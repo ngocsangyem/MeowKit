@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import fs from "node:fs";
+import fs, { chmodSync } from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
 
@@ -159,10 +159,32 @@ function checkHooksExecutable(): DiagResult {
     };
   }
 
+  // Auto-fix: attempt to set executable permissions
+  // Source: claudekit-engineer fix-shebang-permissions.sh
+  // Adapted for MeowKit: integrated into doctor as auto-fix instead of standalone script.
+  let fixed = 0;
+  for (const hook of nonExecutable) {
+    try {
+      chmodSync(path.join(hooksDir, hook), 0o755);
+      fixed++;
+    } catch {
+      // Permission denied — can't auto-fix
+    }
+  }
+
+  if (fixed === nonExecutable.length) {
+    return {
+      name: "Hooks executable",
+      status: "pass",
+      detail: `${hooks.length} hook(s) — auto-fixed ${fixed} permission(s)`,
+    };
+  }
+
+  const stillBroken = nonExecutable.length - fixed;
   return {
     name: "Hooks executable",
     status: "fail",
-    detail: `Not executable: ${nonExecutable.join(", ")}`,
+    detail: `Not executable (${stillBroken} remaining): ${nonExecutable.join(", ")}. Run: chmod +x .claude/hooks/*`,
   };
 }
 
@@ -203,10 +225,53 @@ function checkMemoryWritable(): DiagResult {
   }
 }
 
+function checkScriptsPresent(): DiagResult {
+  const meowkitDir = findMeowkitDir();
+  if (!meowkitDir) {
+    return {
+      name: "Scripts present",
+      status: "warn",
+      detail: "Skipped — no .claude/ found",
+    };
+  }
+
+  const scriptsDir = path.join(meowkitDir, "scripts");
+  if (!fs.existsSync(scriptsDir)) {
+    return {
+      name: "Scripts present",
+      status: "warn",
+      detail: "No scripts/ directory — validation scripts unavailable",
+    };
+  }
+
+  const expectedScripts = ["validate.py", "security-scan.py", "checklist.py", "injection-audit.py"];
+  const missing = expectedScripts.filter(
+    (s) => !fs.existsSync(path.join(scriptsDir, s))
+  );
+
+  if (missing.length === 0) {
+    return {
+      name: "Scripts present",
+      status: "pass",
+      detail: `${expectedScripts.length} validation scripts found`,
+    };
+  }
+
+  return {
+    name: "Scripts present",
+    status: "warn",
+    detail: `Missing: ${missing.join(", ")}`,
+  };
+}
+
 export async function doctor(): Promise<void> {
   console.log(pc.bold(pc.cyan("MeowKit Doctor")));
   console.log(pc.dim("Diagnosing common issues..."));
   console.log();
+
+  // Dependency install step evaluated 260326 — deferred: all deps are SAFE-ASSUME
+  // (Node 20+, Python 3.9+, Git, POSIX shell). No pip/npm runtime deps needed.
+  // All Python scripts use stdlib only. Re-evaluate if future scripts add pip deps.
 
   const results: DiagResult[] = [
     checkNodeVersion(),
@@ -214,6 +279,7 @@ export async function doctor(): Promise<void> {
     checkGit(),
     checkMeowkitDir(),
     checkHooksExecutable(),
+    checkScriptsPresent(),
     checkMemoryWritable(),
   ];
 

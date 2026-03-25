@@ -93,6 +93,21 @@ case "$EXT" in
       run_check "WARN" "CASCADE DELETE detected — review carefully" 'CASCADE' "$FILE"
     )
     ;;
+  sh|bash)
+    # Source: gstack check-careful.sh
+    # Adapted for MeowKit: integrated into post-write hook instead of standalone PreToolUse hook.
+    # Detects destructive shell commands that could cause irreversible damage.
+    OUTPUT=$(
+      run_check "BLOCK" "Destructive rm -rf with root or wildcard" 'rm -rf /\|rm -rf \*\|rm -rf ~' "$FILE"
+      run_check "BLOCK" "DROP TABLE/DATABASE without confirmation" 'DROP TABLE\|DROP DATABASE' "$FILE"
+      run_check "BLOCK" "Force push to remote" 'git push.*--force\|git push.*-f ' "$FILE"
+      run_check "BLOCK" "Hard reset (destroys uncommitted work)" 'git reset --hard' "$FILE"
+      run_check "WARN" "kubectl delete detected — review scope" 'kubectl delete' "$FILE"
+      run_check "WARN" "docker rm/rmi detected — review scope" 'docker rm\|docker rmi' "$FILE"
+      run_check "WARN" "chmod 777 (world-writable)" 'chmod 777' "$FILE"
+      run_check "WARN" "Pipe to sh/bash from network" 'curl.*|.*sh\|curl.*|.*bash\|wget.*|.*sh' "$FILE"
+    )
+    ;;
   *)
     echo "PASS — no security checks for .$EXT files [$FILENAME]"
     exit 0

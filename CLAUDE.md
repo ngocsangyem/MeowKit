@@ -198,7 +198,7 @@ No "skip for speed" exceptions. Security checks run at Phase 2, Phase 4, and via
 ├── hooks/           6 lifecycle hooks (POSIX shell)
 ├── modes/           7 behavioral modes
 ├── memory/          Cross-session persistence + security-log.md
-├── scripts/         5 Python validation scripts (incl. injection-audit.py)
+├── scripts/         6 Python validation scripts (incl. injection-audit.py, validate-docs.py)
 ├── rules/           10 rule files + RULES_INDEX.md (see .claude/rules/RULES_INDEX.md)
 └── CLAUDE.md       This file
 ```
