@@ -11,12 +11,12 @@ Each skill retains its original author credit in its frontmatter.
 | 2 | ship | garrytan (gstack) | [gstack](https://github.com/garrytan/gstack) | MIT | gstack/ship/SKILL.md | 1 |
 | 3 | freeze | garrytan (gstack) | [gstack](https://github.com/garrytan/gstack) | MIT | gstack/freeze/SKILL.md | 1 |
 | 4 | review | garrytan (gstack) | [gstack](https://github.com/garrytan/gstack) | MIT | gstack/review/SKILL.md | 1 |
-| 5 | cook | mrgoonie (claudekit) | [claudekit-engineer](https://claudekit.cc) | Proprietary | claudekit/.claude/skills/cook/SKILL.md | 1 |
+| 5 | cook | mrgoonie (claudekit) | [claudekit-engineer](https://claudekit.cc) | Proprietary | claudekit/.claude/skills/meow:cook/SKILL.md | 1 |
 | 6 | investigate | garrytan (gstack) | [gstack](https://github.com/garrytan/gstack) | MIT | gstack/investigate/SKILL.md | 1 |
 | 7 | clean-code | vudovn (antigravity-kit) | [antigravity-kit](https://github.com/vudovn/antigravity-kit) | MIT | .agent/skills/clean-code/SKILL.md | 1 |
 | 8 | lint-and-validate | vudovn (antigravity-kit) | [antigravity-kit](https://github.com/vudovn/antigravity-kit) | MIT | .agent/skills/lint-and-validate/SKILL.md | 1 |
 | 9 | cso | garrytan (gstack) | [gstack](https://github.com/garrytan/gstack) | MIT | gstack/cso/SKILL.md | 1 |
-| 10 | fix | mrgoonie (claudekit) | [claudekit-engineer](https://claudekit.cc) | Proprietary | claudekit/.claude/skills/fix/SKILL.md | 1 |
+| 10 | fix | mrgoonie (claudekit) | [claudekit-engineer](https://claudekit.cc) | Proprietary | claudekit/.claude/skills/meow:fix/SKILL.md | 1 |
 | 11 | agent-detector | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog) | Unknown | aura-frog/skills/agent-detector/SKILL.md | 2 |
 | 12 | browse | garrytan (gstack) | [gstack](https://github.com/garrytan/gstack) | MIT | gstack/browse/SKILL.md | 2 |
 | 13 | qa | garrytan (gstack) | [gstack](https://github.com/garrytan/gstack) | MIT | gstack/qa/SKILL.md | 2 |

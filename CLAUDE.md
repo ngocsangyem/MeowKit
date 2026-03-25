@@ -223,7 +223,7 @@ All non-trivial tasks require a plan file before implementation. "Non-trivial" m
 
 ### Plan Routing
 
-The `plan-creator` skill (`/.claude/skills/plan-creator/SKILL.md`) auto-selects the right template based on task scope.
+The `plan-creator` skill (`/.claude/skills/meow:plan-creator/SKILL.md`) auto-selects the right template based on task scope.
 
 ### Rules
 
