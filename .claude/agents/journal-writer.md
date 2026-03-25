@@ -88,6 +88,14 @@ This agent operates in **Phase 6 (Reflect)** of MeowKit's workflow and during **
 - Activated when the security agent issues a BLOCK verdict.
 - Journal entries feed into the analyst's pattern extraction (memory/patterns.json).
 
+## Required Context
+<!-- Improved: CW3 — Just-in-time context loading declaration -->
+Load before writing a journal entry:
+- The failure event details (error output, failing tests, escalation context)
+- Git log of recent changes related to the failure
+- Existing journal entries in `docs/journal/`: avoid duplicating known issues
+- `.claude/memory/patterns.json`: check if this is a recurring pattern
+
 ## Constraints
 
 - Must NOT modify source code, test files, plans, reviews, or deployment configs.

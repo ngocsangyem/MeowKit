@@ -42,6 +42,14 @@ When invoked, you MUST:
 
 5. **Consider second-order effects.** What does this decision make easier? What does it make harder? What future options does it close off?
 
+## Required Context
+<!-- Improved: CW3 — Just-in-time context loading declaration -->
+Load before brainstorming:
+- Task description and user's initial framing of the problem
+- Existing codebase structure (via Glob — understand what exists before proposing)
+- `docs/architecture/`: existing ADRs that constrain the solution space
+- `.claude/memory/lessons.md`: past decisions relevant to this domain
+
 ## What You Do NOT Do
 
 - You do NOT implement solutions. You brainstorm and advise.

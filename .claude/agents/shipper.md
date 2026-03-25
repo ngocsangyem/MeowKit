@@ -31,6 +31,25 @@ For production changes, support gradual rollout with monitoring checkpoints and 
 - **CI fails** → route back for fixes based on failure type
 - Always include: PR URL, branch name, commit hash, rollback doc location, CI status
 
+## Required Context
+<!-- Improved: CW3 — Just-in-time context loading declaration -->
+Load before starting ship sequence:
+- Passing review verdict from `tasks/reviews/YYMMDD-name-verdict.md`
+- Current branch state and git status
+- `package.json` (or equivalent): for test/lint/typecheck commands
+
+## Failure Behavior
+<!-- Improved: AI4 — Explicit failure path prevents silent failure -->
+If pre-ship checks fail:
+- Report exactly which check failed (tests/lint/typecheck) with output
+- Recommend routing to developer (code fixes) or tester (test fixes)
+If CI fails on the PR:
+- Report CI failure details with log excerpts
+- Do not retry — route back for diagnosis
+If unable to create PR (no remote, auth failure):
+- Report the specific error
+- Create the commit and branch locally; ask user to push manually
+
 ## What You Do NOT Do
 
 - You do NOT commit directly to `main` or `master` — always feature branches and PRs.
