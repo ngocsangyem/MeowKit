@@ -37,7 +37,7 @@ Skills satisfying all three are in the DANGER ZONE and require Dual LLM architec
 ### Layer 2 — INSTRUCTION ANCHORING
 - **Where:** In CLAUDE.md and skill frontmatter
 - **What:** Explicit statements that core instructions cannot be overridden; security anchor comments in skills; prompt positioning (safety at top AND bottom)
-- **Implemented as:** Security section in `CLAUDE.md` + `.claude/skills/skill-template-secure/SKILL.md`
+- **Implemented as:** Security section in `CLAUDE.md` + `.claude/skills/meow:skill-template-secure/SKILL.md`
 - **Grounded in:** Prompt positioning research, ethical boundary engineering, structured input formats
 
 ### Layer 3 — CONTEXT ISOLATION
@@ -59,7 +59,7 @@ Skills satisfying all three are in the DANGER ZONE and require Dual LLM architec
 | `.claude/rules/injection-rules.md` | L1 | 10 imperative rules: data/instruction boundary, sensitive file protection, exfiltration prevention, escalation protocol |
 | `.claude/hooks/pre-task-check.sh` | L3 | POSIX shell hook scanning task descriptions for 13 BLOCK patterns and 4 WARN patterns before execution |
 | `.claude/scripts/injection-audit.py` | L4 | Python post-task scanner checking for identity override, exfiltration, sensitive data exposure, unexpected commands |
-| `.claude/skills/skill-template-secure/SKILL.md` | L2 | Secure skill template with trust_level/injection_risk frontmatter and security anchor comment |
+| `.claude/skills/meow:skill-template-secure/SKILL.md` | L2 | Secure skill template with trust_level/injection_risk frontmatter and security anchor comment |
 | `CLAUDE.md` (Security section) | L2 | Instruction anchoring statement, layer summary, escalation protocol |
 | `.claude/memory/security-log.md` | L4 | Append-only log for CRITICAL findings from injection-audit.py |
 | `docs/prompt-injection-defense-260326.md` | — | This research report |
