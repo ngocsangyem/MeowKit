@@ -1,0 +1,27 @@
+{
+  "version": "0.1.0",
+  "projectName": "",
+  "stack": [],
+  "teamSize": "solo",
+  "primaryTool": "claude-code",
+  "defaultMode": "balanced",
+  "enableCostTracking": true,
+  "enableMemory": true,
+  "gates": {
+    "gate1": true,
+    "gate2": true,
+    "bypassable": false
+  },
+  "modelRouting": {
+    "trivial": "cheapest",
+    "standard": "default",
+    "complex": "best"
+  },
+  "hooks": {
+    "preImplement": ".claude/hooks/pre-implement.sh",
+    "postWrite": ".claude/hooks/post-write.sh",
+    "preShip": ".claude/hooks/pre-ship.sh",
+    "postSession": ".claude/hooks/post-session.sh",
+    "costMeter": ".claude/hooks/cost-meter.sh"
+  }
+}

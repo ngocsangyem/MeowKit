@@ -1,0 +1,103 @@
+#!/usr/bin/env node
+
+import fs from "node:fs";
+import minimist from "minimist";
+import pc from "picocolors";
+import { upgrade } from "./commands/upgrade.js";
+import { validate } from "./commands/validate.js";
+import { budget } from "./commands/budget.js";
+import { memory } from "./commands/memory.js";
+import { doctor } from "./commands/doctor.js";
+
+const VERSION = "0.1.0";
+
+function printHelp(): void {
+  console.log(`
+${pc.bold(pc.cyan("meowkit"))} ${pc.dim(`v${VERSION}`)} — MeowKit runtime CLI
+
+${pc.bold("Usage:")}
+  meowkit <command> [options]
+
+${pc.bold("Commands:")}
+  ${pc.green("upgrade")}    Upgrade create-meowkit to the latest version
+  ${pc.green("validate")}   Validate .claude/ project structure
+  ${pc.green("budget")}     View token usage and cost log
+  ${pc.green("memory")}     Manage agent memory (lessons & patterns)
+  ${pc.green("doctor")}     Diagnose common environment issues
+  ${pc.green("status")}     Print version and config summary
+
+${pc.bold("Options:")}
+  --help, -h       Show help
+  --version, -v    Show version
+`);
+}
+
+async function printStatus(): Promise<void> {
+  console.log(`${pc.bold(pc.cyan("meowkit"))} ${pc.dim(`v${VERSION}`)}`);
+  console.log();
+
+  const configPath = ".meowkit.config.json";
+  try {
+    const content = fs.readFileSync(configPath, "utf-8");
+    const config: Record<string, unknown> = JSON.parse(content) as Record<string, unknown>;
+    console.log(`${pc.bold("Config:")} ${configPath}`);
+    for (const [key, value] of Object.entries(config)) {
+      console.log(`  ${pc.dim(key)}: ${String(value)}`);
+    }
+  } catch {
+    console.log(`${pc.dim("No .meowkit.config.json found in current directory.")}`);
+  }
+}
+
+async function main(): Promise<void> {
+  const args = minimist(process.argv.slice(2), {
+    boolean: ["help", "version", "check", "beta", "monthly", "clear", "show", "stats"],
+    alias: { h: "help", v: "version" },
+  });
+
+  if (args.version) {
+    console.log(VERSION);
+    return;
+  }
+
+  const command = args._[0] as string | undefined;
+
+  if (args.help && !command) {
+    printHelp();
+    return;
+  }
+
+  switch (command) {
+    case "upgrade":
+      await upgrade({ check: args.check as boolean | undefined, beta: args.beta as boolean | undefined });
+      break;
+    case "validate":
+      await validate();
+      break;
+    case "budget":
+      await budget({ monthly: args.monthly as boolean | undefined });
+      break;
+    case "memory":
+      await memory({ clear: args.clear as boolean | undefined, show: args.show as boolean | undefined, stats: args.stats as boolean | undefined });
+      break;
+    case "doctor":
+      await doctor();
+      break;
+    case "status":
+      await printStatus();
+      break;
+    default:
+      if (command) {
+        console.error(pc.red(`Unknown command: ${command}`));
+        console.log();
+      }
+      printHelp();
+      break;
+  }
+}
+
+main().catch((error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(pc.red(`Fatal: ${message}`));
+  process.exit(1);
+});

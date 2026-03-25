@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Lock files (monorepo uses root lock only)
+packages/*/package-lock.json
+packages/*/pnpm-lock.yaml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Task artifacts (local, not committed)
+tasks/plans/
+tasks/reviews/
