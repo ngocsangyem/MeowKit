@@ -193,14 +193,53 @@ No "skip for speed" exceptions. Security checks run at Phase 2, Phase 4, and via
 ```
 .claude/
 ├── agents/          10 specialist agents
-├── skills/          21 skills across 8 categories (incl. skill-template-secure)
+├── skills/          22 skills across 9 categories (incl. plan-creator, skill-template-secure)
 ├── commands/        18 slash commands across 6 categories
 ├── hooks/           6 lifecycle hooks (POSIX shell)
 ├── modes/           7 behavioral modes
 ├── memory/          Cross-session persistence + security-log.md
 ├── scripts/         5 Python validation scripts (incl. injection-audit.py)
-├── rules/           5 rule files (incl. injection-rules.md)
+├── rules/           10 rule files + RULES_INDEX.md (see .claude/rules/RULES_INDEX.md)
 └── CLAUDE.md       This file
+```
+
+## Planning
+
+All non-trivial tasks require a plan file before implementation. "Non-trivial" means: estimated > 30 minutes OR > 3 files affected.
+
+### Templates
+
+| Template | Use when | Location |
+|----------|----------|----------|
+| `plan-template.md` | Standard features, multi-phase work | `tasks/templates/plan-template.md` |
+| `plan-quick.md` | Small tasks (< 5 files, < 2 hours) | `tasks/templates/plan-quick.md` |
+| `plan-phase.md` | Individual phase in a multi-phase plan | `tasks/templates/plan-phase.md` |
+
+### Plan Routing
+
+The `plan-creator` skill (`/.claude/skills/plan-creator/SKILL.md`) auto-selects the right template based on task scope.
+
+### Rules
+
+1. **Plans before code.** Gate 1 blocks implementation until a plan is approved.
+2. **Context at top, actions at bottom.** Long background goes first; task steps go last.
+3. **Constraints are mandatory.** Every plan MUST list what must NOT change.
+4. **Acceptance criteria are binary.** Pass/fail only — no subjective measures.
+5. **Plans are resumable.** All state lives in the plan file. A fresh session can pick up any plan.
+6. **Plan closure.** When finishing, mark every item Done, Blocked, or Cancelled. No in-progress items left.
+
+### File Locations
+
+```
+tasks/
+├── templates/           Plan templates (do not modify)
+│   ├── plan-template.md
+│   ├── plan-quick.md
+│   └── plan-phase.md
+├── plans/               Active and completed plans
+│   └── YYMMDD-feature-name.md
+└── reviews/             Review verdicts (Phase 4)
+    └── YYMMDD-name-verdict.md
 ```
 
 ## Security — Prompt Injection Defense
