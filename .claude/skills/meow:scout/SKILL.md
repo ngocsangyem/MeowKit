@@ -28,6 +28,7 @@ Fast, parallel codebase exploration using Explore subagents. Divides the project
 ## Workflow Integration
 
 Operates in **Phase 0 (Orient)** and **Phase 1 (Plan)**.
+
 - Orchestrator invokes scout before planner on COMPLEX tasks
 - Planner may invoke scout when the technical approach needs codebase understanding
 - Developer may invoke scout when implementation touches unfamiliar areas
@@ -64,6 +65,7 @@ If SCALE < 2, skip parallel scouting — use a single Explore call instead.
 Split the codebase into SCALE segments. Each segment gets one Explore agent.
 
 **Division rules:**
+
 - Each agent gets distinct directories — no overlap
 - Group related directories together (e.g., `src/auth/` + `src/middleware/` for auth scouting)
 - Tests go to a separate agent from source code
@@ -108,6 +110,7 @@ For each segment, spawn:
 ```
 
 **Important:**
+
 - Each Explore agent has its own context window (~200K tokens)
 - Explore agents are read-only — they cannot modify files
 - Spawn ALL agents in one message, not sequentially
@@ -130,32 +133,39 @@ Output a structured scout report:
 # Scout Report: {SEARCH_TARGET}
 
 ## Summary
+
 {one-sentence overview: N files found across M directories}
 
 ## File Map
 
 ### {Area 1} (N files, ~X lines total)
+
 - `path/file.ext` (lines) — purpose
 - `path/file.ext` (lines) — purpose
 
 ### {Area 2} (N files, ~X lines total)
+
 - `path/file.ext` (lines) — purpose
 
 ## Dependencies
+
 - `file A` → imports → `file B`
 - `file C` → imports → `file D`
 
 ## Complexity Estimate
-| Area | Files | Lines | Complexity |
-|------|-------|-------|-----------|
-| {area} | N | ~X | low/medium/high |
+
+| Area   | Files | Lines | Complexity      |
+| ------ | ----- | ----- | --------------- |
+| {area} | N     | ~X    | low/medium/high |
 
 ## Suggested Routing
+
 - Implementation: developer agent → {files}
 - Tests needed: tester agent → {test files}
 - Architecture review: architect agent → {if new patterns found}
 
 ## Gaps
+
 - {any directories not searched or agents that timed out}
 ```
 
@@ -174,6 +184,7 @@ Never `cat` or `sed` for file reading. The Read tool handles encoding, permissio
 ## Memory Integration
 
 After completing a scout:
+
 - If `.claude/memory/` exists, check for previous scout reports on similar targets
 - Previous reports can accelerate re-scouting (skip unchanged directories)
 - Do NOT write scout reports to memory by default — they are ephemeral task context
