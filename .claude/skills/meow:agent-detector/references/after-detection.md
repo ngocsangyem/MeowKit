@@ -30,6 +30,7 @@ agents[4]{category,count,list}:
 ## Manual Override
 
 User can force specific agent:
+
 ```
 User: "Use only tester for this task"
 -> Override automatic selection
