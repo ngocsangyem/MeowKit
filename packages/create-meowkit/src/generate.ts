@@ -131,6 +131,21 @@ ${body}
 `;
 }
 
+function generateEnvExample(): string {
+  return `# MeowKit Environment Variables
+# Copy to .env and fill in values. Never commit .env to git.
+
+# Gemini API key (required for meow:multimodal skill)
+# Get from: https://aistudio.google.com/apikey
+GEMINI_API_KEY=
+
+# Optional: Override default Gemini models
+# MULTIMODAL_MODEL=gemini-2.5-flash
+# IMAGE_GEN_MODEL=imagen-4.0-generate-001
+# VIDEO_GEN_MODEL=veo-3.1-generate-preview
+`;
+}
+
 function generateMcpExample(): string {
   return `{
   "mcpServers": {
@@ -168,6 +183,26 @@ function buildFileMap(config: UserConfig, targetDir: string): Map<string, { cont
 
   files.set(join(targetDir, ".mcp.json.example"), {
     content: generateMcpExample(),
+    executable: false,
+  });
+
+  // .env.example — always generated with placeholder
+  files.set(join(targetDir, ".env.example"), {
+    content: generateEnvExample(),
+    executable: false,
+  });
+
+  // .env — only if user provided a Gemini API key
+  if (config.geminiApiKey) {
+    files.set(join(targetDir, ".env"), {
+      content: `# MeowKit environment variables\n# WARNING: Never commit this file to git\n\nGEMINI_API_KEY=${config.geminiApiKey}\n`,
+      executable: false,
+    });
+  }
+
+  // .gitignore — ensure .env is excluded
+  files.set(join(targetDir, ".gitignore.meowkit"), {
+    content: `# MeowKit — append to your .gitignore\n.env\n.env.local\n.claude/memory/\n.claude/logs/\n`,
     executable: false,
   });
 

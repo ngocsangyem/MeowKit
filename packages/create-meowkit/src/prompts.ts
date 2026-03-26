@@ -10,6 +10,7 @@ export interface UserConfig {
   defaultMode: "fast" | "balanced" | "strict";
   enableCostTracking: boolean;
   enableMemory: boolean;
+  geminiApiKey: string | null;
 }
 
 function isCancel(value: unknown): value is symbol {
@@ -152,6 +153,32 @@ export async function promptUser(detected: DetectedStack): Promise<UserConfig> {
   });
   handleCancel(enableMemory);
 
+  // Gemini API key (optional — for meow:multimodal skill)
+  const geminiApiKey = await p.text({
+    message: "Gemini API key (optional — for image/video/audio analysis)",
+    placeholder: "Press Enter to skip — add later with GEMINI_API_KEY in .env",
+    validate(value) {
+      if (!value || value.trim().length === 0) {
+        return undefined; // Allow empty (skip)
+      }
+      if (value.trim().length < 10) {
+        return "API key looks too short. Get one at https://aistudio.google.com/apikey";
+      }
+      return undefined;
+    },
+  });
+  handleCancel(geminiApiKey);
+
+  const geminiKey = typeof geminiApiKey === "string" && geminiApiKey.trim().length > 0
+    ? geminiApiKey.trim()
+    : null;
+
+  if (geminiKey) {
+    p.log.success("Gemini API key will be saved to .env");
+  } else {
+    p.log.info("Skipped. Add GEMINI_API_KEY to .env when needed.");
+  }
+
   p.outro(pc.green("Configuration complete!"));
 
   return {
@@ -162,5 +189,6 @@ export async function promptUser(detected: DetectedStack): Promise<UserConfig> {
     defaultMode: defaultMode as "fast" | "balanced" | "strict",
     enableCostTracking: enableCostTracking as boolean,
     enableMemory: enableMemory as boolean,
+    geminiApiKey: geminiKey,
   };
 }
