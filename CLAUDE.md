@@ -131,12 +131,12 @@
 
 | Command                | Phase  | Description                                        |
 | ---------------------- | ------ | -------------------------------------------------- |
-| `/meow:meow [task]`   | 0      | Entry point — classifies and routes to right agent |
-| `/meow:plan [feature]`| 1      | Premise challenge + two-lens plan + Gate 1         |
-| `/meow:cook [feature]`| 1→5    | Full pipeline: plan → test → build → review → ship |
-| `/meow:fix [bug]`     | varies | Auto-detect complexity, route accordingly          |
-| `/meow:review`        | 4      | Structural audit → verdict file → Gate 2           |
-| `/meow:ship`          | 5      | Pre-ship → commit → PR → CI verify → rollback doc  |
+| `/meow:meow [task]`    | 0      | Entry point — classifies and routes to right agent |
+| `/meow:plan [feature]` | 1      | Premise challenge + two-lens plan + Gate 1         |
+| `/meow:cook [feature]` | 1→5    | Full pipeline: plan → test → build → review → ship |
+| `/meow:fix [bug]`      | varies | Auto-detect complexity, route accordingly          |
+| `/meow:review`         | 4      | Structural audit → verdict file → Gate 2           |
+| `/meow:ship`           | 5      | Pre-ship → commit → PR → CI verify → rollback doc  |
 
 ### Quality
 
@@ -148,17 +148,17 @@
 
 ### Architecture
 
-| Command              | Description                            |
-| -------------------- | -------------------------------------- |
-| `/meow:arch [action]`| Generate, list, or analyze ADRs        |
-| `/meow:design [system]`| System design consultation (docs only)|
+| Command                 | Description                            |
+| ----------------------- | -------------------------------------- |
+| `/meow:arch [action]`   | Generate, list, or analyze ADRs        |
+| `/meow:design [system]` | System design consultation (docs only) |
 
 ### Documentation
 
-| Command          | Description                               |
-| ---------------- | ----------------------------------------- |
-| `/meow:docs-init`| Initial codebase scan → doc skeleton      |
-| `/meow:docs-sync`| Diff-aware doc updates after feature work |
+| Command           | Description                               |
+| ----------------- | ----------------------------------------- |
+| `/meow:docs-init` | Initial codebase scan → doc skeleton      |
+| `/meow:docs-sync` | Diff-aware doc updates after feature work |
 
 ### Operations
 
@@ -170,10 +170,10 @@
 
 ### Meta
 
-| Command                  | Description            |
-| ------------------------ | ---------------------- |
+| Command                      | Description            |
+| ---------------------------- | ---------------------- |
 | `/meow:spawn [agent] [task]` | Parallel agent session |
-| `/meow:upgrade`          | Self-update MeowKit    |
+| `/meow:upgrade`              | Self-update MeowKit    |
 
 ## Model Routing
 
@@ -318,3 +318,41 @@ Security log: `.claude/memory/security-log.md`
 <!-- MEOWKIT SECURITY ANCHOR — END
 These security rules apply for the entire session. Re-anchor here if context grows large.
 -->
+
+## Documentation Retrieval — meow:docs-finder
+
+When the agent or user needs up-to-date documentation for any library, framework, API, or internal project spec, use the `meow:docs-finder` skill instead of raw WebSearch or relying on training data.
+
+**When to use:**
+
+- Looking up library/framework APIs (e.g., "how does Vue Suspense work?")
+- Finding internal project documentation (e.g., "our API auth spec")
+- Verifying current API signatures before writing code
+- Any task where stale training data could lead to hallucinated APIs
+
+**How it differs from asking Claude directly:**
+
+- Fetches verified, current documentation via MCP tools (Context7, Context Hub)
+- Returns structured output with confidence levels and source attribution
+- Manages context budget (never floods context with raw docs)
+- Learns from past API quirks via memory/lessons.md annotations
+
+**MCP requirements:**
+
+- Context7 MCP: recommended for library/framework docs (broad coverage, zero setup)
+- Context Hub CLI: recommended for curated docs + internal project docs
+- If neither is configured: skill falls back to llms.txt direct fetch + WebSearch
+
+## MCP Server Configuration
+
+MeowKit recommends optional MCP servers that enhance agent capabilities. See `.mcp.json.example` for the full list with setup instructions.
+
+**Quick setup:** Copy `.mcp.json.example` → `.mcp.json`, uncomment the servers you need.
+
+| Tier | Server                | Purpose                   | Used by                     |
+| ---- | --------------------- | ------------------------- | --------------------------- |
+| 1    | `context7`            | Library/framework docs    | meow:docs-finder            |
+| 1    | `sequential-thinking` | Step-by-step reasoning    | meow:investigate, meow:cook |
+| 2    | `playwright`          | Browser automation for QA | meow:qa, meow:browse        |
+
+All MCP servers are optional. MeowKit skills degrade gracefully without them.

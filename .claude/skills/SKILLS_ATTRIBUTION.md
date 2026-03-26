@@ -29,6 +29,7 @@ Each skill retains its original author credit in its frontmatter.
 | 20 | workflow-orchestrator | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog) | Unknown | aura-frog/skills/workflow-orchestrator/SKILL.md | 2 |
 | 21 | retro | garrytan (gstack) | [gstack](https://github.com/garrytan/gstack) | MIT | gstack/retro/SKILL.md | 2 |
 | 22 | session-continuation | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog) | Unknown | aura-frog/skills/session-continuation/SKILL.md | 2 |
+| 23 | docs-finder | MeowKit (original) | Inspired by claudekit-engineer/docs-seeker | MIT | .claude/skills/docs-finder/ | 1 |
 
 ## Selection Criteria
 
@@ -46,7 +47,8 @@ Full scoring: `docs/skills-evaluation-260325.md`
 | antigravity-kit | 3 | 48 | 6% |
 | aura-frog | 4 | 43 | 9% |
 | claudekit-engineer | 2 | 68 | 3% |
-| **Total** | **22** | **187** | **12%** |
+| MeowKit (original) | 1 | — | — |
+| **Total** | **23** | **187+** | — |
 
 ## Modifications
 
