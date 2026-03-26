@@ -23,6 +23,8 @@
 
 ## Why MeowKit
 
+> Inspired by [gstack](https://github.com/garrytan/gstack), [antigravity-kit](https://github.com/vudovn/antigravity-kit), [aura-frog](https://github.com/nguyenthienthanh/aura-frog), [claudekit-engineer](https://claudekit.cc)
+
 AI coding tools are powerful but undirected. Without structure, they skip tests, ignore security, and ship untested code. MeowKit fixes this by giving your AI agent:
 
 - **Hard gates** that block shipping without a plan and a passing review
@@ -34,7 +36,7 @@ AI coding tools are powerful but undirected. Without structure, they skip tests,
 - **Context-engineered agents** with required context declarations, failure behaviors, and ambiguity resolution
 - **Zero external dependencies** — no third-party services, no API keys, no runtime installs
 
-Built by synthesizing the best patterns from [gstack](https://github.com/garrytan/gstack), [antigravity-kit](https://github.com/vudovn/antigravity-kit), [aura-frog](https://github.com/nguyenthienthanh/aura-frog), and [claudekit-engineer](https://claudekit.cc). All external dependencies have been internalized — MeowKit is fully self-contained. Free and MIT licensed.
+MeowKit is fully self-contained — zero external dependencies, no API keys, no runtime installs. Free and MIT licensed.
 
 ## Quick Start
 
@@ -92,11 +94,11 @@ MeowKit declares complexity before every task:
 
 All non-trivial tasks (> 30 min OR > 3 files) require a plan file before implementation.
 
-| Template           | Use when                         |
-| ------------------ | -------------------------------- |
-| `plan-template.md` | Standard features, multi-phase   |
+| Template           | Use when                        |
+| ------------------ | ------------------------------- |
+| `plan-template.md` | Standard features, multi-phase  |
 | `plan-quick.md`    | Small tasks (< 5 files, < 2 hr) |
-| `plan-phase.md`    | Individual phase of larger plan  |
+| `plan-phase.md`    | Individual phase of larger plan |
 
 The `meow:plan-creator` skill auto-selects the right template based on task scope.
 
@@ -145,8 +147,8 @@ All commands use the `meow:` namespace prefix.
 
 ### Core
 
-| Command                 | Description                                                  |
-| ----------------------- | ------------------------------------------------------------ |
+| Command                | Description                                                  |
+| ---------------------- | ------------------------------------------------------------ |
 | `/meow:meow [task]`    | Entry point — classifies task and routes to the right agent  |
 | `/meow:cook [feature]` | Full pipeline: plan, test, build, review, ship               |
 | `/meow:fix [bug]`      | Auto-detect complexity, route to appropriate fix strategy    |
@@ -159,15 +161,15 @@ All commands use the `meow:` namespace prefix.
 | Command          | Description                                       |
 | ---------------- | ------------------------------------------------- |
 | `/meow:test`     | TDD enforcement — write or run tests              |
-| `/meow:audit`    | Full security scan across all platforms            |
+| `/meow:audit`    | Full security scan across all platforms           |
 | `/meow:validate` | Run deterministic Python checks (outside the LLM) |
 
 ### Architecture
 
-| Command                | Description                                     |
-| ---------------------- | ----------------------------------------------- |
-| `/meow:arch [action]`  | Generate, list, or analyze ADRs                 |
-| `/meow:design [system]`| System design consultation (docs only, no code) |
+| Command                 | Description                                     |
+| ----------------------- | ----------------------------------------------- |
+| `/meow:arch [action]`   | Generate, list, or analyze ADRs                 |
+| `/meow:design [system]` | System design consultation (docs only, no code) |
 
 ### Documentation
 
@@ -178,37 +180,38 @@ All commands use the `meow:` namespace prefix.
 
 ### Operations
 
-| Command                       | Description                              |
-| ----------------------------- | ---------------------------------------- |
-| `/meow:canary`                | Staged deployment with monitoring        |
-| `/meow:retro`                 | Sprint retrospective with trend tracking |
-| `/meow:budget`                | Token cost tracking report               |
-| `/meow:spawn [agent] [task]`  | Launch parallel agent session            |
+| Command                      | Description                              |
+| ---------------------------- | ---------------------------------------- |
+| `/meow:canary`               | Staged deployment with monitoring        |
+| `/meow:retro`                | Sprint retrospective with trend tracking |
+| `/meow:budget`               | Token cost tracking report               |
+| `/meow:spawn [agent] [task]` | Launch parallel agent session            |
 
 ## Agents
 
 MeowKit includes 13 specialist agents, each following the [Claude Code subagent spec](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/sub-agents) with YAML frontmatter, explicit tool lists, and system prompt bodies.
 
 Every agent includes context-engineered sections:
+
 - **Required Context** — what to load before invoking (just-in-time, not upfront)
 - **Failure Behavior** — explicit escalation path when blocked (no silent failures)
 - **Ambiguity Resolution** — protocol for unclear inputs (HIGH-priority agents)
 
-| Agent          | Role                                          | Owns                   | Phase           | Model   |
-| -------------- | --------------------------------------------- | ---------------------- | --------------- | ------- |
-| orchestrator   | Task router, complexity classification        | Routing decisions      | 0 (Orient)      | inherit |
-| planner        | Two-lens planning, Gate 1 enforcement         | `tasks/plans/`         | 1 (Plan)        | inherit |
-| brainstormer   | Solution evaluation, trade-off analysis       | —                      | 1 (Plan)        | inherit |
-| researcher     | Technology research, library evaluation       | —                      | 0, 1, 4         | haiku   |
-| architect      | ADR generation, system design review          | `docs/architecture/`   | 1 (Plan)        | opus    |
-| tester         | TDD red/green/refactor phases                 | Test files             | 2 (Test RED)    | inherit |
-| security       | Security audit, BLOCK verdicts                | Security rules         | 2, 4            | inherit |
-| developer      | Implementation (TDD), self-healing            | `src/`, `lib/`, `app/` | 3 (Build GREEN) | inherit |
-| reviewer       | 5-dimension structural audit, Gate 2          | `tasks/reviews/`       | 4 (Review)      | inherit |
-| shipper        | Ship pipeline, conventional commits, PR       | Release tags, deploy   | 5 (Ship)        | haiku   |
-| documenter     | Living docs, changelogs, API doc sync         | `docs/`                | 6 (Reflect)     | haiku   |
-| analyst        | Cost tracking, pattern extraction, lessons    | `.claude/memory/`      | 0, 6            | haiku   |
-| journal-writer | Failure documentation, root cause analysis    | `docs/journal/`        | 6, escalations  | haiku   |
+| Agent          | Role                                       | Owns                   | Phase           | Model   |
+| -------------- | ------------------------------------------ | ---------------------- | --------------- | ------- |
+| orchestrator   | Task router, complexity classification     | Routing decisions      | 0 (Orient)      | inherit |
+| planner        | Two-lens planning, Gate 1 enforcement      | `tasks/plans/`         | 1 (Plan)        | inherit |
+| brainstormer   | Solution evaluation, trade-off analysis    | —                      | 1 (Plan)        | inherit |
+| researcher     | Technology research, library evaluation    | —                      | 0, 1, 4         | haiku   |
+| architect      | ADR generation, system design review       | `docs/architecture/`   | 1 (Plan)        | opus    |
+| tester         | TDD red/green/refactor phases              | Test files             | 2 (Test RED)    | inherit |
+| security       | Security audit, BLOCK verdicts             | Security rules         | 2, 4            | inherit |
+| developer      | Implementation (TDD), self-healing         | `src/`, `lib/`, `app/` | 3 (Build GREEN) | inherit |
+| reviewer       | 5-dimension structural audit, Gate 2       | `tasks/reviews/`       | 4 (Review)      | inherit |
+| shipper        | Ship pipeline, conventional commits, PR    | Release tags, deploy   | 5 (Ship)        | haiku   |
+| documenter     | Living docs, changelogs, API doc sync      | `docs/`                | 6 (Reflect)     | haiku   |
+| analyst        | Cost tracking, pattern extraction, lessons | `.claude/memory/`      | 0, 6            | haiku   |
+| journal-writer | Failure documentation, root cause analysis | `docs/journal/`        | 6, escalations  | haiku   |
 
 No two agents modify the same file type. Conflicts escalate to human.
 
@@ -222,48 +225,48 @@ MeowKit ships 31 skills:
 
 ### Sourced Skills (22)
 
-Best-in-class skills selected from open-source repos. All external dependencies (gstack binaries, third-party services, user-level paths) have been internalized into MeowKit-native equivalents.
+Skills contributed by the open-source community. All are self-contained with no external dependencies.
 
-| Skill                    | Origin          | What it does                                            | References |
-| ------------------------ | --------------- | ------------------------------------------------------- | ---------- |
-| `meow:careful`           | gstack          | Safety guardrails for destructive commands               | — |
-| `meow:ship`              | gstack          | Full ship pipeline: merge, test, version, PR, verify     | 13 files |
-| `meow:freeze`            | gstack          | Directory-scoped edit restriction                        | — |
-| `meow:review`            | gstack          | Structural PR review + 5-dimension audit                 | 8 files |
-| `meow:investigate`       | gstack          | Root cause debugging — no fix without understanding      | — |
-| `meow:cso`               | gstack          | Security audit (OWASP + STRIDE + supply chain)           | 10 files |
-| `meow:browse`            | gstack          | Headless browser at 100ms/command                        | 7 files |
-| `meow:qa`                | gstack          | Systematic QA with bug fixing                            | 8 files |
-| `meow:office-hours`      | gstack          | Premise-challenging ideation session                     | 10 files |
-| `meow:plan-ceo-review`   | gstack          | Product-lens plan review                                 | 11 files |
-| `meow:plan-eng-review`   | gstack          | Engineering-lens plan review                             | 17 files |
-| `meow:document-release`  | gstack          | Post-ship doc sync                                       | 18 files |
-| `meow:retro`             | gstack          | Sprint retrospective with trend tracking                 | 17 files |
-| `meow:cook`              | claudekit       | Single-command feature pipeline                          | 4 files |
-| `meow:fix`               | claudekit       | Auto-detect bug complexity and route                     | 14 files |
-| `meow:clean-code`        | antigravity-kit | Pragmatic coding standards (SRP, DRY, KISS)              | — |
-| `meow:lint-and-validate` | antigravity-kit | Auto-run linters after every change                      | — |
-| `meow:vulnerability-scanner` | antigravity-kit | OWASP 2025 + threat modeling                         | — |
-| `meow:agent-detector`    | aura-frog       | Auto-route tasks to right agent + model                  | 8 files |
-| `meow:lazy-agent-loader` | aura-frog       | On-demand agent loading for token savings                | — |
-| `meow:workflow-orchestrator` | aura-frog   | 5-phase TDD with token budgets                           | — |
-| `meow:session-continuation`  | aura-frog   | Workflow state persistence across sessions               | — |
+| Skill                        | Credit          | What it does                                         | References |
+| ---------------------------- | --------------- | ---------------------------------------------------- | ---------- |
+| `meow:careful`               | gstack          | Safety guardrails for destructive commands           | —          |
+| `meow:ship`                  | gstack          | Full ship pipeline: merge, test, version, PR, verify | 13 files   |
+| `meow:freeze`                | gstack          | Directory-scoped edit restriction                    | —          |
+| `meow:review`                | gstack          | Structural PR review + 5-dimension audit             | 8 files    |
+| `meow:investigate`           | gstack          | Root cause debugging — no fix without understanding  | —          |
+| `meow:cso`                   | gstack          | Security audit (OWASP + STRIDE + supply chain)       | 10 files   |
+| `meow:browse`                | gstack          | Headless browser at 100ms/command                    | 7 files    |
+| `meow:qa`                    | gstack          | Systematic QA with bug fixing                        | 8 files    |
+| `meow:office-hours`          | gstack          | Premise-challenging ideation session                 | 10 files   |
+| `meow:plan-ceo-review`       | gstack          | Product-lens plan review                             | 11 files   |
+| `meow:plan-eng-review`       | gstack          | Engineering-lens plan review                         | 17 files   |
+| `meow:document-release`      | gstack          | Post-ship doc sync                                   | 18 files   |
+| `meow:retro`                 | gstack          | Sprint retrospective with trend tracking             | 17 files   |
+| `meow:cook`                  | claudekit       | Single-command feature pipeline                      | 4 files    |
+| `meow:fix`                   | claudekit       | Auto-detect bug complexity and route                 | 14 files   |
+| `meow:clean-code`            | antigravity-kit | Pragmatic coding standards (SRP, DRY, KISS)          | —          |
+| `meow:lint-and-validate`     | antigravity-kit | Auto-run linters after every change                  | —          |
+| `meow:vulnerability-scanner` | antigravity-kit | OWASP 2025 + threat modeling                         | —          |
+| `meow:agent-detector`        | aura-frog       | Auto-route tasks to right agent + model              | 8 files    |
+| `meow:lazy-agent-loader`     | aura-frog       | On-demand agent loading for token savings            | —          |
+| `meow:workflow-orchestrator` | aura-frog       | 5-phase TDD with token budgets                       | —          |
+| `meow:session-continuation`  | aura-frog       | Workflow state persistence across sessions           | —          |
 
 ### Original Skills (9)
 
 MeowKit-native skills:
 
-| Skill                        | What it does                                       |
-| ---------------------------- | -------------------------------------------------- |
+| Skill                        | What it does                                        |
+| ---------------------------- | --------------------------------------------------- |
 | `meow:scout`                 | Parallel codebase exploration via Explore subagents |
-| `meow:plan-creator`          | Auto-selects plan template by task scope           |
-| `meow:skill-template-secure` | Secure skill template with injection defense       |
-| `meow:development`           | Code patterns, skill loading, TDD enforcement      |
-| `meow:documentation`         | API sync, changelog gen, living docs               |
-| `meow:memory`                | Cost tracking, pattern extraction, session capture |
-| `meow:planning`              | ADR generation, plan templates, premise challenge  |
-| `meow:shipping`              | Canary deploy, rollback protocol, ship pipeline    |
-| `meow:testing`               | Red-green-refactor, validation scripts, visual QA  |
+| `meow:plan-creator`          | Auto-selects plan template by task scope            |
+| `meow:skill-template-secure` | Secure skill template with injection defense        |
+| `meow:development`           | Code patterns, skill loading, TDD enforcement       |
+| `meow:documentation`         | API sync, changelog gen, living docs                |
+| `meow:memory`                | Cost tracking, pattern extraction, session capture  |
+| `meow:planning`              | ADR generation, plan templates, premise challenge   |
+| `meow:shipping`              | Canary deploy, rollback protocol, ship pipeline     |
+| `meow:testing`               | Red-green-refactor, validation scripts, visual QA   |
 
 Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS_ATTRIBUTION.md)
 
@@ -293,54 +296,54 @@ tasks/templates/     Plan templates (plan-template, plan-quick, plan-phase)
 
 ### Self-Contained Design
 
-MeowKit has **zero external runtime dependencies**. All utilities originally from gstack, claudekit-engineer, and aura-frog have been internalized:
+MeowKit has **zero external runtime dependencies**. All utilities are self-contained:
 
-| Utility | Purpose | Location |
-| ------- | ------- | -------- |
-| `meowkit-slug` | Project slug + branch from git remote | `.claude/scripts/bin/` |
-| `meowkit-config` | Read/write `.meowkit.config.json` | `.claude/scripts/bin/` |
-| `meowkit-repo-mode` | Detect solo vs collaborative from git history | `.claude/scripts/bin/` |
+| Utility              | Purpose                                       | Location               |
+| -------------------- | --------------------------------------------- | ---------------------- |
+| `meowkit-slug`       | Project slug + branch from git remote         | `.claude/scripts/bin/` |
+| `meowkit-config`     | Read/write `.meowkit.config.json`             | `.claude/scripts/bin/` |
+| `meowkit-repo-mode`  | Detect solo vs collaborative from git history | `.claude/scripts/bin/` |
 | `meowkit-diff-scope` | Categorize diff (frontend/backend/tests/docs) | `.claude/scripts/bin/` |
-| `meowkit-review-log` | Log review results to `.claude/memory/` | `.claude/scripts/bin/` |
+| `meowkit-review-log` | Log review results to `.claude/memory/`       | `.claude/scripts/bin/` |
 
-No `~/.gstack/`, no third-party review services, no user-level skill paths, no API keys required.
+No global state directories, no third-party services, no user-level skill paths, no API keys required.
 
 ### Rules
 
-| Rule file                   | Purpose                                               |
-| --------------------------- | ----------------------------------------------------- |
-| `security-rules.md`         | Blocked patterns: secrets, `any`, SQL injection, XSS  |
+| Rule file                   | Purpose                                                  |
+| --------------------------- | -------------------------------------------------------- |
+| `security-rules.md`         | Blocked patterns: secrets, `any`, SQL injection, XSS     |
 | `injection-rules.md`        | 10 prompt injection defense rules (DATA vs INSTRUCTIONS) |
-| `gate-rules.md`             | Gate 1 + Gate 2 hard stops                            |
-| `tdd-rules.md`              | TDD enforcement (7 rules)                             |
-| `naming-rules.md`           | Per-platform naming conventions                       |
-| `development-rules.md`      | File management, code quality, pre-commit, git safety |
-| `orchestration-rules.md`    | Subagent delegation, file ownership                   |
-| `context-ordering-rules.md` | Long content first, context before constraint         |
-| `model-selection-rules.md`  | Task type → model tier routing                        |
-| `output-format-rules.md`    | Response structure: what changed, why, file refs      |
+| `gate-rules.md`             | Gate 1 + Gate 2 hard stops                               |
+| `tdd-rules.md`              | TDD enforcement (7 rules)                                |
+| `naming-rules.md`           | Per-platform naming conventions                          |
+| `development-rules.md`      | File management, code quality, pre-commit, git safety    |
+| `orchestration-rules.md`    | Subagent delegation, file ownership                      |
+| `context-ordering-rules.md` | Long content first, context before constraint            |
+| `model-selection-rules.md`  | Task type → model tier routing                           |
+| `output-format-rules.md`    | Response structure: what changed, why, file refs         |
 
 ### Hooks
 
-| Hook                | When it runs          | What it does                                |
-| ------------------- | --------------------- | ------------------------------------------- |
-| `pre-task-check.sh` | Before any command    | Prompt injection pattern detection (PASS/WARN/BLOCK) |
-| `pre-implement.sh`  | Before implementation | Blocks if no failing test exists (TDD gate) |
-| `post-write.sh`     | After every file write | Security scan + destructive command detection |
-| `pre-ship.sh`       | Before shipping       | Full test + lint + typecheck                |
-| `cost-meter.sh`     | Per task              | Token usage tracking                        |
-| `post-session.sh`   | Session end           | Capture patterns to memory                  |
+| Hook                | When it runs           | What it does                                         |
+| ------------------- | ---------------------- | ---------------------------------------------------- |
+| `pre-task-check.sh` | Before any command     | Prompt injection pattern detection (PASS/WARN/BLOCK) |
+| `pre-implement.sh`  | Before implementation  | Blocks if no failing test exists (TDD gate)          |
+| `post-write.sh`     | After every file write | Security scan + destructive command detection        |
+| `pre-ship.sh`       | Before shipping        | Full test + lint + typecheck                         |
+| `cost-meter.sh`     | Per task               | Token usage tracking                                 |
+| `post-session.sh`   | Session end            | Capture patterns to memory                           |
 
 ### Python Scripts
 
-| Script               | Purpose                                              |
-| -------------------- | ---------------------------------------------------- |
+| Script               | Purpose                                               |
+| -------------------- | ----------------------------------------------------- |
 | `validate.py`        | Comprehensive security scan (NestJS, Vue, Swift, SQL) |
-| `security-scan.py`   | Git-aware focused security scan                      |
-| `checklist.py`       | Pre-ship checklist (tests, security, lint, types)    |
-| `injection-audit.py` | Post-task prompt injection detection                 |
-| `validate-docs.py`   | Documentation accuracy validation                    |
-| `cost-report.py`     | Cost analysis with monthly aggregation               |
+| `security-scan.py`   | Git-aware focused security scan                       |
+| `checklist.py`       | Pre-ship checklist (tests, security, lint, types)     |
+| `injection-audit.py` | Post-task prompt injection detection                  |
+| `validate-docs.py`   | Documentation accuracy validation                     |
+| `cost-report.py`     | Cost analysis with monthly aggregation                |
 
 All scripts: Python 3.9+, stdlib only, zero pip dependencies.
 
@@ -395,3 +398,10 @@ Run `npx meowkit doctor` to verify your environment.
 ## License
 
 MIT
+
+## Draw inspiration and synthesize learning resources.
+
+- [gstack](https://github.com/garrytan/gstack)
+- [antigravity-kit](https://github.com/vudovn/antigravity-kit)
+- [aura-frog](https://github.com/nguyenthienthanh/aura-frog)
+- [claudekit-engineer](https://claudekit.cc)

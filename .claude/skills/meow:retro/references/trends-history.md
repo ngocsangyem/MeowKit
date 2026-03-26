@@ -3,6 +3,7 @@
 ## Step 10: Week-over-Week Trends (if window >= 14d)
 
 If the time window is 14 days or more, split into weekly buckets and show trends:
+
 - Commits per week (total and per-author)
 - LOC per week
 - Test ratio per week
@@ -22,6 +23,7 @@ git log origin/<default> --author="<user_name>" --format="%ad" --date=format:"%Y
 ```
 
 Count backward from today — how many consecutive days have at least one commit? This queries the full history so streaks of any length are reported accurately. Display both:
+
 - "Team shipping streak: 47 consecutive days"
 - "Your shipping streak: 32 consecutive days"
 
@@ -34,6 +36,7 @@ ls -t .context/retros/*.json 2>/dev/null
 ```
 
 **If prior retros exist:** Load the most recent one using the Read tool. Calculate deltas for key metrics and include a **Trends vs Last Retro** section:
+
 ```
                     Last        Now         Delta
 Test ratio:         22%    ->    41%         ^19pp
@@ -55,6 +58,7 @@ mkdir -p .context/retros
 ```
 
 Determine the next sequence number for today (substitute the actual date for `$(date +%Y-%m-%d)`):
+
 ```bash
 # Count existing retros for today to get next sequence number
 today=$(date +%Y-%m-%d)
@@ -64,6 +68,7 @@ next=$((existing + 1))
 ```
 
 Use the Write tool to save the JSON file with this schema:
+
 ```json
 {
   "date": "2026-03-08",
@@ -82,14 +87,19 @@ Use the Write tool to save the JSON file with this schema:
     "deep_sessions": 5,
     "avg_session_minutes": 42,
     "loc_per_session_hour": 350,
-    "feat_pct": 0.40,
-    "fix_pct": 0.30,
+    "feat_pct": 0.4,
+    "fix_pct": 0.3,
     "peak_hour": 22,
     "ai_assisted_commits": 32
   },
   "authors": {
-    "Garry Tan": { "commits": 32, "insertions": 2400, "deletions": 300, "test_ratio": 0.41, "top_area": "browse/" },
-    "Alice": { "commits": 12, "insertions": 800, "deletions": 150, "test_ratio": 0.35, "top_area": "app/services/" }
+    "Alice": {
+      "commits": 12,
+      "insertions": 800,
+      "deletions": 150,
+      "test_ratio": 0.35,
+      "top_area": "app/services/"
+    }
   },
   "version_range": ["1.16.0.0", "1.16.1.0"],
   "streak_days": 47,
@@ -106,6 +116,7 @@ Use the Write tool to save the JSON file with this schema:
 **Note:** Only include the `reviews` field if `.claude/memory/reviews.jsonl` exists and has entries within the time window. Only include the `backlog` field if `TODOS.md` exists. Only include the `test_health` field if test files were found (command 10 returns > 0). If any has no data, omit the field entirely.
 
 Include test health data in the JSON when test files exist:
+
 ```json
   "test_health": {
     "total_test_files": 47,
@@ -116,6 +127,7 @@ Include test health data in the JSON when test files exist:
 ```
 
 Include backlog data in the JSON when TODOS.md exists:
+
 ```json
   "backlog": {
     "total_open": 28,

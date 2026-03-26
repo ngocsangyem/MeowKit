@@ -8,7 +8,6 @@ triggers:
   - "agent:load"
 allowed-tools: Read, Glob
 source: aura-frog
-author: nguyenthienthanh (aura-frog)
 ---
 
 # Lazy Agent Loader
@@ -20,6 +19,7 @@ author: nguyenthienthanh (aura-frog)
 ## Purpose
 
 Reduce token usage by:
+
 1. Loading only agent **summaries** initially (~50 tokens each)
 2. Loading **full definition** only when agent is activated
 3. Caching loaded agents in session state
@@ -53,6 +53,7 @@ agent_index[24]{id,category,specialty,keywords}:
 ## Loading Strategy
 
 ### Initial Load (~1200 tokens)
+
 ```
 1. Load this index file (agent_index)
 2. DO NOT load individual agent files
@@ -60,6 +61,7 @@ agent_index[24]{id,category,specialty,keywords}:
 ```
 
 ### On Agent Selection (~500-2000 tokens per agent)
+
 ```
 1. Agent scores >=80 (PRIMARY) → Load full definition
 2. Agent scores 50-79 (SECONDARY) → Load summary only
@@ -67,6 +69,7 @@ agent_index[24]{id,category,specialty,keywords}:
 ```
 
 ### Full Definition Location
+
 ```
 agents/[agent-id].md
 ```
@@ -76,12 +79,14 @@ agents/[agent-id].md
 ## Loading Commands
 
 ### Load Single Agent
+
 ```bash
 # Load full agent definition
 cat agents/mobile.md
 ```
 
 ### Load Agent Summary
+
 ```toon
 agent_summary{id,role,focus}:
   mobile,Senior React Native Developer,Expo/RN mobile apps with TypeScript
@@ -115,6 +120,7 @@ comparison[4]{scenario,without_lazy,with_lazy,savings}:
 ## Cache Strategy
 
 ### Session Cache
+
 ```
 Loaded agents are cached in conversation context.
 If agent already loaded, skip re-loading.
@@ -122,6 +128,7 @@ Track loaded agents: loaded_agents[]: mobile,tester
 ```
 
 ### Force Reload
+
 ```
 User: "reload agent mobile"
 → Clear cache for agent

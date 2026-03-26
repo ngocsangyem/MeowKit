@@ -15,6 +15,7 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | `context-ordering-rules.md` | Long content first, context before constraint, self-contained docs | New (prompting best practices) | Plans, prompts, handoffs |
 | `model-selection-rules.md` | Task type → model tier routing, security escalation | New (prompting best practices) | Phase 0 (Orient) |
 | `output-format-rules.md` | Response structure: what changed, why, file refs, open questions | New (prompting best practices) | All agent responses |
+| `search-before-building-rules.md` | 3-layer knowledge framework: search before implementing unfamiliar patterns | Adapted from gstack ETHOS.md | Implementation, planning |
 
 ## Loading Priority
 

@@ -17,7 +17,6 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 source: gstack
-author: garrytan (gstack)
 ---
 
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
@@ -39,7 +38,7 @@ Post-ship workflow that ensures every documentation file in the project is accur
 2. **AskUserQuestion format** — Follow structured format for all user questions. See `references/ask-user-question-format.md`
 3. **Completeness principle** — Always recommend the complete option. See `references/completeness-principle.md`
 4. **Repo ownership & search** — Adapt behavior to solo/collaborative mode; search before building. See `references/repo-ownership-and-search.md`
-5. **Contributor mode** — If enabled, file field reports on gstack issues. See `references/contributor-mode.md`
+5. **Contributor mode** — If enabled, file field reports on MeowKit issues. See `references/contributor-mode.md`
 6. **Detect base branch** — Determine PR target branch for all diff commands. See `references/base-branch-detection.md`
 7. **Review automation rules** — What to auto-fix vs ask about vs never do. See `references/automation-rules.md`
 8. **Step 1: Pre-flight & diff analysis** — Gather diff stats, discover doc files, classify changes. See `references/step1-preflight-diff-analysis.md`
@@ -60,7 +59,7 @@ Post-ship workflow that ensures every documentation file in the project is accur
 - `references/ask-user-question-format.md` — Structured format for AskUserQuestion calls
 - `references/completeness-principle.md` — Boil the Lake: always recommend the complete option
 - `references/repo-ownership-and-search.md` — Solo vs collaborative mode; search-before-build philosophy
-- `references/contributor-mode.md` — Field report filing for gstack contributors
+- `references/contributor-mode.md` — Field report filing for MeowKit contributors
 - `references/completion-and-telemetry.md` — Status protocol, escalation, telemetry logging, plan footer
 - `references/base-branch-detection.md` — How to detect the PR target branch
 - `references/automation-rules.md` — What to auto-fix, what to ask about, what to never do

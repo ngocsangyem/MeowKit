@@ -19,7 +19,6 @@ allowed-tools:
   - Bash
   - WebSearch
 source: gstack
-author: garrytan (gstack)
 ---
 
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
@@ -56,22 +55,22 @@ If running low on context or the user asks to compress: Step 0 > Test diagram > 
 
 ## References
 
-| File | Content |
-|------|---------|
-| [preamble.md](references/preamble.md) | Session init, upgrade check, lake intro, telemetry prompt |
-| [askuserquestion-format.md](references/askuserquestion-format.md) | Standard AskUserQuestion structure (re-ground, simplify, recommend, options) |
-| [completeness-principle.md](references/completeness-principle.md) | Boil the Lake — always recommend complete over shortcut |
-| [repo-ownership.md](references/repo-ownership.md) | Solo vs collaborative repo mode, see-something-say-something |
-| [search-before-building.md](references/search-before-building.md) | Three layers of knowledge, eureka moments |
-| [contributor-mode.md](references/contributor-mode.md) | Field report filing for gstack contributors |
-| [completion-status.md](references/completion-status.md) | DONE/BLOCKED/NEEDS_CONTEXT protocol and escalation |
-| [telemetry.md](references/telemetry.md) | End-of-skill telemetry logging |
-| [plan-status-footer.md](references/plan-status-footer.md) | MEOWKIT REVIEW REPORT section for plan files |
-| [engineering-preferences.md](references/engineering-preferences.md) | DRY, testing, diagrams, 15 cognitive patterns |
-| [design-doc-check.md](references/design-doc-check.md) | Design doc lookup and /meow:office-hours prerequisite offer |
-| [step0-scope-challenge.md](references/step0-scope-challenge.md) | Scope challenge: complexity, search, TODOs, distribution |
-| [review-sections.md](references/review-sections.md) | Architecture, code quality, test (with coverage diagram), performance |
-| [outside-voice.md](references/outside-voice.md) | Independent plan challenge via Codex or Claude subagent |
-| [question-rules.md](references/question-rules.md) | How to ask questions in plan reviews |
-| [required-outputs.md](references/required-outputs.md) | NOT in scope, What exists, TODOs, failure modes, summary |
-| [review-log-dashboard.md](references/review-log-dashboard.md) | Review log, readiness dashboard, plan file report, chaining |
+| File                                                                | Content                                                                      |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [preamble.md](references/preamble.md)                               | Session init, upgrade check, lake intro, telemetry prompt                    |
+| [askuserquestion-format.md](references/askuserquestion-format.md)   | Standard AskUserQuestion structure (re-ground, simplify, recommend, options) |
+| [completeness-principle.md](references/completeness-principle.md)   | Boil the Lake — always recommend complete over shortcut                      |
+| [repo-ownership.md](references/repo-ownership.md)                   | Solo vs collaborative repo mode, see-something-say-something                 |
+| [search-before-building.md](references/search-before-building.md)   | Three layers of knowledge, eureka moments                                    |
+| [contributor-mode.md](references/contributor-mode.md)               | Field report filing for MeowKit contributors                                 |
+| [completion-status.md](references/completion-status.md)             | DONE/BLOCKED/NEEDS_CONTEXT protocol and escalation                           |
+| [telemetry.md](references/telemetry.md)                             | End-of-skill telemetry logging                                               |
+| [plan-status-footer.md](references/plan-status-footer.md)           | MEOWKIT REVIEW REPORT section for plan files                                 |
+| [engineering-preferences.md](references/engineering-preferences.md) | DRY, testing, diagrams, 15 cognitive patterns                                |
+| [design-doc-check.md](references/design-doc-check.md)               | Design doc lookup and /meow:office-hours prerequisite offer                  |
+| [step0-scope-challenge.md](references/step0-scope-challenge.md)     | Scope challenge: complexity, search, TODOs, distribution                     |
+| [review-sections.md](references/review-sections.md)                 | Architecture, code quality, test (with coverage diagram), performance        |
+| [outside-voice.md](references/outside-voice.md)                     | Independent plan challenge via Codex or Claude subagent                      |
+| [question-rules.md](references/question-rules.md)                   | How to ask questions in plan reviews                                         |
+| [required-outputs.md](references/required-outputs.md)               | NOT in scope, What exists, TODOs, failure modes, summary                     |
+| [review-log-dashboard.md](references/review-log-dashboard.md)       | Review log, readiness dashboard, plan file report, chaining                  |

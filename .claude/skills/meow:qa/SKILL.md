@@ -21,7 +21,6 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: gstack
-author: garrytan (gstack)
 ---
 
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->

@@ -126,7 +126,7 @@ frontend:
 
 **Single Agent Banner:**
 ```
-⚡ AURA FROG ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ MEOWKIT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -134,7 +134,7 @@ frontend:
 
 **Multi-Agent Banner (when collaboration needed):**
 ```
-⚡ AURA FROG ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ MEOWKIT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agents: [primary] + [secondary], [tertiary]            ┃
 ┃ Phase: [phase] - [name] │ [aura-message]            ┃
 ┃ Model: [model]                                         ┃

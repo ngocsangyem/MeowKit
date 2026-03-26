@@ -11,10 +11,9 @@ allowed-tools: NONE
 # TOKEN OPTIMIZATION: Disabled file scanning tools. Detection uses in-memory patterns only.
 # This saves ~10-30k tokens per message. If file scanning needed, use project-context-loader explicitly.
 source: aura-frog
-author: nguyenthienthanh (aura-frog)
 ---
 
-# Aura Frog Agent Detector
+# MeowKit Agent Detector
 
 **Priority:** HIGHEST - Runs FIRST for every message. Automatically detects the correct agent, task complexity level, and model tier for each user message using a multi-layer scoring system. No manual agent selection needed -- the detector analyzes task content, explicit technology mentions, user intent, project context, and file patterns to route to the right agent with the right model.
 

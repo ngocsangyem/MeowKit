@@ -37,7 +37,7 @@ For each finding:
 5. **Audit exposure window** — when committed? When removed? Was repo public?
 6. **Check for abuse** — review provider's audit logs
 
-**Trend Tracking:** If prior reports exist in `.gstack/security-reports/`:
+**Trend Tracking:** If prior reports exist in `.claude/memory/security-reports/`:
 ```
 SECURITY POSTURE TREND
 ══════════════════════
@@ -65,10 +65,10 @@ Match findings across reports using the `fingerprint` field (sha256 of category 
 # Phase 14: Save Report
 
 ```bash
-mkdir -p .gstack/security-reports
+mkdir -p .claude/memory/security-reports
 ```
 
-Write findings to `.gstack/security-reports/{date}-{HHMMSS}.json` using this schema:
+Write findings to `.claude/memory/security-reports/{date}-{HHMMSS}.json` using this schema:
 
 ```json
 {
@@ -121,7 +121,7 @@ Write findings to `.gstack/security-reports/{date}-{HHMMSS}.json` using this sch
 }
 ```
 
-If `.gstack/` is not in `.gitignore`, note it in findings — security reports should stay local.
+If `.claude/memory/` is not in `.gitignore`, note it in findings — security reports should stay local.
 
 ## Important Rules
 

@@ -1,8 +1,29 @@
 # MeowKit — AI Agent Workflow System
 
-> Synthesized from: gstack (lifecycle gears), aura-frog (TDD + learning),
-> claudekit-engineer (UX pipelines), antigravity-kit (validation scripts).
 > Free. MIT licensed. No paywall.
+
+## MeowKit Philosophy
+
+**Thesis:** AI agents need enforced discipline — hard gates, TDD, security scanning, and human approval — to ship production-quality code. Without structure, agents skip tests, ignore security, and ship untested code.
+
+**Design decisions and why they were made:**
+
+1. **Two hard gates, no auto-approval.** MeowKit requires explicit human approval at Gate 1 (plan) and Gate 2 (review) because the cost of a bad ship is higher than the cost of a 30-second approval. No `--skip-gates` flag exists by design.
+
+2. **Zero external dependencies.** MeowKit uses only stdlib Python, POSIX shell, and Node.js — tools every developer already has. This makes MeowKit portable, container-friendly, and eliminable as a failure source. No API keys, no compiled binaries, no global state directories.
+
+3. **Exclusive file ownership.** Each MeowKit agent owns specific file types — developer owns src/, tester owns tests, reviewer owns reviews. No two agents modify the same files. This eliminates merge conflicts and unclear responsibility.
+
+4. **Security as architecture.** MeowKit's 4-layer defense (input boundary, instruction anchoring, context isolation, output validation) runs on every task. Security rules are non-negotiable and cannot be overridden by mode selection, time pressure, or agent self-reasoning.
+
+5. **Context-engineered agents.** Every MeowKit agent declares what context it needs (Required Context), what to do when blocked (Failure Behavior), and how to handle ambiguity (Ambiguity Resolution). These patterns come from Anthropic's context engineering research and prevent the "agent silently fails" anti-pattern.
+
+**What MeowKit explicitly does NOT do (and why):**
+
+- **No proprietary formats.** MeowKit uses standard Markdown with a references/ pattern for context efficiency. Standard tools can read and edit every file.
+- **No telemetry or analytics syncing.** All data stays project-local in .claude/memory/. Cost tracking is via the analyst agent, not automated telemetry.
+- **No experimental features shipped.** MeowKit does not ship features that aren't production-ready. Experimental ideas go in the backlog, not the codebase.
+- **No external service dependencies.** Everything runs locally with tools the developer already has.
 
 ## Core Principles
 

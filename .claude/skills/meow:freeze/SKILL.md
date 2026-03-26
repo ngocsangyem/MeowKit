@@ -24,7 +24,6 @@ hooks:
           command: "bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh"
           statusMessage: "Checking freeze boundary..."
 source: gstack
-author: garrytan (gstack)
 ---
 
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
@@ -50,15 +49,17 @@ Ask the user which directory to restrict edits to. Use AskUserQuestion:
 Once the user provides a directory path:
 
 1. Resolve it to an absolute path:
+
 ```bash
 FREEZE_DIR=$(cd "<user-provided-path>" 2>/dev/null && pwd)
 echo "$FREEZE_DIR"
 ```
 
 2. Ensure trailing slash and save to the freeze state file:
+
 ```bash
 FREEZE_DIR="${FREEZE_DIR%/}/"
-STATE_DIR="${CLAUDE_PLUGIN_DATA:-$HOME/.gstack}"
+STATE_DIR="${CLAUDE_PLUGIN_DATA:-.claude/memory}"
 mkdir -p "$STATE_DIR"
 echo "$FREEZE_DIR" > "$STATE_DIR/freeze-dir.txt"
 echo "Freeze boundary set: $FREEZE_DIR"

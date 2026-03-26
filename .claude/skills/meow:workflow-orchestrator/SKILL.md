@@ -15,10 +15,9 @@ triggers:
   - "execute from specs"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 source: aura-frog
-author: nguyenthienthanh (aura-frog)
 ---
 
-# Aura Frog Workflow Orchestrator
+# MeowKit Workflow Orchestrator
 
 **Priority:** CRITICAL - Use for complex feature implementations
 
@@ -27,6 +26,7 @@ author: nguyenthienthanh (aura-frog)
 ## When to Use
 
 **USE for:**
+
 - New features
 - Complex implementations
 - Tasks > 2 hours
@@ -34,6 +34,7 @@ author: nguyenthienthanh (aura-frog)
 - Tasks requiring TDD workflow
 
 **DON'T use for:**
+
 - Bug fixes → use `bugfix-quick`
 - Quick refactors → direct edit
 - Config changes → direct edit
@@ -71,6 +72,7 @@ token_budget[5]{phase,max_tokens,format}:
 ### Collaborative Planning (Deep Tasks Only)
 
 For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
+
 - 3 agents (Builder, Breaker, User) analyze independently
 - Cross-review and debate each other's proposals
 - Simulate use cases to find gaps
@@ -80,18 +82,19 @@ For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
 
 **Gate:** Only for Deep tasks. Quick/Standard use single-agent Phase 1.
 
-| Phase | Name | Lead Agent | Deliverable | Gate |
-|-------|------|------------|-------------|------|
-| 1 | Understand + Design | lead → Dev | Requirements (TOON), technical design | **APPROVAL** |
-| 2 | Test (RED) | tester + Dev | Failing tests (TDD RED) | Auto |
-| 3 | Build (GREEN) | Dev agent | Implementation (TDD GREEN) | **APPROVAL** |
-| 4 | Refactor + Review | Dev + security | Clean code, quality/security check | Auto* |
-| 5 | Finalize | tester + PM | Coverage >=80%, docs, notification | Auto |
+| Phase | Name                | Lead Agent     | Deliverable                           | Gate         |
+| ----- | ------------------- | -------------- | ------------------------------------- | ------------ |
+| 1     | Understand + Design | lead → Dev     | Requirements (TOON), technical design | **APPROVAL** |
+| 2     | Test (RED)          | tester + Dev   | Failing tests (TDD RED)               | Auto         |
+| 3     | Build (GREEN)       | Dev agent      | Implementation (TDD GREEN)            | **APPROVAL** |
+| 4     | Refactor + Review   | Dev + security | Clean code, quality/security check    | Auto\*       |
+| 5     | Finalize            | tester + PM    | Coverage >=80%, docs, notification    | Auto         |
 
 **Gate Legend:**
+
 - **APPROVAL** = Must wait for user approval before continuing
 - Auto = Auto-continue after showing deliverables
-- Auto* = Auto-continue unless critical issues found
+- Auto\* = Auto-continue unless critical issues found
 
 ---
 
@@ -155,6 +158,7 @@ After approval:
 ---
 
 Options:
+
 - `approve` / `yes` → Continue
 - `reject: <reason>` → Brainstorm & re-do
 - `modify: <changes>` → Adjust deliverables
@@ -165,12 +169,12 @@ See: `rules/workflow/workflow-navigation.md` for full navigation format.
 
 ### Valid Responses
 
-| Response | Action |
-|----------|--------|
-| `approve` / `yes` | Continue to next phase |
-| `reject: <reason>` | **Brainstorm first**, then restart phase |
-| `modify: <changes>` | **Light brainstorm**, then adjust |
-| `stop` / `cancel` | End workflow, save state |
+| Response            | Action                                   |
+| ------------------- | ---------------------------------------- |
+| `approve` / `yes`   | Continue to next phase                   |
+| `reject: <reason>`  | **Brainstorm first**, then restart phase |
+| `modify: <changes>` | **Light brainstorm**, then adjust        |
+| `stop` / `cancel`   | End workflow, save state                 |
 
 ### Feedback Handling
 
@@ -184,6 +188,7 @@ See: `rules/workflow/feedback-brainstorming.md`
 ## AUTO-CONTINUE Behavior
 
 ### Flow Overview
+
 ```
 START → Phase 1 APPROVAL
       → Phase 2 (auto) → Phase 3 APPROVAL
@@ -191,12 +196,14 @@ START → Phase 1 APPROVAL
 ```
 
 **Auto-Stop Triggers:**
+
 - Phase 2: Tests pass when they should fail
 - Phase 4: Tests fail after refactor, or critical security issues
 - Phase 5: Coverage below 80%
 - Any phase: Token limit reached
 
 **Token Awareness:**
+
 - At 75% (150K tokens): Warn user
 - At 85% (170K tokens): Suggest `workflow:handoff`
 - At 90% (180K tokens): Force handoff
@@ -230,20 +237,22 @@ Phase 4 (REFACTOR):
 
 ### Cross-Review
 
-| Phase | Creator | Reviewers |
-|-------|---------|-----------|
-| 1 (Understand + Design) | PM → Dev | Secondary Dev + QA |
-| 4 (Refactor + Review) | Dev + Security | All |
+| Phase                   | Creator        | Reviewers          |
+| ----------------------- | -------------- | ------------------ |
+| 1 (Understand + Design) | PM → Dev       | Secondary Dev + QA |
+| 4 (Refactor + Review)   | Dev + Security | All                |
 
 ---
 
 ## Phase Skip Rules
 
 ### Automatic Skips
+
 - **Phase 5 notification:** Skip Slack if no integration configured
 - **Phase 5 docs:** Skip if no documentation changes needed
 
 ### User-Requested Skips
+
 User can request skip with reason. Log skip reason and proceed.
 
 ---
@@ -253,6 +262,7 @@ User can request skip with reason. Log skip reason and proceed.
 **TOKEN OPTIMIZATION:** Load only when entering that phase.
 
 ### Phase Guides (Load ONE at a time)
+
 ```toon
 phase_files[5]{phase,file,load_when}:
   1,docs/phases/PHASE_1_UNDERSTAND_DESIGN.MD,Entering Phase 1
@@ -263,12 +273,15 @@ phase_files[5]{phase,file,load_when}:
 ```
 
 ### Project Context (Load ONCE at workflow start)
+
 ```
 .claude/project-contexts/[project]/project-config.yaml
 ```
+
 **Skip:** conventions.md and rules.md unless explicitly needed.
 
 ### Rules (Load only if referenced)
+
 ```toon
 rules[4]{rule,load_when}:
   tdd-workflow.md,Phase 2-4 only
@@ -282,6 +295,7 @@ rules[4]{rule,load_when}:
 ## State Management
 
 ### Save State
+
 ```
 workflow:handoff
 → Saves to .claude/logs/workflows/[workflow-id]/
@@ -289,6 +303,7 @@ workflow:handoff
 ```
 
 ### Resume State
+
 ```
 workflow:resume <workflow-id>
 → Loads saved state
@@ -297,6 +312,7 @@ workflow:resume <workflow-id>
 ```
 
 ### Workflow Status
+
 ```
 workflow:status
 → Shows: current phase, completed phases, pending tasks
@@ -380,13 +396,13 @@ Phase 2 → Phase 3 → Phase 4 → Phase 5
 
 ### Stop Conditions
 
-| Condition | Phase | Action |
-|-----------|-------|--------|
-| Tests pass in RED | 2 | Stop — specs may be incomplete |
-| Tests fail after 3 attempts | 3 | Stop — ask user for clarification |
-| Critical security issue | 4 | Stop — fix before proceeding |
-| Coverage below 80% | 5 | Add tests, retry twice, then ask |
-| Token limit warning | Any | Save state and handoff |
+| Condition                   | Phase | Action                            |
+| --------------------------- | ----- | --------------------------------- |
+| Tests pass in RED           | 2     | Stop — specs may be incomplete    |
+| Tests fail after 3 attempts | 3     | Stop — ask user for clarification |
+| Critical security issue     | 4     | Stop — fix before proceeding      |
+| Coverage below 80%          | 5     | Add tests, retry twice, then ask  |
+| Token limit warning         | Any   | Save state and handoff            |
 
 ### Switching Modes
 
@@ -428,6 +444,7 @@ phase_teams[5]{phase,lead,teammates,team_size}:
 ### Team vs Subagent Fallback
 
 If Agent Teams not enabled OR complexity not Deep + multi-domain:
+
 - Sequential execution (standard subagent behavior)
 - Single context window, hub-spoke communication
 - No additional token overhead
@@ -437,6 +454,7 @@ If Agent Teams not enabled OR complexity not Deep + multi-domain:
 ---
 
 **Remember:**
+
 - Follow phases in order
 - Only 2 approval gates: Phase 1 (Design) and Phase 3 (Build)
 - Auto-continue through other phases unless blocker hit

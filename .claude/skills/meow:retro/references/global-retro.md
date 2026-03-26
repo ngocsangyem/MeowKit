@@ -130,7 +130,7 @@ align cleanly. Never truncate project names.
 |  . [1-line description of second theme]
 |  . [1-line description of third theme]
 |
-|  Powered by gstack . github.com/garrytan/gstack
+|  Powered by MeowKit
 +===================================================================
 ```
 
@@ -258,8 +258,8 @@ Use the Write tool to save JSON to `.claude/memory/retros/global-${today}-${next
   "window": "7d",
   "projects": [
     {
-      "name": "gstack",
-      "remote": "https://github.com/garrytan/gstack",
+      "name": "meowkit",
+      "remote": "https://github.com/meowkit/meowkit",
       "commits": 47,
       "insertions": 3200,
       "deletions": 800,
@@ -276,6 +276,6 @@ Use the Write tool to save JSON to `.claude/memory/retros/global-${today}-${next
     "global_streak_days": 52,
     "avg_context_switches_per_day": 2.1
   },
-  "tweetable": "Week of Mar 14: 5 projects, 182 commits, 15.3k LOC | CC: 48, Codex: 8, Gemini: 3 | Focus: gstack (58%) | Streak: 52d"
+  "tweetable": "Week of Mar 14: 5 projects, 182 commits, 15.3k LOC | CC: 48, Codex: 8, Gemini: 3 | Focus: meowkit (58%) | Streak: 52d"
 }
 ```

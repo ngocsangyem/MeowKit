@@ -27,8 +27,8 @@ branch name wherever the instructions say "the base branch."
 |-----------|---------|-----------------:|
 | Target URL | (auto-detect or required) | `https://myapp.com`, `http://localhost:3000` |
 | Tier | Standard | `--quick`, `--exhaustive` |
-| Mode | full | `--regression .gstack/qa-reports/baseline.json` |
-| Output dir | `.gstack/qa-reports/` | `Output to /tmp/qa` |
+| Mode | full | `--regression .claude/memory/qa-reports/baseline.json` |
+| Output dir | `.claude/memory/qa-reports/` | `Output to /tmp/qa` |
 | Scope | Full app (or diff-scoped) | `Focus on the billing page` |
 | Auth | None | `Sign in to user@example.com`, `Import cookies from cookies.json` |
 
@@ -72,7 +72,7 @@ fi
 ```
 
 If `NEEDS_SETUP`:
-1. Tell the user: "gstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
+1. Tell the user: "MeowKit browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
 2. Run: `cd <SKILL_DIR> && ./setup`
 3. If `bun` is not installed: `curl -fsSL https://bun.sh/install | bash`
 
@@ -232,7 +232,7 @@ Only commit if there are changes. Stage all bootstrap files (config, test direct
 ## Create Output Directories
 
 ```bash
-mkdir -p .gstack/qa-reports/screenshots
+mkdir -p .claude/memory/qa-reports/screenshots
 ```
 
 ## Test Plan Context

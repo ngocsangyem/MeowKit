@@ -12,7 +12,6 @@ tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 model: inherit
 memory: project
 # Source: claudekit-engineer
-# Original: .claude/agents/brainstormer.md
 # Adapted for MeowKit:
 #   - Reformatted frontmatter to sub-agents.md spec (name, description, tools, model, memory)
 #   - Removed TaskCreate/TaskGet/TaskUpdate/TaskList/SendMessage (not standard Claude Code tools for subagents — subagents cannot spawn other subagents)
@@ -43,8 +42,11 @@ When invoked, you MUST:
 5. **Consider second-order effects.** What does this decision make easier? What does it make harder? What future options does it close off?
 
 ## Required Context
+
 <!-- Improved: CW3 — Just-in-time context loading declaration -->
+
 Load before brainstorming:
+
 - Task description and user's initial framing of the problem
 - Existing codebase structure (via Glob — understand what exists before proposing)
 - `docs/architecture/`: existing ADRs that constrain the solution space
@@ -70,6 +72,7 @@ Structure your response as:
 ## Workflow Integration
 
 This agent operates in **Phase 1 (Plan)** of MeowKit's workflow.
+
 - Activated when the orchestrator routes a task that involves significant technical decisions.
 - Works alongside the planner agent — brainstormer evaluates approaches, planner produces the plan file.
 - Does NOT produce plan files (owned by planner) or ADRs (owned by architect).

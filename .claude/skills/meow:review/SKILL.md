@@ -18,7 +18,6 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: gstack
-author: garrytan (gstack)
 ---
 
 # Pre-Landing PR Review
@@ -65,18 +64,18 @@ Analyze the current branch's diff against the base branch for structural issues 
 
 ## References
 
-| File | Contents |
-|------|----------|
-| [references/preamble.md](references/preamble.md) | Session setup, upgrade check, telemetry, AskUserQuestion format, completeness principle, repo ownership mode, search-before-building, contributor mode, completion status, plan status footer |
-| [references/scope-drift-detection.md](references/scope-drift-detection.md) | Plan file discovery, actionable item extraction, cross-reference against diff, scope creep and missing requirements detection |
-| [references/two-pass-review.md](references/two-pass-review.md) | Two-pass checklist application (critical then informational), enum completeness, search-before-recommending |
-| [references/design-review.md](references/design-review.md) | Frontend-conditional design review, design checklist application, Codex design voice |
-| [references/test-coverage.md](references/test-coverage.md) | Test framework detection, codepath tracing, user flow mapping, coverage diagram, E2E/eval decision matrix, regression rule, gap test generation |
-| [references/fix-first-review.md](references/fix-first-review.md) | Finding classification (AUTO-FIX vs ASK), batch user questions, verification of claims, external PR comment resolution |
-| [references/adversarial-review.md](references/adversarial-review.md) | Auto-scaled adversarial review (small/medium/large tiers), Codex and Claude subagent passes, cross-model synthesis |
-| [references/post-review-steps.md](references/post-review-steps.md) | TODOS cross-reference, documentation staleness check, persist eng review result, important rules |
-| [checklist.md](checklist.md) | Review checklist (read in Step 2) |
-| [design-checklist.md](design-checklist.md) | Design review checklist (read in Step 4.5) |
-| — | *(Greptile integration removed — MeowKit uses its own reviewer agent)* |
-| [security-checklist.md](security-checklist.md) | Security review checklist |
-| [structural-audit.md](structural-audit.md) | Structural audit reference |
+| File                                                                       | Contents                                                                                                                                                                                      |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [references/preamble.md](references/preamble.md)                           | Session setup, upgrade check, telemetry, AskUserQuestion format, completeness principle, repo ownership mode, search-before-building, contributor mode, completion status, plan status footer |
+| [references/scope-drift-detection.md](references/scope-drift-detection.md) | Plan file discovery, actionable item extraction, cross-reference against diff, scope creep and missing requirements detection                                                                 |
+| [references/two-pass-review.md](references/two-pass-review.md)             | Two-pass checklist application (critical then informational), enum completeness, search-before-recommending                                                                                   |
+| [references/design-review.md](references/design-review.md)                 | Frontend-conditional design review, design checklist application, Codex design voice                                                                                                          |
+| [references/test-coverage.md](references/test-coverage.md)                 | Test framework detection, codepath tracing, user flow mapping, coverage diagram, E2E/eval decision matrix, regression rule, gap test generation                                               |
+| [references/fix-first-review.md](references/fix-first-review.md)           | Finding classification (AUTO-FIX vs ASK), batch user questions, verification of claims, external PR comment resolution                                                                        |
+| [references/adversarial-review.md](references/adversarial-review.md)       | Auto-scaled adversarial review (small/medium/large tiers), Codex and Claude subagent passes, cross-model synthesis                                                                            |
+| [references/post-review-steps.md](references/post-review-steps.md)         | TODOS cross-reference, documentation staleness check, persist eng review result, important rules                                                                                              |
+| [checklist.md](checklist.md)                                               | Review checklist (read in Step 2)                                                                                                                                                             |
+| [design-checklist.md](design-checklist.md)                                 | Design review checklist (read in Step 4.5)                                                                                                                                                    |
+| —                                                                          | _(Greptile integration removed — MeowKit uses its own reviewer agent)_                                                                                                                        |
+| [security-checklist.md](security-checklist.md)                             | Security review checklist                                                                                                                                                                     |
+| [structural-audit.md](structural-audit.md)                                 | Structural audit reference                                                                                                                                                                    |

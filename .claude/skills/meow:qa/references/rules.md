@@ -26,7 +26,7 @@
 ## Output Structure
 
 ```
-.gstack/qa-reports/
+.claude/memory/qa-reports/
 ├── qa-report-{domain}-{YYYY-MM-DD}.md    # Structured report
 ├── screenshots/
 │   ├── initial.png                        # Landing page annotated screenshot

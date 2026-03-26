@@ -3,7 +3,6 @@ source: new
 original_file: n/a
 adapted: no
 adaptation_notes: >
-  New rule based on claude-prompting-best-practices.md finding:
   "Queries at the end can improve response quality by up to 30% in tests,
   especially with complex, multi-document inputs."
   Also draws from prompt-crafting-for-different-models.md:
@@ -25,6 +24,7 @@ by up to 30%, especially with complex, multi-document inputs.
 Source: claude-prompting-best-practices.md — "Long context prompting"
 
 ### Structure pattern
+
 ```
 1. Background / existing code / reference docs     ← TOP (long)
 2. Context: what exists now, what the problem is    ← MIDDLE
@@ -40,6 +40,7 @@ WHY: Agents follow rules more reliably when they understand the reason.
 Source: prompt-crafting-for-different-models.md — "Provide context before instructions"
 
 ### Pattern
+
 ```
 BAD:  "NEVER use any type"
 GOOD: "TypeScript's any defeats type safety and hides bugs.
@@ -56,6 +57,7 @@ WHY: Context windows reset. Agent sessions end. Plans must survive both.
 Source: codex-prompt-guide.md — autonomy and persistence principles
 
 ### Required in every self-contained document
+
 - WHAT: the goal (one sentence)
 - WHERE: file paths for all relevant code
 - WHY: the problem being solved

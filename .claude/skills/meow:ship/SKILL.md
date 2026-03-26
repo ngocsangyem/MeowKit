@@ -16,7 +16,6 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: gstack
-author: garrytan (gstack)
 ---
 
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
@@ -32,7 +31,7 @@ Use when the user says "ship", "deploy", "push to main", "create a PR", or "merg
 
 ## Workflow
 
-1. **Preamble** — Run gstack session init, handle upgrades, telemetry, lake intro. See `references/preamble.md`
+1. **Preamble** — Run MeowKit session init, handle upgrades, telemetry, lake intro. See `references/preamble.md`
 2. **Detect base branch + Pre-flight** — Detect PR target branch, verify on feature branch, check review readiness dashboard. See `references/pre-flight.md`
 3. **Distribution pipeline check** — Verify release pipeline exists for new standalone artifacts. See `references/distribution-pipeline.md`
 4. **Merge base branch + Test bootstrap** — Fetch/merge base branch, bootstrap test framework if missing. See `references/merge-and-test-bootstrap.md`

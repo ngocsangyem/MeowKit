@@ -15,7 +15,6 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 source: gstack
-author: garrytan (gstack)
 ---
 
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
@@ -49,7 +48,7 @@ For **global mode** (`/retro global`): Skip steps 3-9, follow `references/global
 
 ## Shared Protocols
 
-These apply across all gstack skills:
+These apply across all MeowKit skills:
 
 - **AskUserQuestion format**: See `references/ask-user-question-format.md`
 - **Completeness Principle**: See `references/completeness-principle.md`
@@ -65,22 +64,22 @@ See `references/tone-and-rules.md`
 
 ## References
 
-| File | Contents |
-|------|----------|
-| `references/preamble.md` | Session initialization, upgrade checks, lake intro, telemetry prompt |
-| `references/ask-user-question-format.md` | Standard AskUserQuestion structure (5 rules) |
-| `references/completeness-principle.md` | Boil the Lake principle, effort estimation tables |
-| `references/repo-ownership-mode.md` | Solo vs collaborative repo behavior |
-| `references/search-before-building.md` | Three layers of knowledge, eureka moments |
-| `references/contributor-mode.md` | Field report filing for gstack contributors |
-| `references/completion-status-protocol.md` | DONE/BLOCKED/NEEDS_CONTEXT status reporting, escalation |
-| `references/telemetry.md` | End-of-skill telemetry logging |
-| `references/plan-status-footer.md` | Plan mode review report footer |
-| `references/data-gathering.md` | Arguments, validation, Step 1 parallel git commands |
-| `references/metrics-computation.md` | Steps 2-8: metrics, sessions, hotspots, focus score |
-| `references/team-analysis.md` | Step 9: per-person analysis, praise, growth areas |
-| `references/trends-history.md` | Steps 10-13: weekly trends, streaks, history, JSON save |
-| `references/narrative-output.md` | Step 14: full output structure, section ordering |
-| `references/global-retro.md` | Global mode: cross-project retro (Steps 1-9) |
-| `references/compare-mode.md` | Compare mode: period-over-period comparison |
-| `references/tone-and-rules.md` | Tone guidelines and important rules |
+| File                                       | Contents                                                             |
+| ------------------------------------------ | -------------------------------------------------------------------- |
+| `references/preamble.md`                   | Session initialization, upgrade checks, lake intro, telemetry prompt |
+| `references/ask-user-question-format.md`   | Standard AskUserQuestion structure (5 rules)                         |
+| `references/completeness-principle.md`     | Boil the Lake principle, effort estimation tables                    |
+| `references/repo-ownership-mode.md`        | Solo vs collaborative repo behavior                                  |
+| `references/search-before-building.md`     | Three layers of knowledge, eureka moments                            |
+| `references/contributor-mode.md`           | Field report filing for MeowKit contributors                         |
+| `references/completion-status-protocol.md` | DONE/BLOCKED/NEEDS_CONTEXT status reporting, escalation              |
+| `references/telemetry.md`                  | End-of-skill telemetry logging                                       |
+| `references/plan-status-footer.md`         | Plan mode review report footer                                       |
+| `references/data-gathering.md`             | Arguments, validation, Step 1 parallel git commands                  |
+| `references/metrics-computation.md`        | Steps 2-8: metrics, sessions, hotspots, focus score                  |
+| `references/team-analysis.md`              | Step 9: per-person analysis, praise, growth areas                    |
+| `references/trends-history.md`             | Steps 10-13: weekly trends, streaks, history, JSON save              |
+| `references/narrative-output.md`           | Step 14: full output structure, section ordering                     |
+| `references/global-retro.md`               | Global mode: cross-project retro (Steps 1-9)                         |
+| `references/compare-mode.md`               | Compare mode: period-over-period comparison                          |
+| `references/tone-and-rules.md`             | Tone guidelines and important rules                                  |

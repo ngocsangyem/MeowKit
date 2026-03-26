@@ -14,7 +14,6 @@ allowed-tools:
   - Read
   - AskUserQuestion
 source: gstack
-author: garrytan (gstack)
 ---
 
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
@@ -34,7 +33,7 @@ Persistent headless Chromium browser for QA testing and site dogfooding. First c
 
 ## Workflow
 
-1. **Run preamble** — initialize gstack session, check for upgrades, handle first-run prompts. See `references/preamble.md`
+1. **Run preamble** — initialize MeowKit session, check for upgrades, handle first-run prompts. See `references/preamble.md`
 2. **Follow MeowKit shared protocols** — AskUserQuestion format, Completeness Principle, Repo Ownership, Search Before Building, Contributor Mode, Completion Status, Telemetry, Plan Status Footer. See `references/shared-protocols.md`
 3. **Run setup check** — verify `$B` binary exists; if `NEEDS_SETUP`, prompt user and build. See `references/setup.md`
 4. **Navigate and interact** — use `$B goto`, `$B snapshot`, `$B click`, `$B fill`, etc. See `references/command-reference.md`

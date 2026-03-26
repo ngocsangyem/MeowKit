@@ -29,7 +29,7 @@ complexity[3]{level,criteria,approach}:
 **Deep (7+ tool calls, use workflow-orchestrator):**
 - New feature across multiple files
 - Refactoring/architecture change
-- Vague requirements ("make it better")
+- Vague requirements ("make MeowKit better")
 - Security audit
 - Performance optimization
 - User asks to "plan" or "design"

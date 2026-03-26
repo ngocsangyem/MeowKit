@@ -19,7 +19,6 @@ allowed-tools:
   - WebSearch
   - AskUserQuestion
 source: gstack
-author: garrytan (gstack)
 ---
 
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
@@ -48,15 +47,15 @@ Run `/meow:cso` when the user requests a security audit, threat model, pentest r
 
 ## References
 
-| File | Contents |
-|------|----------|
-| [references/preamble.md](references/preamble.md) | Startup script, upgrade check, lake intro, telemetry prompt |
-| [references/shared-protocols.md](references/shared-protocols.md) | AskUserQuestion format, Completeness Principle, Repo Ownership, Search Before Building, Contributor Mode, Completion Status, Telemetry, Plan Status Footer |
-| [references/arguments-and-modes.md](references/arguments-and-modes.md) | All `/meow:cso` flags, mode resolution logic, Grep tool usage note |
-| [references/phase-0-1-architecture-attack-surface.md](references/phase-0-1-architecture-attack-surface.md) | Stack/framework detection, mental model, attack surface census |
-| [references/phase-2-3-secrets-dependencies.md](references/phase-2-3-secrets-dependencies.md) | Git history secrets scan, .env audit, dependency supply chain |
-| [references/phase-4-5-6-cicd-infra-webhooks.md](references/phase-4-5-6-cicd-infra-webhooks.md) | CI/CD pipeline security, Docker/IaC audit, webhook/integration audit |
-| [references/phase-7-8-llm-skills.md](references/phase-7-8-llm-skills.md) | LLM/AI security checks, skill supply chain scanning |
-| [references/phase-9-10-11-owasp-stride-data.md](references/phase-9-10-11-owasp-stride-data.md) | OWASP Top 10 (A01-A10), STRIDE threat model, data classification |
-| [references/phase-12-fp-filtering.md](references/phase-12-fp-filtering.md) | Confidence gates, 22 hard exclusions, 12 precedents, active verification, variant analysis, parallel verification |
-| [references/phase-13-14-report-save.md](references/phase-13-14-report-save.md) | Findings report format, trend tracking, incident response playbooks, remediation roadmap, JSON schema, important rules, disclaimer |
+| File                                                                                                       | Contents                                                                                                                                                   |
+| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [references/preamble.md](references/preamble.md)                                                           | Startup script, upgrade check, lake intro, telemetry prompt                                                                                                |
+| [references/shared-protocols.md](references/shared-protocols.md)                                           | AskUserQuestion format, Completeness Principle, Repo Ownership, Search Before Building, Contributor Mode, Completion Status, Telemetry, Plan Status Footer |
+| [references/arguments-and-modes.md](references/arguments-and-modes.md)                                     | All `/meow:cso` flags, mode resolution logic, Grep tool usage note                                                                                         |
+| [references/phase-0-1-architecture-attack-surface.md](references/phase-0-1-architecture-attack-surface.md) | Stack/framework detection, mental model, attack surface census                                                                                             |
+| [references/phase-2-3-secrets-dependencies.md](references/phase-2-3-secrets-dependencies.md)               | Git history secrets scan, .env audit, dependency supply chain                                                                                              |
+| [references/phase-4-5-6-cicd-infra-webhooks.md](references/phase-4-5-6-cicd-infra-webhooks.md)             | CI/CD pipeline security, Docker/IaC audit, webhook/integration audit                                                                                       |
+| [references/phase-7-8-llm-skills.md](references/phase-7-8-llm-skills.md)                                   | LLM/AI security checks, skill supply chain scanning                                                                                                        |
+| [references/phase-9-10-11-owasp-stride-data.md](references/phase-9-10-11-owasp-stride-data.md)             | OWASP Top 10 (A01-A10), STRIDE threat model, data classification                                                                                           |
+| [references/phase-12-fp-filtering.md](references/phase-12-fp-filtering.md)                                 | Confidence gates, 22 hard exclusions, 12 precedents, active verification, variant analysis, parallel verification                                          |
+| [references/phase-13-14-report-save.md](references/phase-13-14-report-save.md)                             | Findings report format, trend tracking, incident response playbooks, remediation roadmap, JSON schema, important rules, disclaimer                         |

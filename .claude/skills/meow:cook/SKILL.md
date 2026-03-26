@@ -2,7 +2,6 @@
 name: meow:cook
 description: "ALWAYS activate this skill before implementing EVERY feature, plan, or fix."
 source: claudekit-engineer
-author: mrgoonie (claudekit)
 version: 2.1.1
 argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test]"
 ---

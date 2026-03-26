@@ -12,7 +12,6 @@ triggers:
   - "workflow:resume"
 allowed-tools: Read, Write, Bash
 source: aura-frog
-author: nguyenthienthanh (aura-frog)
 ---
 
 # Session Continuation
@@ -66,6 +65,7 @@ Auto-prompt:
 **State File Location:** `.claude/logs/workflows/[workflow-id]/workflow-state.json`
 
 **State Content:**
+
 ```json
 {
   "workflow_id": "AUTH-123",
@@ -134,6 +134,7 @@ WORKFLOW HANDOFF COMPLETE
 **Workflow ID:** AUTH-123
 
 **Progress:**
+
 - Phase 1: Understand + Design - Approved
 - Phase 2: Test RED - Approved
 - Phase 3: Build GREEN - In Progress
@@ -142,12 +143,14 @@ WORKFLOW HANDOFF COMPLETE
 `.claude/logs/workflows/AUTH-123/workflow-state.json`
 
 **Deliverables Created:**
+
 - requirements.md
 - tech-spec.md
 - architecture.md
 - test-plan.md
 
 **Key Decisions:**
+
 - Using JWT with refresh tokens
 - Storing sessions in Redis
 - bcrypt for password hashing
@@ -158,8 +161,11 @@ Type: `workflow:resume AUTH-123`
 
 Or copy this command:
 ```
+
 workflow:resume AUTH-123
+
 ```
+
 ```
 
 ---
@@ -191,8 +197,7 @@ Validate:
 ### Step 3: Restore Context
 
 ```yaml
-Actions:
-  1. Load project context (project-contexts/[project]/)
+Actions: 1. Load project context (project-contexts/[project]/)
   2. Activate saved agents
   3. Load phase-specific rules
   4. Restore key decisions
@@ -208,15 +213,18 @@ WORKFLOW RESUMED
 **Task:** Implement user authentication with JWT
 
 **Restored State:**
+
 - Current Phase: 3 - Build GREEN
 - Primary Agent: architect
 - Tech Stack: Node.js, Express, PostgreSQL
 
 **Completed Phases:**
+
 - Phase 1: Understand + Design
 - Phase 2: Test RED
 
 **Key Decisions Restored:**
+
 - Using JWT with refresh tokens
 - Storing sessions in Redis
 - bcrypt for password hashing
@@ -231,8 +239,7 @@ Type "continue" to proceed or "status" for more details.
 ### Step 5: Continue Execution
 
 ```yaml
-On "continue":
-  1. Resume from saved phase
+On "continue": 1. Resume from saved phase
   2. Show agent banner
   3. Execute remaining phase steps
   4. Show approval gate when phase complete
@@ -261,14 +268,15 @@ On "continue":
 **Action:** Show all saved workflows with status.
 
 **Output:**
+
 ```markdown
 Saved Workflows:
 
-| ID | Task | Phase | Status | Last Updated |
-|----|------|-------|--------|--------------|
-| AUTH-123 | JWT Auth | 5a | paused | 2h ago |
-| fix-login-0128 | Login fix | 7 | waiting | 1d ago |
-| REFACTOR-789 | API refactor | complete | done | 3d ago |
+| ID             | Task         | Phase    | Status  | Last Updated |
+| -------------- | ------------ | -------- | ------- | ------------ |
+| AUTH-123       | JWT Auth     | 5a       | paused  | 2h ago       |
+| fix-login-0128 | Login fix    | 7        | waiting | 1d ago       |
+| REFACTOR-789   | API refactor | complete | done    | 3d ago       |
 
 To resume: `workflow:resume <id>`
 ```
@@ -337,6 +345,7 @@ Manual cleanup:
 Workflow not found: AUTH-123
 
 Possible reasons:
+
 - Workflow ID is incorrect
 - State file was deleted
 - Workflow was never saved
@@ -353,6 +362,7 @@ To start a new workflow: `workflow:start <task>`
 Cannot load workflow state: Invalid JSON
 
 Attempting recovery...
+
 - Found backup: workflow-state.backup.json
 - Restored from backup (15 minutes old)
 
@@ -364,7 +374,7 @@ Continue with restored state? (yes/no)
 ### Version Mismatch
 
 ```markdown
-Workflow was created with Aura Frog v0.9.0
+Workflow was created with MeowKit v0.9.0
 Current version: v1.0.0
 
 Attempting migration...
@@ -378,12 +388,14 @@ Continue? (yes/no)
 ## Best Practices
 
 ### DO:
+
 - Handoff before token limit (at 150K)
 - Include workflow ID in task tracking
 - Resume promptly to maintain context
 - Review key decisions after resume
 
 ### DON'T:
+
 - Wait until 200K tokens (may truncate)
 - Delete state files manually
 - Resume with different project context
