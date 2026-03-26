@@ -1,31 +1,86 @@
 ---
-title: qa testing
-description: Manual QA testing and Playwright E2E code generation.
+title: QA Testing
+description: Manual QA testing and Playwright E2E code generation with browser automation.
 persona: B
 ---
 
-# qa testing
+# QA Testing
 
-> Manual QA testing and Playwright E2E code generation.
+> Spec-driven testing with structured reports or production-ready Playwright code.
 
-**Skills used:** meow:qa-manual, meow:qa, meow:browse
+**Best for:** Pre-release testing, E2E automation  
+**Time estimate:** 15-45 minutes  
+**Skills used:** [meow:qa-manual](/reference/skills/qa-manual), [meow:qa](/reference/skills/qa), [meow:browse](/reference/skills/browse)  
+**Browser skills:** [meow:agent-browser](/reference/skills/agent-browser), [meow:playwright-cli](/reference/skills/playwright-cli)
 
 ## Overview
 
-This workflow uses MeowKit's pipeline to Manual QA testing and Playwright E2E code generation.
+MeowKit offers two QA approaches: **meow:qa** (find bugs + fix them + verify fixes) and **meow:qa-manual** (spec-driven testing with reports or E2E code generation). Both use browser automation under the hood.
 
-## Step 1: Start
+## Manual QA report
 
-Use the appropriate command to begin this workflow.
+### Step 1: Run from spec
 
-## Step 2: Follow the pipeline
+```
+/meow:qa-manual tasks/plans/260327-auth.md --report
+```
 
-MeowKit's agents handle each phase automatically. Approve gates when prompted.
+### Step 2: Agent navigates like a human
 
-## Step 3: Review and ship
+The skill routes each action to the best browser tool:
+- **DOM interaction** → [meow:playwright-cli](/reference/skills/playwright-cli) (generates PW code as side-effect)
+- **Auth flows** → [meow:agent-browser](/reference/skills/agent-browser) (session persistence)
+- **Visual checks** → [meow:agent-browser](/reference/skills/agent-browser) (annotated screenshots)
 
-After all phases complete, review the output and ship if satisfied.
+### Step 3: Auth handling
 
-## Related workflows
+When the agent encounters a login page:
 
-See the [Workflows Overview](/workflows/) for other development scenarios.
+```
+⚠️ Authentication required at: https://app.example.com/login
+meow:qa-manual needs credentials to continue.
+Please provide:
+- Email: ___________
+- Password: ___________
+Type 'skip' to skip this flow or 'abort' to stop testing.
+```
+
+The agent **never** guesses credentials. You provide them, it fills the form and continues.
+
+### Step 4: Review the report
+
+```markdown
+## QA Manual Test Report
+Spec: tasks/plans/260327-auth.md
+Tested at: 2026-03-27 14:30 UTC
+
+| Flow | Steps | Passed | Failed | Status |
+|------|-------|--------|--------|--------|
+| Login | 5 | 5 | 0 | PASS |
+| Password reset | 4 | 3 | 1 | FAIL |
+
+### Failed: Password reset — Step 3
+Expected: "Reset email sent" message
+Actual: 500 Internal Server Error
+Evidence: /tmp/password-reset-error.png
+```
+
+## E2E code generation
+
+```
+/meow:qa-manual tasks/plans/260327-checkout.md --generate
+```
+
+Same navigation, but outputs `.spec.ts` files with role-based locators (`getByTestId`, `getByRole`, `getByLabel`).
+
+## Systematic QA (find + fix)
+
+```
+/meow:qa https://app.example.com
+```
+
+The [meow:qa](/reference/skills/qa) skill goes further: it finds bugs, fixes them in source code, commits each fix atomically, re-verifies, and produces a before/after health score.
+
+## Next workflow
+
+→ [Documentation](/workflows/documentation) — keep docs in sync

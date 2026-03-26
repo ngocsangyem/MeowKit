@@ -1,6 +1,6 @@
 ---
 title: Starting a New Project
-description: Set up MeowKit in a new or existing project.
+description: Set up MeowKit in a new or existing project and run your first task.
 persona: A
 ---
 
@@ -8,43 +8,65 @@ persona: A
 
 > Initialize MeowKit and scaffold your first plan.
 
-**Best for:** Persona A (first-time users)  
+**Best for:** First-time users  
 **Time estimate:** 5 minutes  
-**Skills used:** create-meowkit CLI, meow:plan
+**Skills used:** create-meowkit CLI, [meow:plan-creator](/reference/skills/plan-creator)
 
-## Step 1: Install MeowKit
+## Overview
+
+This workflow gets you from an empty project to a fully configured MeowKit environment with your first approved plan. By the end, you'll understand how MeowKit's agents, gates, and workflow phases work together.
+
+## Prerequisites
+
+- Node.js 20+, Python 3.9+, Git installed
+- Claude Code installed ([claude.ai/code](https://claude.ai/code))
+- A project directory (new or existing)
+
+## Step-by-step guide
+
+### Step 1: Install MeowKit
 
 ```bash
 npm create meowkit@latest
 ```
 
-Answer the interactive prompts. The CLI auto-detects your stack.
+The CLI auto-detects your tech stack and asks configuration questions (project name, stack, team size, mode, memory, optional Gemini API key). Takes ~30 seconds.
 
-## Step 2: Verify installation
+**What gets created:** A `.claude/` directory with 13 agents, 42 skills, lifecycle hooks, security rules, and a memory system. Plus `CLAUDE.md` (the entry point Claude reads at session start).
+
+### Step 2: Verify installation
 
 ```bash
 npx meowkit doctor
 ```
 
-All checks should pass. If not, see [Installation troubleshooting](/installation#troubleshooting).
+Checks: Node.js version, Python available, Git configured, hooks executable, scripts present.
 
-## Step 3: Start Claude Code
+### Step 3: Start Claude Code
 
 ```bash
 claude
 ```
 
-Claude automatically loads `CLAUDE.md` and all MeowKit configuration.
+Claude reads `CLAUDE.md` automatically. The **orchestrator** agent activates and reads `memory/lessons.md` (empty on first run) and `memory/cost-log.json`.
 
-## Step 4: Plan your first feature
+### Step 4: Plan your first feature
 
 ```
-/meow:plan add user authentication
+/meow:plan add user authentication with JWT
 ```
 
-The planner agent creates a structured plan, challenges your premises, and waits for approval.
+Here's what happens behind the scenes:
 
-## Step 5: Approve and build
+1. **Orchestrator** classifies the task as COMPLEX (auth-related → always complex) and assigns the Opus model tier
+2. **Orchestrator** routes to the **planner** agent
+3. **Planner** applies two lenses:
+   - **Product lens:** "Is JWT the right choice? Have you considered session-based auth? What are your scale requirements?"
+   - **Engineering lens:** "Where will tokens be stored? What's the refresh strategy? How will you handle token revocation?"
+4. **Planner** produces a plan file at `tasks/plans/YYMMDD-auth.md` with: Problem Statement, Success Criteria, Out of Scope, Technical Approach, Risk Flags, Estimated Effort
+5. **Gate 1** activates — you must type `approve` to continue
+
+### Step 5: Approve and build
 
 After reviewing the plan, approve it. Then run the full pipeline:
 
@@ -52,15 +74,26 @@ After reviewing the plan, approve it. Then run the full pipeline:
 /meow:cook
 ```
 
-This executes: Plan → Test RED → Build GREEN → Review → Ship.
+This executes Phases 2-6 automatically:
+- **Phase 2:** The **tester** agent writes failing tests for the auth module
+- **Phase 3:** The **developer** agent implements until tests pass (self-heals up to 3 times)
+- **Phase 4:** The **reviewer** agent checks 5 dimensions (architecture, types, tests, security, performance). The **security** agent auto-inserts because this is auth-related.
+- **Gate 2:** You approve the review verdict
+- **Phase 5:** The **shipper** agent creates a conventional commit, pushes, and creates a PR
+- **Phase 6:** The **documenter** updates docs, the **analyst** captures patterns
 
 ## What MeowKit does automatically
 
-- **Phase 0:** Reads memory (empty on first run), assigns model tier
-- **Phase 1:** Planner creates plan, waits for Gate 1 approval
-- **Hooks:** `post-write.sh` scans every file write for security issues
-- **Gate 2:** Reviewer checks code before shipping
+| Phase | Agent | Hook/Gate | What happens |
+|-------|-------|-----------|-------------|
+| 0 | orchestrator | — | Reads memory, classifies complexity, assigns model tier |
+| 1 | planner | **Gate 1** | Creates plan, waits for human approval |
+| 2 | tester | `pre-implement.sh` | Writes failing tests, blocks implementation without them |
+| 3 | developer | `post-write.sh` | Implements code, security scan on every file write |
+| 4 | reviewer + security | **Gate 2** | 5-dimension audit + security audit, waits for approval |
+| 5 | shipper | `pre-ship.sh` | Test + lint + typecheck, then commit → PR |
+| 6 | documenter + analyst | — | Update docs, capture patterns to memory |
 
 ## Next workflow
 
-→ [Adding a Feature](/workflows/add-feature) — how to add features to an existing MeowKit project
+→ [Adding a Feature](/workflows/add-feature) — how to add features after initial setup

@@ -1,31 +1,54 @@
 ---
-title: retrospective
-description: Run a sprint retrospective with commit analysis and trend tracking.
+title: Sprint Retrospective
+description: Run a team-aware engineering retrospective with commit analysis and trend tracking.
 persona: B
 ---
 
-# retrospective
+# Sprint Retrospective
 
-> Run a sprint retrospective with commit analysis and trend tracking.
+> Analyze commits, work patterns, and code quality with persistent trend tracking.
 
-**Skills used:** meow:retro
+**Best for:** End of sprint, weekly review  
+**Time estimate:** 10-15 minutes  
+**Skills used:** [meow:retro](/reference/skills/retro)  
+**Agents involved:** analyst (cost data), documenter (saves report)
 
 ## Overview
 
-This workflow uses MeowKit's pipeline to Run a sprint retrospective with commit analysis and trend tracking.
+The [meow:retro](/reference/skills/retro) skill analyzes your git history to produce a structured retrospective. It's team-aware (breaks down per-person contributions) and tracks trends across runs to show improvement or regression.
 
-## Step 1: Start
+## Step-by-step guide
 
-Use the appropriate command to begin this workflow.
+### Step 1: Run the retrospective
 
-## Step 2: Follow the pipeline
+```
+/meow:retro
+```
 
-MeowKit's agents handle each phase automatically. Approve gates when prompted.
+### Step 2: Review the analysis
 
-## Step 3: Review and ship
+The skill analyzes:
+- **Commits** by type (feat, fix, refactor, docs) and author
+- **Work patterns** — velocity, review turnaround, deploy frequency
+- **Code quality** — test coverage trends, security findings over time
+- **Per-person** — contributions, strengths, growth areas (with praise)
+- **Cost** — token usage from `memory/cost-log.json` via the **analyst** agent
 
-After all phases complete, review the output and ship if satisfied.
+### Step 3: Track trends
 
-## Related workflows
+Each retrospective is saved, so the next one compares:
+- Are we shipping more or fewer features?
+- Is review turnaround improving?
+- Are security findings decreasing?
+- Is cost per feature going up or down?
 
-See the [Workflows Overview](/workflows/) for other development scenarios.
+### How the analyst agent contributes
+
+The **analyst** provides cost and pattern data from `memory/`:
+- Token usage trends (are we using cheaper models when appropriate?)
+- Pattern frequency (recurring issues that should become rules)
+- Lessons learned that inform the retrospective's recommendations
+
+## Next workflow
+
+→ [Architecture Decisions](/workflows/architecture) — document architectural choices

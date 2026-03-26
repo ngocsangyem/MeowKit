@@ -1,31 +1,70 @@
 ---
-title: frontend
-description: Build frontend features with Vue 3, TypeScript, and design standards.
+title: Frontend Development
+description: Build frontend features with Vue 3, TypeScript, and UI/UX design standards.
 persona: B
 ---
 
-# frontend
+# Frontend Development
 
-> Build frontend features with Vue 3, TypeScript, and design standards.
+> Vue 3 Composition API, strict TypeScript, and production-grade design — all enforced automatically.
 
-**Skills used:** meow:vue, meow:typescript, meow:frontend-design
+**Best for:** UI features, component development, styling  
+**Time estimate:** 15-60 minutes  
+**Skills used:** [meow:vue](/reference/skills/vue), [meow:typescript](/reference/skills/typescript), [meow:frontend-design](/reference/skills/frontend-design)  
+**Agents involved:** developer, tester, reviewer
 
 ## Overview
 
-This workflow uses MeowKit's pipeline to Build frontend features with Vue 3, TypeScript, and design standards.
+MeowKit has three specialized frontend skills that auto-activate based on file types:
+- **meow:vue** — activates on `.vue` files → enforces Composition API, Pinia, `<script setup>`
+- **meow:typescript** — activates on `.ts`/`.tsx` files → enforces strict null checks, type guards
+- **meow:frontend-design** — activates on design/styling tasks → enforces anti-AI-slop checklist
 
-## Step 1: Start
+## Building a Vue component
 
-Use the appropriate command to begin this workflow.
+When you create or modify a `.vue` file, [meow:vue](/reference/skills/vue) enforces:
 
-## Step 2: Follow the pipeline
+| Rule | Enforcement |
+|------|------------|
+| `<script setup lang="ts">` always | Options API (`data()`, `methods:`) blocked |
+| `defineProps<T>()` with TypeScript interfaces | Runtime validation objects blocked |
+| `storeToRefs()` for Pinia destructuring | Direct store state destructuring blocked |
+| No `v-html` with user content | XSS vector (MeowKit security rule) |
+| `ref()` for primitives | `reactive()` only for complex objects |
+| PascalCase components, kebab-case files | MeowKit naming-rules.md enforced |
 
-MeowKit's agents handle each phase automatically. Approve gates when prompted.
+## TypeScript patterns
 
-## Step 3: Review and ship
+When editing `.ts` files, [meow:typescript](/reference/skills/typescript) enforces:
 
-After all phases complete, review the output and ship if satisfied.
+| Rule | Example |
+|------|---------|
+| No `any` type | Use `unknown` + type guards |
+| No implicit truthiness | `if (user !== null)` not `if (user)` |
+| `import type` for type-only | `import type { User } from './types'` |
+| Named exports over default | `export const X` not `export default` |
+| Discriminated unions for results | `{ ok: true; data: T } \| { ok: false; error: string }` |
 
-## Related workflows
+## Design quality
 
-See the [Workflows Overview](/workflows/) for other development scenarios.
+Before delivering any UI, [meow:frontend-design](/reference/skills/frontend-design) runs the **anti-AI-slop checklist**:
+
+| Check | Fail condition | Fix |
+|-------|---------------|-----|
+| Typography | All text same size | Add hierarchy: display → heading → body → caption |
+| Color | Pure #000 on #fff | Soften: #111827 on #fafafa |
+| Layout | Centered everything | Intentional asymmetry, whitespace variation |
+| Spacing | Same padding everywhere | Use 4px-base scale consistently |
+| Accessibility | Contrast < 4.5:1 | Adjust colors to meet WCAG AA |
+
+## The review dimension
+
+The **reviewer** agent checks a **performance** dimension specific to frontend:
+- No unnecessary re-renders
+- No unbounded data fetches
+- No blocking in async
+- Components lazy-loaded where appropriate
+
+## Next workflow
+
+→ [Researching Libraries](/workflows/research) — evaluate tech options before building

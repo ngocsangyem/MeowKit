@@ -1,31 +1,70 @@
 ---
-title: research
-description: Research libraries, frameworks, and technical approaches.
+title: Researching Libraries
+description: Evaluate libraries, frameworks, and technical approaches with structured findings.
 persona: B
 ---
 
-# research
+# Researching Libraries
 
-> Research libraries, frameworks, and technical approaches.
+> Evaluate options with source-graded findings and confidence levels.
 
-**Skills used:** meow:docs-finder, researcher agent
+**Best for:** Choosing dependencies, evaluating frameworks, gathering docs  
+**Time estimate:** 15-30 minutes  
+**Skills used:** [meow:docs-finder](/reference/skills/docs-finder), [meow:scout](/reference/skills/scout)  
+**Agents involved:** researcher (Haiku model), brainstormer
 
 ## Overview
 
-This workflow uses MeowKit's pipeline to Research libraries, frameworks, and technical approaches.
+The **researcher** agent fans out queries to multiple sources (official docs, GitHub, community posts, Stack Overflow) and evaluates quality. The **brainstormer** agent compares approaches with pros/cons/tradeoffs. Both feed into the **planner** for informed decision-making.
 
-## Step 1: Start
+## Step-by-step guide
 
-Use the appropriate command to begin this workflow.
+### Step 1: Ask the research question
 
-## Step 2: Follow the pipeline
+```
+"Compare Prisma vs Drizzle for our PostgreSQL project"
+```
 
-MeowKit's agents handle each phase automatically. Approve gates when prompted.
+### Step 2: Researcher gathers findings
 
-## Step 3: Review and ship
+The **researcher** (running on Haiku for cost efficiency) evaluates sources:
 
-After all phases complete, review the output and ship if satisfied.
+| Source type | Trust level |
+|-------------|------------|
+| Official documentation | Highest |
+| Well-maintained GitHub repos | High |
+| Recent blog posts (<12 months) | Medium |
+| Stack Overflow answers | Low (must cross-reference) |
 
-## Related workflows
+```
+Researcher findings:
+  Prisma: Established (2019+), 37K GitHub stars, extensive docs
+    Strengths: Schema-first, great DX, auto-migrations
+    Weaknesses: Runtime overhead, limited raw SQL, heavy bundle
 
-See the [Workflows Overview](/workflows/) for other development scenarios.
+  Drizzle: Emerging (2023+), 28K GitHub stars, growing fast
+    Strengths: Zero overhead, SQL-like syntax, lightweight
+    Weaknesses: Younger ecosystem, fewer guides
+
+  Confidence: HIGH (both well-documented)
+```
+
+### Step 3: Brainstormer evaluates tradeoffs
+
+```
+Approach 1: Prisma — choose if team values DX and auto-migrations
+Approach 2: Drizzle — choose if team values performance and SQL familiarity
+Second-order: Prisma locks you into their schema format. Drizzle stays close to SQL.
+```
+
+### Step 4: Find specific documentation
+
+```
+/meow:docs-finder drizzle PostgreSQL transactions
+```
+
+The [meow:docs-finder](/reference/skills/docs-finder) skill fetches current docs via Context7 or Context Hub, avoiding stale training data.
+
+## Next workflow
+
+→ [Maintaining Old Projects](/workflows/maintenance) — work in unfamiliar codebases
