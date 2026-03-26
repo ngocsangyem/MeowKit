@@ -1,81 +1,141 @@
 /**
- * MeowKit Color System
+ * MeowKit Design System — VitePress Theme
  *
- * Primary:    Cyan #38F9FF, Purple #A020F0, Magenta #BA55D3
- * Surface:    Base #1C1F26, Dark #0A0E17, Slate #53687E
- * Typography: Primary #F0F0F0, Accent #B0FFFF
- * Effects:    Glow gradient 135deg Cyan → Purple
+ * Brand:
+ *   Primary  #38F9FF  Vibrant Cyan (MeowKit Blue) — CTAs, active states, highlights
+ *   Secondary #A020F0 Vibrant Purple — decorative, category tags, info status
+ *
+ * Dark theme:
+ *   bg.base    #0F172A   bg.surface  #1E293B
+ *   text.primary #F1F5F9  text.secondary #CBD5E1  text.subtle #64748B
+ *   border.subtle #334155  border.strong #475569
+ *
+ * Light theme:
+ *   bg.base    #F8FAFC   bg.surface  #FFFFFF
+ *   text.primary #1E293B  text.secondary #475569  text.subtle #94A3B8
+ *   border.subtle #E2E8F0  border.strong #CBD5E1
+ *
+ * States:
+ *   hover   light rgba(56,249,255,0.10)  dark rgba(56,249,255,0.15)
+ *   active  light rgba(56,249,255,0.20)  dark rgba(56,249,255,0.25)
  */
 
-/* ------------------------------------------------------------------ */
-/*  VitePress CSS variable overrides — dark mode (default for MeowKit) */
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
+/*  1. BRAND — shared across both themes                               */
+/* ================================================================== */
 
 :root {
-  /* Brand accent mapped to VitePress brand slots */
-  --vp-c-brand-1: #38F9FF;
-  --vp-c-brand-2: #5CFAFF;
-  --vp-c-brand-3: #38F9FF;
-  --vp-c-brand-soft: rgba(56, 249, 255, 0.14);
+  --mk-brand-primary: #38F9FF;
+  --mk-brand-secondary: #A020F0;
+  --mk-brand-gradient: linear-gradient(135deg, #38F9FF 0%, #A020F0 100%);
 }
 
+/* ================================================================== */
+/*  2. LIGHT THEME                                                     */
+/* ================================================================== */
+
+html:not(.dark) {
+  /* Brand → VitePress brand slots */
+  --vp-c-brand-1: #A020F0;
+  --vp-c-brand-2: #8B18D0;
+  --vp-c-brand-3: #A020F0;
+  --vp-c-brand-soft: rgba(160, 32, 240, 0.08);
+
+  /* Backgrounds */
+  --vp-c-bg: #F8FAFC;
+  --vp-c-bg-alt: #FFFFFF;
+  --vp-c-bg-elv: #FFFFFF;
+  --vp-c-bg-soft: #F1F5F9;
+
+  /* Text */
+  --vp-c-text-1: #1E293B;
+  --vp-c-text-2: #475569;
+  --vp-c-text-3: #94A3B8;
+
+  /* Borders */
+  --vp-c-border: #E2E8F0;
+  --vp-c-divider: #E2E8F0;
+  --vp-c-gutter: #F8FAFC;
+
+  /* Disabled */
+  --vp-c-disabled: #E2E8F0;
+
+  /* Sidebar */
+  --vp-sidebar-bg-color: #FFFFFF;
+
+  /* Navbar */
+  --vp-nav-bg-color: rgba(248, 250, 252, 0.85);
+
+  /* Code blocks */
+  --vp-code-block-bg: #F1F5F9;
+  --vp-code-line-highlight-color: rgba(160, 32, 240, 0.06);
+  --vp-code-tab-active-bar-color: #A020F0;
+
+  /* Callouts */
+  --vp-custom-block-tip-border: #38F9FF;
+  --vp-custom-block-tip-text: #0E7490;
+  --vp-custom-block-tip-bg: rgba(56, 249, 255, 0.06);
+  --vp-custom-block-info-border: #A020F0;
+  --vp-custom-block-info-text: #7C3AED;
+  --vp-custom-block-info-bg: rgba(160, 32, 240, 0.04);
+}
+
+/* ================================================================== */
+/*  3. DARK THEME                                                      */
+/* ================================================================== */
+
 .dark {
-  /* ---- Brand ---- */
+  /* Brand → VitePress brand slots */
   --vp-c-brand-1: #38F9FF;
   --vp-c-brand-2: #5CFAFF;
   --vp-c-brand-3: #38F9FF;
-  --vp-c-brand-soft: rgba(56, 249, 255, 0.14);
+  --vp-c-brand-soft: rgba(56, 249, 255, 0.12);
 
-  /* ---- Background / Surface ---- */
-  --vp-c-bg: #1C1F26;
-  --vp-c-bg-alt: #0A0E17;
-  --vp-c-bg-elv: #1C1F26;
-  --vp-c-bg-soft: #232830;
+  /* Backgrounds */
+  --vp-c-bg: #0F172A;
+  --vp-c-bg-alt: #1E293B;
+  --vp-c-bg-elv: #1E293B;
+  --vp-c-bg-soft: #1E293B;
 
-  /* ---- Typography ---- */
-  --vp-c-text-1: #F0F0F0;
-  --vp-c-text-2: rgba(240, 240, 240, 0.72);
-  --vp-c-text-3: rgba(240, 240, 240, 0.44);
+  /* Text */
+  --vp-c-text-1: #F1F5F9;
+  --vp-c-text-2: #CBD5E1;
+  --vp-c-text-3: #64748B;
 
-  /* ---- Borders ---- */
-  --vp-c-border: rgba(83, 104, 126, 0.40);
-  --vp-c-divider: rgba(83, 104, 126, 0.24);
-  --vp-c-gutter: #0A0E17;
+  /* Borders */
+  --vp-c-border: #334155;
+  --vp-c-divider: #334155;
+  --vp-c-gutter: #0F172A;
 
-  /* ---- Sidebar ---- */
-  --vp-sidebar-bg-color: #0A0E17;
+  /* Disabled */
+  --vp-c-disabled: #334155;
 
-  /* ---- Code blocks ---- */
-  --vp-code-block-bg: #0A0E17;
+  /* Sidebar */
+  --vp-sidebar-bg-color: #0F172A;
+
+  /* Navbar */
+  --vp-nav-bg-color: rgba(15, 23, 42, 0.85);
+
+  /* Code blocks */
+  --vp-code-block-bg: #0F172A;
   --vp-code-line-highlight-color: rgba(56, 249, 255, 0.06);
   --vp-code-tab-active-bar-color: #38F9FF;
 
-  /* ---- Navbar ---- */
-  --vp-nav-bg-color: #1C1F26;
-
-  /* ---- Custom tip / warning callout accent ---- */
+  /* Callouts */
   --vp-custom-block-tip-border: #38F9FF;
-  --vp-custom-block-tip-text: #B0FFFF;
+  --vp-custom-block-tip-text: #38F9FF;
   --vp-custom-block-tip-bg: rgba(56, 249, 255, 0.06);
+  --vp-custom-block-info-border: #A020F0;
+  --vp-custom-block-info-text: #BA55D3;
+  --vp-custom-block-info-bg: rgba(160, 32, 240, 0.06);
 }
 
-/* ------------------------------------------------------------------ */
-/*  Light-mode fallback — keeps brand consistent, surfaces light       */
-/* ------------------------------------------------------------------ */
-
-html:not(.dark) {
-  --vp-c-brand-1: #A020F0;
-  --vp-c-brand-2: #BA55D3;
-  --vp-c-brand-3: #A020F0;
-  --vp-c-brand-soft: rgba(160, 32, 240, 0.10);
-}
-
-/* ------------------------------------------------------------------ */
-/*  Hero section on home page                                          */
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
+/*  4. HERO SECTION                                                    */
+/* ================================================================== */
 
 .VPHero .name {
-  background: linear-gradient(135deg, #38F9FF 0%, #A020F0 100%);
+  background: var(--mk-brand-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -89,51 +149,74 @@ html:not(.dark) {
   color: var(--vp-c-text-2);
 }
 
-/* ---- Hero action buttons ---- */
-
+/* Brand button — gradient */
 .VPHero .action .VPButton.brand {
-  background: linear-gradient(135deg, #38F9FF 0%, #A020F0 100%);
+  background: var(--mk-brand-gradient);
   border: none;
-  color: #0A0E17;
+  color: #0F172A;
   font-weight: 600;
+  transition: opacity 0.2s;
 }
 
 .VPHero .action .VPButton.brand:hover {
-  background: linear-gradient(135deg, #5CFAFF 0%, #BA55D3 100%);
+  opacity: 0.9;
 }
 
+/* Alt button — outlined with primary */
 .VPHero .action .VPButton.alt {
-  border-color: #38F9FF;
-  color: #38F9FF;
+  border-color: var(--mk-brand-primary);
+  color: var(--mk-brand-primary);
+  transition: background 0.2s, color 0.2s;
 }
 
-.VPHero .action .VPButton.alt:hover {
-  border-color: #5CFAFF;
-  color: #5CFAFF;
-  background: rgba(56, 249, 255, 0.06);
+html:not(.dark) .VPHero .action .VPButton.alt {
+  border-color: var(--mk-brand-secondary);
+  color: var(--mk-brand-secondary);
 }
 
-/* ------------------------------------------------------------------ */
-/*  Feature cards on home page                                         */
-/* ------------------------------------------------------------------ */
+.dark .VPHero .action .VPButton.alt:hover {
+  background: rgba(56, 249, 255, 0.15);
+}
+
+html:not(.dark) .VPHero .action .VPButton.alt:hover {
+  background: rgba(160, 32, 240, 0.10);
+}
+
+/* ================================================================== */
+/*  5. FEATURE CARDS                                                   */
+/* ================================================================== */
 
 .dark .VPFeature {
-  background-color: #0A0E17;
-  border: 1px solid rgba(83, 104, 126, 0.30);
+  background-color: #1E293B;
+  border: 1px solid #334155;
   transition: border-color 0.25s;
 }
 
 .dark .VPFeature:hover {
-  border-color: rgba(56, 249, 255, 0.50);
+  border-color: rgba(56, 249, 255, 0.40);
 }
 
 .dark .VPFeature .title {
-  color: #B0FFFF;
+  color: #38F9FF;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Sidebar active link glow                                           */
-/* ------------------------------------------------------------------ */
+html:not(.dark) .VPFeature {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  transition: border-color 0.25s;
+}
+
+html:not(.dark) .VPFeature:hover {
+  border-color: rgba(160, 32, 240, 0.40);
+}
+
+html:not(.dark) .VPFeature .title {
+  color: #A020F0;
+}
+
+/* ================================================================== */
+/*  6. SIDEBAR                                                         */
+/* ================================================================== */
 
 .dark .VPSidebar .VPSidebarItem.is-active > .item > .link > .text {
   color: #38F9FF;
@@ -143,67 +226,73 @@ html:not(.dark) {
   background-color: #38F9FF;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Nav link hover                                                     */
-/* ------------------------------------------------------------------ */
+html:not(.dark) .VPSidebar .VPSidebarItem.is-active > .item > .link > .text {
+  color: #A020F0;
+}
+
+html:not(.dark) .VPSidebar .VPSidebarItem.is-active > .item > .indicator {
+  background-color: #A020F0;
+}
+
+/* ================================================================== */
+/*  7. NAV LINKS                                                       */
+/* ================================================================== */
 
 .dark .VPNavBarMenuLink:hover .text,
 .dark .VPNavBarMenuLink.active .text {
   color: #38F9FF;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Inline code accent                                                 */
-/* ------------------------------------------------------------------ */
+html:not(.dark) .VPNavBarMenuLink:hover .text,
+html:not(.dark) .VPNavBarMenuLink.active .text {
+  color: #A020F0;
+}
+
+/* ================================================================== */
+/*  8. INLINE CODE                                                     */
+/* ================================================================== */
 
 .dark :not(pre) > code {
   background-color: rgba(56, 249, 255, 0.08);
-  color: #B0FFFF;
+  color: #38F9FF;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Scrollbar (subtle, on dark surface)                                */
-/* ------------------------------------------------------------------ */
-
-.dark ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+html:not(.dark) :not(pre) > code {
+  background-color: rgba(160, 32, 240, 0.06);
+  color: #7C3AED;
 }
 
-.dark ::-webkit-scrollbar-track {
-  background: #0A0E17;
-}
+/* ================================================================== */
+/*  9. TABLES                                                          */
+/* ================================================================== */
 
-.dark ::-webkit-scrollbar-thumb {
-  background: #53687E;
-  border-radius: 3px;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #38F9FF;
-}
-
-/* ------------------------------------------------------------------ */
-/*  Table styling                                                      */
-/* ------------------------------------------------------------------ */
-
-.dark .vp-doc table {
+.vp-doc table {
   border-collapse: collapse;
 }
 
 .dark .vp-doc th {
-  background-color: #0A0E17;
-  color: #B0FFFF;
-  border-bottom: 2px solid rgba(56, 249, 255, 0.30);
+  background-color: #0F172A;
+  color: #38F9FF;
+  border-bottom: 2px solid #334155;
 }
 
 .dark .vp-doc tr:nth-child(even) td {
-  background-color: rgba(28, 31, 38, 0.50);
+  background-color: rgba(30, 41, 59, 0.50);
 }
 
-/* ------------------------------------------------------------------ */
-/*  Custom badge / tag                                                 */
-/* ------------------------------------------------------------------ */
+html:not(.dark) .vp-doc th {
+  background-color: #F1F5F9;
+  color: #1E293B;
+  border-bottom: 2px solid #E2E8F0;
+}
+
+html:not(.dark) .vp-doc tr:nth-child(even) td {
+  background-color: #F8FAFC;
+}
+
+/* ================================================================== */
+/*  10. BADGES                                                         */
+/* ================================================================== */
 
 .dark .VPBadge.tip {
   background-color: rgba(56, 249, 255, 0.12);
@@ -211,6 +300,71 @@ html:not(.dark) {
 }
 
 .dark .VPBadge.warning {
-  background-color: rgba(186, 85, 211, 0.12);
-  color: #BA55D3;
+  background-color: rgba(160, 32, 240, 0.12);
+  color: #A020F0;
+}
+
+html:not(.dark) .VPBadge.tip {
+  background-color: rgba(56, 249, 255, 0.10);
+  color: #0E7490;
+}
+
+html:not(.dark) .VPBadge.warning {
+  background-color: rgba(160, 32, 240, 0.08);
+  color: #7C3AED;
+}
+
+/* ================================================================== */
+/*  11. SCROLLBAR (dark only — light uses native)                      */
+/* ================================================================== */
+
+.dark ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #38F9FF;
+}
+
+/* ================================================================== */
+/*  12. SEARCH BOX ACCENT                                              */
+/* ================================================================== */
+
+.dark .DocSearch-Button {
+  border-color: #334155;
+  background-color: #1E293B;
+}
+
+.dark .DocSearch-Button:hover {
+  border-color: #38F9FF;
+}
+
+/* ================================================================== */
+/*  13. LINKS                                                          */
+/* ================================================================== */
+
+.dark .vp-doc a {
+  color: #38F9FF;
+}
+
+.dark .vp-doc a:hover {
+  color: #5CFAFF;
+}
+
+html:not(.dark) .vp-doc a {
+  color: #A020F0;
+}
+
+html:not(.dark) .vp-doc a:hover {
+  color: #8B18D0;
 }
