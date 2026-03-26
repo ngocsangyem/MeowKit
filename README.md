@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  31 skills &middot; 13 agents &middot; 18 commands &middot; 7 modes &middot; 10 rules &middot; 6 hooks &middot; 4-layer security
+  33 skills &middot; 13 agents &middot; 18 commands &middot; 7 modes &middot; 10 rules &middot; 6 hooks &middot; 4-layer security
 </p>
 
 <p align="center">
@@ -34,9 +34,11 @@ AI coding tools are powerful but undirected. Without structure, they skip tests,
 - **Cost-aware model routing** so trivial tasks don't burn your best model
 - **Cross-session memory** that learns from corrections and accumulates patterns
 - **Context-engineered agents** with required context declarations, failure behaviors, and ambiguity resolution
-- **Zero external dependencies** — no third-party services, no API keys, no runtime installs
+- **Zero external dependencies for core workflow** — no third-party services, no API keys, no runtime installs
+- **Optional MCP integrations** — Context7 for docs, Playwright for QA, Gemini for multimodal analysis
+- **Progressive disclosure** — every skill's SKILL.md stays under ~100 lines; detail lives in references/ loaded on demand
 
-MeowKit is fully self-contained — zero external dependencies, no API keys, no runtime installs. Free and MIT licensed.
+MeowKit core is fully self-contained — zero external dependencies. Optional skills (`meow:docs-finder`, `meow:multimodal`) can use MCP servers and API keys for enhanced capabilities. Free and MIT licensed.
 
 ## Quick Start
 
@@ -44,7 +46,13 @@ MeowKit is fully self-contained — zero external dependencies, no API keys, no 
 npm create meowkit@latest
 ```
 
-The CLI auto-detects your stack (Node.js, Python, Swift, Go, monorepo), asks a few questions, and generates a `.claude/` directory with everything configured.
+The CLI auto-detects your stack (Node.js, Python, Swift, Go, monorepo), asks a few questions (including an optional Gemini API key for multimodal analysis), and generates a `.claude/` directory with everything configured.
+
+After setup:
+1. Review `CLAUDE.md` for project conventions
+2. Copy `.mcp.json.example` → `.mcp.json` for optional MCP servers (Context7, Playwright, etc.)
+3. Copy `.env.example` → `.env` for API keys (Gemini, etc.)
+4. Run `npx meowkit doctor` to verify
 
 ### CLI Flags
 
@@ -219,9 +227,7 @@ Full index: [`.claude/agents/AGENTS_INDEX.md`](.claude/agents/AGENTS_INDEX.md)
 
 ## Skills
 
-All skills use the `meow:` namespace prefix. Complex skills use a `references/` pattern — SKILL.md stays compact (<100 lines) as a workflow overview, with detailed procedures in separate reference files loaded on demand.
-
-MeowKit ships 31 skills:
+All 33 skills use the `meow:` namespace prefix. Every skill has a `SKILL.md` (compact decision router, ≤100 lines) with detailed procedures in `references/` loaded on demand. This progressive disclosure pattern saves ~70% context per invocation.
 
 ### Sourced Skills (22)
 
@@ -233,7 +239,7 @@ Skills contributed by the open-source community. All are self-contained with no 
 | `meow:ship`                  | gstack          | Full ship pipeline: merge, test, version, PR, verify | 13 files   |
 | `meow:freeze`                | gstack          | Directory-scoped edit restriction                    | —          |
 | `meow:review`                | gstack          | Structural PR review + 5-dimension audit             | 8 files    |
-| `meow:investigate`           | gstack          | Root cause debugging — no fix without understanding  | —          |
+| `meow:investigate`           | gstack          | Root cause debugging — no fix without understanding  | 3 files    |
 | `meow:cso`                   | gstack          | Security audit (OWASP + STRIDE + supply chain)       | 10 files   |
 | `meow:browse`                | gstack          | Headless browser at 100ms/command                    | 7 files    |
 | `meow:qa`                    | gstack          | Systematic QA with bug fixing                        | 8 files    |
@@ -244,29 +250,31 @@ Skills contributed by the open-source community. All are self-contained with no 
 | `meow:retro`                 | gstack          | Sprint retrospective with trend tracking             | 17 files   |
 | `meow:cook`                  | claudekit       | Single-command feature pipeline                      | 4 files    |
 | `meow:fix`                   | claudekit       | Auto-detect bug complexity and route                 | 14 files   |
-| `meow:clean-code`            | antigravity-kit | Pragmatic coding standards (SRP, DRY, KISS)          | —          |
+| `meow:clean-code`            | antigravity-kit | Pragmatic coding standards (SRP, DRY, KISS)          | 1 file     |
 | `meow:lint-and-validate`     | antigravity-kit | Auto-run linters after every change                  | —          |
-| `meow:vulnerability-scanner` | antigravity-kit | OWASP 2025 + threat modeling                         | —          |
+| `meow:vulnerability-scanner` | antigravity-kit | OWASP 2025 + threat modeling                         | 1 file     |
 | `meow:agent-detector`        | aura-frog       | Auto-route tasks to right agent + model              | 8 files    |
-| `meow:lazy-agent-loader`     | aura-frog       | On-demand agent loading for token savings            | —          |
-| `meow:workflow-orchestrator` | aura-frog       | 5-phase TDD with token budgets                       | —          |
-| `meow:session-continuation`  | aura-frog       | Workflow state persistence across sessions           | —          |
+| `meow:lazy-agent-loader`     | aura-frog       | On-demand agent loading for token savings            | 1 file     |
+| `meow:workflow-orchestrator` | aura-frog       | 5-phase TDD with token budgets                       | 2 files    |
+| `meow:session-continuation`  | aura-frog       | Workflow state persistence across sessions           | 2 files    |
 
-### Original Skills (9)
+### Original Skills (11)
 
-MeowKit-native skills:
+MeowKit-native skills built from scratch or adapted from source analysis:
 
-| Skill                        | What it does                                        |
-| ---------------------------- | --------------------------------------------------- |
-| `meow:scout`                 | Parallel codebase exploration via Explore subagents |
-| `meow:plan-creator`          | Auto-selects plan template by task scope            |
-| `meow:skill-template-secure` | Secure skill template with injection defense        |
-| `meow:development`           | Code patterns, skill loading, TDD enforcement       |
-| `meow:documentation`         | API sync, changelog gen, living docs                |
-| `meow:memory`                | Cost tracking, pattern extraction, session capture  |
-| `meow:planning`              | ADR generation, plan templates, premise challenge   |
-| `meow:shipping`              | Canary deploy, rollback protocol, ship pipeline     |
-| `meow:testing`               | Red-green-refactor, validation scripts, visual QA   |
+| Skill                        | What it does                                                  | Scripts | References |
+| ---------------------------- | ------------------------------------------------------------- | ------- | ---------- |
+| `meow:docs-finder`           | Retrieve library/project docs via Context7 + Context Hub      | 4 JS    | 3 files    |
+| `meow:multimodal`            | Image/video/audio/PDF analysis via Gemini API                 | 3 PY    | 3 files    |
+| `meow:scout`                 | Parallel codebase exploration via Explore subagents           | —       | 3 files    |
+| `meow:plan-creator`          | Auto-selects plan template by task scope                      | —       | —          |
+| `meow:skill-template-secure` | Secure skill template with injection defense                  | —       | —          |
+| `meow:development`           | Code patterns, skill loading, TDD enforcement                 | —       | 3 files    |
+| `meow:documentation`         | API sync, changelog gen, living docs                          | —       | 3 files    |
+| `meow:memory`                | Cost tracking, pattern extraction, session capture            | —       | 3 files    |
+| `meow:planning`              | ADR generation, plan templates, premise challenge             | —       | 3 files    |
+| `meow:shipping`              | Canary deploy, rollback protocol, ship pipeline               | —       | 3 files    |
+| `meow:testing`               | Red-green-refactor, validation scripts, visual QA             | —       | 3 files    |
 
 Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS_ATTRIBUTION.md)
 
@@ -275,10 +283,11 @@ Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS
 ```
 .claude/
 ├── agents/          13 specialist agents (sub-agents.md compliant)
-├── skills/          31 skills with meow: namespace (13 with references/)
+├── skills/          33 skills with meow: namespace (28 with references/)
 │   └── meow:*/
-│       ├── SKILL.md          Compact workflow overview (<100 lines)
-│       └── references/       Detailed procedures (loaded on demand)
+│       ├── SKILL.md          Compact decision router (<100 lines)
+│       ├── references/       Detailed procedures (loaded on demand)
+│       └── scripts/          Deterministic validation (docs-finder: JS, multimodal: PY)
 ├── commands/        18 slash commands (meow: namespace)
 │   └── meow/                 All commands in flat directory
 ├── hooks/           6 POSIX shell hooks
@@ -289,9 +298,11 @@ Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS
 │   └── bin/         5 POSIX shell utilities (slug, config, repo-mode, diff-scope, review-log)
 └── rules/           10 rule files + RULES_INDEX.md
 
-CLAUDE.md            Entry point — Claude reads this at session start
-.meowkit.config.json Project-specific configuration
-tasks/templates/     Plan templates (plan-template, plan-quick, plan-phase)
+CLAUDE.md             Entry point — Claude reads this at session start
+.meowkit.config.json  Project-specific configuration
+.mcp.json.example     Optional MCP server configuration (Context7, Playwright, etc.)
+.env.example          Optional API keys (Gemini, etc.)
+tasks/templates/      Plan templates (plan-template, plan-quick, plan-phase)
 ```
 
 ### Self-Contained Design
@@ -306,7 +317,7 @@ MeowKit has **zero external runtime dependencies**. All utilities are self-conta
 | `meowkit-diff-scope` | Categorize diff (frontend/backend/tests/docs) | `.claude/scripts/bin/` |
 | `meowkit-review-log` | Log review results to `.claude/memory/`       | `.claude/scripts/bin/` |
 
-No global state directories, no third-party services, no user-level skill paths, no API keys required.
+No global state directories, no third-party services, no user-level skill paths. API keys optional (only for `meow:multimodal`).
 
 ### Rules
 
@@ -387,11 +398,17 @@ Every session reads `lessons.md` at start and updates it at end. After 10 sessio
 
 ## Requirements
 
+**Core (required):**
 - Node.js 20+
 - Python 3.9+ (for validation scripts — stdlib only, no pip installs)
 - Git
 
-No API keys, no third-party services, no runtime installs required.
+**Optional (for enhanced skills):**
+- `GEMINI_API_KEY` — for `meow:multimodal` (image/video/audio/PDF analysis via Gemini)
+- `google-genai` + `pillow` pip packages — for `meow:multimodal` scripts
+- MCP servers — Context7, Playwright, etc. (see `.mcp.json.example`)
+
+Core workflow has zero external dependencies. Optional skills degrade gracefully when their dependencies are missing.
 
 Run `npx meowkit doctor` to verify your environment.
 
@@ -399,9 +416,10 @@ Run `npx meowkit doctor` to verify your environment.
 
 MIT
 
-## Draw inspiration and synthesize learning resources.
+## Inspiration
 
-- [gstack](https://github.com/garrytan/gstack)
-- [antigravity-kit](https://github.com/vudovn/antigravity-kit)
-- [aura-frog](https://github.com/nguyenthienthanh/aura-frog)
-- [claudekit-engineer](https://claudekit.cc)
+- [gstack](https://github.com/garrytan/gstack) — Skills, review patterns, ship workflow
+- [antigravity-kit](https://github.com/vudovn/antigravity-kit) — Clean code standards, lint automation, vulnerability scanning
+- [aura-frog](https://github.com/nguyenthienthanh/aura-frog) — Agent detection, lazy loading, workflow orchestration
+- [claudekit-engineer](https://claudekit.cc) — Cook/fix pipelines, docs-seeker, multimodal analysis
+- [Anthropic context engineering research](https://www.anthropic.com/effective-context-engineering-for-ai-agents) — Progressive disclosure, just-in-time context, sub-agent architecture
