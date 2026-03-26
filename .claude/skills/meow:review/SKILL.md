@@ -1,12 +1,14 @@
 ---
 name: meow:review
 preamble-tier: 4
-version: 1.0.0
+version: 1.1.0
 description: |
-  Pre-landing PR review. Analyzes diff against the base branch for SQL safety, LLM trust
-  boundary violations, conditional side effects, and other structural issues. Use when
-  asked to "review this PR", "code review", "pre-landing review", or "check my diff".
+  Multi-pass code review with adversarial analysis. Supports input modes: branch diff (default),
+  PR number (#123), commit hash, pending changes (--pending). Use when asked to "review this PR",
+  "code review", "pre-landing review", "check my diff", or "review #123".
   Proactively suggest when the user is about to merge or land code changes.
+# Adopted from ck:code-review: input mode flexibility
+argument-hint: "[#PR | COMMIT | --pending]"
 allowed-tools:
   - Bash
   - Read
@@ -20,15 +22,31 @@ allowed-tools:
 source: gstack
 ---
 
-# Pre-Landing PR Review
+# Pre-Landing Code Review
 
-Analyze the current branch's diff against the base branch for structural issues that tests don't catch. This skill runs a multi-pass review covering scope drift, code quality, design, test coverage, adversarial analysis, and fix-first resolution. All findings are either auto-fixed or presented to the user for approval before proceeding.
+Multi-pass code review with adversarial analysis, spec compliance, and auto-fix. Covers scope drift, code quality, design, test coverage, adversarial red-teaming, and fix-first resolution.
+
+## Workflow Integration
+
+Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer` agent. BLOCK verdict prevents Phase 5 (Ship).
+
+## Input Modes
+
+| Input                    | Mode            | What Gets Reviewed                                             |
+| ------------------------ | --------------- | -------------------------------------------------------------- |
+| _(default — no args)_    | **Branch diff** | Current branch diff against base branch                        |
+| `--pending`              | **Pending**     | Staged + unstaged changes via `git diff` + `git diff --cached` |
+| `#123` or PR URL         | **PR**          | Full PR diff via `gh pr diff 123`                              |
+| `abc1234` (7+ hex chars) | **Commit**      | Single commit diff via `git show abc1234`                      |
+
+**Default:** If invoked with no arguments, review the current branch diff (existing behavior).
 
 ## When to Use
 
 - User asks to "review this PR", "code review", "pre-landing review", or "check my diff"
 - User is about to merge or land code changes (proactive suggestion)
 - Before running `/meow:ship` to ensure quality gate passes
+- **For complex changes (3+ files):** Run `/meow:scout` first to identify edge cases before review
 
 ## Workflow
 
@@ -79,3 +97,40 @@ Analyze the current branch's diff against the base branch for structural issues 
 | —                                                                          | _(Greptile integration removed — MeowKit uses its own reviewer agent)_                                                                                                                        |
 | [security-checklist.md](security-checklist.md)                             | Security review checklist                                                                                                                                                                     |
 | [structural-audit.md](structural-audit.md)                                 | Structural audit reference                                                                                                                                                                    |
+
+## Verdict Output
+
+After all passes complete, output this summary:
+
+```
+## Review Verdict: {SEARCH_TARGET}
+
+**Mode:** {branch diff | pending | PR #N | commit HASH}
+**Diff:** +{ins}/-{del} lines across {N} files
+**Spec:** {found at path | not found — scope drift check only}
+
+### Critical Findings ({N})
+{numbered list — must be resolved before merge}
+
+### Informational ({N})
+{numbered list — non-blocking}
+
+### Adversarial ({tier}: {small|medium|large})
+{findings from adversarial review or "skipped (small diff)"}
+
+### Verdict
+{APPROVE — no blocking issues}
+{REQUEST CHANGES — N critical findings must be resolved}
+{BLOCK — critical security or spec violation, requires human resolution}
+
+### Required Actions
+{numbered list if REQUEST CHANGES or BLOCK — empty if APPROVE}
+```
+
+**Verdict rules:**
+
+- **APPROVE** — zero critical findings across all passes
+- **REQUEST CHANGES** — 1+ critical findings that can be fixed
+- **BLOCK** — security vulnerability, spec violation, or 3+ unresolved critical findings
+
+BLOCK verdict prevents `/meow:ship` from executing (Gate 2 enforcement).

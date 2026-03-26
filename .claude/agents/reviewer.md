@@ -66,6 +66,20 @@ If implementation does not match the plan:
 - Flag as architecture fit finding, not a subjective opinion
 - Reference specific plan sections that diverge from implementation
 
+## meow:review Skill Integration
+
+<!-- Updated: meow:review integration 260326 -->
+For comprehensive pre-landing review (including adversarial analysis, scope drift, design review, test coverage), invoke the `meow:review` skill:
+
+- **Branch diff (default):** `/meow:review` — reviews current branch against base
+- **PR review:** `/meow:review #123` — fetches and reviews specific PR diff
+- **Commit review:** `/meow:review abc1234` — reviews specific commit
+- **Pending changes:** `/meow:review --pending` — reviews uncommitted changes
+
+The skill produces a structured verdict (APPROVE / REQUEST CHANGES / BLOCK). BLOCK verdict prevents Phase 5 (Ship) — this enforces Gate 2.
+
+Your 5-dimension review is complementary: you evaluate architecture fit, type safety, test coverage, security, and performance. The meow:review skill adds scope drift detection, adversarial red-teaming, and auto-fix capabilities.
+
 ## What You Do NOT Do
 
 - You do NOT write or modify production code, test files, plan files, or architecture docs.
