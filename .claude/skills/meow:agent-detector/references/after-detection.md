@@ -1,29 +1,38 @@
 # After Detection
 
+<!-- Fixed: replaced phantom aura-frog references with actual MeowKit agents and skills.
+     agents/router.md → orchestrator.md, bugfix-quick → meow:fix, etc. -->
+
 1. **Output detection result** with agent, model, and complexity
-2. **Load agent instructions** from `agents/[agent-name].md`
-3. **Use detected model** when spawning Task tool:
+2. **Load agent instructions** from `.claude/agents/[agent-name].md`
+3. **Use detected model** when spawning Agent tool:
    ```
-   Task(subagent_type="[agent]", model="[detected-model]", ...)
+   Agent(subagent_type="[agent]", model="[detected-model]", ...)
    ```
 4. **Invoke appropriate skill:**
-   - Complex feature -> `workflow-orchestrator`
-   - Bug fix -> `bugfix-quick`
-   - Test request -> `test-writer`
-   - Code review -> `code-reviewer`
-5. **Always load project context** via `project-context-loader` before major actions
+   - Complex feature → `meow:workflow-orchestrator` or `meow:cook`
+   - Bug fix → `meow:fix`
+   - Investigation/debugging → `meow:investigate`
+   - Code review → `meow:review`
+   - Security audit → `meow:cso`
+5. **Context loaded automatically** via MeowKit's Phase 0 (Orient) — memory/lessons.md + memory/patterns.json
 
 ---
 
 ## Available Agents
 
+MeowKit agents at `.claude/agents/`:
+
 ```toon
-agents[4]{category,count,list}:
-  Development,4,architect/frontend/mobile/gamedev
-  Quality & Security,2,security/tester
-  DevOps & Operations,1,devops
-  Infrastructure,3,router/lead/scanner
+agents[5]{category,count,list}:
+  Planning,3,orchestrator/planner/architect
+  Development,1,developer
+  Quality & Security,3,tester/reviewer/security
+  Operations,2,shipper/documenter
+  Analysis,3,analyst/researcher/brainstormer
 ```
+
+See `.claude/agents/AGENTS_INDEX.md` for full details.
 
 ---
 
@@ -33,13 +42,13 @@ User can force specific agent:
 
 ```
 User: "Use only tester for this task"
--> Override automatic selection
--> tester becomes PRIMARY regardless of scoring
+→ Override automatic selection
+→ tester becomes PRIMARY regardless of scoring
 ```
 
 ---
 
-**Full detection algorithm:** `agents/router.md`
-**Selection guide:** `docs/AGENT_SELECTION_GUIDE.md`
+**Agent routing:** `.claude/agents/orchestrator.md`
+**Agent index:** `.claude/agents/AGENTS_INDEX.md`
 
 **MANDATORY:** Always show agent banner at start of EVERY response.

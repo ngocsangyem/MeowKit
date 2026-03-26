@@ -15,8 +15,10 @@ cache_check[4]{condition,action}:
 ```
 
 **Cache hit output:**
+
 ```markdown
 ## Detection Result (cached)
+
 - **Agent:** [cached-agent]
 - **Model:** [cached-model]
 - **Complexity:** [cached-complexity]
@@ -24,6 +26,7 @@ cache_check[4]{condition,action}:
 ```
 
 **Cache write:** After completing Steps 0-5, write detection result to cache file:
+
 ```json
 {
   "workflowId": "FEAT-123",
@@ -59,6 +62,7 @@ Even if repo is pure backend, frontend leads this task!
 **Apply patterns from:** `task-based-agent-selection.md`
 
 ## Step 1: Extract Keywords
+
 ```
 User: "Fix the login button not working on iOS"
 
@@ -90,15 +94,18 @@ Extracted:
 ```
 
 **Detection invalidation triggers:**
+
 - Key config files changed (package.json mtime/size)
 - Detection older than 24 hours
 - User runs `/project:refresh`
 
 **Commands:**
+
 - `/project:status` - Show project detection
 - `/project:refresh` - Force fresh scan
 
 ## Step 3: Score All Agents (Combine Task + Repo)
+
 ```
 mobile:
   - "iOS" keyword: +35 (semantic)
@@ -116,6 +123,7 @@ frontend:
 ```
 
 ## Step 4: Select Agents
+
 - Primary: Highest score >=80
 - Secondary: Score 50-79
 - Optional: Score 30-49
@@ -125,6 +133,7 @@ frontend:
 **See:** `rules/core/agent-identification-banner.md` for official format.
 
 **Single Agent Banner:**
+
 ```
 ⚡ MEOWKIT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
@@ -133,10 +142,11 @@ frontend:
 ```
 
 **Multi-Agent Banner (when collaboration needed):**
+
 ```
 ⚡ MEOWKIT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agents: [primary] + [secondary], [tertiary]            ┃
-┃ Phase: [phase] - [name] │ [aura-message]            ┃
+┃ Phase: [phase] - [name] │ [meow-message]            ┃
 ┃ Model: [model]                                         ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```

@@ -1,32 +1,36 @@
 # Detection Examples
 
+<!-- Fixed: replaced phantom aura-frog agent names (mobile, frontend, lead, scanner)
+     with actual MeowKit agents (developer, orchestrator, planner, etc.) -->
+
 ## Example 1: Explicit Technology Mention
 ```
 User: "Create a React Native screen for user profile"
 
-Layer 1 (Explicit): "React Native" -> +60
-Layer 2 (Intent): "create" -> Implementation
-Layer 4 (Files): *.phone.tsx present -> +20
+Layer 1 (Explicit): "React Native" → +60
+Layer 2 (Intent): "create" → Implementation
+Layer 4 (Files): *.phone.tsx present → +20
 
 Detection Result:
-  Agent: mobile (PRIMARY, 80 pts)
+  Agent: developer (PRIMARY, 80 pts)
   Model: sonnet
   Complexity: Standard
-  Secondary: frontend (35), tester (30)
+  Secondary: tester (30)
 ```
 
 ## Example 2: Context-Based Detection (No Tech Mention)
 ```
 User: "Fix the login bug"
 
-Layer 2 (Intent): "fix", "bug" -> Bug Fix intent
-Layer 3 (Context): CWD=/backend-api, composer.json has laravel -> +40
-Layer 4 (Files): AuthController.php recent -> +20
+Layer 2 (Intent): "fix", "bug" → Bug Fix intent
+Layer 3 (Context): CWD=/backend-api, composer.json has laravel → +40
+Layer 4 (Files): AuthController.php recent → +20
 
 Detection Result:
-  Agent: architect (PRIMARY, 95 pts) + laravel-expert skill
+  Agent: developer (PRIMARY, 95 pts)
   Model: sonnet
   Complexity: Standard
+  Skill: meow:fix
   Secondary: tester (35)
 ```
 
@@ -34,7 +38,7 @@ Detection Result:
 ```
 User: "Design the authentication system architecture"
 
-Layer 2 (Intent): "design", "architecture" -> Architecture intent
+Layer 2 (Intent): "design", "architecture" → Architecture intent
 Complexity: Deep (architecture keyword)
 
 Detection Result:
@@ -51,7 +55,7 @@ User: "Fix typo in README.md line 42"
 Complexity: Quick (single file, explicit location)
 
 Detection Result:
-  Agent: lead
+  Agent: orchestrator (handles directly — too simple for delegation)
   Model: haiku
   Complexity: Quick
 ```
@@ -62,14 +66,13 @@ User: "Fix the password reset email template - the button styling is broken"
 
 Repo Context: Laravel API (backend)
 Task Content Analysis:
-- "email template" -> frontend_task_patterns (+55)
-- "styling" -> frontend_keywords (+40)
-- "button" -> frontend_keywords (+30)
--> Frontend score: 125 pts (OVERRIDE)
+- "email template" → frontend_task_patterns (+55)
+- "styling" → frontend_keywords (+40)
+- "button" → frontend_keywords (+30)
+→ Frontend score: 125 pts (OVERRIDE)
 
 Detection Result:
-  Agent: frontend (PRIMARY, 125 pts) - leads template fix
-  Agent: architect (SECONDARY, 40 pts) - Blade context + laravel-expert skill
+  Agent: developer (PRIMARY, 125 pts) — leads template fix
   Model: sonnet
   Complexity: Standard
 ```
@@ -80,14 +83,13 @@ User: "The user list page is slow - optimize the query"
 
 Repo Context: Next.js frontend
 Task Content Analysis:
-- "slow" -> database_task_patterns (+50)
-- "optimize" -> database context
-- "query" -> database_task_patterns (+40)
--> Database score: 90 pts (OVERRIDE)
+- "slow" → database_task_patterns (+50)
+- "optimize" → database context
+- "query" → database_task_patterns (+40)
+→ Database score: 90 pts (OVERRIDE)
 
 Detection Result:
-  Agent: architect (PRIMARY, 90 pts) - database optimization
-  Agent: frontend (SECONDARY, 40 pts) - API route context + nextjs-expert skill
+  Agent: developer (PRIMARY, 90 pts) — database optimization
   Model: sonnet
   Complexity: Standard
 ```
@@ -98,14 +100,13 @@ User: "Invoice PDF has layout issues - table breaks across pages incorrectly"
 
 Repo Context: Node.js API
 Task Content Analysis:
-- "PDF" -> frontend_task_patterns (+50)
-- "layout" -> frontend_keywords (+40)
-- "table" -> frontend_keywords (+30)
--> Frontend score: 120 pts (OVERRIDE)
+- "PDF" → frontend_task_patterns (+50)
+- "layout" → frontend_keywords (+40)
+- "table" → frontend_keywords (+30)
+→ Frontend score: 120 pts (OVERRIDE)
 
 Detection Result:
-  Agent: frontend (PRIMARY, 120 pts) - HTML/CSS for PDF
-  Agent: architect (SECONDARY, 40 pts) - PDF library integration + nodejs-expert skill
+  Agent: developer (PRIMARY, 120 pts) — HTML/CSS for PDF
   Model: sonnet
   Complexity: Standard
 ```

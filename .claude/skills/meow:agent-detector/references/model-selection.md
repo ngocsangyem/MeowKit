@@ -1,14 +1,17 @@
 # Model Selection
 
+<!-- Fixed: replaced phantom aura-frog agent names with actual MeowKit agents.
+     lead/scanner/router/frontend/mobile/gamedev/strategist/devops → orchestrator/developer/planner/etc. -->
+
 **Auto-select model based on task complexity and agent type.**
 
 ## Model Mapping
 
 ```toon
 model_selection[3]{model,when_to_use,agents}:
-  haiku,Quick tasks/Simple queries/Orchestration,lead/scanner
-  sonnet,Standard implementation/Coding/Testing/Bug fixes,All dev agents/tester/frontend
-  opus,Architecture/Deep analysis/Security audits/Complex planning,security (audits)/Any agent (architecture mode)
+  haiku,Quick tasks/Simple queries/Orchestration,orchestrator/analyst
+  sonnet,Standard implementation/Coding/Testing/Bug fixes,developer/tester/reviewer/planner/researcher
+  opus,Architecture/Deep analysis/Security audits/Complex planning,architect/security (audits)/Any agent (architecture mode)
 ```
 
 ## Complexity to Model
@@ -37,17 +40,20 @@ task_model[8]{task_type,model,reason}:
 ## Agent Default Models
 
 ```toon
-agent_models[10]{agent,default_model,opus_when}:
-  lead,haiku,Never (orchestration only)
-  scanner,haiku,Never (detection/context loading)
-  router,haiku,Never (routing only)
+agent_models[13]{agent,default_model,opus_when}:
+  orchestrator,haiku,Never (routing only)
+  analyst,haiku,Never (cost tracking/pattern extraction)
+  planner,sonnet,Complex multi-phase planning
   architect,sonnet,Schema design / migration planning / system architecture
-  frontend,sonnet,Design system architecture
-  mobile,sonnet,Architecture decisions
-  strategist,sonnet,Business strategy / ROI evaluation
-  security,sonnet,opus for full audits
+  developer,sonnet,Never (implementation focus)
   tester,sonnet,Never
-  devops,sonnet,Infrastructure architecture
+  reviewer,sonnet,opus for security-critical reviews
+  security,sonnet,opus for full audits
+  shipper,sonnet,Never
+  documenter,sonnet,Never
+  researcher,sonnet,opus for deep technical research
+  brainstormer,sonnet,opus for architecture evaluation
+  journal-writer,haiku,Never (documentation only)
 ```
 
 ## Model Selection Output
@@ -62,7 +68,7 @@ Include in detection result:
 - **Reason:** API endpoint implementation
 ```
 
-When spawning Task tool, use the detected model:
+When spawning Agent tool, use the detected model:
 ```
-Task(subagent_type="architect", model="sonnet", ...)
+Agent(subagent_type="architect", model="sonnet", ...)
 ```
