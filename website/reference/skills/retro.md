@@ -1,0 +1,21 @@
+---
+title: "meow:retro"
+description: "Weekly engineering retrospective with commit analysis, work patterns, code quality metrics, and team-aware trend tracking."
+---
+# meow:retro
+Weekly engineering retrospective with commit analysis, work patterns, code quality metrics, and team-aware trend tracking.
+## What This Skill Does
+Analyzes commit history, work patterns, and code quality metrics to produce a structured retrospective. Team-aware: breaks down per-person contributions with praise and growth areas. Tracks trends across retrospectives to show improvement or regression over time.
+## Core Capabilities
+- **Commit analysis** — Parses git log for the period, categorizes by type
+- **Work patterns** — Identifies coding velocity, review turnaround, deploy frequency
+- **Team breakdown** — Per-person contributions with strengths and growth areas
+- **Trend tracking** — Compares metrics across retrospective runs
+- **Persistent history** — Saves reports for long-term trend analysis
+## Usage
+```bash
+/meow:retro                   # run weekly retrospective
+"what did we ship this week"  # auto-triggers
+```
+## Related
+- [`meow:budget`](/reference/skills/) — Cost analysis (complements retro's quality metrics)

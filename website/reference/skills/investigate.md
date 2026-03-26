@@ -1,0 +1,65 @@
+---
+title: "meow:investigate"
+description: "Systematic 5-phase debugging methodology with root cause investigation, pattern matching, and the Iron Law."
+---
+
+# meow:investigate
+
+Systematic 5-phase debugging methodology with root cause investigation, pattern matching, and the Iron Law.
+
+## What This Skill Does
+
+`meow:investigate` enforces the most important debugging principle: **no fixes without root cause investigation first.** Instead of guessing at solutions, it walks through a structured methodology — collect symptoms, trace the code path, check git history for regressions, reproduce the bug, form a testable hypothesis, verify it, then fix. If three hypotheses fail, it stops and escalates rather than continuing to guess.
+
+## Core Capabilities
+
+- **Iron Law enforcement** — Blocks fixes until root cause is confirmed with evidence
+- **5-phase methodology** — Collect → Trace → Analyze patterns → Test hypothesis → Verify fix
+- **Pattern library** — Matches symptoms to known patterns: race condition, null propagation, state corruption, integration failure, config drift, stale cache
+- **3-strike escalation** — After 3 failed hypotheses, stops and asks the user instead of guessing indefinitely
+- **Scope locking** — Restricts edits to the affected module via `meow:freeze` to prevent scope creep
+- **Blast radius check** — If fix touches >5 files, asks whether that's appropriate before proceeding
+
+## When to Use This
+
+::: tip Use meow:investigate when...
+- You need to understand WHY something is broken, not just make it work
+- Previous fix attempts haven't worked
+- The bug is intermittent or hard to reproduce
+- You suspect an architectural issue, not just a code bug
+:::
+
+## Usage
+
+```bash
+# Direct invocation
+/meow:investigate login timeout after session expiry
+
+# Usually invoked by meow:fix during its investigation phase
+/meow:fix payment race condition  # → automatically uses investigate
+```
+
+## Example Prompts
+
+| Prompt | Investigation approach |
+|--------|----------------------|
+| `session token not refreshing` | Trace auth middleware → check refresh logic → git log for recent changes |
+| `intermittent test failures in CI` | Pattern: race condition → check shared state → timing dependencies |
+| `works locally, fails in staging` | Pattern: config drift → compare env vars → check feature flags |
+| `users see stale data after update` | Pattern: stale cache → check Redis TTL → CDN invalidation |
+
+## Quick Workflow
+
+```
+Symptoms → Code Trace → Git History Check → Reproduce
+  → Hypothesis: "Root cause is X because Y"
+  → Verify with temporary log/assertion
+  → Confirmed? → Fix + Regression Test
+  → Not confirmed? → Back to investigation (max 3 tries)
+  → 3 strikes? → Escalate to user
+```
+
+## Related
+
+- [`meow:fix`](/reference/skills/fix) — Orchestrates investigate within the fix pipeline
+- [`meow:scout`](/reference/skills/scout) — Helps find relevant files during investigation
