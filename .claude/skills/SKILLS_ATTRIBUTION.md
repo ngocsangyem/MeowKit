@@ -35,6 +35,9 @@ Each skill retains its original author credit in its frontmatter.
 | 26  | llms                  | MeowKit (adapted)            | Adapted from claudekit-engineer/llms                         | MIT         | .claude/skills/meow:llms/                       | 2    |
 | 27  | skill-creator         | MeowKit (adapted)            | Adapted from claudekit-engineer/skill-creator (simplified from 47 to 4 files) | MIT | .claude/skills/meow:skill-creator/ | 2 |
 | 28  | project-organization  | MeowKit (adapted)            | Adapted from claudekit-engineer/project-organization         | MIT         | .claude/skills/meow:project-organization/       | 2    |
+| 29  | typescript            | MeowKit (adapted)            | Adapted from aura-frog/typescript-expert + claudekit/frontend-development (TS parts) | MIT | .claude/skills/meow:typescript/ | 2 |
+| 30  | vue                   | MeowKit (adapted)            | Adapted from aura-frog/vue-expert                            | MIT         | .claude/skills/meow:vue/                        | 2    |
+| 31  | frontend-design       | MeowKit (adapted)            | Adapted from claudekit/ui-ux-pro-max + claudekit/frontend-design (merged) | MIT | .claude/skills/meow:frontend-design/ | 2 |
 
 ## Selection Criteria
 
