@@ -87,22 +87,22 @@ Human review required at these checkpoints (skipped with `--auto`):
 - **Testing:** 100% pass required (unless no-test mode)
 - **Code Review:** User approval OR auto-approve (score>=9.5, 0 critical)
 - **Finalize (MANDATORY - never skip):**
-  1. `project-manager` subagent → run full plan sync-back (all completed tasks/steps across all `phase-XX-*.md`, not only current phase), then update `plan.md` status/progress
-  2. `docs-manager` subagent → update `./docs` if changes warrant
+  1. `orchestrator` → run full plan sync-back (all completed tasks/steps), then update `plan.md` status/progress
+  2. `documenter` agent → update `./docs` if changes warrant
   3. `TaskUpdate` → mark all Claude Tasks complete after sync-back verification
-  4. Ask user if they want to commit via `git-manager` subagent
+  4. Ask user if they want to commit via `shipper` agent
 
 ## Required Subagents (MANDATORY)
 
 | Phase    | Subagent                                         | Requirement           |
 | -------- | ------------------------------------------------ | --------------------- |
+<!-- Fixed: replaced phantom claudekit agent names with actual MeowKit agents -->
 | Research | `researcher`                                     | Optional in fast/code |
 | Scout    | `meow:scout`                                     | Optional in code      |
 | Plan     | `planner`                                        | Optional in code      |
-| UI Work  | `ui-ux-designer`                                 | If frontend work      |
-| Testing  | `tester`, `debugger`                             | **MUST** spawn        |
-| Review   | `code-reviewer`                                  | **MUST** spawn        |
-| Finalize | `project-manager`, `docs-manager`, `git-manager` | **MUST** spawn all 3  |
+| Testing  | `tester`                                         | **MUST** spawn        |
+| Review   | `reviewer`                                       | **MUST** spawn        |
+| Finalize | `documenter`, `shipper`                          | **MUST** spawn both   |
 
 **CRITICAL ENFORCEMENT:**
 

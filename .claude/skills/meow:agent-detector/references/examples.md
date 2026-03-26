@@ -1,9 +1,7 @@
 # Detection Examples
 
-<!-- Fixed: replaced phantom aura-frog agent names (mobile, frontend, lead, scanner)
-     with actual MeowKit agents (developer, orchestrator, planner, etc.) -->
-
 ## Example 1: Explicit Technology Mention
+
 ```
 User: "Create a React Native screen for user profile"
 
@@ -19,6 +17,7 @@ Detection Result:
 ```
 
 ## Example 2: Context-Based Detection (No Tech Mention)
+
 ```
 User: "Fix the login bug"
 
@@ -35,6 +34,7 @@ Detection Result:
 ```
 
 ## Example 3: Architecture Task (Uses Opus)
+
 ```
 User: "Design the authentication system architecture"
 
@@ -49,6 +49,7 @@ Detection Result:
 ```
 
 ## Example 4: Quick Fix (Uses Haiku)
+
 ```
 User: "Fix typo in README.md line 42"
 
@@ -61,6 +62,7 @@ Detection Result:
 ```
 
 ## Example 5: Backend Repo, Frontend Task (Task-Based Override)
+
 ```
 User: "Fix the password reset email template - the button styling is broken"
 
@@ -78,6 +80,7 @@ Detection Result:
 ```
 
 ## Example 6: Frontend Repo, Database Task (Task-Based Override)
+
 ```
 User: "The user list page is slow - optimize the query"
 
@@ -95,6 +98,7 @@ Detection Result:
 ```
 
 ## Example 7: Backend Repo, PDF Generation (Task-Based Override)
+
 ```
 User: "Invoice PDF has layout issues - table breaks across pages incorrectly"
 

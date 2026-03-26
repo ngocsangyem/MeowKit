@@ -1,8 +1,5 @@
 # After Detection
 
-<!-- Fixed: replaced phantom aura-frog references with actual MeowKit agents and skills.
-     agents/router.md → orchestrator.md, bugfix-quick → meow:fix, etc. -->
-
 1. **Output detection result** with agent, model, and complexity
 2. **Load agent instructions** from `.claude/agents/[agent-name].md`
 3. **Use detected model** when spawning Agent tool:

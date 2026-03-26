@@ -5,17 +5,18 @@
 ## Collaborative Planning (Deep Tasks Only)
 
 For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
+
 - 3 agents (Builder, Breaker, User) analyze independently
 - Cross-review and debate proposals
 - PM converges on optimal plan
 
-| Phase | Name | Lead Agent | Deliverable | Gate |
-|-------|------|-----------|-------------|------|
-| 1 | Understand + Design | lead → Dev | Requirements (TOON), technical design | **APPROVAL** |
-| 2 | Test (RED) | tester + Dev | Failing tests (TDD RED) | Auto |
-| 3 | Build (GREEN) | Dev agent | Implementation (TDD GREEN) | **APPROVAL** |
-| 4 | Refactor + Review | Dev + security | Clean code, quality/security check | Auto* |
-| 5 | Finalize | tester + PM | Coverage >=80%, docs, notification | Auto |
+| Phase | Name                | Lead Agent            | Deliverable                        | Gate         |
+| ----- | ------------------- | --------------------- | ---------------------------------- | ------------ |
+| 1     | Understand + Design | planner → architect   | Requirements, technical design     | **APPROVAL** |
+| 2     | Test (RED)          | tester + developer    | Failing tests (TDD RED)            | Auto         |
+| 3     | Build (GREEN)       | developer             | Implementation (TDD GREEN)         | **APPROVAL** |
+| 4     | Refactor + Review   | developer + security  | Clean code, quality/security check | Auto\*       |
+| 5     | Finalize            | tester + orchestrator | Coverage >=80%, docs, notification | Auto         |
 
 ## Phase Transition Rules
 
@@ -32,9 +33,12 @@ Invalid transitions: Skip Phase 1→3 (no tests), Phase 3 without Phase 2 (no TD
 ## Approval Gates (Only 2)
 
 Format:
+
 ```markdown
 Phase [N]: [Name] - Approval Needed
+
 ## [Friendly Summary]
+
 [Deliverables list]
 Progress: [X]% ([N]/5 phases)
 Options: approve / reject: <reason> / modify: <changes> / stop

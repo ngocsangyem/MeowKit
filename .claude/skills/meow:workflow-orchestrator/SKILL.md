@@ -32,7 +32,7 @@ source: aura-frog
 ## Pre-Execution Checklist
 
 1. **agent-detector** → Select lead agent (MANDATORY)
-2. **project-context-loader** → Load conventions (MANDATORY)
+2. **Load context** → Read `memory/lessons.md` + `memory/patterns.json` (Phase 0 Orient)
 3. **Show agent banner** at start of response
 4. **Verify task complexity** — if simple, suggest lighter approach
 5. **Challenge requirements** → Ask clarifying questions before Phase 1
@@ -50,9 +50,9 @@ source: aura-frog
 
 ## References
 
-| Reference | When to load | Content |
-|-----------|-------------|---------|
-| **[workflow-phases.md](./references/workflow-phases.md)** | Steps 2-6 — executing phases | Phase details, transition rules, approval gates, token budgets, TDD rules |
+| Reference                                                         | When to load                                     | Content                                                                     |
+| ----------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------- |
+| **[workflow-phases.md](./references/workflow-phases.md)**         | Steps 2-6 — executing phases                     | Phase details, transition rules, approval gates, token budgets, TDD rules   |
 | **[fasttrack-and-teams.md](./references/fasttrack-and-teams.md)** | Only if fasttrack trigger or Agent Teams enabled | Fast-track mode, spec validation, Agent Teams composition, state management |
 
 ## Key Rules

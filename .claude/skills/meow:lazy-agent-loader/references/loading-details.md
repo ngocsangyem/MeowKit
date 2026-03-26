@@ -1,72 +1,75 @@
-<!-- Extracted from SKILL.md for progressive disclosure (checklist #11, #14) -->
-
 # Agent Loading Details
 
 ## Loading Commands
 
 ### Load Single Agent
+
 ```bash
-# Load full agent definition
-cat agents/mobile.md
+# Load full agent definition from .claude/agents/
+Read .claude/agents/developer.md
 ```
 
 ### Load Agent Summary
+
 ```toon
 agent_summary{id,role,focus}:
-  mobile,Senior React Native Developer,Expo/RN mobile apps with TypeScript
+  developer,Implementation specialist,TDD-enforced feature development
 ```
 
 ## Token Savings
 
 ```toon
 comparison[4]{scenario,without_lazy,with_lazy,savings}:
-  Initial load (24 agents),~48000,~1200,97.5%
-  Single agent task,~48000,~2700,94.4%
-  Dual agent task,~48000,~4200,91.3%
-  Full stack (3 agents),~48000,~5700,88.1%
+  Initial load (13 agents),~26000,~1000,96%
+  Single agent task,~26000,~2500,90%
+  Dual agent task,~26000,~4000,85%
+  Full stack (3 agents),~26000,~5500,79%
 ```
 
 ## Cache Strategy
 
 ### Session Cache
+
 ```
 Loaded agents are cached in conversation context.
 If agent already loaded, skip re-loading.
-Track loaded agents: loaded_agents[]: mobile,tester
+Track loaded agents: loaded_agents[]: developer,tester
 ```
 
 ### Force Reload
+
 ```
-User: "reload agent mobile"
+User: "reload agent developer"
 → Clear cache for agent
-→ Re-read full definition
+→ Re-read full definition from .claude/agents/developer.md
 ```
 
 ## Example Flow
 
 ```
-User: "Create a React Native screen for login"
+User: "Fix the login bug"
 
 1. Agent Detector scores all agents using keywords from agent_index
-   - mobile: +60 (react-native) +20 (context) = 80 PRIMARY
-   - frontend: +35 (screen/login implies UI) → OPTIONAL
+   - developer: +60 (fix/bug) +20 (context) = 80 PRIMARY
+   - tester: +35 (bug implies test needed) → SECONDARY
 
 2. Lazy Loader activates:
-   - Load: agents/mobile.md (~1500 tokens)
-   - Skip: frontend (score < 50)
+   - Load: .claude/agents/developer.md (~1500 tokens)
+   - Summary only: tester (score 50-79)
 
 3. Context loaded:
-   - Agent index: ~1200 tokens
-   - mobile full: ~1500 tokens
-   - Total: ~2700 tokens (vs ~48000 without lazy loading)
+   - Agent index: ~1000 tokens
+   - developer full: ~1500 tokens
+   - Total: ~2500 tokens (vs ~26000 without lazy loading)
 ```
 
 ## Agent Categories
 
 ```toon
 categories[4]{name,count,when_to_load}:
-  dev,11,When code/implementation requested
-  quality,3,When review/test/design requested
-  ops,5,When deploy/integrate/notify requested
-  infra,5,Usually auto-loaded by system
+  planning,3,When plan/design/research requested
+  dev,1,When code/implementation requested
+  quality,3,When review/test/security requested
+  ops,3,When ship/deploy/docs requested
+  infra,3,Usually auto-loaded by system
 ```

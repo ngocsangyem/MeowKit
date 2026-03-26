@@ -9,7 +9,7 @@ triggers:
   - "always first"
 allowed-tools: NONE
 # TOKEN OPTIMIZATION: Disabled file scanning tools. Detection uses in-memory patterns only.
-# This saves ~10-30k tokens per message. If file scanning needed, use project-context-loader explicitly.
+# This saves ~10-30k tokens per message. If file scanning needed, use meow:scout explicitly.
 source: aura-frog
 ---
 

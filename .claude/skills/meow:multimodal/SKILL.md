@@ -122,21 +122,13 @@ python .claude/skills/meow:multimodal/scripts/gemini_generate.py \
   [--output ./output/]
 ```
 
-**`scripts/media_optimizer.py`** — Compress/resize media for API limits
-
-```bash
-python .claude/skills/meow:multimodal/scripts/media_optimizer.py \
-  --input <file> --output <file> \
-  [--target-size 20] [--verbose]
-```
-
 ## Analysis Process
 
 Follow these steps sequentially:
 
 1. **API key check** — verify `GEMINI_API_KEY` is set (see ## API Key Check above)
 2. **Identify modality** — determine file type from extension
-3. **Check file size** — if > 20MB, use File API upload or compress with `media_optimizer.py`
+3. **Check file size** — if > 20MB, use File API upload; for compression use `ffmpeg` directly (see `references/audio-processing.md`)
 4. **Select model** — use default from Models table (override with `--model` if needed)
 5. **Execute script** — run the appropriate script with the file path
 6. **Check context budget** — if response > 3000 tokens, summarize before returning
@@ -146,7 +138,7 @@ Follow these steps sequentially:
 
 - **Missing API key** → STOP + setup instructions (aistudio.google.com/apikey)
 - **Invalid key (401)** → STOP + re-check key
-- **File too large** → compress with `media_optimizer.py`
+- **File too large** → compress with `ffmpeg` (see audio-processing.md) or use Gemini File API for up to 2GB
 - **Rate limit (429)** → wait 60s + retry once
 - **Billing required** → STOP + explain (console.cloud.google.com)
 

@@ -4,8 +4,6 @@
 
 **Analyze the actual task, not just the repo.** A backend repo may have frontend tasks (templates, PDFs, emails).
 
-**Full patterns:** `task-based-agent-selection.md`
-
 ```toon
 task_content_triggers[7]{category,example_patterns,activates,score_boost}:
   Frontend,html template/blade/twig/email template/pdf styling/css,frontend,+50 to +60
@@ -20,6 +18,7 @@ task_content_triggers[7]{category,example_patterns,activates,score_boost}:
 **Key insight:** Task content score >=50 -> Override or co-lead with repo-based agent.
 
 **Examples:**
+
 ```
 # Backend repo, but frontend task
 Repo: Laravel API

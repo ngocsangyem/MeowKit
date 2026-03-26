@@ -1,8 +1,5 @@
 # Model Selection
 
-<!-- Fixed: replaced phantom aura-frog agent names with actual MeowKit agents.
-     lead/scanner/router/frontend/mobile/gamedev/strategist/devops → orchestrator/developer/planner/etc. -->
-
 **Auto-select model based on task complexity and agent type.**
 
 ## Model Mapping
@@ -62,6 +59,7 @@ Include in detection result:
 
 ```markdown
 ## Detection Result
+
 - **Agent:** architect
 - **Model:** sonnet
 - **Complexity:** Standard
@@ -69,6 +67,7 @@ Include in detection result:
 ```
 
 When spawning Agent tool, use the detected model:
+
 ```
 Agent(subagent_type="architect", model="sonnet", ...)
 ```

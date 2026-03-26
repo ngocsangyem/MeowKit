@@ -45,19 +45,16 @@ author: vudovn (antigravity-kit)
 
 ## Scripts
 
-<!-- Fixed: original antigravity-kit scripts (lint_runner.py, type_coverage.py) do not exist in MeowKit.
-     Replaced with actual MeowKit validation scripts + project toolchain guidance. -->
-
 **MeowKit validation scripts** (at `.claude/scripts/`):
 
-| Script | Purpose | Command |
-|--------|---------|---------|
-| `validate.py` | General code validation | `python .claude/scripts/validate.py` |
+| Script             | Purpose                   | Command                                   |
+| ------------------ | ------------------------- | ----------------------------------------- |
+| `validate.py`      | General code validation   | `python .claude/scripts/validate.py`      |
 | `security-scan.py` | Security pattern scanning | `python .claude/scripts/security-scan.py` |
 
 **For linting and type-checking:** Use the project's own toolchain directly:
 
-| Ecosystem | Lint | Types |
-|-----------|------|-------|
+| Ecosystem  | Lint                                   | Types              |
+| ---------- | -------------------------------------- | ------------------ |
 | Node.js/TS | `npm run lint` or `npx eslint . --fix` | `npx tsc --noEmit` |
-| Python | `ruff check . --fix` | `mypy .` |
+| Python     | `ruff check . --fix`                   | `mypy .`           |

@@ -29,23 +29,20 @@ Reduce token usage by:
 ## Agent Index (Summaries Only)
 
 ```toon
-agent_index[24]{id,category,specialty,keywords}:
-  mobile,dev,React Native/Expo mobile,react-native/expo/RN/mobile/ios/android
-  mobile-flutter,dev,Flutter/Dart mobile,flutter/dart/bloc/mobile
-  web-angular,dev,Angular frontend,angular/ngrx/rxjs/typescript
-  web-vuejs,dev,Vue.js frontend,vue/vuejs/pinia/nuxt/composition
-  web-reactjs,dev,React frontend,react/reactjs/jsx/hooks/redux
-  web-nextjs,dev,Next.js fullstack,next/nextjs/ssr/ssg/app-router
-  architect,dev,Node.js backend,nodejs/express/nestjs/fastify/api
-  backend-python,dev,Python backend,python/django/fastapi/flask/api
-  backend-go,dev,Go backend,go/golang/gin/fiber/api
-  backend-laravel,dev,Laravel/PHP backend,laravel/php/eloquent/artisan
-  security,quality,Security auditing,security/vulnerability/audit/owasp/penetration
-  tester,quality,Testing/QA,test/testing/coverage/qa/jest/cypress
-  devops,ops,DevOps/CI-CD,deploy/docker/kubernetes/ci-cd/pipeline/terraform
-  router,infra,Agent detection,detect/agent/select/route
-  lead,infra,PM/orchestration,pm/project/orchestrate/manage
-  scanner,infra,Project management,project/detect/identify/config/context
+agent_index[13]{id,category,specialty,keywords}:
+  orchestrator,infra,Task routing/complexity classification,route/classify/assign/complexity
+  planner,planning,Two-lens planning/Gate 1,plan/feature/design/scope/requirements
+  architect,planning,ADRs/system design,architecture/schema/api/infra/design/migration
+  developer,dev,Implementation (TDD),implement/build/code/feature/fix/refactor
+  tester,quality,TDD enforcement/test writing,test/testing/coverage/qa/jest/vitest/pytest
+  reviewer,quality,5-dimension code review/Gate 2,review/audit/quality/standards
+  security,quality,Security audit/BLOCK verdicts,security/vulnerability/audit/owasp/injection
+  shipper,ops,Deploy pipeline/PR creation,ship/deploy/release/commit/pr/ci
+  documenter,ops,Living docs/changelogs,docs/documentation/changelog/readme
+  analyst,infra,Cost tracking/pattern extraction,cost/budget/patterns/metrics/usage
+  researcher,planning,Technology research/library evaluation,research/compare/evaluate/library
+  brainstormer,planning,Solution brainstorming/trade-offs,brainstorm/alternatives/tradeoff/explore
+  journal-writer,ops,Failure documentation/lessons,failure/incident/postmortem/lesson
 ```
 
 ---
@@ -71,7 +68,7 @@ agent_index[24]{id,category,specialty,keywords}:
 ### Full Definition Location
 
 ```
-agents/[agent-id].md
+.claude/agents/[agent-name].md
 ```
 
 ---
@@ -87,8 +84,8 @@ Step 4: For SECONDARY agents, use summary from index
 
 ## References
 
-| Reference | When to load | Content |
-|-----------|-------------|---------|
+| Reference                                                 | When to load                 | Content                                           |
+| --------------------------------------------------------- | ---------------------------- | ------------------------------------------------- |
 | **[loading-details.md](./references/loading-details.md)** | When loading specific agents | Commands, token savings, cache strategy, examples |
 
 **Note:** This skill is automatically used by `agent-detector` for optimized loading.

@@ -40,7 +40,6 @@ Skills were selected by scoring 5 criteria (weighted total, max 50):
 - Clarity (2×), Reusability (2×), Agent Empowerment (3×), Task-Size Coverage (2×), Production Evidence (1×)
 
 Threshold: Tier 1 ≥ 40, Tier 2 = 30-39.
-Full scoring: `docs/skills-evaluation-260325.md`
 
 ## By Source
 

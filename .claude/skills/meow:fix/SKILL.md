@@ -65,9 +65,9 @@ Classify before routing. See `references/complexity-assessment.md`.
 ### Step 5: Finalize (MANDATORY - never skip)
 
 1. Report summary: confidence score, changes, files
-2. `docs-manager` subagent → update `./docs` if changes warrant (NON-OPTIONAL)
+2. `documenter` agent → update `./docs` if changes warrant (NON-OPTIONAL)
 3. `TaskUpdate` → mark ALL Claude Tasks `completed`
-4. Ask user if they want to commit via `git-manager` subagent
+4. Ask user if they want to commit via `shipper` agent
 
 ---
 
@@ -77,7 +77,8 @@ See `references/skill-activation-matrix.md` for complete matrix.
 
 **Always activate:** `meow:investigate` (all workflows)
 **Conditional:** `meow:scout` (for codebase exploration), brainstormer agent (for complex root cause analysis)
-**Subagents:** `debugger`, `researcher`, `planner`, `code-reviewer`, `tester`, `Bash`
+<!-- Fixed: replaced phantom claudekit agent names with actual MeowKit agents -->
+**Subagents:** `developer`, `researcher`, `planner`, `reviewer`, `tester`, `Bash`
 **Parallel:** Multiple `Explore` agents for scouting, `Bash` agents for verification
 
 ## Output Format

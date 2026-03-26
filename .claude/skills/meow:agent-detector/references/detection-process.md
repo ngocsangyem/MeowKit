@@ -59,7 +59,7 @@ Task Analysis:
 Even if repo is pure backend, frontend leads this task!
 ```
 
-**Apply patterns from:** `task-based-agent-selection.md`
+**Apply patterns from:** `references/multi-layer-detection.md` (Layer 0 — Task Content Analysis)
 
 ## Step 1: Extract Keywords
 
@@ -78,48 +78,30 @@ Extracted:
 **IMPORTANT:** Use cached project detection to avoid re-scanning every task.
 
 ```bash
-# 1. Check detection first (fast path):
-.claude/project-contexts/[project-name]/project-detection.json
+# 1. Check memory for cached project context (fast path):
+.claude/memory/lessons.md       # past session learnings
+.claude/memory/patterns.json    # detected patterns + frequencies
 
-# 2. If detection valid (< 24h, key files unchanged):
-   -> Use cached: framework, agents, testInfra, filePatterns
+# 2. If context is insufficient:
+   -> Run meow:scout for codebase structure
+   -> Read package.json, tsconfig.json, etc. directly
 
-# 3. If detection invalid or missing:
-   -> Run full detection (reads package.json, etc.)
-   -> Save to project-contexts for next task
-
-# 4. Load project-specific overrides:
-.claude/project-contexts/[project]/project-config.yaml
-.claude/project-contexts/[project]/conventions.md
+# 3. For fresh codebase scan:
+   -> Use /meow:scout [target] for parallel directory search
 ```
-
-**Detection invalidation triggers:**
-
-- Key config files changed (package.json mtime/size)
-- Detection older than 24 hours
-- User runs `/project:refresh`
-
-**Commands:**
-
-- `/project:status` - Show project detection
-- `/project:refresh` - Force fresh scan
 
 ## Step 3: Score All Agents (Combine Task + Repo)
 
 ```
-mobile:
-  - "iOS" keyword: +35 (semantic)
-  - CWD = /mobile-app: +40 (context)
+developer:
+  - "iOS" keyword: +35 (semantic — mobile implementation)
+  - "fix" keyword: +30 (bug fix intent)
   - Recent *.phone.tsx: +20 (file pattern)
-  -> Total: 95 pts PRIMARY
+  → Total: 85 pts PRIMARY
 
 tester:
   - Bug fix intent: +35 (secondary for bugs)
-  -> Total: 35 pts OPTIONAL
-
-frontend:
-  - "button" keyword: +20 (UI element)
-  -> Total: 20 pts NOT SELECTED
+  → Total: 35 pts OPTIONAL
 ```
 
 ## Step 4: Select Agents
@@ -129,8 +111,6 @@ frontend:
 - Optional: Score 30-49
 
 ## Step 5: Show Banner
-
-**See:** `rules/core/agent-identification-banner.md` for official format.
 
 **Single Agent Banner:**
 
