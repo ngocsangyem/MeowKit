@@ -340,7 +340,7 @@ When the agent or user needs up-to-date documentation for any library, framework
 **MCP requirements:**
 
 - Context7 MCP: recommended for library/framework docs (broad coverage, zero setup)
-- Context Hub CLI: recommended for curated docs + internal project docs
+- Context Hub (`npx chub`): recommended for curated docs + internal project docs (no global install needed)
 - If neither is configured: skill falls back to llms.txt direct fetch + WebSearch
 
 ## MCP Server Configuration

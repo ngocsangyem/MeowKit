@@ -35,13 +35,13 @@ assertEqual(detectLanguage('Kotlin Jetpack Compose'), 'kt', 'Detects Kotlin');
 assertEqual(detectLanguage('How to use date picker'), null, 'No language → null');
 assertEqual(detectLanguage('Vue 3 Suspense'), null, 'Vue without lang hint → null');
 
-// ─── isChubInstalled (skipped — env dependent) ─────────────────────
-console.log('\n## isChubInstalled() — skipped (environment dependent)');
-console.log('  (Run `which chub` manually to verify)');
+// ─── isChubAvailable (skipped — env dependent) ─────────────────────
+console.log('\n## isChubAvailable() — skipped (environment dependent)');
+console.log('  (Run `npx chub --version` to verify)');
 
-// ─── fetchChub integration (skipped — requires chub) ────────────────
-console.log('\n## fetchChub() — skipped (requires chub CLI)');
-console.log('  To run integration tests: npm install -g @aisuite/chub');
+// ─── fetchChub integration (skipped — requires npx + network) ──────
+console.log('\n## fetchChub() — skipped (requires npx + network)');
+console.log('  To run integration tests: npx chub search "stripe"');
 console.log('  Then: node scripts/fetch-chub.js "stripe webhooks" --lang js');
 
 // ─── Summary ────────────────────────────────────────────────────────

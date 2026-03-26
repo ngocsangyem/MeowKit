@@ -115,11 +115,11 @@ Before any retrieval attempt, verify availability:
 - If missing: scripts still work via direct HTTP to context7.com
 - Setup: `{"context7": {"type": "stdio", "command": "npx", "args": ["-y", "@context7/mcp@latest"]}}`
 
-**Context Hub CLI** — run `which chub`
+**Context Hub CLI** — run `npx chub --version`
 
-- If present: full chub features (search, get, annotate, language-specific)
-- If missing: skip chub path, use Context7 + web fallback
-- Setup: `npm install -g @aisuite/chub`
+- Available via npx — no global install required
+- Full chub features: search, get, annotate, language-specific docs
+- If unavailable: skip chub path, use Context7 + web fallback
 
 **If neither configured:** Scripts fall back to direct llms.txt fetch + WebSearch.
 

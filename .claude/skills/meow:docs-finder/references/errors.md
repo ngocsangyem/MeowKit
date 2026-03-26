@@ -21,9 +21,9 @@
 
 ### Context Hub (chub) Errors
 
-**Command not found**
-- chub CLI not installed
-- Not in PATH
+**npx chub unavailable**
+- Network issue (npx needs to download the package)
+- npm/npx not installed
 
 **No results**
 - Library not in the community registry

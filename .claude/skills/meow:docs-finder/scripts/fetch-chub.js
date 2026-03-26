@@ -6,13 +6,13 @@
  * Fetches documentation from Context Hub CLI — a community-maintained
  * registry of versioned, LLM-optimized documentation with local annotations.
  *
- * Requires: npm install -g @aisuite/chub
+ * Runs via npx — no global install required: npx chub search "query"
  *
  * Features over context7:
  *  - Local annotations persist across sessions
  *  - Language-specific docs (--lang py, --lang js)
  *  - Version-specific docs (--version 2024-12-18)
- *  - Offline capable (chub update --full)
+ *  - Offline capable (npx chub update --full)
  *  - Community feedback loop
  */
 
@@ -23,12 +23,12 @@ const env = loadEnv();
 const DEBUG = env.DEBUG === 'true';
 
 /**
- * Check if chub CLI is installed
+ * Check if chub is available (via npx or global install)
  * @returns {boolean}
  */
-function isChubInstalled() {
+function isChubAvailable() {
   try {
-    execSync('which chub', { stdio: 'pipe' });
+    execSync('npx chub --version', { stdio: 'pipe', timeout: 15000 });
     return true;
   } catch {
     return false;
@@ -43,7 +43,7 @@ function isChubInstalled() {
  */
 function runChub(command, timeoutMs = 15000) {
   try {
-    const result = execSync(`chub ${command}`, {
+    const result = execSync(`npx chub ${command}`, {
       encoding: 'utf8',
       timeout: timeoutMs,
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -51,7 +51,7 @@ function runChub(command, timeoutMs = 15000) {
     return result.trim();
   } catch (error) {
     if (DEBUG) {
-      console.error(`[DEBUG] chub ${command} failed:`, error.message);
+      console.error(`[DEBUG] npx chub ${command} failed:`, error.message);
     }
     return null;
   }
@@ -63,32 +63,45 @@ function runChub(command, timeoutMs = 15000) {
  * @returns {Array<Object>} Search results
  */
 function searchChub(query) {
-  const output = runChub(`search "${query}"`);
+  // Use --json for structured output (reliable parsing)
+  const output = runChub(`search "${query}" --json`);
 
   if (!output) return [];
 
-  // Parse chub search output (typically tabular or JSON)
-  // chub search returns lines like: id | name | version | description
-  const results = [];
-  const lines = output.split('\n').filter(l => l.trim());
-
-  for (const line of lines) {
-    // Skip header lines
-    if (line.startsWith('─') || line.startsWith('=') || line.startsWith('ID')) continue;
-
-    // Try to parse as pipe-delimited or space-delimited
-    const parts = line.split(/\s*\|\s*/).filter(p => p.trim());
-    if (parts.length >= 2) {
-      results.push({
-        id: parts[0].trim(),
-        name: parts[1] ? parts[1].trim() : parts[0].trim(),
-        version: parts[2] ? parts[2].trim() : null,
-        description: parts[3] ? parts[3].trim() : null,
-      });
+  // Parse JSON output from chub search --json
+  try {
+    const parsed = JSON.parse(output);
+    if (parsed.results && Array.isArray(parsed.results)) {
+      return parsed.results.map(r => ({
+        id: r.id,
+        name: r.name || r.id,
+        version: r.version || null,
+        description: r.description || null,
+        tags: r.tags || [],
+      }));
     }
-  }
+    return [];
+  } catch {
+    // Fallback: parse tabular output if --json failed
+    const results = [];
+    const lines = output.split('\n').filter(l => l.trim());
 
-  return results;
+    for (const line of lines) {
+      if (line.startsWith('─') || line.startsWith('=') || line.startsWith('ID')) continue;
+
+      const parts = line.split(/\s*\|\s*/).filter(p => p.trim());
+      if (parts.length >= 2) {
+        results.push({
+          id: parts[0].trim(),
+          name: parts[1] ? parts[1].trim() : parts[0].trim(),
+          version: parts[2] ? parts[2].trim() : null,
+          description: parts[3] ? parts[3].trim() : null,
+        });
+      }
+    }
+
+    return results;
+  }
 }
 
 /**
@@ -158,13 +171,13 @@ function detectLanguage(query) {
  * @returns {Object} Fetch result
  */
 function fetchChub(query, options = {}) {
-  // Step 1: Check if chub is installed
-  if (!isChubInstalled()) {
+  // Step 1: Check if chub is available via npx
+  if (!isChubAvailable()) {
     return {
       success: false,
       source: 'chub',
-      error: 'Context Hub CLI (chub) is not installed',
-      suggestion: 'Install with: npm install -g @aisuite/chub',
+      error: 'Context Hub (@aisuite/chub) is not available',
+      suggestion: 'Runs via npx — no install needed. Check your network connection or run: npx chub --version',
     };
   }
 
@@ -260,7 +273,7 @@ if (require.main === module) {
 
 module.exports = {
   fetchChub,
-  isChubInstalled,
+  isChubAvailable,
   searchChub,
   getChubDoc,
   annotateChub,

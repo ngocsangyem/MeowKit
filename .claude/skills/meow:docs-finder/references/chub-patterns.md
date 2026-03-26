@@ -1,9 +1,12 @@
 # Context Hub (chub) CLI Patterns
 
-## Installation (Optional)
+## Usage
+
+Runs via `npx` — no global install required:
 
 ```bash
-npm install -g @aisuite/chub
+npx chub search "stripe"
+npx chub get stripe/api --lang js
 ```
 
 ## Core Commands
@@ -11,52 +14,83 @@ npm install -g @aisuite/chub
 ### Search for documentation
 
 ```bash
-npx chub search [query]
-# Returns: list of matching doc IDs with names and versions
+npx chub search                          # List everything available
+npx chub search "stripe"                 # Fuzzy search
+npx chub search stripe/payments          # Exact ID → full detail
+npx chub search "stripe" --json          # Structured JSON output (for agents)
+npx chub search --tags docs,openai       # Filter by tags
 ```
 
 ### Fetch documentation by ID
 
 ```bash
-npx chub get <id>                    # Default language
-npx chub get <id> --lang py          # Python-specific docs
-npx chub get <id> --lang js          # JavaScript-specific docs
-npx chub get <id> --version 2024-12-18  # Specific version
-npx chub get <id> --file reference   # Fetch only the reference file
+npx chub get stripe/api                  # Print doc to terminal
+npx chub get stripe/api --lang py        # Python-specific docs
+npx chub get stripe/api --lang js        # JavaScript-specific docs
+npx chub get stripe/api -o doc.md        # Save to file
+npx chub get stripe/api --full           # Fetch all files, not just entry
+npx chub get openai/chat stripe/api      # Fetch multiple at once
+npx chub get pw-community/login-flows    # Fetch a skill
 ```
 
-### Local annotations
+### Local annotations (persist across sessions)
 
 ```bash
-npx chub annotate <id> "webhook needs raw body"
-# Annotations persist at ~/.chub/annotations/
-# Appended to docs on subsequent fetches
+npx chub annotate stripe/api "Webhook needs raw body"
+npx chub annotate --list                 # See all saved notes
+npx chub annotate stripe/api --clear     # Remove a note
 ```
 
 ### Feedback to maintainers
 
 ```bash
-npx chub feedback <id> down --label outdated
-npx chub feedback <id> up
+npx chub feedback stripe/api up          # Worked well
+npx chub feedback stripe/api down --label outdated   # Needs updating
 ```
 
-### Offline mode
+### Registry and cache management
 
 ```bash
-npx chub update --full    # Download everything for offline use
+npx chub update                          # Refresh the cached registry
+npx chub cache status                    # Check cache state
+npx chub cache clear                     # Clear local cache
 ```
+
+## Agent Piping Patterns
+
+```bash
+# Get the top result ID
+npx chub search "stripe" --json | jq -r '.results[0].id'
+
+# Search → pick → fetch → save
+ID=$(npx chub search "stripe" --json | jq -r '.results[0].id')
+npx chub get "$ID" --lang js -o .context/stripe.md
+
+# Fetch multiple at once
+npx chub get openai/chat stripe/api -o .context/
+```
+
+## Flags Reference
+
+| Flag | Purpose |
+|------|---------|
+| `--json` | Structured JSON output (for agents and piping) |
+| `--tags <csv>` | Filter by tags (e.g. docs, skill, openai) |
+| `--lang <lang>` | Language variant: py, js, ts, rb, cs |
+| `--full` | Fetch all files, not just entry point |
+| `-o, --output <path>` | Write content to file or directory |
 
 ## When to Use chub Over Context7
 
-| Scenario                               | Use chub | Use Context7 |
-| -------------------------------------- | -------- | ------------ |
-| Need language-specific docs (py vs js) | ✓        |              |
-| Need curated, human-reviewed docs      | ✓        |              |
-| Working offline                        | ✓        |              |
-| Need annotations from past sessions    | ✓        |              |
-| Broad library coverage                 |          | ✓            |
-| Zero setup required                    |          | ✓            |
-| Topic-scoped queries                   |          | ✓            |
+| Scenario | Use chub | Use Context7 |
+|----------|----------|-------------|
+| Need language-specific docs (py vs js) | yes | |
+| Need curated, human-reviewed docs | yes | |
+| Need annotations from past sessions | yes | |
+| Want JSON output for piping | yes | |
+| Broad library coverage | | yes |
+| Zero setup required | | yes |
+| Topic-scoped queries | | yes |
 
 ## Trust Policy
 
@@ -66,7 +100,7 @@ chub uses a configurable trust hierarchy:
 2. **Maintainer** — docs from verified community maintainers
 3. **Community** — docs from any contributor
 
-Default: accept official + maintainer, warn on community-only.
+Multi-source config at `~/.chub/config.yaml` supports local/internal registries.
 
 ## Content Model
 
