@@ -65,7 +65,7 @@ echo "Freeze boundary set: $FREEZE_DIR"
 ```
 
 Tell the user: "Edits are now restricted to `<path>/`. Any Edit or Write
-outside this directory will be blocked. To change the boundary, run `/freeze`
+outside this directory will be blocked. To change the boundary, run `/meow:freeze`
 again. To remove it, run `/unfreeze` or end the session."
 
 ## How it works

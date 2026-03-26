@@ -1,6 +1,6 @@
 ---
 name: meow:plan-creator
-description: "Guides agents to create plans using the correct template. Auto-selects plan-quick.md vs plan-template.md based on task scope. Use when starting /plan or /cook commands."
+description: "Guides agents to create plans using the correct template. Auto-selects plan-quick.md vs plan-template.md based on task scope. Use when starting /meow:plan or /meow:cook commands."
 ---
 
 # Plan Creator
@@ -8,7 +8,7 @@ description: "Guides agents to create plans using the correct template. Auto-sel
 ## When to Use
 
 Activate this skill when:
-- User runs `/plan [feature]` or `/cook [feature]`
+- User runs `/plan [feature]` or `/meow:cook [feature]`
 - Agent needs to create a plan file before implementation (Gate 1)
 - User explicitly asks to plan a task
 
@@ -17,7 +17,7 @@ Activate this skill when:
 Assess the task scope BEFORE creating the plan:
 
 ```
-Is the task a simple /fix with complexity=simple?
+Is the task a simple /meow:fix with complexity=simple?
 ├── YES → Skip plan (Gate 1 exception per gate-rules.md)
 │
 └── NO → Estimate scope:

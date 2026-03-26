@@ -6,7 +6,7 @@
 
 - **Before every task:** Log the estimated complexity tier and model.
 - **After every task:** Append actual usage to the cost log.
-- **On `/budget` command:** Display cost summary.
+- **On `/meow:budget` command:** Display cost summary.
 
 ---
 
@@ -52,9 +52,9 @@ Append an entry to `memory/cost-log.json` (create if it does not exist).
 - Task summary should be 1 sentence.
 - If the task was abandoned or failed, still log it (add `"status": "failed"` or `"status": "abandoned"`).
 
-## `/budget` Command
+## `/meow:budget` Command
 
-When the user invokes `/budget`, read `memory/cost-log.json` and display:
+When the user invokes `/meow:budget`, read `memory/cost-log.json` and display:
 
 ### Last N Entries (default: 10)
 
@@ -116,4 +116,4 @@ Most common tier: standard (54%)
 - [ ] cost-log.json is valid JSON after every append
 - [ ] Every task has an entry (including failed/abandoned tasks)
 - [ ] Tier assessment is reasonable for the task complexity
-- [ ] `/budget` output is formatted as a readable table
+- [ ] `/meow:budget` output is formatted as a readable table
