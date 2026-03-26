@@ -108,53 +108,51 @@
 
 ### Core
 
-| Command           | Phase  | Description                                        |
-| ----------------- | ------ | -------------------------------------------------- |
-| `/meow [task]`    | 0      | Entry point — classifies and routes to right agent |
-| `/plan [feature]` | 1      | Premise challenge + two-lens plan + Gate 1         |
-| `/cook [feature]` | 1→5    | Full pipeline: plan → test → build → review → ship |
-| `/fix [bug]`      | varies | Auto-detect complexity, route accordingly          |
-| `/review`         | 4      | Structural audit → verdict file → Gate 2           |
-| `/ship`           | 5      | Pre-ship → commit → PR → CI verify → rollback doc  |
+| Command                | Phase  | Description                                        |
+| ---------------------- | ------ | -------------------------------------------------- |
+| `/meow:meow [task]`   | 0      | Entry point — classifies and routes to right agent |
+| `/meow:plan [feature]`| 1      | Premise challenge + two-lens plan + Gate 1         |
+| `/meow:cook [feature]`| 1→5    | Full pipeline: plan → test → build → review → ship |
+| `/meow:fix [bug]`     | varies | Auto-detect complexity, route accordingly          |
+| `/meow:review`        | 4      | Structural audit → verdict file → Gate 2           |
+| `/meow:ship`          | 5      | Pre-ship → commit → PR → CI verify → rollback doc  |
 
 ### Quality
 
-| Command     | Description                                 |
-| ----------- | ------------------------------------------- |
-| `/test`     | TDD enforcement — write or run tests        |
-| `/audit`    | Full security audit across all platforms    |
-| `/validate` | Run deterministic Python validation scripts |
+| Command          | Description                                 |
+| ---------------- | ------------------------------------------- |
+| `/meow:test`     | TDD enforcement — write or run tests        |
+| `/meow:audit`    | Full security audit across all platforms    |
+| `/meow:validate` | Run deterministic Python validation scripts |
 
-### Architecture (Gap 1 coverage)
+### Architecture
 
-| Command                 | Description                            |
-| ----------------------- | -------------------------------------- |
-| `/arch new [title]`     | Generate ADR                           |
-| `/arch list`            | List all ADRs with status              |
-| `/arch impact [change]` | Analyze architectural impact           |
-| `/design [system]`      | System design consultation (docs only) |
+| Command              | Description                            |
+| -------------------- | -------------------------------------- |
+| `/meow:arch [action]`| Generate, list, or analyze ADRs        |
+| `/meow:design [system]`| System design consultation (docs only)|
 
-### Documentation (Gap 2 coverage)
+### Documentation
 
-| Command      | Description                               |
-| ------------ | ----------------------------------------- |
-| `/docs:init` | Initial codebase scan → doc skeleton      |
-| `/docs:sync` | Diff-aware doc updates after feature work |
+| Command          | Description                               |
+| ---------------- | ----------------------------------------- |
+| `/meow:docs-init`| Initial codebase scan → doc skeleton      |
+| `/meow:docs-sync`| Diff-aware doc updates after feature work |
 
 ### Operations
 
-| Command   | Description                       |
-| --------- | --------------------------------- |
-| `/canary` | Staged deployment with monitoring |
-| `/retro`  | Sprint retrospective              |
-| `/budget` | Cost tracking report (Gap 4)      |
+| Command        | Description                       |
+| -------------- | --------------------------------- |
+| `/meow:canary` | Staged deployment with monitoring |
+| `/meow:retro`  | Sprint retrospective              |
+| `/meow:budget` | Cost tracking report              |
 
 ### Meta
 
-| Command                 | Description            |
-| ----------------------- | ---------------------- |
-| `/spawn [agent] [task]` | Parallel agent session |
-| `/upgrade`              | Self-update MeowKit    |
+| Command                  | Description            |
+| ------------------------ | ---------------------- |
+| `/meow:spawn [agent] [task]` | Parallel agent session |
+| `/meow:upgrade`          | Self-update MeowKit    |
 
 ## Model Routing
 
