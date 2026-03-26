@@ -49,6 +49,7 @@ npm create meowkit@latest
 The CLI auto-detects your stack (Node.js, Python, Swift, Go, monorepo), asks a few questions (including an optional Gemini API key for multimodal analysis), and generates a `.claude/` directory with everything configured.
 
 After setup:
+
 1. Review `CLAUDE.md` for project conventions
 2. Copy `.mcp.json.example` → `.mcp.json` for optional MCP servers (Context7, Playwright, etc.)
 3. Copy `.env.example` → `.env` for API keys (Gemini, etc.)
@@ -262,19 +263,19 @@ Skills contributed by the open-source community. All are self-contained with no 
 
 MeowKit-native skills built from scratch or adapted from source analysis:
 
-| Skill                        | What it does                                                  | Scripts | References |
-| ---------------------------- | ------------------------------------------------------------- | ------- | ---------- |
-| `meow:docs-finder`           | Retrieve library/project docs via Context7 + Context Hub      | 4 JS    | 3 files    |
-| `meow:multimodal`            | Image/video/audio/PDF analysis via Gemini API                 | 3 PY    | 3 files    |
-| `meow:scout`                 | Parallel codebase exploration via Explore subagents           | —       | 3 files    |
-| `meow:plan-creator`          | Auto-selects plan template by task scope                      | —       | —          |
-| `meow:skill-template-secure` | Secure skill template with injection defense                  | —       | —          |
-| `meow:development`           | Code patterns, skill loading, TDD enforcement                 | —       | 3 files    |
-| `meow:documentation`         | API sync, changelog gen, living docs                          | —       | 3 files    |
-| `meow:memory`                | Cost tracking, pattern extraction, session capture            | —       | 3 files    |
-| `meow:planning`              | ADR generation, plan templates, premise challenge             | —       | 3 files    |
-| `meow:shipping`              | Canary deploy, rollback protocol, ship pipeline               | —       | 3 files    |
-| `meow:testing`               | Red-green-refactor, validation scripts, visual QA             | —       | 3 files    |
+| Skill                        | What it does                                             | Scripts | References |
+| ---------------------------- | -------------------------------------------------------- | ------- | ---------- |
+| `meow:docs-finder`           | Retrieve library/project docs via Context7 + Context Hub | 4 JS    | 3 files    |
+| `meow:multimodal`            | Image/video/audio/PDF analysis via Gemini API            | 3 PY    | 3 files    |
+| `meow:scout`                 | Parallel codebase exploration via Explore subagents      | —       | 3 files    |
+| `meow:plan-creator`          | Auto-selects plan template by task scope                 | —       | —          |
+| `meow:skill-template-secure` | Secure skill template with injection defense             | —       | —          |
+| `meow:development`           | Code patterns, skill loading, TDD enforcement            | —       | 3 files    |
+| `meow:documentation`         | API sync, changelog gen, living docs                     | —       | 3 files    |
+| `meow:memory`                | Cost tracking, pattern extraction, session capture       | —       | 3 files    |
+| `meow:planning`              | ADR generation, plan templates, premise challenge        | —       | 3 files    |
+| `meow:shipping`              | Canary deploy, rollback protocol, ship pipeline          | —       | 3 files    |
+| `meow:testing`               | Red-green-refactor, validation scripts, visual QA        | —       | 3 files    |
 
 Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS_ATTRIBUTION.md)
 
@@ -336,14 +337,30 @@ No global state directories, no third-party services, no user-level skill paths.
 
 ### Hooks
 
-| Hook                | When it runs           | What it does                                         |
-| ------------------- | ---------------------- | ---------------------------------------------------- |
-| `pre-task-check.sh` | Before any command     | Prompt injection pattern detection (PASS/WARN/BLOCK) |
-| `pre-implement.sh`  | Before implementation  | Blocks if no failing test exists (TDD gate)          |
-| `post-write.sh`     | After every file write | Security scan + destructive command detection        |
-| `pre-ship.sh`       | Before shipping        | Full test + lint + typecheck                         |
-| `cost-meter.sh`     | Per task               | Token usage tracking                                 |
-| `post-session.sh`   | Session end            | Capture patterns to memory                           |
+Hooks are registered in `.claude/settings.json` and run automatically by Claude Code.
+
+**Registered hooks (automatic):**
+
+| Hook              | Type        | Trigger     | What it does                                      | Blocks?      |
+| ----------------- | ----------- | ----------- | ------------------------------------------------- | ------------ |
+| `post-write.sh`   | PostToolUse | Edit, Write | Security scan: secrets, `any`, SQL injection, XSS | Yes (exit 2) |
+| `post-session.sh` | Stop        | Session end | Capture session data to memory                    | No           |
+
+**Skill-embedded hooks (via SKILL.md frontmatter):**
+
+| Hook               | Skill        | Trigger     | What it does                                      |
+| ------------------ | ------------ | ----------- | ------------------------------------------------- |
+| `check-freeze.sh`  | meow:freeze  | Edit, Write | Block edits outside frozen directory              |
+| `check-careful.sh` | meow:careful | Bash        | Warn on destructive commands (rm -rf, DROP TABLE) |
+
+**Phase-specific scripts (invoked by skills):**
+
+| Script              | Phase     | What it does                                         |
+| ------------------- | --------- | ---------------------------------------------------- |
+| `pre-task-check.sh` | Any       | Prompt injection pattern detection (PASS/WARN/BLOCK) |
+| `pre-implement.sh`  | Phase 2-3 | Blocks if no failing test exists (TDD gate)          |
+| `pre-ship.sh`       | Phase 5   | Full test + lint + typecheck before shipping         |
+| `cost-meter.sh`     | Any       | Token usage tracking (manual invocation)             |
 
 ### Python Scripts
 
@@ -399,11 +416,13 @@ Every session reads `lessons.md` at start and updates it at end. After 10 sessio
 ## Requirements
 
 **Core (required):**
+
 - Node.js 20+
 - Python 3.9+ (for validation scripts — stdlib only, no pip installs)
 - Git
 
 **Optional (for enhanced skills):**
+
 - `GEMINI_API_KEY` — for `meow:multimodal` (image/video/audio/PDF analysis via Gemini)
 - `google-genai` + `pillow` pip packages — for `meow:multimodal` scripts
 - MCP servers — Context7, Playwright, etc. (see `.mcp.json.example`)

@@ -146,6 +146,52 @@ GEMINI_API_KEY=
 `;
 }
 
+function generateSettingsJson(): string {
+  return `{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/post-write.sh \\"$TOOL_INPUT_FILE_PATH\\"",
+            "timeout": 10000,
+            "statusMessage": "Security scanning written file..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/post-session.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm test)",
+      "Bash(npm run lint)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(python .claude/scripts/*)",
+      "Bash(sh .claude/hooks/*)",
+      "Bash(git *)",
+      "Bash(gh *)",
+      "Bash(wc -l *)",
+      "Bash(ls *)",
+      "Bash(find *)"
+    ]
+  }
+}
+`;
+}
+
 function generateMcpExample(): string {
   return `{
   "mcpServers": {
@@ -183,6 +229,12 @@ function buildFileMap(config: UserConfig, targetDir: string): Map<string, { cont
 
   files.set(join(targetDir, ".mcp.json.example"), {
     content: generateMcpExample(),
+    executable: false,
+  });
+
+  // .claude/settings.json — hook registrations and permissions
+  files.set(join(meowkit, "settings.json"), {
+    content: generateSettingsJson(),
     executable: false,
   });
 
@@ -324,6 +376,49 @@ function buildFileMap(config: UserConfig, targetDir: string): Map<string, { cont
               'echo "{\\\"timestamp\\\": \\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\", \\\"task\\\": \\\"${MEOWKIT_TASK:-unknown}\\\"}" >> "$COST_LOG"',
             ].join("\n")
           : "# Cost tracking disabled",
+      ].join("\n")
+    ),
+    executable: true,
+  });
+
+  // post-write hook — security scan on every file write (registered in settings.json)
+  files.set(join(meowkit, "hooks", "post-write.sh"), {
+    content: generateHookScript(
+      "post-write",
+      [
+        '# Security scan on written files — registered as PostToolUse in settings.json',
+        '# Checks: hardcoded secrets, SQL injection, XSS, destructive commands',
+        'FILE="$1"',
+        '[ -z "$FILE" ] && exit 0',
+        '[ ! -f "$FILE" ] && exit 0',
+        '',
+        'EXT="${FILE##*.}"',
+        'case "$EXT" in',
+        '  ts|js)',
+        '    grep -qn "api_key=\\|apiKey=\\|secret=\\|password=\\|token=" "$FILE" 2>/dev/null && { echo "BLOCK — Hardcoded secret in $FILE"; exit 2; }',
+        '    grep -qn ": any\\|as any" "$FILE" 2>/dev/null && { echo "WARN — any type in $FILE"; }',
+        '    ;;',
+        '  vue)',
+        '    grep -qn "v-html" "$FILE" 2>/dev/null && { echo "BLOCK — v-html XSS risk in $FILE"; exit 2; }',
+        '    ;;',
+        '  sql)',
+        '    grep -qin "DROP TABLE\\|DROP DATABASE" "$FILE" 2>/dev/null && { echo "BLOCK — Destructive SQL in $FILE"; exit 2; }',
+        '    ;;',
+        'esac',
+        'exit 0',
+      ].join("\n")
+    ),
+    executable: true,
+  });
+
+  // post-session hook — memory capture (registered as Stop in settings.json)
+  files.set(join(meowkit, "hooks", "post-session.sh"), {
+    content: generateHookScript(
+      "post-session",
+      [
+        '# Capture session data to memory — registered as Stop in settings.json',
+        'mkdir -p .claude/memory',
+        'echo "Session ended: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .claude/memory/sessions.log',
       ].join("\n")
     ),
     executable: true,
