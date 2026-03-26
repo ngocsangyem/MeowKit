@@ -43,7 +43,7 @@ Analyze the current branch's diff against the base branch for structural issues 
 
 5. **Step 2: Read the checklist** — Read `.claude/skills/meow:review/checklist.md`. Stop if unreadable.
 
-6. **Step 2.5: Greptile comments** — Read `.claude/skills/meow:review/greptile-triage.md` and fetch/classify Greptile review comments. Skip silently if no PR or no comments.
+6. **Step 2.5: External PR comments** — If PR has GitHub reviewer or CI bot comments, fetch and classify them for resolution in Step 5.
 
 7. **Step 3: Get the diff** — `git fetch origin <base> --quiet` then `git diff origin/<base>` for the full diff.
 
@@ -72,11 +72,11 @@ Analyze the current branch's diff against the base branch for structural issues 
 | [references/two-pass-review.md](references/two-pass-review.md) | Two-pass checklist application (critical then informational), enum completeness, search-before-recommending |
 | [references/design-review.md](references/design-review.md) | Frontend-conditional design review, design checklist application, Codex design voice |
 | [references/test-coverage.md](references/test-coverage.md) | Test framework detection, codepath tracing, user flow mapping, coverage diagram, E2E/eval decision matrix, regression rule, gap test generation |
-| [references/fix-first-review.md](references/fix-first-review.md) | Finding classification (AUTO-FIX vs ASK), batch user questions, verification of claims, Greptile comment resolution |
+| [references/fix-first-review.md](references/fix-first-review.md) | Finding classification (AUTO-FIX vs ASK), batch user questions, verification of claims, external PR comment resolution |
 | [references/adversarial-review.md](references/adversarial-review.md) | Auto-scaled adversarial review (small/medium/large tiers), Codex and Claude subagent passes, cross-model synthesis |
 | [references/post-review-steps.md](references/post-review-steps.md) | TODOS cross-reference, documentation staleness check, persist eng review result, important rules |
 | [checklist.md](checklist.md) | Review checklist (read in Step 2) |
 | [design-checklist.md](design-checklist.md) | Design review checklist (read in Step 4.5) |
-| [greptile-triage.md](greptile-triage.md) | Greptile comment fetch, classify, and reply templates (read in Step 2.5) |
+| — | *(Greptile integration removed — MeowKit uses its own reviewer agent)* |
 | [security-checklist.md](security-checklist.md) | Security review checklist |
 | [structural-audit.md](structural-audit.md) | Structural audit reference |

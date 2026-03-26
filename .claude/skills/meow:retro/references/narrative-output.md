@@ -38,7 +38,7 @@ Narrative covering:
 ### Code Quality Signals
 - Test LOC ratio trend
 - Hotspot analysis (are the same files churning?)
-- Greptile signal ratio and trend (if history exists): "Greptile: X% signal (Y valid catches, Z false positives)"
+- Review signal ratio (if history exists): "Reviews: X% signal (Y valid catches, Z false positives)"
 
 ### Test Health
 - Total test files: N (from command 10)

@@ -80,8 +80,8 @@ git log origin/<default> --since="<window>" --format="AUTHOR:%aN" --name-only
 # 7. Per-author commit counts (quick summary)
 git shortlog origin/<default> --since="<window>" -sn --no-merges
 
-# 8. Greptile triage history (if available)
-cat .claude/memory/greptile-history.md 2>/dev/null || true
+# 8. Review history (if available)
+cat .claude/memory/reviews.jsonl 2>/dev/null || true
 
 # 9. TODOS.md backlog (if available)
 cat TODOS.md 2>/dev/null || true

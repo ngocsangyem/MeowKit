@@ -93,9 +93,9 @@ gh pr create --base <base> --title "<type>: <summary>" --body "$(cat <<'EOF'
 ## Eval Results
 <If evals ran: suite names, pass/fail counts, cost dashboard summary. If skipped: "No prompt-related files changed — evals skipped.">
 
-## Greptile Review
-<If Greptile comments were found: bullet list with [FIXED] / [FALSE POSITIVE] / [ALREADY FIXED] tag + one-line summary per comment>
-<If no Greptile comments found: "No Greptile comments.">
+## PR Review Comments
+<If PR comments were resolved: bullet list with [FIXED] / [DISMISSED] / [ALREADY ADDRESSED] tag + one-line summary per comment>
+<If no PR comments found: "No PR review comments.">
 <If no PR existed during Step 3.75: omit this section entirely>
 
 ## Plan Completion

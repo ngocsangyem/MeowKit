@@ -1,4 +1,4 @@
-# Pre-Landing Review, Design Review, and Greptile Triage (Steps 3.5 and 3.75)
+# Pre-Landing Review, Design Review, and PR Comment Resolution (Steps 3.5 and 3.75)
 
 ## Step 3.5: Pre-Landing Review
 
@@ -93,39 +93,26 @@ Save the review output — it goes into the PR body in Step 8.
 
 ---
 
-## Step 3.75: Address Greptile review comments (if PR exists)
+## Step 3.75: Address PR review comments (if PR exists)
 
-Read `.claude/skills/meow:review/greptile-triage.md` and follow the fetch, filter, classify, and **escalation detection** steps.
+If a PR exists, fetch review comments from GitHub:
+```bash
+gh pr view --json reviewRequests,reviews,comments -q '.reviews[].body, .comments[].body' 2>/dev/null || true
+```
 
-**If no PR exists, `gh` fails, API returns an error, or there are zero Greptile comments:** Skip this step silently. Continue to Step 4.
+**If no PR, no comments, or `gh` fails:** Skip silently. Continue to Step 4.
 
-**If Greptile comments are found:**
+**If review comments are found:**
 
-Include a Greptile summary in your output: `+ N Greptile comments (X valid, Y fixed, Z FP)`
+For each comment, classify and handle:
 
-Before replying to any comment, run the **Escalation Detection** algorithm from greptile-triage.md to determine whether to use Tier 1 (friendly) or Tier 2 (firm) reply templates.
+**VALID & ACTIONABLE:** Use AskUserQuestion:
+- Show the comment with file:line reference
+- Options: A) Fix now, B) Acknowledge and ship anyway, C) Dismiss as false positive
+- If fixed: commit with `git commit -m "fix: address review comment — <brief>"`, log to `.claude/memory/reviews.jsonl`
 
-For each classified comment:
+**ALREADY ADDRESSED:** Note what was done and the commit SHA. No user action needed.
 
-**VALID & ACTIONABLE:** Use AskUserQuestion with:
-- The comment (file:line or [top-level] + body summary + permalink URL)
-- `RECOMMENDATION: Choose A because [one-line reason]`
-- Options: A) Fix now, B) Acknowledge and ship anyway, C) It's a false positive
-- If user chooses A: apply the fix, commit the fixed files (`git add <fixed-files> && git commit -m "fix: address Greptile review — <brief description>"`), reply using the **Fix reply template** from greptile-triage.md (include inline diff + explanation), and save to both per-project and global greptile-history (type: fix).
-- If user chooses C: reply using the **False Positive reply template** from greptile-triage.md (include evidence + suggested re-rank), save to both per-project and global greptile-history (type: fp).
+**FALSE POSITIVE:** Show evidence for why it's incorrect. Let user decide to dismiss or fix anyway.
 
-**VALID BUT ALREADY FIXED:** Reply using the **Already Fixed reply template** from greptile-triage.md — no AskUserQuestion needed:
-- Include what was done and the fixing commit SHA
-- Save to both per-project and global greptile-history (type: already-fixed)
-
-**FALSE POSITIVE:** Use AskUserQuestion:
-- Show the comment and why you think it's wrong (file:line or [top-level] + body summary + permalink URL)
-- Options:
-  - A) Reply to Greptile explaining the false positive (recommended if clearly wrong)
-  - B) Fix it anyway (if trivial)
-  - C) Ignore silently
-- If user chooses A: reply using the **False Positive reply template** from greptile-triage.md (include evidence + suggested re-rank), save to both per-project and global greptile-history (type: fp)
-
-**SUPPRESSED:** Skip silently — these are known false positives from previous triage.
-
-**After all comments are resolved:** If any fixes were applied, the tests from Step 3 are now stale. **Re-run tests** (Step 3) before continuing to Step 4. If no fixes were applied, continue to Step 4.
+**After all comments resolved:** If fixes were applied, re-run tests (Step 3) before continuing.

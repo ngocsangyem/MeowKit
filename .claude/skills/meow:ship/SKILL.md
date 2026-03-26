@@ -40,7 +40,7 @@ Use when the user says "ship", "deploy", "push to main", "create a PR", or "merg
 6. **Eval suites** — Run evals if prompt-related files changed. See `references/eval-suites.md`
 7. **Test coverage audit** — Trace code paths, generate coverage diagram, write missing tests. See `references/test-coverage-audit.md`
 8. **Plan completion audit + verification** — Cross-reference plan items against diff, run /qa-only verification. See `references/plan-completion-audit.md`
-9. **Pre-landing review + Greptile** — Structural review, design review, Greptile comment triage. See `references/pre-landing-review.md`
+9. **Pre-landing review** — Structural review, design review, PR comment resolution. See `references/pre-landing-review.md`
 10. **Adversarial review** — Auto-scaled cross-model adversarial challenge. See `references/adversarial-review.md`
 11. **Version bump + CHANGELOG + TODOS** — Auto-bump VERSION, generate CHANGELOG entry, update TODOS.md. See `references/version-changelog-todos.md`
 12. **Commit + Push + PR + Docs** — Bisectable commits, verification gate, push, create PR, sync docs, persist metrics. See `references/commit-push-pr.md`
@@ -58,7 +58,7 @@ After completion, run telemetry (see `references/preamble.md` — Telemetry sect
 - `references/eval-suites.md` — Eval suites for prompt-related changes (Step 3.25)
 - `references/test-coverage-audit.md` — Coverage audit, diagram, test generation (Step 3.4)
 - `references/plan-completion-audit.md` — Plan completion audit (Step 3.45), plan verification via /qa-only (Step 3.47)
-- `references/pre-landing-review.md` — Pre-landing review (Step 3.5), design review, Greptile triage (Step 3.75)
+- `references/pre-landing-review.md` — Pre-landing review (Step 3.5), design review, PR comment resolution (Step 3.75)
 - `references/adversarial-review.md` — Auto-scaled adversarial review (Step 3.8)
 - `references/version-changelog-todos.md` — Version bump (Step 4), CHANGELOG (Step 5), TODOS.md (Step 5.5)
 - `references/commit-push-pr.md` — Commit (Step 6), verification gate (Step 6.5), push (Step 7), PR creation (Step 8), document-release (Step 8.5), ship metrics (Step 8.75)

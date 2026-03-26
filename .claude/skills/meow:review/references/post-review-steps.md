@@ -55,4 +55,4 @@ If the review exits early before a real review completes (for example, no diff a
 - **Fix-first, not read-only.** AUTO-FIX items are applied directly. ASK items are only applied after user approval. Never commit, push, or create PRs — that's /ship's job.
 - **Be terse.** One line problem, one line fix. No preamble.
 - **Only flag real problems.** Skip anything that's fine.
-- **Use Greptile reply templates from greptile-triage.md.** Every reply includes evidence. Never post vague replies.
+- **Use the reviewer agent for all review comment replies.** Every reply includes evidence. Never post vague replies.
