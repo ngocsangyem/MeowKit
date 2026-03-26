@@ -131,6 +131,26 @@ ${body}
 `;
 }
 
+function generateMcpExample(): string {
+  return `{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp", "--api-key", "YOUR_API_KEY"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
+}
+`;
+}
+
 function buildFileMap(config: UserConfig, targetDir: string): Map<string, { content: string; executable: boolean }> {
   const files = new Map<string, { content: string; executable: boolean }>();
   const meowkit = join(targetDir, ".claude");
@@ -143,6 +163,11 @@ function buildFileMap(config: UserConfig, targetDir: string): Map<string, { cont
 
   files.set(join(targetDir, ".meowkit.config.json"), {
     content: generateConfigJson(config),
+    executable: false,
+  });
+
+  files.set(join(targetDir, ".mcp.json.example"), {
+    content: generateMcpExample(),
     executable: false,
   });
 

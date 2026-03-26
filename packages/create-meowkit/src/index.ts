@@ -135,7 +135,8 @@ async function main(): Promise<void> {
     console.log(`\nNext steps:`);
     console.log(`  ${pc.dim("1.")} Review ${pc.bold("CLAUDE.md")} for your project conventions`);
     console.log(`  ${pc.dim("2.")} Customize agent files in ${pc.bold(".claude/agents/")}`);
-    console.log(`  ${pc.dim("3.")} Run ${pc.bold("meowkit doctor")} to verify your setup`);
+    console.log(`  ${pc.dim("3.")} Copy ${pc.bold(".mcp.json.example")} → ${pc.bold(".mcp.json")} and configure your MCP servers`);
+    console.log(`  ${pc.dim("4.")} Run ${pc.bold("meowkit doctor")} to verify your setup`);
   }
 }
 
