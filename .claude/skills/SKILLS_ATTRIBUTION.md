@@ -31,6 +31,7 @@ Each skill retains its original author credit in its frontmatter.
 | 22  | session-continuation  | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog)   | Unknown     | aura-frog/skills/session-continuation/SKILL.md  | 2    |
 | 23  | docs-finder           | MeowKit (original)           | Inspired by claudekit-engineer/docs-seeker                   | MIT         | .claude/skills/docs-finder/                     | 1    |
 | 24  | multimodal            | MeowKit (original)           | Inspired by claudekit-engineer/ai-multimodal                 | MIT         | .claude/skills/meow:multimodal/                 | 1    |
+| 25  | scout                 | MeowKit (adapted)            | Adapted from claudekit-engineer/scout. Updated 260326: +search tiers, +arch fingerprint, +handoff protocol | MIT | .claude/skills/meow:scout/ | 1 |
 
 ## Selection Criteria
 
