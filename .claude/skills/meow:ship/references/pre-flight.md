@@ -19,6 +19,25 @@ branch name wherever the instructions say "the base branch."
 
 ---
 
+## Step 0.5: Ship Mode Detection
+
+Determine ship mode from arguments:
+
+```
+If argument = "official" → target = default branch (main/master from Step 0)
+If argument = "beta"     → target = auto-detect dev branch:
+                           for b in dev beta develop; do
+                             git rev-parse --verify origin/$b 2>/dev/null && echo "$b" && break
+                           done
+If no argument           → infer from branch name:
+  - feature/* hotfix/* bugfix/* fix/* → official (target main)
+  - dev/* beta/* experiment/*         → beta (target dev)
+  - unclear                           → AskUserQuestion: "Ship to main (official) or dev (beta)?"
+If --dry-run             → print mode + plan for each step, then stop
+```
+
+---
+
 ## Step 1: Pre-flight
 
 1. Check the current branch. If on the base branch or the repo's default branch, **abort**: "You're on the base branch. Ship from a feature branch."
@@ -27,7 +46,9 @@ branch name wherever the instructions say "the base branch."
 
 3. Run `git diff <base>...HEAD --stat` and `git log <base>..HEAD --oneline` to understand what's being shipped.
 
-4. Check review readiness:
+4. **If `--dry-run`:** Output what each step would do (mode, target branch, test command, version bump prediction) and **stop here**.
+
+5. Check review readiness:
 
 ## Review Readiness Dashboard
 
@@ -56,6 +77,7 @@ Parse the output. Find the most recent entry for each skill (plan-ceo-review, pl
 ```
 
 **Review tiers:**
+
 - **Eng Review (required by default):** The only review that gates shipping. Covers architecture, code quality, tests, performance. Can be disabled globally with `meowkit-config set skip_eng_review true` (the "don't bother me" setting).
 - **CEO Review (optional):** Use your judgment. Recommend it for big product/business changes, new user-facing features, or scope decisions. Skip for bug fixes, refactors, infra, and cleanup.
 - **Design Review (optional):** Use your judgment. Recommend it for UI/UX changes. Skip for backend-only, infra, or prompt-only changes.
@@ -63,12 +85,14 @@ Parse the output. Find the most recent entry for each skill (plan-ceo-review, pl
 - **Outside Voice (optional):** Independent plan review from a different AI model. Offered after all review sections complete in /meow:plan-ceo-review and /meow:plan-eng-review. Falls back to Claude subagent if Codex is unavailable. Never gates shipping.
 
 **Verdict logic:**
+
 - **CLEARED**: Eng Review has >= 1 entry within 7 days from either `review` or `plan-eng-review` with status "clean" (or `skip_eng_review` is `true`)
 - **NOT CLEARED**: Eng Review missing, stale (>7 days), or has open issues
 - CEO, Design, and Codex reviews are shown for context but never block shipping
 - If `skip_eng_review` config is `true`, Eng Review shows "SKIPPED (global)" and verdict is CLEARED
 
 **Staleness detection:** After displaying the dashboard, check if any existing reviews may be stale:
+
 - Parse the `---HEAD---` section from the bash output to get the current HEAD commit hash
 - For each review entry that has a `commit` field: compare it against the current HEAD. If different, count elapsed commits: `git rev-list --count STORED_COMMIT..HEAD`. Display: "Note: {skill} review from {date} may be stale — {N} commits since review"
 - For entries without a `commit` field (legacy entries): display "Note: {skill} review from {date} has no commit tracking — consider re-running for accurate staleness detection"
@@ -77,16 +101,18 @@ Parse the output. Find the most recent entry for each skill (plan-ceo-review, pl
 If the Eng Review is NOT "CLEAR":
 
 1. **Check for a prior override on this branch:**
+
    ```bash
    eval "$(.claude/scripts/bin/meowkit-slug 2>/dev/null)"
    grep '"skill":"ship-review-override"' .claude/memory/projects/$BRANCH-reviews.jsonl 2>/dev/null || echo "NO_OVERRIDE"
    ```
+
    If an override exists, display the dashboard and note "Review gate previously accepted — continuing." Do NOT ask again.
 
 2. **If no override exists,** use AskUserQuestion:
    - Show that Eng Review is missing or has open issues
    - RECOMMENDATION: Choose C if the change is obviously trivial (< 20 lines, typo fix, config-only); Choose B for larger changes
-   - Options: A) Ship anyway  B) Abort — run /meow:review or /meow:plan-eng-review first  C) Change is too small to need eng review
+   - Options: A) Ship anyway B) Abort — run /meow:review or /meow:plan-eng-review first C) Change is too small to need eng review
    - If CEO Review is missing, mention as informational ("CEO Review not run — recommended for product changes") but do NOT block
    - For Design Review: run `source <(.claude/scripts/bin/meowkit-diff-scope <base> 2>/dev/null)`. If `SCOPE_FRONTEND=true` and no design review (plan-design-review or design-review-lite) exists in the dashboard, mention: "Design Review not run — this PR changes frontend code. The lite design check will run automatically in Step 3.5, but consider running /design-review for a full visual audit post-implementation." Still never block.
 

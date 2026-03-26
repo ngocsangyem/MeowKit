@@ -17,6 +17,11 @@
 
 4. Write the new version to the `VERSION` file.
 
+5. **If ship mode is `beta`:** Append prerelease suffix to the version:
+   - Format: `X.Y.Z.W-beta.N` where N increments from 1
+   - Check existing tags/version for current beta count: `git tag -l "*-beta.*" | tail -1`
+   - Example: `0.19.2.0-beta.1`
+
 ---
 
 ## Step 5: CHANGELOG (auto-generate)
@@ -50,6 +55,7 @@ Read `.claude/skills/meow:review/TODOS-format.md` for the canonical format refer
 **1. Check if TODOS.md exists** in the repository root.
 
 **If TODOS.md does not exist:** Use AskUserQuestion:
+
 - Message: "MeowKit recommends maintaining a TODOS.md organized by skill/component, then priority (P0 at top through P4, then Completed at bottom). See TODOS-format.md for the full format. Would you like to create one?"
 - Options: A) Create it now, B) Skip for now
 - If A: Create `TODOS.md` with a skeleton (# TODOS heading + ## Completed section). Continue to step 3.
@@ -58,11 +64,13 @@ Read `.claude/skills/meow:review/TODOS-format.md` for the canonical format refer
 **2. Check structure and organization:**
 
 Read TODOS.md and verify it follows the recommended structure:
+
 - Items grouped under `## <Skill/Component>` headings
 - Each item has `**Priority:**` field with P0-P4 value
 - A `## Completed` section at the bottom
 
 **If disorganized** (missing priority fields, no component groupings, no Completed section): Use AskUserQuestion:
+
 - Message: "TODOS.md doesn't follow the recommended structure (skill/component groupings, P0-P4 priority, Completed section). Would you like to reorganize it?"
 - Options: A) Reorganize now (recommended), B) Leave as-is
 - If A: Reorganize in-place following TODOS-format.md. Preserve all content — only restructure, never delete items.
@@ -73,10 +81,12 @@ Read TODOS.md and verify it follows the recommended structure:
 This step is fully automatic — no user interaction.
 
 Use the diff and commit history already gathered in earlier steps:
+
 - `git diff <base>...HEAD` (full diff against the base branch)
 - `git log <base>..HEAD --oneline` (all commits being shipped)
 
 For each TODO item, check if the changes in this PR complete it by:
+
 - Matching commit messages against the TODO title and description
 - Checking if files referenced in the TODO appear in the diff
 - Checking if the TODO's described work matches the functional changes
@@ -86,6 +96,7 @@ For each TODO item, check if the changes in this PR complete it by:
 **4. Move completed items** to the `## Completed` section at the bottom. Append: `**Completed:** vX.Y.Z (YYYY-MM-DD)`
 
 **5. Output summary:**
+
 - `TODOS.md: N items marked complete (item1, item2, ...). M items remaining.`
 - Or: `TODOS.md: No completed items detected. M items remaining.`
 - Or: `TODOS.md: Created.` / `TODOS.md: Reorganized.`

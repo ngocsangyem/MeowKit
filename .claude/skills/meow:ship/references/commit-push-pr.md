@@ -70,7 +70,42 @@ git push -u origin <branch-name>
 
 ---
 
+## Step 7.5: Link Issues
+
+Find or create related GitHub issues before creating the PR:
+
+1. **Search related issues** by keywords from branch name and commit messages:
+
+   ```bash
+   BRANCH=$(git branch --show-current)
+   KEYWORDS=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9]/ /g' | tr '[:upper:]' '[:lower:]')
+   gh issue list --state open --limit 10 --search "$KEYWORDS" 2>/dev/null || true
+   ```
+
+2. **Check commit messages** for issue references:
+
+   ```bash
+   git log origin/<base>..HEAD --oneline | grep -oE '#[0-9]+' | sort -u
+   ```
+
+3. **If related issues found:** Store numbers for PR body (e.g., `Closes #42, Relates to #43`).
+4. **If NO issues found and change is significant (>50 lines):** Create a tracking issue:
+   ```bash
+   gh issue create --title "<type>: <summary>" --body "Tracking issue for PR. Details in the PR description."
+   ```
+5. **If `gh` unavailable:** Skip silently — issue linking is best-effort.
+
+---
+
 ## Step 8: Create PR
+
+**Check if PR already exists for this branch:**
+
+```bash
+EXISTING_PR=$(gh pr view --json number --jq '.number' 2>/dev/null || true)
+```
+
+If existing PR found → edit it. If not → create new.
 
 Create a pull request using `gh`:
 
@@ -123,6 +158,14 @@ EOF
 )"
 ```
 
+**If `EXISTING_PR` was set:** Update the existing PR instead of creating a new one:
+
+```bash
+gh pr edit "$EXISTING_PR" --title "<type>: <summary>" --body "<same body as above>"
+```
+
+**Include linked issues** in PR body: add `Closes #N` or `Relates to #N` lines from Step 7.5.
+
 **Output the PR URL** — then proceed to Step 8.5.
 
 ---
@@ -163,6 +206,7 @@ echo '{"skill":"ship","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","coverage
 ```
 
 Substitute from earlier steps:
+
 - **COVERAGE_PCT**: coverage percentage from Step 3.4 diagram (integer, or -1 if undetermined)
 - **PLAN_TOTAL**: total plan items extracted in Step 3.45 (0 if no plan file)
 - **PLAN_DONE**: count of DONE + CHANGED items from Step 3.45 (0 if no plan file)
