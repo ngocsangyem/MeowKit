@@ -29,7 +29,7 @@ git push
 1. Read the existing PR body into a PID-unique tempfile:
 
 ```bash
-gh pr view --json body -q .body > /tmp/gstack-pr-body-$$.md
+gh pr view --json body -q .body > /tmp/meowkit-pr-body-$$.md
 ```
 
 2. If the tempfile already contains a `## Documentation` section, replace that section with the
@@ -42,13 +42,13 @@ gh pr view --json body -q .body > /tmp/gstack-pr-body-$$.md
 4. Write the updated body back:
 
 ```bash
-gh pr edit --body-file /tmp/gstack-pr-body-$$.md
+gh pr edit --body-file /tmp/meowkit-pr-body-$$.md
 ```
 
 5. Clean up the tempfile:
 
 ```bash
-rm -f /tmp/gstack-pr-body-$$.md
+rm -f /tmp/meowkit-pr-body-$$.md
 ```
 
 6. If `gh pr view` fails (no PR exists): skip with message "No PR found — skipping body update."

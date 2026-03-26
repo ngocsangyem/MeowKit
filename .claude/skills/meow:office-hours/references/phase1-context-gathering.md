@@ -3,7 +3,7 @@
 Understand the project and the area the user wants to change.
 
 ```bash
-eval "$(~/.claude/skills/bin/gstack-slug 2>/dev/null)"
+eval "$(.claude/scripts/bin/meowkit-slug 2>/dev/null)"
 ```
 
 1. Read `CLAUDE.md`, `TODOS.md` (if they exist).
@@ -11,7 +11,7 @@ eval "$(~/.claude/skills/bin/gstack-slug 2>/dev/null)"
 3. Use Grep/Glob to map the codebase areas most relevant to the user's request.
 4. **List existing design docs for this project:**
    ```bash
-   ls -t ~/.gstack/projects/$SLUG/*-design-*.md 2>/dev/null
+   ls -t .claude/memory/projects/*-design-*.md 2>/dev/null
    ```
    If design docs exist, list them: "Prior designs for this project: [titles + dates]"
 

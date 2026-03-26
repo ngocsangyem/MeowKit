@@ -195,12 +195,12 @@ The plan should be complete enough that when implementation begins, every test i
 After producing the coverage diagram, write a test plan artifact to the project directory so `/meow:qa` and `/qa-only` can consume it as primary test input:
 
 ```bash
-eval "$(~/.claude/skills/bin/gstack-slug 2>/dev/null)" && mkdir -p ~/.gstack/projects/$SLUG
+eval "$(.claude/scripts/bin/meowkit-slug 2>/dev/null)" && mkdir -p .claude/memory/projects
 USER=$(whoami)
 DATETIME=$(date +%Y%m%d-%H%M%S)
 ```
 
-Write to `~/.gstack/projects/{slug}/{user}-{branch}-eng-review-test-plan-{datetime}.md`:
+Write to `.claude/memory/projects/{slug}/{user}-{branch}-eng-review-test-plan-{datetime}.md`:
 
 ```markdown
 # Test Plan

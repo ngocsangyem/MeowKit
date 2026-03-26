@@ -4,14 +4,14 @@ After the user states the problem (first question in Phase 2A or 2B), search exi
 
 Extract 3-5 significant keywords from the user's problem statement and grep across design docs:
 ```bash
-grep -li "<keyword1>\|<keyword2>\|<keyword3>" ~/.gstack/projects/$SLUG/*-design-*.md 2>/dev/null
+grep -li "<keyword1>\|<keyword2>\|<keyword3>" .claude/memory/projects/*-design-*.md 2>/dev/null
 ```
 
 If matches found, read the matching design docs and surface them:
 - "FYI: Related design found — '{title}' by {user} on {date} (branch: {branch}). Key overlap: {1-line summary of relevant section}."
 - Ask via AskUserQuestion: "Should we build on this prior design or start fresh?"
 
-This enables cross-team discovery — multiple users exploring the same project will see each other's design docs in `~/.gstack/projects/`.
+This enables cross-team discovery — multiple users exploring the same project will see each other's design docs in `.claude/memory/projects/`.
 
 If no matches found, proceed silently.
 
@@ -107,7 +107,7 @@ If B: skip Phase 3.5 entirely. Remember that Codex did NOT run (affects design d
 2. **Write the assembled prompt to a temp file** (prevents shell injection from user-derived content):
 
 ```bash
-CODEX_PROMPT_FILE=$(mktemp /tmp/gstack-codex-oh-XXXXXXXX.txt)
+CODEX_PROMPT_FILE=$(mktemp /tmp/meowkit-codex-oh-XXXXXXXX.txt)
 ```
 
 Write the full prompt (context block + instructions) to this file. Use the mode-appropriate variant:

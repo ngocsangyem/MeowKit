@@ -8,7 +8,7 @@ If `_CONTRIB` is `true`: you are in **contributor mode**. You're a gstack user w
 
 **NOT worth filing:** user's app bugs, network errors to user's URL, auth failures on user's site, user's own JS logic bugs.
 
-**To file:** write `~/.gstack/contributor-logs/{slug}.md` with **all sections below** (do not truncate — include every section through the Date/Version footer):
+**To file:** write `.claude/memory/contributor-logs/{slug}.md` with **all sections below** (do not truncate — include every section through the Date/Version footer):
 
 ```
 # {Title}

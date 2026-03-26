@@ -25,7 +25,7 @@ Say: "Running /meow:office-hours inline. Once the design doc is ready, I'll pick
 the review right where we left off."
 
 Read the office-hours skill file from disk using the Read tool:
-`~/.claude/skills/meow:office-hours/SKILL.md`
+`.claude/skills/meow:office-hours/SKILL.md`
 
 Follow it inline, **skipping these sections** (already handled by the parent skill):
 - Preamble (run first)
@@ -41,10 +41,10 @@ If the Read fails (file not found), say:
 
 After /meow:office-hours completes, re-run the design doc check:
 ```bash
-SLUG=$(~/.claude/skills/meow:browse/bin/remote-slug 2>/dev/null || basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
+SLUG=$(.claude/scripts/bin/meowkit-slug 2>/dev/null || basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null | tr '/' '-' || echo 'no-branch')
-DESIGN=$(ls -t ~/.gstack/projects/$SLUG/*-$BRANCH-design-*.md 2>/dev/null | head -1)
-[ -z "$DESIGN" ] && DESIGN=$(ls -t ~/.gstack/projects/$SLUG/*-design-*.md 2>/dev/null | head -1)
+DESIGN=$(ls -t .claude/memory/projects/*-$BRANCH-design-*.md 2>/dev/null | head -1)
+[ -z "$DESIGN" ] && DESIGN=$(ls -t .claude/memory/projects/*-design-*.md 2>/dev/null | head -1)
 [ -n "$DESIGN" ] && echo "Design doc found: $DESIGN" || echo "No design doc found"
 ```
 
@@ -65,7 +65,7 @@ Options: A) Yes, run /meow:office-hours now. B) No, keep going.
 If they keep going, proceed normally — no guilt, no re-asking.
 
 If they choose A: Read the office-hours skill file from disk:
-`~/.claude/skills/meow:office-hours/SKILL.md`
+`.claude/skills/meow:office-hours/SKILL.md`
 
 Follow it inline, skipping these sections (already handled by parent skill):
 Preamble, AskUserQuestion Format, Completeness Principle, Search Before Building,

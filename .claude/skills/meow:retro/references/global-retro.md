@@ -6,27 +6,24 @@ When the user runs `/retro global` (or `/retro global 14d`), follow this flow in
 
 Same midnight-aligned logic as the regular retro. Default 7d. The second argument after `global` is the window (e.g., `14d`, `30d`, `24h`).
 
-## Global Step 2: Run discovery
+## Global Step 2: Discover repos
 
-Locate and run the discovery script using this fallback chain:
+MeowKit uses a simple git-based discovery approach (no external binary needed):
 
 ```bash
-DISCOVER_BIN=""
-[ -x ~/.claude/skills/bin/gstack-global-discover ] && DISCOVER_BIN=~/.claude/skills/bin/gstack-global-discover
-[ -z "$DISCOVER_BIN" ] && [ -x .claude/skills/bin/gstack-global-discover ] && DISCOVER_BIN=.claude/skills/bin/gstack-global-discover
-[ -z "$DISCOVER_BIN" ] && which gstack-global-discover >/dev/null 2>&1 && DISCOVER_BIN=$(which gstack-global-discover)
-[ -z "$DISCOVER_BIN" ] && [ -f bin/gstack-global-discover.ts ] && DISCOVER_BIN="bun run bin/gstack-global-discover.ts"
-echo "DISCOVER_BIN: $DISCOVER_BIN"
+# Find all git repos in common development directories
+find ~/Developer ~/Projects ~/Code ~/repos ~/src ~/work -maxdepth 3 -name ".git" -type d 2>/dev/null | while read gitdir; do
+  REPO_DIR=$(dirname "$gitdir")
+  # Check if repo has commits in the time window
+  COMMIT_COUNT=$(git -C "$REPO_DIR" log --oneline --since="<window>" 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$COMMIT_COUNT" -gt 0 ]; then
+    REPO_NAME=$(basename "$REPO_DIR")
+    echo "{\"path\":\"$REPO_DIR\",\"name\":\"$REPO_NAME\",\"commits\":$COMMIT_COUNT}"
+  fi
+done
 ```
 
-If no binary is found, tell the user: "Discovery script not found. Run `bun run build` in the gstack directory to compile it." and stop.
-
-Run the discovery:
-```bash
-$DISCOVER_BIN --since "<window>" --format json 2>/tmp/gstack-discover-stderr
-```
-
-Read the stderr output from `/tmp/gstack-discover-stderr` for diagnostic info. Parse the JSON output from stdout.
+If no repos with recent commits are found, tell the user: "No repos with commits in the last <window> found. Check your development directories." and stop.
 
 If `total_sessions` is 0, say: "No AI coding sessions found in the last <window>. Try a longer window: `/retro global 30d`" and stop.
 
@@ -149,7 +146,7 @@ align cleanly. Never truncate project names.
 - Top Work: 3 bullet points summarizing the user's major themes, inferred from
   commit messages. Not individual commits — synthesize into themes.
   E.g., "Built /meow:retro global — cross-project retrospective with AI session discovery"
-  not "feat: gstack-global-discover" + "feat: /meow:retro global template".
+  not "feat: repo discovery" + "feat: /meow:retro global template".
 - The card must be self-contained. Someone seeing ONLY this block should understand
   the user's week without any surrounding context.
 - Do NOT include team members, project totals, or context switching data here.
@@ -230,7 +227,7 @@ Considering the full cross-project picture.
 ## Global Step 8: Load history & compare
 
 ```bash
-ls -t ~/.gstack/retros/global-*.json 2>/dev/null | head -5
+ls -t .claude/memory/retros/global-*.json 2>/dev/null | head -5
 ```
 
 **Only compare against a prior retro with the same `window` value** (e.g., 7d vs 7d). If the most recent prior retro has a different window, skip comparison and note: "Prior global retro used a different window — skipping comparison."
@@ -242,17 +239,17 @@ If no prior global retros exist, append: "First global retro recorded — run ag
 ## Global Step 9: Save snapshot
 
 ```bash
-mkdir -p ~/.gstack/retros
+mkdir -p .claude/memory/retros
 ```
 
 Determine the next sequence number for today:
 ```bash
 today=$(date +%Y-%m-%d)
-existing=$(ls ~/.gstack/retros/global-${today}-*.json 2>/dev/null | wc -l | tr -d ' ')
+existing=$(ls .claude/memory/retros/global-${today}-*.json 2>/dev/null | wc -l | tr -d ' ')
 next=$((existing + 1))
 ```
 
-Use the Write tool to save JSON to `~/.gstack/retros/global-${today}-${next}.json`:
+Use the Write tool to save JSON to `.claude/memory/retros/global-${today}-${next}.json`:
 
 ```json
 {

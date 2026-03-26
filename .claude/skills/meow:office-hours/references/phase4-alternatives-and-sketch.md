@@ -64,14 +64,14 @@ Generate a single-page HTML file with these constraints:
 
 Write to a temp file:
 ```bash
-SKETCH_FILE="/tmp/gstack-sketch-$(date +%s).html"
+SKETCH_FILE="/tmp/meowkit-sketch-$(date +%s).html"
 ```
 
 **Step 3: Render and capture**
 
 ```bash
 $B goto "file://$SKETCH_FILE"
-$B screenshot /tmp/gstack-sketch.png
+$B screenshot /tmp/meowkit-sketch.png
 ```
 
 If `$B` is not available (browse binary not set up), skip the render step. Tell the
@@ -87,7 +87,7 @@ If they approve or say "good enough," proceed.
 **Step 5: Include in design doc**
 
 Reference the wireframe screenshot in the design doc's "Recommended Approach" section.
-The screenshot file at `/tmp/gstack-sketch.png` can be referenced by downstream skills
+The screenshot file at `/tmp/meowkit-sketch.png` can be referenced by downstream skills
 (`/plan-design-review`, `/design-review`) to see what was originally envisioned.
 
 **Step 6: Outside design voices** (optional)

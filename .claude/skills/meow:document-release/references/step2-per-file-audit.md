@@ -1,7 +1,7 @@
 # Step 2: Per-File Documentation Audit
 
 Read each documentation file and cross-reference it against the diff. Use these generic heuristics
-(adapt to whatever project you're in — these are not gstack-specific):
+(adapt to whatever project you're in — these are not MeowKit-specific):
 
 **README.md:**
 - Does it describe all features and capabilities visible in the diff?

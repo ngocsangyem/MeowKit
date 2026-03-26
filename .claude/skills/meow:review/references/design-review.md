@@ -1,9 +1,9 @@
 # Design Review (Step 4.5 — conditional, diff-scoped)
 
-Check if the diff touches frontend files using `gstack-diff-scope`:
+Check if the diff touches frontend files using `meowkit-diff-scope`:
 
 ```bash
-source <(~/.claude/skills/bin/gstack-diff-scope <base> 2>/dev/null)
+source <(.claude/scripts/bin/meowkit-diff-scope <base> 2>/dev/null)
 ```
 
 **If `SCOPE_FRONTEND=false`:** Skip design review silently. No output.
@@ -26,7 +26,7 @@ source <(~/.claude/skills/bin/gstack-diff-scope <base> 2>/dev/null)
 6. **Log the result** for the Review Readiness Dashboard:
 
 ```bash
-~/.claude/skills/bin/gstack-review-log '{"skill":"design-review-lite","timestamp":"TIMESTAMP","status":"STATUS","findings":N,"auto_fixed":M,"commit":"COMMIT"}'
+.claude/scripts/bin/meowkit-review-log '{"skill":"design-review-lite","timestamp":"TIMESTAMP","status":"STATUS","findings":N,"auto_fixed":M,"commit":"COMMIT"}'
 ```
 
 Substitute: TIMESTAMP = ISO 8601 datetime, STATUS = "clean" if 0 findings or "issues_found", N = total findings, M = auto-fixed count, COMMIT = output of `git rev-parse --short HEAD`.

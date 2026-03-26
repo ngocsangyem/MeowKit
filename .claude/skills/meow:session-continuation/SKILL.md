@@ -26,10 +26,10 @@ author: nguyenthienthanh (aura-frog)
 
 ```toon
 state_vars[4]{var,purpose,persistence}:
-  AF_ACTIVE_PLAN,Current active plan path,Session temp file
-  AF_SUGGESTED_PLAN,Branch-matched plan hint,Inferred from git branch
-  AF_COMPLEXITY,Auto-detected task complexity,Session memory
-  AF_ACTIVE_AGENTS,Currently active agents,Session memory
+  MEOWKIT_ACTIVE_PLAN,Current active plan path,Session temp file
+  MEOWKIT_SUGGESTED_PLAN,Branch-matched plan hint,Inferred from git branch
+  MEOWKIT_COMPLEXITY,Auto-detected task complexity,Session memory
+  MEOWKIT_ACTIVE_AGENTS,Currently active agents,Session memory
 ```
 
 ---

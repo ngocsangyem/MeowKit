@@ -46,7 +46,7 @@ Read the plan file. Extract every actionable item — anything that describes wo
 **Ignore:**
 - Context/Background sections (`## Context`, `## Background`, `## Problem`)
 - Questions and open items (marked with ?, "TBD", "TODO: decide")
-- Review report sections (`## GSTACK REVIEW REPORT`)
+- Review report sections (`## MEOWKIT REVIEW REPORT`)
 - Explicitly deferred items ("Future:", "Out of scope:", "NOT in scope:", "P2:", "P3:", "P4:")
 - CEO Review Decisions sections (these record choices, not work items)
 

@@ -14,7 +14,7 @@ Never let a noticed issue silently pass. The whole point is proactive communicat
 
 # Search Before Building
 
-Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `~/.claude/skills/ETHOS.md` for the full philosophy.
+Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `# gstack ETHOS removed — MeowKit uses CLAUDE.md for the full philosophy.
 
 **Three layers of knowledge:**
 - **Layer 1** (tried and true — in distribution). Don't reinvent the wheel. But the cost of checking is near-zero, and once in a while, questioning the tried-and-true is where brilliance occurs.
@@ -26,7 +26,7 @@ Before building infrastructure, unfamiliar patterns, or anything the runtime mig
 
 Log eureka moments:
 ```bash
-jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> ~/.gstack/analytics/eureka.jsonl 2>/dev/null || true
+jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> .claude/memory/eureka.jsonl 2>/dev/null || true
 ```
 Replace SKILL_NAME and ONE_LINE_SUMMARY. Runs inline — don't stop the workflow.
 

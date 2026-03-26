@@ -66,7 +66,7 @@ If running low on context or the user asks to compress: Step 0 > Test diagram > 
 | [contributor-mode.md](references/contributor-mode.md) | Field report filing for gstack contributors |
 | [completion-status.md](references/completion-status.md) | DONE/BLOCKED/NEEDS_CONTEXT protocol and escalation |
 | [telemetry.md](references/telemetry.md) | End-of-skill telemetry logging |
-| [plan-status-footer.md](references/plan-status-footer.md) | GSTACK REVIEW REPORT section for plan files |
+| [plan-status-footer.md](references/plan-status-footer.md) | MEOWKIT REVIEW REPORT section for plan files |
 | [engineering-preferences.md](references/engineering-preferences.md) | DRY, testing, diagrams, 15 cognitive patterns |
 | [design-doc-check.md](references/design-doc-check.md) | Design doc lookup and /meow:office-hours prerequisite offer |
 | [step0-scope-challenge.md](references/step0-scope-challenge.md) | Scope challenge: complexity, search, TODOs, distribution |

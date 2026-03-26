@@ -51,8 +51,8 @@ Narrative covering:
 Check review JSONL logs for plan completion data from /meow:ship runs this period:
 
 ```bash
-eval "$(~/.claude/skills/bin/gstack-slug 2>/dev/null)"
-cat ~/.gstack/projects/$SLUG/*-reviews.jsonl 2>/dev/null | grep '"skill":"ship"' | grep '"plan_items_total"' || echo "NO_PLAN_DATA"
+eval "$(.claude/scripts/bin/meowkit-slug 2>/dev/null)"
+cat .claude/memory/projects/*-reviews.jsonl 2>/dev/null | grep '"skill":"ship"' | grep '"plan_items_total"' || echo "NO_PLAN_DATA"
 ```
 
 If plan completion data exists within the retro time window:

@@ -11,6 +11,7 @@ say `origin/<default>` below.
 ## Fetch and identify user
 
 First, fetch origin and identify the current user:
+
 ```bash
 git fetch origin <default> --quiet
 # Identify who is running the retro
@@ -23,19 +24,20 @@ The name returned by `git config user.name` is **"you"** — the person reading 
 ## Arguments
 
 - `/meow:retro` — default: last 7 days
-- `/retro 24h` — last 24 hours
-- `/retro 14d` — last 14 days
-- `/retro 30d` — last 30 days
-- `/retro compare` — compare current window vs prior same-length window
-- `/retro compare 14d` — compare with explicit window
-- `/retro global` — cross-project retro across all AI coding tools (7d default)
-- `/retro global 14d` — cross-project retro with explicit window
+- `/meow:retro 24h` — last 24 hours
+- `/meow:retro 14d` — last 14 days
+- `/meow:retro 30d` — last 30 days
+- `/meow:retro compare` — compare current window vs prior same-length window
+- `/meow:retro compare 14d` — compare with explicit window
+- `/meow:retro global` — cross-project retro across all AI coding tools (7d default)
+- `/meow:retro global 14d` — cross-project retro with explicit window
 
 Parse the argument to determine the time window. Default to 7 days if no argument given. All times should be reported in the user's **local timezone** (use the system default — do NOT set `TZ`).
 
 **Midnight-aligned windows:** For day (`d`) and week (`w`) units, compute an absolute start date at local midnight, not a relative string. For example, if today is 2026-03-18 and the window is 7 days: the start date is 2026-03-11. Use `--since="2026-03-11T00:00:00"` for git log queries — the explicit `T00:00:00` suffix ensures git starts from midnight. Without it, git uses the current wall-clock time (e.g., `--since="2026-03-11"` at 11pm means 11pm, not midnight). For week units, multiply by 7 to get days (e.g., `2w` = 14 days back). For hour (`h`) units, use `--since="N hours ago"` since midnight alignment does not apply to sub-day windows.
 
 **Argument validation:** If the argument doesn't match a number followed by `d`, `h`, or `w`, the word `compare` (optionally followed by a window), or the word `global` (optionally followed by a window), show this usage and stop:
+
 ```
 Usage: /meow:retro [window | compare | global]
   /meow:retro              — last 7 days (default)
@@ -79,7 +81,7 @@ git log origin/<default> --since="<window>" --format="AUTHOR:%aN" --name-only
 git shortlog origin/<default> --since="<window>" -sn --no-merges
 
 # 8. Greptile triage history (if available)
-cat ~/.gstack/greptile-history.md 2>/dev/null || true
+cat .claude/memory/greptile-history.md 2>/dev/null || true
 
 # 9. TODOS.md backlog (if available)
 cat TODOS.md 2>/dev/null || true
@@ -91,7 +93,7 @@ find . -name '*.test.*' -o -name '*.spec.*' -o -name '*_test.*' -o -name '*_spec
 git log origin/<default> --since="<window>" --oneline --grep="test(qa):" --grep="test(design):" --grep="test: coverage"
 
 # 12. gstack skill usage telemetry (if available)
-cat ~/.gstack/analytics/skill-usage.jsonl 2>/dev/null || true
+cat .claude/memory/skill-usage.jsonl 2>/dev/null || true
 
 # 12. Test files changed in window
 git log origin/<default> --since="<window>" --format="" --name-only | grep -E '\.(test|spec)\.' | sort -u | wc -l

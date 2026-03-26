@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# meowkit-review-log — log a review result to .claude/memory/
+# Adapted from gstack-review-log. Uses project-local memory, not ~/.gstack/.
+# Usage: meowkit-review-log '{"skill":"...","timestamp":"...","status":"..."}'
+set -euo pipefail
+MEMORY_DIR=".claude/memory"
+mkdir -p "$MEMORY_DIR"
+echo "$1" >> "$MEMORY_DIR/reviews.jsonl"
