@@ -38,6 +38,7 @@ Each skill retains its original author credit in its frontmatter.
 | 29  | typescript            | MeowKit (adapted)            | Adapted from aura-frog/typescript-expert + claudekit/frontend-development (TS parts) | MIT | .claude/skills/meow:typescript/ | 2 |
 | 30  | vue                   | MeowKit (adapted)            | Adapted from aura-frog/vue-expert                            | MIT         | .claude/skills/meow:vue/                        | 2    |
 | 31  | frontend-design       | MeowKit (adapted)            | Adapted from claudekit/ui-ux-pro-max + claudekit/frontend-design (merged) | MIT | .claude/skills/meow:frontend-design/ | 2 |
+| 32  | qa-manual             | MeowKit (original)           | Orchestrates: agent-browser + playwright-cli + browse for QA + E2E gen | MIT | .claude/skills/meow:qa-manual/ | 1 |
 
 ## Selection Criteria
 

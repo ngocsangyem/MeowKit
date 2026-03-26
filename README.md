@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  39 skills &middot; 13 agents &middot; 18 commands &middot; 7 modes &middot; 10 rules &middot; 6 hooks &middot; 4-layer security
+  40 skills &middot; 13 agents &middot; 18 commands &middot; 7 modes &middot; 10 rules &middot; 6 hooks &middot; 4-layer security
 </p>
 
 <p align="center">
@@ -259,7 +259,7 @@ Skills contributed by the open-source community. All are self-contained with no 
 | `meow:workflow-orchestrator` | aura-frog       | 5-phase TDD with token budgets                       | 2 files    |
 | `meow:session-continuation`  | aura-frog       | Workflow state persistence across sessions           | 2 files    |
 
-### Original Skills (17)
+### Original Skills (18)
 
 MeowKit-native skills built from scratch or adapted from source analysis:
 
@@ -282,6 +282,7 @@ MeowKit-native skills built from scratch or adapted from source analysis:
 | `meow:typescript`            | Strict TS patterns: null handling, type guards, utility types | —  | 1 file     |
 | `meow:vue`                   | Vue 3 Composition API, Pinia, reactivity, component design | —    | 1 file     |
 | `meow:frontend-design`       | UI/UX design with anti-AI-slop, a11y, typography, color  | —      | 1 file     |
+| `meow:qa-manual`             | Spec-driven QA testing + Playwright E2E code generation  | 1 SH   | 2 files + 3 examples |
 
 Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS_ATTRIBUTION.md)
 
@@ -290,7 +291,7 @@ Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS
 ```
 .claude/
 ├── agents/          13 specialist agents (sub-agents.md compliant)
-├── skills/          39 skills with meow: namespace (34 with references/)
+├── skills/          40 skills with meow: namespace (35 with references/)
 │   └── meow:*/
 │       ├── SKILL.md          Compact decision router (<100 lines)
 │       ├── references/       Detailed procedures (loaded on demand)
