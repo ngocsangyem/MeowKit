@@ -32,6 +32,9 @@ Each skill retains its original author credit in its frontmatter.
 | 23  | docs-finder           | MeowKit (original)           | Inspired by claudekit-engineer/docs-seeker                   | MIT         | .claude/skills/docs-finder/                     | 1    |
 | 24  | multimodal            | MeowKit (original)           | Inspired by claudekit-engineer/ai-multimodal                 | MIT         | .claude/skills/meow:multimodal/                 | 1    |
 | 25  | scout                 | MeowKit (adapted)            | Adapted from claudekit-engineer/scout. Updated 260326: +search tiers, +arch fingerprint, +handoff protocol | MIT | .claude/skills/meow:scout/ | 1 |
+| 26  | llms                  | MeowKit (adapted)            | Adapted from claudekit-engineer/llms                         | MIT         | .claude/skills/meow:llms/                       | 2    |
+| 27  | skill-creator         | MeowKit (adapted)            | Adapted from claudekit-engineer/skill-creator (simplified from 47 to 4 files) | MIT | .claude/skills/meow:skill-creator/ | 2 |
+| 28  | project-organization  | MeowKit (adapted)            | Adapted from claudekit-engineer/project-organization         | MIT         | .claude/skills/meow:project-organization/       | 2    |
 
 ## Selection Criteria
 

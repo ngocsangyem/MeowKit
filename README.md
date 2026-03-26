@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  33 skills &middot; 13 agents &middot; 18 commands &middot; 7 modes &middot; 10 rules &middot; 6 hooks &middot; 4-layer security
+  36 skills &middot; 13 agents &middot; 18 commands &middot; 7 modes &middot; 10 rules &middot; 6 hooks &middot; 4-layer security
 </p>
 
 <p align="center">
@@ -259,7 +259,7 @@ Skills contributed by the open-source community. All are self-contained with no 
 | `meow:workflow-orchestrator` | aura-frog       | 5-phase TDD with token budgets                       | 2 files    |
 | `meow:session-continuation`  | aura-frog       | Workflow state persistence across sessions           | 2 files    |
 
-### Original Skills (11)
+### Original Skills (14)
 
 MeowKit-native skills built from scratch or adapted from source analysis:
 
@@ -276,6 +276,9 @@ MeowKit-native skills built from scratch or adapted from source analysis:
 | `meow:planning`              | ADR generation, plan templates, premise challenge        | —       | 3 files    |
 | `meow:shipping`              | Canary deploy, rollback protocol, ship pipeline          | —       | 3 files    |
 | `meow:testing`               | Red-green-refactor, validation scripts, visual QA        | —       | 3 files    |
+| `meow:llms`                  | Generate llms.txt files per llmstxt.org spec             | —       | 1 file     |
+| `meow:skill-creator`         | Create new skills with compliance checks + registration  | —       | 1 file     |
+| `meow:project-organization`  | Standardize file paths, naming, directory structure      | —       | 1 file     |
 
 Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS_ATTRIBUTION.md)
 
@@ -284,7 +287,7 @@ Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS
 ```
 .claude/
 ├── agents/          13 specialist agents (sub-agents.md compliant)
-├── skills/          33 skills with meow: namespace (28 with references/)
+├── skills/          36 skills with meow: namespace (31 with references/)
 │   └── meow:*/
 │       ├── SKILL.md          Compact decision router (<100 lines)
 │       ├── references/       Detailed procedures (loaded on demand)
