@@ -1,14 +1,5 @@
 ---
 name: meow:session-continuation
-source: aura-frog
-author: nguyenthienthanh (aura-frog)
-original_path: skills/session-continuation/SKILL.md
-task_sizes: [large, super-heavy]
-meowkit_tier: 2
----
-
----
-name: meow:session-continuation
 description: "Manage workflow state across sessions with handoff and resume. TOON-based state persistence."
 autoInvoke: false
 priority: high
@@ -20,6 +11,8 @@ triggers:
   - "workflow:handoff"
   - "workflow:resume"
 allowed-tools: Read, Write, Bash
+source: aura-frog
+author: nguyenthienthanh (aura-frog)
 ---
 
 # Session Continuation

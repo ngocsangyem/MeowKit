@@ -1,14 +1,5 @@
 ---
 name: meow:retro
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/retro/SKILL.md
-task_sizes: [medium, large]
-meowkit_tier: 2
----
-
----
-name: meow:retro
 preamble-tier: 2
 version: 2.0.0
 description: |
@@ -23,7 +14,10 @@ allowed-tools:
   - Write
   - Glob
   - AskUserQuestion
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 

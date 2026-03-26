@@ -1,14 +1,5 @@
 ---
 name: meow:investigate
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/investigate/SKILL.md
-task_sizes: [medium, large]
-meowkit_tier: 2
----
-
----
-name: meow:investigate
 preamble-tier: 2
 version: 1.0.0
 description: |
@@ -39,7 +30,10 @@ hooks:
         - type: command
           command: "bash ${CLAUDE_SKILL_DIR}/../freeze/bin/check-freeze.sh"
           statusMessage: "Checking debug scope boundary..."
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 

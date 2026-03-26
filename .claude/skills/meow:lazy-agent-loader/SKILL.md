@@ -1,14 +1,5 @@
 ---
 name: meow:lazy-agent-loader
-source: aura-frog
-author: nguyenthienthanh (aura-frog)
-original_path: skills/lazy-agent-loader/SKILL.md
-task_sizes: [small, medium, large, super-heavy]
-meowkit_tier: 2
----
-
----
-name: meow:lazy-agent-loader
 description: "Load agent definitions on-demand to reduce context usage. Only loads full agent when needed."
 autoInvoke: false
 priority: high
@@ -16,6 +7,8 @@ triggers:
   - "when agent is selected"
   - "agent:load"
 allowed-tools: Read, Glob
+source: aura-frog
+author: nguyenthienthanh (aura-frog)
 ---
 
 # Lazy Agent Loader

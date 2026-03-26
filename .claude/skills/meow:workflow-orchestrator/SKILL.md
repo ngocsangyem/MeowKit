@@ -1,14 +1,5 @@
 ---
 name: meow:workflow-orchestrator
-source: aura-frog
-author: nguyenthienthanh (aura-frog)
-original_path: skills/workflow-orchestrator/SKILL.md
-task_sizes: [medium, large, super-heavy]
-meowkit_tier: 2
----
-
----
-name: meow:workflow-orchestrator
 description: "Execute 5-phase workflow for complex features. Includes fasttrack mode for pre-approved specs. DO NOT use for simple bug fixes."
 autoInvoke: true
 priority: high
@@ -23,6 +14,8 @@ triggers:
   - "just build it"
   - "execute from specs"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
+source: aura-frog
+author: nguyenthienthanh (aura-frog)
 ---
 
 # Aura Frog Workflow Orchestrator

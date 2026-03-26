@@ -1,18 +1,11 @@
 ---
 name: meow:clean-code
-source: antigravity-kit
-author: vudovn (antigravity-kit)
-original_path: .agent/skills/clean-code/SKILL.md
-task_sizes: [small, medium, large, super-heavy]
-meowkit_tier: 1
----
-
----
-name: meow:clean-code
 description: Pragmatic coding standards - concise, direct, no over-engineering, no unnecessary comments
 allowed-tools: Read, Write, Edit
 version: 2.0
 priority: CRITICAL
+source: antigravity-kit
+author: vudovn (antigravity-kit)
 ---
 
 # Clean Code - Pragmatic AI Coding Standards

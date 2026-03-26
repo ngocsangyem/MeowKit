@@ -1,14 +1,5 @@
 ---
 name: meow:browse
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/browse/SKILL.md
-task_sizes: [small, medium]
-meowkit_tier: 1
----
-
----
-name: meow:browse
 preamble-tier: 1
 version: 1.1.0
 description: |
@@ -22,8 +13,10 @@ allowed-tools:
   - Bash
   - Read
   - AskUserQuestion
-
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 

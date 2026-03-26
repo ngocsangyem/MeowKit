@@ -1,14 +1,5 @@
 ---
 name: meow:qa
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/qa/SKILL.md
-task_sizes: [large, super-heavy]
-meowkit_tier: 1
----
-
----
-name: meow:qa
 preamble-tier: 4
 version: 2.0.0
 description: |
@@ -29,7 +20,10 @@ allowed-tools:
   - Grep
   - AskUserQuestion
   - WebSearch
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 

@@ -1,14 +1,5 @@
 ---
 name: meow:review
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/review/SKILL.md
-task_sizes: [large]
-meowkit_tier: 1
----
-
----
-name: meow:review
 preamble-tier: 4
 version: 1.0.0
 description: |
@@ -26,7 +17,10 @@ allowed-tools:
   - Agent
   - AskUserQuestion
   - WebSearch
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 

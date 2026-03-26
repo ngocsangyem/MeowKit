@@ -1,14 +1,5 @@
 ---
 name: meow:careful
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/careful/SKILL.md
-task_sizes: [small]
-meowkit_tier: 1
----
-
----
-name: meow:careful
 version: 0.1.0
 description: |
   Safety guardrails for destructive commands. Warns before rm -rf, DROP TABLE,
@@ -26,7 +17,10 @@ hooks:
         - type: command
           command: "bash ${CLAUDE_SKILL_DIR}/bin/check-careful.sh"
           statusMessage: "Checking for destructive commands..."
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 

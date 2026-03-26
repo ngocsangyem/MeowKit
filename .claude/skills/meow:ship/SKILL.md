@@ -1,14 +1,5 @@
 ---
 name: meow:ship
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/ship/SKILL.md
-task_sizes: [super-heavy]
-meowkit_tier: 1
----
-
----
-name: meow:ship
 preamble-tier: 4
 version: 1.0.0
 description: |
@@ -24,7 +15,10 @@ allowed-tools:
   - Agent
   - AskUserQuestion
   - WebSearch
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 

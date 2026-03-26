@@ -1,15 +1,8 @@
 ---
 name: meow:fix
+description: "ALWAYS activate this skill before fixing ANY bug, error, test failure, CI/CD issue, type error, lint, log error, UI issue, code problem."
 source: claudekit-engineer
 author: mrgoonie (claudekit)
-original_path: .claude/skills/meow:fix/SKILL.md
-task_sizes: [small, medium, large, super-heavy]
-meowkit_tier: 1
----
-
----
-name: ck:fix
-description: "ALWAYS activate this skill before fixing ANY bug, error, test failure, CI/CD issue, type error, lint, log error, UI issue, code problem."
 version: 1.2.0
 argument-hint: "[issue] --auto|--review|--quick|--parallel"
 ---
@@ -41,7 +34,7 @@ See `references/mode-selection.md` for AskUserQuestion format.
 
 ### Step 2: Debug
 
-- Activate `ck:debug` skill.
+- Activate `meow:investigate` skill (root cause debugging).
 - Guess all possible root causes.
 - Spawn multiple `Explore` subagents in parallel to verify each hypothesis.
 - Create report with all findings for the next step.
@@ -82,8 +75,8 @@ Classify before routing. See `references/complexity-assessment.md`.
 
 See `references/skill-activation-matrix.md` for complete matrix.
 
-**Always activate:** `ck:debug` (all workflows)
-**Conditional:** `ck:problem-solving`, `ck:sequential-thinking`, `ck:brainstorm`, `ck:context-engineering`
+**Always activate:** `meow:investigate` (all workflows)
+**Conditional:** `meow:scout` (for codebase exploration), brainstormer agent (for complex root cause analysis)
 **Subagents:** `debugger`, `researcher`, `planner`, `code-reviewer`, `tester`, `Bash`
 **Parallel:** Multiple `Explore` agents for scouting, `Bash` agents for verification
 

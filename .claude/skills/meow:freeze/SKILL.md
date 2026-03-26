@@ -1,14 +1,5 @@
 ---
 name: meow:freeze
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/freeze/SKILL.md
-task_sizes: [small]
-meowkit_tier: 1
----
-
----
-name: meow:freeze
 version: 0.1.0
 description: |
   Restrict file edits to a specific directory for the session. Blocks Edit and
@@ -32,7 +23,10 @@ hooks:
         - type: command
           command: "bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh"
           statusMessage: "Checking freeze boundary..."
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 

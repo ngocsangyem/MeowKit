@@ -1,14 +1,5 @@
 ---
 name: meow:agent-detector
-source: aura-frog
-author: nguyenthienthanh (aura-frog)
-original_path: skills/agent-detector/SKILL.md
-task_sizes: [small, medium, large, super-heavy]
-meowkit_tier: 2
----
-
----
-name: meow:agent-detector
 description: "CRITICAL: MUST run for EVERY message. Detects agent, complexity, AND model automatically. Always runs FIRST."
 autoInvoke: true
 priority: highest
@@ -19,6 +10,8 @@ triggers:
 allowed-tools: NONE
 # TOKEN OPTIMIZATION: Disabled file scanning tools. Detection uses in-memory patterns only.
 # This saves ~10-30k tokens per message. If file scanning needed, use project-context-loader explicitly.
+source: aura-frog
+author: nguyenthienthanh (aura-frog)
 ---
 
 # Aura Frog Agent Detector

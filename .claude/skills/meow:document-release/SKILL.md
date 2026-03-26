@@ -1,14 +1,5 @@
 ---
 name: meow:document-release
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/document-release/SKILL.md
-task_sizes: [medium, large]
-meowkit_tier: 2
----
-
----
-name: meow:document-release
 preamble-tier: 2
 version: 1.0.0
 description: |
@@ -25,7 +16,10 @@ allowed-tools:
   - Grep
   - Glob
   - AskUserQuestion
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 

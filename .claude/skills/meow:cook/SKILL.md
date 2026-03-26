@@ -1,19 +1,10 @@
 ---
 name: meow:cook
+description: "ALWAYS activate this skill before implementing EVERY feature, plan, or fix."
 source: claudekit-engineer
 author: mrgoonie (claudekit)
-original_path: .claude/skills/meow:cook/SKILL.md
-task_sizes: [medium, large, super-heavy]
-meowkit_tier: 1
----
-
----
-
-name: meow:cook
-description: "ALWAYS activate this skill before implementing EVERY feature, plan, or fix."
 version: 2.1.1
 argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test]"
-
 ---
 
 # Cook - Smart Feature Implementation
@@ -107,7 +98,7 @@ Human review required at these checkpoints (skipped with `--auto`):
 | Phase    | Subagent                                         | Requirement           |
 | -------- | ------------------------------------------------ | --------------------- |
 | Research | `researcher`                                     | Optional in fast/code |
-| Scout    | `ck:scout`                                       | Optional in code      |
+| Scout    | `meow:scout`                                     | Optional in code      |
 | Plan     | `planner`                                        | Optional in code      |
 | UI Work  | `ui-ux-designer`                                 | If frontend work      |
 | Testing  | `tester`, `debugger`                             | **MUST** spawn        |

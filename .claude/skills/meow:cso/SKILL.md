@@ -1,14 +1,5 @@
 ---
 name: meow:cso
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/cso/SKILL.md
-task_sizes: [large, super-heavy]
-meowkit_tier: 2
----
-
----
-name: meow:cso
 preamble-tier: 2
 version: 2.0.0
 description: |
@@ -27,7 +18,10 @@ allowed-tools:
   - Agent
   - WebSearch
   - AskUserQuestion
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 

@@ -1,14 +1,5 @@
 ---
 name: meow:office-hours
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/office-hours/SKILL.md
-task_sizes: [medium, large]
-meowkit_tier: 2
----
-
----
-name: meow:office-hours
 preamble-tier: 3
 version: 2.0.0
 description: |
@@ -30,7 +21,10 @@ allowed-tools:
   - Edit
   - AskUserQuestion
   - WebSearch
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 

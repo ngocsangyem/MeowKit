@@ -1,14 +1,5 @@
 ---
 name: meow:plan-ceo-review
-source: gstack
-author: garrytan (gstack)
-original_path: gstack/plan-ceo-review/SKILL.md
-task_sizes: [large, super-heavy]
-meowkit_tier: 2
----
-
----
-name: meow:plan-ceo-review
 preamble-tier: 3
 version: 1.0.0
 description: |
@@ -28,7 +19,10 @@ allowed-tools:
   - Bash
   - AskUserQuestion
   - WebSearch
+source: gstack
+author: garrytan (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
