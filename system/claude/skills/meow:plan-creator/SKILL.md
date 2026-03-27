@@ -8,6 +8,7 @@ description: "Guides agents to create plans using the correct template. Auto-sel
 ## When to Use
 
 Activate this skill when:
+
 - User runs `/plan [feature]` or `/meow:cook [feature]`
 - Agent needs to create a plan file before implementation (Gate 1)
 - User explicitly asks to plan a task
@@ -40,26 +41,43 @@ Is the task a simple /meow:fix with complexity=simple?
 
 ## Plan Creation Steps
 
-1. **Read the template**: Read the selected template file from `tasks/templates/`
-2. **Fill frontmatter**: Set title, status=draft, priority, effort, created date, tags
-3. **Set model_tier**: Match task complexity to Model Routing table in CLAUDE.md
-4. **Write Goal**: One sentence — what success looks like
-5. **Write Context**: Current state first, then problem (context before instructions)
-6. **List Phases**: Break work into numbered phases with task checkboxes
-7. **Write Constraints**: What MUST NOT change — prevents scope creep
-8. **Write Acceptance Criteria**: Binary pass/fail conditions — measurable
-9. **Save**: `tasks/plans/YYMMDD-feature-name.md`
-10. **Present to human**: Print plan summary and wait for Gate 1 approval
+1. **Scout (if needed)** — For unfamiliar codebases or large changes, spawn `meow:scout` to map relevant directories before planning. Save scout report to `tasks/plans/YYMMDD-name/reports/scout-report.md`.
+
+2. **Research (if needed)** — For tasks involving unfamiliar tech, APIs, or architectural decisions, spawn researcher subagents. Save reports to `tasks/plans/YYMMDD-name/reports/researcher-NN-topic.md`. Multiple researchers can run in parallel on different topics.
+
+3. **Select template** — Use the decision tree above. Read from `tasks/templates/`.
+
+4. **Create plan directory with reports folder**:
+
+   ```
+   tasks/plans/YYMMDD-feature-name/
+   ├── plan.md                          ← main plan
+   ├── reports/                         ← scout + research reports
+   │   ├── scout-report.md
+   │   ├── researcher-01-topic.md
+   │   └── researcher-02-topic.md
+   └── phase-XX-name.md                 ← per phase (if multi-phase)
+   ```
+
+5. **Fill plan** — frontmatter + Goal + Context (informed by reports) + Phases + Constraints + Acceptance Criteria. Link to reports: `See reports/scout-report.md for codebase context.`
+
+6. **Validate** — Run quality checklist below.
+
+7. **Present for Gate 1** — Print summary, wait for human approval. No code until approved.
 
 ## Naming Convention
 
 ```
-tasks/plans/YYMMDD-feature-name.md          ← single-file plan
-tasks/plans/YYMMDD-feature-name/            ← multi-phase plan directory
-  ├── plan.md
-  ├── phase-01-name.md
-  └── phase-02-name.md
+tasks/plans/YYMMDD-feature-name/
+├── plan.md                            ← main plan (always)
+├── reports/                           ← scout + research reports
+│   ├── scout-report.md
+│   └── researcher-NN-topic.md
+├── phase-01-name.md                   ← per phase (if multi-phase)
+└── phase-02-name.md
 ```
+
+Always use directory format. Even simple plans benefit from `reports/` for research context.
 
 Date format: `YYMMDD` (e.g., `260326` for March 26, 2026)
 Name: kebab-case, descriptive (e.g., `add-auth-middleware`, `fix-session-timeout`)
@@ -79,6 +97,7 @@ Before presenting plan for Gate 1 approval:
 ## Plan Status Updates
 
 When resuming work on an existing plan:
+
 1. Read the plan file
 2. Check the Plan Status Log table
 3. Update status of completed/blocked phases

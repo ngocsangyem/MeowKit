@@ -75,6 +75,12 @@ Load **only when executing** the corresponding step — not upfront.
 - **Regression test required** — must fail without fix, pass with fix
 - **>5 files touched** — AskUserQuestion about blast radius before proceeding
 
+## Hooks
+
+- **Iron Law enforcement**: No fixes without confirmed root cause — this is a process constraint, not a technical hook
+- The skill gates Phase 3 (Fix) behind Phase 1 (Investigate) completion
+- If root cause cannot be confirmed after 3 hypotheses, escalate to human
+
 ## Gotchas
 
 - **Confirming hypothesis without disproving alternatives**: Finding evidence FOR a theory doesn't mean it's correct → Actively test at least one alternative hypothesis before concluding

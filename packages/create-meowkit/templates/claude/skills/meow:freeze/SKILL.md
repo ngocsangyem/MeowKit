@@ -85,6 +85,12 @@ script reads it on every Edit/Write invocation.
 - This prevents accidental edits, not a security boundary — Bash commands like `sed` can still modify files outside the boundary
 - To deactivate, run `/unfreeze` or end the conversation
 
+## Hooks
+
+- **PreToolUse on Edit/Write**: Blocks writes outside the frozen directory path
+- Activated by `/meow:freeze <path>`. Deactivated when session ends.
+- Bash commands are NOT restricted — freeze only guards Edit and Write tools
+
 ## Gotchas
 
 - **Symlinked files bypass freeze check**: Edit tool resolves symlinks, writing outside frozen directory → Check resolved path, not just the stated path

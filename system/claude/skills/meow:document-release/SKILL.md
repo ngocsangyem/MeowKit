@@ -34,24 +34,19 @@ Post-ship workflow that ensures every documentation file in the project is accur
 
 ## Workflow
 
-1. **Preamble** — Run initialization, check for upgrades, handle telemetry prompts. See `references/preamble.md`
-2. **AskUserQuestion format** — Follow structured format for all user questions. See `references/ask-user-question-format.md`
-3. **Completeness principle** — Always recommend the complete option. See `references/completeness-principle.md`
-4. **Repo ownership & search** — Adapt behavior to solo/collaborative mode; search before building. See `references/repo-ownership-and-search.md`
-5. **Contributor mode** — If enabled, file field reports on MeowKit issues. See `references/contributor-mode.md`
-6. **Detect base branch** — Determine PR target branch for all diff commands. See `references/base-branch-detection.md`
-7. **Review automation rules** — What to auto-fix vs ask about vs never do. See `references/automation-rules.md`
-8. **Step 1: Pre-flight & diff analysis** — Gather diff stats, discover doc files, classify changes. See `references/step1-preflight-diff-analysis.md`
-9. **Step 2: Per-file documentation audit** — Cross-reference each doc file against the diff. See `references/step2-per-file-audit.md`
-10. **Step 3: Apply auto-updates** — Make clear factual updates directly. See `references/step3-apply-auto-updates.md`
-11. **Step 4: Ask about risky changes** — Use AskUserQuestion for narrative/subjective decisions. See `references/step4-risky-changes.md`
-12. **Step 5: CHANGELOG voice polish** — Polish wording without clobbering entries. See `references/step5-changelog-voice-polish.md`
-13. **Step 6: Cross-doc consistency** — Check for contradictions and discoverability. See `references/step6-cross-doc-consistency.md`
-14. **Step 7: TODOS cleanup** — Mark completed items, flag stale descriptions, capture new deferred work. See `references/step7-todos-cleanup.md`
-15. **Step 8: VERSION bump** — Ask user about version bump if needed. See `references/step8-version-bump.md`
-16. **Step 9: Commit & output** — Stage, commit, push, update PR body, output doc health summary. See `references/step9-commit-and-output.md`
-17. **Completion & telemetry** — Report status, log telemetry, write plan footer. See `references/completion-and-telemetry.md`
-18. **Important rules** — Core principles for all steps. See `references/important-rules.md`
+1. **Initialize** — Run preamble, detect base branch, load automation rules. See `references/preamble.md`, `references/base-branch-detection.md`, `references/automation-rules.md`
+
+2. **Read current docs + diff** — Gather diff stats, discover all doc files, cross-reference each against the diff to classify what needs updating. See `references/step1-preflight-diff-analysis.md`, `references/step2-per-file-audit.md`
+
+3. **Apply auto-updates to each affected doc type** — Make clear factual updates directly (README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md). Ask via AskUserQuestion only for narrative or subjective changes. See `references/step3-apply-auto-updates.md`, `references/step4-risky-changes.md`
+
+4. **Polish CHANGELOG voice** — Fix voice inconsistencies without clobbering entries. Always use imperative mood ("Add feature", not "Added feature"). Clean up TODOS: mark completed items, flag stale descriptions, capture deferred work. See `references/step5-changelog-voice-polish.md`, `references/step7-todos-cleanup.md`
+
+5. **Verify cross-doc consistency** — Check for contradictions, broken links, and discoverability gaps across all updated docs. Grep for old paths after any rename. See `references/step6-cross-doc-consistency.md`
+
+6. **VERSION bump if needed** — Ask user before bumping. See `references/step8-version-bump.md`
+
+7. **Commit doc updates + output health summary** — Stage, commit, push, update PR body, print doc health summary. Log telemetry and write plan footer. See `references/step9-commit-and-output.md`, `references/completion-and-telemetry.md`
 
 ## References
 

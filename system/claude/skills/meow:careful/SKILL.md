@@ -61,6 +61,12 @@ if a match is found. You can always override the warning and proceed.
 
 To deactivate, end the conversation or start a new one. Hooks are session-scoped.
 
+## Hooks
+
+- **PreToolUse on Bash**: Warns before destructive commands (rm -rf, DROP TABLE, force-push, reset --hard, kubectl delete)
+- Session-scoped — only active when `meow:careful` is invoked
+- User can override each warning individually
+
 ## Gotchas
 
 - **False positives on legitimate operations**: Pattern matching `rm` or `drop` in file content, not commands → Check command context, not just string presence

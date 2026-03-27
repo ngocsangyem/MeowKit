@@ -39,12 +39,18 @@ source: aura-frog
 
 ## Process
 
-1. Run pre-execution checklist above
-2. **Phase 1: Understand + Design** — load `references/workflow-phases.md`. APPROVAL GATE.
-3. **Phase 2: Test RED** — write failing tests (TDD). Auto-continue.
-4. **Phase 3: Build GREEN** — implement to pass tests. APPROVAL GATE.
-5. **Phase 4: Refactor + Review** — clean code, security check. Auto-continue.
-6. **Phase 5: Finalize** — verify coverage ≥80%, docs, notification. Auto-complete.
+1. **Run pre-execution checklist** — select lead agent, load memory, show agent banner, verify complexity, challenge requirements.
+
+2. **Detect workflow mode** — check for `fasttrack:` prefix or Agent Teams trigger; if present load `references/fasttrack-and-teams.md`. Otherwise proceed with standard 5-phase flow.
+
+3. **Execute phases sequentially** — load `references/workflow-phases.md` then run:
+   - Phase 1: Understand + Design → **APPROVAL GATE** (Gate 1)
+   - Phase 2: Test RED — write failing tests (TDD). Auto-continue.
+   - Phase 3: Build GREEN — implement to pass tests → **APPROVAL GATE** (Gate 2)
+   - Phase 4: Refactor + Review — clean code, security check. Auto-continue.
+   - Phase 5: Finalize — verify coverage ≥80%, update docs, notify. Auto-complete.
+
+4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit.
 
 **Only 2 approval gates:** Phase 1 (Design) and Phase 3 (Build). Everything else auto-continues.
 

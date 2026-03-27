@@ -60,6 +60,12 @@ Run `/meow:cso` when the user requests a security audit, threat model, pentest r
 | [references/phase-12-fp-filtering.md](references/phase-12-fp-filtering.md)                                 | Confidence gates, 22 hard exclusions, 12 precedents, active verification, variant analysis, parallel verification                                          |
 | [references/phase-13-14-report-save.md](references/phase-13-14-report-save.md)                             | Findings report format, trend tracking, incident response playbooks, remediation roadmap, JSON schema, important rules, disclaimer                         |
 
+## Hooks
+
+- **post-write.sh**: Security scan runs on every file write (always-on via settings.json)
+- CSO mode additionally performs manual checks: dependency audit, CI config review, secrets archaeology
+- These manual checks are NOT hooks — they are workflow steps in the audit process
+
 ## Gotchas
 
 - **False positives in vendored/test code**: Security scan flags minified vendor bundles or test fixtures → Exclude vendor/ and test/fixtures/ from scan scope

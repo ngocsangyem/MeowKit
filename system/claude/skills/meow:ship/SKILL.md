@@ -45,19 +45,13 @@ Use when the user says "ship", "deploy", "push to main", "create a PR", or "merg
 
 ## Workflow
 
-1. **Preamble** — Run MeowKit session init, handle upgrades, telemetry, lake intro. See `references/preamble.md`
-2. **Detect base branch + Pre-flight** — Detect PR target branch (official → main, beta → dev), verify on feature branch, check review readiness dashboard. If `--dry-run`: output plan and stop. See `references/pre-flight.md`
-3. **Distribution pipeline check** — Verify release pipeline exists for new standalone artifacts. See `references/distribution-pipeline.md`
-4. **Merge base branch + Test bootstrap** — Fetch/merge base branch, bootstrap test framework if missing. See `references/merge-and-test-bootstrap.md`
-5. **Run tests** — Execute test suites, triage failures (in-branch vs pre-existing). Skip if `--skip-tests`. See `references/test-execution.md`
-6. **Eval suites** — Run evals if prompt-related files changed. See `references/eval-suites.md`
-7. **Test coverage audit** — Trace code paths, generate coverage diagram, write missing tests. See `references/test-coverage-audit.md`
-8. **Plan completion audit + verification** — Cross-reference plan items against diff, run /qa-only verification. See `references/plan-completion-audit.md`
-9. **Pre-landing review** — Structural review, design review, PR comment resolution. See `references/pre-landing-review.md`
-10. **Adversarial review** — Auto-scaled cross-model adversarial challenge. Skip for `beta` mode. See `references/adversarial-review.md`
-11. **Version bump + CHANGELOG + TODOS** — Auto-bump VERSION (beta: use prerelease suffix e.g. 1.2.4-beta.1), generate CHANGELOG entry, update TODOS.md. See `references/version-changelog-todos.md`
-12. **Link issues + Commit + Push + PR + Docs** — Find/create related GitHub issues, bisectable commits, verification gate, push, create PR (or edit existing), sync docs, persist metrics. See `references/commit-push-pr.md`
-13. **Important rules** — Hard constraints that apply across all steps. See `references/rules.md`
+**Pre-ship** — Initialize session, detect base branch (official → main, beta → dev), verify on feature branch, check review readiness dashboard. If `--dry-run`: output plan and stop. Verify distribution pipeline for new standalone artifacts. Fetch/merge base branch, bootstrap test framework if missing. Run test suites and triage failures (in-branch vs pre-existing — skip if `--skip-tests`). Run evals if prompt-related files changed. Trace coverage, write missing tests. Cross-reference plan items against diff and run /qa-only verification. See `references/pre-flight.md`, `references/distribution-pipeline.md`, `references/merge-and-test-bootstrap.md`, `references/test-execution.md`, `references/eval-suites.md`, `references/test-coverage-audit.md`, `references/plan-completion-audit.md`
+
+**Review** — Run structural + design review, resolve PR comments. Run adversarial review (auto-scaled; skip for `beta` mode). See `references/pre-landing-review.md`, `references/adversarial-review.md`
+
+**Ship** — Auto-bump VERSION (patch unless scope warrants minor/major; beta: use prerelease suffix e.g. `1.2.4-beta.1`). Generate CHANGELOG entry in imperative mood. Update TODOS.md. Find/create related GitHub issues. Create bisectable conventional commit, push, create or edit PR, sync docs, persist metrics. See `references/version-changelog-todos.md`, `references/commit-push-pr.md`, `references/rules.md`
+
+**Post-ship** — Verify CI passes. Document rollback steps in PR body. Log telemetry. See `references/preamble.md`
 
 After completion, run telemetry (see `references/preamble.md` — Telemetry section).
 
@@ -114,6 +108,12 @@ After pipeline completes, output this summary:
 - `references/version-changelog-todos.md` — Version bump (Step 4), CHANGELOG (Step 5), TODOS.md (Step 5.5)
 - `references/commit-push-pr.md` — Issue linking, commit (Step 6), verification gate (Step 6.5), push (Step 7), PR creation/edit (Step 8), document-release (Step 8.5), ship metrics (Step 8.75)
 - `references/rules.md` — Important rules and constraints
+
+## Hooks
+
+- **pre-ship.sh**: Runs lint + test + typecheck before any commit (always-on via settings.json)
+- **post-write.sh**: Security scan on every file write (always-on)
+- These are NOT session-scoped — they run on every ship regardless of skill activation
 
 ## Gotchas
 

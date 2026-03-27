@@ -39,22 +39,15 @@ You are a QA engineer AND a bug-fix engineer. Test web applications like a real 
 
 ## Workflow
 
-1. **Preamble** — Run shared preamble, handle upgrades/telemetry prompts. See `references/preamble.md`
-2. **Detect base branch** — Determine PR target branch for diff commands. See `references/setup.md`
-3. **Setup** — Parse parameters (URL, tier, mode, scope, auth), check clean working tree, find browse binary, bootstrap test framework if needed. See `references/setup.md`
-4. **Select mode** — Diff-aware (feature branch, no URL), Full (URL provided), Quick, or Regression. See `references/modes.md`
-5. **Phase 1: Initialize** — Find browse binary, create output dirs, start timer. See `references/workflow-phases.md`
-6. **Phase 2: Authenticate** — Handle login, cookies, 2FA, CAPTCHA if needed. See `references/workflow-phases.md`
-7. **Phase 3: Orient** — Map the application: screenshot, links, console errors, detect framework. See `references/workflow-phases.md`
-8. **Phase 4: Explore** — Visit pages systematically using the per-page checklist. See `references/workflow-phases.md` and `references/issue-taxonomy.md`
-9. **Phase 5: Document** — Capture evidence (screenshots, snapshot -D) for each issue immediately. See `references/workflow-phases.md`
-10. **Phase 6: Wrap Up** — Compute health score, write top 3 issues, save baseline. See `references/workflow-phases.md` and `references/health-score.md`
-11. **Phase 7: Triage** — Sort issues by severity, filter by tier (Quick/Standard/Exhaustive). See `references/workflow-phases.md`
-12. **Phase 8: Fix Loop** — For each fixable issue: locate source, minimal fix, atomic commit, re-test, classify, write regression test, self-regulate via WTF-likelihood. See `references/workflow-phases.md`
-13. **Phase 9: Final QA** — Re-run QA on affected pages, compute final health score, warn on regression. See `references/workflow-phases.md`
-14. **Phase 10: Report** — Write report (local + project-scoped), include fix status, health score delta, PR summary. See `references/workflow-phases.md`
-15. **Phase 11: TODOS.md Update** — Add deferred bugs, annotate fixed bugs. See `references/workflow-phases.md`
-16. **Telemetry** — Log skill outcome and duration. See `references/preamble.md`
+1. **Initialize** — Run preamble, detect base branch, parse parameters (URL, tier, mode, scope, auth), select mode (diff-aware / full / quick / regression), verify clean working tree, find browse binary. See `references/preamble.md`, `references/setup.md`, `references/modes.md`
+
+2. **Orient** — Launch browser, navigate to target URL (or diff-aware entry point), authenticate if needed (login, cookies, 2FA, CAPTCHA), screenshot all key pages, map links and console errors, detect framework. See `references/workflow-phases.md`
+
+3. **Test critical paths + error states** — Visit pages systematically using the per-page checklist. Cover at minimum: one error scenario, one empty state, one boundary condition, mobile viewport. Capture evidence (screenshots, snapshot -D) for each issue immediately. See `references/workflow-phases.md`, `references/issue-taxonomy.md`
+
+4. **Compute health score + triage** — Score all findings using health score rubric, sort by severity, filter by tier (Quick: critical/high only; Standard: + medium; Exhaustive: + cosmetic). Write top 3 issues. See `references/health-score.md`, `references/workflow-phases.md`
+
+5. **Fix + re-verify + report** — For each fixable issue in triage order: apply minimal fix, atomic commit, re-test the affected page. After all fixes, re-run QA on affected pages, compute final health score delta, warn on any regression. Write full report (local + project-scoped) with fix status and PR summary. Update TODOS.md: add deferred bugs, annotate fixed bugs. Log telemetry. See `references/workflow-phases.md`, `references/preamble.md`
 
 ## References
 

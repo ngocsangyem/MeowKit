@@ -50,35 +50,13 @@ Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer
 
 ## Workflow
 
-1. **Preamble** — Run session setup, telemetry init, upgrade check, lake intro, contributor mode. See [references/preamble.md](references/preamble.md).
+1. **Initialize** — Run preamble, detect base branch (PR base → default branch → `main`), verify not on base branch and that a diff exists. Fetch external PR comments and classify them. See [references/preamble.md](references/preamble.md), [references/scope-drift-detection.md](references/scope-drift-detection.md).
 
-2. **Step 0: Detect base branch** — Check for existing PR base (`gh pr view`), fall back to default branch (`gh repo view`), then fall back to `main`. Use this base for all subsequent git commands.
+2. **Pass 1 — Structural review** — Get full diff (`git fetch origin <base> --quiet && git diff origin/<base>`). Check scope drift against plan file, TODOS.md, and PR description. Apply checklist (critical then informational), design review if frontend files present, test coverage trace with gap analysis. Classify all findings as AUTO-FIX or ASK, apply fixes, batch-ask user on remaining items. See [references/two-pass-review.md](references/two-pass-review.md), [references/design-review.md](references/design-review.md), [references/test-coverage.md](references/test-coverage.md), [references/fix-first-review.md](references/fix-first-review.md).
 
-3. **Step 1: Check branch** — Verify we are not on the base branch and that a diff exists against `origin/<base>`. If no diff, stop with a message.
+3. **Pass 2 — Adversarial analysis** — Auto-scaled by diff size (small/medium/large) using Codex and/or Claude subagent. Cross-reference TODOS, check documentation staleness. See [references/adversarial-review.md](references/adversarial-review.md), [references/post-review-steps.md](references/post-review-steps.md).
 
-4. **Step 1.5: Scope drift detection** — Compare the diff against plan file, TODOS.md, and PR description to detect scope creep or missing requirements. See [references/scope-drift-detection.md](references/scope-drift-detection.md).
-
-5. **Step 2: Read the checklist** — Read `.claude/skills/meow:review/checklist.md`. Stop if unreadable.
-
-6. **Step 2.5: External PR comments** — If PR has GitHub reviewer or CI bot comments, fetch and classify them for resolution in Step 5.
-
-7. **Step 3: Get the diff** — `git fetch origin <base> --quiet` then `git diff origin/<base>` for the full diff.
-
-8. **Step 4: Two-pass review** — Apply checklist in two passes (critical then informational). See [references/two-pass-review.md](references/two-pass-review.md).
-
-9. **Step 4.5: Design review** — Conditional on frontend files in diff. See [references/design-review.md](references/design-review.md).
-
-10. **Step 4.75: Test coverage diagram** — Trace codepaths, map user flows, identify gaps, generate tests. See [references/test-coverage.md](references/test-coverage.md).
-
-11. **Step 5: Fix-first review** — Classify findings as AUTO-FIX or ASK, apply fixes, batch-ask user on remaining items. See [references/fix-first-review.md](references/fix-first-review.md).
-
-12. **Step 5.5-5.6: Post-review checks** — TODOS cross-reference and documentation staleness check. See [references/post-review-steps.md](references/post-review-steps.md).
-
-13. **Step 5.7: Adversarial review** — Auto-scaled by diff size (small/medium/large). Uses Codex and/or Claude subagent. See [references/adversarial-review.md](references/adversarial-review.md).
-
-14. **Step 5.8: Persist result** — Log final review outcome for `/meow:ship` to consume. See [references/post-review-steps.md](references/post-review-steps.md).
-
-15. **Telemetry** — Log skill duration and outcome. See [references/preamble.md](references/preamble.md).
+4. **Verdict** — Emit structured verdict (APPROVE / REQUEST CHANGES / BLOCK), persist result for `/meow:ship` to consume, log telemetry. See [references/post-review-steps.md](references/post-review-steps.md), [references/preamble.md](references/preamble.md).
 
 ## References
 
