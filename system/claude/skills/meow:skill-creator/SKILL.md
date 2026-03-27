@@ -112,11 +112,38 @@ If FAIL: fix failing items before registering.
 {checklist with ✓/✗ per item}
 ```
 
+## Anthropic Skill-Building Lessons
+
+When creating or reviewing a skill, verify these 10 lessons from Anthropic's research:
+
+1. **Skills are folders** — use scripts/, references/, assets/, lib/ creatively. See `references/filesystem-patterns.md`.
+2. **Gotchas = highest signal** — every skill MUST have a `## Gotchas` section with real failure modes, not placeholder text. Start with 2-3 gotchas; grow them as Claude hits new edge cases.
+3. **Progressive disclosure** — SKILL.md stays under 150 lines. Details live in references/ loaded on-demand.
+4. **Avoid railroading** — describe outcomes, not step-by-step procedures. See `references/good-vs-bad-examples.md`.
+5. **Description = trigger condition** — must answer "When should I use this?" not "What does this do?" Start with "Use when..."
+6. **On-demand hooks** — skills can register session-scoped hooks in frontmatter for enforcement during execution.
+7. **config.json for setup** — if skill needs user-specific values, store in config.json. Agent asks on first use.
+8. **Memory strategy** — stateful skills should document what they persist and where.
+9. **Don't state the obvious** — only include knowledge that pushes Claude beyond its defaults.
+10. **One skill type** — classify using the 9-type taxonomy. See `references/skill-types.md`.
+
+### Mandatory checklist before finalizing any skill
+
+- [ ] Description starts with "Use when..." (trigger condition)
+- [ ] Has `## Gotchas` with at least 2 real failure modes
+- [ ] SKILL.md is under 150 lines
+- [ ] Steps are outcome-focused (no railroading)
+- [ ] Uses filesystem beyond SKILL.md (or documents why not needed)
+- [ ] Classified into one Anthropic skill type
+
 ## References
 
 | Reference                                                     | When to load                 | Content                                        |
 | ------------------------------------------------------------- | ---------------------------- | ---------------------------------------------- |
 | **[creation-workflow.md](./references/creation-workflow.md)** | Step 4 — generating SKILL.md | Detailed section-by-section guidance, examples |
+| **[skill-types.md](./references/skill-types.md)** | Classifying skill type | 9-type taxonomy with MeowKit examples |
+| **[good-vs-bad-examples.md](./references/good-vs-bad-examples.md)** | Writing descriptions, gotchas, steps | Pattern comparisons with concrete examples |
+| **[filesystem-patterns.md](./references/filesystem-patterns.md)** | Deciding folder structure | When to use scripts/, references/, assets/, lib/, config.json |
 
 ## Failure Handling
 
