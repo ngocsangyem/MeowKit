@@ -1,141 +1,187 @@
 /**
  * MeowKit Design System — VitePress Theme
  *
- * Brand:
- *   Primary  #38F9FF  Vibrant Cyan (MeowKit Blue) — CTAs, active states, highlights
- *   Secondary #A020F0 Vibrant Purple — decorative, category tags, info status
+ * Architecture: 3-layer token system
+ *   Layer 1: Brand primitives (:root) — theme-independent
+ *   Layer 2: Light theme tokens (html:not(.dark))
+ *   Layer 3: Dark theme tokens (.dark)
+ *   Layer 4: Component overrides — reference tokens, not raw hex
  *
- * Dark theme:
- *   bg.base    #0F172A   bg.surface  #1E293B
- *   text.primary #F1F5F9  text.secondary #CBD5E1  text.subtle #64748B
- *   border.subtle #334155  border.strong #475569
- *
- * Light theme:
- *   bg.base    #F8FAFC   bg.surface  #FFFFFF
- *   text.primary #1E293B  text.secondary #475569  text.subtle #94A3B8
- *   border.subtle #E2E8F0  border.strong #CBD5E1
- *
- * States:
- *   hover   light rgba(56,249,255,0.10)  dark rgba(56,249,255,0.15)
- *   active  light rgba(56,249,255,0.20)  dark rgba(56,249,255,0.25)
+ * Source of truth: docs/meowkit-design-tokens.json
  */
 
 /* ================================================================== */
-/*  1. BRAND — shared across both themes                               */
+/*  LAYER 1: Brand Primitives (theme-independent)                      */
 /* ================================================================== */
 
 :root {
-  --mk-brand-primary: #38F9FF;
-  --mk-brand-secondary: #A020F0;
-  --mk-brand-gradient: linear-gradient(135deg, #38F9FF 0%, #A020F0 100%);
+  /* Primary — Vibrant Cyan: CTAs, active states, highlights */
+  --mk-color-primary: #38F9FF;
+  --mk-color-primary-hover: #5CFAFF;
+  --mk-color-primary-muted: rgba(56, 249, 255, 0.12);
+
+  /* Secondary — Vibrant Purple: decorative, category tags, info */
+  --mk-color-secondary: #A020F0;
+  --mk-color-secondary-hover: #BA55D3;
+  --mk-color-secondary-muted: rgba(160, 32, 240, 0.10);
+
+  /* Gradient — hero text, brand buttons, accents */
+  --mk-gradient-brand: linear-gradient(135deg, #38F9FF 0%, #A020F0 100%);
+
+  /* Semantic status */
+  --mk-color-success: #22C55E;
+  --mk-color-warning: #F59E0B;
+  --mk-color-danger: #EF4444;
+  --mk-color-info: #A020F0;
+
+  /* Typography */
+  --mk-font-display: 'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif;
+  --mk-font-body: 'SF Pro Text', 'Inter', system-ui, sans-serif;
+  --mk-font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* Spacing scale (4px base) */
+  --mk-space-1: 4px;
+  --mk-space-2: 8px;
+  --mk-space-3: 12px;
+  --mk-space-4: 16px;
+  --mk-space-6: 24px;
+  --mk-space-8: 32px;
+
+  /* Border radius */
+  --mk-radius-sm: 6px;
+  --mk-radius-md: 10px;
+  --mk-radius-lg: 16px;
+  --mk-radius-pill: 9999px;
+
+  /* Shadows */
+  --mk-shadow-glow-cyan: 0 0 20px rgba(56, 249, 255, 0.25);
+  --mk-shadow-glow-purple: 0 0 20px rgba(160, 32, 240, 0.25);
+
+  /* Transitions */
+  --mk-transition-fast: 0.15s ease;
+  --mk-transition-normal: 0.25s ease;
 }
 
 /* ================================================================== */
-/*  2. LIGHT THEME                                                     */
+/*  LAYER 2: Light Theme                                               */
 /* ================================================================== */
 
 html:not(.dark) {
   /* Brand → VitePress brand slots */
-  --vp-c-brand-1: #A020F0;
+  --vp-c-brand-1: var(--mk-color-secondary);
   --vp-c-brand-2: #8B18D0;
-  --vp-c-brand-3: #A020F0;
+  --vp-c-brand-3: var(--mk-color-secondary);
   --vp-c-brand-soft: rgba(160, 32, 240, 0.08);
 
   /* Backgrounds */
-  --vp-c-bg: #F8FAFC;
-  --vp-c-bg-alt: #FFFFFF;
-  --vp-c-bg-elv: #FFFFFF;
-  --vp-c-bg-soft: #F1F5F9;
+  --mk-bg-base: #F8FAFC;
+  --mk-bg-surface: #FFFFFF;
+  --mk-bg-soft: #F1F5F9;
+  --vp-c-bg: var(--mk-bg-base);
+  --vp-c-bg-alt: var(--mk-bg-surface);
+  --vp-c-bg-elv: var(--mk-bg-surface);
+  --vp-c-bg-soft: var(--mk-bg-soft);
 
   /* Text */
-  --vp-c-text-1: #1E293B;
-  --vp-c-text-2: #475569;
-  --vp-c-text-3: #94A3B8;
+  --mk-text-primary: #1E293B;
+  --mk-text-secondary: #475569;
+  --mk-text-subtle: #94A3B8;
+  --vp-c-text-1: var(--mk-text-primary);
+  --vp-c-text-2: var(--mk-text-secondary);
+  --vp-c-text-3: var(--mk-text-subtle);
 
   /* Borders */
-  --vp-c-border: #E2E8F0;
-  --vp-c-divider: #E2E8F0;
-  --vp-c-gutter: #F8FAFC;
+  --mk-border-subtle: #E2E8F0;
+  --mk-border-strong: #CBD5E1;
+  --vp-c-border: var(--mk-border-subtle);
+  --vp-c-divider: var(--mk-border-subtle);
+  --vp-c-gutter: var(--mk-bg-base);
+  --vp-c-disabled: var(--mk-border-subtle);
 
-  /* Disabled */
-  --vp-c-disabled: #E2E8F0;
+  /* Interactive states */
+  --mk-hover-bg: rgba(160, 32, 240, 0.06);
+  --mk-active-bg: rgba(160, 32, 240, 0.12);
 
-  /* Sidebar */
-  --vp-sidebar-bg-color: #FFFFFF;
-
-  /* Navbar */
+  /* Component overrides */
+  --vp-sidebar-bg-color: var(--mk-bg-surface);
   --vp-nav-bg-color: rgba(248, 250, 252, 0.85);
-
-  /* Code blocks */
-  --vp-code-block-bg: #F1F5F9;
+  --vp-code-block-bg: var(--mk-bg-soft);
   --vp-code-line-highlight-color: rgba(160, 32, 240, 0.06);
-  --vp-code-tab-active-bar-color: #A020F0;
+  --vp-code-tab-active-bar-color: var(--mk-color-secondary);
 
-  /* Callouts */
-  --vp-custom-block-tip-border: #38F9FF;
+  /* Callout blocks */
+  --vp-custom-block-tip-border: var(--mk-color-primary);
   --vp-custom-block-tip-text: #0E7490;
   --vp-custom-block-tip-bg: rgba(56, 249, 255, 0.06);
-  --vp-custom-block-info-border: #A020F0;
+  --vp-custom-block-info-border: var(--mk-color-secondary);
   --vp-custom-block-info-text: #7C3AED;
   --vp-custom-block-info-bg: rgba(160, 32, 240, 0.04);
 }
 
 /* ================================================================== */
-/*  3. DARK THEME                                                      */
+/*  LAYER 3: Dark Theme                                                */
 /* ================================================================== */
 
 .dark {
   /* Brand → VitePress brand slots */
-  --vp-c-brand-1: #38F9FF;
-  --vp-c-brand-2: #5CFAFF;
-  --vp-c-brand-3: #38F9FF;
-  --vp-c-brand-soft: rgba(56, 249, 255, 0.12);
+  --vp-c-brand-1: var(--mk-color-primary);
+  --vp-c-brand-2: var(--mk-color-primary-hover);
+  --vp-c-brand-3: var(--mk-color-primary);
+  --vp-c-brand-soft: var(--mk-color-primary-muted);
 
   /* Backgrounds */
-  --vp-c-bg: #0F172A;
-  --vp-c-bg-alt: #1E293B;
-  --vp-c-bg-elv: #1E293B;
-  --vp-c-bg-soft: #1E293B;
+  --mk-bg-base: #0F172A;
+  --mk-bg-surface: #1E293B;
+  --mk-bg-soft: #1E293B;
+  --vp-c-bg: var(--mk-bg-base);
+  --vp-c-bg-alt: var(--mk-bg-surface);
+  --vp-c-bg-elv: var(--mk-bg-surface);
+  --vp-c-bg-soft: var(--mk-bg-soft);
 
   /* Text */
-  --vp-c-text-1: #F1F5F9;
-  --vp-c-text-2: #CBD5E1;
-  --vp-c-text-3: #64748B;
+  --mk-text-primary: #F1F5F9;
+  --mk-text-secondary: #CBD5E1;
+  --mk-text-subtle: #64748B;
+  --vp-c-text-1: var(--mk-text-primary);
+  --vp-c-text-2: var(--mk-text-secondary);
+  --vp-c-text-3: var(--mk-text-subtle);
 
   /* Borders */
-  --vp-c-border: #334155;
-  --vp-c-divider: #334155;
-  --vp-c-gutter: #0F172A;
+  --mk-border-subtle: #334155;
+  --mk-border-strong: #475569;
+  --vp-c-border: var(--mk-border-subtle);
+  --vp-c-divider: var(--mk-border-subtle);
+  --vp-c-gutter: var(--mk-bg-base);
+  --vp-c-disabled: var(--mk-border-subtle);
 
-  /* Disabled */
-  --vp-c-disabled: #334155;
+  /* Interactive states */
+  --mk-hover-bg: rgba(56, 249, 255, 0.10);
+  --mk-active-bg: rgba(56, 249, 255, 0.20);
 
-  /* Sidebar */
-  --vp-sidebar-bg-color: #0F172A;
-
-  /* Navbar */
+  /* Component overrides */
+  --vp-sidebar-bg-color: var(--mk-bg-base);
   --vp-nav-bg-color: rgba(15, 23, 42, 0.85);
-
-  /* Code blocks */
-  --vp-code-block-bg: #0F172A;
+  --vp-code-block-bg: var(--mk-bg-base);
   --vp-code-line-highlight-color: rgba(56, 249, 255, 0.06);
-  --vp-code-tab-active-bar-color: #38F9FF;
+  --vp-code-tab-active-bar-color: var(--mk-color-primary);
 
-  /* Callouts */
-  --vp-custom-block-tip-border: #38F9FF;
-  --vp-custom-block-tip-text: #38F9FF;
+  /* Callout blocks */
+  --vp-custom-block-tip-border: var(--mk-color-primary);
+  --vp-custom-block-tip-text: var(--mk-color-primary);
   --vp-custom-block-tip-bg: rgba(56, 249, 255, 0.06);
-  --vp-custom-block-info-border: #A020F0;
-  --vp-custom-block-info-text: #BA55D3;
+  --vp-custom-block-info-border: var(--mk-color-secondary);
+  --vp-custom-block-info-text: var(--mk-color-secondary-hover);
   --vp-custom-block-info-bg: rgba(160, 32, 240, 0.06);
 }
 
 /* ================================================================== */
-/*  4. HERO SECTION                                                    */
+/*  LAYER 4: Component Overrides (reference tokens, not raw hex)       */
 /* ================================================================== */
 
+/* — Hero Section — */
+
 .VPHero .name {
-  background: var(--mk-brand-gradient);
+  background: var(--mk-gradient-brand);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -149,47 +195,43 @@ html:not(.dark) {
   color: var(--vp-c-text-2);
 }
 
-/* Brand button — gradient */
 .VPHero .action .VPButton.brand {
-  background: var(--mk-brand-gradient);
+  background: var(--mk-gradient-brand);
   border: none;
   color: #0F172A;
   font-weight: 600;
-  transition: opacity 0.2s;
+  transition: opacity var(--mk-transition-fast);
 }
 
 .VPHero .action .VPButton.brand:hover {
   opacity: 0.9;
 }
 
-/* Alt button — outlined with primary */
 .VPHero .action .VPButton.alt {
-  border-color: var(--mk-brand-primary);
-  color: var(--mk-brand-primary);
-  transition: background 0.2s, color 0.2s;
+  border-color: var(--mk-color-primary);
+  color: var(--mk-color-primary);
+  transition: background var(--mk-transition-fast), color var(--mk-transition-fast);
 }
 
 html:not(.dark) .VPHero .action .VPButton.alt {
-  border-color: var(--mk-brand-secondary);
-  color: var(--mk-brand-secondary);
+  border-color: var(--mk-color-secondary);
+  color: var(--mk-color-secondary);
 }
 
 .dark .VPHero .action .VPButton.alt:hover {
-  background: rgba(56, 249, 255, 0.15);
+  background: var(--mk-hover-bg);
 }
 
 html:not(.dark) .VPHero .action .VPButton.alt:hover {
-  background: rgba(160, 32, 240, 0.10);
+  background: var(--mk-hover-bg);
 }
 
-/* ================================================================== */
-/*  5. FEATURE CARDS                                                   */
-/* ================================================================== */
+/* — Feature Cards — */
 
 .dark .VPFeature {
-  background-color: #1E293B;
-  border: 1px solid #334155;
-  transition: border-color 0.25s;
+  background-color: var(--mk-bg-surface);
+  border: 1px solid var(--mk-border-subtle);
+  transition: border-color var(--mk-transition-normal);
 }
 
 .dark .VPFeature:hover {
@@ -197,13 +239,13 @@ html:not(.dark) .VPHero .action .VPButton.alt:hover {
 }
 
 .dark .VPFeature .title {
-  color: #38F9FF;
+  color: var(--mk-color-primary);
 }
 
 html:not(.dark) .VPFeature {
-  background-color: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  transition: border-color 0.25s;
+  background-color: var(--mk-bg-surface);
+  border: 1px solid var(--mk-border-subtle);
+  transition: border-color var(--mk-transition-normal);
 }
 
 html:not(.dark) .VPFeature:hover {
@@ -211,50 +253,44 @@ html:not(.dark) .VPFeature:hover {
 }
 
 html:not(.dark) .VPFeature .title {
-  color: #A020F0;
+  color: var(--mk-color-secondary);
 }
 
-/* ================================================================== */
-/*  6. SIDEBAR                                                         */
-/* ================================================================== */
+/* — Sidebar — */
 
 .dark .VPSidebar .VPSidebarItem.is-active > .item > .link > .text {
-  color: #38F9FF;
+  color: var(--mk-color-primary);
 }
 
 .dark .VPSidebar .VPSidebarItem.is-active > .item > .indicator {
-  background-color: #38F9FF;
+  background-color: var(--mk-color-primary);
 }
 
 html:not(.dark) .VPSidebar .VPSidebarItem.is-active > .item > .link > .text {
-  color: #A020F0;
+  color: var(--mk-color-secondary);
 }
 
 html:not(.dark) .VPSidebar .VPSidebarItem.is-active > .item > .indicator {
-  background-color: #A020F0;
+  background-color: var(--mk-color-secondary);
 }
 
-/* ================================================================== */
-/*  7. NAV LINKS                                                       */
-/* ================================================================== */
+/* — Nav Links — */
 
 .dark .VPNavBarMenuLink:hover .text,
 .dark .VPNavBarMenuLink.active .text {
-  color: #38F9FF;
+  color: var(--mk-color-primary);
 }
 
 html:not(.dark) .VPNavBarMenuLink:hover .text,
 html:not(.dark) .VPNavBarMenuLink.active .text {
-  color: #A020F0;
+  color: var(--mk-color-secondary);
 }
 
-/* ================================================================== */
-/*  8. INLINE CODE                                                     */
-/* ================================================================== */
+/* — Inline Code — */
 
 .dark :not(pre) > code {
   background-color: rgba(56, 249, 255, 0.08);
-  color: #38F9FF;
+  color: var(--mk-color-primary);
 }
 
 html:not(.dark) :not(pre) > code {
@@ -262,18 +298,16 @@ html:not(.dark) :not(pre) > code {
   color: #7C3AED;
 }
 
-/* ================================================================== */
-/*  9. TABLES                                                          */
-/* ================================================================== */
+/* — Tables — */
 
 .vp-doc table {
   border-collapse: collapse;
 }
 
 .dark .vp-doc th {
-  background-color: #0F172A;
-  color: #38F9FF;
-  border-bottom: 2px solid #334155;
+  background-color: var(--mk-bg-base);
+  color: var(--mk-color-primary);
+  border-bottom: 2px solid var(--mk-border-subtle);
 }
 
 .dark .vp-doc tr:nth-child(even) td {
@@ -281,27 +315,25 @@ html:not(.dark) :not(pre) > code {
 }
 
 html:not(.dark) .vp-doc th {
-  background-color: #F1F5F9;
-  color: #1E293B;
-  border-bottom: 2px solid #E2E8F0;
+  background-color: var(--mk-bg-soft);
+  color: var(--mk-text-primary);
+  border-bottom: 2px solid var(--mk-border-subtle);
 }
 
 html:not(.dark) .vp-doc tr:nth-child(even) td {
-  background-color: #F8FAFC;
+  background-color: var(--mk-bg-base);
 }
 
-/* ================================================================== */
-/*  10. BADGES                                                         */
-/* ================================================================== */
+/* — Badges — */
 
 .dark .VPBadge.tip {
-  background-color: rgba(56, 249, 255, 0.12);
-  color: #38F9FF;
+  background-color: var(--mk-color-primary-muted);
+  color: var(--mk-color-primary);
 }
 
 .dark .VPBadge.warning {
-  background-color: rgba(160, 32, 240, 0.12);
-  color: #A020F0;
+  background-color: var(--mk-color-secondary-muted);
+  color: var(--mk-color-secondary);
 }
 
 html:not(.dark) .VPBadge.tip {
@@ -314,9 +346,7 @@ html:not(.dark) .VPBadge.warning {
   color: #7C3AED;
 }
 
-/* ================================================================== */
-/*  11. SCROLLBAR (dark only — light uses native)                      */
-/* ================================================================== */
+/* — Scrollbar (dark only) — */
 
 .dark ::-webkit-scrollbar {
   width: 6px;
@@ -324,47 +354,43 @@ html:not(.dark) .VPBadge.warning {
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #0F172A;
+  background: var(--mk-bg-base);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: var(--mk-border-strong);
   border-radius: 3px;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #38F9FF;
+  background: var(--mk-color-primary);
 }
 
-/* ================================================================== */
-/*  12. SEARCH BOX ACCENT                                              */
-/* ================================================================== */
+/* — Search Box — */
 
 .dark .DocSearch-Button {
-  border-color: #334155;
-  background-color: #1E293B;
+  border-color: var(--mk-border-subtle);
+  background-color: var(--mk-bg-surface);
 }
 
 .dark .DocSearch-Button:hover {
-  border-color: #38F9FF;
+  border-color: var(--mk-color-primary);
 }
 
-/* ================================================================== */
-/*  13. LINKS                                                          */
-/* ================================================================== */
+/* — Links — */
 
 .dark .vp-doc a {
-  color: #38F9FF;
+  color: var(--mk-color-primary);
 }
 
 .dark .vp-doc a:hover {
-  color: #5CFAFF;
+  color: var(--mk-color-primary-hover);
 }
 
 html:not(.dark) .vp-doc a {
-  color: #A020F0;
+  color: var(--mk-color-secondary);
 }
 
 html:not(.dark) .vp-doc a:hover {
-  color: #8B18D0;
+  color: var(--mk-color-secondary-hover);
 }

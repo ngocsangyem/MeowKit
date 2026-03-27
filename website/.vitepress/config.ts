@@ -4,11 +4,11 @@ export default defineConfig({
   title: 'MeowKit',
   description: 'AI agent toolkit for Claude Code — 40 skills, 13 agents, structured workflow with hard gates, TDD, and security scanning.',
   head: [
-    ['link', { rel: 'icon', type: 'image/png', href: '/logo.png' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/meowkit-favicon.svg' }],
   ],
   appearance: 'dark',
   themeConfig: {
-    logo: '/logo.png',
+    logo: '/meowkit-favicon.svg',
     nav: [
       { text: 'Guide', link: '/introduction' },
       { text: 'CLI', link: '/cli/' },
@@ -209,7 +209,7 @@ export default defineConfig({
       ],
     },
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/nicepkg/meowkit' },
+      { icon: 'github', link: 'https://github.com/ngocsangyem/MeowKit' },
     ],
     search: {
       provider: 'local',

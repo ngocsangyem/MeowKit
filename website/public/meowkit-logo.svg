@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Brand gradient -->
+    <linearGradient id="brand-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38F9FF"/>
+      <stop offset="100%" stop-color="#A020F0"/>
+    </linearGradient>
+
+    <!-- Glow filter for magical effect -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Outer aura glow -->
+    <filter id="aura" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+        values="0 0 0 0 0.63
+                0 0 0 0 0.13
+                0 0 0 0 0.94
+                0 0 0 0.5 0" result="purpleBlur"/>
+      <feComposite in="SourceGraphic" in2="purpleBlur" operator="over"/>
+    </filter>
+
+    <!-- Eye glow -->
+    <filter id="eye-glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Circuit pattern -->
+    <pattern id="circuits" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="20" x2="20" y2="20" stroke="#38F9FF" stroke-width="0.5" opacity="0.3"/>
+      <line x1="20" y1="0" x2="20" y2="20" stroke="#38F9FF" stroke-width="0.5" opacity="0.3"/>
+      <circle cx="20" cy="20" r="1.5" fill="#38F9FF" opacity="0.4"/>
+      <line x1="20" y1="20" x2="40" y2="20" stroke="#A020F0" stroke-width="0.5" opacity="0.2"/>
+      <circle cx="0" cy="20" r="1" fill="#A020F0" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#0F172A"/>
+  <circle cx="256" cy="256" r="240" fill="url(#circuits)" opacity="0.4"/>
+
+  <!-- Outer ring with gradient -->
+  <circle cx="256" cy="256" r="240" fill="none" stroke="url(#brand-gradient)" stroke-width="3" opacity="0.6"/>
+
+  <!-- Purple magical aura particles -->
+  <g opacity="0.6">
+    <circle cx="120" cy="140" r="3" fill="#A020F0" filter="url(#eye-glow)"/>
+    <circle cx="400" cy="120" r="2.5" fill="#A020F0" filter="url(#eye-glow)"/>
+    <circle cx="380" cy="400" r="2" fill="#A020F0" filter="url(#eye-glow)"/>
+    <circle cx="100" cy="380" r="3" fill="#A020F0" filter="url(#eye-glow)"/>
+    <circle cx="256" cy="80" r="2" fill="#38F9FF" filter="url(#eye-glow)"/>
+    <circle cx="440" cy="256" r="2.5" fill="#38F9FF" filter="url(#eye-glow)"/>
+    <circle cx="70" cy="256" r="2" fill="#38F9FF" filter="url(#eye-glow)"/>
+    <circle cx="256" cy="440" r="1.5" fill="#A020F0" filter="url(#eye-glow)"/>
+  </g>
+
+  <!-- Cat silhouette - main body/head -->
+  <g filter="url(#aura)">
+    <!-- Cat ears -->
+    <polygon points="160,180 130,80 200,150" fill="#1E293B" stroke="url(#brand-gradient)" stroke-width="2"/>
+    <polygon points="352,180 382,80 312,150" fill="#1E293B" stroke="url(#brand-gradient)" stroke-width="2"/>
+
+    <!-- Inner ear detail -->
+    <polygon points="163,170 142,100 197,155" fill="none" stroke="#A020F0" stroke-width="1" opacity="0.5"/>
+    <polygon points="349,170 370,100 315,155" fill="none" stroke="#A020F0" stroke-width="1" opacity="0.5"/>
+
+    <!-- Cat head -->
+    <ellipse cx="256" cy="240" rx="130" ry="120" fill="#1E293B"/>
+
+    <!-- Circuit lines on face -->
+    <g stroke="#38F9FF" stroke-width="1" opacity="0.25" fill="none">
+      <path d="M180,200 L200,210 L200,240"/>
+      <path d="M332,200 L312,210 L312,240"/>
+      <path d="M256,180 L256,200 L240,215"/>
+      <path d="M256,200 L272,215"/>
+      <circle cx="200" cy="240" r="2" fill="#38F9FF"/>
+      <circle cx="312" cy="240" r="2" fill="#38F9FF"/>
+      <path d="M220,290 L240,300 L256,295 L272,300 L292,290"/>
+    </g>
+
+    <!-- Eyes - glowing cyan -->
+    <g filter="url(#eye-glow)">
+      <!-- Left eye -->
+      <ellipse cx="210" cy="235" rx="25" ry="20" fill="#0F172A" stroke="#38F9FF" stroke-width="2"/>
+      <ellipse cx="210" cy="235" rx="12" ry="18" fill="#38F9FF" opacity="0.8"/>
+      <ellipse cx="210" cy="235" rx="5" ry="16" fill="#FFFFFF" opacity="0.3"/>
+
+      <!-- Right eye -->
+      <ellipse cx="302" cy="235" rx="25" ry="20" fill="#0F172A" stroke="#38F9FF" stroke-width="2"/>
+      <ellipse cx="302" cy="235" rx="12" ry="18" fill="#38F9FF" opacity="0.8"/>
+      <ellipse cx="302" cy="235" rx="5" ry="16" fill="#FFFFFF" opacity="0.3"/>
+    </g>
+
+    <!-- Nose -->
+    <polygon points="256,268 248,280 264,280" fill="#A020F0" opacity="0.7"/>
+
+    <!-- Mouth -->
+    <path d="M248,280 Q230,300 220,295" fill="none" stroke="#64748B" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M264,280 Q282,300 292,295" fill="none" stroke="#64748B" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- Whiskers with gradient -->
+    <g stroke="url(#brand-gradient)" stroke-width="1.2" opacity="0.5" stroke-linecap="round">
+      <line x1="170" y1="260" x2="100" y2="245"/>
+      <line x1="170" y1="275" x2="95" y2="280"/>
+      <line x1="170" y1="290" x2="105" y2="310"/>
+      <line x1="342" y1="260" x2="412" y2="245"/>
+      <line x1="342" y1="275" x2="417" y2="280"/>
+      <line x1="342" y1="290" x2="407" y2="310"/>
+    </g>
+  </g>
+
+  <!-- Bottom body hint -->
+  <ellipse cx="256" cy="380" rx="100" ry="50" fill="#1E293B" opacity="0.8"/>
+
+  <!-- Circuit line accents on body -->
+  <g stroke="#A020F0" stroke-width="0.8" opacity="0.3" fill="none">
+    <path d="M200,360 L220,370 L220,390 L240,400"/>
+    <path d="M312,360 L292,370 L292,390 L272,400"/>
+    <circle cx="220" cy="370" r="2" fill="#A020F0"/>
+    <circle cx="292" cy="370" r="2" fill="#A020F0"/>
+  </g>
+
+  <!-- Sparkle accents -->
+  <g fill="#38F9FF" opacity="0.7">
+    <polygon points="140,150 143,158 150,160 143,162 140,170 137,162 130,160 137,158" transform="scale(0.6) translate(50,50)"/>
+    <polygon points="420,130 423,138 430,140 423,142 420,150 417,142 410,140 417,138" transform="scale(0.5) translate(200,100)"/>
+  </g>
+  <g fill="#A020F0" opacity="0.6">
+    <polygon points="380,380 383,388 390,390 383,392 380,400 377,392 370,390 377,388" transform="scale(0.7) translate(100,50)"/>
+    <polygon points="100,350 103,358 110,360 103,362 100,370 97,362 90,360 97,358" transform="scale(0.5) translate(50,150)"/>
+  </g>
+</svg>
