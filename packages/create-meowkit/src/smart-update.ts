@@ -6,6 +6,7 @@ import { join, relative, dirname, basename } from "node:path";
 import * as log from "./logger.js";
 import { copyDirRecursive, resolveTemplateDir } from "./copy-template-tree.js";
 import { processTemplate } from "./substitute-placeholders.js";
+import { mergeSettingsFile } from "./merge-settings.js";
 import {
   readManifest,
   buildManifest,
@@ -112,6 +113,13 @@ export async function smartUpdate(
     if (isIgnored(relPath, targetDir)) {
       log.debug(`Ignored (protected): ${relPath}`);
       stats.skipped++;
+      continue;
+    }
+
+    // Special case: settings.json uses append-only merge
+    if (relPath === ".claude/settings.json") {
+      mergeSettingsFile(srcPath, destPath, dryRun);
+      stats.updated++;
       continue;
     }
 

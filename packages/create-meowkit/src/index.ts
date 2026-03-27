@@ -7,20 +7,23 @@ import { promptUser } from "./prompts.js";
 import { validate } from "./validate.js";
 import { smartUpdate } from "./smart-update.js";
 import * as log from "./logger.js";
+import * as spinner from "./spinner.js";
+
+const VERSION = "0.1.0";
 
 const USAGE = `
-${pc.bold("create-meowkit")} - scaffold a meowkit configuration for your project
+${pc.bold("create-meowkit")} ${pc.dim(`v${VERSION}`)} — scaffold MeowKit for your project
 
 ${pc.bold("Usage:")}
   npm create meowkit@latest [options]
 
 ${pc.bold("Options:")}
-  --force       Overwrite existing .claude/ directory
-  --dry-run     Preview files that would be created without writing them
+  --force       Overwrite all files (ignore user modifications)
+  --dry-run     Preview files without writing
   --mode        Set default mode: fast | balanced | strict
   --no-memory   Disable memory/context persistence
   --global      Install as global config (~/.claude/)
-  --json        Output structured JSON (for CI/scripting)
+  --json        Structured JSON output (for CI/scripting)
   --verbose     Enable debug logging
   --help        Show this help message
 `;
@@ -48,16 +51,23 @@ async function main(): Promise<void> {
     },
   });
 
-  // Initialize logger before any output
   log.initLogger({
     json: argv.json,
     verbose: argv.verbose,
     command: "create-meowkit",
   });
 
+  // Set env flag so spinner knows about JSON mode
+  if (argv.json) process.env.MEOWKIT_JSON = "1";
+
   if (argv.help) {
     console.log(USAGE);
     process.exit(0);
+  }
+
+  // Version banner
+  if (!argv.json) {
+    console.log(`\n${pc.bold(pc.cyan("create-meowkit"))} ${pc.dim(`v${VERSION}`)}\n`);
   }
 
   const dryRun: boolean = argv["dry-run"];
@@ -66,53 +76,51 @@ async function main(): Promise<void> {
   const global: boolean = argv.global;
   const modeOverride: string | undefined = argv.mode;
 
-  const targetDir = global
-    ? (process.env.HOME ?? "~")
-    : process.cwd();
+  const targetDir = global ? (process.env.HOME ?? "~") : process.cwd();
 
   if (dryRun) {
-    log.info(pc.yellow("Dry-run mode enabled. No files will be written.\n"));
+    log.info(pc.yellow("Dry-run mode — no files will be written.\n"));
   }
 
-  // Step 1: Detect project stack
+  // Step 1: Detect stack
   log.info("Detecting project stack...");
   const detected = detectStack(targetDir);
-  log.debug(`Stack detection result: ${JSON.stringify(detected)}`);
+  log.debug(`Stack detection: ${JSON.stringify(detected)}`);
 
   if (detected.type !== "unknown") {
     log.success(
-      `Detected: ${detected.type} (${detected.frameworks.join(", ") || "no frameworks"}) ` +
-        `[confidence: ${Math.round(detected.confidence * 100)}%]`
+      `Detected: ${detected.type} (${detected.frameworks.join(", ") || "none"}) ` +
+        `[${Math.round(detected.confidence * 100)}%]`
     );
   } else {
     log.warn("Could not auto-detect project type.");
   }
 
-  // Step 2: Interactive prompts (skip in json mode — require all flags)
+  // Step 2: Interactive prompts
   const config = await promptUser(detected);
 
-  // Apply CLI overrides
   if (modeOverride) {
     const validModes = ["fast", "balanced", "strict"] as const;
     if (validModes.includes(modeOverride as (typeof validModes)[number])) {
       config.defaultMode = modeOverride as (typeof validModes)[number];
     } else {
-      log.warn(`Invalid mode "${modeOverride}". Using "${config.defaultMode}" from prompt.`);
+      log.warn(`Invalid mode "${modeOverride}". Using "${config.defaultMode}".`);
     }
   }
 
-  if (!enableMemory) {
-    config.enableMemory = false;
+  if (!enableMemory) config.enableMemory = false;
+
+  // Step 3: Generate/merge with spinner
+  spinner.start("Scaffolding MeowKit system...");
+  const stats = await smartUpdate(config, targetDir, dryRun, force);
+  const fileCount = stats.updated + stats.added;
+
+  if (fileCount > 0) {
+    spinner.succeed(`Scaffolded ${fileCount} files`);
+  } else {
+    spinner.succeed("Already up to date");
   }
 
-  // Step 3: Generate/merge — always uses smart update
-  // If .claude/ doesn't exist: all files are "new", copies everything
-  // If .claude/ exists: merges — overwrites unchanged core, skips user-modified files
-  // --force: ignores manifest, overwrites everything
-  log.info("Generating configuration files...");
-  const stats = await smartUpdate(config, targetDir, dryRun, force);
-
-  const fileCount = stats.updated + stats.added;
   log.setData("filesCreated", fileCount);
   log.setData("targetDir", targetDir);
   log.setData("stats", { updated: stats.updated, added: stats.added, skipped: stats.skipped });
@@ -127,36 +135,26 @@ async function main(): Promise<void> {
     }
   }
 
-  log.success(`Done: ${stats.updated} updated, ${stats.added} new, ${stats.skipped} skipped`);
-  log.debug(`Processed ${fileCount} files in ${targetDir}`);
-
-  // Step 5: Validate output (skip for dry-run)
+  // Step 4: Validate (skip for dry-run)
   if (!dryRun) {
-    log.info("Validating output...");
+    spinner.start("Validating...");
     const result = validate(targetDir);
     log.setData("validation", { valid: result.valid, issues: result.issues });
 
-    if (!result.valid) {
-      log.warn("Validation found issues:");
+    if (result.valid) {
+      spinner.succeed("Validation passed");
+    } else {
+      spinner.fail(`Validation: ${result.issues.length} issue(s)`);
       for (const issue of result.issues) {
-        log.warn(`  - ${issue}`);
+        log.warn(`  ${issue}`);
       }
     }
   }
 
-  // Step 6: Summary
-  log.success(`${dryRun ? "Would create" : "Created"} ${fileCount} files in ${targetDir}`);
+  // Step 5: Summary
+  log.success(`Done: ${stats.updated} updated, ${stats.added} new, ${stats.skipped} skipped`);
 
   if (!dryRun && !log.isJson()) {
-    console.log(`\n${pc.bold("Scaffolded the full MeowKit system:")}`);
-    console.log(`  ${pc.cyan("agents/")}    13 specialist agents (planner, developer, reviewer, ...)`);
-    console.log(`  ${pc.cyan("skills/")}    40+ skills (cook, fix, ship, review, qa, ...)`);
-    console.log(`  ${pc.cyan("commands/")}  18 slash commands`);
-    console.log(`  ${pc.cyan("modes/")}     7 behavioral modes (default, strict, fast, ...)`);
-    console.log(`  ${pc.cyan("rules/")}     12 enforcement rules (security, TDD, gates, ...)`);
-    console.log(`  ${pc.cyan("hooks/")}     6 lifecycle hooks`);
-    console.log(`  ${pc.cyan("scripts/")}   validation & security scripts`);
-
     console.log(`\n${pc.bold("Next steps:")}`);
     console.log(`  ${pc.dim("1.")} Review ${pc.bold("CLAUDE.md")} for project conventions`);
     console.log(`  ${pc.dim("2.")} Run ${pc.bold("npx meowkit setup")} for guided configuration`);
@@ -166,8 +164,29 @@ async function main(): Promise<void> {
   log.flush();
 }
 
+/** Classify common errors into actionable messages */
+function classifyError(err: unknown): string {
+  if (!(err instanceof Error)) return String(err);
+
+  const msg = err.message;
+  const code = (err as NodeJS.ErrnoException).code;
+
+  if (code === "EACCES" || code === "EPERM") {
+    return `Permission denied: ${msg}\n  Fix: Check directory permissions or run with appropriate privileges`;
+  }
+  if (code === "ENOSPC") {
+    return `Disk full: ${msg}\n  Fix: Free up disk space and try again`;
+  }
+  if (msg.includes("Templates directory not found") || msg.includes("template not found")) {
+    return `${msg}\n  Fix: Package may be corrupted. Reinstall: npm install -g create-meowkit@latest`;
+  }
+
+  return msg;
+}
+
 main().catch((err: unknown) => {
-  log.error(err instanceof Error ? err.message : String(err));
+  spinner.fail("Failed");
+  log.error(classifyError(err));
   log.flush();
   process.exit(1);
 });

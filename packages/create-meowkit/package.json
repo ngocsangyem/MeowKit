@@ -11,8 +11,9 @@
     "templates"
   ],
   "scripts": {
-    "build:templates": "bash scripts/build-templates.sh",
+    "build:templates": "node scripts/build-templates.mjs",
     "build": "npm run build:templates && tsc",
+    "prepublishOnly": "npm run build",
     "dev": "tsc --watch",
     "start": "node dist/index.js"
   },

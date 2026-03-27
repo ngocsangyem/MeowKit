@@ -40,3 +40,10 @@ coverage/
 # Task artifacts (local, not committed)
 tasks/plans/
 tasks/reviews/
+
+# MeowKit
+.env
+.env.local
+.claude/memory/
+.claude/logs/
+

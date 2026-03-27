@@ -1,34 +1,80 @@
 #!/usr/bin/env bash
-# meowkit-config — read/write .meowkit.config.json values
-# Adapted from gstack-config for MeowKit. Uses project-local config, not ~/.gstack/.
+# meowkit-config — read/write .meowkit.config.json with dot-notation
 # Usage:
-#   meowkit-config get <key>
-#   meowkit-config set <key> <value>
+#   meowkit-config get <dotted.key> [default]
+#   meowkit-config set <dotted.key> <value>
+#   meowkit-config has <dotted.key>  → exit 0 if truthy, 1 if falsy/missing
 set -euo pipefail
 
 CONFIG_FILE="${MEOWKIT_CONFIG:-.meowkit.config.json}"
 
+# Resolve nested key: "features.costTracking" → d["features"]["costTracking"]
+resolve_key() {
+  python3 -c "
+import json, sys
+try:
+    d = json.load(open('$CONFIG_FILE'))
+    v = d
+    for k in '$1'.split('.'):
+        v = v[k]
+    print(v if not isinstance(v, bool) else str(v).lower())
+except (KeyError, TypeError, FileNotFoundError):
+    if len(sys.argv) > 1:
+        print(sys.argv[1])
+    else:
+        sys.exit(1)
+" "${2:-}" 2>/dev/null
+}
+
 case "${1:-}" in
   get)
-    KEY="${2:?Usage: meowkit-config get <key>}"
+    KEY="${2:?Usage: meowkit-config get <dotted.key> [default]}"
+    DEFAULT="${3:-}"
     if [ -f "$CONFIG_FILE" ]; then
-      python3 -c "import json,sys; d=json.load(open('$CONFIG_FILE')); print(d.get('$KEY',''))" 2>/dev/null || true
+      resolve_key "$KEY" "$DEFAULT"
+    elif [ -n "$DEFAULT" ]; then
+      echo "$DEFAULT"
+    fi
+    ;;
+  has)
+    KEY="${2:?Usage: meowkit-config has <dotted.key>}"
+    if [ -f "$CONFIG_FILE" ]; then
+      VAL=$(resolve_key "$KEY" "false" 2>/dev/null || echo "false")
+      case "$VAL" in true|1|yes) exit 0 ;; *) exit 1 ;; esac
+    else
+      exit 1
     fi
     ;;
   set)
-    KEY="${2:?Usage: meowkit-config set <key> <value>}"
-    VALUE="${3:?Usage: meowkit-config set <key> <value>}"
-    if [ -f "$CONFIG_FILE" ]; then
-      python3 -c "
+    KEY="${2:?Usage: meowkit-config set <dotted.key> <value>}"
+    VALUE="${3:?Usage: meowkit-config set <dotted.key> <value>}"
+    [ -f "$CONFIG_FILE" ] || { echo "Config not found: $CONFIG_FILE" >&2; exit 1; }
+    python3 -c "
 import json
-with open('$CONFIG_FILE') as f: d=json.load(f)
-d['$KEY']='$VALUE'
-with open('$CONFIG_FILE','w') as f: json.dump(d,f,indent=2)
+with open('$CONFIG_FILE') as f: d = json.load(f)
+keys = '$KEY'.split('.')
+obj = d
+for k in keys[:-1]:
+    obj = obj.setdefault(k, {})
+val = '$VALUE'
+if val.lower() in ('true','false'): val = val.lower() == 'true'
+elif val.isdigit(): val = int(val)
+obj[keys[-1]] = val
+with open('$CONFIG_FILE','w') as f: json.dump(d, f, indent=2)
 " 2>/dev/null
-    fi
     ;;
   *)
-    echo "Usage: meowkit-config {get|set} <key> [value]"
+    cat << 'HELP'
+meowkit-config — read/write .meowkit.config.json
+Usage:
+  meowkit-config get <dotted.key> [default]
+  meowkit-config set <dotted.key> <value>
+  meowkit-config has <dotted.key>
+Examples:
+  meowkit-config get features.costTracking
+  meowkit-config has features.memory && echo enabled
+  meowkit-config set mode.default strict
+HELP
     exit 1
     ;;
 esac

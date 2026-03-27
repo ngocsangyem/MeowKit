@@ -44,50 +44,79 @@ function setupVenv(projectDir: string): StepResult {
   }
 }
 
-/** Setup MCP configuration from example */
+// Default file contents — used when .example files don't exist (no scaffold yet)
+const DEFAULT_MCP = `{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp", "--api-key", "YOUR_API_KEY"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
+}\n`;
+
+const DEFAULT_ENV = `# MeowKit Environment Variables
+# Never commit this file to git.
+
+# Gemini API key (required for meow:multimodal skill)
+# Get from: https://aistudio.google.com/apikey
+GEMINI_API_KEY=
+\n`;
+
+const DEFAULT_GITIGNORE = `# MeowKit
+.env
+.env.local
+.claude/memory/
+.claude/logs/
+\n`;
+
+/** Setup MCP configuration */
 function setupMcp(projectDir: string): StepResult {
-  const mcpExample = join(projectDir, ".mcp.json.example");
   const mcpTarget = join(projectDir, ".mcp.json");
 
   if (existsSync(mcpTarget)) {
     return { name: "mcp", status: "skip", message: ".mcp.json already exists" };
   }
 
-  if (!existsSync(mcpExample)) {
-    return { name: "mcp", status: "fail", message: ".mcp.json.example not found — run 'npm create meowkit' to scaffold" };
+  // Copy from example if available, otherwise create with defaults
+  const mcpExample = join(projectDir, ".mcp.json.example");
+  if (existsSync(mcpExample)) {
+    copyFileSync(mcpExample, mcpTarget);
+  } else {
+    writeFileSync(mcpTarget, DEFAULT_MCP, "utf-8");
   }
-
-  copyFileSync(mcpExample, mcpTarget);
-  return { name: "mcp", status: "pass", message: "Created .mcp.json from example. Edit API keys inside." };
+  return { name: "mcp", status: "pass", message: "Created .mcp.json — edit API keys inside." };
 }
 
-/** Setup .env from example */
+/** Setup .env */
 function setupEnv(projectDir: string): StepResult {
-  const envExample = join(projectDir, ".env.example");
   const envTarget = join(projectDir, ".env");
 
   if (existsSync(envTarget)) {
     return { name: "env", status: "skip", message: ".env already exists" };
   }
 
-  if (!existsSync(envExample)) {
-    return { name: "env", status: "fail", message: ".env.example not found — run 'npm create meowkit' to scaffold" };
+  const envExample = join(projectDir, ".env.example");
+  if (existsSync(envExample)) {
+    copyFileSync(envExample, envTarget);
+  } else {
+    writeFileSync(envTarget, DEFAULT_ENV, "utf-8");
   }
-
-  copyFileSync(envExample, envTarget);
-  return { name: "env", status: "pass", message: "Created .env from example. Add your API keys." };
+  return { name: "env", status: "pass", message: "Created .env — add your API keys." };
 }
 
-/** Append MeowKit gitignore entries to project .gitignore */
+/** Setup .gitignore with MeowKit entries */
 function setupGitignore(projectDir: string): StepResult {
-  const meowkitIgnore = join(projectDir, ".gitignore.meowkit");
   const gitignore = join(projectDir, ".gitignore");
 
-  if (!existsSync(meowkitIgnore)) {
-    return { name: "gitignore", status: "fail", message: ".gitignore.meowkit not found — run 'npm create meowkit' to scaffold" };
-  }
-
-  // Check if already appended
+  // Check if already has MeowKit entries
   if (existsSync(gitignore)) {
     const content = readFileSync(gitignore, "utf-8");
     if (content.includes(".claude/memory/")) {
@@ -95,7 +124,11 @@ function setupGitignore(projectDir: string): StepResult {
     }
   }
 
-  const additions = readFileSync(meowkitIgnore, "utf-8");
+  // Read from .gitignore.meowkit if exists, otherwise use defaults
+  const meowkitIgnore = join(projectDir, ".gitignore.meowkit");
+  const additions = existsSync(meowkitIgnore)
+    ? readFileSync(meowkitIgnore, "utf-8")
+    : DEFAULT_GITIGNORE;
   appendFileSync(gitignore, `\n${additions}`, "utf-8");
   return { name: "gitignore", status: "pass", message: "Appended MeowKit entries to .gitignore" };
 }
