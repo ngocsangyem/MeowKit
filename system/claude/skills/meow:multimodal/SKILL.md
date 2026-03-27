@@ -134,6 +134,13 @@ Follow these steps sequentially:
 6. **Check context budget** — if response > 3000 tokens, summarize before returning
 7. **Format output** — fill the structured template below
 
+## Setup
+
+On first use, this skill checks for `GEMINI_API_KEY` in environment or `.env`.
+If not found, it prompts the user and saves to `.claude/.env`.
+
+Config: `.claude/.env` — stores `GEMINI_API_KEY` for all sessions.
+
 ## Failure Handling
 
 - **Missing API key** → STOP + setup instructions (aistudio.google.com/apikey)

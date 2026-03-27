@@ -279,6 +279,14 @@ playwright-cli close
 - **Tracing** [references/tracing.md](references/tracing.md)
 - **Video recording** [references/video-recording.md](references/video-recording.md)
 
+## Setup
+
+Requires Playwright MCP server. Configure in `.mcp.json`:
+```json
+{ "playwright": { "command": "npx", "args": ["@playwright/mcp@latest"] } }
+```
+Copy from `.claude/mcp.json.example` if not configured.
+
 ## Gotchas
 
 - **Flaky selectors on SPAs**: data-testid changes between renders or framework versions → Prefer role-based selectors (getByRole) over CSS selectors

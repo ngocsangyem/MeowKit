@@ -117,6 +117,15 @@ Scripts handle URL construction, source routing, fallback chains, and error hand
 
 **Budget rule:** ≤3000 tokens inline. Overflow → write to `.claude/memory/docs-cache/`.
 
+## Setup
+
+MCP servers are optional. Skill degrades gracefully:
+- **Context7**: configured in `.mcp.json` → best coverage
+- **Context Hub**: `npx chub` → curated docs, no install
+- **Neither**: falls back to llms.txt direct fetch + WebSearch
+
+Config: `.mcp.json` — MCP server endpoints. Copy from `.claude/mcp.json.example`.
+
 ## Failure Handling
 
 - **Context7 404** → try chub → llms.txt direct → WebSearch
