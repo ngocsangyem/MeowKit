@@ -67,6 +67,15 @@ if (existsSync(settingsSrc)) {
   cpSync(settingsSrc, join(TEMPLATES, "claude", "settings.json"));
 }
 
+// Copy tasks/ directory (templates, guidelines, etc.)
+const TASKS_SRC = join(SYSTEM_DIR, "tasks");
+if (existsSync(TASKS_SRC)) {
+  cpSync(TASKS_SRC, join(TEMPLATES, "tasks"), {
+    recursive: true,
+    filter: (s) => !shouldSkip(s),
+  });
+}
+
 // Create empty memory directory marker
 mkdirSync(join(TEMPLATES, "claude", "memory"), { recursive: true });
 writeFileSync(join(TEMPLATES, "claude", "memory", ".gitkeep"), "");
@@ -76,25 +85,6 @@ const realClaude = join(SYSTEM_DIR, "CLAUDE.md");
 
 if (existsSync(realClaude)) {
   let content = readFileSync(realClaude, "utf-8");
-  // Strip "MeowKit" branding from descriptive text for user projects
-  // Keep it in CLI commands: meow:*, meowkit, create-meowkit, npx meowkit
-  content = content.replace(/^# MeowKit — /m, "# ");
-  content = content.replace(/## MeowKit Philosophy/g, "## Philosophy");
-  // Replace "MeowKit" in prose (not in code/commands)
-  // Replace standalone "MeowKit" with "This system" or remove where redundant
-  content = content.replaceAll("MeowKit requires explicit", "The system requires explicit");
-  content = content.replaceAll("MeowKit uses only stdlib", "The system uses only stdlib");
-  content = content.replaceAll("Each MeowKit agent", "Each agent");
-  content = content.replaceAll("MeowKit's 4-layer defense", "The 4-layer defense");
-  content = content.replaceAll("Every MeowKit agent declares", "Every agent declares");
-  content = content.replaceAll("What MeowKit explicitly does NOT do", "What this system explicitly does NOT do");
-  content = content.replaceAll("MeowKit uses standard Markdown", "The system uses standard Markdown");
-  content = content.replaceAll("MeowKit does not ship features", "The system does not ship features");
-  content = content.replaceAll("MeowKit recommends optional MCP", "Optional MCP");
-  content = content.replaceAll("MeowKit skills degrade", "Skills degrade");
-  content = content.replaceAll("MeowKit core is fully", "The core is fully");
-  content = content.replaceAll("MeowKit includes 13", "This system includes 13");
-  content = content.replaceAll("This makes MeowKit portable", "This makes it portable");
   writeFileSync(join(TEMPLATES, "claude-md.template"), content);
 } else {
   console.warn(`WARNING: CLAUDE.md not found at ${realClaude}`);

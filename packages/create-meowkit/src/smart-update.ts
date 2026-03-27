@@ -65,8 +65,9 @@ export async function smartUpdate(
   const oldManifest = force ? null : readManifest(join(targetDir, ".claude"));
   const stats: UpdateStats = { updated: 0, skipped: 0, added: 0, userModified: [] };
 
-  if (!oldManifest) {
-    log.warn("No manifest found. Building fresh manifest from existing files...");
+  // Only warn about missing manifest on updates (existing .claude/), not fresh installs
+  if (!oldManifest && existsSync(join(targetDir, ".claude"))) {
+    log.warn("No manifest found — will treat all existing files as unmodified.");
   }
 
   const oldChecksums = oldManifest?.checksums ?? {};
@@ -153,6 +154,29 @@ export async function smartUpdate(
     // File matches manifest (or no manifest) — safe to overwrite
     copyFile(srcPath, destPath, dryRun);
     stats.updated++;
+  }
+
+  // Copy tasks/ directory (templates, guidelines structure)
+  const tasksSrc = join(templateDir, "tasks");
+  if (existsSync(tasksSrc)) {
+    const taskFiles = walkTemplates(tasksSrc, tasksSrc)
+      .map((f) => ({ ...f, relPath: `tasks/${f.relPath}` }));
+
+    for (const { relPath, srcPath: tSrc } of taskFiles) {
+      const tDest = join(targetDir, relPath);
+      if (!existsSync(tDest)) {
+        copyFile(tSrc, tDest, dryRun);
+        stats.added++;
+      }
+      // tasks/ files are never overwritten (user-owned once created)
+    }
+
+    // Create empty task directories
+    if (!dryRun) {
+      for (const dir of ["tasks/active", "tasks/completed", "tasks/backlog", "tasks/guidelines"]) {
+        mkdirSync(join(targetDir, dir), { recursive: true });
+      }
+    }
   }
 
   const claudeDir = join(targetDir, ".claude");
