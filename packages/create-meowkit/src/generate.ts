@@ -47,10 +47,12 @@ export async function generate(
 
   // Step 2: Process template files with placeholder substitution
   const claudeMdTemplate = join(templateDir, "claude-md.template");
-  if (existsSync(claudeMdTemplate)) {
-    processTemplate(claudeMdTemplate, join(targetDir, "CLAUDE.md"), config, dryRun);
-    fileCount++;
+  if (!existsSync(claudeMdTemplate)) {
+    console.error(pc.red(`CLAUDE.md template not found at ${claudeMdTemplate}`));
+    process.exit(1);
   }
+  processTemplate(claudeMdTemplate, join(targetDir, "CLAUDE.md"), config, dryRun);
+  fileCount++;
 
   const configTemplate = join(templateDir, "meowkit-config.json.template");
   if (existsSync(configTemplate)) {

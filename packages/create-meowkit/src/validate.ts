@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, accessSync, constants } from "node:fs";
+import { existsSync, readdirSync, statSync, accessSync, constants } from "node:fs";
 import { join } from "node:path";
 import pc from "picocolors";
 
@@ -35,7 +35,6 @@ function countMdFiles(dir: string): number {
 function countSubdirs(dir: string): number {
   if (!existsSync(dir)) return 0;
   try {
-    const { statSync } = require("node:fs");
     return readdirSync(dir).filter((f) => {
       try {
         return statSync(join(dir, f)).isDirectory();

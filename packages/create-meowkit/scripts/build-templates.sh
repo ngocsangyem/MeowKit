@@ -1,20 +1,21 @@
 #!/usr/bin/env bash
-# Copies the real MeowKit .claude/ system into templates/ for npm packaging.
+# Copies the real MeowKit system/ into templates/ for npm packaging.
 # Run before `tsc` in the build pipeline.
-# Source of truth: ../../.claude/ (the monorepo root .claude/ directory)
+# Source of truth: ../../system/ (the canonical MeowKit system directory)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PKG_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-SOURCE_CLAUDE="$(cd "$PKG_DIR/../.." && pwd)/.claude"
+SYSTEM_DIR="$(cd "$PKG_DIR/../.." && pwd)/system"
+SOURCE_CLAUDE="$SYSTEM_DIR/claude"
 TEMPLATES="$PKG_DIR/templates"
 
 if [ ! -d "$SOURCE_CLAUDE" ]; then
-  echo "ERROR: Source .claude/ not found at $SOURCE_CLAUDE"
+  echo "ERROR: system/claude/ not found at $SOURCE_CLAUDE"
   exit 1
 fi
 
-echo "Building templates from $SOURCE_CLAUDE ..."
+echo "Building templates from $SYSTEM_DIR ..."
 
 # Clean previous templates
 rm -rf "$TEMPLATES"
@@ -28,6 +29,9 @@ for dir in agents commands hooks modes rules scripts skills; do
       --exclude 'node_modules' \
       --exclude '.DS_Store' \
       --exclude '*.pyc' \
+      --exclude '.env*' \
+      --exclude '.venv' \
+      --exclude 'venv' \
       "$SOURCE_CLAUDE/$dir/" "$TEMPLATES/claude/$dir/"
   fi
 done
@@ -42,8 +46,8 @@ mkdir -p "$TEMPLATES/claude/memory"
 touch "$TEMPLATES/claude/memory/.gitkeep"
 
 # Create CLAUDE.md template with placeholders
-# Read the real CLAUDE.md and add placeholder markers at top
-REAL_CLAUDE="$PKG_DIR/../../CLAUDE.md"
+# Read the real CLAUDE.md from system/ and add placeholder markers at top
+REAL_CLAUDE="$SYSTEM_DIR/CLAUDE.md"
 if [ -f "$REAL_CLAUDE" ]; then
   {
     echo "# __MEOWKIT_PROJECT_NAME__"
@@ -90,44 +94,14 @@ cat > "$TEMPLATES/meowkit-config.json.template" << 'TMPL'
 }
 TMPL
 
-# Create .env.example template
-cat > "$TEMPLATES/env.example" << 'TMPL'
-# MeowKit Environment Variables
-# Copy to .env and fill in values. Never commit .env to git.
-
-# Gemini API key (required for meow:multimodal skill)
-# Get from: https://aistudio.google.com/apikey
-GEMINI_API_KEY=
-TMPL
-
-# Create .mcp.json.example template
-cat > "$TEMPLATES/mcp.json.example" << 'TMPL'
-{
-  "mcpServers": {
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp", "--api-key", "YOUR_API_KEY"]
-    },
-    "sequential-thinking": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["@playwright/mcp@latest"]
-    }
-  }
-}
-TMPL
-
-# Create .gitignore additions
-cat > "$TEMPLATES/gitignore.meowkit" << 'TMPL'
-# MeowKit — append to your .gitignore
-.env
-.env.local
-.claude/memory/
-.claude/logs/
-TMPL
+# Copy static files from system/ (single source of truth)
+for static_file in env.example mcp.json.example gitignore.meowkit; do
+  if [ -f "$SYSTEM_DIR/$static_file" ]; then
+    cp "$SYSTEM_DIR/$static_file" "$TEMPLATES/$static_file"
+  else
+    echo "WARNING: $SYSTEM_DIR/$static_file not found — skipping"
+  fi
+done
 
 # Count results
 FILE_COUNT=$(find "$TEMPLATES" -type f | wc -l | tr -d ' ')

@@ -53,8 +53,10 @@ async function main(): Promise<void> {
   const global: boolean = argv.global;
   const modeOverride: string | undefined = argv.mode;
 
+  // For --global: target is ~/ (generate.ts creates .claude/ inside targetDir)
+  // For local: target is cwd (generate.ts creates .claude/ inside targetDir)
   const targetDir = global
-    ? `${process.env.HOME ?? "~"}/.claude`
+    ? (process.env.HOME ?? "~")
     : process.cwd();
 
   if (dryRun) {
@@ -98,7 +100,7 @@ async function main(): Promise<void> {
   // Step 3: Check for existing .claude directory
   if (!force && !dryRun) {
     const { existsSync } = await import("node:fs");
-    const meowkitDir = global ? targetDir : `${targetDir}/.claude`;
+    const meowkitDir = `${targetDir}/.claude`;
     if (existsSync(meowkitDir)) {
       console.error(
         pc.red(

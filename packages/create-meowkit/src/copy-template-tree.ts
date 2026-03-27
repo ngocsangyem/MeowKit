@@ -1,12 +1,13 @@
 import {
   readdirSync,
-  statSync,
+  lstatSync,
   mkdirSync,
   readFileSync,
   writeFileSync,
   chmodSync,
 } from "node:fs";
-import { join, basename } from "node:path";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import pc from "picocolors";
 
 /** Directories/files to skip during recursive copy */
@@ -37,7 +38,9 @@ export function copyDirRecursive(
 ): number {
   let count = 0;
 
-  mkdirSync(dest, { recursive: true });
+  if (!dryRun) {
+    mkdirSync(dest, { recursive: true });
+  }
 
   const entries = readdirSync(src);
 
@@ -47,7 +50,10 @@ export function copyDirRecursive(
 
     const srcPath = join(src, entry);
     const destPath = join(dest, entry);
-    const stat = statSync(srcPath);
+    const stat = lstatSync(srcPath);
+
+    // Skip symlinks to avoid bundling content from outside the project
+    if (stat.isSymbolicLink()) continue;
 
     if (stat.isDirectory()) {
       count += copyDirRecursive(srcPath, destPath, dryRun, entry);
@@ -55,7 +61,6 @@ export function copyDirRecursive(
       if (dryRun) {
         console.log(`  ${pc.dim("create")} ${destPath}`);
       } else {
-        mkdirSync(dest, { recursive: true });
         const content = readFileSync(srcPath);
         writeFileSync(destPath, content);
 
@@ -85,7 +90,7 @@ export function resolveTemplateDir(): string {
   // __dirname in ESM: use import.meta.url
   // But since we compile to CJS-style with Node16, use a path-based approach
   // The templates/ dir is always at the package root, sibling to dist/ and src/
-  const distDir = new URL(".", import.meta.url).pathname;
+  const distDir = fileURLToPath(new URL(".", import.meta.url));
   // dist/copy-template-tree.js → go up one level to package root
   const pkgRoot = join(distDir, "..");
   return join(pkgRoot, "templates");
