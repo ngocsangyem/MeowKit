@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner/meowkit_banner.png" alt="MeowKit Banner" width="100%" />
+  <img src="assets/banner/meowkit-banner.svg" alt="MeowKit Banner" width="100%" />
 </p>
 
 <h1 align="center">MeowKit</h1>
