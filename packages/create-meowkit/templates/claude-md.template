@@ -396,3 +396,24 @@ NEVER mark done without all acceptance criteria checked.
 | guideline              | tasks/templates/guideline.md              | Team standards document               |
 
 See: tasks/templates/TEMPLATE-USAGE.md for full guidance.
+
+## Planning Gate (Phase 1)
+
+meow:plan-creator is the official planning skill for Phase 1.
+Every non-trivial task (> 2 files OR > 30 min) requires an approved plan.
+
+### Workflow Models
+
+| Task Type | Model | Phase Flow |
+|-----------|-------|-----------|
+| New feature | feature-model | Plan → Test RED → Build GREEN → Review → Ship |
+| Bug fix | bugfix-model | Investigate → Test RED → Fix → Review → Ship |
+| Refactor | refactor-model | Plan → Implement (incremental) → Review → Ship |
+| Security | security-model | Plan scope → Audit → Review → Ship remediations |
+
+Models: `.claude/skills/meow:plan-creator/references/workflow-models/`
+
+### Gate 1 Condition
+
+Plan file exists in `tasks/plans/` with `Agent State.Approved by` set before Phase 3 begins.
+Validation script (`scripts/validate-plan.py`) must output `PLAN_COMPLETE` before presenting for approval.

@@ -1,110 +1,143 @@
 ---
 name: meow:plan-creator
-description: "Guides agents to create plans using the correct template. Auto-selects plan-quick.md vs plan-template.md based on task scope. Use when starting /meow:plan or /meow:cook commands."
+description: "Creates structured plan files before any implementation. Selects workflow model, validates completeness, enforces Gate 1. Activated by /meow:plan or /meow:cook commands."
 ---
 
 # Plan Creator
 
-## When to Use
+## Trigger Conditions
 
-Activate this skill when:
+Activate when:
+- User runs `/meow:plan [feature]` or `/meow:cook [feature]`
+- Any non-trivial task starts (> 30 min OR > 3 files affected)
+- Gate 1 requires a plan before implementation proceeds
 
-- User runs `/plan [feature]` or `/meow:cook [feature]`
-- Agent needs to create a plan file before implementation (Gate 1)
-- User explicitly asks to plan a task
+Skip when:
+- `/meow:fix` with complexity=simple (Gate 1 exception per gate-rules.md)
+- Task is < 3 files AND < 30 min AND no architectural decisions needed
 
-## Template Selection
+## Step 1 — Select Workflow Model
 
-Assess the task scope BEFORE creating the plan:
+Match task type to model before drafting anything:
+
+| Task type | Model | File |
+|-----------|-------|------|
+| New functionality, endpoints, UI | feature-model | references/workflow-models/feature-model.md |
+| Broken behavior, reported bug, failed test | bugfix-model | references/workflow-models/bugfix-model.md |
+| Restructure without behavior change | refactor-model | references/workflow-models/refactor-model.md |
+| Auth/payments, security review, audit | security-model | references/workflow-models/security-model.md |
+
+Wrong model = wrong phase flow. Always confirm type before proceeding.
+
+## Step 2 — Scope Assessment → Template Selection
 
 ```
-Is the task a simple /meow:fix with complexity=simple?
-├── YES → Skip plan (Gate 1 exception per gate-rules.md)
-│
-└── NO → Estimate scope:
-    ├── < 5 files AND < 2 hours estimated
-    │   └── Use plan-quick.md
-    │       Template: tasks/templates/plan-quick.md
-    │
-    ├── 5-15 files OR 2-8 hours estimated
-    │   └── Use plan-template.md (single file)
-    │       Template: tasks/templates/plan-template.md
-    │
-    └── > 15 files OR > 8 hours OR > 3 phases
-        └── Use plan-template.md + plan-phase.md per phase
-            Templates: tasks/templates/plan-template.md
-                       tasks/templates/plan-phase.md
-            Structure: tasks/plans/YYMMDD-feature-name/
-                       ├── plan.md (overview, copy from plan-template.md)
-                       └── phase-XX-name.md (per phase)
+< 5 files AND < 2 hours  →  plan-quick.md
+5–15 files OR 2–8 hours  →  plan-template.md (single file)
+> 15 files OR > 8 hours OR > 3 phases  →  plan-template.md + phase-XX-name.md per phase
 ```
 
-## Plan Creation Steps
+Template: `assets/plan-template.md`
 
-1. **Scout (if needed)** — For unfamiliar codebases or large changes, spawn `meow:scout` to map relevant directories before planning. Save scout report to `tasks/plans/YYMMDD-name/reports/scout-report.md`.
+## Step 3 — Pre-Plan Research (if needed)
 
-2. **Research (if needed)** — For tasks involving unfamiliar tech, APIs, or architectural decisions, spawn researcher subagents. Save reports to `tasks/plans/YYMMDD-name/reports/researcher-NN-topic.md`. Multiple researchers can run in parallel on different topics.
+- **Unfamiliar codebase**: spawn `meow:scout` first → save to `reports/scout-report.md`
+- **Unfamiliar tech/API**: spawn researcher subagents in parallel → save to `reports/researcher-NN-topic.md`
+- Skip research only when codebase is well-known AND no new dependencies
 
-3. **Select template** — Use the decision tree above. Read from `tasks/templates/`.
+## Step 4 — Draft Plan
 
-4. **Create plan directory with reports folder**:
-
-   ```
-   tasks/plans/YYMMDD-feature-name/
-   ├── plan.md                          ← main plan
-   ├── reports/                         ← scout + research reports
-   │   ├── scout-report.md
-   │   ├── researcher-01-topic.md
-   │   └── researcher-02-topic.md
-   └── phase-XX-name.md                 ← per phase (if multi-phase)
-   ```
-
-5. **Fill plan** — frontmatter + Goal + Context (informed by reports) + Phases + Constraints + Acceptance Criteria. Link to reports: `See reports/scout-report.md for codebase context.`
-
-6. **Validate** — Run quality checklist below.
-
-7. **Present for Gate 1** — Print summary, wait for human approval. No code until approved.
-
-## Naming Convention
-
+Directory structure:
 ```
 tasks/plans/YYMMDD-feature-name/
-├── plan.md                            ← main plan (always)
-├── reports/                           ← scout + research reports
+├── plan.md                    ← main plan (keep under 80 lines)
+├── reports/
 │   ├── scout-report.md
 │   └── researcher-NN-topic.md
-├── phase-01-name.md                   ← per phase (if multi-phase)
-└── phase-02-name.md
+└── phase-XX-name.md           ← only if multi-phase
 ```
 
-Always use directory format. Even simple plans benefit from `reports/` for research context.
+Date format: `YYMMDD` (e.g., `260327` for March 27, 2026). Name: kebab-case outcome-focused.
 
-Date format: `YYMMDD` (e.g., `260326` for March 26, 2026)
-Name: kebab-case, descriptive (e.g., `add-auth-middleware`, `fix-session-timeout`)
+Fill in order: frontmatter → Goal (outcome, not activity) → Context → Scope → Constraints → Technical Approach → Acceptance Criteria → Agent State.
 
-## Quality Checklist
+## Step 5 — Solution Options (when to use)
 
-Before presenting plan for Gate 1 approval:
+Generate multiple options ONLY when:
+- Effort is m/l/xl AND multiple architecturally distinct approaches exist
+- Trade-offs are non-obvious (not just "library A vs B")
 
-- [ ] Goal is one clear sentence
-- [ ] Context explains current state AND problem
-- [ ] Every task has a file path
-- [ ] Constraints section is not empty
-- [ ] Acceptance criteria are binary (pass/fail), not subjective
-- [ ] No content duplication — use links to docs/plans, not copies
-- [ ] Plan is self-contained — a fresh session can pick it up without prior context
+Skip options when: effort xs/s, bug fix with confirmed root cause, single obvious approach.
 
-## Plan Status Updates
+Evaluate via: `references/solution-evaluation.md`
 
-When resuming work on an existing plan:
+## Step 6 — Validate
 
-1. Read the plan file
-2. Check the Plan Status Log table
-3. Update status of completed/blocked phases
-4. Mark todos as done: `- [x]`
-5. NEVER leave items as in_progress when finishing — mark Done, Blocked, or Cancelled
+Run before presenting for Gate 1:
+```bash
+python3 scripts/validate-plan.py tasks/plans/YYMMDD-name/plan.md
+```
 
-## Gotchas
+Must output `PLAN_COMPLETE`. Fix all reported issues before proceeding.
 
-- **Wrong template for scope**: Using plan-quick.md for a multi-phase project → Check: if > 5 files OR > 2 hours, use plan-template.md
-- **Acceptance criteria too vague to verify**: "App works correctly" can't be tested → Every criterion must be independently verifiable by running a specific command or checking a specific file
+Manual checks:
+- [ ] Goal is one sentence describing done-state, not activity
+- [ ] Constraints section is non-empty
+- [ ] Acceptance criteria use checkboxes, no subjective language
+- [ ] Out of scope subsection exists
+- [ ] Plan is self-contained (fresh session can pick it up)
+- [ ] plan.md is under 80 lines (bulk content in reports/)
+
+## Step 7 — Gate 1: Present for Human Approval
+
+Print a summary:
+```
+PLAN READY FOR GATE 1
+Title: [title]
+Type: [type] | Model: [workflow model] | Effort: [xs/s/m/l/xl]
+Goal: [one sentence]
+Phases: [list]
+Files affected: [count or list]
+Validation: PLAN_COMPLETE
+
+Approve to proceed to Phase 2 (Test RED). No code until approved.
+```
+
+Wait for explicit human approval. Do not infer approval from silence.
+
+## Gotchas (top 3)
+
+- **Wrong model for task type**: feature-model on a bug fix skips investigation → always confirm type first
+- **Goal describes activity, not outcome**: "Implement OAuth" vs "Users can log in with OAuth" — next agent can't judge success → rewrite until Goal answers "what does done look like?"
+- **Acceptance criteria that can't be verified**: "code is clean" blocks Gate 2 → every criterion must reference a specific command or file check
+
+Full list: `references/gotchas.md`
+
+## Handoff Protocol
+
+After Gate 1 approval, update Agent State in plan.md:
+```
+Planning phase: approved
+Last action: Gate 1 approved by [human]
+Next action: tester writes failing tests (Phase 2)
+Blockers: none
+```
+
+Hand off to tester agent with: plan file path + selected workflow model + acceptance criteria list.
+
+## Plan Status Updates (resuming work)
+
+1. Read plan.md — check Agent State section
+2. Update completed/blocked phases
+3. Mark todos: `- [x]`
+4. NEVER leave items as in_progress at session end — mark Done, Blocked, or Cancelled
+
+## References
+
+- `assets/plan-template.md` — plan file template
+- `references/workflow-models/` — feature, bugfix, refactor, security models
+- `references/solution-evaluation.md` — trade-off scoring criteria
+- `references/gotchas.md` — full gotchas list
+- `scripts/validate-plan.py` — plan completeness validator
+- `tasks/templates/plan-quick.md` — quick plan template
+- `tasks/templates/plan-phase.md` — phase file template

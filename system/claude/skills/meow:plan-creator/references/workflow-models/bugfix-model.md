@@ -1,0 +1,20 @@
+# Bug Fix Model
+
+Applies when: fixing broken behavior, reported bugs, failed tests, runtime errors.
+
+## Plan Shape
+Required: Goal, Bug Report, Root Cause Analysis, Fix Approach, Regression Risk, Acceptance Criteria, Agent State
+Optional: Context (if root cause is known), Solution Options (if multiple fix strategies)
+
+## Phase Flow
+1. Investigate → 2. Test RED (regression test) → 3. Fix → 4. Review → 5. Ship
+
+## Agent Sequence
+investigator (meow:investigate) → tester → developer → reviewer → shipper
+
+## Gate Points
+- Gate 1: Root cause confirmed before fix attempt
+- Gate 2: Review approved, regression test passes
+
+## Iron Law
+No fix without confirmed root cause. 3-strike escalation if hypotheses fail.
