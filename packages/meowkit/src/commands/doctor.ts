@@ -20,19 +20,15 @@ function statusIcon(status: Status): string {
   }
 }
 
-/** Find MeowKit project root from cwd. Checks cwd and parents for .claude/ + project marker. */
+/** Find MeowKit project root — checks cwd only (no walk-up to avoid matching parent projects). */
 function findProjectRoot(): string | null {
-  let current = process.cwd();
-  for (let i = 0; i < 10; i++) {
-    const hasConfig = fs.existsSync(path.join(current, ".meowkit.config.json"));
-    const hasManifest = fs.existsSync(path.join(current, ".meowkit.manifest.json"));
-    const hasClaude = fs.existsSync(path.join(current, "CLAUDE.md"));
-    if (hasConfig || hasManifest || hasClaude) {
-      return current;
-    }
-    const parent = path.dirname(current);
-    if (parent === current) break;
-    current = parent;
+  const cwd = process.cwd();
+  const hasConfig = fs.existsSync(path.join(cwd, ".meowkit.config.json"));
+  const hasManifest = fs.existsSync(path.join(cwd, ".meowkit.manifest.json"));
+  const hasClaude = fs.existsSync(path.join(cwd, "CLAUDE.md"));
+  const hasDotClaude = fs.existsSync(path.join(cwd, ".claude"));
+  if (hasConfig || hasManifest || hasClaude || hasDotClaude) {
+    return cwd;
   }
   return null;
 }

@@ -142,28 +142,8 @@ const STEPS: Record<StepName, (dir: string) => StepResult> = {
 
 /** Run setup steps. --only=<step> runs a single step. */
 export function setup(args: { only?: string }): void {
-  // Find project root: walk up looking for .claude/ or any MeowKit marker
-  let dir = process.cwd();
-  let found = false;
-  for (let i = 0; i < 10; i++) {
-    if (
-      existsSync(join(dir, ".claude")) ||
-      existsSync(join(dir, ".meowkit.config.json")) ||
-      existsSync(join(dir, ".meowkit.manifest.json")) ||
-      existsSync(join(dir, "CLAUDE.md"))
-    ) {
-      found = true;
-      break;
-    }
-    const parent = join(dir, "..");
-    if (parent === dir) break;
-    dir = parent;
-  }
-
-  // If nothing found, just use cwd — setup will create what's needed
-  if (!found) {
-    dir = process.cwd();
-  }
+  // Always use cwd. No walk-up — avoids matching ~/.claude or parent projects.
+  const dir = process.cwd();
 
   const stepsToRun: StepName[] = args.only
     ? [args.only as StepName]

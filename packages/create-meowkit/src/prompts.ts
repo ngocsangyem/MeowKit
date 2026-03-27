@@ -6,7 +6,7 @@ export interface UserConfig {
   projectName: string;
   stack: string[];
   teamSize: "solo" | "small" | "team";
-  primaryTool: "claude-code" | "antigravity" | "both";
+  primaryTool: "claude-code";
   defaultMode: "fast" | "balanced" | "strict";
   enableCostTracking: boolean;
   enableMemory: boolean;
@@ -104,17 +104,6 @@ export async function promptUser(detected: DetectedStack): Promise<UserConfig> {
   });
   handleCancel(teamSize);
 
-  // Primary tool
-  const primaryTool = await p.select({
-    message: "Which AI coding tool do you primarily use?",
-    options: [
-      { value: "claude-code" as const, label: "Claude Code", hint: "Anthropic CLI" },
-      { value: "antigravity" as const, label: "Antigravity", hint: "VS Code extension" },
-      { value: "both" as const, label: "Both", hint: "generate configs for both" },
-    ],
-  });
-  handleCancel(primaryTool);
-
   // Default mode
   const defaultMode = await p.select({
     message: "Default operating mode?",
@@ -185,7 +174,7 @@ export async function promptUser(detected: DetectedStack): Promise<UserConfig> {
     projectName: projectName as string,
     stack: stack as string[],
     teamSize: teamSize as "solo" | "small" | "team",
-    primaryTool: primaryTool as "claude-code" | "antigravity" | "both",
+    primaryTool: "claude-code",
     defaultMode: defaultMode as "fast" | "balanced" | "strict",
     enableCostTracking: enableCostTracking as boolean,
     enableMemory: enableMemory as boolean,
