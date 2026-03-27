@@ -4,7 +4,6 @@ import minimist from "minimist";
 import pc from "picocolors";
 import { detectStack } from "./detect-stack.js";
 import { promptUser } from "./prompts.js";
-import { generate } from "./generate.js";
 import { validate } from "./validate.js";
 import { smartUpdate } from "./smart-update.js";
 import * as log from "./logger.js";
@@ -106,40 +105,29 @@ async function main(): Promise<void> {
     config.enableMemory = false;
   }
 
-  // Step 3: Check for existing .claude directory — switch to update mode
-  const { existsSync } = await import("node:fs");
-  const meowkitDir = `${targetDir}/.claude`;
-  const isUpdate = existsSync(meowkitDir) && !force && !dryRun;
+  // Step 3: Generate/merge — always uses smart update
+  // If .claude/ doesn't exist: all files are "new", copies everything
+  // If .claude/ exists: merges — overwrites unchanged core, skips user-modified files
+  // --force: ignores manifest, overwrites everything
+  log.info("Generating configuration files...");
+  const stats = await smartUpdate(config, targetDir, dryRun, force);
 
-  let fileCount: number;
-
-  if (isUpdate) {
-    // Smart update mode: preserve user modifications
-    log.info("Existing MeowKit installation detected — switching to update mode...");
-    log.setData("mode", "update");
-    const stats = await smartUpdate(config, targetDir, dryRun);
-    fileCount = stats.updated + stats.added;
-
-    if (stats.userModified.length > 0) {
-      log.warn(`Skipped ${stats.userModified.length} user-modified file(s):`);
-      for (const f of stats.userModified.slice(0, 10)) {
-        log.warn(`  ${f}`);
-      }
-      if (stats.userModified.length > 10) {
-        log.warn(`  ... and ${stats.userModified.length - 10} more`);
-      }
-    }
-
-    log.success(`Update complete: ${stats.updated} updated, ${stats.added} new, ${stats.skipped} skipped`);
-  } else {
-    // Fresh install mode
-    log.info("Generating configuration files...");
-    log.setData("mode", "install");
-    fileCount = await generate(config, targetDir, dryRun);
-  }
-
+  const fileCount = stats.updated + stats.added;
   log.setData("filesCreated", fileCount);
   log.setData("targetDir", targetDir);
+  log.setData("stats", { updated: stats.updated, added: stats.added, skipped: stats.skipped });
+
+  if (stats.userModified.length > 0) {
+    log.warn(`Skipped ${stats.userModified.length} user-modified file(s):`);
+    for (const f of stats.userModified.slice(0, 10)) {
+      log.warn(`  ${f}`);
+    }
+    if (stats.userModified.length > 10) {
+      log.warn(`  ... and ${stats.userModified.length - 10} more`);
+    }
+  }
+
+  log.success(`Done: ${stats.updated} updated, ${stats.added} new, ${stats.skipped} skipped`);
   log.debug(`Processed ${fileCount} files in ${targetDir}`);
 
   // Step 5: Validate output (skip for dry-run)

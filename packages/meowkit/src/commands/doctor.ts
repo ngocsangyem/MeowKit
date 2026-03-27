@@ -9,38 +9,46 @@ interface DiagResult {
   name: string;
   status: Status;
   detail: string;
+  fix?: string;
 }
 
 function statusIcon(status: Status): string {
   switch (status) {
-    case "pass":
-      return pc.green("PASS");
-    case "fail":
-      return pc.red("FAIL");
-    case "warn":
-      return pc.yellow("WARN");
+    case "pass": return pc.green("PASS");
+    case "fail": return pc.red("FAIL");
+    case "warn": return pc.yellow("WARN");
   }
 }
+
+/** Find MeowKit project root from cwd. Checks cwd and parents for .claude/ + project marker. */
+function findProjectRoot(): string | null {
+  let current = process.cwd();
+  for (let i = 0; i < 10; i++) {
+    const hasConfig = fs.existsSync(path.join(current, ".meowkit.config.json"));
+    const hasManifest = fs.existsSync(path.join(current, ".meowkit.manifest.json"));
+    const hasClaude = fs.existsSync(path.join(current, "CLAUDE.md"));
+    if (hasConfig || hasManifest || hasClaude) {
+      return current;
+    }
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+  return null;
+}
+
+// --- Check functions: each takes projectRoot (may be null) ---
 
 function checkNodeVersion(): DiagResult {
   const major = parseInt(process.versions.node.split(".")[0] ?? "0", 10);
   if (major >= 20) {
-    return {
-      name: "Node.js >= 20",
-      status: "pass",
-      detail: `v${process.versions.node}`,
-    };
+    return { name: "Node.js >= 20", status: "pass", detail: `v${process.versions.node}` };
   }
-  return {
-    name: "Node.js >= 20",
-    status: "fail",
-    detail: `v${process.versions.node} — Node 20+ is required`,
-  };
+  return { name: "Node.js >= 20", status: "fail", detail: `v${process.versions.node} — need 20+` };
 }
 
 function checkPython(): DiagResult {
-  const commands = ["python3 --version", "python --version"];
-  for (const cmd of commands) {
+  for (const cmd of ["python3 --version", "python --version"]) {
     try {
       const output = execSync(cmd, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
       const match = output.match(/Python (\d+)\.(\d+)/);
@@ -50,307 +58,220 @@ function checkPython(): DiagResult {
         if (major >= 3 && minor >= 9) {
           return { name: "Python 3.9+", status: "pass", detail: output };
         }
-        return {
-          name: "Python 3.9+",
-          status: "fail",
-          detail: `${output} — Python 3.9+ is required`,
-        };
+        return { name: "Python 3.9+", status: "fail", detail: `${output} — need 3.9+` };
       }
-    } catch {
-      // Try next command
-    }
+    } catch { /* try next */ }
   }
-  return {
-    name: "Python 3.9+",
-    status: "warn",
-    detail: "Python not found in PATH",
-  };
+  return { name: "Python 3.9+", status: "warn", detail: "Not found in PATH" };
 }
 
 function checkGit(): DiagResult {
   try {
-    const output = execSync("git --version", {
-      encoding: "utf-8",
-      stdio: ["pipe", "pipe", "pipe"],
-    }).trim();
-    return { name: "Git available", status: "pass", detail: output };
+    const output = execSync("git --version", { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+    return { name: "Git", status: "pass", detail: output };
   } catch {
-    return {
-      name: "Git available",
-      status: "fail",
-      detail: "git not found in PATH",
-    };
+    return { name: "Git", status: "fail", detail: "Not found in PATH" };
   }
 }
 
-function findMeowkitDir(): string | null {
-  let current = process.cwd();
-  while (true) {
-    const candidate = path.join(current, ".claude");
-    if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
-      return candidate;
-    }
-    const parent = path.dirname(current);
-    if (parent === current) {
-      return null;
-    }
-    current = parent;
-  }
-}
-
-function checkMeowkitDir(): DiagResult {
-  const dir = findMeowkitDir();
-  if (dir) {
+function checkClaudeDir(root: string | null): DiagResult {
+  if (!root) {
     return {
-      name: ".claude/ exists",
-      status: "pass",
-      detail: dir,
+      name: ".claude/ directory",
+      status: "warn",
+      detail: "No MeowKit project found — run 'npm create meowkit' to scaffold",
     };
+  }
+  const claudeDir = path.join(root, ".claude");
+  if (fs.existsSync(claudeDir)) {
+    return { name: ".claude/ directory", status: "pass", detail: claudeDir };
   }
   return {
-    name: ".claude/ exists",
-    status: "fail",
-    detail: "Not found in current or parent directories",
+    name: ".claude/ directory",
+    status: "warn",
+    detail: "Project found but .claude/ missing — run 'npm create meowkit' to scaffold",
+    fix: "npm create meowkit",
   };
 }
 
-function checkHooksExecutable(): DiagResult {
-  const meowkitDir = findMeowkitDir();
-  if (!meowkitDir) {
-    return {
-      name: "Hooks executable",
-      status: "warn",
-      detail: "Skipped — no .claude/ found",
-    };
-  }
+function checkHooks(root: string | null): DiagResult {
+  if (!root) return { name: "Hooks", status: "warn", detail: "Skipped — no project" };
 
-  const hooksDir = path.join(meowkitDir, "hooks");
+  const hooksDir = path.join(root, ".claude", "hooks");
   if (!fs.existsSync(hooksDir)) {
-    return {
-      name: "Hooks executable",
-      status: "warn",
-      detail: "No hooks/ directory",
-    };
+    return { name: "Hooks", status: "warn", detail: "No hooks/ directory" };
   }
 
   const hooks = fs.readdirSync(hooksDir).filter((f) => !f.startsWith("."));
   if (hooks.length === 0) {
-    return {
-      name: "Hooks executable",
-      status: "warn",
-      detail: "No hook files found",
-    };
+    return { name: "Hooks", status: "warn", detail: "No hook files" };
   }
 
-  const nonExecutable: string[] = [];
-  for (const hook of hooks) {
-    try {
-      fs.accessSync(path.join(hooksDir, hook), fs.constants.X_OK);
-    } catch {
-      nonExecutable.push(hook);
-    }
+  const nonExec: string[] = [];
+  for (const h of hooks) {
+    try { fs.accessSync(path.join(hooksDir, h), fs.constants.X_OK); }
+    catch { nonExec.push(h); }
   }
 
-  if (nonExecutable.length === 0) {
-    return {
-      name: "Hooks executable",
-      status: "pass",
-      detail: `${hooks.length} hook(s) are executable`,
-    };
+  if (nonExec.length === 0) {
+    return { name: "Hooks", status: "pass", detail: `${hooks.length} hook(s), all executable` };
   }
 
-  // Auto-fix: attempt to set executable permissions
-  // Source: claudekit-engineer fix-shebang-permissions.sh
-  // Adapted for MeowKit: integrated into doctor as auto-fix instead of standalone script.
+  // Auto-fix permissions
   let fixed = 0;
-  for (const hook of nonExecutable) {
-    try {
-      chmodSync(path.join(hooksDir, hook), 0o755);
-      fixed++;
-    } catch {
-      // Permission denied — can't auto-fix
-    }
+  for (const h of nonExec) {
+    try { chmodSync(path.join(hooksDir, h), 0o755); fixed++; } catch { /* can't fix */ }
   }
 
-  if (fixed === nonExecutable.length) {
-    return {
-      name: "Hooks executable",
-      status: "pass",
-      detail: `${hooks.length} hook(s) — auto-fixed ${fixed} permission(s)`,
-    };
+  if (fixed === nonExec.length) {
+    return { name: "Hooks", status: "pass", detail: `${hooks.length} hook(s) — auto-fixed ${fixed} permission(s)` };
   }
 
-  const stillBroken = nonExecutable.length - fixed;
   return {
-    name: "Hooks executable",
+    name: "Hooks",
     status: "fail",
-    detail: `Not executable (${stillBroken} remaining): ${nonExecutable.join(", ")}. Run: chmod +x .claude/hooks/*`,
+    detail: `${nonExec.length - fixed} not executable: ${nonExec.join(", ")}`,
+    fix: "chmod +x .claude/hooks/*",
   };
 }
 
-function checkMemoryWritable(): DiagResult {
-  const meowkitDir = findMeowkitDir();
-  if (!meowkitDir) {
-    return {
-      name: "Memory writable",
-      status: "warn",
-      detail: "Skipped — no .claude/ found",
-    };
+function checkScripts(root: string | null): DiagResult {
+  if (!root) return { name: "Scripts", status: "warn", detail: "Skipped — no project" };
+
+  const scriptsDir = path.join(root, ".claude", "scripts");
+  if (!fs.existsSync(scriptsDir)) {
+    return { name: "Scripts", status: "warn", detail: "No scripts/ directory" };
   }
 
-  const memoryDir = path.join(meowkitDir, "memory");
-  if (!fs.existsSync(memoryDir)) {
-    return {
-      name: "Memory writable",
-      status: "warn",
-      detail: "memory/ directory does not exist",
-    };
+  const expected = ["validate.py", "security-scan.py", "checklist.py", "injection-audit.py"];
+  const missing = expected.filter((s) => !fs.existsSync(path.join(scriptsDir, s)));
+
+  if (missing.length === 0) {
+    return { name: "Scripts", status: "pass", detail: `${expected.length} validation scripts found` };
+  }
+  return { name: "Scripts", status: "warn", detail: `Missing: ${missing.join(", ")}` };
+}
+
+function checkMemory(root: string | null): DiagResult {
+  if (!root) return { name: "Memory", status: "warn", detail: "Skipped — no project" };
+
+  const memDir = path.join(root, ".claude", "memory");
+  if (!fs.existsSync(memDir)) {
+    return { name: "Memory", status: "warn", detail: "memory/ not found — will be created on first session" };
   }
 
   try {
-    const testFile = path.join(memoryDir, ".doctor-write-test");
-    fs.writeFileSync(testFile, "test", "utf-8");
-    fs.unlinkSync(testFile);
-    return {
-      name: "Memory writable",
-      status: "pass",
-      detail: memoryDir,
-    };
+    const test = path.join(memDir, ".doctor-test");
+    fs.writeFileSync(test, "test", "utf-8");
+    fs.unlinkSync(test);
+    return { name: "Memory", status: "pass", detail: "Writable" };
   } catch {
-    return {
-      name: "Memory writable",
-      status: "fail",
-      detail: `${memoryDir} is not writable`,
-    };
+    return { name: "Memory", status: "fail", detail: `${memDir} is not writable` };
   }
 }
 
-function checkScriptsPresent(): DiagResult {
-  const meowkitDir = findMeowkitDir();
-  if (!meowkitDir) {
-    return {
-      name: "Scripts present",
-      status: "warn",
-      detail: "Skipped — no .claude/ found",
-    };
-  }
+function checkMcp(root: string | null): DiagResult {
+  if (!root) return { name: "MCP config", status: "warn", detail: "Skipped — no project" };
 
-  const scriptsDir = path.join(meowkitDir, "scripts");
-  if (!fs.existsSync(scriptsDir)) {
-    return {
-      name: "Scripts present",
-      status: "warn",
-      detail: "No scripts/ directory — validation scripts unavailable",
-    };
-  }
-
-  const expectedScripts = ["validate.py", "security-scan.py", "checklist.py", "injection-audit.py"];
-  const missing = expectedScripts.filter(
-    (s) => !fs.existsSync(path.join(scriptsDir, s))
-  );
-
-  if (missing.length === 0) {
-    return {
-      name: "Scripts present",
-      status: "pass",
-      detail: `${expectedScripts.length} validation scripts found`,
-    };
-  }
-
-  return {
-    name: "Scripts present",
-    status: "warn",
-    detail: `Missing: ${missing.join(", ")}`,
-  };
-}
-
-function checkMcpConfig(): DiagResult {
-  const meowkitDir = findMeowkitDir();
-  if (!meowkitDir) {
-    return { name: "MCP config", status: "warn", detail: "Skipped — no .claude/ found" };
-  }
-  const projectDir = path.dirname(meowkitDir);
-  const mcpPath = path.join(projectDir, ".mcp.json");
-  if (fs.existsSync(mcpPath)) {
+  if (fs.existsSync(path.join(root, ".mcp.json"))) {
     return { name: "MCP config", status: "pass", detail: ".mcp.json found" };
   }
   return {
     name: "MCP config",
     status: "warn",
-    detail: "No .mcp.json — run 'meowkit setup --only=mcp' to create from example",
+    detail: "No .mcp.json",
+    fix: "meowkit setup --only=mcp",
   };
 }
 
-function checkSkillsVenv(): DiagResult {
-  const meowkitDir = findMeowkitDir();
-  if (!meowkitDir) {
-    return { name: "Skills venv", status: "warn", detail: "Skipped — no .claude/ found" };
-  }
-  const venvDir = path.join(meowkitDir, "skills", ".venv");
+function checkVenv(root: string | null): DiagResult {
+  if (!root) return { name: "Skills venv", status: "warn", detail: "Skipped — no project" };
+
+  const venvDir = path.join(root, ".claude", "skills", ".venv");
   if (fs.existsSync(venvDir)) {
     return { name: "Skills venv", status: "pass", detail: venvDir };
   }
   return {
     name: "Skills venv",
     status: "warn",
-    detail: "No Python venv for skills — run 'meowkit setup --only=venv' to create",
+    detail: "No Python venv for skills",
+    fix: "meowkit setup --only=venv",
   };
+}
+
+function checkConfig(root: string | null): DiagResult {
+  if (!root) return { name: "Config", status: "warn", detail: "Skipped — no project" };
+
+  const configPath = path.join(root, ".meowkit.config.json");
+  if (!fs.existsSync(configPath)) {
+    return { name: "Config", status: "warn", detail: ".meowkit.config.json not found" };
+  }
+
+  try {
+    JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    return { name: "Config", status: "pass", detail: ".meowkit.config.json valid" };
+  } catch {
+    return { name: "Config", status: "fail", detail: ".meowkit.config.json is invalid JSON" };
+  }
 }
 
 export async function doctor(args?: { report?: boolean }): Promise<void> {
   console.log(pc.bold(pc.cyan("MeowKit Doctor")));
-  console.log(pc.dim("Diagnosing common issues..."));
-  console.log();
+  console.log(pc.dim("Diagnosing common issues...\n"));
+
+  const root = findProjectRoot();
+  if (root) {
+    console.log(`  ${pc.dim("Project:")} ${root}\n`);
+  }
 
   const results: DiagResult[] = [
     checkNodeVersion(),
     checkPython(),
     checkGit(),
-    checkMeowkitDir(),
-    checkHooksExecutable(),
-    checkScriptsPresent(),
-    checkMemoryWritable(),
-    checkMcpConfig(),
-    checkSkillsVenv(),
+    checkClaudeDir(root),
+    checkConfig(root),
+    checkHooks(root),
+    checkScripts(root),
+    checkMemory(root),
+    checkMcp(root),
+    checkVenv(root),
   ];
 
-  for (const result of results) {
-    console.log(`  [${statusIcon(result.status)}] ${result.name}`);
-    console.log(`         ${pc.dim(result.detail)}`);
+  for (const r of results) {
+    console.log(`  [${statusIcon(r.status)}] ${r.name}`);
+    console.log(`         ${pc.dim(r.detail)}`);
+    if (r.fix) {
+      console.log(`         ${pc.cyan(`Fix: ${r.fix}`)}`);
+    }
   }
 
   console.log();
 
-  const passCount = results.filter((r) => r.status === "pass").length;
-  const failCount = results.filter((r) => r.status === "fail").length;
-  const warnCount = results.filter((r) => r.status === "warn").length;
+  const pass = results.filter((r) => r.status === "pass").length;
+  const fail = results.filter((r) => r.status === "fail").length;
+  const warn = results.filter((r) => r.status === "warn").length;
 
-  const parts: string[] = [];
-  parts.push(pc.green(`${passCount} passed`));
-  if (warnCount > 0) parts.push(pc.yellow(`${warnCount} warnings`));
-  if (failCount > 0) parts.push(pc.red(`${failCount} failed`));
-
+  const parts: string[] = [pc.green(`${pass} passed`)];
+  if (warn > 0) parts.push(pc.yellow(`${warn} warnings`));
+  if (fail > 0) parts.push(pc.red(`${fail} failed`));
   console.log(parts.join(", "));
 
-  // Generate shareable report if --report flag
   if (args?.report) {
-    const reportLines = [
-      `# MeowKit Doctor Report`,
+    const lines = [
+      "# MeowKit Doctor Report",
       `Date: ${new Date().toISOString()}`,
       `Node: ${process.versions.node}`,
       `Platform: ${process.platform} ${process.arch}`,
-      ``,
-      `## Results`,
-      ...results.map((r) => `- [${r.status.toUpperCase()}] ${r.name}: ${r.detail}`),
-      ``,
-      `## Summary: ${passCount} passed, ${warnCount} warnings, ${failCount} failed`,
+      `Project: ${root ?? "not found"}`,
+      "",
+      "## Results",
+      ...results.map((r) => `- [${r.status.toUpperCase()}] ${r.name}: ${r.detail}${r.fix ? ` (fix: ${r.fix})` : ""}`),
+      "",
+      `## Summary: ${pass} passed, ${warn} warnings, ${fail} failed`,
     ];
-    const reportText = reportLines.join("\n");
-    console.log(pc.dim("\n--- Report (copy/paste to share) ---"));
-    console.log(reportText);
+    console.log(pc.dim("\n--- Report ---"));
+    console.log(lines.join("\n"));
   }
 
-  if (failCount > 0) {
-    process.exit(1);
-  }
+  if (fail > 0) process.exit(1);
 }

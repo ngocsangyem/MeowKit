@@ -54,7 +54,7 @@ function setupMcp(projectDir: string): StepResult {
   }
 
   if (!existsSync(mcpExample)) {
-    return { name: "mcp", status: "fail", message: ".mcp.json.example not found" };
+    return { name: "mcp", status: "fail", message: ".mcp.json.example not found — run 'npm create meowkit' to scaffold" };
   }
 
   copyFileSync(mcpExample, mcpTarget);
@@ -71,7 +71,7 @@ function setupEnv(projectDir: string): StepResult {
   }
 
   if (!existsSync(envExample)) {
-    return { name: "env", status: "fail", message: ".env.example not found" };
+    return { name: "env", status: "fail", message: ".env.example not found — run 'npm create meowkit' to scaffold" };
   }
 
   copyFileSync(envExample, envTarget);
@@ -84,7 +84,7 @@ function setupGitignore(projectDir: string): StepResult {
   const gitignore = join(projectDir, ".gitignore");
 
   if (!existsSync(meowkitIgnore)) {
-    return { name: "gitignore", status: "fail", message: ".gitignore.meowkit not found" };
+    return { name: "gitignore", status: "fail", message: ".gitignore.meowkit not found — run 'npm create meowkit' to scaffold" };
   }
 
   // Check if already appended
@@ -109,18 +109,27 @@ const STEPS: Record<StepName, (dir: string) => StepResult> = {
 
 /** Run setup steps. --only=<step> runs a single step. */
 export function setup(args: { only?: string }): void {
-  // Find project root by walking up to find .claude/
+  // Find project root: walk up looking for .claude/ or any MeowKit marker
   let dir = process.cwd();
+  let found = false;
   for (let i = 0; i < 10; i++) {
-    if (existsSync(join(dir, ".claude"))) break;
+    if (
+      existsSync(join(dir, ".claude")) ||
+      existsSync(join(dir, ".meowkit.config.json")) ||
+      existsSync(join(dir, ".meowkit.manifest.json")) ||
+      existsSync(join(dir, "CLAUDE.md"))
+    ) {
+      found = true;
+      break;
+    }
     const parent = join(dir, "..");
     if (parent === dir) break;
     dir = parent;
   }
 
-  if (!existsSync(join(dir, ".claude"))) {
-    console.error(pc.red("No .claude/ directory found. Run 'npm create meowkit' first."));
-    process.exit(1);
+  // If nothing found, just use cwd — setup will create what's needed
+  if (!found) {
+    dir = process.cwd();
   }
 
   const stepsToRun: StepName[] = args.only

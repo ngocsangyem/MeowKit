@@ -59,10 +59,11 @@ function isIgnored(relPath: string, targetDir: string): boolean {
 export async function smartUpdate(
   config: UserConfig,
   targetDir: string,
-  dryRun: boolean
+  dryRun: boolean,
+  force = false
 ): Promise<UpdateStats> {
   const templateDir = resolveTemplateDir();
-  const oldManifest = readManifest(targetDir);
+  const oldManifest = force ? null : readManifest(targetDir);
   const stats: UpdateStats = { updated: 0, skipped: 0, added: 0, userModified: [] };
 
   if (!oldManifest) {
@@ -149,6 +150,59 @@ export async function smartUpdate(
     // File matches manifest (or no manifest) — safe to overwrite
     copyFile(srcPath, destPath, dryRun);
     stats.updated++;
+  }
+
+  // Process template files (CLAUDE.md, .meowkit.config.json) — user layer, skip if exists
+  const claudeMdTemplate = join(templateDir, "claude-md.template");
+  const claudeMdDest = join(targetDir, "CLAUDE.md");
+  if (existsSync(claudeMdTemplate) && !existsSync(claudeMdDest)) {
+    processTemplate(claudeMdTemplate, claudeMdDest, config, dryRun);
+    stats.added++;
+  }
+
+  const configTemplate = join(templateDir, "meowkit-config.json.template");
+  const configDest = join(targetDir, ".meowkit.config.json");
+  if (existsSync(configTemplate) && !existsSync(configDest)) {
+    processTemplate(configTemplate, configDest, config, dryRun);
+    stats.added++;
+  }
+
+  // Copy static root files — skip if already exist (user layer)
+  const staticFiles = [
+    { src: "env.example", dest: ".env.example" },
+    { src: "mcp.json.example", dest: ".mcp.json.example" },
+    { src: "gitignore.meowkit", dest: ".gitignore.meowkit" },
+  ];
+  for (const { src, dest } of staticFiles) {
+    const srcPath = join(templateDir, src);
+    const destPath = join(targetDir, dest);
+    if (existsSync(srcPath) && !existsSync(destPath)) {
+      copyFile(srcPath, destPath, dryRun);
+      stats.added++;
+    }
+  }
+
+  // Write .env if Gemini API key provided and .env doesn't exist
+  if (config.geminiApiKey && !existsSync(join(targetDir, ".env"))) {
+    if (!dryRun) {
+      const { writeFileSync: wf } = await import("node:fs");
+      wf(
+        join(targetDir, ".env"),
+        `# MeowKit environment variables\nGEMINI_API_KEY=${config.geminiApiKey}\n`,
+        "utf-8"
+      );
+    }
+    stats.added++;
+  }
+
+  // Ensure empty dirs for memory/logs if enabled
+  if (!dryRun) {
+    if (config.enableMemory) {
+      mkdirSync(join(targetDir, ".claude", "memory"), { recursive: true });
+    }
+    if (config.enableCostTracking) {
+      mkdirSync(join(targetDir, ".claude", "logs"), { recursive: true });
+    }
   }
 
   // Write updated manifest

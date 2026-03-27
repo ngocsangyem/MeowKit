@@ -8,12 +8,18 @@ interface CheckResult {
   detail: string;
 }
 
+/** Find MeowKit .claude/ — requires project markers to avoid matching ~/.claude/ */
 function findMeowkitDir(startDir: string): string | null {
   let current = startDir;
   while (true) {
     const candidate = path.join(current, ".claude");
     if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
-      return candidate;
+      const hasConfig = fs.existsSync(path.join(current, ".meowkit.config.json"));
+      const hasManifest = fs.existsSync(path.join(current, ".meowkit.manifest.json"));
+      const hasClaude = fs.existsSync(path.join(current, "CLAUDE.md"));
+      if (hasConfig || hasManifest || hasClaude) {
+        return candidate;
+      }
     }
     const parent = path.dirname(current);
     if (parent === current) {
