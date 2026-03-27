@@ -48,6 +48,17 @@ End-to-end implementation with automatic workflow detection.
 
 See `references/intent-detection.md` for detection logic.
 
+## Plan-First Gate
+
+For non-trivial tasks (> 2 files OR > 30 min):
+
+1. Check for existing approved plan in `tasks/plans/`
+2. If no plan → invoke `meow:plan-creator` with task description
+3. Wait for Gate 1 approval before proceeding to implementation
+
+Skip: When invoked with a plan path (`/cook path/to/plan.md`) — plan already exists.
+Skip: `--fast` mode for trivial tasks (< 3 files, < 30 min).
+
 ## Workflow Overview
 
 ```
@@ -94,15 +105,14 @@ Human review required at these checkpoints (skipped with `--auto`):
 
 ## Required Subagents (MANDATORY)
 
-| Phase    | Subagent                                         | Requirement           |
-| -------- | ------------------------------------------------ | --------------------- |
-<!-- Fixed: replaced phantom claudekit agent names with actual MeowKit agents -->
-| Research | `researcher`                                     | Optional in fast/code |
-| Scout    | `meow:scout`                                     | Optional in code      |
-| Plan     | `planner`                                        | Optional in code      |
-| Testing  | `tester`                                         | **MUST** spawn        |
-| Review   | `reviewer`                                       | **MUST** spawn        |
-| Finalize | `documenter`, `shipper`                          | **MUST** spawn both   |
+| Phase    | Subagent                | Requirement           |
+| -------- | ----------------------- | --------------------- |
+| Research | `researcher`            | Optional in fast/code |
+| Scout    | `meow:scout`            | Optional in code      |
+| Plan     | `planner`               | Optional in code      |
+| Testing  | `tester`                | **MUST** spawn        |
+| Review   | `reviewer`              | **MUST** spawn        |
+| Finalize | `documenter`, `shipper` | **MUST** spawn both   |
 
 **CRITICAL ENFORCEMENT:**
 

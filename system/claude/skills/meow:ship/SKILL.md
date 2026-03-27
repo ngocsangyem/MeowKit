@@ -43,6 +43,14 @@ Operates in **Phase 5 (Ship)** of MeowKit's workflow. Invoked by the `shipper` a
 
 Use when the user says "ship", "deploy", "push to main", "create a PR", or "merge and push". Proactively suggest when code is described as ready or deployment is discussed.
 
+## Plan-First Gate
+
+Shipping requires an approved plan or review verdict:
+1. Check `tasks/plans/` for approved plan covering this change
+2. If no plan exists and change is non-trivial → block and suggest planning first
+
+Skip: Hotfixes explicitly approved by human via PR comment.
+
 ## Workflow
 
 **Pre-ship** — Initialize session, detect base branch (official → main, beta → dev), verify on feature branch, check review readiness dashboard. If `--dry-run`: output plan and stop. Verify distribution pipeline for new standalone artifacts. Fetch/merge base branch, bootstrap test framework if missing. Run test suites and triage failures (in-branch vs pre-existing — skip if `--skip-tests`). Run evals if prompt-related files changed. Trace coverage, write missing tests. Cross-reference plan items against diff and run /qa-only verification. See `references/pre-flight.md`, `references/distribution-pipeline.md`, `references/merge-and-test-bootstrap.md`, `references/test-execution.md`, `references/eval-suites.md`, `references/test-coverage-audit.md`, `references/plan-completion-audit.md`

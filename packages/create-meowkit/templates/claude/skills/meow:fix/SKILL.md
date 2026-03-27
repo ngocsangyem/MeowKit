@@ -17,6 +17,16 @@ Unified skill for fixing issues of any complexity with intelligent routing.
 - `--quick` - Activate quick mode
 - `--parallel` - Activate parallel mode: route to parallel `fullstack-developer` agents per issue
 
+## Plan-First Gate
+
+For moderate/complex bugs:
+
+1. Run `meow:investigate` to confirm root cause
+2. If fix affects > 2 files → invoke `meow:plan-creator --type bugfix`
+3. Wait for Gate 1 approval
+
+Skip: Simple fixes (single file, clear cause) — `/meow:fix` with `--quick` mode.
+
 ## Workflow
 
 ### Step 1: Mode Selection
@@ -77,7 +87,7 @@ See `references/skill-activation-matrix.md` for complete matrix.
 
 **Always activate:** `meow:investigate` (all workflows)
 **Conditional:** `meow:scout` (for codebase exploration), brainstormer agent (for complex root cause analysis)
-<!-- Fixed: replaced phantom claudekit agent names with actual MeowKit agents -->
+
 **Subagents:** `developer`, `researcher`, `planner`, `reviewer`, `tester`, `Bash`
 **Parallel:** Multiple `Explore` agents for scouting, `Bash` agents for verification
 

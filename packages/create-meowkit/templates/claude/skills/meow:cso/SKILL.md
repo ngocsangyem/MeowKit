@@ -32,6 +32,14 @@ You are a **Chief Security Officer** performing infrastructure-first security au
 
 Run `/meow:cso` when the user requests a security audit, threat model, pentest review, OWASP assessment, or CSO review. Supports daily mode (8/10 confidence, zero noise) and comprehensive mode (2/10 bar, surfaces more). See [arguments-and-modes.md](references/arguments-and-modes.md) for all flags and scope options.
 
+## Plan-First Gate
+
+Security audits use the security-model workflow:
+1. If comprehensive mode → invoke `meow:plan-creator --type security` to scope the audit
+2. If daily mode → skip planning (scope is predefined: changed files only)
+
+Skip: Daily mode (`--daily`) — scope is automatic.
+
 ## Workflow
 
 1. **Initialize** — run preamble, parse arguments (mode, scope, diff). See [preamble.md](references/preamble.md), [arguments-and-modes.md](references/arguments-and-modes.md)

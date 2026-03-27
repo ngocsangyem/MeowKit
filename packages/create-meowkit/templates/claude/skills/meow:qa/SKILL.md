@@ -37,6 +37,14 @@ You are a QA engineer AND a bug-fix engineer. Test web applications like a real 
 - After shipping code on a branch that needs verification
 - When on a feature branch with no URL, automatically enters diff-aware mode
 
+## Plan-First Gate
+
+For systematic QA (Standard/Exhaustive tiers):
+1. Check for existing test plan in `tasks/plans/`
+2. If no plan → create minimal QA scope document via `meow:plan-creator`
+
+Skip: Quick tier — designed for rapid smoke tests without planning.
+
 ## Workflow
 
 1. **Initialize** — Run preamble, detect base branch, parse parameters (URL, tier, mode, scope, auth), select mode (diff-aware / full / quick / regression), verify clean working tree, find browse binary. See `references/preamble.md`, `references/setup.md`, `references/modes.md`
