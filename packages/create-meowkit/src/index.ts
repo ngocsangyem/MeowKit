@@ -132,12 +132,21 @@ async function main(): Promise<void> {
   );
 
   if (!dryRun) {
-    console.log(`\nNext steps:`);
-    console.log(`  ${pc.dim("1.")} Review ${pc.bold("CLAUDE.md")} for your project conventions`);
-    console.log(`  ${pc.dim("2.")} Customize agent files in ${pc.bold(".claude/agents/")}`);
-    console.log(`  ${pc.dim("3.")} Copy ${pc.bold(".mcp.json.example")} → ${pc.bold(".mcp.json")} and configure your MCP servers`);
-    console.log(`  ${pc.dim("4.")} Add ${pc.bold(".env")} entries from ${pc.bold(".env.example")} (and append ${pc.bold(".gitignore.meowkit")} to your .gitignore)`);
-    console.log(`  ${pc.dim("5.")} Run ${pc.bold("meowkit doctor")} to verify your setup`);
+    console.log(`\n${pc.bold("Scaffolded the full MeowKit system:")}`);
+    console.log(`  ${pc.cyan("agents/")}    13 specialist agents (planner, developer, reviewer, ...)`);
+    console.log(`  ${pc.cyan("skills/")}    40+ skills (cook, fix, ship, review, qa, ...)`);
+    console.log(`  ${pc.cyan("commands/")}  18 slash commands`);
+    console.log(`  ${pc.cyan("modes/")}     7 behavioral modes (default, strict, fast, ...)`);
+    console.log(`  ${pc.cyan("rules/")}     12 enforcement rules (security, TDD, gates, ...)`);
+    console.log(`  ${pc.cyan("hooks/")}     6 lifecycle hooks`);
+    console.log(`  ${pc.cyan("scripts/")}   validation & security scripts`);
+
+    console.log(`\n${pc.bold("Next steps:")}`);
+    console.log(`  ${pc.dim("1.")} Review ${pc.bold("CLAUDE.md")} for project conventions`);
+    console.log(`  ${pc.dim("2.")} Copy ${pc.bold(".mcp.json.example")} → ${pc.bold(".mcp.json")} and configure MCP servers`);
+    console.log(`  ${pc.dim("3.")} Copy ${pc.bold(".env.example")} → ${pc.bold(".env")} and add API keys`);
+    console.log(`  ${pc.dim("4.")} Append ${pc.bold(".gitignore.meowkit")} to your .gitignore`);
+    console.log(`  ${pc.dim("5.")} Run ${pc.bold("npx meowkit doctor")} to verify your environment`);
   }
 }
 

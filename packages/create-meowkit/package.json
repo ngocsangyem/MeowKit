@@ -11,7 +11,8 @@
     "templates"
   ],
   "scripts": {
-    "build": "tsc",
+    "build:templates": "bash scripts/build-templates.sh",
+    "build": "npm run build:templates && tsc",
     "dev": "tsc --watch",
     "start": "node dist/index.js"
   },

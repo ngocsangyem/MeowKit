@@ -21,82 +21,119 @@ function check(
   return pass;
 }
 
+/** Counts .md files in a directory (non-recursive) */
+function countMdFiles(dir: string): number {
+  if (!existsSync(dir)) return 0;
+  try {
+    return readdirSync(dir).filter((f) => f.endsWith(".md")).length;
+  } catch {
+    return 0;
+  }
+}
+
+/** Counts subdirectories in a directory */
+function countSubdirs(dir: string): number {
+  if (!existsSync(dir)) return 0;
+  try {
+    const { statSync } = require("node:fs");
+    return readdirSync(dir).filter((f) => {
+      try {
+        return statSync(join(dir, f)).isDirectory();
+      } catch {
+        return false;
+      }
+    }).length;
+  } catch {
+    return 0;
+  }
+}
+
 export function validate(targetDir: string): ValidationResult {
   const issues: string[] = [];
-  const meowkitDir = join(targetDir, ".claude");
+  const claude = join(targetDir, ".claude");
 
   console.log(pc.bold("\nValidation Results:"));
 
-  // Check .claude/ directory exists
-  check(
-    ".claude/ directory exists",
-    existsSync(meowkitDir),
-    issues
-  );
-
-  // Check CLAUDE.md exists
-  check(
-    "CLAUDE.md exists",
-    existsSync(join(targetDir, "CLAUDE.md")),
-    issues
-  );
-
-  // Check .meowkit.config.json exists
+  // Core structure
+  check(".claude/ directory exists", existsSync(claude), issues);
+  check("CLAUDE.md exists", existsSync(join(targetDir, "CLAUDE.md")), issues);
   check(
     ".meowkit.config.json exists",
     existsSync(join(targetDir, ".meowkit.config.json")),
     issues
   );
 
-  // Check at least 5 agent files exist
-  const agentsDir = join(meowkitDir, "agents");
-  let agentCount = 0;
-  if (existsSync(agentsDir)) {
-    try {
-      const agentFiles = readdirSync(agentsDir).filter((f) =>
-        f.endsWith(".md")
-      );
-      agentCount = agentFiles.length;
-    } catch {
-      // Directory read failed
-    }
-  }
+  // Agents (expect 10+ from real system)
+  const agentCount = countMdFiles(join(claude, "agents"));
   check(
-    `At least 5 agent files in .claude/agents/ (found ${agentCount})`,
-    agentCount >= 5,
+    `Agents: ${agentCount} files (need 10+)`,
+    agentCount >= 10,
     issues
   );
 
-  // Check hooks are executable
-  const hooksDir = join(meowkitDir, "hooks");
+  // Skills (expect 30+ directories)
+  const skillCount = countSubdirs(join(claude, "skills"));
+  check(
+    `Skills: ${skillCount} directories (need 30+)`,
+    skillCount >= 30,
+    issues
+  );
+
+  // Commands
+  const cmdDir = join(claude, "commands");
+  const cmdExists = existsSync(cmdDir);
+  check("Commands directory exists", cmdExists, issues);
+
+  // Modes
+  const modeCount = countMdFiles(join(claude, "modes"));
+  check(
+    `Modes: ${modeCount} files (need 5+)`,
+    modeCount >= 5,
+    issues
+  );
+
+  // Rules
+  const ruleCount = countMdFiles(join(claude, "rules"));
+  check(
+    `Rules: ${ruleCount} files (need 10+)`,
+    ruleCount >= 10,
+    issues
+  );
+
+  // Hooks — all must be executable
+  const hooksDir = join(claude, "hooks");
   if (existsSync(hooksDir)) {
-    try {
-      const hookFiles = readdirSync(hooksDir);
-      for (const hookFile of hookFiles) {
-        const hookPath = join(hooksDir, hookFile);
-        let isExecutable = false;
-        try {
-          accessSync(hookPath, constants.X_OK);
-          isExecutable = true;
-        } catch {
-          // Not executable
-        }
-        check(
-          `Hook ${hookFile} is executable`,
-          isExecutable,
-          issues
-        );
+    const hookFiles = readdirSync(hooksDir);
+    for (const hookFile of hookFiles) {
+      const hookPath = join(hooksDir, hookFile);
+      let isExecutable = false;
+      try {
+        accessSync(hookPath, constants.X_OK);
+        isExecutable = true;
+      } catch {
+        // Not executable
       }
-    } catch {
-      issues.push("Could not read hooks directory");
-      console.log(`  ${pc.red("FAIL")} Could not read hooks directory`);
+      check(`Hook ${hookFile} is executable`, isExecutable, issues);
     }
   } else {
     check("Hooks directory exists", false, issues);
   }
 
-  const valid = issues.length === 0;
+  // Scripts
+  check(
+    "Scripts directory exists",
+    existsSync(join(claude, "scripts")),
+    issues
+  );
 
+  // Settings
+  check(
+    "settings.json exists",
+    existsSync(join(claude, "settings.json")),
+    issues
+  );
+
+  const valid = issues.length === 0;
   console.log(
     valid
       ? `\n  ${pc.green(pc.bold("All checks passed"))}`

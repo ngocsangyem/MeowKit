@@ -1,510 +1,128 @@
-import { mkdirSync, writeFileSync, chmodSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, mkdirSync, writeFileSync, copyFileSync } from "node:fs";
+import { join } from "node:path";
 import pc from "picocolors";
 import type { UserConfig } from "./prompts.js";
+import { copyDirRecursive, resolveTemplateDir } from "./copy-template-tree.js";
+import { processTemplate } from "./substitute-placeholders.js";
 
-function writeFile(
-  filePath: string,
-  content: string,
-  dryRun: boolean,
-  executable = false
-): void {
-  if (dryRun) {
-    console.log(`  ${pc.dim("create")} ${filePath}`);
-    return;
-  }
-
-  mkdirSync(dirname(filePath), { recursive: true });
-  writeFileSync(filePath, content, "utf-8");
-
-  if (executable) {
-    chmodSync(filePath, 0o755);
-  }
-}
-
-function generateMeowkitMd(config: UserConfig): string {
-  const modeDescriptions: Record<string, string> = {
-    fast: "Minimal checks for rapid iteration. Trusts the developer to handle quality.",
-    balanced:
-      "Standard checks with sensible defaults. Good for most development workflows.",
-    strict:
-      "Thorough validation, linting, and testing. Suitable for CI and production-grade work.",
-  };
-
-  return `# CLAUDE.md
-
-## Project: ${config.projectName}
-
-### Stack
-${config.stack.map((s) => `- ${s}`).join("\n")}
-
-### Team
-- Size: ${config.teamSize}
-- Primary tool: ${config.primaryTool}
-
-### Mode: ${config.defaultMode}
-${modeDescriptions[config.defaultMode]}
-
-### Features
-- Cost tracking: ${config.enableCostTracking ? "enabled" : "disabled"}
-- Memory/persistence: ${config.enableMemory ? "enabled" : "disabled"}
-
-### Conventions
-- Follow existing code style and patterns
-- Write tests for new functionality
-- Keep commits focused and well-described
-- Use the project's established dependency versions
-
-### Agent Guidelines
-- Read CLAUDE.md before starting any task
-- Check .claude/agents/ for task-specific instructions
-- Respect the current mode settings
-- Log actions when cost tracking is enabled
-`;
-}
-
-function generateClaudeMd(config: UserConfig): string {
-  return `# CLAUDE.md
-
-## Project: ${config.projectName}
-
-This project uses meowkit for AI-assisted development configuration.
-See CLAUDE.md for detailed project conventions and guidelines.
-
-### Quick Reference
-- Stack: ${config.stack.join(", ")}
-- Mode: ${config.defaultMode}
-- Tool: ${config.primaryTool}
-
-### Rules
-- Always read CLAUDE.md at the start of a session
-- Follow the agent files in .claude/agents/ for specialized tasks
-- Respect .meowkit.config.json settings
-${config.enableMemory ? "- Use .claude/memory/ for cross-session context\n" : ""}\
-${config.enableCostTracking ? "- Log token usage via .claude/hooks/post-task\n" : ""}\
-`;
-}
-
-function generateConfigJson(config: UserConfig): string {
-  const configObj = {
-    $schema: "https://meowkit.dev/schema/config.json",
-    version: "1.0.0",
-    project: {
-      name: config.projectName,
-      stack: config.stack,
-    },
-    team: {
-      size: config.teamSize,
-    },
-    tool: {
-      primary: config.primaryTool,
-    },
-    mode: {
-      default: config.defaultMode,
-    },
-    features: {
-      costTracking: config.enableCostTracking,
-      memory: config.enableMemory,
-    },
-  };
-
-  return JSON.stringify(configObj, null, 2) + "\n";
-}
-
-function generateAgentFile(name: string, description: string, instructions: string): string {
-  return `# Agent: ${name}
-
-## Description
-${description}
-
-## Instructions
-${instructions}
-`;
-}
-
-function generateHookScript(hookName: string, body: string): string {
-  return `#!/usr/bin/env bash
-# meowkit hook: ${hookName}
-set -euo pipefail
-
-${body}
-`;
-}
-
-function generateEnvExample(): string {
-  return `# MeowKit Environment Variables
-# Copy to .env and fill in values. Never commit .env to git.
-
-# Gemini API key (required for meow:multimodal skill)
-# Get from: https://aistudio.google.com/apikey
-GEMINI_API_KEY=
-
-# Optional: Override default Gemini models
-# MULTIMODAL_MODEL=gemini-2.5-flash
-# IMAGE_GEN_MODEL=imagen-4.0-generate-001
-# VIDEO_GEN_MODEL=veo-3.1-generate-preview
-`;
-}
-
-function generateSettingsJson(): string {
-  return `{
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "sh .claude/hooks/post-write.sh \\"$TOOL_INPUT_FILE_PATH\\"",
-            "timeout": 10000,
-            "statusMessage": "Security scanning written file..."
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "sh .claude/hooks/post-session.sh",
-            "timeout": 5000
-          }
-        ]
-      }
-    ]
-  },
-  "permissions": {
-    "allow": [
-      "Bash(npm test)",
-      "Bash(npm run lint)",
-      "Bash(npx tsc --noEmit)",
-      "Bash(python .claude/scripts/*)",
-      "Bash(sh .claude/hooks/*)",
-      "Bash(git *)",
-      "Bash(gh *)",
-      "Bash(wc -l *)",
-      "Bash(ls *)",
-      "Bash(find *)"
-    ]
-  }
-}
-`;
-}
-
-function generateMcpExample(): string {
-  return `{
-  "mcpServers": {
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp", "--api-key", "YOUR_API_KEY"]
-    },
-    "sequential-thinking": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["@playwright/mcp@latest"]
-    }
-  }
-}
-`;
-}
-
-function buildFileMap(config: UserConfig, targetDir: string): Map<string, { content: string; executable: boolean }> {
-  const files = new Map<string, { content: string; executable: boolean }>();
-  const meowkit = join(targetDir, ".claude");
-
-  // Root-level files
-  files.set(join(targetDir, "CLAUDE.md"), {
-    content: generateMeowkitMd(config),
-    executable: false,
-  });
-
-  files.set(join(targetDir, ".meowkit.config.json"), {
-    content: generateConfigJson(config),
-    executable: false,
-  });
-
-  files.set(join(targetDir, ".mcp.json.example"), {
-    content: generateMcpExample(),
-    executable: false,
-  });
-
-  // .claude/settings.json — hook registrations and permissions
-  files.set(join(meowkit, "settings.json"), {
-    content: generateSettingsJson(),
-    executable: false,
-  });
-
-  // .env.example — always generated with placeholder
-  files.set(join(targetDir, ".env.example"), {
-    content: generateEnvExample(),
-    executable: false,
-  });
-
-  // .env — only if user provided a Gemini API key
-  if (config.geminiApiKey) {
-    files.set(join(targetDir, ".env"), {
-      content: `# MeowKit environment variables\n# WARNING: Never commit this file to git\n\nGEMINI_API_KEY=${config.geminiApiKey}\n`,
-      executable: false,
-    });
-  }
-
-  // .gitignore — ensure .env is excluded
-  files.set(join(targetDir, ".gitignore.meowkit"), {
-    content: `# MeowKit — append to your .gitignore\n.env\n.env.local\n.claude/memory/\n.claude/logs/\n`,
-    executable: false,
-  });
-
-  // Universal agent files
-  files.set(join(meowkit, "agents", "code-review.md"), {
-    content: generateAgentFile(
-      "Code Review",
-      "Reviews code changes for quality, correctness, and style.",
-      [
-        "- Check for common bugs and anti-patterns",
-        "- Verify test coverage for changes",
-        "- Ensure consistent code style",
-        "- Flag security concerns",
-        `- Operating mode: ${config.defaultMode}`,
-      ].join("\n")
-    ),
-    executable: false,
-  });
-
-  files.set(join(meowkit, "agents", "testing.md"), {
-    content: generateAgentFile(
-      "Testing",
-      "Writes and maintains tests for the project.",
-      [
-        "- Write unit tests for new functions",
-        "- Maintain integration test coverage",
-        "- Follow existing test patterns and conventions",
-        `- Stack: ${config.stack.join(", ")}`,
-      ].join("\n")
-    ),
-    executable: false,
-  });
-
-  files.set(join(meowkit, "agents", "refactor.md"), {
-    content: generateAgentFile(
-      "Refactor",
-      "Safely refactors code while preserving behavior.",
-      [
-        "- Make incremental changes with tests",
-        "- Preserve public API contracts",
-        "- Improve readability and maintainability",
-        "- Document breaking changes",
-      ].join("\n")
-    ),
-    executable: false,
-  });
-
-  files.set(join(meowkit, "agents", "docs.md"), {
-    content: generateAgentFile(
-      "Documentation",
-      "Writes and updates project documentation.",
-      [
-        "- Keep docs in sync with code changes",
-        "- Use clear, concise language",
-        "- Include code examples where helpful",
-        "- Follow the project's doc style",
-      ].join("\n")
-    ),
-    executable: false,
-  });
-
-  files.set(join(meowkit, "agents", "debug.md"), {
-    content: generateAgentFile(
-      "Debug",
-      "Investigates and fixes bugs.",
-      [
-        "- Reproduce the issue first",
-        "- Use systematic debugging approaches",
-        "- Write a regression test for each fix",
-        "- Document root cause in commit message",
-      ].join("\n")
-    ),
-    executable: false,
-  });
-
-  files.set(join(meowkit, "agents", "planning.md"), {
-    content: generateAgentFile(
-      "Planning",
-      "Helps plan features, architecture, and tasks.",
-      [
-        "- Break down large tasks into smaller steps",
-        "- Consider edge cases and failure modes",
-        "- Identify dependencies and risks",
-        `- Team size: ${config.teamSize}`,
-      ].join("\n")
-    ),
-    executable: false,
-  });
-
-  // Hooks
-  files.set(join(meowkit, "hooks", "pre-task"), {
-    content: generateHookScript(
-      "pre-task",
-      [
-        '# Runs before each agent task',
-        'echo "[meowkit] Starting task at $(date -u +%Y-%m-%dT%H:%M:%SZ)"',
-        "",
-        "# Validate environment",
-        'if [ ! -f CLAUDE.md ]; then',
-        '  echo "[meowkit] Warning: CLAUDE.md not found in project root"',
-        "fi",
-      ].join("\n")
-    ),
-    executable: true,
-  });
-
-  files.set(join(meowkit, "hooks", "post-task"), {
-    content: generateHookScript(
-      "post-task",
-      [
-        "# Runs after each agent task",
-        'echo "[meowkit] Task completed at $(date -u +%Y-%m-%dT%H:%M:%SZ)"',
-        "",
-        config.enableCostTracking
-          ? [
-              "# Log cost tracking data",
-              'COST_LOG=".claude/logs/cost.jsonl"',
-              'mkdir -p "$(dirname "$COST_LOG")"',
-              'echo "{\\\"timestamp\\\": \\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\", \\\"task\\\": \\\"${MEOWKIT_TASK:-unknown}\\\"}" >> "$COST_LOG"',
-            ].join("\n")
-          : "# Cost tracking disabled",
-      ].join("\n")
-    ),
-    executable: true,
-  });
-
-  // post-write hook — security scan on every file write (registered in settings.json)
-  files.set(join(meowkit, "hooks", "post-write.sh"), {
-    content: generateHookScript(
-      "post-write",
-      [
-        '# Security scan on written files — registered as PostToolUse in settings.json',
-        '# Checks: hardcoded secrets, SQL injection, XSS, destructive commands',
-        'FILE="$1"',
-        '[ -z "$FILE" ] && exit 0',
-        '[ ! -f "$FILE" ] && exit 0',
-        '',
-        'EXT="${FILE##*.}"',
-        'case "$EXT" in',
-        '  ts|js)',
-        '    grep -qn "api_key=\\|apiKey=\\|secret=\\|password=\\|token=" "$FILE" 2>/dev/null && { echo "BLOCK — Hardcoded secret in $FILE"; exit 2; }',
-        '    grep -qn ": any\\|as any" "$FILE" 2>/dev/null && { echo "WARN — any type in $FILE"; }',
-        '    ;;',
-        '  vue)',
-        '    grep -qn "v-html" "$FILE" 2>/dev/null && { echo "BLOCK — v-html XSS risk in $FILE"; exit 2; }',
-        '    ;;',
-        '  sql)',
-        '    grep -qin "DROP TABLE\\|DROP DATABASE" "$FILE" 2>/dev/null && { echo "BLOCK — Destructive SQL in $FILE"; exit 2; }',
-        '    ;;',
-        'esac',
-        'exit 0',
-      ].join("\n")
-    ),
-    executable: true,
-  });
-
-  // post-session hook — memory capture (registered as Stop in settings.json)
-  files.set(join(meowkit, "hooks", "post-session.sh"), {
-    content: generateHookScript(
-      "post-session",
-      [
-        '# Capture session data to memory — registered as Stop in settings.json',
-        'mkdir -p .claude/memory',
-        'echo "Session ended: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .claude/memory/sessions.log',
-      ].join("\n")
-    ),
-    executable: true,
-  });
-
-  // Memory directory
-  if (config.enableMemory) {
-    files.set(join(meowkit, "memory", ".gitkeep"), {
-      content: "",
-      executable: false,
-    });
-  }
-
-  // Logs directory
-  if (config.enableCostTracking) {
-    files.set(join(meowkit, "logs", ".gitkeep"), {
-      content: "",
-      executable: false,
-    });
-  }
-
-  // Tool-specific files
-  if (config.primaryTool === "claude-code" || config.primaryTool === "both") {
-    files.set(join(meowkit, "tools", "claude-code.md"), {
-      content: `# Claude Code Configuration
-
-## Settings
-- Default mode: ${config.defaultMode}
-- Memory: ${config.enableMemory ? "enabled" : "disabled"}
-
-## Usage
-This file provides Claude Code-specific instructions.
-Refer to CLAUDE.md for project-wide conventions.
-
-## Allowed Commands
-- git status, git diff, git log
-- npm test, npm run lint (or equivalent for your stack)
-- File read/write operations within the project
-
-## Restricted Actions
-- Do not push to remote without confirmation
-- Do not modify CI/CD configuration without review
-- Do not install new dependencies without discussion
-`,
-      executable: false,
-    });
-  }
-
-  if (config.primaryTool === "antigravity" || config.primaryTool === "both") {
-    files.set(join(meowkit, "tools", "antigravity.md"), {
-      content: `# Antigravity Configuration
-
-## Settings
-- Default mode: ${config.defaultMode}
-- Memory: ${config.enableMemory ? "enabled" : "disabled"}
-
-## Usage
-This file provides Antigravity-specific instructions.
-Refer to CLAUDE.md for project-wide conventions.
-
-## Workspace Integration
-- Follow VS Code workspace settings
-- Respect .editorconfig if present
-- Use workspace-relative paths
-`,
-      executable: false,
-    });
-  }
-
-  return files;
-}
-
+/**
+ * Generates the full MeowKit system by copying templates and substituting placeholders.
+ *
+ * Architecture:
+ *   1. Copy templates/claude/ → targetDir/.claude/ (the real MeowKit system)
+ *   2. Process .template files with __MEOWKIT_*__ placeholder substitution
+ *   3. Write static root files (.env.example, .mcp.json.example, .gitignore additions)
+ *   4. Optionally write .env if user provided a Gemini API key
+ *   5. Create empty dirs (memory/, logs/) if features enabled
+ */
 export async function generate(
   config: UserConfig,
   targetDir: string,
   dryRun: boolean
 ): Promise<number> {
-  const files = buildFileMap(config, targetDir);
+  const templateDir = resolveTemplateDir();
 
-  for (const [filePath, { content, executable }] of files) {
-    writeFile(filePath, content, dryRun, executable);
+  if (!existsSync(templateDir)) {
+    console.error(
+      pc.red(
+        `Templates directory not found at ${templateDir}.\n` +
+          `Run 'npm run build:templates' first, or reinstall the package.`
+      )
+    );
+    process.exit(1);
+  }
+
+  let fileCount = 0;
+
+  // Step 1: Copy the full .claude/ system from templates
+  const claudeSrc = join(templateDir, "claude");
+  const claudeDest = join(targetDir, ".claude");
+
+  if (existsSync(claudeSrc)) {
+    fileCount += copyDirRecursive(claudeSrc, claudeDest, dryRun);
+  } else {
+    console.error(pc.red(`Template .claude/ directory not found at ${claudeSrc}`));
+    process.exit(1);
+  }
+
+  // Step 2: Process template files with placeholder substitution
+  const claudeMdTemplate = join(templateDir, "claude-md.template");
+  if (existsSync(claudeMdTemplate)) {
+    processTemplate(claudeMdTemplate, join(targetDir, "CLAUDE.md"), config, dryRun);
+    fileCount++;
+  }
+
+  const configTemplate = join(templateDir, "meowkit-config.json.template");
+  if (existsSync(configTemplate)) {
+    processTemplate(
+      configTemplate,
+      join(targetDir, ".meowkit.config.json"),
+      config,
+      dryRun
+    );
+    fileCount++;
+  }
+
+  // Step 3: Copy static root files
+  const staticFiles: Array<{ src: string; dest: string }> = [
+    { src: "env.example", dest: ".env.example" },
+    { src: "mcp.json.example", dest: ".mcp.json.example" },
+    { src: "gitignore.meowkit", dest: ".gitignore.meowkit" },
+  ];
+
+  for (const { src, dest } of staticFiles) {
+    const srcPath = join(templateDir, src);
+    const destPath = join(targetDir, dest);
+
+    if (existsSync(srcPath)) {
+      if (dryRun) {
+        console.log(`  ${pc.dim("create")} ${destPath}`);
+      } else {
+        mkdirSync(targetDir, { recursive: true });
+        copyFileSync(srcPath, destPath);
+      }
+      fileCount++;
+    }
+  }
+
+  // Step 4: Write .env if user provided Gemini API key
+  if (config.geminiApiKey) {
+    const envPath = join(targetDir, ".env");
+    if (dryRun) {
+      console.log(`  ${pc.dim("create")} ${envPath}`);
+    } else {
+      writeFileSync(
+        envPath,
+        `# MeowKit environment variables\n# WARNING: Never commit this file to git\n\nGEMINI_API_KEY=${config.geminiApiKey}\n`,
+        "utf-8"
+      );
+    }
+    fileCount++;
+  }
+
+  // Step 5: Ensure empty directories exist
+  const emptyDirs: string[] = [];
+
+  if (config.enableMemory) {
+    emptyDirs.push(join(claudeDest, "memory"));
+  }
+  if (config.enableCostTracking) {
+    emptyDirs.push(join(claudeDest, "logs"));
+  }
+
+  for (const dir of emptyDirs) {
+    if (!dryRun) {
+      mkdirSync(dir, { recursive: true });
+      const gitkeep = join(dir, ".gitkeep");
+      if (!existsSync(gitkeep)) {
+        writeFileSync(gitkeep, "", "utf-8");
+      }
+    }
   }
 
   if (!dryRun) {
-    console.log(pc.green(`  Created ${files.size} files`));
+    console.log(pc.green(`  Created ${fileCount} files`));
   }
 
-  return files.size;
+  return fileCount;
 }

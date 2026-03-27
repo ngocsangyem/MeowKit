@@ -1,0 +1,21 @@
+{
+  "$schema": "https://meowkit.dev/schema/config.json",
+  "version": "1.0.0",
+  "project": {
+    "name": "__MEOWKIT_PROJECT_NAME__",
+    "stack": __MEOWKIT_STACK_JSON__
+  },
+  "team": {
+    "size": "__MEOWKIT_TEAM_SIZE__"
+  },
+  "tool": {
+    "primary": "__MEOWKIT_PRIMARY_TOOL__"
+  },
+  "mode": {
+    "default": "__MEOWKIT_DEFAULT_MODE__"
+  },
+  "features": {
+    "costTracking": __MEOWKIT_COST_TRACKING__,
+    "memory": __MEOWKIT_MEMORY_ENABLED__
+  }
+}
