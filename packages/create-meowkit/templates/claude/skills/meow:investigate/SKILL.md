@@ -40,6 +40,14 @@ source: gstack
 
 **Iron Law: NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST.**
 
+## Plan-First Gate
+
+Investigation precedes planning for bug fixes:
+1. Confirm root cause FIRST (Iron Law)
+2. After root cause confirmed → invoke `meow:plan-creator --type bugfix` if fix affects > 2 files
+
+Skip: Investigation itself doesn't need a plan — it produces the input for planning.
+
 ## When to Use
 
 - User reports errors, bugs, unexpected behavior

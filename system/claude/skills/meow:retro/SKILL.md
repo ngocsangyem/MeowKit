@@ -24,6 +24,14 @@ source: gstack
 
 Generates a comprehensive engineering retrospective analyzing commit history, work patterns, and code quality metrics. Team-aware: identifies the user running the command, then analyzes every contributor with per-person praise and growth opportunities. Designed for a senior IC/CTO-level builder using Claude Code as a force multiplier.
 
+## Plan-First Gate
+
+Retrospectives are data-driven, not plan-driven:
+1. Scope is defined by time window (default: last 7 days)
+2. No planning needed — data gathering IS the scope definition
+
+Skip: Always — retros don't require pre-planning.
+
 ## When to Use
 
 - User types `/meow:retro` (with optional arguments: `24h`, `14d`, `30d`, `compare`, `global`)

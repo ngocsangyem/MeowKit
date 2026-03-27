@@ -23,6 +23,15 @@ source: aura-frog
 
 **Priority:** CRITICAL — Use for complex feature implementations.
 
+## Plan-First Gate
+
+Orchestrator enforces the plan-first pattern for all workflows:
+1. On task received → check for existing approved plan
+2. If no plan and task is non-trivial → route to `meow:plan-creator` first
+3. After Gate 1 approval → select workflow model and execute phases
+
+Skip: Fasttrack mode with pre-approved spec.
+
 ## When to Use
 
 **USE for:** New features, complex implementations, tasks >2 hours, multi-file changes, tasks requiring TDD.

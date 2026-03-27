@@ -26,6 +26,14 @@ source: gstack
 
 Multi-pass code review with adversarial analysis, spec compliance, and auto-fix. Covers scope drift, code quality, design, test coverage, adversarial red-teaming, and fix-first resolution.
 
+## Plan-First Gate
+
+Review requires context from a plan or diff:
+1. If reviewing a planned feature → read approved plan from `tasks/plans/`
+2. If reviewing a PR/diff → no plan needed (diff IS the context)
+
+Skip: PR reviews triggered by `--pending` or branch diff — plan not required.
+
 ## Workflow Integration
 
 Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer` agent. BLOCK verdict prevents Phase 5 (Ship).

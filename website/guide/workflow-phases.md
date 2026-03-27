@@ -72,10 +72,30 @@ Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has 
 
 ## Phase 6 — Reflect (automatic)
 
-**Agent:** documenter, analyst  
+**Agent:** documenter, analyst
 **Deliverable:** Updated memory + documentation
 
 - Capture patterns to `memory/`
 - Update `memory/lessons.md` and `memory/cost-log.json`
 - Sync affected documentation
 - Close sprint task
+
+### Plan-First Gate Pattern
+
+Most MeowKit skills enforce a plan-first gate: they check for an approved plan before proceeding with significant work.
+
+| Skill | Gate behavior | Skip condition |
+|-------|-------------|----------------|
+| meow:cook | Create plan if missing | Plan path arg, `--fast` mode |
+| meow:fix | Plan if > 2 files | `--quick` mode |
+| meow:ship | Require approved plan | Hotfix with human approval |
+| meow:cso | Scope audit via plan | `--daily` mode |
+| meow:qa | Create QA scope doc | Quick tier |
+| meow:review | Read plan for context | PR diff reviews |
+| meow:workflow-orchestrator | Route to plan-creator | Fasttrack mode |
+| meow:investigate | Produces input FOR plans | Always skips |
+| meow:office-hours | Pre-planning skill | Always skips |
+| meow:retro | Data-driven, no plan | Always skips |
+| meow:document-release | Scope from diff | Post-ship sync |
+
+Skills that skip planning have documented reasons — they either produce planning input (investigate, office-hours) or are data-driven (retro).

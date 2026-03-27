@@ -26,6 +26,14 @@ source: gstack
 
 Post-ship workflow that ensures every documentation file in the project is accurate, up to date, and written in a friendly, user-forward voice. Runs after `/meow:ship` but before the PR merges. Mostly automated — makes obvious factual updates directly, stops only for risky or subjective decisions.
 
+## Plan-First Gate
+
+Doc updates follow shipped code — planning is implicit:
+1. Read the diff/changelog to understand what shipped
+2. If doc restructure (new sections, architecture changes) → invoke `meow:plan-creator`
+
+Skip: Post-ship doc sync (default mode) — scope is defined by the diff.
+
 ## When to Use
 
 - After code is shipped or a PR is created, to sync all docs with what changed

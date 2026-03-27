@@ -87,7 +87,6 @@ See `references/skill-activation-matrix.md` for complete matrix.
 
 **Always activate:** `meow:investigate` (all workflows)
 **Conditional:** `meow:scout` (for codebase exploration), brainstormer agent (for complex root cause analysis)
-
 **Subagents:** `developer`, `researcher`, `planner`, `reviewer`, `tester`, `Bash`
 **Parallel:** Multiple `Explore` agents for scouting, `Bash` agents for verification
 
