@@ -59,3 +59,8 @@ Run `/meow:cso` when the user requests a security audit, threat model, pentest r
 | [references/phase-9-10-11-owasp-stride-data.md](references/phase-9-10-11-owasp-stride-data.md)             | OWASP Top 10 (A01-A10), STRIDE threat model, data classification                                                                                           |
 | [references/phase-12-fp-filtering.md](references/phase-12-fp-filtering.md)                                 | Confidence gates, 22 hard exclusions, 12 precedents, active verification, variant analysis, parallel verification                                          |
 | [references/phase-13-14-report-save.md](references/phase-13-14-report-save.md)                             | Findings report format, trend tracking, incident response playbooks, remediation roadmap, JSON schema, important rules, disclaimer                         |
+
+## Gotchas
+
+- **False positives in vendored/test code**: Security scan flags minified vendor bundles or test fixtures → Exclude vendor/ and test/fixtures/ from scan scope
+- **Missing auth checks on internal endpoints**: "Internal only" APIs often become external → Audit ALL endpoints regardless of intended audience

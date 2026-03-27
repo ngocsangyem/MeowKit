@@ -74,3 +74,8 @@ If running low on context or the user asks to compress: Step 0 > Test diagram > 
 | [question-rules.md](references/question-rules.md)                   | How to ask questions in plan reviews                                         |
 | [required-outputs.md](references/required-outputs.md)               | NOT in scope, What exists, TODOs, failure modes, summary                     |
 | [review-log-dashboard.md](references/review-log-dashboard.md)       | Review log, readiness dashboard, plan file report, chaining                  |
+
+## Gotchas
+
+- **Bikeshedding on naming while missing architecture issues**: Spending review time on variable names instead of data flow → Review architecture and security FIRST; style issues last
+- **Not checking backward compatibility**: Approving a plan that breaks existing API consumers → Always check: does this change any public interface?

@@ -115,3 +115,9 @@ Load as needed:
 - `references/workflow-test.md` - Test suite failures
 - `references/workflow-types.md` - TypeScript type errors
 - `references/workflow-ui.md` - Visual/UI issues (requires design skills)
+
+## Gotchas
+
+- **Fixing symptoms not root cause**: Quick patch makes the test pass but underlying issue remains → Always investigate before implementing; use meow:investigate first
+- **Regression in adjacent code**: Fix in one module breaks an unstated dependency → Run full test suite, not just tests for the changed file
+- **Test mocking hiding real failures**: Mocked tests pass but real integration fails → Prefer integration tests for bug fixes; mock only external services

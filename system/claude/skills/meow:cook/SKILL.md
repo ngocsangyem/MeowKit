@@ -117,3 +117,9 @@ Human review required at these checkpoints (skipped with `--auto`):
 - `references/workflow-steps.md` - Detailed step definitions for all modes
 - `references/review-cycle.md` - Interactive and auto review processes
 - `references/subagent-patterns.md` - Subagent invocation patterns
+
+## Gotchas
+
+- **Skipping Gate 1 on "simple" features**: Features that seem simple grow during implementation → Always create a plan file; cancel it if truly trivial
+- **Context loss between phases**: Long multi-phase workflows exceed context window → Update Agent State section after each phase; next agent reads it first
+- **Spinner hiding error output**: Spinner clears the line, masking error messages beneath → Log errors to stderr before spinner.fail()

@@ -48,3 +48,8 @@ Load **only when needed** — not all upfront.
 ## Handoff
 
 On completion → `shipper` agent handles the actual git operations and PR creation.
+
+## Gotchas
+
+- **Canary deploy without monitoring**: Deploying canary but not watching metrics → Always set up health checks BEFORE canary rollout; define rollback trigger
+- **Rollback plan referencing deleted infrastructure**: Rollback docs point to old deployment scripts → Validate rollback plan against current infra before every ship

@@ -74,3 +74,8 @@ Load these **only when executing** the corresponding step — not upfront.
 - **No external tool dependencies** — uses only Claude Code built-in Explore
 - **Security** — never access .env, credentials, or SSH keys during scouting
 - **Tier 3 always excluded** — no exceptions regardless of task
+
+## Gotchas
+
+- **Subagents returning partial results**: Context window exceeded, agent returns truncated output → Set explicit file count limits per subagent; merge results with dedup
+- **Missing hidden files in directory scan**: Default glob patterns skip dotfiles → Include dotfiles explicitly when scanning config directories

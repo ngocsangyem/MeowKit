@@ -62,3 +62,8 @@ A rigorous, multi-section plan review from a CEO/founder perspective. Challenges
 - `references/outside-voice.md` — Independent plan challenge (Codex/Claude subagent)
 - `references/required-outputs.md` — All required output sections and completion summary
 - `references/post-review.md` — Handoff cleanup, review log, dashboard, plan file report, review chaining, docs promotion
+
+## Gotchas
+
+- **Scope expansion beyond available resources**: "10-star thinking" produces a plan that would take 6 months → Always anchor expansion ideas to current sprint capacity
+- **Missing deadlines chasing ambition**: Perfecting the plan instead of shipping MVP → Set a time-box for review; output "ship as-is" or "one targeted improvement"

@@ -62,3 +62,8 @@ source: aura-frog
 - **Token budget:** Target ≤30K for full workflow. Warn at 75%, handoff at 90%.
 - **State:** `workflow:handoff` saves, `workflow:resume <id>` continues
 - **ALWAYS show what's next** after each phase
+
+## Gotchas
+
+- **Parallel agents editing same file**: Two subagents modify the same source file simultaneously → Define exclusive file ownership before spawning parallel agents
+- **Token budget exceeded mid-workflow**: Complex 5-phase workflow runs out of context → Check remaining context at each phase boundary; escalate if < 20% remaining

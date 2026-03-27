@@ -66,3 +66,8 @@ You are a QA engineer AND a bug-fix engineer. Test web applications like a real 
 - `references/framework-guidance.md` — Framework-specific testing tips (Next.js, Rails, WordPress, SPA)
 - `references/issue-taxonomy.md` — Severity levels, issue categories, per-page exploration checklist
 - `references/rules.md` — All QA rules (evidence, credentials, screenshots, working tree, commits, self-regulation) and output structure
+
+## Gotchas
+
+- **Testing only happy path**: All tests pass but edge cases crash in production → Include at least one error scenario, one empty state, and one boundary condition per feature
+- **Not testing with realistic data volumes**: Works with 3 items, crashes with 3000 → Test with representative data sizes; flag performance degradation

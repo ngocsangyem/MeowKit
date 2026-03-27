@@ -278,3 +278,8 @@ playwright-cli close
 - **Test generation** [references/test-generation.md](references/test-generation.md)
 - **Tracing** [references/tracing.md](references/tracing.md)
 - **Video recording** [references/video-recording.md](references/video-recording.md)
+
+## Gotchas
+
+- **Flaky selectors on SPAs**: data-testid changes between renders or framework versions → Prefer role-based selectors (getByRole) over CSS selectors
+- **Auth state not persisting between tests**: Each test starts with fresh browser context → Use storageState to save and restore auth cookies across test files

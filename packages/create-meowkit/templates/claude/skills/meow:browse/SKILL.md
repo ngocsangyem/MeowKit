@@ -53,3 +53,8 @@ Persistent headless Chromium browser for QA testing and site dogfooding. First c
 - `references/snapshot-flags.md` — Snapshot flag reference (-i, -c, -d, -s, -D, -a, -o, -C), ref numbering, output format
 - `references/user-handoff.md` — Handoff/resume for CAPTCHAs, MFA, OAuth
 - `references/command-reference.md` — Full command list (navigation, reading, interaction, inspection, visual, snapshot, meta, tabs, server)
+
+## Gotchas
+
+- **SPA content not rendered**: Headless browser captures DOM before JS hydration completes → Add explicit wait for selector or networkidle before assertions
+- **Auth-gated pages return 401**: Session cookies expire between commands → Re-authenticate or pass cookies explicitly before each protected page test

@@ -108,3 +108,8 @@ See `references/output-templates.md` for full templates.
 | Element not found | Selector fails | Re-snapshot, try alternate | "Element not found, re-scanning..." |
 | Spec not found | File missing | Ask user | "Spec file not found. Provide path or URL." |
 | Playwright exec fails | Non-zero exit | Show error + fix hints | "Test failed: [error]. Fix: [hint]" |
+
+## Gotchas
+
+- **Testing against stale deployment**: Running E2E tests against yesterday's build → Verify deployment version matches expected before starting test run
+- **Credentials hardcoded in generated spec files**: Auto-generated .spec.ts contains login credentials → Always use environment variables for credentials; never inline in test code

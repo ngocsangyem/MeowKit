@@ -84,3 +84,8 @@ When resuming work on an existing plan:
 3. Update status of completed/blocked phases
 4. Mark todos as done: `- [x]`
 5. NEVER leave items as in_progress when finishing — mark Done, Blocked, or Cancelled
+
+## Gotchas
+
+- **Wrong template for scope**: Using plan-quick.md for a multi-phase project → Check: if > 5 files OR > 2 hours, use plan-template.md
+- **Acceptance criteria too vague to verify**: "App works correctly" can't be tested → Every criterion must be independently verifiable by running a specific command or checking a specific file

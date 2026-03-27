@@ -48,3 +48,8 @@ author: vudovn (antigravity-kit)
 | Keep functions small   | Write 100+ line functions |
 
 > The user wants working code, not a programming lesson.
+
+## Gotchas
+
+- **Over-abstracting simple code**: Creating helpers for one-time operations violates YAGNI → Three similar lines are better than a premature abstraction
+- **Removing error handling deemed unnecessary**: Stripping try-catch from system boundaries loses resilience → Only remove error handling for internal calls with guaranteed contracts

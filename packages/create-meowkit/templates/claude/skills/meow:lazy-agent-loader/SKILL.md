@@ -89,3 +89,8 @@ Step 4: For SECONDARY agents, use summary from index
 | **[loading-details.md](./references/loading-details.md)** | When loading specific agents | Commands, token savings, cache strategy, examples |
 
 **Note:** This skill is automatically used by `agent-detector` for optimized loading.
+
+## Gotchas
+
+- **Agent loaded too late missing context**: Lazy loading skips context that was available at session start → Pre-load agents that need session-start context (orchestrator, analyst)
+- **Cache serving stale agent definition**: Agent file updated but cached version used → Invalidate cache on file mtime change

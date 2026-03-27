@@ -73,3 +73,8 @@ Post-ship workflow that ensures every documentation file in the project is accur
 - `references/step8-version-bump.md` — VERSION bump decision flow
 - `references/step9-commit-and-output.md` — Commit, push, PR update, and health summary
 - `references/important-rules.md` — Core rules: read before edit, never clobber, be explicit
+
+## Gotchas
+
+- **CHANGELOG voice inconsistency**: Mixing first-person and third-person across entries → Always use imperative mood: "Add feature" not "Added feature" or "I added feature"
+- **README links to deleted files**: Refactored paths not updated in documentation → Run link checker after doc updates; grep for old paths

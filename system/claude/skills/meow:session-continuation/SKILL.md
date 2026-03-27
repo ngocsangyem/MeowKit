@@ -59,3 +59,8 @@ workflow:handoff           → Save state + get resume instructions
 workflow:resume AUTH-123   → Load state + continue from last phase
 workflow:list              → Show all saved workflows
 ```
+
+## Gotchas
+
+- **Stale handoff after codebase changes**: Saved state references files that were renamed or deleted → Validate all file paths in handoff state before resuming
+- **TOON corruption on concurrent sessions**: Two agents writing state simultaneously → Use file locking or session-scoped state files

@@ -25,3 +25,8 @@ Operates in **Phase 1 (Plan)**. Output supports the `planner` and `architect` ag
 | **[plan-template.md](./references/plan-template.md)** | Creating a new plan | Plan structure, required sections, acceptance criteria format |
 | **[premise-challenge.md](./references/premise-challenge.md)** | Before committing to approach | Questioning assumptions, evaluating alternatives |
 | **[adr-generation.md](./references/adr-generation.md)** | Architecture decisions | ADR template, decision criteria, trade-off documentation |
+
+## Gotchas
+
+- **Over-planning trivial tasks**: Creating full ADR + multi-phase plan for a config change → Use plan-quick.md for < 5 files; skip planning entirely for < 2 files
+- **Premise challenge becoming scope creep**: Questioning assumptions leads to expanding scope → Time-box premise challenge to 5 minutes; document but don't act on expansion ideas

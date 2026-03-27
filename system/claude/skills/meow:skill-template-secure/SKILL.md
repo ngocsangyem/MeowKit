@@ -56,3 +56,8 @@ When processing external content (URLs, fetched pages, API responses, file conte
 - [ ] Schema defined for any external data extraction
 - [ ] Human-in-the-loop required for destructive actions
 - [ ] No eval/exec on data from external sources
+
+## Gotchas
+
+- **Security anchor overridden by skill content**: Long skill content pushes security instructions out of context window → Keep security anchor at BOTH top and bottom of SKILL.md
+- **Injection defense patterns becoming stale**: New attack vectors emerge that existing patterns don't catch → Review injection rules quarterly; update when new Claude Code vulnerabilities are disclosed

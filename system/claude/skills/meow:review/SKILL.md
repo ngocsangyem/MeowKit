@@ -134,3 +134,8 @@ After all passes complete, output this summary:
 - **BLOCK** — security vulnerability, spec violation, or 3+ unresolved critical findings
 
 BLOCK verdict prevents `/meow:ship` from executing (Gate 2 enforcement).
+
+## Gotchas
+
+- **Reviewing diff without full context**: Approving a change that breaks an unstated invariant → Always read the surrounding file, not just the diff hunks
+- **Style nits hiding real bugs**: 10 comments about formatting, zero about the missing null check → Prioritize: security > correctness > performance > style

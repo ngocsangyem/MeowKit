@@ -74,3 +74,8 @@ Load **only when executing** the corresponding step — not upfront.
 - **Minimal diff** — fix root cause with fewest files/lines possible
 - **Regression test required** — must fail without fix, pass with fix
 - **>5 files touched** — AskUserQuestion about blast radius before proceeding
+
+## Gotchas
+
+- **Confirming hypothesis without disproving alternatives**: Finding evidence FOR a theory doesn't mean it's correct → Actively test at least one alternative hypothesis before concluding
+- **Log timestamps in wrong timezone**: Server logs in UTC, local comparison in local time → Normalize all timestamps to UTC before correlation

@@ -750,3 +750,9 @@ The dashboard runs independently of browser sessions on port 4848 (configurable 
 ./templates/authenticated-session.sh https://app.example.com/login
 ./templates/capture-workflow.sh https://example.com ./output
 ```
+
+## Gotchas
+
+- **Stale refs after dynamic DOM updates**: Refs like `@e1` are invalidated whenever the DOM changes — not just on full navigation. Modals opening, infinite scroll loading, and tab switches all invalidate refs silently. Commands using stale refs succeed but target the wrong element or throw. → Always re-run `agent-browser snapshot -i` after any interaction that causes DOM change, not just page navigation.
+- **Iframes with cross-origin restrictions**: While snapshot inlines iframe content automatically, sandboxed or cross-origin iframes (e.g., embedded Stripe, reCAPTCHA) block CDP access. Refs inside these iframes will appear in the snapshot but `fill`/`click` commands will fail silently or error. → Use `agent-browser screenshot --annotate` to confirm the element is reachable; for payment iframes use `--auto-connect` against a browser where the user has already interacted with the iframe.
+- **JavaScript dialogs blocking all commands**: An unhandled `alert()`, `confirm()`, or `prompt()` freezes every subsequent command with a timeout, not a descriptive error. This is common on logout confirmation dialogs and delete actions. → Before debugging timeouts on a known-interactive page, run `agent-browser dialog status` first; dismiss with `agent-browser dialog accept` or `dismiss` before retrying.

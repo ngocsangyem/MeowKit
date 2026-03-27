@@ -83,3 +83,8 @@ See `references/tone-and-rules.md`
 | `references/global-retro.md`               | Global mode: cross-project retro (Steps 1-9)                         |
 | `references/compare-mode.md`               | Compare mode: period-over-period comparison                          |
 | `references/tone-and-rules.md`             | Tone guidelines and important rules                                  |
+
+## Gotchas
+
+- **Recency bias in commit analysis**: Last 2 days dominate the retro, early-week work forgotten → Weight all days equally; show per-day breakdown
+- **Misattributing pair-programmed work**: Co-authored commits counted for committer only → Parse Co-authored-by trailers in commit messages
