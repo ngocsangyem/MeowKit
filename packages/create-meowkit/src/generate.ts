@@ -4,6 +4,8 @@ import pc from "picocolors";
 import type { UserConfig } from "./prompts.js";
 import { copyDirRecursive, resolveTemplateDir } from "./copy-template-tree.js";
 import { processTemplate } from "./substitute-placeholders.js";
+import { buildManifest, writeManifest } from "./compute-checksums.js";
+import * as log from "./logger.js";
 
 /**
  * Generates the full MeowKit system by copying templates and substituting placeholders.
@@ -122,8 +124,13 @@ export async function generate(
     }
   }
 
+  // Step 6: Write manifest for future update tracking
   if (!dryRun) {
-    console.log(pc.green(`  Created ${fileCount} files`));
+    log.debug("Building file manifest...");
+    const manifest = buildManifest(targetDir);
+    writeManifest(targetDir, manifest);
+    log.debug(`Manifest written: ${Object.keys(manifest.checksums).length} files tracked`);
+    log.success(`Created ${fileCount} files`);
   }
 
   return fileCount;

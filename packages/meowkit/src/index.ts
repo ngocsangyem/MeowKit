@@ -8,6 +8,7 @@ import { validate } from "./commands/validate.js";
 import { budget } from "./commands/budget.js";
 import { memory } from "./commands/memory.js";
 import { doctor } from "./commands/doctor.js";
+import { setup } from "./commands/setup.js";
 
 const VERSION = "0.1.0";
 
@@ -23,6 +24,7 @@ ${pc.bold("Commands:")}
   ${pc.green("validate")}   Validate .claude/ project structure
   ${pc.green("budget")}     View token usage and cost log
   ${pc.green("memory")}     Manage agent memory (lessons & patterns)
+  ${pc.green("setup")}      Guided post-scaffold configuration
   ${pc.green("doctor")}     Diagnose common environment issues
   ${pc.green("status")}     Print version and config summary
 
@@ -51,7 +53,8 @@ async function printStatus(): Promise<void> {
 
 async function main(): Promise<void> {
   const args = minimist(process.argv.slice(2), {
-    boolean: ["help", "version", "check", "beta", "monthly", "clear", "show", "stats"],
+    boolean: ["help", "version", "check", "beta", "monthly", "clear", "show", "stats", "report"],
+    string: ["only"],
     alias: { h: "help", v: "version" },
   });
 
@@ -80,8 +83,11 @@ async function main(): Promise<void> {
     case "memory":
       await memory({ clear: args.clear as boolean | undefined, show: args.show as boolean | undefined, stats: args.stats as boolean | undefined });
       break;
+    case "setup":
+      setup({ only: args.only as string | undefined });
+      break;
     case "doctor":
-      await doctor();
+      await doctor({ report: args.report as boolean | undefined });
       break;
     case "status":
       await printStatus();

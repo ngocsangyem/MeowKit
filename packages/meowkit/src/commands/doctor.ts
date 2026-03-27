@@ -264,14 +264,43 @@ function checkScriptsPresent(): DiagResult {
   };
 }
 
-export async function doctor(): Promise<void> {
+function checkMcpConfig(): DiagResult {
+  const meowkitDir = findMeowkitDir();
+  if (!meowkitDir) {
+    return { name: "MCP config", status: "warn", detail: "Skipped — no .claude/ found" };
+  }
+  const projectDir = path.dirname(meowkitDir);
+  const mcpPath = path.join(projectDir, ".mcp.json");
+  if (fs.existsSync(mcpPath)) {
+    return { name: "MCP config", status: "pass", detail: ".mcp.json found" };
+  }
+  return {
+    name: "MCP config",
+    status: "warn",
+    detail: "No .mcp.json — run 'meowkit setup --only=mcp' to create from example",
+  };
+}
+
+function checkSkillsVenv(): DiagResult {
+  const meowkitDir = findMeowkitDir();
+  if (!meowkitDir) {
+    return { name: "Skills venv", status: "warn", detail: "Skipped — no .claude/ found" };
+  }
+  const venvDir = path.join(meowkitDir, "skills", ".venv");
+  if (fs.existsSync(venvDir)) {
+    return { name: "Skills venv", status: "pass", detail: venvDir };
+  }
+  return {
+    name: "Skills venv",
+    status: "warn",
+    detail: "No Python venv for skills — run 'meowkit setup --only=venv' to create",
+  };
+}
+
+export async function doctor(args?: { report?: boolean }): Promise<void> {
   console.log(pc.bold(pc.cyan("MeowKit Doctor")));
   console.log(pc.dim("Diagnosing common issues..."));
   console.log();
-
-  // Dependency install step evaluated 260326 — deferred: all deps are SAFE-ASSUME
-  // (Node 20+, Python 3.9+, Git, POSIX shell). No pip/npm runtime deps needed.
-  // All Python scripts use stdlib only. Re-evaluate if future scripts add pip deps.
 
   const results: DiagResult[] = [
     checkNodeVersion(),
@@ -281,6 +310,8 @@ export async function doctor(): Promise<void> {
     checkHooksExecutable(),
     checkScriptsPresent(),
     checkMemoryWritable(),
+    checkMcpConfig(),
+    checkSkillsVenv(),
   ];
 
   for (const result of results) {
@@ -300,6 +331,24 @@ export async function doctor(): Promise<void> {
   if (failCount > 0) parts.push(pc.red(`${failCount} failed`));
 
   console.log(parts.join(", "));
+
+  // Generate shareable report if --report flag
+  if (args?.report) {
+    const reportLines = [
+      `# MeowKit Doctor Report`,
+      `Date: ${new Date().toISOString()}`,
+      `Node: ${process.versions.node}`,
+      `Platform: ${process.platform} ${process.arch}`,
+      ``,
+      `## Results`,
+      ...results.map((r) => `- [${r.status.toUpperCase()}] ${r.name}: ${r.detail}`),
+      ``,
+      `## Summary: ${passCount} passed, ${warnCount} warnings, ${failCount} failed`,
+    ];
+    const reportText = reportLines.join("\n");
+    console.log(pc.dim("\n--- Report (copy/paste to share) ---"));
+    console.log(reportText);
+  }
 
   if (failCount > 0) {
     process.exit(1);

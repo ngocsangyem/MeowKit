@@ -6,6 +6,8 @@ import { detectStack } from "./detect-stack.js";
 import { promptUser } from "./prompts.js";
 import { generate } from "./generate.js";
 import { validate } from "./validate.js";
+import { smartUpdate } from "./smart-update.js";
+import * as log from "./logger.js";
 
 const USAGE = `
 ${pc.bold("create-meowkit")} - scaffold a meowkit configuration for your project
@@ -19,12 +21,14 @@ ${pc.bold("Options:")}
   --mode        Set default mode: fast | balanced | strict
   --no-memory   Disable memory/context persistence
   --global      Install as global config (~/.claude/)
+  --json        Output structured JSON (for CI/scripting)
+  --verbose     Enable debug logging
   --help        Show this help message
 `;
 
 async function main(): Promise<void> {
   const argv = minimist(process.argv.slice(2), {
-    boolean: ["force", "dry-run", "memory", "global", "help"],
+    boolean: ["force", "dry-run", "memory", "global", "help", "json", "verbose"],
     string: ["mode"],
     default: {
       memory: true,
@@ -32,6 +36,8 @@ async function main(): Promise<void> {
       "dry-run": false,
       global: false,
       help: false,
+      json: false,
+      verbose: false,
     },
     alias: {
       h: "help",
@@ -39,7 +45,15 @@ async function main(): Promise<void> {
       n: "dry-run",
       m: "mode",
       g: "global",
+      v: "verbose",
     },
+  });
+
+  // Initialize logger before any output
+  log.initLogger({
+    json: argv.json,
+    verbose: argv.verbose,
+    command: "create-meowkit",
   });
 
   if (argv.help) {
@@ -53,32 +67,29 @@ async function main(): Promise<void> {
   const global: boolean = argv.global;
   const modeOverride: string | undefined = argv.mode;
 
-  // For --global: target is ~/ (generate.ts creates .claude/ inside targetDir)
-  // For local: target is cwd (generate.ts creates .claude/ inside targetDir)
   const targetDir = global
     ? (process.env.HOME ?? "~")
     : process.cwd();
 
   if (dryRun) {
-    console.log(pc.yellow("Dry-run mode enabled. No files will be written.\n"));
+    log.info(pc.yellow("Dry-run mode enabled. No files will be written.\n"));
   }
 
   // Step 1: Detect project stack
-  console.log(pc.cyan("Detecting project stack..."));
+  log.info("Detecting project stack...");
   const detected = detectStack(targetDir);
+  log.debug(`Stack detection result: ${JSON.stringify(detected)}`);
 
   if (detected.type !== "unknown") {
-    console.log(
-      pc.green(
-        `Detected: ${detected.type} (${detected.frameworks.join(", ") || "no frameworks"}) ` +
-          `[confidence: ${Math.round(detected.confidence * 100)}%]`
-      )
+    log.success(
+      `Detected: ${detected.type} (${detected.frameworks.join(", ") || "no frameworks"}) ` +
+        `[confidence: ${Math.round(detected.confidence * 100)}%]`
     );
   } else {
-    console.log(pc.yellow("Could not auto-detect project type."));
+    log.warn("Could not auto-detect project type.");
   }
 
-  // Step 2: Interactive prompts
+  // Step 2: Interactive prompts (skip in json mode — require all flags)
   const config = await promptUser(detected);
 
   // Apply CLI overrides
@@ -87,9 +98,7 @@ async function main(): Promise<void> {
     if (validModes.includes(modeOverride as (typeof validModes)[number])) {
       config.defaultMode = modeOverride as (typeof validModes)[number];
     } else {
-      console.warn(
-        pc.yellow(`Invalid mode "${modeOverride}". Using "${config.defaultMode}" from prompt.`)
-      );
+      log.warn(`Invalid mode "${modeOverride}". Using "${config.defaultMode}" from prompt.`);
     }
   }
 
@@ -97,43 +106,60 @@ async function main(): Promise<void> {
     config.enableMemory = false;
   }
 
-  // Step 3: Check for existing .claude directory
-  if (!force && !dryRun) {
-    const { existsSync } = await import("node:fs");
-    const meowkitDir = `${targetDir}/.claude`;
-    if (existsSync(meowkitDir)) {
-      console.error(
-        pc.red(
-          `\n${meowkitDir} already exists. Use --force to overwrite.`
-        )
-      );
-      process.exit(1);
+  // Step 3: Check for existing .claude directory — switch to update mode
+  const { existsSync } = await import("node:fs");
+  const meowkitDir = `${targetDir}/.claude`;
+  const isUpdate = existsSync(meowkitDir) && !force && !dryRun;
+
+  let fileCount: number;
+
+  if (isUpdate) {
+    // Smart update mode: preserve user modifications
+    log.info("Existing MeowKit installation detected — switching to update mode...");
+    log.setData("mode", "update");
+    const stats = await smartUpdate(config, targetDir, dryRun);
+    fileCount = stats.updated + stats.added;
+
+    if (stats.userModified.length > 0) {
+      log.warn(`Skipped ${stats.userModified.length} user-modified file(s):`);
+      for (const f of stats.userModified.slice(0, 10)) {
+        log.warn(`  ${f}`);
+      }
+      if (stats.userModified.length > 10) {
+        log.warn(`  ... and ${stats.userModified.length - 10} more`);
+      }
     }
+
+    log.success(`Update complete: ${stats.updated} updated, ${stats.added} new, ${stats.skipped} skipped`);
+  } else {
+    // Fresh install mode
+    log.info("Generating configuration files...");
+    log.setData("mode", "install");
+    fileCount = await generate(config, targetDir, dryRun);
   }
 
-  // Step 4: Generate files
-  console.log(pc.cyan("\nGenerating configuration files..."));
-  const fileCount = await generate(config, targetDir, dryRun);
+  log.setData("filesCreated", fileCount);
+  log.setData("targetDir", targetDir);
+  log.debug(`Processed ${fileCount} files in ${targetDir}`);
 
   // Step 5: Validate output (skip for dry-run)
   if (!dryRun) {
-    console.log(pc.cyan("\nValidating output..."));
+    log.info("Validating output...");
     const result = validate(targetDir);
+    log.setData("validation", { valid: result.valid, issues: result.issues });
 
     if (!result.valid) {
-      console.warn(pc.yellow("\nValidation found issues:"));
+      log.warn("Validation found issues:");
       for (const issue of result.issues) {
-        console.warn(pc.yellow(`  - ${issue}`));
+        log.warn(`  - ${issue}`);
       }
     }
   }
 
   // Step 6: Summary
-  console.log(
-    `\n${pc.green(pc.bold("Done!"))} ${dryRun ? "Would create" : "Created"} ${pc.bold(String(fileCount))} files in ${pc.dim(targetDir)}`
-  );
+  log.success(`${dryRun ? "Would create" : "Created"} ${fileCount} files in ${targetDir}`);
 
-  if (!dryRun) {
+  if (!dryRun && !log.isJson()) {
     console.log(`\n${pc.bold("Scaffolded the full MeowKit system:")}`);
     console.log(`  ${pc.cyan("agents/")}    13 specialist agents (planner, developer, reviewer, ...)`);
     console.log(`  ${pc.cyan("skills/")}    40+ skills (cook, fix, ship, review, qa, ...)`);
@@ -145,14 +171,15 @@ async function main(): Promise<void> {
 
     console.log(`\n${pc.bold("Next steps:")}`);
     console.log(`  ${pc.dim("1.")} Review ${pc.bold("CLAUDE.md")} for project conventions`);
-    console.log(`  ${pc.dim("2.")} Copy ${pc.bold(".mcp.json.example")} → ${pc.bold(".mcp.json")} and configure MCP servers`);
-    console.log(`  ${pc.dim("3.")} Copy ${pc.bold(".env.example")} → ${pc.bold(".env")} and add API keys`);
-    console.log(`  ${pc.dim("4.")} Append ${pc.bold(".gitignore.meowkit")} to your .gitignore`);
-    console.log(`  ${pc.dim("5.")} Run ${pc.bold("npx meowkit doctor")} to verify your environment`);
+    console.log(`  ${pc.dim("2.")} Run ${pc.bold("npx meowkit setup")} for guided configuration`);
+    console.log(`  ${pc.dim("3.")} Run ${pc.bold("npx meowkit doctor")} to verify your environment`);
   }
+
+  log.flush();
 }
 
 main().catch((err: unknown) => {
-  console.error(pc.red("Fatal error:"), err instanceof Error ? err.message : String(err));
+  log.error(err instanceof Error ? err.message : String(err));
+  log.flush();
   process.exit(1);
 });
