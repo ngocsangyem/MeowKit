@@ -19,22 +19,18 @@ persona: A
 npm create meowkit@latest
 ```
 
-The CLI auto-detects your stack (Node.js, Python, Swift, Go, monorepo), asks a few configuration questions, and generates a `.claude/` directory with everything configured.
+The CLI asks two optional questions then generates a `.claude/` directory with everything configured.
 
 ### Interactive setup
 
-The CLI asks these questions:
+The CLI asks two questions:
 
-| Question | Options | Default |
-|----------|---------|---------|
-| Project name | free text | directory name |
-| Tech stack | Node.js, Python, Go, Swift, React, Vue, Next.js, etc. | auto-detected |
-| Team size | Solo, Small (2-5), Team (6+) | — |
-| Primary tool | Claude Code, Antigravity, Both | Claude Code |
-| Default mode | Fast, Balanced, Strict | Balanced |
-| Cost tracking | yes/no | yes |
-| Memory | yes/no | yes |
-| Gemini API key | free text (optional) | skip |
+| Question | Default |
+|----------|---------|
+| Project description (optional) | skipped |
+| Gemini API key (optional) | skipped |
+
+All other settings use fixed defaults: cost tracking enabled, memory enabled, mode set to `balanced`. Stack detection is not performed.
 
 ### CLI flags
 
@@ -107,6 +103,17 @@ Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 | Hooks not executable | Run `chmod +x .claude/hooks/*.sh` |
 | Python scripts fail | Ensure Python 3.9+ is in PATH |
 | Claude Code doesn't load CLAUDE.md | Restart Claude Code session |
+
+## Post-install steps
+
+After scaffolding completes, run the MeowKit setup and verify your installation:
+
+```bash
+npx meowkit setup
+npx meowkit doctor
+```
+
+`npx meowkit setup` finalises any post-scaffold configuration. `npx meowkit doctor` checks Node.js version, Python version, Git availability, hooks executable, and scripts present.
 
 ## Next steps
 

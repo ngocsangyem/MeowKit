@@ -20,21 +20,22 @@ Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has 
 
 ## Phase 1 — Plan ✋ Gate 1
 
-**Agent:** planner  
+**Agent:** planner
 **Deliverable:** `tasks/plans/YYMMDD-name.md`
 
 - Challenge premises (/office-hours pattern)
 - Product lens: is this the right thing to build?
 - Engineering lens: is this the right way to build it?
 - Architecture check: does this need an ADR?
+- Create a task file using `npx meowkit task new --type feature` before implementation
 - **HUMAN APPROVAL REQUIRED** — no code until plan is approved
 
 ## Phase 2 — Test RED
 
-**Agent:** tester  
+**Agent:** tester
 **Deliverable:** Failing tests
 
-- Write failing tests FIRST
+- Write failing tests FIRST — the task file's acceptance criteria drive the test cases
 - `pre-implement.sh` hook: BLOCKS if no failing test exists
 - Security pre-check: scan for known anti-patterns
 
@@ -50,11 +51,12 @@ Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has 
 
 ## Phase 4 — Review ✋ Gate 2
 
-**Agent:** reviewer  
+**Agent:** reviewer
 **Deliverable:** `tasks/reviews/YYMMDD-name-verdict.md`
 
 - 5-dimension structural audit: architecture, types, security, tests, performance
 - `validate.py`: deterministic checks outside the LLM
+- Review verdict saved to `tasks/plans/YYMMDD-name/reports/`
 - **HUMAN APPROVAL REQUIRED** — no shipping until review passes
 
 ## Phase 5 — Ship

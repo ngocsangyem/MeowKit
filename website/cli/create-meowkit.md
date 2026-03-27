@@ -14,11 +14,21 @@ Scaffold the full MeowKit system into your project, or update an existing instal
 npm create meowkit@latest [options]
 ```
 
+## Interactive prompts
+
+The CLI asks two questions:
+
+| Question | Default |
+|----------|---------|
+| Project description (optional) | skipped |
+| Gemini API key (optional) | skipped |
+
+All other settings use fixed defaults: cost tracking enabled, memory enabled, mode set to `balanced`. Stack detection is not performed.
+
 ## What happens
 
-1. **Detects your tech stack** — scans for package.json, go.mod, pyproject.toml, etc.
-2. **Asks two questions** — project name + optional Gemini API key
-3. **Scaffolds or updates** `.claude/` with the full system:
+1. **Asks two questions** — optional project description + optional Gemini API key
+2. **Scaffolds or updates** `.claude/` with the full system:
 
 | Component | Count | Description |
 |-----------|-------|-------------|

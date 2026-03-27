@@ -14,9 +14,24 @@ This guide gets you from zero to your first MeowKit-managed task in 5 minutes.
 npm create meowkit@latest
 ```
 
-Answer the prompts or accept defaults. Takes ~30 seconds.
+The CLI asks two optional questions: a project description and a Gemini API key. Press Enter to skip both. All other settings (cost tracking, memory, mode) default automatically. Takes ~30 seconds.
 
-## Step 2: Start a Claude Code session
+After scaffolding completes, run setup and verify:
+
+```bash
+npx meowkit setup
+npx meowkit doctor
+```
+
+## Step 2: Create your first task
+
+```bash
+npx meowkit task new --type feature "My first feature"
+```
+
+This creates a task file under `tasks/plans/` using the feature template. Fill in the acceptance criteria before proceeding.
+
+## Step 4: Start a Claude Code session
 
 Open your terminal in the project directory and start Claude Code:
 
@@ -26,7 +41,7 @@ claude
 
 Claude automatically reads `CLAUDE.md` and loads MeowKit's agents, skills, and rules.
 
-## Step 3: Run your first command
+## Step 5: Run your first command
 
 Try the simplest workflow — planning a feature:
 
@@ -40,7 +55,7 @@ MeowKit will:
 3. Create a structured plan at `tasks/plans/YYMMDD-auth.md`
 4. Ask for your approval (**Gate 1**)
 
-## Step 4: See the full pipeline
+## Step 6: See the full pipeline
 
 Once you approve the plan, try the full cook pipeline:
 
@@ -50,7 +65,7 @@ Once you approve the plan, try the full cook pipeline:
 
 This runs the complete workflow: Plan → Test → Build → Review → Ship. Each phase activates the appropriate agent, and you'll see the two hard gates in action.
 
-## Step 5: Explore more commands
+## Step 7: Explore more commands
 
 | Command | What it does |
 |---------|-------------|
