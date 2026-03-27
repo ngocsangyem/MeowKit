@@ -356,3 +356,45 @@ MeowKit recommends optional MCP servers that enhance agent capabilities. See `.m
 | 2    | `playwright`          | Browser automation for QA | meow:qa, meow:browse        |
 
 All MCP servers are optional. MeowKit skills degrade gracefully without them.
+
+## Task & Planning Templates
+
+### When to create a task file
+
+ALWAYS create a task file before implementation for non-trivial changes.
+Non-trivial = any change affecting more than 2 files OR taking more than 30 minutes.
+
+```bash
+npx meowkit task new --type [feature|bug-fix|refactor|security] "description"
+```
+
+Or manually: copy from `.claude/../tasks/templates/`
+
+### Task file requirements (before Phase 3)
+
+- [ ] Title filled (not generic)
+- [ ] Status set correctly
+- [ ] Goal written (one sentence, outcome-focused)
+- [ ] Acceptance criteria filled (binary, verifiable)
+- [ ] Constraints listed (what must not change)
+- [ ] Scope defined (in/out)
+
+### Agent rules for task files
+
+ALWAYS read the task file at session start before touching code.
+ALWAYS update Agent State section after significant actions.
+ALWAYS check acceptance criteria before marking done.
+NEVER start implementation without an approved task file (Gate 1).
+NEVER mark done without all acceptance criteria checked.
+
+### Template types
+
+| Type | Template | Use when |
+|------|----------|----------|
+| feature-implementation | tasks/templates/feature-implementation.md | Adding new functionality |
+| bug-fix | tasks/templates/bug-fix.md | Fixing broken behavior |
+| refactor | tasks/templates/refactor.md | Restructuring without behavior change |
+| security-audit | tasks/templates/security-audit.md | Security review |
+| guideline | tasks/templates/guideline.md | Team standards document |
+
+See: tasks/templates/TEMPLATE-USAGE.md for full guidance.

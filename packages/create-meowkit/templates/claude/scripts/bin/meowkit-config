@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# meowkit-config — read/write .meowkit.config.json with dot-notation
+# meowkit-config — read/write .claude/meowkit.config.json with dot-notation
 # Usage:
 #   meowkit-config get <dotted.key> [default]
 #   meowkit-config set <dotted.key> <value>
 #   meowkit-config has <dotted.key>  → exit 0 if truthy, 1 if falsy/missing
 set -euo pipefail
 
-CONFIG_FILE="${MEOWKIT_CONFIG:-.meowkit.config.json}"
+CONFIG_FILE="${MEOWKIT_CONFIG:-.claude/meowkit.config.json}"
 
 # Resolve nested key: "features.costTracking" → d["features"]["costTracking"]
 resolve_key() {
@@ -65,7 +65,7 @@ with open('$CONFIG_FILE','w') as f: json.dump(d, f, indent=2)
     ;;
   *)
     cat << 'HELP'
-meowkit-config — read/write .meowkit.config.json
+meowkit-config — read/write .claude/meowkit.config.json
 Usage:
   meowkit-config get <dotted.key> [default]
   meowkit-config set <dotted.key> <value>

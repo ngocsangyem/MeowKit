@@ -82,6 +82,8 @@ async function main(): Promise<void> {
     log.info(pc.yellow("Dry-run mode — no files will be written.\n"));
   }
 
+  log.debug(`Target directory: ${targetDir}`);
+
   // Step 1: Detect stack
   log.info("Detecting project stack...");
   const detected = detectStack(targetDir);
@@ -97,7 +99,9 @@ async function main(): Promise<void> {
   }
 
   // Step 2: Interactive prompts
+  log.debug("Starting interactive prompts...");
   const config = await promptUser(detected);
+  log.debug(`Config collected: ${JSON.stringify({ ...config, geminiApiKey: config.geminiApiKey ? "***" : null })}`);
 
   if (modeOverride) {
     const validModes = ["fast", "balanced", "strict"] as const;
@@ -111,6 +115,7 @@ async function main(): Promise<void> {
   if (!enableMemory) config.enableMemory = false;
 
   // Step 3: Generate/merge with spinner
+  log.info(`Writing to: ${targetDir}`);
   spinner.start("Scaffolding MeowKit system...");
   const stats = await smartUpdate(config, targetDir, dryRun, force);
   const fileCount = stats.updated + stats.added;

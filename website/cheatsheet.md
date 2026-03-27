@@ -101,3 +101,19 @@ persona: B
 | meow:multimodal | Image/video/audio file | Analysis via Gemini |
 | meow:qa-manual | "test this flow" | QA report or Playwright .spec.ts |
 | meow:cso | "security audit" | OWASP + STRIDE findings |
+
+## Task Templates
+
+| Template | Use when | Create with |
+|----------|----------|-------------|
+| feature | Adding new functionality | `npx meowkit task new --type feature` |
+| bug-fix | Fixing broken behavior | `npx meowkit task new --type bug-fix` |
+| refactor | Restructuring code | `npx meowkit task new --type refactor` |
+| security | Security review | `npx meowkit task new --type security` |
+| guideline | Team standards | Copy from `tasks/templates/guideline.md` |
+
+### Task status flow
+`draft` → `in-progress` → `blocked` → `review` → `done`
+
+### Non-trivial rule
+Create a task file for any change affecting > 2 files OR > 30 minutes.

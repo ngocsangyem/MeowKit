@@ -83,7 +83,7 @@ function checkHooksExecutable(meowkitDir: string): CheckResult[] {
 }
 
 function checkConfigJson(meowkitDir: string): CheckResult {
-  const configPath = path.join(path.dirname(meowkitDir), ".meowkit.config.json");
+  const configPath = path.join(meowkitDir, "meowkit.config.json");
   if (!fs.existsSync(configPath)) {
     return {
       name: "Config JSON valid",
@@ -138,7 +138,7 @@ export async function validate(): Promise<void> {
   results.push(checkDirExists(meowkitDir, "agents"));
   results.push(checkDirExists(meowkitDir, "hooks"));
 
-  // CLAUDE.md lives in the project root (parent of .claude/)
+  // CLAUDE.md lives at project root (Claude Code reads it from there)
   const projectRoot = path.dirname(meowkitDir);
   results.push(checkFileExists(projectRoot, "CLAUDE.md"));
 

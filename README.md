@@ -46,32 +46,38 @@ MeowKit core is fully self-contained — zero external dependencies. Optional sk
 npm create meowkit@latest
 ```
 
-The CLI auto-detects your stack (Node.js, Python, Swift, Go, monorepo), asks a few questions (including an optional Gemini API key for multimodal analysis), and generates a `.claude/` directory with everything configured.
+The CLI auto-detects your stack, asks for project name + optional Gemini API key, and scaffolds the full `.claude/` system.
 
-After setup:
+After scaffold:
 
-1. Review `CLAUDE.md` for project conventions
-2. Copy `.mcp.json.example` → `.mcp.json` for optional MCP servers (Context7, Playwright, etc.)
-3. Copy `.env.example` → `.env` for API keys (Gemini, etc.)
-4. Run `npx meowkit doctor` to verify
+```bash
+npx meowkit setup      # Configure: Python venv, MCP, .env, .gitignore
+npx meowkit doctor     # Verify environment
+```
+
+Re-running `npm create meowkit@latest` on an existing project triggers **smart update** — overwrites unchanged core files, skips user-modified files.
 
 ### CLI Flags
 
 ```bash
+npm create meowkit@latest -- --force        # Overwrite all files
 npm create meowkit@latest -- --dry-run      # Preview without writing
-npm create meowkit@latest -- --force        # Overwrite existing .claude/
-npm create meowkit@latest -- --mode strict  # Skip prompts, set mode directly
-npm create meowkit@latest -- --no-memory    # Disable cross-session memory
+npm create meowkit@latest -- --json         # Structured output for CI
+npm create meowkit@latest -- --verbose      # Debug logging
 ```
 
 ### Runtime Commands
 
 ```bash
-npx meowkit doctor     # Check environment (Node, Python, Git, hooks, scripts)
-npx meowkit validate   # Verify .claude/ structure integrity
-npx meowkit budget     # View token usage report
-npx meowkit memory     # View/clear session memory
-npx meowkit upgrade    # Update to latest version
+npx meowkit doctor          # Diagnose environment (10 checks + auto-fix)
+npx meowkit setup           # Guided configuration (venv, MCP, .env, .gitignore)
+npx meowkit task new        # Create structured task file from template
+npx meowkit task list       # List active tasks with status
+npx meowkit validate        # Verify .claude/ structure integrity
+npx meowkit budget          # Token usage report (--monthly for aggregation)
+npx meowkit memory          # View/clear session memory (--show, --stats, --clear)
+npx meowkit upgrade         # Update to latest version (--check, --beta)
+npx meowkit status          # Print version and config
 ```
 
 ## What It Does
@@ -306,11 +312,12 @@ Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS
 │   └── bin/         5 POSIX shell utilities (slug, config, repo-mode, diff-scope, review-log)
 └── rules/           10 rule files + RULES_INDEX.md
 
-CLAUDE.md             Entry point — Claude reads this at session start
-.meowkit.config.json  Project-specific configuration
-.mcp.json.example     Optional MCP server configuration (Context7, Playwright, etc.)
-.env.example          Optional API keys (Gemini, etc.)
-tasks/templates/      Plan templates (plan-template, plan-quick, plan-phase)
+CLAUDE.md              Entry point — Claude reads this at session start (project root)
+.claude/meowkit.config.json   Project configuration
+.claude/meowkit.manifest.json Checksum manifest (for smart updates)
+.claude/env.example           API key template
+.claude/mcp.json.example      MCP server config template
+tasks/templates/       Task templates (feature, bug-fix, refactor, security, guideline)
 ```
 
 ### Self-Contained Design

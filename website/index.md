@@ -24,4 +24,6 @@ features:
     details: From docs retrieval to multimodal analysis, code review to QA testing. Progressive disclosure keeps context tight.
   - title: 💾 Cross-Session Memory
     details: Lessons, patterns, and costs persist across sessions. After 10 sessions, the analyst proposes CLAUDE.md improvements.
+  - title: 📋 Structured Task System
+    details: Template-driven task files help agents resume work without losing context. Five template types with acceptance criteria, constraints, and live agent state tracking.
 ---

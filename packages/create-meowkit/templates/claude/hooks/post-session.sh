@@ -5,7 +5,7 @@
 MEMORY_DIR=".claude/memory"
 
 # Skip if memory disabled in config
-if [ -f .meowkit.config.json ]; then
+if [ -f .claude/meowkit.config.json ]; then
   if command -v .claude/scripts/bin/meowkit-config >/dev/null 2>&1; then
     .claude/scripts/bin/meowkit-config has features.memory 2>/dev/null || { echo "Memory disabled in config — skipping"; exit 0; }
   fi

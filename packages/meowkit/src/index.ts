@@ -9,6 +9,7 @@ import { budget } from "./commands/budget.js";
 import { memory } from "./commands/memory.js";
 import { doctor } from "./commands/doctor.js";
 import { setup } from "./commands/setup.js";
+import { task } from "./commands/task.js";
 
 const VERSION = "0.1.0";
 
@@ -27,6 +28,7 @@ ${pc.bold("Commands:")}
   ${pc.green("setup")}      Guided post-scaffold configuration
   ${pc.green("doctor")}     Diagnose common environment issues
   ${pc.green("status")}     Print version and config summary
+  ${pc.green("task")}       Create and list task files (new, list)
 
 ${pc.bold("Options:")}
   --help, -h       Show help
@@ -38,7 +40,7 @@ async function printStatus(): Promise<void> {
   console.log(`${pc.bold(pc.cyan("meowkit"))} ${pc.dim(`v${VERSION}`)}`);
   console.log();
 
-  const configPath = ".meowkit.config.json";
+  const configPath = ".claude/meowkit.config.json";
   try {
     const content = fs.readFileSync(configPath, "utf-8");
     const config: Record<string, unknown> = JSON.parse(content) as Record<string, unknown>;
@@ -47,14 +49,14 @@ async function printStatus(): Promise<void> {
       console.log(`  ${pc.dim(key)}: ${String(value)}`);
     }
   } catch {
-    console.log(`${pc.dim("No .meowkit.config.json found in current directory.")}`);
+    console.log(`${pc.dim("No .claude/meowkit.config.json found.")}`);
   }
 }
 
 async function main(): Promise<void> {
   const args = minimist(process.argv.slice(2), {
-    boolean: ["help", "version", "check", "beta", "monthly", "clear", "show", "stats", "report"],
-    string: ["only"],
+    boolean: ["help", "version", "check", "beta", "monthly", "clear", "show", "stats", "report", "all"],
+    string: ["only", "type", "priority", "status"],
     alias: { h: "help", v: "version" },
   });
 
@@ -92,6 +94,20 @@ async function main(): Promise<void> {
     case "status":
       await printStatus();
       break;
+    case "task": {
+      const subcommand = args._[1] as string | undefined;
+      // positional description: everything after the subcommand that isn't a flag
+      const description = args._.slice(2).join(" ");
+      task({
+        subcommand,
+        type: args.type as string | undefined,
+        priority: args.priority as string | undefined,
+        all: args.all as boolean | undefined,
+        status: args.status as string | undefined,
+        description: description || undefined,
+      });
+      break;
+    }
     default:
       if (command) {
         console.error(pc.red(`Unknown command: ${command}`));

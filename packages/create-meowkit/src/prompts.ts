@@ -13,13 +13,9 @@ export interface UserConfig {
   geminiApiKey: string | null;
 }
 
-function isCancel(value: unknown): value is symbol {
-  return p.isCancel(value);
-}
-
 function handleCancel(value: unknown): void {
-  if (isCancel(value)) {
-    p.cancel("Setup cancelled.");
+  if (p.isCancel(value)) {
+    p.cancel("Setup cancelled. No files were created.");
     process.exit(0);
   }
 }
@@ -44,115 +40,34 @@ export async function promptUser(detected: DetectedStack): Promise<UserConfig> {
     );
   }
 
-  // Project name
+  // Project name — only interactive prompt
   const projectName = await p.text({
     message: "What is your project name?",
     placeholder: "my-project",
     validate(value) {
-      if (!value || value.trim().length === 0) {
-        return "Project name is required";
-      }
-      if (!/^[a-zA-Z0-9_@/.-]+$/.test(value)) {
-        return "Project name contains invalid characters";
-      }
+      if (!value || value.trim().length === 0) return "Project name is required";
+      if (!/^[a-zA-Z0-9_@/.-]+$/.test(value)) return "Invalid characters";
       return undefined;
     },
   });
   handleCancel(projectName);
 
-  // Stack selection (pre-select detected frameworks)
-  const stackOptions = [
-    { value: "node", label: "Node.js / TypeScript" },
-    { value: "python", label: "Python" },
-    { value: "go", label: "Go" },
-    { value: "swift", label: "Swift / iOS" },
-    { value: "react", label: "React" },
-    { value: "vue", label: "Vue" },
-    { value: "nextjs", label: "Next.js" },
-    { value: "nestjs", label: "NestJS" },
-    { value: "django", label: "Django" },
-    { value: "fastapi", label: "FastAPI" },
-    { value: "express", label: "Express" },
-  ];
-
-  const detectedValues = new Set<string>();
+  // Auto-detect stack from project (no prompt needed)
+  const stack: string[] = [];
   if (detected.type !== "unknown" && detected.type !== "monorepo") {
-    detectedValues.add(detected.type);
+    stack.push(detected.type);
   }
   for (const fw of detected.frameworks) {
-    detectedValues.add(fw);
+    if (!stack.includes(fw)) stack.push(fw);
   }
 
-  const stack = await p.multiselect({
-    message: "Select your tech stack (space to toggle, enter to confirm)",
-    options: stackOptions,
-    initialValues: stackOptions
-      .filter((opt) => detectedValues.has(opt.value))
-      .map((opt) => opt.value),
-    required: true,
-  });
-  handleCancel(stack);
-
-  // Team size
-  const teamSize = await p.select({
-    message: "What is your team size?",
-    options: [
-      { value: "solo" as const, label: "Solo", hint: "just me" },
-      { value: "small" as const, label: "Small team", hint: "2-5 people" },
-      { value: "team" as const, label: "Team", hint: "6+ people" },
-    ],
-  });
-  handleCancel(teamSize);
-
-  // Default mode
-  const defaultMode = await p.select({
-    message: "Default operating mode?",
-    options: [
-      {
-        value: "fast" as const,
-        label: "Fast",
-        hint: "minimal checks, quick iteration",
-      },
-      {
-        value: "balanced" as const,
-        label: "Balanced",
-        hint: "recommended for most projects",
-      },
-      {
-        value: "strict" as const,
-        label: "Strict",
-        hint: "thorough checks, CI-grade quality",
-      },
-    ],
-    initialValue: "balanced" as const,
-  });
-  handleCancel(defaultMode);
-
-  // Cost tracking
-  const enableCostTracking = await p.confirm({
-    message: "Enable cost tracking?",
-    initialValue: true,
-  });
-  handleCancel(enableCostTracking);
-
-  // Memory / context persistence
-  const enableMemory = await p.confirm({
-    message: "Enable memory (context persistence across sessions)?",
-    initialValue: true,
-  });
-  handleCancel(enableMemory);
-
-  // Gemini API key (optional — for meow:multimodal skill)
+  // Gemini API key (optional)
   const geminiApiKey = await p.text({
     message: "Gemini API key (optional — for image/video/audio analysis)",
-    placeholder: "Press Enter to skip — add later with GEMINI_API_KEY in .env",
+    placeholder: "Press Enter to skip",
     validate(value) {
-      if (!value || value.trim().length === 0) {
-        return undefined; // Allow empty (skip)
-      }
-      if (value.trim().length < 10) {
-        return "API key looks too short. Get one at https://aistudio.google.com/apikey";
-      }
+      if (!value || value.trim().length === 0) return undefined;
+      if (value.trim().length < 10) return "Key too short. Get one at aistudio.google.com/apikey";
       return undefined;
     },
   });
@@ -163,21 +78,19 @@ export async function promptUser(detected: DetectedStack): Promise<UserConfig> {
     : null;
 
   if (geminiKey) {
-    p.log.success("Gemini API key will be saved to .env");
-  } else {
-    p.log.info("Skipped. Add GEMINI_API_KEY to .env when needed.");
+    p.log.success("Gemini API key will be saved to .claude/.env");
   }
 
   p.outro(pc.green("Configuration complete!"));
 
   return {
     projectName: projectName as string,
-    stack: stack as string[],
-    teamSize: teamSize as "solo" | "small" | "team",
+    stack,
+    teamSize: "solo",
     primaryTool: "claude-code",
-    defaultMode: defaultMode as "fast" | "balanced" | "strict",
-    enableCostTracking: enableCostTracking as boolean,
-    enableMemory: enableMemory as boolean,
+    defaultMode: "balanced",
+    enableCostTracking: true,
+    enableMemory: true,
     geminiApiKey: geminiKey,
   };
 }

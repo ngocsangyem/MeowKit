@@ -10,8 +10,8 @@ TASK_SUMMARY="$4"
 # Skip if cost tracking disabled in config
 if command -v .claude/scripts/bin/meowkit-config >/dev/null 2>&1; then
   .claude/scripts/bin/meowkit-config has features.costTracking 2>/dev/null || exit 0
-elif [ -f .meowkit.config.json ]; then
-  python3 -c "import json; exit(0 if json.load(open('.meowkit.config.json')).get('features',{}).get('costTracking') else 1)" 2>/dev/null || exit 0
+elif [ -f .claude/meowkit.config.json ]; then
+  python3 -c "import json; exit(0 if json.load(open('.claude/meowkit.config.json')).get('features',{}).get('costTracking') else 1)" 2>/dev/null || exit 0
 fi
 
 if [ -z "$COMMAND_NAME" ] || [ -z "$ESTIMATED_TOKENS" ]; then

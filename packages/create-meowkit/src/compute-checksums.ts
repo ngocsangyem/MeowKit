@@ -16,7 +16,7 @@ export interface Manifest {
   checksums: Record<string, ManifestEntry>;
 }
 
-const MANIFEST_FILENAME = ".meowkit.manifest.json";
+const MANIFEST_FILENAME = "meowkit.manifest.json";
 
 /** Directories classified as "core" — overwritten on update if unchanged */
 const CORE_DIRS = new Set(["agents", "commands", "hooks", "modes", "rules", "scripts"]);
@@ -24,12 +24,13 @@ const CORE_DIRS = new Set(["agents", "commands", "hooks", "modes", "rules", "scr
 /** Files classified as "user" — never overwritten */
 const USER_FILES = new Set([
   "CLAUDE.md",
-  ".meowkit.config.json",
+  "meowkit.config.json",
   ".env",
-  ".env.example",
-  ".mcp.json.example",
-  ".mcp.json",
-  ".gitignore.meowkit",
+  "env.example",
+  "mcp.json.example",
+  "mcp.json",
+  "gitignore.meowkit",
+  "meowkit.manifest.json",
 ]);
 
 /** Directories classified as "user" — never overwritten */
@@ -48,7 +49,7 @@ export function classifyLayer(relativePath: string): FileLayer {
   if (USER_FILES.has(basename) || USER_FILES.has(relativePath)) return "user";
 
   // Check path segments for directory-based classification
-  const parts = relativePath.replace(/^\.claude\//, "").split("/");
+  const parts = relativePath.split("/");
   const topDir = parts[0];
 
   if (USER_DIRS.has(topDir)) return "user";
@@ -56,8 +57,7 @@ export function classifyLayer(relativePath: string): FileLayer {
   if (CORE_DIRS.has(topDir)) return "core";
   if (topDir === "settings.json") return "core";
 
-  // Default: core for .claude/ files, user for everything else
-  return relativePath.startsWith(".claude/") ? "core" : "user";
+  return "user";
 }
 
 /**
@@ -85,33 +85,20 @@ function collectFiles(dir: string, baseDir: string): string[] {
 }
 
 /**
- * Build a manifest by scanning all files in the project's .claude/ directory
- * and root-level config files.
+ * Build a manifest by scanning all files in the .claude/ directory.
+ * All MeowKit files live inside .claude/ — no root-level scanning.
  */
-export function buildManifest(targetDir: string): Manifest {
+export function buildManifest(claudeDir: string): Manifest {
   const checksums: Record<string, ManifestEntry> = {};
 
-  // Scan .claude/ directory
-  const claudeDir = join(targetDir, ".claude");
-  const claudeFiles = collectFiles(claudeDir, targetDir);
+  const files = collectFiles(claudeDir, claudeDir);
 
-  for (const relPath of claudeFiles) {
-    const fullPath = join(targetDir, relPath);
+  for (const relPath of files) {
+    const fullPath = join(claudeDir, relPath);
     checksums[relPath] = {
       sha256: hashFile(fullPath),
       layer: classifyLayer(relPath),
     };
-  }
-
-  // Scan root-level config files
-  for (const rootFile of ["CLAUDE.md", ".meowkit.config.json"]) {
-    const fullPath = join(targetDir, rootFile);
-    if (existsSync(fullPath)) {
-      checksums[rootFile] = {
-        sha256: hashFile(fullPath),
-        layer: "user",
-      };
-    }
   }
 
   return {

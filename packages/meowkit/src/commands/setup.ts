@@ -86,7 +86,7 @@ function setupMcp(projectDir: string): StepResult {
   }
 
   // Copy from example if available, otherwise create with defaults
-  const mcpExample = join(projectDir, ".mcp.json.example");
+  const mcpExample = join(projectDir, ".claude", "mcp.json.example");
   if (existsSync(mcpExample)) {
     copyFileSync(mcpExample, mcpTarget);
   } else {
@@ -103,7 +103,7 @@ function setupEnv(projectDir: string): StepResult {
     return { name: "env", status: "skip", message: ".env already exists" };
   }
 
-  const envExample = join(projectDir, ".env.example");
+  const envExample = join(projectDir, ".claude", "env.example");
   if (existsSync(envExample)) {
     copyFileSync(envExample, envTarget);
   } else {
@@ -125,7 +125,7 @@ function setupGitignore(projectDir: string): StepResult {
   }
 
   // Read from .gitignore.meowkit if exists, otherwise use defaults
-  const meowkitIgnore = join(projectDir, ".gitignore.meowkit");
+  const meowkitIgnore = join(projectDir, ".claude", "gitignore.meowkit");
   const additions = existsSync(meowkitIgnore)
     ? readFileSync(meowkitIgnore, "utf-8")
     : DEFAULT_GITIGNORE;

@@ -3,6 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'MeowKit',
   description: 'AI agent toolkit for Claude Code — 40 skills, 13 agents, structured workflow with hard gates, TDD, and security scanning.',
+  srcExclude: ['**/plans/**'],
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/meowkit-favicon.svg' }],
   ],
@@ -34,6 +35,7 @@ export default defineConfig({
             { text: 'Workflow Phases (0-6)', link: '/guide/workflow-phases' },
             { text: 'Model Routing', link: '/guide/model-routing' },
             { text: 'Memory System', link: '/guide/memory-system' },
+            { text: 'Task System', link: '/guide/task-system' },
           ],
         },
       ],
@@ -44,6 +46,7 @@ export default defineConfig({
             { text: 'Overview', link: '/cli/' },
             { text: 'create-meowkit', link: '/cli/create-meowkit' },
             { text: 'Commands', link: '/cli/commands' },
+            { text: 'Task Commands', link: '/cli/task-commands' },
           ],
         },
       ],
@@ -174,6 +177,16 @@ export default defineConfig({
             { text: 'meow:planning', link: '/reference/skills/planning' },
             { text: 'meow:shipping', link: '/reference/skills/shipping' },
             { text: 'meow:testing', link: '/reference/skills/testing' },
+          ],
+        },
+        {
+          text: 'Templates',
+          items: [
+            { text: 'Overview', link: '/reference/templates/' },
+            { text: 'Feature Implementation', link: '/reference/templates/feature-implementation' },
+            { text: 'Bug Fix', link: '/reference/templates/bug-fix' },
+            { text: 'Refactor', link: '/reference/templates/refactor' },
+            { text: 'Security Audit', link: '/reference/templates/security-audit' },
           ],
         },
         {

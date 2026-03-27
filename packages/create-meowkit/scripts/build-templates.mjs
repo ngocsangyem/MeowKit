@@ -26,7 +26,11 @@ const SKIP_PATTERNS = [
 ];
 
 function shouldSkip(src) {
-  return SKIP_PATTERNS.some((p) => src.includes(p));
+  if (SKIP_PATTERNS.some((p) => src.includes(p))) return true;
+  // Skip internal docs not needed in user projects
+  if (src.endsWith("_INDEX.md")) return true;
+  if (src.endsWith("SKILLS_ATTRIBUTION.md")) return true;
+  return false;
 }
 
 // Validate source exists

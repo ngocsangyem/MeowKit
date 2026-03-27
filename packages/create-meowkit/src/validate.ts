@@ -57,8 +57,8 @@ export function validate(targetDir: string): ValidationResult {
   check(".claude/ directory exists", existsSync(claude), issues);
   check("CLAUDE.md exists", existsSync(join(targetDir, "CLAUDE.md")), issues);
   check(
-    ".meowkit.config.json exists",
-    existsSync(join(targetDir, ".meowkit.config.json")),
+    "meowkit.config.json exists",
+    existsSync(join(claude, "meowkit.config.json")),
     issues
   );
 

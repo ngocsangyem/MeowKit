@@ -47,6 +47,8 @@ export function copyDirRecursive(
   for (const entry of entries) {
     if (SKIP_NAMES.has(entry)) continue;
     if (entry.endsWith(".pyc")) continue;
+    if (entry.endsWith("_INDEX.md")) continue;
+    if (entry === "SKILLS_ATTRIBUTION.md") continue;
 
     const srcPath = join(src, entry);
     const destPath = join(dest, entry);

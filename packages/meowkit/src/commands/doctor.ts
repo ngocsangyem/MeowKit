@@ -23,11 +23,11 @@ function statusIcon(status: Status): string {
 /** Find MeowKit project root — checks cwd only (no walk-up to avoid matching parent projects). */
 function findProjectRoot(): string | null {
   const cwd = process.cwd();
-  const hasConfig = fs.existsSync(path.join(cwd, ".meowkit.config.json"));
-  const hasManifest = fs.existsSync(path.join(cwd, ".meowkit.manifest.json"));
-  const hasClaude = fs.existsSync(path.join(cwd, "CLAUDE.md"));
   const hasDotClaude = fs.existsSync(path.join(cwd, ".claude"));
-  if (hasConfig || hasManifest || hasClaude || hasDotClaude) {
+  const hasConfig = fs.existsSync(path.join(cwd, ".claude", "meowkit.config.json"));
+  const hasManifest = fs.existsSync(path.join(cwd, ".claude", "meowkit.manifest.json"));
+  const hasClaude = fs.existsSync(path.join(cwd, "CLAUDE.md"));
+  if (hasDotClaude || hasConfig || hasManifest || hasClaude) {
     return cwd;
   }
   return null;
@@ -198,16 +198,16 @@ function checkVenv(root: string | null): DiagResult {
 function checkConfig(root: string | null): DiagResult {
   if (!root) return { name: "Config", status: "warn", detail: "Skipped — no project" };
 
-  const configPath = path.join(root, ".meowkit.config.json");
+  const configPath = path.join(root, ".claude", "meowkit.config.json");
   if (!fs.existsSync(configPath)) {
-    return { name: "Config", status: "warn", detail: ".meowkit.config.json not found" };
+    return { name: "Config", status: "warn", detail: ".claude/meowkit.config.json not found" };
   }
 
   try {
     JSON.parse(fs.readFileSync(configPath, "utf-8"));
-    return { name: "Config", status: "pass", detail: ".meowkit.config.json valid" };
+    return { name: "Config", status: "pass", detail: ".claude/meowkit.config.json valid" };
   } catch {
-    return { name: "Config", status: "fail", detail: ".meowkit.config.json is invalid JSON" };
+    return { name: "Config", status: "fail", detail: ".claude/meowkit.config.json is invalid JSON" };
   }
 }
 

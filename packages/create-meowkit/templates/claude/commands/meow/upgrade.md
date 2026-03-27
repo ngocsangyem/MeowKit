@@ -14,7 +14,7 @@ Self-update MeowKit to the latest version. Preserves learned knowledge in `memor
 
 ### Execution Steps
 
-1. **Check current version.** Read `.meowkit.config.json` for the current installed version.
+1. **Check current version.** Read `.claude/meowkit.config.json` for the current installed version.
 
 2. **Fetch latest version.** Query npm registry for the latest published MeowKit version.
 
@@ -27,7 +27,7 @@ Self-update MeowKit to the latest version. Preserves learned knowledge in `memor
    - Download the new version.
    - Replace `.claude/` files with updated versions: commands, modes, rules, skills, scripts, agents, hooks.
    - **NEVER overwrite `memory/` directory.** Lessons, cost logs, and learned patterns are preserved across updates.
-   - Update version in `.meowkit.config.json`.
+   - Update version in `.claude/meowkit.config.json`.
 
 5. **Post-update validation.** Run `/validate` to confirm the update installed correctly and all scripts are functional.
 
