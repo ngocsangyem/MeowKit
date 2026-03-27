@@ -2,7 +2,6 @@
 
 import minimist from "minimist";
 import pc from "picocolors";
-import { detectStack } from "./detect-stack.js";
 import { promptUser } from "./prompts.js";
 import { validate } from "./validate.js";
 import { smartUpdate } from "./smart-update.js";
@@ -20,8 +19,6 @@ ${pc.bold("Usage:")}
 ${pc.bold("Options:")}
   --force       Overwrite all files (ignore user modifications)
   --dry-run     Preview files without writing
-  --mode        Set default mode: fast | balanced | strict
-  --no-memory   Disable memory/context persistence
   --global      Install as global config (~/.claude/)
   --json        Structured JSON output (for CI/scripting)
   --verbose     Enable debug logging
@@ -30,10 +27,8 @@ ${pc.bold("Options:")}
 
 async function main(): Promise<void> {
   const argv = minimist(process.argv.slice(2), {
-    boolean: ["force", "dry-run", "memory", "global", "help", "json", "verbose"],
-    string: ["mode"],
+    boolean: ["force", "dry-run", "global", "help", "json", "verbose"],
     default: {
-      memory: true,
       force: false,
       "dry-run": false,
       global: false,
@@ -45,7 +40,6 @@ async function main(): Promise<void> {
       h: "help",
       f: "force",
       n: "dry-run",
-      m: "mode",
       g: "global",
       v: "verbose",
     },
@@ -72,9 +66,7 @@ async function main(): Promise<void> {
 
   const dryRun: boolean = argv["dry-run"];
   const force: boolean = argv.force;
-  const enableMemory: boolean = argv.memory;
   const global: boolean = argv.global;
-  const modeOverride: string | undefined = argv.mode;
 
   const targetDir = global ? (process.env.HOME ?? "~") : process.cwd();
 
@@ -84,35 +76,9 @@ async function main(): Promise<void> {
 
   log.debug(`Target directory: ${targetDir}`);
 
-  // Step 1: Detect stack
-  log.info("Detecting project stack...");
-  const detected = detectStack(targetDir);
-  log.debug(`Stack detection: ${JSON.stringify(detected)}`);
-
-  if (detected.type !== "unknown") {
-    log.success(
-      `Detected: ${detected.type} (${detected.frameworks.join(", ") || "none"}) ` +
-        `[${Math.round(detected.confidence * 100)}%]`
-    );
-  } else {
-    log.warn("Could not auto-detect project type.");
-  }
-
-  // Step 2: Interactive prompts
-  log.debug("Starting interactive prompts...");
-  const config = await promptUser(detected);
+  // Step 1: Interactive prompts
+  const config = await promptUser();
   log.debug(`Config collected: ${JSON.stringify({ ...config, geminiApiKey: config.geminiApiKey ? "***" : null })}`);
-
-  if (modeOverride) {
-    const validModes = ["fast", "balanced", "strict"] as const;
-    if (validModes.includes(modeOverride as (typeof validModes)[number])) {
-      config.defaultMode = modeOverride as (typeof validModes)[number];
-    } else {
-      log.warn(`Invalid mode "${modeOverride}". Using "${config.defaultMode}".`);
-    }
-  }
-
-  if (!enableMemory) config.enableMemory = false;
 
   // Step 3: Generate/merge with spinner
   log.info(`Writing to: ${targetDir}`);

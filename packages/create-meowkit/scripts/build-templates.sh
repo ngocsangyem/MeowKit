@@ -63,7 +63,7 @@ else
 
 > Stack: __MEOWKIT_STACK__ | Team: __MEOWKIT_TEAM_SIZE__ | Mode: __MEOWKIT_DEFAULT_MODE__
 
-## MeowKit — AI Agent Workflow System
+## AI Agent Workflow System
 
 See .claude/ directory for agents, skills, commands, modes, rules, and hooks.
 TMPL

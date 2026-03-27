@@ -3,30 +3,19 @@ import { dirname } from "node:path";
 import pc from "picocolors";
 import type { UserConfig } from "./prompts.js";
 
-/** Placeholder prefix to avoid collision with {{}} in Vue/GitHub Actions */
 const PREFIX = "__MEOWKIT_";
 const SUFFIX = "__";
 
-/**
- * Builds a map of placeholder keys to their replacement values from user config.
- */
+/** Builds placeholder → value map from user config */
 function buildReplacements(config: UserConfig): Record<string, string> {
   return {
-    [`${PREFIX}PROJECT_NAME${SUFFIX}`]: config.projectName,
-    [`${PREFIX}STACK${SUFFIX}`]: config.stack.join(", "),
-    [`${PREFIX}STACK_JSON${SUFFIX}`]: JSON.stringify(config.stack),
-    [`${PREFIX}TEAM_SIZE${SUFFIX}`]: config.teamSize,
-    [`${PREFIX}DEFAULT_MODE${SUFFIX}`]: config.defaultMode,
-    [`${PREFIX}PRIMARY_TOOL${SUFFIX}`]: config.primaryTool,
+    [`${PREFIX}DESCRIPTION${SUFFIX}`]: config.description || "",
     [`${PREFIX}COST_TRACKING${SUFFIX}`]: String(config.enableCostTracking),
     [`${PREFIX}MEMORY_ENABLED${SUFFIX}`]: String(config.enableMemory),
   };
 }
 
-/**
- * Reads a .template file, substitutes __MEOWKIT_*__ placeholders,
- * and writes the result to destPath (without .template extension).
- */
+/** Process a .template file: substitute placeholders, write to destPath */
 export function processTemplate(
   templatePath: string,
   destPath: string,

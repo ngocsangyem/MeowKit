@@ -4,7 +4,7 @@ import {
 } from "node:fs";
 import { join, relative, dirname, basename } from "node:path";
 import * as log from "./logger.js";
-import { copyDirRecursive, resolveTemplateDir } from "./copy-template-tree.js";
+import { resolveTemplateDir } from "./copy-template-tree.js";
 import { processTemplate } from "./substitute-placeholders.js";
 import { mergeSettingsFile } from "./merge-settings.js";
 import {
@@ -25,28 +25,26 @@ interface UpdateStats {
   userModified: string[];
 }
 
-/**
- * Check if a .meowkitignore file protects a given path.
- * Simple glob-free matching: exact paths and directory prefixes.
- */
-function isIgnored(relPath: string, targetDir: string): boolean {
+/** Parse .meowkitignore once, return a matcher function */
+function loadIgnorePatterns(targetDir: string): (relPath: string) => boolean {
   const ignorePath = join(targetDir, ".meowkitignore");
-  if (!existsSync(ignorePath)) return false;
+  if (!existsSync(ignorePath)) return () => false;
 
-  const lines = readFileSync(ignorePath, "utf-8")
+  const patterns = readFileSync(ignorePath, "utf-8")
     .split("\n")
     .map((l) => l.trim())
     .filter((l) => l && !l.startsWith("#"));
 
-  for (const pattern of lines) {
-    // Exact match
-    if (relPath === pattern) return true;
-    // Directory prefix: "agents/" matches "agents/foo.md"
-    if (pattern.endsWith("/") && relPath.startsWith(pattern)) return true;
-    // Prefix without slash: ".claude/agents" matches ".claude/agents/foo.md"
-    if (relPath.startsWith(pattern + "/")) return true;
-  }
-  return false;
+  if (patterns.length === 0) return () => false;
+
+  return (relPath: string) => {
+    for (const p of patterns) {
+      if (relPath === p) return true;
+      if (p.endsWith("/") && relPath.startsWith(p)) return true;
+      if (relPath.startsWith(p + "/")) return true;
+    }
+    return false;
+  };
 }
 
 /**
@@ -72,10 +70,7 @@ export async function smartUpdate(
   }
 
   const oldChecksums = oldManifest?.checksums ?? {};
-
-  // Build a map of what the NEW templates contain
-  // We do this by temporarily scaffolding to a temp analysis
-  // Instead, we compare template source checksums against what's on disk
+  const isIgnored = loadIgnorePatterns(targetDir);
 
   const claudeSrc = join(templateDir, "claude");
   if (!existsSync(claudeSrc)) {
@@ -110,7 +105,7 @@ export async function smartUpdate(
     const layer = classifyLayer(relPath);
 
     // Check .meowkitignore
-    if (isIgnored(relPath, targetDir)) {
+    if (isIgnored(relPath)) {
       log.debug(`Ignored (protected): ${relPath}`);
       stats.skipped++;
       continue;
@@ -204,19 +199,15 @@ export async function smartUpdate(
     stats.added++;
   }
 
-  // Ensure empty dirs for memory/logs if enabled
+  // Ensure memory + logs dirs exist
   if (!dryRun) {
-    if (config.enableMemory) {
-      mkdirSync(join(targetDir, ".claude", "memory"), { recursive: true });
-    }
-    if (config.enableCostTracking) {
-      mkdirSync(join(targetDir, ".claude", "logs"), { recursive: true });
-    }
+    mkdirSync(join(targetDir, ".claude", "memory"), { recursive: true });
+    mkdirSync(join(targetDir, ".claude", "logs"), { recursive: true });
   }
 
   // Write manifest inside .claude/
   if (!dryRun) {
-    const newManifest = buildManifest(targetDir);
+    const newManifest = buildManifest(claudeDir);
     writeManifest(claudeDir, newManifest);
   }
 
