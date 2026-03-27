@@ -1,6 +1,6 @@
 ---
 name: meow:clean-code
-description: Pragmatic coding standards - concise, direct, no over-engineering, no unnecessary comments
+description: "Use when reviewing code for quality, enforcing KISS/DRY/YAGNI principles, or cleaning up over-engineered abstractions. Pragmatic standards: concise, direct, no unnecessary comments."
 allowed-tools: Read, Write, Edit
 version: 2.0
 priority: CRITICAL

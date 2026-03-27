@@ -1,6 +1,6 @@
 ---
 name: meow:planning
-description: "Planning toolkit: plan templates, premise challenge, and ADR generation. Use during Phase 1 (Plan) for structured planning and architecture decisions."
+description: "Use when creating plans, challenging premises, or generating ADRs. Activates during Phase 1 (Plan) for structured planning and architecture decisions."
 ---
 
 # Planning Toolkit

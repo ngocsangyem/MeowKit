@@ -1,6 +1,6 @@
 ---
 name: meow:testing
-description: "Testing toolkit: red-green-refactor cycle, validation scripts, and visual QA. Use during Phase 2 (Test RED) and Phase 3 (Build GREEN) for TDD enforcement."
+description: "Use when writing tests, running validation scripts, or enforcing red-green-refactor cycle. Activates during Phase 2 (Test RED) and Phase 3 (Build GREEN)."
 ---
 
 # Testing Toolkit

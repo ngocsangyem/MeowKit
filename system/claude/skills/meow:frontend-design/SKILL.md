@@ -1,6 +1,6 @@
 ---
 name: meow:frontend-design
-description: "Production-grade UI/UX design with anti-AI-slop enforcement, accessibility, typography, color, motion, and responsive patterns. Auto-activates on frontend design tasks, UI reviews, or design system work. Use for visual design decisions, component styling, design critique, and pre-delivery quality checks."
+description: "Use when designing UI components, reviewing visual design, building design systems, or checking accessibility. Auto-activates on frontend design tasks and UI reviews."
 source: claudekit-engineer
 original_skills: [ui-ux-pro-max, frontend-design]
 adapted_for: meowkit

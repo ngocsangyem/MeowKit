@@ -1,6 +1,6 @@
 ---
 name: meow:memory
-description: "Memory system toolkit: session capture, pattern extraction, and cost tracking. Use during Phase 0 (Orient) and Phase 6 (Reflect) for cross-session persistence."
+description: "Use when capturing session learnings, extracting patterns, or tracking costs. Activates during Phase 0 (Orient) to load context and Phase 6 (Reflect) to persist it."
 ---
 
 # Memory System Toolkit

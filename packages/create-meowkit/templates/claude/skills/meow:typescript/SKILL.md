@@ -1,6 +1,6 @@
 ---
 name: meow:typescript
-description: "Strict TypeScript patterns for type safety, null handling, and modern JS/TS best practices. Auto-activates on .ts, .tsx files or when fixing type errors. Use for TypeScript architecture, strict null checks, utility types, and ESLint configuration."
+description: "Use when writing TypeScript code, fixing type errors, or configuring strict type safety. Auto-activates on .ts/.tsx files. Covers null handling, utility types, and ESLint."
 source: aura-frog
 original_skills: [typescript-expert, frontend-development (TS parts)]
 adapted_for: meowkit

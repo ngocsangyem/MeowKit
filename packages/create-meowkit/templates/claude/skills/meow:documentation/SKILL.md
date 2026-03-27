@@ -1,6 +1,6 @@
 ---
 name: meow:documentation
-description: "Documentation toolkit: living docs, API sync, and changelog generation. Use during Phase 6 (Reflect) or when documentation updates are needed after code changes."
+description: "Use when updating documentation after code changes, generating changelogs, or syncing API docs. Activates during Phase 6 (Reflect) or on explicit doc requests."
 ---
 
 # Documentation Toolkit

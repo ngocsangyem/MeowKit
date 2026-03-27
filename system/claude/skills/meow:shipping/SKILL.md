@@ -1,6 +1,6 @@
 ---
 name: meow:shipping
-description: "Simplified shipping toolkit: ship pipeline, canary deployment, and rollback protocol. Use as a quick reference for shipping mechanics. For the full automated ship workflow, use meow:ship instead."
+description: "Use when you need a quick reference for ship pipeline mechanics, canary deployment, or rollback procedures. For the full automated ship workflow, use meow:ship instead."
 ---
 
 <!-- Restructured for context engineering compliance:

@@ -1,6 +1,6 @@
 ---
 name: meow:project-organization
-description: "Standardize file locations, naming conventions, and directory structure. Use when creating files, determining output paths, organizing project layout, or enforcing naming conventions. Two modes: advisory (return correct path) and organize (restructure files)."
+description: "Use when creating files and need the correct path, organizing project layout, or enforcing naming conventions. Two modes: advisory (return path) and organize (restructure)."
 argument-hint: "[directories or files to organize]"
 source: claudekit-engineer
 original_path: .claude/skills/project-organization/SKILL.md

@@ -1,6 +1,6 @@
 ---
 name: meow:development
-description: "Development reference toolkit: code patterns, TDD enforcement, and skill loading. Use during Phase 3 (Build GREEN) for implementation guidance and coding standards."
+description: "Use when implementing features, writing code, or needing TDD enforcement during Phase 3 (Build GREEN). Provides code patterns, skill loading, and coding standards."
 ---
 
 # Development Toolkit
