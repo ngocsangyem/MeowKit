@@ -33,16 +33,10 @@ Persistent headless Chromium browser for QA testing and site dogfooding. First c
 
 ## Workflow
 
-1. **Run preamble** — initialize MeowKit session, check for upgrades, handle first-run prompts. See `references/preamble.md`
-2. **Follow MeowKit shared protocols** — AskUserQuestion format, Completeness Principle, Repo Ownership, Search Before Building, Contributor Mode, Completion Status, Telemetry, Plan Status Footer. See `references/shared-protocols.md`
-3. **Run setup check** — verify `$B` binary exists; if `NEEDS_SETUP`, prompt user and build. See `references/setup.md`
-4. **Navigate and interact** — use `$B goto`, `$B snapshot`, `$B click`, `$B fill`, etc. See `references/command-reference.md`
-5. **Use QA patterns** — follow established patterns for page verification, user flows, assertions, responsive testing, visual evidence. See `references/qa-patterns.md`
-6. **Use snapshot flags** — combine `-i`, `-c`, `-D`, `-a`, `-C`, etc. for targeted inspection. See `references/snapshot-flags.md`
-7. **Hand off when blocked** — use `$B handoff` / `$B resume` for CAPTCHAs, MFA, OAuth. See `references/user-handoff.md`
-8. **Show screenshots** — always use the Read tool on output PNGs so the user can see them
-9. **Report status** — use Completion Status Protocol (DONE / DONE_WITH_CONCERNS / BLOCKED / NEEDS_CONTEXT)
-10. **Run telemetry** — log session duration and outcome. See `references/shared-protocols.md`
+1. **Initialize** — run preamble, verify browse binary, apply shared protocols. See `references/preamble.md`, `references/setup.md`, `references/shared-protocols.md`
+2. **Navigate + interact** — use browse commands (goto, snapshot, click, fill) to explore the target. See `references/command-reference.md`, `references/snapshot-flags.md`
+3. **Verify + capture** — follow QA patterns, handle handoffs for CAPTCHAs/MFA, take screenshots. See `references/qa-patterns.md`, `references/user-handoff.md`
+4. **Report** — show screenshots via Read tool, report completion status, run telemetry. See `references/shared-protocols.md`
 
 ## References
 

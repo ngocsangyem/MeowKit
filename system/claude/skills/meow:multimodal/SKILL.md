@@ -126,13 +126,10 @@ python .claude/skills/meow:multimodal/scripts/gemini_generate.py \
 
 Follow these steps sequentially:
 
-1. **API key check** — verify `GEMINI_API_KEY` is set (see ## API Key Check above)
-2. **Identify modality** — determine file type from extension
-3. **Check file size** — if > 20MB, use File API upload; for compression use `ffmpeg` directly (see `references/audio-processing.md`)
-4. **Select model** — use default from Models table (override with `--model` if needed)
-5. **Execute script** — run the appropriate script with the file path
-6. **Check context budget** — if response > 3000 tokens, summarize before returning
-7. **Format output** — fill the structured template below
+1. **API key check** — verify `GEMINI_API_KEY` is set. See ## API Key Check above.
+2. **Prepare** — identify modality from file extension, check file size (>20MB → File API), select model from Models table.
+3. **Execute** — run the appropriate script with file path. If response >3000 tokens, summarize before returning.
+4. **Output** — fill the structured template below.
 
 ## Setup
 

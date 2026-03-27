@@ -24,12 +24,9 @@ Operates in **Phase 3 (Build GREEN)** and **Phase 4 (Review)** for design qualit
 
 ## Process
 
-1. **Detect task type** — new component? redesign? design review? responsive fix?
-2. **Load design rules** — read `references/design-rules.md` for the concern
-3. **Apply design principles** — typography, color, spacing, motion per rules
-4. **Run anti-slop check** — verify against Anti-AI-Slop Checklist below
-5. **Accessibility audit** — WCAG 2.1 AA minimum (see references)
-6. **Pre-delivery check** — run full checklist before presenting to user
+1. **Analyze** — detect task type (new component, redesign, review, responsive fix), load relevant design rules from `references/design-rules.md`
+2. **Implement** — apply typography, color, spacing, motion per rules. Run anti-slop check (see checklist below). Ensure WCAG 2.1 AA accessibility.
+3. **Verify** — run pre-delivery checklist before presenting to user
 
 ## Anti-AI-Slop Checklist (MANDATORY before delivery)
 

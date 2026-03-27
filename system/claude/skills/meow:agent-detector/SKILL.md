@@ -23,16 +23,10 @@ source: aura-frog
 
 ## Workflow
 
-1. **Check detection cache** -- reuse cached result if same workflow and phase > 1. See `references/detection-process.md`
-2. **Analyze task content** (Layer 0) -- detect domain from the task itself, overriding repo type if needed. See `references/multi-layer-detection.md`
-3. **Extract keywords and detect intent** (Layers 1-2) -- match explicit technologies and action keywords. See `references/multi-layer-detection.md`
-4. **Check project context and file patterns** (Layers 3-4) -- infer tech stack from project files. See `references/multi-layer-detection.md`
-5. **Auto-detect complexity** -- classify as Quick, Standard, or Deep based on scope signals. See `references/complexity-detection.md`
-6. **Score all agents** -- combine scores from all layers using weighted criteria. See `references/scoring-and-thresholds.md`
-7. **Select model** -- map complexity and agent type to haiku/sonnet/opus. See `references/model-selection.md`
-8. **Check team mode eligibility** -- Deep + multi-domain tasks may use team mode if enabled. See `references/team-mode.md`
-9. **Output detection result and show banner** -- agent, model, complexity, mode. See `references/detection-process.md`
-10. **Hand off** -- load agent instructions, invoke appropriate skill, spawn with detected model. See `references/after-detection.md`
+1. **Check cache** -- reuse cached result if same workflow and phase > 1. See `references/detection-process.md`
+2. **Score agents** -- analyze task content, extract keywords, check project context across all layers (0-4). See `references/multi-layer-detection.md`, `references/scoring-and-thresholds.md`
+3. **Select model + mode** -- map complexity to model tier, check team mode eligibility. See `references/model-selection.md`, `references/complexity-detection.md`, `references/team-mode.md`
+4. **Output + hand off** -- show detection banner, load agent instructions, invoke skill. See `references/detection-process.md`, `references/after-detection.md`
 
 ## References
 

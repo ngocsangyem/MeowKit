@@ -38,16 +38,10 @@ A rigorous, multi-section plan review from a CEO/founder perspective. Challenges
 
 ## Workflow
 
-1. **Preamble** — Run startup checks (update, sessions, telemetry, contributor mode). See `references/preamble.md`
-2. **Shared Protocols** — Follow AskUserQuestion format, Completeness Principle, Repo Ownership, Search Before Building, Contributor Mode, Completion Status, and Telemetry. See `references/shared-protocols.md`
-3. **Detect Base Branch** — Determine the PR target branch via `gh pr view` or `gh repo view`. See `references/base-branch-detection.md`
-4. **Pre-Review System Audit** — Run git history, diff stats, TODO scan, design doc check, handoff note check, retrospective check, frontend scope detection, taste calibration, and landscape check. See `references/pre-review-system-audit.md`
-5. **Prerequisite Skill Offer** — If no design doc found, offer `/meow:office-hours` before proceeding. See `references/prerequisite-skill-offer.md`
-6. **Step 0: Nuclear Scope Challenge + Mode Selection** — Premise challenge, existing code leverage, dream state mapping, implementation alternatives, mode-specific analysis, CEO plan persistence, spec review loop, temporal interrogation, and mode selection. See `references/step0-scope-and-mode.md`
-7. **Review Sections 1-11** — Architecture, Error/Rescue Map, Security, Data Flow/Edge Cases, Code Quality, Tests, Performance, Observability, Deployment, Long-Term Trajectory, Design/UX. See `references/review-sections.md`
-8. **Outside Voice** — Optional independent plan challenge from Codex or Claude subagent. See `references/outside-voice.md`
-9. **Required Outputs** — NOT in scope, What already exists, Dream state delta, Error/Rescue Registry, Failure Modes Registry, TODOS.md updates, Scope Expansion Decisions, Diagrams, Completion Summary. See `references/required-outputs.md`
-10. **Post-Review** — Handoff note cleanup, review log, review readiness dashboard, plan file review report, next steps (review chaining), and docs/designs promotion. See `references/post-review.md`
+1. **Initialize** — run preamble, detect base branch, run pre-review system audit (git history, diff stats, TODOs, design docs). See `references/preamble.md`, `references/base-branch-detection.md`, `references/pre-review-system-audit.md`
+2. **Scope challenge** — nuclear scope challenge + mode selection (Expansion/Selective/Hold/Reduction), premise challenge, dream state mapping. See `references/step0-scope-and-mode.md`, `references/prerequisite-skill-offer.md`
+3. **Review** — sections 1-11 (Architecture → Design/UX), optional outside voice from subagent. See `references/review-sections.md`, `references/outside-voice.md`
+4. **Output** — required deliverables (NOT in scope, Dream state delta, Error/Rescue Registry, TODOs, diagrams), post-review handoff. See `references/required-outputs.md`, `references/post-review.md`
 
 ## References
 

@@ -34,13 +34,9 @@ Operates in **Phase 6 (Reflect)** or advisory mode (called by any skill). Output
 
 ## Process (Organize Mode)
 
-1. **Scan** — list all files in target directories
-2. **Categorize** — assign each file to a directory category (see `references/directory-rules.md`)
-3. **Check naming** — verify kebab-case, self-documenting names
-4. **Propose** — present changes as from → to table
-5. **Confirm** — ask user approval before any moves
-6. **Execute** — move/rename files, create missing directories
-7. **Report** — list final structure
+1. **Scan + categorize** — list all files, assign each to directory category per `references/directory-rules.md`, check naming conventions
+2. **Propose** — present changes as from → to table, ask user approval
+3. **Execute + report** — move/rename files, create missing directories, list final structure
 
 ## Process (Advisory Mode)
 

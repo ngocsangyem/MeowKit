@@ -34,16 +34,10 @@ Run `/meow:cso` when the user requests a security audit, threat model, pentest r
 
 ## Workflow
 
-1. **Preamble** — Run startup checks (upgrade, telemetry, lake intro). See [preamble.md](references/preamble.md).
-2. **Parse arguments** — Resolve mode (daily/comprehensive), scope flags, and diff mode. See [arguments-and-modes.md](references/arguments-and-modes.md).
-3. **Phase 0-1: Architecture + Attack Surface** — Detect stack/framework, build mental model, census all endpoints and infra. See [phase-0-1-architecture-attack-surface.md](references/phase-0-1-architecture-attack-surface.md).
-4. **Phase 2-3: Secrets + Dependencies** — Scan git history for leaked credentials, audit dependency supply chain. See [phase-2-3-secrets-dependencies.md](references/phase-2-3-secrets-dependencies.md).
-5. **Phase 4-6: CI/CD + Infra + Webhooks** — Audit pipeline security, shadow infrastructure, webhook integrations. See [phase-4-5-6-cicd-infra-webhooks.md](references/phase-4-5-6-cicd-infra-webhooks.md).
-6. **Phase 7-8: LLM Security + Skill Supply Chain** — Check AI-specific vulns, scan installed skills for malicious patterns. See [phase-7-8-llm-skills.md](references/phase-7-8-llm-skills.md).
-7. **Phase 9-11: OWASP + STRIDE + Data Classification** — Full OWASP Top 10 assessment, STRIDE threat model, data classification. See [phase-9-10-11-owasp-stride-data.md](references/phase-9-10-11-owasp-stride-data.md).
-8. **Phase 12: False Positive Filtering** — Apply confidence gate, hard exclusions, active verification, variant analysis. See [phase-12-fp-filtering.md](references/phase-12-fp-filtering.md).
-9. **Phase 13-14: Report + Save** — Generate findings report with exploit scenarios, trend tracking, remediation roadmap, save JSON. See [phase-13-14-report-save.md](references/phase-13-14-report-save.md).
-10. **Shared protocols** — AskUserQuestion format, Completeness Principle, Repo Ownership, Contributor Mode, Completion Status, Telemetry. See [shared-protocols.md](references/shared-protocols.md).
+1. **Initialize** — run preamble, parse arguments (mode, scope, diff). See [preamble.md](references/preamble.md), [arguments-and-modes.md](references/arguments-and-modes.md)
+2. **Reconnaissance** — architecture + attack surface + secrets + dependencies + CI/CD + infra + webhooks + LLM + skills. See phases 0-8 references.
+3. **Assessment** — OWASP Top 10 + STRIDE threat model + data classification + false positive filtering. See [phase-9-10-11-owasp-stride-data.md](references/phase-9-10-11-owasp-stride-data.md), [phase-12-fp-filtering.md](references/phase-12-fp-filtering.md)
+4. **Report** — generate findings with exploit scenarios, trend tracking, remediation roadmap. Save JSON. See [phase-13-14-report-save.md](references/phase-13-14-report-save.md), [shared-protocols.md](references/shared-protocols.md)
 
 ## References
 

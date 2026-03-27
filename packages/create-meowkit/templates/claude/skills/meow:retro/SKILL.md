@@ -32,16 +32,10 @@ Generates a comprehensive engineering retrospective analyzing commit history, wo
 
 ## Workflow
 
-1. **Run preamble** — initialize session, check upgrades, telemetry prompts. See `references/preamble.md`
-2. **Parse arguments** — determine time window, mode (standard/compare/global). See `references/data-gathering.md`
-3. **Gather raw data** — fetch origin, run 12 parallel git commands. See `references/data-gathering.md`
-4. **Compute metrics** — summary table, per-author leaderboard, backlog health, skill usage, eureka moments. See `references/metrics-computation.md`
-5. **Analyze time patterns** — hourly histogram, session detection, commit type breakdown, hotspots, PR sizes, focus score. See `references/metrics-computation.md`
-6. **Team member analysis** — per-person stats, praise, growth opportunities. See `references/team-analysis.md`
-7. **Trends & streaks** — week-over-week trends, shipping streaks, load/compare history. See `references/trends-history.md`
-8. **Save retro snapshot** — persist JSON to `.context/retros/`. See `references/trends-history.md`
-9. **Write narrative** — structured output with tweetable summary, all sections. See `references/narrative-output.md`
-10. **Run telemetry** — log skill completion. See `references/telemetry.md`
+1. **Initialize** — run preamble, parse arguments (time window, mode). See `references/preamble.md`, `references/data-gathering.md`
+2. **Gather + compute** — fetch origin, run git commands, compute metrics (summary, leaderboard, backlog, skills, eureka). See `references/data-gathering.md`, `references/metrics-computation.md`
+3. **Analyze** — per-person breakdown (praise + growth), time patterns, trends, streaks. See `references/team-analysis.md`, `references/trends-history.md`
+4. **Output** — save snapshot to `.context/retros/`, write narrative with tweetable summary. See `references/narrative-output.md`, `references/telemetry.md`
 
 For **compare mode**: See `references/compare-mode.md`
 For **global mode** (`/retro global`): Skip steps 3-9, follow `references/global-retro.md` instead.

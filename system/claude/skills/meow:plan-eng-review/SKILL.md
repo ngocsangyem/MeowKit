@@ -36,18 +36,10 @@ Thorough, interactive engineering review of a plan before implementation begins.
 
 ## Workflow
 
-1. **Run preamble** — initialize session, check for upgrades, lake intro, telemetry prompt. See [preamble.md](references/preamble.md).
-2. **Apply shared protocols** — AskUserQuestion format ([askuserquestion-format.md](references/askuserquestion-format.md)), completeness principle ([completeness-principle.md](references/completeness-principle.md)), repo ownership mode ([repo-ownership.md](references/repo-ownership.md)), search before building ([search-before-building.md](references/search-before-building.md)), contributor mode ([contributor-mode.md](references/contributor-mode.md)), completion status ([completion-status.md](references/completion-status.md)).
-3. **Check for design doc** — look for existing design doc on this branch; offer `/meow:office-hours` if none found. See [design-doc-check.md](references/design-doc-check.md).
-4. **Step 0: Scope Challenge** — challenge complexity, search for built-ins, cross-reference TODOs, check completeness and distribution. See [step0-scope-challenge.md](references/step0-scope-challenge.md).
-5. **Review sections** — walk through Architecture, Code Quality, Tests (with ASCII coverage diagram), and Performance one at a time, stopping after each for AskUserQuestion. See [review-sections.md](references/review-sections.md).
-6. **Follow question rules** — one issue per AskUserQuestion, labeled with NUMBER+LETTER, mapped to engineering preferences. See [question-rules.md](references/question-rules.md).
-7. **Outside voice** — optionally get independent plan challenge from Codex or Claude subagent. See [outside-voice.md](references/outside-voice.md).
-8. **Produce required outputs** — NOT in scope, What already exists, TODOS.md updates, diagrams, failure modes, completion summary. See [required-outputs.md](references/required-outputs.md).
-9. **Log review and display dashboard** — persist review result, show readiness dashboard, update plan file, suggest next reviews. See [review-log-dashboard.md](references/review-log-dashboard.md).
-10. **Apply engineering preferences and cognitive patterns** throughout all review steps. See [engineering-preferences.md](references/engineering-preferences.md).
-11. **Write plan status footer** if in plan mode. See [plan-status-footer.md](references/plan-status-footer.md).
-12. **Run telemetry** — log skill duration and outcome. See [telemetry.md](references/telemetry.md).
+1. **Initialize** — run preamble, apply shared protocols, check for design doc (offer `/meow:office-hours` if none). See [preamble.md](references/preamble.md), [design-doc-check.md](references/design-doc-check.md)
+2. **Scope challenge** — challenge complexity, search for built-ins, check TODOs, verify completeness. See [step0-scope-challenge.md](references/step0-scope-challenge.md)
+3. **Review** — walk through Architecture, Code Quality, Tests (with coverage diagram), Performance. One issue per AskUserQuestion. Optional outside voice. See [review-sections.md](references/review-sections.md), [question-rules.md](references/question-rules.md), [outside-voice.md](references/outside-voice.md)
+4. **Output** — required outputs (NOT in scope, TODOs, diagrams, failure modes), log review, show dashboard, update plan file, run telemetry. See [required-outputs.md](references/required-outputs.md), [review-log-dashboard.md](references/review-log-dashboard.md)
 
 ## Priority Hierarchy
 
