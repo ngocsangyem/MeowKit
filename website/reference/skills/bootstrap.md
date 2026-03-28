@@ -65,7 +65,7 @@ Complements `npm create meowkit@latest` — CLI = MeowKit infrastructure (.claud
 
 ```
 bootstrap → git init → research → tech stack → design
-  → scaffold files → plan-creator → cook → docs-init → done
+  → plan-creator → scaffold files → cook → docs-init → done
 ```
 
 ::: info Skill Details

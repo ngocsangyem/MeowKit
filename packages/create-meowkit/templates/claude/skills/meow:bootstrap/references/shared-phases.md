@@ -1,27 +1,39 @@
 # Shared Phases (Post-Plan)
 
 These phases run after planning completes, regardless of bootstrap mode.
+**ALL phases are MANDATORY. Do NOT stop between phases.**
 
-## Phase A: Implementation
+## Phase A: Implementation (MANDATORY)
 
-Invoke meow:cook with the plan path and mode-matched flag:
-- Full mode → `meow:cook [plan-path]` (interactive, all gates)
-- Auto mode → `meow:cook [plan-path] --auto`
-- Fast mode → `meow:cook [plan-path] --auto`
-- Parallel mode → `meow:cook [plan-path] --parallel`
+**ACTION REQUIRED:** Activate meow:cook skill NOW with the plan path:
+
+- Full mode → `/meow:cook [plan-path]` (interactive, all gates)
+- Auto mode → `/meow:cook [plan-path] --auto`
+- Fast mode → `/meow:cook [plan-path] --auto`
+- Parallel mode → `/meow:cook [plan-path] --parallel`
 
 meow:cook handles: TDD, implementation, review cycle, fix-first resolution.
 
 If frontend work: meow:cook uses `ui-ux-designer` subagent per `docs/design-guidelines.md`.
 
-## Phase B: Documentation
+**After cook completes: proceed IMMEDIATELY to Phase B. Do NOT stop.**
 
-After meow:cook completes, invoke meow:docs-init:
-- Scouts the newly-created codebase
-- Generates docs/ directory (project-overview, codebase-summary, code-standards, system-architecture)
-- Generates or updates README.md
+## Phase B: Documentation (MANDATORY)
 
-## Phase C: Final Report
+**ACTION REQUIRED:** Activate meow:docs-init skill NOW:
+
+```
+/meow:docs-init
+```
+
+meow:docs-init will:
+- Scout the newly-created codebase
+- Generate docs/ directory (project-overview, codebase-summary, code-standards, system-architecture)
+- Generate or update README.md
+
+**After docs created: proceed IMMEDIATELY to Phase C. Do NOT stop.**
+
+## Phase C: Final Report (MANDATORY)
 
 Print summary:
 ```
@@ -38,4 +50,6 @@ Next steps:
 - Use meow:document-release after shipping to keep docs in sync
 ```
 
-Ask user: "Want to commit all changes?" If yes → git add + commit.
+Ask user: "Want to commit all changes?" If yes → `git add -A && git commit -m "feat: bootstrap [project-name]"`
+
+**Bootstrap is complete only after this report is printed.**

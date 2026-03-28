@@ -1,9 +1,9 @@
 ---
 name: meow:bootstrap
-version: 2.0.0
+version: 2.1.0
 description: |
   Use when creating a new project from scratch — orchestrates the full journey
-  from idea to running code. Research → design → scaffold → plan → implement → docs.
+  from idea to running code. Research → design → plan → scaffold → implement → docs.
   Explicit invocation only — never auto-activates.
   CLI = MeowKit infrastructure (.claude/), bootstrap = application code + full pipeline.
 allowed-tools:
@@ -21,7 +21,7 @@ sources:
 
 # Bootstrap
 
-End-to-end project orchestrator: research → design → scaffold → plan → implement → docs.
+End-to-end project orchestrator: research → design → **plan → scaffold** → implement → docs.
 
 **CLI boundary:** `npm create meowkit@latest` = MeowKit infrastructure. `meow:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
 
@@ -55,22 +55,24 @@ Parse first flag from arguments:
 - `--parallel` → load `references/workflow-parallel.md`
 - default → load `references/workflow-auto.md`
 
-Each workflow file defines the exact steps for that mode. After plan creation, all modes load `references/shared-phases.md` for implementation → docs → final report.
+Each workflow file defines the exact steps for that mode. After plan + scaffold, all modes load `references/shared-phases.md` for implementation → docs → final report.
 
-## Scaffolding (Step 4 in all modes)
+## Planning BEFORE Scaffolding
 
-When generating files, follow `references/scaffolding-principles.md`:
-1. Detect stack via `scripts/detect-stack.sh` (or ask user)
-2. Generate directory tree first → confirm with user
-3. Generate files progressively: config → source → tests
-4. Validate with `scripts/validate-bootstrap.sh`
-5. Save stack profile to config.json
+**Plan first, scaffold second.** The plan tells us WHAT to scaffold.
+
+1. **Plan** — invoke meow:plan-creator with mode-matched flag. Plan defines: architecture, modules, file structure, acceptance criteria.
+2. **Scaffold** — generate files following the plan's architecture + `references/scaffolding-principles.md`. Detect stack via `scripts/detect-stack.sh`. Validate with `scripts/validate-bootstrap.sh`.
+
+Optional: invoke `meow:plan-ceo-review` on the plan (Full mode).
+
+**Planning is NOT optional.** Every bootstrap creates a plan before generating any source files.
 
 ## Gotchas (top 3)
 
-- **Skipping research on "simple" projects**: projects that seem simple have hidden complexity → always research unless `--fast`
+- **Scaffolding before planning**: generating files without a plan → plan first, scaffold second
+- **Skipping research on "simple" projects**: hidden complexity → always research unless `--fast`
 - **Duplicating CLI init**: never generate .claude/ files — CLI handles that
-- **Context overflow**: never generate all files at once → progressive generation per scaffolding-principles.md
 
 Full list: `references/gotchas.md`
 
@@ -78,7 +80,7 @@ Full list: `references/gotchas.md`
 
 Pre-workflow. Bootstrap IS the full workflow for new projects:
 ```
-meow:bootstrap → [research → design → scaffold → plan → cook → docs] → done
+meow:bootstrap → [research → design → plan → scaffold → cook → docs] → done
 ```
 
 For subsequent features on the same project: use `meow:plan-creator` → `meow:cook` directly.

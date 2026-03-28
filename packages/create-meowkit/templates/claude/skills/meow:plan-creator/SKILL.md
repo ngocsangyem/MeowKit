@@ -52,7 +52,13 @@ Wrong model = wrong phase flow. Always confirm type before proceeding.
 
 Template: `assets/plan-template.md`
 
-## Step 3 — Discovery (if needed)
+## Step 3 — Discovery (skip if pre-researched)
+
+**First:** Check if research reports already exist (e.g., from meow:bootstrap or prior session):
+- Look for `reports/` directory with `researcher-*.md`, `scout-report.md`, `discovery.md`
+- Look for `docs/design-guidelines.md` (from ui-ux-designer)
+- If found → **skip discovery**, use existing reports as plan context
+- If NOT found → run discovery below
 
 Investigate these areas before drafting. Skip any area already well-understood:
 
@@ -118,7 +124,8 @@ Manual checks:
 
 ## Step 7 — Gate 1: Present for Human Approval
 
-Print a summary:
+Print a summary, then use `AskUserQuestion` for structured approval:
+
 ```
 PLAN READY FOR GATE 1
 Title: [title]
@@ -127,11 +134,30 @@ Goal: [one sentence]
 Phases: [list]
 Files affected: [count or list]
 Validation: PLAN_COMPLETE
-
-Approve to proceed to Phase 2 (Test RED). No code until approved.
 ```
 
-Wait for explicit human approval. Do not infer approval from silence.
+**ACTION REQUIRED:** Use `AskUserQuestion` with these options:
+
+```json
+{
+  "questions": [{
+    "question": "Plan is ready. How would you like to proceed?",
+    "header": "Gate 1",
+    "options": [
+      { "label": "Approve (Recommended)", "description": "Proceed to implementation. No code changes until now." },
+      { "label": "Modify plan", "description": "Discuss changes with AI before approving. I'll help refine the plan." },
+      { "label": "Reject", "description": "Discard this plan and start over with different requirements." }
+    ],
+    "multiSelect": false
+  }]
+}
+```
+
+**On "Approve":** Update Agent State → proceed to next phase.
+**On "Modify plan":** Ask what to change. Apply modifications. Re-validate. Present for approval again.
+**On "Reject":** Ask for new requirements. Start over from Step 1.
+
+Do NOT infer approval from silence. Do NOT proceed without explicit selection.
 
 ## ADR Generation
 
