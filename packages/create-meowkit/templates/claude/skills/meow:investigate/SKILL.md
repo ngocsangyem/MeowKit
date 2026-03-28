@@ -30,7 +30,7 @@ hooks:
         - type: command
           command: "bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh"
           statusMessage: "Checking debug scope boundary..."
-source: gstack
+source: gstack/claudekit-engineering
 ---
 
 <!-- Split for progressive disclosure (checklist #11, #14): 497 → ~65 lines -->
@@ -43,6 +43,7 @@ source: gstack
 ## Plan-First Gate
 
 Investigation precedes planning for bug fixes:
+
 1. Confirm root cause FIRST (Iron Law)
 2. After root cause confirmed → invoke `meow:plan-creator --type bugfix` if fix affects > 2 files
 
@@ -69,11 +70,23 @@ Skip: Investigation itself doesn't need a plan — it produces the input for pla
 
 Load **only when executing** the corresponding step — not upfront.
 
-| Reference | When to load | Content |
-|-----------|-------------|---------|
-| **[preamble.md](./references/preamble.md)** | Step 1 — skill startup | Session init, env detection, upgrade check |
+| Reference                                                             | When to load                    | Content                                                                     |
+| --------------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------- |
+| **[preamble.md](./references/preamble.md)**                           | Step 1 — skill startup          | Session init, env detection, upgrade check                                  |
 | **[debugging-methodology.md](./references/debugging-methodology.md)** | Steps 2-6 — investigation + fix | 5-phase debugging: investigate → analyze → hypothesize → implement → verify |
-| **[shared-protocols.md](./references/shared-protocols.md)** | Step 7 — completion | AskUserQuestion format, completion status, telemetry, contributor mode |
+| **[shared-protocols.md](./references/shared-protocols.md)**           | Step 7 — completion             | AskUserQuestion format, completion status, telemetry, contributor mode      |
+
+### Specialized Techniques (load based on bug type)
+
+| Bug type | Load reference | What it adds |
+|----------|---------------|-------------|
+| Deep stack trace errors | `references/root-cause-tracing.md` | Backward trace: symptom → cause → ROOT CAUSE |
+| Server/CI/DB incidents | `references/system-investigation.md` | 5-step system investigation methodology |
+| CI/CD failures, log correlation | `references/log-analysis.md` | Filter → timeline → pattern → cross-source |
+| Performance issues | `references/performance-diagnostics.md` | Quantify → layer isolation → bottleneck |
+| Post-fix validation | `references/reporting-standards.md` | Enhanced DEBUG REPORT with timeline + recommendations |
+| Test pollution | Run `scripts/find-polluter.sh <file> <test-pattern>` | Bisection to find which test creates unwanted state |
+| Defense-in-depth | See `meow:fix/references/prevention-gate.md` | 4-layer validation (DRY — shared with meow:fix) |
 
 ## Constraints
 

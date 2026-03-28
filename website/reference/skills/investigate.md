@@ -64,12 +64,26 @@ Symptoms → Code Trace → Git History Check → Reproduce
 **Plan-First Gate:** Produces input FOR plans — always skips gate.
 :::
 
+## Specialized Techniques (NEW)
+
+Load based on bug type — progressive disclosure:
+
+| Bug type | Reference | What it adds |
+|----------|-----------|-------------|
+| Deep stack trace | `root-cause-tracing.md` | Backward trace to ROOT CAUSE |
+| Server/CI/DB | `system-investigation.md` | 5-step system methodology |
+| Log correlation | `log-analysis.md` | Timeline + pattern matching |
+| Performance | `performance-diagnostics.md` | Bottleneck isolation |
+| Test pollution | `scripts/find-polluter.sh` | Bisection to find polluting test |
+
 ## Gotchas
 
 - **Confirming hypothesis without disproving alternatives**: Finding evidence FOR a theory doesn't mean it's correct → Actively test at least one alternative hypothesis before concluding
 - **Log timestamps in wrong timezone**: Server logs in UTC, local comparison in local time → Normalize all timestamps to UTC before correlation
+- **Fixing where error appears**: Error at line 42 doesn't mean the bug is at line 42 → trace backward to source
 
 ## Related
 
 - [`meow:fix`](/reference/skills/fix) — Orchestrates investigate within the fix pipeline
+- [`meow:sequential-thinking`](/reference/skills/sequential-thinking) — Hypothesis-driven reasoning called during diagnosis
 - [`meow:scout`](/reference/skills/scout) — Helps find relevant files during investigation
