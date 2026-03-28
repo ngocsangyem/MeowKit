@@ -61,3 +61,21 @@ A rigorous, multi-section plan review from a CEO/founder perspective. Challenges
 
 - **Scope expansion beyond available resources**: "10-star thinking" produces a plan that would take 6 months → Always anchor expansion ideas to current sprint capacity
 - **Missing deadlines chasing ambition**: Perfecting the plan instead of shipping MVP → Set a time-box for review; output "ship as-is" or "one targeted improvement"
+
+## Final Step — Handoff and Stop
+
+After CEO review is complete and all findings are written, print this EXACT block:
+
+```
+ /meow:cook [plan file path]
+```
+
+**STOP after printing this block.**
+Do NOT run meow:plan-eng-review automatically.
+Do NOT begin Phase 2.
+Human decides the next step.
+
+<!-- GATE 1 HARD STOP — CEO Review
+     Human decides: run /meow:cook to implement,
+     or run meow:plan-eng-review for engineering review.
+     Agent does not chain reviews automatically. -->

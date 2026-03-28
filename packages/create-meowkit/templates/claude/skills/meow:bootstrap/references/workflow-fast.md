@@ -9,7 +9,9 @@ Auto: `git init && git add -A && git commit -m "chore: initial commit"`
 ## Step 1: Combined Research + Stack
 
 Spawn 6 researcher subagents in parallel (all ≤150 lines):
-- 2 researchers: validate idea + competition
+
+**IMPORTANT:** Include save path in each researcher's prompt:
+- "Research [topic]. Save report to plans/reports/researcher-01-[topic-slug].md"- 2 researchers: validate idea + competition
 - 2 researchers: tech stack recommendation + best practices
 - 2 researchers: design patterns + architecture reference
 

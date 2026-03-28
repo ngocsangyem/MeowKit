@@ -17,7 +17,9 @@ Continue until 100% clear on: what the project does, who uses it, key features, 
 ## Step 2: Research
 
 Spawn 2-4 researcher subagents in parallel. Each report ≤150 lines.
-- Researcher 1: Validate the idea — does this already exist? Competition?
+
+**IMPORTANT:** Include save path in each researcher's prompt:
+- "Research [topic]. Save report to plans/reports/researcher-01-[topic-slug].md"- Researcher 1: Validate the idea — does this already exist? Competition?
 - Researcher 2: Tech stack options — what frameworks/libraries fit?
 - Researcher 3+: Domain-specific research (only if needed — auth, payments, etc.)
 

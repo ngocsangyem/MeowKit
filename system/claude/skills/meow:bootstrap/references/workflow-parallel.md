@@ -12,6 +12,9 @@ Spawn max 2 researcher subagents in parallel (≤150 lines each).
 - Researcher 1: Tech stack + architecture patterns
 - Researcher 2: Similar projects + best practices
 
+**IMPORTANT:** Include save path in each researcher's prompt:
+- "Research [topic]. Save report to plans/reports/researcher-01-[topic-slug].md"
+
 No gate — proceed IMMEDIATELY to Step 2.
 
 ## Step 2: Tech Stack + Design

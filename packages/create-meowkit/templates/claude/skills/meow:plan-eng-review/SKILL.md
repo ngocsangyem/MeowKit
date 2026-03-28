@@ -71,3 +71,20 @@ If running low on context or the user asks to compress: Step 0 > Test diagram > 
 
 - **Bikeshedding on naming while missing architecture issues**: Spending review time on variable names instead of data flow → Review architecture and security FIRST; style issues last
 - **Not checking backward compatibility**: Approving a plan that breaks existing API consumers → Always check: does this change any public interface?
+
+## Final Step — Handoff and Stop
+
+After engineering review is complete and all findings are written, print this EXACT block:
+
+```
+ /meow:cook [plan file path]
+```
+
+**STOP after printing this block.**
+Do NOT begin Phase 2.
+Do NOT write tests or implementation code.
+Human decides when to proceed.
+
+<!-- GATE 1 HARD STOP — Engineering Review
+     Human decides when to run /meow:cook [plan path].
+     Agent does not auto-proceed to Phase 2. -->

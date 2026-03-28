@@ -28,6 +28,16 @@ Reviews plans from an engineering manager perspective. Walks through architectur
 - **Bikeshedding on naming while missing architecture issues**: Spending review time on variable names instead of data flow → Review architecture and security FIRST; style issues last
 - **Not checking backward compatibility**: Approving a plan that breaks existing API consumers → Always check: does this change any public interface?
 
+## Output — Print & Stop
+
+This skill ends with a **Print & Stop**:
+- Prints a handoff block with the `/meow:cook [plan path]` command
+- Stops — Claude will not proceed automatically
+- You run `/meow:cook [plan path]` when ready to implement
+
+Does NOT auto-start Phase 2. Does NOT write tests or implementation code. You decide when to proceed.
+
 ## Related
 - [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — Product/strategy perspective
+- [`meow:plan-creator`](/reference/skills/plan-creator) — Creates the plan that eng review examines
 - [`meow:review`](/reference/skills/review) — Code-level review (after implementation)

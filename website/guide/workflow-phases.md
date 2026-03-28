@@ -18,16 +18,47 @@ Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has 
 - Route: assign model tier by task complexity (Haiku / Sonnet / Opus)
 - Print cost estimate before starting
 
-## Phase 1 — Plan ✋ Gate 1
+## Phase 1 — Plan Gate 1
 
 **Agent:** planner
 **Deliverable:** `tasks/plans/YYMMDD-name.md`
 
-- Challenge premises (/office-hours pattern)
-- Product lens: is this the right thing to build?
-- Engineering lens: is this the right way to build it?
-- Architecture check: does this need an ADR?
-- Create a task file using `npx meowkit task new --type feature` before implementation
+Phase 1 produces an approved plan using one or more planning skills:
+
+| Skill                  | Lens               | Use when                           |
+| ---------------------- | ------------------ | ---------------------------------- |
+| `meow:plan-creator`    | Full plan creation | Starting from scratch              |
+| `meow:plan-ceo-review` | Product lens       | Is this the right thing to build?  |
+| `meow:plan-eng-review` | Engineering lens   | Is this the right way to build it? |
+
+### Gate 1 behavior — Print & Stop
+
+All three skills end with a **Print & Stop**:
+
+1. Skill prints a copy-pasteable `/meow:cook [plan path]` command
+2. Claude stops — no auto-proceed
+3. You review the output and decide the next step
+4. When ready: run `/meow:cook [plan path]` to begin Phase 2
+
+### Review combinations
+
+You control which reviews to run. Common patterns:
+
+```bash
+# Plan only — fastest
+/meow:cook tasks/plans/260328-feature.md
+
+# Plan + product review
+# Run meow:plan-ceo-review, then:
+/meow:cook tasks/plans/260328-feature.md
+
+# Plan + both reviews (recommended for large features)
+# Run meow:plan-ceo-review, then meow:plan-eng-review, then:
+/meow:cook tasks/plans/260328-feature.md
+```
+
+No skill automatically chains into another. You decide the review depth.
+
 - **HUMAN APPROVAL REQUIRED** — no code until plan is approved
 
 ## Phase 2 — Test RED
@@ -84,18 +115,18 @@ Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has 
 
 Most MeowKit skills enforce a plan-first gate: they check for an approved plan before proceeding with significant work.
 
-| Skill | Gate behavior | Skip condition |
-|-------|-------------|----------------|
-| meow:cook | Create plan if missing | Plan path arg, `--fast` mode |
-| meow:fix | Plan if > 2 files | `--quick` mode |
-| meow:ship | Require approved plan | Hotfix with human approval |
-| meow:cso | Scope audit via plan | `--daily` mode |
-| meow:qa | Create QA scope doc | Quick tier |
-| meow:review | Read plan for context | PR diff reviews |
-| meow:workflow-orchestrator | Route to plan-creator | Fasttrack mode |
-| meow:investigate | Produces input FOR plans | Always skips |
-| meow:office-hours | Pre-planning skill | Always skips |
-| meow:retro | Data-driven, no plan | Always skips |
-| meow:document-release | Scope from diff | Post-ship sync |
+| Skill                      | Gate behavior            | Skip condition               |
+| -------------------------- | ------------------------ | ---------------------------- |
+| meow:cook                  | Create plan if missing   | Plan path arg, `--fast` mode |
+| meow:fix                   | Plan if > 2 files        | `--quick` mode               |
+| meow:ship                  | Require approved plan    | Hotfix with human approval   |
+| meow:cso                   | Scope audit via plan     | `--daily` mode               |
+| meow:qa                    | Create QA scope doc      | Quick tier                   |
+| meow:review                | Read plan for context    | PR diff reviews              |
+| meow:workflow-orchestrator | Route to plan-creator    | Fasttrack mode               |
+| meow:investigate           | Produces input FOR plans | Always skips                 |
+| meow:office-hours          | Pre-planning skill       | Always skips                 |
+| meow:retro                 | Data-driven, no plan     | Always skips                 |
+| meow:document-release      | Scope from diff          | Post-ship sync               |
 
 Skills that skip planning have documented reasons — they either produce planning input (investigate, office-hours) or are data-driven (retro).

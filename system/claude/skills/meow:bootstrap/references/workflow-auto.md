@@ -9,7 +9,9 @@ Auto: `git init && git add -A && git commit -m "chore: initial commit"` (no user
 ## Step 1: Research
 
 Spawn 2-3 researcher subagents in parallel. Each report ≤150 lines.
-- Researcher 1: Validation + competition scan
+
+**IMPORTANT:** Include save path in each researcher's prompt:
+- "Research [topic]. Save report to plans/reports/researcher-01-[topic-slug].md"- Researcher 1: Validation + competition scan
 - Researcher 2: Tech stack recommendation
 - Researcher 3: Design patterns for this domain (if applicable)
 
