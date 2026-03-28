@@ -10,6 +10,36 @@ argument-hint: "[issue] --auto|--review|--quick|--parallel"
 
 Unified skill for fixing issues of any complexity with structured diagnosis.
 
+## Process Flow (Authoritative)
+
+```mermaid
+flowchart TD
+    A[Bug Report] --> B[Step 0: Mode Selection]
+    B --> C[Step 1: Scout — MANDATORY]
+    C --> D[Step 2: Diagnose]
+    D --> D1[meow:investigate — collect evidence]
+    D1 --> D2[meow:sequential-thinking — hypothesize + eliminate]
+    D2 --> E{Root cause confirmed?}
+    E -->|Yes, high confidence| F[Step 3: Complexity Assessment]
+    E -->|No, low confidence| D1
+    F -->|Simple| G[Quick fix]
+    F -->|Moderate| H[Standard pipeline + Tasks]
+    F -->|Complex| I[Deep pipeline + research]
+    F -->|Parallel| J[Multi-agent per issue]
+    G --> K[Step 4: Fix Implementation — ROOT CAUSE only]
+    H --> K
+    I --> K
+    J --> K
+    K --> L[Step 5: Verify + Prevent — MANDATORY]
+    L --> L1{Regression test passes?}
+    L1 -->|Yes| M[Step 6: Finalize]
+    L1 -->|Fail, < 3 attempts| D
+    L1 -->|Fail, 3+ attempts| N[STOP — question architecture]
+    M --> O[Report + docs + commit]
+```
+
+**This diagram is the authoritative workflow.** If prose conflicts, follow the diagram.
+
 <HARD-GATE>
 Do NOT propose or implement fixes before completing Steps 1-2 (Scout + Diagnose).
 Symptom fixes are failure. Find the cause first through structured analysis, NEVER guessing.

@@ -60,23 +60,42 @@ Structured bug investigation and fix with auto-complexity detection, parallel ex
 | `/meow:fix intermittent race condition in payment queue` | Deep | Full investigation with parallel exploration |
 | `/meow:fix CI failing on main branch` | Standard | Autonomous — check CI logs, reproduce, fix |
 
-## Quick Workflow
+## Fix Pipeline (7 steps)
 
-```
-Bug Report → Complexity Assessment
-                    ↓
-    ┌──── Quick ────┤──── Standard ────┤──── Deep ────┐
-    │  Direct fix   │  Investigate     │  Full debug  │
-    │  + test       │  → fix → test    │  + parallel  │
-    │  (Gate 1      │  → review        │  exploration │
-    │   skipped)    │  → ship          │  → fix → ship│
-    └───────────────┴──────────────────┴──────────────┘
+```mermaid
+flowchart TD
+    A[Bug Report] --> B[Step 0: Mode Selection]
+    B --> C[Step 1: Scout — MANDATORY]
+    C --> D[Step 2: Diagnose]
+    D --> D1[meow:investigate — collect evidence]
+    D1 --> D2[meow:sequential-thinking — hypothesize + eliminate]
+    D2 --> E{Root cause confirmed?}
+    E -->|Yes| F[Step 3: Complexity Assessment]
+    E -->|No| D1
+    F -->|Simple| G[Quick fix]
+    F -->|Moderate| H[Standard pipeline]
+    F -->|Complex| I[Deep pipeline]
+    G --> K[Step 4: Fix ROOT CAUSE]
+    H --> K
+    I --> K
+    K --> L[Step 5: Verify + Prevent — MANDATORY]
+    L -->|Pass| M[Step 6: Finalize]
+    L -->|Fail, < 3| D
+    L -->|Fail, 3+| N[STOP — question architecture]
+    M --> O[Report + docs + commit]
 ```
 
-1. **Assess complexity** — Quick, Standard, or Deep based on symptom analysis
-2. **Select workflow** — Routes to the appropriate investigation depth
-3. **Investigate** — Collects symptoms, traces code path, checks git history, reproduces
-4. **Hypothesis testing** — Forms and tests hypotheses (3-strike escalation rule)
+| Step | What happens | Skills used |
+|------|-------------|-------------|
+| 0 | Mode selection | AskUserQuestion (Autonomous/HITL/Quick) |
+| 1 | **Scout (mandatory)** | meow:scout — map files, deps, tests |
+| 2 | **Diagnose** | meow:investigate + meow:sequential-thinking |
+| 3 | Complexity assessment | Route to Quick/Standard/Deep |
+| 4 | Fix implementation | Address ROOT CAUSE, not symptoms |
+| 5 | **Verify + prevent (mandatory)** | Regression test + defense-in-depth |
+| 6 | Finalize | Report, update docs, commit |
+
+1. **Scout first** — understand codebase before diagnosing (never skip)
 5. **Fix + regression test** — Minimal fix with a test that proves it works
 6. **Review + ship** — Gate 2 applies (Gate 1 skipped for simple fixes)
 

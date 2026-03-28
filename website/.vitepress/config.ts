@@ -1,9 +1,16 @@
 import { defineConfig } from 'vitepress'
 import llmstxt from 'vitepress-plugin-llms'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 
-export default defineConfig({
+export default withMermaid(defineConfig({
   vite: {
     plugins: [llmstxt()],
+    optimizeDeps: {
+      include: ['mermaid'],
+    },
+    ssr: {
+      noExternal: ['mermaid'],
+    },
   },
   title: 'MeowKit',
   description: 'AI agent toolkit for Claude Code — 48 skills, 14 agents, structured workflow with hard gates, TDD, and security scanning.',
@@ -244,4 +251,4 @@ export default defineConfig({
       copyright: 'Built with MeowKit',
     },
   },
-})
+}))
