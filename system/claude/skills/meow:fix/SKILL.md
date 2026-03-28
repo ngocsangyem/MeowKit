@@ -2,7 +2,7 @@
 name: meow:fix
 description: "ALWAYS activate this skill before fixing ANY bug, error, test failure, CI/CD issue, type error, lint, log error, UI issue, code problem."
 source: claudekit-engineer
-version: 2.0.0
+version: 0.1.0
 argument-hint: "[issue] --auto|--review|--quick|--parallel"
 ---
 
@@ -12,33 +12,15 @@ Unified skill for fixing issues of any complexity with structured diagnosis.
 
 ## Process Flow (Authoritative)
 
-```mermaid
-flowchart TD
-    A[Bug Report] --> B[Step 0: Mode Selection]
-    B --> C[Step 1: Scout — MANDATORY]
-    C --> D[Step 2: Diagnose]
-    D --> D1[meow:investigate — collect evidence]
-    D1 --> D2[meow:sequential-thinking — hypothesize + eliminate]
-    D2 --> E{Root cause confirmed?}
-    E -->|Yes, high confidence| F[Step 3: Complexity Assessment]
-    E -->|No, low confidence| D1
-    F -->|Simple| G[Quick fix]
-    F -->|Moderate| H[Standard pipeline + Tasks]
-    F -->|Complex| I[Deep pipeline + research]
-    F -->|Parallel| J[Multi-agent per issue]
-    G --> K[Step 4: Fix Implementation — ROOT CAUSE only]
-    H --> K
-    I --> K
-    J --> K
-    K --> L[Step 5: Verify + Prevent — MANDATORY]
-    L --> L1{Regression test passes?}
-    L1 -->|Yes| M[Step 6: Finalize]
-    L1 -->|Fail, < 3 attempts| D
-    L1 -->|Fail, 3+ attempts| N[STOP — question architecture]
-    M --> O[Report + docs + commit]
+```
+Bug → Mode Select → Check Memory → Scout (MANDATORY) → Diagnose
+  → [investigate → sequential-thinking → root cause?]
+  → yes → Complexity → Fix ROOT CAUSE → Verify+Prevent (MANDATORY)
+  → pass → Finalize + Write to Memory
+  → fail <3 → re-diagnose | fail 3+ → STOP
 ```
 
-**This diagram is the authoritative workflow.** If prose conflicts, follow the diagram.
+**This flow is authoritative.** If prose conflicts, follow the flow.
 
 <HARD-GATE>
 Do NOT propose or implement fixes before completing Steps 1-2 (Scout + Diagnose).
@@ -57,6 +39,7 @@ Override: `--quick` allows fast scout→diagnose→fix for trivial issues (lint,
 ## Plan-First Gate
 
 For moderate/complex bugs:
+
 1. Run `meow:investigate` to confirm root cause
 2. If fix affects > 2 files → `meow:plan-creator --type bugfix`
 3. Wait for Gate 1 approval
@@ -67,9 +50,19 @@ Skip: `--quick` mode (single file, clear cause).
 
 If no mode flag: use `AskUserQuestion` (Autonomous / HITL / Quick). See `references/mode-selection.md`.
 
+## Step 0.5 — Check Fix Memory (before scouting)
+
+Read `memory/lessons.md` and `memory/patterns.json` for prior fixes:
+- Search for similar symptoms, error messages, or affected modules
+- If a matching fix pattern exists (type: "correction") → use it as starting hypothesis in Step 2
+- If a matching success pattern exists → apply the known fix approach directly
+
+This turns repeated bugs into instant fixes. Skip only if memory/ doesn't exist.
+
 ## Step 1 — Scout (MANDATORY — never skip)
 
 Activate `meow:scout` to map affected codebase BEFORE any diagnosis:
+
 - Affected files, dependencies, related tests, recent changes (`git log`)
 - Quick mode: minimal scout (affected file + direct deps only)
 - Standard/Deep: full scout (module boundaries, test coverage, call chains)
@@ -95,12 +88,12 @@ Output: confirmed root cause (not symptom) with evidence chain + confidence leve
 
 Classify before routing. See `references/complexity-assessment.md`.
 
-| Level | Indicators | Workflow |
-|-------|------------|----------|
-| **Simple** | Single file, clear error | `references/workflow-quick.md` |
+| Level        | Indicators                        | Workflow                          |
+| ------------ | --------------------------------- | --------------------------------- |
+| **Simple**   | Single file, clear error          | `references/workflow-quick.md`    |
 | **Moderate** | Multi-file, root cause multi-step | `references/workflow-standard.md` |
-| **Complex** | System-wide, architecture impact | `references/workflow-deep.md` |
-| **Parallel** | 2+ independent issues | Parallel agents per issue |
+| **Complex**  | System-wide, architecture impact  | `references/workflow-deep.md`     |
+| **Parallel** | 2+ independent issues             | Parallel agents per issue         |
 
 Task orchestration (Moderate+): `references/task-orchestration.md`.
 
@@ -119,11 +112,15 @@ Task orchestration (Moderate+): `references/task-orchestration.md`.
 
 If verify fails: loop to Step 2. After 3 failures → STOP, question architecture.
 
-## Step 6 — Finalize (MANDATORY)
+## Step 6 — Finalize + Learn (MANDATORY)
 
 1. Report: confidence, root cause, changes, files, prevention measures
-2. `documenter` agent → update `./docs`
-3. Ask user about commit
+2. **Write to memory** — capture the fix pattern for future sessions:
+   - Append to `memory/lessons.md`: symptom → root cause → fix approach → what prevented recurrence
+   - Update `memory/patterns.json`: add pattern with `type: "correction"`, `context`, `pattern`, `frequency: 1`
+   - If pattern already exists → increment frequency + update `lastSeen`
+3. `documenter` agent → update `./docs`
+4. Ask user about commit
 
 ## Skill Activation
 

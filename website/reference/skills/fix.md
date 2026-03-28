@@ -65,7 +65,9 @@ Structured bug investigation and fix with auto-complexity detection, parallel ex
 ```mermaid
 flowchart TD
     A[Bug Report] --> B[Step 0: Mode Selection]
-    B --> C[Step 1: Scout — MANDATORY]
+    B --> B1[Step 0.5: Check Fix Memory]
+    B1 -->|known pattern found| K[Step 4: Apply Known Fix]
+    B1 -->|no match| C[Step 1: Scout — MANDATORY]
     C --> D[Step 2: Diagnose]
     D --> D1[meow:investigate — collect evidence]
     D1 --> D2[meow:sequential-thinking — hypothesize + eliminate]
@@ -75,11 +77,11 @@ flowchart TD
     F -->|Simple| G[Quick fix]
     F -->|Moderate| H[Standard pipeline]
     F -->|Complex| I[Deep pipeline]
-    G --> K[Step 4: Fix ROOT CAUSE]
+    G --> K
     H --> K
     I --> K
     K --> L[Step 5: Verify + Prevent — MANDATORY]
-    L -->|Pass| M[Step 6: Finalize]
+    L -->|Pass| M[Step 6: Finalize + Write to Memory]
     L -->|Fail, < 3| D
     L -->|Fail, 3+| N[STOP — question architecture]
     M --> O[Report + docs + commit]
@@ -88,16 +90,23 @@ flowchart TD
 | Step | What happens | Skills used |
 |------|-------------|-------------|
 | 0 | Mode selection | AskUserQuestion (Autonomous/HITL/Quick) |
+| 0.5 | **Check fix memory** | Read memory/lessons.md + patterns.json for known fix patterns |
 | 1 | **Scout (mandatory)** | meow:scout — map files, deps, tests |
 | 2 | **Diagnose** | meow:investigate + meow:sequential-thinking |
 | 3 | Complexity assessment | Route to Quick/Standard/Deep |
 | 4 | Fix implementation | Address ROOT CAUSE, not symptoms |
 | 5 | **Verify + prevent (mandatory)** | Regression test + defense-in-depth |
-| 6 | Finalize | Report, update docs, commit |
+| 6 | **Finalize + learn** | Report, write fix pattern to memory, docs, commit |
 
-1. **Scout first** — understand codebase before diagnosing (never skip)
-5. **Fix + regression test** — Minimal fix with a test that proves it works
-6. **Review + ship** — Gate 2 applies (Gate 1 skipped for simple fixes)
+### Self-Improving Fix Loop
+
+After every fix, Step 6 writes the fix pattern to `memory/patterns.json`. Next time a similar bug appears, Step 0.5 finds the pattern and fast-tracks diagnosis — turning repeated bugs into instant fixes.
+
+```
+Fix bug #1 → write pattern (frequency: 1)
+Fix bug #2 (same class) → read pattern → skip full diagnosis → apply known fix
+After 3+ fixes → pattern promoted to CLAUDE.md rule (via meow:memory)
+```
 
 ::: info Skill Details
 **Phase:** 1–5  
