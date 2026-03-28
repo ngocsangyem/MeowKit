@@ -51,7 +51,7 @@ Triggers Phase 4 structural audit. Runs the 5-dimension review using the `struct
 
 ### Gate 2 Conditions (from gate-rules)
 
-All must be true before proceeding to `/ship`:
+All must be true before proceeding to `/meow:ship`:
 - Verdict file exists at `tasks/reviews/YYMMDD-name-verdict.md`
 - No FAIL dimensions in the verdict
 - All WARN items acknowledged by human

@@ -12,12 +12,12 @@ Runs the complete MeowKit workflow from planning through shipping. This is the "
 
 ### Execution Steps
 
-1. **Phase 1 — Plan.** Run `/plan` internally with the feature description.
+1. **Phase 1 — Plan.** Run `/meow:plan` internally with the feature description.
    - Print: `🐱 Phase 1/5: Planning...`
    - Wait for **Gate 1 approval** from the human.
    - If rejected, stop. If changes requested, revise plan and re-request approval.
 
-2. **Phase 2 — Test (RED).** Run `/test --red-only` to write failing tests for the planned feature.
+2. **Phase 2 — Test (RED).** Run `/meow:test --red-only` to write failing tests for the planned feature.
    - Print: `🐱 Phase 2/5: Writing failing tests...`
    - Tests must target the behaviors defined in the approved plan's Success Criteria.
    - Confirm tests run and FAIL (not compilation errors — actual test failures).
@@ -29,13 +29,13 @@ Runs the complete MeowKit workflow from planning through shipping. This is the "
    - After 3 failures, escalate to human with: failing output, attempted fixes, suspected root cause.
    - After tests pass, optionally refactor (re-run tests after every refactor change).
 
-4. **Phase 4 — Review.** Run `/review` to trigger the 5-dimension structural audit.
+4. **Phase 4 — Review.** Run `/meow:review` to trigger the 5-dimension structural audit.
    - Print: `🐱 Phase 4/5: Reviewing...`
    - Wait for **Gate 2 approval** from the human.
    - If any dimension is FAIL, block shipping. Fix issues and re-review.
    - All WARN items must be acknowledged by the human.
 
-5. **Phase 5 — Ship.** Run `/ship` to commit, create PR, and verify CI.
+5. **Phase 5 — Ship.** Run `/meow:ship` to commit, create PR, and verify CI.
    - Print: `🐱 Phase 5/5: Shipping...`
    - Will not execute if Gate 2 has not passed.
    - Follows ship-pipeline skill: conventional commit → PR → CI verification → rollback plan documented.
@@ -43,6 +43,7 @@ Runs the complete MeowKit workflow from planning through shipping. This is the "
 ### Status Output
 
 Each phase prints its status so the user can track progress:
+
 ```
 🐱 Phase 1/5: Planning...          ✅ Plan approved
 🐱 Phase 2/5: Writing failing tests... ✅ 4 tests written, all RED

@@ -1,6 +1,6 @@
 # Naming Conventions
 
-Enforced per platform. Applied during `/review` (maintainability dimension) and during implementation.
+Enforced per platform. Applied during `/meow:review` (maintainability dimension) and during implementation.
 
 ## TypeScript
 

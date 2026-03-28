@@ -25,7 +25,7 @@ The agent MUST NOT write any of the following without explicit human override:
 
 ### When reviewing existing code
 
-If the agent detects these patterns in existing code during `/review` or `/audit`:
+If the agent detects these patterns in existing code during `/meow:review` or `/meow:audit`:
 - Flag as **WARN**
 - Document in the verdict/audit report
 - Do not auto-fix (existing code may have context the agent lacks)

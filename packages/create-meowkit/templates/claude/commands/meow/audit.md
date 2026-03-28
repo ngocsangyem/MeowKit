@@ -56,4 +56,4 @@ Runs a comprehensive security audit using the `security-checklist` skill across 
 
 - Security report at `tasks/reviews/YYMMDD-security-report.md`
 - Printed summary with per-platform findings and severity levels
-- BLOCK findings must be resolved before any `/ship` command will execute
+- BLOCK findings must be resolved before any `/meow:ship` command will execute

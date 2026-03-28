@@ -45,7 +45,7 @@ Runs TDD enforcement. Ensures tests exist before implementation and reports resu
 |------|----------|
 | `--coverage` | Run tests with coverage report. Show: line coverage %, branch coverage %, uncovered files/lines. |
 | `--watch` | Continuous test mode. Re-run affected tests on every file save. |
-| `--red-only` | Write failing tests but do NOT implement. Used by `/cook` in Phase 2 to generate the RED test suite before Phase 3 implementation. |
+| `--red-only` | Write failing tests but do NOT implement. Used by `/meow:cook` in Phase 2 to generate the RED test suite before Phase 3 implementation. |
 
 ### Output
 

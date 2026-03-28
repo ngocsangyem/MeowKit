@@ -22,7 +22,7 @@ Runs deterministic validation scripts that check for anti-patterns WITHOUT using
 
 ### Why This Exists
 
-LLM-based review (`/review`, `/audit`) is powerful but non-deterministic. `/validate` provides a complementary layer of checks that are:
+LLM-based review (`/meow:review`, `/meow:audit`) is powerful but non-deterministic. `/meow:validate` provides a complementary layer of checks that are:
 - **Reproducible**: same input always produces same output.
 - **Fast**: no API calls, runs locally.
 - **Auditable**: the rules are visible in the script source code.

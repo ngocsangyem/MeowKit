@@ -21,7 +21,7 @@ Proceeding to Phase 2 (Test RED) without an approved plan. No tests are written,
 
 ### Exception
 
-`/fix` with complexity=simple bypasses Gate 1. The fix IS the plan — the scope is small enough that a separate planning document adds overhead without value.
+`/meow:fix` with complexity=simple bypasses Gate 1. The fix IS the plan — the scope is small enough that a separate planning document adds overhead without value.
 
 ## GATE 2 — After Phase 4 (Review)
 
