@@ -23,7 +23,7 @@ Task Received
 Phase 0: Orient ──→ agent-detector scores all agents
      │                lazy-agent-loader loads winner
      ▼
-Phase 1: Plan ────→ planner loads: planning, office-hours, plan-creator
+Phase 1: Plan ────→ planner loads: plan-creator, office-hours, plan-eng-review
      │
      ▼
 Phase 2: Test RED ─→ tester loads: testing, lint-and-validate
@@ -47,8 +47,8 @@ Phase 6: Reflect ─→ documenter loads: documentation, memory
 | Agent | Phase | Skills Loaded |
 |-------|-------|---------------|
 | orchestrator | 0 | agent-detector, lazy-agent-loader, scout |
-| planner | 1 | planning, plan-creator, plan-ceo-review, plan-eng-review, office-hours |
-| architect | 1 | planning (ADR references) |
+| planner | 1 | plan-creator, plan-ceo-review, plan-eng-review, office-hours |
+| architect | 1 | plan-creator (ADR references) |
 | tester | 2 | testing, lint-and-validate, qa, qa-manual |
 | developer | 3 | development, typescript, vue, frontend-design, clean-code, docs-finder |
 | reviewer | 4 | review, cso, vulnerability-scanner |
@@ -67,7 +67,7 @@ flowchart TD
     P0 --> S0[agent-detector\nlazy-agent-loader\nscout]
 
     P0 --> P1[Phase 1: Plan ✋ Gate 1]
-    P1 --> S1[planning\nplan-creator\noffice-hours\nplan-ceo-review\nplan-eng-review]
+    P1 --> S1[plan-creator\noffice-hours\nplan-ceo-review\nplan-eng-review]
 
     P1 --> P2[Phase 2: Test RED]
     P2 --> S2[testing\nlint-and-validate\ncso\nvulnerability-scanner]

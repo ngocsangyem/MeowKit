@@ -105,6 +105,12 @@ Approve to proceed to Phase 2 (Test RED). No code until approved.
 
 Wait for explicit human approval. Do not infer approval from silence.
 
+## ADR Generation
+
+When architecture decisions arise during planning, load `references/adr-generation.md`.
+Output: `docs/architecture/NNNN-title.md` (sequence-numbered).
+Use when: schema changes, new API boundaries, auth/payment architecture, technology choices.
+
 ## Gotchas (top 3)
 
 - **Wrong model for task type**: feature-model on a bug fix skips investigation → always confirm type first

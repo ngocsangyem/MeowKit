@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  42 skills &middot; 13 agents &middot; 18 commands &middot; 7 modes &middot; 12 rules &middot; 6 hooks &middot; 4-layer security
+  41 skills &middot; 13 agents &middot; 18 commands &middot; 7 modes &middot; 12 rules &middot; 6 hooks &middot; 4-layer security
 </p>
 
 <p align="center">
@@ -280,7 +280,6 @@ MeowKit-native skills built from scratch or adapted from source analysis:
 | `meow:development`           | Code patterns, skill loading, TDD enforcement            | —       | 3 files    |
 | `meow:documentation`         | API sync, changelog gen, living docs                     | —       | 3 files    |
 | `meow:memory`                | Cost tracking, pattern extraction, session capture       | —       | 3 files    |
-| `meow:planning`              | ADR generation, plan templates, premise challenge        | —       | 3 files    |
 | `meow:shipping`              | Canary deploy, rollback protocol, ship pipeline          | —       | 3 files    |
 | `meow:testing`               | Red-green-refactor, validation scripts, visual QA        | —       | 3 files    |
 | `meow:llms`                  | Generate llms.txt files per llmstxt.org spec             | —       | 1 file     |
@@ -298,7 +297,7 @@ Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS
 ```
 .claude/
 ├── agents/          13 specialist agents (sub-agents.md compliant)
-├── skills/          42 skills with meow: namespace (35 with references/)
+├── skills/          41 skills with meow: namespace (35 with references/)
 │   └── meow:*/
 │       ├── SKILL.md          Compact decision router (<100 lines)
 │       ├── bin/              Shell utilities (careful, freeze skills)
