@@ -1,6 +1,6 @@
 ---
 title: Skills Overview
-description: "All 41 MeowKit skills organized by category."
+description: "All 42 MeowKit skills organized by category."
 persona: C
 ---
 
@@ -99,6 +99,7 @@ Plan creation, review, and ideation.
 | [meow:plan-ceo-review](/reference/skills/plan-ceo-review) | CEO-mode plan review with scope expansion |
 | [meow:plan-eng-review](/reference/skills/plan-eng-review) | Engineering plan review — architecture, edges, tests |
 | [meow:office-hours](/reference/skills/office-hours) | YC-style brainstorming (startup + builder modes) |
+| [meow:brainstorming](/reference/skills/brainstorming) | Structured ideation with scoring + plan-creator handoff |
 
 ## Exploration & Research
 
