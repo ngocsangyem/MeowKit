@@ -16,8 +16,7 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 sources:
-  - tackline-bootstrap-skill
-  - claudekit-engineer/bootstrap
+  - claudekit-engineer
 ---
 
 # Bootstrap
@@ -61,6 +60,7 @@ Full list: `references/gotchas.md`
 ## Workflow Integration
 
 Pre-workflow (before Phase 0). After completion:
+
 ```
 meow:bootstrap (scaffold) → meow:plan-creator (first feature) → meow:cook (implement)
 ```
@@ -68,6 +68,7 @@ meow:bootstrap (scaffold) → meow:plan-creator (first feature) → meow:cook (i
 ## Handoff Protocol
 
 On BOOTSTRAP_VALID:
+
 - Print generated directory tree
 - Save stack profile to config.json
 - Next: "Project ready. Use `meow:plan-creator` to plan first feature."

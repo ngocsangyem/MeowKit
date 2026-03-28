@@ -20,6 +20,7 @@ Universal principles for generating project structure — any stack, any languag
 ## Naming Convention Enforcement
 
 Follow MeowKit naming-rules.md for the detected stack:
+
 - **TypeScript/Node**: kebab-case files, camelCase functions, PascalCase classes
 - **Vue**: PascalCase components, kebab-case files, `use` prefix for composables
 - **NestJS**: `feature.service.ts`, `feature.controller.ts`, `feature.module.ts`
@@ -53,6 +54,7 @@ Between steps: verify no compilation errors before proceeding.
 ## Minimal Viable Scaffold
 
 For any stack, the minimum output is:
+
 ```
 project/
 ├── src/

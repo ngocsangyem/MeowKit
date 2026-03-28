@@ -15,7 +15,6 @@ allowed-tools:
   - Glob
   - AskUserQuestion
   - WebSearch
-source: meowkit
 sources:
   - claudekit-engineer/brainstorm
   - superpowers/brainstorming
@@ -73,6 +72,7 @@ office-hours (validate) → brainstorming (explore) → plan-creator (plan)
 ## Handoff Protocol
 
 On completion:
+
 - Output saved to plans/reports/
 - If action-plan mode: invoke meow:plan-creator with `{ idea, context, constraints, scores }`
 - Plan-creator receives this as pre-research input, may skip its own discovery step

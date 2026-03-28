@@ -1,6 +1,6 @@
 ---
 title: Skills Overview
-description: "All 43 MeowKit skills organized by category."
+description: "All 44 MeowKit skills organized by category."
 persona: C
 ---
 
@@ -170,6 +170,7 @@ Post-ship docs, retrospectives, and release management.
 
 | Skill | What it does |
 |-------|-------------|
+| [meow:docs-init](/reference/skills/docs-init) | Generate initial docs from codebase analysis |
 | [meow:document-release](/reference/skills/document-release) | Post-ship doc sync — cross-reference diff against docs |
 | [meow:retro](/reference/skills/retro) | Sprint retrospective with commit analysis + trends |
 
