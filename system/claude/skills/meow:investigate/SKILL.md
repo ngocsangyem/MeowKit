@@ -23,12 +23,12 @@ hooks:
     - matcher: "Edit"
       hooks:
         - type: command
-          command: "bash ${CLAUDE_SKILL_DIR}/../freeze/bin/check-freeze.sh"
+          command: "bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh"
           statusMessage: "Checking debug scope boundary..."
     - matcher: "Write"
       hooks:
         - type: command
-          command: "bash ${CLAUDE_SKILL_DIR}/../freeze/bin/check-freeze.sh"
+          command: "bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh"
           statusMessage: "Checking debug scope boundary..."
 source: gstack
 ---

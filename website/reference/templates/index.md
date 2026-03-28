@@ -76,3 +76,20 @@ Examples:
 260327-fix-login-timeout.bug-fix.md
 260327-extract-auth-middleware.refactor.md
 ```
+
+## Plan Creator Reference System
+
+The `meow:plan-creator` skill uses progressive disclosure — details live in reference files loaded on-demand:
+
+| Reference | Purpose | When loaded |
+|-----------|---------|-------------|
+| `scope-challenge.md` | Scope modes (HOLD/EXPANSION/REDUCTION), complexity thresholds | Before research begins |
+| `research-phase.md` | Scout + researcher subagent protocol | When research is needed |
+| `plan-organization.md` | Directory structure, naming, size rules | When creating plan directory |
+| `output-standards.md` | YAML frontmatter, required sections, quality rules | When drafting plan |
+| `solution-evaluation.md` | Trade-off scoring for multiple options | When comparing approaches |
+| `task-management.md` | Hydration, cross-session resume, sync-back | After plan approval |
+| `gotchas.md` | Known planning failure modes | Always (inline top 3 in SKILL.md) |
+| `workflow-models/*.md` | Phase flow per task type | After model selection |
+
+Plans validate via `scripts/validate-plan.py` — deterministic checks for required sections, binary acceptance criteria, and non-empty constraints.

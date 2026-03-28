@@ -138,6 +138,11 @@ Hand off to tester agent with: plan file path + selected workflow model + accept
 - `references/workflow-models/` — feature, bugfix, refactor, security models
 - `references/solution-evaluation.md` — trade-off scoring criteria
 - `references/gotchas.md` — full gotchas list
+- `references/scope-challenge.md` — scope modes (HOLD/EXPANSION/REDUCTION), complexity thresholds
+- `references/research-phase.md` — scout + researcher subagent protocol
+- `references/plan-organization.md` — directory structure, naming, size rules
+- `references/output-standards.md` — YAML frontmatter, required sections, quality rules
+- `references/task-management.md` — hydration, cross-session resume, sync-back
 - `scripts/validate-plan.py` — plan completeness validator
 - `tasks/templates/plan-quick.md` — quick plan template
 - `tasks/templates/plan-phase.md` — phase file template

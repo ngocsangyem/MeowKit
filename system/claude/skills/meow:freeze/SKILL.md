@@ -71,19 +71,7 @@ again. To remove it, run `/unfreeze` or end the session."
 
 ## How it works
 
-The hook reads `file_path` from the Edit/Write tool input JSON, then checks
-whether the path starts with the freeze directory. If not, it returns
-`permissionDecision: "deny"` to block the operation.
-
-The freeze boundary persists for the session via the state file. The hook
-script reads it on every Edit/Write invocation.
-
-## Notes
-
-- The trailing `/` on the freeze directory prevents `/src` from matching `/src-old`
-- Freeze applies to Edit and Write tools only — Read, Bash, Glob, Grep are unaffected
-- This prevents accidental edits, not a security boundary — Bash commands like `sed` can still modify files outside the boundary
-- To deactivate, run `/unfreeze` or end the conversation
+See [references/freeze-mechanics.md](references/freeze-mechanics.md) for technical details on path resolution, symlink handling, state file persistence, and tool scope.
 
 ## Hooks
 

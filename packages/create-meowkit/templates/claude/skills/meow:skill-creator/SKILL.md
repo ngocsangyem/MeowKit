@@ -114,8 +114,6 @@ If FAIL: fix failing items before registering.
 
 ## Anthropic Skill-Building Lessons
 
-When creating or reviewing a skill, verify these 10 lessons from Anthropic's research:
-
 1. **Skills are folders** — use scripts/, references/, assets/, lib/ creatively. See `references/filesystem-patterns.md`.
 2. **Gotchas = highest signal** — every skill MUST have a `## Gotchas` section with real failure modes, not placeholder text. Start with 2-3 gotchas; grow them as Claude hits new edge cases.
 3. **Progressive disclosure** — SKILL.md stays under 150 lines. Details live in references/ loaded on-demand.
@@ -138,12 +136,10 @@ When creating or reviewing a skill, verify these 10 lessons from Anthropic's res
 
 ## References
 
-| Reference                                                     | When to load                 | Content                                        |
-| ------------------------------------------------------------- | ---------------------------- | ---------------------------------------------- |
-| **[creation-workflow.md](./references/creation-workflow.md)** | Step 4 — generating SKILL.md | Detailed section-by-section guidance, examples |
-| **[skill-types.md](./references/skill-types.md)** | Classifying skill type | 9-type taxonomy with MeowKit examples |
-| **[good-vs-bad-examples.md](./references/good-vs-bad-examples.md)** | Writing descriptions, gotchas, steps | Pattern comparisons with concrete examples |
-| **[filesystem-patterns.md](./references/filesystem-patterns.md)** | Deciding folder structure | When to use scripts/, references/, assets/, lib/, config.json |
+- [creation-workflow.md](./references/creation-workflow.md) — Step 4: section-by-section guidance and examples
+- [skill-types.md](./references/skill-types.md) — 9-type taxonomy with MeowKit examples
+- [good-vs-bad-examples.md](./references/good-vs-bad-examples.md) — writing descriptions, gotchas, and steps
+- [filesystem-patterns.md](./references/filesystem-patterns.md) — when to use scripts/, references/, assets/, lib/, config.json
 
 ## Failure Handling
 

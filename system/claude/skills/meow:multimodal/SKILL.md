@@ -74,24 +74,10 @@ Analyze images, video, audio, and documents — or generate images and videos �
 - User asks about Gemini API docs (use meow:docs-finder instead)
 - Image is already described in context (no re-analysis needed)
 
-## Models
+## Models & Limits
 
-| Task                       | Default Model              | Alternative              | Notes                                          |
-| -------------------------- | -------------------------- | ------------------------ | ---------------------------------------------- |
-| Image/video/audio analysis | `gemini-2.5-flash`         | `gemini-2.5-pro`         | Flash is 3x cheaper, Pro for complex reasoning |
-| PDF/document extraction    | `gemini-2.5-flash`         | `gemini-2.5-pro`         | Flash handles most docs well                   |
-| Image generation           | `imagen-4.0-generate-001`  | `gemini-2.5-flash-image` | Imagen for production, Nano Banana for speed   |
-| Video generation           | `veo-3.1-generate-preview` | —                        | 8s clips with audio. Requires billing.         |
-
-## Supported Modalities & Limits
-
-| Modality  | Formats                     | Size Limit                 | Duration/Pages     | Tokens            |
-| --------- | --------------------------- | -------------------------- | ------------------ | ----------------- |
-| Images    | PNG, JPEG, WEBP, HEIC       | 20MB inline / 2GB File API | Up to 3,600 images | ~258 tokens/image |
-| Video     | MP4, MOV, AVI, MKV, WEBM    | 20MB inline / 2GB File API | Up to 6 hours      | ~263 tokens/sec   |
-| Audio     | WAV, MP3, AAC, FLAC, M4A    | 20MB inline / 2GB File API | Up to 9.5 hours    | ~32 tokens/sec    |
-| PDF       | PDF                         | 20MB inline / 2GB File API | Up to 1,000 pages  | ~258 tokens/page  |
-| Documents | DOCX, XLSX, PPTX, HTML, TXT | 20MB inline / 2GB File API | —                  | Varies            |
+Default model for analysis: `gemini-2.5-flash`. For generation: `imagen-4.0-generate-001` (images), `veo-3.1-generate-preview` (video).
+Full model table, pricing, size limits, and token costs: [references/models-and-pricing.md](references/models-and-pricing.md)
 
 ## Scripts
 

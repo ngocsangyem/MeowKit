@@ -12,17 +12,7 @@ author: vudovn (antigravity-kit)
 
 ### Procedures by Ecosystem
 
-#### Node.js / TypeScript
-
-1. **Lint/Fix:** `npm run lint` or `npx eslint "path" --fix`
-2. **Types:** `npx tsc --noEmit`
-3. **Security:** `npm audit --audit-level=high`
-
-#### Python
-
-1. **Linter (Ruff):** `ruff check "path" --fix` (Fast & Modern)
-2. **Security (Bandit):** `bandit -r "path" -ll`
-3. **Types (MyPy):** `mypy "path"`
+See [references/linter-commands.md](references/linter-commands.md) for full command reference per ecosystem (Node.js/TS, Python) and MeowKit validation scripts.
 
 ## The Quality Loop
 
@@ -45,16 +35,4 @@ author: vudovn (antigravity-kit)
 
 ## Scripts
 
-**MeowKit validation scripts** (at `.claude/scripts/`):
-
-| Script             | Purpose                   | Command                                   |
-| ------------------ | ------------------------- | ----------------------------------------- |
-| `validate.py`      | General code validation   | `python .claude/scripts/validate.py`      |
-| `security-scan.py` | Security pattern scanning | `python .claude/scripts/security-scan.py` |
-
-**For linting and type-checking:** Use the project's own toolchain directly:
-
-| Ecosystem  | Lint                                   | Types              |
-| ---------- | -------------------------------------- | ------------------ |
-| Node.js/TS | `npm run lint` or `npx eslint . --fix` | `npx tsc --noEmit` |
-| Python     | `ruff check . --fix`                   | `mypy .`           |
+See [references/linter-commands.md](references/linter-commands.md) for full command tables and MeowKit validation scripts.

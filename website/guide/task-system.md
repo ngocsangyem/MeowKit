@@ -45,11 +45,28 @@ tasks/
 │   ├── refactor.md
 │   ├── security-audit.md
 │   └── guideline.md
+├── plans/              # Plan directories (one per feature)
 ├── active/             # In-progress tasks
 ├── completed/          # Done tasks
 ├── backlog/            # Draft/future tasks
 └── guidelines/         # Team standards
 ```
+
+### Plan directory layout
+
+Every plan uses a directory with reports subfolder:
+
+```
+tasks/plans/260328-add-auth/
+├── plan.md                    # Main plan (under 80 lines)
+├── reports/                   # Scout + research reports
+│   ├── scout-report.md
+│   └── researcher-01-oauth.md
+├── phase-01-setup.md          # Per-phase details
+└── phase-02-implement.md
+```
+
+Plan-creator validates plans via `scripts/validate-plan.py` before Gate 1 approval.
 
 ## Agent State section
 

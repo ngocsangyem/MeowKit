@@ -25,7 +25,7 @@ For moderate/complex bugs:
 2. If fix affects > 2 files → invoke `meow:plan-creator --type bugfix`
 3. Wait for Gate 1 approval
 
-Skip: Simple fixes (single file, clear cause) — `/meow:fix` with `--quick` mode.
+Skip: Simple fixes (single file, clear cause) — `/fix` with `--quick` mode.
 
 ## Workflow
 
