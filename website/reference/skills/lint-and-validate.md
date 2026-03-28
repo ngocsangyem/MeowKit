@@ -13,6 +13,11 @@ Enforces the quality loop: write code → run lint → run typecheck → fix err
 - **MeowKit scripts** — Uses `.claude/scripts/validate.py` and `security-scan.py`
 ## Usage
 Auto-activates after every code modification. Also triggered by: "lint", "format", "check", "validate", "types", "static analysis".
+::: info Skill Details
+**Phase:** 2  
+**Used by:** tester agent
+:::
+
 ## Related
 - [`meow:clean-code`](/reference/skills/clean-code) — Coding standards (principles)
 - [Hooks](/reference/hooks) — `post-write.sh` also runs security checks automatically

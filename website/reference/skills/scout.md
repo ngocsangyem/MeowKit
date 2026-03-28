@@ -61,6 +61,16 @@ Query → SCALE Calculation → Tier Filtering
   → Scout Report (~2000 tokens max)
 ```
 
+::: info Skill Details
+**Phase:** 0  
+**Used by:** orchestrator agent
+:::
+
+## Gotchas
+
+- **Subagents returning partial results**: Context window exceeded, agent returns truncated output → Set explicit file count limits per subagent; merge results with dedup
+- **Missing hidden files in directory scan**: Default glob patterns skip dotfiles → Include dotfiles explicitly when scanning config directories
+
 ## Related
 
 - [`meow:investigate`](/reference/skills/investigate) — Uses scout's file map for debugging

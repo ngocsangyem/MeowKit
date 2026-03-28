@@ -85,6 +85,17 @@ Input → Intent Detection → Mode Selection
 4. **Review cycle** — after implementation, reviewer checks; fix-first resolves trivial issues automatically
 5. **Finalize** — orchestrator syncs plan status, documenter updates docs, shipper creates commit
 
+::: info Skill Details
+**Phase:** 1–5  
+**Plan-First Gate:** Creates plan if missing. Skips with plan path arg or `--fast` mode.
+:::
+
+## Gotchas
+
+- **Skipping Gate 1 on "simple" features**: Features that seem simple grow during implementation → Always create a plan file; cancel it if truly trivial
+- **Context loss between phases**: Long multi-phase workflows exceed context window → Update Agent State section after each phase; next agent reads it first
+- **Spinner hiding error output**: Spinner clears the line, masking error messages beneath → Log errors to stderr before spinner.fail()
+
 ## Related
 
 - [`meow:fix`](/reference/skills/fix) — Lighter pipeline for bug fixes

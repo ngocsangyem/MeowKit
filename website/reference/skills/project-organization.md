@@ -17,5 +17,9 @@ Two modes: **Advisory** (other skills ask "where should I put this file?" and ge
 /meow:project-organization docs/     # organize docs directory
 "where should I put this report?"    # advisory mode
 ```
+::: info Skill Details
+**Phase:** any
+:::
+
 ## Related
 - [`meow:clean-code`](/reference/skills/clean-code) — Code-level standards

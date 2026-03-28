@@ -1,0 +1,139 @@
+---
+title: Agent-Skill Architecture
+description: How MeowKit agents invoke skills across the 7-phase workflow pipeline.
+persona: B
+---
+
+# Agent-Skill Architecture
+
+Agents are specialists. Skills are tools agents load on demand.
+
+Every task is routed to the right agent for its phase. That agent activates only the skills relevant to its work — not a global load of everything. This lazy loading keeps context windows lean and model costs predictable.
+
+::: tip Key principle
+Skills activate by task domain, not all at once. An orchestrator loads routing skills. A developer loads language-specific skills. A shipper loads deployment skills. No agent loads everything.
+:::
+
+## Task Flow
+
+```
+Task Received
+     │
+     ▼
+Phase 0: Orient ──→ agent-detector scores all agents
+     │                lazy-agent-loader loads winner
+     ▼
+Phase 1: Plan ────→ planner loads: planning, office-hours, plan-creator
+     │
+     ▼
+Phase 2: Test RED ─→ tester loads: testing, lint-and-validate
+     │
+     ▼
+Phase 3: Build ───→ developer loads: development, typescript/vue, clean-code
+     │
+     ▼
+Phase 4: Review ──→ reviewer loads: review, cso, vulnerability-scanner
+     │
+     ▼
+Phase 5: Ship ────→ shipper loads: ship, careful, document-release
+     │
+     ▼
+Phase 6: Reflect ─→ documenter loads: documentation, memory
+                    analyst loads: memory
+```
+
+## Agent → Skills Mapping
+
+| Agent | Phase | Skills Loaded |
+|-------|-------|---------------|
+| orchestrator | 0 | agent-detector, lazy-agent-loader, scout |
+| planner | 1 | planning, plan-creator, plan-ceo-review, plan-eng-review, office-hours |
+| architect | 1 | planning (ADR references) |
+| tester | 2 | testing, lint-and-validate, qa, qa-manual |
+| developer | 3 | development, typescript, vue, frontend-design, clean-code, docs-finder |
+| reviewer | 4 | review, cso, vulnerability-scanner |
+| security | 2, 4 | cso, vulnerability-scanner, skill-template-secure |
+| shipper | 5 | ship, shipping, careful |
+| documenter | 6 | documentation, document-release, llms |
+| analyst | 0, 6 | memory |
+| brainstormer | 1 | office-hours |
+| journal-writer | 6 | memory |
+
+## Skill Activation by Phase
+
+```mermaid
+flowchart TD
+    T[Task] --> P0[Phase 0: Orient]
+    P0 --> S0[agent-detector\nlazy-agent-loader\nscout]
+
+    P0 --> P1[Phase 1: Plan ✋ Gate 1]
+    P1 --> S1[planning\nplan-creator\noffice-hours\nplan-ceo-review\nplan-eng-review]
+
+    P1 --> P2[Phase 2: Test RED]
+    P2 --> S2[testing\nlint-and-validate\ncso\nvulnerability-scanner]
+
+    P2 --> P3[Phase 3: Build]
+    P3 --> S3[development\ntypescript / vue\nclean-code\ndocs-finder]
+
+    P3 --> P4[Phase 4: Review ✋ Gate 2]
+    P4 --> S4[review\ncso\nvulnerability-scanner]
+
+    P4 --> P5[Phase 5: Ship]
+    P5 --> S5[ship\nshipping\ncareful\ndocument-release]
+
+    P5 --> P6[Phase 6: Reflect]
+    P6 --> S6[documentation\nmemory\nllms]
+```
+
+## Plan-First Gate Pattern
+
+Most skills enforce a plan-first gate: before doing significant work they check that an approved plan exists.
+
+```
+Task arrives
+     │
+     ▼
+Plan exists? ──No──→ Create plan ──→ ✋ Gate 1 (human approval)
+     │                                       │
+    Yes ◄──────────────────────────── Approved
+     │
+     ▼
+Proceed with implementation
+```
+
+Skills that enforce this gate:
+
+| Skill | Gate behavior | Skip condition |
+|-------|---------------|----------------|
+| meow:cook | Create plan if missing | Plan path arg, `--fast` mode |
+| meow:fix | Plan if > 2 files | `--quick` mode |
+| meow:ship | Require approved plan | Hotfix with human approval |
+| meow:cso | Scope audit via plan | `--daily` mode |
+| meow:qa | Create QA scope doc | Quick tier |
+| meow:review | Read plan for context | PR diff reviews |
+| meow:workflow-orchestrator | Route to plan-creator | Fasttrack mode |
+| meow:investigate | Produces input FOR plans | Always skips |
+| meow:office-hours | Pre-planning skill | Always skips |
+| meow:retro | Data-driven, no plan | Always skips |
+| meow:document-release | Scope from diff | Post-ship sync |
+
+::: info Why some skills skip the gate
+`meow:investigate` and `meow:office-hours` produce planning input — they run before a plan exists by design. `meow:retro` is data-driven and has no implementation output to scope.
+:::
+
+## Cross-Cutting Skills
+
+Some skills activate across multiple phases rather than being owned by a single agent.
+
+| Skill | Activates when |
+|-------|----------------|
+| `careful` | Any phase with destructive commands |
+| `freeze` | Any phase — scopes a debug session |
+| `scout` | Phase 0 + any exploration task |
+| `docs-finder` | Any phase needing up-to-date library docs |
+| `multimodal` | Any phase with visual content or images |
+| `session-continuation` | Cross-session handoff required |
+
+::: warning
+Cross-cutting skills are loaded by individual agents as needed — they are not globally pre-loaded. Loading them unconditionally would inflate every task's context cost.
+:::

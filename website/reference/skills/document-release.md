@@ -17,5 +17,16 @@ After a PR is merged or code is shipped, this skill reads all project documentat
 /meow:docs-sync              # trigger manually
 # Also runs automatically as Step 8.5 of /meow:ship
 ```
+::: info Skill Details
+**Phase:** 6  
+**Used by:** documenter agent  
+**Plan-First Gate:** Scopes from diff — plans only for major doc restructures.
+:::
+
+## Gotchas
+
+- **CHANGELOG voice inconsistency**: Mixing first-person and third-person across entries → Always use imperative mood: "Add feature" not "Added feature" or "I added feature"
+- **README links to deleted files**: Refactored paths not updated in documentation → Run link checker after doc updates; grep for old paths
+
 ## Related
 - [`meow:ship`](/reference/skills/ship) — Invokes document-release after PR creation

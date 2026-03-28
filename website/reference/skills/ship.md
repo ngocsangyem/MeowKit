@@ -88,6 +88,17 @@ Output summary after completion:
 ✓ PR: https://github.com/org/repo/pull/123 (linked: #42, #43)
 ```
 
+::: info Skill Details
+**Phase:** 5  
+**Used by:** shipper agent  
+**Plan-First Gate:** Requires approved plan. Skips for hotfix with human approval.
+:::
+
+## Gotchas
+
+- **Version bump conflicts in monorepo**: Multiple packages bump the same version file → Use per-package VERSION files; bump only the package being shipped
+- **CI passing locally but failing remotely**: Local env has different Node version or env vars → Always verify CI status after push; don't merge on local-only results
+
 ## Related
 
 - [`meow:review`](/reference/skills/review) — The review pass run during ship

@@ -15,6 +15,16 @@ This is a **reference toolkit** — a collection of guides used by agents during
 
 Phase 2-3 TDD enforcement. Agents load these references automatically — you rarely invoke this skill directly.
 
+::: info Skill Details
+**Phase:** 2  
+**Used by:** tester agent
+:::
+
+## Gotchas
+
+- **Mocks hiding integration failures**: All mocked tests pass but real service calls fail → Use integration tests for critical paths; mock only external third-party services
+- **Test coverage metric gamed by trivial assertions**: 100% coverage with `expect(true).toBe(true)` → Measure mutation testing score alongside coverage; flag tests with zero assertions
+
 ## Related
 
 - [Workflow Phases](/guide/workflow-phases) — Where this toolkit is used

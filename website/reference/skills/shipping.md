@@ -15,6 +15,16 @@ This is a **reference toolkit** — a collection of guides used by agents during
 
 Phase 5 (Ship) reference. Agents load these references automatically — you rarely invoke this skill directly.
 
+::: info Skill Details
+**Phase:** 5  
+**Used by:** shipper agent
+:::
+
+## Gotchas
+
+- **Canary deploy without monitoring**: Deploying canary but not watching metrics → Always set up health checks BEFORE canary rollout; define rollback trigger
+- **Rollback plan referencing deleted infrastructure**: Rollback docs point to old deployment scripts → Validate rollback plan against current infra before every ship
+
 ## Related
 
 - [Workflow Phases](/guide/workflow-phases) — Where this toolkit is used

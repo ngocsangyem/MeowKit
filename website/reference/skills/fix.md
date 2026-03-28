@@ -80,6 +80,17 @@ Bug Report → Complexity Assessment
 5. **Fix + regression test** — Minimal fix with a test that proves it works
 6. **Review + ship** — Gate 2 applies (Gate 1 skipped for simple fixes)
 
+::: info Skill Details
+**Phase:** 1–5  
+**Plan-First Gate:** Plans if fix affects > 2 files. Skips with `--quick` mode.
+:::
+
+## Gotchas
+
+- **Fixing symptoms not root cause**: Quick patch makes the test pass but underlying issue remains → Always investigate before implementing; use meow:investigate first
+- **Regression in adjacent code**: Fix in one module breaks an unstated dependency → Run full test suite, not just tests for the changed file
+- **Test mocking hiding real failures**: Mocked tests pass but real integration fails → Prefer integration tests for bug fixes; mock only external services
+
 ## Related
 
 - [`meow:investigate`](/reference/skills/investigate) — The debugging methodology used inside fix

@@ -34,6 +34,17 @@ Systematic QA testing with bug fixing, health scores, and ship-readiness assessm
 /meow:qa https://app.com    # QA a specific URL
 ```
 
+::: info Skill Details
+**Phase:** 2–4  
+**Used by:** tester agent  
+**Plan-First Gate:** Creates QA scope doc for Standard/Exhaustive tiers. Skips Quick tier.
+:::
+
+## Gotchas
+
+- **Testing only happy path**: All tests pass but edge cases crash in production → Include at least one error scenario, one empty state, and one boundary condition per feature
+- **Not testing with realistic data volumes**: Works with 3 items, crashes with 3000 → Test with representative data sizes; flag performance degradation
+
 ## Related
 
 - [`meow:qa-manual`](/reference/skills/qa-manual) — Spec-driven QA + E2E code generation

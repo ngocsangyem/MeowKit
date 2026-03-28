@@ -57,6 +57,10 @@ Name + description → init-skill.py (scaffold)
   → Score < 6/7? → Fix failing items → re-validate
 ```
 
+::: info Skill Details
+**Phase:** any
+:::
+
 ## Related
 
 - [`meow:skill-template-secure`](/reference/skills/) — Security template for skills handling untrusted input

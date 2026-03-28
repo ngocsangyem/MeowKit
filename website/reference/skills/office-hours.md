@@ -17,6 +17,17 @@ Modeled after Y Combinator office hours, this skill forces you to think critical
 "I have an idea for..."      # triggers startup mode
 "brainstorm this"            # triggers builder mode
 ```
+::: info Skill Details
+**Phase:** 1  
+**Used by:** planner, brainstormer agents  
+**Plan-First Gate:** Pre-planning skill — always skips gate.
+:::
+
+## Gotchas
+
+- **Solutioning before understanding the problem**: Jumping to "how to build" before validating "should we build" → Force problem statement completion before any technical discussion
+- **Anchoring on first idea**: First brainstormed solution gets disproportionate attention → Generate at least 3 alternatives before evaluating any
+
 ## Related
 - [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — CEO-level plan review (use after office-hours)
 - [`meow:plan-eng-review`](/reference/skills/plan-eng-review) — Engineering plan review

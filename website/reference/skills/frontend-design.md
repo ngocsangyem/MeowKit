@@ -60,6 +60,11 @@ Detect task → Load design-rules.md reference
   → Deliver only if all checks pass
 ```
 
+::: info Skill Details
+**Phase:** 3  
+**Used by:** developer agent
+:::
+
 ## Related
 
 - [`meow:vue`](/reference/skills/vue) — Vue component patterns

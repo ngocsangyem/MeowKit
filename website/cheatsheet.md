@@ -102,6 +102,14 @@ persona: B
 | meow:qa-manual | "test this flow" | QA report or Playwright .spec.ts |
 | meow:cso | "security audit" | OWASP + STRIDE findings |
 
+## Planning
+
+| Command | What it does |
+|---------|-------------|
+| `/meow:plan "feature"` | Create plan via meow:plan-creator |
+| `npx meowkit task new --type feature "desc"` | Create task from template |
+| `npx meowkit task list` | List active tasks |
+
 ## Task Templates
 
 | Template | Use when | Create with |

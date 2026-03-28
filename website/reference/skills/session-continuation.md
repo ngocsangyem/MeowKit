@@ -18,5 +18,14 @@ workflow:handoff            # save state + get resume command
 workflow:resume AUTH-123    # restore and continue
 workflow:list               # show all saved workflows
 ```
+::: info Skill Details
+**Phase:** 0–6
+:::
+
+## Gotchas
+
+- **Stale handoff after codebase changes**: Saved state references files that were renamed or deleted → Validate all file paths in handoff state before resuming
+- **TOON corruption on concurrent sessions**: Two agents writing state simultaneously → Use file locking or session-scoped state files
+
 ## Related
 - [`meow:workflow-orchestrator`](/reference/skills/workflow-orchestrator) — The workflow being saved/resumed

@@ -15,6 +15,16 @@ This is a **reference toolkit** — a collection of guides used by agents during
 
 Phase 1 (Plan) structured planning. Agents load these references automatically — you rarely invoke this skill directly.
 
+::: info Skill Details
+**Phase:** 1  
+**Used by:** planner, architect agents
+:::
+
+## Gotchas
+
+- **Over-planning trivial tasks**: Creating full ADR + multi-phase plan for a config change → Use plan-quick.md for < 5 files; skip planning entirely for < 2 files
+- **Premise challenge becoming scope creep**: Questioning assumptions leads to expanding scope → Time-box premise challenge to 5 minutes; document but don't act on expansion ideas
+
 ## Related
 
 - [Workflow Phases](/guide/workflow-phases) — Where this toolkit is used

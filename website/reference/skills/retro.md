@@ -17,5 +17,15 @@ Analyzes commit history, work patterns, and code quality metrics to produce a st
 /meow:retro                   # run weekly retrospective
 "what did we ship this week"  # auto-triggers
 ```
+::: info Skill Details
+**Phase:** 6  
+**Plan-First Gate:** Data-driven, no plan needed — always skips gate.
+:::
+
+## Gotchas
+
+- **Recency bias in commit analysis**: Last 2 days dominate the retro, early-week work forgotten → Weight all days equally; show per-day breakdown
+- **Misattributing pair-programmed work**: Co-authored commits counted for committer only → Parse Co-authored-by trailers in commit messages
+
 ## Related
 - [`meow:budget`](/reference/skills/) — Cost analysis (complements retro's quality metrics)

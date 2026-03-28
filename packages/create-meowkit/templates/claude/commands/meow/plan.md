@@ -3,57 +3,38 @@
 ## Usage
 
 ```
-/plan [feature description]
+/meow:plan [feature description]
 ```
 
 ## Behavior
 
-Triggers Phase 1 of the MeowKit workflow. Output is documentation only — no code is written during /plan.
+Triggers Phase 1 of the MeowKit workflow via the `meow:plan-creator` skill. Output is documentation only — no code is written during planning.
 
-### Execution Steps
+### Process
 
-1. **Challenge premises.** Run the `premise-challenge` skill against the feature description. Ask:
-   - What assumptions are we making?
-   - What could invalidate this plan?
-   - Are there simpler alternatives we haven't considered?
-   - What would make us abandon this approach?
+1. **Scope challenge** — check complexity, search for existing solutions, determine scope mode (HOLD/EXPANSION/REDUCTION). See `meow:plan-creator/references/scope-challenge.md`.
 
-2. **Product lens.** Evaluate the feature from a product perspective:
-   - Is this the right thing to build?
-   - What specific problem does it solve?
-   - Who benefits from this? (user persona, team, business)
-   - What does success look like? (measurable criteria)
-   - What is the cost of NOT building this?
+2. **Select workflow model** — map task type to the correct model (feature/bugfix/refactor/security). See `meow:plan-creator/references/workflow-models/`.
 
-3. **Engineering lens.** Evaluate the feature from a technical perspective:
-   - Is this the right way to build it?
-   - What are the alternative approaches? (list at least 2)
-   - What are the technical risks?
-   - What existing code/systems are affected?
-   - What are the dependencies and integration points?
-   - Estimated scope: files changed, new files, migration needed?
+3. **Scout + research** (if needed) — spawn `meow:scout` for unfamiliar codebases, researcher subagents for unfamiliar tech. Reports saved to `tasks/plans/YYMMDD-name/reports/`.
 
-4. **Generate plan file.** Use the `plan-template` skill to produce a structured plan document. Write to:
+4. **Generate plan file** — use `meow:plan-creator` to produce a validated plan. Writes to:
    ```
-   tasks/plans/YYMMDD-feature-name.md
+   tasks/plans/YYMMDD-feature-name/plan.md
    ```
-   The plan must include all required sections: Problem, Success Criteria, Technical Approach (per gate-rules).
+   Validates via `scripts/validate-plan.py` before presenting.
 
-5. **Print plan summary and request approval (Gate 1).** Display:
-   - One-paragraph summary of the plan
-   - Key risks identified
-   - Estimated complexity tier
-   - Explicit prompt: ask the human to approve, request changes, or reject
+5. **Gate 1 — Human approval.** Display plan summary and request approval.
 
 ### Gate 1 Enforcement
 
-Per `rules/gate-rules.md`, the following must be true before proceeding:
-- Plan file exists at `tasks/plans/YYMMDD-name.md`
-- All required sections are populated (Problem, Success Criteria, Technical Approach)
+Per `rules/gate-rules.md`:
+- Plan file exists with all required sections (Goal, Context, Scope, Constraints, Acceptance Criteria)
+- Validation script outputs `PLAN_COMPLETE`
 - Human has explicitly typed approval (not inferred from silence)
 
 No code is written. No tests are written. This phase produces documentation only.
 
 ### Output
 
-A plan file at `tasks/plans/YYMMDD-feature-name.md` and a printed summary awaiting human approval.
+A plan directory at `tasks/plans/YYMMDD-feature-name/` with plan.md + reports/, awaiting human approval.

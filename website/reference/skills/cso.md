@@ -65,6 +65,17 @@ Phase 13-14: Report Generation + Save
 
 Each finding answers: What? Where? Why? Impact? How to fix?
 
+::: info Skill Details
+**Phase:** 4  
+**Used by:** reviewer, security agents  
+**Plan-First Gate:** Scopes audit via plan in comprehensive mode. Skips in `--daily` mode.
+:::
+
+## Gotchas
+
+- **False positives in vendored/test code**: Security scan flags minified vendor bundles or test fixtures → Exclude vendor/ and test/fixtures/ from scan scope
+- **Missing auth checks on internal endpoints**: "Internal only" APIs often become external → Audit ALL endpoints regardless of intended audience
+
 ## Related
 
 - [`meow:vulnerability-scanner`](/reference/skills/) — Code-level pattern scanning

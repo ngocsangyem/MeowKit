@@ -33,6 +33,16 @@ rm -rf node_modules       # → OK (build artifact)
 rm -rf dist               # → OK (build output)
 ```
 
+::: info Skill Details
+**Phase:** 5  
+**Used by:** shipper agent
+:::
+
+## Gotchas
+
+- **False positives on legitimate operations**: Pattern matching `rm` or `drop` in file content, not commands → Check command context, not just string presence
+- **Overly broad regex blocking development**: Guard triggers on test fixtures or documentation mentioning destructive commands → Scope guards to actual Bash tool invocations only
+
 ## Related
 
 - [`meow:freeze`](/reference/skills/freeze) — Restricts edits to a specific directory

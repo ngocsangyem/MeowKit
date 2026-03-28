@@ -14,6 +14,16 @@ Enforces pragmatic coding standards across any language. Core principles: Single
 - **Self-check** — Mandatory verification before task completion
 ## Usage
 Auto-activates on all code-writing tasks. No explicit invocation needed.
+::: info Skill Details
+**Phase:** 3  
+**Used by:** developer agent
+:::
+
+## Gotchas
+
+- **Over-abstracting simple code**: Creating helpers for one-time operations violates YAGNI → Three similar lines are better than a premature abstraction
+- **Removing error handling deemed unnecessary**: Stripping try-catch from system boundaries loses resilience → Only remove error handling for internal calls with guaranteed contracts
+
 ## Related
 - [`meow:lint-and-validate`](/reference/skills/lint-and-validate) — Automated linting after changes
 - [`meow:typescript`](/reference/skills/typescript) — TypeScript-specific patterns

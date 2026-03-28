@@ -59,6 +59,11 @@ Detect concern (component? store? composable? form? performance?)
   → Verify: component renders, types pass, no console warnings
 ```
 
+::: info Skill Details
+**Phase:** 3  
+**Used by:** developer agent
+:::
+
 ## Related
 
 - [`meow:typescript`](/reference/skills/typescript) — TypeScript fundamentals

@@ -12,5 +12,15 @@ Instead of loading all 13 agent definitions at startup (~26,000 tokens), this sk
 - **Session cache** — Once loaded, agent stays cached for the session
 ## Usage
 Automatic — used by `meow:agent-detector` for optimized loading.
+::: info Skill Details
+**Phase:** 0  
+**Used by:** orchestrator agent
+:::
+
+## Gotchas
+
+- **Agent loaded too late missing context**: Lazy loading skips context that was available at session start → Pre-load agents that need session-start context (orchestrator, analyst)
+- **Cache serving stale agent definition**: Agent file updated but cached version used → Invalidate cache on file mtime change
+
 ## Related
 - [`meow:agent-detector`](/reference/skills/agent-detector) — Triggers lazy loading based on scoring

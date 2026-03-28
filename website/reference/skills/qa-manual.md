@@ -76,6 +76,16 @@ Same navigation as A, but also:
   → Run: npx playwright test
 ```
 
+::: info Skill Details
+**Phase:** 2–4  
+**Used by:** tester agent
+:::
+
+## Gotchas
+
+- **Testing against stale deployment**: Running E2E tests against yesterday's build → Verify deployment version matches expected before starting test run
+- **Credentials hardcoded in generated spec files**: Auto-generated .spec.ts contains login credentials → Always use environment variables for credentials; never inline in test code
+
 ## Related
 
 - [`meow:browse`](/reference/skills/browse) — The headless browser used for QA patterns

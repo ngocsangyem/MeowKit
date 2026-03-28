@@ -59,6 +59,16 @@ Symptoms → Code Trace → Git History Check → Reproduce
   → 3 strikes? → Escalate to user
 ```
 
+::: info Skill Details
+**Phase:** 1–3  
+**Plan-First Gate:** Produces input FOR plans — always skips gate.
+:::
+
+## Gotchas
+
+- **Confirming hypothesis without disproving alternatives**: Finding evidence FOR a theory doesn't mean it's correct → Actively test at least one alternative hypothesis before concluding
+- **Log timestamps in wrong timezone**: Server logs in UTC, local comparison in local time → Normalize all timestamps to UTC before correlation
+
 ## Related
 
 - [`meow:fix`](/reference/skills/fix) — Orchestrates investigate within the fix pipeline

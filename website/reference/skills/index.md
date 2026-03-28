@@ -6,7 +6,64 @@ persona: C
 
 # Skills Overview
 
-MeowKit ships 42 skills using the `meow:` namespace prefix. Each skill's SKILL.md stays under ~100 lines as a compact decision router, with detailed procedures in `references/` loaded on demand.
+MeowKit ships 42 skills using the `meow:` namespace prefix.
+
+## Architecture
+
+Each skill folder follows a two-layer design: a compact decision router (`SKILL.md`, ~100 lines) that handles routing logic inline, and a `references/` directory for detailed procedures loaded on demand. This keeps context overhead low — agents load only what each phase requires.
+
+```
+meow:skill-name/
+├── SKILL.md          # Decision router (~100 lines)
+├── references/       # Detailed procedures (loaded on-demand)
+│   ├── workflow-*.md
+│   └── patterns.md
+├── scripts/          # Validation scripts
+├── bin/              # Shell hooks
+└── assets/           # Templates, configs
+```
+
+:::tip On-demand loading
+Skills only load their `references/` files when the relevant phase is active. This prevents flooding the context window with procedures that don't apply to the current step.
+:::
+
+## Skill Types
+
+Skills fall into distinct types based on purpose and phase alignment.
+
+| Type | Purpose | Examples |
+|------|---------|---------|
+| Pipeline | End-to-end workflows orchestrating multiple phases | cook, fix, ship, workflow-orchestrator |
+| Quality Gate | Enforce standards at specific phase boundaries | review, cso, vulnerability-scanner, lint-and-validate |
+| Planning | Plan creation, review, and ideation | plan-creator, plan-ceo-review, plan-eng-review, office-hours |
+| Exploration | Codebase search, debugging, doc retrieval | scout, investigate, docs-finder |
+| Domain | Stack-specific patterns and conventions | typescript, vue, frontend-design |
+| Safety | Prevent destructive actions, scope edits | careful, freeze, skill-template-secure |
+| Infrastructure | Agent routing, loading, skill creation | agent-detector, lazy-agent-loader, skill-creator |
+| Reference Toolkit | Guides loaded by agents during specific phases | development, testing, planning, shipping, documentation, memory |
+| Utility | Cross-cutting tools (browser, media, docs gen) | browse, agent-browser, multimodal, llms, qa, qa-manual, playwright-cli |
+
+## Plan-First Gate
+
+Most pipeline and quality skills check for an approved plan before proceeding. The table below documents each skill's gate behavior and the conditions under which planning is skipped.
+
+| Skill | Gate behavior | Skip condition |
+|-------|-------------|----------------|
+| meow:cook | Create plan if missing | Plan path arg, --fast mode |
+| meow:fix | Plan if > 2 files | --quick mode |
+| meow:ship | Require approved plan | Hotfix with human approval |
+| meow:cso | Scope audit via plan | --daily mode |
+| meow:qa | Create QA scope doc | Quick tier |
+| meow:review | Read plan for context | PR diff reviews |
+| meow:workflow-orchestrator | Route to plan-creator | Fasttrack mode |
+| meow:investigate | Produces input FOR plans | Always skips |
+| meow:office-hours | Pre-planning skill | Always skips |
+| meow:retro | Data-driven, no plan | Always skips |
+| meow:document-release | Scope from diff | Post-ship sync |
+
+:::info Why some skills always skip planning
+Skills that skip planning have documented reasons — they either produce planning input (investigate, office-hours) or are data-driven and operate after the ship phase (retro, document-release).
+:::
 
 ## Pipeline Skills
 
@@ -126,3 +183,9 @@ Collections of reference guides loaded by agents during specific phases.
 | [meow:planning](/reference/skills/planning) | Plan templates, premise challenge, ADRs (Phase 1) |
 | [meow:shipping](/reference/skills/shipping) | Ship pipeline, canary deploy, rollback (Phase 5) |
 | [meow:testing](/reference/skills/testing) | Red-green-refactor, validation, visual QA (Phase 2-3) |
+
+## See Also
+
+- [Agent-Skill Architecture](/guide/agent-skill-architecture) — how agents and skills interact across workflow phases
+- [Workflow Phases](/guide/workflow-phases) — the 6-phase pipeline from Orient to Reflect
+- [Agents Overview](/reference/agents/) — the full agent roster and ownership model

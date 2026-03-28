@@ -18,6 +18,16 @@ Reviews plans from a CEO/founder perspective. Four modes: Scope Expansion (dream
 /meow:plan-ceo-review --hold-scope       # maximum rigor
 /meow:plan-ceo-review --reduce-scope     # strip to essentials
 ```
+::: info Skill Details
+**Phase:** 1  
+**Used by:** planner agent
+:::
+
+## Gotchas
+
+- **Scope expansion beyond available resources**: "10-star thinking" produces a plan that would take 6 months → Always anchor expansion ideas to current sprint capacity
+- **Missing deadlines chasing ambition**: Perfecting the plan instead of shipping MVP → Set a time-box for review; output "ship as-is" or "one targeted improvement"
+
 ## Related
 - [`meow:plan-eng-review`](/reference/skills/plan-eng-review) — Engineering review (complements CEO review)
 - [`meow:office-hours`](/reference/skills/office-hours) — Use before plan reviews

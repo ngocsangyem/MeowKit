@@ -62,6 +62,11 @@ Detect concern (type error? new code? refactor? config?)
   → Verify: npx tsc --noEmit → 0 errors
 ```
 
+::: info Skill Details
+**Phase:** 3  
+**Used by:** developer agent
+:::
+
 ## Related
 
 - [`meow:vue`](/reference/skills/vue) — Vue-specific TypeScript patterns

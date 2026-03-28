@@ -30,6 +30,16 @@ This is a **template**, not an executable skill. Copy it when creating new skill
 # 3. Verify Rule of Two compliance
 ```
 
+::: info Skill Details
+**Phase:** 4  
+**Used by:** security agent
+:::
+
+## Gotchas
+
+- **Security anchor overridden by skill content**: Long skill content pushes security instructions out of context window → Keep security anchor at BOTH top and bottom of SKILL.md
+- **Injection defense patterns becoming stale**: New attack vectors emerge that existing patterns don't catch → Review injection rules quarterly; update when new Claude Code vulnerabilities are disclosed
+
 ## Related
 
 - [`meow:skill-creator`](/reference/skills/skill-creator) — Uses this template during skill creation

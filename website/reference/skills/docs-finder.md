@@ -60,6 +60,11 @@ Query → detect-source.js (classify: library vs internal)
   → Return structured output or write to docs-cache/
 ```
 
+::: info Skill Details
+**Phase:** 3  
+**Used by:** developer agent
+:::
+
 ## Related
 
 - [`meow:multimodal`](/reference/skills/multimodal) — For non-text content (images, audio, video)

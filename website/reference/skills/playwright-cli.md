@@ -55,6 +55,15 @@ playwright-cli open [url] → playwright-cli snapshot
   → collect generated code into .spec.ts file
 ```
 
+::: info Skill Details
+**Phase:** 2–4
+:::
+
+## Gotchas
+
+- **Flaky selectors on SPAs**: `data-testid` changes between renders → prefer role-based selectors (`getByRole`) over CSS selectors
+- **Auth state not persisting between tests**: each test starts with fresh context → use `state-save` / `state-load` to persist auth cookies across runs
+
 ## Related
 
 - [`meow:qa-manual`](/reference/skills/qa-manual) — Uses playwright-cli for E2E code generation

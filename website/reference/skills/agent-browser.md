@@ -68,6 +68,16 @@ agent-browser open [url]
   → agent-browser snapshot (verify result)
 ```
 
+::: info Skill Details
+**Phase:** 2–4
+:::
+
+## Gotchas
+
+- **Stale refs after dynamic DOM updates**: Modals, infinite scroll, and tab switches all invalidate refs silently — commands succeed but target the wrong element. Re-run `snapshot -i` after any interaction that causes DOM change, not just navigation.
+- **Cross-origin iframes block CDP**: Sandboxed iframes (Stripe, reCAPTCHA) appear in snapshot but `fill`/`click` fail silently. Use `screenshot --annotate` to confirm reachability; use `--auto-connect` against a browser where user has already interacted.
+- **JavaScript dialogs freeze all commands**: An unhandled `alert()`/`confirm()`/`prompt()` times out every subsequent command. Run `agent-browser dialog status` first when debugging unexpected timeouts; dismiss with `dialog accept` or `dismiss`.
+
 ## Related
 
 - [`meow:browse`](/reference/skills/browse) — Faster headless browser for QA patterns

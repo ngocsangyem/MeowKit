@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'MeowKit',
-  description: 'AI agent toolkit for Claude Code — 40 skills, 13 agents, structured workflow with hard gates, TDD, and security scanning.',
+  description: 'AI agent toolkit for Claude Code — 42 skills, 13 agents, structured workflow with hard gates, TDD, and security scanning.',
   srcExclude: ['**/plans/**'],
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/meowkit-favicon.svg' }],
@@ -35,6 +35,7 @@ export default defineConfig({
             { text: 'Workflow Phases (0-6)', link: '/guide/workflow-phases' },
             { text: 'Model Routing', link: '/guide/model-routing' },
             { text: 'Memory System', link: '/guide/memory-system' },
+            { text: 'Agent-Skill Architecture', link: '/guide/agent-skill-architecture' },
             { text: 'Task System', link: '/guide/task-system' },
           ],
         },

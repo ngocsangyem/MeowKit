@@ -18,6 +18,16 @@ Orchestrates the full 5-phase development workflow: Understand+Design → Test R
 "fasttrack: [specs]"              # skip Phase 1
 "workflow:start [task]"           # explicit invocation
 ```
+::: info Skill Details
+**Phase:** 0–5  
+**Plan-First Gate:** Routes to plan-creator first. Skips in fasttrack mode.
+:::
+
+## Gotchas
+
+- **Parallel agents editing same file**: Two subagents modify the same source file simultaneously → Define exclusive file ownership before spawning parallel agents
+- **Token budget exceeded mid-workflow**: Complex 5-phase workflow runs out of context → Check remaining context at each phase boundary; escalate if < 20% remaining
+
 ## Related
 - [`meow:cook`](/reference/skills/cook) — The user-facing entry point that triggers this
 - [`meow:session-continuation`](/reference/skills/session-continuation) — Save/resume workflow state

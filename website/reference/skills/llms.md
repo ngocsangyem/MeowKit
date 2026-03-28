@@ -19,5 +19,10 @@ Generates `llms.txt` (and optionally `llms-full.txt`) files that make your proje
 /meow:llms --source ./docs --base-url https://example.com/docs
 python3 .claude/skills/meow:llms/scripts/generate-llms-txt.py --source ./docs --json  # preview
 ```
+::: info Skill Details
+**Phase:** 6  
+**Used by:** documenter agent
+:::
+
 ## Related
 - [`meow:docs-finder`](/reference/skills/docs-finder) — Consumes llms.txt (inverse operation)

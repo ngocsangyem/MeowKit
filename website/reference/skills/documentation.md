@@ -15,6 +15,16 @@ This is a **reference toolkit** — a collection of guides used by agents during
 
 Phase 6 (Reflect) documentation updates. Agents load these references automatically — you rarely invoke this skill directly.
 
+::: info Skill Details
+**Phase:** 6  
+**Used by:** documenter agent
+:::
+
+## Gotchas
+
+- **Docs drifting from code silently**: No automated check that docs match current implementation → Run docs:sync after every feature ship, not just when remembered
+- **Auto-generated docs overwriting manual edits**: Regenerating API docs clobbers hand-written examples → Use separate files for generated vs curated content
+
 ## Related
 
 - [Workflow Phases](/guide/workflow-phases) — Where this toolkit is used

@@ -15,6 +15,16 @@ This is a **reference toolkit** — a collection of guides used by agents during
 
 Phase 0 (Orient) and Phase 6 (Reflect) persistence. Agents load these references automatically — you rarely invoke this skill directly.
 
+::: info Skill Details
+**Phase:** 0, 6  
+**Used by:** analyst, journal-writer agents
+:::
+
+## Gotchas
+
+- **Stale patterns applied to changed codebase**: Memory suggests patterns from old architecture → Include timestamp and context hash in pattern entries; flag old patterns on read
+- **cost-log.json growing unbounded**: Every session appends without pruning → Implement monthly rollup: archive entries older than 90 days
+
 ## Related
 
 - [Workflow Phases](/guide/workflow-phases) — Where this toolkit is used

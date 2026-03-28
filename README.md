@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  40 skills &middot; 13 agents &middot; 18 commands &middot; 7 modes &middot; 10 rules &middot; 6 hooks &middot; 4-layer security
+  42 skills &middot; 13 agents &middot; 18 commands &middot; 7 modes &middot; 12 rules &middot; 6 hooks &middot; 4-layer security
 </p>
 
 <p align="center">
@@ -105,17 +105,18 @@ MeowKit declares complexity before every task:
 | Standard | Feature, bug fix, tests      | Default  |
 | Complex  | Architecture, security, auth | Best     |
 
-### Plan Templates
+### Planning System
 
-All non-trivial tasks (> 30 min OR > 3 files) require a plan file before implementation.
+All non-trivial tasks (> 2 files OR > 30 min) require an approved plan via `meow:plan-creator`.
 
-| Template           | Use when                        |
-| ------------------ | ------------------------------- |
-| `plan-template.md` | Standard features, multi-phase  |
-| `plan-quick.md`    | Small tasks (< 5 files, < 2 hr) |
-| `plan-phase.md`    | Individual phase of larger plan |
+| Workflow Model | Use when | Phase flow |
+|---------------|----------|-----------|
+| feature-model | New functionality | Plan → Test RED → Build GREEN → Review → Ship |
+| bugfix-model | Bug fix | Investigate → Test RED → Fix → Review → Ship |
+| refactor-model | Code restructuring | Plan → Implement → Review → Ship |
+| security-model | Security audit | Plan scope → Audit → Review → Ship |
 
-The `meow:plan-creator` skill auto-selects the right template based on task scope.
+The `meow:plan-creator` skill validates plans via `scripts/validate-plan.py` before Gate 1.
 
 ## Workflow
 
@@ -297,9 +298,10 @@ Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS
 ```
 .claude/
 ├── agents/          13 specialist agents (sub-agents.md compliant)
-├── skills/          40 skills with meow: namespace (35 with references/)
+├── skills/          42 skills with meow: namespace (35 with references/)
 │   └── meow:*/
 │       ├── SKILL.md          Compact decision router (<100 lines)
+│       ├── bin/              Shell utilities (careful, freeze skills)
 │       ├── references/       Detailed procedures (loaded on demand)
 │       └── scripts/          Deterministic validation (docs-finder: JS, multimodal: PY)
 ├── commands/        18 slash commands (meow: namespace)
@@ -310,14 +312,14 @@ Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS
 ├── scripts/
 │   ├── *.py         6 Python validators (stdlib only, no pip deps)
 │   └── bin/         5 POSIX shell utilities (slug, config, repo-mode, diff-scope, review-log)
-└── rules/           10 rule files + RULES_INDEX.md
+└── rules/           12 rule files + RULES_INDEX.md
 
 CLAUDE.md              Entry point — Claude reads this at session start (project root)
 .claude/meowkit.config.json   Project configuration
 .claude/meowkit.manifest.json Checksum manifest (for smart updates)
 .claude/env.example           API key template
 .claude/mcp.json.example      MCP server config template
-tasks/templates/       Task templates (feature, bug-fix, refactor, security, guideline)
+tasks/templates/       Task templates (feature, bug-fix, refactor, security, guideline, report, usage guide)
 ```
 
 ### Self-Contained Design

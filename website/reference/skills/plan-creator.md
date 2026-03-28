@@ -15,5 +15,10 @@ When `/meow:plan` or `/meow:cook` is invoked, this skill determines which plan t
 /meow:plan add pagination    # → auto-selects quick template
 /meow:plan build auth system # → auto-selects standard template
 ```
+::: info Skill Details
+**Phase:** 1  
+**Used by:** planner agent
+:::
+
 ## Related
 - [`meow:cook`](/reference/skills/cook) — Uses plan-creator as its first step

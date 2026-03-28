@@ -69,6 +69,10 @@ File path → API Key Check (STOP if missing)
   → Return structured analysis
 ```
 
+::: info Skill Details
+**Phase:** any
+:::
+
 ## Related
 
 - [`meow:docs-finder`](/reference/skills/docs-finder) — For text-based documentation

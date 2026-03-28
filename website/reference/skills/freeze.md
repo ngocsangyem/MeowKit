@@ -26,6 +26,15 @@ Restrict file edits to a specific directory for the session — prevents acciden
 /unfreeze                   # Remove restriction
 ```
 
+::: info Skill Details
+**Phase:** any
+:::
+
+## Gotchas
+
+- **Symlinked files bypass freeze check**: Edit tool resolves symlinks, writing outside frozen directory → Check resolved path, not just the stated path
+- **Test files in frozen directory can't update fixtures**: Freeze prevents fixture updates needed for new test cases → Use --exclude pattern for test fixtures within frozen scope
+
 ## Related
 
 - [`meow:careful`](/reference/skills/careful) — Warns on destructive commands

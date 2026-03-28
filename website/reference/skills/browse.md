@@ -64,6 +64,15 @@ $B snapshot -D         → See what changed (unified diff)
 $B is visible ".result" → Assert element exists
 ```
 
+::: info Skill Details
+**Phase:** 2–4
+:::
+
+## Gotchas
+
+- **SPA content not rendered**: Headless browser captures DOM before JS hydration completes → Add explicit wait for selector or networkidle before assertions
+- **Auth-gated pages return 401**: Session cookies expire between commands → Re-authenticate or pass cookies explicitly before each protected page test
+
 ## Related
 
 - [`meow:qa-manual`](/reference/skills/qa-manual) — Orchestrates browse for spec-driven QA

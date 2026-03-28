@@ -69,6 +69,17 @@ Verdict rules:
 - **REQUEST CHANGES** — 1+ critical findings that can be fixed
 - **BLOCK** — security vulnerability, spec violation, or 3+ unresolved critical findings
 
+::: info Skill Details
+**Phase:** 4  
+**Used by:** reviewer agent  
+**Plan-First Gate:** Reads plan for context. Skips for standalone PR diff reviews.
+:::
+
+## Gotchas
+
+- **Reviewing diff without full context**: Approving a change that breaks an unstated invariant → Always read the surrounding file, not just the diff hunks
+- **Style nits hiding real bugs**: 10 comments about formatting, zero about the missing null check → Prioritize: security > correctness > performance > style
+
 ## Related
 
 - [`meow:ship`](/reference/skills/ship) — Runs review as part of the ship pipeline

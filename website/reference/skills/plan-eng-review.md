@@ -18,6 +18,16 @@ Reviews plans from an engineering manager perspective. Walks through architectur
 "engineering review"           # auto-triggers
 "lock in the plan"            # auto-triggers
 ```
+::: info Skill Details
+**Phase:** 1  
+**Used by:** planner agent
+:::
+
+## Gotchas
+
+- **Bikeshedding on naming while missing architecture issues**: Spending review time on variable names instead of data flow → Review architecture and security FIRST; style issues last
+- **Not checking backward compatibility**: Approving a plan that breaks existing API consumers → Always check: does this change any public interface?
+
 ## Related
 - [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — Product/strategy perspective
 - [`meow:review`](/reference/skills/review) — Code-level review (after implementation)
