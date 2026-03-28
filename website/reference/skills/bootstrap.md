@@ -1,67 +1,87 @@
 ---
 title: "meow:bootstrap"
-description: "Application scaffold for any stack with progressive generation, auto-detection, and post-scaffold validation."
+description: "End-to-end project orchestrator: research → design → scaffold → plan → implement → docs."
 ---
 
 # meow:bootstrap
 
-Application scaffold for any stack with progressive generation, auto-detection, and post-scaffold validation.
+End-to-end project orchestrator: research → design → scaffold → plan → implement → docs.
 
 ## What This Skill Does
 
-`meow:bootstrap` scaffolds your application code (src/, tests/, docs/, CI/CD) for any tech stack. It complements `npm create meowkit@latest` — the CLI sets up MeowKit infrastructure (.claude/, hooks, skills), while bootstrap generates the application code with MeowKit naming conventions pre-applied.
+`meow:bootstrap` orchestrates the full journey from idea to running code. It doesn't implement anything itself — it wires together MeowKit's existing skills in sequence: parallel research, tech stack selection via brainstorming, design with UI/UX designer, file scaffolding, planning via plan-creator, implementation via cook, and documentation via docs-init.
 
-The skill auto-detects your stack from existing files, applies universal scaffolding principles, and validates the output with a deterministic script. For unknown stacks, it asks you about conventions before generating.
+Complements `npm create meowkit@latest` — CLI = MeowKit infrastructure (.claude/), bootstrap = application code + full pipeline.
 
 ## Core Capabilities
 
-- **Stack auto-detection** — detects from package.json, go.mod, Cargo.toml, Package.swift
-- **Any stack support** — universal principles, not hardcoded templates; asks for conventions on unknown stacks
-- **Progressive generation** — structure → config → source → tests → docs (never all at once)
-- **Post-scaffold validation** — `validate-bootstrap.sh` checks for missing files and placeholder leaks
-- **Config persistence** — saves detected stack + conventions to config.json for future runs
-- **CLI boundary** — never generates .claude/ files (CLI handles that)
+- **4 workflow modes** — Full (all gates), Auto (design gate only), Fast (no gates), Parallel (concurrent implementation)
+- **Research phase** — parallel researcher subagents validate idea + recommend tech stack
+- **Design phase** — UI/UX designer for frontend projects with design guidelines + wireframes
+- **Stack auto-detection** — 40+ stacks via detect-stack.sh (or ask user for unknown)
+- **Progressive scaffolding** — structure → config → source → tests (never all at once)
+- **Full pipeline** — invokes plan-creator, cook, and docs-init (not just handoff text)
+- **CLI boundary** — never touches .claude/ (CLI handles that)
 
 ## When to Use This
 
 ::: tip Use meow:bootstrap when...
 - Starting a new project from scratch
-- You need application scaffolding beyond MeowKit infrastructure
-- You want stack conventions and naming rules pre-applied
+- You want the full pipeline: research → design → scaffold → plan → implement → docs
+- You need MeowKit's workflow applied from day one
 :::
 
 ::: warning Don't use meow:bootstrap when...
 - Project already has source code → use `meow:plan-creator` for new features
 - You only need MeowKit setup → use `npm create meowkit@latest`
-- You need to reorganize existing files → use `meow:project-organization`
 :::
 
 ## Usage
 
 ```bash
-# Auto-detect stack from existing files
-/meow:bootstrap my-project
+# Default (auto mode — design gate only)
+/meow:bootstrap build a task management app with Vue 3 + NestJS
 
-# Specify stack explicitly
-/meow:bootstrap my-project --stack vue3-ts
+# Full mode — gates at every step, maximum control
+/meow:bootstrap build an e-commerce platform --full
 
-# Bootstrap with specific features
-/meow:bootstrap my-project --stack nestjs
+# Fast mode — no gates, max speed, good for prototypes
+/meow:bootstrap quick prototype for a CLI tool --fast
+
+# Parallel mode — concurrent implementation for large projects
+/meow:bootstrap build a SaaS dashboard --parallel
+```
+
+## Modes
+
+| Mode | Gates | Research | Design | Best for |
+|------|-------|----------|--------|----------|
+| **Auto** (default) | Design only | Parallel researchers | UI/UX if frontend | Most projects |
+| **Full** | Every step | Parallel researchers | UI/UX if frontend | Critical projects |
+| **Fast** | None | 6 parallel batch | Skip | Prototypes, hackathons |
+| **Parallel** | Design only | Parallel researchers | UI/UX if frontend | Large multi-module projects |
+
+## Pipeline
+
+```
+bootstrap → git init → research → tech stack → design
+  → scaffold files → plan-creator → cook → docs-init → done
 ```
 
 ::: info Skill Details
-**Phase:** Pre-workflow (before Phase 0)
+**Phase:** Pre-workflow (full pipeline for new projects)
 **Invocation:** Explicit only — never auto-activates
 :::
 
 ## Gotchas
 
+- **Skipping research on "simple" projects**: hidden complexity emerges during implementation → always research unless --fast
 - **Duplicating CLI init**: never generates .claude/ — CLI handles that
-- **Over-scaffolding**: matches scope to config.json, asks before generating 10+ files
-- **Context overflow**: progressive generation prevents generating all files at once
+- **Context overflow**: progressive generation per scaffolding-principles.md
 
 ## Related
 
-- [`meow:project-organization`](/reference/skills/project-organization) — File naming and directory rules (used during generation)
-- [`meow:plan-creator`](/reference/skills/plan-creator) — Plan first feature after bootstrap
-- [`meow:cook`](/reference/skills/cook) — Implement features after planning
+- [`meow:brainstorming`](/reference/skills/brainstorming) — Used during tech stack selection
+- [`meow:plan-creator`](/reference/skills/plan-creator) — Invoked for planning phase
+- [`meow:cook`](/reference/skills/cook) — Invoked for implementation phase
+- [`meow:docs-init`](/reference/skills/docs-init) — Invoked for documentation phase

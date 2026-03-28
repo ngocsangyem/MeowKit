@@ -9,3 +9,5 @@ Update when bootstrap fails in new scenarios.
 - **Placeholder leak**: `[PROJECT_NAME]` or `[TODO]` left in generated files → validate-bootstrap.sh catches these; fix before declaring BOOTSTRAP_VALID
 - **Stale scaffold patterns**: generating patterns from outdated framework versions → use meow:docs-finder to check current framework docs before generating; don't hardcode framework boilerplate
 - **Broken imports after generation**: files reference modules that don't exist yet → generate in dependency order; entry point last (it imports everything)
+- **Skipping research on "simple" projects**: projects that seem simple have hidden complexity (auth, state management, deployment) → always run research phase unless --fast mode
+- **Running full pipeline on tiny scripts**: bootstrapping a 50-line utility with research + design + plan → detect project size; if <5 files expected, use --fast mode automatically

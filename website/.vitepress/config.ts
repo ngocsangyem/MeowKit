@@ -6,7 +6,7 @@ export default defineConfig({
     plugins: [llmstxt()],
   },
   title: 'MeowKit',
-  description: 'AI agent toolkit for Claude Code — 44 skills, 13 agents, structured workflow with hard gates, TDD, and security scanning.',
+  description: 'AI agent toolkit for Claude Code — 47 skills, 14 agents, structured workflow with hard gates, TDD, and security scanning.',
   srcExclude: ['**/plans/**'],
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/meowkit-favicon.svg' }],
@@ -68,6 +68,7 @@ export default defineConfig({
             { text: 'tester', link: '/reference/agents/tester' },
             { text: 'security', link: '/reference/agents/security' },
             { text: 'developer', link: '/reference/agents/developer' },
+            { text: 'ui-ux-designer', link: '/reference/agents/ui-ux-designer' },
             { text: 'reviewer', link: '/reference/agents/reviewer' },
             { text: 'shipper', link: '/reference/agents/shipper' },
             { text: 'documenter', link: '/reference/agents/documenter' },
@@ -135,7 +136,10 @@ export default defineConfig({
           items: [
             { text: 'meow:typescript', link: '/reference/skills/typescript' },
             { text: 'meow:vue', link: '/reference/skills/vue' },
+            { text: 'meow:angular', link: '/reference/skills/angular' },
+            { text: 'meow:react-patterns', link: '/reference/skills/react-patterns' },
             { text: 'meow:frontend-design', link: '/reference/skills/frontend-design' },
+            { text: 'meow:ui-design-system', link: '/reference/skills/ui-design-system' },
           ],
         },
         {

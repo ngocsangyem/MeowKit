@@ -1,6 +1,6 @@
 ---
 title: Skills Overview
-description: "All 44 MeowKit skills organized by category."
+description: "All 47 MeowKit skills organized by category."
 persona: C
 ---
 
@@ -125,13 +125,16 @@ Browser automation, QA testing, and E2E code generation.
 
 ## Frontend
 
-TypeScript, Vue, and UI/UX design patterns.
+TypeScript, Vue, React, and UI/UX design patterns.
 
 | Skill | What it does |
 |-------|-------------|
 | [meow:typescript](/reference/skills/typescript) | Strict TS: null handling, type guards, utility types |
 | [meow:vue](/reference/skills/vue) | Vue 3 Composition API, Pinia, reactivity |
+| [meow:angular](/reference/skills/angular) | Angular v20+ patterns — 10 topics consolidated (components, signals, DI, forms, routing, HTTP, SSR, testing, tooling) |
+| [meow:react-patterns](/reference/skills/react-patterns) | React/Next.js performance — 45+ rules from Vercel Engineering |
 | [meow:frontend-design](/reference/skills/frontend-design) | UI/UX with anti-AI-slop enforcement |
+| [meow:ui-design-system](/reference/skills/ui-design-system) | Design intelligence: styles, WCAG 2.1 AA, palettes, quality checklists |
 
 ## Analysis & Media
 
