@@ -16,6 +16,16 @@ Skip when:
 - `/meow:fix` with complexity=simple (Gate 1 exception per gate-rules.md)
 - Task is < 3 files AND < 30 min AND no architectural decisions needed
 
+## Step 0 — Read Institutional Memory (mandatory)
+
+Before planning, check for prior learnings:
+1. Read `memory/lessons.md` if it exists — note patterns relevant to this task
+2. Read `memory/patterns.json` if it exists — check for frequency-tracked anti-patterns
+3. If relevant learnings found, embed them in plan.md Context section as "Prior learnings"
+
+Skip ONLY if memory/ directory doesn't exist. Never skip if it does.
+Why: prevents re-solving known problems. 60 seconds reading saves hours.
+
 ## Step 1 — Select Workflow Model
 
 Match task type to model before drafting anything:
@@ -39,11 +49,18 @@ Wrong model = wrong phase flow. Always confirm type before proceeding.
 
 Template: `assets/plan-template.md`
 
-## Step 3 — Pre-Plan Research (if needed)
+## Step 3 — Discovery (if needed)
 
-- **Unfamiliar codebase**: spawn `meow:scout` first → save to `reports/scout-report.md`
-- **Unfamiliar tech/API**: spawn researcher subagents in parallel → save to `reports/researcher-NN-topic.md`
-- Skip research only when codebase is well-known AND no new dependencies
+Investigate these areas before drafting. Skip any area already well-understood:
+
+| Area | What to find | Tool |
+|------|-------------|------|
+| **Architecture** | Entry points, module boundaries, dependency graph | meow:scout |
+| **Existing patterns** | Similar implementations to reuse or extend | Grep/Glob |
+| **Constraints** | Runtime limits, framework requirements, build pipeline | Read docs/, config files |
+| **External** | Library APIs, new dependencies (ONLY if novel) | meow:docs-finder, researcher |
+
+Save findings to `reports/discovery.md`. Skip external research if existing patterns cover the need.
 
 ## Step 4 — Draft Plan
 
@@ -59,7 +76,15 @@ tasks/plans/YYMMDD-feature-name/
 
 Date format: `YYMMDD` (e.g., `260327` for March 27, 2026). Name: kebab-case outcome-focused.
 
-Fill in order: frontmatter → Goal (outcome, not activity) → Context → Scope → Constraints → Technical Approach → Acceptance Criteria → Agent State.
+Fill in order: frontmatter → Goal (outcome, not activity) → Context (include Prior learnings from Step 0) → Scope → Constraints → Technical Approach → Risk Map → Acceptance Criteria → Agent State.
+
+### Risk Map (required for m/l/xl effort)
+
+| Component | Risk | Reason |
+|-----------|------|--------|
+| [component] | LOW/MEDIUM/HIGH | [one-line reason] |
+
+Rules: pattern exists in codebase → LOW | external dependency or new API → HIGH | blast radius >5 files → HIGH | novel approach → MEDIUM+ | otherwise → MEDIUM.
 
 ## Step 5 — Solution Options (when to use)
 

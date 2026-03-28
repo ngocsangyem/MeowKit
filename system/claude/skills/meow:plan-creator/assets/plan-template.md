@@ -35,6 +35,13 @@ model: [feature-model | bugfix-model | refactor-model | security-model]
 <!-- How it will be built. Reference workflow model for phase details. -->
 [APPROACH DESCRIPTION]
 
+## Risk Map
+<!-- Required for m/l/xl effort. Skip for xs/s. -->
+<!-- Rules: codebase pattern → LOW | external dep/new API → HIGH | >5 files blast → HIGH | novel → MEDIUM+ -->
+| Component | Risk | Reason |
+|-----------|------|--------|
+| [component] | [LOW/MEDIUM/HIGH] | [one-line reason] |
+
 ## Acceptance Criteria
 <!-- Binary pass/fail. No subjective criteria. -->
 - [ ] [Specific, verifiable condition]
