@@ -1,6 +1,6 @@
 ---
 title: Skills Overview
-description: "All 47 MeowKit skills organized by category."
+description: "All 48 MeowKit skills organized by category."
 persona: C
 ---
 
@@ -110,6 +110,7 @@ Codebase exploration, debugging, and documentation retrieval.
 | [meow:scout](/reference/skills/scout) | Parallel codebase exploration via Explore subagents |
 | [meow:investigate](/reference/skills/investigate) | Systematic 5-phase root cause debugging |
 | [meow:docs-finder](/reference/skills/docs-finder) | Library/project docs via Context7 + Context Hub |
+| [meow:sequential-thinking](/reference/skills/sequential-thinking) | Hypothesis-driven reasoning for root cause analysis |
 
 ## Browser & QA Testing
 

@@ -6,7 +6,7 @@ export default defineConfig({
     plugins: [llmstxt()],
   },
   title: 'MeowKit',
-  description: 'AI agent toolkit for Claude Code — 47 skills, 14 agents, structured workflow with hard gates, TDD, and security scanning.',
+  description: 'AI agent toolkit for Claude Code — 48 skills, 14 agents, structured workflow with hard gates, TDD, and security scanning.',
   srcExclude: ['**/plans/**'],
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/meowkit-favicon.svg' }],
@@ -117,6 +117,7 @@ export default defineConfig({
             { text: 'meow:scout', link: '/reference/skills/scout' },
             { text: 'meow:investigate', link: '/reference/skills/investigate' },
             { text: 'meow:docs-finder', link: '/reference/skills/docs-finder' },
+            { text: 'meow:sequential-thinking', link: '/reference/skills/sequential-thinking' },
           ],
         },
         {
