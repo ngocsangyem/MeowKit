@@ -102,7 +102,16 @@ persona: B
 | meow:qa-manual | "test this flow" | QA report or Playwright .spec.ts |
 | meow:cso | "security audit" | OWASP + STRIDE findings |
 
-## Planning
+## Planning (Phase 1)
+
+| Command | Purpose | Ends with |
+|---------|---------|-----------|
+| `meow:plan-creator` | Create plan from scratch | Print & Stop |
+| `meow:plan-ceo-review` | Product lens review | Print & Stop |
+| `meow:plan-eng-review` | Engineering lens review | Print & Stop |
+| `/meow:cook [path]` | Begin implementation | Runs pipeline |
+
+All three review skills stop after printing — you control when to run `/meow:cook [plan path]`.
 
 | Command | What it does |
 |---------|-------------|

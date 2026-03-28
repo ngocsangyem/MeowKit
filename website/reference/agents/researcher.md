@@ -34,6 +34,26 @@ The researcher is a read-only support agent that fans out queries to multiple so
 # Also invoked by meow:docs-finder for library documentation
 ```
 
+## Documentation Chain
+
+When researching a library or API, the researcher uses a **docs-finder-first** chain:
+
+1. **meow:docs-finder** — resolves official docs via Context7 → Context Hub → WebSearch
+2. **Codebase scan** — checks existing patterns with Grep/Glob before suggesting new approaches
+3. **Cross-reference** — verifies findings against community sources for confidence rating
+
+This ensures recommendations are grounded in current official docs, not stale training data.
+
+## Report Saving
+
+Research findings are saved to the active plan's reports directory:
+
+```
+tasks/plans/YYMMDD-name/reports/researcher-XX-report.md
+```
+
+If no active plan, reports fall back to `plans/reports/`.
+
 ## Under the Hood
 
 ### Handoff Example

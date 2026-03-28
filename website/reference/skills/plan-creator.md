@@ -12,13 +12,42 @@ When `/meow:plan` or `/meow:cook` is invoked, this skill determines the workflow
 - **Workflow model selection** — Routes to feature, bugfix, refactor, or security model
 - **Template selection** — Auto-routes to quick, standard, or multi-phase template by scope
 - **Risk classification** — Maps components to LOW/MEDIUM/HIGH risk, guiding tester and reviewer prioritization
-- **Gate 1 enforcement** — Plans must be approved before implementation
+- **Gate 1 enforcement** — Plans must be approved via `AskUserQuestion` before implementation
+- **Context Reminder** — After Gate 1 approval, prints a mode-matched cook command (e.g. `meow:cook --fast` in fast mode) so you never have to look up the flag
 - **ADR generation** — Creates Architecture Decision Records in `docs/architecture/`
 - **Validation** — Runs `validate-plan.py` to ensure plan completeness
+
+## Flag Modes
+
+| Flag | Behavior |
+|------|----------|
+| *(none)* | Standard mode — full discovery + Gate 1 + validation |
+| `--auto` | Auto-approves minor scope questions, still enforces Gate 1 |
+| `--fast` | Skip discovery, quick template only, Gate 1 still runs |
+| `--hard` | Extended discovery, multi-phase template enforced |
+| `--parallel` | Splits plan into parallel implementation phases |
+
+## Gate 1 — AskUserQuestion
+
+After drafting, the skill presents the plan via `AskUserQuestion` with three options:
+
+- **Approve** — proceed, skill prints context reminder + stops
+- **Modify** — user provides feedback, plan is revised and Gate 1 re-runs
+- **Reject** — planning stops, no plan file is written
+
+## Output — Print & Stop
+
+After Gate 1 approval, the skill ends with a **Print & Stop**:
+- Prints a context reminder block with the mode-matched `/meow:cook [plan path]` command
+- Stops — Claude will not proceed automatically
+- You run the printed command when ready, or run a review skill first
+
 ## Usage
 ```bash
-/meow:plan add pagination    # → auto-selects quick template
-/meow:plan build auth system # → auto-selects standard template
+/meow:plan add pagination              # → auto-selects quick template
+/meow:plan build auth system           # → auto-selects standard template
+/meow:plan build auth system --fast    # → skip discovery, quick template
+/meow:plan redesign API --parallel     # → parallel phase plan
 ```
 ::: info Skill Details
 **Phase:** 1  
