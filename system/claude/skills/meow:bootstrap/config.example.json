@@ -1,0 +1,14 @@
+{
+  "_comment": "meow:bootstrap project config — copy to config.json and fill values",
+  "project_name": "",
+  "stack": "",
+  "features": {
+    "docker": false,
+    "ci_github_actions": false,
+    "database": ""
+  },
+  "conventions": {
+    "naming": "",
+    "test_framework": ""
+  }
+}

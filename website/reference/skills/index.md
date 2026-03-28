@@ -1,12 +1,12 @@
 ---
 title: Skills Overview
-description: "All 42 MeowKit skills organized by category."
+description: "All 43 MeowKit skills organized by category."
 persona: C
 ---
 
 # Skills Overview
 
-MeowKit ships 42 skills using the `meow:` namespace prefix.
+MeowKit ships 43 skills using the `meow:` namespace prefix.
 
 ## Architecture
 
@@ -162,6 +162,7 @@ Agent detection, loading, skill creation, and project organization.
 | [meow:lazy-agent-loader](/reference/skills/lazy-agent-loader) | On-demand agent loading for token savings |
 | [meow:skill-creator](/reference/skills/skill-creator) | Scaffold + validate + register new skills |
 | [meow:project-organization](/reference/skills/project-organization) | File naming, directory structure standards |
+| [meow:bootstrap](/reference/skills/bootstrap) | Application scaffold for any stack with progressive generation |
 
 ## Documentation & Release
 
