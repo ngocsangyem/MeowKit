@@ -88,7 +88,7 @@ Why: meow:docs-finder returns verified, context-efficient docs. WebSearch return
 
 ## Report Saving
 
-When spawned with a report save path in the prompt (e.g., "Save report to plans/reports/researcher-01-auth.md"):
+When spawned with a report save path in the prompt (e.g., "Save report to tasks/reports/researcher-01-auth.md"):
 1. Write the full report to the specified path using Bash
 2. Keep reports ≤150 lines for context efficiency
 3. If no save path given: return findings in response (backward-compatible)

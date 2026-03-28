@@ -18,3 +18,13 @@ planner → security (audit) → reviewer (verify remediations) → shipper
 
 ## Model Tier
 Always COMPLEX — uses best available model regardless of file count.
+
+## Context Reminder (MANDATORY)
+
+After Gate 1 approval, MUST print the cook command with absolute plan path.
+Always: `/meow:cook {path}/plan.md` (interactive, never --auto for security).
+
+> **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
+> Then run the cook command.
+
+This is **NON-NEGOTIABLE** — always output after plan approval.

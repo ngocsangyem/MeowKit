@@ -13,7 +13,7 @@ Spawn max 2 researcher subagents in parallel (≤150 lines each).
 - Researcher 2: Similar projects + best practices
 
 **IMPORTANT:** Include save path in each researcher's prompt:
-- "Research [topic]. Save report to plans/reports/researcher-01-[topic-slug].md"
+- "Research [topic]. Save report to tasks/reports/researcher-01-[topic-slug].md"
 
 No gate — proceed IMMEDIATELY to Step 2.
 

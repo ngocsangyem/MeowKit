@@ -16,6 +16,16 @@ Skip when:
 - `/meow:fix` with complexity=simple (Gate 1 exception per gate-rules.md)
 - Task is < 3 files AND < 30 min AND no architectural decisions needed
 
+## Arguments
+
+| Flag | Behavior | Context Reminder cook flag |
+|------|----------|--------------------------|
+| (default) | Full planning, Gate 1 | `/meow:cook [path]` |
+| `--auto` | Auto complexity, design gate only | `/meow:cook --auto [path]` |
+| `--fast` | Skip research, minimal plan | `/meow:cook --auto [path]` |
+| `--hard` | Thorough, all gates | `/meow:cook [path]` |
+| `--parallel` | File ownership matrix | `/meow:cook --parallel [path]` |
+
 ## Step 0 — Read Institutional Memory (mandatory)
 
 Before planning, check for prior learnings:
@@ -54,46 +64,17 @@ Template: `assets/plan-template.md`
 
 ## Step 3 — Discovery (skip if pre-researched)
 
-**First:** Check if research reports already exist (e.g., from meow:bootstrap or prior session):
-- Look for `reports/` directory with `researcher-*.md`, `scout-report.md`, `discovery.md`
-- Look for `docs/design-guidelines.md` (from ui-ux-designer)
-- If found → **skip discovery**, use existing reports as plan context
-- If NOT found → run discovery below
+**Skip if:** `tasks/reports/researcher-*.md` or `tasks/plans/*/reports/` already has findings, or `docs/design-guidelines.md` exists. Use existing reports as plan context.
 
-Investigate these areas before drafting. Skip any area already well-understood:
-
-| Area | What to find | Tool |
-|------|-------------|------|
-| **Architecture** | Entry points, module boundaries, dependency graph | meow:scout |
-| **Existing patterns** | Similar implementations to reuse or extend | Grep/Glob |
-| **Constraints** | Runtime limits, framework requirements, build pipeline | Read docs/, config files |
-| **External** | Library APIs, new dependencies (ONLY if novel) | meow:docs-finder, researcher |
-
-Save findings to `reports/discovery.md`. Skip external research if existing patterns cover the need.
+**If needed:** Investigate architecture (meow:scout), existing patterns (Grep/Glob), constraints (docs/), external APIs (meow:docs-finder). Save to `reports/discovery.md`.
 
 ## Step 4 — Draft Plan
 
-Directory structure:
-```
-tasks/plans/YYMMDD-feature-name/
-├── plan.md                    ← main plan (keep under 80 lines)
-├── reports/
-│   ├── scout-report.md
-│   └── researcher-NN-topic.md
-└── phase-XX-name.md           ← only if multi-phase
-```
+Output to `tasks/plans/YYMMDD-feature-name/plan.md` (≤80 lines). Use `assets/plan-template.md`.
 
-Date format: `YYMMDD` (e.g., `260327` for March 27, 2026). Name: kebab-case outcome-focused.
+Fill: frontmatter → Goal (outcome, not activity) → Context (Prior learnings) → Scope → Constraints → Technical Approach → Risk Map (m/l/xl effort) → Acceptance Criteria → Agent State.
 
-Fill in order: frontmatter → Goal (outcome, not activity) → Context (include Prior learnings from Step 0) → Scope → Constraints → Technical Approach → Risk Map → Acceptance Criteria → Agent State.
-
-### Risk Map (required for m/l/xl effort)
-
-| Component | Risk | Reason |
-|-----------|------|--------|
-| [component] | LOW/MEDIUM/HIGH | [one-line reason] |
-
-Rules: pattern exists in codebase → LOW | external dependency or new API → HIGH | blast radius >5 files → HIGH | novel approach → MEDIUM+ | otherwise → MEDIUM.
+Risk rules: codebase pattern → LOW | external dep/new API → HIGH | >5 files blast → HIGH | novel → MEDIUM+.
 
 ## Step 5 — Solution Options (when to use)
 
@@ -124,40 +105,11 @@ Manual checks:
 
 ## Step 7 — Gate 1: Present for Human Approval
 
-Print a summary, then use `AskUserQuestion` for structured approval:
-
-```
-PLAN READY FOR GATE 1
-Title: [title]
-Type: [type] | Model: [workflow model] | Effort: [xs/s/m/l/xl]
-Goal: [one sentence]
-Phases: [list]
-Files affected: [count or list]
-Validation: PLAN_COMPLETE
-```
-
-**ACTION REQUIRED:** Use `AskUserQuestion` with these options:
-
-```json
-{
-  "questions": [{
-    "question": "Plan is ready. How would you like to proceed?",
-    "header": "Gate 1",
-    "options": [
-      { "label": "Approve (Recommended)", "description": "Proceed to implementation. No code changes until now." },
-      { "label": "Modify plan", "description": "Discuss changes with AI before approving. I'll help refine the plan." },
-      { "label": "Reject", "description": "Discard this plan and start over with different requirements." }
-    ],
-    "multiSelect": false
-  }]
-}
-```
-
-**On "Approve":** Update Agent State → proceed to next phase.
-**On "Modify plan":** Ask what to change. Apply modifications. Re-validate. Present for approval again.
-**On "Reject":** Ask for new requirements. Start over from Step 1.
-
-Do NOT infer approval from silence. Do NOT proceed without explicit selection.
+Load `references/gate-1-approval.md` and follow its exact process:
+1. Print plan summary
+2. Use AskUserQuestion (Approve / Modify / Reject)
+3. On Approve → print Context Reminder with mode-matched `/meow:cook` command + absolute path
+4. **STOP** — do not auto-proceed to Phase 2
 
 ## ADR Generation
 
@@ -175,22 +127,9 @@ Full list: `references/gotchas.md`
 
 ## Handoff Protocol
 
-After Gate 1 approval, update Agent State in plan.md:
-```
-Planning phase: approved
-Last action: Gate 1 approved by [human]
-Next action: tester writes failing tests (Phase 2)
-Blockers: none
-```
+After Gate 1 approval, update Agent State: `Planning phase: approved`. Hand off to tester with: plan path + workflow model + acceptance criteria.
 
-Hand off to tester agent with: plan file path + selected workflow model + acceptance criteria list.
-
-## Plan Status Updates (resuming work)
-
-1. Read plan.md — check Agent State section
-2. Update completed/blocked phases
-3. Mark todos: `- [x]`
-4. NEVER leave items as in_progress at session end — mark Done, Blocked, or Cancelled
+When resuming: read plan.md Agent State → update completed/blocked → mark todos. Never leave items in_progress at session end.
 
 ## References
 
@@ -202,6 +141,7 @@ Hand off to tester agent with: plan file path + selected workflow model + accept
 - `references/research-phase.md` — scout + researcher subagent protocol
 - `references/plan-organization.md` — directory structure, naming, size rules
 - `references/output-standards.md` — YAML frontmatter, required sections, quality rules
+- `references/gate-1-approval.md` — AskUserQuestion gate + Context Reminder + Print & Stop
 - `references/task-management.md` — hydration, cross-session resume, sync-back
 - `scripts/validate-plan.py` — plan completeness validator
 - `tasks/templates/plan-quick.md` — quick plan template

@@ -18,3 +18,13 @@ planner → developer (incremental changes, test after each) → reviewer → sh
 
 ## Key Rule
 Must be behavior-preserving. All existing tests must pass after every intermediate step.
+
+## Context Reminder (MANDATORY)
+
+After Gate 1 approval, MUST print the cook command with absolute plan path.
+Default: `/meow:cook {path}/plan.md`. Incremental phases — cook handles each.
+
+> **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
+> Then run the cook command.
+
+This is **NON-NEGOTIABLE** — always output after plan approval.

@@ -18,3 +18,13 @@ investigator (meow:investigate) → tester → developer → reviewer → shippe
 
 ## Iron Law
 No fix without confirmed root cause. 3-strike escalation if hypotheses fail.
+
+## Context Reminder (MANDATORY)
+
+After Gate 1 approval, MUST print the cook command with absolute plan path.
+Default: `/meow:cook {path}/plan.md`. Quick fixes skip planning entirely.
+
+> **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
+> Then run the cook command.
+
+This is **NON-NEGOTIABLE** — always output after plan approval.

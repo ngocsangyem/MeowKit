@@ -18,3 +18,13 @@ planner → tester (write failing tests) → developer (implement) → reviewer 
 
 ## TDD Enforcement
 Phase 2 is mandatory. Pre-implement hook blocks code without failing tests.
+
+## Context Reminder (MANDATORY)
+
+After Gate 1 approval, MUST print the cook command with absolute plan path.
+Default: `/meow:cook {path}/plan.md`. With --fast: `/meow:cook --auto {path}/plan.md`
+
+> **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
+> Then run the cook command.
+
+This is **NON-NEGOTIABLE** — always output after plan approval.
