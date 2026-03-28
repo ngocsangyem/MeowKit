@@ -67,6 +67,18 @@ When new evidence invalidates a previous conclusion:
 - When 2+ approaches viable: branch, evaluate each, converge with decision
 
 Load `references/core-patterns.md` for revision/branching patterns.
+For advanced techniques (spiral refinement, multi-branch convergence): `references/advanced-techniques.md`
+For uncertainty + revision cascades: `references/advanced-strategies.md`
+For concrete examples: `references/examples-debug.md`, `examples-api.md`, `examples-architecture.md`
+
+## Scripts
+
+Track and format thoughts deterministically:
+- `scripts/process-thought.js` — validate, track history, branches, revisions. Max 20 thoughts.
+  `node scripts/process-thought.js --thought "..." --number N --total M --next true`
+  `node scripts/process-thought.js --summary` (context-efficient handoff to meow:fix)
+- `scripts/format-thought.js` — format as box/simple/markdown/json
+  `node scripts/format-thought.js --thought "..." --number N --total M --format json`
 
 ## Gotchas
 
