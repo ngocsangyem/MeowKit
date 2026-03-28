@@ -111,8 +111,8 @@ If a script fails — fix it, don't stop.
 
 Keep all project docs in `docs/` and update them as the codebase evolves.
 
-**IMPORTANT:** After completing any feature or fix, run `meow:docs-sync`
-to update affected docs automatically.
+**IMPORTANT:** After shipping features, run `meow:document-release` to update docs.
+**IMPORTANT:** For new projects without docs, run `meow:docs-init` to generate initial docs from codebase analysis.
 
 Key docs to maintain:
 
