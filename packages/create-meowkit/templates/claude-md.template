@@ -10,8 +10,8 @@ and ship production-ready code following the 7-phase workflow.
 ## Workflow Phases
 
 ```
-Phase 0 Orient → Phase 1 Plan [✋ GATE 1] → Phase 2 Test RED
-→ Phase 3 Build → Phase 4 Review [✋ GATE 2] → Phase 5 Ship → Phase 6 Reflect
+Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test RED
+→ Phase 3 Build → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect
 ```
 
 **IMPORTANT:** Read `memory/lessons.md` before starting any task.
