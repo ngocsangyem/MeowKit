@@ -78,5 +78,5 @@ Each finding answers: What? Where? Why? Impact? How to fix?
 
 ## Related
 
-- [`meow:vulnerability-scanner`](/reference/skills/) — Code-level pattern scanning
+- [`meow:vulnerability-scanner`](/reference/skills/vulnerability-scanner) — Code-level pattern scanning
 - [`meow:review`](/reference/skills/review) — Security is one of 5 review dimensions

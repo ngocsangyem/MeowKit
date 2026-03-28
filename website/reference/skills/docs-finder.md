@@ -68,4 +68,4 @@ Query → detect-source.js (classify: library vs internal)
 ## Related
 
 - [`meow:multimodal`](/reference/skills/multimodal) — For non-text content (images, audio, video)
-- [`meow:llms`](/reference/skills/) — Generates llms.txt files (inverse operation)
+- [`meow:llms`](/reference/skills/llms) — Generates llms.txt files (inverse operation)

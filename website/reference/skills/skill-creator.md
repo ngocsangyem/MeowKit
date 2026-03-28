@@ -63,5 +63,5 @@ Name + description → init-skill.py (scaffold)
 
 ## Related
 
-- [`meow:skill-template-secure`](/reference/skills/) — Security template for skills handling untrusted input
+- [`meow:skill-template-secure`](/reference/skills/skill-template-secure) — Security template for skills handling untrusted input
 - [Configuration](/reference/configuration) — Where skills are registered

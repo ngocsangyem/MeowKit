@@ -101,4 +101,4 @@ Input → Intent Detection → Mode Selection
 - [`meow:fix`](/reference/skills/fix) — Lighter pipeline for bug fixes
 - [`meow:ship`](/reference/skills/ship) — Just the shipping step
 - [`meow:review`](/reference/skills/review) — Just the review step
-- [`meow:plan-creator`](/reference/skills/) — The plan template system cook uses
+- [`meow:plan-creator`](/reference/skills/plan-creator) — The plan template system cook uses

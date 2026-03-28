@@ -89,5 +89,5 @@ Same navigation as A, but also:
 ## Related
 
 - [`meow:browse`](/reference/skills/browse) — The headless browser used for QA patterns
-- [`meow:qa`](/reference/skills/) — Systematic QA with health scoring
+- [`meow:qa`](/reference/skills/qa) — Systematic QA with health scoring
 - [`meow:review`](/reference/skills/review) — Code review complements QA testing

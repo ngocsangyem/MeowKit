@@ -28,4 +28,4 @@ Analyzes commit history, work patterns, and code quality metrics to produce a st
 - **Misattributing pair-programmed work**: Co-authored commits counted for committer only → Parse Co-authored-by trailers in commit messages
 
 ## Related
-- [`meow:budget`](/reference/skills/) — Cost analysis (complements retro's quality metrics)
+- [`meow:memory`](/reference/skills/memory) — Cost tracking and session patterns (complements retro metrics)

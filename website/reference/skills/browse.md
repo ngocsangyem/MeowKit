@@ -76,4 +76,4 @@ $B is visible ".result" → Assert element exists
 ## Related
 
 - [`meow:qa-manual`](/reference/skills/qa-manual) — Orchestrates browse for spec-driven QA
-- [`meow:qa`](/reference/skills/) — Systematic QA with health scoring
+- [`meow:qa`](/reference/skills/qa) — Systematic QA with health scoring
