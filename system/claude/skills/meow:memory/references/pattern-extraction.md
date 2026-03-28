@@ -24,6 +24,8 @@ Filter patterns where `frequency >= 3`. These are patterns that have appeared ac
 
 Sort by frequency (descending), then by lastSeen (most recent first).
 
+**Scope awareness:** Patterns with a `scope` field apply only within that path. When proposing rules, note the scope — scoped patterns become package-specific rules, not project-wide CLAUDE.md entries. Project-wide patterns (no `scope`) are candidates for CLAUDE.md rules.
+
 ### Step 3: Group by Category
 
 Group the high-frequency patterns into categories:
@@ -45,6 +47,7 @@ For each high-frequency pattern, draft a rule for the CLAUDE.md rules section:
 ### Proposed Rule: [Rule Name]
 
 **Source:** pattern ID `[id]`, frequency: [N], type: [success/correction]
+**Scope:** [project-wide | specific path, e.g., packages/api]
 **Category:** [coding/review/planning/security/testing/communication]
 
 **Rule:**

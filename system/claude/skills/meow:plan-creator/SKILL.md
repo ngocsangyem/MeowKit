@@ -20,7 +20,10 @@ Skip when:
 
 Before planning, check for prior learnings:
 1. Read `memory/lessons.md` if it exists — note patterns relevant to this task
-2. Read `memory/patterns.json` if it exists — check for frequency-tracked anti-patterns
+2. Read `memory/patterns.json` if it exists — filter by scope:
+   - Patterns with no `scope` field → apply everywhere (project-wide)
+   - Patterns with `scope` → apply only if CWD is within that scope path
+   - Check for frequency-tracked anti-patterns (type: "correction") first
 3. If relevant learnings found, embed them in plan.md Context section as "Prior learnings"
 
 Skip ONLY if memory/ directory doesn't exist. Never skip if it does.

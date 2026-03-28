@@ -25,6 +25,24 @@ MeowKit's memory system lets the AI agent learn from past sessions, track costs,
 3. **Session end:** `post-session.sh` hook triggers memory capture
 4. **After 10 sessions:** Analyst proposes `CLAUDE.md` updates from accumulated patterns
 
+## patterns.json schema
+
+```json
+{
+  "id": "unique-string-id",
+  "type": "success | correction",
+  "scope": "packages/api",
+  "context": "when this pattern applies",
+  "pattern": "what to do (or what not to do)",
+  "frequency": 1,
+  "lastSeen": "YYYY-MM-DD"
+}
+```
+
+The `scope` field is optional. When present, it limits the pattern to a specific directory path (relative to project root). This supports monorepos where patterns may apply to one package but not another. Patterns without `scope` apply project-wide.
+
+**Read-time filtering:** When plan-creator reads patterns.json (Step 0), it filters by current working directory — scoped patterns only apply when CWD is within their scope path.
+
 ## What gets remembered
 
 - Debugging patterns that worked

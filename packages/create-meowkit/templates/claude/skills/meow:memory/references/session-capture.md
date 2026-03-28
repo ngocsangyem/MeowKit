@@ -76,6 +76,7 @@ Write to `memory/patterns.json` (create if it does not exist). This file is mach
     {
       "id": "unique-string-id",
       "type": "success" | "correction",
+      "scope": "relative/path/from/root",
       "context": "when this pattern applies",
       "pattern": "what to do (or what not to do)",
       "frequency": 1,
@@ -91,6 +92,7 @@ Write to `memory/patterns.json` (create if it does not exist). This file is mach
 - Use descriptive `id` values (e.g., `"nestjs-guard-on-all-controllers"`, `"avoid-any-type"`).
 - `type: "success"` = something that works well and should be repeated.
 - `type: "correction"` = something that was wrong and should be avoided.
+- `scope` (optional): relative path from project root where the pattern applies (e.g., `"packages/api"`). Omit for project-wide patterns. In monorepos, this scopes patterns to specific packages so readers can filter by current working directory.
 
 ---
 
@@ -102,6 +104,7 @@ Write to `memory/patterns.json` (create if it does not exist). This file is mach
     {
       "id": "always-validate-dto",
       "type": "success",
+      "scope": "packages/api",
       "context": "NestJS endpoint development",
       "pattern": "Always create a DTO with class-validator decorators for every endpoint that accepts input",
       "frequency": 5,
@@ -110,10 +113,19 @@ Write to `memory/patterns.json` (create if it does not exist). This file is mach
     {
       "id": "no-process-env-direct",
       "type": "correction",
+      "scope": "packages/api",
       "context": "NestJS configuration",
       "pattern": "Do not use process.env directly — always use ConfigService. Human corrected this in session.",
       "frequency": 2,
       "lastSeen": "2026-03-20"
+    },
+    {
+      "id": "kebab-case-file-names",
+      "type": "success",
+      "context": "file naming across all packages",
+      "pattern": "Use kebab-case for all file names — no scope means applies project-wide",
+      "frequency": 4,
+      "lastSeen": "2026-03-25"
     }
   ]
 }
