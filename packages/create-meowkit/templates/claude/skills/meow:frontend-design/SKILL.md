@@ -32,18 +32,27 @@ Operates in **Phase 3 (Build GREEN)** and **Phase 4 (Review)** for design qualit
 
 Every design output MUST pass these checks:
 
-| Category        | Anti-Pattern (NEVER)                              | Do Instead                                                          |
-| --------------- | ------------------------------------------------- | ------------------------------------------------------------------- |
-| **Typography**  | System font stack only, single weight             | 2-3 weights, intentional font pairing                               |
-| **Typography**  | All text same size/weight                         | Clear hierarchy: display → heading → body → caption                 |
-| **Color**       | Pure black (#000) on pure white (#fff)            | Softened: #111827 on #fafafa or similar                             |
-| **Color**       | Rainbow of unrelated colors                       | 1 primary + 1 accent + neutrals (3-5 colors total)                  |
-| **Layout**      | Centered everything, card grid with equal spacing | Asymmetric layouts, intentional whitespace variation                |
-| **Layout**      | Default padding/margin everywhere                 | Design tokens: consistent spacing scale (4px base)                  |
-| **Content**     | "Lorem ipsum" in final delivery                   | Real or realistic content                                           |
-| **Effects**     | Gratuitous shadows, gradients, blur               | Subtle shadows (0 1px 3px), purposeful gradients                    |
-| **Components**  | Default browser inputs/buttons                    | Styled components with clear states (hover, focus, disabled)        |
-| **Performance** | Unoptimized images, layout shift                  | Next-gen formats (WebP/AVIF), explicit dimensions, skeleton loaders |
+| Category | Anti-Pattern (NEVER) | Do Instead |
+|----------|---------------------|------------|
+| **Typography** | System font stack only, single weight | 2-3 weights, intentional font pairing (use meow:ui-design-system/assets/typography.csv) |
+| **Typography** | All text same size/weight | Clear hierarchy: display → heading → body → caption |
+| **Typography** | Inter as default font | Choose font from typography.csv matching project mood |
+| **Color** | Pure black (#000) on pure white (#fff) | Softened: #111827 on #fafafa or similar |
+| **Color** | Rainbow of unrelated colors | 1 primary + 1 accent + neutrals (use meow:ui-design-system/assets/colors.csv) |
+| **Color** | Purple gradient as hero background | Use brand-appropriate gradient or solid color |
+| **Layout** | Centered everything, card grid with equal spacing | Asymmetric layouts, intentional whitespace variation |
+| **Layout** | Default padding/margin everywhere | Design tokens: consistent spacing scale (4px base) |
+| **Layout** | 3-column equal card grid | Vary card sizes, use bento grid, or 2-column with feature highlight |
+| **Content** | "Lorem ipsum" in final delivery | Real or realistic content |
+| **Content** | "John Doe", "jane@example.com" placeholders | Diverse, realistic names and data |
+| **Effects** | Gratuitous shadows, gradients, blur | Subtle shadows (0 1px 3px), purposeful gradients |
+| **Effects** | Parallax on every section | Reserve motion for hero or key CTA; respect prefers-reduced-motion |
+| **Components** | Default browser inputs/buttons | Styled components with clear states (hover, focus, disabled) |
+| **Components** | Unstyled select/checkbox/radio | Custom-styled form controls with accessibility preserved |
+| **Icons** | Emoji as functional icons | SVG icons from consistent library (Lucide, Heroicons, Phosphor) |
+| **Images** | Stock photo hero banners | Custom illustrations, product screenshots, or abstract art |
+| **Performance** | Unoptimized images, layout shift | Next-gen formats (WebP/AVIF), explicit dimensions, skeleton loaders |
+| **Dark Mode** | Just invert colors | Separate dark palette with reduced brightness, maintain contrast ratios |
 
 ## Design Principles (always apply)
 

@@ -1,11 +1,12 @@
 ---
 name: meow:ui-design-system
-version: 1.0.0
+version: 2.0.0
 description: |
   Use when designing UI components, creating design systems, reviewing visual design,
   or checking accessibility compliance. Triggers on "design system", "UI review",
   "color palette", "font pairing", "accessibility audit", "responsive design",
   "WCAG check". Auto-activates when ui-ux-designer agent is working.
+  Data-driven: 161 palettes, 57 font pairings, 161 product types, 99 UX guidelines, 25 chart types.
 allowed-tools:
   - Read
   - Grep
@@ -19,9 +20,7 @@ sources:
 
 # UI Design System
 
-Design intelligence for UI/UX work: styles, accessibility standards, responsive rules, and quality checklists.
-
-Merges capabilities of CK's ui-ux-pro-max (design patterns) + web-design-guidelines (compliance) into one MeowKit skill.
+Data-driven design intelligence: curated palettes, font pairings, product recommendations, UX guidelines, accessibility standards, and quality checklists.
 
 ## When to Use
 
@@ -29,24 +28,44 @@ Merges capabilities of CK's ui-ux-pro-max (design patterns) + web-design-guideli
 - Setting up a design system for a new project
 - Checking WCAG accessibility compliance
 - Selecting color palettes, typography, or UI styles
+- Choosing chart types for data visualization
 - Responsive design review
 
 ## Process
 
-1. **Understand requirements** — what product type? what audience? what style direction?
-2. **Load relevant reference** — select from references/ based on design task:
+1. **Understand requirements** — what product type? audience? style direction?
+2. **Look up design data** — read `references/data-lookup.md` for how to query:
+   - Color palette → `assets/colors.csv` (161 WCAG-verified palettes by product type)
+   - Font pairing → `assets/typography.csv` (57 pairings with Google Fonts URLs)
+   - Product direction → `assets/products.csv` (161 types with style/dashboard/color recs)
+   - UX check → `assets/ux-guidelines.csv` (99 Do/Don't rules with severity)
+   - Chart type → `assets/charts.csv` (25 types with accessibility grades)
+3. **Apply design rules** — load from references/ based on task:
    - Visual design → `references/design-patterns.md`
    - Accessibility → `references/accessibility-standards.md`
    - Quality check → `references/quality-checklist.md`
-3. **Apply standards** — use reference guidelines to create or review design
-4. **Validate** — check output against quality-checklist.md before handoff
+4. **Validate** — run quality-checklist.md before handoff
+
+## Data Assets (NEW — v2.0)
+
+| File | Rows | Content |
+|------|------|---------|
+| `assets/colors.csv` | 161 | WCAG-verified palettes by product type (hex values) |
+| `assets/typography.csv` | 57 | Font pairings with mood, Google Fonts URLs, Tailwind config |
+| `assets/products.csv` | 161 | Product type → style, landing pattern, dashboard, color focus |
+| `assets/ux-guidelines.csv` | 99 | Do/Don't pairs with category + severity |
+| `assets/charts.csv` | 25 | Data type → best chart, accessibility grade, library |
+
+See `references/data-lookup.md` for lookup patterns and examples.
 
 ## Gotchas
 
-- **Aesthetic over accessibility**: beautiful design that fails WCAG → always check contrast ratios (4.5:1 normal, 3:1 large) before shipping
-- **Desktop-first design**: designing for large screens then cramming into mobile → always start from 320px, expand up
-- **Color-only communication**: using red/green alone for status → always pair color with icon or text label
+- **Aesthetic over accessibility**: beautiful design that fails WCAG → check contrast (4.5:1 normal, 3:1 large) before shipping
+- **Desktop-first design**: designing for large screens then cramming into mobile → start from 320px
+- **Color-only communication**: red/green for status → pair with icon or text label
+- **Ignoring the data**: guessing palette when colors.csv has WCAG-verified values → always look up first
+- **Generic product assumptions**: all SaaS looks the same → check products.csv for product-specific recommendations
 
 ## Workflow Integration
 
-Loaded by `ui-ux-designer` agent during Phase 3 (Build). Also used by `developer` agent when implementing frontend components.
+Loaded by `ui-ux-designer` agent during Phase 3 (Build). Also used by `developer` agent for frontend work.
