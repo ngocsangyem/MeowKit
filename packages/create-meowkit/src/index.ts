@@ -2,10 +2,11 @@
 
 import minimist from "minimist";
 import pc from "picocolors";
+import * as p from "@clack/prompts";
 import { promptUser } from "./prompts.js";
 import { validate } from "./validate.js";
 import { smartUpdate } from "./smart-update.js";
-import { fetchReleases, downloadRelease, cleanupDownload, getLatestStable, getLatestBeta } from "./github-releases.js";
+import { fetchReleases, downloadRelease, cleanupDownload } from "./github-releases.js";
 import type { ReleaseInfo } from "./github-releases.js";
 import * as log from "./logger.js";
 import * as spinner from "./spinner.js";
@@ -79,23 +80,57 @@ async function main(): Promise<void> {
 
   log.debug(`Target directory: ${targetDir}`);
 
-  // Step 1: Fetch available release from GitHub
-  spinner.start("Fetching latest release...");
-  let release: ReleaseInfo | null;
+  // Step 1: Fetch releases and let user select version
+  spinner.start("Fetching available releases...");
+  let releases: ReleaseInfo[];
   try {
-    release = beta ? await getLatestBeta() : await getLatestStable();
+    releases = await fetchReleases();
   } catch (err: unknown) {
     spinner.fail("Failed to fetch releases");
     const msg = err instanceof Error ? err.message : String(err);
     throw new Error(`Cannot fetch releases from GitHub: ${msg}`);
   }
 
-  if (!release) {
-    spinner.fail("No release found");
-    throw new Error(beta ? "No beta release available" : "No stable release available");
+  if (releases.length === 0) {
+    spinner.fail("No releases found");
+    throw new Error("No releases available on GitHub");
   }
 
-  spinner.succeed(`Found ${beta ? "beta" : "stable"} release: ${pc.cyan(release.version)}`);
+  spinner.succeed(`Found ${releases.length} release(s)`);
+
+  let release: ReleaseInfo;
+
+  if (argv.json) {
+    // Non-interactive: pick latest stable or beta
+    const pick = beta
+      ? releases.find((r) => r.isBeta)
+      : releases.find((r) => !r.isBeta);
+    if (!pick) throw new Error(beta ? "No beta release available" : "No stable release available");
+    release = pick;
+  } else {
+    // Interactive: let user select
+    const latestStable = releases.find((r) => !r.isBeta);
+    const options = releases.slice(0, 10).map((r) => ({
+      value: r.tag,
+      label: `${r.version}${r.isBeta ? pc.yellow(" (beta)") : ""}${r.tag === latestStable?.tag ? pc.green(" (latest)") : ""}`,
+      hint: r.publishedAt.split("T")[0],
+    }));
+
+    const selected = await p.select({
+      message: "Select MeowKit version to install",
+      options,
+      initialValue: latestStable?.tag ?? releases[0].tag,
+    });
+
+    if (p.isCancel(selected)) {
+      p.cancel("Installation cancelled.");
+      process.exit(0);
+    }
+
+    release = releases.find((r) => r.tag === selected)!;
+  }
+
+  log.info(`Selected: ${pc.cyan(release.version)}${release.isBeta ? pc.yellow(" (beta)") : ""}`);
 
   // Step 2: Interactive prompts
   const config = await promptUser();
