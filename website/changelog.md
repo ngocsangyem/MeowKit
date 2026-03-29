@@ -5,44 +5,46 @@ description: MeowKit release history and changes.
 
 # Changelog
 
-## 0.3.0 (2026-03-30) — Week 3 Improvements
+## 1.0.0 (2026-03-30) — The Disciplined Velocity Release
 
-### Features
+The biggest MeowKit update yet. 10 new capabilities inspired by deep analysis of BMAD-METHOD and ClaudeKit-Engineer. Theme: **scale throughput while maintaining absolute discipline**.
 
-- **Navigation Help** — `/meow:help` scans project state (plans, reviews, tests, git) and recommends the single next action. Maps observed state to 7-phase pipeline. No guessing.
-- **Hook-Based Enforcement** — 3 new shell hooks upgrade behavioral rules to preventive enforcement: `privacy-block.sh` (PreToolUse: blocks sensitive file reads), `gate-enforcement.sh` (PreToolUse: blocks source writes before Gate 1), `project-context-loader.sh` (SessionStart: auto-loads project-context.md).
-- **Planning Depth Per Mode** — All 7 workflow modes declare a researcher count: `strict`/`architect` run 2 parallel researchers with competing approaches; `default`/`audit` run 1; `fast`/`cost-saver`/`document` run 0 (skip research).
+### Intelligence & Routing
 
-### Rules updated
+- **Scale-Adaptive Intelligence** — Domain-based complexity routing at Phase 0 via `meow:scale-routing`. CSV-driven: fintech, healthcare, IoT domains auto-force COMPLEX tier. User-extensible CSV for project-specific domains.
+- **Planning Depth Per Mode** — All 7 modes declare researcher count: `strict`/`architect` run 2 parallel researchers with competing approaches; `default`/`audit` run 1; `fast`/`cost-saver`/`document` skip research.
+- **Navigation Help** — `/meow:help` scans project state (plans, reviews, tests, git) and recommends the next pipeline step. No guessing.
 
-- `RULES_INDEX.md` — documents all 3 new hooks in the Hook Enforcement table
+### Quality & Review
 
-### Breaking changes
+- **Multi-Layer Adversarial Review** — `meow:review` now runs 3 parallel reviewers (Blind Hunter, Edge Case Hunter, Criteria Auditor) with post-review triage. Catches 2-3x more bugs than single-pass review.
+- **Anti-Rationalization Hardening** — Agents cannot downgrade complexity, minimize tests, skip security, or dismiss WARN verdicts without 3-part justification.
+- **Project Context System** — `docs/project-context.md` is the agent "constitution". All agents load it at session start. Eliminates context drift.
 
-None. All additions are backward-compatible.
+### Collaboration & Parallelism
 
-## 0.2.0 (2026-03-30) — Improvements
+- **Party Mode** — `/meow:party "topic"` spawns 2-4 agents to debate architecture decisions with forced synthesis. Discussion only — no code changes during party.
+- **Parallel Execution & Teams** — COMPLEX tasks with independent subtasks run up to 3 parallel agents with git worktree isolation. Integration test required after merge.
 
-### Features
+### Architecture & Enforcement
 
-**Improvement 1**
+- **Step-File Architecture** — Complex skills decompose into JIT-loaded step files. Token-efficient, auditable, resumable. First skill: `meow:review` (4 steps).
+- **Hook-Based Enforcement** — 3 shell hooks upgrade behavioral rules to preventive: `privacy-block.sh` (blocks sensitive reads), `gate-enforcement.sh` (blocks writes before Gate 1), `project-context-loader.sh` (auto-loads context).
 
-- **Party Mode** — `/meow:party "topic"` spawns 2-4 deliberation agents that debate architecture decisions and produce a forced synthesis. Use before any major architectural choice. No code is written during party.
-- **Step-File Architecture** — Complex skills decompose into JIT-loaded step files (`workflow.md` + `step-NN-*.md`). Token-efficient, auditable, and resumable via `session-state/` persistence. First skill: `meow:review` (4 steps).
-- **Parallel Execution & Teams** — COMPLEX tasks with independent subtasks can run up to 3 parallel agents. Each agent gets git worktree isolation. Full integration test required after merge. Gates (1 and 2) are never parallelized.
-
-**Improvement 2**
-
-- **Scale-Adaptive Intelligence** — Domain-based complexity routing at Phase 0 via `meow:scale-routing`. CSV-driven: fintech, healthcare, auth domains auto-force COMPLEX tier. User-extensible CSV for project-specific domains.
-- **Project Context System** — `docs/project-context.md` is now the agent constitution. All 14 agents load it at session start before any task-specific context. Eliminates inter-agent drift from independent inference.
-- **Multi-Layer Adversarial Review** — `meow:review` now runs 3 parallel reviewers (Blind Hunter, Edge Case Hunter, Criteria Auditor) followed by a triage step. Catches 2-3x more bugs than single-pass review.
-- **Anti-Rationalization Hardening** — Agents cannot downgrade complexity after scale-routing assigns it, minimize test coverage, skip security rules for "simple" tasks, or dismiss WARN verdicts without explicit justification.
-
-### Rules added
+### New Rules
 
 - `scale-adaptive-rules.md` — domain routing, CSV override, Gate 1 one-shot bypass
 - `step-file-rules.md` — JIT loading, no-skip, state persistence
 - `parallel-execution-rules.md` — worktree isolation, max 3 agents, integration gate
+
+### New Skills
+
+- `meow:scale-routing` — domain-to-complexity CSV routing
+- `meow:project-context` — generate/update agent constitution
+- `meow:party` — multi-agent deliberation sessions
+- `meow:worktree` — git worktree lifecycle management
+- `meow:task-queue` — task claiming with ownership enforcement
+- `meow:help` — pipeline navigation assistant
 
 ### Breaking changes
 

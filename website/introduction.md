@@ -8,8 +8,8 @@ persona: A
 
 MeowKit is an AI agent toolkit for Claude Code that gives your coding assistant enforced discipline — hard gates, TDD, security scanning, and human approval — so it ships production-quality code instead of untested prototypes.
 
-::: tip What's new in 0.2.0
-Scale-adaptive routing, adversarial review, Party Mode multi-agent deliberation, step-file architecture, and parallel execution with git worktree isolation. [See changelog →](/changelog)
+::: tip What's new in v1.0.0 — The Disciplined Velocity Release
+10 new capabilities: scale-adaptive routing, 3-layer adversarial review, Party Mode, parallel execution, navigation help, hook enforcement, and more. [See what's new →](/guide/whats-new)
 :::
 
 ## What problem does MeowKit solve?

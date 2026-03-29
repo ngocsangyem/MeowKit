@@ -1,10 +1,10 @@
 ---
-title: What's New
-description: Week 3 — navigation help, hook-based enforcement, and planning depth per workflow mode. Week 2 — scale-adaptive routing, adversarial review, Party Mode, step-file architecture, and parallel execution.
+title: What's New in v1.0.0
+description: "The Disciplined Velocity Release — 10 new capabilities: scale-adaptive routing, adversarial review, Party Mode, parallel execution, navigation help, hooks, and more."
 persona: A
 ---
 
-# What's New (v0.3.0)
+# What's New in v1.0.0 — The Disciplined Velocity Release
 
 ## Navigation Help
 
@@ -83,7 +83,7 @@ Rules define *why*. Hooks enforce *what*.
 
 ---
 
-# What's New (v0.2.0)
+## Previously (shipped in same release)
 
 ## Improvements
 
