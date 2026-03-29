@@ -7,7 +7,7 @@
  *   Layer 3: Dark theme tokens (.dark)
  *   Layer 4: Component overrides — reference tokens, not raw hex
  *
- * Source of truth: assets/tokens/meowkit-design-tokens.json
+ * Source of truth: docs/design/design-tokens.json
  */
 
 /* ================================================================== */
@@ -15,43 +15,43 @@
 /* ================================================================== */
 
 :root {
-  /* Primary Blue */
-  --mk-blue-50: #EBF5FF;
-  --mk-blue-100: #D6EBFF;
-  --mk-blue-200: #ADD6FF;
-  --mk-blue-300: #85C2FF;
-  --mk-blue-400: #5CADFF;
-  --mk-blue-500: #3399FF;
-  --mk-blue-600: #007BFF;
-  --mk-blue-700: #0062CC;
-  --mk-blue-800: #004999;
-  --mk-blue-900: #003066;
+  /* Primary Blue — brand: #2563EB (Deep Royal Blue) */
+  --mk-blue-50: #EFF6FF;
+  --mk-blue-100: #DBEAFE;
+  --mk-blue-200: #BFDBFE;
+  --mk-blue-300: #93C5FD;
+  --mk-blue-400: #60A5FA;
+  --mk-blue-500: #3B82F6;
+  --mk-blue-600: #2563EB;
+  --mk-blue-700: #1D4ED8;
+  --mk-blue-800: #1E40AF;
+  --mk-blue-900: #1E3A5F;
 
-  /* Accent — Magic Layer */
-  --mk-accent-glow: #66CCFF;
-  --mk-accent-soft: #99DDFF;
+  /* Accent — lighter brand for dark-mode highlights */
+  --mk-accent-glow: #60A5FA;
+  --mk-accent-soft: #93C5FD;
 
-  /* Neutral */
+  /* Neutral — aligned with design tokens */
   --mk-neutral-0: #FFFFFF;
-  --mk-neutral-50: #F5F7FA;
-  --mk-neutral-100: #E4E7EC;
-  --mk-neutral-300: #98A2B3;
-  --mk-neutral-500: #667085;
-  --mk-neutral-700: #344054;
-  --mk-neutral-900: #101828;
+  --mk-neutral-50: #F8FAFC;
+  --mk-neutral-100: #E2E8F0;
+  --mk-neutral-300: #94A3B8;
+  --mk-neutral-500: #64748B;
+  --mk-neutral-700: #334155;
+  --mk-neutral-900: #05070A;
 
   /* Semantic */
   --mk-success: #12B76A;
   --mk-warning: #F79009;
   --mk-danger: #F04438;
-  --mk-info: #007BFF;
+  --mk-info: #2563EB;
 
   /* Gradient */
-  --mk-gradient-brand: linear-gradient(135deg, #007BFF 0%, #66CCFF 100%);
+  --mk-gradient-brand: linear-gradient(135deg, #2563EB 0%, #60A5FA 100%);
 
-  /* Typography */
+  /* Typography — from design tokens */
   --mk-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --mk-font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --mk-font-mono: 'Fira Code', 'Geist Mono', 'JetBrains Mono', monospace;
 
   /* Spacing */
   --mk-space-1: 4px;
@@ -68,7 +68,7 @@
   --mk-radius-pill: 9999px;
 
   /* Shadows */
-  --mk-shadow-glow: 0 0 20px rgba(102, 204, 255, 0.35);
+  --mk-shadow-glow: 0 0 20px rgba(37, 99, 235, 0.35);
   --mk-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
 
   /* Transitions */
@@ -85,7 +85,7 @@ html:not(.dark) {
   --vp-c-brand-1: var(--mk-blue-600);
   --vp-c-brand-2: var(--mk-blue-700);
   --vp-c-brand-3: var(--mk-blue-600);
-  --vp-c-brand-soft: rgba(0, 123, 255, 0.08);
+  --vp-c-brand-soft: rgba(37, 99, 235, 0.08);
 
   /* Backgrounds */
   --mk-bg-base: var(--mk-neutral-50);
@@ -112,23 +112,23 @@ html:not(.dark) {
   --vp-c-gutter: var(--mk-bg-base);
 
   /* Interactive states */
-  --mk-hover-bg: rgba(0, 123, 255, 0.06);
-  --mk-active-bg: rgba(0, 123, 255, 0.12);
+  --mk-hover-bg: rgba(37, 99, 235, 0.06);
+  --mk-active-bg: rgba(37, 99, 235, 0.12);
 
   /* Component overrides */
   --vp-sidebar-bg-color: var(--mk-bg-surface);
   --vp-nav-bg-color: rgba(245, 247, 250, 0.85);
   --vp-code-block-bg: var(--mk-bg-soft);
-  --vp-code-line-highlight-color: rgba(0, 123, 255, 0.06);
+  --vp-code-line-highlight-color: rgba(37, 99, 235, 0.06);
   --vp-code-tab-active-bar-color: var(--mk-blue-600);
 
   /* Callout blocks */
   --vp-custom-block-tip-border: var(--mk-blue-600);
   --vp-custom-block-tip-text: var(--mk-blue-700);
-  --vp-custom-block-tip-bg: rgba(0, 123, 255, 0.06);
+  --vp-custom-block-tip-bg: rgba(37, 99, 235, 0.06);
   --vp-custom-block-info-border: var(--mk-accent-glow);
   --vp-custom-block-info-text: var(--mk-blue-700);
-  --vp-custom-block-info-bg: rgba(102, 204, 255, 0.06);
+  --vp-custom-block-info-bg: rgba(37, 99, 235, 0.08);
 }
 
 /* ================================================================== */
@@ -140,50 +140,50 @@ html:not(.dark) {
   --vp-c-brand-1: var(--mk-accent-glow);
   --vp-c-brand-2: var(--mk-accent-soft);
   --vp-c-brand-3: var(--mk-accent-glow);
-  --vp-c-brand-soft: rgba(102, 204, 255, 0.12);
+  --vp-c-brand-soft: rgba(37, 99, 235, 0.14);
 
-  /* Backgrounds */
-  --mk-bg-base: var(--mk-neutral-900);
-  --mk-bg-surface: #1E293B;
-  --mk-bg-soft: #1E293B;
+  /* Backgrounds — from design tokens: bg #05070A, bgSecondary #0A1F44, surface #111418 */
+  --mk-bg-base: #05070A;
+  --mk-bg-surface: #111418;
+  --mk-bg-soft: #0A1F44;
   --vp-c-bg: var(--mk-bg-base);
   --vp-c-bg-alt: var(--mk-bg-surface);
   --vp-c-bg-elv: var(--mk-bg-surface);
   --vp-c-bg-soft: var(--mk-bg-soft);
 
-  /* Text */
-  --mk-text-primary: #F1F5F9;
-  --mk-text-secondary: #CBD5E1;
+  /* Text — from design tokens: primary #F8FAFC, secondary #94A3B8 */
+  --mk-text-primary: #F8FAFC;
+  --mk-text-secondary: #94A3B8;
   --mk-text-subtle: #64748B;
   --vp-c-text-1: var(--mk-text-primary);
   --vp-c-text-2: var(--mk-text-secondary);
   --vp-c-text-3: var(--mk-text-subtle);
 
-  /* Borders */
-  --mk-border-subtle: #334155;
-  --mk-border-strong: #475569;
+  /* Borders — from design tokens: border rgba(255,255,255,0.05) */
+  --mk-border-subtle: rgba(255, 255, 255, 0.08);
+  --mk-border-strong: rgba(255, 255, 255, 0.15);
   --vp-c-border: var(--mk-border-subtle);
   --vp-c-divider: var(--mk-border-subtle);
   --vp-c-gutter: var(--mk-bg-base);
 
   /* Interactive states */
-  --mk-hover-bg: rgba(102, 204, 255, 0.10);
-  --mk-active-bg: rgba(102, 204, 255, 0.20);
+  --mk-hover-bg: rgba(37, 99, 235, 0.15);
+  --mk-active-bg: rgba(37, 99, 235, 0.25);
 
   /* Component overrides */
   --vp-sidebar-bg-color: var(--mk-bg-base);
-  --vp-nav-bg-color: rgba(16, 24, 40, 0.85);
-  --vp-code-block-bg: var(--mk-bg-base);
-  --vp-code-line-highlight-color: rgba(102, 204, 255, 0.06);
+  --vp-nav-bg-color: rgba(5, 7, 10, 0.85);
+  --vp-code-block-bg: var(--mk-bg-surface);
+  --vp-code-line-highlight-color: rgba(37, 99, 235, 0.10);
   --vp-code-tab-active-bar-color: var(--mk-accent-glow);
 
   /* Callout blocks */
   --vp-custom-block-tip-border: var(--mk-accent-glow);
   --vp-custom-block-tip-text: var(--mk-accent-glow);
-  --vp-custom-block-tip-bg: rgba(102, 204, 255, 0.06);
+  --vp-custom-block-tip-bg: rgba(37, 99, 235, 0.08);
   --vp-custom-block-info-border: var(--mk-blue-300);
   --vp-custom-block-info-text: var(--mk-blue-300);
-  --vp-custom-block-info-bg: rgba(133, 194, 255, 0.06);
+  --vp-custom-block-info-bg: rgba(37, 99, 235, 0.06);
 }
 
 /* ================================================================== */
@@ -243,11 +243,11 @@ html:not(.dark) {
 }
 
 .dark .VPFeature:hover {
-  border-color: rgba(102, 204, 255, 0.40);
+  border-color: rgba(37, 99, 235, 0.40);
 }
 
 html:not(.dark) .VPFeature:hover {
-  border-color: rgba(0, 123, 255, 0.40);
+  border-color: rgba(37, 99, 235, 0.40);
 }
 
 .dark .VPFeature .title {
@@ -291,12 +291,12 @@ html:not(.dark) .VPNavBarMenuLink.active .text {
 /* — Inline Code — */
 
 .dark :not(pre) > code {
-  background-color: rgba(102, 204, 255, 0.08);
+  background-color: rgba(37, 99, 235, 0.10);
   color: var(--mk-accent-glow);
 }
 
 html:not(.dark) :not(pre) > code {
-  background-color: rgba(0, 123, 255, 0.06);
+  background-color: rgba(37, 99, 235, 0.06);
   color: var(--mk-blue-700);
 }
 
@@ -313,7 +313,7 @@ html:not(.dark) :not(pre) > code {
 }
 
 .dark .vp-doc tr:nth-child(even) td {
-  background-color: rgba(30, 41, 59, 0.50);
+  background-color: rgba(17, 20, 24, 0.60);
 }
 
 html:not(.dark) .vp-doc th {
@@ -329,7 +329,7 @@ html:not(.dark) .vp-doc tr:nth-child(even) td {
 /* — Badges — */
 
 .dark .VPBadge.tip {
-  background-color: rgba(102, 204, 255, 0.12);
+  background-color: rgba(37, 99, 235, 0.14);
   color: var(--mk-accent-glow);
 }
 
@@ -339,7 +339,7 @@ html:not(.dark) .vp-doc tr:nth-child(even) td {
 }
 
 html:not(.dark) .VPBadge.tip {
-  background-color: rgba(0, 123, 255, 0.08);
+  background-color: rgba(37, 99, 235, 0.08);
   color: var(--mk-blue-700);
 }
 
