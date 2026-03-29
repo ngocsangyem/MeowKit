@@ -6,6 +6,16 @@ persona: A
 
 # Why MeowKit
 
+## Standing on the shoulders of giants
+
+MeowKit didn't emerge from a vacuum. It was inspired by and builds upon ideas from several pioneering AI agent toolkits:
+
+- **[ClaudeKit](https://claudekit.cc/)** — the original structured skill system for Claude Code, with orchestration protocols, development rules, and the cook workflow that MeowKit's phase-gated pipeline descends from. Best kit so far!
+- **[Gstack](https://github.com/garrytan/gstack)** — a comprehensive skill collection featuring headless browser automation, QA testing, and the ethos of "search before building" that shaped MeowKit's research-first approach.
+- **[Aura-frog](https://github.com/nguyenthienthanh/aura-frog)** — an autonomous agent framework whose multi-agent coordination patterns and self-healing concepts influenced MeowKit's agent architecture and escalation protocols.
+
+MeowKit takes these foundations and adds **enforced discipline** — hard gates that block, TDD that's mandatory not optional, and security scanning baked into every workflow. The goal isn't to replace these projects but to push the idea further: what happens when best practices aren't suggestions but requirements?
+
 ## The problem with unstructured AI coding
 
 When you give an AI coding agent an unstructured prompt like "fix the auth bug," here's what typically happens:
@@ -64,13 +74,13 @@ Every step is visible. Every claim is verified. The fix is tested, reviewed, and
 
 ## Design decisions
 
-| Decision | Why |
-|----------|-----|
-| **Two hard gates** | The cost of a bad ship > the cost of a 30-second approval |
-| **TDD enforced** | Failing tests before implementation prevents "tests that test nothing" |
-| **Zero external deps** | No API keys, no services, no runtime installs — works offline |
-| **Exclusive file ownership** | Each agent owns specific files — no merge conflicts |
-| **Security as architecture** | 4-layer defense runs on every task, not just audits |
+| Decision                      | Why                                                                    |
+| ----------------------------- | ---------------------------------------------------------------------- |
+| **Two hard gates**            | The cost of a bad ship > the cost of a 30-second approval              |
+| **TDD enforced**              | Failing tests before implementation prevents "tests that test nothing" |
+| **Zero external deps**        | No API keys, no services, no runtime installs — works offline          |
+| **Exclusive file ownership**  | Each agent owns specific files — no merge conflicts                    |
+| **Security as architecture**  | 4-layer defense runs on every task, not just audits                    |
 | **Context-engineered agents** | Every agent declares what context it needs and what to do when blocked |
 
 ## What MeowKit does NOT do
@@ -79,6 +89,12 @@ Every step is visible. Every claim is verified. The fix is tested, reviewed, and
 - **No telemetry** — all data stays project-local
 - **No experimental features** — everything shipped is production-ready
 - **No external services** — zero dependencies on third-party APIs
+
+## A note on usage
+
+MeowKit is an open-source, community-driven project — **not intended for commercial use**. It exists to push the boundaries of what disciplined AI coding agents can do, and to share those learnings freely.
+
+All contributions are welcome. Whether it's a new skill, a bug fix, a documentation improvement, or a wild idea for a new agent workflow — open a PR and let's build together.
 
 ## Next steps
 
