@@ -91,20 +91,44 @@ npx meowkit memory --clear      # Clear all memory (with confirmation)
 Update create-meowkit to the latest version.
 
 ```bash
-npx meowkit upgrade [--check] [--beta]
+npx meowkit upgrade [--check] [--beta] [--list]
 ```
 
 | Flag | Description |
 |------|-------------|
-| `--check` | Show available update without installing |
+| `--check` | Show available update (shows both stable and beta) |
 | `--beta` | Install beta channel |
+| `--list` | List all available versions with channel info |
+
+**Examples:**
+
+```bash
+npx meowkit upgrade              # Upgrade to latest stable
+npx meowkit upgrade --beta       # Upgrade to latest beta
+npx meowkit upgrade --check      # Check without installing
+npx meowkit upgrade --list       # Show all versions
+```
+
+**Output of `--list`:**
+
+```
+Channels:
+  stable:  1.2.0
+  beta:    1.3.0-beta.2
+
+Recent versions:
+  1.2.0 (installed)
+  1.1.1
+  1.1.0
+  1.0.0
+```
 
 ## status
 
-Print version and current config.
+Print version, channel, and current config.
 
 ```bash
 npx meowkit status
 ```
 
-Shows: MeowKit version, project config from `.claude/meowkit.config.json`.
+Shows: MeowKit version with channel indicator (stable/beta), project config from `.claude/meowkit.config.json`.

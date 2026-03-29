@@ -6,39 +6,22 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  41 skills &middot; 13 agents &middot; 18 commands &middot; 7 modes &middot; 12 rules &middot; 6 hooks &middot; 4-layer security
+  49 skills &middot; 14 agents &middot; 18 commands &middot; 7 modes &middot; 14 rules &middot; 6 hooks &middot; 4-layer security
 </p>
 
 <p align="center">
-  <a href="#quick-start">Quick Start</a> &middot;
-  <a href="#what-it-does">What It Does</a> &middot;
-  <a href="#commands">Commands</a> &middot;
-  <a href="#workflow">Workflow</a> &middot;
-  <a href="#agents">Agents</a> &middot;
-  <a href="#skills">Skills</a> &middot;
-  <a href="#architecture">Architecture</a>
+  <a href="https://www.npmjs.com/package/create-meowkit"><img src="https://img.shields.io/npm/v/create-meowkit" alt="npm version" /></a>
+  <a href="https://github.com/ngocsangyem/MeowKit/releases"><img src="https://img.shields.io/github/v/release/ngocsangyem/MeowKit" alt="GitHub release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License" /></a>
 </p>
 
 ---
 
-## Why MeowKit
+## What is MeowKit
 
-> Inspired by [gstack](https://github.com/garrytan/gstack), [antigravity-kit](https://github.com/vudovn/antigravity-kit), [aura-frog](https://github.com/nguyenthienthanh/aura-frog), [claudekit-engineer](https://claudekit.cc)
+MeowKit installs a `.claude/` directory that Claude Code reads at session start. It enforces a structured 7-phase workflow with hard gates, TDD, security scanning, and cross-session memory. Zero external dependencies for core workflow.
 
-AI coding tools are powerful but undirected. Without structure, they skip tests, ignore security, and ship untested code. MeowKit fixes this by giving your AI agent:
-
-- **Hard gates** that block shipping without a plan and a passing review
-- **TDD enforcement** that requires failing tests before implementation
-- **Security scans** on every file write, not just at review time
-- **Prompt injection defense** across 4 layers (input boundary, instruction anchoring, context isolation, output validation)
-- **Cost-aware model routing** so trivial tasks don't burn your best model
-- **Cross-session memory** that learns from corrections and accumulates patterns
-- **Context-engineered agents** with required context declarations, failure behaviors, and ambiguity resolution
-- **Zero external dependencies for core workflow** — no third-party services, no API keys, no runtime installs
-- **Optional MCP integrations** — Context7 for docs, Playwright for QA, Gemini for multimodal analysis
-- **Progressive disclosure** — every skill's SKILL.md stays under ~100 lines; detail lives in references/ loaded on demand
-
-MeowKit core is fully self-contained — zero external dependencies. Optional skills (`meow:docs-finder`, `meow:multimodal`) can use MCP servers and API keys for enhanced capabilities. Free and MIT licensed.
+**Documentation:** [meowkit.dev](https://meowkit.dev) (VitePress)
 
 ## Quick Start
 
@@ -46,405 +29,110 @@ MeowKit core is fully self-contained — zero external dependencies. Optional sk
 npm create meowkit@latest
 ```
 
-The CLI auto-detects your stack, asks for project name + optional Gemini API key, and scaffolds the full `.claude/` system.
-
-After scaffold:
+The CLI fetches the latest release from GitHub, prompts for config, and scaffolds `.claude/` into your project.
 
 ```bash
-npx meowkit setup      # Configure: Python venv, MCP, .env, .gitignore
-npx meowkit doctor     # Verify environment
+npx meowkit-cli setup      # Configure: Python venv, MCP, .env, .gitignore
+npx meowkit-cli doctor     # Verify environment
 ```
 
-Re-running `npm create meowkit@latest` on an existing project triggers **smart update** — overwrites unchanged core files, skips user-modified files.
-
-### CLI Flags
-
-```bash
-npm create meowkit@latest -- --force        # Overwrite all files
-npm create meowkit@latest -- --dry-run      # Preview without writing
-npm create meowkit@latest -- --json         # Structured output for CI
-npm create meowkit@latest -- --verbose      # Debug logging
-```
-
-### Runtime Commands
-
-```bash
-npx meowkit doctor          # Diagnose environment (10 checks + auto-fix)
-npx meowkit setup           # Guided configuration (venv, MCP, .env, .gitignore)
-npx meowkit task new        # Create structured task file from template
-npx meowkit task list       # List active tasks with status
-npx meowkit validate        # Verify .claude/ structure integrity
-npx meowkit budget          # Token usage report (--monthly for aggregation)
-npx meowkit memory          # View/clear session memory (--show, --stats, --clear)
-npx meowkit upgrade         # Update to latest version (--check, --beta)
-npx meowkit status          # Print version and config
-```
-
-## What It Does
-
-MeowKit installs a `.claude/` directory that Claude Code reads automatically at session start. It contains agents, skills, commands, hooks, modes, rules, scripts, and a memory system that together enforce a structured development workflow.
-
-### The Two Gates
-
-Every non-trivial change passes through two human approval gates:
-
-| Gate       | When           | What it blocks                         |
-| ---------- | -------------- | -------------------------------------- |
-| **Gate 1** | After planning | No code written until plan is approved |
-| **Gate 2** | After review   | No shipping until review passes        |
-
-These are hard stops. No `--skip-gates` flag exists. The agent cannot self-approve.
-
-### Model Routing
-
-MeowKit declares complexity before every task:
-
-| Tier     | Examples                     | Model    |
-| -------- | ---------------------------- | -------- |
-| Trivial  | Rename, typo, format         | Cheapest |
-| Standard | Feature, bug fix, tests      | Default  |
-| Complex  | Architecture, security, auth | Best     |
-
-### Planning System
-
-All non-trivial tasks (> 2 files OR > 30 min) require an approved plan via `meow:plan-creator`.
-
-| Workflow Model | Use when | Phase flow |
-|---------------|----------|-----------|
-| feature-model | New functionality | Plan → Test RED → Build GREEN → Review → Ship |
-| bugfix-model | Bug fix | Investigate → Test RED → Fix → Review → Ship |
-| refactor-model | Code restructuring | Plan → Implement → Review → Ship |
-| security-model | Security audit | Plan scope → Audit → Review → Ship |
-
-The `meow:plan-creator` skill validates plans via `scripts/validate-plan.py` before Gate 1.
-
-## Workflow
-
-```
-TASK RECEIVED
-     |
-     v
- PHASE 0 — ORIENT
- Read memory, load relevant skills, route model tier
-     |
-     v
- PHASE 1 — PLAN                          [Gate 1]
- Challenge premises, product + engineering lens
- Human approval required
-     |
-     v
- PHASE 2 — TEST RED
- Write failing tests first (enforced by hook)
- Security pre-check on plan + architecture
-     |
-     v
- PHASE 3 — BUILD GREEN
- Implement until tests pass
- Security scan on every file write (post-write hook)
-     |
-     v
- PHASE 4 — REVIEW                        [Gate 2]
- 5-dimension structural audit + Python validation
- Human approval required
-     |
-     v
- PHASE 5 — SHIP
- Pre-ship checks, conventional commit, PR, verify CI
- Rollback documentation for every ship
-     |
-     v
- PHASE 6 — REFLECT
- Capture learnings, update docs, failure journals, close task
-```
-
-## Commands
-
-All commands use the `meow:` namespace prefix.
-
-### Core
-
-| Command                | Description                                                  |
-| ---------------------- | ------------------------------------------------------------ |
-| `/meow:meow [task]`    | Entry point — classifies task and routes to the right agent  |
-| `/meow:cook [feature]` | Full pipeline: plan, test, build, review, ship               |
-| `/meow:fix [bug]`      | Auto-detect complexity, route to appropriate fix strategy    |
-| `/meow:plan [feature]` | Premise challenge + structured two-lens plan                 |
-| `/meow:review`         | 5-dimension structural audit with written verdict            |
-| `/meow:ship`           | Pre-checks, conventional commit, PR, CI verify, rollback doc |
-
-### Quality
-
-| Command          | Description                                       |
-| ---------------- | ------------------------------------------------- |
-| `/meow:test`     | TDD enforcement — write or run tests              |
-| `/meow:audit`    | Full security scan across all platforms           |
-| `/meow:validate` | Run deterministic Python checks (outside the LLM) |
-
-### Architecture
-
-| Command                 | Description                                     |
-| ----------------------- | ----------------------------------------------- |
-| `/meow:arch [action]`   | Generate, list, or analyze ADRs                 |
-| `/meow:design [system]` | System design consultation (docs only, no code) |
-
-### Documentation
-
-| Command           | Description                                           |
-| ----------------- | ----------------------------------------------------- |
-| `/meow:docs-init` | Scan codebase, generate documentation skeleton        |
-| `/meow:docs-sync` | Diff-aware update of affected docs after feature work |
-
-### Operations
-
-| Command                      | Description                              |
-| ---------------------------- | ---------------------------------------- |
-| `/meow:canary`               | Staged deployment with monitoring        |
-| `/meow:retro`                | Sprint retrospective with trend tracking |
-| `/meow:budget`               | Token cost tracking report               |
-| `/meow:spawn [agent] [task]` | Launch parallel agent session            |
-
-## Agents
-
-MeowKit includes 13 specialist agents, each following the [Claude Code subagent spec](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/sub-agents) with YAML frontmatter, explicit tool lists, and system prompt bodies.
-
-Every agent includes context-engineered sections:
-
-- **Required Context** — what to load before invoking (just-in-time, not upfront)
-- **Failure Behavior** — explicit escalation path when blocked (no silent failures)
-- **Ambiguity Resolution** — protocol for unclear inputs (HIGH-priority agents)
-
-| Agent          | Role                                       | Owns                   | Phase           | Model   |
-| -------------- | ------------------------------------------ | ---------------------- | --------------- | ------- |
-| orchestrator   | Task router, complexity classification     | Routing decisions      | 0 (Orient)      | inherit |
-| planner        | Two-lens planning, Gate 1 enforcement      | `tasks/plans/`         | 1 (Plan)        | inherit |
-| brainstormer   | Solution evaluation, trade-off analysis    | —                      | 1 (Plan)        | inherit |
-| researcher     | Technology research, library evaluation    | —                      | 0, 1, 4         | haiku   |
-| architect      | ADR generation, system design review       | `docs/architecture/`   | 1 (Plan)        | opus    |
-| tester         | TDD red/green/refactor phases              | Test files             | 2 (Test RED)    | inherit |
-| security       | Security audit, BLOCK verdicts             | Security rules         | 2, 4            | inherit |
-| developer      | Implementation (TDD), self-healing         | `src/`, `lib/`, `app/` | 3 (Build GREEN) | inherit |
-| reviewer       | 5-dimension structural audit, Gate 2       | `tasks/reviews/`       | 4 (Review)      | inherit |
-| shipper        | Ship pipeline, conventional commits, PR    | Release tags, deploy   | 5 (Ship)        | haiku   |
-| documenter     | Living docs, changelogs, API doc sync      | `docs/`                | 6 (Reflect)     | haiku   |
-| analyst        | Cost tracking, pattern extraction, lessons | `.claude/memory/`      | 0, 6            | haiku   |
-| journal-writer | Failure documentation, root cause analysis | `docs/journal/`        | 6, escalations  | haiku   |
-
-No two agents modify the same file type. Conflicts escalate to human.
-
-Full index: [`.claude/agents/AGENTS_INDEX.md`](.claude/agents/AGENTS_INDEX.md)
-
-## Skills
-
-All 33 skills use the `meow:` namespace prefix. Every skill has a `SKILL.md` (compact decision router, ≤100 lines) with detailed procedures in `references/` loaded on demand. This progressive disclosure pattern saves ~70% context per invocation.
-
-### Sourced Skills (22)
-
-Skills contributed by the open-source community. All are self-contained with no external dependencies.
-
-| Skill                        | Credit          | What it does                                         | References |
-| ---------------------------- | --------------- | ---------------------------------------------------- | ---------- |
-| `meow:careful`               | gstack          | Safety guardrails for destructive commands           | —          |
-| `meow:ship`                  | gstack          | Full ship pipeline: merge, test, version, PR, verify | 13 files   |
-| `meow:freeze`                | gstack          | Directory-scoped edit restriction                    | —          |
-| `meow:review`                | gstack          | Structural PR review + 5-dimension audit             | 8 files    |
-| `meow:investigate`           | gstack          | Root cause debugging — no fix without understanding  | 3 files    |
-| `meow:cso`                   | gstack          | Security audit (OWASP + STRIDE + supply chain)       | 10 files   |
-| `meow:browse`                | gstack          | Headless browser at 100ms/command                    | 7 files    |
-| `meow:qa`                    | gstack          | Systematic QA with bug fixing                        | 8 files    |
-| `meow:office-hours`          | gstack          | Premise-challenging ideation session                 | 10 files   |
-| `meow:plan-ceo-review`       | gstack          | Product-lens plan review                             | 11 files   |
-| `meow:plan-eng-review`       | gstack          | Engineering-lens plan review                         | 17 files   |
-| `meow:document-release`      | gstack          | Post-ship doc sync                                   | 18 files   |
-| `meow:retro`                 | gstack          | Sprint retrospective with trend tracking             | 17 files   |
-| `meow:cook`                  | claudekit       | Single-command feature pipeline                      | 4 files    |
-| `meow:fix`                   | claudekit       | Auto-detect bug complexity and route                 | 14 files   |
-| `meow:clean-code`            | antigravity-kit | Pragmatic coding standards (SRP, DRY, KISS)          | 1 file     |
-| `meow:lint-and-validate`     | antigravity-kit | Auto-run linters after every change                  | —          |
-| `meow:vulnerability-scanner` | antigravity-kit | OWASP 2025 + threat modeling                         | 1 file     |
-| `meow:agent-detector`        | aura-frog       | Auto-route tasks to right agent + model              | 8 files    |
-| `meow:lazy-agent-loader`     | aura-frog       | On-demand agent loading for token savings            | 1 file     |
-| `meow:workflow-orchestrator` | aura-frog       | 5-phase TDD with token budgets                       | 2 files    |
-| `meow:session-continuation`  | aura-frog       | Workflow state persistence across sessions           | 2 files    |
-
-### Original Skills (18)
-
-MeowKit-native skills built from scratch or adapted from source analysis:
-
-| Skill                        | What it does                                             | Scripts | References |
-| ---------------------------- | -------------------------------------------------------- | ------- | ---------- |
-| `meow:docs-finder`           | Retrieve library/project docs via Context7 + Context Hub | 4 JS    | 3 files    |
-| `meow:multimodal`            | Image/video/audio/PDF analysis via Gemini API            | 3 PY    | 3 files    |
-| `meow:scout`                 | Parallel codebase exploration via Explore subagents      | —       | 3 files    |
-| `meow:plan-creator`          | Auto-selects plan template by task scope                 | —       | —          |
-| `meow:skill-template-secure` | Secure skill template with injection defense             | —       | —          |
-| `meow:development`           | Code patterns, skill loading, TDD enforcement            | —       | 3 files    |
-| `meow:documentation`         | API sync, changelog gen, living docs                     | —       | 3 files    |
-| `meow:memory`                | Cost tracking, pattern extraction, session capture       | —       | 3 files    |
-| `meow:shipping`              | Canary deploy, rollback protocol, ship pipeline          | —       | 3 files    |
-| `meow:testing`               | Red-green-refactor, validation scripts, visual QA        | —       | 3 files    |
-| `meow:llms`                  | Generate llms.txt files per llmstxt.org spec             | —       | 1 file     |
-| `meow:skill-creator`         | Create new skills with compliance checks + registration  | —       | 1 file     |
-| `meow:project-organization`  | Standardize file paths, naming, directory structure      | —       | 1 file     |
-| `meow:typescript`            | Strict TS patterns: null handling, type guards, utility types | —  | 1 file     |
-| `meow:vue`                   | Vue 3 Composition API, Pinia, reactivity, component design | —    | 1 file     |
-| `meow:frontend-design`       | UI/UX design with anti-AI-slop, a11y, typography, color  | —      | 1 file     |
-| `meow:qa-manual`             | Spec-driven QA testing + Playwright E2E code generation  | 1 SH   | 2 files + 3 examples |
-
-Full attribution: [`.claude/skills/SKILLS_ATTRIBUTION.md`](.claude/skills/SKILLS_ATTRIBUTION.md)
-
-## Architecture
-
-```
-.claude/
-├── agents/          13 specialist agents (sub-agents.md compliant)
-├── skills/          41 skills with meow: namespace (35 with references/)
-│   └── meow:*/
-│       ├── SKILL.md          Compact decision router (<100 lines)
-│       ├── bin/              Shell utilities (careful, freeze skills)
-│       ├── references/       Detailed procedures (loaded on demand)
-│       └── scripts/          Deterministic validation (docs-finder: JS, multimodal: PY)
-├── commands/        18 slash commands (meow: namespace)
-│   └── meow/                 All commands in flat directory
-├── hooks/           6 POSIX shell hooks
-├── modes/           7 behavioral modes (default → cost-saver)
-├── memory/          Cross-session persistence
-├── scripts/
-│   ├── *.py         6 Python validators (stdlib only, no pip deps)
-│   └── bin/         5 POSIX shell utilities (slug, config, repo-mode, diff-scope, review-log)
-└── rules/           12 rule files + RULES_INDEX.md
-
-CLAUDE.md              Entry point — Claude reads this at session start (project root)
-.claude/meowkit.config.json   Project configuration
-.claude/meowkit.manifest.json Checksum manifest (for smart updates)
-.claude/env.example           API key template
-.claude/mcp.json.example      MCP server config template
-tasks/templates/       Task templates (feature, bug-fix, refactor, security, guideline, report, usage guide)
-```
-
-### Self-Contained Design
-
-MeowKit has **zero external runtime dependencies**. All utilities are self-contained:
-
-| Utility              | Purpose                                       | Location               |
-| -------------------- | --------------------------------------------- | ---------------------- |
-| `meowkit-slug`       | Project slug + branch from git remote         | `.claude/scripts/bin/` |
-| `meowkit-config`     | Read/write `.meowkit.config.json`             | `.claude/scripts/bin/` |
-| `meowkit-repo-mode`  | Detect solo vs collaborative from git history | `.claude/scripts/bin/` |
-| `meowkit-diff-scope` | Categorize diff (frontend/backend/tests/docs) | `.claude/scripts/bin/` |
-| `meowkit-review-log` | Log review results to `.claude/memory/`       | `.claude/scripts/bin/` |
-
-No global state directories, no third-party services, no user-level skill paths. API keys optional (only for `meow:multimodal`).
-
-### Rules
-
-| Rule file                   | Purpose                                                  |
-| --------------------------- | -------------------------------------------------------- |
-| `security-rules.md`         | Blocked patterns: secrets, `any`, SQL injection, XSS     |
-| `injection-rules.md`        | 10 prompt injection defense rules (DATA vs INSTRUCTIONS) |
-| `gate-rules.md`             | Gate 1 + Gate 2 hard stops                               |
-| `tdd-rules.md`              | TDD enforcement (7 rules)                                |
-| `naming-rules.md`           | Per-platform naming conventions                          |
-| `development-rules.md`      | File management, code quality, pre-commit, git safety    |
-| `orchestration-rules.md`    | Subagent delegation, file ownership                      |
-| `context-ordering-rules.md` | Long content first, context before constraint            |
-| `model-selection-rules.md`  | Task type → model tier routing                           |
-| `output-format-rules.md`    | Response structure: what changed, why, file refs         |
-
-### Hooks
-
-Hooks are registered in `.claude/settings.json` and run automatically by Claude Code.
-
-**Registered hooks (automatic):**
-
-| Hook              | Type        | Trigger     | What it does                                      | Blocks?      |
-| ----------------- | ----------- | ----------- | ------------------------------------------------- | ------------ |
-| `post-write.sh`   | PostToolUse | Edit, Write | Security scan: secrets, `any`, SQL injection, XSS | Yes (exit 2) |
-| `post-session.sh` | Stop        | Session end | Capture session data to memory                    | No           |
-
-**Skill-embedded hooks (via SKILL.md frontmatter):**
-
-| Hook               | Skill        | Trigger     | What it does                                      |
-| ------------------ | ------------ | ----------- | ------------------------------------------------- |
-| `check-freeze.sh`  | meow:freeze  | Edit, Write | Block edits outside frozen directory              |
-| `check-careful.sh` | meow:careful | Bash        | Warn on destructive commands (rm -rf, DROP TABLE) |
-
-**Phase-specific scripts (invoked by skills):**
-
-| Script              | Phase     | What it does                                         |
-| ------------------- | --------- | ---------------------------------------------------- |
-| `pre-task-check.sh` | Any       | Prompt injection pattern detection (PASS/WARN/BLOCK) |
-| `pre-implement.sh`  | Phase 2-3 | Blocks if no failing test exists (TDD gate)          |
-| `pre-ship.sh`       | Phase 5   | Full test + lint + typecheck before shipping         |
-| `cost-meter.sh`     | Any       | Token usage tracking (manual invocation)             |
-
-### Python Scripts
-
-| Script               | Purpose                                               |
-| -------------------- | ----------------------------------------------------- |
-| `validate.py`        | Comprehensive security scan (NestJS, Vue, Swift, SQL) |
-| `security-scan.py`   | Git-aware focused security scan                       |
-| `checklist.py`       | Pre-ship checklist (tests, security, lint, types)     |
-| `injection-audit.py` | Post-task prompt injection detection                  |
-| `validate-docs.py`   | Documentation accuracy validation                     |
-| `cost-report.py`     | Cost analysis with monthly aggregation                |
-
-All scripts: Python 3.9+, stdlib only, zero pip dependencies.
-
-### Security
-
-4-layer prompt injection defense:
-
-| Layer | Name                  | Implementation              |
-| ----- | --------------------- | --------------------------- |
-| L1    | Input Boundary        | `injection-rules.md`        |
-| L2    | Instruction Anchoring | CLAUDE.md + skill templates |
-| L3    | Context Isolation     | `pre-task-check.sh`         |
-| L4    | Output Validation     | `injection-audit.py`        |
-
-Plus platform-specific security scans on every file write (NestJS, Vue, Swift, Supabase) and destructive command detection for shell scripts.
-
-### Modes
-
-| Mode       | Use for                    | Gates          | Security      |
-| ---------- | -------------------------- | -------------- | ------------- |
-| default    | Most work                  | Both           | Full          |
-| strict     | Production, auth, payments | Both (no WARN) | Every file    |
-| fast       | Prototypes, internal tools | Gate 1 only    | BLOCK only    |
-| architect  | Design sessions            | N/A            | N/A           |
-| audit      | Security reviews           | N/A            | Comprehensive |
-| document   | Doc sprints                | N/A            | N/A           |
-| cost-saver | High-volume routine        | Gate 1         | BLOCK only    |
-
-### Memory System
-
-| File                     | Purpose                                  |
-| ------------------------ | ---------------------------------------- |
-| `memory/lessons.md`      | Human-readable session learnings         |
-| `memory/patterns.json`   | Machine-readable patterns with frequency |
-| `memory/cost-log.json`   | Token usage per task                     |
-| `memory/decisions.md`    | Architecture decision log                |
-| `memory/security-log.md` | Prompt injection audit findings          |
-| `memory/reviews.jsonl`   | Review results history                   |
-
-Every session reads `lessons.md` at start and updates it at end. After 10 sessions, the analyst agent proposes `CLAUDE.md` updates from accumulated patterns.
+## Packages
+
+| Package | npm | Description |
+|---------|-----|-------------|
+| [`create-meowkit`](https://www.npmjs.com/package/create-meowkit) | `npm create meowkit@latest` | Scaffold CLI — downloads release from GitHub |
+| [`meowkit-cli`](https://www.npmjs.com/package/meowkit-cli) | `npx meowkit-cli <cmd>` | Runtime CLI — upgrade, doctor, validate, budget, memory |
 
 ## Requirements
 
-**Core (required):**
-
 - Node.js 20+
-- Python 3.9+ (for validation scripts — stdlib only, no pip installs)
+- Python 3.9+ (stdlib only, for validation scripts)
 - Git
 
-**Optional (for enhanced skills):**
+## Project Structure
 
-- `GEMINI_API_KEY` — for `meow:multimodal` (image/video/audio/PDF analysis via Gemini)
-- `google-genai` + `pillow` pip packages — for `meow:multimodal` scripts
-- MCP servers — Context7, Playwright, etc. (see `.mcp.json.example`)
+```
+meowkit/
+├── .claude/                  Source of truth — agents, skills, rules, hooks
+│   ├── agents/               14 specialist agents
+│   ├── skills/               49 skills (meow: namespace)
+│   ├── rules/                14 enforcement rules
+│   ├── hooks/                6 lifecycle hooks
+│   ├── commands/             18 slash commands
+│   ├── modes/                7 behavioral modes
+│   ├── scripts/              Python validators + shell utilities
+│   └── settings.json
+├── tasks/                    Task templates
+├── packages/
+│   ├── create-meowkit/       Scaffold CLI (npm)
+│   └── meowkit/              Runtime CLI (npm as meowkit-cli)
+├── scripts/                  Release automation
+├── website/                  VitePress documentation
+├── CLAUDE.md                 Entry point for Claude Code
+├── .releaserc.cjs            Semantic release config
+└── .github/workflows/        CI/CD (release, beta, PR validation)
+```
 
-Core workflow has zero external dependencies. Optional skills degrade gracefully when their dependencies are missing.
+## Release & Publishing
 
-Run `npx meowkit doctor` to verify your environment.
+### How releases work
+
+1. **Source of truth:** `.claude/`, `tasks/`, `CLAUDE.md` at repo root
+2. **GitHub Release:** `prepare-release-assets.cjs` zips these into `meowkit-release.zip`
+3. **npm CLI:** `create-meowkit` is a thin CLI that downloads the zip at runtime
+4. **Version channels:** `main` branch = stable, `dev` branch = beta
+
+### Manual release
+
+```bash
+# 1. Build release assets
+node scripts/prepare-release-assets.cjs "<version>"
+
+# 2. Tag and push
+git tag v<version>
+git push origin v<version>
+
+# 3. Create GitHub release
+gh release create v<version> dist/meowkit-release.zip#"MeowKit Release Package" \
+  --title "v<version>" --notes "Release notes here"
+
+# 4. Publish CLI packages to npm
+cd packages/create-meowkit && npm publish
+cd ../meowkit && npm publish
+```
+
+### Automated release (CI/CD)
+
+Push to `main` or `dev` triggers GitHub Actions:
+- Semantic-release analyzes commits, determines version
+- Syncs version across both packages
+- Builds release zip, creates GitHub Release
+- Publishes both packages to npm
+
+```bash
+# Conventional commits drive version bumps
+feat: new skill      → MINOR (0.1.0 → 0.2.0)
+fix: skill bug       → PATCH (0.2.0 → 0.2.1)
+feat!: breaking      → MAJOR (0.2.1 → 1.0.0)
+```
+
+### Release scripts
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/sync-package-versions.cjs` | Sync version across both packages |
+| `scripts/generate-release-manifest.cjs` | SHA-256 checksums for all release files |
+| `scripts/prepare-release-assets.cjs` | Metadata + manifest + zip archive |
+
+## Development
+
+```bash
+npm install              # Install dependencies
+npm run build            # Build both packages
+npm test                 # Run tests
+npm run lint             # Lint
+npm run typecheck        # Type check
+```
 
 ## License
 
@@ -453,7 +141,6 @@ MIT
 ## Inspiration
 
 - [gstack](https://github.com/garrytan/gstack) — Skills, review patterns, ship workflow
-- [antigravity-kit](https://github.com/vudovn/antigravity-kit) — Clean code standards, lint automation, vulnerability scanning
-- [aura-frog](https://github.com/nguyenthienthanh/aura-frog) — Agent detection, lazy loading, workflow orchestration
-- [claudekit-engineer](https://claudekit.cc) — Cook/fix pipelines, docs-seeker, multimodal analysis
-- [Anthropic context engineering research](https://www.anthropic.com/effective-context-engineering-for-ai-agents) — Progressive disclosure, just-in-time context, sub-agent architecture
+- [antigravity-kit](https://github.com/vudovn/antigravity-kit) — Clean code standards, vulnerability scanning
+- [aura-frog](https://github.com/nguyenthienthanh/aura-frog) — Agent detection, workflow orchestration
+- [claudekit-engineer](https://claudekit.cc) — Cook/fix pipelines, release model
