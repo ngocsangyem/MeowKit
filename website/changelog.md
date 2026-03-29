@@ -7,7 +7,7 @@ description: MeowKit release history and changes.
 
 ## 1.0.0 (2026-03-30) — The Disciplined Velocity Release
 
-The biggest MeowKit update yet. 10 new capabilities inspired by deep analysis of BMAD-METHOD and ClaudeKit-Engineer. Theme: **scale throughput while maintaining absolute discipline**.
+The biggest MeowKit update yet. 13 new capabilities inspired by deep analysis of BMAD-METHOD and ClaudeKit-Engineer. Theme: **scale throughput while maintaining absolute discipline**.
 
 ### Intelligence & Routing
 
@@ -45,6 +45,9 @@ The biggest MeowKit update yet. 10 new capabilities inspired by deep analysis of
 - `meow:worktree` — git worktree lifecycle management
 - `meow:task-queue` — task claiming with ownership enforcement
 - `meow:help` — pipeline navigation assistant
+- `meow:debug` — structured debugging: reproduce → isolate → root cause → fix → verify
+- `meow:simplify` — post-implementation complexity reduction (between Build and Review)
+- `meow:team-config` — parallel agent team setup with ownership maps and worktrees
 
 ### Breaking changes
 

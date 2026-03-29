@@ -81,6 +81,24 @@ Rules define *why*. Hooks enforce *what*.
 | Hook Enforcement | Rule bypass via agent rationalization | Every session, automatic |
 | Planning Depth | Over/under-researching by mode | Phase 1, per active mode |
 
+## Structured Debugging
+
+**Problem:** Agents guess-and-patch bugs instead of investigating root causes. Fix one symptom, introduce another.
+
+**Solution:** `meow:debug` enforces a 5-step workflow: reproduce → isolate → root cause → fix → verify. The iron rule: no fix without root cause. Includes a `references/common-root-causes.md` covering the patterns behind ~80% of bugs (null paths, race conditions, API mismatches, wrong conditions).
+
+## Post-Implementation Simplification
+
+**Problem:** Code that passes tests can still be unnecessarily complex. Dead code, deep nesting, premature abstractions accumulate.
+
+**Solution:** `meow:simplify` runs after Phase 3 (Build GREEN) and before Phase 4 (Review). The iron rule: behavior must not change — every simplification must pass the same tests. Removes dead code, flattens nesting, extracts only when 3+ duplicates exist.
+
+## Team Configuration
+
+**Problem:** Setting up parallel agents requires creating worktrees, ownership maps, and task queues manually.
+
+**Solution:** `meow:team-config` automates the entire parallel setup: analyzes the plan for independent subtasks, generates an ownership map with glob patterns, creates git worktrees, and initializes the task queue. Validates zero overlap before any agent starts.
+
 ---
 
 ## Previously (shipped in same release)
