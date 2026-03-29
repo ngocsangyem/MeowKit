@@ -5,6 +5,22 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 0.1.2 (2026-03-29)
+
+### Features
+
+- Interactive version selection when running `npm create meowkit@latest`
+- Add `git-manager` agent for commit/push operations with conventional commits
+- Add README.md for both npm packages (`create-meowkit`, `meowkit-cli`)
+- Add CHANGELOG.md and VitePress changelog page
+- Add Resources dropdown in VitePress nav
+
+### Documentation
+
+- Rewrite root README.md — project description, package table, release guide
+- Update VitePress CLI docs — `--list` flag, beta channel, GitHub-download model
+- Rewrite `create-meowkit` docs for GitHub-download architecture
+
 ## 0.1.1 (2026-03-29)
 
 ### Bug Fixes

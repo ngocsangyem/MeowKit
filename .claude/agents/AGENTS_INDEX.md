@@ -17,6 +17,7 @@
 | `documenter.md` | Living documentation, changelog generation, docs sync | MeowKit original | Phase 6 (Reflect) | Routed by orchestrator after ship | 260326 | 260326 |
 | `analyst.md` | Cost tracking, pattern extraction, lessons learned | MeowKit original | Phase 0, 6 | Auto at session start/end | 260326 | 260326 |
 | `journal-writer.md` | Failure documentation, root cause analysis, lessons | Credit: Duy Nguyen | Phase 6 (Reflect), escalations | On failure/escalation | 260326 | 260326 |
+| `git-manager.md` | Git operations: stage, commit, push with conventional commits | Adapted from claudekit-engineer | Phase 5 (Ship), any | On "commit"/"push" request | 260329 | 260329 |
 
 **CE version**: Context Engineering version — tracks when agents were last improved with context engineering principles.
 
@@ -26,7 +27,7 @@ Every agent now includes these sections (where applicable):
 
 | Section | Purpose | Principle | Present in |
 |---------|---------|-----------|------------|
-| Required Context | What to load before invoking | CW3 — just-in-time context | All 13 agents |
+| Required Context | What to load before invoking | CW3 — just-in-time context | All 15 agents |
 | Failure Behavior | What to do when task cannot complete | AI4 — explicit failure path | 10 agents (pipeline agents) |
 | Ambiguity Resolution | How to handle unclear inputs | AI7 — ambiguity protocol | 5 HIGH-priority agents |
 
@@ -34,5 +35,4 @@ Every agent now includes these sections (where applicable):
 
 All phases (0-6) have agent coverage.
 
-**Unfilled role gaps (not phase gaps):**
-- **UI/UX Design** — No agent covers frontend design review, design system maintenance, or visual QA. Flagged for future work.
+**No unfilled role gaps.** All phases (0-6) and all operational roles have agent coverage.

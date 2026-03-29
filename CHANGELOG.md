@@ -2,6 +2,22 @@
 
 All notable changes to MeowKit are documented here. This file is auto-updated by [semantic-release](https://github.com/semantic-release/semantic-release) on future releases.
 
+## [0.1.2](https://github.com/ngocsangyem/MeowKit/releases/tag/v0.1.2) (2026-03-29)
+
+### Features
+
+* interactive version selection when running `npm create meowkit@latest`
+* add `git-manager` agent for commit/push operations with conventional commits
+* add README.md for both npm packages (`create-meowkit`, `meowkit-cli`)
+* add CHANGELOG.md and VitePress changelog page
+* add Resources dropdown in VitePress nav (changelog, GitHub releases, npm links)
+
+### Documentation
+
+* rewrite root README.md — project description, package table, release guide
+* update VitePress CLI docs — `--list` flag, beta channel, GitHub-download model
+* rewrite `create-meowkit` docs for GitHub-download architecture
+
 ## [0.1.1](https://github.com/ngocsangyem/MeowKit/releases/tag/v0.1.1) (2026-03-29)
 
 ### Bug Fixes
