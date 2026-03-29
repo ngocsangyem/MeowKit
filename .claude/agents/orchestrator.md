@@ -104,12 +104,29 @@ When a COMPLEX task can be decomposed into independent subtasks with zero file o
 
 **Rules:** See `parallel-execution-rules.md`. Max 3 agents. Gates remain sequential.
 
+## Planning Depth (from Mode Config)
+
+At Phase 0, read the active mode's `Planning Depth` section and pass to planner:
+
+| Mode | Researchers | Parallel | Two Approaches |
+|------|-------------|----------|----------------|
+| default | 1 | No | No |
+| strict | 2 | Yes | Yes |
+| fast | 0 (skip) | No | No |
+| architect | 2 | Yes | Yes |
+| audit | 1 | No | No |
+| cost-saver | 0 (skip) | No | No |
+| document | 0 (skip) | No | No |
+
+When `two_approaches=true`, planner produces 2 competing plans with an "Approach Comparison" section. User selects one before Gate 1 approval.
+
 ## Output Format
 
 For every routing decision, state:
 - Complexity tier
 - Assigned model tier
 - Execution mode: sequential | parallel | party
+- Planning depth: N researchers, parallel yes/no, two approaches yes/no
 - Target agent sequence (or parallel decomposition)
 - Context summary for the first agent
 

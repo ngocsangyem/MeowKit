@@ -14,6 +14,12 @@ Activate with: `mode: document` in task context or by specifying document mode a
 - **Allowed output**: Documentation files only. No source code changes.
 - **Active agents**: Documenter agent only.
 
+## Planning Depth
+
+- **Researchers:** 0 (documentation doesn't require research phase)
+- **Parallel research:** No
+- **Two approaches:** No
+
 ## Allowed Commands
 
 - `/docs:init` — initial documentation scan and skeleton generation

@@ -14,6 +14,12 @@ This is the default mode. Active unless another mode is explicitly selected.
 - **Test coverage**: Project's existing coverage threshold applies.
 - **Review strictness**: FAIL dimensions block shipping. WARN dimensions require acknowledgment.
 
+## Planning Depth
+
+- **Researchers:** 1 (single researcher investigates before planning)
+- **Parallel research:** No (sequential)
+- **Two approaches:** No (single plan produced)
+
 ## When to Use
 
 This is the recommended mode for most work. It balances quality enforcement with development speed. Suitable for:

@@ -14,6 +14,12 @@ Activate with: `mode: cost-saver` in task context or by specifying cost-saver mo
 - **Test coverage**: No minimum threshold.
 - **Disabled checks**: Visual QA, comprehensive audit, full 5-dimension review. Only basic correctness and security BLOCK checks run.
 
+## Planning Depth
+
+- **Researchers:** 0 (skip research — minimize token usage)
+- **Parallel research:** No
+- **Two approaches:** No
+
 ## Keeps Active
 
 Even in cost-saver mode, these are never disabled:

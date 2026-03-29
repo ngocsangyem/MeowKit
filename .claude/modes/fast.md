@@ -14,6 +14,12 @@ Activate with: `mode: fast` in task context or by specifying fast mode at sessio
 - **Test coverage**: No minimum threshold enforced (but tests still must pass).
 - **Review strictness**: Auto-pass if tests green and no BLOCKs.
 
+## Planning Depth
+
+- **Researchers:** 0 (skip research entirely — go straight to planning)
+- **Parallel research:** No
+- **Two approaches:** No
+
 ## When to Use
 
 - Prototyping and proof-of-concept work

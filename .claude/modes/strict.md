@@ -14,6 +14,12 @@ Activate with: `mode: strict` in task context or by specifying strict mode at se
 - **Test coverage**: 80% minimum threshold for new code. Hard fail if below.
 - **Review strictness**: ALL 5 dimensions must be PASS. No WARN allowed — any WARN is treated as FAIL and blocks shipping.
 
+## Planning Depth
+
+- **Researchers:** 2 (parallel investigation for deeper analysis)
+- **Parallel research:** Yes (two researchers explore different angles simultaneously)
+- **Two approaches:** Yes (planner produces 2 competing plans; user selects one)
+
 ## When to Use
 
 - Production hotfixes (high-risk changes to live systems)

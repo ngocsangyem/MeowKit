@@ -14,6 +14,12 @@ Activate with: `mode: architect` in task context or by specifying architect mode
 - **Allowed output**: Documentation only. No source code, no test code, no configuration changes.
 - **Active agents**: Planner, Architect, Documenter only. Developer and Tester agents are disabled.
 
+## Planning Depth
+
+- **Researchers:** 2 (parallel investigation — architecture decisions need deep analysis)
+- **Parallel research:** Yes (one researcher on technical feasibility, one on existing patterns)
+- **Two approaches:** Yes (architect evaluates competing designs via ADR format)
+
 ## Allowed Commands
 
 - `/plan` — create implementation plans

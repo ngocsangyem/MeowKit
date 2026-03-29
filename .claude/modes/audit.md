@@ -14,6 +14,12 @@ Activate with: `mode: audit` in task context or by specifying audit mode at sess
 - **Allowed output**: Security reports and findings documentation only. Does NOT fix issues — only identifies and documents them.
 - **Active agents**: Security agent activated on all files in scope.
 
+## Planning Depth
+
+- **Researchers:** 1 (focused security research before audit)
+- **Parallel research:** No
+- **Two approaches:** No
+
 ## Allowed Commands
 
 - `/audit` — full security audit

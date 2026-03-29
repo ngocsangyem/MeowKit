@@ -38,6 +38,18 @@ Rules are applied in this priority (higher = stronger override):
 12. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
 13. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
 
+## Hook Enforcement
+
+MeowKit uses shell hooks to upgrade behavioral rules to preventive enforcement:
+
+| Hook | Event | Purpose |
+|------|-------|---------|
+| `hooks/privacy-block.sh` | PreToolUse | Block sensitive file reads before they happen (Rule 4 upgrade) |
+| `hooks/gate-enforcement.sh` | PreToolUse | Block source code writes before Gate 1 approval |
+| `hooks/project-context-loader.sh` | SessionStart | Auto-load project-context.md into agent context |
+
+Hooks supplement rules — they do not replace them. Rules define the WHY; hooks enforce the WHAT.
+
 ## Rule Format Convention
 
 Every rule file follows this structure:
