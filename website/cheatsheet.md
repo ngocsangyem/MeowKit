@@ -26,6 +26,7 @@ persona: B
 | `/meow:canary` | 5 | Staged deployment with monitoring |
 | `/meow:retro` | 6 | Sprint retrospective with trend tracking |
 | `/meow:budget` | any | Token cost tracking report |
+| `/meow:party [topic]` | 1 | Multi-agent deliberation — 2-4 agents debate, forced synthesis |
 | `/meow:spawn [agent]` | any | Launch parallel agent session |
 | `/meow:upgrade` | any | Self-update MeowKit |
 
@@ -59,6 +60,14 @@ persona: B
 | 5 | Ship | — | Commit, PR, CI verify, rollback docs |
 | 6 | Reflect | — | Update docs, memory, retrospective |
 
+## Execution Modes
+
+| Mode | When | Agents | Gate behavior |
+|------|------|--------|---------------|
+| Sequential (default) | All tasks | 1 per phase | Full gates |
+| Parallel | COMPLEX + independent subtasks | Up to 3, worktree isolation | Gates always sequential |
+| Party | Architecture decisions | 2-4 deliberation agents | No code, synthesis only |
+
 ## Model Routing
 
 | Tier | Examples | Model |
@@ -66,6 +75,8 @@ persona: B
 | TRIVIAL | Rename, typo, format | Cheapest (Haiku) |
 | STANDARD | Feature, bug fix, tests | Default (Sonnet) |
 | COMPLEX | Architecture, security, auth | Best (Opus) |
+
+**Domain override:** `meow:scale-routing` at Phase 0. Fintech, healthcare, auth → force COMPLEX regardless of manual classification.
 
 ## Modes
 
@@ -101,6 +112,9 @@ persona: B
 | meow:multimodal | Image/video/audio file | Analysis via Gemini |
 | meow:qa-manual | "test this flow" | QA report or Playwright .spec.ts |
 | meow:cso | "security audit" | OWASP + STRIDE findings |
+| meow:party | "decide architecture" | Multi-agent decision brief |
+| meow:scale-routing | Phase 0 (automatic) | Domain complexity level |
+| meow:worktree | Parallel execution setup | Isolated git worktree |
 
 ## Planning (Phase 1)
 

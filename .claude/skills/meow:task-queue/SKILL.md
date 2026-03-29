@@ -72,3 +72,10 @@ Before any file write, check if the file matches the agent's declared ownership.
 - **Parallel agents** claim and complete tasks
 - **Orchestrator** monitors queue for completion and triggers integration test
 - Queue is ephemeral (session-state/) — recreated per parallel execution
+
+## Gotchas
+
+- **Race condition on claims:** Two agents reading `task-queue.json` simultaneously may both claim the same task. Mitigation: orchestrator is the sole claim-serializer — agents REQUEST claims through orchestrator, never self-claim directly
+- **Ownership globs must not overlap:** `src/api/*` and `src/api/auth/*` overlap — the more specific glob must be in the SAME task, not split across agents
+- **Queue file doesn't auto-create:** Orchestrator must create `session-state/task-queue.json` before dispatching parallel agents. If missing, agents should STOP and report, not create it themselves
+- **Completed tasks are not removed:** Tasks stay in queue with `status=completed` for audit trail. Queue is cleaned up only when the parallel execution phase ends

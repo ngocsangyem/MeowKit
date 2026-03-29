@@ -10,13 +10,30 @@ Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has 
 
 ## Phase 0 — Orient (automatic)
 
-**Agent:** orchestrator, analyst  
-**Deliverable:** Model tier assignment, context loaded
+**Agent:** orchestrator, analyst
+**Deliverable:** Model tier assignment, execution mode, context loaded
 
+- Read `docs/project-context.md` (agent constitution — loaded first, always)
 - Read `memory/lessons.md` and `memory/patterns.json`
+- Run `meow:scale-routing` — domain-based complexity classification (CSV-driven)
 - Load stack-relevant skills only (lazy loading)
 - Route: assign model tier by task complexity (Haiku / Sonnet / Opus)
+- Select execution mode: sequential (default), parallel (COMPLEX), or party (discussions)
 - Print cost estimate before starting
+
+### Execution modes
+
+| Mode | When | How |
+|------|------|-----|
+| **Sequential** | Default for all tasks | Phases run one at a time, single agent per phase |
+| **Parallel** | COMPLEX tasks with independent subtasks | Up to 3 agents, each in a git worktree, zero file overlap |
+| **Party** | Architecture decisions, trade-off analysis | 2-4 agents deliberate, one synthesis — no code during party |
+
+Party Mode is triggered explicitly:
+
+```
+/meow:party "Should we use GraphQL or REST for the public API?"
+```
 
 ## Phase 1 — Plan Gate 1
 

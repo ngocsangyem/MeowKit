@@ -16,46 +16,28 @@ Manages git worktrees for parallel agent isolation. Each parallel agent works in
 
 ### create
 
-Create an isolated worktree for a parallel agent.
-
-```bash
-git worktree add .worktrees/{agent-name} -b parallel/{agent-name}-{timestamp}
-```
-
-- Worktree path: `.worktrees/{agent-name}/`
-- Branch: `parallel/{agent-name}-{timestamp}`
-- Base: current feature branch HEAD
+Create an isolated worktree for a parallel agent. Branch from current feature branch HEAD into `.worktrees/{agent-name}/` on a `parallel/{agent-name}-{timestamp}` branch.
 
 ### merge
 
-Merge a completed worktree branch back to the feature branch.
+Merge a completed worktree branch back to the feature branch using a no-fast-forward merge.
 
-```bash
-git checkout {feature-branch}
-git merge parallel/{agent-name}-{timestamp} --no-ff -m "merge: parallel work from {agent-name}"
-```
-
-If merge conflicts occur:
-1. List conflicting files
-2. STOP and report to orchestrator
-3. Do NOT auto-resolve — human or lead agent decides
+If merge conflicts occur: list conflicting files, STOP, and report to orchestrator. Do NOT auto-resolve — human or lead agent decides.
 
 ### cleanup
 
-Remove worktree and delete the parallel branch.
-
-```bash
-git worktree remove .worktrees/{agent-name}
-git branch -d parallel/{agent-name}-{timestamp}
-```
+Remove the worktree directory and delete the parallel branch after successful merge. Never cleanup a worktree with uncommitted changes — commit or stash first.
 
 ### list
 
-Show active worktrees.
+Show all active worktrees to check parallel agent status.
 
-```bash
-git worktree list
-```
+## Gotchas
+
+- Worktree creation fails if the branch name already exists — use timestamps to ensure uniqueness
+- `git worktree remove` fails silently if the directory was already deleted manually — check existence first
+- Worktrees share the same `.git` — force-pushing from a worktree affects the main checkout
+- On macOS, worktree paths with `:` in skill names (e.g., `meow:review`) need quoting in shell commands
 
 ## Safety Rules
 

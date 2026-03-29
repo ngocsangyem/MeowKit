@@ -21,12 +21,18 @@ features:
     details: Failing tests must exist before implementation begins. No exceptions. Pre-implement hook blocks code without tests.
   - title: 🛡️ 4-Layer Security
     details: Prompt injection defense across input boundary, instruction anchoring, context isolation, and output validation.
-  - title: 🧠 13 Specialist Agents
+  - title: 🧠 14 Specialist Agents
     details: Each agent owns a specific concern — planning, testing, reviewing, shipping. No two agents modify the same files.
-  - title: ⚡ 40+ Skills
-    details: From docs retrieval to multimodal analysis, code review to QA testing. Progressive disclosure keeps context tight.
+  - title: ⚡ 49+ Skills
+    details: From docs retrieval to multimodal analysis, code review to QA testing. Step-file architecture for JIT loading keeps context tight.
   - title: 💾 Cross-Session Memory
     details: Lessons, patterns, and costs persist across sessions. After 10 sessions, the analyst proposes CLAUDE.md improvements.
   - title: 📋 Structured Task System
     details: Template-driven task files help agents resume work without losing context. Five template types with acceptance criteria, constraints, and live agent state tracking.
+  - title: 🎯 Scale-Adaptive Intelligence
+    details: Auto-classifies task complexity by domain at Phase 0. Fintech and healthcare route to COMPLEX automatically — no manual guessing.
+  - title: 🗣️ Party Mode
+    details: /meow:party for multi-agent deliberation. 2-4 agents debate architecture decisions with forced synthesis before any code is written.
+  - title: 🔍 Adversarial Review
+    details: Three parallel reviewers — Blind Hunter, Edge Case Hunter, Criteria Auditor — catch 2-3x more bugs than single-pass review.
 ---

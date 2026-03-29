@@ -8,11 +8,15 @@ persona: A
 
 MeowKit is an AI agent toolkit for Claude Code that gives your coding assistant enforced discipline — hard gates, TDD, security scanning, and human approval — so it ships production-quality code instead of untested prototypes.
 
+::: tip What's new in 0.2.0
+Scale-adaptive routing, adversarial review, Party Mode multi-agent deliberation, step-file architecture, and parallel execution with git worktree isolation. [See changelog →](/changelog)
+:::
+
 ## What problem does MeowKit solve?
 
 AI coding tools are powerful but undirected. Without structure, they skip tests, ignore security, and ship untested code. A single "implement this feature" prompt can produce code that compiles but has no tests, no review, and secrets hardcoded in source.
 
-MeowKit fixes this by installing a `.claude/` directory that Claude Code reads automatically. It contains 13 specialist agents, 42 skills, lifecycle hooks, security rules, and a memory system that together enforce a structured development workflow.
+MeowKit fixes this by installing a `.claude/` directory that Claude Code reads automatically. It contains 14 specialist agents, 49 skills, lifecycle hooks, security rules, and a memory system that together enforce a structured development workflow.
 
 ## How it works
 
@@ -30,28 +34,33 @@ No step can be skipped. Two hard gates (plan approval + review approval) require
 
 ## How it differs from raw Claude Code
 
-| Concern | Raw Claude Code | With MeowKit |
-|---------|----------------|---------------|
-| Planning | Starts coding immediately | Creates and gets approval for a plan first |
-| Testing | Tests optional, often skipped | TDD enforced — failing test before implementation |
-| Security | Relies on model knowledge | 4-layer defense + security agent + post-write hooks |
-| Review | Ask "review this" and hope | 5-dimension structural audit with written verdict |
-| Shipping | "git add -A && git push" | Conventional commits, PR, CI verification, rollback docs |
-| Memory | Forgets everything between sessions | Persists lessons, patterns, and costs |
+| Concern                | Raw Claude Code                     | With MeowKit                                                    |
+| ---------------------- | ----------------------------------- | --------------------------------------------------------------- |
+| Planning               | Starts coding immediately           | Creates and gets approval for a plan first                      |
+| Testing                | Tests optional, often skipped       | TDD enforced — failing test before implementation               |
+| Security               | Relies on model knowledge           | 4-layer defense + security agent + post-write hooks             |
+| Review                 | Ask "review this" and hope          | 3 parallel adversarial reviewers + triage step                  |
+| Shipping               | "git add -A && git push"            | Conventional commits, PR, CI verification, rollback docs        |
+| Memory                 | Forgets everything between sessions | Persists lessons, patterns, and costs                           |
+| Model selection        | Same model for everything           | Domain-adaptive routing — fintech forces COMPLEX tier           |
+| Architecture decisions | Ask and hope for the best           | Party Mode: 2-4 agents deliberate, forced synthesis             |
+| Parallel work          | Single-threaded                     | Worktree-isolated parallel agents, max 3, with integration gate |
 
 ## Architecture at a glance
 
 ```
 .claude/
-├── agents/          13 specialist agents
-├── skills/          42 skills with meow: namespace
+├── agents/          14 specialist agents
+├── skills/          49 skills with meow: namespace (step-file decomposition for complex skills)
 ├── hooks/           Lifecycle hooks (security scan, TDD gate)
-├── rules/           12 enforcement rules (security, injection, TDD)
+├── rules/           14 enforcement rules (security, injection, TDD, parallel execution)
 ├── scripts/         6 Python validators (stdlib only)
 ├── memory/          Cross-session persistence
 └── settings.json    Hook registrations + permissions
 
 CLAUDE.md            Entry point — Claude reads this at session start
+docs/
+└── project-context.md   Agent "constitution" — loaded by ALL agents at session start
 ```
 
 ## Next steps

@@ -13,7 +13,7 @@ export default withMermaid(defineConfig({
     },
   },
   title: 'MeowKit',
-  description: 'AI agent toolkit for Claude Code — 48 skills, 14 agents, structured workflow with hard gates, TDD, and security scanning.',
+  description: 'AI agent toolkit for Claude Code — 49 skills, 14 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
   srcExclude: ['**/plans/**'],
   head: [
     ['link', { rel: 'icon', href: '/favicon.ico' }],
@@ -55,6 +55,7 @@ export default withMermaid(defineConfig({
         {
           text: 'Core Concepts',
           items: [
+            { text: 'What\'s New', link: '/guide/whats-new' },
             { text: 'Philosophy', link: '/guide/philosophy' },
             { text: 'Workflow Phases (0-6)', link: '/guide/workflow-phases' },
             { text: 'Model Routing', link: '/guide/model-routing' },
@@ -129,6 +130,7 @@ export default withMermaid(defineConfig({
             { text: 'meow:plan-eng-review', link: '/reference/skills/plan-eng-review' },
             { text: 'meow:office-hours', link: '/reference/skills/office-hours' },
             { text: 'meow:brainstorming', link: '/reference/skills/brainstorming' },
+            { text: 'meow:party', link: '/reference/skills/party' },
           ],
         },
         {

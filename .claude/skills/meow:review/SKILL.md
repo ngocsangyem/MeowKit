@@ -49,7 +49,7 @@ Skip: PR reviews triggered by `--pending` or branch diff — plan not required.
 
 ## Workflow Integration
 
-Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer` agent. BLOCK verdict prevents Phase 5 (Ship).
+Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer` agent. FAIL verdict prevents Phase 5 (Ship).
 
 ## Input Modes
 
@@ -77,7 +77,7 @@ Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer
 
 3. **Pass 2 — Adversarial analysis** — Auto-scaled by diff size (small/medium/large) using Codex and/or Claude subagent. Cross-reference TODOS, check documentation staleness. See [references/adversarial-review.md](references/adversarial-review.md), [references/post-review-steps.md](references/post-review-steps.md).
 
-4. **Verdict** — Emit structured verdict (APPROVE / REQUEST CHANGES / BLOCK), persist result for `/meow:ship` to consume, log telemetry. See [references/post-review-steps.md](references/post-review-steps.md), [references/preamble.md](references/preamble.md).
+4. **Verdict** — Emit structured verdict (PASS / WARN / FAIL), persist result for `/meow:ship` to consume, log telemetry. See [references/post-review-steps.md](references/post-review-steps.md), [references/preamble.md](references/preamble.md).
 
 ## References
 
@@ -91,9 +91,7 @@ Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer
 | [references/fix-first-review.md](references/fix-first-review.md)           | Finding classification (AUTO-FIX vs ASK), batch user questions, verification of claims, external PR comment resolution                                                                        |
 | [references/adversarial-review.md](references/adversarial-review.md)       | Auto-scaled adversarial review (small/medium/large tiers), Codex and Claude subagent passes, cross-model synthesis                                                                            |
 | [references/post-review-steps.md](references/post-review-steps.md)         | TODOS cross-reference, documentation staleness check, persist eng review result, important rules                                                                                              |
-| [checklist.md](checklist.md)                                               | Review checklist (read in Step 2)                                                                                                                                                             |
-| [design-checklist.md](design-checklist.md)                                 | Design review checklist (read in Step 4.5)                                                                                                                                                    |
-| —                                                                          | _(Greptile integration removed — MeowKit uses its own reviewer agent)_                                                                                                                        |
+| —                                                                          | _(checklist.md and design-checklist.md removed — superseded by step-file prompts in prompts/)_                                                                                                |
 | [security-checklist.md](security-checklist.md)                             | Security review checklist                                                                                                                                                                     |
 | [structural-audit.md](structural-audit.md)                                 | Structural audit reference                                                                                                                                                                    |
 
@@ -118,21 +116,21 @@ After all passes complete, output this summary:
 {findings from adversarial review or "skipped (small diff)"}
 
 ### Verdict
-{APPROVE — no blocking issues}
-{REQUEST CHANGES — N critical findings must be resolved}
-{BLOCK — critical security or spec violation, requires human resolution}
+{PASS — no blocking issues}
+{WARN — N critical findings must be resolved}
+{FAIL — critical security or spec violation, requires human resolution}
 
 ### Required Actions
-{numbered list if REQUEST CHANGES or BLOCK — empty if APPROVE}
+{numbered list if WARN or FAIL — empty if PASS}
 ```
 
 **Verdict rules:**
 
-- **APPROVE** — zero critical findings across all passes
-- **REQUEST CHANGES** — 1+ critical findings that can be fixed
-- **BLOCK** — security vulnerability, spec violation, or 3+ unresolved critical findings
+- **PASS** — zero critical findings across all passes
+- **WARN** — 1+ critical findings that can be fixed
+- **FAIL** — security vulnerability, spec violation, or 3+ unresolved critical findings
 
-BLOCK verdict prevents `/meow:ship` from executing (Gate 2 enforcement).
+FAIL verdict prevents `/meow:ship` from executing (Gate 2 enforcement).
 
 ## Gotchas
 

@@ -62,6 +62,14 @@ The template emphasizes facts agents **cannot infer from code**:
 
 See `templates/project-context-template.md` for the full structure.
 
+## Gotchas
+
+- Stale context is worse than no context — re-run `update` after major architecture changes
+- The template asks for "rejected alternatives" — this is the highest-value content. If you chose Zustand over Redux, say WHY
+- Don't list every file path — agents can Glob for that. Focus on RULES and CONVENTIONS
+- `<!-- manual -->` sections survive `update` action but NOT `generate` — backup before regenerating from scratch
+- If project-context.md conflicts with CLAUDE.md, CLAUDE.md wins (it's the higher-priority document)
+
 ## Integration
 
-All 15 MeowKit agents load `docs/project-context.md` in their Required Context section. If the file doesn't exist, agents behave exactly as before (graceful degradation).
+All MeowKit agents load `docs/project-context.md` in their Required Context section. If the file doesn't exist, agents behave exactly as before (graceful degradation).

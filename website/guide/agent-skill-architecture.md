@@ -14,6 +14,32 @@ Every task is routed to the right agent for its phase. That agent activates only
 Skills activate by task domain, not all at once. An orchestrator loads routing skills. A developer loads language-specific skills. A shipper loads deployment skills. No agent loads everything.
 :::
 
+## Project Context System
+
+`docs/project-context.md` is the agent **constitution** — tech stack, conventions, anti-patterns, and testing approach. All agents load it at session start, before any task-specific context.
+
+```
+Session Start
+     │
+     ▼
+Load docs/project-context.md   ← Always first
+     │
+     ▼
+Load task-specific context
+     │
+     ▼
+Route to agent
+```
+
+Without `project-context.md`, agents infer project conventions independently and make conflicting assumptions. With it, every agent shares the same ground truth.
+
+Create or update it with:
+
+```
+/meow:docs-init    # generate from codebase analysis (new projects)
+/meow:docs-sync    # diff-aware update after feature work
+```
+
 ## Task Flow
 
 ```
@@ -120,6 +146,39 @@ Skills that enforce this gate:
 ::: info Why some skills skip the gate
 `meow:investigate` and `meow:office-hours` produce planning input — they run before a plan exists by design. `meow:retro` is data-driven and has no implementation output to scope.
 :::
+
+## Step-File Architecture
+
+Complex skills decompose into JIT-loaded step files instead of one monolithic SKILL.md:
+
+```
+skills/meow:review/
+├── SKILL.md           # Entrypoint — metadata only, no workflow
+├── workflow.md        # Step sequence definition
+├── step-01-blind-review.md
+├── step-02-edge-cases.md
+├── step-03-criteria-audit.md
+└── step-04-triage.md
+```
+
+**Why step files?**
+
+- **Token efficiency** — only the active step is in context, not the entire workflow
+- **Auditability** — each step produces a discrete artifact
+- **Resumability** — state persists to `session-state/{skill-name}-progress.json`; interrupted workflows resume from the last completed step
+
+**Rules:**
+- One step at a time — never load multiple steps simultaneously
+- Never skip steps — even empty steps run quickly and preserve sequence integrity
+- Fix step files when wrong — don't work around them
+
+### Currently step-file enabled
+
+| Skill | Steps | What each step does |
+|-------|-------|---------------------|
+| `meow:review` | 4 | Blind review → Edge cases → Criteria audit → Triage |
+
+Skills under 150 lines stay monolithic — step files add overhead only worth it for 3+ distinct phases.
 
 ## Cross-Cutting Skills
 

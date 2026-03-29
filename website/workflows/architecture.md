@@ -17,9 +17,33 @@ persona: B
 
 When a task involves database schema, API contracts, service boundaries, or infrastructure changes, the **orchestrator** inserts the **architect** agent. The architect evaluates tradeoffs using evidence (not opinion), generates ADRs, and enforces existing architectural patterns.
 
+For high-stakes architectural decisions, use **Party Mode** to get multi-agent deliberation before writing a single line of code.
+
 ## Step-by-step guide
 
-### Step 1: Brainstorm approaches (optional but recommended)
+### Step 0: Party Mode deliberation (recommended for major decisions)
+
+```
+/meow:party "Should we use GraphQL or REST for the public API?"
+```
+
+Party Mode spawns 2-4 deliberation agents that independently analyze the question, then synthesize their findings into a single recommendation. No code is written during a party — the output is a decision brief that feeds into the ADR.
+
+```
+Party Mode — "GraphQL vs REST"
+  Agent A (performance lens): REST wins — GraphQL query complexity unpredictable at scale
+  Agent B (DX lens): GraphQL wins — eliminates over-fetching for mobile clients
+  Agent C (migration lens): tRPC wins — no overhead, full type safety, TS-only project
+  ─────────────────────────────────────────────────────
+  Synthesis: tRPC for internal APIs, REST for external. GraphQL deferred.
+```
+
+Use `/meow:party` when:
+- Two reasonable engineers would disagree on the approach
+- The decision has long-term architectural consequences
+- The cost of the wrong choice exceeds 2 days of rework
+
+### Step 1: Brainstorm approaches (optional, skip if using Party Mode)
 
 ```
 "Should we use GraphQL or REST for our API?"

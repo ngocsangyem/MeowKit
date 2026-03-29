@@ -60,6 +60,13 @@ Orchestrator Phase 0:
 
 Users can add custom domains by editing `data/domain-complexity.csv`. Add a new row with domain keywords relevant to your project.
 
+## Gotchas
+
+- Multiple domains can match a single task (e.g., "fintech dashboard" matches both fintech and internal_tools) — use the HIGHEST complexity match
+- CSV keyword matching is case-insensitive but signal order matters — first match wins for domain name
+- Adding too many low-signal keywords (e.g., "data", "app") creates false positives — keep signals specific to the domain
+- One-shot workflow bypass requires BOTH CSV match AND orchestrator zero-blast-radius confirmation — CSV alone is not sufficient
+
 ## Data File
 
 - `data/domain-complexity.csv` — Domain → complexity → workflow mapping
