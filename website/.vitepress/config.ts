@@ -16,11 +16,15 @@ export default withMermaid(defineConfig({
   description: 'AI agent toolkit for Claude Code — 48 skills, 14 agents, structured workflow with hard gates, TDD, and security scanning.',
   srcExclude: ['**/plans/**'],
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/meowkit-favicon.svg' }],
+    ['link', { rel: 'icon', href: '/favicon.ico' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16.png' }],
+    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }],
+    ['meta', { property: 'og:image', content: '/og-image.png' }],
   ],
   appearance: 'dark',
   themeConfig: {
-    logo: '/meowkit-favicon.svg',
+    logo: { light: '/logo.svg', dark: '/logo-dark.svg' },
     nav: [
       { text: 'Guide', link: '/introduction' },
       { text: 'CLI', link: '/cli/' },

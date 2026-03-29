@@ -1,0 +1,42 @@
+/* MeowKit Design System - CSS Tokens */
+
+:root {
+  /* Colors */
+  --mk-bg: #05070A;
+  --mk-bg-secondary: #0A1F44;
+  --mk-surface: #111418;
+  --mk-surface-alpha: rgba(17, 20, 24, 0.9);
+  --mk-border: rgba(255, 255, 255, 0.05);
+  --mk-text-primary: #F8FAFC;
+  --mk-text-secondary: #94A3B8;
+  --mk-brand-mascot: #2563EB;
+  --mk-brand-active: #E1E1E1;
+
+  /* Typography */
+  --mk-font-heading: 'Inter', sans-serif;
+  --mk-font-mono: 'Fira Code', 'Geist Mono', monospace;
+  --mk-heading-weight: 400;
+  --mk-heading-tracking: 0.02em;
+}
+
+/* Sharp Glass Effect */
+.mk-glass-panel {
+  background: var(--mk-bg-secondary);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--mk-border);
+}
+
+/* Primary Button */
+.mk-btn-primary {
+  background-color: var(--mk-brand-mascot);
+  color: #FFFFFF;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+/* Surface Card */
+.mk-card {
+  background: var(--mk-surface);
+  border: 1px solid var(--mk-border);
+  border-radius: 8px;
+}

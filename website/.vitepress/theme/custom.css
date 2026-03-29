@@ -2,12 +2,12 @@
  * MeowKit Design System — VitePress Theme
  *
  * Architecture: 3-layer token system
- *   Layer 1: Brand primitives (:root) — theme-independent
+ *   Layer 1: Brand primitives (:root) — from meowkit-design-guideline.md
  *   Layer 2: Light theme tokens (html:not(.dark))
  *   Layer 3: Dark theme tokens (.dark)
  *   Layer 4: Component overrides — reference tokens, not raw hex
  *
- * Source of truth: docs/meowkit-design-tokens.json
+ * Source of truth: assets/tokens/meowkit-design-tokens.json
  */
 
 /* ================================================================== */
@@ -15,31 +15,45 @@
 /* ================================================================== */
 
 :root {
-  /* Primary — Vibrant Cyan: CTAs, active states, highlights */
-  --mk-color-primary: #38F9FF;
-  --mk-color-primary-hover: #5CFAFF;
-  --mk-color-primary-muted: rgba(56, 249, 255, 0.12);
+  /* Primary Blue */
+  --mk-blue-50: #EBF5FF;
+  --mk-blue-100: #D6EBFF;
+  --mk-blue-200: #ADD6FF;
+  --mk-blue-300: #85C2FF;
+  --mk-blue-400: #5CADFF;
+  --mk-blue-500: #3399FF;
+  --mk-blue-600: #007BFF;
+  --mk-blue-700: #0062CC;
+  --mk-blue-800: #004999;
+  --mk-blue-900: #003066;
 
-  /* Secondary — Vibrant Purple: decorative, category tags, info */
-  --mk-color-secondary: #A020F0;
-  --mk-color-secondary-hover: #BA55D3;
-  --mk-color-secondary-muted: rgba(160, 32, 240, 0.10);
+  /* Accent — Magic Layer */
+  --mk-accent-glow: #66CCFF;
+  --mk-accent-soft: #99DDFF;
 
-  /* Gradient — hero text, brand buttons, accents */
-  --mk-gradient-brand: linear-gradient(135deg, #38F9FF 0%, #A020F0 100%);
+  /* Neutral */
+  --mk-neutral-0: #FFFFFF;
+  --mk-neutral-50: #F5F7FA;
+  --mk-neutral-100: #E4E7EC;
+  --mk-neutral-300: #98A2B3;
+  --mk-neutral-500: #667085;
+  --mk-neutral-700: #344054;
+  --mk-neutral-900: #101828;
 
-  /* Semantic status */
-  --mk-color-success: #22C55E;
-  --mk-color-warning: #F59E0B;
-  --mk-color-danger: #EF4444;
-  --mk-color-info: #A020F0;
+  /* Semantic */
+  --mk-success: #12B76A;
+  --mk-warning: #F79009;
+  --mk-danger: #F04438;
+  --mk-info: #007BFF;
+
+  /* Gradient */
+  --mk-gradient-brand: linear-gradient(135deg, #007BFF 0%, #66CCFF 100%);
 
   /* Typography */
-  --mk-font-display: 'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif;
-  --mk-font-body: 'SF Pro Text', 'Inter', system-ui, sans-serif;
-  --mk-font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --mk-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --mk-font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 
-  /* Spacing scale (4px base) */
+  /* Spacing */
   --mk-space-1: 4px;
   --mk-space-2: 8px;
   --mk-space-3: 12px;
@@ -54,8 +68,8 @@
   --mk-radius-pill: 9999px;
 
   /* Shadows */
-  --mk-shadow-glow-cyan: 0 0 20px rgba(56, 249, 255, 0.25);
-  --mk-shadow-glow-purple: 0 0 20px rgba(160, 32, 240, 0.25);
+  --mk-shadow-glow: 0 0 20px rgba(102, 204, 255, 0.35);
+  --mk-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
 
   /* Transitions */
   --mk-transition-fast: 0.15s ease;
@@ -67,15 +81,15 @@
 /* ================================================================== */
 
 html:not(.dark) {
-  /* Brand → VitePress brand slots */
-  --vp-c-brand-1: var(--mk-color-secondary);
-  --vp-c-brand-2: #8B18D0;
-  --vp-c-brand-3: var(--mk-color-secondary);
-  --vp-c-brand-soft: rgba(160, 32, 240, 0.08);
+  /* Brand → VitePress slots */
+  --vp-c-brand-1: var(--mk-blue-600);
+  --vp-c-brand-2: var(--mk-blue-700);
+  --vp-c-brand-3: var(--mk-blue-600);
+  --vp-c-brand-soft: rgba(0, 123, 255, 0.08);
 
   /* Backgrounds */
-  --mk-bg-base: #F8FAFC;
-  --mk-bg-surface: #FFFFFF;
+  --mk-bg-base: var(--mk-neutral-50);
+  --mk-bg-surface: var(--mk-neutral-0);
   --mk-bg-soft: #F1F5F9;
   --vp-c-bg: var(--mk-bg-base);
   --vp-c-bg-alt: var(--mk-bg-surface);
@@ -83,39 +97,38 @@ html:not(.dark) {
   --vp-c-bg-soft: var(--mk-bg-soft);
 
   /* Text */
-  --mk-text-primary: #1E293B;
-  --mk-text-secondary: #475569;
-  --mk-text-subtle: #94A3B8;
+  --mk-text-primary: var(--mk-neutral-900);
+  --mk-text-secondary: var(--mk-neutral-500);
+  --mk-text-subtle: var(--mk-neutral-300);
   --vp-c-text-1: var(--mk-text-primary);
   --vp-c-text-2: var(--mk-text-secondary);
   --vp-c-text-3: var(--mk-text-subtle);
 
   /* Borders */
-  --mk-border-subtle: #E2E8F0;
+  --mk-border-subtle: var(--mk-neutral-100);
   --mk-border-strong: #CBD5E1;
   --vp-c-border: var(--mk-border-subtle);
   --vp-c-divider: var(--mk-border-subtle);
   --vp-c-gutter: var(--mk-bg-base);
-  --vp-c-disabled: var(--mk-border-subtle);
 
   /* Interactive states */
-  --mk-hover-bg: rgba(160, 32, 240, 0.06);
-  --mk-active-bg: rgba(160, 32, 240, 0.12);
+  --mk-hover-bg: rgba(0, 123, 255, 0.06);
+  --mk-active-bg: rgba(0, 123, 255, 0.12);
 
   /* Component overrides */
   --vp-sidebar-bg-color: var(--mk-bg-surface);
-  --vp-nav-bg-color: rgba(248, 250, 252, 0.85);
+  --vp-nav-bg-color: rgba(245, 247, 250, 0.85);
   --vp-code-block-bg: var(--mk-bg-soft);
-  --vp-code-line-highlight-color: rgba(160, 32, 240, 0.06);
-  --vp-code-tab-active-bar-color: var(--mk-color-secondary);
+  --vp-code-line-highlight-color: rgba(0, 123, 255, 0.06);
+  --vp-code-tab-active-bar-color: var(--mk-blue-600);
 
   /* Callout blocks */
-  --vp-custom-block-tip-border: var(--mk-color-primary);
-  --vp-custom-block-tip-text: #0E7490;
-  --vp-custom-block-tip-bg: rgba(56, 249, 255, 0.06);
-  --vp-custom-block-info-border: var(--mk-color-secondary);
-  --vp-custom-block-info-text: #7C3AED;
-  --vp-custom-block-info-bg: rgba(160, 32, 240, 0.04);
+  --vp-custom-block-tip-border: var(--mk-blue-600);
+  --vp-custom-block-tip-text: var(--mk-blue-700);
+  --vp-custom-block-tip-bg: rgba(0, 123, 255, 0.06);
+  --vp-custom-block-info-border: var(--mk-accent-glow);
+  --vp-custom-block-info-text: var(--mk-blue-700);
+  --vp-custom-block-info-bg: rgba(102, 204, 255, 0.06);
 }
 
 /* ================================================================== */
@@ -123,14 +136,14 @@ html:not(.dark) {
 /* ================================================================== */
 
 .dark {
-  /* Brand → VitePress brand slots */
-  --vp-c-brand-1: var(--mk-color-primary);
-  --vp-c-brand-2: var(--mk-color-primary-hover);
-  --vp-c-brand-3: var(--mk-color-primary);
-  --vp-c-brand-soft: var(--mk-color-primary-muted);
+  /* Brand → VitePress slots */
+  --vp-c-brand-1: var(--mk-accent-glow);
+  --vp-c-brand-2: var(--mk-accent-soft);
+  --vp-c-brand-3: var(--mk-accent-glow);
+  --vp-c-brand-soft: rgba(102, 204, 255, 0.12);
 
   /* Backgrounds */
-  --mk-bg-base: #0F172A;
+  --mk-bg-base: var(--mk-neutral-900);
   --mk-bg-surface: #1E293B;
   --mk-bg-soft: #1E293B;
   --vp-c-bg: var(--mk-bg-base);
@@ -152,30 +165,29 @@ html:not(.dark) {
   --vp-c-border: var(--mk-border-subtle);
   --vp-c-divider: var(--mk-border-subtle);
   --vp-c-gutter: var(--mk-bg-base);
-  --vp-c-disabled: var(--mk-border-subtle);
 
   /* Interactive states */
-  --mk-hover-bg: rgba(56, 249, 255, 0.10);
-  --mk-active-bg: rgba(56, 249, 255, 0.20);
+  --mk-hover-bg: rgba(102, 204, 255, 0.10);
+  --mk-active-bg: rgba(102, 204, 255, 0.20);
 
   /* Component overrides */
   --vp-sidebar-bg-color: var(--mk-bg-base);
-  --vp-nav-bg-color: rgba(15, 23, 42, 0.85);
+  --vp-nav-bg-color: rgba(16, 24, 40, 0.85);
   --vp-code-block-bg: var(--mk-bg-base);
-  --vp-code-line-highlight-color: rgba(56, 249, 255, 0.06);
-  --vp-code-tab-active-bar-color: var(--mk-color-primary);
+  --vp-code-line-highlight-color: rgba(102, 204, 255, 0.06);
+  --vp-code-tab-active-bar-color: var(--mk-accent-glow);
 
   /* Callout blocks */
-  --vp-custom-block-tip-border: var(--mk-color-primary);
-  --vp-custom-block-tip-text: var(--mk-color-primary);
-  --vp-custom-block-tip-bg: rgba(56, 249, 255, 0.06);
-  --vp-custom-block-info-border: var(--mk-color-secondary);
-  --vp-custom-block-info-text: var(--mk-color-secondary-hover);
-  --vp-custom-block-info-bg: rgba(160, 32, 240, 0.06);
+  --vp-custom-block-tip-border: var(--mk-accent-glow);
+  --vp-custom-block-tip-text: var(--mk-accent-glow);
+  --vp-custom-block-tip-bg: rgba(102, 204, 255, 0.06);
+  --vp-custom-block-info-border: var(--mk-blue-300);
+  --vp-custom-block-info-text: var(--mk-blue-300);
+  --vp-custom-block-info-bg: rgba(133, 194, 255, 0.06);
 }
 
 /* ================================================================== */
-/*  LAYER 4: Component Overrides (reference tokens, not raw hex)       */
+/*  LAYER 4: Component Overrides                                       */
 /* ================================================================== */
 
 /* — Hero Section — */
@@ -198,7 +210,7 @@ html:not(.dark) {
 .VPHero .action .VPButton.brand {
   background: var(--mk-gradient-brand);
   border: none;
-  color: #0F172A;
+  color: #FFFFFF;
   font-weight: 600;
   transition: opacity var(--mk-transition-fast);
 }
@@ -208,94 +220,84 @@ html:not(.dark) {
 }
 
 .VPHero .action .VPButton.alt {
-  border-color: var(--mk-color-primary);
-  color: var(--mk-color-primary);
+  border-color: var(--mk-blue-600);
+  color: var(--mk-blue-600);
   transition: background var(--mk-transition-fast), color var(--mk-transition-fast);
 }
 
-html:not(.dark) .VPHero .action .VPButton.alt {
-  border-color: var(--mk-color-secondary);
-  color: var(--mk-color-secondary);
+.dark .VPHero .action .VPButton.alt {
+  border-color: var(--mk-accent-glow);
+  color: var(--mk-accent-glow);
 }
 
-.dark .VPHero .action .VPButton.alt:hover {
-  background: var(--mk-hover-bg);
-}
-
-html:not(.dark) .VPHero .action .VPButton.alt:hover {
+.VPHero .action .VPButton.alt:hover {
   background: var(--mk-hover-bg);
 }
 
 /* — Feature Cards — */
 
-.dark .VPFeature {
+.VPFeature {
   background-color: var(--mk-bg-surface);
   border: 1px solid var(--mk-border-subtle);
   transition: border-color var(--mk-transition-normal);
 }
 
 .dark .VPFeature:hover {
-  border-color: rgba(56, 249, 255, 0.40);
-}
-
-.dark .VPFeature .title {
-  color: var(--mk-color-primary);
-}
-
-html:not(.dark) .VPFeature {
-  background-color: var(--mk-bg-surface);
-  border: 1px solid var(--mk-border-subtle);
-  transition: border-color var(--mk-transition-normal);
+  border-color: rgba(102, 204, 255, 0.40);
 }
 
 html:not(.dark) .VPFeature:hover {
-  border-color: rgba(160, 32, 240, 0.40);
+  border-color: rgba(0, 123, 255, 0.40);
+}
+
+.dark .VPFeature .title {
+  color: var(--mk-accent-glow);
 }
 
 html:not(.dark) .VPFeature .title {
-  color: var(--mk-color-secondary);
+  color: var(--mk-blue-600);
 }
 
 /* — Sidebar — */
 
 .dark .VPSidebar .VPSidebarItem.is-active > .item > .link > .text {
-  color: var(--mk-color-primary);
+  color: var(--mk-accent-glow);
 }
 
 .dark .VPSidebar .VPSidebarItem.is-active > .item > .indicator {
-  background-color: var(--mk-color-primary);
+  background-color: var(--mk-accent-glow);
 }
 
 html:not(.dark) .VPSidebar .VPSidebarItem.is-active > .item > .link > .text {
-  color: var(--mk-color-secondary);
+  color: var(--mk-blue-600);
 }
 
 html:not(.dark) .VPSidebar .VPSidebarItem.is-active > .item > .indicator {
-  background-color: var(--mk-color-secondary);
+  background-color: var(--mk-blue-600);
 }
 
 /* — Nav Links — */
 
 .dark .VPNavBarMenuLink:hover .text,
 .dark .VPNavBarMenuLink.active .text {
-  color: var(--mk-color-primary);
+  color: var(--mk-accent-glow);
 }
 
 html:not(.dark) .VPNavBarMenuLink:hover .text,
 html:not(.dark) .VPNavBarMenuLink.active .text {
-  color: var(--mk-color-secondary);
+  color: var(--mk-blue-600);
 }
 
 /* — Inline Code — */
 
 .dark :not(pre) > code {
-  background-color: rgba(56, 249, 255, 0.08);
-  color: var(--mk-color-primary);
+  background-color: rgba(102, 204, 255, 0.08);
+  color: var(--mk-accent-glow);
 }
 
 html:not(.dark) :not(pre) > code {
-  background-color: rgba(160, 32, 240, 0.06);
-  color: #7C3AED;
+  background-color: rgba(0, 123, 255, 0.06);
+  color: var(--mk-blue-700);
 }
 
 /* — Tables — */
@@ -306,7 +308,7 @@ html:not(.dark) :not(pre) > code {
 
 .dark .vp-doc th {
   background-color: var(--mk-bg-base);
-  color: var(--mk-color-primary);
+  color: var(--mk-accent-glow);
   border-bottom: 2px solid var(--mk-border-subtle);
 }
 
@@ -327,26 +329,26 @@ html:not(.dark) .vp-doc tr:nth-child(even) td {
 /* — Badges — */
 
 .dark .VPBadge.tip {
-  background-color: var(--mk-color-primary-muted);
-  color: var(--mk-color-primary);
+  background-color: rgba(102, 204, 255, 0.12);
+  color: var(--mk-accent-glow);
 }
 
 .dark .VPBadge.warning {
-  background-color: var(--mk-color-secondary-muted);
-  color: var(--mk-color-secondary);
+  background-color: rgba(247, 144, 9, 0.12);
+  color: var(--mk-warning);
 }
 
 html:not(.dark) .VPBadge.tip {
-  background-color: rgba(56, 249, 255, 0.10);
-  color: #0E7490;
+  background-color: rgba(0, 123, 255, 0.08);
+  color: var(--mk-blue-700);
 }
 
 html:not(.dark) .VPBadge.warning {
-  background-color: rgba(160, 32, 240, 0.08);
-  color: #7C3AED;
+  background-color: rgba(247, 144, 9, 0.08);
+  color: #B45309;
 }
 
-/* — Scrollbar (dark only) — */
+/* — Scrollbar (dark) — */
 
 .dark ::-webkit-scrollbar {
   width: 6px;
@@ -363,10 +365,10 @@ html:not(.dark) .VPBadge.warning {
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: var(--mk-color-primary);
+  background: var(--mk-accent-glow);
 }
 
-/* — Search Box — */
+/* — Search — */
 
 .dark .DocSearch-Button {
   border-color: var(--mk-border-subtle);
@@ -374,23 +376,23 @@ html:not(.dark) .VPBadge.warning {
 }
 
 .dark .DocSearch-Button:hover {
-  border-color: var(--mk-color-primary);
+  border-color: var(--mk-accent-glow);
 }
 
 /* — Links — */
 
 .dark .vp-doc a {
-  color: var(--mk-color-primary);
+  color: var(--mk-accent-glow);
 }
 
 .dark .vp-doc a:hover {
-  color: var(--mk-color-primary-hover);
+  color: var(--mk-accent-soft);
 }
 
 html:not(.dark) .vp-doc a {
-  color: var(--mk-color-secondary);
+  color: var(--mk-blue-600);
 }
 
 html:not(.dark) .vp-doc a:hover {
-  color: var(--mk-color-secondary-hover);
+  color: var(--mk-blue-500);
 }

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner/meowkit-banner.svg" alt="MeowKit Banner" width="100%" />
+  <img src="assets/branding/logo.png" alt="MeowKit Banner" width="300px" height="300px" />
 </p>
 
 <h1 align="center">MeowKit</h1>
@@ -38,10 +38,10 @@ npx meowkit-cli doctor     # Verify environment
 
 ## Packages
 
-| Package | npm | Description |
-|---------|-----|-------------|
-| [`create-meowkit`](https://www.npmjs.com/package/create-meowkit) | `npm create meowkit@latest` | Scaffold CLI — downloads release from GitHub |
-| [`meowkit-cli`](https://www.npmjs.com/package/meowkit-cli) | `npx meowkit-cli <cmd>` | Runtime CLI — upgrade, doctor, validate, budget, memory |
+| Package                                                          | npm                         | Description                                             |
+| ---------------------------------------------------------------- | --------------------------- | ------------------------------------------------------- |
+| [`create-meowkit`](https://www.npmjs.com/package/create-meowkit) | `npm create meowkit@latest` | Scaffold CLI — downloads release from GitHub            |
+| [`meowkit-cli`](https://www.npmjs.com/package/meowkit-cli)       | `npx meowkit-cli <cmd>`     | Runtime CLI — upgrade, doctor, validate, budget, memory |
 
 ## Requirements
 
@@ -104,6 +104,7 @@ cd ../meowkit && npm publish
 ### Automated release (CI/CD)
 
 Push to `main` or `dev` triggers GitHub Actions:
+
 - Semantic-release analyzes commits, determines version
 - Syncs version across both packages
 - Builds release zip, creates GitHub Release
@@ -118,11 +119,11 @@ feat!: breaking      → MAJOR (0.2.1 → 1.0.0)
 
 ### Release scripts
 
-| Script | Purpose |
-|--------|---------|
-| `scripts/sync-package-versions.cjs` | Sync version across both packages |
+| Script                                  | Purpose                                 |
+| --------------------------------------- | --------------------------------------- |
+| `scripts/sync-package-versions.cjs`     | Sync version across both packages       |
 | `scripts/generate-release-manifest.cjs` | SHA-256 checksums for all release files |
-| `scripts/prepare-release-assets.cjs` | Metadata + manifest + zip archive |
+| `scripts/prepare-release-assets.cjs`    | Metadata + manifest + zip archive       |
 
 ## Development
 

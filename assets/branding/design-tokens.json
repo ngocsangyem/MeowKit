@@ -1,0 +1,46 @@
+{
+  "name": "MeowKit Design System",
+  "version": "1.0.0",
+  "mascot": "Codey",
+  "theme": {
+    "colors": {
+      "bg": "#05070A",
+      "bgSecondary": "#0A1F44",
+      "surface": "#111418",
+      "surfaceAlpha": "rgba(17, 20, 24, 0.9)",
+      "border": "rgba(255, 255, 255, 0.05)",
+      "text": {
+        "primary": "#F8FAFC",
+        "secondary": "#94A3B8"
+      },
+      "brand": {
+        "mascot": "#2563EB",
+        "active": "#E1E1E1"
+      }
+    },
+    "typography": {
+      "headings": {
+        "fontFamily": "Inter, sans-serif",
+        "fontWeight": 400,
+        "letterSpacing": "0.02em"
+      },
+      "mono": {
+        "fontFamily": "'Fira Code', 'Geist Mono', monospace",
+        "fontWeight": 400
+      }
+    },
+    "effects": {
+      "glassPanel": {
+        "background": "#0A1F44",
+        "backdropFilter": "blur(12px)",
+        "border": "1px solid rgba(255, 255, 255, 0.05)"
+      },
+      "btnPrimary": {
+        "backgroundColor": "#2563EB",
+        "color": "#FFFFFF",
+        "fontWeight": 500,
+        "borderRadius": "4px"
+      }
+    }
+  }
+}
