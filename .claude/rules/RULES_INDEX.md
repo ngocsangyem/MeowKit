@@ -17,6 +17,8 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | `output-format-rules.md` | Response structure: what changed, why, file refs, open questions | New (prompting best practices) | All agent responses |
 | `search-before-building-rules.md` | 3-layer knowledge framework: search before implementing unfamiliar patterns | Adapted from gstack ETHOS.md | Implementation, planning |
 | `scale-adaptive-rules.md` | Domain-based complexity routing, CSV match override, Gate 1 one-shot bypass | New (BMAD-inspired) | Phase 0 (Orient) |
+| `step-file-rules.md` | JIT step loading, no skipping, state persistence for multi-step workflows | New (BMAD-inspired) | Step-file skills |
+| `parallel-execution-rules.md` | Worktree isolation, file ownership, max 3 agents, integration test | New (CKE-inspired) | Parallel execution [CONTEXTUAL] |
 
 ## Loading Priority
 
@@ -32,7 +34,9 @@ Rules are applied in this priority (higher = stronger override):
 8. `model-selection-rules.md` — always apply
 9. `output-format-rules.md` — always apply
 10. `scale-adaptive-rules.md` — always apply at Phase 0
-11. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
+11. `step-file-rules.md` — apply when executing step-file workflows
+12. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
+13. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
 
 ## Rule Format Convention
 

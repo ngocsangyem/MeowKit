@@ -46,3 +46,18 @@ Pattern: Component A + Component B + Tests (separate files)
 
 ALWAYS plan integration points before starting parallel work.
 NEVER start parallel agents that modify the same files.
+
+### Parallel execution infrastructure (Week 2 addition)
+
+For COMPLEX tasks with independent subtasks:
+1. Use `meow:worktree` for git worktree isolation per agent
+2. Use `meow:task-queue` for task claiming and ownership enforcement
+3. Follow `parallel-execution-rules.md` for constraints (max 3 agents, integration test required)
+4. Gates (1 and 2) are NEVER parallelized — always sequential, always human-approved
+
+### Party Mode (Week 2 addition)
+
+For architectural discussions and trade-off analysis:
+- Use `meow:party` skill for multi-agent deliberation
+- Party mode is discussion-only — no code changes during party
+- After party decision, resume normal sequential pipeline

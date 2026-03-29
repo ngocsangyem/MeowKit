@@ -82,12 +82,35 @@ If an agent fails to respond after delegation:
 - You do NOT make architectural or implementation decisions — only routing decisions.
 - You do NOT assign trivial tier to any task touching auth, payments, user data, or infrastructure.
 
+## Party Mode Routing
+
+When the task involves architectural trade-offs or multi-perspective decisions, suggest Party Mode:
+
+- User explicitly asks: "should we X or Y?", "let's discuss", "design review"
+- Task is COMPLEX and involves architectural decisions
+- Orchestrator detects trade-off language
+
+Route to `meow:party` skill. Party Mode is discussion-only — no code changes. After party decision, resume normal pipeline.
+
+## Parallel Execution Routing
+
+When a COMPLEX task can be decomposed into independent subtasks with zero file overlap:
+
+1. Decompose into 2-3 subtasks with explicit file ownership globs
+2. Create git worktrees via `meow:worktree`
+3. Assign subtasks via `meow:task-queue`
+4. After all complete: merge worktrees → run full test suite
+5. Resume sequential pipeline at review phase
+
+**Rules:** See `parallel-execution-rules.md`. Max 3 agents. Gates remain sequential.
+
 ## Output Format
 
 For every routing decision, state:
 - Complexity tier
 - Assigned model tier
-- Target agent sequence
+- Execution mode: sequential | parallel | party
+- Target agent sequence (or parallel decomposition)
 - Context summary for the first agent
 
 ## Anti-Rationalization Rules

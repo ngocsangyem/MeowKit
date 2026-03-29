@@ -18,6 +18,8 @@ Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test RED
 **IMPORTANT:** Activate only skills needed for the current task domain.
 **IMPORTANT:** Declare model tier before every task: TRIVIAL · STANDARD · COMPLEX.
 **IMPORTANT:** Non-trivial task (>2 files OR >30 min) = approved plan required before any code.
+**IMPORTANT:** For architectural trade-offs, use `/meow:party` for multi-agent deliberation before deciding.
+**IMPORTANT:** COMPLEX tasks with independent subtasks may use parallel execution (max 3 agents, worktree isolation).
 
 ## Gates
 
