@@ -1,0 +1,129 @@
+import { mkdirSync, writeFileSync, createWriteStream } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { execSync } from "node:child_process";
+import * as log from "./logger.js";
+
+/** GitHub repository for MeowKit releases */
+const GITHUB_OWNER = "ngocsangyem";
+const GITHUB_REPO = "MeowKit";
+
+interface GitHubRelease {
+  tag_name: string;
+  name: string;
+  prerelease: boolean;
+  draft: boolean;
+  assets: Array<{
+    name: string;
+    browser_download_url: string;
+    size: number;
+  }>;
+  published_at: string;
+}
+
+export interface ReleaseInfo {
+  tag: string;
+  version: string;
+  isBeta: boolean;
+  downloadUrl: string;
+  publishedAt: string;
+}
+
+/**
+ * Fetch available releases from GitHub API.
+ * Returns stable and beta releases, sorted by newest first.
+ */
+export async function fetchReleases(): Promise<ReleaseInfo[]> {
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases`;
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/vnd.github.v3+json",
+      "User-Agent": "create-meowkit",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+  }
+
+  const releases = (await response.json()) as GitHubRelease[];
+
+  return releases
+    .filter((r) => !r.draft)
+    .map((r) => {
+      // Find the release zip asset
+      const zipAsset = r.assets.find((a) => a.name.endsWith(".zip"));
+      return {
+        tag: r.tag_name,
+        version: r.tag_name.replace(/^v/, ""),
+        isBeta: r.prerelease,
+        downloadUrl: zipAsset?.browser_download_url ?? "",
+        publishedAt: r.published_at,
+      };
+    })
+    .filter((r) => r.downloadUrl !== "");
+}
+
+/**
+ * Get the latest stable release.
+ */
+export async function getLatestStable(): Promise<ReleaseInfo | null> {
+  const releases = await fetchReleases();
+  return releases.find((r) => !r.isBeta) ?? null;
+}
+
+/**
+ * Get the latest beta release.
+ */
+export async function getLatestBeta(): Promise<ReleaseInfo | null> {
+  const releases = await fetchReleases();
+  return releases.find((r) => r.isBeta) ?? null;
+}
+
+/**
+ * Download a release zip and extract to a temp directory.
+ * Returns the path to the extracted directory.
+ */
+export async function downloadRelease(release: ReleaseInfo): Promise<string> {
+  const tempDir = join(tmpdir(), `meowkit-release-${release.version}-${Date.now()}`);
+  mkdirSync(tempDir, { recursive: true });
+
+  const zipPath = join(tempDir, "release.zip");
+
+  log.debug(`Downloading ${release.downloadUrl}`);
+
+  // Download the zip
+  const response = await fetch(release.downloadUrl, {
+    headers: { "User-Agent": "create-meowkit" },
+    redirect: "follow",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  writeFileSync(zipPath, buffer);
+
+  log.debug(`Downloaded ${buffer.length} bytes to ${zipPath}`);
+
+  // Extract the zip
+  const extractDir = join(tempDir, "extracted");
+  mkdirSync(extractDir, { recursive: true });
+  execSync(`unzip -q "${zipPath}" -d "${extractDir}"`, { stdio: "pipe" });
+
+  log.debug(`Extracted to ${extractDir}`);
+
+  return extractDir;
+}
+
+/**
+ * Clean up a downloaded release temp directory.
+ */
+export function cleanupDownload(tempDir: string): void {
+  try {
+    execSync(`rm -rf "${tempDir}"`, { stdio: "pipe" });
+  } catch {
+    // Best effort cleanup
+  }
+}

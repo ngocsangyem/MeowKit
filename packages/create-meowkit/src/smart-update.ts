@@ -4,7 +4,6 @@ import {
 } from "node:fs";
 import { join, relative, dirname, basename } from "node:path";
 import * as log from "./logger.js";
-import { resolveTemplateDir } from "./copy-template-tree.js";
 import { processTemplate } from "./substitute-placeholders.js";
 import { mergeSettingsFile } from "./merge-settings.js";
 import {
@@ -13,12 +12,10 @@ import {
   writeManifest,
   hashFile,
   classifyLayer,
-  type Manifest,
-  type FileLayer,
 } from "./compute-checksums.js";
 import type { UserConfig } from "./prompts.js";
 
-interface UpdateStats {
+export interface UpdateStats {
   updated: number;
   skipped: number;
   added: number;
@@ -47,25 +44,43 @@ function loadIgnorePatterns(targetDir: string): (relPath: string) => boolean {
   };
 }
 
+/** Recursively collect files from a directory */
+function walkDir(dir: string, base: string): Array<{ relPath: string; srcPath: string }> {
+  const results: Array<{ relPath: string; srcPath: string }> = [];
+  const SKIP = new Set(["__pycache__", "node_modules", ".DS_Store"]);
+
+  for (const entry of readdirSync(dir)) {
+    if (SKIP.has(entry) || entry.endsWith(".pyc") || entry.endsWith("_INDEX.md") || entry === "SKILLS_ATTRIBUTION.md") continue;
+    const full = join(dir, entry);
+    const stat = statSync(full);
+    if (stat.isDirectory()) {
+      results.push(...walkDir(full, base));
+    } else {
+      results.push({ relPath: relative(base, full), srcPath: full });
+    }
+  }
+  return results;
+}
+
 /**
- * Smart update: compare existing files against manifest checksums.
- * - core layer: overwrite if user hasn't modified (checksum matches manifest)
- * - skill layer: same as core, per-file
- * - user layer: never overwrite
- * - new files: always copy
- * - .meowkitignore: skip protected files
+ * Smart update from a downloaded release directory.
+ *
+ * @param config - User configuration (description, API keys, etc.)
+ * @param sourceDir - Path to extracted release (contains .claude/, tasks/, CLAUDE.md)
+ * @param targetDir - User's project directory
+ * @param dryRun - Preview only, no writes
+ * @param force - Overwrite all files, ignore user modifications
  */
 export async function smartUpdate(
   config: UserConfig,
+  sourceDir: string,
   targetDir: string,
   dryRun: boolean,
   force = false
 ): Promise<UpdateStats> {
-  const templateDir = resolveTemplateDir();
   const oldManifest = force ? null : readManifest(join(targetDir, ".claude"));
   const stats: UpdateStats = { updated: 0, skipped: 0, added: 0, userModified: [] };
 
-  // Only warn about missing manifest on updates (existing .claude/), not fresh installs
   if (!oldManifest && existsSync(join(targetDir, ".claude"))) {
     log.warn("No manifest found — will treat all existing files as unmodified.");
   }
@@ -73,46 +88,28 @@ export async function smartUpdate(
   const oldChecksums = oldManifest?.checksums ?? {};
   const isIgnored = loadIgnorePatterns(targetDir);
 
-  const claudeSrc = join(templateDir, "claude");
+  // Source .claude/ from downloaded release
+  const claudeSrc = join(sourceDir, ".claude");
   if (!existsSync(claudeSrc)) {
-    log.error(`Template directory not found: ${claudeSrc}`);
+    log.error(`Release .claude/ not found at: ${claudeSrc}`);
     process.exit(1);
   }
 
-  // Collect all template files and their checksums
-  function walkTemplates(dir: string, base: string): Array<{ relPath: string; srcPath: string }> {
-    const results: Array<{ relPath: string; srcPath: string }> = [];
-    const SKIP = new Set(["__pycache__", "node_modules", ".DS_Store"]);
-
-    for (const entry of readdirSync(dir)) {
-      if (SKIP.has(entry) || entry.endsWith(".pyc") || entry.endsWith("_INDEX.md") || entry === "SKILLS_ATTRIBUTION.md") continue;
-      const full = join(dir, entry);
-      const stat = statSync(full);
-      if (stat.isDirectory()) {
-        results.push(...walkTemplates(full, base));
-      } else {
-        results.push({ relPath: relative(base, full), srcPath: full });
-      }
-    }
-    return results;
-  }
-
-  // Walk template .claude/ files
-  const templateFiles = walkTemplates(claudeSrc, join(templateDir, "claude"))
+  // Walk .claude/ files from release
+  const claudeFiles = walkDir(claudeSrc, claudeSrc)
     .map((f) => ({ ...f, relPath: `.claude/${f.relPath}` }));
 
-  for (const { relPath, srcPath } of templateFiles) {
+  for (const { relPath, srcPath } of claudeFiles) {
     const destPath = join(targetDir, relPath);
     const layer = classifyLayer(relPath);
 
-    // Check .meowkitignore
     if (isIgnored(relPath)) {
       log.debug(`Ignored (protected): ${relPath}`);
       stats.skipped++;
       continue;
     }
 
-    // Special case: settings.json uses append-only merge
+    // settings.json uses append-only merge
     if (relPath === ".claude/settings.json") {
       mergeSettingsFile(srcPath, destPath, dryRun);
       stats.updated++;
@@ -131,7 +128,7 @@ export async function smartUpdate(
       continue;
     }
 
-    // File doesn't exist yet → new file, always add
+    // New file → always add
     if (!existsSync(destPath)) {
       copyFile(srcPath, destPath, dryRun);
       log.debug(`Added (new): ${relPath}`);
@@ -144,22 +141,21 @@ export async function smartUpdate(
     const manifestEntry = oldChecksums[relPath];
 
     if (manifestEntry && currentHash !== manifestEntry.sha256) {
-      // User modified this file — skip and warn
       log.debug(`Skipped (user-modified): ${relPath}`);
       stats.userModified.push(relPath);
       stats.skipped++;
       continue;
     }
 
-    // File matches manifest (or no manifest) — safe to overwrite
+    // Safe to overwrite
     copyFile(srcPath, destPath, dryRun);
     stats.updated++;
   }
 
-  // Copy tasks/ directory (templates, guidelines structure)
-  const tasksSrc = join(templateDir, "tasks");
+  // Copy tasks/ from release
+  const tasksSrc = join(sourceDir, "tasks");
   if (existsSync(tasksSrc)) {
-    const taskFiles = walkTemplates(tasksSrc, tasksSrc)
+    const taskFiles = walkDir(tasksSrc, tasksSrc)
       .map((f) => ({ ...f, relPath: `tasks/${f.relPath}` }));
 
     for (const { relPath, srcPath: tSrc } of taskFiles) {
@@ -168,10 +164,8 @@ export async function smartUpdate(
         copyFile(tSrc, tDest, dryRun);
         stats.added++;
       }
-      // tasks/ files are never overwritten (user-owned once created)
     }
 
-    // Create empty task directories
     if (!dryRun) {
       for (const dir of ["tasks/active", "tasks/completed", "tasks/backlog", "tasks/guidelines"]) {
         mkdirSync(join(targetDir, dir), { recursive: true });
@@ -181,34 +175,32 @@ export async function smartUpdate(
 
   const claudeDir = join(targetDir, ".claude");
 
-  // CLAUDE.md goes at project root (Claude Code reads it from there)
-  const claudeMdTemplate = join(templateDir, "claude-md.template");
+  // CLAUDE.md at project root
+  const claudeMdSrc = join(sourceDir, "CLAUDE.md");
   const claudeMdDest = join(targetDir, "CLAUDE.md");
-  if (existsSync(claudeMdTemplate) && !existsSync(claudeMdDest)) {
-    processTemplate(claudeMdTemplate, claudeMdDest, config, dryRun);
+  if (existsSync(claudeMdSrc) && !existsSync(claudeMdDest)) {
+    processTemplate(claudeMdSrc, claudeMdDest, config, dryRun);
     stats.added++;
   }
 
-  const configTemplate = join(templateDir, "meowkit-config.json.template");
+  // meowkit.config.json template (generated, not from release)
   const configDest = join(claudeDir, "meowkit.config.json");
-  if (existsSync(configTemplate) && !existsSync(configDest)) {
-    processTemplate(configTemplate, configDest, config, dryRun);
-    stats.added++;
-  }
-
-  // Copy static files into .claude/ — skip if already exist
-  const staticFiles = [
-    { src: "env.example", dest: "env.example" },
-    { src: "mcp.json.example", dest: "mcp.json.example" },
-    { src: "gitignore.meowkit", dest: "gitignore.meowkit" },
-  ];
-  for (const { src, dest } of staticFiles) {
-    const srcPath = join(templateDir, src);
-    const destPath = join(claudeDir, dest);
-    if (existsSync(srcPath) && !existsSync(destPath)) {
-      copyFile(srcPath, destPath, dryRun);
-      stats.added++;
+  if (!existsSync(configDest)) {
+    if (!dryRun) {
+      mkdirSync(claudeDir, { recursive: true });
+      const configContent = JSON.stringify(
+        {
+          $schema: "https://meowkit.dev/schema/config.json",
+          version: "1.0.0",
+          project: { description: config.description || "" },
+          features: { costTracking: config.enableCostTracking, memory: config.enableMemory },
+        },
+        null,
+        2
+      );
+      writeFileSync(configDest, configContent + "\n", "utf-8");
     }
+    stats.added++;
   }
 
   // Write .env if Gemini API key provided
@@ -229,13 +221,12 @@ export async function smartUpdate(
     mkdirSync(join(targetDir, ".claude", "logs"), { recursive: true });
   }
 
-  // Write manifest inside .claude/
+  // Write manifest
   if (!dryRun) {
     const newManifest = buildManifest(claudeDir);
     writeManifest(claudeDir, newManifest);
   }
 
-  // Set data for json output
   log.setData("update", {
     updated: stats.updated,
     skipped: stats.skipped,
@@ -253,7 +244,6 @@ function copyFile(src: string, dest: string, dryRun: boolean): void {
   mkdirSync(dirname(dest), { recursive: true });
   copyFileSync(src, dest);
 
-  // Set executable for hooks and scripts/bin
   const parent = dirname(dest).split("/").pop() ?? "";
   const ext = basename(dest).includes(".") ? "." + basename(dest).split(".").pop() : "";
   if (ext === ".sh" || parent === "hooks" || parent === "bin") {

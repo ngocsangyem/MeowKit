@@ -7,12 +7,10 @@
     "create-meowkit": "./dist/index.js"
   },
   "files": [
-    "dist",
-    "templates"
+    "dist"
   ],
   "scripts": {
-    "build:templates": "node scripts/build-templates.mjs",
-    "build": "npm run build:templates && npx tsc",
+    "build": "npx tsc",
     "prepublishOnly": "npm run build",
     "dev": "npx tsc --watch",
     "start": "node dist/index.js"
@@ -33,7 +31,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/meowkit/meowkit"
+    "url": "https://github.com/ngocsangyem/MeowKit"
   },
   "keywords": [
     "claude-code",

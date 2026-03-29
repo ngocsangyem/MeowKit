@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import fs from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import minimist from "minimist";
 import pc from "picocolors";
 import { upgrade } from "./commands/upgrade.js";
@@ -11,7 +13,9 @@ import { doctor } from "./commands/doctor.js";
 import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
 
-const VERSION = "0.1.0";
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
+const VERSION = pkgJson.version;
 
 function printHelp(): void {
   console.log(`
@@ -37,7 +41,8 @@ ${pc.bold("Options:")}
 }
 
 async function printStatus(): Promise<void> {
-  console.log(`${pc.bold(pc.cyan("meowkit"))} ${pc.dim(`v${VERSION}`)}`);
+  const channel = VERSION.includes("-beta") || VERSION.includes("-rc") ? "beta" : "stable";
+  console.log(`${pc.bold(pc.cyan("meowkit"))} ${pc.dim(`v${VERSION}`)} ${pc.dim(`(${channel})`)}`);
   console.log();
 
   const configPath = ".claude/meowkit.config.json";
@@ -55,7 +60,7 @@ async function printStatus(): Promise<void> {
 
 async function main(): Promise<void> {
   const args = minimist(process.argv.slice(2), {
-    boolean: ["help", "version", "check", "beta", "monthly", "clear", "show", "stats", "report", "all"],
+    boolean: ["help", "version", "check", "beta", "list", "monthly", "clear", "show", "stats", "report", "all"],
     string: ["only", "type", "priority", "status"],
     alias: { h: "help", v: "version" },
   });
@@ -74,7 +79,7 @@ async function main(): Promise<void> {
 
   switch (command) {
     case "upgrade":
-      await upgrade({ check: args.check as boolean | undefined, beta: args.beta as boolean | undefined });
+      await upgrade({ check: args.check as boolean | undefined, beta: args.beta as boolean | undefined, list: args.list as boolean | undefined });
       break;
     case "validate":
       await validate();
