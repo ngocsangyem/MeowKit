@@ -35,4 +35,8 @@ features:
     details: /meow:party for multi-agent deliberation. 2-4 agents debate architecture decisions with forced synthesis before any code is written.
   - title: 🔍 Adversarial Review
     details: Three parallel reviewers — Blind Hunter, Edge Case Hunter, Criteria Auditor — catch 2-3x more bugs than single-pass review.
+  - title: 🚦 Hook-Based Enforcement
+    details: Shell hooks block sensitive file reads and source writes before they happen — not after the agent has rationalized past the rule. Rules define why; hooks enforce what.
+  - title: 🧭 Navigation Help
+    details: /meow:help scans plans, reviews, tests, and git to determine where you are in the pipeline and prints the single next action. Re-orient instantly after any interruption.
 ---

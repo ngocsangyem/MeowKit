@@ -13,13 +13,23 @@ Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has 
 **Agent:** orchestrator, analyst
 **Deliverable:** Model tier assignment, execution mode, context loaded
 
-- Read `docs/project-context.md` (agent constitution — loaded first, always)
+- Read `docs/project-context.md` (agent constitution — loaded first, always; auto-injected by `project-context-loader.sh` hook)
 - Read `memory/lessons.md` and `memory/patterns.json`
 - Run `meow:scale-routing` — domain-based complexity classification (CSV-driven)
 - Load stack-relevant skills only (lazy loading)
 - Route: assign model tier by task complexity (Haiku / Sonnet / Opus)
 - Select execution mode: sequential (default), parallel (COMPLEX), or party (discussions)
 - Print cost estimate before starting
+
+### Navigation help
+
+When you're unsure which phase to enter next, run:
+
+```bash
+/meow:help
+```
+
+`/meow:help` scans plans, reviews, tests, git log, and memory to determine current pipeline state and prints a single concrete next action. Use it to re-orient after a context reset or mid-session interruption.
 
 ### Execution modes
 
@@ -127,6 +137,20 @@ No skill automatically chains into another. You decide the review depth.
 - Update `memory/lessons.md` and `memory/cost-log.json`
 - Sync affected documentation
 - Close sprint task
+
+## Hook Enforcement
+
+MeowKit uses shell hooks to upgrade behavioral rules to preventive enforcement — the action is blocked *before* it executes, not after the agent has already reasoned its way past the rule.
+
+| Hook | Event | What it blocks |
+|------|-------|---------------|
+| `privacy-block.sh` | PreToolUse | `.env`, `*.key`, credential file reads |
+| `gate-enforcement.sh` | PreToolUse | Source code writes before Gate 1 approval |
+| `project-context-loader.sh` | SessionStart | Missing project-context.md (auto-loads it) |
+
+`privacy-block.sh` and `gate-enforcement.sh` are preventive — they intercept the tool call. `project-context-loader.sh` is proactive — it ensures the agent constitution is in context before any task runs.
+
+Hooks supplement rules. Rules define the WHY; hooks enforce the WHAT.
 
 ### Plan-First Gate Pattern
 

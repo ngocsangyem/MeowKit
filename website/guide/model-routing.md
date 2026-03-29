@@ -70,6 +70,22 @@ internal-tools,admin;dashboard;report,low,one-shot
 
 Scale-routing verdicts cannot be downgraded mid-task. If the CSV returns COMPLEX, the agent **cannot** argue its way to a cheaper tier. No exceptions.
 
+## Planning Depth Per Mode
+
+Each workflow mode declares a **Planning Depth** — the number of researchers that run before the planner writes the plan.
+
+| Mode | Researchers | Research approach |
+|------|------------|-----------------|
+| `strict` | 2 (parallel) | Competing approaches — each researcher argues a different design |
+| `architect` | 2 (parallel) | Competing approaches — same as strict |
+| `default` | 1 | Standard depth |
+| `audit` | 1 | Security-focused |
+| `fast` | 0 | Skip research |
+| `cost-saver` | 0 | Skip research, minimize tokens |
+| `document` | 0 | Skip research — docs tasks don't need it |
+
+`strict` and `architect` use competing approaches to surface trade-offs that single-researcher planning misses. The synthesis step resolves the competition into a single recommended path before Gate 1.
+
 ## Agent default models
 
 | Agent | Default | Upgrades to Opus when |

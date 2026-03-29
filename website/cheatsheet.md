@@ -29,6 +29,7 @@ persona: B
 | `/meow:party [topic]` | 1 | Multi-agent deliberation — 2-4 agents debate, forced synthesis |
 | `/meow:spawn [agent]` | any | Launch parallel agent session |
 | `/meow:upgrade` | any | Self-update MeowKit |
+| `/meow:help` | any | Scan project state, recommend next pipeline step |
 
 ## Agents Quick Reference
 
@@ -97,6 +98,9 @@ persona: B
 | pre-task-check.sh | Skill-invoked | Injection pattern detection | Yes |
 | pre-implement.sh | Skill-invoked | TDD gate (must have failing test) | Yes |
 | pre-ship.sh | Skill-invoked | Test + lint + typecheck | Yes |
+| privacy-block.sh | PreToolUse | Block .env / *.key / credential reads | Yes |
+| gate-enforcement.sh | PreToolUse | Block source writes before Gate 1 approval | Yes |
+| project-context-loader.sh | SessionStart | Auto-load project-context.md into context | No |
 
 ## Key Skills
 

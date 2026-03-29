@@ -5,6 +5,22 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 0.3.0 (2026-03-30) — Week 3 Improvements
+
+### Features
+
+- **Navigation Help** — `/meow:help` scans project state (plans, reviews, tests, git) and recommends the single next action. Maps observed state to 7-phase pipeline. No guessing.
+- **Hook-Based Enforcement** — 3 new shell hooks upgrade behavioral rules to preventive enforcement: `privacy-block.sh` (PreToolUse: blocks sensitive file reads), `gate-enforcement.sh` (PreToolUse: blocks source writes before Gate 1), `project-context-loader.sh` (SessionStart: auto-loads project-context.md).
+- **Planning Depth Per Mode** — All 7 workflow modes declare a researcher count: `strict`/`architect` run 2 parallel researchers with competing approaches; `default`/`audit` run 1; `fast`/`cost-saver`/`document` run 0 (skip research).
+
+### Rules updated
+
+- `RULES_INDEX.md` — documents all 3 new hooks in the Hook Enforcement table
+
+### Breaking changes
+
+None. All additions are backward-compatible.
+
 ## 0.2.0 (2026-03-30) — Improvements
 
 ### Features

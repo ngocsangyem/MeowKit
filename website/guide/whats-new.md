@@ -1,7 +1,86 @@
 ---
 title: What's New
-description: Improvement — scale-adaptive routing, adversarial review, Party Mode, step-file architecture, and parallel execution.
+description: Week 3 — navigation help, hook-based enforcement, and planning depth per workflow mode. Week 2 — scale-adaptive routing, adversarial review, Party Mode, step-file architecture, and parallel execution.
 persona: A
+---
+
+# What's New (v0.3.0)
+
+## Navigation Help
+
+**Problem:** After orientating in a project mid-session, it's unclear which phase to enter next. Developers waste time re-reading plans, checking git, and manually triangulating state.
+
+**Solution:** `/meow:help` scans the project and tells you exactly what to do next.
+
+```bash
+/meow:help
+# → "You're in Phase 1. Gate 1 is not yet approved.
+#    Next step: run /meow:cook tasks/plans/260329-auth.md"
+```
+
+What it scans:
+
+- `tasks/plans/` — pending plans awaiting Gate 1
+- `tasks/reviews/` — pending verdicts awaiting Gate 2
+- `tests/` — failing tests blocking Phase 3
+- `git log` — unshipped commits blocking Phase 5
+- `memory/lessons.md` — pending retrospective items
+
+The skill maps observed state to one of the 7 pipeline phases and prints a single, unambiguous next action. No hallucination about "what might be next" — only concrete evidence-based routing.
+
+---
+
+## Hook-Based Enforcement
+
+**Problem:** Behavioral rules only work when agents follow them. Rationalization slips through. An agent convinced the `.env` read is "necessary" can bypass Rule 4 silently.
+
+**Solution:** Three shell hooks upgrade behavioral rules to enforcement — the action is blocked *before* it executes.
+
+| Hook | Event | What it prevents |
+|------|-------|-----------------|
+| `privacy-block.sh` | PreToolUse | Reads of `.env`, `*.key`, credential files |
+| `gate-enforcement.sh` | PreToolUse | Source code writes before Gate 1 approval |
+| `project-context-loader.sh` | SessionStart | Missing project-context.md at session start |
+
+```
+Without hooks: agent reasons "this .env read is safe" → reads it anyway
+With hooks:    hook fires → read blocked → agent must ask human first
+```
+
+`privacy-block.sh` and `gate-enforcement.sh` are **preventive** — they intercept the tool call before execution. `project-context-loader.sh` is **proactive** — it injects `docs/project-context.md` into context before any task runs.
+
+Rules define *why*. Hooks enforce *what*.
+
+---
+
+## Planning Depth Per Mode
+
+**Problem:** All workflow modes used the same research approach regardless of task scope. A documentation update ran the same planning overhead as a system design task.
+
+**Solution:** Each mode now declares a **Planning Depth** that determines how many researchers run before the plan is written.
+
+| Mode | Researchers | Approach |
+|------|------------|---------|
+| `strict` | 2 parallel | Competing approaches — each researcher argues a different design |
+| `architect` | 2 parallel | Competing approaches — same as strict |
+| `default` | 1 | Single researcher, standard depth |
+| `audit` | 1 | Single researcher, security-focused |
+| `fast` | 0 | Skip research — go straight to plan |
+| `cost-saver` | 0 | Skip research — minimize token spend |
+| `document` | 0 | Skip research — docs tasks don't need it |
+
+`strict` and `architect` modes force competing approaches specifically to surface trade-offs that single-researcher planning misses. The synthesis step resolves the competition into a single recommended path.
+
+---
+
+## Summary
+
+| Feature | Solves | When it activates |
+|---------|--------|------------------|
+| Navigation Help | "What do I do next?" | Explicit `/meow:help` |
+| Hook Enforcement | Rule bypass via agent rationalization | Every session, automatic |
+| Planning Depth | Over/under-researching by mode | Phase 1, per active mode |
+
 ---
 
 # What's New (v0.2.0)
