@@ -91,7 +91,15 @@ try {
     }
   }
 
-  execSync(`zip -r ${archivePath} ${archiveTargets.join(" ")}`, { stdio: "inherit" });
+  // Exclude runtime dirs that shouldn't be in release
+  const excludes = [
+    "-x", ".claude/session-state/*",
+    "-x", ".claude/memory/*",
+    "-x", ".claude/logs/*",
+    "-x", ".claude/metadata.json",
+    "-x", ".claude/.env",
+  ];
+  execSync(`zip -r ${archivePath} ${archiveTargets.join(" ")} ${excludes.join(" ")}`, { stdio: "inherit" });
   console.log(`Prepared ${archivePath}`);
 } catch (error) {
   console.error(`Failed to prepare release assets: ${error.message}`);
