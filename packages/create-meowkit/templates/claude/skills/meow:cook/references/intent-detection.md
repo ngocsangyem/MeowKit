@@ -1,6 +1,6 @@
 # Intent Detection Logic
 
-Detect user intent from natural language and route to appropriate workflow.
+Detect user intent from input and route to appropriate workflow mode.
 
 ## Detection Algorithm
 
@@ -17,33 +17,58 @@ FUNCTION detectMode(input):
     RETURN "code"
 
   # Priority 3: Keyword detection (case-insensitive)
+  keywords = lowercase(input)
+
   IF keywords contains ["fast", "quick", "rapidly", "asap"]:
     RETURN "fast"
-  IF keywords contains ["trust me", "auto", "yolo", "just do it"]:
+  IF keywords contains ["trust me", "auto", "yolo"]:
     RETURN "auto"
   IF keywords contains ["no test", "skip test", "without test"]:
     RETURN "no-test"
 
   # Priority 4: Complexity detection
   features = extractFeatures(input)
-  IF count(features) >= 3: RETURN "parallel"
+  IF count(features) >= 3 OR keywords contains "parallel":
+    RETURN "parallel"
 
-  # Default
+  # Default: interactive workflow
   RETURN "interactive"
 ```
 
+## Feature Extraction
+
+Detect multiple features from natural language:
+```
+"implement auth, payments, and notifications" → ["auth", "payments", "notifications"]
+"add login + signup + password reset"         → ["login", "signup", "password reset"]
+"create dashboard with charts and tables"     → single feature (dashboard)
+```
+
+**Parallel trigger:** 3+ distinct features = parallel mode.
+
 ## Mode Behaviors
 
-| Mode | Skip Research | Skip Test | Review Gates | Auto-Approve |
-|------|---------------|-----------|--------------|--------------|
-| interactive | No | No | Yes (stops) | No |
-| auto | No | No | No (skips) | Yes (score>=9.5) |
-| fast | Yes | No | Yes (stops) | No |
-| parallel | Optional | No | Yes (stops) | No |
-| no-test | No | Yes | Yes (stops) | No |
-| code | Yes | No | Yes (stops) | Per plan |
+| Mode | Research | TDD | Gate 1 | Gate 2 | Parallel |
+|------|----------|-----|--------|--------|----------|
+| interactive | Yes | Yes (strict) | Human | Human | No |
+| auto | Yes | Yes (strict) | Auto (validated) | **Human** | Per phase |
+| fast | Skip | Plan-level | Human | **Human** | No |
+| parallel | Optional | Yes (strict) | Human | **Human** | Yes |
+| no-test | Yes | Skip | Human | **Human** | No |
+| code | Skip | Yes (strict) | Skip (plan exists) | **Human** | Per plan |
 
-**Key:** Only `auto` mode skips all review gates.
+**Gate 2 is ALWAYS human-approved.** No mode bypasses it.
+
+**TDD column:**
+- "Yes (strict)" = failing tests written in Phase 2, implementation fills them in Phase 3
+- "Plan-level" = tests cover plan intent (not research-level edge cases), still written before implementation
+- "Skip" = no-test mode only, user explicitly opted out
+
+## Edge Cases
+
+- **Ambiguous task** (could be 2 modes): Ask user via `AskUserQuestion` — "Looks like a [fast/parallel] task. Confirm?"
+- **Stale plan file** (>14 days old in code mode): Warn — "Plan is [N] days old, codebase may have changed. Continue or re-plan?"
+- **Mixed signals** ("quick parallel auth"): Explicit flags win → if `--fast`, fast wins over "parallel" keyword
 
 ## Conflict Resolution
 
@@ -53,3 +78,22 @@ Priority order when multiple signals detected:
 3. Keywords in text
 4. Feature count analysis
 5. Default (interactive)
+
+## Examples
+
+```
+"/cook implement user auth"
+→ Mode: interactive (default)
+
+"/cook tasks/plans/260329-auth/plan.md"
+→ Mode: code (path detected)
+
+"/cook quick fix for the login bug"
+→ Mode: fast ("quick" keyword)
+
+"/cook implement auth, payments, notifications, shipping"
+→ Mode: parallel (4 features)
+
+"/cook implement everything --auto"
+→ Mode: auto (explicit flag)
+```

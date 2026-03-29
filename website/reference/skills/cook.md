@@ -1,26 +1,28 @@
 ---
 title: "meow:cook"
-description: "End-to-end feature implementation pipeline with smart intent detection, TDD enforcement, and automatic workflow routing."
+description: "End-to-end feature implementation pipeline with TDD enforcement, hard gates, and 7-phase workflow."
 ---
 
 # meow:cook
 
-End-to-end feature implementation pipeline with smart intent detection, TDD enforcement, and automatic workflow routing.
+End-to-end feature implementation pipeline with TDD enforcement, hard gates, and MeowKit's 7-phase workflow.
 
 ## What This Skill Does
 
-`meow:cook` is the primary entry point for building features in MeowKit. Given a task description, a plan file path, or a set of flags, it automatically detects your intent, selects the right workflow mode, and orchestrates the full Phase 1→5 pipeline — planning, testing, implementing, reviewing, and shipping — without requiring you to invoke each step manually.
+`meow:cook` is the primary entry point for building features in MeowKit. Given a task description, a plan file path, or a set of flags, it automatically detects your intent, selects the right workflow mode, and orchestrates the full 7-phase pipeline — orient, plan, test RED, build GREEN, review, ship, and reflect — without requiring you to invoke each step manually.
 
-The skill is designed around the principle that **different tasks need different workflows.** A quick CSS fix doesn't need the same 12-step pipeline as a new authentication system. `meow:cook` detects this automatically from your input.
+The skill enforces **strict TDD**: failing tests are written BEFORE implementation code. Gate 1 (plan approval) and Gate 2 (review approval) require human approval in ALL modes.
 
 ## Core Capabilities
 
-- **Smart intent detection** — Analyzes your input (natural language, plan path, or flags) to determine the right workflow mode
-- **Five workflow modes** — Interactive (default), fast (skip planning), parallel (multi-agent), auto (autonomous), no-test (skip TDD)
-- **Full TDD enforcement** — Writes failing tests before implementation, verifies green after
-- **Automatic Gate 1 and Gate 2** — Plan approval and review approval enforced unless mode opts out
-- **Subagent delegation** — Routes testing to tester, review to reviewer, shipping to shipper
-- **Fix-first review cycle** — After review, auto-fixes trivial issues before asking about non-trivial ones
+- **Smart intent detection** — Analyzes your input to determine the right workflow mode
+- **Six workflow modes** — Interactive (default), fast, parallel, auto, no-test, code (from plan path)
+- **Full TDD enforcement** — Writes failing tests (Phase 2) before implementation (Phase 3)
+- **Hard Gate 1 and Gate 2** — Plan approval and review approval enforced. Gate 2 is NEVER auto-approved
+- **Model tier routing** — Declares TRIVIAL/STANDARD/COMPLEX before work begins
+- **Memory integration** — Reads prior learnings at start, writes back at end
+- **Gate validation scripts** — Deterministic checks for plan/review completeness
+- **Subagent delegation** — Routes each phase to specialist agents via Task() tool
 
 ## When to Use This
 
@@ -44,57 +46,46 @@ The skill is designed around the principle that **different tasks need different
 /meow:cook add user authentication with JWT
 
 # From an existing plan file
-/meow:cook tasks/plans/260327-auth-flow.md
+/meow:cook tasks/plans/260327-auth-flow/plan.md
 
-# Fast mode — skip the planning step
+# Fast mode — skip research, still requires plan + TDD-flavored tests
 /meow:cook add login form --fast
 
 # Parallel mode — spawn multiple agents for independent components
 /meow:cook implement checkout system --parallel
 
-# Auto mode — fully autonomous, minimal user interaction
+# Auto mode — auto-fix issues, but Gate 2 still requires human approval
 /meow:cook refactor payment module --auto
 
 # No-test mode — skip TDD (use sparingly)
 /meow:cook update readme --no-test
 ```
 
-## Example Prompts
-
-| Prompt | What happens |
-|--------|-------------|
-| `/meow:cook add shopping cart` | Interactive mode → full pipeline with both gates |
-| `/meow:cook tasks/plans/260327-cart.md` | Detects plan path → loads plan → starts from Phase 2 |
-| `/meow:cook fix auth token refresh --fast` | Fast mode → skips planning, goes straight to test+build |
-| `/meow:cook implement API v2 endpoints --parallel` | Spawns parallel developer agents for independent endpoints |
-
-## Quick Workflow
+## 7-Phase Workflow
 
 ```
-Input → Intent Detection → Mode Selection
-                              ↓
-        ┌─────── Interactive (default) ───────┐
-        │  Plan → [Gate 1] → Test → Build     │
-        │  → Review → [Gate 2] → Ship         │
-        └─────────────────────────────────────┘
+Phase 0: Orient → Phase 1: Plan [GATE 1] → Phase 2: Test RED
+→ Phase 3: Build GREEN → Phase 4: Review [GATE 2] + Ship → Phase 5: Reflect
 ```
 
-1. **Detect intent** from your input (natural language, plan path, or flags)
-2. **Select mode** — interactive, fast, parallel, auto, or no-test
-3. **Execute pipeline** — each phase delegates to the appropriate specialist agent
-4. **Review cycle** — after implementation, reviewer checks; fix-first resolves trivial issues automatically
-5. **Finalize** — orchestrator syncs plan status, documenter updates docs, shipper creates commit
-
-::: info Skill Details
-**Phase:** 1–5  
-**Plan-First Gate:** Creates plan if missing. Skips with plan path arg or `--fast` mode.
-:::
+1. **Orient** — Detect intent, declare model tier, read memory
+2. **Plan** — Research + create plan → Gate 1 (human approval)
+3. **Test RED** — Write failing tests from acceptance criteria
+4. **Build GREEN** — Implement until tests pass (TDD)
+5. **Review + Ship** — Code review → Gate 2 (human approval) → commit + PR
+6. **Reflect** — Sync plan, update docs, write memory
 
 ## Gotchas
 
-- **Skipping Gate 1 on "simple" features**: Features that seem simple grow during implementation → Always create a plan file; cancel it if truly trivial
-- **Context loss between phases**: Long multi-phase workflows exceed context window → Update Agent State section after each phase; next agent reads it first
-- **Spinner hiding error output**: Spinner clears the line, masking error messages beneath → Log errors to stderr before spinner.fail()
+- **Skipping Gate 1 on "simple" features**: Features that seem simple grow during implementation. Always create a plan file
+- **Auto-approve sneaking bugs past Gate 2**: Auto mode can auto-fix but NEVER auto-approve. gate-rules.md says NO exceptions
+- **Context loss between phases**: Long workflows exceed context. Update plan.md Agent State after each phase
+- **Parallel mode deadlocks**: Phase dependencies cause deadlocks. Map dependency graph before spawning
+- **Code mode on stale plans**: Running old plan against changed codebase. Warn if plan >14 days old
+- **Fast mode shallow coverage**: Skipping research = plan-level tests only, not edge cases
+- **Missing model tier declaration**: Always declare TRIVIAL/STANDARD/COMPLEX in Phase 0
+- **Forgetting memory read/write**: Phase 0 reads memory/lessons.md; Phase 5 writes back
+- **Using Agent() instead of Task()**: Task() enables tracking and blocking. Always use Task() for phases 2-5
 
 ## Related
 
@@ -102,3 +93,4 @@ Input → Intent Detection → Mode Selection
 - [`meow:ship`](/reference/skills/ship) — Just the shipping step
 - [`meow:review`](/reference/skills/review) — Just the review step
 - [`meow:plan-creator`](/reference/skills/plan-creator) — The plan template system cook uses
+- [`meow:testing`](/reference/skills/testing) — TDD red-green-refactor reference
