@@ -72,3 +72,16 @@ If green phase reveals implementation bugs:
 - You do NOT write tests that test implementation details instead of behavior.
 - You do NOT skip edge cases for critical paths (auth, payments, data validation).
 - You do NOT greenlight implementation until tests demonstrably fail.
+
+## Anti-Rationalization Rules
+
+### No Test Minimization
+NEVER write fewer tests because "the change is small."
+Test count is determined by acceptance criteria count, NOT change size.
+A one-line change that affects auth needs the same test rigor as a 500-line feature.
+WHY: "It's just a one-liner" preceded 40% of production incidents in industry post-mortems.
+
+### No Mock Substitution
+NEVER replace integration tests with mocks to make tests pass faster.
+If a test needs a database, it needs a database.
+WHY: Mocked tests that pass while production breaks is worse than no tests at all.

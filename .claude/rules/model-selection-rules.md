@@ -54,3 +54,9 @@ If the task turns out simpler than expected, complete it at the assigned tier.
 
 WHY: Switching models mid-task loses reasoning context and can introduce
 inconsistencies between the planning and implementation phases.
+
+### Rule 4: Domain Override
+
+When `meow:scale-routing` returns a domain match with `level=high`, the model tier MUST be COMPLEX (best available) regardless of any other signal — including manual classification.
+
+WHY: High-complexity domains (fintech, healthcare, IoT, gaming) have regulatory, security, and architectural requirements that cheaper models handle poorly. The cost of using a weaker model on a security-critical task vastly exceeds the token savings. See `rules/scale-adaptive-rules.md` and `meow:scale-routing/data/domain-complexity.csv` for the domain mapping.

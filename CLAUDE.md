@@ -116,6 +116,7 @@ Keep all project docs in `docs/` and update them as the codebase evolves.
 
 Key docs to maintain:
 
+- `docs/project-context.md` — agent constitution: tech stack, conventions, anti-patterns (loaded by ALL agents)
 - `docs/project-overview.md` — what this project is
 - `docs/system-architecture.md` — how it's structured
 - `docs/code-standards.md` — conventions and patterns

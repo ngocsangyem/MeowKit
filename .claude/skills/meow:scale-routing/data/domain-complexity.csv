@@ -1,0 +1,12 @@
+domain,signals,level,workflow,web_searches
+e_commerce,"shopping,cart,checkout,payment,products,store",medium,standard,"ecommerce architecture, payment processing, inventory"
+fintech,"banking,payment,trading,finance,money,investment",high,enhanced,"financial security, PCI compliance, fraud detection"
+healthcare,"medical,diagnostic,clinical,patient,hospital,health",high,enhanced,"HIPAA compliance, medical data security, FDA regulations"
+social,"social network,community,users,friends,posts,sharing",high,advanced,"social graph, feed ranking, notification systems, privacy"
+education,"learning,course,student,teacher,training",medium,standard,"LMS architecture, progress tracking, assessment systems"
+iot,"IoT,sensors,devices,embedded,smart,connected",high,advanced,"device communication, real-time processing, edge computing"
+gaming,"game,gaming,multiplayer,real-time,matchmaking",high,advanced,"multiplayer architecture, game engine, matchmaking"
+government,"government,civic,public,admin,regulation",high,enhanced,"accessibility standards, security clearance, audit trails"
+internal_tools,"admin,dashboard,internal,backoffice,cms",low,standard,"admin panel patterns, RBAC, data tables"
+docs,"documentation,readme,changelog,wiki,guide",low,one-shot,"documentation generators, static site builders"
+cli,"command_line,cli,terminal,shell,script",medium,standard,"CLI frameworks, argument parsing, shell scripting"

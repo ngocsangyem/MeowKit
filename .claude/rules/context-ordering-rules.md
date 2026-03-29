@@ -62,3 +62,10 @@ Source: codex-prompt-guide.md — autonomy and persistence principles
 - WHERE: file paths for all relevant code
 - WHY: the problem being solved
 - STATUS: what's done, what's next
+
+## Rule 4: Project Context First
+
+When `docs/project-context.md` exists, ALWAYS load it BEFORE task-specific context.
+This file is the agent "constitution" — tech stack, conventions, anti-patterns, testing approach.
+
+WHY: Ensures all agents share the same understanding of project conventions. Without it, agents infer independently and make conflicting assumptions about stack, patterns, and coding standards. Loading it first grounds all subsequent decisions in project reality.

@@ -23,6 +23,8 @@ Proceeding to Phase 2 (Test RED) without an approved plan. No tests are written,
 
 `/meow:fix` with complexity=simple bypasses Gate 1. The fix IS the plan — the scope is small enough that a separate planning document adds overhead without value.
 
+Scale-routing one-shot: When `meow:scale-routing` returns `workflow=one-shot` AND orchestrator confirms zero blast radius, Gate 1 may be bypassed. See `scale-adaptive-rules.md` Rule 4.
+
 ## GATE 2 — After Phase 4 (Review)
 
 ### Conditions for Approval
@@ -46,3 +48,15 @@ None. Every change ships through Gate 2. There are no exceptions to Gate 2, rega
 - Urgency
 - Size of change
 - Who requested it
+
+## Self-Check Before Gate Presentation
+
+Before presenting Gate 1 or Gate 2 for human approval, the responsible agent MUST include:
+
+1. **Completed:** List of completed items
+2. **Skipped:** List of intentionally skipped items with justification (empty if none)
+3. **Uncertain:** List of items the agent is uncertain about (empty if none)
+
+If #2 or #3 contain items, the human sees them BEFORE the approval prompt — not buried in a report.
+
+WHY: Transparency prevents rationalization. If an agent must declare what it skipped, it's less likely to skip things silently.

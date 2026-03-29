@@ -24,7 +24,20 @@ source: gstack
 
 # Pre-Landing Code Review
 
-Multi-pass code review with adversarial analysis, spec compliance, and auto-fix. Covers scope drift, code quality, design, test coverage, adversarial red-teaming, and fix-first resolution.
+Multi-pass code review with 3-layer adversarial analysis, spec compliance, and auto-fix. Uses step-file architecture for deterministic execution.
+
+## Adversarial Review Architecture (v2)
+
+This skill now uses 3 parallel review layers (inspired by BMAD-METHOD):
+
+1. **Blind Hunter** — Reviews ONLY the diff. No plan, no spec. Catches code smells and obvious bugs.
+2. **Edge Case Hunter** — Traces every branch, boundary, null path. Finds what breaks at edges.
+3. **Criteria Auditor** — Maps each plan AC to implementation. Verifies coverage.
+
+Post-review triage categorizes findings as `current-change` (must fix) vs `incidental` (logged to backlog).
+
+**Workflow:** `workflow.md` → `step-01-gather-context.md` → `step-02-parallel-review.md` → `step-03-triage.md` → `step-04-verdict.md`
+**Prompts:** `prompts/blind-hunter.md`, `prompts/edge-case-hunter.md`, `prompts/criteria-auditor.md`
 
 ## Plan-First Gate
 

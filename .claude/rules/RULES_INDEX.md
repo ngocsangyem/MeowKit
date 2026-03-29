@@ -16,6 +16,7 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | `model-selection-rules.md` | Task type → model tier routing, security escalation | New (prompting best practices) | Phase 0 (Orient) |
 | `output-format-rules.md` | Response structure: what changed, why, file refs, open questions | New (prompting best practices) | All agent responses |
 | `search-before-building-rules.md` | 3-layer knowledge framework: search before implementing unfamiliar patterns | Adapted from gstack ETHOS.md | Implementation, planning |
+| `scale-adaptive-rules.md` | Domain-based complexity routing, CSV match override, Gate 1 one-shot bypass | New (BMAD-inspired) | Phase 0 (Orient) |
 
 ## Loading Priority
 
@@ -30,7 +31,8 @@ Rules are applied in this priority (higher = stronger override):
 7. `context-ordering-rules.md` — always apply
 8. `model-selection-rules.md` — always apply
 9. `output-format-rules.md` — always apply
-10. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
+10. `scale-adaptive-rules.md` — always apply at Phase 0
+11. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
 
 ## Rule Format Convention
 
