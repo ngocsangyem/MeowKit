@@ -90,6 +90,7 @@ export default withMermaid(defineConfig({
             { text: 'documenter', link: '/reference/agents/documenter' },
             { text: 'analyst', link: '/reference/agents/analyst' },
             { text: 'journal-writer', link: '/reference/agents/journal-writer' },
+            { text: 'git-manager', link: '/reference/agents/git-manager' },
           ],
         },
         {

@@ -1,12 +1,12 @@
 ---
 title: Agents Overview
-description: MeowKit's 13 specialist agents and their roles in the development workflow.
+description: MeowKit's 15 specialist agents and their roles in the development workflow.
 persona: C
 ---
 
 # Agents Overview
 
-MeowKit includes 13 specialist agents. Each owns a specific concern — no two agents modify the same files.
+MeowKit includes 15 specialist agents. Each owns a specific concern — no two agents modify the same files.
 
 | Agent | Role | Phase | Auto-activates |
 |-------|------|-------|----------------|
@@ -23,6 +23,7 @@ MeowKit includes 13 specialist agents. Each owns a specific concern — no two a
 | [documenter](/reference/agents/documenter) | Docs sync + changelog | 6 | After ship |
 | [analyst](/reference/agents/analyst) | Cost tracking + patterns | 0,6 | Session start/end |
 | [journal-writer](/reference/agents/journal-writer) | Failure documentation | 6 | On failure |
+| [git-manager](/reference/agents/git-manager) | Stage, commit, push (conventional commits) | 5, any | On "commit"/"push" |
 
 ## Context engineering
 
