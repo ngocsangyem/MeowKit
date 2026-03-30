@@ -11,7 +11,7 @@ allowed-tools:
   - Grep
   - Glob
 sources:
-  - claudekit-engineer/react-best-practices (Vercel Engineering, Jan 2026)
+  - claudekit-engineer
 ---
 
 # React Patterns
@@ -32,13 +32,13 @@ Complements `meow:typescript` (type safety) and `meow:vue` (Vue patterns). This 
 
 Load the relevant reference when working in that area:
 
-| Priority | Category | Reference | Key rules |
-|----------|----------|-----------|-----------|
-| CRITICAL | Eliminating waterfalls | `references/async-patterns.md` | Defer await, parallel promises, Suspense boundaries |
-| CRITICAL | Bundle size | `references/bundle-optimization.md` | No barrel imports, dynamic imports, defer third-party |
-| HIGH | Server performance | `references/server-patterns.md` | React.cache(), LRU cache, parallel fetching, after() |
-| MEDIUM | Re-render optimization | `references/rerender-optimization.md` | Derived state, functional setState, memo, transitions |
-| MEDIUM | Rendering perf | `references/rendering-patterns.md` | content-visibility, hoist JSX, conditional render |
+| Priority | Category               | Reference                             | Key rules                                             |
+| -------- | ---------------------- | ------------------------------------- | ----------------------------------------------------- |
+| CRITICAL | Eliminating waterfalls | `references/async-patterns.md`        | Defer await, parallel promises, Suspense boundaries   |
+| CRITICAL | Bundle size            | `references/bundle-optimization.md`   | No barrel imports, dynamic imports, defer third-party |
+| HIGH     | Server performance     | `references/server-patterns.md`       | React.cache(), LRU cache, parallel fetching, after()  |
+| MEDIUM   | Re-render optimization | `references/rerender-optimization.md` | Derived state, functional setState, memo, transitions |
+| MEDIUM   | Rendering perf         | `references/rendering-patterns.md`    | content-visibility, hoist JSX, conditional render     |
 
 ## Process
 

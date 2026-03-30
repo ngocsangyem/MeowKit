@@ -1,6 +1,5 @@
 # Prevention Gate (Post-Fix)
 
-> Source: claudekit-engineer/fix (MIT). Defense-in-depth validation.
 > Run AFTER fix implementation, BEFORE marking complete.
 
 ## 1. Regression Test (ALWAYS required)
@@ -13,12 +12,12 @@
 
 Not every fix needs all 4 layers. But ALWAYS consider each:
 
-| Layer | When to apply | Example |
-|-------|--------------|---------|
-| Entry point validation | Fix involves user/external input | Add input validation, sanitize |
-| Business logic guard | Fix involves data processing | Add assertion, boundary check |
-| Error handling | Fix involves recoverable failure | Add try/catch, fallback, timeout |
-| Type safety | Fix involves wrong type/null | Add type guard, strict null check |
+| Layer                  | When to apply                    | Example                           |
+| ---------------------- | -------------------------------- | --------------------------------- |
+| Entry point validation | Fix involves user/external input | Add input validation, sanitize    |
+| Business logic guard   | Fix involves data processing     | Add assertion, boundary check     |
+| Error handling         | Fix involves recoverable failure | Add try/catch, fallback, timeout  |
+| Type safety            | Fix involves wrong type/null     | Add type guard, strict null check |
 
 ## 3. Verification Checklist
 
@@ -35,11 +34,11 @@ Run through before marking fix complete:
 
 ## 4. Common Prevention Patterns
 
-| Bug type | Prevention |
-|----------|-----------|
-| Null/undefined | Add strict null check + type guard |
-| Wrong type | Add runtime type validation at boundary |
-| Missing error handling | Add try/catch + explicit error logging |
-| Race condition | Add mutex/lock or make operation idempotent |
-| Unhandled edge case | Add boundary condition test |
-| Environment-dependent | Add environment check + clear error message |
+| Bug type               | Prevention                                  |
+| ---------------------- | ------------------------------------------- |
+| Null/undefined         | Add strict null check + type guard          |
+| Wrong type             | Add runtime type validation at boundary     |
+| Missing error handling | Add try/catch + explicit error logging      |
+| Race condition         | Add mutex/lock or make operation idempotent |
+| Unhandled edge case    | Add boundary condition test                 |
+| Environment-dependent  | Add environment check + clear error message |

@@ -1,6 +1,5 @@
 # Advanced Sequential Thinking Strategies
 
-> Source: claudekit-engineer/sequential-thinking (MIT)
 > Filtered for MeowKit: kept uncertainty management + revision cascade. Dropped meta-thinking (YAGNI) and parallel constraint (meow:brainstorming handles this).
 
 ## Uncertainty Management
@@ -20,6 +19,7 @@ Thought 7/7 [FINAL]: Robust solution or clear info requirement
 **Use for**: Decisions under uncertainty, incomplete requirements.
 
 **Strategies**:
+
 - Find solution robust to uncertainty
 - Identify minimal info needed to resolve
 - Make safe assumptions with clear documentation
