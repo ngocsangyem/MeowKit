@@ -51,6 +51,51 @@ The planner will:
 3. Produce a plan file
 4. Wait for your approval (Gate 1)
 
+## Bead Decomposition
+
+For COMPLEX tasks (touching 5+ files), the planner applies **bead decomposition** before finalizing the plan. Each bead is an atomic, independently committable unit of work.
+
+### What is a bead?
+
+A bead is a self-contained slice of the implementation that:
+- Touches a bounded set of files (typically 1-3)
+- Can be committed and verified independently
+- Has a clear done state (tests pass, type-check passes)
+- Can be resumed if the agent session is interrupted
+
+### How it works
+
+```
+COMPLEX task → planner decomposes into N beads
+Each bead:  [files] + [acceptance check] + [commit message]
+Sequence:   bead-01 → commit → bead-02 → commit → ...
+```
+
+The plan file lists beads as numbered sections. The developer processes them sequentially and commits after each. If the session is interrupted mid-task, the developer resumes from the last uncommitted bead — not from scratch.
+
+### When to use
+
+| Task scope | Approach |
+|-----------|---------|
+| < 5 files | Standard plan — no bead decomposition |
+| 5+ files (COMPLEX) | Bead decomposition required |
+| Parallel subtasks | Beads per agent, worktree isolation |
+
+### validate-plan integration
+
+For COMPLEX tasks, the planner runs `meow:validate-plan` after producing the plan file and before presenting Gate 1. This skill checks 8 quality dimensions:
+
+1. Problem statement clarity
+2. Success criteria are binary (pass/fail, not subjective)
+3. Out-of-scope items explicitly listed
+4. Technical approach matches codebase patterns
+5. Risk flags are actionable (not vague)
+6. Bead boundaries are clean (no circular dependencies)
+7. Effort estimate is realistic
+8. Acceptance criteria map to testable behaviors
+
+A plan that fails `validate-plan` is revised before Gate 1 is presented to the human. The human never sees a plan that hasn't passed the 8-dimension check.
+
 ## Under the Hood
 
 ### Handoff Example

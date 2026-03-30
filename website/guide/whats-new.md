@@ -1,8 +1,113 @@
 ---
-title: What's New in v1.0.0
-description: "The Disciplined Velocity Release — 10 new capabilities: scale-adaptive routing, adversarial review, Party Mode, parallel execution, navigation help, hooks, and more."
+title: What's New
+description: "MeowKit v1.1.0 and v1.0.0 release notes — new skills, enhanced review pipeline, execution resilience, and agent system upgrades."
 persona: A
 ---
+
+# What's New in v1.1.0 — The Resilience Release
+
+## Full v1.1.0 Workflow
+
+```mermaid
+flowchart LR
+  P0[Phase 0\nOrient] --> P1[Phase 1\nPlan]
+  P1 -->|Gate 1| VP[validate-plan]
+  VP --> P2[Phase 2\nTest RED]
+  P2 -->|nyquist| P3[Phase 3\nBuild]
+  P3 -->|beads| P4[Phase 4\nReview]
+  P4 -->|scout + review + elicit| G2[Gate 2]
+  G2 --> P5[Phase 5\nShip]
+  P5 --> P6[Phase 6\nReflect]
+```
+
+## New Skills
+
+### meow:elicit — Structured second-pass reasoning
+
+Post-verdict deeper analysis using 8 elicitation methods. Invoked after a reviewer verdict to push harder on borderline dimensions, surface hidden assumptions, or stress-test a PASS decision before Gate 2.
+
+The 8 methods probe from different angles: devil's advocate, steelman, inversion, pre-mortem, boundary probing, assumption surfacing, counterfactual, and first-principles. Each method is independent — elicitation selects the subset most relevant to the verdict's weak points.
+
+### meow:validate-plan — 8-dimension plan quality check
+
+Runs automatically after the planner produces a plan file, before Gate 1 is presented. Checks 8 dimensions: problem clarity, binary success criteria, explicit out-of-scope, pattern fit, actionable risks, clean bead boundaries, realistic effort, and testable acceptance criteria.
+
+A plan that fails any dimension is revised before the human sees it. Gate 1 is only presented after `validate-plan` passes.
+
+### meow:nyquist — Test-to-requirement coverage mapping
+
+Maps written tests to acceptance criteria from the plan file. Ensures that every binary criterion has at least one test targeting it — before Phase 3 begins. Named after Nyquist sampling theorem: you need sufficient test density to faithfully represent the requirement space.
+
+Run at the end of Phase 2 (Test RED) to confirm coverage before handing off to the developer.
+
+## Enhanced Review Pipeline
+
+### Scout integration
+
+`meow:scout` runs optionally before the main review to detect edge cases, unusual patterns, and context the parallel reviewers might miss. Scout findings are injected into the review context as a pre-loaded brief.
+
+### Elicitation hook
+
+After the reviewer issues a verdict, `meow:elicit` can be invoked for a structured second pass. This is particularly useful when a dimension produced WARN — elicitation either upgrades WARN to PASS (with evidence) or downgrades it to FAIL (with specific findings).
+
+## Execution Resilience
+
+### Beads pattern for COMPLEX builds
+
+COMPLEX tasks (5+ files) are decomposed into **beads** — atomic, independently committable work units. Each bead covers a bounded set of files, has a clear done state, and produces one conventional commit.
+
+If the session is interrupted, the developer resumes from the last uncommitted bead. No work is duplicated or lost.
+
+```
+bead-01 → commit → bead-02 → commit → bead-03 → ...
+```
+
+### Bead template for plan decomposition
+
+The planner includes a bead section in COMPLEX plan files. Each bead entry specifies: files owned, acceptance check, and commit message template. Developers follow the bead list sequentially without re-interpreting scope at each step.
+
+---
+
+## Agent System
+
+### Subagent Status Protocol
+
+Every subagent MUST end responses with a structured status block. Four statuses, deterministic routing:
+
+| Status                 | Meaning                                              |
+| ---------------------- | ---------------------------------------------------- |
+| **DONE**               | Task completed successfully                          |
+| **DONE_WITH_CONCERNS** | Completed, flagged doubts                            |
+| **BLOCKED**            | Cannot complete — something must change before retry |
+| **NEEDS_CONTEXT**      | Missing information — provide it, then re-dispatch   |
+
+### Sub-agent type classification
+
+Agents are now classified as **Core** (pipeline, sequential) or **Support** (on-demand, spawnable). The agents index includes a Type column. See [Agents Overview](/reference/agents/).
+
+### AGENTS_INDEX.md
+
+Centralized registry at `.claude/agents/AGENTS_INDEX.md` with columns: Agent file, Type, Role, Source, Workflow phases, Auto-activate, CE version, Last improved.
+
+### SKILLS_INDEX.md
+
+Centralized skill registry at `.claude/skills/SKILLS_INDEX.md` — single source of truth for skill discovery, dependencies, and activation conditions.
+
+---
+
+## Documentation
+
+### Enforcement mechanism matrix in RULES_INDEX
+
+`RULES_INDEX.md` now includes a full enforcement mechanism matrix: each rule mapped to its mechanism (Behavioral / Hook / Data), whether it can be overridden, and the exception condition.
+
+### Quick-start skill selection guide
+
+New section in the skills docs: a decision table for selecting the right skill given task type, complexity, and phase. Replaces the need to read every SKILL.md before knowing what to use.
+
+### Delegation checklist in orchestration rules
+
+`orchestration-rules.md` now includes a pre-delegation checklist (5 items) and a delegation prompt template. Prevents the most common subagent failure: missing file ownership or acceptance criteria in the prompt.
 
 # What's New in v1.0.0 — The Disciplined Velocity Release
 
@@ -34,12 +139,12 @@ The skill maps observed state to one of the 7 pipeline phases and prints a singl
 
 **Problem:** Behavioral rules only work when agents follow them. Rationalization slips through. An agent convinced the `.env` read is "necessary" can bypass Rule 4 silently.
 
-**Solution:** Three shell hooks upgrade behavioral rules to enforcement — the action is blocked *before* it executes.
+**Solution:** Three shell hooks upgrade behavioral rules to enforcement — the action is blocked _before_ it executes.
 
-| Hook | Event | What it prevents |
-|------|-------|-----------------|
-| `privacy-block.sh` | PreToolUse | Reads of `.env`, `*.key`, credential files |
-| `gate-enforcement.sh` | PreToolUse | Source code writes before Gate 1 approval |
+| Hook                        | Event        | What it prevents                            |
+| --------------------------- | ------------ | ------------------------------------------- |
+| `privacy-block.sh`          | PreToolUse   | Reads of `.env`, `*.key`, credential files  |
+| `gate-enforcement.sh`       | PreToolUse   | Source code writes before Gate 1 approval   |
 | `project-context-loader.sh` | SessionStart | Missing project-context.md at session start |
 
 ```
@@ -49,7 +154,7 @@ With hooks:    hook fires → read blocked → agent must ask human first
 
 `privacy-block.sh` and `gate-enforcement.sh` are **preventive** — they intercept the tool call before execution. `project-context-loader.sh` is **proactive** — it injects `docs/project-context.md` into context before any task runs.
 
-Rules define *why*. Hooks enforce *what*.
+Rules define _why_. Hooks enforce _what_.
 
 ---
 
@@ -59,15 +164,15 @@ Rules define *why*. Hooks enforce *what*.
 
 **Solution:** Each mode now declares a **Planning Depth** that determines how many researchers run before the plan is written.
 
-| Mode | Researchers | Approach |
-|------|------------|---------|
-| `strict` | 2 parallel | Competing approaches — each researcher argues a different design |
-| `architect` | 2 parallel | Competing approaches — same as strict |
-| `default` | 1 | Single researcher, standard depth |
-| `audit` | 1 | Single researcher, security-focused |
-| `fast` | 0 | Skip research — go straight to plan |
-| `cost-saver` | 0 | Skip research — minimize token spend |
-| `document` | 0 | Skip research — docs tasks don't need it |
+| Mode         | Researchers | Approach                                                         |
+| ------------ | ----------- | ---------------------------------------------------------------- |
+| `strict`     | 2 parallel  | Competing approaches — each researcher argues a different design |
+| `architect`  | 2 parallel  | Competing approaches — same as strict                            |
+| `default`    | 1           | Single researcher, standard depth                                |
+| `audit`      | 1           | Single researcher, security-focused                              |
+| `fast`       | 0           | Skip research — go straight to plan                              |
+| `cost-saver` | 0           | Skip research — minimize token spend                             |
+| `document`   | 0           | Skip research — docs tasks don't need it                         |
 
 `strict` and `architect` modes force competing approaches specifically to surface trade-offs that single-researcher planning misses. The synthesis step resolves the competition into a single recommended path.
 
@@ -75,11 +180,11 @@ Rules define *why*. Hooks enforce *what*.
 
 ## Summary
 
-| Feature | Solves | When it activates |
-|---------|--------|------------------|
-| Navigation Help | "What do I do next?" | Explicit `/meow:help` |
+| Feature          | Solves                                | When it activates        |
+| ---------------- | ------------------------------------- | ------------------------ |
+| Navigation Help  | "What do I do next?"                  | Explicit `/meow:help`    |
 | Hook Enforcement | Rule bypass via agent rationalization | Every session, automatic |
-| Planning Depth | Over/under-researching by mode | Phase 1, per active mode |
+| Planning Depth   | Over/under-researching by mode        | Phase 1, per active mode |
 
 ## Structured Debugging
 

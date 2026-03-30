@@ -1,5 +1,6 @@
 ---
 name: journal-writer
+subagent_type: escalation
 description: >-
   Use this agent when something goes wrong — test failures after multiple
   fix attempts, production bugs, failed refactors, performance issues,

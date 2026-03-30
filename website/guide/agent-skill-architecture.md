@@ -73,17 +73,19 @@ Phase 6: Reflect ─→ documenter loads: documentation, memory
 | Agent | Phase | Skills Loaded |
 |-------|-------|---------------|
 | orchestrator | 0 | agent-detector, lazy-agent-loader, scout |
-| planner | 1 | plan-creator, plan-ceo-review, plan-eng-review, office-hours |
+| planner | 1 | plan-creator, plan-ceo-review, plan-eng-review, validate-plan, office-hours |
 | architect | 1 | plan-creator (ADR references) |
-| tester | 2 | testing, lint-and-validate, qa, qa-manual |
+| tester | 2 | testing, lint-and-validate, qa, qa-manual, nyquist |
 | developer | 3 | development, typescript, vue, frontend-design, clean-code, docs-finder |
-| reviewer | 4 | review, cso, vulnerability-scanner |
+| reviewer | 4 | review, elicit, scout, cso, vulnerability-scanner |
 | security | 2, 4 | cso, vulnerability-scanner, skill-template-secure |
 | shipper | 5 | ship, shipping, careful |
 | documenter | 6 | documentation, document-release, llms |
 | analyst | 0, 6 | memory |
 | brainstormer | 1 | office-hours |
 | journal-writer | 6 | memory |
+| ui-ux-designer | 3 | frontend-design, ui-design-system |
+| git-manager | 5, any | ship (git operations only) |
 
 ## Skill Activation by Phase
 
@@ -93,16 +95,16 @@ flowchart TD
     P0 --> S0[agent-detector\nlazy-agent-loader\nscout]
 
     P0 --> P1[Phase 1: Plan ✋ Gate 1]
-    P1 --> S1[plan-creator\noffice-hours\nplan-ceo-review\nplan-eng-review]
+    P1 --> S1[plan-creator\noffice-hours\nplan-ceo-review\nplan-eng-review\nvalidate-plan]
 
     P1 --> P2[Phase 2: Test RED]
-    P2 --> S2[testing\nlint-and-validate\ncso\nvulnerability-scanner]
+    P2 --> S2[testing\nlint-and-validate\nnyquist\ncso\nvulnerability-scanner]
 
     P2 --> P3[Phase 3: Build]
     P3 --> S3[development\ntypescript / vue\nclean-code\ndocs-finder]
 
     P3 --> P4[Phase 4: Review ✋ Gate 2]
-    P4 --> S4[review\ncso\nvulnerability-scanner]
+    P4 --> S4[review\nelicit\nscout\ncso\nvulnerability-scanner]
 
     P4 --> P5[Phase 5: Ship]
     P5 --> S5[ship\nshipping\ncareful\ndocument-release]
@@ -196,3 +198,40 @@ Some skills activate across multiple phases rather than being owned by a single 
 ::: warning
 Cross-cutting skills are loaded by individual agents as needed — they are not globally pre-loaded. Loading them unconditionally would inflate every task's context cost.
 :::
+
+## Quick-Start: Which Skill Do I Need? (v1.1.0)
+
+| I want to... | Skill | Phase |
+|--------------|-------|-------|
+| Plan a feature | `meow:plan-creator` | 1 |
+| Validate a plan before building | `meow:validate-plan` | 1 |
+| Brainstorm approaches | `meow:brainstorming`, `meow:office-hours` | 1 |
+| Write tests first (TDD) | `meow:testing` | 2 |
+| Check test-to-requirement coverage | `meow:nyquist` | 2, 4 |
+| Implement a feature | `meow:cook` | 0-6 |
+| Fix a bug | `meow:fix` | 3 |
+| Debug an issue | `meow:debug`, `meow:investigate` | 3 |
+| Review code | `meow:review` | 4 |
+| Deepen review findings | `meow:elicit` | 4 |
+| Security audit | `meow:cso`, `meow:audit` | 2, 4 |
+| Ship / deploy | `meow:ship` | 5 |
+| Update docs after shipping | `meow:document-release` | 6 |
+| Run a retrospective | `meow:retro` | 6 |
+| Explore the codebase | `meow:scout` | 0 |
+| Look up library docs | `meow:docs-finder` | any |
+
+## Subagent Status Protocol (v1.1.0)
+
+All subagents report structured status on completion:
+
+```
+**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
+**Summary:** [1-2 sentences]
+**Concerns/Blockers:** [if applicable]
+```
+
+See `output-format-rules.md` Rule 5 for full protocol.
+
+## Full Skill Registry
+
+See `SKILLS_INDEX.md` for the complete list of all 60+ skills with owner, phase, type, and architecture.

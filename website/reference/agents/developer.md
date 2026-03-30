@@ -48,6 +48,51 @@ Developer hands off:
   → Tester (green phase verify) → Reviewer
 ```
 
+## Bead Processing
+
+For COMPLEX tasks, the developer processes the plan's bead decomposition sequentially. Each bead is committed independently, making large builds resumable and reviewable in smaller increments.
+
+### Processing loop
+
+```
+for each bead in plan:
+  1. Read bead definition (files + acceptance check)
+  2. Implement until bead's tests pass
+  3. Type-check passes
+  4. Commit: "feat(bead-NN): <bead description>"
+  5. Mark bead complete in plan file
+  6. Move to next bead
+```
+
+### Progress tracking
+
+The developer updates the plan file as beads complete:
+
+```markdown
+- [x] bead-01: auth middleware (committed: abc1234)
+- [x] bead-02: token service (committed: def5678)
+- [ ] bead-03: refresh endpoint  ← current
+- [ ] bead-04: integration tests
+```
+
+### Resume on interruption
+
+If the session is interrupted mid-task, the developer reads the plan file to find the last uncommitted bead and resumes from there. No work is duplicated or lost.
+
+### Commit per bead
+
+Each bead produces exactly one conventional commit. Bead commits use the format:
+
+```
+feat(bead-NN): <description matching plan>
+```
+
+This keeps git history granular and makes partial-build rollback straightforward.
+
+### When beads apply
+
+Bead processing activates when the plan file contains a bead section (COMPLEX tasks, 5+ files). For standard plans, the developer follows the normal sequential implementation without bead commits.
+
 ## Under the Hood
 
 ### Self-Healing Pattern

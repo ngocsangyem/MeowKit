@@ -1,5 +1,6 @@
 ---
 name: researcher
+subagent_type: advisory
 description: >-
   Use this agent when you need to research technical topics, evaluate
   libraries or frameworks, find documentation, or gather information

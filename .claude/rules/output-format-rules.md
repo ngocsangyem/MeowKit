@@ -3,10 +3,9 @@ source: new
 original_file: n/a
 adapted: no
 adaptation_notes: >
-  New rule based on universal principles from all 3 prompting guides:
-  - codex: "Lead with a quick explanation of the change, then give more details on context covering where and why"
-  - claude: structured output with XML tags
-  - factory.ai: "Include acceptance criteria", "Be specific about the outcome"
+  - Lead with a quick explanation of the change, then give more details on context covering where and why
+  - structured output with XML tags
+  - "Include acceptance criteria", "Be specific about the outcome"
 ---
 
 # Output Format Rules
@@ -58,3 +57,33 @@ When resuming work on an existing plan, ALWAYS start the response with:
 
 WHY: Resumption context prevents duplicate work and missed steps.
 Source: codex-prompt-guide.md — plan closure rule
+
+## Rule 5: Subagent Status Protocol
+
+Every subagent MUST end its response with a structured status block:
+
+```
+**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
+**Summary:** [1-2 sentence summary of what was accomplished]
+**Concerns/Blockers:** [if applicable — omit if DONE with no concerns]
+```
+
+### Status Definitions
+
+| Status                 | Meaning                        | Controller Action                                                                                      |
+| ---------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| **DONE**               | Task completed successfully    | Proceed to next step                                                                                   |
+| **DONE_WITH_CONCERNS** | Completed but flagged doubts   | If correctness concern → address before review. If tech debt → note, proceed.                          |
+| **BLOCKED**            | Cannot complete task           | Assess blocker → provide more context / break task down / escalate to user. NEVER retry same approach. |
+| **NEEDS_CONTEXT**      | Missing information to proceed | Provide missing context → re-dispatch                                                                  |
+
+### Handling Rules
+
+- NEVER ignore BLOCKED or NEEDS_CONTEXT — something must change before retry
+- NEVER force same approach after BLOCKED — try: more context → simpler task → escalate
+- If subagent fails 3+ times on same task → escalate to user, don't retry blindly
+- DONE_WITH_CONCERNS about file growth or tech debt → note for future, proceed now
+- DONE_WITH_CONCERNS about correctness or security → address before review
+
+WHY: Vague "I'm done" handoffs force the controller to investigate completion state.
+Structured status codes eliminate ambiguity and enable automatic routing decisions.

@@ -57,6 +57,9 @@ Phase 1 produces an approved plan using one or more planning skills:
 | `meow:plan-creator`    | Full plan creation | Starting from scratch              |
 | `meow:plan-ceo-review` | Product lens       | Is this the right thing to build?  |
 | `meow:plan-eng-review` | Engineering lens   | Is this the right way to build it? |
+| `meow:validate-plan`   | 8-dimension quality check | COMPLEX tasks — runs before Gate 1 |
+
+For COMPLEX tasks (5+ files), the planner also applies **bead decomposition** — breaking the plan into atomic, independently committable work units. See [planner](/reference/agents/planner) for details. The `meow:validate-plan` skill checks bead boundaries as one of its 8 dimensions, ensuring clean handoff to the developer.
 
 ### Gate 1 behavior — Print & Stop
 
@@ -96,16 +99,18 @@ No skill automatically chains into another. You decide the review depth.
 - Write failing tests FIRST — the task file's acceptance criteria drive the test cases
 - `pre-implement.sh` hook: BLOCKS if no failing test exists
 - Security pre-check: scan for known anti-patterns
+- Run `meow:nyquist` at the end of Phase 2 to verify test-to-requirement coverage — every acceptance criterion in the plan must have at least one test targeting it before Phase 3 begins
 
 ## Phase 3 — Build GREEN
 
-**Agent:** developer  
+**Agent:** developer
 **Deliverable:** Passing implementation
 
 - Implement until tests pass
 - `post-write.sh` hook: security scan on every file write
 - Self-heal: auto-fix failures up to 3 attempts
 - Memory capture: log patterns as they emerge
+- For COMPLEX tasks: process the plan's **bead decomposition** sequentially — commit after each bead, resume from last uncommitted bead if interrupted. See [developer](/reference/agents/developer) for the full bead processing loop.
 
 ## Phase 4 — Review ✋ Gate 2
 
@@ -115,6 +120,8 @@ No skill automatically chains into another. You decide the review depth.
 - 5-dimension structural audit: architecture, types, security, tests, performance
 - `validate.py`: deterministic checks outside the LLM
 - Review verdict saved to `tasks/plans/YYMMDD-name/reports/`
+- **Optional pre-review:** run `meow:scout` to detect edge cases and unusual patterns before the main review runs — findings are injected into the review context
+- **Optional post-verdict:** run `meow:elicit` after the verdict to push deeper on WARN dimensions using 8 structured elicitation methods
 - **HUMAN APPROVAL REQUIRED** — no shipping until review passes
 
 ## Phase 5 — Ship

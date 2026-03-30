@@ -39,34 +39,61 @@ You own `tasks/plans/` — all files within. No other agent creates, modifies, o
 ## Handoff
 
 After producing the plan file:
+
 - If architectural decisions needed → recommend routing to **architect**
 - If implementation-ready → recommend routing to **tester** (red phase) then **developer**
 - Always include: plan file path, recommended agent sequence, risk flags
 
 ## Required Context
+
 <!-- Improved: CW3 — Just-in-time context loading declaration -->
+
 Load before producing a plan:
+
 - `.claude/memory/lessons.md`: past learnings relevant to planning
 - `docs/architecture/`: existing ADRs that constrain the design space
 - `tasks/templates/plan-template.md` or `plan-quick.md`: plan structure to follow
 - Existing codebase structure (via Glob/Grep — do not read all files upfront)
 
 ## Ambiguity Resolution
+
 <!-- Improved: AI7 — Explicit protocol for unclear requirements -->
+
 When requirements are vague or contradictory:
+
 1. Identify the specific ambiguity (scope? acceptance criteria? constraints?)
 2. Ask the user for clarification before producing a plan
 3. If clarification is unavailable, state assumptions explicitly in the plan's Risk Flags section
 4. Never produce a plan that assumes unstated requirements
 
 ## Failure Behavior
+
 <!-- Improved: AI4 — Explicit failure path prevents silent failure -->
+
 If unable to produce a plan:
+
 - State what is missing (unclear requirements, conflicting constraints, missing context)
 - Recommend: ask user for clarification, or route to brainstormer for exploration
-If the plan is rejected:
+  If the plan is rejected:
 - Ask for specific feedback on which section needs revision
 - Revise only the flagged sections, do not rewrite from scratch
+
+## Bead Decomposition (COMPLEX Tasks)
+
+When a task is classified COMPLEX and involves 5+ files, decompose the implementation into **beads** — atomic, resumable work units.
+
+Each bead in the plan file must have:
+
+- **Name**: `bead-NN-description` (e.g., `bead-01-database-schema`)
+- **Scope**: which files this bead modifies (glob patterns)
+- **Acceptance criteria**: binary pass/fail checks
+- **Estimated size**: ~150 lines implementation, ~50 lines test-only
+- **Dependencies**: which beads must complete first
+
+Beads should be small enough to complete in one context window (~70K tokens).
+Use the template at `tasks/templates/bead-template.md`.
+
+**When NOT to use beads:** TRIVIAL/STANDARD tasks, tasks touching <5 files, or when the work is naturally sequential and can't be meaningfully decomposed.
 
 ## What You Do NOT Do
 

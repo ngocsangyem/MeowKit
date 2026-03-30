@@ -33,6 +33,40 @@ The reviewer can also invoke the `meow:review` skill for extended capabilities: 
 | **PASS WITH NOTES** | Non-blocking suggestions | → Shipper (suggestions noted for future) |
 | **FAIL** | Critical findings | → Back to developer (must fix before re-review) |
 
+## Skill Loading
+
+The reviewer loads these skills depending on the review scope:
+
+| Skill | Purpose | When loaded |
+|-------|---------|------------|
+| `meow:review` | Multi-pass adversarial review with parallel reviewers | Phase 4, explicit invocation |
+| `meow:elicit` | Structured second-pass reasoning (8 methods) — post-verdict deeper analysis | Optional, after verdict |
+| `meow:scout` | Pre-review edge case detection and context gathering | Optional, before review |
+| `meow:cso` | Scope drift detection against original plan | During review |
+| `meow:vulnerability-scanner` | Deep security audit beyond the 5-dimension checklist | When security dimension flags concern |
+
+### Review Pipeline
+
+The full reviewer pipeline with all optional steps:
+
+```mermaid
+flowchart LR
+  S[Scout\noptional] --> GC[Gather\nContext]
+  GC --> P1[Blind\nReview]
+  GC --> P2[Edge Case\nReview]
+  GC --> P3[Criteria\nAudit]
+  P1 & P2 & P3 --> T[Triage]
+  T --> V[Verdict]
+  V --> E[Elicitation\noptional]
+  E --> G2[Gate 2]
+```
+
+**Scout (optional):** Runs before context gathering to detect edge cases and unusual patterns the main reviewers might miss. Feeds findings into the review context.
+
+**Parallel Review:** Three reviewers run simultaneously — Blind Hunter (zero context), Edge Case Hunter (boundary conditions), Criteria Auditor (acceptance criteria). Each is independent to prevent anchoring bias.
+
+**Elicitation (optional):** Post-verdict step using `meow:elicit` to push deeper on any dimension that produced a WARN or borderline PASS. Invoked when the verdict warrants a second-pass challenge.
+
 ## How to Use
 
 The reviewer runs automatically in Phase 4. You can also invoke `meow:review` directly for the extended multi-pass review with adversarial analysis.

@@ -14,7 +14,7 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | `orchestration-rules.md` | Subagent delegation, file ownership, parallel vs sequential | Adapted from claudekit-engineer | Multi-agent workflows [CONTEXTUAL] |
 | `context-ordering-rules.md` | Long content first, context before constraint, self-contained docs | New (prompting best practices) | Plans, prompts, handoffs |
 | `model-selection-rules.md` | Task type → model tier routing, security escalation | New (prompting best practices) | Phase 0 (Orient) |
-| `output-format-rules.md` | Response structure: what changed, why, file refs, open questions | New (prompting best practices) | All agent responses |
+| `output-format-rules.md` | Response structure: what/why/files/open-qs + subagent status protocol | New + CKE-inspired (v1.1.0) | All agent responses |
 | `search-before-building-rules.md` | 3-layer knowledge framework: search before implementing unfamiliar patterns | Adapted from gstack ETHOS.md | Implementation, planning |
 | `scale-adaptive-rules.md` | Domain-based complexity routing, CSV match override, Gate 1 one-shot bypass | New (BMAD-inspired) | Phase 0 (Orient) |
 | `step-file-rules.md` | JIT step loading, no skipping, state persistence for multi-step workflows | New (BMAD-inspired) | Step-file skills |
@@ -49,6 +49,30 @@ MeowKit uses shell hooks to upgrade behavioral rules to preventive enforcement:
 | `hooks/project-context-loader.sh` | SessionStart | Auto-load project-context.md into agent context |
 
 Hooks supplement rules — they do not replace them. Rules define the WHY; hooks enforce the WHAT.
+
+## Enforcement Mechanism Matrix (v1.1.0)
+
+| Rule | Mechanism | Override? | Exception |
+|------|-----------|-----------|-----------|
+| `security-rules.md` | Behavioral | NEVER | Human override only, documented |
+| `injection-rules.md` | Behavioral | NEVER | Human override only, documented |
+| `gate-rules.md` | Hook (gate-enforcement.sh) | NEVER | `/meow:fix` simple bypasses Gate 1; scale-routing one-shot |
+| `tdd-rules.md` | Behavioral | Yes | [fast] mode skips TDD |
+| `naming-rules.md` | Behavioral | No | — |
+| `development-rules.md` | Behavioral | No | — |
+| `orchestration-rules.md` | Behavioral | N/A | [CONTEXTUAL] — only in multi-agent workflows |
+| `context-ordering-rules.md` | Behavioral | No | — |
+| `model-selection-rules.md` | Behavioral | No | Domain override via scale-routing CSV |
+| `output-format-rules.md` | Behavioral | No | — |
+| `search-before-building-rules.md` | Behavioral | No | — |
+| `scale-adaptive-rules.md` | Behavioral + CSV data | No | CSV extensible by users |
+| `step-file-rules.md` | Behavioral | N/A | Only applies to step-file skills |
+| `parallel-execution-rules.md` | Behavioral + worktree | N/A | [CONTEXTUAL] — only during parallel execution |
+
+**Mechanism types:**
+- **Behavioral** — Agent follows rules via system prompt. Relies on LLM compliance.
+- **Hook** — Shell script intercepts tool calls before execution. Preventive enforcement.
+- **Data** — External file (CSV, JSON) drives decisions. User-extensible.
 
 ## Rule Format Convention
 

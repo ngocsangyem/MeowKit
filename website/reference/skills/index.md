@@ -1,12 +1,12 @@
 ---
 title: Skills Overview
-description: "All 48 MeowKit skills organized by category."
+description: "All 51 MeowKit skills organized by category."
 persona: C
 ---
 
 # Skills Overview
 
-MeowKit ships 43 skills using the `meow:` namespace prefix.
+MeowKit ships 51 skills using the `meow:` namespace prefix.
 
 ## Architecture
 
@@ -84,6 +84,8 @@ Code quality enforcement, review, and security scanning.
 | Skill | What it does |
 |-------|-------------|
 | [meow:review](/reference/skills/review) | Multi-pass code review with adversarial analysis |
+| [meow:elicit](/reference/skills/elicit) | Structured second-pass reasoning via 8 named methods (pre-mortem, red team, Socratic, etc.) |
+| [meow:nyquist](/reference/skills/nyquist) | Test-to-requirement coverage mapping — gaps report from plan criteria vs test files |
 | [meow:cso](/reference/skills/cso) | Chief Security Officer — infrastructure-first audit |
 | [meow:vulnerability-scanner](/reference/skills/vulnerability-scanner) | OWASP 2025 code-level scanning |
 | [meow:clean-code](/reference/skills/clean-code) | Pragmatic coding standards (SRP, DRY, KISS) |
@@ -96,6 +98,7 @@ Plan creation, review, and ideation.
 | Skill | What it does |
 |-------|-------------|
 | [meow:plan-creator](/reference/skills/plan-creator) | Auto-select plan template by task scope |
+| [meow:validate-plan](/reference/skills/validate-plan) | 8-dimension plan quality validation before Phase 2 begins |
 | [meow:plan-ceo-review](/reference/skills/plan-ceo-review) | CEO-mode plan review with scope expansion |
 | [meow:plan-eng-review](/reference/skills/plan-eng-review) | Engineering plan review — architecture, edges, tests |
 | [meow:office-hours](/reference/skills/office-hours) | YC-style brainstorming (startup + builder modes) |

@@ -1,5 +1,6 @@
 ---
 name: git-manager
+subagent_type: utility
 description: >-
   Stage, commit, and push code changes with conventional commits.
   Use when user says "commit", "push", or finishes a feature/fix.

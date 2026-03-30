@@ -68,6 +68,7 @@ Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer
 - User is about to merge or land code changes (proactive suggestion)
 - Before running `/meow:ship` to ensure quality gate passes
 - **For complex changes (3+ files):** Run `/meow:scout` first to identify edge cases before review
+- **After verdict:** Optionally run `/meow:elicit` for structured second-pass reasoning on findings
 
 ## Workflow
 
@@ -132,7 +133,34 @@ After all passes complete, output this summary:
 
 FAIL verdict prevents `/meow:ship` from executing (Gate 2 enforcement).
 
+## Pre-Review Scouting (Recommended)
+
+For changes touching 3+ files, run `/meow:scout` BEFORE starting review:
+1. Scout identifies affected dependents, data flow risks, async races, state mutations
+2. Scout output feeds into Step 1 (Gather Context) as additional context
+3. Makes the review more targeted — reviewers check scout-flagged areas first
+
+This is recommended, not mandatory. Small diffs (1-2 files) skip scouting.
+
+## Post-Verdict Elicitation (Optional)
+
+After the verdict is emitted, offer the user `/meow:elicit` for deeper analysis:
+
+```
+Review complete. Verdict: [PASS|WARN|FAIL]
+
+Want deeper analysis? Run /meow:elicit to re-examine findings through a specific lens:
+  pre-mortem | inversion | red-team | socratic | first-principles | skip
+```
+
+Elicitation output appends to the verdict file as a supplementary section.
+It does NOT change the verdict — it adds depth for informed Gate 2 decisions.
+
+**Auto-suggestion:** If verdict is WARN with security findings → suggest `red-team`.
+If verdict is WARN with coverage gaps → suggest `pre-mortem`.
+
 ## Gotchas
 
 - **Reviewing diff without full context**: Approving a change that breaks an unstated invariant → Always read the surrounding file, not just the diff hunks
 - **Style nits hiding real bugs**: 10 comments about formatting, zero about the missing null check → Prioritize: security > correctness > performance > style
+- **Skipping scout on large diffs**: When 5+ files changed, blind review misses cross-file interaction bugs → Run scout first
