@@ -80,3 +80,26 @@ All notable changes to MeowKit are documented here. This file is auto-updated by
 - exclude runtime dirs (session-state, memory, logs) from release zip
 - exclude `.claude/metadata.json` and `.claude/.env` from release artifacts
 - fix typecheck to run per workspace for correct module resolution
+
+## [0.1.2](https://github.com/ngocsangyem/MeowKit/releases/tag/v0.1.2) (2026-03-29)
+
+### Features
+
+- interactive version selection when running `npm create meowkit@latest`
+- git-manager agent for commit/push workflows
+- confirmation step before Gemini API key input
+
+## [0.1.1](https://github.com/ngocsangyem/MeowKit/releases/tag/v0.1.1) (2026-03-29)
+
+### Bug Fixes
+
+- exclude runtime dirs (session-state, memory, logs) from release zip and git tracking
+
+## [0.1.0](https://github.com/ngocsangyem/MeowKit/releases/tag/v0.1.0) (2026-03-29)
+
+### Features
+
+- initial pre-release of MeowKit agent toolkit
+- core skill set (cook, fix, ship, review, memory, testing)
+- sequential thinking and fix diagnosis references
+- prepare-release-assets script for GitHub Release packaging

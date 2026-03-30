@@ -290,6 +290,9 @@ docs: update readme        → no release
 | v1.2.0  | 2026-03-31 | The Memory Activation Release    |
 | v1.1.0  | 2026-03-30 | The Reasoning Depth Release      |
 | v1.0.0  | 2026-03-30 | The Disciplined Velocity Release |
+| v0.1.2  | 2026-03-29 | Interactive version selection     |
+| v0.1.1  | 2026-03-29 | Runtime dir exclusion fix         |
+| v0.1.0  | 2026-03-29 | Initial pre-release               |
 
 ## Troubleshooting
 
