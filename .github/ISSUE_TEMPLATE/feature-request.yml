@@ -1,0 +1,65 @@
+name: Feature Request
+description: Suggest a new skill, agent, rule, or capability
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea to make MeowKit better? We'd love to hear it.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - New skill (meow:*)
+        - New agent
+        - New rule
+        - New hook
+        - New mode
+        - CLI improvement
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the pain point or gap this addresses.
+      placeholder: "When working on fintech projects, there's no skill for..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you like this to work? Be as specific as possible.
+      placeholder: "A new `meow:compliance` skill that scans for PCI-DSS patterns..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What else did you consider? Why is this approach better?
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: How important is this to you?
+      options:
+        - Nice to have
+        - Would significantly improve my workflow
+        - Blocking my use of MeowKit
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Willing to contribute?
+      options:
+        - label: I'd be willing to submit a PR for this feature

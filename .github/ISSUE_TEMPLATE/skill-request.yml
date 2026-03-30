@@ -1,0 +1,67 @@
+name: Skill Request
+description: Request a new MeowKit skill (meow:*)
+title: "[Skill]: meow:"
+labels: ["enhancement", "skill"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Requesting a new skill? Great! Help us understand the use case.
+
+  - type: input
+    id: name
+    attributes:
+      label: Proposed skill name
+      placeholder: "meow:compliance"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Skill type
+      description: "Based on [Anthropic's skill categories](https://www.anthropic.com/engineering/claude-code-skills)"
+      options:
+        - Library & API Reference
+        - Product Verification
+        - Data Fetching & Analysis
+        - Business Process Automation
+        - Code Scaffolding & Templates
+        - Code Quality & Review
+        - CI/CD & Deployment
+        - Runbook / Debugging
+        - Infrastructure Operations
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What should this skill do?
+      description: Describe the trigger, workflow, and expected output.
+      placeholder: |
+        Trigger: when working on payment code or asked to "check compliance"
+        Workflow: scan for PCI-DSS anti-patterns → report findings
+        Output: compliance report with pass/fail per check
+    validations:
+      required: true
+
+  - type: textarea
+    id: gotchas
+    attributes:
+      label: Known gotchas or edge cases
+      description: What would Claude get wrong without this skill?
+
+  - type: dropdown
+    id: pipeline
+    attributes:
+      label: Where in the pipeline?
+      options:
+        - Phase 0 (Orient)
+        - Phase 1 (Plan)
+        - Phase 2 (Test RED)
+        - Phase 3 (Build GREEN)
+        - Phase 4 (Review)
+        - Phase 5 (Ship)
+        - Phase 6 (Reflect)
+        - Anytime (not phase-locked)

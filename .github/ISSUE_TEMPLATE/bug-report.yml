@@ -1,0 +1,96 @@
+name: Bug Report
+description: Report a bug in MeowKit
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the sections below so we can reproduce and fix it.
+
+  - type: input
+    id: version
+    attributes:
+      label: MeowKit Version
+      description: "Run `npx meowkit-cli --version` or check `.claude/metadata.json`"
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area
+      options:
+        - Skill (meow:*)
+        - Agent
+        - Rule enforcement
+        - Hook
+        - CLI (create-meowkit)
+        - CLI (meowkit-cli)
+        - Gate (Gate 1 or Gate 2)
+        - Mode
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Clear description of the bug.
+      placeholder: "When I run /meow:review, the Blind Hunter step fails with..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      placeholder: "The review should complete with a PASS/WARN/FAIL verdict."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps to trigger the bug.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error output / logs
+      description: Paste relevant error messages or Claude Code output.
+      render: shell
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - macOS
+        - Linux
+        - Windows (WSL)
+        - Windows
+    validations:
+      required: true
+
+  - type: input
+    id: node
+    attributes:
+      label: Node.js Version
+      placeholder: "20.x"
+
+  - type: input
+    id: claude-code
+    attributes:
+      label: Claude Code Version
+      placeholder: "2.x"
