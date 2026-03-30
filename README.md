@@ -32,8 +32,8 @@ npm create meowkit@latest
 The CLI fetches the latest release from GitHub, prompts for config, and scaffolds `.claude/` into your project.
 
 ```bash
-npx meowkit-cli setup      # Configure: Python venv, MCP, .env, .gitignore
-npx meowkit-cli doctor     # Verify environment
+npx mewkit setup      # Configure: Python venv, MCP, .env, .gitignore
+npx mewkit doctor     # Verify environment
 ```
 
 ## Packages
@@ -41,7 +41,7 @@ npx meowkit-cli doctor     # Verify environment
 | Package                                                          | npm                         | Description                                             |
 | ---------------------------------------------------------------- | --------------------------- | ------------------------------------------------------- |
 | [`create-meowkit`](https://www.npmjs.com/package/create-meowkit) | `npm create meowkit@latest` | Scaffold CLI — downloads release from GitHub            |
-| [`meowkit-cli`](https://www.npmjs.com/package/meowkit-cli)       | `npx meowkit-cli <cmd>`     | Runtime CLI — upgrade, doctor, validate, budget, memory |
+| [`mewkit`](https://www.npmjs.com/package/mewkit)       | `npx mewkit <cmd>`     | Runtime CLI — upgrade, doctor, validate, budget, memory |
 
 ## Requirements
 
@@ -65,7 +65,7 @@ meowkit/
 ├── tasks/                    Task templates
 ├── packages/
 │   ├── create-meowkit/       Scaffold CLI (npm)
-│   └── meowkit/              Runtime CLI (npm as meowkit-cli)
+│   └── meowkit/              Runtime CLI (npm as mewkit)
 ├── scripts/                  Release automation
 ├── website/                  VitePress documentation
 ├── CLAUDE.md                 Entry point for Claude Code

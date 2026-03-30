@@ -60,15 +60,15 @@ Re-running on an existing project preserves your modifications:
 ## After scaffold
 
 ```bash
-npx meowkit-cli setup      # Configure: Python venv, MCP, .env, .gitignore
-npx meowkit-cli doctor     # Verify environment
+npx mewkit setup      # Configure: Python venv, MCP, .env, .gitignore
+npx mewkit doctor     # Verify environment
 ```
 
 ## Links
 
 - [Documentation](https://github.com/ngocsangyem/MeowKit)
 - [GitHub Releases](https://github.com/ngocsangyem/MeowKit/releases)
-- [Runtime CLI: meowkit-cli](https://www.npmjs.com/package/meowkit-cli)
+- [Runtime CLI: mewkit](https://www.npmjs.com/package/mewkit)
 
 ## License
 

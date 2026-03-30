@@ -37,7 +37,7 @@ export default withMermaid(defineConfig({
           { text: 'Changelog', link: '/changelog' },
           { text: 'GitHub Releases', link: 'https://github.com/ngocsangyem/MeowKit/releases' },
           { text: 'npm: create-meowkit', link: 'https://www.npmjs.com/package/create-meowkit' },
-          { text: 'npm: meowkit-cli', link: 'https://www.npmjs.com/package/meowkit-cli' },
+          { text: 'npm: mewkit', link: 'https://www.npmjs.com/package/mewkit' },
         ],
       },
     ],

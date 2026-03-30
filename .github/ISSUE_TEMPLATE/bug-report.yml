@@ -12,7 +12,7 @@ body:
     id: version
     attributes:
       label: MeowKit Version
-      description: "Run `npx meowkit-cli --version` or check `.claude/metadata.json`"
+      description: "Run `npx mewkit --version` or check `.claude/metadata.json`"
       placeholder: "1.0.0"
     validations:
       required: true
@@ -27,7 +27,7 @@ body:
         - Rule enforcement
         - Hook
         - CLI (create-meowkit)
-        - CLI (meowkit-cli)
+        - CLI (mewkit)
         - Gate (Gate 1 or Gate 2)
         - Mode
         - Documentation

@@ -1,17 +1,17 @@
-# meowkit-cli
+# mewkit
 
 Runtime CLI for [MeowKit](https://github.com/ngocsangyem/MeowKit) — manage your AI agent toolkit after installation.
 
 ## Install
 
 ```bash
-npm install -g meowkit-cli
+npm install -g mewkit
 ```
 
 Or use directly:
 
 ```bash
-npx meowkit-cli <command>
+npx mewkit <command>
 ```
 
 ## Commands
