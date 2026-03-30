@@ -20,11 +20,11 @@ A **reference toolkit** — a collection of guides used by agents during specifi
 
 ## When to Use This
 
-Phase 0 (Orient) and Phase 6 (Reflect) persistence. Agents load these references automatically — you rarely invoke this skill directly. Consolidation is the exception: invoke manually when memory reaches scale (20+ sessions, 50+ patterns, 500+ cost entries).
+Phase 0 (Orient) and Phase 6 (Reflect) persistence. At Phase 0, agents read memory automatically. At Phase 6, `meow:cook` spawns a dedicated subagent for session-capture (3-category extraction). Consolidation is manual: invoke when memory reaches scale (20+ sessions, 50+ patterns, 500+ cost entries).
 
 ::: info Skill Details
 **Phase:** 0, 6
-**Used by:** analyst, journal-writer agents
+**Used by:** analyst agent, meow:cook Phase 6 (MUST-spawn subagent)
 :::
 
 ## Schema (v1.2.0)

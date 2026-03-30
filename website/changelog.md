@@ -5,6 +5,12 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 1.2.1 (2026-03-31)
+
+- **fix:** `meow:cook` Phase 6 (Reflect) now spawns a dedicated subagent for `meow:memory` session-capture. Previously memory write was an inline bullet point that could be skipped if session was interrupted. Now enforced as MUST-spawn, matching project-manager and docs-manager.
+
+---
+
 ## 1.2.0 (2026-03-31) — The Memory Activation Release
 
 Fixed the dormant memory system and enriched it with cross-framework insights from 6 agent frameworks (Khuym, GSD, Superpowers, gstack, CKE, BMAD). Theme: **activate the memory pipeline and enrich the learning format**.

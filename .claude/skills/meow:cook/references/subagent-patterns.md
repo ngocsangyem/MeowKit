@@ -95,6 +95,11 @@ Task(subagent_type="project-manager", prompt="Run full sync-back for [plan-path]
 Task(subagent_type="docs-manager", prompt="Evaluate docs impact for changes: [file-list]. Update docs/ directory if needed. State explicitly: Docs impact: [none|minor|major]", description="Update docs")
 ```
 
+**Memory capture:**
+```
+Task(subagent_type="general-purpose", prompt="Run meow:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append to memory/lessons.md. Update memory/patterns.json with new entries including category, severity, applicable_when fields. Files to modify: .claude/memory/lessons.md, .claude/memory/patterns.json", description="Session memory capture")
+```
+
 ## UI Work (Conditional)
 
 If task involves frontend:

@@ -96,6 +96,7 @@ flowchart TD
 | 4 Review      | `code-reviewer` via `meow:review` | **MUST** spawn — Gate 2                  |
 | 5 Ship        | `git-manager` via `meow:ship`     | **MUST** spawn — commit + PR             |
 | 6 Reflect     | `project-manager`, `docs-manager` | **MUST** spawn — sync-back + docs        |
+| 6 Reflect     | `meow:memory` session-capture     | **MUST** spawn — 3-category learning extraction |
 
 See `references/subagent-patterns.md` for Task() invocation patterns.
 See `references/workflow-steps.md` for detailed per-phase instructions.

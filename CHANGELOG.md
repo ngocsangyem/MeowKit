@@ -2,6 +2,12 @@
 
 All notable changes to MeowKit are documented here. This file is auto-updated by [semantic-release](https://github.com/semantic-release/semantic-release) on future releases.
 
+## [1.2.1](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.2.1) (2026-03-31)
+
+### Bug Fixes
+
+- **memory capture at Phase 6 now enforced** — `meow:cook` Phase 6 (Reflect) now spawns a dedicated subagent for `meow:memory` session-capture, matching the same MUST-spawn enforcement as project-manager and docs-manager. Previously memory write was a bullet point instruction that could be skipped if session was interrupted.
+
 ## [1.2.0](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.2.0) (2026-03-31)
 
 ### Features

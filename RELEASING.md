@@ -287,6 +287,7 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v1.2.1  | 2026-03-31 | Memory capture enforcement fix    |
 | v1.2.0  | 2026-03-31 | The Memory Activation Release    |
 | v1.1.0  | 2026-03-30 | The Reasoning Depth Release      |
 | v1.0.0  | 2026-03-30 | The Disciplined Velocity Release |

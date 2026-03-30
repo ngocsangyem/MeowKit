@@ -139,9 +139,10 @@ Three mandatory subagents in parallel:
    Task(subagent_type="docs-manager", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
    ```
 
-3. **Memory write:**
-   - Append to `memory/lessons.md`: what was learned this session
-   - Update `memory/patterns.json`: new patterns with type, context, frequency
+3. **Memory capture (MUST spawn):**
+   ```
+   Task(subagent_type="general-purpose", prompt="Run meow:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append to memory/lessons.md. Update memory/patterns.json with new entries including category, severity, applicable_when fields. Files to modify: .claude/memory/lessons.md, .claude/memory/patterns.json", description="Session memory capture")
+   ```
 
 4. `TaskUpdate` → mark all Claude Tasks complete after sync-back
 
