@@ -8,7 +8,7 @@
     "build": "npm -w packages/create-meowkit run build && npm -w packages/meowkit run build",
     "dev": "npm -w packages/create-meowkit run dev",
     "lint": "eslint packages/*/src/**/*.ts",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p packages/create-meowkit/tsconfig.json && tsc --noEmit -p packages/meowkit/tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest"
   },
