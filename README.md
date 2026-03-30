@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  49 skills &middot; 14 agents &middot; 18 commands &middot; 7 modes &middot; 14 rules &middot; 6 hooks &middot; 4-layer security
+  58 skills &middot; 15 agents &middot; 18 commands &middot; 7 modes &middot; 17 rules &middot; 9 hooks &middot; 4-layer security
 </p>
 
 <p align="center">
@@ -54,10 +54,10 @@ npx meowkit-cli doctor     # Verify environment
 ```
 meowkit/
 ├── .claude/                  Source of truth — agents, skills, rules, hooks
-│   ├── agents/               14 specialist agents
-│   ├── skills/               49 skills (meow: namespace)
-│   ├── rules/                14 enforcement rules
-│   ├── hooks/                6 lifecycle hooks
+│   ├── agents/               15 specialist agents
+│   ├── skills/               58 skills (meow: namespace)
+│   ├── rules/                17 enforcement rules
+│   ├── hooks/                9 lifecycle hooks
 │   ├── commands/             18 slash commands
 │   ├── modes/                7 behavioral modes
 │   ├── scripts/              Python validators + shell utilities
@@ -73,57 +73,9 @@ meowkit/
 └── .github/workflows/        CI/CD (release, beta, PR validation)
 ```
 
-## Release & Publishing
+## Releasing
 
-### How releases work
-
-1. **Source of truth:** `.claude/`, `tasks/`, `CLAUDE.md` at repo root
-2. **GitHub Release:** `prepare-release-assets.cjs` zips these into `meowkit-release.zip`
-3. **npm CLI:** `create-meowkit` is a thin CLI that downloads the zip at runtime
-4. **Version channels:** `main` branch = stable, `dev` branch = beta
-
-### Manual release
-
-```bash
-# 1. Build release assets
-node scripts/prepare-release-assets.cjs "<version>"
-
-# 2. Tag and push
-git tag v<version>
-git push origin v<version>
-
-# 3. Create GitHub release
-gh release create v<version> dist/meowkit-release.zip#"MeowKit Release Package" \
-  --title "v<version>" --notes "Release notes here"
-
-# 4. Publish CLI packages to npm
-cd packages/create-meowkit && npm publish
-cd ../meowkit && npm publish
-```
-
-### Automated release (CI/CD)
-
-Push to `main` or `dev` triggers GitHub Actions:
-
-- Semantic-release analyzes commits, determines version
-- Syncs version across both packages
-- Builds release zip, creates GitHub Release
-- Publishes both packages to npm
-
-```bash
-# Conventional commits drive version bumps
-feat: new skill      → MINOR (0.1.0 → 0.2.0)
-fix: skill bug       → PATCH (0.2.0 → 0.2.1)
-feat!: breaking      → MAJOR (0.2.1 → 1.0.0)
-```
-
-### Release scripts
-
-| Script                                  | Purpose                                 |
-| --------------------------------------- | --------------------------------------- |
-| `scripts/sync-package-versions.cjs`     | Sync version across both packages       |
-| `scripts/generate-release-manifest.cjs` | SHA-256 checksums for all release files |
-| `scripts/prepare-release-assets.cjs`    | Metadata + manifest + zip archive       |
+See **[RELEASING.md](RELEASING.md)** for the complete release guide — manual steps, CI/CD automation, troubleshooting.
 
 ## Development
 
