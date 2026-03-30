@@ -5,6 +5,42 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 1.2.0 (2026-03-31) — The Memory Activation Release
+
+Fixed the dormant memory system and enriched it with cross-framework insights from 6 agent frameworks (Khuym, GSD, Superpowers, gstack, CKE, BMAD). Theme: **activate the memory pipeline and enrich the learning format**.
+
+### Memory Capture Pipeline
+
+- **Fixed Stop hook** — `post-session.sh` now writes structured `NEEDS_CAPTURE` markers instead of invisible HTML comment placeholders
+- **Retroactive capture** — Phase 0 processes pending markers from previous sessions (max 3 markers, 2-min budget), reconstructing learnings from `git log`
+- **Live capture** — Phase 5 captures non-obvious decisions, corrections, and rejected approaches before shipping. Preserves WHY decisions were made (retroactive can only recover WHAT)
+
+### Enriched Learning Format
+
+- **3-category extraction** — Session learnings captured as patterns, decisions, or failures (inspired by Khuym compounding's 3-agent analysis)
+- **New `patterns.json` fields** — `category` (pattern/decision/failure), `severity` (critical/standard), `applicable_when` (condition sentence). All optional, backward compatible
+- **Stronger promotion criteria** — Patterns promoted to CLAUDE.md only when: frequency ≥ 3, severity = critical OR frequency ≥ 5, generalizable, saves ≥ 30 min. Human approval still required
+
+### Consolidation
+
+- **Consolidation rubric** — New reference with 4-branch classification: clear match (auto-merge), ambiguous (ask user), no match (create new), no durable signal (skip). Inspired by Khuym dream skill
+- **Manual invocation** — Run when memory reaches thresholds: 20+ sessions, 50+ patterns, 500+ cost entries
+
+### Documentation
+
+- **`docs/memory-system.md`** — Comprehensive guide covering architecture, activation, session capture, pattern promotion, consolidation, schema reference, FAQ, limitations, migration
+- **VitePress updates** — Rewrote memory-system guide, updated workflow-phases (Phase 0 + 5 + 6), updated analyst agent, updated memory skill reference
+- **Cross-framework research** — 6 frameworks analyzed. Claude Code dream confirmed in binary (v2.1.83) but NOT officially documented — deferred for MeowKit
+
+### Deferred to v1.3+
+
+- `meow:dream` background consolidation (memory empty — nothing to consolidate yet)
+- Git-as-memory-log pattern from CKE
+- L3-L5 layered memory (vector DB) from CKE
+- Automatic cross-machine memory sync
+
+---
+
 ## 1.1.0 (2026-03-30) — The Reasoning Depth Release
 
 Focused upgrade: deeper review reasoning, resumable builds, and systematic coverage mapping. Inspired by comparative analysis of BMAD-METHOD, ClaudeKit-Engineer, Khuym Skills, and Get-Shit-Done. Theme: **improve execution reliability and reasoning quality without adding architectural complexity**.
@@ -104,6 +140,19 @@ The biggest MeowKit update yet. 13 new capabilities inspired by deep analysis of
 
 None. All additions are backward-compatible.
 
-## Pre-1.0 (2026-03-29)
+## 0.1.2 (2026-03-29)
 
-All pre-1.0 changes are consolidated into the 1.0.0 release above.
+- Interactive version selection when running `npm create meowkit@latest`
+- git-manager agent for commit/push workflows
+- Confirmation step before Gemini API key input
+
+## 0.1.1 (2026-03-29)
+
+- Exclude runtime dirs (session-state, memory, logs) from release zip and git tracking
+
+## 0.1.0 (2026-03-29)
+
+- Initial pre-release of MeowKit agent toolkit
+- Core skill set (cook, fix, ship, review, memory, testing)
+- Sequential thinking and fix diagnosis references
+- prepare-release-assets script for GitHub Release packaging
