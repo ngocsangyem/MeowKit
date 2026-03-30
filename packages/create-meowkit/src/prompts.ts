@@ -26,24 +26,32 @@ export async function promptUser(): Promise<UserConfig> {
   });
   handleCancel(description);
 
-  // Gemini API key (optional)
-  const geminiApiKey = await p.text({
-    message: "Gemini API key (optional — for image/video/audio analysis)",
-    placeholder: "Press Enter to skip",
-    validate(value) {
-      if (!value || value.trim().length === 0) return undefined;
-      if (value.trim().length < 10) return "Key too short. Get one at aistudio.google.com/apikey";
-      return undefined;
-    },
+  // Gemini API key (optional) — ask y/n first, then prompt for key if yes
+  const addGeminiKey = await p.confirm({
+    message: "Add Gemini API key? (for image/video/audio analysis)",
+    initialValue: false,
   });
-  handleCancel(geminiApiKey);
+  handleCancel(addGeminiKey);
 
-  const geminiKey = typeof geminiApiKey === "string" && geminiApiKey.trim().length > 0
-    ? geminiApiKey.trim()
-    : null;
+  let geminiKey: string | null = null;
 
-  if (geminiKey) {
-    p.log.success("Gemini API key will be saved to .claude/.env");
+  if (addGeminiKey) {
+    const geminiApiKey = await p.text({
+      message: "Enter your Gemini API key",
+      placeholder: "Get one at aistudio.google.com/apikey",
+      validate(value: string) {
+        if (!value || value.trim().length === 0) return "API key is required";
+        if (value.trim().length < 10) return "Key too short. Get one at aistudio.google.com/apikey";
+        return undefined;
+      },
+    });
+    handleCancel(geminiApiKey);
+
+    geminiKey = typeof geminiApiKey === "string" ? geminiApiKey.trim() : null;
+
+    if (geminiKey) {
+      p.log.success("Gemini API key will be saved to .claude/.env");
+    }
   }
 
   p.outro(pc.green("Configuration complete!"));
