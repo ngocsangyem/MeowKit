@@ -55,7 +55,13 @@ export default withMermaid(defineConfig({
         {
           text: 'Core Concepts',
           items: [
-            { text: 'What\'s New', link: '/guide/whats-new' },
+            { text: 'What\'s New', link: '/guide/whats-new',
+              items: [
+                { text: 'v1.1.0 — Reasoning Depth', link: '/guide/whats-new/v1.1.0' },
+                { text: 'v1.0.0 — Disciplined Velocity', link: '/guide/whats-new/v1.0.0' },
+              ],
+              collapsed: true,
+            },
             { text: 'Philosophy', link: '/guide/philosophy' },
             { text: 'Workflow Phases (0-6)', link: '/guide/workflow-phases' },
             { text: 'Model Routing', link: '/guide/model-routing' },
