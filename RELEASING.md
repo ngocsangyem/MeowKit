@@ -18,10 +18,10 @@ create-meowkit CLI fetches zip at npm create meowkit@latest
 
 ## Version Channels
 
-| Branch | npm Tag | GitHub Release | Example |
-|--------|---------|----------------|---------|
-| `main` | `@latest` | Stable | `v1.2.0` |
-| `dev` | `@beta` | Pre-release | `v1.3.0-beta.1` |
+| Branch | npm Tag   | GitHub Release | Example         |
+| ------ | --------- | -------------- | --------------- |
+| `main` | `@latest` | Stable         | `v1.2.0`        |
+| `dev`  | `@beta`   | Pre-release    | `v1.3.0-beta.1` |
 
 ## Manual Release (Step-by-Step)
 
@@ -66,14 +66,14 @@ In `website/guide/whats-new.md`, add a summary section for the new version at th
 
 Check and update these pages if the release affects them:
 
-| Page | Update when |
-|------|------------|
-| `guide/memory-system.md` | Memory schema, capture, or consolidation changes |
-| `guide/workflow-phases.md` | Phase behavior changes (new steps, hook changes) |
-| `guide/agent-skill-architecture.md` | New skills, agents, or Mermaid diagram changes |
-| `guide/model-routing.md` | Model tier or routing changes |
-| `reference/agents/*.md` | Agent capability changes |
-| `reference/skills/*.md` | Skill behavior or schema changes |
+| Page                                | Update when                                      |
+| ----------------------------------- | ------------------------------------------------ |
+| `guide/memory-system.md`            | Memory schema, capture, or consolidation changes |
+| `guide/workflow-phases.md`          | Phase behavior changes (new steps, hook changes) |
+| `guide/agent-skill-architecture.md` | New skills, agents, or Mermaid diagram changes   |
+| `guide/model-routing.md`            | Model tier or routing changes                    |
+| `reference/agents/*.md`             | Agent capability changes                         |
+| `reference/skills/*.md`             | Skill behavior or schema changes                 |
 
 #### 1e. Verify VitePress builds
 
@@ -91,12 +91,15 @@ Add a new version section at the top of `CHANGELOG.md`:
 ## [<version>](https://github.com/ngocsangyem/MeowKit/releases/tag/v<version>) (YYYY-MM-DD)
 
 ### Features
+
 - **feature name** — description
 
 ### Documentation
+
 - description of doc changes
 
 ### Bug Fixes (if any)
+
 - description
 ```
 
@@ -125,11 +128,13 @@ node scripts/prepare-release-assets.cjs "<version>"
 ```
 
 This creates:
+
 - `.claude/metadata.json` — version metadata
 - `release-manifest.json` — SHA-256 checksums for all files
 - `dist/meowkit-release.zip` — the release package (`.claude/` + `tasks/` + `CLAUDE.md` + manifest)
 
 Verify the zip:
+
 ```bash
 python3 -c "import os,zipfile; z=zipfile.ZipFile('dist/meowkit-release.zip'); print(f'Size: {os.path.getsize(\"dist/meowkit-release.zip\")/1024:.0f} KB, Files: {len(z.namelist())}')"
 ```
@@ -155,7 +160,7 @@ git push origin v<version>
 
 **This is the critical step.** The zip file MUST be attached as a release asset.
 
-```bash
+````bash
 gh release create v<version> dist/meowkit-release.zip \
   --title "v<version> — <release title>" \
   --notes-file - <<'NOTES'
@@ -169,20 +174,9 @@ gh release create v<version> dist/meowkit-release.zip \
 npm create meowkit@latest
 # or upgrade:
 npx mewkit upgrade
-```
-NOTES
-```
+````
 
-**If `dist/` is blocked by hooks** (e.g., scout-block), copy the zip to `/tmp` first:
-
-```bash
-cp dist/meowkit-release.zip /tmp/meowkit-v<version>.zip
-gh release create v<version> /tmp/meowkit-v<version>.zip \
-  --title "v<version> — <release title>" \
-  --notes "..."
-```
-
-Or create the release first, then upload separately:
+Upload separately:
 
 ```bash
 gh release create v<version> --title "..." --notes "..."
@@ -225,6 +219,7 @@ Copy this checklist for each release:
 ## Release v<version> Checklist
 
 ### Docs
+
 - [ ] Created `website/guide/whats-new/v<version>.md`
 - [ ] Updated `website/.vitepress/config.ts` sidebar
 - [ ] Updated `website/guide/whats-new.md` index
@@ -232,15 +227,18 @@ Copy this checklist for each release:
 - [ ] VitePress build passes (`npx vitepress build`)
 
 ### Changelog
+
 - [ ] Added v<version> section to `CHANGELOG.md`
 
 ### Build
+
 - [ ] `npm run build` passes
 - [ ] `npm run lint` passes
 - [ ] `npm run typecheck` passes
 - [ ] `npm test` passes
 
 ### Release
+
 - [ ] `prepare-release-assets.cjs` ran successfully
 - [ ] `dist/meowkit-release.zip` exists with expected size
 - [ ] Committed and tagged
@@ -249,6 +247,7 @@ Copy this checklist for each release:
 - [ ] Release notes include install instructions
 
 ### Verify
+
 - [ ] `gh release view v<version>` shows asset
 - [ ] `npx create-meowkit@latest` fetches new version (if npm published)
 ```
@@ -278,19 +277,19 @@ docs: update readme        → no release
 
 ## Release Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `scripts/sync-package-versions.cjs` | Sync version across both npm packages |
-| `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files |
-| `scripts/prepare-release-assets.cjs` | Build metadata.json + manifest + dist/meowkit-release.zip |
+| Script                                  | Purpose                                                   |
+| --------------------------------------- | --------------------------------------------------------- |
+| `scripts/sync-package-versions.cjs`     | Sync version across both npm packages                     |
+| `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files          |
+| `scripts/prepare-release-assets.cjs`    | Build metadata.json + manifest + dist/meowkit-release.zip |
 
 ## Release History
 
-| Version | Date | Title |
-|---------|------|-------|
-| v1.2.0 | 2026-03-31 | The Memory Activation Release |
-| v1.1.0 | 2026-03-30 | The Reasoning Depth Release |
-| v1.0.0 | 2026-03-30 | The Disciplined Velocity Release |
+| Version | Date       | Title                            |
+| ------- | ---------- | -------------------------------- |
+| v1.2.0  | 2026-03-31 | The Memory Activation Release    |
+| v1.1.0  | 2026-03-30 | The Reasoning Depth Release      |
+| v1.0.0  | 2026-03-30 | The Disciplined Velocity Release |
 
 ## Troubleshooting
 
@@ -299,6 +298,7 @@ docs: update readme        → no release
 **Cause:** The target release has no `meowkit-release.zip` asset. The code in `github-releases.ts` filters out releases without a `.zip` asset.
 
 **Fix:** Upload the zip to the release:
+
 ```bash
 gh release upload v<version> dist/meowkit-release.zip --clobber
 ```
@@ -325,11 +325,3 @@ gh release upload v<version> dist/meowkit-release.zip --clobber
 ### Semantic-release skips release
 
 No `feat:` or `fix:` commits since last release. Add a commit with the right prefix, or use `--force` on the workflow dispatch.
-
-### `dist/` blocked by hooks
-
-The scout-block hook may prevent bash commands from accessing `dist/`. Workarounds:
-
-1. Copy zip to `/tmp` via python: `python3 -c "import shutil; shutil.copy2('dist/meowkit-release.zip', '/tmp/meowkit-release.zip')"`
-2. Use glob to bypass pattern matching: `cp di*/meowkit-release.zip /tmp/`
-3. Create release first, upload asset separately from `/tmp`
