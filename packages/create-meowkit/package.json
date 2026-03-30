@@ -1,6 +1,6 @@
 {
   "name": "create-meowkit",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Scaffold a MeowKit AI agent toolkit for your project",
   "type": "module",
   "bin": {
