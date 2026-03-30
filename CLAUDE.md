@@ -89,10 +89,13 @@ Full rules: `.claude/rules/injection-rules.md`
 
 Read at session start. Update at session end.
 
-- `memory/lessons.md` — session learnings
-- `memory/patterns.json` — recurring patterns
+- `memory/lessons.md` — session learnings (patterns/decisions/failures)
+- `memory/patterns.json` — recurring patterns with category, severity, applicable_when
 - `memory/cost-log.json` — token usage per task
 - `memory/decisions.md` — architecture decisions
+
+**IMPORTANT:** At Phase 0, check `memory/lessons.md` for sessions marked "NEEDS_CAPTURE". Process at most 3 recent markers (skip older as "skipped-too-old"). Use `meow:memory` session-capture to fill in learnings from git log, then change status to "captured". Budget: max 2 minutes total.
+**IMPORTANT:** Before Phase 5 (Ship), if the session produced non-obvious decisions, corrections, or rejected approaches, append a brief note to `memory/lessons.md` with status "live-captured". This preserves WHY decisions were made.
 
 ## Docs Retrieval
 

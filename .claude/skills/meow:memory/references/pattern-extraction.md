@@ -18,11 +18,17 @@ Read `memory/patterns.json` and load all patterns.
 cat memory/patterns.json | python -m json.tool
 ```
 
-### Step 2: Identify High-Frequency Patterns
+### Step 2: Identify Promotion Candidates
 
-Filter patterns where `frequency >= 3`. These are patterns that have appeared across multiple sessions and are likely worth promoting to permanent rules.
+Filter patterns meeting ALL of these criteria:
+1. `frequency >= 3` — appeared across multiple sessions
+2. `severity == "critical"` OR `frequency >= 5` — high impact or very recurrent
+3. **Generalizable** — not so implementation-specific it's useless elsewhere
+4. **Saves ≥30 min** if known in advance — worth the CLAUDE.md context cost
 
 Sort by frequency (descending), then by lastSeen (most recent first).
+
+**Legacy entries:** Patterns without a `severity` field default to `"standard"`. They can still be promoted if frequency ≥ 5 (strong recurrence signal compensates for unknown severity).
 
 **Scope awareness:** Patterns with a `scope` field apply only within that path. When proposing rules, note the scope — scoped patterns become package-specific rules, not project-wide CLAUDE.md entries. Project-wide patterns (no `scope`) are candidates for CLAUDE.md rules.
 

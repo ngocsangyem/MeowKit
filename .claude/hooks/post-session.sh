@@ -19,13 +19,15 @@ fi
 # Get current timestamp
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M")
 
-# Append session marker to lessons.md
+# Count files in recent commits (captures actual work done)
+RECENT_FILES=$(git log --oneline -5 --name-only 2>/dev/null | grep -v '^[a-f0-9]' | sort -u | wc -l | tr -d ' ')
+
+# Append machine-readable session marker for Phase 0 retroactive capture
 cat >> "$MEMORY_DIR/lessons.md" << EOF
 
-## Session $TIMESTAMP
-
-<!-- Session placeholder — analyst agent will fill in learnings, decisions, and outcomes -->
-
+## Session $TIMESTAMP — NEEDS_CAPTURE
+- Files in recent commits: $RECENT_FILES
+- Status: uncaptured
 EOF
 
 # Initialize cost-log.json if missing
