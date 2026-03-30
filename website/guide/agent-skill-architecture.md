@@ -110,7 +110,7 @@ flowchart TD
     P5 --> S5[ship\nshipping\ncareful\ndocument-release]
 
     P5 --> P6[Phase 6: Reflect]
-    P6 --> S6[documentation\nmemory\nllms]
+    P6 --> S6[documentation\nmemory ⭐\nllms]
 ```
 
 ## Plan-First Gate Pattern

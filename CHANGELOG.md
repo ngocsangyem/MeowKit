@@ -2,6 +2,34 @@
 
 All notable changes to MeowKit are documented here. This file is auto-updated by [semantic-release](https://github.com/semantic-release/semantic-release) on future releases.
 
+## [1.2.0](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.2.0) (2026-03-31)
+
+### Features
+
+* **memory capture pipeline** — fixed Stop hook to write structured NEEDS_CAPTURE markers instead of HTML comment placeholders
+* **retroactive capture** — Phase 0 now processes pending capture markers from previous sessions (max 3, 2-min budget)
+* **live capture** — Phase 5 captures non-obvious decisions, corrections, and rejected approaches before shipping
+* **3-category extraction** — session learnings captured as patterns, decisions, or failures (inspired by Khuym compounding)
+* **enriched patterns.json** — new optional fields: `category`, `severity`, `applicable_when` (backward compatible)
+* **stronger promotion criteria** — patterns promoted to CLAUDE.md only when: frequency ≥ 3, severity = critical OR frequency ≥ 5, generalizable, saves ≥ 30 min
+* **consolidation rubric** — new `consolidation.md` reference with 4-branch classification (clear match/ambiguous/no match/no durable signal)
+* **memory-system.md** — comprehensive developer guide covering architecture, activation, FAQ, limitations, migration
+
+### Documentation
+
+* new VitePress page: v1.2.0 — The Memory Activation Release
+* rewrote memory-system guide with capture pipeline, schema reference, consolidation triggers
+* updated workflow-phases: Phase 0 retroactive capture, Phase 5 live capture, Phase 6 3-category extraction
+* updated analyst agent reference with new capabilities
+* updated memory skill reference with consolidation + schema notes
+* added deferred status to auto-dream-reference.md with cross-framework research summary
+
+### Research
+
+* cross-framework analysis of 6 agent frameworks (Khuym, GSD, Superpowers, gstack, CKE, BMAD) for memory features
+* Khuym compounding and dream skills identified as strongest comparison — category split, consolidation rubric, promotion criteria adopted
+* dream feature confirmed in Claude Code binary (v2.1.83) but NOT officially documented by Anthropic — deferred for MeowKit
+
 ## [1.1.0](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.1.0) (2026-03-30)
 
 ### Features

@@ -9,7 +9,13 @@ Cost tracking and learning agent that extracts patterns, maintains institutional
 
 ## Overview
 
-The analyst is the terminal agent in the pipeline — it runs last (Phase 6) and passes to no one. It tracks token usage, generates cost reports, extracts recurring patterns into `memory/patterns.json`, and maintains lessons learned in `memory/lessons.md`. Every 10 sessions, it proposes updates to CLAUDE.md based on accumulated patterns (never auto-applies — always proposes for human review).
+The analyst runs at both ends of the pipeline — **Phase 0** (retroactive capture) and **Phase 6** (session extraction). It tracks token usage, generates cost reports, extracts recurring patterns into `memory/patterns.json`, and maintains lessons learned in `memory/lessons.md`.
+
+**Phase 0 (Orient):** Checks `lessons.md` for `NEEDS_CAPTURE` markers left by the Stop hook. Processes max 3 recent markers within a 2-min budget, reconstructing learnings from `git log`.
+
+**Phase 6 (Reflect):** Extracts learnings in 3 categories (patterns/decisions/failures), updates `patterns.json` with enriched fields (category, severity, applicable_when), and logs costs.
+
+Every 10 sessions, it proposes updates to CLAUDE.md based on accumulated patterns (never auto-applies — always proposes for human review).
 
 ## Quick Reference
 
@@ -17,12 +23,15 @@ The analyst is the terminal agent in the pipeline — it runs last (Phase 6) and
 
 | Capability | Details |
 |-----------|---------|
+| **Retroactive capture** | Phase 0: processes NEEDS_CAPTURE markers from previous sessions (max 3, 2-min budget) |
+| **3-category extraction** | Phase 6: captures patterns, decisions, and failures separately |
 | **Cost tracking** | Token usage per task in `memory/cost-log.json` |
 | **Cost reports** | `/meow:budget` — spend by task, agent, model tier, over time |
-| **Pattern extraction** | Recurring issues and solutions in `memory/patterns.json` |
+| **Pattern extraction** | Recurring issues and solutions in `memory/patterns.json` (with category, severity, applicable_when) |
 | **Lessons learned** | Human-readable learnings in `memory/lessons.md` |
-| **CLAUDE.md proposals** | After 10 sessions, proposes improvements (human-approved) |
+| **CLAUDE.md proposals** | After 10 sessions, proposes improvements (severity ≥ critical, saves ≥ 30min, human-approved) |
 | **Cost optimization** | Identifies tasks consistently over-classified to expensive tiers |
+| **Consolidation** | Manual: prunes stale patterns, merges duplicates, archives old cost data (when memory reaches scale) |
 
 ## How to Use
 

@@ -15,6 +15,7 @@ Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has 
 
 - Read `docs/project-context.md` (agent constitution — loaded first, always; auto-injected by `project-context-loader.sh` hook)
 - Read `memory/lessons.md` and `memory/patterns.json`
+- **Retroactive capture:** check `lessons.md` for `NEEDS_CAPTURE` markers from previous sessions. Process at most 3 recent markers (2-min budget). Reconstructs learnings from `git log`. Skip markers with 0 files touched. Mark older ones as `skipped-too-old`
 - Run `meow:scale-routing` — domain-based complexity classification (CSV-driven)
 - Load stack-relevant skills only (lazy loading)
 - Route: assign model tier by task complexity (Haiku / Sonnet / Opus)
@@ -129,6 +130,7 @@ No skill automatically chains into another. You decide the review depth.
 **Agent:** shipper  
 **Deliverable:** PR URL + rollback documentation
 
+- **Live capture:** before shipping, if the session produced non-obvious decisions, corrections, or rejected approaches, append a brief note to `memory/lessons.md` with status `live-captured`. This preserves WHY decisions were made — retroactive capture can only recover WHAT
 - `pre-ship.sh` hook: full test + lint + typecheck
 - Conventional commit (auto-generated)
 - PR — never push to main directly
@@ -140,8 +142,9 @@ No skill automatically chains into another. You decide the review depth.
 **Agent:** documenter, analyst
 **Deliverable:** Updated memory + documentation
 
-- Capture patterns to `memory/`
-- Update `memory/lessons.md` and `memory/cost-log.json`
+- **3-category extraction:** capture learnings as patterns, decisions, or failures
+- Update `memory/patterns.json` with new entries (category, severity, applicable_when fields)
+- Update `memory/cost-log.json` with token usage
 - Sync affected documentation
 - Close sprint task
 

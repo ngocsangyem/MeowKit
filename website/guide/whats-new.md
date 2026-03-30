@@ -10,6 +10,17 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### [v1.2.0 — The Memory Activation Release](/guide/whats-new/v1.2.0)
+
+Fixed the dormant memory system and enriched it with cross-framework insights.
+
+- **Session capture pipeline fixed:** Stop hook → NEEDS_CAPTURE markers → Phase 0 retroactive capture
+- **3-category extraction:** Learnings captured as patterns, decisions, or failures (from Khuym compounding)
+- **Enriched schema:** New `category`, `severity`, `applicable_when` fields in patterns.json
+- **Consolidation rubric:** 4-branch classification (clear match/ambiguous/no match/no durable signal)
+- **Stronger promotion:** Severity + ≥30 min savings required alongside frequency ≥ 3
+- **Comprehensive docs:** New `memory-system.md` guide + updated VitePress pages
+
 ### [v1.1.0 — The Reasoning Depth Release](/guide/whats-new/v1.1.0)
 
 Deeper review reasoning, resumable builds, and systematic coverage mapping.

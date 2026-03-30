@@ -57,6 +57,7 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'What\'s New', link: '/guide/whats-new',
               items: [
+                { text: 'v1.2.0 — Memory Activation', link: '/guide/whats-new/v1.2.0' },
                 { text: 'v1.1.0 — Reasoning Depth', link: '/guide/whats-new/v1.1.0' },
                 { text: 'v1.0.0 — Disciplined Velocity', link: '/guide/whats-new/v1.0.0' },
               ],
