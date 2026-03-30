@@ -121,6 +121,8 @@ export default withMermaid(defineConfig({
           collapsed: true,
           items: [
             { text: 'meow:review', link: '/reference/skills/review' },
+            { text: 'meow:elicit', link: '/reference/skills/elicit' },
+            { text: 'meow:nyquist', link: '/reference/skills/nyquist' },
             { text: 'meow:cso', link: '/reference/skills/cso' },
             { text: 'meow:vulnerability-scanner', link: '/reference/skills/vulnerability-scanner' },
             { text: 'meow:clean-code', link: '/reference/skills/clean-code' },
@@ -132,6 +134,7 @@ export default withMermaid(defineConfig({
           collapsed: true,
           items: [
             { text: 'meow:plan-creator', link: '/reference/skills/plan-creator' },
+            { text: 'meow:validate-plan', link: '/reference/skills/validate-plan' },
             { text: 'meow:plan-ceo-review', link: '/reference/skills/plan-ceo-review' },
             { text: 'meow:plan-eng-review', link: '/reference/skills/plan-eng-review' },
             { text: 'meow:office-hours', link: '/reference/skills/office-hours' },
@@ -228,6 +231,14 @@ export default withMermaid(defineConfig({
             { text: 'Bug Fix', link: '/reference/templates/bug-fix' },
             { text: 'Refactor', link: '/reference/templates/refactor' },
             { text: 'Security Audit', link: '/reference/templates/security-audit' },
+          ],
+        },
+        {
+          text: 'Indexes',
+          items: [
+            { text: 'Rules Index', link: '/reference/rules-index' },
+            { text: 'Agents Index', link: '/reference/agents-index' },
+            { text: 'Skills Index', link: '/reference/skills-index' },
           ],
         },
         {
