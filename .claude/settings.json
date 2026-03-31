@@ -48,6 +48,12 @@
             "type": "command",
             "command": "sh .claude/hooks/pre-task-check.sh \"$TOOL_INPUT_COMMAND\"",
             "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/pre-ship.sh \"$TOOL_INPUT_COMMAND\"",
+            "timeout": 30000,
+            "statusMessage": "Running pre-ship validation..."
           }
         ]
       }

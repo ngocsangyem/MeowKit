@@ -80,11 +80,11 @@ Note: This runs ONCE at phase start, not on every file write (too expensive as a
 5. Run type checking after each file modification
 6. If tests fail after implementation:
    - Self-heal up to 3 attempts (each attempt tries a DIFFERENT approach)
-   - After 3 failures → spawn `debugger` subagent via `meow:investigate`:
+   - After 3 failures → spawn `researcher` subagent via `meow:investigate`:
      ```
-     Task(subagent_type="debugger", prompt="Analyze test failures: [output]. Root cause analysis.", description="Debug test failures")
+     Task(subagent_type="researcher", prompt="Analyze test failures using meow:investigate + meow:sequential-thinking: [output]. Root cause analysis.", description="Debug test failures")
      ```
-   - After debugger report → fix and retry
+   - After analysis report → fix and retry
    - After 3 more failures → STOP, escalate to user with: failing output, attempted fixes, suspected root cause
 
 **Parallel mode:**
@@ -102,9 +102,9 @@ Present implementation summary. Ask: "Proceed to review?" / "Request changes" / 
 
 ### Code Review (MANDATORY subagent)
 
-Spawn `code-reviewer` subagent:
+Spawn `reviewer` subagent:
 ```
-Task(subagent_type="code-reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY.", description="Code review")
+Task(subagent_type="reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY.", description="Code review")
 ```
 
 See `review-cycle.md` for interactive vs auto handling.
@@ -125,12 +125,14 @@ Run `.claude/skills/meow:cook/scripts/validate-gate-2.sh` before presenting for 
 
 ## Phase 5: Ship (after Gate 2 approval)
 
-Spawn `git-manager` subagent:
+Spawn `shipper` subagent (NOT git-manager — shipper runs full ship sequence including pre-ship checks, CI verification, and rollback docs):
 ```
-Task(subagent_type="git-manager", prompt="Stage and commit changes with conventional commit message. Create PR if on feature branch.", description="Commit + PR")
+Task(subagent_type="shipper", prompt="Ship changes: 1) Run pre-ship.sh (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use meow:ship skill.", description="Ship + PR")
 ```
 
-**Output:** `Phase 5: Ship — committed, PR created`
+Note: `git-manager` handles raw git operations only (commit, push). `shipper` orchestrates the full ship pipeline including validation and documentation.
+
+**Output:** `Phase 5: Ship — committed, PR created, CI verified`
 
 ## Phase 6: Reflect (MANDATORY — never skip)
 
