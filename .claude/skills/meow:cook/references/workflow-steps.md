@@ -66,6 +66,13 @@ Present test list. Ask: "Proceed to implementation?" / "Adjust tests" / "Abort"
 
 Implement code until all tests pass. TDD: implement ONLY enough to make tests pass.
 
+**Pre-check (TDD enforcement):** Before writing any implementation code, run:
+```bash
+sh .claude/hooks/pre-implement.sh "<feature-name>"
+```
+This verifies failing tests exist. If tests pass (no red), implementation is BLOCKED — go back to Phase 2.
+Note: This runs ONCE at phase start, not on every file write (too expensive as a per-edit hook).
+
 1. **TaskList first** — check for existing tasks (may be hydrated by planning skill)
 2. If tasks exist → pick them up. If not → `TaskCreate` from plan phases with priority + metadata
 3. `TaskUpdate` → mark tasks `in_progress` immediately when starting

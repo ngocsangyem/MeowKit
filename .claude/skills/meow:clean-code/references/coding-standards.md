@@ -69,11 +69,11 @@ MeowKit validation scripts live at `.claude/scripts/`, not inside individual ski
 
 | Script               | Purpose                     | Command                                     |
 | -------------------- | --------------------------- | ------------------------------------------- |
-| `validate.py`        | General code validation     | `python .claude/scripts/validate.py`        |
-| `security-scan.py`   | Security pattern scanning   | `python .claude/scripts/security-scan.py`   |
-| `injection-audit.py` | Prompt injection detection  | `python .claude/scripts/injection-audit.py` |
-| `validate-docs.py`   | Documentation consistency   | `python .claude/scripts/validate-docs.py`   |
-| `checklist.py`       | Review checklist automation | `python .claude/scripts/checklist.py`       |
+| `validate.py`        | General code validation     | `.claude/skills/.venv/bin/python3 .claude/scripts/validate.py`        |
+| `security-scan.py`   | Security pattern scanning   | `.claude/skills/.venv/bin/python3 .claude/scripts/security-scan.py`   |
+| `injection-audit.py` | Prompt injection detection  | `.claude/skills/.venv/bin/python3 .claude/scripts/injection-audit.py` |
+| `validate-docs.py`   | Documentation consistency   | `.claude/skills/.venv/bin/python3 .claude/scripts/validate-docs.py`   |
+| `checklist.py`       | Review checklist automation | `.claude/skills/.venv/bin/python3 .claude/scripts/checklist.py`       |
 
 **For project-specific linting/testing:** Use the project's own toolchain (e.g., `npm run lint`, `npm test`, `pytest`). MeowKit's developer agent handles this automatically.
 

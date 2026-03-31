@@ -29,8 +29,8 @@ Located at `.claude/scripts/` — project-level scripts for deterministic valida
 
 | Script             | Purpose                   | Command                                       |
 | ------------------ | ------------------------- | --------------------------------------------- |
-| `validate.py`      | General code validation   | `python .claude/scripts/validate.py`          |
-| `security-scan.py` | Security pattern scanning | `python .claude/scripts/security-scan.py`     |
+| `validate.py`      | General code validation   | `.claude/skills/.venv/bin/python3 .claude/scripts/validate.py`          |
+| `security-scan.py` | Security pattern scanning | `.claude/skills/.venv/bin/python3 .claude/scripts/security-scan.py`     |
 
 Run these in addition to ecosystem linters — they check MeowKit-specific patterns.
 
@@ -40,7 +40,7 @@ Run these in addition to ecosystem linters — they check MeowKit-specific patte
 Write/Edit code
   → npm run lint && npx tsc --noEmit   (Node.js/TS)
   → ruff check . --fix && mypy .       (Python)
-  → python .claude/scripts/validate.py (all)
+  → .claude/skills/.venv/bin/python3 .claude/scripts/validate.py (all)
   → Fix errors → repeat until clean
 ```
 

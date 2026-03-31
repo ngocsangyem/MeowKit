@@ -81,7 +81,8 @@ Test count is determined by acceptance criteria count, NOT change size.
 A one-line change that affects auth needs the same test rigor as a 500-line feature.
 WHY: "It's just a one-liner" preceded 40% of production incidents in industry post-mortems.
 
-### No Mock Substitution
+### No Mock Substitution for Integration Tests
 NEVER replace integration tests with mocks to make tests pass faster.
 If a test needs a database, it needs a database.
-WHY: Mocked tests that pass while production breaks is worse than no tests at all.
+Unit tests MAY mock dependencies per `meow:testing` red-green-refactor.md guidance — mocking is appropriate for isolating logic in unit tests, NOT for avoiding real infrastructure in integration tests.
+WHY: Mocked integration tests that pass while production breaks is worse than no tests at all.

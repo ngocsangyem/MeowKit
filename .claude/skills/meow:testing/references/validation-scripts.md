@@ -28,7 +28,7 @@ General validation script that checks code quality and correctness.
 
 **How to run:**
 ```bash
-python .claude/scripts/validate.py
+.claude/skills/.venv/bin/python3 .claude/scripts/validate.py
 ```
 
 **Exit codes:**
@@ -49,7 +49,7 @@ Security-focused validation. See `review/security-checklist.md` for the full lis
 
 **How to run:**
 ```bash
-python .claude/scripts/security-scan.py
+.claude/skills/.venv/bin/python3 .claude/scripts/security-scan.py
 ```
 
 **Exit codes:**

@@ -25,8 +25,8 @@ npm run lint      # or: yarn lint, flake8, swiftlint
 npx tsc --noEmit  # or: mypy, swift build
 
 # Run validation scripts
-python .claude/scripts/validate.py
-python .claude/scripts/security-scan.py
+.claude/skills/.venv/bin/python3 .claude/scripts/validate.py
+.claude/skills/.venv/bin/python3 .claude/scripts/security-scan.py
 ```
 
 **Gate:** If ANY command exits with a non-zero code, STOP. Fix the issue before proceeding.
