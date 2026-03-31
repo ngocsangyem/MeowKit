@@ -1,6 +1,6 @@
 {
   "name": "mewkit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MeowKit runtime CLI — upgrade, validate, budget, memory, doctor",
   "type": "module",
   "bin": {

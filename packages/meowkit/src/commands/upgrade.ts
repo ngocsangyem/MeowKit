@@ -18,11 +18,12 @@ interface UpgradeArgs {
 
 function getLocalVersion(): string | null {
   try {
-    const output = execSync("npm list -g create-meowkit --json 2>/dev/null", {
+    // Check version via npx — no global install required
+    const output = execSync("npx --yes create-meowkit --version 2>/dev/null", {
       encoding: "utf-8",
+      timeout: 15000,
     });
-    const parsed = JSON.parse(output) as { dependencies?: { "create-meowkit"?: { version?: string } } };
-    return parsed.dependencies?.["create-meowkit"]?.version ?? null;
+    return output.trim() || null;
   } catch {
     return null;
   }
@@ -100,7 +101,7 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
         console.log(
           pc.yellow(`Update available: ${localVersion ?? "none"} -> ${latest}`)
         );
-        console.log(pc.dim("Run `meowkit upgrade` to install."));
+        console.log(pc.dim("Run `npx mewkit upgrade` to install."));
       }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
@@ -109,14 +110,14 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
     return;
   }
 
-  // Perform upgrade
+  // Perform upgrade via npx (no global install)
   const tag = args.beta ? "beta" : "latest";
   const pkg = `create-meowkit@${tag}`;
 
-  console.log(pc.dim(`Installing ${pkg}...`));
+  console.log(pc.dim(`Running ${pkg} via npx...`));
 
   try {
-    execSync(`npm install -g ${pkg}`, {
+    execSync(`npx --yes ${pkg}`, {
       encoding: "utf-8",
       stdio: "inherit",
     });
