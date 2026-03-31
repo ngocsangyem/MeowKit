@@ -5,6 +5,37 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 1.3.0 (2026-03-31) — The Integration Integrity Release
+
+Full red-team audit: 98 components, 11 batches, 43 criticals found, 42 fixed.
+
+### Critical Fixes
+
+- **Hooks enforcement restored** — `gate-enforcement.sh` and `privacy-block.sh` were completely non-functional (argument mismatch). Fixed argument passing; now all 9 hooks registered and working.
+- **Agent naming standardized** — 5 phantom `subagent_type` values in Task() calls mapped to real agents
+- **7-phase model everywhere** — `workflow-orchestrator` migrated from 5-phase to 7-phase, Gate 2 no longer bypassable
+- **Path consistency** — plan files, memory, ADRs, scripts all use canonical full paths
+- **Verdict taxonomy unified** — PASS/WARN/FAIL everywhere, review dimensions aligned (Correctness/Maintainability/Performance/Security/Coverage)
+- **Python venv enforced** — all scripts use `.claude/skills/.venv/bin/python3`, SessionStart warns if missing
+- **pre-ship.sh guarded** — no longer runs test suite on every Bash call, only on git commit/push
+- **Security BLOCK → FAIL** — security agent BLOCK verdict now automatically fails Gate 2 Security dimension
+
+### Infrastructure
+
+- Created `tasks/plans/`, `tasks/reviews/`, `docs/architecture/adr/`, `session-state/` directories
+- Created missing templates: party prompts (agent-selector, synthesis), team-config ownership map
+- Created `meow:fix/references/gotchas.md` (7 anti-patterns)
+- Fixed `meow:development/references/skill-loader.md` — all 13+ broken paths corrected
+- Fixed mock guidance contradiction in tester agent (unit tests may mock, integration tests must not)
+
+### Documentation
+
+- **`docs/contribution-rules.md`** — 10-section rules from audit findings with pre-merge checklist
+- 11 detailed audit reports in `plans/reports/red-team-*`
+- Honest documentation: meow:careful now states 8/30 patterns are hook-enforced (was claiming all 30)
+
+---
+
 ## 1.2.1 (2026-03-31)
 
 - **fix:** `meow:cook` Phase 6 (Reflect) now spawns a dedicated subagent for `meow:memory` session-capture. Previously memory write was an inline bullet point that could be skipped if session was interrupted. Now enforced as MUST-spawn, matching project-manager and docs-manager.

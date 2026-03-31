@@ -10,6 +10,15 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### [v1.3.0 — The Integration Integrity Release](/guide/whats-new/v1.3.0)
+
+Full red-team audit of 98 components (15 agents, 60 skills, 9 hooks, 14 rules).
+
+- **42 critical fixes**: hooks, paths, agent names, phase model, verdicts, venv
+- **Hooks actually enforced**: gate-enforcement + privacy-block were non-functional since v1.0.0
+- **Contribution rules**: `docs/contribution-rules.md` — pre-merge checklist from audit findings
+- **11 audit reports**: detailed per-batch findings in `plans/reports/`
+
 ### [v1.2.0 — The Memory Activation Release](/guide/whats-new/v1.2.0)
 
 Fixed the dormant memory system and enriched it with cross-framework insights.

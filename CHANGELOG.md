@@ -2,6 +2,38 @@
 
 All notable changes to MeowKit are documented here. This file is auto-updated by [semantic-release](https://github.com/semantic-release/semantic-release) on future releases.
 
+## [1.3.0](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.3.0) (2026-03-31)
+
+### Features
+
+- **full red-team audit** — 11 batches, 98 items (15 agents, 60 skills, 9 hooks, 14 rules), 43 criticals found, 42 fixed
+- **contribution rules** — `docs/contribution-rules.md` with 10 sections and pre-merge checklist derived from audit findings
+- **venv existence check** — SessionStart hook warns if `.claude/skills/.venv` missing
+
+### Bug Fixes
+
+- **hooks enforcement restored** — `gate-enforcement.sh` and `privacy-block.sh` argument mismatch fixed (were completely non-functional since v1.0.0)
+- **all 9 hooks registered** — `settings.json` now registers gate-enforcement, privacy-block, project-context-loader, pre-task-check, pre-ship, cost-meter (was only 2)
+- **5 phantom subagent_type values** — `fullstack-developer`→`developer`, `code-reviewer`→`reviewer`, `project-manager`→`planner`, `docs-manager`→`documenter`, `debugger`→`researcher`
+- **7-phase model** — `workflow-orchestrator` migrated from 5-phase; Gate 2 no longer bypassable
+- **plan path format** — standardized to `tasks/plans/YYMMDD-name/plan.md` across all agents/skills/rules
+- **memory path** — all references use `.claude/memory/` (not bare `memory/`)
+- **verdict taxonomy** — unified to PASS/WARN/FAIL everywhere; review dimensions aligned
+- **python venv paths** — all scripts use `.claude/skills/.venv/bin/python3`
+- **pre-ship.sh** — guarded to only run on git commit/push, not every Bash call
+- **security BLOCK → FAIL** — security agent BLOCK verdict automatically fails Gate 2
+- **skill-loader.md** — all 13+ broken reference paths corrected
+- **mock guidance** — tester agent clarified: unit tests may mock, integration tests must not
+- **ADR path** — standardized to `docs/architecture/adr/YYMMDD-title.md`
+- **gate validation scripts** — correct full paths to `.claude/skills/meow:cook/scripts/`
+- **stale CK references** — `ck:` prefixes replaced with `meow:` in investigate skill
+- **missing directories** — created `tasks/plans/`, `tasks/reviews/`, `docs/architecture/adr/`, `session-state/`
+- **missing templates** — party prompts, team-config ownership map, fix gotchas
+- **duplicate YAML key** — removed in meow:llms frontmatter
+- **docs-finder memory path** — fixed to `.claude/memory/`
+- **freeze hook env var** — respects `CLAUDE_PLUGIN_DATA` fallback
+- **careful docs honesty** — 8/30 patterns hook-enforced (was claiming all 30)
+
 ## [1.2.1](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.2.1) (2026-03-31)
 
 ### Bug Fixes
