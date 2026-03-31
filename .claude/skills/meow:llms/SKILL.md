@@ -5,7 +5,6 @@ argument-hint: "[path] [--full] [--output path] [--url base]"
 source: claudekit-engineer
 original_path: .claude/skills/llms/SKILL.md
 adapted_for: meowkit
-source: claukit-engineer
 ---
 
 # llms.txt Generator
@@ -41,11 +40,11 @@ Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter`
 
 ```bash
 # Generate llms.txt (script does the heavy lifting)
-python3 .claude/skills/meow:llms/scripts/generate-llms-txt.py \
+.claude/skills/.venv/bin/python3 .claude/skills/meow:llms/scripts/generate-llms-txt.py \
   --source ./docs [--output .] [--base-url https://example.com/docs] [--full]
 
 # Preview metadata first (Claude reviews before generating)
-python3 .claude/skills/meow:llms/scripts/generate-llms-txt.py \
+.claude/skills/.venv/bin/python3 .claude/skills/meow:llms/scripts/generate-llms-txt.py \
   --source ./docs --json
 ```
 

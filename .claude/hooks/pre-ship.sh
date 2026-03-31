@@ -1,6 +1,16 @@
 #!/bin/sh
 # pre-ship.sh — Run full test + lint + typecheck before shipping.
-# Usage: pre-ship.sh
+# Usage: pre-ship.sh [command]
+# When registered as PreToolUse hook on Bash, $1 = the bash command.
+# Only triggers on git commit/push commands. Exits 0 for everything else.
+
+COMMAND="$1"
+
+# Only run pre-ship checks on git commit or push commands
+case "$COMMAND" in
+  *"git commit"*|*"git push"*|*"git merge"*) ;;
+  *) exit 0 ;; # Not a ship command — skip
+esac
 
 CHECKS_RUN=""
 CHECKS_FAILED=""

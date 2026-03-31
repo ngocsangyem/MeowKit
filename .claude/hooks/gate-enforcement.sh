@@ -9,14 +9,14 @@
 #
 # Gate 1 bypass: /meow:fix --simple OR scale-routing one-shot
 
-TOOL_NAME="$1"
-FILE_PATH="$2"
+# settings.json matcher already filters to Edit|Write — no need to check tool name
+# $1 = file path passed via $TOOL_INPUT_FILE_PATH
+FILE_PATH="$1"
 
-# Only check write tools
-case "$TOOL_NAME" in
-  Edit|Write) ;;
-  *) exit 0 ;;
-esac
+# If no file path provided, allow (safety fallback)
+if [ -z "$FILE_PATH" ]; then
+  exit 0
+fi
 
 # Allow writes to non-source files (plans, reviews, docs, tests, config)
 if echo "$FILE_PATH" | grep -qiE 'tasks/plans|tasks/reviews|docs/|\.claude/|\.test\.|\.spec\.|__tests__|plans/|\.md$|\.json$|\.yaml$|\.yml$|\.toml$'; then

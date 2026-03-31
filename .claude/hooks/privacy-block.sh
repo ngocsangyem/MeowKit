@@ -9,24 +9,14 @@
 # When blocked: outputs JSON marker for agent to prompt user approval.
 # Agent must use AskUserQuestion tool to get explicit approval before retrying.
 
-TOOL_NAME="$1"
-FILE_PATH="$2"
+# settings.json matcher already filters to Read, Edit|Write — no need to check tool name
+# $1 = file path passed via $TOOL_INPUT_FILE_PATH
+FILE_PATH="$1"
 
-# Only check file-accessing tools
-case "$TOOL_NAME" in
-  Read|Edit|Write) ;;
-  Bash)
-    # Check if bash command references sensitive files
-    if echo "$FILE_PATH" | grep -qiE '\.env|\.key|\.pem|credentials|secret|keystore|\.ssh'; then
-      echo "@@PRIVACY_BLOCK@@"
-      echo "Sensitive file pattern detected in bash command."
-      echo "Ask user for approval before accessing."
-      exit 1
-    fi
-    exit 0
-    ;;
-  *) exit 0 ;;
-esac
+# If no file path provided, allow (safety fallback)
+if [ -z "$FILE_PATH" ]; then
+  exit 0
+fi
 
 # Check file path against blocked patterns
 if echo "$FILE_PATH" | grep -qiE '\.env($|\.)|\.key$|\.pem$|credentials|secret|keystore|\.ssh/'; then
