@@ -49,9 +49,8 @@ gh run view <run-id> --log > /tmp/ci-logs.txt
 
 **For codebase understanding:**
 - Read `docs/codebase-summary.md` if exists and up-to-date (<2 days old)
-- Otherwise use `ck:repomix` to generate fresh codebase summary
-- Use `/ck:scout` or `/ck:scout ext` to find relevant files
-- Use `ck:docs-seeker` skill for package/plugin documentation
+- Use `meow:scout` to find relevant files and map dependencies
+- Use `meow:docs-finder` skill for package/plugin documentation
 
 ## Step 3: Analysis Process
 

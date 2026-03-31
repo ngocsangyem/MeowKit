@@ -34,7 +34,7 @@ Override: `--quick` allows fast scout→diagnose→fix for trivial issues (lint,
 - `--auto` — Autonomous mode (**default**). Auto-approve if score >= 9.5 & 0 critical.
 - `--review` — Human-in-the-loop. Pause at each step.
 - `--quick` — Fast cycle for trivial bugs.
-- `--parallel` — Parallel `fullstack-developer` agents per independent issue.
+- `--parallel` — Parallel `developer` agents per independent issue.
 
 ## Plan-First Gate
 
@@ -52,7 +52,7 @@ If no mode flag: use `AskUserQuestion` (Autonomous / HITL / Quick). See `referen
 
 ## Step 0.5 — Check Fix Memory (before scouting)
 
-Read `memory/lessons.md` and `memory/patterns.json` for prior fixes:
+Read `.claude/memory/lessons.md` and `.claude/memory/patterns.json` for prior fixes:
 - Search for similar symptoms, error messages, or affected modules
 - If a matching fix pattern exists (type: "correction") → use it as starting hypothesis in Step 2
 - If a matching success pattern exists → apply the known fix approach directly
@@ -116,8 +116,8 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 1. Report: confidence, root cause, changes, files, prevention measures
 2. **Write to memory** — capture the fix pattern for future sessions:
-   - Append to `memory/lessons.md`: symptom → root cause → fix approach → what prevented recurrence
-   - Update `memory/patterns.json`: add pattern with `type: "correction"`, `context`, `pattern`, `frequency: 1`
+   - Append to `.claude/memory/lessons.md`: symptom → root cause → fix approach → what prevented recurrence
+   - Update `.claude/memory/patterns.json`: add pattern with `type: "correction"`, `category: "failure"`, `severity`, `applicable_when`, `context`, `pattern`, `frequency: 1`
    - If pattern already exists → increment frequency + update `lastSeen`
 3. `documenter` agent → update `./docs`
 4. Ask user about commit
