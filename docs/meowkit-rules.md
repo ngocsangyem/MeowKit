@@ -8,15 +8,15 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 
 **Source:** B1-C1, B2-C3, B2-C8, B6-C1, B8-C4
 
-| Path Type | Canonical Form | Wrong Forms |
-|-----------|---------------|-------------|
-| Plan files | `tasks/plans/YYMMDD-name/plan.md` | `tasks/plans/YYMMDD-name.md` (flat), `plans/` |
-| Review verdicts | `tasks/reviews/YYMMDD-name-verdict.md` | `reviews/`, `tasks/plans/.../reports/` |
-| Memory files | `.claude/memory/lessons.md` | `memory/lessons.md` (bare) |
-| ADR files | `docs/architecture/adr/YYMMDD-title.md` | `docs/architecture/NNNN-title.md` |
-| Session state | `session-state/` (project root) | `.claude/session-state/` |
-| Skill references | `.claude/skills/meow:*/references/*.md` | `domain/file.md` (short form) |
-| Gate validation scripts | `.claude/skills/meow:cook/scripts/validate-gate-*.sh` | `scripts/validate-gate-*.sh` |
+| Path Type               | Canonical Form                                        | Wrong Forms                                   |
+| ----------------------- | ----------------------------------------------------- | --------------------------------------------- |
+| Plan files              | `tasks/plans/YYMMDD-name/plan.md`                     | `tasks/plans/YYMMDD-name.md` (flat), `plans/` |
+| Review verdicts         | `tasks/reviews/YYMMDD-name-verdict.md`                | `reviews/`, `tasks/plans/.../reports/`        |
+| Memory files            | `.claude/memory/lessons.md`                           | `memory/lessons.md` (bare)                    |
+| ADR files               | `docs/architecture/adr/YYMMDD-title.md`               | `docs/architecture/NNNN-title.md`             |
+| Session state           | `session-state/` (project root)                       | `.claude/session-state/`                      |
+| Skill references        | `.claude/skills/meow:*/references/*.md`               | `domain/file.md` (short form)                 |
+| Gate validation scripts | `.claude/skills/meow:cook/scripts/validate-gate-*.sh` | `scripts/validate-gate-*.sh`                  |
 
 **Rule:** When referencing any file in a skill or agent, use the FULL path from project root. Never use shortened or assumed paths. Before merging, grep for the path in all consuming files.
 
@@ -40,13 +40,13 @@ Plus Claude Code built-in types: `Explore`, `Bash`, `general-purpose`, `Plan`
 
 ### Mapping Table
 
-| Wrong Name | Correct Name |
-|-----------|-------------|
-| `fullstack-developer` | `developer` |
-| `code-reviewer` | `reviewer` |
-| `project-manager` | `planner` |
-| `docs-manager` | `documenter` |
-| `debugger` | `researcher` (with meow:investigate skill) |
+| Wrong Name            | Correct Name                               |
+| --------------------- | ------------------------------------------ |
+| `fullstack-developer` | `developer`                                |
+| `code-reviewer`       | `reviewer`                                 |
+| `project-manager`     | `planner`                                  |
+| `docs-manager`        | `documenter`                               |
+| `debugger`            | `researcher` (with meow:investigate skill) |
 
 **Rule:** Before adding a Task() call, verify the `subagent_type` against the list above. If the agent doesn't exist in `.claude/agents/`, the call will fail silently or use a generic agent without specialized instructions.
 
@@ -64,11 +64,11 @@ Every hook in `.claude/hooks/` MUST be registered in `.claude/settings.json`. An
 
 Hooks registered in settings.json receive arguments via Claude Code environment variables:
 
-| Matcher | Argument Passed | Hook Receives As |
-|---------|----------------|-----------------|
-| `Edit\|Write` | `$TOOL_INPUT_FILE_PATH` | `$1` = file path |
-| `Read` | `$TOOL_INPUT_FILE_PATH` | `$1` = file path |
-| `Bash` | `$TOOL_INPUT_COMMAND` | `$1` = command string |
+| Matcher       | Argument Passed         | Hook Receives As      |
+| ------------- | ----------------------- | --------------------- |
+| `Edit\|Write` | `$TOOL_INPUT_FILE_PATH` | `$1` = file path      |
+| `Read`        | `$TOOL_INPUT_FILE_PATH` | `$1` = file path      |
+| `Bash`        | `$TOOL_INPUT_COMMAND`   | `$1` = command string |
 
 **Rule:** Hook scripts should use `FILE_PATH="$1"` directly. Do NOT write `TOOL_NAME="$1"; FILE_PATH="$2"` — the settings.json matcher already filters by tool name. The hook only receives the file path or command as `$1`.
 
@@ -228,11 +228,11 @@ Missing `category`/`severity`/`applicable_when` are allowed for backward compati
 
 **Rule:** Never document a feature as "enforced" or "active" if the enforcement mechanism doesn't exist or is incomplete.
 
-| Wrong | Right |
-|-------|-------|
-| "This hook blocks X" (hook not registered) | "This hook blocks X when registered in settings.json" |
-| "30 destructive patterns are guarded" (only 8 checked) | "8 patterns are hook-enforced. Additional patterns are behavioral guidance." |
-| "Environment-aware blocking in production" (not implemented) | "Environment-aware blocking is planned but not yet implemented." |
+| Wrong                                                        | Right                                                                        |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| "This hook blocks X" (hook not registered)                   | "This hook blocks X when registered in settings.json"                        |
+| "30 destructive patterns are guarded" (only 8 checked)       | "8 patterns are hook-enforced. Additional patterns are behavioral guidance." |
+| "Environment-aware blocking in production" (not implemented) | "Environment-aware blocking is planned but not yet implemented."             |
 
 ---
 
