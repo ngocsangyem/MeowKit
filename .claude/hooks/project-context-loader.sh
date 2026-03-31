@@ -7,6 +7,17 @@
 # If not, outputs a reminder to generate it.
 
 CONTEXT_FILE="docs/project-context.md"
+VENV_PYTHON=".claude/skills/.venv/bin/python3"
+
+# Check Python venv existence — required for MeowKit scripts
+if [ ! -f "$VENV_PYTHON" ]; then
+  echo "## WARNING: Python venv not found"
+  echo ""
+  echo "MeowKit scripts require \`.claude/skills/.venv/bin/python3\` but it doesn't exist."
+  echo "Run \`npx mewkit setup\` to create the venv and install dependencies."
+  echo "Until then, python-based skills (validate, security-scan, multimodal, llms) will fail."
+  echo ""
+fi
 
 if [ -f "$CONTEXT_FILE" ]; then
   echo "## Project Context (auto-loaded)"

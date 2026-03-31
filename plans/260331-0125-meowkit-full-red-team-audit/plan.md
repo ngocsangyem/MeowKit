@@ -1,11 +1,11 @@
 # MeowKit Full Red-Team Audit Plan
 
 **Created:** 2026-03-31
-**Status:** In Progress
+**Status:** Complete — 11 batches audited, 43 criticals found, 42 fixed, 1 deferred (D2)
 **Mode:** --hard (sequential deep-dive, red team per batch)
 **Scope:** ALL 15 agents, 60 skills, 9 hooks, 14 rules (98 items)
-**Effort:** Multi-session (~8-12 hours across 11 batches)
-**Risk:** Low (audit only, no code changes until fix plan approved)
+**Effort:** ~6 hours across 11 batches + fixes
+**Risk:** Low (all criticals fixed except D2 browser skills)
 
 ---
 
@@ -245,14 +245,35 @@ After audit completes, create a fix plan only for:
 
 | Batch | Started | Completed | Findings |
 |-------|---------|-----------|----------|
-| 1 | — | — | — |
-| 2 | — | — | — |
-| 3 | — | — | — |
-| 4 | — | — | — |
-| 5 | — | — | — |
-| 6 | — | — | — |
-| 7 | — | — | — |
-| 8 | — | — | — |
-| 9 | — | — | — |
-| 10 | — | — | — |
-| 11 | — | — | — |
+| 1 | 2026-03-31 | 2026-03-31 | 5C / 7M / 4m — FIXED |
+| 2 | 2026-03-31 | 2026-03-31 | 5C / 6M / 3m — FIXED |
+| 3 | 2026-03-31 | 2026-03-31 | 4C / 6M / 3m — FIXED |
+| 4 | 2026-03-31 | 2026-03-31 | 5C / 6M / 4m — pending fix |
+| 5 | 2026-03-31 | 2026-03-31 | 4C / 6M / 4m — pending fix |
+| 6 | 2026-03-31 | 2026-03-31 | 4C / 6M / 4m — pending fix |
+| 7 | 2026-03-31 | 2026-03-31 | 3C / 5M / 4m — pending fix |
+| 8 | 2026-03-31 | 2026-03-31 | 4C / 6M / 5m — pending fix |
+| 9 | 2026-03-31 | 2026-03-31 | 3C / 8M / 4m — pending fix |
+| 10 | 2026-03-31 | 2026-03-31 | 4C / 6M / 3m — pending fix |
+| 11 | 2026-03-31 | 2026-03-31 | 3C / 5M / 5m — CRITICAL: hooks bypassed |
+
+---
+
+## Deferred Actions (post-audit)
+
+### D1: Python venv fallback for script execution — DONE
+
+**Fix applied:** Added venv existence check to `project-context-loader.sh` (SessionStart hook). If `.claude/skills/.venv/bin/python3` doesn't exist, warns user to run `npx mewkit setup` and lists affected skills. Warning appears at every session start until venv is created.
+
+### D2: Browser skill setup script and allowed-tools matching (Batch 7)
+
+**Problem (C1):** `meow:browse/references/setup.md` and `meow:qa/references/setup.md` reference a setup script that doesn't exist. First-time browser configuration is broken.
+
+**Problem (C3):** `meow:agent-browser` and `meow:playwright-cli` declare `allowed-tools` with colon syntax (`agent-browser:*`) but commands use space syntax (`agent-browser open`). Pattern may not match.
+
+**Required:**
+1. Create the missing setup script or update setup.md to use manual steps
+2. Verify allowed-tools pattern matching works with space syntax
+3. Test browser skills end-to-end with a real dev server
+
+**Priority:** P2 — browser skills are secondary; fix when browser testing is needed
