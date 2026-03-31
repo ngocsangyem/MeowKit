@@ -9,22 +9,22 @@
 
 ```bash
 # 1. Verify setup
-python .claude/skills/meow:multimodal/scripts/check_setup.py
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/check_setup.py
 
 # 2. Analyze image
-python .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
   --files <image-path> \
   --task analyze \
   [--prompt "Focus on UI layout and color scheme"] \
   [--json]
 
 # 3. For OCR / text extraction
-python .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
   --files <image-path> \
   --task extract
 
 # 4. For multi-image comparison
-python .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
   --files before.png after.png \
   --task analyze \
   --prompt "Compare these two screenshots"

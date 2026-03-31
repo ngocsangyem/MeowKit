@@ -9,24 +9,24 @@
 
 ```bash
 # 1. Single PDF extraction
-python .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
   --files document.pdf \
   --task extract
 
 # 2. With custom extraction prompt
-python .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
   --files report.pdf \
   --task extract \
   --prompt "Extract only the financial tables as markdown"
 
 # 3. Multiple documents
-python .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
   --files doc1.pdf doc2.pdf doc3.pdf \
   --task extract \
   --json
 
 # 4. Large PDF (> 20MB) — auto uses File API
-python .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
   --files large-report.pdf \
   --task extract \
   --verbose

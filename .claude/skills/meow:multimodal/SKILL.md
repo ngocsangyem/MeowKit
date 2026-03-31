@@ -84,13 +84,13 @@ Full model table, pricing, size limits, and token costs: [references/models-and-
 **`scripts/check_setup.py`** — Verify Gemini API key and dependencies
 
 ```bash
-python .claude/skills/meow:multimodal/scripts/check_setup.py
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/check_setup.py
 ```
 
 **`scripts/gemini_analyze.py`** — Analyze media files
 
 ```bash
-python .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
   --files <file-path> \
   --task <analyze|transcribe|extract> \
   [--model gemini-2.5-flash] \
@@ -101,7 +101,7 @@ python .claude/skills/meow:multimodal/scripts/gemini_analyze.py \
 **`scripts/gemini_generate.py`** — Generate images or videos
 
 ```bash
-python .claude/skills/meow:multimodal/scripts/gemini_generate.py \
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/gemini_generate.py \
   --task <generate-image|generate-video> \
   --prompt "description" \
   [--model imagen-4.0-generate-001] \
