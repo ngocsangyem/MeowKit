@@ -83,7 +83,7 @@ module.exports = {
         ].join(" && "),
         publishCmd: [
           `(cd packages/create-meowkit && npm publish --tag ${npmTag})`,
-          `(cd packages/meowkit && npm publish --tag ${npmTag})`,
+          `(cd packages/mewkit && npm publish --tag ${npmTag})`,
         ].join(" && "),
       },
     ],
@@ -109,7 +109,7 @@ module.exports = {
           "package.json",
           "package-lock.json",
           "packages/create-meowkit/package.json",
-          "packages/meowkit/package.json",
+          "packages/mewkit/package.json",
           ".claude/metadata.json",
         ],
         message: 'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',

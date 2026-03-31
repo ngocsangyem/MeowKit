@@ -5,10 +5,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm -w packages/create-meowkit run build && npm -w packages/meowkit run build",
+    "build": "npm -w packages/create-meowkit run build && npm -w packages/mewkit run build",
     "dev": "npm -w packages/create-meowkit run dev",
     "lint": "eslint packages/*/src/**/*.ts",
-    "typecheck": "tsc --noEmit -p packages/create-meowkit/tsconfig.json && tsc --noEmit -p packages/meowkit/tsconfig.json",
+    "typecheck": "tsc --noEmit -p packages/create-meowkit/tsconfig.json && tsc --noEmit -p packages/mewkit/tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest"
   },

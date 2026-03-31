@@ -109,7 +109,7 @@ Follow the existing format. Use `**bold**` for feature names and `—` (em dash)
 
 ```bash
 npm -w packages/create-meowkit version <version> --no-git-tag-version
-npm -w packages/meowkit version <version> --no-git-tag-version
+npm -w packages/mewkit version <version> --no-git-tag-version
 ```
 
 ### 4. Build and verify
@@ -201,7 +201,7 @@ gh release view v<version> --json url -q '.url'
 
 ```bash
 npm -w packages/create-meowkit publish
-npm -w packages/meowkit publish
+npm -w packages/mewkit publish
 ```
 
 ### 11. Test end-to-end
