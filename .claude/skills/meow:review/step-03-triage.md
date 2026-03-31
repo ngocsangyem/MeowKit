@@ -11,7 +11,7 @@ Finding is directly caused by or related to the current diff.
 ### incidental
 Finding exists in code touched by the diff but is NOT caused by the current change.
 Pre-existing tech debt, style inconsistencies, or unrelated issues.
-**Action:** Log to `memory/review-backlog.md` for future addressing. Does NOT block Gate 2.
+**Action:** Log to `.claude/memory/review-backlog.md` for future addressing. Does NOT block Gate 2.
 Create the file if it doesn't exist.
 
 ## Triage Rules

@@ -95,7 +95,7 @@ Invoke this skill during code review — after tests pass but before approving a
 
 ## Output: Verdict File
 
-Generate a verdict file at `reviews/[branch-or-pr-name]-audit.md`:
+Generate a verdict file at `tasks/reviews/YYMMDD-[branch-or-pr-name]-verdict.md`:
 
 ```markdown
 # Structural Audit: [Change Description]

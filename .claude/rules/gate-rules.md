@@ -34,7 +34,7 @@ All must be true:
 1. **Verdict file exists** at `tasks/reviews/YYMMDD-name-verdict.md`
 2. **No FAIL dimensions** in the verdict (all 5 dimensions must be PASS or WARN)
 3. **All WARN items acknowledged** by human (each WARN explicitly seen and accepted)
-4. **Security scan shows no BLOCK items** (from security-rules)
+4. **Security scan shows no BLOCK items** (from security-rules.md patterns AND security agent verdict — a security agent BLOCK automatically makes the Security dimension FAIL)
 5. **Human has explicitly typed approval.** Same standard as Gate 1 — explicit, not inferred.
 
 ### What It Blocks
