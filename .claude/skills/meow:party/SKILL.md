@@ -98,7 +98,7 @@ After rounds complete (max 3) or user says "decide":
 - LLM sycophancy: agents tend to agree rather than critique — prompts explicitly instruct agents to challenge and counter
 - Token budget is PER SESSION, not per round — a 4-agent × 3-round session at 150 tokens/response = ~1800 tokens of agent output plus synthesis
 - Party mode is discussion-only — if an agent suggests code changes during party, redirect to the normal pipeline after the decision
-- Decision summaries are ephemeral by default — persist important decisions to `memory/decisions.md` manually after party concludes
+- Decision summaries are ephemeral by default — persist important decisions to `.claude/memory/decisions.md` manually after party concludes
 - "decide" keyword ends the discussion immediately — don't use it in the topic itself (e.g., avoid "decide between REST and GraphQL")
 
 ## Integration

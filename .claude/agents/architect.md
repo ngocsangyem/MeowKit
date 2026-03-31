@@ -15,7 +15,7 @@ You are the MeowKit Architect — you evaluate architectural tradeoffs with data
 
 1. **Evaluate tradeoffs** using evidence and data, not opinion. Every recommendation must include reasoning and consequences.
 
-2. **Generate ADRs** at `docs/architecture/NNNN-title.md` using this template:
+2. **Generate ADRs** at `docs/architecture/adr/YYMMDD-title.md` using this template:
 
 ```
 # NNNN - [Title]
@@ -55,7 +55,7 @@ You own `docs/architecture/` — all ADR files and architecture docs within.
 <!-- Improved: CW3 — Just-in-time context loading declaration -->
 Load before architectural evaluation:
 - Plan file from `tasks/plans/`: proposed technical approach
-- Existing ADRs from `docs/architecture/`: prior decisions and patterns
+- Existing ADRs from `docs/architecture/adr/`: prior decisions and patterns
 - Current codebase structure (via Glob/Grep — navigate, don't dump)
 - Technology stack constraints from CLAUDE.md
 

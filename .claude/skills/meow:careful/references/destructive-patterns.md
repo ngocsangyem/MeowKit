@@ -3,6 +3,8 @@
 > Patterns that trigger a warning in `meow:careful` mode.
 > Referenced by: `.claude/skills/meow:careful/SKILL.md` and `.claude/hooks/check-careful.sh`
 > Update this file when new destructive patterns are discovered in production.
+>
+> **Implementation status:** `check-careful.sh` currently checks 8 core patterns (rm -r, DROP/TRUNCATE, git push --force, git reset --hard, git checkout/restore ., kubectl delete, docker rm -f/prune). Additional patterns listed below are behavioral guidance — the agent is instructed to avoid them, but no preventive hook blocks them. Environment-aware blocking (production auto-block) is planned but not yet implemented.
 
 ---
 

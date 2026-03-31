@@ -1,48 +1,34 @@
-# Synthesis — Party Mode Decision Summary
+# Party Mode Decision Synthesis
 
-After all discussion rounds complete (or user says "decide"), synthesize findings.
+After all rounds complete, synthesize the discussion into a structured decision.
 
-## Process
-
-1. **Collect** all agent responses from all rounds
-2. **Identify agreements** — points where all agents aligned
-3. **Identify disagreements** — points where agents diverged, with each position
-4. **Identify risks** — any risk flagged by any agent (err on the side of inclusion)
-5. **Formulate recommendation** — weight by: majority position + risk severity + user's stated constraints
-6. **Present for decision** — user makes the final call
-
-## Output Template
+## Template
 
 ```markdown
-## Party Mode Decision Summary
+## Decision: [Topic]
+**Date:** YYYY-MM-DD
+**Participants:** [agent1], [agent2], [agent3]
+**Rounds:** N
 
-**Topic:** [the original topic]
-**Participants:** [agent list]
-**Rounds completed:** [N of 3]
+### Consensus
+[What was agreed upon — 2-3 sentences]
 
-### Agreed Points
-- [point] — supported by all participants
+### Key Arguments
+- **For:** [strongest argument supporting the decision]
+- **Against:** [strongest counterargument and why it was outweighed]
 
-### Disagreements
-| Point | Position A | Position B |
-|-------|-----------|-----------|
-| [topic] | [agent]: [stance] | [agent]: [stance] |
+### Decision
+[Clear, actionable statement of what to do]
 
-### Risks Identified
-- [risk] — flagged by [agent], severity: [high/medium/low]
+### Next Steps
+- [ ] [First concrete action]
+- [ ] [Second concrete action]
 
-### Recommendation
-[1-2 sentence synthesized recommendation]
-
-**Confidence:** [high/medium/low] — based on agreement level
-
-### Next Step
-[Concrete next action if user accepts recommendation]
+### Dissent (if any)
+[Agent] disagreed because: [reason]. Acknowledged but overruled because: [reason].
 ```
 
 ## Rules
-
-- Never fabricate consensus — if agents disagreed, show it clearly
-- Never dismiss minority positions — sometimes the dissenter is right
-- Always include risks even if the recommendation is clear
-- Keep the summary under 300 tokens
+- Synthesis must be factual — do not invent consensus that didn't emerge
+- If no consensus reached, state "No consensus" and list the options with their advocates
+- Persist to `.claude/memory/decisions.md` if decision affects future sessions

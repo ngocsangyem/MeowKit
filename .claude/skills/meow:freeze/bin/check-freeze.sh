@@ -7,8 +7,8 @@ set -euo pipefail
 # Read stdin
 INPUT=$(cat)
 
-# Locate the freeze directory state file — MeowKit stores state in .claude/memory/
-FREEZE_FILE=".claude/memory/freeze-dir.txt"
+# Locate the freeze directory state file — respect CLAUDE_PLUGIN_DATA if set
+FREEZE_FILE="${CLAUDE_PLUGIN_DATA:-.claude/memory}/freeze-dir.txt"
 
 # If no freeze file exists, allow everything (not yet configured)
 if [ ! -f "$FREEZE_FILE" ]; then
