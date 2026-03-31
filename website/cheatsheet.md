@@ -134,17 +134,17 @@ All three review skills stop after printing — you control when to run `/meow:c
 | Command | What it does |
 |---------|-------------|
 | `/meow:plan "feature"` | Create plan via meow:plan-creator |
-| `npx meowkit task new --type feature "desc"` | Create task from template |
-| `npx meowkit task list` | List active tasks |
+| `npx mewkit task new --type feature "desc"` | Create task from template |
+| `npx mewkit task list` | List active tasks |
 
 ## Task Templates
 
 | Template | Use when | Create with |
 |----------|----------|-------------|
-| feature | Adding new functionality | `npx meowkit task new --type feature` |
-| bug-fix | Fixing broken behavior | `npx meowkit task new --type bug-fix` |
-| refactor | Restructuring code | `npx meowkit task new --type refactor` |
-| security | Security review | `npx meowkit task new --type security` |
+| feature | Adding new functionality | `npx mewkit task new --type feature` |
+| bug-fix | Fixing broken behavior | `npx mewkit task new --type bug-fix` |
+| refactor | Restructuring code | `npx mewkit task new --type refactor` |
+| security | Security review | `npx mewkit task new --type security` |
 | guideline | Team standards | Copy from `tasks/templates/guideline.md` |
 
 ### Task status flow

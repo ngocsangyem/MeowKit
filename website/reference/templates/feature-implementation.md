@@ -4,7 +4,7 @@
 
 **Primary agent:** planner → developer → tester
 **Workflow phases:** Phase 1 (Plan) → Phase 2 (Test RED) → Phase 3 (Build GREEN) → Phase 4 (Review)
-**Create with:** `npx meowkit task new --type feature "description"`
+**Create with:** `npx mewkit task new --type feature "description"`
 
 ## When to use
 

@@ -4,7 +4,7 @@
 
 **Primary agent:** developer → reviewer
 **Workflow phases:** Phase 1 (Plan) → Phase 3 (Implement) → Phase 4 (Review)
-**Create with:** `npx meowkit task new --type refactor "description"`
+**Create with:** `npx mewkit task new --type refactor "description"`
 
 ## When to use
 

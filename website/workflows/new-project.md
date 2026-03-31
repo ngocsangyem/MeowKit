@@ -37,7 +37,7 @@ The CLI auto-detects your tech stack and asks configuration questions (project n
 ### Step 2: Verify installation
 
 ```bash
-npx meowkit doctor
+npx mewkit doctor
 ```
 
 Checks: Node.js version, Python available, Git configured, hooks executable, scripts present.

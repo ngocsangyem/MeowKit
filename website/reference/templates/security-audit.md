@@ -4,7 +4,7 @@
 
 **Primary agent:** security → reviewer
 **Workflow phases:** Phase 2 (Audit) → Phase 4 (Review remediation)
-**Create with:** `npx meowkit task new --type security "description"`
+**Create with:** `npx mewkit task new --type security "description"`
 
 ## When to use
 

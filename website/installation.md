@@ -67,7 +67,7 @@ CLAUDE.md             Entry point for Claude Code
 ## Verify installation
 
 ```bash
-npx meowkit doctor
+npx mewkit doctor
 ```
 
 This checks: Node.js version, Python version, Git availability, hooks executable, scripts present.
@@ -109,11 +109,11 @@ Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 After scaffolding completes, run the MeowKit setup and verify your installation:
 
 ```bash
-npx meowkit setup
-npx meowkit doctor
+npx mewkit setup
+npx mewkit doctor
 ```
 
-`npx meowkit setup` finalises any post-scaffold configuration. `npx meowkit doctor` checks Node.js version, Python version, Git availability, hooks executable, and scripts present.
+`npx mewkit setup` finalises any post-scaffold configuration. `npx mewkit doctor` checks Node.js version, Python version, Git availability, hooks executable, and scripts present.
 
 ## Next steps
 

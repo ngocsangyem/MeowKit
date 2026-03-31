@@ -4,7 +4,7 @@
 
 **Primary agent:** investigator → developer → tester
 **Workflow phases:** Phase 1 (Investigate) → Phase 2 (Test RED) → Phase 3 (Fix) → Phase 4 (Review)
-**Create with:** `npx meowkit task new --type bug-fix "description"`
+**Create with:** `npx mewkit task new --type bug-fix "description"`
 
 ## When to use
 

@@ -4,7 +4,7 @@ description: MeowKit CLI runtime commands reference.
 persona: B
 ---
 
-# npx meowkit commands
+# npx mewkit commands
 
 Runtime tools for managing your MeowKit project. Run from your project root.
 
@@ -13,7 +13,7 @@ Runtime tools for managing your MeowKit project. Run from your project root.
 Diagnose environment issues with auto-fix for permissions.
 
 ```bash
-npx meowkit doctor [--report]
+npx mewkit doctor [--report]
 ```
 
 **Checks:** Node.js 20+, Python 3.9+, Git, `.claude/` structure, hooks executable, scripts present, memory writable, MCP config, Python venv, config validity.
@@ -29,7 +29,7 @@ npx meowkit doctor [--report]
 Guided post-scaffold configuration. Each step is idempotent.
 
 ```bash
-npx meowkit setup [--only=<step>]
+npx mewkit setup [--only=<step>]
 ```
 
 | Step | What it does |
@@ -40,8 +40,8 @@ npx meowkit setup [--only=<step>]
 | `gitignore` | Appends MeowKit entries to `.gitignore` |
 
 ```bash
-npx meowkit setup              # Run all steps
-npx meowkit setup --only=venv  # Run single step
+npx mewkit setup              # Run all steps
+npx mewkit setup --only=venv  # Run single step
 ```
 
 ## task
@@ -49,8 +49,8 @@ npx meowkit setup --only=venv  # Run single step
 Create and manage structured task files. See [Task Commands](/cli/task-commands) for details.
 
 ```bash
-npx meowkit task new --type feature "Add user auth"
-npx meowkit task list [--all] [--status done]
+npx mewkit task new --type feature "Add user auth"
+npx mewkit task list [--all] [--status done]
 ```
 
 ## validate
@@ -58,7 +58,7 @@ npx meowkit task list [--all] [--status done]
 Verify `.claude/` structure integrity.
 
 ```bash
-npx meowkit validate
+npx mewkit validate
 ```
 
 **Checks:** Agents (10+), skills (30+), commands dir, modes (5+), rules (10+), hooks executable, scripts present, settings.json, CLAUDE.md, config file.
@@ -68,7 +68,7 @@ npx meowkit validate
 View token usage and cost tracking.
 
 ```bash
-npx meowkit budget [--monthly]
+npx mewkit budget [--monthly]
 ```
 
 | Flag | Description |
@@ -80,10 +80,10 @@ npx meowkit budget [--monthly]
 View or manage cross-session memory.
 
 ```bash
-npx meowkit memory              # Summary (line counts, pattern count)
-npx meowkit memory --show       # Display full lessons.md
-npx meowkit memory --stats      # Sessions captured, patterns learned
-npx meowkit memory --clear      # Clear all memory (with confirmation)
+npx mewkit memory              # Summary (line counts, pattern count)
+npx mewkit memory --show       # Display full lessons.md
+npx mewkit memory --stats      # Sessions captured, patterns learned
+npx mewkit memory --clear      # Clear all memory (with confirmation)
 ```
 
 ## upgrade
@@ -91,7 +91,7 @@ npx meowkit memory --clear      # Clear all memory (with confirmation)
 Update create-meowkit to the latest version.
 
 ```bash
-npx meowkit upgrade [--check] [--beta] [--list]
+npx mewkit upgrade [--check] [--beta] [--list]
 ```
 
 | Flag | Description |
@@ -103,10 +103,10 @@ npx meowkit upgrade [--check] [--beta] [--list]
 **Examples:**
 
 ```bash
-npx meowkit upgrade              # Upgrade to latest stable
-npx meowkit upgrade --beta       # Upgrade to latest beta
-npx meowkit upgrade --check      # Check without installing
-npx meowkit upgrade --list       # Show all versions
+npx mewkit upgrade              # Upgrade to latest stable
+npx mewkit upgrade --beta       # Upgrade to latest beta
+npx mewkit upgrade --check      # Check without installing
+npx mewkit upgrade --list       # Show all versions
 ```
 
 **Output of `--list`:**
@@ -128,7 +128,7 @@ Recent versions:
 Print version, channel, and current config.
 
 ```bash
-npx meowkit status
+npx mewkit status
 ```
 
 Shows: MeowKit version with channel indicator (stable/beta), project config from `.claude/meowkit.config.json`.

@@ -22,7 +22,7 @@ When new versions are released, migration guides will appear here with:
 ## Upgrading
 
 ```bash
-npx meowkit upgrade
+npx mewkit upgrade
 ```
 
 This command handles most migrations automatically.

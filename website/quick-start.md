@@ -19,14 +19,14 @@ The CLI asks two optional questions: a project description and a Gemini API key.
 After scaffolding completes, run setup and verify:
 
 ```bash
-npx meowkit setup
-npx meowkit doctor
+npx mewkit setup
+npx mewkit doctor
 ```
 
 ## Step 2: Create your first task
 
 ```bash
-npx meowkit task new --type feature "My first feature"
+npx mewkit task new --type feature "My first feature"
 ```
 
 This creates a task file under `tasks/plans/` using the feature template. Fill in the acceptance criteria before proceeding.

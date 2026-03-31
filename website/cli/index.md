@@ -11,7 +11,7 @@ MeowKit provides two CLI packages:
 | Package | Command | Purpose |
 |---------|---------|---------|
 | `create-meowkit` | `npm create meowkit@latest` | Scaffold or update the `.claude/` system |
-| `meowkit` | `npx meowkit <command>` | Runtime tools: doctor, setup, task, validate, budget, memory, upgrade, status |
+| `mewkit` | `npx mewkit <command>` | Runtime tools: doctor, setup, task, validate, budget, memory, upgrade, status |
 
 ## Quick Start
 
@@ -21,13 +21,13 @@ cd your-project
 npm create meowkit@latest
 
 # 2. Configure environment
-npx meowkit setup
+npx mewkit setup
 
 # 3. Verify installation
-npx meowkit doctor
+npx mewkit doctor
 
 # 4. Create your first task
-npx meowkit task new --type feature "Add user authentication"
+npx mewkit task new --type feature "Add user authentication"
 ```
 
 ## How it works
@@ -36,4 +36,4 @@ npx meowkit task new --type feature "Add user authentication"
 - **First run:** copies the full MeowKit system (agents, skills, hooks, rules, commands, modes, scripts) into `.claude/`
 - **Subsequent runs:** smart update — overwrites unchanged core files, skips user-modified files, adds new files
 
-`meowkit` is a **runtime toolbox** for daily use — diagnostics, setup, task management, cost tracking.
+`mewkit` is a **runtime toolbox** for daily use — diagnostics, setup, task management, cost tracking.

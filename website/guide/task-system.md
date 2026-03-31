@@ -17,7 +17,7 @@ Key benefits:
 **Non-trivial rule:** Create a task file for any change affecting more than 2 files OR taking more than 30 minutes.
 
 ```bash
-npx meowkit task new --type feature "Add user authentication"
+npx mewkit task new --type feature "Add user authentication"
 ```
 
 ## Task lifecycle

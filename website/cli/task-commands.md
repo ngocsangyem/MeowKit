@@ -7,7 +7,7 @@ Manage task files using MeowKit templates.
 Create a new task file from a template.
 
 ```bash
-npx meowkit task new --type <type> "description"
+npx mewkit task new --type <type> "description"
 ```
 
 **Arguments:**
@@ -26,10 +26,10 @@ npx meowkit task new --type <type> "description"
 **Examples:**
 
 ```bash
-npx meowkit task new --type feature "Add user authentication"
+npx mewkit task new --type feature "Add user authentication"
 # Creates: tasks/active/260327-add-user-authentication.feature.md
 
-npx meowkit task new --type bug-fix --priority high "Fix login timeout"
+npx mewkit task new --type bug-fix --priority high "Fix login timeout"
 # Creates: tasks/active/260327-fix-login-timeout.bug-fix.md
 ```
 
@@ -38,7 +38,7 @@ npx meowkit task new --type bug-fix --priority high "Fix login timeout"
 List task files with status.
 
 ```bash
-npx meowkit task list [--all] [--status <status>]
+npx mewkit task list [--all] [--status <status>]
 ```
 
 **Flags:**
@@ -51,12 +51,12 @@ npx meowkit task list [--all] [--status <status>]
 **Examples:**
 
 ```bash
-npx meowkit task list
+npx mewkit task list
 # Lists active tasks only
 
-npx meowkit task list --all
+npx mewkit task list --all
 # Lists all tasks (active + completed + backlog)
 
-npx meowkit task list --status blocked
+npx mewkit task list --status blocked
 # Lists only blocked tasks
 ```

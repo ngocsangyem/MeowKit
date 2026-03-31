@@ -33,8 +33,8 @@ Is it a new feature or enhancement?
 
 ```bash
 # Using CLI
-npx meowkit task new --type feature "Add user authentication"
-npx meowkit task new --type bug-fix "Fix login timeout"
+npx mewkit task new --type feature "Add user authentication"
+npx mewkit task new --type bug-fix "Fix login timeout"
 
 # Manually
 cp .claude/../tasks/templates/feature-implementation.md tasks/active/260327-add-auth.feature.md
