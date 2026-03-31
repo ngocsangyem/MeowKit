@@ -44,7 +44,7 @@ CSV match OVERRIDES manual classification. See `rules/scale-adaptive-rules.md` f
    - Architect is inserted after planner when schema, API, or infra changes are involved.
    - Security is inserted at Phase 2 and Phase 4 for auth/payments/security changes.
 
-4. **Read memory.** At session start, read `memory/lessons.md` for prior learnings and `memory/cost-log.json` for budget context.
+4. **Read memory.** At session start, read `.claude/memory/lessons.md` for prior learnings and `.claude/memory/cost-log.json` for budget context.
 
 5. **Enforce gates.** Never skip planner for standard/complex tasks (Gate 1). Never skip reviewer for code changes (Gate 2).
 

@@ -57,7 +57,7 @@ Load before any design work:
 
 - Plan file from `tasks/plans/` — what's being designed
 - `docs/design-guidelines.md` — existing design system (if it exists)
-- `memory/lessons.md` — prior design decisions and gotchas
+- `.claude/memory/lessons.md` — prior design decisions and gotchas
 - Project stack detection — React, Vue, or vanilla (determines which framework skill to load)
 
 ## Workflow Integration

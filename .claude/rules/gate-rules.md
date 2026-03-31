@@ -8,7 +8,7 @@ These are hard stops. No automation may bypass them. No agent may self-approve.
 
 All must be true:
 
-1. **Plan file exists** at `tasks/plans/YYMMDD-name.md`
+1. **Plan file exists** at `tasks/plans/YYMMDD-name/plan.md`
 2. **All required sections are populated:**
    - Problem: what problem this solves and for whom
    - Success Criteria: measurable definition of done

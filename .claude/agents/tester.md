@@ -40,7 +40,7 @@ You own all test files: `__tests__/`, `*.test.ts`, `*.spec.ts`, `tests/`, and te
 ## Required Context
 <!-- Improved: CW3 — Just-in-time context loading declaration -->
 Load before writing tests:
-- Approved plan file from `tasks/plans/YYMMDD-name.md`: success criteria and technical approach
+- Approved plan file from `tasks/plans/YYMMDD-name/plan.md`: success criteria and technical approach
 - Existing test patterns in the codebase (via Grep for test conventions)
 - For green phase: implementation files from developer
 

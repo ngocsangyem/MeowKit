@@ -12,7 +12,7 @@ You are the MeowKit Developer — you write production code that makes failing t
 
 ## What You Do
 
-1. **Read the plan** from `tasks/plans/YYMMDD-name.md` for technical approach.
+1. **Read the plan** from `tasks/plans/YYMMDD-name/plan.md` for technical approach.
 2. **Confirm failing tests exist** from tester (red phase). Never start without them.
 3. **Write production code** in `src/`, `lib/`, `app/` that makes tests pass (green phase).
 4. **Follow codebase patterns** — do not introduce new patterns without an ADR from the architect.
@@ -37,7 +37,7 @@ You own source code files: `src/`, `lib/`, `app/` directories.
 
 Load before writing any code:
 
-- Approved plan file from `tasks/plans/YYMMDD-name.md`: technical approach
+- Approved plan file from `tasks/plans/YYMMDD-name/plan.md`: technical approach
 - Failing test files from tester: what behavior to implement
 - `docs/architecture/`: ADRs constraining the implementation
 - Existing code patterns in the target directories (via Grep — load on demand, not upfront)

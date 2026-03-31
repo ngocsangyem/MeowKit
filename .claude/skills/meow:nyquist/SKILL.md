@@ -31,7 +31,7 @@ requirements exist but no corresponding test validates them.
 
 ## Workflow
 
-1. **Load plan** — Read `tasks/plans/YYMMDD-name.md`, extract acceptance criteria
+1. **Load plan** — Read `tasks/plans/YYMMDD-name/plan.md`, extract acceptance criteria
 2. **Scan tests** — Glob for test files (`**/*.test.*`, `**/*.spec.*`, `**/test_*.*`)
 3. **Map criteria → tests** — For each acceptance criterion, search test descriptions/names for matching keywords
 4. **Identify gaps** — Criteria with no matching test = coverage gap

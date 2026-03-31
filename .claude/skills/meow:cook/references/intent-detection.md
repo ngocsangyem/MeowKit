@@ -38,6 +38,7 @@ FUNCTION detectMode(input):
 ## Feature Extraction
 
 Detect multiple features from natural language:
+
 ```
 "implement auth, payments, and notifications" → ["auth", "payments", "notifications"]
 "add login + signup + password reset"         → ["login", "signup", "password reset"]
@@ -48,18 +49,19 @@ Detect multiple features from natural language:
 
 ## Mode Behaviors
 
-| Mode | Research | TDD | Gate 1 | Gate 2 | Parallel |
-|------|----------|-----|--------|--------|----------|
-| interactive | Yes | Yes (strict) | Human | Human | No |
-| auto | Yes | Yes (strict) | Auto (validated) | **Human** | Per phase |
-| fast | Skip | Plan-level | Human | **Human** | No |
-| parallel | Optional | Yes (strict) | Human | **Human** | Yes |
-| no-test | Yes | Skip | Human | **Human** | No |
-| code | Skip | Yes (strict) | Skip (plan exists) | **Human** | Per plan |
+| Mode        | Research | TDD          | Gate 1             | Gate 2    | Parallel  |
+| ----------- | -------- | ------------ | ------------------ | --------- | --------- |
+| interactive | Yes      | Yes (strict) | Human              | Human     | No        |
+| auto        | Yes      | Yes (strict) | Auto (validated)   | **Human** | Per phase |
+| fast        | Skip     | Plan-level   | Human              | **Human** | No        |
+| parallel    | Optional | Yes (strict) | Human              | **Human** | Yes       |
+| no-test     | Yes      | Skip         | Human              | **Human** | No        |
+| code        | Skip     | Yes (strict) | Skip (plan exists) | **Human** | Per plan  |
 
 **Gate 2 is ALWAYS human-approved.** No mode bypasses it.
 
 **TDD column:**
+
 - "Yes (strict)" = failing tests written in Phase 2, implementation fills them in Phase 3
 - "Plan-level" = tests cover plan intent (not research-level edge cases), still written before implementation
 - "Skip" = no-test mode only, user explicitly opted out
@@ -73,6 +75,7 @@ Detect multiple features from natural language:
 ## Conflict Resolution
 
 Priority order when multiple signals detected:
+
 1. Explicit flags (`--fast`, `--auto`, etc.)
 2. Path detection (plan files)
 3. Keywords in text
@@ -82,18 +85,18 @@ Priority order when multiple signals detected:
 ## Examples
 
 ```
-"/cook implement user auth"
+"/meow:cook implement user auth"
 → Mode: interactive (default)
 
-"/cook tasks/plans/260329-auth/plan.md"
+"/meow:cook tasks/plans/260329-auth/plan.md"
 → Mode: code (path detected)
 
-"/cook quick fix for the login bug"
+"/meow:cook quick fix for the login bug"
 → Mode: fast ("quick" keyword)
 
-"/cook implement auth, payments, notifications, shipping"
+"/meow:cook implement auth, payments, notifications, shipping"
 → Mode: parallel (4 features)
 
-"/cook implement everything --auto"
+"/meow:cook implement everything --auto"
 → Mode: auto (explicit flag)
 ```

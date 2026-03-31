@@ -23,9 +23,13 @@ if echo "$FILE_PATH" | grep -qiE 'tasks/plans|tasks/reviews|docs/|\.claude/|\.te
   exit 0
 fi
 
-# Check if any approved plan exists
+# Check if any approved plan exists (directory structure: tasks/plans/YYMMDD-name/plan.md)
+if ls tasks/plans/*/plan.md 2>/dev/null | head -1 > /dev/null 2>&1; then
+  # Plan files exist — Gate 1 is satisfied
+  exit 0
+fi
+# Also check flat file format for backward compatibility
 if ls tasks/plans/*.md 2>/dev/null | head -1 > /dev/null 2>&1; then
-  # Plan files exist — Gate 1 is satisfied (behavioral check passed)
   exit 0
 fi
 

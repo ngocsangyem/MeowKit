@@ -11,7 +11,7 @@ All modes share these phases with mode-specific variations.
    - Auth/payments/security → always COMPLEX
    - Feature <5 files → STANDARD
    - Rename/typo/format → TRIVIAL
-3. **Read memory** (if exists): `memory/lessons.md`, `memory/patterns.json` — note relevant prior learnings
+3. **Read memory** (if exists): `.claude/memory/lessons.md`, `.claude/memory/patterns.json` — note relevant prior learnings
 4. If mode=code: load plan path, parse phases
 5. `TaskCreate` for each workflow phase (with `addBlockedBy` chain)
 
@@ -39,7 +39,7 @@ Present plan summary. Use `AskUserQuestion` (header: "Gate 1"):
 - "Revise plan" → revise based on feedback, re-present
 - "Abort" → stop workflow
 
-**Auto mode:** Skip Gate 1 user prompt. Auto-proceed if plan passes `scripts/validate-gate-1.sh`.
+**Auto mode:** Skip Gate 1 user prompt. Auto-proceed if plan passes `.claude/skills/meow:cook/scripts/validate-gate-1.sh`.
 
 **Output:** `Phase 1: Plan created — [N] phases, Gate 1 [approved|auto-approved]`
 
@@ -112,7 +112,7 @@ Present review verdict. Use `AskUserQuestion` (header: "Gate 2"):
 
 Max 3 review-fix cycles. After 3: final decision required from user.
 
-Run `scripts/validate-gate-2.sh` before presenting for approval.
+Run `.claude/skills/meow:cook/scripts/validate-gate-2.sh` before presenting for approval.
 
 **Output:** `Phase 4: Review [score]/10, Gate 2 approved`
 
@@ -129,19 +129,19 @@ Task(subagent_type="git-manager", prompt="Stage and commit changes with conventi
 
 Three mandatory subagents in parallel:
 
-1. **Project-manager sync-back:**
+1. **Plan sync-back:**
    ```
-   Task(subagent_type="project-manager", prompt="Run full sync-back for [plan-path]: sweep ALL phase-XX-*.md files, mark completed items [x], update plan.md status/progress from actual checkbox state. Report unresolved mappings.", description="Plan sync-back")
+   Task(subagent_type="planner", prompt="Run full sync-back for [plan-path]: sweep ALL phase-XX-*.md files, mark completed items [x], update plan.md status/progress from actual checkbox state. Report unresolved mappings.", description="Plan sync-back")
    ```
 
-2. **Docs-manager:**
+2. **Docs update:**
    ```
-   Task(subagent_type="docs-manager", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
+   Task(subagent_type="documenter", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
    ```
 
 3. **Memory capture (MUST spawn):**
    ```
-   Task(subagent_type="general-purpose", prompt="Run meow:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append to memory/lessons.md. Update memory/patterns.json with new entries including category, severity, applicable_when fields. Files to modify: .claude/memory/lessons.md, .claude/memory/patterns.json", description="Session memory capture")
+   Task(subagent_type="analyst", prompt="Run meow:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append to .claude/memory/lessons.md. Update .claude/memory/patterns.json with new entries including category, severity, applicable_when fields. Files to modify: .claude/memory/lessons.md, .claude/memory/patterns.json", description="Session memory capture")
    ```
 
 4. `TaskUpdate` → mark all Claude Tasks complete after sync-back

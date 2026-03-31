@@ -29,8 +29,8 @@ Skip when:
 ## Step 0 — Read Institutional Memory (mandatory)
 
 Before planning, check for prior learnings:
-1. Read `memory/lessons.md` if it exists — note patterns relevant to this task
-2. Read `memory/patterns.json` if it exists — filter by scope:
+1. Read `.claude/memory/lessons.md` if it exists — note patterns relevant to this task
+2. Read `.claude/memory/patterns.json` if it exists — filter by scope:
    - Patterns with no `scope` field → apply everywhere (project-wide)
    - Patterns with `scope` → apply only if CWD is within that scope path
    - Check for frequency-tracked anti-patterns (type: "correction") first

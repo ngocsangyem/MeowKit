@@ -43,7 +43,7 @@ Does NOT replace Gate 1 (human approval). Supplements it with systematic checks.
 
 ## Workflow
 
-1. **Load plan file** — Read from `tasks/plans/YYMMDD-name.md`
+1. **Load plan file** — Read from `tasks/plans/YYMMDD-name/plan.md`
 2. **Check each dimension** — Evaluate against pass criteria
 3. **Produce validation report** — Pass/fail per dimension with findings
 4. **Route result:**

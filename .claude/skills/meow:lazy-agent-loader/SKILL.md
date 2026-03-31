@@ -29,7 +29,7 @@ Reduce token usage by:
 ## Agent Index (Summaries Only)
 
 ```toon
-agent_index[13]{id,category,specialty,keywords}:
+agent_index[15]{id,category,specialty,keywords}:
   orchestrator,infra,Task routing/complexity classification,route/classify/assign/complexity
   planner,planning,Two-lens planning/Gate 1,plan/feature/design/scope/requirements
   architect,planning,ADRs/system design,architecture/schema/api/infra/design/migration
@@ -39,10 +39,12 @@ agent_index[13]{id,category,specialty,keywords}:
   security,quality,Security audit/BLOCK verdicts,security/vulnerability/audit/owasp/injection
   shipper,ops,Deploy pipeline/PR creation,ship/deploy/release/commit/pr/ci
   documenter,ops,Living docs/changelogs,docs/documentation/changelog/readme
-  analyst,infra,Cost tracking/pattern extraction,cost/budget/patterns/metrics/usage
+  analyst,infra,Cost tracking/pattern extraction/memory,cost/budget/patterns/metrics/usage/memory
   researcher,planning,Technology research/library evaluation,research/compare/evaluate/library
   brainstormer,planning,Solution brainstorming/trade-offs,brainstorm/alternatives/tradeoff/explore
   journal-writer,ops,Failure documentation/lessons,failure/incident/postmortem/lesson
+  git-manager,ops,Git operations/commit/push/PR,git/commit/push/pull/branch/pr/merge
+  ui-ux-designer,dev,UI/UX design/frontend patterns,design/ui/ux/css/layout/accessibility/responsive
 ```
 
 ---

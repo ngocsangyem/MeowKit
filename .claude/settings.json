@@ -1,5 +1,57 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/project-context-loader.sh",
+            "timeout": 5000,
+            "statusMessage": "Loading project context..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/gate-enforcement.sh \"$TOOL_INPUT_FILE_PATH\"",
+            "timeout": 10000,
+            "statusMessage": "Checking Gate 1 approval..."
+          },
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/privacy-block.sh \"$TOOL_INPUT_FILE_PATH\"",
+            "timeout": 5000,
+            "statusMessage": "Checking file access permissions..."
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/privacy-block.sh \"$TOOL_INPUT_FILE_PATH\"",
+            "timeout": 5000,
+            "statusMessage": "Checking file access permissions..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/pre-task-check.sh \"$TOOL_INPUT_COMMAND\"",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
@@ -9,6 +61,16 @@
             "command": "sh .claude/hooks/post-write.sh \"$TOOL_INPUT_FILE_PATH\"",
             "timeout": 10000,
             "statusMessage": "Security scanning written file..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/cost-meter.sh",
+            "timeout": 5000
           }
         ]
       }
