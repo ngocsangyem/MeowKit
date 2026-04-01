@@ -287,6 +287,7 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v1.3.1  | 2026-04-01 | The Red Team Depth Release         |
 | v1.3.0  | 2026-03-31 | The Integration Integrity Release |
 | v1.2.1  | 2026-03-31 | Memory capture enforcement fix    |
 | v1.2.0  | 2026-03-31 | The Memory Activation Release    |
