@@ -5,6 +5,33 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 1.3.2 (2026-04-01) — The Plan Quality Release
+
+Complete redesign of `meow:plan-creator` to match/exceed ck-plan across 15 dimensions.
+
+### Features
+
+- **Step-file architecture** — SKILL.md (thin entry) + workflow.md + 6 step files. JIT loading.
+- **Multi-file phase output** — plan.md overview (≤80 lines) + phase-XX files (12-section template each)
+- **Scope challenge** — Trivial → exit, simple → fast, complex → hard. User chooses EXPANSION/HOLD/REDUCTION.
+- **Plan red team** — 2 adversarial personas (Assumption Destroyer + Scope Critic) review plans before validation (hard mode)
+- **Research integration** — Bounded (2 researchers, 5 calls each), findings cited in phase Key Insights, links verified
+- **Sync-back** — `.plan-state.json` checkpoint enables cross-session resume
+- **Critical-step tasks** — `[CRITICAL]`/`[HIGH]` todo items get dedicated Claude Tasks
+- **Richer frontmatter** — description, tags, issue, blockedBy/blocks fields
+
+### Changed
+
+- `meow:plan-creator` SKILL.md rewritten as thin entry (v1.3.2)
+- `validate-plan.py` validates multi-file plans (plan.md + phase-XX files against 12-section template)
+- `planner.md` agent references step-file workflow and multi-file output
+- `assets/plan-template.md` enriched with description, tags, issue, blockedBy/blocks
+- `references/task-management.md` documents sync-back protocol
+- `references/phase-template.md` added (12-section enforced template)
+- `references/validation-questions.md` added (5-category question framework)
+
+---
+
 ## 1.3.1 (2026-03-31) — The Red Team Depth Release
 
 Hybrid adversarial persona system for `meow:review`.

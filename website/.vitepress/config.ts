@@ -57,6 +57,7 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'What\'s New', link: '/guide/whats-new',
               items: [
+                { text: 'v1.3.2 — Plan Quality', link: '/guide/whats-new/v1.3.2' },
                 { text: 'v1.3.1 — Red Team Depth', link: '/guide/whats-new/v1.3.1' },
                 { text: 'v1.3.0 — Integration Integrity', link: '/guide/whats-new/v1.3.0' },
                 { text: 'v1.2.0 — Memory Activation', link: '/guide/whats-new/v1.2.0' },

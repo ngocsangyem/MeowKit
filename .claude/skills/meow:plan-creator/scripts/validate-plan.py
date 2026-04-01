@@ -1,60 +1,119 @@
 #!/usr/bin/env python3
-"""Validate a MeowKit plan file for required sections and quality."""
-import sys, re, os
+"""Validate a MeowKit plan file and its phase files for required sections and quality."""
+import sys, re, os, glob
 
-REQUIRED_SECTIONS = [
+# plan.md required sections (overview format)
+PLAN_REQUIRED_SECTIONS = [
     "## Goal",
-    "## Context",
-    "## Scope",
-    "## Constraints",
-    "## Acceptance Criteria",
-    "## Agent State",
 ]
 
-REQUIRED_FRONTMATTER = ["title", "type", "status", "priority"]
+# plan.md required frontmatter fields
+PLAN_REQUIRED_FRONTMATTER = ["title", "type", "status", "priority"]
 
-def validate(filepath):
-    if not os.path.exists(filepath):
-        print(f"FAIL: File not found: {filepath}")
-        return 1
+# Phase file required sections (12-section template)
+PHASE_REQUIRED_SECTIONS = [
+    "## Context Links",
+    "## Overview",
+    "## Key Insights",
+    "## Requirements",
+    "## Architecture",
+    "## Related Code Files",
+    "## Implementation Steps",
+    "## Todo List",
+    "## Success Criteria",
+    "## Risk Assessment",
+    "## Security Considerations",
+    "## Next Steps",
+]
 
-    content = open(filepath).read()
+def validate_frontmatter(content, filepath):
+    """Check YAML frontmatter exists and has required fields."""
     issues = []
-
-    # Check frontmatter
     if not content.startswith("---"):
-        issues.append("Missing YAML frontmatter")
+        issues.append(f"{filepath}: Missing YAML frontmatter")
     else:
         fm = content.split("---")[1] if "---" in content else ""
-        for field in REQUIRED_FRONTMATTER:
+        for field in PLAN_REQUIRED_FRONTMATTER:
             if field + ":" not in fm:
-                issues.append(f"Missing frontmatter: {field}")
+                issues.append(f"{filepath}: Missing frontmatter: {field}")
+    return issues
+
+def validate_plan(filepath):
+    """Validate plan.md overview file."""
+    if not os.path.exists(filepath):
+        return [f"File not found: {filepath}"]
+
+    content = open(filepath).read()
+    issues = validate_frontmatter(content, "plan.md")
 
     # Check required sections
-    for section in REQUIRED_SECTIONS:
+    for section in PLAN_REQUIRED_SECTIONS:
         if section not in content:
-            issues.append(f"Missing section: {section}")
+            issues.append(f"plan.md: Missing section: {section}")
 
-    # Check acceptance criteria are binary (checkboxes)
-    ac_match = re.search(r'## Acceptance Criteria\n(.*?)(?=\n##|\Z)', content, re.DOTALL)
-    if ac_match:
-        ac_text = ac_match.group(1)
-        if "- [ ]" not in ac_text and "- [x]" not in ac_text:
-            issues.append("Acceptance criteria must use checkboxes (- [ ])")
-        # Check for subjective criteria
-        subjective = ["is clean", "is good", "works correctly", "is nice", "looks good"]
-        for s in subjective:
-            if s.lower() in ac_text.lower():
-                issues.append(f"Subjective criterion detected: '{s}' — make it binary/measurable")
+    # Check goal is outcome-focused (heuristic: shouldn't start with verb)
+    goal_match = re.search(r'## Goal\n(.*?)(?=\n##|\Z)', content, re.DOTALL)
+    if goal_match:
+        goal = goal_match.group(1).strip()
+        activity_verbs = ["implement", "create", "build", "add", "write", "set up", "configure"]
+        for verb in activity_verbs:
+            if goal.lower().startswith(verb):
+                issues.append(f"plan.md: Goal starts with activity verb '{verb}' — rewrite as outcome")
+                break
 
-    # Check constraints not empty
-    c_match = re.search(r'## Constraints\n(.*?)(?=\n##|\Z)', content, re.DOTALL)
-    if c_match and c_match.group(1).strip() == "":
-        issues.append("Constraints section is empty")
+    # Check line count
+    line_count = len(content.strip().split("\n"))
+    if line_count > 100:
+        issues.append(f"plan.md: {line_count} lines (max 80 recommended) — move detail to phase files")
 
-    # Check out of scope exists under Scope
-    if "### Out of scope" not in content and "### Out of Scope" not in content:
-        issues.append("Missing 'Out of scope' subsection under Scope")
+    return issues
+
+def validate_phase(filepath):
+    """Validate a phase-XX file against 12-section template."""
+    if not os.path.exists(filepath):
+        return [f"File not found: {filepath}"]
+
+    content = open(filepath).read()
+    basename = os.path.basename(filepath)
+    issues = []
+
+    for section in PHASE_REQUIRED_SECTIONS:
+        if section not in content:
+            issues.append(f"{basename}: Missing section: {section}")
+
+    # Check for empty todo list
+    todo_match = re.search(r'## Todo List\n(.*?)(?=\n##|\Z)', content, re.DOTALL)
+    if todo_match:
+        todo = todo_match.group(1).strip()
+        if not todo or ("- [ ]" not in todo and "- [x]" not in todo):
+            issues.append(f"{basename}: Todo List has no checkboxes")
+
+    # Check line count
+    line_count = len(content.strip().split("\n"))
+    if line_count > 200:
+        issues.append(f"{basename}: {line_count} lines (max 150 recommended)")
+
+    return issues
+
+def validate(plan_path):
+    """Validate plan.md and all linked phase files."""
+    issues = validate_plan(plan_path)
+
+    # Find phase files in same directory
+    plan_dir = os.path.dirname(plan_path)
+    phase_files = sorted(glob.glob(os.path.join(plan_dir, "phase-*.md")))
+
+    if phase_files:
+        # Validate each phase file
+        for pf in phase_files:
+            issues.extend(validate_phase(pf))
+
+        # Check plan.md references all phase files
+        content = open(plan_path).read()
+        for pf in phase_files:
+            basename = os.path.basename(pf)
+            if basename not in content:
+                issues.append(f"plan.md: Phase file '{basename}' exists but not linked in plan")
 
     if issues:
         print(f"PLAN_INCOMPLETE: {len(issues)} issue(s)")
@@ -62,11 +121,13 @@ def validate(filepath):
             print(f"  - {i}")
         return 1
     else:
-        print("PLAN_COMPLETE")
+        phase_count = len(phase_files)
+        print(f"PLAN_COMPLETE ({phase_count} phase file{'s' if phase_count != 1 else ''} validated)")
         return 0
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: validate-plan.py <plan-file.md>")
+        print("Usage: validate-plan.py <plan.md>")
+        print("Validates plan.md + any phase-*.md files in the same directory.")
         sys.exit(1)
     sys.exit(validate(sys.argv[1]))

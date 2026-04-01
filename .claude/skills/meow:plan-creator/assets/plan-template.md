@@ -1,5 +1,6 @@
 ---
 title: [Short descriptive title — outcome-focused, not activity]
+description: [One-line summary for card preview]
 type: [feature | bug-fix | refactor | security]
 status: draft
 priority: [critical | high | medium | low]
@@ -7,6 +8,10 @@ effort: [xs | s | m | l | xl]
 created: [YYMMDD]
 branch: [feature/your-branch-name]
 model: [feature-model | bugfix-model | refactor-model | security-model]
+tags: []
+issue: ""
+blockedBy: []
+blocks: []
 ---
 
 ## Goal

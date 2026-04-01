@@ -2,6 +2,21 @@
 
 All notable changes to MeowKit are documented here. This file is auto-updated by [semantic-release](https://github.com/semantic-release/semantic-release) on future releases.
 
+## [1.3.2](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.3.2) (2026-04-01)
+
+### Features
+
+- **plan-creator redesign** — step-file architecture, multi-file phase output, scope challenge with user input, plan red team (2 adversarial personas), bounded research integration, sync-back checkpoint, critical-step tasks, richer frontmatter
+- **validate-plan.py** — now validates multi-file plans (plan.md + phase-XX files against 12-section template)
+
+### Changed
+
+- `meow:plan-creator` SKILL.md rewritten as thin entry (v1.3.2) with 6 step files + workflow.md
+- `planner.md` agent updated to reference step-file workflow
+- `plan-template.md` enriched (description, tags, issue, blockedBy/blocks)
+- `task-management.md` documents sync-back protocol
+- Added: `phase-template.md` (12 required sections), `validation-questions.md` (5-category framework)
+
 ## [1.3.1](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.3.1) (2026-03-31)
 
 ### Features

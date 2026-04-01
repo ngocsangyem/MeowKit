@@ -1,148 +1,102 @@
 ---
 name: meow:plan-creator
-description: "Creates structured plan files before any implementation. Selects workflow model, validates completeness, enforces Gate 1. Activated by /meow:plan or /meow:cook commands."
+version: 1.3.2
+preamble-tier: 3
+description: >-
+  Creates structured multi-file plans before implementation. Scope-aware: trivial tasks
+  exit early, simple tasks get fast plans, complex tasks get full research + phase files +
+  validation. Enforces Gate 1. Activated by /meow:plan or /meow:cook.
+argument-hint: "[task description] [--fast | --hard]"
+allowed-tools:
+  - Bash
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - Agent
+  - AskUserQuestion
+source: meowkit
 ---
 
 # Plan Creator
 
+Scope-aware planning with step-file workflow. Produces plan.md overview + phase-XX detail files.
+
 ## Trigger Conditions
 
 Activate when:
-- User runs `/meow:plan [feature]` or `/meow:cook [feature]`
-- Any non-trivial task starts (> 30 min OR > 3 files affected)
-- Gate 1 requires a plan before implementation proceeds
+- User runs `/meow:plan [task]` or `/meow:cook [task]`
+- Non-trivial task (> 2 files OR > 1h OR architectural decisions)
+- Gate 1 requires a plan before Phase 3
 
 Skip when:
-- `/meow:fix` with complexity=simple (Gate 1 exception per gate-rules.md)
-- Task is < 3 files AND < 30 min AND no architectural decisions needed
+- `/meow:fix` with complexity=simple (Gate 1 exception)
+- `meow:scale-routing` returns workflow=one-shot + zero blast radius
 
 ## Arguments
 
-| Flag | Behavior | Context Reminder cook flag |
-|------|----------|--------------------------|
-| (default) | Full planning, Gate 1 | `/meow:cook [path]` |
-| `--auto` | Auto complexity, design gate only | `/meow:cook --auto [path]` |
-| `--fast` | Skip research, minimal plan | `/meow:cook --auto [path]` |
-| `--hard` | Thorough, all gates | `/meow:cook [path]` |
-| `--parallel` | File ownership matrix | `/meow:cook --parallel [path]` |
+| Flag | Mode | Research | Phase Files | Validation |
+|------|------|----------|-------------|------------|
+| (default) | Auto-detect from scope | Follows mode | Follows mode | Follows mode |
+| `--fast` | Fast | Skip | plan.md only | Semantic checks only |
+| `--hard` | Hard | 2 researchers | plan.md + phases | Full interview |
 
-## Step 0 — Read Institutional Memory (mandatory)
+## Workflow
 
-Before planning, check for prior learnings:
-1. Read `.claude/memory/lessons.md` if it exists — note patterns relevant to this task
-2. Read `.claude/memory/patterns.json` if it exists — filter by scope:
-   - Patterns with no `scope` field → apply everywhere (project-wide)
-   - Patterns with `scope` → apply only if CWD is within that scope path
-   - Check for frequency-tracked anti-patterns (type: "correction") first
-3. If relevant learnings found, embed them in plan.md Context section as "Prior learnings"
-
-Skip ONLY if memory/ directory doesn't exist. Never skip if it does.
-Why: prevents re-solving known problems. 60 seconds reading saves hours.
-
-## Step 1 — Select Workflow Model
-
-Match task type to model before drafting anything:
-
-| Task type | Model | File |
-|-----------|-------|------|
-| New functionality, endpoints, UI | feature-model | references/workflow-models/feature-model.md |
-| Broken behavior, reported bug, failed test | bugfix-model | references/workflow-models/bugfix-model.md |
-| Restructure without behavior change | refactor-model | references/workflow-models/refactor-model.md |
-| Auth/payments, security review, audit | security-model | references/workflow-models/security-model.md |
-
-Wrong model = wrong phase flow. Always confirm type before proceeding.
-
-## Step 2 — Scope Assessment → Template Selection
+Execute via `workflow.md`. Step-file architecture — load one step at a time.
 
 ```
-< 5 files AND < 2 hours  →  plan-quick.md
-5–15 files OR 2–8 hours  →  plan-template.md (single file)
-> 15 files OR > 8 hours OR > 3 phases  →  plan-template.md + phase-XX-name.md per phase
+Step 0: Scope Challenge → trivial (exit) | simple (fast) | complex (hard)
+Step 1: Research (hard only) → 2 researchers, max 5 calls each
+Step 2: Codebase Analysis (hard only) → scout + docs
+Step 3: Draft Plan → plan.md (≤80 lines) + phase-XX files (12-section template)
+Step 4: Validate + Gate 1 → semantic checks + interview (hard) + approval
+Step 5: Hydrate Tasks → phase checkboxes → Claude Tasks
 ```
 
-Template: `assets/plan-template.md`
+## Output Structure
 
-## Step 3 — Discovery (skip if pre-researched)
+**Fast mode:** Single `plan.md` (goal, context, scope, approach, ACs)
+**Hard mode:** Directory with plan.md + phase files:
 
-**Skip if:** `tasks/reports/researcher-*.md` or `tasks/plans/*/reports/` already has findings, or `docs/design-guidelines.md` exists. Use existing reports as plan context.
-
-**If needed:** Investigate architecture (meow:scout), existing patterns (Grep/Glob), constraints (docs/), external APIs (meow:docs-finder). Save to `reports/discovery.md`.
-
-## Step 4 — Draft Plan
-
-Output to `tasks/plans/YYMMDD-feature-name/plan.md` (≤80 lines). Use `assets/plan-template.md`.
-
-Fill: frontmatter → Goal (outcome, not activity) → Context (Prior learnings) → Scope → Constraints → Technical Approach → Risk Map (m/l/xl effort) → Acceptance Criteria → Agent State.
-
-Risk rules: codebase pattern → LOW | external dep/new API → HIGH | >5 files blast → HIGH | novel → MEDIUM+.
-
-## Step 5 — Solution Options (when to use)
-
-Generate multiple options ONLY when:
-- Effort is m/l/xl AND multiple architecturally distinct approaches exist
-- Trade-offs are non-obvious (not just "library A vs B")
-
-Skip options when: effort xs/s, bug fix with confirmed root cause, single obvious approach.
-
-Evaluate via: `references/solution-evaluation.md`
-
-## Step 6 — Validate
-
-Run before presenting for Gate 1:
-```bash
-python3 scripts/validate-plan.py tasks/plans/YYMMDD-name/plan.md
+```
+tasks/plans/YYMMDD-name/
+├── plan.md              ← overview (≤80 lines)
+├── research/            ← researcher reports (hard mode)
+├── phase-01-name.md     ← 12-section detail (≤150 lines)
+├── phase-02-name.md
+└── ...
 ```
 
-Must output `PLAN_COMPLETE`. Fix all reported issues before proceeding.
+## Gotchas
 
-Manual checks:
-- [ ] Goal is one sentence describing done-state, not activity
-- [ ] Constraints section is non-empty
-- [ ] Acceptance criteria use checkboxes, no subjective language
-- [ ] Out of scope subsection exists
-- [ ] Plan is self-contained (fresh session can pick it up)
-- [ ] plan.md is under 80 lines (bulk content in reports/)
-
-## Step 7 — Gate 1: Present for Human Approval
-
-Load `references/gate-1-approval.md` and follow its exact process:
-1. Print plan summary
-2. Use AskUserQuestion (Approve / Modify / Reject)
-3. On Approve → print Context Reminder with mode-matched `/meow:cook` command + absolute path
-4. **STOP** — do not auto-proceed to Phase 2
-
-## ADR Generation
-
-When architecture decisions arise during planning, load `references/adr-generation.md`.
-Output: `docs/architecture/NNNN-title.md` (sequence-numbered).
-Use when: schema changes, new API boundaries, auth/payment architecture, technology choices.
-
-## Gotchas (top 3)
-
-- **Wrong model for task type**: feature-model on a bug fix skips investigation → always confirm type first
-- **Goal describes activity, not outcome**: "Implement OAuth" vs "Users can log in with OAuth" — next agent can't judge success → rewrite until Goal answers "what does done look like?"
-- **Acceptance criteria that can't be verified**: "code is clean" blocks Gate 2 → every criterion must reference a specific command or file check
-
-Full list: `references/gotchas.md`
-
-## Handoff Protocol
-
-After Gate 1 approval, update Agent State: `Planning phase: approved`. Hand off to tester with: plan path + workflow model + acceptance criteria.
-
-When resuming: read plan.md Agent State → update completed/blocked → mark todos. Never leave items in_progress at session end.
+- **Wrong workflow model**: feature-model on a bug fix skips investigation → confirm type at Step 0
+- **Goal describes activity**: "Implement OAuth" vs "Users can log in with OAuth" → rewrite as outcome
+- **ACs can't be verified**: "code is clean" blocks Gate 2 → every AC must reference a command/file check
+- **Monolithic plan**: plan.md over 80 lines → move detail to phase files or research reports
+- **Research disconnected**: findings archived but not cited in plan → Step 3 MUST integrate research into Key Insights
+- **Over-planning trivial tasks**: 2-file config change gets full research → Step 0 scope gate exits early
+- **Skipping scout on unfamiliar codebases**: → always run meow:scout if codebase is new
 
 ## References
 
-- `assets/plan-template.md` — plan file template
-- `references/workflow-models/` — feature, bugfix, refactor, security models
-- `references/solution-evaluation.md` — trade-off scoring criteria
-- `references/gotchas.md` — full gotchas list
-- `references/scope-challenge.md` — scope modes (HOLD/EXPANSION/REDUCTION), complexity thresholds
-- `references/research-phase.md` — scout + researcher subagent protocol
-- `references/plan-organization.md` — directory structure, naming, size rules
-- `references/output-standards.md` — YAML frontmatter, required sections, quality rules
-- `references/gate-1-approval.md` — AskUserQuestion gate + Context Reminder + Print & Stop
-- `references/task-management.md` — hydration, cross-session resume, sync-back
-- `scripts/validate-plan.py` — plan completeness validator
-- `tasks/templates/plan-quick.md` — quick plan template
-- `tasks/templates/plan-phase.md` — phase file template
+| File | Purpose |
+|------|---------|
+| `workflow.md` | Step sequence, variable table, flow diagram |
+| `references/phase-template.md` | 12-section phase file template |
+| `references/scope-challenge.md` | Scope modes (HOLD/EXPANSION/REDUCTION) |
+| `references/research-phase.md` | Researcher spawning protocol |
+| `references/plan-organization.md` | Directory structure, naming, size rules |
+| `references/output-standards.md` | YAML frontmatter, required sections |
+| `references/validation-questions.md` | Critical question categories for interview |
+| `references/gate-1-approval.md` | AskUserQuestion gate + Context Reminder |
+| `references/task-management.md` | Hydration, cross-session resume, sync-back |
+| `references/solution-evaluation.md` | Trade-off scoring criteria |
+| `references/gotchas.md` | Full gotchas list |
+| `references/adr-generation.md` | Architecture Decision Record generation |
+| `scripts/validate-plan.py` | Plan completeness validator |
+
+## Start
+
+Read and follow `workflow.md`.

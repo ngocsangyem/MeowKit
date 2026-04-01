@@ -24,7 +24,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 
 | Skill | Owner | Type | Architecture |
 |-------|-------|------|-------------|
-| `meow:plan-creator` | planner | planning | monolithic |
+| `meow:plan-creator` | planner | planning | step-file (v1.3.2: scope challenge, multi-file output, plan red team, sync-back) |
 | `meow:plan-ceo-review` | planner | planning | monolithic |
 | `meow:plan-eng-review` | planner/architect | planning | monolithic |
 | `meow:validate-plan` | planner | planning | monolithic |

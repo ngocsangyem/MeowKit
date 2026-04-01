@@ -10,6 +10,18 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### [v1.3.2 — The Plan Quality Release](/guide/whats-new/v1.3.2)
+
+Complete redesign of `meow:plan-creator` driven by red-team comparison with ClaudeKit-Engineer's `ck-plan`.
+
+- **Step-file architecture:** JIT-loaded steps replace monolithic SKILL.md
+- **Multi-file output:** plan.md overview (≤80 lines) + phase-XX files (12-section template)
+- **Scope challenge:** Trivial → exit, simple → fast, complex → hard + user scope input (EXPANSION/HOLD/REDUCTION)
+- **Plan red team:** 2 adversarial personas review plans before validation (hard mode)
+- **Research integration:** Bounded researchers, findings cited in phase Key Insights, verified links
+- **Sync-back:** `.plan-state.json` checkpoint for cross-session resume
+- **Critical-step tasks:** `[CRITICAL]`/`[HIGH]` todo items get own Claude Tasks
+
 ### [v1.3.1 — The Red Team Depth Release](/guide/whats-new/v1.3.1)
 
 Hybrid adversarial persona system for `meow:review` v1.2.0.
