@@ -2,6 +2,14 @@
 
 All notable changes to MeowKit are documented here. This file is auto-updated by [semantic-release](https://github.com/semantic-release/semantic-release) on future releases.
 
+## [1.3.3](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.3.3) (2026-04-02)
+
+### Bug Fixes
+
+- **cost-meter.sh** — always exited 1 because settings.json passes no arguments; now exits 0 for missing args
+- **post-write.sh** — exited 1 on empty/missing file path; now exits 0 (matches PreToolUse safety fallback pattern)
+- **pre-task-check.sh** — used `exit 2` for WARN findings; Claude Code treats non-zero as error; now exits 0
+
 ## [1.3.2](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.3.2) (2026-04-01)
 
 ### Features
