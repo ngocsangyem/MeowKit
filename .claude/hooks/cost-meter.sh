@@ -14,9 +14,9 @@ elif [ -f .claude/meowkit.config.json ]; then
   python3 -c "import json; exit(0 if json.load(open('.claude/meowkit.config.json')).get('features',{}).get('costTracking') else 1)" 2>/dev/null || exit 0
 fi
 
+# Safety fallback: if no arguments provided (e.g., called from PostToolUse without args), skip gracefully
 if [ -z "$COMMAND_NAME" ] || [ -z "$ESTIMATED_TOKENS" ]; then
-  echo "Usage: cost-meter.sh <command> <estimated_tokens> <tier> [task_summary]"
-  exit 1
+  exit 0
 fi
 
 if [ -z "$TIER" ]; then

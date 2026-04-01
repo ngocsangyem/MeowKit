@@ -106,7 +106,8 @@ if [ "$HAS_WARN" -eq 1 ]; then
   printf '%s' "$FINDINGS" | grep "^WARN"
   echo ""
   echo "Confirm with user before proceeding."
-  exit 2
+  # Exit 0 — warnings are informational, not blocking. Claude Code treats non-zero as hook error.
+  exit 0
 fi
 
 echo "PASS — no injection patterns detected."

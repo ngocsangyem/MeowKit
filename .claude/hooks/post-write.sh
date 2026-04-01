@@ -4,14 +4,14 @@
 
 FILE="$1"
 
+# Safety fallback: if no file path provided, skip (matches PreToolUse hooks behavior)
 if [ -z "$FILE" ]; then
-  echo "Usage: post-write.sh <file-path>"
-  exit 1
+  exit 0
 fi
 
+# If file doesn't exist (race condition or path issue), skip gracefully
 if [ ! -f "$FILE" ]; then
-  echo "File not found: $FILE"
-  exit 1
+  exit 0
 fi
 
 FILENAME=$(basename "$FILE")
