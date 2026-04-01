@@ -15,7 +15,7 @@ persona: B
 
 ## Overview
 
-MeowKit's review goes beyond "looks good to me." It runs 7 distinct passes, each looking for different issue categories, and includes cross-model adversarial red-teaming on larger diffs. Findings are classified as auto-fixable or requiring human decision.
+MeowKit's review goes beyond "looks good to me." It uses a scope-aware hybrid system: 3 base reviewers (Phase A) + up to 4 adversarial persona passes (Phase B) + forced-finding protocol + 4-level artifact verification. Findings are classified as auto-fixable or requiring human decision.
 
 ## Step-by-step guide
 
@@ -28,22 +28,21 @@ MeowKit's review goes beyond "looks good to me." It runs 7 distinct passes, each
 /meow:review abc1234            # specific commit
 ```
 
-### Step 2: Watch the 7 passes execute
+### Step 2: Watch the review pipeline execute
 
-| Pass | What it checks | Blocks ship? |
-|------|---------------|-------------|
-| **Scope drift** | Diff vs plan file + TODOS.md — catch creep or missing requirements | If requirements missing |
-| **Critical checklist** | SQL injection, race conditions, auth bypass, enum completeness | Yes (CRITICAL findings) |
-| **Informational checklist** | Dead code, magic numbers, style, test gaps | No (noted in PR) |
-| **Design review** | Component structure, accessibility (only if frontend files changed) | No |
-| **Test coverage audit** | Traces codepaths, generates coverage diagram, writes missing tests | If coverage below gate |
-| **Fix-first resolution** | Auto-fixes trivial issues (formatting, imports), asks about non-trivial | Depends on finding |
-| **Adversarial review** | Cross-model red-team: "find ways this code breaks in production" | Only if CRITICAL security |
+**Step 1 — Scope Gate:** Classifies diff as `minimal` or `full` based on file count, line count, security files, and domain complexity.
 
-The adversarial review auto-scales:
-- **<50 lines:** Skipped (small diff, low risk)
-- **50-199 lines:** One cross-model adversarial pass
-- **200+ lines:** Full battery (Claude structured + adversarial subagent)
+| Phase | What it does | Scope |
+|-------|-------------|-------|
+| **Phase A: Base Reviewers** | 3 parallel reviewers — Blind Hunter, Edge Case Hunter, Criteria Auditor | All scopes (minimal = Blind Hunter only) |
+| **Phase B: Adversarial Personas** | 4 hostile-lens passes informed by Phase A findings — Security Adversary, Failure Mode Analyst, Assumption Destroyer, Scope Critic | Full scope only (2 personas for standard, 4 for high-domain) |
+| **Forced-Finding** | If zero findings → re-analyze once with "look harder" prompt | All scopes |
+| **Artifact Verification** | 4-level check: Exists, Substantive, Wired, Data Flowing | Full scope only |
+| **Triage** | Categorize as current-change (blocks ship) vs incidental (backlog) | All scopes |
+
+**Scope auto-scales:**
+- **Minimal** (≤3 files, ≤50 lines, no security, domain≠high): Blind Hunter only — fast, low noise
+- **Full** (anything above thresholds): All 3 reviewers + personas + artifact verification
 
 ### Step 3: Review the verdict
 

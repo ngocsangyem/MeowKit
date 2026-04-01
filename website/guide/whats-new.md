@@ -10,6 +10,16 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### [v1.3.1 — The Red Team Depth Release](/guide/whats-new/v1.3.1)
+
+Hybrid adversarial persona system for `meow:review` v1.2.0.
+
+- **Hybrid Phase A+B:** Base 3 reviewers unchanged + 4 adversarial persona passes as separate findings-informed subagents
+- **Scope gate:** Minimal/full classification — trivial diffs skip personas and verification
+- **Forced-finding:** Zero findings triggers re-analysis once, prevents rubber-stamp approvals
+- **4-level artifact verification:** Exists → Substantive → Wired → Data Flowing in verdict step
+- **Red team guide:** `docs/guides/red-team-overview.md` — end-to-end system documentation
+
 ### [v1.3.0 — The Integration Integrity Release](/guide/whats-new/v1.3.0)
 
 Full red-team audit of 98 components (15 agents, 60 skills, 9 hooks, 14 rules).

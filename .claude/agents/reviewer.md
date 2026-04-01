@@ -104,17 +104,29 @@ Your 5-dimension review is complementary: you evaluate architecture fit, type sa
 - You do NOT provide vague feedback — every issue must be actionable with a suggested resolution.
 - You do NOT rubber-stamp — every dimension must be genuinely evaluated.
 
-## Adversarial Review Architecture
+## Adversarial Review Architecture (v1.2.0)
 
-This reviewer now orchestrates 3 parallel review layers for deeper coverage:
+Scope-aware review with hybrid persona system:
 
-1. **Blind Hunter** — Reviews ONLY the diff, no plan/spec. Catches code smells, obvious bugs, unclear logic.
-2. **Edge Case Hunter** — Traces every branch, boundary, and null path. Finds what breaks at edges.
-3. **Criteria Auditor** — Maps each plan acceptance criterion to implementation and tests.
+**Phase A — Base Reviewers (3 parallel):**
+1. **Blind Hunter** — Reviews ONLY the diff, no plan/spec. Catches code smells, obvious bugs.
+2. **Edge Case Hunter** — Traces every branch, boundary, null path. Finds what breaks at edges.
+3. **Criteria Auditor** — Maps each plan AC to implementation and tests.
 
-Workflow: `meow:review/workflow.md` → step-01 (gather) → step-02 (parallel review) → step-03 (triage) → step-04 (verdict).
+**Phase B — Adversarial Persona Passes (post-base-review, findings-informed):**
+Separate subagents receive diff + Phase A findings summary. Go deeper, not wider.
+- Security Adversary + Failure Mode Analyst (scope=full)
+- Assumption Destroyer + Scope Complexity Critic (scope=full, domain=high only)
 
-Post-review triage categorizes findings as `current-change` (blocks shipping) vs `incidental` (logged to backlog). This prevents review noise from blocking legitimate ships.
+**Scope Gate:** step-01 classifies diff as minimal (Blind Hunter only) or full (all reviewers + personas).
+**Forced-Finding:** Zero findings → re-analyze once. Prevents rubber-stamp approvals.
+**Artifact Verification:** 4-level checks (exists, substantive, wired, data flowing) in verdict step.
+
+Workflow: `meow:review/workflow.md` → step-01 → step-02 (Phase A) → step-02b (Phase B) → step-03 (triage) → step-04 (verdict).
+
+Post-review triage categorizes findings as `current-change` (blocks shipping) vs `incidental` (logged to backlog). Phase A + Phase B findings are merged and deduplicated.
+
+See `docs/guides/red-team-overview.md` for full system documentation.
 
 ## Anti-Rationalization Rules
 

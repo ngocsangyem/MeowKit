@@ -5,6 +5,29 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 1.3.1 (2026-03-31) — The Red Team Depth Release
+
+Hybrid adversarial persona system for `meow:review`.
+
+### Features
+
+- **Scope gate** — step-01 classifies diffs as minimal (≤3 files, ≤50 lines, no security, domain≠high) or full. Minimal runs Blind Hunter only.
+- **Hybrid persona system** — Phase B: 4 adversarial persona subagents (Security Adversary, Failure Mode Analyst, Assumption Destroyer, Scope Complexity Critic) run after base reviewers, informed by Phase A findings. 2-at-a-time batching.
+- **Forced-finding protocol** — zero findings triggers 1 re-analysis with "look harder" prompt. Prevents rubber-stamp approvals.
+- **4-level artifact verification** — Exists, Substantive, Wired, Data Flowing checks in verdict step. Catches hollow implementations, stubs, orphaned exports.
+- **Red team overview guide** — `docs/guides/red-team-overview.md` documents the full system.
+- **Memory patterns** — 3 red-team patterns added to `patterns.json` (scope-gate, forced-finding, hybrid-persona).
+
+### Changed
+
+- `meow:review` bumped to v1.2.0 (SKILL.md)
+- `workflow.md` updated with Phase B step (step-02b), variable table, flow diagram
+- `step-04-verdict.md` includes artifact verification section and Phase B reviewer sources
+- `reviewer.md` agent updated with hybrid architecture description
+- `AGENTS_INDEX.md` reviewer entry updated with persona capabilities
+
+---
+
 ## 1.3.0 (2026-03-31) — The Integration Integrity Release
 
 Full red-team audit: 98 components, 11 batches, 43 criticals found, 42 fixed.

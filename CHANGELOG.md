@@ -2,6 +2,23 @@
 
 All notable changes to MeowKit are documented here. This file is auto-updated by [semantic-release](https://github.com/semantic-release/semantic-release) on future releases.
 
+## [1.3.1](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.3.1) (2026-03-31)
+
+### Features
+
+- **hybrid adversarial persona system** — Phase B: 4 persona subagents (Security Adversary, Failure Mode Analyst, Assumption Destroyer, Scope Complexity Critic) run after base reviewers, informed by Phase A findings
+- **scope gate** — step-01 classifies diffs as minimal (≤3 files, ≤50 lines) or full; minimal runs Blind Hunter only
+- **forced-finding protocol** — zero findings triggers 1 re-analysis; prevents rubber-stamp approvals
+- **4-level artifact verification** — Exists, Substantive, Wired, Data Flowing checks in verdict step
+- **red team overview guide** — `docs/guides/red-team-overview.md`
+
+### Changed
+
+- `meow:review` bumped to v1.2.0 with step-02b (persona passes), updated workflow, verdict format
+- `reviewer.md` agent updated with hybrid architecture
+- `patterns.json` — 3 red-team patterns (scope-gate, forced-finding, hybrid-persona)
+- `security-log.md` — red-team findings format documented
+
 ## [1.3.0](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.3.0) (2026-03-31)
 
 ### Features

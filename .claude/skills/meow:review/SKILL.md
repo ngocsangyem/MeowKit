@@ -1,9 +1,10 @@
 ---
 name: meow:review
 preamble-tier: 4
-version: 1.1.0
+version: 1.3.1
 description: |
-  Multi-pass code review with adversarial analysis. Supports input modes: branch diff (default),
+  Multi-pass code review with adversarial analysis, scope-aware dispatch, adversarial persona passes,
+  and forced-finding protocol. Supports input modes: branch diff (default),
   PR number (#123), commit hash, pending changes (--pending). Use when asked to "review this PR",
   "code review", "pre-landing review", "check my diff", or "review #123".
   Proactively suggest when the user is about to merge or land code changes.
@@ -26,18 +27,41 @@ source: gstack
 
 Multi-pass code review with 3-layer adversarial analysis, spec compliance, and auto-fix. Uses step-file architecture for deterministic execution.
 
-## Adversarial Review Architecture (v2)
+## Adversarial Review Architecture (v3 — Hybrid Persona System)
 
-This skill now uses 3 parallel review layers (inspired by BMAD-METHOD):
+### Phase A: Base Reviewers (3 parallel layers)
 
 1. **Blind Hunter** — Reviews ONLY the diff. No plan, no spec. Catches code smells and obvious bugs.
 2. **Edge Case Hunter** — Traces every branch, boundary, null path. Finds what breaks at edges.
 3. **Criteria Auditor** — Maps each plan AC to implementation. Verifies coverage.
 
-Post-review triage categorizes findings as `current-change` (must fix) vs `incidental` (logged to backlog).
+### Phase B: Adversarial Persona Passes (post-base-review, findings-informed)
 
-**Workflow:** `workflow.md` → `step-01-gather-context.md` → `step-02-parallel-review.md` → `step-03-triage.md` → `step-04-verdict.md`
+After Phase A completes, separate persona subagents receive the diff AND a summary of Phase A findings. They go deeper — not wider — challenging what base reviewers missed or understated.
+
+1. **Security Adversary** — Attack surface, injection vectors, auth bypass, supply chain
+2. **Failure Mode Analyst** — Race conditions, partial failures, cascading errors, data loss
+3. **Assumption Destroyer** — Implicit assumptions, unvalidated inputs, edge cases (high-domain only)
+4. **Scope Complexity Critic** — Over-engineering, YAGNI violations, scope creep (high-domain only)
+
+### Scope Gate
+
+Step-01 assesses diff complexity and sets `review_scope`:
+- **minimal** (≤3 files, ≤50 lines, no security files, domain≠high) → Blind Hunter only, no personas
+- **full** → All 3 base reviewers + personas based on domain complexity
+
+### Forced-Finding Protocol
+
+If total findings across all reviewers = 0, step-03 triggers ONE re-analysis with "look harder" prompt. Prevents rubber-stamp approvals.
+
+### Workflow
+
+```
+workflow.md → step-01 → step-02 (Phase A) → step-02b (Phase B, full scope only) → step-03 → step-04
+```
+
 **Prompts:** `prompts/blind-hunter.md`, `prompts/edge-case-hunter.md`, `prompts/criteria-auditor.md`
+**Personas:** `prompts/personas/security-adversary.md`, `prompts/personas/failure-mode-analyst.md`, `prompts/personas/assumption-destroyer.md`, `prompts/personas/scope-complexity-critic.md`
 
 ## Plan-First Gate
 
@@ -70,15 +94,17 @@ Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer
 - **For complex changes (3+ files):** Run `/meow:scout` first to identify edge cases before review
 - **After verdict:** Optionally run `/meow:elicit` for structured second-pass reasoning on findings
 
-## Workflow
+## Workflow (Step-File Architecture)
 
-1. **Initialize** — Run preamble, detect base branch (PR base → default branch → `main`), verify not on base branch and that a diff exists. Fetch external PR comments and classify them. See [references/preamble.md](references/preamble.md), [references/scope-drift-detection.md](references/scope-drift-detection.md).
+Execute via `workflow.md`. Each step is a separate file loaded JIT:
 
-2. **Pass 1 — Structural review** — Get full diff (`git fetch origin <base> --quiet && git diff origin/<base>`). Check scope drift against plan file, TODOS.md, and PR description. Apply checklist (critical then informational), design review if frontend files present, test coverage trace with gap analysis. Classify all findings as AUTO-FIX or ASK, apply fixes, batch-ask user on remaining items. See [references/two-pass-review.md](references/two-pass-review.md), [references/design-review.md](references/design-review.md), [references/test-coverage.md](references/test-coverage.md), [references/fix-first-review.md](references/fix-first-review.md).
+1. **step-01-gather-context** — Load diff, plan, ACs. **Scope gate** classifies diff as `minimal` or `full`. Domain complexity check via `meow:scale-routing`.
+2. **step-02-parallel-review (Phase A)** — Dispatch reviewers based on scope. Minimal = Blind Hunter only. Full = all 3 reviewers in parallel.
+3. **step-02b-persona-passes (Phase B)** — Full scope only. Dispatch adversarial persona subagents informed by Phase A findings. 2-at-a-time batching.
+4. **step-03-triage** — **Forced-finding check** (zero → re-analyze once). Categorize findings as `current-change` or `incidental`. Dedup Phase A + Phase B.
+5. **step-04-verdict** — 5-dimension verdict (Correctness, Maintainability, Performance, Security, Coverage) + **artifact verification** (4-level). Present for Gate 2.
 
-3. **Pass 2 — Adversarial analysis** — Auto-scaled by diff size (small/medium/large) using Codex and/or Claude subagent. Cross-reference TODOS, check documentation staleness. See [references/adversarial-review.md](references/adversarial-review.md), [references/post-review-steps.md](references/post-review-steps.md).
-
-4. **Verdict** — Emit structured verdict (PASS / WARN / FAIL), persist result for `/meow:ship` to consume, log telemetry. See [references/post-review-steps.md](references/post-review-steps.md), [references/preamble.md](references/preamble.md).
+See also reference files for supplementary checks: [preamble](references/preamble.md), [scope-drift](references/scope-drift-detection.md), [design-review](references/design-review.md), [test-coverage](references/test-coverage.md), [adversarial-review](references/adversarial-review.md), [artifact-verification](references/artifact-verification.md).
 
 ## References
 
@@ -98,38 +124,20 @@ Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer
 
 ## Verdict Output
 
-After all passes complete, output this summary:
+Defined in `step-04-verdict.md`. 5-dimension framework with artifact verification:
 
-```
-## Review Verdict: {SEARCH_TARGET}
-
-**Mode:** {branch diff | pending | PR #N | commit HASH}
-**Diff:** +{ins}/-{del} lines across {N} files
-**Spec:** {found at path | not found — scope drift check only}
-
-### Critical Findings ({N})
-{numbered list — must be resolved before merge}
-
-### Informational ({N})
-{numbered list — non-blocking}
-
-### Adversarial ({tier}: {small|medium|large})
-{findings from adversarial review or "skipped (small diff)"}
-
-### Verdict
-{PASS — no blocking issues}
-{WARN — N critical findings must be resolved}
-{FAIL — critical security or spec violation, requires human resolution}
-
-### Required Actions
-{numbered list if WARN or FAIL — empty if PASS}
-```
+| Dimension | PASS | WARN | FAIL |
+|-----------|------|------|------|
+| Correctness | No CRITICAL/MAJOR bugs | MINOR bugs only | Any CRITICAL bug |
+| Maintainability | Clean, conventions followed | Style issues | Unreadable, violates architecture |
+| Performance | No regressions | Potential issues flagged | Proven regression |
+| Security | No security findings | MINOR security notes | Any CRITICAL security issue |
+| Coverage | All ACs covered + tested | Partial AC coverage | Missing AC implementation |
 
 **Verdict rules:**
-
-- **PASS** — zero critical findings across all passes
-- **WARN** — 1+ critical findings that can be fixed
-- **FAIL** — security vulnerability, spec violation, or 3+ unresolved critical findings
+- Any FAIL dimension → Overall FAIL → Gate 2 blocks
+- All PASS → Overall PASS → Gate 2 eligible
+- Mix of PASS/WARN → Overall WARN → Gate 2 eligible with acknowledgment
 
 FAIL verdict prevents `/meow:ship` from executing (Gate 2 enforcement).
 
