@@ -1,20 +1,22 @@
 # mewkit
 
-Runtime CLI for [MeowKit](https://github.com/ngocsangyem/MeowKit) — manage your AI agent toolkit after installation.
+CLI for [MeowKit](https://github.com/ngocsangyem/MeowKit) — scaffold, upgrade, and manage your AI agent toolkit.
 
 ## Install
 
 ```bash
-npx mewkit <command>
+npx mewkit init           # New project or update existing
+npx mewkit <command>      # Runtime commands
 ```
 
 ## Commands
 
 | Command             | Description                                                       |
 | ------------------- | ----------------------------------------------------------------- |
+| `meowkit init`      | Scaffold new project or update existing (`--dry-run`, `--force`, `--beta`) |
+| `meowkit upgrade`   | Update to latest version (`--check`, `--beta`, `--list`)          |
 | `meowkit doctor`    | Diagnose environment (Node.js, Python, Git, `.claude/` structure) |
 | `meowkit setup`     | Guided configuration (Python venv, MCP, .env, .gitignore)         |
-| `meowkit upgrade`   | Update to latest version (`--check`, `--beta`, `--list`)          |
 | `meowkit validate`  | Verify `.claude/` structure integrity                             |
 | `meowkit budget`    | Token usage and cost tracking (`--monthly`)                       |
 | `meowkit memory`    | View/manage cross-session memory (`--show`, `--stats`, `--clear`) |
@@ -25,17 +27,23 @@ npx mewkit <command>
 ## Usage
 
 ```bash
-# Post-install setup
-npx mewkit setup
-
-# Check environment
-npx mewkit doctor
+# Scaffold or update a MeowKit project
+npx mewkit init                 # Interactive version selection
+npx mewkit init --beta          # Use beta channel
+npx mewkit init --dry-run       # Preview changes without writing
+npx mewkit init --force         # Overwrite all files (bypass user modification checks)
 
 # Upgrade MeowKit
 npx mewkit upgrade              # Latest stable
 npx mewkit upgrade --beta       # Latest beta
 npx mewkit upgrade --check      # Check without installing
 npx mewkit upgrade --list       # Show all available versions
+
+# Post-install setup
+npx mewkit setup
+
+# Check environment
+npx mewkit doctor
 
 # View token costs
 npx mewkit budget --monthly
