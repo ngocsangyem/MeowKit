@@ -24,7 +24,7 @@ export default withMermaid(defineConfig({
   ],
   appearance: 'dark',
   themeConfig: {
-    logo: { light: '/logo.png', dark: '/logo.png' },
+    logo: { light: '/logo.webp', dark: '/logo.webp' },
     nav: [
       { text: 'Guide', link: '/introduction' },
       { text: 'CLI', link: '/cli/' },

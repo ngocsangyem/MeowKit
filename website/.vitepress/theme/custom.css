@@ -142,10 +142,10 @@ html:not(.dark) {
   --vp-c-brand-3: var(--mk-accent-glow);
   --vp-c-brand-soft: rgba(37, 99, 235, 0.14);
 
-  /* Backgrounds — from design tokens: bg #05070A, bgSecondary #0A1F44, surface #111418 */
-  --mk-bg-base: #05070A;
-  --mk-bg-surface: #111418;
-  --mk-bg-soft: #0A1F44;
+  /* Backgrounds — blue-tinted dark palette (comfortable reading) */
+  --mk-bg-base: #0f172a;
+  --mk-bg-surface: #1e293b;
+  --mk-bg-soft: #1e3a5f;
   --vp-c-bg: var(--mk-bg-base);
   --vp-c-bg-alt: var(--mk-bg-surface);
   --vp-c-bg-elv: var(--mk-bg-surface);
@@ -172,7 +172,7 @@ html:not(.dark) {
 
   /* Component overrides */
   --vp-sidebar-bg-color: var(--mk-bg-base);
-  --vp-nav-bg-color: rgba(5, 7, 10, 0.85);
+  --vp-nav-bg-color: rgba(15, 23, 42, 0.85);
   --vp-code-block-bg: var(--mk-bg-surface);
   --vp-code-line-highlight-color: rgba(37, 99, 235, 0.10);
   --vp-code-tab-active-bar-color: var(--mk-accent-glow);
@@ -313,7 +313,7 @@ html:not(.dark) :not(pre) > code {
 }
 
 .dark .vp-doc tr:nth-child(even) td {
-  background-color: rgba(17, 20, 24, 0.60);
+  background-color: rgba(30, 41, 59, 0.60);
 }
 
 html:not(.dark) .vp-doc th {
