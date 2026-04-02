@@ -1,7 +1,7 @@
 {
   "name": "mewkit",
-  "version": "1.4.0",
-  "description": "MeowKit runtime CLI — upgrade, validate, budget, memory, doctor",
+  "version": "1.4.1",
+  "description": "MeowKit CLI — scaffold, upgrade, and manage your AI agent toolkit",
   "type": "module",
   "bin": {
     "meowkit": "./dist/index.js"
