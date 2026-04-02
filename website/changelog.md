@@ -5,6 +5,24 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 1.3.4 (2026-04-02) — Hook path resolution fix
+
+### Bug Fixes
+
+- **all hooks** — use `$CLAUDE_PROJECT_DIR` for absolute paths in settings.json and CWD guard in all 8 scripts; fixes "No such file or directory" when CWD differs from project root
+
+---
+
+## 1.3.3 (2026-04-02) — The Hook Safety Release
+
+### Bug Fixes
+
+- **cost-meter.sh** — always exited 1 because settings.json passes no arguments; now exits 0 for missing args
+- **post-write.sh** — exited 1 on empty/missing file path; now exits 0 (matches PreToolUse safety fallback pattern)
+- **pre-task-check.sh** — used `exit 2` for WARN findings; Claude Code treats non-zero as error; now exits 0
+
+---
+
 ## 1.3.2 (2026-04-01) — The Plan Quality Release
 
 Complete redesign of `meow:plan-creator` to match/exceed ck-plan across 15 dimensions.
