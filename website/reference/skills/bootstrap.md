@@ -11,7 +11,7 @@ End-to-end project orchestrator: research → design → scaffold → plan → i
 
 `meow:bootstrap` orchestrates the full journey from idea to running code. It doesn't implement anything itself — it wires together MeowKit's existing skills in sequence: parallel research, tech stack selection via brainstorming, design with UI/UX designer, file scaffolding, planning via plan-creator, implementation via cook, and documentation via docs-init.
 
-Complements `npm create meowkit@latest` — CLI = MeowKit infrastructure (.claude/), bootstrap = application code + full pipeline.
+Complements `npx mewkit init` — CLI = MeowKit infrastructure (.claude/), bootstrap = application code + full pipeline.
 
 ## Core Capabilities
 
@@ -33,7 +33,7 @@ Complements `npm create meowkit@latest` — CLI = MeowKit infrastructure (.claud
 
 ::: warning Don't use meow:bootstrap when...
 - Project already has source code → use `meow:plan-creator` for new features
-- You only need MeowKit setup → use `npm create meowkit@latest`
+- You only need MeowKit setup → use `npx mewkit init`
 :::
 
 ## Usage

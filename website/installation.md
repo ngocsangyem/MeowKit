@@ -16,7 +16,7 @@ persona: A
 ## Install
 
 ```bash
-npm create meowkit@latest
+npx mewkit init
 ```
 
 The CLI asks two optional questions then generates a `.claude/` directory with everything configured.
@@ -37,11 +37,11 @@ All other settings use fixed defaults: cost tracking enabled, memory enabled, mo
 Skip the interactive prompts with flags:
 
 ```bash
-npm create meowkit@latest -- --mode strict     # Set mode directly
-npm create meowkit@latest -- --no-memory        # Disable memory
-npm create meowkit@latest -- --force            # Overwrite existing .claude/
-npm create meowkit@latest -- --dry-run          # Preview without writing
-npm create meowkit@latest -- --global           # Install as global config
+npx mewkit init -- --mode strict     # Set mode directly
+npx mewkit init -- --no-memory        # Disable memory
+npx mewkit init -- --force            # Overwrite existing .claude/
+npx mewkit init -- --dry-run          # Preview without writing
+npx mewkit init -- --global           # Install as global config
 ```
 
 ## What gets generated

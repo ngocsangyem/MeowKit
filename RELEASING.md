@@ -11,7 +11,8 @@ prepare-release-assets.cjs → dist/meowkit-release.zip
     ↓
 GitHub Release (tag + zip asset)
     ↓
-create-meowkit CLI fetches zip at npm create meowkit@latest
+mewkit CLI fetches zip at npx mewkit init
+(create-meowkit is deprecated — use npx mewkit init)
 ```
 
 **Key insight:** `create-meowkit` is a thin CLI that downloads `meowkit-release.zip` from GitHub Releases at runtime. If the release has no zip asset, the CLI cannot find it and falls back to an older version.
@@ -110,9 +111,10 @@ Follow the existing format. Use `**bold**` for feature names and `—` (em dash)
 ### 3. Bump versions
 
 ```bash
-npm -w packages/create-meowkit version <version> --no-git-tag-version
 npm -w packages/mewkit version <version> --no-git-tag-version
 ```
+
+> **Note:** `create-meowkit` is deprecated. Only bump `mewkit`. Do not publish new versions of `create-meowkit` unless a critical bug fix is required for users who haven't migrated.
 
 ### 4. Build and verify
 
@@ -173,7 +175,7 @@ gh release create v<version> dist/meowkit-release.zip \
 ### Install
 
 ```bash
-npm create meowkit@latest
+npx mewkit init
 # or upgrade:
 npx mewkit upgrade
 ````
@@ -202,15 +204,16 @@ gh release view v<version> --json url -q '.url'
 ### 10. Publish to npm (if package versions bumped)
 
 ```bash
-npm -w packages/create-meowkit publish
 npm -w packages/mewkit publish
 ```
+
+> **Note:** `create-meowkit` is deprecated — do not publish it. Users should migrate to `npx mewkit init`.
 
 ### 11. Test end-to-end
 
 ```bash
-npx create-meowkit@latest test-project
-# Should fetch the new version
+npx mewkit init test-project
+# Should scaffold using the new version
 ```
 
 ## Release Checklist
@@ -251,7 +254,7 @@ Copy this checklist for each release:
 ### Verify
 
 - [ ] `gh release view v<version>` shows asset
-- [ ] `npx create-meowkit@latest` fetches new version (if npm published)
+- [ ] `npx mewkit init` scaffolds new version correctly
 ```
 
 ## Automated Release (CI/CD)

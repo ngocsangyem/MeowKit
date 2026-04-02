@@ -10,7 +10,7 @@ persona: A
 
 **Best for:** First-time users  
 **Time estimate:** 5 minutes  
-**Skills used:** create-meowkit CLI, [meow:plan-creator](/reference/skills/plan-creator)
+**Skills used:** `npx mewkit init`, [meow:plan-creator](/reference/skills/plan-creator)
 
 ## Overview
 
@@ -27,7 +27,7 @@ This workflow gets you from an empty project to a fully configured MeowKit envir
 ### Step 1: Install MeowKit
 
 ```bash
-npm create meowkit@latest
+npx mewkit init
 ```
 
 The CLI auto-detects your tech stack and asks configuration questions (project name, stack, team size, mode, memory, optional Gemini API key). Takes ~30 seconds.

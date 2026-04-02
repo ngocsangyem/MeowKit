@@ -15,6 +15,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
+    "@clack/prompts": "^0.8.2",
     "picocolors": "^1.1.0",
     "minimist": "^1.2.8"
   },

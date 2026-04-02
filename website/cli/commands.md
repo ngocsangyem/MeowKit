@@ -88,7 +88,7 @@ npx mewkit memory --clear      # Clear all memory (with confirmation)
 
 ## upgrade
 
-Update create-meowkit to the latest version.
+Update mewkit to the latest version.
 
 ```bash
 npx mewkit upgrade [--check] [--beta] [--list]

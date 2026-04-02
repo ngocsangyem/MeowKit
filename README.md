@@ -26,7 +26,7 @@ MeowKit installs a `.claude/` directory that Claude Code reads at session start.
 ## Quick Start
 
 ```bash
-npm create meowkit@latest
+npx mewkit init
 ```
 
 The CLI fetches the latest release from GitHub, prompts for config, and scaffolds `.claude/` into your project.
@@ -40,7 +40,7 @@ npx mewkit doctor     # Verify environment
 
 | Package                                                          | npm                         | Description                                             |
 | ---------------------------------------------------------------- | --------------------------- | ------------------------------------------------------- |
-| [`create-meowkit`](https://www.npmjs.com/package/create-meowkit) | `npm create meowkit@latest` | Scaffold CLI — downloads release from GitHub            |
+| [`create-meowkit`](https://www.npmjs.com/package/create-meowkit) | ~~`npm create meowkit@latest`~~ (deprecated) | Scaffold CLI — use `npx mewkit init` instead |
 | [`mewkit`](https://www.npmjs.com/package/mewkit)       | `npx mewkit <cmd>`     | Runtime CLI — upgrade, doctor, validate, budget, memory |
 
 ## Requirements

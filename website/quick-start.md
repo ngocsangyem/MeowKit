@@ -11,7 +11,7 @@ This guide gets you from zero to your first MeowKit-managed task in 5 minutes.
 ## Step 1: Install MeowKit
 
 ```bash
-npm create meowkit@latest
+npx mewkit init
 ```
 
 The CLI asks two optional questions: a project description and a Gemini API key. Press Enter to skip both. All other settings (cost tracking, memory, mode) default automatically. Takes ~30 seconds.

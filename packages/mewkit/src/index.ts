@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import minimist from "minimist";
 import pc from "picocolors";
+import { init } from "./commands/init.js";
 import { upgrade } from "./commands/upgrade.js";
 import { validate } from "./commands/validate.js";
 import { budget } from "./commands/budget.js";
@@ -25,7 +26,8 @@ ${pc.bold("Usage:")}
   meowkit <command> [options]
 
 ${pc.bold("Commands:")}
-  ${pc.green("upgrade")}    Upgrade create-meowkit to the latest version
+  ${pc.green("init")}       Scaffold or update MeowKit in the current project
+  ${pc.green("upgrade")}    Upgrade MeowKit to the latest version
   ${pc.green("validate")}   Validate .claude/ project structure
   ${pc.green("budget")}     View token usage and cost log
   ${pc.green("memory")}     Manage agent memory (lessons & patterns)
@@ -60,7 +62,7 @@ async function printStatus(): Promise<void> {
 
 async function main(): Promise<void> {
   const args = minimist(process.argv.slice(2), {
-    boolean: ["help", "version", "check", "beta", "list", "monthly", "clear", "show", "stats", "report", "all"],
+    boolean: ["help", "version", "check", "beta", "list", "monthly", "clear", "show", "stats", "report", "all", "dry-run", "force"],
     string: ["only", "type", "priority", "status"],
     alias: { h: "help", v: "version" },
   });
@@ -78,6 +80,13 @@ async function main(): Promise<void> {
   }
 
   switch (command) {
+    case "init":
+      await init({
+        dryRun: args["dry-run"] as boolean | undefined,
+        force: args.force as boolean | undefined,
+        beta: args.beta as boolean | undefined,
+      });
+      break;
     case "upgrade":
       await upgrade({ check: args.check as boolean | undefined, beta: args.beta as boolean | undefined, list: args.list as boolean | undefined });
       break;

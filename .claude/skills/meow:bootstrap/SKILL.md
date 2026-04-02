@@ -23,7 +23,7 @@ sources:
 
 End-to-end project orchestrator: research → design → **plan → scaffold** → implement → docs.
 
-**CLI boundary:** `npm create meowkit@latest` = MeowKit infrastructure. `meow:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
+**CLI boundary:** `npx mewkit init` = MeowKit infrastructure. `meow:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
 
 ## When to Invoke
 

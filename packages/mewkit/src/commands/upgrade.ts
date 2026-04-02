@@ -1,139 +1,177 @@
-import { execSync } from "node:child_process";
+import fs from "node:fs";
+import { join } from "node:path";
 import pc from "picocolors";
+import {
+  fetchReleases,
+  downloadRelease,
+  cleanupDownload,
+  smartUpdate,
+} from "../core/index.js";
+import type { ReleaseInfo, UserConfig } from "../core/index.js";
 
-interface RegistryResponse {
-  version: string;
-}
-
-interface RegistryFullResponse {
-  "dist-tags": Record<string, string>;
-  versions: Record<string, unknown>;
-}
-
-interface UpgradeArgs {
+export interface UpgradeArgs {
   check?: boolean;
   beta?: boolean;
   list?: boolean;
 }
 
+/** Read installed version from .claude/metadata.json (instant, no npx) */
 function getLocalVersion(): string | null {
   try {
-    // Check version via npx — no global install required
-    const output = execSync("npx --yes create-meowkit --version 2>/dev/null", {
-      encoding: "utf-8",
-      timeout: 15000,
-    });
-    return output.trim() || null;
+    const raw = fs.readFileSync(join(process.cwd(), ".claude", "metadata.json"), "utf-8");
+    const meta = JSON.parse(raw) as { version?: string };
+    return meta.version ?? null;
   } catch {
     return null;
   }
 }
 
-async function fetchVersion(tag: string): Promise<string> {
-  const response = await fetch(`https://registry.npmjs.org/create-meowkit/${tag}`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${tag} from npm registry: ${response.statusText}`);
-  }
-  const data = (await response.json()) as RegistryResponse;
-  return data.version;
+/** Format a date string as YYYY-MM-DD */
+function formatDate(iso: string): string {
+  return iso.split("T")[0];
 }
 
-async function fetchRegistryInfo(): Promise<RegistryFullResponse> {
-  const response = await fetch("https://registry.npmjs.org/create-meowkit");
-  if (!response.ok) {
-    throw new Error(`Failed to fetch from npm registry: ${response.statusText}`);
+/** Show available releases fetched from GitHub */
+async function listReleases(localVersion: string | null): Promise<void> {
+  console.log(pc.dim("Fetching available releases from GitHub..."));
+
+  const releases = await fetchReleases();
+
+  const stable = releases.filter((r) => !r.isBeta);
+  const beta = releases.filter((r) => r.isBeta);
+
+  console.log();
+  console.log(pc.bold("Channels:"));
+  console.log(`  ${pc.green("stable:")}  ${stable[0]?.version ?? "none"}`);
+  if (beta.length > 0) {
+    console.log(`  ${pc.yellow("beta:")}    ${beta[0]?.version ?? "none"}`);
   }
-  return (await response.json()) as RegistryFullResponse;
+
+  console.log();
+  console.log(pc.bold("Recent releases:"));
+  for (const r of releases.slice(0, 10)) {
+    const installed = r.version === localVersion ? pc.cyan(" (installed)") : "";
+    const label = r.isBeta ? pc.yellow(" (beta)") : "";
+    console.log(`  ${r.version}${label}${installed}  ${pc.dim(formatDate(r.publishedAt))}`);
+  }
+}
+
+/** Compare local vs latest GitHub release */
+async function checkVersion(localVersion: string | null, useBeta: boolean): Promise<void> {
+  console.log(pc.dim("Checking for updates..."));
+
+  const releases = await fetchReleases();
+  const latestStable = releases.find((r) => !r.isBeta);
+  const latestBeta = releases.find((r) => r.isBeta);
+
+  console.log(`${pc.bold("Local version:")}   ${localVersion ? pc.cyan(localVersion) : pc.dim("not installed")}`);
+  if (latestStable) {
+    console.log(`${pc.bold("Latest stable:")}   ${pc.green(latestStable.version)}  ${pc.dim(formatDate(latestStable.publishedAt))}`);
+  }
+  if (latestBeta) {
+    console.log(`${pc.bold("Latest beta:")}     ${pc.yellow(latestBeta.version)}  ${pc.dim(formatDate(latestBeta.publishedAt))}`);
+  }
+
+  const compareTo = useBeta ? (latestBeta ?? latestStable) : latestStable;
+  if (!compareTo) {
+    console.log(pc.yellow("No releases found on GitHub."));
+    return;
+  }
+
+  if (localVersion === compareTo.version) {
+    console.log(pc.green("\nAlready up to date."));
+  } else {
+    console.log(pc.yellow(`\nUpdate available: ${localVersion ?? "none"} → ${compareTo.version}`));
+    console.log(pc.dim("Run `npx mewkit upgrade` to install."));
+  }
+}
+
+/** Perform the upgrade: download latest release and apply via smart update */
+async function performUpgrade(localVersion: string | null, useBeta: boolean): Promise<void> {
+  console.log(pc.dim("Fetching latest release from GitHub..."));
+
+  const releases = await fetchReleases();
+  const latest: ReleaseInfo | undefined = useBeta
+    ? (releases.find((r) => r.isBeta) ?? releases.find((r) => !r.isBeta))
+    : releases.find((r) => !r.isBeta);
+
+  if (!latest) {
+    console.error(pc.red("No releases found on GitHub."));
+    process.exit(1);
+  }
+
+  if (localVersion === latest.version) {
+    console.log(pc.green(`Already up to date (v${latest.version}).`));
+    return;
+  }
+
+  console.log(`Upgrading: ${pc.dim(localVersion ?? "none")} → ${pc.cyan(latest.version)}`);
+  console.log(pc.dim(`Downloading v${latest.version}...`));
+
+  let sourceDir: string;
+  try {
+    sourceDir = await downloadRelease(latest);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(pc.red(`Download failed: ${msg}`));
+    process.exit(1);
+  }
+
+  try {
+    const config: UserConfig = {
+      description: "",
+      enableCostTracking: true,
+      enableMemory: true,
+      geminiApiKey: null,
+    };
+
+    const stats = await smartUpdate(config, sourceDir, process.cwd(), /* dryRun */ false, /* force */ false);
+
+    console.log();
+    console.log(pc.green(pc.bold("Upgrade complete!")));
+    console.log(`  ${pc.dim("Before:")} ${localVersion ?? "not installed"}`);
+    console.log(`  ${pc.dim("After:")}  ${latest.version}`);
+    console.log();
+    console.log(`  ${pc.green("added")}   ${stats.added}`);
+    console.log(`  ${pc.cyan("updated")} ${stats.updated}`);
+    console.log(`  ${pc.dim("skipped")} ${stats.skipped}`);
+
+    if (stats.userModified.length > 0) {
+      console.log(pc.yellow(`\n  ${stats.userModified.length} user-modified file(s) preserved (use --force to overwrite).`));
+    }
+  } finally {
+    cleanupDownload(sourceDir);
+  }
 }
 
 export async function upgrade(args: UpgradeArgs): Promise<void> {
   const localVersion = getLocalVersion();
-  const isBeta = localVersion?.includes("-beta") || localVersion?.includes("-rc");
-  console.log(
-    `${pc.bold("Current version:")} ${localVersion ? pc.cyan(localVersion) : pc.dim("not installed")}${isBeta ? pc.dim(" (beta)") : ""}`
-  );
+  const useBeta = args.beta ?? false;
 
-  // List available versions
-  if (args.list) {
-    console.log(pc.dim("Fetching available versions..."));
-    try {
-      const info = await fetchRegistryInfo();
-      const tags = info["dist-tags"];
-      const versions = Object.keys(info.versions).reverse().slice(0, 10);
-
-      console.log();
-      console.log(pc.bold("Channels:"));
-      console.log(`  ${pc.green("stable:")}  ${tags.latest ?? "none"}`);
-      if (tags.beta) {
-        console.log(`  ${pc.yellow("beta:")}    ${tags.beta}`);
-      }
-
-      console.log();
-      console.log(pc.bold("Recent versions:"));
-      for (const v of versions) {
-        const marker = v === localVersion ? pc.cyan(" (installed)") : "";
-        console.log(`  ${v}${marker}`);
-      }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error(pc.red(`Failed to list versions: ${message}`));
-    }
-    return;
+  if (localVersion) {
+    const isBeta = localVersion.includes("-beta") || localVersion.includes("-rc");
+    console.log(
+      `${pc.bold("Current version:")} ${pc.cyan(localVersion)}${isBeta ? pc.dim(" (beta)") : ""}`
+    );
+  } else {
+    console.log(`${pc.bold("Current version:")} ${pc.dim("not installed")}`);
   }
-
-  // Check for updates
-  if (args.check) {
-    console.log(pc.dim("Checking for updates..."));
-    try {
-      const latest = await fetchVersion("latest");
-      console.log(`${pc.bold("Latest stable:")}  ${pc.green(latest)}`);
-
-      try {
-        const beta = await fetchVersion("beta");
-        console.log(`${pc.bold("Latest beta:")}    ${pc.yellow(beta)}`);
-      } catch {
-        // No beta published yet — skip
-      }
-
-      if (localVersion === latest) {
-        console.log(pc.green("You are on the latest stable version."));
-      } else {
-        console.log(
-          pc.yellow(`Update available: ${localVersion ?? "none"} -> ${latest}`)
-        );
-        console.log(pc.dim("Run `npx mewkit upgrade` to install."));
-      }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error(pc.red(`Failed to check for updates: ${message}`));
-    }
-    return;
-  }
-
-  // Perform upgrade via npx (no global install)
-  const tag = args.beta ? "beta" : "latest";
-  const pkg = `create-meowkit@${tag}`;
-
-  console.log(pc.dim(`Running ${pkg} via npx...`));
 
   try {
-    execSync(`npx --yes ${pkg}`, {
-      encoding: "utf-8",
-      stdio: "inherit",
-    });
+    if (args.list) {
+      await listReleases(localVersion);
+      return;
+    }
 
-    const newVersion = getLocalVersion();
-    console.log();
-    console.log(pc.green(pc.bold("Upgrade complete!")));
-    console.log(
-      `  ${pc.dim("Before:")} ${localVersion ?? "not installed"}`
-    );
-    console.log(
-      `  ${pc.dim("After:")}  ${newVersion ?? "unknown"}`
-    );
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error(pc.red(`Upgrade failed: ${message}`));
+    if (args.check) {
+      await checkVersion(localVersion, useBeta);
+      return;
+    }
+
+    await performUpgrade(localVersion, useBeta);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(pc.red(`upgrade failed: ${msg}`));
     process.exit(1);
   }
 }

@@ -6,6 +6,8 @@ persona: B
 
 # create-meowkit
 
+> **Deprecated.** Use `npx mewkit init` instead. `create-meowkit` still works for users who haven't migrated, but will not receive new features or version bumps.
+
 Scaffold the full MeowKit system into your project, or update an existing installation.
 
 ## How it works
@@ -20,7 +22,7 @@ GitHub Releases → release zip (.claude/, tasks/, CLAUDE.md)
 ## Usage
 
 ```bash
-npm create meowkit@latest [options]
+npx mewkit init [options]
 ```
 
 ## What happens
@@ -95,5 +97,5 @@ your-project/
 
 | Channel | Command | Source |
 |---------|---------|--------|
-| Stable | `npm create meowkit@latest` | Latest GitHub release (not prerelease) |
-| Beta | `npm create meowkit@latest -- --beta` | Latest GitHub prerelease |
+| Stable | `npx mewkit init` | Latest GitHub release (not prerelease) |
+| Beta | `npx mewkit init --beta` | Latest GitHub prerelease |

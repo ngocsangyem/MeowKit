@@ -30,6 +30,8 @@ ${pc.bold("Options:")}
 `;
 
 async function main(): Promise<void> {
+  console.warn("\n⚠️  create-meowkit is deprecated. Use: npx mewkit init\n");
+
   const argv = minimist(process.argv.slice(2), {
     boolean: ["force", "dry-run", "global", "help", "json", "verbose", "beta"],
     default: {

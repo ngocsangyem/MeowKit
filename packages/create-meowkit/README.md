@@ -1,11 +1,13 @@
 # create-meowkit
 
+> **Deprecated.** Use `npx mewkit init` instead. This package still works for existing users but will not receive new features.
+
 Scaffold the [MeowKit](https://github.com/ngocsangyem/MeowKit) AI agent toolkit into your project.
 
 ## Usage
 
 ```bash
-npm create meowkit@latest
+npx mewkit init
 ```
 
 ## How it works
@@ -13,7 +15,7 @@ npm create meowkit@latest
 This is a thin CLI (~50KB). It downloads the latest release from [GitHub Releases](https://github.com/ngocsangyem/MeowKit/releases), extracts it, and installs `.claude/` into your project. No templates are bundled.
 
 ```
-npm create meowkit@latest
+npx mewkit init
   → Fetches latest release from GitHub
   → Prompts for config (description, Gemini API key)
   → Downloads release zip
