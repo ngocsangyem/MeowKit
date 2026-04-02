@@ -29,7 +29,9 @@ create-meowkit CLI fetches zip at npm create meowkit@latest
 
 Create the what's-new page and update affected docs BEFORE tagging.
 
-#### 1a. Create what's-new page
+**Minor fix releases (patch versions):** Skip steps 1a, 1b, and 1d. Only update the what's-new index (step 1c) and CHANGELOG.md (step 2). No individual what's-new page or sidebar entry needed.
+
+#### 1a. Create what's-new page (feature/breaking releases only)
 
 ```bash
 # Create new version page
