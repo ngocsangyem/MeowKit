@@ -287,6 +287,7 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v1.3.4  | 2026-04-02 | Hook path resolution fix            |
 | v1.3.3  | 2026-04-02 | The Hook Safety Release             |
 | v1.3.2  | 2026-04-01 | The Plan Quality Release            |
 | v1.3.1  | 2026-04-01 | The Red Team Depth Release         |

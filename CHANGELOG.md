@@ -2,6 +2,12 @@
 
 All notable changes to MeowKit are documented here. This file is auto-updated by [semantic-release](https://github.com/semantic-release/semantic-release) on future releases.
 
+## [1.3.4](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.3.4) (2026-04-02)
+
+### Bug Fixes
+
+- **all hooks** — use `$CLAUDE_PROJECT_DIR` for absolute paths in settings.json and CWD guard in all 8 scripts; fixes "No such file or directory" when CWD differs from project root
+
 ## [1.3.3](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.3.3) (2026-04-02)
 
 ### Bug Fixes
