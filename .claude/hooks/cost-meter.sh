@@ -2,6 +2,9 @@
 # cost-meter.sh — Track token usage per command.
 # Usage: cost-meter.sh <command> <estimated_tokens> <tier> [task_summary]
 
+# Ensure CWD is project root for relative paths
+if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
+
 COMMAND_NAME="$1"
 ESTIMATED_TOKENS="$2"
 TIER="$3"

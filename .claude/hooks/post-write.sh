@@ -2,6 +2,9 @@
 # post-write.sh — Security scan on every written file.
 # Usage: post-write.sh <file-path>
 
+# Ensure CWD is project root for relative paths
+if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
+
 FILE="$1"
 
 # Safety fallback: if no file path provided, skip (matches PreToolUse hooks behavior)

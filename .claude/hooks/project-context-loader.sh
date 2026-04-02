@@ -6,6 +6,9 @@
 # If docs/project-context.md exists, outputs its content for injection.
 # If not, outputs a reminder to generate it.
 
+# Ensure CWD is project root for relative paths
+if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
+
 CONTEXT_FILE="docs/project-context.md"
 VENV_PYTHON=".claude/skills/.venv/bin/python3"
 

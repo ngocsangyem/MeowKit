@@ -4,9 +4,12 @@
 # Scans task description for prompt injection patterns.
 #
 # Usage: pre-task-check.sh <task-description>
-# Exit codes: 0 = PASS, 1 = BLOCK, 2 = WARN
+# Exit codes: 0 = PASS, 1 = BLOCK
 #
 # POSIX-compatible (macOS + Linux). No bash-isms.
+
+# Ensure CWD is project root for relative paths
+if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
 TASK="$1"
 

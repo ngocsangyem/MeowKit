@@ -9,6 +9,9 @@
 # When blocked: outputs JSON marker for agent to prompt user approval.
 # Agent must use AskUserQuestion tool to get explicit approval before retrying.
 
+# Ensure CWD is project root for relative paths
+if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
+
 # settings.json matcher already filters to Read, Edit|Write — no need to check tool name
 # $1 = file path passed via $TOOL_INPUT_FILE_PATH
 FILE_PATH="$1"

@@ -2,6 +2,9 @@
 # post-session.sh — Capture session data to memory after session ends.
 # Usage: post-session.sh
 
+# Ensure CWD is project root for relative paths
+if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
+
 MEMORY_DIR=".claude/memory"
 
 # Skip if memory disabled in config

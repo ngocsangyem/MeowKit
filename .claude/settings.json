@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh .claude/hooks/project-context-loader.sh",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/project-context-loader.sh\"",
             "timeout": 5000,
             "statusMessage": "Loading project context..."
           }
@@ -18,13 +18,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh .claude/hooks/gate-enforcement.sh \"$TOOL_INPUT_FILE_PATH\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/gate-enforcement.sh\" \"$TOOL_INPUT_FILE_PATH\"",
             "timeout": 10000,
             "statusMessage": "Checking Gate 1 approval..."
           },
           {
             "type": "command",
-            "command": "sh .claude/hooks/privacy-block.sh \"$TOOL_INPUT_FILE_PATH\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\" \"$TOOL_INPUT_FILE_PATH\"",
             "timeout": 5000,
             "statusMessage": "Checking file access permissions..."
           }
@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh .claude/hooks/privacy-block.sh \"$TOOL_INPUT_FILE_PATH\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\" \"$TOOL_INPUT_FILE_PATH\"",
             "timeout": 5000,
             "statusMessage": "Checking file access permissions..."
           }
@@ -46,12 +46,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh .claude/hooks/pre-task-check.sh \"$TOOL_INPUT_COMMAND\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-task-check.sh\" \"$TOOL_INPUT_COMMAND\"",
             "timeout": 5000
           },
           {
             "type": "command",
-            "command": "sh .claude/hooks/pre-ship.sh \"$TOOL_INPUT_COMMAND\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-ship.sh\" \"$TOOL_INPUT_COMMAND\"",
             "timeout": 30000,
             "statusMessage": "Running pre-ship validation..."
           }
@@ -64,7 +64,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh .claude/hooks/post-write.sh \"$TOOL_INPUT_FILE_PATH\"",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-write.sh\" \"$TOOL_INPUT_FILE_PATH\"",
             "timeout": 10000,
             "statusMessage": "Security scanning written file..."
           }
@@ -75,7 +75,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh .claude/hooks/cost-meter.sh",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/cost-meter.sh\"",
             "timeout": 5000
           }
         ]
@@ -86,7 +86,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh .claude/hooks/post-session.sh",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-session.sh\"",
             "timeout": 5000
           }
         ]

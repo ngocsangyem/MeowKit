@@ -4,6 +4,9 @@
 # When registered as PreToolUse hook on Bash, $1 = the bash command.
 # Only triggers on git commit/push commands. Exits 0 for everything else.
 
+# Ensure CWD is project root for relative paths
+if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
+
 COMMAND="$1"
 
 # Only run pre-ship checks on git commit or push commands
