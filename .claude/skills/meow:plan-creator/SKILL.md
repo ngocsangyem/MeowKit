@@ -1,12 +1,12 @@
 ---
 name: meow:plan-creator
-version: 1.3.2
+version: 1.4.0
 preamble-tier: 3
 description: >-
   Creates structured multi-file plans before implementation. Scope-aware: trivial tasks
   exit early, simple tasks get fast plans, complex tasks get full research + phase files +
   validation. Enforces Gate 1. Activated by /meow:plan or /meow:cook.
-argument-hint: "[task description] [--fast | --hard]"
+argument-hint: "[task description] [--fast | --hard | --parallel | --two]"
 allowed-tools:
   - Bash
   - Read
@@ -41,18 +41,24 @@ Skip when:
 | (default) | Auto-detect from scope | Follows mode | Follows mode | Follows mode |
 | `--fast` | Fast | Skip | plan.md only | Semantic checks only |
 | `--hard` | Hard | 2 researchers | plan.md + phases | Full interview |
+| `--parallel` | Parallel | 2 researchers | plan.md + phases + ownership matrix | Full interview |
+| `--two` | Two approaches | 2 researchers | 2 approach files + trade-off matrix | After selection |
 
 ## Workflow
 
 Execute via `workflow.md`. Step-file architecture — load one step at a time.
+Fast mode (`--fast`) uses `workflow-fast.md` (steps 00→03→04→07→08).
 
 ```
 Step 0: Scope Challenge → trivial (exit) | simple (fast) | complex (hard)
 Step 1: Research (hard only) → 2 researchers, max 5 calls each
 Step 2: Codebase Analysis (hard only) → scout + docs
 Step 3: Draft Plan → plan.md (≤80 lines) + phase-XX files (12-section template)
-Step 4: Validate + Gate 1 → semantic checks + interview (hard) + approval
-Step 5: Hydrate Tasks → phase checkboxes → Claude Tasks
+Step 4: Semantic Checks → goal/ACs/constraints + structural validation
+Step 5: Red Team (hard only) → phase-count scaling, plan-specific personas, adjudication
+Step 6: Validation Interview (hard only) → 3-5 critical questions, propagate answers
+Step 7: Gate 1 → self-check + AskUserQuestion (Approve | Modify | Reject)
+Step 8: Hydrate Tasks → phase checkboxes → Claude Tasks
 ```
 
 ## Output Structure
@@ -83,7 +89,13 @@ tasks/plans/YYMMDD-name/
 
 | File | Purpose |
 |------|---------|
-| `workflow.md` | Step sequence, variable table, flow diagram |
+| `workflow.md` | Step sequence, variable table, flow diagram (hard mode) |
+| `workflow-fast.md` | Compact step sequence for `--fast` mode (00→03→04→07→08) |
+| `step-05-red-team.md` | Red team review: persona scaling, subagent dispatch, adjudication |
+| `step-06-validation-interview.md` | Critical question generation and answer propagation |
+| `step-07-gate.md` | Self-check and Gate 1 AskUserQuestion presentation |
+| `prompts/personas/plan-assumption-destroyer.md` | Plan-specific assumption skeptic persona |
+| `prompts/personas/plan-scope-complexity-critic.md` | Plan-specific YAGNI/scope minimalist persona |
 | `references/phase-template.md` | 12-section phase file template |
 | `references/scope-challenge.md` | Scope modes (HOLD/EXPANSION/REDUCTION) |
 | `references/research-phase.md` | Researcher spawning protocol |
@@ -95,6 +107,8 @@ tasks/plans/YYMMDD-name/
 | `references/solution-evaluation.md` | Trade-off scoring criteria |
 | `references/gotchas.md` | Full gotchas list |
 | `references/adr-generation.md` | Architecture Decision Record generation |
+| `references/parallel-mode.md` | Ownership matrix template, parallel group rules |
+| `references/two-approach-mode.md` | Approach file template, trade-off matrix, selection flow |
 | `scripts/validate-plan.py` | Plan completeness validator |
 
 ## Start

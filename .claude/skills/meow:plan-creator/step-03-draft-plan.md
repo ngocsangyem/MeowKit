@@ -101,7 +101,7 @@ For each phase file, populate "Key Insights" from research reports:
 If step-02 found existing plans with overlapping scope:
 1. Classify: new plan blocks existing? new plan needs existing? mutual?
 2. Set `blockedBy` / `blocks` in both plan.md frontmatter
-3. If ambiguous: note for user in step-04 validation
+3. If ambiguous: note for user in step-06 validation interview
 
 ### 3g. Research Link Verification (Hard Mode Only)
 
@@ -114,11 +114,46 @@ For each phase file:
    - Print: `"Fixed: {phase-file} now links to research/{report}"`
 3. If no research reports exist (fast mode): skip this check.
 
+### 3h. Parallel Mode (conditional: `planning_mode = parallel`)
+
+After writing all phase files (section 3c), analyze ownership boundaries:
+
+1. For each phase file, identify which files/dirs it modifies → assign `ownership` globs.
+2. Group phases with zero file overlap into parallel groups (max 3 groups).
+3. Setup/infrastructure phase → Group 0 (always sequential, runs first).
+4. Integration/test/docs phase → final group (always sequential, runs last).
+5. Add `ownership` and `parallel_group` fields to each phase file's YAML frontmatter.
+6. Append `## Execution Strategy` section to plan.md after the Phases table:
+
+```markdown
+## Execution Strategy
+
+| Group | Phases | Parallel? | Ownership |
+|-------|--------|-----------|-----------|
+| Setup | 1 | Sequential (first) | {infra globs} |
+| A | 2, 3 | Yes | {phase globs} |
+| B | 4 | Sequential (after A) | tests/*, docs/* |
+```
+
+See `references/parallel-mode.md` for full rules and templates.
+
+### 3i. Two-Approach Mode (conditional: `planning_mode = two`)
+
+Instead of writing plan.md and phase files directly:
+
+1. Generate `{plan_dir}/plan-approach-a.md` and `{plan_dir}/plan-approach-b.md` using the approach template from `references/two-approach-mode.md`.
+2. Generate `{plan_dir}/trade-off-matrix.md` comparing both approaches.
+3. **Do NOT generate plan.md or phase-XX files yet** — deferred until user selects approach at step-04.
+4. Create `{plan_dir}/archived/` directory (empty, ready for non-selected approach).
+
+Print: `"Two approaches drafted. User selects at step-04 before red-team."`
+
 ## Output
 
 - `plan_dir` — absolute path to the created plan directory
-- Print: `"Plan: {plan_dir}/plan.md ({N} phases)"`
+- Print: `"Plan: {plan_dir}/plan.md ({N} phases)"` (parallel/hard mode)
+- Print: `"Two approaches drafted. User selects at step-04 before red-team."` (two mode)
 
 ## Next
 
-Read and follow `step-04-validate-and-gate.md`
+Read and follow `step-04-semantic-checks.md`

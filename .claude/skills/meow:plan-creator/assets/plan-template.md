@@ -47,6 +47,9 @@ blocks: []
 |-----------|------|--------|
 | [component] | [LOW/MEDIUM/HIGH] | [one-line reason] |
 
+## Red Team Review
+<!-- Optional: populated by step-05 red-team review -->
+
 ## Acceptance Criteria
 <!-- Binary pass/fail. No subjective criteria. -->
 - [ ] [Specific, verifiable condition]

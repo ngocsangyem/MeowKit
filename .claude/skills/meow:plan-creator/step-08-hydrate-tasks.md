@@ -1,16 +1,16 @@
-# Step 5: Hydrate Tasks
+# Step 8: Hydrate Tasks
 
 Create Claude Tasks from plan phases for session-scoped execution tracking.
 
 ## Instructions
 
-### 5a. Skip Check
+### 8a. Skip Check
 
 Skip task hydration if:
 - Less than 3 phases (overhead exceeds benefit)
 - Task tools unavailable (VSCode extension) — plan files are the source of truth
 
-### 5b. Create Tasks from Phases
+### 8b. Create Tasks from Phases
 
 For each phase in plan.md:
 
@@ -27,7 +27,7 @@ TaskCreate:
   }
 ```
 
-### 5c. Set Dependencies + Critical-Step Tasks
+### 8c. Set Dependencies + Critical-Step Tasks
 
 Chain phases with `addBlockedBy`:
 - Phase 2 blockedBy Phase 1 (if Phase 2 depends on Phase 1)
@@ -43,26 +43,50 @@ Chain phases with `addBlockedBy`:
   ```
 - Only create sub-tasks for marked items (most todos stay at phase level)
 
-### 5d. Create Checkpoint File
+**Parallel Group Hydration** (conditional: `planning_mode = parallel`)
+
+Read `## Execution Strategy` from plan.md to determine groups:
+- Phases in the **same parallel group**: NO `addBlockedBy` between them.
+- Phases in a **later group**: `addBlockedBy` the last phase task ID of the prior group.
+- Add `parallel_group: "{letter}"` to each task's metadata.
+
+**Two-Approach Hydration** (conditional: `planning_mode = two`)
+
+Hydrate tasks ONLY from the selected approach's phase files (`selected_approach = "a"` or `"b"`).
+Do NOT create tasks for the archived (non-selected) approach.
+
+### 8d. Create Checkpoint File
 
 Write `{plan_dir}/.plan-state.json` for cross-session resilience:
 
 ```json
 {
-  "version": "1.0",
+  "version": "1.1",
   "created": "{YYYYMMDD-HHMM}",
-  "planning_mode": "{fast|hard}",
+  "planning_mode": "{fast|hard|parallel|two}",
   "scope_mode": "{EXPANSION|HOLD|REDUCTION}",
   "phases": {
     "phase-01-name": { "status": "pending", "tasks_completed": 0, "tasks_total": N },
     "phase-02-name": { "status": "pending", "tasks_completed": 0, "tasks_total": N }
-  }
+  },
+  "parallel_groups": {
+    "Setup": ["phase-01-name"],
+    "A": ["phase-02-name", "phase-03-name"],
+    "B": ["phase-04-name"]
+  },
+  "selected_approach": "a"
 }
 ```
 
 `tasks_total` = count of `- [ ]` checkboxes in the phase file.
 
-### 5e. Output Cook Command
+Fields `parallel_groups` and `selected_approach` are **optional** — omit when not applicable:
+- `parallel_groups`: only set when `planning_mode = parallel`
+- `selected_approach`: only set when `planning_mode = two`
+
+Consumers reading `.plan-state.json` MUST handle unknown/missing fields gracefully (access only known keys).
+
+### 8e. Output Cook Command
 
 Print the Context Reminder block (from `references/gate-1-approval.md`) with:
 - Absolute path to plan.md

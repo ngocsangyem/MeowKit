@@ -1,6 +1,7 @@
 # Plan Creator — Workflow
 
 Step-file workflow for structured plan creation. Scope-aware with fast/hard modes.
+Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 
 ## Rules
 
@@ -15,20 +16,25 @@ Step-file workflow for structured plan creation. Scope-aware with fast/hard mode
 2. `step-01-research.md` — Spawn researchers (hard mode only). Bounded: 2 researchers, max 5 calls each. REDUCTION = 1 researcher.
 3. `step-02-codebase-analysis.md` — Scout + project docs reading (hard mode only)
 4. `step-03-draft-plan.md` — Write plan.md overview + phase-XX files. Integrate research findings. Verify research links in Context Links.
-5. `step-04-validate-and-gate.md` — Semantic checks + **plan red team** (hard: 2 personas) + validation interview (hard) + Gate 1
-6. `step-05-hydrate-tasks.md` — Create Claude Tasks from phase checkboxes + critical-step sub-tasks + checkpoint file
+5. `step-04-semantic-checks.md` — Semantic checks + structural validation (validate-plan.py). Fast mode: skip validation, go to step-07.
+6. `step-05-red-team.md` — Plan red team (hard only): phase-count persona scaling, subagent dispatch, adjudication, 3-option user review
+7. `step-06-validation-interview.md` — Validation interview (hard only): 3-5 critical questions, propagate answers to phase files
+8. `step-07-gate.md` — Self-check + Gate 1: AskUserQuestion (Approve | Modify | Reject)
+9. `step-08-hydrate-tasks.md` — Create Claude Tasks from phase checkboxes + critical-step sub-tasks + checkpoint file
 
 ## Variables Passed Between Steps
 
 | Variable | Set by | Used by | Values |
 |----------|--------|---------|--------|
-| `planning_mode` | step-00 | step-01, step-02, step-03, step-04 | `fast` or `hard` |
+| `planning_mode` | step-00 | step-01, step-02, step-03, step-04, step-05, step-06 | `fast`, `hard`, `parallel`, or `two` |
 | `task_complexity` | step-00 | step-03 | `trivial` (exit), `simple`, `complex` |
 | `workflow_model` | step-00 | step-03 | `feature`, `bugfix`, `refactor`, `security` |
 | `scope_mode` | step-00 | step-01, step-03 | `EXPANSION`, `HOLD`, `REDUCTION` (hard mode; fast defaults to HOLD) |
 | `research_reports` | step-01 | step-03 | List of report file paths |
 | `codebase_findings` | step-02 | step-03 | Scout + docs summary |
-| `plan_dir` | step-03 | step-04, step-05 | Absolute path to plan directory |
+| `plan_dir` | step-03 | step-04, step-05, step-06, step-07, step-08 | Absolute path to plan directory |
+| `red_team_findings` | step-05 | step-06 | Summary string: "{N} findings, {M} accepted" |
+| `selected_approach` | step-04 | step-05, step-08 | `"a"` or `"b"` (two mode only; unset otherwise) |
 
 ## Flow
 
@@ -37,7 +43,7 @@ Task description
     ↓
 Step 0: Scope Challenge
     ├── trivial → "Use /meow:fix" → STOP
-    ├── simple → fast mode → skip to Step 3
+    ├── simple → fast mode → use workflow-fast.md
     └── complex → hard mode
          ├── User scope input: EXPANSION / HOLD / REDUCTION
          └── → Step 1
@@ -59,19 +65,41 @@ Step 3: Draft Plan
     ├── Cross-plan dependency scan (blockedBy/blocks)
     └── Verify research links in phase Context Links
          ↓
-Step 4: Validate + Gate 1
+Step 4: Semantic Checks
     ├── 4a. Semantic checks (goal=outcome, ACs=binary, constraints non-empty)
-    ├── 4b. Structural validation (validate-plan.py)
-    ├── 4c. Plan Red Team (hard: 2 personas — Assumption Destroyer + Scope Critic)
-    ├── 4d. Validation interview (hard: 3-5 critical questions)
-    └── 4e. Gate 1: AskUserQuestion (Approve | Modify | Reject)
+    ├── 4b. Structural validation (validate-plan.py) — must output PLAN_COMPLETE
+    └── fast mode → skip to Step 7
          ↓
-Step 5: Hydrate Tasks
+Step 5: Red Team (hard only)
+    ├── Phase-count scaling: 1-3 phases=2 personas, 4-5=3, 6+=4
+    ├── Load plan-specific personas from prompts/personas/
+    ├── Dispatch subagents with plan-review override prompt
+    ├── Collect → deduplicate → sort by severity → cap at 15
+    ├── Agent adjudicates each: Accept/Reject + rationale
+    └── AskUserQuestion: Apply all / Review each / Reject all
+         ↓
+Step 6: Validation Interview (hard only)
+    ├── Generate 3-5 critical questions from plan content
+    ├── Informed by red-team findings (step-05)
+    └── Propagate answers to phase files
+         ↓
+Step 7: Gate 1
+    ├── Self-check: Completed / Skipped / Uncertain
+    └── AskUserQuestion (Approve | Modify | Reject)
+         ↓
+Step 8: Hydrate Tasks
     ├── TaskCreate per phase with addBlockedBy chain
     ├── Critical-step sub-tasks for [CRITICAL]/[HIGH] todo items
     ├── Create .plan-state.json checkpoint
     └── Output cook command with absolute path → STOP
 ```
+
+## Mode Notes
+
+- `--parallel` and `--two` both require `--hard` internally (full research pipeline runs).
+- `--parallel`: step-03 adds ownership matrix; step-08 uses parallel group hydration.
+- `--two`: step-03 produces 2 approach files (no plan.md yet); step-04 asks user to select before step-05.
+- `selected_approach` is only set in `two` mode; all other modes leave it unset.
 
 ## Next
 

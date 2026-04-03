@@ -55,6 +55,8 @@ Ask these 3 questions (internally, don't need to ask user):
 
 ### 0f. User Scope Input (Hard Mode Only)
 
+**Note:** `--parallel` and `--two` flags set `planning_mode` to `parallel`/`two` respectively and internally behave as `--hard` (full research pipeline). Skip mode selection when either flag is explicitly provided.
+
 **Skip if:** `planning_mode = fast` or trivial.
 
 Present scope mode choice via AskUserQuestion:
@@ -82,10 +84,40 @@ Present scope mode choice via AskUserQuestion:
 | HOLD | 2 researchers (standard) | Standard (3-5) | Execute within stated scope |
 | REDUCTION | 1 researcher (focused) | Minimal (2-3) | Strip to MVP, defer rest |
 
+### 0g. Mode Suggestion Logic (Hard Mode Only)
+
+**Skip if:** `planning_mode = fast`, trivial, or user already provided `--parallel`/`--two` explicitly.
+
+After scope assessment, scan the task description for structural signals:
+
+| Signal | Suggestion |
+|--------|-----------|
+| Task describes 3+ independent layers or modules (e.g., "DB layer", "API layer", "UI layer") | Suggest `--parallel` |
+| Task describes 2 alternatives or "X vs Y" framing (e.g., "monolith vs microservices") | Suggest `--two` |
+
+**If signal detected**, present via AskUserQuestion:
+
+```json
+{
+  "questions": [{
+    "question": "I detected {signal description}. Would you like to use a specialized mode?",
+    "header": "Mode Suggestion",
+    "options": [
+      { "label": "--parallel", "description": "Independent phases run concurrently with file ownership matrix." },
+      { "label": "--two", "description": "Generate 2 competing approaches; you select before red-team." },
+      { "label": "Continue with --hard", "description": "Standard hard mode, no specialization." }
+    ],
+    "multiSelect": false
+  }]
+}
+```
+
+User selection overrides auto-detection. Only present if a signal is clearly detected — do not prompt on every hard-mode plan.
+
 ## Output
 
 - `task_complexity` — trivial, simple, or complex
-- `planning_mode` — fast or hard (trivial = exit, no mode)
+- `planning_mode` — fast, hard, parallel, or two (trivial = exit, no mode)
 - `workflow_model` — feature, bugfix, refactor, or security
 - `scope_mode` — EXPANSION, HOLD, or REDUCTION (hard mode only; fast = HOLD default)
 - Print: `"Scope: {complexity} → mode: {mode} | model: {workflow_model} | scope: {scope_mode}"`
@@ -94,4 +126,4 @@ Present scope mode choice via AskUserQuestion:
 
 If trivial → STOP (recommend /meow:fix).
 If fast → skip to `step-03-draft-plan.md`.
-If hard → read and follow `step-01-research.md`.
+If hard, parallel, or two → read and follow `step-01-research.md`.

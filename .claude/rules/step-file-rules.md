@@ -59,3 +59,4 @@ Skills without `workflow.md` are monolithic and follow standard execution.
 
 Currently step-file enabled:
 - `meow:review` — 4-step adversarial review workflow
+- `meow:plan-creator` — 9-step planning workflow (00-08)
