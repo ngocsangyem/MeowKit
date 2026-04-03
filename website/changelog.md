@@ -11,8 +11,6 @@ description: MeowKit release history and changes.
 
 - **all hooks** — use `$CLAUDE_PROJECT_DIR` for absolute paths in settings.json and CWD guard in all 8 scripts; fixes "No such file or directory" when CWD differs from project root
 
----
-
 ## 1.3.3 (2026-04-02) — The Hook Safety Release
 
 ### Bug Fixes
@@ -20,8 +18,6 @@ description: MeowKit release history and changes.
 - **cost-meter.sh** — always exited 1 because settings.json passes no arguments; now exits 0 for missing args
 - **post-write.sh** — exited 1 on empty/missing file path; now exits 0 (matches PreToolUse safety fallback pattern)
 - **pre-task-check.sh** — used `exit 2` for WARN findings; Claude Code treats non-zero as error; now exits 0
-
----
 
 ## 1.3.2 (2026-04-01) — The Plan Quality Release
 
@@ -48,8 +44,6 @@ Complete redesign of `meow:plan-creator` to match/exceed ck-plan across 15 dimen
 - `references/phase-template.md` added (12-section enforced template)
 - `references/validation-questions.md` added (5-category question framework)
 
----
-
 ## 1.3.1 (2026-03-31) — The Red Team Depth Release
 
 Hybrid adversarial persona system for `meow:review`.
@@ -70,8 +64,6 @@ Hybrid adversarial persona system for `meow:review`.
 - `step-04-verdict.md` includes artifact verification section and Phase B reviewer sources
 - `reviewer.md` agent updated with hybrid architecture description
 - `AGENTS_INDEX.md` reviewer entry updated with persona capabilities
-
----
 
 ## 1.3.0 (2026-03-31) — The Integration Integrity Release
 
@@ -102,13 +94,9 @@ Full red-team audit: 98 components, 11 batches, 43 criticals found, 42 fixed.
 - 11 detailed audit reports in `plans/reports/red-team-*`
 - Honest documentation: meow:careful now states 8/30 patterns are hook-enforced (was claiming all 30)
 
----
-
 ## 1.2.1 (2026-03-31)
 
 - **fix:** `meow:cook` Phase 6 (Reflect) now spawns a dedicated subagent for `meow:memory` session-capture. Previously memory write was an inline bullet point that could be skipped if session was interrupted. Now enforced as MUST-spawn, matching project-manager and docs-manager.
-
----
 
 ## 1.2.0 (2026-03-31) — The Memory Activation Release
 
@@ -144,17 +132,15 @@ Fixed the dormant memory system and enriched it with cross-framework insights fr
 - L3-L5 layered memory (vector DB) from CKE
 - Automatic cross-machine memory sync
 
----
-
 ## 1.1.0 (2026-03-30) — The Reasoning Depth Release
 
 Focused upgrade: deeper review reasoning, resumable builds, and systematic coverage mapping. Inspired by comparative analysis of BMAD-METHOD, ClaudeKit-Engineer, Khuym Skills, and Get-Shit-Done. Theme: **improve execution reliability and reasoning quality without adding architectural complexity**.
 
 ### New Skills
 
-- **`meow:elicit`** — Structured second-pass reasoning after review or analysis. 8 named methods (pre-mortem, inversion, red team, Socratic, first principles, constraint removal, stakeholder mapping, analogical). Auto-suggests method based on context. Optional, user-triggered. *(Source: BMAD Advanced Elicitation)*
-- **`meow:validate-plan`** — 8-dimension plan quality validation (scope, acceptance criteria, dependencies, risks, architecture, test strategy, security, effort). Runs after Gate 1, before Phase 2. Auto for COMPLEX tasks, optional for STANDARD. *(Source: Khuym validation phase)*
-- **`meow:nyquist`** — Test-to-requirement coverage mapping. Reads plan acceptance criteria + test files, produces gap report showing untested requirements. Named after sampling theorem — sufficient coverage prevents missed requirements. *(Source: GSD nyquist-auditor)*
+- **`meow:elicit`** — Structured second-pass reasoning after review or analysis. 8 named methods (pre-mortem, inversion, red team, Socratic, first principles, constraint removal, stakeholder mapping, analogical). Auto-suggests method based on context. Optional, user-triggered. _(Source: BMAD Advanced Elicitation)_
+- **`meow:validate-plan`** — 8-dimension plan quality validation (scope, acceptance criteria, dependencies, risks, architecture, test strategy, security, effort). Runs after Gate 1, before Phase 2. Auto for COMPLEX tasks, optional for STANDARD. _(Source: Khuym validation phase)_
+- **`meow:nyquist`** — Test-to-requirement coverage mapping. Reads plan acceptance criteria + test files, produces gap report showing untested requirements. Named after sampling theorem — sufficient coverage prevents missed requirements. _(Source: GSD nyquist-auditor)_
 
 ### Enhanced Review Pipeline
 
@@ -164,21 +150,21 @@ Focused upgrade: deeper review reasoning, resumable builds, and systematic cover
 
 ### Execution Resilience
 
-- **Beads pattern** — COMPLEX tasks (5+ files) decompose into atomic, resumable work units called beads. Each bead has acceptance criteria, file ownership, and estimated size (~150 lines). Progress tracked in `session-state/build-progress.json`. Interrupted builds resume from last completed bead. Each bead gets atomic git commit. *(Source: Khuym beads + GSD atomic commits)*
+- **Beads pattern** — COMPLEX tasks (5+ files) decompose into atomic, resumable work units called beads. Each bead has acceptance criteria, file ownership, and estimated size (~150 lines). Progress tracked in `session-state/build-progress.json`. Interrupted builds resume from last completed bead. Each bead gets atomic git commit. _(Source: Khuym beads + GSD atomic commits)_
 - **Bead template** — `tasks/templates/bead-template.md` for plan decomposition.
 - **Planner bead decomposition** — Planner auto-decomposes COMPLEX tasks into beads.
 - **Developer bead processing** — Developer processes beads sequentially with resume logic.
 
 ### Agent System
 
-- **Subagent Status Protocol** — All subagents now report structured status: DONE, DONE_WITH_CONCERNS, BLOCKED, NEEDS_CONTEXT. Controller handling rules for each status. Added as Rule 5 in output-format-rules.md. *(Source: ClaudeKit-Engineer)*
+- **Subagent Status Protocol** — All subagents now report structured status: DONE, DONE*WITH_CONCERNS, BLOCKED, NEEDS_CONTEXT. Controller handling rules for each status. Added as Rule 5 in output-format-rules.md. *(Source: ClaudeKit-Engineer)\_
 - **Sub-agent type classification** — Support agents now have `subagent_type` in frontmatter: advisory (brainstormer, researcher, ui-ux-designer), utility (git-manager), escalation (journal-writer).
 - **AGENTS_INDEX.md** — Added Type column (Core/Support), added ui-ux-designer entry, added Agent Types section.
 - **SKILLS_INDEX.md** — New centralized skill registry with all 60 skills organized by phase, with owner, type, and architecture columns.
 
 ### Orchestration
 
-- **Delegation checklist** — Pre-delegation checklist added to orchestration-rules.md: work context, plan reference, file ownership, acceptance criteria, constraints. Template + anti-patterns table. *(Source: ClaudeKit-Engineer context isolation)*
+- **Delegation checklist** — Pre-delegation checklist added to orchestration-rules.md: work context, plan reference, file ownership, acceptance criteria, constraints. Template + anti-patterns table. _(Source: ClaudeKit-Engineer context isolation)_
 
 ### Documentation
 
@@ -194,8 +180,6 @@ Focused upgrade: deeper review reasoning, resumable builds, and systematic cover
 - Step-file decomposition for plan-creator and cook
 - Memory scoping by agent role
 - Party mode formal specification
-
----
 
 ## 1.0.0 (2026-03-30) — The Disciplined Velocity Release
 
