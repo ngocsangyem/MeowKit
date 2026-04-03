@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/ngocsangyem/MeowKit/compare/v1.4.0...v1.5.0) (2026-04-03)
+
+### Features
+
+* add v1.4.0 changelog detailing plan red-team, personas, parallel execution, and two-approach workflow modes ([b8ff879](https://github.com/ngocsangyem/MeowKit/commit/b8ff87905c10e474909ff99903e6397046ac9b62))
+
 # Changelog
 
 All notable changes to MeowKit are documented here. This file is auto-updated by [semantic-release](https://github.com/semantic-release/semantic-release) on future releases.
