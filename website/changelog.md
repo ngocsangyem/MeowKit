@@ -5,6 +5,29 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 1.4.0 (2026-04-03) — The Plan Intelligence Release
+
+Dedicated plan red-team with CK-style adjudication, plan-specific personas, and new workflow modes.
+
+### Features
+
+- **Plan red-team extraction** — monolithic step-04 split into steps 04-07; dedicated `step-05-red-team.md` with 7-field findings (Severity/Location/Flaw/Failure Scenario/Evidence/Suggested Fix/Category), agent adjudication (Accept/Reject + rationale), 3-option user review gate (Apply all / Review each / Reject all), deduplication, severity sorting, 15-finding cap
+- **Plan-specific personas** — 2 new personas in `prompts/personas/`: plan-assumption-destroyer (unvalidated scale, dependency, team, infrastructure, timeline, integration assumptions) and plan-scope-complexity-critic (YAGNI violations, over-phasing, scope creep, premature abstraction). Reference `[PHASE:SECTION]` not `[FILE:LINE]`. Security + Failure personas gated on A/B test
+- **Dynamic persona scaling** — phase-count thresholds: 1-3 phases=2 personas, 4-5=3, 6+=4
+- **Red Team Review section** — auditable finding table with dispositions written to plan.md after red-team completes
+- **Fast-mode workflow** — separate `workflow-fast.md` for compact path (step-00 → step-03 → step-04 → step-07 → step-08). Skips research, scout, red-team, interview
+- **--parallel mode** — file ownership matrix in plan.md `## Execution Strategy`, parallel group task hydration (no `addBlockedBy` within groups), max 3 groups
+- **--two mode** — 2 competing approach files + trade-off matrix; user selects approach at step-04 before red-team reviews selected only
+
+### Changed
+
+- `meow:plan-creator` workflow expanded from 6 steps (00-05) to 9 steps (00-08)
+- `meow:plan-creator` SKILL.md bumped to v1.4.0 with --parallel/--two in arguments table
+- `.plan-state.json` schema bumped to v1.1 with optional `parallel_groups` and `selected_approach` fields
+- `step-file-rules.md` now lists `meow:plan-creator` as step-file enabled (was only `meow:review`)
+- 6 new gotchas in `references/gotchas.md`
+- 2 new reference files: `parallel-mode.md`, `two-approach-mode.md`
+
 ## 1.3.4 (2026-04-02) — Hook path resolution fix
 
 ### Bug Fixes
