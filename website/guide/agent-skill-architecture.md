@@ -179,6 +179,9 @@ skills/meow:review/
 | Skill | Steps | What each step does |
 |-------|-------|---------------------|
 | `meow:review` | 4 | Blind review → Edge cases → Criteria audit → Triage |
+| `meow:plan-creator` | 9 (00–08) | Scope → Research → Codebase → Draft → Semantic checks → Red-team → Interview → Gate 1 → Hydrate |
+
+`meow:plan-creator` also has a fast-mode path (`workflow-fast.md`) that runs steps 00→03→04→07→08, skipping research, codebase analysis, red-team, and the validation interview.
 
 Skills under 150 lines stay monolithic — step files add overhead only worth it for 3+ distinct phases.
 

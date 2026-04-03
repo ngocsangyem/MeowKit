@@ -10,6 +10,18 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### [v1.4.0 — The Plan Intelligence Release](/guide/whats-new/v1.4.0) (2026-04-03)
+
+Dedicated plan red-team with CK-style adjudication, plan-specific personas, and new workflow modes.
+
+- **Red-team extraction:** Monolithic step-04 split into steps 04-07; dedicated `step-05-red-team.md` with 7-field findings, agent adjudication, 3-option user review
+- **Plan-specific personas:** 2 new personas (Assumption Destroyer + Scope Critic) adapted for plan review, not code review
+- **Dynamic persona scaling:** 1-3 phases=2 personas, 4-5=3, 6+=4 (phase-count thresholds)
+- **Fast-mode workflow:** Separate `workflow-fast.md` for compact path (00→03→04→07→08)
+- **--parallel mode:** File ownership matrix, Execution Strategy section, parallel group hydration
+- **--two mode:** 2 competing approaches + trade-off matrix; user selects before red-team
+- **Auditable findings:** Red Team Review section in plan.md with disposition table
+
 ### v1.3.4 — Hook path resolution fix (2026-04-02)
 
 - **all hooks** — use `$CLAUDE_PROJECT_DIR` for absolute paths in settings.json and CWD guard in all 8 scripts; fixes "No such file or directory" when CWD differs from project root

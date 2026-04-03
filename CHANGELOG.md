@@ -2,6 +2,30 @@
 
 All notable changes to MeowKit are documented here. This file is auto-updated by [semantic-release](https://github.com/semantic-release/semantic-release) on future releases.
 
+## [1.4.0](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.4.0) (2026-04-03)
+
+### Features
+
+- **plan red-team extraction** — monolithic step-04 split into steps 04-07; dedicated step-05-red-team.md with CK-style 7-field findings, agent adjudication (Accept/Reject + rationale), 3-option user review gate, deduplication, severity sorting, 15-finding cap
+- **plan-specific personas** — 2 new plan-review personas (Assumption Destroyer + Scope Critic) with [PHASE:SECTION] format; Security + Failure gated on A/B test
+- **dynamic persona scaling** — phase-count thresholds: 1-3=2 personas, 4-5=3, 6+=4
+- **Red Team Review section** — auditable finding table with dispositions written to plan.md
+- **fast-mode workflow** — separate workflow-fast.md for compact path (00→03→04→07→08)
+- **--parallel mode** — file ownership matrix, Execution Strategy section, parallel group task hydration
+- **--two mode** — 2 competing approach files + trade-off matrix; user selects before red-team reviews selected only
+
+### Changed
+
+- `meow:plan-creator` workflow expanded from 6 steps (00-05) to 9 steps (00-08)
+- `meow:plan-creator` SKILL.md bumped to v1.4.0 with new step list and references
+- `.plan-state.json` schema bumped to v1.1 with optional parallel_groups and selected_approach
+- `step-file-rules.md` now lists meow:plan-creator as step-file enabled
+
+### Documentation
+
+- 6 new gotchas in plan-creator gotchas.md
+- 2 new reference files: parallel-mode.md, two-approach-mode.md
+
 ## [1.3.4](https://github.com/ngocsangyem/MeowKit/releases/tag/v1.3.4) (2026-04-02)
 
 ### Bug Fixes

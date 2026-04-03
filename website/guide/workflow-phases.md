@@ -55,10 +55,17 @@ Phase 1 produces an approved plan using one or more planning skills:
 
 | Skill                  | Lens               | Use when                           |
 | ---------------------- | ------------------ | ---------------------------------- |
-| `meow:plan-creator`    | Full plan creation | Starting from scratch              |
+| `meow:plan-creator`    | Full plan creation | Starting from scratch (9-step workflow, 00–08) |
 | `meow:plan-ceo-review` | Product lens       | Is this the right thing to build?  |
 | `meow:plan-eng-review` | Engineering lens   | Is this the right way to build it? |
 | `meow:validate-plan`   | 8-dimension quality check | COMPLEX tasks — runs before Gate 1 |
+
+`meow:plan-creator` v1.4.0 supports two additional modes on top of the standard `--hard` workflow:
+
+| Flag | What it adds |
+|------|-------------|
+| `--parallel` | Execution Strategy section with file ownership matrix and parallel group hydration |
+| `--two` | 2 competing approach files + trade-off matrix; user selects before red-team runs |
 
 For COMPLEX tasks (5+ files), the planner also applies **bead decomposition** — breaking the plan into atomic, independently committable work units. See [planner](/reference/agents/planner) for details. The `meow:validate-plan` skill checks bead boundaries as one of its 8 dimensions, ensuring clean handoff to the developer.
 
