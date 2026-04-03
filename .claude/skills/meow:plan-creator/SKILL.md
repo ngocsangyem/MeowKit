@@ -97,6 +97,10 @@ tasks/plans/YYMMDD-name/
 | `prompts/personas/plan-assumption-destroyer.md` | Plan-specific assumption skeptic persona |
 | `prompts/personas/plan-scope-complexity-critic.md` | Plan-specific YAGNI/scope minimalist persona |
 | `references/phase-template.md` | 12-section phase file template |
+| `references/ops-metrics-design.md` | If task involves metrics/KPIs/dashboards, load for metric philosophy, templates, and domain fallbacks |
+| `references/cold-start-context-brief.md` | When writing phase files, follow this template for self-contained, cold-start-safe phase files |
+| `references/plan-mutation-protocol.md` | When modifying an existing plan (split/insert/skip/reorder/abandon), follow this protocol |
+| `references/worked-example-stripe-billing.md` | For plan detail level reference, see this complete worked example (MeowKit 7-phase model) |
 | `references/scope-challenge.md` | Scope modes (HOLD/EXPANSION/REDUCTION) |
 | `references/research-phase.md` | Researcher spawning protocol |
 | `references/plan-organization.md` | Directory structure, naming, size rules |
@@ -110,6 +114,10 @@ tasks/plans/YYMMDD-name/
 | `references/parallel-mode.md` | Ownership matrix template, parallel group rules |
 | `references/two-approach-mode.md` | Approach file template, trade-off matrix, selection flow |
 | `scripts/validate-plan.py` | Plan completeness validator |
+| `references/workflow-models/feature-model.md` | Workflow template for feature tasks (loaded JIT by step-00) |
+| `references/workflow-models/bugfix-model.md` | Workflow template for bug fix tasks (loaded JIT by step-00) |
+| `references/workflow-models/refactor-model.md` | Workflow template for refactor tasks (loaded JIT by step-00) |
+| `references/workflow-models/security-model.md` | Workflow template for security tasks (loaded JIT by step-00) |
 
 ## Start
 

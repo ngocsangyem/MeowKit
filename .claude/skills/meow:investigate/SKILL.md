@@ -60,7 +60,7 @@ Skip: Investigation itself doesn't need a plan — it produces the input for pla
 
 1. **Run preamble** — load `references/preamble.md` and execute the startup bash block
 2. **Collect symptoms** — read error messages, stack traces, reproduction steps
-3. **Investigate root cause** — load `references/debugging-methodology.md` and follow Phase 1-3
+3. **Investigate root cause** — load `references/debugging-methodology.md` and follow Phase 1-3. For recurring patterns or complex failures, load `references/rca-method-selection.md` for methodology selection. Load `references/rca-anti-patterns.md` to avoid common RCA mistakes.
 4. **Lock scope** — restrict edits to affected module (via freeze hook)
 5. **Implement fix** — follow Phase 4 from debugging methodology
 6. **Verify** — reproduce original scenario, run test suite, output DEBUG REPORT

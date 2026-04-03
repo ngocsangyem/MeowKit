@@ -12,6 +12,9 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
+# Hook profile gating — safety-critical: NEVER skip regardless of profile
+MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+
 # settings.json matcher already filters to Read, Edit|Write — no need to check tool name
 # $1 = file path passed via $TOOL_INPUT_FILE_PATH
 FILE_PATH="$1"

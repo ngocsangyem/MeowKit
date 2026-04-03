@@ -90,6 +90,7 @@ Every design output MUST pass these checks:
 | Reference                                           | When to load | Content                                              |
 | --------------------------------------------------- | ------------ | ---------------------------------------------------- |
 | **[design-rules.md](./references/design-rules.md)** | Steps 2-3    | Typography, color, spacing, motion, responsive rules |
+| **[anti-slop-directives.md](./references/anti-slop-directives.md)** | During UI implementation | 7 generic patterns to avoid + positive alternatives + identity test |
 
 ## Failure Handling
 

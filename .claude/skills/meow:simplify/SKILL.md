@@ -27,18 +27,21 @@ Runs after implementation, before review. Reduces complexity while preserving be
 ## What to Look For
 
 ### Remove
-- **Dead code** — functions never called, variables never read, unreachable branches
+
+- **Dead code** — functions never called, variables never read, unreachable branches, import never used
 - **Commented-out code** — if it's in git history, delete it from source
 - **Unnecessary abstractions** — wrapper that adds no value, interface with one implementation
 - **Redundant null checks** — checking null after a guard that already prevents null
 
 ### Simplify
+
 - **Deep nesting** — 3+ levels of if/else → extract early returns or guard clauses
 - **God functions** — >50 lines → extract focused helpers
 - **Duplicate logic** — same pattern in 3+ places → extract shared utility
 - **Complex conditions** — `if (a && !b || (c && d))` → extract to named boolean or function
 
 ### Don't Touch
+
 - **Working code that's "not how I'd write it"** — style is not complexity
 - **Performance-optimized code** — it looks complex for a reason
 - **Code outside the current diff** — scope discipline, even for simplification

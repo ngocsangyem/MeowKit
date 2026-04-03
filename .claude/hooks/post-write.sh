@@ -5,6 +5,12 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
+# Hook profile gating — skip security scan in fast profile for speed
+MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+case "$MEOW_PROFILE" in
+  fast) exit 0 ;;
+esac
+
 FILE="$1"
 
 # Safety fallback: if no file path provided, skip (matches PreToolUse hooks behavior)

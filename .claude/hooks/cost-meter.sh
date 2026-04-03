@@ -5,6 +5,12 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
+# Hook profile gating — skip token tracking in standard/fast profiles for speed
+MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+case "$MEOW_PROFILE" in
+  standard|fast) exit 0 ;;
+esac
+
 COMMAND_NAME="$1"
 ESTIMATED_TOKENS="$2"
 TIER="$3"

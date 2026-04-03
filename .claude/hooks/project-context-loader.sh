@@ -9,6 +9,9 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
+# Hook profile gating — context loading always needed: NEVER skip regardless of profile
+MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+
 CONTEXT_FILE="docs/project-context.md"
 VENV_PYTHON=".claude/skills/.venv/bin/python3"
 

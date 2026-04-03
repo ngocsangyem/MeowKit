@@ -24,6 +24,8 @@ The orchestrator agent MUST declare the tier before any task begins.
 
 Source: prompt-crafting-for-different-models.md — Model Selection Strategy table
 
+> Note: TRIVIAL (cosmetic: rename, typo, format) is distinct from MICRO-TASK (non-production logic <30 lines). See tdd-rules.md for MICRO-TASK definition.
+
 ## Rules
 
 ### Rule 1: Declare before work

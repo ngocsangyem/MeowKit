@@ -65,15 +65,18 @@ The skill enforces **strict TDD**: failing tests are written BEFORE implementati
 
 ```
 Phase 0: Orient → Phase 1: Plan [GATE 1] → Phase 2: Test RED
-→ Phase 3: Build GREEN → Phase 4: Review [GATE 2] + Ship → Phase 5: Reflect
+→ Phase 3: Build GREEN → Phase 3.5: Simplify → Phase 3.6: Verify
+→ Phase 4: Review [GATE 2] + Ship → Phase 5: Reflect
 ```
 
 1. **Orient** — Detect intent, declare model tier, read memory
 2. **Plan** — Research + create plan → Gate 1 (human approval)
 3. **Test RED** — Write failing tests from acceptance criteria
 4. **Build GREEN** — Implement until tests pass (TDD)
-5. **Review + Ship** — Code review → Gate 2 (human approval) → commit + PR
-6. **Reflect** — Sync plan, update docs, write memory
+5. **3.5 Simplify** — Mandatory `meow:simplify` pass after build. Catches over-engineering before review.
+6. **3.6 Verify** — Run `meow:verify` for unified build→lint→test→type→coverage check.
+7. **Review + Ship** — Code review → Gate 2 (human approval) → commit + PR
+8. **Reflect** — Sync plan, update docs, write memory
 
 ## Gotchas
 
@@ -86,6 +89,8 @@ Phase 0: Orient → Phase 1: Plan [GATE 1] → Phase 2: Test RED
 - **Missing model tier declaration**: Always declare TRIVIAL/STANDARD/COMPLEX in Phase 0
 - **Forgetting memory read/write**: Phase 0 reads memory/lessons.md; Phase 5 writes back
 - **Using Agent() instead of Task()**: Task() enables tracking and blocking. Always use Task() for phases 2-5
+- **Skipping simplify**: The mandatory simplify step catches over-engineering. Don't bypass it even if code "looks clean"
+- **meow:verify failing on unknown project**: If project type not detected, verify asks user for commands. Don't skip.
 
 ## Related
 
@@ -94,3 +99,6 @@ Phase 0: Orient → Phase 1: Plan [GATE 1] → Phase 2: Test RED
 - [`meow:review`](/reference/skills/review) — Just the review step
 - [`meow:plan-creator`](/reference/skills/plan-creator) — The plan template system cook uses
 - [`meow:testing`](/reference/skills/testing) — TDD red-green-refactor reference
+- [`meow:verify`](/reference/skills/verify) — Unified build→lint→test→type→coverage check (Phase 3.6)
+- [`meow:simplify`](/reference/skills/simplify) — Mandatory over-engineering removal pass (Phase 3.5)
+- [`meow:decision-framework`](/reference/skills/decision-framework) — Approach selection during orient phase

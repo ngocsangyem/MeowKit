@@ -67,6 +67,10 @@ Skip: Always — office-hours is a pre-planning skill. It feeds plan-creator, no
 - `references/phase6-handoff.md` — Three-beat closing sequence, tiered Garry plea, next-skill recommendations
 - `references/important-rules.md` — Hard rules: no implementation, one question at a time, mandatory assignment, completion statuses
 
+## Product Diagnostic Modes
+
+For Founder Review (PMF scoring) or User Journey Audit (friction mapping), load `references/product-lens-modes.md`. Use when the user asks about product health, retention, or whether to continue building — not for new ideas.
+
 ## Gotchas
 
 - **Solutioning before understanding the problem**: Jumping to "how to build" before validating "should we build" → Force problem statement completion before any technical discussion

@@ -104,6 +104,8 @@ Execute via `workflow.md`. Each step is a separate file loaded JIT:
 4. **step-03-triage** — **Forced-finding check** (zero → re-analyze once). Categorize findings as `current-change` or `incidental`. Dedup Phase A + Phase B.
 5. **step-04-verdict** — 5-dimension verdict (Correctness, Maintainability, Performance, Security, Coverage) + **artifact verification** (4-level). Present for Gate 2.
 
+For high-stakes code (payments, auth, security) or `--iterative` flag, load `references/iterative-evaluation-protocol.md` for the 3-pass structured review process.
+
 See also reference files for supplementary checks: [preamble](references/preamble.md), [scope-drift](references/scope-drift-detection.md), [design-review](references/design-review.md), [test-coverage](references/test-coverage.md), [adversarial-review](references/adversarial-review.md), [artifact-verification](references/artifact-verification.md).
 
 ## References

@@ -75,10 +75,24 @@ Verdict rules:
 **Plan-First Gate:** Reads plan for context. Skips for standalone PR diff reviews.
 :::
 
+## Iterative Evaluation (v2.0)
+
+For high-stakes code (payments, auth, security) or with `--iterative` flag, review runs multiple passes:
+
+1. **Pass 1** — Full adversarial review (existing workflow)
+2. Developer fixes all FAIL/WARN items
+3. **Pass 2** — Re-review focusing on changed code + previously flagged items
+4. If still FAIL → developer fixes → **Pass 3** (final)
+
+**Max 3 iterations.** After 3, escalate to user regardless. The reviewer never implements fixes; the developer never self-evaluates.
+
+Loaded from: `references/iterative-evaluation-protocol.md`
+
 ## Gotchas
 
 - **Reviewing diff without full context**: Approving a change that breaks an unstated invariant → Always read the surrounding file, not just the diff hunks
 - **Style nits hiding real bugs**: 10 comments about formatting, zero about the missing null check → Prioritize: security > correctness > performance > style
+- **Iterative mode on trivial code**: Only use for payments, auth, security, or public APIs. Standard review is one-shot.
 
 ## Related
 

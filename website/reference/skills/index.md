@@ -1,12 +1,12 @@
 ---
 title: Skills Overview
-description: "All 51 MeowKit skills organized by category."
+description: "All 65+ MeowKit skills organized by category."
 persona: C
 ---
 
 # Skills Overview
 
-MeowKit ships 51 skills using the `meow:` namespace prefix.
+MeowKit ships 65+ skills using the `meow:` namespace prefix.
 
 ## Architecture
 
@@ -38,6 +38,7 @@ Skills fall into distinct types based on purpose and phase alignment.
 | Planning | Plan creation, review, and ideation | plan-creator, plan-ceo-review, plan-eng-review, office-hours |
 | Exploration | Codebase search, debugging, doc retrieval | scout, investigate, docs-finder |
 | Domain | Stack-specific patterns and conventions | typescript, vue, frontend-design |
+| Backend & Data | API design, database patterns, build error resolution | api-design, build-fix, database |
 | Safety | Prevent destructive actions, scope edits | careful, freeze, skill-template-secure |
 | Infrastructure | Agent routing, loading, skill creation | agent-detector, lazy-agent-loader, skill-creator |
 | Reference Toolkit | Guides loaded by agents during specific phases | development, testing, planning, shipping, documentation, memory |
@@ -74,6 +75,7 @@ Full development pipelines that orchestrate multiple phases.
 | [meow:cook](/reference/skills/cook) | End-to-end feature pipeline: plan → test → build → review → ship |
 | [meow:fix](/reference/skills/fix) | Structured bug investigation with auto-complexity detection |
 | [meow:ship](/reference/skills/ship) | Ship pipeline: merge, test, review, version, commit, PR |
+| [meow:verify](/reference/skills/verify) | Unified verification: build→lint→test→type-check→coverage, fail-fast |
 | [meow:workflow-orchestrator](/reference/skills/workflow-orchestrator) | 5-phase TDD workflow with token budgets and fast-track |
 | [meow:session-continuation](/reference/skills/session-continuation) | Save/resume workflow state across sessions |
 
@@ -103,6 +105,8 @@ Plan creation, review, and ideation.
 | [meow:plan-eng-review](/reference/skills/plan-eng-review) | Engineering plan review — architecture, edges, tests |
 | [meow:office-hours](/reference/skills/office-hours) | YC-style brainstorming (startup + builder modes) |
 | [meow:brainstorming](/reference/skills/brainstorming) | Structured ideation with scoring + plan-creator handoff |
+| [meow:decision-framework](/reference/skills/decision-framework) | Operational decision architecture: triage, escalation, case management |
+| [meow:api-design](/reference/skills/api-design) | REST/GraphQL API design patterns |
 
 ## Exploration & Research
 
@@ -139,6 +143,16 @@ TypeScript, Vue, React, and UI/UX design patterns.
 | [meow:react-patterns](/reference/skills/react-patterns) | React/Next.js performance — 45+ rules from Vercel Engineering |
 | [meow:frontend-design](/reference/skills/frontend-design) | UI/UX with anti-AI-slop enforcement |
 | [meow:ui-design-system](/reference/skills/ui-design-system) | Design intelligence: styles, WCAG 2.1 AA, palettes, quality checklists |
+
+## Backend & Data
+
+API design, database patterns, and build error resolution.
+
+| Skill | What it does |
+|-------|-------------|
+| [meow:api-design](/reference/skills/api-design) | REST/GraphQL patterns: resource naming, HTTP methods, status codes, pagination, versioning, rate limiting, error formats |
+| [meow:build-fix](/reference/skills/build-fix) | Build error triage: detect language, load fix references, classify fixability, chain into meow:verify |
+| [meow:database](/reference/skills/database) | Schema design, safe migrations, query optimization. PostgreSQL primary |
 
 ## Analysis & Media
 

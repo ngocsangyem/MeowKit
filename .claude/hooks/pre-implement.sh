@@ -2,6 +2,12 @@
 # pre-implement.sh — Blocks implementation if no failing test exists for the current feature.
 # Usage: pre-implement.sh <feature-name-or-file-path>
 
+# Hook profile gating — skip TDD check in fast profile for rapid iteration
+MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+case "$MEOW_PROFILE" in
+  fast) exit 0 ;;
+esac
+
 set -e
 
 FEATURE="$1"

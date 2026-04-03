@@ -13,7 +13,7 @@ export default withMermaid(defineConfig({
     },
   },
   title: 'MeowKit',
-  description: 'AI agent toolkit for Claude Code — 49 skills, 14 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
+  description: 'AI agent toolkit for Claude Code — 65+ skills, 15 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
   srcExclude: ['**/plans/**'],
   head: [
     ['link', { rel: 'icon', href: '/favicon.ico' }],
@@ -57,6 +57,7 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'What\'s New', link: '/guide/whats-new',
               items: [
+                { text: 'v2.0.0 — The Leverage Release', link: '/guide/whats-new/v2.0.0' },
                 { text: 'v1.4.0 — Plan Intelligence', link: '/guide/whats-new/v1.4.0' },
                 { text: 'v1.3.2 — Plan Quality', link: '/guide/whats-new/v1.3.2' },
                 { text: 'v1.3.1 — Red Team Depth', link: '/guide/whats-new/v1.3.1' },
@@ -117,6 +118,7 @@ export default withMermaid(defineConfig({
             { text: 'meow:cook', link: '/reference/skills/cook' },
             { text: 'meow:fix', link: '/reference/skills/fix' },
             { text: 'meow:ship', link: '/reference/skills/ship' },
+            { text: 'meow:verify', link: '/reference/skills/verify' },
             { text: 'meow:workflow-orchestrator', link: '/reference/skills/workflow-orchestrator' },
             { text: 'meow:session-continuation', link: '/reference/skills/session-continuation' },
           ],
@@ -145,6 +147,7 @@ export default withMermaid(defineConfig({
             { text: 'meow:office-hours', link: '/reference/skills/office-hours' },
             { text: 'meow:brainstorming', link: '/reference/skills/brainstorming' },
             { text: 'meow:party', link: '/reference/skills/party' },
+            { text: 'meow:decision-framework', link: '/reference/skills/decision-framework' },
           ],
         },
         {
@@ -178,6 +181,15 @@ export default withMermaid(defineConfig({
             { text: 'meow:react-patterns', link: '/reference/skills/react-patterns' },
             { text: 'meow:frontend-design', link: '/reference/skills/frontend-design' },
             { text: 'meow:ui-design-system', link: '/reference/skills/ui-design-system' },
+          ],
+        },
+        {
+          text: 'Backend & Data',
+          collapsed: true,
+          items: [
+            { text: 'meow:api-design', link: '/reference/skills/api-design' },
+            { text: 'meow:build-fix', link: '/reference/skills/build-fix' },
+            { text: 'meow:database', link: '/reference/skills/database' },
           ],
         },
         {

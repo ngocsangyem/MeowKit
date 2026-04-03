@@ -25,6 +25,7 @@ Operates in **Phase 2 (Test RED)** and **Phase 3 (Build GREEN)**. Output support
 | **[red-green-refactor.md](./references/red-green-refactor.md)** | Phase 2-3 | TDD cycle, test-first rules, refactoring guidelines |
 | **[validation-scripts.md](./references/validation-scripts.md)** | After code changes | Running validation scripts, interpreting results |
 | **[visual-qa.md](./references/visual-qa.md)** | UI testing | Browser-based visual QA, screenshot comparison, responsive testing |
+| **[e2e-best-practices.md](./references/e2e-best-practices.md)** | When creating E2E tests | Tool preference, locator strategy, wait patterns, POM, flaky quarantine, success metrics |
 
 ## Gotchas
 

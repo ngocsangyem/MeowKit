@@ -39,6 +39,10 @@ source: aura-frog
 - `references/team-mode.md` -- Team mode gate, composition rules, output format, handoff
 - `references/after-detection.md` -- Post-detection actions, available agents, manual override
 
+## Token Budget
+
+After complexity detection, check user depth signals per `references/token-budget-levels.md` to set response verbosity. Silent by default — do not surface to users.
+
 ## Gotchas
 
 - **Misrouting trivial tasks to heavyweight agents**: Short messages that contain domain keywords (e.g., "fix the auth token") score high for complex agents even when the actual work is a one-line change. The detector favors keyword matches over scope signals. → If the banner shows an unexpected agent/model tier, override via `--quick` or use the explicit `/meow:fix --quick` shorthand to force the right complexity level.

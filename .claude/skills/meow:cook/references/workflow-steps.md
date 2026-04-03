@@ -95,6 +95,18 @@ Note: This runs ONCE at phase start, not on every file write (too expensive as a
 
 **Output:** `Phase 3: Build GREEN — [N] files modified, [X/Y] tests pass`
 
+## Phase 3.5: Simplify (MANDATORY — do not skip)
+
+After tests are green, run `meow:simplify` before any review. This is mandatory.
+
+```
+Task(subagent_type="developer", prompt="Run /meow:simplify on the Phase 3 output. Reduce complexity without breaking tests. All tests must still pass after simplification.", description="Simplify before review")
+```
+
+**Why mandatory:** Reviewers catch logic errors better on simplified code. Submitting complex code to review creates review noise that obscures real issues. Simplify once, review once — cleaner than review-fix-simplify cycles.
+
+**Output:** `Phase 3.5: Simplify complete — complexity reduced, tests still pass`
+
 ### [Review Gate] Post-Build (non-auto only)
 Present implementation summary. Ask: "Proceed to review?" / "Request changes" / "Abort"
 

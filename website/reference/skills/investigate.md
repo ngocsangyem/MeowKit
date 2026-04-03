@@ -76,6 +76,21 @@ Load based on bug type — progressive disclosure:
 | Performance | `performance-diagnostics.md` | Bottleneck isolation |
 | Test pollution | `scripts/find-polluter.sh` | Bisection to find polluting test |
 
+## RCA Method Selection (v2.0)
+
+For recurring patterns or complex multi-cause failures, investigate loads structured methodology selection:
+
+| Problem Type | Method | Time Budget |
+|-------------|--------|-------------|
+| Single-event, simple | 5 Whys | 1-2 hours |
+| Single-event, multiple causes | Ishikawa fishbone | 4-8 hours |
+| Recurring, process-related | 8D problem-solving | 20-40 hours |
+| Safety-critical | Fault Tree Analysis | 40-80 hours |
+
+**Anti-patterns:** "Human error" is never a root cause. "Retraining" is the weakest fix. If your root cause matches the symptom reworded, dig deeper.
+
+Loaded from: `references/rca-method-selection.md`, `references/rca-anti-patterns.md`
+
 ## Gotchas
 
 - **Confirming hypothesis without disproving alternatives**: Finding evidence FOR a theory doesn't mean it's correct → Actively test at least one alternative hypothesis before concluding

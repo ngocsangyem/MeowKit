@@ -116,6 +116,9 @@ After pipeline completes, output this summary:
 - `references/version-changelog-todos.md` — Version bump (Step 4), CHANGELOG (Step 5), TODOS.md (Step 5.5)
 - `references/commit-push-pr.md` — Issue linking, commit (Step 6), verification gate (Step 6.5), push (Step 7), PR creation/edit (Step 8), document-release (Step 8.5), ship metrics (Step 8.75)
 - `references/rules.md` — Important rules and constraints
+- `references/rollback-protocol.md` — Rollback steps and procedures (migrated from meow:shipping)
+- `references/ship-pipeline.md` — Full ship pipeline stages and gate definitions (migrated from meow:shipping)
+- `references/canary-deploy.md` — Canary deployment strategy and traffic splitting (migrated from meow:shipping)
 
 ## Hooks
 

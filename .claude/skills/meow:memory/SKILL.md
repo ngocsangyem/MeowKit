@@ -34,4 +34,4 @@ Operates in **Phase 0 (Orient)** and **Phase 6 (Reflect)**. Output supports the 
 
 - **Stale patterns applied to changed codebase**: Memory suggests patterns from old architecture → Run consolidation when patterns exceed 50 entries; flag patterns with lastSeen > 6 months
 - **cost-log.json growing unbounded**: Every session appends without pruning → Run consolidation to archive entries older than 90 days
-- **NEEDS_CAPTURE markers in lessons.md**: Stop hook writes markers at session end; Phase 0 processes them retroactively (max 3, 2-min budget)
+- **NEEDS_CAPTURE markers in lessons.md**: Stop hook writes markers at session end; Phase 0 processes them retroactively (max 5, 5-min budget). Markers tagged CRITICAL or SECURITY are processed regardless of age or count limit. Use `meow:memory --capture-all` to override marker limits and process all NEEDS_CAPTURE markers regardless of age or count.

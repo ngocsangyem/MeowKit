@@ -68,6 +68,10 @@ Skip: Quick tier — designed for rapid smoke tests without planning.
 - `references/issue-taxonomy.md` — Severity levels, issue categories, per-page exploration checklist
 - `references/rules.md` — All QA rules (evidence, credentials, screenshots, working tree, commits, self-regulation) and output structure
 
+## References (Additional)
+
+- `references/browser-qa-checklist.md` — For web app QA, follow this 4-phase protocol: smoke → interaction → visual regression → accessibility
+
 ## Gotchas
 
 - **Testing only happy path**: All tests pass but edge cases crash in production → Include at least one error scenario, one empty state, and one boundary condition per feature

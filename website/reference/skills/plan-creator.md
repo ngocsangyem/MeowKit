@@ -16,6 +16,10 @@ When `/meow:plan` or `/meow:cook` is invoked, this skill determines the workflow
 - **Context Reminder** — After Gate 1 approval, prints a mode-matched cook command (e.g. `meow:cook --fast` in fast mode) so you never have to look up the flag
 - **ADR generation** — Creates Architecture Decision Records in `docs/architecture/`
 - **Validation** — Runs `validate-plan.py` to ensure plan completeness
+- **Ops metrics guidance** — Detects metrics/KPI tasks, loads metric design philosophy to ensure outcome-focused targets
+- **Cold-start context briefs** — Each phase file is self-contained so a fresh agent can execute any step cold without reading prior phases
+- **Plan mutation protocol** — Formal rules for modifying plans mid-execution (split, insert, skip, reorder, abandon)
+- **Worked examples** — Concrete reference showing expected detail level (Stripe billing 7-phase plan)
 
 ## Flag Modes
 
@@ -55,13 +59,30 @@ After Gate 1 approval, the skill ends with a **Print & Stop**:
 **Plan-First Gate:** Creates plan if missing. Skips with plan path arg or `--fast` mode.
 :::
 
+## v2.0 Reference Additions
+
+Four new reference files enhance plan-creator's capabilities:
+
+| Reference | Loaded When | Purpose |
+|-----------|-------------|---------|
+| `ops-metrics-design.md` | Task involves KPIs, dashboards, SLAs | Outcome-focused metric philosophy |
+| `cold-start-context-brief.md` | Every plan (default) | Template for self-contained phase files |
+| `plan-mutation-protocol.md` | Modifying existing plan | Rules for split/insert/skip/reorder/abandon |
+| `worked-example-stripe-billing.md` | Every plan (reference) | Concrete 7-phase plan showing expected detail |
+
 ## Gotchas
 
 - **Wrong model for task type**: feature-model on a bug fix skips investigation → always confirm type first
 - **Goal describes activity, not outcome**: "Implement OAuth" vs "Users can log in with OAuth" — next agent can't judge success → rewrite until Goal answers "what does done look like?"
 - **Acceptance criteria that can't be verified**: "code is clean" blocks Gate 2 → every criterion must reference a specific command or file check
+- **Phase files not self-contained**: "See phase-02 for context" in a phase file = failure. Each phase must state context directly. Use cold-start template.
+- **Modifying plans without protocol**: Skipping a step without justification or splitting without acceptance criteria on both halves. Follow mutation protocol.
+- **Metrics without red flags**: Defining targets without investigation thresholds. Use ops-metrics reference.
 
 ## Related
 - [`meow:cook`](/reference/skills/cook) — Uses plan-creator as its first step
 - [`meow:plan-eng-review`](/reference/skills/plan-eng-review) — Reviews plans created by plan-creator
 - [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — CEO-level plan review
+- [`meow:decision-framework`](/reference/skills/decision-framework) — Guides model/approach selection during planning
+- [`meow:api-design`](/reference/skills/api-design) — API design reference used in planning phases
+- [`meow:verify`](/reference/skills/verify) — Verify step referenced in plan phase templates

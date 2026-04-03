@@ -38,6 +38,21 @@ If --dry-run             → print mode + plan for each step, then stop
 
 ---
 
+## Step 0.8: Unified Verification
+
+Before any pre-flight checks, run `meow:verify` to confirm everything is green.
+
+If `meow:verify` returns FAIL:
+- Display the failing step and errors
+- **Abort ship** with message: "Verification failed — fix issues before shipping. Run `/meow:verify` to re-check."
+- Do not proceed to Step 1
+
+If `meow:verify` returns PASS: continue to Step 1.
+
+> Skip this step only if `--skip-verify` flag is passed explicitly by the user.
+
+---
+
 ## Step 1: Pre-flight
 
 1. Check the current branch. If on the base branch or the repo's default branch, **abort**: "You're on the base branch. Ship from a feature branch."

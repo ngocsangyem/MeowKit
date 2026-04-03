@@ -148,3 +148,4 @@ Full list: `references/gotchas.md` (update when Claude produces wrong fix patter
 - `references/review-cycle.md` — Autonomous/HITL/Quick review
 - `references/skill-activation-matrix.md` — When to activate each skill
 - `references/workflow-ci.md` | `workflow-logs.md` | `workflow-test.md` | `workflow-types.md` | `workflow-ui.md`
+- `references/parallel-exploration.md` — Parallel investigation strategy for multi-hypothesis diagnosis

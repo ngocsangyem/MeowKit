@@ -8,6 +8,10 @@ persona: C
 
 MeowKit includes 15 specialist agents. Each owns a specific concern — no two agents modify the same files.
 
+:::info v2.0 agent count unchanged
+v2.0 kept the same 15 agents. No new agents were added. ECC (Extreme Context Compression) patterns introduced in v2.0 were adapted as skill references rather than new agents — keeping the agent surface area stable.
+:::
+
 | Agent | Type | Role | Phase | Auto-activates |
 |-------|------|------|-------|----------------|
 | [orchestrator](/reference/agents/orchestrator) | Core | Task routing + complexity classification | 0 | Every task |

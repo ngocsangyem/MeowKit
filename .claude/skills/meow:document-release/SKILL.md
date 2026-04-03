@@ -76,6 +76,7 @@ Skip: Post-ship doc sync (default mode) — scope is defined by the diff.
 - `references/step8-version-bump.md` — VERSION bump decision flow
 - `references/step9-commit-and-output.md` — Commit, push, PR update, and health summary
 - `references/important-rules.md` — Core rules: read before edit, never clobber, be explicit
+- `references/general-documentation.md` — General documentation patterns and guidelines (migrated from meow:documentation)
 
 ## Gotchas
 

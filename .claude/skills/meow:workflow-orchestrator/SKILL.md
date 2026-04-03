@@ -57,6 +57,7 @@ Skip: Fasttrack mode with pre-approved spec.
    - Phase 1: Plan → **GATE 1** (human approval required)
    - Phase 2: Test RED — write failing tests (TDD). Auto-continue.
    - Phase 3: Build GREEN — implement to pass tests. Auto-continue.
+   - Phase 3.5: Simplify — run `meow:simplify` after tests pass. **MANDATORY before Phase 4.** Auto-continue.
    - Phase 4: Review — quality/security audit → **GATE 2** (human approval required, NO EXCEPTIONS)
    - Phase 5: Ship — commit, PR, deploy. Auto-continue.
    - Phase 6: Reflect — memory capture, docs sync. Auto-complete.

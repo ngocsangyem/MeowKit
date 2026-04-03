@@ -8,7 +8,7 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | `security-rules.md` | Block hardcoded secrets, any types, SQL injection, XSS patterns | MeowKit original | All modes, all phases |
 | `injection-rules.md` | Prompt injection defense: DATA vs INSTRUCTIONS boundary | MeowKit original | All modes, all phases |
 | `gate-rules.md` | Gate 1 (plan approval) and Gate 2 (review approval) hard stops | MeowKit original | Phases 1, 4 |
-| `tdd-rules.md` | TDD enforcement: failing test before implementation | MeowKit original | Phases 2, 3 |
+| `tdd-rules.md` | TDD enforcement: failing test before implementation. Added MICRO-TASK exemption (v2.0) | MeowKit original | Phases 2, 3 |
 | `naming-rules.md` | Naming conventions per platform (TS, Vue, Swift, DB) | MeowKit original | Implementation, review |
 | `development-rules.md` | File management, code quality, pre-commit, git safety, docs impact | Adapted from claudekit-engineer | Implementation, commit |
 | `orchestration-rules.md` | Subagent delegation, file ownership, parallel vs sequential | Adapted from claudekit-engineer | Multi-agent workflows [CONTEXTUAL] |
@@ -18,7 +18,7 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | `search-before-building-rules.md` | 3-layer knowledge framework: search before implementing unfamiliar patterns | Adapted from gstack ETHOS.md | Implementation, planning |
 | `scale-adaptive-rules.md` | Domain-based complexity routing, CSV match override, Gate 1 one-shot bypass | New (BMAD-inspired) | Phase 0 (Orient) |
 | `step-file-rules.md` | JIT step loading, no skipping, state persistence for multi-step workflows | New (BMAD-inspired) | Step-file skills |
-| `parallel-execution-rules.md` | Worktree isolation, file ownership, max 3 agents, integration test | New (CKE-inspired) | Parallel execution [CONTEXTUAL] |
+| `parallel-execution-rules.md` | Worktree isolation, file ownership, max 3 agents, integration test. Added staged parallel mode (v2.0) | New (CKE-inspired) | Parallel execution [CONTEXTUAL] |
 
 ## Loading Priority
 

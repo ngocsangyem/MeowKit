@@ -6,6 +6,17 @@ These rules apply to all implementation work in MeowKit. No exceptions unless ex
 
 1. **No implementation before a failing test.** No implementation code may be written before a failing test exists for the feature.
 
+1b. **MICRO-TASK exemption.** Code classified as MICRO-TASK by the orchestrator is exempt from TDD. MICRO-TASK means:
+   - (a) Not production-facing (tests, scripts, tooling, docs, configs) AND
+   - (b) Less than 30 lines AND
+   - (c) Orchestrator explicitly classifies as MICRO-TASK
+
+   This is distinct from TRIVIAL in model-selection-rules.md (which means cosmetic-only: rename, typo, format). MICRO-TASK covers non-production code that has logic but doesn't need test coverage.
+
+   WHY: Scripts, configs, and tooling don't benefit from TDD. Requiring tests for a 15-line migration script wastes time without improving quality.
+
+   GUARD: Production-facing code ALWAYS requires TDD regardless of size. When in doubt, require TDD.
+
 2. **Failing test definition.** A "failing test" means a test that:
    - Runs successfully (no compilation/syntax errors)
    - Targets the feature's expected behavior

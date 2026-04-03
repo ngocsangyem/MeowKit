@@ -10,6 +10,22 @@ If two agents' ownership patterns overlap, STOP and restructure the decompositio
 
 WHY: Concurrent edits to the same file cause merge conflicts and lost work. No amount of tooling fixes this — prevention is the only reliable strategy.
 
+### Staged Parallel Mode (Alternative)
+
+When strict zero-overlap is impractical (shared config, utils, types), use staged parallel:
+
+1. Identify overlapping files between parallel agents
+2. Split work: non-overlapping files run in parallel, overlapping files handled sequentially
+3. Agent A completes its overlapping file edits → merge → Agent B starts on same files
+4. Non-overlapping work proceeds in parallel throughout
+
+**When to use staged mode:**
+- Features with shared utility files
+- Changes touching both frontend and shared types
+- Multiple agents needing the same config file
+
+**Constraints:** Same max-3-agent limit. Same worktree isolation. Integration test still required after merge.
+
 ## Rule 2: Max 3 Parallel Agents
 
 NEVER spawn more than 3 parallel agents simultaneously.

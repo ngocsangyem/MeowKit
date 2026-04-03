@@ -20,5 +20,16 @@ Before research or planning begins, challenge the scope:
 - ≤ 3 phases: normal
 - Exceeding any → challenge. Ask user to confirm or reduce.
 
+## Skill Suggestions
+
+During scope challenge, if the task domain matches, suggest the relevant skill:
+
+| Domain Signal | Suggested Skill |
+|---------------|----------------|
+| Operations, triage, case management, billing ops, support workflows, "how should we handle X cases" | `meow:decision-framework` — structures expert judgment into repeatable decision systems |
+| API design, endpoint planning, REST/GraphQL, "how should I structure this API" | `meow:api-design` — REST and GraphQL patterns, naming, status codes, pagination |
+
+Surface the suggestion as: "This looks like an [ops/API design] task — consider activating `meow:[skill]` before planning."
+
 ## Output
 After scope challenge: state the chosen mode and proceed to research (if needed) or plan drafting.

@@ -58,12 +58,38 @@ No plans, no reviews, no changes.
 | Paused workflow | Resume | "Resume [skill] at step [N]" |
 | Mixed state | Clarify | "Multiple items in progress. Which to focus on?" |
 
+## Specialist Skills (surface when domain matches)
+
+| Situation | Skill | When to suggest |
+|-----------|-------|----------------|
+| Operations, triage, case management, escalation protocols, billing workflows | `/meow:decision-framework` | User asks "how should we handle X cases" or is designing any case-routing system |
+| "Is everything green?", pre-review check, post-implementation validation | `/meow:verify` | After implementation completes, before review, or when user wants a quick health check |
+| API design, endpoint structure, REST/GraphQL conventions | `/meow:api-design` | User is planning backend endpoints or asking about API conventions |
+
+## Fast Paths (surface these prominently)
+
+Not every task needs the full 7-phase pipeline. Mention these when relevant:
+
+| Situation | Fast Path | What it bypasses |
+|-----------|-----------|-----------------|
+| Simple bug fix, typo, rename, config tweak | `/meow:fix` | Gate 1 (plan approval) — scope is the plan |
+| Task flagged as `one-shot` by scale-routing | Auto Gate 1 bypass | Gate 1 — zero blast radius confirmed |
+| Rapid iteration / spike work | `MEOW_HOOK_PROFILE=fast` | post-write scan, pre-ship, pre-task-check, TDD check |
+
+**Quick fix?** Use `/meow:fix` — bypasses Gate 1 for simple changes.
+
+**Small config change?** Scale-routing may auto-bypass Gate 1 when blast radius is zero.
+
+**Hook profiles:** Set `MEOW_HOOK_PROFILE=fast` for rapid iteration (skips non-critical hooks).
+Set `MEOW_HOOK_PROFILE=strict` to enable ALL hooks including cost-meter and post-session capture.
+
 ## Gotchas
 
 - Multiple in-progress plans create ambiguity — ask user which to focus on, don't guess
 - `session-state/` files from previous sessions may be stale — check timestamps, warn if >24h old
 - Git status can be noisy (untracked IDE files) — focus on files in `src/`, `lib/`, `app/`, `tests/`
 - Don't recommend skipping phases — even if the user seems impatient, show the full path
+- Fast paths are not loopholes — Gate 2 (review) is NEVER bypassed; security hooks are NEVER skipped
 
 ## Output Format
 

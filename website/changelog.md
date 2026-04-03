@@ -5,6 +5,49 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.0.0 (2026-04-04) — The Leverage Release
+
+Extracted high-leverage patterns from ECC's 38-agent ecosystem. 5 new skills, 17 reference merges, hook profiling, naming cleanup, rule relaxations.
+
+### New Skills
+
+- **meow:decision-framework** — operational decision architecture: classify→rules→score→escalate→communicate. 5 references + 3 domain examples (returns triage, billing ops, incident response)
+- **meow:verify** — unified verification: build→lint→test→type-check→coverage in sequence. Fail-fast. Auto-detects 5 project types (JS/TS, Python, Go, Ruby, Rust)
+- **meow:api-design** — REST/GraphQL patterns: resource naming, HTTP methods, status codes, pagination, versioning, rate limiting, error formats
+- **meow:build-fix** — build error triage: detect language from error output, load fix references, classify fixability (auto-fix/suggest/report), chain into meow:verify. Max 3 attempts then escalate
+- **meow:database** — schema design, migration patterns, query optimization. PostgreSQL primary, general patterns transferable
+
+### Reference Merges (17 files across 10 skills)
+
+- **meow:investigate** — `rca-method-selection.md` (5 Whys/Ishikawa/8D/Fault Tree), `rca-anti-patterns.md` ("human error" is never root cause)
+- **meow:plan-creator** — `ops-metrics-design.md`, `cold-start-context-brief.md`, `plan-mutation-protocol.md`, `worked-example-stripe-billing.md`
+- **meow:qa** — `browser-qa-checklist.md` (4-phase: smoke→interaction→visual→accessibility)
+- **meow:agent-detector** — `token-budget-levels.md` (25/50/75/100% depth, auto-detected from user signals)
+- **meow:office-hours** — `product-lens-modes.md` (Founder Review + User Journey Audit)
+- **meow:typescript** — `review-checklist.md` (prioritized: CRITICAL security→HIGH types/async→MEDIUM React/perf)
+- **meow:cook** — `loop-safety-protocol.md` (stall detection, cost drift, escalation triggers)
+- **meow:review** — `iterative-evaluation-protocol.md` (max 3 passes for payments/auth/security)
+- **meow:frontend-design** — `anti-slop-directives.md` (avoid generic gradients, default themes, AI-generated SVG)
+- **meow:testing** — `e2e-best-practices.md` (Agent Browser preference, POM, flaky quarantine, metrics)
+
+### Workflow Improvements
+
+- **Hook runtime profiling** — `MEOW_HOOK_PROFILE` env var: `strict` (all), `standard` (default, skip cost/session), `fast` (gate + privacy only). Safety-critical hooks never skip.
+- **Naming cleanup** — meow:shipping→meow:ship, meow:documentation→meow:document-release, meow:debug→meow:investigate. Redirects in place for 2 releases.
+- **Mandatory simplification** — meow:cook now requires meow:simplify between Phase 3 (Build) and Phase 4 (Review)
+- **Proactive learning** — new `learning-observer.sh` PostToolUse hook detects churn patterns, feeds into retroactive capture
+
+### Rule Changes
+
+- **MICRO-TASK TDD exemption** — non-production code <30 lines exempt from TDD if classified MICRO-TASK by orchestrator. Distinct from TRIVIAL (cosmetic-only)
+- **Staged parallel mode** — alternative to strict zero-overlap: overlapping files handled sequentially, non-overlapping in parallel
+- **Memory capture enhancement** — budget 2min→5min, markers 3→5, CRITICAL/SECURITY markers always processed, `--capture-all` flag
+
+### Documentation
+
+- New guide: `docs/guides/business-workflow-patterns.md` — explains all adapted patterns and trigger points
+- RULES_INDEX.md updated with v2.0 annotations for tdd-rules.md and parallel-execution-rules.md
+
 ## 1.4.0 (2026-04-03) — The Plan Intelligence Release
 
 Dedicated plan red-team with CK-style adjudication, plan-specific personas, and new workflow modes.

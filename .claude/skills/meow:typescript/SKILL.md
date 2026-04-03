@@ -77,6 +77,7 @@ Operates in **Phase 3 (Build GREEN)**. Output supports the `developer` agent.
 | Reference                                                 | When to load     | Content                                                         |
 | --------------------------------------------------------- | ---------------- | --------------------------------------------------------------- |
 | **[strict-patterns.md](./references/strict-patterns.md)** | Type safety work | Null handling, discriminated unions, type guards, utility types |
+| **[review-checklist.md](./references/review-checklist.md)** | When reviewing TypeScript code | Prioritized checklist: CRITICAL (security), HIGH (type safety, async, errors), MEDIUM (React, perf) |
 
 ## Failure Handling
 

@@ -7,6 +7,12 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
+# Hook profile gating — skip pre-deploy checks in fast profile
+MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+case "$MEOW_PROFILE" in
+  fast) exit 0 ;;
+esac
+
 COMMAND="$1"
 
 # Only run pre-ship checks on git commit or push commands
