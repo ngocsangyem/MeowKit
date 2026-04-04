@@ -61,7 +61,7 @@ export function copyFile(src: string, dest: string, dryRun: boolean): void {
 
   const parent = dirname(dest).split("/").pop() ?? "";
   const ext = basename(dest).includes(".") ? "." + basename(dest).split(".").pop() : "";
-  if (ext === ".sh" || parent === "hooks" || parent === "bin") {
+  if (ext === ".sh" || ext === ".cjs" || parent === "hooks" || parent === "bin") {
     chmodSync(dest, 0o755);
   }
 }

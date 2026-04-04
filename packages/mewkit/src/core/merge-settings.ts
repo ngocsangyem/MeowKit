@@ -94,6 +94,13 @@ export function mergeSettingsFile(
 function appendOnlyMerge(user: Settings, template: Settings): Settings {
   const result = { ...user };
 
+  // Copy new top-level keys from template (e.g. statusLine) without overwriting existing
+  for (const key of Object.keys(template)) {
+    if (key !== 'hooks' && key !== 'permissions' && !(key in result)) {
+      result[key] = template[key];
+    }
+  }
+
   // Merge hooks: add new hook matchers that don't exist in user's config
   if (template.hooks) {
     if (!result.hooks) result.hooks = {};
