@@ -134,6 +134,7 @@ export default withMermaid(defineConfig({
             { text: 'meow:vulnerability-scanner', link: '/reference/skills/vulnerability-scanner' },
             { text: 'meow:clean-code', link: '/reference/skills/clean-code' },
             { text: 'meow:lint-and-validate', link: '/reference/skills/lint-and-validate' },
+            { text: 'meow:simplify', link: '/reference/skills/simplify' },
           ],
         },
         {
@@ -148,6 +149,7 @@ export default withMermaid(defineConfig({
             { text: 'meow:brainstorming', link: '/reference/skills/brainstorming' },
             { text: 'meow:party', link: '/reference/skills/party' },
             { text: 'meow:decision-framework', link: '/reference/skills/decision-framework' },
+            { text: 'meow:intake', link: '/reference/skills/intake' },
           ],
         },
         {
@@ -215,9 +217,19 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'meow:agent-detector', link: '/reference/skills/agent-detector' },
             { text: 'meow:lazy-agent-loader', link: '/reference/skills/lazy-agent-loader' },
+            { text: 'meow:scale-routing', link: '/reference/skills/scale-routing' },
             { text: 'meow:skill-creator', link: '/reference/skills/skill-creator' },
             { text: 'meow:project-organization', link: '/reference/skills/project-organization' },
             { text: 'meow:bootstrap', link: '/reference/skills/bootstrap' },
+            { text: 'meow:worktree', link: '/reference/skills/worktree' },
+          ],
+        },
+        {
+          text: 'External Integrations',
+          collapsed: true,
+          items: [
+            { text: 'meow:jira', link: '/reference/skills/jira' },
+            { text: 'meow:figma', link: '/reference/skills/figma' },
           ],
         },
         {
@@ -286,6 +298,8 @@ export default withMermaid(defineConfig({
             { text: 'Frontend Development', link: '/workflows/frontend' },
             { text: 'Researching Libraries', link: '/workflows/research' },
             { text: 'Maintaining Old Projects', link: '/workflows/maintenance' },
+            { text: 'PRD Intake Automation', link: '/workflows/prd-intake' },
+            { text: 'Tickets with Media', link: '/workflows/ticket-with-media' },
           ],
         },
       ],

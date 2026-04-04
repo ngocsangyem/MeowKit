@@ -1,12 +1,12 @@
 ---
 title: Skills Overview
-description: "All 65+ MeowKit skills organized by category."
+description: "All 68+ MeowKit skills organized by category."
 persona: C
 ---
 
 # Skills Overview
 
-MeowKit ships 65+ skills using the `meow:` namespace prefix.
+MeowKit ships 68+ skills using the `meow:` namespace prefix.
 
 ## Architecture
 
@@ -33,12 +33,14 @@ Skills fall into distinct types based on purpose and phase alignment.
 
 | Type | Purpose | Examples |
 |------|---------|---------|
+| Intake & Triage | Ticket analysis, completeness scoring, product area detection | intake |
 | Pipeline | End-to-end workflows orchestrating multiple phases | cook, fix, ship, workflow-orchestrator |
 | Quality Gate | Enforce standards at specific phase boundaries | review, cso, vulnerability-scanner, lint-and-validate |
 | Planning | Plan creation, review, and ideation | plan-creator, plan-ceo-review, plan-eng-review, office-hours |
 | Exploration | Codebase search, debugging, doc retrieval | scout, investigate, docs-finder |
 | Domain | Stack-specific patterns and conventions | typescript, vue, frontend-design |
 | Backend & Data | API design, database patterns, build error resolution | api-design, build-fix, database |
+| External Integrations | Jira and Figma execution via MCP | jira, figma |
 | Safety | Prevent destructive actions, scope edits | careful, freeze, skill-template-secure |
 | Infrastructure | Agent routing, loading, skill creation | agent-detector, lazy-agent-loader, skill-creator |
 | Reference Toolkit | Guides loaded by agents during specific phases | development, testing, planning, shipping, documentation, memory |
@@ -153,6 +155,15 @@ API design, database patterns, and build error resolution.
 | [meow:api-design](/reference/skills/api-design) | REST/GraphQL patterns: resource naming, HTTP methods, status codes, pagination, versioning, rate limiting, error formats |
 | [meow:build-fix](/reference/skills/build-fix) | Build error triage: detect language, load fix references, classify fixability, chain into meow:verify |
 | [meow:database](/reference/skills/database) | Schema design, safe migrations, query optimization. PostgreSQL primary |
+
+## External Integrations
+
+Jira and Figma execution via MCP.
+
+| Skill | What it does |
+|-------|-------------|
+| [meow:jira](/reference/skills/jira) | Jira execution via Atlassian MCP: create, search, update, transition, link, sprint management. 4-tier safety framework, 50+ JQL templates |
+| [meow:figma](/reference/skills/figma) | Figma design analysis + implementation via Figma MCP. 3 modes: analyze, implement, tokens. Fallback to PNG + multimodal |
 
 ## Analysis & Media
 

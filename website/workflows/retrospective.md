@@ -49,6 +49,10 @@ The **analyst** provides cost and pattern data from `memory/`:
 - Pattern frequency (recurring issues that should become rules)
 - Lessons learned that inform the retrospective's recommendations
 
+::: tip Sprint Data from Jira
+If Atlassian MCP is available, meow:retro can pull sprint velocity and ticket metrics directly from Jira. Currently meow:retro uses git history only — Jira sprint data integration is planned for a future release.
+:::
+
 ## Next workflow
 
 → [Architecture Decisions](/workflows/architecture) — document architectural choices

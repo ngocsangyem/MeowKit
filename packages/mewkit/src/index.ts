@@ -62,7 +62,7 @@ async function printStatus(): Promise<void> {
 
 async function main(): Promise<void> {
   const args = minimist(process.argv.slice(2), {
-    boolean: ["help", "version", "check", "beta", "list", "monthly", "clear", "show", "stats", "report", "all", "dry-run", "force"],
+    boolean: ["help", "version", "check", "beta", "list", "monthly", "clear", "show", "stats", "report", "all", "dry-run", "force", "system-deps"],
     string: ["only", "type", "priority", "status"],
     alias: { h: "help", v: "version" },
   });
@@ -100,7 +100,7 @@ async function main(): Promise<void> {
       await memory({ clear: args.clear as boolean | undefined, show: args.show as boolean | undefined, stats: args.stats as boolean | undefined });
       break;
     case "setup":
-      setup({ only: args.only as string | undefined });
+      await setup({ only: args.only as string | undefined, systemDeps: args["system-deps"] as boolean | undefined });
       break;
     case "doctor":
       await doctor({ report: args.report as boolean | undefined });

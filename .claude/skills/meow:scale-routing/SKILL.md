@@ -23,9 +23,14 @@ Replace subjective orchestrator judgment with deterministic, auditable domain-ba
 ## How It Works
 
 1. **Input:** User task description (string)
-2. **Scan:** Match keywords from `data/domain-complexity.csv`
-3. **Output:** `{domain, level, workflow, model_tier_override}`
-4. **Fallback:** No match → return `unknown`, defer to manual classification
+2. **Layer 0:** Match keywords from `data/domain-complexity.csv`
+3. **Layer 1:** Analyze task content — classify type and extract mentioned files/modules (load `references/multi-layer-detection.md`)
+4. **Layer 2:** Check project context — files present, directory structure, recent git changes
+5. **Layer 3:** Score confidence per domain (HIGH ≥70, MEDIUM 40–69, LOW <40)
+6. **Classify task type** — map signals to bug_fix/feature/refactor/security/devops/docs/review/intake (load `references/task-type-classification.md`)
+7. **Optional:** Check `.claude/product-areas.yaml` if exists — merge area keywords and paths (see `references/product-area-config.md`)
+8. **Output:** `{domain, level, workflow, model_tier_override, task_type, suggested_skill, confidence, product_area?}`
+9. **Fallback:** No match → return `unknown`, defer to manual classification
 
 ## CSV Schema
 
@@ -67,6 +72,32 @@ Users can add custom domains by editing `data/domain-complexity.csv`. Add a new 
 - Adding too many low-signal keywords (e.g., "data", "app") creates false positives — keep signals specific to the domain
 - One-shot workflow bypass requires BOTH CSV match AND orchestrator zero-blast-radius confirmation — CSV alone is not sufficient
 
+## Output Schema (v2.0)
+
+Base fields (v1.0):
+
+| Field | Values | Description |
+|---|---|---|
+| `domain` | snake_case string | Matched domain or `unknown` |
+| `level` | low, medium, high | Complexity classification |
+| `workflow` | one-shot, standard, enhanced, advanced | Workflow intensity |
+| `model_tier_override` | TRIVIAL, STANDARD, COMPLEX | Forced model tier |
+
+New fields (v2.0):
+
+| Field | Values | Description |
+|---|---|---|
+| `task_type` | bug_fix, feature, refactor, security, devops, docs, review, intake | Classified task type |
+| `suggested_skill` | meow:fix, meow:cook, meow:cso, meow:review, meow:intake | Recommended skill for this task |
+| `confidence` | HIGH, MEDIUM, LOW | Routing confidence from Layer 3 scoring |
+| `product_area` | string | Area name from `.claude/product-areas.yaml` (omitted if no YAML) |
+
 ## Data File
 
 - `data/domain-complexity.csv` — Domain → complexity → workflow mapping
+
+## Reference Files
+
+- `references/multi-layer-detection.md` — 4-layer detection logic and confidence scoring
+- `references/task-type-classification.md` — 8 task types, signals, and suggested skills
+- `references/product-area-config.md` — Optional `.claude/product-areas.yaml` schema and loading rules

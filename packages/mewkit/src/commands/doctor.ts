@@ -2,6 +2,7 @@ import { execSync } from "node:child_process";
 import fs, { chmodSync } from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
+import { commandExists } from "./setup.js";
 
 type Status = "pass" | "fail" | "warn";
 
@@ -211,6 +212,48 @@ function checkConfig(root: string | null): DiagResult {
   }
 }
 
+function checkFFmpeg(): DiagResult {
+  if (!commandExists("ffmpeg")) {
+    return {
+      name: "FFmpeg (optional)",
+      status: "warn",
+      detail: "Not installed — video/audio processing unavailable",
+      fix: "brew install ffmpeg (macOS) or npx mewkit setup --system-deps",
+    };
+  }
+  try {
+    const output = execSync("ffmpeg -version", { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+    const match = output.match(/ffmpeg version (\S+)/);
+    const version = match ? match[1] : "unknown";
+    return { name: "FFmpeg (optional)", status: "pass", detail: `v${version} — video/audio processing available` };
+  } catch {
+    return { name: "FFmpeg (optional)", status: "pass", detail: "Installed — video/audio processing available" };
+  }
+}
+
+function checkImageMagick(): DiagResult {
+  const hasConvert = commandExists("convert");
+  const hasMagick = commandExists("magick");
+
+  if (!hasConvert && !hasMagick) {
+    return {
+      name: "ImageMagick (optional)",
+      status: "warn",
+      detail: "Not installed — image processing unavailable",
+      fix: "brew install imagemagick (macOS) or npx mewkit setup --system-deps",
+    };
+  }
+  try {
+    const cmd = hasMagick ? "magick --version" : "convert --version";
+    const output = execSync(cmd, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+    const match = output.match(/ImageMagick (\S+)/);
+    const version = match ? match[1] : "unknown";
+    return { name: "ImageMagick (optional)", status: "pass", detail: `v${version} — image processing available` };
+  } catch {
+    return { name: "ImageMagick (optional)", status: "pass", detail: "Installed — image processing available" };
+  }
+}
+
 export async function doctor(args?: { report?: boolean }): Promise<void> {
   console.log(pc.bold(pc.cyan("MeowKit Doctor")));
   console.log(pc.dim("Diagnosing common issues...\n"));
@@ -231,6 +274,8 @@ export async function doctor(args?: { report?: boolean }): Promise<void> {
     checkMemory(root),
     checkMcp(root),
     checkVenv(root),
+    checkFFmpeg(),
+    checkImageMagick(),
   ];
 
   for (const r of results) {

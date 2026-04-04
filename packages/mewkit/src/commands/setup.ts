@@ -1,7 +1,120 @@
 import { existsSync, readFileSync, writeFileSync, copyFileSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
+import * as p from "@clack/prompts";
 import pc from "picocolors";
+
+// --- System dependency helpers ---
+
+/** Check if a command is available in PATH */
+export function commandExists(cmd: string): boolean {
+  try {
+    execSync(`which ${cmd}`, { stdio: "ignore" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Install FFmpeg and ImageMagick based on the current OS and available package managers */
+export async function installSystemDeps(): Promise<void> {
+  const platform = process.platform;
+
+  const hasFFmpeg = commandExists("ffmpeg");
+  const hasImageMagick = commandExists("convert") || commandExists("magick");
+
+  if (hasFFmpeg && hasImageMagick) {
+    console.log(`  ${pc.green("✓")} FFmpeg and ImageMagick already installed`);
+    return;
+  }
+
+  const toInstall: string[] = [];
+  if (!hasFFmpeg) toInstall.push("FFmpeg");
+  if (!hasImageMagick) toInstall.push("ImageMagick");
+  console.log(`\n  Installing: ${toInstall.join(", ")}...`);
+
+  try {
+    if (platform === "darwin") {
+      // macOS — require Homebrew
+      if (!commandExists("brew")) {
+        console.log(pc.yellow("  ⚠ Homebrew not found. Install from https://brew.sh then re-run."));
+        return;
+      }
+      if (!hasFFmpeg) {
+        console.log(pc.dim("  brew install ffmpeg..."));
+        execSync("brew install ffmpeg", { stdio: "inherit" });
+      }
+      if (!hasImageMagick) {
+        console.log(pc.dim("  brew install imagemagick..."));
+        execSync("brew install imagemagick", { stdio: "inherit" });
+      }
+    } else if (platform === "linux") {
+      if (commandExists("apt-get")) {
+        const pkgs = [!hasFFmpeg && "ffmpeg", !hasImageMagick && "imagemagick"].filter(Boolean).join(" ");
+        execSync(`sudo apt-get install -y ${pkgs}`, { stdio: "inherit" });
+      } else if (commandExists("dnf")) {
+        const pkgs = [!hasFFmpeg && "ffmpeg", !hasImageMagick && "ImageMagick"].filter(Boolean).join(" ");
+        execSync(`sudo dnf install -y ${pkgs}`, { stdio: "inherit" });
+      } else if (commandExists("pacman")) {
+        const pkgs = [!hasFFmpeg && "ffmpeg", !hasImageMagick && "imagemagick"].filter(Boolean).join(" ");
+        execSync(`sudo pacman -S --noconfirm ${pkgs}`, { stdio: "inherit" });
+      } else if (commandExists("apk")) {
+        const pkgs = [!hasFFmpeg && "ffmpeg", !hasImageMagick && "imagemagick"].filter(Boolean).join(" ");
+        execSync(`apk add ${pkgs}`, { stdio: "inherit" });
+      } else {
+        console.log(pc.yellow("  ⚠ No supported package manager found (apt-get, dnf, pacman, apk)."));
+        console.log("    Install FFmpeg and ImageMagick manually for your distribution.");
+        return;
+      }
+    } else {
+      // Windows — no automated install
+      console.log(pc.yellow("  ⚠ Windows: install FFmpeg and ImageMagick manually."));
+      console.log("    FFmpeg:      https://ffmpeg.org/download.html");
+      console.log("    ImageMagick: https://imagemagick.org/script/download.php");
+      return;
+    }
+
+    if (!hasFFmpeg) console.log(`  ${pc.green("✓")} FFmpeg installed`);
+    if (!hasImageMagick) console.log(`  ${pc.green("✓")} ImageMagick installed`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.log(pc.red(`  ✗ Install failed: ${msg}`));
+    console.log("    Try running manually or check your package manager permissions.");
+  }
+}
+
+// --- Interactive system deps flow (used by init and setup --system-deps) ---
+
+/** Show system dep status, prompt, and install if confirmed */
+export async function promptAndInstallSystemDeps(): Promise<void> {
+  const hasFFmpeg = commandExists("ffmpeg");
+  const hasImageMagick = commandExists("convert") || commandExists("magick");
+
+  console.log(pc.bold("\nChecking system dependencies..."));
+  console.log(`  ${hasFFmpeg ? pc.green("✓") : pc.red("✗")} FFmpeg${hasFFmpeg ? " — already installed" : " — not found"}`);
+  console.log(`  ${hasImageMagick ? pc.green("✓") : pc.red("✗")} ImageMagick${hasImageMagick ? " — already installed" : " — not found"}`);
+
+  if (hasFFmpeg && hasImageMagick) return;
+
+  const confirm = await p.confirm({
+    message: "Install missing system dependencies?",
+    initialValue: false,
+  });
+
+  if (p.isCancel(confirm)) {
+    p.cancel("Setup cancelled.");
+    process.exit(0);
+  }
+
+  if (confirm) {
+    await installSystemDeps();
+  } else {
+    console.log(pc.yellow("\n  ⚠ Skipped. Install later with: npx mewkit setup --system-deps"));
+    console.log("    Run npx mewkit doctor to check what's missing.");
+  }
+}
+
+// --- Standard setup steps ---
 
 type StepName = "venv" | "mcp" | "env" | "gitignore";
 
@@ -140,8 +253,15 @@ const STEPS: Record<StepName, (dir: string) => StepResult> = {
   gitignore: setupGitignore,
 };
 
-/** Run setup steps. --only=<step> runs a single step. */
-export function setup(args: { only?: string }): void {
+/** Run setup steps. --only=<step> runs a single step. --system-deps installs FFmpeg/ImageMagick. */
+export async function setup(args: { only?: string; systemDeps?: boolean }): Promise<void> {
+  // --system-deps: standalone system dep install flow, skips normal steps
+  if (args.systemDeps) {
+    console.log(pc.bold("\nMeowKit Setup — System Dependencies\n"));
+    await promptAndInstallSystemDeps();
+    return;
+  }
+
   // Always use cwd. No walk-up — avoids matching ~/.claude or parent projects.
   const dir = process.cwd();
 

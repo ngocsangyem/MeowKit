@@ -82,6 +82,14 @@ Here's what each step does and which agent handles it:
 | CI fails on PR | Environment difference | Diagnose CI logs, fix, push again |
 | No `gh` CLI | GitHub CLI not installed | Install `gh`, or push manually and create PR in browser |
 
+::: tip Jira Integration
+After shipping, update the Jira ticket status to reflect deployment:
+```bash
+/meow:jira transition TICKET-123 "Deployed"
+```
+Future: meow:ship will do this automatically as part of the ship pipeline.
+:::
+
 ## Next workflow
 
 → [Security Audit](/workflows/security-audit) — deep security assessment

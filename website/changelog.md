@@ -43,6 +43,18 @@ Extracted high-leverage patterns from ECC's 38-agent ecosystem. 5 new skills, 17
 - **Staged parallel mode** — alternative to strict zero-overlap: overlapping files handled sequentially, non-overlapping in parallel
 - **Memory capture enhancement** — budget 2min→5min, markers 3→5, CRITICAL/SECURITY markers always processed, `--capture-all` flag
 
+### Jira + Figma Integration
+
+- **meow:jira** (new skill) — Jira execution via Atlassian MCP: 8 operation categories (create, search, read, update, transition, link, sprint, batch), 4-tier safety framework (safe/low/medium/high), 50+ JQL templates, custom field discovery, sprint management. Raw ticket detection guard refuses unstructured input and redirects to meow:intake.
+- **meow:figma** (new skill) — Figma design analysis via Figma MCP: 3 modes (analyze/implement/tokens), 7-step Figma→code workflow, design token extraction (CSS/Tailwind/JSON), 39 API rules. Consolidated from 7 external Figma skills. Fallback: PNG export + multimodal when no Figma MCP.
+- **meow:intake enhanced** — Jira metadata extraction + Figma link detection when MCPs available. Completeness scoring enhanced for Jira fields. Structured handoff to meow:jira for execution.
+
+### Task Routing & Integration
+
+- **meow:scale-routing enhanced** — 4-layer detection (CSV + task content + context + confidence scoring), 8 task type classifications, optional product-areas.yaml
+- **meow:intake** (new skill) — tool-agnostic ticket/PRD analysis with 8-dimension completeness scoring, media fallback chain (FFmpeg→Gemini→Claude Read), injection defense, structured output. Works with Atlassian MCP, Linear, GitHub CLI, or manual paste
+- **mewkit CLI** — `npx mewkit init` now prompts for optional system deps (FFmpeg, ImageMagick). `npx mewkit setup --system-deps` for deferred install. `npx mewkit doctor` reports status
+
 ### Documentation
 
 - New guide: `docs/guides/business-workflow-patterns.md` — explains all adapted patterns and trigger points

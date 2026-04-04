@@ -10,6 +10,7 @@ import {
   validate,
 } from "../core/index.js";
 import type { ReleaseInfo, UserConfig } from "../core/index.js";
+import { promptAndInstallSystemDeps } from "./setup.js";
 
 export interface InitArgs {
   dryRun?: boolean;
@@ -188,7 +189,19 @@ export async function init(args: InitArgs): Promise<void> {
       }
     }
 
-    // Step 7: Summary
+    // Step 7: System dependencies (optional, skipped on dry-run)
+    if (!dryRun) {
+      console.log(`\n${pc.bold("? Phase 2: System dependencies")} ${pc.dim("(optional)")}`);
+      console.log(pc.dim("\n  MeowKit works better with these system tools:\n"));
+      console.log(`  ${pc.cyan("•")} FFmpeg — video frame extraction, image/audio compression`);
+      console.log(`    ${pc.dim("Used by: meow:multimodal, meow:intake (media preprocessing)")}`);
+      console.log(`  ${pc.cyan("•")} ImageMagick — image resize, format conversion`);
+      console.log(`    ${pc.dim("Used by: meow:multimodal (image optimization)")}\n`);
+
+      await promptAndInstallSystemDeps();
+    }
+
+    // Step 8: Summary
     printSummary(stats, dryRun);
     p.outro(pc.green(mode === "new" ? "MeowKit installed!" : "MeowKit updated!"));
   } finally {

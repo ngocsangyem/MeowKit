@@ -124,6 +124,14 @@ If the developer's self-healing exhausted 3 attempts, the **journal-writer** doc
 | Minimal diff | developer | Fixes root cause with fewest lines changed |
 | Evidence-based | reviewer | Verifies fix with test output, not "should work" |
 
+::: tip Jira Integration
+After shipping the fix, update the bug ticket status:
+```bash
+/meow:jira transition BUG-123 Done --resolution Fixed
+```
+Future: meow:ship will do this automatically on merge.
+:::
+
 ## Next workflow
 
 → [Code Review](/workflows/code-review) — review someone else's changes
