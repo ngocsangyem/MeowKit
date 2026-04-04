@@ -20,10 +20,14 @@ export const DEFAULT_PIP_PACKAGES: readonly SkillsDependency[] = [
 /** Validate pip package name — rejects flags, URLs, shell-breaking chars */
 const SAFE_PKG_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]*(\[[a-zA-Z0-9,_-]*\])?(==|>=|<=|!=|~=|<|>)?[a-zA-Z0-9.*]*$/;
 
+/** Extract base package name, stripping version specifiers (e.g. "pillow>=10.0" → "pillow") */
+export function getBasePackageName(name: string): string {
+  return (name.split(/[=<>!~]/)[0] ?? name).toLowerCase();
+}
+
 export function validatePackageName(name: string): boolean {
   if (!name || name.startsWith("-") || name.includes("://")) return false;
-  const baseName = name.split(/[=<>!~]/)[0] ?? name;
-  return SAFE_PKG_RE.test(baseName);
+  return SAFE_PKG_RE.test(getBasePackageName(name));
 }
 
 // Collect per-skill requirements.txt files from .claude/skills/{skill}/scripts/
@@ -75,7 +79,7 @@ export function getRequirementsSource(projectDir: string): {
     for (const filePath of reqFiles) {
       const { packages, rejected } = parseRequirementsFile(filePath);
       for (const pkg of packages) {
-        const baseName = (pkg.name.split(/[=<>!~]/)[0] ?? pkg.name).toLowerCase();
+        const baseName = getBasePackageName(pkg.name);
         if (!seen.has(baseName)) { seen.add(baseName); allPackages.push(pkg); }
       }
       allRejected.push(...rejected);

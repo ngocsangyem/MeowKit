@@ -46,15 +46,20 @@ function parseInput(raw) {
     fiveHourPct: d?.rate_limits?.five_hour?.used_percentage ?? null,
     fiveHourReset: d?.rate_limits?.five_hour?.resets_at || null,
     weekPct: d?.rate_limits?.seven_day?.used_percentage ?? null,
+    weekReset: d?.rate_limits?.seven_day?.resets_at || null,
   };
 }
 
 function fmtTokens(n) { if (!n || n <= 0) return '0'; if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return Math.round(n/1e3)+'k'; return String(n); }
 function fmtCountdown(resetAt) {
   if (!resetAt) return '';
-  const ms = (typeof resetAt === 'number' && resetAt > 1e12) ? resetAt - Date.now() : new Date(resetAt).getTime() - Date.now();
+  // resets_at is epoch SECONDS per Claude Code docs (e.g. 1738425600)
+  const resetMs = typeof resetAt === 'number' ? (resetAt < 1e12 ? resetAt * 1000 : resetAt) : new Date(resetAt).getTime();
+  const ms = resetMs - Date.now();
   if (ms <= 0) return '';
-  const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
+  const d = Math.floor(ms / 86400000);
+  const h = Math.floor((ms % 86400000) / 3600000), m = Math.floor((ms % 3600000) / 60000);
+  if (d > 0) return `${d}d${h > 0 ? h + 'h' : ''}`;
   return h > 0 ? `${h}h${m > 0 ? m + 'm' : ''}` : `${m}m`;
 }
 function coloredBar(pct, width = 10) {
@@ -77,22 +82,22 @@ function getGitInfo(cwd) {
     stale.unstaged = cached.data?.unstaged || 0;
     stale.staged = cached.data?.staged || 0;
   } catch {}
-  // If locked, return stale (another process updating)
-  if (fs.existsSync(lockFile)) return stale;
-  // Acquire lock, spawn git, cache, release
+  // Acquire lock (wx = exclusive create — fails if lock exists, no TOCTOU)
   try {
     fs.writeFileSync(lockFile, String(process.pid), { flag: 'wx' });
-    const branch = execFileSync('git', ['branch', '--show-current'], { cwd, timeout: 500, encoding: 'utf-8' }).trim();
-    let unstaged = 0, staged = 0;
-    try {
-      const status = execFileSync('git', ['status', '--porcelain'], { cwd, timeout: 500, encoding: 'utf-8' });
-      for (const line of status.split('\n')) {
-        if (!line) continue;
-        if (line[0] !== ' ' && line[0] !== '?') staged++;
-        if (line[1] === 'M' || line[1] === 'D') unstaged++;
-        if (line[0] === '?') unstaged++;
-      }
-    } catch {}
+  } catch { return stale; } // locked by another process
+  // Single git command: `status -b --porcelain` gives branch + file status
+  try {
+    const out = execFileSync('git', ['status', '-b', '--porcelain'], { cwd, timeout: 500, encoding: 'utf-8' });
+    const lines = out.split('\n');
+    let branch = '', unstaged = 0, staged = 0;
+    for (const line of lines) {
+      if (line.startsWith('## ')) { branch = line.slice(3).split('...')[0]; continue; }
+      if (!line) continue;
+      if (line[0] !== ' ' && line[0] !== '?') staged++;
+      if (line[1] === 'M' || line[1] === 'D') unstaged++;
+      if (line[0] === '?') unstaged++;
+    }
     const data = { branch, unstaged, staged };
     fs.writeFileSync(cacheFile, JSON.stringify({ ts: Date.now(), data }));
     return data;
@@ -141,10 +146,9 @@ function renderLine1(ctx) {
 }
 
 function renderLine2(ctx) {
-  // Context window usage bar — shows how full THIS conversation is
-  // When high, user should /clear to free space
-  const used = ctx.ctxInput + ctx.ctxCacheCreate + ctx.ctxCacheRead;
-  const pct = ctx.ctxSize > 0 ? Math.min(100, Math.round((used / ctx.ctxSize) * 100)) : 0;
+  // Context window usage bar — uses pre-computed ctxUsedTokens/ctxPct from main
+  const used = ctx.ctxUsedTokens;
+  const pct = ctx.ctxPct;
   const bar = coloredBar(pct);
   let line = `${bar} ${c.bold}${fmtTokens(used)}/${fmtTokens(ctx.ctxSize)}${c.reset} ${c.dim}(${pct}%)${c.reset}`;
   // Warn when context is getting full
@@ -214,113 +218,20 @@ function renderLine3(planInfo) {
   return line;
 }
 
-// --- USAGE QUOTA (5h + weekly rate limits from Anthropic API) ---
-const QUOTA_CACHE = path.join(os.tmpdir(), 'mk-usage-quota.json');
-const QUOTA_TTL_MS = 60_000; // refresh every 60s
-
-function readCredentials() {
-  // macOS Keychain first
-  if (process.platform === 'darwin') {
-    try {
-      const raw = execFileSync('security', ['find-generic-password', '-s', 'Claude Code-credentials', '-w'],
-        { timeout: 2000, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'ignore'] }).trim();
-      const parsed = JSON.parse(raw);
-      if (parsed?.claudeAiOauth?.accessToken) return parsed;
-    } catch {}
-  }
-  // Fallback: ~/.claude/.credentials.json
-  try {
-    const p = path.join(os.homedir(), '.claude', '.credentials.json');
-    const parsed = JSON.parse(fs.readFileSync(p, 'utf-8'));
-    return parsed?.claudeAiOauth?.accessToken ? parsed : null;
-  } catch { return null; }
-}
-
-function readUsageQuota() {
-  // Read cache first
-  try {
-    const cached = JSON.parse(fs.readFileSync(QUOTA_CACHE, 'utf-8'));
-    if (Date.now() - cached.ts < QUOTA_TTL_MS) return cached.data;
-  } catch {}
-  // Also try CK cache (claudekit-engineer may have fresher data)
-  try {
-    const ckPath = process.env.CK_USAGE_CACHE_PATH || path.join(os.tmpdir(), 'ck-usage-limits-cache.json');
-    const ck = JSON.parse(fs.readFileSync(ckPath, 'utf-8'));
-    if (ck?.status === 'available' && ck?.data && ck.timestamp && Date.now() - ck.timestamp < 300_000) {
-      const d = ck.data;
-      const norm = (v) => typeof v === 'number' ? (v > 0 && v < 1 ? Math.round(v * 100) : Math.round(v)) : null;
-      return {
-        fiveHourPct: ck.snapshot?.fiveHourPercent ?? norm(d.five_hour?.utilization),
-        weekPct: ck.snapshot?.weekPercent ?? norm(d.seven_day?.utilization),
-        fiveHourReset: d.five_hour?.resets_at || null,
-        weekReset: d.seven_day?.resets_at || null,
-      };
-    }
-  } catch {}
-  // Fetch from API (async would be ideal but we're sync-ish — use spawn trick)
-  // For statusline perf, do a non-blocking background fetch and use stale data
-  // Trigger background refresh if stale
-  try { triggerBackgroundRefresh(); } catch {}
-  return null;
-}
-
-function triggerBackgroundRefresh() {
-  const lockFile = QUOTA_CACHE + '.lock';
-  // Don't fetch if another process is already fetching
-  try { fs.writeFileSync(lockFile, String(process.pid), { flag: 'wx' }); } catch { return; }
-  const creds = readCredentials();
-  const token = creds?.claudeAiOauth?.accessToken;
-  if (!token) { try { fs.unlinkSync(lockFile); } catch {} return; }
-  // Check subscription type
-  const subType = String(creds?.claudeAiOauth?.subscriptionType || '').toLowerCase();
-  const rateTier = String(creds?.claudeAiOauth?.rateLimitTier || '').toLowerCase();
-  const isPaid = (subType && subType !== 'free' && subType !== 'none') || /pro|max|team|enterprise/.test(rateTier);
-  if (!isPaid) { try { fs.unlinkSync(lockFile); } catch {} return; }
-  // Background fetch using child process (non-blocking)
-  const { spawn: spawnBg } = require('child_process');
-  const child = spawnBg('node', ['-e', `
-    const https = require('https');
-    const fs = require('fs');
-    const req = https.get('https://api.anthropic.com/api/oauth/usage', {
-      headers: { 'Authorization': 'Bearer ${token}', 'anthropic-beta': 'oauth-2025-04-20', 'Accept': 'application/json' },
-      timeout: 5000
-    }, (res) => {
-      let body = '';
-      res.on('data', c => body += c);
-      res.on('end', () => {
-        try {
-          const d = JSON.parse(body);
-          const norm = v => typeof v === 'number' ? (v > 0 && v < 1 ? Math.round(v * 100) : Math.round(v)) : null;
-          const data = {
-            fiveHourPct: norm(d.five_hour?.utilization),
-            weekPct: norm(d.seven_day?.utilization),
-            fiveHourReset: d.five_hour?.resets_at || null,
-            weekReset: d.seven_day?.resets_at || null,
-          };
-          fs.writeFileSync('${QUOTA_CACHE}', JSON.stringify({ ts: Date.now(), data }));
-        } catch {}
-        try { fs.unlinkSync('${lockFile}'); } catch {}
-      });
-    });
-    req.on('error', () => { try { fs.unlinkSync('${lockFile}'); } catch {} });
-    req.end();
-  `], { detached: true, stdio: 'ignore' });
-  child.unref();
-}
-
-function renderLine4Quota() {
-  const quota = readUsageQuota();
-  if (!quota || (quota.fiveHourPct == null && quota.weekPct == null)) return null;
+// Rate limits line — uses stdin data directly (per Claude Code docs, rate_limits
+// is provided for Pro/Max subscribers after first API response)
+function renderLine4Quota(ctx) {
+  if (ctx.fiveHourPct == null && ctx.weekPct == null) return null;
   const parts = [];
-  if (quota.fiveHourPct != null) {
-    let s = `${c.bold}5h ${quota.fiveHourPct}%${c.reset}`;
-    const cd = fmtCountdown(quota.fiveHourReset);
+  if (ctx.fiveHourPct != null) {
+    let s = `${c.bold}5h ${Math.round(ctx.fiveHourPct)}%${c.reset}`;
+    const cd = fmtCountdown(ctx.fiveHourReset);
     if (cd) s += ` ${c.dim}(${cd})${c.reset}`;
     parts.push(s);
   }
-  if (quota.weekPct != null) {
-    let s = `${c.bold}Weekly ${quota.weekPct}%${c.reset}`;
-    const cd = fmtCountdown(quota.weekReset);
+  if (ctx.weekPct != null) {
+    let s = `${c.bold}Weekly ${Math.round(ctx.weekPct)}%${c.reset}`;
+    const cd = fmtCountdown(ctx.weekReset);
     if (cd) s += ` ${c.dim}(${cd})${c.reset}`;
     parts.push(s);
   }
@@ -328,10 +239,8 @@ function renderLine4Quota() {
 }
 
 function renderLine5(ctx) {
-  const used = ctx.ctxInput + ctx.ctxCacheCreate + ctx.ctxCacheRead;
-  const pct = ctx.ctxSize > 0 ? Math.round((used / ctx.ctxSize) * 100) : 0;
   const parts = [];
-  parts.push(`\uD83D\uDD24 ${c.bold}ctx${c.reset} ${fmtTokens(used)}/${fmtTokens(ctx.ctxSize)} (${pct}%)`);
+  parts.push(`\uD83D\uDD24 ${c.bold}ctx${c.reset} ${fmtTokens(ctx.ctxUsedTokens)}/${fmtTokens(ctx.ctxSize)} (${ctx.ctxPct}%)`);
   if (ctx.totalIn > 0 || ctx.totalOut > 0) {
     parts.push(`${c.dim}session ${fmtTokens(ctx.totalIn)} in + ${fmtTokens(ctx.totalOut)} out${c.reset}`);
   }
@@ -344,11 +253,14 @@ async function main() {
     const raw = await readStdin();
     if (!raw.trim()) { console.log('\uD83D\uDC31 MeowKit'); return; }
     const ctx = parseInput(raw);
+    // Pre-compute context values once (used by line 2 + line 5)
+    ctx.ctxUsedTokens = ctx.ctxInput + ctx.ctxCacheCreate + ctx.ctxCacheRead;
+    ctx.ctxPct = ctx.ctxSize > 0 ? Math.min(100, Math.round((ctx.ctxUsedTokens / ctx.ctxSize) * 100)) : 0;
     console.log(renderLine1(ctx));
     console.log(renderLine2(ctx));
     const planInfo = readPlanInfo(ctx.sessionId, ctx.projectDir);
     console.log(renderLine3(planInfo));
-    const quotaLine = renderLine4Quota();
+    const quotaLine = renderLine4Quota(ctx);
     if (quotaLine) console.log(quotaLine);
     console.log(renderLine5(ctx));
   } catch {

@@ -5,7 +5,7 @@ import { join, resolve } from "node:path";
 import { execFileSync, spawn } from "node:child_process";
 import pc from "picocolors";
 import type { SkillsDependency } from "./skills-dependencies.js";
-import { validatePackageName } from "./skills-dependencies.js";
+import { validatePackageName, getBasePackageName } from "./skills-dependencies.js";
 
 export interface InstallResult {
   name: string;
@@ -147,7 +147,7 @@ export function verifyPackages(
   const pipPath = getPipPath(projectDir);
 
   return packages.map((pkg) => {
-    const basePkgName = (pkg.name.split(/[=<>!~]/)[0] ?? pkg.name).toLowerCase();
+    const basePkgName = getBasePackageName(pkg.name);
     const importName = IMPORT_NAME_MAP[basePkgName];
 
     if (importName) {
