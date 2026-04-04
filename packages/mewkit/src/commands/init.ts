@@ -11,6 +11,14 @@ import {
 } from "../core/index.js";
 import type { ReleaseInfo, UserConfig } from "../core/index.js";
 import { promptAndInstallSystemDeps } from "./setup.js";
+import {
+  getRequirementsSource,
+  formatPackageList,
+} from "../core/skills-dependencies.js";
+import {
+  ensureVenv,
+  installPipPackages,
+} from "../core/dependency-installer.js";
 
 export interface InitArgs {
   dryRun?: boolean;
@@ -23,15 +31,17 @@ function detectMode(targetDir: string): "new" | "update" {
   return fs.existsSync(join(targetDir, ".claude")) ? "update" : "new";
 }
 
-/** Build @clack/prompts options from release list */
+/** Build @clack/prompts options from release list (top 4 + manual entry) */
 function buildReleaseOptions(releases: ReleaseInfo[], beta: boolean) {
   const latestStable = releases.find((r) => !r.isBeta);
   const pool = beta ? releases : releases.filter((r) => !r.isBeta);
-  return pool.slice(0, 10).map((r) => ({
+  const options = pool.slice(0, 4).map((r) => ({
     value: r.tag,
     label: `${r.version}${r.isBeta ? pc.yellow(" (beta)") : ""}${r.tag === latestStable?.tag ? pc.green(" (latest)") : ""}`,
     hint: r.publishedAt.split("T")[0],
   }));
+  options.push({ value: "__manual__", label: pc.dim("Enter version manually..."), hint: "" });
+  return options;
 }
 
 /** Cancel-safe wrapper: exits on Ctrl+C */
@@ -39,14 +49,21 @@ function cancelCheck(value: unknown): void {
   if (p.isCancel(value)) { p.cancel("Installation cancelled."); process.exit(0); }
 }
 
-/** Prompt the user for project description + optional Gemini API key */
-async function promptNewInstall(): Promise<UserConfig> {
+/** Prompt the user for project description, skill deps, and Gemini key */
+async function promptNewInstall(): Promise<UserConfig & { installDeps: boolean }> {
   const description = await p.text({
     message: "Describe your project (optional)",
     placeholder: "Press Enter to skip",
     validate() { return undefined; },
   });
   cancelCheck(description);
+
+  // Skills dependencies prompt (before Gemini key — more common question first)
+  const installDeps = await p.confirm({
+    message: "Install Python skill dependencies? (into .claude/skills/.venv)",
+    initialValue: false,
+  });
+  const shouldInstallDeps = p.isCancel(installDeps) ? false : installDeps;
 
   const addGeminiKey = await p.confirm({
     message: "Add Gemini API key? (for image/video/audio analysis)",
@@ -75,6 +92,7 @@ async function promptNewInstall(): Promise<UserConfig> {
     enableCostTracking: true,
     enableMemory: true,
     geminiApiKey,
+    installDeps: shouldInstallDeps,
   };
 }
 
@@ -144,14 +162,36 @@ export async function init(args: InitArgs): Promise<void> {
     process.exit(0);
   }
 
-  const release = releases.find((r) => r.tag === (selected as string))!;
+  let selectedTag = selected as string;
+
+  // Handle manual version entry
+  if (selectedTag === "__manual__") {
+    const manualVersion = await p.text({
+      message: "Enter version tag (e.g. v1.4.0)",
+      placeholder: "v1.4.0",
+      validate(value: string) {
+        if (!value || !value.trim()) return "Version is required";
+        return undefined;
+      },
+    });
+    cancelCheck(manualVersion);
+    selectedTag = (manualVersion as string).trim();
+    // Ensure tag has 'v' prefix for consistency
+    if (!selectedTag.startsWith("v")) selectedTag = `v${selectedTag}`;
+  }
+
+  const release = releases.find((r) => r.tag === selectedTag);
+  if (!release) {
+    p.cancel(`Version ${selectedTag} not found. Available: ${releases.slice(0, 5).map((r) => r.tag).join(", ")}`);
+    process.exit(1);
+  }
 
   // Step 3: Config prompts (new installs only)
-  let config: UserConfig;
+  let config: UserConfig & { installDeps: boolean };
   if (mode === "new") {
     config = await promptNewInstall();
   } else {
-    config = { description: "", enableCostTracking: true, enableMemory: true, geminiApiKey: null };
+    config = { description: "", enableCostTracking: true, enableMemory: true, geminiApiKey: null, installDeps: false };
   }
 
   // Step 4: Download release
@@ -201,7 +241,34 @@ export async function init(args: InitArgs): Promise<void> {
       await promptAndInstallSystemDeps();
     }
 
-    // Step 8: Summary
+    // Step 8: Skills dependencies (if user opted in during config)
+    if (!dryRun && config.installDeps) {
+      console.log(`\n${pc.bold("? Phase 3: Skills dependencies")}`);
+      const { packages, source } = getRequirementsSource(targetDir);
+      console.log(pc.dim(`\n  Packages (from ${source}):\n`));
+      console.log(pc.dim(formatPackageList(packages)));
+      console.log();
+
+      try {
+        const { created } = ensureVenv(targetDir);
+        if (created) console.log(`  ${pc.green("✓")} Python venv created`);
+
+        const results = await installPipPackages(targetDir, packages);
+        const failed = results.filter((r) => !r.success);
+        if (failed.length === 0) {
+          console.log(`\n  ${pc.green("✓")} All ${results.length} packages installed`);
+        } else {
+          console.log(`\n  ${pc.yellow("!")} ${results.length - failed.length} installed, ${failed.length} failed`);
+          console.log(pc.dim(`  Re-run: npx mewkit setup --only=deps`));
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(`  ${pc.red("✗")} ${msg}`);
+        console.log(pc.dim(`  Install later: npx mewkit setup --only=deps`));
+      }
+    }
+
+    // Step 9: Summary
     printSummary(stats, dryRun);
     p.outro(pc.green(mode === "new" ? "MeowKit installed!" : "MeowKit updated!"));
   } finally {

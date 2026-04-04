@@ -3,17 +3,14 @@ import { join } from "node:path";
 import { execSync } from "node:child_process";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
+import { commandAvailable, ensureVenv, installPipPackages, verifyPackages } from "../core/dependency-installer.js";
+import { getRequirementsSource, formatPackageList } from "../core/skills-dependencies.js";
 
 // --- System dependency helpers ---
 
 /** Check if a command is available in PATH */
 export function commandExists(cmd: string): boolean {
-  try {
-    execSync(`which ${cmd}`, { stdio: "ignore" });
-    return true;
-  } catch {
-    return false;
-  }
+  return commandAvailable(cmd);
 }
 
 /** Install FFmpeg and ImageMagick based on the current OS and available package managers */
@@ -116,44 +113,23 @@ export async function promptAndInstallSystemDeps(): Promise<void> {
 
 // --- Standard setup steps ---
 
-type StepName = "venv" | "mcp" | "env" | "gitignore";
+type StepName = "venv" | "deps" | "mcp" | "env" | "gitignore";
 
 interface StepResult {
   name: StepName;
-  status: "pass" | "skip" | "fail";
+  status: "pass" | "skip" | "fail" | "warn";
   message: string;
 }
 
 /** Setup Python virtual environment for MeowKit skill scripts */
 function setupVenv(projectDir: string): StepResult {
-  const venvDir = join(projectDir, ".claude", "skills", ".venv");
-
-  if (existsSync(venvDir)) {
+  try {
+    const { venvDir, created } = ensureVenv(projectDir);
+    if (created) return { name: "venv", status: "pass", message: `Created at ${venvDir}` };
     return { name: "venv", status: "skip", message: "Python venv already exists" };
-  }
-
-  // Check if python3 is available
-  try {
-    execSync("python3 --version", { stdio: "pipe" });
-  } catch {
-    return { name: "venv", status: "fail", message: "python3 not found. Install Python 3.9+ first." };
-  }
-
-  try {
-    console.log(pc.dim("  Creating Python venv..."));
-    execSync(`python3 -m venv "${venvDir}"`, { stdio: "pipe" });
-
-    // Install common skill dependencies if requirements.txt exists
-    const reqFile = join(projectDir, ".claude", "skills", "requirements.txt");
-    if (existsSync(reqFile)) {
-      console.log(pc.dim("  Installing skill dependencies..."));
-      execSync(`"${venvDir}/bin/pip" install -r "${reqFile}"`, { stdio: "pipe" });
-    }
-
-    return { name: "venv", status: "pass", message: `Created at ${venvDir}` };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    return { name: "venv", status: "fail", message: `Failed to create venv: ${msg}` };
+    return { name: "venv", status: "fail", message: msg };
   }
 }
 
@@ -246,8 +222,42 @@ function setupGitignore(projectDir: string): StepResult {
   return { name: "gitignore", status: "pass", message: "Appended MeowKit entries to .gitignore" };
 }
 
-const STEPS: Record<StepName, (dir: string) => StepResult> = {
+/** Install pip packages into the skills venv */
+async function setupDeps(projectDir: string): Promise<StepResult> {
+  const venvDir = join(projectDir, ".claude", "skills", ".venv");
+  if (!existsSync(venvDir)) {
+    return { name: "deps", status: "fail", message: "No venv. Run setup --only=venv first." };
+  }
+
+  const { packages, source } = getRequirementsSource(projectDir);
+  console.log(pc.dim(`\n  Packages (from ${source}):`));
+  console.log(pc.dim(formatPackageList(packages)));
+  console.log();
+
+  const existing = verifyPackages(projectDir, packages);
+  const missing = packages.filter((_, i) => !existing[i]?.installed);
+
+  if (missing.length === 0) {
+    return { name: "deps", status: "skip", message: "All pip packages already installed" };
+  }
+
+  console.log(`  ${missing.length} package(s) to install, ${packages.length - missing.length} already present.\n`);
+
+  const results = await installPipPackages(projectDir, missing);
+  const failed = results.filter((r) => !r.success);
+
+  if (failed.length === 0) {
+    return { name: "deps", status: "pass", message: `Installed ${results.length} package(s)` };
+  }
+  if (failed.length < results.length) {
+    return { name: "deps", status: "warn", message: `${results.length - failed.length} installed, ${failed.length} failed` };
+  }
+  return { name: "deps", status: "fail", message: `All ${failed.length} package(s) failed` };
+}
+
+const STEPS: Record<StepName, (dir: string) => StepResult | Promise<StepResult>> = {
   venv: setupVenv,
+  deps: setupDeps,
   mcp: setupMcp,
   env: setupEnv,
   gitignore: setupGitignore,
@@ -280,20 +290,25 @@ export async function setup(args: { only?: string; systemDeps?: boolean }): Prom
       process.exit(1);
     }
 
-    const result = fn(dir);
+    const result = await fn(dir);
     results.push(result);
 
     const icon = result.status === "pass" ? pc.green("✓")
       : result.status === "skip" ? pc.yellow("○")
+      : result.status === "warn" ? pc.yellow("!")
       : pc.red("✗");
     console.log(`  ${icon} ${pc.bold(stepName)}: ${result.message}`);
   }
 
   const passed = results.filter((r) => r.status === "pass").length;
   const skipped = results.filter((r) => r.status === "skip").length;
+  const warned = results.filter((r) => r.status === "warn").length;
   const failed = results.filter((r) => r.status === "fail").length;
 
-  console.log(`\n  ${pc.bold("Summary:")} ${passed} configured, ${skipped} skipped, ${failed} failed`);
+  const parts = [`${passed} configured`, `${skipped} skipped`];
+  if (warned > 0) parts.push(`${warned} warnings`);
+  if (failed > 0) parts.push(`${failed} failed`);
+  console.log(`\n  ${pc.bold("Summary:")} ${parts.join(", ")}`);
 
   if (failed > 0) {
     process.exit(1);

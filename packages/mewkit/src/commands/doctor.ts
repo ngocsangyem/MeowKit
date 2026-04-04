@@ -3,6 +3,8 @@ import fs, { chmodSync } from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
 import { commandExists } from "./setup.js";
+import { getRequirementsSource } from "../core/skills-dependencies.js";
+import { verifyPackages } from "../core/dependency-installer.js";
 
 type Status = "pass" | "fail" | "warn";
 
@@ -196,6 +198,26 @@ function checkVenv(root: string | null): DiagResult {
   };
 }
 
+function checkPipPackages(root: string | null): DiagResult {
+  if (!root) return { name: "Pip packages", status: "warn", detail: "Skipped — no project" };
+  const venvDir = path.join(root, ".claude", "skills", ".venv");
+  if (!fs.existsSync(venvDir)) {
+    return { name: "Pip packages", status: "warn", detail: "Skipped — no venv (run meowkit setup --only=venv)" };
+  }
+  const { packages } = getRequirementsSource(root);
+  const results = verifyPackages(root, packages);
+  const missing = results.filter((r) => !r.installed);
+  if (missing.length === 0) {
+    return { name: "Pip packages", status: "pass", detail: `${results.length} skill packages verified` };
+  }
+  return {
+    name: "Pip packages",
+    status: "warn",
+    detail: `Missing: ${missing.map((r) => r.name).join(", ")}`,
+    fix: "meowkit setup --only=deps",
+  };
+}
+
 function checkConfig(root: string | null): DiagResult {
   if (!root) return { name: "Config", status: "warn", detail: "Skipped — no project" };
 
@@ -274,6 +296,7 @@ export async function doctor(args?: { report?: boolean }): Promise<void> {
     checkMemory(root),
     checkMcp(root),
     checkVenv(root),
+    checkPipPackages(root),
     checkFFmpeg(),
     checkImageMagick(),
   ];

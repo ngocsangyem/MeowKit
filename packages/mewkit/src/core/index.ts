@@ -7,3 +7,5 @@ export * from "./validate-install.js";
 export * from "./smart-update.js";
 export * from "./smart-update-utils.js";
 export * from "./core-logger.js";
+export * from "./skills-dependencies.js";
+export * from "./dependency-installer.js";

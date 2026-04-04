@@ -1,6 +1,6 @@
 {
   "name": "mewkit",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "MeowKit CLI — scaffold, upgrade, and manage your AI agent toolkit",
   "type": "module",
   "bin": {
@@ -10,9 +10,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "prepublishOnly": "npm run build",
-    "dev": "tsc --watch"
+    "dev": "npx tsc --watch"
   },
   "dependencies": {
     "@clack/prompts": "^0.8.2",
