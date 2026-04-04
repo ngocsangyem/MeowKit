@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/branding/logo.png" alt="MeowKit Banner" width="300px" height="300px" />
+  <img src="assets/branding/meowkit-logo-bg.png" alt="MeowKit Banner" width="300px" height="300px" />
 </p>
 
 <h1 align="center">MeowKit</h1>
@@ -38,10 +38,10 @@ npx mewkit doctor     # Verify environment
 
 ## Packages
 
-| Package                                                          | npm                         | Description                                             |
-| ---------------------------------------------------------------- | --------------------------- | ------------------------------------------------------- |
-| [`create-meowkit`](https://www.npmjs.com/package/create-meowkit) | ~~`npm create meowkit@latest`~~ (deprecated) | Scaffold CLI — use `npx mewkit init` instead |
-| [`mewkit`](https://www.npmjs.com/package/mewkit)       | `npx mewkit <cmd>`     | Runtime CLI — upgrade, doctor, validate, budget, memory |
+| Package                                                          | npm                                          | Description                                             |
+| ---------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------- |
+| [`create-meowkit`](https://www.npmjs.com/package/create-meowkit) | ~~`npm create meowkit@latest`~~ (deprecated) | Scaffold CLI — use `npx mewkit init` instead            |
+| [`mewkit`](https://www.npmjs.com/package/mewkit)                 | `npx mewkit <cmd>`                           | Runtime CLI — upgrade, doctor, validate, budget, memory |
 
 ## Requirements
 
