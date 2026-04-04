@@ -1,3 +1,9 @@
+## [2.2.0](https://github.com/ngocsangyem/MeowKit/compare/v2.1.0...v2.2.0) (2026-04-04)
+
+### Features
+
+* implement automated Python skill dependency management and verification during setup and initialization ([3fba9fb](https://github.com/ngocsangyem/MeowKit/commit/3fba9fbf04071ac2075587d88df25377996dd930))
+
 ## [2.1.0](https://github.com/ngocsangyem/MeowKit/compare/v2.0.1...v2.1.0) (2026-04-04)
 
 ### Features
