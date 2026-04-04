@@ -1,3 +1,9 @@
+## [2.3.0](https://github.com/ngocsangyem/MeowKit/compare/v2.2.0...v2.3.0) (2026-04-04)
+
+### Features
+
+* add custom status line support with dynamic script execution and automatic file permissions ([7e8b703](https://github.com/ngocsangyem/MeowKit/commit/7e8b703635b90a5f513e70a954b9bfc1a2e0e506))
+
 ## [2.2.0](https://github.com/ngocsangyem/MeowKit/compare/v2.1.0...v2.2.0) (2026-04-04)
 
 ### Features
