@@ -13,15 +13,88 @@ export default withMermaid(defineConfig({
     },
   },
   title: 'MeowKit',
-  description: 'AI agent toolkit for Claude Code — 65+ skills, 15 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
+  description: 'AI agent toolkit for Claude Code — 68+ skills, 15 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
+  lang: 'en-US',
+  cleanUrls: true,
+  sitemap: {
+    hostname: 'https://docs.meowkit.dev',
+  },
   srcExclude: ['**/plans/**'],
   head: [
+    // Favicons
     ['link', { rel: 'icon', href: '/favicon.ico' }],
     ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' }],
     ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16.png' }],
     ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }],
-    ['meta', { property: 'og:image', content: '/og-image.png' }],
+    // Open Graph defaults
+    ['meta', { property: 'og:image', content: 'https://docs.meowkit.dev/og-image.png' }],
+    ['meta', { property: 'og:locale', content: 'en_US' }],
+    // SEO essentials
+    ['meta', { name: 'author', content: 'ngocsangyem' }],
+    ['meta', { name: 'keywords', content: 'claude code, ai agent, toolkit, skills, tdd, code review, meowkit, claude, anthropic' }],
+    ['meta', { name: 'twitter:image', content: 'https://docs.meowkit.dev/og-image.png' }],
+    ['meta', { name: 'theme-color', content: '#1a1a2e' }],
+    // Structured data — SoftwareApplication
+    ['script', { type: 'application/ld+json' }, JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'MeowKit',
+      description: 'AI agent toolkit for Claude Code with 68+ skills, 15 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'macOS, Linux, Windows',
+      url: 'https://docs.meowkit.dev',
+      author: { '@type': 'Person', name: 'ngocsangyem', url: 'https://github.com/ngocsangyem' },
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      license: 'https://opensource.org/licenses/MIT',
+    })],
   ],
+  transformHead({ pageData }) {
+    const head: ([string, Record<string, string>] | [string, Record<string, string>, string])[] = []
+    const hostname = 'https://docs.meowkit.dev'
+    const pagePath = pageData.relativePath
+      .replace(/\.md$/, '')
+      .replace(/index$/, '')
+    const url = `${hostname}/${pagePath}`
+
+    // Canonical
+    head.push(['link', { rel: 'canonical', href: url }])
+
+    // Open Graph per-page
+    head.push(['meta', { property: 'og:url', content: url }])
+    head.push(['meta', { property: 'og:type', content: 'article' }])
+    head.push(['meta', { property: 'og:title', content: pageData.title || 'MeowKit' }])
+    head.push(['meta', {
+      property: 'og:description',
+      content: pageData.frontmatter.description as string || 'AI agent toolkit for Claude Code',
+    }])
+    head.push(['meta', { property: 'og:site_name', content: 'MeowKit' }])
+
+    // Twitter Card
+    head.push(['meta', { name: 'twitter:card', content: 'summary_large_image' }])
+    head.push(['meta', { name: 'twitter:title', content: pageData.title || 'MeowKit' }])
+    head.push(['meta', {
+      name: 'twitter:description',
+      content: pageData.frontmatter.description as string || 'AI agent toolkit for Claude Code',
+    }])
+
+    // BreadcrumbList for nested pages
+    const pathParts = pagePath.split('/').filter(Boolean)
+    if (pathParts.length > 1) {
+      const breadcrumbs = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: pathParts.map((part, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: part.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
+          item: `${hostname}/${pathParts.slice(0, i + 1).join('/')}`,
+        })),
+      }
+      head.push(['script', { type: 'application/ld+json' }, JSON.stringify(breadcrumbs)])
+    }
+
+    return head
+  },
   appearance: 'dark',
   themeConfig: {
     logo: { light: '/logo.webp', dark: '/logo.webp' },

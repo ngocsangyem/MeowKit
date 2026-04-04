@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /.vitepress/
+Disallow: /plans/
+
+Sitemap: https://docs.meowkit.dev/sitemap.xml
