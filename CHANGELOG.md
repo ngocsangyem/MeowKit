@@ -1,3 +1,10 @@
+## [1.6.0](https://github.com/ngocsangyem/MeowKit/compare/v1.5.0...v1.6.0) (2026-04-04)
+
+### Features
+
+* add jira skill and more ([732ff3a](https://github.com/ngocsangyem/MeowKit/commit/732ff3aa3cec69955eaf2dacc721608a3f41ef7f))
+* expand skill definitions, add reference documentation, and update hook configurations across the project. ([03a7154](https://github.com/ngocsangyem/MeowKit/commit/03a71541cfa1068db72015c416e7a9c1810fa629))
+
 ## [1.5.0](https://github.com/ngocsangyem/MeowKit/compare/v1.4.0...v1.5.0) (2026-04-03)
 
 ### Features
