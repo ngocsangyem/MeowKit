@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/ngocsangyem/MeowKit/compare/v2.0.0...v2.0.1) (2026-04-04)
+
+### Refactoring
+
+* update branding assets and implement custom 404 error page ([84b74b1](https://github.com/ngocsangyem/MeowKit/commit/84b74b16a903ad2d8ba620ede69d0d5ccac25826))
+
 ## [1.6.0](https://github.com/ngocsangyem/MeowKit/compare/v1.5.0...v1.6.0) (2026-04-04)
 
 ### Features
