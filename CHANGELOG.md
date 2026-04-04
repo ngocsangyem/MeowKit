@@ -1,3 +1,14 @@
+## [2.1.0](https://github.com/ngocsangyem/MeowKit/compare/v2.0.1...v2.1.0) (2026-04-04)
+
+### Features
+
+* implement site-wide SEO enhancements, sitemap generation, and robots.txt configuration ([e18e5a5](https://github.com/ngocsangyem/MeowKit/commit/e18e5a5e7ebed62ff59754078e4348b3e740e0bc))
+
+### Documentation
+
+* update logo asset path and improve README table formatting ([1eb58ce](https://github.com/ngocsangyem/MeowKit/commit/1eb58ce107d84a95665488a1ff718792903d05a7))
+* update logo image source in README ([4a59ca0](https://github.com/ngocsangyem/MeowKit/commit/4a59ca09e9e580adeceeaadb92a8c17c29b6e01f))
+
 ## [2.0.1](https://github.com/ngocsangyem/MeowKit/compare/v2.0.0...v2.0.1) (2026-04-04)
 
 ### Refactoring
