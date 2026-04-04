@@ -96,8 +96,11 @@ try {
     "-x", ".claude/session-state/*",
     "-x", ".claude/memory/*",
     "-x", ".claude/logs/*",
+    "-x", ".claude/skills/.venv/*",
     "-x", ".claude/metadata.json",
     "-x", ".claude/.env",
+    "-x", "*.pyc",
+    "-x", "__pycache__/*",
   ];
   execSync(`zip -r ${archivePath} ${archiveTargets.join(" ")} ${excludes.join(" ")}`, { stdio: "inherit" });
   console.log(`Prepared ${archivePath}`);
