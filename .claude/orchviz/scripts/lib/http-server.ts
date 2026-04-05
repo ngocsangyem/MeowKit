@@ -114,7 +114,7 @@ function handleAPI(
   if (pathname === '/api/sessions') {
     const sessions = eventStore.listSessions().map((s) => ({
       id: s.sessionId,
-      label: `Session ${s.sessionId.slice(0, SESSION_ID_DISPLAY)}`,
+      label: options.getSessionLabel?.(s.sessionId) ?? `Session ${s.sessionId.slice(0, SESSION_ID_DISPLAY)}`,
       size: s.size,
       lastActivity: s.mtimeMs,
       eventCount: eventBuffer.get(s.sessionId)?.length ?? 0,
@@ -151,6 +151,18 @@ function handleAPI(
       totalBuffered: Array.from(eventBuffer.values()).reduce((sum, b) => sum + b.length, 0),
     };
     sendJSON(res, state);
+    return;
+  }
+
+  // GET /api/sessions/:id/agents/:name/conversation — per-agent event thread
+  const convMatch = pathname.match(/^\/api\/sessions\/([^/]+)\/agents\/([^/]+)\/conversation$/);
+  if (convMatch) {
+    const sessionId = convMatch[1];
+    const agentName = decodeURIComponent(convMatch[2]);
+    if (!SESSION_ID_RE.test(sessionId)) { sendJSON(res, { error: 'Invalid session ID' }, 400); return; }
+    const snapshot = options.stateEngine?.getSnapshot() as { conversations?: Record<string, unknown[]> } | undefined;
+    const events = snapshot?.conversations?.[agentName] ?? [];
+    sendJSON(res, { agent: agentName, events });
     return;
   }
 
@@ -223,6 +235,8 @@ export interface HttpServerOptions {
   assetsDir: string;
   dashboardPath?: string;
   stateEngine?: { getSnapshot: () => unknown };
+  /** Optional: resolve a human-readable label for a given session ID */
+  getSessionLabel?: (sessionId: string) => string;
 }
 
 export function createHttpServer(options: HttpServerOptions): http.Server {

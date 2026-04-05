@@ -5,11 +5,16 @@
  * Processes enriched OrchEvents and maintains a live projection of orchestration state.
  */
 
-import { AGENT_PHASE_MAP } from '../../src/orch-model.js';
-import type { OrchEvent } from '../../src/protocol.js';
+import { AGENT_PHASE_MAP, WORKFLOW_PHASES } from '../../src/orch-model.js';
+import type { OrchEvent, FileAttention } from '../../src/protocol.js';
 import { createAgentTracker, type AgentState } from './agent-tracker.js';
 import { createTaskGraph, type TaskState } from './task-graph.js';
 import { createPlanBinder, type PlanExecution } from './plan-binder.js';
+
+export interface FileAttentionEntry extends FileAttention {
+  /** Agent names that accessed this path */
+  agents: string[];
+}
 
 export interface OrchestrationState {
   sessionId: string | null;
@@ -20,6 +25,10 @@ export interface OrchestrationState {
   eventCount: number;
   startTime: number;
   lastEventTime: number;
+  /** Accumulated file attention across all events — keyed by path */
+  fileAttention: Record<string, FileAttentionEntry>;
+  /** Per-agent event history for conversation threading (capped at 200 per agent) */
+  conversations: Record<string, OrchEvent[]>;
 }
 
 export interface StateEngine {
@@ -38,6 +47,8 @@ export function createStateEngine(plansDir: string | null): StateEngine {
   let eventCount = 0;
   let startTime = Date.now();
   let lastEventTime = Date.now();
+  const fileAttentionMap: Record<string, FileAttentionEntry> = {};
+  const conversations: Record<string, OrchEvent[]> = {};
 
   function processEvent(event: OrchEvent): void {
     eventCount++;
@@ -45,6 +56,39 @@ export function createStateEngine(plansDir: string | null): StateEngine {
 
     if (!sessionId && event.sessionId) {
       sessionId = event.sessionId;
+    }
+
+    // Accumulate file attention from any event that has it
+    if (event.fileAttention && event.fileAttention.length > 0) {
+      const agentName = event.agent?.name ?? 'unknown';
+      for (const fa of event.fileAttention) {
+        const existing = fileAttentionMap[fa.path];
+        if (existing) {
+          existing.tokenCost += fa.tokenCost;
+          if (!existing.agents.includes(agentName)) {
+            existing.agents.push(agentName);
+          }
+        } else {
+          fileAttentionMap[fa.path] = { ...fa, agents: [agentName] };
+        }
+      }
+    }
+
+    // Track per-agent conversation threading
+    const agentName = event.agent?.name;
+    if (agentName) {
+      if (!conversations[agentName]) conversations[agentName] = [];
+      conversations[agentName].push(event);
+      // Cap at 200 events per agent to prevent unbounded growth
+      if (conversations[agentName].length > 200) {
+        conversations[agentName] = conversations[agentName].slice(-200);
+      }
+    }
+
+    // Sync contextBreakdown from event into agent tracker
+    if (event.contextBreakdown && event.agent?.name) {
+      const agentState = agentTracker.getOrCreate(event.agent.name);
+      agentState.contextBreakdown = event.contextBreakdown;
     }
 
     switch (event.eventType) {
@@ -114,13 +158,22 @@ export function createStateEngine(plansDir: string | null): StateEngine {
     const active = agentTracker.getActive();
     if (active.length === 0) return 'unknown';
 
-    // Find the most specific (deepest) workflow step among active agents
+    // Return the LATEST phase among all active agents (not first match)
+    let maxIdx = -1;
+    let maxStep = 'unknown';
     for (const agent of active) {
-      const step = AGENT_PHASE_MAP[agent.name.replace(/-[a-f0-9]{4,}$/i, '').toLowerCase()];
-      if (step) return step;
+      const base = agent.name.replace(/-[a-zA-Z0-9]{1,}$/, '').toLowerCase();
+      const step = AGENT_PHASE_MAP[base];
+      if (step) {
+        const idx = WORKFLOW_PHASES.indexOf(step as typeof WORKFLOW_PHASES[number]);
+        if (idx > maxIdx) {
+          maxIdx = idx;
+          maxStep = step;
+        }
+      }
     }
 
-    return active[0]?.workflowStep ?? 'unknown';
+    return maxStep;
   }
 
   function getSnapshot(): OrchestrationState {
@@ -133,53 +186,29 @@ export function createStateEngine(plansDir: string | null): StateEngine {
       eventCount,
       startTime,
       lastEventTime,
+      fileAttention: fileAttentionMap,
+      conversations,
     };
   }
 
   function rebuild(events: OrchEvent[]): void {
-    // Reset state before replaying
-    const fresh = createStateEngine(plansDir);
-    for (const event of events) {
-      fresh.processEvent(event);
-    }
-    // Copy rebuilt state into this engine
-    const rebuilt = fresh.getSnapshot();
-    sessionId = rebuilt.sessionId;
-    eventCount = rebuilt.eventCount;
-    startTime = rebuilt.startTime;
-    lastEventTime = rebuilt.lastEventTime;
+    // Replay all events through the normal processEvent path.
+    // Reset counters first to avoid double-counting.
+    sessionId = null;
+    eventCount = 0;
+    startTime = Date.now();
+    lastEventTime = Date.now();
+    // Clear fileAttentionMap
+    for (const key of Object.keys(fileAttentionMap)) delete fileAttentionMap[key];
+    // Clear conversations
+    for (const key of Object.keys(conversations)) delete conversations[key];
 
-    // Replay into own sub-modules
     for (const event of events) {
-      // Use direct routing without touching counters again
-      routeToSubmodules(event);
+      processEvent(event);
     }
   }
 
-  function routeToSubmodules(event: OrchEvent): void {
-    switch (event.eventType) {
-      case 'SubagentStart':
-        agentTracker.onSpawn(event);
-        if (event.planContext) {
-          planBinder.bindAgent(event.agent?.name ?? 'unknown', event.planContext.phaseId);
-        }
-        break;
-      case 'SubagentStop':
-        agentTracker.onComplete(event);
-        break;
-      case 'PreToolUse':
-        agentTracker.onToolCallStart(event);
-        break;
-      case 'PostToolUse':
-        agentTracker.onToolCallEnd(event);
-        if (event.taskContext) {
-          const toolName = event.toolContext?.name ?? '';
-          if (toolName === 'TaskCreate') taskGraph.onCreated(event);
-          else if (toolName === 'TaskUpdate') taskGraph.onUpdated(event);
-        }
-        break;
-    }
-  }
+  // routeToSubmodules removed — rebuild() now uses processEvent() directly
 
   return { processEvent, getSnapshot, rebuild, getCurrentStep };
 }

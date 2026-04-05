@@ -11,6 +11,7 @@
  */
 
 import * as path from 'node:path';
+import { createRequire } from 'node:module';
 import { createHttpServer, broadcast } from './lib/http-server.js';
 import { findAvailablePort } from './lib/port-finder.js';
 import { writePidFile, stopAllServers, setupShutdownHandlers } from './lib/process-mgr.js';
@@ -20,6 +21,16 @@ import { hookActiveSessions } from './lib/hook-receiver.js';
 import { createStateEngine } from './lib/state-engine.js';
 import * as eventStore from '../src/event-store.js';
 import { log } from '../src/logger.js';
+
+// CommonJS interop for discovery + setup (.cjs = forced CJS in this ESM package)
+const _require = createRequire(import.meta.url);
+const { writeDiscoveryFile, removeDiscoveryFile } = _require('./discovery.cjs') as {
+  writeDiscoveryFile: (port: number, workspace: string) => void;
+  removeDiscoveryFile: () => void;
+};
+const { ensureSetup } = _require('./setup.cjs') as {
+  ensureSetup: () => void;
+};
 
 // ── Parse CLI Args ──
 
@@ -55,6 +66,13 @@ const assetsDir = path.join(import.meta.dirname ?? '.', '..', 'web', 'out');
 // ── Start Server ──
 
 async function start(): Promise<void> {
+  // Ensure hook script and settings.json entries are present before accepting traffic
+  try {
+    ensureSetup();
+  } catch (err) {
+    log.info(`ensureSetup skipped: ${(err as Error).message}`);
+  }
+
   const port = await findAvailablePort(requestedPort || undefined);
 
   // Initialize enricher with plans directory
@@ -67,6 +85,8 @@ async function start(): Promise<void> {
   const stateEngine = createStateEngine(plansDir);
 
   // Create HTTP server — pass stateEngine for /api/state endpoint
+  // getSessionLabel wired after watcher is created below
+  let watcherRef: { getSessionLabel: (sid: string) => string } | null = null;
   const server = createHttpServer({
     hookReceiverOptions: {
       enricherState,
@@ -77,9 +97,11 @@ async function start(): Promise<void> {
     },
     assetsDir,
     stateEngine,
+    getSessionLabel: (sid) => watcherRef?.getSessionLabel(sid) ?? `Session ${sid.slice(0, 8)}`,
   });
 
   // Start session watcher (JSONL tailing)
+  // eslint-disable-next-line prefer-const
   const watcher = new SessionWatcher({
     workspace,
     enricherState,
@@ -91,13 +113,16 @@ async function start(): Promise<void> {
     onSessionStart: (sid) => log.info(`Session started: ${sid.slice(0, 8)}`),
     onSessionEnd: (sid) => log.info(`Session ended: ${sid.slice(0, 8)}`),
   });
+  watcherRef = watcher;
 
   // Listen
   server.listen(port, '127.0.0.1', () => {
     const url = `http://127.0.0.1:${port}`;
 
     writePidFile(port);
+    writeDiscoveryFile(port, workspace);
     setupShutdownHandlers(port, () => {
+      removeDiscoveryFile();
       watcher.stop();
       eventStore.closeAll();
       server.close();

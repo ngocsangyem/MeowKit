@@ -21,6 +21,8 @@ function makeEvent(seq: number, partial?: Partial<OrchEvent>): OrchEvent {
     taskContext: null,
     toolContext: null,
     statusProtocol: null,
+    contextBreakdown: null,
+    fileAttention: null,
     ...partial,
   };
 }

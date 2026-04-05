@@ -12,6 +12,11 @@ interface TopBarProps {
   connected: boolean;
   currentView: 'graph' | 'timeline' | 'tasks';
   onViewChange: (v: 'graph' | 'timeline' | 'tasks') => void;
+  showPlan: boolean;
+  onTogglePlan: () => void;
+  showBottlenecks: boolean;
+  onToggleBottlenecks: () => void;
+  bottleneckCount: number;
 }
 
 const VIEWS = [
@@ -20,7 +25,10 @@ const VIEWS = [
   { id: 'tasks' as const, label: 'Tasks', key: 'K' },
 ];
 
-export function TopBar({ state, connected, currentView, onViewChange }: TopBarProps) {
+export function TopBar({
+  state, connected, currentView, onViewChange,
+  showPlan, onTogglePlan, showBottlenecks, onToggleBottlenecks, bottleneckCount,
+}: TopBarProps) {
   const agentCount = Object.values(state.agents).filter(a => a.status !== 'complete').length;
   const elapsed = state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0;
   const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
@@ -79,7 +87,19 @@ export function TopBar({ state, connected, currentView, onViewChange }: TopBarPr
         ))}
       </div>
 
-      <span style={{ color: 'var(--dim)', fontSize: 10 }}>E=feed F=fit Space=pause</span>
+      {/* Plan + Alerts toggles */}
+      <div style={{ display: 'flex', gap: 4 }}>
+        <ToggleButton active={showPlan} onClick={onTogglePlan} label="Plan" shortcut="P" />
+        <ToggleButton
+          active={showBottlenecks}
+          onClick={onToggleBottlenecks}
+          label={bottleneckCount > 0 ? `Alerts ${bottleneckCount}` : 'Alerts'}
+          shortcut="B"
+          accent={bottleneckCount > 0 ? 'var(--amber)' : undefined}
+        />
+      </div>
+
+      <span style={{ color: 'var(--dim)', fontSize: 10 }}>E=feed F=fit P=plan B=alerts Space=pause</span>
     </div>
   );
 }
@@ -90,5 +110,22 @@ function Stat({ label, value, color }: { label: string; value: string | number; 
       <span style={{ color: 'var(--dim)' }}>{label} </span>
       <span style={{ color, fontWeight: 600 }}>{value}</span>
     </span>
+  );
+}
+
+function ToggleButton({ active, onClick, label, shortcut, accent }: {
+  active: boolean; onClick: () => void; label: string; shortcut: string; accent?: string;
+}) {
+  const activeColor = accent ?? 'var(--cyan)';
+  return (
+    <button onClick={onClick} style={{
+      padding: '3px 10px', borderRadius: 4, fontSize: 11, cursor: 'pointer',
+      border: active ? `1px solid ${activeColor}44` : '1px solid transparent',
+      background: active ? `${activeColor}18` : 'transparent',
+      color: active ? activeColor : 'var(--muted)',
+      letterSpacing: '0.05em',
+    }}>
+      {label} <span style={{ opacity: 0.4, fontSize: 9 }}>{shortcut}</span>
+    </button>
   );
 }

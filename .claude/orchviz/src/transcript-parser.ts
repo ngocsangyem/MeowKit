@@ -46,9 +46,16 @@ export class TranscriptParser {
   private delegate: TranscriptParserDelegate;
   private seenUuids = new Set<string>();
   private pendingToolCalls = new Map<string, { name: string; args: string }>();
+  private sessionLabel: string | null = null;
+  private labelExtracted = false;
 
   constructor(delegate: TranscriptParserDelegate) {
     this.delegate = delegate;
+  }
+
+  /** Get the extracted session label (from first user message). */
+  getLabel(): string | null {
+    return this.sessionLabel;
   }
 
   /**
@@ -70,6 +77,35 @@ export class TranscriptParser {
     if (entry.uuid) {
       if (this.seenUuids.has(entry.uuid)) return;
       this.seenUuids.add(entry.uuid);
+    }
+
+    // Extract session label from first user message
+    if (!this.labelExtracted && entry.type === 'user') {
+      const content = entry.message?.content;
+      const text = typeof content === 'string' ? content :
+        (Array.isArray(content) ? content.find((b) => b.type === 'text')?.text : null);
+      if (text) {
+        this.sessionLabel = text.slice(0, 60).replace(/\n/g, ' ').trim();
+        this.labelExtracted = true;
+      }
+    }
+
+    // Handle inline progress events (Claude Code sends subagent updates inline)
+    if (entry.type === 'progress' && (entry as unknown as Record<string, unknown>).data) {
+      const data = (entry as unknown as Record<string, unknown>).data as Record<string, unknown>;
+      if (data?.type === 'agent_progress') {
+        const parentToolUseID = (entry as unknown as Record<string, unknown>).parentToolUseID as string | undefined;
+        if (parentToolUseID) {
+          const innerLine = JSON.stringify(data.message ?? data);
+          this.delegate.onParsedEvent({
+            session_id: sessionId,
+            hook_event_name: 'InlineProgress',
+            tool_use_id: parentToolUseID,
+            message: innerLine,
+          });
+          return;
+        }
+      }
     }
 
     // Skip non-conversation entries
@@ -183,6 +219,16 @@ export class TranscriptParser {
       try {
         const entry = JSON.parse(line) as TranscriptEntry;
         if (entry.uuid) this.seenUuids.add(entry.uuid);
+        // Extract label from first user entry found during pre-scan
+        if (!this.labelExtracted && entry.type === 'user') {
+          const msgContent = entry.message?.content;
+          const text = typeof msgContent === 'string' ? msgContent :
+            (Array.isArray(msgContent) ? msgContent.find((b) => b.type === 'text')?.text : null);
+          if (text) {
+            this.sessionLabel = text.slice(0, 60).replace(/\n/g, ' ').trim();
+            this.labelExtracted = true;
+          }
+        }
       } catch {
         // Skip
       }
@@ -193,6 +239,8 @@ export class TranscriptParser {
   reset(): void {
     this.seenUuids.clear();
     this.pendingToolCalls.clear();
+    this.sessionLabel = null;
+    this.labelExtracted = false;
   }
 }
 

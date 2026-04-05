@@ -14,6 +14,7 @@ import { enrich, type EnricherState } from './orch-enricher.js';
 import type { OrchEvent, HookPayload } from './protocol.js';
 import { SCAN_INTERVAL_MS, POLL_FALLBACK_MS, INACTIVITY_TIMEOUT_MS } from './constants.js';
 import { log } from './logger.js';
+import { SubagentWatcher, type SubagentWatcherDelegate } from './subagent-watcher.js';
 
 // C3: Import hook-active session tracking to avoid dual-source duplicates
 // When hooks are active for a session, SessionWatcher skips JSONL tailing for it.
@@ -36,6 +37,8 @@ interface WatchedSession {
   startTime: number;
   lastActivityTime: number;
   completed: boolean;
+  subagentWatcher: SubagentWatcher | null;
+  label: string;
 }
 
 export interface SessionWatcherOptions {
@@ -90,6 +93,12 @@ export class SessionWatcher {
 
     // Periodic re-scan (1s)
     this.scanTimer = setInterval(() => this.scanForSessions(), SCAN_INTERVAL_MS);
+  }
+
+  /** Get the human-readable label for a session. */
+  getSessionLabel(sessionId: string): string {
+    const session = this.sessions.get(sessionId);
+    return session?.label ?? `Session ${sessionId.slice(0, 8)}`;
   }
 
   /** Stop all watchers. */
@@ -169,6 +178,8 @@ export class SessionWatcher {
       startTime: Date.now(),
       lastActivityTime: Date.now(),
       completed: false,
+      subagentWatcher: null,
+      label: `Session ${sessionId.slice(0, 8)}`,
     };
 
     this.sessions.set(sessionId, session);
@@ -179,8 +190,12 @@ export class SessionWatcher {
       const stat = fs.statSync(filePath);
       if (stat.size > 0) {
         const content = fs.readFileSync(filePath, 'utf-8');
-        this.getParser(sessionId).prescan(content);
+        const parser = this.getParser(sessionId);
+        parser.prescan(content);
         session.fileSize = stat.size;
+        // Set label from pre-scan result
+        const extracted = parser.getLabel();
+        if (extracted) session.label = extracted;
       }
     } catch {
       // File may be empty or unreadable
@@ -199,6 +214,37 @@ export class SessionWatcher {
     session.pollTimer = setInterval(() => {
       this.readNewLines(session);
     }, POLL_FALLBACK_MS);
+
+    // Subagent watcher — discovers and tails subagent JSONL files
+    const subagentsDir = path.join(path.dirname(filePath), sessionId, 'subagents');
+    const subagentDelegate: SubagentWatcherDelegate = {
+      onSubagentSpawn: (agentName, agentType, sid) => {
+        const payload = {
+          session_id: sid,
+          hook_event_name: 'SubagentStart',
+          agent_type: agentType,
+          agent_id: agentName,
+        };
+        const event = enrich(payload, this.options.enricherState);
+        this.options.onEvent(event);
+      },
+      onSubagentEvent: (_agentName, payload, sid) => {
+        const hookPayload = {
+          session_id: sid,
+          hook_event_name: String(payload.type ?? 'Message'),
+          message: payload.message as string | undefined,
+        };
+        const event = enrich(hookPayload, this.options.enricherState);
+        this.options.onEvent(event);
+      },
+    };
+    session.subagentWatcher = new SubagentWatcher(
+      subagentsDir,
+      sessionId,
+      this.parserDelegate,
+      subagentDelegate,
+    );
+    session.subagentWatcher.start();
 
     // Inactivity timeout
     this.resetInactivityTimer(session);
@@ -219,6 +265,15 @@ export class SessionWatcher {
       parser.processLine(line, session.sessionId);
     }
 
+    // Update label if not yet extracted (e.g. label arrived in new lines)
+    if (session.label === `Session ${session.sessionId.slice(0, 8)}`) {
+      const extracted = parser.getLabel();
+      if (extracted) session.label = extracted;
+    }
+
+    // Also scan subagent directory for new files
+    session.subagentWatcher?.scanDir();
+
     this.resetInactivityTimer(session);
   }
 
@@ -230,6 +285,9 @@ export class SessionWatcher {
         session.completed = true;
         log.info(`Session ${session.sessionId.slice(0, 8)} timed out (inactivity)`);
         this.options.onSessionEnd?.(session.sessionId);
+        // Clean up resources (watchers, timers, parsers) to prevent leaks
+        this.cleanupSession(session);
+        this.sessions.delete(session.sessionId);
       }
     }, INACTIVITY_TIMEOUT_MS);
   }
@@ -240,6 +298,7 @@ export class SessionWatcher {
     }
     if (session.pollTimer) clearInterval(session.pollTimer);
     if (session.inactivityTimer) clearTimeout(session.inactivityTimer);
+    session.subagentWatcher?.stop();
     // C2: Clean up per-session parser to free seenUuids memory
     this.parsers.delete(session.sessionId);
   }

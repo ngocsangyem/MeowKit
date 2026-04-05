@@ -19,6 +19,8 @@ import { drawToolCalls } from './canvas/draw-tool-calls';
 import { drawEffects } from './canvas/draw-effects';
 import { drawCostLabels } from './canvas/draw-cost';
 import { findNodeAt } from './canvas/hit-testing';
+import { drawBottleneckMarkers } from '@/lib/bottleneck-overlay';
+import type { BottleneckMarker } from '@/hooks/use-bottleneck-detection';
 
 interface NodeGraphCanvasProps {
   orchRef: React.MutableRefObject<OrchSimulationState>;
@@ -30,6 +32,7 @@ interface NodeGraphCanvasProps {
   onPanEnd: () => void;
   onZoom: (e: React.WheelEvent) => void;
   paused: boolean;
+  bottleneckMarkers?: BottleneckMarker[];
 }
 
 export function NodeGraphCanvas({
@@ -37,11 +40,16 @@ export function NodeGraphCanvas({
   onSelectAgent, onHoverAgent,
   onPanStart, onPanMove, onPanEnd, onZoom,
   paused,
+  bottleneckMarkers = [],
 }: NodeGraphCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
   const hoveredRef = useRef<AgentNode | null>(null);
   const hoverThrottleRef = useRef<number>(0);
+  // Keep bottleneckMarkers in a ref so the render loop always has the latest value
+  // without needing to restart the effect when markers change
+  const markersRef = useRef<BottleneckMarker[]>(bottleneckMarkers);
+  markersRef.current = bottleneckMarkers;
 
   // Resize canvas to match devicePixelRatio
   useEffect(() => {
@@ -99,6 +107,10 @@ export function NodeGraphCanvas({
         drawToolCalls(ctx, sim.toolCalls, time);
         drawEffects(ctx, sim.effects, time);
         drawCostLabels(ctx, agents);  // inside camera transform — uses world coords
+        // Bottleneck markers drawn last so rings appear above all other layers
+        if (markersRef.current.length > 0) {
+          drawBottleneckMarkers(ctx, markersRef.current, sim.agents);
+        }
 
         ctx.restore();
       }

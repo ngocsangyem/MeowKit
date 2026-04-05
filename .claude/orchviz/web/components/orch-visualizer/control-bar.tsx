@@ -11,11 +11,12 @@ import type { OrchSimulationState } from '@/hooks/simulation/types';
 interface ControlBarProps {
   state: OrchSimulationState;
   connected: boolean;
+  onOpenSessions?: () => void;
 }
 
 const BAR_HEIGHTS = [6, 10, 14, 10, 6]; // heartbeat shape
 
-export function ControlBar({ state, connected }: ControlBarProps) {
+export function ControlBar({ state, connected, onOpenSessions }: ControlBarProps) {
   const [fps, setFps] = useState(0);
   const frameCountRef = useRef(0);
   const lastFpsTimeRef = useRef(Date.now());
@@ -92,6 +93,31 @@ export function ControlBar({ state, connected }: ControlBarProps) {
 
       {/* FPS */}
       <Stat label="FPS" value={fps} color={fps < 30 ? 'var(--red)' : 'var(--emerald)'} />
+
+      <Divider />
+
+      {/* Sessions button */}
+      {onOpenSessions && (
+        <button
+          onClick={onOpenSessions}
+          title="Browse sessions (R)"
+          aria-label="Open session browser"
+          style={{
+            background: 'none',
+            border: '1px solid var(--border)',
+            borderRadius: 4,
+            color: 'var(--dim)',
+            cursor: 'pointer',
+            fontSize: 9,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            padding: '2px 8px',
+            lineHeight: 1.5,
+          }}
+        >
+          SESSIONS
+        </button>
+      )}
 
       <Divider />
 

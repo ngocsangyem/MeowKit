@@ -19,6 +19,7 @@ import type { SSEBridge } from './use-sse-bridge';
 export function useOrchSimulation(bridge: SSEBridge): {
   orchRef: React.MutableRefObject<OrchSimulationState>;
   state: OrchSimulationState;
+  setState: React.Dispatch<React.SetStateAction<OrchSimulationState>>;
 } {
   const orchRef = useRef<OrchSimulationState>(createInitialState());
   const [state, setState] = useState<OrchSimulationState>(orchRef.current);
@@ -105,5 +106,5 @@ export function useOrchSimulation(bridge: SSEBridge): {
     };
   }, [bridge]);
 
-  return { orchRef, state };
+  return { orchRef, state, setState };
 }

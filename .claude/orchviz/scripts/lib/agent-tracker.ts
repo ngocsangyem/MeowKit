@@ -7,6 +7,7 @@
 
 import { classifyTier, inferWorkflowStep, AGENT_PHASE_MAP } from '../../src/orch-model.js';
 import type { OrchEvent } from '../../src/protocol.js';
+import { createContextBreakdown, addToolResultTokens, type ContextBreakdown } from '../../src/context-tracker.js';
 
 export interface AgentState {
   name: string;
@@ -20,6 +21,7 @@ export interface AgentState {
   toolCallCount: number;
   toolsUsed: string[];
   workflowStep: string;
+  contextBreakdown: ContextBreakdown;
 }
 
 export interface DelegationNode {
@@ -57,6 +59,7 @@ export function createAgentTracker(): AgentTracker {
         toolCallCount: 0,
         toolsUsed: [],
         workflowStep: inferWorkflowStep(name),
+        contextBreakdown: createContextBreakdown(),
       };
     }
     return agents[name];
@@ -87,8 +90,13 @@ export function createAgentTracker(): AgentTracker {
     }
   }
 
-  function onToolCallEnd(_event: OrchEvent): void {
-    // Duration tracked at event level — no state change needed
+  function onToolCallEnd(event: OrchEvent): void {
+    // Sync token cost from event's toolContext into agent's contextBreakdown
+    if (event.toolContext?.tokenCost) {
+      const agentName = event.agent?.name ?? 'unknown';
+      const state = getOrCreate(agentName);
+      addToolResultTokens(state.contextBreakdown, event.toolContext.tokenCost);
+    }
   }
 
   function onComplete(event: OrchEvent): void {

@@ -6,6 +6,7 @@
  */
 
 import type { AgentInfo, WorkflowStep, StatusProtocol } from './orch-model.js';
+import type { ContextBreakdown } from './context-tracker.js';
 
 // ── Base Agent Event (mirrors Agent Flow protocol.ts) ──
 
@@ -52,6 +53,17 @@ export interface ToolContext {
   isError: boolean;
 }
 
+// ── File Attention ──
+
+export interface FileAttention {
+  path: string;
+  operation: 'read' | 'write' | 'edit' | 'search';
+  tokenCost: number;
+}
+
+// Re-export for consumers that import from protocol only
+export type { ContextBreakdown } from './context-tracker.js';
+
 // ── Orchestration Event (enriched) ──
 
 export interface OrchEvent {
@@ -77,6 +89,10 @@ export interface OrchEvent {
   toolContext: ToolContext | null;
   /** Status protocol on agent completion */
   statusProtocol: StatusProtocol | null;
+  /** Token usage breakdown by category for the active agent at event time */
+  contextBreakdown: ContextBreakdown | null;
+  /** Files accessed during this event */
+  fileAttention: FileAttention[] | null;
 }
 
 // ── Hook Payload (raw from Claude Code) ──

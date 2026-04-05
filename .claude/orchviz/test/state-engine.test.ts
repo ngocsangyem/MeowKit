@@ -19,6 +19,8 @@ function makeEvent(overrides: Partial<OrchEvent> = {}): OrchEvent {
     taskContext: null,
     toolContext: null,
     statusProtocol: null,
+    contextBreakdown: null,
+    fileAttention: null,
     ...overrides,
   };
 }
