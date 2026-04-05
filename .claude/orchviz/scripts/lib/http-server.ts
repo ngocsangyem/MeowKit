@@ -106,6 +106,7 @@ function handleSSE(req: http.IncomingMessage, res: http.ServerResponse): void {
 function handleAPI(
   parsed: url.UrlWithParsedQuery,
   res: http.ServerResponse,
+  options: HttpServerOptions,
 ): void {
   const pathname = parsed.pathname ?? '';
 
@@ -139,9 +140,11 @@ function handleAPI(
 
   // GET /api/state — current orchestration state snapshot
   if (pathname === '/api/state') {
-    // H3: Evict stale sessions from buffer
     evictStaleSessions();
+    // Return orchestration state from state engine (Phase 3) + transport diagnostics
+    const orchState = (options.stateEngine?.getSnapshot() ?? {}) as Record<string, unknown>;
     const state = {
+      ...orchState,
       activeSession: activeSessionId,
       sessions: Array.from(eventBuffer.keys()),
       sseClients: sseClients.size,
@@ -219,6 +222,7 @@ export interface HttpServerOptions {
   hookReceiverOptions: HookReceiverOptions;
   assetsDir: string;
   dashboardPath?: string;
+  stateEngine?: { getSnapshot: () => unknown };
 }
 
 export function createHttpServer(options: HttpServerOptions): http.Server {
@@ -250,7 +254,7 @@ export function createHttpServer(options: HttpServerOptions): http.Server {
 
     // GET /api/* — REST endpoints
     if (pathname.startsWith('/api/')) {
-      handleAPI(parsed, res);
+      handleAPI(parsed, res, options);
       return;
     }
 

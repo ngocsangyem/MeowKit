@@ -17,6 +17,7 @@ import { writePidFile, stopAllServers, setupShutdownHandlers } from './lib/proce
 import { createEnricherState } from '../src/orch-enricher.js';
 import { SessionWatcher, setHookActiveSessions } from '../src/session-watcher.js';
 import { hookActiveSessions } from './lib/hook-receiver.js';
+import { createStateEngine } from './lib/state-engine.js';
 import * as eventStore from '../src/event-store.js';
 import { log } from '../src/logger.js';
 
@@ -62,10 +63,20 @@ async function start(): Promise<void> {
   // C3: Wire hook-active sessions tracking to prevent dual-source duplicates
   setHookActiveSessions(hookActiveSessions);
 
-  // Create HTTP server
+  // Initialize state engine (Phase 3) — processes enriched events into orchestration state
+  const stateEngine = createStateEngine(plansDir);
+
+  // Create HTTP server — pass stateEngine for /api/state endpoint
   const server = createHttpServer({
-    hookReceiverOptions: { enricherState, broadcast },
+    hookReceiverOptions: {
+      enricherState,
+      broadcast: (event) => {
+        stateEngine.processEvent(event);  // Feed state engine
+        broadcast(event);                  // Broadcast to SSE clients
+      },
+    },
     assetsDir,
+    stateEngine,
   });
 
   // Start session watcher (JSONL tailing)
@@ -73,6 +84,7 @@ async function start(): Promise<void> {
     workspace,
     enricherState,
     onEvent: (event) => {
+      stateEngine.processEvent(event);  // Feed state engine
       eventStore.append(event.sessionId, event);
       broadcast(event);
     },
