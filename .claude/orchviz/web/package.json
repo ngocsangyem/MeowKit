@@ -1,0 +1,20 @@
+{
+  "name": "orchviz-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3601",
+    "build": "next build",
+    "start": "next start --port 3601"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/react": "^19.0.0",
+    "@types/node": "^22.0.0"
+  }
+}
