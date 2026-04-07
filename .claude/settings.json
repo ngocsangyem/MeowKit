@@ -14,15 +14,6 @@
             "statusMessage": "Loading project context..."
           }
         ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/orchviz/scripts/hook-relay.cjs\"",
-            "timeout": 2000
-          }
-        ]
       }
     ],
     "PreToolUse": [
@@ -69,15 +60,6 @@
             "statusMessage": "Running pre-ship validation..."
           }
         ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/orchviz/scripts/hook-relay.cjs\"",
-            "timeout": 2000
-          }
-        ]
       }
     ],
     "PostToolUse": [
@@ -106,15 +88,6 @@
             "timeout": 5000
           }
         ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/orchviz/scripts/hook-relay.cjs\"",
-            "timeout": 2000
-          }
-        ]
       }
     ],
     "Stop": [
@@ -126,39 +99,10 @@
             "timeout": 5000
           }
         ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/orchviz/scripts/hook-relay.cjs\"",
-            "timeout": 2000
-          }
-        ]
       }
     ],
-    "SubagentStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/orchviz/scripts/hook-relay.cjs\"",
-            "timeout": 2000
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/orchviz/scripts/hook-relay.cjs\"",
-            "timeout": 2000
-          }
-        ]
-      }
-    ]
+    "SubagentStart": [],
+    "SubagentStop": []
   },
   "permissions": {
     "allow": [
