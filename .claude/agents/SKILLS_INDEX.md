@@ -24,7 +24,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 
 | Skill | Owner | Type | Architecture |
 |-------|-------|------|-------------|
-| `meow:plan-creator` | planner | planning | step-file (v1.3.2: scope challenge, multi-file output, plan red team, sync-back) |
+| `meow:plan-creator` | planner | planning | step-file (v1.4.0: scope challenge, multi-file output, plan red team, sync-back, **--product-level mode** for green-field app builds via step-03a) |
 | `meow:plan-ceo-review` | planner | planning | monolithic |
 | `meow:plan-eng-review` | planner/architect | planning | monolithic |
 | `meow:validate-plan` | planner | planning | monolithic |
@@ -76,6 +76,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | Skill | Owner | Type | Architecture |
 |-------|-------|------|-------------|
 | `meow:review` | reviewer | review | **step-file** (4 steps) |
+| `meow:rubric` | evaluator (Phase 3) | review | monolithic (v1.0.0: 7 rubrics + 4 composition presets at .claude/rubrics/, weighted graded grading with PASS/WARN/FAIL anchors and load/compose/validate scripts) |
 | `meow:elicit` | reviewer | review | monolithic |
 
 ### Security (Phase 2, 4)

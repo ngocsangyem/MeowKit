@@ -114,16 +114,68 @@ After scope assessment, scan the task description for structural signals:
 
 User selection overrides auto-detection. Only present if a signal is clearly detected — do not prompt on every hard-mode plan.
 
+### 0h. Product-Level Intent Detection
+
+**Skip if:** user already passed `--fast`, `--parallel`, `--two`, or `--hard` explicitly,
+or `task_complexity = trivial`.
+
+**Skip if:** user already passed `--product-level` explicitly — set `planning_mode = product-level` and proceed.
+
+Scan the original task description (case-insensitive) for **product-level intent** signals:
+
+| Signal pattern (POSIX ERE) | Example match |
+|---|---|
+| `\b(build\|create\|make)([[:space:]]+(me\|us))?[[:space:]]+(a\|an\|the)?[[:space:]]*[A-Za-z]+[[:space:]]*(app\|application\|tool\|platform\|game\|site\|service\|product\|saas\|dashboard\|generator\|maker\|editor\|studio\|store\|marketplace\|engine\|suite)\b` | "build me an app", "build a kanban app", "make a SaaS dashboard", "make a retro game maker" |
+| `\b(build\|create\|make)[[:space:]]+(a\|an\|the)[[:space:]]+[A-Z][A-Za-z]{1,8}\b` (bare noun / acronym head) | "create a DAW", "build a CMS", "make a CRM" |
+| `\b(green[[:space:]-]?field\|new product\|from scratch\|brand new)\b` | "green-field SaaS", "new product idea" |
+
+**If a signal matches** AND no implementation context exists in the prompt
+(no file names, no class names, no "fix the X bug", no "refactor the Y module"):
+
+Present via AskUserQuestion:
+
+```json
+{
+  "questions": [{
+    "question": "This looks like a green-field product build. Should I produce a product-level spec (user stories, features, design language) or a traditional implementation plan?",
+    "header": "Plan Mode",
+    "options": [
+      { "label": "Product-Level (Recommended)", "description": "Ambitious user-story spec, no file paths. Hands off to harness skill for implementation. Best for new app/product builds with capable models." },
+      { "label": "Implementation Plan", "description": "Traditional phase-XX file plan with file paths, schemas, and step-by-step builds. Best for refactors, bug fixes, and well-scoped features." },
+      { "label": "Cancel", "description": "Stop and let me clarify the request." }
+    ],
+    "multiSelect": false
+  }]
+}
+```
+
+**Effect of selection:**
+
+| Selection | `planning_mode` | Next step |
+|---|---|---|
+| Product-Level | `product-level` | Skip to step-01 (broader research) → step-02 (LIGHT codebase analysis) → step-03a |
+| Implementation Plan | (continue with prior `planning_mode`) | Existing flow |
+| Cancel | (exit) | Print "Cancelled. Please clarify the request." → STOP |
+
+**Auto-detection guard:** Do NOT auto-fire if any of these are true:
+- Task description contains a file path (e.g., `src/auth.ts`)
+- Task description names an existing module/class (e.g., `UserService`)
+- Task description starts with `fix`, `refactor`, `update`, `migrate`, `bump`
+- `task_complexity = trivial` (use `/meow:fix` instead)
+
+**Note:** `planning_mode = product-level` skips the EXPANSION/HOLD/REDUCTION scope question (it is product-level by definition — ambition is the default).
+
 ## Output
 
 - `task_complexity` — trivial, simple, or complex
-- `planning_mode` — fast, hard, parallel, or two (trivial = exit, no mode)
+- `planning_mode` — fast, hard, parallel, two, or **product-level** (trivial = exit, no mode)
 - `workflow_model` — feature, bugfix, refactor, or security
-- `scope_mode` — EXPANSION, HOLD, or REDUCTION (hard mode only; fast = HOLD default)
+- `scope_mode` — EXPANSION, HOLD, or REDUCTION (hard mode only; fast = HOLD default; product-level = EXPANSION default)
 - Print: `"Scope: {complexity} → mode: {mode} | model: {workflow_model} | scope: {scope_mode}"`
 
 ## Next
 
 If trivial → STOP (recommend /meow:fix).
 If fast → skip to `step-03-draft-plan.md`.
+If **product-level** → read and follow `step-01-research.md` (broader: competitors, design trends, AI integration patterns).
 If hard, parallel, or two → read and follow `step-01-research.md`.

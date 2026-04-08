@@ -5,7 +5,7 @@
 | Agent file | Type | Role | Source | Workflow phases | Auto-activate? | CE version | Last improved |
 |------------|------|------|--------|-----------------|----------------|------------|---------------|
 | `orchestrator.md` | Core | Task router, complexity classification, model tier assignment | MeowKit original | Phase 0 (Orient) | Yes — every task | 260326 | 260326 |
-| `planner.md` | Core | Two-lens planning (product + engineering), Gate 1 enforcement | MeowKit original | Phase 1 (Plan) | Routed by orchestrator | 260326 | 260326 |
+| `planner.md` | Core | Two-lens planning (product + engineering) + product-level mode for green-field builds, Gate 1 enforcement | MeowKit original | Phase 1 (Plan) | Routed by orchestrator | 260326 | 260408 |
 | `brainstormer.md` | Support | Solution brainstorming, architecture evaluation, trade-off analysis | Credit: Duy Nguyen | Phase 1 (Plan) | Routed by orchestrator or explicit | 260326 | 260326 |
 | `researcher.md` | Support | Technology research, library evaluation, documentation gathering | Credit: Duy Nguyen | Phase 0, 1, 4 | Routed by orchestrator or explicit | 260326 | 260326 |
 | `architect.md` | Core | ADR generation, system design, architecture review | MeowKit original | Phase 1 (Plan) | Routed by orchestrator for complex tasks | 260326 | 260326 |

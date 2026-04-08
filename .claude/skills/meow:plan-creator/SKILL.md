@@ -1,12 +1,12 @@
 ---
 name: meow:plan-creator
-version: 1.4.0
+version: 1.5.0
 preamble-tier: 3
 description: >-
   Creates structured multi-file plans before implementation. Scope-aware: trivial tasks
   exit early, simple tasks get fast plans, complex tasks get full research + phase files +
   validation. Enforces Gate 1. Activated by /meow:plan or /meow:cook.
-argument-hint: "[task description] [--fast | --hard | --parallel | --two]"
+argument-hint: "[task description] [--fast | --hard | --parallel | --two | --product-level [--no-design] [--no-scout]]"
 allowed-tools:
   - Bash
   - Read
@@ -29,6 +29,7 @@ Activate when:
 - User runs `/meow:plan [task]` or `/meow:cook [task]`
 - Non-trivial task (> 2 files OR > 1h OR architectural decisions)
 - Gate 1 requires a plan before Phase 3
+- Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
 
 Skip when:
 - `/meow:fix` with complexity=simple (Gate 1 exception)
@@ -43,6 +44,7 @@ Skip when:
 | `--hard` | Hard | 2 researchers | plan.md + phases | Full interview |
 | `--parallel` | Parallel | 2 researchers | plan.md + phases + ownership matrix | Full interview |
 | `--two` | Two approaches | 2 researchers | 2 approach files + trade-off matrix | After selection |
+| `--product-level` | Product spec | 2 researchers (broader) | plan.md only (user stories + features + design language; NO phase files) | Semantic + check-product-spec.sh (no red-team, no validation interview — v1) |
 
 ## Workflow
 
@@ -91,6 +93,9 @@ tasks/plans/YYMMDD-name/
 |------|---------|
 | `workflow.md` | Step sequence, variable table, flow diagram (hard mode) |
 | `workflow-fast.md` | Compact step sequence for `--fast` mode (00→03→04→07→08) |
+| `step-03a-product-spec.md` | Product-level spec drafter: user stories, features, design language. Replaces step-03 when `planning_mode = product-level`. |
+| `assets/product-spec-template.md` | Product spec template (Vision, Features, Design Language, AI Integration, Out-of-Scope) |
+| `references/anthropic-example-plan.md` | RetroForge few-shot calibration example for product-level mode (ambition + feature density reference) |
 | `step-05-red-team.md` | Red team review: persona scaling, subagent dispatch, adjudication |
 | `step-06-validation-interview.md` | Critical question generation and answer propagation |
 | `step-07-gate.md` | Self-check and Gate 1 AskUserQuestion presentation |
@@ -114,6 +119,7 @@ tasks/plans/YYMMDD-name/
 | `references/parallel-mode.md` | Ownership matrix template, parallel group rules |
 | `references/two-approach-mode.md` | Approach file template, trade-off matrix, selection flow |
 | `scripts/validate-plan.py` | Plan completeness validator |
+| `scripts/check-product-spec.sh` | Product-spec structural validator (POSIX bash). Enforces feature count, user stories, forbidden patterns. Used by step-03a §3a.5 and step-04 §4a' for `--product-level` mode. |
 | `references/workflow-models/feature-model.md` | Workflow template for feature tasks (loaded JIT by step-00) |
 | `references/workflow-models/bugfix-model.md` | Workflow template for bug fix tasks (loaded JIT by step-00) |
 | `references/workflow-models/refactor-model.md` | Workflow template for refactor tasks (loaded JIT by step-00) |

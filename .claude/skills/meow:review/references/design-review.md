@@ -12,16 +12,26 @@ source <(.claude/scripts/bin/meowkit-diff-scope <base> 2>/dev/null)
 
 1. **Check for DESIGN.md.** If `DESIGN.md` or `design-system.md` exists in the repo root, read it. All design findings are calibrated against it — patterns blessed in DESIGN.md are not flagged. If not found, use universal design principles.
 
-2. **Read `.claude/skills/meow:review/design-checklist.md`.** If the file cannot be read, skip design review with a note: "Design checklist not found — skipping design review."
+2. **Load design rubrics from the rubric library** (NOT the deleted `design-checklist.md`). The legacy `design-checklist.md` was removed in a prior cleanup; the design judgment surface now lives in `.claude/rubrics/design-quality.md` and `.claude/rubrics/originality.md`. Load both via:
 
-3. **Read each changed frontend file** (full file, not just diff hunks). Frontend files are identified by the patterns listed in the checklist.
+   ```bash
+   .claude/skills/meow:rubric/scripts/load-rubric.sh design-quality
+   .claude/skills/meow:rubric/scripts/load-rubric.sh originality
+   ```
 
-4. **Apply the design checklist** against the changed files. For each item:
+   **If the rubric library is not yet installed** (i.e., `.claude/rubrics/` does not exist), DO NOT silently skip — emit an explicit warning to the review verdict: `"WARN: design rubrics unavailable, design review degraded to mechanical-only. Install meow:rubric library."` and continue with mechanical CSS checks only. The previous silent-skip behavior masked a real evaluation gap (design review was disabled entirely without notice).
+
+3. **Read each changed frontend file** (full file, not just diff hunks). Frontend files are identified by `.tsx`, `.jsx`, `.vue`, `.svelte`, `.css`, `.scss` extensions plus any path containing `components/`, `pages/`, `app/`, `views/`.
+
+4. **Apply the rubrics** against the changed files. The two rubrics provide:
+   - `design-quality` — typography discipline, spacing scale, palette restriction, hierarchy, component consistency, designed empty/loading/error states
+   - `originality` — specific naming, non-generic copy, custom empty states, unique visual signature
+   For each finding:
    - **[HIGH] mechanical CSS fix** (`outline: none`, `!important`, `font-size < 16px`): classify as AUTO-FIX
-   - **[HIGH/MEDIUM] design judgment needed**: classify as ASK
-   - **[LOW] intent-based detection**: present as "Possible — verify visually or run /design-review"
+   - **[HIGH/MEDIUM] rubric-anti-pattern match**: classify as ASK with rubric citation (`design-quality.md` Anti-pattern: <name>)
+   - **[LOW] intent-based detection**: present as "Possible — verify visually"
 
-5. **Include findings** in the review output under a "Design Review" header, following the output format in the checklist. Design findings merge with code review findings into the same Fix-First flow.
+5. **Include findings** in the review output under a "Design Review" header. Cite the rubric and the specific anti-pattern matched. Design findings merge with code review findings into the same Fix-First flow.
 
 6. **Log the result** for the Review Readiness Dashboard:
 
