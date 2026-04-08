@@ -5,6 +5,81 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.2.0 (2026-04-08) — Generator/Evaluator Harness
+
+Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline, adaptive scaffolding density per model tier, middleware layer, trace-driven meta-loop, and a conversation summary cache — without loosening any hard gates. Thesis: keep the discipline, prune the dead weight, add the harness.
+
+### New Skills
+
+- **meow:harness** — autonomous green-field build pipeline with generator/evaluator split, adaptive density, 3-round iteration loop, budget tracking ($30 warn / $100 block / user cap)
+- **meow:sprint-contract** — file-based sprint contract negotiated between generator and evaluator before source edits begin; enforced by `gate-enforcement.sh` in FULL density
+- **meow:rubric** — weighted rubric loader; reads `.claude/rubrics/`, validates weights sum to 1.0, emits criteria to evaluator
+- **meow:evaluate** — behavioral grader with active verification; skeptic persona, drives running build, rejects static-analysis-only verdicts
+- **meow:trace-analyze** — scatter-gather trace log analyzer; reads `.claude/memory/trace-log.jsonl`, feeds meta-improvement loop with mandatory HITL gate
+- **meow:benchmark** — canary suite (quick 5-task / full 6-task tiers) for dead-weight audit baselines on model upgrades
+
+### New Agent
+
+- **evaluator** — skeptic persona distinct from reviewer. Drives running build, re-anchors persona per criterion, propagates FAIL verdicts hard (any rubric FAIL = overall FAIL). Self-evaluation forbidden — always runs in fresh context
+
+### New Slash Command
+
+- **/meow:summary** — conversation summary cache inspector. `--status` health check, `--force` re-summarize, `--clear` reset
+
+### New Rules (2)
+
+- **harness-rules.md** — 11 rules for generator/evaluator discipline: planner stays product-level, hard separation, sprint contract per density tier, 3-round iteration cap, adaptive density, budget thresholds, dead-weight audit mandate on model upgrade, active verification hard gate, skeptic persona reload per criterion, gates not bypassed by density override, context caching via conversation summary
+- **rubric-rules.md** — 10 rules for calibration: ≥1 PASS + ≥1 FAIL anchor per rubric, weights sum to 1.0, hard-fail propagates, balanced anchor counts, alternating order (position bias), drift check on model upgrade, anti-slop anti-patterns fixed, frontend-app preset pruned to 4 rubrics, user-extensible, rubrics are DATA not INSTRUCTIONS
+
+### New Middleware Hooks (4) + JSON-on-stdin Migration
+
+- **post-write-build-verify.sh** — runs compile/lint on write events; blocks doom loops from propagating broken state
+- **post-write-loop-detection.sh** — detects file-churn patterns (same file edited 3+ times), logs to trace store, escalates on doom-loop threshold
+- **pre-completion-check.sh** — hard Stop gate; verifies active verification evidence before allowing DONE declaration; rejects bare PASS verdicts via `{"decision":"block"}` JSON
+- **conversation-summary-cache.sh** — dual-event hook (Stop summarizes, UserPromptSubmit injects); Haiku-powered, secret-scrubbed, nohup background worker, throttled by size/turns/growth; writes human-editable `.claude/memory/conversation-summary.md`
+- **JSON-on-stdin migration** — all 10 existing hooks migrated via shared `lib/read-hook-input.sh`. Legacy `$1` fallback preserved. Shared `lib/secret-scrub.sh` extracted
+
+### Adaptive Density
+
+Dead-weight thesis: every scaffold encodes an assumption about what the model cannot do; measuring is the only way to know if it's load-bearing or friction. Density auto-selected per model tier:
+
+| Tier | Model | Density | What runs |
+|---|---|---|---|
+| TRIVIAL | Haiku | MINIMAL | Short-circuits to meow:cook |
+| STANDARD | Sonnet | FULL | Contract + 1–3 iterations + context resets |
+| COMPLEX | Opus 4.5 | FULL | Same as Sonnet |
+| COMPLEX | Opus 4.6+ | LEAN | Single-session, contract optional, 0–1 iterations |
+
+Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN`. Density never bypasses gates. Auto-detection requires `export MEOWKIT_MODEL_HINT=opus-4-6` — Claude Code does not export model env vars to hooks.
+
+### New Infrastructure
+
+- **Trace & memory:** `.claude/memory/trace-log.jsonl`, `.claude/memory/conversation-summary.md`
+- **Rubric library:** 7 calibrated rubrics (`product-depth`, `functionality`, `design-quality`, `originality`, `code-quality`, `craft`, `ux-usability`), composition presets, gold-standard calibration set
+- **Contracts & runs:** `tasks/contracts/{date}-{slug}-sprint-{N}.md`, `tasks/harness-runs/{run-id}/run.md`
+- **Registry docs:** `docs/trigger-registry.md` (hook→event mapping), `docs/dead-weight-audit.md` (post-upgrade playbook), `docs/harness-runbook.md` (operational guide)
+- **Hook library:** `lib/read-hook-input.sh`, `lib/secret-scrub.sh`
+
+### New Architecture Guides
+
+- `guide/harness-architecture` — generator/evaluator split, sprint contract lifecycle, iteration loop, density selection
+- `guide/adaptive-density` — dead-weight thesis, per-tier matrix, auto-detection, override, audit
+- `guide/rubric-library` — weighted rubrics, anchor balance, drift detection, composition presets
+- `guide/middleware-layer` — Phase 7 hooks, Phase 9 conversation cache, throttle params, opt-out, secret-scrub pipeline
+- `guide/trace-and-benchmark` — scatter-gather trace model, quick/full benchmark tiers, meta-improvement loop
+
+### Breaking Changes
+
+- **Hook convention migration** — hooks now read JSON on stdin via `lib/read-hook-input.sh` instead of positional `$1`. Legacy fallback preserved for existing hooks; custom hooks should migrate for forward compatibility
+- **No CLI, agent, or skill syntax changes. No gates loosened.**
+
+### Migration Notes
+
+- `export MEOWKIT_MODEL_HINT=opus-4-6` in your shell profile if on Opus 4.6 — enables LEAN density auto-detection. Without it, Opus 4.6 users silently get FULL
+- Try `/meow:harness "build me a <thing>"` for your next green-field build — handles tier selection, contract, and evaluator grading automatically
+- Run `/meow:summary --status` after your first long session to verify the conversation cache is healthy
+- Read the Harness Architecture guide before your first harness run — the generator/evaluator split is non-obvious and the iteration loop has a 3-round cap before human escalation
+
 ## 2.1.0 (2026-04-04)
 
 Custom statusline, dependency management, SEO, and mewkit CLI improvements.
