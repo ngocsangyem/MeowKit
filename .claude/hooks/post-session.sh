@@ -95,4 +95,11 @@ EOF
   echo "$CURRENT_MODEL" > "$LAST_MODEL_FILE"
 fi
 
+# Phase 8 (260408): emit session_end trace record (canonical per trace-schema.md).
+# Non-blocking; trace failures don't break the hook chain.
+if [ -x "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" ]; then
+  bash "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" "session_end" \
+    "{\"recent_files\":${RECENT_FILES:-0},\"priority_tag\":\"${PRIORITY_TAG// /_}\"}" 2>/dev/null || true
+fi
+
 echo "Session data captured to .claude/memory/"

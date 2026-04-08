@@ -135,6 +135,13 @@ if [ "$EXIT_CODE" -ne 0 ]; then
   echo ""
   echo "$OUTPUT" | head -50
   echo "@@END_BUILD_VERIFY@@"
+
+  # Phase 8 (260408): emit canonical `build_verify_result` trace record per
+  # trace-schema.md ownership table. Only emits on FAILURE — clean builds skip.
+  if [ -x "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" ]; then
+    bash "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" "build_verify_result" \
+      "{\"file\":\"$FILE\",\"exit_code\":$EXIT_CODE}" 2>/dev/null || true
+  fi
 else
   # Update cache with new hash
   if [ -n "$HASH" ]; then

@@ -51,4 +51,13 @@ if [ "$EDIT_COUNT" -ge 3 ]; then
     "$FILE_PATH" "$EDIT_COUNT" "$TIMESTAMP" >> "$STATE_FILE"
 fi
 
+# Phase 8 (260408): emit canonical `file_edited` trace record per ownership table.
+# Schema: {file: str, edit_count: int} — both fields present.
+# Phase 8 m4 fix: previously emitted before EDIT_COUNT was computed → schema-violating.
+# Non-blocking; trace failures don't break the hook chain.
+if [ -x "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" ] && [ "$FILE_PATH" != "unknown" ]; then
+  bash "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" "file_edited" \
+    "{\"file\":\"$FILE_PATH\",\"edit_count\":$EDIT_COUNT}" 2>/dev/null || true
+fi
+
 exit 0

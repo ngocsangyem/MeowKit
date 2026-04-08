@@ -75,18 +75,28 @@ exec 9>&- 2>/dev/null || true
 COUNT=${COUNT:-0}
 
 # Emit warning / escalation based on thresholds
+TRIGGERED_THRESHOLD=0
 if [ "$COUNT" -ge 8 ]; then
   echo "@@LOOP_DETECT_ESCALATE@@"
   echo "Max edit budget exceeded for $FILE ($COUNT edits this session)."
   echo "Halt and re-plan. Repeated small variations to the same file almost always indicate a flawed approach."
   echo "Re-read the plan/contract, challenge your assumptions, and consider a different strategy before the next edit."
   echo "@@END_LOOP_DETECT@@"
+  TRIGGERED_THRESHOLD=8
 elif [ "$COUNT" -ge 4 ]; then
   echo "@@LOOP_DETECT_WARN@@"
   echo "You have edited $FILE $COUNT times this session."
   echo "Consider reconsidering your approach — repeated small variations often indicate a flawed plan."
   echo "Re-read the plan/contract and challenge your assumptions before the next edit."
   echo "@@END_LOOP_DETECT@@"
+  TRIGGERED_THRESHOLD=4
+fi
+
+# Phase 8 (260408): emit canonical `loop_warning` trace record per trace-schema.md
+# ownership table. ONLY emits when threshold is tripped — no emission for counts 1-3.
+if [ "$TRIGGERED_THRESHOLD" -gt 0 ] && [ -x "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" ]; then
+  bash "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" "loop_warning" \
+    "{\"file\":\"$FILE\",\"count\":$COUNT,\"threshold\":$TRIGGERED_THRESHOLD}" 2>/dev/null || true
 fi
 
 exit 0

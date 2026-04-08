@@ -63,11 +63,11 @@ Each rubric is loaded by `meow:rubric load <name>` or as part of a composition p
 
 | Skill / Hook | Phase | Status |
 |---|---|---|
-| `post-write-build-verify.sh` middleware | 7 | Draft |
-| `post-write-loop-detection.sh` middleware | 7 | Draft |
-| `pre-completion-check.sh` middleware | 7 | Draft |
-| `meow:trace-analyze` | 8 | Draft |
-| `meow:benchmark` | 8 | Draft (consumed by dead-weight audit) |
+| `post-write-build-verify.sh` middleware | 7 | **Shipped 260408** — auto compile/lint per file extension, hash-cached, env-isolated |
+| `post-write-loop-detection.sh` middleware | 7 | **Shipped 260408** — warn at N=4, escalate at N=8 edits to same file |
+| `pre-completion-check.sh` middleware | 7 | **Shipped 260408** — Stop hook hard gate, JSON block decision when no verification evidence |
+| `meow:trace-analyze` | 8 | **Shipped 260408** — `/meow:trace-analyze`, scatter-gather over `.claude/memory/trace-log.jsonl`, HITL gate mandatory |
+| `meow:benchmark` | 8 | **Shipped 260408** — `/meow:benchmark run [--full]`, quick tier 5 tasks ≤$5, full tier 6 tasks ≤$30 |
 | `conversation-summary-cache.sh` middleware | 9 | Draft |
 
 ## Maintenance
