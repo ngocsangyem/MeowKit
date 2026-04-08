@@ -17,6 +17,7 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | `output-format-rules.md` | Response structure: what/why/files/open-qs + subagent status protocol | New + CKE-inspired (v1.1.0) | All agent responses |
 | `search-before-building-rules.md` | 3-layer knowledge framework: search before implementing unfamiliar patterns | Adapted from gstack ETHOS.md | Implementation, planning |
 | `scale-adaptive-rules.md` | Domain-based complexity routing, CSV match override, Gate 1 one-shot bypass | New (BMAD-inspired) | Phase 0 (Orient) |
+| `rubric-rules.md` (pending — Phase 6) | Evaluator calibration discipline, rubric library governance, anchor balance enforcement, drift detection cadence | New (Anthropic harness research) | Phase 4 (Review, evaluator agent) |
 | `step-file-rules.md` | JIT step loading, no skipping, state persistence for multi-step workflows | New (BMAD-inspired) | Step-file skills |
 | `parallel-execution-rules.md` | Worktree isolation, file ownership, max 3 agents, integration test. Added staged parallel mode (v2.0) | New (CKE-inspired) | Parallel execution [CONTEXTUAL] |
 

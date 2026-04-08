@@ -1,6 +1,6 @@
 # MeowKit Rubric Library — Index
 
-Catalog of all evaluation rubrics and composition presets used by the evaluator agent (Phase 3) and `meow:rubric` skill.
+Catalog of all evaluation rubrics and composition presets used by the `evaluator` agent (via `meow:evaluate`) and the standalone `meow:rubric` skill.
 
 > Generated reference. To regenerate, run:
 > `.claude/skills/meow:rubric/scripts/load-rubric.sh --list`
@@ -83,6 +83,6 @@ Rubrics use SemVer in their frontmatter. Bump `version`:
 ## References
 
 - Phase 2 plan: `plans/260407-2331-meowkit-harness-gan-architecture/phase-02-graded-evaluation-rubric-library.md`
-- Phase 3 (consumer): the `evaluator` agent (lands in Phase 3 — pending)
+- Phase 3 (consumer, **shipped 260408**): the `evaluator` agent at `.claude/agents/evaluator.md` and `meow:evaluate` skill at `.claude/skills/meow:evaluate/`
 - Phase 6: registers `.claude/rubrics/` in `meowkit-rules.md` §1 canonical paths table (pending — until then, this directory is convention-only, not in the canonical table)
 - Calibration: `meowkit/.claude/skills/meow:rubric/references/calibration-guide.md`

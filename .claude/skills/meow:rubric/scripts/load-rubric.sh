@@ -9,7 +9,7 @@
 #
 # Used by:
 #   - meow:rubric SKILL.md as the implementation of list/load/compose subcommands
-#   - evaluator subagent (Phase 3) to inject rubrics into its grading prompt
+#   - evaluator subagent (via meow:evaluate, shipped Phase 3) to inject rubrics into its grading prompt
 #
 # Exit: 0 on success, 1 if rubric/preset not found, 2 on usage error
 #

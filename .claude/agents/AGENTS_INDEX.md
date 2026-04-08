@@ -14,6 +14,7 @@
 | `developer.md` | Core | Implementation (TDD), self-healing, production code | MeowKit original | Phase 3 (Build GREEN) | Routed by orchestrator after tester | 260326 | 260326 |
 | `ui-ux-designer.md` | Support | UI design, design systems, accessibility, responsive layouts | MeowKit original | Phase 3 (Build GREEN) | Routed when frontend detected | 260326 | 260330 |
 | `reviewer.md` | Core | 5-dimension code review, Gate 2 enforcement, adversarial personas, artifact verification | MeowKit original | Phase 4 (Review) | Routed by orchestrator after developer | 260326 | 260331 |
+| `evaluator.md` | Core | Behavioral active-verification of running builds against rubric library; skeptic persona; produces graded verdict with concrete runtime evidence (screenshots/curl/CLI). Distinct from reviewer (structural). | MeowKit original | Phase 4 (Review, parallel to reviewer) | Routed by harness after generator iteration; explicit via /meow:evaluate | 260408 | 260408 |
 | `shipper.md` | Core | Deployment pipeline, conventional commits, PR creation | MeowKit original | Phase 5 (Ship) | Routed by orchestrator after Gate 2 | 260326 | 260326 |
 | `git-manager.md` | Support | Git operations: stage, commit, push with conventional commits | Adapted from claudekit-engineer | Phase 5 (Ship), any | On "commit"/"push" request | 260329 | 260329 |
 | `documenter.md` | Core | Living documentation, changelog generation, docs sync | MeowKit original | Phase 6 (Reflect) | Routed by orchestrator after ship | 260326 | 260326 |

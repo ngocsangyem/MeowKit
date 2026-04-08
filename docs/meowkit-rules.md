@@ -33,8 +33,11 @@ These are the ONLY valid names for MeowKit custom agents in Task() calls:
 ```
 developer, tester, reviewer, planner, documenter, analyst,
 researcher, shipper, git-manager, architect, brainstormer,
-security, journal-writer, ui-ux-designer, orchestrator
+security, journal-writer, ui-ux-designer, orchestrator,
+evaluator
 ```
+
+> **`evaluator` added 260408** (Phase 3 of harness plan). The `evaluator` is the **behavioral active-verification** counterpart to the structural `reviewer`. Both coexist; they answer different questions. See `.claude/agents/evaluator.md` and `.claude/skills/meow:evaluate/SKILL.md`.
 
 Plus Claude Code built-in types: `Explore`, `Bash`, `general-purpose`, `Plan`
 

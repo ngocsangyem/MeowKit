@@ -76,7 +76,8 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | Skill | Owner | Type | Architecture |
 |-------|-------|------|-------------|
 | `meow:review` | reviewer | review | **step-file** (4 steps) |
-| `meow:rubric` | evaluator (Phase 3) | review | monolithic (v1.0.0: 7 rubrics + 4 composition presets at .claude/rubrics/, weighted graded grading with PASS/WARN/FAIL anchors and load/compose/validate scripts) |
+| `meow:rubric` | evaluator | review | monolithic (v1.0.0: 7 rubrics + 4 composition presets at .claude/rubrics/, weighted graded grading with PASS/WARN/FAIL anchors and load/compose/validate scripts; frontend-app preset pruned to 4 distinctive rubrics in v2.0.0 per audit 260408) |
+| `meow:evaluate` | evaluator | review | **step-file** (v1.0.0: 5 steps — load-rubrics → boot-app → probe-criteria → grade-and-verdict → feedback-to-generator. Active-verification HARD GATE: validate-verdict.sh rejects PASS verdicts with empty evidence/. Skeptic persona enforced on every criterion grading.) |
 | `meow:elicit` | reviewer | review | monolithic |
 
 ### Security (Phase 2, 4)
