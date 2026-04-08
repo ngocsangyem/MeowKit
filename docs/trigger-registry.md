@@ -28,6 +28,7 @@ Canonical registry of every meowkit skill, its activation triggers, callers, and
 | Skill | Trigger | Caller | User phrases |
 |---|---|---|---|
 | `meow:cook` | User invocation; harness MINIMAL short-circuit | User; `meow:harness` step-00 (MINIMAL only) | "implement this feature", "fix this bug", "make this change" |
+| `meow:summary` | User invocation (Phase 9 inspector) | User | "show conversation summary", "clear summary cache", "/meow:summary", "/meow:summary --clear", "/meow:summary --status" |
 | `meow:review` | User invocation; pre-ship Gate 2 | User; `shipper` agent; `reviewer` agent | "review this", "code review", "check before shipping" |
 | `meow:fix` | User invocation; simple bugs | User | "fix this", "/meow:fix" |
 | `meow:scale-routing` | Auto on every Phase 0 (orient); harness step-00 | `orchestrator` agent; `meow:harness` step-00 | (auto — no user phrase) |
@@ -68,7 +69,7 @@ Each rubric is loaded by `meow:rubric load <name>` or as part of a composition p
 | `pre-completion-check.sh` middleware | 7 | **Shipped 260408** — Stop hook hard gate, JSON block decision when no verification evidence |
 | `meow:trace-analyze` | 8 | **Shipped 260408** — `/meow:trace-analyze`, scatter-gather over `.claude/memory/trace-log.jsonl`, HITL gate mandatory |
 | `meow:benchmark` | 8 | **Shipped 260408** — `/meow:benchmark run [--full]`, quick tier 5 tasks ≤$5, full tier 6 tasks ≤$30 |
-| `conversation-summary-cache.sh` middleware | 9 | Draft |
+| `conversation-summary-cache.sh` middleware | 9 | **Shipped 260408** — dual-event hook (Stop summarizes via detached `nohup` `claude -p --model haiku` background worker, UserPromptSubmit injects cached summary as user-visible context). Throttled by size + event gap + growth delta. Cleared on session change by `project-context-loader.sh`. User-facing inspector: `/meow:summary`. Env-var configurable. |
 
 ## Maintenance
 

@@ -57,7 +57,28 @@ if [ -n "${HOOK_SESSION_ID:-}" ]; then
     echo '{}' > session-state/edit-counts.json 2>/dev/null || true
     echo '{}' > session-state/precompletion-attempts.json 2>/dev/null || true
     echo '{}' > session-state/build-verify-cache.json 2>/dev/null || true
+    rm -f session-state/conversation-summary.lock 2>/dev/null || true
     echo "$HOOK_SESSION_ID" > "$LAST_SESSION_FILE"
+
+    # Phase 9 (M2 fix): clear conversation-summary cache on new session.
+    # This is the correct home — SessionStart always runs (post-session.sh is
+    # gated by MEOW_HOOK_PROFILE and exits early in default `standard` profile).
+    SUMMARY_CACHE=".claude/memory/conversation-summary.md"
+    if [ -f "$SUMMARY_CACHE" ]; then
+      cat > "$SUMMARY_CACHE" << 'CLEAR_EOF'
+---
+session_id: ""
+last_updated: ""
+event_count: 0
+transcript_size_bytes: 0
+summaries: 0
+---
+
+# Conversation Summary
+
+(empty — populated by `.claude/hooks/conversation-summary-cache.sh` on Stop event when throttle thresholds are met)
+CLEAR_EOF
+    fi
   fi
 fi
 

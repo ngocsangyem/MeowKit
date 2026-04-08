@@ -131,6 +131,38 @@ Fix the product spec OR explicitly skip the contract via `MEOWKIT_HARNESS_MODE=L
 
 The harness reads `tasks/harness-runs/{run-id}/run.md` to find the last completed step and continues from there. Iteration counter is durable in the frontmatter; cost trail is in `cost-log.json`.
 
+## Token Savings (Phase 9 — Conversation Summary Cache)
+
+Long harness runs accumulate context fast. The `conversation-summary-cache.sh` hook keeps a Haiku-summarized snapshot of the running conversation at `.claude/memory/conversation-summary.md` and re-injects it on every new turn — instead of forcing the model to re-read the full transcript.
+
+**How it works:**
+
+- On `Stop` (turn complete) the hook checks throttle: transcript > 20KB AND (≥5 turns OR ≥5KB growth since last summary)
+- If throttled, it tails the last 500 transcript lines, pipes them through `claude -p --model haiku`, scrubs secrets, and atomically writes the cache
+- On `UserPromptSubmit` (next turn) it emits the cached summary as a `## Prior conversation summary` block (capped at 4KB) before the model sees the new prompt
+
+**Math (typical 50-turn harness session):**
+
+| Item | Without cache | With cache |
+|---|---|---|
+| Per-turn re-read of transcript | ~48 KB | ~4 KB (cached summary) |
+| Total context burn over 50 turns | ~2.4 MB | ~200 KB |
+| Summarization cost (Haiku, throttled) | $0 | ~$0.01–$0.02 |
+| Net token savings per long session | — | ~90% reduction in transcript replay |
+
+**Tuning:**
+
+```bash
+export MEOWKIT_SUMMARY_CACHE=off              # disable entirely
+export MEOWKIT_SUMMARY_THRESHOLD=40960         # raise to 40KB minimum transcript
+export MEOWKIT_SUMMARY_TURN_GAP=10             # summarize at most every 10 turns
+export MEOWKIT_SUMMARY_GROWTH_DELTA=10240      # require 10KB growth between summaries
+```
+
+**Inspecting the cache:** the cache is a plain markdown file. Open `.claude/memory/conversation-summary.md` at any time to see what the agent will inject on the next turn. Edit it manually if a summary went off-rails — the hook re-generates only when throttle triggers.
+
+**Graceful degradation:** if `claude` CLI is missing or summarization fails, the hook exits 0 silently and the session proceeds with full transcript re-reads. Zero blast radius.
+
 ## Limitations
 
 - **Cannot judge audio** — no audio analysis in the rubric library yet

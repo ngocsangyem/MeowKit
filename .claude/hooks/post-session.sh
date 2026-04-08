@@ -103,3 +103,8 @@ if [ -x "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" ]; then
 fi
 
 echo "Session data captured to .claude/memory/"
+
+# NOTE: Phase 9 conversation-summary cache clear lives in project-context-loader.sh
+# (SessionStart hook) — see M2 fix in red-team-260408-2202-phase-09-review.md.
+# Stop hook is the wrong home: standard|fast profile short-circuits at top of this
+# file, so the cache-clear branch was dead code. SessionStart always runs.

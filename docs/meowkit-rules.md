@@ -17,6 +17,7 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 | Harness runs            | `tasks/harness-runs/YYMMDD-HHMM-name/run.md`          | `runs/`, `harness/`                           |
 | Rubric library          | `.claude/rubrics/<name>.md`                           | `rubrics/`, `.claude/skills/meow:rubric/rubrics/` |
 | Memory files            | `.claude/memory/lessons.md`                           | `memory/lessons.md` (bare)                    |
+| Conversation summary    | `.claude/memory/conversation-summary.md`              | `memory/conversation-summary.md`, `summary.md` |
 | ADR files               | `docs/architecture/adr/YYMMDD-title.md`               | `docs/architecture/NNNN-title.md`             |
 | Session state           | `session-state/` (project root)                       | `.claude/session-state/`                      |
 | Skill references        | `.claude/skills/meow:*/references/*.md`               | `domain/file.md` (short form)                 |

@@ -123,7 +123,7 @@ This is slower than the automated path but works when the harness is broken.
 | LoopDetection middleware (Phase 7) | Agent doom-loops on same file | 2026-04 | TBD | Keep expected |
 | PreCompletion middleware (Phase 7) | Agent exits without verification | 2026-04 | TBD | Keep expected |
 | LocalContext middleware (Phase 7) | Agent lacks env awareness at session start | 2026-04 | TBD | Keep expected |
-| Conversation summary cache (Phase 9) | Repeated context replays waste tokens | 2026-04 | TBD (~$0.01/session, ~48KB/turn savings) | Keep expected |
+| Conversation summary cache (Phase 9) | Repeated context replays waste tokens | 2026-04 | Haiku latency: ~7s warm (~20-byte input, 3 runs avg 6.9s); 45–125s for 3–10KB transcript-tail inputs (measured 260408 on Apple Silicon Mac M-series). The 60–120s figure forced fire-and-forget bg-worker design (cannot block Stop hook). ~$0.01/session, ~48KB/turn savings. | Keep expected |
 
 ## Anti-Patterns
 

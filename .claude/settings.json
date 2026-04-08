@@ -113,6 +113,23 @@
             "type": "command",
             "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-session.sh\"",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/conversation-summary-cache.sh\"",
+            "timeout": 5,
+            "statusMessage": "Spawning background summary..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/conversation-summary-cache.sh\"",
+            "timeout": 2
           }
         ]
       }

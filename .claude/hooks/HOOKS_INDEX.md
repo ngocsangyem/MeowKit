@@ -23,9 +23,11 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 | `post-write-loop-detection.sh` | PostToolUse | Edit\|Write | **Phase 7 NEW.** Warn at N=4, escalate at N=8 edits to same file. Prevents doom loops. | 3s | `HOOK_FILE_PATH` + `HOOK_SESSION_ID` |
 | `cost-meter.sh` | PostToolUse | Bash | Track token cost accumulation | 5s | (none — reads cost log) |
 | `pre-completion-check.sh` | Stop | — | **Phase 7 NEW.** Block session stop if no verification evidence exists. Hard cap 3 re-entries. LEAN mode soft nudge. | 5s | (none — reads plan/contract/trace) |
-| `post-session.sh` | Stop | — | Capture session lessons + model-change detection + cost log initialization | 5s | (none — reads memory) |
+| `post-session.sh` | Stop | — | Capture session lessons + model-change detection + cost log initialization + Phase 9 conversation-summary cache clear on session change | 5s | (none — reads memory) |
+| `conversation-summary-cache.sh` | Stop | — | **Phase 9 NEW.** Spawns **background** worker that summarizes transcript via `claude -p --model haiku` (~60–120s wall) when throttle thresholds met. Hook itself returns instantly. Lock at `session-state/conversation-summary.lock`. Atomic write to `.claude/memory/conversation-summary.md`. | 5s | `HOOK_TRANSCRIPT_PATH` + `HOOK_SESSION_ID` |
+| `conversation-summary-cache.sh` | UserPromptSubmit | — | **Phase 9 NEW.** Inject cached summary as `## Prior conversation summary` block (capped 4KB). Skips on session_id mismatch. | 2s | `HOOK_SESSION_ID` |
 
-**Hook count:** 13 hook scripts in `.claude/hooks/` (12 registered in `.claude/settings.json` events + 1 `pre-implement.sh` invoked manually by the developer agent, not via event). The shared parser shim at `lib/read-hook-input.sh` is not a hook itself — it's a sourceable library.
+**Hook count:** 14 hook scripts in `.claude/hooks/` (13 registered in `.claude/settings.json` events + 1 `pre-implement.sh` invoked manually by the developer agent, not via event). The shared parser shim at `lib/read-hook-input.sh` and the secret scrubber at `lib/secret-scrub.sh` are not hooks themselves — they're sourceable libraries. Note: `conversation-summary-cache.sh` is a single script registered under TWO events (Stop + UserPromptSubmit), branching on `HOOK_EVENT_NAME`.
 
 ## Env Var Bypasses
 
@@ -37,6 +39,12 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 | `MEOWKIT_HARNESS_MODE=LEAN` | PreCompletion falls back to soft nudge; BuildVerify still runs |
 | `MEOWKIT_HARNESS_MODE=MINIMAL` | Skip BuildVerify + PreCompletion entirely |
 | `MEOW_HOOK_PROFILE=fast` | Skip pre-ship, post-session, learning-observer (speed) |
+| `MEOWKIT_SUMMARY_CACHE=off` | Skip conversation-summary-cache.sh (both Stop and UserPromptSubmit paths) |
+| `MEOWKIT_SUMMARY_THRESHOLD=N` | Override 20KB transcript threshold for summarization |
+| `MEOWKIT_SUMMARY_TURN_GAP=N` | Override 30-event minimum gap between summaries (variable kept for back-compat; semantic is JSONL events, ≈ 3–6 turns) |
+| `MEOWKIT_SUMMARY_GROWTH_DELTA=N` | Override 5KB growth-delta minimum between summaries |
+| `MEOWKIT_SUMMARY_BUDGET_SEC=N` | Background worker hard budget for `claude -p` (default 180s) |
+| `MEOWKIT_SUMMARY_DEBUG=1` | Verbose stderr from conversation-summary-cache.sh |
 
 ## State Files
 
@@ -50,6 +58,8 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 | `session-state/last-session-id` | project-context-loader.sh | (same) | Session change detection |
 | `session-state/learning-observer.jsonl` | learning-observer.sh | post-session.sh | Churn pattern log |
 | `session-state/active-plan` | meow:harness (Phase 5), meow:plan-creator | pre-completion-check.sh | Currently active plan slug |
+| `session-state/conversation-summary.lock` | conversation-summary-cache.sh (Stop bg worker) | conversation-summary-cache.sh next Stop (5min stale GC) | Mutex preventing overlapping background summarizers |
+| `.claude/memory/conversation-summary.md` | conversation-summary-cache.sh (Stop bg worker) | **Consumer 1:** conversation-summary-cache.sh (UserPromptSubmit) → emits to stdout → **Consumer 2: Claude Code context injection (the model itself)** for every meowkit agent. Cleared by project-context-loader.sh on session change. | Persistent conversation summary read by every turn |
 
 ## Hook Order Independence (Phase 7 P22)
 
