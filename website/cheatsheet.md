@@ -30,6 +30,13 @@ persona: B
 | `/meow:spawn [agent]` | any | Launch parallel agent session |
 | `/meow:upgrade` | any | Self-update MeowKit |
 | `/meow:help` | any | Scan project state, recommend next pipeline step |
+| `/meow:harness "build a X"` | 0→5 | Autonomous green-field build with generator/evaluator loop |
+| `/meow:evaluate` | 4 | Behavioral rubric grading with active verification |
+| `/meow:sprint-contract` | 3 | Draft contract before harness sprint |
+| `/meow:rubric` | 4 | Load/compose rubric preset |
+| `/meow:trace-analyze` | any | Scatter-gather analysis of trace log |
+| `/meow:benchmark` | any | Canary suite (quick tier default; `--full` for 6-task tier) |
+| `/meow:summary` | any | Inspect conversation-summary cache |
 
 ## Agents Quick Reference
 
@@ -119,6 +126,12 @@ persona: B
 | meow:party | "decide architecture" | Multi-agent decision brief |
 | meow:scale-routing | Phase 0 (automatic) | Domain complexity level |
 | meow:worktree | Parallel execution setup | Isolated git worktree |
+| meow:harness | "build a X from scratch" | Autonomous generator/evaluator build loop |
+| meow:evaluate | Harness Phase 4 | Rubric-graded behavioral verdict with evidence |
+| meow:sprint-contract | Harness FULL density | Acceptance criteria contract before sprint |
+| meow:rubric | Evaluator setup | Load/compose rubric preset |
+| meow:trace-analyze | Trace log available | Root cause analysis across trace spans |
+| meow:benchmark | Canary testing | Quick or full canary suite with scored output |
 
 ## Planning (Phase 1)
 
@@ -152,3 +165,12 @@ All three review skills stop after printing — you control when to run `/meow:c
 
 ### Non-trivial rule
 Create a task file for any change affecting > 2 files OR > 30 minutes.
+
+## Harness Env Vars
+
+| Variable | Values | Effect |
+|----------|--------|--------|
+| `MEOWKIT_HARNESS_MODE` | `MINIMAL` \| `FULL` \| `LEAN` | Override auto-detected scaffolding density |
+| `MEOWKIT_MODEL_HINT` | e.g. `opus-4-6` | Tell harness which model is running (enables LEAN auto-detect) |
+| `MEOWKIT_BUDGET_CAP` | e.g. `50` | Hard budget cap in USD for harness runs |
+| `MEOWKIT_SUMMARY_CACHE` | `off` | Disable conversation-summary cache |

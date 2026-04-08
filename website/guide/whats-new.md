@@ -10,6 +10,10 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### [v2.2.0 — Generator/Evaluator Harness](/guide/whats-new/v2.2.0) (2026-04-08)
+
+Autonomous multi-hour green-field build pipeline with adaptive density, middleware layer, trace-driven meta-loop, and Phase 9 conversation summary cache.
+
 ### [v1.4.0 — The Plan Intelligence Release](/guide/whats-new/v1.4.0) (2026-04-03)
 
 Dedicated plan red-team with CK-style adjudication, plan-specific personas, and new workflow modes.

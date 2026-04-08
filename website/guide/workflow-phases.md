@@ -114,6 +114,10 @@ No skill automatically chains into another. You decide the review depth.
 **Agent:** developer
 **Deliverable:** Passing implementation
 
+::: info Phase 3 pre-build contract substep (harness mode only)
+For `/meow:harness` runs in FULL density, the developer agent must read a signed `tasks/contracts/{date}-{slug}-sprint-N.md` BEFORE writing source code (enforced by `gate-enforcement.sh`). LEAN mode (Opus 4.6+) bypasses via `MEOWKIT_HARNESS_MODE=LEAN`. See [Harness Architecture](/guide/harness-architecture) and the [sprint-contract skill](/reference/skills/sprint-contract).
+:::
+
 - Implement until tests pass
 - `post-write.sh` hook: security scan on every file write
 - Self-heal: auto-fix failures up to 3 attempts

@@ -123,6 +123,48 @@ Recent versions:
   1.0.0
 ```
 
+## /meow:summary — Conversation Summary Cache Inspector
+
+User-facing inspector for the Phase 9 conversation summary cache.
+
+### Usage
+
+```bash
+/meow:summary              # show current cache
+/meow:summary --clear      # wipe cache and lock
+/meow:summary --status     # show throttle state
+```
+
+### What It Reads
+
+- `.claude/memory/conversation-summary.md` — cache file written by background Haiku summarizer on `Stop` hook event
+- `session-state/conversation-summary.lock` — mutex held while background worker runs
+
+### Behavior
+
+**Default (no flags):** Reads `.claude/memory/conversation-summary.md`. If frontmatter `session_id` is empty, prints "No summary cached for this session yet." Otherwise prints frontmatter (session_id, last_updated, event_count, transcript_size_bytes, summaries count) plus the markdown body.
+
+**`--clear`:** Overwrites cache with empty placeholder. Removes `session-state/conversation-summary.lock` if present. Next `Stop` crossing the throttle threshold regenerates the cache.
+
+**`--status`:** Reads transcript size and cache frontmatter. Computes and reports throttle conditions:
+- `THRESHOLD` = `${MEOWKIT_SUMMARY_THRESHOLD:-20480}` bytes
+- `EVENT_GAP` = `${MEOWKIT_SUMMARY_TURN_GAP:-30}` events
+- `GROWTH_DELTA` = `${MEOWKIT_SUMMARY_GROWTH_DELTA:-5120}` bytes
+
+Reports whether the next `Stop` will trigger a summary or skip, and whether the lock file exists (background worker still running).
+
+### Notes
+
+- Cache is per-session: `project-context-loader.sh` clears it automatically on new session start.
+- This command does not do any summarization — it only exposes the cache for inspection and management.
+- Opt-out: set `MEOWKIT_SUMMARY_CACHE=off` to disable both summarization and injection.
+
+### Related
+
+- Hook: `.claude/hooks/conversation-summary-cache.sh` (see [Hooks Reference](/reference/hooks))
+- Rule: [harness-rules Rule 11](/reference/rules-index#harness-rules)
+- Guide: [Middleware Layer](/guide/middleware-layer)
+
 ## status
 
 Print version, channel, and current config.

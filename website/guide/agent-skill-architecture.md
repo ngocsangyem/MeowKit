@@ -78,6 +78,7 @@ Phase 6: Reflect ─→ documenter loads: documentation, memory
 | tester | 2 | testing, lint-and-validate, qa, qa-manual, nyquist |
 | developer | 3 | development, typescript, vue, frontend-design, clean-code, docs-finder |
 | reviewer | 4 | review, elicit, scout, cso, vulnerability-scanner |
+| evaluator | 3, 4 | evaluate, rubric, trace-analyze, benchmark |
 | security | 2, 4 | cso, vulnerability-scanner, skill-template-secure |
 | shipper | 5 | ship, shipping, careful |
 | documenter | 6 | documentation, document-release, llms |
@@ -86,6 +87,10 @@ Phase 6: Reflect ─→ documenter loads: documentation, memory
 | journal-writer | 6 | memory |
 | ui-ux-designer | 3 | frontend-design, ui-design-system |
 | git-manager | 5, any | ship (git operations only) |
+
+::: info Evaluator agent (added v2.2.0)
+The `evaluator` is the behavioral counterpart to the structural `reviewer`. It grades running builds against weighted rubrics using active verification (driving the build via browser/curl/CLI). In harness pipelines (`meow:harness`), the generator (developer) and evaluator are hard-separated to prevent self-eval bias. See [Harness Architecture](/guide/harness-architecture) and the [evaluator agent reference](/reference/agents/evaluator).
+:::
 
 ## Skill Activation by Phase
 

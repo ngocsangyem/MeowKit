@@ -95,3 +95,107 @@ Hooks are registered in `.claude/settings.json`:
   }
 }
 ```
+
+## JSON-on-stdin Convention (260408 Migration)
+
+All meowkit hooks now read input as JSON on stdin (per [Claude Code hook docs](https://code.claude.com/docs/en/hooks)), parsed via the shared shim `lib/read-hook-input.sh`. The shim exports `HOOK_TOOL_NAME`, `HOOK_FILE_PATH`, `HOOK_COMMAND`, `HOOK_SESSION_ID`, `HOOK_EVENT_NAME`, `HOOK_TRANSCRIPT_PATH`, and other fields. Hooks also honor legacy `$1` positional args for back-compat — both forms coexist safely.
+
+Phase 7 of the harness plan migrated all 10 pre-existing hooks and added 4 new middleware hooks to this convention.
+
+## Shared Hook Libraries
+
+Sourceable libraries in `.claude/hooks/lib/` — not hooks themselves:
+
+- `lib/read-hook-input.sh` — JSON-on-stdin parser. Source with `. lib/read-hook-input.sh`; never execute directly. Requires Bash 3.2+. Falls back to system `python3` if venv unavailable. Gracefully degrades (empty vars + warning) if no Python found.
+- `lib/secret-scrub.sh` — shared secret redaction. Exports a `scrub_secrets()` function covering Anthropic/OpenAI/AWS/GH/GL/Slack/JWT/PEM patterns. Sourced by hooks that persist content (`conversation-summary-cache.sh`, `append-trace.sh`).
+
+## Middleware Hooks (Phase 7)
+
+### `post-write-build-verify.sh`
+
+Fires on **PostToolUse Edit|Write**. Classifies the written file by extension (`ts/tsx` → `tsc --noEmit|eslint`; `js` → `eslint`; `py` → `ruff check|mypy`; `go` → `go build ./...`; `rs` → `cargo check`; `rb` → `ruby -c|rubocop`). Errors emitted to stdout as `@@BUILD_VERIFY_ERROR@@ … @@END_BUILD_VERIFY@@` blocks (fed back to agent). Results cached by file content hash — unchanged files are skipped. Skips `node_modules/`, `vendor/`, `dist/`, `tasks/`, `docs/`, `.claude/`, test files, and map/lock files.
+
+- **Opt-out:** `MEOWKIT_BUILD_VERIFY=off`
+- **Timeout override:** `MEOWKIT_BUILD_VERIFY_TIMEOUT=N` (default 30s for TS; 35s hook registration timeout)
+- **Density:** runs in LEAN; skipped in MINIMAL (`MEOWKIT_HARNESS_MODE=MINIMAL`)
+- **Source:** `.claude/hooks/post-write-build-verify.sh`
+
+### `post-write-loop-detection.sh`
+
+Fires on **PostToolUse Edit|Write**. Counts per-file edits keyed `{session_id}:{realpath}` in `session-state/edit-counts.json`. Warns at N≥4 (`@@LOOP_DETECT_WARN@@`) and escalates at N≥8 (`@@LOOP_DETECT_ESCALATE@@`) — doom-loop prevention per LangChain harness research. Never blocks; messages are fed back via stdout.
+
+- **Opt-out:** `MEOWKIT_LOOP_DETECT=off`
+- **Timeout:** 3s
+- **Source:** `.claude/hooks/post-write-loop-detection.sh`
+
+### `pre-completion-check.sh`
+
+Fires on the **Stop** event (not SubagentStop). Hard gate: if no verification evidence exists (no evaluator verdict file, no signed sprint contract, no test-pass markers in the trace log), emits `{"decision":"block","reason":"…"}` JSON to block session close. 3-attempt re-entry guard per active plan slug via `session-state/precompletion-attempts.json`; after 3 attempts soft-nudges and allows stop to prevent infinite loop. LEAN density mode: soft nudge only. MINIMAL: skipped entirely.
+
+- **Opt-out:** `MEOWKIT_PRECOMPLETION=off`
+- **Density:** `MEOWKIT_HARNESS_MODE=LEAN` → soft nudge; `MEOWKIT_HARNESS_MODE=MINIMAL` → skip
+- **Timeout:** 5s
+- **Source:** `.claude/hooks/pre-completion-check.sh`
+
+## Conversation Summary Cache (Phase 9 — Dual-Event)
+
+### `conversation-summary-cache.sh`
+
+Registered under both **Stop** and **UserPromptSubmit**. Branches on `$HOOK_EVENT_NAME`.
+
+**Stop path:** checks throttle conditions (transcript size > `MEOWKIT_SUMMARY_THRESHOLD` AND event delta ≥ `MEOWKIT_SUMMARY_TURN_GAP` OR growth delta ≥ `MEOWKIT_SUMMARY_GROWTH_DELTA`). When conditions are met, spawns a detached `nohup bash worker &` + `disown` (fire-and-forget) that runs `claude -p --model haiku` on the tailed transcript (~60–120s wall time). The hook itself returns in <100ms — the agent is never blocked by Haiku latency. The worker scrubs secrets via `lib/secret-scrub.sh` and atomically writes `.claude/memory/conversation-summary.md`. Lock at `session-state/conversation-summary.lock` prevents overlapping workers (5-minute stale GC).
+
+**UserPromptSubmit path:** reads the cache file, verifies `session_id` match, and emits a `## Prior conversation summary\n{body}\n---\n` block capped at 4KB to stdout (injected into context by Claude Code). Skips on session ID mismatch.
+
+**Throttle defaults:**
+
+| Env var | Default | Semantic |
+|---------|---------|----------|
+| `MEOWKIT_SUMMARY_THRESHOLD` | `20480` (20KB) | Min transcript size in bytes |
+| `MEOWKIT_SUMMARY_TURN_GAP` | `30` | Min JSONL event delta between summaries (≈ 3–6 turns; "TURN_GAP" is a legacy name) |
+| `MEOWKIT_SUMMARY_GROWTH_DELTA` | `5120` (5KB) | Min transcript growth in bytes |
+| `MEOWKIT_SUMMARY_BUDGET_SEC` | `180` | Background worker hard budget for `claude -p` |
+
+**Consumer chain:** background worker → `.claude/memory/conversation-summary.md` → UserPromptSubmit hook → stdout → Claude Code context injection → every meowkit agent.
+
+**Cost:** ~$0.01–$0.02 per long session. Saves ~48KB/turn of full-transcript re-read.
+
+**User-facing inspector:** `/meow:summary` (see [CLI Commands](/cli/commands)).
+
+**Security:** summary is DATA per `injection-rules.md`. Output is secret-scrubbed before write. Prompt template forbids instruction-shaped content in the summary body.
+
+**Graceful degradation:** if `claude` CLI is missing or summarization fails, the hook exits 0 silently.
+
+- **Opt-out:** `MEOWKIT_SUMMARY_CACHE=off` (disables both Stop and UserPromptSubmit paths)
+- **Debug:** `MEOWKIT_SUMMARY_DEBUG=1` — verbose stderr
+- **Source:** `.claude/hooks/conversation-summary-cache.sh`
+
+## State Files Table
+
+| File | Writer | Purpose |
+|------|--------|---------|
+| `session-state/edit-counts.json` | `post-write-loop-detection.sh` | Per-file edit counter, keyed `{session_id}:{realpath}` |
+| `session-state/precompletion-attempts.json` | `pre-completion-check.sh` | Pre-completion re-entry guard per plan slug |
+| `session-state/build-verify-cache.json` | `post-write-build-verify.sh` | File-content-hash cache for skip-on-unchanged |
+| `session-state/conversation-summary.lock` | `conversation-summary-cache.sh` (Stop bg worker) | Phase 9 mutex preventing overlapping background summarizers |
+| `.claude/memory/conversation-summary.md` | `conversation-summary-cache.sh` (Stop bg worker) | Phase 9 cache — read by UserPromptSubmit hook every turn |
+| `session-state/learning-observer.jsonl` | `learning-observer.sh` | Churn pattern log |
+| `session-state/active-plan` | `meow:harness`, `meow:plan-creator` | Currently active plan slug (read by `pre-completion-check.sh`) |
+| `session-state/last-session-id` | `project-context-loader.sh` | Session change detection |
+
+## Env Var Bypasses
+
+| Var | Effect |
+|-----|--------|
+| `MEOWKIT_BUILD_VERIFY=off` | Skip `post-write-build-verify.sh` |
+| `MEOWKIT_LOOP_DETECT=off` | Skip `post-write-loop-detection.sh` |
+| `MEOWKIT_PRECOMPLETION=off` | Skip `pre-completion-check.sh` |
+| `MEOWKIT_HARNESS_MODE=LEAN` | PreCompletion falls back to soft nudge; BuildVerify still runs |
+| `MEOWKIT_HARNESS_MODE=MINIMAL` | Skip BuildVerify + PreCompletion entirely |
+| `MEOW_HOOK_PROFILE=fast` | Skip `pre-ship`, `post-session`, `learning-observer` (speed) |
+| `MEOWKIT_SUMMARY_CACHE=off` | Skip `conversation-summary-cache.sh` (both Stop and UserPromptSubmit) |
+| `MEOWKIT_SUMMARY_THRESHOLD=N` | Override 20KB transcript threshold for summarization |
+| `MEOWKIT_SUMMARY_TURN_GAP=N` | Override 30-event minimum gap between summaries |
+| `MEOWKIT_SUMMARY_GROWTH_DELTA=N` | Override 5KB growth-delta minimum between summaries |
+| `MEOWKIT_SUMMARY_BUDGET_SEC=N` | Background worker hard budget for `claude -p` (default 180s) |
+| `MEOWKIT_SUMMARY_DEBUG=1` | Verbose stderr from `conversation-summary-cache.sh` |

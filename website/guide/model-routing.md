@@ -86,6 +86,19 @@ Each workflow mode declares a **Planning Depth** — the number of researchers t
 
 `strict` and `architect` use competing approaches to surface trade-offs that single-researcher planning misses. The synthesis step resolves the competition into a single recommended path before Gate 1.
 
+## Adaptive Density (Harness Pipelines)
+
+When using `/meow:harness`, the scaffolding density (`MINIMAL` / `FULL` / `LEAN`) auto-adjusts based on model tier per the dead-weight thesis. Opus 4.6+ with auto-compaction degrades under full scaffolding; capable models need less ceremony, not more.
+
+| Tier | Model | Density |
+|------|-------|---------|
+| TRIVIAL | Haiku | MINIMAL — short-circuits to `meow:cook` |
+| STANDARD | Sonnet | FULL — contract + 1–3 iterations |
+| COMPLEX | Opus 4.5 | FULL — same as Sonnet |
+| COMPLEX | Opus 4.6+ | LEAN — single-session, contract optional |
+
+Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN`. Auto-detection requires `export MEOWKIT_MODEL_HINT=opus-4-6` — Claude Code does not export model env vars to hooks automatically. See [Adaptive Density](/guide/adaptive-density) for the full matrix.
+
 ## Agent default models
 
 | Agent | Default | Upgrades to Opus when |
