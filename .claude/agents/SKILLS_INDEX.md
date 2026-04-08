@@ -78,6 +78,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | `meow:review` | reviewer | review | **step-file** (4 steps) |
 | `meow:rubric` | evaluator | review | monolithic (v1.0.0: 7 rubrics + 4 composition presets at .claude/rubrics/, weighted graded grading with PASS/WARN/FAIL anchors and load/compose/validate scripts; frontend-app preset pruned to 4 distinctive rubrics in v2.0.0 per audit 260408) |
 | `meow:evaluate` | evaluator | review | **step-file** (v1.0.0: 5 steps — load-rubrics → boot-app → probe-criteria → grade-and-verdict → feedback-to-generator. Active-verification HARD GATE: validate-verdict.sh rejects PASS verdicts with empty evidence/. Skeptic persona enforced on every criterion grading.) |
+| `meow:sprint-contract` | developer (propose/amend) + evaluator (review) | planning | monolithic (v1.0.0, 130 lines: propose/review/amend/sign actions inline. Phase 4 file-based contract negotiation between generator and evaluator before source edits. Enforced by gate-enforcement.sh; bypassable via MEOWKIT_HARNESS_MODE=LEAN.) |
 | `meow:elicit` | reviewer | review | monolithic |
 
 ### Security (Phase 2, 4)
