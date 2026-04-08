@@ -1,6 +1,10 @@
 #!/bin/sh
 # cost-meter.sh — Track token usage per command.
-# Usage: cost-meter.sh <command> <estimated_tokens> <tier> [task_summary]
+# Registered: PostToolUse on Bash matcher.
+# Input: JSON on stdin (Phase 7 — parsed via lib/read-hook-input.sh if needed).
+# This hook does not currently consume tool input fields — it operates as a passive
+# session-cost accumulator and reads .claude/memory/cost-log.json directly.
+# When manual self-test is needed: bash cost-meter.sh </dev/null
 
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi

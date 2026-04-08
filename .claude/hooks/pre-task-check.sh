@@ -17,7 +17,12 @@ case "$MEOW_PROFILE" in
   fast) exit 0 ;;
 esac
 
-TASK="$1"
+# Phase 7 (260408): JSON-on-stdin parser; prefer $HOOK_COMMAND, fall back to $1.
+# (This hook is registered on Bash matcher; the "task" is the bash command text.)
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+fi
+TASK="${HOOK_COMMAND:-$1}"
 
 if [ -z "$TASK" ]; then
   echo "PASS — no task description provided, skipping injection check."

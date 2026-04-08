@@ -11,7 +11,11 @@ case "$MEOW_PROFILE" in
   fast) exit 0 ;;
 esac
 
-FILE="$1"
+# Phase 7 (260408): JSON-on-stdin parser; prefer $HOOK_FILE_PATH, fall back to $1.
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+fi
+FILE="${HOOK_FILE_PATH:-$1}"
 
 # Safety fallback: if no file path provided, skip (matches PreToolUse hooks behavior)
 if [ -z "$FILE" ]; then

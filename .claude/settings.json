@@ -10,7 +10,7 @@
           {
             "type": "command",
             "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/project-context-loader.sh\"",
-            "timeout": 5000,
+            "timeout": 5,
             "statusMessage": "Loading project context..."
           }
         ]
@@ -22,14 +22,14 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/gate-enforcement.sh\" \"$TOOL_INPUT_FILE_PATH\"",
-            "timeout": 10000,
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/gate-enforcement.sh\"",
+            "timeout": 10,
             "statusMessage": "Checking Gate 1 approval..."
           },
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\" \"$TOOL_INPUT_FILE_PATH\"",
-            "timeout": 5000,
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
+            "timeout": 5,
             "statusMessage": "Checking file access permissions..."
           }
         ]
@@ -39,8 +39,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\" \"$TOOL_INPUT_FILE_PATH\"",
-            "timeout": 5000,
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
+            "timeout": 5,
             "statusMessage": "Checking file access permissions..."
           }
         ]
@@ -50,13 +50,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-task-check.sh\" \"$TOOL_INPUT_COMMAND\"",
-            "timeout": 5000
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-task-check.sh\"",
+            "timeout": 5
           },
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-ship.sh\" \"$TOOL_INPUT_COMMAND\"",
-            "timeout": 30000,
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-ship.sh\"",
+            "timeout": 30,
             "statusMessage": "Running pre-ship validation..."
           }
         ]
@@ -68,14 +68,25 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-write.sh\" \"$TOOL_INPUT_FILE_PATH\"",
-            "timeout": 10000,
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-write.sh\"",
+            "timeout": 10,
             "statusMessage": "Security scanning written file..."
           },
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/learning-observer.sh\" \"$TOOL_INPUT_FILE_PATH\"",
-            "timeout": 5000
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/learning-observer.sh\"",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-write-build-verify.sh\"",
+            "timeout": 35,
+            "statusMessage": "Build-verify check..."
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-write-loop-detection.sh\"",
+            "timeout": 3
           }
         ]
       },
@@ -85,7 +96,7 @@
           {
             "type": "command",
             "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/cost-meter.sh\"",
-            "timeout": 5000
+            "timeout": 5
           }
         ]
       }
@@ -95,8 +106,13 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-completion-check.sh\"",
+            "timeout": 5
+          },
+          {
+            "type": "command",
             "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-session.sh\"",
-            "timeout": 5000
+            "timeout": 5
           }
         ]
       }

@@ -11,8 +11,10 @@ and ship production-ready code following the 7-phase workflow.
 
 ```
 Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test RED
-→ Phase 3 Build → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect
+→ Phase 3 Build [contract substep for harness] → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect
 ```
+
+**Phase 3 pre-build contract substep (harness):** for harness-driven sprint builds, the developer agent must read a signed `tasks/contracts/{date}-{slug}-sprint-N.md` BEFORE writing source code (enforced by `gate-enforcement.sh`). Bypass via `MEOWKIT_HARNESS_MODE=LEAN`. See `harness-rules.md` Rule 3 + `docs/harness-runbook.md`.
 
 **IMPORTANT:** Read `memory/lessons.md` before starting any task.
 **IMPORTANT:** Activate only skills needed for the current task domain.
@@ -20,6 +22,20 @@ Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test RED
 **IMPORTANT:** Non-trivial task (>2 files OR >30 min) = approved plan required before any code.
 **IMPORTANT:** For architectural trade-offs, use `/meow:party` for multi-agent deliberation before deciding.
 **IMPORTANT:** COMPLEX tasks with independent subtasks may use parallel execution (max 3 agents, worktree isolation).
+**IMPORTANT:** For green-field product builds ("build me a kanban app"), prefer `/meow:harness` over `/meow:cook`. Harness picks adaptive scaffolding density (MINIMAL/FULL/LEAN) per model tier.
+
+## Adaptive Density (Harness)
+
+For `/meow:harness` runs, the scaffolding density is auto-selected per model tier:
+
+| Tier | Model | Density | What runs |
+|---|---|---|---|
+| TRIVIAL | Haiku | MINIMAL | Short-circuits to `/meow:cook` |
+| STANDARD | Sonnet | FULL | Contract + 1–3 iterations + context resets |
+| COMPLEX | Opus 4.5 | FULL | Same as Sonnet |
+| COMPLEX | Opus 4.6+ | LEAN | Single-session, contract optional, 0–1 iterations |
+
+Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN` env var. Density does NOT bypass gates. **Auto-detection requires `export MEOWKIT_MODEL_HINT=opus-4-6`** (or your model id) — Claude Code does not export model env vars to hooks. Without the hint, Opus 4.6 users silently get FULL. See `docs/harness-runbook.md` §Troubleshooting; `docs/dead-weight-audit.md` for the recurring playbook on every model upgrade.
 
 ## Gates
 

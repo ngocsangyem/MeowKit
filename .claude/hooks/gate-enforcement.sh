@@ -19,9 +19,13 @@ if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 # Hook profile gating — safety-critical: NEVER skip regardless of profile
 MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
 
-# settings.json matcher already filters to Edit|Write — no need to check tool name
-# $1 = file path (positional convention preserved per meowkit-rules.md §3)
-FILE_PATH="$1"
+# Phase 7 migration: hooks now source the JSON-on-stdin parser shim and prefer
+# $HOOK_FILE_PATH from stdin. Falls back to $1 positional if stdin empty (back-compat).
+# settings.json may still pass "$TOOL_INPUT_FILE_PATH" as positional — harmless either way.
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+fi
+FILE_PATH="${HOOK_FILE_PATH:-$1}"
 
 # If no file path provided, allow (safety fallback)
 if [ -z "$FILE_PATH" ]; then

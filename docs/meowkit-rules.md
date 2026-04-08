@@ -32,7 +32,7 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 
 ### Valid subagent_type Values
 
-These are the ONLY valid names for MeowKit custom agents in Task() calls:
+These are the ONLY valid names for MeowKit custom agents in `Agent(...)` calls (or `Task(...)` — kept as a back-compat alias after the v2.1.63 rename per Claude Code docs):
 
 ```
 developer, tester, reviewer, planner, documenter, analyst,
@@ -67,30 +67,50 @@ Plus Claude Code built-in types: `Explore`, `Bash`, `general-purpose`, `Plan`
 
 Every hook in `.claude/hooks/` MUST be registered in `.claude/settings.json`. An unregistered hook is dead code — it never executes regardless of what the docs claim.
 
-### Argument Convention
+### Argument Convention (Phase 7 migration — 260408)
 
-Hooks registered in settings.json receive arguments via Claude Code environment variables:
+**Canonical convention (per `code.claude.com/docs/en/hooks`):** Claude Code passes hook input as a **JSON object on stdin**, not as positional args. Phase 7 of the harness plan migrated all meowkit hooks to consume stdin via a shared parser shim.
 
-| Matcher       | Argument Passed         | Hook Receives As      |
-| ------------- | ----------------------- | --------------------- |
-| `Edit\|Write` | `$TOOL_INPUT_FILE_PATH` | `$1` = file path      |
-| `Read`        | `$TOOL_INPUT_FILE_PATH` | `$1` = file path      |
-| `Bash`        | `$TOOL_INPUT_COMMAND`   | `$1` = command string |
+**Canonical parser:** `.claude/hooks/lib/read-hook-input.sh`. Every hook sources this at the top and consumes exported env vars:
 
-**Rule:** Hook scripts should use `FILE_PATH="$1"` directly. Do NOT write `TOOL_NAME="$1"; FILE_PATH="$2"` — the settings.json matcher already filters by tool name. The hook only receives the file path or command as `$1`.
+```bash
+#!/bin/bash
+# Source the parser shim (sets HOOK_* env vars from stdin JSON)
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+fi
+
+# Prefer the stdin-parsed value; fall back to $1 positional for back-compat
+FILE_PATH="${HOOK_FILE_PATH:-$1}"
+```
+
+**Exported env vars (from `lib/read-hook-input.sh`):**
+
+| Var | Source in JSON | When set |
+|---|---|---|
+| `HOOK_TOOL_NAME` | `tool_name` | All tool-use events |
+| `HOOK_FILE_PATH` | `tool_input.file_path` | Edit, Write, Read matchers |
+| `HOOK_COMMAND` | `tool_input.command` | Bash matcher |
+| `HOOK_SESSION_ID` | `session_id` | All events |
+| `HOOK_TOOL_USE_ID` | `tool_use_id` | Tool-use events |
+| `HOOK_CWD` | `cwd` | All events |
+| `HOOK_EVENT_NAME` | `hook_event_name` | All events |
+| `HOOK_TRANSCRIPT_PATH` | `transcript_path` | All events |
+
+**Back-compat fallback:** hooks also read `$1` as a fallback so they work in both the old `"$TOOL_INPUT_FILE_PATH"` positional convention (if Claude Code's settings.json parser expands it) AND the canonical stdin convention. If stdin parsing returns empty, `$1` is used. Both conventions coexist safely.
 
 ### Performance Rule
 
 **Source:** B11-C3
 
-Never register expensive hooks (test suites, builds) on broad matchers like `Bash`. Gate them:
+Never register expensive hooks (test suites, builds) on broad matchers like `Bash`. Gate them by inspecting the input early and exiting 0 for non-matching cases:
 
 ```bash
-# WRONG: runs npm test on every bash command
-"matcher": "Bash", "command": "sh pre-ship.sh"
+. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+COMMAND="${HOOK_COMMAND:-$1}"
 
-# RIGHT: check if command is git commit/push before running tests
-case "$1" in
+# Only run on git commit/push commands
+case "$COMMAND" in
   *"git commit"*|*"git push"*) ;; # run checks
   *) exit 0 ;; # skip
 esac

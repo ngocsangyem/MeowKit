@@ -69,4 +69,30 @@ if [ ! -f "$MEMORY_DIR/cost-log.json" ]; then
   echo "[]" > "$MEMORY_DIR/cost-log.json"
 fi
 
+# Phase 6 extension (260408): detect model version change → flag dead-weight audit needed.
+# Reads the current model id from the most recent CLAUDE_MODEL / ANTHROPIC_MODEL env var
+# and compares against last session's recorded value at .claude/memory/last-model-id.txt.
+# On change, appends `dead-weight-audit-needed` to lessons.md so Phase 0 surfaces it.
+LAST_MODEL_FILE="$MEMORY_DIR/last-model-id.txt"
+CURRENT_MODEL="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-unknown}}}"
+
+if [ ! -f "$LAST_MODEL_FILE" ]; then
+  # First run: write current model + exit (no comparison yet)
+  echo "$CURRENT_MODEL" > "$LAST_MODEL_FILE"
+elif [ "$CURRENT_MODEL" != "unknown" ]; then
+  LAST_MODEL=$(cat "$LAST_MODEL_FILE" 2>/dev/null || echo "unknown")
+  if [ "$CURRENT_MODEL" != "$LAST_MODEL" ] && [ "$LAST_MODEL" != "unknown" ]; then
+    cat >> "$MEMORY_DIR/lessons.md" << EOF
+
+## Session $TIMESTAMP — dead-weight-audit-needed
+- Reason: model version changed from "$LAST_MODEL" to "$CURRENT_MODEL"
+- Action: run dead-weight audit per docs/dead-weight-audit.md
+- Status: uncaptured
+EOF
+    echo "Dead-weight audit flagged: model changed $LAST_MODEL → $CURRENT_MODEL" >&2
+  fi
+  # Always update the recorded model for next comparison
+  echo "$CURRENT_MODEL" > "$LAST_MODEL_FILE"
+fi
+
 echo "Session data captured to .claude/memory/"

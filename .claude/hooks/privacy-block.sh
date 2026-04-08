@@ -15,9 +15,11 @@ if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 # Hook profile gating — safety-critical: NEVER skip regardless of profile
 MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
 
-# settings.json matcher already filters to Read, Edit|Write — no need to check tool name
-# $1 = file path passed via $TOOL_INPUT_FILE_PATH
-FILE_PATH="$1"
+# Phase 7 (260408): source JSON-on-stdin parser; prefer $HOOK_FILE_PATH, fall back to $1.
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+fi
+FILE_PATH="${HOOK_FILE_PATH:-$1}"
 
 # If no file path provided, allow (safety fallback)
 if [ -z "$FILE_PATH" ]; then

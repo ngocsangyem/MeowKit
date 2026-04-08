@@ -13,7 +13,11 @@ case "$MEOW_PROFILE" in
   fast) exit 0 ;;
 esac
 
-COMMAND="$1"
+# Phase 7 (260408): JSON-on-stdin parser; prefer $HOOK_COMMAND, fall back to $1.
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+fi
+COMMAND="${HOOK_COMMAND:-$1}"
 
 # Only run pre-ship checks on git commit or push commands
 case "$COMMAND" in
