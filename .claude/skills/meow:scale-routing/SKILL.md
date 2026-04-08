@@ -92,6 +92,27 @@ New fields (v2.0):
 | `confidence` | HIGH, MEDIUM, LOW | Routing confidence from Layer 3 scoring |
 | `product_area` | string | Area name from `.claude/product-areas.yaml` (omitted if no YAML) |
 
+New fields (v2.1 — Phase 5 of harness plan, 260408):
+
+| Field | Values | Description |
+|---|---|---|
+| `harness_density` | `MINIMAL`, `FULL`, `LEAN` | Recommended scaffolding density for `meow:harness` runs (see Adaptive Density Policy below) |
+
+### Harness Density Selection (v2.1)
+
+Used by `meow:harness` to choose how much scaffolding to apply per run. The decision rules:
+
+| `level` (model_tier) | model id contains | `harness_density` |
+|---|---|---|
+| low (TRIVIAL/Haiku) | any | `MINIMAL` |
+| medium (STANDARD/Sonnet) | any | `FULL` |
+| high (COMPLEX/Opus) | `opus-4-6` or `opus-4.6` or `opus-4-7` | `LEAN` |
+| high (COMPLEX/Opus) | other (e.g., `opus-4-5`, `claude-opus-4`) | `FULL` |
+
+**Override:** `MEOWKIT_HARNESS_MODE=MINIMAL\|FULL\|LEAN` env var, when set, overrides the auto-detected value. The override is logged in the harness run report for audit.
+
+For scriptable density selection, callers may invoke `.claude/skills/meow:harness/scripts/density-select.sh` which echoes only the density token to stdout.
+
 ## Data File
 
 - `data/domain-complexity.csv` — Domain → complexity → workflow mapping

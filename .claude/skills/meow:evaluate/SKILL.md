@@ -16,7 +16,7 @@ allowed-tools:
   - Write
   - Grep
   - Glob
-  - Agent
+  - Task
   - AskUserQuestion
 source: meowkit
 ---

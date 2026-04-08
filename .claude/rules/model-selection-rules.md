@@ -62,3 +62,11 @@ inconsistencies between the planning and implementation phases.
 When `meow:scale-routing` returns a domain match with `level=high`, the model tier MUST be COMPLEX (best available) regardless of any other signal — including manual classification.
 
 WHY: High-complexity domains (fintech, healthcare, IoT, gaming) have regulatory, security, and architectural requirements that cheaper models handle poorly. The cost of using a weaker model on a security-critical task vastly exceeds the token savings. See `rules/scale-adaptive-rules.md` and `meow:scale-routing/data/domain-complexity.csv` for the domain mapping.
+
+### Rule 5: Harness Density Follows Tier (Phase 5 — 260408)
+
+For `meow:harness` runs, the model tier auto-selects a scaffolding density (`MINIMAL | FULL | LEAN`).
+
+**Single source of truth:** the full decision matrix and rationale live at `.claude/skills/meow:harness/references/adaptive-density-matrix.md`. See also `scale-adaptive-rules.md` Rule 6.
+
+WHY: Capable models (Opus 4.6+ with auto-compaction + 1M context) need less scaffolding per Anthropic's "dead-weight thesis." Forcing full harness on Opus 4.6 **degrades** output.

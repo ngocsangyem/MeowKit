@@ -12,6 +12,10 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 | ----------------------- | ----------------------------------------------------- | --------------------------------------------- |
 | Plan files              | `tasks/plans/YYMMDD-name/plan.md`                     | `tasks/plans/YYMMDD-name.md` (flat), `plans/` |
 | Review verdicts         | `tasks/reviews/YYMMDD-name-verdict.md`                | `reviews/`, `tasks/plans/.../reports/`        |
+| Sprint contracts        | `tasks/contracts/YYMMDD-HHMM-name-sprint-N.md`        | `contracts/`, `tasks/plans/.../contracts/`    |
+| Evaluator verdicts      | `tasks/reviews/YYMMDD-name-evalverdict.md`            | `evalverdicts/`, separate from review verdict |
+| Harness runs            | `tasks/harness-runs/YYMMDD-HHMM-name/run.md`          | `runs/`, `harness/`                           |
+| Rubric library          | `.claude/rubrics/<name>.md`                           | `rubrics/`, `.claude/skills/meow:rubric/rubrics/` |
 | Memory files            | `.claude/memory/lessons.md`                           | `memory/lessons.md` (bare)                    |
 | ADR files               | `docs/architecture/adr/YYMMDD-title.md`               | `docs/architecture/NNNN-title.md`             |
 | Session state           | `session-state/` (project root)                       | `.claude/session-state/`                      |

@@ -37,3 +37,15 @@ GUARD: Both conditions must be true (CSV says one-shot AND zero blast radius). I
 The `domain-complexity.csv` file is user-editable. Teams should add rows for their project's specific domains and conventions.
 
 WHY: No framework can anticipate every domain. Extensibility ensures the routing stays relevant as projects evolve. The CSV is the mechanism for project-specific intelligence.
+
+## Rule 6: Adaptive Density Emission (Phase 5 — 260408)
+
+When `meow:scale-routing` returns a tier classification, it ALSO emits a `harness_density` field (`MINIMAL | FULL | LEAN`) for `meow:harness` consumers.
+
+**Single source of truth:** the full decision matrix lives at `.claude/skills/meow:harness/references/adaptive-density-matrix.md`. Do NOT duplicate the table here — it drifts. This rule references the matrix; the matrix is authoritative.
+
+WHY: Capable models (Opus 4.6+ with auto-compaction + 1M context) **degrade** when forced through full harness scaffolding — Anthropic's measured "dead-weight thesis" finding. The density policy operationalizes this.
+
+Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN` env var overrides auto-detection. Logged in the harness run report.
+
+GUARD: Density choice does NOT bypass any gate. Gate 1 (plan), Gate 2 (review verdict), and the active-verification HARD GATE on evaluator verdicts ALL still apply regardless of density mode.
