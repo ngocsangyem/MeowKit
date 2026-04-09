@@ -30,6 +30,7 @@ Env vars:
 import json
 import os
 import tempfile
+import urllib.request
 import urllib.robotparser
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -155,7 +156,6 @@ def _fetch_robots_txt(scheme: str, host: str) -> str | None:
         # Extract the raw text by re-fetching — robotparser doesn't expose it directly.
         # We only need a small string to store; reconstruct minimal representation.
         # Use urllib directly for the raw text.
-        import urllib.request
         req = urllib.request.Request(
             robots_url,
             headers={"User-Agent": MEOWKIT_UA},
