@@ -58,6 +58,12 @@
             "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-ship.sh\"",
             "timeout": 30,
             "statusMessage": "Running pre-ship validation..."
+          },
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
+            "timeout": 5,
+            "statusMessage": "Checking web fetch targets..."
           }
         ]
       }

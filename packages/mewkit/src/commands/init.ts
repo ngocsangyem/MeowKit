@@ -230,15 +230,11 @@ export async function init(args: InitArgs): Promise<void> {
     }
 
     // Step 7: System dependencies (optional, skipped on dry-run)
+    // Flat list from registry — no per-skill ownership shown (locked decision #4).
+    // Each dep rendered as: [ ] Name (~NMB) — all unchecked by default.
     if (!dryRun) {
       console.log(`\n${pc.bold("? Phase 2: System dependencies")} ${pc.dim("(optional)")}`);
-      console.log(pc.dim("\n  MeowKit works better with these system tools:\n"));
-      console.log(`  ${pc.cyan("•")} FFmpeg — video frame extraction, image/audio compression`);
-      console.log(`    ${pc.dim("Used by: meow:multimodal, meow:intake (media preprocessing)")}`);
-      console.log(`  ${pc.cyan("•")} ImageMagick — image resize, format conversion`);
-      console.log(`    ${pc.dim("Used by: meow:multimodal (image optimization)")}\n`);
-
-      await promptAndInstallSystemDeps();
+      await promptAndInstallSystemDeps(targetDir);
     }
 
     // Step 8: Skills dependencies (if user opted in during config)

@@ -80,6 +80,43 @@ Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN`. Density never bypasses gates
 - Run `/meow:summary --status` after your first long session to verify the conversation cache is healthy
 - Read the Harness Architecture guide before your first harness run — the generator/evaluator split is non-obvious and the iteration loop has a 3-round cap before human escalation
 
+### meow:web-to-markdown skill (added 2026-04-09)
+
+New skill for fetching arbitrary URLs as clean markdown. Slots in below `meow:docs-finder` (Context7/chub/WebSearch) as the **tier-4 fallback** for blog posts, RFCs, GitHub issues, and vendor pages not in any curated index. Built with security defenses suitable for entering untrusted external content into the agent context.
+
+#### New Skill
+
+- **meow:web-to-markdown** — static-by-default URL → clean markdown with SSRF guard, 6-pass injection scanner, DATA boundary wrap, fetch persistence with manifest, robots.txt cache, per-domain throttle, honest User-Agent. Optional Playwright via opt-in three-layer gate. Vendored Lasso Security injection patterns (MIT, commit `8fbfd14c`).
+
+#### mewkit CLI
+
+- **Schema-driven `system-deps` registry** (`packages/mewkit/src/lib/system-deps-registry.ts`) — refactored hardcoded ffmpeg/imagemagick install paths into a typed registry with allowlist enforcement. Skills declare `optional_system_deps` in their SKILL.md HTML comment; CLI parses and validates against the registry. Unknown keys → rejected. **No skill can pip-install arbitrary packages.**
+- **`detectCommands: string[]`** — new optional field for multi-binary detection (e.g. ImageMagick 7+ uses `magick`, older uses `convert`). Generalized from a hardcoded special case.
+- **`mewkit doctor`** — generic registry loop replaces hardcoded checks. Playwright entry has a dedicated two-probe `doctorCheck` (import + `playwright install --dry-run chromium` → reports `OK / MISSING_PACKAGE / MISSING_BINARY`).
+- **`mewkit init` + `setup --system-deps`** — flat list prompt; FFmpeg / ImageMagick / Playwright + Chromium iterated from registry insertion order, default unchecked.
+
+#### docs-finder integration
+
+- **Tier-4 fallback** — `meow:docs-finder` invokes web-to-markdown after Context7 / chub / WebSearch all return empty or off-target results
+- **`--wtm-approve` flag** — promotes web-to-markdown to **tier-1** (skips other tiers entirely; for known-untrusted-but-needed URLs)
+- **`--wtm-accept-risk` cross-skill delegation gate** — mandatory flag for any skill delegating a fetch. Without it, the call falls back to curated sources
+
+#### Hook fix (framework-wide impact)
+
+- **`privacy-block.sh` exit code corrected** — was using `exit 1` (non-blocking per Claude Code hooks docs). Changed to `exit 2` so the hook actually blocks. Block messages moved stdout → stderr (Claude Code feeds stderr to model on exit 2). **NOTE:** Other meowkit hooks (`gate-enforcement.sh`, `pre-task-check.sh`, `pre-ship.sh`) likely have the same `exit 1` pattern — escalated as separate audit work.
+
+#### Vendored dependency
+
+- **Lasso Security claude-hooks** vendored at commit `8fbfd14c2a2271fe58a95c416b3b31880458c7bc` into `docs/lasso-claude-hooks-vendor/` (MIT). Pattern set extracted into `meow:web-to-markdown/scripts/injection_patterns.py` with citation header. No runtime network dependency on the upstream repo.
+
+#### Deferred to v2.2.0 follow-up
+
+- **Programmatic `--approve` injection-bypass flag** — currently no programmatic recovery from injection HARD_STOP; manual user inspection of `.quarantined` file is the only path. Per-call `--approve` flag (with audit trail) deferred.
+- DNS TOCTOU / rebinding mitigation (single-resolve-by-IP)
+- PSL-based eTLD+1 redirect check
+- Auto-cleanup TTL for `.claude/cache/web-fetches/`
+- File-size modularization for files exceeding 200L (setup.ts 444L, doctor.ts 384L, fetch_as_markdown.py 415L)
+
 ## 2.1.0 (2026-04-04)
 
 Custom statusline, dependency management, SEO, and mewkit CLI improvements.

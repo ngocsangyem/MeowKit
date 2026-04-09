@@ -5,6 +5,7 @@ import pc from "picocolors";
 import { commandExists } from "./setup.js";
 import { getRequirementsSource } from "../core/skills-dependencies.js";
 import { verifyPackages } from "../core/dependency-installer.js";
+import { listDeps, isDepCommandPresent, type DoctorContext } from "../lib/system-deps-registry.js";
 
 type Status = "pass" | "fail" | "warn";
 
@@ -234,46 +235,87 @@ function checkConfig(root: string | null): DiagResult {
   }
 }
 
-function checkFFmpeg(): DiagResult {
-  if (!commandExists("ffmpeg")) {
-    return {
-      name: "FFmpeg (optional)",
-      status: "warn",
-      detail: "Not installed — video/audio processing unavailable",
-      fix: "brew install ffmpeg (macOS) or npx mewkit setup --system-deps",
-    };
-  }
-  try {
-    const output = execSync("ffmpeg -version", { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
-    const match = output.match(/ffmpeg version (\S+)/);
-    const version = match ? match[1] : "unknown";
-    return { name: "FFmpeg (optional)", status: "pass", detail: `v${version} — video/audio processing available` };
-  } catch {
-    return { name: "FFmpeg (optional)", status: "pass", detail: "Installed — video/audio processing available" };
-  }
-}
+/**
+ * Run system dep checks from the registry.
+ * For each entry: if it has a dedicated doctorCheck, call that.
+ * Otherwise, run detectCommand and check exit code.
+ * Zero behavior change for ffmpeg/imagemagick — same pass/warn/fail semantics.
+ * Playwright gets its dedicated two-probe check (locked decision #3).
+ */
+async function checkSystemDeps(root: string | null): Promise<DiagResult[]> {
+  const ctx: DoctorContext = { projectRoot: root ?? process.cwd() };
+  const results: DiagResult[] = [];
 
-function checkImageMagick(): DiagResult {
-  const hasConvert = commandExists("convert");
-  const hasMagick = commandExists("magick");
+  for (const dep of listDeps()) {
+    if (dep.doctorCheck) {
+      // Dedicated check (e.g. Playwright: verifies pip package + chromium binary)
+      try {
+        const result = await dep.doctorCheck(ctx);
+        if (result.status === "OK") {
+          results.push({
+            name: `${dep.name} (optional)`,
+            status: "pass",
+            detail: `${dep.name} installed and ready`,
+          });
+        } else {
+          results.push({
+            name: `${dep.name} (optional)`,
+            status: "warn",
+            detail: result.message ?? `${dep.name} not ready — ${result.status}`,
+            fix: `npx mewkit setup --system-deps`,
+          });
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        results.push({
+          name: `${dep.name} (optional)`,
+          status: "warn",
+          detail: `Check failed: ${msg}`,
+          fix: `npx mewkit setup --system-deps`,
+        });
+      }
+    } else {
+      // Generic PATH-based check — uses detectCommands (multi-probe) when set,
+      // falling back to single detectCommand. No per-dep special-cases needed.
+      const present = isDepCommandPresent(dep, commandExists);
 
-  if (!hasConvert && !hasMagick) {
-    return {
-      name: "ImageMagick (optional)",
-      status: "warn",
-      detail: "Not installed — image processing unavailable",
-      fix: "brew install imagemagick (macOS) or npx mewkit setup --system-deps",
-    };
+      if (!present) {
+        results.push({
+          name: `${dep.name} (optional)`,
+          status: "warn",
+          detail: `Not installed — ${dep.name.toLowerCase()} processing unavailable`,
+          fix: `npx mewkit setup --system-deps`,
+        });
+        continue;
+      }
+
+      // Attempt to get version string for a nicer pass message.
+      // For multi-binary deps (detectCommands), use the first probe that succeeds.
+      try {
+        const probes = dep.detectCommands ?? [dep.detectCommand];
+        const availableCmd = probes.find((cmd) => commandExists(cmd)) ?? dep.detectCommand;
+        const versionFlag = dep.key === "imagemagick" ? "--version" : "-version";
+        const output = execSync(`${availableCmd} ${versionFlag}`, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+        const match = dep.key === "imagemagick"
+          ? output.match(/ImageMagick (\S+)/)
+          : output.match(/version (\S+)/);
+        const version = match ? match[1] : "unknown";
+        results.push({
+          name: `${dep.name} (optional)`,
+          status: "pass",
+          detail: `v${version} — available`,
+        });
+      } catch {
+        results.push({
+          name: `${dep.name} (optional)`,
+          status: "pass",
+          detail: `Installed — available`,
+        });
+      }
+    }
   }
-  try {
-    const cmd = hasMagick ? "magick --version" : "convert --version";
-    const output = execSync(cmd, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
-    const match = output.match(/ImageMagick (\S+)/);
-    const version = match ? match[1] : "unknown";
-    return { name: "ImageMagick (optional)", status: "pass", detail: `v${version} — image processing available` };
-  } catch {
-    return { name: "ImageMagick (optional)", status: "pass", detail: "Installed — image processing available" };
-  }
+
+  return results;
 }
 
 export async function doctor(args?: { report?: boolean }): Promise<void> {
@@ -284,6 +326,8 @@ export async function doctor(args?: { report?: boolean }): Promise<void> {
   if (root) {
     console.log(`  ${pc.dim("Project:")} ${root}\n`);
   }
+
+  const systemDepResults = await checkSystemDeps(root);
 
   const results: DiagResult[] = [
     checkNodeVersion(),
@@ -297,8 +341,7 @@ export async function doctor(args?: { report?: boolean }): Promise<void> {
     checkMcp(root),
     checkVenv(root),
     checkPipPackages(root),
-    checkFFmpeg(),
-    checkImageMagick(),
+    ...systemDepResults,
   ];
 
   for (const r of results) {

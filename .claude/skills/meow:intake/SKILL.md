@@ -123,6 +123,20 @@ Summary structure:
 - Bug ticket → `meow:fix` (targeted fix workflow)
 - Security concern → `meow:cso` (security review)
 
+## Delegation: `meow:web-to-markdown`
+
+When intake processing requires fetching an arbitrary external URL (e.g. a linked spec, a
+vendor changelog, a referenced external document), this skill delegates to
+`meow:web-to-markdown` via the `--wtm-accept-risk` flag.
+
+- **Without `--wtm-accept-risk`:** `meow:web-to-markdown` refuses cross-skill delegation.
+  External URL resolution falls back to Context7 / chub / WebSearch only.
+- **With `--wtm-accept-risk`:** delegation proceeds through all security layers
+  (SSRF guard, injection scanner, DATA boundary, secret scrub). The flag is a conscious
+  trust-boundary crossing — the caller acknowledges the target URL may contain prompt
+  injection and that the skill's defenses are best-effort.
+- Delegation example: `.claude/skills/.venv/bin/python3 .claude/skills/meow:web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller meow:intake`
+
 ## References
 
 - `references/completeness-checklist.md` — 8-dimension scoring

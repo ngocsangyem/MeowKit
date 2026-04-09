@@ -114,3 +114,17 @@ The researcher is a support agent. It does not produce plan files, review verdic
 - Must NOT violate MeowKit security rules (see `.claude/rules/security-rules.md`).
 
 Update your agent memory with research findings, useful sources, and technology evaluations. This avoids re-researching the same topics across sessions.
+
+## Delegation: `meow:web-to-markdown`
+
+When research requires fetching an arbitrary external URL not covered by `meow:docs-finder`
+(Context7 / chub / WebSearch), delegate to `meow:web-to-markdown` via `--wtm-accept-risk`.
+
+- **Without `--wtm-accept-risk`:** `meow:web-to-markdown` refuses cross-skill delegation.
+  External URL resolution falls back to docs-finder tiers only.
+- **With `--wtm-accept-risk`:** delegation proceeds through all security layers
+  (SSRF guard, injection scanner, DATA boundary, secret scrub). The flag is a conscious
+  trust-boundary crossing — the caller acknowledges the target URL may contain prompt
+  injection and that the skill's defenses are best-effort.
+- Delegation example: `.claude/skills/.venv/bin/python3 .claude/skills/meow:web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller researcher`
+- Prefer `meow:docs-finder --wtm-approve <url>` for documentation URLs — it adds tier routing on top of the same fetch.

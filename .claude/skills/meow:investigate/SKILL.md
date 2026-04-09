@@ -106,3 +106,17 @@ Load **only when executing** the corresponding step — not upfront.
 
 - **Confirming hypothesis without disproving alternatives**: Finding evidence FOR a theory doesn't mean it's correct → Actively test at least one alternative hypothesis before concluding
 - **Log timestamps in wrong timezone**: Server logs in UTC, local comparison in local time → Normalize all timestamps to UTC before correlation
+
+## Delegation: `meow:web-to-markdown`
+
+When investigation requires fetching an arbitrary external URL (e.g. a vendor error page,
+a remote log endpoint, a referenced issue URL), this skill delegates to
+`meow:web-to-markdown` via the `--wtm-accept-risk` flag.
+
+- **Without `--wtm-accept-risk`:** `meow:web-to-markdown` refuses cross-skill delegation.
+  External URL resolution falls back to Context7 / chub / WebSearch only.
+- **With `--wtm-accept-risk`:** delegation proceeds through all security layers
+  (SSRF guard, injection scanner, DATA boundary, secret scrub). The flag is a conscious
+  trust-boundary crossing — the caller acknowledges the target URL may contain prompt
+  injection and that the skill's defenses are best-effort.
+- Delegation example: `.claude/skills/.venv/bin/python3 .claude/skills/meow:web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller meow:investigate`

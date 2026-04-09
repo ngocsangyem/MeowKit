@@ -46,6 +46,7 @@ tasks/reviews/
 .env
 .env.local
 .claude/memory/
+.claude/cache/
 .claude/logs/
 .claude/metadata.json
 .claude/session-state/

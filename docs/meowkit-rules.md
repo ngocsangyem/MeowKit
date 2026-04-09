@@ -18,6 +18,9 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 | Rubric library          | `.claude/rubrics/<name>.md`                           | `rubrics/`, `.claude/skills/meow:rubric/rubrics/` |
 | Memory files            | `.claude/memory/lessons.md`                           | `memory/lessons.md` (bare)                    |
 | Conversation summary    | `.claude/memory/conversation-summary.md`              | `memory/conversation-summary.md`, `summary.md` |
+| Web fetch cache         | `.claude/cache/web-fetches/{YYMMDD}-{HHMMSS}-{host}-{sha256-path[:10]}.md` | `.claude/memory/web-fetches/` (memory is for learnings, not caches) |
+| Web fetch manifest      | `.claude/cache/web-fetches/index.jsonl` (append-only) | `.claude/memory/web-fetches/index.jsonl`       |
+| Web fetch quarantine    | `.claude/cache/web-fetches/quarantine/{sha256}.quarantined` | `.claude/memory/quarantine/`, `quarantine/`  |
 | ADR files               | `docs/architecture/adr/YYMMDD-title.md`               | `docs/architecture/NNNN-title.md`             |
 | Session state           | `session-state/` (project root)                       | `.claude/session-state/`                      |
 | Skill references        | `.claude/skills/meow:*/references/*.md`               | `domain/file.md` (short form)                 |

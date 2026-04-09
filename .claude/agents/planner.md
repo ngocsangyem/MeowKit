@@ -130,6 +130,19 @@ Use the template at `tasks/templates/bead-template.md`.
 
 **When NOT to use beads:** TRIVIAL/STANDARD tasks, tasks touching <5 files, or when the work is naturally sequential and can't be meaningfully decomposed.
 
+## Delegation: `meow:web-to-markdown`
+
+When planning requires fetching an arbitrary external URL (e.g. a referenced spec, a
+vendor API page, an external RFC) not available via `meow:docs-finder`, delegate to
+`meow:web-to-markdown` via `--wtm-accept-risk`.
+
+- **Without `--wtm-accept-risk`:** `meow:web-to-markdown` refuses cross-skill delegation.
+  External URL resolution falls back to Context7 / chub / WebSearch only.
+- **With `--wtm-accept-risk`:** delegation proceeds through all security layers. The flag is
+  a conscious trust-boundary crossing — the caller acknowledges the target URL may contain
+  prompt injection and that the skill's defenses are best-effort.
+- Delegation example: `.claude/skills/.venv/bin/python3 .claude/skills/meow:web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller planner`
+
 ## What You Do NOT Do
 
 - You do NOT write implementation code, test code, or configuration files.
