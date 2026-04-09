@@ -102,10 +102,17 @@ _ROT13_KEYWORDS = re.compile(
 # Zero-width + invisible chars
 _ZERO_WIDTH = re.compile(r"[\u200B\u200C\u200D\uFEFF\u00AD\u2060\u180E]")
 
-# Cyrillic homoglyphs (>=3 consecutive)
-_CYRILLIC_HOMOGLYPH = re.compile(r"[\u0430\u0435\u043E\u0440\u0441\u0443\u0445\u0456]{3,}")
-# Greek homoglyphs (>=2 consecutive)
-_GREEK_HOMOGLYPH = re.compile(r"[\u03B1\u03B5\u03BF\u03C1\u03BD\u03C4]{2,}")
+# Homoglyph detection: a real attack mixes Latin and Cyrillic/Greek lookalikes
+# WITHIN a single word (e.g., "аpple" with Cyrillic "а"). Pure foreign-language
+# text — e.g., "Русский", "Українська" in a language switcher — is NOT an attack
+# and must not trigger. We look for word tokens that contain at least one ASCII
+# Latin letter AND at least one confusable Cyrillic/Greek lookalike character.
+_CYRILLIC_LOOKALIKE_CHARS = "\u0430\u0435\u043E\u0440\u0441\u0443\u0445\u0456"  # а е о р с у х і
+_GREEK_LOOKALIKE_CHARS = "\u03B1\u03B5\u03BF\u03C1\u03BD\u03C4"  # α ε ο ρ ν τ
+_MIXED_SCRIPT_WORD = re.compile(
+    rf"\b(?=\w*[A-Za-z])(?=\w*[{_CYRILLIC_LOOKALIKE_CHARS}{_GREEK_LOOKALIKE_CHARS}])\w+\b",
+    re.UNICODE,
+)
 
 # Code-fence detector (to exclude base64 inside legitimate fences)
 _CODE_FENCE = re.compile(r"```[^`]*```", re.DOTALL)
@@ -145,22 +152,18 @@ def scan(text: str) -> InjectionVerdict:
     # --- Pass 1: Normalize ---
     normalized = _normalize(text)
 
-    # Check for homoglyph attacks (not caught by NFKC for all scripts)
-    if _CYRILLIC_HOMOGLYPH.search(text):
+    # Check for homoglyph attacks: only flag mixed-script words (Latin + Cyrillic/
+    # Greek lookalikes in the same token). Pure foreign-language content is fine.
+    mixed = _MIXED_SCRIPT_WORD.search(text)
+    if mixed:
         return InjectionVerdict(
             hit=True,
             category="encoding_obfuscation",
             severity="CRITICAL",
-            matched_pattern="Cyrillic homoglyph sequence",
-            details=["Cyrillic lookalike characters detected — possible homoglyph attack"],
-        )
-    if _GREEK_HOMOGLYPH.search(text):
-        return InjectionVerdict(
-            hit=True,
-            category="encoding_obfuscation",
-            severity="CRITICAL",
-            matched_pattern="Greek homoglyph sequence",
-            details=["Greek lookalike characters detected — possible homoglyph attack"],
+            matched_pattern="mixed-script homoglyph word",
+            details=[
+                f"Mixed Latin + Cyrillic/Greek lookalike characters in token {mixed.group(0)!r} — possible homoglyph attack"
+            ],
         )
 
     # --- Pass 2: Scan normalized plaintext ---
