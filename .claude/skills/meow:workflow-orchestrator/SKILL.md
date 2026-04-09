@@ -53,11 +53,11 @@ Skip: Fasttrack mode with pre-approved spec.
 2. **Detect workflow mode** — check for `fasttrack:` prefix or Agent Teams trigger; if present load `references/fasttrack-and-teams.md`. Otherwise proceed with standard 7-phase flow.
 
 3. **Execute phases sequentially** — load `references/workflow-phases.md` then run:
-   - Phase 0: Orient — model tier, execution mode, read memory. Auto-continue.
+   - Phase 0: Orient — model tier, execution mode, **TDD mode detection**, read memory. Auto-continue.
    - Phase 1: Plan → **GATE 1** (human approval required)
-   - Phase 2: Test RED — write failing tests (TDD). Auto-continue.
-   - Phase 3: Build GREEN — implement to pass tests. Auto-continue.
-   - Phase 3.5: Simplify — run `meow:simplify` after tests pass. **MANDATORY before Phase 4.** Auto-continue.
+   - Phase 2: Test — in TDD mode (`--tdd` / `MEOWKIT_TDD=1`), write failing tests; in default mode, optional / on-request only. Auto-continue.
+   - Phase 3: Build — implement per the plan. In TDD mode, code must make failing tests pass. Auto-continue.
+   - Phase 3.5: Simplify — run `meow:simplify` after build (after tests pass in TDD mode). **MANDATORY before Phase 4.** Auto-continue.
    - Phase 4: Review — quality/security audit → **GATE 2** (human approval required, NO EXCEPTIONS)
    - Phase 5: Ship — commit, PR, deploy. Auto-continue.
    - Phase 6: Reflect — memory capture, docs sync. Auto-complete.
@@ -75,7 +75,7 @@ Skip: Fasttrack mode with pre-approved spec.
 
 ## Key Rules
 
-- **TDD is mandatory:** RED → GREEN → REFACTOR
+- **TDD is OPT-IN** (post-migration): default mode skips Phase 2 RED gate; enable with `--tdd` or `MEOWKIT_TDD=1`. In TDD mode the cycle is RED → GREEN → REFACTOR.
 - **KISS:** Simple over complex, standard patterns over custom
 - **Token budget:** Target ≤30K for full workflow. Warn at 75%, handoff at 90%.
 - **State:** `workflow:handoff` saves, `workflow:resume <id>` continues

@@ -2,8 +2,8 @@
 
 > Use when adding new functionality to the codebase.
 
-**Primary agent:** planner → developer → tester
-**Workflow phases:** Phase 1 (Plan) → Phase 2 (Test RED) → Phase 3 (Build GREEN) → Phase 4 (Review)
+**Primary agent:** planner → developer (in default mode) OR planner → tester → developer (in TDD mode `--tdd` / `MEOWKIT_TDD=1`)
+**Workflow phases:** Phase 1 (Plan) → Phase 2 (Test — RED if `--tdd`, optional otherwise) → Phase 3 (Build) → Phase 4 (Review)
 **Create with:** `npx mewkit task new --type feature "description"`
 
 ## When to use
@@ -21,7 +21,7 @@ Centers the implementation on user value.
 
 ### Technical Approach
 Split into three sub-sections aligned with MeowKit phases:
-- **Phase 2 — Test Plan (RED):** Test cases to write before implementation
+- **Phase 2 — Test Plan:** Test cases (RED if `--tdd`, optional otherwise)
 - **Phase 3 — Implementation Plan:** Numbered steps
 - **Phase 4 — Review Checklist:** What reviewer checks
 
@@ -32,7 +32,7 @@ Document endpoint changes, interface changes, breaking changes.
 
 1. Planner creates the task file, fills Goal + User Story + Technical Approach
 2. Gate 1: Human approves the plan
-3. Tester writes failing tests (Phase 2)
-4. Developer implements until tests pass (Phase 3)
+3. **TDD mode (`--tdd`):** Tester writes failing tests (Phase 2). Default mode: skip Phase 2 unless requested.
+4. Developer implements (Phase 3). In TDD mode, until failing tests pass.
 5. Reviewer audits against Review Checklist (Phase 4)
 6. Gate 2: Human approves the review

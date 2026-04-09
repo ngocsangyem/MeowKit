@@ -10,9 +10,11 @@ and ship production-ready code following the 7-phase workflow.
 ## Workflow Phases
 
 ```
-Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test RED
+Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test (RED if --tdd, else optional)
 → Phase 3 Build [contract substep for harness] → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect
 ```
+
+**TDD mode:** TDD is OPT-IN. Default: Phase 2 is recommended but not gated; tester writes tests when invoked but does not block the developer. Strict mode: pass `--tdd` on commands or `export MEOWKIT_TDD=1` to require failing tests before implementation. See `rules/tdd-rules.md`.
 
 **Phase 3 pre-build contract substep (harness):** for harness-driven sprint builds, the developer agent must read a signed `tasks/contracts/{date}-{slug}-sprint-N.md` BEFORE writing source code (enforced by `gate-enforcement.sh`). Bypass via `MEOWKIT_HARNESS_MODE=LEAN`. See `harness-rules.md` Rule 3 + `docs/harness-runbook.md`.
 

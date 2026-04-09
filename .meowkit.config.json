@@ -18,7 +18,7 @@
     "complex": "best"
   },
   "hooks": {
-    "preImplement": ".claude/hooks/pre-implement.sh",
+    "_comment": "Declarative reference only — actual hook wiring is in .claude/settings.json. preImplement removed: it is invoked by the developer agent itself (not via event), see .claude/agents/developer.md step 3.",
     "postWrite": ".claude/hooks/post-write.sh",
     "preShip": ".claude/hooks/pre-ship.sh",
     "postSession": ".claude/hooks/post-session.sh",

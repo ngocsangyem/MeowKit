@@ -65,7 +65,7 @@ Runs after implementation, before review. Reduces complexity while preserving be
 ## Pipeline Position
 
 ```
-Phase 2 (Test RED) → Phase 3 (Build GREEN) → [meow:simplify] → Phase 4 (Review)
+Phase 2 (Test — RED if `--tdd`) → Phase 3 (Build) → [meow:simplify] → Phase 4 (Review)
 ```
 
 Simplification happens AFTER tests pass but BEFORE review. Reviewer sees the simplified code.

@@ -108,6 +108,7 @@ export default withMermaid(defineConfig({
         text: 'Resources',
         items: [
           { text: 'Changelog', link: '/changelog' },
+          { text: 'Migration: TDD optional', link: '/migration/tdd-optional' },
           { text: 'GitHub Releases', link: 'https://github.com/ngocsangyem/MeowKit/releases' },
           { text: 'npm: create-meowkit', link: 'https://www.npmjs.com/package/create-meowkit' },
           { text: 'npm: mewkit', link: 'https://www.npmjs.com/package/mewkit' },

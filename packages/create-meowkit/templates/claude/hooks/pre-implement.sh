@@ -1,18 +1,50 @@
 #!/bin/sh
 # pre-implement.sh — Blocks implementation if no failing test exists for the current feature.
 # Usage: pre-implement.sh <feature-name-or-file-path>
-
+#
+# This hook is OPT-IN (TDD-optional migration).
+# Default: exits 0 silently. Opt in via:
+#   - export MEOWKIT_TDD=1                          (CI / shell rc)
+#   - echo on > .claude/session-state/tdd-mode      (slash command --tdd flag)
+#   - MEOW_PROFILE=fast still bypasses (legacy, deprecated)
+#
+# When TDD is enabled, blocks the calling tool unless a failing test exists.
 set -e
 
-FEATURE="$1"
+# TDD gate — source the helper. Fail-safe: missing helper means fail-CLOSED in
+# strict mode (user explicitly opted in) and fail-OPEN in default mode.
+HELPER="${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/tdd-detect.sh"
+if [ ! -f "$HELPER" ]; then
+  echo "[tdd] WARN: tdd-detect.sh missing at $HELPER" >&2
+  if [ "${MEOWKIT_TDD:-}" = "1" ]; then
+    echo "BLOCKED: TDD helper missing, cannot verify strict mode" >&2
+    exit 1
+  fi
+  exit 0
+fi
+
+# shellcheck source=lib/tdd-detect.sh
+. "$HELPER"
+if ! is_tdd_enabled; then
+  exit 0
+fi
+
+# At this point: TDD mode is ON (env or sentinel). Proceed with the check.
+
+# Phase 7 (260408): JSON-on-stdin parser; prefer $HOOK_FILE_PATH, fall back to $1.
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+fi
+FEATURE="${HOOK_FILE_PATH:-$1}"
 
 if [ -z "$FEATURE" ]; then
   echo "Usage: pre-implement.sh <feature-name-or-file-path>"
   exit 1
 fi
 
-# Extract a simple name from a file path if given
-FEATURE_NAME=$(basename "$FEATURE" | sed 's/\.[^.]*$//')
+# Extract a simple name from a file path if given.
+# inject ANSI escape sequences into terminal output of subsequent echo lines.
+FEATURE_NAME=$(basename "$FEATURE" | sed 's/\.[^.]*$//' | tr -cd '[:alnum:]._-')
 
 echo "Checking for failing tests for: $FEATURE_NAME"
 
@@ -37,7 +69,8 @@ if [ -z "$FOUND_TESTS" ]; then
 fi
 
 if [ -z "$FOUND_TESTS" ]; then
-  echo "BLOCKED: No test file found for [$FEATURE_NAME]. Write failing tests first (Phase 2)."
+  echo "BLOCKED: TDD mode is ON but no test file found for [$FEATURE_NAME]." >&2
+  echo "Write failing tests first (Phase 2), or unset MEOWKIT_TDD / drop --tdd to proceed without TDD gate." >&2
   exit 1
 fi
 
@@ -68,7 +101,9 @@ else
 fi
 
 if [ "$TEST_EXIT" -eq 0 ]; then
-  echo "BLOCKED: Tests must FAIL before implementation. Your tests are passing — they don't test new behavior yet."
+  echo "BLOCKED: TDD mode requires failing tests before implementation." >&2
+  echo "Your tests are passing — they don't test new behavior yet." >&2
+  echo "Unset MEOWKIT_TDD or drop --tdd to proceed without TDD gate." >&2
   exit 1
 else
   echo "PASS: Failing tests confirmed. Proceeding to implementation."

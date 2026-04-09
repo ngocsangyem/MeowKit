@@ -1,11 +1,11 @@
 ---
 title: "meow:testing"
-description: "Testing toolkit — red-green-refactor, validation scripts, and visual QA"
+description: "Testing toolkit — red-green-refactor (when --tdd enabled), validation scripts, and visual QA. TDD is opt-in."
 ---
 
 # meow:testing
 
-Testing toolkit — red-green-refactor, validation scripts, and visual QA
+Testing toolkit — red-green-refactor (when `--tdd` / `MEOWKIT_TDD=1` enabled), validation scripts, and visual QA.
 
 ## What This Skill Does
 

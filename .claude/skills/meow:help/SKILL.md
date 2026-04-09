@@ -50,7 +50,7 @@ No plans, no reviews, no changes.
 | State | Pipeline Phase | Recommendation |
 |-------|---------------|----------------|
 | No plan | Phase 0 → 1 | "Start with `/meow:plan-creator` or describe your task" |
-| Plan approved, no tests | Phase 2 | "Run tester agent — write failing tests (RED phase)" |
+| Plan approved, no tests | Phase 2 (TDD mode only) | "In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): run tester agent — write failing tests (RED phase). In default mode: skip Phase 2; run developer directly" |
 | Tests written, failing | Phase 3 | "Run developer agent — implement to pass tests (GREEN)" |
 | Tests passing, no review | Phase 4 | "Run `/meow:review` — adversarial code review" |
 | Review PASS/WARN | Phase 5 | "Run `/meow:ship` — commit, PR, deploy" |

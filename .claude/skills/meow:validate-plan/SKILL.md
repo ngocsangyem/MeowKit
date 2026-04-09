@@ -5,7 +5,7 @@ preamble-tier: 3
 description: >-
   Validates an approved plan against 8 dimensions before Phase 3 begins.
   Catches incomplete acceptance criteria, missing dependencies, and unresolved
-  risks. Use after Gate 1 approval and before Phase 2 (Test RED). Produces a
+  risks. Use after Gate 1 approval and before Phase 2 (Test). Produces a
   validation report with pass/fail per dimension.
 allowed-tools:
   - Read
@@ -23,7 +23,7 @@ Does NOT replace Gate 1 (human approval). Supplements it with systematic checks.
 
 ## When to Use
 
-- After Gate 1 approval, before Phase 2 (Test RED)
+- After Gate 1 approval, before Phase 2 (Test)
 - When `/meow:cook` detects a COMPLEX task (auto-suggested)
 - When user wants to stress-test a plan before committing to implementation
 - When user says "validate this plan", "check my plan", "is this plan complete"
@@ -75,7 +75,7 @@ Does NOT replace Gate 1 (human approval). Supplements it with systematic checks.
 In `/meow:cook`, validation runs automatically for COMPLEX tasks:
 
 ```
-Gate 1 (plan approved) → meow:validate-plan → Phase 2 (Test RED)
+Gate 1 (plan approved) → meow:validate-plan → Phase 2 (Test)
 ```
 
 For STANDARD tasks, validation is optional (user-triggered).

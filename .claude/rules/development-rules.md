@@ -45,18 +45,22 @@ NEVER simulate, mock, or stub implementation code to pass tests or CI.
 WHY: Mocks hide real integration failures that surface in production.
 INSTEAD of mocks → implement real code, use test databases/services.
 
-### Tests must pass
+### Tests must pass (if tests exist)
 
 NEVER finish a session with failing tests. Fix all failures before completing.
 WHY: Broken tests left behind become ignored and erode the test suite.
 Escalate after 3 failed fix attempts (per tdd-rules.md).
+
+**Default mode (TDD-optional):** This rule applies IF tests exist in the repo. There is no requirement to create tests for new code in default mode — that's controlled by `tdd-rules.md`, which is opt-in via `MEOWKIT_TDD=1` or `--tdd`. A repo with zero tests is permitted; the reviewer may flag missing tests as a WARN at Gate 2.
+
+**Strict mode (`MEOWKIT_TDD=1` / `--tdd`):** Tests must exist AND pass. The `pre-implement.sh` hook enforces failing-test-first; the rules in `tdd-rules.md` "When TDD is enabled" apply.
 
 ## Pre-Commit Rules
 
 ### Before every commit
 
 1. Run linting — zero lint errors
-2. Run tests — all tests pass
+2. Run tests — all tests pass IF tests exist (default mode tolerates zero-test repos; `pre-ship.sh` already skips the test check when `package.json` has no `"test"` script)
 3. Verify no confidential files are staged (`.env`, credentials, API keys)
 
 ### Commit format

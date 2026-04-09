@@ -61,9 +61,9 @@ Users need to add products, adjust quantities, and proceed to checkout.
 
 **Gate 1:** Review the plan. Type `approve` to continue, or provide feedback.
 
-### Step 4: Testing (Phase 2)
+### Step 4: Testing (Phase 2 — opt-in)
 
-The **tester** agent writes failing tests:
+**TDD mode (`--tdd` / `MEOWKIT_TDD=1`):** The **tester** agent writes failing tests first:
 
 ```
 Tester: "Writing tests for cart store and components..."
@@ -73,7 +73,9 @@ Tester: "Writing tests for cart store and components..."
   Ready for implementation.
 ```
 
-The `pre-implement.sh` hook blocks the **developer** from writing code until these tests exist.
+The `pre-implement.sh` hook blocks the **developer** from writing code until these tests exist (in TDD mode).
+
+**Default mode (TDD off):** Phase 2 is skipped — the developer goes directly to implementation. The tester may be invoked on-request (e.g., `/meow:test` after implementation) or for plan-coverage reasons. `pre-implement.sh` is a no-op.
 
 ### Step 5: Implementation (Phase 3)
 

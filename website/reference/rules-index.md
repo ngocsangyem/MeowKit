@@ -18,7 +18,7 @@ Source file: `.claude/rules/RULES_INDEX.md`
 | `gate-rules.md` | Gate 1 (plan approval) and Gate 2 (review approval) hard stops | MeowKit original | Phases 1, 4 |
 | `harness-rules.md` | Generator/evaluator architecture: planner stance, contract discipline, evaluator skepticism, iteration limits, adaptive density, dead-weight audit | New (Anthropic + LangChain harness research) | Phase 3 (Build, harness), Phase 4 (Review) |
 | `rubric-rules.md` | Evaluator calibration discipline, rubric library governance, anchor balance, drift detection, anti-slop enforcement | New (Anthropic harness research) | Phase 4 (Review, evaluator) |
-| `tdd-rules.md` | TDD enforcement: failing test before implementation | MeowKit original | Phases 2, 3 |
+| `tdd-rules.md` | TDD enforcement (opt-in via `--tdd` / `MEOWKIT_TDD=1`); MICRO-TASK exemption included | MeowKit original | Phases 2, 3 **when TDD enabled** [CONTEXTUAL] |
 | `naming-rules.md` | Naming conventions per platform (TS, Vue, Swift, DB) | MeowKit original | Implementation, review |
 | `development-rules.md` | File management, code quality, pre-commit, git safety | Adapted from CKE | Implementation, commit |
 | `orchestration-rules.md` | Subagent delegation, file ownership, parallel vs sequential | Adapted from CKE | Multi-agent `[CONTEXTUAL]` |

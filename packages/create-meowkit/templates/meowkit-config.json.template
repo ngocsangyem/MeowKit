@@ -1,11 +1,27 @@
 {
-  "$schema": "https://meowkit.dev/schema/config.json",
-  "version": "1.0.0",
-  "project": {
-    "description": "__MEOWKIT_DESCRIPTION__"
+  "version": "0.1.0",
+  "projectName": "",
+  "stack": [],
+  "teamSize": "solo",
+  "primaryTool": "claude-code",
+  "defaultMode": "balanced",
+  "enableCostTracking": true,
+  "enableMemory": true,
+  "gates": {
+    "gate1": true,
+    "gate2": true,
+    "bypassable": false
   },
-  "features": {
-    "costTracking": __MEOWKIT_COST_TRACKING__,
-    "memory": __MEOWKIT_MEMORY_ENABLED__
+  "modelRouting": {
+    "trivial": "cheapest",
+    "standard": "default",
+    "complex": "best"
+  },
+  "hooks": {
+    "_comment": "Declarative reference only — actual hook wiring is in .claude/settings.json. preImplement removed: it is invoked by the developer agent itself (not via event), see .claude/agents/developer.md step 3.",
+    "postWrite": ".claude/hooks/post-write.sh",
+    "preShip": ".claude/hooks/pre-ship.sh",
+    "postSession": ".claude/hooks/post-session.sh",
+    "costMeter": ".claude/hooks/cost-meter.sh"
   }
 }

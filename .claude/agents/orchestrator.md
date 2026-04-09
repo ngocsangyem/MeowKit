@@ -20,6 +20,17 @@ Before manual classification, run domain-based complexity routing:
 
 CSV match OVERRIDES manual classification. See `rules/scale-adaptive-rules.md` for details.
 
+## TDD Mode Detection (Phase 0 — Required)
+
+After complexity routing, detect TDD mode:
+
+1. Read `MEOWKIT_TDD` env var (or check if user passed `--tdd` on the slash command)
+2. Read `.claude/session-state/tdd-mode` sentinel (written by slash command dispatch when `--tdd` is detected)
+3. Print: `TDD mode: ON | OFF` to acknowledge the routing decision
+4. **If ON:** route per the strict TDD pipeline — invoke `tester` for Phase 2 RED before `developer` in Phase 3
+5. **If OFF (default):** Phase 2 is optional — skip `tester` invocation unless explicitly requested or unless the plan's acceptance criteria require test coverage. Route directly from `planner` → `developer` → `reviewer`
+6. TDD mode does NOT change model tier selection — that's controlled by complexity routing only
+
 | CSV Level | Model Tier | Gate 1 |
 |-----------|-----------|--------|
 | low + one-shot workflow | TRIVIAL (Haiku) | Bypass eligible |

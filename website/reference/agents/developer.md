@@ -1,15 +1,15 @@
 ---
 title: developer
-description: "Implementation agent that writes production code following approved plans with strict TDD and self-healing."
+description: "Implementation agent that writes production code following approved plans. TDD is opt-in via --tdd / MEOWKIT_TDD=1."
 ---
 
 # developer
 
-Implementation agent that writes production code following approved plans with strict TDD and self-healing.
+Implementation agent that writes production code following approved plans. TDD is opt-in via `--tdd` / `MEOWKIT_TDD=1`: when enabled, never writes code until failing tests exist; when disabled (default), implements directly per the approved plan.
 
 ## Overview
 
-The developer writes production code in Phase 3 (Build GREEN). It reads the approved plan, confirms failing tests exist, then implements until all tests pass. The developer follows existing codebase patterns (no new patterns without an ADR), enforces type safety (no `any` types), and self-heals up to 3 times when tests fail — each attempt using a different approach. After 3 failures, it escalates.
+The developer writes production code in Phase 3 (Build). It reads the approved plan and implements per acceptance criteria. **In TDD mode** (`--tdd` / `MEOWKIT_TDD=1`), it confirms failing tests exist first, then implements until all tests pass. **In default mode** (TDD off), it proceeds directly to implementation; tests are recommended but not gated. The developer follows existing codebase patterns (no new patterns without an ADR), enforces type safety (no `any` types), and self-heals up to 3 times when tests fail — each attempt using a different approach. After 3 failures, it escalates.
 
 The developer exclusively owns `src/`, `lib/`, `app/` — no other agent touches production code.
 
@@ -19,7 +19,7 @@ The developer exclusively owns `src/`, `lib/`, `app/` — no other agent touches
 
 | Rule | Enforcement |
 |------|------------|
-| **TDD strict** | Will not write code without failing tests from tester |
+| **TDD opt-in** | In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): will not write code without failing tests from tester. Default mode: implements directly per plan. |
 | **Plan required** | Reads `tasks/plans/YYMMDD-name.md` before starting |
 | **No `any` types** | Type-safe code enforced (no `any`, no unsafe casts) |
 | **Pattern respect** | Follows existing codebase patterns; new patterns need ADR |
@@ -32,7 +32,7 @@ Exclusively owns: `src/`, `lib/`, `app/` directories (all production code).
 
 ## How to Use
 
-The developer is invoked automatically after the tester confirms failing tests exist. You don't call it directly.
+The developer is invoked automatically after the tester confirms failing tests exist (in TDD mode) or directly after the planner (in default mode). You don't call it directly.
 
 ```
 Developer receives:

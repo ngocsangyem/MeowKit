@@ -31,7 +31,7 @@ Source file: `.claude/agents/SKILLS_INDEX.md`
 | [brainstorming](/reference/skills/brainstorming) | brainstormer | planning |
 | [office-hours](/reference/skills/office-hours) | brainstormer/planner | planning |
 
-## Phase 2 — Test RED
+## Phase 2 — Test (RED if `--tdd`, optional otherwise)
 
 | Skill | Owner | Type |
 |-------|-------|------|

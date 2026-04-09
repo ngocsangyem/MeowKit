@@ -1,6 +1,6 @@
 ---
 name: meow:testing
-description: "Use when writing tests, running validation scripts, or enforcing red-green-refactor cycle. Activates during Phase 2 (Test RED) and Phase 3 (Build GREEN)."
+description: "Use when writing tests, running validation scripts, or (in TDD mode) enforcing red-green-refactor cycle. Activates during Phase 2 (Test) and Phase 3 (Build)."
 ---
 
 # Testing Toolkit
@@ -9,14 +9,16 @@ Reference guides for testing: TDD red-green-refactor, validation scripts, and vi
 
 ## When to Use
 
-- During Phase 2 (Test RED) for writing failing tests first
-- During Phase 3 (Build GREEN) for verifying implementation
+- During Phase 2 (Test) for writing tests — failing tests first in TDD mode (`--tdd` / `MEOWKIT_TDD=1`), or any-order tests in default mode
+- During Phase 3 (Build) for verifying implementation
 - When the `tester` agent needs testing patterns
 - For visual QA testing of web applications
 
 ## Workflow Integration
 
-Operates in **Phase 2 (Test RED)** and **Phase 3 (Build GREEN)**. Output supports the `tester` agent.
+Operates in **Phase 2 (Test)** and **Phase 3 (Build)**. Output supports the `tester` agent.
+
+In TDD mode the cycle is RED → GREEN → REFACTOR (failing tests required before implementation). In default mode (TDD off), tests may be written before, alongside, or after implementation — the developer chooses.
 
 ## References
 
@@ -25,6 +27,7 @@ Operates in **Phase 2 (Test RED)** and **Phase 3 (Build GREEN)**. Output support
 | **[red-green-refactor.md](./references/red-green-refactor.md)** | Phase 2-3 | TDD cycle, test-first rules, refactoring guidelines |
 | **[validation-scripts.md](./references/validation-scripts.md)** | After code changes | Running validation scripts, interpreting results |
 | **[visual-qa.md](./references/visual-qa.md)** | UI testing | Browser-based visual QA, screenshot comparison, responsive testing |
+| **[e2e-best-practices.md](./references/e2e-best-practices.md)** | When creating E2E tests | Tool preference, locator strategy, wait patterns, POM, flaky quarantine, success metrics |
 
 ## Gotchas
 

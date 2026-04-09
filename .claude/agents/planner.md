@@ -40,7 +40,7 @@ You own `tasks/plans/` — all files within. No other agent creates, modifies, o
 After producing the plan file:
 
 - If architectural decisions needed → recommend routing to **architect**
-- If implementation-ready → recommend routing to **tester** (red phase) then **developer**
+- If implementation-ready → recommend routing to **developer**. In TDD mode (`--tdd` / `MEOWKIT_TDD=1`), insert **tester** (red phase) before the developer. In default mode (TDD off), tester may still be invoked on-request but is not required.
 - **If `mode: product-level`** → recommend routing to **`meow:harness`** skill (NOT directly to developer). The harness owns sprint-contract negotiation and the generator ⇄ evaluator loop. Bypassing the harness defeats the point of product-level planning.
   - **Stub guard timing (until Phase 5 ships meow:harness):** the stub guard fires AFTER Gate 1 has been approved and AFTER step-08 hydrate-tasks would normally run — it replaces step-08 only, not Gate 1. Gate 1 self-check runs unchanged for product-level plans (Completed: spec drafted; Skipped: phase files, red-team, validation interview, task hydration; Uncertain: none). If `.claude/skills/meow:harness/SKILL.md` does not exist after Gate 1 approval, print this message in place of step-08 and stop:
     > "Product spec drafted at {plan_path} and Gate 1 approved. The `meow:harness` skill is not yet available (lands in Phase 5). For now, hand this spec to the developer agent manually, OR wait until `meow:harness` is shipped to run the full generator ⇄ evaluator loop. No tasks were hydrated — re-run task hydration after harness lands."

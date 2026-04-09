@@ -3,27 +3,41 @@ name: meow:cook
 description: "ALWAYS activate this skill before implementing EVERY feature, plan, or fix."
 source: claudekit-engineer
 version: 1.0.0
-argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test]"
+argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd]"
 ---
 
 # Cook — Full Implementation Pipeline
 
-End-to-end implementation following MeowKit's 7-phase workflow with TDD enforcement.
+End-to-end implementation following MeowKit's 7-phase workflow. TDD is opt-in via `--tdd`.
 
 ## Usage
 
 ```
 /cook <natural language task OR plan path>
 /cook "Add user auth" --fast
+/cook "Build payment processor" --tdd       # Strict TDD enforced
 /cook tasks/plans/260329-feature/plan.md --auto
 ```
 
-Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test`
+Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd`
+
+## TDD mode (`--tdd` flag)
+
+When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.claude/session-state/tdd-mode` via a Bash tool call BEFORE any other workflow step:
+
+```bash
+mkdir -p .claude/session-state && echo on > .claude/session-state/tdd-mode
+```
+
+This sentinel file is read by `pre-implement.sh`, `tdd-detect.sh`, and downstream agents to detect TDD mode. Without `--tdd`, the sentinel is absent and the workflow runs in default mode (Phase 2 optional, no RED-phase gate).
+
+`MEOWKIT_TDD=1` env var (set in CI / shell rc) is the highest-precedence opt-in and overrides the sentinel.
 
 <HARD-GATE>
 Do NOT write implementation code until a plan exists and Gate 1 is approved.
-Do NOT skip Test RED phase — write failing tests BEFORE implementation.
-Exception: `--fast` mode skips research but still requires plan + TDD-flavored tests.
+In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): do NOT skip Test RED phase — write failing tests BEFORE implementation.
+In default mode: Phase 2 is optional; the developer may implement directly per the approved plan.
+Exception: `--fast` mode skips research but still requires plan + (in TDD mode) TDD-flavored tests.
 User override: If user explicitly says "just code it" or "skip planning", respect their instruction.
 </HARD-GATE>
 
@@ -34,7 +48,7 @@ User override: If user explicitly says "just code it" or "skip planning", respec
 | "This is too simple to plan"    | Simple tasks have hidden complexity. Plan takes 30 seconds.        |
 | "I already know how to do this" | Knowing ≠ planning. Write it down.                                 |
 | "Let me just start coding"      | Undisciplined action wastes tokens. Plan first.                    |
-| "Tests can come after"          | MeowKit is TDD. Failing tests define the spec. Code fills them in. |
+| "Tests can come after"          | In TDD mode (`--tdd`), no — failing tests define the spec. In default mode, yes — tests after is permitted. Choose your mode explicitly. |
 | "I'll plan as I go"             | That's not planning, that's hoping.                                |
 | "Just this once"                | Every skip is "just this once." No exceptions.                     |
 
@@ -48,7 +62,7 @@ See `references/intent-detection.md` for full detection logic.
 | "fast", "quick"                  | fast        | Skip research, plan→test→code                 |
 | "trust me", "auto"               | auto        | Auto-fix issues, human gates still enforced   |
 | 3+ features OR "parallel"        | parallel    | Multi-agent execution                         |
-| "no test", "skip test"           | no-test     | Skip Test RED phase                           |
+| "no test", "skip test"           | no-test     | Skip Test phase entirely (force off, even if `--tdd`) |
 | Default                          | interactive | Full workflow with user approval at each gate |
 
 ## Process Flow (Authoritative)
@@ -61,9 +75,11 @@ flowchart TD
     C --> G1[GATE 1: Human Approval]
     G1 -->|approved| D
     G1 -->|rejected| C
-    D --> E[Phase 2: Test RED]
+    D --> E[Phase 2: Test - RED if --tdd, optional otherwise]
     E --> F[Phase 3: Build GREEN]
-    F --> G2[Phase 4: Review — GATE 2]
+    F --> S[meow:simplify — MANDATORY]
+    S --> V[meow:verify — MANDATORY]
+    V --> G2[Phase 4: Review — GATE 2]
     G2 -->|approved| H[Phase 5: Ship]
     G2 -->|rejected| F
     H --> I[Phase 6: Reflect]
@@ -90,19 +106,37 @@ flowchart TD
 | ------------- | --------------------------------- | ---------------------------------------- |
 | 0 Orient      | `meow:scout`                      | Codebase mapping                         |
 | 1 Plan        | `meow:plan-creator`, `researcher` | Research + planning                      |
-| 2 Test RED    | `tester` via `meow:testing`       | **MUST** spawn — write failing tests     |
+| 2 Test        | `tester` via `meow:testing`       | TDD mode (`--tdd`): **MUST** spawn — write failing tests. Default mode: optional (skip unless requested) |
 | 3 Build GREEN | `fullstack-developer`             | Implementation                           |
 | 3 Build GREEN | `debugger` via `meow:investigate` | If tests fail after 3 self-heal attempts |
+| 3.5 Simplify  | `developer` via `meow:simplify`   | **MANDATORY** after Phase 3 GREEN — run before verify  |
+| 3.6 Verify    | `meow:verify`                     | **MANDATORY** after simplify — unified build+lint+test+coverage check before Phase 4 |
 | 4 Review      | `code-reviewer` via `meow:review` | **MUST** spawn — Gate 2                  |
 | 5 Ship        | `git-manager` via `meow:ship`     | **MUST** spawn — commit + PR             |
 | 6 Reflect     | `project-manager`, `docs-manager` | **MUST** spawn — sync-back + docs        |
+| 6 Reflect     | `meow:memory` session-capture     | **MUST** spawn — 3-category learning extraction |
+
+During iterative build-test-fix cycles, follow `references/loop-safety-protocol.md` for checkpoint tracking, stall detection, and escalation triggers.
 
 See `references/subagent-patterns.md` for Task() invocation patterns.
 See `references/workflow-steps.md` for detailed per-phase instructions.
 See `references/review-cycle.md` for review gate logic.
 
+## Simplify Step (Mandatory)
+
+After Phase 3 (Build GREEN) completes, run `meow:simplify` to reduce complexity before Phase 4 (Review). This is mandatory — do not skip.
+
+Rationale: Review quality improves when code is already simplified. Reviewers catch logic errors better when complexity is low. Running simplify after tests are green (but before review) ensures the reviewed code is the final, clean version.
+
+## Verify Step (Mandatory)
+
+After `meow:simplify` completes, run `meow:verify` for a unified build→lint→type-check→test→coverage check. This confirms simplification didn't break anything and gives the reviewer a clean signal.
+
+If `meow:verify` FAILS after simplify: send back to developer to fix, then re-run verify before proceeding to Phase 4. Do not skip verify or proceed to review with a failing verify result.
+
 ## Gotchas
 
+- **Skipping meow:simplify before review**: Tests pass but code is still complex → run `/meow:simplify` between Phase 3 and Phase 4 every time, no exceptions
 - **Skipping Gate 1 on "simple" features**: Features that seem simple grow during implementation. Always create a plan file; cancel it if truly trivial
 - **Auto-approve sneaking bugs past Gate 2**: Auto mode can auto-fix but NEVER auto-approve. gate-rules.md says NO exceptions
 - **Context loss between phases**: Long multi-phase workflows exceed context window. Update plan.md Agent State after each phase; next agent reads it first

@@ -39,7 +39,7 @@ Use planner agent to create implementation plan.
 **Output:** `Step 4: Plan created — [N] phases`
 
 ### Step 5: Implement
-Implement per plan. Follow MeowKit TDD rules (failing tests first).
+Implement per plan. In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): follow MeowKit TDD rules (failing tests first per `tdd-rules.md`). In default mode: implement directly per the approved plan; regression test recommended for security-sensitive fixes.
 
 **Parallel Verification** after implementation.
 

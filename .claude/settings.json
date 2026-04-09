@@ -134,6 +134,12 @@
         "hooks": [
           {
             "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/tdd-flag-detector.sh\"",
+            "timeout": 3,
+            "statusMessage": "Detecting --tdd flag..."
+          },
+          {
+            "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/conversation-summary-cache.sh\"",
             "timeout": 2
           }

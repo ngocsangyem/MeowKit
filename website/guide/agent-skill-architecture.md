@@ -52,7 +52,7 @@ Phase 0: Orient ──→ agent-detector scores all agents
 Phase 1: Plan ────→ planner loads: plan-creator, office-hours, plan-eng-review
      │
      ▼
-Phase 2: Test RED ─→ tester loads: testing, lint-and-validate
+Phase 2: Test ────→ tester loads: testing, lint-and-validate (RED if --tdd, optional otherwise)
      │
      ▼
 Phase 3: Build ───→ developer loads: development, typescript/vue, clean-code
@@ -102,7 +102,7 @@ flowchart TD
     P0 --> P1[Phase 1: Plan ✋ Gate 1]
     P1 --> S1[plan-creator\noffice-hours\nplan-ceo-review\nplan-eng-review\nvalidate-plan]
 
-    P1 --> P2[Phase 2: Test RED]
+    P1 --> P2[Phase 2: Test - RED if --tdd]
     P2 --> S2[testing\nlint-and-validate\nnyquist\ncso\nvulnerability-scanner]
 
     P2 --> P3[Phase 3: Build]

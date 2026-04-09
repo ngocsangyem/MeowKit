@@ -15,16 +15,16 @@ persona: B
 
 ## Overview
 
-MeowKit enforces TDD — tests must exist and fail BEFORE implementation. This workflow covers both adding unit tests to existing code and generating E2E tests from user flows.
+MeowKit's TDD discipline is **opt-in via `--tdd` / `MEOWKIT_TDD=1`**. When enabled, tests must exist and fail BEFORE implementation. When disabled (default), tests are recommended but not gated — you may write them before, alongside, or after the code. This workflow covers both adding unit tests to existing code and generating E2E tests from user flows.
 
-## Unit tests (TDD)
+## Unit tests (TDD mode — `--tdd`)
 
 ### Step 1: Write failing tests first
 
-The **tester** writes tests that define expected behavior:
+In TDD mode, the **tester** writes tests that define expected behavior:
 
 ```
-/meow:cook add input validation to user registration
+/meow:cook add input validation to user registration --tdd
 ```
 
 The tester writes tests BEFORE the developer touches implementation:

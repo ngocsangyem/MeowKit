@@ -3,7 +3,7 @@ name: meow:fix
 description: "ALWAYS activate this skill before fixing ANY bug, error, test failure, CI/CD issue, type error, lint, log error, UI issue, code problem."
 source: claudekit-engineer
 version: 0.1.0
-argument-hint: "[issue] --auto|--review|--quick|--parallel"
+argument-hint: "[issue] --auto|--review|--quick|--parallel|--tdd"
 ---
 
 # Fixing
@@ -35,6 +35,7 @@ Override: `--quick` allows fast scout→diagnose→fix for trivial issues (lint,
 - `--review` — Human-in-the-loop. Pause at each step.
 - `--quick` — Fast cycle for trivial bugs.
 - `--parallel` — Parallel `developer` agents per independent issue.
+- `--tdd` — Force regression test BEFORE the fix (writes the `.claude/session-state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not gated. Useful for security-sensitive fixes where you want to prove the bug first.
 
 ## Plan-First Gate
 

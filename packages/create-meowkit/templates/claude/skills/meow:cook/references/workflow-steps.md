@@ -11,7 +11,7 @@ All modes share these phases with mode-specific variations.
    - Auth/payments/security → always COMPLEX
    - Feature <5 files → STANDARD
    - Rename/typo/format → TRIVIAL
-3. **Read memory** (if exists): `memory/lessons.md`, `memory/patterns.json` — note relevant prior learnings
+3. **Read memory** (if exists): `.claude/memory/lessons.md`, `.claude/memory/patterns.json` — note relevant prior learnings
 4. If mode=code: load plan path, parse phases
 5. `TaskCreate` for each workflow phase (with `addBlockedBy` chain)
 
@@ -20,30 +20,34 @@ All modes share these phases with mode-specific variations.
 ## Phase 1: Research + Plan (skip if code mode)
 
 **Interactive/Auto:**
+
 - Spawn `researcher` agents in parallel for external knowledge
 - Use `meow:scout` for codebase exploration
 - Invoke `meow:plan-creator` with research context
 - Create `tasks/plans/YYMMDD-name/plan.md` + `phase-XX-*.md` files
 
 **Fast:**
+
 - Skip research. Use `meow:scout` only → `meow:plan-creator --fast`
 - Plan is lighter but still required
 
 **Parallel:**
+
 - Use `meow:plan-creator --parallel` for dependency graph + file ownership matrix
 
 ### GATE 1 (Non-Auto Mode)
 
 Present plan summary. Use `AskUserQuestion` (header: "Gate 1"):
+
 - "Approve plan" → proceed to Phase 2
 - "Revise plan" → revise based on feedback, re-present
 - "Abort" → stop workflow
 
-**Auto mode:** Skip Gate 1 user prompt. Auto-proceed if plan passes `scripts/validate-gate-1.sh`.
+**Auto mode:** Skip Gate 1 user prompt. Auto-proceed if plan passes `.claude/skills/meow:cook/scripts/validate-gate-1.sh`.
 
 **Output:** `Phase 1: Plan created — [N] phases, Gate 1 [approved|auto-approved]`
 
-## Phase 2: Test RED (skip if no-test mode)
+## Phase 2: Test (skip if no-test mode; RED-phase enforcement only if `--tdd` / `MEOWKIT_TDD=1`)
 
 Write failing tests BEFORE implementation. TDD enforcement per `tdd-rules.md`.
 
@@ -57,14 +61,31 @@ Write failing tests BEFORE implementation. TDD enforcement per `tdd-rules.md`.
 
 **Fast mode:** Tests cover plan-level intent only (not research-level edge cases). Document: "TDD-flavored, coverage may be lower."
 
-**Output:** `Phase 2: Test RED — [N] tests written, all FAIL`
+**Output:** `Phase 2: Test — [N] tests written` (suffix `, all FAIL` only in TDD mode)
 
 ### [Review Gate] Post-Test-RED (non-auto only)
+
 Present test list. Ask: "Proceed to implementation?" / "Adjust tests" / "Abort"
 
 ## Phase 3: Build GREEN
 
 Implement code until all tests pass. TDD: implement ONLY enough to make tests pass.
+
+**Pre-check (TDD gate — opt-in):** Before writing any implementation code, run:
+
+```bash
+sh .claude/hooks/pre-implement.sh "<feature-name>"
+```
+
+The hook is a no-op unless TDD mode is ON. Mode is ON when:
+
+- `MEOWKIT_TDD=1` env var is set (CI / shell rc), OR
+- `.claude/session-state/tdd-mode` sentinel file contains `on` (written by slash command `--tdd`)
+
+When ON, the hook verifies failing tests exist. If tests pass (no red), implementation is BLOCKED — go back to Phase 2.
+When OFF (default), the hook exits 0 silently and the developer proceeds without the RED-phase gate.
+
+Note: This runs ONCE at phase start, not on every file write (too expensive as a per-edit hook).
 
 1. **TaskList first** — check for existing tasks (may be hydrated by planning skill)
 2. If tasks exist → pick them up. If not → `TaskCreate` from plan phases with priority + metadata
@@ -73,14 +94,15 @@ Implement code until all tests pass. TDD: implement ONLY enough to make tests pa
 5. Run type checking after each file modification
 6. If tests fail after implementation:
    - Self-heal up to 3 attempts (each attempt tries a DIFFERENT approach)
-   - After 3 failures → spawn `debugger` subagent via `meow:investigate`:
+   - After 3 failures → spawn `researcher` subagent via `meow:investigate`:
      ```
-     Task(subagent_type="debugger", prompt="Analyze test failures: [output]. Root cause analysis.", description="Debug test failures")
+     Task(subagent_type="researcher", prompt="Analyze test failures using meow:investigate + meow:sequential-thinking: [output]. Root cause analysis.", description="Debug test failures")
      ```
-   - After debugger report → fix and retry
+   - After analysis report → fix and retry
    - After 3 more failures → STOP, escalate to user with: failing output, attempted fixes, suspected root cause
 
 **Parallel mode:**
+
 - Spawn multiple `fullstack-developer` agents with file ownership boundaries
 - Each agent gets distinct files — no overlap
 - `TaskUpdate` to assign + track per agent
@@ -88,16 +110,30 @@ Implement code until all tests pass. TDD: implement ONLY enough to make tests pa
 
 **Output:** `Phase 3: Build GREEN — [N] files modified, [X/Y] tests pass`
 
+## Phase 3.5: Simplify (MANDATORY — do not skip)
+
+After tests are green, run `meow:simplify` before any review. This is mandatory.
+
+```
+Task(subagent_type="developer", prompt="Run /meow:simplify on the Phase 3 output. Reduce complexity without breaking tests. All tests must still pass after simplification.", description="Simplify before review")
+```
+
+**Why mandatory:** Reviewers catch logic errors better on simplified code. Submitting complex code to review creates review noise that obscures real issues. Simplify once, review once — cleaner than review-fix-simplify cycles.
+
+**Output:** `Phase 3.5: Simplify complete — complexity reduced, tests still pass`
+
 ### [Review Gate] Post-Build (non-auto only)
+
 Present implementation summary. Ask: "Proceed to review?" / "Request changes" / "Abort"
 
 ## Phase 4: Review
 
 ### Code Review (MANDATORY subagent)
 
-Spawn `code-reviewer` subagent:
+Spawn `reviewer` subagent:
+
 ```
-Task(subagent_type="code-reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY.", description="Code review")
+Task(subagent_type="reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY.", description="Code review")
 ```
 
 See `review-cycle.md` for interactive vs auto handling.
@@ -107,41 +143,49 @@ See `review-cycle.md` for interactive vs auto handling.
 **Human approval ALWAYS required.** Auto mode auto-fixes issues but does NOT auto-approve Gate 2.
 
 Present review verdict. Use `AskUserQuestion` (header: "Gate 2"):
+
 - If critical issues: "Fix critical" / "Fix all" / "Approve anyway" / "Abort"
 - If no critical: "Approve" / "Fix warnings" / "Abort"
 
 Max 3 review-fix cycles. After 3: final decision required from user.
 
-Run `scripts/validate-gate-2.sh` before presenting for approval.
+Run `.claude/skills/meow:cook/scripts/validate-gate-2.sh` before presenting for approval.
 
 **Output:** `Phase 4: Review [score]/10, Gate 2 approved`
 
 ## Phase 5: Ship (after Gate 2 approval)
 
-Spawn `git-manager` subagent:
+Spawn `shipper` subagent (NOT git-manager — shipper runs full ship sequence including pre-ship checks, CI verification, and rollback docs):
+
 ```
-Task(subagent_type="git-manager", prompt="Stage and commit changes with conventional commit message. Create PR if on feature branch.", description="Commit + PR")
+Task(subagent_type="shipper", prompt="Ship changes: 1) Run pre-ship.sh (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use meow:ship skill.", description="Ship + PR")
 ```
 
-**Output:** `Phase 5: Ship — committed, PR created`
+Note: `git-manager` handles raw git operations only (commit, push). `shipper` orchestrates the full ship pipeline including validation and documentation.
+
+**Output:** `Phase 5: Ship — committed, PR created, CI verified`
 
 ## Phase 6: Reflect (MANDATORY — never skip)
 
 Three mandatory subagents in parallel:
 
-1. **Project-manager sync-back:**
+1. **Plan sync-back:**
+
    ```
-   Task(subagent_type="project-manager", prompt="Run full sync-back for [plan-path]: sweep ALL phase-XX-*.md files, mark completed items [x], update plan.md status/progress from actual checkbox state. Report unresolved mappings.", description="Plan sync-back")
+   Task(subagent_type="planner", prompt="Run full sync-back for [plan-path]: sweep ALL phase-XX-*.md files, mark completed items [x], update plan.md status/progress from actual checkbox state. Report unresolved mappings.", description="Plan sync-back")
    ```
 
-2. **Docs-manager:**
+2. **Docs update:**
+
    ```
-   Task(subagent_type="docs-manager", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
+   Task(subagent_type="documenter", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
    ```
 
-3. **Memory write:**
-   - Append to `memory/lessons.md`: what was learned this session
-   - Update `memory/patterns.json`: new patterns with type, context, frequency
+3. **Memory capture (MUST spawn):**
+
+   ```
+   Task(subagent_type="analyst", prompt="Run meow:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append to .claude/memory/lessons.md. Update .claude/memory/patterns.json with new entries including category, severity, applicable_when fields. Files to modify: .claude/memory/lessons.md, .claude/memory/patterns.json", description="Session memory capture")
+   ```
 
 4. `TaskUpdate` → mark all Claude Tasks complete after sync-back
 

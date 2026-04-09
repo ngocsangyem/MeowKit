@@ -1,10 +1,13 @@
-# Skill: Red-Green-Refactor TDD Cycle
+# Skill: Red-Green-Refactor TDD Cycle (canonical TDD reference)
 
-**Purpose:** Enforce the strict RED-GREEN-REFACTOR cycle for test-driven development.
+**This is the canonical TDD cycle reference.** Used by `--tdd` / `MEOWKIT_TDD=1` mode and recommended for production-quality work; NOT enforced by default.
+
+**Purpose:** Document the strict RED-GREEN-REFACTOR cycle for test-driven development.
 
 ## When to Use
 
-Invoke this skill for every unit of work during feature development or bug fixing.
+- **In TDD mode (`--tdd` / `MEOWKIT_TDD=1`):** Invoke this skill for every unit of work during feature development or bug fixing. RED phase is mandatory.
+- **In default mode (TDD off):** This reference is opt-in guidance, not enforcement. Use it when you choose to write tests first; skip it when you prefer to implement directly. Opt into strict mode via `--tdd` to make this cycle mandatory.
 
 ---
 

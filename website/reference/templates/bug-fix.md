@@ -2,8 +2,8 @@
 
 > Use when fixing broken behavior.
 
-**Primary agent:** investigator → developer → tester
-**Workflow phases:** Phase 1 (Investigate) → Phase 2 (Test RED) → Phase 3 (Fix) → Phase 4 (Review)
+**Primary agent:** investigator → developer (default mode) OR investigator → tester → developer (TDD mode `--tdd` / `MEOWKIT_TDD=1`)
+**Workflow phases:** Phase 1 (Investigate) → Phase 2 (Test — regression test, RED if `--tdd`) → Phase 3 (Fix) → Phase 4 (Review)
 **Create with:** `npx mewkit task new --type bug-fix "description"`
 
 ## When to use

@@ -5,7 +5,7 @@ preamble-tier: 3
 description: >-
   Test-to-requirement coverage mapping. Reads plan acceptance criteria and test
   files, produces a coverage gap report showing which requirements have no tests.
-  Use during Phase 2 (Test RED) or Phase 4 (Review) to verify test completeness.
+  Use during Phase 2 (Test) or Phase 4 (Review) to verify test completeness.
   Named after the Nyquist sampling theorem — sufficient test coverage prevents
   aliased (missed) requirements.
 allowed-tools:
@@ -24,7 +24,7 @@ requirements exist but no corresponding test validates them.
 
 ## When to Use
 
-- Phase 2 (Test RED): After tester writes initial tests, verify all acceptance criteria are covered
+- Phase 2 (Test): After tester writes initial tests, verify all acceptance criteria are covered
 - Phase 4 (Review): As part of test coverage dimension, verify no gaps
 - User says "check test coverage", "are all requirements tested", "coverage gaps"
 - Before Gate 2: verify implementation matches plan

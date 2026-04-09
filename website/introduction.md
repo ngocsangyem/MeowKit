@@ -24,7 +24,7 @@ When you start a Claude Code session in a MeowKit project, the toolkit automatic
 
 1. **Routes your task** to the right agent based on complexity (orchestrator)
 2. **Creates a plan** before any code is written (planner, Gate 1)
-3. **Writes failing tests first** before implementation (tester, TDD enforcement)
+3. **Writes tests** — failing tests first if `--tdd` / `MEOWKIT_TDD=1` is set (strict TDD mode); otherwise tests are recommended but not gated (tester invoked on-request)
 4. **Implements with discipline** — builds until tests pass (developer)
 5. **Reviews across 5 dimensions** — architecture, types, tests, security, performance (reviewer, Gate 2)
 6. **Ships safely** — conventional commits, PR, CI verification, rollback docs (shipper)
@@ -37,7 +37,7 @@ No step can be skipped. Two hard gates (plan approval + review approval) require
 | Concern                | Raw Claude Code                     | With MeowKit                                                    |
 | ---------------------- | ----------------------------------- | --------------------------------------------------------------- |
 | Planning               | Starts coding immediately           | Creates and gets approval for a plan first                      |
-| Testing                | Tests optional, often skipped       | TDD enforced — failing test before implementation               |
+| Testing                | Tests optional, often skipped       | TDD opt-in via `--tdd` — strict failing-test-first when enabled, recommended otherwise |
 | Security               | Relies on model knowledge           | 4-layer defense + security agent + post-write hooks             |
 | Review                 | Ask "review this" and hope          | 3 parallel adversarial reviewers + triage step                  |
 | Shipping               | "git add -A && git push"            | Conventional commits, PR, CI verification, rollback docs        |

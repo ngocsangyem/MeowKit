@@ -53,6 +53,7 @@ Launch a specialist agent in an isolated workspace to handle a specific task in 
 - Ownership boundaries from team-protocol are strictly enforced.
 - All spawned agent output is reviewed before merging back to the main workspace.
 - If an agent encounters an issue outside its boundary, it flags it and stops (does not fix it).
+- **TDD mode inheritance:** spawned agents read the same `.claude/session-state/tdd-mode` sentinel as the parent. If the parent invocation set TDD mode (via `--tdd`), child spawns observe the same mode automatically — no env var propagation required. Filesystem state persists across Bash tool calls and subagent contexts.
 
 ### Output
 

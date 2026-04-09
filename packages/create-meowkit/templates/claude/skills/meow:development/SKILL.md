@@ -1,21 +1,23 @@
 ---
 name: meow:development
-description: "Use when implementing features, writing code, or needing TDD enforcement during Phase 3 (Build GREEN). Provides code patterns, skill loading, and coding standards."
+description: "Use when implementing features or writing code. TDD enforcement is opt-in via --tdd / MEOWKIT_TDD=1. Provides code patterns, skill loading, and coding standards."
 ---
 
 # Development Toolkit
 
-Reference guides for implementation: code patterns, TDD enforcement, and skill lazy-loading.
+Reference guides for implementation: code patterns, TDD enforcement (opt-in), and skill lazy-loading.
 
 ## When to Use
 
-- During Phase 3 (Build GREEN) for implementation guidance
+- During Phase 3 (Build) for implementation guidance
 - When the `developer` agent needs coding pattern references
-- For TDD enforcement rules during red/green/refactor cycle
+- For TDD enforcement rules during red/green/refactor cycle (TDD mode only)
 
 ## Workflow Integration
 
-Operates in **Phase 2 (Test RED)** and **Phase 3 (Build GREEN)**. Output supports the `developer` and `tester` agents.
+Operates in **Phase 2 (Test)** and **Phase 3 (Build)**. Output supports the `developer` and `tester` agents.
+
+TDD enforcement (`tdd-enforcement.md` reference) is OPT-IN as of the TDD-optional migration. Default mode skips RED-phase enforcement; enable with `--tdd` or `MEOWKIT_TDD=1`.
 
 ## References
 
@@ -27,5 +29,5 @@ Operates in **Phase 2 (Test RED)** and **Phase 3 (Build GREEN)**. Output support
 
 ## Gotchas
 
-- **TDD enforcement blocking exploratory prototyping**: Strict red-green cycle slows rapid iteration → Use fast mode for prototypes, switch to default mode before shipping
+- **TDD enforcement blocking exploratory prototyping**: Strict red-green cycle slows rapid iteration → Default mode (TDD off) is now the right choice for prototypes; opt into `--tdd` only when shipping production-quality work
 - **200-line file rule on generated code**: Auto-generated files (migrations, schemas) exceed limit by design → Exempt generated files explicitly in plan constraints

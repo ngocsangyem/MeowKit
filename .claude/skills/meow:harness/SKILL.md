@@ -8,7 +8,7 @@ description: >-
   scaffolding density per model tier. Distinct from /meow:cook (single-task
   pipeline). Triggers on /meow:harness, "build me a kanban app", "build a
   retro game maker", "autonomous build", or any green-field product spec.
-argument-hint: "[task description] [--tier auto|full|lean|minimal] [--max-iter N] [--budget USD]"
+argument-hint: "[task description] [--tier auto|full|lean|minimal] [--max-iter N] [--budget USD] [--tdd]"
 allowed-tools:
   - Bash
   - Read
@@ -45,6 +45,7 @@ Skip when:
 4. **Max 3 iteration rounds** between generator and evaluator before escalating to human (configurable via `--max-iter`)
 5. **Run report mandatory** — every harness run produces `tasks/harness-runs/YYMMDD-{slug}/run.md` with full audit trail
 6. **Coexists with `meow:cook`** — does not replace it; both route through Gate 1 + Gate 2
+7. **TDD opt-in (parallel to cook):** harness respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.claude/session-state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `harness-rules.md`) is independent of TDD mode and always applies.
 
 ## Workflow
 

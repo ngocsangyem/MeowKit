@@ -77,7 +77,7 @@ Every step is visible. Every claim is verified. The fix is tested, reviewed, and
 | Decision                      | Why                                                                    |
 | ----------------------------- | ---------------------------------------------------------------------- |
 | **Two hard gates**            | The cost of a bad ship > the cost of a 30-second approval              |
-| **TDD enforced**              | Failing tests before implementation prevents "tests that test nothing" |
+| **TDD opt-in**                | Strict failing-test-first when `--tdd` is set; otherwise tests are recommended but not gated. Spike work stays fast; production builds opt in for discipline. |
 | **Zero external deps**        | No API keys, no services, no runtime installs — works offline          |
 | **Exclusive file ownership**  | Each agent owns specific files — no merge conflicts                    |
 | **Security as architecture**  | 4-layer defense runs on every task, not just audits                    |

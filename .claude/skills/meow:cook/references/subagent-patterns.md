@@ -32,13 +32,15 @@ Task(subagent_type="planner", prompt="Activate meow:plan-creator skill. Create i
 
 Note: `subagent_type="planner"` is the agent role. The agent should activate the `meow:plan-creator` skill for template selection and validation.
 
-## Phase 2: Test RED — Write Failing Tests
+## Phase 2: Test (RED phase only when `--tdd` / `MEOWKIT_TDD=1`)
 
+**TDD mode** — write failing tests first:
 ```
 Task(subagent_type="tester", prompt="Write failing tests for [plan-path] acceptance criteria. Tests must RUN (no syntax errors) and FAIL. Reference meow:testing red-green-refactor. Target behaviors: [list from plan success criteria].", description="Write failing tests")
 ```
-
 Expected return: test count, all FAIL status, file paths.
+
+**Default mode (TDD off)** — Phase 2 is OPTIONAL. Skip the tester invocation unless the user explicitly requests tests or unless plan acceptance criteria require coverage. The orchestrator routes Phase 1 → Phase 3 directly when TDD mode is off.
 
 ## Phase 3: Build GREEN — Implementation
 

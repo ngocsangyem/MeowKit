@@ -1,10 +1,14 @@
-# Skill: TDD Enforcement
+# Skill: TDD Enforcement (only when `--tdd` / `MEOWKIT_TDD=1`)
 
-**Purpose:** Enforce test-first development. No implementation code is written until failing tests exist and are verified.
+**This reference applies ONLY when TDD mode is enabled.** Default mode (TDD off) skips RED-phase enforcement entirely — the developer implements directly per the approved plan and the `pre-implement.sh` hook is a no-op.
+
+**Purpose (in TDD mode):** Enforce test-first development. No implementation code is written until failing tests exist and are verified.
 
 ## When to Use
 
-Invoke this skill for ALL feature development and bug fixes. The only exceptions are: documentation-only changes, config-only changes, and pure refactors with existing test coverage.
+In TDD mode, invoke this skill for ALL feature development and bug fixes. The only exceptions are: documentation-only changes, config-only changes, and pure refactors with existing test coverage.
+
+In default mode (TDD off), this skill is irrelevant — no RED gate exists. Tests are still recommended for production-quality work; opt into strict mode via `--tdd` or `export MEOWKIT_TDD=1`.
 
 ## Rules
 

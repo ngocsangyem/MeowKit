@@ -17,8 +17,8 @@ hero:
 features:
   - title: 🔒 Two Hard Gates
     details: No code ships without an approved plan (Gate 1) and a passing review (Gate 2). The agent cannot self-approve.
-  - title: 🧪 TDD Enforced
-    details: Failing tests must exist before implementation begins. No exceptions. Pre-implement hook blocks code without tests.
+  - title: 🧪 TDD Opt-In
+    details: TDD is opt-in via `--tdd` or `MEOWKIT_TDD=1`. When enabled, failing tests must exist before implementation; otherwise tests are recommended but not gated. Default mode keeps spike work fast; production builds opt in for strict discipline.
   - title: 🛡️ 4-Layer Security
     details: Prompt injection defense across input boundary, instruction anchoring, context isolation, and output validation.
   - title: 🧠 14 Specialist Agents

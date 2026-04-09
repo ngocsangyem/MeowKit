@@ -32,26 +32,28 @@ Task(subagent_type="planner", prompt="Activate meow:plan-creator skill. Create i
 
 Note: `subagent_type="planner"` is the agent role. The agent should activate the `meow:plan-creator` skill for template selection and validation.
 
-## Phase 2: Test RED — Write Failing Tests
+## Phase 2: Test (RED phase only when `--tdd` / `MEOWKIT_TDD=1`)
 
+**TDD mode** — write failing tests first:
 ```
 Task(subagent_type="tester", prompt="Write failing tests for [plan-path] acceptance criteria. Tests must RUN (no syntax errors) and FAIL. Reference meow:testing red-green-refactor. Target behaviors: [list from plan success criteria].", description="Write failing tests")
 ```
-
 Expected return: test count, all FAIL status, file paths.
+
+**Default mode (TDD off)** — Phase 2 is OPTIONAL. Skip the tester invocation unless the user explicitly requests tests or unless plan acceptance criteria require coverage. The orchestrator routes Phase 1 → Phase 3 directly when TDD mode is off.
 
 ## Phase 3: Build GREEN — Implementation
 
 Single developer:
 ```
-Task(subagent_type="fullstack-developer", prompt="Implement [phase-file] to make all failing tests pass. TDD: implement only enough to pass tests. Run type checking after each file. Files to modify: [list]", description="Implement [phase]")
+Task(subagent_type="developer", prompt="Implement [phase-file] to make all failing tests pass. TDD: implement only enough to pass tests. Run type checking after each file. Files to modify: [list]", description="Implement [phase]")
 ```
 
 ### Parallel Execution
 
 Spawn multiple developers with file ownership:
 ```
-Task(subagent_type="fullstack-developer", prompt="Implement [phase-file]. File ownership: [glob-pattern]. Do NOT modify files outside ownership.", description="Phase [N]")
+Task(subagent_type="developer", prompt="Implement [phase-file]. File ownership: [glob-pattern]. Do NOT modify files outside ownership.", description="Phase [N]")
 ```
 
 Each agent gets distinct files — no overlap. Wait for parallel group before next.
@@ -60,13 +62,13 @@ Each agent gets distinct files — no overlap. Wait for parallel group before ne
 
 After 3 self-heal failures:
 ```
-Task(subagent_type="debugger", prompt="Analyze test failures. Failing output: [output]. Attempted fixes: [list]. Use meow:investigate + meow:sequential-thinking for root cause analysis. Return: root cause, confidence level, suggested fix.", description="Debug test failures")
+Task(subagent_type="researcher", prompt="Analyze test failures using meow:investigate + meow:sequential-thinking. Failing output: [output]. Attempted fixes: [list]. Return: root cause, confidence level, suggested fix.", description="Debug test failures")
 ```
 
 ## Phase 4: Review — Code Review
 
 ```
-Task(subagent_type="code-reviewer", prompt="Review changes for [phase]. Check: security (OWASP), performance, YAGNI/KISS/DRY, architecture patterns. Return: score (X/10), critical_count, warnings list, suggestions list.", description="Code review")
+Task(subagent_type="reviewer", prompt="Review changes for [phase]. Check: security (OWASP), performance, YAGNI/KISS/DRY, architecture patterns. Return: score (X/10), critical_count, warnings list, suggestions list.", description="Code review")
 ```
 
 Expected return format:
@@ -83,16 +85,21 @@ Suggestions (1): ["Consider extracting helper for date formatting"]
 Task(subagent_type="git-manager", prompt="Stage and commit changes with conventional commit message. If on feature branch, create PR.", description="Commit + PR")
 ```
 
-## Phase 5: Reflect — Sync-back + Docs
+## Phase 6: Reflect — Sync-back + Docs + Memory
 
-**Project-manager** (detailed sync-back):
+**Orchestrator** (detailed sync-back):
 ```
-Task(subagent_type="project-manager", prompt="Run full sync-back for [plan-path]: 1) Sweep ALL phase-XX-*.md files in plan directory. 2) Mark every completed item [ ] → [x] based on completed tasks (including earlier phases). 3) Update plan.md status/progress (pending/in-progress/completed) from actual checkbox state. 4) Report unresolved mappings if any task cannot match a phase file.", description="Plan sync-back")
+Task(subagent_type="planner", prompt="Run full sync-back for [plan-path]: 1) Sweep ALL phase-XX-*.md files in plan directory. 2) Mark every completed item [ ] → [x] based on completed tasks (including earlier phases). 3) Update plan.md status/progress (pending/in-progress/completed) from actual checkbox state. 4) Report unresolved mappings if any task cannot match a phase file.", description="Plan sync-back")
 ```
 
-**Docs-manager:**
+**Documenter:**
 ```
-Task(subagent_type="docs-manager", prompt="Evaluate docs impact for changes: [file-list]. Update docs/ directory if needed. State explicitly: Docs impact: [none|minor|major]", description="Update docs")
+Task(subagent_type="documenter", prompt="Evaluate docs impact for changes: [file-list]. Update docs/ directory if needed. State explicitly: Docs impact: [none|minor|major]", description="Update docs")
+```
+
+**Memory capture:**
+```
+Task(subagent_type="analyst", prompt="Run meow:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append to .claude/memory/lessons.md. Update .claude/memory/patterns.json with new entries including category, severity, applicable_when fields. Files to modify: .claude/memory/lessons.md, .claude/memory/patterns.json", description="Session memory capture")
 ```
 
 ## UI Work (Conditional)

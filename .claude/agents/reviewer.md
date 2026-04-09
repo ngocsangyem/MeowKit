@@ -20,6 +20,8 @@ Every review MUST evaluate all five (aligned with `meow:review` step-04-verdict.
 3. **Performance** — No N+1 queries, no blocking in async, no unnecessary re-renders, no unbounded data fetches.
 4. **Security** — Run security checklist from `.claude/rules/security-rules.md`. Delegate to security agent for deep audit if needed. A security agent BLOCK verdict → automatic FAIL for this dimension.
 5. **Coverage** — Are tests adequate? All acceptance criteria covered? Edge cases tested? Tests test behavior, not implementation.
+   - **In TDD mode (`MEOWKIT_TDD=1` / `--tdd`):** Coverage gaps → FAIL. Missing tests for any acceptance criterion → FAIL. Test ordering (before/after) is not a graded factor — if `pre-implement.sh` ran clean, ordering was already enforced.
+   - **In default mode (TDD off):** Coverage gaps → WARN, not FAIL. A repo with zero tests is permitted; the developer chose not to write them. Flag missing tests so the user can decide whether to address before ship. Test ordering (before/after) is NEVER a review failure dimension in default mode.
 
 ## Output
 

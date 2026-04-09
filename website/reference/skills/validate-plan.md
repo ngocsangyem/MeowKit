@@ -33,7 +33,7 @@ Validates an approved plan against 8 quality dimensions before implementation be
 ## When to Use This
 
 ::: tip Use meow:validate-plan when...
-- Gate 1 is approved and you're about to start Phase 2 (Test RED)
+- Gate 1 is approved and you're about to start Phase 2 (Test)
 - `meow:cook` detects a COMPLEX task and suggests validation
 - You want to stress-test a plan before committing to implementation
 - You're unsure if acceptance criteria are binary enough for TDD
@@ -56,7 +56,7 @@ flowchart LR
     A[Gate 1 approved\nplan file exists] --> B[meow:validate-plan]
     B --> C[Evaluate all\n8 dimensions]
     C --> D{All 8 PASS?}
-    D -- Yes --> E[Proceed to\nPhase 2 Test RED]
+    D -- Yes --> E[Proceed to\nPhase 2 Test or Phase 3 if TDD off]
     D -- WARN --> F[User decides:\nproceed or revise]
     D -- FAIL --> G[Return to planner\nwith revision requests]
 ```

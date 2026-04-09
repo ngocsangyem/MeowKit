@@ -99,17 +99,17 @@ No skill automatically chains into another. You decide the review depth.
 
 - **HUMAN APPROVAL REQUIRED** — no code until plan is approved
 
-## Phase 2 — Test RED
+## Phase 2 — Test (RED if `--tdd`, optional otherwise)
 
 **Agent:** tester
-**Deliverable:** Failing tests
+**Deliverable:** Tests (failing tests in TDD mode; optional otherwise)
 
-- Write failing tests FIRST — the task file's acceptance criteria drive the test cases
-- `pre-implement.sh` hook: BLOCKS if no failing test exists
-- Security pre-check: scan for known anti-patterns
-- Run `meow:nyquist` at the end of Phase 2 to verify test-to-requirement coverage — every acceptance criterion in the plan must have at least one test targeting it before Phase 3 begins
+- **TDD mode (`--tdd` / `MEOWKIT_TDD=1`):** Write failing tests FIRST — the task file's acceptance criteria drive the test cases. `pre-implement.sh` hook BLOCKS if no failing test exists.
+- **Default mode (TDD off):** Phase 2 is OPTIONAL. The tester is invoked on-request; tests may be written before, alongside, or after implementation. `pre-implement.sh` is a no-op.
+- Security pre-check: scan for known anti-patterns (always runs)
+- Run `meow:nyquist` at the end of Phase 2 (or after Phase 3 in default mode) to verify test-to-requirement coverage — every acceptance criterion in the plan should have at least one test targeting it before shipping.
 
-## Phase 3 — Build GREEN
+## Phase 3 — Build
 
 **Agent:** developer
 **Deliverable:** Passing implementation

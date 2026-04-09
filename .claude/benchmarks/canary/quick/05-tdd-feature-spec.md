@@ -4,11 +4,27 @@ tier: quick
 target_seconds: 150
 target_cost_usd: 1.20
 rubric_preset: backend-api
+requires_tdd_mode: true
 ---
 
-# Task: TDD a Slug Generator
+# Task: TDD a Slug Generator (TDD-mode canary)
+
+> **Run with `--tdd`** — this canary specifically tests strict-TDD discipline.
+> Without `--tdd` / `MEOWKIT_TDD=1`, MeowKit's default mode skips the RED-phase gate and this canary's premise is invalid.
+>
+> Manual reproduction (no automated runner exists yet):
+> ```bash
+> mkdir -p .claude/session-state && echo on > .claude/session-state/tdd-mode
+> /meow:cook --tdd "build a slugify function per .claude/benchmarks/canary/quick/05-tdd-feature-spec.md"
+> ```
 
 Build a `slugify(title: string): string` function using strict TDD (Phase 2 RED → Phase 3 GREEN). Tests must be written FIRST and FAIL before any implementation exists.
+
+This canary tests that the harness still enforces RED-phase discipline when TDD mode is explicitly enabled. Verifies that:
+1. Sentinel file or env var triggers TDD mode
+2. `pre-implement.sh` blocks if no failing test exists for the feature
+3. Developer agent waits on tester before starting Phase 3
+4. Anti-rationalization rules (no test minimization, no mock substitution) hold
 
 ## Behavior Spec
 

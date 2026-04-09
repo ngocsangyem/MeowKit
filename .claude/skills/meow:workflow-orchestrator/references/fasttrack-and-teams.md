@@ -33,8 +33,8 @@ Overview, Requirements, Technical Design, API/Interfaces, Data Model, Acceptance
 ```toon
 phase_teams[5]{phase,lead,teammates,team_size}:
   1-Understand+Design,planner → architect,developer+tester,3
-  2-Test RED,tester,architect,2
-  3-Build GREEN,architect,developer+tester,3
+  2-Test (RED if --tdd),tester,architect,2
+  3-Build (GREEN if --tdd),architect,developer+tester,3
   4-Refactor+Review,architect+security,reviewer,3
   5-Finalize,orchestrator,-,1
 ```

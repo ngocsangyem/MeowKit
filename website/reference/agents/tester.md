@@ -1,15 +1,20 @@
 ---
 title: tester
-description: "TDD enforcement agent that writes failing tests before implementation and verifies they pass after."
+description: "Test-writing agent. In TDD mode (--tdd / MEOWKIT_TDD=1), writes failing tests before implementation. In default mode, writes tests when invoked but does not block the developer."
 ---
 
 # tester
 
-TDD enforcement agent that writes failing tests before implementation and verifies they pass after.
+Test-writing agent. In TDD mode (`--tdd` / `MEOWKIT_TDD=1`), writes failing tests before implementation (red phase) and verifies they pass after (green phase). In default mode (TDD off), writes tests when invoked but does not block the developer.
 
 ## Overview
 
-The tester runs at two points: **Phase 2 (Red)** to write failing tests before implementation, and again during **Phase 3 (Green)** to verify tests pass after the developer finishes. This two-phase process is the heart of MeowKit's TDD enforcement — no implementation code exists until meaningful failing tests exist first.
+The tester runs at two points: **Phase 2** (write tests) and **Phase 3** (verify tests pass after the developer finishes).
+
+- **In TDD mode (`--tdd` / `MEOWKIT_TDD=1`):** The tester writes failing tests in Phase 2 before implementation begins. It does NOT greenlight the developer until tests demonstrably fail. This is strict TDD enforcement.
+- **In default mode (TDD off, post-migration):** The tester writes tests when invoked by the orchestrator, developer, or user — but does not block. Tests may be written before, alongside, or after the implementation.
+
+The tester owns all test files exclusively. In both modes, anti-rationalization rules apply: tests must fail for the *right reason* (functionality doesn't exist), no test minimization, no mock substitution for integration tests.
 
 The tester owns all test files exclusively. It writes tests that fail for the *right reason* (functionality doesn't exist yet), not the wrong reason (syntax errors or missing imports).
 
@@ -19,8 +24,9 @@ The tester owns all test files exclusively. It writes tests that fail for the *r
 
 | Phase | What tester does | Deliverable |
 |-------|-----------------|------------|
-| **Red (Phase 2)** | Write failing tests that define expected behavior | Test files that compile but fail |
-| **Green (Phase 3)** | Verify developer's implementation passes all tests | Pass/fail report + coverage summary |
+| **Test (Phase 2 — TDD mode)** | Write failing tests that define expected behavior | Test files that compile but fail |
+| **Test (Phase 2 — default mode)** | Write tests on-request, no greenlight semantics | Test files (any pass/fail state) |
+| **Verify (Phase 3)** | Verify developer's implementation passes all tests | Pass/fail report + coverage summary |
 | **Refactor** | Suggest refactoring opportunities after green | Improvement suggestions |
 
 ### Test Ownership

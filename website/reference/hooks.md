@@ -12,41 +12,53 @@ MeowKit uses lifecycle hooks to enforce discipline at the tool level. Some hooks
 
 These run automatically via Claude Code's hook system:
 
-| Hook | Type | Trigger | What it does | Blocks? |
-|------|------|---------|-------------|---------|
-| `post-write.sh` | PostToolUse | Edit, Write | Security scan: secrets, `any` type, SQL injection, XSS, destructive patterns | Yes (exit 2) |
-| `learning-observer.sh` | PostToolUse | Edit, Write | Detect churn patterns (file edited 3+ times); feeds into post-session retroactive capture | No |
-| `post-session.sh` | Stop | Session end | Capture session data to `.claude/memory/` | No |
+| Hook                   | Type        | Trigger     | What it does                                                                              | Blocks?      |
+| ---------------------- | ----------- | ----------- | ----------------------------------------------------------------------------------------- | ------------ |
+| `post-write.sh`        | PostToolUse | Edit, Write | Security scan: secrets, `any` type, SQL injection, XSS, destructive patterns              | Yes (exit 2) |
+| `learning-observer.sh` | PostToolUse | Edit, Write | Detect churn patterns (file edited 3+ times); feeds into post-session retroactive capture | No           |
+| `post-session.sh`      | Stop        | Session end | Capture session data to `.claude/memory/`                                                 | No           |
 
 ## Skill-embedded hooks
 
 These are registered in SKILL.md frontmatter and run when those skills are active:
 
-| Hook | Skill | Trigger | What it does |
-|------|-------|---------|-------------|
-| `check-freeze.sh` | meow:freeze | Edit, Write | Block edits outside frozen directory |
-| `check-careful.sh` | meow:careful | Bash | Warn on destructive commands (rm -rf, DROP TABLE) |
+| Hook               | Skill        | Trigger     | What it does                                      |
+| ------------------ | ------------ | ----------- | ------------------------------------------------- |
+| `check-freeze.sh`  | meow:freeze  | Edit, Write | Block edits outside frozen directory              |
+| `check-careful.sh` | meow:careful | Bash        | Warn on destructive commands (rm -rf, DROP TABLE) |
 
 ## Skill-invoked scripts
 
 These run when specific skills call them:
 
-| Script | Phase | What it does | Blocks? |
-|--------|-------|-------------|---------|
-| `pre-task-check.sh` | Any | Prompt injection pattern detection | Yes (BLOCK on injection) |
-| `pre-implement.sh` | Phase 2-3 | TDD gate — blocks without failing test | Yes |
-| `pre-ship.sh` | Phase 5 | Test + lint + typecheck | Yes |
-| `cost-meter.sh` | Any | Token usage tracking | No |
+| Script              | Phase     | What it does                       | Blocks?                  |
+| ------------------- | --------- | ---------------------------------- | ------------------------ |
+| `pre-task-check.sh` | Any       | Prompt injection pattern detection | Yes (BLOCK on injection) |
+| `pre-implement.sh`  | Phase 2-3 | TDD gate — opt-in (see note below) | Only when TDD enabled    |
+| `pre-ship.sh`       | Phase 5   | Test + lint + typecheck            | Yes                      |
+| `cost-meter.sh`     | Any       | Token usage tracking               | No                       |
+
+### `pre-implement.sh` invocation model
+
+`pre-implement.sh` is **NOT** wired to a Claude Code `PreToolUse` event. It is invoked manually by the cook skill via a Bash tool call (see `meow:cook/references/workflow-steps.md` Phase 3 pre-check). This is **behavioral enforcement**, not mechanical — if a different workflow doc is followed, the hook is not invoked.
+
+The hook is a no-op unless TDD mode is ON via:
+
+- `MEOWKIT_TDD=1` env var (CI / shell rc, highest precedence)
+- `.claude/session-state/tdd-mode` sentinel file containing `on` (written by slash command `--tdd`)
+- (legacy) `MEOW_PROFILE=fast` still bypasses with a deprecation warning, removed in next major
+
+When TDD is OFF (the default), the hook exits 0 silently. When ON, it requires a failing test to exist for the feature being implemented and blocks otherwise. Bypass mechanisms: drop `--tdd`, unset `MEOWKIT_TDD`.
 
 ## Hook runtime profiling
 
 The `MEOW_HOOK_PROFILE` environment variable controls which hooks are active. Set it in your `.env` file or shell before starting a Claude Code session.
 
-| Profile | Hooks Active | Use When |
-|---------|-------------|----------|
-| `strict` | All hooks | COMPLEX tasks, security-critical work |
-| `standard` | All except `cost-meter.sh`, `post-session.sh` | Default — everyday development |
-| `fast` | `gate-enforcement.sh`, `privacy-block.sh`, `project-context-loader.sh` only | Rapid iteration, prototyping |
+| Profile    | Hooks Active                                                                | Use When                              |
+| ---------- | --------------------------------------------------------------------------- | ------------------------------------- |
+| `strict`   | All hooks                                                                   | COMPLEX tasks, security-critical work |
+| `standard` | All except `cost-meter.sh`, `post-session.sh`                               | Default — everyday development        |
+| `fast`     | `gate-enforcement.sh`, `privacy-block.sh`, `project-context-loader.sh` only | Rapid iteration, prototyping          |
 
 ```bash
 # Set in .env or shell
@@ -55,18 +67,18 @@ MEOW_HOOK_PROFILE=fast
 
 ### Per-hook profile classification
 
-| Hook | strict | standard | fast |
-|------|:------:|:--------:|:----:|
-| `gate-enforcement.sh` | ✅ | ✅ | ✅ |
-| `privacy-block.sh` | ✅ | ✅ | ✅ |
-| `project-context-loader.sh` | ✅ | ✅ | ✅ |
-| `post-write.sh` | ✅ | ✅ | ❌ |
-| `pre-ship.sh` | ✅ | ✅ | ❌ |
-| `pre-task-check.sh` | ✅ | ✅ | ❌ |
-| `pre-implement.sh` | ✅ | ✅ | ❌ |
-| `cost-meter.sh` | ✅ | ❌ | ❌ |
-| `post-session.sh` | ✅ | ❌ | ❌ |
-| `learning-observer.sh` | ✅ | ✅ | ❌ |
+| Hook                        | strict | standard | fast |
+| --------------------------- | :----: | :------: | :--: |
+| `gate-enforcement.sh`       |   ✅   |    ✅    |  ✅  |
+| `privacy-block.sh`          |   ✅   |    ✅    |  ✅  |
+| `project-context-loader.sh` |   ✅   |    ✅    |  ✅  |
+| `post-write.sh`             |   ✅   |    ✅    |  ❌  |
+| `pre-ship.sh`               |   ✅   |    ✅    |  ❌  |
+| `pre-task-check.sh`         |   ✅   |    ✅    |  ❌  |
+| `pre-implement.sh`          |   ✅   |    ✅    |  ❌  |
+| `cost-meter.sh`             |   ✅   |    ❌    |  ❌  |
+| `post-session.sh`           |   ✅   |    ❌    |  ❌  |
+| `learning-observer.sh`      |   ✅   |    ✅    |  ❌  |
 
 :::warning Safety-critical hooks never skip
 `gate-enforcement.sh` and `privacy-block.sh` are active in **all** profiles, including `fast`. These enforce the two hard gates and sensitive file protection — they cannot be disabled by profile selection.
@@ -82,15 +94,29 @@ Hooks are registered in `.claude/settings.json`:
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
-        "hooks": [{ "type": "command", "command": "sh .claude/hooks/post-write.sh \"$TOOL_INPUT_FILE_PATH\"" }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/post-write.sh \"$TOOL_INPUT_FILE_PATH\""
+          }
+        ]
       },
       {
         "matcher": "Edit|Write",
-        "hooks": [{ "type": "command", "command": "sh .claude/hooks/learning-observer.sh \"$TOOL_INPUT_FILE_PATH\"" }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/learning-observer.sh \"$TOOL_INPUT_FILE_PATH\""
+          }
+        ]
       }
     ],
     "Stop": [
-      { "hooks": [{ "type": "command", "command": "sh .claude/hooks/post-session.sh" }] }
+      {
+        "hooks": [
+          { "type": "command", "command": "sh .claude/hooks/post-session.sh" }
+        ]
+      }
     ]
   }
 }
@@ -149,12 +175,12 @@ Registered under both **Stop** and **UserPromptSubmit**. Branches on `$HOOK_EVEN
 
 **Throttle defaults:**
 
-| Env var | Default | Semantic |
-|---------|---------|----------|
-| `MEOWKIT_SUMMARY_THRESHOLD` | `20480` (20KB) | Min transcript size in bytes |
-| `MEOWKIT_SUMMARY_TURN_GAP` | `30` | Min JSONL event delta between summaries (≈ 3–6 turns; "TURN_GAP" is a legacy name) |
-| `MEOWKIT_SUMMARY_GROWTH_DELTA` | `5120` (5KB) | Min transcript growth in bytes |
-| `MEOWKIT_SUMMARY_BUDGET_SEC` | `180` | Background worker hard budget for `claude -p` |
+| Env var                        | Default        | Semantic                                                                           |
+| ------------------------------ | -------------- | ---------------------------------------------------------------------------------- |
+| `MEOWKIT_SUMMARY_THRESHOLD`    | `20480` (20KB) | Min transcript size in bytes                                                       |
+| `MEOWKIT_SUMMARY_TURN_GAP`     | `30`           | Min JSONL event delta between summaries (≈ 3–6 turns; "TURN_GAP" is a legacy name) |
+| `MEOWKIT_SUMMARY_GROWTH_DELTA` | `5120` (5KB)   | Min transcript growth in bytes                                                     |
+| `MEOWKIT_SUMMARY_BUDGET_SEC`   | `180`          | Background worker hard budget for `claude -p`                                      |
 
 **Consumer chain:** background worker → `.claude/memory/conversation-summary.md` → UserPromptSubmit hook → stdout → Claude Code context injection → every meowkit agent.
 
@@ -172,30 +198,30 @@ Registered under both **Stop** and **UserPromptSubmit**. Branches on `$HOOK_EVEN
 
 ## State Files Table
 
-| File | Writer | Purpose |
-|------|--------|---------|
-| `session-state/edit-counts.json` | `post-write-loop-detection.sh` | Per-file edit counter, keyed `{session_id}:{realpath}` |
-| `session-state/precompletion-attempts.json` | `pre-completion-check.sh` | Pre-completion re-entry guard per plan slug |
-| `session-state/build-verify-cache.json` | `post-write-build-verify.sh` | File-content-hash cache for skip-on-unchanged |
-| `session-state/conversation-summary.lock` | `conversation-summary-cache.sh` (Stop bg worker) | Phase 9 mutex preventing overlapping background summarizers |
-| `.claude/memory/conversation-summary.md` | `conversation-summary-cache.sh` (Stop bg worker) | Phase 9 cache — read by UserPromptSubmit hook every turn |
-| `session-state/learning-observer.jsonl` | `learning-observer.sh` | Churn pattern log |
-| `session-state/active-plan` | `meow:harness`, `meow:plan-creator` | Currently active plan slug (read by `pre-completion-check.sh`) |
-| `session-state/last-session-id` | `project-context-loader.sh` | Session change detection |
+| File                                        | Writer                                           | Purpose                                                        |
+| ------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------- |
+| `session-state/edit-counts.json`            | `post-write-loop-detection.sh`                   | Per-file edit counter, keyed `{session_id}:{realpath}`         |
+| `session-state/precompletion-attempts.json` | `pre-completion-check.sh`                        | Pre-completion re-entry guard per plan slug                    |
+| `session-state/build-verify-cache.json`     | `post-write-build-verify.sh`                     | File-content-hash cache for skip-on-unchanged                  |
+| `session-state/conversation-summary.lock`   | `conversation-summary-cache.sh` (Stop bg worker) | Phase 9 mutex preventing overlapping background summarizers    |
+| `.claude/memory/conversation-summary.md`    | `conversation-summary-cache.sh` (Stop bg worker) | Phase 9 cache — read by UserPromptSubmit hook every turn       |
+| `session-state/learning-observer.jsonl`     | `learning-observer.sh`                           | Churn pattern log                                              |
+| `session-state/active-plan`                 | `meow:harness`, `meow:plan-creator`              | Currently active plan slug (read by `pre-completion-check.sh`) |
+| `session-state/last-session-id`             | `project-context-loader.sh`                      | Session change detection                                       |
 
 ## Env Var Bypasses
 
-| Var | Effect |
-|-----|--------|
-| `MEOWKIT_BUILD_VERIFY=off` | Skip `post-write-build-verify.sh` |
-| `MEOWKIT_LOOP_DETECT=off` | Skip `post-write-loop-detection.sh` |
-| `MEOWKIT_PRECOMPLETION=off` | Skip `pre-completion-check.sh` |
-| `MEOWKIT_HARNESS_MODE=LEAN` | PreCompletion falls back to soft nudge; BuildVerify still runs |
-| `MEOWKIT_HARNESS_MODE=MINIMAL` | Skip BuildVerify + PreCompletion entirely |
-| `MEOW_HOOK_PROFILE=fast` | Skip `pre-ship`, `post-session`, `learning-observer` (speed) |
-| `MEOWKIT_SUMMARY_CACHE=off` | Skip `conversation-summary-cache.sh` (both Stop and UserPromptSubmit) |
-| `MEOWKIT_SUMMARY_THRESHOLD=N` | Override 20KB transcript threshold for summarization |
-| `MEOWKIT_SUMMARY_TURN_GAP=N` | Override 30-event minimum gap between summaries |
-| `MEOWKIT_SUMMARY_GROWTH_DELTA=N` | Override 5KB growth-delta minimum between summaries |
-| `MEOWKIT_SUMMARY_BUDGET_SEC=N` | Background worker hard budget for `claude -p` (default 180s) |
-| `MEOWKIT_SUMMARY_DEBUG=1` | Verbose stderr from `conversation-summary-cache.sh` |
+| Var                              | Effect                                                                |
+| -------------------------------- | --------------------------------------------------------------------- |
+| `MEOWKIT_BUILD_VERIFY=off`       | Skip `post-write-build-verify.sh`                                     |
+| `MEOWKIT_LOOP_DETECT=off`        | Skip `post-write-loop-detection.sh`                                   |
+| `MEOWKIT_PRECOMPLETION=off`      | Skip `pre-completion-check.sh`                                        |
+| `MEOWKIT_HARNESS_MODE=LEAN`      | PreCompletion falls back to soft nudge; BuildVerify still runs        |
+| `MEOWKIT_HARNESS_MODE=MINIMAL`   | Skip BuildVerify + PreCompletion entirely                             |
+| `MEOW_HOOK_PROFILE=fast`         | Skip `pre-ship`, `post-session`, `learning-observer` (speed)          |
+| `MEOWKIT_SUMMARY_CACHE=off`      | Skip `conversation-summary-cache.sh` (both Stop and UserPromptSubmit) |
+| `MEOWKIT_SUMMARY_THRESHOLD=N`    | Override 20KB transcript threshold for summarization                  |
+| `MEOWKIT_SUMMARY_TURN_GAP=N`     | Override 30-event minimum gap between summaries                       |
+| `MEOWKIT_SUMMARY_GROWTH_DELTA=N` | Override 5KB growth-delta minimum between summaries                   |
+| `MEOWKIT_SUMMARY_BUDGET_SEC=N`   | Background worker hard budget for `claude -p` (default 180s)          |
+| `MEOWKIT_SUMMARY_DEBUG=1`        | Verbose stderr from `conversation-summary-cache.sh`                   |

@@ -1,6 +1,6 @@
 ---
 name: meow:workflow-orchestrator
-description: "Execute 5-phase workflow for complex features. Includes fasttrack mode for pre-approved specs. DO NOT use for simple bug fixes."
+description: "Execute 7-phase workflow for complex features. Includes fasttrack mode for pre-approved specs. DO NOT use for simple bug fixes."
 autoInvoke: true
 priority: high
 triggers:
@@ -50,18 +50,21 @@ Skip: Fasttrack mode with pre-approved spec.
 
 1. **Run pre-execution checklist** — select lead agent, load memory, show agent banner, verify complexity, challenge requirements.
 
-2. **Detect workflow mode** — check for `fasttrack:` prefix or Agent Teams trigger; if present load `references/fasttrack-and-teams.md`. Otherwise proceed with standard 5-phase flow.
+2. **Detect workflow mode** — check for `fasttrack:` prefix or Agent Teams trigger; if present load `references/fasttrack-and-teams.md`. Otherwise proceed with standard 7-phase flow.
 
 3. **Execute phases sequentially** — load `references/workflow-phases.md` then run:
-   - Phase 1: Understand + Design → **APPROVAL GATE** (Gate 1)
-   - Phase 2: Test RED — write failing tests (TDD). Auto-continue.
-   - Phase 3: Build GREEN — implement to pass tests → **APPROVAL GATE** (Gate 2)
-   - Phase 4: Refactor + Review — clean code, security check. Auto-continue.
-   - Phase 5: Finalize — verify coverage ≥80%, update docs, notify. Auto-complete.
+   - Phase 0: Orient — model tier, execution mode, **TDD mode detection**, read memory. Auto-continue.
+   - Phase 1: Plan → **GATE 1** (human approval required)
+   - Phase 2: Test — in TDD mode (`--tdd` / `MEOWKIT_TDD=1`), write failing tests; in default mode, optional / on-request only. Auto-continue.
+   - Phase 3: Build — implement per the plan. In TDD mode, code must make failing tests pass. Auto-continue.
+   - Phase 3.5: Simplify — run `meow:simplify` after build (after tests pass in TDD mode). **MANDATORY before Phase 4.** Auto-continue.
+   - Phase 4: Review — quality/security audit → **GATE 2** (human approval required, NO EXCEPTIONS)
+   - Phase 5: Ship — commit, PR, deploy. Auto-continue.
+   - Phase 6: Reflect — memory capture, docs sync. Auto-complete.
 
 4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit.
 
-**Only 2 approval gates:** Phase 1 (Design) and Phase 3 (Build). Everything else auto-continues.
+**Only 2 approval gates:** Phase 1 (Plan) and Phase 4 (Review). Everything else auto-continues.
 
 ## References
 
@@ -72,7 +75,7 @@ Skip: Fasttrack mode with pre-approved spec.
 
 ## Key Rules
 
-- **TDD is mandatory:** RED → GREEN → REFACTOR
+- **TDD is OPT-IN** (post-migration): default mode skips Phase 2 RED gate; enable with `--tdd` or `MEOWKIT_TDD=1`. In TDD mode the cycle is RED → GREEN → REFACTOR.
 - **KISS:** Simple over complex, standard patterns over custom
 - **Token budget:** Target ≤30K for full workflow. Warn at 75%, handoff at 90%.
 - **State:** `workflow:handoff` saves, `workflow:resume <id>` continues
@@ -81,4 +84,4 @@ Skip: Fasttrack mode with pre-approved spec.
 ## Gotchas
 
 - **Parallel agents editing same file**: Two subagents modify the same source file simultaneously → Define exclusive file ownership before spawning parallel agents
-- **Token budget exceeded mid-workflow**: Complex 5-phase workflow runs out of context → Check remaining context at each phase boundary; escalate if < 20% remaining
+- **Token budget exceeded mid-workflow**: Complex 7-phase workflow runs out of context → Check remaining context at each phase boundary; escalate if < 20% remaining

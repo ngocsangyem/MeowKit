@@ -16,9 +16,11 @@ AI agents need enforced discipline — hard gates, TDD, security scanning, and h
 
 Scans run on every write, every review, every ship. The `post-write.sh` hook automatically scans every file write for hardcoded secrets, SQL injection, XSS, and destructive patterns. No mode can disable security checks.
 
-### 2. TDD is enforced
+### 2. TDD is opt-in (formerly enforced)
 
-Failing tests must exist before implementation begins. The `pre-implement.sh` hook blocks any attempt to write implementation code without a corresponding failing test. This isn't a suggestion — it's a gate.
+TDD enforcement is OPT-IN via `--tdd` flag or `MEOWKIT_TDD=1` environment variable. When enabled, failing tests must exist before implementation begins and the `pre-implement.sh` hook blocks any attempt to write implementation code without a corresponding failing test — that's the strict gate, just opt-in. In default mode, tests are recommended but not gated; the developer implements directly per the approved plan.
+
+Why optional: strict TDD added friction for spike work, tooling, and prototypes. Production-quality work should still enable `--tdd` to restore the gate.
 
 ### 3. Two human gates
 

@@ -17,7 +17,7 @@ After implementation is complete and tests pass, meow:simplify scans modified fi
 meow:simplify runs automatically between Phase 3 (Build) and Phase 4 (Review) in the meow:cook pipeline. This is enforced since v2.0.
 
 ```
-Phase 2 (Test RED) → Phase 3 (Build GREEN) → [meow:simplify] → Phase 4 (Review)
+Phase 2 (Test — RED if `--tdd`) → Phase 3 (Build) → [meow:simplify] → Phase 4 (Review)
 ```
 :::
 

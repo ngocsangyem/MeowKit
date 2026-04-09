@@ -1,11 +1,11 @@
 ---
 title: "meow:workflow-orchestrator"
-description: "Execute 5-phase TDD workflow for complex features with token budgets, approval gates, and fast-track mode."
+description: "Execute 5-phase workflow for complex features with token budgets, approval gates, and fast-track mode. TDD is opt-in via --tdd / MEOWKIT_TDD=1."
 ---
 # meow:workflow-orchestrator
-Execute 5-phase TDD workflow for complex features with token budgets, approval gates, and fast-track mode.
+Execute 5-phase workflow for complex features with token budgets, approval gates, and fast-track mode. TDD is opt-in via `--tdd` / `MEOWKIT_TDD=1`.
 ## What This Skill Does
-Orchestrates the full 5-phase development workflow: Understand+Design → Test RED → Build GREEN → Refactor+Review → Finalize. Includes token budgets per phase (target ≤30K total), two approval gates, and a fast-track mode that skips Phase 1 when specs are pre-approved.
+Orchestrates the full 5-phase development workflow: Understand+Design → Test (RED if `--tdd`) → Build → Refactor+Review → Finalize. Includes token budgets per phase (target ≤30K total), two approval gates, and a fast-track mode that skips Phase 1 when specs are pre-approved.
 ## Core Capabilities
 - **5-phase pipeline** — Design → Test → Build → Refactor → Finalize
 - **Two approval gates** — Phase 1 (Design) and Phase 3 (Build)

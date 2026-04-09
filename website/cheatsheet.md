@@ -47,9 +47,9 @@ persona: B
 | brainstormer | Explicit or complex planning | 1 | Trade-off analysis |
 | researcher | Research tasks | 0,1,4 | Structured findings |
 | architect | Schema/API/infra changes | 1 | ADR + system design |
-| tester | Before implementation | 2 | Failing tests (RED phase) |
+| tester | When invoked (always in `--tdd` mode, on-request otherwise) | 2 | Tests (failing tests in `--tdd` mode) |
 | security | Auth/payments/security changes | 2,4 | BLOCK/PASS verdict |
-| developer | After tester confirms RED | 3 | Implementation (GREEN phase) |
+| developer | After planner (TDD off) or tester (TDD on) | 3 | Implementation |
 | reviewer | After implementation | 4 | 5-dimension verdict |
 | shipper | After Gate 2 | 5 | PR + rollback docs |
 | documenter | After ship | 6 | Updated docs + changelog |
@@ -62,8 +62,8 @@ persona: B
 |-------|------|-------|-------------|
 | 0 | Orient | — | Read memory, load skills, route model tier |
 | 1 | Plan | ✋ Gate 1 | Challenge premises, create plan, human approval |
-| 2 | Test RED | — | Write failing tests first (TDD) |
-| 3 | Build GREEN | — | Implement until tests pass |
+| 2 | Test | — | Write failing tests first (TDD mode `--tdd`/`MEOWKIT_TDD=1`); optional otherwise |
+| 3 | Build | — | Implement per plan; in TDD mode, until tests pass |
 | 4 | Review | ✋ Gate 2 | 5-dimension audit, human approval |
 | 5 | Ship | — | Commit, PR, CI verify, rollback docs |
 | 6 | Reflect | — | Update docs, memory, retrospective |
@@ -103,7 +103,7 @@ persona: B
 | post-write.sh | PostToolUse | Security scan on Edit/Write | Yes |
 | post-session.sh | Stop | Capture session to memory | No |
 | pre-task-check.sh | Skill-invoked | Injection pattern detection | Yes |
-| pre-implement.sh | Skill-invoked | TDD gate (must have failing test) | Yes |
+| pre-implement.sh | Skill-invoked | TDD gate — opt-in via `--tdd` / `MEOWKIT_TDD=1`; no-op otherwise | Only when TDD enabled |
 | pre-ship.sh | Skill-invoked | Test + lint + typecheck | Yes |
 | privacy-block.sh | PreToolUse | Block .env / *.key / credential reads | Yes |
 | gate-enforcement.sh | PreToolUse | Block source writes before Gate 1 approval | Yes |

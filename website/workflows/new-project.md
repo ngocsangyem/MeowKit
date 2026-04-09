@@ -75,8 +75,8 @@ After reviewing the plan, approve it. Then run the full pipeline:
 ```
 
 This executes Phases 2-6 automatically:
-- **Phase 2:** The **tester** agent writes failing tests for the auth module
-- **Phase 3:** The **developer** agent implements until tests pass (self-heals up to 3 times)
+- **Phase 2:** In TDD mode (`--tdd`), the **tester** agent writes failing tests for the auth module. In default mode, Phase 2 is skipped unless requested.
+- **Phase 3:** The **developer** agent implements per the plan (self-heals up to 3 times). In TDD mode, until failing tests pass.
 - **Phase 4:** The **reviewer** agent checks 5 dimensions (architecture, types, tests, security, performance). The **security** agent auto-inserts because this is auth-related.
 - **Gate 2:** You approve the review verdict
 - **Phase 5:** The **shipper** agent creates a conventional commit, pushes, and creates a PR
@@ -88,7 +88,7 @@ This executes Phases 2-6 automatically:
 |-------|-------|-----------|-------------|
 | 0 | orchestrator | — | Reads memory, classifies complexity, assigns model tier |
 | 1 | planner | **Gate 1** | Creates plan, waits for human approval |
-| 2 | tester | `pre-implement.sh` | Writes failing tests, blocks implementation without them |
+| 2 | tester | `pre-implement.sh` (skill-invoked, TDD-mode only) | TDD mode: writes failing tests, blocks implementation. Default mode: optional/on-request. |
 | 3 | developer | `post-write.sh` | Implements code, security scan on every file write |
 | 4 | reviewer + security | **Gate 2** | 5-dimension audit + security audit, waits for approval |
 | 5 | shipper | `pre-ship.sh` | Test + lint + typecheck, then commit → PR |

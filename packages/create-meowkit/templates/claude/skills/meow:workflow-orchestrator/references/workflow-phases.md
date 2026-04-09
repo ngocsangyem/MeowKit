@@ -1,6 +1,6 @@
-<!-- Extracted from SKILL.md for progressive disclosure (checklist #11, #14) -->
+<!-- Aligned to CLAUDE.md 7-phase model (B2-C6 fix) -->
 
-# 5-Phase Workflow Detail
+# 7-Phase Workflow Detail
 
 ## Collaborative Planning (Deep Tasks Only)
 
@@ -10,65 +10,76 @@ For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
 - Cross-review and debate proposals
 - PM converges on optimal plan
 
-| Phase | Name                | Lead Agent            | Deliverable                        | Gate         |
-| ----- | ------------------- | --------------------- | ---------------------------------- | ------------ |
-| 1     | Understand + Design | planner → architect   | Requirements, technical design     | **APPROVAL** |
-| 2     | Test (RED)          | tester + developer    | Failing tests (TDD RED)            | Auto         |
-| 3     | Build (GREEN)       | developer             | Implementation (TDD GREEN)         | **APPROVAL** |
-| 4     | Refactor + Review   | developer + security  | Clean code, quality/security check | Auto\*       |
-| 5     | Finalize            | tester + orchestrator | Coverage >=80%, docs, notification | Auto         |
+> **TDD opt-in (post-migration):** Phase 2 is OPTIONAL by default. Pass `--tdd` or `export MEOWKIT_TDD=1` to require RED-phase tests before Phase 3. In default mode, Phase 2 is skipped unless the orchestrator explicitly invokes the tester for plan-coverage reasons.
+
+| Phase | Name                    | Lead Agent           | Deliverable                                           | Gate             |
+| ----- | ----------------------- | -------------------- | ----------------------------------------------------- | ---------------- |
+| 0     | Orient                  | orchestrator         | Model tier, execution mode, context, **TDD mode**     | Auto             |
+| 1     | Plan                    | planner → architect  | Requirements, technical design                        | **GATE 1**       |
+| 2     | Test (RED if `--tdd`)   | tester               | Failing tests in TDD mode; tests on-request otherwise | Auto / Skipped   |
+| 3     | Build                   | developer            | Implementation (GREEN in TDD mode)                    | Auto             |
+| 4     | Review                  | reviewer + security  | Quality/security audit, verdict                       | **GATE 2**       |
+| 5     | Ship                    | shipper + git-manager| Commit, PR, deploy                                    | Auto             |
+| 6     | Reflect                 | analyst + documenter | Memory capture, docs sync                             | Auto             |
 
 ## Phase Transition Rules
 
 ```
-Phase 1 → Phase 2: APPROVAL REQUIRED
-Phase 2 → Phase 3: AUTO-CONTINUE (if tests fail as expected)
-Phase 3 → Phase 4: APPROVAL REQUIRED
-Phase 4 → Phase 5: AUTO-CONTINUE (if tests pass, no critical issues)
-Phase 5 → DONE: AUTO-COMPLETE
+Phase 0 → Phase 1: AUTO-CONTINUE
+Phase 1 → Phase 2: GATE 1 — HUMAN APPROVAL REQUIRED
+Phase 2 → Phase 3:
+  - In TDD mode: AUTO-CONTINUE (if tests fail as expected)
+  - In default mode: Phase 2 may be skipped entirely; Phase 1 → Phase 3 directly
+Phase 3 → Phase 4: AUTO-CONTINUE (optional review gate in interactive mode)
+Phase 4 → Phase 5: GATE 2 — HUMAN APPROVAL REQUIRED (NO EXCEPTIONS)
+Phase 5 → Phase 6: AUTO-CONTINUE
+Phase 6 → DONE: AUTO-COMPLETE
 ```
 
-Invalid transitions: Skip Phase 1→3 (no tests), Phase 3 without Phase 2 (no TDD), Phase 5 with failing tests.
+Invalid transitions:
+- Skip Phase 1 (no plan) — always invalid
+- Phase 5 with failing tests (if tests exist)
+- Phase 3 without Phase 2 — invalid ONLY when `MEOWKIT_TDD=1` / `--tdd` is set; permitted in default mode
 
 ## Approval Gates (Only 2)
 
-Format:
+**Gate 1** (after Phase 1 — Plan):
+- Plan file exists at `tasks/plans/YYMMDD-name/plan.md`
+- All required sections populated (Problem, Success Criteria, Technical Approach)
+- Human has explicitly approved
 
+**Gate 2** (after Phase 4 — Review):
+- Verdict file exists at `tasks/reviews/YYMMDD-name-verdict.md`
+- No FAIL dimensions (all 5 must be PASS or WARN)
+- All WARN items acknowledged by human
+- No BLOCK items from security scan
+- Human has explicitly approved
+
+Format:
 ```markdown
 Phase [N]: [Name] - Approval Needed
 
 ## [Friendly Summary]
 
 [Deliverables list]
-Progress: [X]% ([N]/5 phases)
+Progress: [X]% ([N]/7 phases)
 Options: approve / reject: <reason> / modify: <changes> / stop
 ```
 
 ## AUTO-CONTINUE Behavior
 
 ```
-START → Phase 1 APPROVAL → Phase 2 (auto) → Phase 3 APPROVAL → Phase 4 (auto) → Phase 5 (auto) → DONE
+Phase 0 (auto) → Phase 1 GATE 1 → Phase 2 (auto) → Phase 3 (auto) → Phase 4 GATE 2 → Phase 5 (auto) → Phase 6 (auto) → DONE
 ```
 
-Auto-Stop: Tests pass when should fail (Phase 2), tests fail after refactor (Phase 4), coverage <80% (Phase 5), token limit reached.
+Auto-Stop: Tests pass when should fail (Phase 2), tests fail after implementation (Phase 3), coverage <80% (Phase 4), token limit reached.
 
 Token awareness: 75% (150K) warn, 85% (170K) suggest handoff, 90% (180K) force handoff.
-
-## Token Budget Per Phase
-
-```toon
-token_budget[5]{phase,max_tokens,format}:
-  1,2000,TOON tables + minimal prose
-  2,1500,Test code only - no explanations
-  3,2500,Implementation code - minimal comments
-  4,1000,Refactor summary + review findings in TOON
-  5,500,Status only
-```
 
 ## Critical Rules — TDD
 
 ```
 Phase 2 (RED):  Write tests FIRST → Run → MUST FAIL
 Phase 3 (GREEN): Write minimal code → Run → MUST PASS
-Phase 4 (REFACTOR): Clean up → Run → MUST STILL PASS
+Phase 4 (REVIEW): Audit → Run → MUST STILL PASS
 ```

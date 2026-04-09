@@ -10,29 +10,36 @@ For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
 - Cross-review and debate proposals
 - PM converges on optimal plan
 
-| Phase | Name            | Lead Agent           | Deliverable                          | Gate             |
-| ----- | --------------- | -------------------- | ------------------------------------ | ---------------- |
-| 0     | Orient          | orchestrator         | Model tier, execution mode, context  | Auto             |
-| 1     | Plan            | planner → architect  | Requirements, technical design       | **GATE 1**       |
-| 2     | Test (RED)      | tester               | Failing tests (TDD RED)              | Auto             |
-| 3     | Build (GREEN)   | developer            | Implementation (TDD GREEN)           | Auto             |
-| 4     | Review          | reviewer + security  | Quality/security audit, verdict      | **GATE 2**       |
-| 5     | Ship            | shipper + git-manager| Commit, PR, deploy                   | Auto             |
-| 6     | Reflect         | analyst + documenter | Memory capture, docs sync            | Auto             |
+> **TDD opt-in (post-migration):** Phase 2 is OPTIONAL by default. Pass `--tdd` or `export MEOWKIT_TDD=1` to require RED-phase tests before Phase 3. In default mode, Phase 2 is skipped unless the orchestrator explicitly invokes the tester for plan-coverage reasons.
+
+| Phase | Name                    | Lead Agent           | Deliverable                                           | Gate             |
+| ----- | ----------------------- | -------------------- | ----------------------------------------------------- | ---------------- |
+| 0     | Orient                  | orchestrator         | Model tier, execution mode, context, **TDD mode**     | Auto             |
+| 1     | Plan                    | planner → architect  | Requirements, technical design                        | **GATE 1**       |
+| 2     | Test (RED if `--tdd`)   | tester               | Failing tests in TDD mode; tests on-request otherwise | Auto / Skipped   |
+| 3     | Build                   | developer            | Implementation (GREEN in TDD mode)                    | Auto             |
+| 4     | Review                  | reviewer + security  | Quality/security audit, verdict                       | **GATE 2**       |
+| 5     | Ship                    | shipper + git-manager| Commit, PR, deploy                                    | Auto             |
+| 6     | Reflect                 | analyst + documenter | Memory capture, docs sync                             | Auto             |
 
 ## Phase Transition Rules
 
 ```
 Phase 0 → Phase 1: AUTO-CONTINUE
 Phase 1 → Phase 2: GATE 1 — HUMAN APPROVAL REQUIRED
-Phase 2 → Phase 3: AUTO-CONTINUE (if tests fail as expected)
+Phase 2 → Phase 3:
+  - In TDD mode: AUTO-CONTINUE (if tests fail as expected)
+  - In default mode: Phase 2 may be skipped entirely; Phase 1 → Phase 3 directly
 Phase 3 → Phase 4: AUTO-CONTINUE (optional review gate in interactive mode)
 Phase 4 → Phase 5: GATE 2 — HUMAN APPROVAL REQUIRED (NO EXCEPTIONS)
 Phase 5 → Phase 6: AUTO-CONTINUE
 Phase 6 → DONE: AUTO-COMPLETE
 ```
 
-Invalid transitions: Skip Phase 1→3 (no tests), Phase 3 without Phase 2 (no TDD), Phase 5 with failing tests.
+Invalid transitions:
+- Skip Phase 1 (no plan) — always invalid
+- Phase 5 with failing tests (if tests exist)
+- Phase 3 without Phase 2 — invalid ONLY when `MEOWKIT_TDD=1` / `--tdd` is set; permitted in default mode
 
 ## Approval Gates (Only 2)
 

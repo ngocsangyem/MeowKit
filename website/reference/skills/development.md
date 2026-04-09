@@ -22,7 +22,7 @@ Phase 3 (Build GREEN) implementation guidance. Agents load these references auto
 
 ## Gotchas
 
-- **TDD enforcement blocking exploratory prototyping**: Strict red-green cycle slows rapid iteration → Use fast mode for prototypes, switch to default mode before shipping
+- **TDD enforcement blocking exploratory prototyping**: Strict red-green cycle slows rapid iteration → Default mode (TDD off) is now the right choice for prototypes; opt into `--tdd` only when shipping production-quality work
 - **200-line file rule on generated code**: Auto-generated files (migrations, schemas) exceed limit by design → Exempt generated files explicitly in plan constraints
 
 ## Related
