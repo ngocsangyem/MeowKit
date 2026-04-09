@@ -19,7 +19,7 @@ Most documentation flows go through `meow:docs-finder` (Context7 → Context Hub
 - **Streaming size cap** — 10MB default via `iter_content` + `lxml huge_tree=False`; configurable via `MEOWKIT_WEB_FETCH_MAX_BYTES`
 - **6-pass injection scanner** — vendored Lasso patterns (MIT) + MeowKit-specific patterns + base64 / ROT13 / Unicode NFKC / zero-width / context-flood detection
 - **HARD_STOP on injection** — no programmatic bypass. Hits are quarantined to `.claude/cache/web-fetches/quarantine/{sha256}.quarantined` and require manual user inspection
-- **DATA boundary wrapping** — every fetched page enters the agent context inside ```` ```fetched-markdown from={url} ```` fences. Both saved reports AND the preview returned to the agent are wrapped — load-bearing per `injection-rules.md` Rule 7
+- **DATA boundary wrapping** — every fetched page enters the agent context inside ` ```fetched-markdown from={url} ` fences. Both saved reports AND the preview returned to the agent are wrapped — load-bearing per `injection-rules.md` Rule 7
 - **Fetch persistence** — successful fetches write to `.claude/cache/web-fetches/{YYMMDD}-{HHMMSS}-{host}-{sha256[:10]}.md`. The skill returns a 2KB preview + path; agent reads full content via `Read` on demand. Token-efficient (Anthropic's just-in-time context engineering)
 - **Per-domain rate limit** — 1 req/2s default via `time.monotonic()`; configurable via `MEOWKIT_WEB_FETCH_THROTTLE_MS=0` to disable
 - **robots.txt respected** — 24h TTL cache at `.claude/cache/web-to-markdown/robots-cache.json`; kill switch `MEOWKIT_WEB_FETCH_RESPECT_ROBOTS=0`
@@ -29,23 +29,26 @@ Most documentation flows go through `meow:docs-finder` (Context7 → Context Hub
 ## When to Use This
 
 ::: tip Use meow:web-to-markdown when...
+
 - The URL is a blog post, RFC, GitHub issue, vendor changelog — anything `meow:docs-finder` can't reach
 - You need clean markdown extraction from a page (not raw HTML)
 - The page is static or you're willing to opt into Playwright for JS rendering
 - You're delegated to it via `meow:docs-finder` tier-4 fallback or another skill passing `--wtm-accept-risk`
-:::
+  :::
 
 ::: warning Don't use meow:web-to-markdown when...
+
 - The URL is in a curated index → use `meow:docs-finder` (Context7/chub/WebSearch)
 - You need interactive browser testing → use `meow:browse` or `meow:agent-browser`
 - You're delegating without `--wtm-accept-risk` → cross-skill delegation is blocked by design
-:::
+  :::
 
 ## Cross-skill delegation gate
 
 Other skills MUST pass `--wtm-accept-risk` to delegate a fetch to `meow:web-to-markdown`. Without the flag, those skills CANNOT call web-to-markdown — they fall back to `meow:docs-finder` (Context7/chub/WebSearch). The flag forces conscious crossing of the trust boundary.
 
 Documented delegation gates (Phase 3):
+
 - `meow:intake`, `meow:investigate` — skill-level
 - `researcher`, `planner`, `analyst` — agent-level
 
@@ -71,13 +74,13 @@ https://blog.example.com/post
 
 ## Environment variables
 
-| Variable | Default | Effect |
-|---|---|---|
-| `MEOWKIT_WEB_FETCH_PERSIST` | `on` | `off` returns full content inline, no disk write |
-| `MEOWKIT_WEB_FETCH_JS` | `0` | `1` enables Playwright (requires opt-in install) |
-| `MEOWKIT_WEB_FETCH_MAX_BYTES` | `10485760` | Per-fetch size cap (capped at 100MB hard ceiling) |
-| `MEOWKIT_WEB_FETCH_THROTTLE_MS` | `2000` | Per-domain rate limit; `0` disables |
-| `MEOWKIT_WEB_FETCH_RESPECT_ROBOTS` | `1` | `0` disables robots.txt check |
+| Variable                           | Default    | Effect                                            |
+| ---------------------------------- | ---------- | ------------------------------------------------- |
+| `MEOWKIT_WEB_FETCH_PERSIST`        | `on`       | `off` returns full content inline, no disk write  |
+| `MEOWKIT_WEB_FETCH_JS`             | `0`        | `1` enables Playwright (requires opt-in install)  |
+| `MEOWKIT_WEB_FETCH_MAX_BYTES`      | `10485760` | Per-fetch size cap (capped at 100MB hard ceiling) |
+| `MEOWKIT_WEB_FETCH_THROTTLE_MS`    | `2000`     | Per-domain rate limit; `0` disables               |
+| `MEOWKIT_WEB_FETCH_RESPECT_ROBOTS` | `1`        | `0` disables robots.txt check                     |
 
 ## Dependencies
 
@@ -100,16 +103,16 @@ All three required.
 
 See `references/security.md` inside the skill for the full threat model. Key layers:
 
-| # | Layer | Defense |
-|---|---|---|
-| 1 | Path/venv | `.claude/cache/web-fetches/` (NOT memory), `.venv/bin/python3` |
-| 2 | SSRF | `safe_url()` IPv4+IPv6 + hostname blocklist + DNS validation |
-| 3 | Size cap | Streaming 10MB + `huge_tree=False` |
-| 4 | DATA boundary | Triple-backtick fence wrap on report + preview |
-| 5 | Injection scan | 6 passes (Lasso patterns + encoding + flood + delimiter) |
-| 6 | HARD_STOP | Quarantine + security-log; no programmatic bypass |
-| 7 | Secret scrub | Regex scrubber before persist |
-| 8 | Post-write library scan | `injection-audit.scan_file` via `importlib` (NOT a hook) |
+| #   | Layer                   | Defense                                                        |
+| --- | ----------------------- | -------------------------------------------------------------- |
+| 1   | Path/venv               | `.claude/cache/web-fetches/` (NOT memory), `.venv/bin/python3` |
+| 2   | SSRF                    | `safe_url()` IPv4+IPv6 + hostname blocklist + DNS validation   |
+| 3   | Size cap                | Streaming 10MB + `huge_tree=False`                             |
+| 4   | DATA boundary           | Triple-backtick fence wrap on report + preview                 |
+| 5   | Injection scan          | 6 passes (Lasso patterns + encoding + flood + delimiter)       |
+| 6   | HARD_STOP               | Quarantine + security-log; no programmatic bypass              |
+| 7   | Secret scrub            | Regex scrubber before persist                                  |
+| 8   | Post-write library scan | `injection-audit.scan_file` via `importlib` (NOT a hook)       |
 
 ## Known limitations
 

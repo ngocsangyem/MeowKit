@@ -43,12 +43,12 @@ Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline
 
 Dead-weight thesis: every scaffold encodes an assumption about what the model cannot do; measuring is the only way to know if it's load-bearing or friction. Density auto-selected per model tier:
 
-| Tier | Model | Density | What runs |
-|---|---|---|---|
-| TRIVIAL | Haiku | MINIMAL | Short-circuits to meow:cook |
-| STANDARD | Sonnet | FULL | Contract + 1–3 iterations + context resets |
-| COMPLEX | Opus 4.5 | FULL | Same as Sonnet |
-| COMPLEX | Opus 4.6+ | LEAN | Single-session, contract optional, 0–1 iterations |
+| Tier     | Model     | Density | What runs                                         |
+| -------- | --------- | ------- | ------------------------------------------------- |
+| TRIVIAL  | Haiku     | MINIMAL | Short-circuits to meow:cook                       |
+| STANDARD | Sonnet    | FULL    | Contract + 1–3 iterations + context resets        |
+| COMPLEX  | Opus 4.5  | FULL    | Same as Sonnet                                    |
+| COMPLEX  | Opus 4.6+ | LEAN    | Single-session, contract optional, 0–1 iterations |
 
 Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN`. Density never bypasses gates. Auto-detection requires `export MEOWKIT_MODEL_HINT=opus-4-6` — Claude Code does not export model env vars to hooks.
 
@@ -86,7 +86,7 @@ New skill for fetching arbitrary URLs as clean markdown. Slots in below `meow:do
 
 #### New Skill
 
-- **meow:web-to-markdown** — static-by-default URL → clean markdown with SSRF guard, 6-pass injection scanner, DATA boundary wrap, fetch persistence with manifest, robots.txt cache, per-domain throttle, honest User-Agent. Optional Playwright via opt-in three-layer gate. Vendored Lasso Security injection patterns (MIT, commit `8fbfd14c`).
+- **meow:web-to-markdown** — static-by-default URL → clean markdown with SSRF guard, 6-pass injection scanner, DATA boundary wrap, fetch persistence with manifest, robots.txt cache, per-domain throttle, honest User-Agent. Optional Playwright via opt-in three-layer gate.
 
 #### mewkit CLI
 
@@ -104,10 +104,6 @@ New skill for fetching arbitrary URLs as clean markdown. Slots in below `meow:do
 #### Hook fix (framework-wide impact)
 
 - **`privacy-block.sh` exit code corrected** — was using `exit 1` (non-blocking per Claude Code hooks docs). Changed to `exit 2` so the hook actually blocks. Block messages moved stdout → stderr (Claude Code feeds stderr to model on exit 2). **NOTE:** Other meowkit hooks (`gate-enforcement.sh`, `pre-task-check.sh`, `pre-ship.sh`) likely have the same `exit 1` pattern — escalated as separate audit work.
-
-#### Vendored dependency
-
-- **Lasso Security claude-hooks** vendored at commit `8fbfd14c2a2271fe58a95c416b3b31880458c7bc` into `docs/lasso-claude-hooks-vendor/` (MIT). Pattern set extracted into `meow:web-to-markdown/scripts/injection_patterns.py` with citation header. No runtime network dependency on the upstream repo.
 
 #### Deferred to v2.2.0 follow-up
 
