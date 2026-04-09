@@ -5,6 +5,12 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.2.2 (2026-04-10) — Homoglyph Detection Refinement
+
+### Changed
+
+- **meow:web-to-markdown** — `injection_detect.py` homoglyph detection now flags only mixed-script tokens (e.g., Latin + Cyrillic within a single word) instead of consecutive foreign characters. Reduces false positives on legitimate multilingual content while still catching homoglyph spoofing attempts.
+
 ## 2.2.1 (2026-04-10) — Bug Fix
 
 ### Fixed
