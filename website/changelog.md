@@ -5,6 +5,12 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.2.1 (2026-04-10) — Bug Fix
+
+### Fixed
+
+- **meow:web-to-markdown** — `robots_cache.py` `_fetch_robots_txt()` raised `UnboundLocalError` when fetching robots.txt. A function-local `import urllib.request` shadowed the module-level `urllib.robotparser` binding, breaking `rp = urllib.robotparser.RobotFileParser()` on line 151. Hoisted `import urllib.request` to module-level imports.
+
 ## 2.2.0 (2026-04-08) — Generator/Evaluator Harness
 
 Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline, adaptive scaffolding density per model tier, middleware layer, trace-driven meta-loop, and a conversation summary cache — without loosening any hard gates. Thesis: keep the discipline, prune the dead weight, add the harness.
