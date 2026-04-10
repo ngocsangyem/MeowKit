@@ -42,7 +42,7 @@ const PRIORITY_KEYWORDS = {
  */
 function categorizeUrl(url) {
   const urlLower = url.toLowerCase();
-  const priorities = ['critical', 'supplementary', 'important'];
+  const priorities = ['critical', 'important', 'supplementary'];
 
   for (const priority of priorities) {
     const keywords = PRIORITY_KEYWORDS[priority];

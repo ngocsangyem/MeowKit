@@ -19,6 +19,15 @@
 const { execSync } = require('child_process');
 const { loadEnv } = require('./utils/env-loader');
 
+/**
+ * Escape a string for safe use inside a single-quoted shell argument.
+ * Neutralizes all shell metacharacters ($, `, \, !, ", ;, &, |).
+ * Ported from fetch-web-to-markdown.js.
+ */
+function shellEscape(str) {
+  return "'" + str.replace(/'/g, "'\\''") + "'";
+}
+
 const env = loadEnv();
 const DEBUG = env.DEBUG === 'true';
 
@@ -64,7 +73,7 @@ function runChub(command, timeoutMs = 15000) {
  */
 function searchChub(query) {
   // Use --json for structured output (reliable parsing)
-  const output = runChub(`search "${query}" --json`);
+  const output = runChub(`search ${shellEscape(query)} --json`);
 
   if (!output) return [];
 
@@ -113,14 +122,14 @@ function searchChub(query) {
  * @returns {string|null} Documentation content
  */
 function getChubDoc(id, options = {}) {
-  let command = `get ${id}`;
+  let command = `get ${shellEscape(id)}`;
 
   if (options.lang) {
-    command += ` --lang ${options.lang}`;
+    command += ` --lang ${shellEscape(options.lang)}`;
   }
 
   if (options.version) {
-    command += ` --version ${options.version}`;
+    command += ` --version ${shellEscape(options.version)}`;
   }
 
   return runChub(command, 30000);
@@ -133,7 +142,7 @@ function getChubDoc(id, options = {}) {
  * @returns {boolean} Success
  */
 function annotateChub(id, annotation) {
-  const result = runChub(`annotate ${id} "${annotation.replace(/"/g, '\\"')}"`);
+  const result = runChub(`annotate ${shellEscape(id)} ${shellEscape(annotation)}`);
   return result !== null;
 }
 
