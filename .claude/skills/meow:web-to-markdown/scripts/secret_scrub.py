@@ -22,10 +22,12 @@ _SECRET_PATTERNS: list[tuple[re.Pattern, str]] = [
     # OpenAI / Anthropic style keys
     (re.compile(r"sk-[a-zA-Z0-9]{32,}"), "api_key"),
     (re.compile(r"pk-live-[a-zA-Z0-9]+"), "api_key"),
-    # Google API key
-    (re.compile(r"AIza[a-zA-Z0-9_\-]{35}"), "google_api_key"),
-    # JWT: header.payload.signature (all base64url segments)
-    (re.compile(r"eyJ[a-zA-Z0-9_\-]+\.eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+"), "jwt"),
+    # Google API key (variable length: AIza + 30-35 chars)
+    (re.compile(r"AIza[a-zA-Z0-9_\-]{30,}"), "google_api_key"),
+    # Bearer token (must precede JWT to capture full "Bearer <jwt>" as one unit)
+    (re.compile(r"(?i)bearer\s+[a-zA-Z0-9\-._~+/]+=*"), "bearer_token"),
+    # JWT: header.payload.signature (standalone, not preceded by Bearer)
+    (re.compile(r"(?<![Bb]earer\s)eyJ[a-zA-Z0-9_\-]+\.eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+"), "jwt"),
     # AWS access key ID
     (re.compile(r"AKIA[A-Z0-9]{16}"), "aws_access_key"),
     # AWS secret (key=value form)
@@ -35,10 +37,14 @@ _SECRET_PATTERNS: list[tuple[re.Pattern, str]] = [
         r"-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----[\s\S]*?-----END [^-]+ PRIVATE KEY-----",
         re.DOTALL,
     ), "private_key"),
-    # Bearer tokens in text
-    (re.compile(r"(?i)bearer\s+[a-zA-Z0-9\-._~+/]+=*"), "bearer_token"),
     # Basic-auth embedded in URL
     (re.compile(r"https?://[^:@/\s]+:[^:@/\s]+@"), "basic_auth_url"),
+    # GitHub tokens (PAT, OAuth, app, refresh)
+    (re.compile(r"gh[opsr]_[a-zA-Z0-9]{36}"), "github_token"),
+    # npm tokens
+    (re.compile(r"npm_[a-zA-Z0-9]{36}"), "npm_token"),
+    # Slack tokens (bot, user, app-level, refresh)
+    (re.compile(r"xox[bpra]-[a-zA-Z0-9\-]+"), "slack_token"),
 ]
 
 # Query-string param names that carry credentials

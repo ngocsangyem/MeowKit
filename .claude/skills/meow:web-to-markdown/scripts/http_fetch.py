@@ -39,6 +39,8 @@ except ImportError:
 
 PLAYWRIGHT_REJECTED_SCHEMES = frozenset({"file", "chrome", "about", "data", "javascript"})
 _BLOCKED_HOSTNAMES = frozenset({"localhost", "metadata.google.internal", "metadata.internal"})
+# RFC 6598 CGN range — not caught by ipaddress flags on Python 3.12
+_BLOCKED_NETWORKS = [ipaddress.ip_network("100.64.0.0/10")]
 _DEFAULT_MAX_BYTES = 10 * 1024 * 1024
 _HARD_CEILING_BYTES = 100 * 1024 * 1024
 
@@ -105,6 +107,8 @@ def safe_url(url: str) -> str | None:
             return None
         if (ip.is_private or ip.is_loopback or ip.is_link_local
                 or ip.is_reserved or ip.is_multicast):
+            return None
+        if any(ip in net for net in _BLOCKED_NETWORKS):
             return None
 
     return url
@@ -231,11 +235,16 @@ def static_fetch(url: str, timeout: int = 15) -> tuple[str | None, int, str]:
 
         raw = b"".join(chunks)
 
-        # Encoding detection
-        if not r.encoding or r.encoding.lower() == "iso-8859-1":
-            r.encoding = r.apparent_encoding
+        # Encoding detection — r.apparent_encoding is unsafe after iter_content()
+        # because it accesses r.content which raises RuntimeError after streaming.
+        # Use chardet directly on the already-buffered bytes instead.
+        encoding = r.encoding
+        if not encoding or encoding.lower() == "iso-8859-1":
+            import chardet
+            detected = chardet.detect(raw)
+            encoding = detected.get("encoding") or "utf-8"
         try:
-            text = raw.decode(r.encoding or "utf-8", errors="replace")
+            text = raw.decode(encoding, errors="replace")
         except (LookupError, UnicodeDecodeError):
             text = raw.decode("utf-8", errors="replace")
 

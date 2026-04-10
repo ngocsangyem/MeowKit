@@ -92,7 +92,7 @@ _FENCE_SYSTEM_MARKER = re.compile(
 )
 
 # Pattern for base64 blocks: >=64 chars of base64 alphabet outside code fences
-_B64_BLOCK = re.compile(r"(?<![`\w])[A-Za-z0-9+/]{64,}={0,2}(?![`\w])")
+_B64_BLOCK = re.compile(r"(?<![`\w])[A-Za-z0-9+/]{20,}={0,2}(?![`\w])")
 
 # ROT13 injection keywords to check after decoding
 _ROT13_KEYWORDS = re.compile(
@@ -200,6 +200,9 @@ def scan(text: str) -> InjectionVerdict:
             decoded_bytes = base64.b64decode(padded, validate=False)
             decoded_str = decoded_bytes.decode("utf-8", errors="ignore")
         except Exception:
+            continue
+        # Skip short decoded strings that lack spaces — likely UUIDs/hashes, not text
+        if len(raw) < 64 and " " not in decoded_str:
             continue
         decoded_normalized = _normalize(decoded_str)
         for pattern, reason, category in _ALL_PATTERNS:

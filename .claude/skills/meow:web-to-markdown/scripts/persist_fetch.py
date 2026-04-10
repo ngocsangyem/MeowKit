@@ -35,9 +35,18 @@ from scripts.secret_scrub import scrub_content, scrub_url
 # ---------------------------------------------------------------------------
 
 def _find_project_root() -> Path:
-    """Walk up from this file to find the directory containing .claude/."""
-    for parent in [Path(__file__).resolve(), *Path(__file__).resolve().parents]:
-        if (parent / ".claude").is_dir():
+    """Walk up from this file to find the project root.
+
+    Previous logic searched for .claude/ directory, but skill subdirs also
+    contain .claude/, causing resolution to stop at the skill dir instead of
+    the actual project root. Uses multiple sentinels for robustness:
+    - CLAUDE.md — created by Claude Code and npx mewkit init
+    - .claude/settings.json — always exists at project root, never in skill subdirs
+    """
+    for parent in Path(__file__).resolve().parents:
+        if (parent / "CLAUDE.md").exists():
+            return parent
+        if (parent / ".claude" / "settings.json").exists():
             return parent
     return Path.cwd()
 
