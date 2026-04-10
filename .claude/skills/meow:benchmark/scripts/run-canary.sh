@@ -74,27 +74,35 @@ for spec in "${SPECS[@]}"; do
 done
 TASKS_JSON="${TASKS_JSON}]"
 
-# Write the initial manifest
-"$PY" -c "
-import json
+# Write the initial manifest — pass dynamic values via env vars to avoid
+# shell→Python injection from spec filenames containing quotes
+TASKS_JSON="$TASKS_JSON" \
+RUN_ID="$RUN_ID" \
+TIER="$TIER" \
+STARTED="$STARTED" \
+MODEL="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-unknown}}" \
+COST_CAP="$COST_CAP" \
+RESULT_FILE="$RESULT_FILE" \
+"$PY" -c '
+import json, os
 manifest = {
-    'run_id': '$RUN_ID',
-    'tier': '$TIER',
-    'started': '$STARTED',
-    'ended': None,
-    'harness_version': '3.0.0',
-    'model': '${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-unknown}}',
-    'cost_cap_usd': $COST_CAP,
-    'total_cost_usd': 0.0,
-    'total_duration_seconds': 0,
-    'tasks': json.loads('''$TASKS_JSON'''),
-    'summary': {'passed': 0, 'warned': 0, 'failed': 0, 'average_score': 0.0},
-    'status': 'in_progress'
+    "run_id": os.environ["RUN_ID"],
+    "tier": os.environ["TIER"],
+    "started": os.environ["STARTED"],
+    "ended": None,
+    "harness_version": "3.0.0",
+    "model": os.environ["MODEL"],
+    "cost_cap_usd": float(os.environ["COST_CAP"]),
+    "total_cost_usd": 0.0,
+    "total_duration_seconds": 0,
+    "tasks": json.loads(os.environ["TASKS_JSON"]),
+    "summary": {"passed": 0, "warned": 0, "failed": 0, "average_score": 0.0},
+    "status": "in_progress"
 }
-with open('$RESULT_FILE', 'w') as f:
+with open(os.environ["RESULT_FILE"], "w") as f:
     json.dump(manifest, f, indent=2)
-print(f'Manifest: $RESULT_FILE')
-"
+print(f"Manifest: {os.environ[\"RESULT_FILE\"]}")
+'
 
 echo ""
 
