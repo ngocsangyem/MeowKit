@@ -12,6 +12,11 @@
             "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/project-context-loader.sh\"",
             "timeout": 5,
             "statusMessage": "Loading project context..."
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" SessionStart",
+            "timeout": 10
           }
         ]
       }
@@ -85,14 +90,8 @@
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-write-build-verify.sh\"",
-            "timeout": 35,
-            "statusMessage": "Build-verify check..."
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-write-loop-detection.sh\"",
-            "timeout": 3
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" PostToolUse \"Edit|Write\"",
+            "timeout": 40
           }
         ]
       },
@@ -103,6 +102,11 @@
             "type": "command",
             "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/cost-meter.sh\"",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" PostToolUse Bash",
+            "timeout": 15
           }
         ]
       }
@@ -125,6 +129,11 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/conversation-summary-cache.sh\"",
             "timeout": 5,
             "statusMessage": "Spawning background summary..."
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" Stop",
+            "timeout": 10
           }
         ]
       }
@@ -142,6 +151,11 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/conversation-summary-cache.sh\"",
             "timeout": 2
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" UserPromptSubmit",
+            "timeout": 10
           }
         ]
       }
@@ -156,6 +170,7 @@
       "Bash(npx tsc --noEmit)",
       "Bash(python .claude/scripts/*)",
       "Bash(sh .claude/hooks/*)",
+      "Bash(node .claude/hooks/*)",
       "Bash(git *)",
       "Bash(gh *)",
       "Bash(wc -l *)",

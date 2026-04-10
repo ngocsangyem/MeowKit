@@ -1,0 +1,12 @@
+{
+  "PostToolUse": {
+    "Edit|Write": [
+      "./handlers/build-verify.cjs",
+      "./handlers/loop-detection.cjs"
+    ],
+    "Bash": []
+  },
+  "Stop": [],
+  "SessionStart": [],
+  "UserPromptSubmit": []
+}

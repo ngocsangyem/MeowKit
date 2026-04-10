@@ -4,7 +4,9 @@ All hooks in `.claude/hooks/` with their registration, purpose, and input contra
 
 ## Convention (Phase 7 — 260408)
 
-Hooks consume input via **JSON on stdin** (per `code.claude.com/docs/en/hooks`) using the shared parser `lib/read-hook-input.sh`. Hooks also fall back to `$1` positional for back-compat with the legacy `"$TOOL_INPUT_FILE_PATH"` settings.json convention. Both forms coexist safely.
+Hooks consume input via **JSON on stdin** (per `code.claude.com/docs/en/hooks`). Shell hooks use the shared parser `lib/read-hook-input.sh`. Node.js hooks use `lib/parse-stdin.cjs`.
+
+**Phase 1 Harness Evolution (260411):** Non-security hooks are dispatched via `dispatch.cjs` + `handlers.json` registry. Security hooks (`gate-enforcement.sh`, `privacy-block.sh`) remain independent bash entries in `settings.json` per red team E-03 (dispatcher SPOF risk).
 
 Every hook must be registered in `.claude/settings.json` — unregistered hooks are dead code.
 
@@ -19,8 +21,9 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 | `pre-ship.sh` | PreToolUse | Bash | Run tests/lint before git commit/push | 30s | `HOOK_COMMAND` |
 | `post-write.sh` | PostToolUse | Edit\|Write | Security scan on every written file | 10s | `HOOK_FILE_PATH` |
 | `learning-observer.sh` | PostToolUse | Edit\|Write | Detect churn patterns (same file edited 3+ times) | 5s | `HOOK_FILE_PATH` |
-| `post-write-build-verify.sh` | PostToolUse | Edit\|Write | **Phase 7 NEW.** Auto-run compile/lint on source files. Cached by file hash. Errors feed back to agent via stdout. | 35s | `HOOK_FILE_PATH` |
-| `post-write-loop-detection.sh` | PostToolUse | Edit\|Write | **Phase 7 NEW.** Warn at N=4, escalate at N=8 edits to same file. Prevents doom loops. | 3s | `HOOK_FILE_PATH` + `HOOK_SESSION_ID` |
+| `handlers/build-verify.cjs` | PostToolUse | Edit\|Write | Auto-run compile/lint on source files. Cached by file hash. Dispatched via `dispatch.cjs`. Supersedes `post-write-build-verify.sh`. | 40s | `tool_input.file_path` |
+| `handlers/loop-detection.cjs` | PostToolUse | Edit\|Write | Warn at N=4, escalate at N=8 edits to same file. Dispatched via `dispatch.cjs`. Supersedes `post-write-loop-detection.sh`. | 40s | `tool_input.file_path` + `session_id` |
+| `dispatch.cjs` | PostToolUse, Stop, SessionStart, UserPromptSubmit | varies | Central Node.js dispatcher. Loads `handlers.json`, dispatches to registered `.cjs` handler modules. | 10-40s | Full stdin JSON |
 | `cost-meter.sh` | PostToolUse | Bash | Track token cost accumulation | 5s | (none — reads cost log) |
 | `pre-completion-check.sh` | Stop | — | **Phase 7 NEW.** Block session stop if no verification evidence exists. Hard cap 3 re-entries. LEAN mode soft nudge. | 5s | (none — reads plan/contract/trace) |
 | `post-session.sh` | Stop | — | Capture session lessons + model-change detection + cost log initialization + Phase 9 conversation-summary cache clear on session change | 5s | (none — reads memory) |
@@ -52,9 +55,9 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 
 | File | Writer | Reader | Purpose |
 |---|---|---|---|
-| `session-state/edit-counts.json` | post-write-loop-detection.sh | (same) | Per-file edit counter, keyed by `{session_id}:{realpath}` |
+| `session-state/edit-counts.json` | handlers/loop-detection.cjs | (same) | Per-file edit counter, keyed by `{session_id}:{realpath}` |
 | `session-state/precompletion-attempts.json` | pre-completion-check.sh | (same) | Forced-re-entry counter per active plan |
-| `session-state/build-verify-cache.json` | post-write-build-verify.sh | (same) | File-content-hash cache for skip-on-unchanged |
+| `session-state/build-verify-cache.json` | handlers/build-verify.cjs | (same) | File-content-hash cache for skip-on-unchanged |
 | `session-state/last-session-id` | project-context-loader.sh | (same) | Session change detection |
 | `session-state/learning-observer.jsonl` | learning-observer.sh | post-session.sh | Churn pattern log |
 | `session-state/active-plan` | meow:harness (Phase 5), meow:plan-creator | pre-completion-check.sh | Currently active plan slug |
@@ -67,7 +70,10 @@ Hooks in the same event must NOT rely on execution order. Cross-hook state passe
 
 ## See Also
 
-- `lib/read-hook-input.sh` — canonical JSON-on-stdin parser shim
+- `lib/read-hook-input.sh` — canonical JSON-on-stdin parser shim (shell hooks)
+- `lib/parse-stdin.cjs` — stdin JSON parser (Node.js hooks)
+- `lib/shared-state.cjs` — atomic JSON state persistence (Node.js hooks)
+- `handlers.json` — handler registry for `dispatch.cjs`
 - `references/build-verify-commands.md` — per-language build-verify command table
 - `docs/meowkit-rules.md` §3 — Argument Convention (Phase 7 rewrite)
 - `.claude/settings.json` — authoritative hook registration

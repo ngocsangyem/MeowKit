@@ -84,3 +84,19 @@ After completing implementation tasks, ALWAYS declare docs impact:
 - `Docs impact: major` — new documentation required
 
 WHY: Undocumented changes create knowledge gaps for future sessions.
+
+## Tool Output Limits
+
+ALWAYS apply default output limits to prevent context bloat at source.
+MicroCompact truncation is infeasible via hooks (RT2-02: PostToolUse can't replace output).
+Instead, prevent bloat by limiting output at the tool call site.
+
+| Tool | Default Limit | Override |
+|------|--------------|----------|
+| Glob | `head_limit=50` | Increase only when explicitly needing more results |
+| Grep | `head_limit=20` per query | Increase for comprehensive searches |
+| Read | `offset` + `limit` for files >500 lines | Read full file only when necessary |
+| Bash | Pipe through `head -100` for verbose commands | Skip for commands with concise output |
+
+WHY: Unbounded tool output consumes 14-70% of context window per research measurements.
+Limiting at source is behavioral (agent compliance) but achievable immediately without platform changes.
