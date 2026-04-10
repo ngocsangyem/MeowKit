@@ -63,9 +63,13 @@ When `meow:scale-routing` returns a domain match with `level=high`, the model ti
 
 WHY: High-complexity domains (fintech, healthcare, IoT, gaming) have regulatory, security, and architectural requirements that cheaper models handle poorly. The cost of using a weaker model on a security-critical task vastly exceeds the token savings. See `rules/scale-adaptive-rules.md` and `meow:scale-routing/data/domain-complexity.csv` for the domain mapping.
 
-### Rule 5: Harness Density Follows Tier (Phase 5 — 260408)
+### Rule 5: Harness Density Follows Tier (Phase 5 — 260408, updated Phase 2 — 260411)
 
 For `meow:harness` runs, the model tier auto-selects a scaffolding density (`MINIMAL | FULL | LEAN`).
+
+**Auto-detection (Phase 2):** `handlers/model-detector.cjs` reads the `model` field from SessionStart stdin and writes tier + density to `session-state/detected-model.json`. `MEOWKIT_MODEL_HINT` is now a fallback, not a requirement. Detection cascade: (1) stdin `model` field, (2) `MEOWKIT_MODEL_HINT` env var, (3) default STANDARD/FULL.
+
+**Density override:** `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN` env var overrides auto-detected density.
 
 **Single source of truth:** the full decision matrix and rationale live at `.claude/skills/meow:harness/references/adaptive-density-matrix.md`. See also `scale-adaptive-rules.md` Rule 6.
 

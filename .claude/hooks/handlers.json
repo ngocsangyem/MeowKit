@@ -2,11 +2,16 @@
   "PostToolUse": {
     "Edit|Write": [
       "./handlers/build-verify.cjs",
-      "./handlers/loop-detection.cjs"
+      "./handlers/loop-detection.cjs",
+      "./handlers/budget-tracker.cjs"
     ],
-    "Bash": []
+    "Bash": [
+      "./handlers/budget-tracker.cjs"
+    ]
   },
   "Stop": [],
-  "SessionStart": [],
+  "SessionStart": [
+    "./handlers/model-detector.cjs"
+  ],
   "UserPromptSubmit": []
 }
