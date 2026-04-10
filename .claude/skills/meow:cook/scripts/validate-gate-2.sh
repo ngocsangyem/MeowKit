@@ -19,16 +19,16 @@ fi
 
 # Check for FAIL dimensions — match structured patterns only to avoid false positives
 # Matches: "FAIL", "VERDICT: FAIL", "Security: FAIL", "BLOCK" at word boundaries
-FAIL_COUNT=$(printf '%s\n' "$CONTENT" | grep -c '^FAIL:\|: FAIL\|VERDICT.*FAIL\|^BLOCK:\|GATE.*BLOCK' 2>/dev/null || true)
+FAIL_COUNT=$(printf '%s\n' "$CONTENT" | grep -cE '^FAIL:|: FAIL|VERDICT.*FAIL|^BLOCK:|GATE.*BLOCK' 2>/dev/null || true)
 FAIL_COUNT=$(echo "$FAIL_COUNT" | tr -d '[:space:]')
 FAIL_COUNT=${FAIL_COUNT:-0}
 
 # Check for critical issues (critical_count > 0 or "Critical (N)" where N > 0)
-CRITICAL=$(echo "$CONTENT" | grep -oi 'Critical ([0-9]\+)' 2>/dev/null | grep -o '[0-9]\+' | head -1)
+CRITICAL=$(echo "$CONTENT" | grep -oiE 'Critical \([0-9]+\)' 2>/dev/null | grep -oE '[0-9]+' | head -1)
 CRITICAL=${CRITICAL:-0}
 
 # Extract score if present
-SCORE=$(echo "$CONTENT" | grep -oi '[0-9]\+\(\.[0-9]\+\)\?/10' 2>/dev/null | head -1 | cut -d/ -f1)
+SCORE=$(echo "$CONTENT" | grep -oiE '[0-9]+(\.[0-9]+)?/10' 2>/dev/null | head -1 | cut -d/ -f1)
 SCORE=${SCORE:-0}
 
 ISSUES=""

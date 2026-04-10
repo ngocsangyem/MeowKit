@@ -17,7 +17,7 @@ check_exists() {
 
 # Check no placeholder tokens remain in generated files
 check_placeholders() {
-  FOUND=$(grep -rl '\[TODO\]\|\[PROJECT_NAME\]\|\[PLACEHOLDER\]' "$DIR/src" "$DIR/tests" 2>/dev/null || true)
+  FOUND=$(grep -rlE '\[TODO\]|\[PROJECT_NAME\]|\[PLACEHOLDER\]' "$DIR/src" "$DIR/tests" 2>/dev/null || true)
   if [ -n "$FOUND" ]; then
     ERRORS="${ERRORS}\n  PLACEHOLDER_LEAK: $FOUND"
   fi
