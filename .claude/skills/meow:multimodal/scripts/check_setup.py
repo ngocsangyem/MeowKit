@@ -75,7 +75,7 @@ def check_api_key():
         fail("Key format: too short — likely invalid")
         return None
 
-    info(f"Key preview: {api_key[:8]}...{api_key[-4:]}")
+    info(f"Key preview: {api_key[:4]}...{api_key[-2:]}")
     return api_key
 
 

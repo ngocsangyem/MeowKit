@@ -269,12 +269,15 @@ Examples:
     if args.json:
         print(json.dumps(results if len(results) > 1 else results[0], indent=2))
     else:
+        any_error = False
         for r in results:
             if r['status'] == 'success':
                 print(r['result'])
             else:
-                print(f"Error: {r['error']}", file=sys.stderr)
-                sys.exit(1)
+                print(f"Error [{r.get('file', '?')}]: {r['error']}", file=sys.stderr)
+                any_error = True
+        if any_error:
+            sys.exit(1)
 
 
 if __name__ == '__main__':
