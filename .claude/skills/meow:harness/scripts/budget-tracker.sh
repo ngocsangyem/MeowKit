@@ -72,6 +72,14 @@ case "${1:-check}" in
 
   add)
     usd="${2:-0}"
+    # Validate usd is a non-negative number (prevents JSONL corruption + threshold bypass)
+    case "$usd" in
+      ''|*[!0-9.]*) echo "ERROR: usd must be a non-negative number, got: $usd" >&2; exit 2;;
+    esac
+    # Block negative values (leading minus already caught above, but guard explicit)
+    if awk -v u="$usd" 'BEGIN{exit !(u < 0)}' 2>/dev/null; then
+      echo "ERROR: usd must be non-negative, got: $usd" >&2; exit 2
+    fi
     step="${3:-unknown}"
     ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     entry="{\"run_id\": \"$run_id\", \"step\": \"$step\", \"usd\": $usd, \"ts\": \"$ts\"}"

@@ -115,7 +115,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # ---- Emit dispatch instructions ----
-cat <<DISPATCH
+cat <<EVAL_DISPATCH_9f3a
 # meow:evaluate — Dispatch Instructions
 
 ## Target
@@ -165,6 +165,6 @@ After the evaluator returns, run:
 
 If validator exits 0 → exit code matches verdict (PASS=0, WARN=1, FAIL=2).
 If validator exits 1 → either fix the verdict or convert PASS/WARN → FAIL.
-DISPATCH
+EVAL_DISPATCH_9f3a
 
 exit 0

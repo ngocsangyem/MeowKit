@@ -15,8 +15,9 @@
 #   4. Exit 0 if found, 1 otherwise
 set -u
 
-# 1. LEAN mode bypass — adaptive density policy for COMPLEX/Opus 4.6 tier
-if [ "${MEOWKIT_HARNESS_MODE:-}" = "LEAN" ]; then
+# 1. LEAN/MINIMAL mode bypass — per harness-rules.md Rule 3:
+#    MINIMAL (Haiku) = contract skipped, LEAN (Opus 4.6+) = contract optional
+if [ "${MEOWKIT_HARNESS_MODE:-}" = "LEAN" ] || [ "${MEOWKIT_HARNESS_MODE:-}" = "MINIMAL" ]; then
   # Log the bypass for audit (per security considerations) but don't block
   if [ -d ".claude" ]; then
     log_file=".claude/memory/lean-bypass.log"
