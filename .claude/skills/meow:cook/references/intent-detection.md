@@ -6,6 +6,12 @@ Detect user intent from input and route to appropriate workflow mode.
 
 ```
 FUNCTION detectMode(input):
+  # Priority 0.5: Modifier flags (do not change mode, layer on top)
+  IF input contains "--verify": SET verify_flag = true
+  IF input contains "--strict": SET strict_flag = true
+  IF input contains "--no-strict": SET strict_flag = false  # overrides auto-trigger
+  IF input contains "--tdd": SET tdd_flag = true
+
   # Priority 1: Explicit flags (override all)
   IF input contains "--fast": RETURN "fast"
   IF input contains "--parallel": RETURN "parallel"
@@ -66,6 +72,37 @@ Detect multiple features from natural language:
 - "Plan-level" = tests cover plan intent (not research-level edge cases), still written before implementation
 - "Skip" = no-test mode only, user explicitly opted out
 
+## Modifier Flags
+
+Modifier flags layer on TOP of the detected mode. They do not change the mode itself.
+
+| Flag | Effect | When It Fires | Cost |
+|------|--------|---------------|------|
+| `--verify` | Light browser check after review passes | Phase 4.5 (between Review and Ship) | ~$1, <5K tokens |
+| `--strict` | Full evaluator (meow:evaluate) after review passes | Phase 4.5 (between Review and Ship) | ~$2-5 |
+| `--no-strict` | Suppress auto-strict trigger from scale-routing | — | — |
+| `--tdd` | Write failing tests before implementation | Phase 2 (Test RED) | Varies |
+
+**Priority:** `--strict` supersedes `--verify` (strict includes verification). If both present, only `--strict` runs.
+**Combination:** All modifiers can combine with any mode (`--verify --fast`, `--strict --parallel`, etc.).
+
+### Auto-Strict Trigger
+
+When `meow:scale-routing` returns `level=high` at Phase 0 (Orient), `strict_flag` is automatically set to `true` — even without explicit `--strict` in input.
+
+**Rationale:** High-complexity domains (fintech, healthcare, IoT, gaming) have behavioral requirements that code review alone misses.
+
+**Transparency:** Phase 4.5 logs the reason: `"scale-routing level=high ({domain}), auto-triggering strict evaluation"`.
+
+**Override:** `--no-strict` suppresses auto-strict even when scale-routing says high.
+
+```
+# At Phase 0, after scale-routing returns:
+IF scale_routing.level == "high" AND NOT input contains "--no-strict":
+  SET strict_flag = true
+  SET strict_trigger = "auto:scale-routing"
+```
+
 ## Edge Cases
 
 - **Ambiguous task** (could be 2 modes): Ask user via `AskUserQuestion` — "Looks like a [fast/parallel] task. Confirm?"
@@ -99,4 +136,13 @@ Priority order when multiple signals detected:
 
 "/meow:cook implement everything --auto"
 → Mode: auto (explicit flag)
+
+"/meow:cook build dashboard --verify"
+→ Mode: interactive, verify_flag=true (light browser check)
+
+"/meow:cook build payment flow --strict"
+→ Mode: interactive, strict_flag=true (full evaluator)
+
+"/meow:cook quick fix login --verify --fast"
+→ Mode: fast, verify_flag=true (fast workflow + browser verify)
 ```

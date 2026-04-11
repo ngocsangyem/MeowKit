@@ -153,6 +153,70 @@ Run `.claude/skills/meow:cook/scripts/validate-gate-2.sh` before presenting for 
 
 **Output:** `Phase 4: Review [score]/10, Gate 2 approved`
 
+## Phase 4.5: Verify (Browser) — only if `--verify` or `--strict` flag
+
+**Skip this phase entirely if neither `--verify` nor `--strict` flag is set.**
+
+### --verify: Light Browser Check
+
+1. **Detect UI files in diff:**
+   ```bash
+   git diff --name-only HEAD~1 | grep -E '\.(vue|tsx|jsx|html|css|scss|svelte|astro)$'
+   ```
+   If no matches → log `"No UI changes detected, skipping browser verify"` → skip to Phase 5.
+
+2. **Boot dev server** (if not already running):
+   - Read `package.json` → detect `dev` or `start` script
+   - Run in background with 30s timeout for ready
+   - If no dev script → try `curl http://localhost:3000` as fallback
+   - If nothing works → log `"No dev server available, skipping verify"` → skip
+
+3. **Check pages** (always check `/` root, cap at 3 pages):
+   - Navigate to root URL
+   - Verify page has content (not blank)
+   - Check for framework error overlays (Next.js, Vite, webpack)
+   - Check for console errors via dev server stdout
+   - Take screenshot if browser skill available (graceful skip if not)
+
+4. **Verdict:**
+   - PASS: Pages load, have content, no error overlays
+   - FAIL: Any page blank, error overlay detected, or console errors
+   - Emit: `Phase 4.5: Verify — [PASS|FAIL] — [N] pages checked`
+
+5. **On FAIL:** Report findings to user. **This is advisory, NOT a gate.** User decides whether to fix or ship.
+
+6. **Cleanup:** Kill dev server background process.
+
+### --strict: Full Evaluator (meow:evaluate)
+
+**Fires when:** `--strict` flag present OR `meow:scale-routing` returned `level=high` at Phase 0.
+**Supersedes:** `--verify` (strict includes active verification via meow:evaluate step-02/03).
+
+1. **Log trigger reason:**
+   - If explicit: `"--strict flag detected, invoking full evaluator"`
+   - If auto: `"scale-routing level=high ({domain}), auto-triggering strict evaluation (~$2-5). Use --no-strict to suppress."`
+
+2. **Spawn evaluator subagent:**
+   ```
+   Task(
+     subagent_type="evaluator",
+     prompt="Run /meow:evaluate on this build.
+       Target: {project_root_path}
+       Rubric preset: {auto-detect from package.json}
+       Context: Cook session for '{task}'. Code-reviewer PASS. Tester PASS.
+       Changed files: {changed_files_list}
+       Run the full 5-step workflow. Return PASS/WARN/FAIL + verdict file path.",
+     description="Strict evaluation — meow:evaluate"
+   )
+   ```
+
+3. **Handle verdict:**
+   - **PASS** → proceed to Phase 5
+   - **WARN** → present to user, user decides
+   - **FAIL** → **BLOCKS Phase 5.** Report verdict + failing criteria. Route back to Phase 3 with evaluator feedback. Max 2 evaluator iterations.
+
+**Output:** `Phase 4.5: Verify — [PASS|FAIL|WARN] — [light|strict] mode`
+
 ## Phase 5: Ship (after Gate 2 approval)
 
 Spawn `shipper` subagent (NOT git-manager — shipper runs full ship sequence including pre-ship checks, CI verification, and rollback docs):
@@ -199,13 +263,15 @@ Three mandatory subagents in parallel:
 Legend: `[G1]` = Gate 1, `[G2]` = Gate 2, `[R]` = Review Gate
 
 ```
-interactive: 0 → 1 → [G1] → 2 → [R] → 3 → [R] → 4[G2] → 5 → 6
-auto:        0 → 1(auto-G1) → 2 → 3 → 4[G2-human] → 5 → 6 → next phase
-fast:        0 → 1(fast) → [G1] → 2(light) → 3 → [R] → 4[G2] → 5 → 6
-parallel:    0 → 1(parallel) → [G1] → 2 → 3(multi-agent) → [R] → 4[G2] → 5 → 6
-no-test:     0 → 1 → [G1] → skip → 3 → [R] → 4[G2] → 5 → 6
-code:        0 → skip → 2 → 3 → [R] → 4[G2] → 5 → 6
+interactive: 0 → 1 → [G1] → 2 → [R] → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
+auto:        0 → 1(auto-G1) → 2 → 3 → 4[G2-human] → (4.5?) → 5 → 6 → next phase
+fast:        0 → 1(fast) → [G1] → 2(light) → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
+parallel:    0 → 1(parallel) → [G1] → 2 → 3(multi-agent) → [R] → 4[G2] → (4.5?) → 5 → 6
+no-test:     0 → 1 → [G1] → skip → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
+code:        0 → skip → 2 → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
 ```
+
+Where `(4.5?)` = only if `--verify` or `--strict` modifier flag set.
 
 **Critical:** Gate 2 is ALWAYS human-approved. No mode bypasses it.
 

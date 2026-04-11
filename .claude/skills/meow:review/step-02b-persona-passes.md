@@ -30,7 +30,10 @@ This respects the max-3-agent rule (Phase A is already done; Phase B runs 2 at a
 
 ## Persona Dispatch
 
-For each selected persona, spawn a subagent with this context:
+For each selected persona:
+1. Load persona prompt from `prompts/personas/{persona-name}.md`
+2. Load skeptic anchor from `prompts/skeptic-anchor.md`
+3. Spawn a subagent with this context:
 
 ```
 # Adversarial Review: {Persona Name}
@@ -46,6 +49,9 @@ The following issues were already found by Phase A reviewers.
 Do NOT repeat these. Find what was MISSED.
 
 {base_findings_summary}
+
+## Skeptic Re-Anchor
+{load from prompts/skeptic-anchor.md}
 
 ## Your Mission
 1. Do NOT repeat findings listed above
@@ -75,10 +81,11 @@ Before dispatching personas, condense Phase A findings into a compact summary:
 1. Condense Phase A findings into `base_findings_summary`
 2. Select persona set based on `domain_complexity`
 3. Load persona prompts from `prompts/personas/`
-4. Dispatch persona subagents with context template above
-5. If 4 personas: run batch 1, wait for completion, then run batch 2
-6. Collect all persona findings into `phase_b_findings`
-7. Document: `"Phase B: {N} personas activated — {persona names}"`
+4. Load skeptic anchor from `prompts/skeptic-anchor.md` (loaded once, injected per persona)
+5. Dispatch persona subagents with context template above (anchor included per dispatch)
+6. If 4 personas: run batch 1, wait for completion, then run batch 2
+7. Collect all persona findings into `phase_b_findings`
+8. Document: `"Phase B: {N} personas activated — {persona names}, skeptic-anchored"`
 
 ## Output
 

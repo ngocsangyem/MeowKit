@@ -3,7 +3,7 @@ name: meow:cook
 description: "ALWAYS activate this skill before implementing EVERY feature, plan, or fix."
 source: claudekit-engineer
 version: 1.0.0
-argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd]"
+argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict]"
 ---
 
 # Cook — Full Implementation Pipeline
@@ -19,7 +19,9 @@ End-to-end implementation following MeowKit's 7-phase workflow. TDD is opt-in vi
 /cook tasks/plans/260329-feature/plan.md --auto
 ```
 
-Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd`
+Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`
+
+**Modifier flags** (layer on any mode): `--verify` (light browser check ~$1) | `--strict` (full evaluator ~$2-5) | `--no-strict` (suppress auto-strict)
 
 ## TDD mode (`--tdd` flag)
 
@@ -64,6 +66,9 @@ See `references/intent-detection.md` for full detection logic.
 | 3+ features OR "parallel"        | parallel    | Multi-agent execution                         |
 | "no test", "skip test"           | no-test     | Skip Test phase entirely (force off, even if `--tdd`) |
 | Default                          | interactive | Full workflow with user approval at each gate |
+| `--verify`                       | (modifier)  | Light browser check after review (Phase 4.5)  |
+| `--strict`                       | (modifier)  | Full evaluator after review (Phase 4.5)        |
+| `--no-strict`                    | (modifier)  | Suppress auto-strict from scale-routing        |
 
 ## Process Flow (Authoritative)
 
@@ -80,7 +85,10 @@ flowchart TD
     F --> S[meow:simplify — MANDATORY]
     S --> V[meow:verify — MANDATORY]
     V --> G2[Phase 4: Review — GATE 2]
-    G2 -->|approved| H[Phase 5: Ship]
+    G2 -->|approved| BV{--verify or --strict?}
+    BV -->|yes| P45[Phase 4.5: Browser Verify]
+    BV -->|no| H[Phase 5: Ship]
+    P45 --> H
     G2 -->|rejected| F
     H --> I[Phase 6: Reflect]
 ```
@@ -112,6 +120,8 @@ flowchart TD
 | 3.5 Simplify  | `developer` via `meow:simplify`   | **MANDATORY** after Phase 3 GREEN — run before verify  |
 | 3.6 Verify    | `meow:verify`                     | **MANDATORY** after simplify — unified build+lint+test+coverage check before Phase 4 |
 | 4 Review      | `code-reviewer` via `meow:review` | **MUST** spawn — Gate 2                  |
+| 4.5 Verify    | `agent-browser` or `curl`         | Only if `--verify` flag (light browser check) |
+| 4.5 Verify    | `evaluator` via `meow:evaluate`   | Only if `--strict` flag or auto-triggered     |
 | 5 Ship        | `git-manager` via `meow:ship`     | **MUST** spawn — commit + PR             |
 | 6 Reflect     | `project-manager`, `docs-manager` | **MUST** spawn — sync-back + docs        |
 | 6 Reflect     | `meow:memory` session-capture     | **MUST** spawn — 3-category learning extraction |
@@ -146,3 +156,5 @@ If `meow:verify` FAILS after simplify: send back to developer to fix, then re-ru
 - **Missing model tier declaration**: Expensive models on trivial tasks, cheap models on security-critical work. Always declare tier in Phase 0
 - **Forgetting memory read/write**: Prior session learnings lost. Phase 0 reads memory/lessons.md; Phase 6 writes back
 - **Subagent patterns using Agent() not Task()**: Task() enables tracking, blocking, and progress. Always use Task() for phases 2-6
+- **--strict cost surprise**: `--strict` spawns full meow:evaluate (~$2-5). Auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress, or `--verify` for light check (~$1)
+- **--strict vs --verify confusion**: `--verify` = light browser check (advisory). `--strict` = full evaluator with rubrics (FAIL blocks ship). `--strict` supersedes `--verify`

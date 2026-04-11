@@ -49,3 +49,14 @@ WHY: Capable models (Opus 4.6+ with auto-compaction + 1M context) **degrade** wh
 Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN` env var overrides auto-detection. Logged in the harness run report.
 
 GUARD: Density choice does NOT bypass any gate. Gate 1 (plan), Gate 2 (review verdict), and the active-verification HARD GATE on evaluator verdicts ALL still apply regardless of density mode.
+
+## Rule 7: Auto-Strict for High-Complexity Cook Runs
+
+When `meow:scale-routing` returns `level=high` during a `/meow:cook` run, the cook workflow MUST auto-enable `--strict` mode (full meow:evaluate) at Phase 4.5 — unless the user explicitly passes `--no-strict`.
+
+WHY: High-complexity domains have behavioral requirements that structural code review alone misses. A fintech payment flow that passes code review may still have a broken checkout funnel. The evaluator catches this by driving the running build against rubric criteria with active verification.
+
+GUARD: Auto-strict fires ONLY in meow:cook, NOT in meow:fix, meow:harness (which has its own evaluator), or standalone meow:review. The `--no-strict` flag is the user escape hatch.
+
+INSTEAD of: hoping the code reviewer catches a broken payment form
+USE: evaluator drives the running app, clicks "Pay", and verifies the flow works end-to-end
