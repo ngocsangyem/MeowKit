@@ -52,20 +52,15 @@ echo ""
 echo "[1/7] Bumping version to $VERSION..."
 # metadata.json is updated by prepare-release-assets.cjs in step 3
 
-# Step 2: Build and verify
-echo "[2/7] Building and verifying..."
-if [ -f "package.json" ] && node -e "const p=require('./package.json'); process.exit(p.scripts?.build ? 0 : 1)" 2>/dev/null; then
-  npm run build
-fi
-if [ -f "package.json" ] && node -e "const p=require('./package.json'); process.exit(p.scripts?.lint ? 0 : 1)" 2>/dev/null; then
-  npm run lint
-fi
-if [ -f "package.json" ] && node -e "const p=require('./package.json'); process.exit(p.scripts?.typecheck ? 0 : 1)" 2>/dev/null; then
-  npm run typecheck
-fi
-if [ -f "package.json" ] && node -e "const p=require('./package.json'); process.exit(p.scripts?.test ? 0 : 1)" 2>/dev/null; then
-  npm test
-fi
+# Step 2: Build and verify (harness-only — skip create-meowkit/mewkit CLI packages)
+echo "[2/7] Verifying harness files..."
+# Validate settings.json is valid JSON
+node -e "JSON.parse(require('fs').readFileSync('.claude/settings.json','utf8'))" || { echo "Error: settings.json is invalid JSON"; exit 1; }
+# Validate handlers.json is valid JSON
+node -e "JSON.parse(require('fs').readFileSync('.claude/hooks/handlers.json','utf8'))" || { echo "Error: handlers.json is invalid JSON"; exit 1; }
+# Validate metadata.json is valid JSON
+node -e "JSON.parse(require('fs').readFileSync('.claude/metadata.json','utf8'))" || { echo "Error: metadata.json is invalid JSON"; exit 1; }
+echo "  All JSON configs valid."
 
 # Step 3: Build release assets
 echo "[3/7] Building release assets..."

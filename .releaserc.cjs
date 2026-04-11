@@ -81,10 +81,6 @@ module.exports = {
           "npm run build",
           'node scripts/prepare-release-assets.cjs "${nextRelease.version}"',
         ].join(" && "),
-        publishCmd: [
-          `(cd packages/create-meowkit && npm publish --tag ${npmTag})`,
-          `(cd packages/mewkit && npm publish --tag ${npmTag})`,
-        ].join(" && "),
       },
     ],
 
@@ -108,8 +104,6 @@ module.exports = {
           "CHANGELOG.md",
           "package.json",
           "package-lock.json",
-          "packages/create-meowkit/package.json",
-          "packages/mewkit/package.json",
           ".claude/metadata.json",
         ],
         message: 'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
