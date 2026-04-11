@@ -3,15 +3,19 @@
     "Edit|Write": [
       "./handlers/build-verify.cjs",
       "./handlers/loop-detection.cjs",
-      "./handlers/budget-tracker.cjs"
+      "./handlers/budget-tracker.cjs",
+      "./handlers/auto-checkpoint.cjs"
     ],
     "Bash": [
       "./handlers/budget-tracker.cjs"
     ]
   },
-  "Stop": [],
+  "Stop": [
+    "./handlers/checkpoint-writer.cjs"
+  ],
   "SessionStart": [
-    "./handlers/model-detector.cjs"
+    "./handlers/model-detector.cjs",
+    "./handlers/orientation-ritual.cjs"
   ],
   "UserPromptSubmit": [
     "./handlers/memory-loader.cjs"
