@@ -48,16 +48,24 @@ fi
 echo "=== MeowKit Release v$VERSION ==="
 echo ""
 
-# Step 1: Bump version
+# Step 1: Bump version (metadata only — packages/mewkit is released separately)
 echo "[1/7] Bumping version to $VERSION..."
-npm -w packages/mewkit version "$VERSION" --no-git-tag-version
+# metadata.json is updated by prepare-release-assets.cjs in step 3
 
 # Step 2: Build and verify
 echo "[2/7] Building and verifying..."
-npm run build
-npm run lint
-npm run typecheck
-npm test
+if [ -f "package.json" ] && node -e "const p=require('./package.json'); process.exit(p.scripts?.build ? 0 : 1)" 2>/dev/null; then
+  npm run build
+fi
+if [ -f "package.json" ] && node -e "const p=require('./package.json'); process.exit(p.scripts?.lint ? 0 : 1)" 2>/dev/null; then
+  npm run lint
+fi
+if [ -f "package.json" ] && node -e "const p=require('./package.json'); process.exit(p.scripts?.typecheck ? 0 : 1)" 2>/dev/null; then
+  npm run typecheck
+fi
+if [ -f "package.json" ] && node -e "const p=require('./package.json'); process.exit(p.scripts?.test ? 0 : 1)" 2>/dev/null; then
+  npm test
+fi
 
 # Step 3: Build release assets
 echo "[3/7] Building release assets..."
