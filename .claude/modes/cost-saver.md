@@ -8,7 +8,7 @@ Activate with: `mode: cost-saver` in task context or by specifying cost-saver mo
 
 - **Phases**: All 6 phases active but with reduced overhead.
 - **Gate 1 (Plan)**: Enforced. Planning is never skipped.
-- **Gate 2 (Review)**: Simplified. Auto-approve if tests pass and no security BLOCKs (same as fast mode).
+- **Gate 2 (Review)**: Streamlined. Human approval still required (gate-rules.md is NON-NEGOTIABLE). WARN-level findings auto-acknowledged; human confirms only BLOCKs and test failures.
 - **Security checks**: BLOCK-level checks only. No WARN-level scanning.
 - **Model routing**: Always cheapest model tier. No escalation for complexity.
 - **Test coverage**: No minimum threshold.
@@ -40,7 +40,7 @@ Even in cost-saver mode, these are never disabled:
 | Aspect | Default | Cost-Saver |
 |--------|---------|-----------|
 | Model routing | Standard (tier-based) | Always cheapest |
-| Gate 2 | Human approval | Auto-approve if tests pass + no BLOCKs |
+| Gate 2 | Human approval | Human approval (WARNs auto-acknowledged) |
 | Security | Full (BLOCK + WARN) | BLOCK only |
 | Visual QA | Active | Disabled |
 | Comprehensive audit | Active | Disabled |

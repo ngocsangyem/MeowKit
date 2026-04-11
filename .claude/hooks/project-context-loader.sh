@@ -58,6 +58,11 @@ if [ -n "${HOOK_SESSION_ID:-}" ]; then
     echo '{}' > session-state/precompletion-attempts.json 2>/dev/null || true
     echo '{}' > session-state/build-verify-cache.json 2>/dev/null || true
     rm -f session-state/conversation-summary.lock 2>/dev/null || true
+    # CF1 fix: clear TDD sentinel + deprecation flag (written to .claude/session-state/)
+    rm -f "${CLAUDE_PROJECT_DIR:-.}/.claude/session-state/tdd-mode" 2>/dev/null || true
+    rm -f "${CLAUDE_PROJECT_DIR:-.}/.claude/session-state/tdd-deprecation-warned" 2>/dev/null || true
+    # Clear undocumented handler state files on new session
+    rm -f session-state/active-plan 2>/dev/null || true
     echo "$HOOK_SESSION_ID" > "$LAST_SESSION_FILE"
 
     # Phase 9 (M2 fix): clear conversation-summary cache on new session.

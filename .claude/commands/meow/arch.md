@@ -17,19 +17,19 @@ Architecture as a first-class concern. Manages Architecture Decision Records (AD
 
 #### /arch new [title]
 
-Generate a new ADR using the `adr-generation` skill.
+Generate a new ADR using the `architect` agent.
 
 1. Assign the next sequential ADR number.
 2. Gather context: What decision needs to be made? What are the constraints? What options exist?
 3. Generate ADR with sections: Title, Status (Proposed), Context, Decision, Consequences, Alternatives Considered.
-4. Write to `docs/adrs/NNNN-title.md`.
+4. Write to `docs/architecture/adr/YYMMDD-title.md`.
 5. Print summary and ask for review.
 
 #### /arch list
 
 List all ADRs with their current status.
 
-1. Scan `docs/adrs/` directory.
+1. Scan `docs/architecture/adr/` directory.
 2. Print table:
    ```
    # | Title                        | Status
@@ -59,7 +59,7 @@ Analyze the architectural impact of a proposed change.
 
 ### Output
 
-- For `new`: ADR file at `docs/adrs/NNNN-title.md`
+- For `new`: ADR file at `docs/architecture/adr/YYMMDD-title.md`
 - For `list`: table of all ADRs
 - For `review`: updated ADR file
 - For `impact`: printed impact assessment with affected components and recommendations

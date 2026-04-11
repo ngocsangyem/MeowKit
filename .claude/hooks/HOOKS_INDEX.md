@@ -16,13 +16,19 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 |---|---|---|---|---|---|
 | `project-context-loader.sh` | SessionStart | — | Load project-context.md + LocalContext expansion (directory tree, tool availability, package scripts) + session-ID reset | 5s | `HOOK_SESSION_ID` |
 | `gate-enforcement.sh` | PreToolUse | Edit\|Write | Gate 1 (plan approval) + Phase 4 sprint contract gate + suspicious-dir rejection | 10s | `HOOK_FILE_PATH` |
-| `privacy-block.sh` | PreToolUse | Read, Edit\|Write | Block reads of sensitive files (.env, .key, credentials) | 5s | `HOOK_FILE_PATH` |
+| `privacy-block.sh` | PreToolUse | Read, Edit\|Write, Bash | Block reads of sensitive files (.env, .key, credentials) + SSRF check on Bash fetch commands | 5s | `HOOK_FILE_PATH` or `HOOK_COMMAND` |
 | `pre-task-check.sh` | PreToolUse | Bash | Scan bash commands for injection patterns | 5s | `HOOK_COMMAND` |
 | `pre-ship.sh` | PreToolUse | Bash | Run tests/lint before git commit/push | 30s | `HOOK_COMMAND` |
 | `post-write.sh` | PostToolUse | Edit\|Write | Security scan on every written file | 10s | `HOOK_FILE_PATH` |
 | `learning-observer.sh` | PostToolUse | Edit\|Write | Detect churn patterns (same file edited 3+ times) | 5s | `HOOK_FILE_PATH` |
 | `handlers/build-verify.cjs` | PostToolUse | Edit\|Write | Auto-run compile/lint on source files. Cached by file hash. Dispatched via `dispatch.cjs`. Supersedes `post-write-build-verify.sh`. | 40s | `tool_input.file_path` |
 | `handlers/loop-detection.cjs` | PostToolUse | Edit\|Write | Warn at N=4, escalate at N=8 edits to same file. Dispatched via `dispatch.cjs`. Supersedes `post-write-loop-detection.sh`. | 40s | `tool_input.file_path` + `session_id` |
+| `handlers/budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | Estimate token cost per tool call, accumulate session budget, warn at $30, block at $100. Dispatched via `dispatch.cjs`. | 40s | `tool_input` + `tool_response` |
+| `handlers/auto-checkpoint.cjs` | PostToolUse | Edit\|Write | Auto-create checkpoints at intervals during long sessions. Dispatched via `dispatch.cjs`. | 40s | `tool_input.file_path` |
+| `handlers/model-detector.cjs` | SessionStart | — | Detect model tier (TRIVIAL/STANDARD/COMPLEX) and harness density (MINIMAL/FULL/LEAN) from SessionStart stdin `model` field. Fallback: `MEOWKIT_MODEL_HINT` env. Dispatched via `dispatch.cjs`. | 10s | `model` field |
+| `handlers/orientation-ritual.cjs` | SessionStart | — | Emit session orientation context (active plan, pending tasks). Dispatched via `dispatch.cjs`. | 10s | Full stdin JSON |
+| `handlers/memory-loader.cjs` | UserPromptSubmit | — | Load `.claude/memory/lessons.md` and `.claude/memory/patterns.json` into context on each user prompt. Dispatched via `dispatch.cjs`. | 10s | Full stdin JSON |
+| `handlers/checkpoint-writer.cjs` | Stop | — | Write session checkpoint with budget summary and file changes. Dispatched via `dispatch.cjs`. | 10s | Full stdin JSON |
 | `dispatch.cjs` | PostToolUse, Stop, SessionStart, UserPromptSubmit | varies | Central Node.js dispatcher. Loads `handlers.json`, dispatches to registered `.cjs` handler modules. | 10-40s | Full stdin JSON |
 | `cost-meter.sh` | PostToolUse | Bash | Track token cost accumulation | 5s | (none — reads cost log) |
 | `pre-completion-check.sh` | Stop | — | **Phase 7 NEW.** Block session stop if no verification evidence exists. Hard cap 3 re-entries. LEAN mode soft nudge. | 5s | (none — reads plan/contract/trace) |
@@ -30,7 +36,7 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 | `conversation-summary-cache.sh` | Stop | — | **Phase 9 NEW.** Spawns **background** worker that summarizes transcript via `claude -p --model haiku` (~60–120s wall) when throttle thresholds met. Hook itself returns instantly. Lock at `session-state/conversation-summary.lock`. Atomic write to `.claude/memory/conversation-summary.md`. | 5s | `HOOK_TRANSCRIPT_PATH` + `HOOK_SESSION_ID` |
 | `conversation-summary-cache.sh` | UserPromptSubmit | — | **Phase 9 NEW.** Inject cached summary as `## Prior conversation summary` block (capped 4KB). Skips on session_id mismatch. | 2s | `HOOK_SESSION_ID` |
 
-**Hook count:** 14 hook scripts in `.claude/hooks/` (13 registered in `.claude/settings.json` events + 1 `pre-implement.sh` invoked manually by the developer agent, not via event). The shared parser shim at `lib/read-hook-input.sh` and the secret scrubber at `lib/secret-scrub.sh` are not hooks themselves — they're sourceable libraries. Note: `conversation-summary-cache.sh` is a single script registered under TWO events (Stop + UserPromptSubmit), branching on `HOOK_EVENT_NAME`.
+**Hook count:** 14 hook scripts + 8 Node.js handlers in `.claude/hooks/`. 13 shell hooks registered in `.claude/settings.json` events + 1 `pre-implement.sh` invoked manually by the developer agent. 8 `.cjs` handlers registered via `handlers.json` → `dispatch.cjs`. The shared parser shim at `lib/read-hook-input.sh` and the secret scrubber at `lib/secret-scrub.sh` are sourceable libraries. `conversation-summary-cache.sh` is registered under TWO events (Stop + UserPromptSubmit), branching on `HOOK_EVENT_NAME`. `SubagentStart`/`SubagentStop` are intentionally empty — hooks in these events would infinite-loop inside subagents.
 
 ## Env Var Bypasses
 
@@ -63,6 +69,11 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 | `session-state/active-plan` | meow:harness (Phase 5), meow:plan-creator | pre-completion-check.sh | Currently active plan slug |
 | `session-state/conversation-summary.lock` | conversation-summary-cache.sh (Stop bg worker) | conversation-summary-cache.sh next Stop (5min stale GC) | Mutex preventing overlapping background summarizers |
 | `.claude/memory/conversation-summary.md` | conversation-summary-cache.sh (Stop bg worker) | **Consumer 1:** conversation-summary-cache.sh (UserPromptSubmit) → emits to stdout → **Consumer 2: Claude Code context injection (the model itself)** for every meowkit agent. Cleared by project-context-loader.sh on session change. | Persistent conversation summary read by every turn |
+| `session-state/detected-model.json` | handlers/model-detector.cjs | handlers/budget-tracker.cjs, handlers/auto-checkpoint.cjs | Model tier + density detection result |
+| `session-state/budget-state.json` | handlers/budget-tracker.cjs | (same) | Accumulated session cost estimate |
+| `session-state/auto-checkpoint-counter.json` | handlers/auto-checkpoint.cjs | (same) | Checkpoint interval counter |
+| `.claude/session-state/tdd-mode` | tdd-flag-detector.sh | tdd-detect.sh, pre-implement.sh | TDD sentinel (cleared on new session by project-context-loader.sh) |
+| `.claude/session-state/tdd-deprecation-warned` | tdd-detect.sh | (same) | Legacy profile deprecation one-shot flag (cleared on new session) |
 
 ## Hook Order Independence (Phase 7 P22)
 

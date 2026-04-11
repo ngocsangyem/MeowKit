@@ -5,7 +5,6 @@ argument-hint: "[directories or files to organize]"
 source: claudekit-engineer
 original_path: .claude/skills/project-organization/SKILL.md
 adapted_for: meowkit
-source: claukit-engineer
 ---
 
 # Project Organization

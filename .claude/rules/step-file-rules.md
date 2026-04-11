@@ -58,5 +58,8 @@ These rules apply ONLY to skills that have a `workflow.md` file.
 Skills without `workflow.md` are monolithic and follow standard execution.
 
 Currently step-file enabled:
-- `meow:review` — 4-step adversarial review workflow
 - `meow:plan-creator` — 9-step planning workflow (00-08)
+- `meow:review` — 5-step adversarial review workflow (includes step-02b persona passes)
+- `meow:evaluate` — 5-step behavioral verification (load-rubrics → boot-app → probe → grade → feedback)
+- `meow:harness` — 7-step autonomous build pipeline (tier-detection → plan → contract → generate → evaluate → iterate-or-ship → run-report)
+- `meow:trace-analyze` — 6-step trace analysis (ingest → partition → scatter → gather → suggestions → HITL gate)

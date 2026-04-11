@@ -15,7 +15,7 @@
 # Env vars (Q7 Option B):
 #   MEOWKIT_SUMMARY_CACHE=off            — disable both paths
 #   MEOWKIT_SUMMARY_THRESHOLD=N          — min transcript bytes (default 20480 / 20KB)
-#   MEOWKIT_SUMMARY_TURN_GAP=N           — min turns between summaries (default 5)
+#   MEOWKIT_SUMMARY_TURN_GAP=N           — min JSONL events between summaries (default 30, ≈ 3-6 turns)
 #   MEOWKIT_SUMMARY_GROWTH_DELTA=N       — min bytes growth between summaries (default 5120)
 #   MEOWKIT_SUMMARY_DEBUG=1              — verbose stderr
 #

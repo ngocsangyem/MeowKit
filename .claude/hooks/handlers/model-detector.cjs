@@ -53,8 +53,10 @@ function classifyModel(modelId) {
 }
 
 module.exports = function modelDetector(ctx, state) {
-  // Only run on SessionStart events
-  if (ctx.hook_event_name !== 'SessionStart') return '';
+  // CF2 fix: dispatch.cjs already routes only SessionStart events to this handler.
+  // The previous guard on ctx.hook_event_name silently killed detection when the
+  // field was absent from stdin JSON (undefined !== 'SessionStart' → true → exit).
+  // Guard removed; dispatch routing is the authoritative event filter.
 
   const modelId = ctx.model || process.env.CLAUDE_MODEL || process.env.CLAUDE_MODEL_ID || null;
   const hintId = process.env.MEOWKIT_MODEL_HINT || null;

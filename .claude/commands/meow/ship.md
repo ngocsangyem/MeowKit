@@ -10,7 +10,7 @@
 
 ## Behavior
 
-Triggers Phase 5. Runs the `ship-pipeline` skill. Will NOT execute if Gate 2 (review) has not passed.
+Triggers Phase 5. Runs `meow:ship` skill. Will NOT execute if Gate 2 (review) has not passed.
 
 ### Pre-Conditions
 

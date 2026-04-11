@@ -89,7 +89,7 @@ Long sessions MUST use the conversation summary cache (`.claude/hooks/conversati
 
 **WHY:** Re-reading the full transcript on every turn burns ~48KB of context per injection in mid-to-long sessions. A Haiku-summarized cache costs ~$0.01–$0.02 per long session and preserves the same continuity. Claude Code's built-in auto-compaction is opaque, fires late, and produces no inspectable artifact — the explicit cache fires proactively and writes a human-editable markdown file.
 
-**Throttle defaults (Q7):** size > `${MEOWKIT_SUMMARY_THRESHOLD:-20480}` bytes AND (turn delta ≥ `${MEOWKIT_SUMMARY_TURN_GAP:-5}` OR growth ≥ `${MEOWKIT_SUMMARY_GROWTH_DELTA:-5120}` bytes).
+**Throttle defaults (Q7):** size > `${MEOWKIT_SUMMARY_THRESHOLD:-20480}` bytes AND (event delta ≥ `${MEOWKIT_SUMMARY_TURN_GAP:-30}` JSONL events, ≈ 3–6 turns, OR growth ≥ `${MEOWKIT_SUMMARY_GROWTH_DELTA:-5120}` bytes).
 
 **Opt-out:** `MEOWKIT_SUMMARY_CACHE=off` cleanly disables both paths. Graceful degradation: if `claude` CLI is missing or summarization fails, the hook exits 0 silently and the session proceeds with full transcript.
 

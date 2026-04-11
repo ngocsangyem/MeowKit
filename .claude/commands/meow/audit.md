@@ -8,13 +8,13 @@
 
 ## Behavior
 
-Runs a comprehensive security audit using the `security-checklist` skill across all platforms detected in the project. Generates a security report.
+Runs a comprehensive security audit using `meow:review` (structural) + `meow:cso` (infrastructure) skills across all platforms detected in the project. Generates a security report.
 
 ### Execution Steps
 
 1. **Detect platforms.** Scan the project to identify which platforms/frameworks are in use (e.g., NestJS, Vue, Swift/iOS, Supabase, PostgreSQL).
 
-2. **Run security-checklist skill** for each detected platform. Check for all blocked patterns defined in `rules/security-rules.md`:
+2. **Run `meow:cso` security audit** for each detected platform. Check for all blocked patterns defined in `rules/security-rules.md`:
    - Hardcoded secrets (API keys, passwords, tokens, JWT secrets in source)
    - `any` type in TypeScript (should use `unknown` + type guards)
    - SQL queries with string interpolation/template literals

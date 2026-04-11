@@ -7,7 +7,7 @@ Review-fix cycle for Gate 2 enforcement. Gate 2 requires human approval in ALL m
 ```
 cycle = 0
 LOOP:
-  1. Spawn code-reviewer subagent → score, critical_count, warnings, suggestions
+  1. Spawn reviewer subagent → score, critical_count, warnings, suggestions
 
   2. Run .claude/skills/meow:cook/scripts/validate-gate-2.sh (if available)
 
@@ -40,7 +40,7 @@ Auto mode auto-FIXES but does NOT auto-APPROVE Gate 2.
 ```
 cycle = 0
 LOOP:
-  1. Spawn code-reviewer → score, critical_count, warnings
+  1. Spawn reviewer → score, critical_count, warnings
 
   2. IF critical_count > 0 AND cycle < 3:
      → Auto-fix critical issues

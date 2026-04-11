@@ -29,8 +29,8 @@ Every agent now includes these sections (where applicable):
 
 | Section | Purpose | Principle | Present in |
 |---------|---------|-----------|------------|
-| Required Context | What to load before invoking | CW3 — just-in-time context | All 15 agents |
-| Failure Behavior | What to do when task cannot complete | AI4 — explicit failure path | 10 agents (pipeline agents) |
+| Required Context | What to load before invoking | CW3 — just-in-time context | All 16 agents |
+| Failure Behavior | What to do when task cannot complete | AI4 — explicit failure path | 13 agents (pipeline + evaluator, ui-ux-designer, git-manager) |
 | Ambiguity Resolution | How to handle unclear inputs | AI7 — ambiguity protocol | 5 HIGH-priority agents |
 
 ## Coverage Gaps

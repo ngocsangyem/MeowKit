@@ -51,7 +51,7 @@ For skill suggestions based on task type, see `.claude/skills/meow:agent-detecto
 
 | State | Pipeline Phase | Recommendation |
 |-------|---------------|----------------|
-| No plan | Phase 0 → 1 | "Start with `/meow:plan-creator` or describe your task" |
+| No plan | Phase 0 → 1 | "Start with `/meow:plan` or describe your task" |
 | Existing plan — stress-test | Standalone subcommand | "`/meow:plan red-team {path}` — adversarial review of existing plan" |
 | Existing plan — interview | Standalone subcommand | "`/meow:plan validate {path}` — critical question interview on existing plan" |
 | Completed/cancelled plans | Housekeeping | "`/meow:plan archive` — archive completed or cancelled plans" |

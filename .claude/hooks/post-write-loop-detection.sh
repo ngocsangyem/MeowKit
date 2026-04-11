@@ -1,8 +1,9 @@
 #!/bin/bash
+# SUPERSEDED — Replaced by handlers/loop-detection.cjs (dispatched via dispatch.cjs).
+# Not registered in settings.json. Do not re-register.
+#
 # post-write-loop-detection.sh — Warn when the same file is edited too many times.
 # Phase 7 middleware — doom-loop detection from LangChain harness research.
-#
-# Registered: PostToolUse on Edit|Write matcher.
 # Input: JSON on stdin (parsed via lib/read-hook-input.sh).
 # Behavior: increment per-file edit count; warn at N=4, escalate at N=8.
 # Never blocks — warnings feed back to agent via stdout injection.

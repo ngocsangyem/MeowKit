@@ -1,8 +1,9 @@
 #!/bin/bash
+# SUPERSEDED — Replaced by handlers/build-verify.cjs (dispatched via dispatch.cjs).
+# Not registered in settings.json. Do not re-register.
+#
 # post-write-build-verify.sh — Auto-run compile/lint after Edit/Write on source files.
 # Phase 7 middleware (Anthropic + LangChain harness research +10.8 pts measured).
-#
-# Registered: PostToolUse on Edit|Write matcher.
 # Input: JSON on stdin (parsed via lib/read-hook-input.sh).
 # Behavior: classify file by extension → run compile/lint → emit errors to stdout.
 # Never blocks — errors feed back to agent via stdout injection.

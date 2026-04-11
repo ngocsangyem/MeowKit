@@ -117,15 +117,15 @@ flowchart TD
 | 0 Orient      | `meow:scout`                      | Codebase mapping                         |
 | 1 Plan        | `meow:plan-creator`, `researcher` | Research + planning                      |
 | 2 Test        | `tester` via `meow:testing`       | TDD mode (`--tdd`): **MUST** spawn — write failing tests. Default mode: optional (skip unless requested) |
-| 3 Build GREEN | `fullstack-developer`             | Implementation                           |
+| 3 Build GREEN | `developer`                       | Implementation                           |
 | 3 Build GREEN | `debugger` via `meow:investigate` | If tests fail after 3 self-heal attempts |
 | 3.5 Simplify  | `developer` via `meow:simplify`   | **MANDATORY** after Phase 3 GREEN — run before verify  |
 | 3.6 Verify    | `meow:verify`                     | **MANDATORY** after simplify — unified build+lint+test+coverage check before Phase 4 |
-| 4 Review      | `code-reviewer` via `meow:review` | **MUST** spawn — Gate 2                  |
+| 4 Review      | `reviewer` via `meow:review`      | **MUST** spawn — Gate 2                  |
 | 4.5 Verify    | `agent-browser` or `curl`         | Only if `--verify` flag (light browser check) |
 | 4.5 Verify    | `evaluator` via `meow:evaluate`   | Only if `--strict` flag or auto-triggered     |
 | 5 Ship        | `git-manager` via `meow:ship`     | **MUST** spawn — commit + PR             |
-| 6 Reflect     | `project-manager`, `docs-manager` | **MUST** spawn — sync-back + docs        |
+| 6 Reflect     | `documenter`                      | **MUST** spawn — sync-back + docs        |
 | 6 Reflect     | `meow:memory` session-capture     | **MUST** spawn — 3-category learning extraction |
 
 During iterative build-test-fix cycles, follow `references/loop-safety-protocol.md` for checkpoint tracking, stall detection, and escalation triggers.

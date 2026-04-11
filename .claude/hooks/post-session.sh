@@ -5,10 +5,11 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
-# Hook profile gating — skip memory capture in standard/fast profiles for speed
+# Hook profile gating — CF7 fix: run by default, opt-OUT only on fast profile
+# Memory capture, cost tracking, and trace records require this hook to run.
 MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
 case "$MEOW_PROFILE" in
-  standard|fast) exit 0 ;;
+  fast) exit 0 ;;
 esac
 
 # Retroactive capture budget (MeowKit v2.0: extended from 2min/3 markers)

@@ -19,6 +19,8 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | `meow:team-config` | orchestrator | utility | monolithic |
 | `meow:workflow-orchestrator` | orchestrator | cross-cutting | monolithic |
 | `meow:memory` | analyst | memory | monolithic |
+| `meow:skill-creator` | orchestrator | utility | monolithic |
+| `meow:worktree` | orchestrator | utility | monolithic |
 
 ### Phase 1 — Plan
 
@@ -30,7 +32,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | `meow:validate-plan` | planner | planning | monolithic |
 | `meow:brainstorming` | brainstormer | planning | monolithic |
 | `meow:office-hours` | brainstormer/planner | planning | monolithic |
-| `meow:party` | orchestrator | planning | monolithic |
+| `meow:party` | orchestrator/brainstormer | planning | monolithic |
 
 ### Phase 2 — Test RED
 
@@ -58,6 +60,14 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | `meow:sequential-thinking` | developer | development | monolithic |
 | `meow:project-organization` | developer | development | monolithic |
 | `meow:bootstrap` | developer | development | monolithic |
+| `meow:verify` | developer | development | monolithic |
+| `meow:build-fix` | developer | development | monolithic |
+| `meow:api-design` | architect | development | monolithic |
+| `meow:database` | developer | development | monolithic |
+| `meow:decision-framework` | planner | development | monolithic |
+| `meow:figma` | ui-ux-designer | development | monolithic |
+| `meow:jira` | orchestrator | integration | monolithic |
+| `meow:intake` | orchestrator | integration | monolithic |
 | `meow:agent-browser` | developer | development | monolithic |
 
 #### Language/Framework Skills (Phase 3)
@@ -108,8 +118,6 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | `meow:docs-init` | documenter | documentation | monolithic |
 | `meow:llms` | documenter | documentation | monolithic |
 | `meow:retro` | analyst/documenter | memory | monolithic |
-| `meow:skill-creator` | orchestrator | utility | monolithic |
-| `meow:worktree` | orchestrator | utility | monolithic |
 
 ### Cross-Cutting (Any Phase)
 
@@ -117,7 +125,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 |-------|-------|---------|
 | `meow:careful` | any agent | Before destructive commands |
 | `meow:freeze` | any agent | Debug session scoping |
-| `meow:docs-finder` | any agent | Library/API documentation lookup |
+| `meow:docs-finder` | any agent (primary: researcher) | Library/API documentation lookup |
 | `meow:multimodal` | any agent | Visual content analysis |
 | `meow:scout` | orchestrator/reviewer | Codebase exploration |
 | `meow:web-to-markdown` | any agent | Fetch arbitrary URLs as clean markdown — use when URL is not covered by meow:docs-finder. Static-only by default; Playwright opt-in via `mewkit setup --system-deps`. |
@@ -128,7 +136,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 |----------|-------|
 | Planning | 7 |
 | Testing | 7 |
-| Development | 17 |
+| Development | 25 |
 | Review | 2 |
 | Security | 3 |
 | Deployment | 2 |
@@ -136,7 +144,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | Memory | 2 |
 | Utility | 9 |
 | Cross-Cutting | 6 |
-| **Total** | **59** |
+| **Total** | **67** |
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category.
 
@@ -147,7 +155,7 @@ Note: Some skills appear in multiple categories (scout, investigate). Count refl
 
 Currently step-file enabled:
 - `meow:plan-creator` — 9 steps (00–08)
-- `meow:review` — 4 steps
+- `meow:review` — 5 steps (includes step-02b persona passes)
 - `meow:evaluate` — 5 steps
 - `meow:harness` — 7 steps
 - `meow:trace-analyze` — 6 steps

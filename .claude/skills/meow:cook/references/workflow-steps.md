@@ -120,7 +120,7 @@ Note: This runs ONCE at phase start, not on every file write (too expensive as a
 
 **Parallel mode:**
 
-- Spawn multiple `fullstack-developer` agents with file ownership boundaries
+- Spawn multiple `developer` agents with file ownership boundaries
 - Each agent gets distinct files — no overlap
 - `TaskUpdate` to assign + track per agent
 - Wait for parallel group to complete before next group

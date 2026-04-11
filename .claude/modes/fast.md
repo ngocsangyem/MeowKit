@@ -8,11 +8,11 @@ Activate with: `mode: fast` in task context or by specifying fast mode at sessio
 
 - **Phases**: All 6 phases active but with reduced gates.
 - **Gate 1 (Plan)**: Still enforced. Planning is not optional even in fast mode.
-- **Gate 2 (Review)**: Auto-approve if ALL tests pass AND no security BLOCK-level findings. Human intervention only needed if tests fail or BLOCK issues exist.
+- **Gate 2 (Review)**: Human approval still required (gate-rules.md is NON-NEGOTIABLE). WARN-level findings are auto-acknowledged, but human must explicitly confirm before ship. Human sees only BLOCKs and test failures — WARNs are logged silently.
 - **Security checks**: Still runs but only checks for BLOCK-level issues. WARN-level findings are logged but do not require acknowledgment.
 - **Model routing**: Default to cheapest model tier unless complexity is detected (then escalate).
 - **Test coverage**: No minimum threshold enforced (but tests still must pass).
-- **Review strictness**: Auto-pass if tests green and no BLOCKs.
+- **Review strictness**: Streamlined — WARNs auto-acknowledged, BLOCKs and test failures surface to human. Human still confirms Gate 2.
 
 ## Planning Depth
 
@@ -42,7 +42,7 @@ Do NOT use fast mode for:
 | Aspect | Default | Fast |
 |--------|---------|------|
 | Gate 1 (Plan) | Human approval | Human approval (same) |
-| Gate 2 (Review) | Human approval | Auto-approve if tests pass + no BLOCKs |
+| Gate 2 (Review) | Human approval | Human approval (WARNs auto-acknowledged) |
 | Security scan | Full (BLOCK + WARN) | BLOCK only |
 | Model routing | Standard | Cheapest unless complex |
 | Test coverage | Project threshold | No minimum |

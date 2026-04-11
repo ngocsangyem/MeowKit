@@ -8,7 +8,7 @@
 
 ## Behavior
 
-Staged deployment with monitoring and human-gated promotion. Uses the `canary-deploy` skill for decision criteria.
+Staged deployment with monitoring and human-gated promotion. Uses `meow:ship` with canary deployment patterns.
 
 ### Execution Steps
 

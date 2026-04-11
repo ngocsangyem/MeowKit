@@ -5,7 +5,6 @@ argument-hint: "[skill-name] [description]"
 source: claudekit-engineer
 original_path: .claude/skills/skill-creator/SKILL.md
 adapted_for: meowkit
-source: claukit-engineer
 ---
 
 # Skill Creator
@@ -30,10 +29,10 @@ Meta skill — not tied to a specific Phase. Invoked on-demand for skill develop
 
 ```bash
 # Scaffold a new skill (creates directory + template SKILL.md)
-python3 .claude/skills/meow:skill-creator/scripts/init-skill.py meow:my-feature --path .claude/skills
+.claude/skills/.venv/bin/python3 .claude/skills/meow:skill-creator/scripts/init-skill.py meow:my-feature --path .claude/skills
 
 # Validate an existing skill against compliance checklist
-python3 .claude/skills/meow:skill-creator/scripts/validate-skill.py .claude/skills/meow:my-feature
+.claude/skills/.venv/bin/python3 .claude/skills/meow:skill-creator/scripts/validate-skill.py .claude/skills/meow:my-feature
 ```
 
 ## Process

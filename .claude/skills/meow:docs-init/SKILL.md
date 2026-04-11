@@ -5,7 +5,7 @@ description: |
   Use when a project has no docs/ directory or needs initial documentation
   generated from codebase analysis. Triggers on "init docs", "create documentation",
   "generate docs", "docs init", or when docs/ is empty. Do NOT use for updating
-  existing docs (use meow:document-release) or for reference guides (use meow:documentation).
+  existing docs (use meow:document-release).
 allowed-tools:
   - Bash
   - Read
@@ -22,7 +22,7 @@ sources:
 
 Generate initial project documentation from codebase analysis.
 
-**Scope:** Creates `docs/` from scratch. For updating existing docs → `meow:document-release`. For doc reference guides → `meow:documentation`.
+**Scope:** Creates `docs/` from scratch. For updating existing docs → `meow:document-release`.
 
 ## When to Invoke
 
@@ -40,7 +40,7 @@ Do NOT invoke when: docs already exist and need updating (use `meow:document-rel
 2. **Scout codebase** — activate `meow:scout` to analyze project structure.
    Skip: `.claude/`, `.git/`, `node_modules/`, `__pycache__/`, `dist/`, `build/`
 3. **Merge findings** — consolidate scout reports into context for doc generation
-4. **Generate docs** — spawn `docs-manager` subagent via Task tool with scout context.
+4. **Generate docs** — spawn `documenter` subagent via Task tool with scout context.
    Output files (adapt to what the project actually has):
    - `README.md` — project overview (≤300 lines)
    - `docs/project-overview.md` — what this project is, who it's for

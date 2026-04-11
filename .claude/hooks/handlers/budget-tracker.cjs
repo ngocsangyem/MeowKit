@@ -6,8 +6,9 @@
 // Pricing: per 1M tokens (input/output) by model tier.
 //
 // Thresholds (configurable via env):
-//   MEOWKIT_BUDGET_WARN  — warning threshold in USD (default: 10)
-//   MEOWKIT_BUDGET_BLOCK — hard block threshold in USD (default: 25)
+//   MEOWKIT_BUDGET_WARN  — warning threshold in USD (default: 30)
+//   MEOWKIT_BUDGET_BLOCK — hard block threshold in USD (default: 100)
+//   MEOWKIT_BUDGET_CAP   — user override for hard block (can be lower OR higher)
 
 // Pricing per 1M tokens [input, output] in USD
 const PRICING = {
@@ -60,8 +61,10 @@ module.exports = function budgetTracker(ctx, state) {
   // Check thresholds (explicit undefined check to allow 0 as valid value)
   const warnEnv = process.env.MEOWKIT_BUDGET_WARN;
   const blockEnv = process.env.MEOWKIT_BUDGET_BLOCK;
-  const warnThreshold = warnEnv !== undefined ? Number(warnEnv) : 10;
-  const blockThreshold = blockEnv !== undefined ? Number(blockEnv) : 25;
+  const capEnv = process.env.MEOWKIT_BUDGET_CAP;
+  const warnThreshold = warnEnv !== undefined ? Number(warnEnv) : 30;
+  // MEOWKIT_BUDGET_CAP overrides the hard block if set
+  const blockThreshold = capEnv !== undefined ? Number(capEnv) : (blockEnv !== undefined ? Number(blockEnv) : 100);
 
   if (budget.estimated_cost_usd >= blockThreshold) {
     budget.warnings_emitted += 1;
