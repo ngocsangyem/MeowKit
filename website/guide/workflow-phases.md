@@ -34,11 +34,11 @@ When you're unsure which phase to enter next, run:
 
 ### Execution modes
 
-| Mode | When | How |
-|------|------|-----|
-| **Sequential** | Default for all tasks | Phases run one at a time, single agent per phase |
-| **Parallel** | COMPLEX tasks with independent subtasks | Up to 3 agents, each in a git worktree, zero file overlap |
-| **Party** | Architecture decisions, trade-off analysis | 2-4 agents deliberate, one synthesis — no code during party |
+| Mode           | When                                       | How                                                         |
+| -------------- | ------------------------------------------ | ----------------------------------------------------------- |
+| **Sequential** | Default for all tasks                      | Phases run one at a time, single agent per phase            |
+| **Parallel**   | COMPLEX tasks with independent subtasks    | Up to 3 agents, each in a git worktree, zero file overlap   |
+| **Party**      | Architecture decisions, trade-off analysis | 2-4 agents deliberate, one synthesis — no code during party |
 
 Party Mode is triggered explicitly:
 
@@ -53,19 +53,19 @@ Party Mode is triggered explicitly:
 
 Phase 1 produces an approved plan using one or more planning skills:
 
-| Skill                  | Lens               | Use when                           |
-| ---------------------- | ------------------ | ---------------------------------- |
-| `meow:plan-creator`    | Full plan creation | Starting from scratch (9-step workflow, 00–08) |
-| `meow:plan-ceo-review` | Product lens       | Is this the right thing to build?  |
-| `meow:plan-eng-review` | Engineering lens   | Is this the right way to build it? |
-| `meow:validate-plan`   | 8-dimension quality check | COMPLEX tasks — runs before Gate 1 |
+| Skill                  | Lens                      | Use when                                       |
+| ---------------------- | ------------------------- | ---------------------------------------------- |
+| `meow:plan-creator`    | Full plan creation        | Starting from scratch (9-step workflow, 00–08) |
+| `meow:plan-ceo-review` | Product lens              | Is this the right thing to build?              |
+| `meow:plan-eng-review` | Engineering lens          | Is this the right way to build it?             |
+| `meow:validate-plan`   | 8-dimension quality check | COMPLEX tasks — runs before Gate 1             |
 
 `meow:plan-creator` v1.4.0 supports two additional modes on top of the standard `--hard` workflow:
 
-| Flag | What it adds |
-|------|-------------|
+| Flag         | What it adds                                                                       |
+| ------------ | ---------------------------------------------------------------------------------- |
 | `--parallel` | Execution Strategy section with file ownership matrix and parallel group hydration |
-| `--two` | 2 competing approach files + trade-off matrix; user selects before red-team runs |
+| `--two`      | 2 competing approach files + trade-off matrix; user selects before red-team runs   |
 
 For COMPLEX tasks (5+ files), the planner also applies **bead decomposition** — breaking the plan into atomic, independently committable work units. See [planner](/reference/agents/planner) for details. The `meow:validate-plan` skill checks bead boundaries as one of its 8 dimensions, ensuring clean handoff to the developer.
 
@@ -124,7 +124,7 @@ For `/meow:harness` runs in FULL density, the developer agent must read a signed
 - Memory capture: log patterns as they emerge
 - For COMPLEX tasks: process the plan's **bead decomposition** sequentially — commit after each bead, resume from last uncommitted bead if interrupted. See [developer](/reference/agents/developer) for the full bead processing loop.
 
-## Phase 4 — Review ✋ Gate 2
+## Phase 4 — Review Gate 2
 
 **Agent:** reviewer
 **Deliverable:** `tasks/reviews/YYMMDD-name-verdict.md`
@@ -143,11 +143,11 @@ For `/meow:harness` runs in FULL density, the developer agent must read a signed
 
 Phase 4.5 fires only during `/meow:cook` runs — not in `meow:fix`, `meow:harness` (which has its own evaluator), or standalone `meow:review`.
 
-| Flag | Behavior | Approx Cost |
-|------|----------|-------------|
-| `--verify` | Light browser check after Phase 4 review. Advisory — warns but does not block ship | ~$1 |
-| `--strict` | Full `meow:evaluate` with rubric grading. FAIL verdict blocks Phase 5 | ~$2–5 |
-| `--no-strict` | Suppress auto-strict even when scale-routing returns `level=high` | — |
+| Flag          | Behavior                                                                           | Approx Cost |
+| ------------- | ---------------------------------------------------------------------------------- | ----------- |
+| `--verify`    | Light browser check after Phase 4 review. Advisory — warns but does not block ship | ~$1         |
+| `--strict`    | Full `meow:evaluate` with rubric grading. FAIL verdict blocks Phase 5              | ~$2–5       |
+| `--no-strict` | Suppress auto-strict even when scale-routing returns `level=high`                  | —           |
 
 ### Auto-strict trigger
 
@@ -180,12 +180,12 @@ See [scale-adaptive-rules Rule 7](/reference/rules-index#scale-adaptive-rules) f
 
 ## Hook Enforcement
 
-MeowKit uses shell hooks to upgrade behavioral rules to preventive enforcement — the action is blocked *before* it executes, not after the agent has already reasoned its way past the rule.
+MeowKit uses shell hooks to upgrade behavioral rules to preventive enforcement — the action is blocked _before_ it executes, not after the agent has already reasoned its way past the rule.
 
-| Hook | Event | What it blocks |
-|------|-------|---------------|
-| `privacy-block.sh` | PreToolUse | `.env`, `*.key`, credential file reads |
-| `gate-enforcement.sh` | PreToolUse | Source code writes before Gate 1 approval |
+| Hook                        | Event        | What it blocks                             |
+| --------------------------- | ------------ | ------------------------------------------ |
+| `privacy-block.sh`          | PreToolUse   | `.env`, `*.key`, credential file reads     |
+| `gate-enforcement.sh`       | PreToolUse   | Source code writes before Gate 1 approval  |
 | `project-context-loader.sh` | SessionStart | Missing project-context.md (auto-loads it) |
 
 `privacy-block.sh` and `gate-enforcement.sh` are preventive — they intercept the tool call. `project-context-loader.sh` is proactive — it ensures the agent constitution is in context before any task runs.
