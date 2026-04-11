@@ -6,6 +6,8 @@
 # Usage: pre-task-check.sh <task-description>
 # Exit codes: 0 = PASS, 1 = BLOCK
 #
+# Load .claude/.env (each hook is a separate subprocess)
+. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 # POSIX-compatible (macOS + Linux). No bash-isms.
 
 # Ensure CWD is project root for relative paths

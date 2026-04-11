@@ -10,6 +10,8 @@
 # Gate 1 bypass: /meow:fix --simple OR scale-routing one-shot
 # Contract gate bypass: MEOWKIT_HARNESS_MODE=LEAN env var (adaptive density for COMPLEX/Opus 4.6)
 #
+# Load .claude/.env (each hook is a separate subprocess)
+. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 # Phase 4 extension (260408): also validates contract files on edit so hand-edits cannot
 # break the schema. Triggered when $1 matches tasks/contracts/*.md.
 

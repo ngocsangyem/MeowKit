@@ -6,6 +6,8 @@
 # Signals detected:
 #   churn   — same file edited 3+ times this session
 #
+# Load .claude/.env (each hook is a separate subprocess)
+. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 # Output: session-state/learning-observer.jsonl (one JSON object per line)
 # Read by: post-session.sh during retroactive capture
 

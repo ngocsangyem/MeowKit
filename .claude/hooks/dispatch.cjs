@@ -16,6 +16,31 @@ const path = require('path');
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const HOOKS_DIR = path.join(ROOT, '.claude', 'hooks');
 
+// Load .claude/.env for Node.js handlers — no external dependency.
+// Does NOT override existing env vars (shell export takes precedence).
+const dotenvPath = path.join(ROOT, '.claude', '.env');
+try {
+  if (fs.existsSync(dotenvPath)) {
+    const lines = fs.readFileSync(dotenvPath, 'utf8').split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const eqIdx = trimmed.indexOf('=');
+      if (eqIdx < 1) continue;
+      const key = trimmed.slice(0, eqIdx).trim();
+      let val = trimmed.slice(eqIdx + 1).trim();
+      // Strip surrounding quotes
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      }
+      // Don't override existing env vars
+      if (!(key in process.env)) {
+        process.env[key] = val;
+      }
+    }
+  }
+} catch (_) { /* graceful — dotenv is optional */ }
+
 async function main() {
   const event = process.argv[2] || '';
   const matcher = process.argv[3] || '';

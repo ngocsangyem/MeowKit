@@ -6,6 +6,11 @@
 # UserPromptSubmit. Saves ~48KB/turn in mid-to-long sessions for ~$0.01-$0.02/session.
 #
 # Registered: Stop + UserPromptSubmit.
+#
+# Load .claude/.env (each hook is a separate subprocess)
+if [ -n "$CLAUDE_PROJECT_DIR" ]; then
+  . "${CLAUDE_PROJECT_DIR}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
+fi
 # Input: JSON on stdin (parsed via lib/read-hook-input.sh).
 # Branches on $HOOK_EVENT_NAME:
 #   Stop              -> summarize transcript via `claude -p --model haiku` if throttled

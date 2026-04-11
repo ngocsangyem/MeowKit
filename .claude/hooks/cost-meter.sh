@@ -5,6 +5,9 @@
 # This hook does not currently consume tool input fields — it operates as a passive
 # session-cost accumulator and reads .claude/memory/cost-log.json directly.
 # When manual self-test is needed: bash cost-meter.sh </dev/null
+#
+# Load .claude/.env (each hook is a separate subprocess)
+. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi

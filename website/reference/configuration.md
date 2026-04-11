@@ -85,13 +85,31 @@ The following entries were added in v2.3.0 to route events to `dispatch.cjs`. Th
 
 `PostToolUse Edit|Write` has both `post-write.sh` (shell, security scan) and `dispatch.cjs` entries. Both fire independently on every file write.
 
-### New environment variables (v2.3.0)
+### Environment variables (v2.3.0+)
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `MEOWKIT_MEMORY_BUDGET` | `4000` | Max chars injected by `memory-loader.cjs` per prompt (~1K tokens) |
-| `MEOWKIT_BUDGET_WARN` | `10` | USD threshold at which `budget-tracker.cjs` warns |
-| `MEOWKIT_BUDGET_BLOCK` | `25` | USD threshold at which `budget-tracker.cjs` hard-blocks |
+See [Environment Variables](#environment-variables) below for the complete reference.
+
+## .claude/.env File {#dotenv}
+
+MeowKit loads `.claude/.env` automatically at session start. This is the recommended way to set project-level env vars (API keys, config overrides) without polluting your shell profile.
+
+**How it works:**
+
+1. `project-context-loader.sh` (SessionStart) sources `.claude/.env` into the shell environment → all shell hooks inherit it
+2. `dispatch.cjs` parses `.claude/.env` into `process.env` → all Node.js handlers inherit it
+3. `meow:multimodal` Python scripts have their own `.env` loading (predates centralized loader)
+
+**Precedence:** Shell exports (`export VAR=x`) **always win**. `.env` vars only apply when the var is not already set. This means you can override `.env` per-session with `export`.
+
+**Setup:**
+```bash
+cp .claude/.env.example .claude/.env
+# Edit .claude/.env with your values
+```
+
+**Security:** `.env` is gitignored by default. Never commit API keys. The `privacy-block.sh` hook blocks Claude from reading `.env` files directly — the dotenv loader is the only authorized reader.
+
+**Template:** See `.claude/.env.example` for all supported variables with descriptions.
 
 ## Rules
 
@@ -116,8 +134,81 @@ The following entries were added in v2.3.0 to route events to `dispatch.cjs`. Th
 |------|-------|---------|---------|
 | default | Both | Full | Most work |
 | strict | Both (no WARN) | Every file | Production, auth, payments |
-| fast | Gate 1 only | BLOCK only | Prototypes |
+| fast | Both (WARNs auto-ack) | BLOCK only | Prototypes |
 | architect | N/A | N/A | Design-only sessions |
 | audit | N/A | Comprehensive | Security reviews |
 | document | N/A | N/A | Doc sprints |
-| cost-saver | Gate 1 | BLOCK only | High-volume routine |
+| cost-saver | Both (WARNs auto-ack) | BLOCK only | High-volume routine |
+
+## Environment Variables
+
+All `MEOWKIT_*` env vars. Set in your shell profile (`~/.zshrc`, `~/.bashrc`) or per-session via `export`.
+
+### Core
+
+| Variable | Default | Purpose | When to use |
+|----------|---------|---------|-------------|
+| `MEOWKIT_TDD` | `off` | Enable strict TDD enforcement (RED-phase gate). Values: `1`, `true`, `on`, `enabled` | Production-quality code, payment/auth features. Opt-in — most users leave this off. |
+| `MEOWKIT_MODEL_HINT` | *(none)* | Fallback model ID for tier detection when SessionStart stdin lacks `model` field | Only if `model-detector.cjs` shows "not detected". Most users don't need this — stdin auto-detection is primary since v2.3.0. |
+| `MEOW_HOOK_PROFILE` | `standard` | Hook execution profile. `standard` = normal, `fast` = skip non-critical hooks (post-session, learning-observer, pre-ship), `strict` = all hooks enabled | `fast` for rapid iteration/spike work. `strict` for production sessions needing full memory capture. |
+
+### Harness (Autonomous Build Pipeline)
+
+| Variable | Default | Purpose | When to use |
+|----------|---------|---------|-------------|
+| `MEOWKIT_HARNESS_MODE` | *(auto-detected)* | Override scaffolding density: `MINIMAL` (Haiku), `FULL` (Sonnet/Opus 4.5), `LEAN` (Opus 4.6+) | When auto-detection picks wrong density. `LEAN` skips contract negotiation; `MINIMAL` short-circuits to `/cook`. Does NOT bypass gates. |
+| `MEOWKIT_BUDGET_WARN` | `30` | USD threshold for budget warning message | Lower for cost-conscious sessions, higher for long research runs. |
+| `MEOWKIT_BUDGET_BLOCK` | `100` | USD threshold for hard session block | Emergency brake. Session halts at this amount. |
+| `MEOWKIT_BUDGET_CAP` | *(none)* | User override for hard block — can be lower OR higher than `BUDGET_BLOCK` | Set `MEOWKIT_BUDGET_CAP=200` for intentional high-budget harness runs. Set `MEOWKIT_BUDGET_CAP=15` for tight budgets. |
+| `MEOWKIT_RUN_ID` | `current` | Harness run identifier for trace and budget tracking | Set automatically by `meow:harness` step-00. Don't set manually unless resuming. |
+
+### Conversation Summary Cache
+
+| Variable | Default | Purpose | When to use |
+|----------|---------|---------|-------------|
+| `MEOWKIT_SUMMARY_CACHE` | `on` | Enable/disable conversation summary. Set `off` to disable. | Disable if using a custom context management strategy or to save ~$0.01–0.02/session. |
+| `MEOWKIT_SUMMARY_THRESHOLD` | `20480` | Min transcript bytes before summarization triggers | Increase for short sessions that don't need summaries. |
+| `MEOWKIT_SUMMARY_TURN_GAP` | `30` | Min JSONL events between summaries (≈ 3–6 turns) | Lower for more frequent summaries in long sessions. |
+| `MEOWKIT_SUMMARY_GROWTH_DELTA` | `5120` | Min transcript growth bytes between summaries | Pair with TURN_GAP — both are OR conditions. |
+| `MEOWKIT_SUMMARY_BUDGET_SEC` | `180` | Background worker timeout for `claude -p` summarization | Increase on slow networks. |
+| `MEOWKIT_SUMMARY_DEBUG` | *(none)* | Set `1` for verbose stderr from summary hook | Debugging summary issues only. |
+
+### Memory & Context
+
+| Variable | Default | Purpose | When to use |
+|----------|---------|---------|-------------|
+| `MEOWKIT_MEMORY_BUDGET` | `4000` | Max chars injected by `memory-loader.cjs` per prompt (~1K tokens) | Reduce if context window is tight. Increase for projects with rich lesson history. |
+
+### Hook Controls
+
+| Variable | Default | Purpose | When to use |
+|----------|---------|---------|-------------|
+| `MEOWKIT_BUILD_VERIFY` | `on` | Set `off` to skip post-write compile/lint checks | Disable during bulk file generation where per-file verification is too slow. |
+| `MEOWKIT_LOOP_DETECT` | `on` | Set `off` to skip edit-count loop detection | Disable during intentional multi-pass refactoring. |
+| `MEOWKIT_PRECOMPLETION` | `on` | Set `off` to skip pre-completion verification check | Disable if the check blocks session exit incorrectly. |
+| `MEOWKIT_TDD_FLAG_DETECTOR` | `on` | Set `off` to disable `--tdd` flag detection in user prompts | Disable if `--tdd` in your prompt text triggers TDD unintentionally. |
+
+### Examples
+
+**Production session with TDD and strict hooks:**
+```bash
+export MEOWKIT_TDD=1
+export MEOW_HOOK_PROFILE=strict
+```
+
+**Quick prototyping session:**
+```bash
+export MEOW_HOOK_PROFILE=fast
+export MEOWKIT_BUILD_VERIFY=off
+```
+
+**High-budget harness run on Opus 4.6:**
+```bash
+export MEOWKIT_BUDGET_CAP=200
+# MEOWKIT_HARNESS_MODE auto-detects LEAN for Opus 4.6
+```
+
+**Disable conversation summaries:**
+```bash
+export MEOWKIT_SUMMARY_CACHE=off
+```
