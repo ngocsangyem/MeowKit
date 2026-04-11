@@ -1,5 +1,5 @@
 // budget-tracker.cjs — PostToolUse handler: estimate token cost from tool output.
-// Gate check confirmed: PostToolUse stdin has `tool_response` with full tool output.
+// PostToolUse stdin provides `tool_response` with full tool output.
 // Replaces dead cost-meter.sh (which exited on standard/fast profiles).
 //
 // Estimation: chars / 4 ≈ tokens (rough, English text). Imprecise but order-of-magnitude.

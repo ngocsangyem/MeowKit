@@ -6,7 +6,6 @@
 // Env: MEOWKIT_LOOP_DETECT=off — skip entirely
 //
 // NOTE: Trace emission (append-trace.sh) intentionally omitted from Node.js port.
-// Trace system will be redesigned as a dispatch.cjs handler in a later phase.
 // Shell version's trace records are not consumed by any downstream system currently.
 
 const path = require('path');

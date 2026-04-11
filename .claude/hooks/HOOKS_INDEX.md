@@ -6,7 +6,7 @@ All hooks in `.claude/hooks/` with their registration, purpose, and input contra
 
 Hooks consume input via **JSON on stdin** (per `code.claude.com/docs/en/hooks`). Shell hooks use the shared parser `lib/read-hook-input.sh`. Node.js hooks use `lib/parse-stdin.cjs`.
 
-**Phase 1 Harness Evolution (260411):** Non-security hooks are dispatched via `dispatch.cjs` + `handlers.json` registry. Security hooks (`gate-enforcement.sh`, `privacy-block.sh`) remain independent bash entries in `settings.json` per red team E-03 (dispatcher SPOF risk).
+Non-security hooks are dispatched via `dispatch.cjs` + `handlers.json` registry. Security hooks (`gate-enforcement.sh`, `privacy-block.sh`) remain independent bash entries in `settings.json` to avoid dispatcher SPOF risk.
 
 Every hook must be registered in `.claude/settings.json` — unregistered hooks are dead code.
 

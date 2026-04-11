@@ -88,7 +88,7 @@ WHY: Undocumented changes create knowledge gaps for future sessions.
 ## Tool Output Limits
 
 ALWAYS apply default output limits to prevent context bloat at source.
-MicroCompact truncation is infeasible via hooks (RT2-02: PostToolUse can't replace output).
+PostToolUse hooks cannot truncate tool output (hooks append, not replace).
 Instead, prevent bloat by limiting output at the tool call site.
 
 | Tool | Default Limit | Override |

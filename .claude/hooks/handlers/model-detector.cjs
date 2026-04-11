@@ -1,5 +1,5 @@
 // model-detector.cjs — SessionStart handler: detect model tier and density.
-// Gate check confirmed: SessionStart stdin has `model` field with model ID string.
+// SessionStart stdin provides `model` field with model ID string.
 //
 // Detection cascade:
 //   1. Parse `model` field from SessionStart stdin

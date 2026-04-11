@@ -13,5 +13,7 @@
   "SessionStart": [
     "./handlers/model-detector.cjs"
   ],
-  "UserPromptSubmit": []
+  "UserPromptSubmit": [
+    "./handlers/memory-loader.cjs"
+  ]
 }
