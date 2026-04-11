@@ -24,6 +24,26 @@ mewkit CLI fetches zip at npx mewkit init
 | `main` | `@latest` | Stable         | `v1.2.0`        |
 | `dev`  | `@beta`   | Pre-release    | `v1.3.0-beta.1` |
 
+## Quick Release (Script)
+
+For standard releases, use the release script:
+
+```bash
+./scripts/release.sh <version> "<release title>"
+```
+
+Example:
+
+```bash
+./scripts/release.sh 2.3.2 "The Agent-Skills Integration Release"
+```
+
+The script automates steps 3-9 below: bump version → build/lint/typecheck/test → prepare release assets → VitePress build check → commit + tag → push → create GitHub Release with zip. Stops on any failure, warns on uncommitted changes.
+
+**Before running the script:** Complete steps 1-2 manually (update VitePress docs + changelog).
+
+**After the script:** Run step 10 (npm publish) and step 11 (end-to-end test) manually.
+
 ## Manual Release (Step-by-Step)
 
 ### 1. Update VitePress docs
@@ -287,11 +307,13 @@ docs: update readme        → no release
 | `scripts/sync-package-versions.cjs`     | Sync version across both npm packages                     |
 | `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files          |
 | `scripts/prepare-release-assets.cjs`    | Build metadata.json + manifest + dist/meowkit-release.zip |
+| `scripts/release.sh`                    | Automated release: bump → build → assets → commit → tag → push → GitHub Release |
 
 ## Release History
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v2.3.2  | 2026-04-11 | The Agent-Skills Integration Release |
 | v2.3.1  | 2026-04-11 | The Plan Creator Intelligence Release |
 | v1.4.0  | 2026-04-03 | The Plan Intelligence Release    |
 | v1.3.4  | 2026-04-02 | Hook path resolution fix            |
