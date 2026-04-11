@@ -5,6 +5,24 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.7 (2026-04-12) — The Copy-Cat Release
+
+New `meow:chom` skill for analyzing and replicating features from external systems, repos, apps, or ideas into any project.
+
+### Features
+
+- **meow:chom skill** — 6-phase workflow: Recon → Map → Analyze → Challenge (HARD GATE) → Decision → Handoff
+- **Smart input routing** — auto-detects git URLs (clone + scout), web URLs (web-to-markdown/browse), local paths, freeform text (researcher WebSearch), screenshots (multimodal vision)
+- **7 challenge questions** — Necessity, Stack Fit, Data Model, Dependency Cost, Effort vs Value, Blast Radius, Maintenance Burden
+- **Risk scoring** — 0-2 proceed, 3-4 resolve first, 5+ reject. Hard gate between Challenge and Decision
+- **Two modes** — `--analyze` (full workflow → Replication Spec) and `--compare` (analysis only → Comparison Report)
+- **General-purpose** — works for any project (SaaS, mobile, CLI), not just MeowKit
+
+### Files
+
+- `.claude/skills/meow:chom/SKILL.md` — skill definition (119 lines)
+- `.claude/skills/meow:chom/references/challenge-framework.md` — 7-question framework with risk scoring and decision matrix
+
 ## 2.3.6 (2026-04-11)
 
 Remove unused files

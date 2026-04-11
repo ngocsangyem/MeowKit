@@ -19,6 +19,7 @@ Source file: `.claude/agents/SKILLS_INDEX.md`
 | [scale-routing](/reference/skills/agent-detector) | orchestrator | utility |
 | [session-continuation](/reference/skills/session-continuation) | orchestrator | cross-cutting |
 | [memory](/reference/skills/memory) | analyst | memory |
+| [chom](/reference/skills/chom) | researcher | research |
 
 ## Phase 1 — Plan
 

@@ -10,6 +10,10 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### v2.3.7 — meow:chom (2026-04-12)
+
+New `meow:chom` skill — copy-cat, replicate, or adapt features from external systems, repos, apps, or ideas into any project. 6-phase workflow (Recon → Map → Analyze → Challenge → Decision → Handoff) with hard gate, 7 challenge questions (Necessity, Stack Fit, Data Model, Dependency Cost, Effort vs Value, Blast Radius, Maintenance Burden), smart input routing (git clone for repos, web-to-markdown for URLs, multimodal for screenshots), risk scoring, and two modes (`--analyze`, `--compare`). General-purpose — works for any project, not just MeowKit.
+
 ### v2.3.6
 
 Remove unused files
