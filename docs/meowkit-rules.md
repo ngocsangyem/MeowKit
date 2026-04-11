@@ -4,27 +4,29 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 
 ---
 
+> Best practice: [Lessons from Building Claude Code: How We Use Skills](./research/lessons-build-skill.md)
+
 ## 1. Path Conventions
 
 **Source:** B1-C1, B2-C3, B2-C8, B6-C1, B8-C4
 
-| Path Type               | Canonical Form                                        | Wrong Forms                                   |
-| ----------------------- | ----------------------------------------------------- | --------------------------------------------- |
-| Plan files              | `tasks/plans/YYMMDD-name/plan.md`                     | `tasks/plans/YYMMDD-name.md` (flat), `plans/` |
-| Review verdicts         | `tasks/reviews/YYMMDD-name-verdict.md`                | `reviews/`, `tasks/plans/.../reports/`        |
-| Sprint contracts        | `tasks/contracts/YYMMDD-HHMM-name-sprint-N.md`        | `contracts/`, `tasks/plans/.../contracts/`    |
-| Evaluator verdicts      | `tasks/reviews/YYMMDD-name-evalverdict.md`            | `evalverdicts/`, separate from review verdict |
-| Harness runs            | `tasks/harness-runs/YYMMDD-HHMM-name/run.md`          | `runs/`, `harness/`                           |
-| Rubric library          | `.claude/rubrics/<name>.md`                           | `rubrics/`, `.claude/skills/meow:rubric/rubrics/` |
-| Memory files            | `.claude/memory/lessons.md`                           | `memory/lessons.md` (bare)                    |
-| Conversation summary    | `.claude/memory/conversation-summary.md`              | `memory/conversation-summary.md`, `summary.md` |
+| Path Type               | Canonical Form                                                             | Wrong Forms                                                         |
+| ----------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Plan files              | `tasks/plans/YYMMDD-name/plan.md`                                          | `tasks/plans/YYMMDD-name.md` (flat), `plans/`                       |
+| Review verdicts         | `tasks/reviews/YYMMDD-name-verdict.md`                                     | `reviews/`, `tasks/plans/.../reports/`                              |
+| Sprint contracts        | `tasks/contracts/YYMMDD-HHMM-name-sprint-N.md`                             | `contracts/`, `tasks/plans/.../contracts/`                          |
+| Evaluator verdicts      | `tasks/reviews/YYMMDD-name-evalverdict.md`                                 | `evalverdicts/`, separate from review verdict                       |
+| Harness runs            | `tasks/harness-runs/YYMMDD-HHMM-name/run.md`                               | `runs/`, `harness/`                                                 |
+| Rubric library          | `.claude/rubrics/<name>.md`                                                | `rubrics/`, `.claude/skills/meow:rubric/rubrics/`                   |
+| Memory files            | `.claude/memory/lessons.md`                                                | `memory/lessons.md` (bare)                                          |
+| Conversation summary    | `.claude/memory/conversation-summary.md`                                   | `memory/conversation-summary.md`, `summary.md`                      |
 | Web fetch cache         | `.claude/cache/web-fetches/{YYMMDD}-{HHMMSS}-{host}-{sha256-path[:10]}.md` | `.claude/memory/web-fetches/` (memory is for learnings, not caches) |
-| Web fetch manifest      | `.claude/cache/web-fetches/index.jsonl` (append-only) | `.claude/memory/web-fetches/index.jsonl`       |
-| Web fetch quarantine    | `.claude/cache/web-fetches/quarantine/{sha256}.quarantined` | `.claude/memory/quarantine/`, `quarantine/`  |
-| ADR files               | `docs/architecture/adr/YYMMDD-title.md`               | `docs/architecture/NNNN-title.md`             |
-| Session state           | `session-state/` (project root)                       | `.claude/session-state/`                      |
-| Skill references        | `.claude/skills/meow:*/references/*.md`               | `domain/file.md` (short form)                 |
-| Gate validation scripts | `.claude/skills/meow:cook/scripts/validate-gate-*.sh` | `scripts/validate-gate-*.sh`                  |
+| Web fetch manifest      | `.claude/cache/web-fetches/index.jsonl` (append-only)                      | `.claude/memory/web-fetches/index.jsonl`                            |
+| Web fetch quarantine    | `.claude/cache/web-fetches/quarantine/{sha256}.quarantined`                | `.claude/memory/quarantine/`, `quarantine/`                         |
+| ADR files               | `docs/architecture/adr/YYMMDD-title.md`                                    | `docs/architecture/NNNN-title.md`                                   |
+| Session state           | `session-state/` (project root)                                            | `.claude/session-state/`                                            |
+| Skill references        | `.claude/skills/meow:*/references/*.md`                                    | `domain/file.md` (short form)                                       |
+| Gate validation scripts | `.claude/skills/meow:cook/scripts/validate-gate-*.sh`                      | `scripts/validate-gate-*.sh`                                        |
 
 **Rule:** When referencing any file in a skill or agent, use the FULL path from project root. Never use shortened or assumed paths. Before merging, grep for the path in all consuming files.
 
@@ -90,16 +92,16 @@ FILE_PATH="${HOOK_FILE_PATH:-$1}"
 
 **Exported env vars (from `lib/read-hook-input.sh`):**
 
-| Var | Source in JSON | When set |
-|---|---|---|
-| `HOOK_TOOL_NAME` | `tool_name` | All tool-use events |
-| `HOOK_FILE_PATH` | `tool_input.file_path` | Edit, Write, Read matchers |
-| `HOOK_COMMAND` | `tool_input.command` | Bash matcher |
-| `HOOK_SESSION_ID` | `session_id` | All events |
-| `HOOK_TOOL_USE_ID` | `tool_use_id` | Tool-use events |
-| `HOOK_CWD` | `cwd` | All events |
-| `HOOK_EVENT_NAME` | `hook_event_name` | All events |
-| `HOOK_TRANSCRIPT_PATH` | `transcript_path` | All events |
+| Var                    | Source in JSON         | When set                   |
+| ---------------------- | ---------------------- | -------------------------- |
+| `HOOK_TOOL_NAME`       | `tool_name`            | All tool-use events        |
+| `HOOK_FILE_PATH`       | `tool_input.file_path` | Edit, Write, Read matchers |
+| `HOOK_COMMAND`         | `tool_input.command`   | Bash matcher               |
+| `HOOK_SESSION_ID`      | `session_id`           | All events                 |
+| `HOOK_TOOL_USE_ID`     | `tool_use_id`          | Tool-use events            |
+| `HOOK_CWD`             | `cwd`                  | All events                 |
+| `HOOK_EVENT_NAME`      | `hook_event_name`      | All events                 |
+| `HOOK_TRANSCRIPT_PATH` | `transcript_path`      | All events                 |
 
 **Back-compat fallback:** hooks also read `$1` as a fallback so they work in both the old `"$TOOL_INPUT_FILE_PATH"` positional convention (if Claude Code's settings.json parser expands it) AND the canonical stdin convention. If stdin parsing returns empty, `$1` is used. Both conventions coexist safely.
 

@@ -63,7 +63,7 @@ Write `{plan_dir}/.plan-state.json` for cross-session resilience:
 {
   "version": "1.1",
   "created": "{YYYYMMDD-HHMM}",
-  "planning_mode": "{fast|hard|parallel|two}",
+  "planning_mode": "{fast|hard|deep|parallel|two|product-level}",
   "scope_mode": "{EXPANSION|HOLD|REDUCTION}",
   "phases": {
     "phase-01-name": { "status": "pending", "tasks_completed": 0, "tasks_total": N },

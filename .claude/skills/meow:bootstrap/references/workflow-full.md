@@ -54,6 +54,8 @@ Plan-creator will detect these and skip its own discovery step (no duplicate res
 This creates the plan in `tasks/plans/` and enforces Gate 1 (human approval).
 The plan defines architecture, modules, file structure — guides what gets scaffolded.
 
+> **Comprehensive bootstrap tip:** For projects spanning 5+ directories, use `--deep` instead of `--hard`. `--deep` provides per-phase file inventory and dependency maps, and triggers automatically when that many root dirs are detected. Gives the generator clearer scope boundaries across complex module layouts.
+
 Optional: activate meow:plan-ceo-review on the plan for product-level review.
 
 **After plan approved (Gate 1): proceed IMMEDIATELY to Step 5. Do NOT stop.**

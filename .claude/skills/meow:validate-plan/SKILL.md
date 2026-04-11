@@ -85,6 +85,10 @@ For TRIVIAL tasks, validation is skipped.
 
 - **Not the same as `validate-plan.py`**: The script at `meow:plan-creator/scripts/validate-plan.py` validates plan file *structure* (required sections exist). This skill validates plan *content quality* (are acceptance criteria binary? are risks identified?). Both can run — they check different things.
 
+## Relationship to plan-creator v2.3.1
+
+Note: plan-creator's step-06 now includes an enhanced validation interview with detection keywords and section mapping. meow:validate-plan focuses on 8-dimension structural validation, which is complementary — not a replacement.
+
 ## What This Skill Does NOT Do
 
 - Does NOT replace Gate 1 — human approval still required

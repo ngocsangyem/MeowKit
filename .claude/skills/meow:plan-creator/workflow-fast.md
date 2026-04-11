@@ -26,6 +26,7 @@ Compact workflow for `--fast` flag or simple tasks. Skips research, codebase ana
 | `planning_mode` | step-00 | all steps | `fast` (fixed in this workflow) |
 | `task_complexity` | step-00 | step-03 | `simple` (trivial exits at step-00) |
 | `workflow_model` | step-00 | step-03 | `feature`, `bugfix`, `refactor`, `security` |
+| `tdd_mode` | step-00 | step-03 | `true` or `false` (composable flag, independent of planning_mode) |
 | `plan_dir` | step-03 | step-04, step-07, step-08 | Absolute path to plan directory |
 
 ## Flow

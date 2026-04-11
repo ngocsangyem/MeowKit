@@ -5,6 +5,7 @@
 1. **Load the diff** — Run `git diff` against the base branch (typically `main`). If no base branch, use the last commit.
 2. **Load the plan** — Find the active plan file from `tasks/plans/`. If no plan exists (e.g., `/meow:fix --simple`), note "no plan — code-only review."
 3. **Extract acceptance criteria** — From the plan's "Success Criteria" or "Acceptance Criteria" section. If no plan, skip.
+3a. **Load red-team findings (supplementary)** — If reviewing implementation against a plan, check for `red-team-findings.md` in the plan directory (e.g., `tasks/plans/YYMMDD-name/red-team-findings.md`). If present, load it as supplementary context: it contains plan-level adversarial findings from an earlier red-team pass (attack surfaces, design risks, scope concerns). During review, check whether the implementation addresses the flagged issues. Skip silently if the file does not exist — its absence is normal.
 4. **Identify changed files** — List all files in the diff with change type (added/modified/deleted).
 5. **Check for security-relevant changes** — Flag files matching: `*auth*`, `*payment*`, `*session*`, `*token*`, `*secret*`, `*password*`, `*encrypt*`, `*.env*`.
 6. **Assess review scope** — Determine `review_scope` and `domain_complexity` (see Scope Assessment below).
@@ -48,6 +49,7 @@ Store gathered context for use by reviewers:
 - `security_relevant` — Boolean, true if security files detected
 - `review_scope` — `minimal` or `full` (from Scope Assessment)
 - `domain_complexity` — `low`, `medium`, `high`, or `unknown` (from Scope Assessment)
+- `red_team_findings` — Contents of `red-team-findings.md` if present; `null` if absent (silently skipped)
 
 ## Next
 

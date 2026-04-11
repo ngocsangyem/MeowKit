@@ -51,7 +51,7 @@ Two hard stops. No bypass. No exceptions.
 | Agent        | Role                           | Phase |
 | ------------ | ------------------------------ | ----- |
 | orchestrator | Route tasks, assign model tier | 0     |
-| planner      | Two-lens plan, Gate 1          | 1     |
+| planner      | Scope-adaptive plan (fast/hard/deep), Gate 1 | 1     |
 | architect    | ADRs, system design            | 1     |
 | tester       | Write failing tests first      | 2     |
 | developer    | TDD implementation             | 3     |
@@ -76,6 +76,7 @@ No two agents modify the same file type. Conflicts → escalate to human.
 - Non-trivial task → `npx meowkit task new --type [feature|bug-fix|refactor|security] "desc"`
 - Or copy from `tasks/templates/`
 - Skill: `meow:plan-creator` auto-selects right template
+- Modes: `--fast` | `--hard` | `--deep` | `--parallel` | `--two` | `--product-level`. Composable: `--tdd`. Subcommands: `archive`, `red-team {path}`, `validate {path}`.
 
 Task file requires before Phase 3:
 

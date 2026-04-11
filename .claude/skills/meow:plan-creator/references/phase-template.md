@@ -77,12 +77,39 @@ Every phase file MUST contain these 12 sections in order. Use "N/A" for sections
 - {Follow-up tasks deferred to future work}
 ```
 
+## Optional TDD Sections (when `tdd_mode = true`)
+
+When `--tdd` flag is set or `MEOWKIT_TDD=1` is active, append these after Implementation Steps:
+
+```markdown
+## Tests Before
+
+- [ ] `test_name_here` — {assertion: what should fail and why}
+- [ ] `test_name_here` — {assertion}
+
+## Refactor Opportunities
+
+- {What to clean up after tests pass — extract helpers, rename, simplify}
+
+## Tests After
+
+- [ ] `integration_test_name` — {cross-component or edge case test}
+
+## Regression Gate
+
+```bash
+{specific test command to verify no regressions, e.g., npm test, pytest -x}
+```
+```
+
+These sections are NOT added in default mode (12-section template remains unchanged).
+
 ## Rules
 
-- Each phase file: ≤150 lines
+- Each phase file: ≤150 lines (≤180 with TDD sections)
 - Sections can be brief but MUST exist (use "N/A" if not applicable)
 - Key Insights MUST cite research source when available
 - Todo checkboxes map 1:1 to implementation steps
 - Success criteria must be verifiable (command to run or file to check)
 - **Research linking (MANDATORY):** If `{plan-dir}/research/` has reports, Context Links MUST include links to relevant research reports. Step-03 verifies this after writing phase files.
-- **Critical-step markers:** Todo items with high risk can be prefixed with `[CRITICAL]` or `[HIGH]` — these get their own Claude Tasks during hydration (step-05), enabling finer-grained tracking.
+- **Critical-step markers:** Todo items with high risk can be prefixed with `[CRITICAL]` or `[HIGH]` — these get their own Claude Tasks during hydration (step-08), enabling finer-grained tracking.

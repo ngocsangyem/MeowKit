@@ -10,6 +10,10 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### [v2.3.1 — The Plan Creator Intelligence Release](/guide/whats-new/v2.3.1) (2026-04-11)
+
+Plan-creator's biggest upgrade since v1.3.2. 4-persona red team (Security Adversary + Failure Mode Analyst), `--deep` mode with per-phase scouting, `--tdd` composable flag, standalone subcommands (`red-team`, `validate`, `archive`), enhanced validation framework with detection keywords, memory capture at Gate 1, solution design checklist. Plus ecosystem sync: 18 downstream files updated — cook passes `--deep`/`--tdd` to plan-creator, review/evaluator load `red-team-findings.md`, help lists subcommands, harness offers `--deep` for FULL density.
+
 ### [v2.3.0 — The Hook Dispatch Release](/guide/whats-new/v2.3.0) (2026-04-11)
 
 Node.js hook dispatch system with 8 handler modules (model detection, budget tracking, checkpoint/resume, memory filtering, build verify, loop detection), cook `--verify`/`--strict` verification flags, review skeptic anchoring, structured memory with domain filtering, and tool output limits. TDD enforcement now opt-in.

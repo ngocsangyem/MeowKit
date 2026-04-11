@@ -24,7 +24,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 
 | Skill | Owner | Type | Architecture |
 |-------|-------|------|-------------|
-| `meow:plan-creator` | planner | planning | step-file (v1.4.0: scope challenge, multi-file output, plan red team, sync-back, **--product-level mode** for green-field app builds via step-03a) |
+| `meow:plan-creator` | planner | planning | step-file (v1.5.0: scope challenge, multi-file output, plan red team, sync-back, **--product-level mode** for green-field app builds via step-03a; **--deep mode** for per-phase scouting; **--tdd flag** injects TDD sections into phase files; **standalone subcommands**: archive/red-team/validate; outputs `red-team-findings.md`; solution design checklist in each phase; memory capture at Gate 1) |
 | `meow:plan-ceo-review` | planner | planning | monolithic |
 | `meow:plan-eng-review` | planner/architect | planning | monolithic |
 | `meow:validate-plan` | planner | planning | monolithic |
@@ -145,4 +145,9 @@ Note: Some skills appear in multiple categories (scout, investigate). Count refl
 - **Monolithic** — Single SKILL.md file. Used for skills <150 lines.
 - **Step-file** — SKILL.md + workflow.md + step-NN-*.md. Used for skills with 3+ phases.
 
-Currently step-file enabled: `meow:review` (4 steps).
+Currently step-file enabled:
+- `meow:plan-creator` — 9 steps (00–08)
+- `meow:review` — 4 steps
+- `meow:evaluate` — 5 steps
+- `meow:harness` — 7 steps
+- `meow:trace-analyze` — 6 steps

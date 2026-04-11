@@ -47,6 +47,7 @@ After plan approval, MUST output with **actual absolute path** and **mode-matche
 | --auto | `/meow:cook --auto {absolute-path}/plan.md` |
 | --fast | `/meow:cook --auto {absolute-path}/plan.md` |
 | --parallel | `/meow:cook --parallel {absolute-path}/plan.md` |
+| --deep | `/meow:cook {absolute-path}/plan.md` |
 
 Print this EXACT block (substitute actual path and flag):
 

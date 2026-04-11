@@ -50,8 +50,11 @@ Ask these 3 questions (internally, don't need to ask user):
 | trivial | EXIT | Print: "Task is trivial. Use `/meow:fix`." → STOP |
 | simple | fast | Skip research + codebase analysis. Go to step-03. |
 | complex | hard | Full pipeline: research → analysis → plan + phases → red team → validation |
+| complex + 5+ dirs OR refactor+complex | deep | Hard pipeline + per-phase scouting after step-03 drafts phase files |
 
-**Override:** User can force mode via `--fast` or `--hard` flag regardless of complexity.
+**Override:** User can force mode via `--fast`, `--hard`, or `--deep` flag regardless of complexity.
+
+**Auto-detect `--deep`:** If complexity = complex AND (task affects 5+ directories OR workflow_model = refactor), suggest `--deep` via AskUserQuestion. User can accept or stay with `--hard`.
 
 ### 0f. User Scope Input (Hard Mode Only)
 
@@ -165,17 +168,28 @@ Present via AskUserQuestion:
 
 **Note:** `planning_mode = product-level` skips the EXPANSION/HOLD/REDUCTION scope question (it is product-level by definition — ambition is the default).
 
+### 0i. Composable Flags
+
+**`--tdd` flag detection:**
+
+If `--tdd` is present in the arguments (e.g., `--hard --tdd`), set `tdd_mode = true`. This flag is composable with any planning mode. It does NOT change the planning mode — it adds TDD structure to phase files at step-03.
+
+If `MEOWKIT_TDD=1` env var is set, auto-enable `tdd_mode = true`.
+
+Default: `tdd_mode = false`.
+
 ## Output
 
 - `task_complexity` — trivial, simple, or complex
-- `planning_mode` — fast, hard, parallel, two, or **product-level** (trivial = exit, no mode)
+- `planning_mode` — fast, hard, deep, parallel, two, or **product-level** (trivial = exit, no mode)
 - `workflow_model` — feature, bugfix, refactor, or security
 - `scope_mode` — EXPANSION, HOLD, or REDUCTION (hard mode only; fast = HOLD default; product-level = EXPANSION default)
-- Print: `"Scope: {complexity} → mode: {mode} | model: {workflow_model} | scope: {scope_mode}"`
+- `tdd_mode` — true or false (composable flag, independent of planning_mode)
+- Print: `"Scope: {complexity} → mode: {mode} | model: {workflow_model} | scope: {scope_mode} | tdd: {tdd_mode}"`
 
 ## Next
 
 If trivial → STOP (recommend /meow:fix).
 If fast → skip to `step-03-draft-plan.md`.
 If **product-level** → read and follow `step-01-research.md` (broader: competitors, design trends, AI integration patterns).
-If hard, parallel, or two → read and follow `step-01-research.md`.
+If hard, deep, parallel, or two → read and follow `step-01-research.md`.

@@ -76,6 +76,9 @@ started: {ISO-8601 timestamp}
 | `MINIMAL` | `meow:plan-creator --fast` | SKIP | SKIP — invoke `meow:cook` instead and return |
 | `FULL` | `meow:plan-creator --product-level` | REQUIRED | 1–3 rounds |
 | `LEAN` | `meow:plan-creator --product-level` | OPTIONAL (skip if < 5 ACs needed) | 0–1 rounds |
+| `DEEP` | `meow:plan-creator --deep` | REQUIRED | 1–3 rounds |
+
+> **`--deep` mode:** Available for FULL density (Sonnet/Opus 4.5) when the task spans 5+ directories. Provides per-phase file inventory and dependency maps in addition to standard product-level scaffolding. Triggers automatically when `meow:scale-routing` detects 5+ root-level directories in scope; can also be forced via `MEOWKIT_HARNESS_MODE=DEEP`.
 
 **MINIMAL short-circuit:** if density resolves to MINIMAL, the harness immediately delegates to `meow:cook` and exits — no contract, no iteration loop, no harness scaffolding. The run report still gets written to record the decision.
 

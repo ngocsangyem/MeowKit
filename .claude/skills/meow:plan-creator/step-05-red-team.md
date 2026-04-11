@@ -1,6 +1,6 @@
 # Step 5: Red Team Review
 
-Adversarial plan review with plan-specific personas. Hard mode only.
+Adversarial plan review with plan-specific personas. Runs in hard/deep/parallel/two modes (skipped in fast).
 
 ## Instructions
 
@@ -15,8 +15,8 @@ Count `phase-XX-*.md` files in `{plan_dir}`:
 | Phase count | Personas to use |
 |-------------|-----------------|
 | 1–3 phases  | Assumption Destroyer + Scope Complexity Critic |
-| 4–5 phases  | Above + 1 additional (pending A/B test result) |
-| 6+ phases   | Above + 2 additional (pending A/B test result) |
+| 4–5 phases  | Above + Security Adversary |
+| 6+ phases   | Above + Security Adversary + Failure Mode Analyst |
 
 Load persona prompts from `.claude/skills/meow:plan-creator/prompts/personas/`.
 
@@ -119,9 +119,40 @@ For each finding the user approved (via "Apply all" or per-finding "Apply"/"Modi
 - If severity Medium: add to affected phase file's **Key Insights** section
 - Prefix applied entries with `[RED TEAM]`
 
-### 5h. Write Red Team Review Section to plan.md
+### 5h. Write Red Team Findings Report File
 
-Append to plan.md:
+Write the **full detailed findings** to a separate file: `{plan_dir}/red-team-findings.md`
+
+```markdown
+# Red Team Findings — {YYYY-MM-DD}
+
+**Plan:** {plan_dir}/plan.md
+**Personas used:** {list of personas}
+**Findings:** {total} ({accepted} accepted, {rejected} rejected)
+**Severity breakdown:** {N} Critical, {N} High, {N} Medium
+
+---
+
+## Finding 1: {title}
+- **Severity:** {Critical | High | Medium}
+- **Location:** {Phase X, section "name"}
+- **Flaw:** {full description}
+- **Failure scenario:** {detailed scenario}
+- **Evidence:** {quote from plan or missing element}
+- **Suggested fix:** {recommendation}
+- **Category:** {assumption | scope | security | reliability | architecture}
+- **Disposition:** {Accept | Reject} — {rationale}
+- **Applied to:** {phase file path or "—"}
+
+## Finding 2: {title}
+...
+```
+
+This file preserves the full evidence and reasoning. It can be re-read by future red-team sessions or referenced during implementation.
+
+### 5i. Write Red Team Review Summary to plan.md
+
+Append a **summary section** to plan.md that links to the full report:
 
 ```markdown
 ## Red Team Review
@@ -129,16 +160,20 @@ Append to plan.md:
 ### Session — {YYYY-MM-DD}
 **Findings:** {total} ({accepted} accepted, {rejected} rejected)
 **Severity breakdown:** {N} Critical, {N} High, {N} Medium
+**Full report:** [red-team-findings.md](red-team-findings.md)
 
 | # | Finding | Severity | Disposition | Applied To | Rationale |
 |---|---------|----------|-------------|------------|-----------|
 | 1 | {title} | {severity} | Accept/Reject | {phase file or —} | {1-line rationale} |
 ```
 
+If a `## Red Team Review` section already exists (from a previous session), append a new `### Session` subsection — don't overwrite. Similarly, if `red-team-findings.md` already exists, rename it to `red-team-findings-{YYMMDD-prev}.md` before writing the new one.
+
 ## Output
 
+- `{plan_dir}/red-team-findings.md` — full detailed findings report
 - Findings applied to phase files (Key Insights or Risk Assessment)
-- `## Red Team Review` section written to plan.md
+- `## Red Team Review` summary section written to plan.md with link to findings file
 - `red_team_findings` variable set: `"{N} findings, {accepted} accepted"`
 
 ## Next

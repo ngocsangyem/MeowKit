@@ -38,7 +38,7 @@ A rigorous, multi-section plan review from a CEO/founder perspective. Challenges
 
 ## Workflow
 
-1. **Initialize** — run preamble, detect base branch, run pre-review system audit (git history, diff stats, TODOs, design docs). See `references/preamble.md`, `references/base-branch-detection.md`, `references/pre-review-system-audit.md`
+1. **Initialize** — run preamble, detect base branch, run pre-review system audit (git history, diff stats, TODOs, design docs). If `red-team-findings.md` exists in the plan directory, load it as context before review. See `references/preamble.md`, `references/base-branch-detection.md`, `references/pre-review-system-audit.md`
 2. **Scope challenge** — nuclear scope challenge + mode selection (Expansion/Selective/Hold/Reduction), premise challenge, dream state mapping. See `references/step0-scope-and-mode.md`, `references/prerequisite-skill-offer.md`
 3. **Review** — sections 1-11 (Architecture → Design/UX), optional outside voice from subagent. See `references/review-sections.md`, `references/outside-voice.md`
 4. **Output** — required deliverables (NOT in scope, Dream state delta, Error/Rescue Registry, TODOs, diagrams), post-review handoff. See `references/required-outputs.md`, `references/post-review.md`

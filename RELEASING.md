@@ -292,6 +292,7 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v2.3.1  | 2026-04-11 | The Plan Creator Intelligence Release |
 | v1.4.0  | 2026-04-03 | The Plan Intelligence Release    |
 | v1.3.4  | 2026-04-02 | Hook path resolution fix            |
 | v1.3.3  | 2026-04-02 | The Hook Safety Release             |

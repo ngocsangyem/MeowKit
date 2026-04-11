@@ -1,4 +1,4 @@
-# Step 1: Research (Hard Mode Only)
+# Step 1: Research (Hard/Deep/Parallel/Two/Product-Level Only)
 
 **Skip if:** `planning_mode = fast`. Go directly to `step-03-draft-plan.md`.
 

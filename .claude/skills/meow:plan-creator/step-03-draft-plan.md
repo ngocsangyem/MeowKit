@@ -10,7 +10,7 @@ Write plan.md overview + phase files. Integrate research findings into plan cont
 tasks/plans/YYMMDD-{slug}/
 ├── plan.md
 ├── research/          (if research reports exist)
-└── phase-XX-name.md   (hard mode only)
+└── phase-XX-name.md   (hard/deep/parallel/two mode)
 ```
 
 ### 3b. Write plan.md (Overview, ≤80 Lines)
@@ -60,7 +60,11 @@ blocks: []
 
 **Fast mode:** Write plan.md with Goal, Context, Scope, Constraints, Technical Approach, ACs, Agent State. NO phase files. Use `assets/plan-template.md` format.
 
-### 3c. Write Phase Files (Hard Mode Only)
+### 3b'. Solution Design Checklist (Hard Mode Only)
+
+Before writing phase files, read `references/solution-design-checklist.md`. Use it as a checklist when writing Architecture, Risk Assessment, and Security Considerations sections. Not every item applies — skip irrelevant items, but explicitly consider each dimension.
+
+### 3c. Write Phase Files (Hard/Deep/Parallel/Two Mode)
 
 Each phase file MUST have these 12 sections:
 
@@ -78,6 +82,17 @@ Each phase file MUST have these 12 sections:
 12. **Next Steps** — dependencies, follow-up tasks
 
 See `references/phase-template.md` for the full template.
+
+### 3c'. TDD Sections (Conditional: `tdd_mode = true`)
+
+If `tdd_mode = true`, append these 4 sections after "Implementation Steps" in each phase file:
+
+13. **Tests Before** — what failing tests to write BEFORE implementation (test names, assertions, expected failures)
+14. **Refactor Opportunities** — what to clean up after tests pass (extract helpers, rename, simplify)
+15. **Tests After** — integration/regression tests to add after refactoring (cross-component, edge cases)
+16. **Regression Gate** — specific test commands to verify no regressions (`npm test`, `pytest -x`, etc.)
+
+These sections are ONLY added when `--tdd` flag is set or `MEOWKIT_TDD=1` env var is active. Phase files without TDD mode retain the standard 12-section template.
 
 ### 3d. Phase Splitting Rules
 
@@ -114,7 +129,23 @@ For each phase file:
    - Print: `"Fixed: {phase-file} now links to research/{report}"`
 3. If no research reports exist (fast mode): skip this check.
 
-### 3h. Parallel Mode (conditional: `planning_mode = parallel`)
+### 3h. Per-Phase Scouting (Conditional: `planning_mode = deep`)
+
+After writing all phase files (section 3c), run targeted scouting for each phase:
+
+1. For each phase file, read its `## Related Code Files` section
+2. Identify unique directories from the file paths listed
+3. Invoke `meow:scout` on each directory set (max 3 tool calls per phase, max 7 phases)
+4. Inject scout results into the phase file:
+   - Add **File Inventory** subsection under Key Insights: list files found, their size, last modified
+   - Add **Dependency Map** subsection under Architecture: which files import/depend on which
+5. Print: `"Deep scan: {N} phases scouted, {M} files inventoried"`
+
+**Bounds:** max 3 tool calls per phase scout, max 7 phases scouted total. If scout exceeds bounds, prioritize phases with highest risk or most file overlap.
+
+**Skip if:** `planning_mode` is not `deep`.
+
+### 3i. Parallel Mode (conditional: `planning_mode = parallel`)
 
 After writing all phase files (section 3c), analyze ownership boundaries:
 
@@ -137,7 +168,7 @@ After writing all phase files (section 3c), analyze ownership boundaries:
 
 See `references/parallel-mode.md` for full rules and templates.
 
-### 3i. Two-Approach Mode (conditional: `planning_mode = two`)
+### 3j. Two-Approach Mode (conditional: `planning_mode = two`)
 
 Instead of writing plan.md and phase files directly:
 

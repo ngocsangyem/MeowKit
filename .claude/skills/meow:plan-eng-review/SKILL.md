@@ -36,7 +36,7 @@ Thorough, interactive engineering review of a plan before implementation begins.
 
 ## Workflow
 
-1. **Initialize** — run preamble, apply shared protocols, check for design doc (offer `/meow:office-hours` if none). See [preamble.md](references/preamble.md), [design-doc-check.md](references/design-doc-check.md)
+1. **Initialize** — run preamble, apply shared protocols, check for design doc (offer `/meow:office-hours` if none). If `red-team-findings.md` exists in the plan directory, load it as context before review. See [preamble.md](references/preamble.md), [design-doc-check.md](references/design-doc-check.md)
 2. **Scope challenge** — challenge complexity, search for built-ins, check TODOs, verify completeness. See [step0-scope-challenge.md](references/step0-scope-challenge.md)
 3. **Review** — walk through Architecture, Code Quality, Tests (with coverage diagram), Performance. One issue per AskUserQuestion. Optional outside voice. See [review-sections.md](references/review-sections.md), [question-rules.md](references/question-rules.md), [outside-voice.md](references/outside-voice.md)
 4. **Output** — required outputs (NOT in scope, TODOs, diagrams, failure modes), log review, show dashboard, update plan file, run telemetry. See [required-outputs.md](references/required-outputs.md), [review-log-dashboard.md](references/review-log-dashboard.md)

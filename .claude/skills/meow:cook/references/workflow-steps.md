@@ -35,6 +35,23 @@ All modes share these phases with mode-specific variations.
 
 - Use `meow:plan-creator --parallel` for dependency graph + file ownership matrix
 
+### plan-creator mode flags (v2.3.1)
+
+Valid flags to pass to `meow:plan-creator`:
+
+| Flag | Effect |
+|------|--------|
+| `--fast` | Skip research; lighter plan from scout only |
+| `--hard` | Stricter acceptance criteria; conservative scope |
+| `--deep` | Deep codebase analysis; higher-fidelity phase breakdown |
+| `--parallel` | Emit dependency graph + file ownership matrix for parallel execution |
+| `--two` | Two-lens planning (product lens + engineering lens) |
+| `--product-level` | Product-level planner stance: user stories only, no file paths or class names |
+
+**`--tdd` passthrough:** When cook receives `--tdd`, pass it to the plan-creator invocation so the plan includes TDD-aware acceptance criteria and test scaffolding notes.
+
+**`--deep` passthrough:** When the task matches deep auto-detection criteria (touches 5+ directories, or is classified as `refactor+complex` at Phase 0), consider passing `--deep` to plan-creator for a higher-fidelity phase breakdown.
+
 ### GATE 1 (Non-Auto Mode)
 
 Present plan summary. Use `AskUserQuestion` (header: "Gate 1"):
@@ -130,10 +147,19 @@ Present implementation summary. Ask: "Proceed to review?" / "Request changes" / 
 
 ### Code Review (MANDATORY subagent)
 
+Before spawning the reviewer, check for adversarial findings from planning:
+
+```bash
+# Run in plan directory
+ls [plan-dir]/red-team-findings.md 2>/dev/null && echo "found" || echo "absent"
+```
+
+If `red-team-findings.md` exists, load its contents and pass as additional context to the reviewer subagent. This file contains plan-level adversarial findings (risks, attack surfaces, design concerns) that the reviewer should cross-reference against the implementation to verify they were addressed.
+
 Spawn `reviewer` subagent:
 
 ```
-Task(subagent_type="reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY.", description="Code review")
+Task(subagent_type="reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY. [If red-team-findings.md loaded]: Also cross-reference the attached plan-level adversarial findings against the implementation — note which findings were addressed and which remain open.", description="Code review")
 ```
 
 See `review-cycle.md` for interactive vs auto handling.

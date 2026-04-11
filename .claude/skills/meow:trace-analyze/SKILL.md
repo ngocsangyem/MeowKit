@@ -67,7 +67,7 @@ All under `plans/{date}-trace-analysis/` (created by step-01):
 - `suggestions.md` — approved suggestions only (written by step-06)
 - `rejected.md` — rejected suggestions with reasons (written by step-06)
 - `analysis.md` — final human-readable summary (written by step-06)
-- Optional: a draft follow-up plan generated from approved suggestions, ready for `meow:plan-creator --hard`
+- Optional: a draft follow-up plan generated from approved suggestions, ready for `meow:plan-creator --hard` (or `--deep` when trace findings span 5+ module areas — provides per-phase file inventory for multi-module remediation)
 
 ## Gotchas
 

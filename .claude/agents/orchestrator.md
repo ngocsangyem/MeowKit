@@ -119,15 +119,18 @@ When a COMPLEX task can be decomposed into independent subtasks with zero file o
 
 At Phase 0, read the active mode's `Planning Depth` section and pass to planner:
 
-| Mode | Researchers | Parallel | Two Approaches |
-|------|-------------|----------|----------------|
-| default | 1 | No | No |
-| strict | 2 | Yes | Yes |
-| fast | 0 (skip) | No | No |
-| architect | 2 | Yes | Yes |
-| audit | 1 | No | No |
-| cost-saver | 0 (skip) | No | No |
-| document | 0 (skip) | No | No |
+| Mode | Researchers | Parallel | Two Approaches | Per-Phase Scout |
+|------|-------------|----------|----------------|-----------------|
+| default | 1 | No | No | No |
+| strict | 2 | Yes | Yes | No |
+| fast | 0 (skip) | No | No | No |
+| architect | 2 | Yes | Yes | No |
+| audit | 1 | No | No | No |
+| cost-saver | 0 (skip) | No | No | No |
+| document | 0 (skip) | No | No | No |
+| deep | 1 per phase | No | No | Yes |
+
+`--deep` triggers automatically when: 5+ directories affected OR task type is refactor+complex. Can also be passed explicitly. Planner runs one scout per phase before writing each phase detail file.
 
 When `two_approaches=true`, planner produces 2 competing plans with an "Approach Comparison" section. User selects one before Gate 1 approval.
 

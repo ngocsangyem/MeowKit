@@ -1,4 +1,4 @@
-# Step 2: Codebase Analysis (Hard Mode Only)
+# Step 2: Codebase Analysis (Hard/Deep/Parallel/Two Only)
 
 **Skip if:** `planning_mode = fast`. Go directly to `step-03-draft-plan.md`.
 
@@ -9,7 +9,8 @@ Understand existing codebase before drafting plan.
 ### 2a. Scout Relevant Directories
 
 Invoke `meow:scout` on directories related to the task:
-- Identify 2-3 directories most likely to be affected
+- **Standard (hard):** Identify 2-3 directories most likely to be affected
+- **Deep mode:** Identify 3-5 directories, spawn 2-3 parallel scouts for broader coverage
 - Scout produces: file map, architecture fingerprint, complexity estimate
 
 If `meow:scout` unavailable, manually Glob + Grep the relevant directories.

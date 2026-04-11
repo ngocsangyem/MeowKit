@@ -5,6 +5,52 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.1 (2026-04-11) — The Plan Creator Intelligence Release
+
+Plan-creator's biggest upgrade since v1.3.2. 4-persona red team, `--deep` mode, `--tdd` composable flag, standalone subcommands, and enhanced validation framework.
+
+### Features
+
+- **4-persona red team** — Security Adversary + Failure Mode Analyst added; phase-count scaling (1-3=2, 4-5=3, 6+=4)
+- **red-team findings file** — separate `red-team-findings.md` with full 7-field detail, linked from plan.md summary
+- **`--deep` mode** — hard pipeline + per-phase scouting with file inventory + dependency maps per phase
+- **`--tdd` composable flag** — combines with any mode; injects Tests Before/Refactor/Tests After/Regression Gate into phase files
+- **standalone red-team** — `/meow:plan red-team {path}` runs adversarial review on existing plans
+- **standalone validate** — `/meow:plan validate {path}` runs critical question interview on existing plans
+- **plan archive** — `/meow:plan archive` scans completed plans, optionally captures learnings, archives or deletes
+- **enhanced validation framework** — detection keywords per category, 2-4 option format, section mapping, recording rules
+- **memory capture at Gate 1** — planning decisions persisted to `lessons.md` after approval
+- **solution design checklist** — 5-dimension trade-off analysis reference for Architecture/Risk sections
+
+### Bug Fixes
+
+- **step-03 duplicate section label** — `3i` appeared twice (Parallel + Two-Approach); renamed to `3i`/`3j`
+- **phase-template wrong step reference** — hydration reference said step-05 instead of step-08
+- **step-08 incomplete schema** — `.plan-state.json` missing `deep` and `product-level` as valid `planning_mode` values
+
+### Ecosystem Sync
+
+- **planner agent** — all 6 modes, --tdd composable, 3 subcommands, red-team-findings.md output
+- **orchestrator agent** — --deep in Planning Depth table with auto-trigger conditions
+- **reviewer + evaluator agents** — red-team-findings.md in Required Context
+- **meow:cook** — --deep/--tdd passthrough to plan-creator; red-team-findings.md loaded at Phase 4 for reviewer
+- **meow:review** — red-team-findings.md as supplementary context in step-01
+- **meow:help** — 3 standalone subcommands listed
+- **meow:harness** — --deep for FULL density tier
+- **meow:validate-plan** — deduplication note vs plan-creator's enhanced validation
+- **meow:plan-ceo-review + plan-eng-review** — red-team-findings.md context loading
+- **meow:trace-analyze + bootstrap** — --deep mentioned for multi-module/5+ dir tasks
+- **CLAUDE.md** — planner description updated, modes/subcommands line added
+- **tdd-rules.md** — plan-creator --tdd composable integration note
+- **gate-1-approval.md** — --deep row in cook-command table
+- **SKILLS_INDEX.md** — plan-creator v1.5.0 description, 5 step-file skills in footer
+
+### Documentation
+
+- Updated plan-creator skill reference page with new flags, subcommands, red-team system diagram
+- Created what's-new page for v2.3.1
+- Updated RELEASING.md history table
+
 ## 2.3.0 (2026-04-11) — The Hook Dispatch Release
 
 Node.js hook dispatch system with 8 handler modules, cook verification flags, review skeptic anchoring, structured memory filtering, and tool output limits. TDD enforcement now opt-in.

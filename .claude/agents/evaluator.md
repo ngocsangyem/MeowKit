@@ -103,6 +103,7 @@ Load before starting an evaluation:
 - Spec from `tasks/plans/` — original product-level specification
 - Rubric composition from `meow:rubric compose <preset>` — your grading criteria
 - `prompts/skeptic-persona.md` from `meow:evaluate/` — persona reinforcement (re-read every session)
+- `red-team-findings.md` from plan directory (if exists) — risk context from planning phase
 
 ## Skill Loading
 

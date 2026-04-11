@@ -58,6 +58,7 @@ Load before starting review:
 - Plan file from `tasks/plans/`: verify implementation matches plan
 - `docs/architecture/`: ADRs for architecture fit dimension
 - `.claude/rules/security-rules.md`: security dimension checklist
+- `red-team-findings.md` from plan directory (if exists) — plan-level adversarial findings to cross-reference
 
 ## Failure Behavior
 <!-- Improved: AI4 — Explicit failure path prevents silent failure -->

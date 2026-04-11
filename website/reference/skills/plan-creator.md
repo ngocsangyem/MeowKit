@@ -1,88 +1,132 @@
 ---
 title: "meow:plan-creator"
-description: "Creates plans and ADRs. Selects workflow model, sizes scope, validates, and enforces Gate 1."
+description: "Creates structured multi-file plans before implementation. Scope-aware with fast/hard/deep modes, 4-persona red team, standalone subcommands, and Gate 1 enforcement."
 ---
 # meow:plan-creator
-Creates plans and Architecture Decision Records (ADRs). Selects workflow model, sizes scope, validates completeness, and enforces Gate 1.
+Creates structured multi-file plans before implementation. Scope-aware: trivial tasks exit early, simple tasks get fast plans, complex tasks get full research + phase files + validation. Enforces Gate 1.
+
 ## What This Skill Does
-When `/meow:plan` or `/meow:cook` is invoked, this skill determines the workflow model (feature, bugfix, refactor, security), selects the right plan template by scope, drafts the plan, validates it, and presents it for Gate 1 approval. Also handles ADR generation for architecture decisions.
+When `/meow:plan` or `/meow:cook` is invoked, this skill determines the workflow model (feature, bugfix, refactor, security), sizes scope, drafts the plan with phase files, validates it through red-team review and critical questions, and presents it for Gate 1 approval. Also handles ADRs, plan archival, and standalone red-team/validate operations on existing plans.
+
 ## Core Capabilities
 - **Institutional memory retrieval** — Reads `memory/lessons.md` and `memory/patterns.json` before planning to prevent re-solving known problems
-- **Structured discovery** — Investigates 4 areas (architecture, existing patterns, constraints, external) before drafting
+- **Step-file architecture** — 9 JIT-loaded steps (00-08) keep context lean; each step loads only when needed
 - **Workflow model selection** — Routes to feature, bugfix, refactor, or security model
-- **Template selection** — Auto-routes to quick, standard, or multi-phase template by scope
-- **Risk classification** — Maps components to LOW/MEDIUM/HIGH risk, guiding tester and reviewer prioritization
+- **Scope challenge** — Trivial → exit, simple → fast, complex → hard; user scope input (EXPANSION/HOLD/REDUCTION)
+- **4-persona red team** — Security Adversary, Failure Mode Analyst, Assumption Destroyer, Scope Complexity Critic; scales by phase count (1-3=2, 4-5=3, 6+=4)
+- **Red-team findings file** — Separate `red-team-findings.md` with full detail (7-field findings), linked from plan.md summary table
+- **Validation question framework** — Detection keywords trigger category-specific questions (Architecture, Assumptions, Scope, Risk, Tradeoffs); 2-4 options with section mapping for answer propagation
 - **Gate 1 enforcement** — Plans must be approved via `AskUserQuestion` before implementation
-- **Context Reminder** — After Gate 1 approval, prints a mode-matched cook command (e.g. `meow:cook --fast` in fast mode) so you never have to look up the flag
+- **Memory capture at Gate 1** — Planning decisions, research findings, and red-team results persisted to `lessons.md` after approval
+- **Solution design checklist** — 5-dimension trade-off analysis (YAGNI/KISS/DRY, security, performance, edge cases, architecture)
+- **Context Reminder** — After Gate 1, prints mode-matched cook command with absolute path
 - **ADR generation** — Creates Architecture Decision Records in `docs/architecture/`
-- **Validation** — Runs `validate-plan.py` to ensure plan completeness
-- **Ops metrics guidance** — Detects metrics/KPI tasks, loads metric design philosophy to ensure outcome-focused targets
-- **Cold-start context briefs** — Each phase file is self-contained so a fresh agent can execute any step cold without reading prior phases
-- **Plan mutation protocol** — Formal rules for modifying plans mid-execution (split, insert, skip, reorder, abandon)
-- **Worked examples** — Concrete reference showing expected detail level (Stripe billing 7-phase plan)
+- **Validation scripts** — `validate-plan.py` for plan completeness, `check-product-spec.sh` for product-level specs
+- **Cold-start context briefs** — Each phase file is self-contained for fresh agent execution
+- **Plan mutation protocol** — Formal rules for split/insert/skip/reorder/abandon
+- **Cross-plan dependency** — Bidirectional `blockedBy`/`blocks` detection across plans
 
 ## Flag Modes
 
 | Flag | Behavior |
 |------|----------|
-| *(none)* | Standard mode — full discovery + Gate 1 + validation |
-| `--auto` | Auto-approves minor scope questions, still enforces Gate 1 |
-| `--fast` | Skip discovery, quick template only, Gate 1 still runs |
-| `--hard` | Extended discovery, multi-phase template enforced |
-| `--parallel` | Splits plan into parallel implementation phases |
+| *(none)* | Auto-detect from scope — trivial exits, simple → fast, complex → hard |
+| `--fast` | Skip research + codebase analysis, plan.md only, semantic checks only |
+| `--hard` | Full pipeline: research → analysis → plan + phases → red team → validation |
+| `--deep` | Hard + per-phase scouting after drafting: file inventory + dependency maps per phase |
+| `--parallel` | Hard + file ownership matrix + parallel group hydration |
+| `--two` | 2 competing approaches + trade-off matrix; user selects before red-team |
+| `--product-level` | Product-level spec (user stories, features, design language); hands off to harness |
+| `--tdd` | **Composable** — combine with any mode. Injects 4 TDD sections per phase file: Tests Before, Refactor Opportunities, Tests After, Regression Gate |
+
+## Subcommands
+
+| Subcommand | Usage | What It Does |
+|------------|-------|-------------|
+| `archive` | `/meow:plan archive` | Scan completed/cancelled plans, optionally capture learnings, archive or delete |
+| `red-team` | `/meow:plan red-team {path}` | Run adversarial 4-persona review on an existing plan; writes `red-team-findings.md` |
+| `validate` | `/meow:plan validate {path}` | Run critical question interview on an existing plan; propagates answers to phase files |
+
+Subcommands skip the planning pipeline — they operate directly on existing plan files.
 
 ## Gate 1 — AskUserQuestion
 
 After drafting, the skill presents the plan via `AskUserQuestion` with three options:
 
-- **Approve** — proceed, skill prints context reminder + stops
+- **Approve** — proceed, skill captures planning decisions to memory, prints context reminder + stops
 - **Modify** — user provides feedback, plan is revised and Gate 1 re-runs
-- **Reject** — planning stops, no plan file is written
+- **Reject** — planning stops, restart from scope challenge
 
 ## Output — Print & Stop
 
 After Gate 1 approval, the skill ends with a **Print & Stop**:
+- Captures planning decisions to `.claude/memory/lessons.md`
 - Prints a context reminder block with the mode-matched `/meow:cook [plan path]` command
 - Stops — Claude will not proceed automatically
 - You run the printed command when ready, or run a review skill first
 
+## Red Team System
+
+The red-team (step-05) uses 4 adversarial personas that scale by phase count:
+
+```mermaid
+flowchart TD
+    A["Count phase files"] --> B{"Phase count?"}
+    B --> |"1-3"| C["2 personas:\nAssumption Destroyer\n+ Scope Critic"]
+    B --> |"4-5"| D["3 personas:\n+ Security Adversary"]
+    B --> |"6+"| E["4 personas:\n+ Failure Mode Analyst"]
+    C & D & E --> F["Dispatch subagents"]
+    F --> G["Collect + deduplicate\n(cap 15 findings)"]
+    G --> H["Agent adjudication\n(Accept/Reject each)"]
+    H --> I["User gate:\nApply all / Review each / Reject all"]
+    I --> J["Write red-team-findings.md\n+ summary in plan.md"]
+```
+
+Findings are written to a **separate `red-team-findings.md`** file with full 7-field detail (severity, location, flaw, failure scenario, evidence, suggested fix, category). Plan.md gets a summary table with a link to the full report.
+
 ## Usage
 ```bash
-/meow:plan add pagination              # → auto-selects quick template
-/meow:plan build auth system           # → auto-selects standard template
-/meow:plan build auth system --fast    # → skip discovery, quick template
-/meow:plan redesign API --parallel     # → parallel phase plan
+/meow:plan add pagination              # → auto-detects fast mode
+/meow:plan build auth system --hard    # → full pipeline
+/meow:plan redesign API --deep         # → hard + per-phase scouting
+/meow:plan build auth --hard --tdd     # → hard + TDD sections in phases
+/meow:plan red-team tasks/plans/260411-auth/  # → standalone red-team
+/meow:plan validate tasks/plans/260411-auth/  # → standalone validation
+/meow:plan archive                     # → archive completed plans
 ```
 ::: info Skill Details
 **Phase:** 1  
-**Used by:** planner agent
+**Used by:** planner agent  
 **Plan-First Gate:** Creates plan if missing. Skips with plan path arg or `--fast` mode.
 :::
 
-## v2.0 Reference Additions
-
-Four new reference files enhance plan-creator's capabilities:
+## v2.3.1 Reference Additions
 
 | Reference | Loaded When | Purpose |
 |-----------|-------------|---------|
-| `ops-metrics-design.md` | Task involves KPIs, dashboards, SLAs | Outcome-focused metric philosophy |
-| `cold-start-context-brief.md` | Every plan (default) | Template for self-contained phase files |
-| `plan-mutation-protocol.md` | Modifying existing plan | Rules for split/insert/skip/reorder/abandon |
-| `worked-example-stripe-billing.md` | Every plan (reference) | Concrete 7-phase plan showing expected detail |
+| `prompts/personas/plan-security-adversary.md` | Red team, 4+ phases | Auth bypass, injection, data exposure at plan level |
+| `prompts/personas/plan-failure-mode-analyst.md` | Red team, 6+ phases | Race conditions, cascading failures, recovery gaps |
+| `references/solution-design-checklist.md` | Step-03, hard/deep mode | 5-dimension trade-off analysis for Architecture/Risk sections |
+| `references/archive-workflow.md` | `/meow:plan archive` | Full archive subcommand workflow |
+| `references/red-team-standalone.md` | `/meow:plan red-team {path}` | Standalone red-team on existing plans |
+| `references/validate-standalone.md` | `/meow:plan validate {path}` | Standalone validation on existing plans |
+| `references/validation-questions.md` | Step-06 (enhanced) | Detection keywords, format rules, section mapping |
 
 ## Gotchas
 
 - **Wrong model for task type**: feature-model on a bug fix skips investigation → always confirm type first
-- **Goal describes activity, not outcome**: "Implement OAuth" vs "Users can log in with OAuth" — next agent can't judge success → rewrite until Goal answers "what does done look like?"
-- **Acceptance criteria that can't be verified**: "code is clean" blocks Gate 2 → every criterion must reference a specific command or file check
-- **Phase files not self-contained**: "See phase-02 for context" in a phase file = failure. Each phase must state context directly. Use cold-start template.
-- **Modifying plans without protocol**: Skipping a step without justification or splitting without acceptance criteria on both halves. Follow mutation protocol.
-- **Metrics without red flags**: Defining targets without investigation thresholds. Use ops-metrics reference.
+- **Goal describes activity, not outcome**: "Implement OAuth" vs "Users can log in with OAuth" → rewrite until Goal answers "what does done look like?"
+- **Acceptance criteria can't be verified**: "code is clean" blocks Gate 2 → every criterion must reference a specific command or file check
+- **Phase files not self-contained**: "See phase-02 for context" = failure. Each phase must state context directly.
+- **Skipping scout on unfamiliar codebases**: → always run meow:scout if codebase is new
+- **Security-sensitive plans need /meow:cso**: Red-team Security Adversary is plan-level; use /meow:cso for full security audit
+- **Over-planning trivial tasks**: 2-file config change gets full research → step-00 scope gate exits early
+- **Research disconnected from plan**: Findings archived but not cited → step-03 MUST integrate research into Key Insights
 
 ## Related
-- [`meow:cook`](/reference/skills/cook) — Uses plan-creator as its first step
+- [`meow:cook`](/reference/skills/cook) �� Uses plan-creator as its first step
 - [`meow:plan-eng-review`](/reference/skills/plan-eng-review) — Reviews plans created by plan-creator
 - [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — CEO-level plan review
-- [`meow:decision-framework`](/reference/skills/decision-framework) — Guides model/approach selection during planning
-- [`meow:api-design`](/reference/skills/api-design) — API design reference used in planning phases
+- [`meow:validate-plan`](/reference/skills/validate-plan) — 8-dimension plan validation
+- [`meow:decision-framework`](/reference/skills/decision-framework) — Guides approach selection during planning
 - [`meow:verify`](/reference/skills/verify) — Verify step referenced in plan phase templates
