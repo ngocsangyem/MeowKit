@@ -92,6 +92,10 @@ Phase 6: Reflect ─→ documenter loads: documentation, memory
 The `evaluator` is the behavioral counterpart to the structural `reviewer`. It grades running builds against weighted rubrics using active verification (driving the build via browser/curl/CLI). In harness pipelines (`meow:harness`), the generator (developer) and evaluator are hard-separated to prevent self-eval bias. See [Harness Architecture](/guide/harness-architecture) and the [evaluator agent reference](/reference/agents/evaluator).
 :::
 
+::: tip Hook dispatch layer (added v2.3.0)
+Below the agent/skill layer, MeowKit runs a **Node.js hook dispatch system** (`dispatch.cjs` + `handlers.json`) that handles infrastructure concerns: model detection, budget tracking, build verification, loop detection, memory filtering, and checkpoint/resume. These handlers fire automatically on lifecycle events — agents don't invoke them. See [Understanding MeowKit's Harness](/guide/understanding-the-harness) and [Middleware Layer](/guide/middleware-layer).
+:::
+
 ## Skill Activation by Phase
 
 ```mermaid
@@ -111,7 +115,10 @@ flowchart TD
     P3 --> P4[Phase 4: Review ✋ Gate 2]
     P4 --> S4[review\nelicit\nscout\ncso\nvulnerability-scanner]
 
-    P4 --> P5[Phase 5: Ship]
+    P4 --> P45{--verify\nor --strict?}
+    P45 -->|yes| V45[Phase 4.5: Verify\nagent-browser or evaluate]
+    P45 -->|no| P5[Phase 5: Ship]
+    V45 --> P5
     P5 --> S5[ship\nshipping\ncareful\ndocument-release]
 
     P5 --> P6[Phase 6: Reflect]

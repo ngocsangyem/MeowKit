@@ -104,7 +104,7 @@ Uses Atlassian Rovo's hosted MCP endpoint. Claude Code handles OAuth — no API 
 
 Ten most useful patterns from the 50+ template library:
 
-```jql
+```sql
 # My open work in current sprint
 assignee = currentUser() AND sprint in openSprints() ORDER BY updated DESC
 

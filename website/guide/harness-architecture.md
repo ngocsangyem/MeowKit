@@ -5,6 +5,10 @@ description: Generator/evaluator split, sprint contract, iteration loop, adaptiv
 
 # Harness Architecture
 
+For the conceptual overview of MeowKit's harness system — what a harness is, the harness² concept, 7-layer taxonomy, 5 functional pillars, and core principles — see the dedicated **[Understanding the Harness](/guide/understanding-the-harness)** page.
+
+This page covers the **`/meow:harness`** autonomous build pipeline specifically.
+
 ## TL;DR
 
 `/meow:harness` is MeowKit's autonomous build pipeline. It splits work across four roles — planner, generator, evaluator, and orchestrator — so no single agent grades its own output. A sprint contract defines what "done" means. The generator builds; the evaluator verifies against a running build. The loop repeats up to 3 rounds before escalating to you.
@@ -153,7 +157,7 @@ Full explanation: [/guide/adaptive-density](/guide/adaptive-density).
 
 ## Node.js Hook Dispatch System (v2.3.0)
 
-In addition to the shell middleware hooks, MeowKit v2.3.0 introduced a Node.js dispatch layer that runs alongside (not replacing) the existing shell hooks.
+MeowKit v2.3.0 evolved the hook layer from ad-hoc shell scripts to a registry-driven Node.js dispatch system. Shell hooks parsed JSON via Python fallback (jq → python → grep). Node.js parses natively in one line.
 
 ### Architecture
 

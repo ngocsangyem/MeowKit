@@ -144,6 +144,7 @@ export default withMermaid(defineConfig({
               ],
               collapsed: true,
             },
+            { text: 'Understanding the MeowKit\'s Harness', link: '/guide/understanding-the-harness' },
             { text: 'Philosophy', link: '/guide/philosophy' },
             { text: 'Workflow Phases (0-6)', link: '/guide/workflow-phases' },
             { text: 'Model Routing', link: '/guide/model-routing' },
