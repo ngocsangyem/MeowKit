@@ -10,7 +10,7 @@ Modeled after Y Combinator office hours, this skill forces you to think critical
 - **Startup mode** — Six forcing questions: demand reality, status quo, desperate specificity, narrowest wedge, observation, future-fit
 - **Builder mode** — Design thinking brainstorming for side projects, hackathons, learning
 - **Design doc output** — Saves structured findings as a design document
-- **Pre-plan skill** — Use before `/meow:plan-ceo-review` or `/meow:plan-eng-review`
+- **Pre-plan skill** — Use before `/meow:plan-ceo-review`
 ## Usage
 ```bash
 /meow:office-hours           # auto-detect mode
@@ -30,4 +30,4 @@ Modeled after Y Combinator office hours, this skill forces you to think critical
 
 ## Related
 - [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — CEO-level plan review (use after office-hours)
-- [`meow:plan-eng-review`](/reference/skills/plan-eng-review) — Engineering plan review
+- [`meow:plan-ceo-review`](/reference/skills/plan-eng-review) — Engineering plan review

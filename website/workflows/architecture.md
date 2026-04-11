@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Schema changes, new services, API design, infrastructure decisions  
 **Time estimate:** 30-60 minutes  
-**Skills used:** [meow:office-hours](/reference/skills/office-hours) (brainstorming), [meow:plan-eng-review](/reference/skills/plan-eng-review)  
+**Skills used:** [meow:office-hours](/reference/skills/office-hours) (brainstorming), [meow:plan-ceo-review](/reference/skills/plan-eng-review)  
 **Agents involved:** architect (ADR generation), brainstormer (approach evaluation), researcher (tech research)
 
 ## Overview
@@ -95,10 +95,10 @@ Saved to `docs/architecture/0005-use-trpc-for-internal-api.md`.
 ### Step 4: Engineering review
 
 ```
-/meow:plan-eng-review
+/meow:plan-ceo-review
 ```
 
-The [meow:plan-eng-review](/reference/skills/plan-eng-review) skill validates: data flow correctness, edge cases, test strategy, and performance implications of the architectural decision.
+The [meow:plan-ceo-review](/reference/skills/plan-eng-review) skill validates: data flow correctness, edge cases, test strategy, and performance implications of the architectural decision.
 
 ## How the architect enforces patterns
 

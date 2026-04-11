@@ -33,11 +33,11 @@ Reviews plans from a CEO/founder perspective. Four modes: Scope Expansion (dream
 This skill ends with a **Print & Stop**:
 - Prints a handoff block with the `/meow:cook [plan path]` command
 - Stops — Claude will not proceed automatically
-- You run `/meow:cook [plan path]` when ready, or run `meow:plan-eng-review` for engineering review first
+- You run `/meow:cook [plan path]` when ready, or run `meow:plan-ceo-review` for engineering review first
 
-Does NOT auto-chain into meow:plan-eng-review or start Phase 2. You control the review sequence.
+Does NOT auto-chain into meow:plan-ceo-review or start Phase 2. You control the review sequence.
 
 ## Related
-- [`meow:plan-eng-review`](/reference/skills/plan-eng-review) — Engineering review (complements CEO review)
+- [`meow:plan-ceo-review`](/reference/skills/plan-eng-review) — Engineering review (complements CEO review)
 - [`meow:plan-creator`](/reference/skills/plan-creator) — Creates the plan that CEO review examines
 - [`meow:office-hours`](/reference/skills/office-hours) — Use before plan reviews

@@ -11,7 +11,7 @@ description: |
   this", "office hours", or "is this worth building".
   Proactively suggest when the user describes a new product idea or is exploring
   whether something is worth building — before any code is written.
-  Use before /meow:plan-ceo-review or /meow:plan-eng-review.
+  Use before /meow:plan-ceo-review.
 allowed-tools:
   - Bash
   - Read
@@ -45,7 +45,7 @@ Skip: Always — office-hours is a pre-planning skill. It feeds plan-creator, no
 
 - User says "brainstorm this", "I have an idea", "help me think through this", "office hours", or "is this worth building"
 - User describes a new product idea or is exploring whether something is worth building
-- Before running `/meow:plan-ceo-review` or `/meow:plan-eng-review`
+- Before running `/meow:plan-ceo-review`
 
 ## Workflow
 

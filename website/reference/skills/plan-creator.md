@@ -125,7 +125,7 @@ Findings are written to a **separate `red-team-findings.md`** file with full 7-f
 
 ## Related
 - [`meow:cook`](/reference/skills/cook) �� Uses plan-creator as its first step
-- [`meow:plan-eng-review`](/reference/skills/plan-eng-review) — Reviews plans created by plan-creator
+- [`meow:plan-ceo-review`](/reference/skills/plan-eng-review) — Reviews plans created by plan-creator
 - [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — CEO-level plan review
 - [`meow:validate-plan`](/reference/skills/validate-plan) — 8-dimension plan validation
 - [`meow:decision-framework`](/reference/skills/decision-framework) — Guides approach selection during planning

@@ -8,7 +8,7 @@ description: |
   "explore approaches", "compare options", "trade-off analysis", "how should
   we build". Do NOT use for product validation ("is this worth building?" →
   use meow:office-hours instead). Do NOT use when a plan already exists
-  (→ use meow:plan-eng-review instead).
+  (→ use meow:plan-ceo-review instead).
 allowed-tools:
   - Read
   - Grep

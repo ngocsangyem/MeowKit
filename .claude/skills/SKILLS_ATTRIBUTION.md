@@ -23,8 +23,7 @@ Each skill retains its original author credit in its frontmatter.
 | 14  | office-hours          | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/office-hours/SKILL.md                    | 2    |
 | 15  | vulnerability-scanner | vudovn (antigravity-kit)     | [antigravity-kit](https://github.com/vudovn/antigravity-kit) | MIT         | .agent/skills/vulnerability-scanner/SKILL.md    | 2    |
 | 16  | plan-ceo-review       | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/plan-ceo-review/SKILL.md                 | 2    |
-| 17  | plan-eng-review       | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/plan-eng-review/SKILL.md                 | 2    |
-| 18  | lazy-agent-loader     | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog)   | Unknown     | aura-frog/skills/lazy-agent-loader/SKILL.md     | 2    |
+| 17  | lazy-agent-loader     | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog)   | Unknown     | aura-frog/skills/lazy-agent-loader/SKILL.md     | 2    |
 | 19  | document-release      | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/document-release/SKILL.md                | 2    |
 | 20  | workflow-orchestrator | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog)   | Unknown     | aura-frog/skills/workflow-orchestrator/SKILL.md | 2    |
 | 21  | retro                 | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/retro/SKILL.md                           | 2    |

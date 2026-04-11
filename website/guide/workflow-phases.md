@@ -57,7 +57,7 @@ Phase 1 produces an approved plan using one or more planning skills:
 | ---------------------- | ------------------------- | ---------------------------------------------- |
 | `meow:plan-creator`    | Full plan creation        | Starting from scratch (9-step workflow, 00–08) |
 | `meow:plan-ceo-review` | Product lens              | Is this the right thing to build?              |
-| `meow:plan-eng-review` | Engineering lens          | Is this the right way to build it?             |
+| `meow:plan-ceo-review` | Engineering lens          | Is this the right way to build it?             |
 | `meow:validate-plan`   | 8-dimension quality check | COMPLEX tasks — runs before Gate 1             |
 
 `meow:plan-creator` v1.4.0 supports two additional modes on top of the standard `--hard` workflow:
@@ -91,7 +91,7 @@ You control which reviews to run. Common patterns:
 /meow:cook tasks/plans/260328-feature.md
 
 # Plan + both reviews (recommended for large features)
-# Run meow:plan-ceo-review, then meow:plan-eng-review, then:
+# Run meow:plan-ceo-review, then meow:plan-ceo-review, then:
 /meow:cook tasks/plans/260328-feature.md
 ```
 

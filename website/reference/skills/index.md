@@ -104,7 +104,7 @@ Plan creation, review, and ideation.
 | [meow:plan-creator](/reference/skills/plan-creator) | Auto-select plan template by task scope |
 | [meow:validate-plan](/reference/skills/validate-plan) | 8-dimension plan quality validation before Phase 2 begins |
 | [meow:plan-ceo-review](/reference/skills/plan-ceo-review) | CEO-mode plan review with scope expansion |
-| [meow:plan-eng-review](/reference/skills/plan-eng-review) | Engineering plan review — architecture, edges, tests |
+| [meow:plan-ceo-review](/reference/skills/plan-eng-review) | Engineering plan review — architecture, edges, tests |
 | [meow:office-hours](/reference/skills/office-hours) | YC-style brainstorming (startup + builder modes) |
 | [meow:brainstorming](/reference/skills/brainstorming) | Structured ideation with scoring + plan-creator handoff |
 | [meow:decision-framework](/reference/skills/decision-framework) | Operational decision architecture: triage, escalation, case management |

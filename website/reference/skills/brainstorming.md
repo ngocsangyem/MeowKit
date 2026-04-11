@@ -33,7 +33,7 @@ Key differentiator from `meow:office-hours`: office-hours asks "should we build 
 
 ::: warning Don't use meow:brainstorming when...
 - Problem isn't validated yet → use [`meow:office-hours`](/reference/skills/office-hours)
-- You already have a plan → use [`meow:plan-eng-review`](/reference/skills/plan-eng-review)
+- You already have a plan → use [`meow:plan-ceo-review`](/reference/skills/plan-eng-review)
 - You need to debug/investigate → use [`meow:investigate`](/reference/skills/investigate)
 :::
 
@@ -82,4 +82,4 @@ Problem → Restate + Confirm → Select Technique
 
 - [`meow:office-hours`](/reference/skills/office-hours) — Product validation BEFORE brainstorming
 - [`meow:plan-creator`](/reference/skills/plan-creator) — Creates plan FROM brainstorming output
-- [`meow:plan-eng-review`](/reference/skills/plan-eng-review) — Reviews existing plans
+- [`meow:plan-ceo-review`](/reference/skills/plan-eng-review) — Reviews existing plans

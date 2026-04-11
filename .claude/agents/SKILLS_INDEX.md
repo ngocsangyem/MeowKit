@@ -28,7 +28,6 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 |-------|-------|------|-------------|
 | `meow:plan-creator` | planner | planning | step-file (v1.5.0: scope challenge, multi-file output, plan red team, sync-back, **--product-level mode** for green-field app builds via step-03a; **--deep mode** for per-phase scouting; **--tdd flag** injects TDD sections into phase files; **standalone subcommands**: archive/red-team/validate; outputs `red-team-findings.md`; solution design checklist in each phase; memory capture at Gate 1) |
 | `meow:plan-ceo-review` | planner | planning | monolithic |
-| `meow:plan-eng-review` | planner/architect | planning | monolithic |
 | `meow:validate-plan` | planner | planning | monolithic |
 | `meow:brainstorming` | brainstormer | planning | monolithic |
 | `meow:office-hours` | brainstormer/planner | planning | monolithic |

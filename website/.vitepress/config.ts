@@ -240,7 +240,6 @@ export default withMermaid(defineConfig({
             { text: 'meow:plan-creator', link: '/reference/skills/plan-creator' },
             { text: 'meow:validate-plan', link: '/reference/skills/validate-plan' },
             { text: 'meow:plan-ceo-review', link: '/reference/skills/plan-ceo-review' },
-            { text: 'meow:plan-eng-review', link: '/reference/skills/plan-eng-review' },
             { text: 'meow:office-hours', link: '/reference/skills/office-hours' },
             { text: 'meow:brainstorming', link: '/reference/skills/brainstorming' },
             { text: 'meow:party', link: '/reference/skills/party' },

@@ -139,7 +139,7 @@ persona: B
 |---------|---------|-----------|
 | `meow:plan-creator` | Create plan from scratch | Print & Stop |
 | `meow:plan-ceo-review` | Product lens review | Print & Stop |
-| `meow:plan-eng-review` | Engineering lens review | Print & Stop |
+| `meow:plan-ceo-review` | Engineering lens review | Print & Stop |
 | `/meow:cook [path]` | Begin implementation | Runs pipeline |
 
 All three review skills stop after printing — you control when to run `/meow:cook [plan path]`.

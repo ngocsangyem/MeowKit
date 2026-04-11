@@ -114,4 +114,4 @@ Output format:
 
 - [`meow:review`](/reference/skills/review) — multi-pass code review that produces the verdict this skill re-examines
 - [`meow:validate-plan`](/reference/skills/validate-plan) — systematic 8-dimension plan quality check
-- [`meow:plan-eng-review`](/reference/skills/plan-eng-review) — engineering plan review, another source of outputs to elicit from
+- [`meow:plan-ceo-review`](/reference/skills/plan-eng-review) — engineering plan review, another source of outputs to elicit from
