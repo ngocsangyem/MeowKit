@@ -5,6 +5,10 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.6 (2026-04-11)
+
+Remove unused files
+
 ## 2.3.5 (2026-04-11) — CEO Review Layered Verification
 
 Redesigns `meow:plan-ceo-review` from single-pass deep review to layered verification pipeline. Strengthens decision quality without changing the 4-mode system.
@@ -97,6 +101,7 @@ Each Claude Code hook runs as a **separate subprocess** — env vars exported in
 ### Audit Reports
 
 5 parallel red-team reports at `plans/260411-1906-meowkit-wiring-red-team-audit/reports/`:
+
 - RT1: Hooks & settings wiring (2C, 4H, 5M, 5L)
 - RT2: Agents & phase routing (1C, 4H, 6M, 4L)
 - RT3: Skills Phase 0-2 + cross-cutting (1F, 7W)
