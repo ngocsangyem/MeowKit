@@ -48,7 +48,7 @@ try {
     name: "meowkit",
     description: packageJson.description || "AI agent toolkit for Claude Code",
     buildDate: new Date().toISOString(),
-    repository: packageJson.repository || { type: "git", url: "https://github.com/meowkit/meowkit" },
+    repository: packageJson.repository || { type: "git", url: "https://github.com/ngocsangyem/MeowKit" },
   };
 
   fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2) + "\n", "utf8");
