@@ -10,6 +10,10 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### v2.3.2 — The Agent-Skills Integration Release (2026-04-11)
+
+Integrates correctness patterns from Anthropic's agent-skills system. Adds `core-behaviors.md` (6 mandatory operating behaviors + 10 failure modes), per-skill failure catalogs for cook/plan-creator/review, phase composition contracts in CLAUDE.md, and lifecycle routing table for skill discovery via meow:help.
+
 ### [v2.3.1 — The Plan Creator Intelligence Release](/guide/whats-new/v2.3.1) (2026-04-11)
 
 Plan-creator's biggest upgrade since v1.3.2. 4-persona red team (Security Adversary + Failure Mode Analyst), `--deep` mode with per-phase scouting, `--tdd` composable flag, standalone subcommands (`red-team`, `validate`, `archive`), enhanced validation framework with detection keywords, memory capture at Gate 1, solution design checklist. Plus ecosystem sync: 18 downstream files updated — cook passes `--deep`/`--tdd` to plan-creator, review/evaluator load `red-team-findings.md`, help lists subcommands, harness offers `--deep` for FULL density.

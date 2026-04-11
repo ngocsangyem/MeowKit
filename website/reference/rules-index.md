@@ -1,6 +1,6 @@
 ---
 title: Rules Index
-description: "All 16 MeowKit enforcement rules with priority, mechanism, and override conditions."
+description: "All 17 MeowKit enforcement rules with priority, mechanism, and override conditions."
 ---
 
 # Rules Index
@@ -18,6 +18,7 @@ Source file: `.claude/rules/RULES_INDEX.md`
 | `gate-rules.md` | Gate 1 (plan approval) and Gate 2 (review approval) hard stops | MeowKit original | Phases 1, 4 |
 | `harness-rules.md` | Generator/evaluator architecture: planner stance, contract discipline, evaluator skepticism, iteration limits, adaptive density, dead-weight audit | New (Anthropic + LangChain harness research) | Phase 3 (Build, harness), Phase 4 (Review) |
 | `rubric-rules.md` | Evaluator calibration discipline, rubric library governance, anchor balance, drift detection, anti-slop enforcement | New (Anthropic harness research) | Phase 4 (Review, evaluator) |
+| `core-behaviors.md` | 6 mandatory operating behaviors: Surface Assumptions, Manage Confusion, Push Back, Enforce Simplicity, Scope Discipline, Verify Don't Assume + 10 failure modes | Adapted from agent-skills | All modes, all phases |
 | `tdd-rules.md` | TDD enforcement (opt-in via `--tdd` / `MEOWKIT_TDD=1`); MICRO-TASK exemption included | MeowKit original | Phases 2, 3 **when TDD enabled** [CONTEXTUAL] |
 | `naming-rules.md` | Naming conventions per platform (TS, Vue, Swift, DB) | MeowKit original | Implementation, review |
 | `development-rules.md` | File management, code quality, pre-commit, git safety | Adapted from CKE | Implementation, commit |
@@ -39,16 +40,17 @@ Higher number = stronger override:
 3. `gate-rules.md` — NEVER override (except `/meow:fix` simple)
 4. `harness-rules.md` — NEVER override gates; density choice does not bypass any gate
 5. `rubric-rules.md` — NEVER override hard-fail propagation
-6. `tdd-rules.md` — override only in `[fast]` mode
-7. `naming-rules.md` — always apply
-8. `development-rules.md` — always apply
-9. `context-ordering-rules.md` — always apply
-10. `model-selection-rules.md` — always apply
-11. `output-format-rules.md` — always apply
-12. `scale-adaptive-rules.md` — always apply at Phase 0
-13. `step-file-rules.md` — apply when executing step-file workflows
-14. `parallel-execution-rules.md` — apply during parallel execution `[CONTEXTUAL]`
-15. `orchestration-rules.md` — apply in multi-agent workflows `[CONTEXTUAL]`
+6. `core-behaviors.md` — always apply (6 behaviors + 10 failure modes)
+7. `tdd-rules.md` — override only in `[fast]` mode
+8. `naming-rules.md` — always apply
+9. `development-rules.md` — always apply
+10. `context-ordering-rules.md` — always apply
+11. `model-selection-rules.md` — always apply
+12. `output-format-rules.md` — always apply
+13. `scale-adaptive-rules.md` — always apply at Phase 0
+14. `step-file-rules.md` — apply when executing step-file workflows
+15. `parallel-execution-rules.md` — apply during parallel execution `[CONTEXTUAL]`
+16. `orchestration-rules.md` — apply in multi-agent workflows `[CONTEXTUAL]`
 
 ## Enforcement Mechanism Matrix
 
@@ -61,6 +63,7 @@ Higher number = stronger override:
 | `gate-rules.md` | Hook | NEVER | `/meow:fix` simple; scale-routing one-shot |
 | `harness-rules.md` | Behavioral + Hook (`gate-enforcement.sh`, `validate-verdict.sh`) | NEVER override gates | Density modes adjust scaffolding, not gate semantics |
 | `rubric-rules.md` | Behavioral + Script (`validate-rubric.sh`) | NEVER override hard-fail propagation | Custom rubrics addable; semantics fixed |
+| `core-behaviors.md` | Behavioral | No | — |
 | `tdd-rules.md` | Behavioral | Yes | `[fast]` mode |
 | `naming-rules.md` | Behavioral | No | — |
 | `development-rules.md` | Behavioral | No | — |

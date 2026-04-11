@@ -5,6 +5,23 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.2 (2026-04-11) — The Agent-Skills Integration Release
+
+Integrates correctness patterns from Anthropic's agent-skills system: 6 core operating behaviors, per-skill failure catalogs, phase composition contracts, and lifecycle-aware skill routing.
+
+### Features
+
+- **core-behaviors.md** — 6 mandatory operating behaviors (Surface Assumptions, Manage Confusion, Push Back, Enforce Simplicity, Scope Discipline, Verify Don't Assume) + 10 failure modes, loaded via CLAUDE.md preamble
+- **failure catalogs** — per-skill Common Rationalizations + Red Flags for meow:cook, meow:plan-creator, meow:review; merged entries into meow:fix gotchas.md
+- **phase composition contracts** — embedded in CLAUDE.md; documents expects/produces/breaks-if-missing per phase
+- **lifecycle routing table** — task signal → phase → skill mapping in meow:agent-detector references; surfaced via meow:help
+
+### Documentation
+
+- Updated rules-index.md with core-behaviors.md entry (priority 6)
+- Updated RULES_INDEX.md numbering (16 → 17 rules)
+- Updated what's-new index
+
 ## 2.3.1 (2026-04-11) — The Plan Creator Intelligence Release
 
 Plan-creator's biggest upgrade since v1.3.2. 4-persona red team, `--deep` mode, `--tdd` composable flag, standalone subcommands, and enhanced validation framework.
