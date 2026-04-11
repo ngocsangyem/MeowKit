@@ -12,10 +12,9 @@ prepare-release-assets.cjs → dist/meowkit-release.zip
 GitHub Release (tag + zip asset)
     ↓
 mewkit CLI fetches zip at npx mewkit init
-(create-meowkit is deprecated — use npx mewkit init)
 ```
 
-**Key insight:** `create-meowkit` is a thin CLI that downloads `meowkit-release.zip` from GitHub Releases at runtime. If the release has no zip asset, the CLI cannot find it and falls back to an older version.
+**Key insight:** `mewkit` CLI downloads `meowkit-release.zip` from GitHub Releases at runtime. If the release has no zip asset, the CLI cannot find it and falls back to an older version.
 
 ## Version Channels
 
@@ -134,7 +133,7 @@ Follow the existing format. Use `**bold**` for feature names and `—` (em dash)
 npm -w packages/mewkit version <version> --no-git-tag-version
 ```
 
-> **Note:** `create-meowkit` is deprecated. Only bump `mewkit`. Do not publish new versions of `create-meowkit` unless a critical bug fix is required for users who haven't migrated.
+> **Note:** Only bump `mewkit`.
 
 ### 4. Build and verify
 
@@ -227,7 +226,7 @@ gh release view v<version> --json url -q '.url'
 npm -w packages/mewkit publish
 ```
 
-> **Note:** `create-meowkit` is deprecated — do not publish it. Users should migrate to `npx mewkit init`.
+> **Note:** Only publish `mewkit`.
 
 ### 11. Test end-to-end
 
@@ -333,7 +332,7 @@ docs: update readme        → no release
 
 ## Troubleshooting
 
-### `create-meowkit` fetches wrong version
+### CLI fetches wrong version
 
 **Cause:** The target release has no `meowkit-release.zip` asset. The code in `github-releases.ts` filters out releases without a `.zip` asset.
 

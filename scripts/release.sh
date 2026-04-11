@@ -52,7 +52,7 @@ echo ""
 echo "[1/7] Bumping version to $VERSION..."
 # metadata.json is updated by prepare-release-assets.cjs in step 3
 
-# Step 2: Build and verify (harness-only — skip create-meowkit/mewkit CLI packages)
+# Step 2: Build and verify (harness-only — skip CLI packages)
 echo "[2/7] Verifying harness files..."
 # Validate settings.json is valid JSON
 node -e "JSON.parse(require('fs').readFileSync('.claude/settings.json','utf8'))" || { echo "Error: settings.json is invalid JSON"; exit 1; }

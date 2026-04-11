@@ -5,7 +5,7 @@
  * - main → production release (v1.2.0, npm @latest)
  * - dev  → beta release (v1.3.0-beta.1, npm @beta)
  *
- * Publishes both create-meowkit and meowkit packages with synchronized versions.
+ * Publishes mewkit package and creates GitHub Release with zip asset.
  */
 
 const { execSync } = require("child_process");

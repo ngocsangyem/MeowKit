@@ -1,5 +1,5 @@
 /**
- * Thin logger shim for core modules ported from create-meowkit.
+ * Thin logger shim for core modules.
  * Maps the logger API to console calls — mewkit uses console directly.
  */
 import pc from "picocolors";

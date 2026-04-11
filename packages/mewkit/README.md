@@ -55,7 +55,6 @@ npx mewkit memory --clear       # Reset memory
 
 ## Related
 
-- [create-meowkit](https://www.npmjs.com/package/create-meowkit) — Scaffold CLI (deprecated; use `npx mewkit init`)
 - [GitHub](https://github.com/ngocsangyem/MeowKit)
 
 ## License

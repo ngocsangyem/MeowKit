@@ -1,4 +1,4 @@
-/** Core modules ported from create-meowkit — shared by init and upgrade commands */
+/** Core modules — shared by init and upgrade commands */
 export * from "./github-releases.js";
 export * from "./compute-checksums.js";
 export * from "./merge-settings.js";

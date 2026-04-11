@@ -20,7 +20,6 @@ if (!/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(version)) {
 }
 
 const PACKAGES = [
-  path.join(__dirname, "..", "packages", "create-meowkit", "package.json"),
   path.join(__dirname, "..", "packages", "meowkit", "package.json"),
 ];
 

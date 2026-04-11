@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/create-meowkit"><img src="https://img.shields.io/npm/v/create-meowkit" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/mewkit"><img src="https://img.shields.io/npm/v/mewkit" alt="npm version" /></a>
   <a href="https://github.com/ngocsangyem/MeowKit/releases"><img src="https://img.shields.io/github/v/release/ngocsangyem/MeowKit" alt="GitHub release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License" /></a>
 </p>
@@ -40,8 +40,7 @@ npx mewkit doctor     # Verify environment
 
 | Package                                                          | npm                                          | Description                                             |
 | ---------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------- |
-| [`create-meowkit`](https://www.npmjs.com/package/create-meowkit) | ~~`npm create meowkit@latest`~~ (deprecated) | Scaffold CLI — use `npx mewkit init` instead            |
-| [`mewkit`](https://www.npmjs.com/package/mewkit)                 | `npx mewkit <cmd>`                           | Runtime CLI — upgrade, doctor, validate, budget, memory |
+| [`mewkit`](https://www.npmjs.com/package/mewkit)                 | `npx mewkit <cmd>`                           | CLI — init, upgrade, doctor, validate, budget, memory   |
 
 ## Requirements
 
@@ -64,8 +63,7 @@ meowkit/
 │   └── settings.json
 ├── tasks/                    Task templates
 ├── packages/
-│   ├── create-meowkit/       Scaffold CLI (npm)
-│   └── meowkit/              Runtime CLI (npm as mewkit)
+│   └── mewkit/               CLI (npm as mewkit)
 ├── scripts/                  Release automation
 ├── website/                  VitePress documentation
 ├── CLAUDE.md                 Entry point for Claude Code

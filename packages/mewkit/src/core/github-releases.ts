@@ -38,7 +38,7 @@ export async function fetchReleases(): Promise<ReleaseInfo[]> {
   const response = await fetch(url, {
     headers: {
       Accept: "application/vnd.github.v3+json",
-      "User-Agent": "create-meowkit",
+      "User-Agent": "mewkit",
     },
   });
 
@@ -94,7 +94,7 @@ export async function downloadRelease(release: ReleaseInfo): Promise<string> {
 
   // Download the zip
   const response = await fetch(release.downloadUrl, {
-    headers: { "User-Agent": "create-meowkit" },
+    headers: { "User-Agent": "mewkit" },
     redirect: "follow",
   });
 

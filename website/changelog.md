@@ -56,7 +56,7 @@ Each Claude Code hook runs as a **separate subprocess** — env vars exported in
 
 ### Release Script
 
-- **Removed** `npm -w packages/mewkit version` and `npm -w packages/create-meowkit run build` from `release.sh` — harness releases no longer trigger CLI package builds
+- **Removed** CLI package builds from `release.sh` — harness releases no longer trigger CLI package builds
 - Build step replaced with JSON config validation (settings.json, handlers.json, metadata.json)
 
 ## 2.3.3 (2026-04-11) — The Wiring Integrity Release
