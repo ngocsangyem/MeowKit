@@ -153,7 +153,7 @@ Plan-creator's biggest upgrade since v1.3.2. 4-persona red team, `--deep` mode, 
 - **meow:help** — 3 standalone subcommands listed
 - **meow:harness** — --deep for FULL density tier
 - **meow:validate-plan** — deduplication note vs plan-creator's enhanced validation
-- **meow:plan-ceo-review + plan-eng-review** — red-team-findings.md context loading
+- **meow:plan-ceo-review + ** — red-team-findings.md context loading
 - **meow:trace-analyze + bootstrap** — --deep mentioned for multi-module/5+ dir tasks
 - **CLAUDE.md** — planner description updated, modes/subcommands line added
 - **tdd-rules.md** — plan-creator --tdd composable integration note

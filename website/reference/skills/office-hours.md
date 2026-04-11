@@ -30,4 +30,4 @@ Modeled after Y Combinator office hours, this skill forces you to think critical
 
 ## Related
 - [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — CEO-level plan review (use after office-hours)
-- [`meow:plan-ceo-review`](/reference/skills/plan-eng-review) — Engineering plan review
+- [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — Engineering plan review

@@ -36,7 +36,7 @@ Skills fall into distinct types based on purpose and phase alignment.
 | Intake & Triage | Ticket analysis, completeness scoring, product area detection | intake |
 | Pipeline | End-to-end workflows orchestrating multiple phases | cook, fix, ship, workflow-orchestrator |
 | Quality Gate | Enforce standards at specific phase boundaries | review, cso, vulnerability-scanner, lint-and-validate |
-| Planning | Plan creation, review, and ideation | plan-creator, plan-ceo-review, plan-eng-review, office-hours |
+| Planning | Plan creation, review, and ideation | plan-creator, plan-ceo-review, office-hours |
 | Exploration | Codebase search, debugging, doc retrieval | scout, investigate, docs-finder |
 | Domain | Stack-specific patterns and conventions | typescript, vue, frontend-design |
 | Backend & Data | API design, database patterns, build error resolution | api-design, build-fix, database |
@@ -104,7 +104,7 @@ Plan creation, review, and ideation.
 | [meow:plan-creator](/reference/skills/plan-creator) | Auto-select plan template by task scope |
 | [meow:validate-plan](/reference/skills/validate-plan) | 8-dimension plan quality validation before Phase 2 begins |
 | [meow:plan-ceo-review](/reference/skills/plan-ceo-review) | CEO-mode plan review with scope expansion |
-| [meow:plan-ceo-review](/reference/skills/plan-eng-review) | Engineering plan review — architecture, edges, tests |
+| [meow:plan-ceo-review](/reference/skills/plan-ceo-review) | Engineering plan review — architecture, edges, tests |
 | [meow:office-hours](/reference/skills/office-hours) | YC-style brainstorming (startup + builder modes) |
 | [meow:brainstorming](/reference/skills/brainstorming) | Structured ideation with scoring + plan-creator handoff |
 | [meow:decision-framework](/reference/skills/decision-framework) | Operational decision architecture: triage, escalation, case management |

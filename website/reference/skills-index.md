@@ -26,7 +26,6 @@ Source file: `.claude/agents/SKILLS_INDEX.md`
 |-------|-------|------|
 | [plan-creator](/reference/skills/plan-creator) | planner | planning |
 | [plan-ceo-review](/reference/skills/plan-ceo-review) | planner | planning |
-| [plan-eng-review](/reference/skills/plan-eng-review) | planner/architect | planning |
 | [validate-plan](/reference/skills/validate-plan) | planner | planning |
 | [brainstorming](/reference/skills/brainstorming) | brainstormer | planning |
 | [office-hours](/reference/skills/office-hours) | brainstormer/planner | planning |

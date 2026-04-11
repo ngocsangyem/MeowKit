@@ -117,5 +117,5 @@ Gate 1: Human approval of ADR
 ## Related
 
 - [`meow:office-hours`](/reference/skills/office-hours) — Pre-planning brainstorming (single agent, less structured)
-- [`meow:plan-ceo-review`](/reference/skills/plan-eng-review) — Engineering lens review after the decision is made
+- [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — Engineering lens review after the decision is made
 - [`/workflows/architecture`](/workflows/architecture) — Full architecture decision workflow
