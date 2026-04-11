@@ -45,6 +45,8 @@ Check `git status` for staged/unstaged changes.
 No plans, no reviews, no changes.
 - "Everything clean. Options: start a new task with planner, run `/meow:retro`, or ask me anything."
 
+For skill suggestions based on task type, see `.claude/skills/meow:agent-detector/references/lifecycle-routing.md`.
+
 ## State-to-Recommendation Map
 
 | State | Pipeline Phase | Recommendation |

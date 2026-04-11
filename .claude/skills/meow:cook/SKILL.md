@@ -54,6 +54,8 @@ User override: If user explicitly says "just code it" or "skip planning", respec
 | "I'll plan as I go"             | That's not planning, that's hoping.                                |
 | "Just this once"                | Every skip is "just this once." No exceptions.                     |
 
+Before starting work, read `references/failure-catalog.md` for common implementation failure modes to avoid.
+
 ## Smart Intent Detection
 
 See `references/intent-detection.md` for full detection logic.

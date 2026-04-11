@@ -54,6 +54,8 @@ Skip when:
 
 ## Workflow
 
+Before starting, read `references/failure-catalog.md` for common planning failure modes to avoid.
+
 Execute via `workflow.md`. Step-file architecture — load one step at a time.
 Fast mode (`--fast`) uses `workflow-fast.md` (steps 00→03→04→07→08).
 

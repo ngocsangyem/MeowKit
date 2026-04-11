@@ -26,6 +26,7 @@ source: aura-frog
 ## Plan-First Gate
 
 Orchestrator enforces the plan-first pattern for all workflows:
+
 1. On task received → check for existing approved plan
 2. If no plan and task is non-trivial → route to `meow:plan-creator` first
 3. After Gate 1 approval → select workflow model and execute phases
@@ -47,6 +48,8 @@ Skip: Fasttrack mode with pre-approved spec.
 5. **Challenge requirements** → Ask clarifying questions before Phase 1
 
 ## Process
+
+See CLAUDE.md and Phase Composition Contracts for input/output expectations per phase.
 
 1. **Run pre-execution checklist** — select lead agent, load memory, show agent banner, verify complexity, challenge requirements.
 

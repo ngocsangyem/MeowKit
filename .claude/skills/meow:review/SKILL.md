@@ -96,6 +96,8 @@ Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer
 
 ## Workflow (Step-File Architecture)
 
+Before starting, read `references/failure-catalog.md` for common review failure modes to avoid.
+
 Execute via `workflow.md`. Each step is a separate file loaded JIT:
 
 1. **step-01-gather-context** — Load diff, plan, ACs. **Scope gate** classifies diff as `minimal` or `full`. Domain complexity check via `meow:scale-routing`.

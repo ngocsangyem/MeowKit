@@ -8,6 +8,7 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | `security-rules.md`               | Block hardcoded secrets, any types, SQL injection, XSS patterns                                                                                    | MeowKit original                             | All modes, all phases                               |
 | `injection-rules.md`              | Prompt injection defense: DATA vs INSTRUCTIONS boundary                                                                                            | MeowKit original                             | All modes, all phases                               |
 | `gate-rules.md`                   | Gate 1 (plan approval) and Gate 2 (review approval) hard stops                                                                                     | MeowKit original                             | Phases 1, 4                                         |
+| `core-behaviors.md`               | 6 mandatory operating behaviors: Surface Assumptions, Manage Confusion, Push Back, Enforce Simplicity, Scope Discipline, Verify Don't Assume       | Adapted from agent-skills                    | All modes, all phases                               |
 | `tdd-rules.md`                    | TDD enforcement (opt-in via MEOWKIT_TDD=1 / --tdd). Includes MICRO-TASK exemption.                                                                 | MeowKit original                             | Phases 2, 3 **when TDD enabled** [CONTEXTUAL]       |
 | `naming-rules.md`                 | Naming conventions per platform (TS, Vue, Swift, DB)                                                                                               | MeowKit original                             | Implementation, review                              |
 | `development-rules.md`            | File management, code quality, pre-commit, git safety, docs impact                                                                                 | Adapted from claudekit-engineer              | Implementation, commit                              |
@@ -31,16 +32,17 @@ Rules are applied in this priority (higher = stronger override):
 3. `gate-rules.md` — NEVER override (except /fix simple bypasses Gate 1)
 4. `harness-rules.md` — NEVER override gates; density choice does not bypass any gate
 5. `rubric-rules.md` — NEVER override hard-fail propagation
-6. `tdd-rules.md` — applies only when `MEOWKIT_TDD=1` / `--tdd`; default OFF. Legacy `[fast]` profile bypass retained with deprecation warning.
-7. `naming-rules.md` — always apply
-8. `development-rules.md` — always apply
-9. `context-ordering-rules.md` — always apply
-10. `model-selection-rules.md` — always apply
-11. `output-format-rules.md` — always apply
-12. `scale-adaptive-rules.md` — always apply at Phase 0
-13. `step-file-rules.md` — apply when executing step-file workflows
-14. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
-15. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
+6. `core-behaviors.md` — always apply (6 behaviors + 10 failure modes)
+7. `tdd-rules.md` — applies only when `MEOWKIT_TDD=1` / `--tdd`; default OFF. Legacy `[fast]` profile bypass retained with deprecation warning.
+8. `naming-rules.md` — always apply
+9. `development-rules.md` — always apply
+10. `context-ordering-rules.md` — always apply
+11. `model-selection-rules.md` — always apply
+12. `output-format-rules.md` — always apply
+13. `scale-adaptive-rules.md` — always apply at Phase 0
+14. `step-file-rules.md` — apply when executing step-file workflows
+15. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
+16. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
 
 ## Hook Enforcement
 

@@ -31,3 +31,12 @@ Common failure patterns when fixing bugs. Update this file when Claude produces 
 ### Ignoring Memory
 **Symptom:** Same bug class fixed repeatedly.
 **Fix:** Check `.claude/memory/patterns.json` for prior fixes before starting. Write fix pattern after completion.
+
+### Fixing Without Reproducing First
+**Symptom:** "I think I know what's wrong" → fix deployed → bug persists.
+**Fix:** Always reproduce the bug before fixing. If you can't reproduce it, you don't understand it.
+
+### Changing Multiple Things at Once
+**Symptom:** Fix touches 5 files, introduces new bug, can't tell which change caused it.
+**Fix:** Change ONE thing, verify, then change the next. Isolate variables.
+

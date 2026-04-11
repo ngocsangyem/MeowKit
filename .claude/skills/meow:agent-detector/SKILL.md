@@ -30,6 +30,7 @@ source: aura-frog
 
 ## References
 
+- `references/lifecycle-routing.md` -- Task signal → phase → skill mapping (advisory, does not change scoring)
 - `references/complexity-detection.md` -- Complexity levels, auto-detection criteria, detection logic
 - `references/model-selection.md` -- Model mapping tables (complexity, task type, agent defaults)
 - `references/multi-layer-detection.md` -- Layers 0-4: task content, tech, intent, project context, file patterns

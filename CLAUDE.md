@@ -19,12 +19,27 @@ Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test (RED if --tdd, else op
 **Phase 3 pre-build contract substep (harness):** for harness-driven sprint builds, the developer agent must read a signed `tasks/contracts/{date}-{slug}-sprint-N.md` BEFORE writing source code (enforced by `gate-enforcement.sh`). Bypass via `MEOWKIT_HARNESS_MODE=LEAN`. See `harness-rules.md` Rule 3 + `docs/harness-runbook.md`.
 
 **IMPORTANT:** Read `memory/lessons.md` before starting any task.
+**IMPORTANT:** Read `.claude/rules/core-behaviors.md` — 6 mandatory operating behaviors that apply in ALL modes.
 **IMPORTANT:** Activate only skills needed for the current task domain.
 **IMPORTANT:** Declare model tier before every task: TRIVIAL · STANDARD · COMPLEX.
 **IMPORTANT:** Non-trivial task (>2 files OR >30 min) = approved plan required before any code.
 **IMPORTANT:** For architectural trade-offs, use `/meow:party` for multi-agent deliberation before deciding.
 **IMPORTANT:** COMPLEX tasks with independent subtasks may use parallel execution (max 3 agents, worktree isolation).
 **IMPORTANT:** For green-field product builds ("build me a kanban app"), prefer `/meow:harness` over `/meow:cook`. Harness picks adaptive scaffolding density (MINIMAL/FULL/LEAN) per model tier.
+
+## Phase Composition Contracts
+
+What each phase expects and produces. Breaking upstream contracts cascades downstream.
+
+| Phase | Skill | Expects | Produces | Breaks-if-Missing |
+|-------|-------|---------|----------|-------------------|
+| 0 Orient | meow:agent-detector | Task description | Agent assignment + model tier | No routing → wrong agent/tier |
+| 1 Plan | meow:plan-creator | Task with enough detail for scope | plan.md + phase files | Gate 1 blocks (hook-enforced) |
+| 2 Test | meow:testing | Plan with acceptance criteria | Failing tests targeting criteria | No correctness proof for Phase 3 |
+| 3 Build | meow:cook | Approved plan (Gate 1), tests if TDD | Passing code + committed increments | Builds wrong thing without plan |
+| 4 Review | meow:review | Committed code with passing tests | Verdict (PASS/WARN/FAIL per dimension) | Can't assess correctness without tests |
+| 5 Ship | meow:ship | PASS/WARN verdict (Gate 2) | PR + branch push | Ships unreviewed code |
+| 6 Reflect | meow:memory | Completed work with decisions | lessons.md + patterns.json entries | Knowledge lost (non-blocking) |
 
 ## Adaptive Density (Harness)
 
