@@ -38,21 +38,26 @@ This is a simplified view. The canonical decision matrix with per-cell rationale
 
 1. `MEOWKIT_HARNESS_MODE` env var (highest priority) — `MINIMAL`, `FULL`, or `LEAN`
 2. `--tier` flag on `/meow:harness` — `auto`, `minimal`, `full`, `lean`
-3. `density-select.sh` auto-detection from model env vars:
-   - `MEOWKIT_MODEL_HINT` (explicit override)
-   - `CLAUDE_MODEL` (Claude Code legacy)
-   - `ANTHROPIC_MODEL` (Anthropic SDK)
-   - (none) → defaults to STANDARD tier → FULL density (safe fallback)
+3. `model-detector.cjs` (SessionStart handler, v2.3.0) — reads the `model` field from SessionStart stdin JSON and writes the detected tier + density to `session-state/detected-model.json`
+4. `MEOWKIT_MODEL_HINT` env var — fallback when stdin `model` field is absent
+5. (none) → defaults to STANDARD tier → FULL density (safe fallback)
 
 The chosen density and its resolution source are logged in the harness run report's "Density Decision" section so you can always audit what fired.
 
-## Auto-Detection Gotcha
+See [model-detector handler](/guide/middleware-layer#node-js-handler-modules-v2-3-0) for handler details.
 
-**Claude Code does NOT export the model id to hooks.** This is a verified limitation (confirmed against `code.claude.com/docs/en/hooks`, 2026-04-08).
+## Auto-Detection (v2.3.0)
 
-If you're running Opus 4.6 without setting a hint, the harness falls back to `STANDARD → FULL`. You silently get full scaffolding when LEAN would serve you better.
+As of v2.3.0, `model-detector.cjs` reads the `model` field directly from Claude Code's SessionStart stdin JSON — **`MEOWKIT_MODEL_HINT` is no longer required** for Opus 4.6+ users. The handler automatically maps model IDs to tiers:
 
-**Fix — set the hint once in your shell:**
+| Model string prefix | Tier | Density |
+|---------------------|------|---------|
+| `claude-opus-4-6*` | COMPLEX | LEAN |
+| `claude-opus-4-5*`, `claude-opus-4*` | COMPLEX | FULL |
+| `claude-sonnet-*` | STANDARD | FULL |
+| `claude-haiku-*` | TRIVIAL | MINIMAL |
+
+`MEOWKIT_MODEL_HINT` remains as a fallback — use it if your Claude Code version does not emit the `model` field in SessionStart stdin, or if you want to force a specific tier:
 
 ```bash
 export MEOWKIT_MODEL_HINT=opus-4-6

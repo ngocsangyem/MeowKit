@@ -10,6 +10,10 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### [v2.3.0 — The Hook Dispatch Release](/guide/whats-new/v2.3.0) (2026-04-11)
+
+Node.js hook dispatch system with 8 handler modules (model detection, budget tracking, checkpoint/resume, memory filtering, build verify, loop detection), cook `--verify`/`--strict` verification flags, review skeptic anchoring, structured memory with domain filtering, and tool output limits. TDD enforcement now opt-in.
+
 ### [v2.2.0 — Generator/Evaluator Harness](/guide/whats-new/v2.2.0) (2026-04-08)
 
 Autonomous multi-hour green-field build pipeline with adaptive density, middleware layer, trace-driven meta-loop, and Phase 9 conversation summary cache.

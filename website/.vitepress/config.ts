@@ -131,6 +131,7 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'What\'s New', link: '/guide/whats-new',
               items: [
+                { text: 'v2.3.0 — The Hook Dispatch Release', link: '/guide/whats-new/v2.3.0' },
                 { text: 'v2.2.0 — Generator/Evaluator Harness', link: '/guide/whats-new/v2.2.0' },
                 { text: 'v2.0.0 — The Leverage Release', link: '/guide/whats-new/v2.0.0' },
                 { text: 'v1.4.0 — Plan Intelligence', link: '/guide/whats-new/v1.4.0' },

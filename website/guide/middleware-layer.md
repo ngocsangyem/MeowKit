@@ -169,6 +169,27 @@ Cross-hook state passes exclusively through `session-state/` filesystem files �
 
 Rule 11 from `.claude/rules/harness-rules.md` governs the summary cache specifically. The broader hook independence principle is documented in HOOKS_INDEX.md §"Hook Order Independence."
 
+## Node.js Handler Modules (v2.3.0)
+
+MeowKit v2.3.0 added a parallel dispatch path alongside the shell hooks above. The Node.js handlers are routed through `dispatch.cjs` using the `handlers.json` registry — they do not replace the shell hooks; both paths run on the same events.
+
+The key advantage over shell hooks: `shared-state.cjs` enables cross-handler state within a single dispatch call — something independent shell processes cannot share.
+
+| Handler | File | Event | Matcher | Purpose |
+|---------|------|-------|---------|---------|
+| model-detector | `handlers/model-detector.cjs` | SessionStart | — | Reads stdin `model` field; writes tier to `session-state/detected-model.json` |
+| orientation-ritual | `handlers/orientation-ritual.cjs` | SessionStart | — | Resumes from checkpoint if one exists |
+| build-verify | `handlers/build-verify.cjs` | PostToolUse | Edit\|Write | Compile/lint; cached by file hash |
+| loop-detection | `handlers/loop-detection.cjs` | PostToolUse | Edit\|Write | Warns at 4 edits, escalates at 8 |
+| budget-tracker | `handlers/budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | Estimates cost; warns at $10, blocks at $25 |
+| auto-checkpoint | `handlers/auto-checkpoint.cjs` | PostToolUse | Edit\|Write | Checkpoint every 20 calls |
+| memory-loader | `handlers/memory-loader.cjs` | UserPromptSubmit | — | Injects domain-filtered lessons to stdout |
+| checkpoint-writer | `handlers/checkpoint-writer.cjs` | Stop | — | Sequenced checkpoint with git state |
+
+Note: `build-verify.cjs` and `loop-detection.cjs` cover the same events as `post-write-build-verify.sh` and `post-write-loop-detection.sh`. Both paths run. The Node.js handlers add budget tracking and checkpoint features that the shell hooks do not provide.
+
+See [harness-architecture](/guide/harness-architecture) for the dispatch flow diagram.
+
 ## Canonical Sources
 
 - `.claude/hooks/HOOKS_INDEX.md` — full hooks table with events, matchers, timeouts, input contracts

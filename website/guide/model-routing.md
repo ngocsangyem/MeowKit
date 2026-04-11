@@ -97,7 +97,13 @@ When using `/meow:harness`, the scaffolding density (`MINIMAL` / `FULL` / `LEAN`
 | COMPLEX | Opus 4.5 | FULL — same as Sonnet |
 | COMPLEX | Opus 4.6+ | LEAN — single-session, contract optional |
 
-Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN`. Auto-detection requires `export MEOWKIT_MODEL_HINT=opus-4-6` — Claude Code does not export model env vars to hooks automatically. See [Adaptive Density](/guide/adaptive-density) for the full matrix.
+**Auto-detection (v2.3.0):** `model-detector.cjs` (SessionStart handler) reads the `model` field from Claude Code's SessionStart stdin and writes the tier + density to `session-state/detected-model.json`. Detection cascade:
+
+1. Stdin `model` field (primary — no env var required)
+2. `MEOWKIT_MODEL_HINT` env var (fallback)
+3. Default: STANDARD tier → FULL density
+
+`MEOWKIT_MODEL_HINT` is now a fallback, not a requirement. Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN`. See [Adaptive Density](/guide/adaptive-density) for the full matrix.
 
 ## Agent default models
 

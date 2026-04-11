@@ -136,6 +136,25 @@ For `/meow:harness` runs in FULL density, the developer agent must read a signed
 - **Optional post-verdict:** run `meow:elicit` after the verdict to push deeper on WARN dimensions using 8 structured elicitation methods
 - **HUMAN APPROVAL REQUIRED** — no shipping until review passes
 
+## Phase 4.5 — Verify (Optional, cook only)
+
+**Agent:** evaluator (light) or meow:evaluate (strict)
+**Deliverable:** Verification report or rubric-graded verdict
+
+Phase 4.5 fires only during `/meow:cook` runs — not in `meow:fix`, `meow:harness` (which has its own evaluator), or standalone `meow:review`.
+
+| Flag | Behavior | Approx Cost |
+|------|----------|-------------|
+| `--verify` | Light browser check after Phase 4 review. Advisory — warns but does not block ship | ~$1 |
+| `--strict` | Full `meow:evaluate` with rubric grading. FAIL verdict blocks Phase 5 | ~$2–5 |
+| `--no-strict` | Suppress auto-strict even when scale-routing returns `level=high` | — |
+
+### Auto-strict trigger
+
+When `meow:scale-routing` returns `level=high` during a cook run, Phase 4.5 auto-enables `--strict` (Rule 7 in `scale-adaptive-rules.md`). Pass `--no-strict` to suppress this if you need a fast path for a known-safe change.
+
+See [scale-adaptive-rules Rule 7](/reference/rules-index#scale-adaptive-rules) for the full rule.
+
 ## Phase 5 — Ship
 
 **Agent:** shipper  

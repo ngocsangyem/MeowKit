@@ -5,6 +5,37 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.0 (2026-04-11) — The Hook Dispatch Release
+
+Node.js hook dispatch system with 8 handler modules, cook verification flags, review skeptic anchoring, structured memory filtering, and tool output limits. TDD enforcement now opt-in.
+
+### Features
+
+- **Node.js hook dispatcher** — central `dispatch.cjs` with `handlers.json` registry; parses stdin once, routes to 8 handlers across 4 lifecycle events
+- **model-detector handler** — auto-detects model tier + density from SessionStart stdin `model` field; replaces `MEOWKIT_MODEL_HINT` as primary source
+- **orientation-ritual handler** — resumes from checkpoint on session resume
+- **build-verify handler** — compile/lint after file edits, cached by file hash (ported from shell to Node.js)
+- **loop-detection handler** — warns at 4 edits, escalates at 8 (ported from shell to Node.js)
+- **budget-tracker handler** — token cost estimation with $10 warn / $25 block session-level thresholds
+- **auto-checkpoint handler** — crash-recovery every 20 tool calls + phase transition detection
+- **memory-loader handler** — domain-filtered memory from structured lessons.md, budget-capped 4000 chars
+- **checkpoint-writer handler** — sequenced checkpoint with git state + budget snapshot on Stop
+- **cook --verify** — advisory browser check after review (~$1)
+- **cook --strict** — full meow:evaluate after review; FAIL blocks ship (~$2-5)
+- **cook --no-strict** — suppress auto-strict trigger
+- **auto-strict (Rule 7)** — scale-routing level=high auto-enables --strict in cook
+- **review skeptic anchoring** — re-anchor prompt injected per adversarial persona dispatch
+- **structured memory** — lessons.md YAML frontmatter with two-phase domain-filtered loading
+- **tool output limits** — Glob head_limit=50, Grep head_limit=20, Read offset+limit for >500 lines
+- **TDD now opt-in** — via `--tdd` flag or `MEOWKIT_TDD=1`; default mode skips RED-phase gate
+
+### Infrastructure
+
+- **parse-stdin.cjs** — shared stdin JSON parser with path normalization
+- **shared-state.cjs** — atomic JSON persistence (tmp+rename)
+- **checkpoint-utils.cjs** — shared git + sequence utilities
+- **memory-migrator.cjs** — migration script for legacy lessons.md to YAML frontmatter
+
 ## 2.2.2 (2026-04-10) — Homoglyph Detection Refinement
 
 ### Changed

@@ -108,6 +108,34 @@ Discipline rules for the autonomous multi-hour build pipeline (`meow:harness`) a
 
 Source: `.claude/rules/harness-rules.md`. Applies to Phase 3 (Build) + Phase 4 (Review) when harness pipeline is active.
 
+## scale-adaptive-rules.md {#scale-adaptive-rules}
+
+Domain-complexity routing rules that drive Phase 0 classification and harness density selection.
+
+| # | Rule | Gloss |
+|---|------|-------|
+| 1 | CSV Match Overrides Manual Classification | Domain keyword match overrides orchestrator judgment |
+| 2 | No Match Falls Back Gracefully | Unknown domain → manual classification per model-selection-rules |
+| 3 | High Complexity Forces COMPLEX Tier | `level=high` → COMPLEX, no exceptions |
+| 4 | One-Shot Workflow Enables Gate 1 Bypass | `workflow=one-shot` + zero blast radius → skip Gate 1 |
+| 5 | Users Can Extend the CSV | `domain-complexity.csv` is user-editable |
+| 6 | Adaptive Density Emission | scale-routing also emits `harness_density` for harness consumers |
+| 7 | **Auto-Strict for High-Complexity Cook Runs** | `level=high` during `/meow:cook` → auto-enables `--strict` at Phase 4.5; suppressible via `--no-strict`; fires ONLY in meow:cook |
+
+**Rule 7 detail:** When `meow:scale-routing` returns `level=high` during a `/meow:cook` run, cook auto-enables `--strict` mode (full `meow:evaluate`) at Phase 4.5 — unless the user explicitly passes `--no-strict`. This catches behavioral failures (e.g., a broken payment flow) that structural code review misses. Does NOT fire in `meow:fix`, `meow:harness`, or standalone `meow:review`.
+
+Source: `.claude/rules/scale-adaptive-rules.md`. Applies at Phase 0 (Orient) and Phase 4.5 (Verify).
+
+## model-selection-rules.md {#model-selection-rules}
+
+Model tier routing rules for Phase 0 task classification.
+
+Key updates in v2.3.0:
+
+> **Rule 5 update (v2.3.0):** Auto-detection now uses `model-detector.cjs` SessionStart handler as the primary source. It reads the `model` field from SessionStart stdin and writes tier + density to `session-state/detected-model.json`. `MEOWKIT_MODEL_HINT` is fallback only — no longer required for Opus 4.6+ users.
+
+Source: `.claude/rules/model-selection-rules.md`. Applies at Phase 0 (Orient).
+
 ## rubric-rules.md {#rubric-rules}
 
 Rules that keep the rubric library (`.claude/rubrics/`) calibrated and the evaluator grading honest.

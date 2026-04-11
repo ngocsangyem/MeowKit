@@ -151,6 +151,71 @@ Full explanation: [/guide/adaptive-density](/guide/adaptive-density).
 - [/guide/trace-and-benchmark](/guide/trace-and-benchmark) — meta-loop
 - [/reference/rules-index#harness-rules](/reference/rules-index#harness-rules) — all 11 harness rules
 
+## Node.js Hook Dispatch System (v2.3.0)
+
+In addition to the shell middleware hooks, MeowKit v2.3.0 introduced a Node.js dispatch layer that runs alongside (not replacing) the existing shell hooks.
+
+### Architecture
+
+`dispatch.cjs` is a central event dispatcher registered in `settings.json` for five events: `SessionStart`, `PostToolUse` (Edit|Write and Bash matchers), `Stop`, and `UserPromptSubmit`. When the event fires, Claude Code calls `node dispatch.cjs <EventName> [Matcher]`, which reads `handlers.json` to find the matching handler modules and dispatches to them sequentially.
+
+```mermaid
+flowchart LR
+    CC[Claude Code] -->|hook event| SJ[settings.json]
+    SJ -->|node dispatch.cjs| D[dispatch.cjs]
+    D -->|reads| HJ[handlers.json]
+    HJ --> H1[model-detector.cjs]
+    HJ --> H2[build-verify.cjs]
+    HJ --> H3[memory-loader.cjs]
+    HJ --> H4[...]
+    D -. independent .-> SEC[gate-enforcement.sh\nprivacy-block.sh]
+```
+
+### Handler Registry (handlers.json)
+
+`handlers.json` maps each event + optional matcher to an array of handler module paths:
+
+```json
+{
+  "PostToolUse": {
+    "Edit|Write": ["./handlers/build-verify.cjs", "..."],
+    "Bash":       ["./handlers/budget-tracker.cjs"]
+  },
+  "Stop":             ["./handlers/checkpoint-writer.cjs"],
+  "SessionStart":     ["./handlers/model-detector.cjs", "./handlers/orientation-ritual.cjs"],
+  "UserPromptSubmit": ["./handlers/memory-loader.cjs"]
+}
+```
+
+### Handler Modules
+
+| Handler | Event | Matcher | Purpose |
+|---------|-------|---------|---------|
+| `model-detector.cjs` | SessionStart | — | Reads `model` field from stdin; writes tier + density to `session-state/detected-model.json` |
+| `orientation-ritual.cjs` | SessionStart | — | Resumes from checkpoint if one exists |
+| `build-verify.cjs` | PostToolUse | Edit\|Write | Compile/lint with file-hash cache |
+| `loop-detection.cjs` | PostToolUse | Edit\|Write | Warns at 4 edits, escalates at 8 |
+| `budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | Estimates cost; warns at $10, blocks at $25 |
+| `auto-checkpoint.cjs` | PostToolUse | Edit\|Write | Writes checkpoint every 20 calls |
+| `memory-loader.cjs` | UserPromptSubmit | — | Injects domain-filtered lessons to stdout |
+| `checkpoint-writer.cjs` | Stop | — | Sequenced checkpoint with git state |
+
+### Shared Libraries
+
+Three shared modules in `.claude/hooks/lib/` support the handlers:
+
+| Library | Purpose |
+|---------|---------|
+| `parse-stdin.cjs` | Parses Claude Code JSON-on-stdin once; shared by all handlers |
+| `shared-state.cjs` | In-process state bag enabling cross-handler state (not possible with independent shell hooks) |
+| `checkpoint-utils.cjs` | Read/write checkpoint files; shared by orientation-ritual and checkpoint-writer |
+
+### SPOF Protection
+
+Security hooks (`gate-enforcement.sh`, `privacy-block.sh`) are intentionally **not** routed through the dispatcher. They remain independent entries in `settings.json`. A failure in `dispatch.cjs` gracefully exits 0 (never blocks Claude Code), but security hooks continue firing independently — no single point of failure.
+
+Full details: [What's New in v2.3.0](/guide/whats-new/v2.3.0).
+
 ## Canonical Sources
 
 - `.claude/rules/harness-rules.md` — the 11 rules governing the harness

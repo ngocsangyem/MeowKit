@@ -124,6 +124,53 @@ When memory grows large, run the consolidation reference manually. It uses a 4-b
 | `patterns.json` | > 50 patterns |
 | `cost-log.json` | > 500 entries (archive to monthly files) |
 
+## Structured Lessons with Domain Filtering (v2.3.0)
+
+`memory-loader.cjs` (a UserPromptSubmit handler) replaced the flat `lessons.md` injection. It supports YAML frontmatter on individual lesson entries for two-phase loading.
+
+### Frontmatter format
+
+Add YAML frontmatter to any lesson block in `lessons.md`:
+
+```yaml
+---
+id: L001
+status: live-captured
+domain: [shell, security, python]
+severity: critical
+date: 2026-04-10
+---
+```
+
+| Field | Values | Purpose |
+|-------|--------|---------|
+| `id` | `L001`, `L002`, … | Unique identifier |
+| `status` | `live-captured`, `captured`, `skipped-too-old` | Capture lifecycle |
+| `domain` | array of keyword tags | Domain filtering |
+| `severity` | `critical`, `standard` | Loading priority |
+| `date` | ISO date | Recency sorting |
+
+### Two-phase loading
+
+1. **Phase A — always loaded:** entries with `severity: critical` or entries tagged `security` in their domain list. Loaded regardless of prompt content.
+2. **Phase B — domain-filtered:** remaining entries whose `domain` tags overlap keywords detected in the user's prompt. A prompt mentioning "shell" loads only shell-domain lessons.
+
+### Budget cap
+
+Total injected memory is capped at **4000 chars** (~1K tokens). Configurable via `MEOWKIT_MEMORY_BUDGET`. Phase A entries are counted first; Phase B fills remaining budget.
+
+### Migration
+
+If your `lessons.md` has unfronmatted entries, run the migration script:
+
+```bash
+node .claude/scripts/memory-migrator.cjs
+```
+
+This adds default frontmatter (`severity: standard`, `domain: []`) to entries that lack it, leaving manually-tagged entries unchanged.
+
+See [memory-loader handler](/guide/middleware-layer#node-js-handler-modules-v2-3-0) for the full handler spec.
+
 ## MeowKit vs Claude Code memory
 
 Both systems coexist without conflict:

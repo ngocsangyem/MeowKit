@@ -196,6 +196,40 @@ Registered under both **Stop** and **UserPromptSubmit**. Branches on `$HOOK_EVEN
 - **Debug:** `MEOWKIT_SUMMARY_DEBUG=1` — verbose stderr
 - **Source:** `.claude/hooks/conversation-summary-cache.sh`
 
+## Node.js Dispatch System (v2.3.0)
+
+`dispatch.cjs` is a central Node.js dispatcher registered in `settings.json` alongside existing shell hooks. It reads `handlers.json` at runtime and dispatches to handler modules sequentially for each event.
+
+**Usage in settings.json:**
+```
+node dispatch.cjs <EventName> [Matcher]
+```
+
+**Graceful degradation:** if `handlers.json` is missing or a handler throws, `dispatch.cjs` exits 0 — it never blocks Claude Code.
+
+**Security note:** `gate-enforcement.sh` and `privacy-block.sh` are intentionally outside the dispatcher. They stay as independent entries in `settings.json`.
+
+### Handler Modules
+
+| Handler | File | Event | Matcher | Stdin Fields Used | Output |
+|---------|------|-------|---------|-------------------|--------|
+| model-detector | `handlers/model-detector.cjs` | SessionStart | — | `model` | Writes `session-state/detected-model.json`; stdout model tier line |
+| orientation-ritual | `handlers/orientation-ritual.cjs` | SessionStart | — | — | Resumes from checkpoint if exists |
+| build-verify | `handlers/build-verify.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Runs compile/lint; cached by file hash |
+| loop-detection | `handlers/loop-detection.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Warns at 4 edits, escalates at 8 |
+| budget-tracker | `handlers/budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | `tool_input`, `tool_response` | Estimates cost; warns $10, blocks $25 |
+| auto-checkpoint | `handlers/auto-checkpoint.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Checkpoint every 20 calls |
+| memory-loader | `handlers/memory-loader.cjs` | UserPromptSubmit | — | `prompt` | Injects domain-filtered memory to stdout |
+| checkpoint-writer | `handlers/checkpoint-writer.cjs` | Stop | — | — | Sequenced checkpoint with git state |
+
+### Shared Libraries
+
+| Library | File | Purpose |
+|---------|------|---------|
+| parse-stdin | `lib/parse-stdin.cjs` | Parses Claude Code JSON-on-stdin once; `dispatch.cjs` passes result to all handlers |
+| shared-state | `lib/shared-state.cjs` | In-process state bag for cross-handler state sharing |
+| checkpoint-utils | `lib/checkpoint-utils.cjs` | Read/write checkpoint files; shared by orientation-ritual and checkpoint-writer |
+
 ## State Files Table
 
 | File                                        | Writer                                           | Purpose                                                        |
