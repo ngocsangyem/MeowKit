@@ -1,43 +1,76 @@
 ---
 title: "meow:plan-ceo-review"
-description: "CEO/founder-mode plan review — rethink the problem, challenge premises, find the 10-star product with scope expansion options."
+description: "CEO/founder-mode plan review — layered verification pipeline with pre-screening, two-lens evaluation, severity tiers, and adversarial necessity."
 ---
 # meow:plan-ceo-review
-CEO/founder-mode plan review — rethink the problem, challenge premises, find the 10-star product.
+
+CEO/founder-mode plan review — a decision and validation layer (NOT a planner). Challenges whether the plan solves the right problem and can be built as scoped.
+
 ## What This Skill Does
-Reviews plans from a CEO/founder perspective. Four modes: Scope Expansion (dream big), Selective Expansion (hold scope + cherry-pick), Hold Scope (maximum rigor), Scope Reduction (strip to essentials). Challenges whether you're thinking big enough and whether the plan solves the real problem.
+
+Reviews plans through a **layered verification pipeline** that fast-fails on cheap checks before spending on expensive judgment:
+
+```
+Layer 0-1: Pre-Screen (placeholders, structure, coverage)
+Layer 3:   Two-Lens Eval (Intent Alignment + Execution Credibility)
+Layer 4:   Deep Review (11 sections with severity tiers + adversarial necessity)
+Layer 5:   Verdict + Handoff (append-only output to plan.md)
+```
+
 ## Core Capabilities
-- **Four modes** — Expand, Selective Expand, Hold, Reduce
-- **Premise challenging** — Questions assumptions in the plan
-- **10-star product thinking** — What would make this 10x better?
-- **Review dashboard** — Tracks review status for `/meow:ship`
+
+- **Four modes** — Expand, Selective Expand, Hold, Reduce (unchanged)
+- **Pre-screen gate** — catches unfinished plans before human review (mode-aware, never rejects — returns for amendment)
+- **Two-lens evaluation** — Intent Alignment (right problem?) + Execution Credibility (buildable?). Any FAIL → NEEDS REVISION
+- **Severity tiers** — all findings classified: BLOCKER / HIGH-LEVERAGE / POLISH
+- **Adversarial necessity** — must surface ≥1 finding per section or document evidence why clean
+- **Append-only output** — `## CEO Review` block appended to plan.md (never overwrites)
+- **Coverage mapping** — requirements → tasks traceability table
+- **Merged failure analysis** — Error & Rescue + Failure Modes in one table
+
 ## Usage
+
 ```bash
 /meow:plan-ceo-review                    # default mode
 /meow:plan-ceo-review --scope-expand     # dream big
 /meow:plan-ceo-review --hold-scope       # maximum rigor
 /meow:plan-ceo-review --reduce-scope     # strip to essentials
 ```
+
 ::: info Skill Details
-**Phase:** 1  
+**Phase:** 1 (post-plan, pre-implementation)
 **Used by:** planner agent
+**Suggested by:** plan-creator (step-08) for hard/deep/parallel modes, harness (step-01) for product builds
 :::
+
+## Verdict Format
+
+Appended to plan.md after review:
+
+```markdown
+## CEO Review (2026-04-11, HOLD SCOPE)
+**Verdict:** APPROVED with 2 high-leverage items
+**Two-Lens:** Intent PASS, Execution WARN
+**Blockers:** 0
+**High-leverage:** 2
+**Polish:** 3
+**Coverage:** 8/8 requirements mapped
+```
 
 ## Gotchas
 
 - **Scope expansion beyond available resources**: "10-star thinking" produces a plan that would take 6 months → Always anchor expansion ideas to current sprint capacity
 - **Missing deadlines chasing ambition**: Perfecting the plan instead of shipping MVP → Set a time-box for review; output "ship as-is" or "one targeted improvement"
+- **Pre-screen false positives**: `TODO` in plan body text triggers placeholder scan — section headers (`## TODO List`) are excluded
 
 ## Output — Print & Stop
 
 This skill ends with a **Print & Stop**:
+- Appends `## CEO Review` block to plan.md
 - Prints a handoff block with the `/meow:cook [plan path]` command
 - Stops — Claude will not proceed automatically
-- You run `/meow:cook [plan path]` when ready, or run `meow:plan-ceo-review` for engineering review first
-
-Does NOT auto-chain into meow:plan-ceo-review or start Phase 2. You control the review sequence.
 
 ## Related
-- [`meow:plan-ceo-review`](/reference/skills/plan-eng-review) — Engineering review (complements CEO review)
 - [`meow:plan-creator`](/reference/skills/plan-creator) — Creates the plan that CEO review examines
-- [`meow:office-hours`](/reference/skills/office-hours) — Use before plan reviews
+- [`meow:validate-plan`](/reference/skills/validate-plan) — 8-dimension binary validation (complementary, not overlapping)
+- [`meow:office-hours`](/reference/skills/office-hours) — Use before plan reviews for ideation

@@ -1,4 +1,21 @@
-# Review Sections (10 sections, after scope and mode are agreed)
+# Review Sections (11 sections, after scope and mode are agreed)
+
+## Severity Tiers (apply to ALL findings in ALL sections)
+
+Every finding must be classified:
+- **BLOCKER** — must fix before implementation. Plan is not executable as-is.
+- **HIGH-LEVERAGE** — fixing improves outcome by >20%. Should fix.
+- **POLISH** — improves by <5%. Note for future, don't block.
+
+Format: `[BLOCKER] Missing auth on /api/payments endpoint` or `[HIGH-LEVERAGE] No retry logic for Stripe webhook failures`
+
+## Adversarial Necessity (apply to ALL sections)
+
+Each section MUST surface ≥1 finding. If you find nothing wrong:
+1. Re-analyze with skeptic lens: "What would a senior engineer worry about here?"
+2. If still nothing: document "Section X: No issues found — [evidence why clean]." (e.g., "Architecture is standard CRUD with no custom state machines or external integrations.")
+
+This prevents rubber-stamping. "No issues found" with evidence is valid; fabricating issues is not.
 
 ## Section 1: Architecture Review
 

@@ -10,6 +10,10 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### v2.3.5 — CEO Review Layered Verification (2026-04-11)
+
+Redesigns `meow:plan-ceo-review` as a layered verification pipeline: pre-screen gate (placeholder scan, coverage mapping), two-lens evaluation (Intent Alignment + Execution Credibility with PASS/FAIL anchors), severity tiers (BLOCKER/HIGH-LEVERAGE/POLISH), adversarial necessity per section, and append-only verdict output. Integration: plan-creator auto-suggests CEO review, harness suggests for product builds. Red-team reviewed with all 7 FAILs resolved.
+
 ### v2.3.4 — Centralized Dotenv Loading (2026-04-11)
 
 Adds `.claude/.env` file support for all hooks and handlers. Shared `lib/load-dotenv.sh` sourced by 11 shell hooks; inline parser in `dispatch.cjs` for 8 Node.js handlers. No external dependencies. Shell exports always take precedence. Includes `.env.example` template with all 19 env vars. Release script decoupled from CLI package builds.

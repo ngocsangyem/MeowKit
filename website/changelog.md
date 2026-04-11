@@ -5,6 +5,31 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.5 (2026-04-11) — CEO Review Layered Verification
+
+Redesigns `meow:plan-ceo-review` from single-pass deep review to layered verification pipeline. Strengthens decision quality without changing the 4-mode system.
+
+### Features
+
+- **Pre-screen gate (Layer 0-1)** — mode-aware placeholder scan, structural completeness check, requirements coverage mapping. Returns for amendment, never rejects.
+- **Two-lens evaluation (Layer 3)** — Intent Alignment (right problem?) + Execution Credibility (buildable?). Each grades PASS/WARN/FAIL. Any FAIL → NEEDS REVISION.
+- **Severity tiers** — all findings classified BLOCKER / HIGH-LEVERAGE / POLISH. Verdict: blockers > 0 → NEEDS REVISION.
+- **Adversarial necessity** — each section must surface ≥1 finding or document evidence why clean. Prevents rubber-stamping.
+- **Append-only output** — `## CEO Review` block appended to plan.md (never overwrites). All modes write review record.
+- **Merged Failure Analysis** — Error & Rescue Map + Failure Modes Registry combined into single table with severity column.
+
+### Integration
+
+- **plan-creator step-08** — auto-suggests CEO review after plan creation (gated by `planning_mode`)
+- **harness step-01** — suggests CEO review after product spec (NOT auto-run — CEO review is interactive)
+- **SKILLS_INDEX** — description updated with layered verification
+
+### Documentation
+
+- Updated website skill page with pipeline diagram and verdict format
+- 2 new reference files: `pre-screen.md`, `two-lens-evaluation.md`
+- Red-team reviewed (RT-A: 4 FAILs, RT-B: 5 FAILs — all resolved in v2)
+
 ## 2.3.4 (2026-04-11) — Centralized Dotenv Loading
 
 Adds project-level `.claude/.env` support so all hooks and handlers can read `MEOWKIT_*` env vars without polluting shell profiles. Red-team verified.

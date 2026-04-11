@@ -100,6 +100,17 @@ Print the Context Reminder block (from `references/gate-1-approval.md`) with:
 - `.plan-state.json` checkpoint created
 - Cook command printed with absolute path
 
+## CEO Review Suggestion
+
+After printing the cook command, check `planning_mode` from `.plan-state.json`:
+
+```
+If planning_mode in [hard, deep, parallel, two, product-level]:
+  Print: "📋 Recommend: /meow:plan-ceo-review {plan-path} — strategic review before implementation."
+Else:
+  Print: "📋 Optional: /meow:plan-ceo-review {plan-path} — strategic review."
+```
+
 ## Next
 
-STOP. User runs `/meow:cook {path}` to begin implementation.
+STOP. User runs `/meow:cook {path}` to begin implementation, or `/meow:plan-ceo-review {path}` for strategic review first.

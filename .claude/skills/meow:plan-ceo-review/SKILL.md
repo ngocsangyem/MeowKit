@@ -36,15 +36,23 @@ A rigorous, multi-section plan review from a CEO/founder perspective. Challenges
 - Before major implementation begins, to catch landmines early
 - When the user wants a second opinion on plan quality and completeness
 
-## Workflow
+## Workflow — Layered Verification Pipeline
 
-1. **Initialize** — run preamble, detect base branch, run pre-review system audit (git history, diff stats, TODOs, design docs). If `red-team-findings.md` exists in the plan directory, load it as context before review. See `references/preamble.md`, `references/base-branch-detection.md`, `references/pre-review-system-audit.md`
-2. **Scope challenge** — nuclear scope challenge + mode selection (Expansion/Selective/Hold/Reduction), premise challenge, dream state mapping. See `references/step0-scope-and-mode.md`, `references/prerequisite-skill-offer.md`
-3. **Review** — sections 1-11 (Architecture → Design/UX), optional outside voice from subagent. See `references/review-sections.md`, `references/outside-voice.md`
-4. **Output** — required deliverables (NOT in scope, Dream state delta, Error/Rescue Registry, TODOs, diagrams), post-review handoff. See `references/required-outputs.md`, `references/post-review.md`
+```
+Layer 0-1: Pre-Screen → Layer 3: Two-Lens Eval → Layer 4: Deep Sections → Layer 5: Verdict
+```
+
+1. **Pre-Screen (Layer 0-1)** — Placeholder scan (mode-aware), structural completeness check, coverage mapping. Surfaces issues with actionable guidance — never rejects outright. See `references/pre-screen.md`
+2. **Initialize** — run preamble, detect base branch, run pre-review system audit (git history, diff stats, TODOs, design docs). If `red-team-findings.md` exists in the plan directory, load it as context. See `references/preamble.md`, `references/base-branch-detection.md`, `references/pre-review-system-audit.md`
+3. **Scope challenge** — nuclear scope challenge + mode selection (Expansion/Selective/Hold/Reduction), premise challenge, dream state mapping. See `references/step0-scope-and-mode.md`, `references/prerequisite-skill-offer.md`
+4. **Two-Lens Evaluation (Step 0.5)** — Lens A: Intent Alignment (does plan solve the right problem?), Lens B: Execution Credibility (can an engineer deliver?). Each grades PASS/WARN/FAIL independently. Any FAIL → NEEDS REVISION, stop before deep review. See `references/two-lens-evaluation.md`
+5. **Deep Review (Layer 4)** — sections 1-11 (Architecture → Design/UX) with **severity tiers** (BLOCKER/HIGH-LEVERAGE/POLISH) and **adversarial necessity** (must surface ≥1 finding per section or document evidence why clean). Optional outside voice from subagent. See `references/review-sections.md`, `references/outside-voice.md`
+6. **Verdict + Handoff (Layer 5)** — Append `## CEO Review` to plan.md (never overwrite). All modes write review record. Severity rollup: blockers > 0 → NEEDS REVISION, else APPROVED with notes. See `references/required-outputs.md`, `references/post-review.md`
 
 ## References
 
+- `references/pre-screen.md` — Layer 0-1: Placeholder scan (mode-aware), structural completeness, coverage mapping
+- `references/two-lens-evaluation.md` — Layer 3: Intent Alignment + Execution Credibility with PASS/FAIL anchors and verdict logic
 - `references/preamble.md` — Preamble bash script and startup logic
 - `references/shared-protocols.md` — AskUserQuestion format, Completeness Principle, Repo Ownership, Search Before Building, Contributor Mode, Completion Status Protocol, Telemetry
 - `references/base-branch-detection.md` — Step 0: Detect base branch
@@ -52,9 +60,9 @@ A rigorous, multi-section plan review from a CEO/founder perspective. Challenges
 - `references/prerequisite-skill-offer.md` — Office-hours prerequisite and mid-session detection
 - `references/step0-scope-and-mode.md` — Premise challenge, code leverage, dream state, implementation alternatives, mode-specific analysis, CEO plan persistence, spec review loop, temporal interrogation, mode selection
 - `references/philosophy-and-principles.md` — Philosophy, Prime Directives, Engineering Preferences, Cognitive Patterns, Priority Hierarchy
-- `references/review-sections.md` — Sections 1-11 (Architecture through Design/UX)
+- `references/review-sections.md` — Sections 1-11 (Architecture through Design/UX) with severity tiers + adversarial necessity
 - `references/outside-voice.md` — Independent plan challenge (Codex/Claude subagent)
-- `references/required-outputs.md` — All required output sections and completion summary
+- `references/required-outputs.md` — All required output sections, verdict format, append-only CEO Review block, completion summary
 - `references/post-review.md` — Handoff cleanup, review log, dashboard, plan file report, review chaining, docs promotion
 
 ## Gotchas

@@ -78,6 +78,8 @@ Increment `budget_spent`. Run `budget-tracker.sh` to check threshold.
 
 Print: `"Plan ready at {plan_dir}. {N} features. Proceeding to step-02 (contract)."`
 
+Print: `"Optional: /meow:plan-ceo-review {plan_dir}/plan.md — strategic review before implementation."`
+
 ## Next
 
 Read and follow `step-02-contract.md`.

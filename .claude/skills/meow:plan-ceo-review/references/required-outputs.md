@@ -12,17 +12,18 @@ List existing code/flows that partially solve sub-problems and whether the plan 
 
 Where this plan leaves us relative to the 12-month ideal.
 
-## Error & Rescue Registry (from Section 2)
+## Failure Analysis (merged: Error & Rescue + Failure Modes)
 
-Complete table of every method that can fail, every exception class, rescued status, rescue action, user impact.
-
-## Failure Modes Registry
+Single table combining method-level error paths and codepath failure modes:
 
 ```
-  CODEPATH | FAILURE MODE   | RESCUED? | TEST? | USER SEES?     | LOGGED?
-  ---------|----------------|----------|-------|----------------|--------
+  CODEPATH / METHOD | FAILURE MODE   | RESCUED? | RESCUE ACTION        | TEST? | USER SEES?     | LOGGED? | SEVERITY
+  ------------------|----------------|----------|----------------------|-------|----------------|---------|----------
+  PaymentService.charge | Stripe timeout | Y | Retry 3x, then queue | Y | "Processing..." | Y | HIGH-LEVERAGE
+  AuthController.login  | DB connection  | N | —                    | N | 500 error       | N | BLOCKER
 ```
-Any row with RESCUED=N, TEST=N, USER SEES=Silent → **CRITICAL GAP**.
+
+Any row with RESCUED=N AND TEST=N AND USER SEES=Silent → **BLOCKER** (automatic).
 
 ## TODOS.md updates
 
@@ -100,3 +101,35 @@ List every ASCII diagram in files this plan touches. Still accurate?
 ## Unresolved Decisions
 
 If any AskUserQuestion goes unanswered, note it here. Never silently default.
+
+---
+
+## Verdict (Layer 5)
+
+After all sections complete, produce a severity rollup:
+
+```
+Verdict logic:
+  blockers > 0 → NEEDS REVISION
+  blockers = 0 → APPROVED (with notes if high-leverage or polish items exist)
+```
+
+## Append-Only CEO Review Output
+
+**NEVER overwrite existing plan.md content.** Append the following block at the END of plan.md (below any existing `## MEOWKIT REVIEW REPORT` section — both coexist):
+
+```markdown
+## CEO Review ({date}, {MODE} SCOPE)
+
+**Verdict:** {APPROVED / APPROVED with notes / NEEDS REVISION}
+**Two-Lens:** Intent {PASS/WARN/FAIL}, Execution {PASS/WARN/FAIL}
+**Blockers:** {count} {list if any}
+**High-leverage:** {count} {brief list}
+**Polish:** {count}
+**Coverage:** {N}/{M} requirements mapped
+**Pre-screen:** {PASS / N gaps noted}
+```
+
+All modes (including HOLD and REDUCTION) write this block. EXPANSION/SELECTIVE additionally write the CEO plan doc to `.claude/memory/projects/ceo-plans/`.
+
+Accepted TODOs from the review are auto-written to TODOS.md with source tag `ceo-review`.
