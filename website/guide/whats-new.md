@@ -10,6 +10,10 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### v2.3.4 — Centralized Dotenv Loading (2026-04-11)
+
+Adds `.claude/.env` file support for all hooks and handlers. Shared `lib/load-dotenv.sh` sourced by 11 shell hooks; inline parser in `dispatch.cjs` for 8 Node.js handlers. No external dependencies. Shell exports always take precedence. Includes `.env.example` template with all 19 env vars. Release script decoupled from CLI package builds.
+
 ### v2.3.3 — The Wiring Integrity Release (2026-04-11)
 
 5-agent parallel red-team audit of the full MeowKit harness. Fixed 7 critical breakpoints: Gate 2 NON-NEGOTIABLE violation in fast/cost-saver modes, TDD sentinel cross-session persistence, memory system silently dead on default profile, phantom agent dispatch in cook, system-wide wrong memory paths, model-detector silent failure, and missing `meowkit.config.json`. Plus 12 high-severity fixes (budget thresholds, 6 missing agents in CLAUDE.md, 8 orphaned skills indexed, HOOKS_INDEX gaps, phantom command refs, `/harness` command created) and 30 medium/low cleanup items.

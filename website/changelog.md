@@ -5,6 +5,31 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.4 (2026-04-11) — Centralized Dotenv Loading
+
+Adds project-level `.claude/.env` support so all hooks and handlers can read `MEOWKIT_*` env vars without polluting shell profiles. Red-team verified.
+
+### Features
+
+- **Shared dotenv loader** — `lib/load-dotenv.sh` sourced by all 11 shell hooks; no `eval`, uses `printenv` for safe key checking
+- **Node.js dotenv** — inline parser in `dispatch.cjs` loads `.claude/.env` for all 8 `.cjs` handlers (zero external dependencies)
+- **`.env.example` template** — all 19 documented env vars with categories (Core, Harness, Summary, Memory, Hook Controls)
+- **Precedence rule** — shell `export` always wins over `.env` values (no-override semantics)
+
+### Architecture
+
+Each Claude Code hook runs as a **separate subprocess** — env vars exported in one hook are invisible to siblings. The fix: every hook independently sources the shared `lib/load-dotenv.sh` at startup. Node.js handlers go through `dispatch.cjs` which parses `.env` before dispatching.
+
+### Documentation
+
+- Updated `website/reference/configuration.md` with `.env` file section, setup instructions, and security notes
+- Updated env vars reference with all 19 vars across 5 categories
+
+### Release Script
+
+- **Removed** `npm -w packages/mewkit version` and `npm -w packages/create-meowkit run build` from `release.sh` — harness releases no longer trigger CLI package builds
+- Build step replaced with JSON config validation (settings.json, handlers.json, metadata.json)
+
 ## 2.3.3 (2026-04-11) — The Wiring Integrity Release
 
 5-agent parallel red-team audit of the full MeowKit harness (agents, skills, commands, hooks). Fixed 7 critical breakpoints, 12 high-severity issues, and 30 medium/low cleanup items across 25+ files.
