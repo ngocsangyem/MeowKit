@@ -10,6 +10,10 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### v2.3.3 — The Wiring Integrity Release (2026-04-11)
+
+5-agent parallel red-team audit of the full MeowKit harness. Fixed 7 critical breakpoints: Gate 2 NON-NEGOTIABLE violation in fast/cost-saver modes, TDD sentinel cross-session persistence, memory system silently dead on default profile, phantom agent dispatch in cook, system-wide wrong memory paths, model-detector silent failure, and missing `meowkit.config.json`. Plus 12 high-severity fixes (budget thresholds, 6 missing agents in CLAUDE.md, 8 orphaned skills indexed, HOOKS_INDEX gaps, phantom command refs, `/harness` command created) and 30 medium/low cleanup items.
+
 ### v2.3.2 — The Agent-Skills Integration Release (2026-04-11)
 
 Integrates correctness patterns from Anthropic's agent-skills system. Adds `core-behaviors.md` (6 mandatory operating behaviors + 10 failure modes), per-skill failure catalogs for cook/plan-creator/review, phase composition contracts in CLAUDE.md, and lifecycle routing table for skill discovery via meow:help.

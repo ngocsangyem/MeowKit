@@ -5,6 +5,54 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.3 (2026-04-11) — The Wiring Integrity Release
+
+5-agent parallel red-team audit of the full MeowKit harness (agents, skills, commands, hooks). Fixed 7 critical breakpoints, 12 high-severity issues, and 30 medium/low cleanup items across 25+ files.
+
+### Critical Fixes
+
+- **Gate 2 NON-NEGOTIABLE violation** — `fast.md` and `cost-saver.md` modes auto-approved Gate 2 without human confirmation; now require explicit human approval (WARNs auto-acknowledged)
+- **TDD sentinel persistence** — `--tdd` flag wrote sentinel to `.claude/session-state/` but session reset cleared `session-state/` at project root (different dirs); sentinel now cleared on new session
+- **Memory system dead by default** — `post-session.sh` exited on `standard` profile, disabling memory capture, cost tracking, and trace records; now runs by default, opts out only on `fast`
+- **Phantom agent dispatch** — `meow:cook` referenced 4 nonexistent agents (`fullstack-developer`, `code-reviewer`, `project-manager`, `docs-manager`); remapped to `developer`, `reviewer`, `documenter`
+- **Memory path wrong system-wide** — CLAUDE.md + 19 skills referenced `memory/` instead of `.claude/memory/`; all paths corrected
+- **Model detector silent failure** — `model-detector.cjs` guard on `ctx.hook_event_name` silently killed detection when field absent; guard removed (dispatch routing is authoritative)
+- **Config file missing** — `meowkit.config.json` referenced by 4+ consumers but never existed; created with version + features object
+
+### High-Severity Fixes
+
+- **Budget thresholds** — code defaults $10/$25, docs said $30/$100; aligned to $30/$100, implemented `MEOWKIT_BUDGET_CAP` override
+- **CLAUDE.md agents table** — added 6 missing agents (evaluator, brainstormer, researcher, journal-writer, ui-ux-designer, git-manager)
+- **8 orphaned skills** — api-design, build-fix, database, decision-framework, figma, intake, jira, verify added to SKILLS_INDEX.md
+- **HOOKS_INDEX.md** — documented 6 Node.js handlers + 5 state files that were invisible
+- **4 phantom skill refs in commands** — `/arch`, `/audit`, `/canary`, `/ship` referenced nonexistent skills; fixed to actual skill names
+- **ADR path conflict** — `/arch` command wrote to `docs/adrs/` but architect agent wrote to `docs/architecture/adr/`; unified to canonical path
+- **`/harness` command** — created missing slash command for primary green-field build entry point
+- **step-file-rules.md** — listed 2 step-file skills; updated to 5 (added evaluate, harness, trace-analyze)
+- **TURN_GAP default** — harness-rules.md said `:-5`, code was `:-30`; docs aligned to code
+
+### Medium/Low Cleanup
+
+- AGENTS_INDEX counts 15→16, Failure Behavior 10→13
+- SKILLS_INDEX: party dual-owner, docs-finder primary consumer note, skill-creator+worktree moved to Phase 0
+- Removed deprecated `meow:documentation` reference from docs-init
+- Fixed duplicate `source:` frontmatter typo in project-organization + skill-creator
+- Fixed `meow:playwright-cli` missing `meow:` prefix in name field
+- Fixed `meow:help` referencing `/meow:plan-creator` instead of `/meow:plan`
+- Added SUPERSEDED markers to replaced shell hooks
+- Fixed skill-creator bare `python3` → venv path
+- RULES_INDEX: reclassified pre-implement.sh from "Hook" to "Manual Script"
+- HOOKS_INDEX: privacy-block.sh 3rd matcher (Bash) documented, SubagentStart/Stop explained
+
+### Audit Reports
+
+5 parallel red-team reports at `plans/260411-1906-meowkit-wiring-red-team-audit/reports/`:
+- RT1: Hooks & settings wiring (2C, 4H, 5M, 5L)
+- RT2: Agents & phase routing (1C, 4H, 6M, 4L)
+- RT3: Skills Phase 0-2 + cross-cutting (1F, 7W)
+- RT4: Skills Phase 3-6 + security (4F, 9W)
+- RT5: Cross-system integrity & memory (8H, 7M, 5L)
+
 ## 2.3.2 (2026-04-11) — The Agent-Skills Integration Release
 
 Integrates correctness patterns from Anthropic's agent-skills system: 6 core operating behaviors, per-skill failure catalogs, phase composition contracts, and lifecycle-aware skill routing.
