@@ -38,7 +38,9 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 
 ### Valid subagent_type Values
 
-These are the ONLY valid names for MeowKit custom agents in `Agent(...)` calls (or `Task(...)` — kept as a back-compat alias after the v2.1.63 rename per Claude Code docs):
+#### Core Agents (Global)
+
+These are the MeowKit core agents defined in `.claude/agents/`. Available to all skills:
 
 ```
 developer, tester, reviewer, planner, documenter, analyst,
@@ -51,6 +53,30 @@ evaluator
 
 Plus Claude Code built-in types: `Explore`, `Bash`, `general-purpose`, `Plan`
 
+#### Skill-Scoped Agents (Per-Skill)
+
+Skills MAY define their own subagents when the skill requires specialized agent behavior that core agents don't cover. Skill-scoped agents live inside the skill directory:
+
+```
+.claude/skills/meow:{skill-name}/
+├── SKILL.md
+├── agents/                    # Optional: skill-scoped agent definitions
+│   ├── {agent-name}.md        # Agent definition (same format as .claude/agents/)
+│   └── ...
+└── references/
+```
+
+**Rules for skill-scoped agents:**
+- Agent definition files use the same format as `.claude/agents/*.md` (frontmatter with name, description, model, tools)
+- Skill-scoped agents are spawned via `Agent(subagent_type: "general-purpose", prompt: "...")` with the agent definition loaded into the prompt — they do NOT need to be registered in the global `.claude/agents/` directory
+- Alternatively, if the skill-scoped agent is reusable across skills, promote it to `.claude/agents/` and add it to the core agents list above
+- Skill SKILL.md must document which agents it spawns and why
+- Max 3 skill-scoped agents per skill (YAGNI — if you need more, the skill is doing too much)
+
+**When to use skill-scoped vs core agents:**
+- Use **core agents** when the agent role exists across many skills (developer, reviewer, researcher)
+- Use **skill-scoped agents** when the agent has domain-specific behavior unique to that skill (e.g., a Jira ticket analyzer, a Figma design extractor)
+
 ### Mapping Table
 
 | Wrong Name            | Correct Name                               |
@@ -61,7 +87,7 @@ Plus Claude Code built-in types: `Explore`, `Bash`, `general-purpose`, `Plan`
 | `docs-manager`        | `documenter`                               |
 | `debugger`            | `researcher` (with meow:investigate skill) |
 
-**Rule:** Before adding a Task() call, verify the `subagent_type` against the list above. If the agent doesn't exist in `.claude/agents/`, the call will fail silently or use a generic agent without specialized instructions.
+**Rule:** Before adding an Agent() call, verify the `subagent_type` against the core list above OR confirm a skill-scoped agent definition exists. If neither exists, the call will use a generic agent without specialized instructions.
 
 ---
 
