@@ -5,6 +5,62 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.9 (2026-04-12) — Memory System Hardening
+
+### Memory Loader Modularization
+
+- **refactor:** Split `memory-loader.cjs` (181 lines) into 3 focused modules: `memory-parser.cjs`, `memory-filter.cjs`, `memory-injector.cjs`
+- **refactor:** `memory-loader.cjs` is now a thin orchestrator (~55 lines)
+
+### Critical Hardening (4 CRITICAL fixes)
+
+- **security:** Tag escaping — `<memory-data>` wrapper tags in content are escaped before injection, preventing DATA boundary escape
+- **fix:** Budget split — 60% for critical entries, 40% for domain-filtered. One oversized entry no longer starves all others (`continue` not `break`)
+- **fix:** YAML validation — malformed frontmatter entries rejected with visible `[parse-errors:]` marker instead of silent fallback
+- **fix:** Per-entry caps — 3000 chars for critical (security findings preserved), 800 for standard
+
+### File Integrity (4 HIGH fixes)
+
+- **fix:** mkdir-based atomic locking for all memory file writes (POSIX portable, works on macOS where `flock` is unavailable)
+- **fix:** O_EXCL checkpoint sequence lock — prevents TOCTOU race between concurrent checkpoint writers
+- **fix:** Staleness filter — standard entries >6 months skipped (configurable via `MEOWKIT_MEMORY_STALENESS_MONTHS`). Critical entries never expire
+- **fix:** Pattern expiration — patterns older than 12 months from `lastSeen` auto-expire. Critical/security patterns exempt
+- **fix:** Cost-log append — `post-session.sh` now writes cost entries to `cost-log.json` with 1000-entry cap
+- **fix:** Shell-to-Python injection — all Python blocks in hooks now use env var passing (single-quoted heredocs), not shell interpolation
+- **fix:** Domain keyword extraction — 30+ domain keywords (`api`, `auth`, `db`, `sql`, etc.) bypass stop-word filter. Zero-keyword fallback loads all non-stale entries
+
+### New: Immediate Capture (`##prefix`)
+
+- **feat:** `##decision:`, `##pattern:`, `##note:` message prefixes auto-route to typed memory files
+- **feat:** Content validated against injection patterns before writing
+- **feat:** mkdir-based locking on all capture writes
+- **feat:** `quick-notes.md` staging area for `##note:` captures (processed during Reflect)
+
+### New: Anchored Iterative Summarization (opt-in)
+
+- **feat:** `MEOWKIT_SUMMARY_MODE=merge` enables merge-based summarization (preserves earlier context across compressions)
+- **feat:** Default remains `full-regen` (proven baseline) until merge quality is validated on real sessions
+- **feat:** `validate-content.cjs` shared injection validator for summaries and captures
+- **feat:** `merge-summary-template.md` with structured sections (Active Task, Key Decisions, File Modifications, Next Steps)
+
+### New: Project Preferences & Readiness
+
+- **feat:** `.claude/memory/preferences.md` — team-shared preferences loaded at SessionStart (project-local, not personal machine)
+- **feat:** Agent readiness banner — 5-point score (CLAUDE.md, project-context, test, lint, typecheck) shown at session start. Detects Node.js, Python, Rust, Makefile projects
+- **feat:** `meow:memory --prune` — archive old standard-severity entries to `lessons-archive.md`, recovering injection budget
+
+### Environment Variables
+
+| Variable                          | Default    | Purpose                                         |
+| --------------------------------- | ---------- | ----------------------------------------------- |
+| `MEOWKIT_MEMORY_BUDGET`           | 4000       | Total char budget for memory injection per turn |
+| `MEOWKIT_MEMORY_STALENESS_MONTHS` | 6          | Standard entries older than this are skipped    |
+| `MEOWKIT_SUMMARY_MODE`            | full-regen | `full-regen` (default) or `merge` (opt-in)      |
+
+### Red-Team Verified
+
+5 rounds of adversarial review (3 plan-level, 2 code-level) + 8-simulation end-to-end pipeline test. All findings resolved. Shell-to-Python injection vectors eliminated across 6 hook files. Budget overflow, YAML fallback, tag escape, and checkpoint TOCTOU races all fixed with evidence.
+
 ## 2.3.8 (2026-04-12) — Multimodal Resilience, MiniMax & Provider Fallback
 
 ### meow:multimodal — Multi-Provider Generation & Cost Optimization

@@ -10,6 +10,24 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### v2.3.9 — Memory System Hardening & FactoryAI Adaptation (2026-04-12)
+
+MeowKit's memory system — the backbone of cross-session learning — gets its biggest hardening since launch. Driven by a FactoryAI comparative analysis and 5 rounds of red-team review.
+
+**Modularization:** `memory-loader.cjs` split into 3 focused modules (parser, filter, injector). Each under 100 lines, independently testable.
+
+**Critical fixes:** Budget overflow (one entry starving all others), YAML silent fallback (malformed entries losing severity), tag escape (DATA boundary injection), and file locking (mkdir-based, POSIX portable — `flock` doesn't exist on macOS). Shell-to-Python injection eliminated across all hook files.
+
+**Immediate capture:** Type `##decision: chose X over Y` and it's written to `lessons.md` instantly — survives mid-session crashes. Also `##pattern:` (patterns.json) and `##note:` (quick-notes.md). All validated against injection patterns before writing.
+
+**Staleness & expiration:** Standard entries >6 months auto-skipped. Patterns expire after 12 months. Critical/security entries never expire. All thresholds configurable via env vars.
+
+**Anchored summarization (opt-in):** `MEOWKIT_SUMMARY_MODE=merge` enables merge-based compression that preserves earlier context. Default remains `full-regen` until quality is validated on real sessions.
+
+**Project readiness:** 5-point score at session start (CLAUDE.md, project-context, test, lint, typecheck). Detects Node.js, Python, Rust, Makefile projects. Team preferences via `.claude/memory/preferences.md`.
+
+**Archival:** `meow:memory --prune` moves old standard entries to `lessons-archive.md`, recovering injection budget. Critical entries exempt.
+
 ### v2.3.8 — Multimodal Resilience, MiniMax & Provider Fallback (2026-04-12)
 
 Major overhaul of `meow:multimodal` — multi-provider generation with intelligent fallback, MiniMax integration (TTS, music, Hailuo video), document conversion, and `MEOWKIT_` env var namespace.
