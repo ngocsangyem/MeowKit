@@ -13,6 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 
+// Must point to meowkit root (not parent repo) for .claude/.env resolution
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const HOOKS_DIR = path.join(ROOT, '.claude', 'hooks');
 

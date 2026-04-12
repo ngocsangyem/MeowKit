@@ -62,6 +62,7 @@ print("## find_api_key()")
 
 with patch.dict(os.environ, {}, clear=True):
     os.environ.pop('GEMINI_API_KEY', None)
+    os.environ.pop('MEOWKIT_GEMINI_API_KEY', None)
     eq(find_api_key(), None, "Returns None when key not set")
 
 with patch.dict(os.environ, {'GEMINI_API_KEY': 'AIzaTestGenKey'}):
@@ -72,9 +73,11 @@ print("\n## generate_image() — missing API key")
 
 with patch.dict(os.environ, {}, clear=True):
     os.environ.pop('GEMINI_API_KEY', None)
+    os.environ.pop('MEOWKIT_GEMINI_API_KEY', None)
     result = generate_image("A sunset", output_dir=tempfile.mkdtemp())
     eq(result['status'], 'error', "Missing key → error")
-    ok('GEMINI_API_KEY' in result['error'], "Error mentions GEMINI_API_KEY")
+    ok('GEMINI_API_KEY' in result['error'] or 'MEOWKIT_GEMINI_API_KEY' in result['error'],
+       "Error mentions API key")
 
 # ─── generate_image — imagen model success ────────────────────────────
 print("\n## generate_image() — imagen model (mocked)")
@@ -177,18 +180,20 @@ with patch.dict(os.environ, {'GEMINI_API_KEY': 'AIzaTestKey12345678901234567890'
                                 output_dir=tempfile.mkdtemp())
         eq(result['status'], 'error', "Billing error → error")
         ok('billing' in result['error'].lower(), "Error mentions billing")
-        ok('console.cloud.google.com' in result['error'], "Error includes console URL")
 
 # ─── generate_video — missing API key ─────────────────────────────────
 print("\n## generate_video() — missing API key")
 
 with patch.dict(os.environ, {}, clear=True):
     os.environ.pop('GEMINI_API_KEY', None)
+    os.environ.pop('MEOWKIT_GEMINI_API_KEY', None)
     result = generate_video("A cat", output_dir=tempfile.mkdtemp())
     eq(result['status'], 'error', "Missing key → error")
-    ok('GEMINI_API_KEY' in result['error'], "Error mentions GEMINI_API_KEY")
+    ok('GEMINI_API_KEY' in result['error'] or 'MEOWKIT_GEMINI_API_KEY' in result['error'],
+       "Error mentions API key")
 
 # ─── generate_video — billing error ───────────────────────────────────
+# generate_video lives in video_generator.py — patch that module's genai
 print("\n## generate_video() — billing error")
 
 with patch.dict(os.environ, {'GEMINI_API_KEY': 'AIzaTestKey12345678901234567890'}):
@@ -197,7 +202,7 @@ with patch.dict(os.environ, {'GEMINI_API_KEY': 'AIzaTestKey12345678901234567890'
         "Billing account not configured"
     )
 
-    with patch('gemini_generate.genai') as patched_genai:
+    with patch('video_generator.genai') as patched_genai:
         patched_genai.Client.return_value = mock_client
 
         result = generate_video("test", output_dir=tempfile.mkdtemp())
@@ -211,7 +216,7 @@ with patch.dict(os.environ, {'GEMINI_API_KEY': 'AIzaTestKey12345678901234567890'
     mock_client = MagicMock()
     mock_client.models.generate_videos.side_effect = Exception("Network timeout")
 
-    with patch('gemini_generate.genai') as patched_genai:
+    with patch('video_generator.genai') as patched_genai:
         patched_genai.Client.return_value = mock_client
 
         result = generate_video("test", output_dir=tempfile.mkdtemp())

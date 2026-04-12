@@ -5,6 +5,34 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.8 (2026-04-12) — Multimodal Resilience, MiniMax & Provider Fallback
+
+### meow:multimodal — Multi-Provider Generation & Cost Optimization
+
+- **feat:** MiniMax image generation (`image-01`)
+- **feat:** MiniMax video generation (Hailuo 2.3) with async polling
+- **feat:** MiniMax text-to-speech (`speech-2.8-hd`, 332 voices, 24 languages)
+- **feat:** MiniMax music generation (`music-2.6`)
+- **feat:** Intelligent provider router — auto-selects Gemini/MiniMax/OpenRouter by available keys
+- **feat:** `--provider` flag to force specific provider
+- **feat:** Document→Markdown converter with batch mode (`document_converter.py`)
+- **feat:** `MEOWKIT_` env var prefix with backward-compat fallback to legacy names
+- **feat:** Env-driven provider chains (`MEOWKIT_IMAGE_PROVIDER_CHAIN` etc.)
+- **feat:** OpenRouter fallback for image gen (opt-in via `MEOWKIT_OPENROUTER_FALLBACK_ENABLED=true`)
+- **feat:** API key rotation (`MEOWKIT_GEMINI_API_KEY_2/3/4`) for free-tier throughput (4x)
+- **feat:** Default image model: Nano Banana 2 (`gemini-3.1-flash-image-preview`)
+- **feat:** `--resolution low-res` flag for video analysis (62% token savings)
+- **feat:** Media pre-optimization via ffmpeg (optional, 10-20% savings)
+- **feat:** Cost estimation for video analysis in `--verbose` mode
+- **improve:** SKILL.md v2.0 restructured with evidence-based prompt design
+- **improve:** `DEFAULT_PROMPTS` request structured JSON output (~50% more token-efficient)
+- **improve:** Output truncation enforced at 6000 chars (CJK-safe)
+- **improve:** `media_resolution` defaults per modality (image=high, pdf=medium, video=low)
+- **refactor:** `gemini_analyze.py` modularized into `analyze_constants.py` + `analyze_core.py` + CLI
+- **refactor:** Shared `env_utils.py` consolidates env loading (was duplicated 4x)
+- **docs:** 5 new reference docs (image-gen, video-gen, video-analysis, minimax-gen, doc-conversion)
+- **docs:** Updated models-and-pricing with verified April 2026 pricing
+
 ## 2.3.7 (2026-04-12) — The Copy-Cat Release
 
 New `meow:chom` skill for analyzing and replicating features from external systems, repos, apps, or ideas into any project.

@@ -1,30 +1,21 @@
 # Gemini Models & Pricing Reference
 
-## Current Models (March 2026)
+## Current Models (April 2026)
 
 ### Analysis Models
 
 | Model | Use Case | Input Cost | Output Cost | Context |
 |-------|----------|-----------|-------------|---------|
-| `gemini-2.5-flash` | Default for all analysis | $0.15/1M tokens | $0.60/1M tokens | 1M tokens |
-| `gemini-2.5-pro` | Advanced reasoning | $1.25/1M tokens | $10.00/1M tokens | 1M tokens |
-| `gemini-2.5-flash-lite` | Speed/cost optimized | $0.075/1M tokens | $0.30/1M tokens | 1M tokens |
-| `gemini-3-pro-preview` | Latest, agentic | $2.00/1M (< 200k) | $12.00/1M tokens | 1M tokens |
+| `gemini-2.5-flash` | Default for all analysis | $0.30/1M tokens | $2.50/1M tokens | 1M tokens |
+| `gemini-2.5-flash-lite` | Speed/cost optimized | $0.10/1M tokens | $0.40/1M tokens | 1M tokens |
+| `gemini-3.1-pro-preview` | Advanced reasoning, agentic | $2.00/1M tokens | $12.00/1M tokens | 1M tokens |
 
 ### Generation Models
 
 | Model | Use Case | Cost | Notes |
 |-------|----------|------|-------|
-| `imagen-4.0-generate-001` | Image generation (standard) | ~$0.02/image | Requires billing |
-| `imagen-4.0-ultra-generate-001` | Image generation (quality) | ~$0.04/image | Requires billing |
-| `imagen-4.0-fast-generate-001` | Image generation (speed) | ~$0.01/image | Requires billing |
-| `gemini-2.5-flash-image` | Image gen (Nano Banana Flash) | ~$1/1M tokens | Requires billing |
-| `veo-3.1-generate-preview` | Video generation (8s clips) | Preview pricing | Requires billing |
-
-## Deprecation Schedule
-
-- Gemini 2.0 Flash: retiring June 1, 2026
-- Gemini 2.0 Flash-Lite: retiring June 1, 2026
+| `gemini-3.1-flash-image-preview` | Image gen (Nano Banana 2, **default**) | ~$0.04/image | Fast, text-in-image support |
+| `veo-3.1-generate-preview` | Video generation (8s clips) | $0.15-0.40/sec | Requires billing |
 
 ## Token Costs by Modality
 
@@ -53,13 +44,13 @@
 ## Model Selection Guide
 
 - **Simple image analysis** → `gemini-2.5-flash` (cheapest, fast)
-- **Complex visual reasoning** → `gemini-2.5-pro` (highest quality)
+- **Complex visual reasoning** → `gemini-3.1-pro-preview` (highest quality)
 - **Audio transcription** → `gemini-2.5-flash` (handles 9.5h audio)
 - **PDF extraction** → `gemini-2.5-flash` (handles 1000 pages)
-- **Image generation** → `imagen-4.0-generate-001` (production quality)
-- **Quick image gen** → `gemini-2.5-flash-image` (Nano Banana, fast)
+- **Image generation** → `gemini-3.1-flash-image-preview` (Nano Banana 2 — fast, text support)
 - **Video generation** → `veo-3.1-generate-preview` (8s clips with audio)
 
 Sources:
 - [Gemini API Models](https://ai.google.dev/gemini-api/docs/models)
 - [Gemini API Pricing](https://ai.google.dev/pricing)
+- Pricing verified 2026-04-12

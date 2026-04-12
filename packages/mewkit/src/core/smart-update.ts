@@ -1,5 +1,5 @@
 import {
-  existsSync, writeFileSync, mkdirSync,
+  existsSync, readFileSync, writeFileSync, mkdirSync,
 } from "node:fs";
 import { join } from "node:path";
 import * as log from "./core-logger.js";
@@ -163,16 +163,47 @@ export async function smartUpdate(
     stats.added++;
   }
 
-  // Write .env if Gemini API key provided
-  if (config.geminiApiKey && !existsSync(join(claudeDir, ".env"))) {
+  // Write .env with API keys (single read-modify-write cycle)
+  const envPath = join(claudeDir, ".env");
+  const hasNewKeys = config.geminiApiKey || config.externalProviderKeys;
+  if (hasNewKeys) {
+    let envContent = existsSync(envPath)
+      ? readFileSync(envPath, "utf-8")
+      : "# MeowKit environment variables\n# Never commit this file to git.\n\n";
+
+    if (config.geminiApiKey && !envContent.includes("MEOWKIT_GEMINI_API_KEY=")) {
+      envContent += `MEOWKIT_GEMINI_API_KEY=${config.geminiApiKey}\n`;
+    }
+    // Legacy migration: if GEMINI_API_KEY exists but MEOWKIT_ doesn't, add it
+    if (!config.geminiApiKey && envContent.includes("GEMINI_API_KEY=") && !envContent.includes("MEOWKIT_GEMINI_API_KEY=")) {
+      const match = envContent.match(/^GEMINI_API_KEY=(.+)$/m);
+      if (match?.[1]?.trim()) {
+        envContent += `MEOWKIT_GEMINI_API_KEY=${match[1].trim()}\n`;
+      }
+    }
+    if (config.externalProviderKeys) {
+      for (const [envVar, value] of Object.entries(config.externalProviderKeys)) {
+        if (!envContent.includes(`${envVar}=`)) {
+          envContent += `${envVar}=${value}\n`;
+        }
+      }
+    }
     if (!dryRun) {
-      writeFileSync(
-        join(claudeDir, ".env"),
-        `# MeowKit environment variables\nGEMINI_API_KEY=${config.geminiApiKey}\n`,
-        "utf-8"
-      );
+      writeFileSync(envPath, envContent, "utf-8");
     }
     stats.added++;
+
+    // Ensure .gitignore covers .claude/.env (prevents accidental commits)
+    const gitignorePath = join(targetDir, ".gitignore");
+    if (!dryRun) {
+      let gitignoreContent = existsSync(gitignorePath)
+        ? readFileSync(gitignorePath, "utf-8")
+        : "";
+      if (!gitignoreContent.includes(".claude/.env")) {
+        gitignoreContent += "\n# MeowKit secrets\n.claude/.env\n";
+        writeFileSync(gitignorePath, gitignoreContent, "utf-8");
+      }
+    }
   }
 
   // Ensure memory + logs dirs exist

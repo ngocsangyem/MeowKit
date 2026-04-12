@@ -31,23 +31,8 @@ def fail(msg): print(f"{RED}✗ {msg}{RESET}")
 def info(msg): print(f"{BLUE}ℹ {msg}{RESET}")
 
 
-def load_env_files():
-    """Load .env files in priority order."""
-    try:
-        from dotenv import load_dotenv
-    except ImportError:
-        return
-
-    script_dir = Path(__file__).parent
-    skill_dir = script_dir.parent
-    claude_dir = skill_dir.parent.parent  # .claude/
-
-    for env_path in [
-        claude_dir / '.env',
-        skill_dir / '.env',
-    ]:
-        if env_path.exists():
-            load_dotenv(env_path, override=True)
+sys.path.insert(0, str(Path(__file__).parent))
+from env_utils import _env, load_env_files
 
 
 def check_api_key():
@@ -55,12 +40,13 @@ def check_api_key():
     print(f"\n{BOLD}{BLUE}Checking API Key{RESET}")
 
     load_env_files()
-    api_key = os.getenv('GEMINI_API_KEY')
+    api_key = _env('GEMINI_API_KEY')
 
     if not api_key:
         fail("GEMINI_API_KEY not found")
-        info("Set it: export GEMINI_API_KEY='your-key'")
-        info("Or add to .env: GEMINI_API_KEY=your-key")
+        info("Set it: export MEOWKIT_GEMINI_API_KEY='your-key'")
+        info("Legacy: export GEMINI_API_KEY='your-key' (also works)")
+        info("Or add to .env: MEOWKIT_GEMINI_API_KEY=your-key")
         info("Get a key: https://aistudio.google.com/apikey")
         return None
 

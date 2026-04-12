@@ -50,6 +50,7 @@ print("## check_api_key() — missing key")
 
 with patch.dict(os.environ, {}, clear=True):
     os.environ.pop('GEMINI_API_KEY', None)
+    os.environ.pop('MEOWKIT_GEMINI_API_KEY', None)
     result = check_api_key()
     eq(result, None, "Returns None when key not set")
 
@@ -71,14 +72,16 @@ with patch.dict(os.environ, {'GEMINI_API_KEY': 'ya29.a0AfH6SMBxxxLongVertexAITok
 # ─── check_api_key — too short (invalid) ─────────────────────────────
 print("\n## check_api_key() — too short key")
 
-with patch.dict(os.environ, {'GEMINI_API_KEY': 'short'}):
+with patch.dict(os.environ, {'GEMINI_API_KEY': 'short'}, clear=True):
+    os.environ.pop('MEOWKIT_GEMINI_API_KEY', None)
     result = check_api_key()
     eq(result, None, "Rejects key that is too short")
 
 # ─── check_api_key — empty string ────────────────────────────────────
 print("\n## check_api_key() — empty string")
 
-with patch.dict(os.environ, {'GEMINI_API_KEY': ''}):
+with patch.dict(os.environ, {'GEMINI_API_KEY': ''}, clear=True):
+    os.environ.pop('MEOWKIT_GEMINI_API_KEY', None)
     result = check_api_key()
     eq(result, None, "Rejects empty string key")
 

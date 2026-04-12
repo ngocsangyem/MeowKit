@@ -8,6 +8,7 @@ export interface UserConfig {
   enableCostTracking: boolean;
   enableMemory: boolean;
   geminiApiKey: string | null;
+  externalProviderKeys?: Record<string, string>;
 }
 
 const PREFIX = "__MEOWKIT_";

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync, copyFileSync, appendFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, copyFileSync, appendFileSync, readdirSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import * as p from "@clack/prompts";
@@ -280,16 +280,26 @@ const DEFAULT_MCP = `{
 }\n`;
 
 const DEFAULT_ENV = `# MeowKit Environment Variables
-# Never commit this file to git.
+# Never commit this file to git. Shell exports take precedence.
 
-# Gemini API key (required for meow:multimodal skill)
+# Gemini (recommended — analysis, image gen, video gen)
 # Get from: https://aistudio.google.com/apikey
-GEMINI_API_KEY=
+MEOWKIT_GEMINI_API_KEY=
+
+# MiniMax (optional — TTS, music, Hailuo video, image fallback)
+# Get from: https://platform.minimax.io/
+# MEOWKIT_MINIMAX_API_KEY=
+
+# OpenRouter (optional — image gen fallback)
+# Get from: https://openrouter.ai/keys
+# MEOWKIT_OPENROUTER_API_KEY=
+# MEOWKIT_OPENROUTER_FALLBACK_ENABLED=true
 \n`;
 
 const DEFAULT_GITIGNORE = `# MeowKit
 .env
 .env.local
+.claude/.env
 .claude/memory/
 .claude/logs/
 \n`;
@@ -312,21 +322,20 @@ function setupMcp(projectDir: string): StepResult {
   return { name: "mcp", status: "pass", message: "Created .mcp.json — edit API keys inside." };
 }
 
-/** Setup .env */
+/** Setup .env in .claude/ directory */
 function setupEnv(projectDir: string): StepResult {
-  const envTarget = join(projectDir, ".env");
+  const envTarget = join(projectDir, ".claude", ".env");
 
   if (existsSync(envTarget)) {
-    return { name: "env", status: "skip", message: ".env already exists" };
+    const content = readFileSync(envTarget, "utf-8").trim();
+    if (content.length > 0) {
+      return { name: "env", status: "skip", message: ".claude/.env already exists" };
+    }
   }
 
-  const envExample = join(projectDir, ".claude", "env.example");
-  if (existsSync(envExample)) {
-    copyFileSync(envExample, envTarget);
-  } else {
-    writeFileSync(envTarget, DEFAULT_ENV, "utf-8");
-  }
-  return { name: "env", status: "pass", message: "Created .env — add your API keys." };
+  mkdirSync(join(projectDir, ".claude"), { recursive: true });
+  writeFileSync(envTarget, DEFAULT_ENV, "utf-8");
+  return { name: "env", status: "pass", message: "Created .claude/.env — add your API keys." };
 }
 
 /** Setup .gitignore with MeowKit entries */

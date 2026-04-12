@@ -200,6 +200,7 @@ print("\n## find_api_key() — missing key")
 with patch.dict(os.environ, {}, clear=True):
     # Remove GEMINI_API_KEY if present
     os.environ.pop('GEMINI_API_KEY', None)
+    os.environ.pop('MEOWKIT_GEMINI_API_KEY', None)
     result = find_api_key()
     eq(result, None, "Returns None when GEMINI_API_KEY not set")
 
@@ -216,9 +217,11 @@ print("\n## analyze_file() — error cases")
 # Missing API key
 with patch.dict(os.environ, {}, clear=True):
     os.environ.pop('GEMINI_API_KEY', None)
+    os.environ.pop('MEOWKIT_GEMINI_API_KEY', None)
     result = analyze_file('/tmp/test.png', task='analyze')
     eq(result['status'], 'error', "Missing key → error status")
-    ok('GEMINI_API_KEY' in result['error'], "Error mentions GEMINI_API_KEY")
+    ok('GEMINI_API_KEY' in result['error'] or 'MEOWKIT_GEMINI_API_KEY' in result['error'],
+       "Error mentions API key")
     ok('aistudio.google.com' in result['error'], "Error includes setup URL")
 
 # Missing file
@@ -257,7 +260,7 @@ with patch.dict(os.environ, {'GEMINI_API_KEY': 'AIzaTestKey12345678901234567890'
     mock_client = MagicMock()
     mock_client.models.generate_content.return_value = mock_response
 
-    with patch('gemini_analyze.genai') as patched_genai:
+    with patch('analyze_core.genai') as patched_genai:
         patched_genai.Client.return_value = mock_client
 
         result = analyze_file(temp_png, task='analyze')
@@ -284,7 +287,7 @@ with patch.dict(os.environ, {'GEMINI_API_KEY': 'AIzaBadKey'}):
     mock_client = MagicMock()
     mock_client.models.generate_content.side_effect = Exception("401 Unauthorized")
 
-    with patch('gemini_analyze.genai') as patched_genai:
+    with patch('analyze_core.genai') as patched_genai:
         patched_genai.Client.return_value = mock_client
 
         result = analyze_file(temp_png, task='analyze', max_retries=1)
@@ -307,7 +310,7 @@ with patch.dict(os.environ, {'GEMINI_API_KEY': 'AIzaTestKey12345678901234567890'
         "Billing account not configured for this project"
     )
 
-    with patch('gemini_analyze.genai') as patched_genai:
+    with patch('analyze_core.genai') as patched_genai:
         patched_genai.Client.return_value = mock_client
 
         result = analyze_file(temp_png, task='analyze', max_retries=1)

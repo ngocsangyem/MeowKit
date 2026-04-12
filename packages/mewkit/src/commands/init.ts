@@ -65,17 +65,17 @@ async function promptNewInstall(): Promise<UserConfig & { installDeps: boolean }
   });
   const shouldInstallDeps = p.isCancel(installDeps) ? false : installDeps;
 
+  // --- API Keys ---
   const addGeminiKey = await p.confirm({
-    message: "Add Gemini API key? (for image/video/audio analysis)",
+    message: "Add Gemini API key? (recommended — analysis, image gen, video gen)",
     initialValue: false,
   });
   cancelCheck(addGeminiKey);
 
   let geminiApiKey: string | null = null;
   if (addGeminiKey) {
-    const keyInput = await p.text({
-      message: "Enter your Gemini API key",
-      placeholder: "Get one at aistudio.google.com/apikey",
+    const keyInput = await p.password({
+      message: "Enter your Gemini API key (get one at aistudio.google.com/apikey)",
       validate(value: string) {
         if (!value || value.trim().length === 0) return "API key is required";
         if (value.trim().length < 10) return "Key too short — check aistudio.google.com/apikey";
@@ -84,7 +84,50 @@ async function promptNewInstall(): Promise<UserConfig & { installDeps: boolean }
     });
     cancelCheck(keyInput);
     geminiApiKey = typeof keyInput === "string" ? keyInput.trim() : null;
-    if (geminiApiKey) p.log.success("Gemini API key will be saved to .claude/.env");
+  }
+
+  // External provider keys (optional fallback)
+  const externalProviderKeys: Record<string, string> = {};
+
+  const EXTERNAL_PROVIDERS = [
+    { id: "minimax", name: "MiniMax", description: "TTS (332 voices), music, Hailuo video, image fallback", envVar: "MEOWKIT_MINIMAX_API_KEY", setupUrl: "platform.minimax.io", extraEnvVars: {} as Record<string, string> },
+    { id: "openrouter", name: "OpenRouter", description: "Image gen fallback (Flux models)", envVar: "MEOWKIT_OPENROUTER_API_KEY", setupUrl: "openrouter.ai/keys", extraEnvVars: { MEOWKIT_OPENROUTER_FALLBACK_ENABLED: "true" } },
+  ];
+
+  const addFallback = await p.confirm({
+    message: "Add fallback API keys for external providers? (optional)",
+    initialValue: false,
+  });
+
+  if (addFallback && !p.isCancel(addFallback)) {
+    const choices = await p.multiselect({
+      message: "Select external providers:",
+      options: EXTERNAL_PROVIDERS.map((prov) => ({
+        value: prov.id,
+        label: prov.name,
+        hint: prov.description,
+      })),
+      required: false,
+    });
+
+    if (!p.isCancel(choices)) {
+      for (const providerId of choices as string[]) {
+        const provider = EXTERNAL_PROVIDERS.find((pr) => pr.id === providerId);
+        if (!provider) continue;
+        const keyInput = await p.password({
+          message: `Enter your ${provider.name} API key (get one at ${provider.setupUrl})`,
+          validate(value: string) {
+            if (!value || value.trim().length === 0) return "API key is required";
+            return undefined;
+          },
+        });
+        if (p.isCancel(keyInput)) continue;
+        externalProviderKeys[provider.envVar] = String(keyInput).trim();
+        for (const [k, v] of Object.entries(provider.extraEnvVars)) {
+          externalProviderKeys[k] = v;
+        }
+      }
+    }
   }
 
   return {
@@ -92,6 +135,7 @@ async function promptNewInstall(): Promise<UserConfig & { installDeps: boolean }
     enableCostTracking: true,
     enableMemory: true,
     geminiApiKey,
+    externalProviderKeys: Object.keys(externalProviderKeys).length > 0 ? externalProviderKeys : undefined,
     installDeps: shouldInstallDeps,
   };
 }
@@ -216,6 +260,12 @@ export async function init(args: InitArgs): Promise<void> {
     updateSpinner.start("Applying files...");
     const stats = await smartUpdate(config, sourceDir, targetDir, dryRun, force);
     updateSpinner.stop(`Applied: ${stats.added} added, ${stats.updated} updated, ${stats.skipped} skipped`);
+
+    // Security confirmation for API keys
+    const hasAnyKey = config.geminiApiKey || config.externalProviderKeys;
+    if (hasAnyKey && !dryRun) {
+      p.log.success("API keys saved to .claude/.env (local only — never committed to git)");
+    }
 
     // Step 6: Validate (skip dry-run)
     if (!dryRun) {

@@ -1,76 +1,92 @@
 ---
 title: "meow:multimodal"
-description: "Image, video, audio, and document analysis via Gemini API with script-driven processing and context budget management."
+description: "Multi-provider media analysis and generation via Gemini, MiniMax, and OpenRouter with intelligent fallback."
 ---
 
 # meow:multimodal
 
-Image, video, audio, and document analysis via Gemini API with script-driven processing and context budget management.
+Multi-provider media processing: analyze images/video/audio/PDFs, generate images/videos/speech/music, convert documents to Markdown. Intelligent provider fallback (Gemini → MiniMax → OpenRouter), all configurable via `.env`.
 
 ## What This Skill Does
 
-Claude can't natively process binary media files — images, video, audio, PDFs. `meow:multimodal` bridges this gap by sending files to Google Gemini's multimodal API and returning structured analysis. Python scripts handle the API calls, file uploads, and response parsing. Claude only reviews the final analysis. The skill also supports image generation (Imagen 4) and video generation (Veo 3).
+Claude can't natively process binary media files. `meow:multimodal` bridges this gap with Python scripts that call Gemini and MiniMax APIs. Provider routing is automatic — set API keys, the router picks the best available. TTS and music generation are MiniMax-exclusive capabilities.
 
 ## Core Capabilities
 
-- **Analysis** — Screenshot description, mockup analysis, audio transcription, video scene detection, PDF text extraction, OCR
-- **Generation** — Image creation via Imagen 4, video creation via Veo 3.1
-- **Smart model selection** — `gemini-2.5-flash` for analysis (cost-effective), `imagen-4.0-generate-001` for images, `veo-3.1-generate-preview` for video
-- **Size handling** — Files <20MB inline, >20MB via File API (up to 2GB)
-- **Audio splitting guidance** — For transcripts >15 min, recommends splitting to avoid truncation
-- **Context budget** — 3000 tokens inline max. Overflow to `.claude/memory/multimodal-cache/`
+- **Analysis** — screenshot description, audio transcription, video scene detection, PDF extraction, OCR
+- **Image generation** — Nano Banana 2 (Gemini), image-01 (MiniMax), Flux (OpenRouter)
+- **Video generation** — Veo 3.1 (Gemini), Hailuo 2.3 (MiniMax)
+- **Text-to-Speech** — MiniMax speech-2.8 (332 voices, 24 languages)
+- **Music generation** — MiniMax music-2.6 (lyrics + prompt)
+- **Document conversion** — PDF/DOCX/images → clean Markdown with batch mode
+- **Provider resilience** — auto-fallback chain, API key rotation, cost estimation
+- **Structured output** — JSON-shaped analysis (~50% more token-efficient)
 
-::: warning Requires GEMINI_API_KEY
-This skill requires a Google Gemini API key. Get one at [aistudio.google.com/apikey](https://aistudio.google.com/apikey). The skill will stop immediately if the key is missing — it never attempts an API call without it.
+::: warning API Keys Required
+- **Gemini:** `MEOWKIT_GEMINI_API_KEY` (or legacy `GEMINI_API_KEY`) — [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+- **MiniMax (optional):** `MEOWKIT_MINIMAX_API_KEY` — [platform.minimax.io](https://platform.minimax.io/)
+- **OpenRouter (optional):** `MEOWKIT_OPENROUTER_API_KEY` + `MEOWKIT_OPENROUTER_FALLBACK_ENABLED=true`
 :::
 
-## When to Use This
+## Provider Router
 
-::: tip Use meow:multimodal when...
-- You need to analyze a screenshot, mockup, or diagram
-- You need to transcribe a meeting recording or podcast
-- You need to extract text from a PDF or scanned document
-- You need to generate an image or video from a description
-:::
+Auto-selects best available provider based on API keys in `.env`:
 
-## Usage
+| Task | Default Chain | Override Env Var |
+|------|--------------|-----------------|
+| Image gen | Gemini → MiniMax → OpenRouter | `MEOWKIT_IMAGE_PROVIDER_CHAIN` |
+| Video gen | Gemini → MiniMax | `MEOWKIT_VIDEO_PROVIDER_CHAIN` |
+| TTS | MiniMax only | `MEOWKIT_SPEECH_PROVIDER_CHAIN` |
+| Music | MiniMax only | `MEOWKIT_MUSIC_PROVIDER_CHAIN` |
 
-```bash
-# Analyze an image
-/meow:multimodal screenshot.png analyze
+Force a specific provider: `--provider gemini|minimax|openrouter`
 
-# Transcribe audio
-/meow:multimodal meeting.mp3 transcribe
+## Cost Optimization
 
-# Extract text from PDF
-/meow:multimodal document.pdf extract
+| Feature | Savings | How |
+|---------|---------|-----|
+| `--resolution low-res` | 62% on video | Reduces tokens from 263/sec to 100/sec |
+| Media pre-compression | 10-20% on large files | Auto-compresses >15MB if ffmpeg available |
+| API key rotation | 4x throughput | Rotates `MEOWKIT_GEMINI_API_KEY_2/3/4` on rate limits |
+| Structured JSON output | ~50% | JSON prompts vs narrative text |
 
-# Generate an image
-/meow:multimodal --generate "sunset over mountains"
-```
+## Environment Variables
 
-## Example Prompts
+| Variable | Required | Description |
+|----------|----------|-------------|
+| **API Keys** | | |
+| `MEOWKIT_GEMINI_API_KEY` | Yes (for Gemini) | Falls back to `GEMINI_API_KEY` |
+| `MEOWKIT_GEMINI_API_KEY_2`, `_3`, `_4` | No | Additional keys for rotation |
+| `MEOWKIT_MINIMAX_API_KEY` | Yes (for MiniMax) | Image/video/TTS/music generation |
+| `MEOWKIT_OPENROUTER_API_KEY` | No | Image gen fallback |
+| `MEOWKIT_OPENROUTER_FALLBACK_ENABLED` | No | Must be `true` to enable |
+| **Provider Chains** | | |
+| `MEOWKIT_IMAGE_PROVIDER_CHAIN` | No | Default: `gemini,minimax,openrouter` |
+| `MEOWKIT_VIDEO_PROVIDER_CHAIN` | No | Default: `gemini,minimax` |
+| `MEOWKIT_SPEECH_PROVIDER_CHAIN` | No | Default: `minimax` |
+| `MEOWKIT_MUSIC_PROVIDER_CHAIN` | No | Default: `minimax` |
+| **Model Overrides** | | |
+| `MEOWKIT_IMAGE_GEN_MODEL` | No | Default: `gemini-3.1-flash-image-preview` |
+| `MEOWKIT_VIDEO_GEN_MODEL` | No | Default: `veo-3.1-generate-preview` |
+| `MEOWKIT_MINIMAX_IMAGE_MODEL` | No | Default: `image-01` |
+| `MEOWKIT_MINIMAX_VIDEO_MODEL` | No | Default: `MiniMax-Hailuo-2.3` |
+| `MEOWKIT_MINIMAX_SPEECH_MODEL` | No | Default: `speech-2.8-hd` |
+| `MEOWKIT_MINIMAX_MUSIC_MODEL` | No | Default: `music-2.6` |
+| `MEOWKIT_MINIMAX_SPEECH_VOICE` | No | Default: `Wise_Woman` |
 
-| Prompt | Model used | Output |
-|--------|-----------|--------|
-| `analyze this screenshot` + image path | gemini-2.5-flash | Structured description of UI elements |
-| `transcribe this meeting` + audio path | gemini-2.5-flash | Timestamped transcript `[HH:MM:SS]` |
-| `extract text from this PDF` + PDF path | gemini-2.5-flash | Markdown-formatted content |
-| `generate image of a logo` | imagen-4.0-generate-001 | Generated PNG file |
+## Gotchas
 
-## Quick Workflow
-
-```
-File path → API Key Check (STOP if missing)
-  → Detect modality (image/video/audio/PDF)
-  → Check file size (inline <20MB, File API >20MB)
-  → Select model → Execute Python script
-  → Budget check (≤3000 tokens inline, else write to cache)
-  → Return structured analysis
-```
+- **Audio >15 min**: Gemini truncates silently. Split into chunks first.
+- **PDF >100 pages**: Quality degrades. Process in 20-page chunks.
+- **Video cost**: ~263 tokens/sec at default resolution. Use `--verbose` for cost estimate.
+- **Image gen requires billing**: Free tier = no gen. MiniMax/OpenRouter as fallback.
+- **MiniMax video timeout**: Hailuo takes 60-180s. Max 600s poll timeout.
+- **TTS voices**: 332 system voices across 24 languages. Default: `Wise_Woman`.
+- **Text in images**: Nano Banana 2 supports text rendering in images.
+- **Temperature**: Keep Gemini at 1.0. Lowering causes degraded output.
 
 ::: info Skill Details
-**Phase:** any
+**Phase:** any · **Version:** 2.3.8
 :::
 
 ## Related
