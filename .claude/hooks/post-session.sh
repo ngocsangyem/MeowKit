@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # post-session.sh — Capture session data to memory after session ends.
 # Usage: post-session.sh
 
@@ -47,7 +47,29 @@ case "$RECENT_MESSAGES" in
   *critical*|*security*|*vuln*|*cve*|*hotfix*) PRIORITY_TAG=" CRITICAL" ;;
 esac
 
+# mkdir-based atomic lock (POSIX portable — flock does not exist on macOS)
+LOCKDIR="$MEMORY_DIR/.lessons.lock"
+acquire_lock() {
+  local _timeout=5
+  while [ "$_timeout" -gt 0 ]; do
+    if mkdir "$LOCKDIR" 2>/dev/null; then
+      trap 'rmdir "$LOCKDIR" 2>/dev/null' EXIT
+      return 0
+    fi
+    # Stale lock detection (>60 seconds old)
+    if [ -d "$LOCKDIR" ]; then
+      local _lock_age
+      _lock_age=$(( $(date +%s) - $(stat -f %m "$LOCKDIR" 2>/dev/null || stat -c %Y "$LOCKDIR" 2>/dev/null || echo 0) ))
+      if [ "$_lock_age" -gt 60 ]; then rmdir "$LOCKDIR" 2>/dev/null; continue; fi
+    fi
+    sleep 1
+    _timeout=$((_timeout - 1))
+  done
+  return 1
+}
+
 # Append machine-readable session marker for Phase 0 retroactive capture
+acquire_lock || { echo "lock timeout on lessons.md" >&2; }
 cat >> "$MEMORY_DIR/lessons.md" << EOF
 
 ## Session $TIMESTAMP — NEEDS_CAPTURE${PRIORITY_TAG}
@@ -71,6 +93,26 @@ fi
 # Initialize cost-log.json if missing
 if [ ! -f "$MEMORY_DIR/cost-log.json" ]; then
   echo "[]" > "$MEMORY_DIR/cost-log.json"
+fi
+
+# Append cost entry from budget-state (values passed via env vars to avoid shell-to-Python injection)
+BUDGET_STATE_FILE="session-state/budget-state.json"
+if [ -f "$BUDGET_STATE_FILE" ] && command -v python3 >/dev/null 2>&1; then
+  _BUDGET_FILE="$BUDGET_STATE_FILE" _COST_LOG="$MEMORY_DIR/cost-log.json" _TIMESTAMP="$TIMESTAMP" python3 -c '
+import json, os
+budget_file = os.environ["_BUDGET_FILE"]
+cost_log = os.environ["_COST_LOG"]
+timestamp = os.environ["_TIMESTAMP"]
+try:
+    with open(budget_file) as f: b = json.load(f)
+    with open(cost_log) as f: logs = json.load(f)
+    logs.append({"date": timestamp, "cost_usd": b.get("estimated_cost_usd", 0),
+        "tokens_in": b.get("estimated_input_tokens", 0), "tokens_out": b.get("estimated_output_tokens", 0)})
+    if len(logs) > 1000: logs = logs[-1000:]
+    with open(cost_log, "w") as f: json.dump(logs, f, indent=2)
+except Exception:
+    pass
+' 2>/dev/null || true
 fi
 
 # Phase 6 extension (260408): detect model version change → flag dead-weight audit needed.

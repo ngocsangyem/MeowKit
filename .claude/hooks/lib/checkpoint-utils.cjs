@@ -1,5 +1,6 @@
 // checkpoint-utils.cjs — Shared utilities for checkpoint handlers.
 // Used by checkpoint-writer.cjs, auto-checkpoint.cjs, orientation-ritual.cjs.
+// Uses O_EXCL atomic lock to prevent TOCTOU race between concurrent callers.
 
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -9,17 +10,39 @@ const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const CHECKPOINT_DIR = path.join(ROOT, 'session-state', 'checkpoints');
 const LATEST_FILE = path.join(CHECKPOINT_DIR, 'checkpoint-latest.json');
 
-// Derive next sequence from directory listing (TOCTOU-safe)
+// Serialized via O_EXCL lock file — prevents TOCTOU race between concurrent callers
 function nextSequence() {
+  const seqFile = path.join(CHECKPOINT_DIR, '.next-seq');
+  const lockFile = path.join(CHECKPOINT_DIR, '.seq.lock');
+
+  fs.mkdirSync(CHECKPOINT_DIR, { recursive: true });
+
+  let fd;
   try {
-    const files = fs.readdirSync(CHECKPOINT_DIR)
-      .filter((f) => /^checkpoint-\d{3}\.json$/.test(f))
-      .sort();
-    if (files.length === 0) return 1;
-    const last = files[files.length - 1];
-    return parseInt(last.match(/(\d{3})/)[1], 10) + 1;
-  } catch {
-    return 1;
+    fd = fs.openSync(lockFile, 'wx'); // O_CREAT | O_EXCL — atomic, fails if exists
+  } catch (e) {
+    if (e.code === 'EEXIST') {
+      try {
+        const stat = fs.statSync(lockFile);
+        if (Date.now() - stat.mtimeMs > 60000) {
+          fs.unlinkSync(lockFile);
+          return nextSequence(); // retry once after stale lock cleanup
+        }
+      } catch { /* stat failed — lock may already be gone */ }
+      return null; // lock held by another process — caller should skip
+    }
+    throw e;
+  }
+
+  try {
+    let current = 0;
+    try { current = parseInt(fs.readFileSync(seqFile, 'utf8'), 10) || 0; } catch { /* first run */ }
+    const next = current + 1;
+    fs.writeFileSync(seqFile, String(next));
+    return next;
+  } finally {
+    fs.closeSync(fd);
+    try { fs.unlinkSync(lockFile); } catch { /* cleanup best-effort */ }
   }
 }
 
@@ -50,11 +73,10 @@ function gitStatus() {
     }).toString().trim();
     return { clean: output.length === 0, changes: output.split('\n').filter(Boolean).length };
   } catch {
-    return { clean: null, changes: null }; // Unknown — not falsely clean
+    return { clean: null, changes: null };
   }
 }
 
-// Write checkpoint file + update latest pointer (atomic)
 function writeCheckpoint(checkpoint, seq) {
   fs.mkdirSync(CHECKPOINT_DIR, { recursive: true });
   const seqStr = String(seq).padStart(3, '0');
@@ -69,7 +91,6 @@ function writeCheckpoint(checkpoint, seq) {
   fs.renameSync(latestTmp, LATEST_FILE);
 }
 
-// Validate checkpoint filename format
 function isValidCheckpointFile(filename) {
   return /^checkpoint-\d{3}\.json$/.test(filename);
 }

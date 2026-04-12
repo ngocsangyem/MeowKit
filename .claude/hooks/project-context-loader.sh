@@ -139,3 +139,65 @@ elif [ -f Cargo.toml ]; then
 else
   echo "  (no recognized manifest)"
 fi
+
+# ═══════════════════════════════════════════════════════════════════
+# Personal preferences injection
+# ═══════════════════════════════════════════════════════════════════
+PREFS_FILE=".claude/memory/preferences.md"
+if [ -f "$PREFS_FILE" ]; then
+  echo ""
+  echo "## Personal Preferences"
+  echo "<preferences-data>"
+  head -c 4096 "$PREFS_FILE"
+  echo ""
+  echo "</preferences-data>"
+  echo ""
+  echo "Note: Project rules in .claude/rules/ override personal preferences."
+fi
+
+# ═══════════════════════════════════════════════════════════════════
+# Agent readiness check — advisory banner
+# ═══════════════════════════════════════════════════════════════════
+READY_SCORE=0
+READY_MAX=5
+READY_MISSING=""
+
+if [ -f "CLAUDE.md" ] || [ -f ".claude/CLAUDE.md" ]; then
+  READY_SCORE=$((READY_SCORE + 1))
+else
+  READY_MISSING="${READY_MISSING} CLAUDE.md"
+fi
+
+if [ -f "docs/project-context.md" ]; then
+  READY_SCORE=$((READY_SCORE + 1))
+else
+  READY_MISSING="${READY_MISSING} project-context"
+fi
+
+# Detect test/lint/typecheck across project types
+HAS_TEST=0 HAS_LINT=0 HAS_TYPECHECK=0
+if [ -f "package.json" ]; then
+  grep -q '"test"' package.json 2>/dev/null && HAS_TEST=1
+  grep -q '"lint"' package.json 2>/dev/null && HAS_LINT=1
+  grep -qE '"typecheck"|"tsc"' package.json 2>/dev/null && HAS_TYPECHECK=1
+elif [ -f "pyproject.toml" ]; then
+  grep -qE 'pytest|unittest' pyproject.toml 2>/dev/null && HAS_TEST=1
+  grep -qE 'ruff|flake8|pylint' pyproject.toml 2>/dev/null && HAS_LINT=1
+  grep -qE 'mypy|pyright' pyproject.toml 2>/dev/null && HAS_TYPECHECK=1
+elif [ -f "Makefile" ]; then
+  grep -q 'test:' Makefile 2>/dev/null && HAS_TEST=1
+  grep -q 'lint:' Makefile 2>/dev/null && HAS_LINT=1
+elif [ -f "Cargo.toml" ]; then
+  HAS_TEST=1  # cargo test is built-in
+  command -v clippy >/dev/null 2>&1 && HAS_LINT=1
+fi
+
+[ "$HAS_TEST" -eq 1 ] && READY_SCORE=$((READY_SCORE + 1)) || READY_MISSING="${READY_MISSING} test-cmd"
+[ "$HAS_LINT" -eq 1 ] && READY_SCORE=$((READY_SCORE + 1)) || READY_MISSING="${READY_MISSING} lint-cmd"
+[ "$HAS_TYPECHECK" -eq 1 ] && READY_SCORE=$((READY_SCORE + 1)) || READY_MISSING="${READY_MISSING} typecheck"
+
+echo ""
+echo "## Agent Readiness: ${READY_SCORE}/${READY_MAX}"
+if [ -n "$READY_MISSING" ]; then
+  echo "Missing:${READY_MISSING}"
+fi

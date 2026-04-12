@@ -26,6 +26,40 @@ Operates in **Phase 0 (Orient)** and **Phase 6 (Reflect)**. Output supports the 
 | **[cost-tracking.md](./references/cost-tracking.md)** | Phase 0, 6 | Token usage tracking, cost reporting, budget alerts |
 | **[consolidation.md](./references/consolidation.md)** | Manual | Prune stale entries, merge duplicates, archive cost data (run when memory grows large) |
 
+## Subcommands
+
+### `--prune`
+
+Archive old standard-severity entries from lessons.md to lessons-archive.md.
+
+**What gets pruned:**
+- Entries with `status: captured` AND `severity: standard` AND `date` older than threshold (default: 90 days)
+
+**What is exempt:**
+- `severity: critical` or `severity: security` — never pruned regardless of age
+- `status: NEEDS_CAPTURE` — not yet processed, keep for next session
+- `status: live-captured` with `date` < threshold — recently captured, keep
+
+**How to run:**
+```
+/meow:memory --prune              # default 90-day threshold
+/meow:memory --prune --days 180   # custom threshold
+/meow:memory --prune --dry-run    # show what would be archived without moving
+```
+
+**Mechanism:**
+1. Read lessons.md, parse entries via memory-parser.cjs schema
+2. Identify entries matching prune criteria
+3. Append matched entries to `.claude/memory/lessons-archive.md`
+4. Remove matched entries from lessons.md (rewrite without them)
+5. Report: "Archived N entries, recovered ~X chars of injection budget"
+
+**Recovery:** Copy entries from lessons-archive.md back to lessons.md to reactivate.
+
+### `--capture-all`
+
+Override marker limits — process all NEEDS_CAPTURE markers regardless of age or count.
+
 ## Schema Notes
 
 `patterns.json` entries now support optional fields: `category` (pattern/decision/failure), `severity` (critical/standard), `applicable_when` (condition sentence). Existing entries without these fields remain valid — `severity` defaults to `standard` during extraction.

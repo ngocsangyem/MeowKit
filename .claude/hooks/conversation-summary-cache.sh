@@ -69,15 +69,15 @@ inject_summary() {
 
   # Read frontmatter session_id; if empty/mismatch, skip
   if [ -n "$PY" ]; then
-    CACHED_SID=$("$PY" -c "
-import sys, re
+    CACHED_SID=$(_MK_CACHE="$CACHE" "$PY" -c '
+import os, re
 try:
-    text = open('$CACHE').read()
-    m = re.search(r'^session_id:\s*\"?([^\"\n]*)\"?', text, re.M)
-    print((m.group(1) if m else '').strip())
+    text = open(os.environ["_MK_CACHE"]).read()
+    m = re.search(r"^session_id:\s*\"?([^\"\n]*)\"?", text, re.M)
+    print((m.group(1) if m else "").strip())
 except Exception:
-    print('')
-" 2>/dev/null)
+    print("")
+' 2>/dev/null)
   else
     CACHED_SID=$(grep -E '^session_id:' "$CACHE" 2>/dev/null | sed -E 's/^session_id:[[:space:]]*"?([^"]*)"?.*/\1/')
   fi
@@ -95,23 +95,23 @@ except Exception:
   # Strip frontmatter + the "# Conversation Summary" title line, emit body capped at 4096 bytes.
   # m4 fix: the injection wrapper already serves as the title → avoid double headings.
   if [ -n "$PY" ]; then
-    BODY=$("$PY" -c "
-import re
+    BODY=$(_MK_CACHE="$CACHE" "$PY" -c '
+import os, re
 try:
-    text = open('$CACHE').read()
-    if text.startswith('---'):
-        parts = text.split('---', 2)
+    text = open(os.environ["_MK_CACHE"]).read()
+    if text.startswith("---"):
+        parts = text.split("---", 2)
         body = parts[2] if len(parts) >= 3 else text
     else:
         body = text
-    body = re.sub(r'^\s*#\s*Conversation Summary\s*\n', '', body, count=1)
+    body = re.sub(r"^\s*#\s*Conversation Summary\s*\n", "", body, count=1)
     body = body.strip()
-    if len(body.encode('utf-8')) > 4096:
-        body = body.encode('utf-8')[:4096].decode('utf-8', errors='ignore')
+    if len(body.encode("utf-8")) > 4096:
+        body = body.encode("utf-8")[:4096].decode("utf-8", errors="ignore")
     print(body)
 except Exception:
     pass
-" 2>/dev/null)
+' 2>/dev/null)
   else
     BODY=$(awk 'BEGIN{fm=0} /^---$/{fm++; next} fm>=2 && !/^#[[:space:]]+Conversation Summary/{print}' "$CACHE" | head -c 4096)
   fi
@@ -148,19 +148,19 @@ summarize_transcript() {
   LAST_SIZE=0
   LAST_SUMMARIES=0
   if [ -f "$CACHE" ] && [ -n "$PY" ]; then
-    eval "$("$PY" -c "
-import re
+    eval "$(_MK_CACHE="$CACHE" "$PY" -c '
+import os, re
 try:
-    t = open('$CACHE').read()
-    def grab(k, d='0'):
-        m = re.search(r'^' + k + r':\s*([^\n]+)', t, re.M)
-        return (m.group(1).strip().strip('\"') if m else d) or d
-    print('LAST_EVENTS=' + grab('event_count'))
-    print('LAST_SIZE=' + grab('transcript_size_bytes'))
-    print('LAST_SUMMARIES=' + grab('summaries'))
+    t = open(os.environ["_MK_CACHE"]).read()
+    def grab(k, d="0"):
+        m = re.search(r"^" + k + r":\s*([^\n]+)", t, re.M)
+        return (m.group(1).strip().strip("\"") if m else d) or d
+    print("LAST_EVENTS=" + grab("event_count"))
+    print("LAST_SIZE=" + grab("transcript_size_bytes"))
+    print("LAST_SUMMARIES=" + grab("summaries"))
 except Exception:
     pass
-" 2>/dev/null)"
+' 2>/dev/null)"
   fi
 
   # M4 fix: transcript is JSONL — each line is an EVENT (tool call, tool result,
@@ -210,29 +210,48 @@ except Exception:
   NEW_SUMMARIES=$(( LAST_SUMMARIES + 1 ))
   BUDGET="${MEOWKIT_SUMMARY_BUDGET_SEC:-180}"
   SCRUB_LIB="$PROJECT_DIR/.claude/hooks/lib/secret-scrub.sh"
+  SUMMARY_MODE="${MEOWKIT_SUMMARY_MODE:-full-regen}"
+  MERGE_TEMPLATE="$PROJECT_DIR/.claude/hooks/references/merge-summary-template.md"
+  VALIDATE_LIB="$PROJECT_DIR/.claude/hooks/lib/validate-content.cjs"
 
-  # C1 fix: write the worker body to a self-deleting tempfile, then launch it via
-  # `nohup bash $tmpfile &` + `disown`. nohup makes the worker SIGHUP-immune;
-  # detached stdio plus disown removes it from this shell's job table.
-  # macOS has no `setsid`; nohup is the strongest portable POSIX detach primitive.
+  # Determine if merge mode is viable: need existing summary for this session
+  USE_MERGE=0
+  if [ "$SUMMARY_MODE" = "merge" ] && [ -f "$CACHE" ] && [ "$LAST_SUMMARIES" -gt 0 ]; then
+    if [ -f "$MERGE_TEMPLATE" ] && grep -q "session_id: \"$SESSION_ID\"" "$CACHE" 2>/dev/null; then
+      USE_MERGE=1
+      dbg "merge mode: existing summary found (summaries=$LAST_SUMMARIES)"
+    fi
+  fi
+
   WORKER_SCRIPT=$(mktemp -t mk-summary-worker.XXXXXX) || exit 0
 
-  # Use a heredoc with NO variable expansion (quoted EOF) to avoid double-expansion;
-  # then sed-substitute the few values the worker needs. Cleaner than escaping $.
   cat > "$WORKER_SCRIPT" << 'WORKER_EOF'
 #!/bin/bash
-# Detached worker for conversation-summary-cache.sh — writes summary, removes lock,
-# self-deletes the script file. Runs disconnected from parent shell via nohup.
 set -u
 trap 'rm -f "__LOCK__" "$0"' EXIT
 
 INPUT_FILE=$(mktemp -t mk-summary-in.XXXXXX) || exit 0
 OUT_FILE=$(mktemp -t mk-summary-out.XXXXXX) || exit 0
 
-{
-  cat "__TEMPLATE__"
-  tail -n 300 "__TRANSCRIPT__"
-} > "$INPUT_FILE" 2>/dev/null
+if [ "__USE_MERGE__" = "1" ]; then
+  # Anchored iterative: compose from merge template + existing body + new turns
+  {
+    cat "__MERGE_TEMPLATE__"
+    # Extract existing summary body (strip YAML frontmatter)
+    awk 'BEGIN{c=0} /^---$/{c++; if(c==2){found=1; next}} found{print}' "__CACHE__" 2>/dev/null
+    echo ""
+    echo "=== NEW TURNS ==="
+    tail -n +"__LAST_EVENTS__" "__TRANSCRIPT__" | tail -n 300
+    echo ""
+    echo "=== MERGED SUMMARY ==="
+  } > "$INPUT_FILE" 2>/dev/null
+else
+  # Full regeneration (first summary or fallback)
+  {
+    cat "__TEMPLATE__"
+    tail -n 300 "__TRANSCRIPT__"
+  } > "$INPUT_FILE" 2>/dev/null
+fi
 
 # Bound the claude -p call (no `timeout` cmd on bare macOS).
 claude -p --model haiku < "$INPUT_FILE" > "$OUT_FILE" 2>/dev/null &
@@ -258,6 +277,17 @@ fi
 RAW=$(cat "$OUT_FILE")
 rm -f "$OUT_FILE"
 CLEAN=$(scrub_secrets "$RAW")
+
+# Content validation — reject summaries with injection patterns
+if command -v node >/dev/null 2>&1 && [ -f "__VALIDATE_LIB__" ]; then
+  if ! echo "$CLEAN" | node -e "
+    const {validateContent}=require('__VALIDATE_LIB__');
+    let t='';process.stdin.on('data',d=>t+=d);
+    process.stdin.on('end',()=>{const r=validateContent(t);process.exit(r.valid?0:1);});
+  " 2>/dev/null; then
+    exit 0
+  fi
+fi
 
 # Cap body at 10KB
 if [ "${#CLEAN}" -gt 10240 ]; then
@@ -295,6 +325,10 @@ WORKER_EOF
     -e "s|__CURRENT_EVENTS__|$CURRENT_EVENTS|g" \
     -e "s|__SIZE__|$SIZE|g" \
     -e "s|__NEW_SUMMARIES__|$NEW_SUMMARIES|g" \
+    -e "s|__USE_MERGE__|$USE_MERGE|g" \
+    -e "s|__MERGE_TEMPLATE__|$MERGE_TEMPLATE|g" \
+    -e "s|__LAST_EVENTS__|$LAST_EVENTS|g" \
+    -e "s|__VALIDATE_LIB__|$VALIDATE_LIB|g" \
     "$WORKER_SCRIPT" 2>/dev/null || { rm -f "$WORKER_SCRIPT" "$WORKER_SCRIPT.bak"; exit 0; }
   rm -f "$WORKER_SCRIPT.bak"
 
