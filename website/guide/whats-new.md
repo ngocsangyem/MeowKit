@@ -10,6 +10,26 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### v2.3.8 — Multimodal Resilience, MiniMax & Provider Fallback (2026-04-12)
+
+Major overhaul of `meow:multimodal` — multi-provider generation with intelligent fallback, MiniMax integration (TTS, music, Hailuo video), document conversion, and `MEOWKIT_` env var namespace.
+
+**Multi-provider generation:** Intelligent provider router auto-selects Gemini → MiniMax → OpenRouter based on available API keys. Override with `--provider` flag. Chain order configurable via `MEOWKIT_IMAGE_PROVIDER_CHAIN` etc.
+
+**MiniMax integration:** Image gen (`image-01`), video gen (Hailuo 2.3 with async polling), text-to-speech (`speech-2.8-hd`, 332 voices, 24 languages), music gen (`music-2.6`). All via stdlib `urllib` — no new pip dependencies.
+
+**Document converter:** `document_converter.py` converts PDFs, DOCX, images to clean Markdown with batch mode. Output: `{stem}_{ext}.md` per file.
+
+**MEOWKIT_ env prefix:** All env vars now use `MEOWKIT_` namespace with backward-compat fallback to legacy names. Shared `env_utils.py` consolidates env loading (was duplicated 4x). `_env()` strips whitespace, returns None for blank values.
+
+**Cost optimization:** `--resolution low-res` (62% video savings), ffmpeg pre-compression, verified pricing ($0.30/1M for gemini-2.5-flash), structured JSON prompts (~50% more token-efficient), output truncation at 6000 chars (CJK-safe).
+
+**Modularization:** `gemini_analyze.py` (411 lines) split into `analyze_constants.py` (121) + `analyze_core.py` (189) + CLI wrapper (85). All files under 200 lines. 8 reference docs.
+
+**CLI update:** `meowkit init` now prompts for Gemini + optional fallback providers (MiniMax, OpenRouter) via multi-select picker. API keys masked with `p.password()`. `.env` written immediately during init with `.gitignore` auto-update. Post-init security message confirms keys stored locally.
+
+**Red-team verified:** 5 rounds of adversarial review (48+ findings, all resolved). Model IDs verified against live Google AI docs. Imagen 4 references removed (sunset June 2026). Pricing corrected from official sources.
+
 ### v2.3.7 — meow:chom (2026-04-12)
 
 New `meow:chom` skill — copy-cat, replicate, or adapt features from external systems, repos, apps, or ideas into any project. 6-phase workflow (Recon → Map → Analyze → Challenge → Decision → Handoff) with hard gate, 7 challenge questions (Necessity, Stack Fit, Data Model, Dependency Cost, Effort vs Value, Blast Radius, Maintenance Burden), smart input routing (git clone for repos, web-to-markdown for URLs, multimodal for screenshots), risk scoring, and two modes (`--analyze`, `--compare`). General-purpose — works for any project, not just MeowKit.
