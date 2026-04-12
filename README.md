@@ -21,7 +21,7 @@
 
 MeowKit installs a `.claude/` directory that Claude Code reads at session start. It enforces a structured 7-phase workflow with hard gates, TDD, security scanning, and cross-session memory. Zero external dependencies for core workflow.
 
-**Documentation:** [meowkit.dev](https://meowkit.dev) (VitePress)
+**Documentation:** [docs.meowkit.dev](https://docs.meowkit.dev/) (VitePress)
 
 ## Quick Start
 
@@ -38,9 +38,9 @@ npx mewkit doctor     # Verify environment
 
 ## Packages
 
-| Package                                                          | npm                                          | Description                                             |
-| ---------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------- |
-| [`mewkit`](https://www.npmjs.com/package/mewkit)                 | `npx mewkit <cmd>`                           | CLI — init, upgrade, doctor, validate, budget, memory   |
+| Package                                          | npm                | Description                                           |
+| ------------------------------------------------ | ------------------ | ----------------------------------------------------- |
+| [`mewkit`](https://www.npmjs.com/package/mewkit) | `npx mewkit <cmd>` | CLI — init, upgrade, doctor, validate, budget, memory |
 
 ## Requirements
 
