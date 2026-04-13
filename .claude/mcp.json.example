@@ -11,6 +11,15 @@
     "playwright": {
       "command": "npx",
       "args": ["@playwright/mcp@latest"]
+    },
+    "atlassian": {
+      "command": "uvx",
+      "args": ["mcp-atlassian"],
+      "env": {
+        "JIRA_URL": "https://YOUR_COMPANY.atlassian.net",
+        "JIRA_USERNAME": "YOUR_EMAIL@company.com",
+        "JIRA_API_TOKEN": "YOUR_API_TOKEN"
+      }
     }
   }
 }

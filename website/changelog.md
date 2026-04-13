@@ -5,6 +5,47 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.10 (2026-04-13) — Jira Ticket Intelligence + Confluence & Sprint Planning
+
+### Jira Ticket Intelligence
+
+- **feat:** `evaluate` command — qualitative complexity assessment (Simple/Medium/Complex with Fibonacci range)
+- **feat:** `estimate` command — heuristic story point estimation with escalation triggers
+- **feat:** `analyze` command — full ticket context analysis with structured RCA output
+- **feat:** Inconsistency detection — missing AC, vague language, unlinked dependencies, contradictions
+- **feat:** Injection defense — ticket content wrapped in DATA boundary markers (injection-rules.md Rule 1)
+- **feat:** Decision tree — goal-oriented routing replaces operations-centric SKILL.md
+- **feat:** Add comment and add attachment as inline Tier 2 operations
+- **security:** Tier 2 batch creates (3+) now require preview + confirmation
+- **security:** Partial failure behavior defined for sequential operations
+- **docs:** Recovery procedures table added to safety-framework.md
+- **refactor:** SKILL.md restructured as thin routing layer (~150 lines)
+- **refactor:** jql-patterns.md pruned from 50+ to 15 core patterns
+- **refactor:** sprint-operations.md and workflow-transitions.md pruned (REST details removed)
+
+### Confluence Spec Analysis
+
+- **feat:** `meow:confluence` skill — fetch Confluence pages as markdown, deep requirement analysis
+- **feat:** Spec Research Report — requirements, AC, gaps, ambiguities, suggested stories
+- **feat:** Gap detection with `[MISSING]`, `[VAGUE]`, `[AMBIGUOUS]` tags
+- **feat:** Multi-page spec assembly (parent + children + comments)
+
+### Sprint Planning Engine
+
+- **feat:** `meow:planning-engine` skill — codebase-aware tech review + sprint planning
+- **feat:** Tech Review Report — feasibility, affected files, dependencies, complexity signals
+- **feat:** Planning Report — dependency map, sprint grouping, capacity analysis, sprint goal candidate
+- **feat:** Deterministic scripts: `dep-graph.py` (cycle detection), `capacity-bin.py` (bin-packing)
+- **security:** All reports are research-only — no ticket creation, assignment, or sprint modification
+
+### Docs
+
+- **docs:** New workflow page: Ticket Evaluation & Estimation
+- **docs:** New workflow page: Spec to Sprint Planning
+- **docs:** New skill reference pages: meow:confluence, meow:planning-engine
+- **docs:** Updated PRD Intake workflow with evaluate/estimate integration
+- **docs:** Updated meow:jira skill reference with v2 capabilities
+
 ## 2.3.9 (2026-04-12) — Memory System Hardening
 
 ### Memory Loader Modularization

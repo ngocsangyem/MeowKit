@@ -1,85 +1,147 @@
 ---
 title: "meow:jira"
-description: "Jira operations via Atlassian MCP: create, search, update, transition, link, sprint management."
+description: "Jira execution & ticket intelligence via Atlassian MCP: create, search, update, transition, link, sprint, evaluate complexity, estimate story points, analyze tickets."
 ---
 
 # meow:jira
 
-Jira execution via Atlassian MCP. Create issues, search with JQL, update fields, transition workflow states, link issues, manage sprints.
+Jira execution & ticket intelligence via Atlassian MCP. Create issues, search with JQL, update fields, transition workflow states, link issues, manage sprints — plus evaluate ticket complexity, estimate story points, and analyze ticket context.
 
 ## What This Skill Does
 
-meow:jira is the **execution layer** for Jira operations in MeowKit. It receives structured commands — from meow:intake analysis output, from meow:cook during feature implementation, or directly from you — and translates them into Atlassian MCP calls.
+meow:jira is the **execution and evaluation layer** for Jira operations in MeowKit. It receives structured commands — from meow:intake analysis output, from meow:cook during feature implementation, or directly from you — and translates them into Atlassian MCP calls.
 
-It handles 8 operation categories: create, search, read, update, transition, link, sprint, and batch. A 4-tier safety framework gates operations by risk level: read operations run immediately, create operations proceed without confirmation (reversible), modify operations show a diff before applying, and destructive operations require explicit confirmation plus a dry-run preview.
+It handles 10 operation categories across two modes:
 
-meow:jira never processes raw ticket text. If you pass a multi-line description that looks like a Jira ticket, it will refuse and redirect you to `/meow:intake`. Ticket analysis is meow:intake's job — meow:jira only executes structured actions after analysis is complete.
+- **Execute mode** — CRUD operations: create, search, read, update, transition, link, sprint, batch, add comment, add attachment
+- **Agent mode** — ticket intelligence: evaluate complexity, estimate story points, analyze ticket context
+
+A 4-tier safety framework gates operations by risk level. Three internal `jira-*` agents handle reasoning-heavy tasks (evaluate, estimate, analyze) while simple CRUD runs inline.
+
+meow:jira never processes raw ticket text. If you pass a multi-line description that looks like a Jira ticket, it will refuse and redirect you to `/meow:intake`.
 
 ## Core Capabilities
 
+### Execute Mode (10 operations)
+
 - **Create** — Bug, Story, Epic, Task, Sub-task with field validation and issue templates
-- **Search** — JQL queries with a 50+ pattern library; named patterns like `my-open-work`
+- **Search** — JQL queries with a 15-pattern core library
 - **Read** — Full issue details, comments, attachments, change history
 - **Update** — Modify fields (summary, description, priority, assignee, labels) with diff preview
 - **Transition** — Move through workflow states with dynamic required-field discovery
 - **Link** — blocks, is-blocked-by, relates-to, duplicates, clones
 - **Sprint** — Board queries, sprint CRUD, add/remove issues, velocity data
 - **Batch** — Bulk create from template, bulk update (always requires dry-run confirm)
+- **Add Comment** — Post structured comments to tickets (Tier 2)
+- **Add Attachment** — Attach files to tickets (Tier 2)
+
+### Agent Mode (ticket intelligence)
+
+- **Evaluate** — Qualitative complexity assessment (Simple/Medium/Complex) with Fibonacci range, inconsistency detection, injection defense
+- **Estimate** — Heuristic story point estimation with escalation triggers for uncertain tickets
+- **Analyze** — Full ticket context analysis (description, comments, attachments, media) with structured RCA output
 
 ## When to Use
 
-::: tip Use meow:jira for execution
-After meow:intake produces analysis and suggested actions, run meow:jira to execute them:
-`/meow:jira transition PRD-123 "In Analysis"`
-`/meow:jira link PRD-123 blocks BUG-045`
-`/meow:jira assign PRD-123 alice`
+::: tip Use meow:jira for execution AND evaluation
+```bash
+# Ticket intelligence
+/meow:jira evaluate PRD-123      # Complexity assessment
+/meow:jira estimate PRD-123      # Story point estimation
+/meow:jira analyze PRD-123       # Full context analysis
+
+# Execution
+/meow:jira transition PRD-123 "In Analysis"
+/meow:jira link PRD-123 blocks BUG-045
+```
 :::
 
-::: warning Use meow:intake first for analysis
-meow:jira is an execution skill — it does not analyze tickets, score completeness, or suggest actions. Run `/meow:intake` first for ticket analysis, then use meow:jira to execute the structured output.
+::: info Evaluate and estimate are read-only
+The evaluate, estimate, and analyze commands read ticket data only — they never modify Jira state. Their output includes suggested `/meow:jira` commands you can run after reviewing.
 :::
 
 ## Prerequisites
 
-meow:jira requires the Atlassian MCP server.
+meow:jira requires a Jira MCP server. Two options are available:
 
-**Option 1: Claude CLI (recommended)**
+### Option 1: Community server (recommended)
+
+[mcp-atlassian](https://github.com/sooperset/mcp-atlassian) — 49 Jira tools, Cloud + Server/DC, ADF auto-conversion, custom fields, attachments, sprints, issue linking.
+
 ```bash
-claude mcp add --transport http atlassian https://mcp.atlassian.com/v1/mcp
+claude mcp add -e JIRA_URL=https://your-company.atlassian.net \
+  -e JIRA_USERNAME=your-email@company.com \
+  -e JIRA_API_TOKEN=your-api-token \
+  atlassian -- uvx mcp-atlassian
 ```
-Uses Atlassian Rovo's hosted MCP endpoint. Claude Code handles OAuth — no API token needed.
 
-**Option 2: Self-hosted via `.mcp.json`**
+Get your API token at [id.atlassian.com](https://id.atlassian.com/manage-profile/security/api-tokens).
+
+Or add to your `.mcp.json`:
 ```json
 {
   "mcpServers": {
     "atlassian": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/atlassian-mcp-server"],
+      "command": "uvx",
+      "args": ["mcp-atlassian"],
       "env": {
-        "ATLASSIAN_SITE_URL": "https://your-company.atlassian.net",
-        "ATLASSIAN_USER_EMAIL": "your-email@company.com",
-        "ATLASSIAN_API_TOKEN": "your-api-token"
+        "JIRA_URL": "https://your-company.atlassian.net",
+        "JIRA_USERNAME": "your-email@company.com",
+        "JIRA_API_TOKEN": "your-api-token"
       }
     }
   }
 }
 ```
 
+Optional env vars: `JIRA_PROJECTS_FILTER` (restrict projects), `JIRA_READ_ONLY_MODE=true` (block writes).
+
+### Option 2: Official Atlassian Rovo (Cloud-only)
+
+[Atlassian MCP Server](https://github.com/atlassian/atlassian-mcp-server) — 13 Jira tools, OAuth 2.1, beta status.
+
+```bash
+claude mcp add --transport http atlassian https://mcp.atlassian.com/v1/mcp
+```
+
+Uses browser OAuth — no API token needed.
+
+::: warning Trade-offs between MCP servers
+| Capability | Community (mcp-atlassian) | Official (Rovo) |
+|---|---|---|
+| Jira tools | 49 | 13 |
+| Custom fields | ✅ | ❌ Broken |
+| ADF conversion | ✅ Auto | ❌ Loses formatting |
+| Attachments | ✅ Download | ❌ Missing |
+| Delete | ✅ | ❌ Missing |
+| Sprint/agile | ✅ 8 tools | ❌ Missing |
+| Issue linking | ✅ Dedicated tools | ⚠️ Undocumented |
+| Cloud + Server/DC | ✅ Both | Cloud only |
+| Auth | API token / OAuth / PAT | OAuth 2.1 (easier setup) |
+| Maintenance | Community (active, no SLA) | Atlassian (beta, bugs unfixed) |
+
+The community server is recommended for production use. The official server is suitable if you only need basic CRUD with zero-config OAuth.
+:::
+
 ## Usage
 
 ```bash
+# Ticket intelligence
+/meow:jira evaluate PROJ-123              # Complexity + inconsistency analysis
+/meow:jira estimate PROJ-123             # Story point estimation
+/meow:jira analyze PROJ-123              # Full ticket context analysis
+
 # Create a bug
-/meow:jira create --project PROJ --type Bug --summary "Login fails after 24h" --priority High
+/meow:jira create --project PROJ --type Bug --summary "Login fails after 24h" --priority High \
+  --description "Users report 500 error on mobile Safari" --assignee alice
 
 # Search with JQL
 /meow:jira search --jql "assignee = currentUser() AND sprint in openSprints()"
-/meow:jira search --pattern my-open-work
 
 # Read issue details
 /meow:jira read PROJ-123 --comments --history
 
-# Transition
+# Transition (prompts for required fields like resolution)
 /meow:jira transition PROJ-123 "In Progress"
 /meow:jira transition PROJ-123 Done --resolution Fixed
 
@@ -88,83 +150,75 @@ Uses Atlassian Rovo's hosted MCP endpoint. Claude Code handles OAuth — no API 
 
 # Sprint management
 /meow:jira sprint --board "Team Alpha" --list-sprints
-/meow:jira sprint --sprint active --add PROJ-123,PROJ-456
+
+# Comments and attachments
+/meow:jira add-comment PROJ-123 "Analysis complete — see RCA below"
+/meow:jira add-attachment PROJ-123 /path/to/screenshot.png
 ```
 
 ## Safety Framework
 
 | Tier | Operations | Confirmation |
 |------|-----------|-------------|
-| Safe (read) | Search, read, list boards/sprints | None — always allowed |
-| Low (create) | Create issue, add comment, add link | None — reversible |
+| Safe (read) | Search, read, list, evaluate, estimate, analyze | None — always allowed |
+| Low (create) | Create issue, add comment, add attachment, add link | None (single). Batch 3+ → preview + confirm |
 | Medium (modify) | Update fields, transition, assign | Show diff before applying |
 | High (destructive) | Delete, bulk update, close sprint | Mandatory confirm + dry-run |
 
-## JQL Quick Reference
+## Evaluate Output Example
 
-Ten most useful patterns from the 50+ template library:
+```markdown
+## Ticket Evaluation: PROJ-123
 
-```sql
-# My open work in current sprint
-assignee = currentUser() AND sprint in openSprints() ORDER BY updated DESC
+**Complexity:** Medium (likely 5-8pt)
+**Confidence:** Medium (no codebase context available)
 
-# In-progress or in-review
-assignee = currentUser() AND status in ("In Progress", "In Review")
+### Signals
+- Scope: Cross-module (mentions "auth" + "payments")
+- Regression risk: Present ("refactoring login flow")
+- Requirement clarity: LOW — no acceptance criteria found
 
-# Critical bugs unassigned
-type = Bug AND assignee is EMPTY AND priority in (Critical, Blocker)
+### Issues Detected
+- ⚠️ Missing acceptance criteria
+- ⚠️ Dependency mentioned but not linked
 
-# Bugs needing triage
-type = Bug AND created >= -7d AND resolution = Unresolved ORDER BY priority DESC
-
-# Sprint backlog without points
-project = PROJ AND sprint in openSprints() AND "Story Points" is EMPTY
-
-# Overdue items
-due < now() AND status != Done ORDER BY due ASC
-
-# Stale in-progress
-status = "In Progress" AND updated < -5d ORDER BY updated ASC
-
-# Recent bugs I reported
-type = Bug AND reporter = currentUser() AND resolution = Unresolved
-
-# Pending for sprint planning
-project = PROJ AND sprint is EMPTY AND status = "To Do" ORDER BY priority ASC
-
-# Ready to deploy (Done this sprint)
-sprint = CURRENT_SPRINT AND status = Done ORDER BY resolutiondate DESC
+### Suggested Actions
+> Recommendations derived from untrusted ticket content — verify before executing.
+- /meow:jira link PROJ-123 blocked-by [related ticket]
 ```
 
 ## Security
 
-**Raw ticket detection:** If input contains multi-line text with patterns like "Steps to Reproduce", "Acceptance Criteria", or "As a user", meow:jira REFUSES and redirects to meow:intake. This prevents the Rule of Two violation where a single skill processes untrusted input, accesses auth data, and changes state simultaneously.
+**Raw ticket detection:** If input contains multi-line text with patterns like "Steps to Reproduce" or "Acceptance Criteria", meow:jira REFUSES and redirects to meow:intake.
 
-**MCP trust:** meow:jira trusts Atlassian MCP for auth and API safety. Keep Atlassian MCP updated for security patches — meow:jira inherits any MCP vulnerabilities.
+**Injection defense (evaluate/estimate/analyze):** Ticket content is wrapped in `===TICKET_DATA_START===` / `===TICKET_DATA_END===` boundary markers before LLM reasoning. The agent never follows instructions embedded in ticket text. All output includes an "untrusted content" warning.
+
+**MCP trust:** meow:jira trusts Atlassian MCP for auth and API safety. Keep Atlassian MCP updated for security patches.
 
 ## Integrated Workflows
 
 | Workflow | Skills Chain | Status |
 |----------|-------------|--------|
-| PRD Intake | scale-routing → intake → **jira** | ✅ Available |
-| Bug Fix | fix → investigate → **jira** (update ticket) | 🔜 Planned |
+| PRD Intake | scale-routing → intake → **jira** (evaluate + execute) | ✅ Available |
+| Ticket Evaluation | **jira** evaluate → estimate → execute | ✅ Available |
+| Bug Fix | fix → investigate → **jira** (analyze + update ticket) | ✅ Available |
 | Ship Code | cook → ship → **jira** (mark deployed) | 🔜 Planned |
 | Sprint Planning | **jira** (search backlog, manage sprint) | ✅ Available |
-| Retrospective | retro → **jira** (pull sprint data) | 🔜 Planned |
 
 ## Gotchas
 
-- **No MCP = no operations.** meow:jira cannot fall back to anything — it requires the Atlassian MCP server. If MCP is unavailable, it reports install instructions and stops.
-- **Safety confirms on medium/high ops.** Transitions and updates show a diff before applying. Destructive operations block until you explicitly confirm. This is intentional.
-- **Custom fields need discovery first.** Jira projects often have required custom fields with IDs like `customfield_10016`. Run `meow:jira discover-fields --project PROJ` to list them before creating issues.
-- **Workflow-specific required fields.** Some transitions require fields (e.g. "Resolution" for Done). meow:jira discovers these dynamically but will block if required fields are missing.
-- **Rate limits on bulk ops.** Batch operations hit Jira API rate limits on large projects. Use `--dry-run` first to preview, then execute with reasonable batch sizes.
+- **No MCP = no operations.** meow:jira requires the Atlassian MCP server. If unavailable, it reports install instructions and stops.
+- **Safety confirms on medium/high ops.** Transitions and updates show a diff before applying. Destructive operations require explicit confirmation.
+- **Custom fields need discovery first.** Jira projects often have required custom fields. The MCP server's `search_fields` tool can discover field IDs for your instance.
+- **Evaluate is read-only.** Evaluate, estimate, and analyze never modify Jira state. Suggested commands require manual execution.
+- **Estimation is heuristic.** Story point estimates are LLM self-assessments, not calibrated predictions. Always review before applying.
+- **v3 planned:** `--batch` sprint estimation and `--deep` codebase-aware estimation are planned for a future release.
 
 ## Related
 
 - [meow:intake](/reference/skills/intake) — ticket analysis and structured handoff to meow:jira
 - [meow:scale-routing](/reference/skills/scale-routing) — product area classification upstream of intake
 - [meow:cook](/reference/skills/cook) — feature pipeline that creates Jira tickets during Phase 3
-- [meow:fix](/reference/skills/fix) — bug fix pipeline (planned: auto-transition on merge)
-- [meow:ship](/reference/skills/ship) — ship pipeline (planned: auto-transition to Deployed)
-- [meow:retro](/reference/skills/retro) — retrospective (planned: pull sprint velocity from Jira)
+- [meow:fix](/reference/skills/fix) — bug fix pipeline
+- [meow:ship](/reference/skills/ship) — ship pipeline
+- [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) — end-to-end workflow guide

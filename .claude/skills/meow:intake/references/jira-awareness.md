@@ -40,6 +40,8 @@ After analysis, append a `### Suggested Actions (meow:jira)` section to the repo
 ```markdown
 ### Suggested Actions (meow:jira)
 
+- [ ] Evaluate complexity: /meow:jira evaluate [TICKET-ID]
+- [ ] Estimate story points: /meow:jira estimate [TICKET-ID]  ← only if no story points set
 - [ ] Transition [TICKET-ID] to "In Analysis"
 - [ ] Link [TICKET-ID] blocks [BLOCKER-ID]  ← only if linked issues found
 - [ ] Assign to [pic-username] ([domain] owner)

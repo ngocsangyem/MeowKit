@@ -22,40 +22,26 @@ MeowKit provides the **analysis engine**. Jira connectivity requires a **Jira MC
 
 ### 1. Install a Jira MCP Server
 
-MeowKit needs the Atlassian MCP server to read and write Jira tickets. Two ways to add it:
+MeowKit needs a Jira MCP server to read and write tickets. We recommend [mcp-atlassian](https://github.com/sooperset/mcp-atlassian) (community, 49 tools, Cloud + Server/DC):
 
-**Option 1: Claude CLI (recommended)**
+```bash
+claude mcp add -e JIRA_URL=https://your-company.atlassian.net \
+  -e JIRA_USERNAME=your-email@company.com \
+  -e JIRA_API_TOKEN=your-api-token \
+  atlassian -- uvx mcp-atlassian
+```
 
+Get your API token at [id.atlassian.com](https://id.atlassian.com/manage-profile/security/api-tokens).
+
+Alternatively, use the [official Atlassian Rovo server](https://github.com/atlassian/atlassian-mcp-server) (Cloud-only, OAuth, 13 tools, beta):
 ```bash
 claude mcp add --transport http atlassian https://mcp.atlassian.com/v1/mcp
 ```
 
-This uses [Atlassian Rovo's hosted MCP endpoint](https://mcp.atlassian.com). Claude Code handles authentication via browser OAuth — no API token needed. See the [Claude Code MCP docs](https://code.claude.com/docs/en/mcp) for details.
-
-**Option 2: Self-hosted via `.mcp.json`**
-
-Add to your project's `.mcp.json` (or `~/.claude.json` for global):
-
-```json
-{
-  "mcpServers": {
-    "atlassian": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/atlassian-mcp-server"],
-      "env": {
-        "ATLASSIAN_SITE_URL": "https://your-company.atlassian.net",
-        "ATLASSIAN_USER_EMAIL": "your-email@company.com",
-        "ATLASSIAN_API_TOKEN": "your-api-token"
-      }
-    }
-  }
-}
-```
-
-See the [official Atlassian MCP server repo](https://github.com/atlassian/atlassian-mcp-server) for setup, available tools, and authentication. Provides tools for Jira (issues, search, transitions, comments) and Confluence.
+See [meow:jira prerequisites](/reference/skills/jira#prerequisites) for a detailed comparison of both servers.
 
 ::: warning MCP Server Required
-Without the Atlassian MCP server, MeowKit cannot read or write Jira tickets. The analysis skills work standalone (paste ticket text manually), but automated I/O requires the MCP.
+Without a Jira MCP server, MeowKit cannot read or write Jira tickets. The analysis skills work standalone (paste ticket text manually), but automated I/O requires the MCP.
 :::
 
 ::: tip Alternative: GitHub Issues
@@ -126,6 +112,20 @@ Read the ticket description, acceptance criteria, and linked tickets.
 ```
 
 The [Atlassian MCP server](https://github.com/atlassian/atlassian-mcp-server) provides tools for reading issues, searching, adding comments, and transitioning status. Check the server's README for the exact tool names and parameters.
+
+### Step 1.5: Evaluate ticket complexity (meow:jira evaluate)
+
+Optionally, assess ticket complexity before proceeding with full intake:
+
+```bash
+/meow:jira evaluate PRD-123
+```
+
+This produces a qualitative complexity assessment (Simple/Medium/Complex), detects missing acceptance criteria, vague language, and unlinked dependencies. The evaluation feeds into estimation and sprint planning. See the [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) workflow for details.
+
+::: tip Evaluate vs completeness scoring
+`meow:jira evaluate` assesses **implementation complexity** for estimation. `meow:plan-creator` scope challenge assesses **structural completeness** of the ticket description. They answer different questions — use both.
+:::
 
 ### Step 2: Classify product area (meow:scale-routing)
 

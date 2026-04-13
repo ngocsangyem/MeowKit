@@ -162,7 +162,9 @@ Jira and Figma execution via MCP.
 
 | Skill | What it does |
 |-------|-------------|
-| [meow:jira](/reference/skills/jira) | Jira execution via Atlassian MCP: create, search, update, transition, link, sprint management. 4-tier safety framework, 50+ JQL templates |
+| [meow:jira](/reference/skills/jira) | Jira execution & ticket intelligence via Atlassian MCP: create, search, update, transition, link, sprint, evaluate complexity, estimate story points, analyze tickets. 4-tier safety framework, internal jira-* agents |
+| [meow:confluence](/reference/skills/confluence) | Confluence spec analysis: fetch pages as markdown, extract requirements, detect gaps, produce research reports. Reports only — no ticket creation |
+| [meow:planning-engine](/reference/skills/planning-engine) | Codebase-aware tech breakdown and sprint planning analysis: dependency mapping, capacity modeling, complexity signals. Reports only — no auto-assignment |
 | [meow:figma](/reference/skills/figma) | Figma design analysis + implementation via Figma MCP. 3 modes: analyze, implement, tokens. Fallback to PNG + multimodal |
 
 ## Analysis & Media

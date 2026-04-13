@@ -20,9 +20,21 @@ WHY: Read operations have zero blast radius. No data is modified.
 
 Operations: Create issue, add comment, add issue link, attach file, add watcher, create sub-task.
 
-Confirmation: None. Execute immediately.
+Confirmation: None for single items. **Batch creates (3+ items) require preview + confirmation.**
 
-WHY: These operations are reversible. Issues can be deleted, comments edited, links removed. The cost of accidental creation is low.
+WHY: Single creates are reversible. Batch creates (3+) warrant a preview to prevent accidental bulk creation.
+
+**Batch confirmation format (3+ items):**
+```
+Suggested actions (all Tier 1-2):
+  1. Create issue: "Fix login timeout"
+  2. Create issue: "Add session refresh"
+  3. Create issue: "Update auth docs"
+
+Run all 3 actions? [y/N]
+```
+
+Tier 3+ operations always require individual confirmation with diff preview, even in batch.
 
 ---
 
@@ -49,7 +61,7 @@ WHY: Field updates can disrupt team workflows if done accidentally. Showing the 
 
 Operations: Delete issue, bulk update multiple issues, close/complete sprint, delete sprint, bulk transition, bulk reassign.
 
-Confirmation: Mandatory. Run dry-run first, then require explicit approval.
+Confirmation: Mandatory. meow:jira implements dry-run by reading the issue/sprint first, displaying what will be affected, then executing after explicit approval. MCP tools do not have native dry-run — meow:jira orchestrates this.
 
 **Dry-run output:**
 ```
@@ -119,6 +131,27 @@ Type "{CONFIRMATION_TOKEN}" to confirm, or press Enter to cancel:
 - Ambiguous scope ("update all bugs") → Clarify before classifying: run search, show count, confirm scope
 
 ---
+
+## Partial Failure Behavior
+
+If any action in a sequential batch fails:
+- **Stop on first error** (default)
+- Report: which succeeded, which failed, which skipped
+- Show recovery guidance for completed actions if rollback needed
+
+## Recovery Procedures
+
+| Action | Reversible? | Recovery |
+|--------|-------------|----------|
+| Create issue | Yes | Delete within 30 days |
+| Update field | Yes | Revert via issue history |
+| Transition | Partially | Reverse transition if workflow allows |
+| Delete issue | 30 days | Restore from trash |
+| Bulk delete | NO | Permanent — dry-run mandatory |
+| Close sprint | NO | Cannot reopen |
+| Add comment | Yes | Delete comment |
+| Add link | Yes | Remove link |
+| Add attachment | Yes | Delete attachment |
 
 ## Never Bypass Safety
 

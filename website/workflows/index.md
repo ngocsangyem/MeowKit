@@ -34,6 +34,14 @@ Step-by-step guides for the most common development scenarios.
 | [Frontend Development](/workflows/frontend) | Vue/TS/CSS work | 15-60 min |
 | [Refactoring](/workflows/refactoring) | Code improvement | 15-45 min |
 
+## Intake & Triage
+
+| Workflow | Best for | Time |
+|----------|----------|------|
+| [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) | Sprint planning, triage | ~30s per ticket |
+| [Spec to Sprint Planning](/workflows/spec-to-sprint) | End-to-end: spec analysis → tech review → sprint plan | 5-15 min |
+| [Ticket to Code](/workflows/ticket-to-code) | Developer: receive ticket → understand → plan → implement → ship | Varies |
+
 ## Operations
 
 | Workflow | Best for | Time |

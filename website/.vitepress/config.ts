@@ -130,6 +130,7 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'What\'s New', link: '/guide/whats-new',
               items: [
+                { text: 'v2.3.10 — Jira + Confluence + Sprint Planning', link: '/guide/whats-new/v2.3.10' },
                 { text: 'v2.3.1 — Plan Creator Intelligence', link: '/guide/whats-new/v2.3.1' },
                 { text: 'v2.3.0 — The Hook Dispatch Release', link: '/guide/whats-new/v2.3.0' },
                 { text: 'v2.2.0 — Generator/Evaluator Harness', link: '/guide/whats-new/v2.2.0' },
@@ -396,6 +397,9 @@ export default withMermaid(defineConfig({
             { text: 'Maintaining Old Projects', link: '/workflows/maintenance' },
             { text: 'PRD Intake Automation', link: '/workflows/prd-intake' },
             { text: 'Tickets with Media', link: '/workflows/ticket-with-media' },
+            { text: 'Ticket Evaluation & Estimation', link: '/workflows/ticket-evaluation' },
+            { text: 'Spec to Sprint Planning', link: '/workflows/spec-to-sprint' },
+            { text: 'Ticket to Code', link: '/workflows/ticket-to-code' },
           ],
         },
       ],

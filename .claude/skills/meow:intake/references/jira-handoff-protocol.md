@@ -24,10 +24,13 @@ Append to the intake report after `### Suggested Actions (meow:jira)`:
 ```
 Run these commands to apply the above actions:
 
+  /meow:jira evaluate [TICKET-ID]
+  /meow:jira estimate [TICKET-ID]
+  /meow:jira analyze [TICKET-ID]
   /meow:jira transition [TICKET-ID] "In Analysis"
   /meow:jira link [TICKET-ID] blocks [BLOCKER-ID]
-  /meow:jira assign [TICKET-ID] [username]
-  /meow:jira set [TICKET-ID] fixVersion [version]
+  /meow:jira update [TICKET-ID] --set assignee=[username]
+  /meow:jira update [TICKET-ID] --set fixVersions=[version]
 ```
 
 Generate only commands for actions that are actually needed (gaps identified in `jira-awareness.md`).
