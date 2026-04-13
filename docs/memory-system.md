@@ -19,7 +19,8 @@ The two systems are complementary:
   decisions.md        # Architecture decisions — append-only
   cost-log.json       # Token usage per task — auto-appended by Stop hook
   security-log.md     # Security audit findings
-  preferences.md      # Team preferences (code style, tools) — loaded at SessionStart
+  preferences.md      # Team preferences (code style, tools) — loaded at SessionStart if present (NOT auto-created)
+  trace-log.jsonl     # Trace events for harness analysis — written by append-trace.sh
   conversation-summary.md  # Haiku-summarized cache (anchored iterative merge)
   lessons-archive.md  # Archived old entries (not injected, recoverable)
   quick-notes.md      # Staging for ##note: captures (processed at Reflect)
@@ -67,11 +68,12 @@ Session ends → Stop hook writes NEEDS_CAPTURE marker to lessons.md (mkdir-lock
             → Stop hook appends cost entry to cost-log.json (env var passing, 1000-entry cap)
             → conversation-summary-cache.sh merges new turns into structured summary
                                     ↓
-Next session → memory-loader.cjs injects:
+Every user message → memory-loader.cjs injects (fires per-turn, not once per session):
              → Critical entries (always, budget: 60%)
              → Domain-filtered entries (keyword-matched, budget: 40%)
              → Skips stale entries (>6mo standard) + expired patterns (>12mo)
-             → Loads .claude/memory/preferences.md
+             → NOTE: entries with null dates are treated as stale (known issue — affects NEEDS_CAPTURE markers without dates)
+SessionStart → project-context-loader.sh loads preferences.md (if file exists — not auto-created)
              → Shows agent readiness banner (5-point score)
                                     ↓
 Phase 0 → Analyst reads lessons.md
