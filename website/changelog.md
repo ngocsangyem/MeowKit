@@ -5,6 +5,45 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.11 (2026-04-14) — Env Var Handling Hardening
+
+### Native `env` Field Adoption
+
+- **feat:** `.claude/settings.json` now uses Claude Code's native `env` field for team-shared defaults (9 control flags: `MEOWKIT_TDD`, `MEOWKIT_BUILD_VERIFY`, `MEOWKIT_LOOP_DETECT`, etc.)
+- **feat:** Three-layer precedence documented: shell export > `.claude/.env` > `settings.json` `env`
+- **refactor:** `load-dotenv.sh` / `dispatch.cjs` parsers now fallback-only for secrets + per-project overrides
+
+### Parser Hardening (Both Shell and Node.js)
+
+- **fix:** Quoted values with `#` preserved literally — `MEOWKIT_API_KEY="abc#123"` no longer truncated to `abc`
+- **fix:** Inline comments stripped from unquoted values only (`VAR=on  # comment` → `on`)
+- **fix:** Indented keys trimmed (`  MEOWKIT_TDD=1` now loads correctly)
+- **security:** Dangerous keys blocked (`PATH`, `LD_PRELOAD`, `LD_LIBRARY_PATH`, `DYLD_INSERT_LIBRARIES`, `DYLD_FRAMEWORK_PATH`, `IFS`, `BASH_ENV`, `ENV`) — prevents env injection via rogue `.env`
+- **security:** Key validation against POSIX var name pattern `[A-Za-z_][A-Za-z0-9_]*`
+
+### Agent Config Visibility
+
+- **feat:** `project-context-loader.sh` emits `## MeowKit Config` block at SessionStart — agent now sees active control vars
+- **fix:** Config block gated on new sessions only (not resume/clear/compact) via session-id check — no context pollution
+- **fix:** CWD mismatch guard added — warns if MeowKit hooks not detected at project root
+
+### Manual-Invocation Scripts
+
+- **fix:** `pre-implement.sh` now loads `.env` via script-relative path fallback when `CLAUDE_PROJECT_DIR` is unset
+- **fix:** Symlink-safe guard prevents walking into install source when `.claude/` is symlinked
+
+### Documentation
+
+- **docs:** `.env.example` documents 3-layer precedence and quoting rules
+- **docs:** Orphaned `MEOWKIT_GEMINI_API_KEY_2/3/4` marked as PLANNED (no consumer code yet)
+- **docs:** Added undiscoverable vars (`MEOWKIT_MEMORY_STALENESS_MONTHS`, `MEOWKIT_SUMMARY_MODE`, etc.)
+- **docs:** `MEOWKIT_HOOK_PROFILE` alias introduced (legacy `MEOW_HOOK_PROFILE` still accepted)
+
+### Verification
+
+- **feat:** `.claude/scripts/verify-env-loading.sh` — 8-test suite replacing stub, covers parser correctness, native env, session gating
+- **red-team:** 3 rounds of review (5 reviewers + claude-api skill evidence). 12 round-3 findings (3 Critical, 4 High, 5 Medium) — all accepted and applied
+
 ## 2.3.10 (2026-04-13) — Jira Ticket Intelligence + Confluence & Sprint Planning
 
 ### Jira Ticket Intelligence

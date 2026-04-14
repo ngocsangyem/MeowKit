@@ -10,6 +10,20 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### v2.3.11 — Env Var Handling Hardening (2026-04-14)
+
+Adopts Claude Code's native `settings.json` `env` field for team-shared defaults — 9 control flags (TDD, build-verify, loop-detect, etc.) no longer require custom parsers to load. Three-layer precedence: shell export > `.claude/.env` > `settings.json` `env`.
+
+Parser bugs fixed in both `load-dotenv.sh` (shell) and `dispatch.cjs` (Node.js): quoted values with `#` (API keys like `"abc#123"`) are preserved literally instead of being truncated; inline comments stripped only from unquoted values; dangerous keys (`PATH`, `LD_PRELOAD`, etc.) blocked to prevent env injection via rogue `.env` files.
+
+Agents now see a `## MeowKit Config` block at SessionStart showing active control vars — resolves the "Claude reports MEOWKIT_ vars not found" issue. Gated on new sessions only (not resume/clear/compact) to avoid context pollution.
+
+Three rounds of red-team review produced 12 findings (3 Critical, 4 High, 5 Medium) — all resolved. New 8-test verification suite at `.claude/scripts/verify-env-loading.sh`.
+
+### v2.3.10 — Jira Ticket Intelligence + Confluence & Sprint Planning (2026-04-13)
+
+See [changelog](../changelog.md#_2-3-10-2026-04-13-jira-ticket-intelligence-confluence-sprint-planning) for full details.
+
 ### v2.3.9 — Memory System Hardening & FactoryAI Adaptation (2026-04-12)
 
 MeowKit's memory system — the backbone of cross-session learning — gets its biggest hardening since launch. Driven by a FactoryAI comparative analysis and 5 rounds of red-team review.
