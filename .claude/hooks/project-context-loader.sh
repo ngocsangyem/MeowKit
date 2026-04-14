@@ -11,8 +11,18 @@ if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
 # Load .claude/.env — shared dotenv lib (each hook is a separate subprocess,
 # so every hook that reads MEOWKIT_* vars must source this independently).
+# Note: as of the native `env` field fix, most control vars now come from
+# settings.json `env` block. .env loading remains for API keys + overrides.
 if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" ]; then
   . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh"
+fi
+
+# CWD mismatch guard (Fix 1b — dev-repo only but harmless in production):
+# if MeowKit's dispatch.cjs marker is absent, we're not at a MeowKit root.
+if [ ! -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/dispatch.cjs" ]; then
+  echo "## NOTE: MeowKit hooks not detected at project root"
+  echo "MEOWKIT_* config may not be loaded. Run from project root where .claude/ lives."
+  echo ""
 fi
 
 # Hook profile gating — context loading always needed: NEVER skip regardless of profile
@@ -91,6 +101,25 @@ summaries: 0
 CLEAR_EOF
     fi
   fi
+fi
+
+
+# ═══════════════════════════════════════════════════════════════════
+# MeowKit Config Status (stdout bridge — RC-0 / Fix 0c)
+# ═══════════════════════════════════════════════════════════════════
+# Agent cannot inspect env vars directly. Hooks load them but the LLM has no
+# process.env access. Emit active control vars to stdout so agent context sees
+# them. Gated on new sessions to avoid polluting resume/clear/compact events.
+if [ -n "${HOOK_SESSION_ID:-}" ] && [ "$HOOK_SESSION_ID" != "${LAST_SESSION:-}" ]; then
+  echo ""
+  echo "## MeowKit Config"
+  [ "${MEOWKIT_TDD:-0}" = "1" ] && echo "- TDD: **enabled** (strict red-green-refactor)" || echo "- TDD: off (default)"
+  [ "${MEOWKIT_BUILD_VERIFY:-on}" = "off" ] && echo "- Build verify: **disabled**" || echo "- Build verify: on (default)"
+  [ "${MEOWKIT_LOOP_DETECT:-on}" = "off" ] && echo "- Loop detection: **disabled**" || echo "- Loop detection: on (default)"
+  [ -n "${MEOWKIT_HARNESS_MODE:-}" ] && echo "- Harness density: **${MEOWKIT_HARNESS_MODE}** (overridden)" || echo "- Harness density: auto-detect"
+  [ "${MEOWKIT_SUMMARY_CACHE:-on}" = "off" ] && echo "- Summary cache: **disabled**" || echo "- Summary cache: on (default)"
+  echo ""
+  echo "_Config sources: settings.json \`env\` (defaults) → .claude/.env (overrides) → shell export (highest). Agent sees this block at session start only._"
 fi
 
 echo ""

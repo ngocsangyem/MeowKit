@@ -11,6 +11,19 @@
 # When TDD is enabled, blocks the calling tool unless a failing test exists.
 set -e
 
+# Load .claude/.env — this script is invoked manually by the developer agent
+# (not wired to a system event), so CLAUDE_PROJECT_DIR may or may not be set.
+# Fall back to script-relative resolution.
+# [M-1 GUARD] Skip .env load if project root doesn't contain .claude/ (catches
+# symlinked installs where ../../ walks into the install source, not the user project).
+_SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+_PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$_SCRIPT_DIR/../.." && pwd 2>/dev/null || echo .)}"
+if [ -d "$_PROJECT_ROOT/.claude" ] && [ -f "$_PROJECT_ROOT/.claude/hooks/lib/load-dotenv.sh" ]; then
+  CLAUDE_PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$_PROJECT_ROOT}" \
+    . "$_PROJECT_ROOT/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
+fi
+unset _SCRIPT_DIR _PROJECT_ROOT
+
 # TDD gate — source the helper. Fail-safe: missing helper means fail-CLOSED in
 # strict mode (user explicitly opted in) and fail-OPEN in default mode.
 HELPER="${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/tdd-detect.sh"

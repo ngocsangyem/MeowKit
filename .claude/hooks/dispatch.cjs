@@ -29,12 +29,25 @@ try {
       const eqIdx = trimmed.indexOf('=');
       if (eqIdx < 1) continue;
       const key = trimmed.slice(0, eqIdx).trim();
+      // Validate key is a legal env var name (skip rogue keys silently)
+      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) continue;
+      // Block dangerous keys (env injection defense)
+      if (['PATH', 'LD_PRELOAD', 'LD_LIBRARY_PATH', 'DYLD_INSERT_LIBRARIES', 'DYLD_FRAMEWORK_PATH', 'IFS', 'BASH_ENV', 'ENV'].includes(key)) continue;
+
       let val = trimmed.slice(eqIdx + 1).trim();
-      // Strip surrounding quotes
-      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      // Detect quoted values BEFORE stripping comments — API keys like
+      // "abc#123" must preserve the `#` literally.
+      const isQuoted = (val.startsWith('"') && val.endsWith('"')) ||
+                       (val.startsWith("'") && val.endsWith("'"));
+      // Strip inline comments only for unquoted values (" # " pattern)
+      if (!isQuoted) {
+        const commentIdx = val.search(/\s+#/);
+        if (commentIdx > 0) val = val.slice(0, commentIdx).trimEnd();
+      } else {
+        // Strip surrounding quotes
         val = val.slice(1, -1);
       }
-      // Don't override existing env vars
+      // Don't override existing env vars (shell export / settings.json env wins)
       if (!(key in process.env)) {
         process.env[key] = val;
       }
