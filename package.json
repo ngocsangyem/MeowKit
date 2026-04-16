@@ -8,6 +8,8 @@
     "build": "npm -w packages/mewkit run build",
     "lint": "eslint packages/*/src/**/*.ts",
     "typecheck": "tsc --noEmit -p packages/mewkit/tsconfig.json",
+    "format": "prettier --write \"packages/*/src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"packages/*/src/**/*.{ts,js,json}\"",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -25,6 +27,7 @@
     "conventional-changelog-conventionalcommits": "^8.0.0",
     "eslint": "^9.5.0",
     "globals": "^17.4.0",
+    "prettier": "^3.8.3",
     "semantic-release": "^24.0.0",
     "typescript": "^5.5.0",
     "typescript-eslint": "^8.58.0",
