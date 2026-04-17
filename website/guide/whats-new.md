@@ -10,6 +10,14 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### v2.3.12 — External Codebase Packing + chom v2 Rigor (2026-04-17)
+
+New `meow:pack` skill exports an external repository as a single AI-friendly file (markdown/xml/json) for handoff to other LLMs, reviewers, or archival. Wraps repomix via `npx` — no global install required. Includes `--compress` mode for Tree-sitter signature extraction (ideal for API-surface queries), self-pack guard preventing accidental self-reingest, and secret scanning on by default.
+
+`meow:chom` refactored to v2 with selective xia-style rigor: 4 user-explicit modes (`--compare` / `--copy` / `--improve` / `--port`), speed flags (`--lean` / `--auto`), intent detection, and sequential-thinking escalation via handoff (never auto-invoke). HARD GATE remains non-bypassable in every mode. Chom does NOT auto-derive adaptation depth — user picks explicitly or plan-creator decides downstream.
+
+Two fabrications corrected: the "Skills cannot call skills (MeowKit convention)" claim (unsourced — skills *can* reference each other) and the "40–70% context burn" number in pack SKILL.md (replaced with honest context-isolation framing). Red-team validation across 5 teams confirmed both skills execute end-to-end.
+
 ### v2.3.11 — Env Var Handling Hardening (2026-04-14)
 
 Adopts Claude Code's native `settings.json` `env` field for team-shared defaults — 9 control flags (TDD, build-verify, loop-detect, etc.) no longer require custom parsers to load. Three-layer precedence: shell export > `.claude/.env` > `settings.json` `env`.

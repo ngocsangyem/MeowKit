@@ -4,3 +4,4 @@
 .claude/memory/
 .claude/logs/
 .claude/.env
+.claude/packs/

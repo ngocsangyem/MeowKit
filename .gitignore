@@ -49,5 +49,6 @@ tasks/reviews/
 .claude/logs/
 .claude/metadata.json
 .claude/session-state/
+.claude/packs/
 release-manifest.json
 

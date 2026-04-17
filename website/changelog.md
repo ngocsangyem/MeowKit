@@ -5,6 +5,44 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.3.12 (2026-04-17) — External Codebase Packing + chom v2 Rigor
+
+### Features
+
+- **feat:** NEW skill `meow:pack` — wraps `npx repomix@^1.11` to produce a single AI-friendly file (markdown/xml/json/plain) from an external repo. Output at `.claude/packs/{timestamp}-{slug}.{ext}` (gitignored).
+- **feat:** `meow:pack --compress` — Tree-sitter signature extraction for API-surface queries (classes/functions/interfaces, bodies omitted)
+- **feat:** `self-pack-guard.sh` — blocks packing the current git root unless `--self` is passed (prevents accidental self-reingest)
+- **feat:** `meow:chom` v2 — 4 user-explicit modes (`--compare` / `--copy` / `--improve` / `--port`) replacing v1's 2-mode scheme
+- **feat:** `meow:chom` speed flags — `--lean` (skip Phase 1 researcher for freeform inputs) and `--auto` (auto-approve non-HARD-GATE steps). Both default off.
+- **feat:** `meow:chom` intent detection — keyword hints map to suggested mode flags
+- **feat:** `meow:chom` sequential-thinking escalation — emits handoff text for 3+ layer features or stateful workflows (never auto-invokes)
+- **feat:** `meow:chom` explicit Boundary Rules — chom emits handoff text only, does NOT invoke `plan-creator` / `brainstorming` / `cook` / `sequential-thinking` mid-flow
+
+### Refactor
+
+- **refactor:** `meow:chom` handoff text enriched — now carries challenge-reds summary + risk score. plan-creator owns adaptation-depth decisions (chom no longer auto-derives mode).
+- **refactor:** `meow:chom` Phase 4 HARD GATE language hardened — explicitly non-bypassable in all modes including `--lean` / `--auto`
+- **refactor:** `--analyze` (v1 default) aliased to no-flag default with deprecation notice. Removed in v1.2.
+
+### Fixes
+
+- **fix:** Removed fabricated "Skills cannot call skills (MeowKit convention)" claim from chom SKILL.md — unsourced and contradicted by `lessons-build-skill.md` §Composing Skills. Replaced with honest "chom's design choice, not a MeowKit platform rule" framing.
+- **fix:** Removed fabricated "40–70% context burn" claim from pack SKILL.md — replaced with correct context-isolation framing (scout's Explore subagents absorb reads in isolated contexts)
+- **fix:** Added Error Recovery entry for empty / unreachable / invalid sources (chom)
+- **fix:** Documented `--lean` semantics per input type (effective for freeform only; no-op for git/local/web/image)
+- **fix:** Documented Comparison Report output location ("print to conversation; no disk write unless user explicitly asks")
+
+### Documentation
+
+- **docs:** NEW what's-new page `v2.3.12.md`
+- **docs:** NEW skill reference `reference/skills/pack.md`
+- **docs:** Updated `reference/skills/chom.md` to v2 (new modes, speed flags, migration table)
+- **docs:** Added `.claude/packs/` to `.gitignore` and `.gitignore.meowkit`
+
+### Red-Team
+
+- **red-team:** 5-team validation (execution flow, integration, context, reality/API grounding, failure modes). 1 CRITICAL hallucination found and fixed (F1). 2 MODERATE + 2 LOW polish items applied. Both skills execute end-to-end with no undefined behavior.
+
 ## 2.3.11 (2026-04-14) — Env Var Handling Hardening
 
 ### Native `env` Field Adoption

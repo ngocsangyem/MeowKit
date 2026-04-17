@@ -130,6 +130,7 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'What\'s New', link: '/guide/whats-new',
               items: [
+                { text: 'v2.3.12 — Pack + chom v2 Rigor', link: '/guide/whats-new/v2.3.12' },
                 { text: 'v2.3.10 — Jira + Confluence + Sprint Planning', link: '/guide/whats-new/v2.3.10' },
                 { text: 'v2.3.1 — Plan Creator Intelligence', link: '/guide/whats-new/v2.3.1' },
                 { text: 'v2.3.0 — The Hook Dispatch Release', link: '/guide/whats-new/v2.3.0' },
@@ -256,6 +257,7 @@ export default withMermaid(defineConfig({
             { text: 'meow:web-to-markdown', link: '/reference/skills/web-to-markdown' },
             { text: 'meow:sequential-thinking', link: '/reference/skills/sequential-thinking' },
             { text: 'meow:chom', link: '/reference/skills/chom' },
+            { text: 'meow:pack', link: '/reference/skills/pack' },
           ],
         },
         {
