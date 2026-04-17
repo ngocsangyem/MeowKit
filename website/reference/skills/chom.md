@@ -11,11 +11,7 @@ Copy-cat, replicate, or adapt features from external systems, repos, apps, or id
 
 `meow:chom` examines an external source — a GitHub repo, a live website, an app screenshot, or even a freeform idea — and produces a structured Replication Spec telling you exactly what to build, how it fits your stack, and what risks to watch for. It challenges every assumption before committing to a plan.
 
-Not limited to MeowKit. Works for any project: SaaS apps, mobile apps, CLI tools, design systems, or MeowKit skills themselves.
-
-::: tip v2 changes (2.3.12)
-chom v2 adopts selective rigor from `ck:xia`: 4 user-explicit modes, speed flags, intent detection, sequential-thinking escalation, and honest Boundary Rules. Legacy `--analyze` aliases the no-flag default (deprecated, removed in v1.2).
-:::
+Works for any project: SaaS apps, mobile apps, CLI tools, design systems, or MeowKit skills themselves.
 
 ## Core Capabilities
 
@@ -30,12 +26,13 @@ chom v2 adopts selective rigor from `ck:xia`: 4 user-explicit modes, speed flags
 ## When to Use This
 
 ::: tip Use meow:chom when...
+
 - You want to replicate a feature from another app ("build Stripe's checkout for us")
 - You found a repo with a pattern worth copying ("port auth from this repo")
 - You're deciding between approaches ("compare Supabase vs Firebase")
 - You want to clone a UI design ("1:1 copy this landing page")
 - You want to understand how a system works before building something similar
-:::
+  :::
 
 ## Usage
 
@@ -63,34 +60,34 @@ chom v2 adopts selective rigor from `ck:xia`: 4 user-explicit modes, speed flags
 
 All modes are user-explicit. chom does NOT auto-derive adaptation depth.
 
-| Mode | Intent | Phase 3 focus |
-|------|--------|---------------|
-| `--compare` | Analysis only, no decision | Architectural differences and trade-offs |
-| `--copy` | Transplant with minimal changes | Compatibility gaps |
-| `--improve` | Adapt anti-patterns during port | Anti-pattern detection |
-| `--port` | Rewrite idiomatically for local stack | Idiom translation |
-| no flag | Full workflow, no mode declaration | Architectural differences |
+| Mode        | Intent                                | Phase 3 focus                            |
+| ----------- | ------------------------------------- | ---------------------------------------- |
+| `--compare` | Analysis only, no decision            | Architectural differences and trade-offs |
+| `--copy`    | Transplant with minimal changes       | Compatibility gaps                       |
+| `--improve` | Adapt anti-patterns during port       | Anti-pattern detection                   |
+| `--port`    | Rewrite idiomatically for local stack | Idiom translation                        |
+| no flag     | Full workflow, no mode declaration    | Architectural differences                |
 
 ## Intent Detection
 
 If the user provides natural-language mode hints, chom maps them:
 
-| User says | Suggested flag |
-|-----------|----------------|
-| "compare", "vs", "how does X do Y" | `--compare` |
-| "copy", "1:1", "exact", "as-is" | `--copy` |
-| "adapt", "improve", "like how X does it" | `--improve` |
-| "port", "rewrite", "convert", "steal", "bring from" | `--port` |
+| User says                                           | Suggested flag |
+| --------------------------------------------------- | -------------- |
+| "compare", "vs", "how does X do Y"                  | `--compare`    |
+| "copy", "1:1", "exact", "as-is"                     | `--copy`       |
+| "adapt", "improve", "like how X does it"            | `--improve`    |
+| "port", "rewrite", "convert", "steal", "bring from" | `--port`       |
 
 ## Input Routing
 
-| Input | Detection | Tool Used |
-|-------|-----------|-----------|
-| Git URL (`github.com/*`, `gitlab.com/*`) | URL contains git host | `git clone --depth 1` → `meow:scout` |
-| Web URL (`https://...`) | URL, not git host | `meow:web-to-markdown` or `meow:browse` |
-| Local path (`./`, `../`, `/`) | Starts with `.` or `/` | Direct Read/Glob |
-| Freeform text | No URL or path | `researcher` agent (WebSearch) |
-| Image/screenshot | Image file extension | `meow:multimodal` (Gemini vision) |
+| Input                                    | Detection              | Tool Used                               |
+| ---------------------------------------- | ---------------------- | --------------------------------------- |
+| Git URL (`github.com/*`, `gitlab.com/*`) | URL contains git host  | `git clone --depth 1` → `meow:scout`    |
+| Web URL (`https://...`)                  | URL, not git host      | `meow:web-to-markdown` or `meow:browse` |
+| Local path (`./`, `../`, `/`)            | Starts with `.` or `/` | Direct Read/Glob                        |
+| Freeform text                            | No URL or path         | `researcher` agent (WebSearch)          |
+| Image/screenshot                         | Image file extension   | `meow:multimodal` (Gemini vision)       |
 
 ## Workflow
 
@@ -98,14 +95,14 @@ If the user provides natural-language mode hints, chom maps them:
 [1. Recon] → [2. Map] → [3. Analyze] → [4. Challenge] ══ HARD GATE ══ [5. Decision] → [6. Handoff]
 ```
 
-| Phase | What Happens |
-|-------|-------------|
-| 1. Recon | Fetch/clone source + read local `docs/project-context.md`. `--lean` skips researcher-agent for freeform inputs only. |
-| 2. Map | Build dependency matrix: source → local (EXISTS / NEW / CONFLICT) |
-| 3. Analyze | Trace execution flow, data model, UX. Mode-specific focus applied here. For 3+ layers or stateful workflows → emit handoff text directing user to `/meow:sequential-thinking`. |
-| 4. Challenge | 7 questions + risk scoring + decision matrix. **Human approval required.** |
-| 5. Decision | Go/no-go based on challenge results |
-| 6. Handoff | Replication Spec + challenge summary + next step for user |
+| Phase        | What Happens                                                                                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1. Recon     | Fetch/clone source + read local `docs/project-context.md`. `--lean` skips researcher-agent for freeform inputs only.                                                           |
+| 2. Map       | Build dependency matrix: source → local (EXISTS / NEW / CONFLICT)                                                                                                              |
+| 3. Analyze   | Trace execution flow, data model, UX. Mode-specific focus applied here. For 3+ layers or stateful workflows → emit handoff text directing user to `/meow:sequential-thinking`. |
+| 4. Challenge | 7 questions + risk scoring + decision matrix. **Human approval required.**                                                                                                     |
+| 5. Decision  | Go/no-go based on challenge results                                                                                                                                            |
+| 6. Handoff   | Replication Spec + challenge summary + next step for user                                                                                                                      |
 
 ::: warning Hard Gate
 Phase 4 (Challenge) must complete and get human approval before Phase 5 (Decision).
@@ -116,10 +113,15 @@ Non-bypassable — no flag, including `--lean` or `--auto`, skips this step.
 
 ```markdown
 # Replication Spec: [Feature/System Name]
+
 ## 1. Source — name, URL, tech stack, what we're replicating
+
 ## 2. What to Build — specific features/patterns to replicate
+
 ## 3. Stack Fit — maps to our stack (exists / new / conflicts)
+
 ## 4. Risks & Effort — what's hard, estimated complexity
+
 ## 5. Recommendation — replicate / adapt / reject + next step
 ```
 
@@ -149,7 +151,7 @@ To bias future chom analysis toward a specific adaptation depth, re-invoke with:
 
 chom emits handoff text. It does NOT invoke any other MeowKit skill mid-flow — including `/meow:plan-creator`, `/meow:brainstorming`, `/meow:cook`, or `/meow:sequential-thinking`.
 
-This is chom's design choice, not a MeowKit platform rule. Skills *can* reference other skills and the model may invoke them; chom opts out because mid-flow invocations of other orchestration skills would break phase ownership — each has its own multi-phase workflow that would interleave with chom's HARD GATE discipline.
+This is chom's design choice, not a MeowKit platform rule. Skills _can_ reference other skills and the model may invoke them; chom opts out because mid-flow invocations of other orchestration skills would break phase ownership — each has its own multi-phase workflow that would interleave with chom's HARD GATE discipline.
 
 chom's job ends at Phase 6 Handoff; the user invokes the next skill.
 
@@ -165,13 +167,13 @@ chom's job ends at Phase 6 Handoff; the user invokes the next skill.
 
 ## Migration (v1 → v2)
 
-| v1 | v2 |
-|----|----|
-| `--analyze` (default) | No-flag default (or explicit `--analyze` — deprecated, removed v1.2) |
-| 2 modes | 4 user-explicit modes + no-flag default |
-| No speed flags | `--lean`, `--auto` |
-| Implicit phase ownership | Explicit Boundary Rules section |
-| "Skills cannot call skills (MeowKit convention)" | Honest "chom's design choice" framing |
+| v1                                               | v2                                                                   |
+| ------------------------------------------------ | -------------------------------------------------------------------- |
+| `--analyze` (default)                            | No-flag default (or explicit `--analyze` — deprecated, removed v1.2) |
+| 2 modes                                          | 4 user-explicit modes + no-flag default                              |
+| No speed flags                                   | `--lean`, `--auto`                                                   |
+| Implicit phase ownership                         | Explicit Boundary Rules section                                      |
+| "Skills cannot call skills (MeowKit convention)" | Honest "chom's design choice" framing                                |
 
 ## Related
 
