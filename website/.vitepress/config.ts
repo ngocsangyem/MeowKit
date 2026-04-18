@@ -13,7 +13,7 @@ export default withMermaid(defineConfig({
     },
   },
   title: 'MeowKit',
-  description: 'AI agent toolkit for Claude Code — 68+ skills, 15 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
+  description: 'AI agent toolkit for Claude Code — 74+ skills, 16 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
   lang: 'en-US',
   cleanUrls: true,
   sitemap: {
@@ -39,7 +39,7 @@ export default withMermaid(defineConfig({
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
       name: 'MeowKit',
-      description: 'AI agent toolkit for Claude Code with 68+ skills, 15 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
+      description: 'AI agent toolkit for Claude Code with 74+ skills, 16 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
       applicationCategory: 'DeveloperApplication',
       operatingSystem: 'macOS, Linux, Windows',
       url: 'https://docs.meowkit.dev',
@@ -130,6 +130,7 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'What\'s New', link: '/guide/whats-new',
               items: [
+                { text: 'v2.4.0 — The Agent Constitution Release', link: '/guide/whats-new/v2.4.0' },
                 { text: 'v2.3.12 — Pack + chom v2 Rigor', link: '/guide/whats-new/v2.3.12' },
                 { text: 'v2.3.10 — Jira + Confluence + Sprint Planning', link: '/guide/whats-new/v2.3.10' },
                 { text: 'v2.3.1 — Plan Creator Intelligence', link: '/guide/whats-new/v2.3.1' },

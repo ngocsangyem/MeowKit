@@ -10,6 +10,16 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### [v2.4.0 — The Agent Constitution Release](/guide/whats-new/v2.4.0) (2026-04-18)
+
+Three plans executed in a single audit-and-fix cycle. The headline change is `docs/project-context.md` — a 286-line agent constitution loaded by every agent at session start via the `project-context-loader.sh` hook. All 16 agents wired. 61/64 audit findings resolved, 0 regressions.
+
+- **Agent constitution** — `docs/project-context.md` (11 sections) as single source of truth for all 16 agents; CF3 closed permanently
+- **SessionStart hook** — `project-context-loader.sh` injects the constitution before any task context; missing file now emits an actionable warning
+- **Setup discoverability** — `npx mewkit setup` surfaces in README, CLAUDE.md, and project-context.md; `ensure-skills-venv.sh` hook as idempotent safety net
+- **`meow:project-context init`** — writes TODO-filled skeleton for new projects from `templates/skeleton.md`
+- **Audit delta** — 5 red-team teams, 64 findings (6C/18H/34M/6L), 61 resolved; 12 skills got real domain-specific Gotchas; 7 gate-owning skills wired to gate-rules.md
+
 ### v2.3.12 — External Codebase Packing + chom v2 Rigor (2026-04-17)
 
 New `meow:pack` skill exports an external repository as a single AI-friendly file (markdown/xml/json) for handoff to other LLMs, reviewers, or archival. Wraps repomix via `npx` — no global install required. Includes `--compress` mode for Tree-sitter signature extraction (ideal for API-surface queries), self-pack guard preventing accidental self-reingest, and secret scanning on by default.
