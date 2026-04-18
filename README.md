@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  58+ skills &middot; 15+ agents &middot; 18+ commands &middot; 7+ modes &middot; 17+ rules &middot; 9+ hooks &middot; 4-layer+ security
+  74+ skills &middot; 16+ agents &middot; 20+ commands &middot; 7 modes &middot; 18 rules &middot; 14+ hooks &middot; 4-layer+ security
 </p>
 
 <p align="center">
@@ -19,7 +19,7 @@
 
 ## What is MeowKit
 
-MeowKit installs a `.claude/` directory that Claude Code reads at session start. It enforces a structured 7-phase workflow with hard gates, TDD, security scanning, and cross-session memory. Zero external dependencies for core workflow.
+MeowKit installs a `.claude/` directory that Claude Code reads at session start. It enforces a structured 7-phase workflow with hard gates, TDD, security scanning, and scoped topic-file memory (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`). Zero external dependencies for core workflow.
 
 **Documentation:** [docs.meowkit.dev](https://docs.meowkit.dev/) (VitePress)
 
@@ -68,12 +68,13 @@ npx mewkit doctor     # Verify environment
 ```
 meowkit/
 ├── .claude/                  Source of truth — agents, skills, rules, hooks
-│   ├── agents/               15 specialist agents
-│   ├── skills/               58 skills (meow: namespace)
-│   ├── rules/                17 enforcement rules
-│   ├── hooks/                9 lifecycle hooks
-│   ├── commands/             18 slash commands
+│   ├── agents/               16 specialist agents
+│   ├── skills/               74 skills (meow: namespace)
+│   ├── rules/                18 enforcement rules
+│   ├── hooks/                14+ lifecycle hooks + handler libs
+│   ├── commands/             20 slash commands
 │   ├── modes/                7 behavioral modes
+│   ├── memory/               Machine-local topic files (gitignored; scaffolded by `mewkit setup`)
 │   ├── scripts/              Python validators + shell utilities
 │   └── settings.json
 ├── tasks/                    Task templates

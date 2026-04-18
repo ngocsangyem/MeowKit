@@ -5,6 +5,59 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.4.1 (2026-04-18) — Memory Simplification + Red-Team Hardening
+
+### Refactor
+
+- **refactor:** Deleted the auto-inject memory pipeline (`memory-loader.cjs`, `memory-parser.cjs`, `memory-filter.cjs`, `memory-injector.cjs` — 4 handlers, ~288 LOC). `UserPromptSubmit` no longer runs a global memory-injection step. Consumer skills (`meow:fix`, `meow:cook`, `meow:plan-creator`, `meow:review`) now read the relevant topic file on demand via their SKILL.md `Read` step.
+- **refactor:** Split `patterns.json` (8 entries, monolith) into three scoped JSON files: `fixes.json` (bug-class failures, 4 entries), `review-patterns.json` (review/architecture patterns, 3 entries), `architecture-decisions.json` (architectural decisions). Each file carries schema v2.0.0 with a `scope` field that blocks cross-file writes.
+- **refactor:** `lessons.md` demoted to an archived stub. Content migrated to four topic files (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`, `security-notes.md`) via the new `memory-topic-file-migrator.cjs` (idempotent).
+- **refactor:** `immediate-capture-handler.cjs` inlined `extractKeywords` + `escapeMemoryContent` from the deleted pipeline modules. `##decision:` now routes to `architecture-decisions.json` as a structured JSON entry (previously wrote to the `lessons.md` stub). `##pattern:` is category-routed to the correct split file (`bug-class` → `fixes.json`, `decision` → `architecture-decisions.json`, default → `review-patterns.json`).
+
+### Features
+
+- **feat:** NEW `.claude/hooks/lib/secret-scrub.cjs` — JS port of `secret-scrub.sh` with 16 regex patterns (Anthropic, OpenAI, Stripe, AWS, GitHub PAT/OAuth, GitLab PAT, Slack tokens + webhooks, JWT, private keys, Bearer tokens, DB URLs, emails, `MEOWKIT_*` env secrets, generic `api_key=`/`password=`/`token=`). Wired into the capture path so `##decision: use stripe key sk_live_abc...` persists with the key redacted — leaked secrets no longer re-enter future session context.
+- **feat:** Vitest suite for the memory subsystem — **40 passing tests** across 7 files (first test coverage the subsystem has ever had). Covers migration idempotency, concurrent `post-session.sh` atomicity, `##prefix:` routing, schema validation, `findMemoryDir` behavioral tests, and secret scrub.
+- **feat:** `packages/mewkit/src/commands/memory.ts` — `findMemoryDir` exported with project-root sentinel (stops at `CLAUDE.md` or `.claude/settings.json`) and 5-level depth cap; `clearMemory` writes valid v2.0.0 skeletons to all three split files instead of bare `[]`; `showStats` / `showSummary` read the three split files.
+
+### Fixes (15-ID memory red-team audit — all closed)
+
+- **fix (C1):** `post-session.sh` lock-failure fallthrough — the `acquire_lock ||` branch could still execute the heredoc write. Block removed; retroactive-capture heredoc eliminated entirely.
+- **fix (C2):** Commit-message privilege escalation — `post-session.sh:46-49` auto-tagged `NEEDS_CAPTURE CRITICAL` whenever the last 5 commit messages contained "critical|security|vuln|cve|hotfix", bypassing filter budgets. Pipeline removed.
+- **fix (C3):** Legacy-body re-injection — `memory-parser.cjs:82-93` stored pre-frontmatter legacy blocks as raw `body` which re-entered context unvalidated. Closed by deletion of the parser.
+- **fix (H1):** Stale-lock false-eviction — dual `stat` failure fell back to `echo 0` (always-stale). Safe mtime retry pattern replaces it.
+- **fix (H2):** `findMemoryDir` walked to filesystem root (could clear a parent project's memory from a nested CWD). Now bounded to 5 levels with project-root sentinel check; also accepts optional `startDir` for testability.
+- **fix (H3):** `secret-scrub.sh` narrow denylist — extended with Bearer tokens, DB URLs, emails, `MEOWKIT_*` env secrets, and generic `api_key=` / `password=` / `token=` patterns.
+- **fix (M1):** `cost-log.json` writer/spec schema drift — writer schema now matches spec (`session_id`, `model`, `cache_write_tokens`, `cache_read_tokens` fields added).
+- **fix (M2):** `clearMemory` wrote bare `"[]"` destroying the `{version, patterns, metadata}` schema. Now writes proper skeletons per file scope.
+- **fix (M3):** `^---$` split collided with Markdown HR inside entry bodies — resolved by parser deletion.
+- **fix (M4):** Dormant `version` field — now actively declared per split file with `scope` verification on read.
+- **fix (M5):** Live duplicate in `patterns.json` — `pattern-202604121231` (freq=1) collapsed into `gnu-grep-bre-macos` (freq=3→4) during migration.
+- **fix (M6):** Lexical keyword-to-domain match produced unloadable LLM-generated tags — retired with the filter; topic-file retrieval is explicit `Read`, not keyword-filtered.
+- **fix (M7):** `cost-log.json` write had no atomicity — now uses temp-file + `os.replace` rename; 5-process concurrent test asserts all entries persist.
+- **fix (M8):** `SESSION_ID` piped unvalidated into `sed s|...|$SESSION_ID|g` in `conversation-summary-cache.sh` — format validated against `^[a-f0-9-]{8,36}$` before use.
+- **fix (M9):** No consolidation threshold — hint now checks sum of all topic file line counts (`> 500` triggers pruning suggestion).
+
+### Fixes (post-red-team hardening pass)
+
+- **fix:** `appendToPatterns` in `immediate-capture-handler.cjs` used bare `writeFileSync` — upgraded to `writeJsonAtomic` (temp-rename). Crash mid-write no longer corrupts `fixes.json` / `review-patterns.json`.
+- **fix:** Dual-lock race — `##pattern:decision` held `.patterns.lock` while `##decision:` held `.decisions.lock`, both targeting `architecture-decisions.json`. Lock is now derived from the target file path, so both prefixes share the same lock.
+- **fix:** `MEMORY_DIR` ENOENT on fresh installs — handler now `mkdirSync(..., { recursive: true })` before acquiring any lock or reading any file. Captures on blank projects no longer silently fail.
+- **fix:** False `auto-loaded per turn` claim in `docs/project-context.md` corrected — `.claude/memory/` is a MeowKit convention, not Claude Code platform auto-memory. Auto-memory lives at `~/.claude/projects/<project>/memory/`.
+
+### Documentation
+
+- **docs:** 17 website + 4 internal docs + 7 `.claude/commands` and skill references updated to describe the topic-file scheme. Removed stale `lessons.md` / `patterns.json` / `NEEDS_CAPTURE` instructions from: `website/reference/agents/analyst.md` (full overview rewrite), `website/guide/workflow-phases.md`, `website/reference/skills/{plan-creator,fix}.md`, `website/workflows/{add-feature,new-project,maintenance}.md`, `website/cli/commands.md`, `docs/memory-system.md` (full rewrite), `docs/{meowkit-architecture,meowkit-system-flow,project-context}.md`, and the 7 command/skill reference files.
+- **docs:** Internal plan/phase IDs removed from all published docs.
+- **docs:** NEW migration section in `docs/memory-system.md` describing the one-time `npx mewkit memory migrate` flow for pre-v2.4.1 projects with an active `lessons.md`.
+
+### Chore
+
+- **chore:** `.gitignore` — `.claude/memory/*` now ignored (only `.gitkeep` tracked). Content files are machine-local workspace state; fresh `mewkit setup` installs start with an empty memory directory. Reverses the short-lived team-learnings-in-repo experiment from earlier this day.
+- **chore:** Removed `.claude/memory/lessons.md.bak` and the 11 previously-tracked memory content files from git history (kept on disk per developer preference).
+
+---
+
 ## 2.4.0 (2026-04-18) — The Agent Constitution Release
 
 ### Features
