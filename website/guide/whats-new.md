@@ -6,210 +6,174 @@ persona: A
 
 # What's New
 
-Release notes for each MeowKit version.
+Release notes for each MeowKit version. Each entry is a 1–2 sentence summary; full per-release detail lives in the [Changelog](/changelog). Major releases also have a dedicated page (linked from the title).
+
+To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.4.3 — Brainstorming v2 (2026-04-18)
+
+`meow:brainstorming` rewritten with discovery protocol, scope assessment, anti-bias pivot, and 3 new techniques (analogical-thinking, scamper, perspective-shift).
+
+### v2.4.2 — Memory Fix (2026-04-18)
+
+Closes the second red-team round on the memory subsystem and corrects three published-doc inaccuracies introduced during the v2.4.1 rewrite.
+
+- Lock-acquisition uses exponential backoff + jitter — eliminates 20–40% concurrent-write drop rate.
+- Shell-side secret scrubber matches JS-side patterns (Stripe keys, DB URLs); macOS BSD `sed` portability fix.
+- `findMemoryDir` no longer walks into a parent project — closes data-loss risk on `mewkit memory --clear` from a nested dir.
+- Auto-memory docs corrected: `memory/` directory (not `MEMORY.md` file), explicit 200-line / 25 KB cap, subagent isolation documented, and `.claude/memory/` clarified as machine-local (gitignored — not team-shared).
+
 ### v2.4.1 — Memory Simplification + Red-Team Hardening (2026-04-18)
 
-Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + injector) and replaces it with on-demand topic-file reads per consumer skill. Closes all 15 red-team findings (C1–C3, H1–H3, M1–M9) from the memory audit; most close by deletion.
+Deletes the auto-inject memory pipeline and replaces it with on-demand topic-file reads per consumer skill. Closes all 15 findings from the memory red-team audit; most close by deletion.
 
-- **Topic-file layout** — `fixes.md/json`, `review-patterns.md/json`, `architecture-decisions.md/json`, `security-notes.md` replace the `lessons.md` + `patterns.json` monolith. Each file has a single consumer skill.
-- **On-demand retrieval** — consumer skills (`meow:fix`, `meow:cook`, `meow:plan-creator`, etc.) read the relevant topic file via their SKILL.md `Read` step. No global auto-injection. No lexical keyword filter.
-- **Atomic capture writes** — `immediate-capture-handler.cjs` uses temp-rename for all JSON writes; crash mid-write no longer corrupts split files. Dual-lock race on `architecture-decisions.json` eliminated by per-target-file lock derivation.
-- **Secret scrub on capture** — new `lib/secret-scrub.cjs` redacts Anthropic, OpenAI, Stripe, AWS, GitHub, JWT, DB URL, and Bearer token patterns before persist. Leaked secrets no longer re-enter future session context.
-- **Fresh-install guard** — handler auto-creates `MEMORY_DIR` on first run. Captures on blank projects no longer silently drop to ENOENT.
-- **Memory is machine-local by default** — `.claude/memory/*` is gitignored; `mewkit setup` scaffolds a blank directory. Downstream installs no longer inherit the MeowKit dev team's learnings.
-- **Vitest coverage** — 40 tests across 7 files (first test coverage the memory subsystem has ever had); covers migration idempotency, concurrent `post-session.sh` atomicity, secret scrub, `##prefix:` routing, and schema validation.
-- **Docs cleanup** — 24 files across `docs/`, `website/`, `.claude/commands/`, and `.claude/skills/` updated to describe the topic-file scheme. Internal plan/phase IDs removed from published docs.
+- Topic-file layout: `fixes.md/json`, `review-patterns.md/json`, `architecture-decisions.md/json`, `security-notes.md` replace the `lessons.md` + `patterns.json` monolith.
+- Atomic capture writes (temp-rename for all JSON), per-target-file lock derivation eliminates the dual-lock race.
+- 16-pattern secret scrubber wired into the capture path — leaked secrets no longer re-enter future session context.
+- `.claude/memory/*` is now gitignored — machine-local by default; downstream installs no longer inherit the dev team's learnings.
 
 ### [v2.4.0 — The Agent Constitution Release](/guide/whats-new/v2.4.0) (2026-04-18)
 
-Three plans executed in a single audit-and-fix cycle. The headline change is `docs/project-context.md` — a 286-line agent constitution loaded by every agent at session start via the `project-context-loader.sh` hook. All 16 agents wired. 61/64 audit findings resolved, 0 regressions.
+`docs/project-context.md` becomes the single source of truth for every agent — a 286-line constitution loaded at SessionStart by all 16 agents. Full audit cycle: 64 findings, 61 resolved, 0 regressions.
 
-- **Agent constitution** — `docs/project-context.md` (11 sections) as single source of truth for all 16 agents; CF3 closed permanently
-- **SessionStart hook** — `project-context-loader.sh` injects the constitution before any task context; missing file now emits an actionable warning
-- **Setup discoverability** — `npx mewkit setup` surfaces in README, CLAUDE.md, and project-context.md; `ensure-skills-venv.sh` hook as idempotent safety net
-- **`meow:project-context init`** — writes TODO-filled skeleton for new projects from `templates/skeleton.md`
-- **Audit delta** — 5 red-team teams, 64 findings (6C/18H/34M/6L), 61 resolved; 12 skills got real domain-specific Gotchas; 7 gate-owning skills wired to gate-rules.md
+- New `meow:project-context init` command writes a TODO-filled skeleton from `templates/skeleton.md`.
+- New SessionStart hook `ensure-skills-venv.sh` — idempotent bootstrap of `.claude/skills/.venv`.
+- 12 SKILL.md files got real domain-specific Gotchas; 7 gate-owning skills wired to `gate-rules.md`.
 
 ### v2.3.12 — External Codebase Packing + chom v2 Rigor (2026-04-17)
 
-New `meow:pack` skill exports an external repository as a single AI-friendly file (markdown/xml/json) for handoff to other LLMs, reviewers, or archival. Wraps repomix via `npx` — no global install required. Includes `--compress` mode for Tree-sitter signature extraction (ideal for API-surface queries), self-pack guard preventing accidental self-reingest, and secret scanning on by default.
-
-`meow:chom` refactored to v2 with selective xia-style rigor: 4 user-explicit modes (`--compare` / `--copy` / `--improve` / `--port`), speed flags (`--lean` / `--auto`), intent detection, and sequential-thinking escalation via handoff (never auto-invoke). HARD GATE remains non-bypassable in every mode. Chom does NOT auto-derive adaptation depth — user picks explicitly or plan-creator decides downstream.
-
-Two fabrications corrected: the "Skills cannot call skills (MeowKit convention)" claim (unsourced — skills *can* reference each other) and the "40–70% context burn" number in pack SKILL.md (replaced with honest context-isolation framing). Red-team validation across 5 teams confirmed both skills execute end-to-end.
+New `meow:pack` skill exports an external repo as a single AI-friendly file (markdown/xml/json) via `repomix`. `meow:chom` refactored to v2 with 4 user-explicit modes (`--compare` / `--copy` / `--improve` / `--port`), speed flags, and a non-bypassable HARD GATE.
 
 ### v2.3.11 — Env Var Handling Hardening (2026-04-14)
 
-Adopts Claude Code's native `settings.json` `env` field for team-shared defaults — 9 control flags (TDD, build-verify, loop-detect, etc.) no longer require custom parsers to load. Three-layer precedence: shell export > `.claude/.env` > `settings.json` `env`.
-
-Parser bugs fixed in both `load-dotenv.sh` (shell) and `dispatch.cjs` (Node.js): quoted values with `#` (API keys like `"abc#123"`) are preserved literally instead of being truncated; inline comments stripped only from unquoted values; dangerous keys (`PATH`, `LD_PRELOAD`, etc.) blocked to prevent env injection via rogue `.env` files.
-
-Agents now see a `## MeowKit Config` block at SessionStart showing active control vars — resolves the "Claude reports MEOWKIT_ vars not found" issue. Gated on new sessions only (not resume/clear/compact) to avoid context pollution.
-
-Three rounds of red-team review produced 12 findings (3 Critical, 4 High, 5 Medium) — all resolved. New 8-test verification suite at `.claude/scripts/verify-env-loading.sh`.
+Adopts Claude Code's native `settings.json` `env` field for team-shared defaults. Three-layer precedence: shell export > `.claude/.env` > `settings.json`. Parser fixes for quoted-with-`#` values, indented keys, and dangerous-key blocking (PATH, LD_PRELOAD, IFS, etc.).
 
 ### v2.3.10 — Jira Ticket Intelligence + Confluence & Sprint Planning (2026-04-13)
 
-See [changelog](../changelog.md#_2-3-10-2026-04-13-jira-ticket-intelligence-confluence-sprint-planning) for full details.
+Three new capabilities for ticket workflows:
 
-### v2.3.9 — Memory System Hardening & FactoryAI Adaptation (2026-04-12)
+- `meow:jira` adds `evaluate` (complexity assessment), `estimate` (story points), and `analyze` (RCA) commands.
+- New `meow:confluence` skill — fetches Confluence pages as markdown with gap detection (`[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` tags).
+- New `meow:planning-engine` skill — codebase-aware tech review + sprint planning with deterministic dependency-graph and capacity-binning scripts.
 
-MeowKit's memory system — the backbone of cross-session learning — gets its biggest hardening since launch. Driven by a FactoryAI comparative analysis and 5 rounds of red-team review.
+### v2.3.9 — Memory System Hardening (2026-04-12)
 
-**Modularization:** `memory-loader.cjs` split into 3 focused modules (parser, filter, injector). Each under 100 lines, independently testable.
+Memory loader split into 3 focused modules. 4 critical security/correctness fixes (tag escape, budget split, YAML validation, per-entry caps).
 
-**Critical fixes:** Budget overflow (one entry starving all others), YAML silent fallback (malformed entries losing severity), tag escape (DATA boundary injection), and file locking (mkdir-based, POSIX portable — `flock` doesn't exist on macOS). Shell-to-Python injection eliminated across all hook files.
-
-**Immediate capture:** Type `##decision: chose X over Y` and it's written to `lessons.md` instantly — survives mid-session crashes. Also `##pattern:` (patterns.json) and `##note:` (quick-notes.md). All validated against injection patterns before writing.
-
-**Staleness & expiration:** Standard entries >6 months auto-skipped. Patterns expire after 12 months. Critical/security entries never expire. All thresholds configurable via env vars.
-
-**Anchored summarization (opt-in):** `MEOWKIT_SUMMARY_MODE=merge` enables merge-based compression that preserves earlier context. Default remains `full-regen` until quality is validated on real sessions.
-
-**Project readiness:** 5-point score at session start (CLAUDE.md, project-context, test, lint, typecheck). Detects Node.js, Python, Rust, Makefile projects. Team preferences via `.claude/memory/preferences.md`.
-
-**Archival:** `meow:memory --prune` moves old standard entries to `lessons-archive.md`, recovering injection budget. Critical entries exempt.
+- New `##decision:` / `##pattern:` / `##note:` immediate-capture prefixes auto-route to typed memory files.
+- Opt-in anchored summarization (`MEOWKIT_SUMMARY_MODE=merge`) preserves earlier context across compressions.
+- New `.claude/memory/preferences.md` for team-shared preferences.
+- Agent readiness banner — 5-point score (CLAUDE.md, project-context, test, lint, typecheck) at session start.
 
 ### v2.3.8 — Multimodal Resilience, MiniMax & Provider Fallback (2026-04-12)
 
-Major overhaul of `meow:multimodal` — multi-provider generation with intelligent fallback, MiniMax integration (TTS, music, Hailuo video), document conversion, and `MEOWKIT_` env var namespace.
+Major overhaul of `meow:multimodal` — multi-provider generation with intelligent Gemini → MiniMax → OpenRouter fallback.
 
-**Multi-provider generation:** Intelligent provider router auto-selects Gemini → MiniMax → OpenRouter based on available API keys. Override with `--provider` flag. Chain order configurable via `MEOWKIT_IMAGE_PROVIDER_CHAIN` etc.
-
-**MiniMax integration:** Image gen (`image-01`), video gen (Hailuo 2.3 with async polling), text-to-speech (`speech-2.8-hd`, 332 voices, 24 languages), music gen (`music-2.6`). All via stdlib `urllib` — no new pip dependencies.
-
-**Document converter:** `document_converter.py` converts PDFs, DOCX, images to clean Markdown with batch mode. Output: `{stem}_{ext}.md` per file.
-
-**MEOWKIT_ env prefix:** All env vars now use `MEOWKIT_` namespace with backward-compat fallback to legacy names. Shared `env_utils.py` consolidates env loading (was duplicated 4x). `_env()` strips whitespace, returns None for blank values.
-
-**Cost optimization:** `--resolution low-res` (62% video savings), ffmpeg pre-compression, verified pricing ($0.30/1M for gemini-2.5-flash), structured JSON prompts (~50% more token-efficient), output truncation at 6000 chars (CJK-safe).
-
-**Modularization:** `gemini_analyze.py` (411 lines) split into `analyze_constants.py` (121) + `analyze_core.py` (189) + CLI wrapper (85). All files under 200 lines. 8 reference docs.
-
-**CLI update:** `meowkit init` now prompts for Gemini + optional fallback providers (MiniMax, OpenRouter) via multi-select picker. API keys masked with `p.password()`. `.env` written immediately during init with `.gitignore` auto-update. Post-init security message confirms keys stored locally.
-
-**Red-team verified:** 5 rounds of adversarial review (48+ findings, all resolved). Model IDs verified against live Google AI docs. Imagen 4 references removed (sunset June 2026). Pricing corrected from official sources.
+- MiniMax integration: image (`image-01`), video (Hailuo 2.3, async polling), TTS (`speech-2.8-hd`, 332 voices), music (`music-2.6`).
+- Document → Markdown converter with batch mode.
+- `MEOWKIT_` env namespace with backward-compat fallback. API key rotation (`MEOWKIT_GEMINI_API_KEY_2/3/4`) for 4× free-tier throughput.
 
 ### v2.3.7 — meow:chom (2026-04-12)
 
-New `meow:chom` skill — copy-cat, replicate, or adapt features from external systems, repos, apps, or ideas into any project. 6-phase workflow (Recon → Map → Analyze → Challenge → Decision → Handoff) with hard gate, 7 challenge questions (Necessity, Stack Fit, Data Model, Dependency Cost, Effort vs Value, Blast Radius, Maintenance Burden), smart input routing (git clone for repos, web-to-markdown for URLs, multimodal for screenshots), risk scoring, and two modes (`--analyze`, `--compare`). General-purpose — works for any project, not just MeowKit.
+New `meow:chom` skill — copy-cat, replicate, or adapt features from external systems. 6-phase workflow with HARD GATE before Decision; 7 challenge questions; risk scoring (0–2 proceed, 3–4 resolve first, 5+ reject).
 
-### v2.3.6
+### v2.3.6 (2026-04-11)
 
-Remove unused files
+Removed unused files.
 
 ### v2.3.5 — CEO Review Layered Verification (2026-04-11)
 
-Redesigns `meow:plan-ceo-review` as a layered verification pipeline: pre-screen gate (placeholder scan, coverage mapping), two-lens evaluation (Intent Alignment + Execution Credibility with PASS/FAIL anchors), severity tiers (BLOCKER/HIGH-LEVERAGE/POLISH), adversarial necessity per section, and append-only verdict output. Integration: plan-creator auto-suggests CEO review, harness suggests for product builds. Red-team reviewed with all 7 FAILs resolved.
+Redesigns `meow:plan-ceo-review` as a layered verification pipeline. Pre-screen gate (placeholder scan, coverage mapping), two-lens evaluation (Intent Alignment + Execution Credibility), severity tiers (BLOCKER / HIGH-LEVERAGE / POLISH), append-only verdict output.
 
 ### v2.3.4 — Centralized Dotenv Loading (2026-04-11)
 
-Adds `.claude/.env` file support for all hooks and handlers. Shared `lib/load-dotenv.sh` sourced by 11 shell hooks; inline parser in `dispatch.cjs` for 8 Node.js handlers. No external dependencies. Shell exports always take precedence. Includes `.env.example` template with all 19 env vars. Release script decoupled from CLI package builds.
+`.claude/.env` support for all hooks and handlers. Shared `lib/load-dotenv.sh` sourced by 11 shell hooks; inline parser in `dispatch.cjs` for 8 Node.js handlers. Zero external dependencies. Shell exports always take precedence.
 
 ### v2.3.3 — The Wiring Integrity Release (2026-04-11)
 
-5-agent parallel red-team audit of the full MeowKit harness. Fixed 7 critical breakpoints: Gate 2 NON-NEGOTIABLE violation in fast/cost-saver modes, TDD sentinel cross-session persistence, memory system silently dead on default profile, phantom agent dispatch in cook, system-wide wrong memory paths, model-detector silent failure, and missing `meowkit.config.json`. Plus 12 high-severity fixes (budget thresholds, 6 missing agents in CLAUDE.md, 8 orphaned skills indexed, HOOKS_INDEX gaps, phantom command refs, `/harness` command created) and 30 medium/low cleanup items.
+5-agent parallel red-team audit fixed 7 critical breakpoints — Gate 2 NON-NEGOTIABLE violation in fast/cost-saver modes, TDD sentinel cross-session persistence, memory system silently dead on default profile, phantom agent dispatch in cook, system-wide wrong memory paths, model-detector silent failure, and missing `meowkit.config.json`. Plus 12 high-severity fixes.
 
 ### v2.3.2 — The Agent-Skills Integration Release (2026-04-11)
 
-Integrates correctness patterns from Anthropic's agent-skills system. Adds `core-behaviors.md` (6 mandatory operating behaviors + 10 failure modes), per-skill failure catalogs for cook/plan-creator/review, phase composition contracts in CLAUDE.md, and lifecycle routing table for skill discovery via meow:help.
+Integrates correctness patterns from Anthropic's agent-skills system: `core-behaviors.md` (6 mandatory operating behaviors + 10 failure modes), per-skill failure catalogs for cook/plan-creator/review, phase composition contracts in CLAUDE.md, and lifecycle routing table.
 
 ### [v2.3.1 — The Plan Creator Intelligence Release](/guide/whats-new/v2.3.1) (2026-04-11)
 
-Plan-creator's biggest upgrade since v1.3.2. 4-persona red team (Security Adversary + Failure Mode Analyst), `--deep` mode with per-phase scouting, `--tdd` composable flag, standalone subcommands (`red-team`, `validate`, `archive`), enhanced validation framework with detection keywords, memory capture at Gate 1, solution design checklist. Plus ecosystem sync: 18 downstream files updated — cook passes `--deep`/`--tdd` to plan-creator, review/evaluator load `red-team-findings.md`, help lists subcommands, harness offers `--deep` for FULL density.
+Plan-creator's biggest upgrade since v1.3.2.
+
+- 4-persona red team (Security Adversary + Failure Mode Analyst added).
+- New `--deep` mode (per-phase scouting + dependency maps) and `--tdd` composable flag.
+- 3 standalone subcommands: `red-team {path}`, `validate {path}`, `archive`.
 
 ### [v2.3.0 — The Hook Dispatch Release](/guide/whats-new/v2.3.0) (2026-04-11)
 
-Node.js hook dispatch system with 8 handler modules (model detection, budget tracking, checkpoint/resume, memory filtering, build verify, loop detection), cook `--verify`/`--strict` verification flags, review skeptic anchoring, structured memory with domain filtering, and tool output limits. TDD enforcement now opt-in.
+Node.js hook dispatch system with 8 handler modules — model detection, budget tracking, checkpoint/resume, memory filtering, build-verify, loop-detection. Cook gains `--verify` (advisory) and `--strict` (full evaluate, FAIL blocks ship). TDD enforcement now opt-in via `--tdd` or `MEOWKIT_TDD=1`.
 
 ### [v2.2.0 — Generator/Evaluator Harness](/guide/whats-new/v2.2.0) (2026-04-08)
 
-Autonomous multi-hour green-field build pipeline with adaptive density, middleware layer, trace-driven meta-loop, and Phase 9 conversation summary cache.
+Largest architectural addition since 1.0.0. Autonomous multi-hour green-field build pipeline with adaptive density per model tier, middleware layer, and conversation summary cache.
+
+- 6 new harness skills (`harness`, `sprint-contract`, `rubric`, `evaluate`, `trace-analyze`, `benchmark`) + 1 fetch skill (`web-to-markdown`).
+- New `evaluator` agent (skeptic persona, runs in fresh context).
+- Adaptive density auto-selected per model tier — Opus 4.6+ runs LEAN; Haiku short-circuits to MINIMAL.
 
 ### [v1.4.0 — The Plan Intelligence Release](/guide/whats-new/v1.4.0) (2026-04-03)
 
-Dedicated plan red-team with CK-style adjudication, plan-specific personas, and new workflow modes.
-
-- **Red-team extraction:** Monolithic step-04 split into steps 04-07; dedicated `step-05-red-team.md` with 7-field findings, agent adjudication, 3-option user review
-- **Plan-specific personas:** 2 new personas (Assumption Destroyer + Scope Critic) adapted for plan review, not code review
-- **Dynamic persona scaling:** 1-3 phases=2 personas, 4-5=3, 6+=4 (phase-count thresholds)
-- **Fast-mode workflow:** Separate `workflow-fast.md` for compact path (00→03→04→07→08)
-- **--parallel mode:** File ownership matrix, Execution Strategy section, parallel group hydration
-- **--two mode:** 2 competing approaches + trade-off matrix; user selects before red-team
-- **Auditable findings:** Red Team Review section in plan.md with disposition table
+Dedicated plan red-team with adjudication, plan-specific personas, and new workflow modes (`--parallel`, `--two`, fast).
 
 ### v1.3.4 — Hook path resolution fix (2026-04-02)
 
-- **all hooks** — use `$CLAUDE_PROJECT_DIR` for absolute paths in settings.json and CWD guard in all 8 scripts; fixes "No such file or directory" when CWD differs from project root
+All hooks use `$CLAUDE_PROJECT_DIR` for absolute paths and CWD guard. Fixes "No such file or directory" when CWD differs from project root.
 
 ### v1.3.3 — The Hook Safety Release (2026-04-02)
 
-- **cost-meter.sh** — always exited 1 (no args passed from settings.json); now exits 0
-- **post-write.sh** — exited 1 on empty/missing file path; now exits 0
-- **pre-task-check.sh** — used `exit 2` for warnings; now exits 0
+Three hooks (`cost-meter.sh`, `post-write.sh`, `pre-task-check.sh`) wrongly exited non-zero on no-op or warn cases — Claude Code treats non-zero as error. All now exit 0 in those cases.
 
-### [v1.3.2 — The Plan Quality Release](/guide/whats-new/v1.3.2)
+### [v1.3.2 — The Plan Quality Release](/guide/whats-new/v1.3.2) (2026-04-01)
 
-Complete redesign of `meow:plan-creator` driven by red-team comparison with ClaudeKit-Engineer's `ck-plan`.
+Complete redesign of `meow:plan-creator`. Step-file architecture (JIT-loaded), multi-file phase output, scope challenge (trivial/simple/complex), 2-persona plan red team, bounded research, and `.plan-state.json` cross-session resume.
 
-- **Step-file architecture:** JIT-loaded steps replace monolithic SKILL.md
-- **Multi-file output:** plan.md overview (≤80 lines) + phase-XX files (12-section template)
-- **Scope challenge:** Trivial → exit, simple → fast, complex → hard + user scope input (EXPANSION/HOLD/REDUCTION)
-- **Plan red team:** 2 adversarial personas review plans before validation (hard mode)
-- **Research integration:** Bounded researchers, findings cited in phase Key Insights, verified links
-- **Sync-back:** `.plan-state.json` checkpoint for cross-session resume
-- **Critical-step tasks:** `[CRITICAL]`/`[HIGH]` todo items get own Claude Tasks
+### [v1.3.1 — The Red Team Depth Release](/guide/whats-new/v1.3.1) (2026-03-31)
 
-### [v1.3.1 — The Red Team Depth Release](/guide/whats-new/v1.3.1)
+Hybrid adversarial persona system for `meow:review`. Phase B adds 4 persona subagents (Security Adversary, Failure Mode Analyst, Assumption Destroyer, Scope Complexity Critic) informed by Phase A findings. Forced-finding protocol prevents rubber-stamping; 4-level artifact verification catches hollow implementations.
 
-Hybrid adversarial persona system for `meow:review` v1.2.0.
+### [v1.3.0 — The Integration Integrity Release](/guide/whats-new/v1.3.0) (2026-03-31)
 
-- **Hybrid Phase A+B:** Base 3 reviewers unchanged + 4 adversarial persona passes as separate findings-informed subagents
-- **Scope gate:** Minimal/full classification — trivial diffs skip personas and verification
-- **Forced-finding:** Zero findings triggers re-analysis once, prevents rubber-stamp approvals
-- **4-level artifact verification:** Exists → Substantive → Wired → Data Flowing in verdict step
-- **Red team guide:** `docs/guides/red-team-overview.md` — end-to-end system documentation
+Full red-team audit of 98 components (15 agents, 60 skills, 9 hooks, 14 rules). 42 critical fixes — including hook enforcement (`gate-enforcement.sh` + `privacy-block.sh` were non-functional since v1.0.0), agent naming, 7-phase model migration, path consistency, and Python venv enforcement.
 
-### [v1.3.0 — The Integration Integrity Release](/guide/whats-new/v1.3.0)
+### v1.2.1 (2026-03-31)
 
-Full red-team audit of 98 components (15 agents, 60 skills, 9 hooks, 14 rules).
+`meow:cook` Phase 6 (Reflect) now spawns a dedicated subagent for `meow:memory` capture — previously was an inline bullet that could be skipped on session interruption.
 
-- **42 critical fixes**: hooks, paths, agent names, phase model, verdicts, venv
-- **Hooks actually enforced**: gate-enforcement + privacy-block were non-functional since v1.0.0
-- **Contribution rules**: `docs/contribution-rules.md` — pre-merge checklist from audit findings
-- **11 audit reports**: detailed per-batch findings in `plans/reports/`
-
-### [v1.2.0 — The Memory Activation Release](/guide/whats-new/v1.2.0)
+### [v1.2.0 — The Memory Activation Release](/guide/whats-new/v1.2.0) (2026-03-31)
 
 Fixed the dormant memory system and enriched it with cross-framework insights.
 
-- **Session capture pipeline fixed:** Stop hook → NEEDS_CAPTURE markers → Phase 0 retroactive capture
-- **3-category extraction:** Learnings captured as patterns, decisions, or failures (from Khuym compounding)
-- **Enriched schema:** New `category`, `severity`, `applicable_when` fields in patterns.json
-- **Consolidation rubric:** 4-branch classification (clear match/ambiguous/no match/no durable signal)
-- **Stronger promotion:** Severity + ≥30 min savings required alongside frequency ≥ 3
-- **Comprehensive docs:** New `memory-system.md` guide + updated VitePress pages
+- Session capture pipeline fixed: Stop hook → `NEEDS_CAPTURE` markers → Phase 0 retroactive capture.
+- 3-category extraction: patterns, decisions, or failures.
+- Enriched `patterns.json` schema (`category`, `severity`, `applicable_when`) — backward compatible.
+- Consolidation rubric — 4-branch classification (clear match / ambiguous / no match / no signal).
 
-### [v1.1.0 — The Reasoning Depth Release](/guide/whats-new/v1.1.0)
+### [v1.1.0 — The Reasoning Depth Release](/guide/whats-new/v1.1.0) (2026-03-30)
 
 Deeper review reasoning, resumable builds, and systematic coverage mapping.
 
-- **3 new skills:** `meow:elicit` (structured second-pass reasoning), `meow:validate-plan` (8-dimension plan validation), `meow:nyquist` (test-to-requirement coverage mapping)
-- **Enhanced review pipeline:** Scout integration + elicitation hook
-- **Beads pattern:** Atomic, resumable work units for COMPLEX builds
-- **Subagent Status Protocol:** DONE / DONE_WITH_CONCERNS / BLOCKED / NEEDS_CONTEXT
-- **SKILLS_INDEX.md:** Centralized registry of 60+ skills
+- 3 new skills: `meow:elicit` (8 named reasoning methods), `meow:validate-plan` (8-dimension validation), `meow:nyquist` (test-to-requirement coverage mapping).
+- Beads pattern — atomic, resumable work units for COMPLEX builds.
+- Subagent Status Protocol — DONE / DONE_WITH_CONCERNS / BLOCKED / NEEDS_CONTEXT.
 
-### [v1.0.0 — The Disciplined Velocity Release](/guide/whats-new/v1.0.0)
+### [v1.0.0 — The Disciplined Velocity Release](/guide/whats-new/v1.0.0) (2026-03-30)
 
-Initial release. 13 capabilities across intelligence, quality, collaboration, and architecture.
+The biggest MeowKit update yet. 13 capabilities across intelligence, quality, collaboration, and architecture.
 
-- **Scale-adaptive routing:** Domain-based complexity detection at Phase 0
-- **Hook enforcement:** Preventive shell hooks upgrade behavioral rules
-- **Adversarial review:** 3 parallel reviewers with triage
-- **Party mode:** Multi-agent deliberation for architecture decisions
-- **Step-file architecture:** JIT-loaded steps with resumability
-- **Parallel execution:** Up to 3 agents in isolated worktrees
+- Scale-adaptive routing — domain-based complexity detection at Phase 0.
+- Hook-based enforcement — preventive shell hooks upgrade behavioral rules.
+- Multi-layer adversarial review — 3 parallel reviewers with triage.
+- Party mode — multi-agent deliberation for architecture decisions.
+- Step-file architecture — JIT-loaded steps with resumability.
+
+### v0.1.x (2026-03-29)
+
+Initial pre-release of MeowKit agent toolkit. Core skill set (`cook`, `fix`, `ship`, `review`, `memory`, `testing`), interactive version selection in `npm create meowkit@latest`, and runtime-dir exclusion from release zip.

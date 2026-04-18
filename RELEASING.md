@@ -105,27 +105,91 @@ cd website && npx vitepress build
 
 Must complete with no errors. Chunk size warnings are normal.
 
-### 2. Update CHANGELOG.md
+### 2. Update CHANGELOG (`website/changelog.md`)
 
-Add a new version section at the top of `CHANGELOG.md`:
+> **Note:** Root `CHANGELOG.md` is a stub that points at `website/changelog.md` (the live source). Edit `website/changelog.md`.
+
+Add a new version section at the **top** (just below the `## Upgrade` block). Use the schema below — only include sections that have content. Empty sections are dropped, not stubbed.
+
+#### Section schema (in this order)
+
+| Section | When to include | Format |
+|---|---|---|
+| `### Highlights` | Always for feature/breaking releases. Optional for patches. | 1–3 sentences. State the user-visible thesis of the release. No file paths, no internal IDs. |
+| `### New Skills` | Whenever ≥1 new skill ships. | Markdown table: `\| Skill \| Purpose \|` |
+| `### New Agents` | Whenever ≥1 new agent ships. | Bullet list: `- ``agent-name`` — purpose.` |
+| `### New Commands` | Whenever ≥1 new slash command ships. | Bullet list: `- ``/command`` — purpose.` |
+| `### CLI` | Whenever `mewkit` CLI changes. | Bullet list. |
+| `### Features` | New user-facing functionality not covered by the New-* sections. | Bullet list. |
+| `### Improvements` | Refactors, ergonomics, perf, prunes that the user notices. | Bullet list. |
+| `### Removals` | Deletions, deprecations, renames. | Bullet list. State migration path inline. |
+| `### Bug Fixes` | All user-visible fixes. | Bullet list. State the symptom + the fix briefly. |
+| `### Beta` | Opt-in / experimental features (env var or flag-gated). | Bullet list. State the opt-in mechanism. |
+| `### Migration Notes` | Only if user action is required. | Bullet list. Include the exact command or env var. |
+| `### Breaking Changes` | Only if there are any. | Bullet list. State the before/after behavior. |
+
+#### Style rules (DRY: enforced by these rules, not duplicated everywhere)
+
+- **One sentence per bullet** unless an env var table or migration command is needed.
+- **No internal IDs** in published bullets — drop `RT-C1`, `M2`, `CF3`, `RF-14`, `phase-XX`, `[CHM]<n>`. They belong in commit messages, not the changelog.
+- **No test counts** (e.g. "40 passed / 3 todo") — that is CI noise, not a user-impact signal.
+- **No audit metadata** ("5 parallel red-team teams audited 78 skills, 64 findings dedup'd") — summarize the *outcome* in Highlights and let bullets describe what changed.
+- **No file counts** ("286 lines, 11 sections, 16 agents wired") — describe what the user gets, not how big the diff was.
+- **No internal plan-directory paths** (`plans/260411-1906-...`).
+- **No `**bold:**` prefix per bullet.** Sentence-case content is enough; bold is reserved for skill / command / agent names referenced inline (use backticks, not bold).
+- **Em dash `—`** between subject and explanation. Hyphens are for compound words.
+- **CLI commands in fenced blocks** when ≥3 chars or a flag combination. Inline backticks for short ones (`mewkit doctor`).
+- **Env vars in tables** when ≥2 are introduced in the same release.
+- **Section dividers `---`** between major versions only, not minor patches.
+
+#### Patch vs. minor vs. major releases
+
+| Release type | Required sections | Optional sections |
+|---|---|---|
+| Patch (`x.y.Z`) | At least one of: `Bug Fixes`, `Improvements` | `Highlights` (only if non-trivial), CLI |
+| Minor (`x.Y.0`) | `Highlights` + at least one of: `Features`, `New Skills`, `New Agents`, `New Commands` | All others |
+| Major (`X.0.0`) | `Highlights` + `Breaking Changes` + `Migration Notes` (if action required) | All others |
+
+#### What goes in `Highlights` vs `Features`
+
+- **Highlights** is the elevator pitch — *what changed in this release at the level the user cares about*. 1–3 sentences. No bullets.
+- **Features** is the granular list of additions. Bullets, one per addition.
+
+If you only have one feature and it's the whole release, put it in **Highlights** as prose and skip **Features**.
+
+#### Worked example
 
 ```markdown
-## [<version>](https://github.com/ngocsangyem/MeowKit/releases/tag/v<version>) (YYYY-MM-DD)
+## 2.5.0 (YYYY-MM-DD) — Release Title
+
+### Highlights
+
+One-paragraph user-facing thesis. State what shipped and why a user
+would want it.
+
+### New Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `meow:example` | One-line purpose. |
 
 ### Features
 
-- **feature name** — description
+- `--new-flag` — what it does.
+- New env var `MEOWKIT_THING` — purpose, default value.
 
-### Documentation
+### Improvements
 
-- description of doc changes
+- Existing thing X now does Y instead of Z.
 
-### Bug Fixes (if any)
+### Bug Fixes
 
-- description
+- Symptom — fix.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the new defaults.
 ```
-
-Follow the existing format. Use `**bold**` for feature names and `—` (em dash) before descriptions.
 
 ### 3. Bump versions
 
