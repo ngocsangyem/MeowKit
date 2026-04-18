@@ -56,6 +56,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | `meow:simplify` | developer | development | monolithic |
 | `meow:clean-code` | developer | development | monolithic |
 | `meow:sequential-thinking` | developer | development | monolithic |
+| `meow:problem-solving` | developer | development | monolithic |
 | `meow:project-organization` | developer | development | monolithic |
 | `meow:bootstrap` | developer | development | monolithic |
 | `meow:verify` | developer | development | monolithic |
@@ -131,7 +132,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 |----------|-------|
 | Planning | 6 |
 | Testing | 7 |
-| Development | 25 |
+| Development | 26 |
 | Review | 8 |
 | Security | 3 |
 | Deployment | 2 |
@@ -139,7 +140,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | Memory | 2 |
 | Utility | 12 |
 | Cross-Cutting | 5 |
-| **Total** | **74** |
+| **Total** | **75** |
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `meow:memory` counted under Memory (not Utility). `meow:retro` counted under Memory (not Documentation).
 

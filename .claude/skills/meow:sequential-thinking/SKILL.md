@@ -5,14 +5,15 @@ description: |
   Use when a problem requires structured step-by-step reasoning before acting.
   Prevents jumping to conclusions or guessing root causes without evidence.
   Triggers on complex debugging, multi-step analysis, hypothesis verification,
-  or when meow:fix invokes diagnosis phase.
+  or when meow:fix invokes diagnosis phase. NOT for being stuck on approach
+  (too many implementations, forced assumptions, innovation block) — use
+  meow:problem-solving instead.
 allowed-tools:
   - Read
   - Grep
   - Glob
   - Bash
-sources:
-  - claudekit-engineer/sequential-thinking
+sources: claudekit-engineer
 ---
 
 # Sequential Thinking
@@ -48,21 +49,25 @@ Use `references/hypothesis-testing.md` template. Key sections:
 ## Sequential Analysis: [problem]
 
 ### Hypotheses
-| # | Hypothesis | Evidence for | Evidence against | Status |
-|---|-----------|-------------|-----------------|--------|
+
+| #   | Hypothesis | Evidence for | Evidence against | Status |
+| --- | ---------- | ------------ | ---------------- | ------ |
 
 ### Root Cause
+
 Confirmed: [root cause]
 Confidence: [high/medium/low]
 Evidence: [what confirms this]
 
 ### Fix Scope
+
 [what must change — files, functions, logic]
 ```
 
 ## Revision & Branching
 
 When new evidence invalidates a previous conclusion:
+
 - Mark revision explicitly: `[REVISION of Hypothesis N]: [correction + why]`
 - When 2+ approaches viable: branch, evaluate each, converge with decision
 
@@ -71,9 +76,18 @@ For advanced techniques (spiral refinement, multi-branch convergence): `referenc
 For uncertainty + revision cascades: `references/advanced-strategies.md`
 For concrete examples: `references/examples-debug.md`, `examples-api.md`, `examples-architecture.md`
 
+## Diagnostic Frameworks
+
+Load when a specific methodology fits the investigation:
+
+- `references/five-whys-plus.md` — enhanced 5-Whys with bias guards + stopping criteria. Use for post-mortems, recurring problems, human-error investigations.
+- `references/scientific-method.md` — hypothesis → falsifiable prediction → experiment → revise. Use for A/B tests, performance investigations, production incidents.
+- `references/kepner-tregoe.md` — SA/PA/DA/PPA + IS/IS-NOT matrix. Use for multi-system bugs, contested root causes, high-stakes decisions.
+
 ## Scripts
 
 Track and format thoughts deterministically:
+
 - `scripts/process-thought.js` — validate, track history, branches, revisions. Max 20 thoughts.
   `node scripts/process-thought.js --thought "..." --number N --total M --next true`
   `node scripts/process-thought.js --summary` (context-efficient handoff to meow:fix)

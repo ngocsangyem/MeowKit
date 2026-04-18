@@ -91,6 +91,8 @@ Source file: `.claude/agents/SKILLS_INDEX.md`
 | [docs-finder](/reference/skills/docs-finder) | Library/API documentation lookup |
 | [multimodal](/reference/skills/multimodal) | Visual content analysis |
 | [scout](/reference/skills/scout) | Codebase exploration |
+| [sequential-thinking](/reference/skills/sequential-thinking) | Evidence-based hypothesis testing for root cause |
+| [problem-solving](/reference/skills/problem-solving) | Stuck on approach — strategic unsticking via 7 techniques |
 
 ## Architecture Types
 

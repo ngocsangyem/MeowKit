@@ -57,6 +57,16 @@ The `--summary` flag on process-thought.js produces a context-efficient handoff 
 | `examples-architecture.md` | Architecture decision                                          |
 | `gotchas.md`               | Common reasoning mistakes                                      |
 
+### Diagnostic Frameworks
+
+Load when a specific methodology fits the investigation:
+
+| Reference                | When to load                                                                            |
+| ------------------------ | --------------------------------------------------------------------------------------- |
+| `five-whys-plus.md`      | Post-mortems, recurring problems, human-error investigations — bias guards + stopping criteria |
+| `scientific-method.md`   | A/B tests, performance investigations, production incidents — falsifiable prediction discipline |
+| `kepner-tregoe.md`       | Multi-system bugs, contested root causes — IS/IS-NOT matrix (SA/PA/DA/PPA)              |
+
 ::: info Skill Details
 **Phase:** Called by meow:fix (Step 2 Diagnose). Also standalone.
 :::
@@ -71,3 +81,4 @@ The `--summary` flag on process-thought.js produces a context-efficient handoff 
 
 - [`meow:fix`](/reference/skills/fix) — Calls sequential-thinking during diagnosis
 - [`meow:investigate`](/reference/skills/investigate) — Collects evidence that feeds into sequential-thinking
+- [`meow:problem-solving`](/reference/skills/problem-solving) — Sister skill for "stuck on approach" (not cause)

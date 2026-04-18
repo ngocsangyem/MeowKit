@@ -120,6 +120,7 @@ Codebase exploration, debugging, and documentation retrieval.
 | [meow:investigate](/reference/skills/investigate) | Systematic 5-phase root cause debugging |
 | [meow:docs-finder](/reference/skills/docs-finder) | Library/project docs via Context7 + Context Hub |
 | [meow:sequential-thinking](/reference/skills/sequential-thinking) | Hypothesis-driven reasoning for root cause analysis |
+| [meow:problem-solving](/reference/skills/problem-solving) | Strategic unsticking — 7 non-default techniques for "stuck on approach" |
 
 ## Browser & QA Testing
 

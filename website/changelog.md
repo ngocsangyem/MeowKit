@@ -15,6 +15,25 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.4.5 (2026-04-19) — The Thinking Skills Release
+
+### Highlights
+
+A new strategic-unsticking skill and three diagnostic frameworks for evidence-based debugging. `meow:problem-solving` ships seven non-default techniques for approach-level stuck-moments — distinct from `meow:sequential-thinking`, which gains five-whys-plus, scientific-method, and kepner-tregoe references for methodology-aware root-cause work.
+
+### New Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `meow:problem-solving` | Seven non-default techniques for "stuck on approach" — simplification cascades, collision-zone thinking, meta-pattern recognition, inversion, scale game, first principles, via negativa. Explicit boundary reroutes debugging to `meow:sequential-thinking`. |
+
+### Improvements
+
+- `meow:sequential-thinking` gains three diagnostic-framework references — `five-whys-plus.md` (bias guards + stopping criteria), `scientific-method.md` (falsifiable prediction discipline), `kepner-tregoe.md` (IS/IS-NOT matrix for multi-system bugs). Core workflow unchanged; load when a specific methodology fits.
+- `SKILLS_INDEX.md` and website skill indexes register the new skill and clarify cross-cutting placement for both thinking skills.
+
+---
+
 ## 2.4.4 (2026-04-19) — Deprecated Skill Cleanup + Brand Refresh
 
 ### Highlights

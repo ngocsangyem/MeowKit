@@ -12,6 +12,14 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.4.5 — The Thinking Skills Release (2026-04-19)
+
+New `meow:problem-solving` skill with seven strategic-unsticking techniques, plus three diagnostic framework references added to `meow:sequential-thinking`. Clear boundary: problem-solving for "stuck on approach", sequential-thinking for "stuck on cause". [Full notes →](/guide/whats-new/v2.4.5)
+
+- `meow:problem-solving` — simplification cascades, collision-zone thinking, meta-pattern recognition, inversion, scale game, first principles, via negativa; dispatch table routes by stuck-symptom with explicit reroute to sequential-thinking for debugging.
+- `meow:sequential-thinking` gains `five-whys-plus.md` (bias guards), `scientific-method.md` (falsifiable prediction), `kepner-tregoe.md` (IS/IS-NOT matrix) — core workflow unchanged.
+- Curation over absorption — audit of 39 third-party thinking frameworks landed only five; the rest stayed out by design.
+
 ### v2.4.4 — Deprecated Skill Cleanup + Brand Refresh (2026-04-19)
 
 Three deprecated skills removed permanently. Brand assets wired into VitePress. Vercel routing fix for direct URL access.

@@ -132,6 +132,7 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'What\'s New', link: '/guide/whats-new',
               items: [
+                { text: 'v2.4.5 — The Thinking Skills Release', link: '/guide/whats-new/v2.4.5' },
                 { text: 'v2.4.0 — The Agent Constitution Release', link: '/guide/whats-new/v2.4.0' },
                 { text: 'v2.3.12 — Pack + chom v2 Rigor', link: '/guide/whats-new/v2.3.12' },
                 { text: 'v2.3.10 — Jira + Confluence + Sprint Planning', link: '/guide/whats-new/v2.3.10' },
@@ -155,6 +156,7 @@ export default withMermaid(defineConfig({
             { text: 'Model Routing', link: '/guide/model-routing' },
             { text: 'Memory System', link: '/guide/memory-system' },
             { text: 'Agent-Skill Architecture', link: '/guide/agent-skill-architecture' },
+            { text: 'Debugging & Thinking Skills', link: '/guide/debugging-skills-decision-guide' },
             { text: 'Task System', link: '/guide/task-system' },
             { text: 'Harness Architecture', link: '/guide/harness-architecture' },
             { text: 'Adaptive Density', link: '/guide/adaptive-density' },
