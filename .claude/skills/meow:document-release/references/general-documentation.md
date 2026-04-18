@@ -1,6 +1,6 @@
 # General Documentation Reference
 
-> Migrated from `meow:documentation` skill. Use `/meow:document-release` for post-ship doc sync.
+Use `/meow:document-release` for post-ship doc sync.
 
 ## When to Use
 
@@ -15,9 +15,6 @@
 | **living-docs.md** | Docs maintenance | Keeping documentation in sync with code changes |
 | **api-sync.md** | API changes | Synchronizing API documentation with endpoint changes |
 | **changelog-gen.md** | Release time | Generating changelog entries from commit history |
-
-> Note: The original `meow:documentation` references (living-docs.md, api-sync.md, changelog-gen.md)
-> remain in `meow:documentation/references/` for backward compatibility during the 2-release deprecation window.
 
 ## Gotchas
 

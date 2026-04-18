@@ -30,7 +30,6 @@ Generate initial project documentation from codebase analysis.
 
 ::: warning Don't use meow:docs-init when...
 - Docs already exist and need updating → use [`meow:document-release`](/reference/skills/document-release)
-- You need doc reference guides → use [`meow:documentation`](/reference/skills/documentation)
 :::
 
 ## Usage
@@ -71,4 +70,3 @@ Generate initial project documentation from codebase analysis.
 
 - [`meow:bootstrap`](/reference/skills/bootstrap) — Creates project code (run docs-init after)
 - [`meow:document-release`](/reference/skills/document-release) — Updates docs after shipping
-- [`meow:documentation`](/reference/skills/documentation) — Reference toolkit for doc patterns

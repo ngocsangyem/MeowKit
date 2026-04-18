@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  79 skills &middot; 18 agents &middot; 20 commands &middot; 7 modes &middot; 17 rules &middot; 35 hook scripts &middot; 4-layer+ security
+  75 skills &middot; 18 agents &middot; 20 commands &middot; 7 modes &middot; 17 rules &middot; 35 hook scripts &middot; 4-layer+ security
 </p>
 
 <p align="center">

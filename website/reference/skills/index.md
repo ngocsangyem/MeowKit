@@ -215,9 +215,7 @@ Collections of reference guides loaded by agents during specific phases.
 | Skill | What it does |
 |-------|-------------|
 | [meow:development](/reference/skills/development) | Code patterns, TDD, skill loading (Phase 3) |
-| [meow:documentation](/reference/skills/documentation) | Living docs, API sync, changelog (Phase 6) |
 | [meow:memory](/reference/skills/memory) | Session capture, patterns, cost tracking (Phase 0, 6) |
-| [meow:shipping](/reference/skills/shipping) | Ship pipeline, canary deploy, rollback (Phase 5) |
 | [meow:testing](/reference/skills/testing) | Red-green-refactor, validation, visual QA (Phase 2-3) |
 
 ## See Also

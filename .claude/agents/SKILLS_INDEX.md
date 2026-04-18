@@ -52,7 +52,6 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | `meow:development` | developer | development | monolithic |
 | `meow:cook` | developer | development | monolithic |
 | `meow:fix` | developer | development | monolithic |
-| `meow:debug` | developer | development | monolithic |
 | `meow:investigate` | tester/developer | development | monolithic |
 | `meow:simplify` | developer | development | monolithic |
 | `meow:clean-code` | developer | development | monolithic |
@@ -106,13 +105,11 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | Skill | Owner | Type | Architecture |
 |-------|-------|------|-------------|
 | `meow:ship` | shipper | deployment | monolithic |
-| `meow:shipping` | shipper | deployment | monolithic |
 
 ### Phase 6 — Reflect
 
 | Skill | Owner | Type | Architecture |
 |-------|-------|------|-------------|
-| `meow:documentation` | documenter | documentation | monolithic |
 | `meow:document-release` | shipper/documenter | documentation | monolithic |
 | `meow:docs-init` | documenter | documentation | monolithic |
 | `meow:llms` | documenter | documentation | monolithic |

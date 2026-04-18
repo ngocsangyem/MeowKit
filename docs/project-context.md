@@ -275,7 +275,6 @@ Notable open issues relevant to agents:
 | CF-H11–H15 | `commands/meow/*.md` | Phantom routing targets: meow:command, meow:plan, meow:arch, meow:design, meow:test, meow:audit, meow:validate, meow:summary |
 
 Orphaned skills (not in SKILLS_INDEX): `meow:chom`, `meow:pack`, `meow:confluence`, `meow:planning-engine`
-Deprecated skills: `meow:debug` → use `meow:investigate`; `meow:documentation` → use `meow:document-release`; `meow:shipping` → use `meow:ship`
 
 ---
 

@@ -225,7 +225,7 @@ Cross-cutting skills are loaded by individual agents as needed — they are not 
 | Check test-to-requirement coverage | `meow:nyquist` | 2, 4 |
 | Implement a feature | `meow:cook` | 0-6 |
 | Fix a bug | `meow:fix` | 3 |
-| Debug an issue | `meow:debug`, `meow:investigate` | 3 |
+| Debug an issue | `meow:investigate` | 3 |
 | Review code | `meow:review` | 4 |
 | Deepen review findings | `meow:elicit` | 4 |
 | Security audit | `meow:cso`, `meow:audit` | 2, 4 |

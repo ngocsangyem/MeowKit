@@ -12,6 +12,14 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.4.4 — Deprecated Skill Cleanup + Brand Refresh (2026-04-19)
+
+Three deprecated skills removed permanently. Brand assets wired into VitePress. Vercel routing fix for direct URL access.
+
+- Removed `meow:debug`, `meow:documentation`, `meow:shipping` (superseded since v2.0.0). Dead references across skill registries, sidebar, and architecture docs cleaned up.
+- Animated SVG logo + SVG favicon + regenerated raster variants + `/meow|` OG card wired into VitePress; site title hidden (logo carries the brand).
+- Fixed direct URL access on Vercel (`cleanUrls: true` in `vercel.json`), homepage hero image hardcoded to `logo.png`, broken README image ref, and stale favicon cache.
+
 ### v2.4.3 — Brainstorming v2 (2026-04-18)
 
 `meow:brainstorming` rewritten with discovery protocol, scope assessment, anti-bias pivot, and 3 new techniques (analogical-thinking, scamper, perspective-shift).

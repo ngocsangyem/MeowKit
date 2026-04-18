@@ -19,7 +19,7 @@ Analyze the files being touched in the current task. Use the following rules to 
 - `.claude/skills/meow:development/references/code-patterns.md` (NestJS section)
 - `.claude/skills/meow:review/references/adversarial-review.md`
 - `.claude/skills/meow:testing/references/red-green-refactor.md`
-- `.claude/skills/meow:documentation/references/api-sync.md`
+- `.claude/skills/meow:document-release/references/general-documentation.md`
 
 ### Rule 2: Vue Frontend
 **Trigger:** Task touches `.vue` files, or `.ts` files in a Vue context (files importing from `vue`, `pinia`, `vue-router`).
@@ -53,9 +53,7 @@ Analyze the files being touched in the current task. Use the following rules to 
 **Trigger:** Task involves deploying, creating PRs, releasing, or rolling back.
 
 **Load these references:**
-- `.claude/skills/meow:shipping/references/ship-pipeline.md`
-- `.claude/skills/meow:shipping/references/canary-deploy.md`
-- `.claude/skills/meow:shipping/references/rollback-protocol.md`
+- `.claude/skills/meow:ship/SKILL.md` — unified ship pipeline (merge base, tests, review, PR)
 
 ## Always-Loaded References
 

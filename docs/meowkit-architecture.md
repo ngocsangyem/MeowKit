@@ -32,11 +32,11 @@ Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 
 | Component | Count | Source of Truth | Drift / Notes |
 |---|---|---|---|
-| Skills on disk | 78 | `ls .claude/skills/ \| grep meow:` | +4 vs prior baseline |
-| Registered skills (SKILLS_INDEX) | 74 | `SKILLS_INDEX.md` pipe-table rows | SKILLS_INDEX footer says "67" — stale (CF-M28) |
+| Skills on disk | 75 | `ls .claude/skills/ \| grep meow:` | 3 deprecated skills removed in v2.4.4 |
+| Registered skills (SKILLS_INDEX) | 71 | `SKILLS_INDEX.md` pipe-table rows | |
 | Orphaned skills (unregistered) | 4 | `inventory-summary.md:15` | meow:chom, meow:pack, meow:confluence, meow:planning-engine |
 | Active (non-deprecated) skills | 75 | `inventory-summary.md:17` | |
-| Deprecated skills | 3 | `inventory-summary.md:16` | meow:debug, meow:documentation, meow:shipping |
+| Deprecated skills | 0 | — | `meow:debug`, `meow:documentation`, `meow:shipping` removed in v2.4.4 |
 | Step-file skills | 5 | `step-file-rules.md` Applicability section | plan-creator, review, evaluate, harness, trace-analyze |
 | Skills with internal agents | 3 | `AGENTS_INDEX.md` Skill-Scoped section | jira (3), confluence (2), planning-engine (2) = 7 agents |
 | Core agents | 16 | `ls .claude/agents/*.md` excl. index | Matches `CLAUDE.md` Agents table |
@@ -138,9 +138,8 @@ flowchart TD
         TA[meow:trace-analyze]
     end
 
-    subgraph P5["Phase 5 — Ship (3 skills)"]
+    subgraph P5["Phase 5 — Ship (2 skills)"]
         SHIP[meow:ship]
-        SHIPP[meow:shipping\nDEPRECATED]
         WT[meow:worktree]
     end
 
@@ -161,12 +160,6 @@ flowchart TD
         INTAKE[meow:intake]
         AB[meow:agent-browser]
         QA[meow:qa]
-    end
-
-    subgraph DEPR["Deprecated (3)"]
-        DEBUG[meow:debug → meow:investigate]
-        SHIPP2[meow:shipping → meow:ship]
-        DOCD[meow:documentation → meow:document-release]
     end
 
     subgraph AGENTS["Key Agents (16)"]
@@ -396,9 +389,9 @@ Source for all: `audit-rubric-final.md` Section A; `meow:skill-creator/SKILL.md`
 
 | ID | File:Line | Issue | Status |
 |---|---|---|---|
-| CF-C1 | `meow:debug/SKILL.md:1-4` | Deprecated skill missing `deprecated: true` + `superseded_by:` YAML — parsers miss it | OPEN |
-| CF-C2 | `meow:shipping/SKILL.md:1-4` | Same YAML deprecation key absence | OPEN |
-| CF-C3 | `meow:documentation/SKILL.md:1-4` | Same YAML deprecation key absence | OPEN |
+| CF-C1 | `meow:debug/SKILL.md:1-4` | Deprecated skill missing `deprecated: true` + `superseded_by:` YAML — parsers miss it | CLOSED (skill removed v2.4.4) |
+| CF-C2 | `meow:shipping/SKILL.md:1-4` | Same YAML deprecation key absence | CLOSED (skill removed v2.4.4) |
+| CF-C3 | `meow:documentation/SKILL.md:1-4` | Same YAML deprecation key absence | CLOSED (skill removed v2.4.4) |
 | CF-C4 | `meow:multimodal/SKILL.md:45` | `.claude/skills/.venv/bin/python3` ABSENT — all Python scripts fail; blocks meow:llms, meow:web-to-markdown, meow:plan-creator | OPEN |
 | CF-C5 | `plan-creator/step-02-codebase-analysis.md:21` | `docs/project-context.md` missing; project-context-loader.sh loads nothing at SessionStart | OPEN |
 | CF-C6 | `meow:cook/SKILL.md:159` | Bare `memory/lessons.md` path (missing `.claude/` prefix); cook Phase 0 memory read silently fails in non-root-cwd | OPEN |

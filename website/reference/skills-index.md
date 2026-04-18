@@ -72,13 +72,11 @@ Source file: `.claude/agents/SKILLS_INDEX.md`
 | Skill | Owner | Type |
 |-------|-------|------|
 | [ship](/reference/skills/ship) | shipper | deployment |
-| [shipping](/reference/skills/shipping) | shipper | deployment |
 
 ## Phase 6 — Reflect
 
 | Skill | Owner | Type |
 |-------|-------|------|
-| [documentation](/reference/skills/documentation) | documenter | documentation |
 | [document-release](/reference/skills/document-release) | documenter | documentation |
 | [docs-init](/reference/skills/docs-init) | documenter | documentation |
 | [llms](/reference/skills/llms) | documenter | documentation |

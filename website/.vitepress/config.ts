@@ -347,9 +347,7 @@ export default withMermaid(defineConfig({
           collapsed: true,
           items: [
             { text: 'meow:development', link: '/reference/skills/development' },
-            { text: 'meow:documentation', link: '/reference/skills/documentation' },
             { text: 'meow:memory', link: '/reference/skills/memory' },
-            { text: 'meow:shipping', link: '/reference/skills/shipping' },
             { text: 'meow:testing', link: '/reference/skills/testing' },
           ],
         },

@@ -15,6 +15,39 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.4.4 (2026-04-19) — Deprecated Skill Cleanup + Brand Refresh
+
+### Highlights
+
+Three deprecated skills removed permanently. Brand assets (animated logo, SVG favicon, OG image) wired into VitePress. Vercel routing fix for direct URL access.
+
+### Removals
+
+- `meow:debug` — deprecated since v2.0.0, superseded by `meow:investigate`. Directory removed from `.claude/skills/`.
+- `meow:documentation` — deprecated since v2.0.0, superseded by `meow:document-release`. Directory removed.
+- `meow:shipping` — deprecated since v2.0.0, superseded by `meow:ship`. Directory removed.
+- Dead references in `SKILLS_INDEX.md`, `website/reference/skills/index.md`, `website/reference/skills-index.md`, `website/reference/skills/docs-init.md`, `docs/project-context.md`, and `docs/meowkit-architecture.md` cleaned up.
+
+### Improvements
+
+- Brand assets wired into VitePress — animated SVG logo (`meow-logo-animated.svg`) replaces raster `logo.png`/`logo.webp` in navbar and homepage hero.
+- Favicon refreshed — SVG primary (`favicon.svg`) + regenerated multi-resolution `.ico` + `16/32` PNGs + `apple-touch-icon` from the new brand source via ImageMagick.
+- OG image swapped to the `/meow|` brand social card (1200×630).
+- Site title hidden in navbar (`siteTitle: false`) — the logo carries the brand; no duplicate text.
+- Color token system synced with brand source-of-truth (`assets/css/colors_and_type.css`): added `--mk-neutral-200/800/950`, `--mk-accent-soft`, full radius scale (`xs`/`xl`), full shadow set (`card`/`lift`/`glow-strong`/`inset-glow`), and motion easings (`--mk-ease-out` / `--mk-ease-in-out` + `--mk-dur-fast/normal/slow`).
+- Changelog reorganized to a strict section schema (`Highlights` / `New Skills` / `Improvements` / `Removals` / `Bug Fixes` / `CLI` / etc.) — removed internal IDs, test counts, audit metadata. Added `npx mewkit upgrade` preamble.
+- What's-new index compressed to 1-line headlines + ≤3 bullets per release.
+- RELEASING.md step 2 rewritten with the new changelog schema, style rules (DRY), and a patch-vs-minor-vs-major required-section matrix.
+
+### Bug Fixes
+
+- Direct URL access on Vercel (`/changelog`, `/guide/whats-new`) returned 404 — added `cleanUrls: true` and `trailingSlash: false` to `vercel.json`. SPA-navigation from `/` worked; direct requests did not because Vercel served only `/changelog.html` without the rewrite.
+- Homepage hero image was hardcoded to `/logo.png` in `index.md` frontmatter, separate from `themeConfig.logo` — the navbar swap didn't propagate. Now `/logo.svg`.
+- README hero image pointed at `assets/branding/meowkit-logo-black.png` which never existed — swapped to `assets/branding/meow-logo-dark.svg`.
+- Stale favicon issue — browsers auto-request `/favicon.ico` from root regardless of `<link>` order, picking the old raster. Regenerated all raster variants from the new SVG.
+
+---
+
 ## 2.4.3 (2026-04-18) — Brainstorming v2: Discovery, Scope, Anti-Bias Pivot
 
 ### Highlights
@@ -141,8 +174,8 @@ Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + inj
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
+| Skill       | Purpose                                                                                                                                                             |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `meow:pack` | Wraps `repomix` to export an external repo as a single AI-friendly file (markdown/xml/json/plain). Output at `.claude/packs/{timestamp}-{slug}.{ext}` (gitignored). |
 
 ### Features
@@ -196,9 +229,9 @@ Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + inj
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `meow:confluence` | Fetch Confluence pages as markdown + deep requirement analysis (Spec Research Report, gap detection with `[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` tags, multi-page assembly). |
+| Skill                  | Purpose                                                                                                                                                                      |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `meow:confluence`      | Fetch Confluence pages as markdown + deep requirement analysis (Spec Research Report, gap detection with `[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` tags, multi-page assembly). |
 | `meow:planning-engine` | Codebase-aware tech review + sprint planning with deterministic scripts (`dep-graph.py` cycle detection, `capacity-bin.py` bin-packing). Research-only — no ticket creation. |
 
 ### Features
@@ -255,11 +288,11 @@ Memory loader split into 3 focused modules. 4 critical security/correctness fixe
 
 ### Environment Variables
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `MEOWKIT_MEMORY_BUDGET` | 4000 | Total char budget for memory injection per turn |
-| `MEOWKIT_MEMORY_STALENESS_MONTHS` | 6 | Standard entries older than this are skipped |
-| `MEOWKIT_SUMMARY_MODE` | full-regen | `full-regen` (default) or `merge` (opt-in) |
+| Variable                          | Default    | Purpose                                         |
+| --------------------------------- | ---------- | ----------------------------------------------- |
+| `MEOWKIT_MEMORY_BUDGET`           | 4000       | Total char budget for memory injection per turn |
+| `MEOWKIT_MEMORY_STALENESS_MONTHS` | 6          | Standard entries older than this are skipped    |
+| `MEOWKIT_SUMMARY_MODE`            | full-regen | `full-regen` (default) or `merge` (opt-in)      |
 
 ---
 
@@ -298,8 +331,8 @@ Major overhaul of `meow:multimodal` — multi-provider generation with intellige
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
+| Skill       | Purpose                                                                                                                                                                             |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `meow:chom` | Analyze and replicate features from external systems, repos, apps, or ideas into any project. 6-phase workflow: Recon → Map → Analyze → Challenge (HARD GATE) → Decision → Handoff. |
 
 ### Features
@@ -485,14 +518,14 @@ Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `meow:harness` | Autonomous green-field build pipeline with generator/evaluator split, adaptive density, 3-round iteration loop, budget tracking ($30 warn / $100 block / user cap). |
-| `meow:sprint-contract` | File-based sprint contract negotiated between generator and evaluator before source edits begin. Enforced by `gate-enforcement.sh` in FULL density. |
-| `meow:rubric` | Weighted rubric loader; reads `.claude/rubrics/`, validates weights sum to 1.0. |
-| `meow:evaluate` | Behavioral grader with active verification; skeptic persona, drives running build, rejects static-analysis-only verdicts. |
-| `meow:trace-analyze` | Scatter-gather trace log analyzer; reads `.claude/memory/trace-log.jsonl`, feeds meta-improvement loop with mandatory HITL gate. |
-| `meow:benchmark` | Canary suite (quick 5-task / full 6-task tiers) for dead-weight audit baselines on model upgrades. |
+| Skill                  | Purpose                                                                                                                                                                                                                 |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `meow:harness`         | Autonomous green-field build pipeline with generator/evaluator split, adaptive density, 3-round iteration loop, budget tracking ($30 warn / $100 block / user cap).                                                     |
+| `meow:sprint-contract` | File-based sprint contract negotiated between generator and evaluator before source edits begin. Enforced by `gate-enforcement.sh` in FULL density.                                                                     |
+| `meow:rubric`          | Weighted rubric loader; reads `.claude/rubrics/`, validates weights sum to 1.0.                                                                                                                                         |
+| `meow:evaluate`        | Behavioral grader with active verification; skeptic persona, drives running build, rejects static-analysis-only verdicts.                                                                                               |
+| `meow:trace-analyze`   | Scatter-gather trace log analyzer; reads `.claude/memory/trace-log.jsonl`, feeds meta-improvement loop with mandatory HITL gate.                                                                                        |
+| `meow:benchmark`       | Canary suite (quick 5-task / full 6-task tiers) for dead-weight audit baselines on model upgrades.                                                                                                                      |
 | `meow:web-to-markdown` | Static-by-default URL → clean markdown with SSRF guard, 6-pass injection scanner, DATA boundary wrap, fetch persistence with manifest, robots.txt cache, per-domain throttle. Tier-4 fallback below `meow:docs-finder`. |
 
 ### New Agents
@@ -564,16 +597,16 @@ Extracted high-leverage patterns from ECC's 38-agent ecosystem. 5 new skills, 17
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `meow:decision-framework` | Operational decision architecture: classify → rules → score → escalate → communicate. 5 references + 3 domain examples. |
-| `meow:verify` | Unified verification: build → lint → test → type-check → coverage. Fail-fast. Auto-detects 5 project types (JS/TS, Python, Go, Ruby, Rust). |
-| `meow:api-design` | REST/GraphQL patterns: resource naming, HTTP methods, status codes, pagination, versioning, rate limiting, error formats. |
-| `meow:build-fix` | Build error triage: detect language from error output, classify fixability, chain into `meow:verify`. Max 3 attempts then escalate. |
-| `meow:database` | Schema design, migration patterns, query optimization. PostgreSQL primary. |
-| `meow:jira` | Jira execution via Atlassian MCP: 8 operation categories, 4-tier safety framework, 50+ JQL templates, sprint management. |
-| `meow:figma` | Figma design analysis via Figma MCP: 3 modes (analyze/implement/tokens), design token extraction (CSS/Tailwind/JSON). Fallback: PNG export + multimodal. |
-| `meow:intake` | Tool-agnostic ticket/PRD analysis with 8-dimension completeness scoring, media fallback chain, injection defense. |
+| Skill                     | Purpose                                                                                                                                                  |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `meow:decision-framework` | Operational decision architecture: classify → rules → score → escalate → communicate. 5 references + 3 domain examples.                                  |
+| `meow:verify`             | Unified verification: build → lint → test → type-check → coverage. Fail-fast. Auto-detects 5 project types (JS/TS, Python, Go, Ruby, Rust).              |
+| `meow:api-design`         | REST/GraphQL patterns: resource naming, HTTP methods, status codes, pagination, versioning, rate limiting, error formats.                                |
+| `meow:build-fix`          | Build error triage: detect language from error output, classify fixability, chain into `meow:verify`. Max 3 attempts then escalate.                      |
+| `meow:database`           | Schema design, migration patterns, query optimization. PostgreSQL primary.                                                                               |
+| `meow:jira`               | Jira execution via Atlassian MCP: 8 operation categories, 4-tier safety framework, 50+ JQL templates, sprint management.                                 |
+| `meow:figma`              | Figma design analysis via Figma MCP: 3 modes (analyze/implement/tokens), design token extraction (CSS/Tailwind/JSON). Fallback: PNG export + multimodal. |
+| `meow:intake`             | Tool-agnostic ticket/PRD analysis with 8-dimension completeness scoring, media fallback chain, injection defense.                                        |
 
 ### Features
 
@@ -742,11 +775,11 @@ Deeper review reasoning, resumable builds, and systematic coverage mapping. Insp
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `meow:elicit` | Structured second-pass reasoning after review or analysis. 8 named methods (pre-mortem, inversion, red team, Socratic, first principles, constraint removal, stakeholder mapping, analogical). |
-| `meow:validate-plan` | 8-dimension plan quality validation. Auto for COMPLEX tasks, optional for STANDARD. |
-| `meow:nyquist` | Test-to-requirement coverage mapping. Reads plan acceptance criteria + test files, produces gap report showing untested requirements. |
+| Skill                | Purpose                                                                                                                                                                                        |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `meow:elicit`        | Structured second-pass reasoning after review or analysis. 8 named methods (pre-mortem, inversion, red team, Socratic, first principles, constraint removal, stakeholder mapping, analogical). |
+| `meow:validate-plan` | 8-dimension plan quality validation. Auto for COMPLEX tasks, optional for STANDARD.                                                                                                            |
+| `meow:nyquist`       | Test-to-requirement coverage mapping. Reads plan acceptance criteria + test files, produces gap report showing untested requirements.                                                          |
 
 ### Features
 
@@ -770,17 +803,17 @@ The biggest MeowKit update yet. 13 new capabilities inspired by deep analysis of
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `meow:scale-routing` | Domain-to-complexity CSV routing. Fintech, healthcare, IoT auto-force COMPLEX tier. User-extensible. |
-| `meow:project-context` | Generate / update agent constitution. |
-| `meow:party` | Multi-agent deliberation sessions (2–4 agents debate architecture decisions with forced synthesis). Discussion only — no code. |
-| `meow:worktree` | Git worktree lifecycle management. |
-| `meow:task-queue` | Task claiming with ownership enforcement. |
-| `meow:help` | Pipeline navigation assistant. |
-| `meow:debug` | Structured debugging: reproduce → isolate → root cause → fix → verify. |
-| `meow:simplify` | Post-implementation complexity reduction (between Build and Review). |
-| `meow:team-config` | Parallel agent team setup with ownership maps and worktrees. |
+| Skill                  | Purpose                                                                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `meow:scale-routing`   | Domain-to-complexity CSV routing. Fintech, healthcare, IoT auto-force COMPLEX tier. User-extensible.                           |
+| `meow:project-context` | Generate / update agent constitution.                                                                                          |
+| `meow:party`           | Multi-agent deliberation sessions (2–4 agents debate architecture decisions with forced synthesis). Discussion only — no code. |
+| `meow:worktree`        | Git worktree lifecycle management.                                                                                             |
+| `meow:task-queue`      | Task claiming with ownership enforcement.                                                                                      |
+| `meow:help`            | Pipeline navigation assistant.                                                                                                 |
+| `meow:debug`           | Structured debugging: reproduce → isolate → root cause → fix → verify.                                                         |
+| `meow:simplify`        | Post-implementation complexity reduction (between Build and Review).                                                           |
+| `meow:team-config`     | Parallel agent team setup with ownership maps and worktrees.                                                                   |
 
 ### Features
 
