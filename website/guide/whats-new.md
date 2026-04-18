@@ -10,6 +10,19 @@ Release notes for each MeowKit version.
 
 ## Releases
 
+### v2.4.1 — Memory Simplification + Red-Team Hardening (2026-04-18)
+
+Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + injector) and replaces it with on-demand topic-file reads per consumer skill. Closes all 15 red-team findings (C1–C3, H1–H3, M1–M9) from the memory audit; most close by deletion.
+
+- **Topic-file layout** — `fixes.md/json`, `review-patterns.md/json`, `architecture-decisions.md/json`, `security-notes.md` replace the `lessons.md` + `patterns.json` monolith. Each file has a single consumer skill.
+- **On-demand retrieval** — consumer skills (`meow:fix`, `meow:cook`, `meow:plan-creator`, etc.) read the relevant topic file via their SKILL.md `Read` step. No global auto-injection. No lexical keyword filter.
+- **Atomic capture writes** — `immediate-capture-handler.cjs` uses temp-rename for all JSON writes; crash mid-write no longer corrupts split files. Dual-lock race on `architecture-decisions.json` eliminated by per-target-file lock derivation.
+- **Secret scrub on capture** — new `lib/secret-scrub.cjs` redacts Anthropic, OpenAI, Stripe, AWS, GitHub, JWT, DB URL, and Bearer token patterns before persist. Leaked secrets no longer re-enter future session context.
+- **Fresh-install guard** — handler auto-creates `MEMORY_DIR` on first run. Captures on blank projects no longer silently drop to ENOENT.
+- **Memory is machine-local by default** — `.claude/memory/*` is gitignored; `mewkit setup` scaffolds a blank directory. Downstream installs no longer inherit the MeowKit dev team's learnings.
+- **Vitest coverage** — 40 tests across 7 files (first test coverage the memory subsystem has ever had); covers migration idempotency, concurrent `post-session.sh` atomicity, secret scrub, `##prefix:` routing, and schema validation.
+- **Docs cleanup** — 24 files across `docs/`, `website/`, `.claude/commands/`, and `.claude/skills/` updated to describe the topic-file scheme. Internal plan/phase IDs removed from published docs.
+
 ### [v2.4.0 — The Agent Constitution Release](/guide/whats-new/v2.4.0) (2026-04-18)
 
 Three plans executed in a single audit-and-fix cycle. The headline change is `docs/project-context.md` — a 286-line agent constitution loaded by every agent at session start via the `project-context-loader.sh` hook. All 16 agents wired. 61/64 audit findings resolved, 0 regressions.
