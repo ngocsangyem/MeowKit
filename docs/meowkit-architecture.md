@@ -1,6 +1,6 @@
 # MeowKit Architecture
 
-> Grounded architecture model derived from the 260418 full-system audit.
+> Grounded architecture model derived from the full-system audit (v2.4.0).
 > Every claim cites source files or the consolidated audit report.
 > Last verified: 2026-04-18
 
@@ -32,7 +32,7 @@ Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 
 | Component | Count | Source of Truth | Drift / Notes |
 |---|---|---|---|
-| Skills on disk | 78 | `ls .claude/skills/ \| grep meow:` | +4 vs prior baseline (260411) |
+| Skills on disk | 78 | `ls .claude/skills/ \| grep meow:` | +4 vs prior baseline |
 | Registered skills (SKILLS_INDEX) | 74 | `SKILLS_INDEX.md` pipe-table rows | SKILLS_INDEX footer says "67" — stale (CF-M28) |
 | Orphaned skills (unregistered) | 4 | `inventory-summary.md:15` | meow:chom, meow:pack, meow:confluence, meow:planning-engine |
 | Active (non-deprecated) skills | 75 | `inventory-summary.md:17` | |
@@ -43,7 +43,7 @@ Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 | AGENTS_INDEX rows | 16 | `AGENTS_INDEX.md` active table | Footer "13 agents" phrasing is stale (CF-M34) |
 | Hook events (settings.json) | 7 | `settings.json` hooks keys | SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit, SubagentStart, SubagentStop |
 | Node handlers on disk | 12 | `ls .claude/hooks/handlers/*.cjs` | **DRIFT**: HOOKS_INDEX footer says 8; disk has 12 (CF-M2) |
-| Node handlers documented (HOOKS_INDEX) | 5 active | `HOOKS_INDEX.md:39` footer | memory-filter, memory-parser, memory-injector, memory-loader deleted (plan 260418); immediate-capture-handler retained (CF-M1 closed) |
+| Node handlers documented (HOOKS_INDEX) | 5 active | `HOOKS_INDEX.md:39` footer | memory-filter, memory-parser, memory-injector, memory-loader deleted (v2.4.0); immediate-capture-handler retained (CF-M1 closed) |
 | Slash commands | 20 | `ls .claude/commands/meow/*.md` | `inventory-summary.md:24` |
 | Rules files | 17 | `ls .claude/rules/*.md` excl. RULES_INDEX | RULES_INDEX table lists 17 rows — matches disk |
 | Memory files | 8 | `CLAUDE.md` Memory section | 6 named + conversation-summary.md + quick-notes.md |
@@ -57,8 +57,6 @@ reference 11, business-process 7, scaffolding 5, cicd 3, library-api-reference 2
 
 Generated 2026-04-18 from consolidated audit findings. Nodes annotated with
 finding severity (orange = gap node, red = critical, yellow = high).
-
-Full 101-node graph: `plans/260418-0031-meowkit-full-system-skill-audit/audit-findings/skill-graph-full.mmd`
 
 ```mermaid
 ---
@@ -332,7 +330,7 @@ Source: `CLAUDE.md` Memory section; `HOOKS_INDEX.md` State Files table.
 | `trace-log.jsonl` | On-demand | append-trace.sh |
 
 **Per-turn context budget** (~4KB, source: `HOOKS_INDEX.md` handler rows):
-conversation-summary-cache ≤4KB only. memory-loader.cjs deleted in plan 260418 — no per-turn memory injection. SessionStart also loads
+conversation-summary-cache ≤4KB only. memory-loader.cjs deleted in v2.4.0 — no per-turn memory injection. SessionStart also loads
 `docs/project-context.md` via project-context-loader.sh — **CF-C5 OPEN**: file
 does not exist; loads nothing.
 
@@ -392,10 +390,7 @@ Source for all: `audit-rubric-final.md` Section A; `meow:skill-creator/SKILL.md`
 
 ---
 
-## 10. Known Issues (from 260418 Audit)
-
-Full evidence: `plans/260418-0031-meowkit-full-system-skill-audit/audit-findings/consolidated.md`
-Remediation: Phase 6 fix-backlog (pending — task #10).
+## 10. Known Issues (v2.4.0 Audit)
 
 ### Critical Findings (6 active)
 
@@ -420,7 +415,6 @@ Remediation: Phase 6 fix-backlog (pending — task #10).
 | CF-H15 | `commands/meow/summary.md` | `meow:summary` phantom target |
 
 **Total active:** 6 CRITICAL, 18 HIGH, 34 MEDIUM, 6 LOW = **64 findings**.
-Source: `consolidated.md` Severity Rollup table.
 
 ### Simulation Verdicts (6 scenarios, 2026-04-18)
 
@@ -439,12 +433,12 @@ Source: `audit-findings/simulation-traces.md` Scenario Verdict Summary table.
 
 ## 11. Audit Lineage
 
-| Audit | Plan Dir | Date | Focus |
-|---|---|---|---|
-| Baseline | `plans/260411-1906-meowkit-wiring-red-team-audit/` | 2026-04-11 | Wiring red-team (CF2–CF7, H2–H12, M1–M16) |
-| Current | `plans/260418-0031-meowkit-full-system-skill-audit/` | 2026-04-18 | Full-system 5-team audit (78 skills, 16 agents, 6 simulation scenarios) |
+| Audit | Date | Focus |
+|---|---|---|
+| Baseline | 2026-04-11 | Wiring red-team (CF2–CF7, H2–H12, M1–M16) |
+| Current (v2.4.0) | 2026-04-18 | Full-system 5-team audit (78 skills, 16 agents, 6 simulation scenarios) |
 
-**Delta vs 260411 baseline** (source: `consolidated.md` Delta table):
+**Delta vs baseline** (source: consolidated audit Delta table):
 - Resolved: 16 prior findings closed
 - Still open: 6 carried forward (CF3→CF-C5, CF4→CF-C6, H2→CF-M1, M2→CF-M33, M6→CF-M6, H7→partial)
 - New: 59 new findings (dominated by Gotchas gaps, phantom command refs, deprecated YAML key absence, Python venv)

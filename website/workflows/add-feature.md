@@ -121,7 +121,7 @@ The **shipper** runs the full ship pipeline:
 
 ### Step 8: Reflect (Phase 6)
 
-The **documenter** updates project docs (adds cart section to README). The **analyst** captures patterns to `memory/lessons.md` ("cart feature: Pinia store pattern worked well, consider debounce for reactive controls").
+The **documenter** updates project docs (adds cart section to README). The **analyst** routes learnings to the appropriate topic file (`review-patterns.json` for code patterns, `architecture-decisions.json` for design decisions — e.g., "cart feature: Pinia store pattern worked well, consider debounce for reactive controls").
 
 ## Common issues
 

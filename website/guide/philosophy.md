@@ -74,13 +74,13 @@ Why optional: strict TDD added friction for spike work, tooling, and prototypes.
 
 ### 8. Learn from Every Session
 
-The memory system (`memory/lessons.md` + `memory/patterns.json`) captures patterns, mistakes, and costs. `memory-loader.cjs` filters lessons by domain tags — loading only what's relevant to the current task instead of dumping everything into context. CRITICAL/SECURITY entries always load. Budget-capped at 4000 chars to prevent memory from crowding out working context.
+The memory system captures patterns, mistakes, and costs across sessions. Topic files in `.claude/memory/` — `fixes.md`/`fixes.json` for bug-class patterns, `review-patterns.md`/`review-patterns.json` for recurring observations, `architecture-decisions.md`/`architecture-decisions.json` for design choices — are read on-demand by consumer skills at task start. There is no auto-injection pipeline; each skill loads only the topic files relevant to its domain. The `conversation-summary-cache.sh` injects a Haiku-summarized session summary (≤4KB) per turn for continuity — that is the only per-turn injection.
 
 ### 9. Load Only What's Needed
 
 Skills activate by task domain, not all at once. Each skill's SKILL.md is a compact decision router, with detailed procedures in `references/` loaded on demand. This progressive disclosure pattern saves ~70% context per invocation.
 
-The same principle applies to the hook system: `handlers.json` routes events to only the matching handlers. A UserPromptSubmit event doesn't trigger build-verify or checkpoint logic — it only triggers memory-loader.
+The same principle applies to the hook system: `handlers.json` routes events to only the matching handlers. A UserPromptSubmit event triggers the summary cache and immediate-capture handler — not build-verify or checkpoint logic.
 
 ## What MeowKit Does NOT Do
 

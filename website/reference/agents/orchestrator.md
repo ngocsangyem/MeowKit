@@ -55,10 +55,10 @@ Orchestrator: Task complexity: TRIVIAL → using Haiku
 
 ### Orchestration Patterns
 
-The orchestrator reads two files at session start to inform routing:
+The orchestrator reads two sources at session start to inform routing:
 
-- **`memory/lessons.md`** — Past patterns that affect routing (e.g., "this codebase has flaky auth tests → always include security agent")
-- **`memory/cost-log.json`** — Token usage history (avoids over-classifying routine tasks to expensive tiers)
+- **Relevant topic files** (`review-patterns.md`, `architecture-decisions.md`) — past patterns that affect routing (e.g., "this codebase has flaky auth tests → always include security agent"), loaded on-demand
+- **`memory/cost-log.json`** — token usage history (avoids over-classifying routine tasks to expensive tiers)
 
 ### Agent Communication
 

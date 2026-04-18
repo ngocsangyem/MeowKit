@@ -17,14 +17,14 @@ Step-file workflow that ingests `.claude/memory/trace-log.jsonl`, partitions rec
 - **Frequency threshold** — patterns require ≥3 occurrences before becoming a suggestion (anti-overfit per `error-taxonomy.md`)
 - **HITL gate per suggestion** — every suggestion is individually approved or rejected via `AskUserQuestion`; no bulk-approve
 - **Structured output** — separate files for findings, draft suggestions, approved suggestions, rejected suggestions, and a human-readable analysis summary
-- **Dead-weight audit integration** — triggered automatically when `dead-weight-audit-needed` flag appears in `memory/lessons.md`
+- **Dead-weight audit integration** — triggered automatically when `post-session.sh` sets the `dead-weight-audit-needed` flag in `last-model-id.txt` on model upgrade
 - **Append-only trace records** — analyzer never mutates the trace log
 
 ## When to Use This
 
 ::: tip Use meow:trace-analyze when...
 - You've had 3+ consecutive harness failures on the same task and want to find the root cause
-- A model upgrade set the `dead-weight-audit-needed` flag in `memory/lessons.md`
+- A model upgrade triggered the dead-weight audit flag (set by `post-session.sh` in `last-model-id.txt`)
 - You want a quarterly review of harness run patterns
 - You suspect a harness component has become dead weight and need evidence
 :::
@@ -49,7 +49,7 @@ Step-file workflow that ingests `.claude/memory/trace-log.jsonl`, partitions rec
 /meow:trace-analyze --pattern evaluator-drift
 
 # Triggered automatically by post-session.sh on model upgrade
-# (sets dead-weight-audit-needed in memory/lessons.md)
+# (sets dead-weight-audit-needed flag in last-model-id.txt)
 ```
 
 ## Workflow

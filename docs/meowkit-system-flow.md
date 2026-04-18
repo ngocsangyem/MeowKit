@@ -27,7 +27,7 @@ UserPromptSubmit event fires
   ├─ immediate-capture-handler.cjs → capture ##prefix messages to topic files
   └─ tdd-flag-detector.sh → check --tdd flag
 
-Note: memory-loader.cjs deleted in plan 260418. Memory is now read on-demand
+Note: memory-loader.cjs deleted in v2.4.0. Memory is now read on-demand
 by consumer skills at task start, not injected every turn.
 ```
 

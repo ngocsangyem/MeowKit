@@ -52,7 +52,7 @@ Monorepo via npm workspaces (`packages/*`). Active package: `packages/mewkit/`.
 | `.claude/agents/` | 16 core agent definitions (excl. index files) | 16 |
 | `.claude/skills/` | 78 domain skills (`meow:*`); 4 orphaned; 3 deprecated | 78 |
 | `.claude/commands/` | 20 slash commands (`meow/*.md`) | 20 |
-| `.claude/memory/` | 8 persistent memory files; 3 auto-loaded per turn | 8 |
+| `.claude/memory/` | Persistent memory topic files; loaded on-demand by consumer skills | — |
 | `.claude/rubrics/` | Evaluator rubric library (frontend-app preset: 4 rubrics) | — |
 | `docs/` | Canonical project docs (this file lives here) | — |
 | `plans/` | Per-task plan artifacts | — |
@@ -170,8 +170,15 @@ All counts from `meowkit-architecture.md` §2 Component Inventory (verified 2026
 
 ## 8. Memory Layout
 
-8 files in `.claude/memory/`
-(source: `meowkit-architecture.md` §7; `CLAUDE.md` Memory section):
+`.claude/memory/` is a **MeowKit convention** — a team-shared directory for accumulated
+learnings that lives inside the repository. It is explicitly read by consumer skills at
+task start and written by hooks and skill-invoked session capture.
+
+This is separate from Claude Code's auto-memory at `~/.claude/projects/<project>/MEMORY.md`,
+which is machine-local and managed by the Claude Code platform. MeowKit's `.claude/memory/`
+serves a different purpose: team-shared, version-controlled knowledge.
+
+(source: `meowkit-architecture.md` §7; `CLAUDE.md` Memory section; `docs/memory-system.md`):
 
 | File | Purpose | When read |
 |------|---------|-----------|
@@ -179,15 +186,16 @@ All counts from `meowkit-architecture.md` §2 Component Inventory (verified 2026
 | `review-patterns.md` + `review-patterns.json` | Review/architecture patterns | On-demand by meow:review, meow:plan-creator |
 | `architecture-decisions.md` + `architecture-decisions.json` | Architectural decisions | On-demand by meow:plan-creator, meow:cook |
 | `security-notes.md` | Curated security findings | On-demand by meow:cso, meow:review |
-| `conversation-summary.md` | Conversation cache (hook-generated on Stop) | Yes (every UserPromptSubmit via summary-cache) |
+| `conversation-summary.md` | Conversation cache (hook-generated on Stop) | Every UserPromptSubmit via summary-cache |
 | `cost-log.json` | Token usage per task | Phase 0 / 6 cost reporting |
 | `decisions.md` | Long-form ADRs | On-demand by architect agent |
 | `security-log.md` | Raw security audit log | On-demand by security agent |
 | `quick-notes.md` | Staging for ##note: captures | Processed at Phase 6 Reflect |
 | `trace-log.jsonl` | Trace events for harness analysis | On-demand |
 
-No auto-inject pipeline (deleted in plan 260418). Memory is read on-demand by consumer skills.
-conversation-summary-cache ≤4KB is the only per-turn auto-inject.
+No auto-inject pipeline (deleted in v2.4.0, memory simplification). Memory is read
+on-demand by consumer skills. The `conversation-summary.md` (≤4KB) is the only
+per-turn auto-inject — it is managed by `conversation-summary-cache.sh`.
 Memory files are DATA (`injection-rules.md` Rule 3) — they inform but do not instruct.
 Memory path is `.claude/memory/` — NOT bare `memory/` (CF-C6 bare-path bug in `meow:cook`).
 
@@ -244,7 +252,7 @@ Full index: `.claude/rules/RULES_INDEX.md`
 
 ## 11. Known Open Issues (as of 2026-04-18)
 
-Full backlog: `meowkit-architecture.md` §10 (audit plan dir not on disk — arch doc is authoritative).
+Full backlog: `meowkit-architecture.md` §10.
 
 Summary from consolidated audit — **64 findings**:
 - CRITICAL: 6

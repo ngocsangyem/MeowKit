@@ -4,13 +4,15 @@
 
 ## 1. Overview
 
-MeowKit maintains an in-repo memory system at `.claude/memory/`. Unlike Claude Code's machine-local auto-memory (personal debugging notes, preferences), MeowKit memory is **team-shared via git** and focuses on **recurring patterns, decisions, failures, and costs**.
+MeowKit maintains an in-repo memory system at `.claude/memory/`. This is a **MeowKit convention** — a team-shared directory for accumulated learnings that lives inside the repository and is explicitly read/written by MeowKit skills and hooks.
+
+**This is distinct from Claude Code's auto-memory.** Claude Code's platform-level auto-memory stores personal debugging notes and preferences at `~/.claude/projects/<project>/MEMORY.md` on your local machine. MeowKit's `.claude/memory/` serves a different purpose: team-shared, version-controlled knowledge about recurring patterns, decisions, failures, and costs.
 
 The two systems are complementary:
-- **MeowKit memory** = team knowledge (code standards, recurring patterns, costs) — lives in the repo
-- **Claude Code auto-memory** = personal insights (debugging notes, workflow habits) — lives on your machine
+- **MeowKit memory** (`.claude/memory/`) = team knowledge (code standards, recurring patterns, costs) — lives in the repo, committed to git
+- **Claude Code auto-memory** (`~/.claude/projects/<project>/MEMORY.md`) = personal insights (debugging notes, workflow habits) — machine-local only, not in repo
 
-**Key design principle:** No auto-inject pipeline. Memory is read on-demand by consumer skills at task start. This eliminates the context-budget drain and trust-boundary issues of the former `memory-loader` / `memory-parser` / `memory-filter` / `memory-injector` pipeline (deleted in plan 260418).
+**Key design principle:** No auto-inject pipeline. Memory is read on-demand by consumer skills at task start. This eliminates the context-budget drain and trust-boundary issues of the former `memory-loader` / `memory-parser` / `memory-filter` / `memory-injector` pipeline (deleted in v2.4.0, memory simplification).
 
 ## 2. File Layout
 
@@ -30,7 +32,7 @@ The two systems are complementary:
   conversation-summary.md   # Haiku-summarized session cache
   trace-log.jsonl           # Harness trace events (append-trace.sh)
   lessons-archive.md        # Historical archive — not actively read
-  lessons.md                # ARCHIVED stub — content migrated to topic files
+  lessons.md                # ARCHIVED stub — content migrated to topic files in v2.4.0
   last-model-id.txt         # Model-change detection for dead-weight audit
   patterns.json             # DEPRECATED stub — split into 3 scoped files above
 ```
@@ -68,7 +70,7 @@ The Stop hook runs `post-session.sh` which:
 - Appends a cost entry to `cost-log.json` (atomic temp-rename, M7 fix)
 - Sets a model-change flag in `last-model-id.txt` to trigger dead-weight audit
 
-The NEEDS_CAPTURE pipeline (writing markers to lessons.md) is **deleted**. lessons.md is an archived stub.
+The NEEDS_CAPTURE pipeline (writing markers to lessons.md) is **deleted** (v2.4.0). lessons.md is an archived stub.
 
 ### c) Skill-invoked session capture
 
@@ -82,7 +84,7 @@ Memory is loaded **on-demand** by consumer skills:
 2. **Agent reads** the relevant topic file(s) at task start
 3. **No injection** — content is not pushed into every prompt turn
 
-Claude Code's auto-memory (`~/.claude/projects/…/MEMORY.md`) operates separately and is machine-local only.
+Topic files are NOT auto-loaded by MeowKit on every turn. This is a MeowKit-managed convention: each consumer skill explicitly reads the files it needs at task start. Claude Code's auto-memory (`~/.claude/projects/…/MEMORY.md`) operates separately and is machine-local only.
 
 ## 5. Pruning
 
@@ -128,7 +130,7 @@ Written atomically via temp-rename (`os.replace`) — concurrent-safe (M7 fix).
 
 ## 7. Deleted Components (Tombstone)
 
-The following components were deleted in plan 260418-1603 (memory simplification):
+The following components were deleted in v2.4.0 (memory simplification):
 
 | Deleted | Replaced by |
 |---------|------------|
@@ -144,7 +146,7 @@ Reason: the auto-inject pipeline added latency on every prompt turn, consumed co
 
 ## Migration
 
-If upgrading from a pre-simplification MeowKit version with an active `lessons.md`:
+If upgrading from a pre-v2.4.0 MeowKit version with an active `lessons.md`:
 
 ```bash
 node .claude/scripts/memory-topic-file-migrator.cjs

@@ -79,7 +79,7 @@ This runs the complete workflow: Plan → Test → Build → Review → Ship. Ea
 
 When you ran `/meow:plan`, MeowKit:
 
-1. **Phase 0 (Orient):** Read `memory/lessons.md` for past patterns, assigned model tier
+1. **Phase 0 (Orient):** Read relevant topic files on-demand for past patterns, assigned model tier
 2. **Phase 1 (Plan):** Planner agent created a structured plan with product + engineering lens
 3. **Gate 1:** Waited for your explicit approval before proceeding
 

@@ -14,8 +14,7 @@ Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has 
 **Deliverable:** Model tier assignment, execution mode, context loaded
 
 - Read `docs/project-context.md` (agent constitution — loaded first, always; auto-injected by `project-context-loader.sh` hook)
-- Read `memory/lessons.md` and `memory/patterns.json`
-- **Retroactive capture:** check `lessons.md` for `NEEDS_CAPTURE` markers from previous sessions. Process at most 3 recent markers (2-min budget). Reconstructs learnings from `git log`. Skip markers with 0 files touched. Mark older ones as `skipped-too-old`
+- Read relevant topic files on-demand (consumer skills handle this at task start — fixes.md for bug work, review-patterns.md and architecture-decisions.md for planning and review)
 - Run `meow:scale-routing` — domain-based complexity classification (CSV-driven)
 - Load stack-relevant skills only (lazy loading)
 - Route: assign model tier by task complexity (Haiku / Sonnet / Opus)
@@ -160,7 +159,7 @@ See [scale-adaptive-rules Rule 7](/reference/rules-index#scale-adaptive-rules) f
 **Agent:** shipper  
 **Deliverable:** PR URL + rollback documentation
 
-- **Live capture:** before shipping, if the session produced non-obvious decisions, corrections, or rejected approaches, append a brief note to `memory/lessons.md` with status `live-captured`. This preserves WHY decisions were made — retroactive capture can only recover WHAT
+- **Live capture:** before shipping, if the session produced non-obvious decisions, corrections, or rejected approaches, capture them to the appropriate topic file (`architecture-decisions.md` for decisions, `fixes.md` for bug-class patterns) using the `##decision:` or `##pattern: bug-class` prefix. This preserves WHY decisions were made — capture by category, not to a monolithic file.
 - `pre-ship.sh` hook: full test + lint + typecheck
 - Conventional commit (auto-generated)
 - PR — never push to main directly
@@ -172,8 +171,9 @@ See [scale-adaptive-rules Rule 7](/reference/rules-index#scale-adaptive-rules) f
 **Agent:** documenter, analyst
 **Deliverable:** Updated memory + documentation
 
-- **3-category extraction:** capture learnings as patterns, decisions, or failures
-- Update `memory/patterns.json` with new entries (category, severity, applicable_when fields)
+- **3-category extraction:** capture learnings as patterns, decisions, or failures; route to the appropriate topic file
+- Update `fixes.json` with new bug-class fix patterns (category, severity, applicable_when fields)
+- Update `review-patterns.json` and `architecture-decisions.json` with new entries
 - Update `memory/cost-log.json` with token usage
 - Sync affected documentation
 - Close sprint task

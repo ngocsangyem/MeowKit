@@ -48,7 +48,7 @@ Checks: Node.js version, Python available, Git configured, hooks executable, scr
 claude
 ```
 
-Claude reads `CLAUDE.md` automatically. The **orchestrator** agent activates and reads `memory/lessons.md` (empty on first run) and `memory/cost-log.json`.
+Claude reads `CLAUDE.md` automatically. The **orchestrator** agent activates and reads `memory/cost-log.json` for cost history. Topic files in `.claude/memory/` (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`) are loaded on-demand by consumer skills at task start — they are empty on first run.
 
 ### Step 4: Plan your first feature
 

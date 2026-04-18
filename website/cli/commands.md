@@ -81,7 +81,7 @@ View or manage cross-session memory.
 
 ```bash
 npx mewkit memory              # Summary (line counts, pattern count)
-npx mewkit memory --show       # Display full lessons.md
+npx mewkit memory --show       # Display summary of topic files (fixes.md, review-patterns.md, architecture-decisions.md)
 npx mewkit memory --stats      # Sessions captured, patterns learned
 npx mewkit memory --clear      # Clear all memory (with confirmation)
 ```

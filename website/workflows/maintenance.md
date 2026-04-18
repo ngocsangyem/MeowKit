@@ -65,15 +65,15 @@ The **developer** applies the fix with MeowKit's constraints:
 
 ### Step 4: Capture learnings
 
-The **analyst** saves to `memory/lessons.md`:
+The **analyst** routes the finding to `.claude/memory/fixes.json` (bug-class fix pattern):
 
 ```
 Project: legacy-dashboard
-Lesson: Dashboard has N+1 query patterns — check any service making
-        per-record DB calls. Repository pattern should use eager loading.
+Pattern: Dashboard has N+1 query patterns — check any service making
+         per-record DB calls. Repository pattern should use eager loading.
 ```
 
-Next time you (or anyone) opens this project, MeowKit reads this lesson at session start.
+Next time `meow:fix` runs, it loads `fixes.md`/`fixes.json` at task start and surfaces this pattern.
 
 ### Step 5: Document what you found
 

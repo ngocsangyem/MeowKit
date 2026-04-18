@@ -90,21 +90,21 @@ flowchart TD
 | Step | What happens | Skills used |
 |------|-------------|-------------|
 | 0 | Mode selection | AskUserQuestion (Autonomous/HITL/Quick) |
-| 0.5 | **Check fix memory** | Read memory/lessons.md + patterns.json for known fix patterns |
+| 0.5 | **Check fix memory** | Read `.claude/memory/fixes.md` + `fixes.json` for known fix patterns |
 | 1 | **Scout (mandatory)** | meow:scout — map files, deps, tests |
 | 2 | **Diagnose** | meow:investigate + meow:sequential-thinking |
 | 3 | Complexity assessment | Route to Quick/Standard/Deep |
 | 4 | Fix implementation | Address ROOT CAUSE, not symptoms |
 | 5 | **Verify + prevent (mandatory)** | Regression test + defense-in-depth |
-| 6 | **Finalize + learn** | Report, write fix pattern to memory, docs, commit |
+| 6 | **Finalize + learn** | Report, write fix pattern to `fixes.json`, docs, commit |
 
 ### Self-Improving Fix Loop
 
-After every fix, Step 6 writes the fix pattern to `memory/patterns.json`. Next time a similar bug appears, Step 0.5 finds the pattern and fast-tracks diagnosis — turning repeated bugs into instant fixes.
+After every fix, Step 6 writes the fix pattern to `.claude/memory/fixes.json`. Next time a similar bug appears, Step 0.5 finds the pattern and fast-tracks diagnosis — turning repeated bugs into instant fixes.
 
 ```
-Fix bug #1 → write pattern (frequency: 1)
-Fix bug #2 (same class) → read pattern → skip full diagnosis → apply known fix
+Fix bug #1 → write pattern to fixes.json (frequency: 1)
+Fix bug #2 (same class) → read fixes.json → skip full diagnosis → apply known fix
 After 3+ fixes → pattern promoted to CLAUDE.md rule (via meow:memory)
 ```
 

@@ -20,7 +20,7 @@ Claude Code already provides infrastructure — context compaction, 40+ tools, s
 | Layer | Who Provides It | What It Handles |
 |-------|----------------|----------------|
 | L7 (base) | Claude Code | Context window management, tool execution, permissions, subagent spawning |
-| L1–L6 (harness²) | MeowKit | Workflows, gates, memory filtering, budget tracking, checkpoint/resume, skills |
+| L1–L6 (harness²) | MeowKit | Workflows, gates, memory, budget tracking, checkpoint/resume, skills |
 
 The two layers compound: Claude Code handles the mechanics of running tools and managing context. MeowKit handles the strategy of what to build, when to stop, and how to verify.
 
@@ -31,7 +31,7 @@ The two layers compound: Claude Code handles the mechanics of running tools and 
 | **L1: Builder**      | Human                       | Approve plans (Gate 1), approve reviews (Gate 2). No agent can self-approve.                                    |
 | **L2: Planner**      | `meow:plan-creator`         | Decompose requests into product-level specs — user stories, not file names.                                     |
 | **L3: Cook**         | `/cook` workflow            | 7-phase pipeline: Orient → Plan → Test → Build → Review → Ship → Reflect.                                       |
-| **L4: Native Tasks** | `dispatch.cjs` + handlers   | 8 handler modules for build-verify, budget tracking, checkpoints, memory filtering.                             |
+| **L4: Native Tasks** | `dispatch.cjs` + handlers   | Handler modules for build-verify, budget tracking, checkpoints, immediate capture.                              |
 | **L5: Teams**        | `/scout`, `/team`, `/party` | Parallel agents with worktree isolation. Context firewall — subagents report findings, main thread stays clean. |
 | **L6: Skills**       | 40+ skills                  | JIT activation — only loaded when task domain matches. 200 tokens metadata → 3K instructions on demand.         |
 | **L7: Base Shell**   | Claude Code                 | Context compaction, tool validation, subagent models. MeowKit does NOT own this layer.                          |
@@ -48,7 +48,7 @@ Every production harness needs these five capabilities:
 
 ### 2. Memory Architecture
 
-`memory-loader.cjs` implements domain-filtered memory with YAML frontmatter tags on `lessons.md`. CRITICAL/SECURITY entries always load regardless of task. Other entries filtered by keywords extracted from the user's prompt. Budget-capped at 4000 chars (~1K tokens) to prevent memory from crowding out working context.
+MeowKit's memory system (`.claude/memory/`) is an on-demand topic-file scheme. Consumer skills read the relevant topic file at task start — `fixes.md`/`fixes.json` for bug work, `review-patterns.md`/`review-patterns.json` for code review, `architecture-decisions.md`/`architecture-decisions.json` for planning. No auto-injection pipeline runs on every turn. The `conversation-summary-cache.sh` injects a Haiku-summarized session cache (≤4KB) per turn — that is the only per-turn memory injection. Budget-capped at 4KB to prevent memory from crowding out working context.
 
 ### 3. Context Engineering
 
@@ -71,7 +71,7 @@ Checkpoint system survives crashes: `checkpoint-writer.cjs` saves state on Stop,
 
 ```mermaid
 flowchart TD
-    P0["Phase 0: Orient\nModel tier + memory"] --> P1["Phase 1: Plan\nProduct-level spec"]
+    P0["Phase 0: Orient\nModel tier + context"] --> P1["Phase 1: Plan\nProduct-level spec"]
     P1 --> G1{"GATE 1\nHuman approves"}
     G1 -->|approved| P2["Phase 2: Test\nOpt-in TDD via --tdd"]
     G1 -->|rejected| P1
@@ -106,7 +106,8 @@ sequenceDiagram
     Note over SS: orientation-ritual → resume checkpoint
 
     CC->>UP: User types prompt
-    Note over UP: memory-loader → filtered lessons + patterns
+    Note over UP: conversation-summary-cache → inject cached summary (≤4KB)
+    Note over UP: immediate-capture-handler → capture ##prefix messages
 
     loop Every tool call
         CC->>PT: Edit/Write/Bash
@@ -160,4 +161,4 @@ For the full set of 9 principles — why gates exist, why TDD is opt-in, why sec
 - **[Workflow Phases](/guide/workflow-phases)** — detailed breakdown of each phase
 - **[Adaptive Density](/guide/adaptive-density)** — how scaffolding scales by model
 - **[Middleware Layer](/guide/middleware-layer)** — the hook dispatch system in depth
-- **[Memory System](/guide/memory-system)** — tiered memory with domain filtering
+- **[Memory System](/guide/memory-system)** — topic-file memory with on-demand loading

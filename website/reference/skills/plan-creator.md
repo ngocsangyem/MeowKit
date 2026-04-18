@@ -9,7 +9,7 @@ Creates structured multi-file plans before implementation. Scope-aware: trivial 
 When `/meow:plan` or `/meow:cook` is invoked, this skill determines the workflow model (feature, bugfix, refactor, security), sizes scope, drafts the plan with phase files, validates it through red-team review and critical questions, and presents it for Gate 1 approval. Also handles ADRs, plan archival, and standalone red-team/validate operations on existing plans.
 
 ## Core Capabilities
-- **Institutional memory retrieval** — Reads `memory/lessons.md` and `memory/patterns.json` before planning to prevent re-solving known problems
+- **Institutional memory retrieval** — Reads `review-patterns.md`/`review-patterns.json` and `architecture-decisions.md`/`architecture-decisions.json` at task start to prevent re-solving known problems
 - **Step-file architecture** — 9 JIT-loaded steps (00-08) keep context lean; each step loads only when needed
 - **Workflow model selection** — Routes to feature, bugfix, refactor, or security model
 - **Scope challenge** — Trivial → exit, simple → fast, complex → hard; user scope input (EXPANSION/HOLD/REDUCTION)
@@ -17,7 +17,7 @@ When `/meow:plan` or `/meow:cook` is invoked, this skill determines the workflow
 - **Red-team findings file** — Separate `red-team-findings.md` with full detail (7-field findings), linked from plan.md summary table
 - **Validation question framework** — Detection keywords trigger category-specific questions (Architecture, Assumptions, Scope, Risk, Tradeoffs); 2-4 options with section mapping for answer propagation
 - **Gate 1 enforcement** — Plans must be approved via `AskUserQuestion` before implementation
-- **Memory capture at Gate 1** — Planning decisions, research findings, and red-team results persisted to `lessons.md` after approval
+- **Memory capture at Gate 1** — Planning decisions and red-team results persisted to `architecture-decisions.json` after approval
 - **Solution design checklist** — 5-dimension trade-off analysis (YAGNI/KISS/DRY, security, performance, edge cases, architecture)
 - **Context Reminder** — After Gate 1, prints mode-matched cook command with absolute path
 - **ADR generation** — Creates Architecture Decision Records in `docs/architecture/`
@@ -53,14 +53,14 @@ Subcommands skip the planning pipeline — they operate directly on existing pla
 
 After drafting, the skill presents the plan via `AskUserQuestion` with three options:
 
-- **Approve** — proceed, skill captures planning decisions to memory, prints context reminder + stops
+- **Approve** — proceed, skill captures planning decisions to `architecture-decisions.json`, prints context reminder + stops
 - **Modify** — user provides feedback, plan is revised and Gate 1 re-runs
 - **Reject** — planning stops, restart from scope challenge
 
 ## Output — Print & Stop
 
 After Gate 1 approval, the skill ends with a **Print & Stop**:
-- Captures planning decisions to `.claude/memory/lessons.md`
+- Captures planning decisions to `.claude/memory/architecture-decisions.json`
 - Prints a context reminder block with the mode-matched `/meow:cook [plan path]` command
 - Stops — Claude will not proceed automatically
 - You run the printed command when ready, or run a review skill first
@@ -124,7 +124,7 @@ Findings are written to a **separate `red-team-findings.md`** file with full 7-f
 - **Research disconnected from plan**: Findings archived but not cited → step-03 MUST integrate research into Key Insights
 
 ## Related
-- [`meow:cook`](/reference/skills/cook) �� Uses plan-creator as its first step
+- [`meow:cook`](/reference/skills/cook) — Uses plan-creator as its first step
 - [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — Reviews plans created by plan-creator
 - [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — CEO-level plan review
 - [`meow:validate-plan`](/reference/skills/validate-plan) — 8-dimension plan validation
