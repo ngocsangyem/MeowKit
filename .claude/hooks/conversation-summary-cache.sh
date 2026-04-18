@@ -44,6 +44,12 @@ fi
 
 EVENT="${HOOK_EVENT_NAME:-}"
 SESSION_ID="${HOOK_SESSION_ID:-}"
+# M8 fix: validate SESSION_ID format before use in sed (closes sed-delimiter injection).
+# Accepts UUID v4 and shorter hex IDs. Regex ^[a-f0-9-]{8,36}$ blocks shell metacharacters.
+if [ -n "$SESSION_ID" ] && ! echo "$SESSION_ID" | grep -qE '^[a-f0-9-]{8,36}$'; then
+  echo "Warning: invalid SESSION_ID format — clearing" >&2
+  SESSION_ID=""
+fi
 TRANSCRIPT="${HOOK_TRANSCRIPT_PATH:-}"
 
 CACHE="$PROJECT_DIR/.claude/memory/conversation-summary.md"

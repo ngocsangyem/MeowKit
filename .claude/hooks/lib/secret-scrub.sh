@@ -37,7 +37,11 @@ scrub_secrets() {
     -e 's|https://hooks\.slack\.com/services/[A-Z0-9/]+|[REDACTED-SLACK-WEBHOOK]|g' \
     -e 's/eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}/[REDACTED-JWT]/g' \
     -e 's/-----BEGIN [A-Z ]*PRIVATE KEY-----[^-]*-----END [A-Z ]*PRIVATE KEY-----/[REDACTED-PRIVATE-KEY]/g' \
-    -e 's/(api[_-]?key|apikey|password|passwd|secret|token)[[:space:]]*[:=][[:space:]]*[\x27"]?[A-Za-z0-9_/+=.-]{16,}[\x27"]?/\1=[REDACTED]/Ig'
+    -e 's/(api[_-]?key|apikey|password|passwd|secret|token)[[:space:]]*[:=][[:space:]]*[\x27"]?[A-Za-z0-9_/+=.-]{16,}[\x27"]?/\1=[REDACTED]/Ig' \
+    -e 's/Bearer [A-Za-z0-9_/+=.-]{20,}/Bearer [REDACTED]/g' \
+    -e 's|(mysql|postgres|postgresql|mongodb|redis)://[^[:space:]"'"'"']+|\1://[REDACTED-DB-URL]/Ig' \
+    -e 's/[A-Za-z0-9._%+-]{3,}@[A-Za-z0-9.-]{3,}\.[A-Za-z]{2,}/[REDACTED-EMAIL]/g' \
+    -e 's/(MEOWKIT_[A-Z_]*(KEY|SECRET|TOKEN|PASSWORD))[[:space:]]*=[[:space:]]*[^[:space:]]{8,}/\1=[REDACTED]/g'
 }
 
 # When sourced, the function is now available. No automatic action.

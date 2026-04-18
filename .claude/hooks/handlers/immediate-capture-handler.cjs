@@ -49,8 +49,10 @@ function escapeMemoryContent(text) {
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const MEMORY_DIR = path.join(ROOT, '.claude', 'memory');
 
+// phase-04 FIX-F3: ##decision: now routes to architecture-decisions.json (was lessons.md stub).
+// ##pattern: routes to fixes.json (bug-class default) or review-patterns.json (see resolvePatternFile).
 const PREFIXES = {
-  '##decision:': { target: 'lessons.md', type: 'decision' },
+  '##decision:': { target: 'architecture-decisions.json', type: 'decision' },
   // ##pattern: is category-routed — resolved at runtime in appendToPatterns()
   '##pattern:': { target: 'pattern-routed', type: 'pattern' },
   '##note:': { target: 'quick-notes.md', type: 'note' },
@@ -84,24 +86,54 @@ function releaseLock(lockDir) {
   try { fs.rmdirSync(lockDir); } catch { /* best-effort */ }
 }
 
-function appendToLessons(id, date, keywords, content) {
-  const lockDir = path.join(MEMORY_DIR, '.lessons.lock');
+// phase-04 FIX-F3: ##decision: appends a v2.0.0 JSON entry to architecture-decisions.json
+// with atomic temp-rename (M7 fix pattern).
+function appendToArchitectureDecisions(id, date, keywords, content) {
+  const targetFile = path.join(MEMORY_DIR, 'architecture-decisions.json');
+  const lockDir = path.join(MEMORY_DIR, '.decisions.lock');
   if (!acquireLock(lockDir, 3)) return false;
   try {
-    const entry = [
-      '', '---',
-      `id: ${id}`,
-      `status: live-captured`,
-      `domain: [${keywords.join(', ')}]`,
-      `severity: standard`,
-      `date: ${date}`,
-      '---',
-      '',
-      `## ${content.split('\n')[0].substring(0, 80)}`,
-      '',
-      escapeMemoryContent(content),
-    ].join('\n');
-    fs.appendFileSync(path.join(MEMORY_DIR, 'lessons.md'), entry + '\n');
+    let data = {
+      version: '2.0.0',
+      scope: 'architecture-decisions',
+      consumer: 'meow:plan-creator,meow:cook',
+      patterns: [],
+      metadata: { created: date, last_updated: date },
+    };
+    try {
+      const raw = fs.readFileSync(targetFile, 'utf8');
+      const parsed = JSON.parse(raw);
+      if (parsed.scope && parsed.scope !== 'architecture-decisions') {
+        process.stderr.write(`appendToArchitectureDecisions: scope mismatch\n`);
+        return false;
+      }
+      data = parsed;
+    } catch { /* init with skeleton */ }
+
+    data.patterns.push({
+      id,
+      type: 'decision',
+      category: 'architecture',
+      severity: 'standard',
+      domain: keywords,
+      applicable_when: content.split('\n')[0].substring(0, 120),
+      context: '',
+      pattern: escapeMemoryContent(content),
+      frequency: 1,
+      lastSeen: date,
+    });
+    if (!data.metadata) data.metadata = {};
+    data.metadata.last_updated = date;
+
+    // Atomic write via temp-rename (M7 fix)
+    const tmpPath = targetFile + '.tmp.' + process.pid;
+    try {
+      fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2));
+      fs.renameSync(tmpPath, targetFile);
+    } catch (e) {
+      try { fs.unlinkSync(tmpPath); } catch { /* best-effort */ }
+      throw e;
+    }
     return true;
   } finally {
     releaseLock(lockDir);
@@ -185,8 +217,8 @@ module.exports = function immediateCapture(ctx) {
     const date = new Date().toISOString().split('T')[0];
     let ok = false;
 
-    if (config.target === 'lessons.md') {
-      ok = appendToLessons(id, date, keywords.length > 0 ? keywords : ['uncategorized'], content);
+    if (config.target === 'architecture-decisions.json') {
+      ok = appendToArchitectureDecisions(id, date, keywords.length > 0 ? keywords : ['uncategorized'], content);
     } else if (config.target === 'pattern-routed') {
       // Category extracted from first word after prefix if present (e.g. "##pattern:bug-class ...")
       const firstWord = content.split(/\s+/)[0].toLowerCase();
