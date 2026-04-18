@@ -5,6 +5,53 @@ description: MeowKit release history and changes.
 
 # Changelog
 
+## 2.4.0 (2026-04-18) — The Agent Constitution Release
+
+### Features
+
+- **feat:** NEW `docs/project-context.md` — "agent constitution" loaded by every agent at SessionStart via `project-context-loader.sh`. 286 lines, 11 sections (tech stack, conventions, anti-patterns, testing approach, deployment, memory layout, hook chain, etc.). Resolves CF3 open since the 260411 audit.
+- **feat:** All 16 agents wired — identical first bullet in `## Required Context`: `` - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution) ``. Grep-verifiable consistency across `orchestrator`, `planner`, `architect`, `researcher`, `brainstormer`, `tester`, `developer`, `ui-ux-designer`, `security`, `reviewer`, `evaluator`, `shipper`, `git-manager`, `documenter`, `analyst`, `journal-writer`.
+- **feat:** NEW `meow:project-context init` action — writes a TODO-filled skeleton from `templates/skeleton.md` for users starting from scratch. Refuses to overwrite an existing `docs/project-context.md`.
+- **feat:** NEW SessionStart hook `.claude/hooks/ensure-skills-venv.sh` — idempotent bootstrap that creates `.claude/skills/.venv` if absent. Composes with existing `npx mewkit setup` (hook = bare venv safety net; CLI = full deps + system prompts).
+- **feat:** NEW `CLAUDE.md` section "Commands vs Skills" — documents the 3 valid command patterns (skill-composing, agent-invoking, standalone). Prevents false-positive phantom flagging.
+- **feat:** NEW audit rubric RF-14 — distinguishes TRUE phantom from skill-less command. Mechanical check: grep both `SKILL.md` and `commands/*.md`; phantom only when both absent.
+- **feat:** `docs/meowkit-architecture.md` regenerated from evidence — 452 lines, 11 sections, embedded summary skill graph, full 101-node graph linked. Every count cites a source file.
+
+### Fixes
+
+- **fix:** RF-13 deprecation YAML keys added to `meow:debug`, `meow:documentation`, `meow:shipping` frontmatter (`deprecated: true` + `superseded_by:`). Previously only description-text deprecation — invisible to YAML parsers.
+- **fix:** CF4 residual path at `meow:cook/SKILL.md:159` — bare `memory/lessons.md` → `.claude/memory/lessons.md`.
+- **fix:** Phantom skill refs in `.claude/commands/meow/meow.md` dispatcher — `meow:plan` → `meow:plan-creator`, `meow:test` → `meow:testing`.
+- **fix:** `meow:shipping` leak in `meow:skill-creator/references/skill-types.md:13` — deprecated name removed from live examples.
+- **fix:** `meow:agent-browser/SKILL.md` frontmatter — `name: agent-browser` → `name: meow:agent-browser` (registry convention).
+- **fix:** SKILLS_INDEX duplicate `meow:scout` row removed; footer "Total: 67" → "74 unique registered"; per-category counts reconciled.
+- **fix:** HOOKS_INDEX reclassified `memory-filter.cjs` / `memory-parser.cjs` / `memory-injector.cjs` as library modules (imported by `memory-loader`, not independently registered). Footer "8 Node.js handlers" → "12 on disk / 10 registered + 3 library".
+- **fix:** Evaluator phase-drift resolved — consistent "Phase 3 (active verification) + Phase 4 (contract reviewer)" wording across `evaluator.md` + `AGENTS_INDEX.md` + `CLAUDE.md`.
+- **fix:** `post-session.sh:27` — added elif branch warning when `python3` absent; previously silent skip.
+- **fix:** `meow:plan-creator/step-02-codebase-analysis.md:21` — upgraded silent-fail on missing `docs/project-context.md` to explicit WARNING directive with graceful fallback.
+
+### Documentation
+
+- **docs:** 12 SKILL.md files got real domain-specific `## Gotchas` sections (5-6 gotchas each, no generic filler): `vue`, `typescript`, `database`, `build-fix`, `lint-and-validate`, `frontend-design`, `project-organization`, `jira`, `intake`, `figma`, `docs-finder`, `elicit` (replaced empty placeholder).
+- **docs:** 7 gate-owning skills gained `gate-rules.md` references in body: `meow:plan-creator`, `meow:workflow-orchestrator`, `meow:sprint-contract`, `meow:cook`, `meow:ship`, `meow:review`; `meow:cso` gained `security-rules.md`.
+- **docs:** 4 agents gained rules in Required Context: `planner` + `reviewer` → `gate-rules.md`; `evaluator` → `rubric-rules.md`; `architect` → full Required Context section added.
+- **docs:** 4 skills got sibling-file disclosure tables (per RF-5): `planning-engine` (`scripts/`, `assets/`), `confluence` (`scripts/assemble-pages.py`), `multimodal` (`workflows/` + 9 internal Python modules), `docs-finder` (`examples/`, `package.json`).
+- **docs:** README + CLAUDE.md + `docs/project-context.md` §12 Bootstrap now surface `npx mewkit setup` as the required post-install step. Python-using skills (`multimodal`, `llms`, `docs-finder`) reference it in their Gotchas.
+- **docs:** NEW what's-new page `v2.4.0.md` with mermaid flow diagram of SessionStart → loader → agent context load.
+- **docs:** `.venv/` added to both `.gitignore` and `.claude/gitignore.meowkit` (distributed template).
+- **docs:** Agent-skill-architecture site footer count drift corrected 60+ → 74+ skills; VitePress site description 68+/15 → 74+/16.
+
+### Red-Team
+
+- **red-team:** Full system skill audit cycle (`plans/260418-0031`) — 5 parallel RT teams audited 78 skills + 16 agents + 7 hook events + 20 commands. 64 findings after dedup (6 CRITICAL / 18 HIGH / 34 MEDIUM / 6 LOW). 16 prior-audit findings confirmed resolved, 0 regressed.
+- **red-team:** 6 simulation scenarios traced (feature request → agent-detector; `/meow:cook`; `/meow:harness`; Python venv runtime; session reset; `/meow fix` dispatcher). 1 BROKEN (Python venv — fixed) + 5 PARTIAL.
+- **red-team:** `reconciliation-decision.md` — R1 chosen for `ensure-skills-venv.sh` vs `mewkit setup` overlap: keep hook as safety net (idempotent via `ensureVenv` guard). No code changes required.
+
+### Cleanup
+
+- **cleanup:** Deferred LOW items CF-L1 through CF-L5 fixed inline: python3 warning in post-session.sh; git-manager `phase: 5` frontmatter; CLAUDE.md researcher phase `0, 1` → `0, 1, 4`; `meow:scale-routing` Cross-Skill Dependencies section; `meow:session-continuation` description rewritten to trigger form.
+- **cleanup:** CF-M15 auto-resolved by CF3 fix ("all agents load docs/project-context.md" claim now accurate).
+
 ## 2.3.12 (2026-04-17) — External Codebase Packing + chom v2 Rigor
 
 ### Features
