@@ -19,7 +19,7 @@ const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json")
 const VERSION = pkgJson.version;
 
 function printHelp(): void {
-  console.log(`
+	console.log(`
 ${pc.bold(pc.cyan("meowkit"))} ${pc.dim(`v${VERSION}`)} — MeowKit runtime CLI
 
 ${pc.bold("Usage:")}
@@ -43,97 +43,120 @@ ${pc.bold("Options:")}
 }
 
 async function printStatus(): Promise<void> {
-  const channel = VERSION.includes("-beta") || VERSION.includes("-rc") ? "beta" : "stable";
-  console.log(`${pc.bold(pc.cyan("meowkit"))} ${pc.dim(`v${VERSION}`)} ${pc.dim(`(${channel})`)}`);
-  console.log();
+	const channel = VERSION.includes("-beta") || VERSION.includes("-rc") ? "beta" : "stable";
+	console.log(`${pc.bold(pc.cyan("meowkit"))} ${pc.dim(`v${VERSION}`)} ${pc.dim(`(${channel})`)}`);
+	console.log();
 
-  const configPath = ".claude/meowkit.config.json";
-  try {
-    const content = fs.readFileSync(configPath, "utf-8");
-    const config: Record<string, unknown> = JSON.parse(content) as Record<string, unknown>;
-    console.log(`${pc.bold("Config:")} ${configPath}`);
-    for (const [key, value] of Object.entries(config)) {
-      console.log(`  ${pc.dim(key)}: ${String(value)}`);
-    }
-  } catch {
-    console.log(`${pc.dim("No .claude/meowkit.config.json found.")}`);
-  }
+	const configPath = ".claude/meowkit.config.json";
+	try {
+		const content = fs.readFileSync(configPath, "utf-8");
+		const config: Record<string, unknown> = JSON.parse(content) as Record<string, unknown>;
+		console.log(`${pc.bold("Config:")} ${configPath}`);
+		for (const [key, value] of Object.entries(config)) {
+			console.log(`  ${pc.dim(key)}: ${String(value)}`);
+		}
+	} catch {
+		console.log(`${pc.dim("No .claude/meowkit.config.json found.")}`);
+	}
 }
 
 async function main(): Promise<void> {
-  const args = minimist(process.argv.slice(2), {
-    boolean: ["help", "version", "check", "beta", "list", "monthly", "clear", "show", "stats", "report", "all", "dry-run", "force", "system-deps"],
-    string: ["only", "type", "priority", "status"],
-    alias: { h: "help", v: "version" },
-  });
+	const args = minimist(process.argv.slice(2), {
+		boolean: [
+			"help",
+			"version",
+			"check",
+			"beta",
+			"list",
+			"monthly",
+			"clear",
+			"show",
+			"stats",
+			"report",
+			"all",
+			"dry-run",
+			"force",
+			"system-deps",
+		],
+		string: ["only", "type", "priority", "status"],
+		alias: { h: "help", v: "version" },
+	});
 
-  if (args.version) {
-    console.log(VERSION);
-    return;
-  }
+	if (args.version) {
+		console.log(VERSION);
+		return;
+	}
 
-  const command = args._[0] as string | undefined;
+	const command = args._[0] as string | undefined;
 
-  if (args.help && !command) {
-    printHelp();
-    return;
-  }
+	if (args.help && !command) {
+		printHelp();
+		return;
+	}
 
-  switch (command) {
-    case "init":
-      await init({
-        dryRun: args["dry-run"] as boolean | undefined,
-        force: args.force as boolean | undefined,
-        beta: args.beta as boolean | undefined,
-      });
-      break;
-    case "upgrade":
-      await upgrade({ check: args.check as boolean | undefined, beta: args.beta as boolean | undefined, list: args.list as boolean | undefined });
-      break;
-    case "validate":
-      await validate();
-      break;
-    case "budget":
-      await budget({ monthly: args.monthly as boolean | undefined });
-      break;
-    case "memory":
-      await memory({ clear: args.clear as boolean | undefined, show: args.show as boolean | undefined, stats: args.stats as boolean | undefined });
-      break;
-    case "setup":
-      await setup({ only: args.only as string | undefined, systemDeps: args["system-deps"] as boolean | undefined });
-      break;
-    case "doctor":
-      await doctor({ report: args.report as boolean | undefined });
-      break;
-    case "status":
-      await printStatus();
-      break;
-    case "task": {
-      const subcommand = args._[1] as string | undefined;
-      // positional description: everything after the subcommand that isn't a flag
-      const description = args._.slice(2).join(" ");
-      task({
-        subcommand,
-        type: args.type as string | undefined,
-        priority: args.priority as string | undefined,
-        all: args.all as boolean | undefined,
-        status: args.status as string | undefined,
-        description: description || undefined,
-      });
-      break;
-    }
-    default:
-      if (command) {
-        console.error(pc.red(`Unknown command: ${command}`));
-        console.log();
-      }
-      printHelp();
-      break;
-  }
+	switch (command) {
+		case "init":
+			await init({
+				dryRun: args["dry-run"] as boolean | undefined,
+				force: args.force as boolean | undefined,
+				beta: args.beta as boolean | undefined,
+			});
+			break;
+		case "upgrade":
+			await upgrade({
+				check: args.check as boolean | undefined,
+				beta: args.beta as boolean | undefined,
+				list: args.list as boolean | undefined,
+			});
+			break;
+		case "validate":
+			await validate();
+			break;
+		case "budget":
+			await budget({ monthly: args.monthly as boolean | undefined });
+			break;
+		case "memory":
+			await memory({
+				clear: args.clear as boolean | undefined,
+				show: args.show as boolean | undefined,
+				stats: args.stats as boolean | undefined,
+			});
+			break;
+		case "setup":
+			await setup({ only: args.only as string | undefined, systemDeps: args["system-deps"] as boolean | undefined });
+			break;
+		case "doctor":
+			await doctor({ report: args.report as boolean | undefined });
+			break;
+		case "status":
+			await printStatus();
+			break;
+		case "task": {
+			const subcommand = args._[1] as string | undefined;
+			// positional description: everything after the subcommand that isn't a flag
+			const description = args._.slice(2).join(" ");
+			task({
+				subcommand,
+				type: args.type as string | undefined,
+				priority: args.priority as string | undefined,
+				all: args.all as boolean | undefined,
+				status: args.status as string | undefined,
+				description: description || undefined,
+			});
+			break;
+		}
+		default:
+			if (command) {
+				console.error(pc.red(`Unknown command: ${command}`));
+				console.log();
+			}
+			printHelp();
+			break;
+	}
 }
 
 main().catch((error: unknown) => {
-  const message = error instanceof Error ? error.message : String(error);
-  console.error(pc.red(`Fatal: ${message}`));
-  process.exit(1);
+	const message = error instanceof Error ? error.message : String(error);
+	console.error(pc.red(`Fatal: ${message}`));
+	process.exit(1);
 });
