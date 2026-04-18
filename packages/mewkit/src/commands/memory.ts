@@ -16,9 +16,10 @@ interface PatternEntry {
 
 // H2 fix: caps walk at 5 levels; stops at project root sentinel (CLAUDE.md or
 // .claude/settings.json) to prevent clearing a parent project's memory.
-export function findMemoryDir(): string | null {
+// Accepts optional startDir for testability; defaults to process.cwd().
+export function findMemoryDir(startDir?: string): string | null {
 	const PROJECT_ROOT_SENTINELS = ["CLAUDE.md", ".claude/settings.json"];
-	let current = process.cwd();
+	let current = startDir ?? process.cwd();
 	for (let depth = 0; depth < 5; depth++) {
 		const candidate = path.join(current, ".claude", "memory");
 		if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {

@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "scope": "fixes",
+  "consumer": "meow:fix",
+  "patterns": [
+    {
+      "id": "gnu-grep-bre-macos",
+      "type": "failure",
+      "category": "bug-class",
+      "severity": "critical",
+      "domain": ["shell", "macos", "grep"],
+      "applicable_when": "writing or reviewing shell scripts that use grep with alternation (|) or quantifiers (+)",
+      "context": "macOS ships BSD grep which does not support GNU BRE extensions.",
+      "pattern": "Always use grep -E (ERE) for alternation and quantifiers.",
+      "frequency": 4,
+      "lastSeen": "2026-04-12"
+    }
+  ],
+  "metadata": {
+    "created": "2026-04-12",
+    "last_updated": "2026-04-18"
+  }
+}
