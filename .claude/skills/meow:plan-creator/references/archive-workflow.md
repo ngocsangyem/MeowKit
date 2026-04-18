@@ -48,7 +48,7 @@ For each selected plan, ask:
     "question": "Capture learnings from these plans to memory before archiving?",
     "header": "Journal Capture",
     "options": [
-      { "label": "Yes — capture learnings", "description": "Append key decisions and patterns to .claude/memory/lessons.md" },
+      { "label": "Yes — capture learnings", "description": "Append key decisions and patterns to .claude/memory/architecture-decisions.md" },
       { "label": "No — just archive", "description": "Archive without capturing learnings" }
     ],
     "multiSelect": false
@@ -61,7 +61,7 @@ If "Yes": for each selected plan, extract:
 - Red Team findings (if Red Team Review section exists)
 - Validation answers (if Validation Log section exists)
 
-Append to `.claude/memory/lessons.md`:
+Append to `.claude/memory/architecture-decisions.md`:
 ```markdown
 ## Archive: {plan-name} ({date})
 - **Goal:** {goal from plan}

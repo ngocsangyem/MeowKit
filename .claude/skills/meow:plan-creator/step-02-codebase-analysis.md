@@ -23,7 +23,7 @@ project. If absent, note the gap and continue — do NOT silently skip without l
    **REQUIRED:** If absent, print `WARNING: docs/project-context.md not found — run meow:project-context generate` before proceeding.
 2. `docs/system-architecture.md` — system structure
 3. `docs/code-standards.md` — coding conventions
-4. `.claude/memory/patterns.json` — recurring patterns
+4. `.claude/memory/architecture-decisions.json` — recurring architectural patterns
 
 ### 2c. Check Existing Plans
 

@@ -47,7 +47,6 @@ When neither chub nor MCP has the internal docs:
 1. **Grep docs/ directory** for keywords from the query
 2. **Glob for spec/design files:** `docs/**/*auth*.md`, `docs/**/*api*.md`
 3. **Check README.md** root for architecture section
-4. **Check .claude/memory/lessons.md** for past annotations about this topic
 
 ## Context Budget
 

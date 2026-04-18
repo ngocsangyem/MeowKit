@@ -11,7 +11,7 @@ All modes share these phases with mode-specific variations.
    - Auth/payments/security → always COMPLEX
    - Feature <5 files → STANDARD
    - Rename/typo/format → TRIVIAL
-3. **Read memory** (if exists): `.claude/memory/lessons.md`, `.claude/memory/patterns.json` — note relevant prior learnings
+3. **Read memory** (if exists): `.claude/memory/fixes.md` for bug-class warnings, `.claude/memory/architecture-decisions.md` for prior architectural decisions — note relevant prior learnings
 4. If mode=code: load plan path, parse phases
 5. `TaskCreate` for each workflow phase (with `addBlockedBy` chain)
 
@@ -274,7 +274,7 @@ Three mandatory subagents in parallel:
 3. **Memory capture (MUST spawn):**
 
    ```
-   Task(subagent_type="analyst", prompt="Run meow:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append to .claude/memory/lessons.md. Update .claude/memory/patterns.json with new entries including category, severity, applicable_when fields. Files to modify: .claude/memory/lessons.md, .claude/memory/patterns.json", description="Session memory capture")
+   Task(subagent_type="analyst", prompt="Run meow:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append bug-class patterns to .claude/memory/fixes.md and .claude/memory/fixes.json; append architectural decisions to .claude/memory/architecture-decisions.md and .claude/memory/architecture-decisions.json; append review patterns to .claude/memory/review-patterns.md and .claude/memory/review-patterns.json.", description="Session memory capture")
    ```
 
 4. `TaskUpdate` → mark all Claude Tasks complete after sync-back

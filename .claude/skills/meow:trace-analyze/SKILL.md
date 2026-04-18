@@ -29,7 +29,7 @@ Step-file workflow that ingests `.claude/memory/trace-log.jsonl`, partitions rec
 
 Activate when:
 - User runs `/meow:trace-analyze [--runs N]` (default N=20)
-- `dead-weight-audit-needed` flag in `.claude/memory/lessons.md` (set by `post-session.sh` on model version change)
+- `dead-weight-audit-needed` flag in `.claude/memory/fixes.md` (set by `post-session.sh` on model version change)
 - After 3+ consecutive harness failures on the same task
 - Quarterly schedule for the dead-weight audit
 

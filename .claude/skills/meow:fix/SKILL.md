@@ -53,9 +53,10 @@ If no mode flag: use `AskUserQuestion` (Autonomous / HITL / Quick). See `referen
 
 ## Step 0.5 — Check Fix Memory (before scouting)
 
-Read `.claude/memory/lessons.md` and `.claude/memory/patterns.json` for prior fixes:
+Read `.claude/memory/fixes.md` for prior session learnings on bug classes.
+Read `.claude/memory/fixes.json` for prior fix patterns (type: "correction").
 - Search for similar symptoms, error messages, or affected modules
-- If a matching fix pattern exists (type: "correction") → use it as starting hypothesis in Step 2
+- If a matching fix pattern exists → use it as starting hypothesis in Step 2
 - If a matching success pattern exists → apply the known fix approach directly
 
 This turns repeated bugs into instant fixes. Skip only if memory/ doesn't exist.
@@ -117,8 +118,8 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 1. Report: confidence, root cause, changes, files, prevention measures
 2. **Write to memory** — capture the fix pattern for future sessions:
-   - Append to `.claude/memory/lessons.md`: symptom → root cause → fix approach → what prevented recurrence
-   - Update `.claude/memory/patterns.json`: add pattern with `type: "correction"`, `category: "failure"`, `severity`, `applicable_when`, `context`, `pattern`, `frequency: 1`
+   - Append to `.claude/memory/fixes.md`: symptom → root cause → fix approach → what prevented recurrence
+   - Update `.claude/memory/fixes.json`: add pattern with `type: "correction"`, `category: "failure"`, `severity`, `applicable_when`, `context`, `pattern`, `frequency: 1`
    - If pattern already exists → increment frequency + update `lastSeen`
 3. `documenter` agent → update `./docs`
 4. Ask user about commit

@@ -37,7 +37,7 @@ Present the plan for approval:
 
 **On Approve:**
 - Update Agent State in plan.md: `Approved by: human`, `Validation: approved`
-- **Memory capture** (lightweight, no subagent): Append to `.claude/memory/lessons.md`:
+- **Memory capture** (lightweight, no subagent): Append to `.claude/memory/architecture-decisions.md`:
   ```markdown
   ## Plan: {plan-dir-name} ({YYYY-MM-DD})
   - **Mode:** {planning_mode} | **Scope:** {scope_mode} | **Model:** {workflow_model} | **TDD:** {tdd_mode}
@@ -46,7 +46,7 @@ Present the plan for approval:
   - **Red-team accepted:** {N} findings (or "skipped (fast mode)")
   - **Status:** live-captured
   ```
-  Skip silently if `.claude/memory/lessons.md` doesn't exist or write fails.
+  Skip silently if `.claude/memory/architecture-decisions.md` doesn't exist or write fails.
 - Print Context Reminder block (from `references/gate-1-approval.md`) with absolute path to plan.md
 - Proceed to step-08
 

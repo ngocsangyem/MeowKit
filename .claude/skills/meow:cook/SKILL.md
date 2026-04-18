@@ -160,7 +160,7 @@ If `meow:verify` FAILS after simplify: send back to developer to fix, then re-ru
 - **Code mode on stale plans**: Running old plan against changed codebase. Warn if plan.md is >14 days old
 - **Fast mode shallow test coverage**: Skipping research means tests capture plan-level intent, not edge cases. Document: "fast mode = TDD-flavored, coverage may be lower"
 - **Missing model tier declaration**: Expensive models on trivial tasks, cheap models on security-critical work. Always declare tier in Phase 0
-- **Forgetting memory read/write**: Prior session learnings lost. Phase 0 reads .claude/memory/lessons.md; Phase 6 writes back
+- **Forgetting memory read/write**: Prior session learnings lost. Phase 0 reads .claude/memory/fixes.md + .claude/memory/architecture-decisions.md; Phase 6 appends to the relevant topic file by category
 - **Subagent patterns using Agent() not Task()**: Task() enables tracking, blocking, and progress. Always use Task() for phases 2-6
 - **--strict cost surprise**: `--strict` spawns full meow:evaluate (~$2-5). Auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress, or `--verify` for light check (~$1)
 - **--strict vs --verify confusion**: `--verify` = light browser check (advisory). `--strict` = full evaluator with rubrics (FAIL blocks ship). `--strict` supersedes `--verify`

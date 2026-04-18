@@ -30,15 +30,19 @@ Operates in **Phase 0 (Orient)** and **Phase 6 (Reflect)**. Output supports the 
 
 ### `--prune`
 
-Archive old standard-severity entries from lessons.md to lessons-archive.md.
+Archive old standard-severity entries from topic files to `lessons-archive.md`.
+
+**Topic files subject to pruning:**
+- `fixes.md` — bug-class session learnings
+- `review-patterns.md` — process/review learnings
+- `architecture-decisions.md` — architectural decision records
 
 **What gets pruned:**
-- Entries with `status: captured` AND `severity: standard` AND `date` older than threshold (default: 90 days)
+- `## headings` with a date `(YYYY-MM-DD, severity: standard)` older than threshold (default: 90 days)
 
 **What is exempt:**
-- `severity: critical` or `severity: security` — never pruned regardless of age
-- `status: NEEDS_CAPTURE` — not yet processed, keep for next session
-- `status: live-captured` with `date` < threshold — recently captured, keep
+- `severity: critical` or `severity: security` entries — never pruned
+- Entries without a parseable date — kept as-is (safe default)
 
 **How to run:**
 ```
@@ -47,25 +51,21 @@ Archive old standard-severity entries from lessons.md to lessons-archive.md.
 /meow:memory --prune --dry-run    # show what would be archived without moving
 ```
 
-**Mechanism:**
-1. Read lessons.md, parse entries via memory-parser.cjs schema
-2. Identify entries matching prune criteria
-3. Append matched entries to `.claude/memory/lessons-archive.md`
-4. Remove matched entries from lessons.md (rewrite without them)
-5. Report: "Archived N entries, recovered ~X chars of injection budget"
+**Mechanism (grep-based — no parser dependency):**
+1. For each topic file: grep for `## ` headings + date pattern `(YYYY-MM-DD, severity: standard)`
+2. Compute age from today's date; identify entries older than threshold
+3. Append stale entries to `.claude/memory/lessons-archive.md`
+4. Remove stale entry blocks from topic file (rewrite without them)
+5. Report: "Archived N entries across M files"
 
-**Recovery:** Copy entries from lessons-archive.md back to lessons.md to reactivate.
-
-### `--capture-all`
-
-Override marker limits — process all NEEDS_CAPTURE markers regardless of age or count.
+**Recovery:** Copy entries from `lessons-archive.md` back to the appropriate topic file.
 
 ## Schema Notes
 
-`patterns.json` entries now support optional fields: `category` (pattern/decision/failure), `severity` (critical/standard), `applicable_when` (condition sentence). Existing entries without these fields remain valid — `severity` defaults to `standard` during extraction.
+Split JSON files (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`) all use v2.0.0 schema with fields: `version`, `scope`, `consumer`, `patterns[]`, `metadata`. Each pattern entry supports: `id`, `type`, `category`, `severity`, `domain`, `applicable_when`, `context`, `pattern`, `frequency`, `lastSeen`.
 
 ## Gotchas
 
 - **Stale patterns applied to changed codebase**: Memory suggests patterns from old architecture → Run consolidation when patterns exceed 50 entries; flag patterns with lastSeen > 6 months
 - **cost-log.json growing unbounded**: Every session appends without pruning → Run consolidation to archive entries older than 90 days
-- **NEEDS_CAPTURE markers in lessons.md**: Stop hook writes markers at session end; Phase 0 processes them retroactively (max 5, 5-min budget). Markers tagged CRITICAL or SECURITY are processed regardless of age or count limit. Use `meow:memory --capture-all` to override marker limits and process all NEEDS_CAPTURE markers regardless of age or count.
+- **lessons.md is now archived**: Do not write to lessons.md — it is a stub. Write to topic files (fixes.md, architecture-decisions.md, review-patterns.md) instead.

@@ -99,7 +99,7 @@ Task(subagent_type="documenter", prompt="Evaluate docs impact for changes: [file
 
 **Memory capture:**
 ```
-Task(subagent_type="analyst", prompt="Run meow:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append to .claude/memory/lessons.md. Update .claude/memory/patterns.json with new entries including category, severity, applicable_when fields. Files to modify: .claude/memory/lessons.md, .claude/memory/patterns.json", description="Session memory capture")
+Task(subagent_type="analyst", prompt="Run meow:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append bug-class patterns to .claude/memory/fixes.md and .claude/memory/fixes.json; append architectural decisions to .claude/memory/architecture-decisions.md and .claude/memory/architecture-decisions.json; append review patterns to .claude/memory/review-patterns.md and .claude/memory/review-patterns.json.", description="Session memory capture")
 ```
 
 ## UI Work (Conditional)

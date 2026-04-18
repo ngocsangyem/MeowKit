@@ -112,12 +112,10 @@ Scripts handle URL construction, source routing, fallback chains, and error hand
 ## Process
 
 1. **Parse query** — run `detect-source.js` to extract library, topic, source routing
-2. **Check memory** — read `.claude/memory/lessons.md` for per-API annotations
-3. **Fetch docs** — run fetch script based on detected source (context7 or chub)
-4. **Evaluate quality** — if `success: false`, try `fallbackSource`
-5. **Analyze results** — pipe through `analyze-results.js` for budget check
-6. **Format output** — fill the output template (see `references/errors.md` for template)
-7. **Update memory** — append API quirks to `.claude/memory/lessons.md`
+2. **Fetch docs** — run fetch script based on detected source (context7 or chub)
+3. **Evaluate quality** — if `success: false`, try `fallbackSource`
+4. **Analyze results** — pipe through `analyze-results.js` for budget check
+5. **Format output** — fill the output template (see `references/errors.md` for template)
 
 **Budget rule:** ≤3000 tokens inline. Overflow → write to `.claude/memory/docs-cache/`.
 

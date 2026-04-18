@@ -42,7 +42,7 @@ Skip: Fasttrack mode with pre-approved spec.
 ## Pre-Execution Checklist
 
 1. **agent-detector** → Select lead agent (MANDATORY)
-2. **Load context** → Read `memory/lessons.md` + `memory/patterns.json` (Phase 0 Orient)
+2. **Load context** → Read `memory/fixes.md` + `memory/architecture-decisions.json` (Phase 0 Orient)
 3. **Show agent banner** at start of response
 4. **Verify task complexity** — if simple, suggest lighter approach
 5. **Challenge requirements** → Ask clarifying questions before Phase 1

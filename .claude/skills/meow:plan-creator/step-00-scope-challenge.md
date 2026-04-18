@@ -6,8 +6,8 @@ Assess task complexity, select planning mode, early-exit trivial tasks.
 
 ### 0a. Read Institutional Memory
 
-1. Read `.claude/memory/lessons.md` if exists — note relevant patterns
-2. Read `.claude/memory/patterns.json` if exists — filter by scope
+1. Read `.claude/memory/architecture-decisions.md` — prior architectural decisions
+2. Read `.claude/memory/architecture-decisions.json` — recurring architectural patterns
 3. If relevant learnings found, note them for inclusion in plan Context section
 
 Skip ONLY if memory/ directory doesn't exist.
