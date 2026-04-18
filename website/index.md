@@ -5,7 +5,7 @@ hero:
   text: Enforced discipline for AI coding agents
   tagline: Hard gates, TDD, security scanning, and human approval — so your AI agent ships production-quality code, not untested prototypes.
   image:
-    src: /logo.png
+    src: /logo.svg
     alt: MeowKit Logo
   actions:
     - theme: brand

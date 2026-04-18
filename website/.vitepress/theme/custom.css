@@ -15,30 +15,33 @@
 /* ================================================================== */
 
 :root {
-  /* Primary Blue — brand: #2563EB (Deep Royal Blue) */
+  /* Royal Blue — brand primary. #2563EB is the /meow slash blue. */
   --mk-blue-50: #EFF6FF;
   --mk-blue-100: #DBEAFE;
   --mk-blue-200: #BFDBFE;
   --mk-blue-300: #93C5FD;
   --mk-blue-400: #60A5FA;
   --mk-blue-500: #3B82F6;
-  --mk-blue-600: #2563EB;
+  --mk-blue-600: #2563EB; /* brand primary */
   --mk-blue-700: #1D4ED8;
   --mk-blue-800: #1E40AF;
-  --mk-blue-900: #1E3A5F;
+  --mk-blue-900: #1E3A5F; /* "deep space" — dark-mode surface accent */
 
-  /* Accent — lighter brand for dark-mode highlights */
+  /* Accent — lighter brand glow for dark-mode highlights */
   --mk-accent-glow: #60A5FA;
   --mk-accent-soft: #93C5FD;
 
-  /* Neutral — aligned with design tokens */
+  /* Neutrals — slate-family, aligns with Tailwind slate */
   --mk-neutral-0: #FFFFFF;
   --mk-neutral-50: #F8FAFC;
   --mk-neutral-100: #E2E8F0;
+  --mk-neutral-200: #CBD5E1;
   --mk-neutral-300: #94A3B8;
   --mk-neutral-500: #64748B;
   --mk-neutral-700: #334155;
-  --mk-neutral-900: #05070A;
+  --mk-neutral-800: #1E293B;
+  --mk-neutral-900: #0F172A;
+  --mk-neutral-950: #05070A; /* true "deep-space black" */
 
   /* Semantic */
   --mk-success: #12B76A;
@@ -46,34 +49,52 @@
   --mk-danger: #F04438;
   --mk-info: #2563EB;
 
-  /* Gradient */
+  /* Brand gradients */
   --mk-gradient-brand: linear-gradient(135deg, #2563EB 0%, #60A5FA 100%);
+  --mk-gradient-space: radial-gradient(circle at 30% 20%, #1E3A5F 0%, #05070A 70%);
 
-  /* Typography — from design tokens */
-  --mk-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --mk-font-mono: 'Fira Code', 'Geist Mono', 'JetBrains Mono', monospace;
+  /* Typography */
+  --mk-font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mk-font-mono: 'Fira Code', 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
 
-  /* Spacing */
+  /* Spacing — 4-based scale */
+  --mk-space-0: 0;
   --mk-space-1: 4px;
   --mk-space-2: 8px;
   --mk-space-3: 12px;
   --mk-space-4: 16px;
+  --mk-space-5: 20px;
   --mk-space-6: 24px;
   --mk-space-8: 32px;
+  --mk-space-10: 40px;
+  --mk-space-12: 48px;
+  --mk-space-16: 64px;
+  --mk-space-20: 80px;
 
-  /* Border radius */
+  /* Radii */
+  --mk-radius-xs: 4px;
   --mk-radius-sm: 6px;
   --mk-radius-md: 10px;
   --mk-radius-lg: 16px;
+  --mk-radius-xl: 24px;
   --mk-radius-pill: 9999px;
 
   /* Shadows */
-  --mk-shadow-glow: 0 0 20px rgba(37, 99, 235, 0.35);
   --mk-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --mk-shadow-card: 0 2px 8px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --mk-shadow-lift: 0 8px 24px rgba(15, 23, 42, 0.10);
+  --mk-shadow-glow: 0 0 20px rgba(37, 99, 235, 0.35);
+  --mk-shadow-glow-strong: 0 0 40px rgba(37, 99, 235, 0.55);
+  --mk-shadow-inset-glow: inset 0 0 0 1px rgba(96, 165, 250, 0.35);
 
-  /* Transitions */
-  --mk-transition-fast: 0.15s ease;
-  --mk-transition-normal: 0.25s ease;
+  /* Motion */
+  --mk-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --mk-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --mk-dur-fast: 150ms;
+  --mk-dur-normal: 250ms;
+  --mk-dur-slow: 400ms;
+  --mk-transition-fast: var(--mk-dur-fast) var(--mk-ease-out);
+  --mk-transition-normal: var(--mk-dur-normal) var(--mk-ease-out);
 }
 
 /* ================================================================== */
@@ -96,8 +117,8 @@ html:not(.dark) {
   --vp-c-bg-elv: var(--mk-bg-surface);
   --vp-c-bg-soft: var(--mk-bg-soft);
 
-  /* Text */
-  --mk-text-primary: var(--mk-neutral-900);
+  /* Text — primary uses neutral-950 for true "deep-space black" */
+  --mk-text-primary: var(--mk-neutral-950);
   --mk-text-secondary: var(--mk-neutral-500);
   --mk-text-subtle: var(--mk-neutral-300);
   --vp-c-text-1: var(--mk-text-primary);
@@ -106,7 +127,7 @@ html:not(.dark) {
 
   /* Borders */
   --mk-border-subtle: var(--mk-neutral-100);
-  --mk-border-strong: #CBD5E1;
+  --mk-border-strong: var(--mk-neutral-200);
   --vp-c-border: var(--mk-border-subtle);
   --vp-c-divider: var(--mk-border-subtle);
   --vp-c-gutter: var(--mk-bg-base);
@@ -142,10 +163,10 @@ html:not(.dark) {
   --vp-c-brand-3: var(--mk-accent-glow);
   --vp-c-brand-soft: rgba(37, 99, 235, 0.14);
 
-  /* Backgrounds — blue-tinted dark palette (comfortable reading) */
-  --mk-bg-base: #0f172a;
-  --mk-bg-surface: #1e293b;
-  --mk-bg-soft: #1e3a5f;
+  /* Backgrounds — blue-tinted slate palette (comfortable reading) */
+  --mk-bg-base: var(--mk-neutral-900);   /* #0F172A */
+  --mk-bg-surface: var(--mk-neutral-800); /* #1E293B */
+  --mk-bg-soft: var(--mk-blue-900);       /* #1E3A5F — deep-space blue */
   --vp-c-bg: var(--mk-bg-base);
   --vp-c-bg-alt: var(--mk-bg-surface);
   --vp-c-bg-elv: var(--mk-bg-surface);
