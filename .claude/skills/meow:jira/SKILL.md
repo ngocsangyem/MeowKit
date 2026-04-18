@@ -186,3 +186,12 @@ meow:jira covers core Jira operations + ticket intelligence (evaluate, estimate,
 - `references/time-tracking.md` — worklog + estimate patterns
 - `references/evaluation-rubric.md` — complexity rubric + inconsistency patterns
 - `references/estimation-guide.md` — heuristic signals + escalation triggers
+
+## Gotchas
+
+- **JQL string interpolation allows injection if user input is unsanitized** — building a JQL query as `"project = " + userInput` lets a malicious user append `OR project = OTHER_PROJECT` and exfiltrate other teams' tickets; always use structured MCP parameters (`project_key`, `assignee`) rather than constructing JQL strings from user input.
+- **Issue key comparison in JQL is case-insensitive but MCP tool calls are not** — `get_issue("proj-123")` (lowercase) may return a 404 from the Atlassian MCP while `get_issue("PROJ-123")` succeeds; always uppercase issue keys before passing them to MCP tools.
+- **Agile board IDs are not the same as project IDs** — `get_agile_boards(board_name="Team Alpha")` returns a `board_id` (e.g. `42`) which is unrelated to the project key (`PROJ`); sprint operations require the `board_id`, not the project key, and mixing them causes "board not found" errors.
+- **`transition_issue` silently succeeds even when required fields are missing on some Jira Server versions** — Cloud Jira returns a 400 with field validation errors, but some Server/DC versions accept the transition and leave the issue in an inconsistent state (e.g., Done with no Resolution); always check the MCP response body, not just the HTTP status.
+- **Bulk fetch via `search` is capped at 100 items per call** — JQL searches return at most 100 results per `search` call; queries like `project = PROJ AND sprint in openSprints()` on large boards silently truncate results; paginate via `startAt` parameter and check `total` vs returned count.
+- **Watchers and assignee are separate fields; updating assignee does not notify watchers** — `update_issue(assignee=...)` changes the assignee but Jira notifies watchers only on specific events; if the workflow requires notifying the team, post a `add_comment` in addition to the field update.

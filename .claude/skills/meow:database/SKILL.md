@@ -112,3 +112,12 @@ WHERE id = ?    -- MySQL/SQLite
 - `references/schema-design.md` — naming, normalization, common patterns, anti-patterns
 - `references/migration-patterns.md` — safe migrations, zero-downtime, rollback
 - `references/query-optimization.md` — indexing, N+1, EXPLAIN, pagination
+
+## Gotchas
+
+- **Adding a NOT NULL column without a default locks the table on Postgres < 12** — `ALTER TABLE users ADD COLUMN verified BOOLEAN NOT NULL` acquires an exclusive lock for the full backfill; add the column as nullable first, backfill in batches, then add the NOT NULL constraint with `ALTER TABLE ... SET NOT NULL` (uses constraint scan, not rewrite, on PG 12+).
+- **`CREATE INDEX` without `CONCURRENTLY` blocks all writes** — a standard index build holds `ShareLock`; on a table with high write throughput this causes queue buildup in `pg_stat_activity`; always use `CREATE INDEX CONCURRENTLY` in production, noting it cannot run inside a transaction block.
+- **`CASCADE DELETE` on a foreign key silently removes child rows across migrations** — if a parent row is deleted during a data migration, all FK-cascaded children are gone with no error; audit every FK with `ON DELETE CASCADE` before batch-deleting seed or test data in production.
+- **`EXPLAIN ANALYZE` executes the query; `EXPLAIN` does not** — running `EXPLAIN ANALYZE DELETE FROM ...` will delete rows; always wrap in a transaction and rollback, or use `EXPLAIN (ANALYZE, BUFFERS)` only on SELECT queries unless you understand the side effect.
+- **Connection pool exhaustion shows as intermittent timeouts, not pool errors** — when all pool slots are taken, new queries wait silently until `pool_timeout` fires; the symptom looks like a slow query but `pg_stat_activity` shows dozens of `idle in transaction` connections from callers that forgot to release; always release connections in a `finally` block.
+- **Transaction isolation default (`READ COMMITTED`) allows non-repeatable reads** — two SELECTs in the same transaction can return different rows if another transaction commits between them; use `REPEATABLE READ` or `SERIALIZABLE` for financial or inventory operations where consistency across reads matters.

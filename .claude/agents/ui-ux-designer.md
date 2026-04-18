@@ -55,6 +55,7 @@ You own design artifacts:
 
 Load before any design work:
 
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - Plan file from `tasks/plans/` — what's being designed
 - `docs/design-guidelines.md` — existing design system (if it exists)
 - `.claude/memory/lessons.md` — prior design decisions and gotchas

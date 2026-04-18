@@ -54,10 +54,12 @@ You own `docs/architecture/` — all ADR files and architecture docs within.
 ## Required Context
 <!-- Improved: CW3 — Just-in-time context loading declaration -->
 Load before architectural evaluation:
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - Plan file from `tasks/plans/`: proposed technical approach
 - Existing ADRs from `docs/architecture/adr/`: prior decisions and patterns
 - Current codebase structure (via Glob/Grep — navigate, don't dump)
 - Technology stack constraints from CLAUDE.md
+- `.claude/rules/security-rules.md` + `.claude/rules/gate-rules.md`: rules that constrain architectural decisions
 
 ## Ambiguity Resolution
 <!-- Improved: AI7 — Explicit protocol for unclear architectural scope -->

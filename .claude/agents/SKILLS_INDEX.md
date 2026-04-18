@@ -126,26 +126,25 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | `meow:freeze` | any agent | Debug session scoping |
 | `meow:docs-finder` | any agent (primary: researcher) | Library/API documentation lookup |
 | `meow:multimodal` | any agent | Visual content analysis |
-| `meow:scout` | orchestrator/reviewer | Codebase exploration |
 | `meow:web-to-markdown` | any agent | Fetch arbitrary URLs as clean markdown — use when URL is not covered by meow:docs-finder. Static-only by default; Playwright opt-in via `mewkit setup --system-deps`. |
 
 ## Summary
 
 | Category | Count |
 |----------|-------|
-| Planning | 7 |
+| Planning | 6 |
 | Testing | 7 |
 | Development | 25 |
-| Review | 2 |
+| Review | 8 |
 | Security | 3 |
 | Deployment | 2 |
 | Documentation | 4 |
 | Memory | 2 |
-| Utility | 9 |
-| Cross-Cutting | 6 |
-| **Total** | **67** |
+| Utility | 12 |
+| Cross-Cutting | 5 |
+| **Total** | **74** |
 
-Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category.
+Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `meow:memory` counted under Memory (not Utility). `meow:retro` counted under Memory (not Documentation).
 
 ## Architecture Types
 

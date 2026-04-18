@@ -100,6 +100,15 @@ Every design output MUST pass these checks:
 | Contrast ratio below 4.5:1  | Adjust colors — never ship inaccessible UI                             |
 | Anti-slop check fails       | Fix failing items before delivery                                      |
 
+## Gotchas
+
+- **Tailwind dynamic class names are purged in production** — classes constructed via string interpolation (`\`text-${size}-bold\``) are not detected by Tailwind's content scanner and are stripped from the production CSS bundle; use complete class strings in source or add them to the `safelist` in `tailwind.config.js`.
+- **shadcn/ui component tokens drift from the project's CSS variables** — shadcn generates components that reference `--primary`, `--card`, `--muted` etc. from its own token set; if the project's design system uses different variable names (e.g. `--brand-primary`), components render with the wrong colors silently; audit `globals.css` token names against shadcn's expected token list after every shadcn `add` command.
+- **Figma color token names don't map 1:1 to CSS custom properties** — a Figma token named `Colors/Brand/Primary` exports as `colors-brand-primary` in Style Dictionary but shadcn and Tailwind expect `--primary`; manually map or configure the transformer, never assume the export name matches the CSS var name.
+- **Dark mode token gaps produce transparent or invisible elements** — adding a `dark:` variant class without defining the corresponding CSS variable in the `.dark` scope makes the element transparent (variable resolves to empty); always verify every token used in light mode has an explicit dark-mode override in the theme.
+- **Default Tailwind breakpoints differ from common design system breakpoints** — Tailwind's `md: 768px` clashes with some design systems that use `md: 960px`; responsive layouts built from Figma specs at 960px will reflow at the wrong breakpoint; override breakpoints in `tailwind.config.js` to match the design system before implementing responsive styles.
+- **SVG icon libraries ship multiple bundle formats and wrong import causes missing icons** — importing `lucide-react` icons in a Vue project (instead of `lucide-vue-next`) compiles without error but icons render as empty elements because the React component returns JSX that Vue ignores; always verify the framework-specific package is used.
+
 ## Handoff
 
 On completion → `reviewer` agent for Phase 4 design dimension check.

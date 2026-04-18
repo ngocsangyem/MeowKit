@@ -105,6 +105,8 @@ Use product-level mode when the user asks for a green-field app/product/tool ("b
 
 Load before producing a plan:
 
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
+- `.claude/rules/gate-rules.md`: Gate 1 hard-stop conditions you enforce
 - `.claude/memory/lessons.md`: past learnings relevant to planning
 - `docs/architecture/`: existing ADRs that constrain the design space
 - `tasks/templates/plan-template.md` or `plan-quick.md`: plan structure to follow

@@ -16,8 +16,8 @@ This is the "friendly front door" to MeowKit. Users who don't know which command
 
 2. **Classify task complexity.** Analyze the task description and assign one of three tiers:
    - **Trivial** — single-file change, typo, simple config update, quick question. Route to `/meow:fix` (simple mode) or answer directly.
-   - **Standard** — feature work, bug fix requiring investigation, test writing. Route to `/meow:cook` (full pipeline) or specific command (`/meow:fix`, `/meow:test`, `/meow:review`).
-   - **Complex** — multi-service change, architectural decision, new system design. Route to `/meow:plan` first, then `/meow:cook`, or `/meow:arch` / `/meow:design` for design-only work.
+   - **Standard** — feature work, bug fix requiring investigation, test writing. Route to `/meow:cook` (full pipeline) or specific command (`/meow:fix`, `/meow:testing`, `/meow:review`).
+   - **Complex** — multi-service change, architectural decision, new system design. Route to `/meow:plan-creator` first, then `/meow:cook`, or `/meow:arch` / `/meow:design` for design-only work.
 
 3. **Print routing decision:**
    ```
@@ -51,5 +51,5 @@ This is the "friendly front door" to MeowKit. Users who don't know which command
 🐱 Task complexity: standard → routing to /meow:cook
 
 /meow we need to migrate from REST to GraphQL for the user service
-🐱 Task complexity: complex → routing to /meow:plan
+🐱 Task complexity: complex → routing to /meow:plan-creator
 ```

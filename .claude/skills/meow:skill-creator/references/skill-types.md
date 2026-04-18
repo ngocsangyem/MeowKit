@@ -10,7 +10,7 @@ Classify your skill before writing it. Each type has different requirements.
 | Business Process | Multi-step workflows, approval chains | meow:cook, meow:ship, meow:workflow-orchestrator | Phase refs, state tracking |
 | Scaffolding | Generate templates, boilerplate | meow:skill-creator, meow:plan-creator | assets/ with templates |
 | Code Quality | Linting, formatting, style | meow:clean-code, meow:typescript | Rules refs, auto-fix scripts |
-| CI/CD | Build, deploy, release | meow:ship, meow:shipping | Pipeline refs, env config |
+| CI/CD | Build, deploy, release | meow:ship | Pipeline refs, env config |
 | Runbooks | Operational procedures, incident response | meow:investigate, meow:careful | Step-by-step with escape hatches |
 | Infrastructure | Cloud, containers, networking | (none yet) | Provider-specific refs, IaC patterns |
 

@@ -68,14 +68,14 @@ Two hard stops. No bypass. No exceptions.
 | orchestrator   | Route tasks, assign model tier           | 0     |
 | planner        | Scope-adaptive plan (fast/hard/deep), Gate 1 | 1     |
 | architect      | ADRs, system design                      | 1     |
-| researcher     | Technology research, library evaluation  | 0, 1  |
+| researcher     | Technology research, library evaluation  | 0, 1, 4 |
 | brainstormer   | Trade-off analysis, solution exploration | 1     |
 | tester         | Write failing tests first                | 2     |
 | developer      | TDD implementation                       | 3     |
 | ui-ux-designer | UI design, accessibility, design systems | 3     |
 | security       | Audit, BLOCK verdicts                    | 2, 4  |
 | reviewer       | Structural audit, Gate 2                 | 4     |
-| evaluator      | Behavioral verification, rubric grading  | 4     |
+| evaluator      | Behavioral verification, rubric grading  | 3, 4  |
 | shipper        | Deploy pipeline                          | 5     |
 | git-manager    | Git operations, conventional commits     | 5     |
 | documenter     | Living docs, changelogs                  | 6     |
@@ -83,6 +83,16 @@ Two hard stops. No bypass. No exceptions.
 | journal-writer | Failure docs, root cause analysis        | 6     |
 
 No two agents modify the same file type. Conflicts → escalate to human.
+
+## Commands vs Skills (they are not the same)
+
+Slash commands live in `.claude/commands/meow/*.md`. They operate in one of 3 valid patterns — NOT every command has a matching SKILL.md, and that is intentional:
+
+1. **Skill-composing** — command chains existing skills (e.g. `/audit` runs `meow:review` + `meow:cso`).
+2. **Agent-invoking** — command directly spawns an agent without a skill wrapper (e.g. `/arch` uses the `architect` agent).
+3. **Standalone** — command operates via inline behavior, no skill or agent spawn (e.g. `/design`, `/meow:summary`).
+
+**Do not flag a command as a "phantom skill" just because no `meow:<command>` SKILL.md exists.** A command is only phantom when BOTH no `meow:<name>` skill AND no `.claude/commands/meow/<name>.md` exist for a reference. See audit-rubric RF-14.
 
 ## Model Routing
 
@@ -146,6 +156,8 @@ Never rely on training data for API signatures.
 MCP chain: Context7 → Context Hub (`npx chub`) → WebSearch
 
 ## Python Scripts
+
+If `.venv` is absent, run `npx mewkit setup` to create it and install dependencies.
 
 Run from skill venv:
 

@@ -103,6 +103,7 @@ You own source code files: `src/`, `lib/`, `app/` directories.
 
 Load before writing any code:
 
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - Approved plan file from `tasks/plans/YYMMDD-name/plan.md`: technical approach
 - Failing test files from tester: what behavior to implement
 - `docs/architecture/`: ADRs constraining the implementation

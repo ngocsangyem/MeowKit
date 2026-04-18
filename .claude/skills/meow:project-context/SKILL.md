@@ -11,7 +11,8 @@ triggers:
 actions:
   - generate
   - update
-argument-hint: "[generate|update]"
+  - init
+argument-hint: "[generate|update|init]"
 source: meowkit
 ---
 
@@ -43,6 +44,23 @@ Scan the codebase and create `docs/project-context.md` from scratch.
 
 Re-scan codebase and update existing `docs/project-context.md`. Preserves manual edits in sections marked `<!-- manual -->`.
 
+### init
+
+Write a TODO-filled skeleton to `docs/project-context.md` for greenfield projects
+where `generate` would produce empty sections (no codebase to scan yet).
+
+**Behaviour:**
+- If `docs/project-context.md` already exists → **refuse with error**. Use `update` instead.
+- If absent → write `templates/skeleton.md` to `docs/project-context.md`.
+- Creates `docs/` directory if it does not exist.
+
+**When to use `init` vs `generate`:**
+| Situation | Action |
+|-----------|--------|
+| Empty or near-empty project, < 5 source files | `init` — fill manually |
+| Established project with real code | `generate` — auto-derive |
+| Existing `docs/project-context.md` is stale | `update` — re-scan, preserve manual edits |
+
 ## When to Run
 
 - **First time:** After `meow:bootstrap` or `meow:docs-init`
@@ -69,7 +87,14 @@ See `templates/project-context-template.md` for the full structure.
 - Don't list every file path — agents can Glob for that. Focus on RULES and CONVENTIONS
 - `<!-- manual -->` sections survive `update` action but NOT `generate` — backup before regenerating from scratch
 - If project-context.md conflicts with CLAUDE.md, CLAUDE.md wins (it's the higher-priority document)
+- `init` refuses to overwrite an existing `docs/project-context.md` — this is intentional. Delete the file manually if you truly want to reset to a blank skeleton.
 
 ## Integration
 
 All MeowKit agents load `docs/project-context.md` in their Required Context section. If the file doesn't exist, agents behave exactly as before (graceful degradation).
+
+## Files in this skill
+
+- `SKILL.md` — you are here
+- `templates/project-context-template.md` — output template used by `generate` action
+- `templates/skeleton.md` — TODO-placeholder constitution template used by `init` action

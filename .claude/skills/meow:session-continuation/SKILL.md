@@ -1,6 +1,6 @@
 ---
 name: meow:session-continuation
-description: "Manage workflow state across sessions with handoff and resume. TOON-based state persistence."
+description: "Invoke when user says 'handoff', 'save state', or 'resume workflow' to persist and restore mid-session workflow progress across context resets."
 autoInvoke: false
 priority: high
 model: haiku

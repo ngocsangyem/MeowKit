@@ -53,12 +53,15 @@ You own `tasks/reviews/` — all review verdict files.
 ## Required Context
 <!-- Improved: CW3 — Just-in-time context loading declaration -->
 Load before starting review:
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
+- `.claude/rules/gate-rules.md`: Gate 2 hard-stop conditions you enforce
 - Implementation files (via git diff for recent changes)
 - Test files from tester (coverage adequacy check)
 - Plan file from `tasks/plans/`: verify implementation matches plan
 - `docs/architecture/`: ADRs for architecture fit dimension
 - `.claude/rules/security-rules.md`: security dimension checklist
 - `red-team-findings.md` from plan directory (if exists) — plan-level adversarial findings to cross-reference
+- `docs/guides/red-team-overview.md`: full system documentation for the adversarial review architecture
 
 ## Failure Behavior
 <!-- Improved: AI4 — Explicit failure path prevents silent failure -->
@@ -128,8 +131,6 @@ Separate subagents receive diff + Phase A findings summary. Go deeper, not wider
 Workflow: `meow:review/workflow.md` → step-01 → step-02 (Phase A) → step-02b (Phase B) → step-03 (triage) → step-04 (verdict).
 
 Post-review triage categorizes findings as `current-change` (blocks shipping) vs `incidental` (logged to backlog). Phase A + Phase B findings are merged and deduplicated.
-
-See `docs/guides/red-team-overview.md` for full system documentation.
 
 ## Anti-Rationalization Rules
 

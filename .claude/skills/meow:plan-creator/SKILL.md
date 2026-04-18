@@ -139,6 +139,10 @@ tasks/plans/YYMMDD-name/
 | `references/workflow-models/refactor-model.md`     | Workflow template for refactor tasks (loaded JIT by step-00)                                                                                                                  |
 | `references/workflow-models/security-model.md`     | Workflow template for security tasks (loaded JIT by step-00)                                                                                                                  |
 
+## Related Rules
+
+- `.claude/rules/gate-rules.md` — Gate 1 hard-stop conditions this skill enforces (plan approval before Phase 3)
+
 ## Start
 
 Read and follow `workflow.md`.

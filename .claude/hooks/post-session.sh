@@ -25,6 +25,8 @@ MEMORY_DIR=".claude/memory"
 if [ -f .claude/meowkit.config.json ]; then
   if command -v .claude/scripts/bin/meowkit-config >/dev/null 2>&1; then
     .claude/scripts/bin/meowkit-config has features.memory 2>/dev/null || { echo "Memory disabled in config — skipping"; exit 0; }
+  elif ! command -v python3 >/dev/null 2>&1; then
+    echo "Warning: python3 not found — meowkit-config unavailable; proceeding with memory capture" >&2
   fi
 fi
 

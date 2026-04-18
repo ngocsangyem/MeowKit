@@ -14,6 +14,7 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 
 | Hook | Event | Matcher | Purpose | Timeout | Input |
 |---|---|---|---|---|---|
+| `ensure-skills-venv.sh` | SessionStart | — | Bootstrap `.claude/skills/.venv` Python venv if missing. Idempotent — no-op when venv already exists. Prevents Python skill failures on fresh clone (H11 fix). | 30s | `CLAUDE_PROJECT_DIR` env |
 | `project-context-loader.sh` | SessionStart | — | Load project-context.md + LocalContext expansion (directory tree, tool availability, package scripts) + session-ID reset | 5s | `HOOK_SESSION_ID` |
 | `gate-enforcement.sh` | PreToolUse | Edit\|Write | Gate 1 (plan approval) + Phase 4 sprint contract gate + suspicious-dir rejection | 10s | `HOOK_FILE_PATH` |
 | `privacy-block.sh` | PreToolUse | Read, Edit\|Write, Bash | Block reads of sensitive files (.env, .key, credentials) + SSRF check on Bash fetch commands | 5s | `HOOK_FILE_PATH` or `HOOK_COMMAND` |
@@ -36,7 +37,19 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 | `conversation-summary-cache.sh` | Stop | — | **Phase 9 NEW.** Spawns **background** worker that summarizes transcript via `claude -p --model haiku` (~60–120s wall) when throttle thresholds met. Hook itself returns instantly. Lock at `session-state/conversation-summary.lock`. Atomic write to `.claude/memory/conversation-summary.md`. | 5s | `HOOK_TRANSCRIPT_PATH` + `HOOK_SESSION_ID` |
 | `conversation-summary-cache.sh` | UserPromptSubmit | — | **Phase 9 NEW.** Inject cached summary as `## Prior conversation summary` block (capped 4KB). Skips on session_id mismatch. | 2s | `HOOK_SESSION_ID` |
 
-**Hook count:** 14 hook scripts + 8 Node.js handlers in `.claude/hooks/`. 13 shell hooks registered in `.claude/settings.json` events + 1 `pre-implement.sh` invoked manually by the developer agent. 8 `.cjs` handlers registered via `handlers.json` → `dispatch.cjs`. The shared parser shim at `lib/read-hook-input.sh` and the secret scrubber at `lib/secret-scrub.sh` are sourceable libraries. `conversation-summary-cache.sh` is registered under TWO events (Stop + UserPromptSubmit), branching on `HOOK_EVENT_NAME`. `SubagentStart`/`SubagentStop` are intentionally empty — hooks in these events would infinite-loop inside subagents.
+**Hook count:** 15 hook scripts + 12 Node.js `.cjs` files in `.claude/hooks/handlers/`. 14 shell hooks registered in `.claude/settings.json` events + 1 `pre-implement.sh` invoked manually by the developer agent. 10 `.cjs` handlers registered via `handlers.json` → `dispatch.cjs` (build-verify, loop-detection, budget-tracker, auto-checkpoint, checkpoint-writer, model-detector, orientation-ritual, memory-loader, immediate-capture-handler) + 1 direct `dispatch.cjs` entry. 3 `.cjs` files are library modules (`memory-filter`, `memory-parser`, `memory-injector`) imported by `memory-loader.cjs`, not independently registered. The shared parser shim at `lib/read-hook-input.sh` and the secret scrubber at `lib/secret-scrub.sh` are sourceable libraries. `conversation-summary-cache.sh` is registered under TWO events (Stop + UserPromptSubmit), branching on `HOOK_EVENT_NAME`. `SubagentStart`/`SubagentStop` are intentionally empty — hooks in these events would infinite-loop inside subagents.
+
+**Additional registered handler (not in hooks table above):**
+| Handler | Event | Purpose |
+|---|---|---|
+| `handlers/immediate-capture-handler.cjs` | UserPromptSubmit | Detects `##decision:`, `##pattern:`, `##note:` prefixes in user prompts and writes entries to typed memory files (lessons.md, patterns.json, quick-notes.md). |
+
+**Library modules (imported by memory-loader.cjs — NOT independently registered in handlers.json):**
+| Module | Imported by | Purpose |
+|---|---|---|
+| `handlers/memory-filter.cjs` | `memory-loader.cjs` | Filters memory entries by domain keyword match, staleness (>6mo), and token budget caps (CRITICAL: 3000 chars, STANDARD: 800 chars). |
+| `handlers/memory-parser.cjs` | `memory-loader.cjs` | Parses lessons.md YAML frontmatter entries with validation; extracts domain keywords from user prompts for relevance filtering. |
+| `handlers/memory-injector.cjs` | `memory-loader.cjs` | Escapes memory content to enforce DATA boundary (prevents injection via `<memory-data>` tags); wraps filtered output with metadata annotations. |
 
 ## Env Var Bypasses
 

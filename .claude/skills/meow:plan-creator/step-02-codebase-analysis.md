@@ -17,8 +17,10 @@ If `meow:scout` unavailable, manually Glob + Grep the relevant directories.
 
 ### 2b. Read Project Context
 
-Read these files if they exist (in priority order):
+Read these files (in priority order). All should exist in a properly-configured MeowKit
+project. If absent, note the gap and continue — do NOT silently skip without logging:
 1. `docs/project-context.md` — tech stack, conventions, anti-patterns
+   **REQUIRED:** If absent, print `WARNING: docs/project-context.md not found — run meow:project-context generate` before proceeding.
 2. `docs/system-architecture.md` — system structure
 3. `docs/code-standards.md` — coding conventions
 4. `.claude/memory/patterns.json` — recurring patterns

@@ -67,6 +67,7 @@ You own `.claude/rules/security-rules.md`.
 ## Required Context
 <!-- Improved: CW3 — Just-in-time context loading declaration -->
 Load before running audit:
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - `.claude/rules/security-rules.md`: security checklist to audit against
 - Plan file from `tasks/plans/` (Phase 2 audit) or implementation files (Phase 4 audit)
 - `docs/architecture/`: ADRs for security-related decisions

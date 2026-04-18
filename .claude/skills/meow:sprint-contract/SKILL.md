@@ -140,6 +140,10 @@ When `MEOWKIT_HARNESS_MODE=LEAN`:
 | `../meow:rubric/` | Rubric library — provides composed presets the contract binds to |
 | `../meow:evaluate/` | Phase 3 evaluator skill — reads signed contract via `step-01-load-rubrics.md` §1e |
 
+## Related Rules
+
+- `.claude/rules/gate-rules.md` — Gate 1 contract-signing requirement this skill enforces before source edits are allowed
+
 ## Start
 
 For interactive use, run `/meow:sprint-contract propose <task-slug>` to begin negotiation.

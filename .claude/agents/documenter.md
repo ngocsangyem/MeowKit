@@ -38,6 +38,7 @@ You own `docs/` — all files EXCEPT `docs/architecture/` (owned by architect) a
 ## Required Context
 <!-- Improved: CW3 — Just-in-time context loading declaration -->
 Load before documentation sync:
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - Git diff of shipped changes (identify what docs need updating)
 - Conventional commit messages (for changelog generation)
 - Plan file from `tasks/plans/`: feature context

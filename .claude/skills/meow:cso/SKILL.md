@@ -68,6 +68,10 @@ Skip: Daily mode (`--daily`) — scope is automatic.
 - CSO mode additionally performs manual checks: dependency audit, CI config review, secrets archaeology
 - These manual checks are NOT hooks — they are workflow steps in the audit process
 
+## Related Rules
+
+- `.claude/rules/security-rules.md` — Blocked patterns and BLOCK verdict definitions this skill audits against
+
 ## Gotchas
 
 - **False positives in vendored/test code**: Security scan flags minified vendor bundles or test fixtures → Exclude vendor/ and test/fixtures/ from scan scope

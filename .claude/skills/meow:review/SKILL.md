@@ -171,6 +171,10 @@ It does NOT change the verdict — it adds depth for informed Gate 2 decisions.
 **Auto-suggestion:** If verdict is WARN with security findings → suggest `red-team`.
 If verdict is WARN with coverage gaps → suggest `pre-mortem`.
 
+## Related Rules
+
+- `.claude/rules/gate-rules.md` — Gate 2 conditions this skill enforces; FAIL verdict blocks Phase 5 (Ship)
+
 ## Gotchas
 
 - **Reviewing diff without full context**: Approving a change that breaks an unstated invariant → Always read the surrounding file, not just the diff hunks

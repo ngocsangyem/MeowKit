@@ -107,7 +107,11 @@ It does NOT change the verdict (PASS/WARN/FAIL) — it adds depth.
 
 ## Gotchas
 
-<!-- Populate from real failures. Do not predict. -->
+- **Reasoning methods are not commutative — order changes the output** — running Red Team then Socratic surfaces attack vectors first and then validates them with evidence, producing a security-focused analysis; reversing to Socratic then Red Team validates assumptions before probing attacks, and often kills the adversarial framing entirely; always apply methods in the order that matches the user's primary concern.
+- **Socratic method loops indefinitely without a termination criterion** — "What evidence supports this claim?" applied recursively has no natural stopping point; without an explicit depth limit (e.g., stop at 3 levels of questioning or when no new claims emerge), the agent keeps decomposing until the context window fills; set a max depth before starting Socratic elicitation.
+- **Inversion only works reliably on binary decisions, not multi-option trade-offs** — "What would make this maximally wrong?" applied to a 3-option architectural choice produces a vague worst-case mix; inversion is sharp when the decision is yes/no (ship vs don't ship, add vs remove); for multi-option decisions, use Constraint Removal or Stakeholder Mapping instead.
+- **Pre-mortem degenerates to a generic worry list without a concrete ship date and scope** — "Assume this shipped and failed" requires a specific artifact (the plan, the feature, the migration) to be meaningful; if the target is vague ("our auth system"), the pre-mortem produces abstract risks ("scalability", "security") that don't map to actionable mitigations; always attach pre-mortem to a specific, scoped output.
+- **Elicitation output appended to the verdict file does NOT change the gate decision** — users sometimes interpret a CRITICAL finding from Red Team elicitation as requiring a Gate 2 re-evaluation; the skill explicitly does not change verdicts; if the elicitation reveals a CRITICAL issue, the user must manually trigger a new `meow:review` pass to produce a revised verdict before proceeding to Phase 5.
 
 ## What This Skill Does NOT Do
 

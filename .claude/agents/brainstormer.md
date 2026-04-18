@@ -48,6 +48,7 @@ When invoked, you MUST:
 
 Load before brainstorming:
 
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - Task description and user's initial framing of the problem
 - Existing codebase structure (via Glob — understand what exists before proposing)
 - `docs/architecture/`: existing ADRs that constrain the solution space

@@ -102,6 +102,19 @@ See `assets/spec-report-template.md` for the full template.
 | No headings in page | Paragraph-level chunking + WARN "spec lacks structure" |
 | MCP auth error | Report auth failure, link to API token setup |
 
+## Files in This Skill
+
+```
+meow:confluence/
+├── SKILL.md
+├── agents/                   — subagent definition files (confluence-reader, spec-analyzer)
+├── assets/                   — report templates (spec-report-template.md)
+├── config.json               — MCP connection configuration
+├── references/               — MCP tool reference (confluence-mcp-tools.md)
+└── scripts/
+    └── assemble-pages.py     — assembles multi-page Confluence content into a single markdown blob
+```
+
 ## Handoff
 
 - **meow:confluence → human → meow:jira** — confluence produces spec report, human reviews, then runs /meow:jira create manually

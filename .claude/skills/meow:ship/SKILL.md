@@ -126,6 +126,10 @@ After pipeline completes, output this summary:
 - **post-write.sh**: Security scan on every file write (always-on)
 - These are NOT session-scoped — they run on every ship regardless of skill activation
 
+## Related Rules
+
+- `.claude/rules/gate-rules.md` — Gate 2 (Review) approval is required before this skill may execute; no exceptions
+
 ## Gotchas
 
 - **Version bump conflicts in monorepo**: Multiple packages bump the same version file → Use per-package VERSION files; bump only the package being shipped

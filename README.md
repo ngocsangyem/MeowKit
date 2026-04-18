@@ -31,8 +31,23 @@ npx mewkit init
 
 The CLI fetches the latest release from GitHub, prompts for config, and scaffolds `.claude/` into your project.
 
+### Setup (required for Python skills)
+
+After installing MeowKit, run:
+
 ```bash
-npx mewkit setup      # Configure: Python venv, MCP, .env, .gitignore
+npx mewkit setup
+```
+
+This creates the Python venv at `.claude/skills/.venv`, installs pip packages
+(`google-genai`, `pillow`, `python-dotenv`), and interactively prompts for
+optional system deps (ImageMagick, FFmpeg, Playwright browsers).
+
+Run once per project. Idempotent — safe to re-run after upgrades.
+
+To verify your environment after setup:
+
+```bash
 npx mewkit doctor     # Verify environment
 ```
 

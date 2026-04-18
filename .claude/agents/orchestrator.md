@@ -64,6 +64,7 @@ After complexity routing, detect TDD mode:
 ## Required Context
 <!-- Improved: CW3 — Just-in-time context loading declaration -->
 Load before starting any routing decision:
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - `.claude/memory/lessons.md`: prior learnings that affect routing heuristics
 - `.claude/memory/cost-log.json`: budget context for model tier decisions
 - `CLAUDE.md` → Agent Roster table: current agent capabilities and ownership

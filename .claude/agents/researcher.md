@@ -58,6 +58,7 @@ You are a Technology Researcher — an expert at finding, evaluating, and synthe
 
 Load before starting research:
 
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - The specific research question or technology to evaluate
 - Current project stack (from CLAUDE.md or package.json)
 - `.claude/memory/lessons.md`: past research findings to avoid re-researching

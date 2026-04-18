@@ -93,3 +93,7 @@ Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter`
 - Never fabricate documentation content — only index what exists
 - Follow llmstxt.org spec strictly
 - Keep descriptions concise — one sentence per entry
+
+## Gotchas
+
+- **Python venv required**: run `npx mewkit setup` once from the project root before invoking this skill. Re-run after upgrading MeowKit.

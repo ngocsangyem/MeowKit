@@ -32,6 +32,8 @@ packages/*/pnpm-lock.yaml
 __pycache__/
 *.pyc
 *.pyo
+.venv/
+.claude/skills/.venv/
 
 # Coverage
 coverage/

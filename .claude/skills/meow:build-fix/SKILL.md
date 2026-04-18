@@ -106,3 +106,11 @@ Per `tdd-rules.md` Rule 4: max 3 self-healing attempts, then escalate.
 
 NEVER use TypeScript `any` as a fix for type errors. Always use `unknown` + type guards or
 fix the actual type mismatch. See `security-rules.md` — `any` type is a blocked pattern.
+
+## Gotchas
+
+- **Stale `.tsbuildinfo` hides real errors on warm incremental builds** — `tsc --incremental` skips files it thinks are unchanged; a corrupt or out-of-date `.tsbuildinfo` causes TS to report 0 errors while the actual output is broken; delete `.tsbuildinfo` and rerun `tsc --noEmit` before declaring the build clean.
+- **Platform-specific native binaries fail silently after `npm ci` on a different OS** — packages like `esbuild`, `sharp`, `@swc/core` ship OS-specific binaries; a `node_modules/` copied from macOS to Linux (or via Docker volume mount) silently uses wrong binaries until a cryptic "invalid ELF header" or "exec format error" appears at runtime; always run `npm ci` fresh inside the container, never share `node_modules` across platforms.
+- **Peer dependency warnings mask fatal version mismatches** — `npm install` prints peer dep warnings as non-fatal by default; a `eslint@8` peer warning can hide the real problem that `@typescript-eslint/parser@6` requires `eslint@8` but `9` is installed, causing `TypeError: eslint.linter is not a constructor` at runtime; always resolve peer warnings before treating the build as clean.
+- **Different error output on cold vs warm cache means fixing the wrong error** — a first clean build often surfaces errors that incremental builds skip; fix errors only after a full clean build (`rm -rf dist .tsbuildinfo && tsc`) to ensure you're seeing the complete error set, not just the delta from last run.
+- **Circular dependencies aren't caught by `tsc` but break bundlers at runtime** — TypeScript compiles circular imports without error; Vite/webpack may emit a broken bundle where one module resolves to `{}` because the other hadn't initialized yet; run `madge --circular src/` to detect cycles as part of build triage.

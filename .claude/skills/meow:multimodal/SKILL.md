@@ -121,8 +121,36 @@ Provider router auto-selects best available provider by checking API keys:
 
 Force a provider: `--provider gemini|minimax|openrouter`. Override chain order via `MEOWKIT_IMAGE_PROVIDER_CHAIN` etc.
 
+## Files in This Skill
+
+```
+meow:multimodal/
+├── SKILL.md
+├── references/               — per-capability reference files (8 files)
+├── workflows/                — step-by-step workflow guides
+│   ├── audio-transcription.md
+│   ├── document-extraction.md
+│   └── image-analysis.md
+└── scripts/                  — Python modules (run via .claude/skills/.venv/bin/python3)
+    ├── gemini_analyze.py     — primary analysis driver (images, video, audio, PDFs)
+    ├── gemini_generate.py    — Gemini image/video generation with provider fallback
+    ├── minimax_generate.py   — MiniMax image/video/TTS/music generation
+    ├── document_converter.py — PDF/docx → Markdown conversion
+    ├── check_setup.py        — API key and dependency verification
+    ├── provider_router.py    — multi-provider selection logic
+    ├── api_key_rotator.py    — Gemini key rotation on rate limits
+    ├── minimax_api_client.py — MiniMax API client wrapper
+    ├── openrouter_fallback.py — OpenRouter fallback for image gen
+    ├── media_optimizer.py    — pre-processing and chunking for large files
+    ├── video_generator.py    — async video polling + download helper
+    ├── analyze_constants.py  — shared model/endpoint constants
+    ├── analyze_core.py       — shared analysis logic reused by analyze scripts
+    └── env_utils.py          — env var loading and validation helpers
+```
+
 ## Gotchas
 
+- **Python venv required**: if you get `python3: command not found` or import errors, run `npx mewkit setup` once from the project root.
 - **Audio >15 min**: Gemini truncates silently. Split first.
 - **PDF >100 pages**: Quality degrades. Process in 20-page chunks.
 - **Video cost**: ~263 tokens/sec at default resolution. Use `--verbose` for cost estimate.

@@ -1,10 +1,10 @@
 ---
 name: evaluator
 description: >-
-  Behavioral active-verification agent. Distinct from reviewer (which audits
-  code structure) — evaluator runs the actual built artifact against rubric
-  library criteria and produces a graded verdict with concrete runtime
-  evidence (screenshots, HTTP responses, CLI output). Skeptic by default —
+  Behavioral active-verification agent. Phase 3 (active verifier: drives the running build
+  against rubric criteria with browser/curl/CLI evidence) + Phase 4 (contract reviewer:
+  critiques sprint contracts for testability before code is written). Distinct from reviewer
+  (which audits code structure) — evaluator runs the actual built artifact. Skeptic by default —
   assumes bugs exist and refuses static-only PASS verdicts.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: inherit
@@ -99,6 +99,8 @@ If you cannot complete the evaluation:
 ## Required Context
 
 Load before starting an evaluation:
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
+- `.claude/rules/rubric-rules.md`: calibration discipline, anchor balance rules, hard-fail propagation
 - Sprint contract from `tasks/contracts/` (if exists) — defines what was promised
 - Spec from `tasks/plans/` — original product-level specification
 - Rubric composition from `meow:rubric compose <preset>` — your grading criteria

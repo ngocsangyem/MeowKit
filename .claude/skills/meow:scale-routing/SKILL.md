@@ -122,3 +122,7 @@ For scriptable density selection, callers may invoke `.claude/skills/meow:harnes
 - `references/multi-layer-detection.md` — 4-layer detection logic and confidence scoring
 - `references/task-type-classification.md` — 8 task types, signals, and suggested skills
 - `references/product-area-config.md` — Optional `.claude/product-areas.yaml` schema and loading rules
+
+## Cross-Skill Dependencies
+
+- `.claude/skills/meow:harness/scripts/density-select.sh` — Echoes `harness_density` token to stdout; used by harness when scriptable density selection is needed

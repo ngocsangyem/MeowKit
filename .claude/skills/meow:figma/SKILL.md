@@ -125,3 +125,12 @@ Official Figma MCP skills: see your Figma MCP server's bundled skills documentat
 | meow:frontend-design | Design spec extraction → implement mode | Figma link present |
 | meow:ui-design-system | Design system setup → tokens mode | "extract design tokens" |
 | meow:review | Design compliance check → analyze mode | Review with Figma spec |
+
+## Gotchas
+
+- **Figma node IDs change when a designer duplicates or restructures frames** — a node ID captured on Monday may return 404 by Friday if the designer reorganized the file; always re-extract the node ID from the current URL before any MCP call rather than caching IDs across sessions.
+- **Batch fetching more than ~20 nodes via `get_design_context` triggers 429 rate limits** — the Figma MCP proxies the REST API which enforces per-minute rate limits; fetching a component library with 50+ variants in a single call reliably hits the limit; fetch in batches of ≤15 nodes with the exponential backoff already defined in Failure Handling.
+- **Component variant JSON structure nests properties under `componentPropertyDefinitions`, not `variants`** — querying a variant component expects `component.variants[0].name` but the MCP returns `component.componentPropertyDefinitions["Size"].variantOptions`; code that accesses the wrong key returns `undefined` silently and produces components with missing variants.
+- **Design token export format differs between Figma Variables (JSON) and Color Styles (CSS)** — `search_design_system` returns color styles as `rgba()` strings, while Figma Variables exports as `{ r, g, b, a }` float objects (0–1 range); mixing the two in a token file produces half the tokens in the wrong format, causing silent CSS variable failures.
+- **`get_screenshot` export scale 1x on a Retina display produces blurry assets** — the default export is 1x; on 2x/3x displays the screenshot looks correct in the MCP response but renders blurry when embedded in a 2x-density web page; always request `scale: 2` for any asset intended for screen display.
+- **Figma prototype links (`/proto/`) are not parseable by `get_design_context`** — prototype URLs use a different path segment than design files; the MCP `get_design_context` call will return a "file not found" or empty response; ask the user for the `/design/` URL from the editor, not the shareable prototype link.

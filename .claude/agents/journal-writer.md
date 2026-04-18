@@ -102,6 +102,7 @@ This agent operates in **Phase 6 (Reflect)** of MeowKit's workflow and during **
 
 Load before writing a journal entry:
 
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - The failure event details (error output, failing tests, escalation context)
 - Git log of recent changes related to the failure
 - Existing journal entries in `docs/journal/`: avoid duplicating known issues

@@ -34,6 +34,7 @@ For production changes, support gradual rollout with monitoring checkpoints and 
 ## Required Context
 <!-- Improved: CW3 — Just-in-time context loading declaration -->
 Load before starting ship sequence:
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - Passing review verdict from `tasks/reviews/YYMMDD-name-verdict.md`
 - Current branch state and git status
 - `package.json` (or equivalent): for test/lint/typecheck commands

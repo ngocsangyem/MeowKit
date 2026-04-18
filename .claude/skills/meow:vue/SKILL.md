@@ -82,3 +82,12 @@ Operates in **Phase 3 (Build GREEN)**. Output supports the `developer` agent.
 | Vue 2 syntax detected (Options API) | Migrate to Composition API `<script setup>` |
 | Pinia not installed                 | `npm install pinia`                         |
 | Type errors in template             | Fix with `defineProps<T>()` typing          |
+
+## Gotchas
+
+- **Destructuring `reactive()` loses reactivity** — `const { count } = reactive({ count: 0 })` makes `count` a plain number; always use `toRefs()` or keep the reactive object intact, or switch to `ref()`.
+- **`storeToRefs()` not called when destructuring Pinia store** — `const { user } = useAuthStore()` gives a non-reactive snapshot; `const { user } = storeToRefs(useAuthStore())` is required for reactive bindings.
+- **`<script setup>` with `defineExpose()` is required for parent `ref` access** — calling `childRef.value.method()` from a parent always returns `undefined` unless the child explicitly `defineExpose({ method })`; omitting this is silent until runtime.
+- **`:deep()` selector broken when component uses scoped styles + slot content** — slot content comes from the parent scope, so `:deep(.child-class)` in a scoped style block has no effect on slotted content; use `:slotted(.child-class)` instead.
+- **`watchEffect` cleanup race on fast re-renders** — without calling the `onCleanup` callback to cancel async operations, a fast prop change triggers a second effect before the first resolves, causing stale state writes; always register cleanup via `watchEffect((onCleanup) => { onCleanup(() => controller.abort()) })`.
+- **Pinia store state not hydrated in SSR (Nuxt/Vite SSR)** — calling `useMyStore()` outside a component setup context (e.g., in a top-level module) creates a store instance disconnected from the SSR app; always call stores inside `setup()` or pass the `pinia` instance explicitly via `useMyStore(pinia)`.

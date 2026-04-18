@@ -105,6 +105,19 @@ Reports are markdown files. See `assets/` for templates:
 | Estimation escalated | Note in report: "human estimation recommended" |
 | Circular deps | Present cycle, list all links — team decides break |
 
+## Files in This Skill
+
+```
+meow:planning-engine/
+├── SKILL.md
+├── agents/              — subagent definition files (tech-analyzer, planning-reporter)
+├── assets/              — report templates (planning-report-template.md, tech-review-template.md)
+├── references/          — rubric and guide references (tech-review-rubric.md, planning-guide.md)
+└── scripts/             — Python analysis utilities
+    ├── capacity-bin.py  — sprint capacity bin-packing algorithm
+    └── dep-graph.py     — dependency graph builder and cycle detector
+```
+
 ## Upstream Context
 
 meow:planning-engine works best when:

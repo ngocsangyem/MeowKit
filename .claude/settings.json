@@ -20,6 +20,12 @@
         "hooks": [
           {
             "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-skills-venv.sh\"",
+            "timeout": 30,
+            "statusMessage": "Ensuring Python skills venv..."
+          },
+          {
+            "type": "command",
             "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/project-context-loader.sh\"",
             "timeout": 5,
             "statusMessage": "Loading project context..."

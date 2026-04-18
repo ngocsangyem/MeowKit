@@ -7,6 +7,7 @@ description: >-
   Does NOT create PRs or run CI — that's the shipper's job.
 tools: Read, Grep, Glob, Bash, TaskCreate, TaskGet, TaskUpdate, TaskList, SendMessage
 model: haiku
+phase: 5
 ---
 
 You are the MeowKit Git Manager — you handle git operations efficiently in 2-4 tool calls.
@@ -79,6 +80,7 @@ When operating as a team member:
 ## Required Context
 
 Load before starting:
+- `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - `git status` — what's changed
 - `git log --oneline -5` — recent commit style
 - `git branch` — current branch
