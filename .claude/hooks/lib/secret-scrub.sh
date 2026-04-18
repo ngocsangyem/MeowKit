@@ -26,13 +26,12 @@ scrub_secrets() {
 
   # Use a single sed pipeline with multiple expressions
   # Order matters — more-specific patterns first, generic patterns after.
-  # RT-C C2 fix: split per-scheme — BSD sed (macOS) rejects ERE alternation
-  # in a grouped capture inside the DB-URL pattern. One bad expr aborted the
-  # whole pipeline and returned empty output. Per-scheme -e entries keep it
-  # portable across GNU sed and BSD sed.
-  # RT-C C3 fix: add Stripe sk_live_ / sk_test_ / rk_ / pk_ patterns so shell
-  # paths (post-session.sh, conversation-summary-cache.sh, append-trace.sh)
-  # redact the same Stripe keys the JS port (secret-scrub.cjs) catches.
+  # DB-URL patterns split per-scheme — BSD sed (macOS) rejects ERE alternation
+  # in a grouped capture, which would abort the whole pipeline and return empty.
+  # Per-scheme -e entries keep it portable across GNU sed and BSD sed.
+  # Stripe sk_live_ / sk_test_ / rk_ / pk_ patterns are included so shell-side
+  # scrubbing (post-session.sh, conversation-summary-cache.sh, append-trace.sh)
+  # matches the JS port in secret-scrub.cjs.
   echo "$input" | sed -E \
     -e 's/sk-ant-[A-Za-z0-9_-]{20,}/[REDACTED-ANTHROPIC-KEY]/g' \
     -e 's/sk-[A-Za-z0-9_-]{20,}/[REDACTED-OPENAI-KEY]/g' \

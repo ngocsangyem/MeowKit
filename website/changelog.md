@@ -47,9 +47,10 @@ description: MeowKit release history and changes.
 
 ### Documentation
 
-- **docs:** 17 website + 4 internal docs + 7 `.claude/commands` and skill references updated to describe the topic-file scheme. Removed stale `lessons.md` / `patterns.json` / `NEEDS_CAPTURE` instructions from: `website/reference/agents/analyst.md` (full overview rewrite), `website/guide/workflow-phases.md`, `website/reference/skills/{plan-creator,fix}.md`, `website/workflows/{add-feature,new-project,maintenance}.md`, `website/cli/commands.md`, `docs/memory-system.md` (full rewrite), `docs/{meowkit-architecture,meowkit-system-flow,project-context}.md`, and the 7 command/skill reference files.
-- **docs:** Internal plan/phase IDs removed from all published docs.
-- **docs:** NEW migration section in `docs/memory-system.md` describing the one-time `npx mewkit memory migrate` flow for pre-v2.4.1 projects with an active `lessons.md`.
+- **docs:** Full rewrite of `docs/memory-system.md` and `website/guide/memory-system.md` to describe the topic-file scheme, on-demand load semantics, the distinction between MeowKit's `.claude/memory/` and Claude Code's platform auto-memory, and migration from pre-v2.4.1 installs.
+- **docs:** Stale `lessons.md` / `patterns.json` / `NEEDS_CAPTURE` instructions removed across website guides, reference pages, workflow docs, skill references, and `.claude/commands/*`. All references now point at the split topic files with the correct load semantics.
+- **docs:** Internal planning artefacts (phase IDs, internal plan directory names) removed from published docs.
+- **docs:** README stats refreshed to reflect current resource counts.
 
 ### Chore
 
@@ -96,7 +97,7 @@ description: MeowKit release history and changes.
 
 ### Red-Team
 
-- **red-team:** Full system skill audit cycle (`plans/260418-0031`) — 5 parallel RT teams audited 78 skills + 16 agents + 7 hook events + 20 commands. 64 findings after dedup (6 CRITICAL / 18 HIGH / 34 MEDIUM / 6 LOW). 16 prior-audit findings confirmed resolved, 0 regressed.
+- **red-team:** Full system skill audit cycle — 5 parallel RT teams audited 78 skills + 16 agents + 7 hook events + 20 commands. 64 findings after dedup (6 CRITICAL / 18 HIGH / 34 MEDIUM / 6 LOW). 16 prior-audit findings confirmed resolved, 0 regressed.
 - **red-team:** 6 simulation scenarios traced (feature request → agent-detector; `/meow:cook`; `/meow:harness`; Python venv runtime; session reset; `/meow fix` dispatcher). 1 BROKEN (Python venv — fixed) + 5 PARTIAL.
 - **red-team:** `reconciliation-decision.md` — R1 chosen for `ensure-skills-venv.sh` vs `mewkit setup` overlap: keep hook as safety net (idempotent via `ensureVenv` guard). No code changes required.
 

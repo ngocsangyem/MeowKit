@@ -26,7 +26,7 @@ function writeJsonAtomic(filePath, data) {
   }
 }
 
-// Inlined from memory-parser.cjs (deleted in phase-03) — extracts domain keywords from prompt text.
+// Extracts domain keywords from prompt text.
 function extractKeywords(prompt) {
   if (!prompt) return [];
   const STOP_WORDS = new Set([
@@ -60,7 +60,7 @@ function extractKeywords(prompt) {
     });
 }
 
-// Inlined from memory-injector.cjs (deleted in phase-03) — escapes memory-data tags.
+// Escapes memory-data tags so captured content cannot inject its own data boundary.
 function escapeMemoryContent(text) {
   return text.replace(/<\/?memory-data[^>]*>/gi, (m) => m.replace(/</g, '&lt;'));
 }
@@ -68,8 +68,10 @@ function escapeMemoryContent(text) {
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const MEMORY_DIR = path.join(ROOT, '.claude', 'memory');
 
-// phase-04 FIX-F3: ##decision: now routes to architecture-decisions.json (was lessons.md stub).
-// ##pattern: routes to fixes.json (bug-class default) or review-patterns.json (see resolvePatternFile).
+// ##decision: routes to architecture-decisions.json (structured JSON entry).
+// ##pattern: is category-routed — resolved at runtime in appendToPatterns() — to
+// fixes.json (bug-class), architecture-decisions.json (decision), or
+// review-patterns.json (default).
 const PREFIXES = {
   '##decision:': { target: 'architecture-decisions.json', type: 'decision' },
   // ##pattern: is category-routed — resolved at runtime in appendToPatterns()
@@ -82,9 +84,9 @@ function generateId(type) {
   return `${type}-${ts}`;
 }
 
-// RT-C C1 fix: busy-spin without sleep caused 20-40% drop rate under concurrent
-// captures. Retry loop now uses bounded spin with exponential backoff + jitter
-// up to ~800ms total wait, which accommodates the common case (prior holder
+// Lock acquisition uses exponential backoff + jitter (10ms → 400ms cap) across
+// up to 8 retries. Busy-spinning without sleep caused silent write loss under
+// concurrent captures. The backoff accommodates the common case (prior holder
 // releases within a few ms) without blocking the hook for long.
 function sleepMs(ms) {
   // Synchronous sleep via Atomics — available in Node 16+ and safe in a hook.
@@ -120,8 +122,7 @@ function releaseLock(lockDir) {
   try { fs.rmdirSync(lockDir); } catch { /* best-effort */ }
 }
 
-// phase-04 FIX-F3: ##decision: appends a v2.0.0 JSON entry to architecture-decisions.json
-// with atomic temp-rename (M7 fix pattern).
+// Appends a schema v2.0.0 entry to architecture-decisions.json via atomic temp-rename.
 function appendToArchitectureDecisions(id, date, keywords, content) {
   const targetFile = path.join(MEMORY_DIR, 'architecture-decisions.json');
   const lockDir = lockDirForFile(targetFile);
@@ -215,8 +216,8 @@ function appendToPatterns(id, date, keywords, content, category) {
   }
 }
 
-// RT-C M2 fix: previously unlocked; concurrent ##note: captures could interleave.
-// Now uses per-file lock (same primitive as appendTo{Patterns,ArchitectureDecisions}).
+// Locked append so concurrent ##note: captures don't interleave. Uses the same
+// per-file lock primitive as appendTo{Patterns,ArchitectureDecisions}.
 function appendToQuickNotes(date, content) {
   const filePath = path.join(MEMORY_DIR, 'quick-notes.md');
   const lockDir = lockDirForFile(filePath);

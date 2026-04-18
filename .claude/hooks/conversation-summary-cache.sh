@@ -44,7 +44,7 @@ fi
 
 EVENT="${HOOK_EVENT_NAME:-}"
 SESSION_ID="${HOOK_SESSION_ID:-}"
-# M8 fix: validate SESSION_ID format before use in sed (closes sed-delimiter injection).
+# Validate SESSION_ID format before use in sed to close the sed-delimiter injection vector.
 # Accepts UUID v4 and shorter hex IDs. Regex ^[a-f0-9-]{8,36}$ blocks shell metacharacters.
 if [ -n "$SESSION_ID" ] && ! echo "$SESSION_ID" | grep -qE '^[a-f0-9-]{8,36}$'; then
   echo "Warning: invalid SESSION_ID format — clearing" >&2
@@ -56,7 +56,7 @@ CACHE="$PROJECT_DIR/.claude/memory/conversation-summary.md"
 TEMPLATE="$PROJECT_DIR/.claude/hooks/references/summary-prompt-template.md"
 
 THRESHOLD="${MEOWKIT_SUMMARY_THRESHOLD:-20480}"
-# M4 fix: transcript is JSONL (events, not turns). Renamed semantically.
+# The Claude Code transcript is JSONL (events, not turns). Named accordingly.
 EVENT_GAP="${MEOWKIT_SUMMARY_TURN_GAP:-30}"
 GROWTH_DELTA="${MEOWKIT_SUMMARY_GROWTH_DELTA:-5120}"
 
@@ -169,9 +169,9 @@ except Exception:
 ' 2>/dev/null)"
   fi
 
-  # M4 fix: transcript is JSONL — each line is an EVENT (tool call, tool result,
-  # message delta, etc.), not a turn. ~5–10 events per turn typical. Renamed
-  # variable + raised default EVENT_GAP to 30 (≈ 3–6 turns).
+  # Transcript is JSONL — each line is an EVENT (tool call, tool result,
+  # message delta, etc.), not a turn. ~5–10 events per turn typical. Default
+  # EVENT_GAP is 30 (≈ 3–6 turns).
   CURRENT_EVENTS=$(wc -l < "$TRANSCRIPT" 2>/dev/null | tr -d ' ')
   CURRENT_EVENTS="${CURRENT_EVENTS:-0}"
 

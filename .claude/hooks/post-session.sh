@@ -51,8 +51,8 @@ acquire_lock() {
       return 0
     fi
     # Stale lock detection (>60 seconds old)
-    # H1 fix: if stat fails (network FS, race), treat lock as live — don't use echo 0 which
-    # would set _lock_age to ~unix-epoch causing spurious stale-eviction.
+    # If stat fails (network FS, race), treat the lock as live — using echo 0 would
+    # set _lock_age to ~unix-epoch and cause spurious stale-eviction.
     if [ -d "$LOCKDIR" ]; then
       local _lock_mtime _lock_age
       _lock_mtime=$(stat -f %m "$LOCKDIR" 2>/dev/null || stat -c %Y "$LOCKDIR" 2>/dev/null)
@@ -68,8 +68,8 @@ acquire_lock() {
   return 1
 }
 
-# NOTE: NEEDS_CAPTURE heredoc removed in phase-05 — lessons.md migration complete.
-# The model-change flag below now targets fixes.md instead of lessons.md.
+# The retroactive NEEDS_CAPTURE heredoc has been removed. lessons.md is archived.
+# The model-change flag below targets fixes.md.
 
 # Initialize cost-log.json if missing
 if [ ! -f "$MEMORY_DIR/cost-log.json" ]; then
@@ -79,15 +79,15 @@ fi
 # Append cost entry from budget-state (values passed via env vars to avoid shell-to-Python injection)
 BUDGET_STATE_FILE="session-state/budget-state.json"
 if [ -f "$BUDGET_STATE_FILE" ] && command -v python3 >/dev/null 2>&1; then
-  # H3 fix: scrub secrets from budget-state before passing to Python block
+  # Scrub secrets from budget-state before passing to the Python block.
   . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/secret-scrub.sh" 2>/dev/null || true
   if command -v scrub_secrets >/dev/null 2>&1; then
     CLEAN_BUDGET=$(scrub_secrets "$(cat "$BUDGET_STATE_FILE" 2>/dev/null || echo '{}')")
   else
     CLEAN_BUDGET=$(cat "$BUDGET_STATE_FILE" 2>/dev/null || echo '{}')
   fi
-  # M1 fix: include session_id + model + cache token fields per cost-tracking.md spec.
-  # M7 fix: write to temp file then atomic rename (os.replace) — concurrent-safe.
+  # Include session_id + model + cache-token fields per cost-tracking.md spec.
+  # Atomic write: temp file + os.replace rename — safe under concurrent invocations.
   _CLEAN_BUDGET="$CLEAN_BUDGET" \
   _COST_LOG="$MEMORY_DIR/cost-log.json" \
   _TIMESTAMP="$TIMESTAMP" \
@@ -124,8 +124,8 @@ except Exception:
 ' 2>/dev/null || true
 fi
 
-# Phase 6 extension (260408): detect model version change → flag dead-weight audit needed.
-# phase-05 update: writes flag to fixes.md (was lessons.md, now archived).
+# Detect model-version change → flag dead-weight audit needed.
+# Writes flag to fixes.md (the bug-class topic file).
 LAST_MODEL_FILE="$MEMORY_DIR/last-model-id.txt"
 CURRENT_MODEL="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-unknown}}}"
 
@@ -167,7 +167,7 @@ fi
 
 echo "Session data captured to .claude/memory/"
 
-# NOTE: Phase 9 conversation-summary cache clear lives in project-context-loader.sh
-# (SessionStart hook) — see M2 fix in red-team-260408-2202-phase-09-review.md.
-# Stop hook is the wrong home: standard|fast profile short-circuits at top of this
-# file, so the cache-clear branch was dead code. SessionStart always runs.
+# NOTE: conversation-summary cache clear lives in project-context-loader.sh
+# (SessionStart hook). Stop hook is the wrong home: standard|fast profile
+# short-circuits at top of this file, so a cache-clear branch here would be
+# dead code. SessionStart always runs.

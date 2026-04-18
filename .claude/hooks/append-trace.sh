@@ -50,10 +50,9 @@ PY=".claude/skills/.venv/bin/python3"
 [ -x "$PY" ] || PY="python3"
 command -v "$PY" >/dev/null 2>&1 || exit 0
 
-# Phase 8 M1 fix (260408): pass EVENT and SCRUBBED via env vars (NOT shell string
-# interpolation) to avoid injection from special chars (single/triple quotes,
-# Python escapes). Previously a filename like O'Brien.ts crashed the parser
-# silently and dropped the trace record.
+# Pass EVENT and SCRUBBED via env vars (NOT shell string interpolation) to avoid
+# injection from special chars (single/triple quotes, Python escapes). A filename
+# like O'Brien.ts would otherwise crash the parser silently and drop the trace record.
 RECORD=$(MEOWKIT_TRACE_EVENT="$EVENT" MEOWKIT_TRACE_PAYLOAD="$SCRUBBED" "$PY" -c "
 import json, sys, os
 from datetime import datetime, timezone

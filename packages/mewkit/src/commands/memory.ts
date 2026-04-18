@@ -14,9 +14,10 @@ interface PatternEntry {
 	[key: string]: unknown;
 }
 
-// H2 fix: caps walk at 5 levels; stops at project root sentinel (CLAUDE.md or
-// .claude/settings.json) to prevent clearing a parent project's memory.
-// Accepts optional startDir for testability; defaults to process.cwd().
+// Walks up at most 5 levels, stopping at a project root sentinel (CLAUDE.md or
+// .claude/settings.json) so `mewkit memory --clear` can't reach a parent
+// project's memory. Accepts optional startDir for testability; defaults to
+// process.cwd().
 export function findMemoryDir(startDir?: string): string | null {
 	const PROJECT_ROOT_SENTINELS = ["CLAUDE.md", ".claude/settings.json"];
 	let current = startDir ?? process.cwd();
@@ -29,10 +30,9 @@ export function findMemoryDir(startDir?: string): string | null {
 		const atRoot = PROJECT_ROOT_SENTINELS.some((s) =>
 			fs.existsSync(path.join(current, s)),
 		);
-		// RT-C H2 fix: sentinel must fire at depth 0 too. Previously `depth > 0`
-		// caused the walk to continue into the parent when CWD had CLAUDE.md but
-		// no memory dir — `mewkit memory --clear` could reach a parent project.
-		if (atRoot) return null; // found root but no memory dir
+		// Sentinel must fire at depth 0 too. If CWD has CLAUDE.md but no memory
+		// dir, the walk must STOP here — not continue into the parent project.
+		if (atRoot) return null;
 		const parent = path.dirname(current);
 		if (parent === current) return null; // filesystem root
 		current = parent;
@@ -54,7 +54,7 @@ function promptConfirmation(question: string): Promise<boolean> {
 	});
 }
 
-// M2 fix: writes valid v2.0.0 skeletons to split files (was: "[]" which destroys schema).
+// Writes valid schema v2.0.0 skeletons to the three split JSON files.
 const EMPTY_SKELETON = (scope: string, consumer: string): string =>
 	JSON.stringify(
 		{
@@ -142,7 +142,7 @@ function showStats(memoryDir: string): void {
 	let patternsCount = 0;
 	let lastUpdated = "unknown";
 
-	// Aggregate patterns across all split files (M2 fix — no longer reads patterns.json)
+	// Aggregate patterns across the three split files.
 	for (const { file } of SPLIT_FILES) {
 		const p = path.join(memoryDir, file);
 		if (fs.existsSync(p)) {
@@ -213,7 +213,7 @@ function showSummary(memoryDir: string): void {
 
 	console.log();
 
-	// Split JSON files (M2 fix — no longer reads patterns.json)
+	// Split JSON files — the canonical pattern/decision stores.
 	for (const { file } of SPLIT_FILES) {
 		const p = path.join(memoryDir, file);
 		const label = `${file}:`.padEnd(28);

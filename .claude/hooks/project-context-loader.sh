@@ -81,7 +81,7 @@ if [ -n "${HOOK_SESSION_ID:-}" ]; then
     rm -f session-state/active-plan 2>/dev/null || true
     echo "$HOOK_SESSION_ID" > "$LAST_SESSION_FILE"
 
-    # Phase 9 (M2 fix): clear conversation-summary cache on new session.
+    # Clear conversation-summary cache on new session.
     # This is the correct home — SessionStart always runs (post-session.sh is
     # gated by MEOW_HOOK_PROFILE and exits early in default `standard` profile).
     SUMMARY_CACHE=".claude/memory/conversation-summary.md"

@@ -144,7 +144,7 @@ Use MeowKit for team knowledge. Use Claude Code auto-memory for personal insight
 
 All memory stays project-local in `.claude/memory/`. No data leaves the machine.
 
-The topic files (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`, `security-notes.md`) and split JSON files are team learnings — commit them via git. Machine-local or sensitive files should remain gitignored.
+`.claude/memory/*` is gitignored by default (only `.gitkeep` is tracked). Memory content is developer-specific working state — session history, transient captures, cost telemetry — and is not shared via the repo. If you want a team-shared subset of learnings, promote high-value patterns to `CLAUDE.md` or `.claude/rules/` (both are committed).
 
 ## Migration from pre-simplification MeowKit
 
