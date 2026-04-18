@@ -1,0 +1,56 @@
+{
+  "version": "2.0.0",
+  "scope": "review-patterns",
+  "consumer": "meow:review,meow:plan-creator",
+  "patterns": [
+    {
+      "id": "red-team-scope-gate",
+      "type": "success",
+      "category": "pattern",
+      "severity": "standard",
+      "domain": [
+        "review",
+        "code-quality"
+      ],
+      "applicable_when": "reviewing code changes with meow:review",
+      "context": "trivial diffs (≤3 files, ≤50 lines, no security, domain≠high) generate false-positive noise when run through full adversarial review",
+      "pattern": "scope gate in step-01 classifies diffs as minimal (Blind Hunter only) or full (all reviewers + personas). prevents wasted review cycles on trivial changes.",
+      "frequency": 1,
+      "lastSeen": "2026-03-31"
+    },
+    {
+      "id": "red-team-forced-finding",
+      "type": "success",
+      "category": "pattern",
+      "severity": "standard",
+      "domain": [
+        "review",
+        "code-quality"
+      ],
+      "applicable_when": "code review produces zero findings",
+      "context": "zero-finding reviews risk rubber-stamp approvals — reviewers may have been too shallow",
+      "pattern": "forced-finding protocol: zero findings triggers ONE re-analysis with 'look harder' prompt. if still zero, accept as clean with double-checked note. prevents lazy approvals without infinite loops.",
+      "frequency": 1,
+      "lastSeen": "2026-03-31"
+    },
+    {
+      "id": "red-team-hybrid-persona",
+      "type": "success",
+      "category": "decision",
+      "severity": "standard",
+      "domain": [
+        "review",
+        "architecture"
+      ],
+      "applicable_when": "designing adversarial review systems with multiple reviewer perspectives",
+      "context": "pure overlay (persona on existing reviewer) dilutes attention. pure separate subagents duplicate infrastructure and violate max-3-agent rule.",
+      "pattern": "hybrid two-phase model: Phase A runs base reviewers unchanged, Phase B runs separate persona subagents informed by Phase A findings. personas go deeper (not wider), don't repeat base findings, and can upgrade WARN to FAIL with evidence.",
+      "frequency": 1,
+      "lastSeen": "2026-03-31"
+    }
+  ],
+  "metadata": {
+    "created": "2026-04-18",
+    "last_updated": "2026-04-18"
+  }
+}

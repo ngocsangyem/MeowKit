@@ -1,8 +1,8 @@
 # MeowKit Memory System
 
-> Team-shared, version-controlled learning system that gets smarter over time.
+> Team-shared, version-controlled learning system. No auto-injection pipeline. Skills read topic files on demand.
 
-## Overview
+## 1. Overview
 
 MeowKit maintains an in-repo memory system at `.claude/memory/`. Unlike Claude Code's machine-local auto-memory (personal debugging notes, preferences), MeowKit memory is **team-shared via git** and focuses on **recurring patterns, decisions, failures, and costs**.
 
@@ -10,215 +10,152 @@ The two systems are complementary:
 - **MeowKit memory** = team knowledge (code standards, recurring patterns, costs) — lives in the repo
 - **Claude Code auto-memory** = personal insights (debugging notes, workflow habits) — lives on your machine
 
-## Architecture
+**Key design principle:** No auto-inject pipeline. Memory is read on-demand by consumer skills at task start. This eliminates the context-budget drain and trust-boundary issues of the former `memory-loader` / `memory-parser` / `memory-filter` / `memory-injector` pipeline (deleted in plan 260418).
+
+## 2. File Layout
 
 ```
 .claude/memory/
-  lessons.md          # Session learnings — YAML frontmatter per entry, append-only
-  patterns.json       # Recurring patterns — machine-queryable, frequency-tracked, auto-expires
-  decisions.md        # Architecture decisions — append-only
-  cost-log.json       # Token usage per task — auto-appended by Stop hook
-  security-log.md     # Security audit findings
-  preferences.md      # Team preferences (code style, tools) — loaded at SessionStart if present (NOT auto-created)
-  trace-log.jsonl     # Trace events for harness analysis — written by append-trace.sh
-  conversation-summary.md  # Haiku-summarized cache (anchored iterative merge)
-  lessons-archive.md  # Archived old entries (not injected, recoverable)
-  quick-notes.md      # Staging for ##note: captures (processed at Reflect)
+  fixes.md                  # Bug-class session learnings (meow:fix)
+  fixes.json                # Machine-queryable fix patterns v2.0.0 (meow:fix)
+  review-patterns.md        # Review / architecture patterns (meow:review, meow:plan-creator)
+  review-patterns.json      # Machine-queryable review patterns v2.0.0
+  architecture-decisions.md # Architectural decisions (meow:plan-creator, meow:cook)
+  architecture-decisions.json # Machine-queryable decisions v2.0.0
+  security-notes.md         # Curated security findings (meow:cso, meow:review)
+  cost-log.json             # Token usage per task — auto-appended by Stop hook
+  decisions.md              # Long-form ADRs — owned by architect agent
+  security-log.md           # Raw security audit log
+  quick-notes.md            # ##note: capture staging — processed at Reflect
+  conversation-summary.md   # Haiku-summarized session cache
+  trace-log.jsonl           # Harness trace events (append-trace.sh)
+  lessons-archive.md        # Historical archive — not actively read
+  lessons.md                # ARCHIVED stub — content migrated to topic files
+  last-model-id.txt         # Model-change detection for dead-weight audit
+  patterns.json             # DEPRECATED stub — split into 3 scoped files above
 ```
 
-### Injection Safety
+### Consumer mapping
 
-Memory injection is hardened against overflow, corruption, and injection attacks:
+| Topic file | Consumer skills | When loaded |
+|-----------|----------------|-------------|
+| `fixes.md` + `fixes.json` | meow:fix | Task start: diagnosing bugs |
+| `review-patterns.md` + `review-patterns.json` | meow:review, meow:plan-creator | Task start: code review / planning |
+| `architecture-decisions.md` + `architecture-decisions.json` | meow:plan-creator, meow:cook | Task start: architecture decisions |
+| `security-notes.md` | meow:cso, meow:review | Task start: security audit |
+| `cost-log.json` | meow:memory, analyst agent | Phase 0 / 6 cost reporting |
 
-- **Budget split**: 60% for critical/security entries, 40% for domain-filtered. Neither pool starves the other.
-- **Per-entry cap**: 3000 chars for critical entries, 800 for standard. Truncated entries show `[TRUNCATED: N chars omitted]`.
-- **Tag escaping**: `<memory-data>` wrapper tags in content are escaped before injection to prevent DATA boundary escape.
-- **Content validation**: `validate-content.cjs` rejects content matching injection patterns (e.g., "ignore previous instructions") before writing to any memory file.
-- **File locking**: All memory writes use POSIX-portable `mkdir` atomic lock with stale-lock detection (60s timeout). Not `flock` — unavailable on macOS.
-- **Staleness filter**: Standard-severity entries older than configurable threshold (default: 6 months) are skipped during injection. Critical entries never expire.
+## 3. Write Path
 
-### Modular Loader
+Three ways to write memory:
 
-Memory loading is split into focused modules:
+### a) Immediate capture (##prefix:)
 
-| Module | Responsibility |
-|--------|---------------|
-| `memory-parser.cjs` | YAML frontmatter parsing + validation. Rejects malformed entries with visible error markers. |
-| `memory-filter.cjs` | Domain keyword matching, staleness filtering, budget enforcement. |
-| `memory-injector.cjs` | Tag escaping, DATA wrapping, filtered/stale count markers. |
-| `memory-loader.cjs` | Thin orchestrator that wires the three modules together. |
+Type messages with `##` prefix during any session. Handled by `immediate-capture-handler.cjs` (UserPromptSubmit hook):
 
-## Memory vs Cache
+| Prefix | Routes to | Entry type |
+|--------|-----------|-----------|
+| `##pattern: bug-class <description>` | `fixes.json` | JSON pattern entry |
+| `##pattern: <description>` | `review-patterns.json` | JSON pattern entry |
+| `##decision: <description>` | `architecture-decisions.json` | JSON decision entry |
+| `##note: <text>` | `quick-notes.md` | Freeform markdown |
 
-**Memory is for team-shared learnings.** It is version-controlled, human-curated, and durable across sessions. Only the canonical files above belong in `.claude/memory/`.
+All captures are validated against injection patterns before writing. Invalid content is blocked with a visible warning.
 
-**Cache is for skill-generated, ephemeral artifacts.** It lives at `.claude/cache/` (not `.claude/memory/`) and is gitignored by default. Skills that produce per-fetch or per-call output (e.g., `meow:web-to-markdown` writing fetched page reports) MUST use cache, not memory.
+### b) Session end (post-session.sh)
 
-**Rule of thumb:** if an agent writing the artifact would want to git-commit it, it's memory. If not, it's cache. Web-fetched content is cache — noisy, large, per-session, possibly PII-laden.
+The Stop hook runs `post-session.sh` which:
+- Appends a cost entry to `cost-log.json` (atomic temp-rename, M7 fix)
+- Sets a model-change flag in `last-model-id.txt` to trigger dead-weight audit
 
-**Injection-rules.md R3 still applies to cache:** files in `.claude/cache/` are DATA, not INSTRUCTIONS.
+The NEEDS_CAPTURE pipeline (writing markers to lessons.md) is **deleted**. lessons.md is an archived stub.
 
-### Data Flow
+### c) Skill-invoked session capture
+
+`meow:memory` session-capture (`references/session-capture.md`) guides extraction of patterns/decisions/failures at Phase 6 (Reflect). Output goes to topic files, not lessons.md.
+
+## 4. Read Path
+
+Memory is loaded **on-demand** by consumer skills:
+
+1. **Consumer skill SKILL.md** includes a "Load memory" step listing which topic files to read
+2. **Agent reads** the relevant topic file(s) at task start
+3. **No injection** — content is not pushed into every prompt turn
+
+Claude Code's auto-memory (`~/.claude/projects/…/MEMORY.md`) operates separately and is machine-local only.
+
+## 5. Pruning
+
+Run `/meow:memory --prune` to archive old entries from topic files.
+
+**How it works (grep-based — no parser dependency):**
+1. For each topic file: grep for `## ` headings with date pattern `(YYYY-MM-DD, severity: standard)`
+2. Compute age; identify entries older than threshold (default: 90 days)
+3. Append stale entries to `.claude/memory/lessons-archive.md`
+4. Rewrite topic file without stale blocks
+
+**Exempt from pruning:** `severity: critical` or `severity: security` entries; entries without a parseable date.
 
 ```
-User types ##decision: / ##pattern: / ##note:
-  → immediate-capture-handler.cjs validates + writes to typed file immediately
-                                    ↓
-Session ends → Stop hook writes NEEDS_CAPTURE marker to lessons.md (mkdir-locked)
-            → Stop hook appends cost entry to cost-log.json (env var passing, 1000-entry cap)
-            → conversation-summary-cache.sh merges new turns into structured summary
-                                    ↓
-Every user message → memory-loader.cjs injects (fires per-turn, not once per session):
-             → Critical entries (always, budget: 60%)
-             → Domain-filtered entries (keyword-matched, budget: 40%)
-             → Skips stale entries (>6mo standard) + expired patterns (>12mo)
-             → NOTE: entries with null dates are treated as stale (known issue — affects NEEDS_CAPTURE markers without dates)
-SessionStart → project-context-loader.sh loads preferences.md (if file exists — not auto-created)
-             → Shows agent readiness banner (5-point score)
-                                    ↓
-Phase 0 → Analyst reads lessons.md
-        → Processes NEEDS_CAPTURE markers (max 5, 5-min budget)
-        → Reconstructs learnings from git log
-                                    ↓
-Before shipping → Live capture: agent writes non-obvious decisions to lessons.md
-                                    ↓
-Reflect → session-capture: categorizes learnings (patterns/decisions/failures)
-        → Updates patterns.json with new entries
-        → Processes quick-notes.md → classifies into lessons or patterns
-                                    ↓
-After ~10 sessions → pattern-extraction: proposes high-frequency patterns for CLAUDE.md
-                   → Human approval required before any CLAUDE.md changes
-                                    ↓
-When memory grows large → meow:memory --prune: archive old standard entries
-                        → consolidation: merge duplicates, clean cost data
+/meow:memory --prune              # default 90-day threshold
+/meow:memory --prune --days 180   # custom threshold
+/meow:memory --prune --dry-run    # preview without writing
 ```
 
-## Immediate Capture
+When to prune: topic file > 300 lines or JSON file > 50 entries.
 
-For crash-resilient knowledge capture, type messages with `##` prefix:
+## 6. Cost Tracking
 
-| Prefix | Routes to | Schema |
-|--------|-----------|--------|
-| `##decision: chose X over Y because...` | lessons.md | YAML frontmatter (auto-generated) |
-| `##pattern: always use grep -E on macOS` | patterns.json | JSON entry (auto-generated) |
-| `##note: check this later` | quick-notes.md | Freeform (classified at Reflect) |
+`cost-log.json` uses v2 schema (M1 fix):
 
-**Why double hash?** Single `#` conflicts with markdown headers and `#123` issue references.
+```json
+[
+  {
+    "date": "YYYY-MM-DD HH:MM",
+    "session_id": "...",
+    "model": "claude-sonnet-4-5",
+    "estimated_cost_usd": 0.12,
+    "estimated_input_tokens": 45000,
+    "estimated_output_tokens": 8000,
+    "cache_read_tokens": 12000,
+    "cache_creation_tokens": 5000,
+    "recent_files": 7
+  }
+]
+```
 
-Captures are validated against injection patterns before writing. Invalid content is blocked with a visible warning. All writes use mkdir-based file locking.
+Written atomically via temp-rename (`os.replace`) — concurrent-safe (M7 fix).
 
-## How to Activate
+## 7. Deleted Components (Tombstone)
 
-**No manual activation needed.** The system works automatically:
+The following components were deleted in plan 260418-1603 (memory simplification):
 
-1. **Immediate capture** (automatic): `##prefix` messages are captured instantly by `immediate-capture-handler.cjs`.
-2. **Stop hook** (automatic): Every session end writes a NEEDS_CAPTURE marker + cost entry. Configured in `.claude/settings.json` → `post-session.sh`.
-3. **Retroactive capture** (automatic): Next session's analyst processes markers. Controlled by CLAUDE.md instruction.
-4. **Live capture** (semi-automatic): Before shipping, agent captures non-obvious decisions. Controlled by CLAUDE.md instruction.
-5. **Pattern extraction** (manual): After ~10 sessions, invoke `meow:memory` pattern-extraction to review promotion candidates.
-6. **Archival** (manual): Run `meow:memory --prune` to archive old standard-severity entries to lessons-archive.md.
-7. **Consolidation** (manual): When memory grows large (20+ sessions, 50+ patterns, 500+ cost entries), invoke `meow:memory` consolidation.
+| Deleted | Replaced by |
+|---------|------------|
+| `handlers/memory-loader.cjs` | Claude Code auto-memory + per-skill topic file reads |
+| `handlers/memory-parser.cjs` | Direct Markdown reads; no parser needed |
+| `handlers/memory-filter.cjs` | Per-skill topic file reads (each skill reads only what it needs) |
+| `handlers/memory-injector.cjs` | `<memory-data>` wrapper removed; trust boundary is behavioral |
+| `NEEDS_CAPTURE` marker system | Eliminated; lessons.md archived; direct topic file writes |
+| `lessons.md` as active store | Archived stub; content migrated to topic files (migration script: `.claude/scripts/memory-topic-file-migrator.cjs`) |
+| `patterns.json` monolith | Deprecated stub; replaced by `fixes.json`, `review-patterns.json`, `architecture-decisions.json` |
 
-## Session Capture
-
-Learnings are captured in 3 categories:
-
-| Category | What to Extract | Example |
-|----------|----------------|---------|
-| **Patterns** | Reusable approaches that worked | "useAuthToken composable centralizes auth state" |
-| **Decisions** | Choices with rationale and outcome | "Chose Redis over in-memory cache — GOOD_CALL" |
-| **Failures** | Mistakes with root cause and prevention | "Token refresh race condition — use SELECT FOR UPDATE" |
-
-Each entry in `patterns.json` includes:
-- `category`: pattern / decision / failure
-- `severity`: critical (saves ≥30 min) / standard
-- `applicable_when`: one sentence — when should future agents use this?
-- `frequency`: how many sessions surfaced this pattern
-- `scope`: optional directory path where this applies
-- `expires_at`: optional expiration date (default: 12 months after lastSeen)
-
-## Conversation Summary
-
-The conversation summary cache uses **anchored iterative summarization**:
-
-- **First summary**: Full regeneration from last 300 lines of transcript via Haiku.
-- **Subsequent summaries**: Merges new turns into existing structured sections (Active Task, Key Decisions, File Modifications, Next Steps). Existing content is preserved unless contradicted.
-- **Default**: `MEOWKIT_SUMMARY_MODE=full-regen` — proven, safe baseline.
-- **Opt-in**: Set `MEOWKIT_SUMMARY_MODE=merge` to enable anchored iterative mode after validating merge quality on real sessions.
-- **Content validation**: All summaries pass through `validate-content.cjs` before writing. Summaries matching injection patterns are rejected.
-- **Secret scrubbing**: API keys, JWTs, private keys are removed before caching.
-
-## Pattern Promotion
-
-Patterns are promoted to CLAUDE.md rules when ALL criteria are met:
-1. `frequency >= 3` (appeared in multiple sessions)
-2. `severity == "critical"` OR `frequency >= 5`
-3. Generalizable (not feature-specific)
-4. Would save ≥30 min if known in advance
-5. **Human approval** — never auto-promoted
-
-Legacy entries without `severity` default to `"standard"` and can still be promoted at frequency ≥ 5.
-
-## Consolidation & Archival
-
-**Archival** (`meow:memory --prune`): Moves old standard-severity entries from lessons.md to lessons-archive.md. Critical/security entries are exempt. Default threshold: 90 days. Supports `--dry-run` mode.
-
-**Consolidation** (manual): Run when memory grows large. Uses a classification rubric:
-
-| Classification | Condition | Action |
-|---------------|-----------|--------|
-| **Clear match** | Exactly one existing entry owns the lesson | Merge into owner |
-| **Ambiguous** | Multiple plausible owners | Ask user to choose |
-| **No match** | No existing entry fits, but lesson is durable | Create new entry |
-| **No durable signal** | Transient, noisy, or not reusable | Skip |
-
-## Environment Variables
-
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `MEOWKIT_MEMORY_BUDGET` | 4000 | Total char budget for memory injection per turn |
-| `MEOWKIT_MEMORY_STALENESS_MONTHS` | 6 | Standard entries older than this are skipped |
-| `MEOWKIT_SUMMARY_MODE` | full-regen | `full-regen` (default, proven) or `merge` (anchored iterative, opt-in after validation) |
-| `MEOWKIT_SUMMARY_CACHE` | (on) | Set to `off` to disable conversation summary |
-
-## FAQ
-
-**Do I need to do anything?**
-No. Session markers are written automatically by the Stop hook. Retroactive capture processes them automatically. You only need to act when pattern-extraction proposes CLAUDE.md promotions (approve/reject).
-
-**How do I capture a decision immediately?**
-Type `##decision: chose X over Y because Z`. It's written to lessons.md instantly — survives crashes.
-
-**Where do memories live?**
-Four knowledge layers exist in MeowKit projects:
-1. `CLAUDE.md` + `.claude/rules/` — instructions and rules (you write these)
-2. `.claude/memory/` — team learnings (MeowKit writes, you review)
-3. `~/.claude/projects/*/memory/` — personal notes (Claude Code auto-memory)
-4. `docs/` — project documentation (maintained by docs-manager agent)
-
-**Can I edit memory files directly?**
-Yes. They are plain markdown and JSON. Edit freely. The system will respect your changes.
-
-**What if my memory seems wrong?**
-Check `[parse-errors:]` and `[memory: N entries filtered]` markers in agent output. Stale entries (>6mo) are auto-skipped.
-
-**How do I change the staleness threshold?**
-`export MEOWKIT_MEMORY_STALENESS_MONTHS=12`
-
-**How do I switch back to old summarization?**
-`export MEOWKIT_SUMMARY_MODE=full-regen`
-
-**What happens if I never run consolidation?**
-Memory files grow unbounded. lessons.md becomes hard to scan, patterns.json gets noisy, cost-log.json gets large. Use `meow:memory --prune` for quick cleanup or full consolidation for thorough maintenance.
-
-## Limitations
-
-- **Immediate capture requires user habit** — `##` prefix must be learned; no automatic capture of agent decisions (only user-initiated and live-capture before shipping)
-- **Anchored summarization is new** — merge quality vs full-regen has not been A/B tested at scale. Fallback: `export MEOWKIT_SUMMARY_MODE=full-regen`
-- **Consolidation thresholds are initial guesses** — 20/50/500 numbers will be revised after real usage
-- **No cross-machine sync** — MeowKit memory syncs via git; Claude Code auto-memory is machine-local only
-- **Stop hook cannot invoke skills** — shell script writes markers; actual extraction happens at next session's orient phase
+Reason: the auto-inject pipeline added latency on every prompt turn, consumed context budget, and introduced a trust-boundary concern (memory content rendered as instructions). The simpler on-demand model achieves the same learning persistence without these costs.
 
 ## Migration
 
-No migration needed. Existing empty memory files work with the new schema. New `patterns.json` fields (`category`, `severity`, `applicable_when`, `expires_at`) are optional — entries without them remain valid. The memory loader handles both structured (YAML frontmatter) and legacy (freeform) entry formats.
+If upgrading from a pre-simplification MeowKit version with an active `lessons.md`:
+
+```bash
+node .claude/scripts/memory-topic-file-migrator.cjs
+```
+
+The script is idempotent — safe to run multiple times. It reads `lessons.md`, categorizes entries into topic files, and archives `lessons.md` with a stub header.
+
+## Memory vs Cache
+
+**Memory** is team-shared learnings — version-controlled, human-curated, durable. Only canonical files above belong in `.claude/memory/`.
+
+**Cache** is skill-generated ephemeral output — lives at `.claude/cache/` (gitignored). Web-fetched content, per-call outputs: cache, not memory.
+
+**Rule:** if an agent writing the artifact would want to git-commit it → memory. If not → cache.

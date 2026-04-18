@@ -46,7 +46,16 @@ tasks/reviews/
 # MeowKit
 .env
 .env.local
-.claude/memory/
+# Memory dir: machine-local files are ignored; topic files (team learnings) are excepted.
+# NOTE: To un-ignore files inside an ignored directory, we must not ignore the directory itself.
+# Instead we ignore individual machine-local files and keep topic files trackable.
+.claude/memory/cost-log.json
+.claude/memory/conversation-summary.md
+.claude/memory/trace-log.jsonl
+.claude/memory/quick-notes.md
+.claude/memory/last-model-id.txt
+.claude/memory/.*.lock
+# Topic files below are intentionally NOT ignored — they are team learnings committed to repo.
 .claude/cache/
 .claude/logs/
 .claude/metadata.json

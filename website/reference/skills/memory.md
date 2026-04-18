@@ -1,11 +1,11 @@
 ---
 title: "meow:memory"
-description: "Memory system toolkit — session capture, pattern extraction, and cost tracking"
+description: "Memory system toolkit — session capture, pattern extraction, cost tracking, and topic file pruning"
 ---
 
 # meow:memory
 
-Memory system toolkit — session capture, pattern extraction, cost tracking, and consolidation.
+Memory system toolkit — session capture, pattern extraction, cost tracking, and topic file pruning.
 
 ## What This Skill Does
 
@@ -13,31 +13,61 @@ A **reference toolkit** — a collection of guides used by agents during specifi
 
 | Reference | When Loaded | Content |
 |-----------|-------------|---------|
-| `session-capture.md` | Phase 6 | 3-category learning extraction (patterns/decisions/failures) |
-| `pattern-extraction.md` | Phase 6 | Frequency-based promotion to CLAUDE.md |
-| `cost-tracking.md` | Phase 0, 6 | Token usage tracking and budget reports |
-| `consolidation.md` | Manual | Prune stale entries, merge duplicates, archive cost data |
+| `session-capture.md` | Phase 6 | 3-category learning extraction (patterns/decisions/failures) into topic files |
+| `pattern-extraction.md` | Phase 6 | Frequency-based promotion candidates from split JSON files to CLAUDE.md |
+| `cost-tracking.md` | Phase 0, 6 | Token usage tracking and budget reports from `cost-log.json` |
+| `consolidation.md` | Manual | Prune stale topic file entries; archive cost data |
 
-## When to Use This
+## When to Use
 
-Phase 0 (Orient) and Phase 6 (Reflect) persistence. At Phase 0, agents read memory automatically. At Phase 6, `meow:cook` spawns a dedicated subagent for session-capture (3-category extraction). Consolidation is manual: invoke when memory reaches scale (20+ sessions, 50+ patterns, 500+ cost entries).
+Phase 0 (Orient) and Phase 6 (Reflect) persistence. At Phase 0, consumer skills load relevant topic files. At Phase 6, `meow:cook` spawns a dedicated subagent for session-capture. Pruning is manual: invoke when a topic file exceeds 300 lines or a JSON file exceeds 50 entries.
 
 ::: info Skill Details
 **Phase:** 0, 6
 **Used by:** analyst agent, meow:cook Phase 6 (MUST-spawn subagent)
 :::
 
-## Schema (v1.2.0)
+## Topic file layout
 
-`patterns.json` entries now support optional fields: `category` (pattern/decision/failure), `severity` (critical/standard), `applicable_when` (condition sentence). Existing entries without these fields remain valid — `severity` defaults to `standard`.
+Memory is split into focused topic files. Each skill reads only the files it needs:
 
-See [Memory System guide](/guide/memory-system) for the full schema reference.
+| File | Scope | Consumer |
+|------|-------|---------|
+| `fixes.md` + `fixes.json` | Bug-class patterns | meow:fix |
+| `review-patterns.md` + `review-patterns.json` | Review patterns | meow:review, meow:plan-creator |
+| `architecture-decisions.md` + `architecture-decisions.json` | Architectural decisions | meow:plan-creator, meow:cook |
+| `security-notes.md` | Security findings | meow:cso, meow:review |
+
+Split JSON files use schema v2.0.0 with fields: `version`, `scope`, `consumer`, `patterns[]`, `metadata`.
+
+## Subcommands
+
+### `--prune`
+
+Archive old standard-severity entries from topic files to `lessons-archive.md`.
+
+**Mechanism (grep-based — no parser dependency):**
+1. For each topic file: grep for `## ` headings with date pattern `(YYYY-MM-DD, severity: standard)`
+2. Compute age from today's date; identify entries older than threshold (default: 90 days)
+3. Append stale entries to `.claude/memory/lessons-archive.md`
+4. Rewrite topic file without stale blocks
+5. Report: "Archived N entries across M files"
+
+```
+/meow:memory --prune              # default 90-day threshold
+/meow:memory --prune --days 180   # custom threshold
+/meow:memory --prune --dry-run    # show what would be archived without moving
+```
+
+**Exempt from pruning:** `severity: critical` or `severity: security` entries; entries without a parseable date.
+
+**Recovery:** Copy entries from `lessons-archive.md` back to the appropriate topic file.
 
 ## Gotchas
 
-- **Stale patterns applied to changed codebase**: Run consolidation when patterns exceed 50 entries; flag patterns with `lastSeen` > 6 months
+- **Stale patterns applied to changed codebase**: Run pruning when JSON files exceed 50 entries; flag patterns with `lastSeen` > 6 months
 - **cost-log.json growing unbounded**: Run consolidation to archive entries older than 90 days
-- **NEEDS_CAPTURE markers in lessons.md**: Stop hook writes markers at session end; Phase 0 processes them retroactively (max 3, 2-min budget)
+- **lessons.md is now an archived stub**: Do not write to `lessons.md`. Write to topic files (`fixes.md`, `architecture-decisions.md`, `review-patterns.md`) or use `##prefix:` immediate capture instead
 
 ## Related
 

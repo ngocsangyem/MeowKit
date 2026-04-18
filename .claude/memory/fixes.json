@@ -1,0 +1,74 @@
+{
+  "version": "2.0.0",
+  "scope": "fixes",
+  "consumer": "meow:fix",
+  "patterns": [
+    {
+      "id": "gnu-grep-bre-macos",
+      "type": "failure",
+      "category": "bug-class",
+      "severity": "critical",
+      "domain": [
+        "shell",
+        "macos",
+        "grep"
+      ],
+      "applicable_when": "writing or reviewing shell scripts that use grep with alternation (|) or quantifiers (+)",
+      "context": "macOS ships BSD grep which does not support GNU BRE extensions \\| and \\+. Scripts using these silently match nothing — gate validators appeared to work but were non-functional.",
+      "pattern": "Always use grep -E (ERE) for alternation and quantifiers. Never use BRE \\| or \\+ in portable shell scripts.",
+      "frequency": 4,
+      "lastSeen": "2026-04-12"
+    },
+    {
+      "id": "shell-to-python-injection",
+      "type": "failure",
+      "category": "bug-class",
+      "severity": "critical",
+      "domain": [
+        "shell",
+        "python",
+        "security"
+      ],
+      "applicable_when": "shell scripts pass variables to inline Python via heredoc or -c argument",
+      "context": "Shell variables interpolated into Python double-quoted heredocs allow code injection via quote boundaries. Found in 3 scripts (run-canary.sh, compare-runs.sh, and potentially hooks).",
+      "pattern": "Pass dynamic values via environment variables and use single-quoted heredocs. Or use python3 -c with os.environ reads. Never interpolate shell vars into Python strings.",
+      "frequency": 3,
+      "lastSeen": "2026-04-10"
+    },
+    {
+      "id": "execsync-shell-injection",
+      "type": "failure",
+      "category": "bug-class",
+      "severity": "critical",
+      "domain": [
+        "javascript",
+        "security",
+        "node"
+      ],
+      "applicable_when": "Node.js scripts use execSync with user-controlled input",
+      "context": "fetch-chub.js passed user queries directly into execSync double-quoted strings. Single-quote escaping (shellEscapeSingleQuote) or execFileSync with argv arrays prevents injection.",
+      "pattern": "Use shellEscapeSingleQuote for all user input in execSync, or prefer execFileSync with argv array to eliminate shell entirely.",
+      "frequency": 1,
+      "lastSeen": "2026-04-10"
+    },
+    {
+      "id": "project-root-skill-subdir",
+      "type": "failure",
+      "category": "bug-class",
+      "severity": "critical",
+      "domain": [
+        "skills",
+        "configuration"
+      ],
+      "applicable_when": "scripts in .claude/skills/ need to find the project root directory",
+      "context": "Skills have nested .claude/ dirs. Walking up and stopping at first .claude/ finds skill subdir, not project root. Layer 8 post-write audit was silently disabled.",
+      "pattern": "Use CLAUDE.md or .claude/settings.json as sentinel for project root detection. These exist only at project root, never in skill subdirs.",
+      "frequency": 1,
+      "lastSeen": "2026-04-10"
+    }
+  ],
+  "metadata": {
+    "created": "2026-04-18",
+    "last_updated": "2026-04-18"
+  }
+}

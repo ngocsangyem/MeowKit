@@ -23,13 +23,12 @@ MeowKit is a **prompt-engineering framework** — no executable runtime. It shap
 
 ```
 UserPromptSubmit event fires
-  ├─ memory-loader.cjs → inject filtered memories (≤4KB)
-  │   ├─ 60% budget: critical entries (always)
-  │   ├─ 40% budget: domain-keyword-matched entries
-  │   └─ skip: stale entries (>6mo standard), expired patterns (>12mo)
   ├─ conversation-summary-cache.sh → inject cached summary (≤4KB)
-  ├─ immediate-capture-handler.cjs → capture ##prefix messages
+  ├─ immediate-capture-handler.cjs → capture ##prefix messages to topic files
   └─ tdd-flag-detector.sh → check --tdd flag
+
+Note: memory-loader.cjs deleted in plan 260418. Memory is now read on-demand
+by consumer skills at task start, not injected every turn.
 ```
 
 ### Stage 2: Intent Classification & Routing
@@ -45,7 +44,7 @@ Claude Code skill matching
 
 | Phase | Agent(s) | Action | Gate |
 |-------|----------|--------|------|
-| 0 Orient | orchestrator | Load context, detect tier, process NEEDS_CAPTURE markers | — |
+| 0 Orient | orchestrator | Load context, detect tier, read relevant topic files | — |
 | 1 Plan | planner, architect, researcher | Scope-adaptive planning (--fast/--hard/--deep) | **GATE 1** (hook-enforced) |
 | 2 Test | tester | Write tests targeting acceptance criteria | Optional (unless --tdd) |
 | 3 Build | developer | Implement per approved plan + sprint contract (harness) | — |
@@ -65,34 +64,39 @@ Claude Code skill matching
 
 ## 3. Memory & Context Flow
 
-### Per-Turn Injection (~8KB budget)
+### Per-Turn Injection (~4KB budget)
 
-- **Memory** (≤4KB): 60% critical entries + 40% domain-matched. Filtered by staleness (6mo), keyword match, per-entry cap (3000 critical / 800 standard).
 - **Summary** (≤4KB): Haiku-summarized conversation cache from previous Stop event.
 - **SessionStart** (once): project-context.md, directory tree, readiness score.
+- Memory is NOT injected per turn — consumer skills read topic files on-demand at task start.
 
 ### Memory Write Points
 
 | Trigger | What's Written | Target |
 |---------|---------------|--------|
-| `##decision:` / `##pattern:` / `##note:` | Immediate capture (crash-resilient) | lessons.md / patterns.json / quick-notes.md |
-| Stop hook | NEEDS_CAPTURE marker + cost entry | lessons.md + cost-log.json |
-| Stop hook | Conversation summary (Haiku) | conversation-summary.md |
-| Phase 6 Reflect | Categorized learnings | patterns.json + lessons.md |
-| Pre-Ship (live) | Non-obvious decisions | lessons.md |
+| `##pattern: bug-class …` | Immediate capture (crash-resilient) | `fixes.json` |
+| `##pattern: …` | Immediate capture | `review-patterns.json` |
+| `##decision: …` | Immediate capture | `architecture-decisions.json` |
+| `##note: …` | Immediate capture | `quick-notes.md` |
+| Stop hook | Cost entry (atomic temp-rename) | `cost-log.json` |
+| Stop hook | Conversation summary (Haiku) | `conversation-summary.md` |
+| Phase 6 Reflect | Categorized learnings | topic files (fixes.md, review-patterns.md, etc.) |
+| Pre-Ship (live) | Non-obvious decisions | appropriate topic file |
 
-### Memory Files (8 active)
+### Memory Files
 
-| File | Auto-loaded? | Purpose |
-|------|-------------|---------|
-| lessons.md | Yes (every turn) | Session learnings, YAML frontmatter |
-| patterns.json | Yes (every turn) | Recurring patterns, frequency-tracked |
-| conversation-summary.md | Yes (every turn) | Haiku-summarized conversation cache |
-| cost-log.json | No | Token usage per task |
-| decisions.md | No | Architecture decisions |
-| security-log.md | No | Security audit findings |
-| quick-notes.md | No | Staging for ##note: captures |
-| trace-log.jsonl | No | Trace events for harness analysis |
+| File | When read | Purpose |
+|------|----------|---------|
+| fixes.md + fixes.json | On-demand (meow:fix) | Bug-class patterns |
+| review-patterns.md + review-patterns.json | On-demand (meow:review) | Review patterns |
+| architecture-decisions.md + architecture-decisions.json | On-demand (meow:plan-creator) | Architectural decisions |
+| security-notes.md | On-demand (meow:cso) | Security findings |
+| conversation-summary.md | Every turn | Haiku-summarized session cache |
+| cost-log.json | Phase 0/6 | Token usage per task |
+| decisions.md | On-demand (architect) | Long-form ADRs |
+| security-log.md | On-demand (security agent) | Raw security audit log |
+| quick-notes.md | Phase 6 Reflect | Staging for ##note: captures |
+| trace-log.jsonl | On-demand | Trace events for harness analysis |
 
 ---
 
@@ -102,7 +106,7 @@ Claude Code skill matching
 Phase 3 Build → Phase 4 Review → PASS? → Ship. FAIL? → Back to Build (max 3 rounds → human escalation). Hard separation: generator ≠ evaluator, no self-evaluation.
 
 ### Loop B — Session Memory (cross-session)
-Session learnings → lessons.md / patterns.json → memory-loader injects next session → agents use context → produce new learnings.
+Session learnings → topic files (fixes.md, review-patterns.md, architecture-decisions.md) → consumer skills read on-demand at next session's task start → agents use context → produce new learnings.
 
 ### Loop C — Pattern Promotion (long-term evolution)
 After ~10 sessions: patterns with frequency ≥3 + severity=critical (or frequency ≥5) → proposed for CLAUDE.md → human approval → permanent behavioral rules.

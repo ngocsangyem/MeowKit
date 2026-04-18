@@ -43,7 +43,7 @@ Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 | AGENTS_INDEX rows | 16 | `AGENTS_INDEX.md` active table | Footer "13 agents" phrasing is stale (CF-M34) |
 | Hook events (settings.json) | 7 | `settings.json` hooks keys | SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit, SubagentStart, SubagentStop |
 | Node handlers on disk | 12 | `ls .claude/hooks/handlers/*.cjs` | **DRIFT**: HOOKS_INDEX footer says 8; disk has 12 (CF-M2) |
-| Node handlers documented (HOOKS_INDEX) | 8 | `HOOKS_INDEX.md:39` footer | 4 undocumented: immediate-capture-handler, memory-filter, memory-parser, memory-injector (CF-M1) |
+| Node handlers documented (HOOKS_INDEX) | 5 active | `HOOKS_INDEX.md:39` footer | memory-filter, memory-parser, memory-injector, memory-loader deleted (plan 260418); immediate-capture-handler retained (CF-M1 closed) |
 | Slash commands | 20 | `ls .claude/commands/meow/*.md` | `inventory-summary.md:24` |
 | Rules files | 17 | `ls .claude/rules/*.md` excl. RULES_INDEX | RULES_INDEX table lists 17 rows — matches disk |
 | Memory files | 8 | `CLAUDE.md` Memory section | 6 named + conversation-summary.md + quick-notes.md |
@@ -240,7 +240,7 @@ Hook chain verified against `settings.json` (2026-04-18). All 7 events listed.
 | `PreToolUse Bash` | pre-task-check.sh → pre-ship.sh → privacy-block.sh | `settings.json:64-85` |
 | `PostToolUse Edit\|Write` | post-write.sh → learning-observer.sh → dispatch.cjs (build-verify, loop-detection, budget-tracker, auto-checkpoint) | `settings.json:87-108` |
 | `PostToolUse Bash` | cost-meter.sh → dispatch.cjs (budget-tracker) | `settings.json:109-123` |
-| `UserPromptSubmit` | tdd-flag-detector.sh → conversation-summary-cache.sh → dispatch.cjs (memory-loader, orientation-ritual) | `settings.json:152-173` |
+| `UserPromptSubmit` | tdd-flag-detector.sh → conversation-summary-cache.sh → dispatch.cjs (immediate-capture-handler, orientation-ritual) | `settings.json:152-173` |
 | `Stop` | pre-completion-check.sh → post-session.sh → conversation-summary-cache.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer) | `settings.json:125-151` |
 
 **Phase routing** (source: `CLAUDE.md` Phase Composition Contracts table):
@@ -318,19 +318,21 @@ Source: `CLAUDE.md` Memory section; `HOOKS_INDEX.md` State Files table.
 Memory path: `.claude/memory/` (NOT bare `memory/` — see CF-C6).
 Source: `CLAUDE.md` Memory section; `HOOKS_INDEX.md` State Files table.
 
-| File | Auto-loaded? | Writer |
+| File | When read | Writer |
 |---|---|---|
-| `lessons.md` | Yes — every UserPromptSubmit (memory-loader.cjs) | post-session.sh, immediate-capture-handler.cjs |
-| `patterns.json` | Yes — every UserPromptSubmit | immediate-capture-handler.cjs |
+| `fixes.md` + `fixes.json` | On-demand (meow:fix) | immediate-capture-handler.cjs, session-capture |
+| `review-patterns.md` + `review-patterns.json` | On-demand (meow:review, meow:plan-creator) | immediate-capture-handler.cjs, session-capture |
+| `architecture-decisions.md` + `architecture-decisions.json` | On-demand (meow:plan-creator, meow:cook) | immediate-capture-handler.cjs, session-capture |
+| `security-notes.md` | On-demand (meow:cso) | Manual / session-capture |
 | `conversation-summary.md` | Yes — every UserPromptSubmit (conversation-summary-cache.sh) | conversation-summary-cache.sh Stop bg worker |
-| `cost-log.json` | No | post-session.sh |
-| `decisions.md` | No | Manual |
-| `security-log.md` | No | Manual / injection-audit.py |
-| `quick-notes.md` | No | immediate-capture-handler.cjs |
-| `trace-log.jsonl` | No | append-trace.sh |
+| `cost-log.json` | Phase 0/6 | post-session.sh (atomic temp-rename) |
+| `decisions.md` | On-demand (architect) | Manual |
+| `security-log.md` | On-demand (security agent) | Manual / injection-audit.py |
+| `quick-notes.md` | Phase 6 Reflect | immediate-capture-handler.cjs |
+| `trace-log.jsonl` | On-demand | append-trace.sh |
 
-**Per-turn context budget** (~8KB total, source: `HOOKS_INDEX.md` handler rows):
-memory-loader ≤4KB + conversation-summary-cache ≤4KB. SessionStart also loads
+**Per-turn context budget** (~4KB, source: `HOOKS_INDEX.md` handler rows):
+conversation-summary-cache ≤4KB only. memory-loader.cjs deleted in plan 260418 — no per-turn memory injection. SessionStart also loads
 `docs/project-context.md` via project-context-loader.sh — **CF-C5 OPEN**: file
 does not exist; loads nothing.
 

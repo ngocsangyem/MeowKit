@@ -1,3 +1,7 @@
+> **ARCHIVED (260418):** This document describes "Auto Dream", a feature that deep-research
+> (plans/reports/deep-research-260418-1509-claude-code-memory-system.md) confirmed does not exist
+> in any Anthropic release. Kept for historical reference. Do not cite.
+
 <!--
 name: 'Agent Prompt: Dream memory consolidation'
 description: Instructs an agent to perform a multi-phase memory consolidation pass — orienting on existing memories, gathering recent signal from logs and transcripts, merging updates into topic files, and pruning the index

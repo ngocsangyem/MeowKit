@@ -173,18 +173,21 @@ All counts from `meowkit-architecture.md` §2 Component Inventory (verified 2026
 8 files in `.claude/memory/`
 (source: `meowkit-architecture.md` §7; `CLAUDE.md` Memory section):
 
-| File | Purpose | Auto-loaded |
-|------|---------|-------------|
-| `lessons.md` | Session learnings — patterns, decisions, failures | Yes (every UserPromptSubmit via memory-loader.cjs) |
-| `patterns.json` | Recurring patterns with category + severity | Yes (every UserPromptSubmit) |
-| `conversation-summary.md` | Conversation cache (hook-generated on Stop) | Yes (every UserPromptSubmit) |
-| `cost-log.json` | Token usage per task | No |
-| `decisions.md` | Architecture decisions | No |
-| `security-log.md` | Security audit findings | No |
-| `quick-notes.md` | Ad-hoc notes | No |
-| `trace-log.jsonl` | Trace analysis log | No |
+| File | Purpose | When read |
+|------|---------|-----------|
+| `fixes.md` + `fixes.json` | Bug-class patterns | On-demand by meow:fix at task start |
+| `review-patterns.md` + `review-patterns.json` | Review/architecture patterns | On-demand by meow:review, meow:plan-creator |
+| `architecture-decisions.md` + `architecture-decisions.json` | Architectural decisions | On-demand by meow:plan-creator, meow:cook |
+| `security-notes.md` | Curated security findings | On-demand by meow:cso, meow:review |
+| `conversation-summary.md` | Conversation cache (hook-generated on Stop) | Yes (every UserPromptSubmit via summary-cache) |
+| `cost-log.json` | Token usage per task | Phase 0 / 6 cost reporting |
+| `decisions.md` | Long-form ADRs | On-demand by architect agent |
+| `security-log.md` | Raw security audit log | On-demand by security agent |
+| `quick-notes.md` | Staging for ##note: captures | Processed at Phase 6 Reflect |
+| `trace-log.jsonl` | Trace events for harness analysis | On-demand |
 
-Auto-load budget: memory-loader ≤4KB + conversation-summary-cache ≤4KB ≈ **8KB total**.
+No auto-inject pipeline (deleted in plan 260418). Memory is read on-demand by consumer skills.
+conversation-summary-cache ≤4KB is the only per-turn auto-inject.
 Memory files are DATA (`injection-rules.md` Rule 3) — they inform but do not instruct.
 Memory path is `.claude/memory/` — NOT bare `memory/` (CF-C6 bare-path bug in `meow:cook`).
 
@@ -203,8 +206,8 @@ Memory path is `.claude/memory/` — NOT bare `memory/` (CF-C6 bare-path bug in 
 | `PreToolUse Bash` | pre-task-check.sh → pre-ship.sh → privacy-block.sh | Pre-ship validation; privacy guard |
 | `PostToolUse Edit\|Write` | post-write.sh → learning-observer.sh → dispatch.cjs (build-verify, loop-detection, budget-tracker, auto-checkpoint) | Security scan + build verification after writes |
 | `PostToolUse Bash` | cost-meter.sh → dispatch.cjs (budget-tracker) | Cost tracking per Bash call |
-| `UserPromptSubmit` | tdd-flag-detector.sh → conversation-summary-cache.sh → dispatch.cjs (memory-loader, orientation-ritual) | TDD flag detection; memory injection per turn |
-| `Stop` | pre-completion-check.sh → post-session.sh → conversation-summary-cache.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer) | Cost tracking + NEEDS_CAPTURE markers; summary cache |
+| `UserPromptSubmit` | tdd-flag-detector.sh → conversation-summary-cache.sh → dispatch.cjs (immediate-capture-handler, orientation-ritual) | TDD flag detection; ##prefix capture; summary inject per turn |
+| `Stop` | pre-completion-check.sh → post-session.sh → conversation-summary-cache.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer) | Cost tracking (atomic); summary cache. NEEDS_CAPTURE pipeline deleted. |
 | `SubagentStart` | (empty by design) | Infinite-loop prevention — hooks would re-fire inside subagents |
 | `SubagentStop` | (empty by design) | No post-subagent action needed |
 

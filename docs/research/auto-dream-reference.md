@@ -1,3 +1,7 @@
+> **ARCHIVED (260418):** This document describes "Auto Dream", a feature that deep-research
+> (plans/reports/deep-research-260418-1509-claude-code-memory-system.md) confirmed does not exist
+> in any Anthropic release. Kept for historical reference. Do not cite.
+
 # Auto Dream — Claude Code Memory Consolidation Reference
 
 **Source:** Claude Code v2.1.83
