@@ -1,4 +1,0 @@
-{
-  "deprecated": true,
-  "message": "Split into fixes.json, review-patterns.json, architecture-decisions.json in v2"
-}
