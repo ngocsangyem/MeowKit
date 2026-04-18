@@ -29,7 +29,10 @@ export function findMemoryDir(startDir?: string): string | null {
 		const atRoot = PROJECT_ROOT_SENTINELS.some((s) =>
 			fs.existsSync(path.join(current, s)),
 		);
-		if (atRoot && depth > 0) return null; // found root but no memory dir
+		// RT-C H2 fix: sentinel must fire at depth 0 too. Previously `depth > 0`
+		// caused the walk to continue into the parent when CWD had CLAUDE.md but
+		// no memory dir — `mewkit memory --clear` could reach a parent project.
+		if (atRoot) return null; // found root but no memory dir
 		const parent = path.dirname(current);
 		if (parent === current) return null; // filesystem root
 		current = parent;

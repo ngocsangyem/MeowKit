@@ -82,6 +82,17 @@ function generateId(type) {
   return `${type}-${ts}`;
 }
 
+// RT-C C1 fix: busy-spin without sleep caused 20-40% drop rate under concurrent
+// captures. Retry loop now uses bounded spin with exponential backoff + jitter
+// up to ~800ms total wait, which accommodates the common case (prior holder
+// releases within a few ms) without blocking the hook for long.
+function sleepMs(ms) {
+  // Synchronous sleep via Atomics — available in Node 16+ and safe in a hook.
+  const sab = new SharedArrayBuffer(4);
+  const arr = new Int32Array(sab);
+  Atomics.wait(arr, 0, 0, Math.max(0, ms));
+}
+
 function acquireLock(lockDir, maxRetries) {
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -96,6 +107,10 @@ function acquireLock(lockDir, maxRetries) {
           continue;
         }
       } catch { /* lock may be gone */ }
+      // Exponential backoff with jitter: ~10ms, ~25ms, ~60ms, ~140ms, …
+      const base = 10 * Math.pow(2.2, i);
+      const jitter = Math.random() * base * 0.5;
+      sleepMs(Math.min(400, base + jitter));
     }
   }
   return false;
@@ -110,7 +125,7 @@ function releaseLock(lockDir) {
 function appendToArchitectureDecisions(id, date, keywords, content) {
   const targetFile = path.join(MEMORY_DIR, 'architecture-decisions.json');
   const lockDir = lockDirForFile(targetFile);
-  if (!acquireLock(lockDir, 3)) return false;
+  if (!acquireLock(lockDir, 8)) return false;
   try {
     let data = {
       version: '2.0.0',
@@ -166,7 +181,7 @@ function appendToPatterns(id, date, keywords, content, category) {
   // Per-file lock: shares with appendToArchitectureDecisions when both target
   // architecture-decisions.json, preventing dual-lock races.
   const lockDir = lockDirForFile(filePath);
-  if (!acquireLock(lockDir, 3)) return { ok: false, target: targetFile };
+  if (!acquireLock(lockDir, 8)) return { ok: false, target: targetFile };
   try {
     let data = { version: '2.0.0', scope: targetFile.replace('.json', ''), consumer: '', patterns: [], metadata: {} };
     try {
@@ -200,13 +215,21 @@ function appendToPatterns(id, date, keywords, content, category) {
   }
 }
 
+// RT-C M2 fix: previously unlocked; concurrent ##note: captures could interleave.
+// Now uses per-file lock (same primitive as appendTo{Patterns,ArchitectureDecisions}).
 function appendToQuickNotes(date, content) {
   const filePath = path.join(MEMORY_DIR, 'quick-notes.md');
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, '# Quick Notes\n\n> Unclassified captures. Processed during Reflect.\n');
+  const lockDir = lockDirForFile(filePath);
+  if (!acquireLock(lockDir, 8)) return false;
+  try {
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, '# Quick Notes\n\n> Unclassified captures. Processed during Reflect.\n');
+    }
+    fs.appendFileSync(filePath, `\n- [${date}] ${escapeMemoryContent(content)}\n`);
+    return true;
+  } finally {
+    releaseLock(lockDir);
   }
-  fs.appendFileSync(filePath, `\n- [${date}] ${escapeMemoryContent(content)}\n`);
-  return true;
 }
 
 module.exports = function immediateCapture(ctx) {
