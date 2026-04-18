@@ -6,6 +6,25 @@ const fs = require('fs');
 const path = require('path');
 
 const { validateContent } = require('../lib/validate-content.cjs');
+const { scrubSecrets } = require('../lib/secret-scrub.cjs');
+
+// Per-file lock: all writers targeting the same topic file acquire the same lock,
+// regardless of which ##prefix triggered the write. Prevents cross-prefix races.
+function lockDirForFile(targetFile) {
+  return path.join(MEMORY_DIR, '.' + path.basename(targetFile) + '.lock');
+}
+
+// Atomic JSON write via temp-rename. Crash during write leaves the original intact.
+function writeJsonAtomic(filePath, data) {
+  const tmp = filePath + '.tmp.' + process.pid;
+  try {
+    fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+    fs.renameSync(tmp, filePath);
+  } catch (e) {
+    try { fs.unlinkSync(tmp); } catch { /* best-effort */ }
+    throw e;
+  }
+}
 
 // Inlined from memory-parser.cjs (deleted in phase-03) — extracts domain keywords from prompt text.
 function extractKeywords(prompt) {
@@ -90,7 +109,7 @@ function releaseLock(lockDir) {
 // with atomic temp-rename (M7 fix pattern).
 function appendToArchitectureDecisions(id, date, keywords, content) {
   const targetFile = path.join(MEMORY_DIR, 'architecture-decisions.json');
-  const lockDir = path.join(MEMORY_DIR, '.decisions.lock');
+  const lockDir = lockDirForFile(targetFile);
   if (!acquireLock(lockDir, 3)) return false;
   try {
     let data = {
@@ -125,15 +144,7 @@ function appendToArchitectureDecisions(id, date, keywords, content) {
     if (!data.metadata) data.metadata = {};
     data.metadata.last_updated = date;
 
-    // Atomic write via temp-rename (M7 fix)
-    const tmpPath = targetFile + '.tmp.' + process.pid;
-    try {
-      fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2));
-      fs.renameSync(tmpPath, targetFile);
-    } catch (e) {
-      try { fs.unlinkSync(tmpPath); } catch { /* best-effort */ }
-      throw e;
-    }
+    writeJsonAtomic(targetFile, data);
     return true;
   } finally {
     releaseLock(lockDir);
@@ -151,14 +162,15 @@ function resolvePatternFile(category) {
 
 function appendToPatterns(id, date, keywords, content, category) {
   const targetFile = resolvePatternFile(category || 'pattern');
-  const lockDir = path.join(MEMORY_DIR, '.patterns.lock');
+  const filePath = path.join(MEMORY_DIR, targetFile);
+  // Per-file lock: shares with appendToArchitectureDecisions when both target
+  // architecture-decisions.json, preventing dual-lock races.
+  const lockDir = lockDirForFile(filePath);
   if (!acquireLock(lockDir, 3)) return { ok: false, target: targetFile };
   try {
-    const filePath = path.join(MEMORY_DIR, targetFile);
     let data = { version: '2.0.0', scope: targetFile.replace('.json', ''), consumer: '', patterns: [], metadata: {} };
     try {
       const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-      // Validate scope field to prevent cross-file writes
       if (parsed.scope && parsed.scope !== data.scope) {
         process.stderr.write(`appendToPatterns: scope mismatch — expected ${data.scope}, got ${parsed.scope}\n`);
         return { ok: false, target: targetFile };
@@ -181,7 +193,7 @@ function appendToPatterns(id, date, keywords, content, category) {
 
     if (!data.metadata) data.metadata = {};
     data.metadata.last_updated = date;
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    writeJsonAtomic(filePath, data);
     return { ok: true, target: targetFile };
   } finally {
     releaseLock(lockDir);
@@ -204,14 +216,26 @@ module.exports = function immediateCapture(ctx) {
   for (const [prefix, config] of Object.entries(PREFIXES)) {
     if (!prompt.toLowerCase().startsWith(prefix)) continue;
 
-    const content = prompt.substring(prefix.length).trim();
-    if (!content) return '';
+    const rawContent = prompt.substring(prefix.length).trim();
+    if (!rawContent) return '';
 
-    const validation = validateContent(content);
+    const validation = validateContent(rawContent);
     if (!validation.valid) {
       return `⚠ Capture blocked: content matched injection pattern (${validation.pattern})`;
     }
 
+    // Ensure memory dir exists. Fresh installs (no prior session) may have no
+    // .claude/memory/ yet; acquireLock() below would fail ENOENT otherwise.
+    try {
+      fs.mkdirSync(MEMORY_DIR, { recursive: true });
+    } catch (e) {
+      process.stderr.write(`immediate-capture: cannot create MEMORY_DIR (${e.message})\n`);
+      return '';
+    }
+
+    // Scrub known secret patterns before persisting. Captured content becomes
+    // re-injected into future sessions — leaked secrets would re-enter context.
+    const content = scrubSecrets(rawContent);
     const keywords = extractKeywords(content).slice(0, 10);
     const id = generateId(config.type);
     const date = new Date().toISOString().split('T')[0];
