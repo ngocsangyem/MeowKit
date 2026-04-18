@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 22px 24px; font-family: var(--mk-font-sans); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .tile { background: var(--mk-neutral-0); border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 22px 18px 14px; position: relative; min-height: 110px; display: grid; place-items: center; }
+  .tile.dark { background: var(--mk-neutral-950); border-color: rgba(255,255,255,.08); }
+  .tile .tag { position: absolute; top: 10px; left: 14px; font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-neutral-500); }
+  .tile.dark .tag { color: var(--mk-neutral-300); }
+
+  .sm { display: inline-flex; align-items: baseline; font-family: var(--mk-font-mono); font-weight: 500; line-height: 1; letter-spacing: -.01em; }
+  .sm .slash { color: var(--mk-blue-600); font-weight: 600; margin-right: 2px; }
+  .sm .meow {
+    background: linear-gradient(135deg, var(--mk-blue-700) 0%, var(--mk-blue-500) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .sm .caret { display: inline-block; width: .1em; height: 1em; background: var(--mk-blue-600); margin-left: .12em; transform: translateY(.08em); }
+  .tile.dark .sm .slash { color: var(--mk-accent-glow); }
+  .tile.dark .sm .meow { background: linear-gradient(135deg, var(--mk-accent-soft) 0%, var(--mk-accent-glow) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .tile.dark .sm .caret { background: var(--mk-accent-glow); }
+
+  .word { font-family: var(--mk-font-sans); font-weight: 500; letter-spacing: -.005em; color: var(--mk-neutral-900); }
+  .tile.dark .word { color: var(--mk-neutral-0); }
+  .tagline { font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-neutral-500); letter-spacing: .06em; margin-top: 8px; }
+  .tile.dark .tagline { color: var(--mk-neutral-300); }
+
+  .horiz { display: flex; align-items: baseline; gap: 14px; }
+  .stack { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+</style>
+</head>
+<body>
+  <!-- A horizontal -->
+  <div class="tile">
+    <span class="tag">A · HORIZONTAL</span>
+    <div class="horiz">
+      <span class="sm" style="font-size: 34px;"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
+      <span class="word" style="font-size: 28px;">MeowKit</span>
+    </div>
+  </div>
+
+  <!-- B stacked -->
+  <div class="tile">
+    <span class="tag">B · STACKED</span>
+    <div class="stack">
+      <span class="sm" style="font-size: 32px;"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
+      <span class="word" style="font-size: 22px;">MeowKit</span>
+      <span class="tagline">AI AGENT TOOLKIT</span>
+    </div>
+  </div>
+
+  <!-- C /meow:kit -->
+  <div class="tile">
+    <span class="tag">C · /MEOW:KIT</span>
+    <span class="sm" style="font-size: 38px;"><span class="slash">/</span><span class="meow">meow:kit</span><span class="caret"></span></span>
+  </div>
+
+  <!-- D dark horizontal -->
+  <div class="tile dark">
+    <span class="tag">D · DARK · HORIZONTAL</span>
+    <div class="horiz">
+      <span class="sm" style="font-size: 34px;"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
+      <span class="word" style="font-size: 28px;">MeowKit</span>
+    </div>
+  </div>
+
+  <!-- E dark primary -->
+  <div class="tile dark">
+    <span class="tag">E · DARK · PRIMARY</span>
+    <span class="sm" style="font-size: 42px;"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
+  </div>
+
+  <!-- F mono -->
+  <div class="tile">
+    <span class="tag">F · MONO INK</span>
+    <span class="sm" style="font-size: 42px; color: var(--mk-neutral-900);">
+      <span style="color: var(--mk-neutral-900); font-weight: 600;">/</span><span style="color: var(--mk-neutral-900); -webkit-text-fill-color: var(--mk-neutral-900); background: none;">meow</span><span class="caret" style="background: var(--mk-neutral-900);"></span>
+    </span>
+  </div>
+</body>
+</html>

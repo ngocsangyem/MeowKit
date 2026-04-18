@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Components — Tables</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 16px 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; padding: 8px 12px; font-weight: 500; color: var(--mk-accent-glow); background: var(--mk-bg-base); border-bottom: 2px solid var(--mk-border-subtle); font-size: 12.5px; letter-spacing: .02em; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--mk-border-subtle); color: var(--mk-fg-1); }
+  tr:nth-child(even) td { background: rgba(30,41,59,.6); }
+  code { font-family: var(--mk-font-mono); font-size: .92em; padding: 1px 5px; border-radius: 3px; background: rgba(37,99,235,.14); color: var(--mk-accent-glow); }
+  .gate { color: #F79009; }
+</style>
+</head>
+<body>
+  <table>
+    <thead><tr><th>Phase</th><th>Name</th><th>Gate?</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Orient</td><td>—</td><td>Read memory, load skills, route model tier</td></tr>
+      <tr><td>1</td><td>Plan</td><td class="gate">✋ Gate 1</td><td>Challenge premises, create plan, human approval</td></tr>
+      <tr><td>2</td><td>Test</td><td>—</td><td>Failing tests first (TDD via <code>--tdd</code>)</td></tr>
+      <tr><td>3</td><td>Build</td><td>—</td><td>Implement per plan; until tests pass in TDD mode</td></tr>
+      <tr><td>4</td><td>Review</td><td class="gate">✋ Gate 2</td><td>5-dimension audit, human approval</td></tr>
+    </tbody>
+  </table>
+</body>
+</html>

@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MeowKit — Hi-Fi Logo Set</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--mk-font-sans);
+    color: var(--mk-fg-1);
+    background: var(--mk-bg-base);
+  }
+
+  .page { max-width: 1240px; margin: 0 auto; padding: 48px 32px 96px; }
+  .page > header { margin-bottom: 40px; }
+  .eyebrow { font-family: var(--mk-font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mk-blue-600); margin: 0 0 8px; }
+  h1.title { font-family: var(--mk-font-sans); font-weight: 500; font-size: 36px; letter-spacing: -.01em; margin: 0 0 6px; color: var(--mk-neutral-900); }
+  .sub { color: var(--mk-neutral-500); font-size: 14px; max-width: 720px; line-height: 1.55; margin: 0; }
+
+  /* concept sections */
+  section.concept { margin: 56px 0; }
+  .concept-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--mk-border-subtle);
+    margin-bottom: 24px;
+  }
+  .concept-head .num {
+    font-family: var(--mk-font-mono);
+    font-size: 13px;
+    color: var(--mk-blue-600);
+    letter-spacing: .12em;
+  }
+  .concept-head h2 { font-size: 22px; font-weight: 500; margin: 0; letter-spacing: -.005em; }
+  .concept-head .tag {
+    font-family: var(--mk-font-mono);
+    font-size: 11px;
+    color: var(--mk-neutral-500);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+  .concept-desc { color: var(--mk-neutral-500); font-size: 13px; line-height: 1.6; max-width: 640px; margin: -8px 0 20px; }
+
+  /* lockup grid */
+  .lockups {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 16px;
+  }
+  .tile {
+    background: var(--mk-neutral-0);
+    border: 1px solid var(--mk-border-subtle);
+    border-radius: var(--mk-radius-md);
+    padding: 28px 24px 16px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 180px;
+  }
+  .tile.dark {
+    background: var(--mk-neutral-950);
+    border-color: rgba(255,255,255,.08);
+    color: #F8FAFC;
+  }
+  .tile .label {
+    position: absolute;
+    top: 10px; left: 14px;
+    font-family: var(--mk-font-mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--mk-neutral-500);
+  }
+  .tile.dark .label { color: var(--mk-neutral-300); }
+  .tile .stage {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 18px 0 8px;
+  }
+
+  .span-3 { grid-column: span 3; }
+  .span-4 { grid-column: span 4; }
+  .span-5 { grid-column: span 5; }
+  .span-6 { grid-column: span 6; }
+  .span-7 { grid-column: span 7; }
+  .span-8 { grid-column: span 8; }
+  .span-12 { grid-column: span 12; }
+
+  /* ═════════════════════════════════════════════════════════ */
+  /* 01 · BRACE CAT                                             */
+  /* ═════════════════════════════════════════════════════════ */
+
+  .brace-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-family: var(--mk-font-mono);
+    color: var(--mk-neutral-900);
+    line-height: 1;
+    font-weight: 400;
+  }
+  .brace-mark .brace {
+    font-size: 1.4em;
+    font-weight: 300;
+    color: var(--mk-blue-600);
+  }
+  .brace-mark .face {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.14em;
+    padding: 0 0.08em;
+  }
+  .brace-mark .eyes {
+    display: inline-flex;
+    gap: 0.25em;
+  }
+  .brace-mark .eye {
+    width: 0.16em; height: 0.16em;
+    border-radius: 50%;
+    background: var(--mk-neutral-900);
+  }
+  .brace-mark .mouth {
+    font-size: 0.36em;
+    color: var(--mk-blue-600);
+    line-height: 1;
+    margin-top: -0.1em;
+  }
+  .tile.dark .brace-mark { color: var(--mk-neutral-0); }
+  .tile.dark .brace-mark .brace { color: var(--mk-accent-glow); }
+  .tile.dark .brace-mark .eye { background: var(--mk-neutral-0); }
+  .tile.dark .brace-mark .mouth { color: var(--mk-accent-glow); }
+
+  /* lockup: brace + wordmark */
+  .bc-horizontal { display: flex; align-items: center; gap: 18px; }
+  .bc-horizontal .brace-mark { font-size: 56px; }
+  .bc-horizontal .wordmark { font-family: var(--mk-font-sans); font-weight: 500; font-size: 36px; letter-spacing: -.01em; color: var(--mk-neutral-900); }
+  .tile.dark .bc-horizontal .wordmark { color: var(--mk-neutral-0); }
+
+  .bc-stacked { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+  .bc-stacked .brace-mark { font-size: 64px; }
+  .bc-stacked .wordmark { font-family: var(--mk-font-sans); font-weight: 500; font-size: 28px; letter-spacing: -.005em; color: var(--mk-neutral-900); }
+  .bc-stacked .tagline { font-family: var(--mk-font-mono); font-size: 12px; letter-spacing: .08em; color: var(--mk-neutral-500); }
+  .tile.dark .bc-stacked .wordmark { color: var(--mk-neutral-0); }
+  .tile.dark .bc-stacked .tagline { color: var(--mk-neutral-300); }
+
+  /* favicon sizes */
+  .favrow { display: flex; align-items: flex-end; gap: 28px; }
+  .favrow .fav {
+    background: var(--mk-blue-600);
+    border-radius: 22%;
+    display: grid; place-items: center;
+    color: #fff;
+    font-family: var(--mk-font-mono);
+    font-weight: 500;
+  }
+  .favrow .fav.sz16 { width: 16px; height: 16px; border-radius: 3px; font-size: 8px; }
+  .favrow .fav.sz32 { width: 32px; height: 32px; border-radius: 6px; font-size: 14px; }
+  .favrow .fav.sz64 { width: 64px; height: 64px; border-radius: 12px; font-size: 28px; }
+  .favrow .fav.sz128 { width: 128px; height: 128px; border-radius: 24px; font-size: 54px; }
+  .favrow .fav .brace-mark { color: #fff; }
+  .favrow .fav .brace-mark .brace { color: #fff; }
+  .favrow .fav .brace-mark .eye { background: #fff; }
+  .favrow .fav .brace-mark .mouth { color: #fff; }
+  .favrow .lbl { font-family: var(--mk-font-mono); font-size: 10px; color: var(--mk-neutral-500); letter-spacing: .08em; margin-top: 6px; text-align: center; }
+  .favrow .col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+  /* scale row */
+  .scale-row { display: flex; align-items: baseline; gap: 32px; flex-wrap: wrap; }
+  .scale-row .brace-mark { color: var(--mk-neutral-900); }
+
+  /* color chips */
+  .colorwall { display: flex; align-items: stretch; gap: 0; border-radius: var(--mk-radius-md); overflow: hidden; width: 100%; height: 90px; }
+  .colorwall .cw { flex: 1; display: grid; place-items: center; font-family: var(--mk-font-mono); font-size: 36px; color: #fff; font-weight: 400; }
+
+  /* ═════════════════════════════════════════════════════════ */
+  /* 02 · WHISKER TERMINAL                                      */
+  /* ═════════════════════════════════════════════════════════ */
+
+  .wt-mark {
+    display: block;
+    position: relative;
+  }
+  .wt-mark svg { display: block; }
+
+  .wt-horizontal { display: flex; align-items: center; gap: 20px; }
+  .wt-horizontal .wt-mark { width: 84px; }
+  .wt-horizontal .wordmark { font-family: var(--mk-font-sans); font-weight: 500; font-size: 36px; letter-spacing: -.01em; color: var(--mk-neutral-900); }
+  .tile.dark .wt-horizontal .wordmark { color: var(--mk-neutral-0); }
+
+  .wt-stacked { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .wt-stacked .wt-mark { width: 110px; }
+  .wt-stacked .wordmark { font-family: var(--mk-font-sans); font-weight: 500; font-size: 26px; letter-spacing: -.005em; color: var(--mk-neutral-900); }
+  .wt-stacked .tagline { font-family: var(--mk-font-mono); font-size: 12px; color: var(--mk-neutral-500); letter-spacing: .06em; }
+  .tile.dark .wt-stacked .wordmark { color: var(--mk-neutral-0); }
+  .tile.dark .wt-stacked .tagline { color: var(--mk-neutral-300); }
+
+  /* ═════════════════════════════════════════════════════════ */
+  /* 03 · SLASH-MEOW PROMPT                                     */
+  /* ═════════════════════════════════════════════════════════ */
+
+  .sm-mark {
+    display: inline-flex;
+    align-items: baseline;
+    font-family: var(--mk-font-mono);
+    font-weight: 500;
+    letter-spacing: -.01em;
+    line-height: 1;
+  }
+  .sm-mark .slash {
+    color: var(--mk-blue-600);
+    font-weight: 600;
+    margin-right: 0.02em;
+  }
+  .sm-mark .meow {
+    color: var(--mk-neutral-900);
+    background: linear-gradient(135deg, var(--mk-blue-700) 0%, var(--mk-blue-500) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .sm-mark .caret {
+    display: inline-block;
+    width: 0.08em;
+    height: 1em;
+    background: var(--mk-blue-600);
+    margin-left: 0.15em;
+    transform: translateY(0.05em);
+    animation: smblink 1.2s steps(2) infinite;
+  }
+  @keyframes smblink { 50% { opacity: 0; } }
+
+  .tile.dark .sm-mark .slash { color: var(--mk-accent-glow); }
+  .tile.dark .sm-mark .meow {
+    background: linear-gradient(135deg, var(--mk-accent-soft) 0%, var(--mk-accent-glow) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .tile.dark .sm-mark .caret { background: var(--mk-accent-glow); }
+
+  .sm-horizontal { display: flex; align-items: baseline; gap: 2px; }
+  .sm-horizontal .sm-mark { font-size: 44px; }
+
+  .sm-stacked { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .sm-stacked .sm-mark { font-size: 38px; }
+  .sm-stacked .tagline { font-family: var(--mk-font-mono); font-size: 12px; color: var(--mk-neutral-500); letter-spacing: .06em; }
+  .tile.dark .sm-stacked .tagline { color: var(--mk-neutral-300); }
+
+  /* og card */
+  .og {
+    aspect-ratio: 1200 / 628;
+    width: 100%;
+    background: var(--mk-gradient-space);
+    border-radius: var(--mk-radius-md);
+    padding: 36px 44px;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .og::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.4), transparent 100%),
+      radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,.3), transparent 100%),
+      radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,.35), transparent 100%),
+      radial-gradient(1px 1px at 85% 65%, rgba(255,255,255,.25), transparent 100%),
+      radial-gradient(1px 1px at 15% 70%, rgba(255,255,255,.3), transparent 100%),
+      radial-gradient(2px 2px at 60% 40%, rgba(96,165,250,.6), transparent 100%);
+    pointer-events: none;
+  }
+  .og > * { position: relative; z-index: 1; }
+  .og .eyebrow-og { font-family: var(--mk-font-mono); font-size: 13px; letter-spacing: .18em; color: var(--mk-accent-glow); text-transform: uppercase; }
+  .og .title-og {
+    font-family: var(--mk-font-sans);
+    font-weight: 400;
+    font-size: 56px;
+    line-height: 1.1;
+    letter-spacing: .01em;
+    max-width: 78%;
+    margin: 10px 0 0;
+    background: linear-gradient(135deg, #fff 0%, #93C5FD 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .og .meta-og {
+    display: flex; align-items: center; gap: 18px;
+    font-family: var(--mk-font-mono); font-size: 14px;
+    color: rgba(255,255,255,.7);
+  }
+  .og .meta-og .dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,.4); }
+  .og .chip-og {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(37, 99, 235, .22);
+    border: 1px solid rgba(96,165,250,.35);
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-family: var(--mk-font-mono); font-size: 13px;
+    color: var(--mk-accent-soft);
+  }
+  .og .logo-og {
+    position: absolute; top: 36px; right: 44px;
+    display: flex; align-items: baseline; gap: 10px;
+    font-family: var(--mk-font-mono); font-size: 20px; color: rgba(255,255,255,.85);
+  }
+  .og .logo-og .slash { color: var(--mk-accent-glow); font-weight: 600; }
+
+  /* terminal screenshot for slash-meow */
+  .term-ss {
+    background: #0F172A;
+    border-radius: var(--mk-radius-md);
+    padding: 14px 16px 18px;
+    font-family: var(--mk-font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: #CBD5E1;
+    box-shadow: var(--mk-shadow-card);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .term-ss .bar { display: flex; gap: 6px; margin-bottom: 10px; }
+  .term-ss .bar i { width: 10px; height: 10px; border-radius: 50%; background: #334155; display: inline-block; }
+  .term-ss .bar i:nth-child(1) { background: #F04438; }
+  .term-ss .bar i:nth-child(2) { background: #F79009; }
+  .term-ss .bar i:nth-child(3) { background: #12B76A; }
+  .term-ss .ln { display: block; }
+  .term-ss .mute { color: #64748B; }
+  .term-ss .blu { color: #60A5FA; }
+  .term-ss .grn { color: #12B76A; }
+
+  /* wordmark specimens */
+  .specimens { display: flex; flex-direction: column; gap: 28px; }
+  .sp-row { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; }
+  .sp-row .label-sm { font-family: var(--mk-font-mono); font-size: 10px; color: var(--mk-neutral-500); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
+
+  /* footer notes */
+  .foot { margin-top: 60px; color: var(--mk-neutral-500); font-size: 12px; line-height: 1.6; border-top: 1px solid var(--mk-border-subtle); padding-top: 18px; }
+  .foot code { font-family: var(--mk-font-mono); background: var(--mk-bg-soft); padding: 2px 6px; border-radius: 4px; color: var(--mk-blue-700); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <p class="eyebrow">Hi-Fi · 3 directions · full lockups</p>
+    <h1 class="title">MeowKit logo system</h1>
+    <p class="sub">Three directions taken to hi-fi with the real brand palette (Royal Blue <code>#2563EB</code>, deep-space dark, Inter + Fira Code), full lockup set per direction: horizontal, stacked, favicons, in-context, and wordmarks.</p>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- 01 BRACE CAT                                                -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+
+  <section class="concept">
+    <div class="concept-head">
+      <span class="num">01</span>
+      <h2>Brace Cat</h2>
+      <span class="tag">code-native · <code style="font-family: var(--mk-font-mono);">{ :3 }</code></span>
+    </div>
+    <p class="concept-desc">Code braces wrapping a micro cat face. Type-native; reads at any size from favicon to banner. The braces pick up the brand blue; the face stays neutral ink so it anchors in both light and dark themes.</p>
+
+    <div class="lockups">
+      <!-- horizontal -->
+      <div class="tile span-7">
+        <span class="label">Horizontal</span>
+        <div class="stage">
+          <div class="bc-horizontal">
+            <span class="brace-mark">
+              <span class="brace">{</span>
+              <span class="face">
+                <span class="eyes"><span class="eye"></span><span class="eye"></span></span>
+                <span class="mouth">⌃</span>
+              </span>
+              <span class="brace">}</span>
+            </span>
+            <span class="wordmark">MeowKit</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- stacked -->
+      <div class="tile span-5">
+        <span class="label">Stacked + tagline</span>
+        <div class="stage">
+          <div class="bc-stacked">
+            <span class="brace-mark">
+              <span class="brace">{</span>
+              <span class="face">
+                <span class="eyes"><span class="eye"></span><span class="eye"></span></span>
+                <span class="mouth">⌃</span>
+              </span>
+              <span class="brace">}</span>
+            </span>
+            <span class="wordmark">MeowKit</span>
+            <span class="tagline">AI AGENT TOOLKIT FOR CLAUDE CODE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- dark horizontal -->
+      <div class="tile dark span-7">
+        <span class="label">Dark · horizontal</span>
+        <div class="stage">
+          <div class="bc-horizontal">
+            <span class="brace-mark">
+              <span class="brace">{</span>
+              <span class="face">
+                <span class="eyes"><span class="eye"></span><span class="eye"></span></span>
+                <span class="mouth">⌃</span>
+              </span>
+              <span class="brace">}</span>
+            </span>
+            <span class="wordmark">MeowKit</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- favicon -->
+      <div class="tile span-5">
+        <span class="label">Favicon scaling</span>
+        <div class="stage">
+          <div class="favrow">
+            <div class="col">
+              <div class="fav sz16"></div>
+              <span class="lbl">16</span>
+            </div>
+            <div class="col">
+              <div class="fav sz32">
+                <span class="brace-mark" style="font-size: 13px;">
+                  <span class="brace">{</span>
+                  <span class="face">
+                    <span class="eyes"><span class="eye"></span><span class="eye"></span></span>
+                  </span>
+                  <span class="brace">}</span>
+                </span>
+              </div>
+              <span class="lbl">32</span>
+            </div>
+            <div class="col">
+              <div class="fav sz64">
+                <span class="brace-mark" style="font-size: 26px;">
+                  <span class="brace">{</span>
+                  <span class="face">
+                    <span class="eyes"><span class="eye"></span><span class="eye"></span></span>
+                    <span class="mouth" style="font-size: .32em;">⌃</span>
+                  </span>
+                  <span class="brace">}</span>
+                </span>
+              </div>
+              <span class="lbl">64</span>
+            </div>
+            <div class="col">
+              <div class="fav sz128">
+                <span class="brace-mark" style="font-size: 54px;">
+                  <span class="brace">{</span>
+                  <span class="face">
+                    <span class="eyes"><span class="eye"></span><span class="eye"></span></span>
+                    <span class="mouth" style="font-size: .34em;">⌃</span>
+                  </span>
+                  <span class="brace">}</span>
+                </span>
+              </div>
+              <span class="lbl">128</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- scale test -->
+      <div class="tile span-12">
+        <span class="label">Size scale · 16 → 96</span>
+        <div class="stage">
+          <div class="scale-row">
+            <span class="brace-mark" style="font-size: 16px;">
+              <span class="brace">{</span><span class="face"><span class="eyes"><span class="eye"></span><span class="eye"></span></span></span><span class="brace">}</span>
+            </span>
+            <span class="brace-mark" style="font-size: 24px;">
+              <span class="brace">{</span><span class="face"><span class="eyes"><span class="eye"></span><span class="eye"></span></span></span><span class="brace">}</span>
+            </span>
+            <span class="brace-mark" style="font-size: 36px;">
+              <span class="brace">{</span><span class="face"><span class="eyes"><span class="eye"></span><span class="eye"></span></span><span class="mouth">⌃</span></span><span class="brace">}</span>
+            </span>
+            <span class="brace-mark" style="font-size: 56px;">
+              <span class="brace">{</span><span class="face"><span class="eyes"><span class="eye"></span><span class="eye"></span></span><span class="mouth">⌃</span></span><span class="brace">}</span>
+            </span>
+            <span class="brace-mark" style="font-size: 96px;">
+              <span class="brace">{</span><span class="face"><span class="eyes"><span class="eye"></span><span class="eye"></span></span><span class="mouth">⌃</span></span><span class="brace">}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- 02 WHISKER TERMINAL                                         -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+
+  <section class="concept">
+    <div class="concept-head">
+      <span class="num">02</span>
+      <h2>Whisker Terminal</h2>
+      <span class="tag">CLI-native · terminal as cat face</span>
+    </div>
+    <p class="concept-desc">A terminal window that <em>is</em> a cat face — titlebar as brow, <code>&gt;</code> prompt as nose, whiskers radiating outward, ears perched on the window chrome. Blue brand glow lives in the prompt caret and whiskers.</p>
+
+    <div class="lockups">
+      <!-- hero mark -->
+      <div class="tile span-5">
+        <span class="label">Mark · light</span>
+        <div class="stage">
+          <div class="wt-mark" style="width: 160px;">
+            <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <!-- ears -->
+              <path d="M64 34 L72 12 L82 34 Z" fill="#0F172A"/>
+              <path d="M118 34 L128 12 L136 34 Z" fill="#0F172A"/>
+              <!-- window -->
+              <rect x="48" y="34" width="104" height="78" rx="10" fill="#fff" stroke="#0F172A" stroke-width="3"/>
+              <!-- titlebar -->
+              <line x1="48" y1="50" x2="152" y2="50" stroke="#0F172A" stroke-width="2.5"/>
+              <circle cx="56" cy="42" r="1.8" fill="#F04438"/>
+              <circle cx="64" cy="42" r="1.8" fill="#F79009"/>
+              <circle cx="72" cy="42" r="1.8" fill="#12B76A"/>
+              <!-- prompt > as nose -->
+              <path d="M94 78 L102 84 L94 90" fill="none" stroke="#2563EB" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- eyes -->
+              <circle cx="78" cy="72" r="2.4" fill="#0F172A"/>
+              <circle cx="120" cy="72" r="2.4" fill="#0F172A"/>
+              <!-- whiskers L -->
+              <line x1="12" y1="66"  x2="46" y2="72" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+              <line x1="12" y1="82"  x2="46" y2="82" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+              <line x1="12" y1="98"  x2="46" y2="92" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+              <!-- whiskers R -->
+              <line x1="154" y1="72" x2="188" y2="66" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+              <line x1="154" y1="82" x2="188" y2="82" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+              <line x1="154" y1="92" x2="188" y2="98" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- horizontal lockup -->
+      <div class="tile span-7">
+        <span class="label">Horizontal lockup</span>
+        <div class="stage">
+          <div class="wt-horizontal">
+            <div class="wt-mark">
+              <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M64 34 L72 12 L82 34 Z" fill="#0F172A"/>
+                <path d="M118 34 L128 12 L136 34 Z" fill="#0F172A"/>
+                <rect x="48" y="34" width="104" height="78" rx="10" fill="#fff" stroke="#0F172A" stroke-width="3"/>
+                <line x1="48" y1="50" x2="152" y2="50" stroke="#0F172A" stroke-width="2.5"/>
+                <circle cx="56" cy="42" r="1.8" fill="#F04438"/>
+                <circle cx="64" cy="42" r="1.8" fill="#F79009"/>
+                <circle cx="72" cy="42" r="1.8" fill="#12B76A"/>
+                <path d="M94 78 L102 84 L94 90" fill="none" stroke="#2563EB" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="78" cy="72" r="2.4" fill="#0F172A"/>
+                <circle cx="120" cy="72" r="2.4" fill="#0F172A"/>
+                <line x1="12" y1="66"  x2="46" y2="72" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+                <line x1="12" y1="82"  x2="46" y2="82" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+                <line x1="12" y1="98"  x2="46" y2="92" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="72" x2="188" y2="66" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="82" x2="188" y2="82" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="92" x2="188" y2="98" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="wordmark">MeowKit</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- dark stacked -->
+      <div class="tile dark span-6">
+        <span class="label">Dark · stacked</span>
+        <div class="stage">
+          <div class="wt-stacked">
+            <div class="wt-mark" style="width: 120px;">
+              <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M64 34 L72 12 L82 34 Z" fill="#F8FAFC"/>
+                <path d="M118 34 L128 12 L136 34 Z" fill="#F8FAFC"/>
+                <rect x="48" y="34" width="104" height="78" rx="10" fill="#1E293B" stroke="#F8FAFC" stroke-width="3"/>
+                <line x1="48" y1="50" x2="152" y2="50" stroke="#F8FAFC" stroke-width="2.5"/>
+                <circle cx="56" cy="42" r="1.8" fill="#F04438"/>
+                <circle cx="64" cy="42" r="1.8" fill="#F79009"/>
+                <circle cx="72" cy="42" r="1.8" fill="#12B76A"/>
+                <path d="M94 78 L102 84 L94 90" fill="none" stroke="#60A5FA" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="78" cy="72" r="2.4" fill="#F8FAFC"/>
+                <circle cx="120" cy="72" r="2.4" fill="#F8FAFC"/>
+                <line x1="12" y1="66"  x2="46" y2="72" stroke="#60A5FA" stroke-width="2" stroke-linecap="round"/>
+                <line x1="12" y1="82"  x2="46" y2="82" stroke="#60A5FA" stroke-width="2" stroke-linecap="round"/>
+                <line x1="12" y1="98"  x2="46" y2="92" stroke="#60A5FA" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="72" x2="188" y2="66" stroke="#60A5FA" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="82" x2="188" y2="82" stroke="#60A5FA" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="92" x2="188" y2="98" stroke="#60A5FA" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="wordmark">MeowKit</span>
+            <span class="tagline">npx mewkit init</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- monochrome -->
+      <div class="tile span-6">
+        <span class="label">Monochrome variants</span>
+        <div class="stage">
+          <div style="display: flex; gap: 40px; align-items: center;">
+            <!-- all ink -->
+            <div class="wt-mark" style="width: 100px;">
+              <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M64 34 L72 12 L82 34 Z" fill="#0F172A"/>
+                <path d="M118 34 L128 12 L136 34 Z" fill="#0F172A"/>
+                <rect x="48" y="34" width="104" height="78" rx="10" fill="none" stroke="#0F172A" stroke-width="3"/>
+                <line x1="48" y1="50" x2="152" y2="50" stroke="#0F172A" stroke-width="2.5"/>
+                <path d="M94 78 L102 84 L94 90" fill="none" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="78" cy="72" r="2.4" fill="#0F172A"/>
+                <circle cx="120" cy="72" r="2.4" fill="#0F172A"/>
+                <line x1="12" y1="66"  x2="46" y2="72" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+                <line x1="12" y1="82"  x2="46" y2="82" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+                <line x1="12" y1="98"  x2="46" y2="92" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="72" x2="188" y2="66" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="82" x2="188" y2="82" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="92" x2="188" y2="98" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <!-- all blue -->
+            <div class="wt-mark" style="width: 100px;">
+              <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M64 34 L72 12 L82 34 Z" fill="#2563EB"/>
+                <path d="M118 34 L128 12 L136 34 Z" fill="#2563EB"/>
+                <rect x="48" y="34" width="104" height="78" rx="10" fill="none" stroke="#2563EB" stroke-width="3"/>
+                <line x1="48" y1="50" x2="152" y2="50" stroke="#2563EB" stroke-width="2.5"/>
+                <path d="M94 78 L102 84 L94 90" fill="none" stroke="#2563EB" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="78" cy="72" r="2.4" fill="#2563EB"/>
+                <circle cx="120" cy="72" r="2.4" fill="#2563EB"/>
+                <line x1="12" y1="66"  x2="46" y2="72" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+                <line x1="12" y1="82"  x2="46" y2="82" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+                <line x1="12" y1="98"  x2="46" y2="92" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="72" x2="188" y2="66" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="82" x2="188" y2="82" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+                <line x1="154" y1="92" x2="188" y2="98" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- 03 SLASH-MEOW PROMPT                                        -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+
+  <section class="concept">
+    <div class="concept-head">
+      <span class="num">03</span>
+      <h2>Slash-Meow Prompt</h2>
+      <span class="tag">command-native · <code style="font-family: var(--mk-font-mono);">/meow</code></span>
+    </div>
+    <p class="concept-desc">The literal invocation as the logo. Every skill starts with <code>/meow:</code> — so the mark is <code>/meow</code> with a blinking caret. Gradient-blue wordmark, slash is the accent hit.</p>
+
+    <div class="lockups">
+      <!-- hero -->
+      <div class="tile span-6">
+        <span class="label">Primary mark · light</span>
+        <div class="stage">
+          <div class="sm-horizontal">
+            <span class="sm-mark">
+              <span class="slash">/</span><span class="meow">meow</span><span class="caret"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="tile dark span-6">
+        <span class="label">Primary mark · dark</span>
+        <div class="stage">
+          <div class="sm-horizontal">
+            <span class="sm-mark">
+              <span class="slash">/</span><span class="meow">meow</span><span class="caret"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- full command lockups -->
+      <div class="tile span-6">
+        <span class="label">Full invocation · <code>/meow:kit</code></span>
+        <div class="stage">
+          <div class="sm-stacked">
+            <span class="sm-mark" style="font-size: 40px;">
+              <span class="slash">/</span><span class="meow">meow:kit</span><span class="caret"></span>
+            </span>
+            <span class="tagline">THE AI AGENT TOOLKIT FOR CLAUDE CODE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- in a real terminal -->
+      <div class="tile span-6" style="padding: 12px;">
+        <span class="label" style="color: var(--mk-neutral-500);">In context · a real session</span>
+        <div class="stage" style="padding: 8px 0 0;">
+          <div class="term-ss" style="width: 100%;">
+            <div class="bar"><i></i><i></i><i></i></div>
+            <span class="ln"><span class="mute">~/apps/api</span> <span class="blu">$</span> <span style="color:#F8FAFC;">npx mewkit init</span></span>
+            <span class="ln mute">✓ scaffolded .claude/ (58 skills, 15 agents)</span>
+            <span class="ln"><span class="mute">~/apps/api</span> <span class="blu">$</span> <span style="color:#F8FAFC;">claude</span></span>
+            <span class="ln mute">• CLAUDE.md loaded · memory/lessons.md read</span>
+            <span class="ln"><span class="blu">&gt;</span> <span style="color:#60A5FA; font-weight: 500;">/meow</span><span style="color:#F8FAFC;">:plan add JWT auth</span></span>
+            <span class="ln grn">→ routing to planner · tier: COMPLEX</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- OG social card -->
+      <div class="tile span-12" style="padding: 12px;">
+        <span class="label" style="color: var(--mk-neutral-500);">Social / OG card · 1200×628</span>
+        <div class="stage" style="padding: 8px 0 0;">
+          <div class="og">
+            <div class="logo-og">
+              <span class="slash">/</span><span>meow</span>
+            </div>
+            <div>
+              <span class="eyebrow-og">AI agent toolkit · Claude Code</span>
+              <h2 class="title-og">Ship production code<br>without breaking gates.</h2>
+            </div>
+            <div class="meta-og">
+              <span class="chip-og"><span style="color: var(--mk-accent-glow);">/</span>meow:cook</span>
+              <span>skills</span>
+              <span class="dot"></span>
+              <span>agents</span>
+              <span class="dot"></span>
+              <span>hard gates</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">
+    Every mark uses only tokens from <code>colors_and_type.css</code>: Royal Blue primary <code>#2563EB</code>, accent glow <code>#60A5FA</code>, deep-space <code>#05070A → #1E3A5F</code>, Inter 400/500 for wordmarks, Fira Code 500 for prompts/taglines. No new colors introduced.
+  </p>
+</div>
+</body>
+</html>

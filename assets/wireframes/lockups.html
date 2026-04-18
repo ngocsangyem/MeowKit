@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Lockup Wireframes</title>
+<style>
+  html, body { margin: 0; font-family: ui-monospace, 'Fira Code', monospace; background: #fafafa; color: #111; }
+  body { padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 1100px; margin: 0 auto; }
+  h1 { grid-column: 1 / -1; font-family: system-ui, sans-serif; font-size: 18px; font-weight: 500; margin: 0 0 8px; }
+  h1 small { color: #666; font-weight: 400; font-size: 12px; margin-left: 10px; }
+  .frame { border: 1px dashed #999; border-radius: 8px; padding: 16px; background: #fff; position: relative; min-height: 140px; }
+  .tag { position: absolute; top: -9px; left: 12px; background: #fafafa; padding: 0 6px; font-size: 11px; color: #666; letter-spacing: .08em; text-transform: uppercase; }
+
+  /* primitives */
+  .box { border: 1px dashed #bbb; display: grid; place-items: center; font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: .08em; background: repeating-linear-gradient(45deg, #f5f5f5 0 6px, #fff 6px 12px); }
+  .mask { border: 1px dashed #bbb; display: grid; place-items: center; font-size: 10px; color: #888; border-radius: 999px; background: repeating-linear-gradient(45deg, #eef 0 6px, #fff 6px 12px); }
+  .txt { border-bottom: 1px solid #333; height: 14px; }
+  .txt.sm { height: 8px; border-bottom-color: #999; }
+  .txt.xs { height: 6px; border-bottom-color: #bbb; }
+
+  /* A horizontal */
+  .a { display: flex; align-items: center; gap: 14px; }
+  .a .mark { width: 56px; height: 56px; flex: 0 0 56px; border-radius: 50%; }
+  .a .stack { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .a .w { width: 60%; height: 22px; border-bottom: 2px solid #111; }
+  .a .sub { width: 45%; }
+
+  /* B stacked */
+  .b { display: flex; flex-direction: column; gap: 10px; }
+  .b .top { display: flex; align-items: center; gap: 10px; }
+  .b .mark { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; }
+  .b .w { width: 130px; height: 18px; border-bottom: 2px solid #111; }
+  .b .tagline { width: 80%; height: 10px; border-bottom: 1px solid #666; }
+  .b .tagline2 { width: 65%; height: 10px; border-bottom: 1px solid #666; }
+
+  /* C monogram */
+  .c { display: flex; align-items: center; gap: 14px; }
+  .c .mono { width: 64px; height: 64px; flex: 0 0 64px; border-radius: 14px; border: 1px dashed #555; display: grid; place-items: center; background: repeating-linear-gradient(45deg, #eef 0 6px, #fff 6px 12px); position: relative; }
+  .c .mono::before, .c .mono::after { content: ''; position: absolute; top: -6px; width: 14px; height: 14px; border: 1px dashed #555; background: #eef; clip-path: polygon(0 100%, 50% 0, 100% 100%); }
+  .c .mono::before { left: 8px; }
+  .c .mono::after  { right: 8px; }
+  .c .letter { font-family: system-ui, sans-serif; font-size: 28px; color: #333; }
+  .c .stack { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .c .w { width: 55%; height: 20px; border-bottom: 2px solid #111; }
+  .c .sub { width: 70%; }
+
+  /* D favicon crops */
+  .d { display: flex; align-items: center; gap: 18px; justify-content: space-between; }
+  .d .row { display: flex; align-items: center; gap: 12px; }
+  .d .s16 { width: 16px; height: 16px; border-radius: 3px; }
+  .d .s32 { width: 32px; height: 32px; border-radius: 6px; }
+  .d .s64 { width: 64px; height: 64px; border-radius: 14px; }
+  .d .lbl { font-size: 11px; color: #666; letter-spacing: .08em; text-transform: uppercase; }
+
+  /* E social card - spans both columns */
+  .e-wrap { grid-column: 1 / -1; }
+  .e { aspect-ratio: 1200 / 628; padding: 28px 32px; display: grid; grid-template-columns: 1fr 180px; gap: 20px; align-items: center; }
+  .e .left { display: flex; flex-direction: column; gap: 10px; }
+  .e .eyebrow { width: 180px; height: 8px; border-bottom: 1px solid #888; }
+  .e .title1 { width: 70%; height: 24px; border-bottom: 2px solid #111; }
+  .e .title2 { width: 60%; height: 24px; border-bottom: 2px solid #111; }
+  .e .tag1 { width: 75%; height: 10px; border-bottom: 1px solid #999; margin-top: 8px; }
+  .e .tag2 { width: 55%; height: 10px; border-bottom: 1px solid #999; }
+  .e .cta { display: flex; gap: 10px; margin-top: 12px; }
+  .e .chip { width: 120px; height: 24px; border: 1px dashed #555; border-radius: 4px; }
+  .e .chip.mono { width: 160px; background: repeating-linear-gradient(45deg, #f5f5f5 0 6px, #fff 6px 12px); }
+  .e .mark { width: 160px; height: 160px; border-radius: 50%; justify-self: end; }
+
+  /* F/G/H wordmarks */
+  .wm-wrap { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .wm { border: 1px dashed #999; border-radius: 8px; padding: 22px; background: #fff; display: grid; place-items: center; min-height: 90px; position: relative; }
+  .wm .tag { top: -9px; }
+  .wm .type { width: 70%; height: 24px; border-bottom: 2px solid #111; }
+
+  .note { grid-column: 1 / -1; font-size: 11px; color: #666; line-height: 1.5; font-family: system-ui, sans-serif; }
+</style>
+</head>
+<body>
+  <h1>Logo lockup wireframes <small>low-fi structural sketches · no real mascot or typography</small></h1>
+
+  <div class="frame a">
+    <span class="tag">A · horizontal lockup</span>
+    <div class="box mark">mark<br>56</div>
+    <div class="stack">
+      <div class="w"></div>
+      <div class="txt sm sub"></div>
+    </div>
+  </div>
+
+  <div class="frame b">
+    <span class="tag">B · stacked + tagline</span>
+    <div class="top">
+      <div class="box mark">mark<br>40</div>
+      <div class="w"></div>
+    </div>
+    <div class="tagline"></div>
+    <div class="tagline2"></div>
+  </div>
+
+  <div class="frame c">
+    <span class="tag">C · monogram tile</span>
+    <div class="mono"><span class="letter">M</span></div>
+    <div class="stack">
+      <div class="w"></div>
+      <div class="txt sm sub"></div>
+    </div>
+  </div>
+
+  <div class="frame d">
+    <span class="tag">D · favicon crops</span>
+    <div class="row">
+      <div class="mask s16"></div>
+      <div class="mask s32"></div>
+      <div class="mask s64"></div>
+    </div>
+    <span class="lbl">16 · 32 · 64</span>
+  </div>
+
+  <div class="e-wrap">
+    <div class="frame e">
+      <span class="tag">E · social / OG card (1200×628)</span>
+      <div class="left">
+        <div class="eyebrow"></div>
+        <div class="title1"></div>
+        <div class="title2"></div>
+        <div class="tag1"></div>
+        <div class="tag2"></div>
+        <div class="cta">
+          <div class="chip mono"></div>
+          <div class="chip"></div>
+        </div>
+      </div>
+      <div class="mask mark">mark</div>
+    </div>
+  </div>
+
+  <div class="wm-wrap">
+    <div class="wm">
+      <span class="tag">F · gradient wordmark</span>
+      <div class="type"></div>
+    </div>
+    <div class="wm">
+      <span class="tag">G · dual-tone wordmark</span>
+      <div class="type"></div>
+    </div>
+    <div class="wm">
+      <span class="tag">H · /meow:kit prompt</span>
+      <div class="type"></div>
+    </div>
+  </div>
+
+  <div class="note">
+    Dashed boxes = mascot / mark placeholder. Solid underlines = real type slot (weight heavier = larger type). Circular dashed = round-crop mask. Repeating stripes = gradient/filled area. Wireframes are structural only — no color, no real type.
+  </div>
+</body>
+</html>

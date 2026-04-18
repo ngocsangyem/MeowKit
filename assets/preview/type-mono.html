@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Type — Mono / Code</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px 24px; }
+  .eyebrow { font-family: var(--mk-font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mk-accent-glow); margin-bottom: 10px; }
+  pre { font-family: var(--mk-font-mono); font-size: 13.5px; line-height: 1.65; margin: 0; padding: 14px 16px; background: var(--mk-bg-surface); border: 1px solid var(--mk-border-subtle); border-radius: 10px; color: var(--mk-fg-1); overflow:auto; }
+  .c-k { color: #93C5FD; } /* keyword */
+  .c-s { color: #12B76A; } /* string-ish success */
+  .c-c { color: var(--mk-fg-2); } /* comment */
+  .c-v { color: #F79009; } /* value */
+</style>
+</head>
+<body>
+  <div class="eyebrow">Mono · Fira Code 400 · 13.5 / 1.65</div>
+<pre><span class="c-c"># Phase 3 — Build</span>
+<span class="c-k">$</span> npx mewkit <span class="c-v">doctor</span>
+<span class="c-s">✓</span> Node <span class="c-v">20.11.1</span>
+<span class="c-s">✓</span> Python <span class="c-v">3.11.6</span>  <span class="c-c"># stdlib only</span>
+<span class="c-s">✓</span> .claude/ present
+<span class="c-k">$</span> /meow:cook <span class="c-v">"add JWT auth"</span>  <span class="c-c">→ [GATE 1]</span></pre>
+</body>
+</html>

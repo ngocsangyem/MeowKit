@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Colors — Semantic</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px; display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .card { border: 1px solid var(--mk-border-subtle); border-radius: 10px; padding: 14px; background: var(--mk-bg-surface); }
+  .dot { width: 40px; height: 40px; border-radius: 999px; margin-bottom: 10px; }
+  .name { font-size: 14px; font-weight: 500; }
+  .hex { font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); margin-top: 2px; }
+  .use { font-size: 11px; color: var(--mk-fg-2); margin-top: 8px; line-height: 1.4; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="dot" style="background:#12B76A; box-shadow: 0 0 24px rgba(18,183,106,.4);"></div>
+    <div class="name">Success</div>
+    <div class="hex">#12B76A</div>
+    <div class="use">✓ PASS verdicts, test green, Gate approvals</div>
+  </div>
+  <div class="card">
+    <div class="dot" style="background:#F79009; box-shadow: 0 0 24px rgba(247,144,9,.4);"></div>
+    <div class="name">Warning</div>
+    <div class="hex">#F79009</div>
+    <div class="use">⚠ WARN verdicts, TDD skipped, soft blocks</div>
+  </div>
+  <div class="card">
+    <div class="dot" style="background:#F04438; box-shadow: 0 0 24px rgba(240,68,56,.4);"></div>
+    <div class="name">Danger</div>
+    <div class="hex">#F04438</div>
+    <div class="use">✗ FAIL, Gate blocked, security BLOCK</div>
+  </div>
+  <div class="card">
+    <div class="dot" style="background:#2563EB; box-shadow: 0 0 24px rgba(37,99,235,.5);"></div>
+    <div class="name">Info · Brand</div>
+    <div class="hex">#2563EB</div>
+    <div class="use">Default info, brand accents, links</div>
+  </div>
+</body>
+</html>

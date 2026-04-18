@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Type — Body &amp; Inline</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px 24px; max-width: 720px; }
+  .eyebrow { font-family: var(--mk-font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mk-accent-glow); }
+  p { font-size: 16px; line-height: 1.6; color: var(--mk-fg-1); margin: 10px 0; }
+  .sub { font-size: 13px; color: var(--mk-fg-2); line-height: 1.55; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; padding: 2px 6px; border-radius: 4px; background: rgba(37,99,235,.14); color: var(--mk-accent-glow); }
+  a { color: var(--mk-accent-glow); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  blockquote { margin: 14px 0; padding: 10px 16px; border-left: 2px solid var(--mk-accent-glow); color: var(--mk-fg-1); font-size: 15px; background: rgba(37,99,235,.08); border-radius: 0 6px 6px 0; }
+</style>
+</head>
+<body>
+  <div class="eyebrow">Body · Inter 400 · 16 / 1.6</div>
+  <p>MeowKit installs a <code>.claude/</code> directory that Claude Code reads at session start. It enforces a 7-phase workflow with two hard gates — no code ships without an approved plan and a passing review.</p>
+  <blockquote>AI agents need enforced discipline, not best practices.</blockquote>
+  <p class="sub">Secondary text uses <code>--mk-fg-2</code> (#94A3B8) at 13 / 1.55 — for captions, table metadata, and sidebar item descriptions. Links like <a href="#">docs.meowkit.dev</a> take the accent glow.</p>
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
   "name": "MeowKit Design System",
   "version": "1.0.0",
-  "mascot": "Codey",
+  "mascot": "/meow prompt",
   "theme": {
     "colors": {
       "bg": "#05070A",

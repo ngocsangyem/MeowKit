@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; padding: 22px 24px; font-family: var(--mk-font-sans); background: var(--mk-bg-base); display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .tile { background: var(--mk-neutral-0); border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 24px 20px 14px; position: relative; min-height: 110px; display: grid; place-items: center; }
+  .tile.dark { background: var(--mk-neutral-950); border-color: rgba(255,255,255,.08); }
+  .tile .tag { position: absolute; top: 10px; left: 14px; font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-neutral-500); }
+  .tile.dark .tag { color: var(--mk-neutral-300); }
+  .tile img { max-width: 80%; height: auto; }
+  .fav-row { display: flex; align-items: flex-end; gap: 20px; }
+  .fav-row img { height: auto; }
+  .fav-row .lbl { font-family: var(--mk-font-mono); font-size: 10px; color: var(--mk-neutral-500); letter-spacing: .08em; margin-top: 6px; text-align: center; }
+  .fav-row .col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+</style>
+</head>
+<body>
+  <div class="tile">
+    <span class="tag">MEOW-LOGO.SVG</span>
+    <img src="../assets/branding/meow-logo.svg" alt="/meow logo" />
+  </div>
+  <div class="tile dark">
+    <span class="tag">MEOW-LOGO-DARK.SVG</span>
+    <img src="../assets/branding/meow-logo-dark.svg" alt="/meow logo dark" />
+  </div>
+  <div class="tile">
+    <span class="tag">MEOW-LOGO-MONO.SVG</span>
+    <img src="../assets/branding/meow-logo-mono.svg" alt="/meow logo mono" />
+  </div>
+  <div class="tile">
+    <span class="tag">MEOW-FAVICON.SVG · 16 · 32 · 64</span>
+    <div class="fav-row">
+      <div class="col"><img src="../assets/branding/meow-favicon.svg" width="16" height="16" /><span class="lbl">16</span></div>
+      <div class="col"><img src="../assets/branding/meow-favicon.svg" width="32" height="32" /><span class="lbl">32</span></div>
+      <div class="col"><img src="../assets/branding/meow-favicon.svg" width="64" height="64" /><span class="lbl">64</span></div>
+    </div>
+  </div>
+</body>
+</html>

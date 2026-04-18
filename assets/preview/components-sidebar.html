@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Components — Sidebar Item</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px; display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start;}
+  .side { background: var(--mk-bg-base); border: 1px solid var(--mk-border-subtle); border-radius: 10px; padding: 14px 8px; }
+  .group { font-family: var(--mk-font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-fg-3); padding: 6px 12px; margin-top: 6px; }
+  .item { position: relative; display: flex; align-items: center; padding: 6px 12px; font-size: 13.5px; color: var(--mk-fg-2); cursor: pointer; border-radius: 4px; }
+  .item:hover { color: var(--mk-fg-1); }
+  .item.active { color: var(--mk-accent-glow); }
+  .item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 2px; background: var(--mk-accent-glow); border-radius: 2px; }
+  .note { color: var(--mk-fg-2); font-size: 13px; line-height: 1.55; padding: 10px 4px; }
+  .note b { color: var(--mk-fg-1); font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="side">
+    <div class="group">Guide</div>
+    <div class="item">Introduction</div>
+    <div class="item">Installation</div>
+    <div class="item">Quick Start</div>
+    <div class="group">Workflow</div>
+    <div class="item">Philosophy</div>
+    <div class="item active">Workflow Phases</div>
+    <div class="item">Memory System</div>
+    <div class="item">Model Routing</div>
+  </div>
+  <div class="note">
+    <b>Sidebar item</b> — default <span style="color:var(--mk-fg-3)">#94A3B8</span>, hover brightens to fg-1, active gets the accent glow (#60A5FA) with a 2px left indicator. Groups use mono eyebrow type.
+  </div>
+</body>
+</html>

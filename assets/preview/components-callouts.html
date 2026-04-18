@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Components — Callouts</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px 24px; display: flex; flex-direction: column; gap: 10px; }
+  .cb { padding: 12px 16px; border-radius: 8px; border-left: 3px solid; font-size: 13.5px; line-height: 1.55; }
+  .cb .t { font-weight: 600; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; display:block; margin-bottom: 4px; }
+  .tip { background: rgba(37,99,235,.08); border-color: var(--mk-accent-glow); }
+  .tip .t { color: var(--mk-accent-glow); }
+  .warn { background: rgba(247,144,9,.10); border-color: #F79009; }
+  .warn .t { color: #F79009; }
+  .danger { background: rgba(240,68,56,.10); border-color: #F04438; }
+  .danger .t { color: #F04438; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; padding: 1px 5px; border-radius: 3px; background: rgba(37,99,235,.14); color: var(--mk-accent-glow); }
+</style>
+</head>
+<body>
+  <div class="cb tip"><span class="t">Tip</span>Non-trivial task = &gt; 2 files OR &gt; 30 min. Always create a plan via <code>/meow:plan</code> first.</div>
+  <div class="cb warn"><span class="t">Important</span>NEVER start Phase 3 without Gate 1 approval. The hook blocks source writes.</div>
+  <div class="cb danger"><span class="t">Blocked</span>Security: secrets detected in <code>auth.ts</code>. Remove before Gate 2.</div>
+</body>
+</html>

@@ -1,0 +1,301 @@
+/**
+ * MeowKit Design System — Tokens
+ *
+ * Source of truth: assets/branding/design-tokens.json +
+ *   mirrored from website/.vitepress/theme/custom.css in the MeowKit repo.
+ *
+ * Architecture:
+ *   Layer 1 — Brand primitives (theme-independent scales)
+ *   Layer 2 — Light theme semantic tokens
+ *   Layer 3 — Dark theme semantic tokens (brand's "hero" mode)
+ *   Layer 4 — Typography roles (display, h1..h3, body, code, etc.)
+ */
+
+/* =========================================================== */
+/*  LAYER 1 — Brand Primitives                                  */
+/* =========================================================== */
+
+:root {
+  /* Royal Blue — brand primary. #2563EB is the /meow slash blue. */
+  --mk-blue-50:  #EFF6FF;
+  --mk-blue-100: #DBEAFE;
+  --mk-blue-200: #BFDBFE;
+  --mk-blue-300: #93C5FD;
+  --mk-blue-400: #60A5FA;
+  --mk-blue-500: #3B82F6;
+  --mk-blue-600: #2563EB; /* brand primary */
+  --mk-blue-700: #1D4ED8;
+  --mk-blue-800: #1E40AF;
+  --mk-blue-900: #1E3A5F; /* "deep space" — dark-mode surface accent */
+
+  /* Accent — lighter brand glow for dark-mode highlights */
+  --mk-accent-glow: #60A5FA;
+  --mk-accent-soft: #93C5FD;
+
+  /* Neutrals — slate-family, aligns with Tailwind slate */
+  --mk-neutral-0:   #FFFFFF;
+  --mk-neutral-50:  #F8FAFC;
+  --mk-neutral-100: #E2E8F0;
+  --mk-neutral-200: #CBD5E1;
+  --mk-neutral-300: #94A3B8;
+  --mk-neutral-500: #64748B;
+  --mk-neutral-700: #334155;
+  --mk-neutral-800: #1E293B;
+  --mk-neutral-900: #0F172A;
+  --mk-neutral-950: #05070A; /* true "deep-space black" */
+
+  /* Semantic */
+  --mk-success: #12B76A;
+  --mk-warning: #F79009;
+  --mk-danger:  #F04438;
+  --mk-info:    #2563EB;
+
+  /* Brand gradient — used on hero titles and primary buttons */
+  --mk-gradient-brand: linear-gradient(135deg, #2563EB 0%, #60A5FA 100%);
+  --mk-gradient-space: radial-gradient(circle at 30% 20%, #1E3A5F 0%, #05070A 70%);
+
+  /* ---------- Typography ---------- */
+  --mk-font-sans:    'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mk-font-display: 'Inter', system-ui, sans-serif; /* same family, heavier weight */
+  --mk-font-mono:    'Fira Code', 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Type scale — compact tech-docs rhythm */
+  --mk-text-xs:    12px;
+  --mk-text-sm:    13px;
+  --mk-text-base:  15px;
+  --mk-text-md:    16px;
+  --mk-text-lg:    18px;
+  --mk-text-xl:    22px;
+  --mk-text-2xl:   28px;
+  --mk-text-3xl:   36px;
+  --mk-text-4xl:   48px;
+  --mk-text-5xl:   64px;
+
+  /* Line heights */
+  --mk-leading-tight: 1.15;
+  --mk-leading-snug:  1.3;
+  --mk-leading-body:  1.6;
+  --mk-leading-loose: 1.75;
+
+  /* Weights — headings are 400/500 (not bold); body is 400; callouts 600 */
+  --mk-weight-regular:  400;
+  --mk-weight-medium:   500;
+  --mk-weight-semibold: 600;
+  --mk-weight-bold:     700;
+
+  /* Letter-spacing — display headings use +2% to feel airy */
+  --mk-tracking-tight:  -0.01em;
+  --mk-tracking-normal: 0;
+  --mk-tracking-wide:   0.02em;
+  --mk-tracking-caps:   0.12em;
+
+  /* ---------- Spacing ---------- */
+  --mk-space-0:  0;
+  --mk-space-1:  4px;
+  --mk-space-2:  8px;
+  --mk-space-3:  12px;
+  --mk-space-4:  16px;
+  --mk-space-5:  20px;
+  --mk-space-6:  24px;
+  --mk-space-8:  32px;
+  --mk-space-10: 40px;
+  --mk-space-12: 48px;
+  --mk-space-16: 64px;
+  --mk-space-20: 80px;
+
+  /* ---------- Radii ---------- */
+  --mk-radius-xs:   4px;  /* buttons from design-tokens.json */
+  --mk-radius-sm:   6px;
+  --mk-radius-md:   10px;
+  --mk-radius-lg:   16px;
+  --mk-radius-xl:   24px;
+  --mk-radius-pill: 9999px;
+
+  /* ---------- Shadows ---------- */
+  --mk-shadow-soft:  0 4px 12px rgba(0, 0, 0, 0.08);
+  --mk-shadow-card:  0 2px 8px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --mk-shadow-lift:  0 8px 24px rgba(15, 23, 42, 0.10);
+  --mk-shadow-glow:  0 0 20px rgba(37, 99, 235, 0.35);
+  --mk-shadow-glow-strong: 0 0 40px rgba(37, 99, 235, 0.55);
+  --mk-shadow-inset-glow: inset 0 0 0 1px rgba(96, 165, 250, 0.35);
+
+  /* ---------- Motion ---------- */
+  --mk-ease-out:     cubic-bezier(0.2, 0.8, 0.2, 1);
+  --mk-ease-in-out:  cubic-bezier(0.4, 0, 0.2, 1);
+  --mk-dur-fast:     150ms;
+  --mk-dur-normal:   250ms;
+  --mk-dur-slow:     400ms;
+}
+
+/* =========================================================== */
+/*  LAYER 2 — Light Theme                                       */
+/* =========================================================== */
+
+html:not(.dark), :root {
+  --mk-bg-base:    var(--mk-neutral-50);
+  --mk-bg-surface: var(--mk-neutral-0);
+  --mk-bg-soft:    #F1F5F9;
+  --mk-bg-code:    #F1F5F9;
+
+  --mk-fg-1: var(--mk-neutral-900); /* primary text */
+  --mk-fg-2: var(--mk-neutral-500); /* secondary */
+  --mk-fg-3: var(--mk-neutral-300); /* subtle / placeholder */
+  --mk-fg-brand: var(--mk-blue-600);
+  --mk-fg-link:  var(--mk-blue-600);
+
+  --mk-border-subtle: var(--mk-neutral-100);
+  --mk-border-strong: var(--mk-neutral-200);
+  --mk-border-brand:  var(--mk-blue-600);
+
+  --mk-hover-bg:  rgba(37, 99, 235, 0.06);
+  --mk-active-bg: rgba(37, 99, 235, 0.12);
+  --mk-focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.35);
+}
+
+/* =========================================================== */
+/*  LAYER 3 — Dark Theme (the brand's hero mode)                */
+/* =========================================================== */
+
+.dark {
+  --mk-bg-base:    #0F172A;  /* slate-900, blue-tinted */
+  --mk-bg-surface: #1E293B;  /* slate-800 */
+  --mk-bg-soft:    #1E3A5F;  /* deep-space blue */
+  --mk-bg-code:    #1E293B;
+
+  --mk-fg-1: #F8FAFC;
+  --mk-fg-2: #94A3B8;
+  --mk-fg-3: #64748B;
+  --mk-fg-brand: var(--mk-accent-glow);
+  --mk-fg-link:  var(--mk-accent-glow);
+
+  --mk-border-subtle: rgba(255, 255, 255, 0.08);
+  --mk-border-strong: rgba(255, 255, 255, 0.15);
+  --mk-border-brand:  var(--mk-accent-glow);
+
+  --mk-hover-bg:  rgba(37, 99, 235, 0.15);
+  --mk-active-bg: rgba(37, 99, 235, 0.25);
+  --mk-focus-ring: 0 0 0 3px rgba(96, 165, 250, 0.45);
+}
+
+/* =========================================================== */
+/*  LAYER 4 — Typography Roles                                  */
+/* =========================================================== */
+
+.mk-display {
+  font-family: var(--mk-font-display);
+  font-size: clamp(44px, 6vw, var(--mk-text-5xl));
+  font-weight: var(--mk-weight-regular); /* headings use 400 per design-tokens.json */
+  line-height: var(--mk-leading-tight);
+  letter-spacing: var(--mk-tracking-wide);
+  background: var(--mk-gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.mk-h1 {
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-text-4xl);
+  font-weight: var(--mk-weight-regular);
+  line-height: var(--mk-leading-tight);
+  letter-spacing: var(--mk-tracking-wide);
+  color: var(--mk-fg-1);
+}
+
+.mk-h2 {
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-text-3xl);
+  font-weight: var(--mk-weight-medium);
+  line-height: var(--mk-leading-tight);
+  letter-spacing: var(--mk-tracking-wide);
+  color: var(--mk-fg-1);
+}
+
+.mk-h3 {
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-text-2xl);
+  font-weight: var(--mk-weight-medium);
+  line-height: var(--mk-leading-snug);
+  color: var(--mk-fg-1);
+}
+
+.mk-h4 {
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-text-xl);
+  font-weight: var(--mk-weight-semibold);
+  line-height: var(--mk-leading-snug);
+  color: var(--mk-fg-1);
+}
+
+.mk-body {
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-text-md);
+  font-weight: var(--mk-weight-regular);
+  line-height: var(--mk-leading-body);
+  color: var(--mk-fg-1);
+}
+
+.mk-body-sm {
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-text-sm);
+  line-height: var(--mk-leading-body);
+  color: var(--mk-fg-2);
+}
+
+.mk-tagline {
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-text-lg);
+  font-weight: var(--mk-weight-regular);
+  line-height: var(--mk-leading-snug);
+  color: var(--mk-fg-2);
+}
+
+.mk-eyebrow {
+  font-family: var(--mk-font-mono);
+  font-size: var(--mk-text-xs);
+  font-weight: var(--mk-weight-medium);
+  letter-spacing: var(--mk-tracking-caps);
+  text-transform: uppercase;
+  color: var(--mk-fg-brand);
+}
+
+.mk-code-inline {
+  font-family: var(--mk-font-mono);
+  font-size: 0.92em;
+  padding: 2px 6px;
+  border-radius: var(--mk-radius-xs);
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--mk-blue-700);
+}
+.dark .mk-code-inline {
+  background: rgba(37, 99, 235, 0.14);
+  color: var(--mk-accent-glow);
+}
+
+.mk-code-block {
+  font-family: var(--mk-font-mono);
+  font-size: var(--mk-text-sm);
+  line-height: var(--mk-leading-body);
+  padding: var(--mk-space-4) var(--mk-space-5);
+  border-radius: var(--mk-radius-md);
+  background: var(--mk-bg-code);
+  color: var(--mk-fg-1);
+  border: 1px solid var(--mk-border-subtle);
+  overflow-x: auto;
+}
+
+/* Base element defaults — opt-in by applying mk-typeset to a root */
+.mk-typeset {
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-text-md);
+  line-height: var(--mk-leading-body);
+  color: var(--mk-fg-1);
+  background: var(--mk-bg-base);
+}
+.mk-typeset h1 { font-size: var(--mk-text-4xl); font-weight: 400; letter-spacing: .02em; line-height: 1.15; margin: 0 0 .6em; }
+.mk-typeset h2 { font-size: var(--mk-text-3xl); font-weight: 500; letter-spacing: .02em; line-height: 1.2;  margin: 1.6em 0 .5em; }
+.mk-typeset h3 { font-size: var(--mk-text-2xl); font-weight: 500; line-height: 1.3;  margin: 1.4em 0 .4em; }
+.mk-typeset p  { margin: 0 0 1em; }
+.mk-typeset code { font-family: var(--mk-font-mono); font-size: 0.92em; }
+.mk-typeset a  { color: var(--mk-fg-link); text-decoration: none; }
+.mk-typeset a:hover { text-decoration: underline; }

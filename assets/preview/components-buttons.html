@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Components — Buttons</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 22px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .lbl { font-family: var(--mk-font-mono); font-size: 10.5px; color: var(--mk-fg-2); letter-spacing: .1em; text-transform: uppercase; width: 90px; flex: 0 0 90px; }
+  button { font: inherit; cursor: pointer; border-radius: 4px; padding: 9px 16px; font-size: 14px; font-weight: 600; border: 1px solid transparent; transition: all .15s ease; }
+  .btn-primary { background: var(--mk-gradient-brand); color: #fff; }
+  .btn-primary:hover { opacity: .9; }
+  .btn-alt { background: transparent; color: var(--mk-accent-glow); border-color: var(--mk-accent-glow); }
+  .btn-alt:hover { background: rgba(37,99,235,.15); }
+  .btn-ghost { background: transparent; color: var(--mk-fg-1); border-color: transparent; font-weight: 500; }
+  .btn-ghost:hover { background: rgba(37,99,235,.08); color: var(--mk-accent-glow); }
+  .btn-danger { background: #F04438; color: #fff; }
+  .btn-sm { padding: 6px 12px; font-size: 13px; }
+  .caret { font-family: var(--mk-font-mono); margin-left: 4px; }
+</style>
+</head>
+<body>
+  <div class="row"><div class="lbl">primary</div>
+    <button class="btn-primary">Get Started <span class="caret">→</span></button>
+    <button class="btn-primary btn-sm">Approve Gate 1</button>
+  </div>
+  <div class="row"><div class="lbl">alt</div>
+    <button class="btn-alt">Why MeowKit</button>
+    <button class="btn-alt btn-sm">View Plan</button>
+  </div>
+  <div class="row"><div class="lbl">ghost / danger</div>
+    <button class="btn-ghost">Cancel</button>
+    <button class="btn-danger btn-sm">Block</button>
+  </div>
+</body>
+</html>

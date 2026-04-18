@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Colors — Neutrals</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px; }
+  .row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+  .sw { height: 84px; border-radius: 8px; border: 1px solid var(--mk-border-subtle); display:flex; align-items:flex-end; padding: 8px; font-family: var(--mk-font-mono); font-size: 10px; }
+  .sw.dark-text { color: rgba(0,0,0,.75); }
+  .sw.light-text { color: rgba(255,255,255,.9); }
+  .sw .name { font-weight:500; }
+  .sw .hex { opacity:.75; }
+  .meta { display: flex; justify-content: space-between; margin-top: 10px; font-family: var(--mk-font-mono); font-size: 10px; color: var(--mk-fg-2); letter-spacing: .08em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw dark-text" style="background:#FFFFFF"><div><div class="name">0</div><div class="hex">#FFFFFF</div></div></div>
+    <div class="sw dark-text" style="background:#F8FAFC"><div><div class="name">50</div><div class="hex">#F8FAFC</div></div></div>
+    <div class="sw dark-text" style="background:#E2E8F0"><div><div class="name">100</div><div class="hex">#E2E8F0</div></div></div>
+    <div class="sw dark-text" style="background:#CBD5E1"><div><div class="name">200</div><div class="hex">#CBD5E1</div></div></div>
+    <div class="sw dark-text" style="background:#94A3B8"><div><div class="name">300</div><div class="hex">#94A3B8</div></div></div>
+    <div class="sw light-text" style="background:#64748B"><div><div class="name">500</div><div class="hex">#64748B</div></div></div>
+    <div class="sw light-text" style="background:#334155"><div><div class="name">700</div><div class="hex">#334155</div></div></div>
+    <div class="sw light-text" style="background:#1E293B"><div><div class="name">800 · surface</div><div class="hex">#1E293B</div></div></div>
+    <div class="sw light-text" style="background:#0F172A"><div><div class="name">900 · base</div><div class="hex">#0F172A</div></div></div>
+    <div class="sw light-text" style="background:#05070A"><div><div class="name">950 · space</div><div class="hex">#05070A</div></div></div>
+  </div>
+  <div class="meta">
+    <span>mk-neutral-0 → mk-neutral-950</span>
+    <span>Slate family · dark mode bg = 900</span>
+  </div>
+</body>
+</html>

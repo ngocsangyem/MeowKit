@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Components — Badges</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .lbl { font-family: var(--mk-font-mono); font-size: 10.5px; color: var(--mk-fg-2); letter-spacing: .1em; text-transform: uppercase; width: 90px; flex: 0 0 90px; }
+  .b { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
+  .b-tip { background: rgba(37,99,235,.14); color: var(--mk-accent-glow); }
+  .b-warn { background: rgba(247,144,9,.12); color: #F79009; }
+  .b-danger { background: rgba(240,68,56,.14); color: #F04438; }
+  .b-success { background: rgba(18,183,106,.14); color: #12B76A; }
+  .b-neutral { background: rgba(148,163,184,.14); color: #94A3B8; }
+  .tier { font-family: var(--mk-font-mono); font-size: 11px; padding: 2px 8px; border-radius: 4px; letter-spacing: .08em; }
+  .t-trivial { background: rgba(148,163,184,.14); color: #94A3B8; }
+  .t-standard { background: rgba(37,99,235,.14); color: var(--mk-accent-glow); }
+  .t-complex { background: rgba(240,68,56,.14); color: #F04438; }
+  .t-gate { background: rgba(247,144,9,.14); color: #F79009; }
+</style>
+</head>
+<body>
+  <div class="row"><div class="lbl">pill · status</div>
+    <span class="b b-tip">✓ PASS</span>
+    <span class="b b-success">APPROVED</span>
+    <span class="b b-warn">WARN</span>
+    <span class="b b-danger">✗ BLOCK</span>
+    <span class="b b-neutral">draft</span>
+  </div>
+  <div class="row"><div class="lbl">tier · mono</div>
+    <span class="tier t-trivial">TRIVIAL</span>
+    <span class="tier t-standard">STANDARD</span>
+    <span class="tier t-complex">COMPLEX</span>
+    <span class="tier t-gate">✋ GATE 1</span>
+  </div>
+</body>
+</html>

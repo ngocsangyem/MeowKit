@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Colors — Brand Blue Scale</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px; }
+  .row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+  .sw { height: 84px; border-radius: 8px; border: 1px solid var(--mk-border-subtle); display:flex; align-items:flex-end; padding: 8px; font-family: var(--mk-font-mono); font-size: 10px; color: rgba(255,255,255,.95); }
+  .sw.dark-text { color: rgba(0,0,0,.75); }
+  .sw .name { font-weight:500; }
+  .sw .hex { opacity:.75; }
+  .meta { display: flex; justify-content: space-between; margin-top: 10px; font-family: var(--mk-font-mono); font-size: 10px; color: var(--mk-fg-2); letter-spacing: .08em; text-transform: uppercase; }
+  .star { border: 2px solid var(--mk-accent-glow); box-shadow: var(--mk-shadow-glow); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw dark-text" style="background:#EFF6FF"><div><div class="name">50</div><div class="hex">#EFF6FF</div></div></div>
+    <div class="sw dark-text" style="background:#DBEAFE"><div><div class="name">100</div><div class="hex">#DBEAFE</div></div></div>
+    <div class="sw dark-text" style="background:#BFDBFE"><div><div class="name">200</div><div class="hex">#BFDBFE</div></div></div>
+    <div class="sw dark-text" style="background:#93C5FD"><div><div class="name">300</div><div class="hex">#93C5FD</div></div></div>
+    <div class="sw" style="background:#60A5FA"><div><div class="name">400 · glow</div><div class="hex">#60A5FA</div></div></div>
+    <div class="sw" style="background:#3B82F6"><div><div class="name">500</div><div class="hex">#3B82F6</div></div></div>
+    <div class="sw star" style="background:#2563EB"><div><div class="name">600 · BRAND</div><div class="hex">#2563EB</div></div></div>
+    <div class="sw" style="background:#1D4ED8"><div><div class="name">700</div><div class="hex">#1D4ED8</div></div></div>
+    <div class="sw" style="background:#1E40AF"><div><div class="name">800</div><div class="hex">#1E40AF</div></div></div>
+    <div class="sw" style="background:#1E3A5F"><div><div class="name">900 · space</div><div class="hex">#1E3A5F</div></div></div>
+  </div>
+  <div class="meta">
+    <span>mk-blue-50 → mk-blue-900</span>
+    <span>--mk-blue-600 · Royal Blue · brand primary</span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Type — Heading Scale</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px 24px; }
+  .row { display: grid; grid-template-columns: 120px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--mk-border-subtle); }
+  .row:last-child { border-bottom: 0; }
+  .tag { font-family: var(--mk-font-mono); font-size: 10.5px; color: var(--mk-fg-2); letter-spacing: .08em; text-transform: uppercase; }
+  h1,h2,h3,h4 { margin: 0; color: var(--mk-fg-1); }
+  h1 { font-size: 48px; font-weight: 400; letter-spacing: .02em; line-height: 1.1; }
+  h2 { font-size: 36px; font-weight: 500; letter-spacing: .02em; line-height: 1.15; }
+  h3 { font-size: 28px; font-weight: 500; line-height: 1.2; }
+  h4 { font-size: 22px; font-weight: 600; line-height: 1.25; }
+</style>
+</head>
+<body>
+  <div class="row"><div class="tag">h1 · 48 / 400</div><h1>Phase 3 — Build</h1></div>
+  <div class="row"><div class="tag">h2 · 36 / 500</div><h2>Two hard gates</h2></div>
+  <div class="row"><div class="tag">h3 · 28 / 500</div><h3>Workflow phases</h3></div>
+  <div class="row"><div class="tag">h4 · 22 / 600</div><h4>meow:plan-creator</h4></div>
+</body>
+</html>

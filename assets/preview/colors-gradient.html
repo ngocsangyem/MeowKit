@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Colors — Gradient</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px; display: flex; gap: 16px; align-items: stretch; }
+  .g1 { flex: 1; border-radius: 12px; background: var(--mk-gradient-brand); padding: 16px; color: #fff; display: flex; flex-direction: column; justify-content: space-between; }
+  .g1 .title { font-size: 32px; font-weight: 400; letter-spacing: .02em; line-height: 1.1; }
+  .g1 .meta { font-family: var(--mk-font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .9; }
+  .g2 { width: 230px; border-radius: 12px; padding: 16px; display:flex; flex-direction: column; justify-content: space-between; background: var(--mk-gradient-space); color: #fff; }
+  .g2 .label { font-family: var(--mk-font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+  .hero-title {
+    font-size: 36px; font-weight: 400; letter-spacing: .02em; line-height: 1.1;
+    background: var(--mk-gradient-brand);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+</style>
+</head>
+<body>
+  <div class="g1">
+    <div class="title">Enforced discipline.</div>
+    <div class="meta">brand · linear 135° · #2563EB → #60A5FA</div>
+  </div>
+  <div class="g2">
+    <div class="hero-title">MeowKit</div>
+    <div class="label">Radial · #1E3A5F → #05070A · "deep space"</div>
+  </div>
+</body>
+</html>

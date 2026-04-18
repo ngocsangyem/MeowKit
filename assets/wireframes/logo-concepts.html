@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MeowKit — New Logo Concepts (Wireframes)</title>
+<style>
+  :root {
+    --ink: #111;
+    --ink-2: #333;
+    --mute: #888;
+    --line: #bbb;
+    --bg: #fafafa;
+    --card: #fff;
+  }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: ui-monospace, 'Fira Code', SFMono-Regular, Menlo, monospace; }
+  body { padding: 28px; max-width: 1180px; margin: 0 auto; }
+  h1 { font-family: system-ui, -apple-system, sans-serif; font-weight: 500; font-size: 20px; margin: 0 0 4px; }
+  h1 small { color: var(--mute); font-weight: 400; font-size: 12px; margin-left: 10px; }
+  .lede { font-family: system-ui, sans-serif; font-size: 13px; color: #444; max-width: 820px; line-height: 1.55; margin: 0 0 24px; }
+  .lede b { color: #000; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+
+  .card { background: var(--card); border: 1px dashed #999; border-radius: 10px; padding: 20px 18px 16px; position: relative; min-height: 230px; display: flex; flex-direction: column; gap: 14px; }
+  .card .tag { position: absolute; top: -9px; left: 14px; background: var(--bg); padding: 0 8px; font-size: 11px; color: #666; letter-spacing: .1em; text-transform: uppercase; }
+  .card .stage { flex: 1; display: grid; place-items: center; padding: 10px 0 4px; }
+  .card .meta { font-family: system-ui, sans-serif; font-size: 11px; color: #555; line-height: 1.5; border-top: 1px solid #eee; padding-top: 10px; }
+  .card .meta b { color: #111; }
+
+  /* shared primitives */
+  .stripe { background: repeating-linear-gradient(45deg, #f0f0f0 0 6px, #fff 6px 12px); }
+  .dashed { border: 1px dashed #555; }
+  .wm { height: 18px; width: 110px; border-bottom: 2px solid var(--ink); }
+  .sub { height: 8px; width: 90px; border-bottom: 1px solid var(--mute); }
+
+  /* ─── 1. GATE GLYPH ─── two chevrons = two gates */
+  .gate { width: 120px; height: 120px; position: relative; display: grid; place-items: center; }
+  .gate svg { width: 100%; height: 100%; }
+
+  /* ─── 2. PHASE RING ─── 7 ticks around a circle */
+  .ring { width: 120px; height: 120px; }
+
+  /* ─── 3. BRACE CAT ─── { :3 } */
+  .brace { display: flex; align-items: center; gap: 6px; font-family: ui-monospace, monospace; font-size: 54px; color: var(--ink); line-height: 1; }
+  .brace .b { font-weight: 300; color: var(--ink-2); }
+  .brace .eyes { display: inline-flex; flex-direction: column; gap: 4px; padding: 0 2px; }
+  .brace .eye { width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+  .brace .face { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; font-size: 22px; line-height: 1; color: var(--ink-2); }
+
+  /* ─── 4. SLASH-MEOW PROMPT ─── /meow */
+  .prompt { display: inline-flex; align-items: baseline; gap: 2px; font-family: ui-monospace, monospace; font-size: 32px; color: var(--ink); }
+  .prompt .slash { color: #c33; font-weight: 600; }
+  .prompt .meow { border-bottom: 2px solid var(--ink); padding-bottom: 2px; }
+  .prompt .caret { display: inline-block; width: 10px; height: 28px; background: var(--ink); margin-left: 3px; animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ─── 5. PAW-GRID ─── paw as 3x3 skill grid */
+  .pawgrid { width: 120px; height: 120px; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr); gap: 4px; }
+  .pawgrid span { background: var(--ink); border-radius: 3px; }
+  .pawgrid span.off { background: transparent; }
+  .pawgrid span.toe { border-radius: 50%; }
+  .pawgrid span.pad { border-radius: 40% 40% 50% 50%; }
+
+  /* ─── 6. CHECK-EAR ─── gate checkmark w/ cat ears */
+  .checkear { width: 120px; height: 120px; position: relative; }
+  .checkear svg { width: 100%; height: 100%; }
+
+  /* ─── 7. ASCII CAT ─── =^..^= */
+  .ascii { font-family: ui-monospace, monospace; font-size: 40px; letter-spacing: 2px; color: var(--ink); }
+  .ascii .bracket { color: #c33; }
+
+  /* ─── 8. KITBOX ─── toolkit box with cat ears */
+  .kitbox { width: 140px; height: 110px; position: relative; }
+  .kitbox svg { width: 100%; height: 100%; }
+
+  /* ─── 9. WHISKER-CMD ─── terminal block with whiskers */
+  .whiskcmd { width: 160px; height: 110px; position: relative; }
+  .whiskcmd .term { width: 120px; height: 80px; border: 2px solid var(--ink); border-radius: 6px; position: relative; margin: 15px auto 0; background: #fff; }
+  .whiskcmd .term::before { content: ''; position: absolute; top: 8px; left: 10px; right: 10px; height: 2px; background: var(--ink); }
+  .whiskcmd .term::after { content: '>'; position: absolute; top: 18px; left: 10px; font-family: monospace; font-size: 14px; font-weight: 700; color: var(--ink); }
+  .whiskcmd .eyes { position: absolute; top: 24px; left: 0; right: 0; display: flex; justify-content: center; gap: 22px; }
+  .whiskcmd .eyes i { width: 6px; height: 6px; background: var(--ink); border-radius: 50%; }
+  .whiskcmd .whisk { position: absolute; top: 50%; width: 18px; height: 2px; background: var(--ink); }
+  .whiskcmd .whisk.l { left: 0; transform: rotate(-5deg); }
+  .whiskcmd .whisk.r { right: 0; transform: rotate(5deg); }
+  .whiskcmd .whisk.l2 { left: 0; top: 58%; transform: rotate(5deg); }
+  .whiskcmd .whisk.r2 { right: 0; top: 58%; transform: rotate(-5deg); }
+  .whiskcmd .ears { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 24px; }
+  .whiskcmd .ears div { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 18px solid var(--ink); }
+
+  .note { margin-top: 24px; font-family: system-ui, sans-serif; font-size: 11px; color: #666; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <h1>MeowKit — new logo concepts <small>wireframes · grounded in the source, not the old mascot</small></h1>
+  <p class="lede">
+    Rooted in what MeowKit actually <b>is</b>: a 7-phase workflow with 2 hard gates, a <b>kit</b> of agents/skills/hooks, slash-command prompts (<code>/meow:plan</code>), CLI-native, enforcement + structure meets feline curiosity. Nine directions below — pick favorites and I'll take them to hi-fi.
+  </p>
+
+  <div class="grid">
+
+    <!-- 1 -->
+    <div class="card">
+      <span class="tag">01 · Gate Glyph</span>
+      <div class="stage">
+        <div class="gate">
+          <svg viewBox="0 0 120 120" fill="none" stroke="#111" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+            <!-- ear 1 -->
+            <path d="M22 38 L36 12 L50 38 Z" fill="#111"/>
+            <!-- ear 2 -->
+            <path d="M70 38 L84 12 L98 38 Z" fill="#111"/>
+            <!-- gate 1 chevron -->
+            <path d="M30 66 L60 50 L90 66"/>
+            <!-- gate 2 chevron -->
+            <path d="M30 92 L60 76 L90 92"/>
+          </svg>
+        </div>
+      </div>
+      <div class="meta"><b>Concept:</b> Two stacked chevrons = Gate 1 + Gate 2. Ears on top = cat. Reads as a discipline mark — "nothing passes without approval."</div>
+    </div>
+
+    <!-- 2 -->
+    <div class="card">
+      <span class="tag">02 · Phase Ring</span>
+      <div class="stage">
+        <svg class="ring" viewBox="0 0 120 120" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round">
+          <circle cx="60" cy="60" r="44"/>
+          <!-- 7 ticks for 7 phases -->
+          <g stroke-width="5">
+            <line x1="60" y1="8"  x2="60" y2="22"/>
+            <line x1="101" y1="26" x2="91" y2="36"/>
+            <line x1="112" y1="60" x2="98" y2="60"/>
+            <line x1="101" y1="94" x2="91" y2="84"/>
+            <line x1="60" y1="112" x2="60" y2="98"/>
+            <line x1="19" y1="94"  x2="29" y2="84"/>
+            <line x1="8" y1="60"   x2="22" y2="60"/>
+          </g>
+          <!-- cat face inside -->
+          <circle cx="50" cy="56" r="3" fill="#111" stroke="none"/>
+          <circle cx="70" cy="56" r="3" fill="#111" stroke="none"/>
+          <path d="M54 70 Q60 74 66 70" stroke-width="3"/>
+        </svg>
+      </div>
+      <div class="meta"><b>Concept:</b> Circular mark with 7 ticks = 7 workflow phases. Minimal cat face inside. Feels like a process dial / compass.</div>
+    </div>
+
+    <!-- 3 -->
+    <div class="card">
+      <span class="tag">03 · Brace Cat</span>
+      <div class="stage">
+        <div class="brace">
+          <span class="b">{</span>
+          <span class="face">
+            <span style="display:flex; gap:6px;">
+              <span class="eye" style="width:8px;height:8px;border-radius:50%;background:#111;"></span>
+              <span class="eye" style="width:8px;height:8px;border-radius:50%;background:#111;"></span>
+            </span>
+            <span style="font-size:14px;">⌃</span>
+          </span>
+          <span class="b">}</span>
+        </div>
+      </div>
+      <div class="meta"><b>Concept:</b> <code>{ :3 }</code> — code braces wrapping a micro cat face. 100% type-native, scales from favicon to header. Embodies "cat in code".</div>
+    </div>
+
+    <!-- 4 -->
+    <div class="card">
+      <span class="tag">04 · Slash-Meow Prompt</span>
+      <div class="stage">
+        <div class="prompt">
+          <span class="slash">/</span><span class="meow">meow</span><span class="caret"></span>
+        </div>
+      </div>
+      <div class="meta"><b>Concept:</b> Literal slash-command as the logo — <code>/meow</code> + caret. Every skill in the kit starts with <code>/meow:</code>. CLI-first identity.</div>
+    </div>
+
+    <!-- 5 -->
+    <div class="card">
+      <span class="tag">05 · Paw-Grid</span>
+      <div class="stage">
+        <div class="pawgrid">
+          <!-- row 1: toes -->
+          <span class="off"></span><span class="toe"></span><span class="off"></span><span class="toe"></span><span class="off"></span>
+          <!-- row 2: toes -->
+          <span class="toe"></span><span class="off"></span><span class="off"></span><span class="off"></span><span class="toe"></span>
+          <!-- row 3: pad top -->
+          <span class="off"></span><span class="pad" style="grid-column: 2 / span 3;"></span>
+          <!-- row 4: pad mid -->
+          <span class="off"></span><span style="grid-column: 2 / span 3; background: #111;"></span>
+          <!-- row 5: pad bottom -->
+          <span class="off"></span><span style="grid-column: 2 / span 3; background: #111; border-radius: 0 0 40% 40%;"></span>
+        </div>
+      </div>
+      <div class="meta"><b>Concept:</b> Paw print built from a pixel grid — toes + pad as discrete cells. The paw <b>is</b> the kit: composable squares. Reads as both mascot and system.</div>
+    </div>
+
+    <!-- 6 -->
+    <div class="card">
+      <span class="tag">06 · Check-Ear</span>
+      <div class="stage">
+        <div class="checkear">
+          <svg viewBox="0 0 120 120" fill="none" stroke="#111" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+            <!-- ears -->
+            <path d="M18 44 L30 18 L46 44 Z" fill="#111"/>
+            <path d="M74 44 L90 18 L102 44 Z" fill="#111"/>
+            <!-- giant checkmark body -->
+            <path d="M22 72 L50 98 L100 50"/>
+          </svg>
+        </div>
+      </div>
+      <div class="meta"><b>Concept:</b> Checkmark with two ears. The gate-approved verdict as a mascot. Every pipeline ends with ✓ — make that the logo.</div>
+    </div>
+
+    <!-- 7 -->
+    <div class="card">
+      <span class="tag">07 · ASCII Cat</span>
+      <div class="stage">
+        <div class="ascii">
+          <span class="bracket">=</span>^<span style="letter-spacing:0;">·<span style="opacity:.5;">.</span>·</span>^<span class="bracket">=</span>
+        </div>
+      </div>
+      <div class="meta"><b>Concept:</b> <code>=^··^=</code> — the terminal's universal cat. Zero-pixel logo, works in a git log, PR title, README banner. Most honest to "lives in your CLI".</div>
+    </div>
+
+    <!-- 8 -->
+    <div class="card">
+      <span class="tag">08 · Kitbox</span>
+      <div class="stage">
+        <div class="kitbox">
+          <svg viewBox="0 0 140 110" fill="none" stroke="#111" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- ears on the lid -->
+            <path d="M28 28 L40 10 L52 28 Z" fill="#111"/>
+            <path d="M88 28 L100 10 L112 28 Z" fill="#111"/>
+            <!-- toolkit box -->
+            <rect x="18" y="28" width="104" height="68" rx="8"/>
+            <!-- handle -->
+            <path d="M56 28 Q70 14 84 28" stroke-width="4"/>
+            <!-- latch / eyes -->
+            <circle cx="56" cy="62" r="4" fill="#111"/>
+            <circle cx="84" cy="62" r="4" fill="#111"/>
+            <!-- nose/divider -->
+            <path d="M50 80 L90 80" stroke-width="3"/>
+          </svg>
+        </div>
+      </div>
+      <div class="meta"><b>Concept:</b> A literal <i>kit</i> (toolkit box) with cat ears + a face built from its hardware. Name-made-visible: Meow + Kit.</div>
+    </div>
+
+    <!-- 9 -->
+    <div class="card">
+      <span class="tag">09 · Whisker Terminal</span>
+      <div class="stage">
+        <div class="whiskcmd">
+          <div class="ears"><div></div><div></div></div>
+          <div class="term">
+            <div class="eyes"><i></i><i></i></div>
+          </div>
+          <div class="whisk l"></div>
+          <div class="whisk r"></div>
+          <div class="whisk l2"></div>
+          <div class="whisk r2"></div>
+        </div>
+      </div>
+      <div class="meta"><b>Concept:</b> A terminal window that <i>is</i> a cat face — titlebar = brow, prompt line hidden by eyes, whiskers on the sides. The most direct "CLI cat" mark.</div>
+    </div>
+
+  </div>
+
+  <p class="note">
+    All concepts are <b>structural wireframes</b> — no final typography, no color, no finished curves. Strokes + primitives only. Each one is hooked to a specific MeowKit concept so the mark earns its shape. Next step: you pick 2–3 and I take them to hi-fi with the real color/type system + full lockup set (horizontal, stacked, monogram, favicon, OG card, wordmark).
+  </p>
+</body>
+</html>

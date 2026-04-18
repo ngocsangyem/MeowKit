@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  body { margin: 0; padding: 24px; font-family: var(--mk-font-sans); background: var(--mk-bg-base); display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .tile { background: var(--mk-neutral-0); border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 24px 20px 14px; position: relative; min-height: 140px; display: grid; place-items: center; }
+  .tile.dark { background: var(--mk-neutral-950); }
+  .tag { position: absolute; top: 10px; left: 14px; font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-neutral-500); }
+  .tile.dark .tag { color: var(--mk-neutral-300); }
+  img { max-width: 80%; height: auto; }
+</style>
+</head>
+<body>
+  <div class="tile">
+    <span class="tag">MEOW-LOGO-ANIMATED.GIF</span>
+    <img src="../assets/branding/meow-logo-animated.gif" alt="/meow animated logo"/>
+  </div>
+  <div class="tile dark">
+    <span class="tag">INLINE SVG (SMIL)</span>
+    <img src="../assets/branding/meow-logo-animated.svg" alt="/meow animated SVG"/>
+  </div>
+</body>
+</html>

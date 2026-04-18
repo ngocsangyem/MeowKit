@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Spacing — Radii</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px; display: flex; gap: 14px; justify-content: space-between; }
+  .tile { flex: 1; height: 110px; background: var(--mk-bg-surface); border: 1px solid var(--mk-border-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .n { font-size: 13px; font-weight: 500; }
+  .v { font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); }
+</style>
+</head>
+<body>
+  <div class="tile" style="border-radius:4px"><div class="n">xs · button</div><div class="v">4px</div></div>
+  <div class="tile" style="border-radius:6px"><div class="n">sm</div><div class="v">6px</div></div>
+  <div class="tile" style="border-radius:10px"><div class="n">md · card</div><div class="v">10px</div></div>
+  <div class="tile" style="border-radius:16px"><div class="n">lg · feature</div><div class="v">16px</div></div>
+  <div class="tile" style="border-radius:24px"><div class="n">xl</div><div class="v">24px</div></div>
+  <div class="tile" style="border-radius:9999px"><div class="n">pill</div><div class="v">∞</div></div>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: var(--mk-bg-base); padding: 22px 24px; font-family: var(--mk-font-sans); display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .tile { border-radius: var(--mk-radius-md); padding: 24px 18px 14px; min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; position: relative; overflow: hidden; }
+  .tile .lbl { font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+
+  .light { background: #fff; border: 1px solid var(--mk-border-subtle); }
+  .light .lbl { color: var(--mk-neutral-500); }
+
+  .dark { background: var(--mk-neutral-950); }
+  .dark .lbl { color: var(--mk-neutral-300); }
+
+  .brand { background: var(--mk-blue-600); }
+  .brand .lbl { color: rgba(255,255,255,.75); }
+
+  .space { background: var(--mk-gradient-space); }
+  .space .lbl { color: rgba(255,255,255,.7); }
+
+  .sm { display: inline-flex; align-items: baseline; font-family: 'Fira Code', ui-monospace, monospace; font-weight: 500; font-size: 38px; line-height: 1; letter-spacing: -.01em; }
+  .sm .caret { display: inline-block; width: .1em; height: 1em; margin-left: .12em; transform: translateY(.08em); }
+
+  /* primary (on light) */
+  .v-primary .slash { color: var(--mk-blue-600); font-weight: 600; }
+  .v-primary .meow {
+    background: linear-gradient(135deg, var(--mk-blue-700) 0%, var(--mk-blue-500) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .v-primary .caret { background: var(--mk-blue-600); }
+
+  /* dark variant */
+  .v-dark .slash { color: var(--mk-accent-glow); font-weight: 600; }
+  .v-dark .meow {
+    background: linear-gradient(135deg, var(--mk-accent-soft) 0%, var(--mk-accent-glow) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .v-dark .caret { background: var(--mk-accent-glow); }
+
+  /* reverse (on brand blue) */
+  .v-rev { color: #fff; }
+  .v-rev .slash { color: #fff; font-weight: 600; }
+  .v-rev .meow { color: #fff; }
+  .v-rev .caret { background: #fff; }
+
+  /* mono ink */
+  .v-mono .slash { color: var(--mk-neutral-900); font-weight: 600; }
+  .v-mono .meow  { color: var(--mk-neutral-900); }
+  .v-mono .caret { background: var(--mk-neutral-900); }
+</style>
+</head>
+<body>
+  <div class="tile light">
+    <span class="sm v-primary"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
+    <span class="lbl">PRIMARY · LIGHT</span>
+  </div>
+  <div class="tile dark">
+    <span class="sm v-dark"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
+    <span class="lbl">PRIMARY · DARK</span>
+  </div>
+  <div class="tile brand">
+    <span class="sm v-rev"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
+    <span class="lbl">REVERSE · ON BRAND</span>
+  </div>
+  <div class="tile light">
+    <span class="sm v-mono"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
+    <span class="lbl">MONO · INK</span>
+  </div>
+</body>
+</html>

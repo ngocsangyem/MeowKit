@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Colors — Surfaces (Light vs Dark)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px; display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .pane { border-radius: 12px; overflow: hidden; border: 1px solid var(--mk-border-subtle); }
+  .pane-h { padding: 8px 12px; font-family: var(--mk-font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; }
+  .stack { display: grid; grid-template-rows: 1fr 1fr 1fr; height: 210px; }
+  .stack .s { display:flex; align-items:center; justify-content:space-between; padding: 0 14px; font-size: 12px; font-family: var(--mk-font-mono); }
+
+  .light .pane-h { background: #fff; color: #0F172A; border-bottom: 1px solid #E2E8F0; }
+  .light .s1 { background: #F8FAFC; color: #0F172A; }
+  .light .s2 { background: #FFFFFF; color: #334155; border-top: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; }
+  .light .s3 { background: #F1F5F9; color: #334155; }
+
+  .dk .pane-h { background: #0F172A; color: #F8FAFC; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .dk .s1 { background: #0F172A; color: #F8FAFC; }
+  .dk .s2 { background: #1E293B; color: #94A3B8; border-top: 1px solid rgba(255,255,255,.08); border-bottom: 1px solid rgba(255,255,255,.08);}
+  .dk .s3 { background: #1E3A5F; color: #F8FAFC; }
+</style>
+</head>
+<body>
+  <div class="pane light">
+    <div class="pane-h">Light</div>
+    <div class="stack">
+      <div class="s s1"><span>base</span><span>#F8FAFC</span></div>
+      <div class="s s2"><span>surface</span><span>#FFFFFF</span></div>
+      <div class="s s3"><span>soft / code</span><span>#F1F5F9</span></div>
+    </div>
+  </div>
+  <div class="pane dk">
+    <div class="pane-h">Dark · hero</div>
+    <div class="stack">
+      <div class="s s1"><span>base</span><span>#0F172A</span></div>
+      <div class="s s2"><span>surface</span><span>#1E293B</span></div>
+      <div class="s s3"><span>soft · deep-space</span><span>#1E3A5F</span></div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MeowKit — Logo Wireframes (pure line art)</title>
+<style>
+  :root {
+    --ink: #111;
+    --mute: #888;
+    --bg: #fafafa;
+    --card: #fff;
+  }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  body { padding: 28px; max-width: 1180px; margin: 0 auto; }
+  h1 { font-family: system-ui, sans-serif; font-weight: 500; font-size: 20px; margin: 0 0 4px; }
+  h1 small { color: var(--mute); font-weight: 400; font-size: 12px; margin-left: 10px; }
+  .lede { font-family: system-ui, sans-serif; font-size: 13px; color: #555; max-width: 780px; line-height: 1.55; margin: 0 0 24px; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+
+  .card { background: var(--card); border: 1px dashed #999; border-radius: 10px; padding: 20px 18px 14px; position: relative; min-height: 230px; display: flex; flex-direction: column; gap: 12px; }
+  .card .tag { position: absolute; top: -9px; left: 14px; background: var(--bg); padding: 0 8px; font-size: 11px; color: #666; letter-spacing: .1em; text-transform: uppercase; }
+  .card .stage { flex: 1; display: grid; place-items: center; padding: 6px 0; }
+  .card .meta { font-family: system-ui, sans-serif; font-size: 11px; color: #555; line-height: 1.5; border-top: 1px dashed #ddd; padding-top: 10px; }
+
+  /* Uniform wireframe stroke spec */
+  svg.wf { width: 140px; height: 140px; }
+  svg.wf * {
+    fill: none !important;
+    stroke: #111 !important;
+    stroke-width: 3 !important;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  /* tiny filled dots still readable as line art: dots only allowed where circle radius <= 2 */
+  svg.wf .dot {
+    fill: #111 !important;
+    stroke: none !important;
+  }
+
+  /* type-based marks: contour-only versions using outline */
+  .type-wf {
+    font-family: ui-monospace, monospace;
+    font-size: 48px;
+    color: transparent;
+    -webkit-text-stroke: 1.5px #111;
+    text-stroke: 1.5px #111;
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+  .type-wf.sm { font-size: 38px; }
+
+  .note { margin-top: 24px; font-family: system-ui, sans-serif; font-size: 11px; color: #666; line-height: 1.5; max-width: 820px; }
+</style>
+</head>
+<body>
+  <h1>MeowKit logo wireframes <small>option A · pure line art · uniform 3px stroke · no fills</small></h1>
+  <p class="lede">
+    Strict wireframe pass of all 9 concepts. Everything is contour-only — no filled shapes, no color, no blinking caret, no decoration. Same stroke weight across all marks so proportions can be judged on equal footing.
+  </p>
+
+  <div class="grid">
+
+    <!-- 01 · Gate Glyph -->
+    <div class="card">
+      <span class="tag">01 · Gate Glyph</span>
+      <div class="stage">
+        <svg class="wf" viewBox="0 0 120 120">
+          <path d="M22 40 L36 14 L50 40"/>
+          <path d="M70 40 L84 14 L98 40"/>
+          <path d="M28 66 L60 50 L92 66"/>
+          <path d="M28 92 L60 76 L92 92"/>
+        </svg>
+      </div>
+      <div class="meta">Two chevrons = Gate 1 + Gate 2. Ears as open triangles.</div>
+    </div>
+
+    <!-- 02 · Phase Ring -->
+    <div class="card">
+      <span class="tag">02 · Phase Ring</span>
+      <div class="stage">
+        <svg class="wf" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="44"/>
+          <line x1="60" y1="8"   x2="60" y2="22"/>
+          <line x1="101" y1="26" x2="91" y2="36"/>
+          <line x1="112" y1="60" x2="98" y2="60"/>
+          <line x1="101" y1="94" x2="91" y2="84"/>
+          <line x1="60" y1="112" x2="60" y2="98"/>
+          <line x1="19" y1="94"  x2="29" y2="84"/>
+          <line x1="8"  y1="60"  x2="22" y2="60"/>
+          <circle cx="50" cy="56" r="2" class="dot"/>
+          <circle cx="70" cy="56" r="2" class="dot"/>
+          <path d="M54 70 Q60 74 66 70"/>
+        </svg>
+      </div>
+      <div class="meta">Dial with 7 ticks (7 phases). Minimal face inside — only 2px dots for eyes.</div>
+    </div>
+
+    <!-- 03 · Brace Cat -->
+    <div class="card">
+      <span class="tag">03 · Brace Cat</span>
+      <div class="stage">
+        <svg class="wf" viewBox="0 0 180 120">
+          <!-- left brace -->
+          <path d="M40 18 Q24 18 24 40 Q24 58 14 60 Q24 62 24 80 Q24 102 40 102"/>
+          <!-- right brace -->
+          <path d="M140 18 Q156 18 156 40 Q156 58 166 60 Q156 62 156 80 Q156 102 140 102"/>
+          <!-- eyes -->
+          <circle cx="72" cy="54" r="2" class="dot"/>
+          <circle cx="108" cy="54" r="2" class="dot"/>
+          <!-- mouth ⌃ -->
+          <path d="M82 76 L90 68 L98 76"/>
+        </svg>
+      </div>
+      <div class="meta"><code>{ :3 }</code> — braces drawn as outlines, eyes as dots, mouth as open caret.</div>
+    </div>
+
+    <!-- 04 · Slash-Meow Prompt -->
+    <div class="card">
+      <span class="tag">04 · Slash-Meow Prompt</span>
+      <div class="stage">
+        <svg class="wf" viewBox="0 0 220 80">
+          <!-- slash -->
+          <line x1="20" y1="66" x2="44" y2="14"/>
+          <!-- M -->
+          <path d="M56 62 L56 18 L70 42 L84 18 L84 62"/>
+          <!-- e -->
+          <path d="M96 46 Q96 30 112 30 Q126 30 126 44 L96 44 Q96 62 112 62 Q122 62 126 54"/>
+          <!-- o -->
+          <ellipse cx="148" cy="46" rx="14" ry="16"/>
+          <!-- w -->
+          <path d="M170 30 L176 62 L186 40 L196 62 L202 30"/>
+          <!-- caret box -->
+          <rect x="208" y="30" width="8" height="32"/>
+        </svg>
+      </div>
+      <div class="meta"><code>/meow</code> + caret, drawn as single-stroke contours.</div>
+    </div>
+
+    <!-- 05 · Paw-Grid -->
+    <div class="card">
+      <span class="tag">05 · Paw-Grid</span>
+      <div class="stage">
+        <svg class="wf" viewBox="0 0 120 120">
+          <!-- 4 toe cells -->
+          <rect x="16" y="20" width="18" height="22" rx="9"/>
+          <rect x="40" y="10" width="18" height="22" rx="9"/>
+          <rect x="62" y="10" width="18" height="22" rx="9"/>
+          <rect x="86" y="20" width="18" height="22" rx="9"/>
+          <!-- pad (rounded rect) -->
+          <path d="M30 60 Q30 52 40 52 L80 52 Q90 52 90 60 L90 96 Q90 108 75 108 L45 108 Q30 108 30 96 Z"/>
+          <!-- internal grid ticks to hint "kit of cells" -->
+          <line x1="48" y1="60" x2="48" y2="104" stroke-dasharray="2 4"/>
+          <line x1="60" y1="60" x2="60" y2="104" stroke-dasharray="2 4"/>
+          <line x1="72" y1="60" x2="72" y2="104" stroke-dasharray="2 4"/>
+        </svg>
+      </div>
+      <div class="meta">Four toe cells + a pad contour. Internal dashed ticks hint the grid.</div>
+    </div>
+
+    <!-- 06 · Check-Ear -->
+    <div class="card">
+      <span class="tag">06 · Check-Ear</span>
+      <div class="stage">
+        <svg class="wf" viewBox="0 0 120 120">
+          <path d="M18 46 L30 18 L46 46"/>
+          <path d="M74 46 L90 18 L102 46"/>
+          <path d="M22 72 L50 98 L100 48"/>
+        </svg>
+      </div>
+      <div class="meta">Gate checkmark with ear triangles. Outline only.</div>
+    </div>
+
+    <!-- 07 · ASCII Cat -->
+    <div class="card">
+      <span class="tag">07 · ASCII Cat</span>
+      <div class="stage">
+        <div class="type-wf">=^··^=</div>
+      </div>
+      <div class="meta">Terminal cat, rendered as hollow glyph outlines.</div>
+    </div>
+
+    <!-- 08 · Kitbox -->
+    <div class="card">
+      <span class="tag">08 · Kitbox</span>
+      <div class="stage">
+        <svg class="wf" viewBox="0 0 140 120">
+          <!-- ears -->
+          <path d="M30 32 L42 12 L54 32"/>
+          <path d="M86 32 L98 12 L110 32"/>
+          <!-- box -->
+          <rect x="18" y="32" width="104" height="72" rx="8"/>
+          <!-- handle -->
+          <path d="M56 32 Q70 18 84 32"/>
+          <!-- eyes -->
+          <circle cx="56" cy="64" r="2" class="dot"/>
+          <circle cx="84" cy="64" r="2" class="dot"/>
+          <!-- divider -->
+          <line x1="50" y1="82" x2="90" y2="82"/>
+        </svg>
+      </div>
+      <div class="meta">Toolkit silhouette + ear triangles + dot eyes. Pure outline.</div>
+    </div>
+
+    <!-- 09 · Whisker Terminal -->
+    <div class="card">
+      <span class="tag">09 · Whisker Terminal</span>
+      <div class="stage">
+        <svg class="wf" viewBox="0 0 180 120">
+          <!-- ears -->
+          <path d="M58 28 L66 10 L76 28"/>
+          <path d="M104 28 L114 10 L122 28"/>
+          <!-- terminal box -->
+          <rect x="44" y="28" width="92" height="68" rx="6"/>
+          <!-- titlebar -->
+          <line x1="44" y1="42" x2="136" y2="42"/>
+          <!-- prompt > -->
+          <path d="M52 54 L60 60 L52 66"/>
+          <!-- eyes -->
+          <circle cx="86" cy="70" r="2" class="dot"/>
+          <circle cx="106" cy="70" r="2" class="dot"/>
+          <!-- whiskers L -->
+          <line x1="12" y1="58" x2="42" y2="62"/>
+          <line x1="12" y1="72" x2="42" y2="70"/>
+          <!-- whiskers R -->
+          <line x1="138" y1="62" x2="168" y2="58"/>
+          <line x1="138" y1="70" x2="168" y2="72"/>
+        </svg>
+      </div>
+      <div class="meta">Terminal window contour, prompt chevron, dot eyes, 4 whisker lines.</div>
+    </div>
+
+  </div>
+
+  <p class="note">
+    Spec: 3px uniform stroke · no fills anywhere except 2px eye-dots (needed for readability under 32px) · rounded line caps · all glyphs shown as outline-only. Ready for you to pick favorites for hi-fi.
+  </p>
+</body>
+</html>
