@@ -65,7 +65,7 @@ A complete plan showing the expected detail level for a MeowKit 7-phase implemen
 **Agent:** orchestrator  
 **Time budget:** 15 minutes
 
-- Read `memory/lessons.md` for prior billing decisions
+- Read `.claude/memory/architecture-decisions.md` (and `architecture-decisions.json`) for prior billing decisions
 - Run `meow:scout` on `src/billing/` — confirm directory doesn't exist yet
 - Run `meow:scale-routing` — confirm domain=fintech, level=high, model=COMPLEX
 - Declare: `Task complexity: COMPLEX → Opus`
@@ -165,7 +165,7 @@ Review dimensions: Correctness, Maintainability, Performance, Security, Coverage
 - Update `docs/project-context.md`: add billing domain, Stripe SDK version, webhook event list
 - Update `docs/system-architecture.md`: add subscription state machine diagram
 - `meow:memory` session-capture: log any Stripe API surprises, webhook ordering issues
-- Append `memory/lessons.md`: "Stripe webhook events arrive out of order — always check `current_period_end` before updating status"
+- Capture with `##pattern:bug-class Stripe webhook events arrive out of order — always check current_period_end before updating status` → routes to `.claude/memory/fixes.json`
 - Docs impact: major
 
 ---

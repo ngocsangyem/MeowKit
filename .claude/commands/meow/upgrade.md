@@ -41,7 +41,7 @@ Self-update MeowKit to the latest version. Preserves learned knowledge in `memor
 ### Safety
 
 - The `memory/` directory is NEVER overwritten. This ensures:
-  - `memory/lessons.md` (project learnings) persists
+  - Topic files in `.claude/memory/` (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`, `security-notes.md`) persist — project learnings live per category
   - `memory/cost-log.json` (cost history) persists
   - Any other accumulated knowledge is preserved
 - If the update fails mid-way, the previous version's files remain intact.

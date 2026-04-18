@@ -78,9 +78,10 @@ Extracted:
 **IMPORTANT:** Use cached project detection to avoid re-scanning every task.
 
 ```bash
-# 1. Check memory for cached project context (fast path):
-.claude/memory/lessons.md       # past session learnings
-.claude/memory/patterns.json    # detected patterns + frequencies
+# 1. Check topic files for cached project context (on-demand reads):
+.claude/memory/fixes.md + fixes.json                      # bug-class lessons (meow:fix)
+.claude/memory/review-patterns.md + review-patterns.json  # review/architecture patterns
+.claude/memory/architecture-decisions.md + *.json         # past architectural decisions
 
 # 2. If context is insufficient:
    -> Run meow:scout for codebase structure

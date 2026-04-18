@@ -12,7 +12,7 @@ This is the "friendly front door" to MeowKit. Users who don't know which command
 
 ### Execution Steps
 
-1. **Load context.** Read `memory/lessons.md` for project-specific learnings, patterns, and past decisions that may affect routing.
+1. **Load context.** Read the relevant topic files in `.claude/memory/` — `fixes.md` for bug-class lessons, `review-patterns.md` for review/architecture patterns, `architecture-decisions.md` for past decisions. Load on demand based on the task at hand.
 
 2. **Classify task complexity.** Analyze the task description and assign one of three tiers:
    - **Trivial** — single-file change, typo, simple config update, quick question. Route to `/meow:fix` (simple mode) or answer directly.
