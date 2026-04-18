@@ -8,8 +8,8 @@
     "build": "npm -w packages/mewkit run build",
     "lint": "eslint packages/*/src/**/*.ts",
     "typecheck": "tsc --noEmit -p packages/mewkit/tsconfig.json",
-    "format": "prettier --write \"packages/*/src/**/*.{ts,js,json}\"",
-    "format:check": "prettier --check \"packages/*/src/**/*.{ts,js,json}\"",
+    "format": "npx prettier --write \"packages/*/src/**/*.{ts,js,json}\"",
+    "format:check": "npx prettier --check \"packages/*/src/**/*.{ts,js,json}\"",
     "test": "vitest run",
     "test:watch": "vitest"
   },
