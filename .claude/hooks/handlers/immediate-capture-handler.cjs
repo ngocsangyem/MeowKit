@@ -14,7 +14,8 @@ const MEMORY_DIR = path.join(ROOT, '.claude', 'memory');
 
 const PREFIXES = {
   '##decision:': { target: 'lessons.md', type: 'decision' },
-  '##pattern:': { target: 'patterns.json', type: 'pattern' },
+  // ##pattern: is category-routed — resolved at runtime in appendToPatterns()
+  '##pattern:': { target: 'pattern-routed', type: 'pattern' },
   '##note:': { target: 'quick-notes.md', type: 'note' },
 };
 
@@ -70,18 +71,36 @@ function appendToLessons(id, date, keywords, content) {
   }
 }
 
-function appendToPatterns(id, date, keywords, content) {
+// Resolve the correct split file for ##pattern: captures.
+// Routing: bug-class category → fixes.json, decision → architecture-decisions.json,
+// all other (default) → review-patterns.json.
+function resolvePatternFile(category) {
+  if (category === 'bug-class') return 'fixes.json';
+  if (category === 'decision') return 'architecture-decisions.json';
+  return 'review-patterns.json';
+}
+
+function appendToPatterns(id, date, keywords, content, category) {
+  const targetFile = resolvePatternFile(category || 'pattern');
   const lockDir = path.join(MEMORY_DIR, '.patterns.lock');
-  if (!acquireLock(lockDir, 3)) return false;
+  if (!acquireLock(lockDir, 3)) return { ok: false, target: targetFile };
   try {
-    const filePath = path.join(MEMORY_DIR, 'patterns.json');
-    let data = { version: '1.0.0', patterns: [], metadata: {} };
-    try { data = JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch { /* init */ }
+    const filePath = path.join(MEMORY_DIR, targetFile);
+    let data = { version: '2.0.0', scope: targetFile.replace('.json', ''), consumer: '', patterns: [], metadata: {} };
+    try {
+      const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      // Validate scope field to prevent cross-file writes
+      if (parsed.scope && parsed.scope !== data.scope) {
+        process.stderr.write(`appendToPatterns: scope mismatch — expected ${data.scope}, got ${parsed.scope}\n`);
+        return { ok: false, target: targetFile };
+      }
+      data = parsed;
+    } catch { /* init with skeleton */ }
 
     data.patterns.push({
       id,
-      type: 'success',
-      category: 'pattern',
+      type: category === 'bug-class' ? 'failure' : 'success',
+      category: category || 'pattern',
       severity: 'standard',
       domain: keywords,
       applicable_when: content.split('\n')[0].substring(0, 120),
@@ -91,9 +110,10 @@ function appendToPatterns(id, date, keywords, content) {
       lastSeen: date,
     });
 
+    if (!data.metadata) data.metadata = {};
     data.metadata.last_updated = date;
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-    return true;
+    return { ok: true, target: targetFile };
   } finally {
     releaseLock(lockDir);
   }
@@ -130,8 +150,13 @@ module.exports = function immediateCapture(ctx) {
 
     if (config.target === 'lessons.md') {
       ok = appendToLessons(id, date, keywords.length > 0 ? keywords : ['uncategorized'], content);
-    } else if (config.target === 'patterns.json') {
-      ok = appendToPatterns(id, date, keywords.length > 0 ? keywords : ['uncategorized'], content);
+    } else if (config.target === 'pattern-routed') {
+      // Category extracted from first word after prefix if present (e.g. "##pattern:bug-class ...")
+      const firstWord = content.split(/\s+/)[0].toLowerCase();
+      const category = ['bug-class', 'decision', 'pattern'].includes(firstWord) ? firstWord : 'pattern';
+      const result = appendToPatterns(id, date, keywords.length > 0 ? keywords : ['uncategorized'], content, category);
+      ok = result.ok;
+      return ok ? `✓ Captured ${config.type} → ${result.target}` : '';
     } else {
       ok = appendToQuickNotes(date, content);
     }
