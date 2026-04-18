@@ -18,7 +18,6 @@
     "./handlers/orientation-ritual.cjs"
   ],
   "UserPromptSubmit": [
-    "./handlers/immediate-capture-handler.cjs",
-    "./handlers/memory-loader.cjs"
+    "./handlers/immediate-capture-handler.cjs"
   ]
 }

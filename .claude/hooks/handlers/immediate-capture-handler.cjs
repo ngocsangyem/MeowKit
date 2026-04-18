@@ -6,8 +6,45 @@ const fs = require('fs');
 const path = require('path');
 
 const { validateContent } = require('../lib/validate-content.cjs');
-const { extractKeywords } = require('./memory-parser.cjs');
-const { escapeMemoryContent } = require('./memory-injector.cjs');
+
+// Inlined from memory-parser.cjs (deleted in phase-03) — extracts domain keywords from prompt text.
+function extractKeywords(prompt) {
+  if (!prompt) return [];
+  const STOP_WORDS = new Set([
+    'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+    'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
+    'should', 'may', 'might', 'can', 'shall', 'must', 'need', 'to', 'of',
+    'in', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'into', 'about',
+    'it', 'its', 'this', 'that', 'these', 'those', 'my', 'your', 'his',
+    'her', 'we', 'they', 'them', 'our', 'i', 'me', 'you', 'he', 'she',
+    'and', 'or', 'but', 'not', 'no', 'if', 'then', 'so', 'just', 'also',
+    'how', 'what', 'when', 'where', 'why', 'which', 'who', 'all', 'each',
+    'some', 'any', 'new', 'please', 'help', 'want', 'make',
+    'get', 'set', 'run', 'let', 'try', 'see', 'now', 'here',
+    'implement', 'create', 'update', 'delete', 'remove',
+  ]);
+  const DOMAIN_KEYWORDS = new Set([
+    'api', 'auth', 'db', 'sql', 'tls', 'ssl', 'css', 'html', 'jwt',
+    'oauth', 'cors', 'xss', 'csrf', 'rls', 'ssr', 'ssg', 'isr',
+    'grpc', 'rest', 'graphql', 'websocket', 'redis', 'postgres',
+    'vue', 'react', 'swift', 'kotlin', 'python', 'typescript',
+    'docker', 'k8s', 'nginx', 'supabase', 'prisma', 'zod',
+    'change', 'fix', 'add', 'use',
+  ]);
+  return prompt
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .split(/\s+/)
+    .filter((w) => {
+      if (DOMAIN_KEYWORDS.has(w)) return true;
+      return w.length > 2 && !STOP_WORDS.has(w);
+    });
+}
+
+// Inlined from memory-injector.cjs (deleted in phase-03) — escapes memory-data tags.
+function escapeMemoryContent(text) {
+  return text.replace(/<\/?memory-data[^>]*>/gi, (m) => m.replace(/</g, '&lt;'));
+}
 
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const MEMORY_DIR = path.join(ROOT, '.claude', 'memory');
