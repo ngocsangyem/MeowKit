@@ -261,6 +261,7 @@ export default withMermaid(defineConfig({
             { text: 'meow:docs-finder', link: '/reference/skills/docs-finder' },
             { text: 'meow:web-to-markdown', link: '/reference/skills/web-to-markdown' },
             { text: 'meow:sequential-thinking', link: '/reference/skills/sequential-thinking' },
+            { text: 'meow:problem-solving', link: '/reference/skills/problem-solving' },
             { text: 'meow:chom', link: '/reference/skills/chom' },
             { text: 'meow:pack', link: '/reference/skills/pack' },
           ],
