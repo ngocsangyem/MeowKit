@@ -61,8 +61,12 @@ async function copyMarkdown() {
 
 <style scoped>
 .copy-as-markdown {
-  float: right;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 10;
   margin-top: 4px;
+  margin-bottom: 0.75rem;
 }
 
 .copy-btn {
@@ -77,8 +81,11 @@ async function copyMarkdown() {
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
+  pointer-events: auto;
   transition: all 0.2s ease;
   line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .copy-btn:hover {
