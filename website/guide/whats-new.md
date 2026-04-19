@@ -12,6 +12,14 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.4.6 — meow:ship Cleanup + Design Review Checklist (2026-04-19)
+
+`meow:ship` drops unused Codex (OpenAI CLI) integration, fixes broken bash in the preamble, and removes phantom slash-command references. `meow:review` gains a lite design-review checklist — source-level pattern detection for frontend diffs, adapted from gstack with additions from claudekit-engineer and everything-claude-code.
+
+- New `meow:review/design-checklist.md` — six categories (AI Slop, Typography, Spacing, Interaction States, DESIGN.md Violations, Strategic Omissions) with `[HIGH]` / `[MEDIUM]` / `[LOW]` confidence tiers for grep-actionable pattern detection.
+- `meow:ship` large-diff review is now Claude-only: 2 passes (structured + adversarial subagent) replacing the prior 4-pass cross-model scheme that depended on an uninstalled CLI.
+- Phantom skill refs cleaned — `/qa-only`, `/plan-design-review`, `/design-review` removed from `meow:ship`; `design-review-lite` fake-skill log tag renamed to honest `"source":"ship-design-check"`; two preamble bash syntax errors fixed.
+
 ### v2.4.5 — The Thinking Skills Release (2026-04-19)
 
 New `meow:problem-solving` skill with seven strategic-unsticking techniques, plus three diagnostic framework references added to `meow:sequential-thinking`. Clear boundary: problem-solving for "stuck on approach", sequential-thinking for "stuck on cause". [Full notes →](/guide/whats-new/v2.4.5)

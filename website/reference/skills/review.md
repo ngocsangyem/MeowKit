@@ -93,6 +93,8 @@ Loaded from: `references/iterative-evaluation-protocol.md`
 - **Reviewing diff without full context**: Approving a change that breaks an unstated invariant → Always read the surrounding file, not just the diff hunks
 - **Style nits hiding real bugs**: 10 comments about formatting, zero about the missing null check → Prioritize: security > correctness > performance > style
 - **Iterative mode on trivial code**: Only use for payments, auth, security, or public APIs. Standard review is one-shot.
+- **Design checklist fires only on frontend diffs**: `design-checklist.md` runs only when `meowkit-diff-scope` reports `SCOPE_FRONTEND=true`. Backend-only, config-only, or prompt-only PRs skip it silently. If you expect design findings and see none, check whether the diff actually touched frontend files.
+- **Design checklist is source-pattern-based, not visual**: It grep-detects anti-patterns (purple gradients, `outline: none`, `!important`, skip-to-content absence). It does NOT render the UI or compare screenshots. `[LOW]` tier items especially need human visual verification — treat them as "possible" hints, not findings.
 
 ## Related
 

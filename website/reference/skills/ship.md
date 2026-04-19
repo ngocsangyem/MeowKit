@@ -15,7 +15,7 @@ Automated ship pipeline with official/beta modes, adversarial review, issue link
 
 - **Ship mode detection** — `official` targets main/master, `beta` targets dev/beta, auto-detected from branch name
 - **Full test + coverage audit** — Runs all tests, triages in-branch vs pre-existing failures, generates coverage diagram, writes missing tests
-- **Auto-scaled adversarial review** — Small diffs skipped, medium diffs get cross-model challenge, large diffs get full multi-pass
+- **Auto-scaled adversarial review (Claude-only)** — Small diffs skip adversarial; medium diffs get a Claude adversarial subagent pass; large diffs run Claude structured + Claude adversarial subagent (2 passes)
 - **Issue linking** — Searches GitHub for related issues by branch keywords, creates tracking issues if none found
 - **Version bump + changelog** — Auto-detects version file, bumps appropriately, generates categorized changelog
 - **PR creation with edit support** — Creates PR via `gh`, or edits existing PR if one already exists
@@ -98,6 +98,8 @@ Output summary after completion:
 
 - **Version bump conflicts in monorepo**: Multiple packages bump the same version file → Use per-package VERSION files; bump only the package being shipped
 - **CI passing locally but failing remotely**: Local env has different Node version or env vars → Always verify CI status after push; don't merge on local-only results
+- **Adversarial review is Claude-only**: Large-diff reviews run 2 passes (Claude structured + Claude adversarial subagent). No cross-model review is invoked.
+- **Inline lite design check runs only on frontend diffs**: The pre-landing review block calls `meowkit-diff-scope`. If `SCOPE_FRONTEND=false` the design check skips silently. If true, it reads [`meow:review/design-checklist.md`](/reference/skills/review) and applies the 6-category pattern scan. Findings join the Fix-First flow (AUTO-FIX vs ASK vs visual-only).
 
 ## Related
 

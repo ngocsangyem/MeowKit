@@ -15,6 +15,31 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.4.6 (2026-04-19) — meow:ship Cleanup + Design Review Checklist
+
+### Highlights
+
+`meow:ship` drops its unused Codex (OpenAI CLI) integration, fixes broken bash in the preamble, and removes phantom slash-command references. `meow:review` gains a lite design-review checklist — source-level pattern detection for frontend diffs, adapted from gstack with additions from claudekit-engineer (Strategic Omissions, Fix Priority Order) and everything-claude-code (anti-template patterns).
+
+### Improvements
+
+- `meow:review/design-checklist.md` — new lite design-review reference with six categories (AI Slop Detection, Typography, Spacing & Layout, Interaction States, DESIGN.md Violations, Strategic Omissions) and a three-tier confidence system (`[HIGH]` / `[MEDIUM]` / `[LOW]`) for grep-actionable pattern detection.
+- `meow:ship` large-diff adversarial review is now Claude-only — two passes (Claude structured + Claude adversarial subagent) replace the prior four-pass cross-model scheme that depended on an uninstalled external CLI.
+- `meow:ship` and `meow:review` Gotchas sections document the scope-gated frontend trigger on the design check and the source-pattern-only limitation (no visual rendering).
+
+### Removals
+
+- Codex (OpenAI CLI) integration removed from `meow:ship` — `codex exec`, `codex review`, and `which codex` guards dropped across five reference files. Claude adversarial subagent was already the runtime fallback.
+- Phantom slash-command references removed from `meow:ship` — `/qa-only`, `/plan-design-review`, and `/design-review` (none exist as meowkit skills). The plan-verification step now emits a post-ship reminder to run `/meow:qa` against the deployed build instead of attempting to invoke a missing skill.
+- `design-review-lite` as a fake skill-name in the review-log schema — renamed to `"source":"ship-design-check"` so the readiness dashboard no longer pretends a non-existent skill produced the entry.
+
+### Bug Fixes
+
+- `meow:ship/references/preamble.md` — two bash syntax errors fixed (unterminated `$(# comment)` upgrade-check and orphan `for...done` with a comment-eaten `done`). `bash -n` now passes on every code block; prior runs silently failed before any shipping work started.
+- `meow:ship/references/plan-completion-audit.md` — the dead `/qa-only` invocation that silently failed every run is replaced with a one-line reminder to run `/meow:qa` against the deployed build.
+
+---
+
 ## 2.4.5 (2026-04-19) — The Thinking Skills Release
 
 ### Highlights
