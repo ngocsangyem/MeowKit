@@ -180,3 +180,5 @@ If verdict is WARN with coverage gaps → suggest `pre-mortem`.
 - **Reviewing diff without full context**: Approving a change that breaks an unstated invariant → Always read the surrounding file, not just the diff hunks
 - **Style nits hiding real bugs**: 10 comments about formatting, zero about the missing null check → Prioritize: security > correctness > performance > style
 - **Skipping scout on large diffs**: When 5+ files changed, blind review misses cross-file interaction bugs → Run scout first
+- **Design checklist fires only on frontend diffs**: `design-checklist.md` runs only when `meowkit-diff-scope` reports `SCOPE_FRONTEND=true`. Backend-only / config-only / prompt-only PRs skip it silently. If you expect design findings and see none, check whether the diff actually touched frontend files.
+- **Design checklist is source-pattern-based, not visual**: It grep-detects anti-patterns (purple gradients, `outline: none`, `!important`, skip-to-content absence). It does NOT render the UI or compare screenshots. `[LOW]` tier items especially need human visual verification — treat them as "possible" hints, not findings.

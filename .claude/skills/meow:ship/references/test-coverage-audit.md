@@ -195,7 +195,7 @@ Coverage line: `Test Coverage Audit: N new code paths. M covered (X%). K tests g
 
 ### Test Plan Artifact
 
-After producing the coverage diagram, write a test plan artifact so `/meow:qa` and `/qa-only` can consume it:
+After producing the coverage diagram, write a test plan artifact so `/meow:qa` can consume it:
 
 ```bash
 eval "$(.claude/scripts/bin/meowkit-slug 2>/dev/null)" && mkdir -p .claude/memory/projects

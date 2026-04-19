@@ -73,7 +73,7 @@ After completing the review, read the review log and config to display the dashb
 .claude/scripts/bin/meowkit-review-log
 ```
 
-Parse the output. Find the most recent entry for each skill (plan-ceo-review, plan-ceo-review, review, plan-design-review, design-review-lite, adversarial-review, codex-review, codex-plan-review). Ignore entries with timestamps older than 7 days. For the Eng Review row, show whichever is more recent between `review` (diff-scoped pre-landing review) and `plan-ceo-review` (plan-stage architecture review). Append "(DIFF)" or "(PLAN)" to the status to distinguish. For the Adversarial row, show whichever is more recent between `adversarial-review` (new auto-scaled) and `codex-review` (legacy). For Design Review, show whichever is more recent between `plan-design-review` (full visual audit) and `design-review-lite` (code-level check). Append "(FULL)" or "(LITE)" to the status to distinguish. Display:
+Parse the output. Match entries by `skill` field for real skills (`plan-ceo-review`, `review`, `adversarial-review`) and by `source` field for inline ship steps (`ship-design-check`). Ignore entries with timestamps older than 7 days. For the Eng Review row, show whichever is more recent between `review` (diff-scoped pre-landing review) and `plan-ceo-review` (plan-stage architecture review). Append "(DIFF)" or "(PLAN)" to the status to distinguish. For the Adversarial row, use `adversarial-review` (auto-scaled). For Design Review, use `ship-design-check` (inline lite check produced during pre-landing review). Display:
 
 ```
 +====================================================================+
@@ -96,14 +96,14 @@ Parse the output. Find the most recent entry for each skill (plan-ceo-review, pl
 - **Eng Review (required by default):** The only review that gates shipping. Covers architecture, code quality, tests, performance. Can be disabled globally with `meowkit-config set skip_eng_review true` (the "don't bother me" setting).
 - **CEO Review (optional):** Use your judgment. Recommend it for big product/business changes, new user-facing features, or scope decisions. Skip for bug fixes, refactors, infra, and cleanup.
 - **Design Review (optional):** Use your judgment. Recommend it for UI/UX changes. Skip for backend-only, infra, or prompt-only changes.
-- **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get cross-model adversarial. Large diffs (200+) get all 4 passes: Claude structured, Codex structured, Claude adversarial subagent, Codex adversarial. No configuration needed.
-- **Outside Voice (optional):** Independent plan review from a different AI model. Offered after all review sections complete in /meow:plan-ceo-review and /meow:plan-ceo-review. Falls back to Claude subagent if Codex is unavailable. Never gates shipping.
+- **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get Claude adversarial subagent. Large diffs (200+) get 2 passes: Claude structured (from pre-landing review) + Claude adversarial subagent. No configuration needed.
+- **Outside Voice (optional):** Independent plan review via Claude adversarial subagent. Offered after all review sections complete in /meow:plan-ceo-review. Never gates shipping.
 
 **Verdict logic:**
 
 - **CLEARED**: Eng Review has >= 1 entry within 7 days from either `review` or `plan-ceo-review` with status "clean" (or `skip_eng_review` is `true`)
 - **NOT CLEARED**: Eng Review missing, stale (>7 days), or has open issues
-- CEO, Design, and Codex reviews are shown for context but never block shipping
+- CEO and Design reviews are shown for context but never block shipping
 - If `skip_eng_review` config is `true`, Eng Review shows "SKIPPED (global)" and verdict is CLEARED
 
 **Staleness detection:** After displaying the dashboard, check if any existing reviews may be stale:
@@ -129,7 +129,7 @@ If the Eng Review is NOT "CLEAR":
    - RECOMMENDATION: Choose C if the change is obviously trivial (< 20 lines, typo fix, config-only); Choose B for larger changes
    - Options: A) Ship anyway B) Abort — run /meow:review first C) Change is too small to need eng review
    - If CEO Review is missing, mention as informational ("CEO Review not run — recommended for product changes") but do NOT block
-   - For Design Review: run `source <(.claude/scripts/bin/meowkit-diff-scope <base> 2>/dev/null)`. If `SCOPE_FRONTEND=true` and no design review (plan-design-review or design-review-lite) exists in the dashboard, mention: "Design Review not run — this PR changes frontend code. The lite design check will run automatically in Step 3.5, but consider running /design-review for a full visual audit post-implementation." Still never block.
+   - For Design Review: run `source <(.claude/scripts/bin/meowkit-diff-scope <base> 2>/dev/null)`. If `SCOPE_FRONTEND=true` and no `ship-design-check` entry exists in the dashboard, mention: "Design Review not run — this PR changes frontend code. The inline lite design check runs automatically during pre-landing review." Still never block.
 
 3. **If the user chooses A or C,** persist the decision so future `/meow:ship` runs on this branch skip the gate:
    ```bash

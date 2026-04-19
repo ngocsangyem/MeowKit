@@ -3,8 +3,6 @@
 ## Preamble (run first)
 
 ```bash
-_UPD=$(# update-check removed — MeowKit uses npx meowkit upgrade 2>/dev/null || # removed — use npx meowkit upgrade 2>/dev/null || true)
-[ -n "$_UPD" ] && echo "$_UPD" || true
 mkdir -p .claude/memory/sessions
 touch .claude/memory/sessions/"$PPID"
 _SESSIONS=$(find .claude/memory/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
@@ -27,14 +25,10 @@ echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p .claude/memory
 echo '{"skill":"ship","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .claude/memory/skill-usage.jsonl 2>/dev/null || true
-# zsh-compatible: use find instead of glob to avoid NOMATCH error
-for _PF in $(find .claude/memory -maxdepth 1 -name '.pending-*' 2>/dev/null); do [ -f "$_PF" ] && # telemetry removed — MeowKit uses analyst agent --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest MeowKit skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
-
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `# upgrade removed — use npx meowkit upgrade` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running MeowKit v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "MeowKit follows the **Boil the Lake** principle — always do the complete
@@ -213,34 +207,6 @@ ATTEMPTED: [what you tried]
 RECOMMENDATION: [what the user should do next]
 ```
 
-## Telemetry (run last)
-
-After the skill workflow completes (success, error, or abort), log the telemetry event.
-Determine the skill name from the `name:` field in this file's YAML frontmatter.
-Determine the outcome from the workflow result (success if completed normally, error
-if it failed, abort if the user interrupted).
-
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
-`.claude/memory/` (user config directory, not project files). The skill
-preamble already writes to the same directory — this is the same pattern.
-Skipping this command loses session duration and outcome data.
-
-Run this bash:
-
-```bash
-_TEL_END=$(date +%s)
-_TEL_DUR=$(( _TEL_END - _TEL_START ))
-rm -f .claude/memory/.pending-"$_SESSION_ID" 2>/dev/null || true
-# telemetry removed — MeowKit uses analyst agent \
-  --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
-  --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
-```
-
-Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with
-success/error/abort, and `USED_BROWSE` with true/false based on whether `$B` was used.
-If you cannot determine the outcome, use "unknown". This runs in the background and
-never blocks the user.
-
 ## Plan Status Footer
 
 When you are in plan mode and about to call ExitPlanMode:
@@ -266,8 +232,7 @@ Then write a `## MEOWKIT REVIEW REPORT` section to the end of the plan file:
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/meow:plan-ceo-review` | Scope & strategy | 0 | — | — |
-| Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
-| Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
+| Design Review | inline lite check during `/meow:ship` pre-landing review | UI/UX gaps | 0 | — | — |
 
 **VERDICT:** NO REVIEWS YET — run `/autoplan` for full review pipeline, or individual reviews above.
 ```
