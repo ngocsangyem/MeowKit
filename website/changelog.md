@@ -16,6 +16,31 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.5.1 (2026-04-20) — meow:henshin
+
+### Highlights
+
+New cross-cutting skill `meow:henshin` — planning front door for transforming existing code into agent-consumable surfaces (CLI + MCP server + companion skill). Adapted from `claudekit-engineer/agentize` (tier 2). Produces a **Transformation Spec** and hands off to `/meow:plan-creator` → `/meow:cook` for the build. Not a builder on its own.
+
+### New Skills
+
+- `meow:henshin` — 6-phase planning workflow: Discover → Inventory → Capability Map → **HARD GATE** → Spec Write → Handoff. Non-bypassable human approval for package name, license, and ownership (business decisions); `--auto` and `--lean` never skip these. Writes an architectural decision record to `.claude/memory/architecture-decisions.md` with `##decision:` prefix. Ships 5 progressive-disclosure references under 200 lines each (`agent-centric-design`, `auth-resolution-chain`, `mcp-transports`, `monorepo-layout`, `challenge-framework`).
+- **Boundary vs `meow:chom`** — henshin is **outbound** (local code → agent surfaces); chom is **inbound** (external repo → local project). No semantic overlap. Paste a GitHub URL into henshin and the Error Recovery section redirects to chom.
+- Triggers on `agentize`, `henshin`, `expose as MCP`, `wrap as CLI`, `publish to npm`, `make LLM-accessible`, `turn into agent tool`.
+
+### Bug Fixes
+
+- `meow:henshin/references/mcp-transports.md` — SSE code snippet rewrote to use Express + a per-session transport map. Previous snippet mixed Hono-style `c.res` with a Node.js `ServerResponse` constructor, producing a copy-paste type error in Hono environments, plus a scope leak where a single `t` served multiple clients.
+- `meow:henshin/references/monorepo-layout.md` — `commander` dependency bumped from `^12.0.0` to `^14.0.0` (current major).
+
+### Documentation
+
+- New per-skill reference page: [/reference/skills/henshin](/reference/skills/henshin).
+- [/guide/agent-skill-architecture](/guide/agent-skill-architecture) — henshin added to the Cross-Cutting Skills and Quick-Start tables.
+- [/guide/whats-new](/guide/whats-new) — v2.5.1 entry with workflow summary and boundary rationale.
+
+---
+
 ## 2.5.0 (2026-04-19) — The Native Fit Release
 
 ### Highlights

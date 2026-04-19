@@ -12,6 +12,16 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.5.1 — meow:henshin (2026-04-20)
+
+New cross-cutting skill `meow:henshin` — planning front door for wrapping existing code as agent-consumable surfaces. Adapted from `claudekit-engineer/agentize` (tier 2). Produces a **Transformation Spec** (CLI + MCP + companion skill shape) and hands off to `meow:plan-creator` → `meow:cook`. Does not build, scaffold, or publish on its own.
+
+- 6-phase workflow: discover → inventory → capability map → HARD GATE (package name / license / ownership) → spec write → handoff.
+- Boundary vs `meow:chom`: henshin is **outbound** (local code → agent surfaces); chom is **inbound** (external repo → local project). No semantic overlap.
+- Writes an architectural decision record to `.claude/memory/architecture-decisions.md` with `##decision:` prefix.
+- 5 references under 200 lines: `agent-centric-design`, `auth-resolution-chain`, `mcp-transports`, `monorepo-layout`, `challenge-framework`.
+- Triggers on `agentize`, `henshin`, `expose as MCP`, `wrap as CLI`, `publish to npm`, `make LLM-accessible`.
+
 ### v2.5.0 — The Native Fit Release (2026-04-19)
 
 Installed skills stop branding themselves as MeowKit and start reading like the project's own workflow — ~70 user-facing phrases rewritten across 50+ files while real infrastructure (binaries, env vars, CLI commands) stays intact. Ships the 64-skill audit cleanup: mechanical path fixes, seven collision-cluster disambiguations, memory persistence for `meow:evaluate` / `meow:benchmark` / `meow:party`, dual-orchestrator arbitration rule, and a documented frontmatter schema. [Full notes →](/guide/whats-new/v2.5.0)

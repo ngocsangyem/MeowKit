@@ -125,6 +125,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | `meow:docs-finder` | any agent (primary: researcher) | Library/API documentation lookup |
 | `meow:multimodal` | any agent | Visual content analysis |
 | `meow:web-to-markdown` | any agent | Fetch arbitrary URLs as clean markdown — use when URL is not covered by meow:docs-finder. Static-only by default; Playwright opt-in via `mewkit setup --system-deps`. |
+| `meow:henshin` | any agent | Planning front door for wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `meow:plan-creator` → `meow:cook`. Adapted from claudekit-engineer/agentize (v1.0.0). |
 
 ## Summary
 

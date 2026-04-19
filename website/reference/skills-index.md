@@ -93,6 +93,7 @@ Source file: `.claude/agents/SKILLS_INDEX.md`
 | [scout](/reference/skills/scout) | Codebase exploration |
 | [sequential-thinking](/reference/skills/sequential-thinking) | Evidence-based hypothesis testing for root cause |
 | [problem-solving](/reference/skills/problem-solving) | Stuck on approach — strategic unsticking via 7 techniques |
+| [henshin](/reference/skills/henshin) | Wrap existing code as agent-consumable surfaces (CLI + MCP + skill) |
 
 ## Architecture Types
 

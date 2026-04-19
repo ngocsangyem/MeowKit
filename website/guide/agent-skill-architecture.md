@@ -231,6 +231,7 @@ Some skills activate across multiple phases rather than being owned by a single 
 | `docs-finder` | Any phase needing up-to-date library docs |
 | `multimodal` | Any phase with visual content or images |
 | `session-continuation` | Cross-session handoff required |
+| `henshin` | Wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `meow:plan-creator` → `meow:cook`. |
 
 ::: warning
 Cross-cutting skills are loaded by individual agents as needed — they are not globally pre-loaded. Loading them unconditionally would inflate every task's context cost.
@@ -256,6 +257,7 @@ Cross-cutting skills are loaded by individual agents as needed — they are not 
 | Run a retrospective | `meow:retro` | 6 |
 | Explore the codebase | `meow:scout` | 0 |
 | Look up library docs | `meow:docs-finder` | any |
+| Wrap existing code as agent surfaces (CLI + MCP + skill) | `meow:henshin` | any |
 
 ## Subagent Status Protocol (v1.1.0)
 

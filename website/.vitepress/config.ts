@@ -264,6 +264,7 @@ export default withMermaid(defineConfig({
             { text: 'meow:sequential-thinking', link: '/reference/skills/sequential-thinking' },
             { text: 'meow:problem-solving', link: '/reference/skills/problem-solving' },
             { text: 'meow:chom', link: '/reference/skills/chom' },
+            { text: 'meow:henshin', link: '/reference/skills/henshin' },
             { text: 'meow:pack', link: '/reference/skills/pack' },
           ],
         },
