@@ -7,6 +7,9 @@ source: vercel-labs/agent-browser
 
 # Browser Automation with agent-browser
 
+> **Use agent-browser when:** auth-heavy flows (session persistence, cookie import, MFA), visual annotated screenshots, flows that must NOT generate reusable test code.
+> **Use `meow:playwright-cli` instead when:** DOM interaction with reusable `.spec.ts` test output is desired.
+
 The CLI uses Chrome/Chromium via CDP directly. Install via `npm i -g agent-browser`, `brew install agent-browser`, or `cargo install agent-browser`. Run `agent-browser install` to download Chrome. Run `agent-browser upgrade` to update.
 
 ## Core Workflow

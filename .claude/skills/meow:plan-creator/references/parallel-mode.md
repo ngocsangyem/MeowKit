@@ -47,7 +47,7 @@ parallel_group: "A"
 - Phases in **later groups**: `addBlockedBy` the last phase of the prior group.
 - Add `parallel_group: "{letter}"` to task metadata.
 
-## Integration with MeowKit Rules
+## Integration with Project Rules
 
 Parallel phases MUST follow `parallel-execution-rules.md`:
 - Worktree isolation per agent

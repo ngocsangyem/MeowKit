@@ -1,6 +1,6 @@
 # Lifecycle Routing Table
 
-Maps task signals to MeowKit workflow phases and recommended skills.
+Maps task signals to workflow phases and recommended skills.
 Advisory only — does not change agent-detector scoring or output format.
 
 ## Discovery Tree

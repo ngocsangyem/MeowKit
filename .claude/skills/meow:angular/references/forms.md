@@ -405,8 +405,6 @@ async onSubmit() {
 ## Advanced Patterns
 
 Files:
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-forms/references/form-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-forms/references/formvalueControl-patterns.md`
 
 Contains:
 - Reactive Forms (Production-Stable) with FormBuilder

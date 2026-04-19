@@ -9,7 +9,7 @@ Usage:
   python3 generate-llms-txt.py --source ./docs --base-url https://example.com/docs
   python3 generate-llms-txt.py --source ./docs --output ./public --full
 
-Adapted from claudekit-engineer/llms/scripts/generate-llms-txt.py for MeowKit.
+Adapted from open-source upstream (MIT) for MeowKit.
 """
 
 import argparse

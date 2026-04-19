@@ -64,6 +64,16 @@ Step 5: Generator Feedback → produce one-line fix guidance per FAIL/WARN; emit
 - `tasks/reviews/YYMMDD-{slug}-evalverdict-evidence/` — directory of screenshots, HTTP captures, CLI transcripts
 - Returned to caller: `PASS | WARN | FAIL` + path to verdict file + generator feedback summary
 
+## Memory Write
+
+After each completed evaluation, append a summary line to `.claude/memory/review-patterns.md`. Create the file with a header row if it does not exist:
+
+```
+| {date} | {artifact-id} | {verdict: PASS/WARN/FAIL} | {top-criterion} | {score} |
+```
+
+Use `mkdir -p .claude/memory` before the append to avoid silent failure on missing directory. This persists evaluation patterns across sessions for `meow:elicit` and `meow:review` to reference.
+
 ## Verdict Schema
 
 See `step-04-grade-and-verdict.md` for the canonical schema. Frontmatter fields: `task`, `evaluator_run`, `rubric_preset`, `model`, `overall`, `weighted_score`, `hard_fail_triggered`, `iterations`.

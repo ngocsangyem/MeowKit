@@ -24,7 +24,7 @@ For TypeScript type errors, lint errors, and static analysis failures.
 ### Step 3: Fix
 
 Rules:
-- NEVER use `any` type (MeowKit security rule — BLOCK)
+- NEVER use `any` type (security rule — BLOCK)
 - NEVER use `as` type assertions to silence errors
 - Use `unknown` + type guards instead of `any`
 - Prefer proper generics over type assertions

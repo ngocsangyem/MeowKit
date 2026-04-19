@@ -14,7 +14,7 @@ Never let a noticed issue silently pass. The whole point is proactive communicat
 
 # Search Before Building
 
-Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `# MeowKit philosophy — see CLAUDE.md — MeowKit uses CLAUDE.md for the full philosophy.
+Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `# Project philosophy — see CLAUDE.md for the full philosophy.
 
 **Three layers of knowledge:**
 - **Layer 1** (tried and true — in distribution). Don't reinvent the wheel. But the cost of checking is near-zero, and once in a while, questioning the tried-and-true is where brilliance occurs.

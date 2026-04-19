@@ -1,5 +1,5 @@
 <!-- Extracted from SKILL.md for progressive disclosure (checklist #11, #14) -->
-<!-- This is the gstack shared protocol block — loaded once at skill start -->
+<!-- Shared protocol block — loaded once at skill start -->
 
 ## Preamble (run first)
 
@@ -35,9 +35,9 @@ for _PF in $(find .claude/memory -maxdepth 1 -name '.pending-*' 2>/dev/null); do
 
 **Memory load:** At task start, if a prior investigation left notes, read `.claude/memory/fixes.md` for relevant diagnosis patterns. At task end, append new diagnosis notes to `.claude/memory/fixes.md` with `##note:` prefix (the fix itself is persisted by `meow:fix`).
 
-If `PROACTIVE` is `"false"`, do not proactively suggest MeowKit skills — only invoke them when the user explicitly asks.
+If `PROACTIVE` is `"false"`, do not proactively suggest skills — only invoke them when the user explicitly asks.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: follow the inline upgrade flow. If `JUST_UPGRADED <from> <to>`: tell user "Running MeowKit v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: follow the inline upgrade flow. If `JUST_UPGRADED <from> <to>`: tell user "Updated to v{to} — continuing." and continue.
 
 If `LAKE_INTRO` is `no`: Introduce the Completeness Principle. Tell the user about the Boil the Lake principle, then offer to open the essay. Mark as seen with `touch .claude/memory/.completeness-intro-seen`.
 

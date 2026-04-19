@@ -2,8 +2,8 @@
 name: meow:party
 description: >-
   Multi-agent collaboration session. Brings 2-4 agent perspectives into one discussion
-  for architecture decisions, trade-off analysis, sprint retros, and brainstorming.
-  Use when asked "should we X or Y?", "let's discuss", "design review", or "retro".
+  for architecture decisions and trade-off analysis.
+  Use when asked "should we X or Y?", "let's discuss", or "design review".
 argument-hint: '"topic to discuss" [--agents planner,architect,developer]'
 source: meowkit
 allowed-tools:
@@ -16,15 +16,16 @@ allowed-tools:
 
 # Party Mode — Multi-Agent Collaboration
 
-Bring multiple MeowKit agent perspectives into one room. Agents debate, challenge, and build on each other's ideas to catch design flaws before code exists.
+Bring multiple agent perspectives into one room. Agents debate, challenge, and build on each other's ideas to catch design flaws before code exists.
 
 ## When to Use
 
 - Architecture trade-offs ("REST vs GraphQL?", "monolith vs microservices?")
 - Security vs UX trade-offs ("session timeout: 5min or 24hr?")
 - Large refactors that touch many files (risk assessment)
-- Sprint retrospectives (multi-perspective post-mortem)
 - Brainstorming with domain expertise
+
+> For dedicated retrospectives, use `meow:retro`. `meow:party` is for architectural trade-off deliberation.
 
 ## Protocol
 
@@ -98,8 +99,22 @@ After rounds complete (max 3) or user says "decide":
 - LLM sycophancy: agents tend to agree rather than critique — prompts explicitly instruct agents to challenge and counter
 - Token budget is PER SESSION, not per round — a 4-agent × 3-round session at 150 tokens/response = ~1800 tokens of agent output plus synthesis
 - Party mode is discussion-only — if an agent suggests code changes during party, redirect to the normal pipeline after the decision
-- Decision summaries are ephemeral by default — persist important decisions to `.claude/memory/decisions.md` manually after party concludes
+- Decision write is NOT optional — see "Memory Write" below
 - "decide" keyword ends the discussion immediately — don't use it in the topic itself (e.g., avoid "decide between REST and GraphQL")
+
+## Memory Write (required, not optional)
+
+After the synthesis round concludes, write a decision record to `.claude/memory/decisions.md`. Create the file with a header if it does not exist; always run `mkdir -p .claude/memory` first.
+
+```markdown
+## {ISO-date} — {decision-title}
+**Context:** {1-sentence problem}
+**Decision:** {chosen option}
+**Rationale:** {key reasons from synthesis}
+**Dissent:** {minority position, if any}
+```
+
+This step is NOT optional. Decisions lost to session end cannot be recovered.
 
 ## Integration
 

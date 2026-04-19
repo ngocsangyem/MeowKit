@@ -19,7 +19,7 @@ source: meowkit
 
 # Rubric Library API
 
-Discovery, composition, and validation for the meowkit rubric library at `.claude/rubrics/`.
+Discovery, composition, and validation for the rubric library at `.claude/rubrics/`.
 
 > **Consumed by `evaluator` agent + `meow:evaluate` skill (Phase 3, shipped 260408).** The dedicated `evaluator` subagent (`.claude/agents/evaluator.md`) drives the running build via active verification and grades it against rubrics composed from this library. The `meow:evaluate` skill (`.claude/skills/meow:evaluate/`) is the orchestration shell. This skill (`meow:rubric`) remains independently invokable via `/meow:rubric <subcommand>` for manual rubric inspection, validation, or composition outside the evaluator workflow.
 

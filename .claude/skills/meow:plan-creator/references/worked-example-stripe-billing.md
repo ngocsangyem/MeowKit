@@ -2,7 +2,7 @@
 
 > **TDD-mode example.** This worked example assumes `--tdd` / `MEOWKIT_TDD=1`. Phase 2 Test RED is shown as mandatory; in default mode (TDD off), Phase 2 would be optional and the developer would implement directly per the approved plan. Payment-processing work like Stripe billing is exactly the kind of production-quality task where opting into `--tdd` is recommended.
 
-A complete plan showing the expected detail level for a MeowKit 7-phase implementation in strict TDD mode.
+A complete plan showing the expected detail level for a 7-phase implementation in strict TDD mode.
 
 ---
 

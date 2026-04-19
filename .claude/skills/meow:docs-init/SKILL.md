@@ -16,6 +16,7 @@ allowed-tools:
   - AskUserQuestion
 sources:
   - claudekit-engineer/docs
+phase: on-demand
 ---
 
 # Docs Init
@@ -23,6 +24,8 @@ sources:
 Generate initial project documentation from codebase analysis.
 
 **Scope:** Creates `docs/` from scratch. For updating existing docs → `meow:document-release`.
+
+> Also run `meow:project-context` to generate the agent-constitution file (`docs/project-context.md`). `meow:docs-init` generates the full documentation suite; `meow:project-context` generates only the constitution.
 
 ## When to Invoke
 
@@ -47,7 +50,7 @@ Do NOT invoke when: docs already exist and need updating (use `meow:document-rel
    - `docs/codebase-summary.md` — directory map, key modules, entry points
    - `docs/code-standards.md` — conventions found in codebase
    - `docs/system-architecture.md` — component diagram, data flow
-   Optional (generate only if relevant):
+     Optional (generate only if relevant):
    - `docs/deployment-guide.md` — if CI/CD or Docker config detected
    - `docs/design-guidelines.md` — if frontend/UI code detected
 5. **Size check** — run `wc -l docs/*.md | sort -rn`. Flag files >800 lines.
@@ -66,6 +69,7 @@ Full list: `references/gotchas.md`
 ## Workflow Integration
 
 Runs after `meow:bootstrap` or on any existing project without docs.
+
 ```
 meow:bootstrap → meow:docs-init → meow:plan-creator (first feature)
 ```
@@ -75,5 +79,6 @@ Also invoked standalone: `meow:docs-init` on existing undocumented project.
 ## Handoff Protocol
 
 On completion:
+
 - Print generated files list + line counts
 - "Docs initialized. Run `meow:document-release` after shipping features to keep them in sync."

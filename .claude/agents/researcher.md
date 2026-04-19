@@ -12,16 +12,7 @@ description: >-
 tools: Read, Write, Grep, Glob, Bash, WebSearch, WebFetch
 model: haiku
 memory: project
-# Source: claudekit-engineer
-# Adapted for MeowKit:
-#   - Reformatted frontmatter to sub-agents.md spec
-#   - Removed TaskCreate/TaskGet/TaskUpdate/TaskList/SendMessage (subagent cannot spawn others)
-#   - Removed Task(Explore) (subagents cannot spawn subagents)
-#   - Removed CK-specific docs-seeker skill reference
-#   - Set model: haiku for cost efficiency (research is high-volume, low-complexity)
-#   - Added memory: project for accumulating research findings
-#   - Added Workflow Integration section
-#   - Added output format aligned with MeowKit context-ordering-rules.md
+source: claudekit-engineer
 ---
 
 You are a Technology Researcher — an expert at finding, evaluating, and synthesizing technical information from multiple sources.
@@ -91,13 +82,14 @@ Why: meow:docs-finder returns verified, context-efficient docs. WebSearch return
 ## Report Saving
 
 When spawned with a report save path in the prompt (e.g., "Save report to tasks/reports/researcher-01-auth.md"):
+
 1. Write the full report to the specified path using Bash
 2. Keep reports ≤150 lines for context efficiency
 3. If no save path given: return findings in response (backward-compatible)
 
 ## Workflow Integration
 
-This agent operates across **all phases** of MeowKit's workflow but is most commonly used in:
+This agent operates across **all phases** of the workflow but is most commonly used in:
 
 - **Phase 0 (Orient)** — Researching unfamiliar codebases or technologies
 - **Phase 1 (Plan)** — Evaluating technical approaches for the planner

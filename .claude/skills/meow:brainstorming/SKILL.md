@@ -32,6 +32,8 @@ Explore technical solutions with structured ideation, scoring, and plan-creator 
 - Pre-mortem / failure-mode exploration before committing to a design
 - Constraint-rich problem (budget, time, stack) where the solution space is narrow
 
+**NOT this skill if:** you are stuck on a specific existing approach with forced assumptions — use `meow:problem-solving`. **NOT this skill if:** you want to deepen an existing verdict or plan — use `meow:elicit`.
+
 ## When NOT to Use
 
 | Situation                                             | Use instead                      |
@@ -67,7 +69,7 @@ The skill is done when:
    - Cross-domain transfer → `analogical-thinking.md`
    - Stakeholder / persona angles → `perspective-shift.md`
 4. **Ideas are generated, then evaluated separately** — cap at 8 ideas per run. Do not score or compare while generating; the full set must exist before any ranking.
-5. **Anti-bias pivot is applied once** — after idea #4 (midpoint), pause and ask: "what orthogonal category have I not touched yet?" Generate the rest from that angle. One pivot per session, mirroring BMAD's ~10% pivot frequency at the 8-idea scale.
+5. **Anti-bias pivot is applied once** — after idea #4 (midpoint), pause and ask: "what orthogonal category have I not touched yet?" Generate the rest from that angle. One pivot per session.
 6. **Output uses the right template** —
    - `--depth quick` → `assets/output-ideas.md`
    - `--depth deep` → `assets/output-scored.md` (score via `references/scoring-criteria.md`)

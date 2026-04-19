@@ -12,13 +12,13 @@
    - Investigation/debugging → `meow:investigate`
    - Code review → `meow:review`
    - Security audit → `meow:cso`
-5. **Context is loaded on demand** by the consumer skill via explicit `Read` calls on `.claude/memory/` topic files (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`). `.claude/memory/` is a MeowKit convention — it is NOT the Claude Code platform auto-memory at `~/.claude/projects/<project>/memory/`.
+5. **Context is loaded on demand** by the consumer skill via explicit `Read` calls on `.claude/memory/` topic files (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`). `.claude/memory/` is a project convention — it is NOT the Claude Code platform auto-memory at `~/.claude/projects/<project>/memory/`.
 
 ---
 
 ## Available Agents
 
-MeowKit agents at `.claude/agents/`:
+Agents at `.claude/agents/`:
 
 ```toon
 agents[5]{category,count,list}:

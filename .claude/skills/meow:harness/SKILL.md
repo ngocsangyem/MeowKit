@@ -29,7 +29,7 @@ Step-file workflow that runs the complete generator/evaluator harness pipeline a
 
 Activate when:
 - User runs `/meow:harness "build a X"` (or any green-field product description)
-- Existing meowkit detection routes a green-field "build me an app" intent here instead of `meow:cook`
+- Existing kit detection routes a green-field "build me an app" intent here instead of `meow:cook`
 - A multi-hour autonomous build is requested with no manual handholding
 
 Skip when:

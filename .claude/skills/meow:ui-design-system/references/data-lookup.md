@@ -1,6 +1,6 @@
 # Design Data Lookup
 
-> Source: claudekit-engineer/ui-ux-pro-max (MIT)
+> Source: open-source upstream (MIT)
 > Data files in assets/ — read the relevant CSV when making design decisions.
 
 ## Color Palettes (`assets/colors.csv` — 161 palettes)

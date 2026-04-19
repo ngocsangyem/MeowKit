@@ -18,7 +18,9 @@ source: meowkit
 
 # Project Context Generator
 
-Creates `docs/project-context.md` — the agent "constitution" that every MeowKit agent loads on activation.
+Creates `docs/project-context.md` — the agent "constitution" that every agent loads on activation.
+
+> To generate the full documentation suite (README, architecture, code standards, etc.), use `meow:docs-init` instead. `meow:project-context` generates only the agent constitution.
 
 ## Purpose
 
@@ -91,7 +93,7 @@ See `templates/project-context-template.md` for the full structure.
 
 ## Integration
 
-All MeowKit agents load `docs/project-context.md` in their Required Context section. If the file doesn't exist, agents behave exactly as before (graceful degradation).
+All agents load `docs/project-context.md` in their Required Context section. If the file doesn't exist, agents behave exactly as before (graceful degradation).
 
 ## Files in this skill
 

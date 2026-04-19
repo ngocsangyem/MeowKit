@@ -54,3 +54,5 @@ Sources:
 - [Gemini API Models](https://ai.google.dev/gemini-api/docs/models)
 - [Gemini API Pricing](https://ai.google.dev/pricing)
 - Pricing verified 2026-04-12
+
+> Warning: `gemini-3.1-*` and `veo-3.1-*` are preview model IDs. Preview IDs are renamed or retired on short notice. Verify current IDs at https://ai.google.dev/gemini-api/docs/models before deploying to production.

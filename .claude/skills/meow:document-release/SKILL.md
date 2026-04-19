@@ -28,7 +28,7 @@ Post-ship workflow that ensures every documentation file in the project is accur
 - **Standalone invocation** (`/meow:document-release`): full doc sync + optional VERSION bump. Use after merging a PR or to reconcile docs with shipped code.
 - **Called from `meow:ship` (Step 8.5)**: doc sync only; VERSION bump is owned by ship and skipped here.
 
-## MeowKit wiring
+## Skill wiring
 
 - **Reads memory:** `.claude/memory/architecture-decisions.md`, `.claude/memory/review-patterns.md`
 - **Writes memory:** none — docs are updated in place; topic files are not touched

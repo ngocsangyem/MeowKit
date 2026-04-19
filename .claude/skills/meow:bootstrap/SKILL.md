@@ -5,7 +5,7 @@ description: |
   Use when creating a new project from scratch — orchestrates the full journey
   from idea to running code. Research → design → plan → scaffold → implement → docs.
   Explicit invocation only — never auto-activates.
-  CLI = MeowKit infrastructure (.claude/), bootstrap = application code + full pipeline.
+  CLI = project infrastructure (.claude/), bootstrap = application code + full pipeline.
 allowed-tools:
   - Bash
   - Read
@@ -23,7 +23,7 @@ sources:
 
 End-to-end project orchestrator: research → design → **plan → scaffold** → implement → docs.
 
-**CLI boundary:** `npx mewkit init` = MeowKit infrastructure. `meow:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
+**CLI boundary:** `npx mewkit init` = project infrastructure. `meow:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
 
 ## When to Invoke
 
@@ -36,7 +36,7 @@ meow:bootstrap [requirements] --fast
 meow:bootstrap [requirements] --parallel
 ```
 
-Do NOT invoke when: project already has source code, or you only need MeowKit setup (use CLI).
+Do NOT invoke when: project already has source code, or you only need kit setup (use CLI).
 
 ## Modes
 

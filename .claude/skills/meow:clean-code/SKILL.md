@@ -4,6 +4,9 @@ description: "Use when reviewing code for quality, enforcing KISS/DRY/YAGNI prin
 allowed-tools: Read, Write, Edit
 version: 2.0
 priority: CRITICAL
+phase: on-demand
+trust_level: third-party
+injection_risk: low
 source: antigravity-kit
 author: vudovn (antigravity-kit)
 ---
@@ -11,6 +14,8 @@ author: vudovn (antigravity-kit)
 # Clean Code — Pragmatic AI Coding Standards
 
 > Be **concise, direct, and solution-focused**.
+
+> For post-implementation complexity reduction within the current diff (Phase 3.5 workflow), use `meow:simplify`. `meow:clean-code` is for broader quality-standards enforcement at any phase.
 
 ## Core Principles
 

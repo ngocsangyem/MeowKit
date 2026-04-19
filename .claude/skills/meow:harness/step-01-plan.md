@@ -14,7 +14,7 @@ Invoke `meow:plan-creator` in product-level mode (Phase 1 of the harness plan). 
 
 ### 1b. Invoke the planner
 
-Use the Task tool to dispatch the `planner` agent (canonical subagent_type per `meowkit-rules.md` §2). The planner runs `meow:plan-creator` internally.
+Use the Task tool to dispatch the `planner` agent (canonical subagent_type per `rules/` §2). The planner runs `meow:plan-creator` internally.
 
 ```
 Task(

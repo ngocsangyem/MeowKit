@@ -65,7 +65,7 @@
 
 ## Verification Scripts
 
-MeowKit validation scripts live at `.claude/scripts/`, not inside individual skills:
+Shared validation scripts live at `.claude/scripts/`, not inside individual skills:
 
 | Script               | Purpose                     | Command                                     |
 | -------------------- | --------------------------- | ------------------------------------------- |
@@ -75,6 +75,6 @@ MeowKit validation scripts live at `.claude/scripts/`, not inside individual ski
 | `validate-docs.py`   | Documentation consistency   | `.claude/skills/.venv/bin/python3 .claude/scripts/validate-docs.py`   |
 | `checklist.py`       | Review checklist automation | `.claude/skills/.venv/bin/python3 .claude/scripts/checklist.py`       |
 
-**For project-specific linting/testing:** Use the project's own toolchain (e.g., `npm run lint`, `npm test`, `pytest`). MeowKit's developer agent handles this automatically.
+**For project-specific linting/testing:** Use the project's own toolchain (e.g., `npm run lint`, `npm test`, `pytest`). The developer agent handles this automatically.
 
 Script output handling: READ → SUMMARIZE → ASK → fix. Never ignore output. Never auto-fix without asking.

@@ -155,7 +155,7 @@ Each benchmark run writes a JSON dump to `.claude/benchmarks/results/{run-id}.js
 
 | File | Purpose |
 |---|---|
-| `scripts/run-canary.sh` | Iterates spec files, invokes meow:harness per spec, records results |
+| `scripts/run-canary.sh` | Step 1 of 2: emits a task manifest with PENDING rows for each canary spec. Prints orchestrator instructions for step 2 (spawning per-task harness subagents). The script does NOT invoke `meow:harness` directly — it cannot, because harness requires a fresh subagent context that only the orchestrator can spawn. |
 | `scripts/compare-runs.sh` | Reads two prior run JSONs, emits delta table |
 | `../../benchmarks/README.md` | How to add new canary tasks |
 | `../../benchmarks/canary/` | Spec files |
@@ -168,3 +168,13 @@ Each benchmark run writes a JSON dump to `.claude/benchmarks/results/{run-id}.js
 
 For run: `scripts/run-canary.sh [--full]`.
 For compare: `scripts/compare-runs.sh <run-id-a> <run-id-b>`.
+
+## Memory Write
+
+After each completed benchmark run, append the baseline to `.claude/memory/cost-log.json` (top-level array). Create the file with `[]` if it does not exist.
+
+```json
+{"run_id": "{id}", "date": "{ISO-date}", "tier": "quick|full", "pass_rate": N, "avg_score": N, "total_cost_usd": N}
+```
+
+Use `mkdir -p .claude/memory` before the append. This persists baselines for `compare-runs.sh` and the dead-weight audit.

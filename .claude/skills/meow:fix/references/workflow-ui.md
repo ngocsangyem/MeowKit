@@ -32,7 +32,7 @@ For visual bugs, layout issues, responsive problems, and frontend interaction er
 - Check for race conditions in state updates
 
 **Vue-specific:**
-- NEVER use `v-html` with user content (MeowKit security rule — BLOCK)
+- NEVER use `v-html` with user content (security rule — BLOCK)
 - Check reactivity: `ref()` vs `reactive()`, computed dependencies
 - Check component lifecycle hooks
 

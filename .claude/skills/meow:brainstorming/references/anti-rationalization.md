@@ -1,6 +1,6 @@
 # Anti-Rationalization
 
-Adapted from `claudekit-engineer/brainstorm`. These are the common excuses Claude or the user invents to skip the brainstorming process. When you catch yourself thinking one of these, do the opposite.
+Adapted from open-source upstream (MIT). These are the common excuses Claude or the user invents to skip the brainstorming process. When you catch yourself thinking one of these, do the opposite.
 
 ## Skip-the-process excuses
 

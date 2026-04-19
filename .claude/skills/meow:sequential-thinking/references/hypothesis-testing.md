@@ -1,7 +1,7 @@
 # Hypothesis-Driven Investigation
 
 > Part of meow:sequential-thinking. Use during debugging and root cause analysis.
-> Source: claudekit-engineer/sequential-thinking (MIT)
+> Source: open-source upstream (MIT)
 
 ## Output Template
 

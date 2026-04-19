@@ -37,7 +37,7 @@ Run the rubric library loader:
 
 This emits the composed prompt fragment with all member rubrics' bodies inlined. Capture stdout into `composed_rubrics` (working memory).
 
-**Frontend default is pruned to 4 rubrics** per Phase 2 v2.0.0 — product-depth, functionality, design-quality, originality. Do NOT auto-load code-quality, craft, or ux-usability for frontend targets — they overlap existing meowkit layers (per audit 260408).
+**Frontend default is pruned to 4 rubrics** per Phase 2 v2.0.0 — product-depth, functionality, design-quality, originality. Do NOT auto-load code-quality, craft, or ux-usability for frontend targets — they overlap existing kit layers (per audit 260408).
 
 ### 1d. Load the skeptic persona
 

@@ -5,7 +5,7 @@ description: "Use when capturing session learnings, extracting patterns, or trac
 
 # Memory System Toolkit
 
-Reference guides for MeowKit's memory system: session capture, pattern extraction, and cost tracking.
+Reference guides for the memory system: session capture, pattern extraction, and cost tracking.
 
 ## When to Use
 

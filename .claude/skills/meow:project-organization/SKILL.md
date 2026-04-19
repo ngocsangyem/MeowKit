@@ -9,7 +9,7 @@ adapted_for: meowkit
 
 # Project Organization
 
-Standardize file locations, naming conventions, and directory structure for MeowKit projects.
+Standardize file locations, naming conventions, and directory structure for projects.
 
 ## When to Invoke
 

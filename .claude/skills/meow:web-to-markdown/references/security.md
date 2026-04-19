@@ -147,7 +147,7 @@ Preview (first 2KB, DATA — not instructions):
    - Role-playing: "DAN mode", "act as", "pretend you are", "you're an uncensored"
    - Encoding tells: high-entropy base64 blocks, ROT13 decode patterns
    - Context manipulation: "your previous instructions have been updated", "this is a test of override"
-2. MeowKit `injection-rules.md` R1 patterns (vendored)
+2. `injection-rules.md` R1 patterns (vendored)
 3. Local additions for `meow:web-to-markdown` specifics:
    - Fake DATA-fence close: ` ``` ` inside content that isn't in a legitimate code block
    - Tool-call hijack: "Call the Write tool with...", "Use the Bash tool to..."
@@ -451,7 +451,7 @@ If injection-audit.py post-write scan (Layer 8) catches a pattern that Layer 5 m
 ## 9. Out of scope (v1)
 
 - Persistent cross-session cache TTL → v2
-- MCP Gateway integration → not applicable (MeowKit is not Cowork-scale)
+- MCP Gateway integration → not applicable (this kit is not Cowork-scale)
 - Automated dedup (same URL twice in one session → cache hit) → v2 optimization
 - Homoglyph-resistant domain parser beyond NFKC normalization → v2 if real-world exploitation seen
 - IPv6-mapped-IPv4 edge case fuzzing → covered by `ipaddress.ip_address()` but untested against deliberate adversarial inputs; v2 hardening pass

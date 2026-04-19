@@ -2,7 +2,7 @@
 
 Classify your skill before writing it. Each type has different requirements.
 
-| Type | Description | MeowKit Example | Key Pattern |
+| Type | Description | Example | Key Pattern |
 |------|-------------|-----------------|-------------|
 | Library/API | Wrap external APIs, handle auth, manage versions | meow:docs-finder, meow:multimodal | Scripts for API calls, config for auth |
 | Verification | Check quality, validate, audit | meow:review, meow:cso, meow:lint-and-validate | Deterministic scripts, pass/fail output |

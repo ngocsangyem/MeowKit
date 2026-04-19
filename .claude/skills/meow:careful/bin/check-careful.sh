@@ -251,6 +251,30 @@ fi
 # --- Output ---
 if [ -n "$WARN" ]; then
   WARN_ESCAPED=$(printf '%s' "$WARN" | sed 's/"/\\"/g')
+
+  # Audit trail — append the warning event to security-log.md.
+  # Each warn is logged as an "override-request" entry; the user's decision
+  # (approve/deny) happens at the Claude Code permission prompt level.
+  LOG_DIR="${CLAUDE_PLUGIN_DATA:-.claude/memory}"
+  LOG_FILE="$LOG_DIR/security-log.md"
+  mkdir -p "$LOG_DIR" 2>/dev/null || true
+  if [ ! -f "$LOG_FILE" ]; then
+    {
+      echo "# Security Override Log"
+      echo
+      echo "| Timestamp | Pattern | Severity | Action | Command |"
+      echo "|-----------|---------|----------|--------|---------|"
+    } > "$LOG_FILE" 2>/dev/null || true
+  fi
+  CMD_ONELINE=$(printf '%s' "$CMD" | tr '\n' ' ' | sed 's/|/\\|/g')
+  {
+    printf '| %s | %s | %s | override-request | %s |\n' \
+      "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+      "${PATTERN:-unknown}" \
+      "${SEVERITY:-UNKNOWN}" \
+      "$CMD_ONELINE"
+  } >> "$LOG_FILE" 2>/dev/null || true
+
   # In production context, escalate CRITICAL patterns from ask → block
   if [ "$IS_PROD" = "true" ] && [ "$SEVERITY" = "CRITICAL" ]; then
     printf '{"permissionDecision":"block","message":"[careful] PRODUCTION BLOCK: %s Override requires a human to unset NODE_ENV/APP_ENV/ENVIRONMENT."}\n' "$WARN_ESCAPED"

@@ -43,7 +43,7 @@ Supplied `first-principles.md` and `via-negativa.md` as strategic-unsticking tec
 
 ### Changed
 
-- **Tone:** compressed from academic (cc-thinking) to imperative (meowkit style). Cut templates over 20 lines; cut "Feynman's wisdom" / "Taleb's wisdom" narrative sections.
+- **Tone:** compressed from academic (cc-thinking) to terse imperative style. Cut templates over 20 lines; cut "Feynman's wisdom" / "Taleb's wisdom" narrative sections.
 - **Cross-references:** all `ck:` references rewritten to `meow:`. `systematic-debugging` / "debugging skill" references rewritten to `meow:sequential-thinking` or `meow:fix` as appropriate.
 - **Boundary pointer:** explicit reroute to `meow:fix` (for bug-fix intent) and `meow:sequential-thinking` (for pure diagnostic reasoning), added to SKILL.md and `when-stuck.md`.
 - **Bridge lines:** each technique references its nearest sibling to reduce "which one do I use" friction.

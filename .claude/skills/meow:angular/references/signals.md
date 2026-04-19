@@ -281,7 +281,6 @@ export class Auth {
 
 ## Advanced Patterns
 
-File: `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-signals/references/signal-patterns.md`
 
 Contains advanced patterns including:
 - Resource API for async data fetching

@@ -9,12 +9,15 @@ triggers:
   - complexity routing
   - phase 0 orient
 phase: 0
+user-invocable: false
 source: meowkit
 ---
 
 # Scale-Adaptive Routing
 
 Automatically classifies task complexity based on domain keywords.
+
+> Internal sub-skill of Phase 0 (Orient). Not user-invocable directly — invoked by the orchestrator during task classification.
 
 ## Purpose
 

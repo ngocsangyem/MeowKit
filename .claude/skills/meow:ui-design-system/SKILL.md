@@ -6,7 +6,7 @@ description: |
   or checking accessibility compliance. Triggers on "design system", "UI review",
   "color palette", "font pairing", "accessibility audit", "responsive design",
   "WCAG check". Auto-activates when ui-ux-designer agent is working.
-  Data-driven: 161 palettes, 57 font pairings, 161 product types, 99 UX guidelines, 25 chart types.
+  Data-driven: 161 palettes, 73 font pairings, 161 product types, 99 UX guidelines, 25 chart types.
 allowed-tools:
   - Read
   - Grep
@@ -36,7 +36,7 @@ Data-driven design intelligence: curated palettes, font pairings, product recomm
 1. **Understand requirements** — what product type? audience? style direction?
 2. **Look up design data** — read `references/data-lookup.md` for how to query:
    - Color palette → `assets/colors.csv` (161 WCAG-verified palettes by product type)
-   - Font pairing → `assets/typography.csv` (57 pairings with Google Fonts URLs)
+   - Font pairing → `assets/typography.csv` (73 pairings with Google Fonts URLs)
    - Product direction → `assets/products.csv` (161 types with style/dashboard/color recs)
    - UX check → `assets/ux-guidelines.csv` (99 Do/Don't rules with severity)
    - Chart type → `assets/charts.csv` (25 types with accessibility grades)
@@ -51,7 +51,7 @@ Data-driven design intelligence: curated palettes, font pairings, product recomm
 | File | Rows | Content |
 |------|------|---------|
 | `assets/colors.csv` | 161 | WCAG-verified palettes by product type (hex values) |
-| `assets/typography.csv` | 57 | Font pairings with mood, Google Fonts URLs, Tailwind config |
+| `assets/typography.csv` | 73 | Font pairings with mood, Google Fonts URLs, Tailwind config |
 | `assets/products.csv` | 161 | Product type → style, landing pattern, dashboard, color focus |
 | `assets/ux-guidelines.csv` | 99 | Do/Don't pairs with category + severity |
 | `assets/charts.csv` | 25 | Data type → best chart, accessibility grade, library |

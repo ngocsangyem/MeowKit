@@ -7,7 +7,7 @@ Ask the user (or infer from context):
 2. When should it auto-activate? (trigger keywords/patterns)
 3. What input does it accept? (arguments, flags, file paths)
 4. What output does it produce? (structured template? file? report?)
-5. Which MeowKit phase does it operate in? (Phase 0-6 or meta)
+5. Which workflow phase does it operate in? (Phase 0-6 or meta)
 6. Which agent receives the output? (planner, developer, reviewer, etc.)
 
 ## Step 2: Scaffold Directory
@@ -52,7 +52,7 @@ Template with `{placeholders}` the agent fills. Not freeform prose. Consuming ag
 For every way the skill can fail: what detects it, what to do, what to tell the user.
 
 ### Workflow Integration
-"This skill operates in Phase [X] of MeowKit's workflow."
+"This skill operates in Phase [X] of the workflow."
 "Output is passed to: [agent name]"
 
 ### Handoff Protocol
@@ -69,7 +69,7 @@ If the skill processes untrusted input, load meow:skill-template-secure and veri
 
 Add to `.claude/skills/SKILLS_ATTRIBUTION.md`:
 ```
-| meow:{name} | MeowKit (original) | — | MIT | .claude/skills/meow:{name}/ |
+| meow:{name} | your org (original) | — | MIT | .claude/skills/meow:{name}/ |
 ```
 
 ## Anti-Patterns

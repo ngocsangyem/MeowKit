@@ -409,7 +409,6 @@ export class MaterialButton {}
 
 ## Advanced Patterns
 
-File: `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-directives/references/directive-patterns.md`
 
 Contains advanced patterns including:
 - DOM Manipulation (Auto-Focus, Text Selection, Copy to Clipboard)

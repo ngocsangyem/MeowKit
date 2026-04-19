@@ -8,7 +8,7 @@ Usage:
   python3 init-skill.py <skill-name> [--path <path>]
   python3 init-skill.py meow:my-feature --path .claude/skills
 
-Adapted from claudekit-engineer/skill-creator/scripts/init_skill.py for MeowKit.
+Adapted from open-source upstream (MIT) for MeowKit.
 """
 
 import re

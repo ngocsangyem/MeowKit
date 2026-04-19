@@ -26,7 +26,7 @@ source: gstack
 
 Multi-pass code review with 3-layer adversarial analysis, spec compliance, and auto-fix. Uses step-file architecture for deterministic execution.
 
-## MeowKit wiring
+## Skill wiring
 
 - **Reads memory:** `.claude/memory/review-patterns.md`, `.claude/memory/security-log.md`
 - **Writes memory:** `.claude/memory/review-patterns.md` with `##pattern:` prefix
@@ -78,7 +78,7 @@ Skip: PR reviews triggered by `--pending` or branch diff — plan not required.
 
 ## Workflow Integration
 
-Operates in **Phase 4 (Review)** of MeowKit's workflow. Invoked by the `reviewer` agent. FAIL verdict prevents Phase 5 (Ship).
+Operates in **Phase 4 (Review)** of the project's workflow. Invoked by the `reviewer` agent. FAIL verdict prevents Phase 5 (Ship).
 
 ## Input Modes
 

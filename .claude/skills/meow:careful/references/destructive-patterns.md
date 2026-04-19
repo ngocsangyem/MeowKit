@@ -47,7 +47,7 @@
 | Pattern                     | Example              | Risk                         | Severity | Safer Alternative                                                 |
 | --------------------------- | -------------------- | ---------------------------- | -------- | ----------------------------------------------------------------- |
 | `redis-cli FLUSHALL`        | `redis-cli FLUSHALL` | Wipes entire Redis instance  | CRITICAL | `redis-cli KEYS '*'` to review first; use `FLUSHDB` for single DB |
-| `redis-cli FLUSHDB`         | `redis-cli FLUSHDB`  | Wipes current Redis DB       | HIGH     | Export keys first with `redis-cli --rdb dump.rdb`                 |
+| `redis-cli FLUSHDB`         | `redis-cli FLUSHDB`  | Wipes current Redis DB       | CRITICAL | Export keys first with `redis-cli --rdb dump.rdb`                 |
 | `mongosh db.dropDatabase()` | `db.dropDatabase()`  | Entire MongoDB database loss | CRITICAL | `mongodump` first, then drop                                      |
 
 ### Git

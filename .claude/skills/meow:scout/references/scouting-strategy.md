@@ -101,7 +101,7 @@ After all agents return (or after 3-minute timeout per agent):
 5. **Collect entry points** from all agent results
 6. **Detect architectural patterns** — MVC, layered, feature-based, monorepo
 7. **Estimate complexity** per area (file count + total lines)
-8. **Suggest routing** — which MeowKit agent should handle each area
+8. **Suggest routing** — which agent should handle each area
 
 ## Reading File Content (When Needed)
 

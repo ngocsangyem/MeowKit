@@ -374,7 +374,6 @@ export class AppMain {
 
 ## Advanced Patterns
 
-File: `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-routing/references/routing-patterns.md`
 
 Contains advanced patterns including:
 - Route Configuration Options (Full options with lazy loading, guards, data, title resolvers)

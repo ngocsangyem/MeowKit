@@ -36,10 +36,10 @@ Operates in **Phase 3 (Build GREEN)**. Output supports the `developer` agent.
 - **ALWAYS** use `<script setup lang="ts">` — never Options API
 - **ALWAYS** use `defineProps` with TypeScript interfaces — never runtime validation
 - **ALWAYS** use `storeToRefs()` when destructuring Pinia store state
-- **NEVER** use `v-html` with user content (MeowKit security-rules.md — XSS vector)
+- **NEVER** use `v-html` with user content (security-rules.md — XSS vector)
 - **PREFER** composables (`use*`) over mixins
 - **PREFER** `ref()` for primitives, `reactive()` only for complex objects
-- **NAME** components PascalCase, files kebab-case (MeowKit naming-rules.md)
+- **NAME** components PascalCase, files kebab-case (naming-rules.md)
 
 ## Anti-Patterns
 

@@ -1,7 +1,7 @@
 # Core Reasoning Patterns
 
 > Part of meow:sequential-thinking.
-> Source: claudekit-engineer/sequential-thinking (MIT)
+> Source: open-source upstream (MIT)
 
 ## Revision Pattern
 

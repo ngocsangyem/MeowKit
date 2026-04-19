@@ -1,7 +1,7 @@
 ---
 name: meow:jira
-description: "Jira execution & evaluation via Atlassian MCP: create, search, update, transition, link, sprint, evaluate complexity, estimate story points, analyze tickets. Requires Atlassian MCP. Use for 'create jira ticket', 'search jira', 'move ticket', 'sprint planning', 'link issues', 'evaluate ticket', 'estimate story points', 'analyze ticket'."
-phase: 3
+description: "Jira execution via Atlassian MCP: create, search, update, transition, link, sprint, estimate story points. Requires Atlassian MCP. Use for 'create jira ticket', 'search jira', 'move ticket', 'sprint planning', 'link issues', 'estimate story points', 'update ticket'. For ticket analysis and completeness scoring, use `meow:intake` first."
+phase: on-demand
 source: meowkit
 ---
 

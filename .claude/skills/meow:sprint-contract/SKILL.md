@@ -24,6 +24,8 @@ source: meowkit
 
 Negotiation protocol between generator and evaluator. Produces a signed contract file at `tasks/contracts/{date}-{slug}-sprint-{N}.md` BEFORE the generator writes any source code. Enforced by `gate-enforcement.sh` (Phase 4 extension).
 
+> For single-task plan validation (cook flow), use `meow:validate-plan` instead. `meow:sprint-contract` is for product-level specs feeding into `meow:harness` only.
+
 ## Trigger Conditions
 
 Activate when:

@@ -7,6 +7,9 @@ source: microsoft/playwright
 
 # Browser Automation with playwright-cli
 
+> **Use playwright-cli when:** DOM interaction, navigation, data extraction, or generating reusable `.spec.ts` E2E test code.
+> **Use `meow:agent-browser` instead when:** session persistence (auth flows, MFA, cookie import) is required.
+
 ## Quick Start
 
 ```bash

@@ -30,7 +30,7 @@
 
 # Text-to-Speech
 .claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/minimax_generate.py \
-  --task generate-speech --text "Hello, welcome to MeowKit" --voice-id Wise_Woman
+  --task generate-speech --text "Hello, welcome to the project" --voice-id Wise_Woman
 
 # Music generation
 .claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/minimax_generate.py \

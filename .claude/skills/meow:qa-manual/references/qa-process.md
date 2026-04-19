@@ -75,7 +75,7 @@
 
 ## Spec Input Parsing
 
-### From MeowKit plan file (tasks/plans/*.md)
+### From the plan file (tasks/plans/*.md)
 Look for:
 - Acceptance criteria (checkbox items)
 - User flow descriptions (numbered steps)

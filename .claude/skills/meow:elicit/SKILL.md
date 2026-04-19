@@ -14,7 +14,7 @@ allowed-tools:
   - Bash
   - AskUserQuestion
 # Inspired by BMAD-METHOD's Advanced Elicitation pattern (docs/explanation/advanced-elicitation.md)
-# Adapted for MeowKit's review pipeline and gate system
+# Adapted for the review pipeline and gate system
 source: new
 ---
 
@@ -29,6 +29,8 @@ Surfaces insights that generic "make it better" requests miss.
 - After plan creation — stress-test assumptions before Gate 1
 - After any agent output — when user wants a specific angle of analysis
 - When user says "dig deeper", "what am I missing", "challenge this"
+
+**NOT this skill if:** you have no existing artifact to re-examine — use `meow:brainstorming` for open exploration, or `meow:problem-solving` for approach-stuck situations.
 
 ## Reasoning Methods
 

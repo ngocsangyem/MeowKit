@@ -73,8 +73,16 @@ n_b = 0
 for name in all_names:
     a_task = ta.get(name, {})
     b_task = tb.get(name, {})
-    a_score = a_task.get("weighted_score") or 0
-    b_score = b_task.get("weighted_score") or 0
+    a_raw = a_task.get("weighted_score")
+    b_raw = b_task.get("weighted_score")
+    # PENDING guard — null scores are excluded from averages (distinct from valid 0).
+    if a_raw is None or b_raw is None:
+        a_display = "PENDING" if a_raw is None else f"{a_raw:.2f}"
+        b_display = "PENDING" if b_raw is None else f"{b_raw:.2f}"
+        print(f"| {name} | {a_display} | {b_display} | — (PENDING — excluded from average) | — |")
+        continue
+    a_score = a_raw
+    b_score = b_raw
     a_cost = a_task.get("cost_usd") or 0
     b_cost = b_task.get("cost_usd") or 0
     delta_score = b_score - a_score
@@ -82,12 +90,10 @@ for name in all_names:
     sign_score = "+" if delta_score >= 0 else ""
     sign_cost = "+" if delta_cost >= 0 else ""
     print(f"| {name} | {a_score:.2f} | {b_score:.2f} | {sign_score}{delta_score:.2f} | {sign_cost}${delta_cost:.2f} |")
-    if a_score > 0:
-        total_a_score += a_score
-        n_a += 1
-    if b_score > 0:
-        total_b_score += b_score
-        n_b += 1
+    total_a_score += a_score
+    n_a += 1
+    total_b_score += b_score
+    n_b += 1
 
 avg_a = total_a_score / n_a if n_a else 0
 avg_b = total_b_score / n_b if n_b else 0

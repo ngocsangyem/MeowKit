@@ -9,7 +9,7 @@ adapted_for: meowkit
 <!-- Improvements over source skills:
 - Split from 361-line monolith to SKILL.md + references/ (Phase 1: CLASS A)
 - Framework-agnostic (removed React-specific patterns from frontend-development)
-- Integrated with MeowKit security-rules.md (no `any` types already enforced)
+- Integrated with security-rules.md (no `any` types already enforced)
 - Added workflow phase anchoring (Phase 3 Build)
 -->
 
@@ -38,8 +38,8 @@ Operates in **Phase 3 (Build GREEN)**. Output supports the `developer` agent.
 
 ## Core Rules (always apply)
 
-- **NEVER** use `any` — use `unknown` + type guards (MeowKit security-rules.md)
-- **NEVER** use `type assertion` — use `unknown` + type guards (MeowKit security-rules.md)
+- **NEVER** use `any` — use `unknown` + type guards (security-rules.md)
+- **NEVER** use `type assertion` — use `unknown` + type guards (security-rules.md)
 - **NEVER** use implicit truthiness for null checks — use explicit `=== null || === undefined`
 - **ALWAYS** use strict TypeScript config: `strict: true`, `noUncheckedIndexedAccess: true`
 - **ALWAYS** use `type` imports: `import type { X } from 'y'`

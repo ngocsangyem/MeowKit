@@ -8,7 +8,7 @@ Usage:
   python3 validate-skill.py <skill-directory>
   python3 validate-skill.py .claude/skills/meow:my-feature
 
-Adapted from claudekit-engineer/skill-creator/scripts/quick_validate.py for MeowKit.
+Adapted from open-source upstream (MIT) for MeowKit.
 """
 
 import re

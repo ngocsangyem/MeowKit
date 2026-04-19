@@ -20,6 +20,8 @@ allowed-tools:
 
 Runs after implementation, before review. Reduces complexity while preserving behavior.
 
+> For ad-hoc quality review outside the current implementation diff, use `meow:clean-code`. `meow:simplify` is behavior-preserving and scoped to the current diff only.
+
 ## Iron Rule
 
 > **Behavior must not change.** Every simplification must pass the exact same tests as before. If tests fail after simplification, the simplification was wrong — revert it.

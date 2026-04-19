@@ -15,6 +15,6 @@ fi
 ```
 
 If `NEEDS_SETUP`:
-1. Tell the user: "MeowKit browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
+1. Tell the user: "The browse skill needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
 2. Run: `cd <SKILL_DIR> && ./setup`
 3. If `bun` is not installed: `curl -fsSL https://bun.sh/install | bash`

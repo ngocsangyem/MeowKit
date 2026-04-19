@@ -13,7 +13,7 @@ allowed-tools: NONE
 source: aura-frog
 ---
 
-# MeowKit Agent Detector
+# Agent Detector
 
 **Priority:** HIGHEST - Runs FIRST for every message. Automatically detects the correct agent, task complexity level, and model tier for each user message using a multi-layer scoring system. No manual agent selection needed -- the detector analyzes task content, explicit technology mentions, user intent, project context, and file patterns to route to the right agent with the right model.
 

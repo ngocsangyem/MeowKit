@@ -12,7 +12,7 @@ allowed-tools:
   - Grep
   - Glob
   - AskUserQuestion
-# Adapted for MeowKit's gate system — runs between Gate 1 and Phase 2
+# Adapted for the gate system — runs between Gate 1 and Phase 2
 source: new
 ---
 
@@ -20,6 +20,8 @@ source: new
 
 Validates a plan file against 8 dimensions to catch gaps before implementation begins.
 Does NOT replace Gate 1 (human approval). Supplements it with systematic checks.
+
+> For green-field harness sprints (generator↔evaluator loop), use `meow:sprint-contract` instead. `meow:validate-plan` operates on plans from `meow:plan-creator` (cook flow only).
 
 ## When to Use
 

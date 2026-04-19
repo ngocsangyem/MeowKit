@@ -1,6 +1,6 @@
 ---
 name: meow:skill-creator
-description: "Create new MeowKit skills with proper structure, compliance checks, and registration. Use when asked to create a skill, build a new skill, or scaffold a skill template. Enforces meow: prefix, sub-agents.md structure, and context engineering principles."
+description: "Create new skills with proper structure, compliance checks, and registration. Use when asked to create a skill, build a new skill, or scaffold a skill template. Enforces meow: prefix, sub-agents.md structure, and context engineering principles."
 argument-hint: "[skill-name] [description]"
 source: claudekit-engineer
 original_path: .claude/skills/skill-creator/SKILL.md
@@ -9,12 +9,12 @@ adapted_for: meowkit
 
 # Skill Creator
 
-Create new MeowKit skills with proper structure, compliance, and registration.
+Create new skills with proper structure, compliance, and registration.
 
 ## When to Invoke
 
 - User asks to "create a skill", "build a new skill", "make a skill for [X]"
-- Converting external skill for MeowKit adoption
+- Converting external skill for adoption
 - Scaffolding a skill from a workflow pattern
 
 Explicit: `/meow:skill-creator [name] [description]`
@@ -81,7 +81,7 @@ description: "{specific trigger keywords + what it does}"
 ## Handoff Protocol — next agent + action
 ```
 
-## MeowKit Compliance Evaluation
+## Compliance Evaluation
 
 After generating, check:
 
@@ -136,7 +136,7 @@ If FAIL: fix failing items before registering.
 ## References
 
 - [creation-workflow.md](./references/creation-workflow.md) — Step 4: section-by-section guidance and examples
-- [skill-types.md](./references/skill-types.md) — 9-type taxonomy with MeowKit examples
+- [skill-types.md](./references/skill-types.md) — 9-type taxonomy with examples
 - [good-vs-bad-examples.md](./references/good-vs-bad-examples.md) — writing descriptions, gotchas, and steps
 - [filesystem-patterns.md](./references/filesystem-patterns.md) — when to use scripts/, references/, assets/, lib/, config.json
 

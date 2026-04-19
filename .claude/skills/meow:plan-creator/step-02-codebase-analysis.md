@@ -17,7 +17,7 @@ If `meow:scout` unavailable, manually Glob + Grep the relevant directories.
 
 ### 2b. Read Project Context
 
-Read these files (in priority order). All should exist in a properly-configured MeowKit
+Read these files (in priority order). All should exist in a properly-configured kit
 project. If absent, note the gap and continue — do NOT silently skip without logging:
 1. `docs/project-context.md` — tech stack, conventions, anti-patterns
    **REQUIRED:** If absent, print `WARNING: docs/project-context.md not found — run meow:project-context generate` before proceeding.

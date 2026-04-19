@@ -27,7 +27,7 @@ source: gstack
 
 A rigorous, multi-section plan review from a CEO/founder perspective. Challenges premises, maps failure modes, traces error paths, and ensures the plan is extraordinary — not just adequate. Operates in four modes (Expansion, Selective Expansion, Hold Scope, Reduction) with the user in full control of every scope decision.
 
-## MeowKit wiring
+## Skill wiring
 
 - **Reads memory:** `.claude/memory/architecture-decisions.md`
 - **Writes memory:** `.claude/memory/architecture-decisions.md` with `##decision:` prefix

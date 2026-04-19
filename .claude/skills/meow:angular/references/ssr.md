@@ -404,7 +404,6 @@ app.listen(4000, () => {
 
 ## Advanced Patterns
 
-File: `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-ssr/references/ssr-patterns.md`
 
 Contains advanced patterns including:
 - Hydration Debugging (Common mismatches, ngSkipHydration, Debug mode)

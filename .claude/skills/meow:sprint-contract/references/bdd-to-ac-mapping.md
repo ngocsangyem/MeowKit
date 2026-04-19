@@ -1,6 +1,6 @@
 # BDD → Acceptance Criteria Mapping
 
-How to translate Gherkin BDD scenarios from a product spec into testable acceptance criteria for a sprint contract. Sourced from research-02 (sprint contract patterns) and adapted for the meowkit harness.
+How to translate Gherkin BDD scenarios from a product spec into testable acceptance criteria for a sprint contract. Sourced from research-02 (sprint contract patterns) and adapted for the harness.
 
 ## The Translation Step
 
@@ -26,7 +26,7 @@ Feature: Region fill
     And the action appears in the undo history
 ```
 
-## Sprint Contract AC (the meowkit form)
+## Sprint Contract AC (this form)
 
 ```markdown
 ### [AC-01] Rectangle drag fills tiles with selected tile
@@ -43,7 +43,7 @@ Feature: Region fill
 
 1. **Collapse multi-step Givens into one Given line.** BDD spreads preconditions across multiple `Given/And` lines; the AC form collects them into a single Given for readability.
 2. **Collapse multi-assertion Thens.** Same as Givens — the AC's Then captures all observable outcomes, joined with AND.
-3. **Add a Verification line.** BDD assumes a test runner that maps step definitions to code; meowkit's evaluator drives the build directly. The Verification line tells the evaluator how to probe the criterion (browser, curl, CLI, or a combination).
+3. **Add a Verification line.** BDD assumes a test runner that maps step definitions to code; this kit's evaluator drives the build directly. The Verification line tells the evaluator how to probe the criterion (browser, curl, CLI, or a combination).
 4. **Add a Rubric tie-in.** BDD tests are atomic; AC criteria are graded against weighted rubrics. The tie-in line says which rubric this AC contributes to and what weight applies.
 5. **Drop "Feature: ... As a ... I want ... So that ..." preamble.** The product-level plan already has the user story. The AC focuses on the testable mechanic.
 6. **Be specific about coordinates / values / data.** BDD often uses `<placeholders>`; AC uses real values the evaluator can paste into a probe.
@@ -114,4 +114,4 @@ The validator accepts EITHER form (Given/When/Then triplet OR explicit Assertion
 
 - research-02 (Contract Net Protocol + BDD alignment)
 - Anthropic harness research on testable criteria translation
-- Cucumber/Gherkin: https://cucumber.io/docs/gherkin/ (background only — meowkit does NOT use Cucumber runtime)
+- Cucumber/Gherkin: https://cucumber.io/docs/gherkin/ (background only — this kit does NOT use Cucumber runtime)

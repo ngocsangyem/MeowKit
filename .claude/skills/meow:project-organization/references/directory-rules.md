@@ -1,4 +1,4 @@
-# Directory Rules — MeowKit Project Organization
+# Directory Rules — Project Organization
 
 ## Directory Categories
 
@@ -13,9 +13,9 @@ Every project file belongs to one of these categories:
 | Scripts | `scripts/` or `.claude/scripts/` | Build, deploy, utility scripts |
 | Assets | `assets/{type}/` | Media, branding, designs |
 | Config | Root or `.config/` | Dotfiles, config files |
-| MeowKit | `.claude/` | Agent toolkit (skills, agents, rules, hooks, memory) |
+| Kit     | `.claude/` | Agent toolkit (skills, agents, rules, hooks, memory) |
 
-### MeowKit-Specific Paths
+### Kit-Specific Paths
 
 ```
 .claude/
@@ -55,7 +55,7 @@ All filenames use **kebab-case**, self-documenting names.
 2. Test? → tests/ (mirror source structure)
 3. Plan or review? → tasks/plans/ or tasks/reviews/
 4. Documentation? → docs/
-5. MeowKit config? → .claude/
+5. Kit config? → .claude/
 6. Asset? → assets/{type}/
 7. Script? → scripts/
 8. Config? → root or .config/

@@ -6,6 +6,7 @@ description:
   from', 'replicate', 'clone this feature', 'how does X do Y', 'chom',
   'like how X does it', 'port from', 'build like', '1:1 copy'."
 argument-hint: "<source-url|path|description> [feature] [--compare|--copy|--improve|--port] [--lean|--auto]"
+phase: on-demand
 trust_level: kit-authored
 injection_risk: low
 source: claudekit-engineer
@@ -155,9 +156,9 @@ Same as Replication Spec but replace sections 2+5 with Head-to-Head table + Take
 
 ## Boundary Rules
 
-This skill emits handoff text. It does NOT invoke any other MeowKit skill mid-flow — including `/meow:plan-creator`, `/meow:brainstorming`, `/meow:cook`, `/meow:sequential-thinking`.
+This skill emits handoff text. It does NOT invoke any other skill mid-flow — including `/meow:plan-creator`, `/meow:brainstorming`, `/meow:cook`, `/meow:sequential-thinking`.
 
-This is chom's design choice, not a MeowKit platform rule. Skills *can* reference other skills and the model may invoke them; chom opts out because mid-flow invocations of other orchestration skills (`plan-creator`, `brainstorming`, `cook`) would break phase ownership — each of those skills has its own multi-phase workflow that would interleave with chom's HARD GATE discipline. chom's job ends at Phase 6 Handoff; the user invokes the next skill.
+This is chom's design choice, not a a platform rule. Skills *can* reference other skills and the model may invoke them; chom opts out because mid-flow invocations of other orchestration skills (`plan-creator`, `brainstorming`, `cook`) would break phase ownership — each of those skills has its own multi-phase workflow that would interleave with chom's HARD GATE discipline. chom's job ends at Phase 6 Handoff; the user invokes the next skill.
 
 HARD GATE (Phase 4 human approval) is non-bypassable. No flag, including `--lean` or `--auto`, skips this step.
 

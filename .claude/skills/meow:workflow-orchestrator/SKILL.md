@@ -4,7 +4,7 @@ description: "Execute 7-phase workflow for complex features. Includes fasttrack 
 autoInvoke: true
 priority: high
 triggers:
-  - "implement"
+  - "implement feature"
   - "build feature"
   - "create feature"
   - "workflow:start"
@@ -19,9 +19,11 @@ source: aura-frog
 
 <!-- Split for progressive disclosure (checklist #11, #14): 463 → ~75 lines -->
 
-# MeowKit Workflow Orchestrator
+# Workflow Orchestrator
 
 **Priority:** CRITICAL — Use for complex feature implementations.
+
+> Only activates on session start for complex-feature intent. If `/meow:cook` was explicitly invoked in this session, do not activate — `meow:cook` owns the pipeline. See the "Orchestrator Entry Point Rule" in the project `CLAUDE.md`.
 
 ## Plan-First Gate
 

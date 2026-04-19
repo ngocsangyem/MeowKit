@@ -21,7 +21,7 @@ source: gstack
 
 Generates a comprehensive engineering retrospective analyzing commit history, work patterns, and code quality metrics. Team-aware: identifies the user running the command, then analyzes every contributor with per-person praise and growth opportunities. Designed for a senior IC/CTO-level builder using Claude Code as a force multiplier.
 
-## MeowKit wiring
+## Skill wiring
 
 - **Reads memory:** `.claude/memory/review-patterns.md`, `.claude/memory/architecture-decisions.md`
 - **Writes memory:** `.claude/memory/review-patterns.md` with `##pattern:` prefix; `.claude/memory/architecture-decisions.md` with `##decision:` prefix (only when retro extracts a new decision)
@@ -53,7 +53,7 @@ For **global mode** (`/retro global`): Skip steps 3-9, follow `references/global
 
 ## Shared Protocols
 
-These apply across all MeowKit skills:
+These apply across all skills:
 
 - **AskUserQuestion format**: See `references/ask-user-question-format.md`
 - **Completeness Principle**: See `references/completeness-principle.md`

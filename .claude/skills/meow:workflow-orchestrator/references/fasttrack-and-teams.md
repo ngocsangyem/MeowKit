@@ -65,7 +65,7 @@ workflow:status   → Shows current phase, completed phases, pending tasks
 
 ## Phase Context (ON-DEMAND ONLY)
 
-Phase-specific context is loaded from MeowKit's built-in rules:
+Phase-specific context is loaded from the kit's built-in rules:
 
 - Phase 1: `.claude/rules/gate-rules.md` (Gate 1 approval)
 - Phase 2-3: `.claude/rules/tdd-rules.md` (RED/GREEN enforcement)

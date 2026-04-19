@@ -260,7 +260,6 @@ export class Hero {
 
 ## Advanced Patterns
 
-File: `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-component/references/component-patterns.md`
 
 Contains advanced patterns including:
 - Model Inputs (Two-Way Binding)

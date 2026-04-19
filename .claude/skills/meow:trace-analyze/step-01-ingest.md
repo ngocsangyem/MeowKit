@@ -25,7 +25,7 @@ mkdir -p "$analysis_dir"
 
 ### 1c. Read records via venv python
 
-Use `.claude/skills/.venv/bin/python3` (per `meowkit-rules.md` §4 — no `jq` dependency):
+Use `.claude/skills/.venv/bin/python3` (per `rules/` §4 — no `jq` dependency):
 
 ```bash
 PY=".claude/skills/.venv/bin/python3"

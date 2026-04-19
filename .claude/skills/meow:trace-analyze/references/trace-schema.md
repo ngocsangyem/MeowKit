@@ -73,7 +73,7 @@ Rotated logs remain in `.claude/memory/` for historical analysis. They are NOT d
 
 ## Reading Records
 
-Always parse via `.claude/skills/.venv/bin/python3` (per meowkit-rules.md §4 — no `jq` dependency):
+Always parse via `.claude/skills/.venv/bin/python3` (per kit rules §4 — no `jq` dependency):
 
 ```python
 import json

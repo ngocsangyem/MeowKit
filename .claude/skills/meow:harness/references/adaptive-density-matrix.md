@@ -80,7 +80,7 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 
 ## See Also
 
-- `meowkit/docs/dead-weight-audit.md` (Phase 6 — pending)
-- `meowkit/.claude/skills/meow:scale-routing/SKILL.md` Output Schema v2.1 — `harness_density` field
-- `meowkit/.claude/skills/meow:benchmark/` (Phase 8 — pending) — calibration replay automation
+- `docs/dead-weight-audit.md` (Phase 6 — pending)
+- `.claude/skills/meow:scale-routing/SKILL.md` Output Schema v2.1 — `harness_density` field
+- `.claude/skills/meow:benchmark/` (Phase 8 — pending) — calibration replay automation
 - Anthropic harness design article (Prithvi Rajasekaran, Labs)

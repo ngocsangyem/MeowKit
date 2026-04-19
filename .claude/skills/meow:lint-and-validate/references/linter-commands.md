@@ -23,7 +23,7 @@ Config files to look for: `.eslintrc`, `.eslintrc.json`, `.eslintrc.js`, `tsconf
 
 Config files to look for: `pyproject.toml`, `setup.cfg`, `.ruff.toml`
 
-## MeowKit Validation Scripts
+## Shared Validation Scripts
 
 Located at `.claude/scripts/` — project-level scripts for deterministic validation.
 
@@ -32,7 +32,7 @@ Located at `.claude/scripts/` — project-level scripts for deterministic valida
 | `validate.py`      | General code validation   | `.claude/skills/.venv/bin/python3 .claude/scripts/validate.py`          |
 | `security-scan.py` | Security pattern scanning | `.claude/skills/.venv/bin/python3 .claude/scripts/security-scan.py`     |
 
-Run these in addition to ecosystem linters — they check MeowKit-specific patterns.
+Run these in addition to ecosystem linters — they check kit-wide patterns.
 
 ## Quality Loop
 

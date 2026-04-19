@@ -34,7 +34,7 @@ Before producing findings, run every candidate through this filter.
 19. Dependency CVEs with CVSS < 4.0 and no known exploit
 20. Docker issues in files named `Dockerfile.dev` or `Dockerfile.local` unless referenced in prod deploy configs
 21. CI/CD findings on archived or disabled workflows
-22. Skill files that are part of MeowKit itself (trusted source)
+22. Skill files that are part of the trusted kit (trusted source)
 
 **Precedents:**
 

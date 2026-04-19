@@ -351,7 +351,6 @@ utilityService.executeWithDI(() => {
 
 ## Advanced Patterns
 
-File: `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-di/references/di-patterns.md`
 
 Contains advanced patterns including:
 - Service Patterns (Facade Service, State Service, Repository Pattern)

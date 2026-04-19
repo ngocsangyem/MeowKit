@@ -23,6 +23,8 @@ Seven techniques for non-debugging stuck-ness. Each targets a specific failure m
 
 ## When to Use
 
+**NOT this skill if:** you want open solution exploration before any plan exists — use `meow:brainstorming`. **NOT this skill if:** you want to re-examine an existing output or verdict — use `meow:elicit`.
+
 Match symptom to technique. Load the reference only after matching.
 
 | Stuck symptom                                         | Technique                | Reference                                |

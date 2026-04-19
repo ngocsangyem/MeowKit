@@ -2,7 +2,7 @@
 name: meow:help
 description: >-
   Workflow navigation assistant. Scans project state (plans, reviews, tests, git)
-  and recommends the next step in MeowKit's 7-phase pipeline. Use when asked
+  and recommends the next step in the 7-phase pipeline. Use when asked
   "what should I do next?", "where am I?", "help", or at session start.
 argument-hint: "[--verbose]"
 source: meowkit
@@ -13,7 +13,7 @@ allowed-tools:
   - Bash
 ---
 
-# MeowKit Navigation Help
+# Navigation Help
 
 Answers "What should I do next?" by scanning project state and mapping to the 7-phase pipeline.
 
@@ -48,6 +48,8 @@ No plans, no reviews, no changes.
 For skill suggestions based on task type, see `.claude/skills/meow:agent-detector/references/lifecycle-routing.md`.
 
 ## State-to-Recommendation Map
+
+> Alias: `/meow:plan` routes to `meow:plan-creator` (slash-command wrapper at `.claude/commands/meow/plan.md`). Subcommands `red-team`, `validate`, `archive` are handled by the same skill.
 
 | State | Pipeline Phase | Recommendation |
 |-------|---------------|----------------|
@@ -99,7 +101,7 @@ Set `MEOW_HOOK_PROFILE=strict` to enable ALL hooks including cost-meter and post
 ## Output Format
 
 ```
-## MeowKit Status
+## Status
 
 **Current phase:** [Phase N — Name]
 **State:** [brief description]

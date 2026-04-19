@@ -6,7 +6,7 @@
 
 - **Before every task:** Log the estimated complexity tier and model.
 - **After every task:** Append actual usage to the cost log.
-- **On `/meow:budget` command:** Display cost summary.
+- **On `/meow:budget` command:** Display cost summary. `/meow:budget` is a subcommand of `meow:memory`, not a standalone skill — invoke it while `meow:memory` is active: `/meow:budget [--report|--alert N]`.
 
 ---
 
@@ -53,6 +53,8 @@ Append an entry to `memory/cost-log.json` (create if it does not exist).
 - If the task was abandoned or failed, still log it (add `"status": "failed"` or `"status": "abandoned"`).
 
 ## `/meow:budget` Command
+
+> Note: `/meow:budget` is a subcommand handled by `meow:memory`, not a standalone skill. Invoke it while `meow:memory` is active: `/meow:budget [--report|--alert N]`.
 
 When the user invokes `/meow:budget`, read `memory/cost-log.json` and display:
 

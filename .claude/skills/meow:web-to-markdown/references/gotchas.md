@@ -6,7 +6,7 @@ Concrete edge cases and operational surprises. Each entry explains why it matter
 
 ## Gotcha: robots.txt respected by default
 
-**Why it matters:** This skill checks `robots.txt` before fetching. A rate-limit-free domain (no Crawl-delay) may still include a `Disallow: /` for all bots or for the MeowKit user-agent. The fetch will return `ERROR: robots.txt denies fetch` even on publicly accessible pages. Silence is not always consent — legitimate content producers opt out of crawling.
+**Why it matters:** This skill checks `robots.txt` before fetching. A rate-limit-free domain (no Crawl-delay) may still include a `Disallow: /` for all bots or for the the configured user-agent. The fetch will return `ERROR: robots.txt denies fetch` even on publicly accessible pages. Silence is not always consent — legitimate content producers opt out of crawling.
 
 **Mitigation:** Set `MEOWKIT_WEB_FETCH_RESPECT_ROBOTS=0` to disable the check entirely. Use sparingly — only when you have explicit permission to fetch or the domain is known to not enforce robots. Default is ON (check respected).
 

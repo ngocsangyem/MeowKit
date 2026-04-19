@@ -8,7 +8,7 @@ Same midnight-aligned logic as the regular retro. Default 7d. The second argumen
 
 ## Global Step 2: Discover repos
 
-MeowKit uses a simple git-based discovery approach (no external binary needed):
+This skill uses a simple git-based discovery approach (no external binary needed):
 
 ```bash
 # Find all git repos in common development directories
@@ -130,7 +130,7 @@ align cleanly. Never truncate project names.
 |  . [1-line description of second theme]
 |  . [1-line description of third theme]
 |
-|  Powered by MeowKit
+|  Powered by this kit
 +===================================================================
 ```
 
@@ -258,8 +258,8 @@ Use the Write tool to save JSON to `.claude/memory/retros/global-${today}-${next
   "window": "7d",
   "projects": [
     {
-      "name": "meowkit",
-      "remote": "https://github.com/meowkit/meowkit",
+      "name": "{project-slug}",
+      "remote": "https://github.com/{org}/{repo}",
       "commits": 47,
       "insertions": 3200,
       "deletions": 800,
@@ -276,6 +276,6 @@ Use the Write tool to save JSON to `.claude/memory/retros/global-${today}-${next
     "global_streak_days": 52,
     "avg_context_switches_per_day": 2.1
   },
-  "tweetable": "Week of Mar 14: 5 projects, 182 commits, 15.3k LOC | CC: 48, Codex: 8, Gemini: 3 | Focus: meowkit (58%) | Streak: 52d"
+  "tweetable": "Week of Mar 14: 5 projects, 182 commits, 15.3k LOC | CC: 48, Codex: 8, Gemini: 3 | Focus: {project} (58%) | Streak: 52d"
 }
 ```

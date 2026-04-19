@@ -328,7 +328,6 @@ rm -rf .angular/cache
 
 ## Advanced Patterns
 
-File: `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-tooling/references/tooling-patterns.md`
 
 Contains advanced patterns including:
 - Custom Schematics (Generate Schematic Collection, Simple Component Schematic)
@@ -390,30 +389,8 @@ All skills default to **Angular v20+**:
 ## COMPLETE FILE LISTING
 
 **SKILL.md files (Main Documentation):**
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-component/SKILL.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-signals/SKILL.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-di/SKILL.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-directives/SKILL.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-forms/SKILL.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-http/SKILL.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-routing/SKILL.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-ssr/SKILL.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-testing/SKILL.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-tooling/SKILL.md`
 
 **References/ Files (Advanced Patterns):**
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-component/references/component-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-signals/references/signal-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-di/references/di-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-directives/references/directive-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-forms/references/form-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-forms/references/formvalueControl-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-http/references/http-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-routing/references/routing-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-ssr/references/ssr-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-testing/references/testing-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-testing/references/vitest-migration.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-tooling/references/tooling-patterns.md`
 
 ---
 

@@ -92,7 +92,7 @@ find . -name '*.test.*' -o -name '*.spec.*' -o -name '*_test.*' -o -name '*_spec
 # 11. Regression test commits in window
 git log origin/<default> --since="<window>" --oneline --grep="test(qa):" --grep="test(design):" --grep="test: coverage"
 
-# 12. MeowKit skill usage telemetry (if available)
+# 12. Skill usage telemetry (if available)
 cat .claude/memory/skill-usage.jsonl 2>/dev/null || true
 
 # 12. Test files changed in window

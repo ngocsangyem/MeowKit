@@ -8,7 +8,7 @@ argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-te
 
 # Cook — Full Implementation Pipeline
 
-End-to-end implementation following MeowKit's 7-phase workflow. TDD is opt-in via `--tdd`.
+End-to-end implementation following the 7-phase workflow. TDD is opt-in via `--tdd`.
 
 ## Usage
 
@@ -59,6 +59,8 @@ Before starting work, read `references/failure-catalog.md` for common implementa
 ## Smart Intent Detection
 
 See `references/intent-detection.md` for full detection logic.
+
+> **Green-field product build** (new kanban app, full SaaS from scratch, multi-sprint autonomous build)? Use `meow:harness` instead. Cook handles single features, fixes, and refactors; harness owns the generator↔evaluator loop and adaptive scaffolding density.
 
 | Input Pattern                    | Mode        | Behavior                                      |
 | -------------------------------- | ----------- | --------------------------------------------- |

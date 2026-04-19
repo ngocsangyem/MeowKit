@@ -112,7 +112,7 @@ Use AskUserQuestion:
 ```
 
 **Last modified by:** <author>
-**Noticed by:** MeowKit /meow:ship on <date>" \
+**Noticed by:** /meow:ship on <date>" \
     --assignee "<github-username>"
   ```
 - If `gh` is not available or `--assignee` fails (user not in org, etc.), create the issue without assignee and note who should look at it in the body.

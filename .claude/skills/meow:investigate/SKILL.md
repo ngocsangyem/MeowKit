@@ -40,7 +40,7 @@ source: gstack
 
 **Iron Law: NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST.**
 
-## MeowKit wiring
+## Skill wiring
 
 - **Reads memory:** `.claude/memory/fixes.md`, `.claude/memory/architecture-decisions.md`
 - **Writes memory:** `.claude/memory/fixes.md` with `##note:` prefix (diagnosis records only — the fix itself is persisted by `meow:fix`)
@@ -66,7 +66,7 @@ Skip: Investigation itself doesn't need a plan — it produces the input for pla
 1. **Run preamble** — load `references/preamble.md` and execute the startup bash block
 2. **Collect symptoms** — read error messages, stack traces, reproduction steps
 3. **Investigate root cause** — load `references/debugging-methodology.md` and follow Phase 1-3. For recurring patterns or complex failures, load `references/rca-method-selection.md` for methodology selection. Load `references/rca-anti-patterns.md` to avoid common RCA mistakes.
-4. **Lock scope** — restrict edits to affected module (via freeze hook)
+4. **Lock scope** — optionally invoke `meow:freeze <target-dir>` first to restrict edits to the affected module. The `check-freeze.sh` hook is installed but without an explicit `meow:freeze` invocation it is a no-op (all edits allowed).
 5. **Implement fix** — follow Phase 4 from debugging methodology
 6. **Verify** — reproduce original scenario, run test suite, output DEBUG REPORT
 7. **Run shared protocols** — load `references/shared-protocols.md` for completion status + telemetry

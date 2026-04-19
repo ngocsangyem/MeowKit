@@ -437,8 +437,6 @@ describe('UserCmpt', () => {
 ## Advanced Patterns
 
 Files:
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-testing/references/testing-patterns.md`
-- `/Users/sangnguyen/Desktop/compare-kit/docs/angular-skills-main/skills/angular-testing/references/vitest-migration.md`
 
 Contains advanced patterns including:
 - Vitest Advanced Patterns (Snapshot Testing, Parameterized Tests, Fake Timers, Module Mocking, Async/Await, Coverage Configuration, UI Mode, Concurrent Tests, Fixtures)
