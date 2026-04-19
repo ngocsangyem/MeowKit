@@ -24,7 +24,7 @@ Rules:
 - One must be the **"minimal viable"** (fewest files, smallest diff, ships fastest).
 - One must be the **"ideal architecture"** (best long-term trajectory, most elegant).
 - One can be **creative/lateral** (unexpected approach, different framing of the problem).
-- If Codex proposed a prototype in Phase 3.5, consider using it as a starting point for the creative/lateral approach.
+- If the second-opinion subagent proposed a prototype in Phase 3.5, consider using it as a starting point for the creative/lateral approach.
 
 **RECOMMENDATION:** Choose [X] because [one-line reason].
 
@@ -92,29 +92,21 @@ The screenshot file at `/tmp/meowkit-sketch.png` can be referenced by downstream
 
 **Step 6: Outside design voices** (optional)
 
-After the wireframe is approved, offer outside design perspectives:
+After the wireframe is approved, offer outside design perspectives via AskUserQuestion:
 
-```bash
-which codex 2>/dev/null && echo "CODEX_AVAILABLE" || echo "CODEX_NOT_AVAILABLE"
-```
-
-If Codex is available, use AskUserQuestion:
-> "Want outside design perspectives on the chosen approach? Codex proposes a visual thesis, content plan, and interaction ideas. A Claude subagent proposes an alternative aesthetic direction."
+> "Want outside design perspectives on the chosen approach? Two Claude subagents with fresh context can propose alternative visual theses and design directions."
 >
 > A) Yes — get outside design voices
 > B) No — proceed without
 
-If user chooses A, launch both voices simultaneously:
+If user chooses A, dispatch two parallel subagents via the Agent tool:
 
-1. **Codex** (via Bash, `model_reasoning_effort="medium"`):
-```bash
-TMPERR_SKETCH=$(mktemp /tmp/codex-sketch-XXXXXXXX)
-codex exec "For this product approach, provide: a visual thesis (one sentence — mood, material, energy), a content plan (hero → support → detail → CTA), and 2 interaction ideas that change page feel. Apply beautiful defaults: composition-first, brand-first, cardless, poster not document. Be opinionated." -s read-only -c 'model_reasoning_effort="medium"' --enable web_search_cached 2>"$TMPERR_SKETCH"
-```
-Use a 5-minute timeout (`timeout: 300000`). After completion: `cat "$TMPERR_SKETCH" && rm -f "$TMPERR_SKETCH"`
+1. **Visual thesis subagent:**
+"For this product approach, provide: a visual thesis (one sentence — mood, material, energy), a content plan (hero → support → detail → CTA), and 2 interaction ideas that change page feel. Apply beautiful defaults: composition-first, brand-first, cardless, poster not document. Be opinionated."
 
-2. **Claude subagent** (via Agent tool):
+2. **Design direction subagent:**
 "For this product approach, what design direction would you recommend? What aesthetic, typography, and interaction patterns fit? What would make this approach feel inevitable to the user? Be specific — font names, hex colors, spacing values."
 
-Present Codex output under `CODEX SAYS (design sketch):` and subagent output under `CLAUDE SUBAGENT (design direction):`.
-Error handling: all non-blocking. On failure, skip and continue.
+Present outputs under `VISUAL THESIS (subagent):` and `DESIGN DIRECTION (subagent):` headers.
+
+**Error handling:** All non-blocking. On subagent failure, skip that voice and continue with whatever succeeded.

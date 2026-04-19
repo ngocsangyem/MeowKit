@@ -1,4 +1,4 @@
-# MeowKit Shared Protocols
+# Shared Protocols
 
 ## AskUserQuestion Format
 

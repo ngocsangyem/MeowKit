@@ -10,7 +10,7 @@ Track which of these signals appeared during the session:
 - Has **domain expertise** — knows this space from the inside
 - Showed **taste** — cared about getting the details right
 - Showed **agency** — actually building, not just planning
-- **Defended premise with reasoning** against cross-model challenge (kept original premise when Codex disagreed AND articulated specific reasoning for why — dismissal without reasoning does not count)
+- **Defended premise with reasoning** against the second-opinion challenge (kept original premise when the subagent disagreed AND articulated specific reasoning for why — dismissal without reasoning does not count)
 
 Count the signals. You'll use this count in Phase 6 to determine which tier of closing message to use.
 
@@ -64,8 +64,8 @@ Supersedes: {prior filename — omit this line if first design on this branch}
 ## Premises
 {from Phase 3}
 
-## Cross-Model Perspective
-{If Codex ran in Phase 3.5: Codex's independent cold read — steelman, key insight, challenged premise, prototype suggestion. Verbatim or close paraphrase of what Codex said. If Codex did NOT run (skipped or unavailable): omit this section entirely — do not include it.}
+## Adversarial Perspective
+{If the second-opinion subagent ran in Phase 3.5: its independent cold read — steelman, key insight, challenged premise, prototype suggestion. Verbatim or close paraphrase. If it did NOT run (user skipped): omit this section entirely.}
 
 ## Approaches Considered
 ### Approach A: {name}
@@ -121,8 +121,8 @@ Supersedes: {prior filename — omit this line if first design on this branch}
 ## Premises
 {from Phase 3}
 
-## Cross-Model Perspective
-{If Codex ran in Phase 3.5: Codex's independent cold read — coolest version, key insight, existing tools, prototype suggestion. Verbatim or close paraphrase of what Codex said. If Codex did NOT run (skipped or unavailable): omit this section entirely — do not include it.}
+## Adversarial Perspective
+{If the second-opinion subagent ran in Phase 3.5: its independent cold read — coolest version, key insight, existing tools, prototype suggestion. Verbatim or close paraphrase. If it did NOT run (user skipped): omit this section entirely.}
 
 ## Approaches Considered
 ### Approach A: {name}

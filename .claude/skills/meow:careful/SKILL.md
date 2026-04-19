@@ -20,9 +20,6 @@ hooks:
 source: gstack
 ---
 
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
-<!-- Regenerate: bun run gen:skill-docs -->
-
 # /careful — Destructive Command Guardrails
 
 Safety mode is now **active**. Every bash command will be checked for destructive
@@ -51,6 +48,7 @@ To deactivate, end the conversation or start a new one. Hooks are session-scoped
 - **PreToolUse on Bash**: Warns before destructive commands (rm -rf, DROP TABLE, force-push, reset --hard, kubectl delete)
 - Session-scoped — only active when `meow:careful` is invoked
 - User can override each warning individually
+- **Interaction with meow:investigate**: When careful is active during an investigation, destructive-Bash warnings still fire. Debugging commands that touch state require explicit user confirmation per warning — do not bypass.
 
 ## Gotchas
 

@@ -81,6 +81,10 @@ touch .claude/memory/.telemetry-prompted
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 
+## Memory
+
+- **Writes memory:** when the session produces a design-doc decision, append to `.claude/memory/architecture-decisions.md` with `##decision:` prefix. Do not overwrite prior entries — always append.
+
 ## SETUP (run this check BEFORE any browse command)
 
 ```bash

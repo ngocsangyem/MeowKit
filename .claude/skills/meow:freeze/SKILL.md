@@ -26,9 +26,6 @@ hooks:
 source: gstack
 ---
 
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
-<!-- Regenerate: bun run gen:skill-docs -->
-
 # /freeze — Restrict Edits to a Directory
 
 Lock file edits to a specific directory. Any Edit or Write operation targeting
@@ -67,7 +64,7 @@ echo "Freeze boundary set: $FREEZE_DIR"
 
 Tell the user: "Edits are now restricted to `<path>/`. Any Edit or Write
 outside this directory will be blocked. To change the boundary, run `/meow:freeze`
-again. To remove it, run `/unfreeze` or end the session."
+again. Freeze persists for the session — end the session or start a new one to clear it."
 
 ## How it works
 

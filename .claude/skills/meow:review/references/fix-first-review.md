@@ -6,9 +6,11 @@ Output a summary header: `Pre-Landing Review: N issues (X critical, Y informatio
 
 ## Step 5a: Classify each finding
 
-For each finding, classify as AUTO-FIX or ASK per the Fix-First Heuristic in
-checklist.md. Critical findings lean toward ASK; informational findings lean
-toward AUTO-FIX.
+For each finding, classify as AUTO-FIX or ASK:
+- **AUTO-FIX**: mechanical, low-ambiguity changes (formatting, typos, obvious null checks, missing imports, CSS pattern fixes like `!important` removal)
+- **ASK**: anything requiring judgment (architectural changes, security trade-offs, behavior changes, non-trivial refactors)
+
+Critical findings lean toward ASK; informational findings lean toward AUTO-FIX.
 
 ## Step 5b: Auto-fix all AUTO-FIX items
 

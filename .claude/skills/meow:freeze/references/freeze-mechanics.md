@@ -60,6 +60,6 @@ edits, but deliberate bash commands can still touch any file.
 ## Deactivation
 
 Freeze is session-scoped. It deactivates when:
-- The conversation ends
-- The user runs `/unfreeze` (deletes the state file)
+- The conversation ends or a new session starts
 - A new freeze is set with a different path (overwrites state file)
+- The user manually deletes the state file at `${CLAUDE_PLUGIN_DATA:-.claude/memory}/freeze-dir.txt`

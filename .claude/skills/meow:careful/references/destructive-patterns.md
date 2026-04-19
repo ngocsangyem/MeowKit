@@ -1,10 +1,10 @@
 # Destructive Command Patterns
 
 > Patterns that trigger a warning in `meow:careful` mode.
-> Referenced by: `.claude/skills/meow:careful/SKILL.md` and `.claude/hooks/check-careful.sh`
-> Update this file when new destructive patterns are discovered in production.
+> Referenced by: `.claude/skills/meow:careful/SKILL.md` and `.claude/skills/meow:careful/bin/check-careful.sh`
+> Update this file when new destructive patterns are discovered in production — and keep the hook in sync.
 >
-> **Implementation status:** `check-careful.sh` currently checks 8 core patterns (rm -r, DROP/TRUNCATE, git push --force, git reset --hard, git checkout/restore ., kubectl delete, docker rm -f/prune). Additional patterns listed below are behavioral guidance — the agent is instructed to avoid them, but no preventive hook blocks them. Environment-aware blocking (production auto-block) is planned but not yet implemented.
+> **Implementation status:** `check-careful.sh` enforces all CRITICAL and HIGH patterns listed below. Production auto-block is active: when `NODE_ENV`, `APP_ENV`, or `ENVIRONMENT` contains `production`/`prod`/`staging`, CRITICAL patterns return `permissionDecision: "block"` (no override) instead of `"ask"`.
 
 ---
 

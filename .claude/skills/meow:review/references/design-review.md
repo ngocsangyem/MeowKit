@@ -41,26 +41,14 @@ source <(.claude/scripts/bin/meowkit-diff-scope <base> 2>/dev/null)
 
 Substitute: TIMESTAMP = ISO 8601 datetime, STATUS = "clean" if 0 findings or "issues_found", N = total findings, M = auto-fixed count, COMMIT = output of `git rev-parse --short HEAD`.
 
-7. **Codex design voice** (optional, automatic if available):
+7. **Design voice adversarial pass** (optional, Claude subagent):
 
-```bash
-which codex 2>/dev/null && echo "CODEX_AVAILABLE" || echo "CODEX_NOT_AVAILABLE"
-```
+For high-value frontend diffs, dispatch a Claude adversarial subagent via the Agent tool. Subagent prompt:
 
-If Codex is available, run a lightweight design check on the diff:
+"Review the git diff on this branch. Run 7 litmus checks (YES/NO each): 1. Brand/product unmistakable in first screen? 2. One strong visual anchor present? 3. Page understandable by scanning headlines only? 4. Each section has one job? 5. Are cards actually necessary? 6. Does motion improve hierarchy or atmosphere? 7. Would design feel premium with all decorative shadows removed? Flag any hard rejections: Generic SaaS card grid as first impression, beautiful image with weak brand, strong headline with no clear action, busy imagery behind text, sections repeating same mood statement, carousel with no narrative purpose, app UI made of stacked cards instead of layout. Five most important design findings only. Reference file:line."
 
-```bash
-TMPERR_DRL=$(mktemp /tmp/codex-drl-XXXXXXXX)
-codex exec "Review the git diff on this branch. Run 7 litmus checks (YES/NO each): 1. Brand/product unmistakable in first screen? 2. One strong visual anchor present? 3. Page understandable by scanning headlines only? 4. Each section has one job? 5. Are cards actually necessary? 6. Does motion improve hierarchy or atmosphere? 7. Would design feel premium with all decorative shadows removed? Flag any hard rejections: 1. Generic SaaS card grid as first impression 2. Beautiful image with weak brand 3. Strong headline with no clear action 4. Busy imagery behind text 5. Sections repeating same mood statement 6. Carousel with no narrative purpose 7. App UI made of stacked cards instead of layout 5 most important design findings only. Reference file:line." -s read-only -c 'model_reasoning_effort="high"' --enable web_search_cached 2>"$TMPERR_DRL"
-```
+Present subagent output under a `DESIGN VOICE (Claude subagent):` header, merged with the rubric findings above.
 
-Use a 5-minute timeout (`timeout: 300000`). After the command completes, read stderr:
-```bash
-cat "$TMPERR_DRL" && rm -f "$TMPERR_DRL"
-```
-
-**Error handling:** All errors are non-blocking. On auth failure, timeout, or empty response — skip with a brief note and continue.
-
-Present Codex output under a `CODEX (design):` header, merged with the checklist findings above.
+**Error handling:** If the subagent fails or times out, skip with a brief note — this pass is optional quality enhancement, not a prerequisite.
 
 Include any design findings alongside the findings from Step 4. They follow the same Fix-First flow in Step 5 — AUTO-FIX for mechanical CSS fixes, ASK for everything else.

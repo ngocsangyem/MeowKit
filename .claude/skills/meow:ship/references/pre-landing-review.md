@@ -2,53 +2,22 @@
 
 ## Step 3.5: Pre-Landing Review
 
-Review the diff for structural issues that tests don't catch.
+Structural review is owned by `meow:review` at Gate 2 — ship does not re-run the full adversarial pipeline. Ship's pre-landing check is a lightweight diff-based pass only.
 
-1. Read `.claude/skills/meow:review/checklist.md`. If the file cannot be read, **STOP** and report the error.
+1. Run `git diff origin/<base>` to get the full diff (scoped to feature changes against the freshly-fetched base branch).
 
-2. Run `git diff origin/<base>` to get the full diff (scoped to feature changes against the freshly-fetched base branch).
+2. Apply the two-pass review via the prompts under `meow:review/prompts/` (blind-hunter for obvious issues, criteria-auditor for plan ACs). Load them JIT when needed.
 
-3. Apply the review checklist in two passes:
-   - **Pass 1 (CRITICAL):** SQL & Data Safety, LLM Output Trust Boundary
-   - **Pass 2 (INFORMATIONAL):** All remaining categories
+## Design Review (delegated to meow:review)
 
-## Design Review (conditional, diff-scoped)
+Design review is delegated to `meow:review/references/design-review.md` — rubric-based, diff-scoped. Ship does not re-implement it.
 
-Check if the diff touches frontend files using `meowkit-diff-scope`:
+If the diff is frontend-only and Gate 2 was skipped for any reason, load `meow:review/references/design-review.md` and follow the rubric pipeline there.
 
-```bash
-source <(.claude/scripts/bin/meowkit-diff-scope <base> 2>/dev/null)
-```
-
-**If `SCOPE_FRONTEND=false`:** Skip design review silently. No output.
-
-**If `SCOPE_FRONTEND=true`:**
-
-1. **Check for DESIGN.md.** If `DESIGN.md` or `design-system.md` exists in the repo root, read it. All design findings are calibrated against it — patterns blessed in DESIGN.md are not flagged. If not found, use universal design principles.
-
-2. **Read `.claude/skills/meow:review/design-checklist.md`.** If the file cannot be read, skip design review with a note: "Design checklist not found — skipping design review."
-
-3. **Read each changed frontend file** (full file, not just diff hunks). Frontend files are identified by the patterns listed in the checklist.
-
-4. **Apply the design checklist** against the changed files. For each item:
-   - **[HIGH] mechanical CSS fix** (`outline: none`, `!important`, `font-size < 16px`): classify as AUTO-FIX
-   - **[HIGH/MEDIUM] design judgment needed**: classify as ASK
-   - **[LOW] intent-based detection**: present as "Possible — verify visually"
-
-5. **Include findings** in the review output under a "Design Review" header, following the output format in the checklist. Design findings merge with code review findings into the same Fix-First flow.
-
-6. **Log the result** for the Review Readiness Dashboard:
-
-```bash
-.claude/scripts/bin/meowkit-review-log '{"source":"ship-design-check","timestamp":"TIMESTAMP","status":"STATUS","findings":N,"auto_fixed":M,"commit":"COMMIT"}'
-```
-
-Substitute: TIMESTAMP = ISO 8601 datetime, STATUS = "clean" if 0 findings or "issues_found", N = total findings, M = auto-fixed count, COMMIT = output of `git rev-parse --short HEAD`. `source` is tagged `ship-design-check` — this is an inline ship step, not a standalone skill.
-
-   Include any design findings alongside the code review findings. They follow the same Fix-First flow below.
+## Classify findings
 
 4. **Classify each finding as AUTO-FIX or ASK** per the Fix-First Heuristic in
-   checklist.md. Critical findings lean toward ASK; informational lean toward AUTO-FIX.
+   `meow:review/references/fix-first-review.md`. Critical findings lean toward ASK; informational lean toward AUTO-FIX.
 
 5. **Auto-fix all AUTO-FIX items.** Apply each fix. Output one line per fix:
    `[AUTO-FIXED] [file:line] Problem → what you did`

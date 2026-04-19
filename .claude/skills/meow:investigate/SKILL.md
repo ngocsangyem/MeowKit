@@ -30,7 +30,7 @@ hooks:
         - type: command
           command: "bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh"
           statusMessage: "Checking debug scope boundary..."
-source: gstack/claudekit-engineering
+source: gstack
 ---
 
 <!-- Split for progressive disclosure (checklist #11, #14): 497 → ~65 lines -->
@@ -39,6 +39,11 @@ source: gstack/claudekit-engineering
 # Systematic Debugging
 
 **Iron Law: NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST.**
+
+## MeowKit wiring
+
+- **Reads memory:** `.claude/memory/fixes.md`, `.claude/memory/architecture-decisions.md`
+- **Writes memory:** `.claude/memory/fixes.md` with `##note:` prefix (diagnosis records only — the fix itself is persisted by `meow:fix`)
 
 ## Plan-First Gate
 
@@ -101,6 +106,8 @@ Load **only when executing** the corresponding step — not upfront.
 - **Iron Law enforcement**: No fixes without confirmed root cause — this is a process constraint, not a technical hook
 - The skill gates Phase 3 (Fix) behind Phase 1 (Investigate) completion
 - If root cause cannot be confirmed after 3 hypotheses, escalate to human
+- **Scope-locking hook**: Installs a `PreToolUse` hook on Edit/Write that delegates to `meow:freeze` to scope edits to the investigation target. Deactivation follows freeze's semantics — end the session or start a new one to clear it.
+- **Interaction with meow:careful**: If meow:careful is active, debugging commands that touch state will still prompt for confirmation. This is expected — do not bypass.
 
 ## Gotchas
 

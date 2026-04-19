@@ -50,14 +50,17 @@ esac
 # Normalize: remove double slashes and trailing slash
 FILE_PATH=$(printf '%s' "$FILE_PATH" | sed 's|/\+|/|g;s|/$||')
 
-# Check: does the file path start with the freeze directory?
+# Normalize FREEZE_DIR: strip trailing slash so exact-match and prefix-match both work.
+# Without this, "/src/" stored as freeze-dir would fail to match FILE_PATH="/src" (the
+# directory node itself) after trailing-slash normalization above.
+FREEZE_DIR_NORM="${FREEZE_DIR%/}"
+
+# Allow when FILE_PATH equals the frozen dir itself OR sits under it (prefix + separator).
 case "$FILE_PATH" in
-  "${FREEZE_DIR}"*)
-    # Inside freeze boundary — allow
+  "$FREEZE_DIR_NORM"|"$FREEZE_DIR_NORM"/*)
     echo '{}'
     ;;
   *)
-    # Outside freeze boundary — deny
-    printf '{"permissionDecision":"deny","message":"[freeze] Blocked: %s is outside the freeze boundary (%s). Only edits within the frozen directory are allowed."}\n' "$FILE_PATH" "$FREEZE_DIR"
+    printf '{"permissionDecision":"deny","message":"[freeze] Blocked: %s is outside the freeze boundary (%s). Only edits within the frozen directory are allowed."}\n' "$FILE_PATH" "$FREEZE_DIR_NORM"
     ;;
 esac

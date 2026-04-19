@@ -78,3 +78,8 @@ touch .claude/memory/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
+
+## Memory
+
+- **Reads memory:** at task start, read `.claude/memory/review-patterns.md` and `.claude/memory/architecture-decisions.md` for prior patterns/decisions that should be surfaced in the retro narrative.
+- **Writes memory:** at task end, append newly-extracted patterns to `.claude/memory/review-patterns.md` with `##pattern:` prefix. If the retro surfaces a new architectural decision (not just a pattern), append to `.claude/memory/architecture-decisions.md` with `##decision:` prefix. Do not overwrite prior entries — always append.

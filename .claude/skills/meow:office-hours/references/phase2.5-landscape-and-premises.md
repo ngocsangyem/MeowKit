@@ -76,25 +76,17 @@ Use AskUserQuestion to confirm. If the user disagrees with a premise, revise und
 
 ---
 
-# Phase 3.5: Cross-Model Second Opinion (optional)
+# Phase 3.5: Adversarial Second Opinion (optional)
 
-**Binary check first — no question if unavailable:**
+Use AskUserQuestion:
 
-```bash
-which codex 2>/dev/null && echo "CODEX_AVAILABLE" || echo "CODEX_NOT_AVAILABLE"
-```
-
-If `CODEX_NOT_AVAILABLE`: skip Phase 3.5 entirely — no message, no AskUserQuestion. Proceed directly to Phase 4.
-
-If `CODEX_AVAILABLE`: use AskUserQuestion:
-
-> Want a second opinion from a different AI model? Codex will independently review your problem statement, key answers, premises, and any landscape findings from this session. It hasn't seen this conversation — it gets a structured summary. Usually takes 2-5 minutes.
+> Want a second opinion? A Claude adversarial subagent will independently review your problem statement, key answers, premises, and any landscape findings from this session. It hasn't seen this conversation — it gets a structured summary. Takes 1-2 minutes.
 > A) Yes, get a second opinion
 > B) No, proceed to alternatives
 
-If B: skip Phase 3.5 entirely. Remember that Codex did NOT run (affects design doc, founder signals, and Phase 4 below).
+If B: skip Phase 3.5 entirely. Remember that the second opinion did NOT run (affects design doc, founder signals, and Phase 4 below).
 
-**If A: Run the Codex cold read.**
+**If A: Dispatch the Claude adversarial subagent.**
 
 1. Assemble a structured context block from Phases 1-3:
    - Mode (Startup or Builder)
@@ -104,56 +96,32 @@ If B: skip Phase 3.5 entirely. Remember that Codex did NOT run (affects design d
    - Agreed premises (from Phase 3)
    - Codebase context (project name, languages, recent activity)
 
-2. **Write the assembled prompt to a temp file** (prevents shell injection from user-derived content):
+2. Dispatch via the Agent tool with the mode-appropriate prompt:
 
-```bash
-CODEX_PROMPT_FILE=$(mktemp /tmp/meowkit-codex-oh-XXXXXXXX.txt)
-```
+**Startup mode prompt:** "You are an independent technical advisor reading a transcript of a startup brainstorming session. [CONTEXT BLOCK HERE]. Your job: 1) What is the STRONGEST version of what this person is trying to build? Steelman it in 2-3 sentences. 2) What is the ONE thing from their answers that reveals the most about what they should actually build? Quote it and explain why. 3) Name ONE agreed premise you think is wrong, and what evidence would prove you right. 4) If you had 48 hours and one engineer to build a prototype, what would you build? Be specific — tech stack, features, what you'd skip. Be direct. Be terse. No preamble."
 
-Write the full prompt (context block + instructions) to this file. Use the mode-appropriate variant:
+**Builder mode prompt:** "You are an independent technical advisor reading a transcript of a builder brainstorming session. [CONTEXT BLOCK HERE]. Your job: 1) What is the COOLEST version of this they haven't considered? 2) What's the ONE thing from their answers that reveals what excites them most? Quote it. 3) What existing open source project or tool gets them 50% of the way there — and what's the 50% they'd need to build? 4) If you had a weekend to build this, what would you build first? Be specific. Be direct. No preamble."
 
-**Startup mode instructions:** "You are an independent technical advisor reading a transcript of a startup brainstorming session. [CONTEXT BLOCK HERE]. Your job: 1) What is the STRONGEST version of what this person is trying to build? Steelman it in 2-3 sentences. 2) What is the ONE thing from their answers that reveals the most about what they should actually build? Quote it and explain why. 3) Name ONE agreed premise you think is wrong, and what evidence would prove you right. 4) If you had 48 hours and one engineer to build a prototype, what would you build? Be specific — tech stack, features, what you'd skip. Be direct. Be terse. No preamble."
+**Error handling:** If the subagent fails or times out, the second opinion is informational — skip with "Second opinion unavailable. Continuing to Phase 4." and proceed.
 
-**Builder mode instructions:** "You are an independent technical advisor reading a transcript of a builder brainstorming session. [CONTEXT BLOCK HERE]. Your job: 1) What is the COOLEST version of this they haven't considered? 2) What's the ONE thing from their answers that reveals what excites them most? Quote it. 3) What existing open source project or tool gets them 50% of the way there — and what's the 50% they'd need to build? 4) If you had a weekend to build this, what would you build first? Be specific. Be direct. No preamble."
-
-3. Run Codex:
-
-```bash
-TMPERR_OH=$(mktemp /tmp/codex-oh-err-XXXXXXXX)
-codex exec "$(cat "$CODEX_PROMPT_FILE")" -s read-only -c 'model_reasoning_effort="xhigh"' --enable web_search_cached 2>"$TMPERR_OH"
-```
-
-Use a 5-minute timeout (`timeout: 300000`). After the command completes, read stderr:
-```bash
-cat "$TMPERR_OH"
-rm -f "$TMPERR_OH" "$CODEX_PROMPT_FILE"
-```
-
-**Error handling:** All errors are non-blocking — Codex second opinion is a quality enhancement, not a prerequisite.
-- **Auth failure:** If stderr contains "auth", "login", "unauthorized", or "API key": "Codex authentication failed. Run `codex login` to authenticate. Skipping second opinion."
-- **Timeout:** "Codex timed out after 5 minutes. Skipping second opinion."
-- **Empty response:** "Codex returned no response. Stderr: <paste relevant error>. Skipping second opinion."
-
-On any error, proceed to Phase 4 — do NOT fall back to a Claude subagent (this is brainstorming, not adversarial review).
-
-4. **Presentation:**
+3. **Presentation:**
 
 ```
-SECOND OPINION (Codex):
+SECOND OPINION (Claude subagent):
 ════════════════════════════════════════════════════════════
-<full codex output, verbatim — do not truncate or summarize>
+<full subagent output, verbatim — do not truncate or summarize>
 ════════════════════════════════════════════════════════════
 ```
 
-5. **Cross-model synthesis:** After presenting Codex output, provide 3-5 bullet synthesis:
-   - Where Claude agrees with Codex
-   - Where Claude disagrees and why
-   - Whether Codex's challenged premise changes Claude's recommendation
+4. **Cross-pass synthesis:** After presenting subagent output, provide 3-5 bullet synthesis:
+   - Where the primary reviewer agrees with the subagent
+   - Where they disagree and why
+   - Whether the subagent's challenged premise changes the recommendation
 
-6. **Premise revision check:** If Codex challenged an agreed premise, use AskUserQuestion:
+5. **Premise revision check:** If the subagent challenged an agreed premise, use AskUserQuestion:
 
-> Codex challenged premise #{N}: "{premise text}". Their argument: "{reasoning}".
-> A) Revise this premise based on Codex's input
+> The second opinion challenged premise #{N}: "{premise text}". Their argument: "{reasoning}".
+> A) Revise this premise based on the feedback
 > B) Keep the original premise — proceed to alternatives
 
 If A: revise the premise and note the revision. If B: proceed (and note that the user defended this premise with reasoning — this is a founder signal if they articulate WHY they disagree, not just dismiss).

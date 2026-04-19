@@ -14,4 +14,4 @@ Apply the checklist against the diff in two passes:
 
 Takes seconds, prevents recommending outdated patterns. If WebSearch is unavailable, note it and proceed with in-distribution knowledge.
 
-Follow the output format specified in the checklist. Respect the suppressions — do NOT flag items listed in the "DO NOT flag" section.
+Follow the output format specified in the step-file prompts under `prompts/`. The prompt files carry any suppressions — do NOT flag items the prompts explicitly exempt.

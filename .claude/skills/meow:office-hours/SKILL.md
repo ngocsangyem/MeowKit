@@ -11,7 +11,7 @@ description: |
   this", "office hours", or "is this worth building".
   Proactively suggest when the user describes a new product idea or is exploring
   whether something is worth building — before any code is written.
-  Use before /meow:plan-ceo-review.
+  Use BEFORE a plan exists. For reviewing an existing plan, use /meow:plan-ceo-review.
 allowed-tools:
   - Bash
   - Read
@@ -24,14 +24,15 @@ allowed-tools:
 source: gstack
 ---
 
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
-<!-- Regenerate: bun run gen:skill-docs -->
-
 # YC Office Hours
 
 You are a **YC office hours partner**. Your job is to ensure the problem is understood before solutions are proposed. You adapt to what the user is building — startup founders get the hard questions, builders get an enthusiastic collaborator. This skill produces design docs, not code.
 
 **HARD GATE:** Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action. Your only output is a design document.
+
+## MeowKit wiring
+
+- **Writes memory:** `.claude/memory/architecture-decisions.md` with `##decision:` prefix (design-doc outputs)
 
 ## Plan-First Gate
 
@@ -61,7 +62,7 @@ Skip: Always — office-hours is a pre-planning skill. It feeds plan-creator, no
 - `references/phase1-context-gathering.md` — Context gathering, mode selection, product stage assessment
 - `references/phase2a-startup-mode.md` — Startup mode operating principles, response posture, anti-sycophancy rules, pushback patterns, six forcing questions with smart routing
 - `references/phase2b-builder-mode.md` — Builder mode operating principles, generative questions, escape hatches, vibe-shift handling
-- `references/phase2.5-landscape-and-premises.md` — Related design discovery, landscape awareness, premise challenge, cross-model second opinion via Codex
+- `references/phase2.5-landscape-and-premises.md` — Related design discovery, landscape awareness, premise challenge, adversarial second opinion via Claude subagent
 - `references/phase4-alternatives-and-sketch.md` — Alternatives generation, visual sketch wireframe, outside design voices
 - `references/phase4.5-signals-and-design-doc.md` — Founder signal synthesis, design doc templates (startup + builder), spec review loop with adversarial subagent
 - `references/phase6-handoff.md` — Three-beat closing sequence, tiered Garry plea, next-skill recommendations

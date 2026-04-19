@@ -78,3 +78,8 @@ touch .claude/memory/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
+
+## Memory
+
+- **Reads memory:** at task start, read `.claude/memory/security-log.md` (prior audit findings) and `.claude/memory/review-patterns.md` (review-time security patterns) for context.
+- **Writes memory:** at task end, append audit findings to `.claude/memory/security-log.md` under a dated section header (not a `##prefix:` — this topic file is section-based, not prefix-scanned).

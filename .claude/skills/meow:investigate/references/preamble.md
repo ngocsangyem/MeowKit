@@ -28,8 +28,12 @@ echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p .claude/memory
 echo '{"skill":"investigate","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .claude/memory/skill-usage.jsonl 2>/dev/null || true
+STATE_DIR="${CLAUDE_PLUGIN_DATA:-$HOME/.claude/data}/investigate"
+mkdir -p "$STATE_DIR"
 for _PF in $(find .claude/memory -maxdepth 1 -name '.pending-*' 2>/dev/null); do [ -f "$_PF" ] && break; done
 ```
+
+**Memory load:** At task start, if a prior investigation left notes, read `.claude/memory/fixes.md` for relevant diagnosis patterns. At task end, append new diagnosis notes to `.claude/memory/fixes.md` with `##note:` prefix (the fix itself is persisted by `meow:fix`).
 
 If `PROACTIVE` is `"false"`, do not proactively suggest MeowKit skills — only invoke them when the user explicitly asks.
 

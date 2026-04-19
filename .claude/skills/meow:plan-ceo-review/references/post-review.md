@@ -65,13 +65,13 @@ Parse the output. Find the most recent entry for each skill (plan-ceo-review, pl
 - **Eng Review (required by default):** The only review that gates shipping. Covers architecture, code quality, tests, performance. Can be disabled globally with `meowkit-config set skip_eng_review true` (the "don't bother me" setting).
 - **CEO Review (optional):** Use your judgment. Recommend it for big product/business changes, new user-facing features, or scope decisions. Skip for bug fixes, refactors, infra, and cleanup.
 - **Design Review (optional):** Use your judgment. Recommend it for UI/UX changes. Skip for backend-only, infra, or prompt-only changes.
-- **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get cross-model adversarial. Large diffs (200+) get all 4 passes: Claude structured, Codex structured, Claude adversarial subagent, Codex adversarial. No configuration needed.
-- **Outside Voice (optional):** Independent plan review from a different AI model. Offered after all review sections complete in /meow:plan-ceo-review and /meow:plan-ceo-review. Falls back to Claude subagent if Codex is unavailable. Never gates shipping.
+- **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get one Claude adversarial pass. Large diffs (200+) get two Claude adversarial passes (attack-surface + failure-mode). No configuration needed.
+- **Outside Voice (optional):** Independent plan review from a Claude adversarial subagent with fresh context. Offered after all review sections complete in /meow:plan-ceo-review. Never gates shipping.
 
 **Verdict logic:**
 - **CLEARED**: Eng Review has >= 1 entry within 7 days from either `review` or `plan-ceo-review` with status "clean" (or `skip_eng_review` is `true`)
 - **NOT CLEARED**: Eng Review missing, stale (>7 days), or has open issues
-- CEO, Design, and Codex reviews are shown for context but never block shipping
+- CEO and Design reviews are shown for context but never block shipping
 - If `skip_eng_review` config is `true`, Eng Review shows "SKIPPED (global)" and verdict is CLEARED
 
 **Staleness detection:** After displaying the dashboard, check if any existing reviews may be stale:
@@ -103,7 +103,7 @@ Parse each JSONL entry. Each skill logs different fields:
   → Findings: "{issues_found} issues, {critical_gaps} critical gaps"
 - **plan-design-review**: `status`, `initial_score`, `overall_score`, `unresolved`, `decisions_made`, `commit`
   → Findings: "score: {initial_score}/10 → {overall_score}/10, {decisions_made} decisions"
-- **codex-review**: `status`, `gate`, `findings`, `findings_fixed`
+- **outside-voice**: `status`, `findings`, `findings_fixed`
   → Findings: "{findings} findings, {findings_fixed}/{findings} fixed"
 
 All fields needed for the Findings column are now present in the JSONL entries.
@@ -118,14 +118,14 @@ Produce this markdown table:
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/meow:plan-ceo-review` | Scope & strategy | {runs} | {status} | {findings} |
-| Codex Review | `/codex review` | Independent 2nd opinion | {runs} | {status} | {findings} |
+| Outside Voice | Claude adversarial subagent | Independent 2nd opinion | {runs} | {status} | {findings} |
 | Design Review | `/plan-design-review` | UI/UX gaps | {runs} | {status} | {findings} |
 ```
 
 Below the table, add these lines (omit any that are empty/not applicable):
 
-- **CODEX:** (only if codex-review ran) — one-line summary of codex fixes
-- **CROSS-MODEL:** (only if both Claude and Codex reviews exist) — overlap analysis
+- **OUTSIDE VOICE:** (only if outside-voice ran) — one-line summary of findings
+- **CROSS-PASS:** (only if multiple reviewer passes ran) — overlap analysis
 - **UNRESOLVED:** total unresolved decisions across all reviews
 - **VERDICT:** list reviews that are CLEAR (e.g., "CEO + ENG CLEARED — ready to implement").
   If Eng Review is not CLEAR and not skipped globally, append "eng review required".

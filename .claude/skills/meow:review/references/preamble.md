@@ -1,8 +1,5 @@
 # Preamble and Session Setup
 
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
-<!-- Regenerate: bun run gen:skill-docs -->
-
 ## Preamble (run first)
 
 ```bash
@@ -83,6 +80,11 @@ touch .claude/memory/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
+
+## Memory
+
+- **Reads memory:** at task start, read `.claude/memory/review-patterns.md` and `.claude/memory/security-log.md` for prior patterns that inform this review.
+- **Writes memory:** at task end, append newly-observed review patterns to `.claude/memory/review-patterns.md` with `##pattern:` prefix. Do not overwrite prior entries — always append.
 
 ## AskUserQuestion Format
 
@@ -269,7 +271,7 @@ Then write a `## MEOWKIT REVIEW REPORT` section to the end of the plan file:
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/meow:plan-ceo-review` | Scope & strategy | 0 | — | — |
-| Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
+| Outside Voice | Claude adversarial subagent | Independent 2nd opinion | 0 | — | — |
 | Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
 
 **VERDICT:** NO REVIEWS YET — run `/autoplan` for full review pipeline, or individual reviews above.

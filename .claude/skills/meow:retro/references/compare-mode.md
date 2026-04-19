@@ -6,4 +6,4 @@ When the user runs `/retro compare` (or `/retro compare 14d`):
 2. Compute metrics for the immediately prior same-length window using both `--since` and `--until` with midnight-aligned dates to avoid overlap (e.g., for a 7d window starting 2026-03-11: prior window is `--since="2026-03-04T00:00:00" --until="2026-03-11T00:00:00"`)
 3. Show a side-by-side comparison table with deltas and arrows
 4. Write a brief narrative highlighting the biggest improvements and regressions
-5. Save only the current-window snapshot to `.context/retros/` (same as a normal retro run); do **not** persist the prior-window metrics.
+5. Save only the current-window snapshot to `.claude/memory/retros/` (same as a normal retro run); do **not** persist the prior-window metrics.
