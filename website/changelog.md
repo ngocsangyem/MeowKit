@@ -1,6 +1,7 @@
 ---
 title: Changelog
 description: MeowKit release history and changes.
+outline: [2, 3]
 ---
 
 # Changelog
