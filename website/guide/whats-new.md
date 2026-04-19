@@ -12,6 +12,18 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.5.0 — The Native Fit Release (2026-04-19)
+
+Installed skills stop branding themselves as MeowKit and start reading like the project's own workflow — ~70 user-facing phrases rewritten across 50+ files while real infrastructure (binaries, env vars, CLI commands) stays intact. Ships the 64-skill audit cleanup: mechanical path fixes, seven collision-cluster disambiguations, memory persistence for `meow:evaluate` / `meow:benchmark` / `meow:party`, dual-orchestrator arbitration rule, and a documented frontmatter schema. [Full notes →](/guide/whats-new/v2.5.0)
+
+- **Brand reframing** — "MeowKit's workflow" → "this workflow", "Help MeowKit get better!" → "Help improve this workflow!", `MeowKit` / `AI-assisted` table columns, and dozens of similar edits. Real `meowkit-*` binaries, `MEOWKIT_*` env vars, `npx mewkit` CLI commands, and frontmatter `source:` fields untouched.
+- **Memory writes added to evaluate / benchmark / party** — verdicts, baselines, and architectural decisions now persist across sessions (`review-patterns.md`, `cost-log.json`, `decisions.md`).
+- **Dual-orchestrator arbitration rule** added to `CLAUDE.md` — explicit `/meow:cook` invocation wins; `meow:workflow-orchestrator` defers. No more duplicate Gate 1 enforcement.
+- **Frontmatter schema documented** — `preamble-tier`, `user-invocable`, `phase`, `trust_level`, `injection_risk` are first-class fields with defined semantics. Twenty-one skills were using `preamble-tier: 3` without a schema.
+- **Collision clusters resolved** — agent-browser vs playwright-cli, intake vs jira, cook vs harness, simplify vs clean-code, docs-init vs project-context, lint-and-validate vs verify, validate-plan vs sprint-contract.
+- **Citation hygiene** — `OWASP Top 10:2025` (no such release) relabeled; stale `57 font pairings` count fixed to `73`; invented BMAD pivot statistic removed; preview model IDs now carry staleness warnings.
+- **`meow:workflow-orchestrator`** no longer fires on bare `"implement"` — use compound triggers (`"implement feature"`, `"build feature"`, `"complex task"`).
+
 ### v2.4.6 — meow:ship Cleanup + Design Review Checklist (2026-04-19)
 
 `meow:ship` drops unused Codex (OpenAI CLI) integration, fixes broken bash in the preamble, and removes phantom slash-command references. `meow:review` gains a lite design-review checklist — source-level pattern detection for frontend diffs, adapted from gstack with additions from claudekit-engineer and everything-claude-code.

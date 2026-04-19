@@ -15,6 +15,61 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.5.0 (2026-04-19) — The Native Fit Release
+
+### Highlights
+
+Skills stop branding themselves and start reading like the project's own workflow. Roughly 70 user-facing phrases were rewritten across 50+ files so installed kits refer to "the project" / "this workflow" / "the kit" instead of "MeowKit's X", while real infrastructure names (binaries, env vars, CLI commands, frontmatter `source:` fields) stay intact. Ships the full 64-skill audit: mechanical cleanup, reference fixes, boundary disambiguation for seven collision clusters, and architecture wiring for memory persistence and dual-orchestrator arbitration.
+
+### Features
+
+- `meow:evaluate`, `meow:benchmark`, and `meow:party` now persist their outputs across sessions — verdicts to `.claude/memory/review-patterns.md`, baselines to `cost-log.json`, architectural decisions to `decisions.md`. Each writer runs `mkdir -p .claude/memory` first so the append never fails silently.
+- `CLAUDE.md` gains an **Orchestrator Entry Point Rule** — explicit `/meow:cook` wins; `meow:workflow-orchestrator` defers for the rest of the session. Ends duplicate Gate 1 enforcement.
+- `CLAUDE.md` gains a **Skill Frontmatter Schema** section defining `preamble-tier` (`1 | 2 | 3`), `user-invocable` (`true | false`), `phase` (`0-6 | on-demand`), `trust_level` (`kit-authored | third-party`), and `injection_risk` (`low | medium | high`). Twenty-one skills were already using `preamble-tier: 3` without a documented schema.
+- `meow:careful` emits an audit-trail log entry to `.claude/memory/security-log.md` on every warn/override event (timestamp, pattern, severity, command). Log file is auto-initialized with a markdown-table header.
+
+### Improvements
+
+- Installed skills read as the project's own workflow — `MeowKit follows the Boil the Lake principle` → `This workflow follows the Boil the Lake principle`; `Help MeowKit get better!` → `Help improve this workflow!`; table column `MeowKit` → `AI-assisted`; dozens of similar edits. See the [What's New page](/guide/whats-new/v2.5.0) for the full pattern list.
+- Seven collision clusters disambiguated — each pair now declares `use when` + `use <other> instead when` at the top of both skills; no more buried routing rules.
+- `NOT this skill if:` differentiators added to the reasoning cluster (`meow:elicit`, `meow:brainstorming`, `meow:problem-solving`).
+- `meow:workflow-orchestrator` bare `"implement"` trigger replaced with `"implement feature"` — no longer fires `autoInvoke:true` on trivial requests.
+- `meow:ship/references/preamble.md` declares a memory-read of `.claude/memory/architecture-decisions.md` at task start. Previously the memory reference existed in frontmatter without a body instruction.
+- `meow:review` and `meow:ship` look up plans from `.claude/plans/` and `tasks/plans/` first; `~/.claude/plans/` is retained only as a legacy fallback with an explanatory comment.
+- `meow:cook` intent-detection table carries a green-field escalation callout pointing at `meow:harness`.
+- `meow:help` documents the `/meow:plan` alias — confirmed via the slash-command router at `.claude/commands/meow/plan.md`.
+- `meow:docs-finder` documents Node.js 18+ as a prerequisite for its `.js` scripts and flags unbounded `.claude/memory/docs-cache/` growth in Gotchas.
+- `meow:investigate` Process step 4 clarifies the freeze hook is a no-op without an explicit `meow:freeze <target-dir>` invocation.
+- `meow:benchmark/SKILL.md` accurately describes `run-canary.sh` as a step-1-of-2 manifest emitter (not a suite runner); `compare-runs.sh` distinguishes `null` scores (PENDING, excluded from averages) from valid `0` scores.
+- `meow:jira` description narrowed from CRUD + evaluation to CRUD only — ticket analysis now routes to `meow:intake`.
+- `meow:scale-routing` marked `user-invocable: false` — it's a Phase 0 sub-skill, not a user-facing entry point.
+- `meow:party` removes `retro` from its triggers with a pointer to `meow:retro` for dedicated retrospectives.
+- Six skills gained `phase: on-demand` frontmatter (`chom`, `clean-code`, `docs-finder`, `docs-init`, `lint-and-validate`, `multimodal`); `meow:jira` corrected from `phase: 3` → `phase: on-demand`.
+- Antigravity-kit-sourced skills (`clean-code`, `lint-and-validate`) gained `trust_level: third-party` + `injection_risk: low` provenance markers.
+- 34 hardcoded `/Users/sangnguyen/Desktop/compare-kit/...` lines stripped from 10 `meow:angular/references/*.md` files — source-import metadata with zero runtime value.
+
+### Removals
+
+- Dead `Codex Review | /codex review` table row removed from 6 shared-protocol tables (`meow:browse`, `meow:document-release`, `meow:investigate`, `meow:office-hours`, `meow:plan-ceo-review`, `meow:retro`) — `/codex review` referenced the OpenAI Codex CLI, not a meowkit skill.
+- `claudekit-engineer` provenance prose genericized in body HTML comments, script file headers, and reference attributions. Frontmatter `source: claudekit-engineer` fields are policy-preserved.
+
+### Bug Fixes
+
+- `meow:careful` FLUSHDB severity aligned — `destructive-patterns.md` said HIGH, `check-careful.sh` enforced CRITICAL. Both now say CRITICAL.
+- `meow:ui-design-system` — `57 font pairings` count fixed to `73` (CSV has 73 data rows; documented count had drifted 28%).
+- `meow:brainstorming` — invented `BMAD's ~10% pivot frequency` statistic removed (no source document existed).
+- `meow:vulnerability-scanner` — fabricated `OWASP Top 10:2025` version label relabeled to `OWASP Top 10 (2021 ranking, 2025 threat context)` with a disclaimer. No official 2025 release exists as of April 2026.
+- `meow:multimodal` — `gemini-3.1-*` and `veo-3.1-*` preview model IDs now carry a verify-before-deploy warning pointing at the Gemini model docs.
+- `meow:scout` and `meow:docs-finder` — `P1-P8` / `P1-P14` citations removed from Anthropic context-engineering-research attributions (neither research doc uses those labels).
+
+### Migration Notes
+
+- `meow:workflow-orchestrator` no longer fires on bare `"implement"` — use compound triggers (`"implement feature"`, `"build feature"`, `"create feature"`, `"complex task"`) or invoke `/meow:cook` explicitly.
+- `meow:party` memory write is now mandatory, not optional. Decision records land in `.claude/memory/decisions.md`. If a shell blocks writes to `.claude/memory/`, whitelist the directory before invoking party.
+- Upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`. Existing `.claude/memory/` topic files are preserved; new writers `mkdir -p` safely if a parent directory is missing.
+
+---
+
 ## 2.4.6 (2026-04-19) — meow:ship Cleanup + Design Review Checklist
 
 ### Highlights

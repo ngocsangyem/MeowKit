@@ -161,6 +161,28 @@ Skills that enforce this gate:
 `meow:investigate` and `meow:office-hours` produce planning input — they run before a plan exists by design. `meow:retro` is data-driven and has no implementation output to scope.
 :::
 
+### Orchestrator Entry Point Rule (v2.5.0)
+
+Two orchestrators exist — `meow:cook` (explicit invocation, single-task pipeline) and `meow:workflow-orchestrator` (auto-invoked on complex-feature intent). `CLAUDE.md` declares arbitration to prevent duplicate Gate 1 enforcement:
+
+- **Explicit `/meow:cook` invocation** → `meow:cook` owns the pipeline. `meow:workflow-orchestrator` does NOT activate for the rest of the session.
+- **Session start, complex-feature intent** → `meow:workflow-orchestrator` activates via `autoInvoke`. Defers to `meow:cook` for single-task requests.
+- **Never both in the same session.** If `meow:cook` is active, the orchestrator skips its phase loop.
+
+`meow:workflow-orchestrator/SKILL.md` carries a pointer to this rule.
+
+## Skill Frontmatter Schema (v2.5.0)
+
+SKILL.md frontmatter supports advisory fields for humans and downstream tooling. These are not hook-enforced; unknown-field parsers ignore them.
+
+| Field | Values | Meaning |
+|---|---|---|
+| `preamble-tier` | `1 \| 2 \| 3` | Context-injection priority. 3 = injected before other context. Used by 21 skills (benchmark, elicit, evaluate, harness, plan-creator, rubric, sprint-contract, trace-analyze, validate-plan, …). |
+| `user-invocable` | `true` (default) / `false` | `false` = internal sub-skill, orchestrator-invoked only. Currently set on `meow:scale-routing`. |
+| `phase` | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6 \| on-demand` | Workflow phase anchor. `on-demand` = invoked by need, not by phase. |
+| `trust_level` | `kit-authored \| third-party` | Provenance marker. Third-party skills (e.g. antigravity-kit) treat external input as DATA per `injection-rules.md`. |
+| `injection_risk` | `low \| medium \| high` | Advisory prompt-injection exposure level. |
+
 ## Step-File Architecture
 
 Complex skills decompose into JIT-loaded step files instead of one monolithic SKILL.md:

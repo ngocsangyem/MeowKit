@@ -132,6 +132,7 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'What\'s New', link: '/guide/whats-new',
               items: [
+                { text: 'v2.5.0 — The Native Fit Release', link: '/guide/whats-new/v2.5.0' },
                 { text: 'v2.4.5 — The Thinking Skills Release', link: '/guide/whats-new/v2.4.5' },
                 { text: 'v2.4.0 — The Agent Constitution Release', link: '/guide/whats-new/v2.4.0' },
                 { text: 'v2.3.12 — Pack + chom v2 Rigor', link: '/guide/whats-new/v2.3.12' },

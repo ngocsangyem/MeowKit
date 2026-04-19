@@ -16,14 +16,14 @@ Memory is split into focused topic files. Each skill reads only the files it nee
 |------|---------|--------|---------|
 | `memory/fixes.md` | Bug-class session learnings | Markdown | meow:fix |
 | `memory/fixes.json` | Machine-queryable fix patterns (v2.0.0) | JSON | meow:fix |
-| `memory/review-patterns.md` | Review and architecture patterns | Markdown | meow:review, meow:plan-creator |
+| `memory/review-patterns.md` | Review and architecture patterns; per-evaluation verdict rows (v2.5.0) | Markdown | meow:review, meow:plan-creator, meow:evaluate (writer) |
 | `memory/review-patterns.json` | Machine-queryable review patterns (v2.0.0) | JSON | meow:review, meow:plan-creator |
-| `memory/architecture-decisions.md` | Architectural decisions | Markdown | meow:plan-creator, meow:cook |
+| `memory/architecture-decisions.md` | Architectural decisions | Markdown | meow:plan-creator, meow:cook, meow:ship (reader) |
 | `memory/architecture-decisions.json` | Machine-queryable decisions (v2.0.0) | JSON | meow:plan-creator, meow:cook |
 | `memory/security-notes.md` | Curated security findings | Markdown | meow:cso, meow:review |
-| `memory/cost-log.json` | Token usage per task | JSON | analyst agent |
-| `memory/decisions.md` | Long-form architecture decision records | Markdown | architect agent |
-| `memory/security-log.md` | Raw security audit log | Markdown | security agent |
+| `memory/cost-log.json` | Token usage per task; per-benchmark baseline entries (v2.5.0) | JSON | analyst agent, meow:benchmark (writer) |
+| `memory/decisions.md` | Long-form architecture decision records; party synthesis outputs (v2.5.0) | Markdown | architect agent, meow:party (writer, required) |
+| `memory/security-log.md` | Raw security audit log; `meow:careful` override audit trail (v2.5.0) | Markdown | security agent, meow:careful (writer) |
 
 ## How it works
 
@@ -105,6 +105,17 @@ Captures are validated against injection patterns before writing. Invalid conten
 | `pattern` | Yes | What to do (or not do) |
 | `frequency` | Yes | Number of sessions that surfaced this |
 | `lastSeen` | Yes | Date of last occurrence |
+
+## Skill-triggered writes (v2.5.0)
+
+Three skills that previously accumulated knowledge only in-session now persist their outputs. All three `mkdir -p .claude/memory` before the append, so a missing parent directory does not silently lose the entry.
+
+| Skill | Target file | When it writes | Entry shape |
+|---|---|---|---|
+| `meow:evaluate` | `review-patterns.md` | After each completed evaluation | Table row: `\| {date} \| {artifact-id} \| {verdict} \| {top-criterion} \| {score} \|` |
+| `meow:benchmark` | `cost-log.json` | After each completed benchmark run | Object: `{run_id, date, tier, pass_rate, avg_score, total_cost_usd}` appended to top-level array |
+| `meow:party` | `decisions.md` | After synthesis round concludes (required, not optional) | Heading: `## {date} — {decision-title}` + Context / Decision / Rationale / Dissent |
+| `meow:careful` | `security-log.md` | On every warn/override event | Table row with timestamp, pattern, severity, command — log auto-initialized with header |
 
 ## Pruning
 

@@ -376,6 +376,7 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v2.5.0  | 2026-04-19 | The Native Fit Release               |
 | v2.3.4  | 2026-04-11 | Centralized Dotenv Loading           |
 | v2.3.3  | 2026-04-11 | The Wiring Integrity Release         |
 | v2.3.2  | 2026-04-11 | The Agent-Skills Integration Release |
