@@ -22,6 +22,7 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | `rubric-rules.md`                 | Evaluator calibration discipline, rubric library governance, anchor balance enforcement, drift detection cadence, anti-slop anti-patterns          | New (Anthropic harness research)             | Phase 4 (Review, evaluator agent)                   |
 | `step-file-rules.md`              | JIT step loading, no skipping, state persistence for multi-step workflows                                                                          | New (BMAD-inspired)                          | Step-file skills                                    |
 | `parallel-execution-rules.md`     | Worktree isolation, file ownership, max 3 agents, integration test. Added staged parallel mode (v2.0)                                              | New (CKE-inspired)                           | Parallel execution [CONTEXTUAL]                     |
+| `skill-authoring-rules.md`        | Mandatory Gotchas section, persistent state in `${CLAUDE_PLUGIN_DATA}`, 500-line SKILL.md cap with decomposition + audit cadence                   | New (Anthropic skill-authoring docs)         | Skill authoring, audits                             |
 
 ## Loading Priority
 
@@ -43,6 +44,7 @@ Rules are applied in this priority (higher = stronger override):
 14. `step-file-rules.md` — apply when executing step-file workflows
 15. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
 16. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
+17. `skill-authoring-rules.md` — apply during skill authoring, scaffolding, and quarterly/model-upgrade audits
 
 ## Hook Enforcement
 
@@ -76,6 +78,7 @@ Hooks supplement rules — they do not replace them. Rules define the WHY; hooks
 | `scale-adaptive-rules.md`         | Behavioral + CSV data                                                                                    | No                                   | CSV extensible by users                                                                                                                 |
 | `step-file-rules.md`              | Behavioral                                                                                               | N/A                                  | Only applies to step-file skills                                                                                                        |
 | `parallel-execution-rules.md`     | Behavioral + worktree                                                                                    | N/A                                  | [CONTEXTUAL] — only during parallel execution                                                                                           |
+| `skill-authoring-rules.md`        | Behavioral + Script (500-line audit `find` one-liner)                                                    | No                                   | MeowKit-internal infra paths exempt from Rule 2; step-filed skills auto-pass Rule 3                                                     |
 
 **Mechanism types:**
 
