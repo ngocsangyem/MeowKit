@@ -2,6 +2,31 @@
 
 Catalog of probe techniques the evaluator uses to drive a running build per criterion type. Loaded once at session start by step-03; referenced inline during the criterion loop.
 
+## Contents
+
+- [Frontend Probes (browser-driven)](#frontend-probes-browser-driven)
+  - [Pattern F1 — Happy path flow](#pattern-f1-happy-path-flow)
+  - [Pattern F2 — Error state probe](#pattern-f2-error-state-probe)
+  - [Pattern F3 — Console log capture](#pattern-f3-console-log-capture)
+  - [Pattern F4 — Multi-screen design consistency](#pattern-f4-multi-screen-design-consistency)
+  - [Pattern F5 — Time-to-value measurement](#pattern-f5-time-to-value-measurement)
+  - [Pattern F6 — Originality / slop pattern match](#pattern-f6-originality-slop-pattern-match)
+- [Backend / API Probes (curl-driven)](#backend-api-probes-curl-driven)
+  - [Pattern B1 — Endpoint shape assertion](#pattern-b1-endpoint-shape-assertion)
+  - [Pattern B2 — Happy path POST + GET round-trip](#pattern-b2-happy-path-post-get-round-trip)
+  - [Pattern B3 — Error response shape](#pattern-b3-error-response-shape)
+  - [Pattern B4 — Auth boundary check](#pattern-b4-auth-boundary-check)
+- [CLI Probes (bash-driven)](#cli-probes-bash-driven)
+  - [Pattern C1 — Help and exit codes](#pattern-c1-help-and-exit-codes)
+  - [Pattern C2 — Happy-path invocation](#pattern-c2-happy-path-invocation)
+  - [Pattern C3 — Bad input handling](#pattern-c3-bad-input-handling)
+- [Cross-Cutting Patterns](#cross-cutting-patterns)
+  - [Pattern X1 — Persistence across reload](#pattern-x1-persistence-across-reload)
+  - [Pattern X2 — Keyboard navigation](#pattern-x2-keyboard-navigation)
+  - [Pattern X3 — Network failure simulation](#pattern-x3-network-failure-simulation)
+- [Probe Hygiene Rules](#probe-hygiene-rules)
+
+
 **Core principle:** active verification means **driving the artifact**, not reading the source code. Every probe in this catalog produces a concrete artifact (screenshot, response capture, transcript) that lands in the evidence directory.
 
 ---

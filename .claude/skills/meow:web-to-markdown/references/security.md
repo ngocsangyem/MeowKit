@@ -1,5 +1,37 @@
 # meow:web-to-markdown — Security Spec
 
+
+## Contents
+
+- [1. Threat model](#1-threat-model)
+  - [Assets to protect](#assets-to-protect)
+  - [Attackers](#attackers)
+  - [Trust boundaries](#trust-boundaries)
+- [2. Defense architecture](#2-defense-architecture)
+  - [Layer 1 — PreToolUse hook (`privacy-block.sh`)](#layer-1-pretooluse-hook-privacy-blocksh)
+  - [Layer 2 — Python URL validator (`_safe_url`)](#layer-2-python-url-validator-safeurl)
+  - [Layer 3 — Size cap (streaming)](#layer-3-size-cap-streaming)
+  - [Layer 4 — DATA boundary wrapping](#layer-4-data-boundary-wrapping)
+  - [Layer 5 — Injection scanner (multi-pass)](#layer-5-injection-scanner-multi-pass)
+  - [Layer 6 — HARD_STOP on injection (per C5 + R7 + R10)](#layer-6-hardstop-on-injection-per-c5-r7-r10)
+  - [Layer 7 — Secret scrub (pre-write)](#layer-7-secret-scrub-pre-write)
+  - [Layer 8 — post-write library scan (`injection-audit.py`)](#layer-8-post-write-library-scan-injection-auditpy)
+- [3. Flag semantics (locked)](#3-flag-semantics-locked)
+  - [Direct user invocation — no flag](#direct-user-invocation-no-flag)
+  - [Cross-skill delegation — `--wtm-accept-risk`](#cross-skill-delegation---wtm-accept-risk)
+  - [`meow:docs-finder` priority override — `--wtm-approve`](#meowdocs-finder-priority-override---wtm-approve)
+  - [Injection-STOP override — **NO FLAG**](#injection-stop-override-no-flag)
+- [4. Cache & path conventions](#4-cache-path-conventions)
+- [5. mewkit CLI allowlist schema](#5-mewkit-cli-allowlist-schema)
+- [6. Manifest (`index.jsonl`) format](#6-manifest-indexjsonl-format)
+- [7. Testing strategy](#7-testing-strategy)
+  - [Unit tests](#unit-tests)
+  - [Smoke tests](#smoke-tests)
+  - [Integration tests](#integration-tests)
+- [8. Incident response](#8-incident-response)
+- [9. Out of scope (v1)](#9-out-of-scope-v1)
+- [10a. Three-layer JS gate (security property)](#10a-three-layer-js-gate-security-property)
+
 ## 1. Threat model
 
 ### Assets to protect

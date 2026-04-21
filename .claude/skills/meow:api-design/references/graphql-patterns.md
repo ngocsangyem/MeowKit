@@ -2,6 +2,20 @@
 
 Conventions for building consistent, performant GraphQL APIs.
 
+## Contents
+
+- [Schema Design](#schema-design)
+- [Queries](#queries)
+  - [Single Entity](#single-entity)
+  - [Collections with Pagination](#collections-with-pagination)
+- [Mutations](#mutations)
+- [Error Handling](#error-handling)
+- [Pagination — Relay Connection Spec](#pagination-relay-connection-spec)
+- [N+1 Prevention — DataLoader (Mandatory)](#n1-prevention-dataloader-mandatory)
+- [Auth — Directive-Based](#auth-directive-based)
+- [Gotchas](#gotchas)
+
+
 ---
 
 ## Schema Design

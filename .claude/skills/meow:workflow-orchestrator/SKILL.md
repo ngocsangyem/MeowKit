@@ -1,8 +1,6 @@
 ---
 name: meow:workflow-orchestrator
-description: "Execute 7-phase workflow for complex features. Includes fasttrack mode for pre-approved specs. DO NOT use for simple bug fixes."
-autoInvoke: true
-priority: high
+description: "Auto-invoked 7-phase workflow for complex-feature intent. Includes fasttrack mode for pre-approved specs. NOT for explicit user-invoked single tasks (see meow:cook); NOT for green-field autonomous builds (see meow:harness); NOT for simple bug fixes (see meow:fix)."
 triggers:
   - "implement feature"
   - "build feature"

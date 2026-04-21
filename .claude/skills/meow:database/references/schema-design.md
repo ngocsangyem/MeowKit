@@ -2,6 +2,20 @@
 
 Patterns for designing relational database schemas. PostgreSQL primary; most rules apply to MySQL and SQLite.
 
+## Contents
+
+- [Naming Conventions](#naming-conventions)
+- [Primary Keys](#primary-keys)
+- [Standard Columns (Include on Every Table)](#standard-columns-include-on-every-table)
+- [Foreign Keys](#foreign-keys)
+- [Normalization](#normalization)
+- [Common Patterns](#common-patterns)
+  - [Polymorphic Relationships (with discriminator)](#polymorphic-relationships-with-discriminator)
+  - [Enum Columns](#enum-columns)
+  - [Tags / Many-to-Many](#tags-many-to-many)
+- [Anti-Patterns](#anti-patterns)
+
+
 ## Naming Conventions
 
 | Element | Convention | Example |

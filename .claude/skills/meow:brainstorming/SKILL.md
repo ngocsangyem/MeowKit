@@ -15,7 +15,7 @@ allowed-tools:
   - Glob
   - AskUserQuestion
   - WebSearch
-sources: claudekit-engineer
+source: claudekit-engineer
 ---
 
 # Brainstorming

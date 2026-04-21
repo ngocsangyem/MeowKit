@@ -2,6 +2,23 @@
 
 All meow:jira operations are classified into one of four tiers. Tier determines the confirmation requirement before execution.
 
+## Contents
+
+- [Tier Definitions](#tier-definitions)
+  - [Tier 1 — Safe (Read)](#tier-1-safe-read)
+  - [Tier 2 — Low Risk (Create / Reversible)](#tier-2-low-risk-create-reversible)
+  - [Tier 3 — Medium Risk (Modify)](#tier-3-medium-risk-modify)
+  - [Tier 4 — High Risk (Destructive)](#tier-4-high-risk-destructive)
+- [Classification Rules](#classification-rules)
+- [Confirmation Prompt Format](#confirmation-prompt-format)
+  - [Tier 3 — Diff confirmation](#tier-3-diff-confirmation)
+  - [Tier 4 — Explicit confirmation](#tier-4-explicit-confirmation)
+- [Escalation Rules](#escalation-rules)
+- [Partial Failure Behavior](#partial-failure-behavior)
+- [Recovery Procedures](#recovery-procedures)
+- [Never Bypass Safety](#never-bypass-safety)
+
+
 ---
 
 ## Tier Definitions

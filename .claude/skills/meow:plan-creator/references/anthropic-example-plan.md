@@ -2,6 +2,29 @@
 
 This is the **calibration reference** for product-level planning mode.
 
+## Contents
+
+- [Product Vision](#product-vision)
+- [Target User](#target-user)
+- [Features](#features)
+  - [1. Prompt-to-Prototype Generator](#1-prompt-to-prototype-generator)
+  - [2. Pixel-Art Sprite Synthesis](#2-pixel-art-sprite-synthesis)
+  - [3. Chiptune Soundtrack Composer](#3-chiptune-soundtrack-composer)
+  - [4. Live Code Inspector](#4-live-code-inspector)
+  - [5. Remix Tree](#5-remix-tree)
+  - [6. Nightly Marquee](#6-nightly-marquee)
+  - [7. Cabinet Themes](#7-cabinet-themes)
+  - [8. Local-First Saves](#8-local-first-saves)
+  - [9. Spectator Mode](#9-spectator-mode)
+  - [10. Daily Generation Budget](#10-daily-generation-budget)
+- [Design Language](#design-language)
+- [AI Integration Opportunities](#ai-integration-opportunities)
+- [Out of Scope (v1)](#out-of-scope-v1)
+- [Open Questions](#open-questions)
+- [Success Criteria (Product-Level)](#success-criteria-product-level)
+- [Handoff](#handoff)
+
+
 It comes from the appendix of Anthropic's harness-design article (Prithvi Rajasekaran, Labs)
 and demonstrates the ambition level, feature density, user-story specificity, and design-language
 texture expected from `step-03a-product-spec.md`.

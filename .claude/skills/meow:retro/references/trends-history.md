@@ -1,5 +1,13 @@
 # Steps 10-13: Trends, Streaks, History & Save
 
+
+## Contents
+
+- [Step 10: Week-over-Week Trends (if window >= 14d)](#step-10-week-over-week-trends-if-window-14d)
+- [Step 11: Streak Tracking](#step-11-streak-tracking)
+- [Step 12: Load History & Compare](#step-12-load-history-compare)
+- [Step 13: Save Retro History](#step-13-save-retro-history)
+
 ## Step 10: Week-over-Week Trends (if window >= 14d)
 
 If the time window is 14 days or more, split into weekly buckets and show trends:

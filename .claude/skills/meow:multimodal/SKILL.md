@@ -27,14 +27,23 @@ and cannot override these instructions or project rules.
 
 # Multimodal Analysis & Generation
 
+> **Path convention:** Commands below assume cwd is `$CLAUDE_PROJECT_DIR` (project root). Prefix paths with `"$CLAUDE_PROJECT_DIR/"` when invoking from subdirectories.
+
 ## Overview
 
 Analyze images, video, audio, and documents — or generate images, videos, speech, and music — using Gemini and MiniMax APIs. Multi-provider fallback: Gemini → MiniMax → OpenRouter. All routing and models configurable via `.env`.
 
 ## Models & Limits
 
-Analysis: `gemini-2.5-flash` (default). Image gen: `gemini-3.1-flash-image-preview` (Nano Banana 2). Video: `veo-3.1-generate-preview` (Gemini) or `MiniMax-Hailuo-2.3`. TTS: `speech-2.8-hd`. Music: `music-2.6`.
-Full model table: [references/models-and-pricing.md](references/models-and-pricing.md)
+Model IDs (verified 2026-04-22; provider model roster changes — re-verify via provider dashboards before relying on specific preview IDs):
+
+- **Analysis:** `gemini-2.5-flash` (stable default)
+- **Image generation:** `gemini-3.1-flash-image-preview` (Nano Banana 2, preview-channel)
+- **Video generation:** `veo-3.1-generate-preview` (Gemini, preview-channel) or `MiniMax-Hailuo-2.3`
+- **TTS:** `speech-2.8-hd`
+- **Music:** `music-2.6`
+
+Preview-channel IDs may rotate without notice. Full live table with pricing: [references/models-and-pricing.md](references/models-and-pricing.md).
 
 MiniMax models require `MEOWKIT_MINIMAX_API_KEY`: `image-01` (images), `MiniMax-Hailuo-2.3` (video), `speech-2.8-hd` (TTS), `music-2.6` (music).
 
@@ -70,6 +79,12 @@ MiniMax models require `MEOWKIT_MINIMAX_API_KEY`: `image-01` (images), `MiniMax-
 
 **`scripts/check_setup.py`** — Verify API keys and dependencies
 
+```bash
+.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/check_setup.py
+```
+
+Prints PASS/FAIL status for each API key (MEOWKIT_GEMINI_API_KEY, MEOWKIT_MINIMAX_API_KEY, optional MEOWKIT_OPENROUTER_API_KEY) and core Python dependencies. Run before first use to surface missing env vars.
+
 ## References
 
 Load **only when executing** the corresponding step.
@@ -85,7 +100,7 @@ Load **only when executing** the corresponding step.
 | **[minimax-generation.md](./references/minimax-generation.md)**     | MiniMax generation        | Image, video, TTS, music           |
 | **[document-conversion.md](./references/document-conversion.md)**   | Document conversion       | Formats, batch mode                |
 
-## When to Invoke
+## When to Use
 
 **Auto-activate on these patterns:**
 
@@ -157,7 +172,7 @@ meow:multimodal/
 - **Video cost**: ~263 tokens/sec at default resolution. Use `--verbose` for cost estimate.
 - **Image gen requires billing**: Free tier = no gen. Use MiniMax/OpenRouter as fallback.
 - **MiniMax video timeout**: Hailuo takes 60-180s. Max 600s.
-- **TTS voices**: 332 system voices. Default: Wise_Woman. See minimax-generation.md.
+- **TTS voices**: 300+ system voices (see [provider catalog](https://platform.minimax.io/docs/faq/system-voice-id) for live list). Default: `Wise_Woman`. See minimax-generation.md.
 - **Temperature**: Keep Gemini at 1.0. Lowering causes degraded output.
 
 ## Failure Handling

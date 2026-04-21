@@ -3,6 +3,12 @@
 > Part of meow:angular skill. Read when: working with ssr.
 > Source: analogjs/angular-skills/angular-ssr (MIT)
 
+## Contents
+
+- [Core Patterns](#core-patterns)
+- [Advanced Patterns](#advanced-patterns)
+
+
 ## Core Patterns
 
 **Setup:**
@@ -415,4 +421,3 @@ Contains advanced patterns including:
 - Testing SSR (Test Server Rendering, Test Hydration)
 
 ---
-

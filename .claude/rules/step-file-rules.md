@@ -52,6 +52,17 @@ Only decompose when the skill has 3+ distinct phases with different context need
 
 WHY: YAGNI. Step-file architecture adds file count and navigation overhead. For simple skills, a single SKILL.md is cleaner. The threshold is ~150 lines — beyond that, context efficiency gains from JIT loading outweigh the overhead.
 
+## Rule 6: Two-Level Reference Chains Are Permitted for Step-File Skills
+
+Step-file skills MAY chain `SKILL.md → step-NN.md → references/X.md` as an architectural exception to the "refs one level deep" rule.
+
+REQUIREMENT: every `step-NN-*.md` file in a step-file skill MUST open with a `## Contents` Table of Contents listing its referenced files. This ensures partial-read previews (`head -100`) land on navigation, not deep content.
+
+WHY: Step files are loaded one at a time per Rule 1. Each step only needs its own subset of references, not all of them flattened up to SKILL.md. The ToC at the step's head makes the second level of indirection navigable without reading the whole file.
+
+INSTEAD of: flattening all step-referenced files up to SKILL.md (would bloat the entry point)
+USE: step files that open with a ToC pointing to their own references
+
 ## Applicability
 
 These rules apply ONLY to skills that have a `workflow.md` file.

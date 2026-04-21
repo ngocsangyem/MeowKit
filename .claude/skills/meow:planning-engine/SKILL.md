@@ -1,7 +1,7 @@
 ---
 name: meow:planning-engine
 version: 1.0.0
-description: "Use when a user wants to understand implementation complexity, map dependencies between tickets, review a ticket against the codebase, or plan which tickets to tackle in a sprint. Triggers on 'how complex is this ticket', 'what should we work on first', 'can we fit this in the sprint', 'tech review before planning', 'plan the sprint'."
+description: "Analyzes ticket complexity and maps dependencies against an existing codebase before sprint planning. Triggers on 'how complex is this ticket', 'what should we work on first', 'can we fit this in the sprint', 'tech review before planning', 'plan the sprint'. NOT for writing implementation plans (see meow:plan-creator); NOT for scope/ambition review (see meow:plan-ceo-review)."
 phase: 1
 source: meowkit
 argument-hint: "review PROJ-123 [--scout] [--graph] | plan --tickets PROJ-101,PROJ-102 [--capacity 40]"
@@ -80,6 +80,7 @@ Reports are markdown files. See `assets/` for templates:
 
 ## Gotchas
 
+- **MCP tools below assume server key `atlassian` in `.mcp.json`** (same server as meow:jira). If your server is registered under a different key, adapt tool-name prefixes or rename in `.mcp.json`.
 - Capacity analysis unreliable when >30% tickets unestimated — shows `[INCOMPLETE]` warning
 - Circular dependency detection presents the cycle — does NOT auto-break (team decides)
 - Scout output can be large — truncate to first 50K chars before passing to agent

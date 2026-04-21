@@ -1,6 +1,6 @@
 ---
 name: meow:memory
-description: "Use when capturing session learnings, extracting patterns, or tracking costs. Activates during Phase 0 (Orient) to load context and Phase 6 (Reflect) to persist it."
+description: "Topic-file-scoped session memory. Use when capturing session learnings, extracting patterns, or tracking costs — persists to .claude/memory/ topic files (fixes.md, review-patterns.md, architecture-decisions.md). Activates during Phase 0 (Orient) to load context and Phase 6 (Reflect) to persist it. NOT for weekly-cadence engineering retrospectives (see meow:retro); NOT for arbitrary file storage."
 ---
 
 # Memory System Toolkit

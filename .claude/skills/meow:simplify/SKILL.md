@@ -5,6 +5,8 @@ description: >-
   Use after Phase 3 (Build GREEN) and before Phase 4 (Review). Catches dead code,
   unnecessary abstractions, over-engineering, and redundant patterns.
   Triggers on "simplify", "clean up", "reduce complexity", "too complex".
+  NOT for style/convention enforcement (see meow:clean-code); NOT for reviewing
+  diffs or PRs (see meow:review).
 argument-hint: "[file_or_directory]"
 source: meowkit
 allowed-tools:

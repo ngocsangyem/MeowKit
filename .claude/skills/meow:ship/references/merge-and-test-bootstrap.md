@@ -1,5 +1,20 @@
 # Merge Base Branch and Test Framework Bootstrap
 
+
+## Contents
+
+- [Step 2: Merge the base branch (BEFORE tests)](#step-2-merge-the-base-branch-before-tests)
+- [Step 2.5: Test Framework Bootstrap](#step-25-test-framework-bootstrap)
+  - [B2. Research best practices](#b2-research-best-practices)
+  - [B3. Framework selection](#b3-framework-selection)
+  - [B4. Install and configure](#b4-install-and-configure)
+  - [B4.5. First real tests](#b45-first-real-tests)
+  - [B5. Verify](#b5-verify)
+  - [B5.5. CI/CD pipeline](#b55-cicd-pipeline)
+  - [B6. Create TESTING.md](#b6-create-testingmd)
+  - [B7. Update CLAUDE.md](#b7-update-claudemd)
+  - [B8. Commit](#b8-commit)
+
 ## Step 2: Merge the base branch (BEFORE tests)
 
 Fetch and merge the base branch into the feature branch so tests run against the merged state:

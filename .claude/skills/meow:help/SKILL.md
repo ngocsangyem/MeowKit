@@ -4,6 +4,8 @@ description: >-
   Workflow navigation assistant. Scans project state (plans, reviews, tests, git)
   and recommends the next step in the 7-phase pipeline. Use when asked
   "what should I do next?", "where am I?", "help", or at session start.
+  NOT for domain complexity routing (see meow:scale-routing); NOT for skill
+  discovery (descriptions handle that automatically).
 argument-hint: "[--verbose]"
 source: meowkit
 allowed-tools:
@@ -45,7 +47,7 @@ Check `git status` for staged/unstaged changes.
 No plans, no reviews, no changes.
 - "Everything clean. Options: start a new task with planner, run `/meow:retro`, or ask me anything."
 
-For skill suggestions based on task type, see `.claude/skills/meow:agent-detector/references/lifecycle-routing.md`.
+For skill suggestions based on task type, see `meow:agent-detector` (its `references/lifecycle-routing.md` maps task patterns to skills).
 
 ## State-to-Recommendation Map
 

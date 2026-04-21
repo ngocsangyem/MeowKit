@@ -1,5 +1,26 @@
 # Commit, Push, PR Creation, and Post-Ship (Steps 6, 6.5, 7, 8, 8.5, 8.75)
 
+
+## Contents
+
+- [Step 6: Commit (bisectable chunks)](#step-6-commit-bisectable-chunks)
+- [Step 6.5: Verification Gate](#step-65-verification-gate)
+- [Step 7: Push](#step-7-push)
+- [Step 7.5: Link Issues](#step-75-link-issues)
+- [Step 8: Create PR](#step-8-create-pr)
+- [Summary](#summary)
+- [Test Coverage](#test-coverage)
+- [Pre-Landing Review](#pre-landing-review)
+- [Design Review](#design-review)
+- [Eval Results](#eval-results)
+- [PR Review Comments](#pr-review-comments)
+- [Plan Completion](#plan-completion)
+- [Verification Results](#verification-results)
+- [TODOS](#todos)
+- [Test plan](#test-plan)
+- [Step 8.5: Auto-invoke /document-release](#step-85-auto-invoke-document-release)
+- [Step 8.75: Persist ship metrics](#step-875-persist-ship-metrics)
+
 ## Step 6: Commit (bisectable chunks)
 
 **Goal:** Create small, logical commits that work well with `git bisect` and help LLMs understand what changed.

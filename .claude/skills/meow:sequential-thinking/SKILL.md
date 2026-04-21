@@ -13,7 +13,7 @@ allowed-tools:
   - Grep
   - Glob
   - Bash
-sources: claudekit-engineer
+source: claudekit-engineer
 ---
 
 # Sequential Thinking

@@ -2,6 +2,19 @@
 
 **Purpose:** Track token usage per task to provide visibility into AI costs and enable budget management.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Before Task: Estimate Complexity](#before-task-estimate-complexity)
+- [After Task: Log Usage](#after-task-log-usage)
+- [`/meow:budget` Command](#meowbudget-command)
+  - [Last N Entries (default: 10)](#last-n-entries-default-10)
+  - [Monthly Aggregation](#monthly-aggregation)
+  - [All-Time Total](#all-time-total)
+- [Example cost-log.json](#example-cost-logjson)
+- [Validation](#validation)
+
+
 ## When to Use
 
 - **Before every task:** Log the estimated complexity tier and model.

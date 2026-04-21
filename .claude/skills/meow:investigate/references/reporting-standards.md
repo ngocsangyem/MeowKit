@@ -2,6 +2,30 @@
 
 Structured format for diagnostic and investigation reports. Sacrifice grammar for concision.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Report Structure](#report-structure)
+  - [1. Executive Summary (3-5 lines)](#1-executive-summary-3-5-lines)
+  - [2. Technical Analysis](#2-technical-analysis)
+  - [3. Actionable Recommendations](#3-actionable-recommendations)
+  - [4. Supporting Evidence](#4-supporting-evidence)
+  - [5. Unresolved Questions](#5-unresolved-questions)
+- [Report File Naming](#report-file-naming)
+- [Writing Guidelines](#writing-guidelines)
+- [Template](#template)
+- [Executive Summary](#executive-summary)
+- [Timeline](#timeline)
+- [Technical Analysis](#technical-analysis)
+  - [Findings](#findings)
+  - [Evidence](#evidence)
+- [Recommendations](#recommendations)
+  - [Immediate (P0)](#immediate-p0)
+  - [Short-term (P1)](#short-term-p1)
+  - [Long-term (P2)](#long-term-p2)
+- [Unresolved Questions](#unresolved-questions)
+
+
 ## When to Use
 
 - After completing system investigation

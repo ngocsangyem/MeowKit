@@ -2,8 +2,6 @@
 
 Proxy configuration for geo-testing, rate limiting avoidance, and corporate environments.
 
-**Related**: [commands.md](commands.md) for global options, [SKILL.md](../SKILL.md) for quick start.
-
 ## Contents
 
 - [Basic Proxy Configuration](#basic-proxy-configuration)

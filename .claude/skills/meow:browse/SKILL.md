@@ -8,6 +8,9 @@ description: |
   check responsive layouts, test forms and uploads, handle dialogs, and assert element states.
   Use when you need to verify a deployment, walk a user flow, or file a bug with evidence.
   Use when asked to "open in browser", "take a screenshot", or "dogfood this".
+  NOT for session-persistent multi-step flows (see meow:playwright-cli);
+  NOT for generating .spec.ts E2E code (see meow:qa-manual);
+  NOT for AI-autonomous long sessions (see meow:agent-browser).
 allowed-tools:
   - Bash
   - Read
@@ -54,5 +57,6 @@ For systematic QA passes with health scores and iterative fix loops, use `meow:q
 
 ## Gotchas
 
+- **Relies on `$B <command>` session alias**: if `$B` is unset, the skill silently fails (commands run against the user's shell, not the headless Chromium). Set the alias via `setup-browser-cookies` or your shell init (e.g., `alias B='npx @gstack/browse'`) BEFORE invoking any skill command.
 - **SPA content not rendered**: Headless browser captures DOM before JS hydration completes → Add explicit wait for selector or networkidle before assertions
 - **Auth-gated pages return 401**: Session cookies expire between commands → Re-authenticate or pass cookies explicitly before each protected page test

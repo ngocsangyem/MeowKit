@@ -2,6 +2,15 @@
 
 4-phase protocol for systematic web application QA. Complete all phases before issuing a verdict.
 
+## Contents
+
+- [Phase 1: Smoke Test](#phase-1-smoke-test)
+- [Phase 2: Interaction Testing](#phase-2-interaction-testing)
+- [Phase 3: Visual Regression](#phase-3-visual-regression)
+- [Phase 4: Accessibility](#phase-4-accessibility)
+- [Verdict Taxonomy](#verdict-taxonomy)
+
+
 ## Phase 1: Smoke Test
 
 Confirm the app is alive and not catastrophically broken before deeper testing.

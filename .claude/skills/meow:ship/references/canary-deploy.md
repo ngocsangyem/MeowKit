@@ -2,6 +2,20 @@
 
 **Purpose:** Deploy changes to a small subset of traffic first, monitor for issues, then promote to full deployment or automatically rollback.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Steps](#steps)
+  - [Step 1: Deploy to Canary Environment](#step-1-deploy-to-canary-environment)
+  - [Step 2: Monitor for 30 Minutes](#step-2-monitor-for-30-minutes)
+  - [Step 3: Evaluate Health](#step-3-evaluate-health)
+  - [Step 4a: Promote to Full Deployment (if healthy)](#step-4a-promote-to-full-deployment-if-healthy)
+  - [Step 4b: Automatic Rollback (if degraded)](#step-4b-automatic-rollback-if-degraded)
+- [Monitoring Dashboard Checklist](#monitoring-dashboard-checklist)
+- [Decision Matrix](#decision-matrix)
+- [Documentation](#documentation)
+
+
 ## When to Use
 
 Use canary deployment when the change affects ANY of the following:

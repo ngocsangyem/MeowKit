@@ -2,6 +2,32 @@
 
 Four integrated processes for rigorous thinking when intuition isn't enough. Most valuable one for debugging: **Problem Analysis (PA)** with the IS / IS-NOT matrix.
 
+## Contents
+
+- [The Four Processes](#the-four-processes)
+- [When to Use Which](#when-to-use-which)
+- [Process 2 (primary): Problem Analysis via IS / IS-NOT](#process-2-primary-problem-analysis-via-is-is-not)
+  - [Specify the problem precisely](#specify-the-problem-precisely)
+  - [Build the IS / IS-NOT matrix](#build-the-is-is-not-matrix)
+  - [From distinctions → possible causes](#from-distinctions-possible-causes)
+  - [Test each possible cause](#test-each-possible-cause)
+  - [Verify](#verify)
+- [Process 1 (summary): Situation Analysis](#process-1-summary-situation-analysis)
+- [Process 3 (summary): Decision Analysis](#process-3-summary-decision-analysis)
+- [Process 4 (summary): Potential Problem Analysis](#process-4-summary-potential-problem-analysis)
+- [PA Template (primary use)](#pa-template-primary-use)
+- [Problem](#problem)
+- [IS / IS-NOT matrix](#is-is-not-matrix)
+- [Distinctions](#distinctions)
+- [Changes near distinctions](#changes-near-distinctions)
+- [Possible causes](#possible-causes)
+- [Cause test](#cause-test)
+- [Verification plan](#verification-plan)
+- [Confirmed root cause](#confirmed-root-cause)
+- [Gotchas](#gotchas)
+- [Bridge to sequential-thinking](#bridge-to-sequential-thinking)
+
+
 **Core principle:** Separate what you know from what you assume. Use structured comparison to reveal truth.
 
 ## The Four Processes

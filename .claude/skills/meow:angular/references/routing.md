@@ -3,6 +3,12 @@
 > Part of meow:angular skill. Read when: working with routing.
 > Source: analogjs/angular-skills/angular-routing (MIT)
 
+## Contents
+
+- [Core Patterns](#core-patterns)
+- [Advanced Patterns](#advanced-patterns)
+
+
 ## Core Patterns
 
 **Basic Setup:**
@@ -386,4 +392,3 @@ Contains advanced patterns including:
 - Scroll Position Restoration
 
 ---
-

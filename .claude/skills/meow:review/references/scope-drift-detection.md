@@ -2,6 +2,18 @@
 
 Before reviewing code quality, check: **did they build what was requested — nothing more, nothing less?**
 
+## Contents
+
+- [Plan File Discovery](#plan-file-discovery)
+- [Actionable Item Extraction](#actionable-item-extraction)
+- [Cross-Reference Against Diff](#cross-reference-against-diff)
+- [Output Format](#output-format)
+- [Implementation Items](#implementation-items)
+- [Test Items](#test-items)
+- [Migration Items](#migration-items)
+- [Integration with Scope Drift Detection](#integration-with-scope-drift-detection)
+
+
 1. Read `TODOS.md` (if it exists). Read PR description (`gh pr view --json body --jq .body 2>/dev/null || true`).
    Read commit messages (`git log origin/<base>..HEAD --oneline`).
    **If no PR exists:** rely on commit messages and TODOS.md for stated intent — this is the common case since /meow:review runs before /meow:ship creates the PR.

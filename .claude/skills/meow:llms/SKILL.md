@@ -11,7 +11,9 @@ adapted_for: meowkit
 
 Generate [llms.txt](https://llmstxt.org/) files — LLM-friendly markdown indexes of project documentation.
 
-## When to Invoke
+> **Path convention:** Commands below assume cwd is `$CLAUDE_PROJECT_DIR` (project root). Prefix paths with `"$CLAUDE_PROJECT_DIR/"` when invoking from subdirectories.
+
+## When to Use
 
 - Project needs LLM-friendly documentation index
 - User asks for "llms.txt", "LLM documentation", "AI-friendly docs"

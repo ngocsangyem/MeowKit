@@ -1,5 +1,14 @@
 # Pre-flight: Base Branch Detection and Review Readiness
 
+
+## Contents
+
+- [Step 0: Detect base branch](#step-0-detect-base-branch)
+- [Step 0.5: Ship Mode Detection](#step-05-ship-mode-detection)
+- [Step 0.8: Unified Verification](#step-08-unified-verification)
+- [Step 1: Pre-flight](#step-1-pre-flight)
+- [Review Readiness Dashboard](#review-readiness-dashboard)
+
 ## Step 0: Detect base branch
 
 Determine which branch this PR targets. Use the result as "the base branch" in all subsequent steps.

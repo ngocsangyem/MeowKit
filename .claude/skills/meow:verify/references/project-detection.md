@@ -2,6 +2,23 @@
 
 Detailed logic for detecting project type and selecting the correct verification commands.
 
+## Contents
+
+- [Detection Order](#detection-order)
+- [JS/TS Sub-Type Detection](#jsts-sub-type-detection)
+  - [Package Manager](#package-manager)
+  - [Script Detection](#script-detection)
+  - [Monorepo Detection](#monorepo-detection)
+- [Coverage Threshold Detection](#coverage-threshold-detection)
+  - [JS/TS](#jsts)
+  - [Python](#python)
+  - [Go](#go)
+  - [Ruby](#ruby)
+  - [Rust](#rust)
+- [Unknown Project Type](#unknown-project-type)
+- [Command Existence Check](#command-existence-check)
+
+
 ---
 
 ## Detection Order

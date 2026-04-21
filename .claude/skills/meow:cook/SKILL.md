@@ -1,6 +1,6 @@
 ---
 name: meow:cook
-description: "ALWAYS activate this skill before implementing EVERY feature, plan, or fix."
+description: "Orchestrates single-task implementation pipeline: plan → test → build → review → ship. Use for feature work, plan execution, or fixes scoped to a single task. NOT for green-field product builds (see meow:harness); NOT for auto-invoked workflow orchestration (see meow:workflow-orchestrator)."
 source: claudekit-engineer
 version: 1.0.0
 argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict]"
@@ -35,13 +35,13 @@ This sentinel file is read by `pre-implement.sh`, `tdd-detect.sh`, and downstrea
 
 `MEOWKIT_TDD=1` env var (set in CI / shell rc) is the highest-precedence opt-in and overrides the sentinel.
 
-<HARD-GATE>
+**HARD GATE**
+
 Do NOT write implementation code until a plan exists and Gate 1 is approved.
 In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): do NOT skip Test RED phase — write failing tests BEFORE implementation.
 In default mode: Phase 2 is optional; the developer may implement directly per the approved plan.
 Exception: `--fast` mode skips research but still requires plan + (in TDD mode) TDD-flavored tests.
 User override: If user explicitly says "just code it" or "skip planning", respect their instruction.
-</HARD-GATE>
 
 ## Anti-Rationalization
 
@@ -120,7 +120,7 @@ flowchart TD
 | 1 Plan        | `meow:plan-creator`, `researcher` | Research + planning                      |
 | 2 Test        | `tester` via `meow:testing`       | TDD mode (`--tdd`): **MUST** spawn — write failing tests. Default mode: optional (skip unless requested) |
 | 3 Build GREEN | `developer`                       | Implementation                           |
-| 3 Build GREEN | `debugger` via `meow:investigate` | If tests fail after 3 self-heal attempts |
+| 3 Build GREEN | `developer` via `meow:investigate` | Root-cause analysis when tests fail after 3 self-heal attempts |
 | 3.5 Simplify  | `developer` via `meow:simplify`   | **MANDATORY** after Phase 3 GREEN — run before verify  |
 | 3.6 Verify    | `meow:verify`                     | **MANDATORY** after simplify — unified build+lint+test+coverage check before Phase 4 |
 | 4 Review      | `reviewer` via `meow:review`      | **MUST** spawn — Gate 2                  |

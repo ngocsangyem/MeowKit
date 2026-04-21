@@ -2,6 +2,18 @@
 
 When the harness should use file-based subagent dispatches (default) vs live Agent Teams (opt-in for live generator↔evaluator coupling).
 
+## Contents
+
+- [TL;DR](#tldr)
+- [Subagents (Default)](#subagents-default)
+- [Agent Teams (Opt-in)](#agent-teams-opt-in)
+- [When to Use Which](#when-to-use-which)
+- [Configuration](#configuration)
+- [File Ownership Matrix (Teams Mode Only)](#file-ownership-matrix-teams-mode-only)
+- [Defaults](#defaults)
+- [Risk Notes](#risk-notes)
+
+
 ## TL;DR
 
 **Default to subagents (file-based, reproducible).** Agent Teams are an opt-in acceleration for **live generator↔evaluator peer comms** during tight iteration loops where the file-based round-trip overhead becomes the bottleneck.

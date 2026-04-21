@@ -10,7 +10,7 @@ adapted_for: meowkit
 
 Production-grade UI/UX design with anti-AI-slop enforcement. Covers aesthetics, accessibility, typography, color, motion, responsive, and design tokens.
 
-## When to Invoke
+## When to Use
 
 **Auto-activate on:** Design tasks, UI component styling, "make it look good", "improve the design", "fix the UI", "design review", design system work, CSS/styling changes
 

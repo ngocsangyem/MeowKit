@@ -67,5 +67,4 @@ node scripts/fetch-chub.js "stripe webhooks" --lang py
 
 ## Fallback
 
-If topic URL returns 404 or empty:
-→ Fallback to [General Library Search](./library-search.md)
+If topic URL returns 404 or empty → fall back to the General Library Search workflow (linked from SKILL.md).

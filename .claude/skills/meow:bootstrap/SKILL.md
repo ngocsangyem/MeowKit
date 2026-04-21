@@ -6,6 +6,8 @@ description: |
   from idea to running code. Research → design → plan → scaffold → implement → docs.
   Explicit invocation only — never auto-activates.
   CLI = project infrastructure (.claude/), bootstrap = application code + full pipeline.
+  NOT for autonomous multi-hour builds of specified products (see meow:harness);
+  NOT for single-task feature work on existing projects (see meow:cook).
 allowed-tools:
   - Bash
   - Read
@@ -15,8 +17,7 @@ allowed-tools:
   - Glob
   - AskUserQuestion
   - WebSearch
-sources:
-  - claudekit-engineer
+source: claudekit-engineer
 ---
 
 # Bootstrap
@@ -25,7 +26,7 @@ End-to-end project orchestrator: research → design → **plan → scaffold** �
 
 **CLI boundary:** `npx mewkit init` = project infrastructure. `meow:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
 
-## When to Invoke
+## When to Use
 
 **Explicit only** — never auto-activate.
 

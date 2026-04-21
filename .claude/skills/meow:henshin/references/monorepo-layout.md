@@ -2,6 +2,20 @@
 
 Canonical tree for `--both` mode (Node / TypeScript). Adapt paths for other ecosystems; the shared-core / thin-adapter shape is the invariant.
 
+## Contents
+
+- [`--both` tree](#both-tree)
+- [Single-surface variants](#single-surface-variants)
+- [`packages/core/package.json`](#packagescorepackagejson)
+- [`packages/cli/package.json`](#packagesclipackagejson)
+- [`packages/mcp/package.json`](#packagesmcppackagejson)
+- [Root `package.json`](#root-packagejson)
+- [Core / adapter boundary (non-negotiable)](#core-adapter-boundary-non-negotiable)
+- [CI workflow outline (`.github/workflows/ci.yml`)](#ci-workflow-outline-githubworkflowsciyml)
+- [Release workflow outline (`.github/workflows/release.yml`)](#release-workflow-outline-githubworkflowsreleaseyml)
+- [Gotchas](#gotchas)
+
+
 Load during Phase 5 (Transformation Spec) so the plan captures the exact tree `/meow:cook` will scaffold.
 
 ## `--both` tree

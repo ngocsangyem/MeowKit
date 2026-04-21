@@ -5,9 +5,10 @@ preamble-tier: 3
 description: >-
   Use when running an autonomous multi-hour build of a green-field product —
   orchestrates planner → contract → generator ⇄ evaluator loop with adaptive
-  scaffolding density per model tier. Distinct from /meow:cook (single-task
-  pipeline). Triggers on /meow:harness, "build me a kanban app", "build a
-  retro game maker", "autonomous build", or any green-field product spec.
+  scaffolding density per model tier. Triggers on /meow:harness, "build me a
+  kanban app", "build a retro game maker", "autonomous build", or any
+  green-field product spec. NOT for scoped single-task work (see meow:cook);
+  NOT for initial project scaffolding only (see meow:bootstrap).
 argument-hint: "[task description] [--tier auto|full|lean|minimal] [--max-iter N] [--budget USD] [--tdd]"
 allowed-tools:
   - Bash
@@ -25,7 +26,7 @@ source: meowkit
 
 Step-file workflow that runs the complete generator/evaluator harness pipeline as an autonomous build. Handles green-field product builds (Phase 1 product-level plan → Phase 4 sprint contract → Phase 3 evaluator loop → ship decision) with adaptive scaffolding density based on detected model tier.
 
-## Trigger Conditions
+## When to Use
 
 Activate when:
 - User runs `/meow:harness "build a X"` (or any green-field product description)

@@ -2,6 +2,25 @@
 
 Safe migration practices for production databases. PostgreSQL primary; principles apply broadly.
 
+## Contents
+
+- [File Naming](#file-naming)
+- [Structure: Always Up + Down](#structure-always-up-down)
+- [Safe vs Unsafe Operations](#safe-vs-unsafe-operations)
+  - [Safe (no table lock, online):](#safe-no-table-lock-online)
+  - [Unsafe (locks table — requires maintenance window or 2-phase approach):](#unsafe-locks-table-requires-maintenance-window-or-2-phase-approach)
+- [Zero-Downtime Patterns](#zero-downtime-patterns)
+  - [Add column (safe in PostgreSQL 11+)](#add-column-safe-in-postgresql-11)
+  - [Drop column (2-phase approach)](#drop-column-2-phase-approach)
+  - [Rename column (3-phase approach)](#rename-column-3-phase-approach)
+  - [Add non-null column](#add-non-null-column)
+  - [Create index without locking](#create-index-without-locking)
+- [Data Migrations](#data-migrations)
+  - [Batched data migration pattern](#batched-data-migration-pattern)
+- [Testing Migrations](#testing-migrations)
+- [Anti-Patterns](#anti-patterns)
+
+
 ## File Naming
 
 ALWAYS use timestamp-based names. NEVER reorder or renumber migrations after creation.

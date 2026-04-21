@@ -2,6 +2,18 @@
 
 Custom fields vary per project and Jira instance. Use this methodology to discover them dynamically before creating or updating issues.
 
+## Contents
+
+- [Step 1: List All Fields](#step-1-list-all-fields)
+- [Step 2: Filter by Project Screen](#step-2-filter-by-project-screen)
+- [Step 3: Common Custom Fields](#step-3-common-custom-fields)
+- [Step 4: Field Type Handling](#step-4-field-type-handling)
+- [Step 5: Discover User Account IDs](#step-5-discover-user-account-ids)
+- [Step 6: Validate Before Creating](#step-6-validate-before-creating)
+- [Quick Reference: Field Discovery Commands](#quick-reference-field-discovery-commands)
+- [Tip: Cache Field IDs Per Project](#tip-cache-field-ids-per-project)
+
+
 ---
 
 ## Step 1: List All Fields

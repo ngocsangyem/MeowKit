@@ -29,7 +29,7 @@ description: "[TODO: Specific trigger keywords + what it does. Include WHEN to u
 
 [TODO: 1-2 sentences — what this skill does and when to use it]
 
-## When to Invoke
+## When to Use
 
 **Auto-activate on:**
 - [TODO: keyword patterns Claude watches for]
@@ -69,6 +69,10 @@ Operates in **Phase [TODO: 0-6]** of MeowKit's workflow. Output supports the `[T
 ## Handoff Protocol
 
 On completion → `[TODO: agent]` receives: [TODO: what]
+
+## Gotchas
+
+(none yet — grow from observed failures)
 
 ## References
 
@@ -147,6 +151,7 @@ def init_skill(skill_name, base_path):
     print("  6. Define Output Format template with placeholders")
     print("  7. Fill Failure Handling table")
     print("  8. Set Handoff Protocol (which agent receives output)")
+    print("  9. Seed Gotchas with real failures (grow from edge cases over time)")
 
     return skill_dir
 

@@ -3,6 +3,12 @@
 > Part of meow:angular skill. Read when: working with forms.
 > Source: analogjs/angular-skills/angular-forms (MIT)
 
+## Contents
+
+- [Core Patterns](#core-patterns)
+- [Advanced Patterns](#advanced-patterns)
+
+
 ## Core Patterns
 
 **Basic Setup:**
@@ -416,4 +422,3 @@ Contains:
 - FormValueControl for custom form controls
 
 ---
-

@@ -26,7 +26,7 @@ Negotiation protocol between generator and evaluator. Produces a signed contract
 
 > For single-task plan validation (cook flow), use `meow:validate-plan` instead. `meow:sprint-contract` is for product-level specs feeding into `meow:harness` only.
 
-## Trigger Conditions
+## When to Use
 
 Activate when:
 - User runs `/meow:sprint-contract <action> [task-slug]`
@@ -135,7 +135,7 @@ When `MEOWKIT_HARNESS_MODE=LEAN`:
 | `assets/contract-template.md` | Canonical contract schema with placeholder ACs |
 | `scripts/validate-contract.sh` | Schema + AC-form validator (POSIX-aware Bash 3.2+) |
 | `scripts/check-contract-signed.sh` | Gate helper called by `gate-enforcement.sh` to block source edits before sign |
-| `references/bdd-to-ac-mapping.md` | How Gherkin scenarios map to acceptance criteria (research-02) |
+| `references/bdd-to-ac-mapping.md` | How Gherkin scenarios map to acceptance criteria |
 | `../../hooks/gate-enforcement.sh` | Hook that enforces the contract gate on Edit/Write of source files |
 | `../../agents/developer.md` | Generator agent — owns `propose` and `amend` actions |
 | `../../agents/evaluator.md` | Evaluator agent — owns `review` action; also Phase 3 active-verification consumer |

@@ -4,11 +4,13 @@ description:
   "Use when copy-catting, replicating, or adapting features from external
   systems, repos, apps, or ideas into the current project. Triggers on 'copy this
   from', 'replicate', 'clone this feature', 'how does X do Y', 'chom',
-  'like how X does it', 'port from', 'build like', '1:1 copy'."
+  'like how X does it', 'port from', 'build like', '1:1 copy'. NOT for packing
+  the current project (see meow:pack); NOT for one-shot URL-to-markdown fetches
+  (see meow:web-to-markdown)."
 argument-hint: "<source-url|path|description> [feature] [--compare|--copy|--improve|--port] [--lean|--auto]"
 phase: on-demand
 trust_level: kit-authored
-injection_risk: low
+injection_risk: medium
 source: claudekit-engineer
 ---
 

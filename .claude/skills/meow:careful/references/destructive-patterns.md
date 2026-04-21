@@ -6,6 +6,25 @@
 >
 > **Implementation status:** `check-careful.sh` enforces all CRITICAL and HIGH patterns listed below. Production auto-block is active: when `NODE_ENV`, `APP_ENV`, or `ENVIRONMENT` contains `production`/`prod`/`staging`, CRITICAL patterns return `permissionDecision: "block"` (no override) instead of `"ask"`.
 
+## Contents
+
+- [Severity Levels](#severity-levels)
+- [Blocked Patterns](#blocked-patterns)
+  - [File System](#file-system)
+  - [Database (SQL)](#database-sql)
+  - [Database (NoSQL & Cache)](#database-nosql-cache)
+  - [Git](#git)
+  - [Kubernetes & Containers](#kubernetes-containers)
+  - [Cloud & Infrastructure](#cloud-infrastructure)
+- [Safe Exceptions (No Warning)](#safe-exceptions-no-warning)
+  - [Build & Dependency Caches](#build-dependency-caches)
+  - [Container Housekeeping](#container-housekeeping)
+- [How the Hook Detects Patterns](#how-the-hook-detects-patterns)
+  - [Override Mechanism](#override-mechanism)
+- [Environment-Aware Blocking](#environment-aware-blocking)
+- [Gotchas](#gotchas)
+
+
 ---
 
 ## Severity Levels

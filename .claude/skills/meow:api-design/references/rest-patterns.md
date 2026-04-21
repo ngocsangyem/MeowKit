@@ -2,6 +2,20 @@
 
 Conventions for building consistent, semantically correct REST APIs.
 
+## Contents
+
+- [Resource Naming](#resource-naming)
+- [HTTP Methods](#http-methods)
+- [Status Codes](#status-codes)
+- [Pagination](#pagination)
+  - [Cursor-Based (preferred)](#cursor-based-preferred)
+  - [Offset-Based (acceptable for static datasets)](#offset-based-acceptable-for-static-datasets)
+- [Filtering and Sorting](#filtering-and-sorting)
+- [Versioning](#versioning)
+- [Rate Limiting](#rate-limiting)
+- [Error Format](#error-format)
+
+
 ---
 
 ## Resource Naming

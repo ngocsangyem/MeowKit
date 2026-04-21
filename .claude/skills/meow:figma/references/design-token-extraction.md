@@ -3,6 +3,17 @@
 Patterns for extracting design tokens from Figma and converting to code.
 Load this file only when meow:figma is in **tokens** mode.
 
+## Contents
+
+- [Color Tokens](#color-tokens)
+- [Typography Tokens](#typography-tokens)
+- [Spacing Tokens](#spacing-tokens)
+- [Shadow Tokens](#shadow-tokens)
+- [Border Radius Tokens](#border-radius-tokens)
+- [Variable Naming Convention](#variable-naming-convention)
+- [Output File Structure](#output-file-structure)
+
+
 ## Color Tokens
 
 Source: Figma color styles + local variables.

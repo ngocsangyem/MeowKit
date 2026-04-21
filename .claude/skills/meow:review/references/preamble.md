@@ -1,5 +1,24 @@
 # Preamble and Session Setup
 
+
+## Contents
+
+- [Preamble (run first)](#preamble-run-first)
+- [Memory](#memory)
+- [AskUserQuestion Format](#askuserquestion-format)
+- [Completeness Principle — Boil the Lake](#completeness-principle-boil-the-lake)
+- [Repo Ownership Mode — See Something, Say Something](#repo-ownership-mode-see-something-say-something)
+- [Search Before Building](#search-before-building)
+- [Contributor Mode](#contributor-mode)
+- [Steps to reproduce](#steps-to-reproduce)
+- [Raw output](#raw-output)
+- [What would make this a 10](#what-would-make-this-a-10)
+- [Completion Status Protocol](#completion-status-protocol)
+  - [Escalation](#escalation)
+- [Telemetry (run last)](#telemetry-run-last)
+- [Plan Status Footer](#plan-status-footer)
+- [MEOWKIT REVIEW REPORT](#meowkit-review-report)
+
 ## Preamble (run first)
 
 ```bash

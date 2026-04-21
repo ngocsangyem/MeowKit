@@ -2,6 +2,20 @@
 
 Full command listing for playwright-cli.
 
+## Contents
+
+- [Core](#core)
+- [Navigation](#navigation)
+- [Keyboard](#keyboard)
+- [Mouse](#mouse)
+- [Capture](#capture)
+- [Tabs](#tabs)
+- [Storage](#storage)
+- [Network](#network)
+- [DevTools](#devtools)
+- [Open Parameters](#open-parameters)
+
+
 ## Core
 
 ```bash

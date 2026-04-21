@@ -2,6 +2,26 @@
 
 Catalog of known harness failure patterns. Used by `meow:trace-analyze` step-03 (scatter analysis) to classify trace findings into actionable categories. Seeded from LangChain published patterns + Anthropic harness research.
 
+## Contents
+
+- [Pattern Schema](#pattern-schema)
+- [Patterns from LangChain (deepagents harness research)](#patterns-from-langchain-deepagents-harness-research)
+  - [`premature-exit-without-verify`](#premature-exit-without-verify)
+  - [`doom-loop-edit-cycle`](#doom-loop-edit-cycle)
+  - [`missing-environmental-context`](#missing-environmental-context)
+  - [`time-budget-exceeded`](#time-budget-exceeded)
+  - [`slop-buildup`](#slop-buildup)
+  - [`compile-break-ignored`](#compile-break-ignored)
+  - [`reasoning-budget-mismatch`](#reasoning-budget-mismatch)
+- [Patterns from Anthropic harness research](#patterns-from-anthropic-harness-research)
+  - [`self-praise-approval`](#self-praise-approval)
+  - [`stub-feature`](#stub-feature)
+  - [`contract-drift`](#contract-drift)
+  - [`context-anxiety-wrap` (LEGACY)](#context-anxiety-wrap-legacy)
+- [Suggestion Format](#suggestion-format)
+- [Adding New Patterns](#adding-new-patterns)
+
+
 ## Pattern Schema
 
 Each entry has:

@@ -2,6 +2,24 @@
 
 Patterns for writing efficient queries and diagnosing slow ones. PostgreSQL primary.
 
+## Contents
+
+- [First: Measure Before Optimizing](#first-measure-before-optimizing)
+- [Indexing Strategy](#indexing-strategy)
+  - [B-tree (default) — use for:](#b-tree-default-use-for)
+  - [Composite index — use for frequent multi-column queries:](#composite-index-use-for-frequent-multi-column-queries)
+  - [Partial index — use when querying a subset:](#partial-index-use-when-querying-a-subset)
+  - [GIN index — use for arrays, JSONB, full-text search:](#gin-index-use-for-arrays-jsonb-full-text-search)
+  - [When NOT to index:](#when-not-to-index)
+- [N+1 Prevention](#n1-prevention)
+- [Pagination](#pagination)
+  - [Offset pagination (simple, but slow on large tables):](#offset-pagination-simple-but-slow-on-large-tables)
+  - [Cursor-based pagination (preferred for large tables):](#cursor-based-pagination-preferred-for-large-tables)
+- [Common Query Mistakes](#common-query-mistakes)
+- [Connection Pooling](#connection-pooling)
+- [Statistics and Cache](#statistics-and-cache)
+
+
 ## First: Measure Before Optimizing
 
 ALWAYS run `EXPLAIN ANALYZE` before and after any optimization.

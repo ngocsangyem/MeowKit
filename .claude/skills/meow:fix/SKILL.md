@@ -1,6 +1,6 @@
 ---
 name: meow:fix
-description: "ALWAYS activate this skill before fixing ANY bug, error, test failure, CI/CD issue, type error, lint, log error, UI issue, code problem."
+description: "Diagnoses and fixes bugs, type errors, lint failures, CI/CD issues, and runtime errors via root-cause-first investigation. Use for defect remediation. NOT for investigation without a fix (see meow:investigate); NOT for build-only compilation errors (see meow:build-fix)."
 source: claudekit-engineer
 version: 0.1.0
 argument-hint: "[issue] --auto|--review|--quick|--parallel|--tdd"
@@ -22,12 +22,12 @@ Bug → Mode Select → Check Memory → Scout (MANDATORY) → Diagnose
 
 **This flow is authoritative.** If prose conflicts, follow the flow.
 
-<HARD-GATE>
+**HARD GATE**
+
 Do NOT propose or implement fixes before completing Steps 1-2 (Scout + Diagnose).
 Symptom fixes are failure. Find the cause first through structured analysis, NEVER guessing.
 If 3+ fix attempts fail, STOP and question the architecture — discuss with user.
 Override: `--quick` allows fast scout→diagnose→fix for trivial issues (lint, type errors).
-</HARD-GATE>
 
 ## Arguments
 

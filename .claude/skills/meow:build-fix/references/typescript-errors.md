@@ -2,6 +2,22 @@
 
 Common TS compiler errors with fix patterns. Load this file when error output contains `error TS\d{4}:`.
 
+## Contents
+
+- [Error Catalog](#error-catalog)
+  - [TS1005 — Expected X](#ts1005-expected-x)
+  - [TS2304 — Cannot find name](#ts2304-cannot-find-name)
+  - [TS2307 — Cannot find module](#ts2307-cannot-find-module)
+  - [TS2322 — Type not assignable](#ts2322-type-not-assignable)
+  - [TS2339 — Property does not exist](#ts2339-property-does-not-exist)
+  - [TS2345 — Argument not assignable](#ts2345-argument-not-assignable)
+  - [TS7006 — Parameter implicitly has 'any'](#ts7006-parameter-implicitly-has-any)
+  - [TS2531 — Object is possibly null](#ts2531-object-is-possibly-null)
+  - [TS2532 — Object is possibly undefined](#ts2532-object-is-possibly-undefined)
+  - [TS2554 — Expected N arguments but got M](#ts2554-expected-n-arguments-but-got-m)
+- [Quick Lookup by Symptom](#quick-lookup-by-symptom)
+
+
 ## Error Catalog
 
 ### TS1005 — Expected X

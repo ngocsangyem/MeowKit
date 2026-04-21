@@ -1,5 +1,24 @@
 # Step 0: Nuclear Scope Challenge + Mode Selection
 
+
+## Contents
+
+- [0A. Premise Challenge](#0a-premise-challenge)
+- [0B. Existing Code Leverage](#0b-existing-code-leverage)
+- [0C. Dream State Mapping](#0c-dream-state-mapping)
+- [0C-bis. Implementation Alternatives (MANDATORY)](#0c-bis-implementation-alternatives-mandatory)
+- [0D. Mode-Specific Analysis](#0d-mode-specific-analysis)
+- [0D-POST. Persist CEO Plan (EXPANSION and SELECTIVE EXPANSION only)](#0d-post-persist-ceo-plan-expansion-and-selective-expansion-only)
+- [Vision](#vision)
+  - [10x Check](#10x-check)
+  - [Platonic Ideal](#platonic-ideal)
+- [Scope Decisions](#scope-decisions)
+- [Accepted Scope (added to this plan)](#accepted-scope-added-to-this-plan)
+- [Deferred to TODOS.md](#deferred-to-todosmd)
+- [Spec Review Loop](#spec-review-loop)
+- [0E. Temporal Interrogation (EXPANSION, SELECTIVE EXPANSION, and HOLD modes)](#0e-temporal-interrogation-expansion-selective-expansion-and-hold-modes)
+- [0F. Mode Selection](#0f-mode-selection)
+
 ## 0A. Premise Challenge
 
 1. Is this the right problem to solve? Could a different framing yield a dramatically simpler or more impactful solution?

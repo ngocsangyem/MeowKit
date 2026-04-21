@@ -1,5 +1,23 @@
 # Ship Preamble and Shared Protocols
 
+
+## Contents
+
+- [Memory — At task start](#memory-at-task-start)
+- [Preamble (run first)](#preamble-run-first)
+- [AskUserQuestion Format](#askuserquestion-format)
+- [Completeness Principle — Boil the Lake](#completeness-principle-boil-the-lake)
+- [Repo Ownership Mode — See Something, Say Something](#repo-ownership-mode-see-something-say-something)
+- [Search Before Building](#search-before-building)
+- [Contributor Mode](#contributor-mode)
+- [Steps to reproduce](#steps-to-reproduce)
+- [Raw output](#raw-output)
+- [What would make this a 10](#what-would-make-this-a-10)
+- [Completion Status Protocol](#completion-status-protocol)
+  - [Escalation](#escalation)
+- [Plan Status Footer](#plan-status-footer)
+- [MEOWKIT REVIEW REPORT](#meowkit-review-report)
+
 ## Memory — At task start
 
 Read `.claude/memory/architecture-decisions.md` for release context (recent architectural decisions that may affect the release scope or rollback strategy). If the file is absent, proceed without it — ship does not block on missing memory.

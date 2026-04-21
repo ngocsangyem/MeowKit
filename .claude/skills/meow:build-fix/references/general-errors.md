@@ -3,6 +3,27 @@
 Framework-agnostic build error patterns. Use when language is unknown or error doesn't match
 TypeScript or Python references.
 
+## Contents
+
+- [Dependency Errors](#dependency-errors)
+  - [Missing dependency](#missing-dependency)
+  - [Version mismatch](#version-mismatch)
+- [Environment Errors](#environment-errors)
+  - [Missing environment variable](#missing-environment-variable)
+  - [Permission denied](#permission-denied)
+  - [Port already in use](#port-already-in-use)
+- [Build Tool Errors](#build-tool-errors)
+  - [Out of memory](#out-of-memory)
+  - [Circular dependency](#circular-dependency)
+  - [Stale cache](#stale-cache)
+- [Go-Specific](#go-specific)
+  - [cannot find package](#cannot-find-package)
+  - [undefined: X](#undefined-x)
+- [Rust-Specific](#rust-specific)
+  - [error[E0432] unresolved import](#errore0432-unresolved-import)
+  - [error[E0308] mismatched types](#errore0308-mismatched-types)
+
+
 ## Dependency Errors
 
 ### Missing dependency

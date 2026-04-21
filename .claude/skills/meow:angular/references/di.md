@@ -3,6 +3,12 @@
 > Part of meow:angular skill. Read when: working with di.
 > Source: analogjs/angular-skills/angular-di (MIT)
 
+## Contents
+
+- [Core Patterns](#core-patterns)
+- [Advanced Patterns](#advanced-patterns)
+
+
 ## Core Patterns
 
 **Basic Injection with inject():**
@@ -362,4 +368,3 @@ Contains advanced patterns including:
 - Injection Context Utilities (assertInInjectionContext, Custom inject Functions)
 
 ---
-

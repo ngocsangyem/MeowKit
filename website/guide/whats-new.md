@@ -12,6 +12,17 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.6.0 — The Skills Compliance Release (2026-04-22)
+
+A 7-agent audit of all 77 `meow:*` skills against Anthropic's skill-authoring best practices + MeowKit's internal `skill-authoring-rules.md`. Ships ~220 edits across description fields, frontmatter, reference integrity, scripts, and grounding. Zero new skills, zero breaking changes, measurably cleaner routing. [Full notes →](/guide/whats-new/v2.6.0)
+
+- **All skill descriptions normalized to Anthropic third-person format** — four greedy/imperative descriptions rewritten (cook, fix, agent-detector, session-continuation); five overlap clusters (bug-fix, pipeline, browser, code-quality, planning) disambiguated with explicit `NOT for X` clauses; 20 more skills got focused exclusion clauses where overlap was latent.
+- **`meow:skill-creator` compliance** — now has its own `## Gotchas`, 500-line cap matches authoritative Rule 3, emitted template includes mandatory Gotchas header, `validate-skill.py` gained check 8/8 for Gotchas presence. Every future scaffold inherits Rule 1 / Rule 3 compliance.
+- **Reference integrity** — `meow:agent-browser` 8-deep nested ref chains + circular `authentication.md ↔ session-management.md` flattened; new `step-file-rules.md` Rule 6 formalizes the 2-level architectural exception for step-file skills; 115 reference files over 100 lines got auto-generated Tables of Contents.
+- **Grounding cleanup** — phantom `research-01` / `research-02` citations removed across 9 locations; non-existent `debugger` agent reference in `meow:cook` replaced with real `developer` via `meow:investigate`; unverifiable "Vercel Engineering" attribution rephrased; `<HARD-GATE>` decorative tags replaced with bold markdown (grep-confirmed decorative).
+- **Critical fixes** — `meow:lint-and-validate` was undiscoverable due to malformed YAML (fixed); Python venv was half-installed making 7 skills crash on import (rebuilt); `validate-rubric.sh --help` no longer crashes on macOS BSD basename.
+- Frontmatter normalization (`preamble-tier: 4 → 3`, dead `autoInvoke` / `priority` deleted, `sources → source` unified, `meow:chom injection_risk` raised); 22 section-name renames to canonical `## When to Use`; 7 skills gained `$CLAUDE_PROJECT_DIR` path-convention note; 3 MCP skills gained server-key Gotcha.
+
 ### v2.5.1 — meow:henshin (2026-04-20)
 
 New cross-cutting skill `meow:henshin` — planning front door for wrapping existing code as agent-consumable surfaces. Adapted from `claudekit-engineer/agentize` (tier 2). Produces a **Transformation Spec** (CLI + MCP + companion skill shape) and hands off to `meow:plan-creator` → `meow:cook`. Does not build, scaffold, or publish on its own.

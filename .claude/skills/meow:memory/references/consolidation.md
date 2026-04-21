@@ -2,6 +2,21 @@
 
 **Purpose:** Keep topic files lean and high-signal. Prune stale entries, archive old cost data, and merge duplicates when topic files grow large.
 
+## Contents
+
+- [When to Prune](#when-to-prune)
+- [Pruning Topic Files (`/meow:memory --prune`)](#pruning-topic-files-meowmemory---prune)
+- [Pruning Split JSON Files (Manual)](#pruning-split-json-files-manual)
+- [Archiving cost-log.json](#archiving-cost-logjson)
+- [Classification Rubric (for manual topic file dedup)](#classification-rubric-for-manual-topic-file-dedup)
+  - [Clear Match](#clear-match)
+  - [Ambiguous](#ambiguous)
+  - [No Match](#no-match)
+  - [No Durable Signal](#no-durable-signal)
+- [Validation](#validation)
+- [Important Rules](#important-rules)
+
+
 ## When to Prune
 
 | File | Threshold | Action |

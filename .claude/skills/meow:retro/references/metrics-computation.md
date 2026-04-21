@@ -1,5 +1,16 @@
 # Steps 2-8: Metrics Computation
 
+
+## Contents
+
+- [Step 2: Compute Metrics](#step-2-compute-metrics)
+- [Step 3: Commit Time Distribution](#step-3-commit-time-distribution)
+- [Step 4: Work Session Detection](#step-4-work-session-detection)
+- [Step 5: Commit Type Breakdown](#step-5-commit-type-breakdown)
+- [Step 6: Hotspot Analysis](#step-6-hotspot-analysis)
+- [Step 7: PR Size Distribution](#step-7-pr-size-distribution)
+- [Step 8: Focus Score + Ship of the Week](#step-8-focus-score-ship-of-the-week)
+
 ## Step 2: Compute Metrics
 
 Calculate and present these metrics in a summary table:

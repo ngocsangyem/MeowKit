@@ -2,6 +2,21 @@
 
 When the user runs `/retro global` (or `/retro global 14d`), follow this flow instead of the repo-scoped Steps 1-14. This mode works from any directory — it does NOT require being inside a git repo.
 
+## Contents
+
+- [Global Step 1: Compute time window](#global-step-1-compute-time-window)
+- [Global Step 2: Discover repos](#global-step-2-discover-repos)
+- [Global Step 3: Run git log on each discovered repo](#global-step-3-run-git-log-on-each-discovered-repo)
+- [Global Step 4: Compute global shipping streak](#global-step-4-compute-global-shipping-streak)
+- [Global Step 5: Compute context switching metric](#global-step-5-compute-context-switching-metric)
+- [Global Step 6: Per-tool productivity patterns](#global-step-6-per-tool-productivity-patterns)
+- [Global Step 7: Aggregate and generate narrative](#global-step-7-aggregate-and-generate-narrative)
+  - [Your Week: [user name] — [date range]](#your-week-user-name-date-range)
+  - [Global Engineering Retro: [date range]](#global-engineering-retro-date-range)
+- [Global Step 8: Load history & compare](#global-step-8-load-history-compare)
+- [Global Step 9: Save snapshot](#global-step-9-save-snapshot)
+
+
 ## Global Step 1: Compute time window
 
 Same midnight-aligned logic as the regular retro. Default 7d. The second argument after `global` is the window (e.g., `14d`, `30d`, `24h`).

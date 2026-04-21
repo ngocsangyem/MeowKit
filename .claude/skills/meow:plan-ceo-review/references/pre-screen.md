@@ -2,6 +2,22 @@
 
 Run BEFORE mode selection (Step 0). Fast-fail on unfinished plans. **Never rejects — always returns for amendment with actionable guidance.**
 
+## Contents
+
+- [Layer 0: Placeholder Scan](#layer-0-placeholder-scan)
+  - [Flag Patterns](#flag-patterns)
+  - [Exclusions (do NOT flag these)](#exclusions-do-not-flag-these)
+  - [Mode-Aware Exceptions](#mode-aware-exceptions)
+  - [If Patterns Found](#if-patterns-found)
+  - [Anchors](#anchors)
+- [Layer 1: Structural Completeness](#layer-1-structural-completeness)
+  - [If Section Missing](#if-section-missing)
+- [Layer 1b: Coverage Mapping (Manual)](#layer-1b-coverage-mapping-manual)
+  - [If Gaps Found](#if-gaps-found)
+  - [If Plan Has No Explicit Requirements List](#if-plan-has-no-explicit-requirements-list)
+- [Integration](#integration)
+
+
 ## Layer 0: Placeholder Scan
 
 Scan plan BODY text for anti-patterns indicating unfinished thinking.

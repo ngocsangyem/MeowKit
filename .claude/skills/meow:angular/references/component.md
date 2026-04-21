@@ -3,6 +3,12 @@
 > Part of meow:angular skill. Read when: working with component.
 > Source: analogjs/angular-skills/angular-component (MIT)
 
+## Contents
+
+- [Core Patterns](#core-patterns)
+- [Advanced Patterns](#advanced-patterns)
+
+
 ## Core Patterns
 
 **Component Structure:**
@@ -270,4 +276,3 @@ Contains advanced patterns including:
 - Dynamic Components with @defer
 
 ---
-

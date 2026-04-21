@@ -16,6 +16,52 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.6.0 (2026-04-22) — The Skills Compliance Release
+
+### Highlights
+
+A 7-agent audit of all 77 `meow:*` skills against Anthropic's Skill-authoring best practices, Lessons-from-building-Claude-Code, and MeowKit's own `skill-authoring-rules.md`. Ships ~220 edits across description fields, frontmatter, reference integrity, scripts, and grounding. Zero new skills, zero breaking changes, measurably cleaner routing. Full audit trail at `plans/260421-2247-meowkit-skills-audit-improvement/`. [Full notes →](/guide/whats-new/v2.6.0)
+
+### Improvements
+
+- All skill descriptions normalized to Anthropic third-person format — `meow:cook`, `meow:fix`, `meow:agent-detector`, `meow:session-continuation` rewritten out of imperative/greedy mood that cannibalized sibling routing.
+- Five overlap clusters disambiguated with explicit `NOT for X (see meow:Y)` clauses — bug-fix (fix / investigate / build-fix), pipeline (cook / workflow-orchestrator / harness), browser (browse / playwright-cli / agent-browser / qa-manual), code-quality (review / clean-code / simplify / evaluate), planning (plan-creator / planning-engine). Twenty additional skills got focused exclusion clauses where latent overlap existed.
+- `meow:agent-browser` 8 inter-ref cross-links flattened and `authentication.md ↔ session-management.md` circular reference broken — all 9 reference files remain directly linked one level deep from `SKILL.md`.
+- New `step-file-rules.md` Rule 6 — step-file skills (`meow:review`, `meow:trace-analyze`, `meow:plan-creator`, `meow:harness`, `meow:evaluate`) formally allowed to chain `SKILL.md → step-NN.md → references/X.md` provided each step file opens with a Contents TOC.
+- Seven skills that reference `.claude/skills/...` paths directly gained a `> Path convention:` note declaring `$CLAUDE_PROJECT_DIR` as the assumed cwd — `meow:rubric`, `meow:multimodal`, `meow:skill-creator`, `meow:intake`, `meow:llms`, `meow:investigate`, `meow:jira`.
+- MCP prerequisite hardening for `meow:jira`, `meow:confluence`, `meow:planning-engine` — server-key assumption (`.mcp.json` key `atlassian`) documented via Gotchas without hardcoding prefixes, preserving install portability.
+- Twenty-two skills renamed their trigger section to canonical `## When to Use` — previously fragmented across "When to Invoke", "When to Activate", "Trigger Conditions".
+- 115 reference files over 100 lines auto-gained a `## Contents` Table of Contents via `plans/260421-2247-meowkit-skills-audit-improvement/scripts/add-toc-to-ref-files.py` — idempotent generator, safe to re-run on future drift. Original audit counted 25; actual was 116 (4.6× under-count, largely from `meow:angular`).
+- Frontmatter normalization — `preamble-tier: 4` → `3` on `meow:qa` / `meow:review` / `meow:ship` (valid range is 1-3). Dead `autoInvoke` and `priority` fields deleted from four skills after grep-confirming zero readers in hooks, scripts, or CLI. `sources` → `source` singular unified across seven skills. `meow:chom` `injection_risk` bumped `low → medium` since it replicates external code into the project.
+- `meow:skill-creator` compliance — now has its own `## Gotchas` section, 500-line cap matches authoritative Rule 3 (was 150), emitted template includes mandatory `## Gotchas` header so every future scaffold inherits Rule 1 compliance. `scripts/validate-skill.py` gained check 8/8 for Gotchas header presence and auto-passes step-file skills.
+
+### Bug Fixes
+
+- `meow:lint-and-validate` was **undiscoverable** — malformed YAML frontmatter had an unquoted colon in `Triggers onKeywords:` which corrupted parsing. Description now wraps cleanly in double quotes.
+- Empty Python venv — `.claude/skills/.venv/` existed but `pip` was half-installed with no RECORD file and no `bin/pip` symlink, so all seven Python-backed skills crashed on first import. Bootstrapped via `get-pip.py --ignore-installed --no-deps`, then `npx mewkit setup --only=deps` installed the nine required packages. `npx mewkit doctor` now reports 13 PASS / 1 WARN (optional Playwright only).
+- `meow:rubric/scripts/validate-rubric.sh --help` no longer crashes on macOS — added `-h`/`--help` case before arg dispatcher, which previously fell through to `basename "--help"` triggering a BSD `illegal option` error.
+- Replaced non-existent `debugger` agent reference in `meow:cook`'s Phase-3 dispatch table with `developer` via `meow:investigate` — `.claude/agents/` never had a `debugger.md`.
+- `<HARD-GATE>` decorative tags in `meow:cook` and `meow:fix` bodies replaced with `**HARD GATE**` bold markdown — grep against `hooks/`, `scripts/`, and the CLI confirmed zero consumers of the tag format.
+- Phantom `research-01` citations removed from `meow:evaluate` (4 locations) — no such research file exists; constraints now cite Anthropic harness research honestly or declare themselves as heuristics.
+- Phantom `research-02` citations removed from `meow:rubric/references/calibration-guide.md` (2), `meow:sprint-contract/SKILL.md`, `meow:sprint-contract/references/bdd-to-ac-mapping.md` (2), and `.claude/rubrics/schema.md` — same non-existence.
+- `meow:multimodal` "332 system voices" unsourced count corrected to "300+ (see provider catalog)" with the MiniMax URL attached.
+- `meow:react-patterns` unverifiable "45+ rules across 8 priority categories from Vercel Engineering" attribution rephrased to "curated rules drawn from framework docs and production practice".
+- `meow:ui-design-system` CSV counts corrected — `colors.csv` 161 → 160, `ux-guidelines.csv` 99 → 98 (matches actual row counts).
+- `meow:vulnerability-scanner` dropped time-anchored "2025 threat landscape" tagline.
+- `meow:multimodal/scripts/minimax_api_client.py` magic numbers `poll_interval=10` and `max_wait=600` now carry derivation comments. `media_optimizer.py` `tokens_per_sec = 100 / 263` constants sourced to `ai.google.dev/pricing`.
+- `meow:multimodal/SKILL.md` — `check_setup.py` gained the bash invocation block every other script in the file already had.
+- `meow:scout` 6-agent cap now documented as an intentional exception to `parallel-execution-rules.md` Rule 2 (read-only Explore agents produce no merge-conflict risk).
+- `meow:browse` gained a Gotcha for the session-scoped `$B` alias silent-fail mode.
+- `meow:problem-solving` unclosed backtick at line 148 fixed.
+
+### Migration Notes
+
+- `npx mewkit upgrade` picks up all description changes. No user action required.
+- If any custom hook was reading `autoInvoke` / `priority` frontmatter fields: they were grep-confirmed unread before deletion. If a hook outside the repo tree was silently depending on them, restore them explicitly in the affected skills.
+- `preamble-tier: 4` → `3` on `meow:qa` / `meow:review` / `meow:ship` may cause tiny context-ordering shifts. Functionally identical outputs.
+
+---
+
 ## 2.5.1 (2026-04-20) — meow:henshin
 
 ### Highlights

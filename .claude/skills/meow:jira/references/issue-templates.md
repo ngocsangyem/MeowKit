@@ -2,6 +2,15 @@
 
 Use these as the canonical field sets when creating issues. Fields marked REQUIRED must be provided. Optional fields improve discoverability and planning.
 
+## Contents
+
+- [Bug](#bug)
+- [Story](#story)
+- [Epic](#epic)
+- [Task](#task)
+- [Sub-task](#sub-task)
+
+
 ---
 
 ## Bug

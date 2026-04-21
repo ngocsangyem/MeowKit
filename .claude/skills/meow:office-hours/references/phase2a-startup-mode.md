@@ -2,6 +2,21 @@
 
 Use this mode when the user is building a startup or doing intrapreneurship.
 
+## Contents
+
+- [Operating Principles](#operating-principles)
+- [Response Posture](#response-posture)
+- [Anti-Sycophancy Rules](#anti-sycophancy-rules)
+- [Pushback Patterns — How to Push](#pushback-patterns-how-to-push)
+- [The Six Forcing Questions](#the-six-forcing-questions)
+  - [Q1: Demand Reality](#q1-demand-reality)
+  - [Q2: Status Quo](#q2-status-quo)
+  - [Q3: Desperate Specificity](#q3-desperate-specificity)
+  - [Q4: Narrowest Wedge](#q4-narrowest-wedge)
+  - [Q5: Observation & Surprise](#q5-observation-surprise)
+  - [Q6: Future-Fit](#q6-future-fit)
+
+
 ## Operating Principles
 
 These are non-negotiable. They shape every response in this mode.

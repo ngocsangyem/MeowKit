@@ -2,6 +2,26 @@
 
 Common pitfalls that cause silent failures or hard-to-debug errors.
 
+## Contents
+
+- [1. Page Not Switched Before Node Access](#1-page-not-switched-before-node-access)
+- [2. Fills/Strokes Are Read-Only Arrays](#2-fillsstrokes-are-read-only-arrays)
+- [3. Text Changes Without Font Load](#3-text-changes-without-font-load)
+- [4. Variable Name Duplicates Crash Silently](#4-variable-name-duplicates-crash-silently)
+- [5. Colors Are 0–1, Not 0–255](#5-colors-are-01-not-0255)
+- [6. Component Variants Need Properties Before Instances](#6-component-variants-need-properties-before-instances)
+- [7. Auto-Layout Padding Has No Shorthand](#7-auto-layout-padding-has-no-shorthand)
+- [8. Node ID URL Encoding](#8-node-id-url-encoding)
+- [9. get_design_context Returns Truncated Trees](#9-getdesigncontext-returns-truncated-trees)
+- [10. Screenshots Reflect Last Published State](#10-screenshots-reflect-last-published-state)
+- [11. Node Default Position is (0,0)](#11-node-default-position-is-00)
+- [12. MUST Return Node IDs from use_figma](#12-must-return-node-ids-from-usefigma)
+- [13. HUG Parent with FILL Child Collapses](#13-hug-parent-with-fill-child-collapses)
+- [14. resize() Resets Sizing Modes](#14-resize-resets-sizing-modes)
+- [15. detachInstance() Invalidates Node IDs](#15-detachinstance-invalidates-node-ids)
+- [16. Variables Need Explicit Scopes](#16-variables-need-explicit-scopes)
+
+
 ## 1. Page Not Switched Before Node Access
 
 ```

@@ -3,6 +3,12 @@
 > Part of meow:angular skill. Read when: working with directives.
 > Source: analogjs/angular-skills/angular-directives (MIT)
 
+## Contents
+
+- [Core Patterns](#core-patterns)
+- [Advanced Patterns](#advanced-patterns)
+
+
 ## Core Patterns
 
 **Attribute Directives:**
@@ -420,4 +426,3 @@ Contains advanced patterns including:
 - Export Directive Reference
 
 ---
-

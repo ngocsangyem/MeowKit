@@ -88,15 +88,24 @@ def validate_skill(skill_path):
     else:
         results.append(("Output template", False, "No output format section or template"))
 
-    # Check 7: SKILL.md line count (progressive disclosure)
+    # Check 7: SKILL.md line count (progressive disclosure per skill-authoring-rules.md Rule 3)
     line_count = len(content.splitlines())
     has_refs = (skill_path / "references").exists()
-    if line_count <= 100:
-        results.append(("Progressive disclosure", True, f"{line_count} lines (≤100)"))
+    has_workflow = (skill_path / "workflow.md").exists()
+    if has_workflow:
+        results.append(("Progressive disclosure", True, f"{line_count} lines (step-file skill auto-passes)"))
+    elif line_count <= 500:
+        results.append(("Progressive disclosure", True, f"{line_count} lines (≤500)"))
     elif has_refs:
         results.append(("Progressive disclosure", True, f"{line_count} lines but has references/"))
     else:
         results.append(("Progressive disclosure", False, f"{line_count} lines, no references/ — should split"))
+
+    # Check 8: Gotchas section present (skill-authoring-rules.md Rule 1 — mandatory)
+    if re.search(r"^##\s+Gotchas\b", content, re.MULTILINE):
+        results.append(("Gotchas section", True, "`## Gotchas` header present"))
+    else:
+        results.append(("Gotchas section", False, "Missing mandatory `## Gotchas` header (Rule 1)"))
 
     # Calculate score
     score = sum(1 for _, passed, _ in results if passed)
@@ -116,7 +125,8 @@ def main():
         print("  4. Description filled (not TODO)")
         print("  5. Workflow phase anchoring")
         print("  6. Output template present")
-        print("  7. Progressive disclosure (≤100 lines or references/)")
+        print("  7. Progressive disclosure (≤500 lines, or step-file, or references/)")
+        print("  8. Gotchas section present (Rule 1)")
         sys.exit(1)
 
     skill_path = Path(sys.argv[1])

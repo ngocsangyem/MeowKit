@@ -1,5 +1,22 @@
 # Required Outputs
 
+
+## Contents
+
+- ["NOT in scope" section](#not-in-scope-section)
+- ["What already exists" section](#what-already-exists-section)
+- ["Dream state delta" section](#dream-state-delta-section)
+- [Failure Analysis (merged: Error & Rescue + Failure Modes)](#failure-analysis-merged-error-rescue-failure-modes)
+- [TODOS.md updates](#todosmd-updates)
+- [Scope Expansion Decisions (EXPANSION and SELECTIVE EXPANSION only)](#scope-expansion-decisions-expansion-and-selective-expansion-only)
+- [Diagrams (mandatory, produce all that apply)](#diagrams-mandatory-produce-all-that-apply)
+- [Stale Diagram Audit](#stale-diagram-audit)
+- [Completion Summary](#completion-summary)
+- [Unresolved Decisions](#unresolved-decisions)
+- [Verdict (Layer 5)](#verdict-layer-5)
+- [Append-Only CEO Review Output](#append-only-ceo-review-output)
+- [CEO Review ({date}, {MODE} SCOPE)](#ceo-review-date-mode-scope)
+
 ## "NOT in scope" section
 
 List work considered and explicitly deferred, with one-line rationale each.

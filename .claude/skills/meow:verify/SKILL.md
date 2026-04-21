@@ -1,6 +1,6 @@
 ---
 name: meow:verify
-description: "Unified verification: build→lint→test→type-check→coverage. Use for 'is everything green', 'run all checks', 'verify build'. Auto-called by meow:cook."
+description: "Unified verification: build→lint→test→type-check→coverage. Use for 'is everything green', 'run all checks', 'verify build'. Auto-called by meow:cook. NOT for lint/format only (see meow:lint-and-validate); NOT for test-to-requirement coverage mapping (see meow:nyquist)."
 version: 1.0.0
 argument-hint: "[--coverage-threshold N] [--skip-build] [--skip-coverage]"
 source: meowkit
@@ -15,7 +15,7 @@ allowed-tools:
 Runs build → lint → type-check → tests → coverage in sequence. Fails fast on first failure.
 Produces a single PASS/FAIL verdict with per-step results.
 
-## When to Activate
+## When to Use
 
 - After Phase 3 (Build GREEN) completes, before Phase 4 (Review)
 - Before creating a PR (`meow:ship` pre-flight)

@@ -1,6 +1,6 @@
 ---
 name: meow:clean-code
-description: "Use when reviewing code for quality, enforcing KISS/DRY/YAGNI principles, or cleaning up over-engineered abstractions. Pragmatic standards: concise, direct, no unnecessary comments."
+description: "Enforces KISS/DRY/YAGNI during authoring and ad-hoc quality reviews. Pragmatic standards: concise, direct, no unnecessary comments. NOT for post-hoc diff/PR review (see meow:review); NOT for behavior-preserving simplification passes (see meow:simplify)."
 allowed-tools: Read, Write, Edit
 version: 2.0
 priority: CRITICAL
@@ -8,7 +8,6 @@ phase: on-demand
 trust_level: third-party
 injection_risk: low
 source: antigravity-kit
-author: vudovn (antigravity-kit)
 ---
 
 # Clean Code — Pragmatic AI Coding Standards

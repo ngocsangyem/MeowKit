@@ -140,6 +140,21 @@ validate_preset() {
 
 # ---- Argument dispatch ----
 case "${1:-}" in
+  -h|--help)
+    cat <<'EOF'
+validate-rubric.sh — Schema validator for the meowkit rubric library
+
+Usage:
+  validate-rubric.sh                 Validate all rubrics + all presets
+  validate-rubric.sh <rubric.md>     Validate a single rubric file
+  validate-rubric.sh --preset <path> Validate a single composition preset
+  validate-rubric.sh --presets-only  Validate only composition presets
+  validate-rubric.sh -h | --help     Show this help
+
+Exit: 0 if all PASS, 1 if any FAIL, 2 on bad invocation.
+EOF
+    exit 0
+    ;;
   --preset)
     shift
     if [ -z "${1:-}" ]; then

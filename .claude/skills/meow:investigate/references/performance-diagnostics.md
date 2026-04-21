@@ -2,6 +2,18 @@
 
 Identify bottlenecks, analyze query performance, and develop optimization strategies.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Diagnostic Process](#diagnostic-process)
+  - [1. Quantify the Problem](#1-quantify-the-problem)
+  - [2. Identify the Bottleneck Layer](#2-identify-the-bottleneck-layer)
+  - [3. Database Performance](#3-database-performance)
+  - [4. Application Performance](#4-application-performance)
+  - [5. Optimization Strategy](#5-optimization-strategy)
+- [Reporting Performance Issues](#reporting-performance-issues)
+
+
 ## When to Use
 
 - Response times increased significantly

@@ -15,7 +15,7 @@ allowed-tools:
 
 REST and GraphQL design patterns for building consistent, developer-friendly APIs.
 
-## When to Activate
+## When to Use
 
 Activate when:
 - Designing a new API or set of endpoints

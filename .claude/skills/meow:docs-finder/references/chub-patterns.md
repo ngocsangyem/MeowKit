@@ -1,5 +1,22 @@
 # Context Hub (chub) CLI Patterns
 
+
+## Contents
+
+- [Usage](#usage)
+- [Core Commands](#core-commands)
+  - [Search for documentation](#search-for-documentation)
+  - [Fetch documentation by ID](#fetch-documentation-by-id)
+  - [Local annotations (persist across sessions)](#local-annotations-persist-across-sessions)
+  - [Feedback to maintainers](#feedback-to-maintainers)
+  - [Registry and cache management](#registry-and-cache-management)
+- [Agent Piping Patterns](#agent-piping-patterns)
+- [Flags Reference](#flags-reference)
+- [When to Use chub Over Context7](#when-to-use-chub-over-context7)
+- [Trust Policy](#trust-policy)
+- [Content Model](#content-model)
+- [Coverage (~1,000+ APIs as of March 2026)](#coverage-1000-apis-as-of-march-2026)
+
 ## Usage
 
 Runs via `npx` — no global install required:

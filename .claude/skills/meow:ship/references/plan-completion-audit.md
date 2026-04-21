@@ -1,5 +1,19 @@
 # Plan Completion Audit and Verification (Steps 3.45 and 3.47)
 
+
+## Contents
+
+- [Step 3.45: Plan Completion Audit](#step-345-plan-completion-audit)
+  - [Plan File Discovery](#plan-file-discovery)
+  - [Actionable Item Extraction](#actionable-item-extraction)
+  - [Cross-Reference Against Diff](#cross-reference-against-diff)
+  - [Output Format](#output-format)
+- [Implementation Items](#implementation-items)
+- [Test Items](#test-items)
+- [Migration Items](#migration-items)
+  - [Gate Logic](#gate-logic)
+- [Step 3.47: Plan Verification (manual follow-up)](#step-347-plan-verification-manual-follow-up)
+
 ## Step 3.45: Plan Completion Audit
 
 ### Plan File Discovery

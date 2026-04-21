@@ -2,6 +2,13 @@
 
 **Exploit scenario requirement:** Every finding MUST include a concrete exploit scenario — a step-by-step attack path an attacker would follow. "This pattern is insecure" is not a finding.
 
+## Contents
+
+- [Finding N: [Title] — [File:Line]](#finding-n-title-fileline)
+- [Important Rules](#important-rules)
+- [Disclaimer](#disclaimer)
+
+
 **Findings table:**
 ```
 SECURITY FINDINGS

@@ -2,6 +2,28 @@
 
 **This is the canonical TDD cycle reference.** Used by `--tdd` / `MEOWKIT_TDD=1` mode and recommended for production-quality work; NOT enforced by default.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Phase RED: Write a Failing Test](#phase-red-write-a-failing-test)
+  - [Steps](#steps)
+  - [What Counts as a Valid Failing Test](#what-counts-as-a-valid-failing-test)
+  - [Output to Capture](#output-to-capture)
+- [Phase GREEN: Make the Test Pass](#phase-green-make-the-test-pass)
+  - [Steps](#steps)
+  - [Rules](#rules)
+  - [Output to Confirm](#output-to-confirm)
+- [Phase REFACTOR: Improve Without Changing Behavior](#phase-refactor-improve-without-changing-behavior)
+  - [Steps](#steps)
+  - [Safe Refactors](#safe-refactors)
+  - [Unsafe Changes (NOT Refactoring)](#unsafe-changes-not-refactoring)
+- [Integration Tests vs Unit Tests](#integration-tests-vs-unit-tests)
+  - [Unit Tests](#unit-tests)
+  - [Integration Tests](#integration-tests)
+  - [TDD Cycle Differences](#tdd-cycle-differences)
+- [Full Cycle Example](#full-cycle-example)
+
+
 **Purpose:** Document the strict RED-GREEN-REFACTOR cycle for test-driven development.
 
 ## When to Use

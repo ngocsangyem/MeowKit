@@ -1,5 +1,25 @@
 # QA Setup & Configuration
 
+
+## Contents
+
+- [Step 0: Detect base branch](#step-0-detect-base-branch)
+- [Parameters](#parameters)
+- [Clean Working Tree Check](#clean-working-tree-check)
+- [Find the Browse Binary](#find-the-browse-binary)
+- [Test Framework Bootstrap](#test-framework-bootstrap)
+  - [B2. Research best practices](#b2-research-best-practices)
+  - [B3. Framework selection](#b3-framework-selection)
+  - [B4. Install and configure](#b4-install-and-configure)
+  - [B4.5. First real tests](#b45-first-real-tests)
+  - [B5. Verify](#b5-verify)
+  - [B5.5. CI/CD pipeline](#b55-cicd-pipeline)
+  - [B6. Create TESTING.md](#b6-create-testingmd)
+  - [B7. Update CLAUDE.md](#b7-update-claudemd)
+  - [B8. Commit](#b8-commit)
+- [Create Output Directories](#create-output-directories)
+- [Test Plan Context](#test-plan-context)
+
 ## Step 0: Detect base branch
 
 Determine which branch this PR targets. Use the result as "the base branch" in all subsequent steps.

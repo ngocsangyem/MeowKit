@@ -2,6 +2,25 @@
 
 **Purpose:** Define and enforce coding conventions for each stack. Use these patterns as the reference for code generation and code review.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [NestJS Patterns](#nestjs-patterns)
+  - [Pattern: Module/Controller/Service/DTO](#pattern-modulecontrollerservicedto)
+  - [Pattern: Guard Usage](#pattern-guard-usage)
+  - [Pattern: Pipe Validation](#pattern-pipe-validation)
+  - [Pattern: DTO with Validation](#pattern-dto-with-validation)
+- [Vue 3 Patterns](#vue-3-patterns)
+  - [Pattern: Composition API with Script Setup](#pattern-composition-api-with-script-setup)
+  - [Pattern: Pinia Store](#pattern-pinia-store)
+  - [Pattern: Composables](#pattern-composables)
+- [Swift Patterns](#swift-patterns)
+  - [Pattern: MVVM Architecture](#pattern-mvvm-architecture)
+  - [Pattern: Combine / Async-Await](#pattern-combine-async-await)
+  - [Pattern: Protocol-Oriented Design](#pattern-protocol-oriented-design)
+- [General Rules (All Stacks)](#general-rules-all-stacks)
+
+
 ## When to Use
 
 Reference this skill when writing new code or reviewing existing code in any of the supported stacks.

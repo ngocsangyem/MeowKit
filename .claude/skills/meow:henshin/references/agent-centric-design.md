@@ -2,6 +2,19 @@
 
 Rules for choosing what to expose and how to shape it when wrapping code for CLI + MCP consumption by AI agents.
 
+## Contents
+
+- [Select capabilities](#select-capabilities)
+- [Consolidate workflows](#consolidate-workflows)
+- [Optimize for context](#optimize-for-context)
+- [Actionable errors](#actionable-errors)
+- [Safe vs mutating vs destructive](#safe-vs-mutating-vs-destructive)
+- [Naming](#naming)
+- [Idempotency](#idempotency)
+- [Output shape (JSON)](#output-shape-json)
+- [Gotchas](#gotchas)
+
+
 Load this reference during Phase 3 (Agentize Map) of `meow:henshin`.
 
 ## Select capabilities

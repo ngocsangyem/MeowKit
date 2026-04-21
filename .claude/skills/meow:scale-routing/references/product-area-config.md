@@ -3,6 +3,16 @@
 Optional team-specific routing enhancement via `.claude/product-areas.yaml`.
 When the file does not exist, scale-routing operates in CSV-only mode — no degradation.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Creating `.claude/product-areas.yaml`](#creating-claudeproduct-areasyaml)
+- [Schema](#schema)
+- [How scale-routing Loads It](#how-scale-routing-loads-it)
+- [Output When YAML Present](#output-when-yaml-present)
+- [Output Without YAML (CSV-only mode)](#output-without-yaml-csv-only-mode)
+
+
 ---
 
 ## When to Use

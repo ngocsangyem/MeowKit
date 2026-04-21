@@ -2,6 +2,17 @@
 
 **Purpose:** Run real, deterministic checks that do not depend on LLM judgment. These scripts provide ground-truth validation for security, code quality, and correctness.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Available Scripts](#available-scripts)
+  - [`.claude/scripts/validate.py`](#claudescriptsvalidatepy)
+  - [`.claude/scripts/security-scan.py`](#claudescriptssecurity-scanpy)
+- [Why Deterministic Validation Matters](#why-deterministic-validation-matters)
+- [How to Extend](#how-to-extend)
+- [Integration with Workflow](#integration-with-workflow)
+
+
 ## When to Use
 
 Run validation scripts at two mandatory points:

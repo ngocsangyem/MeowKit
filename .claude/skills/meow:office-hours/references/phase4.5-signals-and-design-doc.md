@@ -2,6 +2,44 @@
 
 Before writing the design doc, synthesize the founder signals you observed during the session. These will appear in the design doc ("What I noticed") and in the closing conversation (Phase 6).
 
+## Contents
+
+- [Startup mode design doc template:](#startup-mode-design-doc-template)
+- [Problem Statement](#problem-statement)
+- [Demand Evidence](#demand-evidence)
+- [Status Quo](#status-quo)
+- [Target User & Narrowest Wedge](#target-user-narrowest-wedge)
+- [Constraints](#constraints)
+- [Premises](#premises)
+- [Adversarial Perspective](#adversarial-perspective)
+- [Approaches Considered](#approaches-considered)
+  - [Approach A: {name}](#approach-a-name)
+  - [Approach B: {name}](#approach-b-name)
+- [Recommended Approach](#recommended-approach)
+- [Open Questions](#open-questions)
+- [Success Criteria](#success-criteria)
+- [Distribution Plan](#distribution-plan)
+- [Dependencies](#dependencies)
+- [The Assignment](#the-assignment)
+- [What I noticed about how you think](#what-i-noticed-about-how-you-think)
+- [Builder mode design doc template:](#builder-mode-design-doc-template)
+- [Problem Statement](#problem-statement)
+- [What Makes This Cool](#what-makes-this-cool)
+- [Constraints](#constraints)
+- [Premises](#premises)
+- [Adversarial Perspective](#adversarial-perspective)
+- [Approaches Considered](#approaches-considered)
+  - [Approach A: {name}](#approach-a-name)
+  - [Approach B: {name}](#approach-b-name)
+- [Recommended Approach](#recommended-approach)
+- [Open Questions](#open-questions)
+- [Success Criteria](#success-criteria)
+- [Distribution Plan](#distribution-plan)
+- [Next Steps](#next-steps)
+- [What I noticed about how you think](#what-i-noticed-about-how-you-think)
+- [Spec Review Loop](#spec-review-loop)
+
+
 Track which of these signals appeared during the session:
 - Articulated a **real problem** someone actually has (not hypothetical)
 - Named **specific users** (people, not categories — "Sarah at Acme Corp" not "enterprises")

@@ -10,13 +10,12 @@ allowed-tools:
   - Read
   - Grep
   - Glob
-sources:
-  - claudekit-engineer
+source: claudekit-engineer
 ---
 
 # React Patterns
 
-React and Next.js performance optimization — 45+ rules across 8 priority categories from Vercel Engineering.
+React and Next.js performance optimization — curated rules across priority categories drawn from framework docs and production practice.
 
 Complements `meow:typescript` (type safety) and `meow:vue` (Vue patterns). This skill covers React-specific performance patterns.
 

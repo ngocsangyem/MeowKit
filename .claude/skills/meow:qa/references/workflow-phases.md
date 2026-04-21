@@ -1,5 +1,27 @@
 # QA Workflow Phases
 
+
+## Contents
+
+- [Phase 1: Initialize](#phase-1-initialize)
+- [Phase 2: Authenticate (if needed)](#phase-2-authenticate-if-needed)
+- [Phase 3: Orient](#phase-3-orient)
+- [Phase 4: Explore](#phase-4-explore)
+- [Phase 5: Document](#phase-5-document)
+- [Phase 6: Wrap Up](#phase-6-wrap-up)
+- [Phase 7: Triage](#phase-7-triage)
+- [Phase 8: Fix Loop](#phase-8-fix-loop)
+  - [8a. Locate source](#8a-locate-source)
+  - [8b. Fix](#8b-fix)
+  - [8c. Commit](#8c-commit)
+  - [8d. Re-test](#8d-re-test)
+  - [8e. Classify](#8e-classify)
+  - [8e.5. Regression Test](#8e5-regression-test)
+  - [8f. Self-Regulation (STOP AND EVALUATE)](#8f-self-regulation-stop-and-evaluate)
+- [Phase 9: Final QA](#phase-9-final-qa)
+- [Phase 10: Report](#phase-10-report)
+- [Phase 11: TODOS.md Update](#phase-11-todosmd-update)
+
 ## Phase 1: Initialize
 
 1. Find browse binary (see `references/setup.md`)

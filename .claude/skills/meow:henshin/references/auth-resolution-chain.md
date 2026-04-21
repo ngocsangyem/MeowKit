@@ -2,6 +2,18 @@
 
 One resolution chain, shared by CLI and MCP-stdio. MCP-HTTP and MCP-SSE use bearer tokens at the transport layer; tool handlers may still pull per-request values from this chain.
 
+## Contents
+
+- [Resolution chain (first hit wins)](#resolution-chain-first-hit-wins)
+- [Config file shape](#config-file-shape)
+- [`login` and `logout`](#login-and-logout)
+- [Redaction](#redaction)
+- [Precedence rules](#precedence-rules)
+- [MCP-HTTP / MCP-SSE context](#mcp-http-mcp-sse-context)
+- [Anti-patterns](#anti-patterns)
+- [Gotchas](#gotchas)
+
+
 Load this reference during Phase 4 (Challenge) and reference in Phase 5 (Transformation Spec) when credentials decisions land.
 
 ## Resolution chain (first hit wins)

@@ -2,12 +2,26 @@
 
 How to add high-quality PASS / FAIL anchor examples to a rubric without introducing evaluator bias.
 
+## Contents
+
+- [Why Calibration Matters](#why-calibration-matters)
+- [The Three Rules](#the-three-rules)
+  - [Rule 1: Balance PASS and FAIL counts](#rule-1-balance-pass-and-fail-counts)
+  - [Rule 2: Randomize presentation order](#rule-2-randomize-presentation-order)
+  - [Rule 3: Pull from real prior reviews when possible](#rule-3-pull-from-real-prior-reviews-when-possible)
+- [Anchor Format](#anchor-format)
+  - [Example {N} — {VERDICT}](#example-n-verdict)
+- [Common Mistakes](#common-mistakes)
+- [Re-Calibration Per Model Upgrade](#re-calibration-per-model-upgrade)
+- [Adding a New Rubric — Checklist](#adding-a-new-rubric-checklist)
+
+
 ## Why Calibration Matters
 
 Anchor examples are the **highest-leverage** part of a rubric. The model uses them to ground its understanding of "what PASS looks like vs FAIL looks like." Bad anchors produce bad evaluators in subtle, hard-to-debug ways:
 
 - **Too few examples** → model defaults to its prior (usually too lenient)
-- **Imbalanced PASS/FAIL** → positive bias (research-02 measured 40-60% inflation when only PASS examples shown)
+- **Imbalanced PASS/FAIL** → positive bias (observed 40-60% inflation when only PASS examples shown; Anthropic harness research)
 - **Sequential PASS-then-FAIL** → position bias (later examples weight more)
 - **Synthetic examples only** → model grades against an idealized fiction, not reality
 
@@ -21,7 +35,7 @@ Anchor examples are the **highest-leverage** part of a rubric. The model uses th
 - If total anchors **< 4** → tolerance is `±1` (e.g., 1 PASS + 1 FAIL, 2 PASS + 1 FAIL, 1 PASS + 2 FAIL all pass)
 - If total anchors **≥ 4** → exact equality required (2/2, 3/3, 4/4, …). 3/2 and 4/3 are rejected.
 
-**Why two thresholds:** With 2-3 examples, ±1 leaves room for asymmetric edge cases (e.g., one canonical PASS + two distinct failure modes). With 4+ examples, the asymmetry becomes proportionally large enough to bias the evaluator (research-02: 17%+ asymmetry inflates positive verdicts measurably). Exact equality at scale eliminates that drift.
+**Why two thresholds:** With 2-3 examples, ±1 leaves room for asymmetric edge cases (e.g., one canonical PASS + two distinct failure modes). With 4+ examples, the asymmetry becomes proportionally large enough to bias the evaluator (heuristic: ≥17% asymmetry inflates positive verdicts measurably). Exact equality at scale eliminates that drift.
 
 **Practical:**
 - 1 PASS + 1 FAIL → ✅

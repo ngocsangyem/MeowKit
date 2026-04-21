@@ -80,7 +80,7 @@ Flatten the composed rubrics into a sequential criterion list:
 ]
 ```
 
-**Hard cap: 15 criteria per session** (research-01 §4 — context overflow above this).
+**Hard cap: 15 criteria per session** (heuristic — context overflow risk above this threshold).
 
 If the flatten produces > 15 entries:
 1. Split into batches of 15 by criterion priority (hard-fail rubrics first)

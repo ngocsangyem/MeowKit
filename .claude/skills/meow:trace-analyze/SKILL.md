@@ -25,7 +25,7 @@ source: meowkit
 
 Step-file workflow that ingests `.claude/memory/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel `researcher` subagents, gathers cross-batch patterns, and gates suggestions through human review before any harness change is applied.
 
-## Trigger Conditions
+## When to Use
 
 Activate when:
 - User runs `/meow:trace-analyze [--runs N]` (default N=20)

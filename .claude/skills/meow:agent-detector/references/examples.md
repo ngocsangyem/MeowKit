@@ -1,5 +1,16 @@
 # Detection Examples
 
+
+## Contents
+
+- [Example 1: Explicit Technology Mention](#example-1-explicit-technology-mention)
+- [Example 2: Context-Based Detection (No Tech Mention)](#example-2-context-based-detection-no-tech-mention)
+- [Example 3: Architecture Task (Uses Opus)](#example-3-architecture-task-uses-opus)
+- [Example 4: Quick Fix (Uses Haiku)](#example-4-quick-fix-uses-haiku)
+- [Example 5: Backend Repo, Frontend Task (Task-Based Override)](#example-5-backend-repo-frontend-task-task-based-override)
+- [Example 6: Frontend Repo, Database Task (Task-Based Override)](#example-6-frontend-repo-database-task-task-based-override)
+- [Example 7: Backend Repo, PDF Generation (Task-Based Override)](#example-7-backend-repo-pdf-generation-task-based-override)
+
 ## Example 1: Explicit Technology Mention
 
 ```

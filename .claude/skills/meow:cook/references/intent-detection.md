@@ -2,6 +2,18 @@
 
 Detect user intent from input and route to appropriate workflow mode.
 
+## Contents
+
+- [Detection Algorithm](#detection-algorithm)
+- [Feature Extraction](#feature-extraction)
+- [Mode Behaviors](#mode-behaviors)
+- [Modifier Flags](#modifier-flags)
+  - [Auto-Strict Trigger](#auto-strict-trigger)
+- [Edge Cases](#edge-cases)
+- [Conflict Resolution](#conflict-resolution)
+- [Examples](#examples)
+
+
 ## Detection Algorithm
 
 ```

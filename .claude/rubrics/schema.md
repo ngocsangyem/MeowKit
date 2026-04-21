@@ -80,7 +80,7 @@ At least one PASS example AND at least one FAIL example. Format:
 **Reasoning:** {explicit grading logic — why this verdict, citing criteria}
 ```
 
-**Balance rule:** PASS and FAIL example counts MUST be equal (within ±1) per `validate-rubric.sh`. This prevents positive bias in evaluator few-shot prompting (research-02 finding: balanced examples reduce positive bias 40-60%).
+**Balance rule:** PASS and FAIL example counts MUST be equal (within ±1) per `validate-rubric.sh`. This prevents positive bias in evaluator few-shot prompting (observed: balanced examples reduce positive bias by 40-60% — Anthropic harness research).
 
 ## Optional Sections
 

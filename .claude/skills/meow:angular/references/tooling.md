@@ -3,6 +3,15 @@
 > Part of meow:angular skill. Read when: working with tooling.
 > Source: analogjs/angular-skills/angular-tooling (MIT)
 
+## Contents
+
+- [Core Patterns](#core-patterns)
+- [Advanced Patterns](#advanced-patterns)
+- [ANGULAR VERSION ASSUMPTIONS](#angular-version-assumptions)
+- [GOTCHAS AND ANTI-PATTERNS](#gotchas-and-anti-patterns)
+- [COMPLETE FILE LISTING](#complete-file-listing)
+
+
 ## Core Patterns
 
 **Project Setup:**
@@ -395,4 +404,3 @@ All skills default to **Angular v20+**:
 ---
 
 This comprehensive report contains complete documentation of all 10 Angular skills with every code pattern and example verbatim from the source files.
-

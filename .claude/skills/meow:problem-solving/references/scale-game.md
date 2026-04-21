@@ -2,6 +2,23 @@
 
 Test at extremes (1000× bigger / smaller, instant / year-long) to expose fundamental truths hidden at normal scales.
 
+## Contents
+
+- [Core Principle](#core-principle)
+- [When to Use](#when-to-use)
+- [Quick Reference](#quick-reference)
+- [Process](#process)
+- [Detailed Examples](#detailed-examples)
+  - [Example 1: Error Handling](#example-1-error-handling)
+  - [Example 2: Synchronous APIs](#example-2-synchronous-apis)
+  - [Example 3: In-Memory State](#example-3-in-memory-state)
+  - [Example 4: Single vs Million Users](#example-4-single-vs-million-users)
+- [Both Directions Matter](#both-directions-matter)
+- [Red Flags](#red-flags)
+- [Success Metrics](#success-metrics)
+- [Remember](#remember)
+
+
 ## Core Principle
 
 **Extremes expose fundamentals.** What works at one scale fails at another.

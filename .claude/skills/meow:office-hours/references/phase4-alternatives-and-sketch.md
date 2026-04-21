@@ -2,6 +2,11 @@
 
 Produce 2-3 distinct implementation approaches. This is NOT optional.
 
+## Contents
+
+- [Visual Sketch (UI ideas only)](#visual-sketch-ui-ideas-only)
+
+
 For each approach:
 ```
 APPROACH A: [Name]

@@ -9,6 +9,8 @@ source: meowkit
 
 Structured Jira operations + ticket intelligence via Atlassian MCP. Routes to internal agents for reasoning-heavy tasks, handles CRUD inline.
 
+> **Path convention:** Commands below assume cwd is `$CLAUDE_PROJECT_DIR` (project root). Prefix paths with `"$CLAUDE_PROJECT_DIR/"` when invoking from subdirectories.
+
 ## Security
 
 ### Input Guard (Rule of Two)
@@ -189,6 +191,7 @@ meow:jira covers core Jira operations + ticket intelligence (evaluate, estimate,
 
 ## Gotchas
 
+- **MCP tools below assume server key `atlassian` in `.mcp.json`** (matches the `claude mcp add ... atlassian --` setup command above). If your server is registered under a different key, adapt tool-name prefixes or rename in `.mcp.json`.
 - **JQL string interpolation allows injection if user input is unsanitized** — building a JQL query as `"project = " + userInput` lets a malicious user append `OR project = OTHER_PROJECT` and exfiltrate other teams' tickets; always use structured MCP parameters (`project_key`, `assignee`) rather than constructing JQL strings from user input.
 - **Issue key comparison in JQL is case-insensitive but MCP tool calls are not** — `get_issue("proj-123")` (lowercase) may return a 404 from the Atlassian MCP while `get_issue("PROJ-123")` succeeds; always uppercase issue keys before passing them to MCP tools.
 - **Agile board IDs are not the same as project IDs** — `get_agile_boards(board_name="Team Alpha")` returns a `board_id` (e.g. `42`) which is unrelated to the project key (`PROJ`); sprint operations require the `board_id`, not the project key, and mixing them causes "board not found" errors.

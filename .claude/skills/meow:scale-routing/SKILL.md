@@ -70,6 +70,7 @@ Users can add custom domains by editing `data/domain-complexity.csv`. Add a new 
 
 ## Gotchas
 
+- **Runtime dependency on `meow:harness/scripts/density-select.sh`** — if the harness skill is removed or renamed, density selection breaks. The script is shared intentionally (single source of truth for density policy); treat it as load-bearing infrastructure, not a private harness internal.
 - Multiple domains can match a single task (e.g., "fintech dashboard" matches both fintech and internal_tools) — use the HIGHEST complexity match
 - CSV keyword matching is case-insensitive but signal order matters — first match wins for domain name
 - Adding too many low-signal keywords (e.g., "data", "app") creates false positives — keep signals specific to the domain

@@ -1,6 +1,6 @@
 # Skeptic Persona — Evaluator Prompt Fragment
 
-**Reload this file at session start AND before each criterion grading.** Leniency drift is the dominant evaluator failure mode (research-01 §6, Anthropic harness research). The persona is not a once-per-session read; it is a checkpoint.
+**Reload this file at session start AND before each criterion grading.** Leniency drift is the dominant evaluator failure mode (Anthropic harness research). The persona is not a once-per-session read; it is a checkpoint.
 
 ---
 

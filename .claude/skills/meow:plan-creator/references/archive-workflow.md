@@ -2,6 +2,20 @@
 
 Subcommand: `/meow:plan archive`. Manages plan lifecycle by archiving completed/cancelled plans.
 
+## Contents
+
+- [Trigger](#trigger)
+- [Workflow](#workflow)
+  - [A1. Scan Plans](#a1-scan-plans)
+  - [A2. Present Plan List](#a2-present-plan-list)
+  - [A3. Journal Capture (Optional)](#a3-journal-capture-optional)
+- [Archive: {plan-name} ({date})](#archive-plan-name-date)
+  - [A4. Archive Action](#a4-archive-action)
+  - [A5. Summary](#a5-summary)
+  - [A6. Optional Commit](#a6-optional-commit)
+- [Rules](#rules)
+
+
 ## Trigger
 
 Activated when argument is `archive` (e.g., `/meow:plan archive`).

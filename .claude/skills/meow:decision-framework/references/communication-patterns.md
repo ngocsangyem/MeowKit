@@ -2,6 +2,14 @@
 
 3 tones for decision communications. Select based on relationship state and stakes.
 
+## Contents
+
+- [Tone Selection Guide](#tone-selection-guide)
+- [Tone 1: Routine / Collaborative](#tone-1-routine-collaborative)
+- [Tone 2: Significant / Formal](#tone-2-significant-formal)
+- [Tone 3: Crisis / Escalation](#tone-3-crisis-escalation)
+
+
 ---
 
 ## Tone Selection Guide

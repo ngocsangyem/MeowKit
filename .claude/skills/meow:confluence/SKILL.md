@@ -78,6 +78,7 @@ See `assets/spec-report-template.md` for the full template.
 
 ## Gotchas
 
+- **MCP tools below assume server key `atlassian` in `.mcp.json`** (`mcp-atlassian` provides both Jira and Confluence tools under one key). If your server is registered under a different key, adapt tool-name prefixes or rename in `.mcp.json`.
 - `get_page` with `convert_to_markdown=true` loses macro content (tables, status badges, Jira issue macros render as empty)
 - `get_page_children` returns flat list — depth > 2 requires recursive calls
 - `get_page_images` is a SEPARATE call — images NOT included in `get_page` markdown

@@ -2,6 +2,25 @@
 
 Structure the output as:
 
+## Contents
+
+- [Engineering Retro: [date range]](#engineering-retro-date-range)
+  - [Summary Table](#summary-table)
+  - [Trends vs Last Retro](#trends-vs-last-retro)
+  - [Time & Session Patterns](#time-session-patterns)
+  - [Shipping Velocity](#shipping-velocity)
+  - [Code Quality Signals](#code-quality-signals)
+  - [Test Health](#test-health)
+  - [Plan Completion](#plan-completion)
+  - [Focus & Highlights](#focus-highlights)
+  - [Your Week (personal deep-dive)](#your-week-personal-deep-dive)
+  - [Team Breakdown](#team-breakdown)
+  - [Top 3 Team Wins](#top-3-team-wins)
+  - [3 Things to Improve](#3-things-to-improve)
+  - [3 Habits for Next Week](#3-habits-for-next-week)
+  - [Week-over-Week Trends](#week-over-week-trends)
+
+
 ---
 
 **Tweetable summary** (first line, before everything else):

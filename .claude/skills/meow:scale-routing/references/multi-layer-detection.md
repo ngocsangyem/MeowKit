@@ -3,6 +3,15 @@
 Scale-routing v2.0 extends single-layer CSV matching with 3 additional layers.
 Each layer adds evidence. Layer 3 synthesizes all evidence into a confidence score.
 
+## Contents
+
+- [Layer 0 — CSV Keyword Match (EXISTING)](#layer-0-csv-keyword-match-existing)
+- [Layer 1 — Task Content Analysis (NEW)](#layer-1-task-content-analysis-new)
+- [Layer 2 — Project Context Analysis (NEW)](#layer-2-project-context-analysis-new)
+- [Layer 3 — Confidence Scoring (NEW)](#layer-3-confidence-scoring-new)
+- [Anti-Pattern: Repo Type ≠ Task Domain](#anti-pattern-repo-type-task-domain)
+
+
 ---
 
 ## Layer 0 — CSV Keyword Match (EXISTING)

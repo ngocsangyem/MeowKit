@@ -5,9 +5,10 @@ preamble-tier: 3
 description: >-
   Use when grading a running build behaviorally — drives the artifact via
   browser/curl/CLI and grades against rubric criteria with concrete evidence.
-  Distinct from meow:review (structural code audit). Triggers on /meow:evaluate,
-  "evaluate this build", "grade the running app", "check the running site against
-  the spec", or after a generator iteration completes.
+  Triggers on /meow:evaluate, "evaluate this build", "grade the running app",
+  "check the running site against the spec", or after a generator iteration
+  completes. NOT for structural code audit of a diff/PR (see meow:review);
+  NOT for static linting (see meow:lint-and-validate).
 argument-hint: "[target-url-or-path] [--rubric-preset frontend-app|backend-api|cli-tool|fullstack-product] [--max-criteria 15]"
 allowed-tools:
   - Bash
@@ -25,7 +26,7 @@ source: meowkit
 
 Step-file workflow that drives a running build, probes each rubric criterion via active verification, and produces a graded verdict with runtime evidence. Owned by the `evaluator` agent (Phase 3+).
 
-## Trigger Conditions
+## When to Use
 
 Activate when:
 - User runs `/meow:evaluate <target>` with a URL, file path, or running-app handle
@@ -42,7 +43,7 @@ Skip when:
 
 1. **Active verification gate** — every verdict MUST include non-empty `evidence/` directory with at least one of: screenshot, HTTP response capture, CLI stdout+exit-code transcript. `validate-verdict.sh` rejects PASS verdicts with empty evidence and converts them to FAIL.
 2. **Skeptic persona enforced** — load `prompts/skeptic-persona.md` at session start. Re-anchor before each criterion grading.
-3. **Max 15 criteria per session** — split into multiple sessions if rubric composition exceeds. Context overflow above this per research-01 §4.
+3. **Max 15 criteria per session** — split into multiple sessions if rubric composition exceeds. Heuristic: context overflow risk above this threshold.
 4. **No source code edits** — evaluator owns `tasks/reviews/*-evalverdict.md` only. Never modifies source files.
 5. **Frontend default preset is pruned** — `frontend-app` loads only product-depth, functionality, design-quality, originality (per Phase 2 v2.0.0 audit). Other 3 rubrics opt-in only.
 
@@ -84,7 +85,7 @@ See `step-04-grade-and-verdict.md` for the canonical schema. Frontmatter fields:
 - **Don't trust test pass claims** — tests can pass against mocks while the real endpoint 500s. Run the build yourself
 - **Don't auto-load all 7 rubrics** — frontend-app preset is pruned to 4 (Phase 2 v2.0.0). Loading the others duplicates work meow:review/security-rules/qa already do
 - **Don't issue PASS without evidence** — the validator will reject it and convert to FAIL. Save yourself the round-trip
-- **Don't skip the skeptic persona reload** — leniency drift is the dominant evaluator failure mode per research-01 §6
+- **Don't skip the skeptic persona reload** — leniency drift is the dominant evaluator failure mode (Anthropic harness research)
 
 ## References
 

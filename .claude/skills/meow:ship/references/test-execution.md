@@ -1,5 +1,15 @@
 # Test Execution and Failure Triage (Step 3)
 
+
+## Contents
+
+- [Step 3: Run tests (on merged code)](#step-3-run-tests-on-merged-code)
+- [Test Failure Ownership Triage](#test-failure-ownership-triage)
+  - [Step T1: Classify each failure](#step-t1-classify-each-failure)
+  - [Step T2: Handle in-branch failures](#step-t2-handle-in-branch-failures)
+  - [Step T3: Handle pre-existing failures](#step-t3-handle-pre-existing-failures)
+  - [Step T4: Execute the chosen action](#step-t4-execute-the-chosen-action)
+
 ## Step 3: Run tests (on merged code)
 
 **Do NOT run `RAILS_ENV=test bin/rails db:migrate`** — `bin/test-lane` already calls

@@ -2,6 +2,25 @@
 
 **Purpose:** Perform visual quality assurance by testing UI in a browser at multiple breakpoints, checking for layout issues, console errors, and failed requests.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Steps](#steps)
+  - [Step 1: Start Browser Session](#step-1-start-browser-session)
+  - [Step 2: Navigate to Target URL](#step-2-navigate-to-target-url)
+  - [Step 3: Screenshot at Key Breakpoints](#step-3-screenshot-at-key-breakpoints)
+  - [Step 4: Compare Against Expected Layout](#step-4-compare-against-expected-layout)
+  - [Step 5: Check for Runtime Issues](#step-5-check-for-runtime-issues)
+  - [Step 6: Generate Visual QA Report](#step-6-generate-visual-qa-report)
+- [Screenshots](#screenshots)
+- [Console Errors](#console-errors)
+- [Failed Network Requests](#failed-network-requests)
+- [Layout Issues](#layout-issues)
+- [Verdict](#verdict)
+- [Verdict Criteria](#verdict-criteria)
+- [Automation](#automation)
+
+
 ## When to Use
 
 Invoke this skill after any UI change is implemented and passes unit/integration tests. Run before shipping.

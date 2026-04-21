@@ -1,8 +1,6 @@
 ---
 name: meow:session-continuation
-description: "Invoke when user says 'handoff', 'save state', or 'resume workflow' to persist and restore mid-session workflow progress across context resets."
-autoInvoke: false
-priority: high
+description: "Persists and restores mid-session workflow progress across context resets. Use when resuming workflows, saving state, or handling context compaction. Triggers on: handoff, save state, resume workflow."
 model: haiku
 triggers:
   - "handoff"

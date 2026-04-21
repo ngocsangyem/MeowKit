@@ -3,6 +3,23 @@
 Fill-in-the-blank format for meow:intake analysis reports.
 Replace all `[bracketed placeholders]` with actual values. Omit optional sections when not applicable.
 
+## Contents
+
+- [Intake Analysis — [TICKET-ID]](#intake-analysis-ticket-id)
+  - [Product Area: [area] (confidence: HIGH | MEDIUM | LOW)](#product-area-area-confidence-high-medium-low)
+  - [Completeness: [score]/100 ([Ready | Needs clarification | Blocked | Return to author])](#completeness-score100-ready-needs-clarification-blocked-return-to-author)
+  - [Design Context](#design-context)
+  - [Technical Considerations](#technical-considerations)
+  - [Root Cause (bugs only)](#root-cause-bugs-only)
+  - [Suggested Breakdown](#suggested-breakdown)
+  - [Related Tickets](#related-tickets)
+  - [Suggested PIC](#suggested-pic)
+  - [Jira Actions](#jira-actions)
+- [Posting Back](#posting-back)
+- [Minimal Output (score < 40)](#minimal-output-score-40)
+- [Intake Analysis — [TICKET-ID]](#intake-analysis-ticket-id)
+
+
 ---
 
 ```markdown

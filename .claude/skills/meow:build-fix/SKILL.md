@@ -1,6 +1,6 @@
 ---
 name: meow:build-fix
-description: "Build error triage: detect language, load fix patterns, auto-retry. Use for 'build failed', 'fix compilation', 'type error'. Chains into meow:verify."
+description: "Build error triage: detect language, load fix patterns, auto-retry. Use for 'build failed', 'fix compilation', 'type error'. Chains into meow:verify. NOT for runtime errors (see meow:fix); NOT for architectural debugging (see meow:investigate)."
 version: 1.0.0
 argument-hint: "[error output or file path]"
 source: meowkit
@@ -16,7 +16,7 @@ allowed-tools:
 Detects language from error output, loads the appropriate reference, classifies the error
 by fixability, applies the fix, and chains into `meow:verify` to confirm the build is green.
 
-## When to Activate
+## When to Use
 
 - Build command fails (npm run build, tsc, go build, python -m build, cargo build)
 - Type check errors (TypeScript TS\d{4}, mypy)

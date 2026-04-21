@@ -3,6 +3,12 @@
 > Part of meow:angular skill. Read when: working with signals.
 > Source: analogjs/angular-skills/angular-signals (MIT)
 
+## Contents
+
+- [Core Patterns](#core-patterns)
+- [Advanced Patterns](#advanced-patterns)
+
+
 ## Core Patterns
 
 **signal() - Writable State:**
@@ -291,4 +297,3 @@ Contains advanced patterns including:
 - Signal Debugging
 
 ---
-

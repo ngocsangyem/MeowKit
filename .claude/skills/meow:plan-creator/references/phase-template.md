@@ -2,6 +2,33 @@
 
 Every phase file MUST contain these 12 sections in order. Use "N/A" for sections that don't apply.
 
+## Contents
+
+- [Context Links](#context-links)
+- [Overview](#overview)
+- [Key Insights](#key-insights)
+- [Requirements](#requirements)
+  - [Functional](#functional)
+  - [Non-Functional](#non-functional)
+- [Architecture](#architecture)
+- [Related Code Files](#related-code-files)
+  - [Files to Create](#files-to-create)
+  - [Files to Modify](#files-to-modify)
+  - [Files to Read (Context)](#files-to-read-context)
+- [Implementation Steps](#implementation-steps)
+- [Todo List](#todo-list)
+- [Success Criteria](#success-criteria)
+- [Risk Assessment](#risk-assessment)
+- [Security Considerations](#security-considerations)
+- [Next Steps](#next-steps)
+- [Optional TDD Sections (when `tdd_mode = true`)](#optional-tdd-sections-when-tddmode-true)
+- [Tests Before](#tests-before)
+- [Refactor Opportunities](#refactor-opportunities)
+- [Tests After](#tests-after)
+- [Regression Gate](#regression-gate)
+- [Rules](#rules)
+
+
 ```markdown
 # Phase {N}: {Name}
 

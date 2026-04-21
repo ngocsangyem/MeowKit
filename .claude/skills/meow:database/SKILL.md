@@ -17,7 +17,7 @@ allowed-tools:
 Provides reference-backed guidance for database design tasks. PostgreSQL is the primary
 target; most patterns apply to MySQL and SQLite with minor syntax differences.
 
-## When to Activate
+## When to Use
 
 - Designing a new schema or adding tables/columns
 - Writing migration files (up + down)

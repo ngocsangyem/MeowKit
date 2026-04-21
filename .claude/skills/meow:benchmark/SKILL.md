@@ -22,7 +22,7 @@ source: meowkit
 
 Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (`docs/dead-weight-audit.md`) consumes to make load-bearing decisions about each harness component.
 
-## Trigger Conditions
+## When to Use
 
 Activate when:
 - User runs `/meow:benchmark run` (default = quick tier, 5 tasks, ≤$5)

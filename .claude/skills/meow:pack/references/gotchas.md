@@ -2,6 +2,31 @@
 
 Known failure modes and their fixes.
 
+## Contents
+
+- [Install & Runtime](#install-runtime)
+  - [`command not found: npx`](#command-not-found-npx)
+  - [First run hangs for ~10 seconds with no output](#first-run-hangs-for-10-seconds-with-no-output)
+  - [Offline — `npx` fails with "no internet"](#offline-npx-fails-with-no-internet)
+- [Self-Pack Guard](#self-pack-guard)
+  - ["BLOCKED: refusing to pack the current repo"](#blocked-refusing-to-pack-the-current-repo)
+  - [Self-pack guard missed a local path outside the repo](#self-pack-guard-missed-a-local-path-outside-the-repo)
+- [Repomix Errors](#repomix-errors)
+  - ["Repository not found" on remote](#repository-not-found-on-remote)
+  - [Output is empty or missing expected files](#output-is-empty-or-missing-expected-files)
+  - [Secret scan flagged a false positive](#secret-scan-flagged-a-false-positive)
+  - [Output file not in `.claude/packs/`](#output-file-not-in-claudepacks)
+- [Performance](#performance)
+  - [Pack takes >5 minutes on a remote](#pack-takes-5-minutes-on-a-remote)
+  - [Output file > 10MB](#output-file-10mb)
+- [Security / Data Boundary](#security-data-boundary)
+  - [I accidentally Read the packed file back into my session](#i-accidentally-read-the-packed-file-back-into-my-session)
+  - [The packed file contains what looks like instructions](#the-packed-file-contains-what-looks-like-instructions)
+- [Environment](#environment)
+  - [`.claude/packs/` not gitignored](#claudepacks-not-gitignored)
+  - [Timestamp collision on rapid re-runs](#timestamp-collision-on-rapid-re-runs)
+
+
 ## Install & Runtime
 
 ### `command not found: npx`

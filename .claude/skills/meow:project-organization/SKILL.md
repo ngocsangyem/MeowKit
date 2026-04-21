@@ -11,7 +11,7 @@ adapted_for: meowkit
 
 Standardize file locations, naming conventions, and directory structure for projects.
 
-## When to Invoke
+## When to Use
 
 - Creating a file and need the correct path
 - Organizing existing files after a messy session

@@ -2,6 +2,17 @@
 
 Connect meow:intake to your task management tool. Five options — pick the one that matches your stack.
 
+## Contents
+
+- [Option 1: Atlassian (Jira + Confluence)](#option-1-atlassian-jira-confluence)
+- [Option 2: Linear](#option-2-linear)
+- [Option 3: GitHub Issues](#option-3-github-issues)
+- [Option 4: Manual Paste](#option-4-manual-paste)
+- [Option 5: Any Tool with a REST API](#option-5-any-tool-with-a-rest-api)
+- [Verification](#verification)
+- [Fallback Behavior](#fallback-behavior)
+
+
 ## Option 1: Atlassian (Jira + Confluence)
 
 **Recommended for Jira users.**

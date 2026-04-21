@@ -3,6 +3,12 @@
 > Part of meow:angular skill. Read when: working with testing.
 > Source: analogjs/angular-skills/angular-testing (MIT)
 
+## Contents
+
+- [Core Patterns](#core-patterns)
+- [Advanced Patterns](#advanced-patterns)
+
+
 ## Core Patterns
 
 **Vitest Setup (Angular v20+):**
@@ -450,4 +456,3 @@ Contains advanced patterns including:
 - Vitest vs Jasmine Comparison and Migration Guide
 
 ---
-

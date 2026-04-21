@@ -2,6 +2,18 @@
 
 100% coverage is the goal — every untested path is a path where bugs hide and vibe coding becomes yolo coding. Evaluate what was ACTUALLY coded (from the diff), not what was planned.
 
+## Contents
+
+- [Test Framework Detection](#test-framework-detection)
+  - [E2E Test Decision Matrix](#e2e-test-decision-matrix)
+  - [REGRESSION RULE (mandatory)](#regression-rule-mandatory)
+  - [Test Plan Artifact](#test-plan-artifact)
+- [Affected Pages/Routes](#affected-pagesroutes)
+- [Key Interactions to Verify](#key-interactions-to-verify)
+- [Edge Cases](#edge-cases)
+- [Critical Paths](#critical-paths)
+
+
 ## Test Framework Detection
 
 Before analyzing coverage, detect the project's test framework:

@@ -48,9 +48,10 @@ def estimate_video_cost(
 
     Accepts model param; warns if using non-default pricing.
     """
+    # Per ai.google.dev/pricing (verified 2026-04-12):
+    # Gemini video tokens/sec: 100 at low-res, 263 at default (medium/high).
     tokens_per_sec = 100 if resolution == 'low-res' else 263
     total_tokens = duration_sec * tokens_per_sec
-    # Per ai.google.dev/pricing (verified 2026-04-12)
     price_map = {
         'gemini-2.5-flash': 0.30,
         'gemini-2.5-pro': 1.25,

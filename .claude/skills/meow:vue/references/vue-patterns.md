@@ -1,5 +1,15 @@
 # Vue 3 Patterns Reference
 
+
+## Contents
+
+- [Component Template](#component-template)
+- [Composables (Custom Hooks)](#composables-custom-hooks)
+- [Pinia Store (Setup Syntax)](#pinia-store-setup-syntax)
+- [Reactivity Rules](#reactivity-rules)
+- [Performance Patterns](#performance-patterns)
+- [Form Handling (VeeValidate + Zod) - Optional](#form-handling-veevalidate-zod---optional)
+
 ## Component Template
 
 ```vue

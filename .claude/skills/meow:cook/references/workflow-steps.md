@@ -2,6 +2,29 @@
 
 All modes share these phases with mode-specific variations.
 
+## Contents
+
+- [Phase 0: Orient](#phase-0-orient)
+- [Phase 1: Research + Plan (skip if code mode)](#phase-1-research-plan-skip-if-code-mode)
+  - [plan-creator mode flags (v2.3.1)](#plan-creator-mode-flags-v231)
+  - [GATE 1 (Non-Auto Mode)](#gate-1-non-auto-mode)
+- [Phase 2: Test (skip if no-test mode; RED-phase enforcement only if `--tdd` / `MEOWKIT_TDD=1`)](#phase-2-test-skip-if-no-test-mode-red-phase-enforcement-only-if---tdd-meowkittdd1)
+  - [[Review Gate] Post-Test-RED (non-auto only)](#review-gate-post-test-red-non-auto-only)
+- [Phase 3: Build GREEN](#phase-3-build-green)
+- [Phase 3.5: Simplify (MANDATORY — do not skip)](#phase-35-simplify-mandatory-do-not-skip)
+  - [[Review Gate] Post-Build (non-auto only)](#review-gate-post-build-non-auto-only)
+- [Phase 4: Review](#phase-4-review)
+  - [Code Review (MANDATORY subagent)](#code-review-mandatory-subagent)
+  - [GATE 2 (ALL modes — NO exceptions)](#gate-2-all-modes-no-exceptions)
+- [Phase 4.5: Verify (Browser) — only if `--verify` or `--strict` flag](#phase-45-verify-browser-only-if---verify-or---strict-flag)
+  - [--verify: Light Browser Check](#verify-light-browser-check)
+  - [--strict: Full Evaluator (meow:evaluate)](#strict-full-evaluator-meowevaluate)
+- [Phase 5: Ship (after Gate 2 approval)](#phase-5-ship-after-gate-2-approval)
+- [Phase 6: Reflect (MANDATORY — never skip)](#phase-6-reflect-mandatory-never-skip)
+- [Mode Flow Summary](#mode-flow-summary)
+- [Validation](#validation)
+
+
 **Task Tool Fallback:** `TaskCreate`/`TaskUpdate`/`TaskGet`/`TaskList` are CLI-only — unavailable in VSCode extension. If they error, use `TodoWrite` for progress tracking. Plan files remain source of truth.
 
 ## Phase 0: Orient

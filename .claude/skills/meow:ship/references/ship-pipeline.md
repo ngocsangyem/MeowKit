@@ -2,6 +2,25 @@
 
 **Purpose:** Complete, standalone pipeline for shipping code from local branch to merged PR. Never push directly to main/master.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Steps](#steps)
+  - [Step 1: Pre-Ship Validation](#step-1-pre-ship-validation)
+  - [Step 2: Generate Conventional Commit Message](#step-2-generate-conventional-commit-message)
+  - [Step 3: Create Feature Branch (if needed)](#step-3-create-feature-branch-if-needed)
+  - [Step 4: Commit and Push](#step-4-commit-and-push)
+  - [Step 5: Create PR via gh CLI](#step-5-create-pr-via-gh-cli)
+- [Summary](#summary)
+- [Changes](#changes)
+- [Test Plan](#test-plan)
+- [Rollback](#rollback)
+  - [Step 6: Wait for CI](#step-6-wait-for-ci)
+  - [Step 7: Document Rollback](#step-7-document-rollback)
+- [Rules](#rules)
+- [Quick Reference](#quick-reference)
+
+
 ## When to Use
 
 Invoke this skill when code is ready to ship — all development and review is complete.

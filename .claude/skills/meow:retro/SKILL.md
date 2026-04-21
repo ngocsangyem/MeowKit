@@ -3,11 +3,12 @@ name: meow:retro
 preamble-tier: 2
 version: 2.0.0
 description: |
-  Weekly engineering retrospective. Analyzes commit history, work patterns,
+  Weekly-cadence engineering retrospective. Analyzes commit history, work patterns,
   and code quality metrics with persistent history and trend tracking.
   Team-aware: breaks down per-person contributions with praise and growth areas.
   Use when asked to "weekly retro", "what did we ship", or "engineering retrospective".
   Proactively suggest at the end of a work week or sprint.
+  NOT for per-session or per-task reflection (see meow:memory / Phase 6 Reflect).
 allowed-tools:
   - Bash
   - Read

@@ -2,6 +2,44 @@
 
 Manage cookies, localStorage, sessionStorage, and browser storage state.
 
+## Contents
+
+- [Storage State](#storage-state)
+  - [Save Storage State](#save-storage-state)
+  - [Restore Storage State](#restore-storage-state)
+  - [Storage State File Format](#storage-state-file-format)
+- [Cookies](#cookies)
+  - [List All Cookies](#list-all-cookies)
+  - [Filter Cookies by Domain](#filter-cookies-by-domain)
+  - [Filter Cookies by Path](#filter-cookies-by-path)
+  - [Get Specific Cookie](#get-specific-cookie)
+  - [Set a Cookie](#set-a-cookie)
+  - [Delete a Cookie](#delete-a-cookie)
+  - [Clear All Cookies](#clear-all-cookies)
+  - [Advanced: Multiple Cookies or Custom Options](#advanced-multiple-cookies-or-custom-options)
+- [Local Storage](#local-storage)
+  - [List All localStorage Items](#list-all-localstorage-items)
+  - [Get Single Value](#get-single-value)
+  - [Set Value](#set-value)
+  - [Set JSON Value](#set-json-value)
+  - [Delete Single Item](#delete-single-item)
+  - [Clear All localStorage](#clear-all-localstorage)
+  - [Advanced: Multiple Operations](#advanced-multiple-operations)
+- [Session Storage](#session-storage)
+  - [List All sessionStorage Items](#list-all-sessionstorage-items)
+  - [Get Single Value](#get-single-value)
+  - [Set Value](#set-value)
+  - [Delete Single Item](#delete-single-item)
+  - [Clear sessionStorage](#clear-sessionstorage)
+- [IndexedDB](#indexeddb)
+  - [List Databases](#list-databases)
+  - [Delete Database](#delete-database)
+- [Common Patterns](#common-patterns)
+  - [Authentication State Reuse](#authentication-state-reuse)
+  - [Save and Restore Roundtrip](#save-and-restore-roundtrip)
+- [Security Notes](#security-notes)
+
+
 ## Storage State
 
 Save and restore complete browser state including cookies and storage.

@@ -6,16 +6,14 @@ description: |
   or checking accessibility compliance. Triggers on "design system", "UI review",
   "color palette", "font pairing", "accessibility audit", "responsive design",
   "WCAG check". Auto-activates when ui-ux-designer agent is working.
-  Data-driven: 161 palettes, 73 font pairings, 161 product types, 99 UX guidelines, 25 chart types.
+  Data-driven: 160 palettes, 73 font pairings, 161 product types, 98 UX guidelines, 25 chart types.
 allowed-tools:
   - Read
   - Grep
   - Glob
   - WebSearch
   - AskUserQuestion
-sources:
-  - claudekit-engineer/ui-ux-pro-max
-  - claudekit-engineer/web-design-guidelines
+source: claudekit-engineer
 ---
 
 # UI Design System
@@ -48,13 +46,13 @@ Data-driven design intelligence: curated palettes, font pairings, product recomm
 
 ## Data Assets (NEW — v2.0)
 
-| File | Rows | Content |
-|------|------|---------|
-| `assets/colors.csv` | 161 | WCAG-verified palettes by product type (hex values) |
-| `assets/typography.csv` | 73 | Font pairings with mood, Google Fonts URLs, Tailwind config |
-| `assets/products.csv` | 161 | Product type → style, landing pattern, dashboard, color focus |
-| `assets/ux-guidelines.csv` | 99 | Do/Don't pairs with category + severity |
-| `assets/charts.csv` | 25 | Data type → best chart, accessibility grade, library |
+| File                       | Rows | Content                                                       |
+| -------------------------- | ---- | ------------------------------------------------------------- |
+| `assets/colors.csv`        | 160  | WCAG-verified palettes by product type (hex values)           |
+| `assets/typography.csv`    | 73   | Font pairings with mood, Google Fonts URLs, Tailwind config   |
+| `assets/products.csv`      | 161  | Product type → style, landing pattern, dashboard, color focus |
+| `assets/ux-guidelines.csv` | 98   | Do/Don't pairs with category + severity                       |
+| `assets/charts.csv`        | 25   | Data type → best chart, accessibility grade, library          |
 
 See `references/data-lookup.md` for lookup patterns and examples.
 

@@ -2,6 +2,21 @@
 
 Standard Task() invocation patterns for cook workflow phases.
 
+## Contents
+
+- [Task Tool Pattern](#task-tool-pattern)
+- [Phase 0: Orient — Scout](#phase-0-orient-scout)
+- [Phase 1: Plan — Research + Planning](#phase-1-plan-research-planning)
+- [Phase 2: Test (RED phase only when `--tdd` / `MEOWKIT_TDD=1`)](#phase-2-test-red-phase-only-when---tdd-meowkittdd1)
+- [Phase 3: Build GREEN — Implementation](#phase-3-build-green-implementation)
+  - [Parallel Execution](#parallel-execution)
+  - [Test Failure — Debugger](#test-failure-debugger)
+- [Phase 4: Review — Code Review](#phase-4-review-code-review)
+  - [Ship — Git Operations](#ship-git-operations)
+- [Phase 6: Reflect — Sync-back + Docs + Memory](#phase-6-reflect-sync-back-docs-memory)
+- [UI Work (Conditional)](#ui-work-conditional)
+
+
 ## Task Tool Pattern
 
 ```

@@ -1,6 +1,6 @@
 ---
 name: meow:henshin
-description: "Use when transforming existing code into agent-consumable surfaces — CLI (npm-publishable), MCP server (stdio/SSE/Streamable HTTP), and a companion skill. Triggers on 'agentize', 'henshin', 'expose as MCP', 'wrap as CLI', 'publish to npm', 'make LLM-accessible', 'turn into agent tool', 'expose feature as tool'. Runs when the user has existing code and wants to ship it to agents."
+description: "Use when transforming existing code into agent-consumable surfaces — CLI (npm-publishable), MCP server (stdio/SSE/Streamable HTTP), and a companion skill. Triggers on 'agentize', 'henshin', 'expose as MCP', 'wrap as CLI', 'publish to npm', 'make LLM-accessible', 'turn into agent tool', 'expose feature as tool'. Runs when the user has existing code and wants to ship it to agents. NOT for building new code from scratch (see meow:bootstrap); NOT for reviewing or verifying existing code (see meow:review)."
 argument-hint: "[feature-or-module] [--both|--mcp|--cli] [--auto|--ask] [--lean]"
 phase: on-demand
 trust_level: kit-authored

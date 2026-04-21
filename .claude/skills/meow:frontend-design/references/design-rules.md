@@ -1,5 +1,29 @@
 # Design Rules Reference
 
+
+## Contents
+
+- [Typography](#typography)
+  - [Hierarchy (from largest to smallest)](#hierarchy-from-largest-to-smallest)
+  - [Font Pairing Strategy](#font-pairing-strategy)
+  - [Anti-Patterns](#anti-patterns)
+- [Color](#color)
+  - [Palette Structure](#palette-structure)
+  - [Rules](#rules)
+- [Spacing](#spacing)
+  - [Scale (4px base)](#scale-4px-base)
+  - [Rules](#rules)
+- [Motion](#motion)
+  - [When to Animate](#when-to-animate)
+  - [When NOT to Animate](#when-not-to-animate)
+  - [Timing](#timing)
+- [Responsive](#responsive)
+  - [Breakpoints (Tailwind convention)](#breakpoints-tailwind-convention)
+  - [Mobile-First Rules](#mobile-first-rules)
+- [Accessibility (WCAG 2.1 AA)](#accessibility-wcag-21-aa)
+  - [Required](#required)
+  - [Testing](#testing)
+
 ## Typography
 
 ### Hierarchy (from largest to smallest)

@@ -1,5 +1,12 @@
 # Version Bump, CHANGELOG, and TODOS.md (Steps 4, 5, 5.5)
 
+
+## Contents
+
+- [Step 4: Version bump (auto-decide)](#step-4-version-bump-auto-decide)
+- [Step 5: CHANGELOG (auto-generate)](#step-5-changelog-auto-generate)
+- [Step 5.5: TODOS.md (auto-update)](#step-55-todosmd-auto-update)
+
 ## Step 4: Version bump (auto-decide)
 
 1. Read the current `VERSION` file (4-digit format: `MAJOR.MINOR.PATCH.MICRO`)

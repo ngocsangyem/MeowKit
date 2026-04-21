@@ -1,6 +1,6 @@
 ---
 name: meow:scout
-description: "Fast parallel codebase scouting. Spawns multiple Explore subagents to search directories simultaneously, returning a consolidated file map with architecture fingerprint, complexity estimates, and routing suggestions. Use before planning, debugging, or any task spanning multiple directories."
+description: "Fast parallel codebase scouting. Spawns multiple Explore subagents to search directories simultaneously, returning a consolidated file map with architecture fingerprint, complexity estimates, and routing suggestions. Use before planning, debugging, or any task spanning multiple directories. NOT for reading a single known file in depth (use Read directly); NOT for semantic find-usages or go-to-definition."
 source: claudekit-engineer
 ---
 
@@ -64,5 +64,6 @@ Load these **only when executing** the corresponding step — not upfront.
 
 ## Gotchas
 
+- **6-agent cap vs 3-agent rule** — `parallel-execution-rules.md` Rule 2 caps parallel agents at 3, but that rule governs write-capable agents (merge-conflict risk). Scout uses read-only Explore subagents which don't produce conflicts, so the 6-agent ceiling here is intentional, not a rule violation.
 - **Subagents returning partial results**: Context window exceeded, agent returns truncated output → Set explicit file count limits per subagent; merge results with dedup
 - **Missing hidden files in directory scan**: Default glob patterns skip dotfiles → Include dotfiles explicitly when scanning config directories

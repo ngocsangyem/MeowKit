@@ -1,8 +1,6 @@
 ---
 name: meow:agent-detector
-description: "CRITICAL: MUST run for EVERY message. Detects agent, complexity, AND model automatically. Always runs FIRST."
-autoInvoke: true
-priority: highest
+description: "Detects task agent, complexity tier, and model automatically at Phase 0 orient. Invoked first in every workflow. NOT for runtime agent routing inside a single skill (see orchestration-rules.md)."
 model: haiku
 triggers:
   - "every message"

@@ -14,8 +14,7 @@ allowed-tools:
   - Grep
   - Glob
   - AskUserQuestion
-sources:
-  - claudekit-engineer/docs
+source: claudekit-engineer/docs
 phase: on-demand
 ---
 
@@ -27,7 +26,7 @@ Generate initial project documentation from codebase analysis.
 
 > Also run `meow:project-context` to generate the agent-constitution file (`docs/project-context.md`). `meow:docs-init` generates the full documentation suite; `meow:project-context` generates only the constitution.
 
-## When to Invoke
+## When to Use
 
 - Project has no `docs/` directory
 - `docs/` exists but is empty or has only stubs

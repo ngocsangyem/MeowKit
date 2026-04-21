@@ -7,7 +7,8 @@ description: >-
   files, produces a coverage gap report showing which requirements have no tests.
   Use during Phase 2 (Test) or Phase 4 (Review) to verify test completeness.
   Named after the Nyquist sampling theorem — sufficient test coverage prevents
-  aliased (missed) requirements.
+  aliased (missed) requirements. NOT for running tests (see meow:testing);
+  NOT for structural code review (see meow:review).
 allowed-tools:
   - Read
   - Grep

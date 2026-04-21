@@ -2,6 +2,21 @@
 
 **Purpose:** After accumulating enough session data, extract high-frequency patterns from split JSON files and propose them as permanent rules in CLAUDE.md.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Steps](#steps)
+  - [Step 1: Read Accumulated Patterns from Split JSON Files](#step-1-read-accumulated-patterns-from-split-json-files)
+  - [Step 2: Identify Promotion Candidates](#step-2-identify-promotion-candidates)
+  - [Step 3: Group by Category](#step-3-group-by-category)
+  - [Step 4: Propose Additions to CLAUDE.md](#step-4-propose-additions-to-claudemd)
+  - [Proposed Rule: [Rule Name]](#proposed-rule-rule-name)
+  - [Step 5: Human Approval](#step-5-human-approval)
+  - [Step 6: Update Pattern Status](#step-6-update-pattern-status)
+- [The Self-Improving Loop](#the-self-improving-loop)
+- [Validation](#validation)
+
+
 ## When to Use
 
 Invoke after approximately 10 sessions have been captured (check combined entry count across `fixes.json`, `review-patterns.json`, `architecture-decisions.json`). Can also be triggered manually at any time.

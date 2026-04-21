@@ -1,13 +1,15 @@
 ---
 name: meow:review
-preamble-tier: 4
+preamble-tier: 3
 version: 1.3.1
 description: |
-  Multi-pass code review with adversarial analysis, scope-aware dispatch, adversarial persona passes,
+  Multi-pass structural code review with adversarial analysis, scope-aware dispatch, adversarial persona passes,
   and forced-finding protocol. Supports input modes: branch diff (default),
   PR number (#123), commit hash, pending changes (--pending). Use when asked to "review this PR",
   "code review", "pre-landing review", "check my diff", or "review #123".
   Proactively suggest when the user is about to merge or land code changes.
+  NOT for behavioral verification against a running build (see meow:evaluate);
+  NOT for post-implementation simplification (see meow:simplify).
 argument-hint: "[#PR | COMMIT | --pending]"
 allowed-tools:
   - Bash

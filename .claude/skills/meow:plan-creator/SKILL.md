@@ -3,9 +3,11 @@ name: meow:plan-creator
 version: 1.5.0
 preamble-tier: 3
 description: >-
-  Creates structured multi-file plans before implementation. Scope-aware: trivial tasks
+  Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks
   exit early, simple tasks get fast plans, complex tasks get full research + phase files +
   validation. Enforces Gate 1. Activated by /meow:plan or /meow:cook.
+  NOT for ticket complexity analysis against an existing codebase (see meow:planning-engine);
+  NOT for CEO-level scope review of existing plans (see meow:plan-ceo-review).
 argument-hint: "[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout]] [--tdd] OR [archive | red-team {path} | validate {path}]"
 allowed-tools:
   - Bash
@@ -23,7 +25,7 @@ source: meowkit
 
 Scope-aware planning with step-file workflow. Produces plan.md overview + phase-XX detail files.
 
-## Trigger Conditions
+## When to Use
 
 Activate when:
 

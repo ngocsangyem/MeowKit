@@ -1,6 +1,6 @@
 ---
 name: meow:ship
-preamble-tier: 4
+preamble-tier: 3
 version: 1.1.0
 description: |
   Ship workflow: detect + merge base branch, run tests, review diff, bump VERSION, update CHANGELOG, commit, push, create PR. Use when asked to "ship", "deploy", "push to main", "create a PR", or "merge and push".

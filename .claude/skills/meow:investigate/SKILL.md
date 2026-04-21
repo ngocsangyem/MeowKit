@@ -9,6 +9,8 @@ description: |
   "investigate this error", or "root cause analysis".
   Proactively suggest when the user reports errors, unexpected behavior, or
   is troubleshooting why something stopped working.
+  NOT for applying fixes without investigation (see meow:fix); NOT for
+  step-by-step evidence-based reasoning (see meow:sequential-thinking).
 allowed-tools:
   - Bash
   - Read
@@ -37,6 +39,8 @@ source: gstack
 <!-- References loaded just-in-time, not all upfront -->
 
 # Systematic Debugging
+
+> **Path convention:** Commands below assume cwd is `$CLAUDE_PROJECT_DIR` (project root). Prefix paths with `"$CLAUDE_PROJECT_DIR/"` when invoking from subdirectories.
 
 **Iron Law: NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST.**
 

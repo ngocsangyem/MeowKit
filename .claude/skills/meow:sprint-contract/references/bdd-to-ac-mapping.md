@@ -1,6 +1,23 @@
 # BDD → Acceptance Criteria Mapping
 
-How to translate Gherkin BDD scenarios from a product spec into testable acceptance criteria for a sprint contract. Sourced from research-02 (sprint contract patterns) and adapted for the harness.
+How to translate Gherkin BDD scenarios from a product spec into testable acceptance criteria for a sprint contract. Patterns drawn from BDD / contract-net literature, adapted for the generator-evaluator harness.
+
+## Contents
+
+- [The Translation Step](#the-translation-step)
+- [BDD Form (Gherkin)](#bdd-form-gherkin)
+- [Sprint Contract AC (this form)](#sprint-contract-ac-this-form)
+  - [[AC-01] Rectangle drag fills tiles with selected tile](#ac-01-rectangle-drag-fills-tiles-with-selected-tile)
+- [The Translation Rules](#the-translation-rules)
+- [Anti-patterns](#anti-patterns)
+- [Worked Example: User Story → 3 ACs](#worked-example-user-story-3-acs)
+  - [[AC-04] Prompt history persists across sessions](#ac-04-prompt-history-persists-across-sessions)
+  - [[AC-05] Prompt history caps at 10 entries](#ac-05-prompt-history-caps-at-10-entries)
+  - [[AC-06] Prompt history is private per user](#ac-06-prompt-history-is-private-per-user)
+- [When to Skip BDD-style Givens](#when-to-skip-bdd-style-givens)
+  - [[AC-07] Landing page first contentful paint ≤ 2s](#ac-07-landing-page-first-contentful-paint-2s)
+- [References](#references)
+
 
 ## The Translation Step
 
@@ -112,6 +129,6 @@ The validator accepts EITHER form (Given/When/Then triplet OR explicit Assertion
 
 ## References
 
-- research-02 (Contract Net Protocol + BDD alignment)
 - Anthropic harness research on testable criteria translation
+- Contract Net Protocol (BDD alignment — standard agent-coordination pattern)
 - Cucumber/Gherkin: https://cucumber.io/docs/gherkin/ (background only — this kit does NOT use Cucumber runtime)

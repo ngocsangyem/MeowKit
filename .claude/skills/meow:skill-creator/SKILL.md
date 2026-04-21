@@ -11,7 +11,9 @@ adapted_for: meowkit
 
 Create new skills with proper structure, compliance, and registration.
 
-## When to Invoke
+> **Path convention:** Commands below assume cwd is `$CLAUDE_PROJECT_DIR` (project root). Prefix paths with `"$CLAUDE_PROJECT_DIR/"` when invoking from subdirectories.
+
+## When to Use
 
 - User asks to "create a skill", "build a new skill", "make a skill for [X]"
 - Converting external skill for adoption
@@ -68,7 +70,7 @@ description: "{specific trigger keywords + what it does}"
 ```markdown
 ## Overview — what + when (2-3 sentences)
 
-## When to Invoke — auto-triggers + explicit syntax
+## When to Use — auto-triggers + explicit syntax
 
 ## Process — numbered steps (not prose)
 
@@ -90,10 +92,11 @@ After generating, check:
 - [ ] Handoff protocol (next agent specified)
 - [ ] Output format uses template with placeholders
 - [ ] Failure handling covers identified failure modes
-- [ ] SKILL.md ≤ ~100 lines (overflow → references/)
+- [ ] SKILL.md ≤ 500 lines (per `skill-authoring-rules.md` Rule 3; overflow → references/ or step files)
+- [ ] `## Gotchas` section present (per Rule 1 — mandatory, placeholder acceptable day-1)
 - [ ] No conflict with existing `.claude/rules/`
 
-**Score:** X/7 — PASS (≥6) / FAIL (<6)
+**Score:** X/8 — PASS (≥7) / FAIL (<7)
 
 If FAIL: fix failing items before registering.
 
@@ -115,7 +118,7 @@ If FAIL: fix failing items before registering.
 
 1. **Skills are folders** — use scripts/, references/, assets/, lib/ creatively. See `references/filesystem-patterns.md`.
 2. **Gotchas = highest signal** — every skill MUST have a `## Gotchas` section with real failure modes, not placeholder text. Start with 2-3 gotchas; grow them as Claude hits new edge cases.
-3. **Progressive disclosure** — SKILL.md stays under 150 lines. Details live in references/ loaded on-demand.
+3. **Progressive disclosure** — SKILL.md stays under 500 lines per `skill-authoring-rules.md` Rule 3. Details live in references/ loaded on-demand. Step-file skills (with `workflow.md`) auto-pass.
 4. **Avoid railroading** — describe outcomes, not step-by-step procedures. See `references/good-vs-bad-examples.md`.
 5. **Description = trigger condition** — must answer "When should I use this?" not "What does this do?" Start with "Use when..."
 6. **On-demand hooks** — skills can register session-scoped hooks in frontmatter for enforcement during execution.
@@ -127,11 +130,12 @@ If FAIL: fix failing items before registering.
 ### Mandatory checklist before finalizing any skill
 
 - [ ] Description starts with "Use when..." (trigger condition)
-- [ ] Has `## Gotchas` with at least 2 real failure modes
-- [ ] SKILL.md is under 150 lines
+- [ ] Has `## Gotchas` section header (Rule 1 — placeholder acceptable day-1; grow over time)
+- [ ] SKILL.md is under 500 lines (Rule 3 — or decomposed via references/ / step files)
 - [ ] Steps are outcome-focused (no railroading)
 - [ ] Uses filesystem beyond SKILL.md (or documents why not needed)
 - [ ] Classified into one Anthropic skill type
+- [ ] Persistent state (if any) writes to `${CLAUDE_PLUGIN_DATA}`, NOT skill directory (Rule 2)
 
 ## References
 
@@ -147,3 +151,9 @@ If FAIL: fix failing items before registering.
 | Name missing meow: prefix | Auto-prepend and warn                      |
 | Duplicate skill name      | Suggest alternative or update existing     |
 | Compliance check fails    | List failing items, fix before registering |
+
+## Gotchas
+
+- **Template must include `## Gotchas` header** — even as a placeholder. `skill-authoring-rules.md` Rule 1 is hard-enforced by `validate-skill.py`. Day-1 skills may use `(none yet — grow from observed failures)` but the header itself is mandatory.
+- **Line cap is 500, not 150** — the canonical threshold comes from `skill-authoring-rules.md` Rule 3 (Anthropic progressive-disclosure guidance). Step-file skills (with `workflow.md`) auto-pass regardless of line count.
+- **Persistent state goes to `${CLAUDE_PLUGIN_DATA}`, not skill directory** — Rule 2 prevents data loss on plugin upgrade. MeowKit-internal paths (`.claude/memory/`, `session-state/`) are exempt.

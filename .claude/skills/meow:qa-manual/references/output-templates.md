@@ -1,5 +1,26 @@
 # Output Templates
 
+
+## Contents
+
+- [QA Report Template](#qa-report-template)
+- [QA Manual Test Report](#qa-manual-test-report)
+  - [Flow Results](#flow-results)
+  - [Failed Steps Detail](#failed-steps-detail)
+  - [Skipped Flows](#skipped-flows)
+  - [Summary](#summary)
+- [Playwright E2E Code Structure Rules](#playwright-e2e-code-structure-rules)
+  - [Rule 1: One describe per file](#rule-1-one-describe-per-file)
+  - [Rule 2: Feature folder with `common/`](#rule-2-feature-folder-with-common)
+- [Playwright E2E Code Template](#playwright-e2e-code-template)
+  - [`common/{featureName}Selectors.ts`](#commonfeaturenameselectorsts)
+  - [`common/{featureName}Assertions.ts`](#commonfeaturenameassertionsts)
+  - [`common/{featureName}Intercepts.ts`](#commonfeaturenameinterceptsts)
+  - [`{feature-name}.spec.ts`](#feature-namespects)
+  - [Locator Rules (MANDATORY)](#locator-rules-mandatory)
+  - [Test ID Detection (run BEFORE generating code)](#test-id-detection-run-before-generating-code)
+  - [Verifying Selectors Exist (run AFTER generating code)](#verifying-selectors-exist-run-after-generating-code)
+
 ## QA Report Template
 
 ```markdown

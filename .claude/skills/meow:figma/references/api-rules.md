@@ -2,6 +2,20 @@
 
 Critical rules for Figma MCP operations. Violations cause silent failures or data corruption.
 
+## Contents
+
+- [Color Values](#color-values)
+- [Fills and Strokes (Immutable Arrays)](#fills-and-strokes-immutable-arrays)
+- [Page Switching](#page-switching)
+- [Font Loading](#font-loading)
+- [Variable Scopes](#variable-scopes)
+- [Workflow Pattern: Incremental Verify](#workflow-pattern-incremental-verify)
+- [Error Recovery](#error-recovery)
+- [Variable Naming](#variable-naming)
+- [Component Variants](#component-variants)
+- [Auto-Layout Padding](#auto-layout-padding)
+
+
 ## Color Values
 
 - Colors use 0–1 scale, NOT 0–255

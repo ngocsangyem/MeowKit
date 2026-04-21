@@ -3,6 +3,12 @@
 > Part of meow:angular skill. Read when: working with http.
 > Source: analogjs/angular-skills/angular-http (MIT)
 
+## Contents
+
+- [Core Patterns](#core-patterns)
+- [Advanced Patterns](#advanced-patterns)
+
+
 ## Core Patterns
 
 **httpResource() - Signal-Based HTTP:**
@@ -353,4 +359,3 @@ Contains advanced patterns including:
 - Testing HTTP
 
 ---
-

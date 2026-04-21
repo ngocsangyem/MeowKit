@@ -2,6 +2,22 @@
 
 Systematically trace bugs backward through call stack to find original trigger.
 
+## Contents
+
+- [Core Principle](#core-principle)
+- [When to Use](#when-to-use)
+- [The Tracing Process](#the-tracing-process)
+  - [1. Observe the Symptom](#1-observe-the-symptom)
+  - [2. Find Immediate Cause](#2-find-immediate-cause)
+  - [3. Ask: What Called This?](#3-ask-what-called-this)
+  - [4. Keep Tracing Up](#4-keep-tracing-up)
+  - [5. Find Original Trigger](#5-find-original-trigger)
+- [Adding Stack Traces](#adding-stack-traces)
+- [Finding Which Test Causes Pollution](#finding-which-test-causes-pollution)
+- [Key Principle](#key-principle)
+- [Real Example](#real-example)
+
+
 ## Core Principle
 
 **Trace backward through call chain until finding original trigger, then fix at source.**

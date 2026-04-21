@@ -1,5 +1,15 @@
 # Strict TypeScript Patterns
 
+
+## Contents
+
+- [Strict Null Handling](#strict-null-handling)
+- [Type Guard Patterns](#type-guard-patterns)
+- [Utility Types Cheatsheet](#utility-types-cheatsheet)
+- [Error Handling](#error-handling)
+- [Strict tsconfig.json](#strict-tsconfigjson)
+- [ESLint Recommended Rules](#eslint-recommended-rules)
+
 ## Strict Null Handling
 
 ```typescript

@@ -2,6 +2,24 @@
 
 Run multiple isolated browser sessions concurrently with state persistence.
 
+## Contents
+
+- [Named Browser Sessions](#named-browser-sessions)
+- [Browser Session Isolation Properties](#browser-session-isolation-properties)
+- [Browser Session Commands](#browser-session-commands)
+- [Environment Variable](#environment-variable)
+- [Common Patterns](#common-patterns)
+  - [Concurrent Scraping](#concurrent-scraping)
+  - [A/B Testing Sessions](#ab-testing-sessions)
+  - [Persistent Profile](#persistent-profile)
+- [Default Browser Session](#default-browser-session)
+- [Browser Session Configuration](#browser-session-configuration)
+- [Best Practices](#best-practices)
+  - [1. Name Browser Sessions Semantically](#1-name-browser-sessions-semantically)
+  - [2. Always Clean Up](#2-always-clean-up)
+  - [3. Delete Stale Browser Data](#3-delete-stale-browser-data)
+
+
 ## Named Browser Sessions
 
 Use `-s` flag to isolate browser contexts:

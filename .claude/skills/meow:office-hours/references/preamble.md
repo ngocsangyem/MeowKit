@@ -1,5 +1,12 @@
 # Preamble & Setup
 
+
+## Contents
+
+- [Preamble (run first)](#preamble-run-first)
+- [Memory](#memory)
+- [SETUP (run this check BEFORE any browse command)](#setup-run-this-check-before-any-browse-command)
+
 ## Preamble (run first)
 
 ```bash

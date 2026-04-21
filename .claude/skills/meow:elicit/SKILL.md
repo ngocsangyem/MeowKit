@@ -7,6 +7,8 @@ description: >-
   Offers named reasoning methods (pre-mortem, inversion, red team, Socratic, etc.)
   to re-examine findings through a specific lens. Use after /meow:review verdict
   or any time deeper analysis is needed on an existing output.
+  NOT for initial review (see meow:review); NOT for creating implementation plans
+  (see meow:plan-creator).
 allowed-tools:
   - Read
   - Grep

@@ -1,6 +1,6 @@
 ---
 name: meow:qa
-preamble-tier: 4
+preamble-tier: 3
 version: 2.0.0
 description: |
   Systematically QA test a web application and fix bugs found. Runs QA testing,

@@ -1,6 +1,6 @@
 ---
 name: meow:qa-manual
-description: "Spec-driven manual QA testing and Playwright E2E code generation. Orchestrates browser skills to navigate apps like a human tester, producing structured test reports or production-ready .spec.ts files. Always prompts user for credentials — never guesses or stores auth. Use for QA testing, E2E generation, login flow testing, or exploratory testing from a URL."
+description: "Spec-driven manual QA testing and Playwright E2E code generation. Orchestrates browser skills to navigate apps like a human tester, producing structured test reports or production-ready .spec.ts files. Always prompts user for credentials — never guesses or stores auth. Use for QA testing, E2E generation, login flow testing, or exploratory testing from a URL. NOT for unstructured browsing (see meow:browse); NOT for AI-autonomous flows (see meow:agent-browser)."
 argument-hint: "[spec-path | url] [--report | --generate]"
 orchestrates:
   - meow:agent-browser
@@ -24,7 +24,7 @@ auth_handling: prompt-always
 
 Orchestrates browser skills to act like a human tester: navigate, interact, verify, and report.
 
-## When to Invoke
+## When to Use
 
 **Trigger:** "test this flow", "QA this page", "generate E2E tests", "test login flow", "manual testing", "write Playwright tests for"
 

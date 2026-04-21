@@ -78,7 +78,15 @@ def api_get(endpoint: str, params: Dict[str, str], api_key: str,
 def poll_async_task(task_id: str, task_type: str, api_key: str,
                     poll_interval: int = 10, max_wait: int = 600,
                     verbose: bool = False) -> Dict[str, Any]:
-    """Poll async task until completion. Used for video generation."""
+    """Poll async task until completion. Used for video generation.
+
+    Derivation of defaults:
+      poll_interval=10s — MiniMax video-gen p50 completion is ~60-120s; polling at
+        10s gives 6-12 checks and stays well under any rate-limit threshold.
+      max_wait=600s (10min) — p99 of MiniMax-Hailuo video-gen completion. Tasks
+        past this bound have reliably indicated a server-side hang; raising the
+        cap wastes agent-session time without improving success rate.
+    """
     start = time.monotonic()
     while (time.monotonic() - start) < max_wait:
         result = api_get(f"query/{task_type}", {"task_id": task_id}, api_key)

@@ -2,6 +2,25 @@
 
 **Purpose:** Every shipped change must have a documented rollback plan. This template ensures rollbacks are fast, safe, and verifiable.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Rollback Document Template](#rollback-document-template)
+- [1. What Was Deployed](#1-what-was-deployed)
+- [2. How to Rollback](#2-how-to-rollback)
+  - [Option A: Git Revert (preferred for code changes)](#option-a-git-revert-preferred-for-code-changes)
+  - [Option B: Redeploy Previous Version (for infrastructure/config)](#option-b-redeploy-previous-version-for-infrastructureconfig)
+  - [Option C: Feature Flag (if applicable)](#option-c-feature-flag-if-applicable)
+  - [Estimated Rollback Time](#estimated-rollback-time)
+- [3. How to Verify Rollback Worked](#3-how-to-verify-rollback-worked)
+- [4. Who to Notify](#4-who-to-notify)
+- [5. Data Implications](#5-data-implications)
+  - [Is rollback data-safe?](#is-rollback-data-safe)
+  - [If rollback is NOT data-safe:](#if-rollback-is-not-data-safe)
+- [Rules](#rules)
+- [Quick Rollback Decision Tree](#quick-rollback-decision-tree)
+
+
 ## When to Use
 
 Create a rollback document for EVERY ship. Attach it to the PR description and, for high-risk changes, also save to `docs/rollback/`.

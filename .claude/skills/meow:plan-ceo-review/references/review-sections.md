@@ -1,5 +1,24 @@
 # Review Sections (11 sections, after scope and mode are agreed)
 
+
+## Contents
+
+- [Severity Tiers (apply to ALL findings in ALL sections)](#severity-tiers-apply-to-all-findings-in-all-sections)
+- [Adversarial Necessity (apply to ALL sections)](#adversarial-necessity-apply-to-all-sections)
+- [Section 1: Architecture Review](#section-1-architecture-review)
+- [Section 2: Error & Rescue Map](#section-2-error-rescue-map)
+- [Section 3: Security & Threat Model](#section-3-security-threat-model)
+- [Section 4: Data Flow & Interaction Edge Cases](#section-4-data-flow-interaction-edge-cases)
+- [Section 5: Code Quality Review](#section-5-code-quality-review)
+- [Section 6: Test Review](#section-6-test-review)
+- [Section 7: Performance Review](#section-7-performance-review)
+- [Section 8: Observability & Debuggability Review](#section-8-observability-debuggability-review)
+- [Section 9: Deployment & Rollout Review](#section-9-deployment-rollout-review)
+- [Section 10: Long-Term Trajectory Review](#section-10-long-term-trajectory-review)
+- [Section 11: Design & UX Review (skip if no UI scope detected)](#section-11-design-ux-review-skip-if-no-ui-scope-detected)
+- [Post-Implementation Design Audit (if UI scope detected)](#post-implementation-design-audit-if-ui-scope-detected)
+- [CRITICAL RULE — How to ask questions](#critical-rule-how-to-ask-questions)
+
 ## Severity Tiers (apply to ALL findings in ALL sections)
 
 Every finding must be classified:

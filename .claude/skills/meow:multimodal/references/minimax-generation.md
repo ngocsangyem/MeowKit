@@ -39,7 +39,7 @@
 
 ## TTS Voices
 
-332 system voices across 24 languages. Default: `Wise_Woman`.
+300+ system voices across 24 languages (exact count rotates per provider updates; see catalog below for live list). Default: `Wise_Woman`.
 Override: `--voice-id` flag or `MEOWKIT_MINIMAX_SPEECH_VOICE` env var.
 Full voice list: https://platform.minimax.io/docs/faq/system-voice-id
 

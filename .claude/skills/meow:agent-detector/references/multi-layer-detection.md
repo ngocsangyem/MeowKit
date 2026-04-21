@@ -1,5 +1,14 @@
 # Multi-Layer Detection System
 
+
+## Contents
+
+- [Layer 0: Task Content Analysis (Highest Priority)](#layer-0-task-content-analysis-highest-priority)
+- [Layer 1: Explicit Technology Detection](#layer-1-explicit-technology-detection)
+- [Layer 2: Intent Detection Patterns](#layer-2-intent-detection-patterns)
+- [Layer 3: Project Context Detection](#layer-3-project-context-detection)
+- [Layer 4: File Pattern Detection](#layer-4-file-pattern-detection)
+
 ## Layer 0: Task Content Analysis (Highest Priority)
 
 **Analyze the actual task, not just the repo.** A backend repo may have frontend tasks (templates, PDFs, emails).

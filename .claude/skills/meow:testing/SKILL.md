@@ -1,6 +1,6 @@
 ---
 name: meow:testing
-description: "Use when writing tests, running validation scripts, or (in TDD mode) enforcing red-green-refactor cycle. Activates during Phase 2 (Test) and Phase 3 (Build)."
+description: "Use when writing tests, running validation scripts, or (in TDD mode) enforcing red-green-refactor cycle. Activates during Phase 2 (Test) and Phase 3 (Build). NOT for coverage gap mapping (see meow:nyquist); NOT for sprint contract negotiation (see meow:sprint-contract)."
 ---
 
 # Testing Toolkit

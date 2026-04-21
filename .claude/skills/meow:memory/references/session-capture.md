@@ -2,6 +2,21 @@
 
 **Purpose:** Capture key decisions, successful patterns, and corrections from each session so that learnings persist across sessions via topic files.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Steps](#steps)
+  - [Step 1: Extract Patterns (category: pattern)](#step-1-extract-patterns-category-pattern)
+  - [Step 2: Extract Decisions (category: decision)](#step-2-extract-decisions-category-decision)
+  - [Step 3: Extract Failures (category: failure / bug-class)](#step-3-extract-failures-category-failure-bug-class)
+  - [Step 4: Write to topic files](#step-4-write-to-topic-files)
+- [YYYY-MM-DD — [Brief description] (status: live-captured, severity: critical|standard)](#yyyy-mm-dd-brief-description-status-live-captured-severity-criticalstandard)
+  - [What happened](#what-happened)
+  - [Prevention rule](#prevention-rule)
+  - [Step 5: Immediate capture alternative](#step-5-immediate-capture-alternative)
+- [Validation](#validation)
+
+
 ## When to Use
 
 Invoke at the END of every session, before the session closes. This is a mandatory step — no session ends without capture.

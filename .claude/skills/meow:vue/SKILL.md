@@ -12,7 +12,7 @@ Vue 3 Composition API patterns, Pinia, reactivity, component design, forms, and 
 
 > Use `npx chub search vue` for relevant documentation packages within the Context Hub
 
-## When to Invoke
+## When to Use
 
 **Auto-activate on:** `.vue` files, Vue 3 Composition API, Pinia stores, `<script setup>`, Vue Router, composables
 

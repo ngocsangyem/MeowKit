@@ -3,6 +3,21 @@
 Stress-test a replication/adaptation decision before it becomes implementation work.
 Ask these 7 questions. Score risk. Present the decision matrix. Get human approval.
 
+## Contents
+
+- [7 Challenge Questions](#7-challenge-questions)
+  - [1. Necessity](#1-necessity)
+  - [2. Stack Fit](#2-stack-fit)
+  - [3. Data Model](#3-data-model)
+  - [4. Dependency Cost](#4-dependency-cost)
+  - [5. Effort vs Value](#5-effort-vs-value)
+  - [6. Blast Radius](#6-blast-radius)
+  - [7. Maintenance Burden](#7-maintenance-burden)
+- [Risk Scoring](#risk-scoring)
+- [Decision Matrix Template](#decision-matrix-template)
+- [Architecture Fitness Table](#architecture-fitness-table)
+
+
 ## 7 Challenge Questions
 
 For each question, provide: source answer, our project answer, risk if wrong.

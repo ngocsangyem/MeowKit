@@ -1,8 +1,6 @@
 ---
 name: meow:lazy-agent-loader
 description: "Use when managing agent context budget. Loads agent definitions on-demand instead of all-at-once, reducing token consumption in multi-agent workflows."
-autoInvoke: false
-priority: high
 triggers:
   - "when agent is selected"
   - "agent:load"

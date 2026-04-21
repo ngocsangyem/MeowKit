@@ -17,7 +17,7 @@ allowed-tools:
 
 Structures expert judgment into repeatable, auditable decision systems for recurring high-stakes choices.
 
-## When to Activate
+## When to Use
 
 Activate when:
 - User asks "how should we handle X cases?" or "build triage system"

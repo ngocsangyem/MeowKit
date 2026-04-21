@@ -1,5 +1,17 @@
 # Detection Process
 
+
+## Contents
+
+- [Pre-Step: Check Detection Cache (Performance Optimization)](#pre-step-check-detection-cache-performance-optimization)
+- [Detection Result (cached)](#detection-result-cached)
+- [Step 0: Task Content Analysis (Do This First!)](#step-0-task-content-analysis-do-this-first)
+- [Step 1: Extract Keywords](#step-1-extract-keywords)
+- [Step 2: Check Project Context (Use Cached Detection!)](#step-2-check-project-context-use-cached-detection)
+- [Step 3: Score All Agents (Combine Task + Repo)](#step-3-score-all-agents-combine-task-repo)
+- [Step 4: Select Agents](#step-4-select-agents)
+- [Step 5: Show Banner](#step-5-show-banner)
+
 ## Pre-Step: Check Detection Cache (Performance Optimization)
 
 **Before running full detection, check if a cached result can be reused.**

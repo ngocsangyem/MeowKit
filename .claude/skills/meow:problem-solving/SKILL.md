@@ -12,9 +12,7 @@ allowed-tools:
   - Read
   - Grep
   - Glob
-sources:
-  - claudekit-engineer
-  - cc-thinking-skills
+source: [claudekit-engineer, cc-thinking-skills]
 ---
 
 # Problem-Solving — Strategic Unsticking
@@ -147,4 +145,4 @@ Load only what you need:
 - `references/inversion-exercise.md`
 - `references/scale-game.md`
 - `references/first-principles.md`
-- `references/via-negativa.md
+- `references/via-negativa.md`

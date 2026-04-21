@@ -17,7 +17,7 @@ adapted_for: meowkit
 
 Strict TypeScript patterns for type safety, null handling, and modern best practices.
 
-## When to Invoke
+## When to Use
 
 **Auto-activate on:** `.ts`, `.tsx`, `.js`, `.jsx` files, type errors, ESLint issues, "fix types", "add types", "TypeScript help"
 

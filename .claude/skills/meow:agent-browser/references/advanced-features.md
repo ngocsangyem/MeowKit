@@ -1,5 +1,22 @@
 # Advanced Features
 
+
+## Contents
+
+- [Screenshots & Visual Capture](#screenshots-visual-capture)
+  - [Annotated Screenshots (Vision Mode)](#annotated-screenshots-vision-mode)
+- [Video Recording](#video-recording)
+- [Batch Execution](#batch-execution)
+- [Live Streaming (Observability)](#live-streaming-observability)
+  - [Observability Dashboard](#observability-dashboard)
+- [Network Inspection & HAR](#network-inspection-har)
+- [JavaScript Evaluation](#javascript-evaluation)
+- [Visual Debugging](#visual-debugging)
+- [iOS Simulator (Mobile Safari)](#ios-simulator-mobile-safari)
+- [Diffing (Change Verification)](#diffing-change-verification)
+- [Clipboard](#clipboard)
+- [Downloads](#downloads)
+
 ## Screenshots & Visual Capture
 
 ```bash
@@ -37,8 +54,6 @@ agent-browser record start demo.webm     # Start recording session
 # ... perform actions ...
 agent-browser record stop                # Stop and save
 ```
-
-For detailed recording workflows: [video-recording.md](video-recording.md)
 
 ## Batch Execution
 
@@ -130,7 +145,6 @@ agent-browser profiler stop trace.json
 ```
 
 Use `AGENT_BROWSER_HEADED=1` env var to enable headed mode.
-For profiling details: [profiling.md](profiling.md)
 
 ## iOS Simulator (Mobile Safari)
 

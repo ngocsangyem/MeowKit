@@ -2,6 +2,20 @@
 
 Wrapped server must support **stdio**, **SSE**, and **Streamable HTTP** from a single core `Server` instance. Three transport adapters, one tool registry.
 
+## Contents
+
+- [Transport selection](#transport-selection)
+- [stdio — default for local agent processes](#stdio-default-for-local-agent-processes)
+- [SSE — legacy compatibility](#sse-legacy-compatibility)
+- [Streamable HTTP — preferred remote transport](#streamable-http-preferred-remote-transport)
+- [Session state](#session-state)
+- [Auth](#auth)
+- [Tool registration](#tool-registration)
+- [Health and observability](#health-and-observability)
+- [Deployment target matrix](#deployment-target-matrix)
+- [Gotchas](#gotchas)
+
+
 Load during Phase 3 (Agentize Map) when designing the MCP surface and Phase 4 (Challenge) when deciding deployment targets.
 
 ## Transport selection

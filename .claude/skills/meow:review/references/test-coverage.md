@@ -2,6 +2,18 @@
 
 100% coverage is the goal. Evaluate every codepath changed in the diff and identify test gaps. Gaps become INFORMATIONAL findings that follow the Fix-First flow.
 
+## Contents
+
+- [Test Framework Detection](#test-framework-detection)
+- [Step 1: Trace every codepath changed](#step-1-trace-every-codepath-changed)
+- [Step 2: Map user flows, interactions, and error states](#step-2-map-user-flows-interactions-and-error-states)
+- [Step 3: Check each branch against existing tests](#step-3-check-each-branch-against-existing-tests)
+  - [E2E Test Decision Matrix](#e2e-test-decision-matrix)
+  - [REGRESSION RULE (mandatory)](#regression-rule-mandatory)
+- [Step 4: Output ASCII coverage diagram](#step-4-output-ascii-coverage-diagram)
+- [Step 5: Generate tests for gaps (Fix-First)](#step-5-generate-tests-for-gaps-fix-first)
+
+
 ## Test Framework Detection
 
 Before analyzing coverage, detect the project's test framework:
