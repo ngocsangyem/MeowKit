@@ -20,7 +20,7 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ### Highlights
 
-A 7-agent audit of all 77 `meow:*` skills against Anthropic's Skill-authoring best practices, Lessons-from-building-Claude-Code, and MeowKit's own `skill-authoring-rules.md`. Ships ~220 edits across description fields, frontmatter, reference integrity, scripts, and grounding. Zero new skills, zero breaking changes, measurably cleaner routing. Full audit trail at `plans/260421-2247-meowkit-skills-audit-improvement/`. [Full notes →](/guide/whats-new/v2.6.0)
+A 7-agent audit of all 77 `meow:*` skills against Anthropic's Skill-authoring best practices, Lessons-from-building-Claude-Code, and MeowKit's own `skill-authoring-rules.md`. Ships ~220 edits across description fields, frontmatter, reference integrity, scripts, and grounding. Zero new skills, zero breaking changes, measurably cleaner routing. [Full notes →](/guide/whats-new/v2.6.0)
 
 ### Improvements
 
@@ -31,7 +31,7 @@ A 7-agent audit of all 77 `meow:*` skills against Anthropic's Skill-authoring be
 - Seven skills that reference `.claude/skills/...` paths directly gained a `> Path convention:` note declaring `$CLAUDE_PROJECT_DIR` as the assumed cwd — `meow:rubric`, `meow:multimodal`, `meow:skill-creator`, `meow:intake`, `meow:llms`, `meow:investigate`, `meow:jira`.
 - MCP prerequisite hardening for `meow:jira`, `meow:confluence`, `meow:planning-engine` — server-key assumption (`.mcp.json` key `atlassian`) documented via Gotchas without hardcoding prefixes, preserving install portability.
 - Twenty-two skills renamed their trigger section to canonical `## When to Use` — previously fragmented across "When to Invoke", "When to Activate", "Trigger Conditions".
-- 115 reference files over 100 lines auto-gained a `## Contents` Table of Contents via `plans/260421-2247-meowkit-skills-audit-improvement/scripts/add-toc-to-ref-files.py` — idempotent generator, safe to re-run on future drift. Original audit counted 25; actual was 116 (4.6× under-count, largely from `meow:angular`).
+- 115 reference files over 100 lines auto-gained a `## Contents` Table of Contents via idempotent generator, safe to re-run on future drift. Original audit counted 25; actual was 116 (4.6× under-count, largely from `meow:angular`).
 - Frontmatter normalization — `preamble-tier: 4` → `3` on `meow:qa` / `meow:review` / `meow:ship` (valid range is 1-3). Dead `autoInvoke` and `priority` fields deleted from four skills after grep-confirming zero readers in hooks, scripts, or CLI. `sources` → `source` singular unified across seven skills. `meow:chom` `injection_risk` bumped `low → medium` since it replicates external code into the project.
 - `meow:skill-creator` compliance — now has its own `## Gotchas` section, 500-line cap matches authoritative Rule 3 (was 150), emitted template includes mandatory `## Gotchas` header so every future scaffold inherits Rule 1 compliance. `scripts/validate-skill.py` gained check 8/8 for Gotchas header presence and auto-passes step-file skills.
 
@@ -175,8 +175,8 @@ A new strategic-unsticking skill and three diagnostic frameworks for evidence-ba
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
+| Skill                  | Purpose                                                                                                                                                                                                                                                       |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `meow:problem-solving` | Seven non-default techniques for "stuck on approach" — simplification cascades, collision-zone thinking, meta-pattern recognition, inversion, scale game, first principles, via negativa. Explicit boundary reroutes debugging to `meow:sequential-thinking`. |
 
 ### Improvements
