@@ -37,7 +37,7 @@ task_model[8]{task_type,model,reason}:
 ## Agent Default Models
 
 ```toon
-agent_models[13]{agent,default_model,opus_when}:
+agent_models[14]{agent,default_model,opus_when}:
   orchestrator,haiku,Never (routing only)
   analyst,haiku,Never (cost tracking/pattern extraction)
   planner,sonnet,Complex multi-phase planning
@@ -51,6 +51,7 @@ agent_models[13]{agent,default_model,opus_when}:
   researcher,sonnet,opus for deep technical research
   brainstormer,sonnet,opus for architecture evaluation
   journal-writer,haiku,Never (documentation only)
+  project-manager,haiku,Never (delivery status reporting only)
 ```
 
 ## Model Selection Output

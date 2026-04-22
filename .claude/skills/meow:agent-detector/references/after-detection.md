@@ -25,7 +25,7 @@ agents[5]{category,count,list}:
   Planning,3,orchestrator/planner/architect
   Development,1,developer
   Quality & Security,3,tester/reviewer/security
-  Operations,2,shipper/documenter
+  Operations,3,shipper/documenter/project-manager
   Analysis,3,analyst/researcher/brainstormer
 ```
 

@@ -148,9 +148,14 @@ After `meow:simplify` completes, run `meow:verify` for a unified build→lint→
 
 If `meow:verify` FAILS after simplify: send back to developer to fix, then re-run verify before proceeding to Phase 4. Do not skip verify or proceed to review with a failing verify result.
 
+## Status Report (Post-Gate 2)
+
+After Gate 2 verdict PASS and before Phase 5 ship, delegate to `project-manager` per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Do not block on PM — continue to ship. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
+
 ## Related Rules
 
 - `.claude/rules/gate-rules.md` — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions this skill enforces across all modes
+- `.claude/rules/post-phase-delegation.md` — PM delegation fire points and skip conditions
 
 ## Gotchas
 

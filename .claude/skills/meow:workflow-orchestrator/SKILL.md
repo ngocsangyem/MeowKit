@@ -65,7 +65,7 @@ See CLAUDE.md and Phase Composition Contracts for input/output expectations per 
    - Phase 5: Ship — commit, PR, deploy. Auto-continue.
    - Phase 6: Reflect — memory capture, docs sync. Auto-complete.
 
-4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit.
+4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit. Also delegate to `project-manager` after each phase transition per `.claude/rules/post-phase-delegation.md` Rule 1 (background, non-blocking — include "Run in the background" in the prompt). Skipped when `MEOWKIT_PM_AUTO=off`.
 
 **Only 2 approval gates:** Phase 1 (Plan) and Phase 4 (Review). Everything else auto-continues.
 

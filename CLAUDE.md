@@ -99,8 +99,11 @@ Two hard stops. No bypass. No exceptions.
 | documenter     | Living docs, changelogs                      | 6       |
 | analyst        | Cost tracking, patterns                      | 0, 6    |
 | journal-writer | Failure docs, root cause analysis            | 6       |
+| project-manager | Cross-workflow delivery tracking, status reports | on-demand |
 
 No two agents modify the same file type. Conflicts → escalate to human.
+
+**Opt-out:** `MEOWKIT_PM_AUTO=off` disables all silent (background) project-manager fires from orchestration skills. User-invoked `/meow:status` is always honored. See `.claude/rules/post-phase-delegation.md` for fire points and skip conditions.
 
 ## Commands vs Skills (they are not the same)
 

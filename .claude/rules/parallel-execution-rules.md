@@ -54,6 +54,10 @@ WHY: Gates are the discipline core. Parallelizing them defeats their purpose.
 After merging parallel worktrees, run the FULL test suite on the merged result.
 If tests fail, the parallel decomposition was wrong — fix before proceeding.
 
+After the integration test passes, delegate to `project-manager` per
+`.claude/rules/post-phase-delegation.md` Rule 1 to emit a merge report
+summarizing what each parallel branch contributed.
+
 WHY: Individual branches may pass their own tests but fail when combined. Integration testing catches interaction bugs that per-branch testing misses.
 
 ## Rule 6: Only COMPLEX Tasks Qualify

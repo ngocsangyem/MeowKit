@@ -89,7 +89,20 @@ The next session reads `step-03-generate.md` again. step-03 reads the iteration 
 
 ### 5e. Action: escalate (verdict was FAIL at iteration cap)
 
-When `next_action == escalate`, present a 3-option choice via AskUserQuestion BEFORE proceeding to step-06:
+When `next_action == escalate`, first surface current delivery state to the user (foreground), then present a 3-option choice via AskUserQuestion.
+
+**PM foreground invocation (per `.claude/rules/post-phase-delegation.md` Rule 5 — the only foreground PM call):**
+
+```
+Delegate to the project-manager agent (foreground):
+"Generate delivery status for plan at $plan_dir. Write report to
+$plan_dir/status-reports/$(date +%y%m%d)-status.md.
+Load template from tasks/templates/pm-status-template.md."
+```
+
+Wait for PM to return the report path, then include the headline in the escalation question so the user sees current state before deciding. Skip the PM call entirely when `MEOWKIT_PM_AUTO=off`.
+
+Then present via AskUserQuestion BEFORE proceeding to step-06:
 
 ```
 AskUserQuestion(

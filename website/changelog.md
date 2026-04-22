@@ -16,6 +16,40 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.6.1 (2026-04-22) — The project-manager Release
+
+### Highlights
+
+New 17th core agent `project-manager` — a cross-workflow delivery tracker that aggregates plan, test, review, contract, and cost state into an evidence-based status report classified as done / in progress / blocked / not started. Ships the new `/meow:status` slash command, a new `post-phase-delegation.md` rule, and a new `pm-status-template.md` report schema. Five orchestration skills (`meow:cook`, `meow:harness`, `meow:workflow-orchestrator`, `meow:fix` complex path, `meow:worktree`) now cite the rule to delegate post-phase. Opt-out via `MEOWKIT_PM_AUTO=off`.
+
+### New Agents
+
+- `project-manager` — cross-workflow delivery tracker (haiku tier). Reads plan + verdicts + contracts + cost-log + git log; writes status reports co-located inside each plan dir at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Backward-looking ("what's done, what's blocked") — complement, not replacement, for `meow:help` which remains forward-looking ("what's next").
+
+### New Commands
+
+- `/meow:status` — foreground entry point for `project-manager`. Resolves the active plan (prompts if multiple), delegates to the agent, prints the report path.
+
+### Features
+
+- New rule `post-phase-delegation.md` — 7-rule charter defining PM fire points, invocation form, skip conditions, orchestrator disambiguation, and the no-hook-dispatch safety property.
+- New report template `tasks/templates/pm-status-template.md` — follows planner's template convention; schema edits happen in one file, not inside the agent body.
+- New env var `MEOWKIT_PM_AUTO=off` — disables all silent PM fires from orchestration skills. `/meow:status` still works regardless.
+- `meow:agent-detector` gains a `Delivery Status` intent (keywords: status / progress / what's done / what's blocked / delivery tracking) routing to `project-manager`, explicitly distinct from `meow:help`'s forward-looking navigation intent.
+
+### Improvements
+
+- Status reports are co-located with the plan they describe. Archive moves them together. No central `tasks/status-reports/` dir; each plan lazily creates its own subdir on first write.
+- Harness iteration cap escalation (`step-05`) now surfaces current delivery state BEFORE the `AskUserQuestion` escalation — user sees what's done and what's blocked before deciding ship / abort.
+- Parallel-execution Rule 5 appends: after the integration test passes, PM emits a merge report summarizing what each parallel branch contributed.
+- Agent count: 16 → 17. Architecture `§2` counts, `§6` roster, AGENTS_INDEX, CLAUDE.md, and agent-detector routing data all synchronized.
+
+### Bug Fixes
+
+- `docs/meowkit-architecture.md` mermaid subgraph caption "Key Agents (16)" updated to (17); slash-commands count bumped 20 → 21.
+
+---
+
 ## 2.6.0 (2026-04-22) — The Skills Compliance Release
 
 ### Highlights

@@ -65,7 +65,7 @@ tech_detection[10]{technology,keywords,agent,score}:
 Detect user **intent** from action keywords:
 
 ```toon
-intent_detection[8]{intent,keywords,primary,secondary}:
+intent_detection[9]{intent,keywords,primary,secondary}:
   Implementation,implement/create/add/build/develop,Dev agent,frontend/tester
   Bug Fix,fix/bug/error/issue/broken/crash,Dev agent,tester
   Testing,test/testing/coverage/QA/spec,tester,Dev agent
@@ -74,7 +74,10 @@ intent_detection[8]{intent,keywords,primary,secondary}:
   Security,security/vulnerability/audit/owasp/secure,security,Dev agent
   Performance,performance/slow/optimize/speed/memory,devops,Dev agent
   Deployment,deploy/docker/kubernetes/CI-CD/pipeline,devops,-
+  Delivery Status,status/progress/what's done/what's blocked/delivery tracking,project-manager,-
 ```
+
+**Disambiguation from meow:help:** the Delivery Status intent is backward-looking ("what's done / blocked"). For forward-looking navigation ("what should I do next", "where am I", "help"), `meow:help` handles it instead — those keywords do NOT match this intent.
 
 ## Layer 3: Project Context Detection
 

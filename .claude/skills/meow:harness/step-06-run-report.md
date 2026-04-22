@@ -4,6 +4,20 @@ Finalize the audit trail at `tasks/harness-runs/{run_id}/run.md`. Print a user-f
 
 ## Instructions
 
+### 6a0. PM delegation (background) — per `.claude/rules/post-phase-delegation.md` Rule 1
+
+Before finalizing the run report, delegate to `project-manager` (background):
+
+```
+Delegate to the project-manager agent:
+"Generate delivery status for plan at $plan_dir. Write report to
+$plan_dir/status-reports/$(date +%y%m%d)-status.md.
+Load template from tasks/templates/pm-status-template.md.
+Run in the background — do not block step-06 finalization."
+```
+
+Do not block on PM — continue to 6a. The run report's Final Verdict section (6b) may cite the PM report path if available, otherwise proceeds without it. Skipped entirely when `MEOWKIT_PM_AUTO=off` or `MEOWKIT_HARNESS_MODE=MINIMAL`.
+
 ### 6a. Update run report frontmatter
 
 Open `$run_dir/run.md` and update the frontmatter with the final state:

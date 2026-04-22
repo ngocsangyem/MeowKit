@@ -23,6 +23,7 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | `step-file-rules.md`              | JIT step loading, no skipping, state persistence for multi-step workflows                                                                          | New (BMAD-inspired)                          | Step-file skills                                    |
 | `parallel-execution-rules.md`     | Worktree isolation, file ownership, max 3 agents, integration test. Added staged parallel mode (v2.0)                                              | New (CKE-inspired)                           | Parallel execution [CONTEXTUAL]                     |
 | `skill-authoring-rules.md`        | Mandatory Gotchas section, persistent state in `${CLAUDE_PLUGIN_DATA}`, 500-line SKILL.md cap with decomposition + audit cadence                   | New (Anthropic skill-authoring docs)         | Skill authoring, audits                             |
+| `post-phase-delegation.md`        | Fire points, skip conditions, and invocation form for delegating to project-manager after each phase transition                                    | MeowKit original                             | Orchestration skills [CONTEXTUAL]                   |
 
 ## Loading Priority
 
@@ -45,6 +46,7 @@ Rules are applied in this priority (higher = stronger override):
 15. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
 16. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
 17. `skill-authoring-rules.md` — apply during skill authoring, scaffolding, and quarterly/model-upgrade audits
+18. `post-phase-delegation.md` — apply during orchestration-skill execution only [CONTEXTUAL]
 
 ## Hook Enforcement
 
@@ -79,6 +81,7 @@ Hooks supplement rules — they do not replace them. Rules define the WHY; hooks
 | `step-file-rules.md`              | Behavioral                                                                                               | N/A                                  | Only applies to step-file skills                                                                                                        |
 | `parallel-execution-rules.md`     | Behavioral + worktree                                                                                    | N/A                                  | [CONTEXTUAL] — only during parallel execution                                                                                           |
 | `skill-authoring-rules.md`        | Behavioral + Script (500-line audit `find` one-liner)                                                    | No                                   | MeowKit-internal infra paths exempt from Rule 2; step-filed skills auto-pass Rule 3                                                     |
+| `post-phase-delegation.md`        | Behavioral                                                                                               | N/A                                  | [CONTEXTUAL] — only when an orchestration skill is active. `MEOWKIT_PM_AUTO=off` disables silent fires                                  |
 
 **Mechanism types:**
 

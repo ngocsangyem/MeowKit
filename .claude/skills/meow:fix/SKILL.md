@@ -121,8 +121,9 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
    - Append to `.claude/memory/fixes.md`: symptom → root cause → fix approach → what prevented recurrence
    - Update `.claude/memory/fixes.json`: add pattern with `type: "correction"`, `category: "failure"`, `severity`, `applicable_when`, `context`, `pattern`, `frequency: 1`
    - If pattern already exists → increment frequency + update `lastSeen`
-3. `documenter` agent → update `./docs`
-4. Ask user about commit
+3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — Gate 1 bypass path means no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
+4. `documenter` agent → update `./docs`
+5. Ask user about commit
 
 ## Skill Activation
 

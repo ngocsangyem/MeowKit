@@ -12,6 +12,10 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.6.1 — The project-manager Release (2026-04-22)
+
+Adds the 17th core agent `project-manager` — a cross-workflow delivery tracker that aggregates plan / test / review / cost / git state into an evidence-based status report. Ships one new slash command (`/meow:status`), one new rule (`post-phase-delegation.md`), and rule-based delegation from 5 orchestration skills. Status reports live inside each plan dir (`tasks/plans/{slug}/status-reports/`) so they travel with the plan they describe. Opt-out via `MEOWKIT_PM_AUTO=off`.
+
 ### v2.6.0 — The Skills Compliance Release (2026-04-22)
 
 A 7-agent audit of all 77 `meow:*` skills against Anthropic's skill-authoring best practices + MeowKit's internal `skill-authoring-rules.md`. Ships ~220 edits across description fields, frontmatter, reference integrity, scripts, and grounding. Zero new skills, zero breaking changes, measurably cleaner routing. [Full notes →](/guide/whats-new/v2.6.0)

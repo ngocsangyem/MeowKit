@@ -24,6 +24,8 @@ Merge a completed worktree branch back to the feature branch using a no-fast-for
 
 If merge conflicts occur: list conflicting files, STOP, and report to orchestrator. Do NOT auto-resolve — human or lead agent decides.
 
+After the full test suite passes on the merged result (per `parallel-execution-rules.md` Rule 5), delegate to `project-manager` per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt) to summarize what each parallel branch contributed. Skipped when `MEOWKIT_PM_AUTO=off`.
+
 ### cleanup
 
 Remove the worktree directory and delete the parallel branch after successful merge. Never cleanup a worktree with uncommitted changes — commit or stash first.

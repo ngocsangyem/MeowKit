@@ -20,6 +20,7 @@
 | `documenter.md` | Core | Living documentation, changelog generation, docs sync | MeowKit original | Phase 6 (Reflect) | Routed by orchestrator after ship | 260326 | 260326 |
 | `analyst.md` | Core | Cost tracking, pattern extraction, lessons learned | MeowKit original | Phase 0, 6 | Auto at session start/end | 260326 | 260326 |
 | `journal-writer.md` | Support | Failure documentation, root cause analysis, lessons | Credit: Duy Nguyen | Phase 6 (Reflect), escalations | On failure/escalation | 260326 | 260326 |
+| `project-manager.md` | Core | Cross-workflow delivery tracking, evidence-based status reports | MeowKit original | on-demand (0–6) | Explicit delegation, `/meow:status`, or `post-phase-delegation.md` rule | 260422 | 260422 |
 
 **CE version**: Context Engineering version — tracks when agents were last improved with context engineering principles.
 
@@ -29,7 +30,7 @@ Every agent now includes these sections (where applicable):
 
 | Section | Purpose | Principle | Present in |
 |---------|---------|-----------|------------|
-| Required Context | What to load before invoking | CW3 — just-in-time context | All 16 agents |
+| Required Context | What to load before invoking | CW3 — just-in-time context | All 17 agents |
 | Failure Behavior | What to do when task cannot complete | AI4 — explicit failure path | 13 agents (pipeline + evaluator, ui-ux-designer, git-manager) |
 | Ambiguity Resolution | How to handle unclear inputs | AI7 — ambiguity protocol | 5 HIGH-priority agents |
 
