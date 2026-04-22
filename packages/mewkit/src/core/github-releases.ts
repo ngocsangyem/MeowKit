@@ -1,7 +1,7 @@
-import { mkdirSync, writeFileSync, createWriteStream } from "node:fs";
+import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { execSync } from "node:child_process";
+import AdmZip from "adm-zip";
 import * as log from "./core-logger.js";
 
 /** GitHub repository for MeowKit releases */
@@ -107,10 +107,12 @@ export async function downloadRelease(release: ReleaseInfo): Promise<string> {
 
 	log.debug(`Downloaded ${buffer.length} bytes to ${zipPath}`);
 
-	// Extract the zip
+	// Extract the zip — pure JS, works identically on macOS, Linux, Windows.
+	// (Previous `unzip` shell call failed on Windows which has no unzip by default.)
 	const extractDir = join(tempDir, "extracted");
 	mkdirSync(extractDir, { recursive: true });
-	execSync(`unzip -q "${zipPath}" -d "${extractDir}"`, { stdio: "pipe" });
+	const zip = new AdmZip(zipPath);
+	zip.extractAllTo(extractDir, /* overwrite */ true);
 
 	log.debug(`Extracted to ${extractDir}`);
 
@@ -119,10 +121,12 @@ export async function downloadRelease(release: ReleaseInfo): Promise<string> {
 
 /**
  * Clean up a downloaded release temp directory.
+ * Uses fs.rmSync (Node 14.14+) instead of `rm -rf` so it works on Windows,
+ * where cmd.exe has no `rm -rf` equivalent.
  */
 export function cleanupDownload(tempDir: string): void {
 	try {
-		execSync(`rm -rf "${tempDir}"`, { stdio: "pipe" });
+		rmSync(tempDir, { recursive: true, force: true });
 	} catch {
 		// Best effort cleanup
 	}

@@ -52,7 +52,9 @@ export function copyFile(src: string, dest: string, dryRun: boolean): void {
 	mkdirSync(dirname(dest), { recursive: true });
 	copyFileSync(src, dest);
 
-	const parent = dirname(dest).split("/").pop() ?? "";
+	// Use path.basename(path.dirname(...)) rather than splitting on "/" because
+	// Node's path returns platform separators (\ on Windows, / elsewhere).
+	const parent = basename(dirname(dest));
 	const ext = basename(dest).includes(".") ? "." + basename(dest).split(".").pop() : "";
 	if (ext === ".sh" || ext === ".cjs" || parent === "hooks" || parent === "bin") {
 		chmodSync(dest, 0o755);
