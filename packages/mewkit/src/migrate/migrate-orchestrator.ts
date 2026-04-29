@@ -1,5 +1,7 @@
 // Main migration orchestrator. Composes all phases into runMigrate(options).
 
+import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { applyMewkitOverrides } from "./provider-overrides.js";
@@ -19,12 +21,14 @@ import {
 	buildSourceItemState,
 	buildTargetStates,
 	buildTypeDirectoryStates,
+	generateDiff,
 	readPortableRegistry,
 	reconcile,
 	releaseMigrationLock,
 	resolveConflict,
 	type ReconcileAction,
 } from "./reconcile/index.js";
+import { convertItem } from "./converters/index.js";
 import { executeDeleteAction, executeInstallAction } from "./portable-installer.js";
 import { installSkillDirectory } from "./skill-directory-installer.js";
 import { printActionDetails, printFinalSummary, printPreflight } from "./migrate-ui-summary.js";
@@ -132,16 +136,20 @@ async function runMigrateUnderLock(
 		return 0;
 	}
 
+	const itemsByT = itemsByType(discovered);
+
+	// Compute diffs lazily for conflicting actions so the "Show diff" prompt has data.
 	for (const action of plan.actions) {
-		if (action.action === "conflict") {
-			const policy = options.force ? "overwrite" : "keep";
-			const resolution = await resolveConflict(action, {
-				interactive: !!process.stdout.isTTY && !options.yes,
-				color: !!process.stdout.isTTY,
-				nonInteractivePolicy: policy,
-			});
-			action.resolution = resolution;
-		}
+		if (action.action !== "conflict") continue;
+		await attachConflictDiff(action, itemsByT);
+
+		const policy = options.force ? "overwrite" : "keep";
+		const resolution = await resolveConflict(action, {
+			interactive: !!process.stdout.isTTY && !options.yes,
+			color: !!process.stdout.isTTY,
+			nonInteractivePolicy: policy,
+		});
+		action.resolution = resolution;
 	}
 
 	const confirmed =
@@ -149,7 +157,6 @@ async function runMigrateUnderLock(
 		(await confirmExecution(plan.summary.install + plan.summary.update + plan.summary.delete));
 	if (!confirmed) return 130;
 
-	const itemsByT = itemsByType(discovered);
 	const results = await executePlan(plan.actions, { allItems: itemsByT }, discovered.skills, targets, isGlobal, scope.skills);
 
 	printFinalSummary(results);
@@ -232,6 +239,36 @@ function providerKey(type: PortableType): "agents" | "commands" | "skills" | "co
 		case "config": return "config";
 		case "rules": return "rules";
 		case "hooks": return "hooks";
+	}
+}
+
+/**
+ * Read the on-disk target file, run the converter against the matching source item,
+ * and attach a unified diff to the action so the conflict resolver's "Show diff" UI
+ * has real content. Best-effort — silent failures leave action.diff undefined and
+ * the resolver will display "[i] Diff not available."
+ */
+async function attachConflictDiff(
+	action: ReconcileAction,
+	itemsByT: Record<PortableType, PortableItem[]>,
+): Promise<void> {
+	if (action.diff) return;
+	if (!action.targetPath || !existsSync(action.targetPath)) return;
+
+	const sourceItem = itemsByT[action.type]?.find((i) => i.name === action.item);
+	if (!sourceItem) return;
+
+	const providerConfig = providers[action.provider as ProviderType];
+	const pathConfig = providerConfig?.[providerKey(action.type)];
+	if (!pathConfig) return;
+
+	try {
+		const targetContent = await readFile(action.targetPath, "utf-8");
+		const conversion = convertItem(sourceItem, pathConfig.format, action.provider as ProviderType);
+		if (conversion.error) return;
+		action.diff = generateDiff(targetContent, conversion.content, action.item);
+	} catch {
+		// Read or convert failed — leave diff undefined; resolver handles the missing case.
 	}
 }
 
