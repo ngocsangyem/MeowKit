@@ -7,11 +7,19 @@ import type { ReleaseInfo, UserConfig } from "../core/index.js";
 import { promptAndInstallSystemDeps } from "./setup.js";
 import { getRequirementsSource, formatPackageList } from "../core/skills-dependencies.js";
 import { ensureVenv, installPipPackages } from "../core/dependency-installer.js";
+import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.js";
+import type { MigrateOptions } from "../migrate/types.js";
 
 export interface InitArgs {
 	dryRun?: boolean;
 	force?: boolean;
 	beta?: boolean;
+	/** When true, run interactive provider multiselect after init unpacks. */
+	migrate?: boolean;
+	/** CSV of provider names (e.g., "cursor,codex") or "all". When set, migration runs after init. */
+	migrateTo?: string;
+	/** When true, scope the post-init migration globally (~/.cursor/, etc.) instead of per-project. */
+	migrateGlobal?: boolean;
 }
 
 /** Detect if this is a fresh install or an update */
@@ -331,8 +339,55 @@ export async function init(args: InitArgs): Promise<void> {
 
 		// Step 9: Summary
 		printSummary(stats, dryRun);
+
+		// Step 10: Optional migration to external tools
+		if (!dryRun && (args.migrate || args.migrateTo)) {
+			await runPostInitMigrate(args, targetDir);
+		}
+
 		p.outro(pc.green(mode === "new" ? "MeowKit installed!" : "MeowKit updated!"));
 	} finally {
 		cleanupDownload(sourceDir);
+	}
+}
+
+/**
+ * Run a migration after init unpacks .claude/. Failure here does NOT roll back the
+ * unpack — we surface the error and continue. User can re-run `mewkit migrate` later.
+ */
+async function runPostInitMigrate(args: InitArgs, projectDir: string): Promise<void> {
+	console.log(`\n${pc.bold("? Phase 4: Export to external tools")}`);
+
+	const migrateOptions: MigrateOptions = {
+		global: args.migrateGlobal ?? false,
+		yes: !!args.migrateTo, // CSV/all → non-interactive; bare --migrate stays interactive
+		source: join(projectDir, ".claude"),
+	};
+
+	if (args.migrateTo) {
+		const trimmed = args.migrateTo.trim();
+		if (trimmed === "all") {
+			migrateOptions.all = true;
+		} else {
+			migrateOptions.tools = trimmed.split(",").map((t) => t.trim()).filter(Boolean);
+		}
+	}
+
+	try {
+		const exitCode = await runMigrate(migrateOptions, {
+			bundledKitDir: join(projectDir, ".claude"),
+			argv: [],
+		});
+		if (exitCode !== 0) {
+			console.log(pc.yellow(`[!] Migration exited with code ${exitCode} — re-run "mewkit migrate" to retry.`));
+		}
+	} catch (err) {
+		if (err instanceof MewkitMigrateError) {
+			console.log(pc.red(`[!] Migration failed: ${err.message}`));
+			console.log(pc.dim(`    Re-run: mewkit migrate <tool>`));
+		} else {
+			const msg = err instanceof Error ? err.message : String(err);
+			console.log(pc.red(`[!] Migration error: ${msg}`));
+		}
 	}
 }

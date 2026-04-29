@@ -174,3 +174,140 @@ npx mewkit status
 ```
 
 Shows: MeowKit version with channel indicator (stable/beta), project config from `.claude/meowkit.config.json`.
+
+## migrate
+
+Export your `.claude/` kit (agents, commands, skills, config, rules, hooks) to external coding-agent tools.
+
+```bash
+npx mewkit migrate <tool> [flags]
+npx mewkit migrate --all
+npx mewkit migrate                    # interactive multiselect
+```
+
+**Supported tools:** `cursor`, `codex`, `droid`, `opencode`, `goose`, `gemini-cli`, `antigravity`, `github-copilot`, `amp`, `kilo`, `kiro`, `roo`, `windsurf`, `cline`, `openhands`. (`claude-code` is the source format and is not a valid migration target.)
+
+### Flags
+
+| Flag | Description |
+|------|-------------|
+| `--all` | Migrate to all 15 supported tools in one pass |
+| `--global` | Install to user's home (`~/.cursor/`, etc.) instead of project-local paths |
+| `--yes`, `-y` | Non-interactive — auto-confirm prompts |
+| `--dry-run` | Compute and display the plan without writing any files |
+| `--force` | Overwrite user-edited target files without prompting on conflict |
+| `--source <path>` | Override source `.claude/` directory (default: `<cwd>/.claude/` or bundled kit) |
+| `--only <csv>` | Restrict to listed types: `agents,commands,skills,config,rules,hooks` |
+| `--skip-config`, `--skip-rules`, `--skip-hooks` | Exclude one or more types |
+| `--prefer-agents-md` | (Antigravity) write rules to `AGENTS.md` instead of `GEMINI.md` |
+| `--respect-deletions` | Skip items whose target was deleted by the user (default re-installs) |
+| `--reinstall-empty-dirs` | Re-install items even if the user emptied the target directory (default: true) |
+
+### Capability matrix
+
+What each tool accepts. ✓ supported · — not supported by tool.
+
+| Tool | Agents | Commands | Skills | Config | Rules | Hooks |
+|------|:------:|:--------:|:------:|:------:|:-----:|:-----:|
+| Cursor | ✓ | — | ✓ | ✓ | ✓ | — |
+| Codex | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Droid | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| OpenCode | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| Goose | ✓ | — | ✓ | ✓ | ✓ | — |
+| Gemini CLI | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Antigravity | — (skills) | ✓ | ✓ | ✓ | ✓ | — |
+| GitHub Copilot | ✓ | — | ✓ | ✓ | ✓ | — |
+| Amp | ✓ | — | ✓ | ✓ | ✓ | — |
+| Kilo Code [unverified] | ✓ | — | ✓ | ✓ | ✓ | — |
+| Kiro IDE | ✓ | — | ✓ | ✓ | ✓ | — |
+| Roo Code | ✓ | — | ✓ | ✓ | ✓ | — |
+| Windsurf | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| Cline | ✓ | — | ✓ | ✓ | ✓ | — |
+| OpenHands | ✓ | — | ✓ | ✓ | ✓ | — |
+
+**Notes:**
+- Antigravity treats agents as skills (no separate concept) — Claude Code agents land in Antigravity's skills directory.
+- Hooks: only Codex, Droid, and Gemini CLI accept hooks. Other tools warn and skip.
+- Shell hooks (`.sh`/`.ps1`/`.bat`) are filtered at discovery — only node-runnable hooks (`.cjs`/`.mjs`/`.js`) migrate.
+- Kilo Code is `[unverified]` — registry entry is ported verbatim from upstream but no real install was tested. Migration emits a runtime warning.
+
+### Examples
+
+```bash
+# Preview before any writes
+npx mewkit migrate cursor --dry-run
+
+# Single tool, project scope
+npx mewkit migrate cursor
+
+# Multi-tool batch (uses interactive picker if TTY)
+npx mewkit migrate
+
+# All 15 tools, non-interactive (CI-friendly)
+npx mewkit migrate --all --yes
+
+# Global install scope
+npx mewkit migrate codex --global
+
+# Restrict scope to specific types
+npx mewkit migrate cursor --only=skills,rules
+npx mewkit migrate codex --skip-hooks
+
+# Force overwrite user edits
+npx mewkit migrate cursor --force
+```
+
+### Idempotency
+
+mewkit tracks every installation in `~/.mewkit/portable-registry.json` with SHA-256 source + target checksums. Re-running `migrate` reconciles per file:
+
+- Source unchanged + target unchanged → **skip**
+- Source changed + target unchanged → **update**
+- Source unchanged + target edited by user → **skip** (preserves your edits)
+- Source changed + target edited by user → **conflict** (interactive prompt)
+- Source removed + registry entry exists → **delete**
+- Brand new item → **install**
+
+A `mewkit upgrade` followed by `mewkit migrate cursor` propagates kit updates to Cursor without losing local edits.
+
+### Exit codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | Partial failure (one or more items failed; others succeeded) |
+| 2 | Invalid flags or unknown tool name |
+| 130 | User cancelled (Ctrl+C during interactive prompt) |
+
+### Concurrent invocations
+
+A PID-based file lock at `<scope>/.mewkit/.lock` blocks two `mewkit migrate` runs from racing on the same registry. Stale locks (dead PID) are auto-cleared after 60 seconds.
+
+## init --migrate (one-shot scaffold + export)
+
+`mewkit init` accepts three migrate-related flags so you can scaffold AND export in a single command.
+
+```bash
+# Interactive picker after kit unpacks
+npx mewkit init --migrate
+
+# Pre-set tools, no picker
+npx mewkit init --migrate-to cursor,codex,droid
+
+# All 15 tools
+npx mewkit init --migrate-to all
+
+# Global install scope
+npx mewkit init --migrate-to cursor --migrate-global
+```
+
+| Flag | Description |
+|------|-------------|
+| `--migrate` | After unpack, prompt for providers via interactive multiselect (TTY required) |
+| `--migrate-to <csv\|all>` | After unpack, export to listed providers (`cursor,codex` or `all`) |
+| `--migrate-global` | Use global install paths (`~/.cursor/`, etc.) instead of project-local |
+
+**Behavior:**
+- Migration runs after kit unpacks successfully — failures don't roll back the kit install. If migration fails, init still completes; re-run `mewkit migrate` to retry.
+- Init uses the same orchestrator, registry, and reconciler as the standalone `migrate` command. Idempotent re-runs work the same way.
+- `--migrate-to` implies `--yes` (non-interactive), so it's safe to use in CI scripts.

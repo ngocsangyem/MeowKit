@@ -11,6 +11,7 @@ import { validate } from "./commands/validate.js";
 import { budget } from "./commands/budget.js";
 import { memory } from "./commands/memory.js";
 import { doctor } from "./commands/doctor.js";
+import { migrate } from "./commands/migrate.js";
 import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
 
@@ -35,10 +36,16 @@ ${pc.bold("Commands:")}
   ${pc.green("doctor")}     Diagnose common environment issues
   ${pc.green("status")}     Print version and config summary
   ${pc.green("task")}       Create and list task files (new, list)
+  ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
 
 ${pc.bold("Options:")}
   --help, -h       Show help
   --version, -v    Show version
+
+${pc.bold("Init flags for post-init migration:")}
+  --migrate                  After unpack, prompt for providers to export to (interactive)
+  --migrate-to <csv|all>     After unpack, export to listed providers (e.g. cursor,codex)
+  --migrate-global           Use global install paths (~/.cursor/, etc.) instead of project-local
 `);
 }
 
@@ -77,9 +84,21 @@ async function main(): Promise<void> {
 			"dry-run",
 			"force",
 			"system-deps",
+			"yes",
+			"global",
+			"skip-config",
+			"skip-rules",
+			"skip-hooks",
+			"install",
+			"reconcile",
+			"reinstall-empty-dirs",
+			"respect-deletions",
+			"prefer-agents-md",
+			"migrate",
+			"migrate-global",
 		],
-		string: ["only", "type", "priority", "status"],
-		alias: { h: "help", v: "version" },
+		string: ["only", "type", "priority", "status", "source", "source-version", "migrate-to"],
+		alias: { h: "help", v: "version", y: "yes" },
 	});
 
 	if (args.version) {
@@ -100,6 +119,9 @@ async function main(): Promise<void> {
 				dryRun: args["dry-run"] as boolean | undefined,
 				force: args.force as boolean | undefined,
 				beta: args.beta as boolean | undefined,
+				migrate: args.migrate as boolean | undefined,
+				migrateTo: args["migrate-to"] as string | undefined,
+				migrateGlobal: args["migrate-global"] as boolean | undefined,
 			});
 			break;
 		case "upgrade":
@@ -143,6 +165,29 @@ async function main(): Promise<void> {
 				status: args.status as string | undefined,
 				description: description || undefined,
 			});
+			break;
+		}
+		case "migrate": {
+			const exitCode = await migrate({
+				_: args._.map(String),
+				all: args.all as boolean | undefined,
+				global: args.global as boolean | undefined,
+				yes: args.yes as boolean | undefined,
+				"dry-run": args["dry-run"] as boolean | undefined,
+				force: args.force as boolean | undefined,
+				source: args.source as string | undefined,
+				only: args.only as string | undefined,
+				"skip-config": args["skip-config"] as boolean | undefined,
+				"skip-rules": args["skip-rules"] as boolean | undefined,
+				"skip-hooks": args["skip-hooks"] as boolean | undefined,
+				install: args.install as boolean | undefined,
+				reconcile: args.reconcile as boolean | undefined,
+				"reinstall-empty-dirs": args["reinstall-empty-dirs"] as boolean | undefined,
+				"respect-deletions": args["respect-deletions"] as boolean | undefined,
+				"prefer-agents-md": args["prefer-agents-md"] as boolean | undefined,
+				"source-version": args["source-version"] as string | undefined,
+			});
+			if (exitCode !== 0) process.exit(exitCode);
 			break;
 		}
 		default:

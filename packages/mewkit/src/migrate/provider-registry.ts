@@ -1,0 +1,346 @@
+// Vendored from claudekit-cli (MIT). Source: src/commands/portable/provider-registry.ts
+// This file is the declarative capability matrix for all 16 providers (claude-code source + 15 targets).
+// Helpers split into provider-registry-utils.ts. Override patches in provider-overrides.ts.
+// File length exceeds the 200-line house style intentionally — splitting the data table fragments
+// the capability matrix and makes audits harder. The file is a single declarative record.
+
+import { execFileSync } from "node:child_process";
+import { existsSync, readdirSync, statSync } from "node:fs";
+import { homedir, platform } from "node:os";
+import { join } from "node:path";
+import type { ProviderConfig, ProviderType } from "./types.js";
+
+const home = homedir();
+const cwd = process.cwd();
+const isWin = platform() === "win32";
+const OPENCODE_BINARY_NAME = isWin ? "opencode.exe" : "opencode";
+
+function hasInstallSignal(path: string | null | undefined): boolean {
+	if (!path || !existsSync(path)) return false;
+	try {
+		const stat = statSync(path);
+		if (stat.isDirectory()) return readdirSync(path).length > 0;
+		if (stat.isFile()) return true;
+		return false;
+	} catch {
+		return false;
+	}
+}
+
+function hasAnyInstallSignal(paths: Array<string | null | undefined>): boolean {
+	return paths.some((path) => hasInstallSignal(path));
+}
+
+export const binaryCache = new Map<string, boolean>();
+
+export function hasBinaryInPath(name: string): boolean {
+	const cached = binaryCache.get(name);
+	if (cached !== undefined) return cached;
+	try {
+		execFileSync(isWin ? "where" : "which", [name], { stdio: "pipe", timeout: 3000 });
+		binaryCache.set(name, true);
+		return true;
+	} catch {
+		binaryCache.set(name, false);
+		return false;
+	}
+}
+
+function hasOpenCodeInstallSignal(): boolean {
+	return (
+		hasBinaryInPath("opencode") ||
+		hasAnyInstallSignal([
+			join(cwd, "opencode.json"),
+			join(cwd, "opencode.jsonc"),
+			join(cwd, ".opencode/agents"),
+			join(cwd, ".opencode/commands"),
+			join(home, ".config/opencode/AGENTS.md"),
+			join(home, ".config/opencode/agents"),
+			join(home, ".config/opencode/commands"),
+			join(home, ".opencode/bin", OPENCODE_BINARY_NAME),
+		])
+	);
+}
+
+export const providers: Record<ProviderType, ProviderConfig> = {
+	"claude-code": {
+		name: "claude-code",
+		displayName: "Claude Code",
+		subagents: "full",
+		agents: { projectPath: ".claude/agents", globalPath: join(home, ".claude/agents"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		commands: { projectPath: ".claude/commands", globalPath: join(home, ".claude/commands"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		skills: { projectPath: ".claude/skills", globalPath: join(home, ".claude/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: "CLAUDE.md", globalPath: join(home, ".claude/CLAUDE.md"), format: "direct-copy", writeStrategy: "single-file", fileExtension: ".md" },
+		rules: { projectPath: ".claude/rules", globalPath: join(home, ".claude/rules"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		hooks: { projectPath: ".claude/hooks", globalPath: join(home, ".claude/hooks"), format: "direct-copy", writeStrategy: "per-file", fileExtension: "" },
+		settingsJsonPath: { projectPath: ".claude/settings.json", globalPath: join(home, ".claude/settings.json") },
+		detect: async () =>
+			hasBinaryInPath("claude") ||
+			hasAnyInstallSignal([
+				join(cwd, ".claude/agents"), join(cwd, ".claude/commands"), join(cwd, ".claude/skills"),
+				join(cwd, ".claude/rules"), join(cwd, ".claude/hooks"), join(cwd, "CLAUDE.md"),
+				join(home, ".claude/agents"), join(home, ".claude/commands"), join(home, ".claude/skills"),
+				join(home, ".claude/rules"), join(home, ".claude/hooks"), join(home, ".claude/CLAUDE.md"),
+			]),
+	},
+	opencode: {
+		name: "opencode",
+		displayName: "OpenCode",
+		subagents: "full",
+		agents: { projectPath: ".opencode/agents", globalPath: join(home, ".config/opencode/agents"), format: "fm-to-fm", writeStrategy: "per-file", fileExtension: ".md" },
+		commands: { projectPath: ".opencode/commands", globalPath: join(home, ".config/opencode/commands"), format: "fm-to-fm", writeStrategy: "per-file", fileExtension: ".md" },
+		skills: { projectPath: ".claude/skills", globalPath: join(home, ".claude/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: "AGENTS.md", globalPath: join(home, ".config/opencode/AGENTS.md"), format: "md-strip", writeStrategy: "merge-single", fileExtension: ".md" },
+		rules: { projectPath: "AGENTS.md", globalPath: join(home, ".config/opencode/AGENTS.md"), format: "md-strip", writeStrategy: "merge-single", fileExtension: ".md" },
+		hooks: null,
+		settingsJsonPath: null,
+		detect: async () => hasOpenCodeInstallSignal(),
+	},
+	"github-copilot": {
+		name: "github-copilot",
+		displayName: "GitHub Copilot",
+		subagents: "full",
+		agents: { projectPath: ".github/agents", globalPath: null, format: "fm-to-fm", writeStrategy: "per-file", fileExtension: ".agent.md" },
+		commands: null,
+		skills: { projectPath: ".github/skills", globalPath: null, format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: ".github/copilot-instructions.md", globalPath: null, format: "md-strip", writeStrategy: "single-file", fileExtension: ".md" },
+		rules: { projectPath: ".github/instructions", globalPath: null, format: "md-strip", writeStrategy: "per-file", fileExtension: ".instructions.md" },
+		hooks: null,
+		settingsJsonPath: null,
+		detect: async () =>
+			hasAnyInstallSignal([
+				join(cwd, ".github/agents"), join(cwd, ".github/skills"),
+				join(cwd, ".github/instructions"), join(cwd, ".github/copilot-instructions.md"),
+			]),
+	},
+	codex: {
+		name: "codex",
+		displayName: "Codex",
+		subagents: "full",
+		agents: { projectPath: ".codex/agents", globalPath: join(home, ".codex/agents"), format: "fm-to-codex-toml", writeStrategy: "codex-toml", fileExtension: ".toml" },
+		commands: { projectPath: null, globalPath: join(home, ".codex/prompts"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md", nestedCommands: false },
+		skills: { projectPath: ".agents/skills", globalPath: join(home, ".agents/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: "AGENTS.md", globalPath: join(home, ".codex/AGENTS.md"), format: "md-strip", writeStrategy: "merge-single", fileExtension: ".md" },
+		rules: { projectPath: "AGENTS.md", globalPath: join(home, ".codex/AGENTS.md"), format: "md-strip", writeStrategy: "merge-single", fileExtension: ".md" },
+		hooks: { projectPath: ".codex/hooks", globalPath: join(home, ".codex/hooks"), format: "direct-copy", writeStrategy: "codex-hooks", fileExtension: "" },
+		settingsJsonPath: { projectPath: ".codex/hooks.json", globalPath: join(home, ".codex/hooks.json") },
+		detect: async () =>
+			hasBinaryInPath("codex") ||
+			hasAnyInstallSignal([
+				join(cwd, ".codex/config.toml"), join(cwd, ".codex/agents"), join(cwd, ".codex/prompts"),
+				join(cwd, ".codex/hooks.json"), join(home, ".codex/config.toml"), join(home, ".codex/agents"),
+				join(home, ".codex/AGENTS.md"), join(home, ".codex/instructions.md"),
+				join(home, ".codex/prompts"), join(home, ".codex/hooks.json"),
+			]),
+	},
+	droid: {
+		name: "droid",
+		displayName: "Droid",
+		subagents: "full",
+		agents: { projectPath: ".factory/droids", globalPath: join(home, ".factory/droids"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		commands: { projectPath: ".factory/commands", globalPath: join(home, ".factory/commands"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		skills: { projectPath: ".factory/skills", globalPath: join(home, ".factory/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: "AGENTS.md", globalPath: join(home, ".factory/AGENTS.md"), format: "md-strip", writeStrategy: "single-file", fileExtension: ".md" },
+		rules: { projectPath: ".factory/rules", globalPath: join(home, ".factory/rules"), format: "md-strip", writeStrategy: "per-file", fileExtension: ".md" },
+		hooks: { projectPath: ".factory/hooks", globalPath: join(home, ".factory/hooks"), format: "direct-copy", writeStrategy: "per-file", fileExtension: "" },
+		settingsJsonPath: { projectPath: ".factory/settings.json", globalPath: join(home, ".factory/settings.json") },
+		detect: async () =>
+			hasBinaryInPath("droid") ||
+			hasAnyInstallSignal([
+				join(cwd, ".factory/droids"), join(cwd, ".factory/commands"), join(cwd, ".factory/skills"),
+				join(cwd, ".factory/rules"), join(cwd, ".factory/hooks"), join(cwd, ".factory/settings.json"),
+				join(home, ".factory/droids"), join(home, ".factory/commands"), join(home, ".factory/skills"),
+				join(home, ".factory/rules"), join(home, ".factory/hooks"), join(home, ".factory/AGENTS.md"),
+				join(home, ".factory/settings.json"),
+			]),
+	},
+	cursor: {
+		name: "cursor",
+		displayName: "Cursor",
+		subagents: "full",
+		agents: { projectPath: ".cursor/rules", globalPath: join(home, ".cursor/rules"), format: "fm-to-fm", writeStrategy: "per-file", fileExtension: ".mdc" },
+		commands: null,
+		skills: { projectPath: ".agents/skills", globalPath: join(home, ".cursor/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: ".cursor/rules/project-config.mdc", globalPath: join(home, ".cursor/rules/project-config.mdc"), format: "md-to-mdc", writeStrategy: "single-file", fileExtension: ".mdc" },
+		rules: { projectPath: ".cursor/rules", globalPath: join(home, ".cursor/rules"), format: "md-to-mdc", writeStrategy: "per-file", fileExtension: ".mdc" },
+		hooks: null,
+		settingsJsonPath: null,
+		// Cursor v2.2+ moves toward .cursor/rules/<name>/RULE.md folder format. Per-file .mdc still works as of 2026-04. Track via drift detection.
+		detect: async () =>
+			hasBinaryInPath("cursor") ||
+			hasAnyInstallSignal([join(cwd, ".cursor/rules"), join(home, ".cursor/rules"), join(home, ".cursor/skills")]),
+	},
+	roo: {
+		name: "roo",
+		displayName: "Roo Code",
+		subagents: "full",
+		agents: { projectPath: ".roomodes", globalPath: join(home, ".roo/custom_modes.yaml"), format: "fm-to-yaml", writeStrategy: "yaml-merge", fileExtension: ".yaml" },
+		commands: null,
+		skills: { projectPath: ".roo/skills", globalPath: join(home, ".roo/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: ".roo/rules/project-config.md", globalPath: join(home, ".roo/rules/project-config.md"), format: "md-strip", writeStrategy: "single-file", fileExtension: ".md" },
+		rules: { projectPath: ".roo/rules", globalPath: join(home, ".roo/rules"), format: "md-strip", writeStrategy: "per-file", fileExtension: ".md" },
+		hooks: null,
+		settingsJsonPath: null,
+		detect: async () =>
+			hasAnyInstallSignal([
+				join(cwd, ".roomodes"), join(cwd, ".roo/rules"), join(cwd, ".roo/skills"),
+				join(home, ".roo/custom_modes.yaml"), join(home, ".roo/rules"), join(home, ".roo/skills"),
+			]),
+	},
+	kilo: {
+		name: "kilo",
+		displayName: "Kilo Code",
+		subagents: "full",
+		agents: { projectPath: ".kilocodemodes", globalPath: join(home, ".kilocode/custom_modes.yaml"), format: "fm-to-yaml", writeStrategy: "yaml-merge", fileExtension: ".yaml" },
+		commands: null,
+		skills: { projectPath: ".kilocode/skills", globalPath: join(home, ".kilocode/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: ".kilocode/rules/project-config.md", globalPath: join(home, ".kilocode/rules/project-config.md"), format: "md-strip", writeStrategy: "single-file", fileExtension: ".md" },
+		rules: { projectPath: ".kilocode/rules", globalPath: join(home, ".kilocode/rules"), format: "md-strip", writeStrategy: "per-file", fileExtension: ".md" },
+		hooks: null,
+		settingsJsonPath: null,
+		detect: async () =>
+			hasAnyInstallSignal([
+				join(cwd, ".kilocodemodes"), join(cwd, ".kilocode/rules"), join(cwd, ".kilocode/skills"),
+				join(home, ".kilocode/custom_modes.yaml"), join(home, ".kilocode/rules"), join(home, ".kilocode/skills"),
+			]),
+	},
+	kiro: {
+		name: "kiro",
+		displayName: "Kiro IDE",
+		subagents: "none",
+		agents: { projectPath: ".kiro/steering", globalPath: null, format: "md-to-kiro-steering", writeStrategy: "per-file", fileExtension: ".md" },
+		commands: null,
+		skills: { projectPath: ".kiro/skills", globalPath: null, format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: ".kiro/steering/project.md", globalPath: null, format: "md-to-kiro-steering", writeStrategy: "single-file", fileExtension: ".md" },
+		rules: { projectPath: ".kiro/steering", globalPath: null, format: "md-to-kiro-steering", writeStrategy: "per-file", fileExtension: ".md" },
+		hooks: null,
+		settingsJsonPath: null,
+		detect: async () =>
+			hasAnyInstallSignal([
+				join(cwd, ".kiro/steering"), join(cwd, ".kiro/skills"), join(cwd, ".kiro/hooks"),
+				join(cwd, ".kiro/agents"), join(cwd, ".kiro/settings/mcp.json"),
+			]),
+	},
+	windsurf: {
+		name: "windsurf",
+		displayName: "Windsurf",
+		subagents: "none",
+		agents: { projectPath: ".windsurf/rules", globalPath: join(home, ".codeium/windsurf/rules"), format: "fm-strip", writeStrategy: "per-file", fileExtension: ".md", charLimit: 12000 },
+		commands: { projectPath: ".windsurf/workflows", globalPath: join(home, ".codeium/windsurf/workflows"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md", nestedCommands: false },
+		skills: { projectPath: ".agents/skills", globalPath: join(home, ".agents/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: ".windsurf/rules/rules.md", globalPath: join(home, ".codeium/windsurf/rules/rules.md"), format: "md-strip", writeStrategy: "single-file", fileExtension: ".md", charLimit: 6000 },
+		rules: { projectPath: ".windsurf/rules", globalPath: join(home, ".codeium/windsurf/rules"), format: "md-strip", writeStrategy: "per-file", fileExtension: ".md", charLimit: 6000, totalCharLimit: 12000 },
+		hooks: null,
+		settingsJsonPath: null,
+		detect: async () =>
+			hasBinaryInPath("windsurf") ||
+			hasAnyInstallSignal([
+				join(cwd, ".windsurf/rules"), join(cwd, ".windsurf/workflows"),
+				join(home, ".codeium/windsurf/rules"), join(home, ".codeium/windsurf/workflows"),
+			]),
+	},
+	goose: {
+		name: "goose",
+		displayName: "Goose",
+		subagents: "full",
+		agents: { projectPath: "AGENTS.md", globalPath: null, format: "fm-strip", writeStrategy: "merge-single", fileExtension: ".md" },
+		commands: null,
+		skills: { projectPath: ".goose/skills", globalPath: join(home, ".config/goose/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: ".goosehints", globalPath: join(home, ".config/goose/.goosehints"), format: "md-strip", writeStrategy: "merge-single", fileExtension: "" },
+		rules: { projectPath: ".goosehints", globalPath: join(home, ".config/goose/.goosehints"), format: "md-strip", writeStrategy: "merge-single", fileExtension: "" },
+		hooks: null,
+		settingsJsonPath: null,
+		detect: async () =>
+			hasBinaryInPath("goose") ||
+			hasAnyInstallSignal([
+				join(cwd, ".goosehints"), join(cwd, ".goose/skills"),
+				join(home, ".config/goose/.goosehints"), join(home, ".config/goose/skills"),
+			]),
+	},
+	"gemini-cli": {
+		name: "gemini-cli",
+		displayName: "Gemini CLI",
+		subagents: "planned",
+		agents: { projectPath: "AGENTS.md", globalPath: join(home, ".gemini/GEMINI.md"), format: "fm-strip", writeStrategy: "merge-single", fileExtension: ".md" },
+		commands: { projectPath: ".gemini/commands", globalPath: join(home, ".gemini/commands"), format: "md-to-toml", writeStrategy: "per-file", fileExtension: ".toml" },
+		skills: { projectPath: ".agents/skills", globalPath: join(home, ".agents/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: "GEMINI.md", globalPath: join(home, ".gemini/GEMINI.md"), format: "md-strip", writeStrategy: "merge-single", fileExtension: ".md" },
+		rules: { projectPath: "GEMINI.md", globalPath: join(home, ".gemini/GEMINI.md"), format: "md-strip", writeStrategy: "merge-single", fileExtension: ".md" },
+		hooks: { projectPath: ".gemini/hooks", globalPath: join(home, ".gemini/hooks"), format: "direct-copy", writeStrategy: "per-file", fileExtension: "" },
+		settingsJsonPath: { projectPath: ".gemini/settings.json", globalPath: join(home, ".gemini/settings.json") },
+		detect: async () =>
+			hasBinaryInPath("gemini") ||
+			hasAnyInstallSignal([
+				join(cwd, ".gemini/commands"), join(cwd, "GEMINI.md"),
+				join(home, ".gemini/commands"), join(home, ".gemini/GEMINI.md"),
+			]),
+	},
+	amp: {
+		name: "amp",
+		displayName: "Amp",
+		subagents: "full",
+		agents: { projectPath: "AGENT.md", globalPath: join(home, ".config/AGENT.md"), format: "fm-strip", writeStrategy: "merge-single", fileExtension: ".md" },
+		commands: null,
+		skills: { projectPath: ".agents/skills", globalPath: join(home, ".config/agents/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: "AGENT.md", globalPath: join(home, ".config/AGENT.md"), format: "md-strip", writeStrategy: "merge-single", fileExtension: ".md" },
+		rules: { projectPath: ".amp/rules", globalPath: join(home, ".config/amp/rules"), format: "md-strip", writeStrategy: "per-file", fileExtension: ".md" },
+		hooks: null,
+		settingsJsonPath: null,
+		detect: async () =>
+			hasBinaryInPath("amp") ||
+			hasAnyInstallSignal([
+				join(cwd, ".amp/rules"), join(cwd, "AGENT.md"),
+				join(home, ".config/amp/rules"), join(home, ".config/AGENT.md"),
+			]),
+	},
+	antigravity: {
+		name: "antigravity",
+		displayName: "Antigravity",
+		subagents: "full",
+		agents: null,
+		commands: { projectPath: ".agent/workflows", globalPath: null, format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md", nestedCommands: false },
+		skills: { projectPath: ".agent/skills", globalPath: join(home, ".gemini/antigravity/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: "GEMINI.md", globalPath: join(home, ".gemini/GEMINI.md"), format: "md-strip", writeStrategy: "single-file", fileExtension: ".md" },
+		rules: { projectPath: ".agent/rules", globalPath: null, format: "md-strip", writeStrategy: "per-file", fileExtension: ".md" },
+		hooks: null,
+		settingsJsonPath: null,
+		detect: async () =>
+			hasBinaryInPath("agy") ||
+			hasBinaryInPath("antigravity") ||
+			hasAnyInstallSignal([
+				join(cwd, ".agent/rules"), join(cwd, ".agent/skills"), join(cwd, ".agent/workflows"),
+				join(cwd, "GEMINI.md"), join(home, ".gemini/antigravity"), join(home, ".gemini/antigravity/skills"),
+			]),
+	},
+	cline: {
+		name: "cline",
+		displayName: "Cline",
+		subagents: "full",
+		agents: { projectPath: ".clinerules", globalPath: null, format: "fm-strip", writeStrategy: "per-file", fileExtension: ".md" },
+		commands: null,
+		skills: { projectPath: ".cline/skills", globalPath: join(home, ".cline/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: ".clinerules/project-config.md", globalPath: null, format: "md-strip", writeStrategy: "single-file", fileExtension: ".md" },
+		rules: { projectPath: ".clinerules", globalPath: null, format: "md-strip", writeStrategy: "per-file", fileExtension: ".md" },
+		hooks: null,
+		settingsJsonPath: null,
+		detect: async () =>
+			hasAnyInstallSignal([join(cwd, ".clinerules"), join(cwd, ".cline/skills"), join(home, ".cline/skills")]),
+	},
+	openhands: {
+		name: "openhands",
+		displayName: "OpenHands",
+		subagents: "full",
+		agents: { projectPath: ".openhands/skills", globalPath: join(home, ".openhands/skills"), format: "skill-md", writeStrategy: "per-file", fileExtension: ".md" },
+		commands: null,
+		skills: { projectPath: ".openhands/skills", globalPath: join(home, ".openhands/skills"), format: "direct-copy", writeStrategy: "per-file", fileExtension: ".md" },
+		config: { projectPath: ".openhands/instructions.md", globalPath: join(home, ".openhands/instructions.md"), format: "md-strip", writeStrategy: "single-file", fileExtension: ".md" },
+		rules: { projectPath: ".openhands/rules", globalPath: join(home, ".openhands/rules"), format: "md-strip", writeStrategy: "per-file", fileExtension: ".md" },
+		hooks: null,
+		settingsJsonPath: null,
+		detect: async () =>
+			hasAnyInstallSignal([
+				join(cwd, ".openhands/skills"), join(cwd, ".openhands/rules"), join(cwd, ".openhands/instructions.md"),
+				join(home, ".openhands/skills"), join(home, ".openhands/rules"), join(home, ".openhands/instructions.md"),
+			]),
+	},
+};

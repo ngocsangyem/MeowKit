@@ -174,6 +174,7 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'Overview', link: '/cli/' },
             { text: 'Commands', link: '/cli/commands' },
+            { text: 'CLI Usage — Migration', link: '/cli/cli-usage' },
             { text: 'Task Commands', link: '/cli/task-commands' },
           ],
         },
