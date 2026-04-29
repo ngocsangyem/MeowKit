@@ -42,7 +42,7 @@ Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 | Core agents                            | 17       | `ls .claude/agents/*.md` excl. index       | Matches `CLAUDE.md` Agents table. `project-manager`                                                                              |
 | AGENTS_INDEX rows                      | 17       | `AGENTS_INDEX.md` active table             | Footer "13 agents" phrasing is stale (CF-M34)                                                                                    |
 | Hook events (settings.json)            | 7        | `settings.json` hooks keys                 | SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit, SubagentStart, SubagentStop                                       |
-| Node handlers on disk                  | 12       | `ls .claude/hooks/handlers/*.cjs`          | **DRIFT**: HOOKS_INDEX footer says 8; disk has 12 (CF-M2)                                                                        |
+| Node handlers on disk                  | 8        | `ls .claude/hooks/handlers/*.cjs`          | Re-verified 2026-04-29 — disk has 8, matches HOOKS_INDEX. CF-M2 closed (audit cited stale 12).                                  |
 | Node handlers documented (HOOKS_INDEX) | 5 active | `HOOKS_INDEX.md:39` footer                 | memory-filter, memory-parser, memory-injector, memory-loader deleted (v2.4.0); immediate-capture-handler retained (CF-M1 closed) |
 | Slash commands                         | 21       | `ls .claude/commands/meow/*.md`            | `status.md` added 260422 alongside project-manager agent                                                                         |
 | Rules files                            | 17       | `ls .claude/rules/*.md` excl. RULES_INDEX  | RULES_INDEX table lists 17 rows — matches disk                                                                                   |
@@ -393,22 +393,24 @@ Source for all: `audit-rubric-final.md` Section A; `meow:skill-creator/SKILL.md`
 | CF-C1 | `meow:debug/SKILL.md:1-4`                      | Deprecated skill missing `deprecated: true` + `superseded_by:` YAML — parsers miss it                                          | CLOSED (skill removed v2.4.4) |
 | CF-C2 | `meow:shipping/SKILL.md:1-4`                   | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
 | CF-C3 | `meow:documentation/SKILL.md:1-4`              | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
-| CF-C4 | `meow:multimodal/SKILL.md:45`                  | `.claude/skills/.venv/bin/python3` ABSENT — all Python scripts fail; blocks meow:llms, meow:web-to-markdown, meow:plan-creator | OPEN                          |
-| CF-C5 | `plan-creator/step-02-codebase-analysis.md:21` | `docs/project-context.md` missing; project-context-loader.sh loads nothing at SessionStart                                     | OPEN                          |
-| CF-C6 | `meow:cook/SKILL.md:159`                       | Bare `memory/lessons.md` path (missing `.claude/` prefix); cook Phase 0 memory read silently fails in non-root-cwd             | OPEN                          |
+| CF-C4 | `meow:multimodal/SKILL.md:45`                  | `.claude/skills/.venv/bin/python3` ABSENT — all Python scripts fail; blocks meow:llms, meow:web-to-markdown, meow:plan-creator | OPEN (re-verified 2026-04-29; loader warns; covered by `mewkit setup venv`) |
+| CF-C5 | `plan-creator/step-02-codebase-analysis.md:21` | `docs/project-context.md` missing; project-context-loader.sh nudges agent but no setup-time auto-prompt                        | PARTIAL → CLOSED 2026-04-29 (mewkit setup `project-context` step added; warns user to invoke `/meow:project-context` on first session) |
+| CF-C6 | `meow:cook/SKILL.md:159`                       | Audit cited bare `memory/lessons.md` path. Re-verification 2026-04-29: line 159 is `## Gotchas`, line 170 has correct `.claude/memory/fixes.md` prefix | CLOSED 2026-04-29 (re-verified — already correct in current tree) |
 
-### High-Impact High Findings (selected — 18 total active)
+### High-Impact High Findings (re-verified 2026-04-29)
 
-| ID     | File:Line                            | Issue                                                                        |
-| ------ | ------------------------------------ | ---------------------------------------------------------------------------- |
-| CF-H7  | `meow:lazy-agent-loader/SKILL.md:13` | Agent index hardcodes 15; evaluator unreachable via lazy-loader              |
-| CF-H11 | `commands/meow/meow.md:20`           | `/meow:command` routed but `meow:command` not in inventory (phantom)         |
-| CF-H12 | `commands/meow/meow.md:20,40`        | `meow:plan`, `meow:arch`, `meow:design`, `meow:test` phantom routing targets |
-| CF-H13 | `commands/meow/plan.md`              | `meow:plan` phantom — correct name is `meow:plan-creator`                    |
-| CF-H14 | `commands/meow/validate.md`          | `meow:audit`, `meow:validate` — neither in inventory                         |
-| CF-H15 | `commands/meow/summary.md`           | `meow:summary` phantom target                                                |
+| ID     | File:Line                            | Issue                                                                        | Status |
+| ------ | ------------------------------------ | ---------------------------------------------------------------------------- | ------ |
+| CF-H7  | `meow:lazy-agent-loader/SKILL.md:13` | Audit cited hardcoded agent count "15" | CLOSED 2026-04-29 — `grep -nE "[0-9]+ agent"` returns nothing; no hardcoded count exists in current tree |
+| CF-H11 | `commands/meow/meow.md:20`           | `/meow:command` routed but `meow:command` not in inventory (phantom)         | CLOSED 2026-04-29 — refs resolve via `commands/meow/<name>.md` per `MC` "Commands vs Skills" rule (post-dated audit) |
+| CF-H12 | `commands/meow/meow.md:20,40`        | `meow:plan/arch/design/test` phantom routing targets | CLOSED 2026-04-29 — all 4 resolve via `commands/meow/<name>.md` |
+| CF-H13 | `commands/meow/plan.md`              | `meow:plan` phantom                                                          | CLOSED 2026-04-29 — `commands/meow/plan.md` exists |
+| CF-H14 | `commands/meow/validate.md`          | `meow:audit`, `meow:validate` phantom                                        | CLOSED 2026-04-29 — both resolve in `commands/meow/` |
+| CF-H15 | `commands/meow/summary.md`           | `meow:summary` phantom                                                       | CLOSED 2026-04-29 — `commands/meow/summary.md` exists |
 
-**Total active:** 6 CRITICAL, 18 HIGH, 34 MEDIUM, 6 LOW = **64 findings**.
+**Re-verification finding (CF-H11–H15):** the audit pre-dated `meowkit/CLAUDE.md` "Commands vs Skills" section, which formalizes that a command without a matching skill is NOT phantom (per audit-rubric RF-14). All 7 cited refs resolve to a command file. **A future Phase 2 cross-ref CI script will guard against regressions.**
+
+**Total post-re-verify (2026-04-29):** 1 CRITICAL OPEN (CF-C4), 0 HIGH OPEN (5 closed). Re-baseline of MEDIUM/LOW deferred to next audit pass.
 
 ### Simulation Verdicts (6 scenarios, 2026-04-18)
 

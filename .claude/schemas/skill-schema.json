@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "title": "MeowKit SKILL.md frontmatter",
+  "description": "Permissive baseline schema. Calibrate against existing skills before tightening. Fields documented in meowkit/CLAUDE.md plus those observed in actual SKILL.md frontmatter.",
+  "type": "object",
+  "required": ["name", "description"],
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^meow:[a-z][a-z0-9-]*$",
+      "maxLength": 64,
+      "description": "Required. Must use meow: prefix and lowercase-kebab. Per Anthropic spec ≤64 chars."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 1024,
+      "description": "Required. Trigger description for the model. ≤1024 chars per Anthropic spec."
+    },
+    "version": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" }
+      ],
+      "description": "Optional. SemVer string preferred (e.g. '1.0.0') but number values (e.g. 2.0) tolerated for legacy skills."
+    },
+    "source": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ],
+      "description": "Optional. Free-form provenance marker; observed values include 'meowkit', 'new', 'claudekit-engineer', 'agent-skills', 'gstack', 'aura-frog', 'antigravity-kit', 'microsoft/playwright', etc. Calibrated permissive 2026-04-29 — tighten later if a controlled vocabulary is established."
+    },
+    "argument-hint": {
+      "type": "string",
+      "description": "Optional. CLI-style usage hint shown to humans."
+    },
+    "allowed-tools": {
+      "oneOf": [
+        { "type": "array", "items": { "type": "string" } },
+        { "type": "string", "description": "Comma-separated tool list (legacy claudekit-engineer style)" }
+      ],
+      "description": "Optional. Tools available to this skill. Array form preferred; comma-separated string accepted for backward compatibility."
+    },
+    "triggers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional. Phrase triggers for skill activation."
+    },
+    "actions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional. Sub-action names this skill exposes."
+    },
+    "preamble-tier": {
+      "type": "integer",
+      "enum": [1, 2, 3],
+      "description": "Optional. Context-injection priority. 3 = high (preamble loaded first)."
+    },
+    "user-invocable": {
+      "type": "boolean",
+      "description": "Optional. false = internal sub-skill not user-invokable."
+    },
+    "phase": {
+      "oneOf": [
+        { "type": "integer", "minimum": 0, "maximum": 6 },
+        { "type": "string", "const": "on-demand" }
+      ],
+      "description": "Optional. Workflow phase anchor (0..6 or on-demand)."
+    },
+    "trust_level": {
+      "type": "string",
+      "enum": ["kit-authored", "third-party"],
+      "description": "Optional. Provenance for injection-rules.md trust boundary."
+    },
+    "injection_risk": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Optional. Advisory risk level."
+    },
+    "autoInvoke": {
+      "type": "boolean",
+      "description": "Optional. Documented in CLAUDE.md but not currently used in any SKILL.md frontmatter."
+    },
+    "subagent_type": {
+      "type": "string",
+      "description": "Optional. Observed in some agents (e.g., 'advisory'). Not formally documented."
+    }
+  }
+}

@@ -151,6 +151,11 @@
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" Stop",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/control-probe.sh\"",
+            "timeout": 3
           }
         ]
       }
@@ -178,7 +183,29 @@
       }
     ],
     "SubagentStart": [],
-    "SubagentStop": []
+    "SubagentStop": [],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/precompact-probe.sh\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/posttoolfailure-probe.sh\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
   },
   "permissions": {
     "allow": [

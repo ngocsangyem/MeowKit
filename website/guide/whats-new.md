@@ -12,6 +12,10 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.6.2 — The Telemetry & Validator Release (2026-04-29)
+
+Hook-fire telemetry helper, schema-validated skill frontmatter, cross-reference CI for `meow:*` references, and a re-baselined critical-findings audit. Probes for `PreCompact` and `PostToolUseFailure` ship immediately so future feature decisions consult `hook-log.jsonl` evidence instead of speculation. CI now blocks phantom skill references and unregistered hooks. `mewkit setup` gains a `project-context` step that nudges users to invoke `/meow:project-context` on first session.
+
 ### v2.6.1 — The project-manager Release (2026-04-22)
 
 Adds the 17th core agent `project-manager` — a cross-workflow delivery tracker that aggregates plan / test / review / cost / git state into an evidence-based status report. Ships one new slash command (`/meow:status`), one new rule (`post-phase-delegation.md`), and rule-based delegation from 5 orchestration skills. Status reports live inside each plan dir (`tasks/plans/{slug}/status-reports/`) so they travel with the plan they describe. Opt-out via `MEOWKIT_PM_AUTO=off`.

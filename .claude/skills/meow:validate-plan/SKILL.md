@@ -72,6 +72,30 @@ Does NOT replace Gate 1 (human approval). Supplements it with systematic checks.
 **Result:** [N]/8 passed | [Action: proceed / revise dimensions X,Y]
 ```
 
+## Whole-Plan Consistency Sweep (final pre-emit step)
+
+After scoring the 8 dimensions and BEFORE emitting the validation report, run a cross-file consistency check on the plan directory.
+
+**Why:** Distributed plans (`plan.md` + N × `phase-*.md`) drift after edits. One phase gets renamed; another phase still references the old name. Each phase reads as self-consistent but the plan as a whole is contradictory.
+
+**Procedure:**
+1. Re-read `plan.md` and every `phase-*.md` in the plan dir
+2. Build a delta of: renamed entities, scope changes, dropped features, decision changes
+3. Grep every plan file for stale references to renamed/dropped items
+4. Reconcile contradictions across files (not only the file that surfaced them)
+
+**Output:** Append a `sweep_failures` block to the validation report. Sweep failures DO NOT auto-FAIL — they surface inconsistencies the human must reconcile before Phase 3.
+
+```
+sweep_failures:
+  - phase-02.md:18  references `userController` (renamed to `authController` in plan.md:42)
+  - phase-04.md:8   declares scope item that plan.md:62 marks out-of-scope
+```
+
+**Skip conditions:** plan has only `plan.md` (no phase files); plan dir not found.
+
+**Source:** Adapted from claudekit-engineer v2.17 `verification-roles.md` "Whole-Plan Consistency Sweep" section.
+
 ## Integration with Cook Workflow
 
 In `/meow:cook`, validation runs automatically for COMPLEX tasks:

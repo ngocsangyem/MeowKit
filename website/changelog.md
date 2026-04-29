@@ -16,6 +16,44 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.6.2 (2026-04-29) — The Telemetry & Validator Release
+
+### Highlights
+
+Hook telemetry, schema-validated skill frontmatter, cross-reference CI, and a re-baselined critical-findings audit. Every probe is data-driven — Phase 3 advanced enhancements stay deferred until the new `hook-log.jsonl` shows real demand. CI now blocks merges that introduce phantom `meow:*` references or unregistered hooks.
+
+### CLI
+
+- `mewkit setup` gains a `project-context` step that warns when `docs/project-context.md` is absent and tells the user which `/meow:project-context` action to run.
+
+### Features
+
+- New scripts under `scripts/` — `check-skill-cross-refs.sh`, `check-hook-registration.sh`, `validate-skill-frontmatter.py`, and `telemetry-decisions.py`. All four wire into CI; the telemetry tool runs on demand and emits per-item ship/reject verdicts from log data.
+- New JSON Schema at `.claude/schemas/skill-schema.json` — permissive baseline calibrated against all 77 current skills. Validates frontmatter on every PR.
+- New hook helper `lib/hook-logger.sh` — append-only JSONL telemetry at `.claude/hooks/.logs/hook-log.jsonl` with 50MB rotation (rotated logs stay plain text, no gzip, so telemetry analysis stays cheap).
+- Probe hooks for `PreCompact` and `PostToolUseFailure`, plus a `Stop`-event control probe that disambiguates "event unsupported" from "logger broken." Activated immediately; data accumulates in the background.
+- New canonical hook regression test at `.claude/hooks/__tests__/advisory-boundary.test.cjs` runs via `node --test` and locks `@@GATE_BLOCK@@` and `@@PRIVACY_BLOCK@@` sentinel output.
+- `meow:review` workflow gains step `step-03b-whole-plan-sweep.md` between triage and verdict — re-reads `plan.md` plus phase files, surfaces cross-file drift, never auto-FAILs.
+- `meow:validate-plan` gains a Whole-Plan Consistency Sweep section that emits a `sweep_failures` block alongside the 8-dimension verdict.
+
+### Improvements
+
+- `.github/workflows/ci.yml` now runs all four validators and the hook regression test on every PR, in the existing `validate` job. No new workflow file.
+- `meowkit-architecture.md` §10 critical-findings table re-baselined — four of six findings the prior audit listed as OPEN were already CLOSED in the current tree. Component inventory updated to reflect the 8 actual handlers (prior table claimed 12).
+- Probe hooks ship behind the existing telemetry path so future advanced-feature decisions consult `hook-log.jsonl` evidence instead of speculation.
+
+### Bug Fixes
+
+- Audit doc claimed `meow:cook/SKILL.md:159` had a bare `memory/` path — verified-incorrect. Line 170 already used the correct `.claude/memory/` prefix. Stale finding closed.
+- Audit doc claimed `meow:lazy-agent-loader/SKILL.md:13` hardcoded an agent count of 15 — no hardcoded count exists in the current tree. Stale finding closed.
+- Audit doc claimed seven `meow:*` command refs in `commands/meow/` were phantom — all seven resolve to a real command file under the post-audit "Commands vs Skills" rule. Stale finding closed.
+
+### Migration Notes
+
+- After `npx mewkit upgrade`, run the new validators locally to catch any drift introduced before the upgrade — `bash scripts/check-skill-cross-refs.sh && .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py`.
+
+---
+
 ## 2.6.1 (2026-04-22) — The project-manager Release
 
 ### Highlights

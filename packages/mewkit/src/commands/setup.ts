@@ -241,7 +241,7 @@ export async function promptAndInstallSystemDeps(projectDir?: string): Promise<v
 
 // --- Standard setup steps ---
 
-type StepName = "venv" | "deps" | "mcp" | "env" | "gitignore";
+type StepName = "venv" | "deps" | "mcp" | "env" | "gitignore" | "project-context";
 
 interface StepResult {
 	name: StepName;
@@ -394,12 +394,37 @@ async function setupDeps(projectDir: string): Promise<StepResult> {
 	return { name: "deps", status: "fail", message: `All ${failed.length} package(s) failed` };
 }
 
+/**
+ * Notify if docs/project-context.md is missing. The actual generator lives in the
+ * meow:project-context skill (invoked via /meow:project-context generate|init).
+ * This step does not auto-invoke the skill — agents are not callable from this CLI —
+ * but flags the absence so users know to run the skill on first session.
+ */
+function setupProjectContext(projectDir: string): StepResult {
+	const target = join(projectDir, "docs", "project-context.md");
+	if (existsSync(target)) {
+		return { name: "project-context", status: "skip", message: "docs/project-context.md already exists" };
+	}
+	const hasCodebase =
+		existsSync(join(projectDir, "package.json")) ||
+		existsSync(join(projectDir, "pyproject.toml")) ||
+		existsSync(join(projectDir, "Cargo.toml")) ||
+		existsSync(join(projectDir, "go.mod"));
+	const action = hasCodebase ? "generate" : "init";
+	return {
+		name: "project-context",
+		status: "warn",
+		message: `Run \`/meow:project-context ${action}\` in your first session to create docs/project-context.md`,
+	};
+}
+
 const STEPS: Record<StepName, (dir: string) => StepResult | Promise<StepResult>> = {
 	venv: setupVenv,
 	deps: setupDeps,
 	mcp: setupMcp,
 	env: setupEnv,
 	gitignore: setupGitignore,
+	"project-context": setupProjectContext,
 };
 
 /** Run setup steps. --only=<step> runs a single step. --system-deps installs system deps. */

@@ -27,3 +27,20 @@ jobs:
 
       - name: Test
         run: npm test
+
+      - name: Setup Python venv
+        run: |
+          python3 -m venv .claude/skills/.venv
+          .claude/skills/.venv/bin/pip install --quiet pyyaml jsonschema
+
+      - name: Validate skill cross-refs
+        run: bash scripts/check-skill-cross-refs.sh
+
+      - name: Validate hook registration
+        run: bash scripts/check-hook-registration.sh
+
+      - name: Validate skill frontmatter
+        run: .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py
+
+      - name: Hook regression tests
+        run: node --test ".claude/hooks/__tests__/*.test.cjs"
