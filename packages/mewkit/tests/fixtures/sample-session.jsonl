@@ -1,0 +1,20 @@
+{"type":"user","sessionId":"test-sess","uuid":"u1","message":{"role":"user","content":"build me a feature"}}
+{"type":"ai-title","sessionId":"test-sess","uuid":"t1","title":"some title"}
+{"type":"system","sessionId":"test-sess","uuid":"s1","content":"system note"}
+{"type":"assistant","sessionId":"test-sess","uuid":"a1","message":{"role":"assistant","model":"claude-opus-4-7","content":[{"type":"text","text":"I will help."},{"type":"tool_use","id":"tu1","name":"Read","input":{"file_path":"src/foo.ts"}}]}}
+{"type":"user","sessionId":"test-sess","uuid":"u2","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"tu1","content":"file contents here"}]}}
+{"type":"assistant","sessionId":"test-sess","uuid":"a2","message":{"role":"assistant","content":[{"type":"thinking","thinking":"Let me think carefully."},{"type":"tool_use","id":"tu2","name":"Bash","input":{"command":"ls -la"}}]}}
+{"type":"user","sessionId":"test-sess","uuid":"u3","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"tu2","content":"file1\nfile2"}]}}
+{"type":"assistant","sessionId":"test-sess","uuid":"a3","message":{"role":"assistant","content":[{"type":"thinking","thinking":"","signature":"sig-abc-123"},{"type":"tool_use","id":"tu3","name":"Edit","input":{"file_path":"src/foo.ts","old_string":"old","new_string":"new"}}]}}
+{"type":"user","sessionId":"test-sess","uuid":"u4","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"tu3","content":"edited ok"}]}}
+{"type":"assistant","sessionId":"test-sess","uuid":"a4","message":{"role":"assistant","content":[{"type":"tool_use","id":"tu4","name":"Agent","input":{"description":"sub-task","subagent_type":"developer"}}]}}
+{"type":"user","sessionId":"test-sess","uuid":"u5","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"tu4","content":"sub-task done"}]}}
+{"type":"user","sessionId":"test-sess","uuid":"u-side","isSidechain":true,"message":{"role":"user","content":"side branch — should be skipped"}}
+{"type":"user","sessionId":"test-sess","uuid":"u-sys","message":{"role":"user","content":"This session is being continued from a previous conversation."}}
+{"type":"attachment","sessionId":"test-sess","uuid":"att1","content":"some attachment"}
+{"type":"last-prompt","sessionId":"test-sess","uuid":"lp1"}
+{"type":"permission-mode","sessionId":"test-sess","uuid":"pm1","mode":"plan"}
+{"type":"queue-operation","sessionId":"test-sess","uuid":"q1"}
+{"type":"file-history-snapshot","sessionId":"test-sess","uuid":"fhs1"}
+{"type":"assistant","sessionId":"test-sess","uuid":"a5","message":{"role":"assistant","content":[{"type":"text","text":"Done."}]}}
+{"type":"user","sessionId":"test-sess","uuid":"u1","message":{"role":"user","content":"build me a feature"}}

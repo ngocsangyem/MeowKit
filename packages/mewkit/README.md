@@ -23,6 +23,7 @@ npx mewkit <command>      # Runtime commands
 | `meowkit status`    | Print version, channel, and config                                |
 | `meowkit task new`  | Create structured task file from template                         |
 | `meowkit task list` | List active tasks with status                                     |
+| `meowkit orchviz`   | Live web visualizer for the active Claude Code session            |
 
 ## Usage
 
@@ -52,6 +53,37 @@ npx mewkit budget --monthly
 npx mewkit memory --show        # Display lessons learned
 npx mewkit memory --clear       # Reset memory
 ```
+
+## Visualizer (`meowkit orchviz`)
+
+Live web visualizer for the active Claude Code session. Tails the JSONL
+transcript at `~/.claude/projects/<encoded-cwd>/<session>.jsonl`, parses it
+into structured `AgentEvent`s, and serves them at `http://127.0.0.1:<port>/`
+as a Canvas2D + d3-force interactive graph plus a live transcript panel and
+meowkit-specific overlays (Gate state, model tier, today's tokens, phase).
+
+```bash
+# Default: random port, auto-open browser
+npx mewkit orchviz
+
+# Custom flags
+npx mewkit orchviz --port 3001       # fixed port (0 = random)
+npx mewkit orchviz --no-open         # don't auto-launch browser
+npx mewkit orchviz --session <uuid>  # pin to a single session id
+npx mewkit orchviz --workspace .     # override watched workspace (default: cwd)
+npx mewkit orchviz --verbose         # print sanitized AgentEvents to stderr
+npx mewkit orchviz --log             # persist to .claude/logs/orchviz-<sid>.md
+npx mewkit orchviz --log /tmp/run.md # custom path (must end .md)
+```
+
+**Security:** server binds 127.0.0.1 only; Host-header guarded against DNS
+rebinding; SSE frames sanitized (ANSI strip + strict-prefix secret scrub on
+`sk-…`, `ghp_…`, `AKIA…`, PEM blocks); path traversal blocked.
+
+**Limitations (v1):** simplified canvas renderer (no bloom / detail panels /
+multi-session tabs); v1.1 ports the full agent-flow visualizer. Ported (in
+part) from [`patoles/agent-flow`](https://github.com/patoles/agent-flow)
+under the Apache-2.0 license — see `NOTICE`.
 
 ## Related
 

@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+	--color-holo-base: #66ccff;
+	--color-holo-bright: #aaeeff;
+	--color-void: #050510;
+}
+
+body {
+	background: var(--color-void);
+	color: var(--color-holo-bright);
+}
+
+/* Active phase chip pulses; respect prefers-reduced-motion (red-team SCOPE_Q2). */
+@keyframes orchviz-pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.55; }
+}
+
+.phase-chip-active {
+	animation: orchviz-pulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.phase-chip-active {
+		animation: none !important;
+		outline: 1px solid currentColor;
+	}
+}
