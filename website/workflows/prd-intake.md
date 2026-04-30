@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Team leads, engineering managers, DevOps teams  
 **Time estimate:** ~2 min per ticket (automated)  
-**Skills used:** [meow:scale-routing](/reference/skills/scale-routing), [meow:scout](/reference/skills/scout), [meow:investigate](/reference/skills/investigate), [meow:decision-framework](/reference/skills/decision-framework), [meow:plan-creator](/reference/skills/plan-creator)
+**Skills used:** [mk:scale-routing](/reference/skills/scale-routing), [mk:scout](/reference/skills/scout), [mk:investigate](/reference/skills/investigate), [mk:decision-framework](/reference/skills/decision-framework), [mk:plan-creator](/reference/skills/plan-creator)
 
 ## Overview
 
@@ -38,7 +38,7 @@ Alternatively, use the [official Atlassian Rovo server](https://github.com/atlas
 claude mcp add --transport http atlassian https://mcp.atlassian.com/v1/mcp
 ```
 
-See [meow:jira prerequisites](/reference/skills/jira#prerequisites) for a detailed comparison of both servers.
+See [mk:jira prerequisites](/reference/skills/jira#prerequisites) for a detailed comparison of both servers.
 
 ::: warning MCP Server Required
 Without a Jira MCP server, MeowKit cannot read or write Jira tickets. The analysis skills work standalone (paste ticket text manually), but automated I/O requires the MCP.
@@ -71,7 +71,7 @@ areas:
     pic: ["alice", "dave"]
 ```
 
-This feeds into `meow:scale-routing` for automatic product area detection.
+This feeds into `mk:scale-routing` for automatic product area detection.
 
 ### 3. Configure Trigger
 
@@ -89,17 +89,17 @@ Jira Automation Rule:
 **Option B: Manual / On-demand**
 
 ```
-/meow:cook analyze PRD-123 using the intake workflow
+/mk:cook analyze PRD-123 using the intake workflow
 ```
 
 ## Step-by-step Guide
 
-::: tip Simplified with meow:intake (v2.0)
-MeowKit v2.0 introduced `meow:intake` which orchestrates the entire intake workflow automatically. Instead of chaining skills manually, just run:
+::: tip Simplified with mk:intake (v2.0)
+MeowKit v2.0 introduced `mk:intake` which orchestrates the entire intake workflow automatically. Instead of chaining skills manually, just run:
 ```bash
-/meow:intake
+/mk:intake
 ```
-The steps below describe what meow:intake does internally.
+The steps below describe what mk:intake does internally.
 :::
 
 ### Step 1: Fetch the ticket
@@ -113,21 +113,21 @@ Read the ticket description, acceptance criteria, and linked tickets.
 
 The [Atlassian MCP server](https://github.com/atlassian/atlassian-mcp-server) provides tools for reading issues, searching, adding comments, and transitioning status. Check the server's README for the exact tool names and parameters.
 
-### Step 1.5: Evaluate ticket complexity (meow:jira evaluate)
+### Step 1.5: Evaluate ticket complexity (mk:jira evaluate)
 
 Optionally, assess ticket complexity before proceeding with full intake:
 
 ```bash
-/meow:jira evaluate PRD-123
+/mk:jira evaluate PRD-123
 ```
 
 This produces a qualitative complexity assessment (Simple/Medium/Complex), detects missing acceptance criteria, vague language, and unlinked dependencies. The evaluation feeds into estimation and sprint planning. See the [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) workflow for details.
 
 ::: tip Evaluate vs completeness scoring
-`meow:jira evaluate` assesses **implementation complexity** for estimation. `meow:plan-creator` scope challenge assesses **structural completeness** of the ticket description. They answer different questions — use both.
+`mk:jira evaluate` assesses **implementation complexity** for estimation. `mk:plan-creator` scope challenge assesses **structural completeness** of the ticket description. They answer different questions — use both.
 :::
 
-### Step 2: Classify product area (meow:scale-routing)
+### Step 2: Classify product area (mk:scale-routing)
 
 MeowKit scans the ticket description for domain keywords and matches against `.claude/product-areas.yaml`:
 
@@ -139,7 +139,7 @@ Suggested PIC: alice, bob
 
 If multiple areas match, MeowKit reports all with confidence scores.
 
-### Step 3: Evaluate completeness (meow:plan-creator scope challenge)
+### Step 3: Evaluate completeness (mk:plan-creator scope challenge)
 
 MeowKit checks the PRD against required sections:
 
@@ -153,7 +153,7 @@ MeowKit checks the PRD against required sections:
 
 **Completeness score: 55/100**
 
-### Step 4: Scan codebase (meow:scout)
+### Step 4: Scan codebase (mk:scout)
 
 MeowKit pulls latest code and scans for relevant files:
 
@@ -170,7 +170,7 @@ Technical considerations:
   - No background refresh mechanism for idle sessions
 ```
 
-### Step 5: Root cause analysis (meow:investigate)
+### Step 5: Root cause analysis (mk:investigate)
 
 For bug tickets, MeowKit runs structured RCA:
 
@@ -244,26 +244,26 @@ If configured, MeowKit can:
 - Transition status (e.g., "New" → "In Analysis" via Atlassian MCP)
 - Link related tickets (via Atlassian MCP search + link tools)
 
-::: tip Execute with meow:jira
+::: tip Execute with mk:jira
 After reviewing intake analysis, run the suggested Jira actions directly:
 ```bash
-/meow:jira transition PRD-123 "In Analysis"
-/meow:jira link PRD-123 blocks BUG-045
-/meow:jira assign PRD-123 alice
+/mk:jira transition PRD-123 "In Analysis"
+/mk:jira link PRD-123 blocks BUG-045
+/mk:jira assign PRD-123 alice
 ```
-See [meow:jira](/reference/skills/jira) for the full operation reference.
+See [mk:jira](/reference/skills/jira) for the full operation reference.
 :::
 
 ## MeowKit Skills Used
 
 | Step                      | Skill                                                           | What It Does                                                        |
 | ------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Product area detection    | [meow:scale-routing](/reference/skills/scale-routing)           | Matches keywords against domain-complexity CSV / product-areas YAML |
-| Completeness evaluation   | [meow:plan-creator](/reference/skills/plan-creator)             | Scope challenge validates goal, criteria, constraints, scope        |
-| Codebase scanning         | [meow:scout](/reference/skills/scout)                           | Parallel file discovery + architecture fingerprint                  |
-| Root cause analysis       | [meow:investigate](/reference/skills/investigate)               | 4-phase investigation with RCA method selection (v2.0)              |
-| Structured recommendation | [meow:decision-framework](/reference/skills/decision-framework) | Classify → rules → score → escalate (v2.0)                          |
-| Technical assessment      | [meow:verify](/reference/skills/verify)                         | Build/test status of affected code (v2.0)                           |
+| Product area detection    | [mk:scale-routing](/reference/skills/scale-routing)           | Matches keywords against domain-complexity CSV / product-areas YAML |
+| Completeness evaluation   | [mk:plan-creator](/reference/skills/plan-creator)             | Scope challenge validates goal, criteria, constraints, scope        |
+| Codebase scanning         | [mk:scout](/reference/skills/scout)                           | Parallel file discovery + architecture fingerprint                  |
+| Root cause analysis       | [mk:investigate](/reference/skills/investigate)               | 4-phase investigation with RCA method selection (v2.0)              |
+| Structured recommendation | [mk:decision-framework](/reference/skills/decision-framework) | Classify → rules → score → escalate (v2.0)                          |
+| Technical assessment      | [mk:verify](/reference/skills/verify)                         | Build/test status of affected code (v2.0)                           |
 
 ## What MeowKit Does NOT Do
 
@@ -287,4 +287,4 @@ Be honest about boundaries:
 - [Adding a Feature](/workflows/add-feature) — Full implementation workflow after intake
 - [Fixing a Bug](/workflows/fix-bug) — Bug-specific investigation workflow
 - [Code Review](/workflows/code-review) — Review workflow for the fix
-- [meow:decision-framework](/reference/skills/decision-framework) — Decision architecture for triage
+- [mk:decision-framework](/reference/skills/decision-framework) — Decision architecture for triage

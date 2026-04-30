@@ -1,9 +1,9 @@
 ---
-title: "meow:testing"
+title: "mk:testing"
 description: "Testing toolkit — red-green-refactor (when --tdd enabled), validation scripts, and visual QA. TDD is opt-in."
 ---
 
-# meow:testing
+# mk:testing
 
 Testing toolkit — red-green-refactor (when `--tdd` / `MEOWKIT_TDD=1` enabled), validation scripts, and visual QA.
 

@@ -4,7 +4,7 @@ These rules govern the rubric library at `.claude/rubrics/` and the calibration 
 
 ## Rule 1: Every Rubric Must Have ≥1 PASS + ≥1 FAIL Anchor
 
-Every file in `.claude/rubrics/*.md` MUST include at least one PASS example and at least one FAIL example in its `## Few-Shot Examples` section. Enforced mechanically by `meow:rubric/scripts/validate-rubric.sh`.
+Every file in `.claude/rubrics/*.md` MUST include at least one PASS example and at least one FAIL example in its `## Few-Shot Examples` section. Enforced mechanically by `mk:rubric/scripts/validate-rubric.sh`.
 
 **WHY:** Anchor examples are the highest-leverage part of a rubric — the evaluator uses them to ground its understanding of "what PASS looks like vs FAIL looks like." A rubric with only PASS examples produces an evaluator that defaults to PASS. A rubric with only FAIL examples produces over-rejection.
 
@@ -56,7 +56,7 @@ The `originality.md` and `design-quality.md` rubrics include anti-pattern lists 
 
 ## Rule 8: Frontend-App Preset Is Pruned (4 Rubrics, Not 7)
 
-The default `frontend-app` composition preset (v2.0.0) loads only 4 rubrics: `product-depth`, `functionality`, `design-quality`, `originality`. The other 3 rubrics in the library (`code-quality`, `craft`, `ux-usability`) are opt-in only — they overlap existing meowkit layers (`meow:review` 5-dim verdict, security-rules.md, `meow:qa` health-score).
+The default `frontend-app` composition preset (v2.0.0) loads only 4 rubrics: `product-depth`, `functionality`, `design-quality`, `originality`. The other 3 rubrics in the library (`code-quality`, `craft`, `ux-usability`) are opt-in only — they overlap existing meowkit layers (`mk:review` 5-dim verdict, security-rules.md, `mk:qa` health-score).
 
 **WHY:** Loading duplicate rubrics doubles evaluator work without doubling signal. The Phase 2 necessity audit found 3 rubrics overlapped existing layers; pruning the preset honors YAGNI without losing the explicit-opt-in escape hatch.
 

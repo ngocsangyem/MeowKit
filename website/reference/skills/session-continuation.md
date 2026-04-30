@@ -1,8 +1,8 @@
 ---
-title: "meow:session-continuation"
+title: "mk:session-continuation"
 description: "Save and resume workflow state across sessions with handoff and TOON-based state persistence."
 ---
-# meow:session-continuation
+# mk:session-continuation
 Save and resume workflow state across sessions with handoff and TOON-based state persistence.
 ## What This Skill Does
 When a session approaches the context window limit (150K tokens, 75%), this skill saves the current workflow state (phase, agents, deliverables, key decisions) to a JSON file and generates a resume command. In a new session, `workflow:resume [id]` restores the full state and continues from where you left off.
@@ -28,4 +28,4 @@ workflow:list               # show all saved workflows
 - **TOON corruption on concurrent sessions**: Two agents writing state simultaneously → Use file locking or session-scoped state files
 
 ## Related
-- [`meow:workflow-orchestrator`](/reference/skills/workflow-orchestrator) — The workflow being saved/resumed
+- [`mk:workflow-orchestrator`](/reference/skills/workflow-orchestrator) — The workflow being saved/resumed

@@ -1,17 +1,17 @@
 ---
-title: "meow:sequential-thinking"
+title: "mk:sequential-thinking"
 description: "Structured step-by-step reasoning with hypothesis generation, elimination, revision, and deterministic thought tracking scripts."
 ---
 
-# meow:sequential-thinking
+# mk:sequential-thinking
 
 Structured step-by-step reasoning with hypothesis generation, elimination, revision, and deterministic thought tracking.
 
 ## What This Skill Does
 
-`meow:sequential-thinking` prevents the "guess root causes" anti-pattern. Instead of jumping to "I think it's X", it enforces evidence-based reasoning: generate hypotheses from observations, test each against evidence, eliminate until root cause is confirmed.
+`mk:sequential-thinking` prevents the "guess root causes" anti-pattern. Instead of jumping to "I think it's X", it enforces evidence-based reasoning: generate hypotheses from observations, test each against evidence, eliminate until root cause is confirmed.
 
-Called by `meow:fix` during diagnosis, but also useful standalone for complex architecture decisions or multi-step analysis.
+Called by `mk:fix` during diagnosis, but also useful standalone for complex architecture decisions or multi-step analysis.
 
 ## Core Capabilities
 
@@ -26,10 +26,10 @@ Called by `meow:fix` during diagnosis, but also useful standalone for complex ar
 
 ## When to Use This
 
-::: tip Use meow:sequential-thinking when...
+::: tip Use mk:sequential-thinking when...
 
 - Root cause isn't obvious (multiple possibilities)
-- meow:fix invokes diagnosis phase
+- mk:fix invokes diagnosis phase
 - Architecture decision with competing approaches
 - Any "I think it's X" needs evidence before acting
   :::
@@ -42,7 +42,7 @@ Called by `meow:fix` during diagnosis, but also useful standalone for complex ar
 | `format-thought.js`  | Format as box/simple/markdown/JSON                    | `node scripts/format-thought.js --thought "..." --number 1 --total 5 --format json` |
 | `test-scripts.sh`    | 13-test suite for both scripts                        | `sh scripts/test-scripts.sh`                                                        |
 
-The `--summary` flag on process-thought.js produces a context-efficient handoff for meow:fix.
+The `--summary` flag on process-thought.js produces a context-efficient handoff for mk:fix.
 
 ## References
 
@@ -68,7 +68,7 @@ Load when a specific methodology fits the investigation:
 | `kepner-tregoe.md`       | Multi-system bugs, contested root causes — IS/IS-NOT matrix (SA/PA/DA/PPA)              |
 
 ::: info Skill Details
-**Phase:** Called by meow:fix (Step 2 Diagnose). Also standalone.
+**Phase:** Called by mk:fix (Step 2 Diagnose). Also standalone.
 :::
 
 ## Gotchas
@@ -79,6 +79,6 @@ Load when a specific methodology fits the investigation:
 
 ## Related
 
-- [`meow:fix`](/reference/skills/fix) — Calls sequential-thinking during diagnosis
-- [`meow:investigate`](/reference/skills/investigate) — Collects evidence that feeds into sequential-thinking
-- [`meow:problem-solving`](/reference/skills/problem-solving) — Sister skill for "stuck on approach" (not cause)
+- [`mk:fix`](/reference/skills/fix) — Calls sequential-thinking during diagnosis
+- [`mk:investigate`](/reference/skills/investigate) — Collects evidence that feeds into sequential-thinking
+- [`mk:problem-solving`](/reference/skills/problem-solving) — Sister skill for "stuck on approach" (not cause)

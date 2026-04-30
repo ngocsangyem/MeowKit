@@ -1,8 +1,8 @@
 ---
-title: "meow:llms"
+title: "mk:llms"
 description: "Generate llms.txt files from project documentation following the llmstxt.org specification."
 ---
-# meow:llms
+# mk:llms
 Generate llms.txt files from project documentation following the llmstxt.org specification.
 ## What This Skill Does
 Generates `llms.txt` (and optionally `llms-full.txt`) files that make your project documentation discoverable by AI assistants. A Python script handles scanning, title extraction, categorization, and generation — Claude only reviews and improves the output.
@@ -14,10 +14,10 @@ Generates `llms.txt` (and optionally `llms-full.txt`) files that make your proje
 - **Full mode** — `--full` generates llms-full.txt with inline content
 ## Usage
 ```bash
-/meow:llms                                    # scan docs/ directory
-/meow:llms --full                             # also generate llms-full.txt
-/meow:llms --source ./docs --base-url https://example.com/docs
-python3 .claude/skills/meow:llms/scripts/generate-llms-txt.py --source ./docs --json  # preview
+/mk:llms                                    # scan docs/ directory
+/mk:llms --full                             # also generate llms-full.txt
+/mk:llms --source ./docs --base-url https://example.com/docs
+python3 .claude/skills/llms/scripts/generate-llms-txt.py --source ./docs --json  # preview
 ```
 ::: info Skill Details
 **Phase:** 6  
@@ -25,4 +25,4 @@ python3 .claude/skills/meow:llms/scripts/generate-llms-txt.py --source ./docs --
 :::
 
 ## Related
-- [`meow:docs-finder`](/reference/skills/docs-finder) — Consumes llms.txt (inverse operation)
+- [`mk:docs-finder`](/reference/skills/docs-finder) — Consumes llms.txt (inverse operation)

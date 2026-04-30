@@ -9,7 +9,7 @@ Living documentation agent that keeps project docs in sync with the codebase and
 
 ## Overview
 
-The documenter runs in Phase 6 (Reflect) after shipping. It scans the git diff, identifies which docs are affected by the changes, updates them, and generates changelog entries from conventional commits. It uses `meow:docs-sync` for diff-aware updates and `meow:docs-init` for new project skeleton generation. It exclusively owns `docs/` except `docs/architecture/` (architect) and `docs/journal/` (journal-writer).
+The documenter runs in Phase 6 (Reflect) after shipping. It scans the git diff, identifies which docs are affected by the changes, updates them, and generates changelog entries from conventional commits. It uses `mk:docs-sync` for diff-aware updates and `mk:docs-init` for new project skeleton generation. It exclusively owns `docs/` except `docs/architecture/` (architect) and `docs/journal/` (journal-writer).
 
 ## Quick Reference
 
@@ -26,8 +26,8 @@ The documenter runs in Phase 6 (Reflect) after shipping. It scans the git diff, 
 ## How to Use
 
 ```bash
-/meow:docs-sync   # update docs based on recent changes
-/meow:docs-init   # generate initial doc skeleton for new project
+/mk:docs-sync   # update docs based on recent changes
+/mk:docs-init   # generate initial doc skeleton for new project
 ```
 
 ## Under the Hood

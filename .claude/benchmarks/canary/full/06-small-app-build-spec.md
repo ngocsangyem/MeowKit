@@ -8,9 +8,9 @@ rubric_preset: fullstack-product
 
 # Task: Build a Mini "Notes" App End-to-End
 
-**`--full` tier ONLY.** This task triggers `meow:harness` for a complete green-field build and can run for 60–90 minutes. Refuses to run without the explicit `--full` flag.
+**`--full` tier ONLY.** This task triggers `mk:harness` for a complete green-field build and can run for 60–90 minutes. Refuses to run without the explicit `--full` flag.
 
-## Product Spec (input to `meow:plan-creator --product-level`)
+## Product Spec (input to `mk:plan-creator --product-level`)
 
 Build a single-user web app called **Quill** for taking quick text notes.
 
@@ -48,6 +48,6 @@ Build a single-user web app called **Quill** for taking quick text notes.
 
 This is the heavy canary. It exercises the full pipeline: planner → contract → generator → evaluator → ship. If this fails, the whole harness has a regression.
 
-**Cost guard:** the script halts and emits a warning if projected cost exceeds $25 partway through. Hard cap at $30 (set by `meow:benchmark` SKILL.md).
+**Cost guard:** the script halts and emits a warning if projected cost exceeds $25 partway through. Hard cap at $30 (set by `mk:benchmark` SKILL.md).
 
 **Auto-suggested when:** running the dead-weight audit (real-build context required), or when verifying a major harness change end-to-end.

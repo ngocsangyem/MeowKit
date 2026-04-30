@@ -51,7 +51,7 @@ No step can be skipped. Two hard gates (plan approval + review approval) require
 ```
 .claude/
 ├── agents/          14 specialist agents
-├── skills/          49 skills with meow: namespace (step-file decomposition for complex skills)
+├── skills/          49 skills with mk: namespace (step-file decomposition for complex skills)
 ├── hooks/           Lifecycle hooks (security scan, TDD gate)
 ├── rules/           14 enforcement rules (security, injection, TDD, parallel execution)
 ├── scripts/         6 Python validators (stdlib only)

@@ -1,13 +1,13 @@
 # Skill Authoring Rules
 
-These rules govern how new and existing `meow:*` skills are authored, audited, and persisted.
+These rules govern how new and existing `mk:*` skills are authored, audited, and persisted.
 Source: consolidated from Anthropic *Skill Authoring Best Practices* + *Lessons from Building Claude Code* (see `docs/skill-authoring-guidelines.md`).
 
 ## Rule 1: Every Skill MUST Include a Gotchas Section
 
 Every `SKILL.md` MUST include a `## Gotchas` section. Empty is acceptable on day 1 (use placeholder `(none yet — grow from observed failures)`), but the section header itself is mandatory.
 
-The `meow:skill-creator` template MUST emit this section by default for every new skill it scaffolds.
+The `mk:skill-creator` template MUST emit this section by default for every new skill it scaffolds.
 
 WHY: Anthropic's field report identifies the Gotchas section as the highest-signal content in any skill — it captures non-default knowledge accumulated from real failures. A skill without a gotchas section discards institutional learning every time Claude hits a new edge case.
 
@@ -50,7 +50,7 @@ EXCEPTION: MeowKit-internal infrastructure (`.claude/memory/`, `tasks/`, `sessio
 
 ```python
 # scripts/append-history.py
-LOG_PATH = ".claude/skills/meow:standup-post/history.log"
+LOG_PATH = ".claude/skills/standup-post/history.log"
 with open(LOG_PATH, "a") as f:
     f.write(entry)
 ```
@@ -67,7 +67,7 @@ with open(LOG_PATH, "a") as f:
     f.write(entry)
 ```
 
-INSTEAD of: appending to `.claude/skills/meow:foo/log.json`
+INSTEAD of: appending to `.claude/skills/foo/log.json`
 USE: appending to `${CLAUDE_PLUGIN_DATA}/foo/log.json`
 
 ## Rule 3: SKILL.md Body MUST Stay Under 500 Lines
@@ -79,7 +79,7 @@ Every `SKILL.md` body (excluding YAML frontmatter) MUST stay under 500 lines. Sk
 
 WHY: Once SKILL.md loads, every token competes with conversation history and other context. The 500-line cap is Anthropic's empirically-validated threshold for context efficiency. Beyond this, partial reads (`head -100`) start to miss content.
 
-PERIODIC AUDIT: Run a length check on `meow:*` SKILL.md files quarterly OR on every model-tier upgrade (per `harness-rules.md` Rule 7 dead-weight audit cadence). Flag oversized monoliths for decomposition. Step-filed skills auto-pass — only the SKILL.md entrypoint counts.
+PERIODIC AUDIT: Run a length check on `mk:*` SKILL.md files quarterly OR on every model-tier upgrade (per `harness-rules.md` Rule 7 dead-weight audit cadence). Flag oversized monoliths for decomposition. Step-filed skills auto-pass — only the SKILL.md entrypoint counts.
 
 MEASURABLE CHECK:
 ```bash
@@ -89,14 +89,14 @@ find .claude/skills -name SKILL.md -exec sh -c 'wc -l "$1" | awk "{if (\$1 > 500
 **Bad example: Monolithic 900-line SKILL.md** (every load consumes the full file):
 
 ```text
-meow:my-skill/
+mk:my-skill/
 └── SKILL.md   # 900 lines: overview + all references + all examples + all gotchas inline
 ```
 
 **Good example: Decomposed via progressive disclosure** (load only what's needed):
 
 ```text
-meow:my-skill/
+mk:my-skill/
 ├── SKILL.md           # 180 lines: overview + routing table
 ├── references/
 │   ├── api.md         # loaded only when API details needed
@@ -108,7 +108,7 @@ meow:my-skill/
 **Good example: Step-file decomposition** (auto-passes the 500-line check):
 
 ```text
-meow:my-workflow/
+mk:my-workflow/
 ├── SKILL.md           # 60 lines: metadata + entrypoint
 ├── workflow.md        # step sequence
 ├── step-01-load.md
@@ -121,7 +121,7 @@ USE: a ≤500-line SKILL.md routing to `references/*.md` or step files
 
 ## Applies to
 
-- `meow:skill-creator` (must enforce Rules 1 + 3 in templates)
+- `mk:skill-creator` (must enforce Rules 1 + 3 in templates)
 - All future skill authoring (all 3 rules)
 - Quarterly audits and model-upgrade audits (Rule 3 measurable check)
 - Skill maintenance for any skill with persistent state (Rule 2)

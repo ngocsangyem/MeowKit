@@ -35,8 +35,8 @@ by consumer skills at task start, not injected every turn.
 
 ```
 Claude Code skill matching
-  ├─ meow:agent-detector (autoInvoke) → classify message, detect model tier
-  ├─ meow:workflow-orchestrator (autoInvoke) → route complex features
+  ├─ mk:agent-detector (autoInvoke) → classify message, detect model tier
+  ├─ mk:workflow-orchestrator (autoInvoke) → route complex features
   └─ Other skills → matched by SKILL.md description keywords
 ```
 
@@ -87,10 +87,10 @@ Claude Code skill matching
 
 | File | When read | Purpose |
 |------|----------|---------|
-| fixes.md + fixes.json | On-demand (meow:fix) | Bug-class patterns |
-| review-patterns.md + review-patterns.json | On-demand (meow:review) | Review patterns |
-| architecture-decisions.md + architecture-decisions.json | On-demand (meow:plan-creator) | Architectural decisions |
-| security-notes.md | On-demand (meow:cso) | Security findings |
+| fixes.md + fixes.json | On-demand (mk:fix) | Bug-class patterns |
+| review-patterns.md + review-patterns.json | On-demand (mk:review) | Review patterns |
+| architecture-decisions.md + architecture-decisions.json | On-demand (mk:plan-creator) | Architectural decisions |
+| security-notes.md | On-demand (mk:cso) | Security findings |
 | conversation-summary.md | Every turn | Haiku-summarized session cache |
 | cost-log.json | Phase 0/6 | Token usage per task |
 | decisions.md | On-demand (architect) | Long-form ADRs |
@@ -120,7 +120,7 @@ New model ships → audit playbook → measure each scaffold component's delta �
 
 | Model | Density | Scaffolding | Rationale |
 |-------|---------|-------------|-----------|
-| Haiku (TRIVIAL) | MINIMAL | Short-circuits to `/meow:cook` | Cheapest, skip ceremony |
+| Haiku (TRIVIAL) | MINIMAL | Short-circuits to `/mk:cook` | Cheapest, skip ceremony |
 | Sonnet (STANDARD) | FULL | Contract + 1-3 iterations + context resets | Needs explicit scope |
 | Opus 4.5 (COMPLEX) | FULL | Same as Sonnet | Same capability bracket |
 | Opus 4.6+ (COMPLEX) | LEAN | Single-session, contract optional, 0-1 iterations | Capable models degrade under heavy scaffolding |

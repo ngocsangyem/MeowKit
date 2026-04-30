@@ -1,49 +1,49 @@
 ---
-title: "meow:intake"
+title: "mk:intake"
 description: "Tool-agnostic ticket/PRD analysis: completeness scoring, product area classification, RCA, technical assessment."
 ---
 
-# meow:intake
+# mk:intake
 
 Tool-agnostic ticket and PRD intake analysis. Works with Jira (Atlassian MCP), Linear, GitHub Issues, or manual paste.
 
 ## What This Skill Does
 
-When a ticket or PRD arrives, meow:intake analyzes it automatically: classifies the product area, scores description completeness against 8 dimensions, scans the codebase for technical context, runs root cause analysis for bugs, and generates a structured report. The skill handles analysis; MCP servers handle Jira/Linear/GitHub I/O.
+When a ticket or PRD arrives, mk:intake analyzes it automatically: classifies the product area, scores description completeness against 8 dimensions, scans the codebase for technical context, runs root cause analysis for bugs, and generates a structured report. The skill handles analysis; MCP servers handle Jira/Linear/GitHub I/O.
 
 ## Core Capabilities
 
 - **Tool-agnostic** — works with any task management tool via MCP or manual paste
 - **8-dimension completeness scoring** — goal, acceptance criteria, scope, repro steps, constraints, priority, dependencies, design/visual
-- **Product area classification** — via meow:scale-routing with multi-layer detection
-- **Root cause analysis** — for bugs, using meow:investigate with RCA method selection
+- **Product area classification** — via mk:scale-routing with multi-layer detection
+- **Root cause analysis** — for bugs, using mk:investigate with RCA method selection
 - **Media handling** — images (Gemini/Claude Read), videos (FFmpeg frame extraction), Figma links, PDFs
 - **Injection defense** — ticket content treated as DATA, never executed as instructions
 - **Structured output** — classification, score, missing info, technical considerations, breakdown, PIC suggestion
 
 ## When to Use
 
-::: tip Use meow:intake when...
+::: tip Use mk:intake when...
 - Analyzing incoming Jira/Linear/GitHub tickets
 - Evaluating PRD completeness before planning
 - Triaging bug reports with root cause analysis
 - Automating ticket analysis via webhook pipeline
 :::
 
-::: warning Don't use meow:intake when...
-- You're implementing a feature (use meow:cook)
-- You're fixing a known bug (use meow:fix)
-- You're reviewing existing code (use meow:review)
+::: warning Don't use mk:intake when...
+- You're implementing a feature (use mk:cook)
+- You're fixing a known bug (use mk:fix)
+- You're reviewing existing code (use mk:review)
 :::
 
 ## Usage
 
 ```bash
 # Direct invocation
-/meow:intake
+/mk:intake
 
 # With ticket ID (requires Atlassian MCP)
-/meow:intake analyze PRD-123
+/mk:intake analyze PRD-123
 
 # Automated pipeline
 claude -p "analyze ticket: [paste content]" --project /path/to/repo
@@ -86,7 +86,7 @@ No FFmpeg? Images still work via Claude Read. Videos report "install FFmpeg."
 
 ## Security
 
-Ticket content is **DATA** — never executed as instructions. If ticket contains injection patterns ("ignore previous instructions"), meow:intake stops and escalates to user.
+Ticket content is **DATA** — never executed as instructions. If ticket contains injection patterns ("ignore previous instructions"), mk:intake stops and escalates to user.
 
 ## Gotchas
 
@@ -98,8 +98,8 @@ Ticket content is **DATA** — never executed as instructions. If ticket contain
 
 ## Related
 
-- [meow:scale-routing](/reference/skills/scale-routing) — Product area classification
-- [meow:investigate](/reference/skills/investigate) — Root cause analysis
-- [meow:scout](/reference/skills/scout) — Codebase scanning
-- [meow:cook](/reference/skills/cook) — Feature implementation after intake
-- [meow:fix](/reference/skills/fix) — Bug fix after intake
+- [mk:scale-routing](/reference/skills/scale-routing) — Product area classification
+- [mk:investigate](/reference/skills/investigate) — Root cause analysis
+- [mk:scout](/reference/skills/scout) — Codebase scanning
+- [mk:cook](/reference/skills/cook) — Feature implementation after intake
+- [mk:fix](/reference/skills/fix) — Bug fix after intake

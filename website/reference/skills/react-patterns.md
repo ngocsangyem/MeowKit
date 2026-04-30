@@ -1,15 +1,15 @@
 ---
-title: "meow:react-patterns"
+title: "mk:react-patterns"
 description: "React and Next.js performance optimization — 45+ rules from Vercel Engineering. Auto-activates on .tsx/.jsx files."
 ---
 
-# meow:react-patterns
+# mk:react-patterns
 
 React and Next.js performance optimization — 45+ rules across 8 priority categories from Vercel Engineering.
 
 ## What This Skill Does
 
-`meow:react-patterns` provides battle-tested performance patterns for React and Next.js development. Rules are prioritized by impact — CRITICAL patterns (eliminating waterfalls, bundle optimization) can save 200-800ms, while MEDIUM patterns (re-render optimization) improve perceived responsiveness.
+`mk:react-patterns` provides battle-tested performance patterns for React and Next.js development. Rules are prioritized by impact — CRITICAL patterns (eliminating waterfalls, bundle optimization) can save 200-800ms, while MEDIUM patterns (re-render optimization) improve perceived responsiveness.
 
 ## Core Capabilities
 
@@ -30,7 +30,7 @@ React and Next.js performance optimization — 45+ rules across 8 priority categ
 
 ## When to Use This
 
-::: tip Use meow:react-patterns when...
+::: tip Use mk:react-patterns when...
 - Writing or reviewing React/Next.js components
 - Fixing performance issues (slow load, janky UI, large bundle)
 - Deciding server vs client component boundaries
@@ -38,7 +38,7 @@ React and Next.js performance optimization — 45+ rules across 8 priority categ
 :::
 
 ::: info Skill Details
-**Phase:** 3 (Build) — auto-activates on .tsx/.jsx files alongside meow:typescript
+**Phase:** 3 (Build) — auto-activates on .tsx/.jsx files alongside mk:typescript
 :::
 
 ## Gotchas
@@ -49,6 +49,6 @@ React and Next.js performance optimization — 45+ rules across 8 priority categ
 
 ## Related
 
-- [`meow:typescript`](/reference/skills/typescript) — TypeScript type safety (complements React patterns)
-- [`meow:vue`](/reference/skills/vue) — Vue 3 patterns (equivalent for Vue projects)
-- [`meow:frontend-design`](/reference/skills/frontend-design) — UI/UX design patterns
+- [`mk:typescript`](/reference/skills/typescript) — TypeScript type safety (complements React patterns)
+- [`mk:vue`](/reference/skills/vue) — Vue 3 patterns (equivalent for Vue projects)
+- [`mk:frontend-design`](/reference/skills/frontend-design) — UI/UX design patterns

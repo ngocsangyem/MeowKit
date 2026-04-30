@@ -1,15 +1,15 @@
 ---
-title: "meow:review"
+title: "mk:review"
 description: "Multi-pass code review with scope drift detection, adversarial red-teaming, test coverage audit, and fix-first resolution."
 ---
 
-# meow:review
+# mk:review
 
 Multi-pass code review with scope drift detection, adversarial red-teaming, test coverage audit, and fix-first resolution.
 
 ## What This Skill Does
 
-`meow:review` runs a comprehensive 15-step code review that goes far beyond "looks good." It detects scope drift against your plan, applies a two-pass checklist (critical → informational), audits test coverage, runs a design review on frontend files, performs adversarial red-teaming scaled by diff size, and auto-fixes trivial issues before asking about non-trivial ones. The final verdict (APPROVE / REQUEST CHANGES / BLOCK) gates whether `meow:ship` can execute.
+`mk:review` runs a comprehensive 15-step code review that goes far beyond "looks good." It detects scope drift against your plan, applies a two-pass checklist (critical → informational), audits test coverage, runs a design review on frontend files, performs adversarial red-teaming scaled by diff size, and auto-fixes trivial issues before asking about non-trivial ones. The final verdict (APPROVE / REQUEST CHANGES / BLOCK) gates whether `mk:ship` can execute.
 
 ## Core Capabilities
 
@@ -19,11 +19,11 @@ Multi-pass code review with scope drift detection, adversarial red-teaming, test
 - **Test coverage audit** — Traces code paths, generates coverage diagram, writes tests for gaps
 - **Adversarial review** — Auto-scaled: <50 lines skipped, 50-199 lines cross-model challenge, 200+ lines full battery
 - **Fix-first resolution** — Classifies findings as AUTO-FIX or ASK; fixes trivial issues, batch-asks about the rest
-- **Verdict gating** — BLOCK verdict prevents `meow:ship` from executing
+- **Verdict gating** — BLOCK verdict prevents `mk:ship` from executing
 
 ## When to Use This
 
-::: tip Use meow:review when...
+::: tip Use mk:review when...
 - You're about to merge or ship code
 - You want a thorough review before creating a PR
 - You need to review someone else's PR
@@ -34,26 +34,26 @@ Multi-pass code review with scope drift detection, adversarial red-teaming, test
 
 ```bash
 # Review current branch diff (default)
-/meow:review
+/mk:review
 
 # Review a specific PR
-/meow:review #42
+/mk:review #42
 
 # Review uncommitted changes
-/meow:review --pending
+/mk:review --pending
 
 # Review a specific commit
-/meow:review abc1234
+/mk:review abc1234
 ```
 
 ## Example Prompts
 
 | Prompt | Input mode | What gets reviewed |
 |--------|-----------|-------------------|
-| `/meow:review` | Branch diff | Current branch vs base branch |
-| `/meow:review #42` | PR | Full PR diff via `gh pr diff` |
-| `/meow:review --pending` | Pending | Staged + unstaged `git diff` |
-| `/meow:review abc1234` | Commit | Single commit via `git show` |
+| `/mk:review` | Branch diff | Current branch vs base branch |
+| `/mk:review #42` | PR | Full PR diff via `gh pr diff` |
+| `/mk:review --pending` | Pending | Staged + unstaged `git diff` |
+| `/mk:review abc1234` | Commit | Single commit via `git show` |
 
 ## Quick Workflow
 
@@ -98,6 +98,6 @@ Loaded from: `references/iterative-evaluation-protocol.md`
 
 ## Related
 
-- [`meow:ship`](/reference/skills/ship) — Runs review as part of the ship pipeline
-- [`meow:cso`](/reference/skills/cso) — Dedicated security audit (deeper than review's security pass)
-- [`meow:qa-manual`](/reference/skills/qa-manual) — QA testing complements code review
+- [`mk:ship`](/reference/skills/ship) — Runs review as part of the ship pipeline
+- [`mk:cso`](/reference/skills/cso) — Dedicated security audit (deeper than review's security pass)
+- [`mk:qa-manual`](/reference/skills/qa-manual) — QA testing complements code review

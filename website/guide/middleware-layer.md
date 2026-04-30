@@ -92,7 +92,7 @@ The hard gate against "declare done without evidence." Before the session stops,
 1. Evaluator verdict file for the active plan slug (`tasks/reviews/*-evalverdict.md`)
 2. Signed sprint contract (`tasks/contracts/*-sprint-*.md` with `status: signed`)
 3. Test-pass markers in the last 500 lines of the trace log
-4. `meow:review` verdict file (`tasks/reviews/*-verdict.md`)
+4. `mk:review` verdict file (`tasks/reviews/*-verdict.md`)
 
 If none are found **and** attempts < 3: emits `{"decision":"block"}` JSON — Claude Code re-enters the session and the model sees the block reason.
 

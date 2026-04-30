@@ -1,9 +1,9 @@
 ---
-title: "meow:development"
+title: "mk:development"
 description: "Development reference toolkit — code patterns, TDD enforcement, and skill loading for Phase 3"
 ---
 
-# meow:development
+# mk:development
 
 Development reference toolkit — code patterns, TDD enforcement, and skill loading for Phase 3
 

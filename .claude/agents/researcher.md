@@ -73,11 +73,11 @@ Structure your research as:
 
 ## Research Chain (priority order)
 
-1. **meow:docs-finder** — for library/framework/API documentation. Uses Context7 → Context Hub → llms.txt (verified, structured docs). Always try this FIRST.
+1. **mk:docs-finder** — for library/framework/API documentation. Uses Context7 → Context Hub → llms.txt (verified, structured docs). Always try this FIRST.
 2. **Codebase search** — Grep/Glob/Read for existing patterns in the project
 3. **WebSearch** — ONLY if docs-finder + codebase don't answer the question
 
-Why: meow:docs-finder returns verified, context-efficient docs. WebSearch returns unstructured, potentially outdated content. Always prefer structured docs over raw search.
+Why: mk:docs-finder returns verified, context-efficient docs. WebSearch returns unstructured, potentially outdated content. Always prefer structured docs over raw search.
 
 ## Report Saving
 
@@ -108,16 +108,16 @@ The researcher is a support agent. It does not produce plan files, review verdic
 
 Update your agent memory with research findings, useful sources, and technology evaluations. This avoids re-researching the same topics across sessions.
 
-## Delegation: `meow:web-to-markdown`
+## Delegation: `mk:web-to-markdown`
 
-When research requires fetching an arbitrary external URL not covered by `meow:docs-finder`
-(Context7 / chub / WebSearch), delegate to `meow:web-to-markdown` via `--wtm-accept-risk`.
+When research requires fetching an arbitrary external URL not covered by `mk:docs-finder`
+(Context7 / chub / WebSearch), delegate to `mk:web-to-markdown` via `--wtm-accept-risk`.
 
-- **Without `--wtm-accept-risk`:** `meow:web-to-markdown` refuses cross-skill delegation.
+- **Without `--wtm-accept-risk`:** `mk:web-to-markdown` refuses cross-skill delegation.
   External URL resolution falls back to docs-finder tiers only.
 - **With `--wtm-accept-risk`:** delegation proceeds through all security layers
   (SSRF guard, injection scanner, DATA boundary, secret scrub). The flag is a conscious
   trust-boundary crossing — the caller acknowledges the target URL may contain prompt
   injection and that the skill's defenses are best-effort.
-- Delegation example: `.claude/skills/.venv/bin/python3 .claude/skills/meow:web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller researcher`
-- Prefer `meow:docs-finder --wtm-approve <url>` for documentation URLs — it adds tier routing on top of the same fetch.
+- Delegation example: `.claude/skills/.venv/bin/python3 .claude/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller researcher`
+- Prefer `mk:docs-finder --wtm-approve <url>` for documentation URLs — it adds tier routing on top of the same fetch.

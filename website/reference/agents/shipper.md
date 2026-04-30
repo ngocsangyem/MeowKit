@@ -26,9 +26,9 @@ The shipper handles Phase 5: getting code from "reviewed and approved" to "PR cr
 ## How to Use
 
 ```bash
-/meow:ship                # auto-detect mode
-/meow:ship official       # ship to main
-/meow:ship beta           # ship to dev branch
+/mk:ship                # auto-detect mode
+/mk:ship official       # ship to main
+/mk:ship beta           # ship to dev branch
 ```
 
 ## Under the Hood

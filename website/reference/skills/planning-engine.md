@@ -1,15 +1,15 @@
 ---
-title: "meow:planning-engine"
+title: "mk:planning-engine"
 description: "Codebase-aware tech breakdown and sprint planning analysis with dependency mapping and capacity modeling."
 ---
 
-# meow:planning-engine
+# mk:planning-engine
 
 Codebase-aware tech breakdown and sprint planning analysis. Produces reports for human decision-making — NOT automated ticket assignment or sprint modification.
 
 ## What This Skill Does
 
-meow:planning-engine analyzes Jira tickets against codebase context (via meow:scout) and produces two types of reports:
+mk:planning-engine analyzes Jira tickets against codebase context (via mk:scout) and produces two types of reports:
 
 - **Tech Review Report** — single-ticket feasibility analysis: affected files, dependencies, risks, complexity signals
 - **Planning Report** — multi-ticket sprint planning: dependency map, grouping suggestions, sequencing, capacity analysis
@@ -28,12 +28,12 @@ The skill is research-only. It never creates tickets, assigns work, sets story p
 
 ```bash
 # Single-ticket tech review
-/meow:planning-engine review PROJ-123
-/meow:planning-engine review PROJ-123 --scout    # After running /meow:scout first
+/mk:planning-engine review PROJ-123
+/mk:planning-engine review PROJ-123 --scout    # After running /mk:scout first
 
 # Multi-ticket sprint planning
-/meow:planning-engine plan --tickets PROJ-101,PROJ-102,PROJ-103
-/meow:planning-engine plan --tickets PROJ-101,PROJ-102 --capacity 40
+/mk:planning-engine plan --tickets PROJ-101,PROJ-102,PROJ-103
+/mk:planning-engine plan --tickets PROJ-101,PROJ-102 --capacity 40
 ```
 
 ::: info Human decides everything
@@ -51,14 +51,14 @@ claude mcp add -e JIRA_URL=https://your-company.atlassian.net \
   atlassian -- uvx mcp-atlassian
 ```
 
-Optional: run `/meow:scout` before tech review for codebase context.
+Optional: run `/mk:scout` before tech review for codebase context.
 
 ## Upstream Context
 
 Works best when:
-- Tickets have been evaluated (`/meow:jira evaluate`) — complexity signals improve reviews
-- Tickets have been estimated (`/meow:jira estimate`) — points enable capacity analysis
-- A spec report exists (`/meow:confluence analyze`) — provides business context
+- Tickets have been evaluated (`/mk:jira evaluate`) — complexity signals improve reviews
+- Tickets have been estimated (`/mk:jira estimate`) — points enable capacity analysis
+- A spec report exists (`/mk:confluence analyze`) — provides business context
 
 None required. Degrades gracefully without each.
 
@@ -93,7 +93,7 @@ This skill follows Agile Scrum principles:
 
 ## Gotchas
 
-- `--scout` requires running `/meow:scout` separately first (skills can't invoke other skills)
+- `--scout` requires running `/mk:scout` separately first (skills can't invoke other skills)
 - Capacity analysis needs `--capacity N` from user — the skill can't calculate team availability
 - Circular dependencies are detected and presented — the skill does NOT auto-break them
 - Maximum 20 tickets per planning run
@@ -101,8 +101,8 @@ This skill follows Agile Scrum principles:
 
 ## Related
 
-- [meow:jira](/reference/skills/jira) — ticket operations + evaluation/estimation
-- [meow:confluence](/reference/skills/confluence) — upstream spec analysis
-- [meow:scout](/reference/skills/scout) — codebase context for tech reviews
-- [meow:plan-creator](/reference/skills/plan-creator) — file-level implementation plans (different from sprint planning)
+- [mk:jira](/reference/skills/jira) — ticket operations + evaluation/estimation
+- [mk:confluence](/reference/skills/confluence) — upstream spec analysis
+- [mk:scout](/reference/skills/scout) — codebase context for tech reviews
+- [mk:plan-creator](/reference/skills/plan-creator) — file-level implementation plans (different from sprint planning)
 - [Spec to Sprint Planning](/workflows/spec-to-sprint) — end-to-end workflow guide

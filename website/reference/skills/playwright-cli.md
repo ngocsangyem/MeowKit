@@ -1,15 +1,15 @@
 ---
-title: "meow:playwright-cli"
+title: "mk:playwright-cli"
 description: "Playwright-based browser automation that generates TypeScript test code as a side-effect of every interaction."
 ---
 
-# meow:playwright-cli
+# mk:playwright-cli
 
 Playwright-based browser automation that generates TypeScript test code as a side-effect of every interaction.
 
 ## What This Skill Does
 
-`meow:playwright-cli` wraps the Playwright MCP server to control browsers via snapshots and element references. Its unique advantage: **every action you perform outputs the corresponding Playwright TypeScript code.** Click a button → you get `await page.getByRole('button', { name: 'Submit' }).click();`. This makes it the preferred tool when you want to both interact with a page AND generate test code.
+`mk:playwright-cli` wraps the Playwright MCP server to control browsers via snapshots and element references. Its unique advantage: **every action you perform outputs the corresponding Playwright TypeScript code.** Click a button → you get `await page.getByRole('button', { name: 'Submit' }).click();`. This makes it the preferred tool when you want to both interact with a page AND generate test code.
 
 ## Core Capabilities
 
@@ -66,6 +66,6 @@ playwright-cli open [url] → playwright-cli snapshot
 
 ## Related
 
-- [`meow:qa-manual`](/reference/skills/qa-manual) — Uses playwright-cli for E2E code generation
-- [`meow:agent-browser`](/reference/skills/agent-browser) — CDP-based, better for auth
-- [`meow:browse`](/reference/skills/browse) — Faster QA patterns
+- [`mk:qa-manual`](/reference/skills/qa-manual) — Uses playwright-cli for E2E code generation
+- [`mk:agent-browser`](/reference/skills/agent-browser) — CDP-based, better for auth
+- [`mk:browse`](/reference/skills/browse) — Faster QA patterns

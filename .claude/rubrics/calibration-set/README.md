@@ -41,7 +41,7 @@ calibration-set/
 
 ```bash
 # Run evaluator against the calibration source
-.claude/skills/meow:evaluate/scripts/run-evaluator.sh \
+.claude/skills/evaluate/scripts/run-evaluator.sh \
   .claude/rubrics/calibration-set/260408-kanban-app-PASS-anchor/source
 
 # Compare to gold-standard
@@ -54,10 +54,10 @@ diff <(yq '.overall' calibration-set/260408-kanban-app-PASS-anchor/metadata.yaml
 
 ## v1 Status
 
-Phase 3 (shipped 260408) lands this README as the calibration-set scaffold. No starter anchors ship in v1 — real anchors will accumulate as `meow:evaluate` runs against real builds in Phase 5+. The calibration set is a Phase 8 benchmark concern; v1 just reserves the directory and the convention.
+Phase 3 (shipped 260408) lands this README as the calibration-set scaffold. No starter anchors ship in v1 — real anchors will accumulate as `mk:evaluate` runs against real builds in Phase 5+. The calibration set is a Phase 8 benchmark concern; v1 just reserves the directory and the convention.
 
 The calibration set is **not** a bootstrap requirement — the evaluator works without it. The set exists to catch drift after the fact.
 
 ## Future
 
-Phase 8 (`meow:benchmark`) automates the replay loop and produces a delta table. Until then, calibration replays are run manually before any model upgrade.
+Phase 8 (`mk:benchmark`) automates the replay loop and produces a delta table. Until then, calibration replays are run manually before any model upgrade.

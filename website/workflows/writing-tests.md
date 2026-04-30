@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Improving coverage, TDD practice  
 **Time estimate:** 10-30 minutes  
-**Skills used:** [meow:qa-manual](/reference/skills/qa-manual) (E2E), [meow:review](/reference/skills/review) (coverage audit)  
+**Skills used:** [mk:qa-manual](/reference/skills/qa-manual) (E2E), [mk:review](/reference/skills/review) (coverage audit)  
 **Agents involved:** tester, developer (if implementation needed)
 
 ## Overview
@@ -24,7 +24,7 @@ MeowKit's TDD discipline is **opt-in via `--tdd` / `MEOWKIT_TDD=1`**. When enabl
 In TDD mode, the **tester** writes tests that define expected behavior:
 
 ```
-/meow:cook add input validation to user registration --tdd
+/mk:cook add input validation to user registration --tdd
 ```
 
 The tester writes tests BEFORE the developer touches implementation:
@@ -55,10 +55,10 @@ Both tester and developer refine — tests still pass after each change.
 ### Step 1: Generate from spec
 
 ```
-/meow:qa-manual tasks/plans/260327-checkout.md --generate
+/mk:qa-manual tasks/plans/260327-checkout.md --generate
 ```
 
-The [meow:qa-manual](/reference/skills/qa-manual) skill:
+The [mk:qa-manual](/reference/skills/qa-manual) skill:
 1. Navigates the app like a human tester
 2. Records every interaction as Playwright TypeScript code
 3. Detects test ID convention (`data-testid` or `data-cy`)
@@ -92,7 +92,7 @@ npx playwright test tests/e2e/checkout-flow/
 
 ## Coverage audit
 
-The [meow:review](/reference/skills/review) skill includes a test coverage audit (Step 4.75) that:
+The [mk:review](/reference/skills/review) skill includes a test coverage audit (Step 4.75) that:
 1. Traces code paths through your changes
 2. Maps user flows to test scenarios
 3. Identifies untested paths

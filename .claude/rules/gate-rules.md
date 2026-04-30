@@ -21,9 +21,9 @@ Proceeding to Phase 2 (Test RED) without an approved plan. No tests are written,
 
 ### Exception
 
-`/meow:fix` with complexity=simple bypasses Gate 1. The fix IS the plan — the scope is small enough that a separate planning document adds overhead without value.
+`/mk:fix` with complexity=simple bypasses Gate 1. The fix IS the plan — the scope is small enough that a separate planning document adds overhead without value.
 
-Scale-routing one-shot: When `meow:scale-routing` returns `workflow=one-shot` AND orchestrator confirms zero blast radius, Gate 1 may be bypassed. See `scale-adaptive-rules.md` Rule 4.
+Scale-routing one-shot: When `mk:scale-routing` returns `workflow=one-shot` AND orchestrator confirms zero blast radius, Gate 1 may be bypassed. See `scale-adaptive-rules.md` Rule 4.
 
 ## GATE 2 — After Phase 4 (Review)
 

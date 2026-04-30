@@ -1,15 +1,15 @@
 ---
-title: "meow:agent-browser"
+title: "mk:agent-browser"
 description: "Chrome/Chromium browser automation via CDP for page navigation, form filling, screenshots, session persistence, and auth flows."
 ---
 
-# meow:agent-browser
+# mk:agent-browser
 
 Chrome/Chromium browser automation via CDP for page navigation, form filling, screenshots, session persistence, and auth flows.
 
 ## What This Skill Does
 
-`meow:agent-browser` wraps the `agent-browser` CLI (vercel-labs) to control Chrome/Chromium directly via Chrome DevTools Protocol. Its key advantage over other browser skills is **session persistence** — it can import auth from your real browser, save/restore session state, and use persistent profiles. This makes it the best choice for authenticated flows.
+`mk:agent-browser` wraps the `agent-browser` CLI (vercel-labs) to control Chrome/Chromium directly via Chrome DevTools Protocol. Its key advantage over other browser skills is **session persistence** — it can import auth from your real browser, save/restore session state, and use persistent profiles. This makes it the best choice for authenticated flows.
 
 ## Core Capabilities
 
@@ -30,8 +30,8 @@ Chrome/Chromium browser automation via CDP for page navigation, form filling, sc
 :::
 
 ::: warning For simpler browser tasks...
-- Quick QA checks → use [`meow:browse`](/reference/skills/browse) ($B binary, faster)
-- Playwright code generation → use [`meow:playwright-cli`](/reference/skills/playwright-cli)
+- Quick QA checks → use [`mk:browse`](/reference/skills/browse) ($B binary, faster)
+- Playwright code generation → use [`mk:playwright-cli`](/reference/skills/playwright-cli)
 :::
 
 ## Usage
@@ -80,6 +80,6 @@ agent-browser open [url]
 
 ## Related
 
-- [`meow:browse`](/reference/skills/browse) — Faster headless browser for QA patterns
-- [`meow:playwright-cli`](/reference/skills/playwright-cli) — Playwright-based with code generation
-- [`meow:qa-manual`](/reference/skills/qa-manual) — Orchestrates all three for spec-driven QA
+- [`mk:browse`](/reference/skills/browse) — Faster headless browser for QA patterns
+- [`mk:playwright-cli`](/reference/skills/playwright-cli) — Playwright-based with code generation
+- [`mk:qa-manual`](/reference/skills/qa-manual) — Orchestrates all three for spec-driven QA

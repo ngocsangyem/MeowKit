@@ -37,7 +37,7 @@ Higher number = stronger override:
 
 1. `security-rules.md` — NEVER override
 2. `injection-rules.md` — NEVER override
-3. `gate-rules.md` — NEVER override (except `/meow:fix` simple)
+3. `gate-rules.md` — NEVER override (except `/mk:fix` simple)
 4. `harness-rules.md` — NEVER override gates; density choice does not bypass any gate
 5. `rubric-rules.md` — NEVER override hard-fail propagation
 6. `core-behaviors.md` — always apply (6 behaviors + 10 failure modes)
@@ -60,7 +60,7 @@ Higher number = stronger override:
 |------|-----------|-----------|-----------|
 | `security-rules.md` | Behavioral | NEVER | Human override only |
 | `injection-rules.md` | Behavioral | NEVER | Human override only |
-| `gate-rules.md` | Hook | NEVER | `/meow:fix` simple; scale-routing one-shot |
+| `gate-rules.md` | Hook | NEVER | `/mk:fix` simple; scale-routing one-shot |
 | `harness-rules.md` | Behavioral + Hook (`gate-enforcement.sh`, `validate-verdict.sh`) | NEVER override gates | Density modes adjust scaffolding, not gate semantics |
 | `rubric-rules.md` | Behavioral + Script (`validate-rubric.sh`) | NEVER override hard-fail propagation | Custom rubrics addable; semantics fixed |
 | `core-behaviors.md` | Behavioral | No | — |
@@ -93,7 +93,7 @@ Rules define _why_. Hooks enforce _what_.
 
 ## harness-rules.md {#harness-rules}
 
-Discipline rules for the autonomous multi-hour build pipeline (`meow:harness`) and the generator/evaluator architecture.
+Discipline rules for the autonomous multi-hour build pipeline (`mk:harness`) and the generator/evaluator architecture.
 
 | # | Rule | Gloss |
 |---|------|-------|
@@ -123,9 +123,9 @@ Domain-complexity routing rules that drive Phase 0 classification and harness de
 | 4 | One-Shot Workflow Enables Gate 1 Bypass | `workflow=one-shot` + zero blast radius → skip Gate 1 |
 | 5 | Users Can Extend the CSV | `domain-complexity.csv` is user-editable |
 | 6 | Adaptive Density Emission | scale-routing also emits `harness_density` for harness consumers |
-| 7 | **Auto-Strict for High-Complexity Cook Runs** | `level=high` during `/meow:cook` → auto-enables `--strict` at Phase 4.5; suppressible via `--no-strict`; fires ONLY in meow:cook |
+| 7 | **Auto-Strict for High-Complexity Cook Runs** | `level=high` during `/mk:cook` → auto-enables `--strict` at Phase 4.5; suppressible via `--no-strict`; fires ONLY in mk:cook |
 
-**Rule 7 detail:** When `meow:scale-routing` returns `level=high` during a `/meow:cook` run, cook auto-enables `--strict` mode (full `meow:evaluate`) at Phase 4.5 — unless the user explicitly passes `--no-strict`. This catches behavioral failures (e.g., a broken payment flow) that structural code review misses. Does NOT fire in `meow:fix`, `meow:harness`, or standalone `meow:review`.
+**Rule 7 detail:** When `mk:scale-routing` returns `level=high` during a `/mk:cook` run, cook auto-enables `--strict` mode (full `mk:evaluate`) at Phase 4.5 — unless the user explicitly passes `--no-strict`. This catches behavioral failures (e.g., a broken payment flow) that structural code review misses. Does NOT fire in `mk:fix`, `mk:harness`, or standalone `mk:review`.
 
 Source: `.claude/rules/scale-adaptive-rules.md`. Applies at Phase 0 (Orient) and Phase 4.5 (Verify).
 

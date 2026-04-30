@@ -102,4 +102,4 @@ Orchestrator output:
 | Task over-classified as COMPLEX | Orchestrator being cautious | Accept — security-sensitive tasks always Complex |
 | Agent fails after delegation | Downstream agent timeout or error | Orchestrator reports failure, suggests re-run or alternative |
 | Wrong agent selected | Ambiguous task description | Be more specific in task description |
-| Gate 1 blocking when it shouldn't | Only `/meow:fix` with simple complexity can skip Gate 1 | If task is truly trivial, use `/meow:fix --quick` |
+| Gate 1 blocking when it shouldn't | Only `/mk:fix` with simple complexity can skip Gate 1 | If task is truly trivial, use `/mk:fix --quick` |

@@ -1,20 +1,20 @@
 ---
-title: "meow:validate-plan"
+title: "mk:validate-plan"
 description: "8-dimension plan quality validation before Phase 2 begins. Catches incomplete acceptance criteria, missing dependencies, and unresolved risks."
 ---
 
-# meow:validate-plan
+# mk:validate-plan
 
 Validates an approved plan against 8 quality dimensions before implementation begins. Catches gaps that human approval at Gate 1 often misses — non-binary acceptance criteria, undeclared dependencies, missing test strategy, and unestimated effort.
 
 ## What This Skill Does
 
-`meow:validate-plan` reads a plan file from `tasks/plans/`, evaluates it against 8 structured dimensions, and produces a pass/fail/warn report per dimension. It does not replace Gate 1 (human approval is still required) — it supplements it with systematic checks that are easy to overlook in a manual review.
+`mk:validate-plan` reads a plan file from `tasks/plans/`, evaluates it against 8 structured dimensions, and produces a pass/fail/warn report per dimension. It does not replace Gate 1 (human approval is still required) — it supplements it with systematic checks that are easy to overlook in a manual review.
 
 - **8 validation dimensions** — scope, acceptance criteria, dependencies, risks, architecture, test strategy, security, effort
 - **Structured report** — PASS / FAIL / WARN per dimension with specific findings
 - **Routing logic** — all PASS proceeds to Phase 2; any FAIL returns to planner with revision requests
-- **Auto-triggered for COMPLEX tasks** — `meow:cook` runs this automatically after Gate 1 for complex tasks
+- **Auto-triggered for COMPLEX tasks** — `mk:cook` runs this automatically after Gate 1 for complex tasks
 - **Read-only** — never modifies plan files, never blocks Gate 1
 
 ## 8 Validation Dimensions
@@ -32,9 +32,9 @@ Validates an approved plan against 8 quality dimensions before implementation be
 
 ## When to Use This
 
-::: tip Use meow:validate-plan when...
+::: tip Use mk:validate-plan when...
 - Gate 1 is approved and you're about to start Phase 2 (Test)
-- `meow:cook` detects a COMPLEX task and suggests validation
+- `mk:cook` detects a COMPLEX task and suggests validation
 - You want to stress-test a plan before committing to implementation
 - You're unsure if acceptance criteria are binary enough for TDD
 :::
@@ -43,17 +43,17 @@ Validates an approved plan against 8 quality dimensions before implementation be
 
 ```bash
 # Validate the active plan (auto-detects from tasks/plans/)
-/meow:validate-plan
+/mk:validate-plan
 
 # Validate a specific plan file
-/meow:validate-plan tasks/plans/240315-auth-refactor.md
+/mk:validate-plan tasks/plans/240315-auth-refactor.md
 ```
 
 ## How It Works
 
 ```mermaid
 flowchart LR
-    A[Gate 1 approved\nplan file exists] --> B[meow:validate-plan]
+    A[Gate 1 approved\nplan file exists] --> B[mk:validate-plan]
     B --> C[Evaluate all\n8 dimensions]
     C --> D{All 8 PASS?}
     D -- Yes --> E[Proceed to\nPhase 2 Test or Phase 3 if TDD off]
@@ -84,16 +84,16 @@ Output format:
 **Phase:** Between Gate 1 and Phase 2
 **Used by:** planner agent, cook pipeline
 **Plan-First Gate:** Always skips — this skill IS the plan validation step.
-**Auto-trigger:** COMPLEX tasks in `meow:cook`; optional for STANDARD; skipped for TRIVIAL.
+**Auto-trigger:** COMPLEX tasks in `mk:cook`; optional for STANDARD; skipped for TRIVIAL.
 :::
 
 ::: warning Not the same as validate-plan.py
-The script at `meow:plan-creator/scripts/validate-plan.py` validates plan file **structure** (required sections exist). This skill validates plan **content quality** (are acceptance criteria binary? are risks identified?). Both can run — they check different things.
+The script at `mk:plan-creator/scripts/validate-plan.py` validates plan file **structure** (required sections exist). This skill validates plan **content quality** (are acceptance criteria binary? are risks identified?). Both can run — they check different things.
 :::
 
 ## See Also
 
-- [`meow:plan-creator`](/reference/skills/plan-creator) — creates the plan this skill validates
-- [`meow:elicit`](/reference/skills/elicit) — deeper reasoning on plan assumptions after validation
-- [`meow:nyquist`](/reference/skills/nyquist) — verifies test files cover the acceptance criteria that pass validation here
-- [`meow:cook`](/reference/skills/cook) — auto-runs this skill for COMPLEX tasks
+- [`mk:plan-creator`](/reference/skills/plan-creator) — creates the plan this skill validates
+- [`mk:elicit`](/reference/skills/elicit) — deeper reasoning on plan assumptions after validation
+- [`mk:nyquist`](/reference/skills/nyquist) — verifies test files cover the acceptance criteria that pass validation here
+- [`mk:cook`](/reference/skills/cook) — auto-runs this skill for COMPLEX tasks

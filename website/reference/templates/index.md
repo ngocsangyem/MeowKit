@@ -79,7 +79,7 @@ Examples:
 
 ## Plan Creator Reference System
 
-The `meow:plan-creator` skill uses progressive disclosure — details live in reference files loaded on-demand:
+The `mk:plan-creator` skill uses progressive disclosure — details live in reference files loaded on-demand:
 
 | Reference | Purpose | When loaded |
 |-----------|---------|-------------|

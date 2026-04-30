@@ -11,12 +11,12 @@ Each skill retains its original author credit in its frontmatter.
 | 2   | ship                  | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/ship/SKILL.md                            | 1    |
 | 3   | freeze                | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/freeze/SKILL.md                          | 1    |
 | 4   | review                | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/review/SKILL.md. Updated 260326: +input modes, +verdict template, +phase anchoring (ck:code-review sync) | 1    |
-| 5   | cook                  | mrgoonie (claudekit)         | [claudekit-engineer](https://claudekit.cc)                   | Proprietary | claudekit/.claude/skills/meow:cook/SKILL.md     | 1    |
+| 5   | cook                  | mrgoonie (claudekit)         | [claudekit-engineer](https://claudekit.cc)                   | Proprietary | claudekit/.claude/skills/cook/SKILL.md     | 1    |
 | 6   | investigate           | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/investigate/SKILL.md                     | 1    |
 | 7   | clean-code            | vudovn (antigravity-kit)     | [antigravity-kit](https://github.com/vudovn/antigravity-kit) | MIT         | .agent/skills/clean-code/SKILL.md               | 1    |
 | 8   | lint-and-validate     | vudovn (antigravity-kit)     | [antigravity-kit](https://github.com/vudovn/antigravity-kit) | MIT         | .agent/skills/lint-and-validate/SKILL.md        | 1    |
 | 9   | cso                   | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/cso/SKILL.md                             | 1    |
-| 10  | fix                   | mrgoonie (claudekit)         | [claudekit-engineer](https://claudekit.cc)                   | Proprietary | claudekit/.claude/skills/meow:fix/SKILL.md      | 1    |
+| 10  | fix                   | mrgoonie (claudekit)         | [claudekit-engineer](https://claudekit.cc)                   | Proprietary | claudekit/.claude/skills/fix/SKILL.md      | 1    |
 | 11  | agent-detector        | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog)   | Unknown     | aura-frog/skills/agent-detector/SKILL.md        | 2    |
 | 12  | browse                | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/browse/SKILL.md                          | 2    |
 | 13  | qa                    | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/qa/SKILL.md                              | 2    |
@@ -29,16 +29,16 @@ Each skill retains its original author credit in its frontmatter.
 | 21  | retro                 | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/retro/SKILL.md                           | 2    |
 | 22  | session-continuation  | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog)   | Unknown     | aura-frog/skills/session-continuation/SKILL.md  | 2    |
 | 23  | docs-finder           | MeowKit (original)           | Inspired by claudekit-engineer/docs-seeker                   | MIT         | .claude/skills/docs-finder/                     | 1    |
-| 24  | multimodal            | MeowKit (original)           | Inspired by claudekit-engineer/ai-multimodal                 | MIT         | .claude/skills/meow:multimodal/                 | 1    |
-| 25  | scout                 | MeowKit (adapted)            | Adapted from claudekit-engineer/scout. Updated 260326: +search tiers, +arch fingerprint, +handoff protocol | MIT | .claude/skills/meow:scout/ | 1 |
-| 26  | llms                  | MeowKit (adapted)            | Adapted from claudekit-engineer/llms                         | MIT         | .claude/skills/meow:llms/                       | 2    |
-| 27  | skill-creator         | MeowKit (adapted)            | Adapted from claudekit-engineer/skill-creator (simplified from 47 to 4 files) | MIT | .claude/skills/meow:skill-creator/ | 2 |
-| 28  | project-organization  | MeowKit (adapted)            | Adapted from claudekit-engineer/project-organization         | MIT         | .claude/skills/meow:project-organization/       | 2    |
-| 29  | typescript            | MeowKit (adapted)            | Adapted from aura-frog/typescript-expert + claudekit/frontend-development (TS parts) | MIT | .claude/skills/meow:typescript/ | 2 |
-| 30  | vue                   | MeowKit (adapted)            | Adapted from aura-frog/vue-expert                            | MIT         | .claude/skills/meow:vue/                        | 2    |
-| 31  | frontend-design       | MeowKit (adapted)            | Adapted from claudekit/ui-ux-pro-max + claudekit/frontend-design (merged) | MIT | .claude/skills/meow:frontend-design/ | 2 |
-| 32  | qa-manual             | MeowKit (original)           | Orchestrates: agent-browser + playwright-cli + browse for QA + E2E gen | MIT | .claude/skills/meow:qa-manual/ | 1 |
-| 33  | henshin               | MeowKit (adapted)            | Adapted from claudekit-engineer/agentize — planning front door only; downstream execution owned by plan-creator + cook | MIT | .claude/skills/meow:henshin/ | 2 |
+| 24  | multimodal            | MeowKit (original)           | Inspired by claudekit-engineer/ai-multimodal                 | MIT         | .claude/skills/multimodal/                 | 1    |
+| 25  | scout                 | MeowKit (adapted)            | Adapted from claudekit-engineer/scout. Updated 260326: +search tiers, +arch fingerprint, +handoff protocol | MIT | .claude/skills/scout/ | 1 |
+| 26  | llms                  | MeowKit (adapted)            | Adapted from claudekit-engineer/llms                         | MIT         | .claude/skills/llms/                       | 2    |
+| 27  | skill-creator         | MeowKit (adapted)            | Adapted from claudekit-engineer/skill-creator (simplified from 47 to 4 files) | MIT | .claude/skills/skill-creator/ | 2 |
+| 28  | project-organization  | MeowKit (adapted)            | Adapted from claudekit-engineer/project-organization         | MIT         | .claude/skills/project-organization/       | 2    |
+| 29  | typescript            | MeowKit (adapted)            | Adapted from aura-frog/typescript-expert + claudekit/frontend-development (TS parts) | MIT | .claude/skills/typescript/ | 2 |
+| 30  | vue                   | MeowKit (adapted)            | Adapted from aura-frog/vue-expert                            | MIT         | .claude/skills/vue/                        | 2    |
+| 31  | frontend-design       | MeowKit (adapted)            | Adapted from claudekit/ui-ux-pro-max + claudekit/frontend-design (merged) | MIT | .claude/skills/frontend-design/ | 2 |
+| 32  | qa-manual             | MeowKit (original)           | Orchestrates: agent-browser + playwright-cli + browse for QA + E2E gen | MIT | .claude/skills/qa-manual/ | 1 |
+| 33  | henshin               | MeowKit (adapted)            | Adapted from claudekit-engineer/agentize — planning front door only; downstream execution owned by plan-creator + cook | MIT | .claude/skills/henshin/ | 2 |
 
 ## Selection Criteria
 

@@ -171,7 +171,7 @@ would want it.
 
 | Skill | Purpose |
 |-------|---------|
-| `meow:example` | One-line purpose. |
+| `mk:example` | One-line purpose. |
 
 ### Features
 
@@ -376,10 +376,11 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v2.7.0  | 2026-04-30 | The Namespace Rename Release         |
 | v2.6.2  | 2026-04-29 | The Telemetry & Validator Release    |
 | v2.6.1  | 2026-04-22 | The project-manager Release          |
 | v2.6.0  | 2026-04-22 | The Skills Compliance Release        |
-| v2.5.1  | 2026-04-20 | meow:henshin                         |
+| v2.5.1  | 2026-04-20 | mk:henshin                         |
 | v2.5.0  | 2026-04-19 | The Native Fit Release               |
 | v2.3.4  | 2026-04-11 | Centralized Dotenv Loading           |
 | v2.3.3  | 2026-04-11 | The Wiring Integrity Release         |

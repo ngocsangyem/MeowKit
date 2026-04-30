@@ -4,7 +4,7 @@ These rules govern how the orchestrator uses domain-based complexity routing at 
 
 ## Rule 1: CSV Match Overrides Manual Classification
 
-When `meow:scale-routing` returns a domain match, its complexity level OVERRIDES the orchestrator's manual classification.
+When `mk:scale-routing` returns a domain match, its complexity level OVERRIDES the orchestrator's manual classification.
 
 WHY: Domain-specific signals (e.g., "payment" → fintech → high) are more reliable than subjective judgment. The CSV is auditable and version-controlled; gut feelings are not.
 
@@ -12,7 +12,7 @@ INSTEAD of: Orchestrator guessing "this looks standard" → CSV determines "fint
 
 ## Rule 2: No Match Falls Back Gracefully
 
-When `meow:scale-routing` returns "unknown" (no domain keywords matched), the orchestrator falls back to existing manual classification per `model-selection-rules.md`.
+When `mk:scale-routing` returns "unknown" (no domain keywords matched), the orchestrator falls back to existing manual classification per `model-selection-rules.md`.
 
 WHY: The CSV cannot cover every domain. Fallback ensures zero regression for unrecognized task types. The system should never be LESS capable than before the CSV existed.
 
@@ -26,7 +26,7 @@ INSTEAD of: "This fintech task looks simple, let's use Haiku" → "Fintech detec
 
 ## Rule 4: One-Shot Workflow Enables Gate 1 Bypass
 
-When CSV returns `workflow=one-shot` AND the orchestrator confirms zero blast radius, Gate 1 (plan approval) may be bypassed — identical to `/meow:fix` with `complexity=simple` behavior.
+When CSV returns `workflow=one-shot` AND the orchestrator confirms zero blast radius, Gate 1 (plan approval) may be bypassed — identical to `/mk:fix` with `complexity=simple` behavior.
 
 WHY: Documentation typos, config tweaks, and changelog updates don't need a planning phase. The CSV codifies which domains qualify for this fast path.
 
@@ -40,9 +40,9 @@ WHY: No framework can anticipate every domain. Extensibility ensures the routing
 
 ## Rule 6: Adaptive Density Emission (Phase 5 — 260408)
 
-When `meow:scale-routing` returns a tier classification, it ALSO emits a `harness_density` field (`MINIMAL | FULL | LEAN`) for `meow:harness` consumers.
+When `mk:scale-routing` returns a tier classification, it ALSO emits a `harness_density` field (`MINIMAL | FULL | LEAN`) for `mk:harness` consumers.
 
-**Single source of truth:** the full decision matrix lives at `.claude/skills/meow:harness/references/adaptive-density-matrix.md`. Do NOT duplicate the table here — it drifts. This rule references the matrix; the matrix is authoritative.
+**Single source of truth:** the full decision matrix lives at `.claude/skills/harness/references/adaptive-density-matrix.md`. Do NOT duplicate the table here — it drifts. This rule references the matrix; the matrix is authoritative.
 
 WHY: Capable models (Opus 4.6+ with auto-compaction + 1M context) **degrade** when forced through full harness scaffolding — Anthropic's measured "dead-weight thesis" finding. The density policy operationalizes this.
 
@@ -52,11 +52,11 @@ GUARD: Density choice does NOT bypass any gate. Gate 1 (plan), Gate 2 (review ve
 
 ## Rule 7: Auto-Strict for High-Complexity Cook Runs
 
-When `meow:scale-routing` returns `level=high` during a `/meow:cook` run, the cook workflow MUST auto-enable `--strict` mode (full meow:evaluate) at Phase 4.5 — unless the user explicitly passes `--no-strict`.
+When `mk:scale-routing` returns `level=high` during a `/mk:cook` run, the cook workflow MUST auto-enable `--strict` mode (full mk:evaluate) at Phase 4.5 — unless the user explicitly passes `--no-strict`.
 
 WHY: High-complexity domains have behavioral requirements that structural code review alone misses. A fintech payment flow that passes code review may still have a broken checkout funnel. The evaluator catches this by driving the running build against rubric criteria with active verification.
 
-GUARD: Auto-strict fires ONLY in meow:cook, NOT in meow:fix, meow:harness (which has its own evaluator), or standalone meow:review. The `--no-strict` flag is the user escape hatch.
+GUARD: Auto-strict fires ONLY in mk:cook, NOT in mk:fix, mk:harness (which has its own evaluator), or standalone mk:review. The `--no-strict` flag is the user escape hatch.
 
 INSTEAD of: hoping the code reviewer catches a broken payment form
 USE: evaluator drives the running app, clicks "Pay", and verifies the flow works end-to-end

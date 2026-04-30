@@ -14,16 +14,16 @@ Memory is split into focused topic files. Each skill reads only the files it nee
 
 | File | Purpose | Format | Consumer |
 |------|---------|--------|---------|
-| `memory/fixes.md` | Bug-class session learnings | Markdown | meow:fix |
-| `memory/fixes.json` | Machine-queryable fix patterns (v2.0.0) | JSON | meow:fix |
-| `memory/review-patterns.md` | Review and architecture patterns; per-evaluation verdict rows (v2.5.0) | Markdown | meow:review, meow:plan-creator, meow:evaluate (writer) |
-| `memory/review-patterns.json` | Machine-queryable review patterns (v2.0.0) | JSON | meow:review, meow:plan-creator |
-| `memory/architecture-decisions.md` | Architectural decisions | Markdown | meow:plan-creator, meow:cook, meow:ship (reader) |
-| `memory/architecture-decisions.json` | Machine-queryable decisions (v2.0.0) | JSON | meow:plan-creator, meow:cook |
-| `memory/security-notes.md` | Curated security findings | Markdown | meow:cso, meow:review |
-| `memory/cost-log.json` | Token usage per task; per-benchmark baseline entries (v2.5.0) | JSON | analyst agent, meow:benchmark (writer) |
-| `memory/decisions.md` | Long-form architecture decision records; party synthesis outputs (v2.5.0) | Markdown | architect agent, meow:party (writer, required) |
-| `memory/security-log.md` | Raw security audit log; `meow:careful` override audit trail (v2.5.0) | Markdown | security agent, meow:careful (writer) |
+| `memory/fixes.md` | Bug-class session learnings | Markdown | mk:fix |
+| `memory/fixes.json` | Machine-queryable fix patterns (v2.0.0) | JSON | mk:fix |
+| `memory/review-patterns.md` | Review and architecture patterns; per-evaluation verdict rows (v2.5.0) | Markdown | mk:review, mk:plan-creator, mk:evaluate (writer) |
+| `memory/review-patterns.json` | Machine-queryable review patterns (v2.0.0) | JSON | mk:review, mk:plan-creator |
+| `memory/architecture-decisions.md` | Architectural decisions | Markdown | mk:plan-creator, mk:cook, mk:ship (reader) |
+| `memory/architecture-decisions.json` | Machine-queryable decisions (v2.0.0) | JSON | mk:plan-creator, mk:cook |
+| `memory/security-notes.md` | Curated security findings | Markdown | mk:cso, mk:review |
+| `memory/cost-log.json` | Token usage per task; per-benchmark baseline entries (v2.5.0) | JSON | analyst agent, mk:benchmark (writer) |
+| `memory/decisions.md` | Long-form architecture decision records; party synthesis outputs (v2.5.0) | Markdown | architect agent, mk:party (writer, required) |
+| `memory/security-log.md` | Raw security audit log; `mk:careful` override audit trail (v2.5.0) | Markdown | security agent, mk:careful (writer) |
 
 ## How it works
 
@@ -32,7 +32,7 @@ flowchart TD
   USER[User types ##prefix:] -->|validated + written| TF[Topic file\nor JSON entry]
   WORK[Phase 1-4\nWork proceeds] --> P5[Phase 5 Live capture\nnon-obvious decisions]
   P5 --> TF
-  TF --> P6[Phase 6 Reflect\nmeow:memory session-capture]
+  TF --> P6[Phase 6 Reflect\nmk:memory session-capture]
   P6 --> TF
   SKILL[Consumer skill\nat task start] -->|reads on-demand| TF
   STOP[Session ends\nStop hook] -->|cost entry| CL[cost-log.json]
@@ -42,7 +42,7 @@ flowchart TD
 
 1. **Immediate capture** (`##prefix:` messages): written instantly by `immediate-capture-handler.cjs` — crash-resilient
 2. **Live capture** (before shipping): agent captures non-obvious decisions, rejected approaches, surprises — context lost otherwise
-3. **Session capture** (Phase 6): `meow:memory` session-capture extracts patterns/decisions/failures and appends to topic files
+3. **Session capture** (Phase 6): `mk:memory` session-capture extracts patterns/decisions/failures and appends to topic files
 
 ### On-demand read path
 
@@ -69,7 +69,7 @@ Captures are validated against injection patterns before writing. Invalid conten
 {
   "version": "2.0.0",
   "scope": "fixes",
-  "consumer": "meow:fix",
+  "consumer": "mk:fix",
   "patterns": [
     {
       "id": "gnu-grep-bre-macos",
@@ -112,19 +112,19 @@ Three skills that previously accumulated knowledge only in-session now persist t
 
 | Skill | Target file | When it writes | Entry shape |
 |---|---|---|---|
-| `meow:evaluate` | `review-patterns.md` | After each completed evaluation | Table row: `\| {date} \| {artifact-id} \| {verdict} \| {top-criterion} \| {score} \|` |
-| `meow:benchmark` | `cost-log.json` | After each completed benchmark run | Object: `{run_id, date, tier, pass_rate, avg_score, total_cost_usd}` appended to top-level array |
-| `meow:party` | `decisions.md` | After synthesis round concludes (required, not optional) | Heading: `## {date} — {decision-title}` + Context / Decision / Rationale / Dissent |
-| `meow:careful` | `security-log.md` | On every warn/override event | Table row with timestamp, pattern, severity, command — log auto-initialized with header |
+| `mk:evaluate` | `review-patterns.md` | After each completed evaluation | Table row: `\| {date} \| {artifact-id} \| {verdict} \| {top-criterion} \| {score} \|` |
+| `mk:benchmark` | `cost-log.json` | After each completed benchmark run | Object: `{run_id, date, tier, pass_rate, avg_score, total_cost_usd}` appended to top-level array |
+| `mk:party` | `decisions.md` | After synthesis round concludes (required, not optional) | Heading: `## {date} — {decision-title}` + Context / Decision / Rationale / Dissent |
+| `mk:careful` | `security-log.md` | On every warn/override event | Table row with timestamp, pattern, severity, command — log auto-initialized with header |
 
 ## Pruning
 
 When topic files grow large (> 300 lines or JSON > 50 entries), run:
 
 ```
-/meow:memory --prune              # default 90-day threshold
-/meow:memory --prune --days 180   # custom threshold
-/meow:memory --prune --dry-run    # preview without writing
+/mk:memory --prune              # default 90-day threshold
+/mk:memory --prune --days 180   # custom threshold
+/mk:memory --prune --dry-run    # preview without writing
 ```
 
 **What gets pruned:** `severity: standard` entries with a parseable date older than threshold.

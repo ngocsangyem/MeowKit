@@ -1,28 +1,28 @@
 ---
-title: "meow:party"
+title: "mk:party"
 description: "Multi-agent deliberation for architecture decisions. 2-4 agents debate, synthesize, and produce a decision brief — no code written."
 ---
 
-# meow:party
+# mk:party
 
 Multi-agent deliberation for architecture decisions. Spawn 2-4 agents with different lenses, force them to disagree, then synthesize into a single recommendation.
 
 ## What This Skill Does
 
-`meow:party` is a discussion-only skill — no code is written during a party. It spawns 2-4 deliberation agents with distinct analytical lenses (performance, developer experience, migration cost, security). Each agent independently analyzes the question, reaches a conclusion, then a synthesis agent reconciles the positions into a single actionable recommendation.
+`mk:party` is a discussion-only skill — no code is written during a party. It spawns 2-4 deliberation agents with distinct analytical lenses (performance, developer experience, migration cost, security). Each agent independently analyzes the question, reaches a conclusion, then a synthesis agent reconciles the positions into a single actionable recommendation.
 
 Use it when two reasonable engineers would disagree, when the decision has long-term consequences, or when the cost of the wrong choice exceeds 2 days of rework.
 
 ## When to Use
 
-::: tip Use meow:party when...
+::: tip Use mk:party when...
 - Choosing between two architectural approaches (REST vs GraphQL, monolith vs microservices)
 - Deciding on a database schema that will be hard to migrate
 - Evaluating third-party dependencies with long-term lock-in
 - Trade-off analysis where multiple concerns genuinely conflict
 :::
 
-::: warning Do NOT use meow:party for...
+::: warning Do NOT use mk:party for...
 - Implementation decisions ("how do I write this function")
 - Bug fixes with a clear root cause
 - Trivial config choices
@@ -33,19 +33,19 @@ Use it when two reasonable engineers would disagree, when the decision has long-
 
 ```bash
 # Architecture trade-off
-/meow:party "Should we use GraphQL or REST for the public API?"
+/mk:party "Should we use GraphQL or REST for the public API?"
 
 # Technology selection
-/meow:party "PostgreSQL or MongoDB for user sessions?"
+/mk:party "PostgreSQL or MongoDB for user sessions?"
 
 # Design decision
-/meow:party "Monorepo or polyrepo for the new services?"
+/mk:party "Monorepo or polyrepo for the new services?"
 ```
 
 ## How It Works
 
 ```
-/meow:party "question"
+/mk:party "question"
        │
        ▼
 Spawn 2-4 deliberation agents with distinct lenses
@@ -95,7 +95,7 @@ Party Mode fits into Phase 1 (Plan), before writing the ADR:
 Phase 0: Orient
    │
    ▼ (if architectural decision detected)
-/meow:party "question"     ← deliberation, no code
+/mk:party "question"     ← deliberation, no code
    │
    ▼
 Decision brief
@@ -116,6 +116,6 @@ Gate 1: Human approval of ADR
 
 ## Related
 
-- [`meow:office-hours`](/reference/skills/office-hours) — Pre-planning brainstorming (single agent, less structured)
-- [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — Engineering lens review after the decision is made
+- [`mk:office-hours`](/reference/skills/office-hours) — Pre-planning brainstorming (single agent, less structured)
+- [`mk:plan-ceo-review`](/reference/skills/plan-ceo-review) — Engineering lens review after the decision is made
 - [`/workflows/architecture`](/workflows/architecture) — Full architecture decision workflow

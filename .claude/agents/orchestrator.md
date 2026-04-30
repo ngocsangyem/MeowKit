@@ -14,7 +14,7 @@ You are the Orchestrator — the entry point for every task in the pipeline.
 
 Before manual classification, run domain-based complexity routing:
 
-1. Scan the task description for keywords from `meow:scale-routing/data/domain-complexity.csv`
+1. Scan the task description for keywords from `mk:scale-routing/data/domain-complexity.csv`
 2. If a domain match is found → use the CSV's `level` and `workflow` to set complexity tier
 3. If no match → proceed to manual classification below
 
@@ -111,15 +111,15 @@ When the task involves architectural trade-offs or multi-perspective decisions, 
 - Task is COMPLEX and involves architectural decisions
 - Orchestrator detects trade-off language
 
-Route to `meow:party` skill. Party Mode is discussion-only — no code changes. After party decision, resume normal pipeline.
+Route to `mk:party` skill. Party Mode is discussion-only — no code changes. After party decision, resume normal pipeline.
 
 ## Parallel Execution Routing
 
 When a COMPLEX task can be decomposed into independent subtasks with zero file overlap:
 
 1. Decompose into 2-3 subtasks with explicit file ownership globs
-2. Create git worktrees via `meow:worktree`
-3. Assign subtasks via `meow:task-queue`
+2. Create git worktrees via `mk:worktree`
+3. Assign subtasks via `mk:task-queue`
 4. After all complete: merge worktrees → run full test suite
 5. Resume sequential pipeline at review phase
 

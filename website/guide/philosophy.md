@@ -61,7 +61,7 @@ Token efficiency is an economic discipline, not a nice-to-have.
 Tests can pass against mocks while production returns 500. The evaluator must click through the running app — browser navigation, curl against live endpoints, CLI invocation. Static-analysis-only verdicts are rejected.
 
 This principle applies at different scales:
-- **`/meow:harness`**: full evaluator with Playwright, rubric grading, skeptic persona
+- **`/mk:harness`**: full evaluator with Playwright, rubric grading, skeptic persona
 - **`/cook --strict`**: same evaluator, opt-in for high-stakes features
 - **`/cook --verify`**: lightweight browser check — does the page load? console errors?
 - **`/cook`** (default): code-reviewer only — structural, not behavioral. Acceptable for most work.
@@ -103,6 +103,6 @@ The same principle applies to the hook system: `handlers.json` routes events to 
 ## See Also
 
 - [Understanding the Harness](/guide/understanding-the-harness) — the "how" (layers, pillars, lifecycle)
-- [Harness Architecture](/guide/harness-architecture) — the `/meow:harness` autonomous pipeline
+- [Harness Architecture](/guide/harness-architecture) — the `/mk:harness` autonomous pipeline
 - [Adaptive Density](/guide/adaptive-density) — scaffolding by model capability
 - [Workflow Phases](/guide/workflow-phases) — the 7-phase pipeline in detail

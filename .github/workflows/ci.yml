@@ -42,5 +42,16 @@ jobs:
       - name: Validate skill frontmatter
         run: .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py
 
+      - name: Reject residual mk: namespace
+        run: |
+          if grep -rEn '^name:[[:space:]]*mk:' .claude/skills/*/SKILL.md; then
+            echo "ERROR: legacy 'mk:' frontmatter found — use 'mk:' instead." >&2
+            exit 1
+          fi
+          if grep -rEn '/mk:[a-z]' .claude/commands/ .claude/rules/ CLAUDE.md 2>/dev/null; then
+            echo "ERROR: legacy '/mk:' slash references found — use '/mk:' instead." >&2
+            exit 1
+          fi
+
       - name: Hook regression tests
         run: node --test ".claude/hooks/__tests__/*.test.cjs"

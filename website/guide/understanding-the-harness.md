@@ -29,7 +29,7 @@ The two layers compound: Claude Code handles the mechanics of running tools and 
 | Layer                | Owner                       | What It Does                                                                                                    |
 | -------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | **L1: Builder**      | Human                       | Approve plans (Gate 1), approve reviews (Gate 2). No agent can self-approve.                                    |
-| **L2: Planner**      | `meow:plan-creator`         | Decompose requests into product-level specs — user stories, not file names.                                     |
+| **L2: Planner**      | `mk:plan-creator`         | Decompose requests into product-level specs — user stories, not file names.                                     |
 | **L3: Cook**         | `/cook` workflow            | 7-phase pipeline: Orient → Plan → Test → Build → Review → Ship → Reflect.                                       |
 | **L4: Native Tasks** | `dispatch.cjs` + handlers   | Handler modules for build-verify, budget tracking, checkpoints, immediate capture.                              |
 | **L5: Teams**        | `/scout`, `/team`, `/party` | Parallel agents with worktree isolation. Context firewall — subagents report findings, main thread stays clean. |
@@ -61,7 +61,7 @@ Two hard gates that no agent can bypass:
 - **Gate 1** — plan approved before any code is written (enforced by `gate-enforcement.sh` hook)
 - **Gate 2** — review approved before shipping (always requires human)
 
-For autonomous builds (`/meow:harness`): generator/evaluator split with rubric-based grading, skeptic persona, and active browser verification. For regular work (`/cook`): code-reviewer agent + optional `--verify` (browser check) or `--strict` (full evaluator).
+For autonomous builds (`/mk:harness`): generator/evaluator split with rubric-based grading, skeptic persona, and active browser verification. For regular work (`/cook`): code-reviewer agent + optional `--verify` (browser check) or `--strict` (full evaluator).
 
 ### 5. Lifecycle Management
 
@@ -157,7 +157,7 @@ For the full set of 9 principles — why gates exist, why TDD is opt-in, why sec
 ## What's Next
 
 - **[Philosophy](/guide/philosophy)** — the "why" behind every MeowKit design decision
-- **[Harness Architecture](/guide/harness-architecture)** — the `/meow:harness` autonomous build pipeline
+- **[Harness Architecture](/guide/harness-architecture)** — the `/mk:harness` autonomous build pipeline
 - **[Workflow Phases](/guide/workflow-phases)** — detailed breakdown of each phase
 - **[Adaptive Density](/guide/adaptive-density)** — how scaffolding scales by model
 - **[Middleware Layer](/guide/middleware-layer)** — the hook dispatch system in depth

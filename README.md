@@ -69,7 +69,7 @@ npx mewkit doctor     # Verify environment
 meowkit/
 ├── .claude/                  Source of truth — agents, skills, rules, hooks
 │   ├── agents/               18 specialist agents
-│   ├── skills/               79 skills (meow: namespace)
+│   ├── skills/               79 skills (mk: namespace)
 │   ├── rules/                17 enforcement rules
 │   ├── hooks/                35 hook scripts — lifecycle hooks + handlers + libraries
 │   ├── commands/             20 slash commands

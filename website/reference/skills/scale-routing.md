@@ -1,15 +1,15 @@
 ---
-title: "meow:scale-routing"
+title: "mk:scale-routing"
 description: "Domain-aware complexity routing at Phase 0. Scans task description for domain keywords, returns complexity level, workflow intensity, and model tier override."
 ---
 
-# meow:scale-routing
+# mk:scale-routing
 
 Domain-aware complexity routing. Replaces subjective orchestrator judgment with deterministic, auditable domain-based routing at Phase 0.
 
 ## What This Skill Does
 
-When a task arrives, meow:scale-routing scans its description against a domain keyword CSV, runs multi-layer detection, and returns a structured routing decision — complexity level, workflow intensity, model tier override, task type, and suggested skill. A fintech auth change auto-classifies as COMPLEX without manual judgment.
+When a task arrives, mk:scale-routing scans its description against a domain keyword CSV, runs multi-layer detection, and returns a structured routing decision — complexity level, workflow intensity, model tier override, task type, and suggested skill. A fintech auth change auto-classifies as COMPLEX without manual judgment.
 
 ## Core Capabilities
 
@@ -23,7 +23,7 @@ When a task arrives, meow:scale-routing scans its description against a domain k
 ## When to Use
 
 ::: tip Automatic at Phase 0
-meow:scale-routing is called by the orchestrator automatically at Phase 0 for every task. You do not invoke it directly.
+mk:scale-routing is called by the orchestrator automatically at Phase 0 for every task. You do not invoke it directly.
 :::
 
 ::: info Not user-invoked
@@ -48,14 +48,14 @@ This skill is infrastructure. The orchestrator runs it, reads the output, and ro
 
 | Task Type | Signals | Suggested Skill |
 |-----------|---------|----------------|
-| `bug_fix` | error, regression, broken, failing | `meow:fix` |
-| `feature` | new, add, implement, build | `meow:cook` |
-| `refactor` | cleanup, restructure, simplify, extract | `meow:cook` |
-| `security` | auth, vulnerability, injection, CVE | `meow:cso` |
-| `devops` | deploy, pipeline, docker, CI/CD | `meow:cook` |
-| `docs` | documentation, readme, changelog | `meow:fix` |
-| `review` | review, audit, check, inspect | `meow:review` |
-| `intake` | ticket, PRD, brief, requirement | `meow:intake` |
+| `bug_fix` | error, regression, broken, failing | `mk:fix` |
+| `feature` | new, add, implement, build | `mk:cook` |
+| `refactor` | cleanup, restructure, simplify, extract | `mk:cook` |
+| `security` | auth, vulnerability, injection, CVE | `mk:cso` |
+| `devops` | deploy, pipeline, docker, CI/CD | `mk:cook` |
+| `docs` | documentation, readme, changelog | `mk:fix` |
+| `review` | review, audit, check, inspect | `mk:review` |
+| `intake` | ticket, PRD, brief, requirement | `mk:intake` |
 
 ## Product Area Config
 
@@ -73,7 +73,7 @@ areas:
     pic: "@bob"
 ```
 
-When present, meow:scale-routing merges area keywords into domain matching and adds `product_area` and `pic` to the output.
+When present, mk:scale-routing merges area keywords into domain matching and adds `product_area` and `pic` to the output.
 
 ## Output Schema
 
@@ -91,7 +91,7 @@ When present, meow:scale-routing merges area keywords into domain matching and a
 | Field | Values | Description |
 |-------|--------|-------------|
 | `task_type` | bug_fix, feature, refactor, security, devops, docs, review, intake | Classified task type |
-| `suggested_skill` | meow:fix, meow:cook, meow:cso, meow:review, meow:intake | Recommended skill |
+| `suggested_skill` | mk:fix, mk:cook, mk:cso, mk:review, mk:intake | Recommended skill |
 | `confidence` | HIGH, MEDIUM, LOW | Routing confidence from Layer 3 |
 | `product_area` | string | Area from `.claude/product-areas.yaml` (omitted if no YAML) |
 
@@ -104,7 +104,7 @@ When present, meow:scale-routing merges area keywords into domain matching and a
 
 ## Related
 
-- [meow:intake](/reference/skills/intake) — ticket analysis that uses scale-routing for product area classification
-- [meow:cook](/reference/skills/cook) — primary pipeline skill, receives routing output from orchestrator
-- [meow:agent-detector](/reference/skills/agent-detector) — companion infrastructure skill for agent + model detection
-- [meow:fix](/reference/skills/fix) — suggested skill for bug_fix task type
+- [mk:intake](/reference/skills/intake) — ticket analysis that uses scale-routing for product area classification
+- [mk:cook](/reference/skills/cook) — primary pipeline skill, receives routing output from orchestrator
+- [mk:agent-detector](/reference/skills/agent-detector) — companion infrastructure skill for agent + model detection
+- [mk:fix](/reference/skills/fix) — suggested skill for bug_fix task type

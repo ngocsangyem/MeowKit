@@ -7,11 +7,11 @@ description: Generator/evaluator split, sprint contract, iteration loop, adaptiv
 
 For the conceptual overview of MeowKit's harness system — what a harness is, the harness² concept, 7-layer taxonomy, 5 functional pillars, and core principles — see the dedicated **[Understanding the Harness](/guide/understanding-the-harness)** page.
 
-This page covers the **`/meow:harness`** autonomous build pipeline specifically.
+This page covers the **`/mk:harness`** autonomous build pipeline specifically.
 
 ## TL;DR
 
-`/meow:harness` is MeowKit's autonomous build pipeline. It splits work across four roles — planner, generator, evaluator, and orchestrator — so no single agent grades its own output. A sprint contract defines what "done" means. The generator builds; the evaluator verifies against a running build. The loop repeats up to 3 rounds before escalating to you.
+`/mk:harness` is MeowKit's autonomous build pipeline. It splits work across four roles — planner, generator, evaluator, and orchestrator — so no single agent grades its own output. A sprint contract defines what "done" means. The generator builds; the evaluator verifies against a running build. The loop repeats up to 3 rounds before escalating to you.
 
 ## Why This Exists
 
@@ -23,11 +23,11 @@ This page covers the **`/meow:harness`** autonomous build pipeline specifically.
 
 ### Planner
 
-Runs in product-level mode (`meow:plan-creator --product-level`). Produces **user stories and features**, not file names or class names. The constraint is intentional: micro-sharding the plan causes cascading errors because the generator loses room to discover better solutions. The planner sets ambition; the generator finds the path.
+Runs in product-level mode (`mk:plan-creator --product-level`). Produces **user stories and features**, not file names or class names. The constraint is intentional: micro-sharding the plan causes cascading errors because the generator loses room to discover better solutions. The planner sets ambition; the generator finds the path.
 
 ### Generator (Developer Agent)
 
-Implements the product from the sprint contract. Runs `meow:cook` internally for each sprint. Produces source code + a self-eval checklist before handoff. MUST NOT grade its own output — that's the evaluator's job. See [Rule 2 — Generator ≠ Evaluator](#self-eval-bias).
+Implements the product from the sprint contract. Runs `mk:cook` internally for each sprint. Produces source code + a self-eval checklist before handoff. MUST NOT grade its own output — that's the evaluator's job. See [Rule 2 — Generator ≠ Evaluator](#self-eval-bias).
 
 ### Evaluator
 
@@ -43,7 +43,7 @@ The harness script itself. Manages the iteration loop, budget tracking, escalati
 flowchart TD
     A[User prompt] --> B[Planner\nProduct-level spec]
     B --> C{Density?}
-    C -- MINIMAL/Haiku --> D[meow:cook\nshort-circuit]
+    C -- MINIMAL/Haiku --> D[mk:cook\nshort-circuit]
     C -- FULL/LEAN --> E[Sprint Contract\nAcceptance criteria]
     E --> F[Generator\nBuilds + self-eval]
     F --> G[Evaluator\nActive verification]
@@ -115,7 +115,7 @@ Rule 8 in `.claude/rules/harness-rules.md`.
 
 **Rule 2 — Generator ≠ Evaluator.** This is a hard separation enforced architecturally by running the evaluator as a fresh-context subagent.
 
-When Claude graded its own output in internal tests, it identified real issues — then talked itself into accepting them. An external evaluator loaded with a skeptic persona (`meow:evaluate/prompts/skeptic-persona.md`) and re-anchored per criterion is the only known mitigation.
+When Claude graded its own output in internal tests, it identified real issues — then talked itself into accepting them. An external evaluator loaded with a skeptic persona (`mk:evaluate/prompts/skeptic-persona.md`) and re-anchored per criterion is the only known mitigation.
 
 The evaluator is the [evaluator agent](/reference/agents/evaluator). It runs in isolation: no shared context, no memory of the generator's reasoning, no access to the generator's self-eval notes.
 
@@ -129,9 +129,9 @@ The evaluator is the [evaluator agent](/reference/agents/evaluator). It runs in 
 
 Multi-hour runs accumulate cost faster than humans notice. The three-tier policy (warn → hard → user) catches both runaway runs and intentional high-budget research.
 
-## When to Use `/meow:harness` vs `/meow:cook`
+## When to Use `/mk:harness` vs `/mk:cook`
 
-| Use `/meow:cook` for | Use `/meow:harness` for |
+| Use `/mk:cook` for | Use `/mk:harness` for |
 |---|---|
 | Single feature, single sprint | Whole product / green-field app |
 | Bug fix | "Build me a X" prompt |
@@ -141,7 +141,7 @@ Multi-hour runs accumulate cost faster than humans notice. The three-tier policy
 
 ## Adaptive Density
 
-The harness auto-scales scaffolding based on model capability. Haiku short-circuits to `meow:cook`. Sonnet and Opus 4.5 get the full pipeline. Opus 4.6+ gets a leaner config — full pipeline is dead weight for capable models with 1M context + auto-compaction.
+The harness auto-scales scaffolding based on model capability. Haiku short-circuits to `mk:cook`. Sonnet and Opus 4.5 get the full pipeline. Opus 4.6+ gets a leaner config — full pipeline is dead weight for capable models with 1M context + auto-compaction.
 
 Full explanation: [/guide/adaptive-density](/guide/adaptive-density).
 
@@ -224,4 +224,4 @@ Full details: [What's New in v2.3.0](/guide/whats-new/v2.3.0).
 
 - `.claude/rules/harness-rules.md` — the 11 rules governing the harness
 - `docs/harness-runbook.md` — user-facing runbook (flags, density, artifacts, troubleshooting)
-- `.claude/skills/meow:harness/references/adaptive-density-matrix.md` — density decision matrix
+- `.claude/skills/harness/references/adaptive-density-matrix.md` — density decision matrix

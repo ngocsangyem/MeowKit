@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Legacy codebases, inherited projects, unfamiliar code  
 **Time estimate:** 30-60 minutes  
-**Skills used:** [meow:scout](/reference/skills/scout), [meow:investigate](/reference/skills/investigate), [meow:fix](/reference/skills/fix)  
+**Skills used:** [mk:scout](/reference/skills/scout), [mk:investigate](/reference/skills/investigate), [mk:fix](/reference/skills/fix)  
 **Agents involved:** orchestrator (orients), developer, tester, analyst (captures learnings)
 
 ## Overview
@@ -22,10 +22,10 @@ When you open a codebase you've never seen before, MeowKit's first move is **ori
 ### Step 1: Orient — understand the codebase
 
 ```
-/meow:scout project structure
+/mk:scout project structure
 ```
 
-The [meow:scout](/reference/skills/scout) skill spawns 2-6 parallel Explore agents:
+The [mk:scout](/reference/skills/scout) skill spawns 2-6 parallel Explore agents:
 
 ```
 Scout Report:
@@ -43,10 +43,10 @@ Scout Report:
 ### Step 2: Investigate the reported issue
 
 ```
-/meow:fix users report slow page loads on the dashboard
+/mk:fix users report slow page loads on the dashboard
 ```
 
-The [meow:investigate](/reference/skills/investigate) skill traces the problem:
+The [mk:investigate](/reference/skills/investigate) skill traces the problem:
 
 ```
 Phase 1 — Symptoms: Dashboard loads in 8 seconds (should be <2s)
@@ -58,7 +58,7 @@ Root cause: "Dashboard service makes N+1 queries. Each user triggers a separate 
 ### Step 3: Fix with understanding
 
 The **developer** applies the fix with MeowKit's constraints:
-- **meow:freeze** locks edits to `src/services/dashboard.service.ts`
+- **mk:freeze** locks edits to `src/services/dashboard.service.ts`
 - Regression test written: `test('dashboard loads in under 2 seconds')`
 - Fix: Replace N+1 with a single JOIN query
 - All 45 existing tests still pass
@@ -73,7 +73,7 @@ Pattern: Dashboard has N+1 query patterns — check any service making
          per-record DB calls. Repository pattern should use eager loading.
 ```
 
-Next time `meow:fix` runs, it loads `fixes.md`/`fixes.json` at task start and surfaces this pattern.
+Next time `mk:fix` runs, it loads `fixes.md`/`fixes.json` at task start and surfaces this pattern.
 
 ### Step 5: Document what you found
 

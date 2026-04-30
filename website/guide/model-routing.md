@@ -32,13 +32,13 @@ Task complexity: STANDARD → using Sonnet
 
 ## Scale-Adaptive Intelligence (Phase 0)
 
-Before the orchestrator applies manual classification, MeowKit runs **domain-based routing** via the `meow:scale-routing` skill. It reads keywords from the task description and matches them against `domain-complexity.csv`.
+Before the orchestrator applies manual classification, MeowKit runs **domain-based routing** via the `mk:scale-routing` skill. It reads keywords from the task description and matches them against `domain-complexity.csv`.
 
 ```
 Task: "Add Stripe payment checkout"
          │
          ▼
-meow:scale-routing
+mk:scale-routing
   → domain: fintech
   → level: high
   → OVERRIDE → COMPLEX tier (no manual override possible)
@@ -54,7 +54,7 @@ meow:scale-routing
 | docs | readme, changelog, comment | low | Allow one-shot |
 | config | env, .yaml, version bump | low | Allow one-shot |
 
-When level is `low` AND the task has zero blast radius, Gate 1 is bypassed (same behavior as `/meow:fix --quick`).
+When level is `low` AND the task has zero blast radius, Gate 1 is bypassed (same behavior as `/mk:fix --quick`).
 
 ### Extending the CSV
 
@@ -88,11 +88,11 @@ Each workflow mode declares a **Planning Depth** — the number of researchers t
 
 ## Adaptive Density (Harness Pipelines)
 
-When using `/meow:harness`, the scaffolding density (`MINIMAL` / `FULL` / `LEAN`) auto-adjusts based on model tier per the dead-weight thesis. Opus 4.6+ with auto-compaction degrades under full scaffolding; capable models need less ceremony, not more.
+When using `/mk:harness`, the scaffolding density (`MINIMAL` / `FULL` / `LEAN`) auto-adjusts based on model tier per the dead-weight thesis. Opus 4.6+ with auto-compaction degrades under full scaffolding; capable models need less ceremony, not more.
 
 | Tier | Model | Density |
 |------|-------|---------|
-| TRIVIAL | Haiku | MINIMAL — short-circuits to `meow:cook` |
+| TRIVIAL | Haiku | MINIMAL — short-circuits to `mk:cook` |
 | STANDARD | Sonnet | FULL — contract + 1–3 iterations |
 | COMPLEX | Opus 4.5 | FULL — same as Sonnet |
 | COMPLEX | Opus 4.6+ | LEAN — single-session, contract optional |

@@ -310,1071 +310,1071 @@
       "sha256": "b3d61ba331b752c1a843ff1e35a4a5aeb8979a0d60dec008589185b78ee72379",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-browser/SKILL.md": {
+    ".claude/skills/agent-browser/SKILL.md": {
       "sha256": "560503cd3659ebaf83afc77e6ac62aca29804beefb567229981cb78f0600bdf5",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-browser/references/authentication.md": {
+    ".claude/skills/agent-browser/references/authentication.md": {
       "sha256": "8ccc30f2613523630cf3771a07d71339676d93c63623631a4206521c6d78d2e5",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-browser/references/commands.md": {
+    ".claude/skills/agent-browser/references/commands.md": {
       "sha256": "1ae436f116406d9f3c1ad0611c791f9248533475df7dcf81b7da15a42662b7fc",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-browser/references/profiling.md": {
+    ".claude/skills/agent-browser/references/profiling.md": {
       "sha256": "15f1e6c7994d7471a274dc1476992d0ec178acd91f8b626e0d6f24a4dbef738f",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-browser/references/proxy-support.md": {
+    ".claude/skills/agent-browser/references/proxy-support.md": {
       "sha256": "4c44ba60d9397523109fdbdf1d972739691856c5bf6bf1587fc58793c71b4671",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-browser/references/session-management.md": {
+    ".claude/skills/agent-browser/references/session-management.md": {
       "sha256": "2ce531bf105aaf827a907a4e255e00321eef5994ca0e21e41c28489c0a8efebb",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-browser/references/snapshot-refs.md": {
+    ".claude/skills/agent-browser/references/snapshot-refs.md": {
       "sha256": "c2aa75f5a3c1b34a72d53c06b68cc97d8a3c295134257d48f315cdff1c06455d",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-browser/references/video-recording.md": {
+    ".claude/skills/agent-browser/references/video-recording.md": {
       "sha256": "c2c12bd8c44e5d36fbb94cfc376180d47507d3c26a7ee8876b892fc700dcf332",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-browser/templates/authenticated-session.sh": {
+    ".claude/skills/agent-browser/templates/authenticated-session.sh": {
       "sha256": "1fa9926c36dbe71191120ce067e5e3babe732cd1cc605020f3bd04dc430aa58c",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-browser/templates/capture-workflow.sh": {
+    ".claude/skills/agent-browser/templates/capture-workflow.sh": {
       "sha256": "bf3f3a2f8413773891d9fa400d2a2fddf6d73ffc7a9b2fa00f797f944171c3d5",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-browser/templates/form-automation.sh": {
+    ".claude/skills/agent-browser/templates/form-automation.sh": {
       "sha256": "b86836986d339f736b15ca78cf3d566e845a6293ae25a5b00aa520b837572650",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-detector/SKILL.md": {
+    ".claude/skills/agent-detector/SKILL.md": {
       "sha256": "f641b33dee13ac6026ca867ec763f03de557c9315d849ffdd34b4963a3b580a4",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-detector/references/after-detection.md": {
+    ".claude/skills/agent-detector/references/after-detection.md": {
       "sha256": "0520641dc0e438a1555573885ece246400f9280abdf63a99f5f9152a9b8e32b7",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-detector/references/complexity-detection.md": {
+    ".claude/skills/agent-detector/references/complexity-detection.md": {
       "sha256": "a602c59e781379c5d36db0c320b6d518b1bc3669d0dc3e6cab59b45d45633f41",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-detector/references/detection-process.md": {
+    ".claude/skills/agent-detector/references/detection-process.md": {
       "sha256": "40b69febffc824959719862750424bf72a88d03bbcf277f17588d3d1fb2ea76e",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-detector/references/examples.md": {
+    ".claude/skills/agent-detector/references/examples.md": {
       "sha256": "d18bc3b87619ef2d1e891fc44d95b35289fdc39a8730f3b63c9dea0a7a4be1a4",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-detector/references/model-selection.md": {
+    ".claude/skills/agent-detector/references/model-selection.md": {
       "sha256": "3d8f9b7021520212344aa6bb4d3b87fa93023721320a7a78124797b799696749",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-detector/references/multi-layer-detection.md": {
+    ".claude/skills/agent-detector/references/multi-layer-detection.md": {
       "sha256": "b3b2ec015911083140e31162c785476598c0590c873a037938a7337de6ac6c4c",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-detector/references/scoring-and-thresholds.md": {
+    ".claude/skills/agent-detector/references/scoring-and-thresholds.md": {
       "sha256": "4a266b7891d5ed3fb48e1af7daeddf39529210a0f59a749e8ca6c01dfe0ceb4e",
       "layer": "skill"
     },
-    ".claude/skills/meow:agent-detector/references/team-mode.md": {
+    ".claude/skills/agent-detector/references/team-mode.md": {
       "sha256": "18aa1e70016640c2e243c8b0c037ba4ed9420bc9d08b7b85262a42a1b01c9f9b",
       "layer": "skill"
     },
-    ".claude/skills/meow:browse/SKILL.md": {
+    ".claude/skills/browse/SKILL.md": {
       "sha256": "705edc400a899a7fb43f94797f2ef07c868ca539481f4835068454af9d8184a9",
       "layer": "skill"
     },
-    ".claude/skills/meow:browse/references/command-reference.md": {
+    ".claude/skills/browse/references/command-reference.md": {
       "sha256": "92b6b7934aa66135696c12900f7c6c4d472bd0d9a56360bd782298fdcd3b4c9a",
       "layer": "skill"
     },
-    ".claude/skills/meow:browse/references/preamble.md": {
+    ".claude/skills/browse/references/preamble.md": {
       "sha256": "711da1d5c0f5bf24ee607ce52e0a9478edb90038050a469e1451fe8a3d3e9992",
       "layer": "skill"
     },
-    ".claude/skills/meow:browse/references/qa-patterns.md": {
+    ".claude/skills/browse/references/qa-patterns.md": {
       "sha256": "c1214fe3060b3caaa61c0d49e67d81b649e74f098272ca79e82f589c2ae29f89",
       "layer": "skill"
     },
-    ".claude/skills/meow:browse/references/setup.md": {
+    ".claude/skills/browse/references/setup.md": {
       "sha256": "fb08d7b595dc17deae08afb2dc76a0e9550d78636ae0a812d4302d8a8ffd83ec",
       "layer": "skill"
     },
-    ".claude/skills/meow:browse/references/shared-protocols.md": {
+    ".claude/skills/browse/references/shared-protocols.md": {
       "sha256": "f4174c32d383016291b7b65b56f08866647cecaa67cd210a34d0992c0ed7d022",
       "layer": "skill"
     },
-    ".claude/skills/meow:browse/references/snapshot-flags.md": {
+    ".claude/skills/browse/references/snapshot-flags.md": {
       "sha256": "cf2ec34651c77e339a621cc571975c8fa583df490dc3e95a6654975df9d26c16",
       "layer": "skill"
     },
-    ".claude/skills/meow:browse/references/user-handoff.md": {
+    ".claude/skills/browse/references/user-handoff.md": {
       "sha256": "09bd19e345dbf8f0315ea7e1fd147a401bed19e0b923b5f086d62c511e3e54ed",
       "layer": "skill"
     },
-    ".claude/skills/meow:careful/SKILL.md": {
+    ".claude/skills/careful/SKILL.md": {
       "sha256": "c7949f182c97bc8571a52c600d31a01de6d0f9bf2eb23317bd5d03619cb006d6",
       "layer": "skill"
     },
-    ".claude/skills/meow:clean-code/SKILL.md": {
+    ".claude/skills/clean-code/SKILL.md": {
       "sha256": "ba691047f5f684747e86a7f4f4662245f298153284ebee2eed9362d720b5eef6",
       "layer": "skill"
     },
-    ".claude/skills/meow:clean-code/references/coding-standards.md": {
+    ".claude/skills/clean-code/references/coding-standards.md": {
       "sha256": "1db3d499313d1553f2af9ac6ed5c4e1796d2a2ace8e49ed24a9b9332e675f601",
       "layer": "skill"
     },
-    ".claude/skills/meow:cook/SKILL.md": {
+    ".claude/skills/cook/SKILL.md": {
       "sha256": "7e5ee4040e0e1b7e85603eb1596780369def49d1a964a3786d0d4fe71c6a1ea1",
       "layer": "skill"
     },
-    ".claude/skills/meow:cook/references/intent-detection.md": {
+    ".claude/skills/cook/references/intent-detection.md": {
       "sha256": "3a8f97c488a3982ff477ebcd0a02443cbc102c0cbcb417d489465ca044d037c5",
       "layer": "skill"
     },
-    ".claude/skills/meow:cook/references/review-cycle.md": {
+    ".claude/skills/cook/references/review-cycle.md": {
       "sha256": "59e24ff5bdbfdaa678d234e353fad65a1a738fba9bbaf8de64658cee1e9f7991",
       "layer": "skill"
     },
-    ".claude/skills/meow:cook/references/subagent-patterns.md": {
+    ".claude/skills/cook/references/subagent-patterns.md": {
       "sha256": "83506d2331661f15d4218d458bfc0a28bc1a1823c6aca5ec274e9fc8a2c75029",
       "layer": "skill"
     },
-    ".claude/skills/meow:cook/references/workflow-steps.md": {
+    ".claude/skills/cook/references/workflow-steps.md": {
       "sha256": "3c1a50e1d6d59ef9846ab0d44ecb68c29da7dc2039361a41a1947f10c1f4b8bf",
       "layer": "skill"
     },
-    ".claude/skills/meow:cso/SKILL.md": {
+    ".claude/skills/cso/SKILL.md": {
       "sha256": "544a691905904b19ef4411e8eeacc5570e69903d5f67b62361fb9ff408b1c3bf",
       "layer": "skill"
     },
-    ".claude/skills/meow:cso/references/arguments-and-modes.md": {
+    ".claude/skills/cso/references/arguments-and-modes.md": {
       "sha256": "825e242ff2bbf2bccbb1defed09d354890004fea2fbfb406a7dd436d8165755b",
       "layer": "skill"
     },
-    ".claude/skills/meow:cso/references/phase-0-1-architecture-attack-surface.md": {
+    ".claude/skills/cso/references/phase-0-1-architecture-attack-surface.md": {
       "sha256": "e121269a70c12d65b30d0ec43022b889677bc38404f41bc4c51a24432dcff559",
       "layer": "skill"
     },
-    ".claude/skills/meow:cso/references/phase-12-fp-filtering.md": {
+    ".claude/skills/cso/references/phase-12-fp-filtering.md": {
       "sha256": "50d146ae91c0663e5e86536050ebe1fbbf893472f12ad250d55f05a66326294c",
       "layer": "skill"
     },
-    ".claude/skills/meow:cso/references/phase-13-14-report-save.md": {
+    ".claude/skills/cso/references/phase-13-14-report-save.md": {
       "sha256": "e682aac9401b4d556c7d7288e7cb1ea957470f9145b2485dcbede9d06678756c",
       "layer": "skill"
     },
-    ".claude/skills/meow:cso/references/phase-2-3-secrets-dependencies.md": {
+    ".claude/skills/cso/references/phase-2-3-secrets-dependencies.md": {
       "sha256": "c2de5aea00c1a561973d03a9c2f5b1d30267b7c53c8e4624b13a67496b8c5a3c",
       "layer": "skill"
     },
-    ".claude/skills/meow:cso/references/phase-4-5-6-cicd-infra-webhooks.md": {
+    ".claude/skills/cso/references/phase-4-5-6-cicd-infra-webhooks.md": {
       "sha256": "c9965cb1ef9d50c021d6aa428a2393c37895c8434b8602bbcfbba669860bb721",
       "layer": "skill"
     },
-    ".claude/skills/meow:cso/references/phase-7-8-llm-skills.md": {
+    ".claude/skills/cso/references/phase-7-8-llm-skills.md": {
       "sha256": "866d0358972b8ad4f1a1d089ca5890b4a5e0d738256eeac20be8eede8bed7b33",
       "layer": "skill"
     },
-    ".claude/skills/meow:cso/references/phase-9-10-11-owasp-stride-data.md": {
+    ".claude/skills/cso/references/phase-9-10-11-owasp-stride-data.md": {
       "sha256": "587e1c26dceffc07c0483ac5d694361cead83a85ddf5977a0b3c0116c964f698",
       "layer": "skill"
     },
-    ".claude/skills/meow:cso/references/preamble.md": {
+    ".claude/skills/cso/references/preamble.md": {
       "sha256": "2417207e6b61ff15bf62893fb89d8973ef8c71db983ae9f75bc309d3cef5f0a3",
       "layer": "skill"
     },
-    ".claude/skills/meow:cso/references/shared-protocols.md": {
+    ".claude/skills/cso/references/shared-protocols.md": {
       "sha256": "2264be730fc73585462cfa5e44794f40f486f5ff93be80c16fe9e7edeab45b8d",
       "layer": "skill"
     },
-    ".claude/skills/meow:development/SKILL.md": {
+    ".claude/skills/development/SKILL.md": {
       "sha256": "a7a7ddb9b0c64c2be7bbc45ef43849b24814d9fca6caa8a3f48137b0dce9a33e",
       "layer": "skill"
     },
-    ".claude/skills/meow:development/references/code-patterns.md": {
+    ".claude/skills/development/references/code-patterns.md": {
       "sha256": "26e1753e26d6075797ac02197a3ed7c4b121773fd0c7102f4d62df4b8fc71f98",
       "layer": "skill"
     },
-    ".claude/skills/meow:development/references/skill-loader.md": {
+    ".claude/skills/development/references/skill-loader.md": {
       "sha256": "c4ab47f4e7bb155d997d46e95680f9245deb126aa05dbc36f46c0ec33411aa28",
       "layer": "skill"
     },
-    ".claude/skills/meow:development/references/tdd-enforcement.md": {
+    ".claude/skills/development/references/tdd-enforcement.md": {
       "sha256": "623c418cf58680e4a3486217d494eeb8f89f4d6b937d3659844c52226c0e97b9",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/.env.example": {
+    ".claude/skills/docs-finder/.env.example": {
       "sha256": "2065bc2b34d921669fd2bd5e5173f59c6443c722213f06fc0ecac92bf65f5c58",
       "layer": "user"
     },
-    ".claude/skills/meow:docs-finder/SKILL.md": {
+    ".claude/skills/docs-finder/SKILL.md": {
       "sha256": "cc226a014e79a368a9def97f7e0f5c4ed5b1ec8eb5f3f1d3287ac0c3eb265a84",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/package.json": {
+    ".claude/skills/docs-finder/package.json": {
       "sha256": "5b6d534ca029bd1aae9489e4db6ef68a21ea5b9f68ab5156a870f1f989c59f89",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/references/chub-patterns.md": {
+    ".claude/skills/docs-finder/references/chub-patterns.md": {
       "sha256": "23d538117e4fe8ce962b718609b3fe0b8d5321ac492b911852254160cb998834",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/references/context7-patterns.md": {
+    ".claude/skills/docs-finder/references/context7-patterns.md": {
       "sha256": "c5092378662a4f86e44a0530f136cba0c724e51bf78da39420be7217b5776767",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/references/errors.md": {
+    ".claude/skills/docs-finder/references/errors.md": {
       "sha256": "28d79ff9a0b1e9157612e3ba076658fc2e323b0520be56757dd899a68e39c3a8",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/scripts/analyze-results.js": {
+    ".claude/skills/docs-finder/scripts/analyze-results.js": {
       "sha256": "2b0c0791ff22ebd13c9a9ae0457b2796f54ec211fb1af33345a4d9bcb3d97584",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/scripts/detect-source.js": {
+    ".claude/skills/docs-finder/scripts/detect-source.js": {
       "sha256": "48859342ddf0c06dfee544f7877fe6b9ceaaf419b5f0cf820e134cd03a2af11e",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/scripts/fetch-chub.js": {
+    ".claude/skills/docs-finder/scripts/fetch-chub.js": {
       "sha256": "756ee99da12a7ac7794d87f914a55bbe6b98d64d89204a9d22d93686eae298ef",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/scripts/fetch-context7.js": {
+    ".claude/skills/docs-finder/scripts/fetch-context7.js": {
       "sha256": "714987ab9827daeda84debf24aa16fc225c405b7b92a7e259cfe2295837893df",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/scripts/tests/run-tests.js": {
+    ".claude/skills/docs-finder/scripts/tests/run-tests.js": {
       "sha256": "135ac4500547cad5b8f7d10df9277e8cac120506732d6de36453ceaf9dc677cf",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/scripts/tests/test-analyze-results.js": {
+    ".claude/skills/docs-finder/scripts/tests/test-analyze-results.js": {
       "sha256": "d8aa16dfd322b226dceb851a3eeadbc9ec1e6b40ab26088f2d3ec24f66463230",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/scripts/tests/test-detect-source.js": {
+    ".claude/skills/docs-finder/scripts/tests/test-detect-source.js": {
       "sha256": "cad0abc137de258b39390e06cac23d765d66ca79c7fe977234de60901e4bc693",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/scripts/tests/test-fetch-chub.js": {
+    ".claude/skills/docs-finder/scripts/tests/test-fetch-chub.js": {
       "sha256": "48e439e8e333671edbb59c04d3985244f36e69f254e9d1feb531fc9f5593ba09",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/scripts/tests/test-fetch-context7.js": {
+    ".claude/skills/docs-finder/scripts/tests/test-fetch-context7.js": {
       "sha256": "5282b8fdca73d4c6d4b60944a8f98261513591b59c6124eafa221d12acbd2052",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/scripts/utils/env-loader.js": {
+    ".claude/skills/docs-finder/scripts/utils/env-loader.js": {
       "sha256": "ab07fad0b34b1db5b071c3ad5dabed338bb365878f551eac99716eb57b266890",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/workflows/internal-search.md": {
+    ".claude/skills/docs-finder/workflows/internal-search.md": {
       "sha256": "0f645494941373487b4f9ead03aba6a28e60a9ee01bb3ba241fa7aeaa0b9b905",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/workflows/library-search.md": {
+    ".claude/skills/docs-finder/workflows/library-search.md": {
       "sha256": "43ed200fa04ca4379451a01714164701f6e934ff4395bc0a3c2635d0db2e65de",
       "layer": "skill"
     },
-    ".claude/skills/meow:docs-finder/workflows/topic-search.md": {
+    ".claude/skills/docs-finder/workflows/topic-search.md": {
       "sha256": "6d97fd6c8c73cb3cd9887fa637b443dd744d3f5c858f9dde2bf51523733f82f4",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/SKILL.md": {
+    ".claude/skills/document-release/SKILL.md": {
       "sha256": "05648c62179dbfed2846853947c76a35a32fcf753572074c5a416f4221fc6e1a",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/ask-user-question-format.md": {
+    ".claude/skills/document-release/references/ask-user-question-format.md": {
       "sha256": "213337cd7b6719ced9dbc72c3d614060c46bcf27030797b1886efec39a6cc015",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/automation-rules.md": {
+    ".claude/skills/document-release/references/automation-rules.md": {
       "sha256": "5bcf0a89337185156fb17894ec35b759f74a8c20aeee2004ed244b0890d69bd0",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/base-branch-detection.md": {
+    ".claude/skills/document-release/references/base-branch-detection.md": {
       "sha256": "f3cd0fc3fab28e1071270ec236059911b31a0132ccc4000b321c6c5af9228859",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/completeness-principle.md": {
+    ".claude/skills/document-release/references/completeness-principle.md": {
       "sha256": "76cfa182b386b431a733c852735dddc15e8e92d462fc60cc729baf7b5db76a1e",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/completion-and-telemetry.md": {
+    ".claude/skills/document-release/references/completion-and-telemetry.md": {
       "sha256": "016daa9ef3520e5778fbf84331b550c7cda42437aaa4c7490f868c78f6c061cc",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/contributor-mode.md": {
+    ".claude/skills/document-release/references/contributor-mode.md": {
       "sha256": "1b675a98ab003218c5ff4c0e47f480bd41d323722b78137771add138b05ed8ad",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/important-rules.md": {
+    ".claude/skills/document-release/references/important-rules.md": {
       "sha256": "11fcdb6dd956ccfbd485aee46bf67d8066b5ae4e418ac76891c5826a6be3779f",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/preamble.md": {
+    ".claude/skills/document-release/references/preamble.md": {
       "sha256": "7b75408310c91315ae84681e8978a6e9059cff2fe164d738184e3b79e5dba568",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/repo-ownership-and-search.md": {
+    ".claude/skills/document-release/references/repo-ownership-and-search.md": {
       "sha256": "046a78157df810f61c78e214ac1b7465e62318667efb747c9b4aca29cc90449d",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/step1-preflight-diff-analysis.md": {
+    ".claude/skills/document-release/references/step1-preflight-diff-analysis.md": {
       "sha256": "9532fdd37a0a6351490b7fcc1df9bff6355de5ed878c2d18c7072162f8a1b21e",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/step2-per-file-audit.md": {
+    ".claude/skills/document-release/references/step2-per-file-audit.md": {
       "sha256": "e8898deada62154464446c10b0247ec40a3e1e9a2c6cd53435ffb2f2927882d2",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/step3-apply-auto-updates.md": {
+    ".claude/skills/document-release/references/step3-apply-auto-updates.md": {
       "sha256": "698bd230c4342ec2c8b3edadfd03086b3200e5721690c9dee28810809a4cdc4e",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/step4-risky-changes.md": {
+    ".claude/skills/document-release/references/step4-risky-changes.md": {
       "sha256": "e8f818937c53f9606b557ba7279952322b49d6c399d46b657e5888bfe08adcce",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/step5-changelog-voice-polish.md": {
+    ".claude/skills/document-release/references/step5-changelog-voice-polish.md": {
       "sha256": "baedcafb19d8766ef474d71c1dd6b0285a4976569639bd48f2388b259a57d496",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/step6-cross-doc-consistency.md": {
+    ".claude/skills/document-release/references/step6-cross-doc-consistency.md": {
       "sha256": "72c201a07ef9c5d88642030b96beb3148c626f76de0d1bcaf03732f5db5ea3cc",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/step7-todos-cleanup.md": {
+    ".claude/skills/document-release/references/step7-todos-cleanup.md": {
       "sha256": "e16e397e28a578810a75842f501987b06ca3ba66523bc142ca964040da552ab9",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/step8-version-bump.md": {
+    ".claude/skills/document-release/references/step8-version-bump.md": {
       "sha256": "f924ca0491b13a77bccb2781d42caaaad0dc3d10ab41440f9088e36c9337f671",
       "layer": "skill"
     },
-    ".claude/skills/meow:document-release/references/step9-commit-and-output.md": {
+    ".claude/skills/document-release/references/step9-commit-and-output.md": {
       "sha256": "e0839353774dc50e4b2ae2823bbac88193d1e6c284ca1e0774219968d3aa0c9d",
       "layer": "skill"
     },
-    ".claude/skills/meow:documentation/SKILL.md": {
+    ".claude/skills/documentation/SKILL.md": {
       "sha256": "b0df691be05dff431bcf64bfeeafafbcbe6d6b773af645642c290efbab4fe742",
       "layer": "skill"
     },
-    ".claude/skills/meow:documentation/references/api-sync.md": {
+    ".claude/skills/documentation/references/api-sync.md": {
       "sha256": "673a1a1bcf03ed054d56d21ad0ea4a620aa5d4eb0526c6785bb3b0eec6940dbb",
       "layer": "skill"
     },
-    ".claude/skills/meow:documentation/references/changelog-gen.md": {
+    ".claude/skills/documentation/references/changelog-gen.md": {
       "sha256": "668bd092e263fc134633b02fa5f2f67e32f47d010f4286175d323a6efc98eb46",
       "layer": "skill"
     },
-    ".claude/skills/meow:documentation/references/living-docs.md": {
+    ".claude/skills/documentation/references/living-docs.md": {
       "sha256": "b078bb668415448aade8f5f1da4f647a5cbedb9597128581c4b1d77d0ad5b5cb",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/SKILL.md": {
+    ".claude/skills/fix/SKILL.md": {
       "sha256": "524cffd57e48d153333a3a831022e7314fd7971bef073c4c49509573c91354e2",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/complexity-assessment.md": {
+    ".claude/skills/fix/references/complexity-assessment.md": {
       "sha256": "5be40c6885f47dc8672df1dd645d9418a2a5267f9f741081760718c13fdae462",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/mode-selection.md": {
+    ".claude/skills/fix/references/mode-selection.md": {
       "sha256": "f9e281e5e6a595f4db167cfef0287a697ba3b8784ca2db863d1827891e698c27",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/parallel-exploration.md": {
+    ".claude/skills/fix/references/parallel-exploration.md": {
       "sha256": "92eea6e9361168b4c6c347fc70fbc7b050beb27dd13b3e3adc41c81d18e4deba",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/review-cycle.md": {
+    ".claude/skills/fix/references/review-cycle.md": {
       "sha256": "216c6f3db543099e537cc541572df401c6eac824d64561a2779beb7f58e919e9",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/skill-activation-matrix.md": {
+    ".claude/skills/fix/references/skill-activation-matrix.md": {
       "sha256": "1331a488845898d76e9a3f8516ddf292ef2b77366b62cb4a75ee96872725e1c8",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/task-orchestration.md": {
+    ".claude/skills/fix/references/task-orchestration.md": {
       "sha256": "a48bed219eb37ae9aa4da0759a07f7ce9b0c6369a78f508d0c2c04e501a5198a",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/workflow-ci.md": {
+    ".claude/skills/fix/references/workflow-ci.md": {
       "sha256": "d803e6e50a1be2c498fb71762a383294b7b7ad8507b1fcec7920e19a306d1062",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/workflow-deep.md": {
+    ".claude/skills/fix/references/workflow-deep.md": {
       "sha256": "2e0a633a34e9afad0641765de0d21250ec33723985ff0c0d010164a0eb334660",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/workflow-logs.md": {
+    ".claude/skills/fix/references/workflow-logs.md": {
       "sha256": "e722cc6a9902e5a2902b7ae41862884fb3ed8639001532aa5f6fbae043055093",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/workflow-quick.md": {
+    ".claude/skills/fix/references/workflow-quick.md": {
       "sha256": "cf824cca77fc67c85db4eede51b2b589001630a5d7a8ae674fdc9f5e75a19245",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/workflow-standard.md": {
+    ".claude/skills/fix/references/workflow-standard.md": {
       "sha256": "49d3fa9abde671e54b516af7c78da8f59cf7105d98130f4fa268959330c60a01",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/workflow-test.md": {
+    ".claude/skills/fix/references/workflow-test.md": {
       "sha256": "9d7b45c13819466d5373b1db8740940e09f10e495ef8ace41d608a3972ee1448",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/workflow-types.md": {
+    ".claude/skills/fix/references/workflow-types.md": {
       "sha256": "dfe1fc38cec530a2e97cbc72cf20c3fbc8ab716c51afbd7b188ce12a53205648",
       "layer": "skill"
     },
-    ".claude/skills/meow:fix/references/workflow-ui.md": {
+    ".claude/skills/fix/references/workflow-ui.md": {
       "sha256": "4f0bd2f7dcd05a8bde5737f734aa9728f8e04a911095a755b97f9b0b787ac7b7",
       "layer": "skill"
     },
-    ".claude/skills/meow:freeze/SKILL.md": {
+    ".claude/skills/freeze/SKILL.md": {
       "sha256": "378f46e6d268c5c5d7bee324a19432b7d781d1b9bc185d1c001dcb2b9ba529ed",
       "layer": "skill"
     },
-    ".claude/skills/meow:frontend-design/SKILL.md": {
+    ".claude/skills/frontend-design/SKILL.md": {
       "sha256": "9f8e904d026f9f261f5f003da16539eeafcec2e77291883a6c3e907f0c137bc1",
       "layer": "skill"
     },
-    ".claude/skills/meow:frontend-design/references/design-rules.md": {
+    ".claude/skills/frontend-design/references/design-rules.md": {
       "sha256": "49705f93f67d7d9bfb882c7668903cd6b3847aefb905e625c7806e26423bfe57",
       "layer": "skill"
     },
-    ".claude/skills/meow:investigate/SKILL.md": {
+    ".claude/skills/investigate/SKILL.md": {
       "sha256": "d80e2150793803871613ed1747d7ae23a2da5a3a387ad707e7a9a276595e23ed",
       "layer": "skill"
     },
-    ".claude/skills/meow:investigate/references/debugging-methodology.md": {
+    ".claude/skills/investigate/references/debugging-methodology.md": {
       "sha256": "7ed6bb127b1eba375188401957dd159f23d63239e67bfb8968b208d42b7416ed",
       "layer": "skill"
     },
-    ".claude/skills/meow:investigate/references/preamble.md": {
+    ".claude/skills/investigate/references/preamble.md": {
       "sha256": "27e939396d07bd56d36e286c09425ca7e11067e5475783099ed6f06bccb1220e",
       "layer": "skill"
     },
-    ".claude/skills/meow:investigate/references/shared-protocols.md": {
+    ".claude/skills/investigate/references/shared-protocols.md": {
       "sha256": "18c1760e95c5737fa843276773ec222ab9a4e11aaa7e06ed6747c6f86614cd56",
       "layer": "skill"
     },
-    ".claude/skills/meow:lazy-agent-loader/SKILL.md": {
+    ".claude/skills/lazy-agent-loader/SKILL.md": {
       "sha256": "88a81a76f58144b1f524fc84b049ab1b1ae0cb1b620777f3f65c75722c8909c6",
       "layer": "skill"
     },
-    ".claude/skills/meow:lazy-agent-loader/references/loading-details.md": {
+    ".claude/skills/lazy-agent-loader/references/loading-details.md": {
       "sha256": "a4d901526f8d6b656f8e3340903009e0bf59f60f68d13c6caa64069acec767d3",
       "layer": "skill"
     },
-    ".claude/skills/meow:lint-and-validate/SKILL.md": {
+    ".claude/skills/lint-and-validate/SKILL.md": {
       "sha256": "7f89e136bf66fa2fa07c6379c13eaf94feb955d5d0d231315795bdc2233a0bf6",
       "layer": "skill"
     },
-    ".claude/skills/meow:llms/SKILL.md": {
+    ".claude/skills/llms/SKILL.md": {
       "sha256": "f5e4c1047821b44706d8f74071c23af11a071e79adc7217b8aaefee0d6bea429",
       "layer": "skill"
     },
-    ".claude/skills/meow:llms/references/llms-txt-spec.md": {
+    ".claude/skills/llms/references/llms-txt-spec.md": {
       "sha256": "8ca1c46221267f8e2bd36e31c712305a6ee5d4099a364dc5027e28bb0afbab1a",
       "layer": "skill"
     },
-    ".claude/skills/meow:llms/scripts/generate-llms-txt.py": {
+    ".claude/skills/llms/scripts/generate-llms-txt.py": {
       "sha256": "aa2cf215f2c3940586dcdb370574807485dc579606b02e10ac32fea1b8acfdd4",
       "layer": "skill"
     },
-    ".claude/skills/meow:memory/SKILL.md": {
+    ".claude/skills/memory/SKILL.md": {
       "sha256": "5eebc590db5a2096fb43b4ae72255f578c0fd2d9cd396e935c218b7ec9f67f6f",
       "layer": "skill"
     },
-    ".claude/skills/meow:memory/references/cost-tracking.md": {
+    ".claude/skills/memory/references/cost-tracking.md": {
       "sha256": "aece2d45f378765a134d158a3073bcb2261c5013e4408d79b7800cc9229db445",
       "layer": "skill"
     },
-    ".claude/skills/meow:memory/references/pattern-extraction.md": {
+    ".claude/skills/memory/references/pattern-extraction.md": {
       "sha256": "86d85ed7695b88ebc7b6d77a5029618506f525349d749d150af6dfd36c52337c",
       "layer": "skill"
     },
-    ".claude/skills/meow:memory/references/session-capture.md": {
+    ".claude/skills/memory/references/session-capture.md": {
       "sha256": "7617a55c51ae2741d0a755e6a7dd0c4e459667365556e7349fda392f75b5fb26",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/.env.example": {
+    ".claude/skills/multimodal/.env.example": {
       "sha256": "ad443d6d43ad3f3f9682e9aae4d30cc742a439220c124cd2343840fc66141375",
       "layer": "user"
     },
-    ".claude/skills/meow:multimodal/SKILL.md": {
+    ".claude/skills/multimodal/SKILL.md": {
       "sha256": "0e0de0a28b675ff79a56893e7ccfe9be83dab2cf5481fc4d0e62e04f47dddc5c",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/references/audio-processing.md": {
+    ".claude/skills/multimodal/references/audio-processing.md": {
       "sha256": "7f6e57bc21e3d016a30419d407e173af17882aa7288f87c8c530caca98b27f20",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/references/models-and-pricing.md": {
+    ".claude/skills/multimodal/references/models-and-pricing.md": {
       "sha256": "2f3a4323533c0b94435fb32f71de2546fdd0d8b759848a76d3787443d5f5ea5f",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/references/vision-understanding.md": {
+    ".claude/skills/multimodal/references/vision-understanding.md": {
       "sha256": "018580c575044b9d4502b66aae80eb6328d435b4facc5b410dbbf33320865ebd",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/scripts/check_setup.py": {
+    ".claude/skills/multimodal/scripts/check_setup.py": {
       "sha256": "3e9f65aa9dc9f209291667aca6211162d8f687672c4142eec90acbe19860add0",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/scripts/gemini_analyze.py": {
+    ".claude/skills/multimodal/scripts/gemini_analyze.py": {
       "sha256": "0c9d2f9b433276423913f25f305d24ad67f5a114c9fde5a2e06f05070f84e241",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/scripts/gemini_generate.py": {
+    ".claude/skills/multimodal/scripts/gemini_generate.py": {
       "sha256": "1f9d0e87aff9411b111c221e3a95f1bb30e95bfb737b51d913dcdf6089d8ea02",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/scripts/requirements.txt": {
+    ".claude/skills/multimodal/scripts/requirements.txt": {
       "sha256": "9b43f924cac0b1fc86f331c605bca1e92d46c3ab65f5de4e028d1f8b48d3f67b",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/scripts/tests/run_tests.py": {
+    ".claude/skills/multimodal/scripts/tests/run_tests.py": {
       "sha256": "55493c4d8945d1cb9ffd49de758be34ab93bb65cb444de366c0a4bbfcda75a6c",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/scripts/tests/test_check_setup.py": {
+    ".claude/skills/multimodal/scripts/tests/test_check_setup.py": {
       "sha256": "0118067f9c244465fe298d2f253106a38537cf64fd76040ed3105af8af8c36ba",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/scripts/tests/test_gemini_analyze.py": {
+    ".claude/skills/multimodal/scripts/tests/test_gemini_analyze.py": {
       "sha256": "633a19917d81143067d0f2fd62970a2838604affd95d1b859ff43abfe853621d",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/scripts/tests/test_gemini_generate.py": {
+    ".claude/skills/multimodal/scripts/tests/test_gemini_generate.py": {
       "sha256": "c7aec8596aec8a41ef8bcda476e8589993d18a88ee4f46de34bf930efd27e3d9",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/workflows/audio-transcription.md": {
+    ".claude/skills/multimodal/workflows/audio-transcription.md": {
       "sha256": "ea7af14da8f704c51e4e2bd3a9984e1c8894edc2c8cb57e2af585df73ef74c33",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/workflows/document-extraction.md": {
+    ".claude/skills/multimodal/workflows/document-extraction.md": {
       "sha256": "06bfde3cc27a2504fbc8f29bb58bddf62ec081106063ee3f3fadff6c23218300",
       "layer": "skill"
     },
-    ".claude/skills/meow:multimodal/workflows/image-analysis.md": {
+    ".claude/skills/multimodal/workflows/image-analysis.md": {
       "sha256": "e8d3566655464c7103d03b67c3de92e97cd4a3cc6745c1f3d0b0bd158798bebc",
       "layer": "skill"
     },
-    ".claude/skills/meow:office-hours/SKILL.md": {
+    ".claude/skills/office-hours/SKILL.md": {
       "sha256": "8b1319e22a4e9f9d19f0923560c01451360bbe0e945050dea658e9816ea725c2",
       "layer": "skill"
     },
-    ".claude/skills/meow:office-hours/references/important-rules.md": {
+    ".claude/skills/office-hours/references/important-rules.md": {
       "sha256": "3fbf72407a0aafd52ba67ddfd5096af786d270a7ab5c692b1a2e8652dc83e984",
       "layer": "skill"
     },
-    ".claude/skills/meow:office-hours/references/phase1-context-gathering.md": {
+    ".claude/skills/office-hours/references/phase1-context-gathering.md": {
       "sha256": "f3eb7b67c999b6c64d09618e4d84d5d2e9f7f30c6dddf4c806e9fb5e216ec33f",
       "layer": "skill"
     },
-    ".claude/skills/meow:office-hours/references/phase2.5-landscape-and-premises.md": {
+    ".claude/skills/office-hours/references/phase2.5-landscape-and-premises.md": {
       "sha256": "b796473ffcae0c8b8d4907cdd713c13d40fbaaface343bf9518d2f64d40d4f3b",
       "layer": "skill"
     },
-    ".claude/skills/meow:office-hours/references/phase2a-startup-mode.md": {
+    ".claude/skills/office-hours/references/phase2a-startup-mode.md": {
       "sha256": "5358779280a4ae37e80821270fc620193ead16f8b8aab5029ec2ac261a8e6e66",
       "layer": "skill"
     },
-    ".claude/skills/meow:office-hours/references/phase2b-builder-mode.md": {
+    ".claude/skills/office-hours/references/phase2b-builder-mode.md": {
       "sha256": "29580a72da18de55bc94bacd26e641f6bddbd2caebc0d9cd2c2a549f5f0a21e2",
       "layer": "skill"
     },
-    ".claude/skills/meow:office-hours/references/phase4-alternatives-and-sketch.md": {
+    ".claude/skills/office-hours/references/phase4-alternatives-and-sketch.md": {
       "sha256": "14e1163b30c656ff9decb7162b0d11e0a2400a28e162d83cdb6d37250f3bda05",
       "layer": "skill"
     },
-    ".claude/skills/meow:office-hours/references/phase4.5-signals-and-design-doc.md": {
+    ".claude/skills/office-hours/references/phase4.5-signals-and-design-doc.md": {
       "sha256": "94913ebdb9da812054d83f1da9a104179ea14b6a6c3c9b7bd34921bcf13cd2a0",
       "layer": "skill"
     },
-    ".claude/skills/meow:office-hours/references/phase6-handoff.md": {
+    ".claude/skills/office-hours/references/phase6-handoff.md": {
       "sha256": "cbd6766aa9eda1a74142b70f49f62d94d54a5b0aacd67df7ffd5e7d39a0f903a",
       "layer": "skill"
     },
-    ".claude/skills/meow:office-hours/references/preamble.md": {
+    ".claude/skills/office-hours/references/preamble.md": {
       "sha256": "30dd0a6360d3160d1ffabe3dfb54704573e42f0c388ab02fdbaba9d8f0a36980",
       "layer": "skill"
     },
-    ".claude/skills/meow:office-hours/references/shared-protocols.md": {
+    ".claude/skills/office-hours/references/shared-protocols.md": {
       "sha256": "2264be730fc73585462cfa5e44794f40f486f5ff93be80c16fe9e7edeab45b8d",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/SKILL.md": {
+    ".claude/skills/plan-ceo-review/SKILL.md": {
       "sha256": "a87d3961102698d832f24a2f773e7c6a039d84f62f0df19583542b47c46c24b6",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/references/base-branch-detection.md": {
+    ".claude/skills/plan-ceo-review/references/base-branch-detection.md": {
       "sha256": "f3cd0fc3fab28e1071270ec236059911b31a0132ccc4000b321c6c5af9228859",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/references/outside-voice.md": {
+    ".claude/skills/plan-ceo-review/references/outside-voice.md": {
       "sha256": "f4cb2ebb181d0b80cfeb628393d5b464fcccb8b6c2f85aa0ff14c778537b4874",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/references/philosophy-and-principles.md": {
+    ".claude/skills/plan-ceo-review/references/philosophy-and-principles.md": {
       "sha256": "2e3017d959f58e2294a0f6fc9cb2a6073ea28b0c16069f7a0fe3d3c56ae103f6",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/references/post-review.md": {
+    ".claude/skills/plan-ceo-review/references/post-review.md": {
       "sha256": "14f89bcde36cf4bb4bf2f6d7c21535a005d1150f837c7decdad17dad5fc878de",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/references/pre-review-system-audit.md": {
+    ".claude/skills/plan-ceo-review/references/pre-review-system-audit.md": {
       "sha256": "e90935cad72ecc6e1f1e8508f68e3e599926e56ddeb768a13a25d3b85dba388e",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/references/preamble.md": {
+    ".claude/skills/plan-ceo-review/references/preamble.md": {
       "sha256": "700a2213905118d2734aad7b1e16effe71057b7a8dd06b8c3203711019febe03",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/references/prerequisite-skill-offer.md": {
+    ".claude/skills/plan-ceo-review/references/prerequisite-skill-offer.md": {
       "sha256": "b6188d7183ed653419b39e6c810448059c0473c51f1bbb95fe6280b14f1789d7",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/references/required-outputs.md": {
+    ".claude/skills/plan-ceo-review/references/required-outputs.md": {
       "sha256": "d0143c9119ffead0f40f7a87fb9b193b1bbd61af6916d3e7f11352a4ce3c669a",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/references/review-sections.md": {
+    ".claude/skills/plan-ceo-review/references/review-sections.md": {
       "sha256": "eaf906bc5436bfe0ecb0d55a339a5ba78911312d87d94eb8eb526ed4565e6b78",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/references/shared-protocols.md": {
+    ".claude/skills/plan-ceo-review/references/shared-protocols.md": {
       "sha256": "2264be730fc73585462cfa5e44794f40f486f5ff93be80c16fe9e7edeab45b8d",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-ceo-review/references/step0-scope-and-mode.md": {
+    ".claude/skills/plan-ceo-review/references/step0-scope-and-mode.md": {
       "sha256": "18e26dca00148b6a8b70418036c170075cb539755889282fd971a0f1e3d88db8",
       "layer": "skill"
     },
-    ".claude/skills/meow:plan-creator/SKILL.md": {
+    ".claude/skills/plan-creator/SKILL.md": {
       "sha256": "b176460e8267f98e3980362bbc6cb8417dd259d87d4d645f12f4cb488bae1cfd",
       "layer": "skill"
     },
-    ".claude/skills/meow:planning/SKILL.md": {
+    ".claude/skills/planning/SKILL.md": {
       "sha256": "bf2d465e995a9d9370470dad884fae71c6baaef24ba5789b96d15524e19f2fae",
       "layer": "skill"
     },
-    ".claude/skills/meow:planning/references/adr-generation.md": {
+    ".claude/skills/planning/references/adr-generation.md": {
       "sha256": "7601c823527ae452eedc0e6d5e52ff49c3865a3e246ed6aa9713a403f3e35717",
       "layer": "skill"
     },
-    ".claude/skills/meow:planning/references/plan-template.md": {
+    ".claude/skills/planning/references/plan-template.md": {
       "sha256": "0c544a2092870dacffa672e74065814b30c061cea190e28b7109d23146f18cc9",
       "layer": "skill"
     },
-    ".claude/skills/meow:planning/references/premise-challenge.md": {
+    ".claude/skills/planning/references/premise-challenge.md": {
       "sha256": "d622603034e867921b26da0f4c200ee912cf896a942cf060fd7c6db2f23a6281",
       "layer": "skill"
     },
-    ".claude/skills/meow:playwright-cli/SKILL.md": {
+    ".claude/skills/playwright-cli/SKILL.md": {
       "sha256": "431c60837fc719ffd93a58025e33b49f7c484bc9dffd030c81acbc95fc647a13",
       "layer": "skill"
     },
-    ".claude/skills/meow:playwright-cli/references/request-mocking.md": {
+    ".claude/skills/playwright-cli/references/request-mocking.md": {
       "sha256": "54e801c9663fc2b6d68ceb058cb1c360724c2499f42acc7852a68e83e5b5f37c",
       "layer": "skill"
     },
-    ".claude/skills/meow:playwright-cli/references/running-code.md": {
+    ".claude/skills/playwright-cli/references/running-code.md": {
       "sha256": "9707ad5e406db7e06895203fae97e6fb1d72f82fd8e8ece4a0a3754dc64d57ae",
       "layer": "skill"
     },
-    ".claude/skills/meow:playwright-cli/references/session-management.md": {
+    ".claude/skills/playwright-cli/references/session-management.md": {
       "sha256": "97d9a564f9661bf7f6c940d884f20d79f912e7c84df4d3d5742383b9ff1c7a22",
       "layer": "skill"
     },
-    ".claude/skills/meow:playwright-cli/references/storage-state.md": {
+    ".claude/skills/playwright-cli/references/storage-state.md": {
       "sha256": "1122778c9b13b44bddebb4476a7f99d918afd31757be8b4fade3cb09c3d48c99",
       "layer": "skill"
     },
-    ".claude/skills/meow:playwright-cli/references/test-generation.md": {
+    ".claude/skills/playwright-cli/references/test-generation.md": {
       "sha256": "f08d14388b7002963e27bd242550154cb1379def89597464deb36b6f7afca15f",
       "layer": "skill"
     },
-    ".claude/skills/meow:playwright-cli/references/tracing.md": {
+    ".claude/skills/playwright-cli/references/tracing.md": {
       "sha256": "792e0ac7705e56ac48df84c0f5400221ce86107897c671590a64a4ea6a82508e",
       "layer": "skill"
     },
-    ".claude/skills/meow:playwright-cli/references/video-recording.md": {
+    ".claude/skills/playwright-cli/references/video-recording.md": {
       "sha256": "f5a1309e73b080e900d9e01c019d729c0132c616c0e905bc0af79b479d29242a",
       "layer": "skill"
     },
-    ".claude/skills/meow:project-organization/SKILL.md": {
+    ".claude/skills/project-organization/SKILL.md": {
       "sha256": "3c5a4c7dbf87dcb73ef5a63c03b3ccd07140eac1d7c98f698914f4abd5d508b8",
       "layer": "skill"
     },
-    ".claude/skills/meow:project-organization/references/directory-rules.md": {
+    ".claude/skills/project-organization/references/directory-rules.md": {
       "sha256": "dc5997bb65088ee7a4ffc754e60c28e10481dbd90263ac064b290b3db89345ef",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa/SKILL.md": {
+    ".claude/skills/qa/SKILL.md": {
       "sha256": "40bca2b42c254798985b99fe655cc5f0fceba582373f81b3cce773952879d707",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa/references/framework-guidance.md": {
+    ".claude/skills/qa/references/framework-guidance.md": {
       "sha256": "7fe35667c598ab3e45dd938d1b512f13b2908b9827166dd647b9d1385f6981cf",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa/references/health-score.md": {
+    ".claude/skills/qa/references/health-score.md": {
       "sha256": "58e5869317d7dbbfe39b7a745a9129d3e65780c740ac9a61c85e0b18d1e19b63",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa/references/issue-taxonomy.md": {
+    ".claude/skills/qa/references/issue-taxonomy.md": {
       "sha256": "00e8a5f8de02a80b7f92be4b332fb09dc339ecaaa63424f24166790bee688ac5",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa/references/modes.md": {
+    ".claude/skills/qa/references/modes.md": {
       "sha256": "627bf60ab6f2559581a0c20e103bed9febcb0a41b4221a9585f9e57501e45ff4",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa/references/preamble.md": {
+    ".claude/skills/qa/references/preamble.md": {
       "sha256": "8e56dc57cb1d6539ec8050a64f9224c0f4e70448a75cdabc3c8abf5e5a4e6b1d",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa/references/rules.md": {
+    ".claude/skills/qa/references/rules.md": {
       "sha256": "d530fc47879a1f9e9303af6e4d8ef21aff029fac209597d13ea1e3da4a782edb",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa/references/setup.md": {
+    ".claude/skills/qa/references/setup.md": {
       "sha256": "d244a2618b86690f24c1c390cce858fafc8be2327f6c1d59783864b9541d8665",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa/references/workflow-phases.md": {
+    ".claude/skills/qa/references/workflow-phases.md": {
       "sha256": "b9ab6a73d4a8129739d4ebe024f7964f2cf99964f9ffeebb8ec5e9199992a2a0",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa-manual/SKILL.md": {
+    ".claude/skills/qa-manual/SKILL.md": {
       "sha256": "47a8a589f28bcc221009f56e011eeb699b2c7a218e21e9922b668c712d3cd93c",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa-manual/examples/01-login-flow-manual-qa.md": {
+    ".claude/skills/qa-manual/examples/01-login-flow-manual-qa.md": {
       "sha256": "4488ce6e352c34704fbd35dab63a0e5da63fbe7ac860b50ba4153e4cc55cd807",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa-manual/examples/02-checkout-e2e-generation.md": {
+    ".claude/skills/qa-manual/examples/02-checkout-e2e-generation.md": {
       "sha256": "a1c0fa1f72a9dc8c84c57800bc91e6b89e9619dcde04dc409e54c1884da16fa4",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa-manual/examples/03-url-exploration.md": {
+    ".claude/skills/qa-manual/examples/03-url-exploration.md": {
       "sha256": "e475d19c16428ba6eef6eb235fded83a80b0425d4b786fd652677dae4568528e",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa-manual/references/output-templates.md": {
+    ".claude/skills/qa-manual/references/output-templates.md": {
       "sha256": "2eac6a3bee7ced6c53fef283c1e01c4d77f87dea9912f5e09f360b05b6bdd96b",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa-manual/references/qa-process.md": {
+    ".claude/skills/qa-manual/references/qa-process.md": {
       "sha256": "32fc06aca4ae3fe1f339b2127f55177a5a6617304760cbefb61f8150ab319d72",
       "layer": "skill"
     },
-    ".claude/skills/meow:qa-manual/scripts/run-playwright.sh": {
+    ".claude/skills/qa-manual/scripts/run-playwright.sh": {
       "sha256": "48dc703796db2f8e37b4de0d6c93856661b40087818a99ced611edfce963a303",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/SKILL.md": {
+    ".claude/skills/retro/SKILL.md": {
       "sha256": "9779e7fa0938b7c24938db9b41697e6b430776a2077542dbb12beb19bfe86c0a",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/ask-user-question-format.md": {
+    ".claude/skills/retro/references/ask-user-question-format.md": {
       "sha256": "921a068d5aa6687240e236ae5502b0b2bc328cc0565211b189b899bceb913b37",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/compare-mode.md": {
+    ".claude/skills/retro/references/compare-mode.md": {
       "sha256": "9a12e562a9d45d5e7a507b8e80ff719be71f79d8373e56ddc0616f4a7bee6533",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/completeness-principle.md": {
+    ".claude/skills/retro/references/completeness-principle.md": {
       "sha256": "76cfa182b386b431a733c852735dddc15e8e92d462fc60cc729baf7b5db76a1e",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/completion-status-protocol.md": {
+    ".claude/skills/retro/references/completion-status-protocol.md": {
       "sha256": "997ec74f808ba0ce4cbdeef8a755fbba609f184f9c1d5d6791979dbecfcd9d03",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/contributor-mode.md": {
+    ".claude/skills/retro/references/contributor-mode.md": {
       "sha256": "1b675a98ab003218c5ff4c0e47f480bd41d323722b78137771add138b05ed8ad",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/data-gathering.md": {
+    ".claude/skills/retro/references/data-gathering.md": {
       "sha256": "88c3139b62f913e12b8770e43eb5374800bc06ebfb0788eb0e613db0bde3a808",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/global-retro.md": {
+    ".claude/skills/retro/references/global-retro.md": {
       "sha256": "f95621c4ff0333cb9adad728fa55a0e517887e2d277d206cbf5db3529cb804b5",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/metrics-computation.md": {
+    ".claude/skills/retro/references/metrics-computation.md": {
       "sha256": "78f4b0a0af00e51f5e2dcfe0334572a3cf0d901003ef450dd5cc491c4a1c3fa3",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/narrative-output.md": {
+    ".claude/skills/retro/references/narrative-output.md": {
       "sha256": "346aca1d79c4e6223c717592e4c127fee0fb9e02dc8078f2dc7edbf22cc781d4",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/plan-status-footer.md": {
+    ".claude/skills/retro/references/plan-status-footer.md": {
       "sha256": "4ba3b690bee2c93e020766fd99b934235f0a6c5bc5d513b0ac76de1ab625b399",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/preamble.md": {
+    ".claude/skills/retro/references/preamble.md": {
       "sha256": "bd96d55586a314cf8e9ae84aa0eddce064e242607f919b3642c9d52237813609",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/repo-ownership-mode.md": {
+    ".claude/skills/retro/references/repo-ownership-mode.md": {
       "sha256": "7ddb5b318750f306defd5738c4a2910db9a66cfad11269ad3014a0da63325a98",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/search-before-building.md": {
+    ".claude/skills/retro/references/search-before-building.md": {
       "sha256": "d89350bad5f4ac9ff1efc884a5ea7b2b92b52618716247e5affbabe51f33bf99",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/team-analysis.md": {
+    ".claude/skills/retro/references/team-analysis.md": {
       "sha256": "8196910f853eac2e4081a8461ee86d9d2781d2a756ab66690f104c37ec8f11a5",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/telemetry.md": {
+    ".claude/skills/retro/references/telemetry.md": {
       "sha256": "09c1258e5eb23236cc6f9babbdb41dc4bd5520cb61eb37242a7b55039be99569",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/tone-and-rules.md": {
+    ".claude/skills/retro/references/tone-and-rules.md": {
       "sha256": "878a17b1884f63ec6f4e935414405a642cb980b975d5812cfdbfd225a1638e6f",
       "layer": "skill"
     },
-    ".claude/skills/meow:retro/references/trends-history.md": {
+    ".claude/skills/retro/references/trends-history.md": {
       "sha256": "f0a84a898ead980f084cfc1fa176fc3c1519aeaea902cdcc35e1c1841b6c7b5d",
       "layer": "skill"
     },
-    ".claude/skills/meow:review/SKILL.md": {
+    ".claude/skills/review/SKILL.md": {
       "sha256": "e20c5f7166bc682d74d618f3281476d6b9a515d12a4accba503f56716e3fa91a",
       "layer": "skill"
     },
-    ".claude/skills/meow:review/references/adversarial-review.md": {
+    ".claude/skills/review/references/adversarial-review.md": {
       "sha256": "9a191becd8e3c0fad116a4c84813d0065ef32ecfcc59bd0effda8fcfb8e667f9",
       "layer": "skill"
     },
-    ".claude/skills/meow:review/references/design-review.md": {
+    ".claude/skills/review/references/design-review.md": {
       "sha256": "d91a804e8f585ba2dbb20b3c56beed55d6d629156802cb5345c768bf18838218",
       "layer": "skill"
     },
-    ".claude/skills/meow:review/references/fix-first-review.md": {
+    ".claude/skills/review/references/fix-first-review.md": {
       "sha256": "1e85698e0d152c7751458bbe962f88c786d83230d2fae5067e2f2390e997d77e",
       "layer": "skill"
     },
-    ".claude/skills/meow:review/references/post-review-steps.md": {
+    ".claude/skills/review/references/post-review-steps.md": {
       "sha256": "3882a6077628d0469e86402e0906e0248f011ece22aeb8e2eb681d73dba88138",
       "layer": "skill"
     },
-    ".claude/skills/meow:review/references/preamble.md": {
+    ".claude/skills/review/references/preamble.md": {
       "sha256": "00c317ef7bdcbfe2091f70fd138bcc9e11638919e604b4056d2fea7e96d07b9f",
       "layer": "skill"
     },
-    ".claude/skills/meow:review/references/scope-drift-detection.md": {
+    ".claude/skills/review/references/scope-drift-detection.md": {
       "sha256": "a0298d8dee1792f55fdbebdd61ae4c8fc82388f59dd27489551e3d4888844cdd",
       "layer": "skill"
     },
-    ".claude/skills/meow:review/references/test-coverage.md": {
+    ".claude/skills/review/references/test-coverage.md": {
       "sha256": "e2a4eb828b0293bd185eb61711303a7dae285536e8b723eaecb8bbc4c163fc6c",
       "layer": "skill"
     },
-    ".claude/skills/meow:review/references/two-pass-review.md": {
+    ".claude/skills/review/references/two-pass-review.md": {
       "sha256": "78e5c2ab395e4d6c08b592a1f39341724cb02195257cff9cdf1110f14efe5d87",
       "layer": "skill"
     },
-    ".claude/skills/meow:review/security-checklist.md": {
+    ".claude/skills/review/security-checklist.md": {
       "sha256": "dd50041c381c2769b5f47b1fcb2267302947e904bd8f014f3b5f4bc1620bce28",
       "layer": "skill"
     },
-    ".claude/skills/meow:review/structural-audit.md": {
+    ".claude/skills/review/structural-audit.md": {
       "sha256": "3ed4cc57f0d55e0fad73b81db1ac2881d2eadfc4846dcbe30d2c81ed8c6382be",
       "layer": "skill"
     },
-    ".claude/skills/meow:scout/SKILL.md": {
+    ".claude/skills/scout/SKILL.md": {
       "sha256": "3b419a13aad3d95a31bbbdba2931aef9a3e9f2fa3ada766f41c89886408c01bc",
       "layer": "skill"
     },
-    ".claude/skills/meow:scout/references/report-and-handoff.md": {
+    ".claude/skills/scout/references/report-and-handoff.md": {
       "sha256": "a47c71d9efaa34ed35092d6c19e99bb3cadfcd08851195651a2fb02604a70b7b",
       "layer": "skill"
     },
-    ".claude/skills/meow:scout/references/scouting-strategy.md": {
+    ".claude/skills/scout/references/scouting-strategy.md": {
       "sha256": "8fc681b40d931d2f1fb00e8cee963907a333fd7179467911e93d91d00be3a463",
       "layer": "skill"
     },
-    ".claude/skills/meow:scout/references/search-scope.md": {
+    ".claude/skills/scout/references/search-scope.md": {
       "sha256": "fba6aefdc52eaaaba690b098c2b6838374a8123e3287fb7a5c1323348a151f22",
       "layer": "skill"
     },
-    ".claude/skills/meow:session-continuation/SKILL.md": {
+    ".claude/skills/session-continuation/SKILL.md": {
       "sha256": "f75a5043453f867d3ad7a9e668a1bf0410848d267c271162432e7c42fa00d0e1",
       "layer": "skill"
     },
-    ".claude/skills/meow:session-continuation/references/handoff-flow.md": {
+    ".claude/skills/session-continuation/references/handoff-flow.md": {
       "sha256": "a892dcd57ccb3b734aeebe83e1fde4ffd8ae2261beeda9575e241d80c74cb2a6",
       "layer": "skill"
     },
-    ".claude/skills/meow:session-continuation/references/resume-and-state.md": {
+    ".claude/skills/session-continuation/references/resume-and-state.md": {
       "sha256": "aef3e58f3ac313696e22d7b057c5d91fb4cbbf959bdc3c4513cf1333e2de7843",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/SKILL.md": {
+    ".claude/skills/ship/SKILL.md": {
       "sha256": "c7744402bae00107c00e12a03b81da26ee8a87e0a8e59c60b40d6ae9b994dcd9",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/adversarial-review.md": {
+    ".claude/skills/ship/references/adversarial-review.md": {
       "sha256": "1f8f9770697ba8c55a8068dae56610ce07c25127ae4e3f334d647820ea8ba420",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/commit-push-pr.md": {
+    ".claude/skills/ship/references/commit-push-pr.md": {
       "sha256": "b58e9f3bbad1cbcfea106c6c13715e50270d484ab51929982cb01a6c34c68a0c",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/distribution-pipeline.md": {
+    ".claude/skills/ship/references/distribution-pipeline.md": {
       "sha256": "40636da544a4b2d8df04801eb86bcd41b637928c13716f9e0f7181f4c4f56f11",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/eval-suites.md": {
+    ".claude/skills/ship/references/eval-suites.md": {
       "sha256": "36ff8444d052e0fbff7a6abb86568317fc9de47c504635b195595b699f0dbaca",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/merge-and-test-bootstrap.md": {
+    ".claude/skills/ship/references/merge-and-test-bootstrap.md": {
       "sha256": "b8bdd7927cc55cb69290c2d351a07f1c6513465dcc9367dbe781f9fcaf4b7a31",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/plan-completion-audit.md": {
+    ".claude/skills/ship/references/plan-completion-audit.md": {
       "sha256": "4796a3ee7ed0e541b4a65912888147b50d3505297c9f754492c046f1c7ad96a0",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/pre-flight.md": {
+    ".claude/skills/ship/references/pre-flight.md": {
       "sha256": "0b105156ec15685e87fad9d2c427f2267018b06343299c179b87e1834c0bef66",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/pre-landing-review.md": {
+    ".claude/skills/ship/references/pre-landing-review.md": {
       "sha256": "fc41b012c26a41c5da89cff66664b6aaad2995d47e491b5bfc69ce577798f065",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/preamble.md": {
+    ".claude/skills/ship/references/preamble.md": {
       "sha256": "7861fc753eea59e9f82db83a33ce25d9b43aab3458c603b25992f0341ffe0bac",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/rules.md": {
+    ".claude/skills/ship/references/rules.md": {
       "sha256": "acd1bd6a1fe91f4afca8b176661437b25bda062ee27a5adecb0690e37f96c484",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/test-coverage-audit.md": {
+    ".claude/skills/ship/references/test-coverage-audit.md": {
       "sha256": "290a37748cec2ff5f4b88ba25dbdfd280abade5885404741f5fc961d86396317",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/test-execution.md": {
+    ".claude/skills/ship/references/test-execution.md": {
       "sha256": "7ff3bb25d6e76cfc168d2989f30d2b28752800a10fe3dcc62885e694276ce27a",
       "layer": "skill"
     },
-    ".claude/skills/meow:ship/references/version-changelog-todos.md": {
+    ".claude/skills/ship/references/version-changelog-todos.md": {
       "sha256": "0c1b00591ee97fd4a7e4d0a4ebf865d5956a703d30b3fb25fa560736950e4b8f",
       "layer": "skill"
     },
-    ".claude/skills/meow:shipping/SKILL.md": {
+    ".claude/skills/shipping/SKILL.md": {
       "sha256": "7299236f7b8fbc56e3ba49509867c58b39e5759ee3a00a91479857505df96bd6",
       "layer": "skill"
     },
-    ".claude/skills/meow:shipping/references/canary-deploy.md": {
+    ".claude/skills/shipping/references/canary-deploy.md": {
       "sha256": "e5dbd259af3b03dd5deaaeb35fb144a861cf53bbb1fc61898abcf6330a4a68a3",
       "layer": "skill"
     },
-    ".claude/skills/meow:shipping/references/rollback-protocol.md": {
+    ".claude/skills/shipping/references/rollback-protocol.md": {
       "sha256": "e786720692fe6a25a568b7f304f63d7da59edf92be042e1918af54f51d3210fd",
       "layer": "skill"
     },
-    ".claude/skills/meow:shipping/references/ship-pipeline.md": {
+    ".claude/skills/shipping/references/ship-pipeline.md": {
       "sha256": "224b1e5077814bcfc18eee54a1b63499bde3a8014e8eb7ca4ccef15fe1219618",
       "layer": "skill"
     },
-    ".claude/skills/meow:skill-creator/SKILL.md": {
+    ".claude/skills/skill-creator/SKILL.md": {
       "sha256": "52f2d736a1f27a74e2de2841536c7f74d191eb30ddd9c3e60db1c3bb4a3df3a3",
       "layer": "skill"
     },
-    ".claude/skills/meow:skill-creator/references/creation-workflow.md": {
+    ".claude/skills/skill-creator/references/creation-workflow.md": {
       "sha256": "35d361b763397790ef4a6b054c1ce4f99f0402d879ff986103937adef509dfa2",
       "layer": "skill"
     },
-    ".claude/skills/meow:skill-creator/scripts/init-skill.py": {
+    ".claude/skills/skill-creator/scripts/init-skill.py": {
       "sha256": "673a756f2aefb82688fb2b6632d8786870aabd656f936da6c2129b13531e57c2",
       "layer": "skill"
     },
-    ".claude/skills/meow:skill-creator/scripts/validate-skill.py": {
+    ".claude/skills/skill-creator/scripts/validate-skill.py": {
       "sha256": "15cb4d8e247c2860a030accf65bc4fbc401a203080f0febe072797cf413cbcd4",
       "layer": "skill"
     },
-    ".claude/skills/meow:skill-template-secure/SKILL.md": {
+    ".claude/skills/skill-template-secure/SKILL.md": {
       "sha256": "4a92f144020f7bb257e438c479400ed86666cd8ac797cac8cac5fe86fc4b6a33",
       "layer": "skill"
     },
-    ".claude/skills/meow:testing/SKILL.md": {
+    ".claude/skills/testing/SKILL.md": {
       "sha256": "9db8a50f4530c91042dcd2dc556e0a85aa7ee2ee9dc41666f32bc4002a0def1a",
       "layer": "skill"
     },
-    ".claude/skills/meow:testing/references/red-green-refactor.md": {
+    ".claude/skills/testing/references/red-green-refactor.md": {
       "sha256": "f64436e74df6fc3bed203baec158d04f32efc98916092b32de6b3a7cd661ccd3",
       "layer": "skill"
     },
-    ".claude/skills/meow:testing/references/validation-scripts.md": {
+    ".claude/skills/testing/references/validation-scripts.md": {
       "sha256": "971d7dce2934a674cc647541f7708a22c34c238754060d09a3e71c09130205f6",
       "layer": "skill"
     },
-    ".claude/skills/meow:testing/references/visual-qa.md": {
+    ".claude/skills/testing/references/visual-qa.md": {
       "sha256": "8de55333105cf52066d823a7a99ae60eb0cae8f7a3b6e1513f9f99fe566b67dd",
       "layer": "skill"
     },
-    ".claude/skills/meow:typescript/SKILL.md": {
+    ".claude/skills/typescript/SKILL.md": {
       "sha256": "d495c5253ea3c22530b68ac5c57a09b6b988325f2830dcadcafed79381715a2e",
       "layer": "skill"
     },
-    ".claude/skills/meow:typescript/references/strict-patterns.md": {
+    ".claude/skills/typescript/references/strict-patterns.md": {
       "sha256": "401c24b1585aad78e5304ca87ee29d65d1fb3b5d7f4389f9c5b9443ac4edf140",
       "layer": "skill"
     },
-    ".claude/skills/meow:vue/SKILL.md": {
+    ".claude/skills/vue/SKILL.md": {
       "sha256": "b8da9082e72597fde1e4bb0921398e6af350c70373b15dbba579796f8c20c7ee",
       "layer": "skill"
     },
-    ".claude/skills/meow:vue/references/vue-patterns.md": {
+    ".claude/skills/vue/references/vue-patterns.md": {
       "sha256": "0a7a6d2c0deb4dfcfbbabbea1e29c2754540d01b3d749524fa9eea274b54331b",
       "layer": "skill"
     },
-    ".claude/skills/meow:vulnerability-scanner/SKILL.md": {
+    ".claude/skills/vulnerability-scanner/SKILL.md": {
       "sha256": "acff9cb6a5789c9c315a971e454b6c7d0cf97f434dc5e7be63f7d5a40114b139",
       "layer": "skill"
     },
-    ".claude/skills/meow:vulnerability-scanner/references/scanning-methodology.md": {
+    ".claude/skills/vulnerability-scanner/references/scanning-methodology.md": {
       "sha256": "526070a64241bb73f0ad942e9d2baceebe5c9e33f96a04daeb2c69f8671514b9",
       "layer": "skill"
     },
-    ".claude/skills/meow:workflow-orchestrator/SKILL.md": {
+    ".claude/skills/workflow-orchestrator/SKILL.md": {
       "sha256": "2b768815c15ab5d879ad9706badc62d2d4d924252e0f29b7e32cd345873411d8",
       "layer": "skill"
     },
-    ".claude/skills/meow:workflow-orchestrator/references/fasttrack-and-teams.md": {
+    ".claude/skills/workflow-orchestrator/references/fasttrack-and-teams.md": {
       "sha256": "18b2dbc83241a4d04557f73978a15a9e75e9dbc1fa23ee7d5a76370cbbb28e12",
       "layer": "skill"
     },
-    ".claude/skills/meow:workflow-orchestrator/references/workflow-phases.md": {
+    ".claude/skills/workflow-orchestrator/references/workflow-phases.md": {
       "sha256": "37d9b6a01b4e9e074f64ceb80ef8b8be706b9ba6f85c1615574951d148c3c792",
       "layer": "skill"
     },

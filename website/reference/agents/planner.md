@@ -39,10 +39,10 @@ Every plan MUST include these six sections:
 
 ```bash
 # Explicit invocation
-/meow:plan add user authentication with JWT
+/mk:plan add user authentication with JWT
 
 # As part of the cook pipeline
-/meow:cook add shopping cart  # → planner runs first automatically
+/mk:cook add shopping cart  # → planner runs first automatically
 ```
 
 The planner will:
@@ -83,7 +83,7 @@ The plan file lists beads as numbered sections. The developer processes them seq
 
 ### validate-plan integration
 
-For COMPLEX tasks, the planner runs `meow:validate-plan` after producing the plan file and before presenting Gate 1. This skill checks 8 quality dimensions:
+For COMPLEX tasks, the planner runs `mk:validate-plan` after producing the plan file and before presenting Gate 1. This skill checks 8 quality dimensions:
 
 1. Problem statement clarity
 2. Success criteria are binary (pass/fail, not subjective)

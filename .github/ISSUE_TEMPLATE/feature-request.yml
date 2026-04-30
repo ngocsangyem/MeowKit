@@ -13,7 +13,7 @@ body:
     attributes:
       label: Category
       options:
-        - New skill (meow:*)
+        - New skill (mk:*)
         - New agent
         - New rule
         - New hook
@@ -38,7 +38,7 @@ body:
     attributes:
       label: Proposed solution
       description: How would you like this to work? Be as specific as possible.
-      placeholder: "A new `meow:compliance` skill that scans for PCI-DSS patterns..."
+      placeholder: "A new `mk:compliance` skill that scans for PCI-DSS patterns..."
     validations:
       required: true
 

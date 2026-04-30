@@ -1,8 +1,8 @@
 ---
-title: "meow:plan-ceo-review"
+title: "mk:plan-ceo-review"
 description: "CEO/founder-mode plan review — layered verification pipeline with pre-screening, two-lens evaluation, severity tiers, and adversarial necessity."
 ---
-# meow:plan-ceo-review
+# mk:plan-ceo-review
 
 CEO/founder-mode plan review — a decision and validation layer (NOT a planner). Challenges whether the plan solves the right problem and can be built as scoped.
 
@@ -31,10 +31,10 @@ Layer 5:   Verdict + Handoff (append-only output to plan.md)
 ## Usage
 
 ```bash
-/meow:plan-ceo-review                    # default mode
-/meow:plan-ceo-review --scope-expand     # dream big
-/meow:plan-ceo-review --hold-scope       # maximum rigor
-/meow:plan-ceo-review --reduce-scope     # strip to essentials
+/mk:plan-ceo-review                    # default mode
+/mk:plan-ceo-review --scope-expand     # dream big
+/mk:plan-ceo-review --hold-scope       # maximum rigor
+/mk:plan-ceo-review --reduce-scope     # strip to essentials
 ```
 
 ::: info Skill Details
@@ -67,10 +67,10 @@ Appended to plan.md after review:
 
 This skill ends with a **Print & Stop**:
 - Appends `## CEO Review` block to plan.md
-- Prints a handoff block with the `/meow:cook [plan path]` command
+- Prints a handoff block with the `/mk:cook [plan path]` command
 - Stops — Claude will not proceed automatically
 
 ## Related
-- [`meow:plan-creator`](/reference/skills/plan-creator) — Creates the plan that CEO review examines
-- [`meow:validate-plan`](/reference/skills/validate-plan) — 8-dimension binary validation (complementary, not overlapping)
-- [`meow:office-hours`](/reference/skills/office-hours) — Use before plan reviews for ideation
+- [`mk:plan-creator`](/reference/skills/plan-creator) — Creates the plan that CEO review examines
+- [`mk:validate-plan`](/reference/skills/validate-plan) — 8-dimension binary validation (complementary, not overlapping)
+- [`mk:office-hours`](/reference/skills/office-hours) — Use before plan reviews for ideation

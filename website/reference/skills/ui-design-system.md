@@ -1,15 +1,15 @@
 ---
-title: "meow:ui-design-system"
+title: "mk:ui-design-system"
 description: "Data-driven design intelligence: 161 palettes, 57 font pairings, 161 product types, 99 UX guidelines, WCAG 2.1 AA standards."
 ---
 
-# meow:ui-design-system
+# mk:ui-design-system
 
 Data-driven design intelligence: curated palettes, font pairings, product recommendations, UX guidelines, accessibility standards, and quality checklists.
 
 ## What This Skill Does
 
-`meow:ui-design-system` provides the design knowledge that the `ui-ux-designer` agent needs. Unlike generic design rules, this skill ships with **curated CSV data** — 161 WCAG-verified color palettes, 57 pre-tested font pairings with Google Fonts URLs, 161 product type recommendations, 99 structured UX Do/Don't guidelines, and 25 chart type recommendations.
+`mk:ui-design-system` provides the design knowledge that the `ui-ux-designer` agent needs. Unlike generic design rules, this skill ships with **curated CSV data** — 161 WCAG-verified color palettes, 57 pre-tested font pairings with Google Fonts URLs, 161 product type recommendations, 99 structured UX Do/Don't guidelines, and 25 chart type recommendations.
 
 The agent reads the relevant CSV to make data-driven design decisions instead of guessing.
 
@@ -35,7 +35,7 @@ The agent reads the relevant CSV to make data-driven design decisions instead of
 
 ## When to Use This
 
-::: tip Use meow:ui-design-system when...
+::: tip Use mk:ui-design-system when...
 - Creating or reviewing UI components
 - Setting up a project's design system
 - Selecting color palettes (look up, don't guess)
@@ -57,7 +57,7 @@ The agent reads the relevant CSV to make data-driven design decisions instead of
 
 ## Related
 
-- [`meow:frontend-design`](/reference/skills/frontend-design) — Anti-AI-slop enforcement + implementation rules
-- [`meow:react-patterns`](/reference/skills/react-patterns) — React/Next.js performance patterns
-- [`meow:vue`](/reference/skills/vue) — Vue 3 component patterns
-- [`meow:angular`](/reference/skills/angular) — Angular v20+ patterns
+- [`mk:frontend-design`](/reference/skills/frontend-design) — Anti-AI-slop enforcement + implementation rules
+- [`mk:react-patterns`](/reference/skills/react-patterns) — React/Next.js performance patterns
+- [`mk:vue`](/reference/skills/vue) — Vue 3 component patterns
+- [`mk:angular`](/reference/skills/angular) — Angular v20+ patterns

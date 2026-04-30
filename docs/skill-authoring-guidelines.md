@@ -1,7 +1,7 @@
 # MeowKit Skill Authoring Guidelines
 
 **Source consolidation**: Anthropic *Skill Authoring Best Practices* (Doc A) + Anthropic *Lessons from Building Claude Code: How We Use Skills* (Doc B).
-**Audience**: Authors of `meow:*` skills under `.claude/skills/`.
+**Audience**: Authors of `mk:*` skills under `.claude/skills/`.
 **Ground rule**: This file derives from the two source docs only. No external extrapolation.
 
 ---
@@ -131,11 +131,11 @@ Final checklist covers: core quality, code/scripts, testing across models.
 
 ### 5.1 Decide the skill type first
 
-Pick from Doc B's 9 categories. If your skill straddles multiple, split it. Cross-check against existing `meow:*` skills before creating new (per `meow:skill-creator`).
+Pick from Doc B's 9 categories. If your skill straddles multiple, split it. Cross-check against existing `mk:*` skills before creating new (per `mk:skill-creator`).
 
 ### 5.2 Frontmatter
 
-- `name`: ≤64 chars, lowercase + digits + hyphens; gerund form (`processing-X`) preferred for new skills (existing `meow:*` keep their conventions)
+- `name`: ≤64 chars, lowercase + digits + hyphens; gerund form (`processing-X`) preferred for new skills (existing `mk:*` keep their conventions)
 - `description`: ≤1024 chars, third person, includes WHAT + WHEN, key trigger terms; **write for the model, not the human**
 - No reserved words: `anthropic`, `claude`
 - No XML tags in either field
@@ -164,7 +164,7 @@ Pick from Doc B's 9 categories. If your skill straddles multiple, split it. Cros
 ### 5.5 Filesystem layout
 
 ```
-meow:my-skill/
+mk:my-skill/
 ├── SKILL.md              # entrypoint (≤500 lines)
 ├── references/           # one level deep, loaded on demand
 │   └── api.md            # >100 lines → TOC at top
@@ -253,8 +253,8 @@ Adapted from Doc A's checklist + Doc B's lessons:
 
 ## Unresolved questions
 
-1. **Inter-skill dependencies**: Doc B says "no native dep mgmt yet." MeowKit's `meow:*` namespace heavily composes skills. Should we add a manifest field (`requires_skills:`) for static analysis, even without runtime enforcement?
+1. **Inter-skill dependencies**: Doc B says "no native dep mgmt yet." MeowKit's `mk:*` namespace heavily composes skills. Should we add a manifest field (`requires_skills:`) for static analysis, even without runtime enforcement?
 2. **`${CLAUDE_PLUGIN_DATA}` portability**: Doc B introduces this as the stable-folder convention. MeowKit currently uses `.claude/memory/` and `tasks/` for persistence. Do we adopt `${CLAUDE_PLUGIN_DATA}` for new persistent skill state, or keep MeowKit-internal paths?
-3. **500-line cap vs current MeowKit skills**: many existing `meow:*` SKILL.md files exceed 500 lines or use the step-file architecture (per `step-file-rules.md`). Should an audit be run to flag oversized monoliths for decomposition, or does step-file count as the decomposition?
-4. **Eval-driven dev workflow**: Doc A's "build evals first" is not currently a MeowKit phase. Does it slot before Phase 1 (Plan) for skill authoring, or is it a meta-skill (e.g., `meow:skill-eval`)?
-5. **Description vs `meow:` prefix**: gerund form is recommended, but MeowKit uses `meow:processing-X` style with prefix. Confirm current naming convention is intentional and not overdue for normalization.
+3. **500-line cap vs current MeowKit skills**: many existing `mk:*` SKILL.md files exceed 500 lines or use the step-file architecture (per `step-file-rules.md`). Should an audit be run to flag oversized monoliths for decomposition, or does step-file count as the decomposition?
+4. **Eval-driven dev workflow**: Doc A's "build evals first" is not currently a MeowKit phase. Does it slot before Phase 1 (Plan) for skill authoring, or is it a meta-skill (e.g., `mk:skill-eval`)?
+5. **Description vs `mk:` prefix**: gerund form is recommended, but MeowKit uses `mk:processing-X` style with prefix. Confirm current naming convention is intentional and not overdue for normalization.

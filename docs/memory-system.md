@@ -13,7 +13,7 @@ Claude Code ships its own auto-memory system. It is **not** the same as MeowKit'
 | System | Path | Scope | Auto-load | Written by |
 |---|---|---|---|---|
 | Claude Code auto-memory | `~/.claude/projects/<project>/memory/` (directory) | Per-git-repo, machine-local | `MEMORY.md` auto-loads at SessionStart (capped at **200 lines or 25 KB**, whichever comes first). Topic files in the same directory load on demand. | Claude via its standard Write/Edit tools |
-| MeowKit memory | `<repo>/.claude/memory/` | Per-repo, machine-local (gitignored from v2.4.1+) | Never auto-loaded. Consumer skills `Read` the relevant topic file at task start. | MeowKit hooks (`immediate-capture-handler`, `post-session.sh`) and skills (`meow:memory`, `meow:fix`, etc.) |
+| MeowKit memory | `<repo>/.claude/memory/` | Per-repo, machine-local (gitignored from v2.4.1+) | Never auto-loaded. Consumer skills `Read` the relevant topic file at task start. | MeowKit hooks (`immediate-capture-handler`, `post-session.sh`) and skills (`mk:memory`, `mk:fix`, etc.) |
 
 The two systems are complementary: Claude Code's auto-memory captures the user's personal, cross-project habits; MeowKit's `.claude/memory/` captures project-specific engineering artifacts (fix patterns, review findings, architecture decisions, cost telemetry) needed by MeowKit's 7-phase workflow.
 
@@ -36,13 +36,13 @@ The prior auto-inject pipeline (`memory-loader`, `memory-parser`, `memory-filter
 
 ```
 .claude/memory/
-  fixes.md                    # Bug-class session learnings (meow:fix)
+  fixes.md                    # Bug-class session learnings (mk:fix)
   fixes.json                  # Structured fix patterns — schema v2.0.0
-  review-patterns.md          # Review / architecture patterns (meow:review, meow:plan-creator)
+  review-patterns.md          # Review / architecture patterns (mk:review, mk:plan-creator)
   review-patterns.json        # Structured review patterns — schema v2.0.0
-  architecture-decisions.md   # Architectural decisions (meow:plan-creator, meow:cook)
+  architecture-decisions.md   # Architectural decisions (mk:plan-creator, mk:cook)
   architecture-decisions.json # Structured decisions — schema v2.0.0
-  security-notes.md           # Curated security findings (meow:cso, meow:review)
+  security-notes.md           # Curated security findings (mk:cso, mk:review)
   cost-log.json               # Token usage per task — auto-appended by Stop hook
   decisions.md                # Long-form ADRs — owned by architect agent
   security-log.md             # Raw security audit log
@@ -60,11 +60,11 @@ The prior auto-inject pipeline (`memory-loader`, `memory-parser`, `memory-filter
 
 | Topic file | Consumer skills | Loaded when |
 |---|---|---|
-| `fixes.md` + `fixes.json` | `meow:fix` | Diagnosing a bug — task start |
-| `review-patterns.md` + `review-patterns.json` | `meow:review`, `meow:plan-creator` | Code review or planning — task start |
-| `architecture-decisions.md` + `architecture-decisions.json` | `meow:plan-creator`, `meow:cook` | Architecture decisions — task start |
-| `security-notes.md` | `meow:cso`, `meow:review` | Security audit — task start |
-| `cost-log.json` | `meow:memory`, `analyst` agent | Phase 0 / Phase 6 cost reporting |
+| `fixes.md` + `fixes.json` | `mk:fix` | Diagnosing a bug — task start |
+| `review-patterns.md` + `review-patterns.json` | `mk:review`, `mk:plan-creator` | Code review or planning — task start |
+| `architecture-decisions.md` + `architecture-decisions.json` | `mk:plan-creator`, `mk:cook` | Architecture decisions — task start |
+| `security-notes.md` | `mk:cso`, `mk:review` | Security audit — task start |
+| `cost-log.json` | `mk:memory`, `analyst` agent | Phase 0 / Phase 6 cost reporting |
 
 Each `.json` file declares `version: "2.0.0"` and a `scope` field; handlers reject writes with mismatched scope to prevent cross-file corruption.
 
@@ -98,7 +98,7 @@ The Stop hook:
 
 ### c) Skill-invoked session capture
 
-`meow:memory session-capture` (see `skills/meow:memory/references/session-capture.md`) runs at Phase 6 (Reflect) and extracts patterns / decisions / failures from the session, appending to the right topic files.
+`mk:memory session-capture` (see `skills/mk:memory/references/session-capture.md`) runs at Phase 6 (Reflect) and extracts patterns / decisions / failures from the session, appending to the right topic files.
 
 ## 4. Read Path
 
@@ -112,12 +112,12 @@ The files in `.claude/memory/` are plain Markdown and JSON. Claude Code's platfo
 
 ## 5. Pruning
 
-Run `/meow:memory --prune` to archive stale entries from topic files.
+Run `/mk:memory --prune` to archive stale entries from topic files.
 
 ```bash
-/meow:memory --prune              # default 90-day threshold
-/meow:memory --prune --days 180   # custom threshold
-/meow:memory --prune --dry-run    # preview without writing
+/mk:memory --prune              # default 90-day threshold
+/mk:memory --prune --days 180   # custom threshold
+/mk:memory --prune --dry-run    # preview without writing
 ```
 
 **Mechanics** (grep-based, no parser dependency):
@@ -171,7 +171,7 @@ These pieces of Claude Code's own memory system are **separate** from MeowKit's 
 | `handlers/memory-parser.cjs` | Direct Markdown / JSON reads; no parser |
 | `handlers/memory-filter.cjs` | Per-skill scoped topic files |
 | `handlers/memory-injector.cjs` | No auto-inject; trust boundary enforced behaviorally |
-| `NEEDS_CAPTURE` marker system | Eliminated; retroactive capture replaced by direct writes and Phase 6 `meow:memory session-capture` |
+| `NEEDS_CAPTURE` marker system | Eliminated; retroactive capture replaced by direct writes and Phase 6 `mk:memory session-capture` |
 | `lessons.md` as active store | Archived stub; content migrated to topic files via `memory-topic-file-migrator.cjs` |
 | `patterns.json` monolith | Deprecated stub; replaced by `fixes.json` + `review-patterns.json` + `architecture-decisions.json` |
 | `.claude/memory/*` committed to git | Gitignored — machine-local by default |

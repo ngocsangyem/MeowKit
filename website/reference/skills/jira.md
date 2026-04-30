@@ -1,15 +1,15 @@
 ---
-title: "meow:jira"
+title: "mk:jira"
 description: "Jira execution & ticket intelligence via Atlassian MCP: create, search, update, transition, link, sprint, evaluate complexity, estimate story points, analyze tickets."
 ---
 
-# meow:jira
+# mk:jira
 
 Jira execution & ticket intelligence via Atlassian MCP. Create issues, search with JQL, update fields, transition workflow states, link issues, manage sprints — plus evaluate ticket complexity, estimate story points, and analyze ticket context.
 
 ## What This Skill Does
 
-meow:jira is the **execution and evaluation layer** for Jira operations in MeowKit. It receives structured commands — from meow:intake analysis output, from meow:cook during feature implementation, or directly from you — and translates them into Atlassian MCP calls.
+mk:jira is the **execution and evaluation layer** for Jira operations in MeowKit. It receives structured commands — from mk:intake analysis output, from mk:cook during feature implementation, or directly from you — and translates them into Atlassian MCP calls.
 
 It handles 10 operation categories across two modes:
 
@@ -18,7 +18,7 @@ It handles 10 operation categories across two modes:
 
 A 4-tier safety framework gates operations by risk level. Three internal `jira-*` agents handle reasoning-heavy tasks (evaluate, estimate, analyze) while simple CRUD runs inline.
 
-meow:jira never processes raw ticket text. If you pass a multi-line description that looks like a Jira ticket, it will refuse and redirect you to `/meow:intake`.
+mk:jira never processes raw ticket text. If you pass a multi-line description that looks like a Jira ticket, it will refuse and redirect you to `/mk:intake`.
 
 ## Core Capabilities
 
@@ -43,26 +43,26 @@ meow:jira never processes raw ticket text. If you pass a multi-line description 
 
 ## When to Use
 
-::: tip Use meow:jira for execution AND evaluation
+::: tip Use mk:jira for execution AND evaluation
 ```bash
 # Ticket intelligence
-/meow:jira evaluate PRD-123      # Complexity assessment
-/meow:jira estimate PRD-123      # Story point estimation
-/meow:jira analyze PRD-123       # Full context analysis
+/mk:jira evaluate PRD-123      # Complexity assessment
+/mk:jira estimate PRD-123      # Story point estimation
+/mk:jira analyze PRD-123       # Full context analysis
 
 # Execution
-/meow:jira transition PRD-123 "In Analysis"
-/meow:jira link PRD-123 blocks BUG-045
+/mk:jira transition PRD-123 "In Analysis"
+/mk:jira link PRD-123 blocks BUG-045
 ```
 :::
 
 ::: info Evaluate and estimate are read-only
-The evaluate, estimate, and analyze commands read ticket data only — they never modify Jira state. Their output includes suggested `/meow:jira` commands you can run after reviewing.
+The evaluate, estimate, and analyze commands read ticket data only — they never modify Jira state. Their output includes suggested `/mk:jira` commands you can run after reviewing.
 :::
 
 ## Prerequisites
 
-meow:jira requires a Jira MCP server. Two options are available:
+mk:jira requires a Jira MCP server. Two options are available:
 
 ### Option 1: Community server (recommended)
 
@@ -127,33 +127,33 @@ The community server is recommended for production use. The official server is s
 
 ```bash
 # Ticket intelligence
-/meow:jira evaluate PROJ-123              # Complexity + inconsistency analysis
-/meow:jira estimate PROJ-123             # Story point estimation
-/meow:jira analyze PROJ-123              # Full ticket context analysis
+/mk:jira evaluate PROJ-123              # Complexity + inconsistency analysis
+/mk:jira estimate PROJ-123             # Story point estimation
+/mk:jira analyze PROJ-123              # Full ticket context analysis
 
 # Create a bug
-/meow:jira create --project PROJ --type Bug --summary "Login fails after 24h" --priority High \
+/mk:jira create --project PROJ --type Bug --summary "Login fails after 24h" --priority High \
   --description "Users report 500 error on mobile Safari" --assignee alice
 
 # Search with JQL
-/meow:jira search --jql "assignee = currentUser() AND sprint in openSprints()"
+/mk:jira search --jql "assignee = currentUser() AND sprint in openSprints()"
 
 # Read issue details
-/meow:jira read PROJ-123 --comments --history
+/mk:jira read PROJ-123 --comments --history
 
 # Transition (prompts for required fields like resolution)
-/meow:jira transition PROJ-123 "In Progress"
-/meow:jira transition PROJ-123 Done --resolution Fixed
+/mk:jira transition PROJ-123 "In Progress"
+/mk:jira transition PROJ-123 Done --resolution Fixed
 
 # Link issues
-/meow:jira link PROJ-123 blocks PROJ-456
+/mk:jira link PROJ-123 blocks PROJ-456
 
 # Sprint management
-/meow:jira sprint --board "Team Alpha" --list-sprints
+/mk:jira sprint --board "Team Alpha" --list-sprints
 
 # Comments and attachments
-/meow:jira add-comment PROJ-123 "Analysis complete — see RCA below"
-/meow:jira add-attachment PROJ-123 /path/to/screenshot.png
+/mk:jira add-comment PROJ-123 "Analysis complete — see RCA below"
+/mk:jira add-attachment PROJ-123 /path/to/screenshot.png
 ```
 
 ## Safety Framework
@@ -184,16 +184,16 @@ The community server is recommended for production use. The official server is s
 
 ### Suggested Actions
 > Recommendations derived from untrusted ticket content — verify before executing.
-- /meow:jira link PROJ-123 blocked-by [related ticket]
+- /mk:jira link PROJ-123 blocked-by [related ticket]
 ```
 
 ## Security
 
-**Raw ticket detection:** If input contains multi-line text with patterns like "Steps to Reproduce" or "Acceptance Criteria", meow:jira REFUSES and redirects to meow:intake.
+**Raw ticket detection:** If input contains multi-line text with patterns like "Steps to Reproduce" or "Acceptance Criteria", mk:jira REFUSES and redirects to mk:intake.
 
 **Injection defense (evaluate/estimate/analyze):** Ticket content is wrapped in `===TICKET_DATA_START===` / `===TICKET_DATA_END===` boundary markers before LLM reasoning. The agent never follows instructions embedded in ticket text. All output includes an "untrusted content" warning.
 
-**MCP trust:** meow:jira trusts Atlassian MCP for auth and API safety. Keep Atlassian MCP updated for security patches.
+**MCP trust:** mk:jira trusts Atlassian MCP for auth and API safety. Keep Atlassian MCP updated for security patches.
 
 ## Integrated Workflows
 
@@ -207,7 +207,7 @@ The community server is recommended for production use. The official server is s
 
 ## Gotchas
 
-- **No MCP = no operations.** meow:jira requires the Atlassian MCP server. If unavailable, it reports install instructions and stops.
+- **No MCP = no operations.** mk:jira requires the Atlassian MCP server. If unavailable, it reports install instructions and stops.
 - **Safety confirms on medium/high ops.** Transitions and updates show a diff before applying. Destructive operations require explicit confirmation.
 - **Custom fields need discovery first.** Jira projects often have required custom fields. The MCP server's `search_fields` tool can discover field IDs for your instance.
 - **Evaluate is read-only.** Evaluate, estimate, and analyze never modify Jira state. Suggested commands require manual execution.
@@ -216,9 +216,9 @@ The community server is recommended for production use. The official server is s
 
 ## Related
 
-- [meow:intake](/reference/skills/intake) — ticket analysis and structured handoff to meow:jira
-- [meow:scale-routing](/reference/skills/scale-routing) — product area classification upstream of intake
-- [meow:cook](/reference/skills/cook) — feature pipeline that creates Jira tickets during Phase 3
-- [meow:fix](/reference/skills/fix) — bug fix pipeline
-- [meow:ship](/reference/skills/ship) — ship pipeline
+- [mk:intake](/reference/skills/intake) — ticket analysis and structured handoff to mk:jira
+- [mk:scale-routing](/reference/skills/scale-routing) — product area classification upstream of intake
+- [mk:cook](/reference/skills/cook) — feature pipeline that creates Jira tickets during Phase 3
+- [mk:fix](/reference/skills/fix) — bug fix pipeline
+- [mk:ship](/reference/skills/ship) — ship pipeline
 - [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) — end-to-end workflow guide

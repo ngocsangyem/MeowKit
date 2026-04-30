@@ -16,15 +16,65 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.7.0 (2026-04-30) — The Namespace Rename Release
+
+### Highlights
+
+Skill folders renamed from `.claude/skills/meow:<x>/` to `.claude/skills/<x>/` and the skill identity prefix moved from `meow:` to `mk:`. Cross-platform safe — eliminates the colon that broke Windows NTFS checkouts. Slash commands move from `/meow:<x>` to `/mk:<x>`. Backward-compat alias keeps in-prompt `meow:` text working with a stderr warning during the v2.7.x window; hard-cut in v2.8.0.
+
+### Features
+
+- New helper `packages/mewkit/src/migrate/discovery/skill-id-utils.ts` — single source for skill-id parsing, validation, and legacy-prefix resolution. Exports `parseSkillId`, `resolveLegacy`, `_resetWarnState`. Path-traversal guard rejects basenames not matching `^[a-z][a-z0-9-]{0,62}$`.
+- New CI step `Reject residual meow: namespace` in `.github/workflows/ci.yml` — fails the build if any `^name: meow:` SKILL.md frontmatter or `/meow:[a-z]` slash reference exists in `.claude/commands/`, `.claude/rules/`, or `CLAUDE.md`.
+- `SkillInfo.id` is now a required field on the discovery type, derived from frontmatter `name:` and normalized through `resolveLegacy`. Forces compile-time handling at every consumer.
+
+### Improvements
+
+- `discoverSkills()` is fully content-based — any directory under `.claude/skills/` containing a SKILL.md is a skill, regardless of folder prefix. `setup.ts:54` `collectSkillDeclaredDeps` filter changed from name-based (`startsWith("meow:")`) to content-based (`existsSync(SKILL.md)`).
+- Schema regex at `.claude/schemas/skill-schema.json` widened from `^meow:[a-z][a-z0-9-]*$` to `^(mk|meow):[a-z][a-z0-9-]*$` for the deprecation window. Narrows to `^mk:` in v2.8.0.
+- `scripts/validate-skill-frontmatter.py` glob fixed from `meow:*/SKILL.md` to `*/SKILL.md` plus a zero-match guard — empty scans now exit with code 2 instead of phantom-passing.
+- `scripts/check-skill-cross-refs.sh` rewritten — inventory built from bare-name folders, scans for `mk:[a-z][a-z0-9-]*` references, fails on empty inventory.
+- All hook scripts refreshed — `gate-enforcement.sh`, `privacy-block.sh`, `post-session.sh`, `project-context-loader.sh`, `pre-completion-check.sh`, `memory-topic-file-migrator.cjs`. Privacy-block SSRF glob updated to match `*web-to-markdown*` and `*mk:web-to-markdown*` so the guard survives the folder rename.
+- `skill-creator` is now self-consistent — `init-skill.py` and `validate-skill.py` enforce the `mk:` prefix; SKILL.md template emits `/mk:{slug}` invocation syntax and `mk:{name}` frontmatter.
+
+### Removals
+
+- `.claude/skills/meow:*/` folder layout removed. Skills now live at `.claude/skills/<x>/`. Migration: `npx mewkit upgrade` runs the legacy-namespace migrator with confirmation prompt.
+- `.claude/commands/meow/` folder removed. Slash commands now live at `.claude/commands/mk/`. The 21 existing commands moved as-is; the 56 phantom skill-only aliases were intentionally not generated.
+
+### Migration Notes
+
+```bash
+npx mewkit upgrade
+```
+
+The upgrade pipeline detects existing `meow:*` folders, prompts the user, and then:
+
+- Renames folders via `git mv` (preserves history); falls back to `fs.rename` on non-git repos.
+- Rewrites SKILL.md frontmatter `name:` from `meow:<x>` to `mk:<x>`.
+- Reconciles `~/.mewkit/portable-registry.json` — strips `meow-` prefix from sanitized `item` keys.
+- Aborts if the git tree is dirty, or if any folder basename fails the path-safety regex.
+
+If you have custom scripts or aliases that invoke `/meow:cook`, retype them as `/mk:cook`. In-prompt text references like `meow:scout` continue to work via the resolver during v2.7.x — they emit a one-time stderr deprecation warning per id, and they hard-fail in v2.8.0.
+
+### Breaking Changes
+
+- Skill folder paths: `.claude/skills/meow:<x>/` → `.claude/skills/<x>/`.
+- Skill identity prefix: `meow:<x>` → `mk:<x>` in SKILL.md frontmatter and all cross-references.
+- Slash command paths: `.claude/commands/meow/<x>.md` → `.claude/commands/mk/<x>.md`. Type `/mk:cook` instead of `/meow:cook`.
+- `SkillInfo.id` field is now required (was previously absent). Downstream consumers reading the discovery output now see a guaranteed canonical id.
+
+---
+
 ## 2.6.2 (2026-04-29) — The Telemetry & Validator Release
 
 ### Highlights
 
-Hook telemetry, schema-validated skill frontmatter, cross-reference CI, and a re-baselined critical-findings audit. Every probe is data-driven — Phase 3 advanced enhancements stay deferred until the new `hook-log.jsonl` shows real demand. CI now blocks merges that introduce phantom `meow:*` references or unregistered hooks.
+Hook telemetry, schema-validated skill frontmatter, cross-reference CI, and a re-baselined critical-findings audit. Every probe is data-driven — Phase 3 advanced enhancements stay deferred until the new `hook-log.jsonl` shows real demand. CI now blocks merges that introduce phantom `mk:*` references or unregistered hooks.
 
 ### CLI
 
-- `mewkit setup` gains a `project-context` step that warns when `docs/project-context.md` is absent and tells the user which `/meow:project-context` action to run.
+- `mewkit setup` gains a `project-context` step that warns when `docs/project-context.md` is absent and tells the user which `/mk:project-context` action to run.
 
 ### Features
 
@@ -33,8 +83,8 @@ Hook telemetry, schema-validated skill frontmatter, cross-reference CI, and a re
 - New hook helper `lib/hook-logger.sh` — append-only JSONL telemetry at `.claude/hooks/.logs/hook-log.jsonl` with 50MB rotation (rotated logs stay plain text, no gzip, so telemetry analysis stays cheap).
 - Probe hooks for `PreCompact` and `PostToolUseFailure`, plus a `Stop`-event control probe that disambiguates "event unsupported" from "logger broken." Activated immediately; data accumulates in the background.
 - New canonical hook regression test at `.claude/hooks/__tests__/advisory-boundary.test.cjs` runs via `node --test` and locks `@@GATE_BLOCK@@` and `@@PRIVACY_BLOCK@@` sentinel output.
-- `meow:review` workflow gains step `step-03b-whole-plan-sweep.md` between triage and verdict — re-reads `plan.md` plus phase files, surfaces cross-file drift, never auto-FAILs.
-- `meow:validate-plan` gains a Whole-Plan Consistency Sweep section that emits a `sweep_failures` block alongside the 8-dimension verdict.
+- `mk:review` workflow gains step `step-03b-whole-plan-sweep.md` between triage and verdict — re-reads `plan.md` plus phase files, surfaces cross-file drift, never auto-FAILs.
+- `mk:validate-plan` gains a Whole-Plan Consistency Sweep section that emits a `sweep_failures` block alongside the 8-dimension verdict.
 
 ### Improvements
 
@@ -44,9 +94,9 @@ Hook telemetry, schema-validated skill frontmatter, cross-reference CI, and a re
 
 ### Bug Fixes
 
-- Audit doc claimed `meow:cook/SKILL.md:159` had a bare `memory/` path — verified-incorrect. Line 170 already used the correct `.claude/memory/` prefix. Stale finding closed.
-- Audit doc claimed `meow:lazy-agent-loader/SKILL.md:13` hardcoded an agent count of 15 — no hardcoded count exists in the current tree. Stale finding closed.
-- Audit doc claimed seven `meow:*` command refs in `commands/meow/` were phantom — all seven resolve to a real command file under the post-audit "Commands vs Skills" rule. Stale finding closed.
+- Audit doc claimed `mk:cook/SKILL.md:159` had a bare `memory/` path — verified-incorrect. Line 170 already used the correct `.claude/memory/` prefix. Stale finding closed.
+- Audit doc claimed `mk:lazy-agent-loader/SKILL.md:13` hardcoded an agent count of 15 — no hardcoded count exists in the current tree. Stale finding closed.
+- Audit doc claimed seven `mk:*` command refs in `commands/meow/` were phantom — all seven resolve to a real command file under the post-audit "Commands vs Skills" rule. Stale finding closed.
 
 ### Migration Notes
 
@@ -58,22 +108,22 @@ Hook telemetry, schema-validated skill frontmatter, cross-reference CI, and a re
 
 ### Highlights
 
-New 17th core agent `project-manager` — a cross-workflow delivery tracker that aggregates plan, test, review, contract, and cost state into an evidence-based status report classified as done / in progress / blocked / not started. Ships the new `/meow:status` slash command, a new `post-phase-delegation.md` rule, and a new `pm-status-template.md` report schema. Five orchestration skills (`meow:cook`, `meow:harness`, `meow:workflow-orchestrator`, `meow:fix` complex path, `meow:worktree`) now cite the rule to delegate post-phase. Opt-out via `MEOWKIT_PM_AUTO=off`.
+New 17th core agent `project-manager` — a cross-workflow delivery tracker that aggregates plan, test, review, contract, and cost state into an evidence-based status report classified as done / in progress / blocked / not started. Ships the new `/mk:status` slash command, a new `post-phase-delegation.md` rule, and a new `pm-status-template.md` report schema. Five orchestration skills (`mk:cook`, `mk:harness`, `mk:workflow-orchestrator`, `mk:fix` complex path, `mk:worktree`) now cite the rule to delegate post-phase. Opt-out via `MEOWKIT_PM_AUTO=off`.
 
 ### New Agents
 
-- `project-manager` — cross-workflow delivery tracker (haiku tier). Reads plan + verdicts + contracts + cost-log + git log; writes status reports co-located inside each plan dir at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Backward-looking ("what's done, what's blocked") — complement, not replacement, for `meow:help` which remains forward-looking ("what's next").
+- `project-manager` — cross-workflow delivery tracker (haiku tier). Reads plan + verdicts + contracts + cost-log + git log; writes status reports co-located inside each plan dir at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Backward-looking ("what's done, what's blocked") — complement, not replacement, for `mk:help` which remains forward-looking ("what's next").
 
 ### New Commands
 
-- `/meow:status` — foreground entry point for `project-manager`. Resolves the active plan (prompts if multiple), delegates to the agent, prints the report path.
+- `/mk:status` — foreground entry point for `project-manager`. Resolves the active plan (prompts if multiple), delegates to the agent, prints the report path.
 
 ### Features
 
 - New rule `post-phase-delegation.md` — 7-rule charter defining PM fire points, invocation form, skip conditions, orchestrator disambiguation, and the no-hook-dispatch safety property.
 - New report template `tasks/templates/pm-status-template.md` — follows planner's template convention; schema edits happen in one file, not inside the agent body.
-- New env var `MEOWKIT_PM_AUTO=off` — disables all silent PM fires from orchestration skills. `/meow:status` still works regardless.
-- `meow:agent-detector` gains a `Delivery Status` intent (keywords: status / progress / what's done / what's blocked / delivery tracking) routing to `project-manager`, explicitly distinct from `meow:help`'s forward-looking navigation intent.
+- New env var `MEOWKIT_PM_AUTO=off` — disables all silent PM fires from orchestration skills. `/mk:status` still works regardless.
+- `mk:agent-detector` gains a `Delivery Status` intent (keywords: status / progress / what's done / what's blocked / delivery tracking) routing to `project-manager`, explicitly distinct from `mk:help`'s forward-looking navigation intent.
 
 ### Improvements
 
@@ -92,64 +142,64 @@ New 17th core agent `project-manager` — a cross-workflow delivery tracker that
 
 ### Highlights
 
-A 7-agent audit of all 77 `meow:*` skills against Anthropic's Skill-authoring best practices, Lessons-from-building-Claude-Code, and MeowKit's own `skill-authoring-rules.md`. Ships ~220 edits across description fields, frontmatter, reference integrity, scripts, and grounding. Zero new skills, zero breaking changes, measurably cleaner routing. [Full notes →](/guide/whats-new/v2.6.0)
+A 7-agent audit of all 77 `mk:*` skills against Anthropic's Skill-authoring best practices, Lessons-from-building-Claude-Code, and MeowKit's own `skill-authoring-rules.md`. Ships ~220 edits across description fields, frontmatter, reference integrity, scripts, and grounding. Zero new skills, zero breaking changes, measurably cleaner routing. [Full notes →](/guide/whats-new/v2.6.0)
 
 ### Improvements
 
-- All skill descriptions normalized to Anthropic third-person format — `meow:cook`, `meow:fix`, `meow:agent-detector`, `meow:session-continuation` rewritten out of imperative/greedy mood that cannibalized sibling routing.
-- Five overlap clusters disambiguated with explicit `NOT for X (see meow:Y)` clauses — bug-fix (fix / investigate / build-fix), pipeline (cook / workflow-orchestrator / harness), browser (browse / playwright-cli / agent-browser / qa-manual), code-quality (review / clean-code / simplify / evaluate), planning (plan-creator / planning-engine). Twenty additional skills got focused exclusion clauses where latent overlap existed.
-- `meow:agent-browser` 8 inter-ref cross-links flattened and `authentication.md ↔ session-management.md` circular reference broken — all 9 reference files remain directly linked one level deep from `SKILL.md`.
-- New `step-file-rules.md` Rule 6 — step-file skills (`meow:review`, `meow:trace-analyze`, `meow:plan-creator`, `meow:harness`, `meow:evaluate`) formally allowed to chain `SKILL.md → step-NN.md → references/X.md` provided each step file opens with a Contents TOC.
-- Seven skills that reference `.claude/skills/...` paths directly gained a `> Path convention:` note declaring `$CLAUDE_PROJECT_DIR` as the assumed cwd — `meow:rubric`, `meow:multimodal`, `meow:skill-creator`, `meow:intake`, `meow:llms`, `meow:investigate`, `meow:jira`.
-- MCP prerequisite hardening for `meow:jira`, `meow:confluence`, `meow:planning-engine` — server-key assumption (`.mcp.json` key `atlassian`) documented via Gotchas without hardcoding prefixes, preserving install portability.
+- All skill descriptions normalized to Anthropic third-person format — `mk:cook`, `mk:fix`, `mk:agent-detector`, `mk:session-continuation` rewritten out of imperative/greedy mood that cannibalized sibling routing.
+- Five overlap clusters disambiguated with explicit `NOT for X (see mk:Y)` clauses — bug-fix (fix / investigate / build-fix), pipeline (cook / workflow-orchestrator / harness), browser (browse / playwright-cli / agent-browser / qa-manual), code-quality (review / clean-code / simplify / evaluate), planning (plan-creator / planning-engine). Twenty additional skills got focused exclusion clauses where latent overlap existed.
+- `mk:agent-browser` 8 inter-ref cross-links flattened and `authentication.md ↔ session-management.md` circular reference broken — all 9 reference files remain directly linked one level deep from `SKILL.md`.
+- New `step-file-rules.md` Rule 6 — step-file skills (`mk:review`, `mk:trace-analyze`, `mk:plan-creator`, `mk:harness`, `mk:evaluate`) formally allowed to chain `SKILL.md → step-NN.md → references/X.md` provided each step file opens with a Contents TOC.
+- Seven skills that reference `.claude/skills/...` paths directly gained a `> Path convention:` note declaring `$CLAUDE_PROJECT_DIR` as the assumed cwd — `mk:rubric`, `mk:multimodal`, `mk:skill-creator`, `mk:intake`, `mk:llms`, `mk:investigate`, `mk:jira`.
+- MCP prerequisite hardening for `mk:jira`, `mk:confluence`, `mk:planning-engine` — server-key assumption (`.mcp.json` key `atlassian`) documented via Gotchas without hardcoding prefixes, preserving install portability.
 - Twenty-two skills renamed their trigger section to canonical `## When to Use` — previously fragmented across "When to Invoke", "When to Activate", "Trigger Conditions".
-- 115 reference files over 100 lines auto-gained a `## Contents` Table of Contents via idempotent generator, safe to re-run on future drift. Original audit counted 25; actual was 116 (4.6× under-count, largely from `meow:angular`).
-- Frontmatter normalization — `preamble-tier: 4` → `3` on `meow:qa` / `meow:review` / `meow:ship` (valid range is 1-3). Dead `autoInvoke` and `priority` fields deleted from four skills after grep-confirming zero readers in hooks, scripts, or CLI. `sources` → `source` singular unified across seven skills. `meow:chom` `injection_risk` bumped `low → medium` since it replicates external code into the project.
-- `meow:skill-creator` compliance — now has its own `## Gotchas` section, 500-line cap matches authoritative Rule 3 (was 150), emitted template includes mandatory `## Gotchas` header so every future scaffold inherits Rule 1 compliance. `scripts/validate-skill.py` gained check 8/8 for Gotchas header presence and auto-passes step-file skills.
+- 115 reference files over 100 lines auto-gained a `## Contents` Table of Contents via idempotent generator, safe to re-run on future drift. Original audit counted 25; actual was 116 (4.6× under-count, largely from `mk:angular`).
+- Frontmatter normalization — `preamble-tier: 4` → `3` on `mk:qa` / `mk:review` / `mk:ship` (valid range is 1-3). Dead `autoInvoke` and `priority` fields deleted from four skills after grep-confirming zero readers in hooks, scripts, or CLI. `sources` → `source` singular unified across seven skills. `mk:chom` `injection_risk` bumped `low → medium` since it replicates external code into the project.
+- `mk:skill-creator` compliance — now has its own `## Gotchas` section, 500-line cap matches authoritative Rule 3 (was 150), emitted template includes mandatory `## Gotchas` header so every future scaffold inherits Rule 1 compliance. `scripts/validate-skill.py` gained check 8/8 for Gotchas header presence and auto-passes step-file skills.
 
 ### Bug Fixes
 
-- `meow:lint-and-validate` was **undiscoverable** — malformed YAML frontmatter had an unquoted colon in `Triggers onKeywords:` which corrupted parsing. Description now wraps cleanly in double quotes.
+- `mk:lint-and-validate` was **undiscoverable** — malformed YAML frontmatter had an unquoted colon in `Triggers onKeywords:` which corrupted parsing. Description now wraps cleanly in double quotes.
 - Empty Python venv — `.claude/skills/.venv/` existed but `pip` was half-installed with no RECORD file and no `bin/pip` symlink, so all seven Python-backed skills crashed on first import. Bootstrapped via `get-pip.py --ignore-installed --no-deps`, then `npx mewkit setup --only=deps` installed the nine required packages. `npx mewkit doctor` now reports 13 PASS / 1 WARN (optional Playwright only).
-- `meow:rubric/scripts/validate-rubric.sh --help` no longer crashes on macOS — added `-h`/`--help` case before arg dispatcher, which previously fell through to `basename "--help"` triggering a BSD `illegal option` error.
-- Replaced non-existent `debugger` agent reference in `meow:cook`'s Phase-3 dispatch table with `developer` via `meow:investigate` — `.claude/agents/` never had a `debugger.md`.
-- `<HARD-GATE>` decorative tags in `meow:cook` and `meow:fix` bodies replaced with `**HARD GATE**` bold markdown — grep against `hooks/`, `scripts/`, and the CLI confirmed zero consumers of the tag format.
-- Phantom `research-01` citations removed from `meow:evaluate` (4 locations) — no such research file exists; constraints now cite Anthropic harness research honestly or declare themselves as heuristics.
-- Phantom `research-02` citations removed from `meow:rubric/references/calibration-guide.md` (2), `meow:sprint-contract/SKILL.md`, `meow:sprint-contract/references/bdd-to-ac-mapping.md` (2), and `.claude/rubrics/schema.md` — same non-existence.
-- `meow:multimodal` "332 system voices" unsourced count corrected to "300+ (see provider catalog)" with the MiniMax URL attached.
-- `meow:react-patterns` unverifiable "45+ rules across 8 priority categories from Vercel Engineering" attribution rephrased to "curated rules drawn from framework docs and production practice".
-- `meow:ui-design-system` CSV counts corrected — `colors.csv` 161 → 160, `ux-guidelines.csv` 99 → 98 (matches actual row counts).
-- `meow:vulnerability-scanner` dropped time-anchored "2025 threat landscape" tagline.
-- `meow:multimodal/scripts/minimax_api_client.py` magic numbers `poll_interval=10` and `max_wait=600` now carry derivation comments. `media_optimizer.py` `tokens_per_sec = 100 / 263` constants sourced to `ai.google.dev/pricing`.
-- `meow:multimodal/SKILL.md` — `check_setup.py` gained the bash invocation block every other script in the file already had.
-- `meow:scout` 6-agent cap now documented as an intentional exception to `parallel-execution-rules.md` Rule 2 (read-only Explore agents produce no merge-conflict risk).
-- `meow:browse` gained a Gotcha for the session-scoped `$B` alias silent-fail mode.
-- `meow:problem-solving` unclosed backtick at line 148 fixed.
+- `mk:rubric/scripts/validate-rubric.sh --help` no longer crashes on macOS — added `-h`/`--help` case before arg dispatcher, which previously fell through to `basename "--help"` triggering a BSD `illegal option` error.
+- Replaced non-existent `debugger` agent reference in `mk:cook`'s Phase-3 dispatch table with `developer` via `mk:investigate` — `.claude/agents/` never had a `debugger.md`.
+- `<HARD-GATE>` decorative tags in `mk:cook` and `mk:fix` bodies replaced with `**HARD GATE**` bold markdown — grep against `hooks/`, `scripts/`, and the CLI confirmed zero consumers of the tag format.
+- Phantom `research-01` citations removed from `mk:evaluate` (4 locations) — no such research file exists; constraints now cite Anthropic harness research honestly or declare themselves as heuristics.
+- Phantom `research-02` citations removed from `mk:rubric/references/calibration-guide.md` (2), `mk:sprint-contract/SKILL.md`, `mk:sprint-contract/references/bdd-to-ac-mapping.md` (2), and `.claude/rubrics/schema.md` — same non-existence.
+- `mk:multimodal` "332 system voices" unsourced count corrected to "300+ (see provider catalog)" with the MiniMax URL attached.
+- `mk:react-patterns` unverifiable "45+ rules across 8 priority categories from Vercel Engineering" attribution rephrased to "curated rules drawn from framework docs and production practice".
+- `mk:ui-design-system` CSV counts corrected — `colors.csv` 161 → 160, `ux-guidelines.csv` 99 → 98 (matches actual row counts).
+- `mk:vulnerability-scanner` dropped time-anchored "2025 threat landscape" tagline.
+- `mk:multimodal/scripts/minimax_api_client.py` magic numbers `poll_interval=10` and `max_wait=600` now carry derivation comments. `media_optimizer.py` `tokens_per_sec = 100 / 263` constants sourced to `ai.google.dev/pricing`.
+- `mk:multimodal/SKILL.md` — `check_setup.py` gained the bash invocation block every other script in the file already had.
+- `mk:scout` 6-agent cap now documented as an intentional exception to `parallel-execution-rules.md` Rule 2 (read-only Explore agents produce no merge-conflict risk).
+- `mk:browse` gained a Gotcha for the session-scoped `$B` alias silent-fail mode.
+- `mk:problem-solving` unclosed backtick at line 148 fixed.
 
 ### Migration Notes
 
 - `npx mewkit upgrade` picks up all description changes. No user action required.
 - If any custom hook was reading `autoInvoke` / `priority` frontmatter fields: they were grep-confirmed unread before deletion. If a hook outside the repo tree was silently depending on them, restore them explicitly in the affected skills.
-- `preamble-tier: 4` → `3` on `meow:qa` / `meow:review` / `meow:ship` may cause tiny context-ordering shifts. Functionally identical outputs.
+- `preamble-tier: 4` → `3` on `mk:qa` / `mk:review` / `mk:ship` may cause tiny context-ordering shifts. Functionally identical outputs.
 
 ---
 
-## 2.5.1 (2026-04-20) — meow:henshin
+## 2.5.1 (2026-04-20) — mk:henshin
 
 ### Highlights
 
-New cross-cutting skill `meow:henshin` — planning front door for transforming existing code into agent-consumable surfaces (CLI + MCP server + companion skill). Adapted from `claudekit-engineer/agentize` (tier 2). Produces a **Transformation Spec** and hands off to `/meow:plan-creator` → `/meow:cook` for the build. Not a builder on its own.
+New cross-cutting skill `mk:henshin` — planning front door for transforming existing code into agent-consumable surfaces (CLI + MCP server + companion skill). Adapted from `claudekit-engineer/agentize` (tier 2). Produces a **Transformation Spec** and hands off to `/mk:plan-creator` → `/mk:cook` for the build. Not a builder on its own.
 
 ### New Skills
 
-- `meow:henshin` — 6-phase planning workflow: Discover → Inventory → Capability Map → **HARD GATE** → Spec Write → Handoff. Non-bypassable human approval for package name, license, and ownership (business decisions); `--auto` and `--lean` never skip these. Writes an architectural decision record to `.claude/memory/architecture-decisions.md` with `##decision:` prefix. Ships 5 progressive-disclosure references under 200 lines each (`agent-centric-design`, `auth-resolution-chain`, `mcp-transports`, `monorepo-layout`, `challenge-framework`).
-- **Boundary vs `meow:chom`** — henshin is **outbound** (local code → agent surfaces); chom is **inbound** (external repo → local project). No semantic overlap. Paste a GitHub URL into henshin and the Error Recovery section redirects to chom.
+- `mk:henshin` — 6-phase planning workflow: Discover → Inventory → Capability Map → **HARD GATE** → Spec Write → Handoff. Non-bypassable human approval for package name, license, and ownership (business decisions); `--auto` and `--lean` never skip these. Writes an architectural decision record to `.claude/memory/architecture-decisions.md` with `##decision:` prefix. Ships 5 progressive-disclosure references under 200 lines each (`agent-centric-design`, `auth-resolution-chain`, `mcp-transports`, `monorepo-layout`, `challenge-framework`).
+- **Boundary vs `mk:chom`** — henshin is **outbound** (local code → agent surfaces); chom is **inbound** (external repo → local project). No semantic overlap. Paste a GitHub URL into henshin and the Error Recovery section redirects to chom.
 - Triggers on `agentize`, `henshin`, `expose as MCP`, `wrap as CLI`, `publish to npm`, `make LLM-accessible`, `turn into agent tool`.
 
 ### Bug Fixes
 
-- `meow:henshin/references/mcp-transports.md` — SSE code snippet rewrote to use Express + a per-session transport map. Previous snippet mixed Hono-style `c.res` with a Node.js `ServerResponse` constructor, producing a copy-paste type error in Hono environments, plus a scope leak where a single `t` served multiple clients.
-- `meow:henshin/references/monorepo-layout.md` — `commander` dependency bumped from `^12.0.0` to `^14.0.0` (current major).
+- `mk:henshin/references/mcp-transports.md` — SSE code snippet rewrote to use Express + a per-session transport map. Previous snippet mixed Hono-style `c.res` with a Node.js `ServerResponse` constructor, producing a copy-paste type error in Hono environments, plus a scope leak where a single `t` served multiple clients.
+- `mk:henshin/references/monorepo-layout.md` — `commander` dependency bumped from `^12.0.0` to `^14.0.0` (current major).
 
 ### Documentation
 
@@ -167,75 +217,75 @@ Skills stop branding themselves and start reading like the project's own workflo
 
 ### Features
 
-- `meow:evaluate`, `meow:benchmark`, and `meow:party` now persist their outputs across sessions — verdicts to `.claude/memory/review-patterns.md`, baselines to `cost-log.json`, architectural decisions to `decisions.md`. Each writer runs `mkdir -p .claude/memory` first so the append never fails silently.
-- `CLAUDE.md` gains an **Orchestrator Entry Point Rule** — explicit `/meow:cook` wins; `meow:workflow-orchestrator` defers for the rest of the session. Ends duplicate Gate 1 enforcement.
+- `mk:evaluate`, `mk:benchmark`, and `mk:party` now persist their outputs across sessions — verdicts to `.claude/memory/review-patterns.md`, baselines to `cost-log.json`, architectural decisions to `decisions.md`. Each writer runs `mkdir -p .claude/memory` first so the append never fails silently.
+- `CLAUDE.md` gains an **Orchestrator Entry Point Rule** — explicit `/mk:cook` wins; `mk:workflow-orchestrator` defers for the rest of the session. Ends duplicate Gate 1 enforcement.
 - `CLAUDE.md` gains a **Skill Frontmatter Schema** section defining `preamble-tier` (`1 | 2 | 3`), `user-invocable` (`true | false`), `phase` (`0-6 | on-demand`), `trust_level` (`kit-authored | third-party`), and `injection_risk` (`low | medium | high`). Twenty-one skills were already using `preamble-tier: 3` without a documented schema.
-- `meow:careful` emits an audit-trail log entry to `.claude/memory/security-log.md` on every warn/override event (timestamp, pattern, severity, command). Log file is auto-initialized with a markdown-table header.
+- `mk:careful` emits an audit-trail log entry to `.claude/memory/security-log.md` on every warn/override event (timestamp, pattern, severity, command). Log file is auto-initialized with a markdown-table header.
 
 ### Improvements
 
 - Installed skills read as the project's own workflow — `MeowKit follows the Boil the Lake principle` → `This workflow follows the Boil the Lake principle`; `Help MeowKit get better!` → `Help improve this workflow!`; table column `MeowKit` → `AI-assisted`; dozens of similar edits. See the [What's New page](/guide/whats-new/v2.5.0) for the full pattern list.
 - Seven collision clusters disambiguated — each pair now declares `use when` + `use <other> instead when` at the top of both skills; no more buried routing rules.
-- `NOT this skill if:` differentiators added to the reasoning cluster (`meow:elicit`, `meow:brainstorming`, `meow:problem-solving`).
-- `meow:workflow-orchestrator` bare `"implement"` trigger replaced with `"implement feature"` — no longer fires `autoInvoke:true` on trivial requests.
-- `meow:ship/references/preamble.md` declares a memory-read of `.claude/memory/architecture-decisions.md` at task start. Previously the memory reference existed in frontmatter without a body instruction.
-- `meow:review` and `meow:ship` look up plans from `.claude/plans/` and `tasks/plans/` first; `~/.claude/plans/` is retained only as a legacy fallback with an explanatory comment.
-- `meow:cook` intent-detection table carries a green-field escalation callout pointing at `meow:harness`.
-- `meow:help` documents the `/meow:plan` alias — confirmed via the slash-command router at `.claude/commands/meow/plan.md`.
-- `meow:docs-finder` documents Node.js 18+ as a prerequisite for its `.js` scripts and flags unbounded `.claude/memory/docs-cache/` growth in Gotchas.
-- `meow:investigate` Process step 4 clarifies the freeze hook is a no-op without an explicit `meow:freeze <target-dir>` invocation.
-- `meow:benchmark/SKILL.md` accurately describes `run-canary.sh` as a step-1-of-2 manifest emitter (not a suite runner); `compare-runs.sh` distinguishes `null` scores (PENDING, excluded from averages) from valid `0` scores.
-- `meow:jira` description narrowed from CRUD + evaluation to CRUD only — ticket analysis now routes to `meow:intake`.
-- `meow:scale-routing` marked `user-invocable: false` — it's a Phase 0 sub-skill, not a user-facing entry point.
-- `meow:party` removes `retro` from its triggers with a pointer to `meow:retro` for dedicated retrospectives.
-- Six skills gained `phase: on-demand` frontmatter (`chom`, `clean-code`, `docs-finder`, `docs-init`, `lint-and-validate`, `multimodal`); `meow:jira` corrected from `phase: 3` → `phase: on-demand`.
+- `NOT this skill if:` differentiators added to the reasoning cluster (`mk:elicit`, `mk:brainstorming`, `mk:problem-solving`).
+- `mk:workflow-orchestrator` bare `"implement"` trigger replaced with `"implement feature"` — no longer fires `autoInvoke:true` on trivial requests.
+- `mk:ship/references/preamble.md` declares a memory-read of `.claude/memory/architecture-decisions.md` at task start. Previously the memory reference existed in frontmatter without a body instruction.
+- `mk:review` and `mk:ship` look up plans from `.claude/plans/` and `tasks/plans/` first; `~/.claude/plans/` is retained only as a legacy fallback with an explanatory comment.
+- `mk:cook` intent-detection table carries a green-field escalation callout pointing at `mk:harness`.
+- `mk:help` documents the `/mk:plan` alias — confirmed via the slash-command router at `.claude/commands/meow/plan.md`.
+- `mk:docs-finder` documents Node.js 18+ as a prerequisite for its `.js` scripts and flags unbounded `.claude/memory/docs-cache/` growth in Gotchas.
+- `mk:investigate` Process step 4 clarifies the freeze hook is a no-op without an explicit `mk:freeze <target-dir>` invocation.
+- `mk:benchmark/SKILL.md` accurately describes `run-canary.sh` as a step-1-of-2 manifest emitter (not a suite runner); `compare-runs.sh` distinguishes `null` scores (PENDING, excluded from averages) from valid `0` scores.
+- `mk:jira` description narrowed from CRUD + evaluation to CRUD only — ticket analysis now routes to `mk:intake`.
+- `mk:scale-routing` marked `user-invocable: false` — it's a Phase 0 sub-skill, not a user-facing entry point.
+- `mk:party` removes `retro` from its triggers with a pointer to `mk:retro` for dedicated retrospectives.
+- Six skills gained `phase: on-demand` frontmatter (`chom`, `clean-code`, `docs-finder`, `docs-init`, `lint-and-validate`, `multimodal`); `mk:jira` corrected from `phase: 3` → `phase: on-demand`.
 - Antigravity-kit-sourced skills (`clean-code`, `lint-and-validate`) gained `trust_level: third-party` + `injection_risk: low` provenance markers.
-- 34 hardcoded `/Users/sangnguyen/Desktop/compare-kit/...` lines stripped from 10 `meow:angular/references/*.md` files — source-import metadata with zero runtime value.
+- 34 hardcoded `/Users/sangnguyen/Desktop/compare-kit/...` lines stripped from 10 `mk:angular/references/*.md` files — source-import metadata with zero runtime value.
 
 ### Removals
 
-- Dead `Codex Review | /codex review` table row removed from 6 shared-protocol tables (`meow:browse`, `meow:document-release`, `meow:investigate`, `meow:office-hours`, `meow:plan-ceo-review`, `meow:retro`) — `/codex review` referenced the OpenAI Codex CLI, not a meowkit skill.
+- Dead `Codex Review | /codex review` table row removed from 6 shared-protocol tables (`mk:browse`, `mk:document-release`, `mk:investigate`, `mk:office-hours`, `mk:plan-ceo-review`, `mk:retro`) — `/codex review` referenced the OpenAI Codex CLI, not a meowkit skill.
 - `claudekit-engineer` provenance prose genericized in body HTML comments, script file headers, and reference attributions. Frontmatter `source: claudekit-engineer` fields are policy-preserved.
 
 ### Bug Fixes
 
-- `meow:careful` FLUSHDB severity aligned — `destructive-patterns.md` said HIGH, `check-careful.sh` enforced CRITICAL. Both now say CRITICAL.
-- `meow:ui-design-system` — `57 font pairings` count fixed to `73` (CSV has 73 data rows; documented count had drifted 28%).
-- `meow:brainstorming` — invented `BMAD's ~10% pivot frequency` statistic removed (no source document existed).
-- `meow:vulnerability-scanner` — fabricated `OWASP Top 10:2025` version label relabeled to `OWASP Top 10 (2021 ranking, 2025 threat context)` with a disclaimer. No official 2025 release exists as of April 2026.
-- `meow:multimodal` — `gemini-3.1-*` and `veo-3.1-*` preview model IDs now carry a verify-before-deploy warning pointing at the Gemini model docs.
-- `meow:scout` and `meow:docs-finder` — `P1-P8` / `P1-P14` citations removed from Anthropic context-engineering-research attributions (neither research doc uses those labels).
+- `mk:careful` FLUSHDB severity aligned — `destructive-patterns.md` said HIGH, `check-careful.sh` enforced CRITICAL. Both now say CRITICAL.
+- `mk:ui-design-system` — `57 font pairings` count fixed to `73` (CSV has 73 data rows; documented count had drifted 28%).
+- `mk:brainstorming` — invented `BMAD's ~10% pivot frequency` statistic removed (no source document existed).
+- `mk:vulnerability-scanner` — fabricated `OWASP Top 10:2025` version label relabeled to `OWASP Top 10 (2021 ranking, 2025 threat context)` with a disclaimer. No official 2025 release exists as of April 2026.
+- `mk:multimodal` — `gemini-3.1-*` and `veo-3.1-*` preview model IDs now carry a verify-before-deploy warning pointing at the Gemini model docs.
+- `mk:scout` and `mk:docs-finder` — `P1-P8` / `P1-P14` citations removed from Anthropic context-engineering-research attributions (neither research doc uses those labels).
 
 ### Migration Notes
 
-- `meow:workflow-orchestrator` no longer fires on bare `"implement"` — use compound triggers (`"implement feature"`, `"build feature"`, `"create feature"`, `"complex task"`) or invoke `/meow:cook` explicitly.
-- `meow:party` memory write is now mandatory, not optional. Decision records land in `.claude/memory/decisions.md`. If a shell blocks writes to `.claude/memory/`, whitelist the directory before invoking party.
+- `mk:workflow-orchestrator` no longer fires on bare `"implement"` — use compound triggers (`"implement feature"`, `"build feature"`, `"create feature"`, `"complex task"`) or invoke `/mk:cook` explicitly.
+- `mk:party` memory write is now mandatory, not optional. Decision records land in `.claude/memory/decisions.md`. If a shell blocks writes to `.claude/memory/`, whitelist the directory before invoking party.
 - Upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`. Existing `.claude/memory/` topic files are preserved; new writers `mkdir -p` safely if a parent directory is missing.
 
 ---
 
-## 2.4.6 (2026-04-19) — meow:ship Cleanup + Design Review Checklist
+## 2.4.6 (2026-04-19) — mk:ship Cleanup + Design Review Checklist
 
 ### Highlights
 
-`meow:ship` drops its unused Codex (OpenAI CLI) integration, fixes broken bash in the preamble, and removes phantom slash-command references. `meow:review` gains a lite design-review checklist — source-level pattern detection for frontend diffs, adapted from gstack with additions from claudekit-engineer (Strategic Omissions, Fix Priority Order) and everything-claude-code (anti-template patterns).
+`mk:ship` drops its unused Codex (OpenAI CLI) integration, fixes broken bash in the preamble, and removes phantom slash-command references. `mk:review` gains a lite design-review checklist — source-level pattern detection for frontend diffs, adapted from gstack with additions from claudekit-engineer (Strategic Omissions, Fix Priority Order) and everything-claude-code (anti-template patterns).
 
 ### Improvements
 
-- `meow:review/design-checklist.md` — new lite design-review reference with six categories (AI Slop Detection, Typography, Spacing & Layout, Interaction States, DESIGN.md Violations, Strategic Omissions) and a three-tier confidence system (`[HIGH]` / `[MEDIUM]` / `[LOW]`) for grep-actionable pattern detection.
-- `meow:ship` large-diff adversarial review is now Claude-only — two passes (Claude structured + Claude adversarial subagent) replace the prior four-pass cross-model scheme that depended on an uninstalled external CLI.
-- `meow:ship` and `meow:review` Gotchas sections document the scope-gated frontend trigger on the design check and the source-pattern-only limitation (no visual rendering).
+- `mk:review/design-checklist.md` — new lite design-review reference with six categories (AI Slop Detection, Typography, Spacing & Layout, Interaction States, DESIGN.md Violations, Strategic Omissions) and a three-tier confidence system (`[HIGH]` / `[MEDIUM]` / `[LOW]`) for grep-actionable pattern detection.
+- `mk:ship` large-diff adversarial review is now Claude-only — two passes (Claude structured + Claude adversarial subagent) replace the prior four-pass cross-model scheme that depended on an uninstalled external CLI.
+- `mk:ship` and `mk:review` Gotchas sections document the scope-gated frontend trigger on the design check and the source-pattern-only limitation (no visual rendering).
 
 ### Removals
 
-- Codex (OpenAI CLI) integration removed from `meow:ship` — `codex exec`, `codex review`, and `which codex` guards dropped across five reference files. Claude adversarial subagent was already the runtime fallback.
-- Phantom slash-command references removed from `meow:ship` — `/qa-only`, `/plan-design-review`, and `/design-review` (none exist as meowkit skills). The plan-verification step now emits a post-ship reminder to run `/meow:qa` against the deployed build instead of attempting to invoke a missing skill.
+- Codex (OpenAI CLI) integration removed from `mk:ship` — `codex exec`, `codex review`, and `which codex` guards dropped across five reference files. Claude adversarial subagent was already the runtime fallback.
+- Phantom slash-command references removed from `mk:ship` — `/qa-only`, `/plan-design-review`, and `/design-review` (none exist as meowkit skills). The plan-verification step now emits a post-ship reminder to run `/mk:qa` against the deployed build instead of attempting to invoke a missing skill.
 - `design-review-lite` as a fake skill-name in the review-log schema — renamed to `"source":"ship-design-check"` so the readiness dashboard no longer pretends a non-existent skill produced the entry.
 
 ### Bug Fixes
 
-- `meow:ship/references/preamble.md` — two bash syntax errors fixed (unterminated `$(# comment)` upgrade-check and orphan `for...done` with a comment-eaten `done`). `bash -n` now passes on every code block; prior runs silently failed before any shipping work started.
-- `meow:ship/references/plan-completion-audit.md` — the dead `/qa-only` invocation that silently failed every run is replaced with a one-line reminder to run `/meow:qa` against the deployed build.
+- `mk:ship/references/preamble.md` — two bash syntax errors fixed (unterminated `$(# comment)` upgrade-check and orphan `for...done` with a comment-eaten `done`). `bash -n` now passes on every code block; prior runs silently failed before any shipping work started.
+- `mk:ship/references/plan-completion-audit.md` — the dead `/qa-only` invocation that silently failed every run is replaced with a one-line reminder to run `/mk:qa` against the deployed build.
 
 ---
 
@@ -243,17 +293,17 @@ Skills stop branding themselves and start reading like the project's own workflo
 
 ### Highlights
 
-A new strategic-unsticking skill and three diagnostic frameworks for evidence-based debugging. `meow:problem-solving` ships seven non-default techniques for approach-level stuck-moments — distinct from `meow:sequential-thinking`, which gains five-whys-plus, scientific-method, and kepner-tregoe references for methodology-aware root-cause work.
+A new strategic-unsticking skill and three diagnostic frameworks for evidence-based debugging. `mk:problem-solving` ships seven non-default techniques for approach-level stuck-moments — distinct from `mk:sequential-thinking`, which gains five-whys-plus, scientific-method, and kepner-tregoe references for methodology-aware root-cause work.
 
 ### New Skills
 
 | Skill                  | Purpose                                                                                                                                                                                                                                                       |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meow:problem-solving` | Seven non-default techniques for "stuck on approach" — simplification cascades, collision-zone thinking, meta-pattern recognition, inversion, scale game, first principles, via negativa. Explicit boundary reroutes debugging to `meow:sequential-thinking`. |
+| `mk:problem-solving` | Seven non-default techniques for "stuck on approach" — simplification cascades, collision-zone thinking, meta-pattern recognition, inversion, scale game, first principles, via negativa. Explicit boundary reroutes debugging to `mk:sequential-thinking`. |
 
 ### Improvements
 
-- `meow:sequential-thinking` gains three diagnostic-framework references — `five-whys-plus.md` (bias guards + stopping criteria), `scientific-method.md` (falsifiable prediction discipline), `kepner-tregoe.md` (IS/IS-NOT matrix for multi-system bugs). Core workflow unchanged; load when a specific methodology fits.
+- `mk:sequential-thinking` gains three diagnostic-framework references — `five-whys-plus.md` (bias guards + stopping criteria), `scientific-method.md` (falsifiable prediction discipline), `kepner-tregoe.md` (IS/IS-NOT matrix for multi-system bugs). Core workflow unchanged; load when a specific methodology fits.
 - `SKILLS_INDEX.md` and website skill indexes register the new skill and clarify cross-cutting placement for both thinking skills.
 
 ---
@@ -266,9 +316,9 @@ Three deprecated skills removed permanently. Brand assets (animated logo, SVG fa
 
 ### Removals
 
-- `meow:debug` — deprecated since v2.0.0, superseded by `meow:investigate`. Directory removed from `.claude/skills/`.
-- `meow:documentation` — deprecated since v2.0.0, superseded by `meow:document-release`. Directory removed.
-- `meow:shipping` — deprecated since v2.0.0, superseded by `meow:ship`. Directory removed.
+- `mk:debug` — deprecated since v2.0.0, superseded by `mk:investigate`. Directory removed from `.claude/skills/`.
+- `mk:documentation` — deprecated since v2.0.0, superseded by `mk:document-release`. Directory removed.
+- `mk:shipping` — deprecated since v2.0.0, superseded by `mk:ship`. Directory removed.
 - Dead references in `SKILLS_INDEX.md`, `website/reference/skills/index.md`, `website/reference/skills-index.md`, `website/reference/skills/docs-init.md`, `docs/project-context.md`, and `docs/meowkit-architecture.md` cleaned up.
 
 ### Improvements
@@ -295,7 +345,7 @@ Three deprecated skills removed permanently. Brand assets (animated logo, SVG fa
 
 ### Highlights
 
-`meow:brainstorming` rewritten with patterns extracted from BMAD-METHOD, ClaudeKit, and the everything-claude-code structural template. Adds discovery protocol, scope assessment, single mid-session anti-bias pivot, and 3 new techniques.
+`mk:brainstorming` rewritten with patterns extracted from BMAD-METHOD, ClaudeKit, and the everything-claude-code structural template. Adds discovery protocol, scope assessment, single mid-session anti-bias pivot, and 3 new techniques.
 
 ### Features
 
@@ -358,7 +408,7 @@ Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + inj
 ### Improvements
 
 - Topic-file layout: `fixes.md/json`, `review-patterns.md/json`, `architecture-decisions.md/json`, `security-notes.md` replace the `lessons.md` + `patterns.json` monolith. Each file has a single consumer skill.
-- On-demand retrieval: `meow:fix`, `meow:cook`, `meow:plan-creator`, `meow:review` read the relevant topic file via their SKILL.md `Read` step.
+- On-demand retrieval: `mk:fix`, `mk:cook`, `mk:plan-creator`, `mk:review` read the relevant topic file via their SKILL.md `Read` step.
 - Atomic capture writes: `immediate-capture-handler.cjs` uses temp-rename for all JSON writes; crash mid-write no longer corrupts split files. Dual-lock race on `architecture-decisions.json` eliminated.
 - Memory is machine-local by default — `.claude/memory/*` is gitignored; `mewkit setup` scaffolds a blank directory. Downstream installs no longer inherit the MeowKit dev team's learnings.
 
@@ -396,20 +446,20 @@ Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + inj
 
 ### New Commands
 
-- `meow:project-context init` — writes a TODO-filled `docs/project-context.md` skeleton for users starting from scratch. Refuses to overwrite an existing file.
+- `mk:project-context init` — writes a TODO-filled `docs/project-context.md` skeleton for users starting from scratch. Refuses to overwrite an existing file.
 
 ### Improvements
 
 - 12 SKILL.md files got real domain-specific Gotchas sections (5–6 entries each, no generic filler): `vue`, `typescript`, `database`, `build-fix`, `lint-and-validate`, `frontend-design`, `project-organization`, `jira`, `intake`, `figma`, `docs-finder`, `elicit`.
-- 7 gate-owning skills gained `gate-rules.md` references: `meow:plan-creator`, `meow:workflow-orchestrator`, `meow:sprint-contract`, `meow:cook`, `meow:ship`, `meow:review`. `meow:cso` gained `security-rules.md`.
+- 7 gate-owning skills gained `gate-rules.md` references: `mk:plan-creator`, `mk:workflow-orchestrator`, `mk:sprint-contract`, `mk:cook`, `mk:ship`, `mk:review`. `mk:cso` gained `security-rules.md`.
 - README + CLAUDE.md + project-context.md surface `npx mewkit setup` as the required post-install step.
 
 ### Bug Fixes
 
-- Deprecated skills (`meow:debug`, `meow:documentation`, `meow:shipping`) gained `deprecated: true` + `superseded_by:` YAML keys (previously only described in prose, invisible to parsers).
-- Phantom skill refs in dispatcher fixed: `meow:plan` → `meow:plan-creator`, `meow:test` → `meow:testing`.
+- Deprecated skills (`mk:debug`, `mk:documentation`, `mk:shipping`) gained `deprecated: true` + `superseded_by:` YAML keys (previously only described in prose, invisible to parsers).
+- Phantom skill refs in dispatcher fixed: `mk:plan` → `mk:plan-creator`, `mk:test` → `mk:testing`.
 - Silent `python3`-absent skip in `post-session.sh:27` upgraded to a warning.
-- Silent-fail on missing `docs/project-context.md` in `meow:plan-creator/step-02` upgraded to explicit warning with graceful fallback.
+- Silent-fail on missing `docs/project-context.md` in `mk:plan-creator/step-02` upgraded to explicit warning with graceful fallback.
 
 ---
 
@@ -419,20 +469,20 @@ Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + inj
 
 | Skill       | Purpose                                                                                                                                                             |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meow:pack` | Wraps `repomix` to export an external repo as a single AI-friendly file (markdown/xml/json/plain). Output at `.claude/packs/{timestamp}-{slug}.{ext}` (gitignored). |
+| `mk:pack` | Wraps `repomix` to export an external repo as a single AI-friendly file (markdown/xml/json/plain). Output at `.claude/packs/{timestamp}-{slug}.{ext}` (gitignored). |
 
 ### Features
 
-- `meow:pack --compress` — Tree-sitter signature extraction for API-surface queries (bodies omitted).
+- `mk:pack --compress` — Tree-sitter signature extraction for API-surface queries (bodies omitted).
 - `self-pack-guard.sh` blocks packing the current git root unless `--self` is passed.
-- `meow:chom` v2 — 4 user-explicit modes (`--compare` / `--copy` / `--improve` / `--port`) replacing v1's 2-mode scheme.
-- `meow:chom` speed flags: `--lean` (skip Phase 1 researcher for freeform inputs) and `--auto` (auto-approve non-HARD-GATE steps).
-- `meow:chom` intent detection — keyword hints map to suggested mode flags.
-- `meow:chom` explicit Boundary Rules — emits handoff text only, does NOT invoke `plan-creator` / `brainstorming` / `cook` / `sequential-thinking` mid-flow.
+- `mk:chom` v2 — 4 user-explicit modes (`--compare` / `--copy` / `--improve` / `--port`) replacing v1's 2-mode scheme.
+- `mk:chom` speed flags: `--lean` (skip Phase 1 researcher for freeform inputs) and `--auto` (auto-approve non-HARD-GATE steps).
+- `mk:chom` intent detection — keyword hints map to suggested mode flags.
+- `mk:chom` explicit Boundary Rules — emits handoff text only, does NOT invoke `plan-creator` / `brainstorming` / `cook` / `sequential-thinking` mid-flow.
 
 ### Improvements
 
-- `meow:chom` Phase 4 HARD GATE language hardened — explicitly non-bypassable in all modes including `--lean` / `--auto`.
+- `mk:chom` Phase 4 HARD GATE language hardened — explicitly non-bypassable in all modes including `--lean` / `--auto`.
 - chom handoff text enriched with challenge-reds summary + risk score. plan-creator owns adaptation-depth decisions downstream.
 
 ### Bug Fixes
@@ -474,14 +524,14 @@ Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + inj
 
 | Skill                  | Purpose                                                                                                                                                                      |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meow:confluence`      | Fetch Confluence pages as markdown + deep requirement analysis (Spec Research Report, gap detection with `[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` tags, multi-page assembly). |
-| `meow:planning-engine` | Codebase-aware tech review + sprint planning with deterministic scripts (`dep-graph.py` cycle detection, `capacity-bin.py` bin-packing). Research-only — no ticket creation. |
+| `mk:confluence`      | Fetch Confluence pages as markdown + deep requirement analysis (Spec Research Report, gap detection with `[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` tags, multi-page assembly). |
+| `mk:planning-engine` | Codebase-aware tech review + sprint planning with deterministic scripts (`dep-graph.py` cycle detection, `capacity-bin.py` bin-packing). Research-only — no ticket creation. |
 
 ### Features
 
-- `meow:jira evaluate` — qualitative complexity assessment (Simple/Medium/Complex with Fibonacci range).
-- `meow:jira estimate` — heuristic story point estimation with escalation triggers.
-- `meow:jira analyze` — full ticket context analysis with structured RCA output.
+- `mk:jira evaluate` — qualitative complexity assessment (Simple/Medium/Complex with Fibonacci range).
+- `mk:jira estimate` — heuristic story point estimation with escalation triggers.
+- `mk:jira analyze` — full ticket context analysis with structured RCA output.
 - Inconsistency detection — missing AC, vague language, unlinked dependencies, contradictions.
 - Injection defense — ticket content wrapped in DATA boundary markers.
 - Goal-oriented decision tree replaces operations-centric SKILL.md.
@@ -489,7 +539,7 @@ Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + inj
 
 ### Improvements
 
-- `meow:jira` SKILL.md restructured as thin routing layer (~150 lines).
+- `mk:jira` SKILL.md restructured as thin routing layer (~150 lines).
 - `jql-patterns.md` pruned from 50+ to 15 core patterns.
 - `sprint-operations.md` and `workflow-transitions.md` pruned (REST details removed).
 - Tier 2 batch creates (3+) now require preview + confirmation.
@@ -513,7 +563,7 @@ Memory loader split into 3 focused modules. 4 critical security/correctness fixe
 
 ### CLI
 
-- `meow:memory --prune` — archives old standard-severity entries to `lessons-archive.md`, recovering injection budget. Critical entries exempt.
+- `mk:memory --prune` — archives old standard-severity entries to `lessons-archive.md`, recovering injection budget. Critical entries exempt.
 
 ### Bug Fixes
 
@@ -543,7 +593,7 @@ Memory loader split into 3 focused modules. 4 critical security/correctness fixe
 
 ### Highlights
 
-Major overhaul of `meow:multimodal` — multi-provider generation with intelligent Gemini → MiniMax → OpenRouter fallback, MiniMax integration (image, video, TTS, music), document conversion, and `MEOWKIT_` env namespace.
+Major overhaul of `mk:multimodal` — multi-provider generation with intelligent Gemini → MiniMax → OpenRouter fallback, MiniMax integration (image, video, TTS, music), document conversion, and `MEOWKIT_` env namespace.
 
 ### Features
 
@@ -576,7 +626,7 @@ Major overhaul of `meow:multimodal` — multi-provider generation with intellige
 
 | Skill       | Purpose                                                                                                                                                                             |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meow:chom` | Analyze and replicate features from external systems, repos, apps, or ideas into any project. 6-phase workflow: Recon → Map → Analyze → Challenge (HARD GATE) → Decision → Handoff. |
+| `mk:chom` | Analyze and replicate features from external systems, repos, apps, or ideas into any project. 6-phase workflow: Recon → Map → Analyze → Challenge (HARD GATE) → Decision → Handoff. |
 
 ### Features
 
@@ -599,7 +649,7 @@ Major overhaul of `meow:multimodal` — multi-provider generation with intellige
 
 ### Highlights
 
-Redesigns `meow:plan-ceo-review` from single-pass deep review to layered verification pipeline. Strengthens decision quality without changing the 4-mode system.
+Redesigns `mk:plan-ceo-review` from single-pass deep review to layered verification pipeline. Strengthens decision quality without changing the 4-mode system.
 
 ### Features
 
@@ -647,7 +697,7 @@ Project-level `.claude/.env` support so all hooks and handlers can read `MEOWKIT
 - Gate 2 NON-NEGOTIABLE violation — `fast.md` and `cost-saver.md` modes auto-approved Gate 2 without human confirmation; now require explicit human approval.
 - TDD sentinel persistence — `--tdd` flag wrote sentinel to `.claude/session-state/` but session reset cleared `session-state/` at project root (different dirs); sentinel now cleared on new session.
 - Memory system dead by default — `post-session.sh` exited on `standard` profile, disabling memory capture, cost tracking, and trace records; now runs by default.
-- Phantom agent dispatch — `meow:cook` referenced 4 nonexistent agents; remapped to real agents.
+- Phantom agent dispatch — `mk:cook` referenced 4 nonexistent agents; remapped to real agents.
 - Memory path wrong system-wide — CLAUDE.md + 19 skills referenced `memory/` instead of `.claude/memory/`; all paths corrected.
 - Model detector silent failure — `model-detector.cjs` guard on `ctx.hook_event_name` silently killed detection when field absent.
 - Config file missing — `meowkit.config.json` referenced by 4+ consumers but never existed; created with version + features object.
@@ -672,9 +722,9 @@ Integrates correctness patterns from Anthropic's agent-skills system: 6 core ope
 ### Features
 
 - `core-behaviors.md` — 6 mandatory operating behaviors (Surface Assumptions, Manage Confusion, Push Back, Enforce Simplicity, Scope Discipline, Verify Don't Assume) + 10 failure modes. Loaded via CLAUDE.md preamble.
-- Per-skill failure catalogs — Common Rationalizations + Red Flags for `meow:cook`, `meow:plan-creator`, `meow:review`. Merged entries into `meow:fix` gotchas.
+- Per-skill failure catalogs — Common Rationalizations + Red Flags for `mk:cook`, `mk:plan-creator`, `mk:review`. Merged entries into `mk:fix` gotchas.
 - Phase composition contracts — embedded in CLAUDE.md; documents expects/produces/breaks-if-missing per phase.
-- Lifecycle routing table — task signal → phase → skill mapping in `meow:agent-detector`. Surfaced via `meow:help`.
+- Lifecycle routing table — task signal → phase → skill mapping in `mk:agent-detector`. Surfaced via `mk:help`.
 
 ---
 
@@ -695,9 +745,9 @@ Plan-creator's biggest upgrade since v1.3.2. 4-persona red team, `--deep` mode, 
 
 ### New Commands
 
-- `/meow:plan red-team {path}` — runs adversarial review on existing plans.
-- `/meow:plan validate {path}` — runs critical question interview on existing plans.
-- `/meow:plan archive` — scans completed plans, optionally captures learnings, archives or deletes.
+- `/mk:plan red-team {path}` — runs adversarial review on existing plans.
+- `/mk:plan validate {path}` — runs critical question interview on existing plans.
+- `/mk:plan archive` — scans completed plans, optionally captures learnings, archives or deletes.
 
 ### Bug Fixes
 
@@ -724,7 +774,7 @@ Node.js hook dispatch system with 8 handler modules, cook verification flags, re
 - `auto-checkpoint` handler — crash-recovery every 20 tool calls + phase transition detection.
 - `checkpoint-writer` handler — sequenced checkpoint with git state + budget snapshot on Stop.
 - `cook --verify` — advisory browser check after review (~$1).
-- `cook --strict` — full `meow:evaluate` after review; FAIL blocks ship (~$2–5).
+- `cook --strict` — full `mk:evaluate` after review; FAIL blocks ship (~$2–5).
 - `cook --no-strict` — suppress auto-strict trigger.
 - Auto-strict — scale-routing `level=high` auto-enables `--strict` in cook.
 - Review skeptic anchoring — re-anchor prompt injected per adversarial persona dispatch.
@@ -741,7 +791,7 @@ Node.js hook dispatch system with 8 handler modules, cook verification flags, re
 
 ### Improvements
 
-- `meow:web-to-markdown` `injection_detect.py` homoglyph detection now flags only mixed-script tokens (Latin + Cyrillic within a single word) instead of consecutive foreign characters. Reduces false positives on legitimate multilingual content while still catching homoglyph spoofing.
+- `mk:web-to-markdown` `injection_detect.py` homoglyph detection now flags only mixed-script tokens (Latin + Cyrillic within a single word) instead of consecutive foreign characters. Reduces false positives on legitimate multilingual content while still catching homoglyph spoofing.
 
 ---
 
@@ -749,7 +799,7 @@ Node.js hook dispatch system with 8 handler modules, cook verification flags, re
 
 ### Bug Fixes
 
-- `meow:web-to-markdown` `robots_cache.py` `_fetch_robots_txt()` raised `UnboundLocalError`. A function-local `import urllib.request` shadowed the module-level `urllib.robotparser` binding, breaking `rp = urllib.robotparser.RobotFileParser()`. Hoisted `import urllib.request` to module-level imports.
+- `mk:web-to-markdown` `robots_cache.py` `_fetch_robots_txt()` raised `UnboundLocalError`. A function-local `import urllib.request` shadowed the module-level `urllib.robotparser` binding, breaking `rp = urllib.robotparser.RobotFileParser()`. Hoisted `import urllib.request` to module-level imports.
 
 ---
 
@@ -763,13 +813,13 @@ Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline
 
 | Skill                  | Purpose                                                                                                                                                                                                                 |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meow:harness`         | Autonomous green-field build pipeline with generator/evaluator split, adaptive density, 3-round iteration loop, budget tracking ($30 warn / $100 block / user cap).                                                     |
-| `meow:sprint-contract` | File-based sprint contract negotiated between generator and evaluator before source edits begin. Enforced by `gate-enforcement.sh` in FULL density.                                                                     |
-| `meow:rubric`          | Weighted rubric loader; reads `.claude/rubrics/`, validates weights sum to 1.0.                                                                                                                                         |
-| `meow:evaluate`        | Behavioral grader with active verification; skeptic persona, drives running build, rejects static-analysis-only verdicts.                                                                                               |
-| `meow:trace-analyze`   | Scatter-gather trace log analyzer; reads `.claude/memory/trace-log.jsonl`, feeds meta-improvement loop with mandatory HITL gate.                                                                                        |
-| `meow:benchmark`       | Canary suite (quick 5-task / full 6-task tiers) for dead-weight audit baselines on model upgrades.                                                                                                                      |
-| `meow:web-to-markdown` | Static-by-default URL → clean markdown with SSRF guard, 6-pass injection scanner, DATA boundary wrap, fetch persistence with manifest, robots.txt cache, per-domain throttle. Tier-4 fallback below `meow:docs-finder`. |
+| `mk:harness`         | Autonomous green-field build pipeline with generator/evaluator split, adaptive density, 3-round iteration loop, budget tracking ($30 warn / $100 block / user cap).                                                     |
+| `mk:sprint-contract` | File-based sprint contract negotiated between generator and evaluator before source edits begin. Enforced by `gate-enforcement.sh` in FULL density.                                                                     |
+| `mk:rubric`          | Weighted rubric loader; reads `.claude/rubrics/`, validates weights sum to 1.0.                                                                                                                                         |
+| `mk:evaluate`        | Behavioral grader with active verification; skeptic persona, drives running build, rejects static-analysis-only verdicts.                                                                                               |
+| `mk:trace-analyze`   | Scatter-gather trace log analyzer; reads `.claude/memory/trace-log.jsonl`, feeds meta-improvement loop with mandatory HITL gate.                                                                                        |
+| `mk:benchmark`       | Canary suite (quick 5-task / full 6-task tiers) for dead-weight audit baselines on model upgrades.                                                                                                                      |
+| `mk:web-to-markdown` | Static-by-default URL → clean markdown with SSRF guard, 6-pass injection scanner, DATA boundary wrap, fetch persistence with manifest, robots.txt cache, per-domain throttle. Tier-4 fallback below `mk:docs-finder`. |
 
 ### New Agents
 
@@ -777,7 +827,7 @@ Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline
 
 ### New Commands
 
-- `/meow:summary` — conversation summary cache inspector. `--status` health check, `--force` re-summarize, `--clear` reset.
+- `/mk:summary` — conversation summary cache inspector. `--status` health check, `--force` re-summarize, `--clear` reset.
 
 ### Features
 
@@ -798,8 +848,8 @@ Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline
 ### Migration Notes
 
 - `export MEOWKIT_MODEL_HINT=opus-4-6` in your shell profile if on Opus 4.6 — enables LEAN density auto-detection. Without it, Opus 4.6 users silently get FULL density.
-- Try `/meow:harness "build me a <thing>"` for your next green-field build.
-- Run `/meow:summary --status` after your first long session to verify the conversation cache is healthy.
+- Try `/mk:harness "build me a <thing>"` for your next green-field build.
+- Run `/mk:summary --status` after your first long session to verify the conversation cache is healthy.
 
 ### Breaking Changes
 
@@ -842,27 +892,27 @@ Extracted high-leverage patterns from ECC's 38-agent ecosystem. 5 new skills, 17
 
 | Skill                     | Purpose                                                                                                                                                  |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meow:decision-framework` | Operational decision architecture: classify → rules → score → escalate → communicate. 5 references + 3 domain examples.                                  |
-| `meow:verify`             | Unified verification: build → lint → test → type-check → coverage. Fail-fast. Auto-detects 5 project types (JS/TS, Python, Go, Ruby, Rust).              |
-| `meow:api-design`         | REST/GraphQL patterns: resource naming, HTTP methods, status codes, pagination, versioning, rate limiting, error formats.                                |
-| `meow:build-fix`          | Build error triage: detect language from error output, classify fixability, chain into `meow:verify`. Max 3 attempts then escalate.                      |
-| `meow:database`           | Schema design, migration patterns, query optimization. PostgreSQL primary.                                                                               |
-| `meow:jira`               | Jira execution via Atlassian MCP: 8 operation categories, 4-tier safety framework, 50+ JQL templates, sprint management.                                 |
-| `meow:figma`              | Figma design analysis via Figma MCP: 3 modes (analyze/implement/tokens), design token extraction (CSS/Tailwind/JSON). Fallback: PNG export + multimodal. |
-| `meow:intake`             | Tool-agnostic ticket/PRD analysis with 8-dimension completeness scoring, media fallback chain, injection defense.                                        |
+| `mk:decision-framework` | Operational decision architecture: classify → rules → score → escalate → communicate. 5 references + 3 domain examples.                                  |
+| `mk:verify`             | Unified verification: build → lint → test → type-check → coverage. Fail-fast. Auto-detects 5 project types (JS/TS, Python, Go, Ruby, Rust).              |
+| `mk:api-design`         | REST/GraphQL patterns: resource naming, HTTP methods, status codes, pagination, versioning, rate limiting, error formats.                                |
+| `mk:build-fix`          | Build error triage: detect language from error output, classify fixability, chain into `mk:verify`. Max 3 attempts then escalate.                      |
+| `mk:database`           | Schema design, migration patterns, query optimization. PostgreSQL primary.                                                                               |
+| `mk:jira`               | Jira execution via Atlassian MCP: 8 operation categories, 4-tier safety framework, 50+ JQL templates, sprint management.                                 |
+| `mk:figma`              | Figma design analysis via Figma MCP: 3 modes (analyze/implement/tokens), design token extraction (CSS/Tailwind/JSON). Fallback: PNG export + multimodal. |
+| `mk:intake`             | Tool-agnostic ticket/PRD analysis with 8-dimension completeness scoring, media fallback chain, injection defense.                                        |
 
 ### Features
 
 - 17 reference merges across 10 skills (RCA selection, plan-creator ops/cold-start/mutation, QA browser checklist, agent-detector token budget, office-hours product lens, typescript review checklist, cook loop safety, review iterative protocol, frontend anti-slop, testing E2E best practices).
 - Hook runtime profiling — `MEOW_HOOK_PROFILE` env var: `strict` (all), `standard` (default), `fast` (gate + privacy only). Safety-critical hooks never skip.
-- Mandatory simplification — `meow:cook` now requires `meow:simplify` between Phase 3 (Build) and Phase 4 (Review).
+- Mandatory simplification — `mk:cook` now requires `mk:simplify` between Phase 3 (Build) and Phase 4 (Review).
 - Proactive learning — `learning-observer.sh` PostToolUse hook detects churn patterns, feeds into retroactive capture.
 
 ### Removals / Renames
 
-- `meow:shipping` → `meow:ship`.
-- `meow:documentation` → `meow:document-release`.
-- `meow:debug` → `meow:investigate`.
+- `mk:shipping` → `mk:ship`.
+- `mk:documentation` → `mk:document-release`.
+- `mk:debug` → `mk:investigate`.
 - (Redirects in place for 2 releases.)
 
 ### Improvements
@@ -870,7 +920,7 @@ Extracted high-leverage patterns from ECC's 38-agent ecosystem. 5 new skills, 17
 - MICRO-TASK TDD exemption — non-production code <30 lines exempt from TDD if classified MICRO-TASK by orchestrator.
 - Staged parallel mode — overlapping files handled sequentially, non-overlapping in parallel.
 - Memory capture enhancement — budget 2 min → 5 min, markers 3 → 5, CRITICAL/SECURITY markers always processed, `--capture-all` flag.
-- `meow:scale-routing` — 4-layer detection (CSV + task content + context + confidence scoring), 8 task type classifications, optional `product-areas.yaml`.
+- `mk:scale-routing` — 4-layer detection (CSV + task content + context + confidence scoring), 8 task type classifications, optional `product-areas.yaml`.
 
 ### CLI
 
@@ -899,7 +949,7 @@ Dedicated plan red-team with CK-style adjudication, plan-specific personas, and 
 
 ### Improvements
 
-- `meow:plan-creator` workflow expanded from 6 steps (00–05) to 9 steps (00–08).
+- `mk:plan-creator` workflow expanded from 6 steps (00–05) to 9 steps (00–08).
 - `.plan-state.json` schema bumped to v1.1 with optional `parallel_groups` and `selected_approach` fields.
 - 6 new gotchas and 2 new reference files (`parallel-mode.md`, `two-approach-mode.md`).
 
@@ -927,7 +977,7 @@ Dedicated plan red-team with CK-style adjudication, plan-specific personas, and 
 
 ### Highlights
 
-Complete redesign of `meow:plan-creator` to match/exceed `ck-plan` across 15 dimensions.
+Complete redesign of `mk:plan-creator` to match/exceed `ck-plan` across 15 dimensions.
 
 ### Features
 
@@ -946,7 +996,7 @@ Complete redesign of `meow:plan-creator` to match/exceed `ck-plan` across 15 dim
 
 ### Highlights
 
-Hybrid adversarial persona system for `meow:review`.
+Hybrid adversarial persona system for `mk:review`.
 
 ### Features
 
@@ -977,10 +1027,10 @@ Full red-team audit: 98 components, 11 batches, 43 criticals found, 42 fixed.
 ### Improvements
 
 - Created missing templates: party prompts (agent-selector, synthesis), team-config ownership map.
-- Created `meow:fix/references/gotchas.md` (7 anti-patterns).
-- Fixed `meow:development/references/skill-loader.md` — all 13+ broken paths corrected.
+- Created `mk:fix/references/gotchas.md` (7 anti-patterns).
+- Fixed `mk:development/references/skill-loader.md` — all 13+ broken paths corrected.
 - Fixed mock guidance contradiction in tester agent (unit tests may mock, integration tests must not).
-- Honest documentation: `meow:careful` now states 8/30 patterns are hook-enforced (was claiming all 30).
+- Honest documentation: `mk:careful` now states 8/30 patterns are hook-enforced (was claiming all 30).
 
 ---
 
@@ -988,7 +1038,7 @@ Full red-team audit: 98 components, 11 batches, 43 criticals found, 42 fixed.
 
 ### Bug Fixes
 
-- `meow:cook` Phase 6 (Reflect) now spawns a dedicated subagent for `meow:memory` session-capture. Previously memory write was an inline bullet point that could be skipped if session was interrupted. Now enforced as MUST-spawn.
+- `mk:cook` Phase 6 (Reflect) now spawns a dedicated subagent for `mk:memory` session-capture. Previously memory write was an inline bullet point that could be skipped if session was interrupted. Now enforced as MUST-spawn.
 
 ---
 
@@ -1020,14 +1070,14 @@ Deeper review reasoning, resumable builds, and systematic coverage mapping. Insp
 
 | Skill                | Purpose                                                                                                                                                                                        |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meow:elicit`        | Structured second-pass reasoning after review or analysis. 8 named methods (pre-mortem, inversion, red team, Socratic, first principles, constraint removal, stakeholder mapping, analogical). |
-| `meow:validate-plan` | 8-dimension plan quality validation. Auto for COMPLEX tasks, optional for STANDARD.                                                                                                            |
-| `meow:nyquist`       | Test-to-requirement coverage mapping. Reads plan acceptance criteria + test files, produces gap report showing untested requirements.                                                          |
+| `mk:elicit`        | Structured second-pass reasoning after review or analysis. 8 named methods (pre-mortem, inversion, red team, Socratic, first principles, constraint removal, stakeholder mapping, analogical). |
+| `mk:validate-plan` | 8-dimension plan quality validation. Auto for COMPLEX tasks, optional for STANDARD.                                                                                                            |
+| `mk:nyquist`       | Test-to-requirement coverage mapping. Reads plan acceptance criteria + test files, produces gap report showing untested requirements.                                                          |
 
 ### Features
 
-- `meow:review` now recommends running `meow:scout` before review for complex changes (3+ files).
-- After review verdict, users can run `meow:elicit` for deeper analysis through a named reasoning method.
+- `mk:review` now recommends running `mk:scout` before review for complex changes (3+ files).
+- After review verdict, users can run `mk:elicit` for deeper analysis through a named reasoning method.
 - Beads pattern — COMPLEX tasks (5+ files) decompose into atomic, resumable work units. Each bead has acceptance criteria, file ownership, and ~150 lines size. Progress tracked in `session-state/build-progress.json`. Interrupted builds resume from last completed bead.
 - Subagent Status Protocol — all subagents report structured status (DONE, DONE_WITH_CONCERNS, BLOCKED, NEEDS_CONTEXT) with controller handling rules.
 
@@ -1048,24 +1098,24 @@ The biggest MeowKit update yet. 13 new capabilities inspired by deep analysis of
 
 | Skill                  | Purpose                                                                                                                        |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `meow:scale-routing`   | Domain-to-complexity CSV routing. Fintech, healthcare, IoT auto-force COMPLEX tier. User-extensible.                           |
-| `meow:project-context` | Generate / update agent constitution.                                                                                          |
-| `meow:party`           | Multi-agent deliberation sessions (2–4 agents debate architecture decisions with forced synthesis). Discussion only — no code. |
-| `meow:worktree`        | Git worktree lifecycle management.                                                                                             |
-| `meow:task-queue`      | Task claiming with ownership enforcement.                                                                                      |
-| `meow:help`            | Pipeline navigation assistant.                                                                                                 |
-| `meow:debug`           | Structured debugging: reproduce → isolate → root cause → fix → verify.                                                         |
-| `meow:simplify`        | Post-implementation complexity reduction (between Build and Review).                                                           |
-| `meow:team-config`     | Parallel agent team setup with ownership maps and worktrees.                                                                   |
+| `mk:scale-routing`   | Domain-to-complexity CSV routing. Fintech, healthcare, IoT auto-force COMPLEX tier. User-extensible.                           |
+| `mk:project-context` | Generate / update agent constitution.                                                                                          |
+| `mk:party`           | Multi-agent deliberation sessions (2–4 agents debate architecture decisions with forced synthesis). Discussion only — no code. |
+| `mk:worktree`        | Git worktree lifecycle management.                                                                                             |
+| `mk:task-queue`      | Task claiming with ownership enforcement.                                                                                      |
+| `mk:help`            | Pipeline navigation assistant.                                                                                                 |
+| `mk:debug`           | Structured debugging: reproduce → isolate → root cause → fix → verify.                                                         |
+| `mk:simplify`        | Post-implementation complexity reduction (between Build and Review).                                                           |
+| `mk:team-config`     | Parallel agent team setup with ownership maps and worktrees.                                                                   |
 
 ### Features
 
 - Planning Depth Per Mode — 7 modes declare researcher count: `strict` / `architect` run 2 parallel researchers; `default` / `audit` run 1; `fast` / `cost-saver` / `document` skip research.
-- Multi-Layer Adversarial Review — `meow:review` now runs 3 parallel reviewers (Blind Hunter, Edge Case Hunter, Criteria Auditor) with post-review triage. Catches 2–3x more bugs than single-pass review.
+- Multi-Layer Adversarial Review — `mk:review` now runs 3 parallel reviewers (Blind Hunter, Edge Case Hunter, Criteria Auditor) with post-review triage. Catches 2–3x more bugs than single-pass review.
 - Anti-Rationalization Hardening — agents cannot downgrade complexity, minimize tests, skip security, or dismiss WARN verdicts without 3-part justification.
 - Project Context System — `docs/project-context.md` is the agent constitution. All agents load it at session start.
 - Parallel Execution & Teams — COMPLEX tasks with independent subtasks run up to 3 parallel agents with git worktree isolation. Integration test required after merge.
-- Step-File Architecture — complex skills decompose into JIT-loaded step files. First skill: `meow:review` (4 steps).
+- Step-File Architecture — complex skills decompose into JIT-loaded step files. First skill: `mk:review` (4 steps).
 - Hook-Based Enforcement — 3 shell hooks upgrade behavioral rules: `privacy-block.sh` (blocks sensitive reads), `gate-enforcement.sh` (blocks writes before Gate 1), `project-context-loader.sh` (auto-loads context).
 
 ### Breaking Changes

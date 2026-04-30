@@ -5,7 +5,7 @@
 ## Type
 
 - [ ] Bug fix
-- [ ] New skill (`meow:*`)
+- [ ] New skill (`mk:*`)
 - [ ] New agent / rule / hook
 - [ ] Documentation
 - [ ] Refactor (no behavior change)
@@ -29,7 +29,7 @@
 
 ## Checklist
 
-- [ ] Follows [MeowKit naming conventions](https://docs.meowkit.dev/reference/naming-conventions) (kebab-case files, `meow:` prefix for skills)
+- [ ] Follows [MeowKit naming conventions](https://docs.meowkit.dev/reference/naming-conventions) (kebab-case files, `mk:` prefix for skills)
 - [ ] Includes Gotchas section (for new skills)
 - [ ] Uses progressive disclosure (references/, templates/ for complex skills)
 - [ ] Description field is trigger-oriented (for new skills)

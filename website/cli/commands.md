@@ -123,16 +123,16 @@ Recent versions:
   1.0.0
 ```
 
-## /meow:summary — Conversation Summary Cache Inspector
+## /mk:summary — Conversation Summary Cache Inspector
 
 User-facing inspector for the Phase 9 conversation summary cache.
 
 ### Usage
 
 ```bash
-/meow:summary              # show current cache
-/meow:summary --clear      # wipe cache and lock
-/meow:summary --status     # show throttle state
+/mk:summary              # show current cache
+/mk:summary --clear      # wipe cache and lock
+/mk:summary --status     # show throttle state
 ```
 
 ### What It Reads

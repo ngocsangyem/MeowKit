@@ -1,9 +1,9 @@
 ---
-title: "meow:brainstorming"
+title: "mk:brainstorming"
 description: "Structured technical ideation with discovery, scope assessment, anti-bias pivot, scoring, and plan-creator handoff."
 ---
 
-# meow:brainstorming
+# mk:brainstorming
 
 Structured technical ideation with discovery, scope assessment, anti-bias pivot, scoring, and plan-creator handoff.
 
@@ -13,9 +13,9 @@ Skill bumped to internal v2.0.0. Patterns extracted from BMAD-METHOD, ClaudeKit,
 
 ## What This Skill Does
 
-`meow:brainstorming` explores technical solutions for validated problems. Given a problem description, it confirms the problem and binding constraint, optionally decomposes a multi-concern request, selects an ideation technique from a tiebreaker-ordered list, generates up to 8 structured ideas with one mid-session anti-bias pivot, optionally scores them, and can hand the top idea off to `meow:plan-creator` for implementation planning.
+`mk:brainstorming` explores technical solutions for validated problems. Given a problem description, it confirms the problem and binding constraint, optionally decomposes a multi-concern request, selects an ideation technique from a tiebreaker-ordered list, generates up to 8 structured ideas with one mid-session anti-bias pivot, optionally scores them, and can hand the top idea off to `mk:plan-creator` for implementation planning.
 
-Key differentiator from `meow:office-hours`: office-hours asks "should we build this?", brainstorming asks "how should we build this?"
+Key differentiator from `mk:office-hours`: office-hours asks "should we build this?", brainstorming asks "how should we build this?"
 
 ## Core Capabilities
 
@@ -31,31 +31,31 @@ Key differentiator from `meow:office-hours`: office-hours asks "should we build 
 
 ## When to Use This
 
-::: tip Use meow:brainstorming when...
+::: tip Use mk:brainstorming when...
 - You have a validated problem and need technical solutions
 - You want to compare 2-3 architectural approaches with trade-offs
 - You need structured idea generation (not freeform chat)
 - You want scored recommendations before committing to a plan
 :::
 
-::: warning Don't use meow:brainstorming when...
-- Problem isn't validated yet → use [`meow:office-hours`](/reference/skills/office-hours)
-- You already have a plan → use [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review)
-- You need to debug/investigate → use [`meow:investigate`](/reference/skills/investigate)
-- It's an implementation detail (which library, which API call) → use [`meow:docs-finder`](/reference/skills/docs-finder) and just decide
+::: warning Don't use mk:brainstorming when...
+- Problem isn't validated yet → use [`mk:office-hours`](/reference/skills/office-hours)
+- You already have a plan → use [`mk:plan-ceo-review`](/reference/skills/plan-ceo-review)
+- You need to debug/investigate → use [`mk:investigate`](/reference/skills/investigate)
+- It's an implementation detail (which library, which API call) → use [`mk:docs-finder`](/reference/skills/docs-finder) and just decide
 :::
 
 ## Usage
 
 ```bash
 # Quick brainstorm (default — 3-8 ideas, no scoring)
-/meow:brainstorming how should we handle real-time notifications
+/mk:brainstorming how should we handle real-time notifications
 
 # Deep brainstorm (scored ideas + top 3 recommendations + plan handoff offer)
-/meow:brainstorming how to handle file uploads --depth deep
+/mk:brainstorming how to handle file uploads --depth deep
 
 # Force a specific technique
-/meow:brainstorming prevent auth failures --technique reverse
+/mk:brainstorming prevent auth failures --technique reverse
 ```
 
 ## Techniques
@@ -118,7 +118,7 @@ Full list (12 gotchas including scope-explosion, question-fatigue, technique-mis
 
 ## Related
 
-- [`meow:office-hours`](/reference/skills/office-hours) — Product validation BEFORE brainstorming
-- [`meow:plan-creator`](/reference/skills/plan-creator) — Creates plan FROM brainstorming output
-- [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — Reviews existing plans
-- [`meow:investigate`](/reference/skills/investigate) — Bug investigation / root cause (not brainstorming)
+- [`mk:office-hours`](/reference/skills/office-hours) — Product validation BEFORE brainstorming
+- [`mk:plan-creator`](/reference/skills/plan-creator) — Creates plan FROM brainstorming output
+- [`mk:plan-ceo-review`](/reference/skills/plan-ceo-review) — Reviews existing plans
+- [`mk:investigate`](/reference/skills/investigate) — Bug investigation / root cause (not brainstorming)

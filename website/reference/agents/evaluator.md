@@ -17,14 +17,14 @@ The generator (developer agent) and evaluator are distinct subagents with isolat
 
 ## When Invoked
 
-- **Harness step 04** — automatically after the developer completes a sprint build (`meow:harness` FULL density)
-- **Explicitly** via `/meow:evaluate` command
+- **Harness step 04** — automatically after the developer completes a sprint build (`mk:harness` FULL density)
+- **Explicitly** via `/mk:evaluate` command
 - **Programmatically** via `Task(subagent_type="evaluator", ...)`
-- **Contract review** (Phase 4, pre-build) — the evaluator also serves as counter-party in sprint contract negotiation via `meow:sprint-contract review`
+- **Contract review** (Phase 4, pre-build) — the evaluator also serves as counter-party in sprint contract negotiation via `mk:sprint-contract review`
 
 ## Responsibilities
 
-- Reload the skeptic persona (`meow:evaluate/prompts/skeptic-persona.md`) before grading each criterion — leniency drift accumulates over a session (harness-rules Rule 9)
+- Reload the skeptic persona (`mk:evaluate/prompts/skeptic-persona.md`) before grading each criterion — leniency drift accumulates over a session (harness-rules Rule 9)
 - Drive the running build via active verification: browser navigation, `curl`, or CLI invocation — static-analysis-only verdicts are forbidden (Rule 8)
 - Grade each criterion against rubric PASS/FAIL anchors, not intuition
 - Reject any PASS verdict without a concrete evidence artifact (screenshot, HTTP response, CLI output)
@@ -36,11 +36,11 @@ The generator (developer agent) and evaluator are distinct subagents with isolat
 | Input | Source |
 |-------|--------|
 | Sprint contract (if exists) | `tasks/contracts/YYMMDD-{slug}-sprint-N.md` |
-| Rubric composition preset | `meow:rubric compose <preset>` (default: `frontend-app` — 4 rubrics) |
+| Rubric composition preset | `mk:rubric compose <preset>` (default: `frontend-app` — 4 rubrics) |
 | Running build target | Dev server URL, API base, or binary path |
 | Rubric library | `.claude/rubrics/*.md` |
 | Spec / plan | `tasks/plans/` |
-| Skeptic persona prompt | `.claude/skills/meow:evaluate/prompts/skeptic-persona.md` |
+| Skeptic persona prompt | `.claude/skills/evaluate/prompts/skeptic-persona.md` |
 
 ## Outputs
 
@@ -48,7 +48,7 @@ The generator (developer agent) and evaluator are distinct subagents with isolat
 |--------|------|
 | Verdict file | `tasks/reviews/YYMMDD-{slug}-evalverdict.md` |
 | Evidence directory | `tasks/reviews/YYMMDD-{slug}-evalverdict-evidence/` |
-| Trace record (optional) | Captured via `meow:trace-analyze` |
+| Trace record (optional) | Captured via `mk:trace-analyze` |
 
 The evidence directory must be non-empty for any PASS verdict — `validate-verdict.sh` enforces this mechanically.
 
@@ -79,7 +79,7 @@ Out-of-box Claude is a poor QA agent because it identifies legitimate issues, th
 >
 > **Rubber-stamping is rejected at validation time.** `validate-verdict.sh` enforces non-empty `evidence/` directory before accepting any PASS.
 
-The persona is re-read from `.claude/skills/meow:evaluate/prompts/skeptic-persona.md` before grading **each criterion**. Reloading is not optional — it resets leniency drift that accumulates within a session. See harness-rules Rule 9.
+The persona is re-read from `.claude/skills/evaluate/prompts/skeptic-persona.md` before grading **each criterion**. Reloading is not optional — it resets leniency drift that accumulates within a session. See harness-rules Rule 9.
 
 ## Active Verification (Hard Gate)
 
@@ -89,7 +89,7 @@ Verification tools by target type:
 
 | Target | Tools |
 |--------|-------|
-| Frontend | `meow:agent-browser`, `meow:playwright-cli`, `meow:browse` — navigate, click, capture screenshots |
+| Frontend | `mk:agent-browser`, `mk:playwright-cli`, `mk:browse` — navigate, click, capture screenshots |
 | Backend / API | `curl`, `httpie`, `bash` — probe endpoints, capture status codes + response bodies |
 | CLI | `bash` — invoke binary with real arguments, capture stdout + stderr + exit code |
 
@@ -107,7 +107,7 @@ Checks per AC: testable probe technique, correct rubric tie-in, specific scope, 
 
 ## Active Verifier Loop
 
-1. Load rubric composition via `meow:rubric` (default preset `frontend-app`: product-depth, functionality, design-quality, originality)
+1. Load rubric composition via `mk:rubric` (default preset `frontend-app`: product-depth, functionality, design-quality, originality)
 2. Drive the running build via active verification — picks browser, curl, or CLI by target type
 3. Probe each rubric criterion in sequence (max 15 per session to avoid context overflow)
 4. Record concrete evidence per finding (artifact path, log snippet, command output)
@@ -129,11 +129,11 @@ Checks per AC: testable probe technique, correct rubric tie-in, specific scope, 
 
 | Skill | When |
 |---|---|
-| `meow:rubric` | Always (load preset first) |
-| `meow:evaluate` | Always (orchestration shell) |
-| `meow:agent-browser` | Frontend targets |
-| `meow:playwright-cli` | Frontend targets needing scripted flows |
-| `meow:browse` | Frontend targets needing simple navigation/screenshots |
+| `mk:rubric` | Always (load preset first) |
+| `mk:evaluate` | Always (orchestration shell) |
+| `mk:agent-browser` | Frontend targets |
+| `mk:playwright-cli` | Frontend targets needing scripted flows |
+| `mk:browse` | Frontend targets needing simple navigation/screenshots |
 
 ## Anti-Rationalization Reminders
 
@@ -155,11 +155,11 @@ Checks per AC: testable probe technique, correct rubric tie-in, specific scope, 
 ## Related
 
 **Skills:**
-- [meow:evaluate](/reference/skills/evaluate)
-- [meow:rubric](/reference/skills/rubric)
-- [meow:harness](/reference/skills/harness)
-- [meow:sprint-contract](/reference/skills/sprint-contract)
-- [meow:trace-analyze](/reference/skills/trace-analyze)
+- [mk:evaluate](/reference/skills/evaluate)
+- [mk:rubric](/reference/skills/rubric)
+- [mk:harness](/reference/skills/harness)
+- [mk:sprint-contract](/reference/skills/sprint-contract)
+- [mk:trace-analyze](/reference/skills/trace-analyze)
 
 **Rules:**
 - [harness-rules](/reference/rules-index#harness-rules) — Rule 2 (generator ≠ evaluator), Rule 8 (active verification hard gate), Rule 9 (skeptic persona reload)

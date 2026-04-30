@@ -1,15 +1,15 @@
 ---
-title: "meow:pack"
+title: "mk:pack"
 description: "Pack an external repository into a single AI-friendly file (markdown/xml/json) for handoff to external LLMs, third-party library audits, or research snapshots."
 ---
 
-# meow:pack
+# mk:pack
 
 Pack an external repository into a single AI-friendly file for handoff to external tools, humans, or sessions.
 
 ## What This Skill Does
 
-`meow:pack` wraps [repomix](https://github.com/yamadashy/repomix) via `npx` to produce a single AI-friendly file (markdown / xml / json / plain) from a GitHub repo or local path. Output is gitignored under `.claude/packs/` and designed for **outbound** handoff — external LLMs, code reviewers, security auditors — not for re-ingestion by the current Claude Code session.
+`mk:pack` wraps [repomix](https://github.com/yamadashy/repomix) via `npx` to produce a single AI-friendly file (markdown / xml / json / plain) from a GitHub repo or local path. Output is gitignored under `.claude/packs/` and designed for **outbound** handoff — external LLMs, code reviewers, security auditors — not for re-ingestion by the current Claude Code session.
 
 No global install required. `npx --yes repomix@^1.11` is invoked per run; caret-pinned to limit breaking-change blast radius.
 
@@ -25,39 +25,39 @@ No global install required. `npx --yes repomix@^1.11` is invoked per run; caret-
 
 ## When to Use This
 
-::: tip Use meow:pack when...
+::: tip Use mk:pack when...
 - You want to paste a third-party library into ChatGPT, Gemini, or claude.ai web
 - You're auditing a vendored library and want one reviewable file
 - You're snapshotting a repo for offline reading or archival
 - You want the public API of a library only (`--compress`)
 :::
 
-::: warning Do NOT use meow:pack for...
-- Packing your current project so Claude Code can re-read it → use [`/meow:scout`](/reference/skills/scout) instead. scout's Explore subagents read files in **isolated contexts** and return distilled summaries. Packing dumps raw content into the caller's context — the opposite of what inbound analysis needs.
-- Replicating a feature from another repo → use [`/meow:chom`](/reference/skills/chom)
-- Structured codebase exploration → use [`/meow:scout`](/reference/skills/scout)
+::: warning Do NOT use mk:pack for...
+- Packing your current project so Claude Code can re-read it → use [`/mk:scout`](/reference/skills/scout) instead. scout's Explore subagents read files in **isolated contexts** and return distilled summaries. Packing dumps raw content into the caller's context — the opposite of what inbound analysis needs.
+- Replicating a feature from another repo → use [`/mk:chom`](/reference/skills/chom)
+- Structured codebase exploration → use [`/mk:scout`](/reference/skills/scout)
 :::
 
 ## Usage
 
 ```bash
 # Default: markdown pack of a remote repo
-/meow:pack yamadashy/repomix
+/mk:pack yamadashy/repomix
 
 # Specific format
-/meow:pack https://github.com/vercel/ai --style xml
+/mk:pack https://github.com/vercel/ai --style xml
 
 # Filter + comments stripped
-/meow:pack yamadashy/repomix --include "src/**/*.ts" --remove-comments
+/mk:pack yamadashy/repomix --include "src/**/*.ts" --remove-comments
 
 # API surface only (Tree-sitter signatures)
-/meow:pack vercel/ai --compress
+/mk:pack vercel/ai --compress
 
 # Local path (must be outside current repo)
-/meow:pack /path/to/external/repo --style markdown
+/mk:pack /path/to/external/repo --style markdown
 
 # Force self-pack (rare; documented override)
-/meow:pack . --self
+/mk:pack . --self
 ```
 
 ## Flags
@@ -106,6 +106,6 @@ Re-reading a pack into the same session burns context that Claude Code would oth
 
 ## Related
 
-- [`meow:scout`](/reference/skills/scout) — correct tool for inbound codebase analysis (read local project)
-- [`meow:chom`](/reference/skills/chom) — feature replication from external sources (chom may reference pack for export in future versions)
+- [`mk:scout`](/reference/skills/scout) — correct tool for inbound codebase analysis (read local project)
+- [`mk:chom`](/reference/skills/chom) — feature replication from external sources (chom may reference pack for export in future versions)
 - [What's New in v2.3.12](/guide/whats-new/v2.3.12)

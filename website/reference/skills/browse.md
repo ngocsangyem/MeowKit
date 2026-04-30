@@ -1,15 +1,15 @@
 ---
-title: "meow:browse"
+title: "mk:browse"
 description: "Fast headless browser (~100ms/command) for QA testing, visual verification, and site dogfooding."
 ---
 
-# meow:browse
+# mk:browse
 
 Fast headless browser (~100ms/command) for QA testing, visual verification, and site dogfooding.
 
 ## What This Skill Does
 
-`meow:browse` wraps the gstack `$B` headless browser binary, providing fast browser interactions for QA and testing. The core pattern is: navigate → snapshot → interact → re-snapshot → diff. Snapshots are text representations (much more token-efficient than screenshots), with reference IDs for every interactive element. At ~100ms per command, it's fast enough for real-time QA flows.
+`mk:browse` wraps the gstack `$B` headless browser binary, providing fast browser interactions for QA and testing. The core pattern is: navigate → snapshot → interact → re-snapshot → diff. Snapshots are text representations (much more token-efficient than screenshots), with reference IDs for every interactive element. At ~100ms per command, it's fast enough for real-time QA flows.
 
 ## Core Capabilities
 
@@ -22,7 +22,7 @@ Fast headless browser (~100ms/command) for QA testing, visual verification, and 
 
 ## When to Use This
 
-::: tip Use meow:browse when...
+::: tip Use mk:browse when...
 - You need to quickly verify a page loads correctly
 - You want to test a user flow interactively
 - You need visual evidence for a bug report
@@ -75,5 +75,5 @@ $B is visible ".result" → Assert element exists
 
 ## Related
 
-- [`meow:qa-manual`](/reference/skills/qa-manual) — Orchestrates browse for spec-driven QA
-- [`meow:qa`](/reference/skills/qa) — Systematic QA with health scoring
+- [`mk:qa-manual`](/reference/skills/qa-manual) — Orchestrates browse for spec-driven QA
+- [`mk:qa`](/reference/skills/qa) — Systematic QA with health scoring

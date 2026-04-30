@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Active developers  
 **Time estimate:** 5-15 minutes  
-**Skills used:** [meow:review](/reference/skills/review), [meow:cso](/reference/skills/cso) (if security concerns)  
+**Skills used:** [mk:review](/reference/skills/review), [mk:cso](/reference/skills/cso) (if security concerns)  
 **Agents involved:** reviewer, security (auto-inserts on auth/payments)
 
 ## Overview
@@ -22,10 +22,10 @@ MeowKit's review goes beyond "looks good to me." It uses a scope-aware hybrid sy
 ### Step 1: Choose input mode
 
 ```bash
-/meow:review                    # current branch diff (most common)
-/meow:review #42                # specific PR
-/meow:review --pending          # uncommitted changes
-/meow:review abc1234            # specific commit
+/mk:review                    # current branch diff (most common)
+/mk:review #42                # specific PR
+/mk:review --pending          # uncommitted changes
+/mk:review abc1234            # specific commit
 ```
 
 ### Step 2: Watch the review pipeline execute
@@ -68,7 +68,7 @@ Informational:
 
 ### Step 4: Resolve findings
 
-- **APPROVE** → proceed to `/meow:ship`
+- **APPROVE** → proceed to `/mk:ship`
 - **REQUEST CHANGES** → fix the critical findings, then re-review
 - **BLOCK** → security vulnerability or spec violation; requires human resolution before anything else
 

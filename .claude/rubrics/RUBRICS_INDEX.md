@@ -1,9 +1,9 @@
 # MeowKit Rubric Library — Index
 
-Catalog of all evaluation rubrics and composition presets used by the `evaluator` agent (via `meow:evaluate`) and the standalone `meow:rubric` skill.
+Catalog of all evaluation rubrics and composition presets used by the `evaluator` agent (via `mk:evaluate`) and the standalone `mk:rubric` skill.
 
 > Generated reference. To regenerate, run:
-> `.claude/skills/meow:rubric/scripts/load-rubric.sh --list`
+> `.claude/skills/rubric/scripts/load-rubric.sh --list`
 
 ## Rubrics
 
@@ -23,7 +23,7 @@ Catalog of all evaluation rubrics and composition presets used by the `evaluator
 
 | Preset | Loads | Excludes | Use Case |
 |---|---|---|---|
-| `frontend-app` (v2.0.0) | product-depth, functionality, design-quality, originality (4 distinctive rubrics) | code-quality, craft, ux-usability — overlap meow:review/security-rules/qa health-score; opt-in only | Browser-rendered apps (SPA, MPA, framework apps) |
+| `frontend-app` (v2.0.0) | product-depth, functionality, design-quality, originality (4 distinctive rubrics) | code-quality, craft, ux-usability — overlap mk:review/security-rules/qa health-score; opt-in only | Browser-rendered apps (SPA, MPA, framework apps) |
 | `backend-api` | product-depth, functionality, code-quality | design-quality, originality, craft, ux-usability (no visual surface) | Headless APIs, services, workers (no UI) |
 | `cli-tool` | functionality, product-depth, code-quality, ux-usability | design-quality, originality, craft (CLI has no visual surface; craft folded into ux-usability) | CLI binaries, npm CLIs, shell utilities |
 | `fullstack-product` | All 7 rubrics, ux-usability weighted 3x higher | — | End-to-end product builds (UI + backend + persistence) |
@@ -32,7 +32,7 @@ Catalog of all evaluation rubrics and composition presets used by the `evaluator
 
 ## Schema
 
-All rubrics conform to `schema.md`. Validator: `.claude/skills/meow:rubric/scripts/validate-rubric.sh`.
+All rubrics conform to `schema.md`. Validator: `.claude/skills/rubric/scripts/validate-rubric.sh`.
 
 ## Adding a Custom Rubric
 
@@ -41,7 +41,7 @@ All rubrics conform to `schema.md`. Validator: `.claude/skills/meow:rubric/scrip
 3. Optionally register in a composition preset (re-validate weight sum after)
 4. Add a row to this index
 
-See `meowkit/.claude/skills/meow:rubric/references/calibration-guide.md` for anchor-example rules.
+See `meowkit/.claude/skills/rubric/references/calibration-guide.md` for anchor-example rules.
 
 ## Hard-Fail Semantics
 
@@ -83,6 +83,6 @@ Rubrics use SemVer in their frontmatter. Bump `version`:
 ## References
 
 - Phase 2 plan: `plans/260407-2331-meowkit-harness-gan-architecture/phase-02-graded-evaluation-rubric-library.md`
-- Phase 3 (consumer, **shipped 260408**): the `evaluator` agent at `.claude/agents/evaluator.md` and `meow:evaluate` skill at `.claude/skills/meow:evaluate/`
+- Phase 3 (consumer, **shipped 260408**): the `evaluator` agent at `.claude/agents/evaluator.md` and `mk:evaluate` skill at `.claude/skills/evaluate/`
 - Phase 6: registers `.claude/rubrics/` in `meowkit-rules.md` §1 canonical paths table (pending — until then, this directory is convention-only, not in the canonical table)
-- Calibration: `meowkit/.claude/skills/meow:rubric/references/calibration-guide.md`
+- Calibration: `meowkit/.claude/skills/rubric/references/calibration-guide.md`

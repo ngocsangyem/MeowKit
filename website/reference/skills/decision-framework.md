@@ -1,15 +1,15 @@
 ---
-title: "meow:decision-framework"
+title: "mk:decision-framework"
 description: "Operational decision architecture: triage, escalation, case management. Structures expert judgment into repeatable, auditable decision systems."
 ---
 
-# meow:decision-framework
+# mk:decision-framework
 
 Structures expert judgment into repeatable, auditable decision systems for recurring high-stakes choices.
 
 ## What This Skill Does
 
-`meow:decision-framework` solves a specific problem: expert decisions that live in people's heads instead of in documented, consistent processes. When your team handles the same kind of decision repeatedly — a return request, a billing dispute, a security incident — but each case gets handled differently depending on who is on shift, you have a decision debt problem.
+`mk:decision-framework` solves a specific problem: expert decisions that live in people's heads instead of in documented, consistent processes. When your team handles the same kind of decision repeatedly — a return request, a billing dispute, a security incident — but each case gets handled differently depending on who is on shift, you have a decision debt problem.
 
 This skill works through a 7-step process to extract that implicit judgment, build a classification taxonomy, define sequential rules with explicit priority ordering (safety over economics, always), create weighted scoring for ranked options, and produce an escalation protocol with specific severity levels, authority scopes, and timelines.
 
@@ -26,14 +26,14 @@ The output is a decision framework document — not pseudocode, but a structured
 
 ## When to Use This
 
-::: tip Use meow:decision-framework when...
+::: tip Use mk:decision-framework when...
 - Building operations systems: billing, support, returns, logistics, compliance
 - Designing triage logic or case management workflows
 - Creating escalation protocols with multiple severity levels
 - Answering "how should we handle X cases?" for a recurring decision type
 :::
 
-::: warning Don't use meow:decision-framework when...
+::: warning Don't use mk:decision-framework when...
 - The decision happens once (use a plan, not a framework)
 - The domain is already well-documented externally (load the existing spec)
 - You need implementation code directly — this outputs a design document, not code
@@ -43,13 +43,13 @@ The output is a decision framework document — not pseudocode, but a structured
 
 ```bash
 # Decision framework for a specific domain
-/meow:decision-framework returns processing
+/mk:decision-framework returns processing
 
 # Billing operations triage
-/meow:decision-framework billing disputes and chargebacks
+/mk:decision-framework billing disputes and chargebacks
 
 # Incident classification
-/meow:decision-framework security incident response
+/mk:decision-framework security incident response
 ```
 
 ## The 7-Step Process
@@ -99,5 +99,5 @@ Three reference implementations ship with the skill:
 
 ## Related
 
-- [`meow:plan-creator`](/reference/skills/plan-creator) — Creates the plan this framework feeds into
-- [`meow:cook`](/reference/skills/cook) — End-to-end pipeline that uses framework outputs at Phase 1
+- [`mk:plan-creator`](/reference/skills/plan-creator) — Creates the plan this framework feeds into
+- [`mk:cook`](/reference/skills/cook) — End-to-end pipeline that uses framework outputs at Phase 1

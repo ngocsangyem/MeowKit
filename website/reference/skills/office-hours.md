@@ -1,8 +1,8 @@
 ---
-title: "meow:office-hours"
+title: "mk:office-hours"
 description: "YC-style brainstorming with two modes — Startup (six forcing questions) and Builder (design thinking for side projects)."
 ---
-# meow:office-hours
+# mk:office-hours
 YC-style brainstorming with two modes — Startup (six forcing questions) and Builder (design thinking for side projects).
 ## What This Skill Does
 Modeled after Y Combinator office hours, this skill forces you to think critically about whether something is worth building *before* any code is written. Startup mode asks six forcing questions that expose demand reality. Builder mode runs design thinking for side projects and hackathons.
@@ -10,10 +10,10 @@ Modeled after Y Combinator office hours, this skill forces you to think critical
 - **Startup mode** — Six forcing questions: demand reality, status quo, desperate specificity, narrowest wedge, observation, future-fit
 - **Builder mode** — Design thinking brainstorming for side projects, hackathons, learning
 - **Design doc output** — Saves structured findings as a design document
-- **Pre-plan skill** — Use before `/meow:plan-ceo-review`
+- **Pre-plan skill** — Use before `/mk:plan-ceo-review`
 ## Usage
 ```bash
-/meow:office-hours           # auto-detect mode
+/mk:office-hours           # auto-detect mode
 "I have an idea for..."      # triggers startup mode
 "brainstorm this"            # triggers builder mode
 ```
@@ -29,5 +29,5 @@ Modeled after Y Combinator office hours, this skill forces you to think critical
 - **Anchoring on first idea**: First brainstormed solution gets disproportionate attention → Generate at least 3 alternatives before evaluating any
 
 ## Related
-- [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — CEO-level plan review (use after office-hours)
-- [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — Engineering plan review
+- [`mk:plan-ceo-review`](/reference/skills/plan-ceo-review) — CEO-level plan review (use after office-hours)
+- [`mk:plan-ceo-review`](/reference/skills/plan-ceo-review) — Engineering plan review

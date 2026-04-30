@@ -1,29 +1,29 @@
 ---
 title: "Autonomous Green-Field Build"
-description: "Use meow:harness to build a green-field product end-to-end with generator/evaluator loop and adaptive scaffolding."
+description: "Use mk:harness to build a green-field product end-to-end with generator/evaluator loop and adaptive scaffolding."
 persona: B
 ---
 
 # Autonomous Green-Field Build
 
-> `/meow:harness` orchestrates a full product build autonomously — planner → contract → generator ⇄ evaluator loop → ship.
+> `/mk:harness` orchestrates a full product build autonomously — planner → contract → generator ⇄ evaluator loop → ship.
 
 **Best for:** Green-field product builds ("build me a X")  
 **Time estimate:** 30–180 minutes (multi-hour autonomous runs supported)  
-**Skills used:** [meow:harness](/reference/skills/harness), [meow:sprint-contract](/reference/skills/sprint-contract), [meow:evaluate](/reference/skills/evaluate), [meow:rubric](/reference/skills/rubric)
+**Skills used:** [mk:harness](/reference/skills/harness), [mk:sprint-contract](/reference/skills/sprint-contract), [mk:evaluate](/reference/skills/evaluate), [mk:rubric](/reference/skills/rubric)
 
 ## When to Use
 
-Use `/meow:harness` when you want to build a new product or substantial green-field system autonomously:
+Use `/mk:harness` when you want to build a new product or substantial green-field system autonomously:
 
 - "Build me a kanban app with drag/drop and user auth"
 - "Create a time-tracking CLI with SQLite storage"
 - "Scaffold a REST API with authentication and tests"
 
 **Not for:**
-- Single features on an existing codebase → use `/meow:cook`
-- Bug fixes or refactors → use `/meow:fix`
-- Architecture exploration → use `/meow:party`
+- Single features on an existing codebase → use `/mk:cook`
+- Bug fixes or refactors → use `/mk:fix`
+- Architecture exploration → use `/mk:party`
 
 ## What You Get
 
@@ -34,7 +34,7 @@ Use `/meow:harness` when you want to build a new product or substantial green-fi
 
 ## Prerequisites
 
-- Opus 4.5+ recommended (Sonnet works with FULL density, Haiku short-circuits to `meow:cook`)
+- Opus 4.5+ recommended (Sonnet works with FULL density, Haiku short-circuits to `mk:cook`)
 - If on Opus 4.6+, set `export MEOWKIT_MODEL_HINT=opus-4-6` before starting Claude Code — enables LEAN auto-detect
 - Budget awareness: use `--budget 50` or `export MEOWKIT_BUDGET_CAP=50` for long runs
 - MeowKit v2.2.0+ installed (`npx mewkit doctor` to verify)
@@ -42,7 +42,7 @@ Use `/meow:harness` when you want to build a new product or substantial green-fi
 ## Quick Start
 
 ```bash
-/meow:harness "build a kanban app"
+/mk:harness "build a kanban app"
 ```
 
 That's it. The harness reads `MEOWKIT_MODEL_HINT`, selects density, and runs the full pipeline.
@@ -52,7 +52,7 @@ That's it. The harness reads `MEOWKIT_MODEL_HINT`, selects density, and runs the
 This walks through what actually happens when you run:
 
 ```
-/meow:harness "build a kanban app with drag/drop cards and user auth"
+/mk:harness "build a kanban app with drag/drop cards and user auth"
 ```
 
 ### Step 0 — Density Auto-Select
@@ -60,7 +60,7 @@ This walks through what actually happens when you run:
 The harness reads `MEOWKIT_MODEL_HINT` and the model tier:
 
 ```
-meow:harness: model hint = opus-4-6 → tier = COMPLEX → density = LEAN
+mk:harness: model hint = opus-4-6 → tier = COMPLEX → density = LEAN
 Scaffolding: single-session, contract optional, 0–1 evaluator iterations
 Run ID: harness-260408-1423-kanban
 ```
@@ -172,18 +172,18 @@ A score ≥ 0.70 per rubric is PASS. Hard-fail threshold is configurable per rub
 Claude Code does not export model env vars to hooks. Set `export MEOWKIT_MODEL_HINT=opus-4-6` in your shell before running `claude`. Then restart Claude Code. Without the hint, Opus 4.6 silently gets FULL density.
 
 **"Budget breach at iteration 2"**  
-Pass a lower cap: `/meow:harness "..." --budget 30`. Or re-scope the product spec to fewer features — the planner's product-level output drives total work. `/meow:harness --no-boot` on an existing scaffold also reduces Phase 3 cost.
+Pass a lower cap: `/mk:harness "..." --budget 30`. Or re-scope the product spec to fewer features — the planner's product-level output drives total work. `/mk:harness --no-boot` on an existing scaffold also reduces Phase 3 cost.
 
 **"Evaluator returned FAIL but the build looks fine to me"**  
-Open the evidence directory — the evaluator writes screenshots and curl output for every graded AC. Use `/meow:elicit` to re-examine a specific rubric with deeper elicitation methods. If the rubric anchors are miscalibrated for your project, see `.claude/rubrics/calibration-guide.md`.
+Open the evidence directory — the evaluator writes screenshots and curl output for every graded AC. Use `/mk:elicit` to re-examine a specific rubric with deeper elicitation methods. If the rubric anchors are miscalibrated for your project, see `.claude/rubrics/calibration-guide.md`.
 
 **"Run interrupted mid-build"**  
-The harness checkpoints state to `tasks/harness-runs/{run-id}/run.md`. Resume with: `/meow:harness --resume harness-260408-1423-kanban`.
+The harness checkpoints state to `tasks/harness-runs/{run-id}/run.md`. Resume with: `/mk:harness --resume harness-260408-1423-kanban`.
 
 ## Related
 
 - [Harness Architecture](/guide/harness-architecture) — how the generator/evaluator pipeline works
 - [Adaptive Density](/guide/adaptive-density) — full density decision matrix and dead-weight thesis
-- [meow:harness reference](/reference/skills/harness) — all flags and configuration
-- [meow:evaluate reference](/reference/skills/evaluate) — evaluator rubric grading detail
+- [mk:harness reference](/reference/skills/harness) — all flags and configuration
+- [mk:evaluate reference](/reference/skills/evaluate) — evaluator rubric grading detail
 - Canonical runbook: `docs/harness-runbook.md`

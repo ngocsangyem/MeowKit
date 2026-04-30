@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { parseFrontmatter } from "../frontmatter-parser.js";
 import type { SkillInfo } from "../types.js";
 import { MEOWKIT_INTERNAL_DIRS } from "./exclusions.js";
+import { parseSkillId } from "./skill-id-utils.js";
 
 /** Sanitize colon and other illegal-on-Windows characters in skill names */
 export function sanitizeSkillName(dirName: string): string {
@@ -33,10 +34,15 @@ async function parseSkillMd(skillDir: string, dirName: string): Promise<SkillInf
 		const author = metadata?.author;
 		const license = frontmatter.license;
 
+		const frontmatterName =
+			typeof frontmatter.name === "string" ? frontmatter.name : undefined;
+		const id = parseSkillId(frontmatterName, dirName);
+
 		return {
+			id,
 			name: sanitizeSkillName(dirName),
 			dirName,
-			displayName: frontmatter.name,
+			displayName: frontmatterName,
 			description: typeof frontmatter.description === "string" ? frontmatter.description : "",
 			version: version != null ? String(version) : undefined,
 			author: author != null ? String(author) : undefined,

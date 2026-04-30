@@ -13,7 +13,7 @@ The analyst runs at **Phase 0** (Orient) and **Phase 6** (Reflect). At Phase 0, 
 
 Every 10 sessions, it proposes updates to CLAUDE.md based on accumulated patterns (never auto-applies — always proposes for human review).
 
-**How memory loading works:** Consumer skills (meow:fix, meow:plan-creator, meow:review) load the relevant topic files on-demand at their own task start. The analyst does not auto-load or auto-inject memory on every turn — that pipeline was removed in v2.4.0. Topic files are read explicitly by the skill that needs them.
+**How memory loading works:** Consumer skills (mk:fix, mk:plan-creator, mk:review) load the relevant topic files on-demand at their own task start. The analyst does not auto-load or auto-inject memory on every turn — that pipeline was removed in v2.4.0. Topic files are read explicitly by the skill that needs them.
 
 ## Quick Reference
 
@@ -24,7 +24,7 @@ Every 10 sessions, it proposes updates to CLAUDE.md based on accumulated pattern
 | **Phase 0 reporting** | Reads `cost-log.json` for budget reporting and task-cost history |
 | **3-category extraction** | Phase 6: routes learnings to fixes.md, architecture-decisions.md, or review-patterns.md |
 | **Cost tracking** | Token usage per task in `memory/cost-log.json` |
-| **Cost reports** | `/meow:budget` — spend by task, agent, model tier, over time |
+| **Cost reports** | `/mk:budget` — spend by task, agent, model tier, over time |
 | **Pattern capture** | Bug-class patterns → `fixes.json`; review patterns → `review-patterns.json`; decisions → `architecture-decisions.json` |
 | **CLAUDE.md proposals** | After 10 sessions, proposes improvements (severity ≥ critical, saves ≥ 30min, human-approved) |
 | **Cost optimization** | Identifies tasks consistently over-classified to expensive tiers |
@@ -33,7 +33,7 @@ Every 10 sessions, it proposes updates to CLAUDE.md based on accumulated pattern
 ## How to Use
 
 ```bash
-/meow:budget    # view cost report
+/mk:budget    # view cost report
 ```
 
 The analyst also runs automatically at session end (Phase 6).

@@ -10,16 +10,16 @@ persona: B
 
 **Best for:** Post-feature updates, new project setup, changelog generation  
 **Time estimate:** 10-20 minutes  
-**Skills used:** [meow:document-release](/reference/skills/document-release), [meow:llms](/reference/skills/llms)  
+**Skills used:** [mk:document-release](/reference/skills/document-release), [mk:llms](/reference/skills/llms)  
 **Agents involved:** documenter
 
 ## Overview
 
-MeowKit's **documenter** agent keeps project docs in sync with the codebase. It owns `docs/` (except `docs/architecture/` and `docs/journal/`) and uses two key skills: `meow:document-release` for diff-aware updates after shipping, and `meow:llms` for generating AI-discoverable documentation indexes.
+MeowKit's **documenter** agent keeps project docs in sync with the codebase. It owns `docs/` (except `docs/architecture/` and `docs/journal/`) and uses two key skills: `mk:document-release` for diff-aware updates after shipping, and `mk:llms` for generating AI-discoverable documentation indexes.
 
 ## After shipping a feature
 
-Documentation syncs automatically as Step 8.5 of `/meow:ship`. The [meow:document-release](/reference/skills/document-release) skill:
+Documentation syncs automatically as Step 8.5 of `/mk:ship`. The [mk:document-release](/reference/skills/document-release) skill:
 
 1. Reads the git diff since the last release
 2. Cross-references against all project docs (README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, TODOS)
@@ -30,13 +30,13 @@ Documentation syncs automatically as Step 8.5 of `/meow:ship`. The [meow:documen
 If you need to trigger it manually:
 
 ```bash
-/meow:docs-sync          # diff-aware update based on recent changes
+/mk:docs-sync          # diff-aware update based on recent changes
 ```
 
 ## Starting a new project
 
 ```bash
-/meow:docs-init          # scans codebase, generates doc skeleton
+/mk:docs-init          # scans codebase, generates doc skeleton
 ```
 
 The **documenter** creates initial versions of: README, API reference, architecture overview, and contributing guide.
@@ -44,10 +44,10 @@ The **documenter** creates initial versions of: README, API reference, architect
 ## Generating llms.txt
 
 ```bash
-/meow:llms --source ./docs --base-url https://docs.example.com
+/mk:llms --source ./docs --base-url https://docs.example.com
 ```
 
-The [meow:llms](/reference/skills/llms) skill generates `llms.txt` (AI-discoverable documentation index following the [llmstxt.org](https://llmstxt.org) spec). A Python script handles scanning, title extraction, and categorization — Claude only reviews the output.
+The [mk:llms](/reference/skills/llms) skill generates `llms.txt` (AI-discoverable documentation index following the [llmstxt.org](https://llmstxt.org) spec). A Python script handles scanning, title extraction, and categorization — Claude only reviews the output.
 
 ## What the documenter agent does and doesn't do
 

@@ -1,15 +1,15 @@
 ---
-title: "meow:careful"
+title: "mk:careful"
 description: "Safety guardrails for destructive commands — warns before rm -rf, DROP TABLE, force-push, and similar operations."
 ---
 
-# meow:careful
+# mk:careful
 
 Safety guardrails for destructive commands — warns before rm -rf, DROP TABLE, force-push, and similar operations.
 
 ## What This Skill Does
 
-`meow:careful` intercepts destructive Bash commands via a PreToolUse hook and warns before execution. It catches: `rm -rf` on important paths, `DROP TABLE/DATABASE`, `git push --force`, `git reset --hard`, `kubectl delete`, and Docker cleanup commands. Safe exceptions (cleaning `node_modules/`, `dist/`, cache) are allowed through.
+`mk:careful` intercepts destructive Bash commands via a PreToolUse hook and warns before execution. It catches: `rm -rf` on important paths, `DROP TABLE/DATABASE`, `git push --force`, `git reset --hard`, `kubectl delete`, and Docker cleanup commands. Safe exceptions (cleaning `node_modules/`, `dist/`, cache) are allowed through.
 
 ## Core Capabilities
 
@@ -45,5 +45,5 @@ rm -rf dist               # → OK (build output)
 
 ## Related
 
-- [`meow:freeze`](/reference/skills/freeze) — Restricts edits to a specific directory
+- [`mk:freeze`](/reference/skills/freeze) — Restricts edits to a specific directory
 - [Security Rules](/reference/configuration) — Broader security enforcement

@@ -55,7 +55,7 @@ Presets assemble rubric subsets appropriate for the project type. Files live at 
 | `cli-tool` | functionality, product-depth, code-quality, ux-usability | design-quality, originality, craft | CLI binaries, npm CLIs |
 | `fullstack-product` | All 7 rubrics (ux-usability weighted 3×) | — | End-to-end product builds |
 
-**Why `frontend-app` loads only 4 rubrics, not 7.** A necessity audit (Phase 2) found that `code-quality`, `craft`, and `ux-usability` overlap existing MeowKit layers — `meow:review`'s 5-dimension verdict, `security-rules.md`, and `meow:qa`'s health score. Loading duplicate rubrics doubles evaluator work without doubling signal. YAGNI. The 3 excluded rubrics are opt-in via custom presets when you need them (Rule 8).
+**Why `frontend-app` loads only 4 rubrics, not 7.** A necessity audit (Phase 2) found that `code-quality`, `craft`, and `ux-usability` overlap existing MeowKit layers — `mk:review`'s 5-dimension verdict, `security-rules.md`, and `mk:qa`'s health score. Loading duplicate rubrics doubles evaluator work without doubling signal. YAGNI. The 3 excluded rubrics are opt-in via custom presets when you need them (Rule 8).
 
 ## PASS / WARN / FAIL Anchors
 

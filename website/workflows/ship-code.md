@@ -10,22 +10,22 @@ persona: B
 
 **Best for:** Active developers  
 **Time estimate:** 5-10 minutes  
-**Skills used:** [meow:ship](/reference/skills/ship), [meow:review](/reference/skills/review), [meow:document-release](/reference/skills/document-release)  
+**Skills used:** [mk:ship](/reference/skills/ship), [mk:review](/reference/skills/review), [mk:document-release](/reference/skills/document-release)  
 **Agents involved:** shipper, reviewer, security (if auth-related), documenter
 
 ## Overview
 
-`/meow:ship` is a 12-step automated pipeline. You run one command, and the next thing you see is a PR URL. It handles: merging the base branch, running tests, auditing coverage, reviewing code (with adversarial red-teaming), bumping version, generating changelog, linking GitHub issues, creating conventional commit, pushing, and creating the PR.
+`/mk:ship` is a 12-step automated pipeline. You run one command, and the next thing you see is a PR URL. It handles: merging the base branch, running tests, auditing coverage, reviewing code (with adversarial red-teaming), bumping version, generating changelog, linking GitHub issues, creating conventional commit, pushing, and creating the PR.
 
 ## Step-by-step guide
 
 ### Step 1: Ship
 
 ```bash
-/meow:ship                      # auto-detect: feature/* → official, dev/* → beta
-/meow:ship official              # explicitly target main/master
-/meow:ship beta                  # target dev/beta (lighter pipeline)
-/meow:ship --dry-run             # preview each step without executing
+/mk:ship                      # auto-detect: feature/* → official, dev/* → beta
+/mk:ship official              # explicitly target main/master
+/mk:ship beta                  # target dev/beta (lighter pipeline)
+/mk:ship --dry-run             # preview each step without executing
 ```
 
 ### Step 2: Watch the pipeline
@@ -37,16 +37,16 @@ Here's what each step does and which agent handles it:
 | Pre-flight | shipper | Detects base branch, verifies feature branch, checks review dashboard |
 | Merge base | shipper | `git fetch origin main && git merge origin/main` — auto-resolves lockfile conflicts |
 | Run tests | tester (subagent) | Full test suite with failure triage (your fault vs pre-existing) |
-| Coverage audit | meow:review (partial) | Traces codepaths, generates diagram, writes tests for gaps |
-| Plan audit | meow:review (partial) | Cross-references plan items against diff — flags missing implementations |
+| Coverage audit | mk:review (partial) | Traces codepaths, generates diagram, writes tests for gaps |
+| Plan audit | mk:review (partial) | Cross-references plan items against diff — flags missing implementations |
 | Pre-landing review | reviewer | Two-pass checklist: critical first, informational second |
-| Adversarial review | meow:review | Auto-scaled by diff size (cross-model red-teaming) |
+| Adversarial review | mk:review | Auto-scaled by diff size (cross-model red-teaming) |
 | Version bump | shipper | Auto-detects version file, bumps patch/minor. Beta: `1.2.4-beta.1` |
 | Changelog | shipper | Auto-generates from `git log`, categorized: Added/Changed/Fixed/Removed |
 | Issue linking | shipper | Searches GitHub issues by branch keywords, links in PR body |
 | Commit + Push | shipper | Bisectable conventional commits → `git push -u origin feature/...` |
 | PR creation | shipper | `gh pr create` with structured body, linked issues, rollback docs |
-| Post-ship docs | documenter (meow:document-release) | Syncs README, ARCHITECTURE, CHANGELOG, TODOS |
+| Post-ship docs | documenter (mk:document-release) | Syncs README, ARCHITECTURE, CHANGELOG, TODOS |
 
 ### Step 3: See the result
 
@@ -85,9 +85,9 @@ Here's what each step does and which agent handles it:
 ::: tip Jira Integration
 After shipping, update the Jira ticket status to reflect deployment:
 ```bash
-/meow:jira transition TICKET-123 "Deployed"
+/mk:jira transition TICKET-123 "Deployed"
 ```
-Future: meow:ship will do this automatically as part of the ship pipeline.
+Future: mk:ship will do this automatically as part of the ship pipeline.
 :::
 
 ## Next workflow

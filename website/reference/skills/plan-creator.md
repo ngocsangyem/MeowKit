@@ -1,12 +1,12 @@
 ---
-title: "meow:plan-creator"
+title: "mk:plan-creator"
 description: "Creates structured multi-file plans before implementation. Scope-aware with fast/hard/deep modes, 4-persona red team, standalone subcommands, and Gate 1 enforcement."
 ---
-# meow:plan-creator
+# mk:plan-creator
 Creates structured multi-file plans before implementation. Scope-aware: trivial tasks exit early, simple tasks get fast plans, complex tasks get full research + phase files + validation. Enforces Gate 1.
 
 ## What This Skill Does
-When `/meow:plan` or `/meow:cook` is invoked, this skill determines the workflow model (feature, bugfix, refactor, security), sizes scope, drafts the plan with phase files, validates it through red-team review and critical questions, and presents it for Gate 1 approval. Also handles ADRs, plan archival, and standalone red-team/validate operations on existing plans.
+When `/mk:plan` or `/mk:cook` is invoked, this skill determines the workflow model (feature, bugfix, refactor, security), sizes scope, drafts the plan with phase files, validates it through red-team review and critical questions, and presents it for Gate 1 approval. Also handles ADRs, plan archival, and standalone red-team/validate operations on existing plans.
 
 ## Core Capabilities
 - **Institutional memory retrieval** — Reads `review-patterns.md`/`review-patterns.json` and `architecture-decisions.md`/`architecture-decisions.json` at task start to prevent re-solving known problems
@@ -43,9 +43,9 @@ When `/meow:plan` or `/meow:cook` is invoked, this skill determines the workflow
 
 | Subcommand | Usage | What It Does |
 |------------|-------|-------------|
-| `archive` | `/meow:plan archive` | Scan completed/cancelled plans, optionally capture learnings, archive or delete |
-| `red-team` | `/meow:plan red-team {path}` | Run adversarial 4-persona review on an existing plan; writes `red-team-findings.md` |
-| `validate` | `/meow:plan validate {path}` | Run critical question interview on an existing plan; propagates answers to phase files |
+| `archive` | `/mk:plan archive` | Scan completed/cancelled plans, optionally capture learnings, archive or delete |
+| `red-team` | `/mk:plan red-team {path}` | Run adversarial 4-persona review on an existing plan; writes `red-team-findings.md` |
+| `validate` | `/mk:plan validate {path}` | Run critical question interview on an existing plan; propagates answers to phase files |
 
 Subcommands skip the planning pipeline — they operate directly on existing plan files.
 
@@ -61,7 +61,7 @@ After drafting, the skill presents the plan via `AskUserQuestion` with three opt
 
 After Gate 1 approval, the skill ends with a **Print & Stop**:
 - Captures planning decisions to `.claude/memory/architecture-decisions.json`
-- Prints a context reminder block with the mode-matched `/meow:cook [plan path]` command
+- Prints a context reminder block with the mode-matched `/mk:cook [plan path]` command
 - Stops — Claude will not proceed automatically
 - You run the printed command when ready, or run a review skill first
 
@@ -86,13 +86,13 @@ Findings are written to a **separate `red-team-findings.md`** file with full 7-f
 
 ## Usage
 ```bash
-/meow:plan add pagination              # → auto-detects fast mode
-/meow:plan build auth system --hard    # → full pipeline
-/meow:plan redesign API --deep         # → hard + per-phase scouting
-/meow:plan build auth --hard --tdd     # → hard + TDD sections in phases
-/meow:plan red-team tasks/plans/260411-auth/  # → standalone red-team
-/meow:plan validate tasks/plans/260411-auth/  # → standalone validation
-/meow:plan archive                     # → archive completed plans
+/mk:plan add pagination              # → auto-detects fast mode
+/mk:plan build auth system --hard    # → full pipeline
+/mk:plan redesign API --deep         # → hard + per-phase scouting
+/mk:plan build auth --hard --tdd     # → hard + TDD sections in phases
+/mk:plan red-team tasks/plans/260411-auth/  # → standalone red-team
+/mk:plan validate tasks/plans/260411-auth/  # → standalone validation
+/mk:plan archive                     # → archive completed plans
 ```
 ::: info Skill Details
 **Phase:** 1  
@@ -107,9 +107,9 @@ Findings are written to a **separate `red-team-findings.md`** file with full 7-f
 | `prompts/personas/plan-security-adversary.md` | Red team, 4+ phases | Auth bypass, injection, data exposure at plan level |
 | `prompts/personas/plan-failure-mode-analyst.md` | Red team, 6+ phases | Race conditions, cascading failures, recovery gaps |
 | `references/solution-design-checklist.md` | Step-03, hard/deep mode | 5-dimension trade-off analysis for Architecture/Risk sections |
-| `references/archive-workflow.md` | `/meow:plan archive` | Full archive subcommand workflow |
-| `references/red-team-standalone.md` | `/meow:plan red-team {path}` | Standalone red-team on existing plans |
-| `references/validate-standalone.md` | `/meow:plan validate {path}` | Standalone validation on existing plans |
+| `references/archive-workflow.md` | `/mk:plan archive` | Full archive subcommand workflow |
+| `references/red-team-standalone.md` | `/mk:plan red-team {path}` | Standalone red-team on existing plans |
+| `references/validate-standalone.md` | `/mk:plan validate {path}` | Standalone validation on existing plans |
 | `references/validation-questions.md` | Step-06 (enhanced) | Detection keywords, format rules, section mapping |
 
 ## Gotchas
@@ -118,15 +118,15 @@ Findings are written to a **separate `red-team-findings.md`** file with full 7-f
 - **Goal describes activity, not outcome**: "Implement OAuth" vs "Users can log in with OAuth" → rewrite until Goal answers "what does done look like?"
 - **Acceptance criteria can't be verified**: "code is clean" blocks Gate 2 → every criterion must reference a specific command or file check
 - **Phase files not self-contained**: "See phase-02 for context" = failure. Each phase must state context directly.
-- **Skipping scout on unfamiliar codebases**: → always run meow:scout if codebase is new
-- **Security-sensitive plans need /meow:cso**: Red-team Security Adversary is plan-level; use /meow:cso for full security audit
+- **Skipping scout on unfamiliar codebases**: → always run mk:scout if codebase is new
+- **Security-sensitive plans need /mk:cso**: Red-team Security Adversary is plan-level; use /mk:cso for full security audit
 - **Over-planning trivial tasks**: 2-file config change gets full research → step-00 scope gate exits early
 - **Research disconnected from plan**: Findings archived but not cited → step-03 MUST integrate research into Key Insights
 
 ## Related
-- [`meow:cook`](/reference/skills/cook) — Uses plan-creator as its first step
-- [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — Reviews plans created by plan-creator
-- [`meow:plan-ceo-review`](/reference/skills/plan-ceo-review) — CEO-level plan review
-- [`meow:validate-plan`](/reference/skills/validate-plan) — 8-dimension plan validation
-- [`meow:decision-framework`](/reference/skills/decision-framework) — Guides approach selection during planning
-- [`meow:verify`](/reference/skills/verify) — Verify step referenced in plan phase templates
+- [`mk:cook`](/reference/skills/cook) — Uses plan-creator as its first step
+- [`mk:plan-ceo-review`](/reference/skills/plan-ceo-review) — Reviews plans created by plan-creator
+- [`mk:plan-ceo-review`](/reference/skills/plan-ceo-review) — CEO-level plan review
+- [`mk:validate-plan`](/reference/skills/validate-plan) — 8-dimension plan validation
+- [`mk:decision-framework`](/reference/skills/decision-framework) — Guides approach selection during planning
+- [`mk:verify`](/reference/skills/verify) — Verify step referenced in plan phase templates

@@ -10,7 +10,7 @@ hard_fail_threshold: FAIL
 
 ## Intent
 
-Measures whether the implementation is **maintainable** by a human reviewer (or a future agent) without rewriting it. Focuses on structural concerns the evaluator can verify mechanically: file size, function complexity, naming, type safety, dead code. Does NOT enforce style preferences — `meow:review` (Gate 2) handles aesthetic review. This rubric is the floor, not the ceiling.
+Measures whether the implementation is **maintainable** by a human reviewer (or a future agent) without rewriting it. Focuses on structural concerns the evaluator can verify mechanically: file size, function complexity, naming, type safety, dead code. Does NOT enforce style preferences — `mk:review` (Gate 2) handles aesthetic review. This rubric is the floor, not the ceiling.
 
 ## Criteria
 

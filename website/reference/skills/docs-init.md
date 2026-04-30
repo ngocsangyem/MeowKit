@@ -1,15 +1,15 @@
 ---
-title: "meow:docs-init"
+title: "mk:docs-init"
 description: "Generate initial project documentation from codebase analysis — scout, analyze, create docs/."
 ---
 
-# meow:docs-init
+# mk:docs-init
 
 Generate initial project documentation from codebase analysis.
 
 ## What This Skill Does
 
-`meow:docs-init` creates a project's `docs/` directory from scratch by scouting the codebase and generating documentation that reflects what actually exists. It fills the gap between `meow:bootstrap` (creates code) and `meow:document-release` (updates existing docs after shipping).
+`mk:docs-init` creates a project's `docs/` directory from scratch by scouting the codebase and generating documentation that reflects what actually exists. It fills the gap between `mk:bootstrap` (creates code) and `mk:document-release` (updates existing docs after shipping).
 
 ## Core Capabilities
 
@@ -21,26 +21,26 @@ Generate initial project documentation from codebase analysis.
 
 ## When to Use This
 
-::: tip Use meow:docs-init when...
+::: tip Use mk:docs-init when...
 - Project has no `docs/` directory
 - `docs/` exists but is empty or stubs
-- After `meow:bootstrap` creates a new project
+- After `mk:bootstrap` creates a new project
 - Onboarding to an undocumented codebase
 :::
 
-::: warning Don't use meow:docs-init when...
-- Docs already exist and need updating → use [`meow:document-release`](/reference/skills/document-release)
+::: warning Don't use mk:docs-init when...
+- Docs already exist and need updating → use [`mk:document-release`](/reference/skills/document-release)
 :::
 
 ## Usage
 
 ```bash
 # Initialize docs for current project
-/meow:docs-init
+/mk:docs-init
 
 # After bootstrapping a new project
-/meow:bootstrap my-app
-/meow:docs-init
+/mk:bootstrap my-app
+/mk:docs-init
 ```
 
 ## Generated Files
@@ -64,9 +64,9 @@ Generate initial project documentation from codebase analysis.
 
 - **Hallucinating architecture**: always scouts first — generates only from confirmed findings
 - **Over-documenting small projects**: <10 files = README + codebase-summary only
-- **Stale on first run**: tell user to run `meow:document-release` after each ship
+- **Stale on first run**: tell user to run `mk:document-release` after each ship
 
 ## Related
 
-- [`meow:bootstrap`](/reference/skills/bootstrap) — Creates project code (run docs-init after)
-- [`meow:document-release`](/reference/skills/document-release) — Updates docs after shipping
+- [`mk:bootstrap`](/reference/skills/bootstrap) — Creates project code (run docs-init after)
+- [`mk:document-release`](/reference/skills/document-release) — Updates docs after shipping

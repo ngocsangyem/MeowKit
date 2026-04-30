@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Active developers  
 **Time estimate:** 10-30 minutes  
-**Skills used:** [meow:fix](/reference/skills/fix), [meow:investigate](/reference/skills/investigate), [meow:scout](/reference/skills/scout), [meow:freeze](/reference/skills/freeze)
+**Skills used:** [mk:fix](/reference/skills/fix), [mk:investigate](/reference/skills/investigate), [mk:scout](/reference/skills/scout), [mk:freeze](/reference/skills/freeze)
 
 ## Overview
 
@@ -21,12 +21,12 @@ Instead of immediately editing code when you report a bug, MeowKit forces a stru
 ### Step 1: Report the bug
 
 ```
-/meow:fix login fails after 24 hours — session token not refreshed
+/mk:fix login fails after 24 hours — session token not refreshed
 ```
 
 ### Step 2: Complexity assessment
 
-The [meow:fix](/reference/skills/fix) skill classifies the bug:
+The [mk:fix](/reference/skills/fix) skill classifies the bug:
 
 | Classification | Example | Pipeline |
 |---------------|---------|---------|
@@ -36,9 +36,9 @@ The [meow:fix](/reference/skills/fix) skill classifies the bug:
 
 Our example is **Standard** — logic bug in the auth module.
 
-### Step 3: Investigation (meow:investigate)
+### Step 3: Investigation (mk:investigate)
 
-The **developer** agent activates the [meow:investigate](/reference/skills/investigate) skill, which follows the Iron Law: **no fixes without root cause investigation first.**
+The **developer** agent activates the [mk:investigate](/reference/skills/investigate) skill, which follows the Iron Law: **no fixes without root cause investigation first.**
 
 ```
 Phase 1 — Collect symptoms:
@@ -57,9 +57,9 @@ Root cause: "Commit abc1234 removed the token refresh call during refactoring.
 The middleware checks expiry but no longer refreshes before the check."
 ```
 
-### Step 4: Scope lock (meow:freeze)
+### Step 4: Scope lock (mk:freeze)
 
-The [meow:freeze](/reference/skills/freeze) skill locks edits to `src/middleware/` and `src/services/` — preventing accidental changes to unrelated code:
+The [mk:freeze](/reference/skills/freeze) skill locks edits to `src/middleware/` and `src/services/` — preventing accidental changes to unrelated code:
 
 ```
 Debug scope locked to: src/middleware/, src/services/
@@ -117,8 +117,8 @@ If the developer's self-healing exhausted 3 attempts, the **journal-writer** doc
 
 | Concern | Agent/Hook | How it helps |
 |---------|-----------|-------------|
-| Root cause first | meow:investigate | Iron Law prevents fixing symptoms |
-| Scope control | meow:freeze | Prevents touching unrelated code |
+| Root cause first | mk:investigate | Iron Law prevents fixing symptoms |
+| Scope control | mk:freeze | Prevents touching unrelated code |
 | Regression test | tester | Proves the bug existed AND the fix works |
 | Security scan | post-write.sh | Checks every edited file for new vulnerabilities |
 | Minimal diff | developer | Fixes root cause with fewest lines changed |
@@ -127,9 +127,9 @@ If the developer's self-healing exhausted 3 attempts, the **journal-writer** doc
 ::: tip Jira Integration
 After shipping the fix, update the bug ticket status:
 ```bash
-/meow:jira transition BUG-123 Done --resolution Fixed
+/mk:jira transition BUG-123 Done --resolution Fixed
 ```
-Future: meow:ship will do this automatically on merge.
+Future: mk:ship will do this automatically on merge.
 :::
 
 ## Next workflow

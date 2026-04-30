@@ -30,9 +30,9 @@ description: Migration guide for the TDD-optional change. TDD enforcement is now
 Pass `--tdd` to any cook/test/fix invocation:
 
 ```bash
-/meow:cook --tdd "build payment processor"
-/meow:fix --tdd "checkout total calculation off by one"
-/meow:test --tdd
+/mk:cook --tdd "build payment processor"
+/mk:fix --tdd "checkout total calculation off by one"
+/mk:test --tdd
 ```
 
 The slash command writes a sentinel file `.claude/session-state/tdd-mode` that hooks and downstream agents read. The sentinel persists for the session and is cleared at the next session start.
@@ -58,7 +58,7 @@ If you have plans under `tasks/plans/*` with `phase-02-test-red.md` sections tha
 
 1. **Finish under strict mode:** `export MEOWKIT_TDD=1` for the rest of the feature, then complete normally
 2. **Update in place:** edit the phase-02 section to note "optional post-migration" and let the developer implement directly
-3. **Regenerate:** re-run `meow:plan-creator` for the remaining phases under default mode
+3. **Regenerate:** re-run `mk:plan-creator` for the remaining phases under default mode
 
 You can self-check for stale plans by running:
 ```bash
@@ -95,4 +95,4 @@ User feedback: strict TDD added friction for spike work, tooling scripts, and pr
 - [`pre-implement.sh`](/reference/hooks) — the hook (now opt-in)
 - [`developer.md`](/reference/agents/developer) — the agent (now opt-in)
 - [`tester.md`](/reference/agents/tester) — the agent (now opt-in)
-- [`meow:cook`](/reference/skills/cook) — the entry point (`--tdd` flag added)
+- [`mk:cook`](/reference/skills/cook) — the entry point (`--tdd` flag added)

@@ -1,15 +1,15 @@
 ---
-title: "meow:sprint-contract"
+title: "mk:sprint-contract"
 description: "File-based sprint contract protocol — negotiates testable acceptance criteria between generator and evaluator before any source code is written."
 ---
 
-# meow:sprint-contract
+# mk:sprint-contract
 
 Negotiation protocol that produces a signed, git-committed contract file at `tasks/contracts/{date}-{slug}-sprint-{N}.md` before the generator writes a single line of source code. Translates a product-level spec into testable acceptance criteria with rubric tie-ins. Enforced by `gate-enforcement.sh`.
 
 ## What This Skill Does
 
-`meow:sprint-contract` bridges the product plan and the implementation. The generator (developer agent) proposes acceptance criteria in Given/When/Then form, each bound to a rubric in the active preset. The evaluator reviews those ACs for testability and scope clarity. They negotiate until both sign — producing a git-committed contract that becomes the source of truth for what gets built and how it gets graded. The negotiation is capped at 2 rounds; round 3 escalates to a human. Contract bypass is allowed only for LEAN density (Opus 4.6+) with fewer than 5 estimated ACs.
+`mk:sprint-contract` bridges the product plan and the implementation. The generator (developer agent) proposes acceptance criteria in Given/When/Then form, each bound to a rubric in the active preset. The evaluator reviews those ACs for testability and scope clarity. They negotiate until both sign — producing a git-committed contract that becomes the source of truth for what gets built and how it gets graded. The negotiation is capped at 2 rounds; round 3 escalates to a human. Contract bypass is allowed only for LEAN density (Opus 4.6+) with fewer than 5 estimated ACs.
 
 ## Core Capabilities
 
@@ -23,17 +23,17 @@ Negotiation protocol that produces a signed, git-committed contract file at `tas
 
 ## When to Use This
 
-::: tip Use meow:sprint-contract when...
-- You're in `FULL` density (`meow:harness` Sonnet or Opus 4.5) and the harness step-02 requires it
+::: tip Use mk:sprint-contract when...
+- You're in `FULL` density (`mk:harness` Sonnet or Opus 4.5) and the harness step-02 requires it
 - You want explicit, negotiated acceptance criteria before a generator starts building
 - You need a verifiable audit trail that maps each built feature to a rubric-graded criterion
 - You're amending the scope mid-sprint due to a new discovery
 :::
 
-::: warning Don't use meow:sprint-contract when...
+::: warning Don't use mk:sprint-contract when...
 - `MEOWKIT_HARNESS_MODE=LEAN` — capable models (Opus 4.6+) self-derive criteria; contract adds overhead not value
 - `--fast` mode tasks — planning overhead exceeds the value for small tasks
-- `/meow:fix simple` tasks — Gate 1 is already bypassed; contract bypass applies too
+- `/mk:fix simple` tasks — Gate 1 is already bypassed; contract bypass applies too
 - Estimated ACs are fewer than 5 in LEAN mode — skip is explicitly allowed
 :::
 
@@ -41,19 +41,19 @@ Negotiation protocol that produces a signed, git-committed contract file at `tas
 
 ```bash
 # Interactive — start negotiation as the generator
-/meow:sprint-contract propose my-kanban-app
+/mk:sprint-contract propose my-kanban-app
 
 # Evaluator reviews the proposed contract
-/meow:sprint-contract review my-kanban-app
+/mk:sprint-contract review my-kanban-app
 
 # Generator amends per evaluator feedback
-/meow:sprint-contract amend my-kanban-app
+/mk:sprint-contract amend my-kanban-app
 
 # Both agents sign in sequence
-/meow:sprint-contract sign my-kanban-app
+/mk:sprint-contract sign my-kanban-app
 
 # Validate schema conformance at any point
-/meow:sprint-contract validate tasks/contracts/260408-1200-my-kanban-app-sprint-1.md
+/mk:sprint-contract validate tasks/contracts/260408-1200-my-kanban-app-sprint-1.md
 ```
 
 ## Subcommands
@@ -69,7 +69,7 @@ Negotiation protocol that produces a signed, git-committed contract file at `tas
 ## Inputs
 
 - Product spec from `tasks/plans/*/plan.md` (read by `propose`)
-- Rubric preset loaded via `meow:rubric compose <preset>`
+- Rubric preset loaded via `mk:rubric compose <preset>`
 - Existing contracts `tasks/contracts/*-{slug}-sprint-*.md` (to determine sprint N)
 - `assets/contract-template.md` — canonical template copied on `propose`
 - `MEOWKIT_HARNESS_MODE` — if `LEAN`, the subcommands are skipped entirely
@@ -114,7 +114,7 @@ Post-sign amendments null both signature fields first (`status: amended`), appen
 From `harness-rules.md` Rule 3 and sprint-contract source:
 - FULL density: contract required before any source-code edit; enforced by `gate-enforcement.sh`
 - LEAN density: contract optional; skip if estimated ACs < 5
-- MINIMAL density: contract skipped entirely (harness short-circuits to `meow:cook`)
+- MINIMAL density: contract skipped entirely (harness short-circuits to `mk:cook`)
 - 2-round negotiation cap; round 3 always escalates to human
 - Signed fields must be real git SHAs — validators reject placeholder values
 - Amended contracts null both sigs before accepting source edits again
@@ -130,14 +130,14 @@ From `harness-rules.md` Rule 3 and sprint-contract source:
 
 ## Relationships
 
-- [`meow:harness`](/reference/skills/harness) — step 2 of the harness pipeline; invokes sprint-contract automatically
-- [`meow:rubric`](/reference/skills/rubric) — provides rubric presets that contracts bind ACs to
-- [`meow:evaluate`](/reference/skills/evaluate) — consumes signed contracts in step-01 to load rubrics + scope
+- [`mk:harness`](/reference/skills/harness) — step 2 of the harness pipeline; invokes sprint-contract automatically
+- [`mk:rubric`](/reference/skills/rubric) — provides rubric presets that contracts bind ACs to
+- [`mk:evaluate`](/reference/skills/evaluate) — consumes signed contracts in step-01 to load rubrics + scope
 - [`/reference/agents/evaluator`](/reference/agents/evaluator) — evaluator agent that owns the `review` subcommand
 
 ## See Also
 
-- Canonical source: `.claude/skills/meow:sprint-contract/SKILL.md`
-- Contract template: `.claude/skills/meow:sprint-contract/assets/contract-template.md`
-- BDD-to-AC mapping: `.claude/skills/meow:sprint-contract/references/bdd-to-ac-mapping.md`
-- Related skill: [`meow:harness`](/reference/skills/harness), [`meow:evaluate`](/reference/skills/evaluate)
+- Canonical source: `.claude/skills/sprint-contract/SKILL.md`
+- Contract template: `.claude/skills/sprint-contract/assets/contract-template.md`
+- BDD-to-AC mapping: `.claude/skills/sprint-contract/references/bdd-to-ac-mapping.md`
+- Related skill: [`mk:harness`](/reference/skills/harness), [`mk:evaluate`](/reference/skills/evaluate)

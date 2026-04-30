@@ -22,7 +22,7 @@ body:
     attributes:
       label: Affected Area
       options:
-        - Skill (meow:*)
+        - Skill (mk:*)
         - Agent
         - Rule enforcement
         - Hook
@@ -40,7 +40,7 @@ body:
     attributes:
       label: What happened?
       description: Clear description of the bug.
-      placeholder: "When I run /meow:review, the Blind Hunter step fails with..."
+      placeholder: "When I run /mk:review, the Blind Hunter step fails with..."
     validations:
       required: true
 

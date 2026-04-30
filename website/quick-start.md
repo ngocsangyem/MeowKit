@@ -46,7 +46,7 @@ Claude automatically reads `CLAUDE.md` and loads MeowKit's agents, skills, and r
 Try the simplest workflow — planning a feature:
 
 ```
-/meow:plan add user authentication with JWT
+/mk:plan add user authentication with JWT
 ```
 
 MeowKit will:
@@ -60,7 +60,7 @@ MeowKit will:
 Once you approve the plan, try the full cook pipeline:
 
 ```
-/meow:cook
+/mk:cook
 ```
 
 This runs the complete workflow: Plan → Test → Build → Review → Ship. Each phase activates the appropriate agent, and you'll see the two hard gates in action.
@@ -69,15 +69,15 @@ This runs the complete workflow: Plan → Test → Build → Review → Ship. Ea
 
 | Command | What it does |
 |---------|-------------|
-| `/meow:fix [bug]` | Investigate and fix a bug with root cause analysis |
-| `/meow:review` | Run a multi-pass code review with adversarial analysis |
-| `/meow:ship` | Full ship pipeline: test → review → commit → PR |
-| `/meow:scout [target]` | Parallel codebase exploration |
-| `/meow:retro` | Sprint retrospective with trend tracking |
+| `/mk:fix [bug]` | Investigate and fix a bug with root cause analysis |
+| `/mk:review` | Run a multi-pass code review with adversarial analysis |
+| `/mk:ship` | Full ship pipeline: test → review → commit → PR |
+| `/mk:scout [target]` | Parallel codebase exploration |
+| `/mk:retro` | Sprint retrospective with trend tracking |
 
 ## What happened behind the scenes
 
-When you ran `/meow:plan`, MeowKit:
+When you ran `/mk:plan`, MeowKit:
 
 1. **Phase 0 (Orient):** Read relevant topic files on-demand for past patterns, assigned model tier
 2. **Phase 1 (Plan):** Planner agent created a structured plan with product + engineering lens

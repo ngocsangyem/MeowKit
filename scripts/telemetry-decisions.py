@@ -115,7 +115,7 @@ def evaluate(hook_rows: list[dict], trace_rows: list[dict], days: int) -> list[d
     decisions.append({
         "item": "AD1 LLM git-commit gate",
         "verdict": VERDICT_MANUAL,
-        "reason": "needs manual review: count commits in last %dd that (a) failed `meow:ship` for non-conventional message OR (b) introduced suspicious patterns. Threshold ≥3/week." % days,
+        "reason": "needs manual review: count commits in last %dd that (a) failed `mk:ship` for non-conventional message OR (b) introduced suspicious patterns. Threshold ≥3/week." % days,
         "fires": None,
     })
 

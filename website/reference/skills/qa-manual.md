@@ -1,15 +1,15 @@
 ---
-title: "meow:qa-manual"
+title: "mk:qa-manual"
 description: "Spec-driven manual QA testing and Playwright E2E code generation with human-like browser interaction and auth prompting."
 ---
 
-# meow:qa-manual
+# mk:qa-manual
 
 Spec-driven manual QA testing and Playwright E2E code generation with human-like browser interaction and auth prompting.
 
 ## What This Skill Does
 
-`meow:qa-manual` serves two use cases with one interaction model. The agent navigates your app like a real human tester — reading the page, clicking elements, filling forms, handling unexpected states. This same human-like navigation powers both: (A) structured QA reports with pass/fail per step, and (B) production-ready Playwright `.spec.ts` files that mirror exactly what a human would do.
+`mk:qa-manual` serves two use cases with one interaction model. The agent navigates your app like a real human tester — reading the page, clicking elements, filling forms, handling unexpected states. This same human-like navigation powers both: (A) structured QA reports with pass/fail per step, and (B) production-ready Playwright `.spec.ts` files that mirror exactly what a human would do.
 
 The skill orchestrates three browser tools, routing each action to the best one: `playwright-cli` for DOM interaction (because it generates Playwright code as a side-effect), `agent-browser` for auth flows (session persistence), and `browse` for visual verification.
 
@@ -24,7 +24,7 @@ The skill orchestrates three browser tools, routing each action to the best one:
 
 ## When to Use This
 
-::: tip Use meow:qa-manual when...
+::: tip Use mk:qa-manual when...
 - You have a spec/plan and want to test it like a human would
 - You need to generate Playwright E2E tests from a described flow
 - You want to explore an app from a URL and discover testable flows
@@ -35,26 +35,26 @@ The skill orchestrates three browser tools, routing each action to the best one:
 
 ```bash
 # Manual QA from spec — produce pass/fail report
-/meow:qa-manual tasks/plans/260315-auth-flow.md --report
+/mk:qa-manual tasks/plans/260315-auth-flow.md --report
 
 # E2E code generation — produce Playwright .spec.ts
-/meow:qa-manual tasks/plans/260315-checkout.md --generate
+/mk:qa-manual tasks/plans/260315-checkout.md --generate
 
 # Auto-detect use case from spec content
-/meow:qa-manual tasks/plans/260315-feature.md
+/mk:qa-manual tasks/plans/260315-feature.md
 
 # Explore from URL — discover and test flows
-/meow:qa-manual https://app.example.com
+/mk:qa-manual https://app.example.com
 ```
 
 ## Example Prompts
 
 | Prompt | Use case | Output |
 |--------|----------|--------|
-| `/meow:qa-manual tasks/plans/auth.md --report` | Manual QA | Pass/fail report per flow step |
-| `/meow:qa-manual tasks/plans/checkout.md --generate` | E2E gen | `tests/e2e/checkout-flow/checkout-flow.spec.ts` + `common/` |
-| `/meow:qa-manual https://app.example.com` | Exploration | Discovered flows → QA report |
-| `/meow:qa-manual login flow with MFA` | Natural language | Navigates, prompts for MFA code, reports result |
+| `/mk:qa-manual tasks/plans/auth.md --report` | Manual QA | Pass/fail report per flow step |
+| `/mk:qa-manual tasks/plans/checkout.md --generate` | E2E gen | `tests/e2e/checkout-flow/checkout-flow.spec.ts` + `common/` |
+| `/mk:qa-manual https://app.example.com` | Exploration | Discovered flows → QA report |
+| `/mk:qa-manual login flow with MFA` | Natural language | Navigates, prompts for MFA code, reports result |
 
 ## Quick Workflow
 
@@ -88,6 +88,6 @@ Same navigation as A, but also:
 
 ## Related
 
-- [`meow:browse`](/reference/skills/browse) — The headless browser used for QA patterns
-- [`meow:qa`](/reference/skills/qa) — Systematic QA with health scoring
-- [`meow:review`](/reference/skills/review) — Code review complements QA testing
+- [`mk:browse`](/reference/skills/browse) — The headless browser used for QA patterns
+- [`mk:qa`](/reference/skills/qa) — Systematic QA with health scoring
+- [`mk:review`](/reference/skills/review) — Code review complements QA testing

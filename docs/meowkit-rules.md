@@ -17,7 +17,7 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 | Sprint contracts        | `tasks/contracts/YYMMDD-HHMM-name-sprint-N.md`                             | `contracts/`, `tasks/plans/.../contracts/`                          |
 | Evaluator verdicts      | `tasks/reviews/YYMMDD-name-evalverdict.md`                                 | `evalverdicts/`, separate from review verdict                       |
 | Harness runs            | `tasks/harness-runs/YYMMDD-HHMM-name/run.md`                               | `runs/`, `harness/`                                                 |
-| Rubric library          | `.claude/rubrics/<name>.md`                                                | `rubrics/`, `.claude/skills/meow:rubric/rubrics/`                   |
+| Rubric library          | `.claude/rubrics/<name>.md`                                                | `rubrics/`, `.claude/skills/rubric/rubrics/`                   |
 | Memory files            | `.claude/memory/lessons.md`                                                | `memory/lessons.md` (bare)                                          |
 | Conversation summary    | `.claude/memory/conversation-summary.md`                                   | `memory/conversation-summary.md`, `summary.md`                      |
 | Web fetch cache         | `.claude/cache/web-fetches/{YYMMDD}-{HHMMSS}-{host}-{sha256-path[:10]}.md` | `.claude/memory/web-fetches/` (memory is for learnings, not caches) |
@@ -25,8 +25,8 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 | Web fetch quarantine    | `.claude/cache/web-fetches/quarantine/{sha256}.quarantined`                | `.claude/memory/quarantine/`, `quarantine/`                         |
 | ADR files               | `docs/architecture/adr/YYMMDD-title.md`                                    | `docs/architecture/NNNN-title.md`                                   |
 | Session state           | `session-state/` (project root)                                            | `.claude/session-state/`                                            |
-| Skill references        | `.claude/skills/meow:*/references/*.md`                                    | `domain/file.md` (short form)                                       |
-| Gate validation scripts | `.claude/skills/meow:cook/scripts/validate-gate-*.sh`                      | `scripts/validate-gate-*.sh`                                        |
+| Skill references        | `.claude/skills/*/references/*.md`                                    | `domain/file.md` (short form)                                       |
+| Gate validation scripts | `.claude/skills/cook/scripts/validate-gate-*.sh`                      | `scripts/validate-gate-*.sh`                                        |
 
 **Rule:** When referencing any file in a skill or agent, use the FULL path from project root. Never use shortened or assumed paths. Before merging, grep for the path in all consuming files.
 
@@ -49,7 +49,7 @@ security, journal-writer, ui-ux-designer, orchestrator,
 evaluator
 ```
 
-> **`evaluator` added 260408** (Phase 3 of harness plan). The `evaluator` is the **behavioral active-verification** counterpart to the structural `reviewer`. Both coexist; they answer different questions. See `.claude/agents/evaluator.md` and `.claude/skills/meow:evaluate/SKILL.md`.
+> **`evaluator` added 260408** (Phase 3 of harness plan). The `evaluator` is the **behavioral active-verification** counterpart to the structural `reviewer`. Both coexist; they answer different questions. See `.claude/agents/evaluator.md` and `.claude/skills/evaluate/SKILL.md`.
 
 Plus Claude Code built-in types: `Explore`, `Bash`, `general-purpose`, `Plan`
 
@@ -58,7 +58,7 @@ Plus Claude Code built-in types: `Explore`, `Bash`, `general-purpose`, `Plan`
 Skills MAY define their own subagents when the skill requires specialized agent behavior that core agents don't cover. Skill-scoped agents live inside the skill directory:
 
 ```
-.claude/skills/meow:{skill-name}/
+.claude/skills/{skill-name}/
 ├── SKILL.md
 ├── agents/                    # Optional: skill-scoped agent definitions
 │   ├── {agent-name}.md        # Agent definition (same format as .claude/agents/)
@@ -85,7 +85,7 @@ Skills MAY define their own subagents when the skill requires specialized agent 
 | `code-reviewer`       | `reviewer`                                 |
 | `project-manager`     | `planner`                                  |
 | `docs-manager`        | `documenter`                               |
-| `debugger`            | `researcher` (with meow:investigate skill) |
+| `debugger`            | `researcher` (with mk:investigate skill) |
 
 **Rule:** Before adding an Agent() call, verify the `subagent_type` against the core list above OR confirm a skill-scoped agent definition exists. If neither exists, the call will use a generic agent without specialized instructions.
 
@@ -159,11 +159,11 @@ esac
 ```bash
 # WRONG
 python .claude/scripts/validate.py
-python3 .claude/skills/meow:multimodal/scripts/check_setup.py
+python3 .claude/skills/multimodal/scripts/check_setup.py
 
 # RIGHT
 .claude/skills/.venv/bin/python3 .claude/scripts/validate.py
-.claude/skills/.venv/bin/python3 .claude/skills/meow:multimodal/scripts/check_setup.py
+.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/check_setup.py
 ```
 
 The venv is created by `npx mewkit setup`. If it doesn't exist, the `project-context-loader.sh` SessionStart hook warns the user.
@@ -262,7 +262,7 @@ Missing `category`/`severity`/`applicable_when` are allowed for backward compati
 ### Required Structure
 
 ```
-.claude/skills/meow:{name}/
+.claude/skills/{name}/
 ├── SKILL.md                    # Required: frontmatter + description
 ├── references/                 # Optional: JIT-loaded reference docs
 │   ├── reference-a.md
@@ -276,8 +276,8 @@ Missing `category`/`severity`/`applicable_when` are allowed for backward compati
 ### Rules
 
 - Every referenced file MUST exist. grep for paths before merging.
-- Use `meow:` prefix in skill names. Never use `ck:` prefix (that's ClaudeKit).
-- Reference paths must use full `.claude/skills/meow:*/references/*` form, not short `domain/file.md` form.
+- Use `mk:` prefix in skill names. Never use `ck:` prefix (that's ClaudeKit).
+- Reference paths must use full `.claude/skills/*/references/*` form, not short `domain/file.md` form.
 
 ---
 

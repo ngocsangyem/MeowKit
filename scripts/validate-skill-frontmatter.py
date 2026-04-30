@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""validate-skill-frontmatter.py — validate every meow:*/SKILL.md frontmatter
+"""validate-skill-frontmatter.py — validate every mk:*/SKILL.md frontmatter
 against .claude/schemas/skill-schema.json.
 
 Defensive: imports yaml and jsonschema with a helpful ImportError message so
@@ -43,7 +43,15 @@ def main() -> int:
     errors: list[str] = []
     valid = 0
 
-    for skill_md in sorted(skills_root.glob("meow:*/SKILL.md")):
+    # Iterate every directory under .claude/skills/ that contains a SKILL.md.
+    # Excludes hidden dirs and non-skill files (e.g., SKILLS_ATTRIBUTION.md).
+    skill_mds = sorted(
+        p
+        for p in skills_root.glob("*/SKILL.md")
+        if not p.parent.name.startswith(".")
+    )
+
+    for skill_md in skill_mds:
         text = skill_md.read_text()
         m = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
         if not m:
@@ -66,6 +74,11 @@ def main() -> int:
             print(line, file=sys.stderr)
         print(f"\n{len(errors)} skill(s) failed validation; {valid} passed", file=sys.stderr)
         return 1
+
+    # Zero-match guard: an empty scan must not phantom-pass.
+    if valid == 0:
+        print("ERROR: zero SKILL.md files found under .claude/skills/", file=sys.stderr)
+        return 2
 
     print(f"OK: {valid} skill(s) validated")
     return 0

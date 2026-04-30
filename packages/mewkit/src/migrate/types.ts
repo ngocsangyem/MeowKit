@@ -142,9 +142,11 @@ export interface PortableInstallResult {
 
 /** Skill metadata for directory-based skill items */
 export interface SkillInfo {
-	/** Sanitized canonical name (colon-free) — e.g., "meow-cook" */
+	/** Canonical skill id derived from frontmatter (e.g., "mk:cook"). Required. */
+	id: string;
+	/** Sanitized canonical name (colon-free) — e.g., "cook" or legacy "meow-cook" */
 	name: string;
-	/** Original directory name (may contain colon, e.g., "meow:cook") */
+	/** Original directory name (post-rename: bare "cook"; pre-rename: "mk:cook") */
 	dirName: string;
 	/** Display name from frontmatter `name:` field */
 	displayName?: string;

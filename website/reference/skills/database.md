@@ -1,15 +1,15 @@
 ---
-title: "meow:database"
+title: "mk:database"
 description: "Database patterns: schema design, safe migrations, query optimization, and indexing strategy. PostgreSQL primary."
 ---
 
-# meow:database
+# mk:database
 
 Reference-backed guidance for database schema design, safe migrations, query optimization, and indexing. PostgreSQL primary; most patterns transfer to MySQL and SQLite.
 
 ## What This Skill Does
 
-`meow:database` provides structured guidance for the three most error-prone database tasks: designing schemas that won't need painful restructuring later, writing migrations that won't lock production tables or require rollbacks, and optimizing queries that are slow because of missing indexes or N+1 patterns.
+`mk:database` provides structured guidance for the three most error-prone database tasks: designing schemas that won't need painful restructuring later, writing migrations that won't lock production tables or require rollbacks, and optimizing queries that are slow because of missing indexes or N+1 patterns.
 
 The skill detects your database type from project markers, loads the appropriate reference file(s), applies patterns to your specific task, and validates the output against a checklist before delivering. Every response includes the SQL or migration code, a brief note on which patterns were applied, any risks flagged (missing rollback, potential table lock, N+1 risk), and suggested indexes if not already present.
 
@@ -24,7 +24,7 @@ Security constraint: SQL with string interpolation is never written. Parameteriz
 
 ## When to Use This
 
-::: tip Use meow:database when...
+::: tip Use mk:database when...
 - Designing a new schema or adding tables and columns
 - Writing migration files (up + down)
 - Optimizing a slow query or diagnosing an N+1
@@ -32,7 +32,7 @@ Security constraint: SQL with string interpolation is never written. Parameteriz
 - Triggers: "database schema", "migration", "query optimization", "N+1", "slow query"
 :::
 
-::: warning Don't use meow:database when...
+::: warning Don't use mk:database when...
 - You need ORM-specific query builder syntax — this skill works at SQL level; consult ORM docs for the translation
 - The slowness is application-level (missing caching, business logic in loops) rather than database-level
 :::
@@ -41,16 +41,16 @@ Security constraint: SQL with string interpolation is never written. Parameteriz
 
 ```bash
 # Schema design
-/meow:database schema user accounts with roles and permissions
+/mk:database schema user accounts with roles and permissions
 
 # Migration
-/meow:database migration add soft delete to orders table
+/mk:database migration add soft delete to orders table
 
 # Query optimization
-/meow:database optimize "SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at"
+/mk:database optimize "SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at"
 
 # Indexing strategy
-/meow:database index strategy for orders and order_items tables
+/mk:database index strategy for orders and order_items tables
 ```
 
 ## Schema Design Patterns
@@ -109,5 +109,5 @@ Key patterns from `references/query-optimization.md`:
 
 ## Related
 
-- [`meow:api-design`](/reference/skills/api-design) — API design that exposes the schema as resources
-- [`meow:build-fix`](/reference/skills/build-fix) — Fixes build errors during database layer implementation
+- [`mk:api-design`](/reference/skills/api-design) — API design that exposes the schema as resources
+- [`mk:build-fix`](/reference/skills/build-fix) — Fixes build errors during database layer implementation

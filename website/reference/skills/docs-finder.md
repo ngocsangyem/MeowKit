@@ -1,15 +1,15 @@
 ---
-title: "meow:docs-finder"
+title: "mk:docs-finder"
 description: "Script-driven documentation retrieval via Context7, Context Hub, and web fallback with 3000-token budget management."
 ---
 
-# meow:docs-finder
+# mk:docs-finder
 
 Script-driven documentation retrieval via Context7, Context Hub, and web fallback with 3000-token budget management.
 
 ## What This Skill Does
 
-`meow:docs-finder` solves the stale documentation problem. LLM training data has a cutoff date — APIs evolve faster than models retrain. Instead of hallucinating function signatures, this skill fetches verified, current documentation from multiple sources and returns it in a structured, token-efficient format. All the heavy work (URL construction, HTTP fetching, JSON parsing) is done by Node.js scripts — Claude only reviews and improves the final result.
+`mk:docs-finder` solves the stale documentation problem. LLM training data has a cutoff date — APIs evolve faster than models retrain. Instead of hallucinating function signatures, this skill fetches verified, current documentation from multiple sources and returns it in a structured, token-efficient format. All the heavy work (URL construction, HTTP fetching, JSON parsing) is done by Node.js scripts — Claude only reviews and improves the final result.
 
 ## Core Capabilities
 
@@ -22,7 +22,7 @@ Script-driven documentation retrieval via Context7, Context Hub, and web fallbac
 
 ## When to Use This
 
-::: tip Use meow:docs-finder when...
+::: tip Use mk:docs-finder when...
 - You need current API documentation for a library
 - You want to verify function signatures before writing code
 - You're looking for internal project specs or API docs
@@ -33,13 +33,13 @@ Script-driven documentation retrieval via Context7, Context Hub, and web fallbac
 
 ```bash
 # Library docs
-/meow:docs-finder vue suspense
+/mk:docs-finder vue suspense
 
 # Internal project docs
-/meow:docs-finder our API auth spec
+/mk:docs-finder our API auth spec
 
 # Specific topic
-/meow:docs-finder stripe webhook verification python
+/mk:docs-finder stripe webhook verification python
 ```
 
 ## Example Prompts
@@ -67,5 +67,5 @@ Query → detect-source.js (classify: library vs internal)
 
 ## Related
 
-- [`meow:multimodal`](/reference/skills/multimodal) — For non-text content (images, audio, video)
-- [`meow:llms`](/reference/skills/llms) — Generates llms.txt files (inverse operation)
+- [`mk:multimodal`](/reference/skills/multimodal) — For non-text content (images, audio, video)
+- [`mk:llms`](/reference/skills/llms) — Generates llms.txt files (inverse operation)

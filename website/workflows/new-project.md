@@ -10,7 +10,7 @@ persona: A
 
 **Best for:** First-time users  
 **Time estimate:** 5 minutes  
-**Skills used:** `npx mewkit init`, [meow:plan-creator](/reference/skills/plan-creator)
+**Skills used:** `npx mewkit init`, [mk:plan-creator](/reference/skills/plan-creator)
 
 ## Overview
 
@@ -53,7 +53,7 @@ Claude reads `CLAUDE.md` automatically. The **orchestrator** agent activates and
 ### Step 4: Plan your first feature
 
 ```
-/meow:plan add user authentication with JWT
+/mk:plan add user authentication with JWT
 ```
 
 Here's what happens behind the scenes:
@@ -71,7 +71,7 @@ Here's what happens behind the scenes:
 After reviewing the plan, approve it. Then run the full pipeline:
 
 ```
-/meow:cook
+/mk:cook
 ```
 
 This executes Phases 2-6 automatically:

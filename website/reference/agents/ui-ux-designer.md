@@ -11,7 +11,7 @@ UI/UX design agent that creates accessible, responsive, production-ready interfa
 
 The ui-ux-designer creates and maintains design systems, builds production-ready UI components, and validates visual quality. It operates in Phase 3 (Build) alongside the developer agent, activated when frontend work is detected in a plan.
 
-The agent loads design skills on demand: `meow:ui-design-system` for design intelligence, `meow:frontend-design` for implementation patterns, stack-specific skills (`meow:react-patterns` or `meow:vue`), `meow:multimodal` for image generation, and `meow:browse` for visual QA screenshots.
+The agent loads design skills on demand: `mk:ui-design-system` for design intelligence, `mk:frontend-design` for implementation patterns, stack-specific skills (`mk:react-patterns` or `mk:vue`), `mk:multimodal` for image generation, and `mk:browse` for visual QA screenshots.
 
 ## Quick Reference
 
@@ -30,12 +30,12 @@ The agent loads design skills on demand: `meow:ui-design-system` for design inte
 
 | Skill | Purpose |
 |-------|---------|
-| [`meow:ui-design-system`](/reference/skills/ui-design-system) | Styles, palettes, WCAG, responsive rules, quality checklist |
-| [`meow:frontend-design`](/reference/skills/frontend-design) | Design replication, anti-AI-slop |
-| [`meow:react-patterns`](/reference/skills/react-patterns) | React/Next.js patterns (if React project) |
-| [`meow:vue`](/reference/skills/vue) | Vue 3 patterns (if Vue project) |
-| [`meow:multimodal`](/reference/skills/multimodal) | Image generation and visual analysis |
-| [`meow:browse`](/reference/skills/browse) | Screenshots for visual QA |
+| [`mk:ui-design-system`](/reference/skills/ui-design-system) | Styles, palettes, WCAG, responsive rules, quality checklist |
+| [`mk:frontend-design`](/reference/skills/frontend-design) | Design replication, anti-AI-slop |
+| [`mk:react-patterns`](/reference/skills/react-patterns) | React/Next.js patterns (if React project) |
+| [`mk:vue`](/reference/skills/vue) | Vue 3 patterns (if Vue project) |
+| [`mk:multimodal`](/reference/skills/multimodal) | Image generation and visual analysis |
+| [`mk:browse`](/reference/skills/browse) | Screenshots for visual QA |
 
 ### File Ownership
 
@@ -54,7 +54,7 @@ Plan → Load design skills → Research trends → Create design guidelines
 ```
 
 **Phase:** 3 (Build)
-**Triggered by:** `meow:cook` (frontend detected), `meow:bootstrap` (design phase), explicit request
+**Triggered by:** `mk:cook` (frontend detected), `mk:bootstrap` (design phase), explicit request
 **Hands off to:** developer (more implementation) or reviewer (Gate 2)
 
 ## Design Principles

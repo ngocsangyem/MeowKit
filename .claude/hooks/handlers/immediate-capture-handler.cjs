@@ -131,7 +131,7 @@ function appendToArchitectureDecisions(id, date, keywords, content) {
     let data = {
       version: '2.0.0',
       scope: 'architecture-decisions',
-      consumer: 'meow:plan-creator,meow:cook',
+      consumer: 'mk:plan-creator,mk:cook',
       patterns: [],
       metadata: { created: date, last_updated: date },
     };

@@ -1,10 +1,10 @@
 # Harness Rules
 
-These rules govern the autonomous multi-hour build pipeline (`meow:harness`) and the generator/evaluator architecture introduced by the harness plan (Phases 1–5).
+These rules govern the autonomous multi-hour build pipeline (`mk:harness`) and the generator/evaluator architecture introduced by the harness plan (Phases 1–5).
 
 ## Rule 1: Planner Stays Product-Level
 
-The planner agent in product-level mode (`meow:plan-creator --product-level`) MUST produce user stories, features, and design language — NOT file paths, class names, schemas, or step-by-step code instructions.
+The planner agent in product-level mode (`mk:plan-creator --product-level`) MUST produce user stories, features, and design language — NOT file paths, class names, schemas, or step-by-step code instructions.
 
 **WHY:** Anthropic harness research found that capable models (Opus 4.5+) under-perform when locked into pre-sharded implementation tasks. Micro-sharding the plan causes cascading errors — the model loses room to discover better solutions. The planner's job is to set ambition; the generator's job is to find the path.
 
@@ -22,9 +22,9 @@ The generator (developer agent) and evaluator (evaluator agent) are distinct sub
 
 ## Rule 3: Sprint Contract Required in FULL Density; Optional in LEAN; Skipped in MINIMAL
 
-Per the adaptive density policy (`meow:harness/references/adaptive-density-matrix.md`):
+Per the adaptive density policy (`mk:harness/references/adaptive-density-matrix.md`):
 
-- `MINIMAL` (Haiku) — contract skipped (harness short-circuits to `meow:cook`)
+- `MINIMAL` (Haiku) — contract skipped (harness short-circuits to `mk:cook`)
 - `FULL` (Sonnet, Opus 4.5) — contract REQUIRED before any source-code edit; enforced by `gate-enforcement.sh`
 - `LEAN` (Opus 4.6+) — contract OPTIONAL; skip if estimated ACs < 5
 
@@ -36,9 +36,9 @@ The harness iteration loop (generator ⇄ evaluator) is capped at 3 rounds by de
 
 **WHY:** Agents that can't converge in 3 rounds won't converge in 5 — the failure mode is deeper than iteration count. Forcing more rounds wastes budget and erodes trust in the verdict. Human escalation breaks ties.
 
-## Rule 5: Adaptive Density Decided by `meow:scale-routing` + Model String
+## Rule 5: Adaptive Density Decided by `mk:scale-routing` + Model String
 
-The harness scaffolding density (`MINIMAL | FULL | LEAN`) is selected by `meow:scale-routing` based on the detected model tier and model id. The decision matrix is the single source of truth at `.claude/skills/meow:harness/references/adaptive-density-matrix.md`.
+The harness scaffolding density (`MINIMAL | FULL | LEAN`) is selected by `mk:scale-routing` based on the detected model tier and model id. The decision matrix is the single source of truth at `.claude/skills/harness/references/adaptive-density-matrix.md`.
 
 **WHY:** Capable models (Opus 4.6+ with auto-compaction + 1M context) **degrade** when forced through full harness scaffolding — Anthropic's measured "dead-weight thesis" finding. The density policy operationalizes this without manual ceremony.
 
@@ -46,7 +46,7 @@ The harness scaffolding density (`MINIMAL | FULL | LEAN`) is selected by `meow:s
 
 ## Rule 6: Budget Thresholds — Warn at $30, Approve at $100, Hard Block at User Cap
 
-The harness budget tracker (`meow:harness/scripts/budget-tracker.sh`) enforces three thresholds:
+The harness budget tracker (`mk:harness/scripts/budget-tracker.sh`) enforces three thresholds:
 
 - **$30 warn** — print warning, continue
 - **$100 hard block** — halt the run, set `final_status=TIMED_OUT`
@@ -73,7 +73,7 @@ The evaluator (Phase 3) MUST drive the running build via active verification —
 
 ## Rule 9: Skeptic Persona Reloaded Per Criterion
 
-The evaluator MUST re-anchor its skeptic persona (`meow:evaluate/prompts/skeptic-persona.md`) before grading each criterion. Leniency drift accumulates over a session.
+The evaluator MUST re-anchor its skeptic persona (`mk:evaluate/prompts/skeptic-persona.md`) before grading each criterion. Leniency drift accumulates over a session.
 
 **WHY:** Out-of-box Claude as a QA agent identifies legitimate issues, then talks itself into accepting them. Re-anchoring the persona is the cheapest mitigation. Reloading is not optional — it's a checkpoint.
 

@@ -1,15 +1,15 @@
 ---
-title: "meow:bootstrap"
+title: "mk:bootstrap"
 description: "End-to-end project orchestrator: research → design → scaffold → plan → implement → docs."
 ---
 
-# meow:bootstrap
+# mk:bootstrap
 
 End-to-end project orchestrator: research → design → scaffold → plan → implement → docs.
 
 ## What This Skill Does
 
-`meow:bootstrap` orchestrates the full journey from idea to running code. It doesn't implement anything itself — it wires together MeowKit's existing skills in sequence: parallel research, tech stack selection via brainstorming, design with UI/UX designer, file scaffolding, planning via plan-creator, implementation via cook, and documentation via docs-init.
+`mk:bootstrap` orchestrates the full journey from idea to running code. It doesn't implement anything itself — it wires together MeowKit's existing skills in sequence: parallel research, tech stack selection via brainstorming, design with UI/UX designer, file scaffolding, planning via plan-creator, implementation via cook, and documentation via docs-init.
 
 Complements `npx mewkit init` — CLI = MeowKit infrastructure (.claude/), bootstrap = application code + full pipeline.
 
@@ -25,14 +25,14 @@ Complements `npx mewkit init` — CLI = MeowKit infrastructure (.claude/), boots
 
 ## When to Use This
 
-::: tip Use meow:bootstrap when...
+::: tip Use mk:bootstrap when...
 - Starting a new project from scratch
 - You want the full pipeline: research → design → scaffold → plan → implement → docs
 - You need MeowKit's workflow applied from day one
 :::
 
-::: warning Don't use meow:bootstrap when...
-- Project already has source code → use `meow:plan-creator` for new features
+::: warning Don't use mk:bootstrap when...
+- Project already has source code → use `mk:plan-creator` for new features
 - You only need MeowKit setup → use `npx mewkit init`
 :::
 
@@ -40,16 +40,16 @@ Complements `npx mewkit init` — CLI = MeowKit infrastructure (.claude/), boots
 
 ```bash
 # Default (auto mode — design gate only)
-/meow:bootstrap build a task management app with Vue 3 + NestJS
+/mk:bootstrap build a task management app with Vue 3 + NestJS
 
 # Full mode — gates at every step, maximum control
-/meow:bootstrap build an e-commerce platform --full
+/mk:bootstrap build an e-commerce platform --full
 
 # Fast mode — no gates, max speed, good for prototypes
-/meow:bootstrap quick prototype for a CLI tool --fast
+/mk:bootstrap quick prototype for a CLI tool --fast
 
 # Parallel mode — concurrent implementation for large projects
-/meow:bootstrap build a SaaS dashboard --parallel
+/mk:bootstrap build a SaaS dashboard --parallel
 ```
 
 ## Modes
@@ -81,7 +81,7 @@ bootstrap → git init → research → tech stack → design
 
 ## Related
 
-- [`meow:brainstorming`](/reference/skills/brainstorming) — Used during tech stack selection
-- [`meow:plan-creator`](/reference/skills/plan-creator) — Invoked for planning phase
-- [`meow:cook`](/reference/skills/cook) — Invoked for implementation phase
-- [`meow:docs-init`](/reference/skills/docs-init) — Invoked for documentation phase
+- [`mk:brainstorming`](/reference/skills/brainstorming) — Used during tech stack selection
+- [`mk:plan-creator`](/reference/skills/plan-creator) — Invoked for planning phase
+- [`mk:cook`](/reference/skills/cook) — Invoked for implementation phase
+- [`mk:docs-init`](/reference/skills/docs-init) — Invoked for documentation phase

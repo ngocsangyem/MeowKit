@@ -42,9 +42,9 @@ Status: Proposed | Accepted | Deprecated | Superseded
 The architect is inserted automatically by the orchestrator for complex tasks. You can also invoke it explicitly:
 
 ```bash
-/meow:arch generate    # Create a new ADR
-/meow:arch list        # List existing ADRs
-/meow:design [system]  # System design consultation
+/mk:arch generate    # Create a new ADR
+/mk:arch list        # List existing ADRs
+/mk:design [system]  # System design consultation
 ```
 
 ## Under the Hood

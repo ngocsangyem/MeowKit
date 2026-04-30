@@ -49,7 +49,7 @@ No investigation. No tests. No review. Does the fix actually work? Nobody knows.
 ### After: with MeowKit
 
 ```
-You: "/meow:fix auth login fails after session expiry"
+You: "/mk:fix auth login fails after session expiry"
 
 Phase 1 — Investigate:
   Root cause: session token refresh not called before expiry check

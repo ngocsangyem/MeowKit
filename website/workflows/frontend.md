@@ -10,19 +10,19 @@ persona: B
 
 **Best for:** UI features, component development, styling  
 **Time estimate:** 15-60 minutes  
-**Skills used:** [meow:vue](/reference/skills/vue), [meow:typescript](/reference/skills/typescript), [meow:frontend-design](/reference/skills/frontend-design)  
+**Skills used:** [mk:vue](/reference/skills/vue), [mk:typescript](/reference/skills/typescript), [mk:frontend-design](/reference/skills/frontend-design)  
 **Agents involved:** developer, tester, reviewer
 
 ## Overview
 
 MeowKit has three specialized frontend skills that auto-activate based on file types:
-- **meow:vue** — activates on `.vue` files → enforces Composition API, Pinia, `<script setup>`
-- **meow:typescript** — activates on `.ts`/`.tsx` files → enforces strict null checks, type guards
-- **meow:frontend-design** — activates on design/styling tasks → enforces anti-AI-slop checklist
+- **mk:vue** — activates on `.vue` files → enforces Composition API, Pinia, `<script setup>`
+- **mk:typescript** — activates on `.ts`/`.tsx` files → enforces strict null checks, type guards
+- **mk:frontend-design** — activates on design/styling tasks → enforces anti-AI-slop checklist
 
 ## Building a Vue component
 
-When you create or modify a `.vue` file, [meow:vue](/reference/skills/vue) enforces:
+When you create or modify a `.vue` file, [mk:vue](/reference/skills/vue) enforces:
 
 | Rule | Enforcement |
 |------|------------|
@@ -35,7 +35,7 @@ When you create or modify a `.vue` file, [meow:vue](/reference/skills/vue) enfor
 
 ## TypeScript patterns
 
-When editing `.ts` files, [meow:typescript](/reference/skills/typescript) enforces:
+When editing `.ts` files, [mk:typescript](/reference/skills/typescript) enforces:
 
 | Rule | Example |
 |------|---------|
@@ -47,7 +47,7 @@ When editing `.ts` files, [meow:typescript](/reference/skills/typescript) enforc
 
 ## Design quality
 
-Before delivering any UI, [meow:frontend-design](/reference/skills/frontend-design) runs the **anti-AI-slop checklist**:
+Before delivering any UI, [mk:frontend-design](/reference/skills/frontend-design) runs the **anti-AI-slop checklist**:
 
 | Check | Fail condition | Fix |
 |-------|---------------|-----|

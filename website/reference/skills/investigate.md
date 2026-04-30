@@ -1,15 +1,15 @@
 ---
-title: "meow:investigate"
+title: "mk:investigate"
 description: "Systematic 5-phase debugging methodology with root cause investigation, pattern matching, and the Iron Law."
 ---
 
-# meow:investigate
+# mk:investigate
 
 Systematic 5-phase debugging methodology with root cause investigation, pattern matching, and the Iron Law.
 
 ## What This Skill Does
 
-`meow:investigate` enforces the most important debugging principle: **no fixes without root cause investigation first.** Instead of guessing at solutions, it walks through a structured methodology — collect symptoms, trace the code path, check git history for regressions, reproduce the bug, form a testable hypothesis, verify it, then fix. If three hypotheses fail, it stops and escalates rather than continuing to guess.
+`mk:investigate` enforces the most important debugging principle: **no fixes without root cause investigation first.** Instead of guessing at solutions, it walks through a structured methodology — collect symptoms, trace the code path, check git history for regressions, reproduce the bug, form a testable hypothesis, verify it, then fix. If three hypotheses fail, it stops and escalates rather than continuing to guess.
 
 ## Core Capabilities
 
@@ -17,12 +17,12 @@ Systematic 5-phase debugging methodology with root cause investigation, pattern 
 - **5-phase methodology** — Collect → Trace → Analyze patterns → Test hypothesis → Verify fix
 - **Pattern library** — Matches symptoms to known patterns: race condition, null propagation, state corruption, integration failure, config drift, stale cache
 - **3-strike escalation** — After 3 failed hypotheses, stops and asks the user instead of guessing indefinitely
-- **Scope locking** — Restricts edits to the affected module via `meow:freeze` to prevent scope creep
+- **Scope locking** — Restricts edits to the affected module via `mk:freeze` to prevent scope creep
 - **Blast radius check** — If fix touches >5 files, asks whether that's appropriate before proceeding
 
 ## When to Use This
 
-::: tip Use meow:investigate when...
+::: tip Use mk:investigate when...
 - You need to understand WHY something is broken, not just make it work
 - Previous fix attempts haven't worked
 - The bug is intermittent or hard to reproduce
@@ -33,10 +33,10 @@ Systematic 5-phase debugging methodology with root cause investigation, pattern 
 
 ```bash
 # Direct invocation
-/meow:investigate login timeout after session expiry
+/mk:investigate login timeout after session expiry
 
-# Usually invoked by meow:fix during its investigation phase
-/meow:fix payment race condition  # → automatically uses investigate
+# Usually invoked by mk:fix during its investigation phase
+/mk:fix payment race condition  # → automatically uses investigate
 ```
 
 ## Example Prompts
@@ -99,6 +99,6 @@ Loaded from: `references/rca-method-selection.md`, `references/rca-anti-patterns
 
 ## Related
 
-- [`meow:fix`](/reference/skills/fix) — Orchestrates investigate within the fix pipeline
-- [`meow:sequential-thinking`](/reference/skills/sequential-thinking) — Hypothesis-driven reasoning called during diagnosis
-- [`meow:scout`](/reference/skills/scout) — Helps find relevant files during investigation
+- [`mk:fix`](/reference/skills/fix) — Orchestrates investigate within the fix pipeline
+- [`mk:sequential-thinking`](/reference/skills/sequential-thinking) — Hypothesis-driven reasoning called during diagnosis
+- [`mk:scout`](/reference/skills/scout) — Helps find relevant files during investigation

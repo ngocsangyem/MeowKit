@@ -6,36 +6,36 @@ The audit playbook for keeping the harness pruned across model upgrades. Impleme
 
 - **Every new model release** (Opus / Sonnet / Haiku major version) — **manual trigger required by default.** `post-session.sh` attempts to detect model changes via the `MEOWKIT_MODEL_HINT` env var, but Claude Code does NOT export `CLAUDE_MODEL` or `ANTHROPIC_MODEL` to hooks (verified against `code.claude.com/docs/en/hooks` 260408). Auto-detection only fires if the user sets `export MEOWKIT_MODEL_HINT=opus-4-7` at session start. Without that, the audit is triggered by calendar reminder or by reading `~/.claude/projects/*/session.jsonl` to identify the active model id.
 - **Quarterly** regardless of releases — calendar reminder, manual trigger
-- **When `meow:trace-analyze` (Phase 8) surfaces a recurring no-value pattern** — a component flagged as "never catches anything" is a prune candidate
+- **When `mk:trace-analyze` (Phase 8) surfaces a recurring no-value pattern** — a component flagged as "never catches anything" is a prune candidate
 - **When a user reports the harness "feels heavy"** — empirical signal of over-scaffolding
 
 ## Process (Benchmark-Driven, Phase 8 SHIPPED 260408)
 
-Phase 8 (`meow:benchmark` + `meow:trace-analyze`) ships the measurement infrastructure. The audit now uses real benchmark deltas instead of TBD placeholders.
+Phase 8 (`mk:benchmark` + `mk:trace-analyze`) ships the measurement infrastructure. The audit now uses real benchmark deltas instead of TBD placeholders.
 
 1. **List components.** Refer to the Assumption Registry below.
 2. **Establish baseline:**
    ```bash
-   /meow:benchmark run --full
+   /mk:benchmark run --full
    # Capture run-id from output
    ```
 3. **For each component to test:**
    - Disable (env var flag like `MEOWKIT_BUILD_VERIFY=off`, comment out hook registration in `settings.json`, or comment out a rule import)
-   - Re-run: `/meow:benchmark run --full`
+   - Re-run: `/mk:benchmark run --full`
    - Capture the disabled run-id
 4. **Compare and compute delta:**
    ```bash
-   /meow:benchmark compare {baseline-run-id} {disabled-run-id}
+   /mk:benchmark compare {baseline-run-id} {disabled-run-id}
    ```
 5. **Decide based on `measured_delta` (= `baseline_avg - disabled_avg`):**
    - **Delta ≤ 0** (no regression OR improvement when disabled) → mark **PRUNE**; open removal plan
    - **0 < Delta < 0.02** (< 2 points on 0-1 scale) → mark **WATCH**; revisit next audit
    - **Delta ≥ 0.02** (≥ 2 points) → mark **KEEP** with evidence
 6. **Update the registry below** with measured delta + audit date + model version.
-7. **File follow-up plan** for PRUNE items via `meow:plan-creator --hard`.
+7. **File follow-up plan** for PRUNE items via `mk:plan-creator --hard`.
 8. **Re-enable disabled components** before exiting the audit (non-destructive measurement).
 
-Optionally, also run `/meow:trace-analyze --runs 20` to identify failure patterns from real session traces — this complements the benchmark with field data.
+Optionally, also run `/mk:trace-analyze --runs 20` to identify failure patterns from real session traces — this complements the benchmark with field data.
 
 ## Pruning Criteria
 
@@ -89,15 +89,15 @@ If a future model regresses, restore from git history at SHA <sha>.
 
 Every harness component, its assumption, and current status. Updated per audit cycle.
 
-> **Audit maturity:** the registry below was seeded at Phase 6 landing (260408). The `First listed` column records when each component first appeared in the registry. Phase 8 has now SHIPPED `meow:benchmark` + `meow:trace-analyze`, so the `Measured delta` column can be populated by running the audit playbook above. **Current TBD values mean "no audit cycle has run yet on this component," NOT "Phase 8 unshipped."** The first audit cycle will replace TBDs with real numbers.
+> **Audit maturity:** the registry below was seeded at Phase 6 landing (260408). The `First listed` column records when each component first appeared in the registry. Phase 8 has now SHIPPED `mk:benchmark` + `mk:trace-analyze`, so the `Measured delta` column can be populated by running the audit playbook above. **Current TBD values mean "no audit cycle has run yet on this component," NOT "Phase 8 unshipped."** The first audit cycle will replace TBDs with real numbers.
 
 ## When the Harness Is Broken (Circular Dep Workaround)
 
-`meow:benchmark` invokes `meow:harness` per canary task. If the bug being audited is IN the harness itself (deadlocked iteration loop, broken contract gate, etc.), the audit can't run end-to-end. Workaround:
+`mk:benchmark` invokes `mk:harness` per canary task. If the bug being audited is IN the harness itself (deadlocked iteration loop, broken contract gate, etc.), the audit can't run end-to-end. Workaround:
 
-1. **Bypass `meow:benchmark`.** Run individual canary specs through `meow:cook` directly:
+1. **Bypass `mk:benchmark`.** Run individual canary specs through `mk:cook` directly:
    ```bash
-   /meow:cook .claude/benchmarks/canary/quick/01-react-component-spec.md
+   /mk:cook .claude/benchmarks/canary/quick/01-react-component-spec.md
    ```
 2. **Manually score** the verdict against the spec's acceptance criteria (binary pass/fail).
 3. **Aggregate** across the 5 quick specs to compute a baseline average.
@@ -137,7 +137,7 @@ This is slower than the automated path but works when the harness is broken.
 
 ## See Also
 
-- `.claude/skills/meow:harness/references/adaptive-density-matrix.md` — per-tier density decisions (the audit's siblings)
-- `.claude/skills/meow:benchmark/` (Phase 8 — pending) — automated baseline + replay
+- `.claude/skills/harness/references/adaptive-density-matrix.md` — per-tier density decisions (the audit's siblings)
+- `.claude/skills/benchmark/` (Phase 8 — pending) — automated baseline + replay
 - `.claude/memory/lessons.md` — where `post-session.sh` writes the audit-needed flag
 - Anthropic harness design article (Prithvi Rajasekaran, Labs)

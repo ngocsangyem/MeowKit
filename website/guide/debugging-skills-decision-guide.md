@@ -1,6 +1,6 @@
 ---
 title: "Debugging & Thinking Skills — Decision Guide"
-description: "When to use meow:fix, meow:investigate, meow:sequential-thinking, and meow:problem-solving — with real invocation chains from the SKILL.md files."
+description: "When to use mk:fix, mk:investigate, mk:sequential-thinking, and mk:problem-solving — with real invocation chains from the SKILL.md files."
 persona: C
 ---
 
@@ -14,13 +14,13 @@ Match the **strongest** signal in your current situation to ONE skill. Do not st
 
 | Your situation | Starting skill | Why |
 |---|---|---|
-| Bug, error, test failure, CI issue, type error, lint — anything broken | **`meow:fix`** | Top-level bug-fix orchestrator. Mandatorily invokes scout + investigate + sequential-thinking. |
-| Pure diagnostic question — "why is this broken?" without intent to fix yet | **`meow:investigate`** | 5-phase root-cause debugging. Read-only until hypothesis confirmed. Feeds into fix later. |
-| Structured reasoning about evidence — "these are my hypotheses, which is correct?" | **`meow:sequential-thinking`** | Hypothesis table, evidence-based elimination, revision. Not scoped to bugs — also for architecture decisions. |
-| Stuck on **approach**, not on **cause** — "I've built this 5 ways and it still feels wrong" | **`meow:problem-solving`** | Strategic unsticking. 7 non-default techniques. **Not** for debugging. |
+| Bug, error, test failure, CI issue, type error, lint — anything broken | **`mk:fix`** | Top-level bug-fix orchestrator. Mandatorily invokes scout + investigate + sequential-thinking. |
+| Pure diagnostic question — "why is this broken?" without intent to fix yet | **`mk:investigate`** | 5-phase root-cause debugging. Read-only until hypothesis confirmed. Feeds into fix later. |
+| Structured reasoning about evidence — "these are my hypotheses, which is correct?" | **`mk:sequential-thinking`** | Hypothesis table, evidence-based elimination, revision. Not scoped to bugs — also for architecture decisions. |
+| Stuck on **approach**, not on **cause** — "I've built this 5 ways and it still feels wrong" | **`mk:problem-solving`** | Strategic unsticking. 7 non-default techniques. **Not** for debugging. |
 
 ::: tip Default when unsure
-Anything that smells like "something is broken" → `meow:fix`. It will invoke the others internally. The only time to skip `meow:fix` is when you explicitly do NOT want to fix (just diagnose), or when you are not dealing with a bug at all.
+Anything that smells like "something is broken" → `mk:fix`. It will invoke the others internally. The only time to skip `mk:fix` is when you explicitly do NOT want to fix (just diagnose), or when you are not dealing with a bug at all.
 :::
 
 ## The Real Composition (from SKILL.md files)
@@ -31,19 +31,19 @@ These skills aren't peers — they compose. This diagram reflects exactly what e
 flowchart TD
     USER([User reports issue]) --> TRIAGE{What kind of issue?}
 
-    TRIAGE -->|"Bug / error / failure<br/>(fix intent)"| FIX[meow:fix]
-    TRIAGE -->|"Why is this broken?<br/>(diagnose only)"| INV[meow:investigate]
-    TRIAGE -->|"Which hypothesis is correct?<br/>(reasoning only)"| SEQ[meow:sequential-thinking]
-    TRIAGE -->|"Stuck on approach<br/>(not debugging)"| PS[meow:problem-solving]
+    TRIAGE -->|"Bug / error / failure<br/>(fix intent)"| FIX[mk:fix]
+    TRIAGE -->|"Why is this broken?<br/>(diagnose only)"| INV[mk:investigate]
+    TRIAGE -->|"Which hypothesis is correct?<br/>(reasoning only)"| SEQ[mk:sequential-thinking]
+    TRIAGE -->|"Stuck on approach<br/>(not debugging)"| PS[mk:problem-solving]
 
     FIX -->|Step 0.5| MEM[(.claude/memory/fixes.md)]
-    FIX -->|"Step 1 — MANDATORY"| SCOUT[meow:scout]
-    FIX -->|"Step 2 — MANDATORY"| INV2[meow:investigate]
-    FIX -->|"Step 2 — MANDATORY"| SEQ2[meow:sequential-thinking]
+    FIX -->|"Step 1 — MANDATORY"| SCOUT[mk:scout]
+    FIX -->|"Step 2 — MANDATORY"| INV2[mk:investigate]
+    FIX -->|"Step 2 — MANDATORY"| SEQ2[mk:sequential-thinking]
     FIX --> FIX_IMPL[Step 3–5: fix + verify + prevent]
     FIX --> LEARN[("Step 6: write to<br/>.claude/memory/fixes.md")]
 
-    INV -->|"Phase 3 — Hypothesize"| SEQ3[meow:sequential-thinking]
+    INV -->|"Phase 3 — Hypothesize"| SEQ3[mk:sequential-thinking]
 
     PS -.->|Explicit boundary:<br/>'code broken' → reroute| FIX
 
@@ -53,7 +53,7 @@ flowchart TD
     style SEQ fill:#9b59b6,color:#fff
 ```
 
-Read this diagram as: **`meow:fix` is the orchestrator that calls `meow:investigate` which calls `meow:sequential-thinking`**. `meow:problem-solving` stands apart — it's the only one on the strategic-unsticking axis, not the debugging axis.
+Read this diagram as: **`mk:fix` is the orchestrator that calls `mk:investigate` which calls `mk:sequential-thinking`**. `mk:problem-solving` stands apart — it's the only one on the strategic-unsticking axis, not the debugging axis.
 
 ## Which Skill to Start With — Decision Tree
 
@@ -64,11 +64,11 @@ flowchart TD
     Q1 -->|Yes| Q2{Do I want to FIX it<br/>in this session?}
     Q1 -->|No| Q3{Am I stuck on<br/>an APPROACH?}
 
-    Q2 -->|Yes| USE_FIX["/meow:fix [issue]"]
-    Q2 -->|"No — just understand why"| USE_INV["/meow:investigate [issue]"]
+    Q2 -->|Yes| USE_FIX["/mk:fix [issue]"]
+    Q2 -->|"No — just understand why"| USE_INV["/mk:investigate [issue]"]
 
-    Q3 -->|"Yes — 'tried 5 ways',<br/>'told impossible',<br/>'bloated', etc."| USE_PS["/meow:problem-solving"]
-    Q3 -->|"No — I have hypotheses<br/>and need to pick one"| USE_SEQ["/meow:sequential-thinking"]
+    Q3 -->|"Yes — 'tried 5 ways',<br/>'told impossible',<br/>'bloated', etc."| USE_PS["/mk:problem-solving"]
+    Q3 -->|"No — I have hypotheses<br/>and need to pick one"| USE_SEQ["/mk:sequential-thinking"]
 
     USE_FIX -->|"invokes internally"| USE_INV
     USE_INV -->|"invokes internally"| USE_SEQ
@@ -81,20 +81,20 @@ flowchart TD
 
 ## Skill-by-Skill: What Actually Happens
 
-### `meow:fix` — The Top-Level Bug Orchestrator
+### `mk:fix` — The Top-Level Bug Orchestrator
 
 **When it triggers:** bug, error, test failure, CI issue, type error, lint, log error, UI issue, code problem. The description is intentionally broad — this is the front door for anything broken.
 
-**What it actually does** (from `.claude/skills/meow:fix/SKILL.md`):
+**What it actually does** (from `.claude/skills/fix/SKILL.md`):
 
 ```mermaid
 flowchart LR
     BUG([Bug reported]) --> S0[Step 0: Mode select<br/>auto / review / quick]
     S0 --> S05[Step 0.5: Read<br/>.claude/memory/fixes.md]
-    S05 --> S1[Step 1: MANDATORY scout<br/>meow:scout]
+    S05 --> S1[Step 1: MANDATORY scout<br/>mk:scout]
     S1 --> S2[Step 2: MANDATORY diagnose]
-    S2 --> INV2[meow:investigate<br/>collect symptoms]
-    S2 --> SEQ2[meow:sequential-thinking<br/>hypothesis + evidence]
+    S2 --> INV2[mk:investigate<br/>collect symptoms]
+    S2 --> SEQ2[mk:sequential-thinking<br/>hypothesis + evidence]
     INV2 --> ROOT{Root cause<br/>confirmed?}
     SEQ2 --> ROOT
     ROOT -->|"confidence < medium"| BLOCK[BLOCK — gather more evidence]
@@ -115,20 +115,20 @@ flowchart LR
 - BLOCK — confidence below "medium" forces more evidence
 - STOP — 3 failed fix attempts triggers architecture review, not a fourth attempt
 
-**Use `meow:fix` when:** you have a concrete broken thing AND you want it fixed this session.
+**Use `mk:fix` when:** you have a concrete broken thing AND you want it fixed this session.
 
-### `meow:investigate` — Pure Root-Cause Debugging
+### `mk:investigate` — Pure Root-Cause Debugging
 
 **When it triggers:** "debug this", "why is this broken", "root cause analysis", troubleshooting.
 
-**What it actually does** (from `.claude/skills/meow:investigate/SKILL.md`):
+**What it actually does** (from `.claude/skills/investigate/SKILL.md`):
 
 ```mermaid
 flowchart LR
     SYM([Symptoms reported]) --> P1[Phase 1: Investigate<br/>errors, traces, repro]
     P1 --> P2[Phase 2: Analyze<br/>trace backward to cause]
     P2 --> P3[Phase 3: Hypothesize]
-    P3 --> SEQ3[meow:sequential-thinking<br/>test each hypothesis]
+    P3 --> SEQ3[mk:sequential-thinking<br/>test each hypothesis]
     SEQ3 -->|"≥3 hypotheses fail"| ESC[3-strike rule:<br/>ESCALATE to human]
     SEQ3 -->|confirmed| P4[Phase 4: Implement fix]
     P4 --> P5[Phase 5: Verify<br/>regression test required]
@@ -144,13 +144,13 @@ flowchart LR
 - 3-strike rule — if 3 hypotheses fail, escalate; do not keep guessing
 - `> 5 files touched` — `AskUserQuestion` about blast radius first
 
-**Use `meow:investigate` when:** you want to understand the root cause without necessarily fixing it in the same session. Also fires automatically inside `meow:fix` Step 2.
+**Use `mk:investigate` when:** you want to understand the root cause without necessarily fixing it in the same session. Also fires automatically inside `mk:fix` Step 2.
 
-### `meow:sequential-thinking` — The Reasoning Engine
+### `mk:sequential-thinking` — The Reasoning Engine
 
-**When it triggers:** complex multi-step reasoning, debugging where root cause isn't obvious, architecture decisions with competing trade-offs, `meow:fix` diagnosis phase, any "I think it's X" that needs evidence.
+**When it triggers:** complex multi-step reasoning, debugging where root cause isn't obvious, architecture decisions with competing trade-offs, `mk:fix` diagnosis phase, any "I think it's X" that needs evidence.
 
-**What it actually does** (from `.claude/skills/meow:sequential-thinking/SKILL.md`):
+**What it actually does** (from `.claude/skills/sequential-thinking/SKILL.md`):
 
 ```mermaid
 flowchart LR
@@ -171,13 +171,13 @@ flowchart LR
 - `references/scientific-method.md` — A/B tests, performance investigations, production incidents
 - `references/kepner-tregoe.md` — multi-system bugs, contested root causes (IS/IS-NOT matrix)
 
-**Use `meow:sequential-thinking` when:** you have competing hypotheses and need the evidence-based elimination discipline. Works standalone for architecture decisions too.
+**Use `mk:sequential-thinking` when:** you have competing hypotheses and need the evidence-based elimination discipline. Works standalone for architecture decisions too.
 
-### `meow:problem-solving` — The Non-Debugging Sibling
+### `mk:problem-solving` — The Non-Debugging Sibling
 
 **When it triggers:** stuck on **approach** (not cause). Complexity spiraling, innovation block, recurring patterns, forced-assumption solutions, scale uncertainty, told-it's-impossible, bloated systems needing subtraction.
 
-**What it actually does** (from `.claude/skills/meow:problem-solving/SKILL.md`):
+**What it actually does** (from `.claude/skills/problem-solving/SKILL.md`):
 
 ```mermaid
 flowchart LR
@@ -195,16 +195,16 @@ flowchart LR
     RESOLVED -->|yes| DONE([Proceed])
     RESOLVED -->|no| COMBINE[Combine 2 techniques<br/>e.g. Scale + Via Negativa]
 
-    MATCH -.->|"code broken"| REROUTE[Route to meow:sequential-thinking]
+    MATCH -.->|"code broken"| REROUTE[Route to mk:sequential-thinking]
 
     style REROUTE fill:#e74c3c,color:#fff
 ```
 
 **Explicit boundary (baked into the description):**
 
-> For evidence-based root-cause debugging, use `meow:sequential-thinking` instead.
+> For evidence-based root-cause debugging, use `mk:sequential-thinking` instead.
 
-**Use `meow:problem-solving` when:** the block is *how* to approach a problem, not *why* something broke.
+**Use `mk:problem-solving` when:** the block is *how* to approach a problem, not *why* something broke.
 
 ## Five Real Scenarios — Mapped to Skills
 
@@ -212,31 +212,31 @@ flowchart LR
 
 > "I refactored the auth middleware. Three tests now fail with `TypeError: cannot read property 'id' of undefined`."
 
-→ **`meow:fix`**. Concrete broken thing + fix intent + error signal. `meow:fix` will invoke scout (map refactor blast radius), investigate (collect stack traces), sequential-thinking (hypothesize what changed), then fix the root cause.
+→ **`mk:fix`**. Concrete broken thing + fix intent + error signal. `mk:fix` will invoke scout (map refactor blast radius), investigate (collect stack traces), sequential-thinking (hypothesize what changed), then fix the root cause.
 
 ### Scenario 2: Intermittent production bug, already fixed twice, still recurring
 
 > "Payment retries succeed most of the time but we see 0.3% duplicate-charge reports. We added idempotency keys last sprint. Still happening."
 
-→ **`meow:fix`** first. It will read `.claude/memory/fixes.md` for prior sessions on this bug class. If the pattern "adding X to fix problem caused by adding Y" emerges during diagnosis, follow up with **`meow:problem-solving`** (Via Negativa) to consider removing the retry wrapper rather than adding a fourth guard.
+→ **`mk:fix`** first. It will read `.claude/memory/fixes.md` for prior sessions on this bug class. If the pattern "adding X to fix problem caused by adding Y" emerges during diagnosis, follow up with **`mk:problem-solving`** (Via Negativa) to consider removing the retry wrapper rather than adding a fourth guard.
 
 ### Scenario 3: "Why did deployment fail last night?"
 
 > "The 22:00 deploy went red but CI is green now. What happened?"
 
-→ **`meow:investigate`**. Pure diagnostic intent — no fix is required yet; the deploy already succeeded on retry. `meow:investigate` produces a DEBUG REPORT; you decide afterward if a fix is needed.
+→ **`mk:investigate`**. Pure diagnostic intent — no fix is required yet; the deploy already succeeded on retry. `mk:investigate` produces a DEBUG REPORT; you decide afterward if a fix is needed.
 
 ### Scenario 4: Architecture trade-off with competing positions
 
 > "Should we move order-processing to a queue or keep it inline? I have arguments for both."
 
-→ **`meow:sequential-thinking`** directly. Not a bug, not stuck on approach — a reasoning task. The hypothesis table supports "pick between known options with evidence." For multi-perspective debate, escalate to `meow:party`.
+→ **`mk:sequential-thinking`** directly. Not a bug, not stuck on approach — a reasoning task. The hypothesis table supports "pick between known options with evidence." For multi-perspective debate, escalate to `mk:party`.
 
 ### Scenario 5: Seven features built, none feel right
 
 > "I've implemented this notification system five different ways. Every implementation has ugly special cases."
 
-→ **`meow:problem-solving`** → Simplification Cascades. "Same thing 5+ ways, growing special cases" is the trigger-row for this technique. Look for the one insight that eliminates the special cases.
+→ **`mk:problem-solving`** → Simplification Cascades. "Same thing 5+ ways, growing special cases" is the trigger-row for this technique. Look for the one insight that eliminates the special cases.
 
 ## The Common Misroutes
 
@@ -244,11 +244,11 @@ These are the patterns meowkit users hit most often. Memorize them.
 
 | Wrong | Right | Why |
 |---|---|---|
-| Starting with `meow:problem-solving` for a bug | `meow:fix` or `meow:investigate` | problem-solving's description explicitly reroutes "code broken" away. Its axis is approach, not cause. |
-| Starting with `meow:sequential-thinking` for a bug you want fixed | `meow:fix` | `meow:fix` already invokes sequential-thinking at Step 2 AND adds scout + memory + verify + prevent. Using sequential-thinking alone skips the scout and leaves you without a regression test. |
-| Starting with `meow:investigate` then separately running `meow:fix` | `meow:fix` only | `meow:fix` Step 2 already invokes investigate. Running them separately duplicates work and produces two DEBUG REPORTs. |
-| Stacking `meow:problem-solving` + `meow:sequential-thinking` in one prompt | Pick ONE — based on whether you're stuck on approach or cause | Claude Code has no chain operator. Stacking just sends the second skill name as arguments to the first. |
-| Starting with `/meow:fix` for "design this from scratch" | `meow:plan-creator` or `meow:brainstorming` | `meow:fix` is for broken things. Green-field design is a different axis entirely. |
+| Starting with `mk:problem-solving` for a bug | `mk:fix` or `mk:investigate` | problem-solving's description explicitly reroutes "code broken" away. Its axis is approach, not cause. |
+| Starting with `mk:sequential-thinking` for a bug you want fixed | `mk:fix` | `mk:fix` already invokes sequential-thinking at Step 2 AND adds scout + memory + verify + prevent. Using sequential-thinking alone skips the scout and leaves you without a regression test. |
+| Starting with `mk:investigate` then separately running `mk:fix` | `mk:fix` only | `mk:fix` Step 2 already invokes investigate. Running them separately duplicates work and produces two DEBUG REPORTs. |
+| Stacking `mk:problem-solving` + `mk:sequential-thinking` in one prompt | Pick ONE — based on whether you're stuck on approach or cause | Claude Code has no chain operator. Stacking just sends the second skill name as arguments to the first. |
+| Starting with `/mk:fix` for "design this from scratch" | `mk:plan-creator` or `mk:brainstorming` | `mk:fix` is for broken things. Green-field design is a different axis entirely. |
 
 ## Hand-offs Between Skills
 
@@ -256,14 +256,14 @@ Once started, a skill may hand off. These hand-offs are **real** (coded into the
 
 ```mermaid
 flowchart LR
-    FIX[meow:fix] -->|Step 2 internal call| INV[meow:investigate]
-    INV -->|Phase 3 internal call| SEQ[meow:sequential-thinking]
+    FIX[mk:fix] -->|Step 2 internal call| INV[mk:investigate]
+    INV -->|Phase 3 internal call| SEQ[mk:sequential-thinking]
     FIX -->|Step 2 internal call| SEQ
-    FIX -->|Conditional Step 2.5| BRAIN[meow:brainstorming]
-    FIX -->|Conditional| DOCS[meow:docs-finder]
+    FIX -->|Conditional Step 2.5| BRAIN[mk:brainstorming]
+    FIX -->|Conditional| DOCS[mk:docs-finder]
 
-    PS[meow:problem-solving] -.->|boundary reroute<br/>if code broken| SEQ
-    PS -.->|boundary reroute<br/>if multi-perspective| PARTY[meow:party]
+    PS[mk:problem-solving] -.->|boundary reroute<br/>if code broken| SEQ
+    PS -.->|boundary reroute<br/>if multi-perspective| PARTY[mk:party]
 
     style FIX fill:#4a90e2,color:#fff
     style INV fill:#27ae60,color:#fff
@@ -275,19 +275,19 @@ flowchart LR
 
 From the `Gotchas` sections of each SKILL.md:
 
-- **Guessing root causes** — "I think it's X" without evidence. Fix: let `meow:sequential-thinking` enforce evidence.
+- **Guessing root causes** — "I think it's X" without evidence. Fix: let `mk:sequential-thinking` enforce evidence.
 - **Fixing symptoms** — test passes but underlying issue remains. Fix: trace backward, symptom → cause → ROOT cause.
-- **Skipping scout** — diagnosing without codebase context. `meow:fix` Step 1 is MANDATORY, not optional.
-- **No regression test** — bug resurfaces next sprint. `meow:fix` Step 5 BLOCKs without one.
-- **3+ failed fix attempts** — insanity loop. Both `meow:fix` and `meow:investigate` STOP at 3; time to question the architecture with the user.
-- **Debugging misroute to problem-solving** — "my code is broken" is not problem-solving territory. Route to `meow:sequential-thinking` or `meow:fix`.
+- **Skipping scout** — diagnosing without codebase context. `mk:fix` Step 1 is MANDATORY, not optional.
+- **No regression test** — bug resurfaces next sprint. `mk:fix` Step 5 BLOCKs without one.
+- **3+ failed fix attempts** — insanity loop. Both `mk:fix` and `mk:investigate` STOP at 3; time to question the architecture with the user.
+- **Debugging misroute to problem-solving** — "my code is broken" is not problem-solving territory. Route to `mk:sequential-thinking` or `mk:fix`.
 - **Tool-stacking in problem-solving** — running 3 techniques at once hides which one worked. One at a time.
 
 ## See Also
 
-- [`meow:fix`](/reference/skills/fix) — full reference
-- [`meow:investigate`](/reference/skills/investigate) — full reference
-- [`meow:sequential-thinking`](/reference/skills/sequential-thinking) — full reference
-- [`meow:problem-solving`](/reference/skills/problem-solving) — full reference
+- [`mk:fix`](/reference/skills/fix) — full reference
+- [`mk:investigate`](/reference/skills/investigate) — full reference
+- [`mk:sequential-thinking`](/reference/skills/sequential-thinking) — full reference
+- [`mk:problem-solving`](/reference/skills/problem-solving) — full reference
 - [Agent-Skill Architecture](/guide/agent-skill-architecture) — how agents compose skills
 - [Workflow Phases](/guide/workflow-phases) — where each skill sits in the 7-phase pipeline

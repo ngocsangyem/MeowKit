@@ -72,16 +72,16 @@ const EMPTY_SKELETON = (scope: string, consumer: string): string =>
 	);
 
 const SPLIT_FILES = [
-	{ file: "fixes.json", scope: "fixes", consumer: "meow:fix" },
+	{ file: "fixes.json", scope: "fixes", consumer: "mk:fix" },
 	{
 		file: "review-patterns.json",
 		scope: "review-patterns",
-		consumer: "meow:review,meow:plan-creator",
+		consumer: "mk:review,mk:plan-creator",
 	},
 	{
 		file: "architecture-decisions.json",
 		scope: "architecture-decisions",
-		consumer: "meow:plan-creator,meow:cook",
+		consumer: "mk:plan-creator,mk:cook",
 	},
 ] as const;
 

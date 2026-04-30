@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Code improvement, tech debt reduction  
 **Time estimate:** 15-45 minutes  
-**Skills used:** [meow:cook](/reference/skills/cook), [meow:scout](/reference/skills/scout), [meow:review](/reference/skills/review)  
+**Skills used:** [mk:cook](/reference/skills/cook), [mk:scout](/reference/skills/scout), [mk:review](/reference/skills/review)  
 **Agents involved:** planner, tester, developer, reviewer, architect (if pattern changes)
 
 ## Overview
@@ -22,10 +22,10 @@ Refactoring with MeowKit follows the TDD refactor phase: existing tests must pas
 ### Step 1: Scout the code to understand current structure
 
 ```
-/meow:scout payment module
+/mk:scout payment module
 ```
 
-The [meow:scout](/reference/skills/scout) skill spawns parallel Explore agents to map the module:
+The [mk:scout](/reference/skills/scout) skill spawns parallel Explore agents to map the module:
 - File structure and dependencies
 - Architecture fingerprint (patterns used)
 - Complexity estimate (files × lines)
@@ -34,7 +34,7 @@ The [meow:scout](/reference/skills/scout) skill spawns parallel Explore agents t
 ### Step 2: Plan the refactor
 
 ```
-/meow:plan refactor payment module — extract service layer from controllers
+/mk:plan refactor payment module — extract service layer from controllers
 ```
 
 The **planner** creates a plan. For refactoring, the plan focuses on:

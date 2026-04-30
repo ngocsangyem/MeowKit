@@ -1,15 +1,15 @@
 ---
-title: "meow:nyquist"
+title: "mk:nyquist"
 description: "Test-to-requirement coverage mapping. Reads plan acceptance criteria and test files, produces a gap report showing which requirements have no tests."
 ---
 
-# meow:nyquist
+# mk:nyquist
 
 Test-to-requirement coverage mapping that reads plan acceptance criteria and scans test files to identify which requirements have no corresponding test. Named after the Nyquist sampling theorem — sufficient test coverage prevents aliased (missed) requirements.
 
 ## What This Skill Does
 
-`meow:nyquist` extracts acceptance criteria from a plan file, globs all test files in the project, maps each criterion to matching test descriptions via keyword and semantic matching, and produces a structured gap report. It is read-only — it never writes tests or modifies plan files.
+`mk:nyquist` extracts acceptance criteria from a plan file, globs all test files in the project, maps each criterion to matching test descriptions via keyword and semantic matching, and produces a structured gap report. It is read-only — it never writes tests or modifies plan files.
 
 - **Acceptance criteria extraction** — reads `tasks/plans/YYMMDD-name.md`, pulls all binary criteria
 - **Test file scanning** — globs `**/*.test.*`, `**/*.spec.*`, `**/test_*.*`
@@ -19,7 +19,7 @@ Test-to-requirement coverage mapping that reads plan acceptance criteria and sca
 
 ## When to Use This
 
-::: tip Use meow:nyquist when...
+::: tip Use mk:nyquist when...
 - Phase 2 is complete and you want to verify all acceptance criteria have tests
 - Phase 4 review is checking test coverage against the plan
 - Before Gate 2, to confirm implementation matches plan requirements
@@ -30,10 +30,10 @@ Test-to-requirement coverage mapping that reads plan acceptance criteria and sca
 
 ```bash
 # Map criteria from active plan to test files
-/meow:nyquist
+/mk:nyquist
 
 # Target a specific plan file
-/meow:nyquist tasks/plans/240315-auth-refactor.md
+/mk:nyquist tasks/plans/240315-auth-refactor.md
 ```
 
 ## How It Works
@@ -93,6 +93,6 @@ Output format:
 
 ## See Also
 
-- [`meow:validate-plan`](/reference/skills/validate-plan) — validates acceptance criteria are binary before tests are written
-- [`meow:review`](/reference/skills/review) — uses nyquist output in the test coverage audit dimension
-- [`meow:elicit`](/reference/skills/elicit) — deeper analysis of coverage gaps via pre-mortem or Socratic methods
+- [`mk:validate-plan`](/reference/skills/validate-plan) — validates acceptance criteria are binary before tests are written
+- [`mk:review`](/reference/skills/review) — uses nyquist output in the test coverage audit dimension
+- [`mk:elicit`](/reference/skills/elicit) — deeper analysis of coverage gaps via pre-mortem or Socratic methods

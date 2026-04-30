@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Choosing dependencies, evaluating frameworks, gathering docs  
 **Time estimate:** 15-30 minutes  
-**Skills used:** [meow:docs-finder](/reference/skills/docs-finder), [meow:scout](/reference/skills/scout)  
+**Skills used:** [mk:docs-finder](/reference/skills/docs-finder), [mk:scout](/reference/skills/scout)  
 **Agents involved:** researcher (Haiku model), brainstormer
 
 ## Overview
@@ -60,10 +60,10 @@ Second-order: Prisma locks you into their schema format. Drizzle stays close to 
 ### Step 4: Find specific documentation
 
 ```
-/meow:docs-finder drizzle PostgreSQL transactions
+/mk:docs-finder drizzle PostgreSQL transactions
 ```
 
-The [meow:docs-finder](/reference/skills/docs-finder) skill fetches current docs via Context7 or Context Hub, avoiding stale training data.
+The [mk:docs-finder](/reference/skills/docs-finder) skill fetches current docs via Context7 or Context Hub, avoiding stale training data.
 
 ## Next workflow
 

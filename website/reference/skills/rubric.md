@@ -1,15 +1,15 @@
 ---
-title: "meow:rubric"
+title: "mk:rubric"
 description: "Rubric library API — load, compose, list, and validate PASS/WARN/FAIL grading rubrics with balanced anchor examples for evaluator-grade judgments."
 ---
 
-# meow:rubric
+# mk:rubric
 
-Discovery, composition, and validation API for the meowkit rubric library at `.claude/rubrics/`. Consumed by the `evaluator` agent and `meow:evaluate` skill to load grading criteria with balanced PASS/FAIL anchor examples — independently invokable via `/meow:rubric <subcommand>` for manual inspection or CI validation.
+Discovery, composition, and validation API for the meowkit rubric library at `.claude/rubrics/`. Consumed by the `evaluator` agent and `mk:evaluate` skill to load grading criteria with balanced PASS/FAIL anchor examples — independently invokable via `/mk:rubric <subcommand>` for manual inspection or CI validation.
 
 ## What This Skill Does
 
-`meow:rubric` provides the interface to a curated library of evaluation rubrics. Each rubric defines what PASS, WARN, and FAIL look like for one dimension of a build — design quality, functionality, originality, product depth, and more. The skill loads individual rubrics as prompt-ready fragments, composes multiple rubrics from a preset (with weights summing to 1.0), or validates rubric files against the canonical schema. Rubric anchor examples are balanced: at least one PASS and one FAIL example per rubric, preventing the 40–60% positive-bias inflation that appears when only PASS examples are shown to an LLM judge.
+`mk:rubric` provides the interface to a curated library of evaluation rubrics. Each rubric defines what PASS, WARN, and FAIL look like for one dimension of a build — design quality, functionality, originality, product depth, and more. The skill loads individual rubrics as prompt-ready fragments, composes multiple rubrics from a preset (with weights summing to 1.0), or validates rubric files against the canonical schema. Rubric anchor examples are balanced: at least one PASS and one FAIL example per rubric, preventing the 40–60% positive-bias inflation that appears when only PASS examples are shown to an LLM judge.
 
 ## Core Capabilities
 
@@ -22,7 +22,7 @@ Discovery, composition, and validation API for the meowkit rubric library at `.c
 
 ## When to Use This
 
-::: tip Use meow:rubric when...
+::: tip Use mk:rubric when...
 - You need to inspect what a rubric grades before running an evaluation
 - You're composing a custom evaluation preset for a non-standard project type
 - CI needs to validate rubric files after editing anchor examples or weights
@@ -30,32 +30,32 @@ Discovery, composition, and validation API for the meowkit rubric library at `.c
 - You're adding a new rubric and want to confirm it passes schema validation
 :::
 
-::: warning Don't use meow:rubric when...
-- You want to grade a running build — use [`meow:evaluate`](/reference/skills/evaluate) instead
-- You're doing structural code review — use [`meow:review`](/reference/skills/review)
-- You want to load all 7 rubrics in the frontend preset — the pruned `frontend-app` preset loads only 4; loading extras duplicates work already done by `meow:review` and `security-rules.md`
+::: warning Don't use mk:rubric when...
+- You want to grade a running build — use [`mk:evaluate`](/reference/skills/evaluate) instead
+- You're doing structural code review — use [`mk:review`](/reference/skills/review)
+- You want to load all 7 rubrics in the frontend preset — the pruned `frontend-app` preset loads only 4; loading extras duplicates work already done by `mk:review` and `security-rules.md`
 :::
 
 ## Usage
 
 ```bash
 # List all rubrics and presets
-.claude/skills/meow:rubric/scripts/load-rubric.sh --list
+.claude/skills/rubric/scripts/load-rubric.sh --list
 
 # Load one rubric as a prompt fragment
-.claude/skills/meow:rubric/scripts/load-rubric.sh design-quality
+.claude/skills/rubric/scripts/load-rubric.sh design-quality
 
 # Compose a full preset (returns all member rubrics + weight table)
-.claude/skills/meow:rubric/scripts/load-rubric.sh --preset frontend-app
+.claude/skills/rubric/scripts/load-rubric.sh --preset frontend-app
 
 # Validate all rubrics in the library
-.claude/skills/meow:rubric/scripts/validate-rubric.sh
+.claude/skills/rubric/scripts/validate-rubric.sh
 
 # Validate one specific rubric
-.claude/skills/meow:rubric/scripts/validate-rubric.sh .claude/rubrics/originality.md
+.claude/skills/rubric/scripts/validate-rubric.sh .claude/rubrics/originality.md
 
 # Validate a composition preset for weight-sum correctness
-.claude/skills/meow:rubric/scripts/validate-rubric.sh --preset .claude/rubrics/composition-presets/frontend-app.md
+.claude/skills/rubric/scripts/validate-rubric.sh --preset .claude/rubrics/composition-presets/frontend-app.md
 ```
 
 ## Rubric Library Tour
@@ -72,7 +72,7 @@ The library ships with 7 rubrics. The `frontend-app` preset uses 4 by default (m
 | `craft` | Edge cases, accessibility, performance care | opt-in |
 | `ux-usability` | Flow, affordances, error messaging | opt-in |
 
-The opt-in rubrics overlap with `meow:review`'s 5-dimension verdict and `security-rules.md`; loading them in every frontend evaluation duplicates work without adding signal (Phase 2 v2.0.0 audit finding).
+The opt-in rubrics overlap with `mk:review`'s 5-dimension verdict and `security-rules.md`; loading them in every frontend evaluation duplicates work without adding signal (Phase 2 v2.0.0 audit finding).
 
 ## Inputs
 
@@ -164,16 +164,16 @@ From `rubric-rules.md`:
 
 ## Relationships
 
-- [`meow:evaluate`](/reference/skills/evaluate) — consumes `compose <preset>` to load grading criteria for a build
-- [`meow:sprint-contract`](/reference/skills/sprint-contract) — contracts bind each AC to one rubric from the active preset
-- [`meow:harness`](/reference/skills/harness) — triggers the evaluator which uses rubrics as its grading criteria
+- [`mk:evaluate`](/reference/skills/evaluate) — consumes `compose <preset>` to load grading criteria for a build
+- [`mk:sprint-contract`](/reference/skills/sprint-contract) — contracts bind each AC to one rubric from the active preset
+- [`mk:harness`](/reference/skills/harness) — triggers the evaluator which uses rubrics as its grading criteria
 - [`/reference/agents/evaluator`](/reference/agents/evaluator) — the agent that ingests composed rubric fragments
 
 ## See Also
 
-- Canonical source: `.claude/skills/meow:rubric/SKILL.md`
+- Canonical source: `.claude/skills/rubric/SKILL.md`
 - Rubric schema: `.claude/rubrics/schema.md`
-- Calibration guide: `.claude/skills/meow:rubric/references/calibration-guide.md`
+- Calibration guide: `.claude/skills/rubric/references/calibration-guide.md`
 - All rubrics catalog: `.claude/rubrics/RUBRICS_INDEX.md`
 - Related guide: [`/guide/rubric-library`](/guide/rubric-library)
 - Governing rule: `rubric-rules.md`

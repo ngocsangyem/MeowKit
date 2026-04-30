@@ -12,8 +12,8 @@ export interface SkillsDependency {
 
 /** Default pip packages installed into .claude/skills/.venv */
 export const DEFAULT_PIP_PACKAGES: readonly SkillsDependency[] = [
-	{ name: "google-genai", description: "Gemini API client (meow:multimodal skill)" },
-	{ name: "pillow", description: "Image processing (meow:multimodal)" },
+	{ name: "google-genai", description: "Gemini API client (mk:multimodal skill)" },
+	{ name: "pillow", description: "Image processing (mk:multimodal)" },
 	{ name: "python-dotenv", description: "Env var loading (optional — scripts have fallback)" },
 ] as const;
 

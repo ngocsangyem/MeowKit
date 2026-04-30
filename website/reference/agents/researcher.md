@@ -31,14 +31,14 @@ The researcher is a read-only support agent that fans out queries to multiple so
 "Compare Prisma vs Drizzle for our use case"
 "Find docs on Vue 3 Suspense"
 
-# Also invoked by meow:docs-finder for library documentation
+# Also invoked by mk:docs-finder for library documentation
 ```
 
 ## Documentation Chain
 
 When researching a library or API, the researcher uses a **docs-finder-first** chain:
 
-1. **meow:docs-finder** — resolves official docs via Context7 → Context Hub → WebSearch
+1. **mk:docs-finder** — resolves official docs via Context7 → Context Hub → WebSearch
 2. **Codebase scan** — checks existing patterns with Grep/Glob before suggesting new approaches
 3. **Cross-reference** — verifies findings against community sources for confidence rating
 

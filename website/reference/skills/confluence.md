@@ -1,17 +1,17 @@
 ---
-title: "meow:confluence"
+title: "mk:confluence"
 description: "Confluence spec analysis: fetch pages as markdown, extract requirements, detect gaps, produce deep research reports."
 ---
 
-# meow:confluence
+# mk:confluence
 
 Fetch Confluence specifications and produce deep research reports analyzing requirements, gaps, and ambiguities. Output is a report for human reading — NOT automated ticket creation.
 
 ## What This Skill Does
 
-meow:confluence reads Confluence pages via the Atlassian MCP server, assembles multi-page specs into a single markdown document, and produces a Spec Research Report that extracts requirements, flags gaps, and suggests user stories.
+mk:confluence reads Confluence pages via the Atlassian MCP server, assembles multi-page specs into a single markdown document, and produces a Spec Research Report that extracts requirements, flags gaps, and suggests user stories.
 
-The skill is research-only. It never creates Jira tickets, never updates Confluence pages, and never executes any state changes. All suggested actions require explicit human approval and manual execution via `/meow:jira`.
+The skill is research-only. It never creates Jira tickets, never updates Confluence pages, and never executes any state changes. All suggested actions require explicit human approval and manual execution via `/mk:jira`.
 
 ## Core Capabilities
 
@@ -23,22 +23,22 @@ The skill is research-only. It never creates Jira tickets, never updates Conflue
 
 ## When to Use
 
-::: tip Use meow:confluence for spec analysis
+::: tip Use mk:confluence for spec analysis
 ```bash
-/meow:confluence analyze 12345                    # By page ID
-/meow:confluence analyze --title "Auth PRD" --space ENG  # By title
-/meow:confluence search "authentication redesign"       # Find pages
-/meow:confluence analyze 12345 --with-commands          # Include suggested /meow:jira create commands
+/mk:confluence analyze 12345                    # By page ID
+/mk:confluence analyze --title "Auth PRD" --space ENG  # By title
+/mk:confluence search "authentication redesign"       # Find pages
+/mk:confluence analyze 12345 --with-commands          # Include suggested /mk:jira create commands
 ```
 :::
 
 ::: info Reports, not automation
-meow:confluence produces research reports. It does NOT create Jira tickets. After reading the report, you manually run `/meow:jira create` for stories you approve.
+mk:confluence produces research reports. It does NOT create Jira tickets. After reading the report, you manually run `/mk:jira create` for stories you approve.
 :::
 
 ## Prerequisites
 
-meow:confluence requires the [mcp-atlassian](https://github.com/sooperset/mcp-atlassian) MCP server with Confluence access:
+mk:confluence requires the [mcp-atlassian](https://github.com/sooperset/mcp-atlassian) MCP server with Confluence access:
 
 ```bash
 claude mcp add -e JIRA_URL=https://your-company.atlassian.net \
@@ -78,7 +78,7 @@ All Confluence page content is treated as DATA per injection-rules.md. Content i
 
 ## Related
 
-- [meow:jira](/reference/skills/jira) — execute Jira operations after reviewing the spec report
-- [meow:planning-engine](/reference/skills/planning-engine) — tech review and sprint planning after tickets are created
-- [meow:intake](/reference/skills/intake) — raw ticket triage (different from spec analysis)
+- [mk:jira](/reference/skills/jira) — execute Jira operations after reviewing the spec report
+- [mk:planning-engine](/reference/skills/planning-engine) — tech review and sprint planning after tickets are created
+- [mk:intake](/reference/skills/intake) — raw ticket triage (different from spec analysis)
 - [Spec to Sprint Planning](/workflows/spec-to-sprint) — end-to-end workflow guide

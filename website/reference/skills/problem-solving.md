@@ -1,30 +1,30 @@
 ---
-title: "meow:problem-solving"
+title: "mk:problem-solving"
 description: "Strategic unsticking via 7 non-default techniques for approach-level stuck-moments: simplification cascades, collision-zone thinking, meta-pattern recognition, inversion, scale game, first principles, via negativa."
 ---
 
-# meow:problem-solving
+# mk:problem-solving
 
 Seven non-default techniques for when you're stuck on *approach*, not on *cause*.
 
 ## What This Skill Does
 
-`meow:problem-solving` targets the stuck-moments where default thinking fails — complexity spirals, innovation blocks, forced assumptions, scale uncertainty, "told it's impossible," and bloated systems needing subtraction. Each technique is a specific mental shift with a crisp trigger symptom.
+`mk:problem-solving` targets the stuck-moments where default thinking fails — complexity spirals, innovation blocks, forced assumptions, scale uncertainty, "told it's impossible," and bloated systems needing subtraction. Each technique is a specific mental shift with a crisp trigger symptom.
 
-Distinct from `meow:sequential-thinking` (which is for evidence-based root-cause debugging). Problem-solving is for being stuck on *approach*; sequential-thinking is for being stuck on *cause*.
+Distinct from `mk:sequential-thinking` (which is for evidence-based root-cause debugging). Problem-solving is for being stuck on *approach*; sequential-thinking is for being stuck on *cause*.
 
 ## Core Capabilities
 
 - **Symptom-based dispatch** — 8-row table routes stuck-symptoms to the right technique; no guessing
 - **Seven techniques** — Simplification Cascades, Collision-Zone Thinking, Meta-Pattern Recognition, Inversion Exercise, Scale Game, First Principles, Via Negativa
-- **Explicit boundary** — description and dispatch table reroute debugging requests to `meow:sequential-thinking`
+- **Explicit boundary** — description and dispatch table reroute debugging requests to `mk:sequential-thinking`
 - **Progressive disclosure** — SKILL.md is a router; references/ loads on demand (one technique at a time)
 - **Gotchas section** — 9 named failure modes (tool-stacking, premature abstraction, invalid inversion, scale-game theater, first-principles tourism, etc.)
 - **Composable** — 4 documented technique-combinations for when one pass isn't enough
 
 ## When to Use This
 
-::: tip Use meow:problem-solving when...
+::: tip Use mk:problem-solving when...
 
 - Same concept implemented 5+ ways; growing special cases
 - Conventional solutions feel incremental; need breakthrough
@@ -37,9 +37,9 @@ Distinct from `meow:sequential-thinking` (which is for evidence-based root-cause
 
 ::: warning Do NOT use for
 
-- Root-cause debugging → use `meow:sequential-thinking` (evidence-based hypothesis testing)
+- Root-cause debugging → use `mk:sequential-thinking` (evidence-based hypothesis testing)
 - Trivial fixes (typo, rename, single-file with obvious cause)
-- Known-options trade-off → use `meow:party` (multi-agent) or `meow:brainstorming`
+- Known-options trade-off → use `mk:party` (multi-agent) or `mk:brainstorming`
   :::
 
 ## The Seven Techniques
@@ -75,7 +75,7 @@ Distinct from `meow:sequential-thinking` (which is for evidence-based root-cause
 ## Gotchas
 
 - **Tool-stacking** — running 3 techniques at once hides which one helped. One at a time.
-- **Debugging misroute** — "my code is broken" is not problem-solving territory. Route to `meow:sequential-thinking`.
+- **Debugging misroute** — "my code is broken" is not problem-solving territory. Route to `mk:sequential-thinking`.
 - **Premature abstraction** — collapsing 2 instances. Meta-pattern rule requires 3+ domains.
 - **Invalid inversion** — "trust all user input" is a security hole, not a valid inversion.
 - **Scale-game theater** — thinking about 1000× without running the numbers.
@@ -83,7 +83,7 @@ Distinct from `meow:sequential-thinking` (which is for evidence-based root-cause
 
 ## Related
 
-- [`meow:sequential-thinking`](/reference/skills/sequential-thinking) — Evidence-based root-cause diagnosis (distinct axis)
-- [`meow:brainstorming`](/reference/skills/brainstorming) — Exploring known-alternative trade-offs
-- [`meow:party`](/reference/skills/party) — Multi-agent deliberation for architectural decisions
-- [`meow:investigate`](/reference/skills/investigate) — 5-phase debugging (upstream of sequential-thinking)
+- [`mk:sequential-thinking`](/reference/skills/sequential-thinking) — Evidence-based root-cause diagnosis (distinct axis)
+- [`mk:brainstorming`](/reference/skills/brainstorming) — Exploring known-alternative trade-offs
+- [`mk:party`](/reference/skills/party) — Multi-agent deliberation for architectural decisions
+- [`mk:investigate`](/reference/skills/investigate) — 5-phase debugging (upstream of sequential-thinking)

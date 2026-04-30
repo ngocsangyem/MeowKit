@@ -97,7 +97,7 @@ MeowKit loads `.claude/.env` automatically at session start. This is the recomme
 
 1. `project-context-loader.sh` (SessionStart) sources `.claude/.env` into the shell environment → all shell hooks inherit it
 2. `dispatch.cjs` parses `.claude/.env` into `process.env` → all Node.js handlers inherit it
-3. `meow:multimodal` Python scripts have their own `.env` loading (predates centralized loader)
+3. `mk:multimodal` Python scripts have their own `.env` loading (predates centralized loader)
 
 **Precedence:** Shell exports (`export VAR=x`) **always win**. `.env` vars only apply when the var is not already set. This means you can override `.env` per-session with `export`.
 
@@ -160,7 +160,7 @@ All `MEOWKIT_*` env vars. Set in your shell profile (`~/.zshrc`, `~/.bashrc`) or
 | `MEOWKIT_BUDGET_WARN` | `30` | USD threshold for budget warning message | Lower for cost-conscious sessions, higher for long research runs. |
 | `MEOWKIT_BUDGET_BLOCK` | `100` | USD threshold for hard session block | Emergency brake. Session halts at this amount. |
 | `MEOWKIT_BUDGET_CAP` | *(none)* | User override for hard block — can be lower OR higher than `BUDGET_BLOCK` | Set `MEOWKIT_BUDGET_CAP=200` for intentional high-budget harness runs. Set `MEOWKIT_BUDGET_CAP=15` for tight budgets. |
-| `MEOWKIT_RUN_ID` | `current` | Harness run identifier for trace and budget tracking | Set automatically by `meow:harness` step-00. Don't set manually unless resuming. |
+| `MEOWKIT_RUN_ID` | `current` | Harness run identifier for trace and budget tracking | Set automatically by `mk:harness` step-00. Don't set manually unless resuming. |
 
 ### Conversation Summary Cache
 

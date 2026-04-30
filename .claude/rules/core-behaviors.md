@@ -61,7 +61,7 @@ Before finishing any implementation, ask:
 
 If you build 1000 lines and 100 would suffice, you have failed. Prefer the boring solution.
 
-**Enforced by:** `development-rules.md` (file size limits, YAGNI), `meow:simplify` skill
+**Enforced by:** `development-rules.md` (file size limits, YAGNI), `mk:simplify` skill
 
 ## 5. Maintain Scope Discipline
 

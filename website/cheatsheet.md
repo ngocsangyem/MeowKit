@@ -10,33 +10,33 @@ persona: B
 
 | Command | Phase | What it does |
 |---------|-------|-------------|
-| `/meow:meow [task]` | 0 | Entry point — classifies and routes to right agent |
-| `/meow:plan [feature]` | 1 | Premise challenge + two-lens plan + Gate 1 |
-| `/meow:cook [feature]` | 1→5 | Full pipeline: plan → test → build → review → ship |
-| `/meow:fix [bug]` | varies | Auto-detect complexity, route to fix strategy |
-| `/meow:review` | 4 | Multi-pass code review + adversarial analysis |
-| `/meow:ship` | 5 | Pre-ship → commit → PR → CI verify → rollback doc |
-| `/meow:test` | 2 | TDD enforcement — write or run tests |
-| `/meow:audit` | 4 | Full security scan across all platforms |
-| `/meow:validate` | any | Run deterministic Python validation scripts |
-| `/meow:arch [action]` | 1 | Generate, list, or analyze ADRs |
-| `/meow:design [system]` | 1 | System design consultation (docs only) |
-| `/meow:docs-init` | 6 | Initial codebase scan → doc skeleton |
-| `/meow:docs-sync` | 6 | Diff-aware doc updates after feature work |
-| `/meow:canary` | 5 | Staged deployment with monitoring |
-| `/meow:retro` | 6 | Sprint retrospective with trend tracking |
-| `/meow:budget` | any | Token cost tracking report |
-| `/meow:party [topic]` | 1 | Multi-agent deliberation — 2-4 agents debate, forced synthesis |
-| `/meow:spawn [agent]` | any | Launch parallel agent session |
-| `/meow:upgrade` | any | Self-update MeowKit |
-| `/meow:help` | any | Scan project state, recommend next pipeline step |
-| `/meow:harness "build a X"` | 0→5 | Autonomous green-field build with generator/evaluator loop |
-| `/meow:evaluate` | 4 | Behavioral rubric grading with active verification |
-| `/meow:sprint-contract` | 3 | Draft contract before harness sprint |
-| `/meow:rubric` | 4 | Load/compose rubric preset |
-| `/meow:trace-analyze` | any | Scatter-gather analysis of trace log |
-| `/meow:benchmark` | any | Canary suite (quick tier default; `--full` for 6-task tier) |
-| `/meow:summary` | any | Inspect conversation-summary cache |
+| `/mk:meow [task]` | 0 | Entry point — classifies and routes to right agent |
+| `/mk:plan [feature]` | 1 | Premise challenge + two-lens plan + Gate 1 |
+| `/mk:cook [feature]` | 1→5 | Full pipeline: plan → test → build → review → ship |
+| `/mk:fix [bug]` | varies | Auto-detect complexity, route to fix strategy |
+| `/mk:review` | 4 | Multi-pass code review + adversarial analysis |
+| `/mk:ship` | 5 | Pre-ship → commit → PR → CI verify → rollback doc |
+| `/mk:test` | 2 | TDD enforcement — write or run tests |
+| `/mk:audit` | 4 | Full security scan across all platforms |
+| `/mk:validate` | any | Run deterministic Python validation scripts |
+| `/mk:arch [action]` | 1 | Generate, list, or analyze ADRs |
+| `/mk:design [system]` | 1 | System design consultation (docs only) |
+| `/mk:docs-init` | 6 | Initial codebase scan → doc skeleton |
+| `/mk:docs-sync` | 6 | Diff-aware doc updates after feature work |
+| `/mk:canary` | 5 | Staged deployment with monitoring |
+| `/mk:retro` | 6 | Sprint retrospective with trend tracking |
+| `/mk:budget` | any | Token cost tracking report |
+| `/mk:party [topic]` | 1 | Multi-agent deliberation — 2-4 agents debate, forced synthesis |
+| `/mk:spawn [agent]` | any | Launch parallel agent session |
+| `/mk:upgrade` | any | Self-update MeowKit |
+| `/mk:help` | any | Scan project state, recommend next pipeline step |
+| `/mk:harness "build a X"` | 0→5 | Autonomous green-field build with generator/evaluator loop |
+| `/mk:evaluate` | 4 | Behavioral rubric grading with active verification |
+| `/mk:sprint-contract` | 3 | Draft contract before harness sprint |
+| `/mk:rubric` | 4 | Load/compose rubric preset |
+| `/mk:trace-analyze` | any | Scatter-gather analysis of trace log |
+| `/mk:benchmark` | any | Canary suite (quick tier default; `--full` for 6-task tier) |
+| `/mk:summary` | any | Inspect conversation-summary cache |
 
 ## Agents Quick Reference
 
@@ -84,7 +84,7 @@ persona: B
 | STANDARD | Feature, bug fix, tests | Default (Sonnet) |
 | COMPLEX | Architecture, security, auth | Best (Opus) |
 
-**Domain override:** `meow:scale-routing` at Phase 0. Fintech, healthcare, auth → force COMPLEX regardless of manual classification.
+**Domain override:** `mk:scale-routing` at Phase 0. Fintech, healthcare, auth → force COMPLEX regardless of manual classification.
 
 ## Modes
 
@@ -113,40 +113,40 @@ persona: B
 
 | Skill | Trigger | Output |
 |-------|---------|--------|
-| meow:cook | "build feature" | Full pipeline execution |
-| meow:fix | "fix bug", "debug" | Root cause + fix + regression test |
-| meow:ship | "ship", "deploy", "create PR" | PR URL + rollback docs |
-| meow:review | "review", "check diff" | Verdict: APPROVE/BLOCK |
-| meow:scout | "find files", "search codebase" | File map + architecture fingerprint |
-| meow:investigate | "debug this", "why broken" | Root cause + evidence |
-| meow:docs-finder | "docs for [lib]" | Structured documentation |
-| meow:multimodal | Image/video/audio file | Analysis via Gemini |
-| meow:qa-manual | "test this flow" | QA report or Playwright .spec.ts |
-| meow:cso | "security audit" | OWASP + STRIDE findings |
-| meow:party | "decide architecture" | Multi-agent decision brief |
-| meow:scale-routing | Phase 0 (automatic) | Domain complexity level |
-| meow:worktree | Parallel execution setup | Isolated git worktree |
-| meow:harness | "build a X from scratch" | Autonomous generator/evaluator build loop |
-| meow:evaluate | Harness Phase 4 | Rubric-graded behavioral verdict with evidence |
-| meow:sprint-contract | Harness FULL density | Acceptance criteria contract before sprint |
-| meow:rubric | Evaluator setup | Load/compose rubric preset |
-| meow:trace-analyze | Trace log available | Root cause analysis across trace spans |
-| meow:benchmark | Canary testing | Quick or full canary suite with scored output |
+| mk:cook | "build feature" | Full pipeline execution |
+| mk:fix | "fix bug", "debug" | Root cause + fix + regression test |
+| mk:ship | "ship", "deploy", "create PR" | PR URL + rollback docs |
+| mk:review | "review", "check diff" | Verdict: APPROVE/BLOCK |
+| mk:scout | "find files", "search codebase" | File map + architecture fingerprint |
+| mk:investigate | "debug this", "why broken" | Root cause + evidence |
+| mk:docs-finder | "docs for [lib]" | Structured documentation |
+| mk:multimodal | Image/video/audio file | Analysis via Gemini |
+| mk:qa-manual | "test this flow" | QA report or Playwright .spec.ts |
+| mk:cso | "security audit" | OWASP + STRIDE findings |
+| mk:party | "decide architecture" | Multi-agent decision brief |
+| mk:scale-routing | Phase 0 (automatic) | Domain complexity level |
+| mk:worktree | Parallel execution setup | Isolated git worktree |
+| mk:harness | "build a X from scratch" | Autonomous generator/evaluator build loop |
+| mk:evaluate | Harness Phase 4 | Rubric-graded behavioral verdict with evidence |
+| mk:sprint-contract | Harness FULL density | Acceptance criteria contract before sprint |
+| mk:rubric | Evaluator setup | Load/compose rubric preset |
+| mk:trace-analyze | Trace log available | Root cause analysis across trace spans |
+| mk:benchmark | Canary testing | Quick or full canary suite with scored output |
 
 ## Planning (Phase 1)
 
 | Command | Purpose | Ends with |
 |---------|---------|-----------|
-| `meow:plan-creator` | Create plan from scratch | Print & Stop |
-| `meow:plan-ceo-review` | Product lens review | Print & Stop |
-| `meow:plan-ceo-review` | Engineering lens review | Print & Stop |
-| `/meow:cook [path]` | Begin implementation | Runs pipeline |
+| `mk:plan-creator` | Create plan from scratch | Print & Stop |
+| `mk:plan-ceo-review` | Product lens review | Print & Stop |
+| `mk:plan-ceo-review` | Engineering lens review | Print & Stop |
+| `/mk:cook [path]` | Begin implementation | Runs pipeline |
 
-All three review skills stop after printing — you control when to run `/meow:cook [plan path]`.
+All three review skills stop after printing — you control when to run `/mk:cook [plan path]`.
 
 | Command | What it does |
 |---------|-------------|
-| `/meow:plan "feature"` | Create plan via meow:plan-creator |
+| `/mk:plan "feature"` | Create plan via mk:plan-creator |
 | `npx mewkit task new --type feature "desc"` | Create task from template |
 | `npx mewkit task list` | List active tasks |
 

@@ -100,7 +100,7 @@ Source file: `.claude/agents/SKILLS_INDEX.md`
 - **Monolithic** — Single `SKILL.md` file. Used for skills <150 lines.
 - **Step-file** — `SKILL.md` + `workflow.md` + `step-NN-*.md`. Used for 3+ phases.
 
-Currently step-file enabled: `meow:review` (4 steps).
+Currently step-file enabled: `mk:review` (4 steps).
 
 ## See Also
 

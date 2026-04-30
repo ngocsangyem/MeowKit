@@ -11,7 +11,7 @@ description: "5-dimension structural code review agent that enforces Gate 2 with
 
 The reviewer performs deep structural reviews across five dimensions: architecture fit, type safety, test coverage, security, and performance. It produces a written verdict file at `tasks/reviews/YYMMDD-name-verdict.md` with PASS, FAIL, or PASS WITH NOTES. A FAIL verdict blocks shipping (Gate 2). Every finding must be actionable — no vague feedback.
 
-The reviewer can also invoke the `meow:review` skill for extended capabilities: scope drift detection, adversarial red-teaming, and auto-fix.
+The reviewer can also invoke the `mk:review` skill for extended capabilities: scope drift detection, adversarial red-teaming, and auto-fix.
 
 ## Quick Reference
 
@@ -39,11 +39,11 @@ The reviewer loads these skills depending on the review scope:
 
 | Skill | Purpose | When loaded |
 |-------|---------|------------|
-| `meow:review` | Multi-pass adversarial review with parallel reviewers | Phase 4, explicit invocation |
-| `meow:elicit` | Structured second-pass reasoning (8 methods) — post-verdict deeper analysis | Optional, after verdict |
-| `meow:scout` | Pre-review edge case detection and context gathering | Optional, before review |
-| `meow:cso` | Scope drift detection against original plan | During review |
-| `meow:vulnerability-scanner` | Deep security audit beyond the 5-dimension checklist | When security dimension flags concern |
+| `mk:review` | Multi-pass adversarial review with parallel reviewers | Phase 4, explicit invocation |
+| `mk:elicit` | Structured second-pass reasoning (8 methods) — post-verdict deeper analysis | Optional, after verdict |
+| `mk:scout` | Pre-review edge case detection and context gathering | Optional, before review |
+| `mk:cso` | Scope drift detection against original plan | During review |
+| `mk:vulnerability-scanner` | Deep security audit beyond the 5-dimension checklist | When security dimension flags concern |
 
 ### Review Pipeline
 
@@ -65,20 +65,20 @@ flowchart LR
 
 **Parallel Review:** Three reviewers run simultaneously — Blind Hunter (zero context), Edge Case Hunter (boundary conditions), Criteria Auditor (acceptance criteria). Each is independent to prevent anchoring bias.
 
-**Elicitation (optional):** Post-verdict step using `meow:elicit` to push deeper on any dimension that produced a WARN or borderline PASS. Invoked when the verdict warrants a second-pass challenge.
+**Elicitation (optional):** Post-verdict step using `mk:elicit` to push deeper on any dimension that produced a WARN or borderline PASS. Invoked when the verdict warrants a second-pass challenge.
 
 ## How to Use
 
-The reviewer runs automatically in Phase 4. You can also invoke `meow:review` directly for the extended multi-pass review with adversarial analysis.
+The reviewer runs automatically in Phase 4. You can also invoke `mk:review` directly for the extended multi-pass review with adversarial analysis.
 
 ```bash
 # Automatic (Phase 4 of pipeline)
 # Triggered after developer + tester green phase
 
 # Explicit review with extended capabilities
-/meow:review              # branch diff
-/meow:review #42          # specific PR
-/meow:review --pending    # uncommitted changes
+/mk:review              # branch diff
+/mk:review #42          # specific PR
+/mk:review --pending    # uncommitted changes
 ```
 
 ## Under the Hood

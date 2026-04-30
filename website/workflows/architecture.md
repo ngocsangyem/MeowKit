@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Schema changes, new services, API design, infrastructure decisions  
 **Time estimate:** 30-60 minutes  
-**Skills used:** [meow:office-hours](/reference/skills/office-hours) (brainstorming), [meow:plan-ceo-review](/reference/skills/plan-ceo-review)  
+**Skills used:** [mk:office-hours](/reference/skills/office-hours) (brainstorming), [mk:plan-ceo-review](/reference/skills/plan-ceo-review)  
 **Agents involved:** architect (ADR generation), brainstormer (approach evaluation), researcher (tech research)
 
 ## Overview
@@ -24,7 +24,7 @@ For high-stakes architectural decisions, use **Party Mode** to get multi-agent d
 ### Step 0: Party Mode deliberation (recommended for major decisions)
 
 ```
-/meow:party "Should we use GraphQL or REST for the public API?"
+/mk:party "Should we use GraphQL or REST for the public API?"
 ```
 
 Party Mode spawns 2-4 deliberation agents that independently analyze the question, then synthesize their findings into a single recommendation. No code is written during a party — the output is a decision brief that feeds into the ADR.
@@ -38,7 +38,7 @@ Party Mode — "GraphQL vs REST"
   Synthesis: tRPC for internal APIs, REST for external. GraphQL deferred.
 ```
 
-Use `/meow:party` when:
+Use `/mk:party` when:
 - Two reasonable engineers would disagree on the approach
 - The decision has long-term architectural consequences
 - The cost of the wrong choice exceeds 2 days of rework
@@ -95,10 +95,10 @@ Saved to `docs/architecture/0005-use-trpc-for-internal-api.md`.
 ### Step 4: Engineering review
 
 ```
-/meow:plan-ceo-review
+/mk:plan-ceo-review
 ```
 
-The [meow:plan-ceo-review](/reference/skills/plan-ceo-review) skill validates: data flow correctness, edge cases, test strategy, and performance implications of the architectural decision.
+The [mk:plan-ceo-review](/reference/skills/plan-ceo-review) skill validates: data flow correctness, edge cases, test strategy, and performance implications of the architectural decision.
 
 ## How the architect enforces patterns
 

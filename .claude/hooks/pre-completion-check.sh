@@ -87,7 +87,7 @@ if [ "$HAS_VERIFICATION" -eq 0 ] && [ -f ".claude/memory/trace-log.jsonl" ]; the
   fi
 fi
 
-# 4. meow:review verdict file exists (regular Gate 2)
+# 4. mk:review verdict file exists (regular Gate 2)
 if [ "$HAS_VERIFICATION" -eq 0 ]; then
   for f in tasks/reviews/[0-9]*-"$SLUG"-verdict.md; do
     [ -f "$f" ] && HAS_VERIFICATION=1 && break
@@ -138,7 +138,7 @@ with open('$ATTEMPTS_FILE', 'w') as f:
 " 2>/dev/null || true
 
   cat <<EOF
-{"decision":"block","reason":"Verification missing for active plan '$ACTIVE_PLAN' (attempt $NEW_ATTEMPTS/3). No evaluator verdict, no signed contract, and no test-pass markers found in this session. Run tests, invoke /meow:evaluate, OR sign the sprint contract before stopping."}
+{"decision":"block","reason":"Verification missing for active plan '$ACTIVE_PLAN' (attempt $NEW_ATTEMPTS/3). No evaluator verdict, no signed contract, and no test-pass markers found in this session. Run tests, invoke /mk:evaluate, OR sign the sprint contract before stopping."}
 EOF
   exit 0
 fi

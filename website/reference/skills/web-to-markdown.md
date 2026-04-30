@@ -1,15 +1,15 @@
 ---
-title: "meow:web-to-markdown"
+title: "mk:web-to-markdown"
 description: "Fetch arbitrary URLs as clean markdown with SSRF guard, 6-pass injection scanner, and DATA-boundary content wrapping."
 ---
 
-# meow:web-to-markdown
+# mk:web-to-markdown
 
-Fetch a URL and return clean markdown. Use when the agent needs an arbitrary external page (blog, RFC, GitHub issue, vendor doc) that is not covered by `meow:docs-finder`. Triggers on URLs in chat.
+Fetch a URL and return clean markdown. Use when the agent needs an arbitrary external page (blog, RFC, GitHub issue, vendor doc) that is not covered by `mk:docs-finder`. Triggers on URLs in chat.
 
 ## What This Skill Does
 
-Most documentation flows go through `meow:docs-finder` (Context7 → Context Hub → WebSearch). That works for libraries with curated indexes. But blog posts, RFCs, vendor changelogs, GitHub issues, and one-off vendor pages often aren't in any curated source. `meow:web-to-markdown` is the **tier-4 fallback** — an arbitrary-URL → clean-markdown skill with security defenses suitable for entering untrusted content into the agent context.
+Most documentation flows go through `mk:docs-finder` (Context7 → Context Hub → WebSearch). That works for libraries with curated indexes. But blog posts, RFCs, vendor changelogs, GitHub issues, and one-off vendor pages often aren't in any curated source. `mk:web-to-markdown` is the **tier-4 fallback** — an arbitrary-URL → clean-markdown skill with security defenses suitable for entering untrusted content into the agent context.
 
 ## Core Capabilities
 
@@ -28,33 +28,33 @@ Most documentation flows go through `meow:docs-finder` (Context7 → Context Hub
 
 ## When to Use This
 
-::: tip Use meow:web-to-markdown when...
+::: tip Use mk:web-to-markdown when...
 
-- The URL is a blog post, RFC, GitHub issue, vendor changelog — anything `meow:docs-finder` can't reach
+- The URL is a blog post, RFC, GitHub issue, vendor changelog — anything `mk:docs-finder` can't reach
 - You need clean markdown extraction from a page (not raw HTML)
 - The page is static or you're willing to opt into Playwright for JS rendering
-- You're delegated to it via `meow:docs-finder` tier-4 fallback or another skill passing `--wtm-accept-risk`
+- You're delegated to it via `mk:docs-finder` tier-4 fallback or another skill passing `--wtm-accept-risk`
   :::
 
-::: warning Don't use meow:web-to-markdown when...
+::: warning Don't use mk:web-to-markdown when...
 
-- The URL is in a curated index → use `meow:docs-finder` (Context7/chub/WebSearch)
-- You need interactive browser testing → use `meow:browse` or `meow:agent-browser`
+- The URL is in a curated index → use `mk:docs-finder` (Context7/chub/WebSearch)
+- You need interactive browser testing → use `mk:browse` or `mk:agent-browser`
 - You're delegating without `--wtm-accept-risk` → cross-skill delegation is blocked by design
   :::
 
 ## Cross-skill delegation gate
 
-Other skills MUST pass `--wtm-accept-risk` to delegate a fetch to `meow:web-to-markdown`. Without the flag, those skills CANNOT call web-to-markdown — they fall back to `meow:docs-finder` (Context7/chub/WebSearch). The flag forces conscious crossing of the trust boundary.
+Other skills MUST pass `--wtm-accept-risk` to delegate a fetch to `mk:web-to-markdown`. Without the flag, those skills CANNOT call web-to-markdown — they fall back to `mk:docs-finder` (Context7/chub/WebSearch). The flag forces conscious crossing of the trust boundary.
 
 Documented delegation gates (Phase 3):
 
-- `meow:intake`, `meow:investigate` — skill-level
+- `mk:intake`, `mk:investigate` — skill-level
 - `researcher`, `planner`, `analyst` — agent-level
 
 ## docs-finder integration
 
-`meow:docs-finder` invokes web-to-markdown as **tier-4 fallback** when Context7 / Context Hub / WebSearch all return empty or off-target results. The `--wtm-approve` flag promotes web-to-markdown to **tier-1** (skips Context7/chub/WebSearch entirely) — used when the user knows the target URL is not in any curated index.
+`mk:docs-finder` invokes web-to-markdown as **tier-4 fallback** when Context7 / Context Hub / WebSearch all return empty or off-target results. The `--wtm-approve` flag promotes web-to-markdown to **tier-1** (skips Context7/chub/WebSearch entirely) — used when the user knows the target URL is not in any curated index.
 
 ## Usage
 
@@ -63,10 +63,10 @@ Documented delegation gates (Phase 3):
 https://blog.example.com/post
 
 # Via docs-finder tier-4 fallback (automatic when other tiers fail)
-/meow:docs-finder some obscure topic
+/mk:docs-finder some obscure topic
 
 # Via docs-finder priority override
-/meow:docs-finder https://specific-url.com --wtm-approve
+/mk:docs-finder https://specific-url.com --wtm-approve
 
 # Cross-skill delegation (other skills must pass)
 --wtm-accept-risk

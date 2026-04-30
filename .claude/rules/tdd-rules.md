@@ -42,7 +42,7 @@ GUARD: Production-facing code ALWAYS requires TDD regardless of size. When in do
 
 7. **Refactoring phase.** After tests pass, the developer may refactor but must re-run ALL tests after every refactoring change. No "batch refactor then test" — test after each change.
 
-**Plan-creator integration:** `--tdd` composes with plan-creator modes (e.g., `--hard --tdd`, `--deep --tdd`). When enabled, plan-creator injects 4 TDD sections per phase file: Tests Before, Refactor Opportunities, Tests After, Regression Gate. See `meow:plan-creator workflow.md` variable `tdd_mode`.
+**Plan-creator integration:** `--tdd` composes with plan-creator modes (e.g., `--hard --tdd`, `--deep --tdd`). When enabled, plan-creator injects 4 TDD sections per phase file: Tests Before, Refactor Opportunities, Tests After, Regression Gate. See `mk:plan-creator workflow.md` variable `tdd_mode`.
 
 ## When TDD is disabled (default)
 

@@ -1,8 +1,8 @@
 ---
-title: "meow:lazy-agent-loader"
+title: "mk:lazy-agent-loader"
 description: "Load agent definitions on-demand to reduce context usage — only loads full agent when scoring indicates it's needed."
 ---
-# meow:lazy-agent-loader
+# mk:lazy-agent-loader
 Load agent definitions on-demand to reduce context usage — only loads full agent when scoring indicates it's needed.
 ## What This Skill Does
 Instead of loading all 13 agent definitions at startup (~26,000 tokens), this skill loads only the agent index (~1,000 tokens) and fetches full definitions when a specific agent scores high enough to be activated. Saves 90%+ of context for single-agent tasks.
@@ -11,7 +11,7 @@ Instead of loading all 13 agent definitions at startup (~26,000 tokens), this sk
 - **Scoring-based loading** — Score ≥80: load full definition. 50-79: summary only. <50: skip.
 - **Session cache** — Once loaded, agent stays cached for the session
 ## Usage
-Automatic — used by `meow:agent-detector` for optimized loading.
+Automatic — used by `mk:agent-detector` for optimized loading.
 ::: info Skill Details
 **Phase:** 0  
 **Used by:** orchestrator agent
@@ -23,4 +23,4 @@ Automatic — used by `meow:agent-detector` for optimized loading.
 - **Cache serving stale agent definition**: Agent file updated but cached version used → Invalidate cache on file mtime change
 
 ## Related
-- [`meow:agent-detector`](/reference/skills/agent-detector) — Triggers lazy loading based on scoring
+- [`mk:agent-detector`](/reference/skills/agent-detector) — Triggers lazy loading based on scoring

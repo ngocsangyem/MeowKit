@@ -23,17 +23,17 @@ Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test (RED if --tdd, else op
 **IMPORTANT:** Activate only skills needed for the current task domain.
 **IMPORTANT:** Declare model tier before every task: TRIVIAL · STANDARD · COMPLEX.
 **IMPORTANT:** Non-trivial task (>2 files OR >30 min) = approved plan required before any code.
-**IMPORTANT:** For architectural trade-offs, use `/meow:party` for multi-agent deliberation before deciding.
+**IMPORTANT:** For architectural trade-offs, use `/mk:party` for multi-agent deliberation before deciding.
 **IMPORTANT:** COMPLEX tasks with independent subtasks may use parallel execution (max 3 agents, worktree isolation).
-**IMPORTANT:** For green-field product builds ("build me a kanban app"), prefer `/meow:harness` over `/meow:cook`. Harness picks adaptive scaffolding density (MINIMAL/FULL/LEAN) per model tier.
+**IMPORTANT:** For green-field product builds ("build me a kanban app"), prefer `/mk:harness` over `/mk:cook`. Harness picks adaptive scaffolding density (MINIMAL/FULL/LEAN) per model tier.
 
 ## Orchestrator Entry Point Rule
 
-Two orchestrators exist — `meow:cook` (explicit invocation, single-task pipeline) and `meow:workflow-orchestrator` (auto-invoked on complex-feature intent). Arbitration to avoid duplicate gate enforcement:
+Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). Arbitration to avoid duplicate gate enforcement:
 
-- **Explicit `/meow:cook` invocation** → `meow:cook` owns the full pipeline. `meow:workflow-orchestrator` does NOT activate for the remainder of the session.
-- **Session start with complex-feature intent (no explicit invocation)** → `meow:workflow-orchestrator` activates via autoInvoke and routes through the 7-phase flow. It defers to `meow:cook` for single-task requests.
-- **Never run both in the same session.** If `meow:cook` is active, `meow:workflow-orchestrator` skips its phase loop.
+- **Explicit `/mk:cook` invocation** → `mk:cook` owns the full pipeline. `mk:workflow-orchestrator` does NOT activate for the remainder of the session.
+- **Session start with complex-feature intent (no explicit invocation)** → `mk:workflow-orchestrator` activates via autoInvoke and routes through the 7-phase flow. It defers to `mk:cook` for single-task requests.
+- **Never run both in the same session.** If `mk:cook` is active, `mk:workflow-orchestrator` skips its phase loop.
 
 ## Skill Frontmatter Schema — Additional Fields
 
@@ -51,21 +51,21 @@ What each phase expects and produces. Breaking upstream contracts cascades downs
 
 | Phase     | Skill               | Expects                              | Produces                                                 | Breaks-if-Missing                      |
 | --------- | ------------------- | ------------------------------------ | -------------------------------------------------------- | -------------------------------------- |
-| 0 Orient  | meow:agent-detector | Task description                     | Agent assignment + model tier                            | No routing → wrong agent/tier          |
-| 1 Plan    | meow:plan-creator   | Task with enough detail for scope    | plan.md + phase files                                    | Gate 1 blocks (hook-enforced)          |
-| 2 Test    | meow:testing        | Plan with acceptance criteria        | Failing tests targeting criteria                         | No correctness proof for Phase 3       |
-| 3 Build   | meow:cook           | Approved plan (Gate 1), tests if TDD | Passing code + committed increments                      | Builds wrong thing without plan        |
-| 4 Review  | meow:review         | Committed code with passing tests    | Verdict (PASS/WARN/FAIL per dimension)                   | Can't assess correctness without tests |
-| 5 Ship    | meow:ship           | PASS/WARN verdict (Gate 2)           | PR + branch push                                         | Ships unreviewed code                  |
-| 6 Reflect | meow:memory         | Completed work with decisions        | topic file entries (fixes.md, architecture-decisions.md) | Knowledge lost (non-blocking)          |
+| 0 Orient  | mk:agent-detector | Task description                     | Agent assignment + model tier                            | No routing → wrong agent/tier          |
+| 1 Plan    | mk:plan-creator   | Task with enough detail for scope    | plan.md + phase files                                    | Gate 1 blocks (hook-enforced)          |
+| 2 Test    | mk:testing        | Plan with acceptance criteria        | Failing tests targeting criteria                         | No correctness proof for Phase 3       |
+| 3 Build   | mk:cook           | Approved plan (Gate 1), tests if TDD | Passing code + committed increments                      | Builds wrong thing without plan        |
+| 4 Review  | mk:review         | Committed code with passing tests    | Verdict (PASS/WARN/FAIL per dimension)                   | Can't assess correctness without tests |
+| 5 Ship    | mk:ship           | PASS/WARN verdict (Gate 2)           | PR + branch push                                         | Ships unreviewed code                  |
+| 6 Reflect | mk:memory         | Completed work with decisions        | topic file entries (fixes.md, architecture-decisions.md) | Knowledge lost (non-blocking)          |
 
 ## Adaptive Density (Harness)
 
-For `/meow:harness` runs, the scaffolding density is auto-selected per model tier:
+For `/mk:harness` runs, the scaffolding density is auto-selected per model tier:
 
 | Tier     | Model     | Density | What runs                                         |
 | -------- | --------- | ------- | ------------------------------------------------- |
-| TRIVIAL  | Haiku     | MINIMAL | Short-circuits to `/meow:cook`                    |
+| TRIVIAL  | Haiku     | MINIMAL | Short-circuits to `/mk:cook`                    |
 | STANDARD | Sonnet    | FULL    | Contract + 1–3 iterations + context resets        |
 | COMPLEX  | Opus 4.5  | FULL    | Same as Sonnet                                    |
 | COMPLEX  | Opus 4.6+ | LEAN    | Single-session, contract optional, 0–1 iterations |
@@ -103,17 +103,17 @@ Two hard stops. No bypass. No exceptions.
 
 No two agents modify the same file type. Conflicts → escalate to human.
 
-**Opt-out:** `MEOWKIT_PM_AUTO=off` disables all silent (background) project-manager fires from orchestration skills. User-invoked `/meow:status` is always honored. See `.claude/rules/post-phase-delegation.md` for fire points and skip conditions.
+**Opt-out:** `MEOWKIT_PM_AUTO=off` disables all silent (background) project-manager fires from orchestration skills. User-invoked `/mk:status` is always honored. See `.claude/rules/post-phase-delegation.md` for fire points and skip conditions.
 
 ## Commands vs Skills (they are not the same)
 
 Slash commands live in `.claude/commands/meow/*.md`. They operate in one of 3 valid patterns — NOT every command has a matching SKILL.md, and that is intentional:
 
-1. **Skill-composing** — command chains existing skills (e.g. `/audit` runs `meow:review` + `meow:cso`).
+1. **Skill-composing** — command chains existing skills (e.g. `/audit` runs `mk:review` + `mk:cso`).
 2. **Agent-invoking** — command directly spawns an agent without a skill wrapper (e.g. `/arch` uses the `architect` agent).
-3. **Standalone** — command operates via inline behavior, no skill or agent spawn (e.g. `/design`, `/meow:summary`).
+3. **Standalone** — command operates via inline behavior, no skill or agent spawn (e.g. `/design`, `/mk:summary`).
 
-**Do not flag a command as a "phantom skill" just because no `meow:<command>` SKILL.md exists.** A command is only phantom when BOTH no `meow:<name>` skill AND no `.claude/commands/meow/<name>.md` exist for a reference. See audit-rubric RF-14.
+**Do not flag a command as a "phantom skill" just because no `mk:<command>` SKILL.md exists.** A command is only phantom when BOTH no `mk:<name>` skill AND no `.claude/commands/mk/<name>.md` exist for a reference. See audit-rubric RF-14.
 
 ## Model Routing
 
@@ -127,7 +127,7 @@ Slash commands live in `.claude/commands/meow/*.md`. They operate in one of 3 va
 
 - Non-trivial task → `npx mewkit task new --type [feature|bug-fix|refactor|security] "desc"`
 - Or copy from `tasks/templates/`
-- Skill: `meow:plan-creator` auto-selects right template
+- Skill: `mk:plan-creator` auto-selects right template
 - Modes: `--fast` | `--hard` | `--deep` | `--parallel` | `--two` | `--product-level`. Composable: `--tdd`. Subcommands: `archive`, `red-team {path}`, `validate {path}`.
 
 Task file requires before Phase 3:
@@ -160,20 +160,20 @@ Full rules: `.claude/rules/injection-rules.md`
 
 Read topic files at task start. Update at task end.
 
-- `.claude/memory/fixes.md` + `fixes.json` — bug-class lessons and patterns (meow:fix)
-- `.claude/memory/review-patterns.md` + `review-patterns.json` — review/architecture patterns (meow:review, meow:plan-creator)
-- `.claude/memory/architecture-decisions.md` + `architecture-decisions.json` — architectural decisions (meow:plan-creator, meow:cook)
+- `.claude/memory/fixes.md` + `fixes.json` — bug-class lessons and patterns (mk:fix)
+- `.claude/memory/review-patterns.md` + `review-patterns.json` — review/architecture patterns (mk:review, mk:plan-creator)
+- `.claude/memory/architecture-decisions.md` + `architecture-decisions.json` — architectural decisions (mk:plan-creator, mk:cook)
 - `.claude/memory/cost-log.json` — token usage per task
 - `.claude/memory/decisions.md` — long-form architecture decision records
 - `.claude/memory/security-log.md` — security audit findings
 
 **How to load:** Consumer skills include a "Load memory" step in their SKILL.md.
 **How to write:** Append to the relevant topic file by category. Use `##decision:`, `##pattern:`, `##note:` prefixes for immediate capture.
-**Pruning:** `/meow:memory --prune` archives entries older than 90 days from topic files.
+**Pruning:** `/mk:memory --prune` archives entries older than 90 days from topic files.
 
 ## Docs Retrieval
 
-Use `meow:docs-finder` for any library or API lookup.
+Use `mk:docs-finder` for any library or API lookup.
 Never rely on training data for API signatures.
 MCP chain: Context7 → Context Hub (`npx chub`) → WebSearch
 
@@ -192,8 +192,8 @@ If a script fails — fix it, don't stop.
 
 Keep all project docs in `docs/` and update them as the codebase evolves.
 
-**IMPORTANT:** After shipping features, run `meow:document-release` to update docs.
-**IMPORTANT:** For new projects without docs, run `meow:docs-init` to generate initial docs from codebase analysis.
+**IMPORTANT:** After shipping features, run `mk:document-release` to update docs.
+**IMPORTANT:** For new projects without docs, run `mk:docs-init` to generate initial docs from codebase analysis.
 
 Key docs to maintain:
 

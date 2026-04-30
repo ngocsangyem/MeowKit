@@ -1,15 +1,15 @@
 ---
-title: "meow:ship"
+title: "mk:ship"
 description: "Automated ship pipeline with official/beta modes, adversarial review, issue linking, and PR creation."
 ---
 
-# meow:ship
+# mk:ship
 
 Automated ship pipeline with official/beta modes, adversarial review, issue linking, and PR creation.
 
 ## What This Skill Does
 
-`meow:ship` takes your feature branch from "code complete" to "PR created with CI passing" in one command. It runs a 12-step pipeline: merge the base branch, run tests, audit coverage, review code (including adversarial red-teaming), bump the version, generate changelog, link GitHub issues, create a conventional commit, push, and create a PR. The entire pipeline is non-interactive — it only stops for test failures, critical review issues, or major version decisions.
+`mk:ship` takes your feature branch from "code complete" to "PR created with CI passing" in one command. It runs a 12-step pipeline: merge the base branch, run tests, audit coverage, review code (including adversarial red-teaming), bump the version, generate changelog, link GitHub issues, create a conventional commit, push, and create a PR. The entire pipeline is non-interactive — it only stops for test failures, critical review issues, or major version decisions.
 
 ## Core Capabilities
 
@@ -23,16 +23,16 @@ Automated ship pipeline with official/beta modes, adversarial review, issue link
 
 ## When to Use This
 
-::: tip Use meow:ship when...
+::: tip Use mk:ship when...
 - Code is complete, reviewed, and ready to merge
 - You want the full ship pipeline in one command
 - You need to ship to main (official) or dev (beta) branch
 - You want to preview the ship with `--dry-run` before executing
 :::
 
-::: warning Don't use meow:ship when...
+::: warning Don't use mk:ship when...
 - Code isn't ready — run tests and review first
-- You just want a code review → use [`meow:review`](/reference/skills/review)
+- You just want a code review → use [`mk:review`](/reference/skills/review)
 - You're on the target branch already — ship from a feature branch
 :::
 
@@ -40,34 +40,34 @@ Automated ship pipeline with official/beta modes, adversarial review, issue link
 
 ```bash
 # Auto-detect mode from branch name
-/meow:ship
+/mk:ship
 
 # Explicit: ship to main/master
-/meow:ship official
+/mk:ship official
 
 # Ship to dev/beta branch (lighter pipeline)
-/meow:ship beta
+/mk:ship beta
 
 # Skip tests (when tests already passed this session)
-/meow:ship --skip-tests
+/mk:ship --skip-tests
 
 # Preview without executing
-/meow:ship --dry-run
+/mk:ship --dry-run
 ```
 
 ## Example Prompts
 
 | Prompt | Mode | Target |
 |--------|------|--------|
-| `/meow:ship` | Auto (from branch name) | main if `feature/*`, dev if `dev/*` |
-| `/meow:ship official` | Official | main/master |
-| `/meow:ship beta` | Beta | dev/beta/develop |
-| `/meow:ship --dry-run` | Preview | Shows plan without executing |
+| `/mk:ship` | Auto (from branch name) | main if `feature/*`, dev if `dev/*` |
+| `/mk:ship official` | Official | main/master |
+| `/mk:ship beta` | Beta | dev/beta/develop |
+| `/mk:ship --dry-run` | Preview | Shows plan without executing |
 
 ## Quick Workflow
 
 ```
-/meow:ship
+/mk:ship
   ↓
 Pre-flight → Merge base → Tests → Coverage audit
   → Plan audit → Pre-landing review → Adversarial review
@@ -99,10 +99,10 @@ Output summary after completion:
 - **Version bump conflicts in monorepo**: Multiple packages bump the same version file → Use per-package VERSION files; bump only the package being shipped
 - **CI passing locally but failing remotely**: Local env has different Node version or env vars → Always verify CI status after push; don't merge on local-only results
 - **Adversarial review is Claude-only**: Large-diff reviews run 2 passes (Claude structured + Claude adversarial subagent). No cross-model review is invoked.
-- **Inline lite design check runs only on frontend diffs**: The pre-landing review block calls `meowkit-diff-scope`. If `SCOPE_FRONTEND=false` the design check skips silently. If true, it reads [`meow:review/design-checklist.md`](/reference/skills/review) and applies the 6-category pattern scan. Findings join the Fix-First flow (AUTO-FIX vs ASK vs visual-only).
+- **Inline lite design check runs only on frontend diffs**: The pre-landing review block calls `meowkit-diff-scope`. If `SCOPE_FRONTEND=false` the design check skips silently. If true, it reads [`mk:review/design-checklist.md`](/reference/skills/review) and applies the 6-category pattern scan. Findings join the Fix-First flow (AUTO-FIX vs ASK vs visual-only).
 
 ## Related
 
-- [`meow:review`](/reference/skills/review) — The review pass run during ship
-- [`meow:cook`](/reference/skills/cook) — Includes ship as the final phase
-- [`meow:qa-manual`](/reference/skills/qa-manual) — QA testing before shipping
+- [`mk:review`](/reference/skills/review) — The review pass run during ship
+- [`mk:cook`](/reference/skills/cook) — Includes ship as the final phase
+- [`mk:qa-manual`](/reference/skills/qa-manual) — QA testing before shipping

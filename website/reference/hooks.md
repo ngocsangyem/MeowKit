@@ -24,8 +24,8 @@ These are registered in SKILL.md frontmatter and run when those skills are activ
 
 | Hook               | Skill        | Trigger     | What it does                                      |
 | ------------------ | ------------ | ----------- | ------------------------------------------------- |
-| `check-freeze.sh`  | meow:freeze  | Edit, Write | Block edits outside frozen directory              |
-| `check-careful.sh` | meow:careful | Bash        | Warn on destructive commands (rm -rf, DROP TABLE) |
+| `check-freeze.sh`  | mk:freeze  | Edit, Write | Block edits outside frozen directory              |
+| `check-careful.sh` | mk:careful | Bash        | Warn on destructive commands (rm -rf, DROP TABLE) |
 
 ## Skill-invoked scripts
 
@@ -40,7 +40,7 @@ These run when specific skills call them:
 
 ### `pre-implement.sh` invocation model
 
-`pre-implement.sh` is **NOT** wired to a Claude Code `PreToolUse` event. It is invoked manually by the cook skill via a Bash tool call (see `meow:cook/references/workflow-steps.md` Phase 3 pre-check). This is **behavioral enforcement**, not mechanical — if a different workflow doc is followed, the hook is not invoked.
+`pre-implement.sh` is **NOT** wired to a Claude Code `PreToolUse` event. It is invoked manually by the cook skill via a Bash tool call (see `mk:cook/references/workflow-steps.md` Phase 3 pre-check). This is **behavioral enforcement**, not mechanical — if a different workflow doc is followed, the hook is not invoked.
 
 The hook is a no-op unless TDD mode is ON via:
 
@@ -186,7 +186,7 @@ Registered under both **Stop** and **UserPromptSubmit**. Branches on `$HOOK_EVEN
 
 **Cost:** ~$0.01–$0.02 per long session. Saves ~48KB/turn of full-transcript re-read.
 
-**User-facing inspector:** `/meow:summary` (see [CLI Commands](/cli/commands)).
+**User-facing inspector:** `/mk:summary` (see [CLI Commands](/cli/commands)).
 
 **Security:** summary is DATA per `injection-rules.md`. Output is secret-scrubbed before write. Prompt template forbids instruction-shaped content in the summary body.
 
@@ -240,7 +240,7 @@ node dispatch.cjs <EventName> [Matcher]
 | `session-state/conversation-summary.lock`   | `conversation-summary-cache.sh` (Stop bg worker) | Phase 9 mutex preventing overlapping background summarizers    |
 | `.claude/memory/conversation-summary.md`    | `conversation-summary-cache.sh` (Stop bg worker) | Phase 9 cache — read by UserPromptSubmit hook every turn       |
 | `session-state/learning-observer.jsonl`     | `learning-observer.sh`                           | Churn pattern log                                              |
-| `session-state/active-plan`                 | `meow:harness`, `meow:plan-creator`              | Currently active plan slug (read by `pre-completion-check.sh`) |
+| `session-state/active-plan`                 | `mk:harness`, `mk:plan-creator`              | Currently active plan slug (read by `pre-completion-check.sh`) |
 | `session-state/last-session-id`             | `project-context-loader.sh`                      | Session change detection                                       |
 
 ## Env Var Bypasses

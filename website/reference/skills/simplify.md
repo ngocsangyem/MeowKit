@@ -1,23 +1,23 @@
 ---
-title: "meow:simplify"
+title: "mk:simplify"
 description: "Post-implementation complexity reduction. Removes dead code, unnecessary abstractions, and over-engineering between Phase 3 (Build) and Phase 4 (Review)."
 ---
 
-# meow:simplify
+# mk:simplify
 
-Post-implementation simplification pass. Reduces complexity without changing behavior. Mandatory in meow:cook between Phase 3 (Build GREEN) and Phase 4 (Review).
+Post-implementation simplification pass. Reduces complexity without changing behavior. Mandatory in mk:cook between Phase 3 (Build GREEN) and Phase 4 (Review).
 
 ## What This Skill Does
 
-After implementation is complete and tests pass, meow:simplify scans modified files for complexity signals — dead code, unnecessary abstractions, over-engineering, redundant patterns — and removes them before the reviewer sees the code. The iron rule: behavior must not change. Every simplification must pass the same tests as before.
+After implementation is complete and tests pass, mk:simplify scans modified files for complexity signals — dead code, unnecessary abstractions, over-engineering, redundant patterns — and removes them before the reviewer sees the code. The iron rule: behavior must not change. Every simplification must pass the same tests as before.
 
 ## When to Use
 
-::: tip Mandatory in meow:cook
-meow:simplify runs automatically between Phase 3 (Build) and Phase 4 (Review) in the meow:cook pipeline. This is enforced since v2.0.
+::: tip Mandatory in mk:cook
+mk:simplify runs automatically between Phase 3 (Build) and Phase 4 (Review) in the mk:cook pipeline. This is enforced since v2.0.
 
 ```
-Phase 2 (Test — RED if `--tdd`) → Phase 3 (Build) → [meow:simplify] → Phase 4 (Review)
+Phase 2 (Test — RED if `--tdd`) → Phase 3 (Build) → [mk:simplify] → Phase 4 (Review)
 ```
 :::
 
@@ -61,6 +61,6 @@ Can also be invoked standalone when you want to reduce complexity in existing co
 
 ## Related
 
-- [meow:cook](/reference/skills/cook) — pipeline skill that mandates meow:simplify before Phase 4
-- [meow:clean-code](/reference/skills/clean-code) — pragmatic coding standards (SRP, DRY, KISS)
-- [meow:review](/reference/skills/review) — Phase 4 review that sees the simplified code
+- [mk:cook](/reference/skills/cook) — pipeline skill that mandates mk:simplify before Phase 4
+- [mk:clean-code](/reference/skills/clean-code) — pragmatic coding standards (SRP, DRY, KISS)
+- [mk:review](/reference/skills/review) — Phase 4 review that sees the simplified code

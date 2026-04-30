@@ -15,16 +15,16 @@ Adaptive density operationalizes this finding. The harness checks the model tier
 
 ## The Four Tiers
 
-This is a simplified view. The canonical decision matrix with per-cell rationale lives at `.claude/skills/meow:harness/references/adaptive-density-matrix.md`.
+This is a simplified view. The canonical decision matrix with per-cell rationale lives at `.claude/skills/harness/references/adaptive-density-matrix.md`.
 
 | Tier | Model | Density | Planner | Contract | Iteration | Context Reset | Rubric |
 |---|---|---|---|---|---|---|---|
-| TRIVIAL | Haiku | MINIMAL | Skip (use `meow:cook`) | Skip | Skip | Skip | Skip |
+| TRIVIAL | Haiku | MINIMAL | Skip (use `mk:cook`) | Skip | Skip | Skip | Skip |
 | STANDARD | Sonnet | FULL | Product-level | Required | 1–3 rounds | Optional | Full |
 | COMPLEX | Opus 4.5 | FULL | Product-level | Required | 2–3 rounds | Required | Full |
 | COMPLEX | Opus 4.6+ | LEAN | Product-level | Optional | 0–1 round | Skip | Full |
 
-**MINIMAL (Haiku):** the harness short-circuits immediately to `meow:cook`. Haiku can execute focused tasks but can't drive a multi-hour iteration loop productively. The scaffolding overhead would exceed the value.
+**MINIMAL (Haiku):** the harness short-circuits immediately to `mk:cook`. Haiku can execute focused tasks but can't drive a multi-hour iteration loop productively. The scaffolding overhead would exceed the value.
 
 **FULL (Sonnet, Opus 4.5):** full pipeline with everything on. Contract required to prevent silent feature substitution. Context resets required for Opus 4.5 because working memory degrades over long sessions. Sonnet benefits from up to 3 iteration rounds.
 
@@ -34,10 +34,10 @@ This is a simplified view. The canonical decision matrix with per-cell rationale
 
 ## How It's Selected
 
-`meow:scale-routing` emits a `harness_density` field (`MINIMAL | FULL | LEAN`) based on detected model tier and model string. The resolution order:
+`mk:scale-routing` emits a `harness_density` field (`MINIMAL | FULL | LEAN`) based on detected model tier and model string. The resolution order:
 
 1. `MEOWKIT_HARNESS_MODE` env var (highest priority) — `MINIMAL`, `FULL`, or `LEAN`
-2. `--tier` flag on `/meow:harness` — `auto`, `minimal`, `full`, `lean`
+2. `--tier` flag on `/mk:harness` — `auto`, `minimal`, `full`, `lean`
 3. `model-detector.cjs` (SessionStart handler, v2.3.0) — reads the `model` field from SessionStart stdin JSON and writes the detected tier + density to `session-state/detected-model.json`
 4. `MEOWKIT_MODEL_HINT` env var — fallback when stdin `model` field is absent
 5. (none) → defaults to STANDARD tier → FULL density (safe fallback)
@@ -66,7 +66,7 @@ export MEOWKIT_MODEL_HINT=opus-4-6
 Or pass the flag per-run:
 
 ```bash
-/meow:harness "build a kanban app" --tier lean
+/mk:harness "build a kanban app" --tier lean
 ```
 
 Or force it session-wide:
@@ -104,7 +104,7 @@ Full playbook: `docs/dead-weight-audit.md`.
 
 ## Canonical Source
 
-`.claude/skills/meow:harness/references/adaptive-density-matrix.md` is the single source of truth. This page embeds a simplified 4-row view; the canonical matrix includes per-cell rationale and anti-patterns.
+`.claude/skills/harness/references/adaptive-density-matrix.md` is the single source of truth. This page embeds a simplified 4-row view; the canonical matrix includes per-cell rationale and anti-patterns.
 
 ## Related
 

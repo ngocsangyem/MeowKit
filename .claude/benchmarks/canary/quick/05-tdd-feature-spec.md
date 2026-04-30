@@ -15,7 +15,7 @@ requires_tdd_mode: true
 > Manual reproduction (no automated runner exists yet):
 > ```bash
 > mkdir -p .claude/session-state && echo on > .claude/session-state/tdd-mode
-> /meow:cook --tdd "build a slugify function per .claude/benchmarks/canary/quick/05-tdd-feature-spec.md"
+> /mk:cook --tdd "build a slugify function per .claude/benchmarks/canary/quick/05-tdd-feature-spec.md"
 > ```
 
 Build a `slugify(title: string): string` function using strict TDD (Phase 2 RED → Phase 3 GREEN). Tests must be written FIRST and FAIL before any implementation exists.

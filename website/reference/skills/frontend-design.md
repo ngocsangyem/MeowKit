@@ -1,15 +1,15 @@
 ---
-title: "meow:frontend-design"
+title: "mk:frontend-design"
 description: "Production-grade UI/UX design with anti-AI-slop checklist, WCAG accessibility, typography hierarchy, and responsive patterns."
 ---
 
-# meow:frontend-design
+# mk:frontend-design
 
 Production-grade UI/UX design with anti-AI-slop checklist, WCAG accessibility, typography hierarchy, and responsive patterns.
 
 ## What This Skill Does
 
-`meow:frontend-design` prevents AI-generated interfaces from looking like AI-generated interfaces. It enforces specific, opinionated design rules across typography, color, spacing, motion, and accessibility — and requires every output to pass a 10-point anti-slop checklist before delivery. The checklist targets the exact patterns that make AI-generated UIs look generic: system font stacks, pure black-on-white, centered-everything layouts, gratuitous gradients, and Lorem ipsum.
+`mk:frontend-design` prevents AI-generated interfaces from looking like AI-generated interfaces. It enforces specific, opinionated design rules across typography, color, spacing, motion, and accessibility — and requires every output to pass a 10-point anti-slop checklist before delivery. The checklist targets the exact patterns that make AI-generated UIs look generic: system font stacks, pure black-on-white, centered-everything layouts, gratuitous gradients, and Lorem ipsum.
 
 ## Core Capabilities
 
@@ -23,7 +23,7 @@ Production-grade UI/UX design with anti-AI-slop checklist, WCAG accessibility, t
 
 ## When to Use This
 
-::: tip Use meow:frontend-design when...
+::: tip Use mk:frontend-design when...
 - Styling new UI components
 - Reviewing design quality before shipping
 - Fixing "it looks like AI made this" problems
@@ -35,10 +35,10 @@ Production-grade UI/UX design with anti-AI-slop checklist, WCAG accessibility, t
 
 ```bash
 # Auto-activates on design/styling tasks
-/meow:frontend-design improve the dashboard layout
-/meow:frontend-design review this component's design
-/meow:frontend-design set up design tokens
-/meow:frontend-design check accessibility
+/mk:frontend-design improve the dashboard layout
+/mk:frontend-design review this component's design
+/mk:frontend-design set up design tokens
+/mk:frontend-design check accessibility
 ```
 
 ## Example Prompts
@@ -67,5 +67,5 @@ Detect task → Load design-rules.md reference
 
 ## Related
 
-- [`meow:vue`](/reference/skills/vue) — Vue component patterns
-- [`meow:typescript`](/reference/skills/typescript) — TypeScript for frontend
+- [`mk:vue`](/reference/skills/vue) — Vue component patterns
+- [`mk:typescript`](/reference/skills/typescript) — TypeScript for frontend

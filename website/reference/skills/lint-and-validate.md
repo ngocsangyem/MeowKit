@@ -1,8 +1,8 @@
 ---
-title: "meow:lint-and-validate"
+title: "mk:lint-and-validate"
 description: "Automatic quality control — runs linting, type checking, and security scanning after every code change."
 ---
-# meow:lint-and-validate
+# mk:lint-and-validate
 Automatic quality control — runs linting, type checking, and security scanning after every code change.
 ## What This Skill Does
 Enforces the quality loop: write code → run lint → run typecheck → fix errors → repeat until clean. Supports Node.js/TypeScript (`npm run lint`, `npx tsc --noEmit`) and Python (`ruff check`, `mypy`). No code is committed or reported as "done" without passing these checks.
@@ -19,5 +19,5 @@ Auto-activates after every code modification. Also triggered by: "lint", "format
 :::
 
 ## Related
-- [`meow:clean-code`](/reference/skills/clean-code) — Coding standards (principles)
+- [`mk:clean-code`](/reference/skills/clean-code) — Coding standards (principles)
 - [Hooks](/reference/hooks) — `post-write.sh` also runs security checks automatically

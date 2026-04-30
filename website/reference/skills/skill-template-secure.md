@@ -1,9 +1,9 @@
 ---
-title: "meow:skill-template-secure"
+title: "mk:skill-template-secure"
 description: "Secure skill template with prompt injection defenses — copy when creating skills that process untrusted input."
 ---
 
-# meow:skill-template-secure
+# mk:skill-template-secure
 
 Secure skill template with prompt injection defenses — copy when creating skills that process untrusted input.
 
@@ -22,7 +22,7 @@ This is a **template**, not an executable skill. Copy it when creating new skill
 
 ```bash
 # When creating a new skill that processes external content:
-/meow:skill-creator meow:my-api-fetcher
+/mk:skill-creator mk:my-api-fetcher
 
 # Then apply the secure template's patterns:
 # 1. Add Trust Model table
@@ -42,5 +42,5 @@ This is a **template**, not an executable skill. Copy it when creating new skill
 
 ## Related
 
-- [`meow:skill-creator`](/reference/skills/skill-creator) — Uses this template during skill creation
+- [`mk:skill-creator`](/reference/skills/skill-creator) — Uses this template during skill creation
 - [Security Rules](/reference/configuration) — MeowKit's broader security framework

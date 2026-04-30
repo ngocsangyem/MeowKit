@@ -1,15 +1,15 @@
 ---
-title: "meow:multimodal"
+title: "mk:multimodal"
 description: "Multi-provider media analysis and generation via Gemini, MiniMax, and OpenRouter with intelligent fallback."
 ---
 
-# meow:multimodal
+# mk:multimodal
 
 Multi-provider media processing: analyze images/video/audio/PDFs, generate images/videos/speech/music, convert documents to Markdown. Intelligent provider fallback (Gemini → MiniMax → OpenRouter), all configurable via `.env`.
 
 ## What This Skill Does
 
-Claude can't natively process binary media files. `meow:multimodal` bridges this gap with Python scripts that call Gemini and MiniMax APIs. Provider routing is automatic — set API keys, the router picks the best available. TTS and music generation are MiniMax-exclusive capabilities.
+Claude can't natively process binary media files. `mk:multimodal` bridges this gap with Python scripts that call Gemini and MiniMax APIs. Provider routing is automatic — set API keys, the router picks the best available. TTS and music generation are MiniMax-exclusive capabilities.
 
 ## Core Capabilities
 
@@ -91,5 +91,5 @@ Force a specific provider: `--provider gemini|minimax|openrouter`
 
 ## Related
 
-- [`meow:docs-finder`](/reference/skills/docs-finder) — For text-based documentation
-- [`meow:qa-manual`](/reference/skills/qa-manual) — Uses browser screenshots for visual QA
+- [`mk:docs-finder`](/reference/skills/docs-finder) — For text-based documentation
+- [`mk:qa-manual`](/reference/skills/qa-manual) — Uses browser screenshots for visual QA

@@ -1,28 +1,28 @@
 ---
-title: "meow:fix"
+title: "mk:fix"
 description: "Structured bug investigation and fix with auto-complexity detection, parallel exploration, and multiple workflow modes."
 ---
 
-# meow:fix
+# mk:fix
 
 Structured bug investigation and fix with auto-complexity detection, parallel exploration, and multiple workflow modes.
 
 ## What This Skill Does
 
-`meow:fix` is MeowKit's debugging pipeline. Instead of immediately editing code when you report a bug, it forces a structured investigation: assess complexity, choose the right workflow, find the root cause, write a regression test, then apply the minimal fix. The skill adapts its approach based on how complex the bug is — a typo gets a quick fix, while a cross-module race condition gets the full investigation treatment.
+`mk:fix` is MeowKit's debugging pipeline. Instead of immediately editing code when you report a bug, it forces a structured investigation: assess complexity, choose the right workflow, find the root cause, write a regression test, then apply the minimal fix. The skill adapts its approach based on how complex the bug is — a typo gets a quick fix, while a cross-module race condition gets the full investigation treatment.
 
 ## Core Capabilities
 
 - **Auto-complexity assessment** — Classifies bugs as Quick (typo, config), Standard (logic, one module), or Deep (cross-cutting, architectural)
 - **Four fix modes** — Autonomous (default), human-in-the-loop review, quick (for trivial issues), parallel (for multi-file problems)
-- **Root cause methodology** — Uses `meow:investigate` for systematic 5-phase debugging
+- **Root cause methodology** — Uses `mk:investigate` for systematic 5-phase debugging
 - **Parallel exploration** — Spawns multiple Explore subagents to verify hypotheses simultaneously
 - **Regression test guarantee** — Every fix includes a test that fails without the fix and passes with it
-- **Scope locking** — Uses `meow:freeze` to restrict edits to affected modules, preventing scope creep
+- **Scope locking** — Uses `mk:freeze` to restrict edits to affected modules, preventing scope creep
 
 ## When to Use This
 
-::: tip Use meow:fix when...
+::: tip Use mk:fix when...
 - You've found a bug and need it investigated properly
 - Tests are failing and you need to understand why
 - A CI/CD pipeline is broken
@@ -30,8 +30,8 @@ Structured bug investigation and fix with auto-complexity detection, parallel ex
 - Type errors, lint failures, or UI glitches need fixing
 :::
 
-::: warning Don't use meow:fix when...
-- You're building a new feature → use [`meow:cook`](/reference/skills/cook)
+::: warning Don't use mk:fix when...
+- You're building a new feature → use [`mk:cook`](/reference/skills/cook)
 - The issue is a design/architecture concern → use architect agent
 :::
 
@@ -39,26 +39,26 @@ Structured bug investigation and fix with auto-complexity detection, parallel ex
 
 ```bash
 # Default — autonomous mode, auto-detects complexity
-/meow:fix login fails after 24 hours
+/mk:fix login fails after 24 hours
 
 # Review mode — pauses for approval at each step
-/meow:fix payment processing timeout --review
+/mk:fix payment processing timeout --review
 
 # Quick mode — for trivial issues (typos, lint, config)
-/meow:fix TypeScript error in auth.ts --quick
+/mk:fix TypeScript error in auth.ts --quick
 
 # Parallel mode — spawns agents per issue for multi-file problems
-/meow:fix all failing tests in checkout module --parallel
+/mk:fix all failing tests in checkout module --parallel
 ```
 
 ## Example Prompts
 
 | Prompt | Complexity | Mode |
 |--------|-----------|------|
-| `/meow:fix typo in README.md` | Quick | Quick — direct fix, no investigation |
-| `/meow:fix session token not refreshed` | Standard | Autonomous — investigate → fix → test |
-| `/meow:fix intermittent race condition in payment queue` | Deep | Full investigation with parallel exploration |
-| `/meow:fix CI failing on main branch` | Standard | Autonomous — check CI logs, reproduce, fix |
+| `/mk:fix typo in README.md` | Quick | Quick — direct fix, no investigation |
+| `/mk:fix session token not refreshed` | Standard | Autonomous — investigate → fix → test |
+| `/mk:fix intermittent race condition in payment queue` | Deep | Full investigation with parallel exploration |
+| `/mk:fix CI failing on main branch` | Standard | Autonomous — check CI logs, reproduce, fix |
 
 ## Fix Pipeline (7 steps)
 
@@ -69,8 +69,8 @@ flowchart TD
     B1 -->|known pattern found| K[Step 4: Apply Known Fix]
     B1 -->|no match| C[Step 1: Scout — MANDATORY]
     C --> D[Step 2: Diagnose]
-    D --> D1[meow:investigate — collect evidence]
-    D1 --> D2[meow:sequential-thinking — hypothesize + eliminate]
+    D --> D1[mk:investigate — collect evidence]
+    D1 --> D2[mk:sequential-thinking — hypothesize + eliminate]
     D2 --> E{Root cause confirmed?}
     E -->|Yes| F[Step 3: Complexity Assessment]
     E -->|No| D1
@@ -91,8 +91,8 @@ flowchart TD
 |------|-------------|-------------|
 | 0 | Mode selection | AskUserQuestion (Autonomous/HITL/Quick) |
 | 0.5 | **Check fix memory** | Read `.claude/memory/fixes.md` + `fixes.json` for known fix patterns |
-| 1 | **Scout (mandatory)** | meow:scout — map files, deps, tests |
-| 2 | **Diagnose** | meow:investigate + meow:sequential-thinking |
+| 1 | **Scout (mandatory)** | mk:scout — map files, deps, tests |
+| 2 | **Diagnose** | mk:investigate + mk:sequential-thinking |
 | 3 | Complexity assessment | Route to Quick/Standard/Deep |
 | 4 | Fix implementation | Address ROOT CAUSE, not symptoms |
 | 5 | **Verify + prevent (mandatory)** | Regression test + defense-in-depth |
@@ -105,7 +105,7 @@ After every fix, Step 6 writes the fix pattern to `.claude/memory/fixes.json`. N
 ```
 Fix bug #1 → write pattern to fixes.json (frequency: 1)
 Fix bug #2 (same class) → read fixes.json → skip full diagnosis → apply known fix
-After 3+ fixes → pattern promoted to CLAUDE.md rule (via meow:memory)
+After 3+ fixes → pattern promoted to CLAUDE.md rule (via mk:memory)
 ```
 
 ::: info Skill Details
@@ -115,12 +115,12 @@ After 3+ fixes → pattern promoted to CLAUDE.md rule (via meow:memory)
 
 ## Gotchas
 
-- **Fixing symptoms not root cause**: Quick patch makes the test pass but underlying issue remains → Always investigate before implementing; use meow:investigate first
+- **Fixing symptoms not root cause**: Quick patch makes the test pass but underlying issue remains → Always investigate before implementing; use mk:investigate first
 - **Regression in adjacent code**: Fix in one module breaks an unstated dependency → Run full test suite, not just tests for the changed file
 - **Test mocking hiding real failures**: Mocked tests pass but real integration fails → Prefer integration tests for bug fixes; mock only external services
 
 ## Related
 
-- [`meow:investigate`](/reference/skills/investigate) — The debugging methodology used inside fix
-- [`meow:cook`](/reference/skills/cook) — Full pipeline for new features
-- [`meow:scout`](/reference/skills/scout) — Helps find relevant files during investigation
+- [`mk:investigate`](/reference/skills/investigate) — The debugging methodology used inside fix
+- [`mk:cook`](/reference/skills/cook) — Full pipeline for new features
+- [`mk:scout`](/reference/skills/scout) — Helps find relevant files during investigation

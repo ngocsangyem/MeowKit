@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Active developers  
 **Time estimate:** 15-60 minutes (depends on feature size)  
-**Skills used:** [meow:cook](/reference/skills/cook), [meow:plan-creator](/reference/skills/plan-creator), [meow:review](/reference/skills/review), [meow:ship](/reference/skills/ship)
+**Skills used:** [mk:cook](/reference/skills/cook), [mk:plan-creator](/reference/skills/plan-creator), [mk:review](/reference/skills/review), [mk:ship](/reference/skills/ship)
 
 ## Overview
 
@@ -21,14 +21,14 @@ This is the most common MeowKit workflow. You describe a feature, and MeowKit or
 ### Step 1: Start the pipeline
 
 ```
-/meow:cook add shopping cart with quantity management
+/mk:cook add shopping cart with quantity management
 ```
 
 The **orchestrator** classifies this as STANDARD complexity (feature, <5 files expected) and assigns Sonnet as the model tier.
 
 ### Step 2: Smart intent detection
 
-The [meow:cook](/reference/skills/cook) skill detects your intent from the input:
+The [mk:cook](/reference/skills/cook) skill detects your intent from the input:
 
 | Your input | Detected mode | What happens |
 |------------|--------------|--------------|
@@ -75,7 +75,7 @@ Tester: "Writing tests for cart store and components..."
 
 The `pre-implement.sh` hook blocks the **developer** from writing code until these tests exist (in TDD mode).
 
-**Default mode (TDD off):** Phase 2 is skipped — the developer goes directly to implementation. The tester may be invoked on-request (e.g., `/meow:test` after implementation) or for plan-coverage reasons. `pre-implement.sh` is a no-op.
+**Default mode (TDD off):** Phase 2 is skipped — the developer goes directly to implementation. The tester may be invoked on-request (e.g., `/mk:test` after implementation) or for plan-coverage reasons. `pre-implement.sh` is a no-op.
 
 ### Step 5: Implementation (Phase 3)
 

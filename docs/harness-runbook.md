@@ -1,14 +1,14 @@
 # Harness Runbook
 
-User-facing guide to running `/meow:harness` for autonomous multi-hour product builds.
+User-facing guide to running `/mk:harness` for autonomous multi-hour product builds.
 
 ## What Is the Harness
 
-`meow:harness` is meowkit's autonomous build pipeline. You describe a green-field product in plain English ("build me a kanban app", "make a retro game maker") and the harness orchestrates planner → contract → generator → evaluator → ship without manual handholding.
+`mk:harness` is meowkit's autonomous build pipeline. You describe a green-field product in plain English ("build me a kanban app", "make a retro game maker") and the harness orchestrates planner → contract → generator → evaluator → ship without manual handholding.
 
-It's distinct from `meow:cook`:
+It's distinct from `mk:cook`:
 
-| Use `/meow:cook` for | Use `/meow:harness` for |
+| Use `/mk:cook` for | Use `/mk:harness` for |
 |---|---|
 | Single feature | Whole product / app |
 | Bug fix | Green-field build |
@@ -18,7 +18,7 @@ It's distinct from `meow:cook`:
 ## Quick Start
 
 ```bash
-/meow:harness "build a kanban app"
+/mk:harness "build a kanban app"
 ```
 
 The harness picks the right scaffolding density based on your model tier and runs the full pipeline.
@@ -40,7 +40,7 @@ The harness scales scaffolding to model capability per the dead-weight thesis:
 
 | Mode | Tier | What runs |
 |---|---|---|
-| **MINIMAL** | TRIVIAL (Haiku) | Short-circuits to `meow:cook`. No contract, no iteration. |
+| **MINIMAL** | TRIVIAL (Haiku) | Short-circuits to `mk:cook`. No contract, no iteration. |
 | **FULL** | STANDARD (Sonnet), COMPLEX (Opus 4.5) | Full pipeline: contract required, 1–3 iteration rounds, context resets between steps. |
 | **LEAN** | COMPLEX (Opus 4.6+) | Single-session: contract optional, 0–1 iteration, no context reset. Trusts the model's adaptive reasoning. |
 
@@ -100,7 +100,7 @@ export MEOWKIT_MODEL_HINT=opus-4-6
 OR pass the flag:
 
 ```bash
-/meow:harness "build X" --tier lean
+/mk:harness "build X" --tier lean
 ```
 
 ### "Budget breach at iteration 2"
@@ -126,7 +126,7 @@ Fix the product spec OR explicitly skip the contract via `MEOWKIT_HARNESS_MODE=L
 ### "I want to resume a killed run"
 
 ```bash
-/meow:harness --resume {run-id}
+/mk:harness --resume {run-id}
 ```
 
 The harness reads `tasks/harness-runs/{run-id}/run.md` to find the last completed step and continues from there. Iteration counter is durable in the frontmatter; cost trail is in `cost-log.json`.
@@ -172,8 +172,8 @@ export MEOWKIT_SUMMARY_GROWTH_DELTA=10240      # require 10KB growth between sum
 
 ## See Also
 
-- `.claude/skills/meow:harness/SKILL.md` — full skill specification
-- `.claude/skills/meow:harness/references/adaptive-density-matrix.md` — density decision matrix
-- `.claude/skills/meow:harness/references/agent-teams-vs-subagents.md` — when to use `--teams`
+- `.claude/skills/harness/SKILL.md` — full skill specification
+- `.claude/skills/harness/references/adaptive-density-matrix.md` — density decision matrix
+- `.claude/skills/harness/references/agent-teams-vs-subagents.md` — when to use `--teams`
 - `docs/dead-weight-audit.md` — playbook for keeping the harness pruned
 - `.claude/rules/harness-rules.md` — discipline core

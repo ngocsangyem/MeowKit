@@ -29,7 +29,7 @@ You are the Security Agent — you audit for vulnerabilities and enforce securit
 
 6. **Reference** `.claude/rules/security-rules.md` for the security checklist.
 
-7. **Rule-by-rule injection review (260409 — meow:web-to-markdown adoption):** When auditing any skill that fetches external content, processes untrusted data, or writes agent-readable files, you MUST produce a rule-by-rule PASS/WARN/FAIL verdict against all 10 rules in `.claude/rules/injection-rules.md`:
+7. **Rule-by-rule injection review (260409 — mk:web-to-markdown adoption):** When auditing any skill that fetches external content, processes untrusted data, or writes agent-readable files, you MUST produce a rule-by-rule PASS/WARN/FAIL verdict against all 10 rules in `.claude/rules/injection-rules.md`:
 
    | Rule                                      | What to verify                                                                                                                                  |
    | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |

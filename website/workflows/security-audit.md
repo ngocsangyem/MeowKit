@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Before releases, after incidents, onboarding new codebases  
 **Time estimate:** 15-30 minutes  
-**Skills used:** [meow:cso](/reference/skills/cso), [meow:vulnerability-scanner](/reference/skills/vulnerability-scanner)  
+**Skills used:** [mk:cso](/reference/skills/cso), [mk:vulnerability-scanner](/reference/skills/vulnerability-scanner)  
 **Agents involved:** security (auto-inserts on auth/payments)
 
 ## Overview
@@ -23,16 +23,16 @@ MeowKit offers two levels of security scanning. The **vulnerability-scanner** do
 
 ```bash
 # Quick code-level scan
-/meow:vulnerability-scanner
+/mk:vulnerability-scanner
 
 # Full CSO audit — daily mode (high confidence, zero noise)
-/meow:cso
+/mk:cso
 
 # Deep scan — comprehensive mode (lower threshold, more findings)
-/meow:cso comprehensive
+/mk:cso comprehensive
 
 # Scan specific directory
-/meow:cso src/api/
+/mk:cso src/api/
 ```
 
 ### Step 2: Understand the 14-phase CSO audit

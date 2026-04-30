@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Developers picking up tickets from sprint backlog
 **Time estimate:** Varies by ticket complexity
-**Skills used:** [meow:jira](/reference/skills/jira), [meow:planning-engine](/reference/skills/planning-engine), [meow:scout](/reference/skills/scout), [meow:plan-creator](/reference/skills/plan-creator), [meow:cook](/reference/skills/cook), [meow:review](/reference/skills/review), [meow:ship](/reference/skills/ship)
+**Skills used:** [mk:jira](/reference/skills/jira), [mk:planning-engine](/reference/skills/planning-engine), [mk:scout](/reference/skills/scout), [mk:plan-creator](/reference/skills/plan-creator), [mk:cook](/reference/skills/cook), [mk:review](/reference/skills/review), [mk:ship](/reference/skills/ship)
 
 ## The Flow
 
@@ -28,13 +28,13 @@ Read the ticket and assess what's needed:
 
 ```bash
 # Read full ticket details (description, AC, comments, attachments, links)
-/meow:jira analyze AUTH-201
+/mk:jira analyze AUTH-201
 
 # Evaluate complexity (if not already done in sprint planning)
-/meow:jira evaluate AUTH-201
+/mk:jira evaluate AUTH-201
 
 # Check story points / estimation
-/meow:jira estimate AUTH-201
+/mk:jira estimate AUTH-201
 ```
 
 **What you get:** Analysis report with gaps flagged, complexity assessment, story point suggestion.
@@ -42,7 +42,7 @@ Read the ticket and assess what's needed:
 **If the ticket is unclear:**
 - Check `[MISSING]` and `[AMBIGUOUS]` flags in the evaluation
 - Ask the PO to clarify before proceeding
-- Update the ticket: `/meow:jira update AUTH-201 --set description="..."`
+- Update the ticket: `/mk:jira update AUTH-201 --set description="..."`
 
 ### Step 2: Review against codebase
 
@@ -50,10 +50,10 @@ Understand what code needs to change:
 
 ```bash
 # Scout the codebase first
-/meow:scout
+/mk:scout
 
 # Tech review: ticket vs codebase
-/meow:planning-engine review AUTH-201 --scout
+/mk:planning-engine review AUTH-201 --scout
 ```
 
 **What you get:** Tech Review Report — affected files, feasibility rating, dependencies, risks, complexity signals.
@@ -63,20 +63,20 @@ Understand what code needs to change:
 ```bash
 # Investigate the root cause (works on local codebase — 
 # paste the ticket description and repro steps when prompted)
-/meow:investigate
+/mk:investigate
 ```
 
-Note: `meow:investigate` operates on your local codebase, not directly on Jira. Copy the bug description and reproduction steps from the ticket analysis into the investigation prompt.
+Note: `mk:investigate` operates on your local codebase, not directly on Jira. Copy the bug description and reproduction steps from the ticket analysis into the investigation prompt.
 
 ### Step 3: Transition ticket
 
 Move the ticket to "In Progress":
 
 ```bash
-/meow:jira transition AUTH-201 "In Progress"
+/mk:jira transition AUTH-201 "In Progress"
 ```
 
-If the transition requires fields (e.g., resolution), meow:jira will prompt you.
+If the transition requires fields (e.g., resolution), mk:jira will prompt you.
 
 **If the ticket is already in a terminal state** (Done, Deployed, Closed): you may need to reopen it first. Check available transitions — if none exist for "In Progress", ask your team lead about the reopen workflow.
 
@@ -84,7 +84,7 @@ If the transition requires fields (e.g., resolution), meow:jira will prompt you.
 
 ```bash
 # Create an implementation plan
-/meow:plan-creator
+/mk:plan-creator
 ```
 
 This produces a plan with phases, file changes, and acceptance criteria. Gate 1 requires your approval before coding.
@@ -93,24 +93,24 @@ This produces a plan with phases, file changes, and acceptance criteria. Gate 1 
 
 ```bash
 # Quick fix — skip the full planning cycle
-/meow:fix AUTH-201
+/mk:fix AUTH-201
 ```
 
 ### Step 5: Implement
 
 ```bash
 # Execute the plan
-/meow:cook path/to/plan.md
+/mk:cook path/to/plan.md
 
 # Or for a quick implementation
-/meow:cook "Implement OAuth2 login per AUTH-201 requirements" --fast
+/mk:cook "Implement OAuth2 login per AUTH-201 requirements" --fast
 ```
 
 ### Step 6: Review
 
 ```bash
 # Code review before shipping
-/meow:review
+/mk:review
 ```
 
 Gate 2 — human approval required before shipping.
@@ -119,7 +119,7 @@ Gate 2 — human approval required before shipping.
 
 ```bash
 # Ship: merge main, test, commit, push, create PR
-/meow:ship
+/mk:ship
 ```
 
 ### Step 8: Update ticket
@@ -128,13 +128,13 @@ After the PR is merged:
 
 ```bash
 # Transition to Done
-/meow:jira transition AUTH-201 "Done" --resolution Fixed
+/mk:jira transition AUTH-201 "Done" --resolution Fixed
 
 # Add a comment with what was done
-/meow:jira add-comment AUTH-201 "Implemented OAuth2 login. PR #42 merged."
+/mk:jira add-comment AUTH-201 "Implemented OAuth2 login. PR #42 merged."
 
 # Link to related tickets if needed
-/meow:jira link AUTH-201 relates-to AUTH-202
+/mk:jira link AUTH-201 relates-to AUTH-202
 ```
 
 ## By Ticket Type
@@ -142,50 +142,50 @@ After the PR is merged:
 ### Bug Fix
 
 ```
-/meow:jira analyze BUG-456         → understand the bug
-/meow:jira evaluate BUG-456        → check for missing AC, gaps
-/meow:jira transition BUG-456 "In Progress"
-/meow:investigate                   → find root cause (paste repro steps)
-/meow:fix                           → fix based on investigation
-/meow:review                        → code review
-/meow:ship                          → ship the fix
-/meow:jira transition BUG-456 "Done" --resolution Fixed
+/mk:jira analyze BUG-456         → understand the bug
+/mk:jira evaluate BUG-456        → check for missing AC, gaps
+/mk:jira transition BUG-456 "In Progress"
+/mk:investigate                   → find root cause (paste repro steps)
+/mk:fix                           → fix based on investigation
+/mk:review                        → code review
+/mk:ship                          → ship the fix
+/mk:jira transition BUG-456 "Done" --resolution Fixed
 ```
 
 ### Feature (Story)
 
 ```
-/meow:jira analyze STORY-789        → understand requirements
-/meow:planning-engine review STORY-789 --scout  → tech review
-/meow:jira transition STORY-789 "In Progress"
-/meow:plan-creator                   → implementation plan
-/meow:cook plan.md                   → implement
-/meow:review                        → code review
-/meow:ship                          → ship the feature
-/meow:jira transition STORY-789 "Done" --resolution Fixed
+/mk:jira analyze STORY-789        → understand requirements
+/mk:planning-engine review STORY-789 --scout  → tech review
+/mk:jira transition STORY-789 "In Progress"
+/mk:plan-creator                   → implementation plan
+/mk:cook plan.md                   → implement
+/mk:review                        → code review
+/mk:ship                          → ship the feature
+/mk:jira transition STORY-789 "Done" --resolution Fixed
 ```
 
 ### Technical Task
 
 ```
-/meow:jira analyze TASK-101          → understand scope
-/meow:jira transition TASK-101 "In Progress"
-/meow:cook "Implement TASK-101" --fast  → quick implementation
-/meow:review                         → code review
-/meow:ship                           → ship
-/meow:jira transition TASK-101 "Done" --resolution Done
+/mk:jira analyze TASK-101          → understand scope
+/mk:jira transition TASK-101 "In Progress"
+/mk:cook "Implement TASK-101" --fast  → quick implementation
+/mk:review                         → code review
+/mk:ship                           → ship
+/mk:jira transition TASK-101 "Done" --resolution Done
 ```
 
 ## When Things Go Wrong
 
 | Situation | What to do |
 |---|---|
-| Ticket AC is vague | `/meow:jira evaluate` will flag `[MISSING]` — ask PO to clarify |
-| Ticket is too large | `/meow:jira evaluate` will flag Complex (8-13pt) — ask to split |
-| Blocked by another ticket | `/meow:jira link AUTH-201 blocked-by AUTH-200` — work on something else |
-| Implementation harder than expected | Update estimate: run `/meow:jira estimate` again, share findings with team |
-| Tests fail after implementation | `/meow:investigate` to find root cause, then `/meow:fix` |
-| PR review finds issues | Fix issues, re-run `/meow:review`, then `/meow:ship` |
+| Ticket AC is vague | `/mk:jira evaluate` will flag `[MISSING]` — ask PO to clarify |
+| Ticket is too large | `/mk:jira evaluate` will flag Complex (8-13pt) — ask to split |
+| Blocked by another ticket | `/mk:jira link AUTH-201 blocked-by AUTH-200` — work on something else |
+| Implementation harder than expected | Update estimate: run `/mk:jira estimate` again, share findings with team |
+| Tests fail after implementation | `/mk:investigate` to find root cause, then `/mk:fix` |
+| PR review finds issues | Fix issues, re-run `/mk:review`, then `/mk:ship` |
 
 ## Related
 

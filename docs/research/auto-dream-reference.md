@@ -123,7 +123,7 @@ type: {{user | feedback | project | reference}}
 
 ---
 
-## MeowKit Adaptation Plan (`meow:dream` for v1.1.1)
+## MeowKit Adaptation Plan (`mk:dream` for v1.1.1)
 
 ### What to adopt directly
 - 4-phase structure (orient → gather → consolidate → prune)
@@ -147,7 +147,7 @@ type: {{user | feedback | project | reference}}
 ### Trigger condition for MeowKit
 ```
 IF (hours since last dream > 24) AND (sessions since last dream > 5):
-  acquire lock → run meow:dream in background → release lock
+  acquire lock → run mk:dream in background → release lock
 ```
 
 Check trigger at: Phase 0 (Orient), after analyst loads memory.

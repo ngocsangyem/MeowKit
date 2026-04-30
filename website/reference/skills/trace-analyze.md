@@ -1,15 +1,15 @@
 ---
-title: "meow:trace-analyze"
+title: "mk:trace-analyze"
 description: "Scatter-gather trace log analysis — surfaces recurring failure patterns from harness runs and gates improvement suggestions through mandatory human review."
 ---
 
-# meow:trace-analyze
+# mk:trace-analyze
 
 Step-file workflow that ingests `.claude/memory/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel researcher subagents, gathers cross-batch patterns, and gates every suggested improvement through a mandatory human-in-the-loop review before any harness change is applied.
 
 ## What This Skill Does
 
-`meow:trace-analyze` turns raw harness run logs into actionable improvement proposals — with a hard stop before anything changes. It reads the last N trace records, splits them into up to 3 batches, spawns parallel researcher subagents to find patterns per batch, synthesizes cross-batch findings, and emits structured fix proposals. Each proposal clears a HITL gate (`AskUserQuestion`) individually before being written to an approved suggestions file. Patterns require ≥3 occurrences to become a suggestion — single failures are noise, not signal.
+`mk:trace-analyze` turns raw harness run logs into actionable improvement proposals — with a hard stop before anything changes. It reads the last N trace records, splits them into up to 3 batches, spawns parallel researcher subagents to find patterns per batch, synthesizes cross-batch findings, and emits structured fix proposals. Each proposal clears a HITL gate (`AskUserQuestion`) individually before being written to an approved suggestions file. Patterns require ≥3 occurrences to become a suggestion — single failures are noise, not signal.
 
 ## Core Capabilities
 
@@ -22,17 +22,17 @@ Step-file workflow that ingests `.claude/memory/trace-log.jsonl`, partitions rec
 
 ## When to Use This
 
-::: tip Use meow:trace-analyze when...
+::: tip Use mk:trace-analyze when...
 - You've had 3+ consecutive harness failures on the same task and want to find the root cause
 - A model upgrade triggered the dead-weight audit flag (set by `post-session.sh` in `last-model-id.txt`)
 - You want a quarterly review of harness run patterns
 - You suspect a harness component has become dead weight and need evidence
 :::
 
-::: warning Don't use meow:trace-analyze when...
+::: warning Don't use mk:trace-analyze when...
 - The trace log has fewer than 3 records — insufficient signal for pattern detection
 - The last analysis ran within 24h with no new records — no new data to process
-- You want to run a single benchmark measurement — use [`meow:benchmark`](/reference/skills/benchmark) instead
+- You want to run a single benchmark measurement — use [`mk:benchmark`](/reference/skills/benchmark) instead
 - You want to apply a harness change without evidence — run analysis first
 :::
 
@@ -40,13 +40,13 @@ Step-file workflow that ingests `.claude/memory/trace-log.jsonl`, partitions rec
 
 ```bash
 # Analyze last 20 runs (default)
-/meow:trace-analyze
+/mk:trace-analyze
 
 # Analyze last 50 runs explicitly
-/meow:trace-analyze --runs 50
+/mk:trace-analyze --runs 50
 
 # Filter to a specific failure pattern type
-/meow:trace-analyze --pattern evaluator-drift
+/mk:trace-analyze --pattern evaluator-drift
 
 # Triggered automatically by post-session.sh on model upgrade
 # (sets dead-weight-audit-needed flag in last-model-id.txt)
@@ -83,7 +83,7 @@ All files written under `plans/{date}-trace-analysis/`:
 | `rejected.md` | step-06 | Rejected suggestions with human-provided reasons |
 | `analysis.md` | step-06 | Human-readable summary of the full analysis |
 
-Optional: a draft follow-up plan generated from approved suggestions, ready for `meow:plan-creator --hard`.
+Optional: a draft follow-up plan generated from approved suggestions, ready for `mk:plan-creator --hard`.
 
 ## Flags
 
@@ -116,7 +116,7 @@ Maps findings to structured fix proposals using `error-taxonomy.md` as the catal
 
 ### Step 6 — HITL Gate
 
-Presents each suggestion to the human via `AskUserQuestion` individually — no bulk-approve. Approved suggestions are written to `suggestions.md` with the human's optional notes. Rejected suggestions are written to `rejected.md` with the reason. Approved suggestions may optionally seed a follow-up plan for `meow:plan-creator --hard`.
+Presents each suggestion to the human via `AskUserQuestion` individually — no bulk-approve. Approved suggestions are written to `suggestions.md` with the human's optional notes. Rejected suggestions are written to `rejected.md` with the reason. Approved suggestions may optionally seed a follow-up plan for `mk:plan-creator --hard`.
 
 ## Hard Constraints
 
@@ -138,16 +138,16 @@ From `trace-analyze` source and `injection-rules.md`:
 
 ## Relationships
 
-- [`meow:harness`](/reference/skills/harness) — generates the trace records this skill analyzes
-- [`meow:benchmark`](/reference/skills/benchmark) — provides structured benchmark result records to `trace-log.jsonl`; analysis of benchmark results is a key use case
-- [`meow:evaluate`](/reference/skills/evaluate) — evaluator verdict events land in the trace log and are analyzed here
+- [`mk:harness`](/reference/skills/harness) — generates the trace records this skill analyzes
+- [`mk:benchmark`](/reference/skills/benchmark) — provides structured benchmark result records to `trace-log.jsonl`; analysis of benchmark results is a key use case
+- [`mk:evaluate`](/reference/skills/evaluate) — evaluator verdict events land in the trace log and are analyzed here
 - [`/reference/agents/evaluator`](/reference/agents/evaluator) — evaluator agent whose verdict patterns are a primary analysis target
 
 ## See Also
 
-- Canonical source: `.claude/skills/meow:trace-analyze/SKILL.md`
-- Trace schema: `.claude/skills/meow:trace-analyze/references/trace-schema.md`
-- Error taxonomy: `.claude/skills/meow:trace-analyze/references/error-taxonomy.md`
+- Canonical source: `.claude/skills/trace-analyze/SKILL.md`
+- Trace schema: `.claude/skills/trace-analyze/references/trace-schema.md`
+- Error taxonomy: `.claude/skills/trace-analyze/references/error-taxonomy.md`
 - Trace store: `.claude/memory/trace-log.jsonl`
-- Related skill: [`meow:benchmark`](/reference/skills/benchmark)
+- Related skill: [`mk:benchmark`](/reference/skills/benchmark)
 - Related guide: [`/guide/trace-and-benchmark`](/guide/trace-and-benchmark)

@@ -1,6 +1,6 @@
 name: Skill Request
-description: Request a new MeowKit skill (meow:*)
-title: "[Skill]: meow:"
+description: Request a new MeowKit skill (mk:*)
+title: "[Skill]: mk:"
 labels: ["enhancement", "skill"]
 body:
   - type: markdown
@@ -12,7 +12,7 @@ body:
     id: name
     attributes:
       label: Proposed skill name
-      placeholder: "meow:compliance"
+      placeholder: "mk:compliance"
     validations:
       required: true
 

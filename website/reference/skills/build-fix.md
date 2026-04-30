@@ -1,17 +1,17 @@
 ---
-title: "meow:build-fix"
-description: "Build error triage with language detection, fixability classification, auto-retry loop, and meow:verify chain."
+title: "mk:build-fix"
+description: "Build error triage with language detection, fixability classification, auto-retry loop, and mk:verify chain."
 ---
 
-# meow:build-fix
+# mk:build-fix
 
-Detects language from error output, loads the appropriate fix reference, classifies fixability, applies the fix, and chains into `meow:verify` to confirm the build is green.
+Detects language from error output, loads the appropriate fix reference, classifies fixability, applies the fix, and chains into `mk:verify` to confirm the build is green.
 
 ## What This Skill Does
 
-`meow:build-fix` treats build errors as structured data, not free-form text. When a build fails, the error output contains signal: TypeScript errors have `TS####` codes, Python errors name the exception type, Go errors have recognizable patterns like `cannot find package`. This skill reads those signals, loads the appropriate language-specific reference, classifies whether the error can be auto-fixed or only diagnosed, and applies the minimum change needed.
+`mk:build-fix` treats build errors as structured data, not free-form text. When a build fails, the error output contains signal: TypeScript errors have `TS####` codes, Python errors name the exception type, Go errors have recognizable patterns like `cannot find package`. This skill reads those signals, loads the appropriate language-specific reference, classifies whether the error can be auto-fixed or only diagnosed, and applies the minimum change needed.
 
-After every fix attempt, it chains into `meow:verify` to confirm the build is actually green — not just that the immediate error message disappeared. If the build still fails, it tries a different approach. After 3 failed attempts it stops and escalates with full context: all 3 error outputs, all 3 attempted fixes, and a suspected root cause.
+After every fix attempt, it chains into `mk:verify` to confirm the build is actually green — not just that the immediate error message disappeared. If the build still fails, it tries a different approach. After 3 failed attempts it stops and escalates with full context: all 3 error outputs, all 3 attempted fixes, and a suspected root cause.
 
 The skill enforces one security constraint unconditionally: TypeScript `any` is never used as a fix for type errors. `unknown` + type guards is the correct approach. See `security-rules.md`.
 
@@ -20,12 +20,12 @@ The skill enforces one security constraint unconditionally: TypeScript `any` is 
 - **Language detection** — Identifies TypeScript, Python, Go, Rust, or unknown from error output patterns
 - **Fixability classification** — Three tiers: auto-fixable (apply immediately), suggest-with-confidence (explain then apply), report-only (diagnose, do not touch files)
 - **Auto-retry loop** — Up to 3 attempts, each with a different approach; resets counter when switching errors
-- **Verify chain** — Calls `meow:verify` after each fix to confirm actual green state
+- **Verify chain** — Calls `mk:verify` after each fix to confirm actual green state
 - **Escalation** — After 3 failures, delivers full diagnostic: all errors, all attempted fixes, root cause hypothesis
 
 ## When to Use This
 
-::: tip Use meow:build-fix when...
+::: tip Use mk:build-fix when...
 - A build command fails with compilation or type errors
 - TypeScript `tsc` reports `TS####` error codes
 - Python raises `SyntaxError`, `ModuleNotFoundError`, or `IndentationError`
@@ -33,7 +33,7 @@ The skill enforces one security constraint unconditionally: TypeScript `any` is 
 - Triggers: "build failed", "fix build", "compilation error", "type error"
 :::
 
-::: warning Don't use meow:build-fix when...
+::: warning Don't use mk:build-fix when...
 - The error is a runtime error, not a build/compile error — runtime errors need debugging, not build-fix
 - The build fails due to an architectural issue requiring a refactor — the skill will classify these as report-only and stop
 :::
@@ -42,13 +42,13 @@ The skill enforces one security constraint unconditionally: TypeScript `any` is 
 
 ```bash
 # Fix the current build failure
-/meow:build-fix
+/mk:build-fix
 
 # Pass error output directly
-/meow:build-fix "error TS2345: Argument of type 'string' is not assignable"
+/mk:build-fix "error TS2345: Argument of type 'string' is not assignable"
 
 # Point at a file with captured error output
-/meow:build-fix build-error.txt
+/mk:build-fix build-error.txt
 ```
 
 ## Error Detection
@@ -85,7 +85,7 @@ Report-only examples: circular dependency graphs, architectural type mismatches 
 
 ```
 Capture error → Detect language → Load reference → Classify
-  → Apply fix (if auto-fixable or suggest) → Run meow:verify
+  → Apply fix (if auto-fixable or suggest) → Run mk:verify
   → PASS? Done. FAIL? Attempt 2 with different approach.
   → FAIL again? Attempt 3 with different approach.
   → FAIL again? Escalate to user with full diagnostic.
@@ -117,6 +117,6 @@ After 3 failures, escalate with:
 
 ## Related
 
-- [`meow:verify`](/reference/skills/verify) — Called after each fix attempt to confirm green state
-- [`meow:cook`](/reference/skills/cook) — Invokes build-fix during Phase 3 when build fails
-- [`meow:testing`](/reference/skills/testing) — TDD reference; test failures are separate from build failures
+- [`mk:verify`](/reference/skills/verify) — Called after each fix attempt to confirm green state
+- [`mk:cook`](/reference/skills/cook) — Invokes build-fix during Phase 3 when build fails
+- [`mk:testing`](/reference/skills/testing) — TDD reference; test failures are separate from build failures

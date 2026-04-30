@@ -82,8 +82,8 @@ NEVER start parallel agents that modify the same files.
 
 For COMPLEX tasks with independent subtasks:
 
-1. Use `meow:worktree` for git worktree isolation per agent
-2. Use `meow:task-queue` for task claiming and ownership enforcement
+1. Use `mk:worktree` for git worktree isolation per agent
+2. Use `mk:task-queue` for task claiming and ownership enforcement
 3. Follow `parallel-execution-rules.md` for constraints (max 3 agents, integration test required)
 4. Gates (1 and 2) are NEVER parallelized — always sequential, always human-approved
 
@@ -91,6 +91,6 @@ For COMPLEX tasks with independent subtasks:
 
 For architectural discussions and trade-off analysis:
 
-- Use `meow:party` skill for multi-agent deliberation
+- Use `mk:party` skill for multi-agent deliberation
 - Party mode is discussion-only — no code changes during party
 - After party decision, resume normal sequential pipeline

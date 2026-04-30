@@ -129,19 +129,19 @@ function migrate() {
   // Ensure topic files exist
   ensureTopicFile(FILES.fixes, `# Fixes — Session Learnings
 
-> Loaded on-demand by meow:fix. Read this file when diagnosing bugs or after fixing to record patterns.`);
+> Loaded on-demand by mk:fix. Read this file when diagnosing bugs or after fixing to record patterns.`);
 
   ensureTopicFile(FILES.reviewPatterns, `# Review Patterns — Session Learnings
 
-> Loaded on-demand by meow:review and meow:plan-creator.`);
+> Loaded on-demand by mk:review and mk:plan-creator.`);
 
   ensureTopicFile(FILES.architectureDecisions, `# Architecture Decisions — Session Learnings
 
-> Loaded on-demand by meow:plan-creator and meow:cook.`);
+> Loaded on-demand by mk:plan-creator and mk:cook.`);
 
   ensureTopicFile(FILES.securityNotes, `# Security Notes — Session Learnings
 
-> Curated from security-log.md. Read by meow:cso and meow:review for security context.`);
+> Curated from security-log.md. Read by mk:cso and mk:review for security context.`);
 
   let migrated = 0;
   let skipped = 0;

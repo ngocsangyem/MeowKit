@@ -1,15 +1,15 @@
 ---
-title: "meow:vue"
+title: "mk:vue"
 description: "Vue 3 Composition API patterns with Pinia, reactivity best practices, forms (VeeValidate + Zod), and performance optimization."
 ---
 
-# meow:vue
+# mk:vue
 
 Vue 3 Composition API patterns with Pinia, reactivity best practices, forms (VeeValidate + Zod), and performance optimization.
 
 ## What This Skill Does
 
-`meow:vue` ensures all Vue code follows modern Vue 3 patterns. It enforces `<script setup>` exclusively, Pinia setup stores instead of Vuex, `storeToRefs()` for reactive destructuring, composables instead of mixins, and `ref()` for primitives. The skill prevents common Vue anti-patterns that cause reactivity bugs, unnecessary re-renders, and XSS vulnerabilities.
+`mk:vue` ensures all Vue code follows modern Vue 3 patterns. It enforces `<script setup>` exclusively, Pinia setup stores instead of Vuex, `storeToRefs()` for reactive destructuring, composables instead of mixins, and `ref()` for primitives. The skill prevents common Vue anti-patterns that cause reactivity bugs, unnecessary re-renders, and XSS vulnerabilities.
 
 ## Core Capabilities
 
@@ -23,7 +23,7 @@ Vue 3 Composition API patterns with Pinia, reactivity best practices, forms (Vee
 
 ## When to Use This
 
-::: tip Use meow:vue when...
+::: tip Use mk:vue when...
 - Creating or modifying Vue components
 - Setting up Pinia stores
 - Writing composables (custom hooks)
@@ -35,10 +35,10 @@ Vue 3 Composition API patterns with Pinia, reactivity best practices, forms (Vee
 
 ```bash
 # Auto-activates on .vue files, or invoke explicitly
-/meow:vue create a user profile component
-/meow:vue set up Pinia auth store
-/meow:vue add form validation with Zod
-/meow:vue optimize this component for performance
+/mk:vue create a user profile component
+/mk:vue set up Pinia auth store
+/mk:vue add form validation with Zod
+/mk:vue optimize this component for performance
 ```
 
 ## Example Prompts
@@ -66,5 +66,5 @@ Detect concern (component? store? composable? form? performance?)
 
 ## Related
 
-- [`meow:typescript`](/reference/skills/typescript) — TypeScript fundamentals
-- [`meow:frontend-design`](/reference/skills/frontend-design) — Visual design patterns
+- [`mk:typescript`](/reference/skills/typescript) — TypeScript fundamentals
+- [`mk:frontend-design`](/reference/skills/frontend-design) — Visual design patterns

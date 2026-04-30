@@ -1,15 +1,15 @@
 ---
-title: "meow:typescript"
+title: "mk:typescript"
 description: "Strict TypeScript patterns for null safety, type guards, discriminated unions, utility types, and ESLint configuration."
 ---
 
-# meow:typescript
+# mk:typescript
 
 Strict TypeScript patterns for null safety, type guards, discriminated unions, utility types, and ESLint configuration.
 
 ## What This Skill Does
 
-`meow:typescript` enforces strict TypeScript patterns that prevent the subtle bugs `tsc` doesn't catch on its own. It goes beyond "no `any` types" into the nuances: implicit truthiness checks that miss `0` and `""`, untyped error catches, runtime enums that add bundle weight, and `as` assertions that lie to the compiler. The skill auto-activates on `.ts` and `.tsx` files.
+`mk:typescript` enforces strict TypeScript patterns that prevent the subtle bugs `tsc` doesn't catch on its own. It goes beyond "no `any` types" into the nuances: implicit truthiness checks that miss `0` and `""`, untyped error catches, runtime enums that add bundle weight, and `as` assertions that lie to the compiler. The skill auto-activates on `.ts` and `.tsx` files.
 
 ## Core Capabilities
 
@@ -23,7 +23,7 @@ Strict TypeScript patterns for null safety, type guards, discriminated unions, u
 
 ## When to Use This
 
-::: tip Use meow:typescript when...
+::: tip Use mk:typescript when...
 - You're writing new TypeScript code and want strict patterns
 - You're fixing type errors or ESLint issues
 - You need to refactor code for better type safety
@@ -31,17 +31,17 @@ Strict TypeScript patterns for null safety, type guards, discriminated unions, u
 :::
 
 ::: warning Don't use for...
-- Vue-specific patterns → [`meow:vue`](/reference/skills/vue)
-- Visual/CSS work → [`meow:frontend-design`](/reference/skills/frontend-design)
+- Vue-specific patterns → [`mk:vue`](/reference/skills/vue)
+- Visual/CSS work → [`mk:frontend-design`](/reference/skills/frontend-design)
 :::
 
 ## Usage
 
 ```bash
 # Auto-activates on .ts/.tsx files, or invoke explicitly
-/meow:typescript fix type errors in auth module
-/meow:typescript add strict null checks
-/meow:typescript configure ESLint for strict TypeScript
+/mk:typescript fix type errors in auth module
+/mk:typescript add strict null checks
+/mk:typescript configure ESLint for strict TypeScript
 ```
 
 ## Example Prompts
@@ -69,5 +69,5 @@ Detect concern (type error? new code? refactor? config?)
 
 ## Related
 
-- [`meow:vue`](/reference/skills/vue) — Vue-specific TypeScript patterns
-- [`meow:frontend-design`](/reference/skills/frontend-design) — Visual/CSS patterns
+- [`mk:vue`](/reference/skills/vue) — Vue-specific TypeScript patterns
+- [`mk:frontend-design`](/reference/skills/frontend-design) — Visual/CSS patterns

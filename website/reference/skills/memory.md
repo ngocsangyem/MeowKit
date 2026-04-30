@@ -1,9 +1,9 @@
 ---
-title: "meow:memory"
+title: "mk:memory"
 description: "Memory system toolkit — session capture, pattern extraction, cost tracking, and topic file pruning"
 ---
 
-# meow:memory
+# mk:memory
 
 Memory system toolkit — session capture, pattern extraction, cost tracking, and topic file pruning.
 
@@ -20,11 +20,11 @@ A **reference toolkit** — a collection of guides used by agents during specifi
 
 ## When to Use
 
-Phase 0 (Orient) and Phase 6 (Reflect) persistence. At Phase 0, consumer skills load relevant topic files. At Phase 6, `meow:cook` spawns a dedicated subagent for session-capture. Pruning is manual: invoke when a topic file exceeds 300 lines or a JSON file exceeds 50 entries.
+Phase 0 (Orient) and Phase 6 (Reflect) persistence. At Phase 0, consumer skills load relevant topic files. At Phase 6, `mk:cook` spawns a dedicated subagent for session-capture. Pruning is manual: invoke when a topic file exceeds 300 lines or a JSON file exceeds 50 entries.
 
 ::: info Skill Details
 **Phase:** 0, 6
-**Used by:** analyst agent, meow:cook Phase 6 (MUST-spawn subagent)
+**Used by:** analyst agent, mk:cook Phase 6 (MUST-spawn subagent)
 :::
 
 ## Topic file layout
@@ -33,10 +33,10 @@ Memory is split into focused topic files. Each skill reads only the files it nee
 
 | File | Scope | Consumer |
 |------|-------|---------|
-| `fixes.md` + `fixes.json` | Bug-class patterns | meow:fix |
-| `review-patterns.md` + `review-patterns.json` | Review patterns | meow:review, meow:plan-creator |
-| `architecture-decisions.md` + `architecture-decisions.json` | Architectural decisions | meow:plan-creator, meow:cook |
-| `security-notes.md` | Security findings | meow:cso, meow:review |
+| `fixes.md` + `fixes.json` | Bug-class patterns | mk:fix |
+| `review-patterns.md` + `review-patterns.json` | Review patterns | mk:review, mk:plan-creator |
+| `architecture-decisions.md` + `architecture-decisions.json` | Architectural decisions | mk:plan-creator, mk:cook |
+| `security-notes.md` | Security findings | mk:cso, mk:review |
 
 Split JSON files use schema v2.0.0 with fields: `version`, `scope`, `consumer`, `patterns[]`, `metadata`.
 
@@ -54,9 +54,9 @@ Archive old standard-severity entries from topic files to `lessons-archive.md`.
 5. Report: "Archived N entries across M files"
 
 ```
-/meow:memory --prune              # default 90-day threshold
-/meow:memory --prune --days 180   # custom threshold
-/meow:memory --prune --dry-run    # show what would be archived without moving
+/mk:memory --prune              # default 90-day threshold
+/mk:memory --prune --days 180   # custom threshold
+/mk:memory --prune --dry-run    # show what would be archived without moving
 ```
 
 **Exempt from pruning:** `severity: critical` or `severity: security` entries; entries without a parseable date.

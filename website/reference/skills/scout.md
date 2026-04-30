@@ -1,15 +1,15 @@
 ---
-title: "meow:scout"
+title: "mk:scout"
 description: "Parallel codebase exploration that divides the project into segments and searches them simultaneously using Explore subagents."
 ---
 
-# meow:scout
+# mk:scout
 
 Parallel codebase exploration that divides the project into segments and searches them simultaneously using Explore subagents.
 
 ## What This Skill Does
 
-`meow:scout` solves the "where is everything?" problem that comes up at the start of any complex task. It divides your codebase into logical segments (source, tests, config, types), spawns 2-6 parallel Explore agents to search them simultaneously, and returns a consolidated report with an architecture fingerprint, file map, complexity estimates, and routing suggestions for which agent should handle which area.
+`mk:scout` solves the "where is everything?" problem that comes up at the start of any complex task. It divides your codebase into logical segments (source, tests, config, types), spawns 2-6 parallel Explore agents to search them simultaneously, and returns a consolidated report with an architecture fingerprint, file map, complexity estimates, and routing suggestions for which agent should handle which area.
 
 ## Core Capabilities
 
@@ -22,7 +22,7 @@ Parallel codebase exploration that divides the project into segments and searche
 
 ## When to Use This
 
-::: tip Use meow:scout when...
+::: tip Use mk:scout when...
 - Starting work on a feature that spans multiple directories
 - You need to understand project structure before planning
 - Debugging and need to find related files
@@ -33,22 +33,22 @@ Parallel codebase exploration that divides the project into segments and searche
 
 ```bash
 # Search for auth-related files
-/meow:scout authentication
+/mk:scout authentication
 
 # Find database migration files
-/meow:scout database migrations
+/mk:scout database migrations
 
 # Understand project structure
-/meow:scout project structure
+/mk:scout project structure
 ```
 
 ## Example Prompts
 
 | Prompt | What scout finds |
 |--------|-----------------|
-| `/meow:scout authentication` | Auth middleware, guards, login pages, auth tests, token utils |
-| `/meow:scout database` | Models, migrations, seeds, schema files, DB config |
-| `/meow:scout payment` | Payment controllers, Stripe integration, billing tests |
+| `/mk:scout authentication` | Auth middleware, guards, login pages, auth tests, token utils |
+| `/mk:scout database` | Models, migrations, seeds, schema files, DB config |
+| `/mk:scout payment` | Payment controllers, Stripe integration, billing tests |
 
 ## Quick Workflow
 
@@ -73,5 +73,5 @@ Query → SCALE Calculation → Tier Filtering
 
 ## Related
 
-- [`meow:investigate`](/reference/skills/investigate) — Uses scout's file map for debugging
-- [`meow:docs-finder`](/reference/skills/docs-finder) — Finds external docs (not codebase files)
+- [`mk:investigate`](/reference/skills/investigate) — Uses scout's file map for debugging
+- [`mk:docs-finder`](/reference/skills/docs-finder) — Finds external docs (not codebase files)

@@ -48,7 +48,7 @@ if [ -f "$CONTEXT_FILE" ]; then
 else
   echo "## Project Context"
   echo ""
-  echo "No project-context.md found. Run \`meow:project-context generate\` to create one."
+  echo "No project-context.md found. Run \`mk:project-context generate\` to create one."
   echo "This file helps all agents understand your project's tech stack, conventions, and anti-patterns."
 fi
 

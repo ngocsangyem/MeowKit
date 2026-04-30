@@ -1,15 +1,15 @@
 ---
-title: "meow:chom"
+title: "mk:chom"
 description: "Copy-cat, replicate, or adapt features from external systems, repos, apps, or ideas into the current project. v2 adopts xia-style mode granularity and sharper boundary rules."
 ---
 
-# meow:chom
+# mk:chom
 
 Copy-cat, replicate, or adapt features from external systems, repos, apps, or ideas into the current project.
 
 ## What This Skill Does
 
-`meow:chom` examines an external source — a GitHub repo, a live website, an app screenshot, or even a freeform idea — and produces a structured Replication Spec telling you exactly what to build, how it fits your stack, and what risks to watch for. It challenges every assumption before committing to a plan.
+`mk:chom` examines an external source — a GitHub repo, a live website, an app screenshot, or even a freeform idea — and produces a structured Replication Spec telling you exactly what to build, how it fits your stack, and what risks to watch for. It challenges every assumption before committing to a plan.
 
 Works for any project: SaaS apps, mobile apps, CLI tools, design systems, or MeowKit skills themselves.
 
@@ -25,7 +25,7 @@ Works for any project: SaaS apps, mobile apps, CLI tools, design systems, or Meo
 
 ## When to Use This
 
-::: tip Use meow:chom when...
+::: tip Use mk:chom when...
 
 - You want to replicate a feature from another app ("build Stripe's checkout for us")
 - You found a repo with a pattern worth copying ("port auth from this repo")
@@ -38,22 +38,22 @@ Works for any project: SaaS apps, mobile apps, CLI tools, design systems, or Meo
 
 ```bash
 # Full 6-phase workflow, no mode declaration in handoff
-/meow:chom https://github.com/shouc/agentflow
+/mk:chom https://github.com/shouc/agentflow
 
 # User-explicit modes bias Phase 3 focus
-/meow:chom https://linear.app "keyboard shortcuts" --improve
-/meow:chom owner/repo "payment flow" --copy
-/meow:chom owner/repo "state mgmt" --port
+/mk:chom https://linear.app "keyboard shortcuts" --improve
+/mk:chom owner/repo "payment flow" --copy
+/mk:chom owner/repo "state mgmt" --port
 
 # Compare-only (phases 1–3, no decision)
-/meow:chom "Supabase vs Firebase for real-time features" --compare
+/mk:chom "Supabase vs Firebase for real-time features" --compare
 
 # Speed flags (HARD GATE still enforced)
-/meow:chom owner/repo --lean       # skip Phase 1 researcher for freeform inputs
-/meow:chom owner/repo --auto       # auto-approve non-gate steps
+/mk:chom owner/repo --lean       # skip Phase 1 researcher for freeform inputs
+/mk:chom owner/repo --auto       # auto-approve non-gate steps
 
 # Analyze a screenshot
-/meow:chom screenshot.png "replicate this UI"
+/mk:chom screenshot.png "replicate this UI"
 ```
 
 ## Modes
@@ -83,11 +83,11 @@ If the user provides natural-language mode hints, chom maps them:
 
 | Input                                    | Detection              | Tool Used                               |
 | ---------------------------------------- | ---------------------- | --------------------------------------- |
-| Git URL (`github.com/*`, `gitlab.com/*`) | URL contains git host  | `git clone --depth 1` → `meow:scout`    |
-| Web URL (`https://...`)                  | URL, not git host      | `meow:web-to-markdown` or `meow:browse` |
+| Git URL (`github.com/*`, `gitlab.com/*`) | URL contains git host  | `git clone --depth 1` → `mk:scout`    |
+| Web URL (`https://...`)                  | URL, not git host      | `mk:web-to-markdown` or `mk:browse` |
 | Local path (`./`, `../`, `/`)            | Starts with `.` or `/` | Direct Read/Glob                        |
 | Freeform text                            | No URL or path         | `researcher` agent (WebSearch)          |
-| Image/screenshot                         | Image file extension   | `meow:multimodal` (Gemini vision)       |
+| Image/screenshot                         | Image file extension   | `mk:multimodal` (Gemini vision)       |
 
 ## Workflow
 
@@ -99,7 +99,7 @@ If the user provides natural-language mode hints, chom maps them:
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1. Recon     | Fetch/clone source + read local `docs/project-context.md`. `--lean` skips researcher-agent for freeform inputs only.                                                           |
 | 2. Map       | Build dependency matrix: source → local (EXISTS / NEW / CONFLICT)                                                                                                              |
-| 3. Analyze   | Trace execution flow, data model, UX. Mode-specific focus applied here. For 3+ layers or stateful workflows → emit handoff text directing user to `/meow:sequential-thinking`. |
+| 3. Analyze   | Trace execution flow, data model, UX. Mode-specific focus applied here. For 3+ layers or stateful workflows → emit handoff text directing user to `/mk:sequential-thinking`. |
 | 4. Challenge | 7 questions + risk scoring + decision matrix. **Human approval required.**                                                                                                     |
 | 5. Decision  | Go/no-go based on challenge results                                                                                                                                            |
 | 6. Handoff   | Replication Spec + challenge summary + next step for user                                                                                                                      |
@@ -134,10 +134,10 @@ Challenge summary: 2 stack-fit reds, 1 data-model red, 0 blast-radius reds.
 Risk level: medium.
 
 To implement, run:
-  /meow:plan-creator "Replicate [feature] from [source]"
+  /mk:plan-creator "Replicate [feature] from [source]"
 
 To bias future chom analysis toward a specific adaptation depth, re-invoke with:
-  /meow:chom [source] --copy | --improve | --port
+  /mk:chom [source] --copy | --improve | --port
 ```
 
 ::: info Skill Details
@@ -149,7 +149,7 @@ To bias future chom analysis toward a specific adaptation depth, re-invoke with:
 
 ## Boundary Rules
 
-chom emits handoff text. It does NOT invoke any other MeowKit skill mid-flow — including `/meow:plan-creator`, `/meow:brainstorming`, `/meow:cook`, or `/meow:sequential-thinking`.
+chom emits handoff text. It does NOT invoke any other MeowKit skill mid-flow — including `/mk:plan-creator`, `/mk:brainstorming`, `/mk:cook`, or `/mk:sequential-thinking`.
 
 This is chom's design choice, not a MeowKit platform rule. Skills _can_ reference other skills and the model may invoke them; chom opts out because mid-flow invocations of other orchestration skills would break phase ownership — each has its own multi-phase workflow that would interleave with chom's HARD GATE discipline.
 
@@ -158,11 +158,11 @@ chom's job ends at Phase 6 Handoff; the user invokes the next skill.
 ## Gotchas
 
 - **chom never declares adaptation depth.** Pick `--copy` / `--improve` / `--port` explicitly to bias the analysis.
-- **3+ architectural layers trigger a sequential-thinking handoff**, not auto-invocation. Trace the flow via `/meow:sequential-thinking`, then return to chom.
+- **3+ architectural layers trigger a sequential-thinking handoff**, not auto-invocation. Trace the flow via `/mk:sequential-thinking`, then return to chom.
 - **HARD GATE applies in all modes**, including `--lean` and `--auto`.
 - **No local context = generic advice** — always reads `docs/project-context.md` first.
 - **"Obvious" copies hide complexity** — auth flows, data models, API contracts. Challenge phase is never skipped.
-- **API-surface queries use [`/meow:pack --compress`](/reference/skills/pack)**, not chom. pack's Tree-sitter signature extraction is the right tool when the question is "what's the public API of library X" rather than "should we replicate it."
+- **API-surface queries use [`/mk:pack --compress`](/reference/skills/pack)**, not chom. pack's Tree-sitter signature extraction is the right tool when the question is "what's the public API of library X" rather than "should we replicate it."
 - **Spec ≠ code** — Replication Spec describes WHAT and WHY, never HOW.
 
 ## Migration (v1 → v2)
@@ -177,9 +177,9 @@ chom's job ends at Phase 6 Handoff; the user invokes the next skill.
 
 ## Related
 
-- [`meow:pack`](/reference/skills/pack) — for API-surface queries (`--compress`) or exporting source for external review
-- [`meow:scout`](/reference/skills/scout) — used during Recon for local project architecture mapping
-- [`meow:plan-creator`](/reference/skills/plan-creator) — downstream: converts Replication Spec into implementation plan
-- [`meow:sequential-thinking`](/reference/skills/sequential-thinking) — invoked via handoff for 3+ layer complexity
-- [`meow:web-to-markdown`](/reference/skills/web-to-markdown) — used for fetching web URLs during Recon
+- [`mk:pack`](/reference/skills/pack) — for API-surface queries (`--compress`) or exporting source for external review
+- [`mk:scout`](/reference/skills/scout) — used during Recon for local project architecture mapping
+- [`mk:plan-creator`](/reference/skills/plan-creator) — downstream: converts Replication Spec into implementation plan
+- [`mk:sequential-thinking`](/reference/skills/sequential-thinking) — invoked via handoff for 3+ layer complexity
+- [`mk:web-to-markdown`](/reference/skills/web-to-markdown) — used for fetching web URLs during Recon
 - [What's New in v2.3.12](/guide/whats-new/v2.3.12)

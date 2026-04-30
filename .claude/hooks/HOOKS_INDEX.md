@@ -79,7 +79,7 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 | `session-state/build-verify-cache.json` | handlers/build-verify.cjs | (same) | File-content-hash cache for skip-on-unchanged |
 | `session-state/last-session-id` | project-context-loader.sh | (same) | Session change detection |
 | `session-state/learning-observer.jsonl` | learning-observer.sh | post-session.sh | Churn pattern log |
-| `session-state/active-plan` | meow:harness (Phase 5), meow:plan-creator | pre-completion-check.sh | Currently active plan slug |
+| `session-state/active-plan` | mk:harness (Phase 5), mk:plan-creator | pre-completion-check.sh | Currently active plan slug |
 | `session-state/conversation-summary.lock` | conversation-summary-cache.sh (Stop bg worker) | conversation-summary-cache.sh next Stop (5min stale GC) | Mutex preventing overlapping background summarizers |
 | `.claude/memory/conversation-summary.md` | conversation-summary-cache.sh (Stop bg worker) | **Consumer 1:** conversation-summary-cache.sh (UserPromptSubmit) → emits to stdout → **Consumer 2: Claude Code context injection (the model itself)** for every meowkit agent. Cleared by project-context-loader.sh on session change. | Persistent conversation summary read by every turn |
 | `session-state/detected-model.json` | handlers/model-detector.cjs | handlers/budget-tracker.cjs, handlers/auto-checkpoint.cjs | Model tier + density detection result |

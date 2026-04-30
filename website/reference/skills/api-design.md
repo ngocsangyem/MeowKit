@@ -1,15 +1,15 @@
 ---
-title: "meow:api-design"
+title: "mk:api-design"
 description: "REST/GraphQL API design patterns: resource naming, HTTP methods, status codes, pagination, versioning, rate limiting, and error formats."
 ---
 
-# meow:api-design
+# mk:api-design
 
 Reference-backed API design guidance for building consistent, developer-friendly REST and GraphQL APIs.
 
 ## What This Skill Does
 
-`meow:api-design` provides structured design guidance before implementation begins. API shape decisions — resource naming, status codes, pagination strategy, versioning — are cheap to change in a design document and expensive to change after clients exist. This skill front-loads those decisions.
+`mk:api-design` provides structured design guidance before implementation begins. API shape decisions — resource naming, status codes, pagination strategy, versioning — are cheap to change in a design document and expensive to change after clients exist. This skill front-loads those decisions.
 
 It identifies your API type (REST, GraphQL, or both), maps domain entities to resources, applies naming and HTTP semantics conventions from reference files, and produces a design document that the developer agent uses as the authoritative spec during implementation. The design document includes an endpoint table, request/response examples, error format, pagination strategy, versioning approach, and rate limiting headers.
 
@@ -23,14 +23,14 @@ It identifies your API type (REST, GraphQL, or both), maps domain entities to re
 
 ## When to Use This
 
-::: tip Use meow:api-design when...
+::: tip Use mk:api-design when...
 - Designing a new API or adding a significant set of endpoints
 - Reviewing existing endpoint structure for consistency problems
 - Planning backend architecture before implementation starts
 - Answering "how should I structure this endpoint?"
 :::
 
-::: warning Don't use meow:api-design when...
+::: warning Don't use mk:api-design when...
 - You're adding a single endpoint to a well-established existing API — follow its conventions instead
 - Implementation has already started — the design document is a Phase 1 artifact
 :::
@@ -39,16 +39,16 @@ It identifies your API type (REST, GraphQL, or both), maps domain entities to re
 
 ```bash
 # REST API design for a domain
-/meow:api-design user management system
+/mk:api-design user management system
 
 # GraphQL API design
-/meow:api-design e-commerce catalog --graphql
+/mk:api-design e-commerce catalog --graphql
 
 # Design both REST and GraphQL surfaces
-/meow:api-design order processing --both
+/mk:api-design order processing --both
 
 # Review existing endpoint structure
-/meow:api-design review src/routes/
+/mk:api-design review src/routes/
 ```
 
 ## REST Patterns
@@ -98,6 +98,6 @@ Key patterns from `references/graphql-patterns.md`:
 
 ## Related
 
-- [`meow:plan-creator`](/reference/skills/plan-creator) — Creates the plan that the API design document feeds into
-- [`meow:database`](/reference/skills/database) — Schema design that backs the API resources
-- [`meow:build-fix`](/reference/skills/build-fix) — Fixes build errors during API implementation
+- [`mk:plan-creator`](/reference/skills/plan-creator) — Creates the plan that the API design document feeds into
+- [`mk:database`](/reference/skills/database) — Schema design that backs the API resources
+- [`mk:build-fix`](/reference/skills/build-fix) — Fixes build errors during API implementation

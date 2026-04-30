@@ -20,7 +20,7 @@ const suggestions = [
       <h1 class="title">Page not found</h1>
       <p class="quote">
         Looks like this page wandered off. Even MeowKit's
-        <code>meow:scout</code> couldn't find it.
+        <code>mk:scout</code> couldn't find it.
       </p>
 
       <div class="action">

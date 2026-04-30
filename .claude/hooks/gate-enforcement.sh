@@ -7,7 +7,7 @@
 # Blocks: if no approved plan in tasks/plans/ OR no signed contract in tasks/contracts/ AND target is source code
 # Allows: plan files, test files, docs, config, contract files themselves, and any write after both gates pass
 #
-# Gate 1 bypass: /meow:fix --simple OR scale-routing one-shot
+# Gate 1 bypass: /mk:fix --simple OR scale-routing one-shot
 # Contract gate bypass: MEOWKIT_HARNESS_MODE=LEAN env var (adaptive density for COMPLEX/Opus 4.6)
 #
 # Load .claude/.env (each hook is a separate subprocess)
@@ -51,7 +51,7 @@ NORMALIZED_PATH="${NORMALIZED_PATH#./}"
 # Closes C1 (abs paths) and C2 (substring leak — anchor on segment boundaries).
 case "$NORMALIZED_PATH" in
   tasks/contracts/*.md|*/tasks/contracts/*.md)
-    validator=".claude/skills/meow:sprint-contract/scripts/validate-contract.sh"
+    validator=".claude/skills/sprint-contract/scripts/validate-contract.sh"
     if [ -x "$validator" ]; then
       if ! "$validator" "$FILE_PATH" >/dev/null 2>&1; then
         echo "@@GATE_BLOCK@@"
@@ -112,13 +112,13 @@ if [ "$gate1_passed" -eq 0 ]; then
   echo "@@GATE_BLOCK@@"
   echo "No approved plan found in tasks/plans/."
   echo "Gate 1 requires an approved plan before source code changes."
-  echo "Create a plan first: /meow:plan-creator or /meow:fix for simple fixes."
+  echo "Create a plan first: /mk:plan-creator or /mk:fix for simple fixes."
   exit 1
 fi
 
 # Phase 4: Sprint contract gate. Only runs if a plan-creator-style date-prefixed plan dir exists
 # (otherwise check-contract-signed.sh defers and exits 0 — no false blocks on legacy plans).
-contract_check=".claude/skills/meow:sprint-contract/scripts/check-contract-signed.sh"
+contract_check=".claude/skills/sprint-contract/scripts/check-contract-signed.sh"
 if [ -x "$contract_check" ]; then
   if ! "$contract_check"; then
     # check-contract-signed.sh already prints @@CONTRACT_GATE_BLOCK@@ + diagnostics on stderr

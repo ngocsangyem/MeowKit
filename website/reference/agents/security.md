@@ -40,9 +40,9 @@ The security agent automatically inserts itself when changes touch: authenticati
 ```bash
 # Usually auto-activated by orchestrator
 # For explicit security audit:
-/meow:audit                # full security audit
-/meow:cso                  # CSO-mode deep audit
-/meow:cso comprehensive    # comprehensive scan
+/mk:audit                # full security audit
+/mk:cso                  # CSO-mode deep audit
+/mk:cso comprehensive    # comprehensive scan
 ```
 
 ## Under the Hood

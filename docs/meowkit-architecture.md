@@ -18,7 +18,7 @@ through three mechanisms:
 2. **Hooks** (`.claude/hooks/*.sh`, `.cjs`) — shell/Node scripts triggered by
    Claude Code events before or after tool calls. Source: `settings.json` (7 hook
    events registered).
-3. **Skills** (`.claude/skills/meow:*/SKILL.md`) — context-loaded domain expertise
+3. **Skills** (`.claude/skills/*/SKILL.md`) — context-loaded domain expertise
    activated by user intent or `autoInvoke: true`. Source: `skill-inventory.json`
    (78 entries, verified 2026-04-18).
 
@@ -32,11 +32,11 @@ Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 
 | Component                              | Count    | Source of Truth                            | Drift / Notes                                                                                                                    |
 | -------------------------------------- | -------- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| Skills on disk                         | 75       | `ls .claude/skills/ \| grep meow:`         | 3 deprecated skills removed in v2.4.4                                                                                            |
+| Skills on disk                         | 75       | `ls .claude/skills/`         | 3 deprecated skills removed in v2.4.4                                                                                            |
 | Registered skills (SKILLS_INDEX)       | 71       | `SKILLS_INDEX.md` pipe-table rows          |                                                                                                                                  |
-| Orphaned skills (unregistered)         | 4        | `inventory-summary.md:15`                  | meow:chom, meow:pack, meow:confluence, meow:planning-engine                                                                      |
+| Orphaned skills (unregistered)         | 4        | `inventory-summary.md:15`                  | mk:chom, mk:pack, mk:confluence, mk:planning-engine                                                                      |
 | Active (non-deprecated) skills         | 75       | `inventory-summary.md:17`                  |                                                                                                                                  |
-| Deprecated skills                      | 0        | —                                          | `meow:debug`, `meow:documentation`, `meow:shipping` removed in v2.4.4                                                            |
+| Deprecated skills                      | 0        | —                                          | `mk:debug`, `mk:documentation`, `mk:shipping` removed in v2.4.4                                                            |
 | Step-file skills                       | 5        | `step-file-rules.md` Applicability section | plan-creator, review, evaluate, harness, trace-analyze                                                                           |
 | Skills with internal agents            | 3        | `AGENTS_INDEX.md` Skill-Scoped section     | jira (3), confluence (2), planning-engine (2) = 7 agents                                                                         |
 | Core agents                            | 17       | `ls .claude/agents/*.md` excl. index       | Matches `CLAUDE.md` Agents table. `project-manager`                                                                              |
@@ -74,92 +74,92 @@ flowchart TD
     end
 
     subgraph P0["Phase 0 — Orient (12 skills)"]
-        AD[meow:agent-detector\nautoInvoke:true]
-        SC[meow:scout]
-        SR[meow:scale-routing]
-        WO[meow:workflow-orchestrator\nautoInvoke:true]
-        H[meow:harness]
-        LAL[meow:lazy-agent-loader]
-        PC[meow:project-context]
-        SK[meow:skill-creator]
-        SECON[meow:session-continuation]
-        BENCH[meow:benchmark]
-        PARTY[meow:party]
-        TQ[meow:task-queue]
+        AD[mk:agent-detector\nautoInvoke:true]
+        SC[mk:scout]
+        SR[mk:scale-routing]
+        WO[mk:workflow-orchestrator\nautoInvoke:true]
+        H[mk:harness]
+        LAL[mk:lazy-agent-loader]
+        PC[mk:project-context]
+        SK[mk:skill-creator]
+        SECON[mk:session-continuation]
+        BENCH[mk:benchmark]
+        PARTY[mk:party]
+        TQ[mk:task-queue]
     end
 
     subgraph P1["Phase 1 — Plan (7 skills)"]
-        PLANC[meow:plan-creator]
-        PE[meow:planning-engine]
-        BRN[meow:brainstorming]
-        OH[meow:office-hours]
-        VP[meow:validate-plan]
-        CEO[meow:plan-ceo-review]
-        DF[meow:decision-framework]
+        PLANC[mk:plan-creator]
+        PE[mk:planning-engine]
+        BRN[mk:brainstorming]
+        OH[mk:office-hours]
+        VP[mk:validate-plan]
+        CEO[mk:plan-ceo-review]
+        DF[mk:decision-framework]
     end
 
     subgraph P2["Phase 2 — Test (6 skills)"]
-        TEST[meow:testing]
-        CSO[meow:cso]
-        STS[meow:skill-template-secure]
-        LAV[meow:lint-and-validate]
-        NYQ[meow:nyquist]
-        BRW[meow:browse]
+        TEST[mk:testing]
+        CSO[mk:cso]
+        STS[mk:skill-template-secure]
+        LAV[mk:lint-and-validate]
+        NYQ[mk:nyquist]
+        BRW[mk:browse]
     end
 
     subgraph P3["Phase 3 — Build (20 skills)"]
-        COOK[meow:cook]
-        DEV[meow:development]
-        FIX[meow:fix]
-        INV[meow:investigate]
-        SIM[meow:simplify]
-        SC_P[meow:sprint-contract]
-        BOOT[meow:bootstrap]
-        ANG[meow:angular]
-        VUE[meow:vue]
-        TS[meow:typescript]
-        DB[meow:database]
-        FE[meow:frontend-design]
-        CHOM[meow:chom]
-        PACK[meow:pack]
-        JIRA[meow:jira]
-        BF[meow:build-fix]
-        PRJO[meow:project-organization]
-        VER[meow:verify]
-        SEQT[meow:sequential-thinking]
-        CONF[meow:confluence]
+        COOK[mk:cook]
+        DEV[mk:development]
+        FIX[mk:fix]
+        INV[mk:investigate]
+        SIM[mk:simplify]
+        SC_P[mk:sprint-contract]
+        BOOT[mk:bootstrap]
+        ANG[mk:angular]
+        VUE[mk:vue]
+        TS[mk:typescript]
+        DB[mk:database]
+        FE[mk:frontend-design]
+        CHOM[mk:chom]
+        PACK[mk:pack]
+        JIRA[mk:jira]
+        BF[mk:build-fix]
+        PRJO[mk:project-organization]
+        VER[mk:verify]
+        SEQT[mk:sequential-thinking]
+        CONF[mk:confluence]
     end
 
     subgraph P4["Phase 4 — Review (5 skills)"]
-        REV[meow:review]
-        EVAL[meow:evaluate]
-        RUB[meow:rubric]
-        ELICIT[meow:elicit]
-        TA[meow:trace-analyze]
+        REV[mk:review]
+        EVAL[mk:evaluate]
+        RUB[mk:rubric]
+        ELICIT[mk:elicit]
+        TA[mk:trace-analyze]
     end
 
     subgraph P5["Phase 5 — Ship (2 skills)"]
-        SHIP[meow:ship]
-        WT[meow:worktree]
+        SHIP[mk:ship]
+        WT[mk:worktree]
     end
 
     subgraph P6["Phase 6 — Reflect (5 skills)"]
-        MEM[meow:memory]
-        RETRO[meow:retro]
-        LLMS[meow:llms]
-        DOCINIT[meow:docs-init]
-        DOCREL[meow:document-release]
+        MEM[mk:memory]
+        RETRO[mk:retro]
+        LLMS[mk:llms]
+        DOCINIT[mk:docs-init]
+        DOCREL[mk:document-release]
     end
 
     subgraph CROSS["Cross-Phase Skills (8)"]
-        MM[meow:multimodal]
-        W2M[meow:web-to-markdown]
-        DF2[meow:docs-finder]
-        CAREFUL[meow:careful]
-        FREEZE[meow:freeze]
-        INTAKE[meow:intake]
-        AB[meow:agent-browser]
-        QA[meow:qa]
+        MM[mk:multimodal]
+        W2M[mk:web-to-markdown]
+        DF2[mk:docs-finder]
+        CAREFUL[mk:careful]
+        FREEZE[mk:freeze]
+        INTAKE[mk:intake]
+        AB[mk:agent-browser]
+        QA[mk:qa]
     end
 
     subgraph AGENTS["Key Agents (17)"]
@@ -249,7 +249,7 @@ registration), `RULES_INDEX.md` Enforcement Mechanism Matrix.
 
 | Gate                | Trigger                              | Mechanism                                                                         | Bypass                                                                        |
 | ------------------- | ------------------------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Gate 1              | After Phase 1, before any code write | **Hook-preventive**: `gate-enforcement.sh` on PreToolUse Edit\|Write; timeout 10s | `/meow:fix` simple; scale-routing one-shot (`scale-adaptive-rules.md` Rule 4) |
+| Gate 1              | After Phase 1, before any code write | **Hook-preventive**: `gate-enforcement.sh` on PreToolUse Edit\|Write; timeout 10s | `/mk:fix` simple; scale-routing one-shot (`scale-adaptive-rules.md` Rule 4) |
 | Gate 2              | After Phase 4, before Phase 5        | **Behavioral**: reviewer verdict at `tasks/reviews/` required                     | None — zero exceptions (`gate-rules.md` Gate 2 section)                       |
 | Active Verification | Phase 4 evaluator PASS               | **Script**: `validate-verdict.sh` rejects PASS with empty `evidence/` dir         | None — hard gate (`harness-rules.md` Rule 8)                                  |
 | Sprint Contract     | FULL density harness Phase 3         | **Hook**: `gate-enforcement.sh` contract gate                                     | `MEOWKIT_HARNESS_MODE=LEAN` or `MINIMAL`                                      |
@@ -297,9 +297,9 @@ Source: `AGENTS_INDEX.md` table footnote; `harness-rules.md` Rule 2.
 
 | Skill                | Agents                                       | Role                |
 | -------------------- | -------------------------------------------- | ------------------- |
-| meow:jira            | jira-evaluator, jira-estimator, jira-analyst | Ticket intelligence |
-| meow:confluence      | confluence-reader, spec-analyzer             | Spec analysis       |
-| meow:planning-engine | tech-analyzer, planning-reporter             | Sprint planning     |
+| mk:jira            | jira-evaluator, jira-estimator, jira-analyst | Ticket intelligence |
+| mk:confluence      | confluence-reader, spec-analyzer             | Spec analysis       |
+| mk:planning-engine | tech-analyzer, planning-reporter             | Sprint planning     |
 
 ---
 
@@ -312,10 +312,10 @@ Source: `CLAUDE.md` Memory section; `HOOKS_INDEX.md` State Files table.
 
 | File                                                        | When read                                                    | Writer                                         |
 | ----------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------- |
-| `fixes.md` + `fixes.json`                                   | On-demand (meow:fix)                                         | immediate-capture-handler.cjs, session-capture |
-| `review-patterns.md` + `review-patterns.json`               | On-demand (meow:review, meow:plan-creator)                   | immediate-capture-handler.cjs, session-capture |
-| `architecture-decisions.md` + `architecture-decisions.json` | On-demand (meow:plan-creator, meow:cook)                     | immediate-capture-handler.cjs, session-capture |
-| `security-notes.md`                                         | On-demand (meow:cso)                                         | Manual / session-capture                       |
+| `fixes.md` + `fixes.json`                                   | On-demand (mk:fix)                                         | immediate-capture-handler.cjs, session-capture |
+| `review-patterns.md` + `review-patterns.json`               | On-demand (mk:review, mk:plan-creator)                   | immediate-capture-handler.cjs, session-capture |
+| `architecture-decisions.md` + `architecture-decisions.json` | On-demand (mk:plan-creator, mk:cook)                     | immediate-capture-handler.cjs, session-capture |
+| `security-notes.md`                                         | On-demand (mk:cso)                                         | Manual / session-capture                       |
 | `conversation-summary.md`                                   | Yes — every UserPromptSubmit (conversation-summary-cache.sh) | conversation-summary-cache.sh Stop bg worker   |
 | `cost-log.json`                                             | Phase 0/6                                                    | post-session.sh (atomic temp-rename)           |
 | `decisions.md`                                              | On-demand (architect)                                        | Manual                                         |
@@ -333,7 +333,7 @@ does not exist; loads nothing.
 ## 8. Harness (Autonomous Build Pipeline)
 
 Source: `harness-rules.md` (11 rules), `CLAUDE.md` Adaptive Density table,
-`.claude/skills/meow:harness/references/adaptive-density-matrix.md` (density
+`.claude/skills/harness/references/adaptive-density-matrix.md` (density
 matrix single source of truth).
 
 7-step step-file pipeline for green-field product builds. Generator/evaluator
@@ -343,8 +343,8 @@ architecture: separate agents, separate contexts; self-evaluation forbidden
 | Step | Action                                                                                                                                            | Rule      |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
 | 0    | Tier Detection — model-detector.cjs → session-state/detected-model.json → MINIMAL\|FULL\|LEAN                                                     | Rule 5    |
-| 1    | Plan — meow:plan-creator --product-level; user stories NOT file paths → Gate 1                                                                    | Rule 1, 3 |
-| 2    | Contract — meow:sprint-contract (FULL: required; LEAN: optional; MINIMAL: skip)                                                                   | Rule 3    |
+| 1    | Plan — mk:plan-creator --product-level; user stories NOT file paths → Gate 1                                                                    | Rule 1, 3 |
+| 2    | Contract — mk:sprint-contract (FULL: required; LEAN: optional; MINIMAL: skip)                                                                   | Rule 3    |
 | 3    | Generate — developer agent (isolated context)                                                                                                     | Rule 2    |
 | 4    | Evaluate — evaluator (fresh context, skeptic-persona per criterion); MUST drive running build; validate-verdict.sh rejects empty evidence/ → FAIL | Rule 8, 9 |
 | 5    | Ship or Iterate — PASS→ship; FAIL→loop; max 3 rounds → AskUserQuestion                                                                            | Rule 4    |
@@ -352,11 +352,11 @@ architecture: separate agents, separate contexts; self-evaluation forbidden
 
 ### Density Matrix
 
-Source: `CLAUDE.md` Adaptive Density table; `.claude/skills/meow:harness/references/adaptive-density-matrix.md`.
+Source: `CLAUDE.md` Adaptive Density table; `.claude/skills/harness/references/adaptive-density-matrix.md`.
 
 | Density                 | Model        | Contract                           | Iterations | Override                       |
 | ----------------------- | ------------ | ---------------------------------- | ---------- | ------------------------------ |
-| MINIMAL (Haiku)         | Cheapest     | Skip — short-circuits to meow:cook | Skip       | `MEOWKIT_HARNESS_MODE=MINIMAL` |
+| MINIMAL (Haiku)         | Cheapest     | Skip — short-circuits to mk:cook | Skip       | `MEOWKIT_HARNESS_MODE=MINIMAL` |
 | FULL (Sonnet, Opus 4.5) | Default/Best | Required (gate-enforced)           | 1–3 rounds | `MEOWKIT_HARNESS_MODE=FULL`    |
 | LEAN (Opus 4.6+)        | Best         | Optional (skip if ACs < 5)         | 0–1 rounds | `MEOWKIT_HARNESS_MODE=LEAN`    |
 
@@ -368,9 +368,9 @@ Density override adjusts scaffolding only — **never bypasses gates**
 ## 9. Design Principles
 
 Derived from `audit-rubric-final.md` Section A. Each principle maps to a rubric
-criterion. Source for all: `meow:skill-creator/SKILL.md` + `audit-rubric-final.md`.
+criterion. Source for all: `mk:skill-creator/SKILL.md` + `audit-rubric-final.md`.
 
-Source for all: `audit-rubric-final.md` Section A; `meow:skill-creator/SKILL.md`.
+Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 
 | #   | Principle                                                                                                                                           | Rubric       | Current Violations                                     |
 | --- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------------------------------------ |
@@ -390,23 +390,23 @@ Source for all: `audit-rubric-final.md` Section A; `meow:skill-creator/SKILL.md`
 
 | ID    | File:Line                                      | Issue                                                                                                                          | Status                        |
 | ----- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
-| CF-C1 | `meow:debug/SKILL.md:1-4`                      | Deprecated skill missing `deprecated: true` + `superseded_by:` YAML — parsers miss it                                          | CLOSED (skill removed v2.4.4) |
-| CF-C2 | `meow:shipping/SKILL.md:1-4`                   | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
-| CF-C3 | `meow:documentation/SKILL.md:1-4`              | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
-| CF-C4 | `meow:multimodal/SKILL.md:45`                  | `.claude/skills/.venv/bin/python3` ABSENT — all Python scripts fail; blocks meow:llms, meow:web-to-markdown, meow:plan-creator | OPEN (re-verified 2026-04-29; loader warns; covered by `mewkit setup venv`) |
-| CF-C5 | `plan-creator/step-02-codebase-analysis.md:21` | `docs/project-context.md` missing; project-context-loader.sh nudges agent but no setup-time auto-prompt                        | PARTIAL → CLOSED 2026-04-29 (mewkit setup `project-context` step added; warns user to invoke `/meow:project-context` on first session) |
-| CF-C6 | `meow:cook/SKILL.md:159`                       | Audit cited bare `memory/lessons.md` path. Re-verification 2026-04-29: line 159 is `## Gotchas`, line 170 has correct `.claude/memory/fixes.md` prefix | CLOSED 2026-04-29 (re-verified — already correct in current tree) |
+| CF-C1 | `mk:debug/SKILL.md:1-4`                      | Deprecated skill missing `deprecated: true` + `superseded_by:` YAML — parsers miss it                                          | CLOSED (skill removed v2.4.4) |
+| CF-C2 | `mk:shipping/SKILL.md:1-4`                   | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
+| CF-C3 | `mk:documentation/SKILL.md:1-4`              | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
+| CF-C4 | `mk:multimodal/SKILL.md:45`                  | `.claude/skills/.venv/bin/python3` ABSENT — all Python scripts fail; blocks mk:llms, mk:web-to-markdown, mk:plan-creator | OPEN (re-verified 2026-04-29; loader warns; covered by `mewkit setup venv`) |
+| CF-C5 | `plan-creator/step-02-codebase-analysis.md:21` | `docs/project-context.md` missing; project-context-loader.sh nudges agent but no setup-time auto-prompt                        | PARTIAL → CLOSED 2026-04-29 (mewkit setup `project-context` step added; warns user to invoke `/mk:project-context` on first session) |
+| CF-C6 | `mk:cook/SKILL.md:159`                       | Audit cited bare `memory/lessons.md` path. Re-verification 2026-04-29: line 159 is `## Gotchas`, line 170 has correct `.claude/memory/fixes.md` prefix | CLOSED 2026-04-29 (re-verified — already correct in current tree) |
 
 ### High-Impact High Findings (re-verified 2026-04-29)
 
 | ID     | File:Line                            | Issue                                                                        | Status |
 | ------ | ------------------------------------ | ---------------------------------------------------------------------------- | ------ |
-| CF-H7  | `meow:lazy-agent-loader/SKILL.md:13` | Audit cited hardcoded agent count "15" | CLOSED 2026-04-29 — `grep -nE "[0-9]+ agent"` returns nothing; no hardcoded count exists in current tree |
-| CF-H11 | `commands/meow/meow.md:20`           | `/meow:command` routed but `meow:command` not in inventory (phantom)         | CLOSED 2026-04-29 — refs resolve via `commands/meow/<name>.md` per `MC` "Commands vs Skills" rule (post-dated audit) |
-| CF-H12 | `commands/meow/meow.md:20,40`        | `meow:plan/arch/design/test` phantom routing targets | CLOSED 2026-04-29 — all 4 resolve via `commands/meow/<name>.md` |
-| CF-H13 | `commands/meow/plan.md`              | `meow:plan` phantom                                                          | CLOSED 2026-04-29 — `commands/meow/plan.md` exists |
-| CF-H14 | `commands/meow/validate.md`          | `meow:audit`, `meow:validate` phantom                                        | CLOSED 2026-04-29 — both resolve in `commands/meow/` |
-| CF-H15 | `commands/meow/summary.md`           | `meow:summary` phantom                                                       | CLOSED 2026-04-29 — `commands/meow/summary.md` exists |
+| CF-H7  | `mk:lazy-agent-loader/SKILL.md:13` | Audit cited hardcoded agent count "15" | CLOSED 2026-04-29 — `grep -nE "[0-9]+ agent"` returns nothing; no hardcoded count exists in current tree |
+| CF-H11 | `commands/meow/meow.md:20`           | `/mk:command` routed but `mk:command` not in inventory (phantom)         | CLOSED 2026-04-29 — refs resolve via `commands/meow/<name>.md` per `MC` "Commands vs Skills" rule (post-dated audit) |
+| CF-H12 | `commands/meow/meow.md:20,40`        | `mk:plan/arch/design/test` phantom routing targets | CLOSED 2026-04-29 — all 4 resolve via `commands/meow/<name>.md` |
+| CF-H13 | `commands/meow/plan.md`              | `mk:plan` phantom                                                          | CLOSED 2026-04-29 — `commands/meow/plan.md` exists |
+| CF-H14 | `commands/meow/validate.md`          | `mk:audit`, `mk:validate` phantom                                        | CLOSED 2026-04-29 — both resolve in `commands/meow/` |
+| CF-H15 | `commands/meow/summary.md`           | `mk:summary` phantom                                                       | CLOSED 2026-04-29 — `commands/meow/summary.md` exists |
 
 **Re-verification finding (CF-H11–H15):** the audit pre-dated `meowkit/CLAUDE.md` "Commands vs Skills" section, which formalizes that a command without a matching skill is NOT phantom (per audit-rubric RF-14). All 7 cited refs resolve to a command file. **A future Phase 2 cross-ref CI script will guard against regressions.**
 
@@ -417,11 +417,11 @@ Source for all: `audit-rubric-final.md` Section A; `meow:skill-creator/SKILL.md`
 | Scenario                       | Verdict | Key Break Point                                                    |
 | ------------------------------ | ------- | ------------------------------------------------------------------ |
 | S1 — Feature request routing   | PARTIAL | `commands/meow/meow.md:40` phantom routing (CF-H12)                |
-| S2 — `/meow:cook <plan>`       | PARTIAL | `meow:cook/SKILL.md:159` bare memory path (CF-C6)                  |
-| S3 — `/meow:harness "build X"` | PARTIAL | `evaluator.md` Required Context missing rubric-rules.md (CF-M4)    |
+| S2 — `/mk:cook <plan>`       | PARTIAL | `mk:cook/SKILL.md:159` bare memory path (CF-C6)                  |
+| S3 — `/mk:harness "build X"` | PARTIAL | `evaluator.md` Required Context missing rubric-rules.md (CF-M4)    |
 | S4 — Python skill runtime      | BROKEN  | `.claude/skills/.venv/bin/python3` absent (CF-C4)                  |
 | S5 — Session reset mid-phase   | PARTIAL | `plan-creator/step-02:21` loads missing project-context.md (CF-C5) |
-| S6 — `/meow fix` dispatcher    | PARTIAL | `commands/meow/fix.md:58` phantom `/meow:plan` ref (CF-M29)        |
+| S6 — `/meow fix` dispatcher    | PARTIAL | `commands/meow/fix.md:58` phantom `/mk:plan` ref (CF-M29)        |
 
 Source: `audit-findings/simulation-traces.md` Scenario Verdict Summary table.
 

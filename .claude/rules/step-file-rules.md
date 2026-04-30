@@ -6,7 +6,7 @@ These rules govern how agents execute multi-step workflow skills that use the st
 
 Some MeowKit skills decompose complex workflows into individual step files:
 ```
-skills/meow:review/
+skills/mk:review/
 ├── SKILL.md           # Entrypoint (metadata only)
 ├── workflow.md        # Step sequence definition
 ├── step-01-*.md       # Step 1
@@ -69,8 +69,8 @@ These rules apply ONLY to skills that have a `workflow.md` file.
 Skills without `workflow.md` are monolithic and follow standard execution.
 
 Currently step-file enabled:
-- `meow:plan-creator` — 9-step planning workflow (00-08)
-- `meow:review` — 5-step adversarial review workflow (includes step-02b persona passes)
-- `meow:evaluate` — 5-step behavioral verification (load-rubrics → boot-app → probe → grade → feedback)
-- `meow:harness` — 7-step autonomous build pipeline (tier-detection → plan → contract → generate → evaluate → iterate-or-ship → run-report)
-- `meow:trace-analyze` — 6-step trace analysis (ingest → partition → scatter → gather → suggestions → HITL gate)
+- `mk:plan-creator` — 9-step planning workflow (00-08)
+- `mk:review` — 5-step adversarial review workflow (includes step-02b persona passes)
+- `mk:evaluate` — 5-step behavioral verification (load-rubrics → boot-app → probe → grade → feedback)
+- `mk:harness` — 7-step autonomous build pipeline (tier-detection → plan → contract → generate → evaluate → iterate-or-ship → run-report)
+- `mk:trace-analyze` — 6-step trace analysis (ingest → partition → scatter → gather → suggestions → HITL gate)

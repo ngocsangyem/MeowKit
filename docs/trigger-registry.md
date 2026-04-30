@@ -6,7 +6,7 @@ Canonical registry of every meowkit skill, its activation triggers, callers, and
 
 | Field | Meaning |
 |---|---|
-| **Skill** | Skill name (e.g., `meow:harness`) |
+| **Skill** | Skill name (e.g., `mk:harness`) |
 | **Trigger** | Auto-activation pattern OR explicit user invocation |
 | **Caller** | Which agent/skill/hook/user invokes this |
 | **User phrases** | Natural-language phrases that surface this skill |
@@ -16,30 +16,30 @@ Canonical registry of every meowkit skill, its activation triggers, callers, and
 
 | Skill | Trigger | Caller | User phrases | Outputs |
 |---|---|---|---|---|
-| `meow:harness` | User invocation; auto-suggest on green-field "build me a X" intent | User; orchestrator routing | "build me a kanban app", "make a retro game maker", "create a SaaS dashboard", "autonomous build" | `tasks/harness-runs/{run-id}/run.md` + all per-step artifacts |
-| `meow:plan-creator` | `/meow:plan` or `/meow:cook`; harness step-01 | User; `meow:harness`; `meow:cook` | "create a plan", "plan this feature", "draft a spec" | `tasks/plans/{date-slug}/plan.md` + phase files |
-| `meow:plan-creator --product-level` | step-00 of plan-creator detects green-field intent; harness step-01 | `meow:plan-creator`; `meow:harness` step-01 | "build a kanban app" (auto-detected); explicit `--product-level` flag | `tasks/plans/{date-slug}/plan.md` (product spec form, no phase files) |
-| `meow:sprint-contract` | Harness step-02 (FULL density); pre-developer for any sprint-driven build | `meow:harness` step-02; user via `/meow:sprint-contract` | "draft a sprint contract", "negotiate scope for sprint" | `tasks/contracts/{date}-{slug}-sprint-{N}.md` |
-| `meow:rubric` | Loaded by `meow:evaluate` step-01; user via `/meow:rubric` | `evaluator` agent; user | "load rubric", "compose rubric preset", "validate rubric" | Composed prompt fragment to stdout |
-| `meow:evaluate` | Harness step-04; post-developer handoff | `meow:harness` step-04; `evaluator` agent | "evaluate this build", "grade the running app", "verify against the spec" | `tasks/reviews/{date-slug}-evalverdict.md` + `evidence/` directory |
+| `mk:harness` | User invocation; auto-suggest on green-field "build me a X" intent | User; orchestrator routing | "build me a kanban app", "make a retro game maker", "create a SaaS dashboard", "autonomous build" | `tasks/harness-runs/{run-id}/run.md` + all per-step artifacts |
+| `mk:plan-creator` | `/mk:plan` or `/mk:cook`; harness step-01 | User; `mk:harness`; `mk:cook` | "create a plan", "plan this feature", "draft a spec" | `tasks/plans/{date-slug}/plan.md` + phase files |
+| `mk:plan-creator --product-level` | step-00 of plan-creator detects green-field intent; harness step-01 | `mk:plan-creator`; `mk:harness` step-01 | "build a kanban app" (auto-detected); explicit `--product-level` flag | `tasks/plans/{date-slug}/plan.md` (product spec form, no phase files) |
+| `mk:sprint-contract` | Harness step-02 (FULL density); pre-developer for any sprint-driven build | `mk:harness` step-02; user via `/mk:sprint-contract` | "draft a sprint contract", "negotiate scope for sprint" | `tasks/contracts/{date}-{slug}-sprint-{N}.md` |
+| `mk:rubric` | Loaded by `mk:evaluate` step-01; user via `/mk:rubric` | `evaluator` agent; user | "load rubric", "compose rubric preset", "validate rubric" | Composed prompt fragment to stdout |
+| `mk:evaluate` | Harness step-04; post-developer handoff | `mk:harness` step-04; `evaluator` agent | "evaluate this build", "grade the running app", "verify against the spec" | `tasks/reviews/{date-slug}-evalverdict.md` + `evidence/` directory |
 
 ## Existing Skills (Pre-Harness — Just Documented Here)
 
 | Skill | Trigger | Caller | User phrases |
 |---|---|---|---|
-| `meow:cook` | User invocation; harness MINIMAL short-circuit | User; `meow:harness` step-00 (MINIMAL only) | "implement this feature", "fix this bug", "make this change" |
-| `meow:summary` | User invocation (Phase 9 inspector) | User | "show conversation summary", "clear summary cache", "/meow:summary", "/meow:summary --clear", "/meow:summary --status" |
-| `meow:review` | User invocation; pre-ship Gate 2 | User; `shipper` agent; `reviewer` agent | "review this", "code review", "check before shipping" |
-| `meow:fix` | User invocation; simple bugs | User | "fix this", "/meow:fix" |
-| `meow:scale-routing` | Auto on every Phase 0 (orient); harness step-00 | `orchestrator` agent; `meow:harness` step-00 | (auto — no user phrase) |
-| `meow:scout` | Pre-review on COMPLEX changes; user via `/meow:scout` | `reviewer` agent; user | "scout the codebase", "find related files" |
-| `meow:agent-browser` | User invocation; `meow:evaluate` step-03 for frontend probes | `evaluator` agent; user | "navigate to", "click on", "test this URL" |
-| `meow:playwright-cli` | User invocation; `meow:evaluate` step-03 for scripted flows | `evaluator` agent; user | "run playwright script", "automated browser test" |
-| `meow:browse` | User invocation; `meow:evaluate` step-03 for quick screenshots | `evaluator` agent; user | "screenshot this", "browse to" |
+| `mk:cook` | User invocation; harness MINIMAL short-circuit | User; `mk:harness` step-00 (MINIMAL only) | "implement this feature", "fix this bug", "make this change" |
+| `mk:summary` | User invocation (Phase 9 inspector) | User | "show conversation summary", "clear summary cache", "/mk:summary", "/mk:summary --clear", "/mk:summary --status" |
+| `mk:review` | User invocation; pre-ship Gate 2 | User; `shipper` agent; `reviewer` agent | "review this", "code review", "check before shipping" |
+| `mk:fix` | User invocation; simple bugs | User | "fix this", "/mk:fix" |
+| `mk:scale-routing` | Auto on every Phase 0 (orient); harness step-00 | `orchestrator` agent; `mk:harness` step-00 | (auto — no user phrase) |
+| `mk:scout` | Pre-review on COMPLEX changes; user via `/mk:scout` | `reviewer` agent; user | "scout the codebase", "find related files" |
+| `mk:agent-browser` | User invocation; `mk:evaluate` step-03 for frontend probes | `evaluator` agent; user | "navigate to", "click on", "test this URL" |
+| `mk:playwright-cli` | User invocation; `mk:evaluate` step-03 for scripted flows | `evaluator` agent; user | "run playwright script", "automated browser test" |
+| `mk:browse` | User invocation; `mk:evaluate` step-03 for quick screenshots | `evaluator` agent; user | "screenshot this", "browse to" |
 
 ## Rubric Library Triggers (Phase 2)
 
-Each rubric is loaded by `meow:rubric load <name>` or as part of a composition preset.
+Each rubric is loaded by `mk:rubric load <name>` or as part of a composition preset.
 
 | Rubric | Loaded by preset | Loaded by direct `load` |
 |---|---|---|
@@ -67,15 +67,15 @@ Each rubric is loaded by `meow:rubric load <name>` or as part of a composition p
 | `post-write-build-verify.sh` middleware | 7 | **Shipped 260408** — auto compile/lint per file extension, hash-cached, env-isolated |
 | `post-write-loop-detection.sh` middleware | 7 | **Shipped 260408** — warn at N=4, escalate at N=8 edits to same file |
 | `pre-completion-check.sh` middleware | 7 | **Shipped 260408** — Stop hook hard gate, JSON block decision when no verification evidence |
-| `meow:trace-analyze` | 8 | **Shipped 260408** — `/meow:trace-analyze`, scatter-gather over `.claude/memory/trace-log.jsonl`, HITL gate mandatory |
-| `meow:benchmark` | 8 | **Shipped 260408** — `/meow:benchmark run [--full]`, quick tier 5 tasks ≤$5, full tier 6 tasks ≤$30 |
-| `conversation-summary-cache.sh` middleware | 9 | **Shipped 260408** — dual-event hook (Stop summarizes via detached `nohup` `claude -p --model haiku` background worker, UserPromptSubmit injects cached summary as user-visible context). Throttled by size + event gap + growth delta. Cleared on session change by `project-context-loader.sh`. User-facing inspector: `/meow:summary`. Env-var configurable. |
+| `mk:trace-analyze` | 8 | **Shipped 260408** — `/mk:trace-analyze`, scatter-gather over `.claude/memory/trace-log.jsonl`, HITL gate mandatory |
+| `mk:benchmark` | 8 | **Shipped 260408** — `/mk:benchmark run [--full]`, quick tier 5 tasks ≤$5, full tier 6 tasks ≤$30 |
+| `conversation-summary-cache.sh` middleware | 9 | **Shipped 260408** — dual-event hook (Stop summarizes via detached `nohup` `claude -p --model haiku` background worker, UserPromptSubmit injects cached summary as user-visible context). Throttled by size + event gap + growth delta. Cleared on session change by `project-context-loader.sh`. User-facing inspector: `/mk:summary`. Env-var configurable. |
 
 ## Maintenance
 
 This file is the **canonical source** for skill discovery. Add a row whenever a new skill ships. Remove a row when a skill is pruned.
 
-**CI lint (not yet scheduled):** a linter that greps `.claude/skills/meow:*/SKILL.md` and verifies each name has a row here would prevent skill drift. Currently a manual grep before merge. Not pinned to any phase — a future plan can pick it up if drift becomes a real problem.
+**CI lint (not yet scheduled):** a linter that greps `.claude/skills/*/SKILL.md` and verifies each name has a row here would prevent skill drift. Currently a manual grep before merge. Not pinned to any phase — a future plan can pick it up if drift becomes a real problem.
 
 ## See Also
 

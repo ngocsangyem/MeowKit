@@ -1,28 +1,28 @@
 ---
-title: "meow:benchmark"
+title: "mk:benchmark"
 description: "Harness canary suite — runs a small set of ground-truth tasks to measure harness performance and back dead-weight audit decisions with empirical deltas."
 ---
 
-# meow:benchmark
+# mk:benchmark
 
 Measures harness performance against a curated set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (`docs/dead-weight-audit.md`) consumes to make load-bearing decisions about each harness component. Results land in `trace-log.jsonl` as `benchmark_result` events, tagged with `benchmark_version`, `harness_version`, and `model_version`.
 
 ## What This Skill Does
 
-`meow:benchmark` runs a small canary suite — 5 quick tasks by default, or 6 with `--full` — against the current harness configuration and records per-task scores. The `compare` subcommand produces a delta table between two prior runs, making before/after harness changes directly measurable. This is how the dead-weight audit answers "is this harness component still load-bearing?" — by running the suite before a change, applying the change, and running again. The `--full` flag is required to include the heavy app-build task that can run for hours; omitting it prevents accidental cost burn.
+`mk:benchmark` runs a small canary suite — 5 quick tasks by default, or 6 with `--full` — against the current harness configuration and records per-task scores. The `compare` subcommand produces a delta table between two prior runs, making before/after harness changes directly measurable. This is how the dead-weight audit answers "is this harness component still load-bearing?" — by running the suite before a change, applying the change, and running again. The `--full` flag is required to include the heavy app-build task that can run for hours; omitting it prevents accidental cost burn.
 
 ## Core Capabilities
 
 - **3 subcommands** — `run`, `run --full`, `compare <run-id-a> <run-id-b>`
 - **Two cost tiers** — quick tier ≤$5 (5 tasks), full tier ≤$30 (6 tasks); hard-blocked if projected cost exceeds
 - **`--full` opt-in gate** — the heavy `06-small-app-build` task requires explicit `--full` to prevent accidental multi-hour runs
-- **Trace integration** — results written to both `.claude/benchmarks/results/{run-id}.json` and `trace-log.jsonl` for `meow:trace-analyze` consumption
+- **Trace integration** — results written to both `.claude/benchmarks/results/{run-id}.json` and `trace-log.jsonl` for `mk:trace-analyze` consumption
 - **Delta comparison** — `compare` reads two prior run JSONs and emits a per-task score delta table
 - **Dead-weight audit backing** — the canonical measurement mechanism per `docs/dead-weight-audit.md`
 
 ## When to Use This
 
-::: tip Use meow:benchmark when...
+::: tip Use mk:benchmark when...
 - You're about to apply a harness change and need a baseline measurement first
 - You've applied a harness change and want to verify the delta
 - A model upgrade requires validating that existing scaffolding is still load-bearing
@@ -30,10 +30,10 @@ Measures harness performance against a curated set of ground-truth tasks. Provid
 - You want empirical evidence before promoting or demoting a density tier in the adaptive density matrix
 :::
 
-::: warning Don't use meow:benchmark when...
+::: warning Don't use mk:benchmark when...
 - The harness has been run end-to-end manually within the last hour — use that data instead
 - You're looking for unit-test coverage — this is harness-level measurement only, not a test suite replacement
-- You want to analyze patterns across multiple runs — use [`meow:trace-analyze`](/reference/skills/trace-analyze) for that
+- You want to analyze patterns across multiple runs — use [`mk:trace-analyze`](/reference/skills/trace-analyze) for that
 - Budget cap would be hit before the suite finishes — record partial result, alert, and investigate
 :::
 
@@ -41,13 +41,13 @@ Measures harness performance against a curated set of ground-truth tasks. Provid
 
 ```bash
 # Run the quick tier (5 tasks, ≤$5)
-/meow:benchmark run
+/mk:benchmark run
 
 # Run the full tier (6 tasks including the heavy app build, ≤$30)
-/meow:benchmark run --full
+/mk:benchmark run --full
 
 # Compare two prior runs — shows per-task delta table
-/meow:benchmark compare 260408-1430 260408-1530
+/mk:benchmark compare 260408-1430 260408-1530
 ```
 
 ## Subcommands
@@ -87,7 +87,7 @@ Measures harness performance against a curated set of ground-truth tasks. Provid
 
 Per `run`:
 - `.claude/benchmarks/results/{run-id}.json` — full result JSON with per-task scores, costs, durations
-- `.claude/memory/trace-log.jsonl` — appended `benchmark_result` events (consumed by `meow:trace-analyze`)
+- `.claude/memory/trace-log.jsonl` — appended `benchmark_result` events (consumed by `mk:trace-analyze`)
 - Printed: per-task verdict + score, total cost, total duration, run ID
 
 Per `compare`:
@@ -135,7 +135,7 @@ Per `compare`:
 
 ### `run` — Canary Execution
 
-`run-canary.sh` iterates spec files in the active tier, writes a manifest with `PENDING` tasks, then prints orchestrator instructions. The agent invoking this skill must follow those instructions to fill in each task's results — the shell script cannot spawn `meow:harness` subagents directly. Each task invokes `meow:harness` with the spec as input. Results are recorded back to the manifest and then flushed to the result JSON and `trace-log.jsonl`.
+`run-canary.sh` iterates spec files in the active tier, writes a manifest with `PENDING` tasks, then prints orchestrator instructions. The agent invoking this skill must follow those instructions to fill in each task's results — the shell script cannot spawn `mk:harness` subagents directly. Each task invokes `mk:harness` with the spec as input. Results are recorded back to the manifest and then flushed to the result JSON and `trace-log.jsonl`.
 
 ### `compare` — Delta Table
 
@@ -143,7 +143,7 @@ Per `compare`:
 
 ## Hard Constraints
 
-From `meow:benchmark` source:
+From `mk:benchmark` source:
 1. Quick tier ≤$5 total cost; hard block if projected cost exceeds
 2. Full tier ≤$30 total cost; hard block if projected cost exceeds
 3. `--full` is opt-in — heavy task requires explicit flag; refuses without it
@@ -152,8 +152,8 @@ From `meow:benchmark` source:
 
 ## Gotchas
 
-1. **`run-canary.sh` is a half-implementation by design** — it writes a manifest with `PENDING` tasks then prints orchestrator instructions; the agent MUST follow those instructions manually. Shell processes cannot spawn `meow:harness` subagents. Documented in `run-canary.sh:101-115`
-2. **Circular dependency with `meow:harness`** — this skill invokes `meow:harness` per task; if a harness bug is exactly what the dead-weight audit is trying to find, the audit may fail to start. Workaround: run individual canary specs manually via `/meow:cook <spec.md>` for the broken-harness case
+1. **`run-canary.sh` is a half-implementation by design** — it writes a manifest with `PENDING` tasks then prints orchestrator instructions; the agent MUST follow those instructions manually. Shell processes cannot spawn `mk:harness` subagents. Documented in `run-canary.sh:101-115`
+2. **Circular dependency with `mk:harness`** — this skill invokes `mk:harness` per task; if a harness bug is exactly what the dead-weight audit is trying to find, the audit may fail to start. Workaround: run individual canary specs manually via `/mk:cook <spec.md>` for the broken-harness case
 3. **Don't treat 100% pass as "harness is perfect"** — canary tasks are intentionally simple; they catch regressions, not the full tail of real-world failures
 4. **Don't skip `--full` for the dead-weight audit** — the heavy task is needed to detect issues that only manifest in real product builds
 5. **Don't compare runs across different model versions** without noting it in the delta table — model upgrade is a confounding variable that must be declared
@@ -161,17 +161,17 @@ From `meow:benchmark` source:
 
 ## Relationships
 
-- [`meow:harness`](/reference/skills/harness) — benchmark invokes `meow:harness` per canary spec task
-- [`meow:trace-analyze`](/reference/skills/trace-analyze) — consumes benchmark result records from `trace-log.jsonl` for the dead-weight audit
-- [`meow:evaluate`](/reference/skills/evaluate) — each harness invocation uses `meow:evaluate` to grade the canary build; rubric scores flow into the result JSON
+- [`mk:harness`](/reference/skills/harness) — benchmark invokes `mk:harness` per canary spec task
+- [`mk:trace-analyze`](/reference/skills/trace-analyze) — consumes benchmark result records from `trace-log.jsonl` for the dead-weight audit
+- [`mk:evaluate`](/reference/skills/evaluate) — each harness invocation uses `mk:evaluate` to grade the canary build; rubric scores flow into the result JSON
 - [`/reference/agents/evaluator`](/reference/agents/evaluator) — evaluator agent grading each canary task
 
 ## See Also
 
-- Canonical source: `.claude/skills/meow:benchmark/SKILL.md`
+- Canonical source: `.claude/skills/benchmark/SKILL.md`
 - Canary spec directory: `.claude/benchmarks/canary/`
-- Canary runner: `.claude/skills/meow:benchmark/scripts/run-canary.sh`
-- Compare script: `.claude/skills/meow:benchmark/scripts/compare-runs.sh`
+- Canary runner: `.claude/skills/benchmark/scripts/run-canary.sh`
+- Compare script: `.claude/skills/benchmark/scripts/compare-runs.sh`
 - Dead-weight audit playbook: `docs/dead-weight-audit.md`
 - Related guide: [`/guide/trace-and-benchmark`](/guide/trace-and-benchmark)
-- Related skill: [`meow:trace-analyze`](/reference/skills/trace-analyze)
+- Related skill: [`mk:trace-analyze`](/reference/skills/trace-analyze)

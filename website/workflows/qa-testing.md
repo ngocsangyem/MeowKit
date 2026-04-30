@@ -10,27 +10,27 @@ persona: B
 
 **Best for:** Pre-release testing, E2E automation  
 **Time estimate:** 15-45 minutes  
-**Skills used:** [meow:qa-manual](/reference/skills/qa-manual), [meow:qa](/reference/skills/qa), [meow:browse](/reference/skills/browse)  
-**Browser skills:** [meow:agent-browser](/reference/skills/agent-browser), [meow:playwright-cli](/reference/skills/playwright-cli)
+**Skills used:** [mk:qa-manual](/reference/skills/qa-manual), [mk:qa](/reference/skills/qa), [mk:browse](/reference/skills/browse)  
+**Browser skills:** [mk:agent-browser](/reference/skills/agent-browser), [mk:playwright-cli](/reference/skills/playwright-cli)
 
 ## Overview
 
-MeowKit offers two QA approaches: **meow:qa** (find bugs + fix them + verify fixes) and **meow:qa-manual** (spec-driven testing with reports or E2E code generation). Both use browser automation under the hood.
+MeowKit offers two QA approaches: **mk:qa** (find bugs + fix them + verify fixes) and **mk:qa-manual** (spec-driven testing with reports or E2E code generation). Both use browser automation under the hood.
 
 ## Manual QA report
 
 ### Step 1: Run from spec
 
 ```
-/meow:qa-manual tasks/plans/260327-auth.md --report
+/mk:qa-manual tasks/plans/260327-auth.md --report
 ```
 
 ### Step 2: Agent navigates like a human
 
 The skill routes each action to the best browser tool:
-- **DOM interaction** → [meow:playwright-cli](/reference/skills/playwright-cli) (generates PW code as side-effect)
-- **Auth flows** → [meow:agent-browser](/reference/skills/agent-browser) (session persistence)
-- **Visual checks** → [meow:agent-browser](/reference/skills/agent-browser) (annotated screenshots)
+- **DOM interaction** → [mk:playwright-cli](/reference/skills/playwright-cli) (generates PW code as side-effect)
+- **Auth flows** → [mk:agent-browser](/reference/skills/agent-browser) (session persistence)
+- **Visual checks** → [mk:agent-browser](/reference/skills/agent-browser) (annotated screenshots)
 
 ### Step 3: Auth handling
 
@@ -38,7 +38,7 @@ When the agent encounters a login page:
 
 ```
 ⚠️ Authentication required at: https://app.example.com/login
-meow:qa-manual needs credentials to continue.
+mk:qa-manual needs credentials to continue.
 Please provide:
 - Email: ___________
 - Password: ___________
@@ -68,7 +68,7 @@ Evidence: /tmp/password-reset-error.png
 ## E2E code generation
 
 ```
-/meow:qa-manual tasks/plans/260327-checkout.md --generate
+/mk:qa-manual tasks/plans/260327-checkout.md --generate
 ```
 
 Same navigation, but outputs `.spec.ts` files with role-based locators (`getByTestId`, `getByRole`, `getByLabel`).
@@ -76,10 +76,10 @@ Same navigation, but outputs `.spec.ts` files with role-based locators (`getByTe
 ## Systematic QA (find + fix)
 
 ```
-/meow:qa https://app.example.com
+/mk:qa https://app.example.com
 ```
 
-The [meow:qa](/reference/skills/qa) skill goes further: it finds bugs, fixes them in source code, commits each fix atomically, re-verifies, and produces a before/after health score.
+The [mk:qa](/reference/skills/qa) skill goes further: it finds bugs, fixes them in source code, commits each fix atomically, re-verifies, and produces a before/after health score.
 
 ## Next workflow
 

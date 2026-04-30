@@ -9,7 +9,7 @@ persona: B
 > Full flow for tickets containing images, video recordings, Figma design links, and PDF documents — with graceful fallback at every step.
 
 **Best for:** Team leads, QA engineers, frontend developers  
-**Skills used:** [meow:intake](/reference/skills/intake), [meow:figma](/reference/skills/figma), [meow:multimodal](/reference/skills/multimodal), [meow:jira](/reference/skills/jira), [meow:investigate](/reference/skills/investigate)
+**Skills used:** [mk:intake](/reference/skills/intake), [mk:figma](/reference/skills/figma), [mk:multimodal](/reference/skills/multimodal), [mk:jira](/reference/skills/jira), [mk:investigate](/reference/skills/investigate)
 
 ## Overview
 
@@ -18,7 +18,7 @@ Tickets often include more than text. Bug reports have screen recordings. Featur
 ```
 Ticket arrives (Jira/Linear/GitHub/manual)
   │
-  ├─ Text content → meow:intake analyzes directly
+  ├─ Text content → mk:intake analyzes directly
   ├─ Images (.png/.jpg) → Claude Read or Gemini
   ├─ Videos (.mp4/.mov) → FFmpeg key frames → Claude Read or Gemini
   ├─ Figma links → Figma MCP or PNG export → Claude Read or Gemini
@@ -46,14 +46,14 @@ MeowKit works without all of them. Each missing tool reduces capability but neve
 ### Step 1: Intake receives ticket
 
 ```bash
-/meow:intake
+/mk:intake
 # Paste ticket content, or if Atlassian MCP:
-# meow:intake reads BUG-456 automatically
+# mk:intake reads BUG-456 automatically
 ```
 
 ### Step 2: Detect image attachments
 
-meow:intake finds `.png` files in the ticket attachments.
+mk:intake finds `.png` files in the ticket attachments.
 
 ### Step 3: Image analysis — fallback chain
 
@@ -63,7 +63,7 @@ meow:intake finds `.png` files in the ticket attachments.
    → NO:  Use raw image (works, costs more tokens)
 
 2. GEMINI_API_KEY available?
-   → YES: meow:multimodal → detailed analysis
+   → YES: mk:multimodal → detailed analysis
           "Error toast showing 'Session expired' at coordinates (340, 120).
            Background shows login form partially filled. Submit button is
            in loading state (spinner visible)."
@@ -99,7 +99,7 @@ meow:intake finds `.png` files in the ticket attachments.
 
 ### Step 1: Intake detects video
 
-meow:intake finds `.mp4` in attachments.
+mk:intake finds `.mp4` in attachments.
 
 ### Step 2: Video processing — FFmpeg required
 
@@ -136,7 +136,7 @@ Gemini available?
 
 ### Step 4: Timeline synthesis
 
-meow:intake builds a timeline from frame analysis:
+mk:intake builds a timeline from frame analysis:
 
 ```markdown
 ### Media Analysis
@@ -155,7 +155,7 @@ meow:intake builds a timeline from frame analysis:
 
 ### Step 5: RCA with video evidence
 
-meow:investigate uses the video timeline as evidence:
+mk:investigate uses the video timeline as evidence:
 
 ```markdown
 ### Root Cause Analysis (5 Whys)
@@ -190,21 +190,21 @@ Unlike images (Claude Read always works), video analysis has no fallback without
 
 ### Step 1: Intake detects Figma URL
 
-meow:intake regex matches: `figma.com/(design|file|proto)/`
+mk:intake regex matches: `figma.com/(design|file|proto)/`
 
 ### Step 2: Figma analysis — fallback chain
 
 ```
 Figma MCP available?
 ├─ YES (best):
-│   meow:figma ANALYZE mode:
+│   mk:figma ANALYZE mode:
 │   → get_design_context: component tree, styles, layout, constraints
 │   → get_screenshot: visual reference
 │   → Extract: exact colors (#1A73E8), exact spacing (24px), fonts (Inter 14px/20px)
 │   → Components: LoginCard, EmailInput, PasswordInput, SubmitButton, SocialLoginGroup
 │
 ├─ NO, but user can export PNG:
-│   meow:intake asks: "Export Figma frames as PNG"
+│   mk:intake asks: "Export Figma frames as PNG"
 │   User drops login-screen.png
 │   → Claude Read or Gemini analyzes the image
 │   → Gets: approximate colors (~#1a73e8), estimated spacing (~24px), visual layout
@@ -235,11 +235,11 @@ Figma MCP available?
 5. Responsive: stack vertically on mobile, center on desktop
 ```
 
-### Step 4: Implementation with meow:cook
+### Step 4: Implementation with mk:cook
 
-User runs `/meow:cook implement the login screen from PRD-123`
+User runs `/mk:cook implement the login screen from PRD-123`
 
-→ meow:cook activates meow:figma IMPLEMENT mode  
+→ mk:cook activates mk:figma IMPLEMENT mode  
 → 7-step Figma→code workflow  
 → Pixel-perfect implementation with exact design values
 

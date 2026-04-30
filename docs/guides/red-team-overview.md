@@ -1,6 +1,6 @@
 # Red Team System
 
-MeowKit's red-team system is integrated into `meow:review` (v1.2.0). It enhances code review with scope-aware dispatch, adversarial persona passes, forced-finding protocol, and 4-level artifact verification.
+MeowKit's red-team system is integrated into `mk:review` (v1.2.0). It enhances code review with scope-aware dispatch, adversarial persona passes, forced-finding protocol, and 4-level artifact verification.
 
 ## How It Works
 
@@ -30,7 +30,7 @@ Diff → Scope Gate ─── minimal ──→ Blind Hunter only ──→ Tria
 
 | Component | Role | Where |
 |-----------|------|-------|
-| `meow:review` | Execution engine (step-file workflow) | `.claude/skills/meow:review/` |
+| `mk:review` | Execution engine (step-file workflow) | `.claude/skills/review/` |
 | Scope Gate | Classifies diff as minimal/full | `step-01-gather-context.md` |
 | Base Reviewers | 3 parallel layers (Blind/Edge-Case/Criteria) | `step-02-parallel-review.md` |
 | Adversarial Personas | 4 hostile lenses, findings-informed | `step-02b-persona-passes.md` |
@@ -48,7 +48,7 @@ Determines review intensity based on diff characteristics.
 | File count | ≤ 3 | Contributes to minimal scope |
 | Line count | ≤ 50 | Contributes to minimal scope |
 | Security file touched | Any | Forces full scope |
-| Domain complexity | high (via `meow:scale-routing`) | Forces full scope |
+| Domain complexity | high (via `mk:scale-routing`) | Forces full scope |
 
 All 4 conditions must be below threshold for minimal scope. Any one above → full scope.
 
@@ -86,7 +86,7 @@ If all reviewers + personas produce zero findings:
 ## Configuration
 
 - Scope gate thresholds: constants in `step-01-gather-context.md` (`SCOPE_GATE_MAX_FILES`, `SCOPE_GATE_MAX_LINES`)
-- Domain complexity: extend `meow:scale-routing/data/domain-complexity.csv` for project-specific domains
+- Domain complexity: extend `mk:scale-routing/data/domain-complexity.csv` for project-specific domains
 - Persona prompts: edit `prompts/personas/*.md` to tune adversarial intensity
 
 ## Sources

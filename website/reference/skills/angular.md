@@ -1,15 +1,15 @@
 ---
-title: "meow:angular"
+title: "mk:angular"
 description: "Angular v20+ patterns — components, signals, DI, forms, routing, HTTP, SSR, testing, tooling. 10 skills consolidated into 1."
 ---
 
-# meow:angular
+# mk:angular
 
 Angular v20+ patterns — 10 topics consolidated with progressive disclosure via references/.
 
 ## What This Skill Does
 
-`meow:angular` provides Angular v20+ best practices across all major topics: components, signals, dependency injection, directives, forms, HTTP, routing, SSR, testing, and tooling. It consolidates 10 separate Angular skills into one with a routing table that loads the right reference for the current task.
+`mk:angular` provides Angular v20+ best practices across all major topics: components, signals, dependency injection, directives, forms, HTTP, routing, SSR, testing, and tooling. It consolidates 10 separate Angular skills into one with a routing table that loads the right reference for the current task.
 
 ## Core Capabilities
 
@@ -33,7 +33,7 @@ These apply to ALL Angular work unless explicitly told otherwise:
 
 ## When to Use This
 
-::: tip Use meow:angular when...
+::: tip Use mk:angular when...
 - Working on any Angular v20+ codebase
 - Creating components, services, forms, routes
 - Setting up SSR/hydration/prerendering
@@ -71,7 +71,7 @@ These apply to ALL Angular work unless explicitly told otherwise:
 
 ## Related
 
-- [`meow:typescript`](/reference/skills/typescript) — TypeScript type safety (used alongside Angular)
-- [`meow:frontend-design`](/reference/skills/frontend-design) — UI/UX design patterns
-- [`meow:react-patterns`](/reference/skills/react-patterns) — React equivalent (for React projects)
-- [`meow:vue`](/reference/skills/vue) — Vue equivalent (for Vue projects)
+- [`mk:typescript`](/reference/skills/typescript) — TypeScript type safety (used alongside Angular)
+- [`mk:frontend-design`](/reference/skills/frontend-design) — UI/UX design patterns
+- [`mk:react-patterns`](/reference/skills/react-patterns) — React equivalent (for React projects)
+- [`mk:vue`](/reference/skills/vue) — Vue equivalent (for Vue projects)

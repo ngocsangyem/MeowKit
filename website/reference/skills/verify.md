@@ -1,19 +1,19 @@
 ---
-title: "meow:verify"
+title: "mk:verify"
 description: "Unified verification: build→lint→type-check→test→coverage in sequence, failing fast on first error."
 ---
 
-# meow:verify
+# mk:verify
 
 Single "is everything green?" check — runs build → lint → type-check → tests → coverage in sequence, fails fast on first error.
 
 ## What This Skill Does
 
-`meow:verify` exists because developers run these checks in different orders, skip steps under time pressure, and interpret "the tests pass" as "the build is green" — which it isn't. A passing test suite with lint errors and a broken type-check is not a green build.
+`mk:verify` exists because developers run these checks in different orders, skip steps under time pressure, and interpret "the tests pass" as "the build is green" — which it isn't. A passing test suite with lint errors and a broken type-check is not a green build.
 
 This skill enforces the **ECC pattern** (Every Check Counts): all five verification steps run in a fixed order, and the sequence stops at the first failure. You get one unified report — one PASS or FAIL — not five separate tool invocations to interpret separately. Skipped steps are listed explicitly so the report is always self-explanatory.
 
-`meow:cook` calls `meow:verify` automatically at the Phase 3→4 transition. `meow:ship` calls it as pre-flight before creating a PR. You can also invoke it standalone to answer "is everything green?" without running the full pipeline.
+`mk:cook` calls `mk:verify` automatically at the Phase 3→4 transition. `mk:ship` calls it as pre-flight before creating a PR. You can also invoke it standalone to answer "is everything green?" without running the full pipeline.
 
 ## Core Capabilities
 
@@ -25,14 +25,14 @@ This skill enforces the **ECC pattern** (Every Check Counts): all five verificat
 
 ## When to Use This
 
-::: tip Use meow:verify when...
+::: tip Use mk:verify when...
 - After implementation, before requesting a review
 - Before merging or creating a PR (pre-flight check)
 - Standalone: "is everything green?" without running the full cook pipeline
-- Auto-called by `meow:cook` (Phase 3→4) and `meow:ship` (pre-flight)
+- Auto-called by `mk:cook` (Phase 3→4) and `mk:ship` (pre-flight)
 :::
 
-::: warning Don't use meow:verify when...
+::: warning Don't use mk:verify when...
 - You only need to run a single check — call the tool directly instead of the full sequence
 - You're in a monorepo and need workspace-level verification — ask which workspace first
 :::
@@ -41,16 +41,16 @@ This skill enforces the **ECC pattern** (Every Check Counts): all five verificat
 
 ```bash
 # Run full verification sequence
-/meow:verify
+/mk:verify
 
 # Override coverage threshold to 90%
-/meow:verify --coverage-threshold 90
+/mk:verify --coverage-threshold 90
 
 # Skip build step (if build runs in CI separately)
-/meow:verify --skip-build
+/mk:verify --skip-build
 
 # Quick check without coverage
-/meow:verify --skip-coverage
+/mk:verify --skip-coverage
 ```
 
 ## Project Detection
@@ -108,9 +108,9 @@ Fail example (stops after lint):
 
 ## Integration
 
-- **`meow:cook`** — calls `meow:verify` automatically after Phase 3 (Build GREEN) completes. If FAIL, developer fixes and re-runs before Phase 4 can begin.
-- **`meow:ship`** — calls `meow:verify` as pre-flight before creating a commit or PR. A FAIL blocks the ship.
-- **`meow:build-fix`** — calls `meow:verify` after each fix attempt to confirm the build is actually green.
+- **`mk:cook`** — calls `mk:verify` automatically after Phase 3 (Build GREEN) completes. If FAIL, developer fixes and re-runs before Phase 4 can begin.
+- **`mk:ship`** — calls `mk:verify` as pre-flight before creating a commit or PR. A FAIL blocks the ship.
+- **`mk:build-fix`** — calls `mk:verify` after each fix attempt to confirm the build is actually green.
 
 ## Gotchas
 
@@ -122,7 +122,7 @@ Fail example (stops after lint):
 
 ## Related
 
-- [`meow:cook`](/reference/skills/cook) — Calls verify at Phase 3→4 transition
-- [`meow:ship`](/reference/skills/ship) — Calls verify as pre-flight before PR creation
-- [`meow:build-fix`](/reference/skills/build-fix) — Chains into verify after each fix attempt
-- [`meow:testing`](/reference/skills/testing) — TDD reference for writing the tests verify runs
+- [`mk:cook`](/reference/skills/cook) — Calls verify at Phase 3→4 transition
+- [`mk:ship`](/reference/skills/ship) — Calls verify as pre-flight before PR creation
+- [`mk:build-fix`](/reference/skills/build-fix) — Chains into verify after each fix attempt
+- [`mk:testing`](/reference/skills/testing) — TDD reference for writing the tests verify runs

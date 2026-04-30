@@ -8,9 +8,9 @@
   "properties": {
     "name": {
       "type": "string",
-      "pattern": "^meow:[a-z][a-z0-9-]*$",
+      "pattern": "^(mk|meow):[a-z][a-z0-9-]*$",
       "maxLength": 64,
-      "description": "Required. Must use meow: prefix and lowercase-kebab. Per Anthropic spec ≤64 chars."
+      "description": "Required. Must use mk: prefix and lowercase-kebab (meow: accepted as legacy alias; deprecated)."
     },
     "description": {
       "type": "string",

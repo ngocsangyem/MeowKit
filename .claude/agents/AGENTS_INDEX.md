@@ -14,13 +14,13 @@
 | `developer.md` | Core | Implementation per approved plan; strict TDD when `--tdd` / `MEOWKIT_TDD=1`; direct implementation in default mode; self-healing | MeowKit original | Phase 3 (Build) | Routed by orchestrator (after tester in TDD mode; directly after planner in default mode) | 260326 | 260409 |
 | `ui-ux-designer.md` | Support | UI design, design systems, accessibility, responsive layouts | MeowKit original | Phase 3 (Build GREEN) | Routed when frontend detected | 260326 | 260330 |
 | `reviewer.md` | Core | 5-dimension code review, Gate 2 enforcement, adversarial personas, artifact verification | MeowKit original | Phase 4 (Review) | Routed by orchestrator after developer | 260326 | 260331 |
-| `evaluator.md` | Core | Behavioral active-verification of running builds against rubric library; skeptic persona; produces graded verdict with concrete runtime evidence (screenshots/curl/CLI). Distinct from reviewer (structural). | MeowKit original | Phase 3 (active verification) + Phase 4 (contract reviewer) | Routed by harness after generator iteration; explicit via /meow:evaluate | 260408 | 260408 |
+| `evaluator.md` | Core | Behavioral active-verification of running builds against rubric library; skeptic persona; produces graded verdict with concrete runtime evidence (screenshots/curl/CLI). Distinct from reviewer (structural). | MeowKit original | Phase 3 (active verification) + Phase 4 (contract reviewer) | Routed by harness after generator iteration; explicit via /mk:evaluate | 260408 | 260408 |
 | `shipper.md` | Core | Deployment pipeline, conventional commits, PR creation | MeowKit original | Phase 5 (Ship) | Routed by orchestrator after Gate 2 | 260326 | 260326 |
 | `git-manager.md` | Support | Git operations: stage, commit, push with conventional commits | Adapted from claudekit-engineer | Phase 5 (Ship), any | On "commit"/"push" request | 260329 | 260329 |
 | `documenter.md` | Core | Living documentation, changelog generation, docs sync | MeowKit original | Phase 6 (Reflect) | Routed by orchestrator after ship | 260326 | 260326 |
 | `analyst.md` | Core | Cost tracking, pattern extraction, lessons learned | MeowKit original | Phase 0, 6 | Auto at session start/end | 260326 | 260326 |
 | `journal-writer.md` | Support | Failure documentation, root cause analysis, lessons | Credit: Duy Nguyen | Phase 6 (Reflect), escalations | On failure/escalation | 260326 | 260326 |
-| `project-manager.md` | Core | Cross-workflow delivery tracking, evidence-based status reports | MeowKit original | on-demand (0–6) | Explicit delegation, `/meow:status`, or `post-phase-delegation.md` rule | 260422 | 260422 |
+| `project-manager.md` | Core | Cross-workflow delivery tracking, evidence-based status reports | MeowKit original | on-demand (0–6) | Explicit delegation, `/mk:status`, or `post-phase-delegation.md` rule | 260422 | 260422 |
 
 **CE version**: Context Engineering version — tracks when agents were last improved with context engineering principles.
 

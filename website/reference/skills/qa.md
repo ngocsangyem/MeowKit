@@ -1,15 +1,15 @@
 ---
-title: "meow:qa"
+title: "mk:qa"
 description: "Systematic QA testing with bug fixing, health scores, and ship-readiness assessment across three tiers."
 ---
 
-# meow:qa
+# mk:qa
 
 Systematic QA testing with bug fixing, health scores, and ship-readiness assessment across three tiers.
 
 ## What This Skill Does
 
-`meow:qa` goes beyond finding bugs — it finds them, fixes them, and verifies the fixes. Three tiers of thoroughness: Quick (critical/high only), Standard (+ medium), Exhaustive (+ cosmetic). Produces before/after health scores and a ship-readiness summary.
+`mk:qa` goes beyond finding bugs — it finds them, fixes them, and verifies the fixes. Three tiers of thoroughness: Quick (critical/high only), Standard (+ medium), Exhaustive (+ cosmetic). Produces before/after health scores and a ship-readiness summary.
 
 ## Core Capabilities
 
@@ -21,7 +21,7 @@ Systematic QA testing with bug fixing, health scores, and ship-readiness assessm
 
 ## When to Use This
 
-::: tip Use meow:qa when...
+::: tip Use mk:qa when...
 - A feature is ready for testing and you want bugs found AND fixed
 - You need a ship-readiness assessment
 - You want before/after quality metrics
@@ -30,8 +30,8 @@ Systematic QA testing with bug fixing, health scores, and ship-readiness assessm
 ## Usage
 
 ```bash
-/meow:qa                    # Standard tier
-/meow:qa https://app.com    # QA a specific URL
+/mk:qa                    # Standard tier
+/mk:qa https://app.com    # QA a specific URL
 ```
 
 ::: info Skill Details
@@ -47,5 +47,5 @@ Systematic QA testing with bug fixing, health scores, and ship-readiness assessm
 
 ## Related
 
-- [`meow:qa-manual`](/reference/skills/qa-manual) — Spec-driven QA + E2E code generation
-- [`meow:browse`](/reference/skills/browse) — The browser tool QA uses
+- [`mk:qa-manual`](/reference/skills/qa-manual) — Spec-driven QA + E2E code generation
+- [`mk:browse`](/reference/skills/browse) — The browser tool QA uses

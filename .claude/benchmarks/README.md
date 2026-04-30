@@ -13,19 +13,19 @@ A small set of self-contained tasks (5 quick + 1 heavy) that exercise different 
 | **quick** (default) | 5 | ≤$5 | Day-to-day regression check; before/after a hook change |
 | **full** (`--full`) | 6 (quick + heavy) | ≤$30 | Dead-weight audit; major harness release; quarterly check |
 
-The heavy task (`06-small-app-build`) requires explicit `--full` because it triggers `meow:harness` which can run for 60–90 minutes.
+The heavy task (`06-small-app-build`) requires explicit `--full` because it triggers `mk:harness` which can run for 60–90 minutes.
 
 ## Running
 
 ```bash
 # Quick tier (default)
-/meow:benchmark run
+/mk:benchmark run
 
 # Full tier (opt-in only)
-/meow:benchmark run --full
+/mk:benchmark run --full
 
 # Compare two prior runs
-/meow:benchmark compare 260408-1430-bench 260408-1530-bench
+/mk:benchmark compare 260408-1430-bench 260408-1530-bench
 ```
 
 Results land in `.claude/benchmarks/results/{run-id}.json` AND as a `benchmark_result` record in `.claude/memory/trace-log.jsonl`.
@@ -61,7 +61,7 @@ rubric_preset: frontend-app | backend-api | cli-tool | fullstack-product
 2. Write the smallest possible task that exercises it
 3. Set realistic `target_seconds` and `target_cost_usd` based on prior runs
 4. Drop the spec into `canary/quick/` or `canary/full/`
-5. Run `/meow:benchmark run` once to establish a baseline
+5. Run `/mk:benchmark run` once to establish a baseline
 6. Document the task's purpose in this README
 
 ## What's NOT Covered
@@ -87,7 +87,7 @@ rubric_preset: frontend-app | backend-api | cli-tool | fullstack-product
 │       └── 06-small-app-build-spec.md          ← Notes app E2E, ~90min, ~$25
 ├── results/                                    ← per-run JSON dumps
 │   └── .gitkeep
-└── (see .claude/skills/meow:benchmark/ for the runner)
+└── (see .claude/skills/benchmark/ for the runner)
 ```
 
 ## Cost Budget
@@ -97,10 +97,10 @@ rubric_preset: frontend-app | backend-api | cli-tool | fullstack-product
 
 ## Trace Integration
 
-Each benchmark run appends a `benchmark_result` record to `.claude/memory/trace-log.jsonl`. `meow:trace-analyze` consumes these for the dead-weight audit's measured-delta column.
+Each benchmark run appends a `benchmark_result` record to `.claude/memory/trace-log.jsonl`. `mk:trace-analyze` consumes these for the dead-weight audit's measured-delta column.
 
 ## See Also
 
-- `.claude/skills/meow:benchmark/SKILL.md` — runner skill
-- `.claude/skills/meow:trace-analyze/` — consumer of benchmark results
+- `.claude/skills/benchmark/SKILL.md` — runner skill
+- `.claude/skills/trace-analyze/` — consumer of benchmark results
 - `docs/dead-weight-audit.md` — recurring playbook that depends on this suite

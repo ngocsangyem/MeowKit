@@ -39,7 +39,7 @@ function isDepPresent(dep: SystemDepEntry): boolean {
 }
 
 /**
- * Enumerate all meow:* skills in .claude/skills/, parse their SKILL.md,
+ * Enumerate all skills in .claude/skills/, parse their SKILL.md,
  * and aggregate the valid optional_system_deps keys.
  * Unknown keys produce a console warning and are excluded.
  */
@@ -47,11 +47,16 @@ function collectSkillDeclaredDeps(projectDir: string): Set<string> {
 	const skillsDir = join(projectDir, ".claude", "skills");
 	if (!existsSync(skillsDir)) return new Set();
 
-	// Enumerate meow:* subdirectories and look for SKILL.md in each
+	// Enumerate any subdirectory containing SKILL.md (content-based, prefix-agnostic)
 	let skillDirs: string[];
 	try {
 		skillDirs = readdirSync(skillsDir, { withFileTypes: true })
-			.filter((d) => d.isDirectory() && d.name.startsWith("meow:"))
+			.filter(
+				(d) =>
+					d.isDirectory() &&
+					!d.name.startsWith(".") &&
+					existsSync(join(skillsDir, d.name, "SKILL.md")),
+			)
 			.map((d) => d.name);
 	} catch {
 		skillDirs = [];
@@ -396,7 +401,7 @@ async function setupDeps(projectDir: string): Promise<StepResult> {
 
 /**
  * Notify if docs/project-context.md is missing. The actual generator lives in the
- * meow:project-context skill (invoked via /meow:project-context generate|init).
+ * mk:project-context skill (invoked via /mk:project-context generate|init).
  * This step does not auto-invoke the skill — agents are not callable from this CLI —
  * but flags the absence so users know to run the skill on first session.
  */
@@ -414,7 +419,7 @@ function setupProjectContext(projectDir: string): StepResult {
 	return {
 		name: "project-context",
 		status: "warn",
-		message: `Run \`/meow:project-context ${action}\` in your first session to create docs/project-context.md`,
+		message: `Run \`/mk:project-context ${action}\` in your first session to create docs/project-context.md`,
 	};
 }
 

@@ -14,12 +14,12 @@ hooks cannot invoke the Agent tool (verified).
 
 | Skill                          | Fire point                                                 | Mode        |
 | ------------------------------ | ---------------------------------------------------------- | ----------- |
-| `meow:cook`                    | After Gate 2 verdict PASS, before Phase 5 ship             | background  |
-| `meow:harness`                 | Step 5 pre-escalation (before AskUserQuestion on iter cap) | **foreground** |
-| `meow:harness`                 | Step 6 final run report                                    | background  |
-| `meow:workflow-orchestrator`   | After each phase transition (post-SubagentStop)            | background  |
-| `meow:fix`                     | Complex path only, after Phase 4 verdict                   | background  |
-| `meow:worktree`                | After merge integration test passes                        | background  |
+| `mk:cook`                    | After Gate 2 verdict PASS, before Phase 5 ship             | background  |
+| `mk:harness`                 | Step 5 pre-escalation (before AskUserQuestion on iter cap) | **foreground** |
+| `mk:harness`                 | Step 6 final run report                                    | background  |
+| `mk:workflow-orchestrator`   | After each phase transition (post-SubagentStop)            | background  |
+| `mk:fix`                     | Complex path only, after Phase 4 verdict                   | background  |
+| `mk:worktree`                | After merge integration test passes                        | background  |
 
 WHY: Without a single source of truth for fire points, each skill drifts
 with its own delegation logic. Centralizing in a rule keeps behavior DRY
@@ -53,9 +53,9 @@ drift; a fixed invocation pattern prevents subtle semantic differences.
 
 PM is NOT invoked when ANY of the following is true:
 
-- `meow:fix` with `complexity=simple` (Gate 1 bypass path — no plan to track)
-- `meow:harness` with `MEOWKIT_HARNESS_MODE=MINIMAL` (dead-weight thesis)
-- Environment variable `MEOWKIT_PM_AUTO=off` (user opt-out; `/meow:status` still works)
+- `mk:fix` with `complexity=simple` (Gate 1 bypass path — no plan to track)
+- `mk:harness` with `MEOWKIT_HARNESS_MODE=MINIMAL` (dead-weight thesis)
+- Environment variable `MEOWKIT_PM_AUTO=off` (user opt-out; `/mk:status` still works)
 - No active plan at `tasks/plans/` (nothing to track)
 
 WHY: Delivery tracking has a cost. Skip paths prevent PM from firing when
@@ -67,11 +67,11 @@ USE: the skip conditions above, audited once per skill citation
 
 ## Rule 4: Orchestrator Disambiguation
 
-Per `CLAUDE.md` "Orchestrator Entry Point Rule", `meow:cook` and
-`meow:workflow-orchestrator` are mutually exclusive per session.
+Per `CLAUDE.md` "Orchestrator Entry Point Rule", `mk:cook` and
+`mk:workflow-orchestrator` are mutually exclusive per session.
 
-- **Explicit `/meow:cook` invocation** → `meow:cook` delegates to PM per its row above. `meow:workflow-orchestrator` does NOT also delegate.
-- **Session-start complex-feature intent (no explicit invocation)** → `meow:workflow-orchestrator` delegates per its row.
+- **Explicit `/mk:cook` invocation** → `mk:cook` delegates to PM per its row above. `mk:workflow-orchestrator` does NOT also delegate.
+- **Session-start complex-feature intent (no explicit invocation)** → `mk:workflow-orchestrator` delegates per its row.
 - **Never both in the same session.**
 
 WHY: Double-firing PM on the same phase transition wastes haiku calls and
@@ -82,7 +82,7 @@ orchestrators themselves extends to their PM delegation.
 
 Step 5 pre-escalation is the ONLY foreground PM invocation.
 
-Rationale: when `meow:harness` iteration cap is reached, the user is
+Rationale: when `mk:harness` iteration cap is reached, the user is
 about to decide ship vs abort via AskUserQuestion. Current delivery
 state must surface BEFORE the question, not after.
 
@@ -97,7 +97,7 @@ on the decision, justifying the block.
 `MEOWKIT_PM_AUTO=off` disables ALL automatic fires across all skills.
 Set in the shell environment; not agent-controlled.
 
-User-invoked `/meow:status` is ALWAYS honored regardless of this env var.
+User-invoked `/mk:status` is ALWAYS honored regardless of this env var.
 
 WHY: Users who don't want silent PM chatter should have one knob to
 disable it globally. A per-skill opt-out would drift and confuse.
@@ -119,12 +119,12 @@ auditable.
 
 ## Applies To
 
-- `meow:cook` (single-task pipeline)
-- `meow:harness` (autonomous build pipeline, steps 5 + 6)
-- `meow:workflow-orchestrator` (auto-invoked 7-phase)
-- `meow:fix` (standard/complex paths only; simple path skipped)
-- `meow:worktree` (after parallel merge integration test)
+- `mk:cook` (single-task pipeline)
+- `mk:harness` (autonomous build pipeline, steps 5 + 6)
+- `mk:workflow-orchestrator` (auto-invoked 7-phase)
+- `mk:fix` (standard/complex paths only; simple path skipped)
+- `mk:worktree` (after parallel merge integration test)
 - Any future orchestration skill that drives the 7-phase flow
 
-Skills NOT in this list do NOT delegate to PM. User-invoked `/meow:status`
+Skills NOT in this list do NOT delegate to PM. User-invoked `/mk:status`
 is the only non-orchestration entry path.

@@ -15,7 +15,7 @@ Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has 
 
 - Read `docs/project-context.md` (agent constitution — loaded first, always; auto-injected by `project-context-loader.sh` hook)
 - Read relevant topic files on-demand (consumer skills handle this at task start — fixes.md for bug work, review-patterns.md and architecture-decisions.md for planning and review)
-- Run `meow:scale-routing` — domain-based complexity classification (CSV-driven)
+- Run `mk:scale-routing` — domain-based complexity classification (CSV-driven)
 - Load stack-relevant skills only (lazy loading)
 - Route: assign model tier by task complexity (Haiku / Sonnet / Opus)
 - Select execution mode: sequential (default), parallel (COMPLEX), or party (discussions)
@@ -26,10 +26,10 @@ Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has 
 When you're unsure which phase to enter next, run:
 
 ```bash
-/meow:help
+/mk:help
 ```
 
-`/meow:help` scans plans, reviews, tests, git log, and memory to determine current pipeline state and prints a single concrete next action. Use it to re-orient after a context reset or mid-session interruption.
+`/mk:help` scans plans, reviews, tests, git log, and memory to determine current pipeline state and prints a single concrete next action. Use it to re-orient after a context reset or mid-session interruption.
 
 ### Execution modes
 
@@ -42,7 +42,7 @@ When you're unsure which phase to enter next, run:
 Party Mode is triggered explicitly:
 
 ```
-/meow:party "Should we use GraphQL or REST for the public API?"
+/mk:party "Should we use GraphQL or REST for the public API?"
 ```
 
 ## Phase 1 — Plan Gate 1
@@ -54,28 +54,28 @@ Phase 1 produces an approved plan using one or more planning skills:
 
 | Skill                  | Lens                      | Use when                                       |
 | ---------------------- | ------------------------- | ---------------------------------------------- |
-| `meow:plan-creator`    | Full plan creation        | Starting from scratch (9-step workflow, 00–08) |
-| `meow:plan-ceo-review` | Product lens              | Is this the right thing to build?              |
-| `meow:plan-ceo-review` | Engineering lens          | Is this the right way to build it?             |
-| `meow:validate-plan`   | 8-dimension quality check | COMPLEX tasks — runs before Gate 1             |
+| `mk:plan-creator`    | Full plan creation        | Starting from scratch (9-step workflow, 00–08) |
+| `mk:plan-ceo-review` | Product lens              | Is this the right thing to build?              |
+| `mk:plan-ceo-review` | Engineering lens          | Is this the right way to build it?             |
+| `mk:validate-plan`   | 8-dimension quality check | COMPLEX tasks — runs before Gate 1             |
 
-`meow:plan-creator` v1.4.0 supports two additional modes on top of the standard `--hard` workflow:
+`mk:plan-creator` v1.4.0 supports two additional modes on top of the standard `--hard` workflow:
 
 | Flag         | What it adds                                                                       |
 | ------------ | ---------------------------------------------------------------------------------- |
 | `--parallel` | Execution Strategy section with file ownership matrix and parallel group hydration |
 | `--two`      | 2 competing approach files + trade-off matrix; user selects before red-team runs   |
 
-For COMPLEX tasks (5+ files), the planner also applies **bead decomposition** — breaking the plan into atomic, independently committable work units. See [planner](/reference/agents/planner) for details. The `meow:validate-plan` skill checks bead boundaries as one of its 8 dimensions, ensuring clean handoff to the developer.
+For COMPLEX tasks (5+ files), the planner also applies **bead decomposition** — breaking the plan into atomic, independently committable work units. See [planner](/reference/agents/planner) for details. The `mk:validate-plan` skill checks bead boundaries as one of its 8 dimensions, ensuring clean handoff to the developer.
 
 ### Gate 1 behavior — Print & Stop
 
 All three skills end with a **Print & Stop**:
 
-1. Skill prints a copy-pasteable `/meow:cook [plan path]` command
+1. Skill prints a copy-pasteable `/mk:cook [plan path]` command
 2. Claude stops — no auto-proceed
 3. You review the output and decide the next step
-4. When ready: run `/meow:cook [plan path]` to begin Phase 2
+4. When ready: run `/mk:cook [plan path]` to begin Phase 2
 
 ### Review combinations
 
@@ -83,15 +83,15 @@ You control which reviews to run. Common patterns:
 
 ```bash
 # Plan only — fastest
-/meow:cook tasks/plans/260328-feature.md
+/mk:cook tasks/plans/260328-feature.md
 
 # Plan + product review
-# Run meow:plan-ceo-review, then:
-/meow:cook tasks/plans/260328-feature.md
+# Run mk:plan-ceo-review, then:
+/mk:cook tasks/plans/260328-feature.md
 
 # Plan + both reviews (recommended for large features)
-# Run meow:plan-ceo-review, then meow:plan-ceo-review, then:
-/meow:cook tasks/plans/260328-feature.md
+# Run mk:plan-ceo-review, then mk:plan-ceo-review, then:
+/mk:cook tasks/plans/260328-feature.md
 ```
 
 No skill automatically chains into another. You decide the review depth.
@@ -106,7 +106,7 @@ No skill automatically chains into another. You decide the review depth.
 - **TDD mode (`--tdd` / `MEOWKIT_TDD=1`):** Write failing tests FIRST — the task file's acceptance criteria drive the test cases. `pre-implement.sh` hook BLOCKS if no failing test exists.
 - **Default mode (TDD off):** Phase 2 is OPTIONAL. The tester is invoked on-request; tests may be written before, alongside, or after implementation. `pre-implement.sh` is a no-op.
 - Security pre-check: scan for known anti-patterns (always runs)
-- Run `meow:nyquist` at the end of Phase 2 (or after Phase 3 in default mode) to verify test-to-requirement coverage — every acceptance criterion in the plan should have at least one test targeting it before shipping.
+- Run `mk:nyquist` at the end of Phase 2 (or after Phase 3 in default mode) to verify test-to-requirement coverage — every acceptance criterion in the plan should have at least one test targeting it before shipping.
 
 ## Phase 3 — Build
 
@@ -114,7 +114,7 @@ No skill automatically chains into another. You decide the review depth.
 **Deliverable:** Passing implementation
 
 ::: info Phase 3 pre-build contract substep (harness mode only)
-For `/meow:harness` runs in FULL density, the developer agent must read a signed `tasks/contracts/{date}-{slug}-sprint-N.md` BEFORE writing source code (enforced by `gate-enforcement.sh`). LEAN mode (Opus 4.6+) bypasses via `MEOWKIT_HARNESS_MODE=LEAN`. See [Harness Architecture](/guide/harness-architecture) and the [sprint-contract skill](/reference/skills/sprint-contract).
+For `/mk:harness` runs in FULL density, the developer agent must read a signed `tasks/contracts/{date}-{slug}-sprint-N.md` BEFORE writing source code (enforced by `gate-enforcement.sh`). LEAN mode (Opus 4.6+) bypasses via `MEOWKIT_HARNESS_MODE=LEAN`. See [Harness Architecture](/guide/harness-architecture) and the [sprint-contract skill](/reference/skills/sprint-contract).
 :::
 
 - Implement until tests pass
@@ -131,26 +131,26 @@ For `/meow:harness` runs in FULL density, the developer agent must read a signed
 - 5-dimension structural audit: architecture, types, security, tests, performance
 - `validate.py`: deterministic checks outside the LLM
 - Review verdict saved to `tasks/plans/YYMMDD-name/reports/`
-- **Optional pre-review:** run `meow:scout` to detect edge cases and unusual patterns before the main review runs — findings are injected into the review context
-- **Optional post-verdict:** run `meow:elicit` after the verdict to push deeper on WARN dimensions using 8 structured elicitation methods
+- **Optional pre-review:** run `mk:scout` to detect edge cases and unusual patterns before the main review runs — findings are injected into the review context
+- **Optional post-verdict:** run `mk:elicit` after the verdict to push deeper on WARN dimensions using 8 structured elicitation methods
 - **HUMAN APPROVAL REQUIRED** — no shipping until review passes
 
 ## Phase 4.5 — Verify (Optional, cook only)
 
-**Agent:** evaluator (light) or meow:evaluate (strict)
+**Agent:** evaluator (light) or mk:evaluate (strict)
 **Deliverable:** Verification report or rubric-graded verdict
 
-Phase 4.5 fires only during `/meow:cook` runs — not in `meow:fix`, `meow:harness` (which has its own evaluator), or standalone `meow:review`.
+Phase 4.5 fires only during `/mk:cook` runs — not in `mk:fix`, `mk:harness` (which has its own evaluator), or standalone `mk:review`.
 
 | Flag          | Behavior                                                                           | Approx Cost |
 | ------------- | ---------------------------------------------------------------------------------- | ----------- |
 | `--verify`    | Light browser check after Phase 4 review. Advisory — warns but does not block ship | ~$1         |
-| `--strict`    | Full `meow:evaluate` with rubric grading. FAIL verdict blocks Phase 5              | ~$2–5       |
+| `--strict`    | Full `mk:evaluate` with rubric grading. FAIL verdict blocks Phase 5              | ~$2–5       |
 | `--no-strict` | Suppress auto-strict even when scale-routing returns `level=high`                  | —           |
 
 ### Auto-strict trigger
 
-When `meow:scale-routing` returns `level=high` during a cook run, Phase 4.5 auto-enables `--strict` (Rule 7 in `scale-adaptive-rules.md`). Pass `--no-strict` to suppress this if you need a fast path for a known-safe change.
+When `mk:scale-routing` returns `level=high` during a cook run, Phase 4.5 auto-enables `--strict` (Rule 7 in `scale-adaptive-rules.md`). Pass `--no-strict` to suppress this if you need a fast path for a known-safe change.
 
 See [scale-adaptive-rules Rule 7](/reference/rules-index#scale-adaptive-rules) for the full rule.
 
@@ -198,16 +198,16 @@ Most MeowKit skills enforce a plan-first gate: they check for an approved plan b
 
 | Skill                      | Gate behavior            | Skip condition               |
 | -------------------------- | ------------------------ | ---------------------------- |
-| meow:cook                  | Create plan if missing   | Plan path arg, `--fast` mode |
-| meow:fix                   | Plan if > 2 files        | `--quick` mode               |
-| meow:ship                  | Require approved plan    | Hotfix with human approval   |
-| meow:cso                   | Scope audit via plan     | `--daily` mode               |
-| meow:qa                    | Create QA scope doc      | Quick tier                   |
-| meow:review                | Read plan for context    | PR diff reviews              |
-| meow:workflow-orchestrator | Route to plan-creator    | Fasttrack mode               |
-| meow:investigate           | Produces input FOR plans | Always skips                 |
-| meow:office-hours          | Pre-planning skill       | Always skips                 |
-| meow:retro                 | Data-driven, no plan     | Always skips                 |
-| meow:document-release      | Scope from diff          | Post-ship sync               |
+| mk:cook                  | Create plan if missing   | Plan path arg, `--fast` mode |
+| mk:fix                   | Plan if > 2 files        | `--quick` mode               |
+| mk:ship                  | Require approved plan    | Hotfix with human approval   |
+| mk:cso                   | Scope audit via plan     | `--daily` mode               |
+| mk:qa                    | Create QA scope doc      | Quick tier                   |
+| mk:review                | Read plan for context    | PR diff reviews              |
+| mk:workflow-orchestrator | Route to plan-creator    | Fasttrack mode               |
+| mk:investigate           | Produces input FOR plans | Always skips                 |
+| mk:office-hours          | Pre-planning skill       | Always skips                 |
+| mk:retro                 | Data-driven, no plan     | Always skips                 |
+| mk:document-release      | Scope from diff          | Post-ship sync               |
 
 Skills that skip planning have documented reasons — they either produce planning input (investigate, office-hours) or are data-driven (retro).

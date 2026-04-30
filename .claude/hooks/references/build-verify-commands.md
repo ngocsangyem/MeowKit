@@ -72,4 +72,4 @@ The `@@BUILD_VERIFY_ERROR@@` marker lets the agent parse and prioritize compile 
 
 ## Why Per-File and Not Project-Wide
 
-Running `tsc --noEmit` on the whole project after every single file edit would take 30+ seconds on a real codebase. Per-file checking is imperfect (TypeScript can't fully type-check a file in isolation) but it catches 80% of errors in under 5 seconds. Full project typecheck is a user-triggered `meow:verify` concern, not an automatic middleware concern.
+Running `tsc --noEmit` on the whole project after every single file edit would take 30+ seconds on a real codebase. Per-file checking is imperfect (TypeScript can't fully type-check a file in isolation) but it catches 80% of errors in under 5 seconds. Full project typecheck is a user-triggered `mk:verify` concern, not an automatic middleware concern.

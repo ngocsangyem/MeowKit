@@ -21,7 +21,7 @@ Source file: `.claude/agents/AGENTS_INDEX.md`
 | [tester](/reference/agents/tester) | Core | TDD red/green/refactor | 2 | After planning |
 | [security](/reference/agents/security) | Core | Security audit, BLOCK verdicts | 2, 4 | Auth/payment changes |
 | [developer](/reference/agents/developer) | Core | Implementation (TDD), bead processing | 3 | After tester |
-| [evaluator](/reference/agents/evaluator) | Core | Skeptic-persona behavioral grader with active verification | 3, 4 | harness pipeline, `meow:evaluate`, rubric-driven reviews |
+| [evaluator](/reference/agents/evaluator) | Core | Skeptic-persona behavioral grader with active verification | 3, 4 | harness pipeline, `mk:evaluate`, rubric-driven reviews |
 | [ui-ux-designer](/reference/agents/ui-ux-designer) | Support | UI design, accessibility, responsive | 3 | Frontend detected |
 | [reviewer](/reference/agents/reviewer) | Core | 5-dimension review, Gate 2 | 4 | After developer |
 | [shipper](/reference/agents/shipper) | Core | Ship pipeline, PR creation | 5 | After Gate 2 |

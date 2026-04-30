@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Tech leads, engineering managers, sprint planners
 **Time estimate:** 5-15 min per spec (depending on size)
-**Skills used:** [meow:confluence](/reference/skills/confluence), [meow:jira](/reference/skills/jira), [meow:planning-engine](/reference/skills/planning-engine), [meow:scout](/reference/skills/scout) (optional)
+**Skills used:** [mk:confluence](/reference/skills/confluence), [mk:jira](/reference/skills/jira), [mk:planning-engine](/reference/skills/planning-engine), [mk:scout](/reference/skills/scout) (optional)
 
 ::: warning Not for standalone bugs or hotfixes
 This workflow is for **planning new work from specs**. If you have an existing ticket to fix or implement, use the [Ticket to Code](/workflows/ticket-to-code) workflow instead.
@@ -25,7 +25,7 @@ Every step produces a **report**. Human reads and decides before proceeding. No 
 ### Step 1: Analyze the spec
 
 ```bash
-/meow:confluence analyze PAGE-ID
+/mk:confluence analyze PAGE-ID
 ```
 
 Produces a **Spec Research Report**: requirements extracted, gaps flagged, stories suggested.
@@ -37,7 +37,7 @@ Read the report. Check the `[MISSING]`, `[VAGUE]`, and `[AMBIGUOUS]` tags. Ask t
 For stories you approve from the report:
 
 ```bash
-/meow:jira create --project AUTH --type Story --summary "Implement OAuth2 login" \
+/mk:jira create --project AUTH --type Story --summary "Implement OAuth2 login" \
   --description "OAuth2 flow for Google and GitHub providers"
 ```
 
@@ -46,8 +46,8 @@ You decide which stories to create, what priority to set, and how to word them.
 ### Step 3: Evaluate and estimate
 
 ```bash
-/meow:jira evaluate AUTH-201
-/meow:jira estimate AUTH-201
+/mk:jira evaluate AUTH-201
+/mk:jira estimate AUTH-201
 ```
 
 Produces complexity assessment and story point suggestion. The **team** makes the final estimate in planning poker — the AI provides signals, not decisions.
@@ -57,8 +57,8 @@ Produces complexity assessment and story point suggestion. The **team** makes th
 Run scout first for codebase context:
 
 ```bash
-/meow:scout
-/meow:planning-engine review AUTH-201 --scout
+/mk:scout
+/mk:planning-engine review AUTH-201 --scout
 ```
 
 Produces a **Tech Review Report**: affected files, feasibility rating, dependencies, risks, complexity signals.
@@ -66,7 +66,7 @@ Produces a **Tech Review Report**: affected files, feasibility rating, dependenc
 ### Step 5: Sprint planning
 
 ```bash
-/meow:planning-engine plan --tickets AUTH-201,AUTH-202,AUTH-203 --capacity 40
+/mk:planning-engine plan --tickets AUTH-201,AUTH-202,AUTH-203 --capacity 40
 ```
 
 Produces a **Planning Report**: sprint goal candidate, dependency map, grouping suggestions, capacity analysis.
@@ -96,8 +96,8 @@ No step requires the previous step's output as a hard dependency.
 
 ## Related
 
-- [meow:confluence](/reference/skills/confluence) — spec analysis
-- [meow:jira](/reference/skills/jira) — ticket operations
-- [meow:planning-engine](/reference/skills/planning-engine) — tech review + sprint planning
+- [mk:confluence](/reference/skills/confluence) — spec analysis
+- [mk:jira](/reference/skills/jira) — ticket operations
+- [mk:planning-engine](/reference/skills/planning-engine) — tech review + sprint planning
 - [PRD Intake Automation](/workflows/prd-intake) — raw ticket triage (different workflow)
 - [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) — single-ticket evaluation

@@ -139,7 +139,7 @@ elif [ "$CURRENT_MODEL" != "unknown" ]; then
     cat >> "$MEMORY_DIR/fixes.md" << 'FIXES_EOF'
 
 ## dead-weight-audit-needed (auto-flagged)
-- Reason: model version changed — run /meow:trace-analyze
+- Reason: model version changed — run /mk:trace-analyze
 - Date: TIMESTAMP_PLACEHOLDER
 FIXES_EOF
     # Replace placeholder — TIMESTAMP contains only digits/colons/hyphens, no injection risk
@@ -156,7 +156,7 @@ fi
 TOTAL=$(wc -l "$MEMORY_DIR"/fixes.md "$MEMORY_DIR"/review-patterns.md \
   "$MEMORY_DIR"/architecture-decisions.md "$MEMORY_DIR"/security-notes.md \
   2>/dev/null | tail -1 | awk '{print $1}')
-[ "${TOTAL:-0}" -gt 500 ] && echo "HINT: topic files total $TOTAL lines — consider /meow:memory --prune" >&2
+[ "${TOTAL:-0}" -gt 500 ] && echo "HINT: topic files total $TOTAL lines — consider /mk:memory --prune" >&2
 
 # Phase 8 (260408): emit session_end trace record (canonical per trace-schema.md).
 # Non-blocking; trace failures don't break the hook chain.

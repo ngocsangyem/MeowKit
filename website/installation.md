@@ -49,7 +49,7 @@ npx mewkit init -- --global           # Install as global config
 ```
 .claude/
 ├── agents/          13 specialist agents
-├── skills/          40+ skills with meow: namespace
+├── skills/          40+ skills with mk: namespace
 ├── hooks/           Lifecycle hooks
 ├── rules/           10 enforcement rules
 ├── scripts/         6 Python validators
@@ -86,7 +86,7 @@ Available MCP servers: Context7 (docs), Playwright (QA), Sequential Thinking.
 
 ### Gemini API key (optional)
 
-For `meow:multimodal` (image/video/audio analysis):
+For `mk:multimodal` (image/video/audio analysis):
 
 ```bash
 # Add to .env

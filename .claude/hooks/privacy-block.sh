@@ -13,7 +13,7 @@
 #   - .env*, *.key, *.pem, *credentials*, *secret*, *.keystore, ~/.ssh/*  (R4 sensitive files)
 #   - .claude/cache/web-fetches/index.jsonl                                (C10 — browsing history disclosure)
 #   - **/*.quarantined                                                     (C6 — injection-stopped content)
-#   - Bash invocations of meow:web-to-markdown scripts with unsafe URLs    (C8 — defense-in-depth for SSRF)
+#   - Bash invocations of mk:web-to-markdown scripts with unsafe URLs    (C8 — defense-in-depth for SSRF)
 #
 # When blocked: writes block reason to stderr (Claude Code feeds stderr to model on exit 2).
 # Agent must use AskUserQuestion tool to get explicit approval before retrying.
@@ -58,7 +58,7 @@ fi
 # block it here before the Python ever runs.
 if [ -n "$COMMAND" ]; then
   case "$COMMAND" in
-    *fetch_as_markdown.py*|*meow:web-to-markdown*)
+    *fetch_as_markdown.py*|*web-to-markdown*|*mk:web-to-markdown*)
       # Extract http(s) URL argument (best-effort — agent may quote it arbitrarily)
       URL=$(echo "$COMMAND" | grep -oE 'https?://[^[:space:]"'\''`]+' | head -1)
       if [ -n "$URL" ]; then

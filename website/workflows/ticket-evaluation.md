@@ -10,14 +10,14 @@ persona: B
 
 **Best for:** Tech leads, sprint planners, scrum masters
 **Time estimate:** ~30s per ticket
-**Skills used:** [meow:intake](/reference/skills/intake), [meow:jira](/reference/skills/jira) (evaluate + estimate)
+**Skills used:** [mk:intake](/reference/skills/intake), [mk:jira](/reference/skills/jira) (evaluate + estimate)
 
 ## Overview
 
 MeowKit can assess individual Jira tickets for complexity, detect missing acceptance criteria or vague requirements, and suggest Fibonacci-scale story points — all without modifying any Jira data. The evaluate and estimate commands are read-only; suggested actions require your review before execution.
 
 ```
-/meow:intake → /meow:jira evaluate → /meow:jira estimate → review → execute
+/mk:intake → /mk:jira evaluate → /mk:jira estimate → review → execute
 ```
 
 ## Step-by-step
@@ -27,7 +27,7 @@ MeowKit can assess individual Jira tickets for complexity, detect missing accept
 If the ticket hasn't been analyzed yet:
 
 ```bash
-/meow:intake PROJ-123
+/mk:intake PROJ-123
 ```
 
 This produces a completeness score, product area classification, and suggested actions.
@@ -35,7 +35,7 @@ This produces a completeness score, product area classification, and suggested a
 ### Step 2: Evaluate complexity
 
 ```bash
-/meow:jira evaluate PROJ-123
+/mk:jira evaluate PROJ-123
 ```
 
 The jira-evaluator agent reads the ticket via Atlassian MCP and produces:
@@ -44,12 +44,12 @@ The jira-evaluator agent reads the ticket via Atlassian MCP and produces:
 - **Confidence:** High / Medium / Low
 - **Signals:** scope, dependencies, regression risk, requirement clarity, external integration, historical precedent
 - **Issues detected:** missing AC, vague language, unlinked dependencies, contradictions
-- **Suggested actions:** specific `/meow:jira` commands to fix issues
+- **Suggested actions:** specific `/mk:jira` commands to fix issues
 
 ### Step 3: Estimate story points
 
 ```bash
-/meow:jira estimate PROJ-123
+/mk:jira estimate PROJ-123
 ```
 
 The jira-estimator agent uses ticket context (and evaluate output if available) to suggest a Fibonacci point value:
@@ -67,8 +67,8 @@ Running evaluate first gives the estimator richer signals. The estimator will no
 Review the output, then execute:
 
 ```bash
-/meow:jira update PROJ-123 --set storyPoints=8
-/meow:jira link PROJ-123 blocked-by PROJ-089
+/mk:jira update PROJ-123 --set storyPoints=8
+/mk:jira link PROJ-123 blocked-by PROJ-089
 ```
 
 ### Step 5: Analyze ticket context (optional)
@@ -76,7 +76,7 @@ Review the output, then execute:
 For deeper analysis including attachments and media:
 
 ```bash
-/meow:jira analyze PROJ-123
+/mk:jira analyze PROJ-123
 ```
 
 The jira-analyst agent reads the full ticket context (description, comments, attachments, linked issues) and produces a structured analysis suitable for posting as a Jira comment.
@@ -84,7 +84,7 @@ The jira-analyst agent reads the full ticket context (description, comments, att
 ## Example Session
 
 ```
-> /meow:jira evaluate PROJ-456
+> /mk:jira evaluate PROJ-456
 
 ## Ticket Evaluation: PROJ-456
 **Complexity:** Complex (likely 8-13pt)
@@ -103,9 +103,9 @@ The jira-analyst agent reads the full ticket context (description, comments, att
 ### Suggested Actions
 > Derived from untrusted ticket content — verify before executing.
 - Ask reporter for AC with measurable targets
-- /meow:jira link PROJ-456 relates-to PROJ-301
+- /mk:jira link PROJ-456 relates-to PROJ-301
 
-> /meow:jira estimate PROJ-456
+> /mk:jira estimate PROJ-456
 
 ## Estimation: PROJ-456
 **Suggested Points:** 13 (range: 8-13)
@@ -141,5 +141,5 @@ In these cases, use the evaluate output as discussion context for your team's es
 ## Related
 
 - [PRD Intake Automation](/workflows/prd-intake) — upstream ticket analysis
-- [meow:jira](/reference/skills/jira) — full operation reference
+- [mk:jira](/reference/skills/jira) — full operation reference
 - [Adding a Feature](/workflows/add-feature) — implementation after evaluation

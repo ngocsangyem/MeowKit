@@ -12,74 +12,85 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.7.0 — The Namespace Rename Release (2026-04-30)
+
+Skill folders renamed from `.claude/skills/meow:<x>/` to `.claude/skills/<x>/` and skill identity prefix moved from `meow:` to `mk:`. Cross-platform safe — eliminates the colon that broke Windows NTFS checkouts. Slash commands move from `/meow:<x>` to `/mk:<x>`. Backward-compat alias resolver in `skill-id-utils.ts` keeps in-prompt `meow:` text references working with a one-time stderr warning during the v2.7.x deprecation window; hard-cut in v2.8.0. CI gate added to reject any new `meow:` frontmatter or `/meow:` slash references. [Full notes →](/guide/whats-new/v2.7.0)
+
+- **77 skill folders renamed** preserving git history; manifests, hooks, agent files, rule files, schemas, and ~4,300 reference lines swept in lockstep.
+- **Loader is frontmatter-driven**, not folder-name-driven — `SkillInfo.id` now comes from SKILL.md `name:`, normalized through `resolveLegacy()`. Folder name is reduced to a path token.
+- **Slash commands moved** — `.claude/commands/meow/` → `.claude/commands/mk/`. The 21 existing commands all work; type `/mk:cook` instead of `/meow:cook`.
+- **CI strengthened** — new `Reject residual meow: namespace` lint step; `validate-skill-frontmatter.py` glob fixed + zero-match guard added (no more phantom-pass on empty scans); `check-skill-cross-refs.sh` rewritten for bare-name inventory.
+- **Schema regex widened** to `^(mk|meow):[a-z][a-z0-9-]*$` for the deprecation window — narrows back to `^mk:` in v2.8.0.
+- **Migration via `npx mewkit upgrade`** — detects legacy `meow:*` folders, prompts for confirmation, then renames + rewrites frontmatter + reconciles `~/.mewkit/portable-registry.json` keys.
+
 ### v2.6.2 — The Telemetry & Validator Release (2026-04-29)
 
-Hook-fire telemetry helper, schema-validated skill frontmatter, cross-reference CI for `meow:*` references, and a re-baselined critical-findings audit. Probes for `PreCompact` and `PostToolUseFailure` ship immediately so future feature decisions consult `hook-log.jsonl` evidence instead of speculation. CI now blocks phantom skill references and unregistered hooks. `mewkit setup` gains a `project-context` step that nudges users to invoke `/meow:project-context` on first session.
+Hook-fire telemetry helper, schema-validated skill frontmatter, cross-reference CI for `mk:*` references, and a re-baselined critical-findings audit. Probes for `PreCompact` and `PostToolUseFailure` ship immediately so future feature decisions consult `hook-log.jsonl` evidence instead of speculation. CI now blocks phantom skill references and unregistered hooks. `mewkit setup` gains a `project-context` step that nudges users to invoke `/mk:project-context` on first session.
 
 ### v2.6.1 — The project-manager Release (2026-04-22)
 
-Adds the 17th core agent `project-manager` — a cross-workflow delivery tracker that aggregates plan / test / review / cost / git state into an evidence-based status report. Ships one new slash command (`/meow:status`), one new rule (`post-phase-delegation.md`), and rule-based delegation from 5 orchestration skills. Status reports live inside each plan dir (`tasks/plans/{slug}/status-reports/`) so they travel with the plan they describe. Opt-out via `MEOWKIT_PM_AUTO=off`.
+Adds the 17th core agent `project-manager` — a cross-workflow delivery tracker that aggregates plan / test / review / cost / git state into an evidence-based status report. Ships one new slash command (`/mk:status`), one new rule (`post-phase-delegation.md`), and rule-based delegation from 5 orchestration skills. Status reports live inside each plan dir (`tasks/plans/{slug}/status-reports/`) so they travel with the plan they describe. Opt-out via `MEOWKIT_PM_AUTO=off`.
 
 ### v2.6.0 — The Skills Compliance Release (2026-04-22)
 
-A 7-agent audit of all 77 `meow:*` skills against Anthropic's skill-authoring best practices + MeowKit's internal `skill-authoring-rules.md`. Ships ~220 edits across description fields, frontmatter, reference integrity, scripts, and grounding. Zero new skills, zero breaking changes, measurably cleaner routing. [Full notes →](/guide/whats-new/v2.6.0)
+A 7-agent audit of all 77 `mk:*` skills against Anthropic's skill-authoring best practices + MeowKit's internal `skill-authoring-rules.md`. Ships ~220 edits across description fields, frontmatter, reference integrity, scripts, and grounding. Zero new skills, zero breaking changes, measurably cleaner routing. [Full notes →](/guide/whats-new/v2.6.0)
 
 - **All skill descriptions normalized to Anthropic third-person format** — four greedy/imperative descriptions rewritten (cook, fix, agent-detector, session-continuation); five overlap clusters (bug-fix, pipeline, browser, code-quality, planning) disambiguated with explicit `NOT for X` clauses; 20 more skills got focused exclusion clauses where overlap was latent.
-- **`meow:skill-creator` compliance** — now has its own `## Gotchas`, 500-line cap matches authoritative Rule 3, emitted template includes mandatory Gotchas header, `validate-skill.py` gained check 8/8 for Gotchas presence. Every future scaffold inherits Rule 1 / Rule 3 compliance.
-- **Reference integrity** — `meow:agent-browser` 8-deep nested ref chains + circular `authentication.md ↔ session-management.md` flattened; new `step-file-rules.md` Rule 6 formalizes the 2-level architectural exception for step-file skills; 115 reference files over 100 lines got auto-generated Tables of Contents.
-- **Grounding cleanup** — phantom `research-01` / `research-02` citations removed across 9 locations; non-existent `debugger` agent reference in `meow:cook` replaced with real `developer` via `meow:investigate`; unverifiable "Vercel Engineering" attribution rephrased; `<HARD-GATE>` decorative tags replaced with bold markdown (grep-confirmed decorative).
-- **Critical fixes** — `meow:lint-and-validate` was undiscoverable due to malformed YAML (fixed); Python venv was half-installed making 7 skills crash on import (rebuilt); `validate-rubric.sh --help` no longer crashes on macOS BSD basename.
-- Frontmatter normalization (`preamble-tier: 4 → 3`, dead `autoInvoke` / `priority` deleted, `sources → source` unified, `meow:chom injection_risk` raised); 22 section-name renames to canonical `## When to Use`; 7 skills gained `$CLAUDE_PROJECT_DIR` path-convention note; 3 MCP skills gained server-key Gotcha.
+- **`mk:skill-creator` compliance** — now has its own `## Gotchas`, 500-line cap matches authoritative Rule 3, emitted template includes mandatory Gotchas header, `validate-skill.py` gained check 8/8 for Gotchas presence. Every future scaffold inherits Rule 1 / Rule 3 compliance.
+- **Reference integrity** — `mk:agent-browser` 8-deep nested ref chains + circular `authentication.md ↔ session-management.md` flattened; new `step-file-rules.md` Rule 6 formalizes the 2-level architectural exception for step-file skills; 115 reference files over 100 lines got auto-generated Tables of Contents.
+- **Grounding cleanup** — phantom `research-01` / `research-02` citations removed across 9 locations; non-existent `debugger` agent reference in `mk:cook` replaced with real `developer` via `mk:investigate`; unverifiable "Vercel Engineering" attribution rephrased; `<HARD-GATE>` decorative tags replaced with bold markdown (grep-confirmed decorative).
+- **Critical fixes** — `mk:lint-and-validate` was undiscoverable due to malformed YAML (fixed); Python venv was half-installed making 7 skills crash on import (rebuilt); `validate-rubric.sh --help` no longer crashes on macOS BSD basename.
+- Frontmatter normalization (`preamble-tier: 4 → 3`, dead `autoInvoke` / `priority` deleted, `sources → source` unified, `mk:chom injection_risk` raised); 22 section-name renames to canonical `## When to Use`; 7 skills gained `$CLAUDE_PROJECT_DIR` path-convention note; 3 MCP skills gained server-key Gotcha.
 
-### v2.5.1 — meow:henshin (2026-04-20)
+### v2.5.1 — mk:henshin (2026-04-20)
 
-New cross-cutting skill `meow:henshin` — planning front door for wrapping existing code as agent-consumable surfaces. Adapted from `claudekit-engineer/agentize` (tier 2). Produces a **Transformation Spec** (CLI + MCP + companion skill shape) and hands off to `meow:plan-creator` → `meow:cook`. Does not build, scaffold, or publish on its own.
+New cross-cutting skill `mk:henshin` — planning front door for wrapping existing code as agent-consumable surfaces. Adapted from `claudekit-engineer/agentize` (tier 2). Produces a **Transformation Spec** (CLI + MCP + companion skill shape) and hands off to `mk:plan-creator` → `mk:cook`. Does not build, scaffold, or publish on its own.
 
 - 6-phase workflow: discover → inventory → capability map → HARD GATE (package name / license / ownership) → spec write → handoff.
-- Boundary vs `meow:chom`: henshin is **outbound** (local code → agent surfaces); chom is **inbound** (external repo → local project). No semantic overlap.
+- Boundary vs `mk:chom`: henshin is **outbound** (local code → agent surfaces); chom is **inbound** (external repo → local project). No semantic overlap.
 - Writes an architectural decision record to `.claude/memory/architecture-decisions.md` with `##decision:` prefix.
 - 5 references under 200 lines: `agent-centric-design`, `auth-resolution-chain`, `mcp-transports`, `monorepo-layout`, `challenge-framework`.
 - Triggers on `agentize`, `henshin`, `expose as MCP`, `wrap as CLI`, `publish to npm`, `make LLM-accessible`.
 
 ### v2.5.0 — The Native Fit Release (2026-04-19)
 
-Installed skills stop branding themselves as MeowKit and start reading like the project's own workflow — ~70 user-facing phrases rewritten across 50+ files while real infrastructure (binaries, env vars, CLI commands) stays intact. Ships the 64-skill audit cleanup: mechanical path fixes, seven collision-cluster disambiguations, memory persistence for `meow:evaluate` / `meow:benchmark` / `meow:party`, dual-orchestrator arbitration rule, and a documented frontmatter schema. [Full notes →](/guide/whats-new/v2.5.0)
+Installed skills stop branding themselves as MeowKit and start reading like the project's own workflow — ~70 user-facing phrases rewritten across 50+ files while real infrastructure (binaries, env vars, CLI commands) stays intact. Ships the 64-skill audit cleanup: mechanical path fixes, seven collision-cluster disambiguations, memory persistence for `mk:evaluate` / `mk:benchmark` / `mk:party`, dual-orchestrator arbitration rule, and a documented frontmatter schema. [Full notes →](/guide/whats-new/v2.5.0)
 
 - **Brand reframing** — "MeowKit's workflow" → "this workflow", "Help MeowKit get better!" → "Help improve this workflow!", `MeowKit` / `AI-assisted` table columns, and dozens of similar edits. Real `meowkit-*` binaries, `MEOWKIT_*` env vars, `npx mewkit` CLI commands, and frontmatter `source:` fields untouched.
 - **Memory writes added to evaluate / benchmark / party** — verdicts, baselines, and architectural decisions now persist across sessions (`review-patterns.md`, `cost-log.json`, `decisions.md`).
-- **Dual-orchestrator arbitration rule** added to `CLAUDE.md` — explicit `/meow:cook` invocation wins; `meow:workflow-orchestrator` defers. No more duplicate Gate 1 enforcement.
+- **Dual-orchestrator arbitration rule** added to `CLAUDE.md` — explicit `/mk:cook` invocation wins; `mk:workflow-orchestrator` defers. No more duplicate Gate 1 enforcement.
 - **Frontmatter schema documented** — `preamble-tier`, `user-invocable`, `phase`, `trust_level`, `injection_risk` are first-class fields with defined semantics. Twenty-one skills were using `preamble-tier: 3` without a schema.
 - **Collision clusters resolved** — agent-browser vs playwright-cli, intake vs jira, cook vs harness, simplify vs clean-code, docs-init vs project-context, lint-and-validate vs verify, validate-plan vs sprint-contract.
 - **Citation hygiene** — `OWASP Top 10:2025` (no such release) relabeled; stale `57 font pairings` count fixed to `73`; invented BMAD pivot statistic removed; preview model IDs now carry staleness warnings.
-- **`meow:workflow-orchestrator`** no longer fires on bare `"implement"` — use compound triggers (`"implement feature"`, `"build feature"`, `"complex task"`).
+- **`mk:workflow-orchestrator`** no longer fires on bare `"implement"` — use compound triggers (`"implement feature"`, `"build feature"`, `"complex task"`).
 
-### v2.4.6 — meow:ship Cleanup + Design Review Checklist (2026-04-19)
+### v2.4.6 — mk:ship Cleanup + Design Review Checklist (2026-04-19)
 
-`meow:ship` drops unused Codex (OpenAI CLI) integration, fixes broken bash in the preamble, and removes phantom slash-command references. `meow:review` gains a lite design-review checklist — source-level pattern detection for frontend diffs, adapted from gstack with additions from claudekit-engineer and everything-claude-code.
+`mk:ship` drops unused Codex (OpenAI CLI) integration, fixes broken bash in the preamble, and removes phantom slash-command references. `mk:review` gains a lite design-review checklist — source-level pattern detection for frontend diffs, adapted from gstack with additions from claudekit-engineer and everything-claude-code.
 
-- New `meow:review/design-checklist.md` — six categories (AI Slop, Typography, Spacing, Interaction States, DESIGN.md Violations, Strategic Omissions) with `[HIGH]` / `[MEDIUM]` / `[LOW]` confidence tiers for grep-actionable pattern detection.
-- `meow:ship` large-diff review is now Claude-only: 2 passes (structured + adversarial subagent) replacing the prior 4-pass cross-model scheme that depended on an uninstalled CLI.
-- Phantom skill refs cleaned — `/qa-only`, `/plan-design-review`, `/design-review` removed from `meow:ship`; `design-review-lite` fake-skill log tag renamed to honest `"source":"ship-design-check"`; two preamble bash syntax errors fixed.
+- New `mk:review/design-checklist.md` — six categories (AI Slop, Typography, Spacing, Interaction States, DESIGN.md Violations, Strategic Omissions) with `[HIGH]` / `[MEDIUM]` / `[LOW]` confidence tiers for grep-actionable pattern detection.
+- `mk:ship` large-diff review is now Claude-only: 2 passes (structured + adversarial subagent) replacing the prior 4-pass cross-model scheme that depended on an uninstalled CLI.
+- Phantom skill refs cleaned — `/qa-only`, `/plan-design-review`, `/design-review` removed from `mk:ship`; `design-review-lite` fake-skill log tag renamed to honest `"source":"ship-design-check"`; two preamble bash syntax errors fixed.
 
 ### v2.4.5 — The Thinking Skills Release (2026-04-19)
 
-New `meow:problem-solving` skill with seven strategic-unsticking techniques, plus three diagnostic framework references added to `meow:sequential-thinking`. Clear boundary: problem-solving for "stuck on approach", sequential-thinking for "stuck on cause". [Full notes →](/guide/whats-new/v2.4.5)
+New `mk:problem-solving` skill with seven strategic-unsticking techniques, plus three diagnostic framework references added to `mk:sequential-thinking`. Clear boundary: problem-solving for "stuck on approach", sequential-thinking for "stuck on cause". [Full notes →](/guide/whats-new/v2.4.5)
 
-- `meow:problem-solving` — simplification cascades, collision-zone thinking, meta-pattern recognition, inversion, scale game, first principles, via negativa; dispatch table routes by stuck-symptom with explicit reroute to sequential-thinking for debugging.
-- `meow:sequential-thinking` gains `five-whys-plus.md` (bias guards), `scientific-method.md` (falsifiable prediction), `kepner-tregoe.md` (IS/IS-NOT matrix) — core workflow unchanged.
+- `mk:problem-solving` — simplification cascades, collision-zone thinking, meta-pattern recognition, inversion, scale game, first principles, via negativa; dispatch table routes by stuck-symptom with explicit reroute to sequential-thinking for debugging.
+- `mk:sequential-thinking` gains `five-whys-plus.md` (bias guards), `scientific-method.md` (falsifiable prediction), `kepner-tregoe.md` (IS/IS-NOT matrix) — core workflow unchanged.
 - Curation over absorption — audit of 39 third-party thinking frameworks landed only five; the rest stayed out by design.
 
 ### v2.4.4 — Deprecated Skill Cleanup + Brand Refresh (2026-04-19)
 
 Three deprecated skills removed permanently. Brand assets wired into VitePress. Vercel routing fix for direct URL access.
 
-- Removed `meow:debug`, `meow:documentation`, `meow:shipping` (superseded since v2.0.0). Dead references across skill registries, sidebar, and architecture docs cleaned up.
+- Removed `mk:debug`, `mk:documentation`, `mk:shipping` (superseded since v2.0.0). Dead references across skill registries, sidebar, and architecture docs cleaned up.
 - Animated SVG logo + SVG favicon + regenerated raster variants + `/meow|` OG card wired into VitePress; site title hidden (logo carries the brand).
 - Fixed direct URL access on Vercel (`cleanUrls: true` in `vercel.json`), homepage hero image hardcoded to `logo.png`, broken README image ref, and stale favicon cache.
 
 ### v2.4.3 — Brainstorming v2 (2026-04-18)
 
-`meow:brainstorming` rewritten with discovery protocol, scope assessment, anti-bias pivot, and 3 new techniques (analogical-thinking, scamper, perspective-shift).
+`mk:brainstorming` rewritten with discovery protocol, scope assessment, anti-bias pivot, and 3 new techniques (analogical-thinking, scamper, perspective-shift).
 
 ### v2.4.2 — Memory Fix (2026-04-18)
 
@@ -103,13 +114,13 @@ Deletes the auto-inject memory pipeline and replaces it with on-demand topic-fil
 
 `docs/project-context.md` becomes the single source of truth for every agent — a 286-line constitution loaded at SessionStart by all 16 agents. Full audit cycle: 64 findings, 61 resolved, 0 regressions.
 
-- New `meow:project-context init` command writes a TODO-filled skeleton from `templates/skeleton.md`.
+- New `mk:project-context init` command writes a TODO-filled skeleton from `templates/skeleton.md`.
 - New SessionStart hook `ensure-skills-venv.sh` — idempotent bootstrap of `.claude/skills/.venv`.
 - 12 SKILL.md files got real domain-specific Gotchas; 7 gate-owning skills wired to `gate-rules.md`.
 
 ### v2.3.12 — External Codebase Packing + chom v2 Rigor (2026-04-17)
 
-New `meow:pack` skill exports an external repo as a single AI-friendly file (markdown/xml/json) via `repomix`. `meow:chom` refactored to v2 with 4 user-explicit modes (`--compare` / `--copy` / `--improve` / `--port`), speed flags, and a non-bypassable HARD GATE.
+New `mk:pack` skill exports an external repo as a single AI-friendly file (markdown/xml/json) via `repomix`. `mk:chom` refactored to v2 with 4 user-explicit modes (`--compare` / `--copy` / `--improve` / `--port`), speed flags, and a non-bypassable HARD GATE.
 
 ### v2.3.11 — Env Var Handling Hardening (2026-04-14)
 
@@ -119,9 +130,9 @@ Adopts Claude Code's native `settings.json` `env` field for team-shared defaults
 
 Three new capabilities for ticket workflows:
 
-- `meow:jira` adds `evaluate` (complexity assessment), `estimate` (story points), and `analyze` (RCA) commands.
-- New `meow:confluence` skill — fetches Confluence pages as markdown with gap detection (`[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` tags).
-- New `meow:planning-engine` skill — codebase-aware tech review + sprint planning with deterministic dependency-graph and capacity-binning scripts.
+- `mk:jira` adds `evaluate` (complexity assessment), `estimate` (story points), and `analyze` (RCA) commands.
+- New `mk:confluence` skill — fetches Confluence pages as markdown with gap detection (`[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` tags).
+- New `mk:planning-engine` skill — codebase-aware tech review + sprint planning with deterministic dependency-graph and capacity-binning scripts.
 
 ### v2.3.9 — Memory System Hardening (2026-04-12)
 
@@ -134,15 +145,15 @@ Memory loader split into 3 focused modules. 4 critical security/correctness fixe
 
 ### v2.3.8 — Multimodal Resilience, MiniMax & Provider Fallback (2026-04-12)
 
-Major overhaul of `meow:multimodal` — multi-provider generation with intelligent Gemini → MiniMax → OpenRouter fallback.
+Major overhaul of `mk:multimodal` — multi-provider generation with intelligent Gemini → MiniMax → OpenRouter fallback.
 
 - MiniMax integration: image (`image-01`), video (Hailuo 2.3, async polling), TTS (`speech-2.8-hd`, 332 voices), music (`music-2.6`).
 - Document → Markdown converter with batch mode.
 - `MEOWKIT_` env namespace with backward-compat fallback. API key rotation (`MEOWKIT_GEMINI_API_KEY_2/3/4`) for 4× free-tier throughput.
 
-### v2.3.7 — meow:chom (2026-04-12)
+### v2.3.7 — mk:chom (2026-04-12)
 
-New `meow:chom` skill — copy-cat, replicate, or adapt features from external systems. 6-phase workflow with HARD GATE before Decision; 7 challenge questions; risk scoring (0–2 proceed, 3–4 resolve first, 5+ reject).
+New `mk:chom` skill — copy-cat, replicate, or adapt features from external systems. 6-phase workflow with HARD GATE before Decision; 7 challenge questions; risk scoring (0–2 proceed, 3–4 resolve first, 5+ reject).
 
 ### v2.3.6 (2026-04-11)
 
@@ -150,7 +161,7 @@ Removed unused files.
 
 ### v2.3.5 — CEO Review Layered Verification (2026-04-11)
 
-Redesigns `meow:plan-ceo-review` as a layered verification pipeline. Pre-screen gate (placeholder scan, coverage mapping), two-lens evaluation (Intent Alignment + Execution Credibility), severity tiers (BLOCKER / HIGH-LEVERAGE / POLISH), append-only verdict output.
+Redesigns `mk:plan-ceo-review` as a layered verification pipeline. Pre-screen gate (placeholder scan, coverage mapping), two-lens evaluation (Intent Alignment + Execution Credibility), severity tiers (BLOCKER / HIGH-LEVERAGE / POLISH), append-only verdict output.
 
 ### v2.3.4 — Centralized Dotenv Loading (2026-04-11)
 
@@ -198,11 +209,11 @@ Three hooks (`cost-meter.sh`, `post-write.sh`, `pre-task-check.sh`) wrongly exit
 
 ### [v1.3.2 — The Plan Quality Release](/guide/whats-new/v1.3.2) (2026-04-01)
 
-Complete redesign of `meow:plan-creator`. Step-file architecture (JIT-loaded), multi-file phase output, scope challenge (trivial/simple/complex), 2-persona plan red team, bounded research, and `.plan-state.json` cross-session resume.
+Complete redesign of `mk:plan-creator`. Step-file architecture (JIT-loaded), multi-file phase output, scope challenge (trivial/simple/complex), 2-persona plan red team, bounded research, and `.plan-state.json` cross-session resume.
 
 ### [v1.3.1 — The Red Team Depth Release](/guide/whats-new/v1.3.1) (2026-03-31)
 
-Hybrid adversarial persona system for `meow:review`. Phase B adds 4 persona subagents (Security Adversary, Failure Mode Analyst, Assumption Destroyer, Scope Complexity Critic) informed by Phase A findings. Forced-finding protocol prevents rubber-stamping; 4-level artifact verification catches hollow implementations.
+Hybrid adversarial persona system for `mk:review`. Phase B adds 4 persona subagents (Security Adversary, Failure Mode Analyst, Assumption Destroyer, Scope Complexity Critic) informed by Phase A findings. Forced-finding protocol prevents rubber-stamping; 4-level artifact verification catches hollow implementations.
 
 ### [v1.3.0 — The Integration Integrity Release](/guide/whats-new/v1.3.0) (2026-03-31)
 
@@ -210,7 +221,7 @@ Full red-team audit of 98 components (15 agents, 60 skills, 9 hooks, 14 rules). 
 
 ### v1.2.1 (2026-03-31)
 
-`meow:cook` Phase 6 (Reflect) now spawns a dedicated subagent for `meow:memory` capture — previously was an inline bullet that could be skipped on session interruption.
+`mk:cook` Phase 6 (Reflect) now spawns a dedicated subagent for `mk:memory` capture — previously was an inline bullet that could be skipped on session interruption.
 
 ### [v1.2.0 — The Memory Activation Release](/guide/whats-new/v1.2.0) (2026-03-31)
 
@@ -225,7 +236,7 @@ Fixed the dormant memory system and enriched it with cross-framework insights.
 
 Deeper review reasoning, resumable builds, and systematic coverage mapping.
 
-- 3 new skills: `meow:elicit` (8 named reasoning methods), `meow:validate-plan` (8-dimension validation), `meow:nyquist` (test-to-requirement coverage mapping).
+- 3 new skills: `mk:elicit` (8 named reasoning methods), `mk:validate-plan` (8-dimension validation), `mk:nyquist` (test-to-requirement coverage mapping).
 - Beads pattern — atomic, resumable work units for COMPLEX builds.
 - Subagent Status Protocol — DONE / DONE_WITH_CONCERNS / BLOCKED / NEEDS_CONTEXT.
 

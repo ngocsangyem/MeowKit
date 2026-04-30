@@ -10,19 +10,19 @@ persona: B
 
 **Best for:** End of sprint, weekly review  
 **Time estimate:** 10-15 minutes  
-**Skills used:** [meow:retro](/reference/skills/retro)  
+**Skills used:** [mk:retro](/reference/skills/retro)  
 **Agents involved:** analyst (cost data), documenter (saves report)
 
 ## Overview
 
-The [meow:retro](/reference/skills/retro) skill analyzes your git history to produce a structured retrospective. It's team-aware (breaks down per-person contributions) and tracks trends across runs to show improvement or regression.
+The [mk:retro](/reference/skills/retro) skill analyzes your git history to produce a structured retrospective. It's team-aware (breaks down per-person contributions) and tracks trends across runs to show improvement or regression.
 
 ## Step-by-step guide
 
 ### Step 1: Run the retrospective
 
 ```
-/meow:retro
+/mk:retro
 ```
 
 ### Step 2: Review the analysis
@@ -50,7 +50,7 @@ The **analyst** provides cost and pattern data from `memory/`:
 - Lessons learned that inform the retrospective's recommendations
 
 ::: tip Sprint Data from Jira
-If Atlassian MCP is available, meow:retro can pull sprint velocity and ticket metrics directly from Jira. Currently meow:retro uses git history only — Jira sprint data integration is planned for a future release.
+If Atlassian MCP is available, mk:retro can pull sprint velocity and ticket metrics directly from Jira. Currently mk:retro uses git history only — Jira sprint data integration is planned for a future release.
 :::
 
 ## Next workflow
