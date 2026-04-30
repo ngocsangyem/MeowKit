@@ -12,6 +12,10 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.7.1 — Phase Frontmatter Contract (2026-04-30)
+
+`mk:plan-creator` ships a strict YAML frontmatter contract for phase files — frontmatter is machine-readable truth, the Overview block is a regenerated human-readable mirror. Cook's finalize-step sync-back is now a formal algorithm: counts `[x]` in `## Todo List`, derives status, never overwrites terminal states (`failed`, `abandoned`), idempotent on re-run. Aligns plan-creator with the orchviz parser cascade so plan state stays consistent across planner, validator, harness, and visualizer. `scripts/validate-plan.py` hard-fails on the "stamp at creation" anti-pattern.
+
 ### v2.7.0 — The Namespace Rename Release (2026-04-30)
 
 Skill folders renamed from `.claude/skills/meow:<x>/` to `.claude/skills/<x>/` and skill identity prefix moved from `meow:` to `mk:`. Cross-platform safe — eliminates the colon that broke Windows NTFS checkouts. Slash commands move from `/meow:<x>` to `/mk:<x>`. Backward-compat alias resolver in `skill-id-utils.ts` keeps in-prompt `meow:` text references working with a one-time stderr warning during the v2.7.x deprecation window; hard-cut in v2.8.0. CI gate added to reject any new `meow:` frontmatter or `/meow:` slash references. [Full notes →](/guide/whats-new/v2.7.0)

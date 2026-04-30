@@ -16,6 +16,28 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.7.1 (2026-04-30) — Phase Frontmatter Contract
+
+### Highlights
+
+`mk:plan-creator` now ships a strict YAML frontmatter contract for phase files — frontmatter is the machine-readable source of truth, the Overview block is a human-readable mirror that sync-back regenerates from it. Aligns plan-creator output with the orchviz parser cascade, hardens the validator against drift, and formalizes the cook finalize-step sync-back algorithm.
+
+### Improvements
+
+- Phase files (`phase-XX-*.md`) MUST begin with a YAML frontmatter block — schema: `phase`, `title`, `status`, `priority`, `effort`, `dependencies`. `status: pending` is the only legal value at creation; `failed` and `abandoned` are terminal. Documented in `references/phase-template.md` and `references/output-standards.md`.
+- Cook's finalize-step sync-back is now a formal algorithm — counts `[x]` checkboxes in `## Todo List` to derive `pending` / `in_progress` / `completed`, regenerates the Overview mirror from frontmatter, never overwrites terminal states, idempotent on re-run. Documented in `references/task-management.md`.
+- Step-08 hydration adds a "Status Read Order" block that mirrors `packages/mewkit/src/orchviz/plan/parse-phase-file.ts` so plan state stays consistent across the planner, the validator, the harness, and orchviz.
+- `--two` mode approach files (`plan-approach-a.md`, `plan-approach-b.md`) get frontmatter at creation with `status: pending` — `draft` is no longer used because it is not in the parser union.
+- `--parallel` mode merges `ownership` and `parallel_group` into the same frontmatter block instead of a separate one.
+- `mk:review` step-03b whole-plan-sweep gains a drift surface — flags stale `dependencies: [N]` references when phases are renumbered or removed (informational, non-blocking).
+
+### Bug Fixes
+
+- `scripts/validate-plan.py` now hard-fails on `status: completed` written at creation time and on `unknown` / `draft` / `done` written from frontmatter — the validator catches the "stamp at creation" anti-pattern before Gate 1.
+- `scripts/validate-plan.py` documents its PyYAML dependency — install via `npx mewkit setup` (creates `.claude/skills/.venv/`); run via `.claude/skills/.venv/bin/python3 scripts/validate-plan.py <plan.md>`.
+
+---
+
 ## 2.7.0 (2026-04-30) — The Namespace Rename Release
 
 ### Highlights
