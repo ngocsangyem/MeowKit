@@ -57,6 +57,17 @@ Do NOT create tasks for the archived (non-selected) approach.
 
 ### 8d. Create Checkpoint File
 
+#### Status Read Order (Required)
+
+When populating `phases[*].status` in `.plan-state.json`, read in this order (mirrors `packages/mewkit/src/orchviz/plan/parse-phase-file.ts:42-106` cascade):
+
+1. Frontmatter `status:` field (PREFERRED)
+2. `**Status:**` bold pattern in `## Overview` (legacy fallback)
+3. Plain `status: ...` regex anywhere in body (deeper fallback)
+4. `unknown` sentinel (parse-failure indicator — never written from frontmatter)
+
+New plans always have frontmatter (per step-03 §3c.0), so step 1 resolves immediately. Legacy plans created before this skill upgrade fall through to step 2.
+
 Write `{plan_dir}/.plan-state.json` for cross-session resilience:
 
 ```json
@@ -79,6 +90,7 @@ Write `{plan_dir}/.plan-state.json` for cross-session resilience:
 ```
 
 `tasks_total` = count of `- [ ]` checkboxes in the phase file.
+`status` value above is resolved via the cascade in `### Status Read Order`.
 
 Fields `parallel_groups` and `selected_approach` are **optional** — omit when not applicable:
 - `parallel_groups`: only set when `planning_mode = parallel`

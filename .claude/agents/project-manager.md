@@ -50,7 +50,7 @@ Load before writing any status report:
 - `docs/project-context.md` — project conventions (may be absent per CF-C5; proceed with note)
 - `tasks/templates/pm-status-template.md` — report schema
 - Latest `{plan-dir}/status-reports/*.md` via Glob — prior state (if any)
-- Active `{plan-dir}/plan.md` + `phase-*.md` — source of truth for scope
+- Active `{plan-dir}/plan.md` + `phase-*.md` — source of truth for scope. Note: phase files now carry YAML frontmatter (`status`, `priority`, `effort`, `dependencies`). The frontmatter is metadata-only — read phase BODY for scope inference, not the YAML block. No agent-logic change.
 - `tasks/reviews/` — all verdicts for the current plan
 - `.claude/memory/cost-log.json` — schema v2; filter by current session_id
 - `.claude/memory/quick-notes.md` — `##note:` captures this session

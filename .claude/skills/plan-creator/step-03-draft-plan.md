@@ -66,7 +66,21 @@ Before writing phase files, read `references/solution-design-checklist.md`. Use 
 
 ### 3c. Write Phase Files (Hard/Deep/Parallel/Two Mode)
 
-Each phase file MUST have these 12 sections:
+### 3c.0. Frontmatter (Required)
+
+Every phase file MUST begin with a YAML frontmatter block. See `references/phase-template.md` for schema.
+
+Mapping rules:
+- `phase`: integer matching filename (`phase-01-foo.md` → `phase: 1`)
+- `title`: same as `# Phase N: {Name}` heading minus the `Phase N:` prefix
+- `status`: ALWAYS `pending` at creation. NEVER write `completed`. NEVER write `unknown`/`draft`/`done` (not in parser union).
+- `priority`: from priority assignment (default `P2`)
+- `effort`: from effort estimate (e.g., `~1.75h`, `2h`, `?`)
+- `dependencies`: integer array from "Depends On" column. `Phase 1, Phase 2` → `[1, 2]`. `—` → `[]`.
+
+The Overview block markdown still includes `**Priority:**`, `**Effort:**`, `**Status:**`, `**Depends on:**` as a HUMAN-READABLE MIRROR. Frontmatter is the machine source of truth; cook's sync-back regenerates the mirror.
+
+Each phase file MUST have these 12 sections (after the frontmatter block):
 
 1. **Context Links** — links to research reports, related files, docs
 2. **Overview** — priority, status, effort, description
@@ -153,7 +167,7 @@ After writing all phase files (section 3c), analyze ownership boundaries:
 2. Group phases with zero file overlap into parallel groups (max 3 groups).
 3. Setup/infrastructure phase → Group 0 (always sequential, runs first).
 4. Integration/test/docs phase → final group (always sequential, runs last).
-5. Add `ownership` and `parallel_group` fields to each phase file's YAML frontmatter.
+5. Add `ownership` and `parallel_group` fields to the SAME frontmatter block (alongside `phase`, `title`, `status`, `priority`, `effort`, `dependencies`). Place at the bottom of the block for readability.
 6. Append `## Execution Strategy` section to plan.md after the Phases table:
 
 ```markdown
@@ -172,7 +186,7 @@ See `references/parallel-mode.md` for full rules and templates.
 
 Instead of writing plan.md and phase files directly:
 
-1. Generate `{plan_dir}/plan-approach-a.md` and `{plan_dir}/plan-approach-b.md` using the approach template from `references/two-approach-mode.md`.
+1. Generate `{plan_dir}/plan-approach-a.md` and `{plan_dir}/plan-approach-b.md` using the approach template from `references/two-approach-mode.md`. Both approach files get frontmatter with `status: pending` (not `draft` — `draft` is not in the parser union and would normalize to `unknown`). The "selected vs archived" distinction is tracked in `trade-off-matrix.md`.
 2. Generate `{plan_dir}/trade-off-matrix.md` comparing both approaches.
 3. **Do NOT generate plan.md or phase-XX files yet** — deferred until user selects approach at step-04.
 4. Create `{plan_dir}/archived/` directory (empty, ready for non-selected approach).
