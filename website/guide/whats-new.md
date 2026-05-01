@@ -12,6 +12,10 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.7.3 — `npx mewkit` resolution fix (2026-05-01)
+
+`npx mewkit <cmd>` now works on every machine. The npm package was named `mewkit` but exposed a bin called `meowkit`, which broke resolution under older npm, pnpm dlx, yarn dlx, and some Windows shells with `command not found`. Bin renamed to `mewkit` so name and bin agree. Also fixes a Stop-hook counter persistence bug where `pre-completion-check.sh` could never reach its 3-attempt soft-nudge cap because `project-context-loader.sh` reset the counter on every SessionStart — the pre-completion check now owns its own counter lifecycle.
+
 ### v2.7.2 — Checkpoint subsystem cleanup (2026-05-01)
 
 The `session-state/checkpoints/` directory stops accumulating files unboundedly. Was a pointer-and-numbered-file scheme with no rotation logic; now a single overwriting `checkpoint-latest.json` written atomically via POSIX `.tmp` + rename. Resume context, git-drift detection, and budget tracking are preserved. Internal cleanup also reconciles `HOOKS_INDEX.md`, `AGENTS_INDEX.md`, `build-verify-commands.md`, and `trace-schema.md` with disk state, removes two long-superseded shell hook writers, and adds a `safePlanPath` content guard to `orientation-ritual.cjs` against `..` traversal and control-character injection in the resumed `plan_path` field.

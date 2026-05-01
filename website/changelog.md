@@ -16,6 +16,20 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.7.3 (2026-05-01) — `npx mewkit` resolution fix
+
+### Bug Fixes
+
+- `npx mewkit <cmd>` failed on some machines with `sh: meowkit: command not found` (macOS) or `'meowkit' is not recognized as an internal or external command` (Windows) — the npm package was named `mewkit` but exposed a bin called `meowkit`, so resolvers (older npm, pnpm dlx, yarn dlx, certain Windows shells) spawned the bin by name through `PATH` instead of the symlinked `.bin/` path. Bin renamed to `mewkit` so package name and bin agree across all package managers.
+- `pre-completion-check.sh` counter never reaching its 3-attempt soft-nudge cap — Claude Code assigns a new session ID for every blocked-Stop cycle, and `project-context-loader.sh` was resetting `session-state/precompletion-attempts.json` on every SessionStart, wiping the counter mid-loop. The pre-completion check now owns its own counter lifecycle (clears on verification success or cap-hit); the SessionStart reset is removed.
+
+### CLI
+
+- Help banner and `mewkit status` now print `mewkit` instead of `meowkit` to match the published bin name.
+- `mewkit doctor` venv-missing hint updated to suggest `mewkit setup --only=venv`.
+
+---
+
 ## 2.7.2 (2026-05-01) — Checkpoint subsystem cleanup
 
 ### Highlights

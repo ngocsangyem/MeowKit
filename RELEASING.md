@@ -376,6 +376,9 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v2.7.3  | 2026-05-01 | `npx mewkit` resolution fix          |
+| v2.7.2  | 2026-05-01 | Checkpoint subsystem cleanup         |
+| v2.7.1  | 2026-04-30 | Phase Frontmatter Contract           |
 | v2.7.0  | 2026-04-30 | The Namespace Rename Release         |
 | v2.6.2  | 2026-04-29 | The Telemetry & Validator Release    |
 | v2.6.1  | 2026-04-22 | The project-manager Release          |
