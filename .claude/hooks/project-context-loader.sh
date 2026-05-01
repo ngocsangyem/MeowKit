@@ -71,7 +71,11 @@ if [ -n "${HOOK_SESSION_ID:-}" ]; then
   if [ "$HOOK_SESSION_ID" != "$LAST_SESSION" ]; then
     # New session — reset per-session counters
     echo '{}' > session-state/edit-counts.json 2>/dev/null || true
-    echo '{}' > session-state/precompletion-attempts.json 2>/dev/null || true
+    # Note: precompletion-attempts.json is NOT reset here. pre-completion-check.sh
+    # owns its own lifecycle — it clears the counter when verification passes
+    # (line ~110) or when the 3-attempt soft-nudge cap is hit (line ~152).
+    # Resetting here breaks the cap because Claude Code assigns a new session ID
+    # for every blocked-Stop cycle, which would otherwise wipe the counter mid-loop.
     echo '{}' > session-state/build-verify-cache.json 2>/dev/null || true
     rm -f session-state/conversation-summary.lock 2>/dev/null || true
     # CF1 fix: clear TDD sentinel + deprecation flag (written to .claude/session-state/)
