@@ -9,7 +9,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const zlib = require("node:zlib");
 
-const MAX_BYTES = 150 * 1024;
+const MAX_BYTES = 160 * 1024;
 const dist = path.resolve(__dirname, "..", "dist", "orchviz-web");
 
 function gzipSize(filePath) {

@@ -85,6 +85,41 @@ multi-session tabs); v1.1 ports the full agent-flow visualizer. Ported (in
 part) from [`patoles/agent-flow`](https://github.com/patoles/agent-flow)
 under the Apache-2.0 license — see `NOTICE`.
 
+### orchviz API Endpoints (v1.2)
+
+The orchviz server exposes these HTTP endpoints on `http://127.0.0.1:<port>`:
+
+**GET /api/plans** — list non-archived plans sorted by mtime (newest first):
+```bash
+curl http://127.0.0.1:3001/api/plans
+# { "plans": [{ "slug": "260501-my-plan", "title": "...", "status": "draft", ... }] }
+```
+
+**GET /api/plan?slug=\<slug\>** — full plan state with per-phase ETags:
+```bash
+curl "http://127.0.0.1:3001/api/plan?slug=260501-my-plan"
+# { "plan": { ... }, "phaseEtags": { "1": "<hex64>", "2": "<hex64>" }, "readonly": false }
+# Omit ?slug= to get the most-recently-modified plan.
+```
+
+**POST /api/plan/todo** — toggle a todo checkbox (Origin header required):
+```bash
+curl -X POST http://127.0.0.1:3001/api/plan/todo \
+  -H "Content-Type: application/json" \
+  -H "Origin: http://127.0.0.1:3001" \
+  -d '{"slug":"260501-my-plan","phase":1,"todoIdx":0,"checked":true,"etag":"<hex64>"}'
+# 200: { "ok": true, "changed": true, "etag": "<new-hex64>" }
+# 409: { "error": "stale", "currentEtag": "<latest-hex64>" }  → re-fetch and retry
+# 403: Origin header missing or not in allowlist
+```
+
+**Origin requirement:** POST requests must include `Origin: http://127.0.0.1:<port>`
+or `Origin: http://localhost:<port>`. This prevents cross-origin writes from
+browser tabs served by other origins.
+
+**Read-only mode:** set `MEOWKIT_ORCHVIZ_READONLY=1` before launching; POST
+returns 405 and the UI reverts to disabled checkboxes.
+
 ## Related
 
 - [GitHub](https://github.com/ngocsangyem/MeowKit)

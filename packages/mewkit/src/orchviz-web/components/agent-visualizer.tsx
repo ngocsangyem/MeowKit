@@ -3,11 +3,16 @@
  *
  * Grid: TopStrip (auto) / MainGrid 60-40 (PlanTable | Canvas+Transcript) / BottomBar (auto).
  * GateDrawer overlays at z-50 when triggered. AgentCanvas demoted to right sidebar.
+ *
+ * v1.2: selectedSlug state lifted here. Shared via props to TopStrip + PlanTable.
+ *       Stale-slug recovery: if useActivePlan returns "empty" for a non-null slug,
+ *       clear the stored slug and fall back to most-recent (R2-4 — no custom DOM events).
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAgentSimulation } from "@/hooks/use-agent-simulation";
 import { useEventSource } from "@/hooks/use-event-source";
+import { useActivePlan, type UseActivePlanResult } from "@/hooks/use-active-plan";
 import { AgentCanvas } from "./agent-canvas";
 import { TranscriptPanel } from "./transcript-panel";
 import { TopStrip } from "./top-strip";
@@ -15,6 +20,8 @@ import { PlanTable } from "./plan-table";
 import { BottomBar } from "./bottom-bar";
 import { GateDrawer } from "./drawers/gate-drawer";
 import { COLORS } from "@/lib/colors";
+import { loadSelectedSlug, saveSelectedSlug } from "@/lib/selected-slug-store";
+import { ToastProvider } from "./toast";
 
 export function AgentVisualizer() {
 	const { pendingEvents, consumeEvents, connectionStatus } = useEventSource("/events");
@@ -30,6 +37,33 @@ export function AgentVisualizer() {
 		sessionFilterRef,
 		disable1MContext: false,
 	});
+
+	// Lifted slug state — lazy-init from localStorage (rule: rerender-lazy-state-init)
+	const [selectedSlug, setSelectedSlug] = useState<string | null>(() => loadSelectedSlug());
+
+	const handleSelectSlug = useCallback((slug: string | null): void => {
+		setSelectedSlug(slug);
+		saveSelectedSlug(slug);
+	}, []);
+
+	// Single useActivePlan call lifted here — passed to TopStrip + PlanTable as a prop
+	// so we have ONE polling effect, not three (was: AgentVisualizer + TopStrip + PlanTable).
+	const activePlan = useActivePlan(selectedSlug ?? undefined);
+
+	// Stale-slug recovery (R2-4): watch useActivePlan for 404 → fall back to most-recent.
+	// Fire-once per slug using a ref to avoid multiple clears on subsequent polls.
+	const staleSlugs = useRef<Set<string>>(new Set());
+
+	useEffect(() => {
+		if (
+			activePlan.status === "empty" &&
+			selectedSlug !== null &&
+			!staleSlugs.current.has(selectedSlug)
+		) {
+			staleSlugs.current.add(selectedSlug);
+			handleSelectSlug(null);
+		}
+	}, [activePlan.status, selectedSlug, handleSelectSlug]);
 
 	const [showTranscript, setShowTranscript] = useState(true);
 	const [openGate, setOpenGate] = useState<"G1" | "G2" | null>(null);
@@ -47,6 +81,7 @@ export function AgentVisualizer() {
 	const isEmpty = agents.size === 0;
 
 	return (
+		<ToastProvider>
 		<div
 			className="grid h-screen w-screen overflow-hidden relative"
 			style={{
@@ -56,7 +91,12 @@ export function AgentVisualizer() {
 				minWidth: 1024,
 			}}
 		>
-			<TopStrip onGateClick={(id) => setOpenGate(id)} />
+			<TopStrip
+				onGateClick={(id) => setOpenGate(id)}
+				selectedSlug={selectedSlug}
+				onSelectSlug={handleSelectSlug}
+				activePlan={activePlan}
+			/>
 
 			<main
 				className="grid overflow-hidden"
@@ -69,7 +109,7 @@ export function AgentVisualizer() {
 					className="overflow-hidden"
 					style={{ borderRight: `1px solid ${COLORS.panelSeparator}` }}
 				>
-					<PlanTable />
+					<PlanTable selectedSlug={selectedSlug} activePlan={activePlan} />
 				</section>
 				<section
 					className="grid overflow-hidden"
@@ -114,5 +154,6 @@ export function AgentVisualizer() {
 
 			<GateDrawer gate={openGate} onClose={() => setOpenGate(null)} />
 		</div>
+		</ToastProvider>
 	);
 }

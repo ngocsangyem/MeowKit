@@ -13,8 +13,8 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import yaml from "js-yaml";
 import type { PhaseState, PhaseStatus, TodoItem } from "./types.js";
+import { FRONTMATTER_RE } from "./plan-constants.js";
 
-const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---/;
 const STATUS_BOLD_RE = /\*+\s*Status\s*:?\s*\*+\s*([A-Za-z_-]+)/i;
 const STATUS_PLAIN_RE = /\bstatus\s*:\s*([a-z_-]+)/i;
 const TODO_RE = /^\s*-\s*\[(\s|x|X|~|✓)\]\s+(.+?)\s*$/;
@@ -110,11 +110,25 @@ function extractEffort(raw: string): string | null {
 	return match ? match[1].trim() : null;
 }
 
+/**
+ * Extract todos from the ## Todo List section.
+ *
+ * Per red-team C1: tracks ``` fence depth and skips checkbox lines inside
+ * fenced code blocks. This makes the reader's todoIdx consistent with the
+ * writer's applyTodoToggle walk (Phase 2). Reader and writer use the SAME
+ * counting logic — only checkboxes OUTSIDE fences are counted.
+ */
 function extractTodos(raw: string): TodoItem[] {
 	const todoSection = raw.match(/##\s+Todo\s+List\s*\n([\s\S]*?)(?=\n##\s|\n#\s|$)/i);
 	if (!todoSection) return [];
 	const out: TodoItem[] = [];
+	let fenceDepth = 0;
 	for (const line of todoSection[1].split(/\r?\n/)) {
+		if (/^```/.test(line)) {
+			fenceDepth = fenceDepth === 0 ? 1 : 0;
+			continue;
+		}
+		if (fenceDepth > 0) continue;
 		const m = line.match(TODO_RE);
 		if (!m) continue;
 		const marker = m[1];

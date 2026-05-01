@@ -9,6 +9,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import yaml from "js-yaml";
+import { FRONTMATTER_RE } from "./plan-constants.js";
 import { createLogger } from "../logger.js";
 
 const log = createLogger("PlanFinder");
@@ -20,9 +21,14 @@ interface Candidate {
 
 export function findActivePlan(projectRoot: string): string | null {
 	const plansDir = path.join(projectRoot, "tasks", "plans");
-	if (!fs.existsSync(plansDir)) return null;
 
-	const boundary = path.resolve(plansDir) + path.sep;
+	let resolvedPlansDir: string;
+	try {
+		resolvedPlansDir = fs.realpathSync(plansDir);
+	} catch {
+		return null;
+	}
+	const boundary = resolvedPlansDir + path.sep;
 	let entries: fs.Dirent[];
 	try {
 		entries = fs.readdirSync(plansDir, { withFileTypes: true });
@@ -71,7 +77,7 @@ function isArchived(planFile: string): boolean {
 	} catch {
 		return false;
 	}
-	const fmMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+	const fmMatch = raw.match(FRONTMATTER_RE);
 	if (!fmMatch) return false;
 	let parsed: unknown;
 	try {

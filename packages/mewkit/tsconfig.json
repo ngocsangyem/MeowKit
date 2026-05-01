@@ -15,5 +15,5 @@
     "composite": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "src/orchviz-web"]
+  "exclude": ["node_modules", "dist", "src/orchviz-web", "src/**/__tests__/**", "src/orchviz/test-server-boot.ts"]
 }

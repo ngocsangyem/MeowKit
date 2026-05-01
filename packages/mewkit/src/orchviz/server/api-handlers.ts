@@ -1,10 +1,17 @@
 /**
- * /api/overlays + /api/plan — JSON endpoints backed by collectors.
+ * /api/overlays + /api/plan + /api/plans — JSON endpoints backed by collectors.
  */
 
 import type { ServerResponse } from "node:http";
 import { OverlayCollector } from "../overlay/collector.js";
-import { PlanCollector, type PlanSnapshot } from "../plan/collector.js";
+import { PlanCollector, type PlanSnapshot, type PlanSnapshotError } from "../plan/collector.js";
+import { listPlans } from "../plan/list-plans.js";
+
+const PLAN_ERROR_HTTP: Record<PlanSnapshotError, number> = {
+	"invalid-slug": 400,
+	"forbidden-path": 403,
+	"not-found": 404,
+};
 
 const HTML_TAG_RE = /<[^>]*>/g;
 
@@ -63,13 +70,33 @@ export function makeOverlayProvider(projectRoot: string): OverlayProvider {
 	return () => collector.snapshot();
 }
 
-export type PlanProvider = () => PlanSnapshot;
+/**
+ * PlanProvider now accepts an optional slug string.
+ * PlanCollector.snapshot(slug?) maps to this signature.
+ */
+export type PlanProvider = (slug?: string) => PlanSnapshot;
 
-export function handlePlan(res: ServerResponse, provider: PlanProvider): void {
+/**
+ * Handle GET /api/plan — optionally targeted by ?slug=<slug> query param.
+ *
+ * Error mapping (R2-8):
+ *   snapshot.error === "invalid-slug"   → 400
+ *   snapshot.error === "forbidden-path" → 403
+ *   snapshot.error === "not-found"      → 404
+ *   no error                            → 200
+ */
+export function handlePlan(
+	res: ServerResponse,
+	provider: PlanProvider,
+	query: URLSearchParams,
+): void {
 	try {
-		const snapshot = provider();
-		// Strip HTML tags at boundary (red-team H2). React auto-escapes downstream
-		// but defense-in-depth is consistent with sanitizeEvent at SSE boundary.
+		const slug = query.get("slug") ?? undefined;
+		const snapshot = provider(slug);
+		if (snapshot.error) {
+			writeJson(res, PLAN_ERROR_HTTP[snapshot.error], { error: snapshot.error });
+			return;
+		}
 		const safe = stripHtmlDeep(snapshot);
 		writeJson(res, 200, safe);
 	} catch {
@@ -79,10 +106,35 @@ export function handlePlan(res: ServerResponse, provider: PlanProvider): void {
 
 export const PLACEHOLDER_PLAN: PlanProvider = () => ({
 	plan: null,
+	phaseEtags: null,
+	readonly: false,
 	generatedAt: new Date().toISOString(),
 });
 
 export function makePlanProvider(projectRoot: string): PlanProvider {
 	const collector = new PlanCollector(projectRoot);
-	return () => collector.snapshot();
+	return (slug?: string) => collector.snapshot(slug);
+}
+
+/**
+ * Create a standalone PlanCollector instance for injection into the write handler.
+ * The write handler calls collector.invalidate() after every successful write,
+ * invalidating the cache so the next GET returns fresh data (R2-4).
+ */
+export function makePlanCollector(projectRoot: string): PlanCollector {
+	return new PlanCollector(projectRoot);
+}
+
+/**
+ * Handle GET /api/plans — returns all non-archived plan summaries sorted mtime desc.
+ * HTML-tag scrub applied to all string fields (red-team H2).
+ */
+export function handlePlans(res: ServerResponse, projectRoot: string): void {
+	try {
+		const plans = listPlans(projectRoot);
+		const safe = stripHtmlDeep(plans);
+		writeJson(res, 200, { plans: safe, generatedAt: new Date().toISOString() });
+	} catch {
+		writeJson(res, 500, { error: "plans-read-failed" });
+	}
 }

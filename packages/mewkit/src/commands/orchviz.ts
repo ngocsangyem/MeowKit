@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import pc from "picocolors";
 import { SessionRuntime } from "../orchviz/session-runtime.js";
 import { OrchvizServer } from "../orchviz/server/index.js";
-import { makeOverlayProvider, makePlanProvider } from "../orchviz/server/api-handlers.js";
+import { makeOverlayProvider, makePlanCollector } from "../orchviz/server/api-handlers.js";
 import { LogPersister, sanitizeSessionIdForPath } from "../orchviz/log-persister.js";
 import { openURL } from "../orchviz/open-url.js";
 import { setVerbose } from "../orchviz/logger.js";
@@ -96,13 +96,20 @@ export async function orchviz(args: OrchvizArgs): Promise<void> {
 	const runtime = new SessionRuntime(workspace, { sessionId: args.session, verbose });
 	const staticDir = resolveStaticDir();
 	const overlayProvider = projectRoot ? makeOverlayProvider(projectRoot) : undefined;
-	const planProvider = projectRoot ? makePlanProvider(projectRoot) : undefined;
+	// Shared PlanCollector — write handler calls invalidate() after writes
+	// so the next GET returns fresh data (R2-4 / M4 injection path).
+	const planCollector = projectRoot ? makePlanCollector(projectRoot) : undefined;
+	const planProvider = projectRoot
+		? (slug?: string) => planCollector!.snapshot(slug)
+		: undefined;
 	const server = new OrchvizServer({
 		port: args.port,
 		staticDir,
 		eventSource: runtime,
 		overlayProvider,
 		planProvider,
+		planCollector,
+		projectRoot: projectRoot ?? undefined,
 		verbose,
 	});
 
@@ -148,10 +155,7 @@ export async function orchviz(args: OrchvizArgs): Promise<void> {
 		runtime.dispose();
 	};
 
-	// Server must subscribe to runtime's "event" emitter BEFORE runtime.start()
-	// fires session:start (which emits the orchestrator agent_spawn). Node
-	// EventEmitter does not queue, so any event emitted before subscription is
-	// dropped — including the one-time orchestrator spawn that the client needs.
+	// Subscribe before runtime.start() — EventEmitter does not queue events.
 	const url = await server.start();
 	runtime.start();
 

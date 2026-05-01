@@ -15,11 +15,19 @@ import { serveStatic } from "./static-handler.js";
 import {
 	handleOverlays,
 	handlePlan,
+	handlePlans,
+	writeJson,
 	PLACEHOLDER_OVERLAYS,
 	PLACEHOLDER_PLAN,
 	type OverlayProvider,
 	type PlanProvider,
 } from "./api-handlers.js";
+import {
+	handleTodoWrite,
+	handleTodoPreflight,
+	type WriteHandlerContext,
+} from "./write-handlers.js";
+import type { PlanCollector } from "../plan/collector.js";
 
 export interface OrchvizServerOptions {
 	port?: number;
@@ -27,6 +35,10 @@ export interface OrchvizServerOptions {
 	eventSource: EventEmitter;
 	overlayProvider?: OverlayProvider;
 	planProvider?: PlanProvider;
+	/** Required for /api/plans endpoint. Falls back to no-op if absent. */
+	projectRoot?: string;
+	/** Required for POST /api/plan/todo cache invalidation (red-team M4 / R2-4). */
+	planCollector?: PlanCollector;
 	verbose?: boolean;
 }
 
@@ -114,6 +126,21 @@ export class OrchvizServer {
 		const url = new URL(req.url ?? "/", `http://${BIND_HOST}:${this.actualPort}`);
 		const pathname = url.pathname;
 
+		// Route /api/plan/todo BEFORE the GET/HEAD method gate (spec step 14).
+		if (pathname === "/api/plan/todo") {
+			const writeCtx: WriteHandlerContext = {
+				projectRoot: this.opts.projectRoot ?? "",
+				port: this.actualPort,
+				planCollector: this.opts.planCollector,
+			};
+			if (req.method === "OPTIONS") {
+				handleTodoPreflight(req, res, this.actualPort);
+				return;
+			}
+			void handleTodoWrite(req, res, writeCtx);
+			return;
+		}
+
 		if (req.method !== "GET" && req.method !== "HEAD") {
 			res.writeHead(405, { Allow: "GET, HEAD", "Content-Type": "text/plain" });
 			res.end("Method Not Allowed");
@@ -127,8 +154,16 @@ export class OrchvizServer {
 			handleOverlays(res, this.opts.overlayProvider ?? PLACEHOLDER_OVERLAYS);
 			return;
 		}
+		if (pathname === "/api/plans") {
+			if (this.opts.projectRoot) {
+				handlePlans(res, this.opts.projectRoot);
+			} else {
+				writeJson(res, 200, { plans: [], generatedAt: new Date().toISOString() });
+			}
+			return;
+		}
 		if (pathname === "/api/plan") {
-			handlePlan(res, this.opts.planProvider ?? PLACEHOLDER_PLAN);
+			handlePlan(res, this.opts.planProvider ?? PLACEHOLDER_PLAN, url.searchParams);
 			return;
 		}
 		serveStatic(req, res, this.opts.staticDir);

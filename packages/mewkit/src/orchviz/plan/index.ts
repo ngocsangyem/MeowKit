@@ -11,25 +11,33 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type { PhaseState, PlanState } from "./types.js";
+import { PHASE_FILE_RE } from "./plan-constants.js";
 
-export type { PhaseState, PhaseStatus, PlanState, TodoItem } from "./types.js";
+export type { PhaseState, PhaseStatus, PlanState, PlanStatus, PlanSummary, TodoItem } from "./types.js";
 export { findActivePlan } from "./find-active-plan.js";
 export { parsePlanFile, type PlanScaffold } from "./parse-plan-file.js";
 export { parsePhaseFile } from "./parse-phase-file.js";
+export { listPlans } from "./list-plans.js";
+export { computePhaseFileEtag, computeAllPhaseEtags } from "./etag.js";
 
-import { findActivePlan } from "./find-active-plan.js";
 import { parsePlanFile } from "./parse-plan-file.js";
 import { parsePhaseFile } from "./parse-phase-file.js";
 import { createLogger } from "../logger.js";
 
 const log = createLogger("PlanReader");
-const PHASE_FILE_RE = /^phase-\d+-.+\.md$/i;
 
 export function readPlan(planDir: string): PlanState | null {
 	const scaffold = parsePlanFile(planDir);
 	if (!scaffold) return null;
 
-	const boundary = path.resolve(planDir) + path.sep;
+	// Use realpathSync for boundary so macOS /var→/private/var symlink doesn't break check
+	let resolvedPlanDir: string;
+	try {
+		resolvedPlanDir = fs.realpathSync(planDir);
+	} catch {
+		return null;
+	}
+	const boundary = resolvedPlanDir + path.sep;
 	let entries: string[];
 	try {
 		entries = fs.readdirSync(planDir);

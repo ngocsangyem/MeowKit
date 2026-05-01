@@ -12,6 +12,33 @@ export type PhaseStatus =
 	| "abandoned"
 	| "unknown";
 
+/**
+ * Plan-level status vocabulary (red-team H3).
+ * Used by listPlans and PlanSummary. "unknown" is the fallback for unrecognized strings.
+ */
+export type PlanStatus =
+	| "draft"
+	| "in_progress"
+	| "active"
+	| "completed"
+	| "archived"
+	| "blocked"
+	| "unknown";
+
+/**
+ * Lightweight summary of a plan — returned by GET /api/plans.
+ * Full plan state (with phases + todos) is returned by GET /api/plan?slug=<slug>.
+ */
+export interface PlanSummary {
+	slug: string;
+	title: string;
+	status: PlanStatus;
+	created: string;
+	effort: string;
+	mtimeMs: number;
+	phaseCount: number;
+}
+
 export interface TodoItem {
 	checked: boolean;
 	text: string;

@@ -1,17 +1,25 @@
 /**
  * Single phase row. Status icon (incl. "?" for unknown — red-team H1) + progress
  * bar + source phase-file path label (red-team M5).
+ *
+ * v1.2: threads slug, etag, readonly, onTodoToggle to TodoList.
  */
 
 import { COLORS } from "@/lib/colors";
 import type { PlanPhase } from "@/hooks/use-active-plan";
 import { phaseProgress } from "@/lib/phase-progress";
 import { TodoList } from "./todo-list";
+import type { TodoToggleArgs } from "@/hooks/use-todo-writer";
 
 interface PhaseRowProps {
 	phase: PlanPhase;
 	expanded: boolean;
 	onToggle: () => void;
+	/** v1.2 write props */
+	slug: string;
+	etag: string;
+	readonly: boolean;
+	onTodoToggle: (args: TodoToggleArgs) => void;
 }
 
 const STATUS_ICONS: Record<PlanPhase["status"], string> = {
@@ -43,7 +51,15 @@ function shortPath(filePath: string): string {
 	return idx >= 0 ? filePath.slice(idx + 1) : filePath;
 }
 
-export function PhaseRow({ phase, expanded, onToggle }: PhaseRowProps) {
+export function PhaseRow({
+	phase,
+	expanded,
+	onToggle,
+	slug,
+	etag,
+	readonly,
+	onTodoToggle,
+}: PhaseRowProps) {
 	const progress = phaseProgress(phase);
 	const isActive = phase.status === "active" || phase.status === "in_progress";
 	const color = STATUS_COLORS[phase.status];
@@ -105,7 +121,14 @@ export function PhaseRow({ phase, expanded, onToggle }: PhaseRowProps) {
 			>
 				{shortPath(phase.filePath)}
 			</div>
-			{expanded && <TodoList todos={phase.todos} />}
+			{expanded && (
+				<TodoList
+					todos={phase.todos}
+					phaseNumber={phase.number}
+					readonly={readonly}
+					onToggle={onTodoToggle}
+				/>
+			)}
 		</div>
 	);
 }

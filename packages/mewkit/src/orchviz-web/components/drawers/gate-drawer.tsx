@@ -52,6 +52,7 @@ export function GateDrawer({ gate, onClose }: GateDrawerProps) {
 					fontFamily: "'SF Mono', 'Fira Code', monospace",
 				}}
 				role="dialog"
+				aria-modal="true"
 				aria-label={`Gate ${gate} details`}
 			>
 				<div

@@ -19,7 +19,7 @@ export interface PlanScaffold {
 	path: string;
 }
 
-const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---/;
+import { FRONTMATTER_RE } from "./plan-constants.js";
 
 function asString(v: unknown, fallback = ""): string {
 	if (typeof v === "string") return v;
