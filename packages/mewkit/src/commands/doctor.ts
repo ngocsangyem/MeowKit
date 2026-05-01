@@ -216,7 +216,7 @@ function checkPipPackages(root: string | null): DiagResult {
 	if (!root) return { name: "Pip packages", status: "warn", detail: "Skipped — no project" };
 	const venvDir = path.join(root, ".claude", "skills", ".venv");
 	if (!fs.existsSync(venvDir)) {
-		return { name: "Pip packages", status: "warn", detail: "Skipped — no venv (run meowkit setup --only=venv)" };
+		return { name: "Pip packages", status: "warn", detail: "Skipped — no venv (run mewkit setup --only=venv)" };
 	}
 	const { packages } = getRequirementsSource(root);
 	const results = verifyPackages(root, packages);

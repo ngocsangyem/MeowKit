@@ -22,10 +22,10 @@ const VERSION = pkgJson.version;
 
 function printHelp(): void {
 	console.log(`
-${pc.bold(pc.cyan("meowkit"))} ${pc.dim(`v${VERSION}`)} — MeowKit runtime CLI
+${pc.bold(pc.cyan("mewkit"))} ${pc.dim(`v${VERSION}`)} — MeowKit runtime CLI
 
 ${pc.bold("Usage:")}
-  meowkit <command> [options]
+  mewkit <command> [options]
 
 ${pc.bold("Commands:")}
   ${pc.green("init")}       Scaffold or update MeowKit in the current project
@@ -61,7 +61,7 @@ ${pc.bold("orchviz flags:")}
 
 async function printStatus(): Promise<void> {
 	const channel = VERSION.includes("-beta") || VERSION.includes("-rc") ? "beta" : "stable";
-	console.log(`${pc.bold(pc.cyan("meowkit"))} ${pc.dim(`v${VERSION}`)} ${pc.dim(`(${channel})`)}`);
+	console.log(`${pc.bold(pc.cyan("mewkit"))} ${pc.dim(`v${VERSION}`)} ${pc.dim(`(${channel})`)}`);
 	console.log();
 
 	const configPath = ".claude/meowkit.config.json";
