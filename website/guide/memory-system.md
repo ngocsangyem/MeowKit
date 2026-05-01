@@ -137,7 +137,7 @@ Pruned entries are moved to `lessons-archive.md` for recovery.
 
 Every session appends to `cost-log.json` via the Stop hook (`post-session.sh`). Fields: `date`, `session_id`, `model`, `estimated_cost_usd`, token counts, `cache_read_tokens`, `cache_creation_tokens`, `recent_files`.
 
-View cost report with `npx meowkit memory --stats`.
+View cost report with `npx mewkit memory --stats`.
 
 ## Session state vs memory
 
