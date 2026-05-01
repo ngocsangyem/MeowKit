@@ -22,8 +22,15 @@ const FIXTURES_DIR = path.resolve(
 
 let handle: TestServerHandle | null = null;
 
-beforeEach(async () => { handle = await bootTestServer({ fixturesDir: FIXTURES_DIR }); });
-afterEach(async () => { if (handle) { await handle.cleanup(); handle = null; } });
+beforeEach(async () => {
+	// Read-only is the default — these tests exercise the write endpoint, opt in.
+	process.env.MEOWKIT_ORCHVIZ_WRITABLE = "1";
+	handle = await bootTestServer({ fixturesDir: FIXTURES_DIR });
+});
+afterEach(async () => {
+	delete process.env.MEOWKIT_ORCHVIZ_WRITABLE;
+	if (handle) { await handle.cleanup(); handle = null; }
+});
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

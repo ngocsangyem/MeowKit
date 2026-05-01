@@ -98,12 +98,23 @@ curl http://127.0.0.1:3001/api/plans
 **GET /api/plan?slug=\<slug\>** — full plan state with per-phase ETags:
 ```bash
 curl "http://127.0.0.1:3001/api/plan?slug=260501-my-plan"
-# { "plan": { ... }, "phaseEtags": { "1": "<hex64>", "2": "<hex64>" }, "readonly": false }
+# { "plan": { ... }, "phaseEtags": { "1": "<hex64>", "2": "<hex64>" }, "readonly": true }
 # Omit ?slug= to get the most-recently-modified plan.
 ```
 
-**POST /api/plan/todo** — toggle a todo checkbox (Origin header required):
+**Read-only by default.** The visualizer is a viewer, not an editor — graph,
+plan tree, and todos all render read-only. The hamburger drawer browses the
+plan tree (plan → phase → todo) without exposing edit affordances. To opt
+into write mode (legacy todo-toggle endpoint), launch with
+`MEOWKIT_ORCHVIZ_WRITABLE=1`. The legacy `MEOWKIT_ORCHVIZ_READONLY=0` flag
+also opts in for backwards compatibility; `MEOWKIT_ORCHVIZ_READONLY=1`
+forces read-only as a defensive lock.
+
+**POST /api/plan/todo** — toggle a todo checkbox (write mode only):
 ```bash
+# Default (no env): returns 405 { "error": "readonly" }
+MEOWKIT_ORCHVIZ_WRITABLE=1 npx mewkit orchviz   # opt in to write mode
+
 curl -X POST http://127.0.0.1:3001/api/plan/todo \
   -H "Content-Type: application/json" \
   -H "Origin: http://127.0.0.1:3001" \
@@ -111,14 +122,12 @@ curl -X POST http://127.0.0.1:3001/api/plan/todo \
 # 200: { "ok": true, "changed": true, "etag": "<new-hex64>" }
 # 409: { "error": "stale", "currentEtag": "<latest-hex64>" }  → re-fetch and retry
 # 403: Origin header missing or not in allowlist
+# 405: server is in read-only mode (the default)
 ```
 
 **Origin requirement:** POST requests must include `Origin: http://127.0.0.1:<port>`
 or `Origin: http://localhost:<port>`. This prevents cross-origin writes from
 browser tabs served by other origins.
-
-**Read-only mode:** set `MEOWKIT_ORCHVIZ_READONLY=1` before launching; POST
-returns 405 and the UI reverts to disabled checkboxes.
 
 ## Related
 

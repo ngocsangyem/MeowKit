@@ -17,7 +17,7 @@ import { z } from "zod";
 import { applyTodoToggle } from "../plan/apply-todo-toggle.js";
 import { atomicWriteFileSync, cleanOrphanedTmps } from "../plan/atomic-write.js";
 import { SLUG_RE, buildPhaseNumberRe } from "../plan/plan-constants.js";
-import type { PlanCollector } from "../plan/collector.js";
+import { isOrchvizReadonly, type PlanCollector } from "../plan/collector.js";
 import { createLogger } from "../logger.js";
 import {
 	isOriginAllowed,
@@ -64,7 +64,7 @@ export async function handleTodoWrite(
 	res: ServerResponse,
 	ctx: WriteHandlerContext,
 ): Promise<void> {
-	if (process.env.MEOWKIT_ORCHVIZ_READONLY === "1") { writeJson(res, 405, { error: "readonly" }); return; }
+	if (isOrchvizReadonly()) { writeJson(res, 405, { error: "readonly" }); return; }
 	if (req.method !== "POST") { res.writeHead(405, { Allow: "POST" }); res.end(); return; }
 
 	const origin = req.headers["origin"] ?? "";

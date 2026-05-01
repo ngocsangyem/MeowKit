@@ -101,9 +101,14 @@ function postTodo(body: unknown, extraHdrs: Record<string, string> = {}): Promis
 	});
 }
 
-beforeEach(async () => { delete process.env.MEOWKIT_ORCHVIZ_READONLY; await startServer(makeProjectRoot()); });
+beforeEach(async () => {
+	delete process.env.MEOWKIT_ORCHVIZ_READONLY;
+	process.env.MEOWKIT_ORCHVIZ_WRITABLE = "1";
+	await startServer(makeProjectRoot());
+});
 afterEach(async () => {
 	delete process.env.MEOWKIT_ORCHVIZ_READONLY;
+	delete process.env.MEOWKIT_ORCHVIZ_WRITABLE;
 	if (active) { await active.stop(); active = null; }
 	if (tmpDir) { fs.rmSync(tmpDir, { recursive: true, force: true }); tmpDir = null; }
 	resetPlansDirCache();

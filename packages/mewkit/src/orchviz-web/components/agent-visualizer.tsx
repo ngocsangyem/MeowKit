@@ -1,24 +1,26 @@
 /**
- * AgentVisualizer — composition root with v1.1 plan-aware grid layout.
+ * AgentVisualizer — composition root, graph-first layout.
  *
- * Grid: TopStrip (auto) / MainGrid 60-40 (PlanTable | Canvas+Transcript) / BottomBar (auto).
- * GateDrawer overlays at z-50 when triggered. AgentCanvas demoted to right sidebar.
+ * Grid: TopStrip (auto) / canvas+optional-transcript (1fr) / BottomBar (auto).
+ * No left/right split. The old inline plan grid is removed; plan structure
+ * now lives in the hamburger drawer (PlanSwitcher) as a hierarchical tree.
  *
- * v1.2: selectedSlug state lifted here. Shared via props to TopStrip + PlanTable.
- *       Stale-slug recovery: if useActivePlan returns "empty" for a non-null slug,
- *       clear the stored slug and fall back to most-recent (R2-4 — no custom DOM events).
+ * - selectedSlug: lifted state shared with TopStrip + PlanSwitcher drawer.
+ * - liveViewSubtitle: last-clicked drawer context, displayed under the
+ *   "Live view" chip; cleared when slug changes.
+ * - Stale-slug recovery: useActivePlan empty for a non-null slug → clear.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAgentSimulation } from "@/hooks/use-agent-simulation";
 import { useEventSource } from "@/hooks/use-event-source";
-import { useActivePlan, type UseActivePlanResult } from "@/hooks/use-active-plan";
+import { useActivePlan } from "@/hooks/use-active-plan";
 import { AgentCanvas } from "./agent-canvas";
 import { TranscriptPanel } from "./transcript-panel";
 import { TopStrip } from "./top-strip";
-import { PlanTable } from "./plan-table";
 import { BottomBar } from "./bottom-bar";
 import { GateDrawer } from "./drawers/gate-drawer";
+import { LiveViewChip } from "./live-view-chip";
 import { COLORS } from "@/lib/colors";
 import { loadSelectedSlug, saveSelectedSlug } from "@/lib/selected-slug-store";
 import { ToastProvider } from "./toast";
@@ -38,22 +40,21 @@ export function AgentVisualizer() {
 		disable1MContext: false,
 	});
 
-	// Lifted slug state — lazy-init from localStorage (rule: rerender-lazy-state-init)
 	const [selectedSlug, setSelectedSlug] = useState<string | null>(() => loadSelectedSlug());
+	const [liveViewSubtitle, setLiveViewSubtitle] = useState<string | null>(null);
 
 	const handleSelectSlug = useCallback((slug: string | null): void => {
 		setSelectedSlug(slug);
 		saveSelectedSlug(slug);
+		setLiveViewSubtitle(null);
 	}, []);
 
-	// Single useActivePlan call lifted here — passed to TopStrip + PlanTable as a prop
-	// so we have ONE polling effect, not three (was: AgentVisualizer + TopStrip + PlanTable).
+	// Single useActivePlan call lifted here — passed to TopStrip + PlanSwitcher
+	// so we have ONE polling effect, not multiple.
 	const activePlan = useActivePlan(selectedSlug ?? undefined);
 
-	// Stale-slug recovery (R2-4): watch useActivePlan for 404 → fall back to most-recent.
-	// Fire-once per slug using a ref to avoid multiple clears on subsequent polls.
+	// Stale-slug recovery: 404 on slug-targeted fetch → fall back to most-recent.
 	const staleSlugs = useRef<Set<string>>(new Set());
-
 	useEffect(() => {
 		if (
 			activePlan.status === "empty" &&
@@ -65,7 +66,7 @@ export function AgentVisualizer() {
 		}
 	}, [activePlan.status, selectedSlug, handleSelectSlug]);
 
-	const [showTranscript, setShowTranscript] = useState(true);
+	const [showTranscript, setShowTranscript] = useState(false);
 	const [openGate, setOpenGate] = useState<"G1" | "G2" | null>(null);
 
 	useEffect(() => {
@@ -82,41 +83,33 @@ export function AgentVisualizer() {
 
 	return (
 		<ToastProvider>
-		<div
-			className="grid h-screen w-screen overflow-hidden relative"
-			style={{
-				gridTemplateRows: "auto 1fr auto",
-				background: COLORS.void,
-				fontFamily: "'SF Mono', 'Fira Code', monospace",
-				minWidth: 1024,
-			}}
-		>
-			<TopStrip
-				onGateClick={(id) => setOpenGate(id)}
-				selectedSlug={selectedSlug}
-				onSelectSlug={handleSelectSlug}
-				activePlan={activePlan}
-			/>
-
-			<main
-				className="grid overflow-hidden"
+			<div
+				className="grid h-screen w-screen overflow-hidden relative"
 				style={{
-					gridTemplateColumns: "60% 40%",
-					borderTop: `1px solid ${COLORS.panelSeparator}`,
+					gridTemplateRows: "auto 1fr auto",
+					background: COLORS.void,
+					fontFamily: "'SF Mono', 'Fira Code', monospace",
+					minWidth: 1024,
 				}}
 			>
-				<section
-					className="overflow-hidden"
-					style={{ borderRight: `1px solid ${COLORS.panelSeparator}` }}
-				>
-					<PlanTable selectedSlug={selectedSlug} activePlan={activePlan} />
-				</section>
-				<section
+				<TopStrip
+					onGateClick={(id) => setOpenGate(id)}
+					selectedSlug={selectedSlug}
+					onSelectSlug={handleSelectSlug}
+					activePlan={activePlan}
+					onLiveViewSubtitle={setLiveViewSubtitle}
+				/>
+
+				<main
 					className="grid overflow-hidden"
-					style={{ gridTemplateRows: showTranscript ? "1fr 280px" : "1fr" }}
+					style={{
+						gridTemplateRows: showTranscript ? "1fr 280px" : "1fr",
+						borderTop: `1px solid ${COLORS.panelSeparator}`,
+					}}
 				>
 					<div className="relative overflow-hidden">
 						<AgentCanvas simulationRef={frameRef} />
+						<LiveViewChip subtitle={liveViewSubtitle} />
 						{isEmpty && (
 							<div
 								className="absolute inset-0 flex items-center justify-center pointer-events-none"
@@ -142,18 +135,17 @@ export function AgentVisualizer() {
 							onClose={() => setShowTranscript(false)}
 						/>
 					)}
-				</section>
-			</main>
+				</main>
 
-			<BottomBar
-				connectionStatus={connectionStatus}
-				agentCount={agents.size}
-				showTranscript={showTranscript}
-				onToggleTranscript={() => setShowTranscript((v) => !v)}
-			/>
+				<BottomBar
+					connectionStatus={connectionStatus}
+					agentCount={agents.size}
+					showTranscript={showTranscript}
+					onToggleTranscript={() => setShowTranscript((v) => !v)}
+				/>
 
-			<GateDrawer gate={openGate} onClose={() => setOpenGate(null)} />
-		</div>
+				<GateDrawer gate={openGate} onClose={() => setOpenGate(null)} />
+			</div>
 		</ToastProvider>
 	);
 }

@@ -9,7 +9,9 @@
  * Soft-reset if map.size > 50. NO LRU, NO 16-entry cap, NO evict-oldest.
  *
  * Per R2-8: PlanSnapshot shape includes phaseEtags (not etag) and error tag.
- * Per red-team M2 (Phase 1): readonly boolean from MEOWKIT_ORCHVIZ_READONLY env var.
+ * Read-only is the default behavior. Set MEOWKIT_ORCHVIZ_WRITABLE=1 to opt
+ * into write mode. Legacy MEOWKIT_ORCHVIZ_READONLY=0 continues to enable
+ * writes for backwards compatibility with existing user setups.
  */
 
 import * as path from "node:path";
@@ -27,6 +29,20 @@ const FALLBACK_TIMEOUT_MS = 60_000;
 const CACHE_SOFT_RESET_THRESHOLD = 50;
 const ACTIVE_KEY = "__active";
 
+/**
+ * Read-only is the default. Precedence (highest first):
+ *   1. MEOWKIT_ORCHVIZ_READONLY=1   forces readonly (defensive lock)
+ *   2. MEOWKIT_ORCHVIZ_WRITABLE=1   opts into writes (preferred opt-in)
+ *   3. MEOWKIT_ORCHVIZ_READONLY=0   opts into writes (legacy compat)
+ *   4. otherwise                   readonly
+ */
+export function isOrchvizReadonly(): boolean {
+	if (process.env.MEOWKIT_ORCHVIZ_READONLY === "1") return true;
+	if (process.env.MEOWKIT_ORCHVIZ_WRITABLE === "1") return false;
+	if (process.env.MEOWKIT_ORCHVIZ_READONLY === "0") return false;
+	return true;
+}
+
 /** Error tags for PlanSnapshot failure cases (R2-8). */
 export type PlanSnapshotError = "invalid-slug" | "forbidden-path" | "not-found";
 
@@ -34,7 +50,7 @@ export interface PlanSnapshot {
 	plan: PlanState | null;
 	/** Per-phase etags keyed by phase number. null on error. */
 	phaseEtags: Record<number, string> | null;
-	/** Whether the server is in read-only mode (MEOWKIT_ORCHVIZ_READONLY=1). */
+	/** Whether the server is in read-only mode (default true; see isOrchvizReadonly). */
 	readonly: boolean;
 	generatedAt: string;
 	error?: PlanSnapshotError;
@@ -54,7 +70,7 @@ export class PlanCollector {
 	constructor(private readonly projectRoot: string) {}
 
 	snapshot(slug?: string): PlanSnapshot {
-		const isReadonly = process.env.MEOWKIT_ORCHVIZ_READONLY === "1";
+		const isReadonly = isOrchvizReadonly();
 		const generatedAt = new Date().toISOString();
 
 		if (slug !== undefined) {

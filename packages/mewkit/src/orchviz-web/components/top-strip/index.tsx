@@ -1,16 +1,14 @@
 /**
  * TopStrip — fixed top strip showing canonical phase pipeline + gate state.
  *
- * v1.1 omits entry lane (red-team SCOPE_Q1).
- * v1.2 adds PlanSwitcher (hamburger) in left slot.
- *      Internal useActivePlan updated to useActivePlan(selectedSlug) (red-team H1)
- *      so the phase pipeline tracks the user-selected plan, not the most-recent.
+ * Hosts the PlanSwitcher hamburger; forwards selectedSlug and the
+ * liveViewSubtitle setter so drawer clicks can update the chip context.
  */
 
 import { COLORS } from "@/lib/colors";
 import type { UseActivePlanResult } from "@/hooks/use-active-plan";
 import { useOverlays } from "@/hooks/use-overlays";
-import { derivePhaseStatuses, type CanonicalPhaseId } from "@/lib/phase-status";
+import { derivePhaseStatuses } from "@/lib/phase-status";
 import { PhasePipeline } from "./phase-pipeline";
 import { PlanSwitcher } from "@/components/plan-switcher";
 
@@ -18,11 +16,19 @@ interface TopStripProps {
 	onGateClick?: (id: "G1" | "G2") => void;
 	selectedSlug: string | null;
 	onSelectSlug: (slug: string | null) => void;
-	/** Lifted from AgentVisualizer so we don't double-poll (R1 H1 + perf fix). */
+	/** Lifted from AgentVisualizer so we don't double-poll. */
 	activePlan: UseActivePlanResult;
+	/** Setter for the LiveViewChip subtitle, threaded into the drawer. */
+	onLiveViewSubtitle: (subtitle: string | null) => void;
 }
 
-export function TopStrip({ onGateClick, selectedSlug, onSelectSlug, activePlan }: TopStripProps) {
+export function TopStrip({
+	onGateClick,
+	selectedSlug,
+	onSelectSlug,
+	activePlan,
+	onLiveViewSubtitle,
+}: TopStripProps) {
 	const { plan } = activePlan;
 	const overlays = useOverlays();
 
@@ -31,10 +37,6 @@ export function TopStrip({ onGateClick, selectedSlug, onSelectSlug, activePlan }
 		(overlays.gate2?.verdict as "PASS" | "WARN" | "FAIL" | undefined) ?? null;
 
 	const phaseStates = derivePhaseStatuses(plan, { gate1Approved, gate2Verdict });
-
-	const handlePhaseClick = (id: CanonicalPhaseId): void => {
-		document.dispatchEvent(new CustomEvent("orchviz:scroll-to-phase", { detail: { id } }));
-	};
 
 	return (
 		<div
@@ -46,8 +48,12 @@ export function TopStrip({ onGateClick, selectedSlug, onSelectSlug, activePlan }
 				fontFamily: "'SF Mono', 'Fira Code', monospace",
 			}}
 		>
-			{/* Left slot: hamburger PlanSwitcher */}
-			<PlanSwitcher selectedSlug={selectedSlug} onSelect={onSelectSlug} />
+			<PlanSwitcher
+				selectedSlug={selectedSlug}
+				onSelect={onSelectSlug}
+				activePlan={activePlan}
+				onLiveViewSubtitle={onLiveViewSubtitle}
+			/>
 
 			<div className="text-[10px] uppercase tracking-widest" style={{ color: COLORS.textMuted }}>
 				MeowKit
@@ -56,7 +62,6 @@ export function TopStrip({ onGateClick, selectedSlug, onSelectSlug, activePlan }
 				phases={phaseStates}
 				gate1Approved={gate1Approved}
 				gate2Verdict={gate2Verdict}
-				onPhaseClick={handlePhaseClick}
 				onGateClick={onGateClick}
 			/>
 		</div>

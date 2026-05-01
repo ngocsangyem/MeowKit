@@ -1,18 +1,21 @@
 /**
  * DrawerBody — inner body of PlanSwitcher drawer.
  *
- * Mounted only when the drawer is open so useAvailablePlans polling only runs
- * while the drawer is visible (R2-8/M8).
+ * Mounted only while the drawer is open so useAvailablePlans polling only runs
+ * while visible. Renders a hierarchical tree (plan → phase → todo).
  *
- * Renders loading skeleton, empty state, or grouped plan list (Active / Recent).
+ * Single-expand semantics: only one plan may be expanded at a time. Expanding
+ * a new plan auto-collapses any previously expanded plan, which caps concurrent
+ * useActivePlan instances to two (the lifted singleton + the lazy expanded row,
+ * and the lazy row is skipped when slug === selectedSlug).
  */
 
-import { useEffect, useRef } from "react";
+import { useState } from "react";
 import { COLORS } from "@/lib/colors";
 import { useAvailablePlans, type PlanStatus } from "@/hooks/use-available-plans";
-import { PlanListItem } from "./plan-list-item";
+import type { UseActivePlanResult } from "@/hooks/use-active-plan";
+import { PlanTreeRow } from "./plan-tree-row";
 
-// Plans in these statuses surface in the "Active" group (R1 H3 + R2-5)
 const ACTIVE_STATUSES = new Set<PlanStatus>([
 	"draft",
 	"in_progress",
@@ -25,53 +28,69 @@ interface DrawerBodyProps {
 	selectedSlug: string | null;
 	onSelect: (slug: string) => void;
 	onClose: () => void;
+	/** Lifted active plan — reused inside the tree row matching selectedSlug. */
+	activePlan: UseActivePlanResult;
+	/** Setter for the LiveViewChip subtitle (Phase 3 navigation). */
+	onLiveViewSubtitle: (subtitle: string | null) => void;
 }
 
-export function DrawerBody({ selectedSlug, onSelect, onClose }: DrawerBodyProps) {
+export function DrawerBody({
+	selectedSlug,
+	onSelect,
+	onClose,
+	activePlan,
+	onLiveViewSubtitle,
+}: DrawerBodyProps) {
 	const { status, plans } = useAvailablePlans();
-	const firstItemRef = useRef<HTMLButtonElement | null>(null);
+	const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
 
-	// Focus first list item on mount (simple focus management)
-	useEffect(() => {
-		const timer = setTimeout(() => firstItemRef.current?.focus(), 60);
-		return () => clearTimeout(timer);
-	}, []);
-
-	// Filter archived; group remaining
 	const visible = plans.filter((p) => p.status !== "archived");
 	const activeGroup = visible.filter((p) => ACTIVE_STATUSES.has(p.status));
 	const recentGroup = visible.filter((p) => p.status === "completed");
 
-	const handleSelect = (slug: string): void => {
+	const handleSelectPlan = (slug: string, title: string): void => {
 		onSelect(slug);
+		onLiveViewSubtitle(title);
 		onClose();
 	};
 
-	const renderGroup = (label: string, items: typeof visible, groupIdx: number) => {
+	const handlePhaseClickFor = (slug: string, planTitle: string) => {
+		return (phase: { number: number; title: string }): void => {
+			if (slug !== selectedSlug) onSelect(slug);
+			onLiveViewSubtitle(`${planTitle} · phase ${phase.number}: ${phase.title}`);
+			onClose();
+		};
+	};
+
+	const toggleExpand = (slug: string): void => {
+		setExpandedSlug((prev) => (prev === slug ? null : slug));
+	};
+
+	const renderGroup = (label: string, items: typeof visible) => {
 		if (items.length === 0) return null;
 		return (
 			<div key={label}>
 				<div
 					className="px-3 py-1 text-[9px] uppercase tracking-widest"
-					style={{ color: COLORS.textMuted, borderBottom: `1px solid ${COLORS.panelSeparator}` }}
+					style={{
+						color: COLORS.textMuted,
+						borderBottom: `1px solid ${COLORS.panelSeparator}`,
+					}}
 				>
 					{label}
 				</div>
-				{items.map((summary, itemIdx) => {
-					const isFirst = groupIdx === 0 && itemIdx === 0;
-					return (
-						<div
-							key={summary.slug}
-							ref={isFirst ? (el) => { firstItemRef.current = el?.querySelector("button") ?? null; } : undefined}
-						>
-							<PlanListItem
-								summary={summary}
-								isSelected={summary.slug === selectedSlug}
-								onClick={() => handleSelect(summary.slug)}
-							/>
-						</div>
-					);
-				})}
+				{items.map((summary) => (
+					<PlanTreeRow
+						key={summary.slug}
+						summary={summary}
+						isSelected={summary.slug === selectedSlug}
+						expanded={expandedSlug === summary.slug}
+						onToggleExpand={() => toggleExpand(summary.slug)}
+						onSelectPlan={() => handleSelectPlan(summary.slug, summary.title)}
+						activePlan={activePlan}
+						onPhaseClick={handlePhaseClickFor(summary.slug, summary.title)}
+					/>
+				))}
 			</div>
 		);
 	};
@@ -79,19 +98,25 @@ export function DrawerBody({ selectedSlug, onSelect, onClose }: DrawerBodyProps)
 	return (
 		<>
 			{status === "loading" && (
-				<div className="flex-1 flex items-center justify-center" style={{ color: COLORS.textMuted }}>
+				<div
+					className="flex-1 flex items-center justify-center"
+					style={{ color: COLORS.textMuted }}
+				>
 					<span className="text-[11px]">Loading plans…</span>
 				</div>
 			)}
 			{status === "empty" && (
-				<div className="flex-1 flex items-center justify-center" style={{ color: COLORS.textMuted }}>
+				<div
+					className="flex-1 flex items-center justify-center"
+					style={{ color: COLORS.textMuted }}
+				>
 					<span className="text-[11px]">No plans found</span>
 				</div>
 			)}
 			{status === "loaded" && (
 				<div className="flex-1 overflow-y-auto">
-					{renderGroup("Active", activeGroup, 0)}
-					{renderGroup("Recent", recentGroup, activeGroup.length === 0 ? 0 : 1)}
+					{renderGroup("Active", activeGroup)}
+					{renderGroup("Recent", recentGroup)}
 					{activeGroup.length === 0 && recentGroup.length === 0 && (
 						<div
 							className="px-3 py-4 text-center text-[11px]"

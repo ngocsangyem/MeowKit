@@ -15,7 +15,7 @@
  * Exposes:
  *   etag        — per-plan ETag string for optimistic write guards (Phase 4)
  *   phaseEtags  — map of { [phaseNumber]: hexEtag } (Phase 4 fine-grained guard)
- *   readonly    — server-side readonly flag (MEOWKIT_ORCHVIZ_READONLY)
+ *   readonly    — server-side readonly flag (default true; opt out via MEOWKIT_ORCHVIZ_WRITABLE=1)
  *   refetch()   — imperative bust: increment an internal key to force re-mount the effect
  */
 

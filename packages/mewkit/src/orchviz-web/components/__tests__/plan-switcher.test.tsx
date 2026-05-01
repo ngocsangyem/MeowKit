@@ -14,6 +14,19 @@ import React from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act, waitFor, cleanup } from "@testing-library/react";
 import { PlanSwitcher } from "../plan-switcher/index.js";
+import type { UseActivePlanResult } from "../../hooks/use-active-plan.js";
+
+// ── Empty active-plan stub (drawer body uses it for the lifted-singleton row) ─
+
+const emptyActivePlan: UseActivePlanResult = {
+	status: "empty",
+	plan: null,
+	generatedAt: "",
+	etag: null,
+	phaseEtags: null,
+	readonly: true,
+	refetch: () => undefined,
+};
 
 // ── Fetch mock ─────────────────────────────────────────────────────────────────
 
@@ -55,7 +68,7 @@ afterEach(() => {
 describe("PlanSwitcher — hamburger button", () => {
 	it("1. renders hamburger button with aria-label='Switch plan'", () => {
 		render(
-			<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} />,
+			<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} activePlan={emptyActivePlan} onLiveViewSubtitle={vi.fn()} />,
 		);
 		const btn = screen.getByRole("button", { name: /switch plan/i });
 		expect(btn).toBeDefined();
@@ -63,52 +76,48 @@ describe("PlanSwitcher — hamburger button", () => {
 	});
 
 	it("button has aria-expanded=false before open", () => {
-		render(<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} />);
+		render(<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} activePlan={emptyActivePlan} onLiveViewSubtitle={vi.fn()} />);
 		const btn = screen.getByRole("button", { name: /switch plan/i });
 		expect(btn.getAttribute("aria-expanded")).toBe("false");
 	});
 });
 
 describe("PlanSwitcher — drawer open/close", () => {
-	it("2. click hamburger opens drawer (role=dialog)", () => {
-		render(<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} />);
+	it("2. click hamburger opens drawer (role=complementary)", () => {
+		render(<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} activePlan={emptyActivePlan} onLiveViewSubtitle={vi.fn()} />);
 		const btn = screen.getByRole("button", { name: /switch plan/i });
 		fireEvent.click(btn);
-		const dialog = screen.getByRole("dialog");
-		expect(dialog).toBeDefined();
+		const drawer = screen.getByRole("complementary");
+		expect(drawer).toBeDefined();
 	});
 
 	it("3. ESC key closes drawer", async () => {
-		render(<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} />);
+		render(<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} activePlan={emptyActivePlan} onLiveViewSubtitle={vi.fn()} />);
 		const btn = screen.getByRole("button", { name: /switch plan/i });
 		fireEvent.click(btn);
-		// Dialog should be open
-		expect(screen.queryByRole("dialog")).not.toBeNull();
-		// Fire ESC
+		expect(screen.queryByRole("complementary")).not.toBeNull();
 		await act(async () => {
 			fireEvent.keyDown(window, { key: "Escape" });
 		});
-		expect(screen.queryByRole("dialog")).toBeNull();
+		// Drawer stays mounted briefly during the close animation, but visibility flips.
+		await act(async () => {
+			await new Promise((r) => setTimeout(r, 250));
+		});
+		expect(screen.queryByRole("complementary")).toBeNull();
 	});
 
 	it("4. outside-click (on backdrop) closes drawer", () => {
 		render(
 			<div>
-				<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} />
+				<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} activePlan={emptyActivePlan} onLiveViewSubtitle={vi.fn()} />
 			</div>,
 		);
 		const btn = screen.getByRole("button", { name: /switch plan/i });
 		fireEvent.click(btn);
 
-		// The backdrop is the outer div with onClick that checks e.target === e.currentTarget
-		// Grab it — it's the element wrapping the dialog panel
-		const backdrop = screen.getByRole("dialog").parentElement;
+		const backdrop = screen.getByRole("complementary").parentElement;
 		expect(backdrop).not.toBeNull();
-
-		// Click on backdrop (simulated as target === currentTarget)
 		fireEvent.click(backdrop!, { target: backdrop });
-		// Note: fireEvent sets target, but the React handler checks e.target === e.currentTarget
-		// which will be true for a direct click on the backdrop element
 	});
 });
 
@@ -117,7 +126,7 @@ describe("PlanSwitcher — plan selection", () => {
 		mockFetchOnce({ plans: mockPlans, generatedAt: new Date().toISOString() });
 		const onSelect = vi.fn();
 
-		render(<PlanSwitcher selectedSlug={null} onSelect={onSelect} />);
+		render(<PlanSwitcher selectedSlug={null} onSelect={onSelect} activePlan={emptyActivePlan} onLiveViewSubtitle={vi.fn()} />);
 		const btn = screen.getByRole("button", { name: /switch plan/i });
 		fireEvent.click(btn);
 
@@ -142,7 +151,7 @@ describe("PlanSwitcher — useAvailablePlans idle behavior", () => {
 			json: () => Promise.resolve({ plans: [], generatedAt: "" }),
 		} as Response);
 
-		render(<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} />);
+		render(<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} activePlan={emptyActivePlan} onLiveViewSubtitle={vi.fn()} />);
 
 		// Drawer is closed — DrawerBody is not mounted so useAvailablePlans doesn't poll
 		await act(async () => {
@@ -160,7 +169,7 @@ describe("PlanSwitcher — useAvailablePlans idle behavior", () => {
 			json: () => Promise.resolve({ plans: [], generatedAt: "" }),
 		} as Response);
 
-		render(<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} />);
+		render(<PlanSwitcher selectedSlug={null} onSelect={vi.fn()} activePlan={emptyActivePlan} onLiveViewSubtitle={vi.fn()} />);
 		const btn = screen.getByRole("button", { name: /switch plan/i });
 		fireEvent.click(btn);
 

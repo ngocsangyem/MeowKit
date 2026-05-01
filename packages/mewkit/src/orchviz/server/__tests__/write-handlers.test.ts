@@ -154,7 +154,11 @@ let projectRoot = "";
 let phaseFile = "";
 
 beforeEach(async () => {
+	// Read-only is the new default — opt in to write mode for the test fixtures
+	// that exercise POST /api/plan/todo. Test 5 deletes WRITABLE and sets
+	// READONLY=1 explicitly to verify the legacy block path still triggers.
 	delete process.env.MEOWKIT_ORCHVIZ_READONLY;
+	process.env.MEOWKIT_ORCHVIZ_WRITABLE = "1";
 	const fixture = makeProjectRoot();
 	projectRoot = fixture.root;
 	phaseFile = fixture.phaseFile;
@@ -163,6 +167,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
 	delete process.env.MEOWKIT_ORCHVIZ_READONLY;
+	delete process.env.MEOWKIT_ORCHVIZ_WRITABLE;
 	if (active) {
 		await active.stop();
 		active = null;
