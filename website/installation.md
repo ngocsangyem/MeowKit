@@ -48,15 +48,15 @@ npx mewkit init -- --global           # Install as global config
 
 ```
 .claude/
-├── agents/          13 specialist agents
-├── skills/          40+ skills with mk: namespace
+├── agents/          Specialist agents for each phase
+├── skills/          Domain skills with mk: namespace
 ├── hooks/           Lifecycle hooks
-├── rules/           10 enforcement rules
-├── scripts/         6 Python validators
-│   └── bin/         5 shell utilities
+├── rules/           Enforcement rules
+├── scripts/         Python validators
+│   └── bin/         Shell utilities
 ├── memory/          Cross-session persistence
 ├── settings.json    Hook registrations
-└── modes/           7 behavioral modes
+└── modes/           Behavioral modes
 
 CLAUDE.md             Entry point for Claude Code
 .meowkit.config.json  Project configuration
@@ -104,18 +104,14 @@ Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 | Python scripts fail | Ensure Python 3.9+ is in PATH |
 | Claude Code doesn't load CLAUDE.md | Restart Claude Code session |
 
-## Post-install steps
+## Next steps
 
-After scaffolding completes, run the MeowKit setup and verify your installation:
+After scaffolding, finalize setup:
 
 ```bash
-npx mewkit setup
-npx mewkit doctor
+npx mewkit setup    # Post-scaffold configuration (venv, MCP, env, gitignore)
+npx mewkit doctor   # Verify installation
 ```
-
-`npx mewkit setup` finalises any post-scaffold configuration. `npx mewkit doctor` checks Node.js version, Python version, Git availability, hooks executable, and scripts present.
-
-## Next steps
 
 - [Quick Start](/quick-start) — your first task with MeowKit
 - [Configuration](/reference/configuration) — customize MeowKit for your project

@@ -173,11 +173,9 @@ All `MEOWKIT_*` env vars. Set in your shell profile (`~/.zshrc`, `~/.bashrc`) or
 | `MEOWKIT_SUMMARY_BUDGET_SEC` | `180` | Background worker timeout for `claude -p` summarization | Increase on slow networks. |
 | `MEOWKIT_SUMMARY_DEBUG` | *(none)* | Set `1` for verbose stderr from summary hook | Debugging summary issues only. |
 
-### Memory & Context
+### Memory
 
-| Variable | Default | Purpose | When to use |
-|----------|---------|---------|-------------|
-| `MEOWKIT_MEMORY_BUDGET` | `4000` | Max chars injected by `memory-loader.cjs` per prompt (~1K tokens) | Reduce if context window is tight. Increase for projects with rich lesson history. |
+Memory is loaded on-demand by consumer skills via `Read` calls — there is no per-turn auto-injection pipeline (removed in v2.4.1). See [Memory System](/guide/memory-system) for details.
 
 ### Hook Controls
 

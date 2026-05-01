@@ -1,213 +1,117 @@
 ---
 title: Workflow Phases (0-6)
-description: MeowKit's 7-phase development workflow from task receipt to reflection.
+description: Detailed breakdown of each phase — deliverables, agents, hooks, and execution modes.
 persona: B
 ---
 
-# Workflow Phases
+> **See also:** [Workflow Phases](/core-concepts/workflow) — the canonical, concise 7-phase reference.
 
-Every non-trivial task flows through MeowKit's 7-phase pipeline. Each phase has a specific agent, a clear deliverable, and (in two cases) a hard gate requiring human approval.
+# Workflow Phases — In Detail
 
-## Phase 0 — Orient (automatic)
+This page expands each phase with agent details, deliverables, and hook enforcement. For the canonical overview (one sentence per phase), see the [core concepts page](/core-concepts/workflow).
+
+## Phase 0 — Orient
 
 **Agent:** orchestrator, analyst
 **Deliverable:** Model tier assignment, execution mode, context loaded
 
-- Read `docs/project-context.md` (agent constitution — loaded first, always; auto-injected by `project-context-loader.sh` hook)
-- Read relevant topic files on-demand (consumer skills handle this at task start — fixes.md for bug work, review-patterns.md and architecture-decisions.md for planning and review)
-- Run `mk:scale-routing` — domain-based complexity classification (CSV-driven)
+- Read `docs/project-context.md` (agent constitution — auto-injected by `project-context-loader.sh`)
+- Read relevant topic files on-demand (consumer skills handle this at task start)
+- Run `mk:scale-routing` for domain-based complexity classification
 - Load stack-relevant skills only (lazy loading)
-- Route: assign model tier by task complexity (Haiku / Sonnet / Opus)
-- Select execution mode: sequential (default), parallel (COMPLEX), or party (discussions)
 - Print cost estimate before starting
 
-### Navigation help
+**Navigation help:** `/mk:help` scans plans, reviews, tests, and git to determine pipeline state and prints the next action.
 
-When you're unsure which phase to enter next, run:
-
-```bash
-/mk:help
-```
-
-`/mk:help` scans plans, reviews, tests, git log, and memory to determine current pipeline state and prints a single concrete next action. Use it to re-orient after a context reset or mid-session interruption.
-
-### Execution modes
-
-| Mode           | When                                       | How                                                         |
-| -------------- | ------------------------------------------ | ----------------------------------------------------------- |
-| **Sequential** | Default for all tasks                      | Phases run one at a time, single agent per phase            |
-| **Parallel**   | COMPLEX tasks with independent subtasks    | Up to 3 agents, each in a git worktree, zero file overlap   |
-| **Party**      | Architecture decisions, trade-off analysis | 2-4 agents deliberate, one synthesis — no code during party |
-
-Party Mode is triggered explicitly:
-
-```
-/mk:party "Should we use GraphQL or REST for the public API?"
-```
-
-## Phase 1 — Plan Gate 1
+## Phase 1 — Plan
 
 **Agent:** planner
-**Deliverable:** `tasks/plans/YYMMDD-name.md`
+**Deliverable:** `tasks/plans/YYMMDD-name/plan.md`
 
-Phase 1 produces an approved plan using one or more planning skills:
+- `mk:plan-creator` — full plan creation (9-step workflow). Modes: `--fast`, `--hard`, `--deep`, `--parallel`, `--two`, `--product-level`
+- `mk:plan-ceo-review` — product lens + engineering lens
+- `mk:validate-plan` — 8-dimension quality check for COMPLEX tasks
+- For COMPLEX tasks (5+ files): bead decomposition — atomic, independently committable work units
 
-| Skill                  | Lens                      | Use when                                       |
-| ---------------------- | ------------------------- | ---------------------------------------------- |
-| `mk:plan-creator`    | Full plan creation        | Starting from scratch (9-step workflow, 00–08) |
-| `mk:plan-ceo-review` | Product lens              | Is this the right thing to build?              |
-| `mk:plan-ceo-review` | Engineering lens          | Is this the right way to build it?             |
-| `mk:validate-plan`   | 8-dimension quality check | COMPLEX tasks — runs before Gate 1             |
+**Gate 1:** Human approval required. `gate-enforcement.sh` blocks all file writes until plan is approved.
 
-`mk:plan-creator` v1.4.0 supports two additional modes on top of the standard `--hard` workflow:
-
-| Flag         | What it adds                                                                       |
-| ------------ | ---------------------------------------------------------------------------------- |
-| `--parallel` | Execution Strategy section with file ownership matrix and parallel group hydration |
-| `--two`      | 2 competing approach files + trade-off matrix; user selects before red-team runs   |
-
-For COMPLEX tasks (5+ files), the planner also applies **bead decomposition** — breaking the plan into atomic, independently committable work units. See [planner](/reference/agents/planner) for details. The `mk:validate-plan` skill checks bead boundaries as one of its 8 dimensions, ensuring clean handoff to the developer.
-
-### Gate 1 behavior — Print & Stop
-
-All three skills end with a **Print & Stop**:
-
-1. Skill prints a copy-pasteable `/mk:cook [plan path]` command
-2. Claude stops — no auto-proceed
-3. You review the output and decide the next step
-4. When ready: run `/mk:cook [plan path]` to begin Phase 2
-
-### Review combinations
-
-You control which reviews to run. Common patterns:
-
-```bash
-# Plan only — fastest
-/mk:cook tasks/plans/260328-feature.md
-
-# Plan + product review
-# Run mk:plan-ceo-review, then:
-/mk:cook tasks/plans/260328-feature.md
-
-# Plan + both reviews (recommended for large features)
-# Run mk:plan-ceo-review, then mk:plan-ceo-review, then:
-/mk:cook tasks/plans/260328-feature.md
-```
-
-No skill automatically chains into another. You decide the review depth.
-
-- **HUMAN APPROVAL REQUIRED** — no code until plan is approved
-
-## Phase 2 — Test (RED if `--tdd`, optional otherwise)
+## Phase 2 — Test
 
 **Agent:** tester
-**Deliverable:** Tests (failing tests in TDD mode; optional otherwise)
+**Deliverable:** Tests (failing in TDD mode; optional otherwise)
 
-- **TDD mode (`--tdd` / `MEOWKIT_TDD=1`):** Write failing tests FIRST — the task file's acceptance criteria drive the test cases. `pre-implement.sh` hook BLOCKS if no failing test exists.
-- **Default mode (TDD off):** Phase 2 is OPTIONAL. The tester is invoked on-request; tests may be written before, alongside, or after implementation. `pre-implement.sh` is a no-op.
-- Security pre-check: scan for known anti-patterns (always runs)
-- Run `mk:nyquist` at the end of Phase 2 (or after Phase 3 in default mode) to verify test-to-requirement coverage — every acceptance criterion in the plan should have at least one test targeting it before shipping.
+- **TDD mode** (`--tdd` / `MEOWKIT_TDD=1`): failing tests first. `pre-implement.sh` blocks if no failing test exists.
+- **Default mode:** Phase 2 is optional. Tester invoked on-request.
+- `mk:nyquist` verifies test-to-requirement coverage at end of phase.
+- Security pre-check always runs.
 
 ## Phase 3 — Build
 
 **Agent:** developer
 **Deliverable:** Passing implementation
 
-::: info Phase 3 pre-build contract substep (harness mode only)
-For `/mk:harness` runs in FULL density, the developer agent must read a signed `tasks/contracts/{date}-{slug}-sprint-N.md` BEFORE writing source code (enforced by `gate-enforcement.sh`). LEAN mode (Opus 4.6+) bypasses via `MEOWKIT_HARNESS_MODE=LEAN`. See [Harness Architecture](/guide/harness-architecture) and the [sprint-contract skill](/reference/skills/sprint-contract).
-:::
-
 - Implement until tests pass
 - `post-write.sh` hook: security scan on every file write
-- Self-heal: auto-fix failures up to 3 attempts
-- Memory capture: log patterns as they emerge
-- For COMPLEX tasks: process the plan's **bead decomposition** sequentially — commit after each bead, resume from last uncommitted bead if interrupted. See [developer](/reference/agents/developer) for the full bead processing loop.
+- Self-heal: auto-fix up to 3 attempts, each using a different approach
+- For COMPLEX tasks: bead processing — commit after each bead, resume from last uncommitted bead
+- For harness runs in FULL density: signed sprint contract required before source writes
 
-## Phase 4 — Review Gate 2
+## Phase 4 — Review
 
 **Agent:** reviewer
 **Deliverable:** `tasks/reviews/YYMMDD-name-verdict.md`
 
-- 5-dimension structural audit: architecture, types, security, tests, performance
-- `validate.py`: deterministic checks outside the LLM
-- Review verdict saved to `tasks/plans/YYMMDD-name/reports/`
-- **Optional pre-review:** run `mk:scout` to detect edge cases and unusual patterns before the main review runs — findings are injected into the review context
-- **Optional post-verdict:** run `mk:elicit` after the verdict to push deeper on WARN dimensions using 8 structured elicitation methods
-- **HUMAN APPROVAL REQUIRED** — no shipping until review passes
+- 5-dimension audit: architecture, types, security, tests, performance
+- Optional pre-review: `mk:scout` for edge case detection
+- Optional post-verdict: `mk:elicit` for deeper analysis on WARN dimensions
 
-## Phase 4.5 — Verify (Optional, cook only)
+**Gate 2:** Human approval required. FAIL blocks Phase 5.
 
-**Agent:** evaluator (light) or mk:evaluate (strict)
-**Deliverable:** Verification report or rubric-graded verdict
-
-Phase 4.5 fires only during `/mk:cook` runs — not in `mk:fix`, `mk:harness` (which has its own evaluator), or standalone `mk:review`.
-
-| Flag          | Behavior                                                                           | Approx Cost |
-| ------------- | ---------------------------------------------------------------------------------- | ----------- |
-| `--verify`    | Light browser check after Phase 4 review. Advisory — warns but does not block ship | ~$1         |
-| `--strict`    | Full `mk:evaluate` with rubric grading. FAIL verdict blocks Phase 5              | ~$2–5       |
-| `--no-strict` | Suppress auto-strict even when scale-routing returns `level=high`                  | —           |
-
-### Auto-strict trigger
-
-When `mk:scale-routing` returns `level=high` during a cook run, Phase 4.5 auto-enables `--strict` (Rule 7 in `scale-adaptive-rules.md`). Pass `--no-strict` to suppress this if you need a fast path for a known-safe change.
-
-See [scale-adaptive-rules Rule 7](/reference/rules-index#scale-adaptive-rules) for the full rule.
+**Optional flags** (cook only):
+- `--verify`: lightweight browser check (~$1), advisory
+- `--strict`: full evaluator with rubric grading (~$2-5), FAIL blocks ship
 
 ## Phase 5 — Ship
 
-**Agent:** shipper  
+**Agent:** shipper
 **Deliverable:** PR URL + rollback documentation
 
-- **Live capture:** before shipping, if the session produced non-obvious decisions, corrections, or rejected approaches, capture them to the appropriate topic file (`architecture-decisions.md` for decisions, `fixes.md` for bug-class patterns) using the `##decision:` or `##pattern: bug-class` prefix. This preserves WHY decisions were made — capture by category, not to a monolithic file.
-- `pre-ship.sh` hook: full test + lint + typecheck
+- `pre-ship.sh`: full test + lint + typecheck
 - Conventional commit (auto-generated)
 - PR — never push to main directly
 - Verify CI passes before closing
-- Document rollback steps
 
-## Phase 6 — Reflect (automatic)
+## Phase 6 — Reflect
 
 **Agent:** documenter, analyst
 **Deliverable:** Updated memory + documentation
 
-- **3-category extraction:** capture learnings as patterns, decisions, or failures; route to the appropriate topic file
-- Update `fixes.json` with new bug-class fix patterns (category, severity, applicable_when fields)
-- Update `review-patterns.json` and `architecture-decisions.json` with new entries
-- Update `memory/cost-log.json` with token usage
+- Extract learnings as patterns, decisions, or failures
+- Update `.claude/memory/` topic files
 - Sync affected documentation
 - Close sprint task
 
-## Hook Enforcement
+## Execution modes
 
-MeowKit uses shell hooks to upgrade behavioral rules to preventive enforcement — the action is blocked _before_ it executes, not after the agent has already reasoned its way past the rule.
+| Mode | When | How |
+|------|------|-----|
+| Sequential | Default | One phase at a time |
+| Parallel | COMPLEX with independent subtasks | Up to 3 agents in isolated git worktrees |
+| Party | Architecture decisions | 2-4 agents deliberate, forced synthesis |
 
-| Hook                        | Event        | What it blocks                             |
-| --------------------------- | ------------ | ------------------------------------------ |
-| `privacy-block.sh`          | PreToolUse   | `.env`, `*.key`, credential file reads     |
-| `gate-enforcement.sh`       | PreToolUse   | Source code writes before Gate 1 approval  |
-| `project-context-loader.sh` | SessionStart | Missing project-context.md (auto-loads it) |
+## Plan-first gate pattern
 
-`privacy-block.sh` and `gate-enforcement.sh` are preventive — they intercept the tool call. `project-context-loader.sh` is proactive — it ensures the agent constitution is in context before any task runs.
+| Skill | Gate behavior | Skip condition |
+|-------|-------------|----------------|
+| `mk:cook` | Create plan if missing | Plan path arg, `--fast` |
+| `mk:fix` | Plan if > 2 files | `--quick` |
+| `mk:ship` | Require approved plan | Hotfix with human approval |
+| `mk:cso` | Scope audit via plan | `--daily` |
+| `mk:review` | Read plan for context | PR diff reviews |
 
-Hooks supplement rules. Rules define the WHY; hooks enforce the WHAT.
+Skills that skip: `mk:investigate` and `mk:office-hours` (produce planning input, run before plan exists); `mk:retro` (data-driven, no implementation).
 
-### Plan-First Gate Pattern
+## Next steps
 
-Most MeowKit skills enforce a plan-first gate: they check for an approved plan before proceeding with significant work.
-
-| Skill                      | Gate behavior            | Skip condition               |
-| -------------------------- | ------------------------ | ---------------------------- |
-| mk:cook                  | Create plan if missing   | Plan path arg, `--fast` mode |
-| mk:fix                   | Plan if > 2 files        | `--quick` mode               |
-| mk:ship                  | Require approved plan    | Hotfix with human approval   |
-| mk:cso                   | Scope audit via plan     | `--daily` mode               |
-| mk:qa                    | Create QA scope doc      | Quick tier                   |
-| mk:review                | Read plan for context    | PR diff reviews              |
-| mk:workflow-orchestrator | Route to plan-creator    | Fasttrack mode               |
-| mk:investigate           | Produces input FOR plans | Always skips                 |
-| mk:office-hours          | Pre-planning skill       | Always skips                 |
-| mk:retro                 | Data-driven, no plan     | Always skips                 |
-| mk:document-release      | Scope from diff          | Post-ship sync               |
-
-Skills that skip planning have documented reasons — they either produce planning input (investigate, office-hours) or are data-driven (retro).
+- [Build a feature](/guides/build-a-feature) — the full cook pipeline
+- [How gates work](/core-concepts/gates) — enforcement details

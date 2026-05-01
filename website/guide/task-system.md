@@ -87,10 +87,10 @@ Agents update this section after each significant action. On resumption, the age
 
 | Type | Use when | Primary agent |
 |------|----------|---------------|
-| [Feature Implementation](/reference/templates/feature-implementation) | Adding new functionality | planner → developer |
-| [Bug Fix](/reference/templates/bug-fix) | Fixing broken behavior | investigator → developer |
-| [Refactor](/reference/templates/refactor) | Restructuring without behavior change | developer → reviewer |
-| [Security Audit](/reference/templates/security-audit) | Security review | security agent |
-| [Guideline](/reference/templates/) | Team standards document | documenter |
+| Feature Implementation | Adding new functionality | planner → developer |
+| Bug Fix | Fixing broken behavior | investigator → developer |
+| Refactor | Restructuring without behavior change | developer → reviewer |
+| Security Audit | Security review | security agent |
+| Guideline | Team standards document | documenter |
 
-See [Template Reference](/reference/templates/) for detailed documentation.
+Create tasks with `npx mewkit task new --type <type> "description"`. See [Task Commands](/cli/task-commands) for details.

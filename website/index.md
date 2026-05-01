@@ -12,8 +12,8 @@ hero:
       text: Get Started →
       link: /quick-start
     - theme: alt
-      text: Why MeowKit
-      link: /why-meowkit
+      text: How It Works
+      link: /introduction
 features:
   - title: 🔒 Two Hard Gates
     details: No code ships without an approved plan (Gate 1) and a passing review (Gate 2). The agent cannot self-approve.
@@ -21,10 +21,10 @@ features:
     details: TDD is opt-in via `--tdd` or `MEOWKIT_TDD=1`. When enabled, failing tests must exist before implementation; otherwise tests are recommended but not gated. Default mode keeps spike work fast; production builds opt in for strict discipline.
   - title: 🛡️ 4-Layer Security
     details: Prompt injection defense across input boundary, instruction anchoring, context isolation, and output validation.
-  - title: 🧠 14 Specialist Agents
+  - title: 🧠 Specialist Agents
     details: Each agent owns a specific concern — planning, testing, reviewing, shipping. No two agents modify the same files.
-  - title: ⚡ 49+ Skills
-    details: From docs retrieval to multimodal analysis, code review to QA testing. Step-file architecture for JIT loading keeps context tight.
+  - title: ⚡ Domain Skills
+    details: From docs retrieval to multimodal analysis, code review to QA testing. Step-file architecture loads skills on demand, keeping context tight.
   - title: 💾 Cross-Session Memory
     details: Lessons, patterns, and costs persist across sessions. After 10 sessions, the analyst proposes CLAUDE.md improvements.
   - title: 📋 Structured Task System

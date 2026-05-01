@@ -31,7 +31,7 @@ npx mewkit task new --type feature "My first feature"
 
 This creates a task file under `tasks/plans/` using the feature template. Fill in the acceptance criteria before proceeding.
 
-## Step 4: Start a Claude Code session
+## Step 3: Start a Claude Code session
 
 Open your terminal in the project directory and start Claude Code:
 
@@ -41,7 +41,7 @@ claude
 
 Claude automatically reads `CLAUDE.md` and loads MeowKit's agents, skills, and rules.
 
-## Step 5: Run your first command
+## Step 4: Run your first command
 
 Try the simplest workflow — planning a feature:
 
@@ -52,10 +52,10 @@ Try the simplest workflow — planning a feature:
 MeowKit will:
 1. Route to the **planner** agent
 2. Challenge your premises (do you really need JWT?)
-3. Create a structured plan at `tasks/plans/YYMMDD-auth.md`
+3. Create a structured plan at `tasks/plans/YYMMDD-auth/plan.md`
 4. Ask for your approval (**Gate 1**)
 
-## Step 6: See the full pipeline
+## Step 5: See the full pipeline
 
 Once you approve the plan, try the full cook pipeline:
 
@@ -65,7 +65,7 @@ Once you approve the plan, try the full cook pipeline:
 
 This runs the complete workflow: Plan → Test → Build → Review → Ship. Each phase activates the appropriate agent, and you'll see the two hard gates in action.
 
-## Step 7: Explore more commands
+## Step 6: Explore more commands
 
 | Command | What it does |
 |---------|-------------|
@@ -89,5 +89,5 @@ No code was written until you approved. That's MeowKit's discipline.
 
 - [Cheatsheet](/cheatsheet) — quick reference for all commands
 - [Workflow Phases](/guide/workflow-phases) — understand Phase 0-6
-- [Adding a Feature](/workflows/add-feature) — step-by-step feature development
-- [Fixing a Bug](/workflows/fix-bug) — structured bug investigation
+- [Build a Feature](/guide/agent-skill-architecture) — how agents and skills work together
+- [Fix a Bug](/guide/debugging-skills-decision-guide) — structured debugging guide

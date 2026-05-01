@@ -4,6 +4,8 @@ description: "MeowKit's design principles — why the harness matters more than 
 persona: B
 ---
 
+> **See also:** [What Is MeowKit](/core-concepts/what-is-meowkit) — the canonical overview with all 9 design principles.
+
 # Philosophy
 
 ## Core Thesis
@@ -98,7 +100,7 @@ The same principle applies to the hook system: `handlers.json` routes events to 
 | Behavioral output limits | Hook-based truncation | Hooks can't replace tool output (PostToolUse appends only) |
 | Independent security hooks | Unified dispatcher | SPOF protection outweighs DRY |
 | Opt-in TDD | Mandatory TDD | Friction for spikes > value for prototypes |
-| Session-level budget ($10/$25) | No budget tracking | Runaway sessions cost more than false warnings |
+| Session-level budget ($30/$100) | No budget tracking | Runaway sessions cost more than false warnings |
 
 ## See Also
 

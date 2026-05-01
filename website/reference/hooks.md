@@ -217,10 +217,11 @@ node dispatch.cjs <EventName> [Matcher]
 | orientation-ritual | `handlers/orientation-ritual.cjs` | SessionStart | — | — | Resumes from checkpoint if exists |
 | build-verify | `handlers/build-verify.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Runs compile/lint; cached by file hash |
 | loop-detection | `handlers/loop-detection.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Warns at 4 edits, escalates at 8 |
-| budget-tracker | `handlers/budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | `tool_input`, `tool_response` | Estimates cost; warns $10, blocks $25 |
+| budget-tracker | `handlers/budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | `tool_input`, `tool_response` | Estimates cost; warns $30, blocks $100 |
 | auto-checkpoint | `handlers/auto-checkpoint.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Checkpoint every 20 calls |
-| memory-loader | `handlers/memory-loader.cjs` | UserPromptSubmit | — | `prompt` | Injects domain-filtered memory to stdout |
 | checkpoint-writer | `handlers/checkpoint-writer.cjs` | Stop | — | — | Sequenced checkpoint with git state |
+
+> **Note:** The `memory-loader.cjs` handler was removed in v2.4.1. Memory is now loaded on-demand by consumer skills — there is no per-turn auto-injection.
 
 ### Shared Libraries
 

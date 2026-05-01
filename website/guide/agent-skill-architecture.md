@@ -4,6 +4,8 @@ description: How MeowKit agents invoke skills across the 7-phase workflow pipeli
 persona: B
 ---
 
+> **See also:** [How It Works](/core-concepts/how-it-works) — the canonical agents and skills overview.
+
 # Agent-Skill Architecture
 
 Agents are specialists. Skills are tools agents load on demand.
@@ -80,7 +82,7 @@ Phase 6: Reflect ─→ documenter loads: documentation, memory
 | reviewer | 4 | review, elicit, scout, cso, vulnerability-scanner |
 | evaluator | 3, 4 | evaluate, rubric, trace-analyze, benchmark |
 | security | 2, 4 | cso, vulnerability-scanner, skill-template-secure |
-| shipper | 5 | ship, shipping, careful |
+| shipper | 5 | ship, careful |
 | documenter | 6 | documentation, document-release, llms |
 | analyst | 0, 6 | memory |
 | brainstormer | 1 | office-hours |
@@ -119,7 +121,7 @@ flowchart TD
     P45 -->|yes| V45[Phase 4.5: Verify\nagent-browser or evaluate]
     P45 -->|no| P5[Phase 5: Ship]
     V45 --> P5
-    P5 --> S5[ship\nshipping\ncareful\ndocument-release]
+    P5 --> S5[ship\ncareful\ndocument-release]
 
     P5 --> P6[Phase 6: Reflect]
     P6 --> S6[documentation\nmemory ⭐\nllms]

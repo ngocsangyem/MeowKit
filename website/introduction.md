@@ -8,15 +8,15 @@ persona: A
 
 MeowKit is an AI agent toolkit for Claude Code that gives your coding assistant enforced discipline — hard gates, TDD, security scanning, and human approval — so it ships production-quality code instead of untested prototypes.
 
-::: tip What's new in v1.0.0 — The Disciplined Velocity Release
-10 new capabilities: scale-adaptive routing, 3-layer adversarial review, Party Mode, parallel execution, navigation help, hook enforcement, and more. [See what's new →](/guide/whats-new)
+::: tip See what's new
+[Changelog](/changelog) — latest features, improvements, and fixes.
 :::
 
 ## What problem does MeowKit solve?
 
 AI coding tools are powerful but undirected. Without structure, they skip tests, ignore security, and ship untested code. A single "implement this feature" prompt can produce code that compiles but has no tests, no review, and secrets hardcoded in source.
 
-MeowKit fixes this by installing a `.claude/` directory that Claude Code reads automatically. It contains 14 specialist agents, 49 skills, lifecycle hooks, security rules, and a memory system that together enforce a structured development workflow.
+MeowKit fixes this by installing a `.claude/` directory that Claude Code reads automatically. It contains specialist agents, domain skills, lifecycle hooks, security rules, and a memory system that together enforce a structured development workflow.
 
 ## How it works
 
@@ -50,11 +50,11 @@ No step can be skipped. Two hard gates (plan approval + review approval) require
 
 ```
 .claude/
-├── agents/          14 specialist agents
-├── skills/          49 skills with mk: namespace (step-file decomposition for complex skills)
+├── agents/          Specialist agents for each phase
+├── skills/          Domain skills with mk: namespace (step-file decomposition)
 ├── hooks/           Lifecycle hooks (security scan, TDD gate)
-├── rules/           14 enforcement rules (security, injection, TDD, parallel execution)
-├── scripts/         6 Python validators (stdlib only)
+├── rules/           Enforcement rules (security, injection, TDD, parallel execution)
+├── scripts/         Python validators (stdlib only)
 ├── memory/          Cross-session persistence
 └── settings.json    Hook registrations + permissions
 
@@ -65,6 +65,6 @@ docs/
 
 ## Next steps
 
-- [Why MeowKit](/why-meowkit) — the philosophy behind enforced discipline
+- [How It Works](/guide/understanding-the-harness) — the philosophy behind enforced discipline
 - [Installation](/installation) — get MeowKit running in 2 minutes
 - [Quick Start](/quick-start) — your first task with MeowKit in 5 minutes

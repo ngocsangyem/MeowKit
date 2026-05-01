@@ -1,17 +1,17 @@
 ---
 title: "mk:workflow-orchestrator"
-description: "Execute 5-phase workflow for complex features with token budgets, approval gates, and fast-track mode. TDD is opt-in via --tdd / MEOWKIT_TDD=1."
+description: "Auto-invoked orchestrator for the 7-phase workflow on complex-feature intent. Defers to mk:cook for single-task requests."
 ---
 # mk:workflow-orchestrator
-Execute 5-phase workflow for complex features with token budgets, approval gates, and fast-track mode. TDD is opt-in via `--tdd` / `MEOWKIT_TDD=1`.
+Auto-invoked orchestrator for the 7-phase workflow on complex-feature intent. Defers to `mk:cook` for single-task requests.
 ## What This Skill Does
-Orchestrates the full 5-phase development workflow: Understand+Design → Test (RED if `--tdd`) → Build → Refactor+Review → Finalize. Includes token budgets per phase (target ≤30K total), two approval gates, and a fast-track mode that skips Phase 1 when specs are pre-approved.
+Orchestrates the full 7-phase development workflow: Orient → Plan → Test → Build → Review → Ship → Reflect. Activates automatically via `autoInvoke` when Claude Code detects complex-feature intent at session start. Defers to `mk:cook` for explicit single-task invocations. Never runs concurrently with `mk:cook` in the same session.
 ## Core Capabilities
-- **5-phase pipeline** — Design → Test → Build → Refactor → Finalize
-- **Two approval gates** — Phase 1 (Design) and Phase 3 (Build)
-- **Token budgets** — Per-phase limits to prevent context explosion
-- **Fast-track mode** — Skip Phase 1 for pre-approved specs
-- **Auto-continue** — Phases 2, 4, 5 auto-continue unless blockers found
+- **7-phase pipeline** — Orient → Plan → Test → Build → Review → Ship → Reflect
+- **Two hard gates** — Gate 1 (plan approval) and Gate 2 (review approval)
+- **Auto-invoke** — Activates on session start with complex-feature intent
+- **Deference to mk:cook** — Explicit `/mk:cook` invocation takes priority
+- **Phase routing** — Each phase delegates to the appropriate specialist agent
 ## Usage
 ```bash
 /mk:cook [feature]              # standard 5-phase workflow
