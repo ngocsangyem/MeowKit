@@ -1,41 +1,27 @@
-// auto-checkpoint.cjs — PostToolUse handler: periodic crash-recovery checkpoint.
-// Saves lightweight checkpoint every N tool calls (default 20) as crash recovery.
-// Stop event doesn't fire on crashes — this ensures progress isn't lost.
-//
-// Also detects phase transitions by watching writes to tasks/ directories.
+// auto-checkpoint.cjs — PostToolUse handler: phase-transition checkpoint.
+// Writes a lightweight checkpoint when a write touches a phase-transition directory
+// (tasks/plans/, tasks/contracts/, tasks/reviews/). Stop event covers end-of-turn
+// state; this handler only fires on workflow phase boundaries.
 
 const path = require('path');
 
-const { nextSequence, writeCheckpoint } = require(
+const { writeCheckpoint } = require(
   path.join(process.env.CLAUDE_PROJECT_DIR || process.cwd(), '.claude', 'hooks', 'lib', 'checkpoint-utils.cjs')
 );
 
-const INTERVAL = 20;
 const TRANSITION_DIRS = ['tasks/plans/', 'tasks/contracts/', 'tasks/reviews/'];
 
 module.exports = function autoCheckpoint(ctx, state) {
   const filePath = ctx.tool_input?.file_path || '';
-
-  const counter = state.load('auto-checkpoint-counter') || { count: 0 };
-  counter.count += 1;
-
   const isTransition = TRANSITION_DIRS.some((dir) => filePath.includes(dir));
-
-  if (counter.count % INTERVAL !== 0 && !isTransition) {
-    state.save('auto-checkpoint-counter', counter);
-    return '';
-  }
-
-  state.save('auto-checkpoint-counter', counter);
+  if (!isTransition) return '';
 
   const budget = state.load('budget-state');
   const model = state.load('detected-model');
 
-  const seq = nextSequence();
   const checkpoint = {
     version: '1.0.0',
-    sequence: seq,
-    type: isTransition ? 'transition' : 'periodic',
+    type: 'transition',
     session_id: ctx.session_id || 'unknown',
     created_at: new Date().toISOString(),
     state: {
@@ -43,8 +29,7 @@ module.exports = function autoCheckpoint(ctx, state) {
       density: model?.density || 'FULL',
     },
     progress: {
-      tool_calls: counter.count,
-      trigger: isTransition ? `transition: ${filePath}` : `periodic: every ${INTERVAL}`,
+      trigger: `transition: ${filePath}`,
     },
     budget: budget ? {
       estimated_spent_usd: budget.estimated_cost_usd,
@@ -52,6 +37,6 @@ module.exports = function autoCheckpoint(ctx, state) {
     } : null,
   };
 
-  writeCheckpoint(checkpoint, seq);
+  writeCheckpoint(checkpoint);
   return '';
 };

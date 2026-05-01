@@ -1,6 +1,7 @@
 // checkpoint-utils.cjs — Shared utilities for checkpoint handlers.
-// Used by checkpoint-writer.cjs, auto-checkpoint.cjs, orientation-ritual.cjs.
-// Uses O_EXCL atomic lock to prevent TOCTOU race between concurrent callers.
+// Single-file checkpoint: writes data directly to checkpoint-latest.json via .tmp + rename
+// (POSIX-atomic). Two writers (PostToolUse + Stop) race to overwrite — last writer wins.
+// Sequence is display-only; collisions across concurrent writers are acceptable.
 
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -9,42 +10,6 @@ const path = require('path');
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const CHECKPOINT_DIR = path.join(ROOT, 'session-state', 'checkpoints');
 const LATEST_FILE = path.join(CHECKPOINT_DIR, 'checkpoint-latest.json');
-
-// Serialized via O_EXCL lock file — prevents TOCTOU race between concurrent callers
-function nextSequence() {
-  const seqFile = path.join(CHECKPOINT_DIR, '.next-seq');
-  const lockFile = path.join(CHECKPOINT_DIR, '.seq.lock');
-
-  fs.mkdirSync(CHECKPOINT_DIR, { recursive: true });
-
-  let fd;
-  try {
-    fd = fs.openSync(lockFile, 'wx'); // O_CREAT | O_EXCL — atomic, fails if exists
-  } catch (e) {
-    if (e.code === 'EEXIST') {
-      try {
-        const stat = fs.statSync(lockFile);
-        if (Date.now() - stat.mtimeMs > 60000) {
-          fs.unlinkSync(lockFile);
-          return nextSequence(); // retry once after stale lock cleanup
-        }
-      } catch { /* stat failed — lock may already be gone */ }
-      return null; // lock held by another process — caller should skip
-    }
-    throw e;
-  }
-
-  try {
-    let current = 0;
-    try { current = parseInt(fs.readFileSync(seqFile, 'utf8'), 10) || 0; } catch { /* first run */ }
-    const next = current + 1;
-    fs.writeFileSync(seqFile, String(next));
-    return next;
-  } finally {
-    fs.closeSync(fd);
-    try { fs.unlinkSync(lockFile); } catch { /* cleanup best-effort */ }
-  }
-}
 
 function gitHead() {
   try {
@@ -77,31 +42,34 @@ function gitStatus() {
   }
 }
 
-function writeCheckpoint(checkpoint, seq) {
-  fs.mkdirSync(CHECKPOINT_DIR, { recursive: true });
-  const seqStr = String(seq).padStart(3, '0');
-  const checkpointFile = path.join(CHECKPOINT_DIR, `checkpoint-${seqStr}.json`);
-
-  const tmp = checkpointFile + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(checkpoint, null, 2));
-  fs.renameSync(tmp, checkpointFile);
-
-  const latestTmp = LATEST_FILE + '.tmp';
-  fs.writeFileSync(latestTmp, JSON.stringify({ sequence: seq, file: `checkpoint-${seqStr}.json` }));
-  fs.renameSync(latestTmp, LATEST_FILE);
+// Read previous sequence (if file exists) and return next monotonic value.
+// Best-effort under contention: two writers may both compute the same N+1.
+// Sequence is display-only; collisions are acceptable.
+function readPreviousSequence() {
+  try {
+    const prev = JSON.parse(fs.readFileSync(LATEST_FILE, 'utf8'));
+    return typeof prev.sequence === 'number' ? prev.sequence : 0;
+  } catch {
+    return 0;
+  }
 }
 
-function isValidCheckpointFile(filename) {
-  return /^checkpoint-\d{3}\.json$/.test(filename);
+function writeCheckpoint(checkpoint) {
+  fs.mkdirSync(CHECKPOINT_DIR, { recursive: true });
+  if (checkpoint.sequence === undefined || checkpoint.sequence === null) {
+    checkpoint.sequence = readPreviousSequence() + 1;
+  }
+  const tmp = LATEST_FILE + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(checkpoint, null, 2));
+  fs.renameSync(tmp, LATEST_FILE);
 }
 
 module.exports = {
   CHECKPOINT_DIR,
   LATEST_FILE,
-  nextSequence,
   gitHead,
   gitBranch,
   gitStatus,
+  readPreviousSequence,
   writeCheckpoint,
-  isValidCheckpointFile,
 };

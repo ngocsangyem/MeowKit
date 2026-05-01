@@ -9,28 +9,28 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-const { CHECKPOINT_DIR, LATEST_FILE, gitHead, isValidCheckpointFile } = require(
+const { LATEST_FILE, gitHead } = require(
   path.join(ROOT, '.claude', 'hooks', 'lib', 'checkpoint-utils.cjs')
 );
+
+// Reject path traversal and control-char injection in untrusted plan_path field
+// before emitting it into stdout (Claude Code injects as system context).
+// Plan paths are canonically absolute (set-active-plan resolves them), so we do
+// NOT reject absolute paths — only `..` traversal and control chars.
+function safePlanPath(p) {
+  if (!p || typeof p !== 'string') return null;
+  if (p.includes('..')) return null;
+  if (/[\x00-\x1f]/.test(p)) return null;
+  return p;
+}
 
 module.exports = function orientationRitual(ctx, state) {
   const source = ctx.source || 'startup';
   if (source === 'startup') return '';
 
-  // Load latest checkpoint pointer
-  let latest;
-  try {
-    latest = JSON.parse(fs.readFileSync(LATEST_FILE, 'utf8'));
-  } catch {
-    return '';
-  }
-
-  // Validate filename to prevent path traversal
-  if (!latest.file || !isValidCheckpointFile(latest.file)) return '';
-
   let checkpoint;
   try {
-    checkpoint = JSON.parse(fs.readFileSync(path.join(CHECKPOINT_DIR, latest.file), 'utf8'));
+    checkpoint = JSON.parse(fs.readFileSync(LATEST_FILE, 'utf8'));
   } catch {
     return '';
   }
@@ -47,8 +47,9 @@ module.exports = function orientationRitual(ctx, state) {
   lines.push(`Resuming session (checkpoint #${checkpoint.sequence})`);
   lines.push(`Model: ${checkpoint.state?.model_tier || 'unknown'}/${checkpoint.state?.density || 'unknown'}`);
 
-  if (checkpoint.progress?.plan_path) {
-    lines.push(`Active plan: ${checkpoint.progress.plan_path}`);
+  const plan = safePlanPath(checkpoint.progress?.plan_path);
+  if (plan) {
+    lines.push(`Active plan: ${plan}`);
   }
 
   lines.push(`Git: ${checkpoint.environment?.git_branch || 'unknown'} @ ${currentHash}`);

@@ -20,8 +20,8 @@ Reference for `.claude/memory/trace-log.jsonl` records. Append-only JSONL writte
 | Event | Emitter | Payload schema |
 |---|---|---|
 | `file_edited` | `learning-observer.sh` | `{file: str, edit_count: int}` |
-| `build_verify_result` | `post-write-build-verify.sh` | `{file: str, exit_code: int, command: str}` (only on failure) |
-| `loop_warning` | `post-write-loop-detection.sh` | `{file: str, count: int, threshold: 4 \| 8}` (only when threshold tripped) |
+| ~~`build_verify_result`~~ | **DEPRECATED (v2.4.0)** — `.sh` emitter removed; `handlers/build-verify.cjs` does NOT re-emit | `{file: str, exit_code: int, command: str}` (historical only) |
+| ~~`loop_warning`~~ | **DEPRECATED (v2.4.0)** — `.sh` emitter removed; `handlers/loop-detection.cjs` does NOT re-emit | `{file: str, count: int, threshold: 4 \| 8}` (historical only) |
 | `harness_run_start` | `mk:harness` step-00 | `{task: str, density: str, model: str, run_id: str}` |
 | `contract_signed` | `mk:sprint-contract` sign action | `{slug: str, sprint: int, generator_sha: str, evaluator_sha: str}` |
 | `verdict_written` | `mk:evaluate` step-04 | `{slug: str, overall: str, weighted_score: float, hard_fail: bool, evidence_count: int}` |
@@ -35,8 +35,8 @@ Reference for `.claude/memory/trace-log.jsonl` records. Append-only JSONL writte
 Each event type has exactly ONE canonical emitter. No double-emission across hooks:
 
 - `learning-observer.sh` is the only emitter of `file_edited`
-- `post-write-build-verify.sh` is the only emitter of `build_verify_result` (and only on failure — clean builds emit nothing)
-- `post-write-loop-detection.sh` is the only emitter of `loop_warning` (and only when threshold tripped)
+- ~~`post-write-build-verify.sh`~~ removed v2.4.0; `build_verify_result` is no longer emitted (verify-result feedback now via stdout, not trace)
+- ~~`post-write-loop-detection.sh`~~ removed v2.4.0; `loop_warning` is no longer emitted (warn/escalate now via stdout markers `@@LOOP_DETECT_WARN@@` / `@@LOOP_DETECT_ESCALATE@@`)
 
 This prevents trace inflation from redundant records.
 

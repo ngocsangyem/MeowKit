@@ -158,6 +158,7 @@ export default withMermaid(defineConfig({
             { text: 'Workflow Phases (0-6)', link: '/guide/workflow-phases' },
             { text: 'Model Routing', link: '/guide/model-routing' },
             { text: 'Memory System', link: '/guide/memory-system' },
+            { text: 'Session State vs --resume', link: '/guide/session-state-vs-resume' },
             { text: 'Agent-Skill Architecture', link: '/guide/agent-skill-architecture' },
             { text: 'Debugging & Thinking Skills', link: '/guide/debugging-skills-decision-guide' },
             { text: 'Task System', link: '/guide/task-system' },

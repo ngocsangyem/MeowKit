@@ -16,6 +16,35 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.7.2 (2026-05-01) — Checkpoint subsystem cleanup
+
+### Highlights
+
+The session-state checkpoint subsystem stops accumulating files unboundedly. `session-state/checkpoints/` is now a single overwriting `checkpoint-latest.json` written atomically via POSIX `.tmp` + rename — replacing the prior pointer-and-numbered-file scheme that had no rotation logic. Resume context, git-drift detection, and budget tracking work the same; the file count just stays at 1.
+
+### Improvements
+
+- Checkpoint dir collapsed to a single file — `checkpoint-utils.cjs` rewritten without `nextSequence()`, the `O_EXCL` lock, the `.next-seq` counter, or the filename validator. Two writers (Stop hook + phase-transition trigger) race to last-writer-wins; sequence is display-only.
+- `auto-checkpoint.cjs` fires on phase-transition writes only — the modulo-20 mid-session trigger and `auto-checkpoint-counter.json` are removed. The Stop hook still captures end-of-turn state.
+- `orientation-ritual.cjs` reads the checkpoint file directly with one `readFileSync` and a `try/catch` — no more pointer indirection, no more two-hop read.
+- New `safePlanPath` guard in `orientation-ritual.cjs` rejects `..` traversal and control-character injection (e.g. embedded `\n` "ignore previous instructions" payloads) in the `plan_path` field before stdout emission. Replaces the deleted `isValidCheckpointFile` filename guard with content-level validation.
+- Two superseded shell hook writers removed — `.claude/hooks/post-write-build-verify.sh` and `post-write-loop-detection.sh` were marked "Not registered. Do not re-register." Their `.cjs` ports (`build-verify.cjs`, `loop-detection.cjs`) keep working unchanged; env-var bypasses (`MEOWKIT_BUILD_VERIFY=off`, `MEOWKIT_LOOP_DETECT=off`) still honored by the active handlers.
+- `HOOKS_INDEX.md` reconciled with disk — stale rows for the v2.4.0-deleted `memory-loader.cjs`, `memory-parser.cjs`, `memory-injector.cjs`, `memory-filter.cjs` removed, replaced with a single tombstone callout. State-file table updated to reference `checkpoint-latest.json` instead of `auto-checkpoint-counter.json`.
+- `AGENTS_INDEX.md`, `build-verify-commands.md`, and `trace-schema.md` reconciled — stale "13 agents" phrasing corrected to "17 agents", `.sh` references updated to `.cjs`, and the `build_verify_result` / `loop_warning` trace events deprecated (their emitters were removed in v2.4.0; the events have not fired since).
+
+### Bug Fixes
+
+- Pre-existing silent-failure path closed — under `nextSequence()` lock contention the function returned `null`, both writers passed `null` to `writeCheckpoint`, producing `checkpoint-null.json` which `isValidCheckpointFile` rejected; `orientation-ritual` then returned empty silently and the user got a cold-start resume with no error visible. The new design has no lock and no null-seq path; resume cannot fail this way.
+- Resume injection no longer susceptible to prompt-injection via the `plan_path` field — `safePlanPath` filters `..` traversal and control-character payloads (newline, escape sequences) before they reach Claude's system context.
+
+### Removals
+
+- `meowkit/.claude/hooks/handlers/checkpoint-utils.cjs` exports `nextSequence` and `isValidCheckpointFile` are gone — they were only used inside the checkpoint subsystem and have been replaced by the single-file overwrite pattern.
+- `meowkit/session-state/checkpoints/.next-seq`, `.seq.lock`, and `auto-checkpoint-counter.json` are no longer produced. Existing files are stale and safe to delete; `orientation-ritual.cjs` ignores them.
+- Two shell writers removed (see Improvements). Their functionality was already migrated to `.cjs` handlers in v2.4.0; the `.sh` files were dead code.
+
+---
+
 ## 2.7.1 (2026-04-30) — Phase Frontmatter Contract
 
 ### Highlights

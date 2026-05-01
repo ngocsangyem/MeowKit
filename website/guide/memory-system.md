@@ -139,6 +139,56 @@ Every session appends to `cost-log.json` via the Stop hook (`post-session.sh`). 
 
 View cost report with `npx meowkit memory --stats`.
 
+## Session state vs memory
+
+MeowKit also persists a **session-state** layer at `session-state/` — distinct from memory. The two layers serve different purposes:
+
+| Layer | Path | Lifetime | What it holds |
+|---|---|---|---|
+| Memory | `.claude/memory/` | Durable across sessions; pruned manually via `/mk:memory --prune` | Curated learnings, patterns, decisions, cost log — stuff humans should review later |
+| Session state | `session-state/` | Cleared on session-id change by `project-context-loader.sh` | Live counters, hash caches, doom-loop guards, checkpoints — stuff the agent rebuilds itself |
+
+Rule of thumb: if the agent that produced the artifact would want a human to inspect it later → memory. If the agent would rebuild it on demand → session state.
+
+### Resume checkpoint (v2.7.2)
+
+`session-state/checkpoints/` holds **one** file: `checkpoint-latest.json`. It is overwritten atomically (`.tmp` + rename) by two writers — the Stop hook on every assistant turn, and the phase-transition trigger on writes to `tasks/plans/`, `tasks/contracts/`, or `tasks/reviews/`. On session resume, `orientation-ritual.cjs` reads this file once and injects model tier, harness density, active plan path, git-drift warning, and budget summary into the new session's context.
+
+Notable design points:
+
+- **Single file, no rotation.** Earlier versions used a pointer file plus numbered `checkpoint-NNN.json` snapshots, with no rotation logic — checkpoints accumulated unboundedly. v2.7.2 collapses this to one overwriting file. Existing numbered files are stale and ignored by the reader; safe to delete.
+- **Sequence is display-only.** The `sequence` field shown in `Resuming session #N` is a monotonic counter sourced from the file itself; concurrent writers may compute the same value. The display is informational, not a session identifier.
+- **Path-traversal and injection guard.** Before emitting the active plan path into the resumed session's context, `orientation-ritual.cjs` filters `..` traversal and control-character payloads via the `safePlanPath` content check.
+- **`/mk:harness --resume` does NOT use this file.** Harness reconstructs run state from `run.md` frontmatter inside the harness run directory, independently of the session-state checkpoint.
+
+Other notable session-state files: `budget-state.json` (live token/cost accumulator), `edit-counts.json` (doom-loop guard), `precompletion-attempts.json` (Stop-gate re-entry counter), `build-verify-cache.json` (hash-based skip cache for compile/lint). All are session-scoped and reset on new session.
+
+### Why Claude Code's `--resume` cannot replace session-state
+
+Claude Code's `--resume` and MeowKit's session-state share a trigger word ("session") but operate at different layers and solve different problems. They are complementary, not redundant. **For the full comparison with file-by-file map and four concrete unlocks, see [Session State vs --resume](/guide/session-state-vs-resume).**
+
+| Layer | Claude Code `--resume` | MeowKit `session-state/` |
+|---|---|---|
+| What it restores | Conversation transcript (messages + tool calls) | Hook-layer enforcement state (counters, caches, gates) |
+| Operates at | Protocol / dialogue layer | Hook / runtime-policy layer |
+| Knows about | What was said | What the process is allowed to do next |
+| Cannot restore | Hook counters, build-skip caches, environment drift | Conversation context (the model derives that from `--resume`) |
+
+The right axis is **convo-layer vs enforcement-layer**, not redundant vs complementary. They cover different failure modes entirely.
+
+**Four concrete things `session-state/` enables that `--resume` cannot:**
+
+| Capability | Mechanism | File |
+|---|---|---|
+| Pre-model policy enforcement | `loop-detection.cjs` blocks `@@LOOP_DETECT_ESCALATE@@` on PostToolUse before the model sees the tool result | `edit-counts.json` |
+| Hook composition as shared bus | Five handlers (model-detector, budget-tracker, auto-checkpoint, build-verify, loop-detection) cross-read state | All session-state files |
+| Hash-based build skip cache | `build-verify.cjs` skips `tsc --noEmit` / `eslint` on unchanged files via content-addressed hash | `build-verify-cache.json` |
+| Adaptive harness density per model tier | Cheaper models get MINIMAL density; Opus 4.6+ gets LEAN — density drives downstream hook behavior | `detected-model.json` |
+
+`--resume` restores what the model *knows*. Session-state controls what the model is *allowed to do next*. Both are needed; neither replaces the other.
+
+**Note on project files:** Claude Code does re-read `CLAUDE.md` and `.claude/rules/*.md` on `--resume` because they are project files loaded at session start. So *some* behavioral constraints survive `--resume`. The gap MeowKit's session-state fills is specifically the runtime-policy state — counters, caches, hashes, drift — that lives in files Claude Code does not load.
+
 ## MeowKit vs Claude Code memory
 
 | Aspect | MeowKit Memory | Claude Code Auto-Memory |

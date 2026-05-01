@@ -1,6 +1,6 @@
 # Build-Verify Commands — Per-Language Lookup
 
-Reference table for `post-write-build-verify.sh`. Maps file extension → compile/lint commands.
+Reference table for `handlers/build-verify.cjs`. Maps file extension → compile/lint commands.
 
 ## Resolution Rules (per Phase 7 red-team P19)
 

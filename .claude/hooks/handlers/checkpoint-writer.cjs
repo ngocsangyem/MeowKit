@@ -4,12 +4,11 @@
 // On Stop event:
 //   1. Check git status (clean/dirty)
 //   2. Read current budget + model state from session-state/
-//   3. Write sequenced checkpoint-NNN.json
-//   4. Update checkpoint-latest.json pointer
+//   3. Write checkpoint-latest.json (overwriting; sequence auto-incremented in writeCheckpoint)
 //
 // Checkpoint dir: session-state/checkpoints/
 
-const { nextSequence, gitHead, gitBranch, gitStatus, writeCheckpoint } = require(
+const { gitHead, gitBranch, gitStatus, writeCheckpoint } = require(
   require('path').join(process.env.CLAUDE_PROJECT_DIR || process.cwd(), '.claude', 'hooks', 'lib', 'checkpoint-utils.cjs')
 );
 
@@ -22,10 +21,8 @@ module.exports = function checkpointWriter(ctx, state) {
   const commitHash = gitHead();
   const branch = gitBranch();
 
-  const seq = nextSequence();
   const checkpoint = {
     version: '1.0.0',
-    sequence: seq,
     session_id: ctx.session_id || 'unknown',
     created_at: new Date().toISOString(),
     state: {
@@ -49,9 +46,9 @@ module.exports = function checkpointWriter(ctx, state) {
     } : null,
   };
 
-  writeCheckpoint(checkpoint, seq);
+  writeCheckpoint(checkpoint);
 
-  let summary = `Checkpoint #${seq} saved.`;
+  let summary = `Checkpoint #${checkpoint.sequence} saved.`;
   if (git.clean === false) {
     summary += ` WARNING: ${git.changes} uncommitted change(s).`;
   } else if (git.clean === null) {

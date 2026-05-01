@@ -27,9 +27,8 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 | `handlers/budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | Estimate token cost per tool call, accumulate session budget, warn at $30, block at $100. Dispatched via `dispatch.cjs`. | 40s | `tool_input` + `tool_response` |
 | `handlers/auto-checkpoint.cjs` | PostToolUse | Edit\|Write | Auto-create checkpoints at intervals during long sessions. Dispatched via `dispatch.cjs`. | 40s | `tool_input.file_path` |
 | `handlers/model-detector.cjs` | SessionStart | — | Detect model tier (TRIVIAL/STANDARD/COMPLEX) and harness density (MINIMAL/FULL/LEAN) from SessionStart stdin `model` field. Fallback: `MEOWKIT_MODEL_HINT` env. Dispatched via `dispatch.cjs`. | 10s | `model` field |
-| `handlers/orientation-ritual.cjs` | SessionStart | — | Emit session orientation context (active plan, pending tasks). Dispatched via `dispatch.cjs`. | 10s | Full stdin JSON |
-| `handlers/memory-loader.cjs` | UserPromptSubmit | — | Load `.claude/memory/lessons.md` and `.claude/memory/patterns.json` into context on each user prompt. Dispatched via `dispatch.cjs`. | 10s | Full stdin JSON |
-| `handlers/checkpoint-writer.cjs` | Stop | — | Write session checkpoint with budget summary and file changes. Dispatched via `dispatch.cjs`. | 10s | Full stdin JSON |
+| `handlers/orientation-ritual.cjs` | SessionStart | — | Emit session orientation context (active plan, pending tasks). Reads `session-state/checkpoints/checkpoint-latest.json` directly (single-file, no pointer indirection). Dispatched via `dispatch.cjs`. | 10s | Full stdin JSON |
+| `handlers/checkpoint-writer.cjs` | Stop | — | Write session checkpoint with budget summary and file changes. Single-file overwrite via atomic .tmp+rename. Dispatched via `dispatch.cjs`. | 10s | Full stdin JSON |
 | `dispatch.cjs` | PostToolUse, Stop, SessionStart, UserPromptSubmit | varies | Central Node.js dispatcher. Loads `handlers.json`, dispatches to registered `.cjs` handler modules. | 10-40s | Full stdin JSON |
 | `cost-meter.sh` | PostToolUse | Bash | Track token cost accumulation | 5s | (none — reads cost log) |
 | `pre-completion-check.sh` | Stop | — | **Phase 7 NEW.** Block session stop if no verification evidence exists. Hard cap 3 re-entries. LEAN mode soft nudge. | 5s | (none — reads plan/contract/trace) |
@@ -37,26 +36,21 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 | `conversation-summary-cache.sh` | Stop | — | **Phase 9 NEW.** Spawns **background** worker that summarizes transcript via `claude -p --model haiku` (~60–120s wall) when throttle thresholds met. Hook itself returns instantly. Lock at `session-state/conversation-summary.lock`. Atomic write to `.claude/memory/conversation-summary.md`. | 5s | `HOOK_TRANSCRIPT_PATH` + `HOOK_SESSION_ID` |
 | `conversation-summary-cache.sh` | UserPromptSubmit | — | **Phase 9 NEW.** Inject cached summary as `## Prior conversation summary` block (capped 4KB). Skips on session_id mismatch. | 2s | `HOOK_SESSION_ID` |
 
-**Hook count:** 15 hook scripts + 12 Node.js `.cjs` files in `.claude/hooks/handlers/`. 14 shell hooks registered in `.claude/settings.json` events + 1 `pre-implement.sh` invoked manually by the developer agent. 10 `.cjs` handlers registered via `handlers.json` → `dispatch.cjs` (build-verify, loop-detection, budget-tracker, auto-checkpoint, checkpoint-writer, model-detector, orientation-ritual, memory-loader, immediate-capture-handler) + 1 direct `dispatch.cjs` entry. 3 `.cjs` files are library modules (`memory-filter`, `memory-parser`, `memory-injector`) imported by `memory-loader.cjs`, not independently registered. The shared parser shim at `lib/read-hook-input.sh` and the secret scrubber at `lib/secret-scrub.sh` are sourceable libraries. `conversation-summary-cache.sh` is registered under TWO events (Stop + UserPromptSubmit), branching on `HOOK_EVENT_NAME`. `SubagentStart`/`SubagentStop` are intentionally empty — hooks in these events would infinite-loop inside subagents.
+**Hook count:** 13 shell hook scripts + 8 Node.js `.cjs` handlers in `.claude/hooks/handlers/`. Shell hooks registered in `.claude/settings.json` events + `pre-implement.sh` invoked manually by the developer agent. `.cjs` handlers registered via `handlers.json` → `dispatch.cjs` (build-verify, loop-detection, budget-tracker, auto-checkpoint, checkpoint-writer, model-detector, orientation-ritual, immediate-capture-handler) + 1 direct `dispatch.cjs` entry. The shared parser shim at `lib/read-hook-input.sh`, the secret scrubber at `lib/secret-scrub.sh`, and `lib/checkpoint-utils.cjs` are sourceable libraries. `conversation-summary-cache.sh` is registered under TWO events (Stop + UserPromptSubmit), branching on `HOOK_EVENT_NAME`. `SubagentStart`/`SubagentStop` are intentionally empty — hooks in these events would infinite-loop inside subagents.
+
+**Tombstoned (v2.4.0):** `memory-loader.cjs`, `memory-filter.cjs`, `memory-parser.cjs`, `memory-injector.cjs` — auto-inject memory pipeline removed; memory now loads on-demand per skill (see `docs/memory-system.md` §8 Tombstone).
 
 **Additional registered handler (not in hooks table above):**
 | Handler | Event | Purpose |
 |---|---|---|
 | `handlers/immediate-capture-handler.cjs` | UserPromptSubmit | Detects `##decision:`, `##pattern:`, `##note:` prefixes in user prompts and writes entries to typed memory files (lessons.md, patterns.json, quick-notes.md). |
 
-**Library modules (imported by memory-loader.cjs — NOT independently registered in handlers.json):**
-| Module | Imported by | Purpose |
-|---|---|---|
-| `handlers/memory-filter.cjs` | `memory-loader.cjs` | Filters memory entries by domain keyword match, staleness (>6mo), and token budget caps (CRITICAL: 3000 chars, STANDARD: 800 chars). |
-| `handlers/memory-parser.cjs` | `memory-loader.cjs` | Parses lessons.md YAML frontmatter entries with validation; extracts domain keywords from user prompts for relevance filtering. |
-| `handlers/memory-injector.cjs` | `memory-loader.cjs` | Escapes memory content to enforce DATA boundary (prevents injection via `<memory-data>` tags); wraps filtered output with metadata annotations. |
-
 ## Env Var Bypasses
 
 | Var | Effect |
 |---|---|
-| `MEOWKIT_BUILD_VERIFY=off` | Skip post-write-build-verify.sh |
-| `MEOWKIT_LOOP_DETECT=off` | Skip post-write-loop-detection.sh |
+| `MEOWKIT_BUILD_VERIFY=off` | Skip handlers/build-verify.cjs |
+| `MEOWKIT_LOOP_DETECT=off` | Skip handlers/loop-detection.cjs |
 | `MEOWKIT_PRECOMPLETION=off` | Skip pre-completion-check.sh |
 | `MEOWKIT_HARNESS_MODE=LEAN` | PreCompletion falls back to soft nudge; BuildVerify still runs |
 | `MEOWKIT_HARNESS_MODE=MINIMAL` | Skip BuildVerify + PreCompletion entirely |
@@ -84,7 +78,7 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 | `.claude/memory/conversation-summary.md` | conversation-summary-cache.sh (Stop bg worker) | **Consumer 1:** conversation-summary-cache.sh (UserPromptSubmit) → emits to stdout → **Consumer 2: Claude Code context injection (the model itself)** for every meowkit agent. Cleared by project-context-loader.sh on session change. | Persistent conversation summary read by every turn |
 | `session-state/detected-model.json` | handlers/model-detector.cjs | handlers/budget-tracker.cjs, handlers/auto-checkpoint.cjs | Model tier + density detection result |
 | `session-state/budget-state.json` | handlers/budget-tracker.cjs | (same) | Accumulated session cost estimate |
-| `session-state/auto-checkpoint-counter.json` | handlers/auto-checkpoint.cjs | (same) | Checkpoint interval counter |
+| `session-state/checkpoints/checkpoint-latest.json` | handlers/checkpoint-writer.cjs (Stop), handlers/auto-checkpoint.cjs (PostToolUse phase transitions) | handlers/orientation-ritual.cjs (SessionStart resume/clear/compact) | Single-file checkpoint with model tier, density, plan path, git state, budget. Atomic .tmp+rename; last-writer-wins; sequence display-only. |
 | `.claude/session-state/tdd-mode` | tdd-flag-detector.sh | tdd-detect.sh, pre-implement.sh | TDD sentinel (cleared on new session by project-context-loader.sh) |
 | `.claude/session-state/tdd-deprecation-warned` | tdd-detect.sh | (same) | Legacy profile deprecation one-shot flag (cleared on new session) |
 

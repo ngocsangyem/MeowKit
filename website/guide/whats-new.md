@@ -12,6 +12,10 @@ To upgrade: `npx mewkit upgrade`. Fresh install: `npx mewkit init`.
 
 ## Releases
 
+### v2.7.2 — Checkpoint subsystem cleanup (2026-05-01)
+
+The `session-state/checkpoints/` directory stops accumulating files unboundedly. Was a pointer-and-numbered-file scheme with no rotation logic; now a single overwriting `checkpoint-latest.json` written atomically via POSIX `.tmp` + rename. Resume context, git-drift detection, and budget tracking are preserved. Internal cleanup also reconciles `HOOKS_INDEX.md`, `AGENTS_INDEX.md`, `build-verify-commands.md`, and `trace-schema.md` with disk state, removes two long-superseded shell hook writers, and adds a `safePlanPath` content guard to `orientation-ritual.cjs` against `..` traversal and control-character injection in the resumed `plan_path` field.
+
 ### v2.7.1 — Phase Frontmatter Contract (2026-04-30)
 
 `mk:plan-creator` ships a strict YAML frontmatter contract for phase files — frontmatter is machine-readable truth, the Overview block is a regenerated human-readable mirror. Cook's finalize-step sync-back is now a formal algorithm: counts `[x]` in `## Todo List`, derives status, never overwrites terminal states (`failed`, `abandoned`), idempotent on re-run. Aligns plan-creator with the orchviz parser cascade so plan state stays consistent across planner, validator, harness, and visualizer. `scripts/validate-plan.py` hard-fails on the "stamp at creation" anti-pattern.
