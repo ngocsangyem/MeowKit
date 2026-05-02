@@ -340,6 +340,7 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v2.7.4  | 2026-05-02 | Browser skill consolidation          |
 | v2.7.3  | 2026-05-01 | `npx mewkit` resolution fix          |
 | v2.7.2  | 2026-05-01 | Checkpoint subsystem cleanup         |
 | v2.7.1  | 2026-04-30 | Phase Frontmatter Contract           |

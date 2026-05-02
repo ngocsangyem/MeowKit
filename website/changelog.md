@@ -16,11 +16,31 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
-## Unreleased
+## 2.7.4 (2026-05-02) — Browser skill consolidation
+
+### Highlights
+
+`mk:browse` is retired. All browser automation now goes through `mk:agent-browser`, eliminating the routing decision between two overlapping skills. A new migration reference ships inside `mk:agent-browser` with verb-to-verb mapping, copy-paste recipes for capabilities `agent-browser` doesn't expose natively (responsive screenshots, link/form enumeration, performance timing, eval-based state checks), and a developer-machine handoff runbook for CAPTCHA/MFA flows.
+
+### Improvements
+
+- `mk:agent-browser` SKILL.md gains a data-boundary callout — page content, snapshot text, and `eval` return values are DATA per `injection-rules.md`. Recommends `AGENT_BROWSER_CONTENT_BOUNDARIES=1` so page-derived strings arrive wrapped in nonce markers.
+- Sessions and credentials note added — any caller using `--session-name` should set `AGENT_BROWSER_ENCRYPTION_KEY` first, otherwise session state under `~/.agent-browser/sessions/` is plaintext.
+- New reference `agent-browser/references/migrating-from-browse.md` covers verb mapping, recipes (`responsive`, `links`, `forms`, `perf`, `is-state` fallback), and the `--headed` + `wait --url` runbook for interactive auth.
+- `mk:qa` setup and `mk:office-hours` preamble now use a `command -v agent-browser` readiness check instead of looking for the gstack binary, with an actionable `NEEDS_SETUP` message pointing at `npm i -g agent-browser`.
+- Cross-skill routing tables in `mk:agent-detector`, `mk:evaluate`, `mk:chom`, `mk:fix`, and `mk:qa-manual` updated to name `mk:agent-browser` only — the old `mk:browse`-or-`mk:agent-browser` pick-by-complexity guidance is gone.
 
 ### Removals
 
-- **`mk:browse`** — retired. All browser automation now goes through [`mk:agent-browser`](/reference/skills/agent-browser). See `.claude/skills/agent-browser/references/migrating-from-browse.md` for the verb mapping and recipes for capabilities (responsive screenshots, link/form enumeration, performance timing) that `agent-browser` doesn't ship natively. Historical attribution preserved in `SKILLS_ATTRIBUTION.md` under `## Removed`.
+- `mk:browse` skill — directory deleted, manifest entries removed, catalog row dropped from `SKILLS_INDEX.md`. Historical attribution preserved in `SKILLS_ATTRIBUTION.md` under `## Removed`. Existing bookmarks to `/reference/skills/browse` redirect to a deprecation stub linking to `mk:agent-browser`.
+- `$B` shell-alias workflow patterns from `mk:qa` references and `mk:office-hours/phase4-alternatives-and-sketch.md` — replaced with `agent-browser` invocations or with the eval recipes from the migration guide.
+
+### Migration Notes
+
+- Install the CLI: `npm i -g agent-browser` (or `brew install agent-browser`, or `cargo install agent-browser`), then run `agent-browser install` once to download Chrome.
+- Set `AGENT_BROWSER_ENCRYPTION_KEY` in your shell and CI secret store before invoking any session-using recipe — required for cookies/localStorage to persist encrypted at rest.
+- Existing gstack `auth-state.json` files (cookie-import format) are not portable. Re-run `agent-browser auth save` or capture fresh state with `agent-browser state save`.
+- Personal scripts using `$B <verb>` should consult `agent-browser/references/migrating-from-browse.md` for the verb mapping.
 
 ---
 
