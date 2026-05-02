@@ -1,28 +1,20 @@
 ---
 title: "mk:llms"
-description: "Generate llms.txt files from project documentation following the llmstxt.org specification."
+description: "Generate llms.txt files from project documentation following the llmstxt.org spec. Makes projects discoverable by AI assistants."
 ---
-# mk:llms
-Generate llms.txt files from project documentation following the llmstxt.org specification.
-## What This Skill Does
-Generates `llms.txt` (and optionally `llms-full.txt`) files that make your project documentation discoverable by AI assistants. A Python script handles scanning, title extraction, categorization, and generation — Claude only reviews and improves the output.
-## Core Capabilities
-- **Script-driven** — `generate-llms-txt.py` does all deterministic work
-- **Auto-categorization** — Groups docs into Getting Started, API Reference, Guides, Architecture, etc.
-- **Project auto-detection** — Reads package.json/README for project name and description
-- **JSON preview mode** — `--json` flag outputs metadata for Claude to review before generating
-- **Full mode** — `--full` generates llms-full.txt with inline content
-## Usage
-```bash
-/mk:llms                                    # scan docs/ directory
-/mk:llms --full                             # also generate llms-full.txt
-/mk:llms --source ./docs --base-url https://example.com/docs
-python3 .claude/skills/llms/scripts/generate-llms-txt.py --source ./docs --json  # preview
-```
-::: info Skill Details
-**Phase:** 6  
-**Used by:** documenter agent
-:::
 
-## Related
-- [`mk:docs-finder`](/reference/skills/docs-finder) — Consumes llms.txt (inverse operation)
+# mk:llms
+
+Generate llms.txt files — LLM-friendly markdown indexes of project documentation following the [llmstxt.org](https://llmstxt.org/) spec.
+
+## When to use
+
+- Project needs LLM-friendly documentation index
+- "llms.txt", "LLM documentation", "AI-friendly docs"
+- After major documentation updates (Phase 6 Reflect)
+
+Explicit: `/mk:llms [path] [--full]`
+
+## Phase anchor
+
+Phase 6 (Reflect) or on-demand. Output supports the `documenter` agent.

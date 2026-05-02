@@ -1,71 +1,36 @@
 ---
 title: "mk:frontend-design"
-description: "Production-grade UI/UX design with anti-AI-slop checklist, WCAG accessibility, typography hierarchy, and responsive patterns."
+description: "Production-grade UI/UX design — anti-AI-slop enforcement, WCAG 2.1 AA accessibility, typography, color, motion, responsive."
 ---
 
 # mk:frontend-design
 
-Production-grade UI/UX design with anti-AI-slop checklist, WCAG accessibility, typography hierarchy, and responsive patterns.
+Production-grade UI/UX design with anti-AI-slop enforcement. Covers aesthetics, accessibility, typography, color, motion, responsive, and design tokens. Auto-activates on design tasks and UI reviews.
 
-## What This Skill Does
+## When to use
 
-`mk:frontend-design` prevents AI-generated interfaces from looking like AI-generated interfaces. It enforces specific, opinionated design rules across typography, color, spacing, motion, and accessibility — and requires every output to pass a 10-point anti-slop checklist before delivery. The checklist targets the exact patterns that make AI-generated UIs look generic: system font stacks, pure black-on-white, centered-everything layouts, gratuitous gradients, and Lorem ipsum.
+Auto-activate on: design tasks, UI component styling, "make it look good", "improve the design", "fix the UI", "design review", design system work, CSS/styling changes. Explicit: `/mk:frontend-design [concern]`. NOT for Vue patterns (`mk:vue`), TypeScript (`mk:typescript`), or backend code.
 
-## Core Capabilities
+## Anti-AI-Slop checklist (mandatory before delivery)
 
-- **Anti-AI-slop checklist** — 10 specific patterns to avoid, checked before every delivery
-- **Typography hierarchy** — Display → heading → subhead → body → caption with intentional font pairing
-- **Color system** — 1 primary + 1 accent + neutrals. Softened values (never pure #000 on #fff)
-- **Spacing scale** — 4px base, consistent scale. Section spacing differs from component padding.
-- **Motion rules** — Animate only state transitions and feedback. Micro: 100-200ms, Standard: 200-300ms.
-- **Accessibility** — WCAG 2.1 AA minimum: 4.5:1 contrast, keyboard nav, focus indicators, reduced motion
-- **Responsive** — Mobile-first, 44px touch targets, 16px minimum text on mobile
+| Category | NEVER | Do instead |
+|---|---|---|
+| Typography | System font stack only, single weight | 2-3 weights, intentional font pairing |
+| Typography | All text same size/weight | Clear hierarchy: display → heading → body → caption |
+| Typography | Inter as default font | Choose font matching project mood from typography.csv |
+| Color | Pure black (#000) on pure white (#fff) | Softened: #111827 on #fafafa |
+| Layout | Centered hero, 3-column features, testimonials, CTA | Unique layouts, product-specific patterns |
+| Visual | unDraw/Storyset illustrations | Custom visuals or none |
+| Visual | Default or missing favicon | Distinct favicon |
+| Branding | "Built with love by the X team" footer | Real content or nothing |
+| Branding | Product name = literal description (KanbanApp) | Distinctive naming |
 
-## When to Use This
+## Process
 
-::: tip Use mk:frontend-design when...
-- Styling new UI components
-- Reviewing design quality before shipping
-- Fixing "it looks like AI made this" problems
-- Setting up a design system or tokens
-- Checking accessibility compliance
-:::
+1. Analyze — detect task type (new component, redesign, review, responsive), load design rules
+2. Implement — apply typography, color, spacing, motion. Run anti-slop checklist. Ensure WCAG 2.1 AA.
+3. Verify — pre-delivery checklist before presenting
 
-## Usage
+## Phase anchor
 
-```bash
-# Auto-activates on design/styling tasks
-/mk:frontend-design improve the dashboard layout
-/mk:frontend-design review this component's design
-/mk:frontend-design set up design tokens
-/mk:frontend-design check accessibility
-```
-
-## Example Prompts
-
-| Prompt | What frontend-design does |
-|--------|--------------------------|
-| `make this look professional` | Applies typography hierarchy, color system, spacing scale, passes anti-slop check |
-| `the login page looks generic` | Identifies specific anti-patterns (same-size text, no hierarchy, default inputs) → fixes each |
-| `add dark mode support` | Inverts neutrals, reduces saturation 10-15%, maintains contrast ratios |
-| `check accessibility` | Contrast audit, keyboard nav test, screen reader label verification |
-
-## Quick Workflow
-
-```
-Detect task → Load design-rules.md reference
-  → Apply: typography → color → spacing → motion
-  → Anti-slop check (10-point checklist)
-  → Accessibility audit (WCAG 2.1 AA)
-  → Deliver only if all checks pass
-```
-
-::: info Skill Details
-**Phase:** 3  
-**Used by:** developer agent
-:::
-
-## Related
-
-- [`mk:vue`](/reference/skills/vue) — Vue component patterns
-- [`mk:typescript`](/reference/skills/typescript) — TypeScript for frontend
+Phase 3 (Build GREEN) and Phase 4 (Review) for design quality checks.

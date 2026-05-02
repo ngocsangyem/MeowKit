@@ -1,72 +1,26 @@
 ---
 title: "mk:docs-init"
-description: "Generate initial project documentation from codebase analysis — scout, analyze, create docs/."
+description: "Generate initial project documentation from codebase analysis — creates docs/ from scratch. For new projects or empty docs directories."
 ---
 
 # mk:docs-init
 
-Generate initial project documentation from codebase analysis.
+Generate initial project documentation from codebase analysis. Creates `docs/` from scratch. For updating existing docs, use `mk:document-release`.
 
-## What This Skill Does
+## When to use
 
-`mk:docs-init` creates a project's `docs/` directory from scratch by scouting the codebase and generating documentation that reflects what actually exists. It fills the gap between `mk:bootstrap` (creates code) and `mk:document-release` (updates existing docs after shipping).
-
-## Core Capabilities
-
-- **Codebase-driven** — scouts first, generates from findings (no hallucinated architecture)
-- **Adaptive output** — generates only relevant docs based on what's detected (no deployment guide for libs)
-- **Size-aware** — flags files >800 lines, suggests splitting
-- **Delegates generation** — spawns docs-manager subagent for actual file creation
-- **Scope-appropriate** — small projects get README + summary only; large projects get full doc suite
-
-## When to Use This
-
-::: tip Use mk:docs-init when...
 - Project has no `docs/` directory
-- `docs/` exists but is empty or stubs
-- After `mk:bootstrap` creates a new project
-- Onboarding to an undocumented codebase
-:::
+- `docs/` exists but is empty or has only stubs
+- User asks "initialize docs", "create documentation", "generate docs"
+- After `mk:bootstrap` completes (new project needs docs)
 
-::: warning Don't use mk:docs-init when...
-- Docs already exist and need updating → use [`mk:document-release`](/reference/skills/document-release)
-:::
+NOT when docs already exist and need updating (use `mk:document-release`).
 
-## Usage
+## Process
 
-```bash
-# Initialize docs for current project
-/mk:docs-init
+1. Check existing state — does `docs/` exist? Are files populated?
+2. Scout codebase — identify project type, stack, structure
+3. Generate docs skeleton — README, ARCHITECTURE, CONTRIBUTING, project-context
+4. Populate — fill with content from codebase analysis
 
-# After bootstrapping a new project
-/mk:bootstrap my-app
-/mk:docs-init
-```
-
-## Generated Files
-
-| File | When generated | Audience |
-|------|---------------|----------|
-| `README.md` | Always (≤300 lines) | External — setup, usage |
-| `docs/project-overview.md` | Always | Internal — why it exists, design decisions |
-| `docs/codebase-summary.md` | Always | Internal — directory map, entry points |
-| `docs/code-standards.md` | Always | Team — conventions, patterns |
-| `docs/system-architecture.md` | Always | Team — component diagram, data flow |
-| `docs/deployment-guide.md` | If CI/CD or Docker detected | DevOps |
-| `docs/design-guidelines.md` | If frontend/UI code detected | Design/Frontend |
-
-::: info Skill Details
-**Phase:** Post-bootstrap or standalone
-**Used by:** documenter agent
-:::
-
-## Gotchas
-
-- **Hallucinating architecture**: always scouts first — generates only from confirmed findings
-- **Over-documenting small projects**: <10 files = README + codebase-summary only
-- **Stale on first run**: tell user to run `mk:document-release` after each ship
-
-## Related
-
-- [`mk:bootstrap`](/reference/skills/bootstrap) — Creates project code (run docs-init after)
-- [`mk:document-release`](/reference/skills/document-release) — Updates docs after shipping
+Also run `mk:project-context` to generate the agent-constitution file. `mk:docs-init` generates the full documentation suite; `mk:project-context` generates only the constitution.

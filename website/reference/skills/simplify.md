@@ -1,66 +1,43 @@
 ---
 title: "mk:simplify"
-description: "Post-implementation complexity reduction. Removes dead code, unnecessary abstractions, and over-engineering between Phase 3 (Build) and Phase 4 (Review)."
+description: "Post-implementation simplification pass — reduces complexity without changing behavior. Runs after Phase 3 GREEN, before Phase 4 Review."
 ---
 
 # mk:simplify
 
-Post-implementation simplification pass. Reduces complexity without changing behavior. Mandatory in mk:cook between Phase 3 (Build GREEN) and Phase 4 (Review).
+Runs after implementation, before review. Behavior-preserving simplification: reduces complexity while passing the exact same tests. Scoped to the current diff only. For ad-hoc code quality review, use `mk:clean-code` instead.
 
-## What This Skill Does
+## Iron Rule
 
-After implementation is complete and tests pass, mk:simplify scans modified files for complexity signals — dead code, unnecessary abstractions, over-engineering, redundant patterns — and removes them before the reviewer sees the code. The iron rule: behavior must not change. Every simplification must pass the same tests as before.
+Behavior must not change. Every simplification must pass the exact same tests. If tests fail after simplification, the simplification was wrong — revert it.
 
-## When to Use
-
-::: tip Mandatory in mk:cook
-mk:simplify runs automatically between Phase 3 (Build) and Phase 4 (Review) in the mk:cook pipeline. This is enforced since v2.0.
-
-```
-Phase 2 (Test — RED if `--tdd`) → Phase 3 (Build) → [mk:simplify] → Phase 4 (Review)
-```
-:::
-
-Can also be invoked standalone when you want to reduce complexity in existing code outside the cook pipeline.
-
-## What It Checks
+## What to look for
 
 **Remove:**
-- Dead code — functions never called, variables never read, unreachable branches, unused imports
-- Commented-out code — if it's in git history, delete it from source
-- Unnecessary abstractions — wrappers that add no value, interfaces with one implementation
-- Redundant null checks — checking null after a guard that already prevents null
+- Dead code — functions never called, variables never read, unreachable branches, imports never used
+- Commented-out code — if it's in git history, delete from source
+- Unnecessary abstractions — wrapper adding no value, interface with one implementation
+- Redundant null checks — checking null after a guard already prevents it
+- Boolean traps — function with 4 boolean params where names hide meaning
 
 **Simplify:**
-- Deep nesting — 3+ levels of if/else → extract early returns or guard clauses
-- God functions — >50 lines → extract focused helpers
-- Duplicate logic — same pattern in 3+ places → extract shared utility
-- Complex conditions — `if (a && !b || (c && d))` → extract to named boolean or function
+- Nested conditionals → early returns or guard clauses (fundamental pattern, not style preference)
+- Complex boolean expressions → named intermediate variables
+- Inline once-called abstractions into their single call site
 
-**Do not touch:**
-- Working code that's "not how I'd write it" — style is not complexity
-- Performance-optimized code — it looks complex for a reason
-- Code outside the current diff — scope discipline applies even during simplification
+## Process
 
-## How It Works
+1. Read the current diff (`git diff`)
+2. For each file: look for patterns, suggest removals
+3. User accepts/rejects each suggestion via `AskUserQuestion`
+4. Apply changes, run validator via `mk:lint-and-validate`
+5. Run tests — if any fail, revert that change
+6. Confirmation: summarize what was simplified
 
-1. **Identify** — scan changed files for complexity signals listed above
-2. **Propose** — list each simplification with before/after preview
-3. **Apply** — make changes one at a time (not batched)
-4. **Verify** — run full test suite after each change
-5. **Report** — list what was simplified and why
+## Hard constraint
 
-## Gotchas
+Never simplify across file boundaries. If two files are coupled in a way that makes simplifications unsafe, flag them as "coupled" and stop — don't attempt cleanup.
 
-- **Scope creep** — only simplify code from the current diff; touching unrelated code creates unexpected regressions
-- **Dynamic references** — grep for string references before removing "dead" code; it may be used via reflection or dynamic import
-- **Premature extraction** — 2 copies is not enough to justify a shared utility; wait for 3
-- **Breaking public API** — simplifying internals is fine; changing exported signatures is a breaking change
-- **Test code** — don't simplify test helpers or fixtures; they prioritize readability over DRY
-- **Timing** — do not simplify during Phase 3 (Build); wait until tests pass GREEN, then simplify
+## Phase anchor
 
-## Related
-
-- [mk:cook](/reference/skills/cook) — pipeline skill that mandates mk:simplify before Phase 4
-- [mk:clean-code](/reference/skills/clean-code) — pragmatic coding standards (SRP, DRY, KISS)
-- [mk:review](/reference/skills/review) — Phase 4 review that sees the simplified code
+Phase: 3→4 transition (Build → Review). Auto-called by `mk:cook`. Handoff: if PASS → proceed to `mk:review`.

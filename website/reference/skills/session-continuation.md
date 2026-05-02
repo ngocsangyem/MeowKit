@@ -1,31 +1,19 @@
 ---
 title: "mk:session-continuation"
-description: "Save and resume workflow state across sessions with handoff and TOON-based state persistence."
+description: "Persists and restores mid-session workflow progress across context resets. Save state, resume with workflow ID."
 ---
+
 # mk:session-continuation
-Save and resume workflow state across sessions with handoff and TOON-based state persistence.
-## What This Skill Does
-When a session approaches the context window limit (150K tokens, 75%), this skill saves the current workflow state (phase, agents, deliverables, key decisions) to a JSON file and generates a resume command. In a new session, `workflow:resume [id]` restores the full state and continues from where you left off.
-## Core Capabilities
-- **Auto-handoff** — Prompts at 75% context usage (150K tokens)
-- **State persistence** — Saves to `.claude/logs/workflows/[id]/workflow-state.json`
-- **Resume** — `workflow:resume [id]` restores state and continues
-- **TOON format** — Token-efficient state format (73% smaller than JSON)
-- **Auto-save** — Silent saves at phase completion and token milestones
-## Usage
-```bash
-workflow:handoff            # save state + get resume command
-workflow:resume AUTH-123    # restore and continue
-workflow:list               # show all saved workflows
-```
-::: info Skill Details
-**Phase:** 0–6
-:::
 
-## Gotchas
+Manages workflow state across sessions with handoff and resume. Runs on Haiku tier.
 
-- **Stale handoff after codebase changes**: Saved state references files that were renamed or deleted → Validate all file paths in handoff state before resuming
-- **TOON corruption on concurrent sessions**: Two agents writing state simultaneously → Use file locking or session-scoped state files
+## When to use
 
-## Related
-- [`mk:workflow-orchestrator`](/reference/skills/workflow-orchestrator) — The workflow being saved/resumed
+- Token count approaching 150K (75% of limit)
+- User says "handoff", "save", "pause", "resume" + workflow ID
+- Session ending with incomplete workflow
+- Incomplete workflow from previous session
+
+## How it works
+
+Captures plan state variables, active agent, current phase, and file state at handoff. On resume, reads state file and continues from exact interruption point.

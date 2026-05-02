@@ -1,87 +1,49 @@
 ---
 title: tester
-description: "Test-writing agent. In TDD mode (--tdd / MEOWKIT_TDD=1), writes failing tests before implementation. In default mode, writes tests when invoked but does not block the developer."
+description: Test writing agent — enforces TDD red-green-refactor discipline in TDD mode, writes tests on-request in default mode.
 ---
 
 # tester
 
-Test-writing agent. In TDD mode (`--tdd` / `MEOWKIT_TDD=1`), writes failing tests before implementation (red phase) and verifies they pass after (green phase). In default mode (TDD off), writes tests when invoked but does not block the developer.
+Writes tests in Phase 2. In TDD mode (`--tdd` / `MEOWKIT_TDD=1`), enforces strict red-green-refactor: failing tests before implementation, verification after. In default mode, writes tests when invoked but does not block the developer. Anti-rationalization rules apply in both modes.
 
-## Overview
+## Key facts
 
-The tester runs at two points: **Phase 2** (write tests) and **Phase 3** (verify tests pass after the developer finishes).
+| | |
+|---|---|
+| **Type** | Core |
+| **Phase** | 2 (Test) |
+| **Auto-activates** | After planning (Phase 1) |
+| **Never does** | Write production code, ship, minimize tests to save tokens, substitute mocks for integration tests |
 
-- **In TDD mode (`--tdd` / `MEOWKIT_TDD=1`):** The tester writes failing tests in Phase 2 before implementation begins. It does NOT greenlight the developer until tests demonstrably fail. This is strict TDD enforcement.
-- **In default mode (TDD off, post-migration):** The tester writes tests when invoked by the orchestrator, developer, or user — but does not block. Tests may be written before, alongside, or after the implementation.
+## Red phase (TDD mode only)
 
-The tester owns all test files exclusively. In both modes, anti-rationalization rules apply: tests must fail for the *right reason* (functionality doesn't exist), no test minimization, no mock substitution for integration tests.
+1. Write failing tests targeting expected behavior
+2. Tests must fail for the right reason — functionality doesn't exist yet, NOT syntax errors or missing imports
+3. Confirm: "Tests written and verified failing. Ready for implementation." This greenlights the developer.
 
-The tester owns all test files exclusively. It writes tests that fail for the *right reason* (functionality doesn't exist yet), not the wrong reason (syntax errors or missing imports).
+## Test writing (default mode)
 
-## Quick Reference
+1. Write tests when invoked — may be before, alongside, or after implementation
+2. Do NOT block the developer; do NOT issue a "ready for implementation" greenlight
+3. Anti-rationalization rules still apply (no test minimization, no mock substitution)
 
-### Development & Implementation
+## Green phase (after implementation, both modes)
 
-| Phase | What tester does | Deliverable |
-|-------|-----------------|------------|
-| **Test (Phase 2 — TDD mode)** | Write failing tests that define expected behavior | Test files that compile but fail |
-| **Test (Phase 2 — default mode)** | Write tests on-request, no greenlight semantics | Test files (any pass/fail state) |
-| **Verify (Phase 3)** | Verify developer's implementation passes all tests | Pass/fail report + coverage summary |
-| **Refactor** | Suggest refactoring opportunities after green | Improvement suggestions |
+1. Run all tests and verify they pass
+2. Report: pass/fail status, coverage summary, regressions
+3. Distinguish between "implementation bug" vs "test needs updating"
 
-### Test Ownership
+## Refactor phase
 
-The tester exclusively owns: `__tests__/`, `*.test.ts`, `*.spec.ts`, `tests/`, `*.test.js`, `*.spec.js`, `*.test.py`
+Suggest refactoring opportunities after green phase.
 
-### Quality Rules
+## Anti-rationalization rules (both modes)
 
-- Tests must fail for the **right reason** (functionality missing, NOT syntax/import errors)
-- Edge cases MUST be covered for critical paths (auth, payments, data validation)
-- Tests must test **behavior**, not implementation details
+- Do not minimize tests to "save tokens"
+- Do not substitute mocks for integration tests when real behavior matters
+- Do not skip edge cases because "the developer probably handled it"
 
-## How to Use
+## Skills loaded
 
-The tester is invoked automatically by the orchestrator during Phases 2 and 3. You don't call it directly.
-
-```
-Phase 2 (after plan approved):
-  Tester: "Writing tests for user authentication..."
-  Tester: "Tests written and verified failing. Ready for implementation."
-  → Handoff to developer
-
-Phase 3 (after developer finishes):
-  Tester: "Running all tests..."
-  Tester: "42 passed, 0 failed. Coverage: 87%. All green."
-  → Handoff to reviewer
-```
-
-## Under the Hood
-
-### Handoff Example
-
-**Red phase handoff:**
-```
-Tester → Developer:
-  Files created: tests/auth.test.ts (12 tests, all failing)
-  Reason for failure: auth module not yet implemented
-  Edge cases covered: empty credentials, expired tokens, invalid format
-  Ready for implementation: YES
-```
-
-**Green phase handoff:**
-```
-Tester → Reviewer:
-  Test results: 42 passed, 0 failed
-  New tests: 12 (from red phase)
-  Regression: 0 (existing tests still pass)
-  Coverage: 87% of new code paths
-```
-
-### Troubleshooting
-
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Tests fail for wrong reason (import error) | Missing dependency or wrong import path | Tester rewrites to fix compilation, keeps test logic |
-| Developer can't make tests pass after 3 attempts | Test expectations may be wrong OR implementation approach flawed | Tester re-evaluates: "implementation bug" vs "test needs updating" |
-| Test framework not configured | New project without test setup | Tester reports what's missing — doesn't attempt to install (escalates) |
-| Not enough edge cases | Non-critical path | Tester prioritizes: auth/payments/data validation always get edge cases |
+`mk:testing` (red-green-refactor), `mk:lint-and-validate`, `mk:qa`, `mk:qa-manual`, `mk:nyquist`

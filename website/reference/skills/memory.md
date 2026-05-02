@@ -1,76 +1,39 @@
 ---
 title: "mk:memory"
-description: "Memory system toolkit — session capture, pattern extraction, cost tracking, and topic file pruning"
+description: "Session memory toolkit — capture learnings, extract patterns, track costs. Persists to .claude/memory/ topic files."
 ---
 
 # mk:memory
 
-Memory system toolkit — session capture, pattern extraction, cost tracking, and topic file pruning.
+Topic-file-scoped session memory. Captures learnings, extracts patterns, and tracks costs. Persists to `.claude/memory/` topic files. Activates during Phase 0 (Orient) to load context and Phase 6 (Reflect) to persist it.
 
-## What This Skill Does
+## When to use
 
-A **reference toolkit** — a collection of guides used by agents during specific workflow phases. Each guide is in the `references/` subdirectory and loaded on-demand.
-
-| Reference | When Loaded | Content |
-|-----------|-------------|---------|
-| `session-capture.md` | Phase 6 | 3-category learning extraction (patterns/decisions/failures) into topic files |
-| `pattern-extraction.md` | Phase 6 | Frequency-based promotion candidates from split JSON files to CLAUDE.md |
-| `cost-tracking.md` | Phase 0, 6 | Token usage tracking and budget reports from `cost-log.json` |
-| `consolidation.md` | Manual | Prune stale topic file entries; archive cost data |
-
-## When to Use
-
-Phase 0 (Orient) and Phase 6 (Reflect) persistence. At Phase 0, consumer skills load relevant topic files. At Phase 6, `mk:cook` spawns a dedicated subagent for session-capture. Pruning is manual: invoke when a topic file exceeds 300 lines or a JSON file exceeds 50 entries.
-
-::: info Skill Details
-**Phase:** 0, 6
-**Used by:** analyst agent, mk:cook Phase 6 (MUST-spawn subagent)
-:::
-
-## Topic file layout
-
-Memory is split into focused topic files. Each skill reads only the files it needs:
-
-| File | Scope | Consumer |
-|------|-------|---------|
-| `fixes.md` + `fixes.json` | Bug-class patterns | mk:fix |
-| `review-patterns.md` + `review-patterns.json` | Review patterns | mk:review, mk:plan-creator |
-| `architecture-decisions.md` + `architecture-decisions.json` | Architectural decisions | mk:plan-creator, mk:cook |
-| `security-notes.md` | Security findings | mk:cso, mk:review |
-
-Split JSON files use schema v2.0.0 with fields: `version`, `scope`, `consumer`, `patterns[]`, `metadata`.
+- Phase 0 (Orient): load previous session context
+- Phase 6 (Reflect): capture learnings and patterns
+- When `analyst` agent tracks costs or extracts patterns
 
 ## Subcommands
 
 ### `--prune`
 
-Archive old standard-severity entries from topic files to `lessons-archive.md`.
+Archive old standard-severity entries from topic files to `lessons-archive.md`. Topic files pruned: `fixes.md`, `review-patterns.md`, `architecture-decisions.md`. Exempt: entries marked `severity: critical` or `severity: security`, entries with no parseable date.
 
-**Mechanism (grep-based — no parser dependency):**
-1. For each topic file: grep for `## ` headings with date pattern `(YYYY-MM-DD, severity: standard)`
-2. Compute age from today's date; identify entries older than threshold (default: 90 days)
-3. Append stale entries to `.claude/memory/lessons-archive.md`
-4. Rewrite topic file without stale blocks
-5. Report: "Archived N entries across M files"
-
-```
-/mk:memory --prune              # default 90-day threshold
-/mk:memory --prune --days 180   # custom threshold
-/mk:memory --prune --dry-run    # show what would be archived without moving
+```bash
+/mk:memory --prune              # Default 90-day threshold
+/mk:memory --prune --days 180   # Custom threshold
+/mk:memory --prune --dry-run    # Preview without writing
 ```
 
-**Exempt from pruning:** `severity: critical` or `severity: security` entries; entries without a parseable date.
+### `session-capture`
 
-**Recovery:** Copy entries from `lessons-archive.md` back to the appropriate topic file.
+Phase 6 extraction: patterns, decisions, failures from the session. Appends to the appropriate topic file by category.
 
-## Gotchas
+## References (loaded on-demand)
 
-- **Stale patterns applied to changed codebase**: Run pruning when JSON files exceed 50 entries; flag patterns with `lastSeen` > 6 months
-- **cost-log.json growing unbounded**: Run consolidation to archive entries older than 90 days
-- **lessons.md is now an archived stub**: Do not write to `lessons.md`. Write to topic files (`fixes.md`, `architecture-decisions.md`, `review-patterns.md`) or use `##prefix:` immediate capture instead
-
-## Related
-
-- [Memory System](/guide/memory-system) — Comprehensive guide with architecture, FAQ, and migration
-- [Workflow Phases](/guide/workflow-phases) — Where this toolkit is used
-- [analyst agent](/reference/agents/analyst) — Primary agent using these references
+| Reference | When | Content |
+|---|---|---|
+| `session-capture.md` | Phase 6 | 3-category capture (patterns/decisions/failures) |
+| `pattern-extraction.md` | Phase 6 | High-frequency pattern extraction for CLAUDE.md promotion |
+| `cost-tracking.md` | Phase 0, 6 | Token usage tracking, cost reporting, budget alerts |
+| `consolidation.md` | Manual | Prune stale entries, merge duplicates, archive cost data |

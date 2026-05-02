@@ -1,32 +1,23 @@
 ---
 title: "mk:document-release"
-description: "Post-ship documentation sync — reads all project docs, cross-references the diff, and updates everything to match what shipped."
+description: "Post-ship documentation sync — updates all project docs to match shipped code, polishes changelog, cleans up TODOs."
 ---
+
 # mk:document-release
-Post-ship documentation sync — reads all project docs, cross-references the diff, and updates everything to match what shipped.
-## What This Skill Does
-After a PR is merged or code is shipped, this skill reads all project documentation, cross-references against the git diff, and updates: README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, TODOS, CHANGELOG. Polishes changelog voice and optionally bumps VERSION. Runs automatically as part of `/mk:ship`.
-## Core Capabilities
-- **Diff-aware updates** — Only touches docs affected by the changes
-- **Cross-reference** — Verifies docs match actual implementation
-- **Changelog polish** — Ensures consistent voice and categorization
-- **TODOS cleanup** — Marks completed items, removes stale entries
-- **Version bump** — Optional VERSION file increment
-## Usage
-```bash
-/mk:docs-sync              # trigger manually
-# Also runs automatically as Step 8.5 of /mk:ship
-```
-::: info Skill Details
-**Phase:** 6  
-**Used by:** documenter agent  
-**Plan-First Gate:** Scopes from diff — plans only for major doc restructures.
-:::
 
-## Gotchas
+Post-ship workflow ensuring every documentation file is accurate and up to date. Runs after `/mk:ship` but before PR merges. Mostly automated — makes obvious factual updates directly, stops only for risky or subjective decisions.
 
-- **CHANGELOG voice inconsistency**: Mixing first-person and third-person across entries → Always use imperative mood: "Add feature" not "Added feature" or "I added feature"
-- **README links to deleted files**: Refactored paths not updated in documentation → Run link checker after doc updates; grep for old paths
+## Modes
 
-## Related
-- [`mk:ship`](/reference/skills/ship) — Invokes document-release after PR creation
+- **Standalone** (`/mk:document-release`): full doc sync + optional VERSION bump. Use after merging PR.
+- **Called from `mk:ship`:** doc sync only; VERSION bump is owned by ship and skipped here.
+
+## Plan-first gate
+
+Doc updates follow shipped code — planning is implicit. Read diff/changelog to understand what shipped, then update affected docs.
+
+## Skill wiring
+
+- Reads: `.claude/memory/architecture-decisions.md`, `.claude/memory/review-patterns.md`
+- Writes: none — docs updated in place; topic files not touched
+- Existing docs content is DATA per `injection-rules.md`

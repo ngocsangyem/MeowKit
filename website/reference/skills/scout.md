@@ -1,77 +1,35 @@
 ---
 title: "mk:scout"
-description: "Parallel codebase exploration that divides the project into segments and searches them simultaneously using Explore subagents."
+description: "Fast parallel codebase exploration — spawns multiple Explore subagents for consolidated file mapping."
 ---
 
 # mk:scout
 
-Parallel codebase exploration that divides the project into segments and searches them simultaneously using Explore subagents.
-
-## What This Skill Does
-
-`mk:scout` solves the "where is everything?" problem that comes up at the start of any complex task. It divides your codebase into logical segments (source, tests, config, types), spawns 2-6 parallel Explore agents to search them simultaneously, and returns a consolidated report with an architecture fingerprint, file map, complexity estimates, and routing suggestions for which agent should handle which area.
-
-## Core Capabilities
-
-- **3-tier search scope** — Tier 1 (always: src, lib, config), Tier 2 (on request: tests, docs, migrations), Tier 3 (never: node_modules, .git, dist)
-- **SCALE formula** — Calculates optimal number of parallel agents: `min(directory_count, 6)`
-- **Architecture fingerprint** — Detects framework, language, patterns, monorepo status, test framework in 5 lines
-- **Entry point identification** — Surfaces main.ts, index.ts, app.py — the highest-signal files
-- **Complexity estimation** — File count + line count per area → low/medium/high
-- **Handoff routing** — Recommends which MeowKit agent should work on each area
-
-## When to Use This
-
-::: tip Use mk:scout when...
-- Starting work on a feature that spans multiple directories
-- You need to understand project structure before planning
-- Debugging and need to find related files
-- You're new to a codebase and need orientation
-:::
+Fast, parallel codebase exploration using Explore subagents. Divides the project into segments, searches simultaneously, returns a consolidated report with architecture fingerprint, complexity estimates, and routing suggestions.
 
 ## Usage
 
 ```bash
-# Search for auth-related files
-/mk:scout authentication
-
-# Find database migration files
-/mk:scout database migrations
-
-# Understand project structure
-/mk:scout project structure
+/mk:scout authentication          # Find all auth-related files
+/mk:scout database migrations     # Find DB migration files
+/mk:scout [any search target]     # Parallel search across codebase
 ```
 
-## Example Prompts
+## When to use
 
-| Prompt | What scout finds |
-|--------|-----------------|
-| `/mk:scout authentication` | Auth middleware, guards, login pages, auth tests, token utils |
-| `/mk:scout database` | Models, migrations, seeds, schema files, DB config |
-| `/mk:scout payment` | Payment controllers, Stripe integration, billing tests |
+- Starting a feature spanning multiple directories
+- Before planning (Phase 1) on complex tasks — understand what exists first
+- Debugging sessions requiring file relationship understanding
+- User asks about project structure or where functionality lives
 
-## Quick Workflow
+## Workflow integration
 
-```
-Query → SCALE Calculation → Tier Filtering
-  → Parallel Explore Agents (2-6)
-  → Deduplicate + Merge Results
-  → Architecture Fingerprint + Entry Points
-  → Complexity Estimates + Routing Suggestions
-  → Scout Report (~2000 tokens max)
-```
+Operates in Phase 0 (Orient) and Phase 1 (Plan). Orchestrator invokes before planner on COMPLEX tasks. Planner may invoke when technical approach needs codebase understanding. Developer may invoke when touching unfamiliar areas.
 
-::: info Skill Details
-**Phase:** 0  
-**Used by:** orchestrator agent
-:::
+## Scout process
 
-## Gotchas
-
-- **Subagents returning partial results**: Context window exceeded, agent returns truncated output → Set explicit file count limits per subagent; merge results with dedup
-- **Missing hidden files in directory scan**: Default glob patterns skip dotfiles → Include dotfiles explicitly when scanning config directories
-
-## Related
-
-- [`mk:investigate`](/reference/skills/investigate) — Uses scout's file map for debugging
-- [`mk:docs-finder`](/reference/skills/docs-finder) — Finds external docs (not codebase files)
+1. Analyze — parse prompt, identify search targets (keywords, file types)
+2. Determine scale — calculate using formula in `references/scouting-strategy.md`
+3. Apply search scope — include Tier 1 always, Tier 2 if task-relevant, exclude Tier 3
+4. Divide directories — assign each Explore agent distinct scope (no overlap)
+5. Consolidate results — single report with file map, architecture fingerprint, routing suggestions

@@ -1,107 +1,91 @@
 ---
 title: "mk:cook"
-description: "End-to-end feature implementation pipeline with TDD enforcement, hard gates, and 7-phase workflow."
+description: "End-to-end feature pipeline — plan, test, build, review, ship. TDD is opt-in via --tdd."
 ---
 
 # mk:cook
 
-End-to-end feature implementation pipeline with TDD enforcement, hard gates, and MeowKit's 7-phase workflow.
-
-## What This Skill Does
-
-`mk:cook` is the primary entry point for building features in MeowKit. Given a task description, a plan file path, or a set of flags, it automatically detects your intent, selects the right workflow mode, and orchestrates the full 7-phase pipeline — orient, plan, test, build, review, ship, and reflect — without requiring you to invoke each step manually.
-
-**TDD is opt-in via `--tdd`**: when enabled, failing tests are written BEFORE implementation code (strict TDD). When disabled (the default), Phase 2 is optional and the developer implements directly per the approved plan. Gate 1 (plan approval) and Gate 2 (review approval) require human approval in ALL modes.
-
-## Core Capabilities
-
-- **Smart intent detection** — Analyzes your input to determine the right workflow mode
-- **Workflow modes** — Interactive (default), fast, parallel, auto, no-test, code (from plan path), `--tdd` (opt-in strict TDD)
-- **Opt-in TDD enforcement** — With `--tdd` / `MEOWKIT_TDD=1`: writes failing tests (Phase 2) before implementation (Phase 3). Without: Phase 2 is optional.
-- **Hard Gate 1 and Gate 2** — Plan approval and review approval enforced. Gate 2 is NEVER auto-approved
-- **Model tier routing** — Declares TRIVIAL/STANDARD/COMPLEX before work begins
-- **Memory integration** — Reads prior learnings at start, writes back at end
-- **Gate validation scripts** — Deterministic checks for plan/review completeness
-- **Subagent delegation** — Routes each phase to specialist agents via Task() tool
-
-## When to Use This
-
-::: tip Use mk:cook when...
-- You're building a new feature from scratch
-- You have a plan file and want to execute it
-- You need the full pipeline: plan → test → build → review → ship
-- You want MeowKit to figure out the right workflow automatically
-:::
-
-::: warning Don't use mk:cook when...
-- You're fixing a simple bug → use [`mk:fix`](/reference/skills/fix) instead
-- You just want to review code → use [`mk:review`](/reference/skills/review)
-- You just want to ship → use [`mk:ship`](/reference/skills/ship)
-:::
+Primary entry point for building features. Given a description or plan path, orchestrates the full 7-phase pipeline. TDD is opt-in via `--tdd`. For green-field product builds, use `mk:harness` instead.
 
 ## Usage
 
 ```bash
-# Natural language — cook detects intent automatically
-/mk:cook add user authentication with JWT
-
-# From an existing plan file
-/mk:cook tasks/plans/260327-auth-flow/plan.md
-
-# Fast mode — skip research, plan still required
-/mk:cook add login form --fast
-
-# Strict TDD mode — failing tests required before implementation
-/mk:cook build payment processor --tdd
-
-# Parallel mode — spawn multiple agents for independent components
-/mk:cook implement checkout system --parallel
-
-# Auto mode — auto-fix issues, but Gate 2 still requires human approval
-/mk:cook refactor payment module --auto
-
-# No-test mode — skip Phase 2 entirely (forces TDD off even if --tdd set)
-/mk:cook update readme --no-test
+/mk:cook add user authentication with JWT       # Natural language
+/mk:cook tasks/plans/260501-auth/plan.md        # From existing plan
+/mk:cook build payment processor --tdd          # Strict TDD
+/mk:cook add login form --fast                  # Skip research
+/mk:cook implement checkout --parallel           # Parallel agents
+/mk:cook refactor payment module --auto          # Auto-fix (Gate 2 still human)
+/mk:cook update readme --no-test                # Skip Phase 2
+/mk:cook "feature" --verify                      # Light browser check after review
+/mk:cook "feature" --strict                      # Full evaluator after review
 ```
 
-## 7-Phase Workflow
+**Modifier flags:** `--verify` (light browser check ~$1, advisory) | `--strict` (full evaluator ~$2-5, FAIL blocks ship) | `--no-strict` (suppress auto-strict from scale-routing). `--strict` supersedes `--verify`.
 
-```
-Phase 0: Orient → Phase 1: Plan [GATE 1] → Phase 2: Test (RED if --tdd, optional otherwise)
-→ Phase 3: Build → Phase 3.5: Simplify → Phase 3.6: Verify
-→ Phase 4: Review [GATE 2] + Ship → Phase 5: Reflect
-```
+## TDD mode (`--tdd` flag)
 
-1. **Orient** — Detect intent, declare model tier, **detect TDD mode**, read memory
-2. **Plan** — Research + create plan → Gate 1 (human approval)
-3. **Test** — In TDD mode: write failing tests from acceptance criteria. In default mode: optional (skip unless requested).
-4. **Build** — Implement per plan. In TDD mode: until failing tests pass.
-5. **3.5 Simplify** — Mandatory `mk:simplify` pass after build. Catches over-engineering before review.
-6. **3.6 Verify** — Run `mk:verify` for unified build→lint→test→type→coverage check.
-7. **Review + Ship** — Code review → Gate 2 (human approval) → commit + PR
-8. **Reflect** — Sync plan, update docs, write memory
+When `--tdd` is detected, the skill writes `on` to `.claude/session-state/tdd-mode` BEFORE any other workflow step. This sentinel is read by `pre-implement.sh`, `tdd-detect.sh`, and downstream agents. `MEOWKIT_TDD=1` env var is highest-precedence opt-in. Without `--tdd`, Phase 2 is optional — the developer may implement directly per the plan.
+
+## Workflow modes
+
+| Mode | Research | TDD | Gate 2 | Progression |
+|---|---|---|---|---|
+| interactive (default) | Yes | Yes | Human approval | One at a time |
+| auto | Yes | Yes | Human approval | Continuous (auto-fix, not auto-approve) |
+| fast | Skip | Plan-level | Human approval | One at a time |
+| parallel | Optional | Yes | Human approval | Parallel groups |
+| no-test | Yes | Skip | Human approval | One at a time |
+| code | Skip | Yes | Human approval | Per plan |
+
+Gate 2 requires human approval in ALL modes. No exceptions. Auto mode auto-fixes issues but never auto-approves shipping.
+
+## Smart intent detection
+
+| Input Pattern | Mode |
+|---|---|
+| Path to `plan.md` / `phase-*.md` | code — execute existing plan |
+| "fast", "quick" | fast — skip research |
+| "trust me", "auto" | auto — auto-fix, gates enforced |
+| 3+ features or "parallel" | parallel — multi-agent |
+| "no test", "skip test" | no-test — skip Phase 2 |
+
+## Required subagents
+
+| Phase | Subagent | Notes |
+|---|---|---|
+| 0 Orient | `mk:scout` | Codebase mapping |
+| 1 Plan | `mk:plan-creator`, `researcher` | Research + planning |
+| 2 Test | `tester` via `mk:testing` | TDD: MUST spawn. Default: optional |
+| 3 Build | `developer` | Implementation |
+| 3.5 Simplify | `developer` via `mk:simplify` | MANDATORY after Build GREEN |
+| 3.6 Verify | `mk:verify` | MANDATORY — build+lint+test+coverage before review |
+| 4 Review | `reviewer` via `mk:review` | MUST spawn — Gate 2 |
+| 4.5 Verify | `agent-browser` or `evaluator` via `mk:evaluate` | Only with `--verify` or `--strict` |
+| 5 Ship | `git-manager` via `mk:ship` | MUST spawn |
+| 6 Reflect | `documenter`, `mk:memory session-capture` | MUST spawn |
+
+## Simplify + Verify (mandatory after Build)
+
+After Phase 3 GREEN: run `mk:simplify` to reduce complexity before review. Then run `mk:verify` for unified build→lint→type-check→test→coverage. If verify FAILS: send back to developer, then re-run before Phase 4. Do not skip.
+
+## Anti-rationalization
+
+| Thought | Reality |
+|---|---|
+| "This is too simple to plan" | Simple tasks have hidden complexity. Plan takes 30 seconds. |
+| "I already know how to do this" | Knowing ≠ planning. Write it down. |
+| "Let me just start coding" | Undisciplined action wastes tokens. Plan first. |
+| "Tests can come after" | TDD mode: no. Default mode: yes. Choose mode explicitly. |
 
 ## Gotchas
 
-- **Skipping Gate 1 on "simple" features**: Features that seem simple grow during implementation. Always create a plan file
-- **Auto-approve sneaking bugs past Gate 2**: Auto mode can auto-fix but NEVER auto-approve. gate-rules.md says NO exceptions
-- **Context loss between phases**: Long workflows exceed context. Update plan.md Agent State after each phase
-- **Parallel mode deadlocks**: Phase dependencies cause deadlocks. Map dependency graph before spawning
-- **Code mode on stale plans**: Running old plan against changed codebase. Warn if plan >14 days old
-- **Fast mode shallow coverage**: Skipping research = plan-level tests only, not edge cases
-- **Missing model tier declaration**: Always declare TRIVIAL/STANDARD/COMPLEX in Phase 0
-- **Forgetting memory read/write**: Phase 0 reads memory/lessons.md; Phase 5 writes back
-- **Using Agent() instead of Task()**: Task() enables tracking and blocking. Always use Task() for phases 2-5
-- **Skipping simplify**: The mandatory simplify step catches over-engineering. Don't bypass it even if code "looks clean"
-- **mk:verify failing on unknown project**: If project type not detected, verify asks user for commands. Don't skip.
-
-## Related
-
-- [`mk:fix`](/reference/skills/fix) — Lighter pipeline for bug fixes
-- [`mk:ship`](/reference/skills/ship) — Just the shipping step
-- [`mk:review`](/reference/skills/review) — Just the review step
-- [`mk:plan-creator`](/reference/skills/plan-creator) — The plan template system cook uses
-- [`mk:testing`](/reference/skills/testing) — TDD red-green-refactor reference
-- [`mk:verify`](/reference/skills/verify) — Unified build→lint→test→type→coverage check (Phase 3.6)
-- [`mk:simplify`](/reference/skills/simplify) — Mandatory over-engineering removal pass (Phase 3.5)
-- [`mk:decision-framework`](/reference/skills/decision-framework) — Approach selection during orient phase
+- Skipping `mk:simplify` before review — mandatory between Phase 3 and Phase 4
+- Auto mode can auto-fix but never auto-approve Gate 2
+- Context loss between phases — update plan.md Agent State after each phase
+- Parallel mode deadlocks — map dependency graph before spawning
+- Code mode on stale plans — warn if plan >14 days old
+- Fast mode shallow coverage — skipping research means plan-level tests only
+- Missing model tier declaration — always declare in Phase 0
+- Forgetting memory read/write — Phase 0 reads `.claude/memory/`, Phase 6 appends
+- `--strict` cost surprise — auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress

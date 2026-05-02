@@ -122,6 +122,7 @@ Skills that can activate in any phase.
 | Skill | What it does |
 |-------|-------------|
 | `mk:docs-finder` | Library/project docs via Context7 + Context Hub |
+| `mk:help` | Navigation assistant — scans project state, recommends next pipeline step |
 | `mk:careful` | Warn before `rm -rf`, `DROP TABLE`, force-push |
 | `mk:freeze` | Restrict edits to one directory during debugging |
 | `mk:multimodal` | Image/video/audio/PDF analysis via Gemini API |

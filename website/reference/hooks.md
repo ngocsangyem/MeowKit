@@ -17,6 +17,8 @@ These run automatically via Claude Code's hook system:
 | `post-write.sh`        | PostToolUse | Edit, Write | Security scan: secrets, `any` type, SQL injection, XSS, destructive patterns              | Yes (exit 2) |
 | `learning-observer.sh` | PostToolUse | Edit, Write | Detect churn patterns (file edited 3+ times); feeds into post-session retroactive capture | No           |
 | `post-session.sh`      | Stop        | Session end | Capture session data to `.claude/memory/`                                                 | No           |
+| `ensure-skills-venv.sh` | SessionStart | Session start | Idempotent bootstrap — creates `.claude/skills/.venv` if absent                         | No           |
+| `tdd-flag-detector.sh`  | UserPromptSubmit | Prompt submit | Detects `--tdd` flag in user prompts, writes sentinel to `session-state/tdd-mode`      | No           |
 
 ## Skill-embedded hooks
 

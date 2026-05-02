@@ -1,67 +1,35 @@
 ---
 title: "mk:skill-creator"
-description: "Scaffold, validate, and register new MeowKit skills with script-driven compliance checking."
+description: "Create new skills with proper structure, compliance checks, and registration. Enforces mk: prefix and context engineering principles."
 ---
 
 # mk:skill-creator
 
-Scaffold, validate, and register new MeowKit skills with script-driven compliance checking.
+Create new skills with proper structure, compliance, and registration. Enforces `mk:` prefix, sub-agents.md structure, and context engineering principles.
 
-## What This Skill Does
+## When to use
 
-`mk:skill-creator` is MeowKit's tool for building new skills. It uses Python scripts for the deterministic parts (directory creation, template generation, compliance validation) and Claude for the creative parts (writing descriptions, designing processes). The result is a compliant skill directory with SKILL.md, references/, and a row in SKILLS_ATTRIBUTION.md.
+- "create a skill", "build a new skill", "make a skill for [X]"
+- Converting external skill for adoption
+- Scaffolding a skill from a workflow pattern
 
-## Core Capabilities
+Explicit: `/mk:skill-creator [name] [description]`
 
-- **Script-driven scaffolding** — `init-skill.py` creates the directory + template SKILL.md with TODO markers for every required section
-- **Name validation** — Enforces `mk:` prefix, kebab-case, max 40 chars, no consecutive hyphens
-- **7-point compliance check** — `validate-skill.py` checks: SKILL.md exists, frontmatter present, mk: prefix, description filled, workflow phase, output template, progressive disclosure
-- **Registration** — Adds skill to SKILLS_ATTRIBUTION.md
+## Script-first approach
 
-## When to Use This
-
-::: tip Use mk:skill-creator when...
-- You want to create a new skill for your project
-- You're converting an external skill for MeowKit
-- You need to scaffold from a workflow pattern
-:::
-
-## Usage
+Python scripts handle scaffolding and validation. Claude reviews and fills content.
 
 ```bash
-# Scaffold a new skill
-/mk:skill-creator mk:my-feature "Description of what it does"
+# Scaffold new skill
+.claude/skills/.venv/bin/python3 .claude/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .claude/skills
 
-# Or use the scripts directly
-python3 .claude/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .claude/skills
-
-# Validate after filling in content
-python3 .claude/skills/skill-creator/scripts/validate-skill.py .claude/skills/my-feature
+# Validate skill
+.claude/skills/.venv/bin/python3 .claude/skills/skill-creator/scripts/validate-skill.py .claude/skills/my-feature/SKILL.md
 ```
 
-## Example Prompts
+## Process
 
-| Prompt | What happens |
-|--------|-------------|
-| `create a skill for database migrations` | Scaffolds mk:db-migrate with TODO markers → Claude fills each section |
-| `create a skill for API documentation` | Scaffolds mk:api-docs → Claude writes process steps + output template |
-| `validate my new skill` | Runs 7-point compliance check, reports score X/7 |
-
-## Quick Workflow
-
-```
-Name + description → init-skill.py (scaffold)
-  → Claude fills TODO sections
-  → validate-skill.py (compliance check)
-  → Score ≥ 6/7? → Register in SKILLS_ATTRIBUTION.md
-  → Score < 6/7? → Fix failing items → re-validate
-```
-
-::: info Skill Details
-**Phase:** any
-:::
-
-## Related
-
-- [`mk:skill-template-secure`](/reference/skills/skill-template-secure) — Security template for skills handling untrusted input
-- [Configuration](/reference/configuration) — Where skills are registered
+1. Scaffold via init script
+2. Fill SKILL.md with name, description, triggers, allowed-tools
+3. Validate via validate script
+4. Register — no separate registration step; validation confirms readiness

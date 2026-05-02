@@ -1,72 +1,41 @@
 ---
 title: git-manager
-description: "Git operations agent that stages, commits, and pushes code with conventional commits."
+description: Git operations agent — stages, commits, and pushes with conventional commit format. Does NOT create PRs.
 ---
 
 # git-manager
 
-Git operations agent that stages, commits, and pushes code with conventional commits. Handles the mechanics of git — not the full ship pipeline.
+Handles git operations: stage, commit, push. Uses conventional commits. Does NOT create PRs or run CI — that's the shipper's job. Runs on Haiku tier.
 
-## Overview
+## Key facts
 
-The git-manager handles focused git operations: staging files, creating commits with conventional prefixes, and pushing to remotes. It operates in 2-4 tool calls for efficiency. Unlike the shipper (which handles PRs, CI verification, and rollback docs), the git-manager focuses purely on commit/push mechanics. Uses the Haiku model.
+| | |
+|---|---|
+| **Type** | Support |
+| **Phase** | 5, any |
+| **Subagent type** | utility |
+| **Auto-activates** | On "commit" or "push" requests |
+| **Never does** | Force push, push to main directly, `git add .` blindly (checks for secrets first), create PRs |
 
-## Quick Reference
+## Workflow
 
-| Operation | What git-manager does |
-|-----------|----------------------|
-| **Assess** | `git status` + `git diff --stat` |
-| **Stage** | Add specific files (never blind `git add .`) |
-| **Commit** | Conventional commit with descriptive message |
-| **Push** | Only when explicitly requested |
+1. Assess — `git status` + `git diff --stat`
+2. Stage — specific files only, never `git add .` blindly
+3. Commit — conventional commit with descriptive message
+4. Push — only if explicitly requested
 
-## Conventional Commits
+## Commit format
+
+```
+<type>(<optional scope>): <short description>
+```
 
 | Prefix | When |
-|--------|------|
-| `feat:` | New feature or capability |
+|---|---|
+| `feat:` | New feature |
 | `fix:` | Bug fix |
 | `refactor:` | Code restructuring, no behavior change |
 | `docs:` | Documentation only |
-| `test:` | Test additions or fixes |
-| `chore:` | Build, CI, deps, config changes |
+| `test:` | Test additions/fixes |
+| `chore:` | Build, CI, deps, config |
 | `perf:` | Performance improvement |
-| `style:` | Formatting, whitespace |
-
-## How to Use
-
-The git-manager is typically invoked by the orchestrator or cook skill after implementation work completes.
-
-```
-User: "commit these changes"
-→ orchestrator routes to git-manager
-→ git-manager: status → stage → commit
-```
-
-## Safety Rules
-
-- Never force-push unless user explicitly requests
-- Never commit `.env`, credentials, or secrets
-- Never commit to `main`/`master` directly
-- Never amend commits without explicit request
-- Always check `git diff --cached` before committing
-- Always pull before push
-
-## Boundaries
-
-| Does | Does NOT |
-|------|----------|
-| Stage, commit, push | Create PRs (shipper) |
-| Conventional commit messages | Run tests (tester) |
-| Pre-commit secret detection | Modify source code |
-| Branch operations | CI verification (shipper) |
-
-## Activation
-
-- User says "commit", "push", or "stage"
-- Cook/fix skill finalize step
-- Team mode task assignment
-
-## Model
-
-**Haiku** — git operations are routine and don't require deep reasoning.

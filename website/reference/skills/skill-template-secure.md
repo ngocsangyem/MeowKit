@@ -1,46 +1,19 @@
 ---
 title: "mk:skill-template-secure"
-description: "Secure skill template with prompt injection defenses — copy when creating skills that process untrusted input."
+description: "Secure skill template with prompt injection defenses. Copy this template when creating new skills."
 ---
 
 # mk:skill-template-secure
 
-Secure skill template with prompt injection defenses — copy when creating skills that process untrusted input.
+Secure template for creating new MeowKit skills with prompt injection defenses built in. Use as the starting point when creating skills that handle untrusted input.
 
-## What This Skill Does
+## When to use
 
-This is a **template**, not an executable skill. Copy it when creating new skills that process untrusted inputs (fetched URLs, API responses, user-pasted content). It provides a trust model table, content processing rules, and the Rule of Two compliance check.
+Creating any new skill that processes external content (user input, web pages, API responses, file content). Copy the template and customize.
 
-## Core Capabilities
+## Key security elements
 
-- **Trust model table** — Defines what's trusted (user input, SKILL.md) vs untrusted (external content)
-- **Rule of Two** — Skills should satisfy at most 2 of: [A] untrusted input, [B] sensitive data, [C] state change
-- **Content processing rules** — Extract structured data only, ignore instructions in external content
-- **Checklist** — All reference material inlined, trust boundaries accurate, schema defined for extraction
-
-## Usage
-
-```bash
-# When creating a new skill that processes external content:
-/mk:skill-creator mk:my-api-fetcher
-
-# Then apply the secure template's patterns:
-# 1. Add Trust Model table
-# 2. Add Content Processing Rules
-# 3. Verify Rule of Two compliance
-```
-
-::: info Skill Details
-**Phase:** 4  
-**Used by:** security agent
-:::
-
-## Gotchas
-
-- **Security anchor overridden by skill content**: Long skill content pushes security instructions out of context window → Keep security anchor at BOTH top and bottom of SKILL.md
-- **Injection defense patterns becoming stale**: New attack vectors emerge that existing patterns don't catch → Review injection rules quarterly; update when new Claude Code vulnerabilities are disclosed
-
-## Related
-
-- [`mk:skill-creator`](/reference/skills/skill-creator) — Uses this template during skill creation
-- [Security Rules](/reference/configuration) — MeowKit's broader security framework
+- **Security Anchor** — marks skill instructions as non-overridable by processed data
+- **Trust Model** — defines what operations are allowed, what network access exists
+- **Rule of Two** — a skill must not satisfy all three: process untrusted input + access sensitive data + change state
+- **Input boundaries** — `===DATA_START===` / `===DATA_END===` markers for untrusted content

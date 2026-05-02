@@ -1,71 +1,36 @@
 ---
 title: architect
-description: "System design specialist for ADR generation, architectural tradeoff evaluation, and pattern enforcement."
+description: Architecture decision agent — evaluates trade-offs with evidence, generates ADRs, reviews plans for architectural soundness.
 ---
 
 # architect
 
-System design specialist for ADR generation, architectural tradeoff evaluation, and pattern enforcement.
+Evaluates architectural trade-offs using evidence and data. Generates Architecture Decision Records (ADRs). Reviews plan files for pattern violations and architectural soundness. Activated at Phase 1 for Complex tasks.
 
-## Overview
+## Key facts
 
-The architect evaluates system design decisions and generates Architecture Decision Records (ADRs). It's selectively inserted by the orchestrator when a task touches database schema, API contracts, service boundaries, auth systems, or infrastructure. It uses the Opus model (best available) because architectural decisions require the deepest reasoning.
+| | |
+|---|---|
+| **Type** | Core |
+| **Phase** | 1 |
+| **Auto-activates** | Complex tasks (schema design, new service boundaries, auth systems, API contracts, infrastructure) |
+| **Owns** | `docs/architecture/` |
+| **Never does** | Write production code, make decisions without evidence |
 
-The architect exclusively owns `docs/architecture/` and produces ADRs with structured consequence tracking.
+## ADR format
 
-## Quick Reference
-
-### Architecture & Design
-
-| Responsibility | Output |
-|---------------|--------|
-| **ADR generation** | `docs/architecture/NNNN-title.md` with Status, Context, Decision, Consequences |
-| **Tradeoff evaluation** | Evidence-based analysis (not opinion) of architectural options |
-| **Pattern enforcement** | Flags when implementation introduces patterns that conflict with existing ADRs |
-| **Plan review** | Validates planner's technical approach for architectural soundness |
-
-### ADR Format
-
-```markdown
-# NNNN: Title
-Status: Proposed | Accepted | Deprecated | Superseded
-## Context — why this decision is needed
-## Decision — what was decided
-## Consequences
-- [+] positive effect
-- [-] negative effect
-- [~] neutral tradeoff
-```
-
-## How to Use
-
-The architect is inserted automatically by the orchestrator for complex tasks. You can also invoke it explicitly:
-
-```bash
-/mk:arch generate    # Create a new ADR
-/mk:arch list        # List existing ADRs
-/mk:design [system]  # System design consultation
-```
-
-## Under the Hood
-
-### Handoff Example
+Generates ADRs at `docs/architecture/adr/YYMMDD-title.md`:
 
 ```
-Orchestrator inserts architect after planner:
-  "Task touches database schema — architect review needed"
-
-Architect output:
-  ADR: docs/architecture/0005-session-storage-redis.md
-  Constraints for developer: Use Redis adapter, not direct client
-  Security note: Encrypt session data at rest
-  → Handoff to tester (Phase 2)
+# NNNN - [Title]
+## Status: Proposed | Accepted | Deprecated | Superseded by [NNNN]
+## Context — What issue motivates this decision?
+## Decision — What change are we proposing?
+## Consequences — Positive, Negative, Neutral
 ```
 
-### Troubleshooting
+NNNN numbers are sequential, zero-padded (0001, 0002, ...).
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Conflicting ADRs | New decision contradicts existing one | Architect marks old ADR as "Superseded" and documents migration |
-| Architect not triggered | Orchestrator didn't detect architectural impact | Explicitly request: "This needs an architecture review" |
-| Opinion without evidence | Shouldn't happen (enforced) | Every recommendation must cite evidence or data |
+## Skills loaded
+
+`mk:plan-creator` (ADR references)

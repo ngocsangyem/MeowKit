@@ -1,70 +1,32 @@
 ---
 title: "mk:vue"
-description: "Vue 3 Composition API patterns with Pinia, reactivity best practices, forms (VeeValidate + Zod), and performance optimization."
+description: "Vue 3 Composition API patterns — Pinia state management, reactivity, component design, forms, performance. Auto-activates on .vue files."
 ---
 
 # mk:vue
 
-Vue 3 Composition API patterns with Pinia, reactivity best practices, forms (VeeValidate + Zod), and performance optimization.
+Vue 3 Composition API patterns, Pinia, reactivity, component design, forms, and performance. Auto-activates on `.vue` files. NOT for TypeScript fundamentals (use `mk:typescript`), visual design (use `mk:frontend-design`), or testing (use `mk:testing`).
 
-## What This Skill Does
+## When to use
 
-`mk:vue` ensures all Vue code follows modern Vue 3 patterns. It enforces `<script setup>` exclusively, Pinia setup stores instead of Vuex, `storeToRefs()` for reactive destructuring, composables instead of mixins, and `ref()` for primitives. The skill prevents common Vue anti-patterns that cause reactivity bugs, unnecessary re-renders, and XSS vulnerabilities.
+Auto-activate on: `.vue` files, Vue 3 Composition API, Pinia stores, `<script setup>`, Vue Router, composables. Explicit: `/mk:vue [concern]`.
 
-## Core Capabilities
+## Core rules (always apply)
 
-- **Script setup enforcement** — Every component uses `<script setup lang="ts">`
-- **Pinia setup stores** — `defineStore('name', () => { ... })` with `storeToRefs()` for reactive destructuring
-- **Reactivity patterns** — `ref()` for primitives, `reactive()` only for complex objects, `computed()` for derived state
-- **Component typing** — `defineProps<T>()` with TypeScript interfaces, `defineEmits<T>()`
-- **Form handling** — VeeValidate + Zod schema validation via `toTypedSchema()`
-- **Performance** — `v-once`, `v-memo`, `defineAsyncComponent()` for code splitting
-- **Security** — Never use `v-html` with dynamic content (XSS vector, MeowKit security rule)
+- ALWAYS use `<script setup lang="ts">` — never Options API
+- ALWAYS use `defineProps` with TypeScript interfaces — never runtime validation
+- ALWAYS use `storeToRefs()` when destructuring Pinia store state
+- NEVER use `v-html` with user content (`security-rules.md` — XSS vector)
+- PREFER composables (`use*`) over mixins
+- Use `npx chub search vue` for documentation packages within Context Hub
 
-## When to Use This
+## Process
 
-::: tip Use mk:vue when...
-- Creating or modifying Vue components
-- Setting up Pinia stores
-- Writing composables (custom hooks)
-- Implementing forms with validation
-- Optimizing Vue component performance
-:::
+1. Detect concern — component? composable? store? form? performance?
+2. Load relevant reference — vue-patterns, pinia, or forms
+3. Apply patterns using Vue 3 best practices
+4. Verify — component renders, types pass, no console warnings
 
-## Usage
+## Phase anchor
 
-```bash
-# Auto-activates on .vue files, or invoke explicitly
-/mk:vue create a user profile component
-/mk:vue set up Pinia auth store
-/mk:vue add form validation with Zod
-/mk:vue optimize this component for performance
-```
-
-## Example Prompts
-
-| Prompt | What vue does |
-|--------|--------------|
-| `create a login form component` | `<script setup>` + defineProps + VeeValidate + Zod schema |
-| `set up auth store with Pinia` | Setup store with `ref()`, `computed()`, `storeToRefs()` usage |
-| `convert Options API to Composition` | Migrates `data()` → `ref()`, `methods:` → functions, `computed:` → `computed()` |
-| `add async component loading` | `defineAsyncComponent(() => import('./Heavy.vue'))` |
-
-## Quick Workflow
-
-```
-Detect concern (component? store? composable? form? performance?)
-  → Load vue-patterns.md reference
-  → Apply: script setup, Pinia, reactivity rules, typing
-  → Verify: component renders, types pass, no console warnings
-```
-
-::: info Skill Details
-**Phase:** 3  
-**Used by:** developer agent
-:::
-
-## Related
-
-- [`mk:typescript`](/reference/skills/typescript) — TypeScript fundamentals
-- [`mk:frontend-design`](/reference/skills/frontend-design) — Visual design patterns
+Phase 3 (Build GREEN). Output supports the `developer` agent.

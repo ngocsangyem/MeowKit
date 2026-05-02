@@ -1,31 +1,31 @@
 ---
 title: "mk:development"
-description: "Development reference toolkit — code patterns, TDD enforcement, and skill loading for Phase 3"
+description: "Implementation toolkit — code patterns, TDD enforcement (opt-in via --tdd), skill lazy-loading. Used by the developer agent."
 ---
 
 # mk:development
 
-Development reference toolkit — code patterns, TDD enforcement, and skill loading for Phase 3
+Reference guides for implementation: code patterns, TDD enforcement (opt-in), and skill loading. Used by the `developer` agent in Phase 2-3.
 
-## What This Skill Does
+## When to use
 
-This is a **reference toolkit** — a collection of guides used by agents during specific workflow phases. Each guide is in the `references/` subdirectory and loaded on-demand.
+- Phase 3 (Build) for implementation guidance
+- `developer` agent needs coding pattern references
+- TDD enforcement rules during red/green/refactor cycle (TDD mode only)
 
-## When to Use This
+## References (loaded on-demand)
 
-Phase 3 (Build GREEN) implementation guidance. Agents load these references automatically — you rarely invoke this skill directly.
+| Reference | When | Content |
+|---|---|---|
+| `code-patterns.md` | During implementation | Architecture patterns, file organization, coding conventions |
+| `tdd-enforcement.md` | Phase 2-3 (TDD mode only) | RED/GREEN/REFACTOR cycle, test-first rules, coverage requirements |
+| `skill-loader.md` | Skill activation | How to load skills on-demand, lazy loading patterns |
 
-::: info Skill Details
-**Phase:** 3  
-**Used by:** developer agent
-:::
+## TDD enforcement
+
+TDD enforcement is OPT-IN as of the TDD-optional migration. Default mode skips RED-phase enforcement. Enable with `--tdd` or `MEOWKIT_TDD=1`.
 
 ## Gotchas
 
-- **TDD enforcement blocking exploratory prototyping**: Strict red-green cycle slows rapid iteration → Default mode (TDD off) is now the right choice for prototypes; opt into `--tdd` only when shipping production-quality work
-- **200-line file rule on generated code**: Auto-generated files (migrations, schemas) exceed limit by design → Exempt generated files explicitly in plan constraints
-
-## Related
-
-- [Workflow Phases](/guide/workflow-phases) — Where this toolkit is used
-- [Agents Overview](/reference/agents/) — Which agents use these references
+- TDD enforcement blocks exploratory prototyping in strict mode → use default mode for prototypes; opt into `--tdd` for production work
+- 200-line file rule exempts auto-generated files (migrations, schemas) by design

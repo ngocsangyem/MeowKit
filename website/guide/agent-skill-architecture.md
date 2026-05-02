@@ -275,4 +275,4 @@ See `output-format-rules.md` Rule 5 for full protocol.
 
 ## Full Skill Registry
 
-See [SKILLS_INDEX.md](/reference/skills-index) for the complete list of all 74+ skills with owner, phase, type, and architecture.
+See [Skills Reference](/reference/skills) for the complete list of all skills organized by phase.

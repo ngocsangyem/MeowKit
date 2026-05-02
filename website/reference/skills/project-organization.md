@@ -1,25 +1,21 @@
 ---
 title: "mk:project-organization"
-description: "Standardize file locations, naming conventions, and directory structure with advisory and organize modes."
+description: "Standardize file locations, naming conventions, and directory structure. Two modes: advisory (return path) and organize (restructure)."
 ---
-# mk:project-organization
-Standardize file locations, naming conventions, and directory structure with advisory and organize modes.
-## What This Skill Does
-Two modes: **Advisory** (other skills ask "where should I put this file?" and get the correct path) and **Organize** (scan a directory, propose renames/moves, execute after confirmation). Enforces kebab-case naming, timestamped vs evergreen patterns, and MeowKit's directory conventions.
-## Core Capabilities
-- **Advisory mode** — Return correct path + naming for any file type
-- **Organize mode** — Scan → categorize → propose → confirm → execute
-- **Directory rules** — src/, docs/, tasks/, tests/, assets/, .claude/
-- **Naming patterns** — Timestamped (YYMMDD-slug), evergreen (slug), variant (slug-variant)
-- **Safety** — Never touches .git/, node_modules/, .env files
-## Usage
-```bash
-/mk:project-organization docs/     # organize docs directory
-"where should I put this report?"    # advisory mode
-```
-::: info Skill Details
-**Phase:** any
-:::
 
-## Related
-- [`mk:clean-code`](/reference/skills/clean-code) — Code-level standards
+# mk:project-organization
+
+Standardizes file locations, naming conventions, and directory structure. Two modes: advisory (return the correct path for a file type) and organize (restructure existing files).
+
+## When to use
+
+- Creating a file and need the correct path
+- Organizing files after a messy session
+- Enforcing naming conventions
+- Other skills need to know where to save output (advisory mode)
+
+Explicit: `/mk:project-organization [targets]`
+
+## Phase anchor
+
+Phase 6 (Reflect) or advisory mode (called by any skill). Output supports the `documenter` agent.

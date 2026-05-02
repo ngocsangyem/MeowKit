@@ -1,127 +1,69 @@
 ---
 title: planner
-description: "Product and engineering planning agent with two-lens review that produces structured plans and enforces Gate 1."
+description: Scope-adaptive planning agent — two-lens review (product + engineering), 6 planning modes, bead decomposition, Gate 1 enforcement.
 ---
 
 # planner
 
-Product and engineering planning agent with two-lens review that produces structured plans and enforces Gate 1.
+Creates structured plans with a two-lens review: product lens ("should we build this?") and engineering lens ("is this the right way?"). Produces plans using `mk:plan-creator` step-file workflow. Enforces Gate 1 — no code without an approved plan.
 
-## Overview
+## Key facts
 
-The planner creates structured implementation plans before any code is written. It applies two lenses: a **product lens** (is this the right thing to build?) and an **engineering lens** (is this the right way to build it?). The output is a plan file at `tasks/plans/YYMMDD-name.md` that must be approved by a human before implementation begins (Gate 1).
+| | |
+|---|---|
+| **Type** | Core |
+| **Phase** | 1 (Plan) |
+| **Auto-activates** | Standard and Complex tasks |
+| **Owns** | `tasks/plans/` |
+| **Never does** | Write production code, self-approve plans, produce plans without all required sections |
 
-The planner challenges your assumptions, evaluates alternatives, estimates effort, and flags risks — all before a single line of code is touched.
+## Planning modes (6 total)
 
-## Quick Reference
+| Mode | Flag | Behavior |
+|---|---|---|
+| Fast | `--fast` | Single `plan.md` with Goal, Context, Scope, Constraints, Approach, ACs. 0 researchers. |
+| Hard | `--hard` (default for complex) | `plan.md` overview (≤80 lines) + `phase-XX-name.md` detail files (12-section template each) |
+| Deep | `--deep` | Hard mode + per-phase scouting. Triggers when 5+ directories affected OR refactor+complex. |
+| Parallel | `--parallel` | Two researchers run simultaneously on different aspects; findings merged before plan. |
+| Two-approach | `--two` | Produces 2 competing plans with "Approach Comparison" section; user selects before Gate 1. |
+| Product-level | `--product-level` | Green-field app builds: Vision, Features with user stories, Design Language, Out-of-Scope. NO file paths, NO class names, NO schemas. |
 
-### Plan File Structure
+**Composable flags:** `--tdd` injects TDD sections (RED phase requirements, test-first ACs, coverage targets) into every phase file.
 
-Every plan MUST include these six sections:
+## Standalone subcommands
 
-| Section | Purpose |
-|---------|---------|
-| **Problem Statement** | What problem this solves and for whom |
-| **Success Criteria** | Measurable definition of done |
-| **Out of Scope** | What this plan explicitly does NOT cover |
-| **Technical Approach** | How it will be built (architecture, components, data flow) |
-| **Risk Flags** | What could go wrong and mitigation strategies |
-| **Estimated Effort** | Time estimate for both human team and MeowKit |
+| Command | Purpose |
+|---|---|
+| `/mk:plan red-team {path}` | 4-persona adversarial review against existing plan; outputs `red-team-findings.md` |
+| `/mk:plan validate {path}` | Structural validation against 12-section template; reports missing/weak sections |
+| `/mk:plan archive` | Moves completed plans to `tasks/plans/archive/`, cleans up stale task files |
 
-### Two-Lens Evaluation
+## Product-level mode
 
-| Lens | Questions asked |
-|------|----------------|
-| **Product** | Is this the right thing to build? Are assumptions validated? Does the user really need this? |
-| **Engineering** | Is the approach sound? Are there simpler alternatives? What are the tradeoffs? |
+For green-field app builds ("build a kanban app"). The planner sets ambition and constraints, not the implementation path.
 
-## How to Use
+**Forbidden in product-level plans:** file paths, class/interface names, function signatures, database schemas, step-by-step instructions, specific package versions.
 
-```bash
-# Explicit invocation
-/mk:plan add user authentication with JWT
+**Required:** ambitious vision (3-5 sentences), ≥8 features with user stories, design language section, AI integration opportunities, explicit out-of-scope anti-features.
 
-# As part of the cook pipeline
-/mk:cook add shopping cart  # → planner runs first automatically
-```
+**Handoff:** after Gate 1, route to `mk:harness` skill (NOT directly to developer). The harness owns sprint-contract negotiation and the generator ⇄ evaluator loop.
 
-The planner will:
-1. Challenge your premises ("Do you really need JWT? Have you considered session-based auth?")
-2. Apply both lenses
-3. Produce a plan file
-4. Wait for your approval (Gate 1)
+## Bead decomposition
 
-## Bead Decomposition
+For COMPLEX tasks (5+ files), decompose into atomic, resumable work units. Each bead: name (`bead-NN-description`), file scope (glob patterns), binary acceptance criteria, estimated size (~150 lines implementation, ~50 lines test), and dependency list. Use template at `tasks/templates/bead-template.md`. Do NOT use beads for TRIVIAL/STANDARD tasks or tasks touching <5 files.
 
-For COMPLEX tasks (touching 5+ files), the planner applies **bead decomposition** before finalizing the plan. Each bead is an atomic, independently committable unit of work.
+## Required context
 
-### What is a bead?
+Load before planning: `docs/project-context.md` (agent constitution), `gate-rules.md` (Gate 1 conditions), `.claude/memory/` for past learnings, `docs/architecture/` ADRs, plan template from `tasks/templates/`, existing codebase structure (via Glob/Grep — do not read all files upfront).
 
-A bead is a self-contained slice of the implementation that:
-- Touches a bounded set of files (typically 1-3)
-- Can be committed and verified independently
-- Has a clear done state (tests pass, type-check passes)
-- Can be resumed if the agent session is interrupted
+## Ambiguity resolution
 
-### How it works
+When requirements are vague: identify the specific ambiguity, ask user for clarification before producing a plan. If clarification unavailable, state assumptions explicitly in the plan's Risk Flags section. Never produce a plan assuming unstated requirements.
 
-```
-COMPLEX task → planner decomposes into N beads
-Each bead:  [files] + [acceptance check] + [commit message]
-Sequence:   bead-01 → commit → bead-02 → commit → ...
-```
+## Failure behavior
 
-The plan file lists beads as numbered sections. The developer processes them sequentially and commits after each. If the session is interrupted mid-task, the developer resumes from the last uncommitted bead — not from scratch.
+If unable to produce a plan: state what is missing (unclear requirements, conflicting constraints, missing context). If plan is rejected: ask for specific feedback, revise only flagged sections — do not rewrite from scratch.
 
-### When to use
+## Gate 1
 
-| Task scope | Approach |
-|-----------|---------|
-| < 5 files | Standard plan — no bead decomposition |
-| 5+ files (COMPLEX) | Bead decomposition required |
-| Parallel subtasks | Beads per agent, worktree isolation |
-
-### validate-plan integration
-
-For COMPLEX tasks, the planner runs `mk:validate-plan` after producing the plan file and before presenting Gate 1. This skill checks 8 quality dimensions:
-
-1. Problem statement clarity
-2. Success criteria are binary (pass/fail, not subjective)
-3. Out-of-scope items explicitly listed
-4. Technical approach matches codebase patterns
-5. Risk flags are actionable (not vague)
-6. Bead boundaries are clean (no circular dependencies)
-7. Effort estimate is realistic
-8. Acceptance criteria map to testable behaviors
-
-A plan that fails `validate-plan` is revised before Gate 1 is presented to the human. The human never sees a plan that hasn't passed the 8-dimension check.
-
-## Under the Hood
-
-### Handoff Example
-
-**Planner receives from orchestrator:**
-```
-Task: "Add user authentication with JWT"
-Complexity: COMPLEX
-Sequence position: Phase 1
-```
-
-**Planner produces:**
-```
-File: tasks/plans/260327-auth-jwt.md
-Status: AWAITING APPROVAL (Gate 1)
-Handoff to: architect (if architectural decisions needed), then tester (Phase 2)
-Risk flags: 2 (session management complexity, token refresh edge cases)
-```
-
-**After human approves:** Pipeline continues to tester (or architect first if flagged).
-
-### Troubleshooting
-
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Plan rejected by user | Scope too broad or wrong approach | Ask planner to narrow scope or explore alternatives |
-| Planner asks too many questions | Task is genuinely ambiguous | Provide more context: target users, constraints, existing patterns |
-| Plan missing sections | Shouldn't happen (enforced) | Report — all 6 sections are mandatory |
-| Can't proceed past Gate 1 | Plan not yet approved | Review and type "approve" to continue |
+Plan approval enforced by `gate-enforcement.sh` — file writes to `src/`, `lib/`, `app/` blocked until plan is approved.

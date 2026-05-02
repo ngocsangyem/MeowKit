@@ -1,23 +1,24 @@
 ---
 title: "mk:lint-and-validate"
-description: "Automatic quality control — runs linting, type checking, and security scanning after every code change."
+description: "Automatic linting and static analysis after code changes. Runs linter + typecheck. NOT for full build verification (use mk:verify)."
 ---
-# mk:lint-and-validate
-Automatic quality control — runs linting, type checking, and security scanning after every code change.
-## What This Skill Does
-Enforces the quality loop: write code → run lint → run typecheck → fix errors → repeat until clean. Supports Node.js/TypeScript (`npm run lint`, `npx tsc --noEmit`) and Python (`ruff check`, `mypy`). No code is committed or reported as "done" without passing these checks.
-## Core Capabilities
-- **Node.js/TypeScript** — `npm run lint`, `npx tsc --noEmit`, `npm audit`
-- **Python** — `ruff check --fix`, `bandit -r`, `mypy`
-- **Mandatory** — No code submitted without passing checks
-- **MeowKit scripts** — Uses `.claude/scripts/validate.py` and `security-scan.py`
-## Usage
-Auto-activates after every code modification. Also triggered by: "lint", "format", "check", "validate", "types", "static analysis".
-::: info Skill Details
-**Phase:** 2  
-**Used by:** tester agent
-:::
 
-## Related
-- [`mk:clean-code`](/reference/skills/clean-code) — Coding standards (principles)
-- [Hooks](/reference/hooks) — `post-write.sh` also runs security checks automatically
+# mk:lint-and-validate
+
+Run lint and type-check after every code change. Submitting code with audit failures is NOT allowed. For the full pipeline (build → lint → type-check → tests → coverage), use `mk:verify`.
+
+## Quality loop
+
+1. Write/Edit Code
+2. Run Audit: `npm run lint && npx tsc --noEmit` (adjust per ecosystem)
+3. Analyze Report — check the report output
+4. Fix & Repeat — submitting code with failures is not allowed
+
+## Ecosystem support
+
+Node.js/TypeScript and Python via `references/linter-commands.md`. If lint fails: fix style/syntax immediately. If type-check fails: fix type errors. If tool missing: install it.
+
+## Gotchas
+
+- Linter config must exist in project — if missing, suggest creating one before running
+- TypeScript projects must have `tsconfig.json` with `noEmit: true` for `tsc --noEmit`

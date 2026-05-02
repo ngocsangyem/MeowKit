@@ -28,6 +28,7 @@ persona: B
 | `/mk:budget` | any | Token cost tracking report |
 | `/mk:party [topic]` | 1 | Multi-agent deliberation — 2-4 agents debate, forced synthesis |
 | `/mk:spawn [agent]` | any | Launch parallel agent session |
+| `/mk:status` | any | Delivery status report via project-manager |
 | `/mk:upgrade` | any | Self-update MeowKit |
 | `/mk:help` | any | Scan project state, recommend next pipeline step |
 | `/mk:harness "build a X"` | 0→5 | Autonomous green-field build with generator/evaluator loop |

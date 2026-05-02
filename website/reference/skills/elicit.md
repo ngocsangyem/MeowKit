@@ -1,117 +1,37 @@
 ---
 title: "mk:elicit"
-description: "Structured second-pass reasoning after code review or plan evaluation using named reasoning methods."
+description: "Structured second-pass reasoning — re-examine review verdicts, plans, or analyses through named methods (pre-mortem, red team, Socratic)."
 ---
 
 # mk:elicit
 
-Structured second-pass reasoning that re-examines an existing output — review verdict, plan, or analysis — through a specific named reasoning lens. Surfaces insights that generic "make it better" requests miss.
+Re-examines existing outputs (review verdict, plan, analysis) through a named reasoning method. Surfaces insights that generic "make it better" requests miss.
 
-## What This Skill Does
+## When to use
 
-`mk:elicit` offers 8 named reasoning methods to apply after any analysis output. It loads the target output (verdict file, plan, or in-session context), presents the method menu, applies the chosen lens, and produces a structured findings report. The result appends to the original output as a supplementary section — it deepens analysis without changing verdicts or gate decisions.
+- After `/mk:review` verdict — deepen analysis before Gate 2
+- After plan creation — stress-test assumptions before Gate 1
+- After any agent output when user wants a specific angle
+- "dig deeper", "what am I missing", "challenge this"
 
-- **8 named methods** — pre-mortem, inversion, red team, Socratic, first principles, constraint removal, stakeholder mapping, analogical
-- **Auto-suggestion** — recommends a method based on context when none is specified
-- **Structured output** — findings ranked by severity: CRITICAL / IMPORTANT / INFORMATIONAL
-- **Non-destructive** — never changes verdicts, never generates code, always user-triggered
-- **Review integration** — optionally offered by `mk:review` after step-04 verdict
+NOT for: initial review (use `mk:review`), creating plans (use `mk:plan-creator`), open exploration (use `mk:brainstorming`), or approach-stuck (use `mk:problem-solving`).
 
-## Reasoning Methods
+## Reasoning methods
 
-| Method | Lens | Best For |
-|--------|------|----------|
-| **Pre-mortem** | "Assume this shipped and failed. Why?" | Risk discovery, failure mode analysis |
-| **Inversion** | "What would make this maximally wrong?" | Assumption testing, edge cases |
-| **Red Team** | "You are an attacker. How do you exploit this?" | Security analysis, adversarial thinking |
-| **Socratic** | "What evidence supports each claim?" | Logic validation, gap detection |
-| **First Principles** | "Strip assumptions. What's fundamentally true?" | Architecture decisions, design simplification |
-| **Constraint Removal** | "What if [constraint X] didn't exist?" | Innovation, scope exploration |
-| **Stakeholder Mapping** | "Who else is affected? What do they need?" | Impact analysis, requirements gaps |
-| **Analogical** | "What similar system solved this differently?" | Alternative approaches, pattern matching |
+| Method | Lens | Best for |
+|---|---|---|
+| Pre-mortem | "It failed. Why?" | Before major releases |
+| Inversion | "What would make this worse?" | Optimizing for robustness |
+| Red Team | Adversarial attack | Security-critical decisions |
+| Socratic | Question assumptions | Entrenched beliefs |
+| Steel Man | Best version of opposing view | Binary decisions |
+| Five Whys | Root cause | Surface symptoms |
+| Second-Order Effects | Downstream consequences | System changes |
+| Devil's Advocate | Argue against consensus | Group decisions |
 
-## When to Use This
+## Process
 
-::: tip Use mk:elicit when...
-- You have a review verdict and want deeper analysis before Gate 2
-- A plan has assumptions you want stress-tested before Gate 1
-- You ask "what am I missing?" or "challenge this"
-- You want a specific angle of analysis, not a generic second opinion
-:::
-
-## Usage
-
-```bash
-# Run after /mk:review — pick a method interactively
-/mk:elicit
-
-# Specify a method directly
-/mk:elicit red-team
-/mk:elicit pre-mortem
-/mk:elicit first-principles
-
-# Target a specific plan file
-/mk:elicit tasks/plans/240315-auth-refactor.md
-```
-
-## Auto-Suggestion Logic
-
-When invoked without a method, `mk:elicit` suggests based on context:
-
-| Context | Suggested Method |
-|---------|----------------|
-| Review found security issues | Red Team |
-| Review found low test coverage | Pre-mortem |
-| Plan has many assumptions | First Principles |
-| Architecture decision | Inversion |
-| Complex feature with many stakeholders | Stakeholder Mapping |
-| Default / unclear | Socratic |
-
-## How It Works
-
-```mermaid
-flowchart LR
-    A[Review verdict\nor plan output] --> B[mk:elicit triggered]
-    B --> C{Method specified?}
-    C -- No --> D[Auto-suggest based\non context]
-    C -- Yes --> E[Apply method directly]
-    D --> F[User confirms method]
-    F --> E
-    E --> G[Re-examine output\nthrough chosen lens]
-    G --> H[Supplementary analysis:\nCRITICAL / IMPORTANT / INFO]
-```
-
-Output format:
-
-```markdown
-## Elicitation: [Method Name]
-
-**Target:** [what was re-examined]
-**Method:** [brief description of the lens applied]
-
-### Findings
-
-1. **[CRITICAL]** [finding] — [recommendation]
-2. **[IMPORTANT]** [finding] — [recommendation]
-3. **[INFORMATIONAL]** [finding] — [observation]
-
-### Summary
-
-[1-2 sentence synthesis of what this method revealed]
-
-### Action Required
-
-- [ ] [specific action items, if any]
-```
-
-::: info Skill Details
-**Phase:** 4 (after verdict) or 1 (after plan creation)
-**Used by:** reviewer agent, planner agent
-**Plan-First Gate:** Always skips — operates on existing outputs, not new plans.
-:::
-
-## See Also
-
-- [`mk:review`](/reference/skills/review) — multi-pass code review that produces the verdict this skill re-examines
-- [`mk:validate-plan`](/reference/skills/validate-plan) — systematic 8-dimension plan quality check
-- [`mk:plan-ceo-review`](/reference/skills/plan-ceo-review) — engineering plan review, another source of outputs to elicit from
+1. Identify the artifact to re-examine
+2. Select method based on goal
+3. Apply method — produce findings structured by the method's framework
+4. Report findings appended to original artifact (never overwrite)

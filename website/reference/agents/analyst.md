@@ -1,63 +1,37 @@
 ---
 title: analyst
-description: "Cost tracking and pattern capture agent. Runs at Phase 0 for budget reporting and Phase 6 for session reflection."
+description: Cost tracking and pattern analysis agent — tracks token usage, extracts patterns, proposes CLAUDE.md improvements.
 ---
 
 # analyst
 
-Cost tracking and pattern capture agent that runs at both ends of the pipeline.
+Tracks token usage, extracts patterns from sessions, and maintains institutional memory. Runs at Phase 0 (session start) and Phase 6 (Reflect). Terminal agent in the pipeline — no further routing after it completes.
 
-## Overview
+## Key facts
 
-The analyst runs at **Phase 0** (Orient) and **Phase 6** (Reflect). At Phase 0, it reads `cost-log.json` for budget reporting and task-cost history. At Phase 6, it processes the session's learnings and routes them to the appropriate topic file — `fixes.md` for bug-class patterns, `architecture-decisions.md` for architectural choices, or `review-patterns.md` for recurring observations.
+| | |
+|---|---|
+| **Type** | Core |
+| **Phase** | 0, 6 |
+| **Auto-activates** | Session start and end |
+| **Owns** | `.claude/memory/` (cost-log.json, patterns, lessons) |
+| **Never does** | Write code, auto-apply CLAUDE.md changes |
 
-Every 10 sessions, it proposes updates to CLAUDE.md based on accumulated patterns (never auto-applies — always proposes for human review).
+## Responsibilities
 
-**How memory loading works:** Consumer skills (mk:fix, mk:plan-creator, mk:review) load the relevant topic files on-demand at their own task start. The analyst does not auto-load or auto-inject memory on every turn — that pipeline was removed in v2.4.0. Topic files are read explicitly by the skill that needs them.
+1. Track token usage in `.claude/memory/cost-log.json`: task name, model, tokens consumed, estimated cost, timestamp
+2. Generate cost reports on `/mk:budget`: spend by task, agent, model tier, over time
+3. Extract patterns into memory: recurring issues, common solutions, frequently needed refactors
+4. Maintain lessons in memory: what worked, what didn't, what to do differently
+5. Propose `CLAUDE.md` updates every 10 sessions based on accumulated patterns — never auto-apply, always propose for human review
+6. Identify cost optimizations: tasks consistently over-classified to expensive model tiers
 
-## Quick Reference
+## Handoff
 
-### Documentation & Management
+- After recording session data → confirm pipeline complete (terminal agent)
+- If cost anomalies detected → recommend routing adjustments to orchestrator
+- When proposing CLAUDE.md updates → hand to orchestrator for human review
 
-| Capability | Details |
-|-----------|---------|
-| **Phase 0 reporting** | Reads `cost-log.json` for budget reporting and task-cost history |
-| **3-category extraction** | Phase 6: routes learnings to fixes.md, architecture-decisions.md, or review-patterns.md |
-| **Cost tracking** | Token usage per task in `memory/cost-log.json` |
-| **Cost reports** | `/mk:budget` — spend by task, agent, model tier, over time |
-| **Pattern capture** | Bug-class patterns → `fixes.json`; review patterns → `review-patterns.json`; decisions → `architecture-decisions.json` |
-| **CLAUDE.md proposals** | After 10 sessions, proposes improvements (severity ≥ critical, saves ≥ 30min, human-approved) |
-| **Cost optimization** | Identifies tasks consistently over-classified to expensive tiers |
-| **Consolidation** | Manual: prunes stale patterns, merges duplicates, archives old cost data (when memory reaches scale) |
+## Skills loaded
 
-## How to Use
-
-```bash
-/mk:budget    # view cost report
-```
-
-The analyst also runs automatically at session end (Phase 6).
-
-## Under the Hood
-
-### Handoff Example
-
-```
-Analyst (session end):
-  Token usage this session: 45,000 (Sonnet)
-  Patterns found: "auth tests frequently need retry" → saved to review-patterns.json
-  Decision: "JWT refresh logic requires integration tests, not unit tests" → architecture-decisions.md
-  Cost note: "3 trivial tasks were classified STANDARD — could be TRIVIAL"
-
-  Sessions since last CLAUDE.md proposal: 8 (2 more until next)
-
-  → No handoff (terminal agent)
-```
-
-### Troubleshooting
-
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Memory files corrupted | Interrupted session or manual edit | Analyst creates fresh files with empty structure |
-| Cost data seems wrong | Token counting is approximate | Analyst logs what's available — never fabricates |
-| CLAUDE.md proposal unwanted | Happens every 10 sessions | Review and accept/reject — never auto-applied |
+`mk:memory` (session capture, patterns, cost tracking)

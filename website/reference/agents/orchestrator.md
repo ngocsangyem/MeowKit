@@ -1,105 +1,100 @@
 ---
 title: orchestrator
-description: "Task router that classifies complexity, assigns model tier, and routes every incoming request to the right specialist agent."
+description: Task router — classifies complexity, assigns model tier, detects TDD mode, and routes every request to the right specialist agent.
 ---
 
 # orchestrator
 
-Task router that classifies complexity, assigns model tier, and routes every incoming request to the right specialist agent.
+Entry point for every task. Classifies complexity (Trivial / Standard / Complex), assigns model tier (Haiku / Sonnet / Opus), detects TDD mode, and routes to the correct specialist agent sequence. Never writes code, tests, or docs.
 
-## Overview
+## Key facts
 
-The orchestrator is the entry point for every task in MeowKit. No task bypasses it. When you give Claude a task, the orchestrator classifies its complexity (Trivial / Standard / Complex), assigns the appropriate model tier (Haiku / Sonnet / Opus), and routes to the correct specialist agent sequence. It enforces both hard gates and reads past session data to make informed routing decisions.
+| | |
+|---|---|
+| **Type** | Core |
+| **Phase** | 0 (Orient) |
+| **Auto-activates** | Every task |
+| **Never does** | Write code, modify files, grade output, downgrade complexity mid-task |
 
-The orchestrator never writes code, tests, or docs. It only makes routing decisions.
+## Routing
 
-## Quick Reference
+| Complexity | Model | Agent sequence | Examples |
+|---|---|---|---|
+| Trivial | Haiku | Direct to specialist | Rename, typo, format |
+| Standard | Sonnet | Planner → Tester → Developer → Reviewer → Shipper | Feature (<5 files), bug fix |
+| Complex | Opus | Planner → Architect → Security(2) → Tester → Developer → Security(4) → Reviewer → Shipper | Architecture, auth, payments |
 
-### Routing & Classification
+Architect is inserted after planner when schema, API, or infra changes are involved. Security is inserted at Phase 2 and Phase 4 for auth/payments/security changes.
 
-| Complexity | Model tier | Agent sequence | Example tasks |
-|-----------|-----------|---------------|---------------|
-| **Trivial** | Haiku (cheapest) | Direct to specialist | Rename, typo, format, version bump |
-| **Standard** | Sonnet (default) | Planner → Tester → Developer → Reviewer → Shipper | Feature (<5 files), bug fix, test writing |
-| **Complex** | Opus (best) | Planner → Architect → Tester → Developer → Reviewer → Shipper | Architecture, security, auth/payments, multi-module |
+## Domain-based routing (Phase 0 — first step)
 
-### Security Escalation
+Before manual classification, `mk:scale-routing` reads keywords from the task and matches against `domain-complexity.csv`. CSV match OVERRIDES manual classification.
 
-Tasks touching auth, payments, user data, or infrastructure **always** escalate to Complex tier and insert the Security agent at Phase 2 and Phase 4.
+| CSV Level | Model Tier | Gate 1 |
+|---|---|---|
+| low + one-shot | TRIVIAL (Haiku) | Bypass eligible |
+| medium | STANDARD (Sonnet) | Required |
+| high | COMPLEX (Opus) | Required |
 
-### Pipeline Gates
+## TDD mode detection (Phase 0 — required)
 
-| Gate | When | What it blocks |
-|------|------|---------------|
-| Gate 1 | After planner (Phase 1) | No implementation without approved plan |
-| Gate 2 | After reviewer (Phase 4) | No shipping without approved review |
+After complexity routing, detect TDD mode:
+- Read `MEOWKIT_TDD` env var or check `--tdd` flag
+- Read `.claude/session-state/tdd-mode` sentinel (written by `tdd-flag-detector.sh`)
+- Print: `TDD mode: ON | OFF`
+- **TDD ON:** invoke tester for Phase 2 RED before developer in Phase 3
+- **TDD OFF (default):** Phase 2 is optional. Route planner → developer → reviewer directly unless plan requires test coverage
 
-## How to Use
+TDD mode does NOT change model tier selection.
 
-The orchestrator activates automatically on every task — you never invoke it explicitly.
+## Escalation rules
 
-```
-You: "Add user authentication with JWT"
-Orchestrator: Task complexity: COMPLEX → using Opus
-              Routing: planner → architect → tester → developer → reviewer → shipper
-              Security agent inserted at Phase 2 and Phase 4 (auth-related)
-```
+- Auth, payments, user data, infrastructure → always Complex
+- Once assigned, tier cannot be downgraded mid-task (anti-rationalization)
+- Code review always runs on Complex tier
+- Security agent ALWAYS runs at Phase 2 and Phase 4 — "no auth changes" is not a valid reason to skip
 
-```
-You: "Fix typo in README line 42"
-Orchestrator: Task complexity: TRIVIAL → using Haiku
-              Routing: direct edit (no pipeline needed)
-```
+## Party mode routing
 
-## Under the Hood
+When the task involves architectural trade-offs: user asks "should we X or Y?", task is COMPLEX with architectural decisions, or orchestrator detects trade-off language — route to `mk:party`. Party Mode is discussion-only. After party decision, resume normal pipeline.
 
-### Orchestration Patterns
+## Parallel execution routing
 
-The orchestrator reads two sources at session start to inform routing:
+When a COMPLEX task has independent subtasks with zero file overlap:
 
-- **Relevant topic files** (`review-patterns.md`, `architecture-decisions.md`) — past patterns that affect routing (e.g., "this codebase has flaky auth tests → always include security agent"), loaded on-demand
-- **`memory/cost-log.json`** — token usage history (avoids over-classifying routine tasks to expensive tiers)
+1. Decompose into 2-3 subtasks with file ownership globs
+2. Create git worktrees via `mk:worktree`
+3. Assign subtasks via `mk:task-queue`
+4. After all complete: merge worktrees → run full test suite
+5. Resume sequential pipeline at review phase
 
-### Agent Communication
+Max 3 agents. Gates remain sequential. See `parallel-execution-rules.md`.
 
-The orchestrator communicates through explicit routing declarations:
+## Planning depth
 
-```
-Task complexity: [TRIVIAL|STANDARD|COMPLEX] → using [model tier]
-Agent sequence: [agent1] → [agent2] → ... → [agentN]
-```
+| Mode | Researchers | Parallel | Two Approaches |
+|---|---|---|---|
+| default | 1 | No | No |
+| strict | 2 | Yes | Yes |
+| fast | 0 (skip) | No | No |
+| architect | 2 | Yes | Yes |
+| audit | 1 | No | No |
+| cost-saver | 0 (skip) | No | No |
+| document | 0 (skip) | No | No |
 
-Every downstream agent knows its position in the sequence and what comes next.
+## Required context
 
-### Handoff Example
+Load before routing: `docs/project-context.md` (agent constitution), `.claude/memory/` topic files relevant to past learnings, `.claude/memory/cost-log.json`, `CLAUDE.md` Agent Roster table, `tasks/plans/` for in-progress plans.
 
-**Standard feature request:**
-```
-User: "Add pagination to the user list API"
+## Ambiguity resolution
 
-Orchestrator output:
-  Task complexity: STANDARD → using Sonnet
-  Routing: planner → tester → developer → reviewer → shipper → documenter → analyst
-  Gate 1: Plan approval required before Phase 2
-  Gate 2: Review approval required before Phase 5
-```
+When task description is ambiguous: identify what is unclear, ask one targeted clarifying question. Never assign COMPLEX tier without understanding full scope. If user says "just do it", classify as STANDARD and route to planner.
 
-**Escalation (auth-related):**
-```
-User: "Add OAuth2 login flow"
+## Failure behavior
 
-Orchestrator output:
-  Task complexity: COMPLEX → using Opus
-  Routing: planner → architect → security(Phase2) → tester → developer →
-           security(Phase4) → reviewer → shipper → documenter → analyst
-  Security: Auto-inserted (auth-related change)
-```
+If unable to classify: state what is blocking, suggest what information would unblock. Never silently default to a tier.
+If agent fails after delegation: report timeout to user, suggest re-run or alternative agent.
 
-### Troubleshooting
+## Output format
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Task over-classified as COMPLEX | Orchestrator being cautious | Accept — security-sensitive tasks always Complex |
-| Agent fails after delegation | Downstream agent timeout or error | Orchestrator reports failure, suggests re-run or alternative |
-| Wrong agent selected | Ambiguous task description | Be more specific in task description |
-| Gate 1 blocking when it shouldn't | Only `/mk:fix` with simple complexity can skip Gate 1 | If task is truly trivial, use `/mk:fix --quick` |
+For every routing decision, state: complexity tier, model tier, execution mode (sequential | parallel | party), planning depth, target agent sequence, context summary for first agent.

@@ -1,29 +1,35 @@
 ---
 title: "mk:clean-code"
-description: "Pragmatic coding standards — SRP, DRY, KISS, YAGNI with concrete anti-patterns and a mandatory self-check."
+description: "Pragmatic coding standards — KISS, DRY, YAGNI, SRP. For ad-hoc quality reviews, not post-hoc diff review or behavior-preserving simplification."
 ---
+
 # mk:clean-code
-Pragmatic coding standards — SRP, DRY, KISS, YAGNI with concrete anti-patterns and a mandatory self-check.
-## What This Skill Does
-Enforces pragmatic coding standards across any language. Core principles: Single Responsibility, Don't Repeat Yourself, Keep It Simple, You Aren't Gonna Need It. Includes concrete anti-patterns (comment every line, helper for one-liner, factory for 2 objects) and a mandatory self-check before completing any task.
-## Core Capabilities
-- **Five principles** — SRP, DRY, KISS, YAGNI, Boy Scout Rule
-- **Naming rules** — Variables reveal intent, functions verb+noun, booleans question form
-- **Function rules** — Max 20 lines, one thing, few args, no side effects
-- **Anti-patterns** — Specific patterns to avoid with concrete replacements
-- **Self-check** — Mandatory verification before task completion
-## Usage
-Auto-activates on all code-writing tasks. No explicit invocation needed.
-::: info Skill Details
-**Phase:** 3  
-**Used by:** developer agent
-:::
 
-## Gotchas
+Enforces KISS/DRY/YAGNI/SRP during authoring and ad-hoc quality reviews. Pragmatic standards: concise, direct, no unnecessary comments. NOT for post-hoc diff/PR review (use `mk:review`); NOT for behavior-preserving simplification (use `mk:simplify`).
 
-- **Over-abstracting simple code**: Creating helpers for one-time operations violates YAGNI → Three similar lines are better than a premature abstraction
-- **Removing error handling deemed unnecessary**: Stripping try-catch from system boundaries loses resilience → Only remove error handling for internal calls with guaranteed contracts
+## Core principles
 
-## Related
-- [`mk:lint-and-validate`](/reference/skills/lint-and-validate) — Automated linting after changes
-- [`mk:typescript`](/reference/skills/typescript) — TypeScript-specific patterns
+| Principle | Rule |
+|---|---|
+| SRP | Single Responsibility — each function/class does ONE thing |
+| DRY | Don't Repeat Yourself — extract duplicates, reuse |
+| KISS | Keep It Simple — simplest solution that works |
+| YAGNI | You Aren't Gonna Need It — don't build unused features |
+| Boy Scout | Leave code cleaner than you found it |
+
+## Process
+
+1. Read existing code — understand structure before changing
+2. Check dependencies — what imports this file? what tests cover it?
+3. Apply coding standards from `references/coding-standards.md`
+4. Self-check — goal met? all files edited? code works? nothing forgotten?
+5. Run verification scripts
+
+## Summary
+
+| Do | Don't |
+|---|---|
+| Write code directly | Write tutorials |
+| Let code self-document | Add obvious comments |
+| Fix bugs immediately | Explain the fix first |
+| Inline small things | Create unnecessary files |

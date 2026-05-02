@@ -1,49 +1,16 @@
 ---
 title: "mk:careful"
-description: "Safety guardrails for destructive commands — warns before rm -rf, DROP TABLE, force-push, and similar operations."
+description: "Session-scoped safety guardrails — warns before rm -rf, DROP TABLE, force-push, git reset --hard, and other destructive operations."
 ---
 
 # mk:careful
 
-Safety guardrails for destructive commands — warns before rm -rf, DROP TABLE, force-push, and similar operations.
+Session-scoped safety guardrails for destructive commands. Warns before `rm -rf`, `DROP TABLE`, `force-push`, `git reset --hard`, `kubectl delete`, and similar operations. Active for current session only. User can override each warning.
 
-## What This Skill Does
+## When to use
 
-`mk:careful` intercepts destructive Bash commands via a PreToolUse hook and warns before execution. It catches: `rm -rf` on important paths, `DROP TABLE/DATABASE`, `git push --force`, `git reset --hard`, `kubectl delete`, and Docker cleanup commands. Safe exceptions (cleaning `node_modules/`, `dist/`, cache) are allowed through.
+Touching prod, debugging live systems, working in a shared environment. User asks "be careful", "safety mode", "prod mode", "careful mode". NOT for scoping edits to a directory (use `mk:freeze`).
 
-## Core Capabilities
+## How it works
 
-- **PreToolUse hook** — Intercepts Bash commands before execution
-- **Pattern detection** — rm -rf, DROP, force-push, hard reset, kubectl delete, docker rm
-- **Safe exceptions** — Build artifacts (node_modules, dist, __pycache__, .cache) pass through
-- **User override** — Warnings can be acknowledged; user decides to proceed or cancel
-
-## Usage
-
-Activates automatically when the skill is loaded. No explicit invocation needed.
-
-```bash
-# These trigger warnings:
-rm -rf /important/path    # → WARNING: Destructive rm -rf detected
-DROP TABLE users;         # → WARNING: DROP TABLE detected
-git push --force          # → WARNING: Force push detected
-
-# These pass through (safe):
-rm -rf node_modules       # → OK (build artifact)
-rm -rf dist               # → OK (build output)
-```
-
-::: info Skill Details
-**Phase:** 5  
-**Used by:** shipper agent
-:::
-
-## Gotchas
-
-- **False positives on legitimate operations**: Pattern matching `rm` or `drop` in file content, not commands → Check command context, not just string presence
-- **Overly broad regex blocking development**: Guard triggers on test fixtures or documentation mentioning destructive commands → Scope guards to actual Bash tool invocations only
-
-## Related
-
-- [`mk:freeze`](/reference/skills/freeze) — Restricts edits to a specific directory
-- [Security Rules](/reference/configuration) — Broader security enforcement
+Every bash command is checked against destructive patterns via `bin/check-careful.sh` PreToolUse hook before running. If detected: warns and asks user to proceed or cancel. Full pattern list at `references/destructive-patterns.md`.

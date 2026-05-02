@@ -1,51 +1,27 @@
 ---
 title: "mk:qa"
-description: "Systematic QA testing with bug fixing, health scores, and ship-readiness assessment across three tiers."
+description: "Systematic QA testing with bug fixing — three tiers (Quick/Standard/Exhaustive), health scores, and fix evidence."
 ---
 
 # mk:qa
 
-Systematic QA testing with bug fixing, health scores, and ship-readiness assessment across three tiers.
+QA engineer AND bug-fix engineer. Tests web applications like a real user — click everything, fill every form, check every state. Finds bugs, fixes them in source with atomic commits, re-verifies. Produces before/after health scores, fix evidence, and ship-readiness summary.
 
-## What This Skill Does
+## When to use
 
-`mk:qa` goes beyond finding bugs — it finds them, fixes them, and verifies the fixes. Three tiers of thoroughness: Quick (critical/high only), Standard (+ medium), Exhaustive (+ cosmetic). Produces before/after health scores and a ship-readiness summary.
+"qa", "QA", "test this site", "find bugs", "test and fix", "fix what's broken", "does this work?"
 
-## Core Capabilities
+## Three tiers
 
-- **Find + fix + verify** — Not just reporting, actually fixes bugs in source code
-- **Three tiers** — Quick, Standard, Exhaustive based on thoroughness needed
-- **Health scoring** — Before/after scores to quantify improvement
-- **Atomic commits** — Each fix committed independently for clean history
-- **Ship-readiness** — Final summary: is this ready to ship?
+| Tier | Scope | When |
+|---|---|---|
+| Quick | Critical + high only | Quick sanity check |
+| Standard | + medium severity | Normal QA pass |
+| Exhaustive | + cosmetic | Before major release |
 
-## When to Use This
+## Process
 
-::: tip Use mk:qa when...
-- A feature is ready for testing and you want bugs found AND fixed
-- You need a ship-readiness assessment
-- You want before/after quality metrics
-:::
-
-## Usage
-
-```bash
-/mk:qa                    # Standard tier
-/mk:qa https://app.com    # QA a specific URL
-```
-
-::: info Skill Details
-**Phase:** 2–4  
-**Used by:** tester agent  
-**Plan-First Gate:** Creates QA scope doc for Standard/Exhaustive tiers. Skips Quick tier.
-:::
-
-## Gotchas
-
-- **Testing only happy path**: All tests pass but edge cases crash in production → Include at least one error scenario, one empty state, and one boundary condition per feature
-- **Not testing with realistic data volumes**: Works with 3 items, crashes with 3000 → Test with representative data sizes; flag performance degradation
-
-## Related
-
-- [`mk:qa-manual`](/reference/skills/qa-manual) — Spec-driven QA + E2E code generation
-- [`mk:browse`](/reference/skills/browse) — The browser tool QA uses
+1. Test — run QA checks at selected tier
+2. Fix — atomic commits per bug fix
+3. Verify — re-test after fixes
+4. Report — before/after health score + evidence + ship-readiness

@@ -1,111 +1,73 @@
 ---
 title: reviewer
-description: "5-dimension structural code review agent that enforces Gate 2 with written verdicts."
+description: 5-dimension structural code review — enforces Gate 2 with written verdicts. Adversarial review with parallel reviewers.
 ---
 
 # reviewer
 
-5-dimension structural code review agent that enforces Gate 2 with written verdicts.
+Performs structural code review across five dimensions. Produces a written verdict at `tasks/reviews/YYMMDD-name-verdict.md`. FAIL blocks shipping (Gate 2). Every finding must be actionable — no vague feedback.
 
-## Overview
+## Key facts
 
-The reviewer performs deep structural reviews across five dimensions: architecture fit, type safety, test coverage, security, and performance. It produces a written verdict file at `tasks/reviews/YYMMDD-name-verdict.md` with PASS, FAIL, or PASS WITH NOTES. A FAIL verdict blocks shipping (Gate 2). Every finding must be actionable — no vague feedback.
+| | |
+|---|---|
+| **Type** | Core |
+| **Phase** | 4 (Review) |
+| **Auto-activates** | After developer (Phase 3) |
+| **Owns** | `tasks/reviews/` |
+| **Never does** | Write code, self-approve, issue PASS with critical finding, provide vague feedback, rubber-stamp |
 
-The reviewer can also invoke the `mk:review` skill for extended capabilities: scope drift detection, adversarial red-teaming, and auto-fix.
-
-## Quick Reference
-
-### Quality & Review
+## Five review dimensions
 
 | Dimension | What it checks |
-|-----------|---------------|
-| **Architecture fit** | Matches existing patterns? Respects ADRs? Accidental complexity? |
-| **Type safety** | No `any` types? No unsafe casts? Generics used appropriately? |
-| **Test coverage** | Adequate tests? Edge cases? Testing behavior not implementation? |
-| **Security** | Runs `.claude/rules/security-rules.md` checklist. Delegates to security agent if deep audit needed. |
-| **Performance** | No N+1 queries? No blocking in async? No unnecessary re-renders? No unbounded fetches? |
+|---|---|
+| **Correctness** | No critical/major bugs. Logic matches requirements. Architecture fits existing patterns. |
+| **Maintainability** | Clean, readable, follows conventions. No `any` types, no unsafe casts. Type safety enforced. |
+| **Performance** | No N+1 queries, no blocking async, no unnecessary re-renders, no unbounded data fetches. |
+| **Security** | Run checklist from `security-rules.md`. Delegate to security agent for deep audit. Security BLOCK → automatic FAIL. |
+| **Coverage** | All acceptance criteria tested? Edge cases covered? Tests test behavior not implementation. **TDD mode:** coverage gaps → FAIL. **Default mode:** coverage gaps → WARN, not FAIL. Zero tests is permitted in default mode. |
 
-### Verdicts
+## Verdicts
 
-| Verdict | Meaning | What happens next |
-|---------|---------|------------------|
-| **PASS** | No blocking issues | → Shipper (Phase 5) |
-| **PASS WITH NOTES** | Non-blocking suggestions | → Shipper (suggestions noted for future) |
-| **FAIL** | Critical findings | → Back to developer (must fix before re-review) |
+| Verdict | Meaning | Effect |
+|---|---|---|
+| PASS | No blocking issues | → Shipper (Phase 5) |
+| PASS WITH NOTES | Non-blocking suggestions | → Shipper, suggestions noted |
+| FAIL | Critical findings | → Back to developer — must fix before re-review |
 
-## Skill Loading
+Every WARN finding requires 3-part justification: what the WARN means, why it's acceptable in this context, what condition would make it a FAIL. If the reviewer cannot articulate all three, WARN becomes FAIL.
 
-The reviewer loads these skills depending on the review scope:
+## Adversarial review architecture
 
-| Skill | Purpose | When loaded |
-|-------|---------|------------|
-| `mk:review` | Multi-pass adversarial review with parallel reviewers | Phase 4, explicit invocation |
-| `mk:elicit` | Structured second-pass reasoning (8 methods) — post-verdict deeper analysis | Optional, after verdict |
-| `mk:scout` | Pre-review edge case detection and context gathering | Optional, before review |
-| `mk:cso` | Scope drift detection against original plan | During review |
-| `mk:vulnerability-scanner` | Deep security audit beyond the 5-dimension checklist | When security dimension flags concern |
+**Phase A — Base Reviewers (3 parallel, isolated contexts):**
 
-### Review Pipeline
+1. **Blind Hunter** — reviews ONLY the diff, no plan/spec. Catches code smells, obvious bugs.
+2. **Edge Case Hunter** — traces every branch, boundary, null path. Finds what breaks at edges.
+3. **Criteria Auditor** — maps each plan acceptance criterion to implementation and tests.
 
-The full reviewer pipeline with all optional steps:
+**Phase B — Adversarial Persona Passes (post-base-review, findings-informed):**
+Separate subagents receive diff + Phase A findings. Security Adversary + Failure Mode Analyst (full scope). Assumption Destroyer + Scope Complexity Critic (full scope, high-complexity domain only).
 
-```mermaid
-flowchart LR
-  S[Scout\noptional] --> GC[Gather\nContext]
-  GC --> P1[Blind\nReview]
-  GC --> P2[Edge Case\nReview]
-  GC --> P3[Criteria\nAudit]
-  P1 & P2 & P3 --> T[Triage]
-  T --> V[Verdict]
-  V --> E[Elicitation\noptional]
-  E --> G2[Gate 2]
-```
+Post-review triage categorizes findings as `current-change` (blocks shipping) vs `incidental` (logged to backlog). Zero findings → re-analyze once (prevents rubber-stamp).
 
-**Scout (optional):** Runs before context gathering to detect edge cases and unusual patterns the main reviewers might miss. Feeds findings into the review context.
+## Skill loading
 
-**Parallel Review:** Three reviewers run simultaneously — Blind Hunter (zero context), Edge Case Hunter (boundary conditions), Criteria Auditor (acceptance criteria). Each is independent to prevent anchoring bias.
+| Skill | When | Purpose |
+|---|---|---|
+| `mk:review` | Always (Phase 4) | Multi-pass adversarial review with step-file workflow |
+| `mk:scout` | Complex changes (3+ files) | Edge case detection: dependents, data flow, async races |
+| `mk:elicit` | After verdict, user-triggered | Structured second-pass reasoning via 8 methods |
+| `mk:cso` | Security concerns found | Deep security audit delegation |
+| `mk:vulnerability-scanner` | Security dimension flagged | Automated vulnerability detection |
 
-**Elicitation (optional):** Post-verdict step using `mk:elicit` to push deeper on any dimension that produced a WARN or borderline PASS. Invoked when the verdict warrants a second-pass challenge.
+## Required context
 
-## How to Use
+Load before reviewing: `docs/project-context.md` (agent constitution), `gate-rules.md` (Gate 2 conditions), implementation files (via git diff), test files, plan file, `docs/architecture/` ADRs, `security-rules.md` checklist, `red-team-findings.md` (if exists in plan directory).
 
-The reviewer runs automatically in Phase 4. You can also invoke `mk:review` directly for the extended multi-pass review with adversarial analysis.
+## Failure behavior
 
-```bash
-# Automatic (Phase 4 of pipeline)
-# Triggered after developer + tester green phase
+If unable to complete review: state which dimensions could not be evaluated and why. Issue FAIL for unevaluated dimensions — never skip a dimension. If implementation does not match plan: flag as architecture fit finding, reference specific plan sections that diverge.
 
-# Explicit review with extended capabilities
-/mk:review              # branch diff
-/mk:review #42          # specific PR
-/mk:review --pending    # uncommitted changes
-```
+## Gate 2
 
-## Under the Hood
-
-### Handoff Example
-
-```
-Reviewer verdict file: tasks/reviews/260327-auth-verdict.md
-
-Verdict: PASS WITH NOTES
-Architecture Fit: PASS — follows existing middleware pattern
-Type Safety: PASS — no any types, proper generics
-Test Coverage: PASS — 87% coverage, edge cases for auth
-Security: PASS — no hardcoded secrets, proper input validation
-Performance: PASS WITH NOTE — consider caching token validation
-
-Suggestions:
-1. Cache JWT validation result for 5min to reduce repeated crypto ops
-
-→ Handoff to: shipper (PASS WITH NOTES allows shipping)
-```
-
-### Troubleshooting
-
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Review stuck on one dimension | Missing context (e.g., no ADRs for architecture check) | Reviewer issues FAIL for unevaluated dimension — provide missing context |
-| FAIL verdict on implementation that matches plan | Plan may have architectural issues | Check if plan itself needs revision via planner |
-| Security dimension triggers concern | Sensitive code detected | Reviewer delegates to security agent for deep audit |
-| Can't proceed to ship | Gate 2 — FAIL verdict active | Fix the critical findings, then re-review |
+Review approval required before Phase 5. No auto-approve. No exceptions.

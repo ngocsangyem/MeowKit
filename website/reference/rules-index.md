@@ -168,6 +168,6 @@ Every rule file follows:
 
 ## See Also
 
-- [Agents Index](/reference/agents-index) — all 15 agents
-- [Skills Index](/reference/skills-index) — all 60+ skills
+- [Agents Reference](/reference/agents) — all 17 agents
+- [Skills Reference](/reference/skills) — all skills organized by phase
 - [Hooks Reference](/reference/hooks) — lifecycle hooks

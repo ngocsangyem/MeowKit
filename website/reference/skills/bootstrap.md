@@ -1,87 +1,25 @@
 ---
 title: "mk:bootstrap"
-description: "End-to-end project orchestrator: research → design → scaffold → plan → implement → docs."
+description: "End-to-end project orchestrator — research → design → plan → scaffold → implement → docs. For new projects from scratch."
 ---
 
 # mk:bootstrap
 
-End-to-end project orchestrator: research → design → scaffold → plan → implement → docs.
+End-to-end project orchestrator for new projects from scratch. Research → design → plan → scaffold → implement → docs. Explicit invocation only — never auto-activates.
 
-## What This Skill Does
+## When to use
 
-`mk:bootstrap` orchestrates the full journey from idea to running code. It doesn't implement anything itself — it wires together MeowKit's existing skills in sequence: parallel research, tech stack selection via brainstorming, design with UI/UX designer, file scaffolding, planning via plan-creator, implementation via cook, and documentation via docs-init.
+Creating a new project from scratch. NOT for autonomous builds of specified products (use `mk:harness`); NOT for single-task feature work (use `mk:cook`).
 
-Complements `npx mewkit init` — CLI = MeowKit infrastructure (.claude/), bootstrap = application code + full pipeline.
+## CLI boundary
 
-## Core Capabilities
+`npx mewkit init` = project infrastructure (`.claude/`). `mk:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
 
-- **4 workflow modes** — Full (all gates), Auto (design gate only), Fast (no gates), Parallel (concurrent implementation)
-- **Research phase** — parallel researcher subagents validate idea + recommend tech stack
-- **Design phase** — UI/UX designer for frontend projects with design guidelines + wireframes
-- **Stack auto-detection** — 40+ stacks via detect-stack.sh (or ask user for unknown)
-- **Progressive scaffolding** — structure → config → source → tests (never all at once)
-- **Full pipeline** — invokes plan-creator, cook, and docs-init (not just handoff text)
-- **CLI boundary** — never touches .claude/ (CLI handles that)
+## Process
 
-## When to Use This
-
-::: tip Use mk:bootstrap when...
-- Starting a new project from scratch
-- You want the full pipeline: research → design → scaffold → plan → implement → docs
-- You need MeowKit's workflow applied from day one
-:::
-
-::: warning Don't use mk:bootstrap when...
-- Project already has source code → use `mk:plan-creator` for new features
-- You only need MeowKit setup → use `npx mewkit init`
-:::
-
-## Usage
-
-```bash
-# Default (auto mode — design gate only)
-/mk:bootstrap build a task management app with Vue 3 + NestJS
-
-# Full mode — gates at every step, maximum control
-/mk:bootstrap build an e-commerce platform --full
-
-# Fast mode — no gates, max speed, good for prototypes
-/mk:bootstrap quick prototype for a CLI tool --fast
-
-# Parallel mode — concurrent implementation for large projects
-/mk:bootstrap build a SaaS dashboard --parallel
-```
-
-## Modes
-
-| Mode | Gates | Research | Design | Best for |
-|------|-------|----------|--------|----------|
-| **Auto** (default) | Design only | Parallel researchers | UI/UX if frontend | Most projects |
-| **Full** | Every step | Parallel researchers | UI/UX if frontend | Critical projects |
-| **Fast** | None | 6 parallel batch | Skip | Prototypes, hackathons |
-| **Parallel** | Design only | Parallel researchers | UI/UX if frontend | Large multi-module projects |
-
-## Pipeline
-
-```
-bootstrap → git init → research → tech stack → design
-  → plan-creator → scaffold files → cook → docs-init → done
-```
-
-::: info Skill Details
-**Phase:** Pre-workflow (full pipeline for new projects)
-**Invocation:** Explicit only — never auto-activates
-:::
-
-## Gotchas
-
-- **Skipping research on "simple" projects**: hidden complexity emerges during implementation → always research unless --fast
-- **Duplicating CLI init**: never generates .claude/ — CLI handles that
-- **Context overflow**: progressive generation per scaffolding-principles.md
-
-## Related
-
-- [`mk:brainstorming`](/reference/skills/brainstorming) — Used during tech stack selection
-- [`mk:plan-creator`](/reference/skills/plan-creator) — Invoked for planning phase
-- [`mk:cook`](/reference/skills/cook) — Invoked for implementation phase
-- [`mk:docs-init`](/reference/skills/docs-init) — Invoked for documentation phase
+1. Research — understand requirements, tech choices
+2. Design — architecture, data model, component tree
+3. Plan — `mk:plan-creator` for structured plan
+4. Scaffold — generate project structure and boilerplate
+5. Implement — `mk:cook` or `mk:harness` for implementation
+6. Docs — `mk:docs-init` for documentation suite

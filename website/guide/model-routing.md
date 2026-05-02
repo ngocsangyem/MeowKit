@@ -1,118 +1,54 @@
 ---
 title: Model Routing
-description: How MeowKit assigns the right AI model tier to each task.
-persona: B
+description: How MeowKit assigns the right AI model tier to each task — Trivial, Standard, or Complex.
 ---
 
 # Model Routing
 
-MeowKit declares complexity before every task, ensuring trivial tasks don't burn expensive models and complex tasks get the reasoning power they need.
+The orchestrator classifies every task by complexity before work begins. Trivial tasks use the cheapest model. Complex tasks get the best reasoning power.
 
 ## Routing table
 
-| Task type | Model tier | Examples |
-|-----------|-----------|---------|
-| **Trivial** | Cheapest (Haiku) | Rename, typo, format, version bump, config change |
-| **Standard** | Default (Sonnet) | Feature (<5 files), bug fix, test writing, API endpoint |
-| **Complex** | Best (Opus) | Architecture, security audit, multi-module refactor, auth/payments |
+| Complexity | Model | Examples |
+|---|---|---|
+| Trivial | Haiku | Rename, typo, format, version bump |
+| Standard | Sonnet | Feature (<5 files), bug fix, test writing |
+| Complex | Opus | Architecture, security audit, auth, payments |
 
-## How it works
+## Escalation rules
 
-The orchestrator agent classifies every incoming task and prints:
+- **Always Complex:** authentication, payment processing, database schema, security audit
+- **Never downgrade:** once assigned, a task stays at its tier for the session
+- **Code review always Complex:** structural audits need highest reasoning
+- **Domain override:** `mk:scale-routing` checks a CSV of domain keywords (fintech, healthcare → force COMPLEX)
 
-```
-Task complexity: STANDARD → using Sonnet
-```
+## Domain-based routing (Phase 0)
 
-### Escalation rules
+Before manual classification, `mk:scale-routing` reads keywords from the task and matches against `domain-complexity.csv`:
 
-- **Always Complex:** Authentication, payment processing, database schema, security audit
-- **Never downgrade:** Once assigned, a task stays at its tier for the entire session
-- **Code review always Complex:** Structural audits need the highest reasoning capability
+| Domain | Keywords | Effect |
+|--------|----------|--------|
+| fintech | payment, stripe, billing, invoice | Force COMPLEX |
+| healthcare | hipaa, phi, ehr, patient data | Force COMPLEX |
+| auth | oauth, jwt, session, credentials | Force COMPLEX |
+| docs | readme, changelog, comment | Allow one-shot |
+| config | env, .yaml, version bump | Allow one-shot |
 
-## Scale-Adaptive Intelligence (Phase 0)
+The CSV is user-editable. Add rows for your project's domains. Scale-routing verdicts cannot be downgraded mid-task.
 
-Before the orchestrator applies manual classification, MeowKit runs **domain-based routing** via the `mk:scale-routing` skill. It reads keywords from the task description and matches them against `domain-complexity.csv`.
+## Planning depth per mode
 
-```
-Task: "Add Stripe payment checkout"
-         │
-         ▼
-mk:scale-routing
-  → domain: fintech
-  → level: high
-  → OVERRIDE → COMPLEX tier (no manual override possible)
-```
+| Mode | Researchers | Approach |
+|------|------------|----------|
+| `strict`, `architect` | 2 (parallel) | Competing approaches, forced synthesis |
+| `default`, `audit` | 1 | Standard depth |
+| `fast`, `cost-saver`, `document` | 0 | Skip research |
 
-### Domain routing table (examples)
+## Adaptive density
 
-| Domain | Keywords | Level | Effect |
-|--------|----------|-------|--------|
-| fintech | payment, stripe, billing, invoice | high | Force COMPLEX |
-| healthcare | hipaa, phi, ehr, patient data | high | Force COMPLEX |
-| auth | oauth, jwt, session, credentials | high | Force COMPLEX |
-| docs | readme, changelog, comment | low | Allow one-shot |
-| config | env, .yaml, version bump | low | Allow one-shot |
+For harness builds, density auto-adjusts per model tier: Haiku → MINIMAL, Sonnet → FULL, Opus 4.6+ → LEAN. See [Adaptive Density](/guide/adaptive-density).
 
-When level is `low` AND the task has zero blast radius, Gate 1 is bypassed (same behavior as `/mk:fix --quick`).
+## See also
 
-### Extending the CSV
-
-The `domain-complexity.csv` file is user-editable. Add rows for your project's specific domains:
-
-```csv
-domain,keywords,level,workflow
-payments,braintree;adyen;paypal,high,full
-internal-tools,admin;dashboard;report,low,one-shot
-```
-
-### Anti-rationalization hardening
-
-Scale-routing verdicts cannot be downgraded mid-task. If the CSV returns COMPLEX, the agent **cannot** argue its way to a cheaper tier. No exceptions.
-
-## Planning Depth Per Mode
-
-Each workflow mode declares a **Planning Depth** — the number of researchers that run before the planner writes the plan.
-
-| Mode | Researchers | Research approach |
-|------|------------|-----------------|
-| `strict` | 2 (parallel) | Competing approaches — each researcher argues a different design |
-| `architect` | 2 (parallel) | Competing approaches — same as strict |
-| `default` | 1 | Standard depth |
-| `audit` | 1 | Security-focused |
-| `fast` | 0 | Skip research |
-| `cost-saver` | 0 | Skip research, minimize tokens |
-| `document` | 0 | Skip research — docs tasks don't need it |
-
-`strict` and `architect` use competing approaches to surface trade-offs that single-researcher planning misses. The synthesis step resolves the competition into a single recommended path before Gate 1.
-
-## Adaptive Density (Harness Pipelines)
-
-When using `/mk:harness`, the scaffolding density (`MINIMAL` / `FULL` / `LEAN`) auto-adjusts based on model tier per the dead-weight thesis. Opus 4.6+ with auto-compaction degrades under full scaffolding; capable models need less ceremony, not more.
-
-| Tier | Model | Density |
-|------|-------|---------|
-| TRIVIAL | Haiku | MINIMAL — short-circuits to `mk:cook` |
-| STANDARD | Sonnet | FULL — contract + 1–3 iterations |
-| COMPLEX | Opus 4.5 | FULL — same as Sonnet |
-| COMPLEX | Opus 4.6+ | LEAN — single-session, contract optional |
-
-**Auto-detection (v2.3.0):** `model-detector.cjs` (SessionStart handler) reads the `model` field from Claude Code's SessionStart stdin and writes the tier + density to `session-state/detected-model.json`. Detection cascade:
-
-1. Stdin `model` field (primary — no env var required)
-2. `MEOWKIT_MODEL_HINT` env var (fallback)
-3. Default: STANDARD tier → FULL density
-
-`MEOWKIT_MODEL_HINT` is now a fallback, not a requirement. Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN`. See [Adaptive Density](/guide/adaptive-density) for the full matrix.
-
-## Agent default models
-
-| Agent | Default | Upgrades to Opus when |
-|-------|---------|----------------------|
-| orchestrator | Haiku | Never (routing only) |
-| planner | Sonnet | Complex multi-phase planning |
-| architect | Sonnet | Schema design, migrations |
-| developer | Sonnet | Never |
-| reviewer | Sonnet | Security-critical reviews |
-| security | Sonnet | Full audits |
-| analyst | Haiku | Never |
+- [Adaptive Density](/guide/adaptive-density) — scaffolding by model capability
+- [Orchestrator agent](/reference/agents/orchestrator) — the routing agent

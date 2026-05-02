@@ -1,73 +1,33 @@
 ---
 title: "mk:typescript"
-description: "Strict TypeScript patterns for null safety, type guards, discriminated unions, utility types, and ESLint configuration."
+description: "Strict TypeScript patterns — null handling, type safety, utility types. Auto-activates on .ts/.tsx files."
 ---
 
 # mk:typescript
 
-Strict TypeScript patterns for null safety, type guards, discriminated unions, utility types, and ESLint configuration.
+Strict TypeScript patterns for type safety, null handling, and modern best practices. Auto-activates on `.ts`/`.tsx` files. NOT for Vue-specific patterns (use `mk:vue`) or visual design (use `mk:frontend-design`).
 
-## What This Skill Does
+## When to use
 
-`mk:typescript` enforces strict TypeScript patterns that prevent the subtle bugs `tsc` doesn't catch on its own. It goes beyond "no `any` types" into the nuances: implicit truthiness checks that miss `0` and `""`, untyped error catches, runtime enums that add bundle weight, and `as` assertions that lie to the compiler. The skill auto-activates on `.ts` and `.tsx` files.
+Auto-activate on: `.ts`, `.tsx`, `.js`, `.jsx` files, type errors, ESLint issues, "fix types", "add types", "TypeScript help". Explicit: `/mk:typescript [concern]`.
 
-## Core Capabilities
+## Core rules (always apply)
 
-- **Strict null handling** — Explicit `=== null || === undefined` instead of implicit truthiness
-- **Type guard patterns** — Proper runtime narrowing instead of `as SomeType` assertions
-- **Discriminated unions** — `{ ok: true; data: T } | { ok: false; error: string }` for result types
-- **Utility type mastery** — Correct use of `Partial`, `Readonly`, `Pick`, `Omit`, `Record`
-- **Import conventions** — `import type { X }` for type-only imports, named exports over defaults
-- **ESLint configuration** — Recommended strict rules for `@typescript-eslint`
-- **Strict tsconfig** — `strict: true`, `noUncheckedIndexedAccess: true`, `exactOptionalPropertyTypes: true`
+- NEVER use `any` — use `unknown` + type guards (enforced by `security-rules.md`)
+- NEVER use type assertion — use `unknown` + type guards
+- NEVER use implicit truthiness for null checks — use explicit `=== null || === undefined`
+- ALWAYS use strict config: `strict: true`, `noUncheckedIndexedAccess: true`
+- ALWAYS use `type` imports: `import type { X } from 'y'`
+- PREFER named exports over default exports
+- PREFER discriminated unions over type assertions
 
-## When to Use This
+## Process
 
-::: tip Use mk:typescript when...
-- You're writing new TypeScript code and want strict patterns
-- You're fixing type errors or ESLint issues
-- You need to refactor code for better type safety
-- You want to set up strict TypeScript configuration
-:::
+1. Detect concern — type error? new code? refactor? ESLint config?
+2. Load relevant reference — strict-null, type-safety, utility-types, or eslint
+3. Apply patterns from references
+4. Verify — `npx tsc --noEmit` must pass with zero errors
 
-::: warning Don't use for...
-- Vue-specific patterns → [`mk:vue`](/reference/skills/vue)
-- Visual/CSS work → [`mk:frontend-design`](/reference/skills/frontend-design)
-:::
+## Phase anchor
 
-## Usage
-
-```bash
-# Auto-activates on .ts/.tsx files, or invoke explicitly
-/mk:typescript fix type errors in auth module
-/mk:typescript add strict null checks
-/mk:typescript configure ESLint for strict TypeScript
-```
-
-## Example Prompts
-
-| Prompt | What typescript does |
-|--------|---------------------|
-| `fix type errors in auth.ts` | Replaces `any` with proper types, adds null guards |
-| `make this function type-safe` | Adds generics, discriminated unions, or type guards |
-| `set up strict TypeScript config` | Generates tsconfig.json with all strict flags |
-| `add ESLint rules for TypeScript` | Configures `@typescript-eslint` strict rules |
-
-## Quick Workflow
-
-```
-Detect concern (type error? new code? refactor? config?)
-  → Load strict-patterns.md reference
-  → Apply: null guards, type guards, utility types, imports
-  → Verify: npx tsc --noEmit → 0 errors
-```
-
-::: info Skill Details
-**Phase:** 3  
-**Used by:** developer agent
-:::
-
-## Related
-
-- [`mk:vue`](/reference/skills/vue) — Vue-specific TypeScript patterns
-- [`mk:frontend-design`](/reference/skills/frontend-design) — Visual/CSS patterns
+Phase 3 (Build GREEN). Output supports the `developer` agent.

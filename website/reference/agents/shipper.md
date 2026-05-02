@@ -1,62 +1,52 @@
 ---
 title: shipper
-description: "Deployment pipeline agent that executes the full ship sequence from pre-checks to PR with rollback documentation."
+description: Deployment agent — runs pre-ship checks, creates conventional commits, opens PRs, verifies CI. Never pushes directly to main.
 ---
 
 # shipper
 
-Deployment pipeline agent that executes the full ship sequence from pre-checks to PR with rollback documentation.
+Handles safe deployment in Phase 5. Runs full test/lint/typecheck, creates conventional commits, opens a PR, and verifies CI. Never pushes directly to main. Documents rollback steps.
 
-## Overview
+## Key facts
 
-The shipper handles Phase 5: getting code from "reviewed and approved" to "PR created and CI passing." It runs pre-ship checks (tests + lint + typecheck), creates conventional commits, pushes to a feature branch, creates a PR via `gh`, and verifies CI passes. Every ship includes rollback documentation. It uses the Haiku model since shipping is routine work.
+| | |
+|---|---|
+| **Type** | Core |
+| **Phase** | 5 (Ship) |
+| **Auto-activates** | After Gate 2 (review approved) |
+| **Never does** | Push to main directly, skip CI verification, ship without passing review verdict, force-push to shared branches, modify source code |
 
-## Quick Reference
+## Ship sequence
 
-### Documentation & Management
+1. Pre-ship checks: test suite, linter, type checker — ALL must pass
+2. Conventional commit: `feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:`, `perf:`, `ci:` prefixes
+3. Branch + PR: feature branch, never main directly
+4. Verify CI: confirm CI pipeline passes
+5. Rollback documentation: document rollback procedure for every ship
 
-| Step | What shipper does |
-|------|------------------|
-| **Pre-ship checks** | Run test suite, linter, type checker — ALL must pass |
-| **Conventional commit** | `feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:` |
-| **Branch + PR** | Feature branch, never commit to main directly |
-| **CI verification** | Verify CI passes on the PR |
-| **Rollback docs** | Every ship includes rollback procedure |
+## Canary deployments
 
-## How to Use
+For production changes, supports gradual rollout with monitoring checkpoints and rollback triggers.
 
-```bash
-/mk:ship                # auto-detect mode
-/mk:ship official       # ship to main
-/mk:ship beta           # ship to dev branch
-```
+## Flags
 
-## Under the Hood
+| Flag | Behavior |
+|---|---|
+| (default) | Standard ship pipeline |
+| `--canary` | Staged deployment with monitoring |
+| `--dry-run` | Preview without pushing or creating PR |
 
-### Handoff Example
+## Handoff
 
-```
-Shipper receives from reviewer:
-  Verdict: PASS
-  Files changed: 5
-  Branch: feature/auth-jwt
+- Ship successful (PR created, CI passing) → route to documenter (Phase 6)
+- Pre-ship checks fail → route to developer or tester for fixes
+- CI fails → route back for fixes based on failure type
+- Always include: PR URL, branch name, commit hash, rollback doc location, CI status
 
-Shipper executes:
-  ✓ Pre-ship: tests pass, lint clean, types clean
-  ✓ Commit: feat(auth): add JWT authentication flow
-  ✓ Push: origin/feature/auth-jwt
-  ✓ PR: https://github.com/org/repo/pull/42
-  ✓ CI: passing
-  ✓ Rollback: documented in PR description
+## Required context
 
-  → Handoff to documenter (Phase 6)
-```
+Load before shipping: `docs/project-context.md`, passing review verdict from `tasks/reviews/`, current branch state and git status, `package.json` (or equivalent) for test/lint/typecheck commands.
 
-### Troubleshooting
+## Failure behavior
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Pre-ship checks fail | Tests, lint, or types have errors | Back to developer/tester to fix |
-| CI fails on PR | Different environment | Report CI failure details — don't retry, diagnose |
-| Can't create PR | No `gh` CLI or auth failure | Create commit/branch locally, ask user to push |
-| Force push attempted | Never allowed | Shipper only uses regular `git push` |
+If pre-ship checks fail: report exactly which check failed with output, recommend routing to developer or tester. If CI fails: report CI failure details with log excerpts, do not retry — route back for diagnosis. If unable to create PR: report the specific error, create commit and branch locally, ask user to push manually.

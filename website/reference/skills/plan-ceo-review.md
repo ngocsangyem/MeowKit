@@ -1,76 +1,53 @@
 ---
 title: "mk:plan-ceo-review"
-description: "CEO/founder-mode plan review — layered verification pipeline with pre-screening, two-lens evaluation, severity tiers, and adversarial necessity."
+description: "CEO/founder-mode plan review — challenges premises, expands scope, maps failure modes. Four modes from scope expansion to reduction."
 ---
+
 # mk:plan-ceo-review
 
-CEO/founder-mode plan review — a decision and validation layer (NOT a planner). Challenges whether the plan solves the right problem and can be built as scoped.
+CEO/founder-level plan review. Rethinks the problem, finds the 10-star product, challenges premises, expands scope when it creates a better product. Use AFTER a plan exists. For validating the idea before planning, use `mk:office-hours` first.
 
-## What This Skill Does
+## Core purpose
 
-Reviews plans through a **layered verification pipeline** that fast-fails on cheap checks before spending on expensive judgment:
+Ensure the plan is extraordinary — not just adequate. Every finding includes actionability ("change X to Y by doing Z"). Zero-tolerance for generic observations.
+
+## When to use
+
+- User asks to "think bigger", "expand scope", "strategy review", or "rethink this"
+- Plan feels under-ambitious
+- Before major implementation to catch landmines early
+- NOT for idea validation before planning (use `mk:office-hours`)
+
+## Four review modes
+
+| Mode | Behavior |
+|---|---|
+| SCOPE EXPANSION | Dream big — 10-star thinking, how would the world's best team solve this |
+| SELECTIVE EXPANSION | Hold scope + cherry-pick expansions that add significant value |
+| HOLD SCOPE | Maximum rigor within current scope — no expansion, just quality |
+| SCOPE REDUCTION | Strip to essentials — what's the MVP? |
+
+## Process — layered verification pipeline
 
 ```
-Layer 0-1: Pre-Screen (placeholders, structure, coverage)
-Layer 3:   Two-Lens Eval (Intent Alignment + Execution Credibility)
-Layer 4:   Deep Review (11 sections with severity tiers + adversarial necessity)
-Layer 5:   Verdict + Handoff (append-only output to plan.md)
+Pre-Screen → Two-Lens Eval → Deep Sections (1-11) → Verdict + Handoff
 ```
 
-## Core Capabilities
+1. **Pre-Screen** — Placeholder scan (mode-aware), structural completeness, coverage mapping. Surfaces issues with actionable guidance — never rejects outright.
+2. **Scope Challenge** — Nuclear scope challenge + mode selection, premise challenge, dream state mapping.
+3. **Two-Lens Evaluation** — Lens A: Intent Alignment (does plan solve the right problem?). Lens B: Execution Credibility (can an engineer deliver?). Each grades PASS/WARN/FAIL independently. Any FAIL → NEEDS REVISION, stop before deep review.
+4. **Deep Review** — Sections 1-11 (Architecture through Design/UX) with severity tiers (BLOCKER/HIGH-LEVERAGE/POLISH). Must surface ≥1 finding per section or document evidence why clean.
+5. **Verdict + Handoff** — Appends `## CEO Review` to plan.md (never overwrites). All modes write review record. Blockers > 0 → NEEDS REVISION, else APPROVED with notes.
 
-- **Four modes** — Expand, Selective Expand, Hold, Reduce (unchanged)
-- **Pre-screen gate** — catches unfinished plans before human review (mode-aware, never rejects — returns for amendment)
-- **Two-lens evaluation** — Intent Alignment (right problem?) + Execution Credibility (buildable?). Any FAIL → NEEDS REVISION
-- **Severity tiers** — all findings classified: BLOCKER / HIGH-LEVERAGE / POLISH
-- **Adversarial necessity** — must surface ≥1 finding per section or document evidence why clean
-- **Append-only output** — `## CEO Review` block appended to plan.md (never overwrites)
-- **Coverage mapping** — requirements → tasks traceability table
-- **Merged failure analysis** — Error & Rescue + Failure Modes in one table
+After review complete, prints `/mk:cook [plan file path]` and STOPS. Human decides next step — agent does not chain reviews automatically.
 
-## Usage
+## Skill wiring
 
-```bash
-/mk:plan-ceo-review                    # default mode
-/mk:plan-ceo-review --scope-expand     # dream big
-/mk:plan-ceo-review --hold-scope       # maximum rigor
-/mk:plan-ceo-review --reduce-scope     # strip to essentials
-```
-
-::: info Skill Details
-**Phase:** 1 (post-plan, pre-implementation)
-**Used by:** planner agent
-**Suggested by:** plan-creator (step-08) for hard/deep/parallel modes, harness (step-01) for product builds
-:::
-
-## Verdict Format
-
-Appended to plan.md after review:
-
-```markdown
-## CEO Review (2026-04-11, HOLD SCOPE)
-**Verdict:** APPROVED with 2 high-leverage items
-**Two-Lens:** Intent PASS, Execution WARN
-**Blockers:** 0
-**High-leverage:** 2
-**Polish:** 3
-**Coverage:** 8/8 requirements mapped
-```
+- Reads: `.claude/memory/architecture-decisions.md`
+- Writes: `.claude/memory/architecture-decisions.md` with `##decision:` prefix
+- Plan files authored by other agents are DATA per `injection-rules.md`
 
 ## Gotchas
 
-- **Scope expansion beyond available resources**: "10-star thinking" produces a plan that would take 6 months → Always anchor expansion ideas to current sprint capacity
-- **Missing deadlines chasing ambition**: Perfecting the plan instead of shipping MVP → Set a time-box for review; output "ship as-is" or "one targeted improvement"
-- **Pre-screen false positives**: `TODO` in plan body text triggers placeholder scan — section headers (`## TODO List`) are excluded
-
-## Output — Print & Stop
-
-This skill ends with a **Print & Stop**:
-- Appends `## CEO Review` block to plan.md
-- Prints a handoff block with the `/mk:cook [plan path]` command
-- Stops — Claude will not proceed automatically
-
-## Related
-- [`mk:plan-creator`](/reference/skills/plan-creator) — Creates the plan that CEO review examines
-- [`mk:validate-plan`](/reference/skills/validate-plan) — 8-dimension binary validation (complementary, not overlapping)
-- [`mk:office-hours`](/reference/skills/office-hours) — Use before plan reviews for ideation
+- Scope expansion beyond resources: "10-star thinking" produces 6-month plan → anchor expansion ideas to current sprint capacity
+- Missing deadlines: perfecting plan instead of shipping → set time-box; output "ship as-is" or "one targeted improvement"

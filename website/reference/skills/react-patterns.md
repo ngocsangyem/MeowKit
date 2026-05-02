@@ -1,54 +1,26 @@
 ---
 title: "mk:react-patterns"
-description: "React and Next.js performance optimization — 45+ rules from Vercel Engineering. Auto-activates on .tsx/.jsx files."
+description: "React/Next.js performance optimization — waterfall elimination, bundle optimization, re-render reduction. Provides context-aware rules."
 ---
 
 # mk:react-patterns
 
-React and Next.js performance optimization — 45+ rules across 8 priority categories from Vercel Engineering.
+React and Next.js performance optimization across priority categories. Complements `mk:typescript` (type safety) and `mk:vue` (Vue patterns). Auto-activates on `.tsx`/`.jsx` files when React project detected.
 
-## What This Skill Does
+## When to use
 
-`mk:react-patterns` provides battle-tested performance patterns for React and Next.js development. Rules are prioritized by impact — CRITICAL patterns (eliminating waterfalls, bundle optimization) can save 200-800ms, while MEDIUM patterns (re-render optimization) improve perceived responsiveness.
-
-## Core Capabilities
-
-- **5 reference categories** — async patterns, bundle optimization, server patterns, re-render optimization, rendering performance
-- **Priority-ranked** — CRITICAL → HIGH → MEDIUM so you fix highest-impact issues first
-- **Code examples** — every rule has problem/solution with concrete code
-- **Vercel Engineering source** — patterns proven at scale (Next.js, Vercel platform)
-
-## Rule Categories
-
-| Priority | Category | Key wins |
-|----------|----------|----------|
-| CRITICAL | Async patterns | Promise.all, Suspense boundaries, defer await |
-| CRITICAL | Bundle size | No barrel imports (saves 200-800ms), dynamic imports |
-| HIGH | Server performance | React.cache(), parallel fetching, minimize serialization |
-| MEDIUM | Re-render optimization | Derived state, functional setState, memo, transitions |
-| MEDIUM | Rendering performance | content-visibility, hoist JSX, conditional render |
-
-## When to Use This
-
-::: tip Use mk:react-patterns when...
 - Writing or reviewing React/Next.js components
-- Fixing performance issues (slow load, janky UI, large bundle)
-- Deciding server vs client component boundaries
-- Optimizing data fetching patterns
-:::
+- Optimizing bundle size or render performance
+- Fixing re-render issues
+- Server vs client component decisions
+- Data fetching patterns
 
-::: info Skill Details
-**Phase:** 3 (Build) — auto-activates on .tsx/.jsx files alongside mk:typescript
-:::
+## Rule categories (by priority)
 
-## Gotchas
-
-- **Premature optimization**: profile first with React DevTools Profiler, then optimize
-- **Over-memoizing**: React.memo only when profiler confirms expensive re-renders
-- **Barrel file trap**: importing from index.ts pulls entire module — always import from source
-
-## Related
-
-- [`mk:typescript`](/reference/skills/typescript) — TypeScript type safety (complements React patterns)
-- [`mk:vue`](/reference/skills/vue) — Vue 3 patterns (equivalent for Vue projects)
-- [`mk:frontend-design`](/reference/skills/frontend-design) — UI/UX design patterns
+| Priority | Category | Key rules |
+|---|---|---|
+| CRITICAL | Eliminating waterfalls | Defer await, parallel promises, Suspense boundaries |
+| CRITICAL | Bundle size | No barrel imports, dynamic imports, defer third-party |
+| HIGH | Server performance | `React.cache()`, LRU cache, parallel fetching, `after()` |
+| MEDIUM | Re-render optimization | Derived state, functional setState, memo, transitions |
+| MEDIUM | Rendering performance | `content-visibility`, hoist JSX, conditional render |

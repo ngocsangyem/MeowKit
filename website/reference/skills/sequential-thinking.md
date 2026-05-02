@@ -1,84 +1,29 @@
 ---
 title: "mk:sequential-thinking"
-description: "Structured step-by-step reasoning with hypothesis generation, elimination, revision, and deterministic thought tracking scripts."
+description: "Structured step-by-step reasoning — hypothesis generation, evidence-based elimination, explicit revision. Used by mk:fix diagnosis phase."
 ---
 
 # mk:sequential-thinking
 
-Structured step-by-step reasoning with hypothesis generation, elimination, revision, and deterministic thought tracking.
+Structured reasoning with hypothesis generation, elimination, and explicit revision capability. Prevents jumping to conclusions or guessing root causes without evidence.
 
-## What This Skill Does
+## When to use
 
-`mk:sequential-thinking` prevents the "guess root causes" anti-pattern. Instead of jumping to "I think it's X", it enforces evidence-based reasoning: generate hypotheses from observations, test each against evidence, eliminate until root cause is confirmed.
+- Complex problem requiring multi-step reasoning
+- Debugging where root cause isn't obvious
+- When `mk:fix` invokes diagnosis phase
+- Architecture decisions with multiple trade-offs
+- Any "I think it's X" that needs evidence before acting
 
-Called by `mk:fix` during diagnosis, but also useful standalone for complex architecture decisions or multi-step analysis.
+NOT for trivial fixes (typo, lint) or single-file changes with obvious cause. NOT for strategic stuck-ness (use `mk:problem-solving`).
 
-## Core Capabilities
+## Process
 
-- **Hypothesis-driven investigation** — generate → test → eliminate → conclude
-- **Evidence-based only** — every hypothesis needs verifiable evidence
-- **Revision capability** — explicitly revise when new evidence contradicts
-- **Branching** — explore 2-3 alternatives, converge with decision rationale
-- **Structured output** — hypothesis table + elimination + root cause conclusion
-- **Deterministic scripts** — `process-thought.js` tracks history/branches, `format-thought.js` outputs box/markdown/JSON
-- **Advanced techniques** — spiral refinement, multi-branch convergence, progressive context deepening
-- **Concrete examples** — debugging, API design, architecture decision walkthroughs
+1. **State the problem** — observed vs expected
+2. **Generate hypotheses** — from evidence, NOT guessing. Each needs: what would confirm, what would refute
+3. **Test hypotheses** — use Grep/Read/Bash to find evidence
+4. **Eliminate** — mark each CONFIRMED, REFUTED, or INCONCLUSIVE with evidence
+5. **Conclude** — root cause with confidence level + evidence chain
+6. **Scope the fix** — what must change to address root cause (not symptoms)
 
-## When to Use This
-
-::: tip Use mk:sequential-thinking when...
-
-- Root cause isn't obvious (multiple possibilities)
-- mk:fix invokes diagnosis phase
-- Architecture decision with competing approaches
-- Any "I think it's X" needs evidence before acting
-  :::
-
-## Scripts
-
-| Script               | Purpose                                               | Usage                                                                               |
-| -------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `process-thought.js` | Validate, track history, branches, revisions (max 20) | `node scripts/process-thought.js --thought "..." --number 1 --total 5 --next true`  |
-| `format-thought.js`  | Format as box/simple/markdown/JSON                    | `node scripts/format-thought.js --thought "..." --number 1 --total 5 --format json` |
-| `test-scripts.sh`    | 13-test suite for both scripts                        | `sh scripts/test-scripts.sh`                                                        |
-
-The `--summary` flag on process-thought.js produces a context-efficient handoff for mk:fix.
-
-## References
-
-| Reference                  | When to load                                                   |
-| -------------------------- | -------------------------------------------------------------- |
-| `hypothesis-testing.md`    | Always — output template for diagnosis                         |
-| `core-patterns.md`         | When using revision or branching                               |
-| `advanced-techniques.md`   | Complex problems (spiral refinement, multi-branch convergence) |
-| `advanced-strategies.md`   | Uncertainty or revision cascades                               |
-| `examples-debug.md`        | Performance debugging walkthrough                              |
-| `examples-api.md`          | API design reasoning                                           |
-| `examples-architecture.md` | Architecture decision                                          |
-| `gotchas.md`               | Common reasoning mistakes                                      |
-
-### Diagnostic Frameworks
-
-Load when a specific methodology fits the investigation:
-
-| Reference                | When to load                                                                            |
-| ------------------------ | --------------------------------------------------------------------------------------- |
-| `five-whys-plus.md`      | Post-mortems, recurring problems, human-error investigations — bias guards + stopping criteria |
-| `scientific-method.md`   | A/B tests, performance investigations, production incidents — falsifiable prediction discipline |
-| `kepner-tregoe.md`       | Multi-system bugs, contested root causes — IS/IS-NOT matrix (SA/PA/DA/PPA)              |
-
-::: info Skill Details
-**Phase:** Called by mk:fix (Step 2 Diagnose). Also standalone.
-:::
-
-## Gotchas
-
-- **Premature conclusion**: test minimum 2 hypotheses before concluding
-- **Evidence-free hypotheses**: every hypothesis needs verifiable evidence
-- **Confirmation bias**: actively search for evidence AGAINST each hypothesis
-
-## Related
-
-- [`mk:fix`](/reference/skills/fix) — Calls sequential-thinking during diagnosis
-- [`mk:investigate`](/reference/skills/investigate) — Collects evidence that feeds into sequential-thinking
-- [`mk:problem-solving`](/reference/skills/problem-solving) — Sister skill for "stuck on approach" (not cause)
+New evidence contradicting earlier conclusions → explicit REVISION step, not silent override.

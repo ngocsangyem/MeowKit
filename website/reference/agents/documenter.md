@@ -1,57 +1,37 @@
 ---
 title: documenter
-description: "Living documentation agent that keeps project docs in sync with the codebase and generates changelogs."
+description: Documentation agent — maintains living docs, changelogs, and project context in sync with the codebase.
 ---
 
 # documenter
 
-Living documentation agent that keeps project docs in sync with the codebase and generates changelogs.
+Maintains project documentation in Phase 6 (Reflect). Syncs docs with code changes, generates changelogs from conventional commits, and keeps API docs current. Runs on Haiku tier to minimize cost.
 
-## Overview
+## Key facts
 
-The documenter runs in Phase 6 (Reflect) after shipping. It scans the git diff, identifies which docs are affected by the changes, updates them, and generates changelog entries from conventional commits. It uses `mk:docs-sync` for diff-aware updates and `mk:docs-init` for new project skeleton generation. It exclusively owns `docs/` except `docs/architecture/` (architect) and `docs/journal/` (journal-writer).
+| | |
+|---|---|
+| **Type** | Core |
+| **Phase** | 6 |
+| **Auto-activates** | After ship (Phase 5) |
+| **Owns** | `docs/` (EXCEPT `docs/architecture/` — architect, and `docs/journal/` — journal-writer) |
+| **Never does** | Write production code |
 
-## Quick Reference
+## Responsibilities
 
-### Documentation & Management
+- `/mk:document-release` after every feature: scan git diff, update only affected doc sections, verify against implementation
+- `/mk:docs-init` for new projects: scout codebase, generate initial `docs/` directory from analysis
+- Generate changelogs from conventional commits, grouped by type (features, fixes, breaking changes)
+- Keep API docs in sync: endpoint signatures, request/response schemas, error codes
+- Maintain README and guides as codebase evolves
+- Flag documentation gaps when identified
 
-| Capability | Details |
-|-----------|---------|
-| **Diff-aware sync** | Scans git diff to find affected documentation sections |
-| **Changelog generation** | Creates entries from conventional commits (grouped by type) |
-| **API doc sync** | Keeps endpoint signatures, schemas, and error codes current |
-| **Accuracy verification** | Verifies docs match actual implementation |
-| **Gap flagging** | Identifies undocumented features or stale sections |
+## Handoff
 
-## How to Use
+- After docs sync → route to analyst for cost/learning analysis (final phase)
+- If docs reveal implementation inconsistencies → flag and route to developer or reviewer
+- Include: updated doc files, changelog entries, remaining gaps
 
-```bash
-/mk:docs-sync   # update docs based on recent changes
-/mk:docs-init   # generate initial doc skeleton for new project
-```
+## Skills loaded
 
-## Under the Hood
-
-### Handoff Example
-
-```
-Documenter receives from shipper:
-  Ship: feat(auth): add JWT authentication
-  Diff: 5 files changed
-
-Documenter actions:
-  ✓ Updated: docs/api-reference.md (new /auth endpoints)
-  ✓ Updated: README.md (added auth section to quick start)
-  ✓ Generated: CHANGELOG entry under "Added"
-  ✗ Gap found: No docs for token refresh flow
-
-  → Handoff to analyst (final phase)
-```
-
-### Troubleshooting
-
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Docs contradict implementation | Code changed after docs were written | Documenter flags inconsistency — routes to developer/reviewer |
-| Can't determine what changed | No git diff available | Ask for explicit commit range or file list |
-| Placeholder docs generated | Shouldn't happen (enforced) | Every section must have real content |
+`mk:documentation`, `mk:document-release` (post-ship doc sync), `mk:llms` (generate llms.txt)
