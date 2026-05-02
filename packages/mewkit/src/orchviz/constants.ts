@@ -65,6 +65,20 @@ export function resolveSubagentChildName(input: Record<string, unknown>): string
 	return String(input.description || input.subagent_type || "subagent").slice(0, CHILD_NAME_MAX);
 }
 
+// ─── Pause detection ────────────────────────────────────────────────────────
+
+/** Maximum bytes for detail.plan preview (truncated server-side). */
+export const PLAN_PREVIEW_MAX = 2048;
+/** Hard cap for permission_request heuristic; emit pause_cleared even without tool_result. */
+export const PERMISSION_HEURISTIC_MAX_MS = 60_000;
+/**
+ * Minimum pause duration to surface in the UI (debounce — used by sse-handler in phase-06).
+ * Do NOT redeclare locally in phase-06; import from here.
+ */
+export const PAUSE_MIN_DURATION_MS = 200;
+/** Safety cap for hook_blocked pause; parser cleanup clears after this. */
+export const HOOK_BLOCKED_MAX_MS = 300_000;
+
 // ─── HTTP/SSE server ────────────────────────────────────────────────────────
 
 export const BIND_HOST = "127.0.0.1";

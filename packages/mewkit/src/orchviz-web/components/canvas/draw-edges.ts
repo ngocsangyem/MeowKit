@@ -119,6 +119,11 @@ export function drawEdges(
     const baseAlpha = hasActiveParticles ? BEAM.activeAlpha : BEAM.idleAlpha
     const pulsing = hasActiveParticles ? Math.sin(time * ANIM.pulseSpeed) * 0.1 + 0.9 : 1
 
+    // Determine if target agent is in a paused state (phase-03 edge tint)
+    const targetAgent = agents.get(edge.to)
+    const targetIsPaused = !!targetAgent &&
+      (targetAgent.state === 'paused' || targetAgent.state === 'waiting_permission')
+
     const cp = computeControlPoints(fromX, fromY, toX, toY)
     if (!cp) continue
     const { cp1x, cp1y, cp2x, cp2y } = cp
@@ -136,6 +141,18 @@ export function drawEdges(
     if (hasActiveParticles) {
       drawTaperedBezier(ctx, fromX, fromY, cp1x, cp1y, cp2x, cp2y, toX, toY,
         bw.startW + BEAM.glowExtra.startW, bw.endW + BEAM.glowExtra.endW, beamColor, BEAM.glowExtra.alpha)
+    }
+
+    // Amber tint overlay for edges leading into paused agents
+    if (targetIsPaused) {
+      const edgePath = new Path2D()
+      edgePath.moveTo(fromX, fromY)
+      edgePath.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, toX, toY)
+      ctx.globalCompositeOperation = 'lighter'
+      ctx.strokeStyle = COLORS.pausedScrim
+      ctx.lineWidth   = bw.startW + 2
+      ctx.stroke(edgePath)
+      ctx.globalCompositeOperation = 'source-over'
     }
 
     ctx.restore()

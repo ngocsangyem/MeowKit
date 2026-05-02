@@ -16,5 +16,9 @@
 		"baseUrl": "src/orchviz-web",
 		"paths": { "@/*": ["./*"] }
 	},
-	"include": ["src/orchviz-web/**/*.ts", "src/orchviz-web/**/*.tsx"]
+	"include": [
+		"src/orchviz-web/**/*.ts",
+		"src/orchviz-web/**/*.tsx",
+		"src/orchviz/protocol.ts"
+	]
 }

@@ -15,6 +15,8 @@ interface PhasePipelineProps {
 	gate2Verdict: "PASS" | "WARN" | "FAIL" | null;
 	onPhaseClick?: (id: CanonicalPhaseState["id"]) => void;
 	onGateClick?: (id: "G1" | "G2") => void;
+	/** Phase-05: forces the active chip into amber-pulse mode. */
+	paused?: boolean;
 }
 
 function Connector() {
@@ -37,25 +39,26 @@ export function PhasePipeline(props: PhasePipelineProps) {
 	const get = (id: CanonicalPhaseState["id"]): CanonicalPhaseState =>
 		byId.get(id) ?? { id, label: id, status: "pending" };
 
+	const paused = props.paused === true;
 	return (
 		<div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-			<PhaseChip phase={get("orient")} onClick={props.onPhaseClick} />
+			<PhaseChip phase={get("orient")} onClick={props.onPhaseClick} paused={paused} />
 			<Connector />
-			<PhaseChip phase={get("plan")} onClick={props.onPhaseClick} />
+			<PhaseChip phase={get("plan")} onClick={props.onPhaseClick} paused={paused} />
 			<Connector />
 			<GateDiamond id="G1" verdict={null} approved={props.gate1Approved} onClick={props.onGateClick} />
 			<Connector />
-			<PhaseChip phase={get("test")} onClick={props.onPhaseClick} />
+			<PhaseChip phase={get("test")} onClick={props.onPhaseClick} paused={paused} />
 			<Connector />
-			<PhaseChip phase={get("build")} onClick={props.onPhaseClick} />
+			<PhaseChip phase={get("build")} onClick={props.onPhaseClick} paused={paused} />
 			<Connector />
-			<PhaseChip phase={get("review")} onClick={props.onPhaseClick} />
+			<PhaseChip phase={get("review")} onClick={props.onPhaseClick} paused={paused} />
 			<Connector />
 			<GateDiamond id="G2" verdict={props.gate2Verdict} onClick={props.onGateClick} />
 			<Connector />
-			<PhaseChip phase={get("ship")} onClick={props.onPhaseClick} />
+			<PhaseChip phase={get("ship")} onClick={props.onPhaseClick} paused={paused} />
 			<Connector />
-			<PhaseChip phase={get("reflect")} onClick={props.onPhaseClick} />
+			<PhaseChip phase={get("reflect")} onClick={props.onPhaseClick} paused={paused} />
 		</div>
 	);
 }

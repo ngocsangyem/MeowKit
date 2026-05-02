@@ -24,8 +24,15 @@ export const COLORS = {
   tool_calling: '#ffbb44',
   complete: '#66ffaa',
   error: '#ff5566',
-  paused: '#888899',
+  // [red-team #13] paused repurposed from gray #888899 → amber #ffaa33
+  // (old gray deleted; no `inactive` token per validation Q5 YAGNI)
+  paused: '#ffaa33',
   waiting_permission: '#ffaa33',
+  // Pause-state derived tokens
+  pausedDim:    '#ffaa3380',
+  pausedBg:     'rgba(255, 170, 51, 0.15)',
+  pausedBorder: 'rgba(255, 170, 51, 0.35)',
+  pausedScrim:  'rgba(255, 170, 51, 0.04)',
 
   // Edge/Particle Colors
   dispatch: '#cc88ff',

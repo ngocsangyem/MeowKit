@@ -3,10 +3,22 @@ import {
   type TimelineEntry,
   emptyContextBreakdown,
 } from '@/lib/agent-types'
+import type { PauseReason, PauseDetail } from '../../../orchviz/protocol'
 import { COLORS } from '@/lib/colors'
 import { AGENT_SPAWN_DISTANCE } from '@/lib/canvas-constants'
 import { pushTimelineBlock, type ProcessEventContext, type MutableEventState } from './process-event'
 import { edgeId, asString, asBoolean } from './types'
+
+// ── Pause label helper ────────────────────────────────────────────────────────
+function pauseLabel(reason: PauseReason): string {
+  switch (reason) {
+    case 'permission_request': return 'Permission'
+    case 'ask_user_question':  return 'Question'
+    case 'plan_mode_review':   return 'Plan Review'
+    case 'tool_rejected':      return 'Rejected'
+    case 'hook_blocked':       return 'Hook Blocked'
+  }
+}
 
 export function handleAgentSpawn(
   payload: Record<string, unknown>,
@@ -118,7 +130,17 @@ export function handleAgentComplete(
   const name = asString(payload.name)
   const agent = state.agents.get(name)
   if (agent && agent.state !== 'complete') {
-    state.agents.set(name, { ...agent, state: 'complete', completeTime: currentTime })
+    // [red-team #7] Clear pause fields so pause_cleared arriving after agent_complete
+    // doesn't leave a ghost amber node via the toolUseId guard.
+    state.agents.set(name, {
+      ...agent,
+      state: 'complete',
+      completeTime: currentTime,
+      pauseReason: null,
+      pauseToolUseId: undefined,
+      pauseDetail: undefined,
+      pauseStartedAt: undefined,
+    })
 
     const entry = state.timelineEntries.get(name)
     if (entry) {
@@ -129,7 +151,16 @@ export function handleAgentComplete(
     const agentsToComplete = [name]
     for (const [childId, childAgent] of state.agents) {
       if (childAgent.parentId === name && childAgent.state !== 'complete') {
-        state.agents.set(childId, { ...childAgent, state: 'complete', completeTime: currentTime })
+        // [red-team #7] Cascade: clear pause fields on child agents too
+        state.agents.set(childId, {
+          ...childAgent,
+          state: 'complete',
+          completeTime: currentTime,
+          pauseReason: null,
+          pauseToolUseId: undefined,
+          pauseDetail: undefined,
+          pauseStartedAt: undefined,
+        })
         agentsToComplete.push(childId)
         const childEntry = state.timelineEntries.get(childId)
         if (childEntry) {
@@ -193,4 +224,68 @@ export function handleModelDetected(
       tokensMax: ctx.getContextWindowSize(model),
     })
   }
+}
+
+// ── Typed pause event handlers (phase-03) ────────────────────────────────────
+// [red-team #14] handlePermissionRequested above is RETAINED and UNCHANGED.
+// handlePauseStarted fires in parallel for typed pause_started events.
+// Both push timeline blocks independently.
+
+export function handlePauseStarted(
+  payload: Record<string, unknown>,
+  currentTime: number,
+  state: MutableEventState,
+  ctx: ProcessEventContext,
+): void {
+  const agentName = asString(payload.agent, 'Orchestrator')
+  const reason    = asString(payload.reason, 'permission_request') as PauseReason
+  const toolUseId = typeof payload.toolUseId === 'string' ? payload.toolUseId : undefined
+  const detail    = (payload.detail ?? undefined) as PauseDetail | undefined
+
+  const agent = state.agents.get(agentName)
+  if (!agent || agent.state === 'complete') return
+
+  state.agents.set(agentName, {
+    ...agent,
+    state: 'paused',
+    pauseReason:    reason,
+    pauseToolUseId: toolUseId,
+    pauseDetail:    detail,
+    pauseStartedAt: Date.now(),
+  })
+
+  // [red-team #14] Preserve timeline block side-effect (same as handlePermissionRequested)
+  const entry = state.timelineEntries.get(agentName)
+  if (entry) {
+    pushTimelineBlock(entry, currentTime, { type: 'idle', label: pauseLabel(reason), color: COLORS.paused }, ctx)
+  }
+}
+
+export function handlePauseCleared(
+  payload: Record<string, unknown>,
+  state: MutableEventState,
+): void {
+  const agentName = asString(payload.agent, 'Orchestrator')
+  const reason    = asString(payload.reason, 'permission_request') as PauseReason
+  const toolUseId = typeof payload.toolUseId === 'string' ? payload.toolUseId : undefined
+
+  const agent = state.agents.get(agentName)
+  if (!agent) return
+
+  // [red-team #18] For heuristic permission_request, server omits toolUseId.
+  // Match by (agent, reason) instead of toolUseId for this specific reason.
+  const matches = reason === 'permission_request'
+    ? agent.pauseReason === 'permission_request'
+    : agent.pauseToolUseId === toolUseId
+
+  if (!matches) return
+
+  state.agents.set(agentName, {
+    ...agent,
+    state: 'thinking',
+    pauseReason:    null,
+    pauseToolUseId: undefined,
+    pauseDetail:    undefined,
+    pauseStartedAt: undefined,
+  })
 }

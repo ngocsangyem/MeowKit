@@ -26,18 +26,29 @@ import {
 	getActiveEdgeIds,
 } from "./canvas/index.js";
 import { drawEffects, type VisualEffect } from "./canvas/draw-effects.js";
+import { findAgentAt } from "./canvas/hit-detection";
 
 interface AgentCanvasProps {
 	simulationRef: MutableRefObject<SimulationState>;
+	/** Called with the agent id when the canvas is clicked over an agent node. */
+	onAgentClick?: (agentId: string) => void;
 }
 
-export function AgentCanvas({ simulationRef }: AgentCanvasProps) {
+export function AgentCanvas({ simulationRef, onAgentClick }: AgentCanvasProps) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const visualEffectsRef = useRef<VisualEffect[]>([]);
 	const edgeMapCacheRef = useRef<{ source: unknown; map: ReturnType<typeof buildEdgeMap> }>({
 		source: null,
 		map: new Map(),
 	});
+	// Camera transform (CSS pixels) — exposed via ref so click→world hit-test
+	// can read the same value the renderer uses.
+	const camRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+	// Latest onAgentClick — read inside the listener without re-attaching.
+	const onAgentClickRef = useRef<typeof onAgentClick>(onAgentClick);
+	useEffect(() => {
+		onAgentClickRef.current = onAgentClick;
+	}, [onAgentClick]);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -49,7 +60,7 @@ export function AgentCanvas({ simulationRef }: AgentCanvasProps) {
 
 		let raf = 0;
 		const dpr = window.devicePixelRatio || 1;
-		const cam = { x: 0, y: 0 };
+		const cam = camRef.current;
 		let parentW = 0;
 		let parentH = 0;
 
@@ -119,9 +130,26 @@ export function AgentCanvas({ simulationRef }: AgentCanvasProps) {
 		resize();
 		tick();
 
+		const onClick = (ev: MouseEvent): void => {
+			const handler = onAgentClickRef.current;
+			if (!handler) return;
+			const state = simulationRef.current;
+			if (!state || !state.agents) return;
+			const rect = canvas.getBoundingClientRect();
+			// CSS pixels relative to canvas; cam is also CSS pixels (post ctx.scale(dpr)).
+			const cssX = ev.clientX - rect.left;
+			const cssY = ev.clientY - rect.top;
+			const worldX = cssX - cam.x;
+			const worldY = cssY - cam.y;
+			const id = findAgentAt(worldX, worldY, state.agents);
+			if (id) handler(id);
+		};
+		canvas.addEventListener("click", onClick);
+
 		return () => {
 			cancelAnimationFrame(raf);
 			ro.disconnect();
+			canvas.removeEventListener("click", onClick);
 		};
 	}, [simulationRef]);
 

@@ -10,6 +10,10 @@ import type { PendingToolCall, ToolResultBlock } from "../protocol.js";
 import { ARGS_MAX, CHILD_NAME_MAX, RESULT_MAX, FAILED_RESULT_MAX } from "../constants.js";
 import { summarizeResult, buildDiscovery, detectError } from "../tool-summarizer.js";
 import { estimateTokensFromContent } from "../token-estimator.js";
+import { createLogger } from "../logger.js";
+import { _getPauseRecord, _getPendingRejections } from "./handle-system.js";
+
+const log = createLogger("handle-tool-result");
 
 export function handleToolResult(
 	parser: TranscriptParser,
@@ -31,6 +35,75 @@ export function handleToolResult(
 		} else {
 			session.contextBreakdown.toolResults += tokenCost;
 		}
+	}
+
+	// ── Rejection detection [red-team #1] ─────────────────────────────────────
+	// MUST use block.content string scan — block.is_error and entry.toolUseResult
+	// do NOT exist on ToolResultBlock (protocol.ts:63-67 defines only type, tool_use_id, content).
+	const resultText = _extractResultText(block.content);
+	const isUserRejection =
+		resultText.includes("User rejected tool use") ||
+		resultText.startsWith("The user doesn't want to proceed with this tool use");
+
+	// Log a warning if detectError flagged it but we didn't match a known rejection string,
+	// in case Claude Code changes the wording (stability note from phase-02 spec).
+	if (!isUserRejection && detectError(result)) {
+		log.debug("tool_result has error but no known rejection string", {
+			toolName,
+			resultPreview: result.slice(0, 80),
+		});
+	}
+
+	if (isUserRejection) {
+		const key = `${sessionId ?? ""}:${agentName}`;
+		_getPendingRejections(parser).add(key);
+		// Record pause start so handle-text.ts can compute durationMs on clear.
+		_getPauseRecord(parser).set(key, {
+			reason: "tool_rejected",
+			toolUseId: block.tool_use_id,
+			startedAt: Date.now(),
+		});
+		parser.delegate.emit(
+			{
+				time: parser.delegate.elapsed(sessionId),
+				type: "pause_started",
+				payload: {
+					agent: agentName,
+					reason: "tool_rejected",
+					toolUseId: block.tool_use_id,
+					toolName,
+				},
+			},
+			sessionId,
+		);
+	}
+
+	// ── pause_cleared for AskUserQuestion / ExitPlanMode ─────────────────────
+	// When matching tool_result arrives, clear the typed pause and emit durationMs.
+	const pauseRecord = _getPauseRecord(parser);
+	const pauseKey = `${sessionId ?? ""}:${agentName}`;
+	const activeTypedPause = pauseRecord.get(pauseKey);
+	if (
+		activeTypedPause &&
+		activeTypedPause.toolUseId === block.tool_use_id &&
+		(activeTypedPause.reason === "ask_user_question" ||
+			activeTypedPause.reason === "plan_mode_review")
+	) {
+		const durationMs = Date.now() - activeTypedPause.startedAt;
+		pauseRecord.delete(pauseKey);
+		parser.delegate.emit(
+			{
+				time: parser.delegate.elapsed(sessionId),
+				type: "pause_cleared",
+				payload: {
+					agent: agentName,
+					reason: activeTypedPause.reason,
+					toolUseId: block.tool_use_id,
+					durationMs,
+				},
+			},
+			sessionId,
+		);
 	}
 
 	ctxPending.delete(block.tool_use_id);
@@ -82,4 +155,20 @@ export function handleToolResult(
 	);
 
 	if (session) parser.delegate.emitContextUpdate(agentName, session, sessionId);
+}
+
+/**
+ * Extract a plain string from ToolResultBlock.content for rejection detection.
+ * [red-team #1] NEVER use block.is_error or entry.toolUseResult — those fields don't exist.
+ */
+function _extractResultText(
+	content: ToolResultBlock["content"],
+): string {
+	if (typeof content === "string") return content;
+	if (Array.isArray(content)) {
+		return content
+			.map((c) => (c as { text?: string }).text ?? "")
+			.join("");
+	}
+	return "";
 }

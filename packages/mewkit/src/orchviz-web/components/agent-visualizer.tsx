@@ -20,9 +20,11 @@ import { TranscriptPanel } from "./transcript-panel";
 import { TopStrip } from "./top-strip";
 import { BottomBar } from "./bottom-bar";
 import { GateDrawer } from "./drawers/gate-drawer";
+import { PauseDetailDrawer } from "./drawers/pause-detail-drawer";
 import { LiveViewChip } from "./live-view-chip";
 import { COLORS } from "@/lib/colors";
 import { loadSelectedSlug, saveSelectedSlug } from "@/lib/selected-slug-store";
+import { selectPauseSummary } from "@/lib/pause-labels";
 import { ToastProvider } from "./toast";
 
 export function AgentVisualizer() {
@@ -68,6 +70,49 @@ export function AgentVisualizer() {
 
 	const [showTranscript, setShowTranscript] = useState(false);
 	const [openGate, setOpenGate] = useState<"G1" | "G2" | null>(null);
+	// pauseDrawer.agentName=null while in list-view mode (≥2 paused).
+	const [pauseDrawer, setPauseDrawer] = useState<{ open: boolean; agentName: string | null }>({
+		open: false,
+		agentName: null,
+	});
+
+	// Mutual exclusion with GateDrawer — only one right-side drawer open at a time.
+	const openPauseDrawer = useCallback((agentName: string | null): void => {
+		setOpenGate(null);
+		setPauseDrawer({ open: true, agentName });
+	}, []);
+	const closePauseDrawer = useCallback((): void => {
+		setPauseDrawer({ open: false, agentName: null });
+	}, []);
+	const openGateExclusive = useCallback((id: "G1" | "G2"): void => {
+		setPauseDrawer({ open: false, agentName: null });
+		setOpenGate(id);
+	}, []);
+
+	// Auto-close drawer when its represented pause clears (or agent vanishes).
+	useEffect(() => {
+		if (!pauseDrawer.open || !pauseDrawer.agentName) return;
+		const a = agents.get(pauseDrawer.agentName);
+		if (!a || a.state !== "paused") {
+			closePauseDrawer();
+		}
+	}, [agents, pauseDrawer.open, pauseDrawer.agentName, closePauseDrawer]);
+
+	const pauseSummary = useMemo(() => selectPauseSummary(agents), [agents]);
+	const pausedAgents = pauseSummary.agents as import("@/lib/agent-types").Agent[];
+
+	const drawerAgent = useMemo(() => {
+		if (!pauseDrawer.open || !pauseDrawer.agentName) return null;
+		return agents.get(pauseDrawer.agentName) ?? null;
+	}, [agents, pauseDrawer.open, pauseDrawer.agentName]);
+
+	const onCanvasAgentClick = useCallback(
+		(id: string): void => {
+			const a = agents.get(id);
+			if (a && a.state === "paused") openPauseDrawer(a.name);
+		},
+		[agents, openPauseDrawer],
+	);
 
 	useEffect(() => {
 		play();
@@ -93,11 +138,15 @@ export function AgentVisualizer() {
 				}}
 			>
 				<TopStrip
-					onGateClick={(id) => setOpenGate(id)}
+					onGateClick={openGateExclusive}
 					selectedSlug={selectedSlug}
 					onSelectSlug={handleSelectSlug}
 					activePlan={activePlan}
 					onLiveViewSubtitle={setLiveViewSubtitle}
+					pauseSummary={pauseSummary}
+					onPausePillClick={(s) =>
+						openPauseDrawer(s.count === 1 && s.first ? s.first.name : null)
+					}
 				/>
 
 				<main
@@ -108,7 +157,7 @@ export function AgentVisualizer() {
 					}}
 				>
 					<div className="relative overflow-hidden">
-						<AgentCanvas simulationRef={frameRef} />
+						<AgentCanvas simulationRef={frameRef} onAgentClick={onCanvasAgentClick} />
 						<LiveViewChip subtitle={liveViewSubtitle} />
 						{isEmpty && (
 							<div
@@ -142,9 +191,19 @@ export function AgentVisualizer() {
 					agentCount={agents.size}
 					showTranscript={showTranscript}
 					onToggleTranscript={() => setShowTranscript((v) => !v)}
+					pausedCount={pauseSummary.count}
 				/>
 
 				<GateDrawer gate={openGate} onClose={() => setOpenGate(null)} />
+
+				<PauseDetailDrawer
+					open={pauseDrawer.open}
+					onClose={closePauseDrawer}
+					agent={drawerAgent}
+					pausedAgents={pausedAgents}
+					onSelectAgent={(name) => setPauseDrawer({ open: true, agentName: name })}
+					onBackToList={() => setPauseDrawer({ open: true, agentName: null })}
+				/>
 			</div>
 		</ToastProvider>
 	);

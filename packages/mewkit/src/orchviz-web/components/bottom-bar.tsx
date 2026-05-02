@@ -6,6 +6,8 @@ interface BottomBarProps {
 	agentCount: number;
 	showTranscript: boolean;
 	onToggleTranscript: () => void;
+	/** Phase-05: number of currently paused agents — drives the inline ⏸ PAUSED indicator. */
+	pausedCount?: number;
 }
 
 export function BottomBar({
@@ -13,6 +15,7 @@ export function BottomBar({
 	agentCount,
 	showTranscript,
 	onToggleTranscript,
+	pausedCount = 0,
 }: BottomBarProps) {
 	const dotColor = connectionStatus === "connected" ? COLORS.complete : COLORS.error;
 	return (
@@ -27,6 +30,12 @@ export function BottomBar({
 		>
 			<span style={{ color: dotColor }}>● {connectionStatus.toUpperCase()}</span>
 			<span>{agentCount} agents</span>
+			{pausedCount > 0 && (
+				<span className="inline-flex items-center" style={{ color: COLORS.paused }}>
+					<span className="orchviz-paused-dot" aria-hidden="true" />
+					PAUSED{pausedCount > 1 ? ` · ${pausedCount}` : ""}
+				</span>
+			)}
 			<span className="flex-1" />
 			<button
 				type="button"

@@ -53,6 +53,14 @@ export function getAgentGlowSprite(
   return sprite
 }
 
+// ─── Pause icon Path2D cache ───────────────────────────────────────────────
+// pause-icons.ts manages its own internal Path2D cache keyed by icon-name + size-bucket.
+// That cache is module-private and populated on first call (lazy, zero allocation in hot path).
+// No additional caching layer is needed here — all pause icon builders produce
+// per-frame-safe output via cached Path2D objects.
+// (phase-03 note: render-cache.ts is the canonical cache registry; this comment
+//  documents that pause-icons.ts is self-contained and compliant.)
+
 // ─── Text measurement cache ────────────────────────────────────────────────
 // Caches ctx.measureText().width to avoid redundant browser layout per frame.
 

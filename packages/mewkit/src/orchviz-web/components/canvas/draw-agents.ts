@@ -1,4 +1,5 @@
 import { Agent, NODE, ANIM } from '@/lib/agent-types'
+import type { PauseReason } from '../../../orchviz/protocol'
 import { COLORS, getStateColor, contextSegments } from '@/lib/colors'
 import {
   AGENT_DRAW, CONTEXT_BAR, CONTEXT_RING, STATS_OVERLAY,
@@ -6,6 +7,14 @@ import {
 import { alphaHex, formatTokens } from '@/lib/utils'
 import { truncateText, drawHexagon, CLAUDE_SPARK_D, OPENAI_LOGO_D, OPENAI_LOGO_VIEWBOX } from './draw-misc'
 import { getAgentGlowSprite } from './render-cache'
+import {
+  drawLockIcon,
+  drawQuestionBubbleIcon,
+  drawDocumentCheckIcon,
+  drawForbiddenIcon,
+  drawShieldBarIcon,
+  drawCornerBadge,
+} from './pause-icons'
 
 let _claudeSparkPath: Path2D | null = null
 export function getClaudeSparkPath() {
@@ -185,9 +194,9 @@ function drawDepthShadow(ctx: CanvasRenderingContext2D, agent: Agent, r: number)
   ctx.restore()
 }
 
-function drawAgentGlow(ctx: CanvasRenderingContext2D, agent: Agent, r: number, color: string, isHovered: boolean, isSelected: boolean, isWaiting: boolean) {
+function drawAgentGlow(ctx: CanvasRenderingContext2D, agent: Agent, r: number, color: string, isHovered: boolean, isSelected: boolean, isPaused: boolean) {
   const glowR = r + AGENT_DRAW.glowPadding
-  const glowAlpha = isHovered || isSelected ? 0.35 : isWaiting ? 0.3 : agent.state === 'thinking' ? 0.2 : 0.1
+  const glowAlpha = isHovered || isSelected ? 0.35 : isPaused ? 0.3 : agent.state === 'thinking' ? 0.2 : 0.1
   // Pre-rendered glow sprite instead of per-frame gradient creation
   const sprite = getAgentGlowSprite(color, Math.round(r * 0.5), Math.ceil(glowR), alphaHex(glowAlpha))
   ctx.drawImage(sprite, agent.x - Math.ceil(glowR), agent.y - Math.ceil(glowR))
@@ -204,8 +213,8 @@ function drawAgentGlow(ctx: CanvasRenderingContext2D, agent: Agent, r: number, c
   ctx.fill()
 }
 
-function drawScanline(ctx: CanvasRenderingContext2D, agent: Agent, r: number, color: string, isHovered: boolean, isWaiting: boolean, time: number) {
-  const scanSpeed = agent.state === 'thinking' || isHovered || isWaiting ? ANIM.scanline.thinking : ANIM.scanline.normal
+function drawScanline(ctx: CanvasRenderingContext2D, agent: Agent, r: number, color: string, isHovered: boolean, isPaused: boolean, time: number) {
+  const scanSpeed = agent.state === 'thinking' || isHovered || isPaused ? ANIM.scanline.thinking : ANIM.scanline.normal
   const scanY = agent.y - r + ((time * scanSpeed) % (r * 2))
   ctx.save()
   drawHexagon(ctx, agent.x, agent.y, r)
@@ -220,14 +229,14 @@ function drawScanline(ctx: CanvasRenderingContext2D, agent: Agent, r: number, co
   ctx.restore()
 }
 
-function drawStateRing(ctx: CanvasRenderingContext2D, agent: Agent, r: number, color: string, isHovered: boolean, isSelected: boolean, isWaiting: boolean, time: number) {
+function drawStateRing(ctx: CanvasRenderingContext2D, agent: Agent, r: number, color: string, isHovered: boolean, isSelected: boolean, isPaused: boolean, time: number) {
   drawHexagon(ctx, agent.x, agent.y, r)
   ctx.strokeStyle = color
   ctx.lineWidth = (isSelected || isHovered) ? 2.5 : 2
   if (agent.state === 'complete') {
     ctx.setLineDash([4, 4])
     ctx.strokeStyle = color + '60'
-  } else if (isWaiting) {
+  } else if (isPaused) {
     ctx.setLineDash([6, 4])
     ctx.lineDashOffset = -time * AGENT_DRAW.waitingDashSpeed
     ctx.lineWidth = 2.5
@@ -237,23 +246,19 @@ function drawStateRing(ctx: CanvasRenderingContext2D, agent: Agent, r: number, c
   ctx.lineDashOffset = 0
 }
 
-function drawCenterIcon(ctx: CanvasRenderingContext2D, agent: Agent, r: number, color: string, isWaiting: boolean) {
-  if (isWaiting) {
-    // Geometric lock icon — fits the holographic style
-    const s = r * 0.3
-    ctx.save()
-    ctx.strokeStyle = color + '90'
-    ctx.fillStyle = color + '90'
-    ctx.lineWidth = 1.5
-    // Lock body (rounded rect)
-    ctx.beginPath()
-    ctx.roundRect(agent.x - s * 0.6, agent.y - s * 0.1, s * 1.2, s * 1.0, 2)
-    ctx.fill()
-    // Lock shackle (arc)
-    ctx.beginPath()
-    ctx.arc(agent.x, agent.y - s * 0.15, s * 0.4, Math.PI, 0)
-    ctx.stroke()
-    ctx.restore()
+// [red-team #2] Lock-icon drawing extracted to pause-icons.ts:drawLockIcon.
+// Per-reason switch added for phase-03 typed pause reasons.
+function drawCenterIcon(ctx: CanvasRenderingContext2D, agent: Agent, r: number, color: string, isPaused: boolean) {
+  if (isPaused) {
+    // Covers both state === "paused" and legacy state === "waiting_permission"
+    const reason: PauseReason = agent.pauseReason ?? 'permission_request'
+    switch (reason) {
+      case 'permission_request': drawLockIcon(ctx, agent.x, agent.y, r, color); break
+      case 'ask_user_question':  drawQuestionBubbleIcon(ctx, agent.x, agent.y, r, color); break
+      case 'plan_mode_review':   drawDocumentCheckIcon(ctx, agent.x, agent.y, r, color); break
+      case 'tool_rejected':      drawForbiddenIcon(ctx, agent.x, agent.y, r, color); break
+      case 'hook_blocked':       drawShieldBarIcon(ctx, agent.x, agent.y, r, color); break
+    }
   } else if (agent.isMain) {
     drawAgentBrand(ctx, agent.x, agent.y, r, color + '90', agent.runtime)
   } else {
@@ -346,9 +351,11 @@ export function drawAgents(
     const isHovered = id === hoveredAgentId
     const isSelected = id === selectedAgentId
 
-    const isWaiting = agent.state === 'waiting_permission'
+    // isPaused covers both typed "paused" state and legacy "waiting_permission"
+    const isPaused = agent.state === 'paused' || agent.state === 'waiting_permission'
+    const reason: PauseReason = agent.pauseReason ?? 'permission_request'
 
-    const breathe = isWaiting
+    const breathe = isPaused
       ? Math.sin(time * AGENT_DRAW.waitingBreatheSpeed) * AGENT_DRAW.waitingBreatheAmp + 1
       : agent.state === 'thinking'
       ? Math.sin(time * ANIM.breathe.thinkingSpeed) * ANIM.breathe.thinkingAmp + 1
@@ -360,17 +367,29 @@ export function drawAgents(
     ctx.globalAlpha = agent.opacity
 
     drawDepthShadow(ctx, agent, r)
-    drawAgentGlow(ctx, agent, r, color, isHovered, isSelected, isWaiting)
-    drawScanline(ctx, agent, r, color, isHovered, isWaiting, time)
-    drawStateRing(ctx, agent, r, color, isHovered, isSelected, isWaiting, time)
-    drawCenterIcon(ctx, agent, r, color, isWaiting)
+    drawAgentGlow(ctx, agent, r, color, isHovered, isSelected, isPaused)
+    drawScanline(ctx, agent, r, color, isHovered, isPaused, time)
+    drawStateRing(ctx, agent, r, color, isHovered, isSelected, isPaused, time)
+    drawCenterIcon(ctx, agent, r, color, isPaused)
 
     if (agent.state === 'thinking') {
       drawOrbitingParticles(ctx, agent, r, color, time)
     }
 
-    if (isWaiting) {
+    if (isPaused) {
       drawWaitingRipples(ctx, agent, r, color, time)
+    }
+
+    // Corner badge for ask_user_question (option count) and hook_blocked ("!")
+    if (isPaused) {
+      if (reason === 'ask_user_question') {
+        const optionCount = agent.pauseDetail?.questions?.[0]?.options?.length ?? 0
+        if (optionCount > 0) {
+          drawCornerBadge(ctx, agent.x, agent.y, r, String(optionCount), color)
+        }
+      } else if (reason === 'hook_blocked') {
+        drawCornerBadge(ctx, agent.x, agent.y, r, '!', color)
+      }
     }
 
     drawAgentLabel(ctx, agent, r, isHovered)

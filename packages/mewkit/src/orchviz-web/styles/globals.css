@@ -21,9 +21,39 @@ body {
 	animation: orchviz-pulse 1.6s ease-in-out infinite;
 }
 
+/* Phase-05: amber pulse on the active chip while any agent is paused. */
+@keyframes orchviz-pulse-amber {
+	0%, 100% { opacity: 1; border-color: #ffaa33; }
+	50% { opacity: 0.55; border-color: rgba(255, 170, 51, 0.38); }
+}
+
+.phase-chip-active-paused {
+	animation: orchviz-pulse-amber 1.6s ease-in-out infinite;
+}
+
+/* Phase-05: amber blink for inline PAUSED dot indicators. */
+@keyframes orchviz-paused-blink {
+	0%, 100% { opacity: 1; box-shadow: 0 0 4px #ffaa33; }
+	50% { opacity: 0.4; box-shadow: 0 0 0 #ffaa33; }
+}
+
+.orchviz-paused-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #ffaa33;
+	display: inline-block;
+	animation: orchviz-paused-blink 1.6s ease-in-out infinite;
+	margin-right: 6px;
+}
+
 @media (prefers-reduced-motion: reduce) {
-	.phase-chip-active {
+	.phase-chip-active,
+	.phase-chip-active-paused {
 		animation: none !important;
 		outline: 1px solid currentColor;
+	}
+	.orchviz-paused-dot {
+		animation: none !important;
 	}
 }

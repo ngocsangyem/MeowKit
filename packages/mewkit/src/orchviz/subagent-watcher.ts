@@ -19,6 +19,7 @@ import {
 	handlePermissionDetection,
 	type PermissionDetectionDelegate,
 } from "./permission-detection.js";
+import { _getPauseRecord } from "./parser/handle-system.js";
 import { resolveNameFromMeta } from "./subagent-meta.js";
 import { createLogger } from "./logger.js";
 import type { WatchedSession } from "./protocol.js";
@@ -186,6 +187,9 @@ export function readSubagentNewLines(
 		state.pendingToolCalls,
 		state,
 		sessionId,
+		undefined,
+		undefined,
+		_getPauseRecord(parser),
 	);
 	delegate.resetInactivityTimer(sessionId);
 }

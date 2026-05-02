@@ -1,6 +1,9 @@
 // Agent Visualizer Types — Holographic Edition v2
 // Now with actual information visibility
 
+// [red-team #4] Import pause types from protocol.ts (single source of truth — defined in phase-02)
+import type { PauseReason, PauseDetail } from '../../orchviz/protocol'
+
 export type AgentState = 'idle' | 'thinking' | 'tool_calling' | 'complete' | 'error' | 'paused' | 'waiting_permission'
 
 // Context window composition — the key insight
@@ -39,6 +42,13 @@ export interface Agent {
   scale: number
   /** Queued text bubbles shown on canvas — newest pushed to end */
   messageBubbles: MessageBubble[]
+  // ── Pause state (phase-03) ──────────────────────────────────────────────────
+  // Populated by pause_started; cleared by pause_cleared or agent_complete.
+  // [red-team #4] Types imported from orchviz/protocol (single source of truth)
+  pauseReason?: PauseReason | null
+  pauseToolUseId?: string
+  pauseDetail?: PauseDetail
+  pauseStartedAt?: number
 }
 
 export interface MessageBubble {
@@ -158,6 +168,8 @@ export interface SimulationEvent {
     | 'subagent_dispatch'
     | 'subagent_return'
     | 'permission_requested'
+    | 'pause_started'   // phase-02: new typed pause event
+    | 'pause_cleared'   // phase-02: new typed pause cleared event
   payload: Record<string, unknown>
   sessionId?: string
 }
@@ -225,6 +237,10 @@ export const ANIM = {
   scanline: { thinking: 40, normal: 15 },
   orbitSpeed: 1.5,
   pulseSpeed: 4,
+  // [red-team #3] Must be INSIDE the literal (ANIM is `as const`)
+  pauseEdgeTintAlpha: 0.18,
+  pauseParticleSpeedFactor: 0.4,
+  pauseRippleSpeed: 0.6,
 } as const
 
 export const FX = {

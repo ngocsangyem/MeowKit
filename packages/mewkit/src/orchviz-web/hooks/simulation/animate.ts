@@ -5,6 +5,7 @@ import {
   BUBBLE_VISIBLE_S, MOCK_END_BUFFER_S,
   ANIM_SPEED,
 } from '@/lib/canvas-constants'
+import { ANIM } from '@/lib/agent-types'
 
 export interface AnimateOptions {
   useMockData: boolean
@@ -141,9 +142,26 @@ function animateDiscoveries(discoveries: SimulationState['discoveries'], deltaTi
     .filter(d => d.opacity > 0)
 }
 
-function animateParticles(particles: SimulationState['particles'], deltaTime: number, speed: number): SimulationState['particles'] {
-  const particleSpeed = ANIM_SPEED.particleSpeed * speed
+function animateParticles(
+  particles: SimulationState['particles'],
+  deltaTime: number,
+  speed: number,
+  edges: SimulationState['edges'],
+  agents: SimulationState['agents'],
+): SimulationState['particles'] {
+  // Build edge-to lookup for pause check (O(n) per frame, edges array is small)
+  const edgeToMap = new Map<string, string>()
+  for (const e of edges) edgeToMap.set(e.id, e.to)
+
   return particles.map(p => {
+    const targetAgentId = edgeToMap.get(p.edgeId)
+    const targetAgent   = targetAgentId ? agents.get(targetAgentId) : undefined
+    const targetIsPaused = !!targetAgent &&
+      (targetAgent.state === 'paused' || targetAgent.state === 'waiting_permission')
+    // Slow particles flowing into paused agents
+    const speedFactor   = targetIsPaused ? ANIM.pauseParticleSpeedFactor : 1
+    const particleSpeed = ANIM_SPEED.particleSpeed * speed * speedFactor
+
     if (p.type === 'return' || p.type === 'tool_return')
       return { ...p, progress: Math.max(0, p.progress - deltaTime * particleSpeed) }
     return { ...p, progress: Math.min(1, p.progress + deltaTime * particleSpeed) }
@@ -163,7 +181,7 @@ export function computeNextFrame(prev: SimulationState, deltaTime: number, newTi
         cleanupFaded(newAgentsRaw, newToolCallsRaw, newEdgesRaw, currentState.agents, currentState.toolCalls)
 
       const newDiscoveries = animateDiscoveries(currentState.discoveries, deltaTime, newTime)
-      const newParticles = animateParticles(currentState.particles, deltaTime, currentState.speed)
+      const newParticles = animateParticles(currentState.particles, deltaTime, currentState.speed, currentState.edges, currentState.agents)
 
       // Stop playback when mock scenario ends (user can restart manually)
       if (options.useMockData && currentState.eventIndex >= options.mockScenarioLength && newTime > options.mockScenarioEndTime + MOCK_END_BUFFER_S) {

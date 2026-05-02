@@ -9,8 +9,10 @@ import { COLORS } from "@/lib/colors";
 import type { UseActivePlanResult } from "@/hooks/use-active-plan";
 import { useOverlays } from "@/hooks/use-overlays";
 import { derivePhaseStatuses } from "@/lib/phase-status";
+import type { PauseSummary } from "@/lib/pause-labels";
 import { PhasePipeline } from "./phase-pipeline";
 import { PlanSwitcher } from "@/components/plan-switcher";
+import { PausePill } from "@/components/pause-pill";
 
 interface TopStripProps {
 	onGateClick?: (id: "G1" | "G2") => void;
@@ -20,6 +22,10 @@ interface TopStripProps {
 	activePlan: UseActivePlanResult;
 	/** Setter for the LiveViewChip subtitle, threaded into the drawer. */
 	onLiveViewSubtitle: (subtitle: string | null) => void;
+	/** Phase-05: triggers amber pulse on the active phase chip + renders the pause pill. */
+	pauseSummary?: PauseSummary;
+	/** Phase-05: pill click hands off to the visualizer's pause-drawer opener. */
+	onPausePillClick?: (summary: PauseSummary) => void;
 }
 
 export function TopStrip({
@@ -28,6 +34,8 @@ export function TopStrip({
 	onSelectSlug,
 	activePlan,
 	onLiveViewSubtitle,
+	pauseSummary,
+	onPausePillClick,
 }: TopStripProps) {
 	const { plan } = activePlan;
 	const overlays = useOverlays();
@@ -63,7 +71,15 @@ export function TopStrip({
 				gate1Approved={gate1Approved}
 				gate2Verdict={gate2Verdict}
 				onGateClick={onGateClick}
+				paused={pauseSummary ? pauseSummary.count > 0 : false}
 			/>
+
+			{pauseSummary && pauseSummary.count > 0 && onPausePillClick && (
+				<>
+					<span className="flex-1" />
+					<PausePill summary={pauseSummary} onClick={onPausePillClick} />
+				</>
+			)}
 		</div>
 	);
 }

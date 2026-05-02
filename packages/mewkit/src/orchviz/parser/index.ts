@@ -25,6 +25,7 @@ import { handleThinkingBlock } from "./handle-thinking.js";
 import { handleToolUse } from "./handle-tool-use.js";
 import { handleToolResult } from "./handle-tool-result.js";
 import { handleProgressEvent } from "./handle-progress.js";
+import { handleSystemEntry } from "./handle-system.js";
 import { evictOldEntries, isSystemInjectedContent } from "./utils.js";
 import { applySessionLabel } from "./label-helpers.js";
 
@@ -80,6 +81,12 @@ export class TranscriptParser {
 
 		if (parsed.type === "progress") {
 			handleProgressEvent(this, parsed, sessionId);
+			return;
+		}
+		// [CRITICAL — red-team #5] Dispatch system entries BEFORE the early-return guard.
+		// Without this, handle-system.ts is unreachable — "system" lines are dropped silently.
+		if (parsed.type === "system") {
+			handleSystemEntry(this, parsed, sessionId, agentName);
 			return;
 		}
 		if (parsed.type !== "user" && parsed.type !== "assistant") return;

@@ -22,8 +22,68 @@ export type AgentEventType =
 	| "tool_call_end"
 	| "subagent_dispatch"
 	| "subagent_return"
-	| "permission_requested"
+	| "permission_requested" // KEEP — backwards compat alias of pause_started reason=permission_request
+	| "pause_started" // NEW
+	| "pause_cleared" // NEW
 	| "error";
+
+// ─── Pause Event Types ───────────────────────────────────────────────────────
+
+/**
+ * Deterministic pause reasons emitted by the parser layer.
+ * - permission_request: heuristic 5s stall fallback (no toolUseId)
+ * - ask_user_question: AskUserQuestion tool_use with no matching tool_result
+ * - plan_mode_review: ExitPlanMode tool_use with no matching tool_result
+ * - tool_rejected: tool_result content contains rejection string
+ * - hook_blocked: system stop_hook_summary with preventedContinuation=true
+ */
+export type PauseReason =
+	| "permission_request"
+	| "ask_user_question"
+	| "plan_mode_review"
+	| "tool_rejected"
+	| "hook_blocked";
+
+/**
+ * Detail payload for pause_started events.
+ * All string fields must flow through sanitize.ts before SSE emission (enforced in phase-06).
+ *
+ * [red-team #22] options is string[] (flat), NOT Array<{label; description?}>.
+ * Aligns with what tool-input-data.ts:67-69 already produces.
+ *
+ * [red-team #16] detail.plan is emitted with newlines preserved; phase-04 renders
+ * via JSX .map() — NEVER use dangerouslySetInnerHTML to restore newlines.
+ *
+ * [security — red-team #17] hookCommand may contain env-style secrets
+ * (AWS_SECRET_ACCESS_KEY=, Authorization: Bearer). Known gap for v1 — documented,
+ * mitigation deferred to follow-up CLI warning. See phase-02 security notes.
+ */
+export interface PauseDetail {
+	questions?: Array<{
+		question: string;
+		header?: string;
+		options: string[]; // flat string[] — matches tool-input-data.ts shape
+		multiSelect?: boolean;
+	}>;
+	plan?: string; // truncated to PLAN_PREVIEW_MAX (2KB) server-side
+	hookCommand?: string;
+	hookReason?: string;
+}
+
+export interface PauseStartedPayload {
+	agent: string;
+	reason: PauseReason;
+	toolUseId?: string; // omitted for permission_request heuristic (red-team #18)
+	toolName?: string;
+	detail?: PauseDetail;
+}
+
+export interface PauseClearedPayload {
+	agent: string;
+	reason: PauseReason;
+	toolUseId?: string;
+	durationMs: number;
+}
 
 export interface AgentEvent {
 	time: number;
