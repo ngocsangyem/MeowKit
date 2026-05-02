@@ -278,7 +278,6 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'mk:qa-manual', link: '/reference/skills/qa-manual' },
             { text: 'mk:qa', link: '/reference/skills/qa' },
-            { text: 'mk:browse', link: '/reference/skills/browse' },
             { text: 'mk:agent-browser', link: '/reference/skills/agent-browser' },
             { text: 'mk:playwright-cli', link: '/reference/skills/playwright-cli' },
           ],

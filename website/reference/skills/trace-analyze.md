@@ -13,7 +13,7 @@ Step-file workflow that ingests `.claude/memory/trace-log.jsonl`, partitions rec
 
 Activate when:
 - `/mk:trace-analyze [--runs N]` (default N=20 runs worth of records)
-- `/mk:trace-analyze --pattern <name>` (focus on a specific pattern from the error taxonomy)
+- `/mk:trace-analyze --pattern `NAME` (focus on a specific pattern from the error taxonomy)
 - `dead-weight-audit-needed` flag set by `post-session.sh` on model version change
 - After 3+ consecutive harness failures on the same task
 - Quarterly dead-weight audit schedule
@@ -32,7 +32,7 @@ Activate when:
 | Argument | Effect |
 |---|---|
 | `--runs N` | Cap ingest to last N runs (default 20) |
-| `--pattern <name>` | Filter to a specific pattern from `references/error-taxonomy.md` |
+| `--pattern `NAME` | Filter to a specific pattern from `references/error-taxonomy.md` |
 
 ## Example Prompt
 

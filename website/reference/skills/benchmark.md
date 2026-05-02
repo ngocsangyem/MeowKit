@@ -15,7 +15,7 @@ Measures harness performance against a small set of ground-truth tasks. Provides
 |---|---|---|---|---|
 | `/mk:benchmark run` | quick | 5 | ≤$5 | Runs the quick canary suite (default) |
 | `/mk:benchmark run --full` | full | 6 | ≤$30 | Quick tier + 1 heavy app-build task |
-| `/mk:benchmark compare <a> <b>` | — | — | free (reads cache) | Delta table between two prior runs |
+| `/mk:benchmark compare A B` | — | — | free (reads cache) | Delta table between two prior runs |
 
 Activate before applying a harness change (baseline) and after (verify delta). Also used during the dead-weight audit playbook for component enable/disable cycles.
 
@@ -39,7 +39,7 @@ Run the benchmark canary suite to baseline current harness performance. Then com
 |---|---|
 | `run` (default) | Execute quick tier (5 tasks, under `.claude/benchmarks/canary/quick/`) |
 | `run --full` | Execute quick + heavy tier (6 tasks total, includes `.claude/benchmarks/canary/full/`) |
-| `compare <run-id-a> <run-id-b>` | Diff two prior run JSONs |
+| ``compare RUN-ID-A RUN-ID-B`` | Diff two prior run JSONs |
 
 `--full` is strictly opt-in. The heavy task (`06-small-app-build`) triggers `mk:harness` which can run for hours — the script refuses without the flag to prevent accidental cost burn.
 

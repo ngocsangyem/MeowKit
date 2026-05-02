@@ -29,10 +29,10 @@ Type messages with `##` prefix. The `immediate-capture-handler.cjs` hook routes 
 
 | Prefix | Target |
 |--------|--------|
-| `##pattern: bug-class <description>` | `fixes.json` |
-| `##pattern: <description>` | `review-patterns.json` |
+| `##pattern: bug-class DESCRIPTION` | `fixes.json` |
+| `##pattern: DESCRIPTION` | `review-patterns.json` |
 | `##decision: chose X over Y because…` | `architecture-decisions.json` |
-| `##note: <text>` | `quick-notes.md` |
+| `##note: TEXT` | `quick-notes.md` |
 
 Captures pass injection validation and secret scrubbing before writing. All writes are atomic (temp-file + rename).
 
@@ -56,9 +56,8 @@ Entries move to `lessons-archive.md`. Exempt: entries marked `severity: critical
 
 ## Separate from Claude Code auto-memory
 
-Claude Code has its own auto-memory at `~/.claude/projects/<project>/memory/`. It is separate from MeowKit's `.claude/memory/`. Use Claude Code auto-memory for personal habits; use MeowKit memory for project-specific engineering artifacts.
+Claude Code has its own auto-memory at `~/.claude/projects/PROJECT/memory/`. It is separate from MeowKit's `.claude/memory/`. Use Claude Code auto-memory for personal habits; use MeowKit memory for project-specific engineering artifacts.
 
 ## See also
 
 - [How It Works](/core-concepts/how-it-works) — memory in the architecture overview
-- [docs/memory-system.md](/docs/memory-system) — full system reference

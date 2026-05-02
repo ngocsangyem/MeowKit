@@ -75,9 +75,9 @@ JSON format for split JSON files (v2.0.0 schema):
 ### Immediate Capture (during session)
 
 For quick, crash-resilient capture during the session:
-- `##pattern: bug-class <description>` -- auto-writes to `fixes.json`
-- `##decision: <description>` -- auto-writes to `architecture-decisions.json`
-- `##note: <text>` -- staging in `quick-notes.md` (classified at Reflect)
+- `##pattern: bug-class `DESCRIPTION` -- auto-writes to `fixes.json`
+- `##decision: `DESCRIPTION` -- auto-writes to `architecture-decisions.json`
+- `##note: `TEXT` -- staging in `quick-notes.md` (classified at Reflect)
 
 ### Pattern Extraction (from `references/pattern-extraction.md`)
 

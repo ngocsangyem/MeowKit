@@ -65,4 +65,4 @@ No two agents modify the same file type. Conflicts escalate to human.
 - [How agents and skills work together](/core-concepts/how-it-works)
 - [Workflow phases](/core-concepts/workflow)
 - [Skills reference](/reference/skills)
-- [Agent definitions on disk](/.claude/agents/) — canonical source
+- [Agent definitions on disk](https://github.com/ngocsangyem/MeowKit/tree/main/.claude/agents) — canonical source

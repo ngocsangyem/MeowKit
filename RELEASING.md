@@ -39,52 +39,19 @@ Example:
 
 The script automates steps 3-9 below: bump version → build/lint/typecheck/test → prepare release assets → VitePress build check → commit + tag → push → create GitHub Release with zip. Stops on any failure, warns on uncommitted changes.
 
-**Before running the script:** Complete steps 1-2 manually (update VitePress docs + changelog).
+**Before running the script:** Complete step 2 (update CHANGELOG) manually. If the release affects guide/reference pages, complete step 1a as well.
 
 **After the script:** Run step 10 (npm publish) and step 11 (end-to-end test) manually.
 
 ## Manual Release (Step-by-Step)
 
-### 1. Update VitePress docs
+### 1. Update CHANGELOG and affected docs
 
-Create the what's-new page and update affected docs BEFORE tagging.
+Update the changelog and any affected guide/reference pages BEFORE tagging.
 
-**Minor fix releases (patch versions):** Skip steps 1a, 1b, and 1d. Only update the what's-new index (step 1c) and CHANGELOG.md (step 2). No individual what's-new page or sidebar entry needed.
+**Patch releases:** Only update `website/changelog.md` (step 2). Skip the doc update step below unless a guide page documents behavior that changed.
 
-#### 1a. Create what's-new page (feature/breaking releases only)
-
-```bash
-# Create new version page
-website/guide/whats-new/v<version>.md
-```
-
-Use this frontmatter and structure:
-
-```yaml
----
-title: "v<version> — <Release Title>"
-description: "<One-line summary>"
-persona: A
----
-```
-
-Include: features, flow diagrams (Mermaid), files changed table.
-
-#### 1b. Update VitePress sidebar
-
-In `website/.vitepress/config.ts`, add the new version to the sidebar:
-
-```ts
-{ text: 'v<version> — <Title>', link: '/guide/whats-new/v<version>' },
-```
-
-Add above the previous version entry in the `What's New` collapsed section.
-
-#### 1c. Update what's-new index
-
-In `website/guide/whats-new.md`, add a summary section for the new version at the top of the `## Releases` section.
-
-#### 1d. Update affected guide pages
+#### 1a. Update affected guide pages
 
 Check and update these pages if the release affects them:
 
@@ -97,7 +64,7 @@ Check and update these pages if the release affects them:
 | `reference/agents/*.md`             | Agent capability changes                         |
 | `reference/skills/*.md`             | Skill behavior or schema changes                 |
 
-#### 1e. Verify VitePress builds
+#### 1b. Verify VitePress builds
 
 ```bash
 cd website && npx vitepress build
@@ -308,10 +275,7 @@ Copy this checklist for each release:
 
 ### Docs
 
-- [ ] Created `website/guide/whats-new/v<version>.md`
-- [ ] Updated `website/.vitepress/config.ts` sidebar
-- [ ] Updated `website/guide/whats-new.md` index
-- [ ] Updated affected guide/reference pages
+- [ ] Updated affected guide/reference pages (step 1a)
 - [ ] VitePress build passes (`npx vitepress build`)
 
 ### Changelog
@@ -351,7 +315,7 @@ Push to `main` or `dev` triggers `.github/workflows/release.yml`:
 5. `@semantic-release/exec` publishes both packages to npm
 6. `@semantic-release/git` commits version files back to repo
 
-**Note:** Automated releases do NOT update VitePress docs or CHANGELOG.md. Those must be done manually before the release commit.
+**Note:** Automated releases do NOT update `CHANGELOG.md` or affected guide/reference pages. Those must be done manually before the release commit.
 
 ### Conventional commits → version bumps
 

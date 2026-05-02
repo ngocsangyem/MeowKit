@@ -15,8 +15,8 @@ The `mewkit migrate` command exports your `.claude/` kit to 15 external coding-a
 | Just ran `mewkit init`, want Cursor to see the kit too | `mewkit migrate cursor` |
 | Set up a fresh project for both Cursor and Codex in one shot | `mewkit init --migrate-to cursor,codex` |
 | Have multiple coding agents installed and want them all in sync | `mewkit migrate --all` |
-| Just ran `mewkit upgrade`, need to propagate changes to external tools | `mewkit migrate <tool>` (re-runs are idempotent) |
-| Want to check what would happen before writing | `mewkit migrate <tool> --dry-run` |
+| Just ran `mewkit upgrade`, need to propagate changes to external tools | `mewkit migrate TOOL` (re-runs are idempotent) |
+| Want to check what would happen before writing | `mewkit migrate TOOL --dry-run` |
 
 ## Capability matrix
 
@@ -188,7 +188,7 @@ mewkit migrate cursor
 
 ## Concurrency
 
-A PID-based file lock at `<scope>/.mewkit/.lock` (`./.mewkit/.lock` for project, `~/.mewkit/.lock` for global) prevents two `mewkit migrate` runs from racing. Stale locks with dead PIDs auto-clear after 60 seconds.
+A PID-based file lock at `SCOPE/.mewkit/.lock` (`./.mewkit/.lock` for project, `~/.mewkit/.lock` for global) prevents two `mewkit migrate` runs from racing. Stale locks with dead PIDs auto-clear after 60 seconds.
 
 If you see `Another mewkit migrate is in progress (PID X)`, check whether that PID is actually alive:
 
@@ -228,7 +228,7 @@ npx mewkit upgrade --beta    # latest beta
 npx mewkit upgrade --check   # show available without installing
 ```
 
-After upgrading mewkit, your `.claude/` kit content does NOT change. Run `mewkit init` (in a fresh dir) or `mewkit upgrade` (to refresh the kit) — both flows can chain `--migrate-to <tool>` to update external tools.
+After upgrading mewkit, your `.claude/` kit content does NOT change. Run `mewkit init` (in a fresh dir) or `mewkit upgrade` (to refresh the kit) — both flows can chain `--migrate-to TOOL` to update external tools.
 
 ## See also
 

@@ -120,7 +120,7 @@ For purely behavioral criteria with no precondition (e.g., "page loads under 2s"
 ```markdown
 ### [AC-07] Landing page first contentful paint ≤ 2s
 
-- **Assertion:** `mk:browse <url>` reports `firstContentfulPaint <= 2000`
+- **Assertion:** `agent-browser open <url> && agent-browser eval "performance.getEntriesByType('paint').find(e=>e.name==='first-contentful-paint')?.startTime"` returns a value `<= 2000`
 - **Verification:** browser DevTools timing API; capture and assert
 - **Rubric tie-in:** craft (weight 0.05)
 ```

@@ -14,7 +14,7 @@ Henshin analyzes existing code and produces a **Transformation Spec** -- a plann
 Triggers:
 - "agentize this module", "expose as MCP", "wrap as CLI", "publish to npm"
 - "make this LLM-accessible", "turn into agent tool", "expose feature as tool"
-- "henshin <module>", "wrap <module> for agents"
+- "henshin MODULE", "wrap MODULE for agents"
 
 Anti-triggers:
 - Building new code from scratch -- use `mk:bootstrap`
@@ -54,7 +54,7 @@ Anti-triggers:
 3. **Agentize Map** -- Apply agent-centric design rules. Consolidate workflows. Classify safe/mutating/destructive. Design all three surfaces.
 4. **Challenge (HARD GATE)** -- 10-decision matrix covering output mode, capability cuts, transports, credentials, deployment, CLI framework, test runner, package name, license, ownership. **Human approval required.** Stops if <5 capabilities or >=5 red flags.
 5. **Transformation Spec** -- Structured planning document: source, surfaces, capability cut list, credentials/auth, deployment targets, decision matrix, risks, out of scope.
-6. **Handoff** -- Emits spec and suggests next command: `/mk:plan-creator "Agentize <module>"`.
+6. **Handoff** — Emits spec and suggests next command: `/mk:plan-creator "Agentize MODULE"`.
 
 ## Usage
 

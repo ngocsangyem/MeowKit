@@ -15,7 +15,7 @@ A combined QA engineer and bug-fix engineer that tests web applications like a r
 - A feature is ready for testing or user asks "does this work?"
 - After shipping code on a feature branch that needs verification
 - When on a feature branch with no URL, automatically enters **diff-aware mode** -- analyzes branch diff to identify affected pages/routes and tests them directly
-- **NOT** for one-off browser commands (single click, screenshot) -- use `mk:browse` instead
+- **NOT** for one-off browser commands (single click, screenshot) -- use `mk:agent-browser` instead
 - **NOT** for spec-driven manual QA with E2E code generation -- use `mk:qa-manual`
 
 ## Core Capabilities
@@ -35,7 +35,7 @@ A combined QA engineer and bug-fix engineer that tests web applications like a r
 | Argument | Effect |
 |----------|--------|
 | _(no args on feature branch)_ | Diff-aware mode -- auto-detect affected pages from branch diff |
-| `<URL>` | Target URL for full QA testing |
+| `URL` | Target URL for full QA testing |
 | `--quick` | Quick tier -- 30-second smoke test (homepage + top 5 nav targets) |
 | `--exhaustive` | Exhaustive tier -- includes cosmetic/low severity issues |
 | `--regression <baseline.json>` | Regression mode -- compare against previous baseline |

@@ -25,7 +25,7 @@ Aggregates from canonical sources only:
 - `tasks/reviews/*-verdict.md` + `*-evalverdict.md` — gate state
 - `tasks/contracts/*.md` — harness contracts
 - `.claude/memory/cost-log.json` — filtered by session_id
-- `git log --since=<anchor>` — landed commits
+- `git log --since=ANCHOR` — landed commits
 
 ## Task classification
 

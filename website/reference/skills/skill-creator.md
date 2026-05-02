@@ -14,7 +14,7 @@ Create new skills with proper structure, compliance, and registration. Enforces 
 - User asks to "create a skill", "build a new skill", "make a skill for [X]"
 - Converting an external skill for adoption in MeowKit
 - Scaffolding a skill from a workflow pattern
-- Explicit: `/mk:skill-creator [name] [description]`
+- Explicit: `/mk:skill-creator [`NAME`] [description]`
 
 **Do NOT invoke:** When the user just wants to edit an existing skill's content — this is for creation and scaffolding only.
 
@@ -34,7 +34,7 @@ Create a new skill called mk:database that generates PostgreSQL schema migration
 ## Process
 
 1. **Gather intent** — what should the skill do? When should it trigger? What output format?
-2. **Scaffold** — run `init-skill.py mk:<name> --path .claude/skills` to create directory + template
+2. **Scaffold** — run `init-skill.py mk:NAME --path .claude/skills` to create directory + template
 3. **Fill content** — Claude completes each TODO section in the generated template
 4. **Add references/** — if skill body would exceed ~500 lines, split into reference files
 5. **Security boundaries** — load `mk:skill-template-secure` for trust model if skill processes untrusted input

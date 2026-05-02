@@ -14,7 +14,7 @@ Retrieves current, accurate documentation for any library, framework, API, SDK, 
 - "find our internal spec", "where is [convention] documented"
 - Any request requiring current documentation (not training data)
 
-**Do NOT use for:** arbitrary web pages (use `mk:web-to-markdown`), interactive browser testing (use `mk:browse` or `mk:agent-browser`).
+**Do NOT use for:** arbitrary web pages (use `mk:web-to-markdown`), interactive browser testing (use `mk:agent-browser`).
 
 ## Example Prompt
 

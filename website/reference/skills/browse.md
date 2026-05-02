@@ -1,41 +1,23 @@
 ---
-title: "mk:browse"
-description: "Fast headless Chromium browser for single-shot site verification and evidence capture — navigate, interact, screenshot, diff, verify state. Persistent state between calls."
+title: "mk:browse (removed)"
+description: "Retired. Superseded by mk:agent-browser."
 ---
 
-## What This Skill Does
+# `mk:browse` — removed
 
-Provides a persistent headless Chromium browser session for QA testing and dogfooding. Browser state (cookies, localStorage, tabs, login sessions) persists between calls within a session. All interactions use the `$B` alias. Supports 40+ commands across navigation, reading, interaction, inspection, visual capture, snapshot/diff, tabs, and server management.
+The `mk:browse` skill was retired in this release. All browser automation is now handled by [`mk:agent-browser`](./agent-browser).
 
-## When to Use
+## Migration
 
-- "open in browser", "take a screenshot", "dogfood this"
-- Verifying a deployment or feature works end-to-end
-- Filing bugs with visual evidence (annotated screenshots, console errors, network logs)
-- Testing user flows (login, forms, uploads, dialogs)
-- Comparing responsive layouts or diffing environments (staging vs prod)
-- Single-shot interactions — one click, one screenshot, one state check
+See the [migration guide](https://github.com/) bundled with the `agent-browser` skill: `.claude/skills/agent-browser/references/migrating-from-browse.md`. It covers verb-to-verb mapping (`$B goto` → `agent-browser open`, `$B snapshot -i` → `agent-browser snapshot -i`, etc.), recipes for capabilities `agent-browser` doesn't ship natively (responsive screenshots, link enumeration, performance timing), and a developer-machine runbook for handoff/CAPTCHA/MFA flows that previously used `$B handoff`.
 
-**NOT for:** systematic QA passes with health scores/fix loops (use `mk:qa`), multi-step session-persistent flows (use `mk:playwright-cli`), E2E test code generation (use `mk:qa-manual`), AI-autonomous long sessions (use `mk:agent-browser`).
+## Why
 
-## Example Prompt
+`mk:browse` and `mk:agent-browser` covered overlapping use cases. Consolidating onto one skill removes the routing decision between them and reduces maintenance surface.
 
-```
-Open https://staging.example.com/login, fill in the test credentials, verify the dashboard loads, take a full-page screenshot, and diff it against last week's screenshot to catch visual regressions.
-```
+## What changed
 
-## Core Capabilities
-
-| Category | Commands |
-|----------|---------|
-| Navigation | `goto`, `back`, `forward`, `reload`, `url` |
-| Reading | `text`, `html`, `links`, `accessibility`, `forms` |
-| Interaction | `click`, `fill`, `select`, `hover`, `press`, `upload`, `scroll`, `type`, `viewport` |
-| Inspection | `attrs`, `console`, `cookies`, `css`, `is`, `js`, `network`, `perf`, `storage` |
-| Visual | `screenshot`, `snapshot` (with 8 flags), `diff`, `pdf`, `responsive` |
-| Tabs | `tabs`, `newtab`, `tab`, `closetab` |
-| Server | `handoff`, `resume`, `restart`, `status`, `stop` |
-
-## The `$B` Alias
-
-All commands must be prefixed with `$B`. This is a shell alias that must be set before first use:
+- `mk:browse` SKILL.md and references removed.
+- Catalog entries dropped from `SKILLS_INDEX.md` and `.meowkit.manifest.json`.
+- Historical attribution preserved in `SKILLS_ATTRIBUTION.md` under the `## Removed` section.
+- Cross-skill callers (`mk:qa`, `mk:office-hours`, `mk:fix`, `mk:evaluate`, `mk:chom`, `mk:agent-detector`, `mk:sprint-contract`, `mk:retro`, `mk:qa-manual`, `mk:ui-ux-designer`, `mk:evaluator`) now use `mk:agent-browser` directly or paste the relevant recipe from the migration guide.

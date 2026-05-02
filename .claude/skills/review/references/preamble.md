@@ -181,7 +181,7 @@ If `_CONTRIB` is `true`: you are in **contributor mode**. You're a MeowKit user 
 
 **At the end of each major workflow step** (not after every single command), reflect on the MeowKit tooling you used. Rate your experience 0 to 10. If it wasn't a 10, think about why. If there is an obvious, actionable bug OR an insightful, interesting thing that could have been done better by MeowKit code or skill markdown — file a field report. Maybe our contributor will help make us better!
 
-**Calibration — this is the bar:** For example, `$B js "await fetch(...)"` used to fail with `SyntaxError: await is only valid in async functions` because MeowKit didn't wrap expressions in async context. Small, but the input was reasonable and MeowKit should have handled it — that's the kind of thing worth filing. Things less consequential than this, ignore.
+**Calibration — this is the bar:** For example, if `agent-browser eval "await fetch(...)"` failed with `SyntaxError: await is only valid in async functions` because the runner didn't wrap expressions in async context, that would be small but reasonable input that MeowKit should handle — worth filing. Things less consequential than this, ignore.
 
 **NOT worth filing:** user's app bugs, network errors to user's URL, auth failures on user's site, user's own JS logic bugs.
 

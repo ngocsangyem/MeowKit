@@ -75,12 +75,12 @@ SKETCH_FILE="/tmp/meowkit-sketch-$(date +%s).html"
 **Step 3: Render and capture**
 
 ```bash
-$B goto "file://$SKETCH_FILE"
-$B screenshot /tmp/meowkit-sketch.png
+agent-browser open "file://$SKETCH_FILE"
+agent-browser screenshot /tmp/meowkit-sketch.png
 ```
 
-If `$B` is not available (browse binary not set up), skip the render step. Tell the
-user: "Visual sketch requires the browse binary. Run the setup script to enable it."
+If `agent-browser` is not available, skip the render step. Tell the
+user: "Visual sketch requires the agent-browser CLI. Install with `npm i -g agent-browser` to enable it."
 
 **Step 4: Present and iterate**
 

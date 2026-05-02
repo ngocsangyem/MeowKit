@@ -5,9 +5,9 @@ For visual bugs, layout issues, responsive problems, and frontend interaction er
 ## Steps
 
 ### Step 1: Reproduce
-- Use `mk:browse` skill to navigate to the affected page
-- Take screenshot of the issue: `snapshot -i -a -o`
-- Check browser console for JS errors: `console --errors`
+- Use `mk:agent-browser` skill to navigate to the affected page
+- Take screenshot of the issue: `agent-browser snapshot -i && agent-browser screenshot --annotate /tmp/issue.png`
+- Check browser console for JS errors: `agent-browser console --errors`
 - Test on multiple viewports if responsive issue
 
 ### Step 2: Diagnose
@@ -37,7 +37,7 @@ For visual bugs, layout issues, responsive problems, and frontend interaction er
 - Check component lifecycle hooks
 
 ### Step 4: Visual Verify
-Use `mk:browse` to verify the fix:
+Use `mk:agent-browser` to verify the fix:
 - Take after-screenshot, compare with before
 - Test all affected viewports
 - Check console is clean

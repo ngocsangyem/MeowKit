@@ -196,8 +196,8 @@ npx mewkit migrate                    # interactive multiselect
 | `--yes`, `-y` | Non-interactive — auto-confirm prompts |
 | `--dry-run` | Compute and display the plan without writing any files |
 | `--force` | Overwrite user-edited target files without prompting on conflict |
-| `--source <path>` | Override source `.claude/` directory (default: `<cwd>/.claude/` or bundled kit) |
-| `--only <csv>` | Restrict to listed types: `agents,commands,skills,config,rules,hooks` |
+| `--source PATH` | Override source `.claude/` directory (default: `CWD/.claude/` or bundled kit) |
+| `--only CSV` | Restrict to listed types: `agents,commands,skills,config,rules,hooks` |
 | `--skip-config`, `--skip-rules`, `--skip-hooks` | Exclude one or more types |
 | `--prefer-agents-md` | (Antigravity) write rules to `AGENTS.md` instead of `GEMINI.md` |
 | `--respect-deletions` | Skip items whose target was deleted by the user (default re-installs) |
@@ -281,7 +281,7 @@ A `mewkit upgrade` followed by `mewkit migrate cursor` propagates kit updates to
 
 ### Concurrent invocations
 
-A PID-based file lock at `<scope>/.mewkit/.lock` blocks two `mewkit migrate` runs from racing on the same registry. Stale locks (dead PID) are auto-cleared after 60 seconds.
+A PID-based file lock at `SCOPE/.mewkit/.lock` blocks two `mewkit migrate` runs from racing on the same registry. Stale locks (dead PID) are auto-cleared after 60 seconds.
 
 ## init --migrate (one-shot scaffold + export)
 

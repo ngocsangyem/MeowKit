@@ -29,11 +29,11 @@ Locks all Edit and Write tool operations to a single directory for the current s
 
 ## Arguments
 
-`/mk:freeze <path>` — the directory to restrict edits to. If no path is given, the skill prompts via AskUserQuestion for a text input path.
+`/mk:freeze `PATH` — the directory to restrict edits to. If no path is given, the skill prompts via AskUserQuestion for a text input path.
 
 ## Workflow
 
-1. **User runs** `/mk:freeze` or `/mk:freeze <path>`
+1. **User runs** `/mk:freeze` or `/mk:freeze `PATH`
 2. **If no path given:** AskUserQuestion prompts for directory (text input, not multiple choice)
 3. **Path resolution:**
    ```bash

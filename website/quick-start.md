@@ -90,4 +90,4 @@ No code was written until you approved. That's MeowKit's discipline.
 - [Cheatsheet](/cheatsheet) — quick reference for all commands
 - [Workflow Phases](/guide/workflow-phases) — understand Phase 0-6
 - [Build a Feature](/guide/agent-skill-architecture) — how agents and skills work together
-- [Fix a Bug](/guide/debugging-skills-decision-guide) — structured debugging guide
+- [Fix a Bug](/guides/debug-effectively) — structured debugging guide

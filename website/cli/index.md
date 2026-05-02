@@ -11,7 +11,7 @@ MeowKit provides two CLI packages:
 | Package | Command | Purpose |
 |---------|---------|---------|
 | `mewkit` | `npx mewkit init` | Scaffold or update the `.claude/` system |
-| `mewkit` | `npx mewkit <command>` | Runtime tools: doctor, setup, task, validate, budget, memory, upgrade, status |
+| `mewkit` | `npx mewkit COMMAND` | Runtime tools: doctor, setup, task, validate, budget, memory, upgrade, status |
 
 ## Quick Start
 

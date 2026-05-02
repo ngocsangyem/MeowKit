@@ -97,7 +97,7 @@ flowchart LR
 |---|---|---|---|
 | `/mk:benchmark run` | 5 quick tasks | ≤ $5 | Regression check after a harness change |
 | `/mk:benchmark run --full` | 5 quick + 1 heavy | ≤ $30 | Full dead-weight audit cycle |
-| `/mk:benchmark compare <a> <b>` | — | Free | Delta table between two prior runs |
+| `/mk:benchmark compare A B` | — | Free | Delta table between two prior runs |
 
 **Quick tier spec files** (`.claude/benchmarks/canary/quick/`): react-component, api-endpoint, bug-fix, refactor, tdd-feature. Each is a focused 1-sprint task runnable through `mk:cook`.
 

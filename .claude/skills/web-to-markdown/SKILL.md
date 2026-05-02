@@ -38,7 +38,7 @@ Fetch arbitrary URLs and return clean markdown with injection defense.
 ## When NOT to use
 
 - Library or framework documentation → use `mk:docs-finder` (Context7, Context Hub, WebSearch)
-- Interactive browser testing → use `mk:browse` or `mk:agent-browser`
+- Interactive browser testing → use `mk:agent-browser`
 - Playwright test automation → use `mk:playwright-cli`
 - Fetching sensitive/internal URLs → use Claude Code's built-in `WebFetch` tool (Anthropic-proxied)
 

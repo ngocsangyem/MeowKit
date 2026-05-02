@@ -7,7 +7,7 @@ description: "Spec-driven manual QA testing and Playwright E2E code generation. 
 
 ## What This Skill Does
 
-Orchestrates multiple browser skills (`mk:agent-browser`, `mk:playwright-cli`, `mk:browse`) to act like a human QA tester: navigate applications, interact with elements, verify outcomes, and produce structured reports. Supports two primary use cases: manual QA testing from a spec or URL (producing pass/fail reports), and E2E code generation (producing production-ready Playwright `.spec.ts` files with role-based locators). Always prompts the user for credentials -- never guesses or stores auth.
+Orchestrates browser skills (`mk:agent-browser`, `mk:playwright-cli`) to act like a human QA tester: navigate applications, interact with elements, verify outcomes, and produce structured reports. Supports two primary use cases: manual QA testing from a spec or URL (producing pass/fail reports), and E2E code generation (producing production-ready Playwright `.spec.ts` files with role-based locators). Always prompts the user for credentials -- never guesses or stores auth.
 
 ## When to Use
 
@@ -15,7 +15,6 @@ Orchestrates multiple browser skills (`mk:agent-browser`, `mk:playwright-cli`, `
 - Running a spec-driven QA pass from a plan file: `/mk:qa-manual tasks/plans/auth-flow.md --report`
 - Generating Playwright E2E tests: `/mk:qa-manual tasks/plans/checkout.md --generate`
 - Exploratory testing from a URL: `/mk:qa-manual https://app.example.com`
-- **NOT** for unstructured browsing -- use `mk:browse`
 - **NOT** for AI-autonomous flows -- use `mk:agent-browser`
 - **NOT** for automated fix-and-verify QA cycles -- use `mk:qa`
 
@@ -34,8 +33,8 @@ Orchestrates multiple browser skills (`mk:agent-browser`, `mk:playwright-cli`, `
 
 | Argument | Effect |
 |----------|--------|
-| `<spec-path>` | Path to a plan/spec file in `tasks/plans/` |
-| `<URL>` | Direct URL to test (exploratory mode) |
+| `SPEC-PATH` | Path to a plan/spec file in `tasks/plans/` |
+| `URL` | Direct URL to test (exploratory mode) |
 | `--report` | Produce a QA manual test report |
 | `--generate` | Generate Playwright `.spec.ts` E2E code |
 

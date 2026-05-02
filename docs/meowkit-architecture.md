@@ -104,7 +104,6 @@ flowchart TD
         STS[mk:skill-template-secure]
         LAV[mk:lint-and-validate]
         NYQ[mk:nyquist]
-        BRW[mk:browse]
     end
 
     subgraph P3["Phase 3 — Build (20 skills)"]

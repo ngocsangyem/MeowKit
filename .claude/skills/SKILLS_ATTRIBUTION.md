@@ -18,7 +18,6 @@ Each skill retains its original author credit in its frontmatter.
 | 9   | cso                   | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/cso/SKILL.md                             | 1    |
 | 10  | fix                   | mrgoonie (claudekit)         | [claudekit-engineer](https://claudekit.cc)                   | Proprietary | claudekit/.claude/skills/fix/SKILL.md      | 1    |
 | 11  | agent-detector        | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog)   | Unknown     | aura-frog/skills/agent-detector/SKILL.md        | 2    |
-| 12  | browse                | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/browse/SKILL.md                          | 2    |
 | 13  | qa                    | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/qa/SKILL.md                              | 2    |
 | 14  | office-hours          | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/office-hours/SKILL.md                    | 2    |
 | 15  | vulnerability-scanner | vudovn (antigravity-kit)     | [antigravity-kit](https://github.com/vudovn/antigravity-kit) | MIT         | .agent/skills/vulnerability-scanner/SKILL.md    | 2    |
@@ -37,8 +36,14 @@ Each skill retains its original author credit in its frontmatter.
 | 29  | typescript            | MeowKit (adapted)            | Adapted from aura-frog/typescript-expert + claudekit/frontend-development (TS parts) | MIT | .claude/skills/typescript/ | 2 |
 | 30  | vue                   | MeowKit (adapted)            | Adapted from aura-frog/vue-expert                            | MIT         | .claude/skills/vue/                        | 2    |
 | 31  | frontend-design       | MeowKit (adapted)            | Adapted from claudekit/ui-ux-pro-max + claudekit/frontend-design (merged) | MIT | .claude/skills/frontend-design/ | 2 |
-| 32  | qa-manual             | MeowKit (original)           | Orchestrates: agent-browser + playwright-cli + browse for QA + E2E gen | MIT | .claude/skills/qa-manual/ | 1 |
+| 32  | qa-manual             | MeowKit (original)           | Orchestrates: agent-browser + playwright-cli for QA + E2E gen | MIT | .claude/skills/qa-manual/ | 1 |
 | 33  | henshin               | MeowKit (adapted)            | Adapted from claudekit-engineer/agentize — planning front door only; downstream execution owned by plan-creator + cook | MIT | .claude/skills/henshin/ | 2 |
+
+## Removed
+
+| #   | Skill   | Original Source   | Source Repository                                            | License | Notes                                                  |
+|-----|---------|-------------------|--------------------------------------------------------------|---------|--------------------------------------------------------|
+| 12  | browse  | garrytan (gstack) | [gstack](https://github.com/garrytan/gstack)                 | MIT     | Retired in this release; superseded by `agent-browser` |
 
 ## Selection Criteria
 

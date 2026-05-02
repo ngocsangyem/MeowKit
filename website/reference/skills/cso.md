@@ -53,7 +53,7 @@ Run a comprehensive security audit on the entire repository before the v2.0 rele
 | `--skills` | Skill supply chain only | 0, 8, 12-14 |
 | `--supply-chain` | Dependency audit only | 0, 3, 12-14 |
 | `--owasp` | OWASP Top 10 only | 0, 9, 12-14 |
-| `--scope <domain>` | Focused audit | Domain-filtered |
+| `--scope `DOMAIN` | Focused audit | Domain-filtered |
 | `--diff` | Branch changes only | Combinable with any scope flag |
 
 Scope flags are **mutually exclusive**. If multiple scope flags are passed, the skill errors immediately. `--diff` is combinable with any scope flag.

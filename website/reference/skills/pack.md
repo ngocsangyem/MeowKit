@@ -37,20 +37,20 @@ Anti-triggers:
 | Flag | Effect |
 |------|--------|
 | `--style markdown\|xml\|json\|plain` | Output format (default: `markdown`) |
-| `--include <pattern>` | Comma-separated globs to force inclusion |
-| `--ignore <pattern>` | Additional ignore patterns (`.gitignore` respected by default) |
+| `--include `PATTERN` | Comma-separated globs to force inclusion |
+| `--ignore `PATTERN` | Additional ignore patterns (`.gitignore` respected by default) |
 | `--remove-comments` | Strip comments for supported languages |
 | `--compress` | Tree-sitter signature extraction -- API surface only |
 | `--self` | Allow packing the current git root (rare override) |
 | `--no-security-check` | Disable Secretlint scan (emits explicit warning) |
-| `--output <path>` | Override the auto-generated output path |
+| `--output `PATH` | Override the auto-generated output path |
 
 ## Workflow
 
 1. **Parse source** -- classify as remote (`owner/repo`, GitHub URL) or local path.
 2. **Self-pack guard** -- block if target resolves to current git root and `--self` not passed.
 3. **Compute output path** -- `.claude/packs/{timestamp}-{slug}.{ext}`.
-4. **Invoke repomix** -- `npx --yes repomix@^1.11 [flags] -o "<output>"`.
+4. **Invoke repomix** -- `npx --yes repomix@^1.11 [flags] -o` `OUTPUT`.
 5. **Surface secret-scan results** -- parse repomix output for security warnings.
 6. **Handoff** -- print output path with reminder: "Do NOT Read this file back into the current session."
 

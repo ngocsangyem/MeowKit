@@ -58,4 +58,4 @@ Load before evaluating: `docs/project-context.md`, `rubric-rules.md`, sprint con
 
 ## Skills loaded
 
-`mk:rubric` (always), `mk:evaluate` (orchestration shell), `mk:agent-browser` / `mk:playwright-cli` / `mk:browse` (frontend targets)
+`mk:rubric` (always), `mk:evaluate` (orchestration shell), `mk:agent-browser` / `mk:playwright-cli` (frontend targets)

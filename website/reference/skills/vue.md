@@ -255,7 +255,7 @@ const onSubmit = handleSubmit(async (values) => {
 |---------|----------|
 | Vue 2 syntax detected (Options API) | Migrate to Composition API `<script setup>` |
 | Pinia not installed | `npm install pinia` |
-| Type errors in template | Fix with `defineProps<T>()` typing |
+| Type errors in template | Fix with `definePropsT()` typing |
 
 ## Gotchas
 
@@ -288,7 +288,7 @@ const onSubmit = handleSubmit(async (values) => {
 
 ## Pro Tips
 
-- Use `defineProps<T>()` with interfaces for type safety — never runtime validation
+- Use `definePropsT()` with interfaces for type safety — never runtime validation
 - Destructure methods directly from the store, but always use `storeToRefs()` for state
 - Use `computed()` instead of `watch()` for derived state whenever possible
 - Always test components after refactoring — ensure no console warnings appear

@@ -126,7 +126,6 @@ Skills that can activate in any phase.
 | `mk:careful` | Warn before `rm -rf`, `DROP TABLE`, force-push |
 | `mk:freeze` | Restrict edits to one directory during debugging |
 | `mk:multimodal` | Image/video/audio/PDF analysis via Gemini API |
-| `mk:browse` | Fast headless browser (~100ms/command) |
 | `mk:agent-browser` | Chrome/CDP with session persistence and auth |
 | `mk:web-to-markdown` | Convert web pages to markdown for context injection |
 | `mk:llms` | Generate llms.txt per llmstxt.org spec |
@@ -188,4 +187,4 @@ Most pipeline skills enforce a plan-first gate. Skills that skip planning either
 - [How agents and skills work together](/core-concepts/how-it-works)
 - [Workflow phases](/core-concepts/workflow)
 - [Agents reference](/reference/agents)
-- [Skill definitions on disk](/.claude/skills/) — canonical source (SKILL.md files)
+- [Skill definitions on disk](https://github.com/ngocsangyem/MeowKit/tree/main/.claude/skills) — canonical source (SKILL.md files)

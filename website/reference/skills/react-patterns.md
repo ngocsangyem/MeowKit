@@ -90,7 +90,7 @@ const [users, posts, comments] = await Promise.all([
 ])
 ```
 
-**Suspense boundaries:** Wrap slow sections in `<Suspense>` with fallback.
+**Suspense boundaries:** Wrap slow sections in `SUSPENSE` with fallback.
 
 ```tsx
 <Suspense fallback={<Skeleton />}>

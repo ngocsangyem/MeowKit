@@ -18,14 +18,13 @@ Triggers:
 - Generating reusable `.spec.ts` E2E test code
 
 Anti-triggers:
-- Single-shot screenshots -- use `mk:browse`
 - AI-driven long autonomous flows -- use `mk:agent-browser` (session persistence, auth flows, MFA, cookie import)
 - Writing E2E test files from scratch -- use `mk:qa-manual`
 
 ## Core Capabilities
 
 - **Accessibility tree snapshots** -- `snapshot` returns element refs (`e1`, `e2`, ...) that stay stable across re-renders
-- **Named persistent sessions** -- isolated contexts with separate cookies, storage, and history via `-s=<name> --persistent`
+- **Named persistent sessions** -- isolated contexts with separate cookies, storage, and history via `-s=NAME --persistent`
 - **Auth state management** -- `state-save` and `state-load` persist auth cookies across runs
 - **Request mocking** -- `route` blocks or mocks network requests by URL pattern
 - **Network inspection** -- `network` command views request/response details
@@ -38,31 +37,31 @@ Anti-triggers:
 
 | Argument | Effect |
 |----------|--------|
-| `open <url>` | Navigate to a URL |
+| `open `URL` | Navigate to a URL |
 | `snapshot` | Get accessibility tree with element refs |
-| `snapshot --filename=<name>.yaml` | Save snapshot to named file |
-| `click <ref>` | Click element by ref (e.g., `e15`) |
-| `fill <ref> "text"` | Clear and type into an input |
+| `snapshot --filename=`NAME`.yaml` | Save snapshot to named file |
+| `click `REF` | Click element by ref (e.g., `e15`) |
+| `fill `REF` "text"` | Clear and type into an input |
 | `type "text"` | Type at current focus |
-| `press <key>` | Press a key (Enter, Tab, Escape) |
-| `select <ref> "value"` | Select an option |
-| `check <ref>` / `uncheck <ref>` | Check/uncheck a checkbox |
-| `screenshot` / `screenshot --filename=<name>.png` | Capture screenshot |
-| `pdf --filename=<name>.pdf` | Export page as PDF |
-| `-s=<name>` | Use a named session |
+| `press `KEY` | Press a key (Enter, Tab, Escape) |
+| `select `REF` "value"` | Select an option |
+| `check `REF` / `uncheck `REF` | Check/uncheck a checkbox |
+| `screenshot` / `screenshot --filename=`NAME`.png` | Capture screenshot |
+| `pdf --filename=`NAME`.pdf` | Export page as PDF |
+| `-s=`NAME` | Use a named session |
 | `--persistent` | Keep session alive across commands |
-| `state-save <file>` / `state-load <file>` | Save/load auth state |
-| `route "<pattern>" --status=404` | Mock a request |
-| `route "<pattern>" --body='{"mock": true}'` | Mock with custom body |
+| `state-save `FILE` / `state-load `FILE` | Save/load auth state |
+| `route "`PATTERN`" --status=404` | Mock a request |
+| `route "`PATTERN`" --body='{"mock": true}'` | Mock with custom body |
 | `console` / `network` | View console output / network requests |
 | `tracing-start` / `tracing-stop` | Record a trace |
-| `video-start` / `video-stop <file>.webm` | Record a video |
+| `video-start` / `video-stop `FILE`.webm` | Record a video |
 | `run-code "async page => { ... }"` | Execute custom Playwright code |
 | `list` / `close` / `close-all` / `kill-all` | Session management |
 
 ## Workflow
 
-1. `open <url>` -- navigate to target page
+1. `open `URL` -- navigate to target page
 2. `snapshot` -- get accessibility tree with element refs
 3. Interact using refs: `click`, `fill`, `type`, `select`, `check`
 4. Re-`snapshot` after navigation or DOM changes
@@ -112,7 +111,7 @@ take a screenshot of the table, and save the auth state for re-use.
 - **Snapshot after every navigation.** Element refs change when the DOM re-renders. Always re-snapshot.
 - **Flaky selectors on SPAs?** `data-testid` attributes change between renders. Prefer role-based selectors (`getByRole`) when using `run-code`.
 - **Auth state not persisting?** Each test starts with a fresh context. Use `state-save` / `state-load` to persist auth cookies.
-- **Named sessions are isolated.** Each `-s=<name>` session has separate cookies, storage, and history. Use different names for parallel tasks.
+- **Named sessions are isolated.** Each `-s=`NAME`` session has separate cookies, storage, and history. Use different names for parallel tasks.
 - **Requires Playwright MCP server.** Configure in `.mcp.json`: `{ "playwright": { "command": "npx", "args": ["@playwright/mcp@latest"] } }`.
 
 > **Canonical source:** `.claude/skills/playwright-cli/SKILL.md`

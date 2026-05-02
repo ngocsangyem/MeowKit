@@ -42,7 +42,6 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | `mk:lint-and-validate` | tester | testing | monolithic |
 | `mk:qa` | tester | testing | monolithic |
 | `mk:qa-manual` | tester | testing | monolithic |
-| `mk:browse` | tester | testing | monolithic |
 | `mk:playwright-cli` | tester | testing | monolithic |
 
 ### Phase 3 — Build GREEN

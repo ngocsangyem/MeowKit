@@ -14,7 +14,7 @@ Fetches arbitrary web pages and returns clean markdown wrapped in a DATA boundar
 - External references during research, investigation, planning
 - Cross-skill delegation from `mk:research`, `mk:intake`, etc. (with `--wtm-accept-risk`)
 
-**NOT for:** library/framework docs (use `mk:docs-finder`), interactive browser testing (use `mk:browse` or `mk:agent-browser`), Playwright test automation (use `mk:playwright-cli`), fetching sensitive/internal URLs (use Anthropic-proxied WebFetch).
+**NOT for:** library/framework docs (use `mk:docs-finder`), interactive browser testing (use `mk:agent-browser`), Playwright test automation (use `mk:playwright-cli`), fetching sensitive/internal URLs (use Anthropic-proxied WebFetch).
 
 ## Core Capabilities
 

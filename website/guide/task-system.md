@@ -93,4 +93,4 @@ Agents update this section after each significant action. On resumption, the age
 | Security Audit | Security review | security agent |
 | Guideline | Team standards document | documenter |
 
-Create tasks with `npx mewkit task new --type <type> "description"`. See [Task Commands](/cli/task-commands) for details.
+Create tasks with `npx mewkit task new --type TYPE "description"`. See [Task Commands](/cli/task-commands) for details.

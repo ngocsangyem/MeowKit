@@ -15,7 +15,7 @@ Provides a full Chrome/CDP automation CLI for long-running autonomous browser se
 - Complex interactions requiring video recording for debugging
 - Long-running scraping or monitoring sessions
 
-**NOT for:** quick single-shot verification (`mk:browse`), deterministic scripted flows (`mk:playwright-cli`), E2E test code generation (`mk:qa-manual`).
+**NOT for:** deterministic scripted flows (`mk:playwright-cli`), E2E test code generation (`mk:qa-manual`).
 
 ## Example Prompt
 
@@ -38,7 +38,7 @@ Log into our SaaS dashboard at https://app.example.com, navigate to the billing 
 | Semantic Locators | `find role button click --name "Submit"`, `find label "Email" fill "..."`, `find placeholder "Search" type "..."` |
 | Auth | `auth save/load`, `state save/load`, `cookies set/get/clear`, `set credentials` |
 | Network | `network route`, `network requests`, `network unroute` |
-| JS Execution | `eval "expr"`, `eval -b "<base64>"`, `eval --stdin` |
+| JS Execution | `eval "expr"`, `eval -b` `BASE64`, `eval --stdin` |
 | Debugging | `console`, `errors`, `highlight`, `inspect`, `trace`, `profiler` |
 
 ## Installation

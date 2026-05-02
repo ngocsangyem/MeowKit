@@ -27,7 +27,7 @@ When you create or modify a `.vue` file, [mk:vue](/reference/skills/vue) enforce
 | Rule | Enforcement |
 |------|------------|
 | `<script setup lang="ts">` always | Options API (`data()`, `methods:`) blocked |
-| `defineProps<T>()` with TypeScript interfaces | Runtime validation objects blocked |
+| `definePropsT()` with TypeScript interfaces | Runtime validation objects blocked |
 | `storeToRefs()` for Pinia destructuring | Direct store state destructuring blocked |
 | No `v-html` with user content | XSS vector (MeowKit security rule) |
 | `ref()` for primitives | `reactive()` only for complex objects |

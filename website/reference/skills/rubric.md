@@ -5,7 +5,7 @@ description: "Rubric library API — load, list, compose, and validate graded ev
 
 # mk:rubric
 
-Discovery, composition, and validation API for the rubric library at `.claude/rubrics/`. Consumed by the `evaluator` agent and `mk:evaluate` skill. Independently invokable via `/mk:rubric <subcommand>` for manual inspection, validation, or composition outside the evaluator workflow.
+Discovery, composition, and validation API for the rubric library at `.claude/rubrics/`. Consumed by the `evaluator` agent and `mk:evaluate` skill. Independently invokable via `/mk:rubric `SUBCOMMAND`` for manual inspection, validation, or composition outside the evaluator workflow.
 
 ## What This Skill Does
 
@@ -30,8 +30,8 @@ Activate when:
 | Subcommand | Purpose | Output |
 |---|---|---|
 | `list` | List all available rubrics + presets | Table: name, weight_default, applies_to |
-| `load <name>` | Load a single rubric and emit prompt-ready fragment | Markdown block ready to inject into evaluator prompt |
-| `compose <preset>` | Load a composition preset and return all member rubrics + weights | Composed prompt fragment with weight table |
+| `load `NAME`` | Load a single rubric and emit prompt-ready fragment | Markdown block ready to inject into evaluator prompt |
+| `compose `PRESET`` | Load a composition preset and return all member rubrics + weights | Composed prompt fragment with weight table |
 | `validate [path]` | Validate one rubric (or all if no path) against schema.md | PASS / FAIL with diagnostics |
 | `validate --preset [path]` | Validate composition preset (weights sum to 1.0 +-0.01) | PASS / FAIL |
 
@@ -58,7 +58,7 @@ Composition presets MUST have all weights summing to 1.0 +-0.01.
 
 ### Output Schema
 
-**`load <name>` output:**
+**`load `NAME`` output:**
 
 ```markdown
 ## Rubric: {name} (weight: {weight_default}, hard_fail: {threshold})
@@ -78,7 +78,7 @@ Composition presets MUST have all weights summing to 1.0 +-0.01.
 {PASS + FAIL examples, balanced}
 ```
 
-**`compose <preset>` output:**
+**`compose `PRESET`` output:**
 
 ```markdown
 ## Composition: {preset-name}

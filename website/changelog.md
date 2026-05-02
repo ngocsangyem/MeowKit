@@ -16,11 +16,19 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## Unreleased
+
+### Removals
+
+- **`mk:browse`** — retired. All browser automation now goes through [`mk:agent-browser`](/reference/skills/agent-browser). See `.claude/skills/agent-browser/references/migrating-from-browse.md` for the verb mapping and recipes for capabilities (responsive screenshots, link/form enumeration, performance timing) that `agent-browser` doesn't ship natively. Historical attribution preserved in `SKILLS_ATTRIBUTION.md` under `## Removed`.
+
+---
+
 ## 2.7.3 (2026-05-01) — `npx mewkit` resolution fix
 
 ### Bug Fixes
 
-- `npx mewkit <cmd>` failed on some machines with `sh: meowkit: command not found` (macOS) or `'meowkit' is not recognized as an internal or external command` (Windows) — the npm package was named `mewkit` but exposed a bin called `meowkit`, so resolvers (older npm, pnpm dlx, yarn dlx, certain Windows shells) spawned the bin by name through `PATH` instead of the symlinked `.bin/` path. Bin renamed to `mewkit` so package name and bin agree across all package managers.
+- `npx mewkit CMD` failed on some machines with `sh: meowkit: command not found` (macOS) or `'meowkit' is not recognized as an internal or external command` (Windows) — the npm package was named `mewkit` but exposed a bin called `meowkit`, so resolvers (older npm, pnpm dlx, yarn dlx, certain Windows shells) spawned the bin by name through `PATH` instead of the symlinked `.bin/` path. Bin renamed to `mewkit` so package name and bin agree across all package managers.
 - `pre-completion-check.sh` counter never reaching its 3-attempt soft-nudge cap — Claude Code assigns a new session ID for every blocked-Stop cycle, and `project-context-loader.sh` was resetting `session-state/precompletion-attempts.json` on every SessionStart, wiping the counter mid-loop. The pre-completion check now owns its own counter lifecycle (clears on verification success or cap-hit); the SessionStart reset is removed.
 
 ### CLI
@@ -85,7 +93,7 @@ The session-state checkpoint subsystem stops accumulating files unboundedly. `se
 
 ### Highlights
 
-Skill folders renamed from `.claude/skills/meow:<x>/` to `.claude/skills/<x>/` and the skill identity prefix moved from `meow:` to `mk:`. Cross-platform safe — eliminates the colon that broke Windows NTFS checkouts. Slash commands move from `/meow:<x>` to `/mk:<x>`. Backward-compat alias keeps in-prompt `meow:` text working with a stderr warning during the v2.7.x window; hard-cut in v2.8.0.
+Skill folders renamed from `.claude/skills/meow:X/` to `.claude/skills/X/` and the skill identity prefix moved from `meow:` to `mk:`. Cross-platform safe — eliminates the colon that broke Windows NTFS checkouts. Slash commands move from `/meow:X` to `/mk:X`. Backward-compat alias keeps in-prompt `meow:` text working with a stderr warning during the v2.7.x window; hard-cut in v2.8.0.
 
 ### Features
 
@@ -104,7 +112,7 @@ Skill folders renamed from `.claude/skills/meow:<x>/` to `.claude/skills/<x>/` a
 
 ### Removals
 
-- `.claude/skills/meow:*/` folder layout removed. Skills now live at `.claude/skills/<x>/`. Migration: `npx mewkit upgrade` runs the legacy-namespace migrator with confirmation prompt.
+- `.claude/skills/meow:*/` folder layout removed. Skills now live at `.claude/skills/X/`. Migration: `npx mewkit upgrade` runs the legacy-namespace migrator with confirmation prompt.
 - `.claude/commands/meow/` folder removed. Slash commands now live at `.claude/commands/mk/`. The 21 existing commands moved as-is; the 56 phantom skill-only aliases were intentionally not generated.
 
 ### Migration Notes
@@ -116,7 +124,7 @@ npx mewkit upgrade
 The upgrade pipeline detects existing `meow:*` folders, prompts the user, and then:
 
 - Renames folders via `git mv` (preserves history); falls back to `fs.rename` on non-git repos.
-- Rewrites SKILL.md frontmatter `name:` from `meow:<x>` to `mk:<x>`.
+- Rewrites SKILL.md frontmatter `name:` from `meow:X` to `mk:X`.
 - Reconciles `~/.mewkit/portable-registry.json` — strips `meow-` prefix from sanitized `item` keys.
 - Aborts if the git tree is dirty, or if any folder basename fails the path-safety regex.
 
@@ -124,9 +132,9 @@ If you have custom scripts or aliases that invoke `/meow:cook`, retype them as `
 
 ### Breaking Changes
 
-- Skill folder paths: `.claude/skills/meow:<x>/` → `.claude/skills/<x>/`.
-- Skill identity prefix: `meow:<x>` → `mk:<x>` in SKILL.md frontmatter and all cross-references.
-- Slash command paths: `.claude/commands/meow/<x>.md` → `.claude/commands/mk/<x>.md`. Type `/mk:cook` instead of `/meow:cook`.
+- Skill folder paths: `.claude/skills/meow:X/` → `.claude/skills/X/`.
+- Skill identity prefix: `meow:X` → `mk:X` in SKILL.md frontmatter and all cross-references.
+- Slash command paths: `.claude/commands/meow/X.md` → `.claude/commands/mk/X.md`. Type `/mk:cook` instead of `/meow:cook`.
 - `SkillInfo.id` field is now required (was previously absent). Downstream consumers reading the discovery output now see a guaranteed canonical id.
 
 ---
@@ -207,7 +215,7 @@ New 17th core agent `project-manager` — a cross-workflow delivery tracker that
 
 ### Highlights
 
-A 7-agent audit of all 77 `mk:*` skills against Anthropic's Skill-authoring best practices, Lessons-from-building-Claude-Code, and MeowKit's own `skill-authoring-rules.md`. Ships ~220 edits across description fields, frontmatter, reference integrity, scripts, and grounding. Zero new skills, zero breaking changes, measurably cleaner routing. [Full notes →](/guide/whats-new/v2.6.0)
+A 7-agent audit of all 77 `mk:*` skills against Anthropic's Skill-authoring best practices, Lessons-from-building-Claude-Code, and MeowKit's own `skill-authoring-rules.md`. Ships ~220 edits across description fields, frontmatter, reference integrity, scripts, and grounding. Zero new skills, zero breaking changes, measurably cleaner routing.
 
 ### Improvements
 
@@ -228,7 +236,7 @@ A 7-agent audit of all 77 `mk:*` skills against Anthropic's Skill-authoring best
 - Empty Python venv — `.claude/skills/.venv/` existed but `pip` was half-installed with no RECORD file and no `bin/pip` symlink, so all seven Python-backed skills crashed on first import. Bootstrapped via `get-pip.py --ignore-installed --no-deps`, then `npx mewkit setup --only=deps` installed the nine required packages. `npx mewkit doctor` now reports 13 PASS / 1 WARN (optional Playwright only).
 - `mk:rubric/scripts/validate-rubric.sh --help` no longer crashes on macOS — added `-h`/`--help` case before arg dispatcher, which previously fell through to `basename "--help"` triggering a BSD `illegal option` error.
 - Replaced non-existent `debugger` agent reference in `mk:cook`'s Phase-3 dispatch table with `developer` via `mk:investigate` — `.claude/agents/` never had a `debugger.md`.
-- `<HARD-GATE>` decorative tags in `mk:cook` and `mk:fix` bodies replaced with `**HARD GATE**` bold markdown — grep against `hooks/`, `scripts/`, and the CLI confirmed zero consumers of the tag format.
+- `HARD-GATE` decorative tags in `mk:cook` and `mk:fix` bodies replaced with `**HARD GATE**` bold markdown — grep against `hooks/`, `scripts/`, and the CLI confirmed zero consumers of the tag format.
 - Phantom `research-01` citations removed from `mk:evaluate` (4 locations) — no such research file exists; constraints now cite Anthropic harness research honestly or declare themselves as heuristics.
 - Phantom `research-02` citations removed from `mk:rubric/references/calibration-guide.md` (2), `mk:sprint-contract/SKILL.md`, `mk:sprint-contract/references/bdd-to-ac-mapping.md` (2), and `.claude/rubrics/schema.md` — same non-existence.
 - `mk:multimodal` "332 system voices" unsourced count corrected to "300+ (see provider catalog)" with the MiniMax URL attached.
@@ -270,7 +278,7 @@ New cross-cutting skill `mk:henshin` — planning front door for transforming ex
 
 - New per-skill reference page: [/reference/skills/henshin](/reference/skills/henshin).
 - [/guide/agent-skill-architecture](/guide/agent-skill-architecture) — henshin added to the Cross-Cutting Skills and Quick-Start tables.
-- [/guide/whats-new](/guide/whats-new) — v2.5.1 entry with workflow summary and boundary rationale.
+- `/mk:henshin` — new skill for agentizing code into CLI, MCP, and companion skill surfaces. v2.5.1 entry with workflow summary and boundary rationale.
 
 ---
 
@@ -289,8 +297,8 @@ Skills stop branding themselves and start reading like the project's own workflo
 
 ### Improvements
 
-- Installed skills read as the project's own workflow — `MeowKit follows the Boil the Lake principle` → `This workflow follows the Boil the Lake principle`; `Help MeowKit get better!` → `Help improve this workflow!`; table column `MeowKit` → `AI-assisted`; dozens of similar edits. See the [What's New page](/guide/whats-new/v2.5.0) for the full pattern list.
-- Seven collision clusters disambiguated — each pair now declares `use when` + `use <other> instead when` at the top of both skills; no more buried routing rules.
+- Installed skills read as the project's own workflow — `MeowKit follows the Boil the Lake principle` → `This workflow follows the Boil the Lake principle`; `Help MeowKit get better!` → `Help improve this workflow!`; table column `MeowKit` → `AI-assisted`; dozens of similar edits.
+- Seven collision clusters disambiguated — each pair now declares `use when` + `use OTHER instead when` at the top of both skills; no more buried routing rules.
 - `NOT this skill if:` differentiators added to the reasoning cluster (`mk:elicit`, `mk:brainstorming`, `mk:problem-solving`).
 - `mk:workflow-orchestrator` bare `"implement"` trigger replaced with `"implement feature"` — no longer fires `autoInvoke:true` on trivial requests.
 - `mk:ship/references/preamble.md` declares a memory-read of `.claude/memory/architecture-decisions.md` at task start. Previously the memory reference existed in frontmatter without a body instruction.
@@ -298,7 +306,7 @@ Skills stop branding themselves and start reading like the project's own workflo
 - `mk:cook` intent-detection table carries a green-field escalation callout pointing at `mk:harness`.
 - `mk:help` documents the `/mk:plan` alias — confirmed via the slash-command router at `.claude/commands/meow/plan.md`.
 - `mk:docs-finder` documents Node.js 18+ as a prerequisite for its `.js` scripts and flags unbounded `.claude/memory/docs-cache/` growth in Gotchas.
-- `mk:investigate` Process step 4 clarifies the freeze hook is a no-op without an explicit `mk:freeze <target-dir>` invocation.
+- `mk:investigate` Process step 4 clarifies the freeze hook is a no-op without an explicit `mk:freeze TARGET-DIR` invocation.
 - `mk:benchmark/SKILL.md` accurately describes `run-canary.sh` as a step-1-of-2 manifest emitter (not a suite runner); `compare-runs.sh` distinguishes `null` scores (PENDING, excluded from averages) from valid `0` scores.
 - `mk:jira` description narrowed from CRUD + evaluation to CRUD only — ticket analysis now routes to `mk:intake`.
 - `mk:scale-routing` marked `user-invocable: false` — it's a Phase 0 sub-skill, not a user-facing entry point.
@@ -632,7 +640,7 @@ Memory loader split into 3 focused modules. 4 critical security/correctness fixe
 
 ### Bug Fixes
 
-- Tag escape — `<memory-data>` wrapper tags in content are escaped before injection, preventing DATA boundary escape.
+- Tag escape — `MEMORY-DATA` wrapper tags in content are escaped before injection, preventing DATA boundary escape.
 - Budget split — 60% for critical entries, 40% for domain-filtered. One oversized entry no longer starves all others.
 - YAML validation — malformed frontmatter entries rejected with visible `[parse-errors:]` marker instead of silent fallback.
 - Per-entry caps — 3000 chars for critical (security findings preserved), 800 for standard.
@@ -913,7 +921,7 @@ Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline
 ### Migration Notes
 
 - `export MEOWKIT_MODEL_HINT=opus-4-6` in your shell profile if on Opus 4.6 — enables LEAN density auto-detection. Without it, Opus 4.6 users silently get FULL density.
-- Try `/mk:harness "build me a <thing>"` for your next green-field build.
+- Try `/mk:harness "build me a THING"` for your next green-field build.
 - Run `/mk:summary --status` after your first long session to verify the conversation cache is healthy.
 
 ### Breaking Changes

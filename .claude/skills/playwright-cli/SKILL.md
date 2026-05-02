@@ -1,6 +1,6 @@
 ---
 name: mk:playwright-cli
-description: "Session-persistent browser automation via Playwright CLI — form filling, screenshots, data extraction, multi-step flows. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, test web applications, or extract information across multiple requests. NOT for single-shot screenshots (see mk:browse); NOT for AI-driven long-autonomous flows (see mk:agent-browser); NOT for generating .spec.ts E2E code (see mk:qa-manual)."
+description: "Session-persistent browser automation via Playwright CLI — form filling, screenshots, data extraction, multi-step flows. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, test web applications, or extract information across multiple requests. NOT for AI-driven long-autonomous flows (see mk:agent-browser); NOT for generating .spec.ts E2E code (see mk:qa-manual)."
 allowed-tools: Bash(playwright-cli:*)
 source: microsoft/playwright
 ---

@@ -33,11 +33,11 @@ Catalog of probe techniques the evaluator uses to drive a running build per crit
 
 ## Frontend Probes (browser-driven)
 
-Tools: `mk:agent-browser`, `mk:playwright-cli`, `mk:browse`. Pick by complexity:
+Tools: `mk:agent-browser`, `mk:playwright-cli`. Pick by complexity:
 
 | Need | Tool | Why |
 |---|---|---|
-| Quick screenshot + check element exists | `mk:browse` | Lowest overhead |
+| Quick screenshot + check element exists | `mk:agent-browser` | Open + snapshot + screenshot in 3 commands |
 | Multi-step user flow (click, type, navigate, assert) | `mk:agent-browser` | Built for AI-driven flows |
 | Scripted regression flows | `mk:playwright-cli` | Replayable, deterministic |
 

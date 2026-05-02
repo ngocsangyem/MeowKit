@@ -167,8 +167,8 @@ Loaded by `ui-ux-designer` agent during **Phase 3 (Build)**. Also used by `devel
 
 - All images: meaningful `alt` text or `aria-hidden="true"` for decorative
 - Heading hierarchy: h1 -> h2 -> h3 (no skipping levels)
-- Form inputs: associated `<label>` or `aria-label`
-- ARIA landmarks: `<main>`, `<nav>`, `<aside>`, `<footer>`
+- Form inputs: associated `LABEL` or `aria-label`
+- ARIA landmarks: `MAIN`, `NAV`, `ASIDE`, `FOOTER`
 - Dynamic content: `aria-live="polite"` for updates
 
 ### Motion & Animation

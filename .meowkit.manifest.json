@@ -322,6 +322,10 @@
       "sha256": "1ae436f116406d9f3c1ad0611c791f9248533475df7dcf81b7da15a42662b7fc",
       "layer": "skill"
     },
+    ".claude/skills/agent-browser/references/migrating-from-browse.md": {
+      "sha256": "ce68168eaeb8bdfc6e3b88361d374d3d086fb4cc8c3bc644b34c29dd66efaa9c",
+      "layer": "skill"
+    },
     ".claude/skills/agent-browser/references/profiling.md": {
       "sha256": "15f1e6c7994d7471a274dc1476992d0ec178acd91f8b626e0d6f24a4dbef738f",
       "layer": "skill"
@@ -388,38 +392,6 @@
     },
     ".claude/skills/agent-detector/references/team-mode.md": {
       "sha256": "18aa1e70016640c2e243c8b0c037ba4ed9420bc9d08b7b85262a42a1b01c9f9b",
-      "layer": "skill"
-    },
-    ".claude/skills/browse/SKILL.md": {
-      "sha256": "705edc400a899a7fb43f94797f2ef07c868ca539481f4835068454af9d8184a9",
-      "layer": "skill"
-    },
-    ".claude/skills/browse/references/command-reference.md": {
-      "sha256": "92b6b7934aa66135696c12900f7c6c4d472bd0d9a56360bd782298fdcd3b4c9a",
-      "layer": "skill"
-    },
-    ".claude/skills/browse/references/preamble.md": {
-      "sha256": "711da1d5c0f5bf24ee607ce52e0a9478edb90038050a469e1451fe8a3d3e9992",
-      "layer": "skill"
-    },
-    ".claude/skills/browse/references/qa-patterns.md": {
-      "sha256": "c1214fe3060b3caaa61c0d49e67d81b649e74f098272ca79e82f589c2ae29f89",
-      "layer": "skill"
-    },
-    ".claude/skills/browse/references/setup.md": {
-      "sha256": "fb08d7b595dc17deae08afb2dc76a0e9550d78636ae0a812d4302d8a8ffd83ec",
-      "layer": "skill"
-    },
-    ".claude/skills/browse/references/shared-protocols.md": {
-      "sha256": "f4174c32d383016291b7b65b56f08866647cecaa67cd210a34d0992c0ed7d022",
-      "layer": "skill"
-    },
-    ".claude/skills/browse/references/snapshot-flags.md": {
-      "sha256": "cf2ec34651c77e339a621cc571975c8fa583df490dc3e95a6654975df9d26c16",
-      "layer": "skill"
-    },
-    ".claude/skills/browse/references/user-handoff.md": {
-      "sha256": "09bd19e345dbf8f0315ea7e1fd147a401bed19e0b923b5f086d62c511e3e54ed",
       "layer": "skill"
     },
     ".claude/skills/careful/SKILL.md": {

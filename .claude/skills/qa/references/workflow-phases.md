@@ -34,19 +34,18 @@
 **If the user specified auth credentials:**
 
 ```bash
-$B goto <login-url>
-$B snapshot -i                    # find the login form
-$B fill @e3 "user@example.com"
-$B fill @e4 "[REDACTED]"         # NEVER include real passwords in report
-$B click @e5                      # submit
-$B snapshot -D                    # verify login succeeded
+agent-browser open <login-url>
+agent-browser snapshot -i                  # find the login form
+agent-browser fill @e3 "user@example.com"
+agent-browser fill @e4 "[REDACTED]"        # NEVER include real passwords in report
+agent-browser click @e5                    # submit
+agent-browser snapshot -i                  # verify login succeeded
 ```
 
-**If the user provided a cookie file:**
+**If the user provided a saved auth state:**
 
 ```bash
-$B cookie-import cookies.json
-$B goto <target-url>
+agent-browser open <target-url> --state ./auth-state.json
 ```
 
 **If 2FA/OTP is required:** Ask the user for the code and wait.
@@ -58,10 +57,11 @@ $B goto <target-url>
 Get a map of the application:
 
 ```bash
-$B goto <target-url>
-$B snapshot -i -a -o "$REPORT_DIR/screenshots/initial.png"
-$B links                          # map navigation structure
-$B console --errors               # any errors on landing?
+agent-browser open <target-url>
+agent-browser snapshot -i
+agent-browser screenshot --annotate "$REPORT_DIR/screenshots/initial.png"
+agent-browser eval "JSON.stringify(Array.from(document.links).map(l=>({href:l.href,text:l.innerText.trim()})))"  # map navigation
+agent-browser console --errors                                                                                    # any errors on landing?
 ```
 
 **Detect framework** (note in report metadata):
@@ -70,16 +70,17 @@ $B console --errors               # any errors on landing?
 - `wp-content` in URLs → WordPress
 - Client-side routing with no page reloads → SPA
 
-**For SPAs:** The `links` command may return few results because navigation is client-side. Use `snapshot -i` to find nav elements (buttons, menu items) instead.
+**For SPAs:** The links eval may return few results because navigation is client-side. Use `snapshot -i` to find nav elements (buttons, menu items) instead.
 
 ## Phase 4: Explore
 
 Visit pages systematically. At each page:
 
 ```bash
-$B goto <page-url>
-$B snapshot -i -a -o "$REPORT_DIR/screenshots/page-name.png"
-$B console --errors
+agent-browser open <page-url>
+agent-browser snapshot -i
+agent-browser screenshot --annotate "$REPORT_DIR/screenshots/page-name.png"
+agent-browser console --errors
 ```
 
 Then follow the **per-page exploration checklist** (see `references/issue-taxonomy.md`):
@@ -92,9 +93,9 @@ Then follow the **per-page exploration checklist** (see `references/issue-taxono
 6. **Console** — Any new JS errors after interactions?
 7. **Responsiveness** — Check mobile viewport if relevant:
    ```bash
-   $B viewport 375x812
-   $B screenshot "$REPORT_DIR/screenshots/page-mobile.png"
-   $B viewport 1280x720
+   agent-browser set viewport 375 812
+   agent-browser screenshot "$REPORT_DIR/screenshots/page-mobile.png"
+   agent-browser set viewport 1280 720
    ```
 
 **Depth judgment:** Spend more time on core features (homepage, dashboard, checkout, search) and less on secondary pages (about, terms, privacy).
@@ -111,14 +112,14 @@ Document each issue **immediately when found** — don't batch them.
 1. Take a screenshot before the action
 2. Perform the action
 3. Take a screenshot showing the result
-4. Use `snapshot -D` to show what changed
+4. Capture the post-action snapshot to show new state
 5. Write repro steps referencing screenshots
 
 ```bash
-$B screenshot "$REPORT_DIR/screenshots/issue-001-step-1.png"
-$B click @e5
-$B screenshot "$REPORT_DIR/screenshots/issue-001-result.png"
-$B snapshot -D
+agent-browser screenshot "$REPORT_DIR/screenshots/issue-001-step-1.png"
+agent-browser click @e5
+agent-browser screenshot "$REPORT_DIR/screenshots/issue-001-result.png"
+agent-browser snapshot -i
 ```
 
 **Static bugs** (typos, layout issues, missing images):
@@ -126,7 +127,8 @@ $B snapshot -D
 2. Describe what's wrong
 
 ```bash
-$B snapshot -i -a -o "$REPORT_DIR/screenshots/issue-002.png"
+agent-browser snapshot -i
+agent-browser screenshot --annotate "$REPORT_DIR/screenshots/issue-002.png"
 ```
 
 **Write each issue to the report immediately** using the template format from `qa/templates/qa-report-template.md`.
@@ -206,13 +208,13 @@ git commit -m "fix(qa): ISSUE-NNN — short description"
 - Navigate back to the affected page
 - Take **before/after screenshot pair**
 - Check console for errors
-- Use `snapshot -D` to verify the change had the expected effect
+- Capture a fresh snapshot to verify the change had the expected effect
 
 ```bash
-$B goto <affected-url>
-$B screenshot "$REPORT_DIR/screenshots/issue-NNN-after.png"
-$B console --errors
-$B snapshot -D
+agent-browser open <affected-url>
+agent-browser screenshot "$REPORT_DIR/screenshots/issue-NNN-after.png"
+agent-browser console --errors
+agent-browser snapshot -i
 ```
 
 ### 8e. Classify

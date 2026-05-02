@@ -9,7 +9,7 @@ Step-file workflow that drives a running build, probes each rubric criterion via
 
 ## What This Skill Does
 
-- Composes rubric presets from the rubric library via `mk:rubric compose <preset>`
+- Composes rubric presets from the rubric library via `mk:rubric compose `PRESET`
 - Boots the target build if given a path (skips if a URL is already running)
 - Probes every loaded criterion by actively driving the build (browser, curl, CLI)
 - Captures concrete evidence (screenshots, HTTP responses, CLI transcripts) for every finding
@@ -20,7 +20,7 @@ Step-file workflow that drives a running build, probes each rubric criterion via
 ## When to Use
 
 Activate when:
-- User runs `/mk:evaluate <target>` with a URL, file path, or running-app handle
+- User runs `/mk:evaluate `TARGET` with a URL, file path, or running-app handle
 - A generator iteration completes and the harness needs a graded verdict
 - After Phase 3 (build) and before Phase 5 (ship) for frontend/fullstack/CLI products
 - When asked to "grade the running app", "check the build behaviorally", or "verify against the spec"
@@ -87,7 +87,7 @@ Verdict derivation:
 
 | Flag | Purpose |
 |------|---------|
-| `<target>` | URL (`http://localhost:3000`), path (`./apps/web`), or CLI binary (`./bin/mytool`) |
+| `` `TARGET` `` | URL (`http://localhost:3000`), path (`./apps/web`), or CLI binary (`./bin/mytool`) |
 | `--rubric-preset` | Override auto-detected preset |
 | `--max-criteria` | Cap criteria count (default: 15) |
 | `--no-boot` | Skip step-02 boot (target must be a URL) |

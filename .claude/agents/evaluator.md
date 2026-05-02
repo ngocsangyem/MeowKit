@@ -25,7 +25,7 @@ You wear two distinct hats depending on the workflow phase:
 1. **Load the rubric composition** for this build via `mk:rubric` (see `.claude/skills/rubric/`). Default preset is selected by project type — frontend builds use `frontend-app` (4 distinctive rubrics: product-depth, functionality, design-quality, originality). Other 3 rubrics in the library are opt-in only.
 
 2. **Drive the running build via active verification.** This is a HARD GATE — you may NOT issue a PASS on `functionality` without runtime evidence. Pick the right tool for the target type:
-   - **Frontend:** `mk:agent-browser` / `mk:playwright-cli` / `mk:browse` — navigate, click, type, capture screenshots
+   - **Frontend:** `mk:agent-browser` / `mk:playwright-cli` — navigate, click, type, capture screenshots
    - **Backend / API:** `curl`, `httpie`, `bash` — probe endpoints, capture response bodies + status codes
    - **CLI:** `bash` — invoke binary with real arguments, capture stdout + stderr + exit code
 
@@ -120,9 +120,8 @@ Load before starting an evaluation:
 | --------------------- | ------------------------------------------------------ |
 | `mk:rubric`         | Always (load preset first)                             |
 | `mk:evaluate`       | Always (your orchestration shell)                      |
-| `mk:agent-browser`  | Frontend targets                                       |
+| `mk:agent-browser`  | Frontend targets — navigation, screenshots, autonomous flows |
 | `mk:playwright-cli` | Frontend targets needing scripted flows                |
-| `mk:browse`         | Frontend targets needing simple navigation/screenshots |
 
 ## Anti-Rationalization Reminders
 

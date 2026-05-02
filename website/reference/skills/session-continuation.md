@@ -24,7 +24,7 @@ Persists and restores mid-session workflow progress across context resets. Captu
 | Command | Syntax | Action |
 |---------|--------|--------|
 | Handoff | `workflow:handoff` | Save state + generate resume instructions |
-| Resume | `workflow:resume <id>` | Load state + continue from last phase |
+| Resume | `workflow:resume `ID` | Load state + continue from last phase |
 | List | `workflow:list` | Show all saved workflows |
 
 ## Workflow

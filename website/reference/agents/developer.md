@@ -25,7 +25,7 @@ Detect TDD mode in this order (highest precedence first):
 2. **Sentinel file:** `.claude/session-state/tdd-mode` — if contents are `on`, TDD is ON (written mechanically by `tdd-flag-detector.sh` when user invokes with `--tdd`)
 3. **Otherwise:** TDD is OFF (default)
 
-**TDD mode:** confirm failing tests exist from tester. Before first source-code edit, invoke the gate hook: `sh .claude/hooks/pre-implement.sh "<feature-name>"`. If exit 1, STOP and route back to tester. This invocation is the developer's responsibility regardless of which skill spawned it.
+**TDD mode:** confirm failing tests exist from tester. Before first source-code edit, invoke the gate hook: `sh .claude/hooks/pre-implement.sh "FEATURE-NAME"`. If exit 1, STOP and route back to tester. This invocation is the developer's responsibility regardless of which skill spawned it.
 
 **Default mode:** proceed directly to implementation. Tests are recommended but not gated.
 
@@ -64,7 +64,7 @@ For COMPLEX tasks with bead decomposition:
 2. Process sequentially — complete each bead before starting the next
 3. Track progress in `session-state/build-progress.json`
 4. Resume from last incomplete bead on interruption
-5. Commit per bead: `feat(bead-NN): <description>`
+5. Commit per bead: `feat(bead-NN): DESCRIPTION`
 
 **Bead sizing:** ~150 lines implementation, ~50 lines test-only. If a bead grows beyond this, flag to planner for re-decomposition. When beads are absent: process plan normally.
 

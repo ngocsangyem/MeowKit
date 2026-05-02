@@ -16,7 +16,7 @@ Advisory only — does not change agent-detector scoring or output format.
 | Database work | Build | mk:database, mk:cook |
 | Writing or running tests | Verify | mk:testing, mk:qa |
 | Something broke, debugging | Verify | mk:investigate, mk:fix |
-| Browser testing needed | Verify | mk:browse, mk:qa |
+| Browser testing needed | Verify | mk:agent-browser, mk:qa |
 | Reviewing code quality | Review | mk:review |
 | Security audit | Review | mk:cso |
 | Simplify/refactor code | Review | mk:simplify |

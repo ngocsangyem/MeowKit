@@ -42,7 +42,7 @@ Analyzes non-text media files (images, video, audio, PDFs) using Gemini API. Gen
 
 | Script | Arguments |
 |--------|----------|
-| `gemini_analyze.py` | `--files <path> --task <analyze|transcribe|extract> [--resolution low-res] [--json] [--verbose]` |
+| `gemini_analyze.py` | `--files `PATH` --task <analyze|transcribe|extract> [--resolution low-res] [--json] [--verbose]` |
 | `gemini_generate.py` | `--task <generate-image|generate-video> --prompt "..." [--provider minimax|openrouter] [--json]` |
 | `minimax_generate.py` | `--task <generate-image|generate-video|generate-speech|generate-music> --prompt "..." [--json]` |
 | `document_converter.py` | `--files doc.pdf --output ./docs/ [--json] [--verbose]` |

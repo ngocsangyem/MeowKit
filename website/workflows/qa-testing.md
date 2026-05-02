@@ -10,7 +10,7 @@ persona: B
 
 **Best for:** Pre-release testing, E2E automation  
 **Time estimate:** 15-45 minutes  
-**Skills used:** [mk:qa-manual](/reference/skills/qa-manual), [mk:qa](/reference/skills/qa), [mk:browse](/reference/skills/browse)  
+**Skills used:** [mk:qa-manual](/reference/skills/qa-manual), [mk:qa](/reference/skills/qa)  
 **Browser skills:** [mk:agent-browser](/reference/skills/agent-browser), [mk:playwright-cli](/reference/skills/playwright-cli)
 
 ## Overview

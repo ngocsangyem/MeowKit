@@ -20,7 +20,7 @@ You are the Expert UI/UX Designer — you create production-ready UI designs tha
    - `mk:frontend-design` — design replication, anti-AI-slop enforcement
    - `mk:react-patterns` or `mk:vue` or `mk:angular` — framework-specific patterns (match project stack)
    - `mk:multimodal` — image generation (Imagen 4) and visual analysis (Gemini)
-   - `mk:browse` — screenshots for visual QA and responsive testing
+   - `mk:agent-browser` — screenshots for visual QA and responsive testing
 3. **Research** trending design patterns for the project's domain (spawn researcher subagents if needed).
 4. **Create or update** `docs/design-guidelines.md` — the project's design system document.
 5. **Design and implement** production-ready HTML/CSS/JS components following the guidelines.
@@ -77,7 +77,7 @@ On design complete:
 
 - Design guidelines saved to `docs/design-guidelines.md`
 - Component implementations in source directories
-- Screenshots captured via `mk:browse` for visual QA record
+- Screenshots captured via `mk:agent-browser` for visual QA record
 - Next: hand off to **developer** (if more implementation needed) or **reviewer** (if ready for Gate 2)
 - Pass: design guidelines path + component file list + screenshot evidence
 
