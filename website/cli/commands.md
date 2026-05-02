@@ -175,6 +175,104 @@ npx mewkit status
 
 Shows: MeowKit version with channel indicator (stable/beta), project config from `.claude/meowkit.config.json`.
 
+## orchviz
+
+Live web visualizer for the active Claude Code session. Tails the JSONL transcript at `~/.claude/projects/<encoded-cwd>/<session>.jsonl`, parses it into structured `AgentEvent`s, and serves them at `http://127.0.0.1:<port>/` as a Canvas2D + d3-force interactive graph plus a live transcript panel and MeowKit-specific overlays (Gate state, model tier, today's tokens, phase).
+
+```bash
+npx mewkit orchviz [flags]
+```
+
+### Flags
+
+| Flag | Description |
+|------|-------------|
+| `--port <number>` | Bind to fixed port (`0` = random; default: random) |
+| `--open` / `--no-open` | Auto-launch browser (default: `--open`) |
+| `--session <id>` | Pin to a single Claude Code session id |
+| `--workspace <path>` | Override watched workspace (default: cwd) |
+| `--verbose` | Print sanitized `AgentEvent`s to stderr |
+| `--log [path]` | Persist events to markdown (default: `.claude/logs/orchviz-<sid>.md`; custom path must end in `.md`) |
+
+### Examples
+
+```bash
+# Default: random port, auto-open browser
+npx mewkit orchviz
+
+# Fixed port, don't auto-launch the browser
+npx mewkit orchviz --port 3001 --no-open
+
+# Pin to a single session id
+npx mewkit orchviz --session <uuid>
+
+# Override watched workspace
+npx mewkit orchviz --workspace .
+
+# Persist events to default log path
+npx mewkit orchviz --log
+
+# Persist events to a custom .md path
+npx mewkit orchviz --log /tmp/run.md
+```
+
+### Environment Variables
+
+| Variable | Effect |
+|----------|--------|
+| `MEOWKIT_ORCHVIZ_WRITABLE=1` | Opt into write mode (enables todo-toggle endpoint). Default is read-only. |
+| `MEOWKIT_ORCHVIZ_READONLY=1` | Force read-only mode (defensive lock). |
+| `MEOWKIT_ORCHVIZ_READONLY=0` | Legacy opt-in to write mode (kept for backwards compatibility). |
+
+### HTTP API
+
+The orchviz server exposes these endpoints on `http://127.0.0.1:<port>`:
+
+**`GET /api/plans`** — list non-archived plans sorted by mtime (newest first).
+
+```bash
+curl http://127.0.0.1:3001/api/plans
+# { "plans": [{ "slug": "260501-my-plan", "title": "...", "status": "draft", ... }] }
+```
+
+**`GET /api/plan?slug=<slug>`** — full plan state with per-phase ETags. Omit `?slug=` to get the most-recently-modified plan.
+
+```bash
+curl "http://127.0.0.1:3001/api/plan?slug=260501-my-plan"
+# { "plan": { ... }, "phaseEtags": { "1": "<hex64>", "2": "<hex64>" }, "readonly": true }
+```
+
+**`POST /api/plan/todo`** — toggle a todo checkbox (write mode only).
+
+```bash
+MEOWKIT_ORCHVIZ_WRITABLE=1 npx mewkit orchviz   # opt in to write mode
+
+curl -X POST http://127.0.0.1:3001/api/plan/todo \
+  -H "Content-Type: application/json" \
+  -H "Origin: http://127.0.0.1:3001" \
+  -d '{"slug":"260501-my-plan","phase":1,"todoIdx":0,"checked":true,"etag":"<hex64>"}'
+# 200: { "ok": true, "changed": true, "etag": "<new-hex64>" }
+# 409: { "error": "stale", "currentEtag": "<latest-hex64>" }  → re-fetch and retry
+# 403: Origin header missing or not in allowlist
+# 405: server is in read-only mode (the default)
+```
+
+POST requests must include `Origin: http://127.0.0.1:<port>` or `Origin: http://localhost:<port>` to prevent cross-origin writes.
+
+### Security
+
+- Server binds `127.0.0.1` only.
+- Host-header guarded against DNS rebinding.
+- SSE frames sanitized: ANSI strip + strict-prefix secret scrub (`sk-…`, `ghp_…`, `AKIA…`, PEM blocks).
+- Path traversal blocked on the static file server.
+- Read-only by default — opt into writes explicitly via env var.
+
+### Notes
+
+- If the web UI bundle is missing at `dist/orchviz-web/`, run `npm run build:web` in the `mewkit` package to produce it.
+- When no `.claude/` is detected from the workspace, overlays render empty but the graph still streams events.
+- Closing with `Ctrl+C` prints a final event count summary before exit.
+
 ## migrate
 
 Export your `.claude/` kit (agents, commands, skills, config, rules, hooks) to external coding-agent tools.
