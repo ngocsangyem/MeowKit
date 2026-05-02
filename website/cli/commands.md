@@ -20,8 +20,8 @@ npx mewkit doctor [--report]
 
 **Auto-fixes:** Hook file permissions (`chmod +x`).
 
-| Flag | Description |
-|------|-------------|
+| Flag       | Description                       |
+| ---------- | --------------------------------- |
 | `--report` | Print shareable diagnostic report |
 
 ## setup
@@ -32,12 +32,12 @@ Guided post-scaffold configuration. Each step is idempotent.
 npx mewkit setup [--only=<step>]
 ```
 
-| Step | What it does |
-|------|-------------|
-| `venv` | Creates Python venv for skill scripts at `.claude/skills/.venv` |
-| `mcp` | Copies `mcp.json.example` → `.mcp.json` |
-| `env` | Copies `env.example` → `.env` |
-| `gitignore` | Appends MeowKit entries to `.gitignore` |
+| Step        | What it does                                                    |
+| ----------- | --------------------------------------------------------------- |
+| `venv`      | Creates Python venv for skill scripts at `.claude/skills/.venv` |
+| `mcp`       | Copies `mcp.json.example` → `.mcp.json`                         |
+| `env`       | Copies `env.example` → `.env`                                   |
+| `gitignore` | Appends MeowKit entries to `.gitignore`                         |
 
 ```bash
 npx mewkit setup              # Run all steps
@@ -71,8 +71,8 @@ View token usage and cost tracking.
 npx mewkit budget [--monthly]
 ```
 
-| Flag | Description |
-|------|-------------|
+| Flag        | Description                                           |
+| ----------- | ----------------------------------------------------- |
 | `--monthly` | Aggregate by month instead of showing last 10 entries |
 
 ## memory
@@ -94,11 +94,11 @@ Update mewkit to the latest version.
 npx mewkit upgrade [--check] [--beta] [--list]
 ```
 
-| Flag | Description |
-|------|-------------|
+| Flag      | Description                                        |
+| --------- | -------------------------------------------------- |
 | `--check` | Show available update (shows both stable and beta) |
-| `--beta` | Install beta channel |
-| `--list` | List all available versions with channel info |
+| `--beta`  | Install beta channel                               |
+| `--list`  | List all available versions with channel info      |
 
 **Examples:**
 
@@ -123,48 +123,6 @@ Recent versions:
   1.0.0
 ```
 
-## /mk:summary — Conversation Summary Cache Inspector
-
-User-facing inspector for the Phase 9 conversation summary cache.
-
-### Usage
-
-```bash
-/mk:summary              # show current cache
-/mk:summary --clear      # wipe cache and lock
-/mk:summary --status     # show throttle state
-```
-
-### What It Reads
-
-- `.claude/memory/conversation-summary.md` — cache file written by background Haiku summarizer on `Stop` hook event
-- `session-state/conversation-summary.lock` — mutex held while background worker runs
-
-### Behavior
-
-**Default (no flags):** Reads `.claude/memory/conversation-summary.md`. If frontmatter `session_id` is empty, prints "No summary cached for this session yet." Otherwise prints frontmatter (session_id, last_updated, event_count, transcript_size_bytes, summaries count) plus the markdown body.
-
-**`--clear`:** Overwrites cache with empty placeholder. Removes `session-state/conversation-summary.lock` if present. Next `Stop` crossing the throttle threshold regenerates the cache.
-
-**`--status`:** Reads transcript size and cache frontmatter. Computes and reports throttle conditions:
-- `THRESHOLD` = `${MEOWKIT_SUMMARY_THRESHOLD:-20480}` bytes
-- `EVENT_GAP` = `${MEOWKIT_SUMMARY_TURN_GAP:-30}` events
-- `GROWTH_DELTA` = `${MEOWKIT_SUMMARY_GROWTH_DELTA:-5120}` bytes
-
-Reports whether the next `Stop` will trigger a summary or skip, and whether the lock file exists (background worker still running).
-
-### Notes
-
-- Cache is per-session: `project-context-loader.sh` clears it automatically on new session start.
-- This command does not do any summarization — it only exposes the cache for inspection and management.
-- Opt-out: set `MEOWKIT_SUMMARY_CACHE=off` to disable both summarization and injection.
-
-### Related
-
-- Hook: `.claude/hooks/conversation-summary-cache.sh` (see [Hooks Reference](/reference/hooks))
-- Rule: [harness-rules Rule 11](/reference/rules-index#harness-rules)
-- Guide: [Middleware Layer](/guide/middleware-layer)
-
 ## status
 
 Print version, channel, and current config.
@@ -185,14 +143,14 @@ npx mewkit orchviz [flags]
 
 ### Flags
 
-| Flag | Description |
-|------|-------------|
-| `--port <number>` | Bind to fixed port (`0` = random; default: random) |
-| `--open` / `--no-open` | Auto-launch browser (default: `--open`) |
-| `--session <id>` | Pin to a single Claude Code session id |
-| `--workspace <path>` | Override watched workspace (default: cwd) |
-| `--verbose` | Print sanitized `AgentEvent`s to stderr |
-| `--log [path]` | Persist events to markdown (default: `.claude/logs/orchviz-<sid>.md`; custom path must end in `.md`) |
+| Flag                   | Description                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `--port <number>`      | Bind to fixed port (`0` = random; default: random)                                                   |
+| `--open` / `--no-open` | Auto-launch browser (default: `--open`)                                                              |
+| `--session <id>`       | Pin to a single Claude Code session id                                                               |
+| `--workspace <path>`   | Override watched workspace (default: cwd)                                                            |
+| `--verbose`            | Print sanitized `AgentEvent`s to stderr                                                              |
+| `--log [path]`         | Persist events to markdown (default: `.claude/logs/orchviz-<sid>.md`; custom path must end in `.md`) |
 
 ### Examples
 
@@ -218,11 +176,11 @@ npx mewkit orchviz --log /tmp/run.md
 
 ### Environment Variables
 
-| Variable | Effect |
-|----------|--------|
+| Variable                     | Effect                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------- |
 | `MEOWKIT_ORCHVIZ_WRITABLE=1` | Opt into write mode (enables todo-toggle endpoint). Default is read-only. |
-| `MEOWKIT_ORCHVIZ_READONLY=1` | Force read-only mode (defensive lock). |
-| `MEOWKIT_ORCHVIZ_READONLY=0` | Legacy opt-in to write mode (kept for backwards compatibility). |
+| `MEOWKIT_ORCHVIZ_READONLY=1` | Force read-only mode (defensive lock).                                    |
+| `MEOWKIT_ORCHVIZ_READONLY=0` | Legacy opt-in to write mode (kept for backwards compatibility).           |
 
 ### HTTP API
 
@@ -287,43 +245,44 @@ npx mewkit migrate                    # interactive multiselect
 
 ### Flags
 
-| Flag | Description |
-|------|-------------|
-| `--all` | Migrate to all 15 supported tools in one pass |
-| `--global` | Install to user's home (`~/.cursor/`, etc.) instead of project-local paths |
-| `--yes`, `-y` | Non-interactive — auto-confirm prompts |
-| `--dry-run` | Compute and display the plan without writing any files |
-| `--force` | Overwrite user-edited target files without prompting on conflict |
-| `--source PATH` | Override source `.claude/` directory (default: `CWD/.claude/` or bundled kit) |
-| `--only CSV` | Restrict to listed types: `agents,commands,skills,config,rules,hooks` |
-| `--skip-config`, `--skip-rules`, `--skip-hooks` | Exclude one or more types |
-| `--prefer-agents-md` | (Antigravity) write rules to `AGENTS.md` instead of `GEMINI.md` |
-| `--respect-deletions` | Skip items whose target was deleted by the user (default re-installs) |
-| `--reinstall-empty-dirs` | Re-install items even if the user emptied the target directory (default: true) |
+| Flag                                            | Description                                                                    |
+| ----------------------------------------------- | ------------------------------------------------------------------------------ |
+| `--all`                                         | Migrate to all 15 supported tools in one pass                                  |
+| `--global`                                      | Install to user's home (`~/.cursor/`, etc.) instead of project-local paths     |
+| `--yes`, `-y`                                   | Non-interactive — auto-confirm prompts                                         |
+| `--dry-run`                                     | Compute and display the plan without writing any files                         |
+| `--force`                                       | Overwrite user-edited target files without prompting on conflict               |
+| `--source PATH`                                 | Override source `.claude/` directory (default: `CWD/.claude/` or bundled kit)  |
+| `--only CSV`                                    | Restrict to listed types: `agents,commands,skills,config,rules,hooks`          |
+| `--skip-config`, `--skip-rules`, `--skip-hooks` | Exclude one or more types                                                      |
+| `--prefer-agents-md`                            | (Antigravity) write rules to `AGENTS.md` instead of `GEMINI.md`                |
+| `--respect-deletions`                           | Skip items whose target was deleted by the user (default re-installs)          |
+| `--reinstall-empty-dirs`                        | Re-install items even if the user emptied the target directory (default: true) |
 
 ### Capability matrix
 
 What each tool accepts. ✓ supported · — not supported by tool.
 
-| Tool | Agents | Commands | Skills | Config | Rules | Hooks |
-|------|:------:|:--------:|:------:|:------:|:-----:|:-----:|
-| Cursor | ✓ | — | ✓ | ✓ | ✓ | — |
-| Codex | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Droid | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| OpenCode | ✓ | ✓ | ✓ | ✓ | ✓ | — |
-| Goose | ✓ | — | ✓ | ✓ | ✓ | — |
-| Gemini CLI | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Antigravity | — (skills) | ✓ | ✓ | ✓ | ✓ | — |
-| GitHub Copilot | ✓ | — | ✓ | ✓ | ✓ | — |
-| Amp | ✓ | — | ✓ | ✓ | ✓ | — |
-| Kilo Code [unverified] | ✓ | — | ✓ | ✓ | ✓ | — |
-| Kiro IDE | ✓ | — | ✓ | ✓ | ✓ | — |
-| Roo Code | ✓ | — | ✓ | ✓ | ✓ | — |
-| Windsurf | ✓ | ✓ | ✓ | ✓ | ✓ | — |
-| Cline | ✓ | — | ✓ | ✓ | ✓ | — |
-| OpenHands | ✓ | — | ✓ | ✓ | ✓ | — |
+| Tool                   |   Agents   | Commands | Skills | Config | Rules | Hooks |
+| ---------------------- | :--------: | :------: | :----: | :----: | :---: | :---: |
+| Cursor                 |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
+| Codex                  |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   ✓   |
+| Droid                  |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   ✓   |
+| OpenCode               |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
+| Goose                  |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
+| Gemini CLI             |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   ✓   |
+| Antigravity            | — (skills) |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
+| GitHub Copilot         |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
+| Amp                    |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
+| Kilo Code [unverified] |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
+| Kiro IDE               |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
+| Roo Code               |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
+| Windsurf               |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
+| Cline                  |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
+| OpenHands              |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
 
 **Notes:**
+
 - Antigravity treats agents as skills (no separate concept) — Claude Code agents land in Antigravity's skills directory.
 - Hooks: only Codex, Droid, and Gemini CLI accept hooks. Other tools warn and skip.
 - Shell hooks (`.sh`/`.ps1`/`.bat`) are filtered at discovery — only node-runnable hooks (`.cjs`/`.mjs`/`.js`) migrate.
@@ -370,12 +329,12 @@ A `mewkit upgrade` followed by `mewkit migrate cursor` propagates kit updates to
 
 ### Exit codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Partial failure (one or more items failed; others succeeded) |
-| 2 | Invalid flags or unknown tool name |
-| 130 | User cancelled (Ctrl+C during interactive prompt) |
+| Code | Meaning                                                      |
+| ---- | ------------------------------------------------------------ |
+| 0    | Success                                                      |
+| 1    | Partial failure (one or more items failed; others succeeded) |
+| 2    | Invalid flags or unknown tool name                           |
+| 130  | User cancelled (Ctrl+C during interactive prompt)            |
 
 ### Concurrent invocations
 
@@ -399,13 +358,14 @@ npx mewkit init --migrate-to all
 npx mewkit init --migrate-to cursor --migrate-global
 ```
 
-| Flag | Description |
-|------|-------------|
-| `--migrate` | After unpack, prompt for providers via interactive multiselect (TTY required) |
-| `--migrate-to <csv\|all>` | After unpack, export to listed providers (`cursor,codex` or `all`) |
-| `--migrate-global` | Use global install paths (`~/.cursor/`, etc.) instead of project-local |
+| Flag                      | Description                                                                   |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| `--migrate`               | After unpack, prompt for providers via interactive multiselect (TTY required) |
+| `--migrate-to <csv\|all>` | After unpack, export to listed providers (`cursor,codex` or `all`)            |
+| `--migrate-global`        | Use global install paths (`~/.cursor/`, etc.) instead of project-local        |
 
 **Behavior:**
+
 - Migration runs after kit unpacks successfully — failures don't roll back the kit install. If migration fails, init still completes; re-run `mewkit migrate` to retry.
 - Init uses the same orchestrator, registry, and reconciler as the standalone `migrate` command. Idempotent re-runs work the same way.
 - `--migrate-to` implies `--yes` (non-interactive), so it's safe to use in CI scripts.
