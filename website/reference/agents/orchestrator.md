@@ -21,8 +21,8 @@ Entry point for every task. Classifies complexity (Trivial / Standard / Complex)
 | Complexity | Model | Agent sequence | Examples |
 |---|---|---|---|
 | Trivial | Haiku | Direct to specialist | Rename, typo, format |
-| Standard | Sonnet | Planner → Tester → Developer → Reviewer → Shipper | Feature (<5 files), bug fix |
-| Complex | Opus | Planner → Architect → Security(2) → Tester → Developer → Security(4) → Reviewer → Shipper | Architecture, auth, payments |
+| Standard | Sonnet | Planner → Tester → Developer → Reviewer → Shipper → Documenter → Analyst | Feature (<5 files), bug fix |
+| Complex | Opus | Planner → Architect → Security(2) → Tester → Developer → Security(4) → Reviewer → Shipper → Documenter → Analyst | Architecture, auth, payments |
 
 Architect is inserted after planner when schema, API, or infra changes are involved. Security is inserted at Phase 2 and Phase 4 for auth/payments/security changes.
 
@@ -72,15 +72,16 @@ Max 3 agents. Gates remain sequential. See `parallel-execution-rules.md`.
 
 ## Planning depth
 
-| Mode | Researchers | Parallel | Two Approaches |
-|---|---|---|---|
-| default | 1 | No | No |
-| strict | 2 | Yes | Yes |
-| fast | 0 (skip) | No | No |
-| architect | 2 | Yes | Yes |
-| audit | 1 | No | No |
-| cost-saver | 0 (skip) | No | No |
-| document | 0 (skip) | No | No |
+| Mode | Researchers | Parallel | Two Approaches | Per-Phase Scout |
+|---|---|---|---|---|---|
+| default | 1 | No | No | No |
+| strict | 2 | Yes | Yes | No |
+| fast | 0 (skip) | No | No | No |
+| architect | 2 | Yes | Yes | No |
+| audit | 1 | No | No | No |
+| cost-saver | 0 (skip) | No | No | No |
+| document | 0 (skip) | No | No | No |
+| deep | 1 per phase | No | No | Yes |
 
 ## Required context
 

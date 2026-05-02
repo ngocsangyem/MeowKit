@@ -1,60 +1,94 @@
 ---
 title: "mk:worktree"
-description: "Git worktree management for parallel agent execution. Creates isolated worktrees per agent, merges results, and cleans up after parallel tasks complete."
+description: "Git worktree management for parallel agent execution. Creates isolated worktrees for parallel agents, merges results, and cleans up."
 ---
 
 # mk:worktree
 
-Git worktree management for parallel agent execution. Each parallel agent works in its own worktree to prevent file conflicts.
-
 ## What This Skill Does
 
-When the orchestrator decomposes a COMPLEX task into parallel subtasks, mk:worktree creates an isolated git worktree for each parallel agent, manages the lifecycle (create → work → merge → cleanup), and enforces safety constraints to prevent data loss. Agents in separate worktrees cannot accidentally overwrite each other's work.
+Worktree manages git worktrees to enable parallel agent execution. When the orchestrator decomposes a COMPLEX task into independent subtasks with zero file overlap, worktree creates an isolated worktree for each parallel agent, preventing file conflicts. After all agents complete, it merges results back to the feature branch, runs integration tests, and cleans up. It enforces safety constraints to prevent data loss.
 
 ## When to Use
 
-::: tip For COMPLEX parallel tasks
-mk:worktree is used by the orchestrator when decomposing COMPLEX tasks into independent parallel subtasks. You do not invoke it directly in most cases.
+Triggers:
+- Called by the orchestrator when decomposing a COMPLEX task into parallel subtasks
+- The orchestrator determines parallel execution is safe (zero file overlap, COMPLEX classification)
 
-Parallel execution only qualifies when subtasks have zero file overlap and the task is classified as COMPLEX.
-:::
+Anti-triggers:
+- Direct invocation by users -- the orchestrator manages the lifecycle
+- Simple or MODERATE tasks -- parallel execution only for COMPLEX tasks
+- Tasks with file overlap -- overlapping files are handled sequentially
 
-## Actions
+## Core Capabilities
 
-| Action | What it does |
-|--------|-------------|
-| `create [agent-name]` | Branch from current HEAD into `.worktrees/{agent-name}/` on a `parallel/{agent-name}-{timestamp}` branch |
-| `merge [agent-name]` | Merge completed worktree branch back to feature branch (no-fast-forward) |
-| `cleanup [agent-name]` | Remove worktree directory and delete the parallel branch after successful merge |
-| `list` | Show all active worktrees to check parallel agent status |
+- **Isolated worktree creation** -- branches from current feature HEAD into `.worktrees/{agent-name}/` on a `parallel/{agent-name}-{timestamp}` branch
+- **No-fast-forward merge** -- merges completed worktree branches back to the feature branch with a merge commit
+- **Conflict detection** -- if merge conflicts occur, lists conflicting files, stops, and reports; never auto-resolves
+- **Integration test gate** -- after merge, runs the full test suite; if tests fail, the decomposition was wrong
+- **Cleanup** -- removes worktree directories and deletes parallel branches after successful merge
+- **Status listing** -- `list` shows all active worktrees and their branches
+- **Safety enforcement** -- max 3 active worktrees, feature branches only, no force-delete with uncommitted changes
 
-## How It Works
+## Arguments
 
-1. **Orchestrator decomposes** — COMPLEX task split into independent subtasks with zero file overlap
-2. **Create worktrees** — one per parallel agent: `git worktree add .worktrees/{name} -b parallel/{name}-{timestamp}`
-3. **Agents work in isolation** — each agent edits only files in its worktree; no cross-worktree access
-4. **Merge results** — after all parallel agents complete, merge worktree branches to feature branch
-5. **Integration test** — run full test suite on merged result; if it fails, the decomposition was wrong
-6. **Cleanup** — remove worktree directories and parallel branches
+| Action | Effect |
+|--------|--------|
+| `create [agent-name]` | Create isolated worktree from current HEAD on `parallel/{agent-name}-{timestamp}` |
+| `merge [agent-name]` | No-fast-forward merge of worktree branch back to feature branch |
+| `cleanup [agent-name]` | Remove worktree directory and delete parallel branch (only after successful merge) |
+| `list` | Show all active worktrees with branch names |
 
-## Constraints
+## Workflow
 
-- **Max 3 active worktrees** at any time — enforced by `parallel-execution-rules.md`
-- **Feature branches only** — never create worktrees on `main` or `master`
-- **No force-delete** with uncommitted changes — commit or stash first
-- **Merge conflicts** — if conflicts occur during merge, list conflicting files, STOP, and report to orchestrator; do NOT auto-resolve
-- **Integration test required** — after merge, always run full test suite before proceeding
+1. **Orchestrator decomposes** -- COMPLEX task split into independent subtasks with zero file overlap
+2. **Create worktrees** -- one per parallel agent: `git worktree add .worktrees/{name} -b parallel/{name}-{timestamp}`
+3. **Agents work in isolation** -- each agent edits only files in its worktree; no cross-worktree access
+4. **Merge results** -- after all parallel agents complete, merge worktree branches to the feature branch
+5. **Integration test** -- run full test suite on the merged result; if it fails, the decomposition was wrong
+6. **Cleanup** -- remove worktree directories and parallel branches
 
-## Gotchas
+## Usage
 
-- **Branch name collision** — worktree creation fails if branch already exists; timestamps ensure uniqueness
-- **Manual directory deletion** — `git worktree remove` fails silently if directory was already deleted; check existence first
-- **Shared `.git`** — worktrees share the same `.git` directory; force-pushing from a worktree affects the main checkout
-- **macOS path quoting** — worktree paths with `:` in skill names (e.g., `mk:review`) need quoting in shell commands
-- **Staged parallel mode** — when strict zero-overlap is impractical, overlapping files are handled sequentially while non-overlapping work runs in parallel; see `parallel-execution-rules.md`
+```bash
+# Orchestrator creates worktrees for parallel agents
+mk:worktree create agent-auth
+mk:worktree create agent-db
+mk:worktree create agent-api
 
-## Related
+# ...agents work independently in their worktrees...
 
-- [mk:task-queue](/reference/skills/workflow-orchestrator) — task claiming and ownership enforcement for parallel agents
-- [mk:cook](/reference/skills/cook) — pipeline skill that triggers parallel execution for COMPLEX tasks
-- Parallel execution rules: `.claude/rules/parallel-execution-rules.md`
+# Orchestrator merges results
+mk:worktree merge agent-auth
+mk:worktree merge agent-db
+mk:worktree merge agent-api
+
+# Verify and cleanup
+mk:worktree list
+mk:worktree cleanup agent-auth
+mk:worktree cleanup agent-db
+mk:worktree cleanup agent-api
+```
+
+## Example Prompt
+
+```
+This is handled by the orchestrator internally -- users do not invoke mk:worktree directly.
+```
+
+## Common Use Cases
+
+- Parallelizing a COMPLEX `mk:cook` task across 3 agents working on independent modules
+- Running multiple code generation subtasks simultaneously without file conflicts
+- Isolating experimental work from the main feature branch during exploration
+
+## Pro Tips
+
+- **Branch name collisions are prevented by timestamps.** The `{timestamp}` suffix ensures uniqueness.
+- **Never create worktrees on `main` or `master`.** Only feature branches. The skill enforces this.
+- **Worktrees share the same `.git`.** Force-pushing from a worktree affects the main checkout -- be careful.
+- **macOS path quoting matters.** Worktree paths with `:` in names (derived from skill names like `mk:review`) need quoting in shell commands.
+- **Integration test is mandatory.** If the test suite fails after merge, the parallel decomposition was wrong -- the subtasks had hidden dependencies.
+- **Uncommitted changes block cleanup.** `git worktree remove` fails if there are uncommitted changes. Commit or stash first.
+
+> **Canonical source:** `.claude/skills/worktree/SKILL.md`

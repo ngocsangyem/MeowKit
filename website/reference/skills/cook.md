@@ -5,7 +5,26 @@ description: "End-to-end feature pipeline — plan, test, build, review, ship. T
 
 # mk:cook
 
+## What This Skill Does
+
 Primary entry point for building features. Given a description or plan path, orchestrates the full 7-phase pipeline. TDD is opt-in via `--tdd`. For green-field product builds, use `mk:harness` instead.
+
+## When to Use
+
+- Building a feature, fix, or refactor scoped to a single task
+- Executing an existing implementation plan
+- Rapid iteration with `--fast` mode (skips research)
+- Parallel multi-feature builds with `--parallel`
+- **NOT for:** green-field product builds (use `mk:harness`), workflow orchestration (use `mk:workflow-orchestrator`)
+
+## Core Capabilities
+
+- **7-phase pipeline:** Orient → Plan → Test → Build → Simplify → Verify → Review → Ship → Reflect
+- **TDD mode:** Opt-in via `--tdd` — writes failing tests before implementation, enforces RED-GREEN-REFACTOR
+- **Smart intent detection:** Auto-routes to the correct mode based on input patterns (plan path, "fast", "parallel", "auto")
+- **Workflow modes:** interactive (default), auto, fast, parallel, no-test, code — with modifier flags `--verify`, `--strict`, `--no-strict`
+- **Required subagents:** Scout (Phase 0), plan-creator + researcher (Phase 1), tester (Phase 2, TDD only), developer (Phase 3), mk:simplify + mk:verify (post-build), reviewer (Phase 4), git-manager via mk:ship (Phase 5), documenter + memory capture (Phase 6)
+- **Simplify + Verify:** Mandatory post-build steps — reduce complexity, then run unified build+lint+test+coverage before review
 
 ## Usage
 
@@ -19,7 +38,16 @@ Primary entry point for building features. Given a description or plan path, orc
 /mk:cook update readme --no-test                # Skip Phase 2
 /mk:cook "feature" --verify                      # Light browser check after review
 /mk:cook "feature" --strict                      # Full evaluator after review
+/mk:cook "feature" --interactive                 # Full interactive (default)
 ```
+
+## Example Prompt
+
+```
+Build a JWT-based authentication system for the API — login, registration, token refresh, and role-based access control. Run in TDD mode with full review gates.
+```
+
+**Flags:** `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`
 
 **Modifier flags:** `--verify` (light browser check ~$1, advisory) | `--strict` (full evaluator ~$2-5, FAIL blocks ship) | `--no-strict` (suppress auto-strict from scale-routing). `--strict` supersedes `--verify`.
 
@@ -49,6 +77,10 @@ Gate 2 requires human approval in ALL modes. No exceptions. Auto mode auto-fixes
 | "trust me", "auto" | auto — auto-fix, gates enforced |
 | 3+ features or "parallel" | parallel — multi-agent |
 | "no test", "skip test" | no-test — skip Phase 2 |
+| Default | interactive — full workflow with user approval at each gate |
+| `--verify` | (modifier) — light browser check after review (Phase 4.5) |
+| `--strict` | (modifier) — full evaluator after review (Phase 4.5) |
+| `--no-strict` | (modifier) — suppress auto-strict from scale-routing |
 
 ## Required subagents
 
@@ -89,3 +121,6 @@ After Phase 3 GREEN: run `mk:simplify` to reduce complexity before review. Then 
 - Missing model tier declaration — always declare in Phase 0
 - Forgetting memory read/write — Phase 0 reads `.claude/memory/`, Phase 6 appends
 - `--strict` cost surprise — auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress
+- Skipping Gate 1 on "simple" features — features that seem simple grow during implementation. Always create a plan file; cancel it if truly trivial
+- Subagent patterns using Agent() not Task() — Task() enables tracking, blocking, and progress. Always use Task() for phases 2-6
+- `--strict` vs `--verify` confusion — `--verify` = light browser check (advisory). `--strict` = full evaluator with rubrics (FAIL blocks ship). `--strict` supersedes `--verify`

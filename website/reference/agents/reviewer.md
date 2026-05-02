@@ -32,7 +32,7 @@ Performs structural code review across five dimensions. Produces a written verdi
 | Verdict | Meaning | Effect |
 |---|---|---|
 | PASS | No blocking issues | → Shipper (Phase 5) |
-| PASS WITH NOTES | Non-blocking suggestions | → Shipper, suggestions noted |
+| WARN | Non-blocking suggestions | → Shipper, suggestions noted |
 | FAIL | Critical findings | → Back to developer — must fix before re-review |
 
 Every WARN finding requires 3-part justification: what the WARN means, why it's acceptable in this context, what condition would make it a FAIL. If the reviewer cannot articulate all three, WARN becomes FAIL.

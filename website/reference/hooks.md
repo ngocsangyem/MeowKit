@@ -19,6 +19,9 @@ These run automatically via Claude Code's hook system:
 | `post-session.sh`      | Stop        | Session end | Capture session data to `.claude/memory/`                                                 | No           |
 | `ensure-skills-venv.sh` | SessionStart | Session start | Idempotent bootstrap — creates `.claude/skills/.venv` if absent                         | No           |
 | `tdd-flag-detector.sh`  | UserPromptSubmit | Prompt submit | Detects `--tdd` flag in user prompts, writes sentinel to `session-state/tdd-mode`      | No           |
+| `gate-enforcement.sh`   | PreToolUse     | Edit, Write  | Blocks code writes before Gate 1 (plan approval) and sprint contract sign; validates contract file edits against schema | Yes (exit 1) |
+| `privacy-block.sh`      | PreToolUse     | Read, Edit, Write, Bash | Blocks reads/writes of sensitive files (.env, keys, credentials, SSH) and SSRF-vulnerable web fetches | Yes (exit 2) |
+| `project-context-loader.sh` | SessionStart | Session start | Loads project context, directory listing, tool availability, package scripts, preferences, and agent readiness score | No           |
 
 ## Skill-embedded hooks
 
@@ -39,6 +42,7 @@ These run when specific skills call them:
 | `pre-implement.sh`  | Phase 2-3 | TDD gate — opt-in (see note below) | Only when TDD enabled    |
 | `pre-ship.sh`       | Phase 5   | Test + lint + typecheck            | Yes                      |
 | `cost-meter.sh`     | Any       | Token usage tracking               | No                       |
+| `append-trace.sh`   | Any       | Append JSONL trace record to `.claude/memory/trace-log.jsonl` (secret-scrubbed, atomic, auto-rotates at 50MB) | No                       |
 
 ### `pre-implement.sh` invocation model
 
@@ -51,6 +55,16 @@ The hook is a no-op unless TDD mode is ON via:
 - (legacy) `MEOW_PROFILE=fast` still bypasses with a deprecation warning, removed in next major
 
 When TDD is OFF (the default), the hook exits 0 silently. When ON, it requires a failing test to exist for the feature being implemented and blocks otherwise. Bypass mechanisms: drop `--tdd`, unset `MEOWKIT_TDD`.
+
+## Telemetry probes
+
+These hooks are telemetry-only — they log event fires to verify Claude Code supports the corresponding hook event types. They never block and always exit 0. Replace with real handlers once event support is confirmed.
+
+| Probe                         | Event               | Purpose                                                                 |
+| ----------------------------- | ------------------- | ----------------------------------------------------------------------- |
+| `control-probe.sh`            | Stop                | Control signal — confirms Stop event fires reliably, providing a baseline for comparing PreCompact/PostToolUseFailure probe fire rates |
+| `posttoolfailure-probe.sh`    | PostToolUseFailure  | Logs PostToolUseFailure hook fires to verify CC supports the event      |
+| `precompact-probe.sh`         | PreCompact          | Logs PreCompact hook fires to verify CC supports the event              |
 
 ## Hook runtime profiling
 
@@ -139,22 +153,22 @@ Sourceable libraries in `.claude/hooks/lib/` — not hooks themselves:
 
 ## Middleware Hooks (Phase 7)
 
-### `post-write-build-verify.sh`
+### `build-verify` (handler)
 
-Fires on **PostToolUse Edit|Write**. Classifies the written file by extension (`ts/tsx` → `tsc --noEmit|eslint`; `js` → `eslint`; `py` → `ruff check|mypy`; `go` → `go build ./...`; `rs` → `cargo check`; `rb` → `ruby -c|rubocop`). Errors emitted to stdout as `@@BUILD_VERIFY_ERROR@@ … @@END_BUILD_VERIFY@@` blocks (fed back to agent). Results cached by file content hash — unchanged files are skipped. Skips `node_modules/`, `vendor/`, `dist/`, `tasks/`, `docs/`, `.claude/`, test files, and map/lock files.
+Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Classifies the written file by extension (`ts/tsx` → `tsc --noEmit|eslint`; `js` → `eslint`; `py` → `ruff check|mypy`; `go` → `go build ./...`; `rs` → `cargo check`; `rb` → `ruby -c|rubocop`). Errors emitted to stdout as `@@BUILD_VERIFY_ERROR@@ … @@END_BUILD_VERIFY@@` blocks (fed back to agent). Results cached by file content hash — unchanged files are skipped. Skips `node_modules/`, `vendor/`, `dist/`, `tasks/`, `docs/`, `.claude/`, test files, and map/lock files.
 
 - **Opt-out:** `MEOWKIT_BUILD_VERIFY=off`
 - **Timeout override:** `MEOWKIT_BUILD_VERIFY_TIMEOUT=N` (default 30s for TS; 35s hook registration timeout)
 - **Density:** runs in LEAN; skipped in MINIMAL (`MEOWKIT_HARNESS_MODE=MINIMAL`)
-- **Source:** `.claude/hooks/post-write-build-verify.sh`
+- **Source:** `handlers/build-verify.cjs` (dispatched via `dispatch.cjs`)
 
-### `post-write-loop-detection.sh`
+### `loop-detection` (handler)
 
-Fires on **PostToolUse Edit|Write**. Counts per-file edits keyed `{session_id}:{realpath}` in `session-state/edit-counts.json`. Warns at N≥4 (`@@LOOP_DETECT_WARN@@`) and escalates at N≥8 (`@@LOOP_DETECT_ESCALATE@@`) — doom-loop prevention per LangChain harness research. Never blocks; messages are fed back via stdout.
+Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Counts per-file edits keyed `{session_id}:{realpath}` in `session-state/edit-counts.json`. Warns at N≥4 (`@@LOOP_DETECT_WARN@@`) and escalates at N≥8 (`@@LOOP_DETECT_ESCALATE@@`) — doom-loop prevention per LangChain harness research. Never blocks; messages are fed back via stdout.
 
 - **Opt-out:** `MEOWKIT_LOOP_DETECT=off`
 - **Timeout:** 3s
-- **Source:** `.claude/hooks/post-write-loop-detection.sh`
+- **Source:** `handlers/loop-detection.cjs` (dispatched via `dispatch.cjs`)
 
 ### `pre-completion-check.sh`
 
@@ -222,6 +236,7 @@ node dispatch.cjs <EventName> [Matcher]
 | budget-tracker | `handlers/budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | `tool_input`, `tool_response` | Estimates cost; warns $30, blocks $100 |
 | auto-checkpoint | `handlers/auto-checkpoint.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Checkpoint every 20 calls |
 | checkpoint-writer | `handlers/checkpoint-writer.cjs` | Stop | — | — | Sequenced checkpoint with git state |
+| immediate-capture | `handlers/immediate-capture-handler.cjs` | UserPromptSubmit | — | `prompt` | Detects ##decision:, ##pattern:, ##note: prefixes; routes to memory files |
 
 > **Note:** The `memory-loader.cjs` handler was removed in v2.4.1. Memory is now loaded on-demand by consumer skills — there is no per-turn auto-injection.
 
@@ -237,9 +252,9 @@ node dispatch.cjs <EventName> [Matcher]
 
 | File                                        | Writer                                           | Purpose                                                        |
 | ------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------- |
-| `session-state/edit-counts.json`            | `post-write-loop-detection.sh`                   | Per-file edit counter, keyed `{session_id}:{realpath}`         |
+| `session-state/edit-counts.json`            | `handlers/loop-detection.cjs`                    | Per-file edit counter, keyed `{session_id}:{realpath}`         |
 | `session-state/precompletion-attempts.json` | `pre-completion-check.sh`                        | Pre-completion re-entry guard per plan slug                    |
-| `session-state/build-verify-cache.json`     | `post-write-build-verify.sh`                     | File-content-hash cache for skip-on-unchanged                  |
+| `session-state/build-verify-cache.json`     | `handlers/build-verify.cjs`                      | File-content-hash cache for skip-on-unchanged                  |
 | `session-state/conversation-summary.lock`   | `conversation-summary-cache.sh` (Stop bg worker) | Phase 9 mutex preventing overlapping background summarizers    |
 | `.claude/memory/conversation-summary.md`    | `conversation-summary-cache.sh` (Stop bg worker) | Phase 9 cache — read by UserPromptSubmit hook every turn       |
 | `session-state/learning-observer.jsonl`     | `learning-observer.sh`                           | Churn pattern log                                              |
@@ -250,8 +265,8 @@ node dispatch.cjs <EventName> [Matcher]
 
 | Var                              | Effect                                                                |
 | -------------------------------- | --------------------------------------------------------------------- |
-| `MEOWKIT_BUILD_VERIFY=off`       | Skip `post-write-build-verify.sh`                                     |
-| `MEOWKIT_LOOP_DETECT=off`        | Skip `post-write-loop-detection.sh`                                   |
+| `MEOWKIT_BUILD_VERIFY=off`       | Skip `build-verify` handler                                            |
+| `MEOWKIT_LOOP_DETECT=off`        | Skip `loop-detection` handler                                          |
 | `MEOWKIT_PRECOMPLETION=off`      | Skip `pre-completion-check.sh`                                        |
 | `MEOWKIT_HARNESS_MODE=LEAN`      | PreCompletion falls back to soft nudge; BuildVerify still runs        |
 | `MEOWKIT_HARNESS_MODE=MINIMAL`   | Skip BuildVerify + PreCompletion entirely                             |

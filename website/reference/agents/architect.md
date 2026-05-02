@@ -13,6 +13,7 @@ Evaluates architectural trade-offs using evidence and data. Generates Architectu
 |---|---|
 | **Type** | Core |
 | **Phase** | 1 |
+| **Model** | Opus |
 | **Auto-activates** | Complex tasks (schema design, new service boundaries, auth systems, API contracts, infrastructure) |
 | **Owns** | `docs/architecture/` |
 | **Never does** | Write production code, make decisions without evidence |
@@ -30,6 +31,12 @@ Generates ADRs at `docs/architecture/adr/YYMMDD-title.md`:
 ```
 
 NNNN numbers are sequential, zero-padded (0001, 0002, ...).
+
+## Handoff
+
+- Architectural issues in plan → hand back to **planner** with specific concerns
+- Architecture is sound → confirm to orchestrator, recommend routing to **tester** then **developer**
+- Always include: ADR file path, constraints for developer, security considerations
 
 ## Skills loaded
 

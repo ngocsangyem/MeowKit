@@ -3,33 +3,44 @@ title: "mk:skill-creator"
 description: "Create new skills with proper structure, compliance checks, and registration. Enforces mk: prefix and context engineering principles."
 ---
 
-# mk:skill-creator
+# mk:skill-creator — Skill Scaffolding & Validation
 
-Create new skills with proper structure, compliance, and registration. Enforces `mk:` prefix, sub-agents.md structure, and context engineering principles.
+## What This Skill Does
 
-## When to use
+Create new skills with proper structure, compliance, and registration. Enforces the `mk:` prefix, sub-agents.md structure, and Anthropic context engineering principles.
 
-- "create a skill", "build a new skill", "make a skill for [X]"
-- Converting external skill for adoption
+## When to Use
+
+- User asks to "create a skill", "build a new skill", "make a skill for [X]"
+- Converting an external skill for adoption in MeowKit
 - Scaffolding a skill from a workflow pattern
+- Explicit: `/mk:skill-creator [name] [description]`
 
-Explicit: `/mk:skill-creator [name] [description]`
+**Do NOT invoke:** When the user just wants to edit an existing skill's content — this is for creation and scaffolding only.
 
-## Script-first approach
+## Core Capabilities
 
-Python scripts handle scaffolding and validation. Claude reviews and fills content.
+- **Scaffolding:** `scripts/init-skill.py` creates directory + template SKILL.md with TODO markers
+- **Validation:** `scripts/validate-skill.py` checks compliance against 8-point checklist
+- **Content guidance:** References cover required sections, trigger-condition descriptions, gotcha writing, filesystem patterns, and 9-type taxonomy
+- **Registration:** Adds attribution row to `SKILLS_ATTRIBUTION.md`
 
-```bash
-# Scaffold new skill
-.claude/skills/.venv/bin/python3 .claude/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .claude/skills
+## Example Prompt
 
-# Validate skill
-.claude/skills/.venv/bin/python3 .claude/skills/skill-creator/scripts/validate-skill.py .claude/skills/my-feature/SKILL.md
+```
+Create a new skill called mk:database that generates PostgreSQL schema migrations from TypeScript entity definitions. It should validate schemas against naming conventions and produce a migration plan.
 ```
 
 ## Process
 
-1. Scaffold via init script
-2. Fill SKILL.md with name, description, triggers, allowed-tools
-3. Validate via validate script
-4. Register — no separate registration step; validation confirms readiness
+1. **Gather intent** — what should the skill do? When should it trigger? What output format?
+2. **Scaffold** — run `init-skill.py mk:<name> --path .claude/skills` to create directory + template
+3. **Fill content** — Claude completes each TODO section in the generated template
+4. **Add references/** — if skill body would exceed ~500 lines, split into reference files
+5. **Security boundaries** — load `mk:skill-template-secure` for trust model if skill processes untrusted input
+6. **Validate** — run `validate-skill.py` to check 8-point compliance
+7. **Fix failures** — if score < 7/8, fix failing items
+8. **Register** — add row to `SKILLS_ATTRIBUTION.md`
+9. **Report** — output creation summary with compliance details
+
+## Scripts

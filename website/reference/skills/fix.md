@@ -5,17 +5,52 @@ description: "Structured bug investigation — auto-complexity detection, root c
 
 # mk:fix
 
+## What This Skill Does
+
 Structured debugging pipeline. Instead of immediately editing code, it forces structured investigation: assess complexity, find root cause, write a regression test, apply the minimal fix. Auto-detects complexity — a typo gets a quick fix, a race condition gets full investigation.
+
+## When to Use
+
+- Diagnosing and fixing bugs, type errors, lint failures, CI/CD issues, and runtime errors
+- Any defect remediation requiring root-cause-first investigation
+- Repeated bug patterns where fix memory can accelerate resolution
+- **NOT for:** investigation without a fix (use `mk:investigate`), build-only compilation errors (use `mk:build-fix`)
+
+## Core Capabilities
+
+- **Mandatory scout + diagnose:** Never fixes before understanding the codebase and confirming root cause with evidence
+- **Complexity auto-detection:** Classifies as Simple (single file), Moderate (multi-file), Complex (system-wide), or Parallel (2+ independent issues)
+- **Regression test enforcement:** Every fix must include a test that fails without the fix and passes with it
+- **Fix memory:** Reads `.claude/memory/fixes.md` and `fixes.json` for prior patterns — repeated bugs become instant fixes
+- **Defense-in-depth:** After fixing, applies prevention measures: entry validation, business logic guards, error handling, type safety
+- **Mode selection:** `--auto` (default, auto-approve if score ≥ 9.5), `--review` (human-in-the-loop), `--quick` (fast cycle), `--parallel` (per-issue agents), `--tdd` (regression test before fix)
 
 ## Usage
 
 ```bash
-/mk:fix login fails after 24 hours                    # Autonomous (default)
+/mk:fix login fails after 24 hours --auto              # Autonomous (default) — auto-approve if score ≥ 9.5
+/mk:fix login fails after 24 hours                     # Same as above (--auto is default)
 /mk:fix payment processing timeout --review            # Human-in-the-loop at each step
 /mk:fix TypeScript error in auth.ts --quick            # Fast cycle for trivial bugs
 /mk:fix all failing tests in checkout --parallel       # Parallel agents per issue
 /mk:fix "auth bypass" --tdd                            # Force regression test before fix
 ```
+
+## Example Prompt
+
+```
+Login fails after 24 hours with a 401 error — the refresh token isn't being rotated properly. Diagnose the root cause, write a regression test, and apply a minimal fix.
+```
+
+## Arguments
+
+| Flag | Behavior |
+|------|----------|
+| `--auto` | **Default.** Autonomous mode. Auto-approve if score ≥ 9.5 and 0 critical. |
+| `--review` | Human-in-the-loop. Pause at each step for approval. |
+| `--quick` | Fast cycle for trivial bugs (single file, clear cause). Skips investigation. |
+| `--parallel` | Parallel `developer` agents per independent issue. |
+| `--tdd` | Force regression test BEFORE the fix. Writes the `tdd-mode` sentinel. |
 
 ## Process flow
 
