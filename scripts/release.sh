@@ -74,22 +74,32 @@ echo "  Release zip: ${ZIP_SIZE} KB"
 echo "[4/7] Verifying VitePress build..."
 (cd website && npx vitepress build) 2>&1 | tail -1
 
-# Step 5: Commit and tag
+# Step 5: Commit and tag (idempotent — reuse existing tag if present)
 echo "[5/7] Committing and tagging..."
 git add -A
-git commit -m "chore: release v$VERSION"
-git tag -a "v$VERSION" -m "v$VERSION — $TITLE"
+if git diff --cached --quiet; then
+  echo "  No staged changes — skipping commit."
+else
+  git commit -m "chore: release v$VERSION"
+fi
+if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+  echo "  Tag v$VERSION already exists — reusing it."
+else
+  git tag -a "v$VERSION" -m "v$VERSION — $TITLE"
+fi
 
-# Step 6: Push
+# Step 6: Push (skip tag push if already on remote)
 echo "[6/7] Pushing to GitHub..."
 git push origin main
-git push origin "v$VERSION"
+if [ -n "$(git ls-remote --tags origin "refs/tags/v$VERSION" 2>/dev/null)" ]; then
+  echo "  Remote already has tag v$VERSION — skipping tag push."
+else
+  git push origin "v$VERSION"
+fi
 
-# Step 7: Create GitHub Release
-echo "[7/7] Creating GitHub Release..."
-gh release create "v$VERSION" dist/meowkit-release.zip \
-  --title "v$VERSION — $TITLE" \
-  --notes "## $TITLE
+# Step 7: Create or update GitHub Release (overwrite asset on existing tag)
+echo "[7/7] Publishing GitHub Release..."
+RELEASE_NOTES="## $TITLE
 
 See [changelog](https://docs.meowkit.dev/changelog) for full details.
 
@@ -100,6 +110,16 @@ npx mewkit init
 # or upgrade:
 npx mewkit upgrade
 \`\`\`"
+
+if gh release view "v$VERSION" >/dev/null 2>&1; then
+  echo "  Release v$VERSION already exists — uploading asset with --clobber."
+  gh release upload "v$VERSION" dist/meowkit-release.zip --clobber
+  gh release edit "v$VERSION" --title "v$VERSION — $TITLE" --notes "$RELEASE_NOTES"
+else
+  gh release create "v$VERSION" dist/meowkit-release.zip \
+    --title "v$VERSION — $TITLE" \
+    --notes "$RELEASE_NOTES"
+fi
 
 # Verify
 echo ""
