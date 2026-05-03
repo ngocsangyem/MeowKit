@@ -14,6 +14,11 @@
     "build:cli": "npx tsc",
     "build:web": "npx tsc -p tsconfig.orchviz-web.json --noEmit && npx vite build --config vite.config.orchviz-web.ts && node scripts/check-bundle-budget.cjs",
     "test": "vitest run",
+    "tokens": "node scripts/generate-tokens.mjs",
+    "tokens:check": "node scripts/generate-tokens.mjs && git diff --exit-code -- src/orchviz-web/lib/tokens.generated.ts src/orchviz-web/styles/tokens.generated.css",
+    "lint:colors": "bash scripts/check-no-color-literals.sh",
+    "lint:no-direct-io": "bash scripts/check-no-direct-io.sh",
+    "lint": "npm run tokens:check && npm run lint:colors && npm run lint:no-direct-io",
     "prepublishOnly": "npm run build",
     "dev": "npx tsc --watch"
   },
@@ -29,6 +34,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@fontsource/fira-code": "^5.2.7",
+    "@fontsource/inter": "^5.2.8",
     "@tailwindcss/vite": "^4.2.4",
     "@testing-library/react": "^16.0.0",
     "@types/adm-zip": "^0.5.8",
@@ -39,10 +46,10 @@
     "@types/node": "^20.14.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "jsdom": "^25.0.0",
     "@types/semver": "^7.5.8",
     "@vitejs/plugin-react": "^4.7.0",
     "d3-force": "^3.0.0",
+    "jsdom": "^25.0.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "tailwindcss": "^4.2.4",

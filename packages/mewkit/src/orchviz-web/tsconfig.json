@@ -1,0 +1,4 @@
+{
+	"extends": "../../tsconfig.orchviz-web.json",
+	"include": ["**/*.ts", "**/*.tsx", "../orchviz/protocol.ts"]
+}

@@ -6,6 +6,7 @@
  */
 
 import { COLORS } from "@/lib/colors";
+import { MK_TOKENS } from "@/lib/tokens.generated";
 import type { PlanPhase } from "@/hooks/use-active-plan";
 import { phaseProgress } from "@/lib/phase-progress";
 import { TodoList } from "./todo-list";
@@ -76,12 +77,12 @@ export function PhaseRow({
 			<button
 				type="button"
 				onClick={onToggle}
-				className={`w-full flex items-center gap-2 px-3 py-2 text-left text-[12px] hover:bg-[rgba(100,200,255,0.04)] ${isActive ? "phase-chip-active" : ""}`}
+				className={`w-full flex items-center gap-2 px-3 py-2 text-left text-[12px] orchviz-row-hover ${isActive ? "phase-chip-active" : ""}`}
 				style={{
 					background: "transparent",
 					border: "none",
 					cursor: "pointer",
-					fontFamily: "'SF Mono', 'Fira Code', monospace",
+					fontFamily: MK_TOKENS.typography.family.mono,
 					textDecoration: isAbandoned ? "line-through" : "none",
 				}}
 				aria-expanded={expanded}

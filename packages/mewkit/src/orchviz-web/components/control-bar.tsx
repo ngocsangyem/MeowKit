@@ -117,7 +117,7 @@ function LiveControlBar({
             className="w-2 h-2 rounded-full transition-opacity duration-500"
             style={{
               background: COLORS.liveDot,
-              boxShadow: pulseOn ? `0 0 8px ${COLORS.liveDot}, 0 0 16px rgba(255,68,68,0.3)` : `0 0 4px ${COLORS.liveDot}80`,
+              boxShadow: pulseOn ? `0 0 8px ${COLORS.liveDot}, 0 0 16px ${COLORS.liveResumeBg}` : `0 0 4px ${COLORS.liveDot}80`,
               opacity: pulseOn ? 1 : 0.6,
             }}
           />

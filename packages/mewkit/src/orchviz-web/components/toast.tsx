@@ -19,6 +19,8 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { COLORS } from "@/lib/colors";
+import { MK_TOKENS } from "@/lib/tokens.generated";
 
 // ── Context ──────────────────────────────────────────────────────────────────
 
@@ -80,10 +82,10 @@ function ToastSlot({ message }: { message: string | null }) {
 			aria-live="polite"
 			className="fixed bottom-4 right-4 z-60 max-w-xs px-3 py-2 rounded text-[11px] font-mono"
 			style={{
-				background: "rgba(20, 30, 48, 0.95)",
-				border: "1px solid rgba(100, 200, 255, 0.25)",
-				color: "#c8d8e8",
-				boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+				background: COLORS.panelBg,
+				border: `1px solid ${COLORS.glassBorder}`,
+				color: COLORS.textPrimary,
+				boxShadow: MK_TOKENS.effects.panelShadow,
 				backdropFilter: "blur(4px)",
 				pointerEvents: "none",
 			}}

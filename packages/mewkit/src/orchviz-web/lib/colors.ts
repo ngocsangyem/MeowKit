@@ -1,227 +1,269 @@
 /**
- * Holographic color palette and role color definitions.
+ * Color palette and role color definitions.
  *
- * Extracted from agent-types.ts to keep that file focused on type definitions.
- * All colors are re-exported from agent-types.ts for backward compatibility.
+ * Re-derived from the MeowKit Constellation tokens (see tokens.generated.ts /
+ * design-tokens.json). The exported `COLORS` shape is preserved for backward
+ * compatibility with every canvas drawer; values are sourced from tokens with
+ * a small "Orchviz extensions" block for concepts the constellation token set
+ * does not cover (paused state, tool-calling distinction, role bubbles, etc.).
  */
 
 import type { AgentState, ContextBreakdown } from './agent-types'
+import { MK_TOKENS } from './tokens.generated'
 
-// Holographic Color Palette
-export const COLORS = {
-  // Background
-  void: '#050510',
-  hexGrid: '#0d0d1f',
+const T = MK_TOKENS
 
-  // Primary Hologram
-  holoBase: '#66ccff',
-  holoBright: '#aaeeff',
-  holoHot: '#ffffff',
-
-  // Agent States
-  idle: '#66ccff',
-  thinking: '#66ccff',
-  tool_calling: '#ffbb44',
-  complete: '#66ffaa',
-  error: '#ff5566',
-  // [red-team #13] paused repurposed from gray #888899 → amber #ffaa33
-  // (old gray deleted; no `inactive` token per validation Q5 YAGNI)
+// State taxonomy bridge: runtime AgentState ↔ token signal.* (lossy by design).
+// - tool_calling: kept as Orchviz extension amber to preserve workflow legibility.
+// - paused / waiting_permission: kept as Orchviz extension amber; not in tokens.
+const EXT = {
   paused: '#ffaa33',
-  waiting_permission: '#ffaa33',
-  // Pause-state derived tokens
-  pausedDim:    '#ffaa3380',
-  pausedBg:     'rgba(255, 170, 51, 0.15)',
+  pausedDim: '#ffaa3380',
+  pausedBg: 'rgba(255, 170, 51, 0.15)',
   pausedBorder: 'rgba(255, 170, 51, 0.35)',
-  pausedScrim:  'rgba(255, 170, 51, 0.04)',
+  pausedScrim: 'rgba(255, 170, 51, 0.04)',
+  toolCalling: '#ffbb44',
+} as const
 
-  // Edge/Particle Colors
-  dispatch: '#cc88ff',
-  return: '#66ffaa',
-  tool: '#ffbb44',
-  message: '#66ccff',
+// Mascot blue at varying alphas — replaces the old holo-cyan glass family.
+const MASCOT_GLASS = {
+  bg03: 'rgba(37, 99, 235, 0.03)',
+  bg05: 'rgba(37, 99, 235, 0.05)',
+  bg10: 'rgba(37, 99, 235, 0.10)',
+  border06: 'rgba(37, 99, 235, 0.06)',
+  border08: 'rgba(37, 99, 235, 0.08)',
+  border10: 'rgba(37, 99, 235, 0.10)',
+  border12: 'rgba(37, 99, 235, 0.12)',
+  border15: 'rgba(37, 99, 235, 0.15)',
+  border20: 'rgba(37, 99, 235, 0.20)',
+  border25: 'rgba(37, 99, 235, 0.25)',
+  border30: 'rgba(37, 99, 235, 0.30)',
+  border40: 'rgba(37, 99, 235, 0.40)',
+  selected15: 'rgba(225, 225, 225, 0.15)',
+} as const
 
-  // Context breakdown colors
-  contextSystem: '#555577',     // gray-blue — fixed overhead
-  contextUser: '#66ccff',       // blue — user input
-  contextToolResults: '#ffbb44', // amber — expensive!
-  contextReasoning: '#cc88ff',  // purple — agent thinking
-  contextSubagent: '#66ffaa',   // green — child agent results
+const ROLE_BUBBLE = {
+  // assistant — sourced from mascot blue family
+  assistantBg: 'rgba(37, 99, 235, 0.12)',
+  assistantBgSelected: 'rgba(37, 99, 235, 0.22)',
+  assistantText: '#A8C5FF',
+  // thinking — purple extension
+  thinkingBg: 'rgba(140, 100, 200, 0.12)',
+  thinkingBgSelected: 'rgba(140, 100, 200, 0.20)',
+  thinkingText: '#C0A0E0',
+  // user — gold extension
+  userBg: 'rgba(200, 160, 80, 0.12)',
+  userBgSelected: 'rgba(200, 160, 80, 0.20)',
+  userText: '#E0C888',
+} as const
+
+export const COLORS = {
+  // ─── Backgrounds & surfaces (token-mapped) ──────────────────────────────────
+  void: T.color.surface.bg,
+  hexGrid: T.color.surface.bgSecondary,
+
+  // Brand wires — replace holo-cyan with mascot blue.
+  holoBase: T.color.brand.mascot,
+  holoBright: T.color.text.primary,
+  holoHot: '#FFFFFF',
+
+  // Agent states (canvas)
+  idle: T.color.signal.queued,
+  thinking: T.color.signal.thinking,
+  tool_calling: EXT.toolCalling,
+  complete: T.color.signal.done,
+  error: T.color.signal.failed,
+  paused: EXT.paused,
+  waiting_permission: EXT.paused,
+  pausedDim: EXT.pausedDim,
+  pausedBg: EXT.pausedBg,
+  pausedBorder: EXT.pausedBorder,
+  pausedScrim: EXT.pausedScrim,
+
+  // Edge / particle colors
+  dispatch: '#CC88FF',
+  return: T.color.signal.done,
+  tool: EXT.toolCalling,
+  message: T.color.brand.mascot,
+
+  // Context breakdown segments
+  contextSystem: T.color.text.muted,
+  contextUser: T.color.brand.mascot,
+  contextToolResults: EXT.toolCalling,
+  contextReasoning: '#CC88FF',
+  contextSubagent: T.color.signal.done,
 
   // UI Chrome
-  nodeInterior: 'rgba(10, 15, 40, 0.5)',
-  textPrimary: '#aaeeff',
-  textDim: '#66ccff90',
-  textMuted: '#66ccff50',
+  nodeInterior: 'rgba(17, 20, 24, 0.5)',
+  textPrimary: T.color.text.primary,
+  textDim: T.color.text.secondary,
+  textMuted: T.color.text.muted,
 
-  // Glass card
-  glassBg: 'rgba(10, 15, 30, 0.7)',
-  glassBorder: 'rgba(100, 200, 255, 0.15)',
-  glassHighlight: 'rgba(100, 200, 255, 0.08)',
+  // Glass card / panels
+  glassBg: T.color.surface.surfaceAlpha,
+  glassBorder: T.color.border.default,
+  glassHighlight: T.color.border.strong,
 
-  // Holo background/border opacities (avoids scattered rgba literals)
-  holoBg03: 'rgba(100, 200, 255, 0.03)',
-  holoBg05: 'rgba(100, 200, 255, 0.05)',
-  holoBg10: 'rgba(100, 200, 255, 0.1)',
-  holoBorder06: 'rgba(100, 200, 255, 0.06)',
-  holoBorder08: 'rgba(100, 200, 255, 0.08)',
-  holoBorder10: 'rgba(100, 200, 255, 0.1)',
-  holoBorder12: 'rgba(100, 200, 255, 0.12)',
+  // Modal scrim — bg surface at low/zero alpha
+  scrimVisible: 'rgba(5, 7, 10, 0.55)',
+  scrimHidden: 'rgba(5, 7, 10, 0)',
+  scrimGate: 'rgba(5, 7, 10, 0.65)',
+
+  // Mascot-blue background opacities (replaces scattered holo rgba literals)
+  holoBg03: MASCOT_GLASS.bg03,
+  holoBg05: MASCOT_GLASS.bg05,
+  holoBg10: MASCOT_GLASS.bg10,
+  holoBorder06: MASCOT_GLASS.border06,
+  holoBorder08: MASCOT_GLASS.border08,
+  holoBorder10: MASCOT_GLASS.border10,
+  holoBorder12: MASCOT_GLASS.border12,
 
   // Panel chrome
-  panelBg: 'rgba(8, 12, 24, 0.85)',
-  panelSeparator: 'rgba(100, 200, 255, 0.04)',
+  panelBg: T.color.surface.surfaceAlpha,
+  panelSeparator: T.color.border.default,
 
   // Toggle button states
-  toggleActive: 'rgba(100, 200, 255, 0.15)',
-  toggleInactive: 'rgba(100, 200, 255, 0.05)',
-  toggleBorder: 'rgba(100, 200, 255, 0.1)',
+  toggleActive: MASCOT_GLASS.border15,
+  toggleInactive: MASCOT_GLASS.bg05,
+  toggleBorder: MASCOT_GLASS.border10,
 
   // Live indicator
-  liveDot: '#ff4444',
-  liveText: '#ff6666',
-  liveResumeBg: 'rgba(255, 68, 68, 0.15)',
-  liveResumeBorder: 'rgba(255, 68, 68, 0.35)',
+  liveDot: T.color.signal.failed,
+  liveText: '#FF8A8A',
+  liveResumeBg: 'rgba(248, 113, 113, 0.15)',
+  liveResumeBorder: 'rgba(248, 113, 113, 0.35)',
 
-  // Discovery type colors
-  discoveryFile: '#66ccff',
-  discoveryPattern: '#cc88ff',
-  discoveryFinding: '#66ffaa',
-  discoveryCode: '#ffbb44',
+  // Discovery type colors — Orchviz extensions (no constellation token)
+  discoveryFile: T.color.brand.mascot,
+  discoveryPattern: '#CC88FF',
+  discoveryFinding: T.color.signal.done,
+  discoveryCode: EXT.toolCalling,
 
   // Session tab states
-  tabSelectedBg: 'rgba(100, 200, 255, 0.15)',
-  tabInactiveBg: 'rgba(100, 200, 255, 0.03)',
-  tabSelectedBorder: 'rgba(100, 200, 255, 0.3)',
-  tabInactiveBorder: 'rgba(100, 200, 255, 0.08)',
-  tabClose: '#ff6688',
+  tabSelectedBg: MASCOT_GLASS.border15,
+  tabInactiveBg: MASCOT_GLASS.bg03,
+  tabSelectedBorder: MASCOT_GLASS.border30,
+  tabInactiveBorder: MASCOT_GLASS.border08,
+  tabClose: '#FF6688',
 
-  // Role colors (message bubbles)
-  roleAssistantBg: 'rgba(80, 160, 220, 0.12)',
-  roleAssistantBgSelected: 'rgba(80, 160, 220, 0.2)',
-  roleAssistantText: '#a0d4f0',
-  roleThinkingBg: 'rgba(140, 100, 200, 0.12)',
-  roleThinkingBgSelected: 'rgba(140, 100, 200, 0.2)',
-  roleThinkingText: '#c0a0e0',
-  roleUserBg: 'rgba(200, 160, 80, 0.12)',
-  roleUserBgSelected: 'rgba(200, 160, 80, 0.2)',
-  roleUserText: '#e0c888',
+  // Role colors (message bubbles) — Orchviz extensions
+  roleAssistantBg: ROLE_BUBBLE.assistantBg,
+  roleAssistantBgSelected: ROLE_BUBBLE.assistantBgSelected,
+  roleAssistantText: ROLE_BUBBLE.assistantText,
+  roleThinkingBg: ROLE_BUBBLE.thinkingBg,
+  roleThinkingBgSelected: ROLE_BUBBLE.thinkingBgSelected,
+  roleThinkingText: ROLE_BUBBLE.thinkingText,
+  roleUserBg: ROLE_BUBBLE.userBg,
+  roleUserBgSelected: ROLE_BUBBLE.userBgSelected,
+  roleUserText: ROLE_BUBBLE.userText,
 
   // Result/success
-  resultBg: 'rgba(102, 255, 170, 0.05)',
-  resultBorder: 'rgba(102, 255, 170, 0.1)',
+  resultBg: 'rgba(52, 211, 153, 0.05)',
+  resultBorder: 'rgba(52, 211, 153, 0.10)',
 
   // Unread indicator
-  unreadDot: '#ff6666',
+  unreadDot: '#FF8A8A',
 
   // Play button
-  playBtnBg: 'rgba(102, 204, 255, 0.12)',
-  playBtnActiveBg: 'rgba(102, 204, 255, 0.2)',
-  playBtnBorder: 'rgba(102, 204, 255, 0.4)',
-  playBtnGlow: '0 0 12px rgba(102, 204, 255, 0.15)',
+  playBtnBg: 'rgba(37, 99, 235, 0.12)',
+  playBtnActiveBg: 'rgba(37, 99, 235, 0.20)',
+  playBtnBorder: MASCOT_GLASS.border40,
+  playBtnGlow: '0 0 12px rgba(37, 99, 235, 0.15)',
 
   // Scrubber
-  scrubberFill: 'linear-gradient(90deg, rgba(102,204,255,0.3), rgba(102,204,255,0.6))',
-  scrubberHeadGlow: '0 0 10px rgba(102, 204, 255, 0.6), 0 0 20px rgba(102, 204, 255, 0.2)',
-  reviewBtnBorder: 'rgba(102, 204, 255, 0.25)',
+  scrubberFill: 'linear-gradient(90deg, rgba(37,99,235,0.3), rgba(37,99,235,0.6))',
+  scrubberHeadGlow: '0 0 10px rgba(37, 99, 235, 0.6), 0 0 20px rgba(37, 99, 235, 0.2)',
+  reviewBtnBorder: MASCOT_GLASS.border25,
 
   // Cost overlay
-  costActiveBg: 'rgba(102, 255, 170, 0.15)',
+  costActiveBg: 'rgba(52, 211, 153, 0.15)',
 
   // Canvas drawing — bubble base colors (partial rgba, alpha appended at draw time)
   bubbleThinkingBase: 'rgba(140, 100, 200,',
   bubbleUserBase: 'rgba(200, 160, 80,',
-  bubbleAssistantBase: 'rgba(80, 160, 220,',
+  bubbleAssistantBase: 'rgba(37, 99, 235,',
 
   // Canvas drawing — tool card backgrounds (partial rgba, alpha appended at draw time)
   toolCardErrorBase: 'rgba(40, 10, 15,',
-  toolCardSelectedBase: 'rgba(100, 200, 255,',
-  toolCardBase: 'rgba(10, 15, 30,',
+  toolCardSelectedBase: 'rgba(37, 99, 235,',
+  toolCardBase: 'rgba(17, 20, 24,',
 
   // Canvas drawing — agent/tool card backgrounds
-  cardBgDark: 'rgba(5, 5, 16, 0.8)',
-  cardBg: 'rgba(10, 15, 30, 0.6)',
-  cardBgSelected: 'rgba(10, 15, 30, 0.8)',
+  cardBgDark: 'rgba(5, 7, 10, 0.8)',
+  cardBg: 'rgba(17, 20, 24, 0.6)',
+  cardBgSelected: 'rgba(17, 20, 24, 0.8)',
   cardBgError: 'rgba(40, 10, 15, 0.8)',
-  cardBgSelectedHolo: 'rgba(100, 200, 255, 0.15)',
+  cardBgSelectedHolo: MASCOT_GLASS.selected15,
   cardBgFaintOverlay: 'rgba(0, 0, 0, 0.01)',
 
   // Active tool indicator (detail card)
-  toolIndicatorBg: 'rgba(255, 187, 68, 0.1)',
-  toolIndicatorBorder: 'rgba(255, 187, 68, 0.2)',
-  toolIndicatorText: '#ffbb44',
+  toolIndicatorBg: 'rgba(255, 187, 68, 0.10)',
+  toolIndicatorBorder: 'rgba(255, 187, 68, 0.20)',
+  toolIndicatorText: EXT.toolCalling,
 
   // Canvas drawing — cost labels
-  costText: '#66ffaa',
-  costTextDim: '#66ffaa80',
-  costPillBg: 'rgba(10, 20, 40, 0.75)',
-  costPillStroke: 'rgba(102, 255, 170, 0.3)',
+  costText: T.color.signal.done,
+  costTextDim: 'rgba(52, 211, 153, 0.5)',
+  costPillBg: 'rgba(17, 20, 24, 0.75)',
+  costPillStroke: 'rgba(52, 211, 153, 0.30)',
 
   // Canvas drawing — cost panel bar fills
-  barFillMain: 'rgba(102, 204, 255, 0.15)',
+  barFillMain: 'rgba(37, 99, 235, 0.15)',
   barFillSub: 'rgba(204, 136, 255, 0.15)',
 
   // ─── Transcript / message feed colors ───────────────────────────────────────
-
-  // User messages
   userMsgBg: 'rgba(255, 187, 68, 0.06)',
   userMsgBorder: 'rgba(255, 187, 68, 0.12)',
-  userLabel: '#ffbb4490',
-  userText: '#ffcc66',
+  userLabel: 'rgba(255, 187, 68, 0.6)',
+  userText: '#FFCC66',
 
-  // Assistant messages
-  assistantLabel: '#66ccff80',
-  assistantText: '#aaeeff',
+  assistantLabel: 'rgba(37, 99, 235, 0.6)',
+  assistantText: T.color.text.primary,
 
-  // Thinking messages
   thinkingBgExpanded: 'rgba(180, 140, 255, 0.06)',
   thinkingBgCollapsed: 'rgba(180, 140, 255, 0.03)',
   thinkingBorder: 'rgba(180, 140, 255, 0.08)',
-  thinkingLabel: '#bb99ff70',
-  thinkingArrow: '#bb99ff55',
-  thinkingPreview: '#bb99ff',
-  thinkingTextExpanded: '#bb99ff80',
+  thinkingLabel: 'rgba(187, 153, 255, 0.45)',
+  thinkingArrow: 'rgba(187, 153, 255, 0.35)',
+  thinkingPreview: '#BB99FF',
+  thinkingTextExpanded: 'rgba(187, 153, 255, 0.5)',
   thinkingBorderLeft: 'rgba(180, 140, 255, 0.15)',
 
-  // Tool call messages
   toolCallBg: 'rgba(255, 187, 68, 0.05)',
-  toolCallBorder: 'rgba(255, 187, 68, 0.1)',
+  toolCallBorder: 'rgba(255, 187, 68, 0.10)',
 
-  // Tool result messages
-  bashResultBg: 'rgba(0,0,0,0.25)',
-  toolResultBg: 'rgba(102, 255, 170, 0.04)',
-  bashResultBorder: 'rgba(255, 187, 68, 0.1)',
-  toolResultBorder: 'rgba(102, 255, 170, 0.08)',
-  bashResultText: '#aaeeff80',
-  toolResultText: '#66ffaa80',
-  textFaint: '#aaeeff60',
+  bashResultBg: 'rgba(0, 0, 0, 0.25)',
+  toolResultBg: 'rgba(52, 211, 153, 0.04)',
+  bashResultBorder: 'rgba(255, 187, 68, 0.10)',
+  toolResultBorder: 'rgba(52, 211, 153, 0.08)',
+  bashResultText: 'rgba(248, 250, 252, 0.5)',
+  toolResultText: 'rgba(52, 211, 153, 0.5)',
+  textFaint: 'rgba(248, 250, 252, 0.38)',
 
   // Search highlight
-  searchHighlightBg: 'rgba(255,187,68,0.3)',
+  searchHighlightBg: 'rgba(255, 187, 68, 0.30)',
 
   // ─── Diff / code block colors ───────────────────────────────────────────────
-
-  codeBlockBg: 'rgba(0,0,0,0.3)',
-  diffRemoved: '#ff6666',
-  diffRemovedBg: 'rgba(255,80,80,0.08)',
-  diffAdded: '#66ff88',
-  diffAddedBg: 'rgba(80,255,120,0.08)',
+  codeBlockBg: 'rgba(0, 0, 0, 0.3)',
+  diffRemoved: T.color.signal.failed,
+  diffRemovedBg: 'rgba(248, 113, 113, 0.08)',
+  diffAdded: T.color.signal.done,
+  diffAddedBg: 'rgba(52, 211, 153, 0.08)',
 
   // ─── Tool content colors ────────────────────────────────────────────────────
-
-  filePathActive: '#66ccff',
-  filePathInactive: '#66ccff90',
-  todoCompleted: '#66ffaa',
-  todoCompletedText: '#66ffaa90',
-  todoPending: '#66ccff60',
-  contentDim: '#aaeeff90',
-  searchIcon: '#66ccff60',
+  filePathActive: T.color.brand.mascot,
+  filePathInactive: 'rgba(37, 99, 235, 0.6)',
+  todoCompleted: T.color.signal.done,
+  todoCompletedText: 'rgba(52, 211, 153, 0.6)',
+  todoPending: 'rgba(37, 99, 235, 0.4)',
+  contentDim: 'rgba(248, 250, 252, 0.55)',
+  searchIcon: 'rgba(37, 99, 235, 0.4)',
 
   // ─── Panel header / chrome text ─────────────────────────────────────────────
-
-  panelLabel: '#66ccff90',
-  panelLabelDim: '#66ccff65',
-  scrollBtnText: '#66ccff',
-  scrollbarThumb: 'rgba(100,200,255,0.15)',
+  panelLabel: T.color.text.secondary,
+  panelLabelDim: T.color.text.muted,
+  scrollBtnText: T.color.brand.mascot,
+  scrollbarThumb: MASCOT_GLASS.border15,
 } as const
 
 // ─── Role Colors (message feed & bubbles) ───────────────────────────────────
@@ -236,13 +278,13 @@ export const ROLE_COLORS: Record<string, { bg: string; bgSelected: string; text:
 
 export function getStateColor(state: AgentState): string {
   switch (state) {
-    case 'idle': return COLORS.idle
-    case 'thinking': return COLORS.thinking
-    case 'tool_calling': return COLORS.tool_calling
-    case 'complete': return COLORS.complete
-    case 'error': return COLORS.error
-    case 'paused': return COLORS.paused
-    case 'waiting_permission': return COLORS.waiting_permission
+    case 'idle': return T.color.signal.queued
+    case 'thinking': return T.color.signal.thinking
+    case 'tool_calling': return EXT.toolCalling
+    case 'complete': return T.color.signal.done
+    case 'error': return T.color.signal.failed
+    case 'paused': return EXT.paused
+    case 'waiting_permission': return EXT.paused
   }
 }
 

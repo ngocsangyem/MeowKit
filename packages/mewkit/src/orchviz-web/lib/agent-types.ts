@@ -185,9 +185,12 @@ export interface DepthParticle {
 
 // ─── Layout Constants ────────────────────────────────────────────────────────
 
+// Token-derived: token diameters are 56px (orchestrator), 38px (default), 46px (selected).
+// Radii = diameter / 2 → 28, 19, 23 respectively.
 export const NODE = {
   radiusMain: 28,
-  radiusSub: 20,
+  radiusSub: 19,
+  radiusSelected: 23,
 } as const
 
 export const CARD = {

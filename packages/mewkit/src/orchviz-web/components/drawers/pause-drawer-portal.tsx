@@ -10,9 +10,10 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { COLORS } from "@/lib/colors";
+import { MK_TOKENS } from "@/lib/tokens.generated";
 
-const ANIMATION_MS = 220;
-const DRAWER_WIDTH = 420;
+const ANIMATION_MS = parseInt(MK_TOKENS.motion.duration.panel, 10);
+const DRAWER_WIDTH = parseInt(MK_TOKENS.geometry.panel.width, 10);
 
 interface PauseDrawerPortalProps {
 	open: boolean;
@@ -85,9 +86,9 @@ export function PauseDrawerPortal({ open, onClose, children }: PauseDrawerPortal
 				zIndex: 50,
 				background: COLORS.panelBg,
 				borderLeft: `1px solid ${COLORS.holoBorder12}`,
-				fontFamily: "'SF Mono', 'Fira Code', monospace",
+				fontFamily: MK_TOKENS.typography.family.mono,
 				transform: visible ? "translateX(0)" : `translateX(${DRAWER_WIDTH}px)`,
-				transition: `transform ${ANIMATION_MS}ms cubic-bezier(0.2, 0, 0, 1)`,
+				transition: `transform ${ANIMATION_MS}ms ${MK_TOKENS.motion.easing.default}`,
 				willChange: "transform",
 				display: "flex",
 				flexDirection: "column",

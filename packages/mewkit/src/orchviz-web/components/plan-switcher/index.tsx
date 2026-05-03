@@ -162,7 +162,7 @@ function DrawerPortal({
 		<div
 			className="fixed inset-0 z-40 flex"
 			style={{
-				background: visible ? "rgba(5,5,16,0.55)" : "rgba(5,5,16,0)",
+				background: visible ? COLORS.scrimVisible : COLORS.scrimHidden,
 				transition: "background 180ms ease",
 			}}
 			onClick={(e) => {

@@ -8,6 +8,7 @@
 
 import { useEffect } from "react";
 import { COLORS } from "@/lib/colors";
+import { MK_TOKENS } from "@/lib/tokens.generated";
 import { useOverlays } from "@/hooks/use-overlays";
 
 interface GateDrawerProps {
@@ -39,17 +40,18 @@ export function GateDrawer({ gate, onClose }: GateDrawerProps) {
 	return (
 		<div
 			className="absolute inset-0 z-50 flex justify-end"
-			style={{ background: "rgba(5,5,16,0.65)" }}
+			style={{ background: COLORS.scrimGate }}
 			onClick={(e) => {
 				if (e.target === e.currentTarget) onClose();
 			}}
 		>
 			<div
-				className="h-full w-[420px] flex flex-col"
+				className="h-full flex flex-col"
 				style={{
+					width: MK_TOKENS.geometry.panel.width,
 					background: COLORS.panelBg,
 					borderLeft: `1px solid ${COLORS.glassBorder}`,
-					fontFamily: "'SF Mono', 'Fira Code', monospace",
+					fontFamily: MK_TOKENS.typography.family.mono,
 				}}
 				role="dialog"
 				aria-modal="true"

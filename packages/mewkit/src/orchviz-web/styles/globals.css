@@ -1,17 +1,50 @@
 @import "tailwindcss";
+@import "./tokens.generated.css";
 
+/* Bridge a subset of MeowKit tokens to Tailwind's @theme so utility classes
+ * (bg-surface, text-primary, etc.) read from the generated tokens. */
 @theme {
-	--color-holo-base: #66ccff;
-	--color-holo-bright: #aaeeff;
-	--color-void: #050510;
+	--color-surface-bg: var(--mk-color-surface-bg);
+	--color-surface-bg-secondary: var(--mk-color-surface-bg-secondary);
+	--color-surface: var(--mk-color-surface-surface);
+	--color-surface-alpha: var(--mk-color-surface-surface-alpha);
+	--color-border-default: var(--mk-color-border-default);
+	--color-border-strong: var(--mk-color-border-strong);
+	--color-text-primary: var(--mk-color-text-primary);
+	--color-text-secondary: var(--mk-color-text-secondary);
+	--color-text-muted: var(--mk-color-text-muted);
+	--color-brand-mascot: var(--mk-color-brand-mascot);
+	--color-brand-mascot-deep: var(--mk-color-brand-mascot-deep);
+	--color-brand-active: var(--mk-color-brand-active);
+	--color-signal-queued: var(--mk-color-signal-queued);
+	--color-signal-thinking: var(--mk-color-signal-thinking);
+	--color-signal-running: var(--mk-color-signal-running);
+	--color-signal-done: var(--mk-color-signal-done);
+	--color-signal-failed: var(--mk-color-signal-failed);
+}
+
+/* Orchviz extensions — not in design tokens (Q1/Q2 defaults: amber kept for visual
+ * continuity with paused/tool-call distinction; revisit when design owner signs off). */
+:root {
+	--mk-ext-paused: #ffaa33;
+	--mk-ext-paused-dim: rgba(255, 170, 51, 0.5);
+	--mk-ext-paused-bg: rgba(255, 170, 51, 0.15);
+	--mk-ext-paused-border: rgba(255, 170, 51, 0.35);
+	--mk-ext-tool-calling: #ffbb44;
 }
 
 body {
-	background: var(--color-void);
-	color: var(--color-holo-bright);
+	background: var(--mk-color-surface-bg);
+	color: var(--mk-color-text-primary);
+	font-family: var(--mk-typography-family-ui);
 }
 
-/* Active phase chip pulses; respect prefers-reduced-motion (red-team SCOPE_Q2). */
+/* Faint row hover used by plan tables and switcher rows. */
+.orchviz-row-hover:hover {
+	background: var(--mk-color-border-default);
+}
+
+/* Active phase chip pulses; respect prefers-reduced-motion. */
 @keyframes orchviz-pulse {
 	0%, 100% { opacity: 1; }
 	50% { opacity: 0.55; }
@@ -21,30 +54,40 @@ body {
 	animation: orchviz-pulse 1.6s ease-in-out infinite;
 }
 
-/* Phase-05: amber pulse on the active chip while any agent is paused. */
+/* Amber pulse on the active chip while any agent is paused. */
 @keyframes orchviz-pulse-amber {
-	0%, 100% { opacity: 1; border-color: #ffaa33; }
-	50% { opacity: 0.55; border-color: rgba(255, 170, 51, 0.38); }
+	0%, 100% { opacity: 1; border-color: var(--mk-ext-paused); }
+	50% { opacity: 0.55; border-color: var(--mk-ext-paused-border); }
 }
 
 .phase-chip-active-paused {
 	animation: orchviz-pulse-amber 1.6s ease-in-out infinite;
 }
 
-/* Phase-05: amber blink for inline PAUSED dot indicators. */
+/* Amber blink for inline PAUSED dot indicators. */
 @keyframes orchviz-paused-blink {
-	0%, 100% { opacity: 1; box-shadow: 0 0 4px #ffaa33; }
-	50% { opacity: 0.4; box-shadow: 0 0 0 #ffaa33; }
+	0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--mk-ext-paused); }
+	50% { opacity: 0.4; box-shadow: 0 0 0 var(--mk-ext-paused); }
 }
 
 .orchviz-paused-dot {
 	width: 8px;
 	height: 8px;
 	border-radius: 50%;
-	background: #ffaa33;
+	background: var(--mk-ext-paused);
 	display: inline-block;
 	animation: orchviz-paused-blink 1.6s ease-in-out infinite;
 	margin-right: 6px;
+}
+
+/* Side-panel slide-in transition tied to motion tokens. */
+@keyframes orchviz-panel-slide-in {
+	from { transform: translateX(100%); }
+	to   { transform: translateX(0); }
+}
+
+.orchviz-panel-slide {
+	animation: orchviz-panel-slide-in var(--mk-motion-duration-panel) var(--mk-motion-easing-default);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -53,7 +96,8 @@ body {
 		animation: none !important;
 		outline: 1px solid currentColor;
 	}
-	.orchviz-paused-dot {
+	.orchviz-paused-dot,
+	.orchviz-panel-slide {
 		animation: none !important;
 	}
 }

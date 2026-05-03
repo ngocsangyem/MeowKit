@@ -21,8 +21,10 @@ import { TopStrip } from "./top-strip";
 import { BottomBar } from "./bottom-bar";
 import { GateDrawer } from "./drawers/gate-drawer";
 import { PauseDetailDrawer } from "./drawers/pause-detail-drawer";
+import { AgentDetailDrawer } from "./drawers/agent-detail-drawer";
 import { LiveViewChip } from "./live-view-chip";
 import { COLORS } from "@/lib/colors";
+import { MK_TOKENS } from "@/lib/tokens.generated";
 import { loadSelectedSlug, saveSelectedSlug } from "@/lib/selected-slug-store";
 import { selectPauseSummary } from "@/lib/pause-labels";
 import { ToastProvider } from "./toast";
@@ -75,10 +77,13 @@ export function AgentVisualizer() {
 		open: false,
 		agentName: null,
 	});
+	// selectedAgentId drives the agent detail drawer + canvas selection ring.
+	const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
 
-	// Mutual exclusion with GateDrawer — only one right-side drawer open at a time.
+	// Mutual exclusion across the three right-side overlays (gate / pause / agent).
 	const openPauseDrawer = useCallback((agentName: string | null): void => {
 		setOpenGate(null);
+		setSelectedAgentId(null);
 		setPauseDrawer({ open: true, agentName });
 	}, []);
 	const closePauseDrawer = useCallback((): void => {
@@ -86,7 +91,11 @@ export function AgentVisualizer() {
 	}, []);
 	const openGateExclusive = useCallback((id: "G1" | "G2"): void => {
 		setPauseDrawer({ open: false, agentName: null });
+		setSelectedAgentId(null);
 		setOpenGate(id);
+	}, []);
+	const closeAgentDrawer = useCallback((): void => {
+		setSelectedAgentId(null);
 	}, []);
 
 	// Auto-close drawer when its represented pause clears (or agent vanishes).
@@ -109,10 +118,40 @@ export function AgentVisualizer() {
 	const onCanvasAgentClick = useCallback(
 		(id: string): void => {
 			const a = agents.get(id);
-			if (a && a.state === "paused") openPauseDrawer(a.name);
+			if (!a) return;
+			if (a.state === "paused") {
+				openPauseDrawer(a.name);
+				return;
+			}
+			// Toggle: clicking already-selected agent closes the drawer.
+			setSelectedAgentId((prev) => {
+				if (prev === a.name) return null;
+				setOpenGate(null);
+				setPauseDrawer({ open: false, agentName: null });
+				return a.name;
+			});
 		},
 		[agents, openPauseDrawer],
 	);
+
+	const selectedAgent = useMemo(() => {
+		if (!selectedAgentId) return null;
+		return agents.get(selectedAgentId) ?? null;
+	}, [agents, selectedAgentId]);
+
+	// Auto-close agent drawer if the selected agent vanishes (or transitions to paused).
+	useEffect(() => {
+		if (!selectedAgentId) return;
+		const a = agents.get(selectedAgentId);
+		if (!a) {
+			setSelectedAgentId(null);
+			return;
+		}
+		if (a.state === "paused") {
+			setSelectedAgentId(null);
+			openPauseDrawer(a.name);
+		}
+	}, [agents, selectedAgentId, openPauseDrawer]);
 
 	useEffect(() => {
 		play();
@@ -133,7 +172,7 @@ export function AgentVisualizer() {
 				style={{
 					gridTemplateRows: "auto 1fr auto",
 					background: COLORS.void,
-					fontFamily: "'SF Mono', 'Fira Code', monospace",
+					fontFamily: MK_TOKENS.typography.family.ui,
 					minWidth: 1024,
 				}}
 			>
@@ -162,7 +201,7 @@ export function AgentVisualizer() {
 						{isEmpty && (
 							<div
 								className="absolute inset-0 flex items-center justify-center pointer-events-none"
-								style={{ color: "#66ccff80" }}
+								style={{ color: COLORS.textDim }}
 							>
 								<div className="text-center">
 									<div className="text-[11px]">
@@ -170,7 +209,7 @@ export function AgentVisualizer() {
 											? "WAITING FOR AGENT ACTIVITY"
 											: "CONNECTING…"}
 									</div>
-									<div className="mt-1 text-[10px]" style={{ color: "#66ccff40" }}>
+									<div className="mt-1 text-[10px]" style={{ color: COLORS.textMuted }}>
 										Run a Claude Code task to see live activity.
 									</div>
 								</div>
@@ -203,6 +242,13 @@ export function AgentVisualizer() {
 					pausedAgents={pausedAgents}
 					onSelectAgent={(name) => setPauseDrawer({ open: true, agentName: name })}
 					onBackToList={() => setPauseDrawer({ open: true, agentName: null })}
+				/>
+
+				<AgentDetailDrawer
+					open={selectedAgent !== null}
+					onClose={closeAgentDrawer}
+					agent={selectedAgent}
+					toolCalls={frameRef.current.toolCalls}
 				/>
 			</div>
 		</ToastProvider>

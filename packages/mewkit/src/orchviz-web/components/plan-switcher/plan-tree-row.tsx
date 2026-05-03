@@ -14,6 +14,8 @@
 
 import { useState } from "react";
 import { COLORS } from "@/lib/colors";
+import { MK_TOKENS } from "@/lib/tokens.generated";
+import { PLAN_STATUS_BADGES } from "./plan-status-palette";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 import {
 	useActivePlan,
@@ -22,15 +24,10 @@ import {
 import type { PlanSummary, PlanStatus } from "@/hooks/use-available-plans";
 import { PhaseTreeRow } from "./phase-tree-row";
 
-const STATUS_PILL: Record<PlanStatus, { bg: string; text: string; label: string }> = {
-	draft: { bg: "rgba(100,200,255,0.10)", text: "#66ccff", label: "draft" },
-	in_progress: { bg: "rgba(255,187,68,0.12)", text: "#ffbb44", label: "in-prog" },
-	active: { bg: "rgba(255,187,68,0.12)", text: "#ffbb44", label: "active" },
-	completed: { bg: "rgba(102,255,170,0.10)", text: "#66ffaa", label: "done" },
-	blocked: { bg: "rgba(255,85,102,0.10)", text: "#ff5566", label: "blocked" },
-	archived: { bg: "rgba(100,200,255,0.04)", text: "#66ccff40", label: "archived" },
-	unknown: { bg: "rgba(100,200,255,0.06)", text: "#66ccff60", label: "?" },
-};
+const STATUS_PILL: Record<PlanStatus, { bg: string; text: string; label: string }> = PLAN_STATUS_BADGES as Record<
+	PlanStatus,
+	{ bg: string; text: string; label: string }
+>;
 
 interface PlanTreeRowProps {
 	summary: PlanSummary;
@@ -61,11 +58,11 @@ export function PlanTreeRow({
 			<div
 				className="flex items-center gap-2 px-3 py-2"
 				style={{
-					background: isSelected ? "rgba(100,200,255,0.10)" : "transparent",
+					background: isSelected ? COLORS.holoBg10 : "transparent",
 					borderLeft: isSelected
 						? `2px solid ${COLORS.holoBase}`
 						: "2px solid transparent",
-					fontFamily: "'SF Mono', 'Fira Code', monospace",
+					fontFamily: MK_TOKENS.typography.family.mono,
 				}}
 			>
 				<button

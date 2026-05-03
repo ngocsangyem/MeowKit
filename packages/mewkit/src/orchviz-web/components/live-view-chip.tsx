@@ -6,6 +6,7 @@
  */
 
 import { COLORS } from "@/lib/colors";
+import { MK_TOKENS } from "@/lib/tokens.generated";
 
 interface LiveViewChipProps {
 	/** Optional second line: last-clicked context from drawer navigation. */
@@ -18,10 +19,10 @@ export function LiveViewChip({ subtitle }: LiveViewChipProps) {
 			aria-hidden="true"
 			className="absolute top-3 right-3 z-10 px-2 py-1 rounded"
 			style={{
-				background: "rgba(8, 12, 24, 0.7)",
+				background: COLORS.panelBg,
 				border: `1px solid ${COLORS.glassBorder}`,
 				color: COLORS.holoBase,
-				fontFamily: "'SF Mono', 'Fira Code', monospace",
+				fontFamily: MK_TOKENS.typography.family.mono,
 				fontSize: 10,
 				letterSpacing: "0.1em",
 				textTransform: "uppercase",

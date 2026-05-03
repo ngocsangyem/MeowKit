@@ -1,3 +1,5 @@
+import { MK_TOKENS } from './tokens.generated'
+
 // ─── Model context sizes ────────────────────────────────────────────────────
 
 /** Context window size by model family. Patterns are checked in order;
@@ -382,10 +384,10 @@ export const PERF_OVERLAY = {
   fpsCaution: 50,
   updateIntervalMs: 1000,
   bgColor: 'rgba(0, 0, 0, 0.75)',
-  fpsGoodColor: '#44ff44',
+  fpsGoodColor: MK_TOKENS.color.signal.done,
   fpsCautionColor: '#ffaa00',
-  fpsWarningColor: '#ff4444',
-  textColor: '#cccccc',
+  fpsWarningColor: MK_TOKENS.color.signal.failed,
+  textColor: MK_TOKENS.color.text.secondary,
 } as const
 
 // ─── Hit detection constants ────────────────────────────────────────────────
