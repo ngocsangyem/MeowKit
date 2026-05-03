@@ -9,6 +9,8 @@
  * and hook-server constants; only timing/sizing/display values retained.
  */
 
+import { stripAnsi } from "./parser/strip-ansi.js";
+
 // ─── Timing ──────────────────────────────────────────────────────────────────
 
 export const INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000;
@@ -61,8 +63,37 @@ export function generateSubagentFallbackName(id: string, index: number): string 
 	return `subagent-${id.length > SUBAGENT_ID_SUFFIX_LENGTH ? id.slice(-SUBAGENT_ID_SUFFIX_LENGTH) : index}`;
 }
 
-export function resolveSubagentChildName(input: Record<string, unknown>): string {
-	return String(input.description || input.subagent_type || "subagent").slice(0, CHILD_NAME_MAX);
+function normalizeNameField(value: unknown): string {
+	if (typeof value !== "string") return "";
+	return stripAnsi(value).replace(/[\r\n\t]+/g, " ").trim();
+}
+
+/**
+ * Resolve a stable display label for a Task/Agent spawn.
+ *
+ * Probe order: description → subagent_type → agentType (sidecar shape) → prompt → fallback.
+ * `prompt`-derived names enter the SSE event stream; redact.ts only scrubs sk-/ghp_/AKIA/PEM
+ * prefixes — lexical credential markers (password=, token=) pass through. Localhost-only
+ * server makes this low-severity but worth knowing during review.
+ */
+export function resolveSubagentChildName(
+	input: Record<string, unknown>,
+	toolUseId?: string,
+): string {
+	const desc = normalizeNameField(input.description);
+	const subType = normalizeNameField(input.subagent_type);
+	const agentType = normalizeNameField(input.agentType);
+	const prompt = normalizeNameField(input.prompt).slice(0, CHILD_NAME_MAX);
+	const base = desc || subType || agentType || prompt || "subagent";
+	const name = base.slice(0, CHILD_NAME_MAX);
+	if (
+		name === "subagent" &&
+		typeof toolUseId === "string" &&
+		toolUseId.length > SUBAGENT_ID_SUFFIX_LENGTH
+	) {
+		return `subagent-${toolUseId.slice(-SUBAGENT_ID_SUFFIX_LENGTH)}`;
+	}
+	return name;
 }
 
 // ─── Pause detection ────────────────────────────────────────────────────────

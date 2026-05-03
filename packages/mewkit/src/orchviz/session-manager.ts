@@ -29,6 +29,7 @@ export class SessionManager {
 			inactivityTimer: null,
 			subagentWatchers: new Map(),
 			spawnedSubagents: new Set(),
+			spawnedToolUseIds: new Set(),
 			inlineProgressAgents: new Set(),
 			subagentsDirWatcher: null,
 			subagentsDir: null,

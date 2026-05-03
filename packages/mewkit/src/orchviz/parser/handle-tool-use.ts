@@ -31,11 +31,17 @@ export function handleToolUse(
 	ctxPending.set(block.id, { name: toolName, args, filePath, startTime: Date.now() });
 
 	if (toolName === "Task" || toolName === "Agent") {
-		const childName = resolveSubagentChildName(block.input);
+		const childName = resolveSubagentChildName(block.input, block.id);
 		parser.subagentChildNames.set(block.id, childName);
 		const session = sessionId ? parser.delegate.getSession(sessionId) : undefined;
-		if (!session?.spawnedSubagents.has(childName)) {
-			session?.spawnedSubagents.add(childName);
+		// Dedup by tool_use id so siblings with the same display label
+		// (e.g., two `subagent_type: "researcher"` Task calls) each fire
+		// their own spawn event. The frontend reactivates the existing node.
+		if (!session) {
+			emitSubagentSpawn(parser.delegate, agentName, childName, args, sessionId);
+		} else if (!session.spawnedToolUseIds.has(block.id)) {
+			session.spawnedToolUseIds.add(block.id);
+			session.spawnedSubagents.add(childName);
 			emitSubagentSpawn(parser.delegate, agentName, childName, args, sessionId);
 		}
 	}

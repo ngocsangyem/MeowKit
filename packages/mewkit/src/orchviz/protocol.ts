@@ -188,6 +188,8 @@ export interface SubagentState {
 	watcher: FSWatcher | null;
 	fileSize: number;
 	agentName: string;
+	/** Originating Task/Agent tool_use id from the spawn sidecar, when available. */
+	spawnToolUseId?: string;
 	pendingToolCalls: Map<string, PendingToolCall>;
 	seenToolUseIds: Set<string>;
 	permissionTimer: NodeJS.Timeout | null;
@@ -219,6 +221,12 @@ export interface WatchedSession {
 	inactivityTimer: NodeJS.Timeout | null;
 	subagentWatchers: Map<string, SubagentState>;
 	spawnedSubagents: Set<string>;
+	/**
+	 * Dedup primary key for agent_spawn events. Keyed by originating tool_use id
+	 * so siblings sharing a display label (two `subagent_type: "researcher"` calls)
+	 * each fire their own spawn — the canvas reactivates the existing node.
+	 */
+	spawnedToolUseIds: Set<string>;
 	inlineProgressAgents: Set<string>;
 	subagentsDirWatcher: FSWatcher | null;
 	subagentsDir: string | null;

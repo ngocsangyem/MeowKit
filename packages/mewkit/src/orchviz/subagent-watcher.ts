@@ -4,8 +4,9 @@
  * Ported from patoles/agent-flow @ 59ccf4e (extension/src/subagent-watcher.ts).
  * License Apache-2.0 (see ../NOTICE).
  *
- * Phase 4 is READ-ONLY on `session.inlineProgressAgents` and
- * `session.spawnedSubagents` (per red-team Finding #9). Phase 3 owns writes.
+ * Writes to `session.spawnedSubagents` and `session.spawnedToolUseIds` for
+ * Path B sidecar-driven spawns; the parser path also writes both. Reads
+ * `session.inlineProgressAgents` only (read-only).
  */
 
 import * as fs from "node:fs";
@@ -75,13 +76,16 @@ function startWatchingSubagentFile(
 ): void {
 	const session = delegate.getSession(sessionId);
 	if (!session) return;
-	const agentName = resolveNameFromMeta(filePath, session.subagentWatchers.size + 1);
+	const meta = resolveNameFromMeta(filePath, session.subagentWatchers.size + 1);
+	const agentName = meta.name;
+	const spawnToolUseId = meta.toolUseId;
 	log.info(`Tailing subagent ${path.basename(filePath)} as "${agentName}"`);
 
 	const state: SubagentState = {
 		watcher: null,
 		fileSize: 0,
 		agentName,
+		spawnToolUseId,
 		pendingToolCalls: new Map(),
 		seenToolUseIds: new Set(),
 		permissionTimer: null,
@@ -121,10 +125,14 @@ function startWatchingSubagentFile(
 		log.debug("Subagent initial read failed:", err);
 	}
 
-	const alreadySpawned = session.spawnedSubagents.has(agentName);
+	const alreadySpawnedById =
+		spawnToolUseId !== undefined && session.spawnedToolUseIds.has(spawnToolUseId);
+	const alreadySpawnedByName = session.spawnedSubagents.has(agentName);
+	const alreadySpawned = alreadySpawnedById || alreadySpawnedByName;
 	state.spawnEmitted = pendingToolUseIds.size > 0 || alreadySpawned;
 	if (pendingToolUseIds.size > 0 && !alreadySpawned) {
 		session.spawnedSubagents.add(agentName);
+		if (spawnToolUseId) session.spawnedToolUseIds.add(spawnToolUseId);
 		emitSubagentSpawn(delegate, ORCHESTRATOR_NAME, agentName, agentName, sessionId);
 	}
 
@@ -165,8 +173,13 @@ export function readSubagentNewLines(
 
 	if (!state.spawnEmitted) {
 		state.spawnEmitted = true;
-		if (!session.spawnedSubagents.has(state.agentName)) {
+		const alreadySpawnedById =
+			state.spawnToolUseId !== undefined &&
+			session.spawnedToolUseIds.has(state.spawnToolUseId);
+		const alreadySpawnedByName = session.spawnedSubagents.has(state.agentName);
+		if (!alreadySpawnedById && !alreadySpawnedByName) {
 			session.spawnedSubagents.add(state.agentName);
+			if (state.spawnToolUseId) session.spawnedToolUseIds.add(state.spawnToolUseId);
 			emitSubagentSpawn(delegate, ORCHESTRATOR_NAME, state.agentName, state.agentName, sessionId);
 		}
 	}
