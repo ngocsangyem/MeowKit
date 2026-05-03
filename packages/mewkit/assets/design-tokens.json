@@ -1,0 +1,193 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "meta": {
+    "name": "agents-flow V4 · MeowKit Constellation",
+    "version": "1.0.0",
+    "system": "MeowKit",
+    "theme": "dark",
+    "description": "Tokens for the V4 Constellation visualization — orchestrator-centered agent graph using MeowKit's dark surface, mascot blue, and Inter + Fira Code stack.",
+    "updated": "2026-05-03"
+  },
+
+  "color": {
+    "surface": {
+      "bg":             { "value": "#05070A", "type": "color", "role": "Canvas. Largest surface." },
+      "bgSecondary":    { "value": "#0A1F44", "type": "color", "role": "Glass panels, token blocks, deep wells." },
+      "surface":        { "value": "#111418", "type": "color", "role": "Cards, nodes, side panel, swatches." },
+      "surfaceAlpha":   { "value": "rgba(17,20,24,0.9)", "type": "color", "role": "Sticky headers, over-graph overlays." }
+    },
+    "border": {
+      "default":        { "value": "rgba(255,255,255,0.05)", "type": "color", "role": "Hairlines, dividers, idle wires." },
+      "strong":         { "value": "rgba(255,255,255,0.10)", "type": "color", "role": "Hover-state borders, glass panel edges." }
+    },
+    "text": {
+      "primary":        { "value": "#F8FAFC", "type": "color", "role": "Body, headings, agent names." },
+      "secondary":      { "value": "#94A3B8", "type": "color", "role": "Captions, eyebrows, transcript." },
+      "muted":          { "value": "#64748B", "type": "color", "role": "Footnotes, labels at rest." }
+    },
+    "brand": {
+      "mascot":         { "value": "#2563EB", "type": "color", "role": "Running state, active wires, primary buttons, /meow." },
+      "mascotDeep":     { "value": "#1E3FA8", "type": "color", "role": "Hover/pressed mascot." },
+      "active":         { "value": "#E1E1E1", "type": "color", "role": "Selected node fill, active rail." }
+    },
+    "signal": {
+      "queued":         { "value": "rgba(255,255,255,0.18)", "type": "color", "role": "Pre-roll. Dashed outline." },
+      "thinking":       { "value": "#60A5FA", "type": "color", "role": "Considering. Light-blue ring." },
+      "running":        { "value": "#2563EB", "type": "color", "role": "Working. Pulsing mascot ring." },
+      "done":           { "value": "#34D399", "type": "color", "role": "Settled. Emerald." },
+      "failed":         { "value": "#F87171", "type": "color", "role": "Stop state. Red." }
+    }
+  },
+
+  "typography": {
+    "family": {
+      "ui":   { "value": "'Inter', system-ui, sans-serif", "type": "fontFamily" },
+      "mono": { "value": "'Fira Code', 'Geist Mono', ui-monospace, monospace", "type": "fontFamily" }
+    },
+    "weight": {
+      "regular":  { "value": 400, "type": "fontWeight" },
+      "medium":   { "value": 500, "type": "fontWeight" },
+      "semibold": { "value": 600, "type": "fontWeight" },
+      "bold":     { "value": 700, "type": "fontWeight" }
+    },
+    "scale": {
+      "hero":    { "value": { "size": "60px", "lineHeight": 1.05, "letterSpacing": "-0.02em", "weight": 400, "family": "{typography.family.ui}" } },
+      "h2":      { "value": { "size": "32px", "lineHeight": 1.15, "letterSpacing": "-0.01em", "weight": 500, "family": "{typography.family.ui}" } },
+      "h3":      { "value": { "size": "11px", "lineHeight": 1.4,  "letterSpacing": "0.16em",  "weight": 500, "family": "{typography.family.mono}", "transform": "uppercase" } },
+      "lede":    { "value": { "size": "20px", "lineHeight": 1.5,  "letterSpacing": "0",       "weight": 400, "family": "{typography.family.ui}" } },
+      "body":    { "value": { "size": "16px", "lineHeight": 1.55, "letterSpacing": "0",       "weight": 400, "family": "{typography.family.ui}" } },
+      "caption": { "value": { "size": "13px", "lineHeight": 1.45, "letterSpacing": "0",       "weight": 400, "family": "{typography.family.ui}" } },
+      "label":   { "value": { "size": "11px", "lineHeight": 1.4,  "letterSpacing": "0.10em",  "weight": 500, "family": "{typography.family.mono}", "transform": "uppercase" } },
+      "code":    { "value": { "size": "12.5px","lineHeight": 1.5,  "letterSpacing": "0",      "weight": 400, "family": "{typography.family.mono}" } }
+    },
+    "rules": [
+      "Inter for voice, structure, and copy.",
+      "Fira Code reserved for system: agent ids, tool calls, timestamps, eyebrows.",
+      "Never mix mono and sans inside a single label."
+    ]
+  },
+
+  "geometry": {
+    "frame": {
+      "width":  { "value": "1280px", "type": "dimension" },
+      "height": { "value": "820px",  "type": "dimension" }
+    },
+    "ring": {
+      "ring1":  { "value": "230px", "type": "dimension", "role": "Direct children of orchestrator." },
+      "ring2":  { "value": "380px", "type": "dimension", "role": "Grandchildren and Tests." }
+    },
+    "node": {
+      "orchestrator": { "value": "56px", "type": "dimension", "role": "Center anchor — rounded square." },
+      "default":      { "value": "38px", "type": "dimension", "role": "Hex shape, lane glyph inside." },
+      "selected":     { "value": "46px", "type": "dimension", "role": "Grows to rounded rect on click." },
+      "compact": {
+        "orchestrator": { "value": "44px" },
+        "default":      { "value": "26px" },
+        "selected":     { "value": "36px" }
+      }
+    },
+    "panel": {
+      "width":  { "value": "360px", "type": "dimension" }
+    },
+    "compass": {
+      "planner":  { "value": "-1.5708rad", "role": "Top (↑)" },
+      "coder":    { "value": "0rad",       "role": "Right (→)" },
+      "reviewer": { "value": "3.1416rad",  "role": "Left (←)" },
+      "tests":    { "value": "1.5708rad",  "role": "Bottom (↓)" }
+    },
+    "spread": {
+      "ring1Arc": { "value": "0.85π", "role": "Sibling fan-out on Ring 1." },
+      "ring2Arc": { "value": "0.40π", "role": "Sibling fan-out on Ring 2." }
+    }
+  },
+
+  "radius": {
+    "sm":   { "value": "2px" },
+    "md":   { "value": "4px",  "role": "Buttons, swatches, pills." },
+    "lg":   { "value": "6px",  "role": "Cards, panels, nodes." },
+    "xl":   { "value": "8px",  "role": "Glass overlays, hero containers." }
+  },
+
+  "stroke": {
+    "hairline":   { "value": "1px",   "role": "Idle wires, dividers." },
+    "active":     { "value": "1.5px", "role": "Active wires, selected node." },
+    "pulse":      { "value": "6px",   "role": "Pulse outline base." }
+  },
+
+  "effects": {
+    "glassBlur":     { "value": "blur(12px)" },
+    "mascotGlow":    { "value": "0 0 12px rgba(37,99,235,0.7)" },
+    "panelShadow":   { "value": "0 16px 48px rgba(0,0,0,0.45)" },
+    "wireGlow":      { "value": "0 0 8px rgba(37,99,235,0.8)" }
+  },
+
+  "motion": {
+    "duration": {
+      "snap":     { "value": "150ms" },
+      "selection":{ "value": "200ms" },
+      "panel":    { "value": "250ms" },
+      "cable":    { "value": "1600ms", "role": "Bullet travel along active wire." },
+      "pulse":    { "value": "2200ms", "role": "Node pulse." },
+      "dash":     { "value": "900ms",  "role": "stroke-dashoffset on active wires." }
+    },
+    "easing": {
+      "default":  { "value": "cubic-bezier(0.2, 0.7, 0.2, 1)" },
+      "linear":   { "value": "linear" }
+    },
+    "rules": [
+      "Never run more than three concurrent independent animations on a single node.",
+      "Progress arcs are linear and follow real elapsed time — never bounce or overshoot.",
+      "Information must travel along wires. State never teleports onto a node."
+    ]
+  },
+
+  "states": {
+    "queued":   { "color": "{color.signal.queued}",   "verb": "waits",      "stroke": "1px dashed", "opacity": 0.35 },
+    "thinking": { "color": "{color.signal.thinking}", "verb": "considers",  "stroke": "1.5px solid","preroll": "400ms" },
+    "running":  { "color": "{color.signal.running}",  "verb": "works",      "stroke": "1.5px solid","pulse": true, "progressArc": true },
+    "done":     { "color": "{color.signal.done}",     "verb": "delivers",   "stroke": "1.5px solid","wireFade": true },
+    "failed":   { "color": "{color.signal.failed}",   "verb": "stops",      "stroke": "1.5px solid","cardTint": "rgba(248,113,113,0.06)" }
+  },
+
+  "lanes": {
+    "planner":  { "glyph": "8-arm sun", "compass": "↑", "ring": "ring1" },
+    "coder":    { "glyph": "diamond, rotates 360°/6s while running", "compass": "→", "ring": "ring1" },
+    "reviewer": { "glyph": "pointer triangle with eye dot", "compass": "←", "ring": "ring1" },
+    "tests":    { "glyph": "checkmark in circle (fills on done)", "compass": "↓", "ring": "ring2" }
+  },
+
+  "cables": {
+    "routings": {
+      "curve": { "role": "Default. Organic Bezier bending toward center.", "stroke": "{color.border.default}" },
+      "arc":   { "role": "Sweeps around center on shared ring.",            "stroke": "{color.brand.mascot}" },
+      "ortho": { "role": "Right-angle back-edge (rework loops).",            "stroke": "{color.signal.done}" }
+    },
+    "endpointRadius": { "value": "2.5px" },
+    "bulletRadius":   { "value": "3.5px" },
+    "activeDashArray":{ "value": "3 3" }
+  },
+
+  "principles": [
+    "Center holds the truth — the orchestrator never moves.",
+    "Lanes have compass — Agents (Example: Planner, Developer, Reviewer, project-manager,...) are around the orchestrator. The position doesn't have to be fixed, just need to be around and near the orchestrator/main agent.",
+    "Light, not noise — status lives in color and motion on quiet hairlines.",
+    "Mono is the voice — Fira Code reserved for what an agent does.",
+    "Information arrives, not appears — state travels along wires."
+  ],
+
+  "do": [
+    "Keep the orchestrator at center, always.",
+    "Use mascot blue only for running / running-through.",
+    "Reserve Fira Code for system text — names, code, timestamps.",
+    "Show idle wires at border opacity — never hide structure.",
+    "Animate information traveling along wires, not flashing nodes."
+  ],
+
+  "dont": [
+    "Don't use heavy gradients or glows on text — one mascot glow per active element.",
+    "Don't force-direct the layout — compass beats physics.",
+    "Don't color status with anything outside the four signal colors.",
+    "Don't mix mono and sans inside the same label.",
+    "Don't overlay the side panel — it pushes, never covers."
+  ]
+}
