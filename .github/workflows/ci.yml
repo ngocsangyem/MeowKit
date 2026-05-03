@@ -42,7 +42,7 @@ jobs:
       - name: Validate skill frontmatter
         run: .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py
 
-      - name: Reject residual mk: namespace
+      - name: "Reject residual mk: namespace"
         run: |
           if grep -rEn '^name:[[:space:]]*mk:' .claude/skills/*/SKILL.md; then
             echo "ERROR: legacy 'mk:' frontmatter found — use 'mk:' instead." >&2
