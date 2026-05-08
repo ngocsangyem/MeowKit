@@ -146,10 +146,15 @@ if [ -z "$CLEAN_OUTPUT" ]; then
   exit 0
 fi
 
-echo "$CLEAN_OUTPUT"
+# Per Claude Code hook docs (https://code.claude.com/docs/en/hooks):
+# PostToolUse exit code 1 surfaces as a "PostToolUse:Edit hook error" notice
+# in the transcript. Exit 2 is the documented channel for PostToolUse: stderr
+# is forwarded to Claude (the tool already ran, so blocking is not possible)
+# without producing a hook-error notice. Findings must therefore go to stderr.
+echo "$CLEAN_OUTPUT" >&2
 
 if [ "$HAS_BLOCK" -eq 1 ]; then
-  exit 1
+  exit 2
 fi
 
 exit 0

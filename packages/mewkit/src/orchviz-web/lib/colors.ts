@@ -16,6 +16,8 @@ const T = MK_TOKENS
 // State taxonomy bridge: runtime AgentState ↔ token signal.* (lossy by design).
 // - tool_calling: kept as Orchviz extension amber to preserve workflow legibility.
 // - paused / waiting_permission: kept as Orchviz extension amber; not in tokens.
+// - idleCanvas: hex form of signal.queued; the token is rgba(255,255,255,0.18)
+//   which crashes addColorStop when concatenated with hex alpha (e.g. `${color}19`).
 const EXT = {
   paused: '#ffaa33',
   pausedDim: '#ffaa3380',
@@ -23,6 +25,7 @@ const EXT = {
   pausedBorder: 'rgba(255, 170, 51, 0.35)',
   pausedScrim: 'rgba(255, 170, 51, 0.04)',
   toolCalling: '#ffbb44',
+  idleCanvas: '#9CA3B0',
 } as const
 
 // Mascot blue at varying alphas — replaces the old holo-cyan glass family.
@@ -278,7 +281,9 @@ export const ROLE_COLORS: Record<string, { bg: string; bgSelected: string; text:
 
 export function getStateColor(state: AgentState): string {
   switch (state) {
-    case 'idle': return T.color.signal.queued
+    // idle uses the canvas-safe hex; T.color.signal.queued is rgba and breaks
+    // canvas concat patterns like `${color}${alphaHex(x)}` used by gradients.
+    case 'idle': return EXT.idleCanvas
     case 'thinking': return T.color.signal.thinking
     case 'tool_calling': return EXT.toolCalling
     case 'complete': return T.color.signal.done
