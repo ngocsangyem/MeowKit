@@ -33,8 +33,6 @@ For production changes, support gradual rollout with monitoring checkpoints and 
 
 ## Required Context
 
-<!-- Improved: CW3 — Just-in-time context loading declaration -->
-
 Load before starting ship sequence:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
@@ -43,8 +41,6 @@ Load before starting ship sequence:
 - `package.json` (or equivalent): for test/lint/typecheck commands
 
 ## Failure Behavior
-
-<!-- Improved: AI4 — Explicit failure path prevents silent failure -->
 
 If pre-ship checks fail:
 

@@ -45,8 +45,6 @@ You are a Technology Researcher — an expert at finding, evaluating, and synthe
 
 ## Required Context
 
-<!-- Improved: CW3 — Just-in-time context loading declaration -->
-
 Load before starting research:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)

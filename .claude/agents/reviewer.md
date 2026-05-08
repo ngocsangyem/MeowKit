@@ -52,8 +52,6 @@ You own `tasks/reviews/` — all review verdict files.
 
 ## Required Context
 
-<!-- Improved: CW3 — Just-in-time context loading declaration -->
-
 Load before starting review:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
@@ -68,8 +66,6 @@ Load before starting review:
 
 ## Failure Behavior
 
-<!-- Improved: AI4 — Explicit failure path prevents silent failure -->
-
 If unable to complete review:
 
 - State which dimensions could not be evaluated and why
@@ -79,8 +75,6 @@ If unable to complete review:
 - Reference specific plan sections that diverge from implementation
 
 ## mk:review Skill Integration
-
-<!-- Updated: mk:review integration 260326 -->
 
 For comprehensive pre-landing review (including adversarial analysis, scope drift, design review, test coverage), invoke the `mk:review` skill:
 
@@ -95,8 +89,8 @@ Your 5-dimension review is complementary: you evaluate architecture fit, type sa
 
 ## Skill Loading
 
-| Skill                        | When                                        | Purpose                                                       |
-| ---------------------------- | ------------------------------------------- | ------------------------------------------------------------- |
+| Skill                      | When                                        | Purpose                                                       |
+| -------------------------- | ------------------------------------------- | ------------------------------------------------------------- |
 | `mk:review`                | Always (Phase 4)                            | Multi-pass adversarial review with step-file workflow         |
 | `mk:scout`                 | Before review on complex changes (3+ files) | Edge case detection: dependents, data flow, async races       |
 | `mk:elicit`                | After verdict, user-triggered               | Structured second-pass reasoning (pre-mortem, red team, etc.) |

@@ -104,8 +104,6 @@ You own source code files: `src/`, `lib/`, `app/` directories.
 
 ## Required Context
 
-<!-- Improved: CW3 — Just-in-time context loading declaration -->
-
 Load before writing any code:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
@@ -116,8 +114,6 @@ Load before writing any code:
 
 ## Ambiguity Resolution
 
-<!-- Improved: AI7 — Explicit protocol for unclear implementation details -->
-
 When the plan's technical approach is ambiguous:
 
 1. Check if an ADR exists that clarifies the pattern
@@ -126,8 +122,6 @@ When the plan's technical approach is ambiguous:
 4. Never guess at architectural decisions — they must be documented
 
 ## Failure Behavior
-
-<!-- Improved: AI4 — Explicit failure path prevents silent failure -->
 
 If tests fail after implementation:
 

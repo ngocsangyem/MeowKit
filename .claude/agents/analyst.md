@@ -37,8 +37,6 @@ You own `.claude/memory/` — all files including cost-log.json, patterns.json, 
 
 ## Required Context
 
-<!-- Improved: CW3 — Just-in-time context loading declaration -->
-
 Load before session analysis:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
@@ -48,8 +46,6 @@ Load before session analysis:
 - Task metadata from the current session (agents involved, outcomes)
 
 ## Failure Behavior
-
-<!-- Improved: AI4 — Explicit failure path prevents silent failure -->
 
 If memory files are corrupted or missing:
 

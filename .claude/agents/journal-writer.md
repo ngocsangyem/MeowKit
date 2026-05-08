@@ -90,8 +90,6 @@ This agent operates in **Phase 6 (Reflect)** of the workflow and during **escala
 
 ## Required Context
 
-<!-- Improved: CW3 — Just-in-time context loading declaration -->
-
 Load before writing a journal entry:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)

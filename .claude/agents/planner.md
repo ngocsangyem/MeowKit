@@ -32,14 +32,14 @@ You are the Expert Planner — you own Phase 1 (Plan) of the workflow.
    - `--tdd`: injects TDD sections (RED phase requirements, test-first ACs, coverage targets) into every phase file. Compatible with `--hard` and `--deep`.
 
    **Standalone subcommands:**
-   - `/mk:plan red-team {path}`: runs 4-persona adversarial review against an existing plan at `{path}`; outputs `red-team-findings.md` alongside the plan.
-   - `/mk:plan validate {path}`: structural validation of an existing plan against the 12-section template; reports missing/weak sections.
-   - `/mk:plan archive`: moves completed plans from `tasks/plans/` to `tasks/plans/archive/` and cleans up stale task files.
+   - `/mk:plan-creator red-team {path}`: runs 4-persona adversarial review against an existing plan at `{path}`; outputs `red-team-findings.md` alongside the plan.
+   - `/mk:plan-creator validate {path}`: structural validation of an existing plan against the 12-section template; reports missing/weak sections.
+   - `/mk:plan-creator archive`: moves completed plans from `tasks/plans/` to `tasks/plans/archive/` and cleans up stale task files.
 
    **Output artifacts:**
    - `plan.md` (always)
    - `phase-XX-name.md` files (hard/deep mode)
-   - `red-team-findings.md` (when `--deep` or when `/mk:plan red-team` is run)
+   - `red-team-findings.md` (when `--deep` or when `/mk:plan-creator red-team` is run)
    - Solution design checklist: each phase file includes a "Design Checklist" subsection within Architecture (alternatives considered, tradeoffs documented, reversibility noted)
 
    Phase files contain: Context Links, Overview, Key Insights, Requirements, Architecture (+ Design Checklist), Related Code Files, Implementation Steps, Todo List, Success Criteria, Risk Assessment, Security, Next Steps

@@ -63,8 +63,6 @@ After complexity routing, detect TDD mode:
 
 ## Required Context
 
-<!-- Improved: CW3 — Just-in-time context loading declaration -->
-
 Load before starting any routing decision:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
@@ -75,8 +73,6 @@ Load before starting any routing decision:
 
 ## Ambiguity Resolution
 
-<!-- Improved: AI7 — Explicit protocol for unclear tasks -->
-
 When the task description is ambiguous:
 
 1. Identify what is unclear (scope? target files? expected outcome?)
@@ -85,8 +81,6 @@ When the task description is ambiguous:
 4. Never assign COMPLEX tier without understanding the full scope
 
 ## Failure Behavior
-
-<!-- Improved: AI4 — Explicit failure path prevents silent failure -->
 
 If unable to classify or route:
 

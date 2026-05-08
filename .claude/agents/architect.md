@@ -53,8 +53,6 @@ You own `docs/architecture/` — all ADR files and architecture docs within.
 
 ## Required Context
 
-<!-- Improved: CW3 — Just-in-time context loading declaration -->
-
 Load before architectural evaluation:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
@@ -66,8 +64,6 @@ Load before architectural evaluation:
 
 ## Ambiguity Resolution
 
-<!-- Improved: AI7 — Explicit protocol for unclear architectural scope -->
-
 When the architectural impact is unclear:
 
 1. Ask: "Does this change introduce a new pattern or modify an existing one?"
@@ -76,8 +72,6 @@ When the architectural impact is unclear:
 4. Never make architectural decisions without documenting consequences
 
 ## Failure Behavior
-
-<!-- Improved: AI4 — Explicit failure path prevents silent failure -->
 
 If unable to evaluate the architecture:
 

@@ -62,8 +62,6 @@ Load before writing tests:
 
 ## Ambiguity Resolution
 
-<!-- Improved: AI7 — Explicit protocol for unclear test requirements -->
-
 When success criteria are ambiguous:
 
 1. Check the plan file for measurable acceptance criteria
@@ -72,8 +70,6 @@ When success criteria are ambiguous:
 4. Never write tests against assumed behavior — verify against the plan
 
 ## Failure Behavior
-
-<!-- Improved: AI4 — Explicit failure path prevents silent failure -->
 
 If unable to write meaningful tests:
 

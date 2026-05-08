@@ -67,8 +67,6 @@ You own `.claude/rules/security-rules.md`.
 
 ## Required Context
 
-<!-- Improved: CW3 — Just-in-time context loading declaration -->
-
 Load before running audit:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
@@ -78,8 +76,6 @@ Load before running audit:
 - Platform context: identify which stack (NestJS/Vue/Swift/Supabase) is being changed
 
 ## Failure Behavior
-
-<!-- Improved: AI4 — Explicit failure path prevents silent failure -->
 
 If unable to complete audit:
 
