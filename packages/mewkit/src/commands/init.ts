@@ -281,7 +281,24 @@ export async function init(args: InitArgs): Promise<void> {
 		// Step 5: Apply via smart update
 		const updateSpinner = p.spinner();
 		updateSpinner.start("Applying files...");
-		const stats = await smartUpdate(config, sourceDir, targetDir, dryRun, force);
+		const stats = await smartUpdate(config, sourceDir, targetDir, dryRun, force, {
+			// Spinner overwrites inline `[y/N]` prompts → hand the prompt back to
+			// init so we can pause the spinner, ask via clack, then resume.
+			confirmOrphans: async (orphans) => {
+				updateSpinner.stop("Orphan files detected");
+				p.log.warn(
+					`Found ${orphans.length} orphan file(s) — files on disk no longer in release:`,
+				);
+				for (const o of orphans) p.log.message(`  - ${pc.dim(o)}`);
+				const answer = await p.confirm({
+					message: `Delete ${orphans.length} orphan file(s)?`,
+					initialValue: false,
+				});
+				const ok = !p.isCancel(answer) && answer === true;
+				updateSpinner.start("Applying files...");
+				return ok;
+			},
+		});
 		updateSpinner.stop(`Applied: ${stats.added} added, ${stats.updated} updated, ${stats.skipped} skipped`);
 
 		// Security confirmation for API keys

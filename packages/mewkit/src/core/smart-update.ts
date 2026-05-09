@@ -23,6 +23,16 @@ export interface SmartUpdateOptions {
 	cleanup?: boolean;
 	/** Default false. Skip confirmation prompt (CLI: `--yes` / `-y`). */
 	assumeYes?: boolean;
+	/**
+	 * Optional UI callback that owns the orphan-confirmation interaction.
+	 * Receives the orphan list and returns true to delete, false to skip.
+	 * When provided, smartUpdate skips its own console listing + TTY prompt —
+	 * the caller is responsible for displaying the orphans and asking the user.
+	 * Used by `mewkit init` to pause its spinner around the prompt; without
+	 * this hook, an active spinner overwrites the inline `[y/N]` prompt and
+	 * the process hangs on stdin.
+	 */
+	confirmOrphans?: (orphans: string[]) => Promise<boolean>;
 }
 
 /**
@@ -230,7 +240,15 @@ export async function smartUpdate(
 	// user-private state (memory/, logs/, .env, secrets/) is never inspected.
 	// Default-on; opt out via `--no-cleanup`. Confirmation required unless
 	// `--yes` / `--force`.
-	if (cleanup) {
+	//
+	// Safety gate: only run when a prior meowkit.manifest.json exists in the
+	// user's .claude/. Without it the dir is either fresh (no orphans possible)
+	// or owned by another tool (claudekit, etc.) — in the latter case every
+	// existing file would be flagged and we'd offer to delete the user's
+	// other toolkit. `force` is computed from oldManifest at line 47 and is
+	// not a re-read, so we read fresh here.
+	const hasPriorMeowkitInstall = readManifest(claudeDir) !== null;
+	if (cleanup && hasPriorMeowkitInstall) {
 		const releaseManifest = buildReleaseManifest(sourceDir);
 		if (!releaseManifest) {
 			log.warn(
@@ -240,10 +258,18 @@ export async function smartUpdate(
 		} else {
 			const orphans = findOrphans({ claudeDir, manifest: releaseManifest });
 			if (orphans.length > 0) {
-				log.info(`Found ${orphans.length} orphan file(s) — files on disk no longer in release:`);
-				for (const o of orphans) log.info(`  - ${o}`);
+				const useCallback = options.confirmOrphans && !dryRun && !assumeYes && !force;
+				if (!useCallback) {
+					log.info(`Found ${orphans.length} orphan file(s) — files on disk no longer in release:`);
+					for (const o of orphans) log.info(`  - ${o}`);
+				}
 
-				const proceed = dryRun ? false : assumeYes || force || (await confirmDelete(orphans.length));
+				let proceed: boolean;
+				if (dryRun) proceed = false;
+				else if (assumeYes || force) proceed = true;
+				else if (options.confirmOrphans) proceed = await options.confirmOrphans(orphans);
+				else proceed = await confirmDelete(orphans.length);
+
 				if (!proceed) {
 					stats.orphansSkipped.push(...orphans);
 					if (dryRun) log.info("Dry-run: orphans listed but not deleted.");
