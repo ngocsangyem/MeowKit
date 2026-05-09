@@ -6,6 +6,9 @@ phase: on-demand
 trust_level: third-party
 injection_risk: low
 source: antigravity-kit
+keywords: [lint, format, static-analysis, type-check, quality-control, post-edit-check]
+when_to_use: "Use for automatic quality control / linting / static analysis after code modifications. NOT for full build verification (see mk:verify) or test coverage (see mk:testing)."
+user-invocable: true
 ---
 
 # Lint and Validate Skill

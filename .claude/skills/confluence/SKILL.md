@@ -6,6 +6,9 @@ phase: 0
 source: meowkit
 argument-hint: "analyze PAGE-ID | analyze --title 'Title' --space SPACE | search 'query'"
 allowed-tools: [Read, Grep, Glob, Bash]
+keywords: [confluence, spec-extraction, prd-analysis, requirements-parsing, atlassian]
+when_to_use: "Use when extracting requirements from a Confluence page or spec before building. NOT for Jira ticket execution (see mk:jira)."
+user-invocable: true
 ---
 
 # mk:confluence — Confluence Spec Analysis

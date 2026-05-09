@@ -3,6 +3,9 @@ name: mk:jira
 description: "Jira execution via Atlassian MCP: create, search, update, transition, link, sprint, estimate story points. Requires Atlassian MCP. Use for 'create jira ticket', 'search jira', 'move ticket', 'sprint planning', 'link issues', 'estimate story points', 'update ticket'. For ticket analysis and completeness scoring, use `mk:intake` first."
 phase: on-demand
 source: meowkit
+keywords: [jira, atlassian-mcp, ticket-execution, jira-sprint, issue-tracking, story-points]
+when_to_use: "Use when creating, searching, updating Jira tickets via Atlassian MCP. NOT for ticket completeness analysis (see mk:intake)."
+user-invocable: true
 ---
 
 # mk:jira — Jira Execution & Evaluation Layer

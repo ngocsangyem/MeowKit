@@ -3,6 +3,9 @@ name: mk:intake
 description: "Ticket/PRD intake: product area classification, completeness scoring, RCA, technical assessment. Works with Jira/Linear/GitHub via MCP or manual paste. Triggers: 'analyze ticket', 'intake PRD', 'triage issue', 'classify ticket', 'check ticket'."
 phase: 0
 source: meowkit
+keywords: [intake, ticket-analysis, prd-classification, completeness-scoring, triage, jira-linear-github]
+when_to_use: "Use when triaging tickets/PRDs — product-area classification, completeness, RCA. NOT for sprint planning against codebase (see mk:planning-engine)."
+user-invocable: true
 ---
 
 # mk:intake — Ticket & PRD Intake Analysis

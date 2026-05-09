@@ -2,6 +2,9 @@
 name: mk:web-to-markdown
 description: Fetch a URL and return clean markdown. Use when the agent needs an arbitrary external page (blog, RFC, GitHub issue, vendor doc) not covered by mk:docs-finder. Triggers on URLs in chat. Static-only by default; opt-in JS rendering available.
 argument-hint: "<url> [--wtm-accept-risk] [--wtm-approve]"
+keywords: [web-to-markdown, url-fetch, page-to-markdown, external-page, one-shot-fetch]
+when_to_use: "Use when fetching an arbitrary external page (blog, RFC, GitHub issue, vendor doc) not covered by mk:docs-finder. NOT for library/framework docs (see mk:docs-finder)."
+user-invocable: true
 ---
 
 <!--

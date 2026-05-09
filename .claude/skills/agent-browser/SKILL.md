@@ -3,6 +3,9 @@ name: mk:agent-browser
 description: "AI-agent-driven browser automation (long autonomous sessions, Browserbase-capable). Use when the user needs to interact with websites across many steps, automate complex browser tasks, or run unattended flows. Triggers include 'open a website', 'fill out a form', 'automate browser actions', 'login to a site', or any task requiring programmatic web interaction. NOT for manual E2E test generation (see mk:qa-manual); NOT for deterministic scripted flows (see mk:playwright-cli)."
 allowed-tools: Bash(npx agent-browser:*), Bash(agent-browser:*)
 source: vercel-labs/agent-browser
+keywords: [agent-browser, ai-driven-browser, browserbase, autonomous-browsing, web-automation, unattended-flow, login-flow]
+when_to_use: "Use when AI needs long-autonomous browser sessions or complex multi-step web flows. NOT for deterministic scripted flows (see mk:playwright-cli) or manual E2E test generation (see mk:qa-manual)."
+user-invocable: true
 ---
 
 # Browser Automation with agent-browser

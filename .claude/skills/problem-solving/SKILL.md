@@ -13,6 +13,9 @@ allowed-tools:
   - Grep
   - Glob
 source: [claudekit-engineer, cc-thinking-skills]
+keywords: [problem-solving, first-principles, reasoning-framework, approach-design, decomposition, analytical-thinking]
+when_to_use: "Use when applying first-principles reasoning to a complex problem. General-purpose problem decomposition."
+user-invocable: true
 ---
 
 # Problem-Solving — Strategic Unsticking

@@ -18,6 +18,9 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: claudekit-engineer
+keywords: [bootstrap, scaffold, new-project, initial-scaffolding, greenfield-init]
+when_to_use: "Use when scaffolding a brand-new project from scratch. NOT for autonomous green-field product builds (see mk:harness) or single-task implementation (see mk:cook)."
+user-invocable: true
 ---
 
 # Bootstrap

@@ -4,6 +4,9 @@ description: "Use when writing TypeScript code, fixing type errors, or configuri
 source: aura-frog
 original_skills: [typescript-expert, frontend-development (TS parts)]
 adapted_for: meowkit
+keywords: [typescript, type-errors, strict-types, null-handling, utility-types, ts-eslint]
+when_to_use: "Use when writing TypeScript or fixing type errors / configuring strict type safety. Auto-activates on .ts/.tsx files. NOT for framework-specific patterns (see mk:vue / mk:angular / mk:react-patterns)."
+user-invocable: true
 ---
 
 <!-- Improvements over source skills:

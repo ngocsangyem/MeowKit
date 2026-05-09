@@ -16,6 +16,9 @@ allowed-tools:
   - Edit
   - Write
   - Bash
+keywords: [simplify, behavior-preserving, refactor, reduce-complexity, yagni-pass]
+when_to_use: "Use for behavior-preserving simplification passes on existing code. NOT for authoring-time quality enforcement (see mk:clean-code)."
+user-invocable: true
 ---
 
 # Code Simplification

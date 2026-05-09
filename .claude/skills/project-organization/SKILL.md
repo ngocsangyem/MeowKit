@@ -5,6 +5,9 @@ argument-hint: "[directories or files to organize]"
 source: claudekit-engineer
 original_path: .claude/skills/project-organization/SKILL.md
 adapted_for: meowkit
+keywords: [project-organization, output-organization, file-structure, plan-organization, report-routing, directory-layout]
+when_to_use: "Use when organizing plan/report outputs into the correct project directories."
+user-invocable: true
 ---
 
 # Project Organization

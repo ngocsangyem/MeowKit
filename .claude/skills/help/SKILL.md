@@ -13,6 +13,9 @@ allowed-tools:
   - Glob
   - Grep
   - Bash
+keywords: [help, command-reference, skill-discovery, usage-guide, onboarding, catalog-listing]
+when_to_use: "Use when the user asks for help understanding which skills or commands to use. Surfaces available commands and their purposes."
+user-invocable: true
 ---
 
 # Navigation Help

@@ -4,6 +4,9 @@ description: "Orchestrates single-task implementation pipeline: plan → test �
 source: claudekit-engineer
 version: 1.0.0
 argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict]"
+keywords: [cook, implement-pipeline, plan-execution, feature-build, seven-phase, single-task]
+when_to_use: "Use when implementing a single task end-to-end (plan→test→build→review→ship). NOT for green-field product builds (see mk:harness) or auto-invoked workflow orchestration (see mk:workflow-orchestrator)."
+user-invocable: true
 ---
 
 # Cook — Full Implementation Pipeline

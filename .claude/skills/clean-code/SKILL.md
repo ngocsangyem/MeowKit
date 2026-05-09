@@ -8,6 +8,9 @@ phase: on-demand
 trust_level: third-party
 injection_risk: low
 source: antigravity-kit
+keywords: [clean-code, kiss, dry, yagni, authoring-quality, ad-hoc-review]
+when_to_use: "Use during authoring or ad-hoc quality reviews — KISS/DRY/YAGNI enforcement. NOT for post-hoc diff/PR review (see mk:review) or behavior-preserving simplification (see mk:simplify)."
+user-invocable: true
 ---
 
 # Clean Code — Pragmatic AI Coding Standards

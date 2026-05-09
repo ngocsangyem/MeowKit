@@ -12,6 +12,9 @@ allowed-tools:
   - Glob
   - Bash
   - AskUserQuestion
+keywords: [party, multi-agent-deliberation, architecture-decision, trade-off-discussion, design-review]
+when_to_use: "Use when deliberating architecture trade-offs — brings 2-4 agent perspectives into one discussion. NOT for solo brainstorming (see mk:brainstorming)."
+user-invocable: true
 ---
 
 # Party Mode — Multi-Agent Collaboration

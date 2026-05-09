@@ -16,6 +16,9 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: claudekit-engineer
+keywords: [brainstorm, explore-solutions, compare-approaches, trade-off-analysis, alternatives]
+when_to_use: "Use when exploring technical solutions or comparing approaches for a validated problem. NOT for product validation (see mk:office-hours) or after a plan exists (see mk:plan-ceo-review)."
+user-invocable: true
 ---
 
 # Brainstorming

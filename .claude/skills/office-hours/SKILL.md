@@ -22,6 +22,9 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: gstack
+keywords: [office-hours, yc, product-validation, forcing-questions, brainstorm-builder, design-doc]
+when_to_use: "Use when validating an idea (startup mode) or brainstorming side projects (builder mode). NOT for technical solution exploration after validation (see mk:brainstorming)."
+user-invocable: true
 ---
 
 # YC Office Hours

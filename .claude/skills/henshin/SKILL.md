@@ -6,6 +6,9 @@ phase: on-demand
 trust_level: kit-authored
 injection_risk: low
 source: claudekit-engineer
+keywords: [henshin, agentize, mcp-server, cli-publish, wrap-as-tool, expose-feature, npm-publish]
+when_to_use: "Use when transforming existing code into agent-consumable surfaces — CLI/MCP server/skill. NOT for building new code from scratch (see mk:bootstrap) or reviewing code (see mk:review)."
+user-invocable: true
 ---
 
 <!-- MEOWKIT SECURITY ANCHOR

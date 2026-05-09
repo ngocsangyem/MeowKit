@@ -118,6 +118,8 @@ New model ships → audit playbook → measure each scaffold component's delta �
 
 ## 5. Adaptive Density (Harness)
 
+> Canonical source: `.claude/skills/harness/references/adaptive-density-matrix.md`. Mirrored here for quick reference.
+
 | Model | Density | Scaffolding | Rationale |
 |-------|---------|-------------|-----------|
 | Haiku (TRIVIAL) | MINIMAL | Short-circuits to `/mk:cook` | Cheapest, skip ceremony |

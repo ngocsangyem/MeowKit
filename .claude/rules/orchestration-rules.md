@@ -11,6 +11,14 @@ adaptation_notes: >
 
 These rules apply when the agent spawns subagents or coordinates parallel work.
 
+## Orchestrator Entry Point Rule
+
+Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). Arbitration to avoid duplicate gate enforcement:
+
+- **Explicit `/mk:cook` invocation** → `mk:cook` owns the full pipeline. `mk:workflow-orchestrator` does NOT activate for the remainder of the session.
+- **Session start with complex-feature intent (no explicit invocation)** → `mk:workflow-orchestrator` activates via autoInvoke and routes through the 7-phase flow. It defers to `mk:cook` for single-task requests.
+- **Never run both in the same session.** If `mk:cook` is active, `mk:workflow-orchestrator` skips its phase loop.
+
 ## Delegation Context
 
 When spawning a subagent, ALWAYS include in the prompt:

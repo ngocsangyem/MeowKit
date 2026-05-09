@@ -33,6 +33,9 @@ hooks:
           command: "bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh"
           statusMessage: "Checking debug scope boundary..."
 source: gstack
+keywords: [investigate, root-cause, debug, four-phase, iron-law, systematic-debugging]
+when_to_use: "Use when debugging with systematic root-cause investigation (four phases). NOT for applying fixes without investigation (see mk:fix)."
+user-invocable: true
 ---
 
 <!-- Split for progressive disclosure (checklist #11, #14): 497 → ~65 lines -->

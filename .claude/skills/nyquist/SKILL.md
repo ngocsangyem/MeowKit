@@ -16,6 +16,9 @@ allowed-tools:
 # Inspired by GSD's nyquist-auditor agent (test coverage gap detection)
 # Read-only analysis — writes report, never modifies code
 source: new
+keywords: [nyquist, test-coverage, requirement-mapping, coverage-gap, acceptance-criteria]
+when_to_use: "Use during Phase 2 or Phase 4 to map test coverage to plan acceptance criteria — finds aliased (missed) requirements. NOT for running tests (see mk:testing) or structural code review (see mk:review)."
+user-invocable: true
 ---
 
 # Nyquist — Test-to-Requirement Coverage Mapping

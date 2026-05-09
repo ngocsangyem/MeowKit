@@ -5,12 +5,18 @@ against .claude/schemas/skill-schema.json.
 Defensive: imports yaml and jsonschema with a helpful ImportError message so
 missing venv deps are diagnosed in one run.
 
+Two-tier severity:
+  ERROR — schema violation (missing required, type mismatch, length out of range,
+          keywords > 15, etc.). Exits 1.
+  WARN  — missing recommended field (currently: when_to_use). Logged but does NOT
+          contribute to exit 1 unless --strict is passed.
+
 Usage:
-  .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py [project-root]
+  .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py [project-root] [--strict]
 
 Exit:
-  0 — all skills valid
-  1 — at least one validation failure
+  0 — all skills valid (warnings allowed unless --strict)
+  1 — at least one ERROR (or WARN with --strict)
   2 — missing dependency or fatal error
 """
 import json
@@ -27,8 +33,16 @@ except ImportError as exc:
     sys.exit(2)
 
 
+# Recommended-but-not-required fields. Missing → WARN (not ERROR).
+RECOMMENDED_FIELDS = ["when_to_use"]
+
+
 def main() -> int:
-    root = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else pathlib.Path.cwd()
+    args = [a for a in sys.argv[1:] if a]
+    strict = "--strict" in args
+    args = [a for a in args if not a.startswith("--")]
+    root = pathlib.Path(args[0]) if args else pathlib.Path.cwd()
+
     schema_path = root / ".claude/schemas/skill-schema.json"
     skills_root = root / ".claude/skills"
 
@@ -41,10 +55,9 @@ def main() -> int:
 
     schema = json.loads(schema_path.read_text())
     errors: list[str] = []
+    warnings: list[str] = []
     valid = 0
 
-    # Iterate every directory under .claude/skills/ that contains a SKILL.md.
-    # Excludes hidden dirs and non-skill files (e.g., SKILLS_ATTRIBUTION.md).
     skill_mds = sorted(
         p
         for p in skills_root.glob("*/SKILL.md")
@@ -63,24 +76,48 @@ def main() -> int:
                 errors.append(f"{skill_md.relative_to(root)}: frontmatter is not an object")
                 continue
             jsonschema.validate(fm, schema)
+            # Recommended-field check — runs only if schema validation passed.
+            for field in RECOMMENDED_FIELDS:
+                if field not in fm:
+                    warnings.append(
+                        f"{skill_md.relative_to(root)}: recommended field '{field}' missing"
+                    )
             valid += 1
         except yaml.YAMLError as exc:
             errors.append(f"{skill_md.relative_to(root)}: YAML parse error: {exc}")
         except jsonschema.ValidationError as exc:
-            errors.append(f"{skill_md.relative_to(root)}: {exc.message} (path: {list(exc.absolute_path) or '/'})")
+            errors.append(
+                f"{skill_md.relative_to(root)}: {exc.message} (path: {list(exc.absolute_path) or '/'})"
+            )
+
+    # Output
+    for line in errors:
+        print(f"ERROR: {line}", file=sys.stderr)
+    for line in warnings:
+        print(f"WARN:  {line}", file=sys.stderr)
 
     if errors:
-        for line in errors:
-            print(line, file=sys.stderr)
-        print(f"\n{len(errors)} skill(s) failed validation; {valid} passed", file=sys.stderr)
+        print(
+            f"\n{len(errors)} ERROR(s), {len(warnings)} WARN(s); {valid} skill(s) valid",
+            file=sys.stderr,
+        )
         return 1
 
-    # Zero-match guard: an empty scan must not phantom-pass.
     if valid == 0:
         print("ERROR: zero SKILL.md files found under .claude/skills/", file=sys.stderr)
         return 2
 
-    print(f"OK: {valid} skill(s) validated")
+    if warnings and strict:
+        print(
+            f"\n{len(warnings)} WARN(s) (--strict mode promotes to error); {valid} skill(s) valid",
+            file=sys.stderr,
+        )
+        return 1
+
+    msg = f"OK: {valid} skill(s) validated"
+    if warnings:
+        msg += f" ({len(warnings)} warning(s) — use --strict to fail)"
+    print(msg)
     return 0
 
 

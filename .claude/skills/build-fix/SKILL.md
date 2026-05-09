@@ -9,6 +9,9 @@ allowed-tools:
   - Read
   - Edit
   - Glob
+keywords: [build-fix, compile-error, type-error, build-failed, auto-retry, error-triage]
+when_to_use: "Use when build/compilation fails — detect language, load fix patterns, auto-retry. NOT for runtime errors (see mk:fix) or architectural debugging (see mk:investigate)."
+user-invocable: true
 ---
 
 # Build Fix — Universal Build Error Resolver

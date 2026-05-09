@@ -16,6 +16,9 @@ allowed-tools:
   - Glob
   - Agent
 source: meowkit
+keywords: [benchmark, canary-suite, trace-log, measure-harness, dead-weight-audit, ground-truth]
+when_to_use: "Use when measuring harness changes against ground truth — runs canary suite, records scores. NOT for production performance benchmarking."
+user-invocable: true
 ---
 
 # mk:benchmark — Harness Canary Suite

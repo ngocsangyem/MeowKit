@@ -5,6 +5,9 @@ argument-hint: "<source> [--style markdown|xml|json|plain] [--include pattern] [
 trust_level: kit-authored
 injection_risk: medium
 source: claudekit-engineer
+keywords: [pack, repomix, external-repo, third-party-snapshot, ai-friendly-export, handoff]
+when_to_use: "Use when packing an EXTERNAL repository into a single AI-friendly file. NOT for packing the current project (Claude Code reads files lazily)."
+user-invocable: true
 ---
 
 <!-- MEOWKIT SECURITY ANCHOR

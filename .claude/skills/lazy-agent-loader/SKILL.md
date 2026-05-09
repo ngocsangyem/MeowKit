@@ -6,6 +6,9 @@ triggers:
   - "agent:load"
 allowed-tools: Read, Glob
 source: aura-frog
+keywords: [lazy-agent-loader, context-budget, on-demand-load, agent-load-signal, multi-agent]
+when_to_use: "Auto-invoked when managing agent context budget — loads agent definitions on-demand. Not user-callable directly."
+user-invocable: false
 ---
 
 # Lazy Agent Loader

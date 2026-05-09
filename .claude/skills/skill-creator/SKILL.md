@@ -5,6 +5,9 @@ argument-hint: "[skill-name] [description]"
 source: claudekit-engineer
 original_path: .claude/skills/skill-creator/SKILL.md
 adapted_for: meowkit
+keywords: [skill-creator, new-skill, scaffold-skill, authoring-template, gotchas-section]
+when_to_use: "Use when creating a new MeowKit skill — scaffolds SKILL.md with required sections per skill-authoring-rules."
+user-invocable: true
 ---
 
 # Skill Creator

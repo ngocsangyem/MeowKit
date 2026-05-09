@@ -22,6 +22,9 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: gstack
+keywords: [review, code-review, structural-audit, verdict, gate-2, adversarial-review]
+when_to_use: "Use for structural code audit of a diff/PR — produces PASS/WARN/FAIL verdict per dimension. Phase 4 review skill. NOT for behavioral verification of running build (see mk:evaluate)."
+user-invocable: true
 ---
 
 # Pre-Landing Code Review

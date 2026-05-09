@@ -127,11 +127,44 @@ def scan_doc_file(
     return findings
 
 
+CLAUDE_MD_LINE_LIMIT = 150
+
+
+def check_claude_md_line_count(directory: Path) -> list[DocFinding]:
+    """ERROR if CLAUDE.md exceeds 150 lines (Anthropic memory best practice).
+
+    Anthropic's memory guidance documents that files >200 lines reduce adherence;
+    MeowKit's policy is ≤150 to leave headroom. Enforced as ERROR per the
+    260509 refactor validation decision.
+    """
+    findings: list[DocFinding] = []
+    claude_md = directory / "CLAUDE.md"
+    if not claude_md.is_file():
+        return findings
+
+    try:
+        line_count = sum(1 for _ in claude_md.open("r", encoding="utf-8", errors="ignore"))
+    except (OSError, PermissionError):
+        return findings
+
+    if line_count > CLAUDE_MD_LINE_LIMIT:
+        findings.append(DocFinding(
+            "ERROR",
+            f"CLAUDE.md is {line_count} lines (limit: {CLAUDE_MD_LINE_LIMIT}). "
+            "Per Anthropic memory best practices, longer files reduce adherence. "
+            "Relocate content to .claude/rules/ or skill references.",
+            "CLAUDE.md",
+        ))
+    return findings
+
+
 def scan_docs(directory: Path) -> list[DocFinding]:
     """Scan all documentation files in the project."""
     findings: list[DocFinding] = []
     source_symbols = collect_source_symbols(directory)
     project_paths = collect_file_paths(directory)
+
+    findings.extend(check_claude_md_line_count(directory))
 
     # Scan .md files in docs/, README.md, and CLAUDE.md
     doc_locations = [
@@ -168,8 +201,9 @@ def main() -> int:
     else:
         print(f"\n{len(findings)} potential issue(s) found. Review recommended.")
 
-    # Always exit 0 — warn-only mode
-    return 0
+    # Exit non-zero if any ERROR finding (e.g., CLAUDE.md > 150 lines).
+    # WARN findings remain warn-only.
+    return 1 if any(f.level == "ERROR" for f in findings) else 0
 
 
 if __name__ == "__main__":

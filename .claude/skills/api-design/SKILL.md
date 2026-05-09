@@ -9,6 +9,9 @@ allowed-tools:
   - Write
   - Glob
   - Grep
+keywords: [api-design, rest, graphql, resource-naming, status-codes, pagination, versioning]
+when_to_use: "Use when designing REST or GraphQL APIs (resource naming, HTTP methods, error formats, pagination). NOT for backend implementation (use mk:database for schema)."
+user-invocable: true
 ---
 
 # API Design

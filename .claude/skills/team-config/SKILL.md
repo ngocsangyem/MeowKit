@@ -12,6 +12,9 @@ allowed-tools:
   - Glob
   - Bash
   - Write
+keywords: [team-config, worktree-setup, ownership-map, parallel-team-init, task-queue-init]
+when_to_use: "Auto-invoked when orchestrator decomposes a COMPLEX task into parallel subtasks — sets up worktrees, ownership map, task queue. Not user-callable directly."
+user-invocable: false
 ---
 
 # Team Configuration

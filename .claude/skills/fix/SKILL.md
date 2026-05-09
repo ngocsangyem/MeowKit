@@ -4,6 +4,9 @@ description: "Diagnoses and fixes bugs, type errors, lint failures, CI/CD issues
 source: claudekit-engineer
 version: 0.1.0
 argument-hint: "[issue] --auto|--review|--quick|--parallel|--tdd"
+keywords: [fix, bug-fix, runtime-error, apply-fix, error-recovery, memory-driven-fix]
+when_to_use: "Use when fixing a runtime bug or applying a known fix pattern. NOT for build/compile errors (see mk:build-fix) or architectural debugging (see mk:investigate)."
+user-invocable: true
 ---
 
 # Fixing

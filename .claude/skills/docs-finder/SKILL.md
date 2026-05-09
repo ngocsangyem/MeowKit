@@ -6,6 +6,9 @@ argument-hint: "[library-name] [topic]"
 phase: on-demand
 trust_level: kit-authored
 injection_risk: low
+keywords: [docs-finder, library-docs, context7, api-reference, framework-docs, mcp-fallback]
+when_to_use: "Use when retrieving library/framework/API documentation via Context7 or Context Hub. NOT for fetching arbitrary external pages (see mk:web-to-markdown)."
+user-invocable: true
 ---
 
 <!-- MEOWKIT SECURITY ANCHOR

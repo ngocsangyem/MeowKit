@@ -10,6 +10,9 @@ triggers:
   - "workflow:resume"
 allowed-tools: Read, Write, Bash
 source: aura-frog
+keywords: [session-continuation, session-handoff, resume-workflow, context-reset, state-persistence]
+when_to_use: "Auto-invoked when persisting/restoring mid-session workflow progress across context resets. Not user-callable directly."
+user-invocable: false
 ---
 
 <!-- Split for progressive disclosure (checklist #11, #14): 427 → ~60 lines -->

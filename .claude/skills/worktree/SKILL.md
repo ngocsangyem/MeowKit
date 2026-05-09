@@ -6,6 +6,9 @@ description: >-
   decomposes a COMPLEX task into parallel subtasks.
 argument-hint: "[create|merge|cleanup] [agent-name]"
 source: meowkit
+keywords: [worktree, git-worktree, parallel-isolation, branch-setup, task-decomposition]
+when_to_use: "Auto-invoked when orchestrator decomposes COMPLEX task into parallel subtasks — sets up git worktrees. Not user-callable directly."
+user-invocable: false
 ---
 
 # Git Worktree Manager

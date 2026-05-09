@@ -19,6 +19,9 @@ allowed-tools:
   - WebSearch
   - AskUserQuestion
 source: gstack
+keywords: [cso, security-audit, stride, threat-model, owasp, supply-chain, secrets-archaeology]
+when_to_use: "Use for infrastructure-first security audit (STRIDE, OWASP, secrets, dependencies). NOT for OWASP-only vulnerability scanning (see mk:vulnerability-scanner)."
+user-invocable: true
 ---
 
 # /mk:cso — Chief Security Officer Audit (v2)

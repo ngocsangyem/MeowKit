@@ -9,6 +9,9 @@ allowed-tools: NONE
 # TOKEN OPTIMIZATION: Disabled file scanning tools. Detection uses in-memory patterns only.
 # This saves ~10-30k tokens per message. If file scanning needed, use mk:scout explicitly.
 source: aura-frog
+keywords: [agent-routing, model-tier, phase-0-orient, auto-detect, complexity-classification]
+when_to_use: "Auto-invoked at Phase 0 by orchestrator to assign agent + model tier. Not user-callable directly."
+user-invocable: false
 ---
 
 # Agent Detector

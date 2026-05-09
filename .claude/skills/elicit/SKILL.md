@@ -18,6 +18,9 @@ allowed-tools:
 # Inspired by BMAD-METHOD's Advanced Elicitation pattern (docs/explanation/advanced-elicitation.md)
 # Adapted for the review pipeline and gate system
 source: new
+keywords: [elicit, second-pass-reasoning, pre-mortem, red-team-analysis, socratic, inversion]
+when_to_use: "Use after a code review or plan evaluation — re-examines findings via named reasoning methods. NOT for initial review (see mk:review) or creating plans (see mk:plan-creator)."
+user-invocable: true
 ---
 
 # Elicitation — Structured Second-Pass Reasoning

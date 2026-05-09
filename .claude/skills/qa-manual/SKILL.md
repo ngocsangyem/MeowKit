@@ -8,6 +8,9 @@ orchestrates:
 use_cases: [manual-qa, e2e-code-generation]
 requires_user_input: true
 auth_handling: prompt-always
+keywords: [qa-manual, spec-driven-qa, playwright-e2e-gen, login-flow-test, exploratory-test]
+when_to_use: "Use for spec-driven manual QA testing or Playwright E2E code generation. Always prompts for credentials — never guesses. NOT for AI-autonomous flows (see mk:agent-browser)."
+user-invocable: true
 ---
 
 <!-- Design decisions:

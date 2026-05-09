@@ -14,6 +14,9 @@ allowed-tools:
   - AskUserQuestion
 # Adapted for the gate system — runs between Gate 1 and Phase 2
 source: new
+keywords: [validate-plan, plan-validation, gate-1-pass, acceptance-criteria-check, 8-dimension-validation]
+when_to_use: "Use after Gate 1 plan approval and before Phase 2 — validates plan against 8 dimensions. NOT for creating plans (see mk:plan-creator)."
+user-invocable: true
 ---
 
 # Plan Validation — 8-Dimension Quality Check

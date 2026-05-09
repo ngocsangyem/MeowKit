@@ -4,6 +4,9 @@ description: "Vue 3 Composition API patterns, Pinia state management, reactivity
 source: aura-frog
 original_skills: [vue-expert]
 adapted_for: meowkit
+keywords: [vue, composition-api, pinia, reactivity, composables, framework-specific]
+when_to_use: "Use when working with Vue 3 Composition API, Pinia, reactivity, composables. Auto-activates on .vue files. NOT for React (see mk:react-patterns) or Angular."
+user-invocable: true
 ---
 
 # Vue 3 Expert

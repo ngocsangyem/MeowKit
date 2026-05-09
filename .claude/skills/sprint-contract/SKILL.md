@@ -18,6 +18,9 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 source: meowkit
+keywords: [sprint-contract, testable-criteria, generator-evaluator-handshake, scope-negotiation, rubric-tie-in]
+when_to_use: "Use when negotiating a file-based sprint contract between generator (developer) and evaluator before code is written. NOT for plan generation (see mk:plan-creator)."
+user-invocable: true
 ---
 
 # mk:sprint-contract — File-Based Sprint Contract Protocol

@@ -67,16 +67,9 @@ USE: the skip conditions above, audited once per skill citation
 
 ## Rule 4: Orchestrator Disambiguation
 
-Per `CLAUDE.md` "Orchestrator Entry Point Rule", `mk:cook` and
-`mk:workflow-orchestrator` are mutually exclusive per session.
+Per `.claude/rules/orchestration-rules.md` §"Orchestrator Entry Point Rule", `mk:cook` and `mk:workflow-orchestrator` are mutually exclusive per session. Refer to that rule for the full disambiguation logic.
 
-- **Explicit `/mk:cook` invocation** → `mk:cook` delegates to PM per its row above. `mk:workflow-orchestrator` does NOT also delegate.
-- **Session-start complex-feature intent (no explicit invocation)** → `mk:workflow-orchestrator` delegates per its row.
-- **Never both in the same session.**
-
-WHY: Double-firing PM on the same phase transition wastes haiku calls and
-produces duplicate reports. The mutual-exclusion rule that governs the
-orchestrators themselves extends to their PM delegation.
+WHY: Double-firing PM on the same phase transition wastes haiku calls and produces duplicate reports. The mutual-exclusion rule that governs the orchestrators themselves extends to their PM delegation.
 
 ## Rule 5: Harness Foreground Exception
 

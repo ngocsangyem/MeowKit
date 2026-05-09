@@ -119,9 +119,50 @@ mk:my-workflow/
 INSTEAD of: a 900-line monolithic SKILL.md
 USE: a ≤500-line SKILL.md routing to `references/*.md` or step files
 
+## Rule 4: Every Skill MUST Carry keywords / when_to_use / user-invocable
+
+Every `SKILL.md` frontmatter MUST include three discovery-and-routing fields:
+
+- `keywords:` — array of 5–15 lowercase-hyphenated strings, no duplicates. Catalog metadata for future skill-discovery tooling. Pattern `^[a-z0-9][a-z0-9-]*$`. Validator emits ERROR if missing or invalid.
+- `when_to_use:` — string 10–500 chars, third-person voice, includes a "NOT for ..." disambiguation clause when the skill is in a confusion cluster. Validator emits WARN if missing (exits 0 unless `--strict` is passed).
+- `user-invocable:` — boolean. Default `true`. `false` only for orchestration internals (auto-invoked, not user-callable directly).
+
+### Authorial discipline (when_to_use ↔ description)
+
+`when_to_use` overlaps content already in `description`. There is no automated drift detection — false positives on legitimate paraphrasing make heuristics unreliable. Editors MUST keep both in sync: when updating one, update the other. Reviewer responsibility at PR time.
+
+WHY: Standardized metadata enables catalog tooling, downstream consumers, and a predictable user-invocable surface across the skill set.
+
+### Validation
+
+Enforced by `meowkit/scripts/validate-skill-frontmatter.py` against `meowkit/.claude/schemas/skill-schema.json`. CI runs on every PR via `ci.yml`. Two-tier severity: ERROR (schema violation) vs WARN (missing recommended). Pass `--strict` to promote WARN to ERROR.
+
+### Deprecated fields
+
+- `triggers:` — legacy field, no CLI consumer. Use `keywords:` instead. Existing 6 instances are not removed; do not add to new skills.
+
+## Advisory Frontmatter Fields
+
+The following frontmatter fields are advisory (not hook-enforced); they annotate skills for humans and downstream tooling.
+
+- `preamble-tier: 1 | 2 | 3` — context-injection priority for the skill's preamble block. 1 = low (loaded on demand), 2 = medium, 3 = high (injected before other context). Skills that depend on memory-read or gate-check preambles typically set `3`.
+- `phase: 0 | 1 | 2 | 3 | 4 | 5 | 6 | on-demand` — anchors the skill to a workflow phase. `on-demand` means the skill is invoked by need, not by phase.
+- `trust_level: kit-authored | third-party` — provenance marker. Third-party skills should treat external input as DATA per `injection-rules.md`.
+- `injection_risk: low | medium | high` — advisory risk level for prompt-injection exposure.
+
+## Commands vs Skills (they are not the same)
+
+Slash commands live in `.claude/commands/meow/*.md`. They operate in one of 3 valid patterns — NOT every command has a matching SKILL.md, and that is intentional:
+
+1. **Skill-composing** — command chains existing skills (e.g. `/audit` runs `mk:review` + `mk:cso`).
+2. **Agent-invoking** — command directly spawns an agent without a skill wrapper (e.g. `/arch` uses the `architect` agent).
+3. **Standalone** — command operates via inline behavior, no skill or agent spawn (e.g. `/design`, `/mk:summary`).
+
+**Do not flag a command as a "phantom skill" just because no `mk:<command>` SKILL.md exists.** A command is only phantom when BOTH no `mk:<name>` skill AND no `.claude/commands/mk/<name>.md` exist for a reference. See audit-rubric RF-14.
+
 ## Applies to
 
-- `mk:skill-creator` (must enforce Rules 1 + 3 in templates)
-- All future skill authoring (all 3 rules)
+- `mk:skill-creator` (must enforce Rules 1 + 3 + 4 in templates)
+- All future skill authoring (all 4 rules)
 - Quarterly audits and model-upgrade audits (Rule 3 measurable check)
 - Skill maintenance for any skill with persistent state (Rule 2)

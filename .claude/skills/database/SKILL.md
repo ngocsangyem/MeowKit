@@ -10,6 +10,9 @@ allowed-tools:
   - Edit
   - Write
   - Glob
+keywords: [database, schema-design, migrations, query-optimization, indexing, postgresql, sql]
+when_to_use: "Use when designing schemas, writing migrations, or optimizing SQL queries (PostgreSQL primary). NOT for ORM/code-level data access patterns."
+user-invocable: true
 ---
 
 # Database — Schema, Migrations, Query Optimization

@@ -2,6 +2,9 @@
 name: mk:scout
 description: "Fast parallel codebase scouting. Spawns multiple Explore subagents to search directories simultaneously, returning a consolidated file map with architecture fingerprint, complexity estimates, and routing suggestions. Use before planning, debugging, or any task spanning multiple directories. NOT for reading a single known file in depth (use Read directly); NOT for semantic find-usages or go-to-definition."
 source: claudekit-engineer
+keywords: [scout, codebase-search, parallel-explore, file-mapping, architecture-fingerprint, routing-suggestions]
+when_to_use: "Use before planning/debugging or any task spanning multiple directories — fast parallel codebase scouting. NOT for reading a single known file (use Read directly) or semantic find-usages."
+user-invocable: true
 ---
 
 # Scout

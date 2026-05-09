@@ -21,6 +21,9 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: gstack
+keywords: [plan-ceo-review, scope-review, ambition-check, plan-evaluation, executive-review]
+when_to_use: "Use when reviewing existing plan for scope/ambition — CEO-level critique. NOT for ticket complexity analysis (see mk:planning-engine) or writing plans (see mk:plan-creator)."
+user-invocable: true
 ---
 
 # Mega Plan Review Mode — CEO/Founder-Level Plan Review

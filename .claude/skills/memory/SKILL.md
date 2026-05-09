@@ -1,6 +1,9 @@
 ---
 name: mk:memory
 description: "Topic-file-scoped session memory. Use when capturing session learnings, extracting patterns, or tracking costs — persists to .claude/memory/ topic files (fixes.md, review-patterns.md, architecture-decisions.md). Activates during Phase 0 (Orient) to load context and Phase 6 (Reflect) to persist it. NOT for weekly-cadence engineering retrospectives (see mk:retro); NOT for arbitrary file storage."
+keywords: [memory, topic-files, fixes-log, architecture-decisions, review-patterns, persistence]
+when_to_use: "Use when reading or updating .claude/memory/ topic files (fixes, review-patterns, architecture-decisions, cost-log)."
+user-invocable: true
 ---
 
 # Memory System Toolkit

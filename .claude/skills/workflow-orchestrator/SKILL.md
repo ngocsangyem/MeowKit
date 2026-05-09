@@ -13,6 +13,9 @@ triggers:
   - "execute from specs"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 source: aura-frog
+keywords: [workflow-orchestrator, auto-invoke, phase-routing, intent-detection, fasttrack, complex-feature]
+when_to_use: "Auto-invoked on complex-feature intent — routes through 7-phase workflow. NOT for explicit user-invoked single tasks (see mk:cook). Not user-callable directly."
+user-invocable: false
 ---
 
 <!-- Split for progressive disclosure (checklist #11, #14): 463 → ~75 lines -->
@@ -21,7 +24,7 @@ source: aura-frog
 
 **Priority:** CRITICAL — Use for complex feature implementations.
 
-> Only activates on session start for complex-feature intent. If `/mk:cook` was explicitly invoked in this session, do not activate — `mk:cook` owns the pipeline. See the "Orchestrator Entry Point Rule" in the project `CLAUDE.md`.
+> Only activates on session start for complex-feature intent. If `/mk:cook` was explicitly invoked in this session, do not activate — `mk:cook` owns the pipeline. See `.claude/rules/orchestration-rules.md`"Orchestrator Entry Point Rule".
 
 ## Plan-First Gate
 
@@ -49,7 +52,7 @@ Skip: Fasttrack mode with pre-approved spec.
 
 ## Process
 
-See CLAUDE.md and Phase Composition Contracts for input/output expectations per phase.
+See `.claude/rules/phase-contracts.md` for input/output expectations per phase.
 
 1. **Run pre-execution checklist** — select lead agent, load memory, show agent banner, verify complexity, challenge requirements.
 

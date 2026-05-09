@@ -6,6 +6,9 @@ phase: 1
 source: meowkit
 argument-hint: "review PROJ-123 [--scout] [--graph] | plan --tickets PROJ-101,PROJ-102 [--capacity 40]"
 allowed-tools: [Read, Grep, Glob, Bash]
+keywords: [planning-engine, ticket-complexity, sprint-planning, dependency-mapping, tech-review]
+when_to_use: "Use when analyzing ticket complexity and dependencies against existing codebase before sprint planning. NOT for writing implementation plans (see mk:plan-creator)."
+user-invocable: true
 ---
 
 # mk:planning-engine — Tech Review & Sprint Planning Analysis

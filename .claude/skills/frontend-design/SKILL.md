@@ -4,6 +4,9 @@ description: "Use when designing UI components, reviewing visual design, buildin
 source: claudekit-engineer
 original_skills: [ui-ux-pro-max, frontend-design]
 adapted_for: meowkit
+keywords: [frontend-design, ui-mockup, screenshot-replication, design-implementation, best-practices]
+when_to_use: "Use when replicating a mockup/screenshot or building React/TS components with best practices. NOT for design-system audits (see mk:ui-design-system)."
+user-invocable: true
 ---
 
 # Frontend Design

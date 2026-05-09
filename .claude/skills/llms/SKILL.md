@@ -5,6 +5,9 @@ argument-hint: "[path] [--full] [--output path] [--url base]"
 source: claudekit-engineer
 original_path: .claude/skills/llms/SKILL.md
 adapted_for: meowkit
+keywords: [llms, llms-txt, llm-friendly-docs, ai-discoverability, agentic-content]
+when_to_use: "Use when generating llms.txt or LLM-friendly documentation for AI consumers."
+user-invocable: true
 ---
 
 # llms.txt Generator

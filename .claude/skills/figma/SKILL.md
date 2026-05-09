@@ -2,6 +2,9 @@
 name: mk:figma
 description: "Figma design analysis and implementation via Figma MCP. Parse Figma links, extract design specs, translate to code. Triggers: 'figma', 'design link', 'implement this design', 'design tokens'."
 version: 1.0.0
+keywords: [figma, design-link, design-tokens, mcp-figma, figma-spec, design-to-code]
+when_to_use: "Use when parsing Figma links, extracting design specs, or translating to code via Figma MCP. NOT for general UI design (see mk:ui-design-system)."
+user-invocable: true
 ---
 
 # mk:figma — Figma Design Analysis & Implementation

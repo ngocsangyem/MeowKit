@@ -8,6 +8,9 @@ allowed-tools:
   - Bash
   - Read
   - Glob
+keywords: [verify, build-check, lint-test-typecheck, coverage, unified-verification, pre-ship]
+when_to_use: "Use for unified verification — build→lint→test→type-check→coverage. Auto-called by mk:cook. NOT for lint/format only (see mk:lint-and-validate) or coverage mapping (see mk:nyquist)."
+user-invocable: true
 ---
 
 # Verify — Unified Verification Loop

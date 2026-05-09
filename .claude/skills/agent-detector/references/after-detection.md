@@ -29,7 +29,7 @@ agents[5]{category,count,list}:
   Analysis,3,analyst/researcher/brainstormer
 ```
 
-See `.claude/agents/AGENTS_INDEX.md` for full details.
+See `.claude/rules/agent-routing.md` for full details.
 
 ---
 
@@ -45,7 +45,6 @@ User: "Use only tester for this task"
 
 ---
 
-**Agent routing:** `.claude/agents/orchestrator.md`
-**Agent index:** `.claude/agents/AGENTS_INDEX.md`
+**Agent routing:** `.claude/rules/agent-routing.md` (canonical) and `.claude/agents/orchestrator.md` (orchestrator agent definition)
 
 **MANDATORY:** Always show agent banner at start of EVERY response.

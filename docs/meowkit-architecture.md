@@ -39,7 +39,7 @@ Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 | Deprecated skills                      | 0        | —                                          | `mk:debug`, `mk:documentation`, `mk:shipping` removed in v2.4.4                                                            |
 | Step-file skills                       | 5        | `step-file-rules.md` Applicability section | plan-creator, review, evaluate, harness, trace-analyze                                                                           |
 | Skills with internal agents            | 3        | `AGENTS_INDEX.md` Skill-Scoped section     | jira (3), confluence (2), planning-engine (2) = 7 agents                                                                         |
-| Core agents                            | 17       | `ls .claude/agents/*.md` excl. index       | Matches `CLAUDE.md` Agents table. `project-manager`                                                                              |
+| Core agents                            | 17       | `ls .claude/agents/*.md` excl. index       | Matches `.claude/rules/agent-routing.md` agent table. `project-manager`                                                          |
 | AGENTS_INDEX rows                      | 17       | `AGENTS_INDEX.md` active table             | Footer "13 agents" phrasing is stale (CF-M34)                                                                                    |
 | Hook events (settings.json)            | 7        | `settings.json` hooks keys                 | SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit, SubagentStart, SubagentStop                                       |
 | Node handlers on disk                  | 8        | `ls .claude/hooks/handlers/*.cjs`          | Re-verified 2026-04-29 — disk has 8, matches HOOKS_INDEX. CF-M2 closed (audit cited stale 12).                                  |
@@ -233,7 +233,7 @@ Hook chain verified against `settings.json` (2026-04-18). All 7 events listed.
 | `UserPromptSubmit`        | tdd-flag-detector.sh → conversation-summary-cache.sh → dispatch.cjs (immediate-capture-handler, orientation-ritual)           | `settings.json:152-173` |
 | `Stop`                    | pre-completion-check.sh → post-session.sh → conversation-summary-cache.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer) | `settings.json:125-151` |
 
-**Phase routing** (source: `CLAUDE.md` Phase Composition Contracts table):
+**Phase routing** (source: `.claude/rules/phase-contracts.md`):
 `Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test → Phase 3 Build → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect`
 
 SubagentStart/SubagentStop: intentionally empty — hooks in these events would
@@ -266,7 +266,7 @@ anchor. See `consolidated.md` Cross-Cutting Pattern 2.
 ## 6. Agent Roster (17)
 
 Source: `AGENTS_INDEX.md` active table (17 rows verified against `ls .claude/agents/*.md`),
-`CLAUDE.md` Agents table. AGENTS_INDEX footer contains stale "13 agents" phrasing
+`.claude/rules/agent-routing.md` agent table. AGENTS_INDEX footer contains stale "13 agents" phrasing
 (CF-M34) — canonical count is 17 (project-manager added 260422).
 
 | Agent           | Type    | Phase           | Role                                                                         |
@@ -331,9 +331,7 @@ does not exist; loads nothing.
 
 ## 8. Harness (Autonomous Build Pipeline)
 
-Source: `harness-rules.md` (11 rules), `CLAUDE.md` Adaptive Density table,
-`.claude/skills/harness/references/adaptive-density-matrix.md` (density
-matrix single source of truth).
+Source: `harness-rules.md` (11 rules), `.claude/skills/harness/references/adaptive-density-matrix.md` (density matrix single source of truth).
 
 7-step step-file pipeline for green-field product builds. Generator/evaluator
 architecture: separate agents, separate contexts; self-evaluation forbidden
@@ -351,7 +349,7 @@ architecture: separate agents, separate contexts; self-evaluation forbidden
 
 ### Density Matrix
 
-Source: `CLAUDE.md` Adaptive Density table; `.claude/skills/harness/references/adaptive-density-matrix.md`.
+Source: `.claude/skills/harness/references/adaptive-density-matrix.md` (canonical).
 
 | Density                 | Model        | Contract                           | Iterations | Override                       |
 | ----------------------- | ------------ | ---------------------------------- | ---------- | ------------------------------ |
@@ -401,13 +399,13 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | ID     | File:Line                            | Issue                                                                        | Status |
 | ------ | ------------------------------------ | ---------------------------------------------------------------------------- | ------ |
 | CF-H7  | `mk:lazy-agent-loader/SKILL.md:13` | Audit cited hardcoded agent count "15" | CLOSED 2026-04-29 — `grep -nE "[0-9]+ agent"` returns nothing; no hardcoded count exists in current tree |
-| CF-H11 | `commands/meow/meow.md:20`           | `/mk:command` routed but `mk:command` not in inventory (phantom)         | CLOSED 2026-04-29 — refs resolve via `commands/meow/<name>.md` per `MC` "Commands vs Skills" rule (post-dated audit) |
+| CF-H11 | `commands/meow/meow.md:20`           | `/mk:command` routed but `mk:command` not in inventory (phantom)         | CLOSED 2026-04-29 — refs resolve via `commands/meow/<name>.md` per `.claude/rules/skill-authoring-rules.md` §"Commands vs Skills" (post-dated audit) |
 | CF-H12 | `commands/meow/meow.md:20,40`        | `mk:plan/arch/design/test` phantom routing targets | CLOSED 2026-04-29 — all 4 resolve via `commands/meow/<name>.md` |
 | CF-H13 | `commands/meow/plan.md`              | `mk:plan` phantom                                                          | CLOSED 2026-04-29 — `commands/meow/plan.md` exists |
 | CF-H14 | `commands/meow/validate.md`          | `mk:audit`, `mk:validate` phantom                                        | CLOSED 2026-04-29 — both resolve in `commands/meow/` |
 | CF-H15 | `commands/meow/summary.md`           | `mk:summary` phantom                                                       | CLOSED 2026-04-29 — `commands/meow/summary.md` exists |
 
-**Re-verification finding (CF-H11–H15):** the audit pre-dated `meowkit/CLAUDE.md` "Commands vs Skills" section, which formalizes that a command without a matching skill is NOT phantom (per audit-rubric RF-14). All 7 cited refs resolve to a command file. **A future Phase 2 cross-ref CI script will guard against regressions.**
+**Re-verification finding (CF-H11–H15):** the audit pre-dated `.claude/rules/skill-authoring-rules.md` §"Commands vs Skills" (originally in `meowkit/CLAUDE.md`, relocated 2026-05-09), which formalizes that a command without a matching skill is NOT phantom (per audit-rubric RF-14). All 7 cited refs resolve to a command file. **A future Phase 2 cross-ref CI script will guard against regressions.**
 
 **Total post-re-verify (2026-04-29):** 1 CRITICAL OPEN (CF-C4), 0 HIGH OPEN (5 closed). Re-baseline of MEDIUM/LOW deferred to next audit pass.
 

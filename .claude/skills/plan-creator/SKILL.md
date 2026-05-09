@@ -19,6 +19,9 @@ allowed-tools:
   - Agent
   - AskUserQuestion
 source: meowkit
+keywords: [plan-creator, implementation-plan, phase-files, gate-1, scope-adaptive]
+when_to_use: "Use when creating a structured multi-file implementation plan before build. NOT for ticket analysis (see mk:planning-engine) or scope review (see mk:plan-ceo-review)."
+user-invocable: true
 ---
 
 # Plan Creator

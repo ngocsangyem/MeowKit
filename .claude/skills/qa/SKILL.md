@@ -21,6 +21,9 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: gstack
+keywords: [qa, quality-assurance, health-score, manual-test, verification]
+when_to_use: "Use when running quality assurance checks. General QA wrapper. NOT for E2E generation (see mk:qa-manual) or behavioral evaluation (see mk:evaluate)."
+user-invocable: true
 ---
 
 # /qa: Test → Fix → Verify

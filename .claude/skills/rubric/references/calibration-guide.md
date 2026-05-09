@@ -123,4 +123,3 @@ The Phase 8 benchmark suite (`mk:benchmark`) automates this — run after every 
 - [ ] File ≤200 lines
 - [ ] `validate-rubric.sh path/to/new-rubric.md` exits 0
 - [ ] If used by a preset, add to the preset frontmatter and re-validate weight sum
-- [ ] Add to `RUBRICS_INDEX.md`

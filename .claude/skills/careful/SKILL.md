@@ -19,6 +19,9 @@ hooks:
           command: "bash ${CLAUDE_SKILL_DIR}/bin/check-careful.sh"
           statusMessage: "Checking for destructive commands..."
 source: gstack
+keywords: [careful, safety-mode, destructive-commands, prod-mode, guardrails]
+when_to_use: "Use when working in prod or with destructive commands — warns before rm -rf, DROP TABLE, force-push. NOT for scoping edits to a directory (see mk:freeze)."
+user-invocable: true
 ---
 
 # /careful — Destructive Command Guardrails

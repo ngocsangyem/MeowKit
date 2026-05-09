@@ -18,6 +18,9 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: gstack
+keywords: [ship, pr-creation, branch-push, deploy-pipeline, gate-2-pass]
+when_to_use: "Use when shipping reviewed code — creates PR + branch push after Gate 2 PASS verdict. NOT for code review (see mk:review)."
+user-invocable: true
 ---
 
 # Ship: Fully Automated Ship Workflow

@@ -11,6 +11,9 @@ allowed-tools:
   - Glob
   - Grep
   - AskUserQuestion
+keywords: [decision-framework, triage, escalation, case-management, operational-decisions]
+when_to_use: "Use when building operational decision frameworks — triage, escalation protocols, case management. NOT for technical architecture decisions (see mk:party)."
+user-invocable: true
 ---
 
 # Decision Framework Builder
