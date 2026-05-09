@@ -16,6 +16,22 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.8.2 (2026-05-09) — Prompt Enhancer Output Modes
+
+### Highlights
+
+`mk:prompt-enhancer` default output is now the rewritten prompt only — no analysis, no preamble, paste-ready into any coding agent. The new `--analyze` flag opts back into the four-section diagnostic surface (decomposition, detected issues, source-grounded suggestions), and `--score` adds a deterministic 1–10 quality rating on the original prompt with a transparent rubric breakdown.
+
+### Improvements
+
+- `mk:prompt-enhancer` default mode emits only the rewritten prompt code block — decomposition and weakness detection still run internally to feed the rewrite, but are no longer displayed unless requested.
+- New `--analyze` flag — surfaces the original-prompt analysis (5-component decomposition, FOUND-only issues, one-fix-per-finding suggestions) alongside the rewrite.
+- New `--score` flag — adds a deterministic 1–10 quality score on the original prompt using a fixed rubric (5 components × {0,1,2} − issues × 0.5, clamped to 1–10, banker's rounding). Auto-promotes to `--analyze --score` when used alone since a bare integer hides the rubric.
+- `mk:prompt-enhancer` frontmatter gains an `argument-hint` field for slash-command argument completion in supporting clients.
+- Skill docs and references cleaned up — removed source-citation `§` symbols and academic section IDs (`§5.2`, `§4.1`, etc.) that added noise without aiding the user. Quoted source-name citations preserved.
+
+---
+
 ## 2.8.1 (2026-05-09) — The Prompt Enhancer Release
 
 ### Highlights

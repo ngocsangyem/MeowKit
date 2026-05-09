@@ -34,7 +34,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-# Caps (cite references/deep-mode-scout.md §4)
+# Caps (cite references/deep-mode-scout.md)
 MAX_FILES = 8
 MAX_LINES_PER_FILE = 100
 MAX_WALL_CLOCK_SECONDS = 30

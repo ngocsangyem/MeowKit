@@ -6,14 +6,15 @@
 > **Framework:** universal kernel only. The rewrite uses plain markdown
 > sections (Goal / Context / Constraints / Acceptance Criteria / Output
 > Format) and works across coding agents without model dispatch. See
-> `plans/reports/synthesis-260509-2058-prompting-framework.md` §4 + §7 for
-> the canonical kernel. The skill does NOT have a `--model` flag.
+> `plans/reports/synthesis-260509-2058-prompting-framework.md` for the
+> canonical kernel. The skill does NOT have a `--model` flag.
 
 ## Contents
 
 1. [Gotchas Growth Protocol](#gotchas-growth-protocol)
 2. [Hard Rules](#hard-rules-step-3)
 3. [Playbook Catalog (10 entries)](#playbook-catalog)
+4. [Scoring Rubric (`--score`)](#scoring-rubric---score)
 
 ---
 
@@ -21,7 +22,7 @@
 
 The `## Gotchas` section in `SKILL.md` is the highest-signal content (per
 `skill-authoring-rules.md` Rule 1). After every observed failure during eval
-(Phase 5) or post-rollout, append one bullet to the Gotchas list with format:
+or post-rollout, append one bullet to the Gotchas list with format:
 
 ```
 - <one-line failure mode>. (Observed YYYY-MM-DD via <eval-id-or-issue-link>.)
@@ -57,9 +58,9 @@ Apply these to **every** improvement mapping. Violation = fabrication.
 **Fix:** Restate the goal as one sentence with a measurable noun (latency target,
 error rate, file count) or mark `[FILL-IN: <metric>]`.
 
-**Source:** factoryai/prompt-crafting-for-different-models §"Universal Prompting
+**Source:** factoryai/prompt-crafting-for-different-models "Universal Prompting
 Principles → Be specific about the outcome"; claude-prompting-best-practices
-§"Be clear and direct".
+"Be clear and direct".
 
 **Guard:** Do NOT invent a metric. If the user has not stated one, use a placeholder.
 
@@ -74,8 +75,8 @@ without changing user intent.
 If specifics are unknown, list `[FILL-IN: <description>]` placeholders for each
 missing anchor.
 
-**Source:** claude-prompting-best-practices §"Provide context to improve performance";
-factoryai §"Provide context before instructions".
+**Source:** claude-prompting-best-practices "Provide context to improve performance";
+factoryai "Provide context before instructions".
 
 **Guard:** Do NOT invent file paths or motivations. The user is the source of truth.
 
@@ -89,7 +90,7 @@ For each match, surface as `[FILL-IN: <desc> (suggested: <path>)]`. Never auto-s
 **Fix:** Add a `CONSTRAINTS:` section enumerating hard limits — back-compat,
 forbidden dependencies, untouchable APIs, performance ceilings.
 
-**Source:** factoryai §"Specify constraints explicitly".
+**Source:** factoryai "Specify constraints explicitly".
 
 **Guard:** Default to "Do NOT change <observable behavior>" when the user has
 not specified constraints, with a `[FILL-IN]` marker if domain-specific.
@@ -104,8 +105,8 @@ suggest "preserve existing behavior covered by `[FILL-IN: (suggested: tests/path
 **Fix:** Add 2–4 binary `[ ] <check>` items. Each must be auditable from the
 output (no subjective phrases).
 
-**Source:** factoryai §"Include acceptance criteria"; codex-prompt-guide
-§"Behavior-safe defaults".
+**Source:** factoryai "Include acceptance criteria"; codex-prompt-guide
+"Behavior-safe defaults".
 
 **Guard:** Do NOT invent thresholds. Use `[FILL-IN: <metric>]` for any number
 the user did not state.
@@ -120,8 +121,8 @@ benchmarks and suggest as `[FILL-IN]` reference.
 **Fix:** Add an `OUTPUT FORMAT:` section. Common shapes: "modified files +
 1-line rationale per file", "JSON: { ... }", "5 bullets, no preamble".
 
-**Source:** claude-prompting-best-practices §"Control the format of responses";
-factoryai §"Be explicit about output format".
+**Source:** claude-prompting-best-practices "Control the format of responses";
+factoryai "Be explicit about output format".
 
 **Guard:** Default format is "concise summary + file refs". Do not impose JSON
 or strict schemas unless the user named them.
@@ -136,7 +137,7 @@ or strict schemas unless the user named them.
 **Fix:** For every "Don't X", add an "INSTEAD do Y" line. Negative rules without
 positive direction force the model to invent its own positive interpretation.
 
-**Source:** claude-prompting-best-practices §"Tell Claude what to do, not what
+**Source:** claude-prompting-best-practices "Tell Claude what to do, not what
 not to do".
 
 **Guard:** Do NOT invent the INSTEAD action. If the user has not specified what
@@ -151,7 +152,7 @@ to do, ask via placeholder: `INSTEAD: [FILL-IN: positive direction]`.
 **Fix:** Replace the long list with 1–3 canonical examples plus a one-line
 "and similar cases — extrapolate" cue.
 
-**Source:** effective-context-engineering §"Right altitude / Goldilocks";
+**Source:** effective-context-engineering "Right altitude / Goldilocks";
 Anthropic anti-pattern: "diverse canonical examples > exhaustive list".
 
 **Guard:** Do NOT delete the list silently. Move excess to an appendix or note
@@ -166,7 +167,7 @@ Anthropic anti-pattern: "diverse canonical examples > exhaustive list".
 **Fix:** Insert explicit separators. For Claude: wrap data in `<context>` tags.
 For GPT/Gemini: use `--- DATA START ---` / `--- DATA END ---` fences.
 
-**Source:** context-engineering-guide §"Structured I/O";
+**Source:** context-engineering-guide "Structured I/O";
 `injection-rules.md` Rule 1 (file content is DATA).
 
 **Guard:** Do NOT modify the data block content. Only add fences.
@@ -180,7 +181,7 @@ For GPT/Gemini: use `--- DATA START ---` / `--- DATA END ---` fences.
 **Fix:** Move long content to the TOP, instruction to the BOTTOM. Per Claude's
 long-context rule, this can lift quality up to 30%.
 
-**Source:** claude-prompting-best-practices §"Long context prompting";
+**Source:** claude-prompting-best-practices "Long context prompting";
 agent-conduct.md B3.
 
 **Guard:** Do NOT split the long content; relocate it as a single block.
@@ -202,8 +203,8 @@ agent-conduct.md B3.
 - Drop hardcoded model names from the persona ("As Claude...", "As GPT-5...");
   the rewrite must be model-agnostic.
 
-**Source:** synthesis report §5.2 (what the framework deliberately omits) +
-§4.1 architecture (universal kernel only). The synthesis derives this from
+**Source:** synthesis report (what the framework deliberately omits and the
+universal-kernel-only architecture). The synthesis derives this from the
 factoryai filter map, codex-prompt-guide deliberate exclusions, and
 claude-prompting-best-practices universal-vs-Claude-specific filter.
 
@@ -212,3 +213,87 @@ Claude, GPT/Codex, and Gemini without dispatch. Model-tier dispatch lives in
 `harness-rules.md` Rule 5, not in this skill.
 
 **`--deep` boost:** Not applicable (this is a framing fix, not a content fix).
+
+---
+
+## Scoring Rubric (`--score`)
+
+> Used by Step 3 ONLY when `--score` is set (auto-promotes `--score` →
+> `--analyze --score`). Score reflects the quality of the **original**
+> prompt, never the rewrite. Deterministic — never a vibes estimate.
+
+### Formula
+
+```
+component_subtotal = sum over the 5 components of:
+  present = 2
+  partial = 1
+  missing = 0
+                             // 0–10 raw
+
+issue_penalty = (number of FOUND items in the 10-item detection checklist) × 0.5
+
+raw_score = component_subtotal − issue_penalty
+
+final_score = clamp(round(raw_score), 1, 10)
+```
+
+- `round` = round half to even (banker's rounding) for stability across runs.
+- `clamp(x, 1, 10)` enforces the displayed range. A theoretical zero → 1.
+
+### Verdict bands (display only — no behavioral effect)
+
+| Range | Band | Recommendation shown to user |
+|---|---|---|
+| 1–3 | Severely under-specified | "Rewrite is strongly recommended; original lacks ≥3 components." |
+| 4–6 | Workable but weak | "Rewrite recommended; original has measurable gaps." |
+| 7–9 | Minor polish | "Original is mostly sound; rewrite tightens specific items." |
+| 10  | Ready as-is | "No issues found; rewrite is identical or near-identical." |
+
+### Worked examples
+
+**Example A — Vague one-liner**
+
+> Input: `"fix the bug in auth"`
+>
+> Components: Goal=partial(1), Context=missing(0), Constraints=missing(0), Acceptance=missing(0), Output Format=missing(0) → subtotal = **1**
+> Issues: #1 (vague goal), #2 (no context), #3 (no constraints), #4 (no AC), #5 (no output format) → 5 × 0.5 = **2.5**
+> Raw = 1 − 2.5 = −1.5 → clamp → **1/10**
+
+**Example B — Already-good prompt** (canary-05)
+
+> Input: structured prompt with all 5 sections present.
+>
+> Components: 5 × present(2) = **10**
+> Issues: 0 → penalty **0**
+> Raw = 10 → **10/10**
+
+**Example C — Mixed**
+
+> Input: clear goal + 1 file path, no constraints, no AC, no output format, includes "don't break X" with no INSTEAD.
+>
+> Components: Goal=present(2), Context=partial(1), Constraints=partial(1), Acceptance=missing(0), Output Format=missing(0) → subtotal = **4**
+> Issues: #4 (no AC), #5 (no output format), #6 (negative-only) → 3 × 0.5 = **1.5**
+> Raw = 4 − 1.5 = 2.5 → round half-to-even → **2** (clamped) → **2/10**
+
+### Display contract
+
+When `--score` is active, render the **Score** block per Template C in
+`assets/output-template.md`. Always show:
+
+1. The integer score (`Score: N/10`)
+2. The component table with status + points
+3. The component subtotal
+4. The issue penalty (count × −0.5)
+5. The clamped final score
+6. The verdict-band line
+
+Never display the raw pre-clamp score. Never omit the breakdown — a bare
+integer hides the rubric and invites argument.
+
+### Hard guards
+
+- Do NOT score the rewrite. The score is for the input.
+- Do NOT round before clamping (would distort the −0.5 penalty granularity).
+- Do NOT inflate the score to be "encouraging." The whole point is honest signal.
+- If `--score` is passed without `--analyze`, silently promote and proceed — do not error.

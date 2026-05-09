@@ -32,9 +32,9 @@ Specific enough to guide; flexible enough to allow heuristics.
 - **Context:** enough to ground; no full file dumps if a reference suffices.
 - **Constraints:** hard limits only. Soft preferences belong nowhere — they create false acceptance criteria.
 
-**Validation:** golden-rule clarity test (claude-prompting-best-practices §"Be clear and direct"). If a colleague with no project context would be confused, the model will be too. Re-read before sending.
+**Validation:** golden-rule clarity test (claude-prompting-best-practices "Be clear and direct"). If a colleague with no project context would be confused, the model will be too. Re-read before sending.
 
-**Source:** ANT §"anatomy" (system prompts); claude-prompting-best-practices §178; skill-authoring-guidelines §5.4 (freedom-level matching).
+**Source:** ANT "anatomy" (system prompts); claude-prompting-best-practices; skill-authoring-guidelines (freedom-level matching).
 
 ---
 
@@ -52,7 +52,7 @@ Patterns:
 Inline content dumps cost tokens twice: once when read, once when echoed back
 in a rewrite. Identifiers cost it once.
 
-**Source:** ANT §"retrieval" (just-in-time vs upfront); skill-authoring-guidelines §5.5 (progressive disclosure); synthesis §6.2.
+**Source:** ANT "retrieval" (just-in-time vs upfront); skill-authoring-guidelines (progressive disclosure); synthesis.
 
 ---
 
@@ -72,7 +72,7 @@ prompting framework does not auto-compact).
 
 When the input prompt mentions any of these mechanisms (or similar — "checkpoint", "resumable", "long task"), surface the relevant pattern as a recommendation in section 3 of the output.
 
-**Source:** ANT §"long-horizon" (compaction, structured note-taking, sub-agent architectures); CEG §"States" (state buckets to preserve across turns).
+**Source:** ANT "long-horizon" (compaction, structured note-taking, sub-agent architectures); CEG "States" (state buckets to preserve across turns).
 
 ---
 
@@ -82,7 +82,7 @@ For agents with persistent message history: once a tool call is settled and the
 next decision no longer needs the raw result, drop the result body. Keep the
 call summary.
 
-- Cuts attention budget by 30–60% on multi-tool sessions (ANT §"long-horizon").
+- Cuts attention budget by 30–60% on multi-tool sessions (ANT "long-horizon").
 - Especially valuable for `Read` / `Grep` calls where the file content was already
   digested into a decision.
 
@@ -90,7 +90,7 @@ When the input prompt is itself a long agentic transcript, suggest tool-result
 clearing as a CONSTRAINTS line: "After each tool call, summarize the result in
 one line and drop the raw body from context."
 
-**Source:** ANT §"long-horizon" (Compaction → tool result clearing).
+**Source:** ANT "long-horizon" (Compaction → tool result clearing).
 
 ---
 
@@ -98,15 +98,15 @@ one line and drop the raw body from context."
 
 Three named bloat sources:
 
-- **Tool sets:** keep minimum viable. Remove tools whose use case is ambiguous (ANT §"anatomy/tools": "if a human engineer can't definitively say which tool should be used, an AI agent can't be expected to do better").
+- **Tool sets:** keep minimum viable. Remove tools whose use case is ambiguous (ANT "anatomy/tools": "if a human engineer can't definitively say which tool should be used, an AI agent can't be expected to do better").
 - **System prompt:** load `docs/project-context.md` as on-demand context, not as a permanent system-prompt bullet list. The rewrite should reference, not inline.
-- **CLAUDE.md / agent instructions:** keep evergreen; legacy notes go in a collapsed "old patterns" section (skill-authoring-guidelines §5.3). Time-sensitive content erodes signal-to-noise.
+- **CLAUDE.md / agent instructions:** keep evergreen; legacy notes go in a collapsed "old patterns" section (skill-authoring-guidelines). Time-sensitive content erodes signal-to-noise.
 
 When the input prompt enumerates 10+ tools or contains a multi-paragraph block
 of "always remember…" rules, flag bloat as detection #7 (laundry-list) and
 suggest pruning to canonical examples.
 
-**Source:** ANT §"anatomy" (tools, system prompts); skill-authoring-guidelines §5.3 (evergreen).
+**Source:** ANT "anatomy" (tools, system prompts); skill-authoring-guidelines (evergreen).
 
 ---
 
@@ -127,7 +127,7 @@ When the input prompt is itself a skill / system prompt / agent instruction set
 (meta-prompting case), surface eval discipline as a CONSTRAINTS line: "Add 3+
 canary scenarios with expected outputs before broadening this prompt."
 
-**Source:** skill-authoring-guidelines §5.10 (eval-driven authoring); rubric-rules.md Rule 6 (drift check on model upgrade); synthesis §6.6.
+**Source:** skill-authoring-guidelines (eval-driven authoring); rubric-rules.md Rule 6 (drift check on model upgrade); synthesis.
 
 ---
 

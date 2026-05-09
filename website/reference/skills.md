@@ -30,7 +30,7 @@ Skills for planning, research, and ideation.
 | `mk:plan-ceo-review` | CEO-mode plan review (product lens + engineering lens) |
 | `mk:office-hours` | YC-style brainstorming (startup + builder modes) |
 | `mk:brainstorming` | Structured ideation with scoring and plan-creator handoff |
-| `mk:prompt-enhancer` | Refine a draft user prompt — decompose, detect 10 weakness patterns, emit a model-agnostic rewrite (plain markdown, no XML); optional `--deep` codebase scout |
+| `mk:prompt-enhancer` | Refine a draft user prompt — default emits only the rewrite. `--analyze` adds decomposition, detected issues, and suggestions; `--score` adds a deterministic 1–10 quality rating; `--deep` adds an opt-in codebase scout |
 | `mk:decision-framework` | Triage, escalation, and case management for architecture decisions |
 | `mk:api-design` | REST/GraphQL API design patterns |
 
