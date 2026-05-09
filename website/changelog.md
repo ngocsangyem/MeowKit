@@ -16,6 +16,32 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.7.5 (2026-05-09) — CLAUDE.md trim + reference cleanup
+
+### Highlights
+
+`CLAUDE.md` is trimmed from 209 to 112 lines to honor Anthropic's memory guidance — files over 200 lines reduce instruction adherence. Phase Composition Contracts, the Agents table, Adaptive Density, the Orchestrator Entry Point Rule, Commands-vs-Skills, advisory skill frontmatter fields, and the Skill Rule of Two now live in `.claude/rules/` where they load alongside the other rule files. Cross-references in skills, docs, and scripts that pointed at the old `CLAUDE.md` sections were updated to the new locations. Broken `*_INDEX.md` pointers in shipped skill markdown were repaired so they resolve in fresh `mewkit init` installs.
+
+### Improvements
+
+- `CLAUDE.md` trimmed from 209 → 112 lines; pointers replace inline tables. The slim file fits Anthropic's ≤200 line ceiling with a 150-line internal target.
+- New rule file `.claude/rules/phase-contracts.md` — phase I/O contracts (what each phase expects/produces); loads unconditionally.
+- New rule file `.claude/rules/agent-routing.md` — 17-row agent → role → phase routing table plus the `MEOWKIT_PM_AUTO=off` opt-out; loads unconditionally.
+- `.claude/rules/orchestration-rules.md` gains "Orchestrator Entry Point Rule" — the `mk:cook` ↔ `mk:workflow-orchestrator` mutual-exclusion contract.
+- `.claude/rules/skill-authoring-rules.md` gains "Advisory Frontmatter Fields" (`preamble-tier`, `phase`, `trust_level`, `injection_risk`) and "Commands vs Skills" (the three valid command patterns).
+- `.claude/rules/injection-rules.md` Rule 11 — Skill Rule of Two as an always-loaded numbered rule.
+- `.claude/rules/post-phase-delegation.md` Rule 4 body compressed to a pointer; eliminates duplicate restatement of the Orchestrator Entry Point Rule.
+- `CLAUDE.md` Planning section now points to `tasks/plans/YYMMDD-name/` so Claude knows where `mk:plan-creator` writes plans.
+- `validate-docs.py` now emits `ERROR` and exits non-zero when `CLAUDE.md` exceeds 150 lines — prevents regression of the trim.
+
+### Bug Fixes
+
+- `mk:agent-detector` references — `after-detection.md` cited `.claude/agents/AGENTS_INDEX.md` twice; that file is contributor-facing and does not ship via `mewkit init`. Both pointers now resolve to `.claude/rules/agent-routing.md`.
+- `mk:rubric` `SKILL.md` references table — dropped the row pointing at `RUBRICS_INDEX.md`. The skill's `--list` flag generates the catalog dynamically, which is the actual interactive entry point.
+- `mk:rubric` calibration checklist — removed the "Add to `RUBRICS_INDEX.md`" item. Custom user rubrics live in user projects where the index does not ship; `--list` discovers them at runtime.
+
+---
+
 ## 2.7.4 (2026-05-02) — Browser skill consolidation
 
 ### Highlights
@@ -182,7 +208,7 @@ Hook telemetry, schema-validated skill frontmatter, cross-reference CI, and a re
 ### Improvements
 
 - `.github/workflows/ci.yml` now runs all four validators and the hook regression test on every PR, in the existing `validate` job. No new workflow file.
-- `meowkit-architecture.md` §10 critical-findings table re-baselined — four of six findings the prior audit listed as OPEN were already CLOSED in the current tree. Component inventory updated to reflect the 8 actual handlers (prior table claimed 12).
+- `meowkit-architecture.md` 10 critical-findings table re-baselined — four of six findings the prior audit listed as OPEN were already CLOSED in the current tree. Component inventory updated to reflect the 8 actual handlers (prior table claimed 12).
 - Probe hooks ship behind the existing telemetry path so future advanced-feature decisions consult `hook-log.jsonl` evidence instead of speculation.
 
 ### Bug Fixes
@@ -223,7 +249,7 @@ New 17th core agent `project-manager` — a cross-workflow delivery tracker that
 - Status reports are co-located with the plan they describe. Archive moves them together. No central `tasks/status-reports/` dir; each plan lazily creates its own subdir on first write.
 - Harness iteration cap escalation (`step-05`) now surfaces current delivery state BEFORE the `AskUserQuestion` escalation — user sees what's done and what's blocked before deciding ship / abort.
 - Parallel-execution Rule 5 appends: after the integration test passes, PM emits a merge report summarizing what each parallel branch contributed.
-- Agent count: 16 → 17. Architecture `§2` counts, `§6` roster, AGENTS_INDEX, CLAUDE.md, and agent-detector routing data all synchronized.
+- Agent count: 16 → 17. Architecture `2` counts, `6` roster, AGENTS_INDEX, CLAUDE.md, and agent-detector routing data all synchronized.
 
 ### Bug Fixes
 
@@ -390,8 +416,8 @@ A new strategic-unsticking skill and three diagnostic frameworks for evidence-ba
 
 ### New Skills
 
-| Skill                  | Purpose                                                                                                                                                                                                                                                       |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skill                | Purpose                                                                                                                                                                                                                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:problem-solving` | Seven non-default techniques for "stuck on approach" — simplification cascades, collision-zone thinking, meta-pattern recognition, inversion, scale game, first principles, via negativa. Explicit boundary reroutes debugging to `mk:sequential-thinking`. |
 
 ### Improvements
@@ -560,8 +586,8 @@ Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + inj
 
 ### New Skills
 
-| Skill       | Purpose                                                                                                                                                             |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skill     | Purpose                                                                                                                                                             |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:pack` | Wraps `repomix` to export an external repo as a single AI-friendly file (markdown/xml/json/plain). Output at `.claude/packs/{timestamp}-{slug}.{ext}` (gitignored). |
 
 ### Features
@@ -580,7 +606,7 @@ Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + inj
 
 ### Bug Fixes
 
-- Removed fabricated "Skills cannot call skills" claim from chom SKILL.md (contradicted by `lessons-build-skill.md` §Composing Skills).
+- Removed fabricated "Skills cannot call skills" claim from chom SKILL.md (contradicted by `lessons-build-skill.md` Composing Skills).
 - Removed fabricated "40–70% context burn" claim from pack SKILL.md (replaced with honest context-isolation framing).
 - Added Error Recovery for empty / unreachable / invalid sources (chom).
 
@@ -615,8 +641,8 @@ Deletes the auto-inject memory pipeline (`memory-loader` + parser + filter + inj
 
 ### New Skills
 
-| Skill                  | Purpose                                                                                                                                                                      |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skill                | Purpose                                                                                                                                                                      |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:confluence`      | Fetch Confluence pages as markdown + deep requirement analysis (Spec Research Report, gap detection with `[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` tags, multi-page assembly). |
 | `mk:planning-engine` | Codebase-aware tech review + sprint planning with deterministic scripts (`dep-graph.py` cycle detection, `capacity-bin.py` bin-packing). Research-only — no ticket creation. |
 
@@ -717,8 +743,8 @@ Major overhaul of `mk:multimodal` — multi-provider generation with intelligent
 
 ### New Skills
 
-| Skill       | Purpose                                                                                                                                                                             |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skill     | Purpose                                                                                                                                                                             |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:chom` | Analyze and replicate features from external systems, repos, apps, or ideas into any project. 6-phase workflow: Recon → Map → Analyze → Challenge (HARD GATE) → Decision → Handoff. |
 
 ### Features
@@ -904,14 +930,14 @@ Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline
 
 ### New Skills
 
-| Skill                  | Purpose                                                                                                                                                                                                                 |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mk:harness`         | Autonomous green-field build pipeline with generator/evaluator split, adaptive density, 3-round iteration loop, budget tracking ($30 warn / $100 block / user cap).                                                     |
-| `mk:sprint-contract` | File-based sprint contract negotiated between generator and evaluator before source edits begin. Enforced by `gate-enforcement.sh` in FULL density.                                                                     |
-| `mk:rubric`          | Weighted rubric loader; reads `.claude/rubrics/`, validates weights sum to 1.0.                                                                                                                                         |
-| `mk:evaluate`        | Behavioral grader with active verification; skeptic persona, drives running build, rejects static-analysis-only verdicts.                                                                                               |
-| `mk:trace-analyze`   | Scatter-gather trace log analyzer; reads `.claude/memory/trace-log.jsonl`, feeds meta-improvement loop with mandatory HITL gate.                                                                                        |
-| `mk:benchmark`       | Canary suite (quick 5-task / full 6-task tiers) for dead-weight audit baselines on model upgrades.                                                                                                                      |
+| Skill                | Purpose                                                                                                                                                                                                               |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mk:harness`         | Autonomous green-field build pipeline with generator/evaluator split, adaptive density, 3-round iteration loop, budget tracking ($30 warn / $100 block / user cap).                                                   |
+| `mk:sprint-contract` | File-based sprint contract negotiated between generator and evaluator before source edits begin. Enforced by `gate-enforcement.sh` in FULL density.                                                                   |
+| `mk:rubric`          | Weighted rubric loader; reads `.claude/rubrics/`, validates weights sum to 1.0.                                                                                                                                       |
+| `mk:evaluate`        | Behavioral grader with active verification; skeptic persona, drives running build, rejects static-analysis-only verdicts.                                                                                             |
+| `mk:trace-analyze`   | Scatter-gather trace log analyzer; reads `.claude/memory/trace-log.jsonl`, feeds meta-improvement loop with mandatory HITL gate.                                                                                      |
+| `mk:benchmark`       | Canary suite (quick 5-task / full 6-task tiers) for dead-weight audit baselines on model upgrades.                                                                                                                    |
 | `mk:web-to-markdown` | Static-by-default URL → clean markdown with SSRF guard, 6-pass injection scanner, DATA boundary wrap, fetch persistence with manifest, robots.txt cache, per-domain throttle. Tier-4 fallback below `mk:docs-finder`. |
 
 ### New Agents
@@ -983,12 +1009,12 @@ Extracted high-leverage patterns from ECC's 38-agent ecosystem. 5 new skills, 17
 
 ### New Skills
 
-| Skill                     | Purpose                                                                                                                                                  |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skill                   | Purpose                                                                                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:decision-framework` | Operational decision architecture: classify → rules → score → escalate → communicate. 5 references + 3 domain examples.                                  |
 | `mk:verify`             | Unified verification: build → lint → test → type-check → coverage. Fail-fast. Auto-detects 5 project types (JS/TS, Python, Go, Ruby, Rust).              |
 | `mk:api-design`         | REST/GraphQL patterns: resource naming, HTTP methods, status codes, pagination, versioning, rate limiting, error formats.                                |
-| `mk:build-fix`          | Build error triage: detect language from error output, classify fixability, chain into `mk:verify`. Max 3 attempts then escalate.                      |
+| `mk:build-fix`          | Build error triage: detect language from error output, classify fixability, chain into `mk:verify`. Max 3 attempts then escalate.                        |
 | `mk:database`           | Schema design, migration patterns, query optimization. PostgreSQL primary.                                                                               |
 | `mk:jira`               | Jira execution via Atlassian MCP: 8 operation categories, 4-tier safety framework, 50+ JQL templates, sprint management.                                 |
 | `mk:figma`              | Figma design analysis via Figma MCP: 3 modes (analyze/implement/tokens), design token extraction (CSS/Tailwind/JSON). Fallback: PNG export + multimodal. |
@@ -1161,8 +1187,8 @@ Deeper review reasoning, resumable builds, and systematic coverage mapping. Insp
 
 ### New Skills
 
-| Skill                | Purpose                                                                                                                                                                                        |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skill              | Purpose                                                                                                                                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:elicit`        | Structured second-pass reasoning after review or analysis. 8 named methods (pre-mortem, inversion, red team, Socratic, first principles, constraint removal, stakeholder mapping, analogical). |
 | `mk:validate-plan` | 8-dimension plan quality validation. Auto for COMPLEX tasks, optional for STANDARD.                                                                                                            |
 | `mk:nyquist`       | Test-to-requirement coverage mapping. Reads plan acceptance criteria + test files, produces gap report showing untested requirements.                                                          |
@@ -1189,8 +1215,8 @@ The biggest MeowKit update yet. 13 new capabilities inspired by deep analysis of
 
 ### New Skills
 
-| Skill                  | Purpose                                                                                                                        |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Skill                | Purpose                                                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `mk:scale-routing`   | Domain-to-complexity CSV routing. Fintech, healthcare, IoT auto-force COMPLEX tier. User-extensible.                           |
 | `mk:project-context` | Generate / update agent constitution.                                                                                          |
 | `mk:party`           | Multi-agent deliberation sessions (2–4 agents debate architecture decisions with forced synthesis). Discussion only — no code. |

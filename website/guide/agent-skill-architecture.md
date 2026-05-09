@@ -72,23 +72,23 @@ Phase 6: Reflect ─→ documenter loads: documentation, memory
 
 ## Agent → Skills Mapping
 
-| Agent | Phase | Skills Loaded |
-|-------|-------|---------------|
-| orchestrator | 0 | agent-detector, lazy-agent-loader, scout |
-| planner | 1 | plan-creator, plan-ceo-review, validate-plan, office-hours |
-| architect | 1 | plan-creator (ADR references) |
-| tester | 2 | testing, lint-and-validate, qa, qa-manual, nyquist |
-| developer | 3 | development, typescript, vue, frontend-design, clean-code, docs-finder |
-| reviewer | 4 | review, elicit, scout, cso, vulnerability-scanner |
-| evaluator | 3, 4 | evaluate, rubric, trace-analyze, benchmark |
-| security | 2, 4 | cso, vulnerability-scanner, skill-template-secure |
-| shipper | 5 | ship, careful |
-| documenter | 6 | documentation, document-release, llms |
-| analyst | 0, 6 | memory |
-| brainstormer | 1 | office-hours |
-| journal-writer | 6 | memory |
-| ui-ux-designer | 3 | frontend-design, ui-design-system |
-| git-manager | 5, any | ship (git operations only) |
+| Agent          | Phase  | Skills Loaded                                                          |
+| -------------- | ------ | ---------------------------------------------------------------------- |
+| orchestrator   | 0      | agent-detector, lazy-agent-loader, scout                               |
+| planner        | 1      | plan-creator, plan-ceo-review, validate-plan, office-hours             |
+| architect      | 1      | plan-creator (ADR references)                                          |
+| tester         | 2      | testing, lint-and-validate, qa, qa-manual, nyquist                     |
+| developer      | 3      | development, typescript, vue, frontend-design, clean-code, docs-finder |
+| reviewer       | 4      | review, elicit, scout, cso, vulnerability-scanner                      |
+| evaluator      | 3, 4   | evaluate, rubric, trace-analyze, benchmark                             |
+| security       | 2, 4   | cso, vulnerability-scanner, skill-template-secure                      |
+| shipper        | 5      | ship, careful                                                          |
+| documenter     | 6      | documentation, document-release, llms                                  |
+| analyst        | 0, 6   | memory                                                                 |
+| brainstormer   | 1      | office-hours                                                           |
+| journal-writer | 6      | memory                                                                 |
+| ui-ux-designer | 3      | frontend-design, ui-design-system                                      |
+| git-manager    | 5, any | ship (git operations only)                                             |
 
 ::: info Evaluator agent (added v2.2.0)
 The `evaluator` is the behavioral counterpart to the structural `reviewer`. It grades running builds against weighted rubrics using active verification (driving the build via browser/curl/CLI). In harness pipelines (`mk:harness`), the generator (developer) and evaluator are hard-separated to prevent self-eval bias. See [Harness Architecture](/guide/harness-architecture) and the [evaluator agent reference](/reference/agents/evaluator).
@@ -145,19 +145,19 @@ Proceed with implementation
 
 Skills that enforce this gate:
 
-| Skill | Gate behavior | Skip condition |
-|-------|---------------|----------------|
-| mk:cook | Create plan if missing | Plan path arg, `--fast` mode |
-| mk:fix | Plan if > 2 files | `--quick` mode |
-| mk:ship | Require approved plan | Hotfix with human approval |
-| mk:cso | Scope audit via plan | `--daily` mode |
-| mk:qa | Create QA scope doc | Quick tier |
-| mk:review | Read plan for context | PR diff reviews |
-| mk:workflow-orchestrator | Route to plan-creator | Fasttrack mode |
-| mk:investigate | Produces input FOR plans | Always skips |
-| mk:office-hours | Pre-planning skill | Always skips |
-| mk:retro | Data-driven, no plan | Always skips |
-| mk:document-release | Scope from diff | Post-ship sync |
+| Skill                    | Gate behavior            | Skip condition               |
+| ------------------------ | ------------------------ | ---------------------------- |
+| mk:cook                  | Create plan if missing   | Plan path arg, `--fast` mode |
+| mk:fix                   | Plan if > 2 files        | `--quick` mode               |
+| mk:ship                  | Require approved plan    | Hotfix with human approval   |
+| mk:cso                   | Scope audit via plan     | `--daily` mode               |
+| mk:qa                    | Create QA scope doc      | Quick tier                   |
+| mk:review                | Read plan for context    | PR diff reviews              |
+| mk:workflow-orchestrator | Route to plan-creator    | Fasttrack mode               |
+| mk:investigate           | Produces input FOR plans | Always skips                 |
+| mk:office-hours          | Pre-planning skill       | Always skips                 |
+| mk:retro                 | Data-driven, no plan     | Always skips                 |
+| mk:document-release      | Scope from diff          | Post-ship sync               |
 
 ::: info Why some skills skip the gate
 `mk:investigate` and `mk:office-hours` produce planning input — they run before a plan exists by design. `mk:retro` is data-driven and has no implementation output to scope.
@@ -165,7 +165,7 @@ Skills that enforce this gate:
 
 ### Orchestrator Entry Point Rule (v2.5.0)
 
-Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). `CLAUDE.md` declares arbitration to prevent duplicate Gate 1 enforcement:
+Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). `.claude/rules/orchestration-rules.md` "Orchestrator Entry Point Rule" declares arbitration to prevent duplicate Gate 1 enforcement (relocated from `CLAUDE.md` in v2.7.5):
 
 - **Explicit `/mk:cook` invocation** → `mk:cook` owns the pipeline. `mk:workflow-orchestrator` does NOT activate for the rest of the session.
 - **Session start, complex-feature intent** → `mk:workflow-orchestrator` activates via `autoInvoke`. Defers to `mk:cook` for single-task requests.
@@ -177,13 +177,13 @@ Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline
 
 SKILL.md frontmatter supports advisory fields for humans and downstream tooling. These are not hook-enforced; unknown-field parsers ignore them.
 
-| Field | Values | Meaning |
-|---|---|---|
-| `preamble-tier` | `1 \| 2 \| 3` | Context-injection priority. 3 = injected before other context. Used by 21 skills (benchmark, elicit, evaluate, harness, plan-creator, rubric, sprint-contract, trace-analyze, validate-plan, …). |
-| `user-invocable` | `true` (default) / `false` | `false` = internal sub-skill, orchestrator-invoked only. Currently set on `mk:scale-routing`. |
-| `phase` | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6 \| on-demand` | Workflow phase anchor. `on-demand` = invoked by need, not by phase. |
-| `trust_level` | `kit-authored \| third-party` | Provenance marker. Third-party skills (e.g. antigravity-kit) treat external input as DATA per `injection-rules.md`. |
-| `injection_risk` | `low \| medium \| high` | Advisory prompt-injection exposure level. |
+| Field            | Values                                         | Meaning                                                                                                                                                                                          |
+| ---------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `preamble-tier`  | `1 \| 2 \| 3`                                  | Context-injection priority. 3 = injected before other context. Used by 21 skills (benchmark, elicit, evaluate, harness, plan-creator, rubric, sprint-contract, trace-analyze, validate-plan, …). |
+| `user-invocable` | `true` (default) / `false`                     | `false` = internal sub-skill, orchestrator-invoked only. Currently set on `mk:scale-routing`.                                                                                                    |
+| `phase`          | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6 \| on-demand` | Workflow phase anchor. `on-demand` = invoked by need, not by phase.                                                                                                                              |
+| `trust_level`    | `kit-authored \| third-party`                  | Provenance marker. Third-party skills (e.g. antigravity-kit) treat external input as DATA per `injection-rules.md`.                                                                              |
+| `injection_risk` | `low \| medium \| high`                        | Advisory prompt-injection exposure level.                                                                                                                                                        |
 
 ## Step-File Architecture
 
@@ -206,15 +206,16 @@ skills/mk:review/
 - **Resumability** — state persists to `session-state/{skill-name}-progress.json`; interrupted workflows resume from the last completed step
 
 **Rules:**
+
 - One step at a time — never load multiple steps simultaneously
 - Never skip steps — even empty steps run quickly and preserve sequence integrity
 - Fix step files when wrong — don't work around them
 
 ### Currently step-file enabled
 
-| Skill | Steps | What each step does |
-|-------|-------|---------------------|
-| `mk:review` | 4 | Blind review → Edge cases → Criteria audit → Triage |
+| Skill             | Steps     | What each step does                                                                             |
+| ----------------- | --------- | ----------------------------------------------------------------------------------------------- |
+| `mk:review`       | 4         | Blind review → Edge cases → Criteria audit → Triage                                             |
 | `mk:plan-creator` | 9 (00–08) | Scope → Research → Codebase → Draft → Semantic checks → Red-team → Interview → Gate 1 → Hydrate |
 
 `mk:plan-creator` also has a fast-mode path (`workflow-fast.md`) that runs steps 00→03→04→07→08, skipping research, codebase analysis, red-team, and the validation interview.
@@ -225,15 +226,15 @@ Skills under 150 lines stay monolithic — step files add overhead only worth it
 
 Some skills activate across multiple phases rather than being owned by a single agent.
 
-| Skill | Activates when |
-|-------|----------------|
-| `careful` | Any phase with destructive commands |
-| `freeze` | Any phase — scopes a debug session |
-| `scout` | Phase 0 + any exploration task |
-| `docs-finder` | Any phase needing up-to-date library docs |
-| `multimodal` | Any phase with visual content or images |
-| `session-continuation` | Cross-session handoff required |
-| `henshin` | Wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `mk:plan-creator` → `mk:cook`. |
+| Skill                  | Activates when                                                                                                                                                 |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `careful`              | Any phase with destructive commands                                                                                                                            |
+| `freeze`               | Any phase — scopes a debug session                                                                                                                             |
+| `scout`                | Phase 0 + any exploration task                                                                                                                                 |
+| `docs-finder`          | Any phase needing up-to-date library docs                                                                                                                      |
+| `multimodal`           | Any phase with visual content or images                                                                                                                        |
+| `session-continuation` | Cross-session handoff required                                                                                                                                 |
+| `henshin`              | Wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `mk:plan-creator` → `mk:cook`. |
 
 ::: warning
 Cross-cutting skills are loaded by individual agents as needed — they are not globally pre-loaded. Loading them unconditionally would inflate every task's context cost.
@@ -241,25 +242,25 @@ Cross-cutting skills are loaded by individual agents as needed — they are not 
 
 ## Quick-Start: Which Skill Do I Need? (v1.1.0)
 
-| I want to... | Skill | Phase |
-|--------------|-------|-------|
-| Plan a feature | `mk:plan-creator` | 1 |
-| Validate a plan before building | `mk:validate-plan` | 1 |
-| Brainstorm approaches | `mk:brainstorming`, `mk:office-hours` | 1 |
-| Write tests first (TDD) | `mk:testing` | 2 |
-| Check test-to-requirement coverage | `mk:nyquist` | 2, 4 |
-| Implement a feature | `mk:cook` | 0-6 |
-| Fix a bug | `mk:fix` | 3 |
-| Debug an issue | `mk:investigate` | 3 |
-| Review code | `mk:review` | 4 |
-| Deepen review findings | `mk:elicit` | 4 |
-| Security audit | `mk:cso`, `mk:audit` | 2, 4 |
-| Ship / deploy | `mk:ship` | 5 |
-| Update docs after shipping | `mk:document-release` | 6 |
-| Run a retrospective | `mk:retro` | 6 |
-| Explore the codebase | `mk:scout` | 0 |
-| Look up library docs | `mk:docs-finder` | any |
-| Wrap existing code as agent surfaces (CLI + MCP + skill) | `mk:henshin` | any |
+| I want to...                                             | Skill                                 | Phase |
+| -------------------------------------------------------- | ------------------------------------- | ----- |
+| Plan a feature                                           | `mk:plan-creator`                     | 1     |
+| Validate a plan before building                          | `mk:validate-plan`                    | 1     |
+| Brainstorm approaches                                    | `mk:brainstorming`, `mk:office-hours` | 1     |
+| Write tests first (TDD)                                  | `mk:testing`                          | 2     |
+| Check test-to-requirement coverage                       | `mk:nyquist`                          | 2, 4  |
+| Implement a feature                                      | `mk:cook`                             | 0-6   |
+| Fix a bug                                                | `mk:fix`                              | 3     |
+| Debug an issue                                           | `mk:investigate`                      | 3     |
+| Review code                                              | `mk:review`                           | 4     |
+| Deepen review findings                                   | `mk:elicit`                           | 4     |
+| Security audit                                           | `mk:cso`, `mk:audit`                  | 2, 4  |
+| Ship / deploy                                            | `mk:ship`                             | 5     |
+| Update docs after shipping                               | `mk:document-release`                 | 6     |
+| Run a retrospective                                      | `mk:retro`                            | 6     |
+| Explore the codebase                                     | `mk:scout`                            | 0     |
+| Look up library docs                                     | `mk:docs-finder`                      | any   |
+| Wrap existing code as agent surfaces (CLI + MCP + skill) | `mk:henshin`                          | any   |
 
 ## Subagent Status Protocol (v1.1.0)
 
