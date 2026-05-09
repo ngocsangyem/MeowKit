@@ -42,7 +42,7 @@ Operates in **Phase 3 (Build GREEN)**. Output supports the `developer` agent.
 - **NEVER** use `v-html` with user content (security-rules.md — XSS vector)
 - **PREFER** composables (`use*`) over mixins
 - **PREFER** `ref()` for primitives, `reactive()` only for complex objects
-- **NAME** components PascalCase, files kebab-case (naming-rules.md)
+- **NAME** components PascalCase, files kebab-case (`agent-conduct.md` (B1))
 
 ## Anti-Patterns
 

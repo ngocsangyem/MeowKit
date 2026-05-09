@@ -42,7 +42,7 @@ The 4 retained rubrics each close a verified gap:
 | Rubric | Why excluded from default | When to opt in |
 |---|---|---|
 | `code-quality` | Overlaps `mk:review` Maintainability dim + `security-rules.md` hardcoded-secret hard fail | Add explicitly when reviewing legacy code without an active review pipeline |
-| `craft` | Overlaps `mk:review` Polish dim + `naming-rules.md` | Add for ship-quality polish gates, not prototypes |
+| `craft` | Overlaps `mk:review` Polish dim + `agent-conduct.md` (B1) | Add for ship-quality polish gates, not prototypes |
 | `ux-usability` | Overlaps `mk:qa` health-score and existing review UX coverage | Already wired into `fullstack-product` preset; add manually for UX-primary risk |
 
 To opt in to one of these for a specific run, the evaluator can call `load-rubric.sh <name>` directly without changing the preset.

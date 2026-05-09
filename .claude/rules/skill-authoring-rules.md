@@ -1,7 +1,6 @@
 # Skill Authoring Rules
 
 These rules govern how new and existing `mk:*` skills are authored, audited, and persisted.
-Source: consolidated from Anthropic *Skill Authoring Best Practices* + *Lessons from Building Claude Code* (see `docs/skill-authoring-guidelines.md`).
 
 ## Rule 1: Every Skill MUST Include a Gotchas Section
 
@@ -82,6 +81,7 @@ WHY: Once SKILL.md loads, every token competes with conversation history and oth
 PERIODIC AUDIT: Run a length check on `mk:*` SKILL.md files quarterly OR on every model-tier upgrade (per `harness-rules.md` Rule 7 dead-weight audit cadence). Flag oversized monoliths for decomposition. Step-filed skills auto-pass — only the SKILL.md entrypoint counts.
 
 MEASURABLE CHECK:
+
 ```bash
 find .claude/skills -name SKILL.md -exec sh -c 'wc -l "$1" | awk "{if (\$1 > 500) print}"' _ {} \;
 ```

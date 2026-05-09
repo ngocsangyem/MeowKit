@@ -1,3 +1,5 @@
+<!-- HUMAN-ONLY: navigation aid for the rules directory. Not auto-loaded by Claude Code. Edit alongside .claude/rules/ changes. -->
+
 # MeowKit Rules Index
 
 Rules are loaded by the agent at session start.
@@ -7,26 +9,30 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | --------------------------------------------------- |
 | `security-rules.md`               | Block hardcoded secrets, any types, SQL injection, XSS patterns                                                                                    | MeowKit original                             | All modes, all phases                               |
 | `injection-rules.md`              | Prompt injection defense: DATA vs INSTRUCTIONS boundary; Rule 11 = Skill Rule of Two                                                               | MeowKit original                             | All modes, all phases                               |
-| `phase-contracts.md`              | Phase I/O contracts table — what each phase expects/produces                                                                                       | MeowKit original                             | All phases                                          |
-| `agent-routing.md`                | Agent → role → phase routing table; PM opt-out env var                                                                                             | MeowKit original                             | Phase 0, all                                        |
 | `gate-rules.md`                   | Gate 1 (plan approval) and Gate 2 (review approval) hard stops                                                                                     | MeowKit original                             | Phases 1, 4                                         |
 | `core-behaviors.md`               | 6 mandatory operating behaviors: Surface Assumptions, Manage Confusion, Push Back, Enforce Simplicity, Scope Discipline, Verify Don't Assume       | Adapted from agent-skills                    | All modes, all phases                               |
 | `tdd-rules.md`                    | TDD enforcement (opt-in via MEOWKIT_TDD=1 / --tdd). Includes MICRO-TASK exemption.                                                                 | MeowKit original                             | Phases 2, 3 **when TDD enabled** [CONTEXTUAL]       |
-| `naming-rules.md`                 | Naming conventions per platform (TS, Vue, Swift, DB)                                                                                               | MeowKit original                             | Implementation, review                              |
+| `agent-conduct.md`                | Two-tier merge: file naming (B1), response structure (B2), context ordering (B3), search-before-building (B4), plan-resumption (B5); subagent status protocol (A1), project-context-first (A2), eureka documentation (A3) | MeowKit original (merged from 4 sources) | Implementation, review, all agent responses |
 | `development-rules.md`            | File management, code quality, pre-commit, git safety, docs impact                                                                                 | Adapted from claudekit-engineer              | Implementation, commit                              |
 | `orchestration-rules.md`          | Subagent delegation, file ownership, parallel vs sequential                                                                                        | Adapted from claudekit-engineer              | Multi-agent workflows [CONTEXTUAL]                  |
-| `context-ordering-rules.md`       | Long content first, context before constraint, self-contained docs                                                                                 | New (prompting best practices)               | Plans, prompts, handoffs                            |
-| `model-selection-rules.md`        | Task type → model tier routing, security escalation                                                                                                | New (prompting best practices)               | Phase 0 (Orient)                                    |
-| `output-format-rules.md`          | Response structure: what/why/files/open-qs + subagent status protocol                                                                              | New + CKE-inspired (v1.1.0)                  | All agent responses                                 |
-| `search-before-building-rules.md` | 3-layer knowledge framework: search before implementing unfamiliar patterns                                                                        | Adapted from gstack ETHOS.md                 | Implementation, planning                            |
-| `scale-adaptive-rules.md`         | Domain-based complexity routing, CSV match override, Gate 1 one-shot bypass                                                                        | New (BMAD-inspired)                          | Phase 0 (Orient)                                    |
-| `risk-checklist.md`               | Phase 0 risk-flag evaluation (9 horizontal-risk flags); auto-escalation feeds `model-selection-rules.md` Rule 2                                    | New (FEATURE_INTAKE adaptation)              | Phase 0 (Orient)                                    |
 | `harness-rules.md`                | Generator/evaluator architecture: planner stance, contract discipline, evaluator skepticism, iteration limits, adaptive density, dead-weight audit | New (Anthropic + LangChain harness research) | Phase 3 (Build, harness pipeline), Phase 4 (Review) |
 | `rubric-rules.md`                 | Evaluator calibration discipline, rubric library governance, anchor balance enforcement, drift detection cadence, anti-slop anti-patterns          | New (Anthropic harness research)             | Phase 4 (Review, evaluator agent)                   |
 | `step-file-rules.md`              | JIT step loading, no skipping, state persistence for multi-step workflows                                                                          | New (BMAD-inspired)                          | Step-file skills                                    |
 | `parallel-execution-rules.md`     | Worktree isolation, file ownership, max 3 agents, integration test. Added staged parallel mode (v2.0)                                              | New (CKE-inspired)                           | Parallel execution [CONTEXTUAL]                     |
 | `skill-authoring-rules.md`        | Mandatory Gotchas section, persistent state in `${CLAUDE_PLUGIN_DATA}`, 500-line SKILL.md cap with decomposition + audit cadence, required `keywords`/`when_to_use`/`user-invocable` frontmatter (Rule 4) | New (Anthropic skill-authoring docs)         | Skill authoring, audits                             |
 | `post-phase-delegation.md`        | Fire points, skip conditions, and invocation form for delegating to project-manager after each phase transition                                    | MeowKit original                             | Orchestration skills [CONTEXTUAL]                   |
+
+### Phase-Zero Conditional Rules (`.claude/rules-conditional/`)
+
+Loaded explicitly by `mk:agent-detector` Step 0b — NOT auto-loaded by Claude Code's directory mechanism. Out of always-on tier; only reaches context when agent-detector runs (every user message).
+
+| Rule | Purpose | Loaded by |
+| ---- | ------- | --------- |
+| `phase-contracts.md` | Phase I/O contracts table — what each phase expects/produces | `mk:agent-detector` Step 0b |
+| `agent-routing.md` | Agent → role → phase routing table; PM opt-out env var | `mk:agent-detector` Step 0b |
+| `model-selection-rules.md` | Task type → model tier routing, security escalation | `mk:agent-detector` Step 0b |
+| `scale-adaptive-rules.md` | Domain-based complexity routing, CSV match override, Gate 1 one-shot bypass | `mk:agent-detector` Step 0b |
+| `risk-checklist.md` | Phase 0 horizontal-risk flag eval (9 flags); auto-escalation feeds `model-selection-rules.md` Rule 2 | `mk:agent-detector` Step 0b |
 
 ## Loading Priority
 
@@ -39,20 +45,20 @@ Rules are applied in this priority (higher = stronger override):
 5. `rubric-rules.md` — NEVER override hard-fail propagation
 6. `core-behaviors.md` — always apply (6 behaviors + 10 failure modes)
 7. `tdd-rules.md` — applies only when `MEOWKIT_TDD=1` / `--tdd`; default OFF. Legacy `[fast]` profile bypass retained with deprecation warning.
-8. `naming-rules.md` — always apply
+8. `agent-conduct.md` — always apply (file naming, response structure, context ordering, search-before-building, plan-resumption, subagent status protocol)
 9. `development-rules.md` — always apply
-10. `context-ordering-rules.md` — always apply
-11. `model-selection-rules.md` — always apply
-12. `output-format-rules.md` — always apply
-13. `scale-adaptive-rules.md` — always apply at Phase 0
-13b. `risk-checklist.md` — always apply at Phase 0 (alongside scale-adaptive-rules; horizontal-risk flag signal complementing CSV match)
-14. `step-file-rules.md` — apply when executing step-file workflows
-15. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
-16. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
-17. `skill-authoring-rules.md` — apply during skill authoring, scaffolding, and quarterly/model-upgrade audits
-18. `post-phase-delegation.md` — apply during orchestration-skill execution only [CONTEXTUAL]
-19. `phase-contracts.md` — always apply (orchestrator reads at session start)
-20. `agent-routing.md` — always apply at Phase 0
+10. `step-file-rules.md` — apply when executing step-file workflows
+11. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
+12. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
+13. `skill-authoring-rules.md` — apply during skill authoring, scaffolding, and quarterly/model-upgrade audits
+14. `post-phase-delegation.md` — apply during orchestration-skill execution only [CONTEXTUAL]
+
+**Phase-zero conditional** (loaded by `mk:agent-detector` Step 0b only — NOT auto-loaded):
+- `rules-conditional/phase-contracts.md`
+- `rules-conditional/agent-routing.md`
+- `rules-conditional/model-selection-rules.md`
+- `rules-conditional/scale-adaptive-rules.md`
+- `rules-conditional/risk-checklist.md`
 
 ## Hook Enforcement
 
@@ -76,13 +82,10 @@ Hooks supplement rules — they do not replace them. Rules define the WHY; hooks
 | `harness-rules.md`                | Behavioral + Hook (gate-enforcement.sh contract gate, validate-verdict.sh active-verification HARD GATE) | NEVER override gates                 | Density modes adjust scaffolding, not gate semantics                                                                                    |
 | `rubric-rules.md`                 | Behavioral + Script (validate-rubric.sh, check-product-spec.sh)                                          | NEVER override hard-fail propagation | Custom rubrics can be added; existing rubric semantics are fixed                                                                        |
 | `tdd-rules.md`                    | Behavioral + Manual Script (`pre-implement.sh` — invoked by developer agent, not wired to system events)  | Yes                                  | Default OFF. Opt in via `--tdd` / `MEOWKIT_TDD=1`. Legacy `MEOW_PROFILE=fast` retained with deprecation warn. [CONTEXTUAL]              |
-| `naming-rules.md`                 | Behavioral                                                                                               | No                                   | —                                                                                                                                       |
+| `agent-conduct.md`                | Behavioral                                                                                               | No                                   | Tier A (A1/A2/A3) preserves rationale verbatim; Tier B (B1–B5) compressed                                                              |
 | `development-rules.md`            | Behavioral                                                                                               | No                                   | —                                                                                                                                       |
 | `orchestration-rules.md`          | Behavioral                                                                                               | N/A                                  | [CONTEXTUAL] — only in multi-agent workflows                                                                                            |
-| `context-ordering-rules.md`       | Behavioral                                                                                               | No                                   | —                                                                                                                                       |
 | `model-selection-rules.md`        | Behavioral                                                                                               | No                                   | Domain override via scale-routing CSV                                                                                                   |
-| `output-format-rules.md`          | Behavioral                                                                                               | No                                   | —                                                                                                                                       |
-| `search-before-building-rules.md` | Behavioral                                                                                               | No                                   | —                                                                                                                                       |
 | `scale-adaptive-rules.md`         | Behavioral + CSV data                                                                                    | No                                   | CSV extensible by users                                                                                                                 |
 | `risk-checklist.md`               | Behavioral + DATA                                                                                        | No                                   | Flags advisory; escalation routed through `model-selection-rules.md` Rule 2                                                             |
 | `step-file-rules.md`              | Behavioral                                                                                               | N/A                                  | Only applies to step-file skills                                                                                                        |

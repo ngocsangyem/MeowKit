@@ -16,6 +16,36 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## Unreleased — orphan cleanup + rule-availability validator
+
+### Highlights
+
+`mewkit update` now removes user-disk files that the new release no longer ships. Without this, file additions accumulated on user installs and any future rule-pruning release would leave dead weight in agent context. New `validate-rule-availability.sh` script checks that every `.claude/rules/<name>.md` reference in the repo resolves to a real file — wired into CI as a regression guard.
+
+### CLI
+
+- `mewkit upgrade` gains `--no-cleanup` (skip orphan deletion) and `--yes` (auto-confirm). Default behavior is **on**: orphans are listed and a confirmation prompt is shown before deletion. Non-TTY environments skip deletion automatically (cron-safe).
+
+### Features
+
+- Manifest-driven orphan detection. Compares files on disk under `.claude/{rules,skills,agents,hooks}/` against the release `release-manifest.json`. Anything on disk + not in the manifest + not allowlisted is treated as an orphan.
+- Conservative default allowlist exempts user customizations: `custom-*`, `user-*`, `*.local.md`, scope-internal `README.md`.
+- Scope is intentionally limited to kit-owned dirs. User-private state — `.claude/memory/`, `.claude/logs/`, `.claude/.env`, `.claude/secrets/` — is never inspected.
+- New CI step `Validate rule availability` fails the build if any rule path referenced in `.md`/`.sh`/`.cjs`/`.js`/`.ts`/`.json`/`.py`/`.yaml`/`.yml`/`.toml` files does not resolve on disk. Catches dead references before they ship.
+- New skill-body precheck in `mk:agent-detector` HARD-GATEs Phase 0 routing on the existence of all 5 always-on safety rules (`security-rules.md`, `injection-rules.md`, `gate-rules.md`, `core-behaviors.md`, `development-rules.md`). Aborts with `SAFETY BASELINE INCOMPLETE` if any are missing.
+- New `## Compaction Policy` section in `CLAUDE.md` instructs Claude Code to preserve numbered `injection-rules.md` rules, the Subagent Status Protocol, and the safety-rule names verbatim across auto-compaction.
+
+### Improvements
+
+- `smartUpdate` now returns `orphansDeleted` and `orphansSkipped` arrays in `UpdateStats`; surfaced in `mewkit upgrade` summary output.
+- New `find-orphans.ts` module exported from `core/index.ts` — reusable for downstream tooling that needs orphan detection independent of the update pipeline.
+
+### Bug Fixes
+
+- `docs/research/claude-memory.md` fixed an illustrative `ln -s` example that referenced a non-existent `.claude/rules/security.md` path. Replaced with a placeholder name (`your-org-security.example.md`) that does not collide with the rule-availability validator's regex.
+
+---
+
 ## 2.7.5 (2026-05-09) — CLAUDE.md trim + reference cleanup
 
 ### Highlights

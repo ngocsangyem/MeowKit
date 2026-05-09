@@ -52,7 +52,7 @@ Skip: Fasttrack mode with pre-approved spec.
 
 ## Process
 
-See `.claude/rules/phase-contracts.md` for input/output expectations per phase.
+See `.claude/rules-conditional/phase-contracts.md` for input/output expectations per phase. (Loaded by `mk:agent-detector` Step 0b at session start.)
 
 1. **Run pre-execution checklist** — select lead agent, load memory, show agent banner, verify complexity, challenge requirements.
 

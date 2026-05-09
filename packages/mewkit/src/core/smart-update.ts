@@ -1,17 +1,28 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import * as log from "./core-logger.js";
 import { processTemplate } from "./substitute-placeholders.js";
 import type { UserConfig } from "./substitute-placeholders.js";
 import { mergeSettingsFile } from "./merge-settings.js";
 import { readManifest, buildManifest, writeManifest, hashFile, classifyLayer } from "./compute-checksums.js";
+import type { Manifest } from "./compute-checksums.js";
 import { loadIgnorePatterns, walkDir, copyFile } from "./smart-update-utils.js";
+import { findOrphans } from "./find-orphans.js";
 
 export interface UpdateStats {
 	updated: number;
 	skipped: number;
 	added: number;
 	userModified: string[];
+	orphansDeleted: string[];
+	orphansSkipped: string[];
+}
+
+export interface SmartUpdateOptions {
+	/** Default true. Set false to disable orphan deletion (CLI: `--no-cleanup`). */
+	cleanup?: boolean;
+	/** Default false. Skip confirmation prompt (CLI: `--yes` / `-y`). */
+	assumeYes?: boolean;
 }
 
 /**
@@ -29,9 +40,19 @@ export async function smartUpdate(
 	targetDir: string,
 	dryRun: boolean,
 	force = false,
+	options: SmartUpdateOptions = {},
 ): Promise<UpdateStats> {
+	const cleanup = options.cleanup !== false; // default-on
+	const assumeYes = options.assumeYes === true;
 	const oldManifest = force ? null : readManifest(join(targetDir, ".claude"));
-	const stats: UpdateStats = { updated: 0, skipped: 0, added: 0, userModified: [] };
+	const stats: UpdateStats = {
+		updated: 0,
+		skipped: 0,
+		added: 0,
+		userModified: [],
+		orphansDeleted: [],
+		orphansSkipped: [],
+	};
 
 	if (!oldManifest && existsSync(join(targetDir, ".claude"))) {
 		log.warn("No manifest found — will treat all existing files as unmodified.");
@@ -204,6 +225,45 @@ export async function smartUpdate(
 		mkdirSync(join(targetDir, ".claude", "logs"), { recursive: true });
 	}
 
+	// Orphan cleanup pass — removes user-disk files no longer in the release
+	// manifest. Scoped to kit-owned dirs (rules/, skills/, agents/, hooks/);
+	// user-private state (memory/, logs/, .env, secrets/) is never inspected.
+	// Default-on; opt out via `--no-cleanup`. Confirmation required unless
+	// `--yes` / `--force`.
+	if (cleanup) {
+		const releaseManifest = buildReleaseManifest(sourceDir);
+		if (!releaseManifest) {
+			log.warn(
+				"release-manifest.json not found in source release — orphan cleanup skipped. " +
+					"Pass --no-cleanup to silence this warning, or report the missing manifest as a release-pipeline bug.",
+			);
+		} else {
+			const orphans = findOrphans({ claudeDir, manifest: releaseManifest });
+			if (orphans.length > 0) {
+				log.info(`Found ${orphans.length} orphan file(s) — files on disk no longer in release:`);
+				for (const o of orphans) log.info(`  - ${o}`);
+
+				const proceed = dryRun ? false : assumeYes || force || (await confirmDelete(orphans.length));
+				if (!proceed) {
+					stats.orphansSkipped.push(...orphans);
+					if (dryRun) log.info("Dry-run: orphans listed but not deleted.");
+					else log.info("Cleanup skipped by user. Pass `--yes` to auto-confirm.");
+				} else {
+					for (const orphan of orphans) {
+						try {
+							unlinkSync(join(claudeDir, orphan));
+							stats.orphansDeleted.push(orphan);
+						} catch (err) {
+							log.warn(`Failed to delete orphan ${orphan}: ${(err as Error).message}`);
+							stats.orphansSkipped.push(orphan);
+						}
+					}
+					log.info(`Deleted ${stats.orphansDeleted.length} orphan file(s).`);
+				}
+			}
+		}
+	}
+
 	// Write manifest
 	if (!dryRun) {
 		const newManifest = buildManifest(claudeDir);
@@ -215,7 +275,61 @@ export async function smartUpdate(
 		skipped: stats.skipped,
 		added: stats.added,
 		userModified: stats.userModified,
+		orphansDeleted: stats.orphansDeleted,
+		orphansSkipped: stats.orphansSkipped,
 	});
 
 	return stats;
+}
+
+/**
+ * Build a manifest-shaped object from the release source `.claude/` so we can
+ * compare against the user-installed dir without writing anything to disk.
+ * The release ships `release-manifest.json` at sourceDir root with `files[]`;
+ * we project that onto the same `checksums` shape `findOrphans` expects.
+ */
+function buildReleaseManifest(sourceDir: string): Manifest | null {
+	const manifestPath = join(sourceDir, "release-manifest.json");
+	if (!existsSync(manifestPath)) return null;
+	try {
+		const raw = JSON.parse(readFileSync(manifestPath, "utf-8")) as {
+			version?: string;
+			generatedAt?: string;
+			files?: Array<{ path: string; checksum: string }>;
+		};
+		const checksums: Manifest["checksums"] = {};
+		for (const f of raw.files ?? []) {
+			checksums[f.path] = { sha256: f.checksum, layer: "core" };
+		}
+		return {
+			version: raw.version ?? "unknown",
+			generatedAt: raw.generatedAt ?? new Date().toISOString(),
+			checksums,
+		};
+	} catch (err) {
+		log.warn(`Failed to parse release-manifest.json: ${(err as Error).message}`);
+		return null;
+	}
+}
+
+async function confirmDelete(count: number): Promise<boolean> {
+	if (!process.stdin.isTTY) {
+		log.info(`Non-TTY environment: skipping cleanup of ${count} orphan(s). Re-run with --yes to confirm.`);
+		return false;
+	}
+	process.stdout.write(`\nDelete ${count} orphan file(s)? [y/N] `);
+	const answer = await readLine();
+	return /^y(es)?$/i.test(answer.trim());
+}
+
+function readLine(): Promise<string> {
+	return new Promise((resolve) => {
+		const onData = (chunk: Buffer) => {
+			process.stdin.removeListener("data", onData);
+			process.stdin.pause();
+			resolve(chunk.toString());
+		};
+		process.stdin.resume();
+		process.stdin.once("data", onData);
+	});
 }

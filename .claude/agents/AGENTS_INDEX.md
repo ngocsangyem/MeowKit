@@ -47,4 +47,4 @@ All phases (0-6) have agent coverage.
 
 ## Subagent Status Protocol (v1.1.0)
 
-All subagents MUST end responses with structured status. See `output-format-rules.md` Rule 5.
+All subagents MUST end responses with structured status. See `agent-conduct.md` (A1).

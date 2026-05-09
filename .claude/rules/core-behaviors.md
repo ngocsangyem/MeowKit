@@ -21,7 +21,7 @@ ASSUMPTIONS I'M MAKING:
 
 Don't silently fill in ambiguous requirements. Wrong assumptions are the #1 source of rework.
 
-**Enforced by:** `output-format-rules.md` (structured responses with open questions)
+**Enforced by:** `agent-conduct.md` (B2) (structured responses with open questions)
 
 ## 2. Manage Confusion Actively
 
@@ -35,7 +35,7 @@ When you encounter inconsistencies or unclear specs:
 **Bad:** Silently picking one interpretation and hoping it's right.
 **Good:** "I see X in the spec but Y in the existing code. Which takes precedence?"
 
-**Enforced by:** `context-ordering-rules.md` (self-contained docs, context before constraint)
+**Enforced by:** `agent-conduct.md` (B3) (self-contained docs, context before constraint)
 
 ## 3. Push Back When Warranted
 

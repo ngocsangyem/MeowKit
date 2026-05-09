@@ -104,6 +104,7 @@ async function main(): Promise<void> {
 			"reinstall-empty-dirs",
 			"respect-deletions",
 			"prefer-agents-md",
+			"no-cleanup",
 			"migrate",
 			"migrate-global",
 			"open",
@@ -155,6 +156,8 @@ async function main(): Promise<void> {
 				check: args.check as boolean | undefined,
 				beta: args.beta as boolean | undefined,
 				list: args.list as boolean | undefined,
+				noCleanup: args["no-cleanup"] as boolean | undefined,
+				yes: args.yes as boolean | undefined,
 			});
 			break;
 		case "validate":

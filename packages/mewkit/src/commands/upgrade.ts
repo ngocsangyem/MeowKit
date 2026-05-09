@@ -8,6 +8,8 @@ export interface UpgradeArgs {
 	check?: boolean;
 	beta?: boolean;
 	list?: boolean;
+	noCleanup?: boolean;
+	yes?: boolean;
 }
 
 /** Read installed version from .claude/metadata.json (instant, no npx) */
@@ -86,7 +88,12 @@ async function checkVersion(localVersion: string | null, useBeta: boolean): Prom
 }
 
 /** Perform the upgrade: download latest release and apply via smart update */
-async function performUpgrade(localVersion: string | null, useBeta: boolean): Promise<void> {
+async function performUpgrade(
+	localVersion: string | null,
+	useBeta: boolean,
+	cleanup: boolean,
+	assumeYes: boolean,
+): Promise<void> {
 	console.log(pc.dim("Fetching latest release from GitHub..."));
 
 	const releases = await fetchReleases();
@@ -124,7 +131,14 @@ async function performUpgrade(localVersion: string | null, useBeta: boolean): Pr
 			geminiApiKey: null,
 		};
 
-		const stats = await smartUpdate(config, sourceDir, process.cwd(), /* dryRun */ false, /* force */ false);
+		const stats = await smartUpdate(
+			config,
+			sourceDir,
+			process.cwd(),
+			/* dryRun */ false,
+			/* force */ false,
+			{ cleanup, assumeYes },
+		);
 
 		console.log();
 		console.log(pc.green(pc.bold("Upgrade complete!")));
@@ -134,6 +148,14 @@ async function performUpgrade(localVersion: string | null, useBeta: boolean): Pr
 		console.log(`  ${pc.green("added")}   ${stats.added}`);
 		console.log(`  ${pc.cyan("updated")} ${stats.updated}`);
 		console.log(`  ${pc.dim("skipped")} ${stats.skipped}`);
+		if (stats.orphansDeleted.length > 0) {
+			console.log(`  ${pc.red("removed")} ${stats.orphansDeleted.length}  ${pc.dim("(release no longer ships)")}`);
+		}
+		if (stats.orphansSkipped.length > 0) {
+			console.log(
+				pc.yellow(`\n  ${stats.orphansSkipped.length} orphan file(s) detected but not deleted (use --yes to confirm).`),
+			);
+		}
 
 		if (stats.userModified.length > 0) {
 			console.log(
@@ -167,7 +189,7 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 			return;
 		}
 
-		await performUpgrade(localVersion, useBeta);
+		await performUpgrade(localVersion, useBeta, /* cleanup */ args.noCleanup !== true, /* assumeYes */ args.yes === true);
 	} catch (err: unknown) {
 		const msg = err instanceof Error ? err.message : String(err);
 		console.error(pc.red(`upgrade failed: ${msg}`));

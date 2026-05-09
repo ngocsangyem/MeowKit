@@ -210,7 +210,7 @@ This example links both a shared directory and an individual file:
 
 ```bash theme={null}
 ln -s ~/shared-claude-rules .claude/rules/shared
-ln -s ~/company-standards/security.md .claude/rules/security.md
+ln -s ~/company-standards/security-policy.md .claude/rules/your-org-security.example.md
 ```
 
 #### User-level rules

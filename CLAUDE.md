@@ -38,7 +38,7 @@ Two hard stops. No bypass. No exceptions. See `.claude/rules/gate-rules.md`.
 | STANDARD | Feature <5 files, bug fix, tests      | Default  |
 | COMPLEX  | Architecture, security, auth/payments | Best     |
 
-Full policy (4-col task-type table, security escalation, domain override): `.claude/rules/model-selection-rules.md`.
+Full policy (4-col task-type table, security escalation, domain override): `.claude/rules-conditional/model-selection-rules.md` (loaded by `mk:agent-detector`).
 
 ## Security
 
@@ -97,11 +97,21 @@ If `.venv` is absent, run `npx mewkit setup` to create it and install dependenci
 
 If a script fails — fix it, don't stop.
 
+## Compaction Policy
+
+When Claude Code auto-compacts this session, ALWAYS preserve verbatim:
+
+- The full text of every numbered Rule in `.claude/rules/injection-rules.md` (especially Rule 11 — Skill Rule of Two — which is itself a rescue rule from a prior compaction regression)
+- The Subagent Status Protocol from `.claude/rules/agent-conduct.md` (A1)
+- The names of the 5 always-on safety/baseline rules: `security-rules.md`, `injection-rules.md`, `gate-rules.md`, `core-behaviors.md`, `development-rules.md`
+
+WHY: Compaction summarizes; safety rules cannot be summarized without losing enforcement specifics. Always preserve verbatim` block.
+
 ## Pointers (relocated content)
 
-- **Phase contracts:** `.claude/rules/phase-contracts.md` (what each phase expects/produces)
-- **Agent routing:** `.claude/rules/agent-routing.md` (17-row agent table + PM opt-out)
-- **Risk checklist:** `.claude/rules/risk-checklist.md` (Phase 0 horizontal-risk flag evaluation; complements `mk:scale-routing` CSV)
+- **Phase contracts:** `.claude/rules-conditional/phase-contracts.md` (loaded by `mk:agent-detector` Step 0b)
+- **Agent routing:** `.claude/rules-conditional/agent-routing.md` (17-row agent table; loaded by `mk:agent-detector` Step 0b)
+- **Risk checklist:** `.claude/rules-conditional/risk-checklist.md` (Phase 0 horizontal-risk flags; loaded by `mk:agent-detector` Step 0b)
 - **Adaptive density:** `.claude/skills/harness/references/adaptive-density-matrix.md` (canonical) — governing rule: `.claude/rules/harness-rules.md` Rule 5
 - **Orchestrator entry rule:** `.claude/rules/orchestration-rules.md`
 - **Commands vs Skills:** `.claude/rules/skill-authoring-rules.md`

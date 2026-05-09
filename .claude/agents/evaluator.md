@@ -78,7 +78,7 @@ After producing the verdict file:
 - **WARN** → recommend routing to **generator** for one more iteration; pass the WARN list as feedback. Hard cap on iteration count enforced by harness (Phase 5).
 - **FAIL** → recommend routing to **generator** with the specific fix-guidance feedback; do NOT route to shipper. If FAIL persists across 3 iterations, escalate to user.
 
-Status protocol per `output-format-rules.md`:
+Status protocol per `agent-conduct.md` (A1):
 
 - **DONE** — verdict written, evidence captured, all criteria probed
 - **DONE_WITH_CONCERNS** — verdict written but some criteria could not be probed (target unreachable, tool failure); document gaps in verdict

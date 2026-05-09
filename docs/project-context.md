@@ -66,7 +66,7 @@ All counts from `meowkit-architecture.md` Component Inventory (verified 2026-04-
 
 ## 4. Conventions
 
-### Naming (source: `naming-rules.md`)
+### Naming (source: `agent-conduct.md` (B1))
 
 | Element | Convention | Example |
 |---------|-----------|---------|
@@ -164,7 +164,7 @@ All counts from `meowkit-architecture.md` Component Inventory (verified 2026-04-
 - No auto-approve in any mode; human must explicitly type approval
 - Conventional commits are required because semantic-release parses them for version bumps
 
-(source: `gate-rules.md` Gate 2; `.claude/rules/phase-contracts.md` Phase 5 row)
+(source: `gate-rules.md` Gate 2; `.claude/rules-conditional/phase-contracts.md` Phase 5 row)
 
 ---
 
@@ -235,18 +235,15 @@ Priority order (1 = highest override):
 5. `rubric-rules.md` — hard-fail propagation NEVER overrideable
 6. `core-behaviors.md` — 6 mandatory behaviors, all modes
 7. `tdd-rules.md` — applies only when `MEOWKIT_TDD=1` / `--tdd`; default OFF
-8. `naming-rules.md` — always apply
+8. `agent-conduct.md` — always apply (merged: file naming, output format, context ordering, search-before-building)
 9. `development-rules.md` — always apply
-10. `context-ordering-rules.md` — always apply
-11. `model-selection-rules.md` — always apply
-12. `output-format-rules.md` — always apply
-13. `scale-adaptive-rules.md` — always apply at Phase 0
-14. `step-file-rules.md` — apply when executing step-file workflows
-15. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
-16. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
-17. `search-before-building-rules.md` — always apply
+10. `model-selection-rules.md` — always apply
+11. `scale-adaptive-rules.md` — always apply at Phase 0
+12. `step-file-rules.md` — apply when executing step-file workflows
+13. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
+14. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
 
-Full index: `.claude/rules/RULES_INDEX.md`
+Full index: `docs/rules-index.md`
 
 ---
 

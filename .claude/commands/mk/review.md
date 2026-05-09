@@ -21,7 +21,7 @@ Triggers Phase 4 structural audit. Runs the 5-dimension review using the `struct
    | **Correctness** | Does the code do what the plan says? Logic errors, edge cases, off-by-ones. |
    | **Security** | Apply `rules/security-rules.md`. Check for blocked patterns. BLOCK-level findings fail this dimension. |
    | **Performance** | N+1 queries, unnecessary re-renders, missing indexes, unbounded loops, memory leaks. |
-   | **Maintainability** | Naming conventions (per `rules/naming-rules.md`), code duplication, separation of concerns, readability. |
+   | **Maintainability** | Naming conventions (per `rules/agent-conduct.md` (B1)), code duplication, separation of concerns, readability. |
    | **Test Coverage** | Are new behaviors covered by tests? Do tests test the right things (behavior, not implementation)? |
 
 3. **Generate verdict file.** Write to:
