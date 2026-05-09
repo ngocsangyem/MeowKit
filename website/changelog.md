@@ -16,6 +16,36 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.8.1 (2026-05-09) — The Prompt Enhancer Release
+
+### Highlights
+
+`mk:prompt-enhancer` ships as a model-agnostic prompting framework synthesized from seven prompting and context-engineering source documents. It decomposes a draft user prompt into goal / context / constraints / acceptance / output-format, detects ten weakness patterns, and emits a rewritten prompt using a universal markdown kernel that works across coding agents without model dispatch. An opt-in `--deep` mode surfaces codebase suggestions from allow-listed sources only.
+
+### New Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `mk:prompt-enhancer` | Refine a draft user prompt — decompose, detect weaknesses against a 10-item checklist, emit a model-agnostic rewrite using the universal kernel (plain markdown, no XML, no vendor tokens). Auto-suggests freedom level and verbosity. Optional `--deep` flag scouts allow-listed sources for `[FILL-IN]` placeholder candidates. |
+
+### New Commands
+
+- `/mk:prompt-enhancer` — runs the 5-step framework on a draft prompt and writes the analysis + rewrite to the active plan dir or `${CLAUDE_PLUGIN_DATA}`.
+
+### Features
+
+- Auto-suggested **freedom level** (`LOW` / `MEDIUM` / `HIGH`) based on task shape — destructive ops route to `LOW`, standard feature work to `MEDIUM`, open-ended exploration to `HIGH`. Surfaced in the `OUTPUT FORMAT` section so the user can flip without re-running.
+- Auto-suggested **verbosity** (`terse` / `structured` / `confirmation`) by task type — terse for implementation, structured for review/analysis, confirmation for Q&A.
+- Bounded `--deep` scout — ≤8 files, ≤100 lines/file, ≤30s wall clock, default-deny against `.claude/memory/*`, `.env*`, `tasks/`, secrets. Aborts gracefully with `SCOUT_BUDGET_EXCEEDED`, `NO_GIT_REPO`, `MINIMAL_DENSITY`, or `NO_MATCHES`. Suggestions live in `[FILL-IN: <desc> (suggested: <path>)]` brackets — never auto-substituted.
+- 10-canary eval suite (six default-mode + four deep-mode) with hard-fail boundary canary that grep-audits saved output and transcript for forbid-list paths.
+
+### Improvements
+
+- `mk:prompt-enhancer` rewrites strip model-coupled framing — XML tags (`<context>`, `<task>`), vendor tokens ("think step by step", `apply_patch`, "Reasoning: high"), and role-as-XML wrapping. Detection item `#10` flags the input; the rewrite emits plain markdown headings.
+- Added `references/context-safeguards.md` — six model-agnostic safeguards (right-altitude tone, identifier-based context, long-horizon defenses, tool-result clearing, bloat avoidance, eval discipline) loaded just-in-time on long-horizon signals.
+
+---
+
 ## 2.8.0 (2026-05-09) — The Cleanup & Audit Release
 
 ### Highlights

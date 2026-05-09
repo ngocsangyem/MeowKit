@@ -340,6 +340,7 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v2.8.1  | 2026-05-09 | The Prompt Enhancer Release          |
 | v2.8.0  | 2026-05-09 | The Cleanup & Audit Release          |
 | v2.7.6  | 2026-05-09 | Phase 0 risk checklist               |
 | v2.7.5  | 2026-05-09 | CLAUDE.md trim + reference cleanup   |

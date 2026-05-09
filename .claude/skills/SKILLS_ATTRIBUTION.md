@@ -38,6 +38,7 @@ Each skill retains its original author credit in its frontmatter.
 | 31  | frontend-design       | MeowKit (adapted)            | Adapted from claudekit/ui-ux-pro-max + claudekit/frontend-design (merged) | MIT | .claude/skills/frontend-design/ | 2 |
 | 32  | qa-manual             | MeowKit (original)           | Orchestrates: agent-browser + playwright-cli for QA + E2E gen | MIT | .claude/skills/qa-manual/ | 1 |
 | 33  | henshin               | MeowKit (adapted)            | Adapted from claudekit-engineer/agentize — planning front door only; downstream execution owned by plan-creator + cook | MIT | .claude/skills/henshin/ | 2 |
+| 34  | prompt-enhancer       | MeowKit (original)           | Synthesized from 7 source docs: claude-prompting-best-practices, codex-prompt-guide, factoryai/prompt-crafting-for-different-models, context-engineering-guide, effective-context-engineering-for-ai-agents (Anthropic), lessons-build-skill, skill-authoring-guidelines | MIT | .claude/skills/prompt-enhancer/ | 2 |
 
 ## Removed
 
