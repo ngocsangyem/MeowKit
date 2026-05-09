@@ -8,7 +8,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { execSync } = require("child_process");
+const { execSync, spawnSync } = require("child_process");
 
 const version = process.argv[2];
 if (!version) {
@@ -91,7 +91,9 @@ try {
     }
   }
 
-  // Exclude runtime dirs that shouldn't be in release
+  // Exclude runtime dirs that shouldn't be in release.
+  // Patterns are passed as separate args (no shell) so glob expansion is done
+  // by zip's matcher, not by the shell — `*` then correctly crosses `/`.
   const excludes = [
     "-x", ".claude/session-state/*",
     "-x", ".claude/memory/*",
@@ -102,7 +104,14 @@ try {
     "-x", "*.pyc",
     "-x", "__pycache__/*",
   ];
-  execSync(`zip -r ${archivePath} ${archiveTargets.join(" ")} ${excludes.join(" ")}`, { stdio: "inherit" });
+  const zipResult = spawnSync(
+    "zip",
+    ["-r", archivePath, ...archiveTargets, ...excludes],
+    { stdio: "inherit" }
+  );
+  if (zipResult.status !== 0) {
+    throw new Error(`zip exited with status ${zipResult.status}`);
+  }
   console.log(`Prepared ${archivePath}`);
 } catch (error) {
   console.error(`Failed to prepare release assets: ${error.message}`);
