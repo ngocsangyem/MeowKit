@@ -340,6 +340,8 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v2.8.0  | 2026-05-09 | The Cleanup & Audit Release          |
+| v2.7.6  | 2026-05-09 | Phase 0 risk checklist               |
 | v2.7.5  | 2026-05-09 | CLAUDE.md trim + reference cleanup   |
 | v2.7.4  | 2026-05-02 | Browser skill consolidation          |
 | v2.7.3  | 2026-05-01 | `npx mewkit` resolution fix          |

@@ -16,11 +16,21 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
-## Unreleased — orphan cleanup + rule-availability validator
+## 2.8.0 (2026-05-09) — The Cleanup & Audit Release
 
 ### Highlights
 
-`mewkit update` now removes user-disk files that the new release no longer ships. Without this, file additions accumulated on user installs and any future rule-pruning release would leave dead weight in agent context. New `validate-rule-availability.sh` script checks that every `.claude/rules/<name>.md` reference in the repo resolves to a real file — wired into CI as a regression guard.
+`mewkit upgrade` now cleans up files the new release no longer ships, so old kit files do not pile up in agent context across versions. A new `mk:context-audit` skill reports how much of the model context window your `.claude/` setup is using and recommends the highest-value trims. Red-team and party deliberation gain cross-persona blind-spot detection — every reviewer is asked to name one dimension outside their specialty that the team may also miss. Four small behavioral rule files were merged into one `agent-conduct.md`, and conditional rules moved out of the always-loaded folder so the safety bundle stays lean.
+
+### New Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `mk:context-audit` | Read-only audit of `.claude/` structural overhead. Reports prioritized "remove X save Y tokens" recommendations against the model context window. |
+
+### New Commands
+
+- `/mk:context-audit` — runs the audit pipeline and prints a markdown report. Read-only; no files are modified.
 
 ### CLI
 
@@ -28,21 +38,52 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ### Features
 
-- Manifest-driven orphan detection. Compares files on disk under `.claude/{rules,skills,agents,hooks}/` against the release `release-manifest.json`. Anything on disk + not in the manifest + not allowlisted is treated as an orphan.
+- Manifest-driven orphan detection in `mewkit upgrade`. Compares files on disk under `.claude/{rules,skills,agents,hooks}/` against `release-manifest.json`. Anything on disk + not in the manifest + not allowlisted is treated as an orphan.
 - Conservative default allowlist exempts user customizations: `custom-*`, `user-*`, `*.local.md`, scope-internal `README.md`.
-- Scope is intentionally limited to kit-owned dirs. User-private state — `.claude/memory/`, `.claude/logs/`, `.claude/.env`, `.claude/secrets/` — is never inspected.
+- Scope is intentionally limited to kit-owned directories. User-private state — `.claude/memory/`, `.claude/logs/`, `.claude/.env`, `.claude/secrets/` — is never inspected.
 - New CI step `Validate rule availability` fails the build if any rule path referenced in `.md`/`.sh`/`.cjs`/`.js`/`.ts`/`.json`/`.py`/`.yaml`/`.yml`/`.toml` files does not resolve on disk. Catches dead references before they ship.
 - New skill-body precheck in `mk:agent-detector` HARD-GATEs Phase 0 routing on the existence of all 5 always-on safety rules (`security-rules.md`, `injection-rules.md`, `gate-rules.md`, `core-behaviors.md`, `development-rules.md`). Aborts with `SAFETY BASELINE INCOMPLETE` if any are missing.
 - New `## Compaction Policy` section in `CLAUDE.md` instructs Claude Code to preserve numbered `injection-rules.md` rules, the Subagent Status Protocol, and the safety-rule names verbatim across auto-compaction.
+- Cross-persona blind-spot detection in `mk:plan-creator` adversarial review. Each persona names ONE dimension outside their specialty that the team may also miss; aggregated as a separate "Cross-Persona Blind Spots" section in the red-team report.
+- `mk:party` Round 2 gains the same blind-spot probe — each agent calls out a dimension the room may have under-weighted.
+- `mk:party` decision record adds a `## Next Action` field — the single concrete next step coming out of the discussion.
+- New conditional rule file `risk-checklist.md` — Phase 0 horizontal-risk flags (auth, authorization, data-model change, audit/security event, external systems, public contracts, cross-platform, existing-behavior touch) that complement the vertical domain match in `mk:scale-routing`.
+- New helper script `.claude/scripts/rules-audit.sh` for contributors to check rule-file health locally.
 
 ### Improvements
 
-- `smartUpdate` now returns `orphansDeleted` and `orphansSkipped` arrays in `UpdateStats`; surfaced in `mewkit upgrade` summary output.
+- `smartUpdate` now returns `orphansDeleted` and `orphansSkipped` arrays in `UpdateStats`; surfaced in the `mewkit upgrade` summary output.
 - New `find-orphans.ts` module exported from `core/index.ts` — reusable for downstream tooling that needs orphan detection independent of the update pipeline.
+- Four behavioral rule files (`naming-rules.md`, `output-format-rules.md`, `context-ordering-rules.md`, `search-before-building-rules.md`) merged into a single `agent-conduct.md`. Tier A preserves orchestrator-consumed schemas (Subagent Status Protocol, Project Context First, Eureka logging) verbatim; Tier B compresses model-default rules. Net: one file instead of four with no behavior change.
+- Conditional rule files moved from `.claude/rules/` to `.claude/rules-conditional/` so the always-loaded bundle stays small. `mk:agent-detector` loads them on demand at Phase 0. Affected files: `agent-routing.md`, `model-selection-rules.md`, `phase-contracts.md`, `risk-checklist.md`, `scale-adaptive-rules.md`.
+- `RULES_INDEX.md` moved from `.claude/rules/` to `docs/rules-index.md` so it does not load into every Claude session.
+
+### Removals
+
+- `.claude/rules/naming-rules.md`, `.claude/rules/output-format-rules.md`, `.claude/rules/context-ordering-rules.md`, `.claude/rules/search-before-building-rules.md` — content lives in `agent-conduct.md`. The orphan-cleanup pass in `mewkit upgrade` removes the old files automatically on next upgrade.
 
 ### Bug Fixes
 
 - `docs/research/claude-memory.md` fixed an illustrative `ln -s` example that referenced a non-existent `.claude/rules/security.md` path. Replaced with a placeholder name (`your-org-security.example.md`) that does not collide with the rule-availability validator's regex.
+
+### Migration Notes
+
+```bash
+npx mewkit upgrade
+```
+
+The first `mewkit upgrade` after this release lists the four removed rule files as orphans and prompts before deleting them. Pass `--yes` to auto-confirm in scripted environments, `--no-cleanup` to keep the old files on disk.
+
+---
+
+## 2.7.6 (2026-05-09) — Phase 0 risk checklist
+
+### Improvements
+
+- New rule file `.claude/rules/risk-checklist.md` — 9 horizontal-risk flags (auth, authorization, data-model change, audit/security event, external systems, public contracts, cross-platform, existing-behavior touch, performance-critical path) that complement vertical domain matching in `mk:scale-routing`. Loaded by `mk:agent-detector` at Phase 0. Together they raise the floor on routing accuracy without adding new tiers or new lanes.
+- `mk:agent-detector` Step 0b now loads the risk checklist alongside `phase-contracts.md` and `agent-routing.md`.
+
+> **Note:** The risk-checklist file moved to `.claude/rules-conditional/risk-checklist.md` in v2.8.0 as part of the rules-folder split.
 
 ---
 

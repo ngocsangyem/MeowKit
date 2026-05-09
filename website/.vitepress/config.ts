@@ -307,6 +307,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:project-organization', link: '/reference/skills/project-organization' },
             { text: 'mk:bootstrap', link: '/reference/skills/bootstrap' },
             { text: 'mk:worktree', link: '/reference/skills/worktree' },
+            { text: 'mk:context-audit', link: '/reference/skills/context-audit' },
           ],
         },
         {

@@ -1,0 +1,70 @@
+---
+title: "mk:context-audit"
+description: "Read-only audit of .claude/ structural overhead — reports prioritized 'remove X save Y tokens' recommendations against the model context window."
+---
+
+# mk:context-audit
+
+## What This Skill Does
+
+Walks `.claude/` and tells you how much of the model context window your always-on setup is using. Prints a prioritized "remove X save Y tokens" report to the terminal. Read-only — no files are modified.
+
+## When to Use
+
+- **Before adding a new agent, skill, or rule** — confirm you are below the 25% structural-overhead threshold.
+- **When sessions feel slow or off-topic** — check if structural overhead has grown past 10%.
+- **Quarterly health check** — confirm the always-on bundle still pays its keep, paired with the dead-weight audit in `harness-rules.md` Rule 7.
+
+## Boundaries
+
+| Concern              | Use this instead                                         |
+|----------------------|----------------------------------------------------------|
+| USD cost tracking    | `/mk:budget`                                              |
+| Transcript caching   | `.claude/hooks/conversation-summary-cache.sh`             |
+| Runtime agent trim   | `mk:lazy-agent-loader`                                    |
+| Window utilization   | **`/mk:context-audit`** (this skill)                      |
+
+## Usage
+
+```bash
+/mk:context-audit
+/mk:context-audit <scan-root>
+```
+
+`<scan-root>` defaults to the current working directory.
+
+## Workflow
+
+1. **Inventory** — walks `.claude/` and emits byte / line counts per category (CLAUDE.md chain, agents, skills, rules, commands, MCP) as JSON.
+2. **Estimate** — enriches the inventory with token estimates (chars/4 heuristic) and computes `structural_overhead_pct` against a 200K window.
+3. **Format** — emits a 5-section markdown report: header, summary table, top consumers, recommendations, footer.
+4. **Banner** — Healthy (`< 10%`), Watch (`10–25%`), or Action (`≥ 25%`).
+
+## Output
+
+```
+# Context Audit — <scan_root>
+*Scanned at <timestamp> · model window 200K tokens · banner: <Healthy|Watch|Action>*
+
+## Summary
+| Category | Components | Bytes | Tokens | % of Window |
+
+## Top Consumers
+1. <component> ~<tokens> (<path>)
+
+## Recommendations
+1. <priority finding> — saves ~<tokens>
+
+## How to Act
+- Cost: see `/mk:budget`
+- Transcript: see `.claude/hooks/conversation-summary-cache.sh`
+- Runtime trim: see `mk:lazy-agent-loader`
+```
+
+## Pro Tips
+
+- **Pair with `/mk:budget`** — context-audit reports tokens (window utilization), `/mk:budget` reports USD (monetary cost). They answer different questions.
+- **Run after model upgrades** — components that were load-bearing on Opus 4.5 may be dead weight on Opus 4.7. The audit gives you the data; `harness-rules.md` Rule 7 is the playbook for acting on it.
+- **No env vars** — window size is hard-coded 200K. Override is deferred until a real 1M-context use case appears.
+
+> **Canonical source:** `.claude/skills/context-audit/SKILL.md`
