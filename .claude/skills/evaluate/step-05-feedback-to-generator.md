@@ -84,7 +84,7 @@ NEXT_ACTION:
 
 ### 5e. Status block
 
-End the evaluator session with the structured status block per `output-format-rules.md` §5:
+End the evaluator session with the structured status block per `output-format-rules.md`:
 
 ```
 **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED

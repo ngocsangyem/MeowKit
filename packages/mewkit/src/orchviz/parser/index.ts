@@ -91,7 +91,7 @@ export class TranscriptParser {
 		}
 		if (parsed.type !== "user" && parsed.type !== "assistant") return;
 
-		// Filter sidechain (branched) turns — research-02 §7
+		// Filter sidechain (branched) turns
 		if (parsed.isSidechain === true) return;
 
 		const msg = parsed.message as TranscriptEntry["message"] | undefined;

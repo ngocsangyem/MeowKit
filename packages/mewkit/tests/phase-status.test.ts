@@ -1,6 +1,5 @@
 /**
- * derivePhaseStatuses regression — covers the dual-pulse bug from
- * 260430-orchviz-redesign-verdict.md §Correctness.
+ * derivePhaseStatuses regression — covers the dual-pulse bug.
  *
  * Without `active.clear()` in the gate2 block, Plan + Ship both rendered
  * active when gate1 was never approved.
@@ -47,7 +46,7 @@ describe("derivePhaseStatuses", () => {
 
 	it("gate2 PASS clears earlier active markers — Ship is the ONLY active", () => {
 		// Regression: without active.clear() in gate2 block, gate1=false + gate2=PASS
-		// produced ["plan", "ship"] (dual pulse) — see verdict §Correctness.
+		// produced ["plan", "ship"] (dual pulse).
 		const states = derivePhaseStatuses(stubPlan, { gate1Approved: false, gate2Verdict: "PASS" });
 		expect(activeIds(states)).toEqual(["ship"]);
 	});

@@ -47,7 +47,7 @@ dependencies: []
 
 | Field | Type | Allowed values | Default | Notes |
 |-------|------|----------------|---------|-------|
-| phase | int | ≥1 (max enforced by `step-03-draft-plan.md` §3d, currently 7) | filename-derived | required |
+| phase | int | ≥1 (max enforced by `step-03-draft-plan.md`, currently 7) | filename-derived | required |
 | title | string | — | heading-derived | required |
 | status | enum | `pending \| active \| in_progress \| completed \| failed \| abandoned` | `pending` | NEVER `completed` at creation. `unknown` is reserved as a parser sentinel — never written from frontmatter. |
 | priority | enum | `P1 \| P2 \| P3` | `P2` | matches Overview convention |

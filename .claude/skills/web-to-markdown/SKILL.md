@@ -124,4 +124,4 @@ See `references/security.md` for the full threat model, attack surface, and defe
 .claude/skills/.venv/bin/playwright install chromium  # ~200MB one-time
 ```
 
-To enable JS rendering at runtime, set `MEOWKIT_WEB_FETCH_JS=1` before invoking the skill. All three gates must be open: Playwright installed, `MEOWKIT_WEB_FETCH_JS=1`, and `js=True` per-call argument. See `references/security.md` §10a for the three-layer JS gate spec.
+To enable JS rendering at runtime, set `MEOWKIT_WEB_FETCH_JS=1` before invoking the skill. All three gates must be open: Playwright installed, `MEOWKIT_WEB_FETCH_JS=1`, and `js=True` per-call argument. See `references/security.md` for the three-layer JS gate spec.

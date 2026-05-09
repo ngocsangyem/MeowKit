@@ -26,10 +26,10 @@ Product-level plans use a different schema (product spec, not phase plan). Run t
 | Feature count ≥8 | `grep -c '^### [0-9]' plan.md` ≥ 8 | < 8 → expand feature set |
 | Each feature has ≥2 user stories | "As a X, I want Y, so that Z" format, 2+ per feature | Missing → add |
 | Each feature has ≥2 ACs | Binary, behavior-facing | Missing → add |
-| No forbidden patterns | POSIX greps from step-03a §3a.5 return zero matches | Any match → rewrite feature at user-story level |
+| No forbidden patterns | POSIX greps from step-03a return zero matches | Any match → rewrite feature at user-story level |
 | Out-of-Scope populated | ≥2 anti-features with rationale | Empty → add |
 
-Run the dedicated product-spec validator (same script invoked at step-03a §3a.5; running it twice is cheap and catches edits made between steps):
+Run the dedicated product-spec validator (same script invoked at step-03a; running it twice is cheap and catches edits made between steps):
 
 ```bash
 .claude/skills/plan-creator/scripts/check-product-spec.sh "{plan_dir}/plan.md"

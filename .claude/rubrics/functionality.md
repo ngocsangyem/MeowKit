@@ -52,5 +52,4 @@ Measures whether the build **actually works** when exercised against real input 
 
 ## References
 
-- Anthropic harness article §6 (active verification beats test-pass claims)
-- research/researcher-01-harness-patterns.md §11
+- Anthropic harness article (active verification beats test-pass claims)

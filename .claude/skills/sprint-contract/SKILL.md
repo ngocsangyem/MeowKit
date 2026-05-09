@@ -143,7 +143,7 @@ When `MEOWKIT_HARNESS_MODE=LEAN`:
 | `../../agents/developer.md` | Generator agent — owns `propose` and `amend` actions |
 | `../../agents/evaluator.md` | Evaluator agent — owns `review` action; also Phase 3 active-verification consumer |
 | `../mk:rubric/` | Rubric library — provides composed presets the contract binds to |
-| `../mk:evaluate/` | Phase 3 evaluator skill — reads signed contract via `step-01-load-rubrics.md` §1e |
+| `../mk:evaluate/` | Evaluator skill — reads signed contract via `step-01-load-rubrics.md` |
 
 ## Related Rules
 

@@ -98,7 +98,7 @@ export function derivePhaseStatuses(
 		// Clear all earlier active markers — once Gate 2 has a verdict, the workflow
 		// has moved to Ship regardless of gate1 state. Without clear() and gate1 was
 		// never approved (cross-session state), "plan" stayed active producing a
-		// dual-pulse render. (reviewer 260430-orchviz-redesign-verdict.md §Correctness)
+		// dual-pulse render.
 		active.clear();
 		active.add("ship");
 	}

@@ -185,7 +185,7 @@ HARD GATE (Phase 4 human approval) is non-bypassable. No flag, including `--lean
 - **HARD GATE applies in all modes**, including `--lean` and `--auto`. Phase 4 human approval is never skipped.
 - **No local context = generic advice**: always read `docs/project-context.md` first. Without it, recommendations won't fit your stack.
 - **"Obvious" copies hide complexity**: auth flows, data models, API contracts — the challenge phase is NEVER skipped.
-- **chom never chains into other skills mid-flow**: handoff text only. USER invokes plan-creator / cook / sequential-thinking. See §Boundary Rules for rationale.
+- **chom never chains into other skills mid-flow**: handoff text only. USER invokes plan-creator / cook / sequential-thinking. See Boundary Rules for rationale.
 - **Spec ≠ code**: output describes WHAT and WHY, never HOW. No code blocks in specs.
 
 ## Reference

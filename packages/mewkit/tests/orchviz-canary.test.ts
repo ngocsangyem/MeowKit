@@ -1,7 +1,7 @@
 /**
  * End-to-end fixture canary — feeds tests/fixtures/sample-session.jsonl through
  * the parser and asserts ranges. Designed to fail loudly if Claude Code's
- * JSONL format changes (per researcher-02 §5).
+ * JSONL format changes.
  */
 
 import { describe, expect, it } from "vitest";

@@ -66,7 +66,7 @@ When populating `phases[*].status` in `.plan-state.json`, read in this order (mi
 3. Plain `status: ...` regex anywhere in body (deeper fallback)
 4. `unknown` sentinel (parse-failure indicator — never written from frontmatter)
 
-New plans always have frontmatter (per step-03 §3c.0), so step 1 resolves immediately. Legacy plans created before this skill upgrade fall through to step 2.
+New plans always have frontmatter, so step 1 resolves immediately. Legacy plans created before this skill upgrade fall through to step 2.
 
 Write `{plan_dir}/.plan-state.json` for cross-session resilience:
 

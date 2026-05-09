@@ -110,7 +110,7 @@ Step 8: Hydrate Tasks
 - `--parallel`: step-03 adds ownership matrix; step-08 uses parallel group hydration.
 - `--two`: step-03 produces 2 approach files (no plan.md yet); step-04 asks user to select before step-05.
 - `selected_approach` is only set in `two` mode; all other modes leave it unset.
-- `--product-level`: step-03 → step-03a (spec only, no phase files). step-03a runs a LIGHT codebase scout (§3a.0) on non-empty repos via an ALLOWLIST of `README*`/`docs/`/`brand/`/`tasks/plans/` (BLOCKLIST: `src/`, source files, schemas) — output is injected as agent working memory only, never written to `plan.md`. Hands off to `mk:harness` after Gate 1, NOT directly to developer. Auto-detected by step-00 on green-field "build a X app" prompts; explicit flag bypasses detection. Optional: `--no-design` skips design subagent, `--no-scout` skips §3a.0 codebase scout.
+- `--product-level`: step-03 → step-03a (spec only, no phase files). step-03a runs a LIGHT codebase scout on non-empty repos via an ALLOWLIST of `README*`/`docs/`/`brand/`/`tasks/plans/` (BLOCKLIST: `src/`, source files, schemas) — output is injected as agent working memory only, never written to `plan.md`. Hands off to `mk:harness` after Gate 1, NOT directly to developer. Auto-detected by step-00 on green-field "build a X app" prompts; explicit flag bypasses detection. Optional: `--no-design` skips design subagent, `--no-scout` skips codebase scout.
 
 ## Next
 

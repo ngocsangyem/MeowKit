@@ -399,13 +399,13 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | ID     | File:Line                            | Issue                                                                        | Status |
 | ------ | ------------------------------------ | ---------------------------------------------------------------------------- | ------ |
 | CF-H7  | `mk:lazy-agent-loader/SKILL.md:13` | Audit cited hardcoded agent count "15" | CLOSED 2026-04-29 — `grep -nE "[0-9]+ agent"` returns nothing; no hardcoded count exists in current tree |
-| CF-H11 | `commands/meow/meow.md:20`           | `/mk:command` routed but `mk:command` not in inventory (phantom)         | CLOSED 2026-04-29 — refs resolve via `commands/meow/<name>.md` per `.claude/rules/skill-authoring-rules.md` §"Commands vs Skills" (post-dated audit) |
+| CF-H11 | `commands/meow/meow.md:20`           | `/mk:command` routed but `mk:command` not in inventory (phantom)         | CLOSED 2026-04-29 — refs resolve via `commands/meow/<name>.md` per `.claude/rules/skill-authoring-rules.md` (post-dated audit) |
 | CF-H12 | `commands/meow/meow.md:20,40`        | `mk:plan/arch/design/test` phantom routing targets | CLOSED 2026-04-29 — all 4 resolve via `commands/meow/<name>.md` |
 | CF-H13 | `commands/meow/plan.md`              | `mk:plan` phantom                                                          | CLOSED 2026-04-29 — `commands/meow/plan.md` exists |
 | CF-H14 | `commands/meow/validate.md`          | `mk:audit`, `mk:validate` phantom                                        | CLOSED 2026-04-29 — both resolve in `commands/meow/` |
 | CF-H15 | `commands/meow/summary.md`           | `mk:summary` phantom                                                       | CLOSED 2026-04-29 — `commands/meow/summary.md` exists |
 
-**Re-verification finding (CF-H11–H15):** the audit pre-dated `.claude/rules/skill-authoring-rules.md` §"Commands vs Skills" (originally in `meowkit/CLAUDE.md`, relocated 2026-05-09), which formalizes that a command without a matching skill is NOT phantom (per audit-rubric RF-14). All 7 cited refs resolve to a command file. **A future Phase 2 cross-ref CI script will guard against regressions.**
+**Re-verification finding (CF-H11–H15):** the audit pre-dated `.claude/rules/skill-authoring-rules.md` (originally in `meowkit/CLAUDE.md`, relocated 2026-05-09), which formalizes that a command without a matching skill is NOT phantom (per audit-rubric RF-14). All 7 cited refs resolve to a command file. **A future cross-ref CI script will guard against regressions.**
 
 **Total post-re-verify (2026-04-29):** 1 CRITICAL OPEN (CF-C4), 0 HIGH OPEN (5 closed). Re-baseline of MEDIUM/LOW deferred to next audit pass.
 

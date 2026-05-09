@@ -19,7 +19,7 @@ is no compiled binary; it shapes LLM behavior through prompt engineering and fil
 conventions. Its users are Claude Code operators who want reproducible,
 gate-enforced AI workflows. It adds `.claude/` conventions on top of Claude Code
 (Anthropic) without modifying Claude Code itself.
-(source: `CLAUDE.md` Role section; `meowkit-architecture.md` §1 System Overview)
+(source: `CLAUDE.md` Role section; `meowkit-architecture.md` System Overview)
 
 ---
 
@@ -60,7 +60,7 @@ Monorepo via npm workspaces (`packages/*`). Active package: `packages/mewkit/`.
 | `session-state/` | Session-lifecycle files (cleared on new session) | — |
 | `packages/mewkit/` | npm workspace TypeScript package | — |
 
-All counts from `meowkit-architecture.md` §2 Component Inventory (verified 2026-04-18).
+All counts from `meowkit-architecture.md` Component Inventory (verified 2026-04-18).
 
 ---
 
@@ -178,7 +178,7 @@ This is separate from Claude Code's auto-memory at `~/.claude/projects/<project>
 which is machine-local and managed by the Claude Code platform. MeowKit's `.claude/memory/`
 serves a different purpose: team-shared, version-controlled knowledge.
 
-(source: `meowkit-architecture.md` §7; `CLAUDE.md` Memory section; `docs/memory-system.md`):
+(source: `meowkit-architecture.md`; `CLAUDE.md` Memory section; `docs/memory-system.md`):
 
 | File | Purpose | When read |
 |------|---------|-----------|
@@ -204,7 +204,7 @@ Memory path is `.claude/memory/` — NOT bare `memory/` (CF-C6 bare-path bug in 
 ## 9. Hook Chain
 
 7 events registered in `.claude/settings.json`
-(source: `meowkit-architecture.md` §4 Execution Flow; `settings.json` verified 2026-04-18):
+(source: `meowkit-architecture.md` Execution Flow; `settings.json` verified 2026-04-18):
 
 | Event | Key Handlers (in order) | Purpose |
 |-------|------------------------|---------|
@@ -252,7 +252,7 @@ Full index: `.claude/rules/RULES_INDEX.md`
 
 ## 11. Known Open Issues (as of 2026-04-18)
 
-Full backlog: `meowkit-architecture.md` §10.
+Full backlog: `meowkit-architecture.md`.
 
 Summary from consolidated audit — **64 findings**:
 - CRITICAL: 6

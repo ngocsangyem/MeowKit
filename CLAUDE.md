@@ -103,10 +103,10 @@ If a script fails — fix it, don't stop.
 - **Agent routing:** `.claude/rules/agent-routing.md` (17-row agent table + PM opt-out)
 - **Risk checklist:** `.claude/rules/risk-checklist.md` (Phase 0 horizontal-risk flag evaluation; complements `mk:scale-routing` CSV)
 - **Adaptive density:** `.claude/skills/harness/references/adaptive-density-matrix.md` (canonical) — governing rule: `.claude/rules/harness-rules.md` Rule 5
-- **Orchestrator entry rule:** `.claude/rules/orchestration-rules.md` §"Orchestrator Entry Point Rule"
-- **Commands vs Skills:** `.claude/rules/skill-authoring-rules.md` §"Commands vs Skills"
+- **Orchestrator entry rule:** `.claude/rules/orchestration-rules.md`
+- **Commands vs Skills:** `.claude/rules/skill-authoring-rules.md`
 - **Skill Rule of Two:** `.claude/rules/injection-rules.md` Rule 11
-- **Advisory skill frontmatter fields** (`preamble-tier`, `phase`, `trust_level`, `injection_risk`): `.claude/rules/skill-authoring-rules.md` §"Advisory Frontmatter Fields"
+- **Advisory skill frontmatter fields** (`preamble-tier`, `phase`, `trust_level`, `injection_risk`): `.claude/rules/skill-authoring-rules.md`
 
 ## Docs Retrieval
 

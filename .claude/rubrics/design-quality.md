@@ -59,5 +59,4 @@ For TRIVIAL tier (Haiku) builds, downgrade FAIL to WARN on anti-pattern matches 
 
 ## References
 
-- Anthropic harness article §4 (design weighted higher to penalize slop)
-- research/researcher-01-harness-patterns.md §4
+- Anthropic harness article (design weighted higher to penalize slop)

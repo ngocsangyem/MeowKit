@@ -52,5 +52,4 @@ Measures whether the build delivers on the **ambition of the product spec**, not
 
 ## References
 
-- Anthropic harness article §3 (under-scoping is the default failure mode)
-- research/researcher-01-harness-patterns.md §2
+- Anthropic harness article (under-scoping is the default failure mode)

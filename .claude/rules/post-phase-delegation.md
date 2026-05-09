@@ -67,7 +67,7 @@ USE: the skip conditions above, audited once per skill citation
 
 ## Rule 4: Orchestrator Disambiguation
 
-Per `.claude/rules/orchestration-rules.md` §"Orchestrator Entry Point Rule", `mk:cook` and `mk:workflow-orchestrator` are mutually exclusive per session. Refer to that rule for the full disambiguation logic.
+Per `.claude/rules/orchestration-rules.md`, `mk:cook` and `mk:workflow-orchestrator` are mutually exclusive per session. Refer to that rule for the full disambiguation logic.
 
 WHY: Double-firing PM on the same phase transition wastes haiku calls and produces duplicate reports. The mutual-exclusion rule that governs the orchestrators themselves extends to their PM delegation.
 

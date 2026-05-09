@@ -61,7 +61,7 @@ else:
 
 Path: `tasks/reviews/${MEOWKIT_EVAL_SLUG}-evalverdict.md`
 
-**Slug consistency:** read `MEOWKIT_EVAL_SLUG` (set by step-01 §1g) — do NOT re-derive the slug here. Step-01 owns the slug-source priority (task slug → contract slug → branch slug → cwd basename). Re-deriving in step-04 risks divergence between the evidence directory path (set in step-01) and the verdict file path, which corrupts the relative-path citations the validator follows.
+**Slug consistency:** read `MEOWKIT_EVAL_SLUG` (set by step-01) — do NOT re-derive the slug here. Step-01 owns the slug-source priority (task slug → contract slug → branch slug → cwd basename). Re-deriving in step-04 risks divergence between the evidence directory path (set in step-01) and the verdict file path, which corrupts the relative-path citations the validator follows.
 
 ```markdown
 ---

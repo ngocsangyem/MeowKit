@@ -84,5 +84,5 @@ Rubrics use SemVer in their frontmatter. Bump `version`:
 
 - Phase 2 plan: `plans/260407-2331-meowkit-harness-gan-architecture/phase-02-graded-evaluation-rubric-library.md`
 - Phase 3 (consumer, **shipped 260408**): the `evaluator` agent at `.claude/agents/evaluator.md` and `mk:evaluate` skill at `.claude/skills/evaluate/`
-- Phase 6: registers `.claude/rubrics/` in `meowkit-rules.md` §1 canonical paths table (pending — until then, this directory is convention-only, not in the canonical table)
+- Registers `.claude/rubrics/` in `meowkit-rules.md` canonical paths table (pending — until then, this directory is convention-only, not in the canonical table)
 - Calibration: `meowkit/.claude/skills/rubric/references/calibration-guide.md`

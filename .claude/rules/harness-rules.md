@@ -15,7 +15,7 @@ The planner agent in product-level mode (`mk:plan-creator --product-level`) MUST
 
 The generator (developer agent) and evaluator (evaluator agent) are distinct subagents with isolated contexts. Self-evaluation is forbidden.
 
-**WHY:** Out-of-box Claude has a measurable leniency drift when grading its own output — it identifies legitimate issues, then talks itself into deciding they weren't a big deal. An external evaluator with a skeptic persona is the only known mitigation. See `.claude/agents/evaluator.md` and research-01 §6.
+**WHY:** Out-of-box Claude has a measurable leniency drift when grading its own output — it identifies legitimate issues, then talks itself into deciding they weren't a big deal. An external evaluator with a skeptic persona is the only known mitigation. See `.claude/agents/evaluator.md`.
 
 **INSTEAD of:** generator says "PASS" → ship
 **USE:** generator → handoff → evaluator (fresh context) → graded verdict with evidence → ship/loop

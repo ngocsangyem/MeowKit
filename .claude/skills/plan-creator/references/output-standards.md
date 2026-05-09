@@ -27,7 +27,7 @@ Phase files (`phase-XX-*.md`) MUST begin with their own YAML frontmatter block. 
 
 | Field | Type | Allowed values | Default | Notes |
 |-------|------|----------------|---------|-------|
-| phase | int | ≥1 (max enforced by `step-03-draft-plan.md` §3d, currently 7) | filename-derived | required |
+| phase | int | ≥1 (max enforced by `step-03-draft-plan.md`, currently 7) | filename-derived | required |
 | title | string | — | heading-derived | required |
 | status | enum | `pending \| active \| in_progress \| completed \| failed \| abandoned` | `pending` | NEVER `completed` at creation |
 | priority | enum | `P1 \| P2 \| P3` | `P2` | phase-level priority — distinct from plan.md `critical/high/medium/low` |

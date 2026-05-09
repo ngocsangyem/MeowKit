@@ -54,5 +54,5 @@ Measures whether the build feels like a **specific, opinionated product** — no
 
 ## References
 
-- Anthropic harness article §4 (originality weighted high to penalize slop)
+- Anthropic harness article (originality weighted high to penalize slop)
 - "AI slop" failure mode catalog

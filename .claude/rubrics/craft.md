@@ -55,5 +55,5 @@ Measures the **small details** that distinguish a finished product from a demo: 
 
 ## References
 
-- Anthropic harness article §4 (craft as tiebreaker dimension)
+- Anthropic harness article (craft as tiebreaker dimension)
 - Craft is the rubric that distinguishes "looks good in a screenshot" from "feels good in 30 seconds of use"

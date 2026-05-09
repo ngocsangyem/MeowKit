@@ -55,4 +55,4 @@ Measures whether a **first-time user can complete the core value action without 
 
 ## References
 
-- Anthropic harness article §4 (UX as the proxy for "would a human use this")
+- Anthropic harness article (UX as the proxy for "would a human use this")

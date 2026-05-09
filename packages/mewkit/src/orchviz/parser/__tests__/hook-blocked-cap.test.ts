@@ -1,5 +1,5 @@
 /**
- * HOOK_BLOCKED_MAX_MS fail-open auto-clear — phase-06 §7 safety cap.
+ * HOOK_BLOCKED_MAX_MS fail-open auto-clear — safety cap.
  *
  * If a hook_blocked pause is never cleared by an assistant text from the
  * same agent (the normal clear path), the parser's 5-min safety timer must

@@ -14,7 +14,7 @@ Invoke `mk:plan-creator` in product-level mode (Phase 1 of the harness plan). Pr
 
 ### 1b. Invoke the planner
 
-Use the Task tool to dispatch the `planner` agent (canonical subagent_type per `rules/` §2). The planner runs `mk:plan-creator` internally.
+Use the Task tool to dispatch the `planner` agent (canonical subagent_type per `rules/`). The planner runs `mk:plan-creator` internally.
 
 ```
 Task(
