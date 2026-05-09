@@ -125,7 +125,7 @@ Saved to `{plan-dir}/prompt-enhancer/<YYMMDD-HHMM>-<slug>.md` if an active plan 
 
 ## Source Documents
 
-The skill is grounded in seven prompting and context-engineering source documents, synthesized via a 5-agent analysis:
+The skill is grounded in seven prompting and context-engineering source documents:
 
 - Anthropic prompting best practices (Claude 4.5–4.7)
 - OpenAI Codex prompt guide
@@ -133,6 +133,6 @@ The skill is grounded in seven prompting and context-engineering source document
 - Context engineering survey + Anthropic's "Effective context engineering for AI agents"
 - Skill-authoring guidelines + lessons-build-skill
 
-The synthesis lives at `plans/reports/synthesis-260509-2058-prompting-framework.md` (12 shared principles, 4 cross-source contradictions resolved, universal kernel in §4 and §7).
+The synthesis distilled twelve shared principles across all sources, resolved four cross-source contradictions, and produced the universal kernel rendered in §7 of the framework. The skill encodes that kernel verbatim.
 
 > **Canonical source:** `.claude/skills/prompt-enhancer/SKILL.md`
