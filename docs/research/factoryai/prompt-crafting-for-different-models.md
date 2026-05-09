@@ -113,7 +113,7 @@ Claude models excel with structured, explicit instructions and respond particula
 </Steps>
 
 <Tip>
-  Ready-to-use prompt refiner skills are available in the [examples folder](https://github.com/Factory-AI/factory/tree/main/examples/power-user-skills). Copy them to `~/.factory/skills/` to use them. Learn more about skills in the [Skills documentation](/cli/configuration/skills).
+  Copy the prompt refiner skills below to `~/.factory/skills/` to use them. Learn more about skills in the [Skills documentation](/cli/configuration/skills).
 </Tip>
 
 ### Claude Prompt Refiner Skill
@@ -415,11 +415,11 @@ Match the model to the task:
 
 | Task Type                   | Recommended Model           | Reasoning Level |
 | --------------------------- | --------------------------- | --------------- |
-| **Complex architecture**    | Opus 4.6 or Opus 4.5        | High-Max        |
+| **Complex architecture**    | Opus 4.7 or Opus 4.6        | High-Max        |
 | **Feature implementation**  | Sonnet 4.5 or GPT-5.1-Codex | Medium          |
 | **Quick edits, formatting** | Haiku 4.5                   | Off/Low         |
 | **Code review**             | GPT-5.1-Codex-Max           | High            |
-| **Bulk automation**         | GLM-4.7 (Droid Core)        | None            |
+| **Bulk automation**         | GLM-5 (Droid Core)          | None            |
 | **Research/analysis**       | Gemini 3 Pro                | High            |
 
 ---
@@ -499,5 +499,3 @@ Done when: \[Acceptance criteria]
     Reduce costs while maintaining quality
   </Card>
 </CardGroup>
-
-Built with [Mintlify](https://mintlify.com).

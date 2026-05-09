@@ -70,3 +70,25 @@ occurs, the editor will display a "file changed externally" prompt. This is
 expected behavior — orchviz does not coordinate with editor locks. The atomic
 rename guarantees the file is never partially written from the editor's
 perspective; the editor sees the complete new version.
+
+## Context Boundary
+
+Three different concerns about "how much is loaded" are deliberately split
+across three separate mechanisms. Confusing them is a recurring source of
+mis-reported state.
+
+| Concern                                   | Mechanism                                          | Unit             |
+| ----------------------------------------- | -------------------------------------------------- | ---------------- |
+| Cost                                      | `/mk:budget` + `harness/scripts/budget-tracker.sh`  | USD              |
+| Window utilization & structural overhead  | `/mk:context-audit`                                 | tokens / %       |
+| Transcript size                           | `.claude/hooks/conversation-summary-cache.sh`     | bytes / events   |
+
+`/mk:budget` answers "how much have we spent?" (monetary). `/mk:context-audit`
+answers "how much of the context window is consumed by always-on `.claude/`
+content?" (window utilization). The transcript cache answers "how big is the
+running conversation?" — orthogonal to both above.
+
+The 10% / 25% structural-overhead banners used by `/mk:context-audit` are the
+canonical source of truth for window-utilization thresholds. They are NOT
+linked to `MEOWKIT_BUDGET_*` env vars — those are USD amounts, not token
+percentages.

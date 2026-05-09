@@ -55,3 +55,7 @@ Tracks and reports AI model usage costs. Reads from `memory/cost-log.json`.
 ### Output
 
 Formatted table of cost data from `memory/cost-log.json`. No files are modified (except `--reset`).
+
+### Related
+
+For context window utilization and structural overhead, see `/mk:context-audit`. `/mk:budget` tracks USD only.

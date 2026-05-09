@@ -418,40 +418,40 @@ This is our default TODO tool; feel free to customize as you’d prefer. See the
 
 ```json
 {
-  "type": "function",
-  "function": {
-    "name": "update_plan",
-    "description": "Updates the task plan.\nProvide an optional explanation and a list of plan items, each with a step and status.\nAt most one step can be in_progress at a time.",
-    "strict": false,
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "explanation": {
-          "type": "string"
-        },
-        "plan": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "step": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string",
-                "description": "One of: pending, in_progress, completed"
-              }
-            },
-            "additionalProperties": false,
-            "required": ["step", "status"]
-          },
-          "description": "The list of steps"
-        }
-      },
-      "additionalProperties": false,
-      "required": ["plan"]
-    }
-  }
+	"type": "function",
+	"function": {
+		"name": "update_plan",
+		"description": "Updates the task plan.\nProvide an optional explanation and a list of plan items, each with a step and status.\nAt most one step can be in_progress at a time.",
+		"strict": false,
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"explanation": {
+					"type": "string"
+				},
+				"plan": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"step": {
+								"type": "string"
+							},
+							"status": {
+								"type": "string",
+								"description": "One of: pending, in_progress, completed"
+							}
+						},
+						"additionalProperties": false,
+						"required": ["step", "status"]
+					},
+					"description": "The list of steps"
+				}
+			},
+			"additionalProperties": false,
+			"required": ["plan"]
+		}
+	}
 }
 ```
 
