@@ -159,7 +159,9 @@ export MEOWKIT_SUMMARY_TURN_GAP=10             # summarize at most every 10 turn
 export MEOWKIT_SUMMARY_GROWTH_DELTA=10240      # require 10KB growth between summaries
 ```
 
-**Inspecting the cache:** the cache is a plain markdown file. Open `.claude/memory/conversation-summary.md` at any time to see what the agent will inject on the next turn. Edit it manually if a summary went off-rails — the hook re-generates only when throttle triggers.
+**Inspecting the cache:** the cache is a plain markdown file. Open `.claude/memory/conversation-summary.md` at any time to see what the agent will inject on the next turn. The file carries a leading HTML-comment banner restating the write protocol — see `harness-rules.md` Rule 11 §"Write Protocol".
+
+**Cache write protocol:** **AUTOMATED-ONLY.** The hook owns the write contract end-to-end (atomic, locked, throttled, scrubbed, validated). Manual edits are overwritten on next regeneration. To preserve notes across sessions, append to `.claude/memory/notes.md` instead — that file is not auto-generated.
 
 **Graceful degradation:** if `claude` CLI is missing or summarization fails, the hook exits 0 silently and the session proceeds with full transcript re-reads. Zero blast radius.
 

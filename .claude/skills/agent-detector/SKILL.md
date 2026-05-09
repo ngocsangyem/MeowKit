@@ -27,7 +27,8 @@ user-invocable: false
 1. **Check cache** -- reuse cached result if same workflow and phase > 1. See `references/detection-process.md`
 2. **Score agents** -- analyze task content, extract keywords, check project context across all layers (0-4). See `references/multi-layer-detection.md`, `references/scoring-and-thresholds.md`
 3. **Select model + mode** -- map complexity to model tier, check team mode eligibility. See `references/model-selection.md`, `references/complexity-detection.md`, `references/team-mode.md`
-4. **Output + hand off** -- show detection banner, load agent instructions, invoke skill. See `references/detection-process.md`, `references/after-detection.md`
+4. **Evaluate risk flags** -- read `.claude/rules/risk-checklist.md`. For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per `model-selection-rules.md` Rule 2 — regardless of `mk:scale-routing` outcome.
+5. **Output + hand off** -- show detection banner (including `matched_flags` line if non-empty), load agent instructions, invoke skill. See `references/detection-process.md`, `references/after-detection.md`
 
 ## References
 

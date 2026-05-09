@@ -54,6 +54,7 @@ After complexity routing, detect TDD mode:
    - Standard/Complex tasks: planner → tester → developer → reviewer → shipper → documenter → analyst
    - Architect is inserted after planner when schema, API, or infra changes are involved.
    - Security is inserted at Phase 2 and Phase 4 for auth/payments/security changes.
+   - **Green-field product builds** (signals: "build me a kanban app", "make a retro game maker", "build a SaaS dashboard", "autonomous build", or any prompt asking for a multi-hour autonomous green-field build): route to `mk:harness` instead of the standard pipeline. The harness owns its own planner → contract → generator ⇄ evaluator loop with adaptive density. See `mk:harness/SKILL.md` and CLAUDE.md preference note.
 
 4. **Read memory.** At session start, read `.claude/memory/lessons.md` for prior learnings and `.claude/memory/cost-log.json` for budget context.
 

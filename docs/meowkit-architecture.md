@@ -13,7 +13,7 @@ workflows, quality gates, memory persistence, and 78 domain skills. It operates
 through three mechanisms:
 
 1. **Rules** (`.claude/rules/*.md`) — behavioral instructions loaded every session;
-   17 rule files, priority-ordered; 2 are NEVER-override (`security-rules.md`,
+   18 rule files, priority-ordered; 2 are NEVER-override (`security-rules.md`,
    `injection-rules.md`). Source: `RULES_INDEX.md` loading-priority table.
 2. **Hooks** (`.claude/hooks/*.sh`, `.cjs`) — shell/Node scripts triggered by
    Claude Code events before or after tool calls. Source: `settings.json` (7 hook
@@ -45,7 +45,7 @@ Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 | Node handlers on disk                  | 8        | `ls .claude/hooks/handlers/*.cjs`          | Re-verified 2026-04-29 — disk has 8, matches HOOKS_INDEX. CF-M2 closed (audit cited stale 12).                                  |
 | Node handlers documented (HOOKS_INDEX) | 5 active | `HOOKS_INDEX.md:39` footer                 | memory-filter, memory-parser, memory-injector, memory-loader deleted (v2.4.0); immediate-capture-handler retained (CF-M1 closed) |
 | Slash commands                         | 21       | `ls .claude/commands/meow/*.md`            | `status.md` added 260422 alongside project-manager agent                                                                         |
-| Rules files                            | 17       | `ls .claude/rules/*.md` excl. RULES_INDEX  | RULES_INDEX table lists 17 rows — matches disk                                                                                   |
+| Rules files                            | 18       | `ls .claude/rules/*.md` excl. RULES_INDEX  | RULES_INDEX table lists 18 rows — matches disk (`risk-checklist.md` added at slot 13b for Phase 0 horizontal-risk evaluation)    |
 | Memory files                           | 8        | `CLAUDE.md` Memory section                 | 6 named + conversation-summary.md + quick-notes.md                                                                               |
 
 **Skill type breakdown** (source: `inventory-summary.md`): workflow 33, verification 17,

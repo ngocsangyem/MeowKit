@@ -1,5 +1,4 @@
 ---
-source: new (adapted from gstack ETHOS.md "Search Before Building" principle)
 original_file: n/a
 adapted: no
 adaptation_notes: >

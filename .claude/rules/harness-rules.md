@@ -94,3 +94,23 @@ Long sessions MUST use the conversation summary cache (`.claude/hooks/conversati
 **Opt-out:** `MEOWKIT_SUMMARY_CACHE=off` cleanly disables both paths. Graceful degradation: if `claude` CLI is missing or summarization fails, the hook exits 0 silently and the session proceeds with full transcript.
 
 **Security:** the summary is DATA per `injection-rules.md`. Output is secret-scrubbed via `lib/secret-scrub.sh` before writing to cache. The prompt template forbids instruction-shaped content in the summary body.
+
+### Write Protocol
+
+The cache file (`.claude/memory/conversation-summary.md`) is **AUTOMATED-ONLY**. Ownership is single-writer:
+
+| Role | Owner | Trigger |
+|---|---|---|
+| Writer | `conversation-summary-cache.sh` (Stop event) | Throttle thresholds met (size + event delta or size delta) |
+| Reader / Injector | `conversation-summary-cache.sh` (UserPromptSubmit) | Every user prompt; emits ≤4KB body block |
+| Clearer | `project-context-loader.sh` (SessionStart) | Session change detected (new HOOK_SESSION_ID) |
+| Lock holder | `conversation-summary.lock` | Mutex preventing overlapping background summarizers |
+
+Manual user edits to the cache file are **NOT preserved** — they are overwritten on next Stop regeneration. The file carries a leading HTML-comment banner restating this contract.
+
+**WHY:** A proactive, editable cache without maintenance discipline degrades to staleness + false confidence. AUTOMATED-ONLY ownership eliminates the drift class entirely. Users who need persistent notes across sessions append to `.claude/memory/notes.md` instead — that file is not auto-generated.
+
+**INSTEAD of:** editing the cache file in place
+**USE:** appending to `.claude/memory/notes.md` (per CLAUDE.md `## Memory` section)
+
+The banner header is metadata only — stripped by the injection path so it does NOT consume the 4KB injection budget. It exists for human readers of the cache file.

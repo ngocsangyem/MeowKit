@@ -45,9 +45,18 @@ ALWAYS use COMPLEX tier for any task involving:
 - Credential handling
 - Security audit or vulnerability fix
 - Database schema changes with CASCADE
+- Data loss / migration (CASCADE DELETE, ALTER TABLE without backup, irreversible schema change)
+- External provider behavior (third-party API contract change, payment-provider migration, webhook ingress, SSO IdP)
+- Removing or weakening validation requirements (deleting input checks, relaxing schema constraints, dropping rate limits)
 
 WHY: Security-sensitive code requires the highest reasoning capability.
 Cutting corners on model tier for security work creates real vulnerabilities.
+The expanded list closes three risk categories that a vertical domain-CSV
+match would otherwise miss — they cut across domains.
+
+The `risk-checklist.md` rule emits a `matched_flags` array at Phase 0; any
+flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` triggers this
+escalation regardless of CSV match.
 
 ### Rule 3: Never downgrade mid-task
 
