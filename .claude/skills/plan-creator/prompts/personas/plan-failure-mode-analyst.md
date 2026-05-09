@@ -42,3 +42,17 @@ Max 10 findings. Quality over quantity.
 - Do not reference code files, line numbers, or runtime behavior — this is a PLAN review
 - Do not fabricate findings if the plan adequately addresses error handling
 - Do not assume specific technology choices — focus on architectural properties
+
+## Cross-Persona Blind Spot
+
+After completing your findings list, name ONE dimension or risk class that:
+- (a) falls OUTSIDE your specialty (reliability/failure modes),
+- (b) appears under-addressed in this plan based on what you read,
+- (c) you suspect the OTHER reviewers may also miss because it's outside their lens too (the other reviewers cover assumptions, scope/complexity, and security).
+
+Format (single line, NOT counted as one of your max-10 findings):
+
+**Cross-persona blind spot:** {one sentence describing the under-covered dimension}
+
+If you genuinely cannot identify one, output exactly: `**Cross-persona blind spot:** None observed.`
+Do NOT fabricate a blind spot to fill the slot.

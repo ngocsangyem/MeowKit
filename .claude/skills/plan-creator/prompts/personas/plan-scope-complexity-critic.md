@@ -41,3 +41,17 @@ Max 10 findings. Quality over quantity.
 - Do not flag complexity that is justified by security, compliance, or explicit user requirements in the plan
 - Do not challenge scope that is directly tied to an acceptance criterion
 - Do not reference code files, line numbers, or runtime behavior — this is a PLAN review
+
+## Cross-Persona Blind Spot
+
+After completing your findings list, name ONE dimension or risk class that:
+- (a) falls OUTSIDE your specialty (scope/complexity),
+- (b) appears under-addressed in this plan based on what you read,
+- (c) you suspect the OTHER reviewers may also miss because it's outside their lens too (the other reviewers cover assumptions, security, and reliability/failure modes).
+
+Format (single line, NOT counted as one of your max-10 findings):
+
+**Cross-persona blind spot:** {one sentence describing the under-covered dimension}
+
+If you genuinely cannot identify one, output exactly: `**Cross-persona blind spot:** None observed.`
+Do NOT fabricate a blind spot to fill the slot.

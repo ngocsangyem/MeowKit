@@ -48,6 +48,8 @@ There is no code to lint, build, or test. Focus exclusively on plan quality.
 Find architectural flaws, unstated assumptions, scope issues, or risks in this PLAN.
 Use the output format defined in your persona prompt.
 Max 10 findings. Quality over quantity.
+
+After the findings list, emit ONE `**Cross-persona blind spot:**` line per the "Cross-Persona Blind Spot" section in your persona prompt. Use `None observed.` if you cannot identify one — do NOT fabricate.
 ```
 
 ### 5d. Collect and Deduplicate Findings
@@ -68,8 +70,25 @@ Each finding must have these 7 fields:
 - **Failure scenario:** {concrete description of how this breaks}
 - **Evidence:** {quote from plan or note of missing element}
 - **Suggested fix:** {brief recommendation}
-- **Category:** {assumption | scope | risk | architecture | timeline}
+- **Category:** {assumption | scope | risk | architecture | timeline | cross-cutting}
 ```
+
+### 5d.5 Cross-Persona Blind Spot Aggregation
+
+Each persona was instructed to emit ONE `**Cross-persona blind spot:**` line after their findings list — naming a dimension OUTSIDE their specialty that they suspect the other reviewers may also miss. This sub-step processes those lines.
+
+1. **Collect** each persona's `**Cross-persona blind spot:**` value (the line is OUTSIDE the findings list, not deduped in 5d).
+2. **Detect convergence:** if 2+ personas independently named overlapping dimensions (matching by topic, not exact wording — e.g., "no observability story" + "no metrics/logging" converge on observability), promote to a NEW finding:
+   - **Severity:** `High` (default — 2+ specialized reviewers agreeing on a gap is a stronger signal than any single-lens finding; orchestrator may downgrade only if the dimension is genuinely minor).
+   - **Category:** `cross-cutting`
+   - **Location:** `plan.md` if cross-cutting; or affected phase(s) by best-guess.
+   - **Flaw:** paraphrased convergent blind-spot description.
+   - **Failure scenario:** orchestrator-derived from the convergent text.
+   - **Evidence:** `Independently noted by {persona-A}, {persona-B}: '{quote-A}', '{quote-B}'` (always include raw quotes, do not paraphrase Evidence).
+   - **Suggested fix:** "Add explicit treatment in {affected section(s)}; or run a focused review on this dimension."
+3. **Single-persona observations:** if only 1 persona named a unique blind spot, record it as a "noted concern" — visible in the final report (5h) but NOT pushed into phase files and NOT counted in finding totals.
+4. **All-clear case:** if all personas output `None observed.`, record `Cross-persona blind spots: none` in the summary; no findings added.
+5. **Re-cap if needed:** if the cross-cutting promotions push total findings past 15, re-trim the lowest-severity Medium findings first; never drop a promoted cross-cutting High.
 
 ### 5e. Agent Adjudication
 
@@ -130,6 +149,7 @@ Write the **full detailed findings** to a separate file: `{plan_dir}/red-team-fi
 **Personas used:** {list of personas}
 **Findings:** {total} ({accepted} accepted, {rejected} rejected)
 **Severity breakdown:** {N} Critical, {N} High, {N} Medium
+**Cross-persona blind spots:** {N promoted to findings, M noted concerns, K personas reported "None observed"}
 
 ---
 
@@ -140,12 +160,31 @@ Write the **full detailed findings** to a separate file: `{plan_dir}/red-team-fi
 - **Failure scenario:** {detailed scenario}
 - **Evidence:** {quote from plan or missing element}
 - **Suggested fix:** {recommendation}
-- **Category:** {assumption | scope | security | reliability | architecture}
+- **Category:** {assumption | scope | security | reliability | architecture | cross-cutting}
 - **Disposition:** {Accept | Reject} — {rationale}
 - **Applied to:** {phase file path or "—"}
 
 ## Finding 2: {title}
 ...
+
+---
+
+## Cross-Persona Blind Spot Pass
+
+**Promoted to findings:** {N convergent blind spots — see findings list above with `Category: cross-cutting`}
+**Noted concerns (single-persona):** {M items — recorded for visibility, not applied to phase files}
+
+| Persona | Blind spot |
+|---------|------------|
+| Assumption Destroyer | {raw text from persona, or "None observed"} |
+| Scope/Complexity Critic | {raw text from persona, or "None observed"} |
+| Security Adversary | {raw text from persona, or "None observed"} |
+| Failure Mode Analyst | {raw text from persona, or "None observed"} |
+
+### Noted Concerns (single-persona observations)
+
+- **{persona}:** {blind-spot text} — _not promoted; no convergent second voice_
+- ... (omit this sub-section entirely if no noted concerns)
 ```
 
 This file preserves the full evidence and reasoning. It can be re-read by future red-team sessions or referenced during implementation.
@@ -160,6 +199,7 @@ Append a **summary section** to plan.md that links to the full report:
 ### Session — {YYYY-MM-DD}
 **Findings:** {total} ({accepted} accepted, {rejected} rejected)
 **Severity breakdown:** {N} Critical, {N} High, {N} Medium
+**Cross-persona blind spots:** {N promoted, M noted}
 **Full report:** [red-team-findings.md](red-team-findings.md)
 
 | # | Finding | Severity | Disposition | Applied To | Rationale |
@@ -171,10 +211,10 @@ If a `## Red Team Review` section already exists (from a previous session), appe
 
 ## Output
 
-- `{plan_dir}/red-team-findings.md` — full detailed findings report
-- Findings applied to phase files (Key Insights or Risk Assessment)
-- `## Red Team Review` summary section written to plan.md with link to findings file
-- `red_team_findings` variable set: `"{N} findings, {accepted} accepted"`
+- `{plan_dir}/red-team-findings.md` — full detailed findings report (includes Cross-Persona Blind Spot Pass section)
+- Findings applied to phase files (Key Insights or Risk Assessment), including any promoted `cross-cutting` findings
+- `## Red Team Review` summary section written to plan.md with cross-persona-blind-spot count and link to findings file
+- `red_team_findings` variable set: `"{N} findings, {accepted} accepted, {C} cross-persona promoted"`
 
 ## Next
 
