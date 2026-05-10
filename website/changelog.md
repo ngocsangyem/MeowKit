@@ -14,6 +14,21 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.8.5 (2026-05-10) — Rules Folder Reconsolidation
+
+### Improvements
+
+- The five Phase-Zero conditional rule files (`agent-routing.md`, `model-selection-rules.md`, `phase-contracts.md`, `risk-checklist.md`, `scale-adaptive-rules.md`) move from `.claude/rules-conditional/` back to `.claude/rules/`. They keep the same Phase-0 conditional load semantics (read explicitly by `mk:agent-detector` Step 0b — NOT auto-loaded by Claude Code's directory mechanism), but live alongside the always-on rules so the orphan-cleanup pass and the rule-availability validator see them as a single tree.
+- `scripts/validate-rule-availability.sh` regex simplified — drops the `(-conditional)?` group now that the legacy path is gone.
+
+### Bug Fixes
+
+- `mewkit upgrade` orphan-cleanup pass was blind to `.claude/rules-conditional/` — `DEFAULT_ORPHAN_SCOPES` only listed `rules`, `skills`, `agents`, `hooks`. After this release, the scope list also covers `rules-conditional` as a one-time migration sunset, so users upgrading from v2.8.3 / v2.8.4 get the legacy directory flagged and removed on the next upgrade. New regression test in `tests/find-orphans.test.ts` locks the behaviour.
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the merged layout. The orphan-cleanup pass will detect leftover files under `.claude/rules-conditional/` and prompt to delete (skip with `--no-cleanup`).
+
 ---
 
 ## 2.8.4 (2026-05-10) — Confluence Ecosystem + Macro-Aware Spec Analysis

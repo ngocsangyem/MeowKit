@@ -340,6 +340,7 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v2.8.5  | 2026-05-10 | Rules Folder Reconsolidation     |
 | v2.8.4  | 2026-05-10 | Confluence Ecosystem + Macro-Aware Spec Analysis |
 | v2.8.3  | 2026-05-10 | Jira Family + Workflow Discovery     |
 | v2.8.2  | 2026-05-09 | Prompt Enhancer Output Modes         |
