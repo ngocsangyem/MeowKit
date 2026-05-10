@@ -47,7 +47,7 @@ while read -r ref; do
   PHANTOM=1
 done < <(
   find .claude/commands .claude/skills \
-    \( -path '*/.*' -o -path '*/node_modules/*' \) -prune -o \
+    \( -path '*/.*' -o -path '*/.venv/*' -o -path '*/node_modules/*' \) -prune -o \
     -type f \( -name '*.md' -o -name '*.json' \) -print0 \
     | xargs -0 grep -hoE 'mk:[a-z][a-z0-9-]*' 2>/dev/null \
     | sort -u
