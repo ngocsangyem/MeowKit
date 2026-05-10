@@ -31,14 +31,25 @@ Every step produces a **report**. Human reads and decides before proceeding. No 
 This workflow assumes the work is already represented as Jira tickets. If you're starting from a spec document instead, see the **"Importing a spec"** sidebar below.
 
 ::: tip Importing a spec (alternative entry point)
-If your spec lives outside Jira (a Confluence page, Notion doc, or any URL):
+Two paths depending on where the spec lives:
 
-1. Convert the URL to markdown: `/mk:web-to-markdown <spec-url>`
-2. Run `/mk:intake` and paste the markdown content (or save to a file and reference it)
-3. mk:intake produces a Spec Research Report with `[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` tags and suggested user stories
-4. You then create the tickets manually (Step 2) — never auto-creation
+**Confluence (first-party path):**
 
-This is a manual, human-gated import. There is no first-party Confluence reader anymore.
+1. `/mk:confluence-spec-analyst analyze <PAGE-ID>` — produces a Spec Research Report with requirements, ACs, gaps, and suggested user stories (read-only — no tickets created)
+2. Resolve `[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` flags with the PM via `/mk:confluence-collaborate add-comment <PAGE-ID> ... --footer`
+3. Optional pre-ticket feasibility scan with `/mk:scout` + `/mk:docs-finder` (see the [Spec → PR walkthrough](/workflows/spec-to-pr-walkthrough#step-3-tech-feasibility-breakdown-pre-ticket) for the full pattern)
+4. Create tickets manually (Step 2 below) — never auto-creation
+5. At Step 5, pass the report path back in: `/mk:planning-engine plan --tickets ... --spec <report-path>` brings the spec context into the Planning Report
+
+**Notion / generic URL (fallback):**
+
+1. `/mk:web-to-markdown <spec-url>` — convert the page to markdown
+2. `/mk:intake` and paste/reference the markdown — produces a similar Spec Research Report
+3. Create tickets manually (Step 2)
+
+Both paths are manual and human-gated. No path auto-creates Jira tickets from the spec.
+
+For a step-by-step walkthrough showing what every skill does behind the scenes, see [Spec → PR: Behind the Scenes](/workflows/spec-to-pr-walkthrough).
 :::
 
 ### Step 2: Create tickets (your decision)
@@ -78,7 +89,17 @@ Produces a **Tech Review Report**: affected files, feasibility rating, dependenc
 /mk:planning-engine plan --tickets AUTH-201,AUTH-202,AUTH-203 --capacity 40
 ```
 
-Produces a **Planning Report**: sprint goal candidate, dependency map, grouping suggestions, capacity analysis.
+If the tickets originated from a Confluence spec (see the sidebar above), pass the Spec Research Report back in to preserve spec context end-to-end:
+
+```bash
+/mk:planning-engine plan \
+  --tickets AUTH-201,AUTH-202,AUTH-203 \
+  --capacity 40 \
+  --scout \
+  --spec tasks/reports/spec-research-260511-q3-auth-refresh.md
+```
+
+Produces a **Planning Report**: sprint goal candidate, dependency map, grouping suggestions, capacity analysis. With `--spec`, the report includes a `## Spec Context (mk:confluence-spec-analyst)` section summarizing the upstream requirements / ACs / gaps relevant to the planning tickets.
 
 The **team** negotiates the sprint goal, self-selects work, and commits.
 
@@ -111,3 +132,4 @@ No step requires the previous step's output as a hard dependency.
 - [mk:planning-engine](/reference/skills/planning-engine) — tech review + sprint planning
 - [PRD Intake Automation](/workflows/prd-intake) — raw ticket triage (different workflow)
 - [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) — single-ticket evaluation
+- [Spec → PR: Behind the Scenes](/workflows/spec-to-pr-walkthrough) — deep-dive walkthrough showing every skill, agent fork, and gate

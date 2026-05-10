@@ -27,17 +27,19 @@ This page exists because the seam between Confluence, Jira, and your codebase is
 ## The Flow
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Confluence spec] -->|mk:confluence-spec-analyst| B[Spec Research Report]
     B -->|human review| C{Gaps?}
     C -->|yes| D[mk:confluence-collaborate]
     D --> A
-    C -->|no| E[mk:jira-issue create]
+    C -->|no| S[mk:scout + mk:docs-finder<br/>pre-ticket feasibility scan]
+    S --> E[mk:jira-issue create]
     E --> F[Tickets PROJ-1001..N]
     F -->|mk:jira-agile + mk:jira-relationships| G[Epic + ranking]
     G -->|mk:jira-evaluator + mk:jira-estimator| H[Refinement report]
-    H -->|mk:planning-engine review| I[Tech Review Report]
-    I -->|/mk:cook PROJ-1001| J[7-phase pipeline]
+    H -->|mk:planning-engine review --scout<br/>+ plan --tickets --spec| I[Tech Review &amp; Planning Reports]
+    I -->|mk:plan-creator per ticket<br/>tier-aware: hard/fast/skip| P[tasks/plans/.../plan.md<br/>GATE 1 approved]
+    P -->|/mk:cook PROJ-1001| J[7-phase pipeline]
     J -->|mk:ship + mk:jira-dev| K[PR + ticket transitions]
     K -->|mk:memory| L[fixes.md / decisions.md]
 ```
@@ -149,7 +151,74 @@ Resolving ambiguity **before** ticket creation prevents two failure modes:
 
 ---
 
-## Step 3 — Create the Jira tickets (your decision)
+## Step 3 — Tech feasibility breakdown (pre-ticket)
+
+Before tickets exist, do a **read-only feasibility pass** against the codebase. The goal is to catch "this can't be built without a refactor first" or "we already shipped this" *before* tickets get filed and estimated.
+
+::: warning What MeowKit actually supports here
+Two skills run **before** any Jira ticket exists: `mk:scout` (codebase fingerprint) and `mk:docs-finder` (external API/library docs). That's it.
+
+`mk:planning-engine` — the deeper tech-review skill — **requires Jira ticket keys** (`review TICKET-KEY` or `plan --tickets KEY,KEY,...`). So MeowKit's auto-mapping of spec requirements to specific files happens in **Step 7**, *after* tickets exist. Step 3 is the pre-ticket scan that fits between "what the PM wants" and "what we'll commit to build."
+
+Anything more automated than `mk:scout` + human cross-read at this stage would be speculative — there's no MeowKit skill that ingests a Spec Research Report and emits per-file impact without ticket keys.
+:::
+
+### Prompt
+
+```bash
+/mk:scout authentication oauth session
+# Cross-read the Spec Research Report against scout output. Then:
+/mk:docs-finder "Google OAuth 2.0 — current scopes + PKCE requirements"
+```
+
+### What happens behind the scenes
+
+| Layer | Action | Skill |
+|---|---|---|
+| Codebase fingerprint | Spawns parallel Explore subagents per directory segment; consolidates into a file map with architecture sketch, complexity estimates, and routing suggestions. Cached for downstream skills. | `mk:scout` |
+| External docs check | For any third-party API/library named in the spec (OAuth providers, SDKs, etc.), pulls current docs via Context7 / Context Hub. Avoids planning against outdated training data. | `mk:docs-finder` |
+| Spec cross-read | **You** read the Spec Research Report's `## Suggested User Stories` section next to the scout output, then decide whether the scope is feasible as-is, needs splitting, or hits an unblockable gap (e.g. "we don't have a session middleware yet"). | Human — no skill |
+
+### Sample output (scout, abridged)
+
+```
+Architecture sketch
+  Stack: NestJS + Vue 3 + Postgres
+  Auth surface: src/auth/ — already has GitHubOAuthService (plugin pattern)
+  Session middleware: src/auth/session.middleware.ts — currently fixed 24h
+  Test runner: vitest
+
+Files relevant to spec keywords
+  src/auth/oauth.controller.ts          (provider plugin pattern entry)
+  src/auth/github-oauth.service.ts      (reference impl)
+  src/auth/session.middleware.ts        (fixed expiry — needs change)
+  src/users/users.module.ts             (no OAuth fields yet)
+
+Gaps detected
+  No PKCE helper exists in the codebase (would be new code for Google's 2026 req)
+```
+
+### Feasibility decisions you make here
+
+After cross-reading the Spec Research Report against the scout output:
+
+| Spec story | Feasibility | Decision |
+|---|---|---|
+| "Sign in with Google" | HIGH — OAuth plugin pattern exists; just add a provider | Create ticket as-is |
+| "Sliding 24h session" | MEDIUM — middleware exists but uses fixed expiry; needs refactor | Create ticket; flag dependency before "Sign in with Google" |
+| "OAuth users can add password later" | LOW — users table has no OAuth-provider column; separate model change | Defer to a follow-up sprint; flag with PM |
+
+::: tip Why this step exists separately from Step 7
+Step 7's `mk:planning-engine review` produces a per-ticket Tech Review Report — but it needs a ticket key. If a requirement is infeasible against the current codebase, you want to know **before** it becomes a ticket that the team gets pressured to commit to. This Step 3 scan is the only chance.
+:::
+
+### What you carry forward
+
+A short, hand-written set of notes (kept in the Spec Research Report or a follow-up Confluence comment) that says, per suggested story: *feasibility level + any structural prerequisite*. These notes inform Step 4 (ticket creation) and resurface in Step 7 (per-ticket review) for confirmation.
+
+---
+
+## Step 4 — Create the Jira tickets (your decision)
 
 PM has replied. You now know: Google scopes = `email + profile`; expiry = sliding 24h; OAuth users can add a password later (separate ticket).
 
@@ -199,7 +268,7 @@ AUTH-203  Task   "Preserve email/password login flow"    (To Do)
 
 ---
 
-## Step 4 — Group into an epic and rank
+## Step 5 — Group into an epic and rank
 
 ### Prompt
 
@@ -225,7 +294,7 @@ The agent did not read "blocks" from the spec — you told it. The spec analyst 
 
 ---
 
-## Step 5 — Refine and estimate
+## Step 6 — Refine and estimate
 
 ### Prompt
 
@@ -273,22 +342,40 @@ AUTH-201 estimator
 
 ---
 
-## Step 6 — Tech review against your codebase
+## Step 7 — Tech review against your codebase (per-ticket + sprint-level)
+
+This is the deeper tech analysis the pre-ticket scan (Step 3) couldn't do. Now that tickets exist, `mk:planning-engine` has the keys it needs and runs in two modes:
+
+| Mode | Command | Output |
+|---|---|---|
+| **Per-ticket review** | `mk:planning-engine review AUTH-201 --scout` | Tech Review Report — affected files, feasibility, dependencies, risks, complexity signals for one ticket |
+| **Sprint-level plan with spec context** | `mk:planning-engine plan --tickets AUTH-201,AUTH-202,AUTH-203 --capacity 40 --scout --spec path/to/spec-research-report.md` | Planning Report — sprint goal candidate, dependency map, grouping, sequencing, capacity analysis, **plus** a `## Spec Context (mk:confluence-spec-analyst)` section that brings the upstream spec requirements / AC / gaps back into the planning view |
 
 ### Prompt
 
 ```bash
-/mk:scout                                            # fast codebase fingerprint
+# Per-ticket — run for each ticket entering the sprint
+/mk:scout                                            # only if not already cached from Step 3
 /mk:planning-engine review AUTH-201 --scout
+
+# Sprint-level — closes the spec → planning loop with the real --spec integration
+/mk:planning-engine plan \
+  --tickets AUTH-201,AUTH-202,AUTH-203 \
+  --capacity 40 \
+  --scout \
+  --spec tasks/reports/spec-research-260511-q3-auth-refresh.md
 ```
 
 ### What happens behind the scenes
 
 | Step | Action |
 |---|---|
-| `mk:scout` | Builds an architecture sketch (top-level dirs, framework, primary languages, test runner). Cached. |
-| `mk:planning-engine review` | Pulls ticket via `mk:jira-issue`, cross-references ACs against scout output, reports feasibility |
-| Spec linkage | If you pass `--spec path/to/spec-research-report.md`, planning-engine also reads the original spec for context preservation |
+| `mk:scout` | Reuses the cached fingerprint from Step 3 if available. If absent, rebuilds the architecture sketch. |
+| `mk:planning-engine review TICKET --scout` | Pulls the ticket via `mk:jira-issue`, cross-references ACs against scout output, emits a Tech Review Report per ticket. `[NO_CODEBASE_CONTEXT]` flag if scout was skipped. |
+| `mk:planning-engine plan --tickets ... --spec REPORT` | Validates the report path exists and starts with `# Spec Research Report:` (else prompts you to run `mk:confluence-spec-analyst` first and exits — no auto-invocation across skills). Extracts the report's Requirements / AC / Gaps sections and passes them inline to the planning-reporter agent. |
+| Spec context in output | The Planning Report gains a `## Spec Context (mk:confluence-spec-analyst)` section summarizing the upstream spec inputs the planning is based on. This is the *only* place the original spec resurfaces in the planning pipeline. |
+| Validation failure | If the `--spec` path is wrong or the report header doesn't match, planning-engine prompts and exits. Read failure **mid-flow** → `[NO_SPEC_CONTEXT: <error>]` flag in the report; planning continues without spec context. |
+| Where reports land | `planning-engine` writes to `tasks/reports/` because no plan-dir exists yet (per its SKILL.md report-persistence rule: "Active plan's `research/` if exists, else `tasks/reports/`"). These files stay there — Step 8's plan-creator does **not** auto-copy them into the new plan-dir. |
 
 ### Sample output (Tech Review Report)
 
@@ -327,17 +414,126 @@ Without scout, planning-engine guesses at file paths from the ticket text. Scout
 
 ---
 
-## Step 7 — Implement with `/mk:cook`
+## Step 8 — Plan per ticket with `/mk:plan-creator`
+
+Now that the tech review exists for each ticket, run `mk:plan-creator` **per ticket** to produce a durable, file-based implementation plan that goes through Gate 1 *before* any code is generated. This is what an engineering manager wants: Gate 1 visibility at sprint kickoff, not buried inside each developer's cook run.
+
+::: tip Why split this from `/mk:cook`
+`mk:cook` already runs `mk:plan-creator` at its own Phase 1. But running it standalone first has three measurable wins:
+
+1. **Earlier Gate 1.** Catching "this needs a security review" or "this hides a migration" at plan stage costs minutes. Catching it at Gate 2 costs hours of generated code thrown out.
+2. **Sprint-level plan portfolio.** With per-ticket plans materialized in `tasks/plans/`, the tech lead can read every plan side-by-side at sprint kickoff. Shared-file ownership conflicts surfaced by Step 7's `mk:planning-engine plan --spec` become actionable at this stage.
+3. **Plan persistence across context resets.** A standalone plan-creator artifact survives session death; a Phase-1-inside-cook plan is bundled with that one cook invocation.
+
+`mk:cook` accepts a plan path as its argument (`mk:cook/SKILL.md` line 70 — "code mode") and **skips its own Phase 1** when invoked that way. No double-planning.
+:::
+
+### Tier-aware decision (not blanket policy)
+
+| Ticket tier (from `mk:agent-detector` at Step 7) | Recommendation | Plan-creator mode |
+|---|---|---|
+| **TRIVIAL** — rename, typo, single-file config | **Skip** Step 8 | Plan-creator runs inline as `mk:cook` Phase 1 (cheaper than a separate session) |
+| **STANDARD** — feature < 5 files, bug fix, API endpoint | **Default** | `mk:plan-creator --fast` per ticket |
+| **COMPLEX** — auth, payments, data-model, any non-empty `matched_flags` from Step 7 Phase 0 | **Required** | `mk:plan-creator --hard` per ticket |
+
+The tier comes from `mk:agent-detector`'s Phase 0 output during Step 7's `mk:planning-engine review`. You do not re-derive it.
+
+### Prompt
+
+```bash
+# AUTH-201 was flagged COMPLEX in Step 7 (matched_flags: ["AUTH"])
+/mk:plan-creator --hard
+# Plan-creator interview prompts; you paste:
+#   - The Tech Review Report path from Step 7 (tasks/reports/...)
+#   - Ticket: AUTH-201
+#   - Linked spec: tasks/reports/spec-research-260511-q3-auth-refresh.md
+
+# AUTH-202 was flagged STANDARD
+/mk:plan-creator --fast
+
+# AUTH-203 was flagged TRIVIAL — skip Step 8 for this ticket;
+# `/mk:cook implement AUTH-203` at Step 9 will handle it inline.
+```
+
+### What happens behind the scenes
+
+| Layer | Action |
+|---|---|
+| Scope check | `step-00-scope-challenge.md` runs first; trivial scope exits early with a one-paragraph plan instead of a phase tree |
+| Research (in `--hard` / `--deep`) | 2-3 researcher subagents spawned in parallel, each capped at 5 calls; reports written to `tasks/plans/<slug>/research/` |
+| DoR advisory (if Agile context active) | Plan-creator checks `agile-story-gates.md` if `jira_tickets:` frontmatter is set; renders a Definition-of-Ready checklist; **does not block** — you decide |
+| Plan emission | Writes `tasks/plans/YYMMDD-<slug>/plan.md` (≤80 lines overview) + `phase-XX-*.md` per implementation phase |
+| Tech Review handoff (manual) | `mk:plan-creator` has **no auto-discovery** of Step 7's report. You reference the path during plan-creator's Validation Interview (Step 6 of its own workflow) or paste excerpts when asked about technical approach. The dev is responsible for citing it in `plan.md`'s Key Insights — plan-creator's "Research disconnected" gotcha (line 109 of its SKILL.md) only governs plan-creator's *own* researcher outputs, not external reports |
+| Where the Step 7 report stays | `tasks/reports/<filename>.md` — planning-engine wrote it there because no plan dir existed at Step 7 (per `planning-engine/SKILL.md` lines 81-83). It is **not** copied or moved into `tasks/plans/<slug>/research/` |
+| Gate 1 | The skill emits the plan for human review. `gate-enforcement.sh` will block any downstream cook code mode if the plan file has no approval line. |
+
+### What you have after Step 8
+
+```
+tasks/
+├── reports/                                            ← from Step 7 (unchanged)
+│   ├── tech-review-260511-auth-201.md                  (mk:planning-engine review AUTH-201)
+│   ├── tech-review-260511-auth-202.md                  (mk:planning-engine review AUTH-202)
+│   ├── planning-260511-sprint.md                       (mk:planning-engine plan --tickets ... --spec)
+│   └── spec-research-260511-q3-auth-refresh.md         (from Step 1, mk:confluence-spec-analyst)
+└── plans/                                              ← new in Step 8
+    ├── 260511-auth-201-google-oauth/
+    │   ├── plan.md
+    │   ├── phase-01-service-skeleton.md
+    │   ├── phase-02-controller-route.md
+    │   ├── phase-03-integration-tests.md
+    │   └── research/                                   ← plan-creator's own researchers (--hard mode)
+    │       ├── researcher-01-oauth-libraries.md
+    │       └── researcher-02-pkce-strategies.md
+    ├── 260511-auth-202-sliding-session/
+    │   ├── plan.md
+    │   └── phase-01-middleware-refactor.md
+    └── (AUTH-203 has no plan dir — TRIVIAL, will plan inline at Step 9)
+```
+
+::: warning Two distinct research artifacts — don't confuse them
+- **`tasks/reports/tech-review-*.md`** — Step 7's output from `mk:planning-engine`. Stays where it was written. Cited by hand in `plan.md`.
+- **`tasks/plans/<slug>/research/`** — Step 8's plan-creator researchers (only in `--hard`/`--deep` modes). Different agents, different artifacts, different purpose.
+
+There is no automatic copy or symlink between them. If you want the Tech Review summary visible in the plan, paste the relevant lines into `plan.md`'s Key Insights yourself during plan-creator's interview.
+:::
+
+::: danger GATE 1 — happens HERE in this workflow
+When plan-creator runs standalone, Gate 1 fires at Step 8 (not inside Step 9's cook). The tech lead approves every sprint plan in one sitting. When `/mk:cook <plan-path>` runs at Step 9, it sees an approved plan and goes straight to Phase 2 / Phase 3.
+:::
+
+### Engineering manager caveats
+
+| Risk | Mitigation |
+|---|---|
+| **Plan staleness** — `mk:cook` SKILL.md warns: plans >14 days old trigger a re-validation prompt | Pick up tickets within 14 days of sprint kickoff; for slipped sprints, re-run `mk:plan-creator` on stale tickets before cook |
+| **Overplanning** — devs treat the plan as gospel and `/mk:cook --auto` without re-reading | Gate 1 is still hook-enforced regardless; the policy should be that devs re-read the plan when picking up a ticket |
+| **Tier mis-classification** — TRIVIAL ticket gets a full plan | Trust `mk:agent-detector`'s tier; if a STANDARD ticket gets plan-created and reveals 0 phases of substance, that's a signal to demote it to TRIVIAL and skip the standalone plan next time |
+
+---
+
+## Step 9 — Implement with `/mk:cook`
 
 You've chosen AUTH-201 for this sprint. Time to build.
 
 ### Prompt
 
 ```bash
-/mk:cook implement AUTH-201
+# AUTH-201 has a plan from Step 8 — call cook in "code mode" with the plan path.
+# cook skips its own Phase 1 (plan-creator) because the plan is already approved.
+/mk:cook tasks/plans/260511-auth-201-google-oauth/plan.md
+
+# AUTH-203 (TRIVIAL — skipped Step 8) — pass a natural-language task.
+# cook runs the full pipeline including Phase 1 inline.
+/mk:cook implement AUTH-203
 ```
 
-Optional flags: `--tdd` (failing test first), `--fast` (skip Phase 1 research). For this walkthrough we run the default pipeline.
+Optional flags: `--tdd` (failing test first), `--fast` (skip Phase 1 research). For this walkthrough we run the default pipeline for AUTH-201.
+
+::: tip Phase 1 behavior
+- **Plan-path entry (AUTH-201, AUTH-202):** Phase 1 is SKIPPED. Cook reads the approved plan from Step 8 and goes straight to Phase 2 / Phase 3.
+- **Natural-language entry (AUTH-203):** Phase 1 runs inline — `mk:plan-creator` produces the plan and Gate 1 fires inside the cook invocation.
+:::
 
 ### What happens behind the scenes — the 7 phases
 
@@ -348,7 +544,7 @@ This is where the most happens per command. Each phase is observable.
 ```
 mk:agent-detector reads:
   - AUTH-201 description + ACs (via mk:jira-issue)
-  - The Tech Review Report from Step 6 (if present in tasks/reports/)
+  - The Tech Review Report from Step 7 (if present in tasks/reports/)
 mk:scale-routing scans for vertical-domain CSV match
   → "OAuth" matches auth domain → level=high → tier override: COMPLEX
 mk:risk-checklist flags:
@@ -370,17 +566,20 @@ Routed to: planner → developer → security → reviewer → shipper
 #### Phase 1 — Plan
 
 ```
-mk:plan-creator runs in --hard mode (forced by AUTH flag)
-Writes:
-  tasks/plans/260511-auth-201-google-oauth/
-  ├── plan.md                          (≤80 lines overview)
-  ├── phase-01-service-skeleton.md     (new oauth-google.service.ts)
-  ├── phase-02-controller-route.md     (add /google route + callback)
-  └── phase-03-integration-tests.md
+Plan-path entry (AUTH-201): SKIPPED
+  cook detects an existing plan.md → enters code mode
+  → no plan-creator invocation, no re-research
+
+Natural-language entry (AUTH-203, TRIVIAL):
+  mk:plan-creator runs inline in --fast mode
+  Writes a one-paragraph plan; phases collapsed
 ```
 
-::: danger GATE 1 — Human approval required
-The pipeline halts. You read `plan.md`, then either approve in chat or edit the plan files and re-prompt. `gate-enforcement.sh` blocks Phase 3 from starting if no approval line exists.
+::: danger GATE 1 — Where it fires
+- **For tickets that went through Step 8** (AUTH-201, AUTH-202): Gate 1 already fired at Step 8 standalone. Cook treats the existing plan as approved (sources approval from the plan file's approval line).
+- **For tickets that skipped Step 8** (TRIVIAL — AUTH-203): Gate 1 fires here, inside cook's Phase 1. `gate-enforcement.sh` still blocks Phase 3 if no approval line exists.
+
+Gate 1 is non-bypassable in both paths.
 :::
 
 #### Phase 2 — Test (only if `--tdd`)
@@ -450,7 +649,7 @@ mk:memory appends to:
 
 ---
 
-## Step 8 — After merge: close the loop
+## Step 10 — After merge: close the loop
 
 When the PR merges:
 
@@ -496,22 +695,25 @@ Three systems, three artifacts crossing each seam. No more, no less.
 | Step 1 | `mk:confluence-spec-analyst` | read Confluence, write local report | Forks agent; multimodal optional |
 | Step 1 | `mk:multimodal` *(opt)* | read media | Image/PDF findings in the report |
 | Step 2 | `mk:confluence-collaborate` | write Confluence | Footer comments for open questions |
-| Step 3 | `mk:jira-issue` | write Jira | One verb per ticket, no bulk |
-| Step 3 | `mk:jira-fields` *(opt)* | read Jira | Resolves custom required fields |
-| Step 4 | `mk:jira-agile` | write Jira | Epic-add + rank |
-| Step 4 | `mk:jira-relationships` | write Jira | Blocks / depends-on links |
-| Step 5 | `mk:jira-evaluator` | read Jira | Complexity + inconsistencies |
-| Step 5 | `mk:jira-estimator` | read Jira | Story-point suggestion |
-| Step 6 | `mk:scout` | read codebase | Fingerprint cache |
-| Step 6 | `mk:planning-engine` | read all | Tech Review Report |
-| Step 7 P0 | `mk:agent-detector` + `mk:scale-routing` | read | Tier + matched_flags |
-| Step 7 P1 | `mk:plan-creator` | write plan files | Gate 1 enforced |
-| Step 7 P2 | `mk:testing` *(`--tdd`)* | write tests | RED-phase gate |
-| Step 7 P3 | `mk:cook` inner build | write code | Incremental commits |
-| Step 7 P4 | `mk:review` | write verdict | Gate 2 enforced |
-| Step 7 P5 | `mk:ship` + `mk:jira-dev` + `mk:jira-lifecycle` | write git + Jira | Branch, PR, transition |
-| Step 7 P6 | `mk:memory` | write `.claude/memory/` | Cross-session continuity |
-| Step 8 | `mk:jira-lifecycle` + `mk:jira-collaborate` + `mk:confluence-collaborate` | write Jira + Confluence | Close the loop |
+| Step 3 | `mk:scout` | read codebase | Pre-ticket fingerprint (cached for Step 7) |
+| Step 3 | `mk:docs-finder` *(opt)* | read external docs | Current third-party API/library docs |
+| Step 4 | `mk:jira-issue` | write Jira | One verb per ticket, no bulk |
+| Step 4 | `mk:jira-fields` *(opt)* | read Jira | Resolves custom required fields |
+| Step 5 | `mk:jira-agile` | write Jira | Epic-add + rank |
+| Step 5 | `mk:jira-relationships` | write Jira | Blocks / depends-on links |
+| Step 6 | `mk:jira-evaluator` | read Jira | Complexity + inconsistencies |
+| Step 6 | `mk:jira-estimator` | read Jira | Story-point suggestion |
+| Step 7 | `mk:planning-engine review TICKET --scout` | read all | Per-ticket Tech Review Report |
+| Step 7 | `mk:planning-engine plan --tickets ... --spec REPORT --scout` | read all | Sprint-level Planning Report with Spec Context section |
+| Step 8 | `mk:plan-creator --hard` *(COMPLEX)* / `--fast` *(STANDARD)* / *skip (TRIVIAL)* | write plan files | Standalone Gate 1 per ticket; durable plan artifacts |
+| Step 9 P0 | `mk:agent-detector` + `mk:scale-routing` | read | Tier + matched_flags |
+| Step 9 P1 | `mk:plan-creator` | write plan files | **SKIPPED** in code mode (plan from Step 8) — runs only for TRIVIAL tickets |
+| Step 9 P2 | `mk:testing` *(`--tdd`)* | write tests | RED-phase gate |
+| Step 9 P3 | `mk:cook` inner build | write code | Incremental commits |
+| Step 9 P4 | `mk:review` | write verdict | Gate 2 enforced |
+| Step 9 P5 | `mk:ship` + `mk:jira-dev` + `mk:jira-lifecycle` | write git + Jira | Branch, PR, transition |
+| Step 9 P6 | `mk:memory` | write `.claude/memory/` | Cross-session continuity |
+| Step 10 | `mk:jira-lifecycle` + `mk:jira-collaborate` + `mk:confluence-collaborate` | write Jira + Confluence | Close the loop |
 
 ## Human gates summary
 
@@ -520,19 +722,21 @@ Every gate where automation stops and a human decides.
 | Gate | Where | Who decides |
 |---|---|---|
 | Resolve spec ambiguities | After Step 1 | Dev + PM |
-| Which suggestions become tickets | Step 3 | Dev |
-| Story-point estimate | After Step 5 | Team (planning poker) |
-| Ticket ranking + dependencies | Step 4 | Dev / tech lead |
-| **Gate 1** — plan approval | Phase 1 of `/mk:cook` | Dev (hook-enforced) |
-| **Gate 2** — review verdict | Phase 4 of `/mk:cook` | Dev (hook-enforced) |
+| Feasibility / defer decision per suggested story | After Step 3 | Dev |
+| Which suggestions become tickets | Step 4 | Dev |
+| Story-point estimate | After Step 6 | Team (planning poker) |
+| Ticket ranking + dependencies | Step 5 | Dev / tech lead |
+| Tier-aware plan-creator decision (skip TRIVIAL / `--fast` STANDARD / `--hard` COMPLEX) | Start of Step 8 | Dev / tech lead |
+| **Gate 1** — plan approval | Step 8 standalone (STANDARD/COMPLEX), OR inside `/mk:cook` Phase 1 (TRIVIAL only) | Dev (hook-enforced) |
+| **Gate 2** — review verdict | Phase 4 of `/mk:cook` (Step 9) | Dev (hook-enforced) |
 | Ship despite WARN dimensions | After Gate 2 | Dev |
 
 ## Common deviations
 
 | Situation | Skip to |
 |---|---|
-| Spec is already a Jira ticket (no Confluence) | Step 5 — straight to evaluation |
-| Tickets exist but no spec analysis was done | Step 5; consider asking the PO to back-fill ACs |
+| Spec is already a Jira ticket (no Confluence) | Step 6 — straight to evaluation |
+| Tickets exist but no spec analysis was done | Step 6; consider asking the PO to back-fill ACs |
 | Bug, not a feature | Use [Fixing a Bug](/workflows/fix-bug); spec-analyst doesn't apply |
 | Hotfix (one-shot, zero blast radius) | `/mk:fix` bypasses Gate 1 per `scale-adaptive-rules.md` Rule 4 |
 | Green-field product build | [Autonomous Build](/workflows/autonomous-build) (`/mk:harness`) — different pipeline |
@@ -543,9 +747,10 @@ Every gate where automation stops and a human decides.
 |---|---|
 | Spec changed mid-sprint | Re-run `/mk:confluence-spec-analyst` — the report includes a source-page hash so you can see what changed |
 | Estimate was way off | Update points via `/mk:jira-agile set-story-points`; the team retro picks this up |
-| Gate 1 plan rejected | Edit the phase files directly, re-prompt `/mk:cook` — it picks up where it left off |
+| Gate 1 plan rejected at Step 8 | Edit `tasks/plans/<slug>/phase-*.md` directly, re-prompt `/mk:plan-creator` (or just re-approve) before invoking `/mk:cook <plan-path>` at Step 9 |
+| Plan went stale (>14 days since Step 8) | `mk:cook` will warn on stale plan in code mode — re-run `/mk:plan-creator` on that ticket before cook |
 | Gate 2 verdict FAIL | Fix the failing dimension, re-run `/mk:review`. No override. |
-| Two tickets want the same file | `mk:planning-engine` flagged this in Step 6 — sequence them, don't parallelize |
+| Two tickets want the same file | `mk:planning-engine` flagged this in Step 7 — sequence them, don't parallelize |
 
 ## Related
 
