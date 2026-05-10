@@ -53,6 +53,19 @@ The **analyst** provides cost and pattern data from `memory/`:
 If Atlassian MCP is available, mk:retro can pull sprint velocity and ticket metrics directly from Jira. Currently mk:retro uses git history only — Jira sprint data integration is planned for a future release.
 :::
 
+### Step 4: Action-item ceremony (Agile mode)
+
+When an Agile context is active (sprint-state contract present, `MEOW_JIRA_BASE_URL` env, `jira_tickets:` in plans, or Jira-key prompt match), `mk:retro` parses the narrative for `## 3 Things to Improve` and `## 3 Habits for Next Week` and surfaces a per-item AskUserQuestion:
+
+| Option | Effect |
+|--------|--------|
+| Create Jira story now | Invokes `mk:jira-issue create` with body pre-filled — REQUIRES user review before submit |
+| Add to plan TODO | Appends to active plan as a TODO item |
+| Document as no-action | Appends to `.claude/memory/retros/{date}-decisions.md` with reason |
+| Defer to next retro | Carries the item forward |
+
+The retro is not "complete" until every surfaced action has a disposition. NEVER auto-creates Jira stories — preserves the reports-not-automation principle. In non-Agile sessions this step is inert (the rule isn't loaded). Governed by `.claude/rules-conditional/agile-feedback-cycle.md`.
+
 ## Next workflow
 
 → [Architecture Decisions](/workflows/architecture) — document architectural choices

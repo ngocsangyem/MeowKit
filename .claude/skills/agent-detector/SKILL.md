@@ -52,6 +52,23 @@ user-invocable: false
 
    If any `Read` fails: ABORT with `PHASE-ZERO RULE MISSING: <name>` — same fail-fast semantics as Step 0. These rules drive the routing logic in steps 2–4; without them, detection silently degrades to keyword-only.
 
+   **Agile context detection (additive — Agile-only load).** After the 5 phase-zero `Read`s succeed:
+
+   1. **PRE-FLIGHT.** Check that `.claude/rules-conditional/` directory exists. If absent → log `agile rules: rules-conditional/ not deployed; skipping load` and skip steps 2–4. (Defensive: filesystem may lag pruning-plan status doc.)
+   2. **Detect Agile context — OR-logic, any one match triggers load:**
+      - Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
+      - Active plan frontmatter has non-empty `jira_tickets:`
+      - `MEOW_JIRA_BASE_URL` env var is set
+      - Last user message matches `[A-Z]{2,10}-\d+` (Jira-key pattern)
+   3. **If Agile context detected, `Read` the 3 conditional rules:**
+      - `.claude/rules-conditional/agile-story-gates.md`
+      - `.claude/rules-conditional/agile-sprint-commitment.md`
+      - `.claude/rules-conditional/agile-feedback-cycle.md`
+      Per-file Read failure (file absent inside the directory): log and skip THAT rule; do NOT abort Step 0b. The phase-zero baseline is already loaded.
+   4. **Sprint-goal banner.** If a sprint-state contract exists, parse `sprint_goal:` from the newest active sprint-state file (status: active) and surface in the orient banner.
+
+   Non-Agile sessions skip steps 1–4 silently — zero context cost.
+
 1. **Check cache** -- reuse cached result if same workflow and phase > 1. See `references/detection-process.md`
 2. **Score agents** -- analyze task content, extract keywords, check project context across all layers (0-4). See `references/multi-layer-detection.md`, `references/scoring-and-thresholds.md`
 3. **Select model + mode** -- map complexity to model tier, check team mode eligibility. See `references/model-selection.md`, `references/complexity-detection.md`, `references/team-mode.md`

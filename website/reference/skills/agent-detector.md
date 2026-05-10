@@ -130,3 +130,22 @@ Result:
 - For cross-domain tasks, state the primary concern explicitly at the start (e.g., "Security task: add check to the payment UI") so Layer 0 detection anchors correctly.
 - The detection cache does NOT invalidate on pivot signals. After any explicit task change ("actually, let's do X instead"), confirm the banner is correct — if not, start a new message explicitly describing the new task.
 - Short messages with domain keywords ("fix the auth token") score high for complex agents even for one-line changes — the detector favors keyword matches over scope signals.
+
+## Step 0b — Agile context detection (additive)
+
+After loading the 5 phase-zero rules, Step 0b checks for an Agile context and conditionally loads 3 additional rules from `.claude/rules-conditional/agile-*.md`. Non-Agile sessions skip this load silently — zero context cost.
+
+**Pre-flight:** verify `.claude/rules-conditional/` directory exists. If absent → log and skip steps 2–4 (defensive against drift between status doc and filesystem).
+
+**Detection (OR-logic, any one match triggers load):**
+
+| Condition | Mechanism |
+|-----------|-----------|
+| Sprint-state contract present | Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result |
+| Active plan frontmatter | Non-empty `jira_tickets:` |
+| Env var | `MEOW_JIRA_BASE_URL` set |
+| User prompt | Last user message matches `[A-Z]{2,10}-\d+` |
+
+**Load:** if Agile context detected, `Read` each of the 3 rules. Per-file Read failure → log and skip THAT rule; do NOT abort Step 0b.
+
+**Sprint-goal banner:** if a sprint-state contract exists, parse `sprint_goal:` from the newest active sprint-state file (status: active) and surface in the orient banner.

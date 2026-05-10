@@ -44,6 +44,22 @@ The planning engine. Creates a complete implementation plan before any code is w
 | `--two-approach` | Two-alternative design with trade-off comparison |
 | `--no-design` | Skip design language subagent (product-level only) |
 | `--no-scout` | Skip codebase scout (product-level only) |
+| `--spike --timebox <duration>` | Time-boxed investigation (Agile mode). Skips research, codebase analysis, red-team, validation interview. Uses `assets/spike-plan-template.md` (investigate + findings, no test/ship). Incompatible with `--product-level` and `mk:harness` FULL |
+
+### Spike mode (Agile context)
+
+Governed by `.claude/rules-conditional/agile-feedback-cycle.md` Section 2 (loaded only when Agile context active).
+
+- Requires `--timebox <duration>` (e.g., `--timebox 2d`, `--timebox 4h`); rejected without it
+- Sets plan frontmatter `spike: true`, `timebox:`, `findings_doc:` (default `tasks/plans/{slug}/findings.md`)
+- Two phases only: investigate + document findings — NO test phase, NO ship phase
+- Story-points cap (advisory): warn if `story_points > 5`
+- INCOMPATIBLE with `mk:harness` FULL density (harness gate breaks); use `mk:cook` or `mk:plan-creator --fast`
+- At spike completion: prompt to convert findings to delivery story / close as research-only / defer
+
+### DoR advisory at Phase 1 entry (Agile context)
+
+If the plan frontmatter has non-empty `jira_tickets:`, `mk:plan-creator` runs the DoR advisory checklist (5 mechanical checks per ticket) BEFORE generating phase files. Advisory only — never blocks. Skip silently when `jira_tickets:` absent or rule not loaded. Governed by `agile-story-gates.md` Section 1.
 
 ## Workflow (10 step files)
 

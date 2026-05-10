@@ -33,6 +33,18 @@ Source file: `docs/rules-index.md`
 | `phase-contracts.md` | Phase input/output contract table | MeowKit original | Phases 1-6 |
 | `risk-checklist.md` | Horizontal risk flags feeding model escalation | MeowKit original | Phase 0 |
 
+## Agile Conditional Rules
+
+Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sprint-state contract present, `jira_tickets:` in plan frontmatter, `MEOW_JIRA_BASE_URL` env var set, or Jira-key pattern in user prompt). Non-Agile sessions pay zero context cost.
+
+| Rule | Purpose | Loaded by |
+|------|---------|-----------|
+| `agile-story-gates.md` | Definition of Ready (Phase 1 entry), Definition of Done (Gate 2 PASS), traceability frontmatter contract | `mk:agent-detector` Step 0b (Agile context) |
+| `agile-sprint-commitment.md` | Sprint goal persistence, mid-sprint amendment ceremony, sprint close hygiene | `mk:agent-detector` Step 0b (Agile context) |
+| `agile-feedback-cycle.md` | Retro action-item ceremony, spike governance (timebox + findings doc) | `mk:agent-detector` Step 0b (Agile context) |
+
+These rules live at `.claude/rules-conditional/agile-*.md`. They wire into existing skills (`mk:plan-creator`, `mk:sprint-contract`, `mk:retro`, `mk:jira-agile`, `mk:ship`, `project-manager` agent) — no new agents, no new hooks, no new gates.
+
 ## Loading Priority
 
 Higher number = stronger override:

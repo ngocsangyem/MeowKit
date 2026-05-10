@@ -34,6 +34,16 @@ Live alongside the always-on rules but are loaded explicitly by `mk:agent-detect
 | `scale-adaptive-rules.md` | Domain-based complexity routing, CSV match override, Gate 1 one-shot bypass | `mk:agent-detector` Step 0b |
 | `risk-checklist.md` | Phase 0 horizontal-risk flag eval (9 flags); auto-escalation feeds `model-selection-rules.md` Rule 2 | `mk:agent-detector` Step 0b |
 
+### Agile Conditional Rules (`.claude/rules-conditional/`)
+
+Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sprint-state contract present, `jira_tickets:` in plan frontmatter, `MEOW_JIRA_BASE_URL` env, or Jira-key pattern in user prompt). Non-Agile sessions pay zero context cost.
+
+| Rule | Purpose | Loaded by |
+| ---- | ------- | --------- |
+| `agile-story-gates.md` | Definition of Ready (Phase 1 entry) + Definition of Done (Gate 2 PASS) + traceability frontmatter contract | `mk:agent-detector` Step 0b (Agile context) |
+| `agile-sprint-commitment.md` | Sprint goal persistence, mid-sprint amendment ceremony, sprint close hygiene | `mk:agent-detector` Step 0b (Agile context) |
+| `agile-feedback-cycle.md` | Retro action-item ceremony, spike governance (timebox + findings doc) | `mk:agent-detector` Step 0b (Agile context) |
+
 ## Loading Priority
 
 Rules are applied in this priority (higher = stronger override):
@@ -59,6 +69,11 @@ Rules are applied in this priority (higher = stronger override):
 - `rules/model-selection-rules.md`
 - `rules/scale-adaptive-rules.md`
 - `rules/risk-checklist.md`
+
+**Agile conditional** (live in `rules-conditional/`, loaded by `mk:agent-detector` Step 0b only when Agile context detected):
+- `rules-conditional/agile-story-gates.md`
+- `rules-conditional/agile-sprint-commitment.md`
+- `rules-conditional/agile-feedback-cycle.md`
 
 ## Hook Enforcement
 

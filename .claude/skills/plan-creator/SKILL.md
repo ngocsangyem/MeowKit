@@ -8,7 +8,7 @@ description: >-
   validation. Enforces Gate 1. Activated by /mk:plan or /mk:cook.
   NOT for ticket complexity analysis against an existing codebase (see mk:planning-engine);
   NOT for CEO-level scope review of existing plans (see mk:plan-ceo-review).
-argument-hint: "[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout]] [--tdd] OR [archive | red-team {path} | validate {path}]"
+argument-hint: "[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] OR [archive | red-team {path} | validate {path}]"
 allowed-tools:
   - Bash
   - Read
@@ -56,6 +56,14 @@ Skip when:
 | `--parallel`      | Parallel               | 2 researchers           | plan.md + phases + ownership matrix                                      | Full interview                                                               |
 | `--two`           | Two approaches         | 2 researchers           | 2 approach files + trade-off matrix                                      | After selection                                                              |
 | `--product-level` | Product spec           | 2 researchers (broader) | plan.md only (user stories + features + design language; NO phase files) | Semantic + check-product-spec.sh (no red-team, no validation interview — v1) |
+| `--spike`         | Time-boxed investigation | Skip                  | spike plan from `assets/spike-plan-template.md` (investigate + findings phases; NO test/ship) | Semantic only |
+
+**`--spike` constraints (Agile context only — gated by `agile-feedback-cycle.md` 2 when loaded):**
+
+- Requires `--timebox <duration>` (e.g., `--timebox 2d`, `--timebox 4h`); reject with "spike requires --timebox" if absent
+- Sets plan frontmatter `spike: true`, `timebox:`, and `findings_doc:` (default `tasks/plans/{slug}/findings.md`)
+- INCOMPATIBLE with `--product-level` and `mk:harness` FULL density (harness gate breaks). Reject combination "spike incompatible with harness FULL — use --fast or mk:cook"
+- Advisory cap: warn if `story_points > 5` — likely two spikes, or spike + story
 
 ## Workflow
 
@@ -63,6 +71,8 @@ Before starting, read `references/failure-catalog.md` for common planning failur
 
 Execute via `workflow.md`. Step-file architecture — load one step at a time.
 Fast mode (`--fast`) uses `workflow-fast.md` (steps 00→03→04→07→08).
+
+**Agile DoR advisory (Phase 1 entry, conditional):** if the parsed plan frontmatter contains a non-empty `jira_tickets:` list AND `agile-story-gates.md` is loaded (Agile context active per `mk:agent-detector` Step 0b), run 1 of `agile-story-gates.md` for each ticket BEFORE generating phase files. Render the advisory checklist; never block — let the user decide. Skip silently when `jira_tickets:` is absent or the rule is not loaded.
 
 ```
 Step 0: Scope Challenge → trivial (exit) | simple (fast) | complex (hard/deep)
@@ -108,6 +118,7 @@ tasks/plans/YYMMDD-name/
 | `workflow-fast.md`                                 | Compact step sequence for `--fast` mode (00→03→04→07→08)                                                                                                                      |
 | `step-03a-product-spec.md`                         | Product-level spec drafter: user stories, features, design language. Replaces step-03 when `planning_mode = product-level`.                                                   |
 | `assets/product-spec-template.md`                  | Product spec template (Vision, Features, Design Language, AI Integration, Out-of-Scope)                                                                                       |
+| `assets/spike-plan-template.md`                    | Spike plan template (used when `planning_mode = spike`). Two phases: investigate + findings. Required frontmatter: `spike: true`, `timebox:`, `findings_doc:`. NOT compatible with `mk:harness` FULL. |
 | `references/anthropic-example-plan.md`             | RetroForge few-shot calibration example for product-level mode (ambition + feature density reference)                                                                         |
 | `step-05-red-team.md`                              | Red team review: persona scaling, subagent dispatch, adjudication                                                                                                             |
 | `step-06-validation-interview.md`                  | Critical question generation and answer propagation                                                                                                                           |

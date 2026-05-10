@@ -51,3 +51,31 @@ Mixing project keys and board IDs is the #1 source of "board not found" errors.
 ## Agent
 
 [`jira-agile`](/reference/agents/jira-agile) — A + C, NOT B.
+
+## Sprint Commitment Hooks (Agile mode)
+
+When `tasks/contracts/sprint-state-{date}-sprint-{N}.md` exists with `status: active`, governed by `.claude/rules-conditional/agile-sprint-commitment.md` (loaded only when Agile context detected):
+
+### `sprint add KEY` and `sprint remove KEY` (post-start)
+
+1. Read newest sprint-state file matching the active sprint
+2. Acquire `flock` on the sprint-state file (concurrent-write safety — YAML frontmatter append is non-atomic across shells)
+3. AskUserQuestion: "Reason for mid-sprint scope change?" — required free-text
+4. Append `{ ts, action: add|remove, ticket, reason }` to `amendments:` list
+5. Release lock; proceed with the underlying jira-as call
+
+If sprint-state contract is absent OR `status: closed`, the amendment ceremony is skipped silently.
+
+### `sprint close`
+
+1. Read `committed_tickets:` from newest active sprint-state
+2. Query each via `mk:jira-issue get KEY`
+3. For each non-terminal ticket (not Done/Cancelled/Won't-Do): "PROJ-X is in {status}. Carry over? Drop? Mark not delivered?"
+4. Write closure summary: `status: closed`, `closed_at`, `delivered: [...]`, `carried_over: [...]`
+5. Proceed with the underlying jira-as call
+
+### Validator scope (sprint-state vs sprint-contract)
+
+- `mk:sprint-contract/scripts/validate-contract.sh` validates per-story sprint-CONTRACT files only
+- Sprint-STATE files have NO validator — YAML parsed inline by this skill, `mk:agent-detector`, and `mk:sprint-contract sprint-goal`
+- Do not invoke `validate-contract.sh` on a sprint-state path; it WILL fail (sprint-state lacks contract schema fields by design)

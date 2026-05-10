@@ -70,6 +70,26 @@ Each rubric is loaded by `mk:rubric load <name>` or as part of a composition pre
 | `mk:benchmark` | 8 | **Shipped 260408** — `/mk:benchmark run [--full]`, quick tier 5 tasks ≤$5, full tier 6 tasks ≤$30 |
 | `conversation-summary-cache.sh` middleware | 9 | **Shipped 260408** — dual-event hook (Stop summarizes via detached `nohup` `claude -p --model haiku` background worker, UserPromptSubmit injects cached summary as user-visible context). Throttled by size + event gap + growth delta. Cleared on session change by `project-context-loader.sh`. User-facing inspector: `/mk:summary`. Env-var configurable. |
 
+## Agile Conditional Rule Triggers
+
+OR-logic: any one match → `mk:agent-detector` Step 0b loads the 3 Agile rules.
+
+| Trigger | Detection mechanism | Loaded rules |
+|---|---|---|
+| Sprint-state contract present | Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result | `agile-*.md` |
+| Plan frontmatter `jira_tickets:` non-empty | YAML parse on active plan | `agile-*.md` |
+| `MEOW_JIRA_BASE_URL` env var set | shell env | `agile-*.md` |
+| Jira-key pattern in last user message | regex `[A-Z]{2,10}-\d+` | `agile-*.md` |
+
+| Skill subcommand | Triggered by | Effect |
+|---|---|---|
+| `mk:sprint-contract sprint-goal` (set/show/align) | user `/mk:sprint-contract sprint-goal ...` | Read/write sprint-LEVEL goal in `tasks/contracts/sprint-state-{date}-sprint-{N}.md` |
+| `mk:plan-creator --spike --timebox <duration>` | user CLI flag OR plan frontmatter `spike: true` | Skip step-01/02/05/06; use `assets/spike-plan-template.md`; reject `--spike --product-level` and `--spike` + harness FULL |
+| `mk:retro` step 5 (action-item ceremony) | retro completes step 4 with Agile context active | Parse `## 3 Things to Improve` + `## 3 Habits for Next Week`; per-item AskUserQuestion |
+| `mk:jira-agile sprint add/remove` (post-start) | sprint-state contract has `status: active` | flock + amendment append + reason prompt |
+| `mk:jira-agile sprint close` | always (skips silently when no sprint-state) | Per-ticket disposition prompt for non-terminal commits + closure summary |
+| `mk:ship` Gate 2 PASS DoD prompts | verdict frontmatter has non-empty `jira_tickets:` | 3 opt-in prompts (verdict comment, transition, AC checkbox) |
+
 ## Maintenance
 
 This file is the **canonical source** for skill discovery. Add a row whenever a new skill ships. Remove a row when a skill is pruned.

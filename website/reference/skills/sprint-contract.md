@@ -34,6 +34,19 @@ Creates and negotiates a sprint contract — a signed agreement between the gene
 | `--amend` | Amend an existing contract (appends to negotiation log, nullifies signatures) |
 | `--sign` | Sign the contract (generator or evaluator) |
 | `--validate` | Run `validate-contract.sh` checks |
+| `sprint-goal set/show/align` | Sprint-LEVEL goal management (Agile mode — gated by `agile-sprint-commitment.md` Section 1) |
+
+### sprint-goal subcommand (Agile mode)
+
+Sprint-LEVEL goal contract — distinct from per-story sprint-CONTRACT files. Writes to `tasks/contracts/sprint-state-{date}-sprint-{N}.md` using `assets/sprint-state-template.md`.
+
+| Action | Form | Effect |
+|--------|------|--------|
+| `set` | `mk:sprint-contract sprint-goal set "<text>" --sprint N` | Writes `sprint_goal:` (≤120 chars) to sprint-state file. Creates the file if absent. Acquires `flock` for concurrent-write safety |
+| `show` | `mk:sprint-contract sprint-goal show --sprint N` | Prints current `sprint_goal:` |
+| `align` | `mk:sprint-contract sprint-goal align --plan <path>` | Renders alignment between plan goal and sprint goal. Advisory only |
+
+**Validator scope note:** the existing `validate-contract.sh` validates per-story sprint-CONTRACT files only. Sprint-STATE files have NO validator — YAML is parsed inline by consuming skills.
 
 ## Workflow
 

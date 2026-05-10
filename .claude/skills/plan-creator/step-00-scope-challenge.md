@@ -168,6 +168,26 @@ Present via AskUserQuestion:
 
 **Note:** `planning_mode = product-level` skips the EXPANSION/HOLD/REDUCTION scope question (it is product-level by definition — ambition is the default).
 
+### 0h-spike. Spike Mode Detection (Agile context)
+
+**Skip if:** user did NOT pass `--spike` AND plan frontmatter does NOT contain `spike: true`.
+
+**If `--spike` flag is present OR frontmatter has `spike: true`:**
+
+1. **Reject incompatible combinations:**
+   - `--spike` + `--product-level` → emit "spike incompatible with --product-level" → STOP
+   - `--spike` + harness FULL density invocation → emit "spike incompatible with harness FULL — use --fast or mk:cook" → STOP
+2. **Require timebox.** If `--timebox <duration>` flag absent (and no `timebox:` in frontmatter) → emit "spike requires --timebox (e.g., --timebox 2d)" → STOP
+3. **Set planning_mode = spike.** Override any auto-detected mode
+4. **Set frontmatter additions for plan.md:**
+   - `spike: true`
+   - `timebox: "<duration>"` (from `--timebox` flag)
+   - `findings_doc: "tasks/plans/{slug}/findings.md"` (default; user-overridable)
+5. **Skip step-01 (research) and step-02 (codebase analysis).** Proceed directly to step-03 with the spike template at `assets/spike-plan-template.md`
+6. **Story-points advisory:** if user passed `--story-points N` and N > 5, surface `Spike with story_points={N} > 5 — likely two spikes, or spike + story. Continue?` (advisory only, never blocks)
+
+Spike plans use `assets/spike-plan-template.md` instead of the full phase template. The template defines two phases only: investigate + document findings (NO test, NO ship). Phase 5 is "Findings doc written and reviewed".
+
 ### 0i. Composable Flags
 
 **`--tdd` flag detection:**
@@ -181,15 +201,17 @@ Default: `tdd_mode = false`.
 ## Output
 
 - `task_complexity` — trivial, simple, or complex
-- `planning_mode` — fast, hard, deep, parallel, two, or **product-level** (trivial = exit, no mode)
+- `planning_mode` — fast, hard, deep, parallel, two, **product-level**, or **spike** (trivial = exit, no mode)
 - `workflow_model` — feature, bugfix, refactor, or security
-- `scope_mode` — EXPANSION, HOLD, or REDUCTION (hard mode only; fast = HOLD default; product-level = EXPANSION default)
+- `scope_mode` — EXPANSION, HOLD, or REDUCTION (hard mode only; fast = HOLD default; product-level = EXPANSION default; spike skips scope question)
 - `tdd_mode` — true or false (composable flag, independent of planning_mode)
+- `spike_meta` — `{ timebox, findings_doc, story_points }` when planning_mode = spike; unset otherwise
 - Print: `"Scope: {complexity} → mode: {mode} | model: {workflow_model} | scope: {scope_mode} | tdd: {tdd_mode}"`
 
 ## Next
 
 If trivial → STOP (recommend /mk:fix).
 If fast → skip to `step-03-draft-plan.md`.
+If **spike** → skip step-01 and step-02; go directly to `step-03-draft-plan.md` using `assets/spike-plan-template.md` (gated by `agile-feedback-cycle.md` 2 when Agile context active).
 If **product-level** → read and follow `step-01-research.md` (broader: competitors, design trends, AI integration patterns).
 If hard, deep, parallel, or two → read and follow `step-01-research.md`.

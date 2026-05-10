@@ -8,7 +8,7 @@ description: >-
   spec into testable acceptance criteria with rubric tie-ins. Triggers on
   /mk:sprint-contract, "draft a sprint contract", "negotiate scope for sprint",
   or before any harness-driven sprint kicks off.
-argument-hint: "[propose | review | amend | sign | validate] [task-slug] [--sprint N]"
+argument-hint: "[propose | review | amend | sign | validate | sprint-goal] [task-slug | sprint-goal-text] [--sprint N]"
 allowed-tools:
   - Bash
   - Read
@@ -51,6 +51,7 @@ Skip when:
 | `amend` | generator | Iterates on the contract per evaluator feedback; status stays `negotiating`; rounds += 1 |
 | `sign` | both | Both agents commit to the contract via git commit messages; status: `negotiating → signed` |
 | `validate` | anyone | Runs `validate-contract.sh` to check schema conformance |
+| `sprint-goal` | user | Writes/reads/aligns sprint-LEVEL goal in `tasks/contracts/sprint-state-{date}-sprint-{N}.md` (Agile mode) |
 
 ## Workflow (Inline — monolithic, < 150 lines)
 
@@ -100,6 +101,22 @@ The signature workflow uses **two commits per agent** to avoid the chicken-and-e
 .claude/skills/sprint-contract/scripts/validate-contract.sh tasks/contracts/{path}.md
 ```
 
+### `sprint-goal` (Agile mode — gated by `agile-sprint-commitment.md` 1)
+
+Sprint-LEVEL goal management. Writes to `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files.
+
+| Action | Form | Effect |
+|---|---|---|
+| `set` | `mk:sprint-contract sprint-goal set "<text>" --sprint N` | Writes `sprint_goal:` (≤120 chars) to `tasks/contracts/sprint-state-{YYMMDD}-sprint-{N}.md`. Creates the file from `assets/sprint-state-template.md` if absent |
+| `show` | `mk:sprint-contract sprint-goal show --sprint N` | Prints current `sprint_goal:` from the newest sprint-state file matching `--sprint N` |
+| `align` | `mk:sprint-contract sprint-goal align --plan <path>` | Renders alignment between plan goal (frontmatter `goal:` or first H1) and sprint goal. Advisory — never blocks |
+
+**Concurrent-write safety:** `sprint-goal set` MUST acquire `flock` on the sprint-state file before any read-modify-write. YAML frontmatter append is non-atomic across shells; lock is the only mitigation. Release on completion or error.
+
+**Validator scope:** the existing `validate-contract.sh` is for sprint-CONTRACT files only. Sprint-STATE files have NO validator; YAML is parsed inline by consuming skills (this skill, `mk:agent-detector` Step 0b, `mk:jira-agile`).
+
+**Why this lives here:** `tasks/contracts/` already belongs to this skill; co-locating `sprint-goal` avoids creating a sibling skill that duplicates path discipline.
+
 ### Mid-build amendment (post-sign)
 
 The amendment flow MUST null both signature fields BEFORE adding the amendment block. Otherwise stale SHAs from the prior signing round would falsely pass `check-contract-signed.sh`.
@@ -135,7 +152,8 @@ When `MEOWKIT_HARNESS_MODE=LEAN`:
 
 | File | Purpose |
 |---|---|
-| `assets/contract-template.md` | Canonical contract schema with placeholder ACs |
+| `assets/contract-template.md` | Canonical per-story sprint-contract schema with placeholder ACs |
+| `assets/sprint-state-template.md` | Sprint-LEVEL state contract template (used by `sprint-goal set`; tracks goal + committed_tickets + amendments + closure summary) |
 | `scripts/validate-contract.sh` | Schema + AC-form validator (POSIX-aware Bash 3.2+) |
 | `scripts/check-contract-signed.sh` | Gate helper called by `gate-enforcement.sh` to block source edits before sign |
 | `references/bdd-to-ac-mapping.md` | How Gherkin scenarios map to acceptance criteria |

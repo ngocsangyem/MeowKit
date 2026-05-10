@@ -112,6 +112,7 @@ WHY: Compaction summarizes; safety rules cannot be summarized without losing enf
 - **Phase contracts:** `.claude/rules/phase-contracts.md` (loaded by `mk:agent-detector` Step 0b)
 - **Agent routing:** `.claude/rules/agent-routing.md` (17-row agent table; loaded by `mk:agent-detector` Step 0b)
 - **Risk checklist:** `.claude/rules/risk-checklist.md` (Phase 0 horizontal-risk flags; loaded by `mk:agent-detector` Step 0b)
+- **Agile/Scrum rules:** `.claude/rules-conditional/agile-*.md` (loaded by `mk:agent-detector` Step 0b when Agile context detected)
 - **Adaptive density:** `.claude/skills/harness/references/adaptive-density-matrix.md` (canonical) — governing rule: `.claude/rules/harness-rules.md` Rule 5
 - **Orchestrator entry rule:** `.claude/rules/orchestration-rules.md`
 - **Commands vs Skills:** `.claude/rules/skill-authoring-rules.md`

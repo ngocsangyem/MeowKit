@@ -14,6 +14,55 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.8.7 (2026-05-11) — Agile/Scrum Rule Layer
+
+### Highlights
+
+Adds a thin, conditionally-loaded Agile/Scrum governance layer covering Definition of Ready, Definition of Done with Jira sync, sprint-goal persistence, mid-sprint amendment ceremony, sprint-close hygiene, retro→action loop, and time-boxed spike governance. Three rules in `.claude/rules-conditional/agile-*.md` load via `mk:agent-detector` Step 0b ONLY when an Agile context is detected. Non-Agile sessions pay zero context cost — no new agents, no new hooks, no new gates.
+
+### New Conditional Rules
+
+| Rule | Purpose |
+|------|---------|
+| `agile-story-gates.md` | DoR (Phase 1 entry) + DoD (Gate 2 PASS) + traceability frontmatter contract |
+| `agile-sprint-commitment.md` | Sprint goal persistence, mid-sprint amendment ceremony, sprint close hygiene |
+| `agile-feedback-cycle.md` | Retro action-item ceremony, spike governance (timebox + findings doc) |
+
+### Skill Integrations
+
+- `mk:plan-creator` — DoR advisory at Phase 1 entry; new `--spike --timebox <duration>` flag with two-phase spike template (`assets/spike-plan-template.md`); rejects `--spike --product-level` and `--spike` + `mk:harness` FULL
+- `mk:sprint-contract` — new `sprint-goal` subcommand (`set` / `show` / `align`) writing to `tasks/contracts/sprint-state-{date}-sprint-{N}.md` with `flock` discipline; new `assets/sprint-state-template.md`
+- `mk:retro` — post-narrative action-item ceremony parsing `## 3 Things to Improve` and `## 3 Habits for Next Week`; per-item AskUserQuestion (Create Jira story / Add to plan TODO / Document as no-action / Defer)
+- `mk:jira-agile` — `sprint add/remove` post-start: `flock` + amendment append + reason prompt; `sprint close`: per-ticket disposition prompt + closure summary
+- `mk:ship` — Gate 2 PASS path early-return guard (preserves zero-cost for non-Agile) + 3 opt-in DoD prompts (verdict→Jira comment, status transition, business AC checkbox); covers the `mk:cook` → `mk:ship` chain in one insertion
+- `project-manager` agent — Jira-aware status enrichment via single `mk:jira-search` JQL aggregation when Agile context active
+
+### Agile Context Detection (OR-logic)
+
+Any one match triggers load of all 3 rules at `mk:agent-detector` Step 0b:
+
+- Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
+- Active plan frontmatter has non-empty `jira_tickets:`
+- `MEOW_JIRA_BASE_URL` env var set
+- Last user message matches `[A-Z]{2,10}-\d+`
+
+Pre-flight check defends against drift: if `.claude/rules-conditional/` directory is absent, the load is skipped silently.
+
+### Architecture Notes
+
+- Plan-as-source-of-truth retained; Jira receives projections only (verdict comment, status transition) — never authoritative
+- Sprint-state contract path uses leading `sprint-state-` prefix to prevent glob collision with the existing `check-contract-signed.sh` glob
+- Spike plans are INCOMPATIBLE with `mk:harness` FULL density (harness gate breaks); use `mk:cook` or `mk:plan-creator --fast`
+- Concurrent-write safety: `mk:jira-agile` and `mk:sprint-contract sprint-goal set` MUST acquire `flock` before any read-modify-write on sprint-state files
+
+ADR: `docs/architecture/adr/260511-agile-scrum-conditional-rule-layer.md`. Plan: `plans/260510-2333-agile-scrum-rule-layer-design/`.
+
+## 2.8.6 (2026-05-10) — Align rules
+
+### Improvements
+
+- Generalized generated runtime assets and aligned rule prose across `.claude/rules/`, `.claude/agents/`, and `.claude/commands/mk/` so wording, role labels, and cross-references match the post-2.8.5 namespace and folder layout.
+
 ## 2.8.5 (2026-05-10) — Rules Folder Reconsolidation + mk:preview
 
 ### Highlights

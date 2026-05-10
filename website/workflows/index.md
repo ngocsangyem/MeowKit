@@ -41,6 +41,7 @@ Step-by-step guides for the most common development scenarios.
 | [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) | Sprint planning, triage | ~30s per ticket |
 | [Spec to Sprint Planning](/workflows/spec-to-sprint) | End-to-end: spec analysis → tech review → sprint plan | 5-15 min |
 | [Ticket to Code](/workflows/ticket-to-code) | Developer: receive ticket → understand → plan → implement → ship | Varies |
+| [Spec → PR: Behind the Scenes](/workflows/spec-to-pr-walkthrough) | Deep-dive: see what every skill does between Confluence and a merged PR | 20 min read |
 
 ## Operations
 
@@ -48,5 +49,6 @@ Step-by-step guides for the most common development scenarios.
 |----------|----------|------|
 | [Documentation](/workflows/documentation) | Docs maintenance | 10-20 min |
 | [Sprint Retrospective](/workflows/retrospective) | Team reflection | 10-15 min |
+| [Agile / Scrum Workflow](/workflows/agile-scrum) | Sprint goal, DoR/DoD, retro→action, spike governance | Per-sprint |
 | [Researching Libraries](/workflows/research) | Tech evaluation | 15-30 min |
 | [Maintaining Old Projects](/workflows/maintenance) | Legacy codebases | 30-60 min |

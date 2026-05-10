@@ -27,7 +27,8 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 
 | Variable | Set by | Used by | Values |
 |----------|--------|---------|--------|
-| `planning_mode` | step-00 | step-01, step-02, step-03, step-04, step-05, step-06 | `fast`, `hard`, `deep`, `parallel`, `two`, or `product-level` |
+| `planning_mode` | step-00 | step-01, step-02, step-03, step-04, step-05, step-06 | `fast`, `hard`, `deep`, `parallel`, `two`, `product-level`, or `spike` |
+| `spike_meta` | step-00 | step-03 | `{ timebox, findings_doc, story_points }` when planning_mode=spike; unset otherwise |
 | `task_complexity` | step-00 | step-03 | `trivial` (exit), `simple`, `complex` |
 | `workflow_model` | step-00 | step-03 | `feature`, `bugfix`, `refactor`, `security` |
 | `scope_mode` | step-00 | step-01, step-03 | `EXPANSION`, `HOLD`, `REDUCTION` (hard mode; fast defaults to HOLD; product-level defaults to EXPANSION) |
@@ -111,6 +112,7 @@ Step 8: Hydrate Tasks
 - `--two`: step-03 produces 2 approach files (no plan.md yet); step-04 asks user to select before step-05.
 - `selected_approach` is only set in `two` mode; all other modes leave it unset.
 - `--product-level`: step-03 → step-03a (spec only, no phase files). step-03a runs a LIGHT codebase scout on non-empty repos via an ALLOWLIST of `README*`/`docs/`/`brand/`/`tasks/plans/` (BLOCKLIST: `src/`, source files, schemas) — output is injected as agent working memory only, never written to `plan.md`. Hands off to `mk:harness` after Gate 1, NOT directly to developer. Auto-detected by step-00 on green-field "build a X app" prompts; explicit flag bypasses detection. Optional: `--no-design` skips design subagent, `--no-scout` skips codebase scout.
+- `--spike`: time-boxed investigation. Skips step-01 (research), step-02 (codebase analysis), step-05 (red team), step-06 (validation interview). step-03 uses `assets/spike-plan-template.md` with two phases (investigate + findings — NO test/ship). Requires `--timebox <duration>`. Incompatible with `--product-level` and `mk:harness` FULL. Run via `mk:cook` or `mk:plan-creator --fast`.
 
 ## Next
 

@@ -402,6 +402,8 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v2.8.7  | 2026-05-11 | Agile/Scrum Rule Layer                    |
+| v2.8.6  | 2026-05-10 | Align rules                               |
 | v2.8.5  | 2026-05-10 | Rules Folder Reconsolidation + mk:preview |
 | v2.8.4  | 2026-05-10 | Confluence Ecosystem + Macro-Aware Spec Analysis |
 | v2.8.3  | 2026-05-10 | Jira Family + Workflow Discovery     |

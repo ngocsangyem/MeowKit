@@ -171,6 +171,7 @@ export MEOWKIT_SUMMARY_GROWTH_DELTA=10240      # require 10KB growth between sum
 - **Cannot judge highly subjective taste** without rubric anchors — if the project has unique aesthetic constraints, write a custom rubric
 - **Cannot execute closed-source binaries** — the active-verification gate needs source-runnable build
 - **`--resume` is partial in v1.0** — iteration counter resumes correctly, but step entry-point detection is manual; you may need to set `MEOWKIT_HARNESS_RESUME_STEP=N` to skip already-completed steps
+- **Spike plans (`--spike`) are INCOMPATIBLE with `mk:harness` FULL density mode.** Harness FULL requires Phase 2 (test red) → Phase 3 (build green) → Phase 4 (review) sequence with a sprint-contract gate. Spikes skip Phase 2/Phase 5; the harness flow breaks. Use `mk:cook` or `mk:plan-creator --fast` to run a spike. See `.claude/rules-conditional/agile-feedback-cycle.md` 2.
 
 ## See Also
 

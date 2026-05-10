@@ -36,6 +36,23 @@ Non-interactive, fully automated workflow. The user said `/mk:ship` — run stra
 
 Operates in **Phase 5 (Ship)** of the project's workflow. Invoked by the `shipper` agent after Gate 2 approval.
 
+## Agile DoD prompts (Gate 2 PASS — gated by `agile-story-gates.md` 2 when loaded)
+
+After the verdict file is read at the start of the workflow:
+
+1. **Early-return guard (preserves zero-cost for non-Agile sessions):** if verdict frontmatter has no `jira_tickets:` field OR the field is an empty array → SKIP the entire DoD block. ONE frontmatter read; no AskUserQuestion calls; no further branching. Proceed directly to ship
+2. **If verdict has `jira_tickets:` non-empty AND verdict status is PASS/WARN:**
+   - Per `agile-story-gates.md` 2 — three opt-in actions via AskUserQuestion (each cancel-safe, each Jira-offline-safe):
+     1. **Verdict→Jira comment.** "Post the Gate 2 verdict summary to PROJ-123 as a comment? [Y/n/edit]" → `mk:jira-collaborate add comment KEY=PROJ-123` with verdict's Summary + Risks. Set verdict frontmatter `posted_to_jira: true|deferred`
+     2. **Status transition.** "Transition PROJ-123 to Done? [Y/n/skip]" → `mk:jira-lifecycle transition KEY=PROJ-123 to=Done`. Set `transitioned_to_done: true|deferred`
+     3. **Business AC checkbox.** Source priority: (a) Jira AC field via `mk:jira-issue get`; (b) **fallback to plan.md `## Acceptance Criteria`** if Jira read fails or AC field is empty. Y/n per item before allowing the rest of the ship pipeline
+3. Honor each user answer; update verdict frontmatter accordingly (`bool|deferred` per offline fallback)
+4. Proceed with the rest of the ship pipeline (or abort if user explicitly cancels)
+
+**Cost analysis:** for non-Agile sessions, the only added cost is reading the verdict frontmatter (which `mk:ship` already does to read PASS/WARN/FAIL). The `jira_tickets:` field check is a single grep on already-loaded data. Effectively zero added cost.
+
+**Coverage of `mk:cook` pipeline:** `mk:cook` invokes `mk:ship` for Phase 5 (per `mk:cook` Step 5 delegation), so this single insertion covers BOTH direct `mk:ship` invocation AND the `mk:cook` → `mk:ship` chain. No separate insertion needed in `mk:cook`.
+
 ## Arguments
 
 | Flag           | Effect                                                                                                        |

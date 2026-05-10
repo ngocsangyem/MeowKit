@@ -15,6 +15,7 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 | Plan files              | `tasks/plans/YYMMDD-name/plan.md`                                          | `tasks/plans/YYMMDD-name.md` (flat), `plans/`                       |
 | Review verdicts         | `tasks/reviews/YYMMDD-name-verdict.md`                                     | `reviews/`, `tasks/plans/.../reports/`                              |
 | Sprint contracts        | `tasks/contracts/YYMMDD-HHMM-name-sprint-N.md`                             | `contracts/`, `tasks/plans/.../contracts/`                          |
+| Sprint-state contracts  | `tasks/contracts/sprint-state-YYMMDD-sprint-N.md`                          | `tasks/contracts/state/`, missing `sprint-state-` prefix            |
 | Evaluator verdicts      | `tasks/reviews/YYMMDD-name-evalverdict.md`                                 | `evalverdicts/`, separate from review verdict                       |
 | Harness runs            | `tasks/harness-runs/YYMMDD-HHMM-name/run.md`                               | `runs/`, `harness/`                                                 |
 | Rubric library          | `.claude/rubrics/<name>.md`                                                | `rubrics/`, `.claude/skills/rubric/rubrics/`                   |
@@ -292,6 +293,31 @@ Missing `category`/`severity`/`applicable_when` are allowed for backward compati
 | "This hook blocks X" (hook not registered)                   | "This hook blocks X when registered in settings.json"                        |
 | "30 destructive patterns are guarded" (only 8 checked)       | "8 patterns are hook-enforced. Additional patterns are behavioral guidance." |
 | "Environment-aware blocking in production" (not implemented) | "Environment-aware blocking is planned but not yet implemented."             |
+
+---
+
+## 11. Agile/Scrum Conditional Rules
+
+**Source:** plan `260510-2333-agile-scrum-rule-layer-design`
+
+The toolkit has a thin Agile governance layer. Three rules live in `.claude/rules-conditional/` and are loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected. Non-Agile sessions pay zero context cost.
+
+| Rule | Source | Loaded by | Integration |
+|---|---|---|---|
+| `agile-story-gates.md` | original | `mk:agent-detector` Step 0b (Agile context) | `mk:plan-creator` Phase 1 entry (DoR 1); `mk:ship` Gate 2 PASS (DoD 2); traceability frontmatter 3 |
+| `agile-sprint-commitment.md` | original | `mk:agent-detector` Step 0b (Agile context) | `mk:sprint-contract sprint-goal` 1; `mk:jira-agile sprint add/remove` 2; `mk:jira-agile sprint close` 3 |
+| `agile-feedback-cycle.md` | original | `mk:agent-detector` Step 0b (Agile context) | `mk:retro` post-narrative step 5 (action-item ceremony 1); `mk:plan-creator --spike` (spike governance 2) |
+
+**Detection (OR-logic, any one match triggers load):**
+
+- Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
+- Active plan frontmatter has non-empty `jira_tickets:`
+- `MEOW_JIRA_BASE_URL` env var set
+- Last user message matches `[A-Z]{2,10}-\d+`
+
+**Sprint-state contracts:** sprint-LEVEL state lives at `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files. Template: `mk:sprint-contract/assets/sprint-state-template.md`. Concurrent writes require `flock`; YAML append is non-atomic across shells. The existing `validate-contract.sh` does NOT validate sprint-state files (different schema by design).
+
+**Spike governance:** `mk:plan-creator --spike --timebox <duration>` produces a two-phase investigation plan from `mk:plan-creator/assets/spike-plan-template.md`. INCOMPATIBLE with `mk:harness` FULL density (harness gate breaks). Run via `mk:cook` or `mk:plan-creator --fast`.
 
 ---
 
