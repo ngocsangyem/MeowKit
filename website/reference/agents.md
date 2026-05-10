@@ -1,11 +1,11 @@
 ---
 title: Agents Reference
-description: Complete agent roster — 17 specialist agents with type, role, phase, and activation conditions.
+description: Complete agent roster — 33 specialist agents (12 core, 5 support, 16 Jira) with type, role, phase, and activation conditions.
 ---
 
 # Agents Reference
 
-MeowKit ships 17 specialist agents. Each owns a specific phase or concern. No two agents modify the same file type.
+MeowKit ships 33 specialist agents across three categories: 12 core pipeline agents, 5 support agents, and 16 Jira integration agents. Each owns a specific phase or concern. No two agents modify the same file type.
 
 ## Core Agents
 
@@ -37,6 +37,29 @@ Invoked on-demand by core agents or explicitly by the user.
 | [ui-ux-designer](/reference/agents/ui-ux-designer) | 3 | UI design, accessibility, design systems | advisory |
 | [git-manager](/reference/agents/git-manager) | 5, any | Git operations, conventional commits | utility |
 | [journal-writer](/reference/agents/journal-writer) | 6 | Failure documentation, root cause analysis | escalation |
+
+## Jira Agents
+
+Domain agents for Jira integration via the `jira-as` CLI wrapper. All share a 4-tier safety model and follow the Rule of Two.
+
+| Agent | Role | Safety highlight |
+|-------|------|-----------------|
+| [jira-issue](/reference/agents/jira-issue) | Single-issue CRUD (create, read, update, delete) | 4-tier graduated confirmation |
+| [jira-search](/reference/agents/jira-search) | JQL queries, filter management, result export | Mandatory JQL sanitization |
+| [jira-lifecycle](/reference/agents/jira-lifecycle) | Transitions, assignments, versions, components | Workflow discovery before transitions |
+| [jira-collaborate](/reference/agents/jira-collaborate) | Comments, attachments, watchers, notifications | Internal-vs-public comment gate |
+| [jira-relationships](/reference/agents/jira-relationships) | Issue links, blockers, dependencies, clones | Semantic link type enforcement |
+| [jira-time](/reference/agents/jira-time) | Work logging, estimates, time reports | Confirm before worklog edits/deletes |
+| [jira-agile](/reference/agents/jira-agile) | Sprints, epics, backlog, story points, velocity | Board ID ≠ Project Key validation |
+| [jira-fields](/reference/agents/jira-fields) | Custom field discovery and caching | Read-only by default; admin for config |
+| [jira-bulk](/reference/agents/jira-bulk) | Bulk transition, assign, priority, clone, delete | Mandatory dry-run for all operations |
+| [jira-jsm](/reference/agents/jira-jsm) | Service desks, requests, SLAs, approvals | JSM license + agent role required |
+| [jira-admin](/reference/agents/jira-admin) | Projects, users, groups, schemes, automation | 2-step token confirmation for deletes |
+| [jira-dev](/reference/agents/jira-dev) | Branch names, PR descriptions, commit links | Read-only, output generation only |
+| [jira-ops](/reference/agents/jira-ops) | Cache management, connectivity, project context | Diagnostic-only, no Jira state changes |
+| [jira-evaluator](/reference/agents/jira-evaluator) | Ticket complexity scoring (8 dimensions) | Read-only analysis |
+| [jira-estimator](/reference/agents/jira-estimator) | Story point estimation with reasoning | Read-only, never sets points |
+| [jira-analyst](/reference/agents/jira-analyst) | Full context analysis with media and linked issues | Read-only, processes attachments |
 
 ## Agent communication
 

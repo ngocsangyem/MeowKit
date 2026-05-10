@@ -1,52 +1,80 @@
 ---
 title: shipper
-description: Deployment agent — runs pre-ship checks, creates conventional commits, opens PRs, verifies CI. Never pushes directly to main.
+description: Deployment pipeline agent — executes the full ship sequence from pre-checks through PR creation, CI verification, and rollback documentation.
 ---
 
 # shipper
 
-Handles safe deployment in Phase 5. Runs full test/lint/typecheck, creates conventional commits, opens a PR, and verifies CI. Never pushes directly to main. Documents rollback steps.
+The shipper is your deployment specialist. Once Gate 2 passes, the shipper takes over to execute the full ship sequence — running pre-ship checks, creating conventional commits, opening pull requests on feature branches, verifying CI, and documenting rollback procedures. It never commits directly to main.
 
-## Key facts
+## Cognitive Framing
+
+> *"Ship safely. Never commit to main. Every deployment has a rollback plan."*
+
+The shipper operates at Phase 5 (Ship) and only activates after Gate 2 (review approval). It is deliberately the simplest agent in the pipeline — its job is to execute a well-defined checklist, not to make judgments about code quality. That judgment has already been made by the reviewer and evaluator.
+
+## Key Facts
 
 | | |
 |---|---|
 | **Type** | Core |
 | **Phase** | 5 (Ship) |
-| **Auto-activates** | After Gate 2 (review approved) |
-| **Never does** | Push to main directly, skip CI verification, ship without passing review verdict, force-push to shared branches, modify source code |
+| **Auto-activates** | After Gate 2 passes |
+| **Never does** | Commit to main/master, ship without a passing review, skip pre-ship checks, skip rollback docs, force-push to shared branches |
 
-## Ship sequence
+## When to Use
 
-1. Pre-ship checks: test suite, linter, type checker — ALL must pass
-2. Conventional commit: `feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:`, `perf:`, `ci:` prefixes
-3. Branch + PR: feature branch, never main directly
-4. Verify CI: confirm CI pipeline passes
-5. Rollback documentation: document rollback procedure for every ship
+- After **Gate 2 passes** — the shipper activates automatically when the reviewer issues a PASS or WARN verdict.
+- When you are ready to **create a PR** and push changes.
+- When you need a **conventional commit** with the correct prefix.
+- When deploying to production and need **canary deployment support** with gradual rollout.
 
-## Canary deployments
+## Key Capabilities
 
-For production changes, supports gradual rollout with monitoring checkpoints and rollback triggers.
+- **Pre-ship checks** — runs test suite, linter, and type checker. All must pass before proceeding.
+- **Conventional commits** — creates commits with appropriate prefixes: `feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:`, `perf:`, `ci:`.
+- **Branch + PR creation** — creates a feature branch and opens a pull request. Never commits directly to main.
+- **CI verification** — confirms the CI pipeline passes on the PR before marking the ship as successful.
+- **Rollback documentation** — documents the rollback procedure for every ship.
+- **Canary deployments** — supports gradual rollout for production changes with monitoring checkpoints and rollback triggers.
 
-## Flags
+## Behavioral Checklist
 
-| Flag | Behavior |
+- [x] Runs all pre-ship checks (tests, lint, typecheck) before committing
+- [x] Creates conventional commits with correct prefix
+- [x] Uses feature branches — never commits to main/master
+- [x] Opens pull request with descriptive title and body
+- [x] Verifies CI passes on the PR
+- [x] Documents rollback procedure for every ship
+- [x] Never ships without a passing review verdict (Gate 2)
+- [x] Never force-pushes to shared branches
+
+## Common Use Cases
+
+| Scenario | What the shipper does |
 |---|---|
-| (default) | Standard ship pipeline |
-| `--canary` | Staged deployment with monitoring |
-| `--dry-run` | Preview without pushing or creating PR |
+| Standard feature ship | Runs pre-checks → creates conventional commit → opens PR on feature branch → verifies CI |
+| Bug fix deployment | Same sequence with `fix:` commit prefix, includes rollback documentation |
+| Production deployment | Supports canary deployment with gradual rollout and monitoring checkpoints |
+| CI failure on PR | Reports failure details with log excerpts, routes back to developer or tester for fixes |
 
-## Handoff
+## Pro Tips
 
-- Ship successful (PR created, CI passing) → route to documenter (Phase 6)
-- Pre-ship checks fail → route to developer or tester for fixes
-- CI fails → route back for fixes based on failure type
-- Always include: PR URL, branch name, commit hash, rollback doc location, CI status
+### Let Pre-Ship Checks Catch Issues Early
 
-## Required context
+The pre-ship checks (tests, lint, typecheck) are your last opportunity to catch issues before they enter the PR. If any check fails, the shipper routes back to the appropriate agent rather than proceeding. This is by design — catching issues at pre-ship is much cheaper than catching them in CI.
 
-Load before shipping: `docs/project-context.md`, passing review verdict from `tasks/reviews/`, current branch state and git status, `package.json` (or equivalent) for test/lint/typecheck commands.
+### Include Rollback Context in Every Ship
 
-## Failure behavior
+Rollback documentation is not optional. Even for small changes, the rollback procedure should answer: "If this change causes problems in production, what is the fastest way to undo it?" This is a one-time cost that pays for itself when an incident occurs.
 
-If pre-ship checks fail: report exactly which check failed with output, recommend routing to developer or tester. If CI fails: report CI failure details with log excerpts, do not retry — route back for diagnosis. If unable to create PR: report the specific error, create commit and branch locally, ask user to push manually.
+## Key Takeaway
+
+The shipper is deliberately simple and procedural. Its value comes from rigorously following a checklist — pre-checks, conventional commit, feature branch, PR, CI verification, rollback docs — without exceptions. The hard rule of never committing to main ensures that every change goes through the PR review process.
+
+## Related Agents
+
+- **[reviewer](/reference/agents/reviewer)** — provides Gate 2 approval that triggers the shipper
+- **[developer](/reference/agents/developer)** — receives routing when pre-ship checks or CI fail
+- **[documenter](/reference/agents/documenter)** — receives handoff after successful ship to update documentation
+- **[tester](/reference/agents/tester)** — receives routing when test failures block the ship

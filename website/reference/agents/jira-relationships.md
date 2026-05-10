@@ -1,37 +1,76 @@
 ---
 title: jira-relationships
-description: "Domain agent for issue relationships: link, unlink, blockers, dependencies, clone, bulk-link."
+description: Jira issue linking agent — manages links, blockers, dependencies, clones, and bulk-link operations between issues.
 ---
 
 # jira-relationships
 
-Domain agent invoked by [`mk:jira-relationships`](/reference/skills/jira-relationships) via `context: fork`.
+The jira-relationships agent manages issue-to-issue relationships — links, blockers, dependencies, and clones. It connects issues semantically (blocks, is blocked by, relates to, duplicates) and provides dependency tree visualization to understand project bottlenecks.
 
-## Key facts
+## Cognitive Framing
+
+> *"Relationships reveal dependencies. Understanding what blocks what prevents delivery surprises."*
+
+The jira-relationships agent handles the link layer between issues. It creates and removes links, identifies blockers and dependency chains, clones issues, and supports bulk-linking when multiple issues share the same dependency.
+
+## Key Facts
 
 | | |
 |---|---|
-| **Type** | Domain |
-| **Phase** | on-demand |
-| **Tools** | Bash, Read, Grep, Glob |
+| **Type** | Domain (Jira) |
+| **Phase** | On-demand |
 | **Model** | inherit |
-| **Memory** | project |
 | **Color** | purple |
-| **Skill Rule of Two** | A + C, NOT B (2/3 compliant) |
+| **Safety** | Tier 3 (link/unlink), Tier 2 (clone) |
+| **Never does** | Sprint/epic relationships (jira-agile), parent/subtask hierarchy (jira-agile), issue CRUD (jira-issue) |
 
-## Operations
+## When to Use
 
-| Op | Tier | Wrapper invocation |
-|---|---|---|
-| Link | 2 | `... relationships link PROJ-123 --type blocks --to PROJ-456` |
-| Unlink | 3 | `... relationships unlink PROJ-123 --link-id <ID>` |
-| Get blockers | 1 | `... relationships get-blockers PROJ-123` |
-| Get dependencies | 1 | `... relationships get-dependencies PROJ-123` |
-| Clone | 2 | `... relationships clone PROJ-123 --summary "..."` |
-| Bulk-link by JQL | 3 | `... relationships bulk-link --jql "<JQL>" --type blocks --to PROJ-456 --dry-run` |
+- When you need to **link two issues** — blocks, is blocked by, relates to, duplicates.
+- When you need to **find what blocks an issue** or view the dependency chain.
+- When you need to **clone an issue** as a new ticket.
+- When you need to **bulk-link** multiple issues to a shared dependency.
 
-`bulk-link` lives in the `relationships` group (verified `relationships_cmds.py:1661`). Link direction is not symmetric — agent confirms when ambiguous.
+## Key Capabilities
 
-## Skill
+- **Issue linking** — creates semantic links between issues: blocks, is blocked by, relates to, clones, duplicates.
+- **Blocker analysis** — identifies all blockers for an issue and traces the dependency chain.
+- **Issue cloning** — creates a copy of an issue as a new ticket.
+- **Bulk linking** — links multiple issues to a shared dependency in a single operation.
+- **Link removal** — removes links between issues with confirmation.
 
-[`mk:jira-relationships`](/reference/skills/jira-relationships)
+## Behavioral Checklist
+
+- [x] Uses correct link type semantics (blocks vs is-blocked-by, relates-to vs duplicates)
+- [x] Shows diff or confirmation before link modifications (Tier 3)
+- [x] Traces full dependency chains when analyzing blockers
+- [x] Never manages sprint or epic relationships — those belong to jira-agile
+
+## Common Use Cases
+
+| Scenario | What the agent does |
+|---|---|
+| "PROJ-100 blocks PROJ-101" | Creates a "blocks" link between the two issues |
+| "What blocks PROJ-123?" | Lists all blocker relationships and traces the dependency chain |
+| "Clone PROJ-456" | Creates a copy of the issue with a new key |
+| "Link these 5 issues to the API epic" | Bulk-links multiple issues to the shared parent |
+
+## Pro Tips
+
+### Use Blocker Analysis for Sprint Planning
+
+Before sprint planning, run blocker analysis on key issues. Hidden dependency chains are a leading cause of sprint scope creep — an issue that appears independent may be blocked by three other tickets that are not in the sprint.
+
+### Choose Link Types Carefully
+
+"Blocks" and "relates to" carry different semantic weight. A "blocks" link implies a hard dependency — the blocked issue cannot proceed until the blocker is resolved. A "relates to" link is informational. Using the correct link type ensures dependency tracking tools work accurately.
+
+## Key Takeaway
+
+The jira-relationships agent makes dependency structures visible and manageable. By providing blocker analysis and semantic linking, it prevents the common delivery surprise of discovering hidden dependencies during implementation.
+
+## Related Agents
+
+- **[jira-issue](/reference/agents/jira-issue)** — handles issue CRUD; jira-relationships handles inter-issue links
+- **[jira-agile](/reference/agents/jira-agile)** — handles sprint and epic hierarchy relationships
+- **[jira-lifecycle](/reference/agents/jira-lifecycle)** — handles status transitions on linked issues

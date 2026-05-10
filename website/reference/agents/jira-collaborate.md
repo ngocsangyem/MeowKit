@@ -1,40 +1,79 @@
 ---
 title: jira-collaborate
-description: Domain agent for comments, attachments, watchers, notifications. Internal-vs-public comment safety enforced.
+description: Jira collaboration agent — manages comments, attachments, watchers, and notifications with internal-vs-public safety enforcement.
 ---
 
 # jira-collaborate
 
-Domain agent invoked by [`mk:jira-collaborate`](/reference/skills/jira-collaborate) via `context: fork`.
+The jira-collaborate agent manages the collaboration layer on Jira issues — comments, attachments, watchers, and notifications. Its most critical safety feature is the internal-vs-public comment distinction: before posting any potentially customer-facing comment, it confirms visibility with the user to prevent accidental information leaks.
 
-## Key facts
+## Cognitive Framing
+
+> *"Default to internal. The cost of leaking an internal comment publicly is always higher than the friction of one extra confirmation."*
+
+The jira-collaborate agent handles all per-issue collaboration operations. Its key safety discipline is the internal-vs-public comment gate — on JSM tickets and any ticket where customer visibility is possible, it confirms the intended audience before posting.
+
+## Key Facts
 
 | | |
 |---|---|
-| **Type** | Domain |
-| **Phase** | on-demand |
-| **Tools** | Bash, Read, Grep, Glob |
+| **Type** | Domain (Jira) |
+| **Phase** | On-demand |
 | **Model** | inherit |
-| **Memory** | project |
 | **Color** | cyan |
-| **Skill Rule of Two** | A + C, NOT B (2/3 compliant) |
+| **Safety** | Comment visibility gate, Tier 4 for deletes |
+| **Never does** | Issue CRUD (jira-issue), link issues (jira-relationships), transition issues (jira-lifecycle), write comment content to memory |
 
-## Operations
+## When to Use
 
-| Op | Tier | Wrapper invocation |
-|---|---|---|
-| Comment add | 2 | `... collaborate comment add PROJ-123 --body "text"` |
-| Comment list | 1 | `... collaborate comment list PROJ-123` |
-| Comment delete | 4 | `... collaborate comment delete PROJ-123 --comment-id <ID>` |
-| Attachment upload | 2 | `... collaborate attachment upload PROJ-123 --file /path/to/file` |
-| Attachment download | 1 | `... collaborate attachment download PROJ-123 --attachment-id <ID> --output /tmp/...` |
-| Watcher add | 2 | `... collaborate watcher add PROJ-123 --user <username>` |
-| Notify | 2 | `... collaborate notify PROJ-123 --message "..."` |
+- When you need to **add, update, or delete comments** on an issue.
+- When you need to **upload or download attachments**.
+- When you need to **manage watchers** — add, list, or remove.
+- When you need to **send notifications** to issue watchers.
 
-## Internal-vs-Public Safety
+## Key Capabilities
 
-The agent confirms intent before posting any comment that could be customer-facing — defaults to `internal` if uncertain.
+- **Comment management** — add, list, update, and delete comments. Supports multi-line comments with code blocks via markdown.
+- **Internal-vs-public safety** — confirms visibility before posting comments that could be customer-facing. Defaults to internal when uncertain.
+- **Attachment operations** — upload, download, list, and delete attachments on issues.
+- **Watcher management** — add, list, and remove watchers from issues.
+- **Notifications** — send targeted notifications to issue watchers.
 
-## Skill
+## Behavioral Checklist
 
-[`mk:jira-collaborate`](/reference/skills/jira-collaborate)
+- [x] Confirms internal vs public visibility before posting comments on JSM or customer-facing tickets
+- [x] Defaults to internal when comment visibility is uncertain
+- [x] Supports markdown formatting for multi-line comments and code blocks
+- [x] Requires confirmation before irreversible operations (comment delete, attachment delete)
+- [x] Never writes comment bodies, attachment contents, or auth payloads to memory
+- [x] Captures user's typical comment patterns per project in memory for future sessions
+
+## Common Use Cases
+
+| Scenario | What the agent does |
+|---|---|
+| "Comment on PROJ-123" | Confirms internal vs public visibility, then posts comment |
+| "Upload this file to PROJ-123" | Uploads attachment via `collaborate attachment upload` |
+| "Who is watching PROJ-123?" | Lists current watchers |
+| "Add john.doe as a watcher" | Adds watcher via `collaborate watcher add` |
+| "Delete the second comment" | Warns this is irreversible, requires confirmation, then deletes |
+
+## Pro Tips
+
+### Default to Internal Comments
+
+When in doubt about comment visibility, always choose internal. An internal comment that should have been public is easy to re-post publicly. A public comment that should have been internal is a potential security incident. The agent enforces this bias by default.
+
+### Use Attachment Naming Conventions
+
+When uploading attachments, follow the project's naming conventions (recorded in memory). Consistent naming makes attachments searchable and prevents the common problem of multiple versions of the same document with different names.
+
+## Key Takeaway
+
+The jira-collaborate agent prevents the most costly collaboration mistake — accidentally exposing internal information publicly. By defaulting to internal visibility and requiring explicit confirmation for public comments, it trades a small amount of friction for significant risk reduction.
+
+## Related Agents
+
+- **[jira-issue](/reference/agents/jira-issue)** — handles issue CRUD; jira-collaborate handles the collaboration layer
+- **[jira-lifecycle](/reference/agents/jira-lifecycle)** — handles transitions, which may include transition comments
+- **[jira-relationships](/reference/agents/jira-relationships)** — handles issue-to-issue links (not comments)
