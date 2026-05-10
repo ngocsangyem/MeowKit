@@ -57,4 +57,4 @@ jobs:
           fi
 
       - name: Hook regression tests
-        run: node --test ".claude/hooks/__tests__/*.test.cjs"
+        run: node --test .claude/hooks/__tests__/*.test.cjs
