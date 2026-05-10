@@ -1,6 +1,6 @@
 # Parallel Execution Rules
 
-These rules govern when and how MeowKit agents execute work in parallel.
+These rules govern when and how agents execute work in parallel.
 
 ## Rule 1: Zero File Overlap Required
 
@@ -40,7 +40,7 @@ Create: `git worktree add .worktrees/{agent-name} -b {branch-name}`
 Merge: After all parallel agents complete, merge worktree branches to feature branch.
 Cleanup: `git worktree remove .worktrees/{agent-name}`
 
-WHY: Worktrees provide filesystem-level isolation. Agents cannot accidentally overwrite each other's work. This is the MeowKit pattern for safe parallel teams.
+WHY: Worktrees provide filesystem-level isolation. Agents cannot accidentally overwrite each other's work. This is the workflow pattern for safe parallel teams.
 
 ## Rule 4: Gates Are Never Parallel
 
@@ -69,7 +69,7 @@ WHY: Parallel decomposition has coordination overhead. For simple tasks, sequent
 
 ## Rule 7: Team Coordination Is Opt-In
 
-Agent Team rules apply only when a MeowKit team/worktree workflow is active. Standard single-session subagent workflows use `orchestration-rules.md`.
+Agent Team rules apply only when a team/worktree workflow is active. Standard single-session subagent workflows use `orchestration-rules.md`.
 
 When team mode is active:
 

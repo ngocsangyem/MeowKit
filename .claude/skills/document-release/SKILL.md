@@ -73,7 +73,7 @@ Skip: Post-ship doc sync (default mode) — scope is defined by the diff.
 - `references/ask-user-question-format.md` — Structured format for AskUserQuestion calls
 - `references/completeness-principle.md` — Boil the Lake: always recommend the complete option
 - `references/repo-ownership-and-search.md` — Solo vs collaborative mode; search-before-build philosophy
-- `references/contributor-mode.md` — Field report filing for MeowKit contributors
+- `references/contributor-mode.md` — Field report filing for the toolkit contributors
 - `references/completion-and-telemetry.md` — Status protocol, escalation, telemetry logging, plan footer
 - `references/base-branch-detection.md` — How to detect the PR target branch
 - `references/automation-rules.md` — What to auto-fix, what to ask about, what to never do

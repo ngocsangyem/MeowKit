@@ -8,7 +8,7 @@
 
 ## Behavior
 
-Triggers Phase 1 of the MeowKit workflow via the `mk:plan-creator` skill. Output is documentation only — no code is written during planning.
+Triggers Phase 1 of the 7-phase workflow via the `mk:plan-creator` skill. Output is documentation only — no code is written during planning.
 
 ### Process
 

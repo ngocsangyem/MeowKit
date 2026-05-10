@@ -1,5 +1,5 @@
 ---
-source: MeowKit
+source: the toolkit
 adapted: yes
 adaptation_notes: >
   Extracted delegation context and parallel/sequential chaining rules.

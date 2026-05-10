@@ -2,7 +2,7 @@
 name: mk:jira-relationships
 description: "Manage JIRA issue relationships via the jira-as wrapper: link, unlink, blockers, dependencies, clone, bulk-link. Triggers: 'link KEY blocks KEY', 'what blocks KEY', 'clone KEY', 'unlink KEY from KEY'. NOT for sprint/epic relationships (mk:jira-agile)."
 phase: on-demand
-source: meowkit
+source: local
 keywords: [jira, jira-relationships, jira-link, jira-blocker, jira-clone, jira-dependency]
 when_to_use: "Use to create / remove / inspect issue-to-issue links (blocks, depends on, clones, relates to). NOT for parent-subtask or epic-issue (mk:jira-agile)."
 user-invocable: true

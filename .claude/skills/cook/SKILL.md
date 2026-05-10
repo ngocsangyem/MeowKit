@@ -1,7 +1,7 @@
 ---
 name: mk:cook
 description: "Orchestrates single-task implementation pipeline: plan → test → build → review → ship. Use for feature work, plan execution, or fixes scoped to a single task. NOT for green-field product builds (see mk:harness); NOT for auto-invoked workflow orchestration (see mk:workflow-orchestrator)."
-source: claudekit-engineer
+source: local
 version: 1.0.0
 argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict]"
 keywords: [cook, implement-pipeline, plan-execution, feature-build, seven-phase, single-task]
@@ -79,7 +79,7 @@ See `references/intent-detection.md` for full detection logic.
 
 ## Process Flow (Authoritative)
 
-> Before emitting any Mermaid block, Read `meowkit/.claude/skills/preview/references/mermaid-essentials.md`.
+> Before emitting any Mermaid block, Read `.claude/skills/preview/references/mermaid-essentials.md`.
 
 ```mermaid
 flowchart TD

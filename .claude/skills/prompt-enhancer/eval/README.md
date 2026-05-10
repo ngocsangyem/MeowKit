@@ -34,7 +34,7 @@ Initialize and pin:
 cd <your-fixture-path>
 git init -q
 git add -A
-git -c user.email=eval@meowkit -c user.name=eval commit -q -m "fixture baseline"
+git -c user.email=eval@local -c user.name=eval commit -q -m "fixture baseline"
 git rev-parse HEAD  # record this sha in baseline-results.md
 ```
 

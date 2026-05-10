@@ -2,11 +2,11 @@
 name: mk:skill-creator
 description: "Create new skills with proper structure, compliance checks, and registration. Use when asked to create a skill, build a new skill, or scaffold a skill template. Enforces mk: prefix, sub-agents.md structure, and context engineering principles."
 argument-hint: "[skill-name] [description]"
-source: claudekit-engineer
+source: local
 original_path: .claude/skills/skill-creator/SKILL.md
-adapted_for: meowkit
+adapted_for: claude-code
 keywords: [skill-creator, new-skill, scaffold-skill, authoring-template, gotchas-section]
-when_to_use: "Use when creating a new MeowKit skill — scaffolds SKILL.md with required sections per skill-authoring-rules."
+when_to_use: "Use when creating a new skill — scaffolds SKILL.md with required sections per skill-authoring-rules."
 user-invocable: true
 ---
 
@@ -159,4 +159,4 @@ If FAIL: fix failing items before registering.
 
 - **Template must include `## Gotchas` header** — even as a placeholder. `skill-authoring-rules.md` Rule 1 is hard-enforced by `validate-skill.py`. Day-1 skills may use `(none yet — grow from observed failures)` but the header itself is mandatory.
 - **Line cap is 500, not 150** — the canonical threshold comes from `skill-authoring-rules.md` Rule 3 (Anthropic progressive-disclosure guidance). Step-file skills (with `workflow.md`) auto-pass regardless of line count.
-- **Persistent state goes to `${CLAUDE_PLUGIN_DATA}`, not skill directory** — Rule 2 prevents data loss on plugin upgrade. MeowKit-internal paths (`.claude/memory/`, `session-state/`) are exempt.
+- **Persistent state goes to `${CLAUDE_PLUGIN_DATA}`, not skill directory** — Rule 2 prevents data loss on plugin upgrade. framework-internal paths (`.claude/memory/`, `session-state/`) are exempt.

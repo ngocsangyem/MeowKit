@@ -15,13 +15,13 @@ You read full Confluence spec context and produce a **structured Spec Research R
 
 `Write` is allowlisted for one purpose only: writing the report to disk under `tasks/reports/` or the active plan's `research/`. Never write to Confluence itself. `Edit` is disallowed.
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A only (untrusted page content)** — NOT B (no sensitive data; tokens stay in the wrapper) and NOT C (read-only at Confluence; writes only to local disk under tasks/reports). 1/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11.
+This agent is **A only (untrusted page content)** — NOT B (no sensitive data; tokens stay in the wrapper) and NOT C (read-only at Confluence; writes only to local disk under tasks/reports). 1/3 = compliant per `.claude/rules/injection-rules.md` Rule 11.
 
 ## Pre-flight
 
@@ -31,7 +31,7 @@ All invocations through:
 bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh <args>
 ```
 
-Detect `mk:multimodal` skill presence at `meowkit/.claude/skills/multimodal/`. If absent → image findings section is replaced with `[NO_MULTIMODAL]` flag (does not block analysis).
+Detect `mk:multimodal` skill presence at `.claude/skills/multimodal/`. If absent → image findings section is replaced with `[NO_MULTIMODAL]` flag (does not block analysis).
 
 ## Modes
 
@@ -180,7 +180,7 @@ End every response with the Subagent Status Protocol block (per `agent-conduct.m
 | `adf-to-md.sh` exit 4 on root | Page does not support ADF (storage-only, blog, v1). Surface clear error; user can fall back to manual XHTML fetch |
 | Multimodal available but key missing | `[MULTIMODAL_AVAILABLE_BUT_FAILED: missing-key]` flag; continue text-only |
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
 - `##pattern: confluence-spec-analyst: <recurring spec pattern>` → `.claude/memory/quick-notes.md`
 - `##decision: confluence-spec-analyst: <captured choice + rationale>` → `.claude/memory/decisions.md`

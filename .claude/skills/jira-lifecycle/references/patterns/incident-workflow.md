@@ -1,6 +1,6 @@
 # Incident Management Workflow Pattern
 
-> **CONCEPT REFERENCE — NOT AUTHORITATIVE.** This file describes a common workflow shape for orientation. **Your project may use different status names + transitions.** Always consult `tasks/jira-workflows/<workflow-slug>.md` (discovered via `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/fetch-workflow.sh <KEY>`) for the actual workflow. See `meowkit/.claude/skills/jira-lifecycle/references/workflow-discovery.md`.
+> **CONCEPT REFERENCE — NOT AUTHORITATIVE.** This file describes a common workflow shape for orientation. **Your project may use different status names + transitions.** Always consult `tasks/jira-workflows/<workflow-slug>.md` (discovered via `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/fetch-workflow.sh <KEY>`) for the actual workflow. See `.claude/skills/jira-lifecycle/references/workflow-discovery.md`.
 
 **Use this pattern for:** Managing incidents, outages, and urgent issues.
 

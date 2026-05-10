@@ -14,7 +14,7 @@
  *   - Added JSON format for machine-readable output
  *   - Removed emoji (wastes tokens in LLM context)
  *
- * Source: claudekit-engineer/sequential-thinking (MIT, improved)
+ * Source: external sequential-thinking patterns (MIT, improved)
  */
 
 class ThoughtFormatter {

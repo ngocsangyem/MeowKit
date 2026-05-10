@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# validate-rubric.sh — Schema validator for the meowkit rubric library.
+# validate-rubric.sh — Schema validator for the rubric library.
 # Usage:  validate-rubric.sh [<rubric.md> | --preset <path> | --presets-only]
 #         (no args validates all rubrics + all presets)
 # Exit:   0 if all PASS, 1 if any FAIL (diagnostics on stderr)
@@ -142,7 +142,7 @@ validate_preset() {
 case "${1:-}" in
   -h|--help)
     cat <<'EOF'
-validate-rubric.sh — Schema validator for the meowkit rubric library
+validate-rubric.sh — Schema validator for the rubric library
 
 Usage:
   validate-rubric.sh                 Validate all rubrics + all presets

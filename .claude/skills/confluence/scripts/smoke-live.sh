@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # smoke-live.sh — manual live-credentials smoke test.
-# Run after `npx mewkit setup` + populating .claude/.env.
+# Run after `.claude/scripts/bin/setup-workflow` + populating .claude/.env.
 # Verifies: wrapper resolves, env vars load, Cloud-only gate passes,
 # binary returns valid JSON, expected stdout-filter behavior.
 #

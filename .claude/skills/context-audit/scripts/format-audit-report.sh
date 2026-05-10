@@ -33,7 +33,7 @@ elif overhead_p < 25:
 else:
     banner = "Action recommended"
 
-# Essential basenames — hard-coded from meowkit/CLAUDE.md "Compaction Policy".
+# Essential basenames — hard-coded from CLAUDE.md "Compaction Policy".
 ESSENTIAL_BASENAMES = {
     "security-rules.md",
     "injection-rules.md",

@@ -14,7 +14,7 @@ allowed-tools:
   - Grep
   - Glob
   - AskUserQuestion
-source: claudekit-engineer/docs
+source: local
 phase: on-demand
 keywords: [docs-init, initial-documentation, docs-scaffolding, new-project-docs, codebase-analysis]
 when_to_use: "Use when a project has no docs/ directory and needs initial documentation generated from codebase analysis. NOT for updating existing docs (see mk:document-release)."

@@ -3,7 +3,7 @@
 Understand the project and the area the user wants to change.
 
 ```bash
-eval "$(.claude/scripts/bin/meowkit-slug 2>/dev/null)"
+eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)"
 ```
 
 1. Read `CLAUDE.md`, `TODOS.md` (if they exist).

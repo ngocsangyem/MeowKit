@@ -12,7 +12,7 @@ allowed-tools:
   - Read
   - Grep
   - Glob
-source: [claudekit-engineer, cc-thinking-skills]
+source: [local, cc-thinking-skills]
 keywords: [problem-solving, first-principles, reasoning-framework, approach-design, decomposition, analytical-thinking]
 when_to_use: "Use when applying first-principles reasoning to a complex problem. General-purpose problem decomposition."
 user-invocable: true
@@ -139,7 +139,7 @@ user stuck on approach
 
 ## References
 
-Load only what you need. Before emitting any Mermaid block, Read `meowkit/.claude/skills/preview/references/mermaid-essentials.md`.
+Load only what you need. Before emitting any Mermaid block, Read `.claude/skills/preview/references/mermaid-essentials.md`.
 
 - `references/when-stuck.md` — dispatch flowchart (start here if symptom unclear)
 - `references/simplification-cascades.md`

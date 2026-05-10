@@ -155,7 +155,7 @@ Treat context as a limited resource:
 - Prefer deterministic verification (tests, build output, screenshots, runtime checks) over plausibility.
 - After two repeated corrections on the same issue, refine the prompt/plan instead of accumulating more failed context.
 
-WHY: Claude Code performance degrades as context fills. MeowKit's skill, rule, hook, and step-file architecture exists to load the right context just in time.
+WHY: Claude Code performance degrades as context fills. the toolkit's skill, rule, hook, and step-file architecture exists to load the right context just in time.
 
 ---
 

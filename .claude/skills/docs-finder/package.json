@@ -17,9 +17,9 @@
     "context-hub",
     "chub",
     "docs-discovery",
-    "meowkit"
+    "workflow"
   ],
-  "author": "MeowKit",
+  "author": "Workflow",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {},

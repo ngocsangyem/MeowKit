@@ -19,7 +19,7 @@ allowed-tools:
   - Glob
   - Agent
   - AskUserQuestion
-source: meowkit
+source: local
 keywords: [harness, autonomous-build, green-field, generator-evaluator, harness-contract, adaptive-density]
 when_to_use: "Use when running an autonomous multi-hour build of a green-field product (planner→contract→generator⇄evaluator loop). NOT for scoped single-task work (see mk:cook) or initial scaffolding only (see mk:bootstrap)."
 user-invocable: true

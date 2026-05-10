@@ -12,7 +12,7 @@ SCRIPT="$ROOT/.claude/skills/confluence/scripts/adf_to_md.py"
 WRAPPER="$ROOT/.claude/skills/confluence/scripts/confluence-as.sh"
 
 if [ ! -x "$PY" ]; then
-  echo "[adf-to-md] venv not found at $PY - run \`npx mewkit setup\` first" >&2
+  echo "[adf-to-md] venv not found at $PY - run \`.claude/scripts/bin/setup-workflow\` first" >&2
   exit 127
 fi
 

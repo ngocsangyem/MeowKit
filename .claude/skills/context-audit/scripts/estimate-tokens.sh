@@ -7,9 +7,9 @@
 #   - "totals.window_size_tokens" (hard-coded 200000)
 #   - "totals.structural_overhead_pct"
 #
-# Heuristic source-of-truth: meowkit/packages/mewkit/src/orchviz/token-estimator.ts
+# Heuristic source-of-truth: token-estimator.ts
 # (CHARS_PER_TOKEN = 4). We inline the same heuristic to avoid a Node bridge that
-# would require dist/ — not present on a fresh `mewkit init` install.
+# would require dist/ — not present on a fresh the installer install.
 #
 # Reqs: Bash 3.2+, python3 (used only for JSON parse/edit). No jq.
 
@@ -29,7 +29,7 @@ import json, sys, math
 window = int(sys.argv[1])
 data = json.loads(sys.stdin.read())
 
-CHARS_PER_TOKEN = 4  # mirrors meowkit/packages/mewkit/src/orchviz/token-estimator.ts
+CHARS_PER_TOKEN = 4  # mirrors token-estimator.ts
 
 def tokens_of(byte_count):
     if not byte_count:

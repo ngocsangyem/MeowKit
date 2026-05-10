@@ -9,7 +9,7 @@ description: >-
   Supports --analyze, --score, and --deep. NOT for prompts from scratch
   (mk:brainstorming), plans/reviews (mk:elicit), implementation plans
   (mk:plan-creator), or general codebase scouting (mk:scout).
-source: meowkit
+source: local
 allowed-tools:
   - Read
   - Write

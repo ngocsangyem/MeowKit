@@ -59,7 +59,7 @@ Do NOT create tasks for the archived (non-selected) approach.
 
 #### Status Read Order (Required)
 
-When populating `phases[*].status` in `.plan-state.json`, read in this order (mirrors `packages/mewkit/src/orchviz/plan/parse-phase-file.ts:42-106` cascade):
+When populating `phases[*].status` in `.plan-state.json`, read in this order (mirrors `packages/cli/src/orchviz/plan/parse-phase-file.ts:42-106` cascade):
 
 1. Frontmatter `status:` field (PREFERRED)
 2. `**Status:**` bold pattern in `## Overview` (legacy fallback)

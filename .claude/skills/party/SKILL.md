@@ -5,7 +5,7 @@ description: >-
   for architecture decisions and trade-off analysis.
   Use when asked "should we X or Y?", "let's discuss", or "design review".
 argument-hint: '"topic to discuss" [--agents planner,architect,developer]'
-source: meowkit
+source: local
 allowed-tools:
   - Read
   - Grep
@@ -23,7 +23,7 @@ Bring multiple agent perspectives into one room. Agents debate, challenge, and b
 
 ## Required Agents
 
-This skill orchestrates discussion among existing agent definitions. The following must exist under `meowkit/.claude/agents/` (per `agent-routing.md`):
+This skill orchestrates discussion among existing agent definitions. The following must exist under `.claude/agents/` (per `agent-routing.md`):
 
 `architect`, `developer`, `security`, `tester`, `reviewer`, `ui-ux-designer`, `analyst`, `planner`, `researcher`
 

@@ -13,7 +13,7 @@ alone prevents corruption; concurrent writers may lose updates but cannot corrup
 the cache (lost updates self-heal within the 24h TTL).
 
 Exports:
-    is_allowed(url: str, user_agent: str = MEOWKIT_UA) -> tuple[bool, str]
+    is_allowed(url: str, user_agent: str = WORKFLOW_UA) -> tuple[bool, str]
         Returns (allowed, reason).
         Reason strings:
             "cache hit allow"       — cached entry, allowed
@@ -44,9 +44,9 @@ except ImportError:
     _HAS_FCNTL = False
 
 try:
-    from scripts.http_fetch import MEOWKIT_UA, safe_url as _safe_url
+    from scripts.http_fetch import WORKFLOW_UA, safe_url as _safe_url
 except ImportError:
-    MEOWKIT_UA = "MeowKit/1.0 (+https://docs.meowkit.dev/skills/web-to-markdown)"
+    WORKFLOW_UA = "WorkflowFetcher/1.0"
     _safe_url = None  # type: ignore[assignment]
 
 # ---------------------------------------------------------------------------
@@ -158,7 +158,7 @@ def _fetch_robots_txt(scheme: str, host: str) -> str | None:
         # Use urllib directly for the raw text.
         req = urllib.request.Request(
             robots_url,
-            headers={"User-Agent": MEOWKIT_UA},
+            headers={"User-Agent": WORKFLOW_UA},
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
             raw = resp.read(65536).decode("utf-8", errors="replace")
@@ -171,7 +171,7 @@ def _fetch_robots_txt(scheme: str, host: str) -> str | None:
 # Public API
 # ---------------------------------------------------------------------------
 
-def is_allowed(url: str, user_agent: str = MEOWKIT_UA) -> tuple[bool, str]:
+def is_allowed(url: str, user_agent: str = WORKFLOW_UA) -> tuple[bool, str]:
     """
     Check robots.txt for url. Returns (allowed, reason).
 

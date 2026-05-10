@@ -97,7 +97,7 @@ sweep_failures:
 
 **Skip conditions:** plan has only `plan.md` (no phase files); plan dir not found.
 
-**Source:** Adapted from claudekit-engineer v2.17 `verification-roles.md` "Whole-Plan Consistency Sweep" section.
+**Source:** Adapted from external verification-role guidance for whole-plan consistency sweeps.
 
 ## Integration with Cook Workflow
 

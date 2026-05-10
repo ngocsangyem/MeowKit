@@ -2,9 +2,9 @@
 name: mk:project-organization
 description: "Use when creating files and need the correct path, organizing project layout, or enforcing naming conventions. Two modes: advisory (return path) and organize (restructure)."
 argument-hint: "[directories or files to organize]"
-source: claudekit-engineer
+source: local
 original_path: .claude/skills/project-organization/SKILL.md
-adapted_for: meowkit
+adapted_for: claude-code
 keywords: [project-organization, output-organization, file-structure, plan-organization, report-routing, directory-layout]
 when_to_use: "Use when organizing plan/report outputs into the correct project directories."
 user-invocable: true

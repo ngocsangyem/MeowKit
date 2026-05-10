@@ -3,7 +3,7 @@ name: mk:verify
 description: "Unified verification: build→lint→test→type-check→coverage. Use for 'is everything green', 'run all checks', 'verify build'. Auto-called by mk:cook. NOT for lint/format only (see mk:lint-and-validate); NOT for test-to-requirement coverage mapping (see mk:nyquist)."
 version: 1.0.0
 argument-hint: "[--coverage-threshold N] [--skip-build] [--skip-coverage]"
-source: meowkit
+source: local
 allowed-tools:
   - Bash
   - Read

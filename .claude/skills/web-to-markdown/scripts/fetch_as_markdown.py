@@ -35,7 +35,7 @@ import requests
 import requests.exceptions
 
 from scripts.html_to_markdown import best_markdown_from_html, is_thin_content, maybe_fix_mojibake
-from scripts.http_fetch import safe_url, static_fetch, PLAYWRIGHT_REJECTED_SCHEMES, MEOWKIT_UA
+from scripts.http_fetch import safe_url, static_fetch, PLAYWRIGHT_REJECTED_SCHEMES, WORKFLOW_UA
 from scripts.injection_detect import scan as _injection_scan
 from scripts.rate_limit import throttle as _throttle
 from scripts.robots_cache import is_allowed as _robots_allowed
@@ -94,7 +94,7 @@ def _playwright_fetch(url: str, wait_ms: int = 3000) -> tuple[str | None, int, s
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            context = browser.new_context(user_agent=MEOWKIT_UA)
+            context = browser.new_context(user_agent=WORKFLOW_UA)
             page = context.new_page()
 
             # Intercept every document-level navigation and re-validate the URL
@@ -263,7 +263,7 @@ def fetch_as_markdown(
     # robots.txt check (task 3.4) — after safe_url so we never DNS-resolve blocked URLs.
     # Kill switch: MEOWKIT_WEB_FETCH_RESPECT_ROBOTS=0 skips the check entirely.
     if os.environ.get("MEOWKIT_WEB_FETCH_RESPECT_ROBOTS", "1").strip() != "0":
-        _allowed, _reason = _robots_allowed(url, MEOWKIT_UA)
+        _allowed, _reason = _robots_allowed(url, WORKFLOW_UA)
         if not _allowed:
             return f"ERROR: robots.txt denies fetch ({_reason}) for {url!r}."
 
@@ -331,7 +331,7 @@ def fetch_api_spec(
 
     # robots.txt check (task 3.4) — after safe_url.
     if os.environ.get("MEOWKIT_WEB_FETCH_RESPECT_ROBOTS", "1").strip() != "0":
-        _allowed, _reason = _robots_allowed(url, MEOWKIT_UA)
+        _allowed, _reason = _robots_allowed(url, WORKFLOW_UA)
         if not _allowed:
             return f"ERROR: robots.txt denies fetch ({_reason}) for {url!r}."
 

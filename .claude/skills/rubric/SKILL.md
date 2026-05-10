@@ -14,7 +14,7 @@ allowed-tools:
   - Read
   - Grep
   - Glob
-source: meowkit
+source: local
 keywords: [rubric, graded-evaluation, weighted-criteria, pass-warn-fail, anchor-examples, calibration]
 when_to_use: "Use when loading, listing, composing, or validating graded evaluation rubrics with PASS/WARN/FAIL grading."
 user-invocable: true

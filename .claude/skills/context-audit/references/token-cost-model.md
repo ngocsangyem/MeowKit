@@ -8,14 +8,14 @@ estimates and how it derives the structural-overhead percentage banners.
 Every counted byte is divided by 4 to estimate tokens. This is the same
 heuristic encoded in:
 
-- `meowkit/packages/mewkit/src/orchviz/token-estimator.ts` (`CHARS_PER_TOKEN = 4`)
-- `meowkit/.claude/hooks/handlers/budget-tracker.cjs` (cost-tracking path)
+- the cost-tracking token estimator (`CHARS_PER_TOKEN = 4`)
+- `.claude/hooks/handlers/budget-tracker.cjs` (cost-tracking path)
 
 We inline the heuristic in shell rather than calling
 `token-estimator.ts` because:
 
 1. The TS module exports a programmatic API only (no CLI entry).
-2. `dist/` is `.gitignore`d and not present on a fresh `mewkit init` install,
+2. `dist/` is `.gitignore`d and not present on a fresh the installer install,
    so a Node bridge would require an extra build step.
 3. The heuristic is a single expression. Mirroring it inline keeps the audit
    script zero-dep.

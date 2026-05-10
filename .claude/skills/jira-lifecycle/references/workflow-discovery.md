@@ -128,7 +128,7 @@ The lifecycle agent should:
 
 ## Educational concept patterns (NOT authoritative)
 
-The files at `meowkit/.claude/skills/jira-lifecycle/references/patterns/` (`standard-workflow.md`, `software-dev-workflow.md`, `jsm-request-workflow.md`, `incident-workflow.md`) describe **common workflow shapes** for orientation. They are NOT your project's actual workflow.
+The files at `.claude/skills/jira-lifecycle/references/patterns/` (`standard-workflow.md`, `software-dev-workflow.md`, `jsm-request-workflow.md`, `incident-workflow.md`) describe **common workflow shapes** for orientation. They are NOT your project's actual workflow.
 
 If you find yourself asking "what statuses does this project use?" — read the cache first, run `fetch-workflow.sh` if absent. Do NOT default to the patterns/ files.
 

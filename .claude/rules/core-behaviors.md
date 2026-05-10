@@ -1,7 +1,7 @@
 # Core Operating Behaviors
 
 6 mandatory behaviors that apply in ALL modes, ALL phases, ALL skills. Non-negotiable.
-These unify the WHY behind MeowKit's rule files. Rules are the enforcement WHAT.
+These unify the WHY behind the toolkit's rule files. Rules are the enforcement WHAT.
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-source: MeowKit original
+source: original
 applies_to: [Phase 0, all]
 # Unconditional load — orchestrator always needs the routing table.
 ---
@@ -45,7 +45,7 @@ The 21 domain integration agents below are NOT scored by `mk:agent-detector` and
 
 ## Skill Domain Routing
 
-The orchestrator routes by MeowKit skill names:
+The orchestrator routes by skill names:
 
 | Intent | Use |
 | --- | --- |

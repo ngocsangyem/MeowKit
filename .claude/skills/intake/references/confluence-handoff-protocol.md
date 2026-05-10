@@ -48,7 +48,7 @@ When user input lacks a URL but contains a numeric token (3+ digits), intake rec
 
 ## When Intake Triggers Spec-Analyst (it doesn't, in v1)
 
-intake does NOT programmatically invoke spec-analyst. The intake report's Suggested Actions section recommends running `/mk:confluence-spec-analyst <page-id>` as a follow-up. This preserves MeowKit's "user orchestrates skills" boundary.
+intake does NOT programmatically invoke spec-analyst. The intake report's Suggested Actions section recommends running `/mk:confluence-spec-analyst <page-id>` as a follow-up. This preserves the toolkit's "user orchestrates skills" boundary.
 
 ## How the Spec Report Flows Back
 

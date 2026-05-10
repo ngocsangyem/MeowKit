@@ -51,7 +51,7 @@ Fallback chain — try each step; move to next if step unavailable:
    → Report to user: "Video attachment detected. FFmpeg required for frame
      extraction but is not installed. Cannot analyze video content."
    → Suggest: "Install FFmpeg: brew install ffmpeg (macOS) or
-     npx meowkit setup --system-deps"
+     .claude/scripts/bin/setup-workflow --system-deps"
    → Continue intake without video content; note gap in output
 ```
 

@@ -43,7 +43,7 @@ When a skill needs to persist data across sessions (append-only logs, JSON state
 
 WHY: Skill-directory state is wiped on plugin upgrade per Anthropic's documented behavior. Silent data loss is the failure mode. `${CLAUDE_PLUGIN_DATA}` is the stable, upgrade-safe folder.
 
-EXCEPTION: MeowKit-internal infrastructure (`.claude/memory/`, `tasks/`, `session-state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
+EXCEPTION: framework-internal infrastructure (`.claude/memory/`, `tasks/`, `session-state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
 
 **Bad example: Skill-dir path** (wiped on plugin upgrade):
 
@@ -137,7 +137,7 @@ WHY: Standardized metadata enables catalog tooling, downstream consumers, and a 
 
 ### Validation
 
-Enforced by `meowkit/scripts/validate-skill-frontmatter.py` against `meowkit/.claude/schemas/skill-schema.json`. CI runs on every PR via `ci.yml`. Two-tier severity: ERROR (schema violation) vs WARN (missing recommended). Pass `--strict` to promote WARN to ERROR.
+Enforced by `scripts/validate-skill-frontmatter.py` against `.claude/schemas/skill-schema.json`. CI runs on every PR via `ci.yml`. Two-tier severity: ERROR (schema violation) vs WARN (missing recommended). Pass `--strict` to promote WARN to ERROR.
 
 ### Deprecated fields
 

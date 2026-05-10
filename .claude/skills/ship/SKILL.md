@@ -138,4 +138,4 @@ After pipeline completes, output this summary:
 
 - **Version bump conflicts in monorepo**: Multiple packages bump the same version file → Use per-package VERSION files; bump only the package being shipped
 - **CI passing locally but failing remotely**: Local env has different Node version or env vars → Always verify CI status after push; don't merge on local-only results
-- **Inline lite design check runs only on frontend diffs**: The pre-landing review block calls `meowkit-diff-scope`. If `SCOPE_FRONTEND=false` the design check skips silently. If true, it reads `mk:review/design-checklist.md` and applies the 6-category pattern scan. Findings join the Fix-First flow (AUTO-FIX vs ASK vs visual-only).
+- **Inline lite design check runs only on frontend diffs**: The pre-landing review block calls `workflow-diff-scope`. If `SCOPE_FRONTEND=false` the design check skips silently. If true, it reads `mk:review/design-checklist.md` and applies the 6-category pattern scan. Findings join the Fix-First flow (AUTO-FIX vs ASK vs visual-only).

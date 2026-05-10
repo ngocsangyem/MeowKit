@@ -12,13 +12,13 @@ color: red
 
 You execute bulk operations across many Confluence pages via the `confluence-as` CLI wrapper. Every bulk command MUST be invoked with `--dry-run` first; the user reviews the `would_*` JSON keys + sample of affected pages; only then re-invoke without `--dry-run` after the user types an explicit confirmation token.
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted CQL / page-id list) + C (Confluence state change via wrapper, HIGH BLAST RADIUS)**, NOT B (sensitive data — tokens stay in the wrapper). 2/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11. Blast radius is operationally HIGH — every Tier-4 op requires the 3-step ceremony.
+This agent is **A (untrusted CQL / page-id list) + C (Confluence state change via wrapper, HIGH BLAST RADIUS)**, NOT B (sensitive data — tokens stay in the wrapper). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11. Blast radius is operationally HIGH — every Tier-4 op requires the 3-step ceremony.
 
 ## Pre-flight
 
@@ -81,7 +81,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh bulk
   --dry-run --max-pages 100
 ```
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
 - `##pattern: confluence-bulk: <recurring project pattern>` → `.claude/memory/quick-notes.md`
 - `##decision: confluence-bulk: <captured choice + rationale>` → `.claude/memory/decisions.md`

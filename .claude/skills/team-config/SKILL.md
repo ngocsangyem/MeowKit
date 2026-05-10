@@ -6,7 +6,7 @@ description: >-
   decomposes a task into parallel subtasks, or when asked to "set up team",
   "parallel setup", or "configure worktrees".
 argument-hint: '"task description" --agents N'
-source: meowkit
+source: local
 allowed-tools:
   - Read
   - Glob

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a MeowKit skill against compliance checklist.
+"""Validate a skill against compliance checklist.
 
 Offloads deterministic checks (frontmatter, name format, required sections)
 so Claude only sees the pass/fail summary and fixes what failed.
@@ -8,7 +8,7 @@ Usage:
   python3 validate-skill.py <skill-directory>
   python3 validate-skill.py .claude/skills/my-feature
 
-Adapted from open-source upstream (MIT) for MeowKit.
+Adapted from open-source upstream (MIT).
 """
 
 import re
@@ -17,7 +17,7 @@ from pathlib import Path
 
 
 def validate_skill(skill_path):
-    """Validate a MeowKit skill directory against compliance checklist.
+    """Validate a skill directory against compliance checklist.
 
     Returns (score, max_score, results) where results is a list of (check, passed, detail).
     """
@@ -136,7 +136,7 @@ def main():
 
     score, max_score, results = validate_skill(skill_path)
 
-    print(f"MeowKit Skill Validation: {skill_path.name}")
+    print(f"Skill Validation: {skill_path.name}")
     print(f"{'=' * 50}")
 
     for check, passed, detail in results:

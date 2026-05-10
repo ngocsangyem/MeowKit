@@ -18,7 +18,7 @@ allowed-tools:
   - Glob
   - Agent
   - AskUserQuestion
-source: meowkit
+source: local
 keywords: [plan-creator, implementation-plan, phase-files, gate-1, scope-adaptive]
 when_to_use: "Use when creating a structured multi-file implementation plan before build. NOT for ticket analysis (see mk:planning-engine) or scope review (see mk:plan-ceo-review)."
 user-invocable: true
@@ -137,7 +137,7 @@ tasks/plans/YYMMDD-name/
 | `references/adr-generation.md`                     | Architecture Decision Record generation                                                                                                                                       |
 | `references/parallel-mode.md`                      | Ownership matrix template, parallel group rules                                                                                                                               |
 | `references/two-approach-mode.md`                  | Approach file template, trade-off matrix, selection flow                                                                                                                      |
-| `scripts/validate-plan.py`                         | Plan completeness validator. **Depends on PyYAML** (installed via `npx mewkit setup` into `.claude/skills/.venv/`). Run via `.claude/skills/.venv/bin/python3 scripts/validate-plan.py <plan.md>`. |
+| `scripts/validate-plan.py`                         | Plan completeness validator. **Depends on PyYAML** (installed via `.claude/scripts/bin/setup-workflow` into `.claude/skills/.venv/`). Run via `.claude/skills/.venv/bin/python3 scripts/validate-plan.py <plan.md>`. |
 | `scripts/check-product-spec.sh`                    | Product-spec structural validator (POSIX bash). Enforces feature count, user stories, forbidden patterns. Used by step-03a and step-04 for `--product-level` mode. |
 | `references/workflow-models/feature-model.md`      | Workflow template for feature tasks (loaded JIT by step-00)                                                                                                                   |
 | `references/workflow-models/bugfix-model.md`       | Workflow template for bug fix tasks (loaded JIT by step-00)                                                                                                                   |

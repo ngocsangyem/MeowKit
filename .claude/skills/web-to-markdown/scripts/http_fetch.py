@@ -46,7 +46,7 @@ _HARD_CEILING_BYTES = 100 * 1024 * 1024
 
 # Honest User-Agent (task 3.6) — identifies this tool rather than spoofing a browser.
 # Used in static_fetch headers and passed to Playwright new_context(user_agent=...).
-MEOWKIT_UA = "MeowKit/1.0 (+https://meowkit.dev/skills/web-to-markdown)"
+WORKFLOW_UA = "WorkflowFetcher/1.0"
 
 
 def _max_bytes() -> int:
@@ -171,7 +171,7 @@ def static_fetch(url: str, timeout: int = 15) -> tuple[str | None, int, str]:
             r = requests.get(
                 current_url,
                 headers={
-                    "User-Agent": MEOWKIT_UA,
+                    "User-Agent": WORKFLOW_UA,
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                     "Accept-Language": "en-US,en;q=0.5",
                 },

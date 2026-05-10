@@ -4,23 +4,21 @@
 ## Preamble (run first)
 
 ```bash
-_UPD=$(# update-check removed — MeowKit uses npx meowkit upgrade 2>/dev/null || # removed — use npx meowkit upgrade 2>/dev/null || true)
-[ -n "$_UPD" ] && echo "$_UPD" || true
 mkdir -p .claude/memory/sessions
 touch .claude/memory/sessions/"$PPID"
 _SESSIONS=$(find .claude/memory/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
 find .claude/memory/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(.claude/scripts/bin/meowkit-config get meowkit_contributor 2>/dev/null || true)
-_PROACTIVE=$(.claude/scripts/bin/meowkit-config get proactive 2>/dev/null || echo "true")
+_CONTRIB=$(.claude/scripts/bin/workflow-config get contributor 2>/dev/null || true)
+_PROACTIVE=$(.claude/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
 echo "PROACTIVE: $_PROACTIVE"
-source <(.claude/scripts/bin/meowkit-repo-mode 2>/dev/null) || true
+source <(.claude/scripts/bin/workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
 _LAKE_SEEN=$([ -f .claude/memory/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(.claude/scripts/bin/meowkit-config get telemetry 2>/dev/null || true)
+_TEL=$(.claude/scripts/bin/workflow-config get telemetry 2>/dev/null || true)
 _TEL_PROMPTED=$([ -f .claude/memory/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"

@@ -3,7 +3,7 @@ name: mk:database
 description: "Database patterns: schema design, migrations, query optimization, indexing. PostgreSQL primary. Use for 'database schema', 'migration', 'SQL optimization'."
 version: 1.0.0
 argument-hint: "[schema|migration|query|optimize] [description]"
-source: meowkit
+source: local
 allowed-tools:
   - Bash
   - Read

@@ -33,7 +33,7 @@ If the subagent fails or times out: "Claude adversarial subagent unavailable. Co
 
 **Persist the review result:**
 ```bash
-.claude/scripts/bin/meowkit-review-log '{"skill":"adversarial-review","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"claude","tier":"medium","commit":"'"$(git rev-parse --short HEAD)"'"}'
+.claude/scripts/bin/workflow-review-log '{"skill":"adversarial-review","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"claude","tier":"medium","commit":"'"$(git rev-parse --short HEAD)"'"}'
 ```
 Substitute STATUS: "clean" if no findings, "issues_found" if findings exist. If the subagent failed, do NOT persist.
 
@@ -58,7 +58,7 @@ Both flows: FIXABLE findings → Fix-First pipeline; INVESTIGATE findings → in
 
 **Persist the review result AFTER all passes complete** (not after each sub-step):
 ```bash
-.claude/scripts/bin/meowkit-review-log '{"skill":"adversarial-review","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"claude","tier":"large","commit":"'"$(git rev-parse --short HEAD)"'"}'
+.claude/scripts/bin/workflow-review-log '{"skill":"adversarial-review","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"claude","tier":"large","commit":"'"$(git rev-parse --short HEAD)"'"}'
 ```
 Substitute STATUS: "clean" if no findings across BOTH passes, "issues_found" if any pass found issues. If both passes failed, do NOT persist.
 

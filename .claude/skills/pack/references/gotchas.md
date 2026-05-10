@@ -124,7 +124,7 @@ Known failure modes and their fixes.
 ### `.claude/packs/` not gitignored
 
 **Cause:** The skill install missed adding the entry.
-**Fix:** Verify `.gitignore` (project-local) and `.gitignore.meowkit` (shared template) both contain `.claude/packs/`. Add manually if missing.
+**Fix:** Verify `.gitignore` (project-local) and `.gitignore.workflow` (shared template) both contain `.claude/packs/`. Add manually if missing.
 
 ### Timestamp collision on rapid re-runs
 

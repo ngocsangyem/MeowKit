@@ -9,7 +9,7 @@
 - [Plan File Review Report](#plan-file-review-report)
   - [Detect the plan file](#detect-the-plan-file)
   - [Generate the report](#generate-the-report)
-- [MEOWKIT REVIEW REPORT](#meowkit-review-report)
+- [REVIEW REPORT](#review-report)
   - [Write to the plan file](#write-to-the-plan-file)
 - [Next Steps — Review Chaining](#next-steps-review-chaining)
 - [docs/designs Promotion (EXPANSION and SELECTIVE EXPANSION only)](#docsdesigns-promotion-expansion-and-selective-expansion-only)
@@ -20,7 +20,7 @@ After producing the Completion Summary, clean up any handoff notes for this bran
 the review is complete and the context is no longer needed.
 
 ```bash
-eval "$(.claude/scripts/bin/meowkit-slug 2>/dev/null)"
+eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)"
 rm -f .claude/memory/projects/*-$BRANCH-ceo-handoff-*.md 2>/dev/null || true
 ```
 
@@ -35,7 +35,7 @@ the same pattern. The review dashboard depends on this data. Skipping this
 command breaks the review readiness dashboard in /ship.
 
 ```bash
-.claude/scripts/bin/meowkit-review-log '{"skill":"plan-ceo-review","timestamp":"TIMESTAMP","status":"STATUS","unresolved":N,"critical_gaps":N,"mode":"MODE","scope_proposed":N,"scope_accepted":N,"scope_deferred":N,"commit":"COMMIT"}'
+.claude/scripts/bin/workflow-review-log '{"skill":"plan-ceo-review","timestamp":"TIMESTAMP","status":"STATUS","unresolved":N,"critical_gaps":N,"mode":"MODE","scope_proposed":N,"scope_accepted":N,"scope_deferred":N,"commit":"COMMIT"}'
 ```
 
 Before running this command, substitute the placeholder values from the Completion Summary you just produced:
@@ -54,7 +54,7 @@ Before running this command, substitute the placeholder values from the Completi
 After completing the review, read the review log and config to display the dashboard.
 
 ```bash
-.claude/scripts/bin/meowkit-review-log
+.claude/scripts/bin/workflow-review-log
 ```
 
 Parse the output. Find the most recent entry for each skill (plan-ceo-review, plan-ceo-review, review, plan-design-review, design-review-lite, adversarial-review, codex-review, codex-plan-review). Ignore entries with timestamps older than 7 days. For the Eng Review row, show whichever is more recent between `review` (diff-scoped pre-landing review) and `plan-ceo-review` (plan-stage architecture review). Append "(DIFF)" or "(PLAN)" to the status to distinguish. For the Adversarial row, show whichever is more recent between `adversarial-review` (new auto-scaled) and `codex-review` (legacy). For Design Review, show whichever is more recent between `plan-design-review` (full visual audit) and `design-review-lite` (code-level check). Append "(FULL)" or "(LITE)" to the status to distinguish. Display:
@@ -76,7 +76,7 @@ Parse the output. Find the most recent entry for each skill (plan-ceo-review, pl
 ```
 
 **Review tiers:**
-- **Eng Review (required by default):** The only review that gates shipping. Covers architecture, code quality, tests, performance. Can be disabled globally with `meowkit-config set skip_eng_review true` (the "don't bother me" setting).
+- **Eng Review (required by default):** The only review that gates shipping. Covers architecture, code quality, tests, performance. Can be disabled globally with `workflow-config set skip_eng_review true` (the "don't bother me" setting).
 - **CEO Review (optional):** Use your judgment. Recommend it for big product/business changes, new user-facing features, or scope decisions. Skip for bug fixes, refactors, infra, and cleanup.
 - **Design Review (optional):** Use your judgment. Recommend it for UI/UX changes. Skip for backend-only, infra, or prompt-only changes.
 - **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get one Claude adversarial pass. Large diffs (200+) get two Claude adversarial passes (attack-surface + failure-mode). No configuration needed.
@@ -127,7 +127,7 @@ Summary. For prior reviews, use the JSONL fields directly — they contain all r
 Produce this markdown table:
 
 ```markdown
-## MEOWKIT REVIEW REPORT
+## REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
@@ -150,9 +150,9 @@ Below the table, add these lines (omit any that are empty/not applicable):
 file you are allowed to edit in plan mode. The plan file review report is part of the
 plan's living status.
 
-- Search the plan file for a `## MEOWKIT REVIEW REPORT` section **anywhere** in the file
+- Search the plan file for a `## REVIEW REPORT` section **anywhere** in the file
   (not just at the end — content may have been added after it).
-- If found, **replace it** entirely using the Edit tool. Match from `## MEOWKIT REVIEW REPORT`
+- If found, **replace it** entirely using the Edit tool. Match from `## REVIEW REPORT`
   through either the next `## ` heading or end of file, whichever comes first. This ensures
   content added after the report section is preserved, not eaten. If the Edit fails
   (e.g., concurrent edit changed the content), re-read the plan file and retry once.

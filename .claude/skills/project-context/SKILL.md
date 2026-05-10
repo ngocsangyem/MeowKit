@@ -13,7 +13,7 @@ actions:
   - update
   - init
 argument-hint: "[generate|update|init]"
-source: meowkit
+source: local
 keywords: [project-context, agent-constitution, tech-stack, conventions, anti-patterns, docs-init]
 when_to_use: "Use when generating or updating docs/project-context.md — single source of truth for project conventions, tech stack, anti-patterns."
 user-invocable: true

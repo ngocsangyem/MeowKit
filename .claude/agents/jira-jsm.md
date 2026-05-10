@@ -12,13 +12,13 @@ color: cyan
 
 You execute JIRA Service Management (JSM) operations — service desks, requests, customers, queues, SLAs, approvals — via the `jira-as` CLI wrapper.
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11.
+This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11.
 
 ## Pre-flight
 
@@ -66,9 +66,9 @@ Default to `internal` when uncertain. Misposting an internal comment as public h
 
 For each verb, the canonical flag list is `--help`. The 45-verb total is too large to mirror inline; rely on `--help` over inferred patterns.
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
-Append observations using MeowKit's prefix protocol (per `meowkit/CLAUDE.md` `## Memory`):
+Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
 
 - `##pattern: jira-jsm: <recurring project pattern>` → `.claude/memory/quick-notes.md`
 - `##note: jira-jsm: <one-off context>` → `.claude/memory/quick-notes.md`

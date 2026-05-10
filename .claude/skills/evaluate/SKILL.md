@@ -19,7 +19,7 @@ allowed-tools:
   - Glob
   - Agent
   - AskUserQuestion
-source: meowkit
+source: local
 keywords: [evaluate, behavioral-verification, rubric-grading, running-build, active-verification, skeptic-persona]
 when_to_use: "Use when grading a running build behaviorally — drives artifact via browser/curl/CLI against rubric criteria. NOT for structural code audit of a diff/PR (see mk:review) or static linting (see mk:lint-and-validate)."
 user-invocable: true

@@ -1,10 +1,10 @@
 # Development Rules
 
-These rules apply to all implementation work in MeowKit-enabled projects.
+These rules apply to all implementation work in projects using this workflow.
 
 ## General
 
-- Analyze the MeowKit skill catalog before starting and activate only the skills needed for the task domain.
+- Analyze the skill catalog before starting and activate only the skills needed for the task domain.
 - Follow YAGNI, KISS, and DRY. Prefer the smallest real change that satisfies the approved scope.
 - Use `mk:docs-finder` for current library/API documentation; do not rely on training data for signatures.
 - Use `mk:multimodal` for describing or processing images, videos, audio, PDFs, and other non-text artifacts.
@@ -44,7 +44,7 @@ ALWAYS run the compile/build command after creating or modifying a code file.
 WHY: Catching syntax errors immediately prevents cascading failures.
 Check: zero compilation errors before proceeding.
 
-For MeowKit itself, the default commands are:
+For this toolkit itself, the default commands are:
 
 - `npm run build`
 - `npm run lint`

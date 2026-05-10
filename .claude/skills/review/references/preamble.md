@@ -17,28 +17,26 @@
   - [Escalation](#escalation)
 - [Telemetry (run last)](#telemetry-run-last)
 - [Plan Status Footer](#plan-status-footer)
-- [MEOWKIT REVIEW REPORT](#meowkit-review-report)
+- [REVIEW REPORT](#review-report)
 
 ## Preamble (run first)
 
 ```bash
-_UPD=$(# update-check removed — MeowKit uses npx meowkit upgrade 2>/dev/null || # removed — use npx meowkit upgrade 2>/dev/null || true)
-[ -n "$_UPD" ] && echo "$_UPD" || true
 mkdir -p .claude/memory/sessions
 touch .claude/memory/sessions/"$PPID"
 _SESSIONS=$(find .claude/memory/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
 find .claude/memory/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(.claude/scripts/bin/meowkit-config get meowkit_contributor 2>/dev/null || true)
-_PROACTIVE=$(.claude/scripts/bin/meowkit-config get proactive 2>/dev/null || echo "true")
+_CONTRIB=$(.claude/scripts/bin/workflow-config get contributor 2>/dev/null || true)
+_PROACTIVE=$(.claude/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
 echo "PROACTIVE: $_PROACTIVE"
-source <(.claude/scripts/bin/meowkit-repo-mode 2>/dev/null) || true
+source <(.claude/scripts/bin/workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
 _LAKE_SEEN=$([ -f .claude/memory/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(.claude/scripts/bin/meowkit-config get telemetry 2>/dev/null || true)
+_TEL=$(.claude/scripts/bin/workflow-config get telemetry 2>/dev/null || true)
 _TEL_PROMPTED=$([ -f .claude/memory/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
@@ -47,13 +45,10 @@ echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p .claude/memory
 echo '{"skill":"review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .claude/memory/skill-usage.jsonl 2>/dev/null || true
 # zsh-compatible: use find instead of glob to avoid NOMATCH error
-for _PF in $(find .claude/memory -maxdepth 1 -name '.pending-*' 2>/dev/null); do [ -f "$_PF" ] && # telemetry removed — MeowKit uses analyst agent --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
-
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `# upgrade removed — use npx meowkit upgrade` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Updated to v{to} — continuing." and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "This workflow follows the **Boil the Lake** principle — always do the complete
@@ -73,13 +68,13 @@ ask the user about telemetry. Use AskUserQuestion:
 > Help improve this workflow! Community mode shares usage data (which skills you use, how long
 > they take, crash info) with a stable device ID so we can track trends and fix bugs faster.
 > No code, file paths, or repo names are ever sent.
-> Change anytime with `meowkit-config set telemetry off`.
+> Change anytime with `workflow-config set telemetry off`.
 
 Options:
 - A) Help improve the workflow! (recommended)
 - B) No thanks
 
-If A: run `.claude/scripts/bin/meowkit-config set telemetry community`
+If A: run `.claude/scripts/bin/workflow-config set telemetry community`
 
 If B: ask a follow-up AskUserQuestion:
 
@@ -90,8 +85,8 @@ Options:
 - A) Sure, anonymous is fine
 - B) No thanks, fully off
 
-If B→A: run `.claude/scripts/bin/meowkit-config set telemetry anonymous`
-If B→B: run `.claude/scripts/bin/meowkit-config set telemetry off`
+If B→A: run `.claude/scripts/bin/workflow-config set telemetry anonymous`
+If B→B: run `.claude/scripts/bin/workflow-config set telemetry off`
 
 Always run:
 ```bash
@@ -177,11 +172,11 @@ Replace SKILL_NAME and ONE_LINE_SUMMARY. Runs inline — don't stop the workflow
 
 ## Contributor Mode
 
-If `_CONTRIB` is `true`: you are in **contributor mode**. You're a MeowKit user who also helps make MeowKit better.
+If `_CONTRIB` is `true`: you are in **contributor mode**. You're a toolkit user who also helps make the toolkit better.
 
-**At the end of each major workflow step** (not after every single command), reflect on the MeowKit tooling you used. Rate your experience 0 to 10. If it wasn't a 10, think about why. If there is an obvious, actionable bug OR an insightful, interesting thing that could have been done better by MeowKit code or skill markdown — file a field report. Maybe our contributor will help make us better!
+**At the end of each major workflow step** (not after every single command), reflect on the tooling you used. Rate your experience 0 to 10. If it wasn't a 10, think about why. If there is an obvious, actionable bug OR an insightful, interesting thing that could have been done better by tooling code or skill markdown — file a field report. Maybe our contributor will help make us better!
 
-**Calibration — this is the bar:** For example, if `agent-browser eval "await fetch(...)"` failed with `SyntaxError: await is only valid in async functions` because the runner didn't wrap expressions in async context, that would be small but reasonable input that MeowKit should handle — worth filing. Things less consequential than this, ignore.
+**Calibration — this is the bar:** For example, if `agent-browser eval "await fetch(...)"` failed with `SyntaxError: await is only valid in async functions` because the runner didn't wrap expressions in async context, that would be small but reasonable input that the toolkit should handle — worth filing. Things less consequential than this, ignore.
 
 **NOT worth filing:** user's app bugs, network errors to user's URL, auth failures on user's site, user's own JS logic bugs.
 
@@ -190,7 +185,7 @@ If `_CONTRIB` is `true`: you are in **contributor mode**. You're a MeowKit user 
 ```
 # {Title}
 
-Hey MeowKit team — ran into this while using /{skill-name}:
+Hey tooling maintainers — ran into this while using /{skill-name}:
 
 **What I was trying to do:** {what the user/agent was attempting}
 **What happened instead:** {what actually happened}
@@ -205,12 +200,12 @@ Hey MeowKit team — ran into this while using /{skill-name}:
 ```
 
 ## What would make this a 10
-{one sentence: what MeowKit should have done differently}
+{one sentence: what the toolkit should have done differently}
 
-**Date:** {YYYY-MM-DD} | **Version:** {MeowKit version} | **Skill:** /{skill}
+**Date:** {YYYY-MM-DD} | **Version:** {toolkit version} | **Skill:** /{skill}
 ```
 
-Slug: lowercase, hyphens, max 60 chars (e.g. `browse-js-no-await`). Skip if file already exists. Max 3 reports per session. File inline and continue — don't stop the workflow. Tell user: "Filed MeowKit field report: {title}"
+Slug: lowercase, hyphens, max 60 chars (e.g. `browse-js-no-await`). Skip if file already exists. Max 3 reports per session. File inline and continue — don't stop the workflow. Tell user: "Filed tooling field report: {title}"
 
 ## Completion Status Protocol
 
@@ -255,7 +250,7 @@ Run this bash:
 _TEL_END=$(date +%s)
 _TEL_DUR=$(( _TEL_END - _TEL_START ))
 rm -f .claude/memory/.pending-"$_SESSION_ID" 2>/dev/null || true
-# telemetry removed — MeowKit uses analyst agent \
+# telemetry removed — telemetry disabled; analyst agent not invoked \
   --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
   --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
 ```
@@ -269,15 +264,15 @@ never blocks the user.
 
 When you are in plan mode and about to call ExitPlanMode:
 
-1. Check if the plan file already has a `## MEOWKIT REVIEW REPORT` section.
+1. Check if the plan file already has a `## REVIEW REPORT` section.
 2. If it DOES — skip (a review skill already wrote a richer report).
 3. If it does NOT — run this command:
 
 ```bash
-.claude/scripts/bin/meowkit-review-log
+.claude/scripts/bin/workflow-review-log
 ```
 
-Then write a `## MEOWKIT REVIEW REPORT` section to the end of the plan file:
+Then write a `## REVIEW REPORT` section to the end of the plan file:
 
 - If the output contains review entries (JSONL lines before `---CONFIG---`): format the
   standard report table with runs/status/findings per skill, same format as the review
@@ -285,7 +280,7 @@ Then write a `## MEOWKIT REVIEW REPORT` section to the end of the plan file:
 - If the output is `NO_REVIEWS` or empty: write this placeholder table:
 
 ```markdown
-## MEOWKIT REVIEW REPORT
+## REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|

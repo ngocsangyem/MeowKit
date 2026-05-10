@@ -79,7 +79,7 @@ Skip silently when:
 
 ## Source
 
-Adapted from claudekit-engineer v2.17 `verification-roles.md` "Whole-Plan Consistency Sweep" section.
+Adapted from external verification-role guidance for whole-plan consistency sweeps.
 
 ## Next
 

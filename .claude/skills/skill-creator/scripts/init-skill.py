@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Initialize a new MeowKit skill with proper structure.
+"""Initialize a new skill with proper structure.
 
 Offloads deterministic scaffolding (directory creation, template filling)
 so Claude only needs to review and customize the generated content.
@@ -8,7 +8,7 @@ Usage:
   python3 init-skill.py <skill-name> [--path <path>]
   python3 init-skill.py mk:my-feature --path .claude/skills
 
-Adapted from open-source upstream (MIT) for MeowKit.
+Adapted from open-source upstream (MIT).
 """
 
 import re
@@ -41,7 +41,7 @@ description: "[TODO: Specific trigger keywords + what it does. Include WHEN to u
 
 ## Workflow Integration
 
-Operates in **Phase [TODO: 0-6]** of MeowKit's workflow. Output supports the `[TODO: agent name]` agent.
+Operates in **Phase [TODO: 0-6]** of the 7-phase workflow. Output supports the `[TODO: agent name]` agent.
 
 ## Process
 

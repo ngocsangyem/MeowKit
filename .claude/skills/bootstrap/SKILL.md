@@ -17,7 +17,7 @@ allowed-tools:
   - Glob
   - AskUserQuestion
   - WebSearch
-source: claudekit-engineer
+source: local
 keywords: [bootstrap, scaffold, new-project, initial-scaffolding, greenfield-init]
 when_to_use: "Use when scaffolding a brand-new project from scratch. NOT for autonomous green-field product builds (see mk:harness) or single-task implementation (see mk:cook)."
 user-invocable: true
@@ -27,7 +27,7 @@ user-invocable: true
 
 End-to-end project orchestrator: research → design → **plan → scaffold** → implement → docs.
 
-**CLI boundary:** `npx mewkit init` = project infrastructure. `mk:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
+**CLI boundary:** the installer = project infrastructure. `mk:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
 
 ## When to Use
 

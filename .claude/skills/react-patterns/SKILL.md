@@ -10,7 +10,7 @@ allowed-tools:
   - Read
   - Grep
   - Glob
-source: claudekit-engineer
+source: local
 keywords: [react, nextjs, tsx, jsx, performance, re-render, bundle-optimization]
 when_to_use: "Use when writing/reviewing/optimizing React/Next.js code. Triggers on .tsx/.jsx files. NOT for generic TypeScript (see mk:typescript) or Vue/Angular."
 user-invocable: true
