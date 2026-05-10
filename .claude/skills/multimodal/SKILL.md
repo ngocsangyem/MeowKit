@@ -17,7 +17,21 @@ requires_env:
     required: false
     description: "MiniMax API key for image/video/TTS/music generation"
     setup: "Get from https://platform.minimax.io/"
-keywords: [multimodal, gemini, image-gen, video-gen, tts, transcription, document-conversion]
+keywords:
+  [
+    multimodal,
+    gemini,
+    image-gen,
+    video-gen,
+    tts,
+    transcription,
+    document-conversion,
+    vision,
+    image,
+    video,
+    audio,
+    minimax,
+  ]
 when_to_use: "Use when processing images, video, audio, PDFs or generating media via Gemini/MiniMax/OpenRouter. Activate when task references media files."
 user-invocable: true
 ---
