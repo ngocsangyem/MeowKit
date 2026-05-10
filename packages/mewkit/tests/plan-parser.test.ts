@@ -17,11 +17,16 @@ import { PlanCollector } from "../src/orchviz/plan/collector.js";
 const FIXTURE = path.resolve(__dirname, "fixtures", "plan-redesign-fixture", "8-phase-standard");
 
 let tmpPhaseFile: string | null = null;
+let tmpProjectRoot: string | null = null;
 
 afterEach(() => {
 	if (tmpPhaseFile) {
 		try { fs.unlinkSync(tmpPhaseFile); } catch { /* best-effort */ }
 		tmpPhaseFile = null;
+	}
+	if (tmpProjectRoot) {
+		try { fs.rmSync(tmpProjectRoot, { recursive: true, force: true }); } catch { /* best-effort */ }
+		tmpProjectRoot = null;
 	}
 });
 
@@ -84,9 +89,12 @@ describe("findActivePlan boundary check (red-team C1)", () => {
 
 describe("PlanCollector mtime-keyed cache (red-team H3)", () => {
 	it("returns same plan content from cache while refreshing generatedAt per call", () => {
-		// Use this very project root; the redesign plan IS the active plan.
-		const root = path.resolve(__dirname, "..", "..", "..");
-		const collector = new PlanCollector(root);
+		tmpProjectRoot = fs.mkdtempSync(path.join(os.tmpdir(), "plan-collector-"));
+		const activePlanDir = path.join(tmpProjectRoot, "tasks", "plans", "260501-active-fixture");
+		fs.mkdirSync(path.dirname(activePlanDir), { recursive: true });
+		fs.cpSync(FIXTURE, activePlanDir, { recursive: true });
+
+		const collector = new PlanCollector(tmpProjectRoot);
 		const a = collector.snapshot();
 		const b = collector.snapshot();
 		// Cache hit returns the same parsed plan reference (no reparse) ...
