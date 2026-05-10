@@ -20,15 +20,12 @@ describe("provider registry", () => {
 	});
 
 	it(".agents/skills/ shared by codex+cursor+windsurf+gemini-cli+amp (5 providers)", () => {
-		const collisions = detectProviderPathCollisions(
-			["codex", "cursor", "windsurf", "gemini-cli", "amp"],
-			{ global: false },
-		);
+		const collisions = detectProviderPathCollisions(["codex", "cursor", "windsurf", "gemini-cli", "amp"], {
+			global: false,
+		});
 		const skillsCollision = collisions.find((c) => c.path === ".agents/skills");
 		expect(skillsCollision).toBeDefined();
-		expect(skillsCollision?.providers.sort()).toEqual(
-			["amp", "codex", "cursor", "gemini-cli", "windsurf"],
-		);
+		expect(skillsCollision?.providers.sort()).toEqual(["amp", "codex", "cursor", "gemini-cli", "windsurf"]);
 	});
 
 	it("antigravity uses .agent/skills (singular), distinct from .agents/skills", () => {

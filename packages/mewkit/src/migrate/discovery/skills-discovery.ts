@@ -34,8 +34,7 @@ async function parseSkillMd(skillDir: string, dirName: string): Promise<SkillInf
 		const author = metadata?.author;
 		const license = frontmatter.license;
 
-		const frontmatterName =
-			typeof frontmatter.name === "string" ? frontmatter.name : undefined;
+		const frontmatterName = typeof frontmatter.name === "string" ? frontmatter.name : undefined;
 		const id = parseSkillId(frontmatterName, dirName);
 
 		return {

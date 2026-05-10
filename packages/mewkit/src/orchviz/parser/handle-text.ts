@@ -81,9 +81,7 @@ export function handleTextBlock(
 		}
 	}
 
-	const hash = entryUuid
-		? `${emitRole}:${entryUuid}`
-		: `${emitRole}:${text.slice(0, HASH_PREFIX_MAX)}`;
+	const hash = entryUuid ? `${emitRole}:${entryUuid}` : `${emitRole}:${text.slice(0, HASH_PREFIX_MAX)}`;
 	if (seenMsgs?.has(hash)) return;
 	if (seenMsgs) {
 		seenMsgs.add(hash);

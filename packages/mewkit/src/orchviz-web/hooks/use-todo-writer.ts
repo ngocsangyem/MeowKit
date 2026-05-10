@@ -45,9 +45,7 @@ export function phaseListReducer(phases: PlanPhase[], action: OptimisticAction):
 		if (phase.number !== action.phase) return phase;
 		return {
 			...phase,
-			todos: phase.todos.map((todo, idx) =>
-				idx === action.todoIdx ? { ...todo, checked: action.checked } : todo,
-			),
+			todos: phase.todos.map((todo, idx) => (idx === action.todoIdx ? { ...todo, checked: action.checked } : todo)),
 		};
 	});
 }
@@ -68,50 +66,53 @@ export function useTodoWriter(
 
 	const [optimisticPhases, addOptimistic] = useOptimistic(phases, phaseListReducer);
 
-	const toggle = useCallback(async ({ phase, todoIdx, checked }: TodoToggleArgs): Promise<void> => {
-		if (readonly) {
-			showToast("Server is read-only");
-			return;
-		}
+	const toggle = useCallback(
+		async ({ phase, todoIdx, checked }: TodoToggleArgs): Promise<void> => {
+			if (readonly) {
+				showToast("Server is read-only");
+				return;
+			}
 
-		// Read etag at click time (R2-5) — slug is also captured per-render
-		// so plan-switch propagates correctly via React's re-call of this hook.
-		const etag = phaseEtags?.[phase] ?? "";
+			// Read etag at click time (R2-5) — slug is also captured per-render
+			// so plan-switch propagates correctly via React's re-call of this hook.
+			const etag = phaseEtags?.[phase] ?? "";
 
-		// Optimistic flip — useOptimistic auto-reverts if we don't call addOptimistic again
-		addOptimistic({ type: "toggle", phase, todoIdx, checked });
+			// Optimistic flip — useOptimistic auto-reverts if we don't call addOptimistic again
+			addOptimistic({ type: "toggle", phase, todoIdx, checked });
 
-		let res: Response;
-		try {
-			res = await fetch("/api/plan/todo", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ slug, phase, todoIdx, checked, etag }),
-			});
-		} catch (err) {
-			console.warn("[orchviz:todo-writer] fetch error:", err);
-			showToast("Network failure — todo not saved");
+			let res: Response;
+			try {
+				res = await fetch("/api/plan/todo", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ slug, phase, todoIdx, checked, etag }),
+				});
+			} catch (err) {
+				console.warn("[orchviz:todo-writer] fetch error:", err);
+				showToast("Network failure — todo not saved");
+				refetch();
+				return;
+			}
+
+			if (res.status === 200) {
+				const json = (await res.json()) as ApiTodoResponse;
+				if (json.changed === false) return;
+				// changed:true — wait for next 2s poll; don't double-request (validation Q2)
+				return;
+			}
+
+			if (res.status === 409) {
+				refetch();
+				showToast("Plan changed externally — reloaded");
+				return;
+			}
+
+			// 400 / 403 / 405 / 413 / 415 / 500+
+			showToast(`Failed to update todo (status ${res.status})`);
 			refetch();
-			return;
-		}
-
-		if (res.status === 200) {
-			const json = (await res.json()) as ApiTodoResponse;
-			if (json.changed === false) return;
-			// changed:true — wait for next 2s poll; don't double-request (validation Q2)
-			return;
-		}
-
-		if (res.status === 409) {
-			refetch();
-			showToast("Plan changed externally — reloaded");
-			return;
-		}
-
-		// 400 / 403 / 405 / 413 / 415 / 500+
-		showToast(`Failed to update todo (status ${res.status})`);
-		refetch();
-	}, [slug, phaseEtags, readonly, addOptimistic, refetch, showToast]);
+		},
+		[slug, phaseEtags, readonly, addOptimistic, refetch, showToast],
+	);
 
 	return { optimisticPhases, toggle };
 }

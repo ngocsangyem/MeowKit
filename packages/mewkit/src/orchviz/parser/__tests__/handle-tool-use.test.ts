@@ -16,10 +16,7 @@ import { makeMockSession } from "./make-mock-session.js";
 const SESSION_ID = "sess-spawn";
 const AGENT = "orchestrator";
 
-function makeDelegate(
-	events: AgentEvent[],
-	session: WatchedSession,
-): TranscriptParserDelegate {
+function makeDelegate(events: AgentEvent[], session: WatchedSession): TranscriptParserDelegate {
 	return {
 		emit(event) {
 			events.push(event);
@@ -75,10 +72,7 @@ describe("handleToolUse — Task/Agent spawn emission", () => {
 
 		const spawns = spawnEvents(events);
 		expect(spawns).toHaveLength(2);
-		expect(spawns.map((e) => (e.payload as { name: string }).name)).toEqual([
-			"research auth",
-			"research storage",
-		]);
+		expect(spawns.map((e) => (e.payload as { name: string }).name)).toEqual(["research auth", "research storage"]);
 	});
 
 	it("same-description siblings — both fire with same display name (frontend reactivates)", () => {
@@ -134,10 +128,7 @@ describe("handleToolUse — Task/Agent spawn emission", () => {
 
 		const spawns = spawnEvents(events);
 		expect(spawns).toHaveLength(2);
-		expect(spawns.map((e) => (e.payload as { name: string }).name)).toEqual([
-			"researcher",
-			"researcher",
-		]);
+		expect(spawns.map((e) => (e.payload as { name: string }).name)).toEqual(["researcher", "researcher"]);
 	});
 
 	it("pure fallback — empty input emits subagent-<id6> with distinct suffixes", () => {
@@ -147,20 +138,8 @@ describe("handleToolUse — Task/Agent spawn emission", () => {
 		const pending = new Map();
 		const seen = new Set<string>();
 
-		parser.processTranscriptLine(
-			assistantTaskLine("toolu_aaaaaa", {}),
-			AGENT,
-			pending,
-			seen,
-			SESSION_ID,
-		);
-		parser.processTranscriptLine(
-			assistantTaskLine("toolu_bbbbbb", {}),
-			AGENT,
-			pending,
-			seen,
-			SESSION_ID,
-		);
+		parser.processTranscriptLine(assistantTaskLine("toolu_aaaaaa", {}), AGENT, pending, seen, SESSION_ID);
+		parser.processTranscriptLine(assistantTaskLine("toolu_bbbbbb", {}), AGENT, pending, seen, SESSION_ID);
 
 		const spawns = spawnEvents(events);
 		expect(spawns).toHaveLength(2);
@@ -206,13 +185,7 @@ describe("handleToolUse — Task/Agent spawn emission", () => {
 		const pending = new Map();
 		const seen = new Set<string>();
 
-		parser.processTranscriptLine(
-			assistantTaskLine("abc", {}),
-			AGENT,
-			pending,
-			seen,
-			SESSION_ID,
-		);
+		parser.processTranscriptLine(assistantTaskLine("abc", {}), AGENT, pending, seen, SESSION_ID);
 
 		const spawns = spawnEvents(events);
 		expect(spawns).toHaveLength(1);

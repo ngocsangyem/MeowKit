@@ -94,12 +94,7 @@ describe("applyTodoToggle", () => {
 
 	it("6. code-fence skip: [ ] inside ``` block is NOT counted", () => {
 		// The fenced [ ] should be ignored; only the real todo is index 0
-		const content = makeContent([
-			"```",
-			"- [ ] This is inside a fence and should NOT count",
-			"```",
-			"- [ ] Real todo",
-		]);
+		const content = makeContent(["```", "- [ ] This is inside a fence and should NOT count", "```", "- [ ] Real todo"]);
 		const result = applyTodoToggle(content, 0, true);
 		expect("error" in result).toBe(false);
 		if ("error" in result) return;

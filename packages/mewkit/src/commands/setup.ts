@@ -51,12 +51,7 @@ function collectSkillDeclaredDeps(projectDir: string): Set<string> {
 	let skillDirs: string[];
 	try {
 		skillDirs = readdirSync(skillsDir, { withFileTypes: true })
-			.filter(
-				(d) =>
-					d.isDirectory() &&
-					!d.name.startsWith(".") &&
-					existsSync(join(skillsDir, d.name, "SKILL.md")),
-			)
+			.filter((d) => d.isDirectory() && !d.name.startsWith(".") && existsSync(join(skillsDir, d.name, "SKILL.md")))
 			.map((d) => d.name);
 	} catch {
 		skillDirs = [];

@@ -23,10 +23,7 @@ function firstExisting(candidates: string[]): string | null {
 	return null;
 }
 
-export function resolveSourcePaths(
-	explicitSource: string | undefined,
-	bundledKitDir: string,
-): SourcePaths {
+export function resolveSourcePaths(explicitSource: string | undefined, bundledKitDir: string): SourcePaths {
 	const projectClaude = join(process.cwd(), ".claude");
 	const globalClaude = join(home, ".claude");
 
@@ -61,8 +58,7 @@ export function resolveSourcePaths(
 	const projectConfig = join(process.cwd(), "CLAUDE.md");
 	const claudeMdInRoot = join(root, "CLAUDE.md");
 	const configFile =
-		firstExisting([projectConfig, claudeMdInRoot, join(home, ".claude", "CLAUDE.md")]) ??
-		claudeMdInRoot;
+		firstExisting([projectConfig, claudeMdInRoot, join(home, ".claude", "CLAUDE.md")]) ?? claudeMdInRoot;
 
 	return { root, agents, commands, skills, rules, hooks, configFile, origin };
 }

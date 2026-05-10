@@ -5,14 +5,5 @@ export { discoverConfig } from "./config-discovery.js";
 export { discoverRules } from "./rules-discovery.js";
 export { discoverHooks, type HookDiscoveryResult } from "./hooks-discovery.js";
 export { filterHandlersJson, type FilteredHandlers } from "./handlers-json-filter.js";
-export {
-	resolveSourcePaths,
-	readKitVersion,
-	type SourcePaths,
-} from "./source-paths.js";
-export {
-	MEOWKIT_INTERNAL_DIRS,
-	MEOWKIT_INTERNAL_FILES,
-	isExcludedDir,
-	isExcludedFile,
-} from "./exclusions.js";
+export { resolveSourcePaths, readKitVersion, type SourcePaths } from "./source-paths.js";
+export { MEOWKIT_INTERNAL_DIRS, MEOWKIT_INTERNAL_FILES, isExcludedDir, isExcludedFile } from "./exclusions.js";

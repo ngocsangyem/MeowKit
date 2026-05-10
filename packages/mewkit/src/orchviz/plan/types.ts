@@ -3,27 +3,13 @@
  * the /api/plan endpoint. Pure data; no logic.
  */
 
-export type PhaseStatus =
-	| "pending"
-	| "active"
-	| "in_progress"
-	| "completed"
-	| "failed"
-	| "abandoned"
-	| "unknown";
+export type PhaseStatus = "pending" | "active" | "in_progress" | "completed" | "failed" | "abandoned" | "unknown";
 
 /**
  * Plan-level status vocabulary (red-team H3).
  * Used by listPlans and PlanSummary. "unknown" is the fallback for unrecognized strings.
  */
-export type PlanStatus =
-	| "draft"
-	| "in_progress"
-	| "active"
-	| "completed"
-	| "archived"
-	| "blocked"
-	| "unknown";
+export type PlanStatus = "draft" | "in_progress" | "active" | "completed" | "archived" | "blocked" | "unknown";
 
 /**
  * Lightweight summary of a plan — returned by GET /api/plans.

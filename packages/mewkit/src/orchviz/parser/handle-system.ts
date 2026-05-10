@@ -135,4 +135,3 @@ export function _getPauseRecord(parser: TranscriptParser): Map<string, PauseReco
 	}
 	return m;
 }
-

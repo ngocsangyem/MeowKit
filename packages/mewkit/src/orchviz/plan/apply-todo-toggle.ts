@@ -11,14 +11,9 @@
  */
 
 /** Static error tags returned when applyTodoToggle cannot apply the flip. */
-export type TodoToggleErrorTag =
-	| "section-missing"
-	| "out-of-range"
-	| "fence-overflow";
+export type TodoToggleErrorTag = "section-missing" | "out-of-range" | "fence-overflow";
 
-export type TodoToggleResult =
-	| { content: string; changed: boolean }
-	| { error: TodoToggleErrorTag };
+export type TodoToggleResult = { content: string; changed: boolean } | { error: TodoToggleErrorTag };
 
 const TODO_RE = /^(\s*-\s*\[)(\s|x|X|~|✓)(\]\s+.+?)\s*$/;
 const FENCE_RE = /^```/;
@@ -51,11 +46,7 @@ function detectEol(content: string): "\r\n" | "\n" {
  *   - Checkbox lines inside fences (fenceDepth > 0) are skipped/not counted.
  *   - Only `^phase-` regex used in server, NOT here — caller decides glob.
  */
-export function applyTodoToggle(
-	content: string,
-	todoIdx: number,
-	checked: boolean,
-): TodoToggleResult {
+export function applyTodoToggle(content: string, todoIdx: number, checked: boolean): TodoToggleResult {
 	// Split preserving original EOL on each line for later reassembly.
 	// We split on \n and check if each line ends with \r (for CRLF lines).
 	const eol = detectEol(content);
@@ -140,8 +131,7 @@ export function applyTodoToggle(
 	// Reassemble with original EOL type
 	// If original was CRLF, rawLines had \r on each line; we stripped them above.
 	// Now rebuild: join with detected EOL. Last line may or may not have trailing EOL.
-	const hasTrailingNewline =
-		content.endsWith("\n") || content.endsWith("\r\n");
+	const hasTrailingNewline = content.endsWith("\n") || content.endsWith("\r\n");
 
 	let newContent: string;
 	if (eol === "\r\n") {

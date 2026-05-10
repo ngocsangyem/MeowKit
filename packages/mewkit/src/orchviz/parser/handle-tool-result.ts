@@ -86,8 +86,7 @@ export function handleToolResult(
 	if (
 		activeTypedPause &&
 		activeTypedPause.toolUseId === block.tool_use_id &&
-		(activeTypedPause.reason === "ask_user_question" ||
-			activeTypedPause.reason === "plan_mode_review")
+		(activeTypedPause.reason === "ask_user_question" || activeTypedPause.reason === "plan_mode_review")
 	) {
 		const durationMs = Date.now() - activeTypedPause.startedAt;
 		pauseRecord.delete(pauseKey);
@@ -112,9 +111,7 @@ export function handleToolResult(
 
 	if (toolName === "Task" || toolName === "Agent") {
 		const childName =
-			parser.subagentChildNames.get(block.tool_use_id) ||
-			pending.args?.slice(0, CHILD_NAME_MAX) ||
-			"subagent";
+			parser.subagentChildNames.get(block.tool_use_id) || pending.args?.slice(0, CHILD_NAME_MAX) || "subagent";
 		parser.subagentChildNames.delete(block.tool_use_id);
 		parser.inlineSubagentState.delete(block.tool_use_id);
 		parser.delegate.emit(
@@ -161,14 +158,10 @@ export function handleToolResult(
  * Extract a plain string from ToolResultBlock.content for rejection detection.
  * [red-team #1] NEVER use block.is_error or entry.toolUseResult — those fields don't exist.
  */
-function _extractResultText(
-	content: ToolResultBlock["content"],
-): string {
+function _extractResultText(content: ToolResultBlock["content"]): string {
 	if (typeof content === "string") return content;
 	if (Array.isArray(content)) {
-		return content
-			.map((c) => (c as { text?: string }).text ?? "")
-			.join("");
+		return content.map((c) => (c as { text?: string }).text ?? "").join("");
 	}
 	return "";
 }

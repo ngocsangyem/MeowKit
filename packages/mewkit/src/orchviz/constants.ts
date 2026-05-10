@@ -65,7 +65,9 @@ export function generateSubagentFallbackName(id: string, index: number): string 
 
 function normalizeNameField(value: unknown): string {
 	if (typeof value !== "string") return "";
-	return stripAnsi(value).replace(/[\r\n\t]+/g, " ").trim();
+	return stripAnsi(value)
+		.replace(/[\r\n\t]+/g, " ")
+		.trim();
 }
 
 /**
@@ -76,21 +78,14 @@ function normalizeNameField(value: unknown): string {
  * prefixes — lexical credential markers (password=, token=) pass through. Localhost-only
  * server makes this low-severity but worth knowing during review.
  */
-export function resolveSubagentChildName(
-	input: Record<string, unknown>,
-	toolUseId?: string,
-): string {
+export function resolveSubagentChildName(input: Record<string, unknown>, toolUseId?: string): string {
 	const desc = normalizeNameField(input.description);
 	const subType = normalizeNameField(input.subagent_type);
 	const agentType = normalizeNameField(input.agentType);
 	const prompt = normalizeNameField(input.prompt).slice(0, CHILD_NAME_MAX);
 	const base = desc || subType || agentType || prompt || "subagent";
 	const name = base.slice(0, CHILD_NAME_MAX);
-	if (
-		name === "subagent" &&
-		typeof toolUseId === "string" &&
-		toolUseId.length > SUBAGENT_ID_SUFFIX_LENGTH
-	) {
+	if (name === "subagent" && typeof toolUseId === "string" && toolUseId.length > SUBAGENT_ID_SUFFIX_LENGTH) {
 		return `subagent-${toolUseId.slice(-SUBAGENT_ID_SUFFIX_LENGTH)}`;
 	}
 	return name;

@@ -25,7 +25,10 @@ function mapToolsToGroups(toolsStr: string): string[] {
 }
 
 function toSlug(name: string): string {
-	return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+	return name
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-|-$/g, "");
 }
 
 export interface ClineCustomMode {
@@ -41,9 +44,7 @@ export function convertFmToJson(item: PortableItem): ConversionResult {
 		slug: toSlug(item.name),
 		name: item.frontmatter.name || item.name,
 		roleDefinition: item.body,
-		groups: item.frontmatter.tools
-			? mapToolsToGroups(item.frontmatter.tools)
-			: ["read", "edit", "command", "mcp"],
+		groups: item.frontmatter.tools ? mapToolsToGroups(item.frontmatter.tools) : ["read", "edit", "command", "mcp"],
 		customInstructions: "",
 	};
 

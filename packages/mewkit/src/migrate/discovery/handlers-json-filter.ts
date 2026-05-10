@@ -20,10 +20,7 @@ function referencedScript(entry: { command?: string; script?: string }): string 
 	return match ? match[0] : null;
 }
 
-export async function filterHandlersJson(
-	hooksDir: string,
-	skippedShellHooks: string[],
-): Promise<FilteredHandlers> {
+export async function filterHandlersJson(hooksDir: string, skippedShellHooks: string[]): Promise<FilteredHandlers> {
 	const handlersPath = join(hooksDir, "handlers.json");
 	if (!existsSync(handlersPath)) return { json: null, droppedEntries: [] };
 

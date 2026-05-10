@@ -26,14 +26,8 @@ export {
 } from "./reconcile-state-builders.js";
 export { reconcile } from "./reconciler.js";
 export { displayDiff, generateDiff } from "./diff-display.js";
-export {
-	resolveConflict,
-	type NonInteractiveConflictPolicy,
-} from "./conflict-resolver.js";
-export {
-	sanitizeSingleLineTerminalText,
-	sanitizeTerminalText,
-} from "./output-sanitizer.js";
+export { resolveConflict, type NonInteractiveConflictPolicy } from "./conflict-resolver.js";
+export { sanitizeSingleLineTerminalText, sanitizeTerminalText } from "./output-sanitizer.js";
 export {
 	acquireMigrationLock,
 	releaseMigrationLock,

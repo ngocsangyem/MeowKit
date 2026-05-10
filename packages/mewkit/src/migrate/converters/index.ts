@@ -12,11 +12,7 @@ import { convertMdToMdc } from "./md-to-mdc.js";
 import { convertMdToToml } from "./md-to-toml.js";
 import { convertToSkillMd } from "./skill-md.js";
 
-export function convertItem(
-	item: PortableItem,
-	format: ConversionFormat,
-	provider: ProviderType,
-): ConversionResult {
+export function convertItem(item: PortableItem, format: ConversionFormat, provider: ProviderType): ConversionResult {
 	try {
 		switch (format) {
 			case "direct-copy":

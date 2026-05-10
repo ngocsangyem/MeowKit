@@ -26,9 +26,7 @@ export async function computeFileChecksum(filePath: string): Promise<string> {
 	return computeSha256Hex(buffer);
 }
 
-export function computeSectionChecksums(
-	sections: Array<{ name: string; content: string }>,
-): Record<string, string> {
+export function computeSectionChecksums(sections: Array<{ name: string; content: string }>): Record<string, string> {
 	const checksums: Record<string, string> = {};
 	for (const section of sections) {
 		checksums[section.name] = computeContentChecksum(section.content);

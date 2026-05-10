@@ -1,11 +1,7 @@
 // Preflight + final-summary printers for `mewkit migrate`. Console output only.
 
 import pc from "picocolors";
-import type {
-	ReconcileBanner,
-	ReconcileAction,
-	ReconcilePlan,
-} from "./reconcile/reconcile-types.js";
+import type { ReconcileBanner, ReconcileAction, ReconcilePlan } from "./reconcile/reconcile-types.js";
 import type { InstallResult } from "./portable-installer.js";
 
 export interface PreflightContext {
@@ -35,9 +31,7 @@ export function printPreflight(plan: ReconcilePlan, ctx: PreflightContext): void
 	if (ctx.skippedShellHooks > 0) {
 		console.log();
 		console.log(
-			pc.yellow(
-				`[!] ${ctx.skippedShellHooks} shell hook(s) skipped (only node-runnable .cjs/.mjs/.js hooks migrate).`,
-			),
+			pc.yellow(`[!] ${ctx.skippedShellHooks} shell hook(s) skipped (only node-runnable .cjs/.mjs/.js hooks migrate).`),
 		);
 	}
 

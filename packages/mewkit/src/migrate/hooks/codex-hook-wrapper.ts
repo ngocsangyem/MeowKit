@@ -36,7 +36,9 @@ export function generateCodexHookWrappers(
 
 		if (!isPathWithinBoundary(wrapperPath, resolvedWrapperDir)) {
 			results.push({
-				wrapperPath, originalPath, success: false,
+				wrapperPath,
+				originalPath,
+				success: false,
 				error: `Unsafe wrapper path: ${wrapperPath} escapes ${resolvedWrapperDir}`,
 			});
 			continue;
@@ -51,7 +53,9 @@ export function generateCodexHookWrappers(
 			results.push({ wrapperPath, originalPath, success: true });
 		} catch (err) {
 			results.push({
-				wrapperPath, originalPath, success: false,
+				wrapperPath,
+				originalPath,
+				success: false,
 				error: err instanceof Error ? err.message : String(err),
 			});
 		}

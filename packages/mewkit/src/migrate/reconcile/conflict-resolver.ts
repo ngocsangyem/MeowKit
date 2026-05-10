@@ -7,9 +7,7 @@ import type { ConflictResolution, ReconcileAction } from "./reconcile-types.js";
 const MAX_SHOW_DIFF_ATTEMPTS = 5;
 export type NonInteractiveConflictPolicy = "keep" | "overwrite" | "skip";
 
-function resolveNonInteractiveConflict(
-	policy: NonInteractiveConflictPolicy | string | undefined,
-): ConflictResolution {
+function resolveNonInteractiveConflict(policy: NonInteractiveConflictPolicy | string | undefined): ConflictResolution {
 	if (policy === "overwrite") return { type: "overwrite" };
 	return { type: "keep" };
 }
@@ -24,9 +22,7 @@ export async function resolveConflict(
 ): Promise<ConflictResolution> {
 	if (!options.interactive) return resolveNonInteractiveConflict(options.nonInteractivePolicy);
 
-	const conflictKey = sanitizeSingleLineTerminalText(
-		`${action.provider}/${action.type}/${action.item}`,
-	);
+	const conflictKey = sanitizeSingleLineTerminalText(`${action.provider}/${action.type}/${action.item}`);
 	console.log("\n+---------------------------------------------+");
 	console.log(`| [!] Conflict: ${conflictKey}`);
 	console.log("+---------------------------------------------+");

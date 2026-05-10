@@ -25,10 +25,7 @@ export interface OrchvizArgs {
 function findProjectRoot(start: string): string | null {
 	let cur = path.resolve(start);
 	while (true) {
-		if (
-			fs.existsSync(path.join(cur, ".claude")) ||
-			fs.existsSync(path.join(cur, "CLAUDE.md"))
-		) {
+		if (fs.existsSync(path.join(cur, ".claude")) || fs.existsSync(path.join(cur, "CLAUDE.md"))) {
 			return cur;
 		}
 		const parent = path.dirname(cur);
@@ -60,11 +57,7 @@ function resolveLogPath(
 		const inCwd = abs.startsWith(cwd + path.sep);
 		const inHome = abs.startsWith(path.join(home, ".claude") + path.sep);
 		if (!inCwd && !inHome) {
-			console.error(
-				pc.yellow(
-					`Warning: --log path ${abs} is outside cwd and ~/.claude/. Writing anyway.`,
-				),
-			);
+			console.error(pc.yellow(`Warning: --log path ${abs} is outside cwd and ~/.claude/. Writing anyway.`));
 		}
 		return abs;
 	}
@@ -99,9 +92,7 @@ export async function orchviz(args: OrchvizArgs): Promise<void> {
 	// Shared PlanCollector — write handler calls invalidate() after writes
 	// so the next GET returns fresh data (R2-4 / M4 injection path).
 	const planCollector = projectRoot ? makePlanCollector(projectRoot) : undefined;
-	const planProvider = projectRoot
-		? (slug?: string) => planCollector!.snapshot(slug)
-		: undefined;
+	const planProvider = projectRoot ? (slug?: string) => planCollector!.snapshot(slug) : undefined;
 	const server = new OrchvizServer({
 		port: args.port,
 		staticDir,
@@ -165,21 +156,13 @@ export async function orchviz(args: OrchvizArgs): Promise<void> {
 	}
 	console.log(`${pc.bold("Server:")} ${pc.cyan(url)}`);
 	if (!fs.existsSync(path.join(staticDir, "index.html"))) {
-		console.log(
-			pc.yellow(
-				`Note: web UI bundle not found at ${staticDir} — run \`npm run build:web\` to produce it.`,
-			),
-		);
+		console.log(pc.yellow(`Note: web UI bundle not found at ${staticDir} — run \`npm run build:web\` to produce it.`));
 	}
 
 	const wantOpen = args.noOpen ? false : args.open !== false;
 	if (wantOpen) {
 		openURL(url, (err) => {
-			console.error(
-				pc.yellow(
-					`Could not auto-open browser (${err.message}). Navigate manually to ${url}`,
-				),
-			);
+			console.error(pc.yellow(`Could not auto-open browser (${err.message}). Navigate manually to ${url}`));
 		});
 	}
 

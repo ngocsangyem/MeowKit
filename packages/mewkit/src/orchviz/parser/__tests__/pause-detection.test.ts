@@ -36,11 +36,7 @@ function makeDelegate(events: AgentEvent[]): TranscriptParserDelegate {
 
 // ─── JSONL line builders ──────────────────────────────────────────────────────
 
-function assistantToolUseLine(
-	toolName: string,
-	toolId: string,
-	input: Record<string, unknown> = {},
-): string {
+function assistantToolUseLine(toolName: string, toolId: string, input: Record<string, unknown> = {}): string {
 	return JSON.stringify({
 		type: "assistant",
 		sessionId: "sess-01",
@@ -228,13 +224,7 @@ describe("ExitPlanMode pause detection", () => {
 		const seen = new Set<string>();
 
 		// input.plan is undocumented — test that omitting it doesn't crash
-		parser.processTranscriptLine(
-			assistantToolUseLine("ExitPlanMode", TOOL_ID, {}),
-			AGENT,
-			pending,
-			seen,
-			SESSION_ID,
-		);
+		parser.processTranscriptLine(assistantToolUseLine("ExitPlanMode", TOOL_ID, {}), AGENT, pending, seen, SESSION_ID);
 
 		const pauseEvents = events.filter((e) => e.type === "pause_started");
 		expect(pauseEvents).toHaveLength(1);
@@ -255,13 +245,7 @@ describe("ExitPlanMode pause detection", () => {
 			SESSION_ID,
 		);
 
-		parser.processTranscriptLine(
-			userToolResultLine(TOOL_ID, "Plan approved"),
-			AGENT,
-			pending,
-			seen,
-			SESSION_ID,
-		);
+		parser.processTranscriptLine(userToolResultLine(TOOL_ID, "Plan approved"), AGENT, pending, seen, SESSION_ID);
 
 		const clearedEvents = events.filter((e) => e.type === "pause_cleared");
 		expect(clearedEvents).toHaveLength(1);
@@ -277,11 +261,7 @@ describe("tool_rejected detection via content string scan", () => {
 	const TOOL_ID = "toolu_read_001";
 
 	// Register a pending tool so the tool_result handler has something to match
-	function seedPendingTool(
-		parser: TranscriptParser,
-		pending: Map<string, unknown>,
-		seen: Set<string>,
-	): void {
+	function seedPendingTool(parser: TranscriptParser, pending: Map<string, unknown>, seen: Set<string>): void {
 		parser.processTranscriptLine(
 			assistantToolUseLine("Read", TOOL_ID, { file_path: "/foo/bar.ts" }),
 			AGENT,

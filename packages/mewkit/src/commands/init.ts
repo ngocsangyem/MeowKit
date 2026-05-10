@@ -286,9 +286,7 @@ export async function init(args: InitArgs): Promise<void> {
 			// init so we can pause the spinner, ask via clack, then resume.
 			confirmOrphans: async (orphans) => {
 				updateSpinner.stop("Orphan files detected");
-				p.log.warn(
-					`Found ${orphans.length} orphan file(s) — files on disk no longer in release:`,
-				);
+				p.log.warn(`Found ${orphans.length} orphan file(s) — files on disk no longer in release:`);
 				for (const o of orphans) p.log.message(`  - ${pc.dim(o)}`);
 				const answer = await p.confirm({
 					message: `Delete ${orphans.length} orphan file(s)?`,
@@ -386,7 +384,10 @@ async function runPostInitMigrate(args: InitArgs, projectDir: string): Promise<v
 		if (trimmed === "all") {
 			migrateOptions.all = true;
 		} else {
-			migrateOptions.tools = trimmed.split(",").map((t) => t.trim()).filter(Boolean);
+			migrateOptions.tools = trimmed
+				.split(",")
+				.map((t) => t.trim())
+				.filter(Boolean);
 		}
 	}
 

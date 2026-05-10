@@ -34,11 +34,7 @@ export interface ReadNewLinesResult {
  * Returns null when the file is gone or unchanged.
  * On truncation (file shrunk), returns { lines: [], newSize: 0, tail: '' }.
  */
-export function readNewFileLines(
-	filePath: string,
-	lastSize: number,
-	lastTail = "",
-): ReadNewLinesResult | null {
+export function readNewFileLines(filePath: string, lastSize: number, lastTail = ""): ReadNewLinesResult | null {
 	let stat: fs.Stats;
 	try {
 		stat = fs.statSync(filePath);

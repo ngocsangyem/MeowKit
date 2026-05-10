@@ -1,14 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { reconcile } from "../reconcile/reconciler.js";
-import type {
-	PortableInstallationV3,
-	PortableRegistryV3,
-} from "../reconcile/portable-registry.js";
-import type {
-	ReconcileInput,
-	SourceItemState,
-	TargetFileState,
-} from "../reconcile/reconcile-types.js";
+import type { PortableInstallationV3, PortableRegistryV3 } from "../reconcile/portable-registry.js";
+import type { ReconcileInput, SourceItemState, TargetFileState } from "../reconcile/reconcile-types.js";
 
 function makeRegistry(installations: PortableInstallationV3[] = []): PortableRegistryV3 {
 	return { version: "3.0", installations };

@@ -131,14 +131,10 @@ async function performUpgrade(
 			geminiApiKey: null,
 		};
 
-		const stats = await smartUpdate(
-			config,
-			sourceDir,
-			process.cwd(),
-			/* dryRun */ false,
-			/* force */ false,
-			{ cleanup, assumeYes },
-		);
+		const stats = await smartUpdate(config, sourceDir, process.cwd(), /* dryRun */ false, /* force */ false, {
+			cleanup,
+			assumeYes,
+		});
 
 		console.log();
 		console.log(pc.green(pc.bold("Upgrade complete!")));
@@ -189,7 +185,12 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 			return;
 		}
 
-		await performUpgrade(localVersion, useBeta, /* cleanup */ args.noCleanup !== true, /* assumeYes */ args.yes === true);
+		await performUpgrade(
+			localVersion,
+			useBeta,
+			/* cleanup */ args.noCleanup !== true,
+			/* assumeYes */ args.yes === true,
+		);
 	} catch (err: unknown) {
 		const msg = err instanceof Error ? err.message : String(err);
 		console.error(pc.red(`upgrade failed: ${msg}`));

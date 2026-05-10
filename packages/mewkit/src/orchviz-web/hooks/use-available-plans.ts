@@ -11,14 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 
 // Re-export PlanSummary shape locally to avoid cross-package import issues.
 // Mirror of orchviz/plan/types.ts PlanSummary.
-export type PlanStatus =
-	| "draft"
-	| "in_progress"
-	| "active"
-	| "completed"
-	| "archived"
-	| "blocked"
-	| "unknown";
+export type PlanStatus = "draft" | "in_progress" | "active" | "completed" | "archived" | "blocked" | "unknown";
 
 export interface PlanSummary {
 	slug: string;
@@ -63,8 +56,7 @@ export function useAvailablePlans(intervalMs = 5000): UseAvailablePlansResult {
 				if (!res.ok) return;
 				const json = (await res.json()) as ApiPlansResponse;
 				if (!alive) return;
-				const nextStatus: AvailablePlansStatus =
-					json.plans.length > 0 ? "loaded" : "empty";
+				const nextStatus: AvailablePlansStatus = json.plans.length > 0 ? "loaded" : "empty";
 				setState({ status: nextStatus, plans: json.plans, generatedAt: json.generatedAt });
 			} catch (err) {
 				if (!warned) {

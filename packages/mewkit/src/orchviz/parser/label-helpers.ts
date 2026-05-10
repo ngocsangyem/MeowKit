@@ -31,10 +31,7 @@ export function truncateLabel(text: string): string {
 	return firstLine.slice(0, SESSION_LABEL_TRUNCATED) + "..";
 }
 
-export function applySessionLabel(
-	session: WatchedSession,
-	entry: TranscriptEntry,
-): boolean {
+export function applySessionLabel(session: WatchedSession, entry: TranscriptEntry): boolean {
 	if (session.labelSet) return false;
 	if (entry.type !== "user") return false;
 	const text = extractUserMessageText(entry);

@@ -19,9 +19,7 @@ export interface ProcessLockOptions {
  *  context (matters for tests that change directories and for users running mewkit
  *  in different projects within one session). */
 function getLockPath(scope: "project" | "global"): string {
-	return scope === "project"
-		? join(process.cwd(), ".mewkit", ".lock")
-		: join(homedir(), ".mewkit", ".lock");
+	return scope === "project" ? join(process.cwd(), ".mewkit", ".lock") : join(homedir(), ".mewkit", ".lock");
 }
 
 function isProcessAlive(pid: number): boolean {
@@ -38,9 +36,7 @@ function isProcessAlive(pid: number): boolean {
  * Acquire a migration lock. Returns result; caller checks `.acquired`.
  * If the lock exists with a dead PID, automatically clears stale lock and retries once.
  */
-export async function acquireMigrationLock(
-	options: ProcessLockOptions,
-): Promise<AcquireLockResult> {
+export async function acquireMigrationLock(options: ProcessLockOptions): Promise<AcquireLockResult> {
 	const lockPath = getLockPath(options.scope);
 	const dir = dirname(lockPath);
 	if (!existsSync(dir)) await mkdir(dir, { recursive: true });

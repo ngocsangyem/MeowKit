@@ -4,20 +4,11 @@ version: 1.3.0
 argument-hint: "[prompt text] [--analyze] [--score] [--deep] [--save-to <path>]"
 description: >-
   Use when refining a draft user prompt before sending it to a coding agent.
-  Default output is the enhanced prompt only — no analysis, no preamble. Pass
-  --analyze to surface decomposition, detected issues, and improvement notes.
-  Pass --score (with --analyze) to add a deterministic 1–10 quality score on
-  the original prompt. Internally decomposes into goal/context/constraints/
-  acceptance/output-format, identifies ambiguity, missing context, weak
-  structure, and model-coupled framing (XML tags, role tagging, vendor
-  tokens), then emits a model-agnostic rewritten prompt. Auto-suggests a
-  freedom level (LOW/MEDIUM/HIGH) and verbosity mode
-  (terse/structured/confirmation) based on task type. Optional --deep flag
-  invokes mk:scout on an allow-listed source set to surface SUGGESTED
-  [FILL-IN] candidates (never auto-substituted). NOT for generating prompts
-  from scratch (see mk:brainstorming), NOT for re-examining reviews or plans
-  (see mk:elicit), NOT for planning implementations (see mk:plan-creator),
-  NOT for general codebase scouting (see mk:scout).
+  Decomposes goal/context/constraints/acceptance/output-format, detects
+  ambiguity and model-coupled framing, then emits a model-agnostic rewrite.
+  Supports --analyze, --score, and --deep. NOT for prompts from scratch
+  (mk:brainstorming), plans/reviews (mk:elicit), implementation plans
+  (mk:plan-creator), or general codebase scouting (mk:scout).
 source: meowkit
 allowed-tools:
   - Read
@@ -38,13 +29,8 @@ keywords:
   - prompt-scoring
   - deep-prompt-mode
 when_to_use: >-
-  Use when refining a draft user prompt before sending to a coding agent —
-  decomposes, detects weaknesses, rewrites with the universal kernel
-  (model-agnostic; no XML, no vendor tokens). Default returns the enhanced
-  prompt only; --analyze adds analysis sections; --score (with --analyze)
-  adds a 1–10 quality score on the original. Auto-suggests freedom level and
-  verbosity. Optional --deep flag scouts allow-listed sources for SUGGESTED
-  placeholders (never auto-substituted). NOT for prompts from scratch
+  Use when refining a draft coding-agent prompt for clarity, structure,
+  acceptance criteria, and model-agnostic framing. NOT for prompts from scratch
   (mk:brainstorming), plans/reviews (mk:elicit), implementation plans
   (mk:plan-creator), or general codebase scouting (mk:scout).
 user-invocable: true

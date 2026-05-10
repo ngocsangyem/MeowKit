@@ -60,9 +60,7 @@ export function handlePermissionDetection(
 		);
 	}
 
-	const needsPermission = Array.from(pendingToolCalls.values()).some(
-		(tc) => tc.name !== "Agent" && tc.name !== "Task",
-	);
+	const needsPermission = Array.from(pendingToolCalls.values()).some((tc) => tc.name !== "Agent" && tc.name !== "Task");
 	if (!needsPermission) return;
 
 	// Skip if a typed pause already covers this agent (red-team #5 coexistence rule).

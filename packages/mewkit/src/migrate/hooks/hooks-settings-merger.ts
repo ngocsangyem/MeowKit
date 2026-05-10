@@ -49,7 +49,11 @@ async function restoreSettings(snap: SettingsSnapshot): Promise<void> {
 	if (snap.existed && snap.content !== null) {
 		await writeFile(snap.path, snap.content, "utf-8");
 	} else if (existsSync(snap.path)) {
-		try { await unlink(snap.path); } catch { /* ignore */ }
+		try {
+			await unlink(snap.path);
+		} catch {
+			/* ignore */
+		}
 	}
 }
 
@@ -61,7 +65,11 @@ async function atomicWrite(target: string, content: string): Promise<void> {
 		await writeFile(tmp, content, "utf-8");
 		await rename(tmp, target);
 	} catch (err) {
-		try { await unlink(tmp); } catch { /* best-effort */ }
+		try {
+			await unlink(tmp);
+		} catch {
+			/* best-effort */
+		}
 		throw err;
 	}
 }
@@ -71,19 +79,18 @@ async function atomicWrite(target: string, content: string): Promise<void> {
  * keyed by hook event name. Source items represent the .cjs scripts already
  * installed at their target paths.
  */
-function buildClaudeHooksSection(
-	hooks: PortableItem[],
-	hookTargetPaths: Map<string, string>,
-): HooksSection {
+function buildClaudeHooksSection(hooks: PortableItem[], hookTargetPaths: Map<string, string>): HooksSection {
 	const section: HooksSection = {};
 	for (const hook of hooks) {
 		const event = inferEventFromName(hook.name);
 		const targetPath = hookTargetPaths.get(hook.name) ?? hook.sourcePath;
 		const group: HookGroup = {
-			hooks: [{
-				type: "command",
-				command: `node ${targetPath}`,
-			}],
+			hooks: [
+				{
+					type: "command",
+					command: `node ${targetPath}`,
+				},
+			],
 		};
 		const list = section[event] ?? [];
 		list.push(group);
@@ -100,7 +107,8 @@ function inferEventFromName(name: string): string {
 	const lower = name.toLowerCase();
 	if (lower.includes("pretooluse") || lower.includes("pre-tool")) return "PreToolUse";
 	if (lower.includes("posttooluse") || lower.includes("post-tool")) return "PostToolUse";
-	if (lower.includes("sessionstart") || lower.includes("session-start") || lower.includes("session-init")) return "SessionStart";
+	if (lower.includes("sessionstart") || lower.includes("session-start") || lower.includes("session-init"))
+		return "SessionStart";
 	if (lower.includes("stop")) return "Stop";
 	if (lower.includes("notification")) return "Notification";
 	if (lower.includes("userpromptsubmit") || lower.includes("user-prompt")) return "UserPromptSubmit";
@@ -137,10 +145,7 @@ async function readSettings(path: string): Promise<Record<string, unknown>> {
 	return {};
 }
 
-async function mergeIntoSettingsJson(
-	settingsPath: string,
-	section: HooksSection,
-): Promise<void> {
+async function mergeIntoSettingsJson(settingsPath: string, section: HooksSection): Promise<void> {
 	const settings = await readSettings(settingsPath);
 	settings.hooks = section;
 	settings[SENTINEL_KEY] = { hooks: true };
@@ -161,8 +166,12 @@ async function mergeClaudeCode(
 		const section = buildClaudeHooksSection(hooks, hookTargetPaths);
 		await mergeIntoSettingsJson(settingsPath, section);
 		return {
-			provider: "claude-code", success: true, settingsPath,
-			hooksWritten: hooks.length, hooksDropped: 0, warnings: [],
+			provider: "claude-code",
+			success: true,
+			settingsPath,
+			hooksWritten: hooks.length,
+			hooksDropped: 0,
+			warnings: [],
 		};
 	} catch (err) {
 		await restoreSettings(snapshot);
@@ -182,13 +191,15 @@ async function mergeGeminiCli(
 	const snapshot = await snapshotSettings(settingsPath);
 	try {
 		const claudeSection = buildClaudeHooksSection(hooks, hookTargetPaths);
-		const section = requiresHookMapping("gemini-cli")
-			? applyGeminiMapping(claudeSection)
-			: claudeSection;
+		const section = requiresHookMapping("gemini-cli") ? applyGeminiMapping(claudeSection) : claudeSection;
 		await mergeIntoSettingsJson(settingsPath, section);
 		return {
-			provider: "gemini-cli", success: true, settingsPath,
-			hooksWritten: hooks.length, hooksDropped: 0, warnings: [],
+			provider: "gemini-cli",
+			success: true,
+			settingsPath,
+			hooksWritten: hooks.length,
+			hooksDropped: 0,
+			warnings: [],
 		};
 	} catch (err) {
 		await restoreSettings(snapshot);
@@ -210,8 +221,12 @@ async function mergeDroid(
 		const section = buildClaudeHooksSection(hooks, hookTargetPaths);
 		await mergeIntoSettingsJson(settingsPath, section);
 		return {
-			provider: "droid", success: true, settingsPath,
-			hooksWritten: hooks.length, hooksDropped: 0, warnings: [],
+			provider: "droid",
+			success: true,
+			settingsPath,
+			hooksWritten: hooks.length,
+			hooksDropped: 0,
+			warnings: [],
 		};
 	} catch (err) {
 		await restoreSettings(snapshot);
@@ -278,8 +293,12 @@ async function mergeCodex(
 		}
 
 		return {
-			provider: "codex", success: true, settingsPath: hooksJsonPath,
-			hooksWritten: hooks.length - hooksDropped, hooksDropped, warnings,
+			provider: "codex",
+			success: true,
+			settingsPath: hooksJsonPath,
+			hooksWritten: hooks.length - hooksDropped,
+			hooksDropped,
+			warnings,
 		};
 	} catch (err) {
 		await restoreSettings(snapshot);
@@ -288,13 +307,29 @@ async function mergeCodex(
 }
 
 function badResult(provider: ProviderType): HooksMergeResult {
-	return { provider, success: false, hooksWritten: 0, hooksDropped: 0, warnings: [], error: `${provider} hook merge not configured` };
+	return {
+		provider,
+		success: false,
+		hooksWritten: 0,
+		hooksDropped: 0,
+		warnings: [],
+		error: `${provider} hook merge not configured`,
+	};
 }
 
-function errResult(provider: ProviderType, err: unknown, hooksCount: number, warnings: string[] = []): HooksMergeResult {
+function errResult(
+	provider: ProviderType,
+	err: unknown,
+	hooksCount: number,
+	warnings: string[] = [],
+): HooksMergeResult {
 	return {
-		provider, success: false, hooksWritten: 0, hooksDropped: hooksCount,
-		warnings, error: err instanceof Error ? err.message : String(err),
+		provider,
+		success: false,
+		hooksWritten: 0,
+		hooksDropped: hooksCount,
+		warnings,
+		error: err instanceof Error ? err.message : String(err),
 	};
 }
 
@@ -313,13 +348,20 @@ export async function mergeHooksSettings(
 	}
 
 	switch (provider) {
-		case "claude-code": return mergeClaudeCode(hooks, hookTargetPaths, options);
-		case "gemini-cli": return mergeGeminiCli(hooks, hookTargetPaths, options);
-		case "droid": return mergeDroid(hooks, hookTargetPaths, options);
-		case "codex": return mergeCodex(hooks, hookTargetPaths, options);
+		case "claude-code":
+			return mergeClaudeCode(hooks, hookTargetPaths, options);
+		case "gemini-cli":
+			return mergeGeminiCli(hooks, hookTargetPaths, options);
+		case "droid":
+			return mergeDroid(hooks, hookTargetPaths, options);
+		case "codex":
+			return mergeCodex(hooks, hookTargetPaths, options);
 		default:
 			return {
-				provider, success: true, hooksWritten: 0, hooksDropped: hooks.length,
+				provider,
+				success: true,
+				hooksWritten: 0,
+				hooksDropped: hooks.length,
 				warnings: [`${provider} does not support hooks; ${hooks.length} hook(s) skipped`],
 			};
 	}

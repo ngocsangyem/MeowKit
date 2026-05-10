@@ -42,11 +42,7 @@ export class BodyError extends Error {
  * Destroys the socket if body exceeds cap OR if timeoutMs elapses first.
  * Throws BodyError(413) on overflow, BodyError(408) on timeout.
  */
-export function bufferBody(
-	req: IncomingMessage,
-	capBytes: number,
-	timeoutMs: number,
-): Promise<Buffer> {
+export function bufferBody(req: IncomingMessage, capBytes: number, timeoutMs: number): Promise<Buffer> {
 	return new Promise<Buffer>((resolve, reject) => {
 		const chunks: Buffer[] = [];
 		let total = 0;
@@ -94,11 +90,7 @@ export function bufferBody(
  * H4: allowlist check FIRST — only emit ACAO after passing.
  * Disallowed origin → 403 with NO ACAO header.
  */
-export function handleTodoPreflight(
-	req: IncomingMessage,
-	res: ServerResponse,
-	port: number,
-): void {
+export function handleTodoPreflight(req: IncomingMessage, res: ServerResponse, port: number): void {
 	const origin = req.headers["origin"] ?? "";
 	if (!isOriginAllowed(origin, port)) {
 		res.writeHead(403, { "Content-Type": "text/plain" });
@@ -169,10 +161,7 @@ export function resolvePlanDirBoundary(
  * Verify a globbed phase file sits inside resolvedPlanDir (M15, R2-15).
  * Returns the resolved absolute path, or null on failure.
  */
-export function resolvePhaseFileBoundary(
-	phaseFilePath: string,
-	resolvedPlanDir: string,
-): string | null {
+export function resolvePhaseFileBoundary(phaseFilePath: string, resolvedPlanDir: string): string | null {
 	const resolved = safeRealpath(phaseFilePath);
 	if (!resolved) return null;
 	if (!resolved.startsWith(resolvedPlanDir + path.sep)) return null;

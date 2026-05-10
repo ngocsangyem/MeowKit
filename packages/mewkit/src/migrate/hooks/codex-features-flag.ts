@@ -4,11 +4,7 @@
 import { existsSync } from "node:fs";
 import { readFile, rename, unlink, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import {
-	getCodexGlobalBoundary,
-	isCanonicalPathWithinBoundary,
-	withCodexTargetLock,
-} from "./codex-path-safety.js";
+import { getCodexGlobalBoundary, isCanonicalPathWithinBoundary, withCodexTargetLock } from "./codex-path-safety.js";
 
 const SENTINEL_START = "# --- mewkit-managed-features-start ---";
 const SENTINEL_END = "# --- mewkit-managed-features-end ---";
@@ -49,7 +45,8 @@ async function ensureFlagLocked(configTomlPath: string): Promise<FeatureFlagWrit
 			existing = await readFile(configTomlPath, "utf8");
 		} catch (err) {
 			return {
-				status: "failed", configPath: configTomlPath,
+				status: "failed",
+				configPath: configTomlPath,
 				error: `Failed to read ${configTomlPath}: ${err instanceof Error ? err.message : String(err)}`,
 			};
 		}
@@ -72,7 +69,8 @@ async function ensureFlagLocked(configTomlPath: string): Promise<FeatureFlagWrit
 			await atomicWrite(configTomlPath, content);
 		} catch (err) {
 			return {
-				status: "failed", configPath: configTomlPath,
+				status: "failed",
+				configPath: configTomlPath,
 				error: `Failed to write ${configTomlPath}: ${err instanceof Error ? err.message : String(err)}`,
 			};
 		}
@@ -86,7 +84,8 @@ async function ensureFlagLocked(configTomlPath: string): Promise<FeatureFlagWrit
 		await atomicWrite(configTomlPath, withBlock);
 	} catch (err) {
 		return {
-			status: "failed", configPath: configTomlPath,
+			status: "failed",
+			configPath: configTomlPath,
 			error: `Failed to write ${configTomlPath}: ${err instanceof Error ? err.message : String(err)}`,
 		};
 	}
@@ -99,10 +98,7 @@ function findFeaturesSectionStart(content: string): number {
 	return match ? match.index : -1;
 }
 
-function ensureFlagInFeaturesSection(
-	content: string,
-	headerStartIdx: number,
-): { updated: string; changed: boolean } {
+function ensureFlagInFeaturesSection(content: string, headerStartIdx: number): { updated: string; changed: boolean } {
 	const headerLineEnd = content.indexOf("\n", headerStartIdx);
 	const bodyStart = headerLineEnd === -1 ? content.length : headerLineEnd + 1;
 
@@ -116,10 +112,7 @@ function ensureFlagInFeaturesSection(
 
 	if (flagMatch) {
 		if (flagMatch[2] === "true") return { updated: content, changed: false };
-		const newBody = body.replace(
-			flagRegex,
-			(_m, prefix, _v, trailing) => `${prefix}true${trailing ?? ""}`,
-		);
+		const newBody = body.replace(flagRegex, (_m, prefix, _v, trailing) => `${prefix}true${trailing ?? ""}`);
 		return {
 			updated: content.slice(0, bodyStart) + newBody + content.slice(bodyEnd),
 			changed: true,
@@ -176,7 +169,11 @@ async function atomicWrite(filePath: string, content: string): Promise<void> {
 		await writeFile(tempPath, content, "utf8");
 		await rename(tempPath, filePath);
 	} catch (err) {
-		try { await unlink(tempPath); } catch { /* ignore */ }
+		try {
+			await unlink(tempPath);
+		} catch {
+			/* ignore */
+		}
 		throw err;
 	}
 }

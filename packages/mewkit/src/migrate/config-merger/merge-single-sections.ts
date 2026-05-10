@@ -76,10 +76,7 @@ function splitManagedContent(content: string): { preambleEnd: number; parts: str
 					continue;
 				}
 				const nextLine = lines[nextIdx].trim();
-				if (
-					isManagedHeadingLine(nextLine) ||
-					!hasLaterManagedHeading(lines, nextIdx)
-				) {
+				if (isManagedHeadingLine(nextLine) || !hasLaterManagedHeading(lines, nextIdx)) {
 					separatorIndices.push(lineOffsets[lineIndex]);
 				}
 			}
@@ -142,9 +139,7 @@ export function parseMergedSections(content: string): ParsedMergedSections {
 			const existingIndex = seenKeys.get(compositeKey);
 
 			if (existingIndex !== undefined) {
-				warnings.push(
-					`Duplicate ${metadata.kind} section "${metadata.key}"; keeping last occurrence`,
-				);
+				warnings.push(`Duplicate ${metadata.kind} section "${metadata.key}"; keeping last occurrence`);
 				sections.splice(existingIndex, 1);
 				for (const [key, index] of seenKeys) {
 					if (index > existingIndex) seenKeys.set(key, index - 1);
@@ -164,14 +159,8 @@ export function parseMergedSections(content: string): ParsedMergedSections {
 	let preamble = content.slice(0, preambleEnd).trimEnd();
 	// Strip mewkit-stamped preamble headers so they don't accumulate on rerun.
 	preamble = preamble
-		.replace(
-			/^# Agents\r?\n\r?\n> Ported from MeowKit agents via mewkit migrate\r?\n> Target: .*\r?\n+/is,
-			"",
-		)
-		.replace(
-			/^# Rules\r?\n\r?\n> Ported from MeowKit rules via mewkit migrate.*\r?\n> Target: .*\r?\n+/is,
-			"",
-		)
+		.replace(/^# Agents\r?\n\r?\n> Ported from MeowKit agents via mewkit migrate\r?\n> Target: .*\r?\n+/is, "")
+		.replace(/^# Rules\r?\n\r?\n> Ported from MeowKit rules via mewkit migrate.*\r?\n> Target: .*\r?\n+/is, "")
 		.replace(/^# Config\r?\n\r?\n> Ported from MeowKit config via mewkit migrate.*\r?\n+/is, "")
 		.trimEnd();
 
@@ -184,11 +173,7 @@ export function getMergeSectionKey(kind: MergeSectionKind, item: PortableItem): 
 	return item.name;
 }
 
-export function buildMergeSectionContent(
-	kind: MergeSectionKind,
-	sectionKey: string,
-	convertedContent: string,
-): string {
+export function buildMergeSectionContent(kind: MergeSectionKind, sectionKey: string, convertedContent: string): string {
 	if (kind === "config") return `## Config\n\n${convertedContent.trim()}\n`;
 	if (kind === "rule") return `## Rule: ${sectionKey}\n\n${convertedContent.trim()}\n`;
 	return convertedContent.trimEnd();
@@ -202,10 +187,8 @@ export function computeManagedSectionChecksums(content: string): Record<string, 
 	const checksums: Record<string, string> = {};
 	for (const section of parseMergedSections(content).sections) {
 		if (section.kind === "unknown") continue;
-		const normalized =
-			section.kind === "agent" ? section.content.trimEnd() : `${section.content.trimEnd()}\n`;
-		checksums[getManagedSectionChecksumKey(section.kind, section.key)] =
-			computeContentChecksum(normalized);
+		const normalized = section.kind === "agent" ? section.content.trimEnd() : `${section.content.trimEnd()}\n`;
+		checksums[getManagedSectionChecksumKey(section.kind, section.key)] = computeContentChecksum(normalized);
 	}
 	return checksums;
 }

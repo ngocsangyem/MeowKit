@@ -57,16 +57,12 @@ export function extractInputData(
 					prompt: String(input.prompt || "").slice(0, WEB_FETCH_PROMPT_MAX),
 				};
 			case "AskUserQuestion": {
-				const qs = input.questions as
-					| Array<{ question?: string; options?: Array<{ label?: string }> }>
-					| undefined;
+				const qs = input.questions as Array<{ question?: string; options?: Array<{ label?: string }> }> | undefined;
 				return {
 					questions: Array.isArray(qs)
 						? qs.map((q) => ({
 								question: String(q.question || ""),
-								options: Array.isArray(q.options)
-									? q.options.map((o) => String(o.label || ""))
-									: [],
+								options: Array.isArray(q.options) ? q.options.map((o) => String(o.label || "")) : [],
 							}))
 						: [],
 				};

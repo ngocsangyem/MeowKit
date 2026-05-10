@@ -7,14 +7,7 @@ export function convertMdToMdc(item: PortableItem, provider: ProviderType): Conv
 	const description = item.description || formatDescription(item.name);
 	const escapedDesc = description.replace(/"/g, '\\"');
 
-	const content = [
-		"---",
-		`description: "${escapedDesc}"`,
-		"alwaysApply: true",
-		"---",
-		"",
-		stripped.content,
-	].join("\n");
+	const content = ["---", `description: "${escapedDesc}"`, "alwaysApply: true", "---", "", stripped.content].join("\n");
 
 	return { content, filename: `${item.name}.mdc`, warnings: stripped.warnings };
 }

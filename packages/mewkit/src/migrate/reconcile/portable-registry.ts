@@ -41,10 +41,7 @@ export type PortableRegistryV3 = z.infer<typeof PortableRegistrySchemaV3>;
 
 function isErrnoCode(error: unknown, code: string): boolean {
 	return (
-		typeof error === "object" &&
-		error !== null &&
-		"code" in error &&
-		(error as NodeJS.ErrnoException).code === code
+		typeof error === "object" && error !== null && "code" in error && (error as NodeJS.ErrnoException).code === code
 	);
 }
 
@@ -92,7 +89,11 @@ export async function writePortableRegistry(registry: PortableRegistryV3): Promi
 		await writeFile(tempPath, JSON.stringify(normalized, null, 2), "utf-8");
 		await rename(tempPath, REGISTRY_PATH);
 	} catch (error) {
-		try { await unlink(tempPath); } catch { /* best-effort */ }
+		try {
+			await unlink(tempPath);
+		} catch {
+			/* best-effort */
+		}
 		throw error;
 	}
 }
@@ -135,7 +136,11 @@ async function acquireRegistryLock(): Promise<void> {
 			}
 
 			if (!alive || (Number.isFinite(ts) && Date.now() - ts > STALE_LOCK_MS)) {
-				try { await unlink(REGISTRY_LOCK_PATH); } catch { /* race */ }
+				try {
+					await unlink(REGISTRY_LOCK_PATH);
+				} catch {
+					/* race */
+				}
 				continue;
 			}
 		} catch {
@@ -239,10 +244,7 @@ export function findPortableInstallations(
 	});
 }
 
-export function getInstallationsByType(
-	registry: PortableRegistryV3,
-	type: PortableType,
-): PortableInstallationV3[] {
+export function getInstallationsByType(registry: PortableRegistryV3, type: PortableType): PortableInstallationV3[] {
 	return registry.installations.filter((i) => i.type === type);
 }
 

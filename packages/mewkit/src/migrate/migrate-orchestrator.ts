@@ -39,10 +39,7 @@ export interface RunMigrateContext {
 	argv: string[];
 }
 
-export async function runMigrate(
-	options: MigrateOptions,
-	ctx: RunMigrateContext,
-): Promise<number> {
+export async function runMigrate(options: MigrateOptions, ctx: RunMigrateContext): Promise<number> {
 	applyMewkitOverrides({ preferAgentsMd: options.preferAgentsMd });
 	validateFlags(options, ctx.argv);
 
@@ -59,9 +56,7 @@ export async function runMigrate(
 
 	const lockResult = await acquireMigrationLock({ scope: isGlobal ? "global" : "project" });
 	if (!lockResult.acquired) {
-		console.error(
-			pc.red(`Another mewkit migrate is in progress (PID ${lockResult.heldBy ?? "unknown"})`),
-		);
+		console.error(pc.red(`Another mewkit migrate is in progress (PID ${lockResult.heldBy ?? "unknown"})`));
 		return 1;
 	}
 
@@ -88,9 +83,7 @@ async function runMigrateUnderLock(
 	});
 	spinner?.stop("Discovery complete.");
 
-	const sourceItems = flattenForReconcile(discovered).map((item) =>
-		buildSourceItemState(item, item.type, targets),
-	);
+	const sourceItems = flattenForReconcile(discovered).map((item) => buildSourceItemState(item, item.type, targets));
 
 	const registry = await readPortableRegistry();
 	const targetStates = await buildTargetStates(registry.installations);
@@ -113,14 +106,16 @@ async function runMigrateUnderLock(
 	for (const action of plan.actions) {
 		if (!action.targetPath) {
 			action.targetPath =
-				getPortableInstallPath(action.item, action.provider as ProviderType, providerKey(action.type), { global: action.global }) ??
-				"";
+				getPortableInstallPath(action.item, action.provider as ProviderType, providerKey(action.type), {
+					global: action.global,
+				}) ?? "";
 		}
 	}
 
 	const collisions = detectProviderPathCollisions(targets, { global: isGlobal });
 	const collisionBanners = collisions.map(
-		(c) => `Shared target: ${c.path} (${c.portableType}) used by ${c.providers.join(" + ")} — each provider writes the same content here`,
+		(c) =>
+			`Shared target: ${c.path} (${c.portableType}) used by ${c.providers.join(" + ")} — each provider writes the same content here`,
 	);
 
 	printPreflight(plan, {
@@ -153,11 +148,19 @@ async function runMigrateUnderLock(
 	}
 
 	const confirmed =
-		options.yes || !process.stdout.isTTY ||
+		options.yes ||
+		!process.stdout.isTTY ||
 		(await confirmExecution(plan.summary.install + plan.summary.update + plan.summary.delete));
 	if (!confirmed) return 130;
 
-	const results = await executePlan(plan.actions, { allItems: itemsByT }, discovered.skills, targets, isGlobal, scope.skills);
+	const results = await executePlan(
+		plan.actions,
+		{ allItems: itemsByT },
+		discovered.skills,
+		targets,
+		isGlobal,
+		scope.skills,
+	);
 
 	printFinalSummary(results);
 	return results.some((r) => !r.success) ? 1 : 0;
@@ -233,12 +236,18 @@ function skillActionShim(skill: SkillInfo, provider: ProviderType, global: boole
 
 function providerKey(type: PortableType): "agents" | "commands" | "skills" | "config" | "rules" | "hooks" {
 	switch (type) {
-		case "agent": return "agents";
-		case "command": return "commands";
-		case "skill": return "skills";
-		case "config": return "config";
-		case "rules": return "rules";
-		case "hooks": return "hooks";
+		case "agent":
+			return "agents";
+		case "command":
+			return "commands";
+		case "skill":
+			return "skills";
+		case "config":
+			return "config";
+		case "rules":
+			return "rules";
+		case "hooks":
+			return "hooks";
 	}
 }
 

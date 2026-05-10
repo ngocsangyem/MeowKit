@@ -52,11 +52,7 @@ export function convertClaudeHooksToCodex(
 	return result;
 }
 
-function filterGroupsByMatcher(
-	groups: HookGroup[],
-	event: string,
-	capabilities: CodexCapabilities,
-): HookGroup[] {
+function filterGroupsByMatcher(groups: HookGroup[], event: string, capabilities: CodexCapabilities): HookGroup[] {
 	const eventCaps = capabilities.events[event];
 	if (!eventCaps) return [];
 
@@ -115,12 +111,8 @@ export function rewriteCommandPath(command: string, pathRewrite: PathRewriteMap)
 		}
 	}
 
-	const src = pathRewrite.sourceDir.endsWith("/")
-		? pathRewrite.sourceDir
-		: `${pathRewrite.sourceDir}/`;
-	const tgt = pathRewrite.targetDir.endsWith("/")
-		? pathRewrite.targetDir
-		: `${pathRewrite.targetDir}/`;
+	const src = pathRewrite.sourceDir.endsWith("/") ? pathRewrite.sourceDir : `${pathRewrite.sourceDir}/`;
+	const tgt = pathRewrite.targetDir.endsWith("/") ? pathRewrite.targetDir : `${pathRewrite.targetDir}/`;
 	if (src === tgt) return command;
 	return command.replaceAll(src, tgt);
 }

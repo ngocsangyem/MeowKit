@@ -28,11 +28,7 @@ function send404(res: ServerResponse): void {
 	res.end("Not Found");
 }
 
-export function serveStatic(
-	req: IncomingMessage,
-	res: ServerResponse,
-	staticDir: string,
-): void {
+export function serveStatic(req: IncomingMessage, res: ServerResponse, staticDir: string): void {
 	if (req.method !== "GET" && req.method !== "HEAD") {
 		res.writeHead(405, { Allow: "GET, HEAD", "Content-Type": "text/plain" });
 		res.end("Method Not Allowed");
@@ -71,9 +67,7 @@ export function serveStatic(
 	const headers: Record<string, string> = {
 		"Content-Type": mimeFor(candidate),
 		"Content-Length": String(stat.size),
-		"Cache-Control": isAsset
-			? "public, max-age=31536000, immutable"
-			: "no-cache",
+		"Cache-Control": isAsset ? "public, max-age=31536000, immutable" : "no-cache",
 	};
 	res.writeHead(200, headers);
 	if (req.method === "HEAD") {

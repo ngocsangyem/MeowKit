@@ -96,9 +96,7 @@ export function useActivePlan(slug?: string, intervalMs?: number): UseActivePlan
 		let alive = true;
 		let warned = false;
 
-		const url = slug
-			? `/api/plan?slug=${encodeURIComponent(slug)}`
-			: "/api/plan";
+		const url = slug ? `/api/plan?slug=${encodeURIComponent(slug)}` : "/api/plan";
 
 		const fetchOnce = async (): Promise<void> => {
 			try {
@@ -132,11 +130,7 @@ export function useActivePlan(slug?: string, intervalMs?: number): UseActivePlan
 						prev.readonly === (json.readonly ?? false);
 					if (sameContent && prev.plan && json.plan) return prev;
 
-					const nextStatus: PlanStatus = json.plan
-						? "loaded"
-						: prev.status === "loaded"
-							? "loaded"
-							: "empty";
+					const nextStatus: PlanStatus = json.plan ? "loaded" : prev.status === "loaded" ? "loaded" : "empty";
 					return {
 						status: nextStatus,
 						plan: json.plan,

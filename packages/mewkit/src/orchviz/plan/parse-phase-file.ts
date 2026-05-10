@@ -65,8 +65,7 @@ export function parsePhaseFile(filePath: string): PhaseState | null {
 		}
 	}
 
-	const fmStatus =
-		typeof frontmatter.status === "string" ? frontmatter.status.toLowerCase() : null;
+	const fmStatus = typeof frontmatter.status === "string" ? frontmatter.status.toLowerCase() : null;
 	const abandoned = abandonedFromName || fmStatus === "abandoned";
 
 	let status: PhaseStatus = "unknown";
@@ -87,10 +86,7 @@ export function parsePhaseFile(filePath: string): PhaseState | null {
 	const headingMatch = raw.match(HEADING_RE);
 	const title = headingMatch ? headingMatch[1].trim() : fileName.replace(/\.md$/, "");
 
-	const effort =
-		typeof frontmatter.effort === "string"
-			? frontmatter.effort
-			: extractEffort(raw) ?? "?";
+	const effort = typeof frontmatter.effort === "string" ? frontmatter.effort : (extractEffort(raw) ?? "?");
 
 	const todos = extractTodos(raw);
 

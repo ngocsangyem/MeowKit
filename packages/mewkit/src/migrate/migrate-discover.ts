@@ -39,9 +39,7 @@ export async function discoverAll(
 	const skills = scope.skills ? await discoverSkills(source.skills) : [];
 	const config = scope.config ? await discoverConfig(source.configFile) : null;
 	const rules = scope.rules ? await discoverRules(source.rules) : [];
-	const hookResult = scope.hooks
-		? await discoverHooks(source.hooks)
-		: { items: [], skippedShellHooks: [] };
+	const hookResult = scope.hooks ? await discoverHooks(source.hooks) : { items: [], skippedShellHooks: [] };
 
 	return {
 		agents,

@@ -25,12 +25,18 @@ export interface ConversionFallbackWarning {
 
 function getProviderPathKeyForPortableType(type: PortableType): ProviderPathKey {
 	switch (type) {
-		case "agent": return "agents";
-		case "command": return "commands";
-		case "skill": return "skills";
-		case "config": return "config";
-		case "rules": return "rules";
-		case "hooks": return "hooks";
+		case "agent":
+			return "agents";
+		case "command":
+			return "commands";
+		case "skill":
+			return "skills";
+		case "config":
+			return "config";
+		case "rules":
+			return "rules";
+		case "hooks":
+			return "hooks";
 	}
 }
 
@@ -59,8 +65,7 @@ function buildTargetChecksum(
 		return computeContentChecksum(convertedContent);
 	}
 
-	const sectionKind =
-		type === "config" ? "config" : type === "rules" ? "rule" : type === "agent" ? "agent" : null;
+	const sectionKind = type === "config" ? "config" : type === "rules" ? "rule" : type === "agent" ? "agent" : null;
 	if (!sectionKind) return undefined;
 
 	const sectionKey = getMergeSectionKey(sectionKind, item);
@@ -86,7 +91,11 @@ export function buildConvertedChecksums(
 		const result = convertItem(item, pathConfig.format, provider);
 		if (result.error) {
 			options?.onConversionFallback?.({
-				item: item.name, type, provider, format: pathConfig.format, error: result.error,
+				item: item.name,
+				type,
+				provider,
+				format: pathConfig.format,
+				error: result.error,
 			});
 			convertedChecksums[provider] = rawChecksum;
 			continue;
@@ -149,10 +158,7 @@ export function buildTypeDirectoryStates(
 			const pathConfig = providerConfig[pathKey];
 			if (!pathConfig) continue;
 
-			if (
-				pathConfig.writeStrategy === "merge-single" ||
-				pathConfig.writeStrategy === "single-file"
-			) {
+			if (pathConfig.writeStrategy === "merge-single" || pathConfig.writeStrategy === "single-file") {
 				continue;
 			}
 
@@ -163,8 +169,13 @@ export function buildTypeDirectoryStates(
 
 			if (!exists) {
 				results.push({
-					provider, type, global: isGlobal, path: dirPath,
-					exists: false, isEmpty: true, fileCount: 0,
+					provider,
+					type,
+					global: isGlobal,
+					path: dirPath,
+					exists: false,
+					isEmpty: true,
+					fileCount: 0,
 				});
 				continue;
 			}
@@ -174,16 +185,26 @@ export function buildTypeDirectoryStates(
 				stat = statSync(dirPath);
 			} catch {
 				results.push({
-					provider, type, global: isGlobal, path: dirPath,
-					exists: false, isEmpty: true, fileCount: 0,
+					provider,
+					type,
+					global: isGlobal,
+					path: dirPath,
+					exists: false,
+					isEmpty: true,
+					fileCount: 0,
 				});
 				continue;
 			}
 
 			if (!stat.isDirectory()) {
 				results.push({
-					provider, type, global: isGlobal, path: dirPath,
-					exists: true, isEmpty: false, fileCount: 1,
+					provider,
+					type,
+					global: isGlobal,
+					path: dirPath,
+					exists: true,
+					isEmpty: false,
+					fileCount: 1,
 				});
 				continue;
 			}
@@ -194,8 +215,13 @@ export function buildTypeDirectoryStates(
 				entries = readdirSync(dirPath);
 			} catch {
 				results.push({
-					provider, type, global: isGlobal, path: dirPath,
-					exists: true, isEmpty: true, fileCount: 0,
+					provider,
+					type,
+					global: isGlobal,
+					path: dirPath,
+					exists: true,
+					isEmpty: true,
+					fileCount: 0,
 				});
 				continue;
 			}
@@ -206,8 +232,13 @@ export function buildTypeDirectoryStates(
 					: entries.filter((f) => f.endsWith(ext));
 
 			results.push({
-				provider, type, global: isGlobal, path: dirPath,
-				exists: true, isEmpty: managedFiles.length === 0, fileCount: managedFiles.length,
+				provider,
+				type,
+				global: isGlobal,
+				path: dirPath,
+				exists: true,
+				isEmpty: managedFiles.length === 0,
+				fileCount: managedFiles.length,
 			});
 		}
 	}

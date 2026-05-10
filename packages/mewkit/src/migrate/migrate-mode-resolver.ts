@@ -21,10 +21,7 @@ export function validateFlags(options: MigrateOptions, argv: string[]): void {
 		throw new MewkitMigrateError("--install and --reconcile are mutually exclusive", 2);
 	}
 	if (options.reinstallEmptyDirs && options.respectDeletions) {
-		throw new MewkitMigrateError(
-			"--reinstall-empty-dirs and --respect-deletions are mutually exclusive",
-			2,
-		);
+		throw new MewkitMigrateError("--reinstall-empty-dirs and --respect-deletions are mutually exclusive", 2);
 	}
 	if (options.tool === "claude-code") {
 		throw new MewkitMigrateError(
@@ -35,9 +32,7 @@ export function validateFlags(options: MigrateOptions, argv: string[]): void {
 	void argv;
 }
 
-export async function selectProviders(
-	options: MigrateOptions,
-): Promise<ProviderType[]> {
+export async function selectProviders(options: MigrateOptions): Promise<ProviderType[]> {
 	if (options.tools && options.tools.length > 0) {
 		const unknown: string[] = [];
 		const valid: ProviderType[] = [];
@@ -89,7 +84,9 @@ export async function selectProviders(
 	// Interactive mode tolerates detection failure — picker still works without hints.
 	const detectionResult = await safeDetectInstalledTargets();
 	if (detectionResult.failed) {
-		console.log(`[!] Provider detection failed: ${detectionResult.error ?? "unknown error"}. Continuing without detection hints.`);
+		console.log(
+			`[!] Provider detection failed: ${detectionResult.error ?? "unknown error"}. Continuing without detection hints.`,
+		);
 	}
 	const detected: ProviderType[] = detectionResult.installed;
 

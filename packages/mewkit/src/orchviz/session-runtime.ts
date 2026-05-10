@@ -13,7 +13,7 @@ import { ORCHESTRATOR_NAME, INACTIVITY_TIMEOUT_MS } from "./constants.js";
 import type { SubagentWatcherDelegate } from "./subagent-watcher.js";
 import { SubagentScanner } from "./subagent-scanner.js";
 
-export interface SessionRuntimeOptions extends SessionWatcherOptions {}
+export type SessionRuntimeOptions = SessionWatcherOptions;
 
 export class SessionRuntime extends EventEmitter {
 	readonly manager = new SessionManager();
@@ -65,33 +65,30 @@ export class SessionRuntime extends EventEmitter {
 		};
 		this.scanner = new SubagentScanner(subagentDelegate, this.parser);
 
-		this.watcher.on(
-			"session:start",
-			({ sessionId, filePath }: { sessionId: string; filePath: string }) => {
-				const session = this.manager.create(sessionId, filePath);
-				const projectDir = path.dirname(filePath);
-				session.subagentsDir = path.join(projectDir, sessionId, "subagents");
-				this.armInactivity(sessionId);
-				// Spawn the main orchestrator node so the canvas has a root agent for
-				// every subsequent tool/message event to attach to. Without this, no
-				// nodes ever render — subagents only spawn on Task/Agent tool calls.
-				emit(
-					{
-						time: 0,
-						type: "agent_spawn",
-						payload: {
-							name: ORCHESTRATOR_NAME,
-							parent: null,
-							task: session.label,
-							isMain: true,
-						},
+		this.watcher.on("session:start", ({ sessionId, filePath }: { sessionId: string; filePath: string }) => {
+			const session = this.manager.create(sessionId, filePath);
+			const projectDir = path.dirname(filePath);
+			session.subagentsDir = path.join(projectDir, sessionId, "subagents");
+			this.armInactivity(sessionId);
+			// Spawn the main orchestrator node so the canvas has a root agent for
+			// every subsequent tool/message event to attach to. Without this, no
+			// nodes ever render — subagents only spawn on Task/Agent tool calls.
+			emit(
+				{
+					time: 0,
+					type: "agent_spawn",
+					payload: {
+						name: ORCHESTRATOR_NAME,
+						parent: null,
+						task: session.label,
+						isMain: true,
 					},
-					sessionId,
-				);
-				this.scanner.start(sessionId);
-				this.emit("session:start", { sessionId, filePath, label: session.label });
-			},
-		);
+				},
+				sessionId,
+			);
+			this.scanner.start(sessionId);
+			this.emit("session:start", { sessionId, filePath, label: session.label });
+		});
 		this.watcher.on("session:reset", ({ sessionId }: { sessionId: string }) => {
 			this.emit("session:reset", { sessionId });
 		});
