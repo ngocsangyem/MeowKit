@@ -64,7 +64,7 @@ If no tension points exist, note: "No cross-pass tension — both passes agree."
 ## Persist the Result
 
 ```bash
-.claude/scripts/bin/meowkit-review-log '{"skill":"plan-review-outside-voice","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"claude","commit":"'"$(git rev-parse --short HEAD)"'"}'
+.claude/scripts/bin/workflow-review-log '{"skill":"plan-review-outside-voice","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"claude","commit":"'"$(git rev-parse --short HEAD)"'"}'
 ```
 
 Substitute STATUS: "clean" if no findings, "issues_found" if findings exist. If the subagent failed, do NOT persist.

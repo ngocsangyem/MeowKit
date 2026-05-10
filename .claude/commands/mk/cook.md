@@ -28,7 +28,7 @@ This sentinel persists for the session. Hooks (`pre-implement.sh`), the helper (
 
 ## Behavior
 
-Runs MeowKit's 7-phase workflow from planning through shipping. The user intervenes at Gate 1 (plan approval) and Gate 2 (review approval). All other phases proceed automatically.
+Runs the toolkit's 7-phase workflow from planning through shipping. The user intervenes at Gate 1 (plan approval) and Gate 2 (review approval). All other phases proceed automatically.
 
 **TDD mode (post-migration):** TDD enforcement is OPT-IN. In default mode, Phase 2 is optional and the developer implements directly per the approved plan. Pass `--tdd` (or set `MEOWKIT_TDD=1` in your shell) to enable strict RED-phase enforcement.
 

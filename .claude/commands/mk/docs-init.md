@@ -45,7 +45,7 @@ Performs a one-time initial documentation scan of the entire codebase and genera
 
 ### When to Use
 
-- First time setting up MeowKit on an existing project
+- First time setting up the toolkit on an existing project
 - When joining a new codebase and need to understand the structure
 - After a major restructuring that invalidated previous docs
 

@@ -3,7 +3,7 @@ name: mk:api-design
 description: "REST/GraphQL API design: resource naming, HTTP methods, status codes, pagination, versioning, error formats. Use for 'design API', 'endpoint patterns'."
 version: 1.0.0
 argument-hint: "[api description] [--rest | --graphql | --both]"
-source: meowkit
+source: local
 allowed-tools:
   - Read
   - Write

@@ -1,9 +1,9 @@
 ---
 name: mk:frontend-design
 description: "Use when designing UI components, reviewing visual design, building design systems, or checking accessibility. Auto-activates on frontend design tasks and UI reviews."
-source: claudekit-engineer
+source: local
 original_skills: [ui-ux-pro-max, frontend-design]
-adapted_for: meowkit
+adapted_for: claude-code
 keywords: [frontend-design, ui-mockup, screenshot-replication, design-implementation, best-practices]
 when_to_use: "Use when replicating a mockup/screenshot or building React/TS components with best practices. NOT for design-system audits (see mk:ui-design-system)."
 user-invocable: true

@@ -12,13 +12,13 @@ color: blue
 
 You are the Confluence page CRUD agent. Execute create / get / update / delete / hierarchy / version operations against single Confluence Cloud pages via the `confluence-as` CLI wrapper.
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted page content) + C (Confluence state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11.
+This agent is **A (untrusted page content) + C (Confluence state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11.
 
 ## Pre-flight
 
@@ -34,7 +34,7 @@ Never call the binary directly. The wrapper handles env translation, JSON-output
 
 ## CLI Idioms
 
-Read `meowkit/.claude/skills/confluence/references/cli-idioms.md` once at session start; cache the verified syntax block. For unfamiliar flags, run `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page <verb> --help` and rely on `--help` over prose.
+Read `.claude/skills/confluence/references/cli-idioms.md` once at session start; cache the verified syntax block. For unfamiliar flags, run `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page <verb> --help` and rely on `--help` over prose.
 
 `CONFLUENCE_OUTPUT=json` is set by the wrapper; do NOT add `--output json` per call.
 
@@ -74,7 +74,7 @@ For full flag inventory (incl. `--representation storage|view|export_view`, `--l
 
 ## Templates
 
-`confluence-as` ships with built-in templates (verify via `--help`); otherwise body content is supplied via `--content` (markdown auto-converted to Confluence storage format). See `meowkit/.claude/skills/confluence-page/references/page-templates.md` for the canonical Markdown skeletons (RFC / Runbook / Decision Record) Claude writes when the user asks for a "well-formed" page body.
+`confluence-as` ships with built-in templates (verify via `--help`); otherwise body content is supplied via `--content` (markdown auto-converted to Confluence storage format). See `.claude/skills/confluence-page/references/page-templates.md` for the canonical Markdown skeletons (RFC / Runbook / Decision Record) Claude writes when the user asks for a "well-formed" page body.
 
 ## Idempotency Note (POST-retry)
 
@@ -86,9 +86,9 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh sear
 
 If `--idempotency-key=auto` flag is available, prefer it on `page create`. Confirm flag presence via `page create --help` before assuming.
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
-Append observations using MeowKit's prefix protocol (per `meowkit/CLAUDE.md` `## Memory`):
+Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
 
 - `##pattern: confluence-page: <recurring project pattern>` → `.claude/memory/quick-notes.md`
 - `##note: confluence-page: <one-off context>` → `.claude/memory/quick-notes.md`

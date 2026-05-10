@@ -67,7 +67,7 @@ For EXPANSION and SELECTIVE EXPANSION modes: expansion opportunities and delight
 
 ## Diagrams (mandatory, produce all that apply)
 
-> Before emitting any Mermaid block, Read `meowkit/.claude/skills/preview/references/mermaid-essentials.md`.
+> Before emitting any Mermaid block, Read `.claude/skills/preview/references/mermaid-essentials.md`.
 
 1. System architecture
 2. Data flow (including shadow paths)
@@ -135,7 +135,7 @@ Verdict logic:
 
 ## Append-Only CEO Review Output
 
-**NEVER overwrite existing plan.md content.** Append the following block at the END of plan.md (below any existing `## MEOWKIT REVIEW REPORT` section — both coexist):
+**NEVER overwrite existing plan.md content.** Append the following block at the END of plan.md (below any existing `## REVIEW REPORT` section — both coexist):
 
 ```markdown
 ## CEO Review ({date}, {MODE} SCOPE)

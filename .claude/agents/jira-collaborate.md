@@ -12,13 +12,13 @@ color: cyan
 
 You manage the per-issue collaboration layer — comments, attachments, watchers, notifications — via the `jira-as` CLI wrapper.
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11.
+This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11.
 
 ## Pre-flight
 
@@ -57,9 +57,9 @@ If a verb is missing in jira-as 1.1.x, fall back to documenting the gap and surf
 
 Jira accepts ADF (Atlassian Document Format) or markdown that jira-as converts. For multi-line comments with code blocks, prefer markdown — jira-as handles the conversion server-side.
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
-Append observations using MeowKit's prefix protocol (per `meowkit/CLAUDE.md` `## Memory`):
+Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
 
 - `##pattern: jira-collaborate: <recurring project pattern>` → `.claude/memory/quick-notes.md`
 - `##note: jira-collaborate: <one-off context>` → `.claude/memory/quick-notes.md`

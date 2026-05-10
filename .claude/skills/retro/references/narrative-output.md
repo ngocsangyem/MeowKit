@@ -70,7 +70,7 @@ Narrative covering:
 Check review JSONL logs for plan completion data from /mk:ship runs this period:
 
 ```bash
-eval "$(.claude/scripts/bin/meowkit-slug 2>/dev/null)"
+eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)"
 cat .claude/memory/projects/*-reviews.jsonl 2>/dev/null | grep '"skill":"ship"' | grep '"plan_items_total"' || echo "NO_PLAN_DATA"
 ```
 

@@ -4,7 +4,7 @@ These rules govern how agents execute multi-step workflow skills that use the st
 
 ## What Is Step-File Architecture
 
-Some MeowKit skills decompose complex workflows into individual step files:
+Some skills decompose complex workflows into individual step files:
 ```
 skills/mk:review/
 ├── SKILL.md           # Entrypoint (metadata only)
@@ -21,6 +21,8 @@ ALWAYS read the entire step file before executing any instructions in it.
 ALWAYS complete the current step before reading the next.
 
 WHY: Loading multiple steps wastes context tokens and creates confusion about which instructions to follow. JIT loading keeps the context window lean. Source: BMAD-METHOD step-file pattern.
+
+This is also the toolkit's implementation of Claude Code progressive disclosure: `SKILL.md` stays small, `workflow.md` declares the sequence, and step files load only when needed.
 
 ## Rule 2: Never Skip Steps
 

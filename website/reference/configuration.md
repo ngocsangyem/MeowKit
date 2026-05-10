@@ -113,20 +113,27 @@ cp .claude/.env.example .claude/.env
 
 ## Rules
 
-10 rule files in `.claude/rules/`, loaded in priority order:
+19 rule files in `.claude/rules/`, loaded in priority order:
 
 | Priority | Rule | Purpose |
 |----------|------|---------|
 | 1 | security-rules.md | Blocked patterns: secrets, `any`, SQL injection |
 | 2 | injection-rules.md | 10 prompt injection defense rules |
 | 3 | gate-rules.md | Gate 1 + Gate 2 hard stops |
-| 4 | tdd-rules.md | TDD enforcement (7 rules) |
-| 5 | naming-rules.md | Per-platform naming conventions |
-| 6 | development-rules.md | File management, code quality, git safety |
-| 7 | context-ordering-rules.md | Long content first, context before constraint |
-| 8 | model-selection-rules.md | Task type → model tier routing |
-| 9 | output-format-rules.md | Response structure |
-| 10 | orchestration-rules.md | Subagent delegation, file ownership |
+| 4 | harness-rules.md | Harness generator/evaluator discipline |
+| 5 | rubric-rules.md | Evaluator rubric calibration |
+| 6 | core-behaviors.md | Mandatory operating behaviors |
+| 7 | tdd-rules.md | Opt-in TDD enforcement |
+| 8 | agent-conduct.md | Naming, responses, context ordering, search-before-building |
+| 9 | development-rules.md | Skill activation, file management, code quality, git safety |
+| 10 | step-file-rules.md | Step-file workflow execution |
+| 11 | model-selection-rules.md | Task type → model tier routing |
+| 12 | skill-authoring-rules.md | Skill metadata, state, and size discipline |
+| 13 | scale-adaptive-rules.md | Domain-complexity routing |
+| 14 | risk-checklist.md | Horizontal risk flags |
+| 15 | parallel-execution-rules.md | Worktree isolation and team coordination |
+| 16 | orchestration-rules.md | Subagent delegation and file ownership |
+| 17 | post-phase-delegation.md | Project-manager fire points |
 
 ## Modes
 

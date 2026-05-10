@@ -43,7 +43,7 @@ When a skill needs to persist data across sessions (append-only logs, JSON state
 
 WHY: Skill-directory state is wiped on plugin upgrade per Anthropic's documented behavior. Silent data loss is the failure mode. `${CLAUDE_PLUGIN_DATA}` is the stable, upgrade-safe folder.
 
-EXCEPTION: MeowKit-internal infrastructure (`.claude/memory/`, `tasks/`, `session-state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
+EXCEPTION: framework-internal infrastructure (`.claude/memory/`, `tasks/`, `session-state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
 
 **Bad example: Skill-dir path** (wiped on plugin upgrade):
 
@@ -77,6 +77,8 @@ Every `SKILL.md` body (excluding YAML frontmatter) MUST stay under 500 lines. Sk
 - Step-file architecture per `step-file-rules.md` — `workflow.md` + `step-NN-*.md` files
 
 WHY: Once SKILL.md loads, every token competes with conversation history and other context. The 500-line cap is Anthropic's empirically-validated threshold for context efficiency. Beyond this, partial reads (`head -100`) start to miss content.
+
+If a skill has 3+ distinct phases with different context needs, prefer step-file architecture. If it only needs reference material, keep `SKILL.md` concise and link to `references/*.md`.
 
 PERIODIC AUDIT: Run a length check on `mk:*` SKILL.md files quarterly OR on every model-tier upgrade (per `harness-rules.md` Rule 7 dead-weight audit cadence). Flag oversized monoliths for decomposition. Step-filed skills auto-pass — only the SKILL.md entrypoint counts.
 
@@ -135,7 +137,7 @@ WHY: Standardized metadata enables catalog tooling, downstream consumers, and a 
 
 ### Validation
 
-Enforced by `meowkit/scripts/validate-skill-frontmatter.py` against `meowkit/.claude/schemas/skill-schema.json`. CI runs on every PR via `ci.yml`. Two-tier severity: ERROR (schema violation) vs WARN (missing recommended). Pass `--strict` to promote WARN to ERROR.
+Enforced by `scripts/validate-skill-frontmatter.py` against `.claude/schemas/skill-schema.json`. CI runs on every PR via `ci.yml`. Two-tier severity: ERROR (schema violation) vs WARN (missing recommended). Pass `--strict` to promote WARN to ERROR.
 
 ### Deprecated fields
 
@@ -152,7 +154,7 @@ The following frontmatter fields are advisory (not hook-enforced); they annotate
 
 ## Commands vs Skills (they are not the same)
 
-Slash commands live in `.claude/commands/meow/*.md`. They operate in one of 3 valid patterns — NOT every command has a matching SKILL.md, and that is intentional:
+Slash commands live in `.claude/commands/mk/*.md`. They operate in one of 3 valid patterns — NOT every command has a matching SKILL.md, and that is intentional:
 
 1. **Skill-composing** — command chains existing skills (e.g. `/audit` runs `mk:review` + `mk:cso`).
 2. **Agent-invoking** — command directly spawns an agent without a skill wrapper (e.g. `/arch` uses the `architect` agent).

@@ -12,13 +12,13 @@ color: blue
 
 You are the JIRA issue CRUD agent. Execute create / get / update / delete operations against single Jira issues via the `jira-as` CLI wrapper.
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11.
+This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11.
 
 ## Pre-flight
 
@@ -34,7 +34,7 @@ Never call the binary directly. The wrapper handles env translation + JSON-outpu
 
 ## CLI Idioms
 
-Read `meowkit/.claude/skills/jira/references/cli-idioms.md` once at session start; cache the verified syntax block. For unfamiliar flags, run `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue <verb> --help` and rely on `--help` over prose.
+Read `.claude/skills/jira/references/cli-idioms.md` once at session start; cache the verified syntax block. For unfamiliar flags, run `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue <verb> --help` and rely on `--help` over prose.
 
 Default field projection for reads (use `jq` to trim output):
 
@@ -67,11 +67,11 @@ For full flag inventory (incl. `--description`, `--assignee`, `--labels`, `--com
 
 ## Templates
 
-`jira-as` ships with `bug`, `task`, `story` templates. Use `--template <name>` on `issue create` to seed defaults. See `meowkit/.claude/skills/jira-issue/references/issue-templates.md` for the canonical Markdown templates Claude writes when the user asks for a "well-formed" ticket body.
+`jira-as` ships with `bug`, `task`, `story` templates. Use `--template <name>` on `issue create` to seed defaults. See `.claude/skills/jira-issue/references/issue-templates.md` for the canonical Markdown templates Claude writes when the user asks for a "well-formed" ticket body.
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
-Append observations using MeowKit's prefix protocol (per `meowkit/CLAUDE.md` `## Memory`):
+Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
 
 - `##pattern: jira-issue: <recurring project pattern>` → `.claude/memory/quick-notes.md`
 - `##note: jira-issue: <one-off context>` → `.claude/memory/quick-notes.md`

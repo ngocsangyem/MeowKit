@@ -31,7 +31,7 @@ When you create or modify a `.vue` file, [mk:vue](/reference/skills/vue) enforce
 | `storeToRefs()` for Pinia destructuring | Direct store state destructuring blocked |
 | No `v-html` with user content | XSS vector (MeowKit security rule) |
 | `ref()` for primitives | `reactive()` only for complex objects |
-| PascalCase components, kebab-case files | MeowKit naming-rules.md enforced |
+| PascalCase components, kebab-case files | MeowKit `agent-conduct.md` B1 enforced |
 
 ## TypeScript patterns
 

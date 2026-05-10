@@ -60,7 +60,7 @@ authoritative tier comes from `model-selection-rules.md` Rule 2 escalation.
 This list complements `mk:scale-routing` CSV. The CSV remains
 **tier-authoritative** for vertical-domain matches. The risk checklist is
 the **single escalation lever** folded into Rule 2 — it does NOT introduce
-new lanes (no "tiny / normal / high-risk" vocabulary in MeowKit). Map flags
+new lanes (no "tiny / normal / high-risk" vocabulary in the toolkit). Map flags
 onto existing TRIVIAL / STANDARD / COMPLEX via Rule 2.
 
 ## Calibration

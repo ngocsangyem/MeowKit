@@ -5,10 +5,10 @@ This file is the canonical setup reference for `mk:jira` and the 16 `mk:jira-*` 
 ## Canonical install
 
 ```
-npx mewkit setup
+.claude/scripts/bin/setup-workflow
 ```
 
-This triggers `packages/mewkit/src/core/dependency-installer.ts` to read every per-skill `requirements.txt` (discovered by `skills-dependencies.ts:findRequirementsFiles()`) and `pip install` into `.claude/skills/.venv`. The jira-as binary lands at:
+This triggers `packages/cli/src/core/dependency-installer.ts` to read every per-skill `requirements.txt` (discovered by `skills-dependencies.ts:findRequirementsFiles()`) and `pip install` into `.claude/skills/.venv`. The jira-as binary lands at:
 
 ```
 .claude/skills/.venv/bin/jira-as
@@ -20,7 +20,7 @@ This triggers `packages/mewkit/src/core/dependency-installer.ts` to read every p
 .claude/skills/.venv/bin/pip install jira-as 'jira-as[keyring]'
 ```
 
-Use only if `mewkit setup` is unavailable. The wrapper resolves to the venv-local binary; do NOT rely on global PATH.
+Use only if `.claude/scripts/bin/setup-workflow` is unavailable. The wrapper resolves to the venv-local binary; do NOT rely on global PATH.
 
 ## Authentication — three required env vars
 
@@ -78,6 +78,6 @@ Expected: prints version, exits 0. With env missing, errors with `:?` parameter-
 
 ## Troubleshooting
 
-- **`jira-as not installed at <path>`** — run `npx mewkit setup` (or use the manual fallback).
+- **`jira-as not installed at <path>`** — run `.claude/scripts/bin/setup-workflow` (or use the manual fallback).
 - **`MEOW_JIRA_API_TOKEN missing`** — copy `.claude/.env.example` to `.claude/.env` and fill the three vars.
 - **Wrapper works but hook says "missing"** — hook validates presence-only via grep; an empty value passes the grep but fails at the `:?` expansion. Set actual values.

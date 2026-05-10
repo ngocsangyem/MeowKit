@@ -8,7 +8,7 @@ description: >-
   NOT for style/convention enforcement (see mk:clean-code); NOT for reviewing
   diffs or PRs (see mk:review).
 argument-hint: "[file_or_directory]"
-source: meowkit
+source: local
 allowed-tools:
   - Read
   - Grep

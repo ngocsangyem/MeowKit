@@ -1,4 +1,4 @@
-# /meow — MeowKit Entry Point and Router
+# /meow — Command Entry Point and Router
 
 ## Usage
 
@@ -8,7 +8,7 @@
 
 ## Behavior
 
-This is the "friendly front door" to MeowKit. Users who don't know which command to use start here.
+This is the "friendly front door" to the toolkit. Users who don't know which command to use start here.
 
 ### Execution Steps
 

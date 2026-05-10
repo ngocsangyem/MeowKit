@@ -272,7 +272,7 @@ All subagents report structured status on completion:
 **Concerns/Blockers:** [if applicable]
 ```
 
-See `output-format-rules.md` Rule 5 for full protocol.
+See `agent-conduct.md` A1 for the full protocol.
 
 ## Full Skill Registry
 

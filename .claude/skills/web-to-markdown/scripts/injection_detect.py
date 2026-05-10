@@ -30,7 +30,7 @@ from scripts.injection_patterns import (
     _ROLE_PLAYING,
     _ENCODING_OBFUSCATION,
     _CONTEXT_MANIPULATION,
-    _MEOWKIT_SPECIFIC,
+    _WORKFLOW_SPECIFIC,
 )
 
 # ---------------------------------------------------------------------------
@@ -78,7 +78,7 @@ _ALL_PATTERNS: list[tuple[re.Pattern, str, str]] = (
     + _compile(_ROLE_PLAYING, "role_playing")
     + _compile(_ENCODING_OBFUSCATION, "encoding_obfuscation")
     + _compile(_CONTEXT_MANIPULATION, "context_manipulation")
-    + _compile(_MEOWKIT_SPECIFIC, "meowkit_specific")
+    + _compile(_WORKFLOW_SPECIFIC, "meowkit_specific")
 )
 
 # Fence-near-system-marker: WARN-only check (not CRITICAL — not added to _ALL_PATTERNS)

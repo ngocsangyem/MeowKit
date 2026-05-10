@@ -25,6 +25,15 @@ Proceeding to Phase 2 (Test RED) without an approved plan. No tests are written,
 
 Scale-routing one-shot: When `mk:scale-routing` returns `workflow=one-shot` AND orchestrator confirms zero blast radius, Gate 1 may be bypassed. See `scale-adaptive-rules.md` Rule 4.
 
+### Plan Shape
+
+Plans live under `tasks/plans/YYMMDD-name/`.
+
+- `plan.md` is the overview entrypoint and stays under 80 lines.
+- `phase-XX-name.md` files hold detailed phase instructions, context links, requirements, affected files, implementation steps, success criteria, risks, security notes, and next steps.
+
+Every plan and phase file must be self-contained: goal, scope, assumptions, constraints, acceptance criteria, verification commands, and file paths must be understandable without prior conversation.
+
 ## GATE 2 — After Phase 4 (Review)
 
 ### Conditions for Approval

@@ -2,7 +2,7 @@
 name: mk:jira-ops
 description: "JIRA-side cache + project-context discovery via the jira-as wrapper. Triggers: 'jira cache status', 'clear jira cache', 'discover project context for PROJ'. Diagnostic-only — no Atlassian state changes. NOT for issue CRUD; NOT for project admin (mk:jira-admin)."
 phase: on-demand
-source: meowkit
+source: local
 keywords: [jira, jira-ops, jira-cache, jira-discover, jira-diagnostic]
 when_to_use: "Use to inspect / clear the jira-as local cache or discover project context (default issue types, mandatory fields). NOT for project admin (use mk:jira-admin)."
 user-invocable: true

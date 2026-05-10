@@ -1,6 +1,6 @@
 # Integration With Planning-Engine
 
-How the Spec Research Report feeds the rest of the MeowKit workflow.
+How the Spec Research Report feeds the rest of the 7-phase workflow.
 
 ## Contents
 
@@ -28,7 +28,7 @@ The index supports a future v2 `--spec <page-id>` convenience flag that auto-res
 
 `mk:planning-engine plan --tickets PROJ-101,PROJ-102 --spec <report-path>` extends the planning pipeline with spec context.
 
-**User-orchestrated, two-step flow** — skill-to-skill invocation is forbidden in MeowKit:
+**User-orchestrated, two-step flow** — skill-to-skill invocation is forbidden in Toolkit:
 
 ```
 Step 1 (user): /mk:confluence-spec-analyst 12345

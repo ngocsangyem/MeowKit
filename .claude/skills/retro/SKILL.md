@@ -80,7 +80,7 @@ See `references/tone-and-rules.md`
 | `references/completeness-principle.md`     | Boil the Lake principle, effort estimation tables                    |
 | `references/repo-ownership-mode.md`        | Solo vs collaborative repo behavior                                  |
 | `references/search-before-building.md`     | Three layers of knowledge, eureka moments                            |
-| `references/contributor-mode.md`           | Field report filing for MeowKit contributors                         |
+| `references/contributor-mode.md`           | Field report filing for the toolkit contributors                         |
 | `references/completion-status-protocol.md` | DONE/BLOCKED/NEEDS_CONTEXT status reporting, escalation              |
 | `references/telemetry.md`                  | End-of-skill telemetry logging                                       |
 | `references/plan-status-footer.md`         | Plan mode review report footer                                       |

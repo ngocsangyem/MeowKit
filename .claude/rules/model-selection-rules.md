@@ -4,7 +4,7 @@ original_file: n/a
 adapted: no
 adaptation_notes: >
   "Complex architecture → Opus, Feature implementation → Sonnet, Quick edits → Haiku"
-  Cross-referenced with MeowKit's existing Model Routing table in CLAUDE.md.
+  Cross-referenced with the toolkit's existing Model Routing table in CLAUDE.md.
 ---
 
 # Model Selection Rules

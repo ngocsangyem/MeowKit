@@ -217,7 +217,7 @@ doc updates — the user runs `/mk:ship` and documentation stays current without
 Log coverage and plan completion data so `/mk:retro` can track trends:
 
 ```bash
-eval "$(.claude/scripts/bin/meowkit-slug 2>/dev/null)" && mkdir -p .claude/memory/projects
+eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .claude/memory/projects
 ```
 
 Append to `.claude/memory/projects/$BRANCH-reviews.jsonl`:

@@ -59,7 +59,7 @@ Count the signals. You'll use this count in Phase 6 to determine which tier of c
 Write the design document to the project directory.
 
 ```bash
-eval "$(.claude/scripts/bin/meowkit-slug 2>/dev/null)" && mkdir -p .claude/memory/projects
+eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .claude/memory/projects
 USER=$(whoami)
 DATETIME=$(date +%Y%m%d-%H%M%S)
 ```

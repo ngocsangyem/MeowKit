@@ -29,7 +29,7 @@ user-invocable: true
 phase: on-demand
 trust_level: kit-authored
 injection_risk: medium
-source: meowkit
+source: local
 ---
 
 # /mk:context-audit — Context Window Structural Audit
@@ -121,10 +121,10 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
 
 ## Integration Points
 
-- **Reuses, does not duplicate:** `packages/mewkit/src/orchviz/token-estimator.ts`
+- **Reuses, does not duplicate:** `packages/cli/src/orchviz/token-estimator.ts`
   is the canonical chars/4 source. Shell scripts inline the same heuristic with
   a citation comment, avoiding a Node bridge that would require `dist/`.
-- **Reads, does not write:** `meowkit/.claude/memory/cost-log.json`,
+- **Reads, does not write:** `.claude/memory/cost-log.json`,
   `.claude/`, `.mcp.json`. No file writes anywhere.
 - **No env vars introduced.** Window size is hard-coded 200K; override deferred
   until a real 1M-context use case appears.

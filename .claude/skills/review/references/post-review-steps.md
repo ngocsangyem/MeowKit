@@ -34,7 +34,7 @@ recognize that Eng Review was run on this branch.
 Run:
 
 ```bash
-.claude/scripts/bin/meowkit-review-log '{"skill":"review","timestamp":"TIMESTAMP","status":"STATUS","issues_found":N,"critical":N,"informational":N,"commit":"COMMIT"}'
+.claude/scripts/bin/workflow-review-log '{"skill":"review","timestamp":"TIMESTAMP","status":"STATUS","issues_found":N,"critical":N,"informational":N,"commit":"COMMIT"}'
 ```
 
 Substitute:

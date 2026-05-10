@@ -8,7 +8,7 @@ Walk the user through Confluence Cloud credential setup for the `mk:confluence-*
 
 ## Steps
 
-1. Verify `npx mewkit setup` ran and `confluence-as` binary exists at `.claude/skills/.venv/bin/confluence-as`. If not, instruct: `npx mewkit setup`.
+1. Verify `.claude/scripts/bin/setup-workflow` ran and `confluence-as` binary exists at `.claude/skills/.venv/bin/confluence-as`. If not, instruct: `.claude/scripts/bin/setup-workflow`.
 
 2. Ensure `.claude/.env` exists. If absent: create empty file, then `chmod 0600 .claude/.env`.
 

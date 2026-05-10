@@ -10,7 +10,7 @@ triggers:
   - phase 0 orient
 phase: 0
 user-invocable: false
-source: meowkit
+source: local
 keywords: [scale-routing, domain-classification, complexity-routing, csv-routing, model-tier-override]
 when_to_use: "Auto-invoked at Phase 0 — scans task description for domain keywords, returns complexity tier and model override. Not user-callable directly."
 ---

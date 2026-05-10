@@ -67,7 +67,7 @@ For tasks running >5 turns or >50KB of accumulated context.
 | **Sub-agent handoff** — delegate focused subtasks; receive 1–2KB distilled summaries | Lead-context lean; sub-agent's distilled return | Sub-agent's full exploration trace |
 
 The skill **documents** these as safeguards. **Triggering** belongs to the
-harness (`harness-rules.md` Rule 11 in MeowKit handles compaction-cache; the
+harness (`harness-rules.md` Rule 11 in the toolkit handles compaction-cache; the
 prompting framework does not auto-compact).
 
 When the input prompt mentions any of these mechanisms (or similar — "checkpoint", "resumable", "long task"), surface the relevant pattern as a recommendation in section 3 of the output.

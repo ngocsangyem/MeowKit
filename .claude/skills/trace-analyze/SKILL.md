@@ -18,7 +18,7 @@ allowed-tools:
   - Glob
   - Agent
   - AskUserQuestion
-source: meowkit
+source: local
 keywords: [trace-analyze, harness-trace-log, failure-patterns, scatter-gather, hitl-gate, model-upgrade-audit]
 when_to_use: "Use when analyzing harness trace logs to surface recurring failure patterns and suggest improvements. Mandatory HITL gate before changes apply."
 user-invocable: true

@@ -56,7 +56,7 @@ The `originality.md` and `design-quality.md` rubrics include anti-pattern lists 
 
 ## Rule 8: Frontend-App Preset Is Pruned (4 Rubrics, Not 7)
 
-The default `frontend-app` composition preset (v2.0.0) loads only 4 rubrics: `product-depth`, `functionality`, `design-quality`, `originality`. The other 3 rubrics in the library (`code-quality`, `craft`, `ux-usability`) are opt-in only — they overlap existing meowkit layers (`mk:review` 5-dim verdict, security-rules.md, `mk:qa` health-score).
+The default `frontend-app` composition preset (v2.0.0) loads only 4 rubrics: `product-depth`, `functionality`, `design-quality`, `originality`. The other 3 rubrics in the library (`code-quality`, `craft`, `ux-usability`) are opt-in only — they overlap existing workflow layers (`mk:review` 5-dim verdict, security-rules.md, `mk:qa` health-score).
 
 **WHY:** Loading duplicate rubrics doubles evaluator work without doubling signal. The Phase 2 necessity audit found 3 rubrics overlapped existing layers; pruning the preset honors YAGNI without losing the explicit-opt-in escape hatch.
 

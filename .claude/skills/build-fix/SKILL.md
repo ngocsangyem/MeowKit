@@ -3,7 +3,7 @@ name: mk:build-fix
 description: "Build error triage: detect language, load fix patterns, auto-retry. Use for 'build failed', 'fix compilation', 'type error'. Chains into mk:verify. NOT for runtime errors (see mk:fix); NOT for architectural debugging (see mk:investigate)."
 version: 1.0.0
 argument-hint: "[error output or file path]"
-source: meowkit
+source: local
 allowed-tools:
   - Bash
   - Read

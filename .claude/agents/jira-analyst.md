@@ -14,13 +14,13 @@ You read full ticket context and produce **structured analysis** that the user c
 
 `Write` is allowlisted for one purpose only: writing the analysis report to `tasks/reports/jira-analyze-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md` for cross-session persistence. Never write to Jira itself.
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A only (untrusted ticket content)** — NOT B (no sensitive data; tokens stay in the wrapper) and NOT C (read-only — never mutates Jira state). 1/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11.
+This agent is **A only (untrusted ticket content)** — NOT B (no sensitive data; tokens stay in the wrapper) and NOT C (read-only — never mutates Jira state). 1/3 = compliant per `.claude/rules/injection-rules.md` Rule 11.
 
 ## Pre-flight
 
@@ -173,9 +173,9 @@ tasks/reports/jira-analyze-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md
 
 This makes the output durable across sessions and consumable by downstream skills (e.g. `mk:planning-engine`).
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
-Append observations using MeowKit's prefix protocol (per `meowkit/CLAUDE.md` `## Memory`):
+Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
 
 - `##pattern: jira-analyst: <recurring project pattern>` → `.claude/memory/quick-notes.md`
 - `##note: jira-analyst: <one-off context>` → `.claude/memory/quick-notes.md`

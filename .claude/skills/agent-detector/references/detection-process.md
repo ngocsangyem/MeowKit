@@ -128,7 +128,7 @@ tester:
 **Single Agent Banner:**
 
 ```
-⚡ MEOWKIT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ WORKFLOW ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -137,9 +137,9 @@ tester:
 **Multi-Agent Banner (when collaboration needed):**
 
 ```
-⚡ MEOWKIT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ WORKFLOW ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agents: [primary] + [secondary], [tertiary]            ┃
-┃ Phase: [phase] - [name] │ [meow-message]            ┃
+┃ Phase: [phase] - [name] │ [status-message]            ┃
 ┃ Model: [model]                                         ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```

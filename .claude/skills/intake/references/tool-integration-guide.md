@@ -19,8 +19,8 @@ Connect mk:intake to your task management tool. Five options — pick the one th
 
 Setup:
 ```bash
-# Install jira-as into the meowkit venv (auto-handled by mewkit setup)
-npx mewkit setup
+# Install jira-as into the workflow venv (auto-handled by .claude/scripts/bin/setup-workflow)
+.claude/scripts/bin/setup-workflow
 
 # Populate .claude/.env with the three MEOW_JIRA_* vars
 cp .claude/.env.example .claude/.env

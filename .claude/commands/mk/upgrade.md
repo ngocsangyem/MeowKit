@@ -1,4 +1,4 @@
-# /upgrade — Self-Update MeowKit
+# /upgrade — Self-Update Toolkit
 
 ## Usage
 
@@ -10,16 +10,16 @@
 
 ## Behavior
 
-Self-update MeowKit to the latest version. Preserves learned knowledge in `memory/` directory.
+Self-update the installed toolkit to the latest version. Preserves learned knowledge in `memory/` directory.
 
 ### Execution Steps
 
-1. **Check current version.** Read `.claude/meowkit.config.json` for the current installed version.
+1. **Check current version.** Read `the workflow config` for the current installed version.
 
-2. **Fetch latest version.** Query npm registry for the latest published MeowKit version.
+2. **Fetch latest version.** Query npm registry for the latest published toolkit version.
 
 3. **Compare versions.** If current version matches latest:
-   - Print: "MeowKit is up to date (vX.Y.Z)"
+   - Print: "Toolkit is up to date (vX.Y.Z)"
    - Exit.
 
 4. **If update is available:**
@@ -27,7 +27,7 @@ Self-update MeowKit to the latest version. Preserves learned knowledge in `memor
    - Download the new version.
    - Replace `.claude/` files with updated versions: commands, modes, rules, skills, scripts, agents, hooks.
    - **NEVER overwrite `memory/` directory.** Lessons, cost logs, and learned patterns are preserved across updates.
-   - Update version in `.claude/meowkit.config.json`.
+   - Update version in `the workflow config`.
 
 5. **Post-update validation.** Run `/validate` to confirm the update installed correctly and all scripts are functional.
 

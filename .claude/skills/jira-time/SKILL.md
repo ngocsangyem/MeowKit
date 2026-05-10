@@ -2,7 +2,7 @@
 name: mk:jira-time
 description: "JIRA time tracking via the jira-as wrapper: log work, list/update/delete worklogs, set estimates, generate reports, bulk-log. Triggers: 'log 2h on KEY', 'show worklog for KEY', 'time report for sprint', 'bulk-log 30m to JQL'. Worklog edit/delete loses data — agent confirms. NOT for sprint capacity (mk:jira-agile)."
 phase: on-demand
-source: meowkit
+source: local
 keywords: [jira, jira-time, jira-worklog, jira-estimate, time-tracking, jira-report]
 when_to_use: "Use to log work / inspect worklogs / set estimates / pull time reports on Jira tickets. NOT for sprint capacity planning (mk:jira-agile)."
 user-invocable: true

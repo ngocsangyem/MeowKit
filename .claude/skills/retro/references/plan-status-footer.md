@@ -2,15 +2,15 @@
 
 When you are in plan mode and about to call ExitPlanMode:
 
-1. Check if the plan file already has a `## MEOWKIT REVIEW REPORT` section.
+1. Check if the plan file already has a `## REVIEW REPORT` section.
 2. If it DOES — skip (a review skill already wrote a richer report).
 3. If it does NOT — run this command:
 
 ```bash
-.claude/scripts/bin/meowkit-review-log
+.claude/scripts/bin/workflow-review-log
 ```
 
-Then write a `## MEOWKIT REVIEW REPORT` section to the end of the plan file:
+Then write a `## REVIEW REPORT` section to the end of the plan file:
 
 - If the output contains review entries (JSONL lines before `---CONFIG---`): format the
   standard report table with runs/status/findings per skill, same format as the review
@@ -18,7 +18,7 @@ Then write a `## MEOWKIT REVIEW REPORT` section to the end of the plan file:
 - If the output is `NO_REVIEWS` or empty: write this placeholder table:
 
 ```markdown
-## MEOWKIT REVIEW REPORT
+## REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|

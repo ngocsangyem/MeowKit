@@ -7,7 +7,7 @@ description: >-
   NOT for domain complexity routing (see mk:scale-routing); NOT for skill
   discovery (descriptions handle that automatically).
 argument-hint: "[--verbose]"
-source: meowkit
+source: local
 allowed-tools:
   - Read
   - Glob

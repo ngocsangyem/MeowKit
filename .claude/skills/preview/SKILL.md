@@ -14,7 +14,7 @@ allowed-tools:
   - Glob
   - Grep
   - AskUserQuestion
-source: claudekit-engineer
+source: local
 keywords:
   - preview
   - visual-explanation

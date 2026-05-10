@@ -4,7 +4,7 @@ description: >-
   Task claiming and ownership tracking for parallel agent execution. Agents claim
   tasks from a shared queue with file ownership enforcement. Use during parallel
   execution phases when multiple agents work simultaneously.
-source: meowkit
+source: local
 keywords: [task-queue, ownership-tracking, parallel-execution, claim-task, file-ownership]
 when_to_use: "Auto-invoked when multiple agents claim tasks during parallel execution. Not user-callable directly."
 user-invocable: false

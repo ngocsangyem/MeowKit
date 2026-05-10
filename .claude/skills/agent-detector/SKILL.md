@@ -38,7 +38,7 @@ user-invocable: false
 
    ```
    SAFETY BASELINE INCOMPLETE: rule <name> not found at .claude/rules/<name>.md
-   Refusing to route any task. Restore the rule (git checkout / mewkit init) before retrying.
+   Refusing to route any task. Restore the rule (git checkout / the installer) before retrying.
    ```
 
    Do NOT proceed to detection. Do NOT route to any agent. The 5 rules are the deterministic baseline; their absence indicates either repo corruption or a partial install. Replaces the unverified directory-auto-load assumption with a positive existence check.

@@ -16,7 +16,7 @@ Run this bash:
 _TEL_END=$(date +%s)
 _TEL_DUR=$(( _TEL_END - _TEL_START ))
 rm -f .claude/memory/.pending-"$_SESSION_ID" 2>/dev/null || true
-# telemetry removed — MeowKit uses analyst agent \
+# telemetry removed — telemetry disabled; analyst agent not invoked \
   --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
   --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
 ```

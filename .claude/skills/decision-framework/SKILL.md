@@ -3,7 +3,7 @@ name: mk:decision-framework
 description: "Operational decision frameworks: triage, escalation, case management, billing ops. Use for 'how to handle X cases', 'build triage', 'escalation protocol'."
 version: 1.0.0
 argument-hint: "[decision domain description]"
-source: meowkit
+source: local
 allowed-tools:
   - Read
   - Write

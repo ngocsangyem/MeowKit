@@ -1,4 +1,4 @@
-# MeowKit Skills Attribution
+# the toolkit Skills Attribution
 
 Skills in this directory are sourced from open-source repositories.
 Each skill retains its original author credit in its frontmatter.
@@ -11,12 +11,12 @@ Each skill retains its original author credit in its frontmatter.
 | 2   | ship                  | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/ship/SKILL.md                            | 1    |
 | 3   | freeze                | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/freeze/SKILL.md                          | 1    |
 | 4   | review                | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/review/SKILL.md. Updated 260326: +input modes, +verdict template, +phase anchoring (ck:code-review sync) | 1    |
-| 5   | cook                  | mrgoonie (claudekit)         | [claudekit-engineer](https://claudekit.cc)                   | Proprietary | claudekit/.claude/skills/cook/SKILL.md     | 1    |
+| 5   | cook                  | external author         | external toolkit                   | Proprietary | .claude/skills/cook/SKILL.md     | 1    |
 | 6   | investigate           | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/investigate/SKILL.md                     | 1    |
 | 7   | clean-code            | vudovn (antigravity-kit)     | [antigravity-kit](https://github.com/vudovn/antigravity-kit) | MIT         | .agent/skills/clean-code/SKILL.md               | 1    |
 | 8   | lint-and-validate     | vudovn (antigravity-kit)     | [antigravity-kit](https://github.com/vudovn/antigravity-kit) | MIT         | .agent/skills/lint-and-validate/SKILL.md        | 1    |
 | 9   | cso                   | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/cso/SKILL.md                             | 1    |
-| 10  | fix                   | mrgoonie (claudekit)         | [claudekit-engineer](https://claudekit.cc)                   | Proprietary | claudekit/.claude/skills/fix/SKILL.md      | 1    |
+| 10  | fix                   | external author         | external toolkit                   | Proprietary | .claude/skills/fix/SKILL.md      | 1    |
 | 11  | agent-detector        | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog)   | Unknown     | aura-frog/skills/agent-detector/SKILL.md        | 2    |
 | 13  | qa                    | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/qa/SKILL.md                              | 2    |
 | 14  | office-hours          | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/office-hours/SKILL.md                    | 2    |
@@ -27,18 +27,18 @@ Each skill retains its original author credit in its frontmatter.
 | 20  | workflow-orchestrator | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog)   | Unknown     | aura-frog/skills/workflow-orchestrator/SKILL.md | 2    |
 | 21  | retro                 | garrytan (gstack)            | [gstack](https://github.com/garrytan/gstack)                 | MIT         | gstack/retro/SKILL.md                           | 2    |
 | 22  | session-continuation  | nguyenthienthanh (aura-frog) | [aura-frog](https://github.com/nguyenthienthanh/aura-frog)   | Unknown     | aura-frog/skills/session-continuation/SKILL.md  | 2    |
-| 23  | docs-finder           | MeowKit (original)           | Inspired by claudekit-engineer/docs-seeker                   | MIT         | .claude/skills/docs-finder/                     | 1    |
-| 24  | multimodal            | MeowKit (original)           | Inspired by claudekit-engineer/ai-multimodal                 | MIT         | .claude/skills/multimodal/                 | 1    |
-| 25  | scout                 | MeowKit (adapted)            | Adapted from claudekit-engineer/scout. Updated 260326: +search tiers, +arch fingerprint, +handoff protocol | MIT | .claude/skills/scout/ | 1 |
-| 26  | llms                  | MeowKit (adapted)            | Adapted from claudekit-engineer/llms                         | MIT         | .claude/skills/llms/                       | 2    |
-| 27  | skill-creator         | MeowKit (adapted)            | Adapted from claudekit-engineer/skill-creator (simplified from 47 to 4 files) | MIT | .claude/skills/skill-creator/ | 2 |
-| 28  | project-organization  | MeowKit (adapted)            | Adapted from claudekit-engineer/project-organization         | MIT         | .claude/skills/project-organization/       | 2    |
-| 29  | typescript            | MeowKit (adapted)            | Adapted from aura-frog/typescript-expert + claudekit/frontend-development (TS parts) | MIT | .claude/skills/typescript/ | 2 |
-| 30  | vue                   | MeowKit (adapted)            | Adapted from aura-frog/vue-expert                            | MIT         | .claude/skills/vue/                        | 2    |
-| 31  | frontend-design       | MeowKit (adapted)            | Adapted from claudekit/ui-ux-pro-max + claudekit/frontend-design (merged) | MIT | .claude/skills/frontend-design/ | 2 |
-| 32  | qa-manual             | MeowKit (original)           | Orchestrates: agent-browser + playwright-cli for QA + E2E gen | MIT | .claude/skills/qa-manual/ | 1 |
-| 33  | henshin               | MeowKit (adapted)            | Adapted from claudekit-engineer/agentize — planning front door only; downstream execution owned by plan-creator + cook | MIT | .claude/skills/henshin/ | 2 |
-| 34  | prompt-enhancer       | MeowKit (original)           | Synthesized from 7 source docs: claude-prompting-best-practices, codex-prompt-guide, factoryai/prompt-crafting-for-different-models, context-engineering-guide, effective-context-engineering-for-ai-agents (Anthropic), lessons-build-skill, skill-authoring-guidelines | MIT | .claude/skills/prompt-enhancer/ | 2 |
+| 23  | docs-finder           | local original           | Inspired by external docs-seeker patterns                   | MIT         | .claude/skills/docs-finder/                     | 1    |
+| 24  | multimodal            | local original           | Inspired by external multimodal patterns                 | MIT         | .claude/skills/multimodal/                 | 1    |
+| 25  | scout                 | local adaptation            | Adapted from external skill patterns/scout. Updated 260326: +search tiers, +arch fingerprint, +handoff protocol | MIT | .claude/skills/scout/ | 1 |
+| 26  | llms                  | local adaptation            | Adapted from external skill patterns/llms                         | MIT         | .claude/skills/llms/                       | 2    |
+| 27  | skill-creator         | local adaptation            | Adapted from external skill patterns/skill-creator (simplified from 47 to 4 files) | MIT | .claude/skills/skill-creator/ | 2 |
+| 28  | project-organization  | local adaptation            | Adapted from external skill patterns/project-organization         | MIT         | .claude/skills/project-organization/       | 2    |
+| 29  | typescript            | local adaptation            | Adapted from external TypeScript and frontend-development patterns | MIT | .claude/skills/typescript/ | 2 |
+| 30  | vue                   | local adaptation            | Adapted from aura-frog/vue-expert                            | MIT         | .claude/skills/vue/                        | 2    |
+| 31  | frontend-design       | local adaptation            | Adapted from external UI/UX and frontend-design patterns | MIT | .claude/skills/frontend-design/ | 2 |
+| 32  | qa-manual             | local original           | Orchestrates: agent-browser + playwright-cli for QA + E2E gen | MIT | .claude/skills/qa-manual/ | 1 |
+| 33  | henshin               | local adaptation            | Adapted from external skill patterns/agentize — planning front door only; downstream execution owned by plan-creator + cook | MIT | .claude/skills/henshin/ | 2 |
+| 34  | prompt-enhancer       | local original           | Synthesized from 7 source docs: claude-prompting-best-practices, codex-prompt-guide, factoryai/prompt-crafting-for-different-models, context-engineering-guide, effective-context-engineering-for-ai-agents (Anthropic), lessons-build-skill, skill-authoring-guidelines | MIT | .claude/skills/prompt-enhancer/ | 2 |
 
 ## Removed
 
@@ -61,8 +61,8 @@ Threshold: Tier 1 ≥ 40, Tier 2 = 30-39.
 | gstack             | 13              | 28              | 46%            |
 | antigravity-kit    | 3               | 48              | 6%             |
 | aura-frog          | 4               | 43              | 9%             |
-| claudekit-engineer | 2               | 68              | 3%             |
-| MeowKit (original) | 1               | —               | —              |
+| external patterns | 2               | 68              | 3%             |
+| local original | 1               | —               | —              |
 | **Total**          | **23**          | **187+**        | —              |
 
 ## Modifications
@@ -76,11 +76,11 @@ No instruction content was rewritten in any skill.
 
 ## Duplicates Resolved
 
-Skills that overlap with existing MeowKit skills (in .claude/skills/planning/, testing/, review/, shipping/, etc.) were included because the sourced versions are more comprehensive. The MeowKit originals remain in their subdirectories and serve as simplified fallbacks.
+Skills that overlap with existing skills (in .claude/skills/planning/, testing/, review/, shipping/, etc.) were included because the sourced versions are more comprehensive. The originals remain in their subdirectories and serve as simplified fallbacks.
 
-| Concept        | MeowKit original              | Sourced skill                              | Resolution                                                                 |
+| Concept        | original              | Sourced skill                              | Resolution                                                                 |
 | -------------- | ----------------------------- | ------------------------------------------ | -------------------------------------------------------------------------- |
-| Ship pipeline  | shipping/ship-pipeline.md     | ship/SKILL.md (gstack)                     | Both kept — gstack version is comprehensive, MeowKit version is simplified |
+| Ship pipeline  | shipping/ship-pipeline.md     | ship/SKILL.md (gstack)                     | Both kept — gstack version is comprehensive, toolkit version is simplified |
 | Code review    | review/structural-audit.md    | review/SKILL.md (gstack)                   | Both kept — different scope                                                |
 | Security audit | review/security-checklist.md  | cso/SKILL.md (gstack)                      | Both kept — different scope                                                |
 | TDD            | testing/red-green-refactor.md | workflow-orchestrator/SKILL.md (aura-frog) | Both kept — different granularity                                          |

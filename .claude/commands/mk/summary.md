@@ -61,4 +61,4 @@ it without needing to `cat` the file by hand.
 - Cache: `.claude/memory/conversation-summary.md`
 - Lock: `session-state/conversation-summary.lock`
 - Rule: `.claude/rules/harness-rules.md` Rule 11
-- Plan: `plans/260407-2331-meowkit-harness-gan-architecture/phase-09-conversation-summary-cache.md`
+- Plan: `plans/260407-2331-harness-gan-architecture/phase-09-conversation-summary-cache.md`

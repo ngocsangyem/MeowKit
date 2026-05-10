@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Validate a MeowKit plan file and its phase files for required sections and quality.
+"""Validate a plan file and its phase files for required sections and quality.
 
 Dependencies:
-    PyYAML >= 6.0  (parses phase frontmatter; installed via `npx mewkit setup`)
+    PyYAML >= 6.0  (parses phase frontmatter; installed via `.claude/scripts/bin/setup-workflow`)
 
 Usage:
     .claude/skills/.venv/bin/python3 validate-plan.py <plan.md>

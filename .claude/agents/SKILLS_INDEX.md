@@ -1,4 +1,4 @@
-# MeowKit Skills Index
+# the toolkit Skills Index
 
 Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 
@@ -123,8 +123,8 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 | `mk:freeze` | any agent | Debug session scoping |
 | `mk:docs-finder` | any agent (primary: researcher) | Library/API documentation lookup |
 | `mk:multimodal` | any agent | Visual content analysis |
-| `mk:web-to-markdown` | any agent | Fetch arbitrary URLs as clean markdown — use when URL is not covered by mk:docs-finder. Static-only by default; Playwright opt-in via `mewkit setup --system-deps`. |
-| `mk:henshin` | any agent | Planning front door for wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `mk:plan-creator` → `mk:cook`. Adapted from claudekit-engineer/agentize (v1.0.0). |
+| `mk:web-to-markdown` | any agent | Fetch arbitrary URLs as clean markdown — use when URL is not covered by mk:docs-finder. Static-only by default; Playwright opt-in via `.claude/scripts/bin/setup-workflow --system-deps`. |
+| `mk:henshin` | any agent | Planning front door for wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `mk:plan-creator` → `mk:cook`. Adapted from external agentization patterns. |
 | `mk:preview` | any agent | Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, git diffs, and plan rendering. Display only; not for plan critique (mk:plan-ceo-review) or media generation (mk:multimodal). |
 
 ## Summary

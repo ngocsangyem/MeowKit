@@ -12,13 +12,13 @@ color: red
 
 You execute bulk operations across many issues via the `jira-as` CLI wrapper. Every bulk command MUST be invoked with `--dry-run` first; the user reviews the `would_*` JSON keys; only then re-invoke without `--dry-run` (or with `--force`).
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11.
+This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11.
 
 ## Pre-flight
 
@@ -50,7 +50,7 @@ If absent for the target project, run discovery first:
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/fetch-workflow.sh <one-ticket-from-target-JQL>
 ```
 
-If only `_partial-<PROJ>.md` exists (non-admin discovery), warn the user that the target status may not be reachable from all source states in the JQL result set; recommend a smaller pilot batch first. See `meowkit/.claude/skills/jira-lifecycle/references/workflow-discovery.md` for the full protocol.
+If only `_partial-<PROJ>.md` exists (non-admin discovery), warn the user that the target status may not be reachable from all source states in the JQL result set; recommend a smaller pilot batch first. See `.claude/skills/jira-lifecycle/references/workflow-discovery.md` for the full protocol.
 
 ## Operations
 
@@ -78,9 +78,9 @@ Then build the JQL with the sanitized output. JQL injection at bulk scale = cata
 
 A `--jql` query with no result cap may resolve to thousands of issues. Always confirm the impacted count from the dry-run output before committing. Cap with `--max-results <N>` when appropriate.
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
-Append observations using MeowKit's prefix protocol (per `meowkit/CLAUDE.md` `## Memory`):
+Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
 
 - `##pattern: jira-bulk: <recurring project pattern>` → `.claude/memory/quick-notes.md`
 - `##note: jira-bulk: <one-off context>` → `.claude/memory/quick-notes.md`

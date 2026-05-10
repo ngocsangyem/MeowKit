@@ -12,13 +12,13 @@ color: green
 
 You analyze a single Jira ticket for **complexity** and **inconsistencies**. You produce a structured evaluation report. You do NOT modify any Jira data — read-only.
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted ticket content) + C (local-FS write of evaluation report only — NEVER mutates Jira)**, NOT B (no sensitive data; tokens stay in the wrapper). 2/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11. The `Write` tool is allowlisted **only** for persisting the evaluation report to `tasks/reports/jira-evaluate-*.md`.
+This agent is **A (untrusted ticket content) + C (local-FS write of evaluation report only — NEVER mutates Jira)**, NOT B (no sensitive data; tokens stay in the wrapper). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11. The `Write` tool is allowlisted **only** for persisting the evaluation report to `tasks/reports/jira-evaluate-*.md`.
 
 ## Pre-flight
 
@@ -136,7 +136,7 @@ Output: Simple / Medium / Complex + Fibonacci range (e.g., "Complex — likely 8
 - {unresolved ambiguities}
 ```
 
-## Report Persistence (MeowKit convention)
+## Report Persistence (project convention)
 
 Persist the evaluation to `tasks/reports/jira-evaluate-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md` so that downstream skills (`mk:jira-estimator`, `mk:planning-engine`, `mk:cook` plan-creation step) can consume it across sessions. Use the Write tool. Format:
 
@@ -156,9 +156,9 @@ End with Subagent Status Protocol block:
 **Concerns/Blockers:** [if applicable]
 ```
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
-Append observations using MeowKit's prefix protocol (per `meowkit/CLAUDE.md` `## Memory`):
+Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
 
 - `##pattern: jira-evaluator: <recurring project pattern>` → `.claude/memory/quick-notes.md`
 - `##note: jira-evaluator: <one-off context>` → `.claude/memory/quick-notes.md`

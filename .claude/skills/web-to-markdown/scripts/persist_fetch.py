@@ -40,7 +40,7 @@ def _find_project_root() -> Path:
     Previous logic searched for .claude/ directory, but skill subdirs also
     contain .claude/, causing resolution to stop at the skill dir instead of
     the actual project root. Uses multiple sentinels for robustness:
-    - CLAUDE.md — created by Claude Code and npx mewkit init
+    - CLAUDE.md — created by Claude Code and the installer
     - .claude/settings.json — always exists at project root, never in skill subdirs
     """
     for parent in Path(__file__).resolve().parents:

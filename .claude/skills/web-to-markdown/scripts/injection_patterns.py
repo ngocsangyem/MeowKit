@@ -3,7 +3,7 @@
 injection_patterns.py — Pattern data for Layer 5 injection scanner.
 
 Pattern set vendored from github.com/lasso-security/claude-hooks (MIT, 260409)
-MeowKit-specific patterns added for DATA-fence injection and tool-call hijack.
+Workflow-specific patterns added for DATA-fence injection and tool-call hijack.
 
 Imported by injection_detect.py — do NOT import scan() from here.
 """
@@ -139,8 +139,8 @@ _CONTEXT_MANIPULATION: list[tuple[str, str]] = [
      "Prompt repetition extraction"),
 ]
 
-# MeowKit-specific: DATA-fence injection, tool-call hijack, memory poisoning
-_MEOWKIT_SPECIFIC: list[tuple[str, str]] = [
+# Workflow-specific: DATA-fence injection, tool-call hijack, memory poisoning
+_WORKFLOW_SPECIFIC: list[tuple[str, str]] = [
     # Attacker mimicking our exact wrapper open-fence — never appears legitimately in fetched content
     # (bare closing fences removed: every markdown page has them → CRITICAL false-positive storm)
     (r"```fetched-markdown", "DATA-fence wrapper mimicry (attacker replicating our open-fence marker)"),

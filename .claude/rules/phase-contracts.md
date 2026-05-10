@@ -1,5 +1,5 @@
 ---
-source: MeowKit original
+source: original
 applies_to: [Phase 1, 2, 3, 4, 5, 6]
 # Unconditional load — target task directories (`tasks/plans/`, `tasks/contracts/`)
 # contain only `.gitkeep` at plan-creation time. Path-scoping would defer the rule

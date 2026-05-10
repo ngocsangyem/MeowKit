@@ -12,13 +12,13 @@ color: orange
 
 You produce a **heuristic story-point estimation** for a single Jira ticket. Qualitative reasoning → Fibonacci suggestion. You do NOT modify any Jira data — read-only.
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted ticket content) + C (local-FS write of estimation report only — NEVER mutates Jira)**, NOT B (no sensitive data; tokens stay in the wrapper). 2/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11. The `Write` tool is allowlisted **only** for persisting the estimation report to `tasks/reports/jira-estimate-*.md`.
+This agent is **A (untrusted ticket content) + C (local-FS write of estimation report only — NEVER mutates Jira)**, NOT B (no sensitive data; tokens stay in the wrapper). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11. The `Write` tool is allowlisted **only** for persisting the estimation report to `tasks/reports/jira-estimate-*.md`.
 
 ## Pre-flight
 
@@ -150,15 +150,15 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue update {IS
 Run team estimation session for this ticket.
 ```
 
-## Report Persistence (MeowKit convention)
+## Report Persistence (project convention)
 
 Persist the estimation to `tasks/reports/jira-estimate-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md`. This makes the result durable for `mk:planning-engine` capacity analysis and the `mk:cook` plan-creation input. Use the Write tool. Filename slug uses absolute date stamp (per memory rules).
 
 End with Subagent Status Protocol block.
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
-Append observations using MeowKit's prefix protocol (per `meowkit/CLAUDE.md` `## Memory`):
+Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
 
 - `##pattern: jira-estimator: <recurring project pattern>` → `.claude/memory/quick-notes.md`
 - `##note: jira-estimator: <one-off context>` → `.claude/memory/quick-notes.md`

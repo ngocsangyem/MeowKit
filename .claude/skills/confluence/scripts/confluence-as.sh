@@ -16,7 +16,7 @@ LOCAL_SETTINGS="$ROOT/.claude/settings.local.json"
 
 if [ ! -x "$CONFLUENCE_AS" ]; then
   echo "[mk:confluence] confluence-as not installed at $CONFLUENCE_AS" >&2
-  echo "[mk:confluence] Run: npx mewkit setup    (auto-installs from .claude/skills/confluence/scripts/requirements.txt)" >&2
+  echo "[mk:confluence] Run: .claude/scripts/bin/setup-workflow    (auto-installs from .claude/skills/confluence/scripts/requirements.txt)" >&2
   exit 127
 fi
 

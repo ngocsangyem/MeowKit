@@ -12,13 +12,13 @@ color: cyan
 
 You manage the per-page collaboration layer — comments, attachments, labels, watchers — via the `confluence-as` CLI wrapper.
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted comment / file content) + C (Confluence state change via wrapper)**, NOT B (sensitive data — tokens stay in the wrapper). 2/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11.
+This agent is **A (untrusted comment / file content) + C (Confluence state change via wrapper)**, NOT B (sensitive data — tokens stay in the wrapper). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11.
 
 ## Pre-flight
 
@@ -76,7 +76,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/cql-sanitize.sh '<ter
 
 Confluence accepts ADF (Atlassian Document Format) or markdown that `confluence-as` converts. For multi-line comments with code blocks, prefer markdown — the wrapper handles conversion server-side.
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
 - `##pattern: confluence-collaborate: <recurring project pattern>` → `.claude/memory/quick-notes.md`
 - `##decision: confluence-collaborate: <captured choice + rationale>` → `.claude/memory/decisions.md`

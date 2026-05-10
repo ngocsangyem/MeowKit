@@ -22,7 +22,7 @@
   - [`mk:docs-finder` priority override — `--wtm-approve`](#meowdocs-finder-priority-override---wtm-approve)
   - [Injection-STOP override — **NO FLAG**](#injection-stop-override-no-flag)
 - [4. Cache & path conventions](#4-cache-path-conventions)
-- [5. mewkit CLI allowlist schema](#5-mewkit-cli-allowlist-schema)
+- [5. CLI allowlist schema](#5-cli-allowlist-schema)
 - [6. Manifest (`index.jsonl`) format](#6-manifest-indexjsonl-format)
 - [7. Testing strategy](#7-testing-strategy)
   - [Unit tests](#unit-tests)
@@ -359,20 +359,20 @@ rm -rf .claude/cache/web-fetches/*.md         # clean regular reports
 rm -rf .claude/cache/web-fetches/quarantine/  # clean quarantine (CAUTION — review first)
 ```
 
-v2 will add a TTL-based cleanup in `mewkit setup --clean-fetches`.
+v2 will add a TTL-based cleanup in `setup cleanup command`.
 
 **Git posture:** `.claude/cache/` is in `.gitignore`. Never commit.
 
 ---
 
-## 5. mewkit CLI allowlist schema
+## 5. CLI allowlist schema
 
 **Problem:** if `optional_system_deps` frontmatter is free-form, a malicious skill can declare `optional_system_deps: [malicious-pypi-package]` and trick the CLI into pip-installing it.
 
-**Solution:** mewkit CLI has a hardcoded registry. Skill frontmatter can only REFERENCE keys from the registry; cannot define new installers.
+**Solution:** CLI has a hardcoded registry. Skill frontmatter can only REFERENCE keys from the registry; cannot define new installers.
 
 ```typescript
-// packages/mewkit/src/core/system-deps-registry.ts
+// packages/cli/src/core/system-deps-registry.ts
 export type SystemDepEntry = {
   name: string;
   detectCommand: string; // probe: shell command; exit 0 = installed
@@ -417,7 +417,7 @@ export const SYSTEM_DEPS_REGISTRY: Record<string, SystemDepEntry> = {
 
 ```
 ⚠ Skill mk:evil-skill declares optional_system_deps: [malicious-package]
-  This key is not in the mewkit system-deps registry. Skipping.
+  This key is not in the system-deps registry. Skipping.
   Known keys: ffmpeg, imagemagick, playwright-chromium.
 ```
 

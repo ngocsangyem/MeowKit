@@ -2,7 +2,7 @@
 
 ## Sources (in order of contribution)
 
-### 1. claudekit-engineer problem-solving skill (v2.0.0)
+### 1. external problem-solving skill (v2.0.0)
 
 Primary source. Supplied 5 core techniques and the `when-stuck` dispatch pattern.
 
@@ -16,10 +16,10 @@ Primary source. Supplied 5 core techniques and the `when-stuck` dispatch pattern
 
 ### 2. microsoft/amplifier (insight-synthesizer agent)
 
-Original lineage of the 5 core techniques. Claudekit adapted these from Amplifier; meowkit adapted them further.
+Original lineage of the 5 core techniques. This adaptation builds on those source patterns.
 
 - Repository: https://github.com/microsoft/amplifier
-- Commit referenced by claudekit: `2adb63f858e7d760e188197c8e8d4c1ef721e2a6` (2025-10-10)
+- Commit referenced by source material: `2adb63f858e7d760e188197c8e8d4c1ef721e2a6` (2025-10-10)
 - License: MIT
 
 ### 3. cc-thinking-skills (TJ Boudreaux)
@@ -44,7 +44,7 @@ Supplied `first-principles.md` and `via-negativa.md` as strategic-unsticking tec
 ### Changed
 
 - **Tone:** compressed from academic (cc-thinking) to terse imperative style. Cut templates over 20 lines; cut "Feynman's wisdom" / "Taleb's wisdom" narrative sections.
-- **Cross-references:** all `ck:` references rewritten to `meow:`. `systematic-debugging` / "debugging skill" references rewritten to `mk:sequential-thinking` or `mk:fix` as appropriate.
+- **Cross-references:** legacy command references were rewritten to current `mk:` skill references. `systematic-debugging` / "debugging skill" references rewritten to `mk:sequential-thinking` or `mk:fix` as appropriate.
 - **Boundary pointer:** explicit reroute to `mk:fix` (for bug-fix intent) and `mk:sequential-thinking` (for pure diagnostic reasoning), added to SKILL.md and `when-stuck.md`.
 - **Bridge lines:** each technique references its nearest sibling to reduce "which one do I use" friction.
 - **Gotchas section:** added in SKILL.md (non-obvious failure modes per technique) per `lessons-build-skill.md`.

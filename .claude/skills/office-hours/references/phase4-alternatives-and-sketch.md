@@ -69,14 +69,14 @@ Generate a single-page HTML file with these constraints:
 
 Write to a temp file:
 ```bash
-SKETCH_FILE="/tmp/meowkit-sketch-$(date +%s).html"
+SKETCH_FILE="/tmp/workflow-sketch-$(date +%s).html"
 ```
 
 **Step 3: Render and capture**
 
 ```bash
 agent-browser open "file://$SKETCH_FILE"
-agent-browser screenshot /tmp/meowkit-sketch.png
+agent-browser screenshot /tmp/workflow-sketch.png
 ```
 
 If `agent-browser` is not available, skip the render step. Tell the
@@ -92,7 +92,7 @@ If they approve or say "good enough," proceed.
 **Step 5: Include in design doc**
 
 Reference the wireframe screenshot in the design doc's "Recommended Approach" section.
-The screenshot file at `/tmp/meowkit-sketch.png` can be referenced by downstream skills
+The screenshot file at `/tmp/workflow-sketch.png` can be referenced by downstream skills
 (`/plan-design-review`, `/design-review`) to see what was originally envisioned.
 
 **Step 6: Outside design voices** (optional)

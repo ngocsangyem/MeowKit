@@ -2,7 +2,7 @@
 name: mk:jira-issue
 description: "JIRA issue CRUD via the jira-as wrapper. Triggers: 'create bug/task/story', 'show me PROJ-123', 'get/view/look up issue', 'update PROJ-123', 'delete PROJ-123'. NOT for transitions (mk:jira-lifecycle); NOT for comments/attachments (mk:jira-collaborate); NOT for bulk ops (mk:jira-bulk); NOT for issue links (mk:jira-relationships); NOT for time logging (mk:jira-time); NOT for sprint/epic (mk:jira-agile)."
 phase: on-demand
-source: meowkit
+source: local
 keywords: [jira, jira-issue, issue-crud, create-issue, get-issue, update-issue, delete-issue]
 when_to_use: "Use to create / read / update / delete a single Jira issue. NOT for state transitions (use mk:jira-lifecycle)."
 user-invocable: true
@@ -12,7 +12,7 @@ agent: jira-issue
 
 # mk:jira-issue
 
-Forks to the `jira-issue` agent (system prompt at `meowkit/.claude/agents/jira-issue.md`). The skill body is the task brief — Claude Code injects this content into the forked agent.
+Forks to the `jira-issue` agent (system prompt at `.claude/agents/jira-issue.md`). The skill body is the task brief — Claude Code injects this content into the forked agent.
 
 ## Triggers
 

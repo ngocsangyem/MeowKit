@@ -3,11 +3,11 @@ Offline end-to-end tests for mk:web-to-markdown.
 
 Covers the OFFLINE subset of the 8 E2E scenarios:
 - (b) Poisoned page → INJECTION_STOP + quarantine + security-log + no preview leaked
-- (e) `mewkit doctor` detects missing Playwright (Python-side: import probe)
+- (e) the doctor command detects missing Playwright (Python-side: import probe)
 - (h) MEOWKIT_WEB_FETCH_PERSIST=off → full content inline, no disk write
 
 Network-dependent scenarios (a, c, d, f, g) are intentionally skipped — they
-require live URLs, the venv-installed deps, or `mewkit` CLI invocation, none
+require live URLs, the venv-installed deps, or CLI invocation, none
 of which are available in the no-test mode this skill was built under.
 
 How to run:
@@ -122,13 +122,13 @@ def test_injection_stop_response_does_not_leak_content():
 
 def test_playwright_import_probe_matches_doctor_check():
     """
-    Scenario (e) — `mewkit doctor` runs `.venv/bin/python3 -c 'import playwright'`
+    Scenario (e) — the doctor command runs `.venv/bin/python3 -c 'import playwright'`
     as the MISSING_PACKAGE probe. This test verifies the Python side of that
     contract: importing `playwright` either succeeds (deps installed) or
     raises ImportError (the doctor check should report MISSING_PACKAGE).
 
-    This is the OFFLINE half of E2E scenario (e). The TS-side `mewkit doctor`
-    invocation is tested separately in mewkit's TS test suite.
+    This is the OFFLINE half of E2E scenario (e). The TS-side the doctor command
+    invocation is tested separately in the CLI TS test suite.
     """
     try:
         import playwright  # noqa: F401

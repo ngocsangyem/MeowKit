@@ -12,13 +12,13 @@ color: yellow
 
 You drive workflow lifecycle on Jira issues — transitions, assignment, resolution, version + component management — via the `jira-as` CLI wrapper.
 
-## Required Context (MeowKit)
+## Required Context
 
-Per `meowkit/.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `meowkit/.claude/rules/injection-rules.md` Rule 11.
+This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11.
 
 ## Pre-flight
 
@@ -43,7 +43,7 @@ If the cache is absent for the target ticket's project, run discovery once:
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/fetch-workflow.sh PROJ-123
 ```
 
-The script tries the admin path (`admin workflow for-issue`) first; falls back to non-admin per-state discovery and writes `_partial-<PROJECT>.md` (flagged INCOMPLETE) on 403. See `meowkit/.claude/skills/jira-lifecycle/references/workflow-discovery.md` for the full protocol + cache layout.
+The script tries the admin path (`admin workflow for-issue`) first; falls back to non-admin per-state discovery and writes `_partial-<PROJECT>.md` (flagged INCOMPLETE) on 403. See `.claude/skills/jira-lifecycle/references/workflow-discovery.md` for the full protocol + cache layout.
 
 ### Live cache validation
 
@@ -57,7 +57,7 @@ Diff against cached IDs from `tasks/jira-workflows/<slug>.md`. If divergent, pro
 
 ### Educational patterns are NOT authoritative
 
-The files at `meowkit/.claude/skills/jira-lifecycle/references/patterns/{standard,software-dev,jsm-request,incident}-workflow.md` describe **common shapes** for orientation. They are NOT this project's workflow. Always prefer the discovered cache.
+The files at `.claude/skills/jira-lifecycle/references/patterns/{standard,software-dev,jsm-request,incident}-workflow.md` describe **common shapes** for orientation. They are NOT this project's workflow. Always prefer the discovered cache.
 
 ## CLI Idioms
 
@@ -98,9 +98,9 @@ Then re-invoke with `--resolution <value>`.
 
 If `transition` returns exit code 1 with a "transition required field" error, parse the error to identify the missing field and prompt the user with options.
 
-## Memory (MeowKit convention)
+## Memory (project convention)
 
-Append observations using MeowKit's prefix protocol (per `meowkit/CLAUDE.md` `## Memory`):
+Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
 
 - `##pattern: jira-lifecycle: <recurring project pattern>` → `.claude/memory/quick-notes.md`
 - `##note: jira-lifecycle: <one-off context>` → `.claude/memory/quick-notes.md`

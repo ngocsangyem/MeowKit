@@ -17,7 +17,7 @@
  *   - Input sanitization (trim, length check)
  *   - --summary flag for context-efficient handoff
  *
- * Source: claudekit-engineer/sequential-thinking (MIT, improved)
+ * Source: external sequential-thinking patterns (MIT, improved)
  */
 
 const fs = require('fs');

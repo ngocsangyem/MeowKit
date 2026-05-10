@@ -25,7 +25,7 @@ Single source of truth for per-leaf risk, dry-run protocol, and sanitization rul
 
 ## Risk Tier per Operation
 
-Taxonomy for confluence-as ops, condensed to MeowKit conventions:
+Taxonomy for confluence-as ops, condensed to project conventions:
 
 - **Tier 1 (read-only)** — `page get`, `search`, `hierarchy *`, `version list`, `space list/get`, `comment list`, `attachment list/download`, `label list`, `watch list`. No confirmation; execute immediately.
 - **Tier 2 (single-item modify, reversible)** — `page create`, `comment add`, `label add`, `attachment upload`, `watch add`. Agent reports the change in response.
@@ -59,7 +59,7 @@ If the impacted_count differs by > 5% between dry-run and execute, surface as a 
 | Wrapper exits 3 | Non-Cloud site URL | Use MCP escape hatch per `install-and-auth.md` |
 | Wrapper exits 4 | Network / DNS / page not found | Retry once; check VPN; verify page-id |
 | Wrapper exits 5 | 401 / 403 — token rotated or permission missing | Re-run `/mk:confluence-setup`; verify user has Confluence access to space |
-| Wrapper exits 127 | Binary not installed | Run `npx mewkit setup` |
+| Wrapper exits 127 | Binary not installed | Run `.claude/scripts/bin/setup-workflow` |
 | JSON parse error | Wrapper stdout filter missed an edge case | File issue; fall back to passthrough; tighten filter |
 | CQL sanitizer rejects valid query | False positive in regex | File issue with example; tune sanitizer (v2) |
 | Bulk delete partial failure | Rate limit / per-page permission error mid-run | Re-invoke on remaining set with `id NOT IN (<completed>)` |

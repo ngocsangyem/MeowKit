@@ -2,7 +2,7 @@
 name: mk:intake
 description: "Ticket/PRD intake: product area classification, completeness scoring, RCA, technical assessment. Works with Jira (via mk:jira-issue / jira-as), Linear (via MCP), GitHub (via gh CLI), or manual paste. Triggers: 'analyze ticket', 'intake PRD', 'triage issue', 'classify ticket', 'check ticket'."
 phase: 0
-source: meowkit
+source: local
 keywords: [intake, ticket-analysis, prd-classification, completeness-scoring, triage, jira-linear-github]
 when_to_use: "Use when triaging tickets/PRDs — product-area classification, completeness, RCA. NOT for sprint planning against codebase (see mk:planning-engine)."
 user-invocable: true
@@ -107,7 +107,7 @@ Identify affected files, test coverage gaps, and implementation complexity.
 
 ### Step 8b: Jira enrichment
 
-If the `mk:jira-*` family is available (jira-as installed via `npx mewkit setup` + `.claude/.env` populated), load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
+If the `mk:jira-*` family is available (jira-as installed via `.claude/scripts/bin/setup-workflow` + `.claude/.env` populated), load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
 Suggest `mk:jira-*` actions per `references/jira-handoff-protocol.md`.
 
 ### Step 9: Generate output

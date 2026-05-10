@@ -19,7 +19,7 @@ Security flaws baked into the plan survive into implementation. Catching auth ga
 
 1. For each finding: state what security property is violated, where in the plan, and the attack scenario
 2. Classify severity: CRITICAL (exploitable with no special access) | HIGH (exploitable with insider/adjacent access) | MEDIUM (requires specific conditions)
-3. Reference MeowKit's `security-rules.md` blocked patterns where applicable
+3. Reference the toolkit's `security-rules.md` blocked patterns where applicable
 4. If you find zero security issues, state why — do not fabricate
 
 ## Output Format

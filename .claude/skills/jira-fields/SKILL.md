@@ -2,7 +2,7 @@
 name: mk:jira-fields
 description: "JIRA custom field discovery + configuration via the jira-as wrapper. Triggers: 'field ID for X', 'list custom fields', 'check fields for project PROJ', 'configure agile fields for board'. Read ops are open; create/configure-agile require admin. NOT for setting per-issue field values (mk:jira-issue update)."
 phase: on-demand
-source: meowkit
+source: local
 keywords: [jira, jira-fields, custom-fields, field-discovery, agile-field-config]
 when_to_use: "Use to discover field IDs / names / scope, check per-project field availability, or configure agile field mappings. NOT for setting individual field values on a ticket."
 user-invocable: true

@@ -1,5 +1,5 @@
 ---
-source: MeowKit original
+source: original
 applies_to: [Phase 0, all]
 # Unconditional load — orchestrator always needs the routing table.
 ---
@@ -42,3 +42,27 @@ The 21 domain integration agents below are NOT scored by `mk:agent-detector` and
 **Routing flow:** `mk:agent-detector` (Phase 0) → if scale-routing CSV matches `jira` or `confluence` keywords, route to the hub skill → hub disambiguates and forks the leaf agent via the matching `mk:<domain>-<leaf>` skill. Orchestrator never invokes a domain agent directly.
 
 **Why excluded from the core table:** Domain integration agents are scoped to one external system, follow a separate safety model (4-tier per-leaf with the wrapper as the credential boundary), and would dilute the core agent scoring if they shared the orchestrator's keyword surface. The hubs are the routing surface for their families.
+
+## Skill Domain Routing
+
+The orchestrator routes by skill names:
+
+| Intent | Use |
+| --- | --- |
+| Quick codebase search or architecture fingerprint | `mk:scout` |
+| Implementation pipeline | `mk:plan-creator` → `mk:cook` |
+| Bug investigation / root cause | `mk:investigate` → `mk:fix` |
+| Current library/API documentation | `mk:docs-finder` |
+| Project documentation updates | `mk:document-release` or `mk:docs-init` |
+| Verification build/lint/test/typecheck | `mk:verify` or `mk:lint-and-validate` |
+| Code review / pre-landing audit | `mk:review` |
+| Browser or UI QA | `mk:qa`, `mk:qa-manual`, `mk:playwright-cli`, or `mk:agent-browser` |
+| Visual explanation / diagrams / slides | `mk:preview` |
+| Media or document analysis/generation | `mk:multimodal` |
+| Security audit | `mk:cso` or `mk:vulnerability-scanner` |
+| Skill creation | `mk:skill-creator` |
+| AI-friendly docs index | `mk:llms` |
+
+Pick one primary skill per distinct intent.
+
+If a task spans domains, run the workflow skill first (`mk:plan-creator`, `mk:cook`, `mk:fix`, or `mk:harness`) and load the domain skill at the phase where it is needed.

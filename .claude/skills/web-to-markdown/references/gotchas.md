@@ -48,13 +48,13 @@ Concrete edge cases and operational surprises. Each entry explains why it matter
 
 **Why it matters:** Playwright rendering is triple-gated. ALL three must be true simultaneously:
 
-1. `playwright` package installed (via `mewkit setup --system-deps`, ~200MB download)
+1. `playwright` package installed (via `.claude/scripts/bin/setup-workflow --system-deps`, ~200MB download)
 2. `MEOWKIT_WEB_FETCH_JS=1` environment variable set
 3. Per-call `js=True` argument passed to `fetch_as_markdown()`
 
 Missing any single gate silently falls back to static fetch. If static fetch returns thin content and all three gates are not met, the skill returns an error, not a Playwright result.
 
-**Mitigation:** Run `npx mewkit setup --system-deps` to install Playwright, then set `MEOWKIT_WEB_FETCH_JS=1` in your environment, and pass `js=True` at the call site. Verify all three before assuming JS rendering is active.
+**Mitigation:** Run `.claude/scripts/bin/setup-workflow --system-deps` to install Playwright, then set `MEOWKIT_WEB_FETCH_JS=1` in your environment, and pass `js=True` at the call site. Verify all three before assuming JS rendering is active.
 
 ---
 
@@ -69,7 +69,7 @@ rm -rf .claude/cache/web-fetches/*.md         # clear regular reports
 rm -rf .claude/cache/web-fetches/quarantine/  # clear quarantine (REVIEW FIRST)
 ```
 
-TTL auto-cleanup is deferred to v2 (`mewkit setup --clean-fetches`). Add the cache directory to `.gitignore`
+TTL auto-cleanup is deferred to v2 (`setup cleanup command`). Add the cache directory to `.gitignore`
 
 ---
 

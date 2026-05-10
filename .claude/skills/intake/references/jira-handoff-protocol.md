@@ -43,7 +43,7 @@ jira-as not installed (or .claude/.env not populated). Apply these changes manua
 - Assign to [username]
 - Set Fix Version to [version]
 
-Or run `npx mewkit setup` then populate .claude/.env from .claude/.env.example to enable the mk:jira-* family.
+Or run `.claude/scripts/bin/setup-workflow` then populate .claude/.env from .claude/.env.example to enable the mk:jira-* family.
 ```
 
 ## Safety Gate
