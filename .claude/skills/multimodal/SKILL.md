@@ -34,6 +34,11 @@ keywords:
   ]
 when_to_use: "Use when processing images, video, audio, PDFs or generating media via Gemini/MiniMax/OpenRouter. Activate when task references media files."
 user-invocable: true
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - Edit
 ---
 
 <!-- MEOWKIT SECURITY ANCHOR
