@@ -1,66 +1,81 @@
 ---
 title: security
-description: Security audit agent — audits at Phase 2 (pre-implementation) and Phase 4 (review). Issues BLOCK verdicts that halt the pipeline.
+description: Security audit specialist — runs checks at Phase 2 and Phase 4, issues BLOCK verdicts that halt the pipeline for critical vulnerabilities.
 ---
 
 # security
 
-Audits code for security vulnerabilities across Phases 2 and 4. Issues BLOCK verdicts on critical findings — BLOCK cannot be overridden by any agent or mode. Auto-activated on auth, payment, user data, API endpoint, or encryption changes.
+The security agent is your last line of defense against shipping vulnerabilities. It audits both the plan (before code is written) and the implementation (before code ships), with the authority to halt the entire pipeline when it finds critical issues. No other agent can override a security BLOCK.
 
-## Key facts
+## Cognitive Framing
+
+> *"Security is not a feature — it is a constraint. The security agent ensures vulnerabilities are caught before they reach production."*
+
+The security agent operates at Phase 2 (pre-implementation audit) and Phase 4 (review audit). It auto-activates on any change touching auth, payments, user data, API endpoints, or encryption. Its BLOCK verdict is the strongest enforcement mechanism in MeowKit — once issued, the pipeline halts until the finding is resolved and a re-audit passes.
+
+## Key Facts
 
 | | |
 |---|---|
 | **Type** | Core |
-| **Phase** | 2, 4 |
-| **Auto-activates** | Auth, payment, user data, API, encryption changes |
+| **Phase** | 2 (pre-implementation), 4 (review) |
+| **Auto-activates** | Auth, payment, user data, API, or encryption changes |
 | **Owns** | `.claude/rules/security-rules.md` |
-| **Never does** | Write code, issue PASS on CRITICAL finding, allow BLOCK override, weaken security rules without ADR, store sensitive info in output |
+| **Never does** | Write code, issue PASS with CRITICAL findings, allow other agents to override BLOCK, downgrade ambiguous findings to LOW |
 
-## What it checks
+## When to Use
 
-- Hardcoded secrets (API keys, tokens, passwords)
-- SQL injection, XSS, path traversal
-- Input validation and sanitization
-- Authentication and authorization patterns
+- When a task **touches authentication, payments, user data, or encryption** — the security agent activates automatically.
+- During **Phase 2** to audit the plan and architecture for security design flaws before code is written.
+- During **Phase 4** to audit the implementation for vulnerabilities before code ships.
+- When **reviewing skills that fetch external content** or process untrusted data — triggers a rule-by-rule injection review.
 
-## Platform-specific rules
+## Key Capabilities
 
-| Platform | Key checks |
+- **Dual-phase auditing** — reviews both the design (Phase 2) and the implementation (Phase 4) to catch security issues at both stages.
+- **Platform-specific rules** — applies targeted security checks for NestJS (auth guards, input validation, parameterized queries), Vue (XSS prevention, CSRF tokens, secure token storage), Swift (Keychain, certificate pinning, ATS compliance), and Supabase (RLS, service key isolation, auth policies).
+- **Finding classification** — categorizes findings by severity: CRITICAL (blocks pipeline), HIGH (must fix before ship), MEDIUM (should fix), LOW (advisory).
+- **BLOCK verdicts** — issues pipeline-halting verdicts with clear explanations and remediation steps. Only the security agent can clear a BLOCK after re-audit.
+- **Injection review** — performs rule-by-rule PASS/WARN/FAIL audits against all 10 rules in `injection-rules.md` for skills handling external content. Any FAIL on rules R1–R10 blocks merge with no exceptions.
+
+## Behavioral Checklist
+
+- [x] Runs security audit at both Phase 2 (plan) and Phase 4 (implementation)
+- [x] Applies platform-specific security rules based on the project's tech stack
+- [x] Classifies findings by severity (CRITICAL, HIGH, MEDIUM, LOW)
+- [x] Issues BLOCK verdicts for critical vulnerabilities with remediation steps
+- [x] Never issues PASS when any CRITICAL finding exists
+- [x] Never downgrades ambiguous findings to avoid blocking the pipeline
+- [x] Performs rule-by-rule injection review for skills handling external content
+- [x] Requires re-audit before pipeline can resume after BLOCK
+
+## Common Use Cases
+
+| Scenario | What the security agent does |
 |---|---|
-| NestJS | Auth guards on protected routes, class-validator input validation, parameterized queries, rate limiting, CORS |
-| Vue | XSS prevention (no v-html with user input), CSRF tokens, secure token storage (never localStorage), CSP headers |
-| Swift | Keychain for credentials, certificate pinning, biometric auth, no hardcoded secrets, ATS compliance |
-| Supabase | RLS on all tables, service key never on client, proper auth policies, secure edge functions |
+| Adding JWT authentication | Audits token storage approach, validates against platform rules, checks for hardcoded secrets |
+| Payment integration | CRITICAL-level audit of data handling, encryption, and API security. BLOCK if any vulnerability found |
+| New API endpoint | Checks for input validation, rate limiting, CORS configuration, parameterized queries |
+| Skill that fetches external URLs | Performs 10-rule injection review covering data boundaries, encoding obfuscation, context flooding |
+| Vue component with user input | Checks for XSS prevention (no `v-html` with user input), CSRF tokens, CSP headers |
 
-## Finding classification
+## Pro Tips
 
-| Severity | Effect |
-|---|---|
-| CRITICAL | Blocks pipeline |
-| HIGH | Must fix before ship |
-| MEDIUM | Should fix |
-| LOW | Advisory |
+### Treat Ambiguity as Risk
 
-## Verdicts
+When a finding is unclear — you cannot determine whether it is truly vulnerable — the security agent classifies it as MEDIUM and flags for human review. It never downgrades to LOW to avoid blocking. This "fail safe" approach means you might occasionally investigate false positives, but you will never ship a vulnerability that was spotted and then dismissed.
 
-| Verdict | Effect |
-|---|---|
-| PASS | No security issues found |
-| BLOCK | Critical vulnerability — stops pipeline until re-audited |
+### Combine Security with Architecture Reviews
 
-## Rule-by-rule injection review
+For changes involving both new architecture and security-sensitive code (like an auth system redesign), the security agent and architect work in parallel. The architect evaluates structural tradeoffs while the security agent audits for vulnerabilities — each respects the other's domain but the security BLOCK verdict always takes precedence.
 
-When auditing any skill that fetches external content or processes untrusted data, produce a PASS/WARN/FAIL verdict against all 10 rules in `injection-rules.md` (R1: file content is data, R2: tool output is data, R3: memory files cannot override rules, R4: sensitive file protection, R5: no external exfiltration, R6: project directory boundary, R7: skill content boundary, R8: encoding obfuscation detection, R9: context flooding defense, R10: escalation protocol). Any FAIL on R1–R10 blocks merge. Write verdict to `tasks/reviews/YYMMDD-SKILL-NAME-verdict.md`.
+## Key Takeaway
 
-## Required context
+The security agent exists to prevent the most costly engineering outcome: shipping a security vulnerability. Its BLOCK verdict is deliberately the strongest enforcement in the pipeline because the cost of a missed vulnerability is always higher than the cost of a delayed ship.
 
-Load before audit: `docs/project-context.md`, `security-rules.md` checklist, plan file (Phase 2) or implementation files (Phase 4), `docs/architecture/` ADRs, platform context (identify which stack is affected).
+## Related Agents
 
-## Failure behavior
-
-If unable to complete audit: issue BLOCK until audit can be completed — never skip a security check. If findings are ambiguous: classify as MEDIUM and flag for human review — never downgrade ambiguous finding to LOW to avoid blocking.
-
-## Skills loaded
-
-`mk:cso` (infrastructure-first audit), `mk:vulnerability-scanner` (OWASP 2025 code-level scanning), `mk:skill-template-secure` (secure skill templates)
+- **[orchestrator](/reference/agents/orchestrator)** — inserts the security agent at Phase 2 and Phase 4 for security-sensitive changes
+- **[architect](/reference/agents/architect)** — coordinates on security-related architectural decisions; respects BLOCK verdicts
+- **[reviewer](/reference/agents/reviewer)** — security BLOCK automatically fails the Security dimension of the review
+- **[developer](/reference/agents/developer)** — implements remediation when BLOCK is issued

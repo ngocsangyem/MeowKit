@@ -1,54 +1,78 @@
 ---
 title: jira-estimator
-description: Intelligence agent — read-only heuristic story-point estimation. Auto-consumes prior evaluator output.
+description: Jira story point estimator — produces heuristic estimates using complexity analysis, historical data, and team velocity context.
 ---
 
 # jira-estimator
 
-Intelligence agent invoked by [`mk:jira-estimator`](/reference/skills/jira-estimator) via `context: fork`. Produces a **heuristic story-point estimation** (Fibonacci suggestion) for a single Jira ticket. Read-only — never mutates Jira.
+The jira-estimator agent produces story point estimates for Jira tickets. It combines complexity analysis from the evaluator, historical velocity data, and team context to generate calibrated estimates — not gut feelings. Every estimate includes a confidence level and the reasoning behind the number.
 
-## Key facts
+## Cognitive Framing
+
+> *"An estimate without reasoning is a guess. Show the work behind the number."*
+
+The jira-estimator agent is a read-only analysis agent that produces story point recommendations. It never modifies Jira state or sets story points directly — it generates estimates with supporting reasoning that the team can review and accept, adjust, or override.
+
+## Key Facts
 
 | | |
 |---|---|
-| **Type** | Intelligence |
-| **Phase** | on-demand |
-| **Tools** | Bash, Read, Grep, Glob, Write |
+| **Type** | Domain (Jira) |
+| **Phase** | On-demand |
 | **Model** | inherit |
-| **Memory** | project |
-| **Color** | orange |
-| **Skill Rule of Two** | A + C (FS write only — NEVER Jira state), NOT B (2/3 compliant) |
+| **Color** | teal |
+| **Safety** | Read-only — never modifies Jira state or sets story points |
+| **Never does** | Set story points (jira-agile), evaluate complexity only (jira-evaluator), perform full RCA (jira-analyst) |
 
-`Write` is allowlisted only for persisting to `tasks/reports/jira-estimate-*.md`.
+## When to Use
 
-## Custom-Field Discovery (mandatory)
+- When you need **story point estimates** for sprint planning.
+- When you want **calibrated estimates** based on complexity analysis rather than gut feeling.
+- When you need to **compare effort levels** across tickets to inform sprint capacity.
+- When you want to understand **why a ticket deserves a particular estimate**.
 
-Before reading or writing story points, the agent verifies the per-instance ID:
+## Key Capabilities
 
-```bash
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields list --search "Story Points" \
-  | jq '.[] | select(.name == "Story Points") | .id'
-```
+- **Heuristic estimation** — produces story point estimates using multiple data inputs: complexity scores, historical patterns, and team context.
+- **Confidence scoring** — rates each estimate's confidence level based on information quality.
+- **Reasoning transparency** — documents the factors that influenced the estimate, making it reviewable.
+- **Complexity integration** — uses evaluator findings as input for more accurate estimates.
+- **Historical calibration** — references past estimates and actual effort to improve accuracy over time.
 
-`customfield_10016` is the upstream-default + the value documented across `mk:jira-fields/references/agile-field-ids.md`, `mk:jira-agile/references/agile-field-reference.md`, and `mk:jira-admin/references/voodoo-constants.md`. If discovered ID differs, use it.
+## Behavioral Checklist
 
-## Evaluator-First Recommendation
+- [x] Produces estimates with explicit reasoning — never outputs a number alone
+- [x] Includes confidence level with every estimate
+- [x] References complexity analysis when available
+- [x] Considers historical data and team velocity for calibration
+- [x] Never modifies Jira state — recommendation only
+- [x] Never sets story points directly — that belongs to jira-agile
 
-If no prior evaluation output is provided in the task brief, the agent prompts the user to run `mk:jira-evaluator <KEY>` first for more informed estimation. If `tasks/reports/jira-evaluate-*-{KEY}.md` exists, the agent reads it automatically.
+## Common Use Cases
 
-## Escalation Triggers
+| Scenario | What the agent does |
+|---|---|
+| "Estimate PROJ-123" | Analyzes ticket complexity, produces story point estimate with reasoning and confidence |
+| "How complex is this ticket?" | Runs complexity analysis and maps it to a calibrated story point range |
+| "Estimate these 5 tickets for the sprint" | Produces individual estimates for each ticket with comparative context |
+| "Why is PROJ-456 estimated at 8 points?" | Shows the complexity factors and historical patterns that led to the estimate |
 
-Auto-flag for human estimation when ANY of:
+## Pro Tips
 
-- Suggested range spans >1 Fibonacci step
-- Zero historical precedent in project
-- Ticket references unfamiliar technology
-- Description too vague (<30 words, no AC)
+### Use Estimates as Conversation Starters
 
-## Report persistence
+The estimator's output is designed to be discussed, not accepted blindly. When the estimate includes "high ambiguity score due to missing edge cases in acceptance criteria," that is a prompt for the team to clarify the ticket before committing to the sprint.
 
-Writes to `tasks/reports/jira-estimate-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md`. Consumed by `mk:planning-engine` (capacity), `mk:cook` plan-creation step.
+### Calibrate with Actual Results
 
-## Skill
+The estimator improves over time when actual effort data is available. After a sprint, comparing estimates to actual story points reveals systematic biases (e.g., consistently underestimating testing effort) that can be corrected in future estimates.
 
-[`mk:jira-estimator`](/reference/skills/jira-estimator)
+## Key Takeaway
+
+The jira-estimator agent replaces gut-feel estimation with transparent, reasoned story point recommendations. By showing the work behind every number, it transforms estimation from a guessing exercise into a structured conversation about effort and complexity.
+
+## Related Agents
+
+- **[jira-evaluator](/reference/agents/jira-evaluator)** — provides complexity analysis that feeds into estimates
+- **[jira-analyst](/reference/agents/jira-analyst)** — performs deep analysis with media support for complex tickets
+- **[jira-agile](/reference/agents/jira-agile)** — sets story points on issues (the estimator only recommends)

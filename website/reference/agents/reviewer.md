@@ -5,52 +5,71 @@ description: 5-dimension structural code review — enforces Gate 2 with written
 
 # reviewer
 
-Performs structural code review across five dimensions. Produces a written verdict at `tasks/reviews/YYMMDD-name-verdict.md`. FAIL blocks shipping (Gate 2). Every finding must be actionable — no vague feedback.
+The reviewer is your quality gatekeeper for code. It performs thorough structural reviews across five dimensions and enforces Gate 2 — the hard stop that prevents code from shipping without a passing review verdict. Every finding must be actionable, every WARN must be justified, and rubber-stamping is mechanically prevented.
 
-## Key facts
+## Cognitive Framing
+
+> *"Every dimension must be genuinely evaluated. Rubber-stamping is rejected. FAIL blocks shipping."*
+
+The reviewer operates at Phase 4 (Review). It produces a structured verdict file that determines whether code can proceed to Phase 5 (Ship). The reviewer uses a multi-pass adversarial architecture — parallel base reviewers catch different classes of issues, followed by adversarial persona passes that go deeper on findings.
+
+## Key Facts
 
 | | |
 |---|---|
 | **Type** | Core |
 | **Phase** | 4 (Review) |
 | **Auto-activates** | After developer (Phase 3) |
-| **Owns** | `tasks/reviews/` |
-| **Never does** | Write code, self-approve, issue PASS with critical finding, provide vague feedback, rubber-stamp |
+| **Owns** | `tasks/reviews/` (review verdict files) |
+| **Never does** | Write code, self-approve, issue PASS with critical findings, provide vague feedback, rubber-stamp |
 
-## Five review dimensions
+## When to Use
+
+- After the **developer completes implementation** — the reviewer activates automatically.
+- When you want a **pre-landing review** of a branch diff, PR, commit, or pending changes.
+- When you need a **structured verdict** across five quality dimensions before shipping.
+- Via `/mk:review` for explicit invocation with options: branch diff (default), PR number (`#123`), commit hash, or `--pending` for uncommitted changes.
+
+## Key Capabilities
+
+- **Five review dimensions** — every review evaluates Correctness, Maintainability, Performance, Security, and Coverage.
+- **Adversarial review architecture** — multi-phase review with isolated reviewer subagents:
+  - **Phase A (3 parallel base reviewers):** Blind Hunter (diff-only, no plan context), Edge Case Hunter (branch tracing, boundary analysis), Criteria Auditor (plan AC to implementation mapping).
+  - **Phase B (adversarial personas):** Security Adversary + Failure Mode Analyst (full scope), Assumption Destroyer + Scope Complexity Critic (full scope, high-complexity only).
+- **Anti-rubber-stamp enforcement** — zero findings triggers a mandatory re-analysis. Forces reviewers to look harder rather than approving by default.
+- **WARN justification** — every WARN finding requires 3-part justification: what the WARN means, why it is acceptable, what would make it a FAIL. If the reviewer cannot articulate all three, WARN becomes FAIL.
+- **Scope-aware dispatch** — classifies diffs as minimal (Blind Hunter only) or full (all reviewers + personas) based on scope.
+
+## Behavioral Checklist
+
+- [x] Evaluates all five dimensions — never skips a dimension
+- [x] Issues FAIL for unevaluated dimensions rather than silently skipping
+- [x] Provides actionable feedback with suggested resolutions for every finding
+- [x] Enforces 3-part WARN justification — incomplete justification becomes FAIL
+- [x] Re-analyzes when zero findings are found (anti-rubber-stamp)
+- [x] Distinguishes current-change findings (blocks shipping) from incidental ones (logged to backlog)
+- [x] In TDD mode: coverage gaps are FAIL; in default mode: coverage gaps are WARN
+- [x] Delegates to security agent for deep audit when security concerns are found
+
+## Five Review Dimensions
 
 | Dimension | What it checks |
 |---|---|
 | **Correctness** | No critical/major bugs. Logic matches requirements. Architecture fits existing patterns. |
 | **Maintainability** | Clean, readable, follows conventions. No `any` types, no unsafe casts. Type safety enforced. |
-| **Performance** | No N+1 queries, no blocking async, no unnecessary re-renders, no unbounded data fetches. |
-| **Security** | Run checklist from `security-rules.md`. Delegate to security agent for deep audit. Security BLOCK → automatic FAIL. |
-| **Coverage** | All acceptance criteria tested? Edge cases covered? Tests test behavior not implementation. **TDD mode:** coverage gaps → FAIL. **Default mode:** coverage gaps → WARN, not FAIL. Zero tests is permitted in default mode. |
+| **Performance** | No N+1 queries, no blocking in async, no unnecessary re-renders, no unbounded data fetches. |
+| **Security** | Security checklist compliance. Security BLOCK verdict from the security agent triggers automatic FAIL. |
+| **Coverage** | Acceptance criteria covered by tests. Edge cases tested. Tests verify behavior, not implementation. |
 
 ## Verdicts
 
 | Verdict | Meaning | Effect |
 |---|---|---|
-| PASS | No blocking issues | → Shipper (Phase 5) |
-| WARN | Non-blocking suggestions | → Shipper, suggestions noted |
-| FAIL | Critical findings | → Back to developer — must fix before re-review |
+| **PASS** | No blocking issues | Proceed to shipper (Phase 5) |
+| **WARN** | Non-blocking suggestions | Proceed to shipper with acknowledged warnings |
+| **FAIL** | Critical findings | Route back to developer — must fix before re-review |
 
-Every WARN finding requires 3-part justification: what the WARN means, why it's acceptable in this context, what condition would make it a FAIL. If the reviewer cannot articulate all three, WARN becomes FAIL.
-
-## Adversarial review architecture
-
-**Phase A — Base Reviewers (3 parallel, isolated contexts):**
-
-1. **Blind Hunter** — reviews ONLY the diff, no plan/spec. Catches code smells, obvious bugs.
-2. **Edge Case Hunter** — traces every branch, boundary, null path. Finds what breaks at edges.
-3. **Criteria Auditor** — maps each plan acceptance criterion to implementation and tests.
-
-**Phase B — Adversarial Persona Passes (post-base-review, findings-informed):**
-Separate subagents receive diff + Phase A findings. Security Adversary + Failure Mode Analyst (full scope). Assumption Destroyer + Scope Complexity Critic (full scope, high-complexity domain only).
-
-Post-review triage categorizes findings as `current-change` (blocks shipping) vs `incidental` (logged to backlog). Zero findings → re-analyze once (prevents rubber-stamp).
-
-## Skill loading
+## Skill Loading
 
 | Skill | When | Purpose |
 |---|---|---|
@@ -60,14 +79,24 @@ Post-review triage categorizes findings as `current-change` (blocks shipping) vs
 | `mk:cso` | Security concerns found | Deep security audit delegation |
 | `mk:vulnerability-scanner` | Security dimension flagged | Automated vulnerability detection |
 
-## Required context
+## Pro Tips
 
-Load before reviewing: `docs/project-context.md` (agent constitution), `gate-rules.md` (Gate 2 conditions), implementation files (via git diff), test files, plan file, `docs/architecture/` ADRs, `security-rules.md` checklist, `red-team-findings.md` (if exists in plan directory).
+### Scope Reviews Strategically
 
-## Failure behavior
+Not every review needs the full adversarial architecture. Minimal diffs (small, well-scoped changes) get the Blind Hunter only, saving time and context. Full reviews activate all base reviewers plus adversarial personas. Let the scope gate make this determination automatically rather than manually choosing a review depth.
 
-If unable to complete review: state which dimensions could not be evaluated and why. Issue FAIL for unevaluated dimensions — never skip a dimension. If implementation does not match plan: flag as architecture fit finding, reference specific plan sections that diverge.
+### Combine with the Elicit Workflow
 
-## Gate 2
+After a review verdict, you can invoke `mk:elicit` for structured second-pass reasoning. Choose from 8 methods (pre-mortem, inversion, red team, Socratic, etc.) to re-examine findings through a specific lens. This is particularly valuable for Complex tasks where the first review pass may not catch subtle architectural issues.
 
-Review approval required before Phase 5. No auto-approve. No exceptions.
+## Key Takeaway
+
+The reviewer ensures that no code ships without genuine quality verification across five dimensions. The adversarial architecture prevents the most common review failure mode — rubber-stamping — by using multiple isolated reviewers with different focus areas and mandatory re-analysis when zero findings emerge.
+
+## Related Agents
+
+- **[developer](/reference/agents/developer)** — receives FAIL verdict with required changes; re-submits for re-review
+- **[evaluator](/reference/agents/evaluator)** — complements the reviewer by verifying runtime behavior (reviewer = code quality, evaluator = product behavior)
+- **[security](/reference/agents/security)** — security BLOCK verdict automatically fails the Security dimension
+- **[shipper](/reference/agents/shipper)** — receives handoff after PASS or WARN verdict (Gate 2)
+- **[tester](/reference/agents/tester)** — coverage adequacy check informs the Coverage dimension

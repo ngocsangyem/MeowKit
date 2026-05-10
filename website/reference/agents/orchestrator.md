@@ -5,9 +5,15 @@ description: Task router — classifies complexity, assigns model tier, detects 
 
 # orchestrator
 
-Entry point for every task. Classifies complexity (Trivial / Standard / Complex), assigns model tier (Haiku / Sonnet / Opus), detects TDD mode, and routes to the correct specialist agent sequence. Never writes code, tests, or docs.
+The orchestrator is the front door of every MeowKit workflow. Before any code is written, any plan is drafted, or any review is conducted, the orchestrator steps in to understand what you are asking for and decides who should handle it. Think of it as a project intake coordinator — it reads the room, sizes up the task, and assigns the right team.
 
-## Key facts
+## Cognitive Framing
+
+> *"Every task starts here. The orchestrator never writes code — it decides who does."*
+
+The orchestrator operates at Phase 0 (Orient). It exists to answer three questions for every incoming task: **How complex is this?** **Which model should handle it?** **Which agents need to be involved, and in what order?** Once those answers are locked in, the orchestrator hands off and steps back.
+
+## Key Facts
 
 | | |
 |---|---|
@@ -16,86 +22,81 @@ Entry point for every task. Classifies complexity (Trivial / Standard / Complex)
 | **Auto-activates** | Every task |
 | **Never does** | Write code, modify files, grade output, downgrade complexity mid-task |
 
-## Routing
+## When to Use
 
-| Complexity | Model | Agent sequence | Examples |
+- At the **start of every task** — the orchestrator activates automatically; you do not need to invoke it manually.
+- When you need to **understand how a task will be routed** through the pipeline.
+- When a task involves **ambiguity** and needs a clear complexity classification before work begins.
+
+You typically do not interact with the orchestrator directly. It runs behind the scenes to ensure your request lands with the right specialist.
+
+## Key Capabilities
+
+- **Complexity classification** — every task is assigned one of three tiers: Trivial (single-file, no architectural impact), Standard (multi-file, within existing patterns), or Complex (cross-cutting, new patterns, architectural decisions).
+- **Model tier assignment** — Trivial tasks use the cheapest model, Standard tasks use the default, Complex tasks use the best available. Auth, payments, and user-data changes always escalate to Complex.
+- **Domain-based routing** — before manual classification, the orchestrator scans for domain keywords using `mk:scale-routing` and overrides classification when a match is found.
+- **TDD mode detection** — checks environment variables and sentinel files to determine whether test-driven development is active, then adjusts the agent sequence accordingly.
+- **Agent sequence planning** — defines the execution order for every task (e.g., planner → tester → developer → reviewer → shipper → documenter → analyst).
+- **Parallel execution** — for Complex tasks with independent subtasks, the orchestrator can decompose into 2–3 parallel agent tracks using git worktrees.
+- **Party mode** — routes architectural trade-off discussions to multi-agent collaboration sessions.
+
+## Behavioral Checklist
+
+- [x] Classifies complexity before any work begins
+- [x] Assigns model tier based on complexity — never downgrades mid-task
+- [x] Detects TDD mode from environment variables and sentinel files
+- [x] Enforces Gate 1 (plan required) for Standard and Complex tasks
+- [x] Enforces Gate 2 (review required) for all code changes
+- [x] Reads memory files at session start for prior learnings and budget context
+- [x] Asks one targeted clarifying question when task is ambiguous — never guesses
+- [x] Routes to `mk:harness` for green-field product builds instead of the standard pipeline
+
+## Common Use Cases
+
+| Scenario | What the orchestrator does |
+|---|---|
+| "Fix this typo in the README" | Classifies as Trivial, routes directly to a specialist |
+| "Add user authentication" | Classifies as Complex (auth = always Complex), routes through full pipeline with security agent at Phase 2 and Phase 4 |
+| "Build me a kanban app" | Detects green-field product build, routes to `mk:harness` instead of the standard pipeline |
+| "Should we use WebSockets or SSE?" | Detects trade-off language, routes to Party mode for multi-agent discussion |
+| "Refactor the API layer" | Classifies as Standard or Complex based on scope, inserts architect after planner if API contracts change |
+
+## Routing Table
+
+| Complexity | Model | Agent Sequence | Examples |
 |---|---|---|---|
-| Trivial | Haiku | Direct to specialist | Rename, typo, format |
-| Standard | Sonnet | Planner → Tester → Developer → Reviewer → Shipper → Documenter → Analyst | Feature (<5 files), bug fix |
-| Complex | Opus | Planner → Architect → Security(2) → Tester → Developer → Security(4) → Reviewer → Shipper → Documenter → Analyst | Architecture, auth, payments |
+| Trivial | Cheapest | Direct to specialist | Rename, typo, format |
+| Standard | Default | Planner → Tester → Developer → Reviewer → Shipper → Documenter → Analyst | Feature (<5 files), bug fix |
+| Complex | Best | Planner → Architect → Security → Tester → Developer → Security → Reviewer → Shipper → Documenter → Analyst | Architecture, auth, payments |
 
-Architect is inserted after planner when schema, API, or infra changes are involved. Security is inserted at Phase 2 and Phase 4 for auth/payments/security changes.
-
-## Domain-based routing (Phase 0 — first step)
-
-Before manual classification, `mk:scale-routing` reads keywords from the task and matches against `domain-complexity.csv`. CSV match OVERRIDES manual classification.
-
-| CSV Level | Model Tier | Gate 1 |
-|---|---|---|
-| low + one-shot | TRIVIAL (Haiku) | Bypass eligible |
-| medium | STANDARD (Sonnet) | Required |
-| high | COMPLEX (Opus) | Required |
-
-## TDD mode detection (Phase 0 — required)
-
-After complexity routing, detect TDD mode:
-- Read `MEOWKIT_TDD` env var or check `--tdd` flag
-- Read `.claude/session-state/tdd-mode` sentinel (written by `tdd-flag-detector.sh`)
-- Print: `TDD mode: ON | OFF`
-- **TDD ON:** invoke tester for Phase 2 RED before developer in Phase 3
-- **TDD OFF (default):** Phase 2 is optional. Route planner → developer → reviewer directly unless plan requires test coverage
-
-TDD mode does NOT change model tier selection.
-
-## Escalation rules
-
-- Auth, payments, user data, infrastructure → always Complex
-- Once assigned, tier cannot be downgraded mid-task (anti-rationalization)
-- Code review always runs on Complex tier
-- Security agent ALWAYS runs at Phase 2 and Phase 4 — "no auth changes" is not a valid reason to skip
-
-## Party mode routing
-
-When the task involves architectural trade-offs: user asks "should we X or Y?", task is COMPLEX with architectural decisions, or orchestrator detects trade-off language — route to `mk:party`. Party Mode is discussion-only. After party decision, resume normal pipeline.
-
-## Parallel execution routing
-
-When a COMPLEX task has independent subtasks with zero file overlap:
-
-1. Decompose into 2-3 subtasks with file ownership globs
-2. Create git worktrees via `mk:worktree`
-3. Assign subtasks via `mk:task-queue`
-4. After all complete: merge worktrees → run full test suite
-5. Resume sequential pipeline at review phase
-
-Max 3 agents. Gates remain sequential. See `parallel-execution-rules.md`.
-
-## Planning depth
+## Planning Depth
 
 | Mode | Researchers | Parallel | Two Approaches | Per-Phase Scout |
-|---|---|---|---|---|---|
+|---|---|---|---|---|
 | default | 1 | No | No | No |
 | strict | 2 | Yes | Yes | No |
 | fast | 0 (skip) | No | No | No |
 | architect | 2 | Yes | Yes | No |
-| audit | 1 | No | No | No |
-| cost-saver | 0 (skip) | No | No | No |
-| document | 0 (skip) | No | No | No |
 | deep | 1 per phase | No | No | Yes |
+| cost-saver | 0 (skip) | No | No | No |
 
-## Required context
+## Pro Tips
 
-Load before routing: `docs/project-context.md` (agent constitution), `.claude/memory/` topic files relevant to past learnings, `.claude/memory/cost-log.json`, `CLAUDE.md` Agent Roster table, `tasks/plans/` for in-progress plans.
+### Understand Escalation Rules
 
-## Ambiguity resolution
+Auth, payments, user data, and infrastructure changes are **always** classified as Complex — regardless of how small the change appears. This is intentional. Once a tier is assigned, it cannot be downgraded mid-task. This anti-rationalization rule prevents the common pattern of "it's just a small auth change" leading to insufficient review.
 
-When task description is ambiguous: identify what is unclear, ask one targeted clarifying question. Never assign COMPLEX tier without understanding full scope. If user says "just do it", classify as STANDARD and route to planner.
+### Use Domain-Based Routing to Your Advantage
 
-## Failure behavior
+If your project has recurring task patterns, the orchestrator's domain-based routing (via `domain-complexity.csv`) can automatically classify tasks before manual review. This saves time on projects with well-defined complexity boundaries.
 
-If unable to classify: state what is blocking, suggest what information would unblock. Never silently default to a tier.
-If agent fails after delegation: report timeout to user, suggest re-run or alternative agent.
+## Key Takeaway
 
-## Output format
+The orchestrator ensures every task gets the right level of attention. It prevents over-engineering simple changes and under-reviewing critical ones. You never interact with it directly, but it shapes the entire workflow that follows.
 
-For every routing decision, state: complexity tier, model tier, execution mode (sequential | parallel | party), planning depth, target agent sequence, context summary for first agent.
+## Related Agents
+
+- **[planner](/reference/agents/planner)** — receives tasks from the orchestrator to produce implementation plans
+- **[architect](/reference/agents/architect)** — inserted by the orchestrator when architectural decisions are needed
+- **[security](/reference/agents/security)** — inserted by the orchestrator for auth, payment, and security-sensitive changes
+- **[analyst](/reference/agents/analyst)** — provides cost context that informs model tier decisions

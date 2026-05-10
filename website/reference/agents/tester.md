@@ -1,49 +1,86 @@
 ---
 title: tester
-description: Test writing agent — enforces TDD red-green-refactor discipline in TDD mode, writes tests on-request in default mode.
+description: Test-writing agent — enforces red-green-refactor discipline in TDD mode and writes behavior-focused tests in default mode.
 ---
 
 # tester
 
-Writes tests in Phase 2. In TDD mode (`--tdd` / `MEOWKIT_TDD=1`), enforces strict red-green-refactor: failing tests before implementation, verification after. In default mode, writes tests when invoked but does not block the developer. Anti-rationalization rules apply in both modes.
+The tester is your quality guardian. It writes tests that protect production behavior — not implementation details. In TDD mode, it enforces strict red-green-refactor discipline, ensuring failing tests exist before any code is written. In default mode, it writes tests when invoked but does not block the developer.
 
-## Key facts
+## Cognitive Framing
+
+> *"Tests protect behavior, not implementation. A one-line change that affects auth needs the same test rigor as a 500-line feature."*
+
+The tester operates at Phase 2 (Test) and after implementation during the green phase. Its core principle is that test count is determined by acceptance criteria count, not by the size of the change. This prevents the dangerous "it's just a small change" rationalization that precedes many production incidents.
+
+## Key Facts
 
 | | |
 |---|---|
 | **Type** | Core |
-| **Phase** | 2 (Test) |
-| **Auto-activates** | After planning (Phase 1) |
-| **Never does** | Write production code, ship, minimize tests to save tokens, substitute mocks for integration tests |
+| **Phase** | 2 (Test), post-implementation |
+| **Auto-activates** | After planning (TDD mode) or on invocation (default mode) |
+| **Owns** | `__tests__/`, `*.test.ts`, `*.spec.ts`, `tests/`, test fixtures and helpers |
+| **Never does** | Write production code, approve tests that fail for wrong reasons, skip edge cases for critical paths |
 
-## Red phase (TDD mode only)
+## When to Use
 
-1. Write failing tests targeting expected behavior
-2. Tests must fail for the right reason — functionality doesn't exist yet, NOT syntax errors or missing imports
-3. Confirm: "Tests written and verified failing. Ready for implementation." This greenlights the developer.
+- In **TDD mode** (`--tdd` / `MEOWKIT_TDD=1`) — the tester writes failing tests before implementation, then verifies they pass after.
+- In **default mode** — the tester writes tests when invoked by the orchestrator, developer, or user. Testing is recommended but not gated.
+- During the **green phase** — after implementation, to verify all tests pass and report coverage.
+- When the plan's acceptance criteria require **test coverage verification**.
 
-## Test writing (default mode)
+## Key Capabilities
 
-1. Write tests when invoked — may be before, alongside, or after implementation
-2. Do NOT block the developer; do NOT issue a "ready for implementation" greenlight
-3. Anti-rationalization rules still apply (no test minimization, no mock substitution)
+- **Red phase (TDD only)** — writes failing tests that target expected behavior. Tests must fail because functionality does not exist yet, not due to syntax errors or missing imports.
+- **Green phase (both modes)** — runs all tests, verifies they pass, reports coverage summary and regressions. Distinguishes between implementation bugs and test expectation issues.
+- **Refactor phase** — suggests refactoring opportunities after the green phase confirms all tests pass.
+- **Anti-rationalization enforcement** — enforces two critical rules in both modes: no test minimization (test count matches criteria count, not change size) and no mock substitution for integration tests (if a test needs a database, it needs a database).
 
-## Green phase (after implementation, both modes)
+## Behavioral Checklist
 
-1. Run all tests and verify they pass
-2. Report: pass/fail status, coverage summary, regressions
-3. Distinguish between "implementation bug" vs "test needs updating"
+- [x] Writes tests that target behavior, not implementation details
+- [x] In TDD mode: confirms tests fail for the right reason before greenlighting implementation
+- [x] In default mode: writes tests without blocking the developer
+- [x] Reports pass/fail status, coverage summary, and regressions during green phase
+- [x] Never writes fewer tests because "the change is small"
+- [x] Never replaces integration tests with mocks to make tests pass faster
+- [x] Distinguishes between "implementation bug" and "test needs updating"
+- [x] Checks plan file for measurable acceptance criteria before writing tests
 
-## Refactor phase
+## Common Use Cases
 
-Suggest refactoring opportunities after green phase.
+| Scenario | What the tester does |
+|---|---|
+| TDD feature development | Writes failing tests (red), confirms they fail correctly, greenlights developer, then verifies pass (green) |
+| Post-implementation verification | Runs full test suite, reports pass/fail counts, coverage data, and any regressions |
+| Edge case coverage | Writes tests for boundary conditions, null paths, and error states based on plan acceptance criteria |
+| Auth feature testing | Applies full test rigor regardless of change size — auth changes always get comprehensive edge case coverage |
 
-## Anti-rationalization rules (both modes)
+## Anti-Rationalization Rules
 
-- Do not minimize tests to "save tokens"
-- Do not substitute mocks for integration tests when real behavior matters
-- Do not skip edge cases because "the developer probably handled it"
+These rules apply in **both** TDD and default modes:
 
-## Skills loaded
+- **No test minimization** — test count is determined by acceptance criteria, not change size. A one-line auth change needs the same rigor as a 500-line feature.
+- **No mock substitution for integration tests** — if a test needs a database, it needs a database. Unit tests may mock dependencies, but integration tests must use real infrastructure.
 
-`mk:testing` (red-green-refactor), `mk:lint-and-validate`, `mk:qa`, `mk:qa-manual`, `mk:nyquist`
+## Pro Tips
+
+### Write Tests Against the Plan, Not the Code
+
+Tests should verify the behavior described in the plan's acceptance criteria, not the specific implementation approach. This makes tests resilient to refactoring and ensures they catch actual regressions rather than breaking on harmless code changes.
+
+### Use the Green Phase to Catch Test Quality Issues
+
+The green phase is not just about pass/fail. It also reveals whether tests are testing the right things. If all tests pass but you cannot demonstrate that the acceptance criteria are met, the tests are insufficient — regardless of coverage numbers.
+
+## Key Takeaway
+
+The tester ensures that quality is built in from the start, not bolted on afterward. By tying test rigor to acceptance criteria rather than change size, it prevents the "small change, no tests needed" pattern that is responsible for a disproportionate share of production incidents.
+
+## Related Agents
+
+- **[planner](/reference/agents/planner)** — provides acceptance criteria that the tester writes tests against
+- **[developer](/reference/agents/developer)** — implements code to make failing tests pass (TDD) or receives test results after implementation (default)
+- **[reviewer](/reference/agents/reviewer)** — evaluates test coverage as one of five review dimensions
+- **[orchestrator](/reference/agents/orchestrator)** — detects TDD mode and adjusts agent sequence accordingly

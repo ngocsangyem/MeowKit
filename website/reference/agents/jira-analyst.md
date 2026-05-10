@@ -1,52 +1,79 @@
 ---
 title: jira-analyst
-description: Intelligence agent — read-only full ticket context analysis incl. media. Persists structured RCA report.
+description: Jira ticket analyst — performs full context analysis including attached media (images, PDFs, screenshots) and linked issues for root cause investigation.
 ---
 
 # jira-analyst
 
-Intelligence agent invoked by [`mk:jira-analyst`](/reference/skills/jira-analyst) via `context: fork`. Reads full ticket context — description, comments, attachments, linked issues, **including media (images / PDFs / screenshots)** — and produces a structured analysis suitable for posting back as a Jira comment. Read-only — never mutates Jira.
+The jira-analyst agent performs the deepest level of Jira ticket analysis. Unlike the evaluator and estimator, the analyst processes attached media — screenshots, PDFs, images — and follows linked issue chains to build a complete picture. Its findings are structured for posting back to Jira as a comment, making analysis results accessible to the entire team.
 
-## Key facts
+## Cognitive Framing
+
+> *"The full story is in the attachments and links, not just the description. Analyze everything."*
+
+The jira-analyst agent is a read-only analysis agent that produces comprehensive findings. It processes ticket descriptions, acceptance criteria, attached media, and linked issues to perform root cause analysis. Its output is structured as a Jira comment, ready to post back to the issue.
+
+## Key Facts
 
 | | |
 |---|---|
-| **Type** | Intelligence |
-| **Phase** | on-demand |
-| **Tools** | Bash, Read, Grep, Glob, Write |
+| **Type** | Domain (Jira) |
+| **Phase** | On-demand |
 | **Model** | inherit |
-| **Memory** | project |
-| **Color** | cyan |
-| **Skill Rule of Two** | A + C (FS write only — NEVER Jira state), NOT B (2/3 compliant) |
+| **Color** | indigo |
+| **Safety** | Read-only — never modifies Jira state |
+| **Never does** | Modify issues, skip media analysis when attachments exist, estimate story points (jira-estimator), score complexity only (jira-evaluator) |
 
-`Write` is allowlisted only for persisting to `tasks/reports/jira-analyze-*.md`.
+## When to Use
 
-## Two Modes
+- When you need **full root cause analysis** for a bug or incident ticket.
+- When a ticket has **attached screenshots or PDFs** that contain critical context.
+- When you need to **follow linked issue chains** to understand the full dependency picture.
+- When you need structured findings that can be **posted back to Jira as a comment**.
 
-| Mode | Output |
+## Key Capabilities
+
+- **Media analysis** — processes attached images, PDFs, and screenshots to extract context not present in the text description.
+- **Linked issue traversal** — follows issue links (blocks, is blocked by, relates to) to build a complete dependency picture.
+- **Root cause analysis** — identifies the root cause of bugs and incidents based on all available evidence.
+- **Structured findings** — produces analysis formatted for Jira comment posting, accessible to the entire team.
+- **Cross-reference** — correlates information across the ticket description, acceptance criteria, attachments, and linked issues.
+
+## Behavioral Checklist
+
+- [x] Analyzes all attached media when present — never skips attachments
+- [x] Follows linked issue chains to build complete context
+- [x] Produces structured findings suitable for Jira comment posting
+- [x] Identifies root causes with supporting evidence
+- [x] Correlates information across all available ticket data
+- [x] Never modifies Jira state — analysis only
+
+## Common Use Cases
+
+| Scenario | What the agent does |
 |---|---|
-| **Standalone** | What + Suggested Actions (no Why / How to Fix — those need investigation context) |
-| **Post-Investigate** | Full RCA: What + Why + How to Fix + Suggested Actions |
+| "Analyze PROJ-123" | Reads description, processes attachments, follows links, produces structured findings |
+| "RCA for PROJ-456" | Performs root cause analysis using all available evidence including screenshots |
+| "Describe PROJ-789 with media" | Produces comprehensive description incorporating attached images and PDFs |
+| "What's the full context for this bug?" | Follows linked issues and analyzes attachments to build complete picture |
 
-## Media Analysis Pipeline
+## Pro Tips
 
-For each image / PDF / screenshot:
+### Attach Screenshots to Bug Reports
 
-1. `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate attachment download <KEY> --attachment-id <ID> --output /tmp/jira-attach-<ID>.<ext>`
-2. `Read("/tmp/jira-attach-<ID>.<ext>")` → multimodal vision analysis
-3. Optional Gemini enhancement: `.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/gemini_analyze.py <path>` (requires `MEOWKIT_GEMINI_API_KEY`)
-4. Cleanup `/tmp/...`
+The analyst's media analysis capability means that screenshots attached to bug reports are not just visual aids — they are data sources. Error messages visible in screenshots, UI state information, and environmental context all contribute to more accurate root cause analysis.
 
-Attachment limit: 5 most recent if >5 total.
+### Use Analyst Output as Jira Comments
 
-## Injection Defense
+The analyst's structured findings are formatted for posting back to Jira via jira-collaborate. This makes the analysis visible to the entire team, not just the person who requested it, and creates a permanent record of the investigation.
 
-Wraps all ticket content + media analysis output in `===TICKET_DATA_START===` / `===TICKET_DATA_END===` boundaries. Media output is also DATA, never instructions.
+## Key Takeaway
 
-## Report persistence
+The jira-analyst agent provides the deepest level of ticket analysis by processing media attachments and linked issue chains that other agents skip. When a ticket's full story is hidden in screenshots and dependency networks, the analyst finds it.
 
-Writes non-trivial analyses (>500 chars or contains media findings) to `tasks/reports/jira-analyze-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md`. Consumed by `mk:planning-engine`, `mk:cook` plan-creation step.
+## Related Agents
 
-## Skill
-
-[`mk:jira-analyst`](/reference/skills/jira-analyst)
+- **[jira-evaluator](/reference/agents/jira-evaluator)** — scores complexity (shallower analysis, no media)
+- **[jira-estimator](/reference/agents/jira-estimator)** — estimates story points (uses evaluator, not analyst depth)
+- **[jira-collaborate](/reference/agents/jira-collaborate)** — posts analyst findings back to Jira as comments
+- **[jira-issue](/reference/agents/jira-issue)** — provides ticket data for analysis

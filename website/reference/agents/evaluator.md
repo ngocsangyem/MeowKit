@@ -1,61 +1,91 @@
 ---
 title: evaluator
-description: Behavioral active-verification agent — grades running builds against weighted rubrics using browser, curl, and CLI evidence.
+description: Behavioral verification agent — drives the running build against rubric criteria with real evidence. Skeptic by default.
 ---
 
 # evaluator
 
-Grades running builds by driving the application — browser navigation, curl, CLI invocation. Static-analysis-only verdicts are rejected by `validate-verdict.sh`. Runs in a fresh context with a skeptic persona to prevent leniency drift. Also serves as contract reviewer (Phase 4 pre-build).
+The evaluator is your skeptical quality inspector. Unlike the reviewer (which audits code structure), the evaluator tests whether the built product **actually works** by driving it through a browser, API calls, or CLI commands. It grades against rubric criteria with concrete evidence — no passing without proof.
 
-## Key facts
+## Cognitive Framing
+
+> *"Assume bugs exist. Your job is to find them, not approve the work."*
+
+The evaluator wears two hats: as an **active verifier** (Phase 3, post-build) it drives the running build against rubrics and produces graded verdicts with evidence; as a **contract reviewer** (Phase 4, pre-build) it critiques sprint contracts for testability before code is written. Its default stance is skepticism — it treats leniency as a failure mode.
+
+## Key Facts
 
 | | |
 |---|---|
 | **Type** | Core |
-| **Phase** | 3 (post-build verification), 4 (contract review) |
-| **Auto-activates** | Harness pipeline, `mk:evaluate`, rubric-driven reviews |
-| **Owns** | `tasks/reviews/*-evalverdict.md` (distinct suffix from reviewer's `-verdict.md`), `tasks/reviews/*-evalverdict-evidence/` directories |
-| **Never does** | Write code, grade its own output, issue PASS without runtime evidence, replace the reviewer agent |
+| **Phase** | 3 (active verification), 4 (contract review) |
+| **Auto-activates** | Harness pipeline, `mk:evaluate` invocation |
+| **Owns** | `tasks/reviews/*-evalverdict.md`, `tasks/reviews/*-evalverdict-evidence/` |
+| **Never does** | Modify source code, issue PASS without runtime evidence, replace the reviewer, skip active verification |
 
-## Active verifier loop
+## When to Use
 
-1. Load rubric composition via `mk:rubric` — default preset by project type (frontend uses `frontend-app` with 4 rubrics)
-2. Drive the running build: frontend via `mk:agent-browser` / `mk:playwright-cli`, backend via `curl`, CLI via `bash`
-3. Probe each rubric criterion in sequence — max 15 criteria per evaluator session
-4. Record evidence per finding — every verdict line cites a concrete artifact path, log snippet, or command output. Narrative-only findings are rejected.
-5. Grade against rubric anchors, not intuition — pattern-match against PASS/FAIL anchor examples
-6. Write verdict at `tasks/reviews/YYMMDD-{slug}-evalverdict.md`
-7. Generate fix guidance — for each FAIL or WARN, one-line actionable feedback for the generator
+- During **harness-driven builds** — evaluates each sprint iteration to determine if the build meets acceptance criteria.
+- When you need to **verify that a built product actually works** — not just that the code looks right.
+- When **grading against rubrics** — the evaluator uses predefined rubric presets (e.g., `frontend-app`) with PASS/FAIL anchor examples.
+- During **sprint contract negotiation** — reviews proposed contracts for testability and scope clarity before the generator writes code.
 
-## Skeptic persona (non-negotiable)
+## Key Capabilities
 
-Default stance: assume bugs exist. Leniency is the dominant evaluator failure mode. If unsure, mark WARN — never PASS without evidence. Rubber-stamping is rejected at validation time.
+- **Active verification** — drives the running build via browser automation, curl, or CLI to produce runtime evidence. This is a hard gate: no PASS on functionality without runtime evidence.
+- **Rubric-based grading** — loads rubric compositions via `mk:rubric` and grades each criterion against documented PASS and FAIL anchor examples. Frontend builds use the `frontend-app` preset (product-depth, functionality, design-quality, originality).
+- **Skeptic persona** — assumes bugs exist and actively hunts for: stub features, silent feature substitution, mocked verification, AI-generated filler, missing wiring, layout gaps, and onboarding walls.
+- **Contract review** — critiques sprint contracts for testability by checking each acceptance criterion: is it testable via browser/curl/CLI? Is the rubric tie-in correct? Is the scope specific enough?
+- **Generator feedback** — for each FAIL or WARN, produces one-line specific fix guidance the developer can act on immediately.
 
-Failure modes to actively hunt: stub features, silent feature substitution, mocked verification, AI slop (purple gradient, stock illustrations), missing wiring, layout gaps (no empty/loading/error states), onboarding walls.
+## Behavioral Checklist
 
-Anti-rationalization: "It looks fine" → name the rubric criterion. "The tests pass" → did YOU run the build? Tests can pass against mocks. "Edge case" → the rubric FAIL anchor probably IS the edge case.
+- [x] Drives the running build via browser, curl, or CLI — never issues verdicts from static code review
+- [x] Grades against rubric anchors, not personal intuition
+- [x] Assumes bugs exist — leniency is treated as a failure mode
+- [x] If unsure, marks WARN — never PASS
+- [x] Every verdict requires evidence (screenshot, log, command output)
+- [x] Hunts for stub features, mocked verification, and silent feature substitution
+- [x] Produces specific fix guidance for each FAIL or WARN
+- [x] Reviews sprint contracts for testability before code is written
 
-## Contract reviewer role (Phase 4 pre-build)
+## Common Use Cases
 
-Also serves as counter-party in sprint contract negotiation. Before generator writes code, reviews proposed contract for:
+| Scenario | What the evaluator does |
+|---|---|
+| Harness sprint iteration | Drives the running build, grades against rubric, provides PASS/WARN/FAIL verdict with evidence |
+| Frontend feature verification | Uses browser automation to navigate, click, and capture screenshots as evidence |
+| API endpoint verification | Uses curl/httpie to probe endpoints, captures response bodies and status codes |
+| Sprint contract review | Checks each acceptance criterion for testability, rubric alignment, and scope clarity |
+| Detecting stub features | Clicks buttons and verifies handlers are wired — catches "button exists but nothing happens" |
 
-1. **Testability** — can each AC be probed via browser/curl/CLI?
-2. **Rubric alignment** — does `Rubric tie-in:` match the criterion's content?
-3. **Scope clarity** — is the criterion specific enough to prevent silent substitution?
-4. **Form validity** — does each AC use Given/When/Then or explicit Assertion form?
+## Failure Modes the Evaluator Hunts
 
-Hard cap: 2 negotiation rounds. After 2 rounds with unresolved ACs, escalate to human. Evaluator also signs the contract when acceptable.
+- **Stub features** — button exists but no handler is wired
+- **Silent feature substitution** — spec says real-time but implementation uses polling
+- **Mocked verification** — tests pass against mocks while real endpoints return 500
+- **AI slop** — generic purple gradients, stock illustrations, placeholder copy
+- **Missing wiring** — frontend renders state but API is never called
+- **Layout gaps** — no empty, loading, or error states implemented
+- **Onboarding walls** — 4-step required signup before any value is delivered
 
-## Handoff
+## Pro Tips
 
-- PASS → route to shipper (Phase 5)
-- WARN → route to generator for one more iteration
-- FAIL → route to generator with fix-guidance; after 3 iterations, escalate to user
+### Scope Reviews Strategically
 
-## Required context
+The evaluator has a maximum of 15 criteria per session to prevent context overflow. For large rubric compositions, split across multiple sessions and merge verdicts. Prioritize the criteria most likely to fail — stub features and missing wiring are the most common issues.
 
-Load before evaluating: `docs/project-context.md`, `rubric-rules.md`, sprint contract, product spec, rubric composition from `mk:rubric`, `skeptic-persona.md` (re-read every session), `red-team-findings.md` (if exists).
+### Combine with the Fix Workflow
 
-## Skills loaded
+When the evaluator issues a FAIL, it provides specific one-line fix guidance. This pairs naturally with the `mk:fix` skill — take the evaluator's FAIL findings and route them directly to the developer as targeted fix tasks rather than vague "make it work" instructions.
 
-`mk:rubric` (always), `mk:evaluate` (orchestration shell), `mk:agent-browser` / `mk:playwright-cli` (frontend targets)
+## Key Takeaway
+
+The evaluator exists because code that "looks correct" can still be broken in production. By requiring runtime evidence for every verdict and treating leniency as a failure mode, it catches the class of bugs that static code review misses — the ones where the code compiles but the product does not work.
+
+## Related Agents
+
+- **[developer](/reference/agents/developer)** — receives FAIL/WARN feedback and iterates in the generator loop
+- **[reviewer](/reference/agents/reviewer)** — complements the evaluator by auditing code structure (reviewer = code quality, evaluator = product behavior)
+- **[orchestrator](/reference/agents/orchestrator)** — routes to the evaluator during harness pipeline or on `mk:evaluate` invocation
+- **[shipper](/reference/agents/shipper)** — receives handoff after evaluator issues PASS verdict

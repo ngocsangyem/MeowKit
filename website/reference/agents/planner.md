@@ -1,13 +1,19 @@
 ---
 title: planner
-description: Scope-adaptive planning agent — two-lens review (product + engineering), 6 planning modes, bead decomposition, Gate 1 enforcement.
+description: Planning agent — runs dual product and engineering lens reviews, produces structured plans, and enforces Gate 1 before any code is written.
 ---
 
 # planner
 
-Creates structured plans with a two-lens review: product lens ("should we build this?") and engineering lens ("is this the right way?"). Produces plans using `mk:plan-creator` step-file workflow. Enforces Gate 1 — no code without an approved plan.
+The planner is your strategic thinker. Before a single line of code is written, the planner steps back and asks two fundamental questions: *"Is this the right thing to build?"* and *"Is this the right way to build it?"* It produces a structured plan that every downstream agent — developer, tester, reviewer — relies on as their source of truth.
 
-## Key facts
+## Cognitive Framing
+
+> *"No code without a plan. The planner challenges assumptions before the first line is written."*
+
+The planner operates at Phase 1 (Plan) and enforces Gate 1 — the hard stop that prevents implementation from starting without an approved plan. It owns the `tasks/plans/` directory exclusively. No other agent creates, modifies, or deletes plan files.
+
+## Key Facts
 
 | | |
 |---|---|
@@ -15,55 +21,69 @@ Creates structured plans with a two-lens review: product lens ("should we build 
 | **Phase** | 1 (Plan) |
 | **Auto-activates** | Standard and Complex tasks |
 | **Owns** | `tasks/plans/` |
-| **Never does** | Write production code, self-approve plans, produce plans without all required sections |
+| **Never does** | Write code, write tests, skip Gate 1, implement without approval |
 
-## Planning modes (6 total)
+## When to Use
 
-| Mode | Flag | Behavior |
-|---|---|---|
-| Fast | `--fast` | Single `plan.md` with Goal, Context, Scope, Constraints, Approach, ACs. 0 researchers. |
-| Hard | `--hard` (default for complex) | `plan.md` overview (≤80 lines) + `phase-XX-name.md` detail files (12-section template each) |
-| Deep | `--deep` | Hard mode + per-phase scouting. Triggers when 5+ directories affected OR refactor+complex. |
-| Parallel | `--parallel` | Two researchers run simultaneously on different aspects; findings merged before plan. |
-| Two-approach | `--two` | Produces 2 competing plans with "Approach Comparison" section; user selects before Gate 1. |
-| Product-level | `--product-level` | Green-field app builds: Vision, Features with user stories, Design Language, Out-of-Scope. NO file paths, NO class names, NO schemas. |
+- At the **start of any Standard or Complex task** — the planner activates automatically after the orchestrator routes the task.
+- When you want to **challenge assumptions** about what should be built and how.
+- When you need a **structured breakdown** of a feature before implementation begins.
+- When a task requires **effort estimation and risk assessment** before committing resources.
 
-**Composable flags:** `--tdd` injects TDD sections (RED phase requirements, test-first ACs, coverage targets) into every phase file.
+The planner is skipped for Trivial tasks (typos, renames, formatting) where a plan would add overhead without value.
 
-## Standalone subcommands
+## Key Capabilities
 
-| Command | Purpose |
+- **Dual-lens review** — evaluates every task through both a product lens (is this the right thing to build?) and an engineering lens (is this the right way to build it?).
+- **Six planning modes** — adapts planning depth to the task:
+  - **Fast** (`--fast`) — single plan file with goal, context, scope, constraints, approach, and acceptance criteria.
+  - **Hard** (`--hard`) — overview plan plus per-phase detail files with 12-section template.
+  - **Deep** (`--deep`) — hard mode plus per-phase scouting with researcher scouts injecting findings.
+  - **Parallel** (`--parallel`) — two researchers run simultaneously on different aspects, findings merged.
+  - **Two-approach** (`--two`) — produces two competing plans with comparison; user selects one.
+  - **Product-level** (`--product-level`) — product spec for green-field builds (vision, features, user stories). No file paths or class names.
+- **TDD integration** — composable `--tdd` flag injects test-first requirements into every phase file.
+- **Red-team validation** — `/mk:plan-creator red-team` runs 4-persona adversarial review against existing plans.
+- **Plan archival** — `/mk:plan-creator archive` moves completed plans to archive and cleans up stale files.
+
+## Behavioral Checklist
+
+- [x] Challenges premises — asks whether the requirement addresses the root cause or just a symptom
+- [x] Evaluates both product and engineering dimensions before producing a plan
+- [x] Produces plan artifacts at `tasks/plans/YYMMDD-name/`
+- [x] Enforces Gate 1 — no implementation agent starts without an approved plan
+- [x] Estimates effort and flags risks before work begins
+- [x] Rejects unclear tasks with specific clarification requests
+- [x] Routes product-level plans to `mk:harness` — never directly to the developer
+
+## Common Use Cases
+
+| Scenario | What the planner does |
 |---|---|
-| `/mk:plan red-team {path}` | 4-persona adversarial review against existing plan; outputs `red-team-findings.md` |
-| `/mk:plan validate {path}` | Structural validation against 12-section template; reports missing/weak sections |
-| `/mk:plan archive` | Moves completed plans to `tasks/plans/archive/`, cleans up stale task files |
+| "Add a search feature to the dashboard" | Produces a Standard plan with goal, acceptance criteria, scope boundaries, and implementation steps |
+| "Redesign the authentication system" | Produces a Deep plan with per-phase scouting, risk assessment, and recommends routing to the architect |
+| "Build a SaaS analytics dashboard" | Produces a Product-Level plan (vision, features, user stories) and routes to `mk:harness` |
+| "Should we refactor the API or add a new endpoint?" | Produces a Two-Approach plan with comparison table for user decision |
+| "Quick bug fix for the login form" | Produces a Fast plan — minimal overhead, direct to implementation |
 
-## Product-level mode
+## Pro Tips
 
-For green-field app builds ("build a kanban app"). The planner sets ambition and constraints, not the implementation path.
+### Match Planning Depth to Task Complexity
 
-**Forbidden in product-level plans:** file paths, class/interface names, function signatures, database schemas, step-by-step instructions, specific package versions.
+Do not use `--deep` for a simple bug fix, and do not use `--fast` for an authentication redesign. The planning mode should match the risk and scope of the task. When in doubt, `--hard` (the default for complex tasks) provides a good balance.
 
-**Required:** ambitious vision (3-5 sentences), ≥8 features with user stories, design language section, AI integration opportunities, explicit out-of-scope anti-features.
+### Use Red-Team Validation for Critical Features
 
-**Handoff:** after Gate 1, route to `mk:harness` skill (NOT directly to developer). The harness owns sprint-contract negotiation and the generator ⇄ evaluator loop.
+For any plan involving auth, payments, or user data, run `/mk:plan-creator red-team` after drafting. The 4-persona adversarial review catches blind spots that a single-pass plan misses — a security adversary, failure mode analyst, assumption destroyer, and scope critic each review the plan independently.
 
-## Bead decomposition
+## Key Takeaway
 
-For COMPLEX tasks (5+ files), decompose into atomic, resumable work units. Each bead: name (`bead-NN-description`), file scope (glob patterns), binary acceptance criteria, estimated size (~150 lines implementation, ~50 lines test), and dependency list. Use template at `tasks/templates/bead-template.md`. Do NOT use beads for TRIVIAL/STANDARD tasks or tasks touching <5 files.
+The planner prevents the most expensive kind of engineering mistake: building the wrong thing, or building the right thing the wrong way. Every minute spent in planning saves hours in implementation and rework.
 
-## Required context
+## Related Agents
 
-Load before planning: `docs/project-context.md` (agent constitution), `gate-rules.md` (Gate 1 conditions), `.claude/memory/` for past learnings, `docs/architecture/` ADRs, plan template from `tasks/templates/`, existing codebase structure (via Glob/Grep — do not read all files upfront).
-
-## Ambiguity resolution
-
-When requirements are vague: identify the specific ambiguity, ask user for clarification before producing a plan. If clarification unavailable, state assumptions explicitly in the plan's Risk Flags section. Never produce a plan assuming unstated requirements.
-
-## Failure behavior
-
-If unable to produce a plan: state what is missing (unclear requirements, conflicting constraints, missing context). If plan is rejected: ask for specific feedback, revise only flagged sections — do not rewrite from scratch.
-
-## Gate 1
-
-Plan approval enforced by `gate-enforcement.sh` — file writes to `src/`, `lib/`, `app/` blocked until plan is approved.
+- **[orchestrator](/reference/agents/orchestrator)** — routes tasks to the planner based on complexity classification
+- **[architect](/reference/agents/architect)** — receives handoff from the planner when architectural decisions are needed
+- **[developer](/reference/agents/developer)** — implements the approved plan after Gate 1
+- **[tester](/reference/agents/tester)** — writes tests based on the plan's acceptance criteria (inserted before developer in TDD mode)
+- **[brainstormer](/reference/agents/brainstormer)** — works alongside the planner during Phase 1 to evaluate competing solutions

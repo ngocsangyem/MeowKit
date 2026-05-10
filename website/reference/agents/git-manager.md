@@ -1,41 +1,103 @@
 ---
 title: git-manager
-description: Git operations agent — stages, commits, and pushes with conventional commit format. Does NOT create PRs.
+description: Git operations specialist — stages, commits, and pushes code with conventional commits and strict safety rules.
 ---
 
 # git-manager
 
-Handles git operations: stage, commit, push. Uses conventional commits. Does NOT create PRs or run CI — that's the shipper's job. Runs on Haiku tier.
+The git-manager handles git operations cleanly and safely. It stages specific files, creates conventional commits with descriptive messages, and pushes when requested — all while enforcing strict safety rules that prevent accidental exposure of secrets, force-pushes to shared branches, or commits to main.
 
-## Key facts
+## Cognitive Framing
+
+> *"Commit what you intend, nothing more. Never commit secrets. Never push to main."*
+
+The git-manager operates at Phase 5 (Ship) as a utility subagent. It is designed to be fast and focused — most operations complete in 2–4 tool calls. It does not create PRs (that is the shipper's job), run tests (tester), or make code quality judgments. It simply commits the current state of the code cleanly and safely.
+
+## Key Facts
 
 | | |
 |---|---|
-| **Type** | Support |
-| **Phase** | 5, any |
-| **Subagent type** | utility |
-| **Auto-activates** | On "commit" or "push" requests |
-| **Never does** | Force push, push to main directly, `git add .` blindly (checks for secrets first), create PRs |
+| **Type** | Support (utility subagent) |
+| **Phase** | 5 (Ship) |
+| **Model** | haiku (lightweight, fast) |
+| **Auto-activates** | On "commit", "push", or at feature completion |
+| **Never does** | Create PRs (shipper), run tests (tester), modify source code, force-push without explicit request, commit secrets |
 
-## Workflow
+## When to Use
 
-1. Assess — `git status` + `git diff --stat`
-2. Stage — specific files only, never `git add .` blindly
-3. Commit — conventional commit with descriptive message
-4. Push — only if explicitly requested
+- When the user says **"commit"** or **"push"** — the git-manager handles the operation.
+- When a **feature or fix is complete** and changes need to be committed.
+- When you need a **conventional commit** with the correct prefix based on what changed.
+- When working in **team mode** and need to stage and commit changes from a task queue.
 
-## Commit format
+## Key Capabilities
 
-```
-<type>(<optional scope>): <short description>
-```
+- **Conventional commits** — selects the correct commit prefix based on the type of change.
+- **Pre-commit safety checks** — verifies no `.env` files, credentials, or secrets are staged. Warns about `console.log` and debug statements.
+- **Selective staging** — stages specific files (never uses `git add .` blindly). Checks `git status` and `git diff --stat` before staging.
+- **Push safety** — only pushes when explicitly requested. Pulls before pushing to catch conflicts early.
+
+## Conventional Commit Prefixes
 
 | Prefix | When |
 |---|---|
-| `feat:` | New feature |
+| `feat:` | New feature or capability |
 | `fix:` | Bug fix |
 | `refactor:` | Code restructuring, no behavior change |
 | `docs:` | Documentation only |
-| `test:` | Test additions/fixes |
-| `chore:` | Build, CI, deps, config |
+| `test:` | Test additions or fixes |
+| `chore:` | Build, CI, deps, config changes |
 | `perf:` | Performance improvement |
+| `style:` | Formatting, whitespace (no logic change) |
+
+## Safety Rules
+
+- **NEVER** force-push unless explicitly requested by the user
+- **NEVER** commit `.env`, credentials, API keys, or secrets
+- **NEVER** commit to `main`/`master` directly — use feature branches
+- **NEVER** use `git add .` or `git add -A` without checking `git status` first
+- **NEVER** amend commits without explicit user request
+- **NEVER** include AI references in commit messages
+- **ALWAYS** check `git diff --cached` before committing to verify staged content
+- **ALWAYS** pull before push to catch conflicts early
+
+## Behavioral Checklist
+
+- [x] Runs `git status` and `git diff --stat` to understand what changed
+- [x] Stages specific files — never uses `git add .` blindly
+- [x] Checks for secrets and credential files before committing
+- [x] Warns about `console.log` and debug statements (warn, not block)
+- [x] Creates conventional commits with descriptive messages under 72 characters
+- [x] Only pushes when explicitly requested
+- [x] Pulls before pushing to catch conflicts early
+- [x] Reports specific errors and suggests resolutions on push failures
+
+## Common Use Cases
+
+| Scenario | What the git-manager does |
+|---|---|
+| "Commit these changes" | Runs `git status`, stages specific files, checks for secrets, creates conventional commit |
+| "Push to remote" | Pulls first to catch conflicts, then pushes |
+| Feature completion | Assesses changes, selects `feat:` prefix, creates commit with descriptive message |
+| Bug fix completion | Selects `fix:` prefix, keeps commit message under 72 characters |
+| Secret detected in staged files | Stops immediately, reports the file containing the suspected secret, asks user to remove it |
+
+## Pro Tips
+
+### Check Status Before Staging
+
+The git-manager always runs `git status` and `git diff --stat` before staging anything. This prevents accidentally committing unrelated files or work-in-progress changes. Adopt this habit for manual git operations as well — a quick status check prevents many commit mistakes.
+
+### Use Conventional Commits Consistently
+
+Conventional commit prefixes make changelogs, release notes, and git history dramatically more useful. The git-manager selects the correct prefix based on what actually changed, not what you intended to change — so the commit history accurately reflects the codebase evolution.
+
+## Key Takeaway
+
+The git-manager is deliberately simple and safety-focused. Its value comes from preventing the most common git mistakes — committing secrets, pushing to main, and staging unintended files — while consistently producing clean conventional commits that make the git history useful.
+
+## Related Agents
+
+- **[shipper](/reference/agents/shipper)** — handles PRs and CI verification; the git-manager handles only git operations
+- **[developer](/reference/agents/developer)** — produces the code changes that the git-manager commits
+- **[tester](/reference/agents/tester)** — runs tests before changes are committed (separate responsibility)

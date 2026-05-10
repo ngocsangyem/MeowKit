@@ -1,18 +1,92 @@
 ---
 title: researcher
-description: Technology research agent — evaluates libraries, frameworks, APIs, and patterns. Advisory role.
+description: Technology research agent — investigates APIs, libraries, and patterns with a prioritized research chain before making recommendations.
 ---
 
 # researcher
 
-Researches technology choices, evaluates libraries and frameworks, finds documentation, and gathers information before decisions are made. Advisory role — provides analysis, never writes code.
+The researcher is your technical scout. When you need to understand a library, evaluate an API, or investigate how a technology works, the researcher follows a prioritized research chain — checking curated documentation first, then the codebase, and only falling back to web search when other sources are insufficient.
 
-## Key facts
+## Cognitive Framing
+
+> *"Research before you recommend. Facts come from documentation, not from assumptions."*
+
+The researcher operates at Phase 0 (Orient), Phase 1 (Plan), and Phase 4 (Review) as an advisory subagent. It provides evidence-based technology analysis without writing code. Its most important discipline is the research chain: documentation sources are consulted in priority order, never skipped.
+
+## Key Facts
 
 | | |
 |---|---|
-| **Type** | Support |
-| **Phase** | 0, 1, 4 |
-| **Subagent type** | advisory |
-| **Auto-activates** | Explicit invocation or on Complex tasks |
-| **Never does** | Write code, modify files |
+| **Type** | Support (advisory subagent) |
+| **Phase** | 0 (Orient), 1 (Plan), 4 (Review) |
+| **Auto-activates** | During planning deep mode, on explicit invocation |
+| **Never does** | Write code, modify files, skip the research chain, recommend without evidence |
+
+## When to Use
+
+- When you need to **understand a library or API** — the researcher checks documentation sources before making claims.
+- During **Phase 1 deep planning** — researchers scout technologies and patterns referenced in the plan.
+- During **Phase 4 review** — to verify that implementation uses APIs correctly by checking current documentation.
+- When you need to **evaluate technologies** for adoption — the researcher compares options with evidence.
+
+## Key Capabilities
+
+- **Prioritized research chain** — follows a strict source priority:
+  1. `mk:docs-finder` — curated, structured documentation retrieval (Context7, Context Hub)
+  2. Codebase search — existing usage patterns and conventions within the project
+  3. WebSearch — general web search as a last resort when other sources are insufficient
+- **Evidence-based recommendations** — every recommendation includes sources, confidence level, and methodology.
+- **Technology evaluation** — compares libraries and APIs based on documentation quality, community support, and compatibility with the project's stack.
+- **Confidence scoring** — rates the reliability of findings based on the quality and recency of sources consulted.
+
+## Behavioral Checklist
+
+- [x] Follows the research chain in priority order — never skips to web search
+- [x] Cites sources for every claim and recommendation
+- [x] Includes confidence level based on source quality
+- [x] Documents methodology — what was searched and in what order
+- [x] Never recommends without evidence from at least one source
+- [x] Never writes code or modifies files — advisory only
+- [x] Never relies on training data for API signatures — uses documentation retrieval
+
+## Output Structure
+
+The researcher produces structured findings with these sections:
+
+1. **Research Question** — what is being investigated
+2. **Methodology** — sources consulted and search terms used
+3. **Findings** — evidence-based results with citations
+4. **Recommendation** — clear recommendation based on findings
+5. **Confidence Level** — HIGH / MEDIUM / LOW based on source quality
+6. **Sources** — list of sources consulted with relevance notes
+
+## Common Use Cases
+
+| Scenario | What the researcher does |
+|---|---|
+| "How does the Stripe API handle webhooks?" | Checks Stripe docs via `mk:docs-finder`, documents webhook patterns with source citations |
+| "What testing library should we use?" | Compares options by checking docs, community data, and existing codebase usage patterns |
+| "Is this npm package maintained?" | Checks npm registry data, GitHub activity, and issue tracker for maintenance signals |
+| "What's the correct syntax for this API?" | Uses `mk:docs-finder` to retrieve current documentation rather than relying on training data |
+| Deep planning research | Scouts technologies referenced in the plan, produces findings for the planner to incorporate |
+
+## Pro Tips
+
+### Trust the Research Chain Order
+
+The research chain exists because documentation quality varies dramatically by source. Curated docs (Context7, Context Hub) are structured and accurate. Codebase patterns show what actually works in your project. Web search results vary in quality and recency. Always start from the top and only descend when needed.
+
+### Use Confidence Levels to Guide Decisions
+
+A researcher finding with HIGH confidence (curated docs, verified codebase patterns) can be trusted directly. MEDIUM confidence (web search, community posts) should be verified. LOW confidence (scarce sources, conflicting information) should trigger further investigation before committing to a decision.
+
+## Key Takeaway
+
+The researcher prevents the most common source of technical debt: implementing based on assumptions rather than documentation. By following a disciplined research chain and scoring confidence levels, it ensures that every technical decision is grounded in verifiable evidence.
+
+## Related Agents
+
+- **[planner](/reference/agents/planner)** — spawns researchers during deep planning to scout technologies
+- **[brainstormer](/reference/agents/brainstormer)** — uses researcher findings as input for trade-off analysis
+- **[reviewer](/reference/agents/reviewer)** — may invoke the researcher to verify API usage during review
+- **[orchestrator](/reference/agents/orchestrator)** — routes research tasks during Phase 0 orientation
