@@ -79,6 +79,8 @@ See `references/intent-detection.md` for full detection logic.
 
 ## Process Flow (Authoritative)
 
+> Before emitting any Mermaid block, Read `meowkit/.claude/skills/preview/references/mermaid-essentials.md`.
+
 ```mermaid
 flowchart TD
     A[Phase 0: Orient] --> B{Has plan?}

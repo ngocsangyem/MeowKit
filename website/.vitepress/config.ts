@@ -319,6 +319,7 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'mk:multimodal', link: '/reference/skills/multimodal' },
             { text: 'mk:llms', link: '/reference/skills/llms' },
+            { text: 'mk:preview', link: '/reference/skills/preview' },
           ],
         },
         {

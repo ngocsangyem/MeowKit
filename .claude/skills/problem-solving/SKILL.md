@@ -139,7 +139,7 @@ user stuck on approach
 
 ## References
 
-Load only what you need:
+Load only what you need. Before emitting any Mermaid block, Read `meowkit/.claude/skills/preview/references/mermaid-essentials.md`.
 
 - `references/when-stuck.md` — dispatch flowchart (start here if symptom unclear)
 - `references/simplification-cascades.md`

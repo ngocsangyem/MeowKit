@@ -21,6 +21,8 @@ Advisory only — does not change agent-detector scoring or output format.
 | Reviewing code quality | Review | mk:review |
 | Security audit | Review | mk:cso |
 | Simplify/refactor code | Review | mk:simplify |
+| Visualize code, draw diagram, build slide deck, render plan as HTML | any | mk:preview |
+| Visualize a git diff or PR before review | Review | mk:preview (`--html --diff`) |
 | Ready to ship/deploy | Ship | mk:ship |
 | Need docs updated | Ship | mk:document-release |
 | Session retrospective | Reflect | mk:retro, mk:memory |

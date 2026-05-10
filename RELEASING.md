@@ -39,7 +39,7 @@ Example:
 
 The script automates steps 3-9 below: bump version → build/lint/typecheck/test → prepare release assets → VitePress build check → commit + tag → push → create GitHub Release with zip. Stops on any failure, warns on uncommitted changes.
 
-**Before running the script:** Complete step 2 (update CHANGELOG) manually. If the release affects guide/reference pages, complete step 1a as well.
+**Before running the script:** Complete step 2 (update CHANGELOG) manually. If the release affects guide/reference pages, complete step 1a as well. If a new agent or skill landed, complete step 1b (routing surfaces) too.
 
 **After the script:** Run step 10 (npm publish) and step 11 (end-to-end test) manually.
 
@@ -64,7 +64,24 @@ Check and update these pages if the release affects them:
 | `reference/agents/*.md`             | Agent capability changes                         |
 | `reference/skills/*.md`             | Skill behavior or schema changes                 |
 
-#### 1b. Verify VitePress builds
+#### 1b. Update agent and skill routing (when new agents/skills land)
+
+When a release adds a new agent or skill, update the routing surfaces so the orchestrator and `mk:help` can recommend it.
+
+| File | Update when |
+| --- | --- |
+| `.claude/agents/SKILLS_INDEX.md` | New skill — add a row in the matching phase or "Cross-Cutting (Any Phase)" table |
+| `.claude/agents/AGENTS_INDEX.md` | New agent — add a row to the active-agents table (Type, Role, Source, phases, auto-activate, CE version) |
+| `.claude/rules/agent-routing.md` | New core/support agent — add to the 17-row table; new domain agent → add to the hub-skill family row |
+| `.claude/skills/agent-detector/references/lifecycle-routing.md` | New skill that maps to a user signal — add a Discovery Tree row |
+| `.claude/skills/scale-routing/data/domain-complexity.csv` | New domain match (fintech, healthcare, etc.) — add a row with signals + level + workflow |
+| `website/.vitepress/config.ts` | New skill or agent — add to the matching sidebar group under `reference/skills/*` or `reference/agents/*` |
+| `website/reference/skills/<name>.md` | New skill — create the reference page (use an existing skill page as a template; keep it under 800 lines per `docs.maxLoc`) |
+| `website/reference/agents/<name>.md` | New agent — create the reference page |
+
+Skip rows that don't apply to the current release. The matrix is a checklist, not a mandate to edit every file.
+
+#### 1c. Verify VitePress builds
 
 ```bash
 cd website && npx vitepress build
@@ -160,11 +177,36 @@ would want it.
 
 ### 3. Bump versions
 
+#### When to bump
+
+Only bump `packages/mewkit` when the release ships **changes inside `packages/mewkit/src/`**. Edits to `.claude/`, `tasks/`, `CLAUDE.md`, the website, or rules do NOT require a CLI version bump — those ride out via the release zip and `npx mewkit upgrade`.
+
+```bash
+# Decide first — does this release touch CLI code?
+git diff --name-only HEAD~1 -- packages/mewkit/src
+```
+
+If the command prints nothing, skip step 3 entirely. The release proceeds at the existing CLI version.
+
+#### How to choose the bump (SemVer)
+
+Map the size of the change inside `packages/mewkit/src/` to a SemVer field:
+
+| Change shape | Bump | Example | New version from `2.8.5` |
+|---|---|---|---|
+| Minor edits — bug fix, log tweak, refactor that preserves CLI surface | patch (last number) | `2.8.5 → 2.8.6` | `2.8.6` |
+| Big changes — new flag, new subcommand, new env var, behavior addition that does NOT remove or rename existing behavior | minor (middle number) | `2.8.6 → 2.9.0` | `2.9.0` |
+| Breaking changes — removed flag, renamed subcommand, removed/renamed env var, contract change that an existing script would notice | major (first number) | `2.9.0 → 3.0.0` | `3.0.0` |
+
+Patch resets minor/patch counters according to standard SemVer (`2.x.x → 3.0.0`, never `3.0.5`).
+
+#### Run the bump
+
 ```bash
 npm -w packages/mewkit version <version> --no-git-tag-version
 ```
 
-> **Note:** Only bump `mewkit`.
+> **Note:** Only bump `mewkit`. Do NOT pass `<version>` if `packages/mewkit/src/` is untouched — skip step 3 instead.
 
 ### 4. Build and verify
 
@@ -251,13 +293,15 @@ gh release view v<version> --json assets -q '.assets[].name'
 gh release view v<version> --json url -q '.url'
 ```
 
-### 10. Publish to npm (if package versions bumped)
+### 10. Publish to npm (only if step 3 ran)
+
+Skip this step entirely if `packages/mewkit/src/` was not touched in this release. `npm publish` against an unchanged version errors out, and republishing the same code at a new version pollutes the registry.
 
 ```bash
 npm -w packages/mewkit publish
 ```
 
-> **Note:** Only publish `mewkit`.
+> **Note:** Only publish `mewkit`. Tag with `--tag beta` for pre-releases on the `dev` branch.
 
 ### 11. Test end-to-end
 
@@ -276,11 +320,18 @@ Copy this checklist for each release:
 ### Docs
 
 - [ ] Updated affected guide/reference pages (step 1a)
+- [ ] If a new agent or skill landed: updated routing surfaces (step 1b — `SKILLS_INDEX.md`, `AGENTS_INDEX.md`, `agent-routing.md`, `lifecycle-routing.md`, sidebar config, reference page)
 - [ ] VitePress build passes (`npx vitepress build`)
 
 ### Changelog
 
 - [ ] Added v<version> section to `CHANGELOG.md`
+
+### Version
+
+- [ ] Checked `git diff --name-only HEAD~1 -- packages/mewkit/src` — empty means SKIP step 3 and step 10
+- [ ] If `packages/mewkit/src/` changed: chose patch / minor / major bump per the SemVer table in step 3
+- [ ] Ran `npm -w packages/mewkit version <version>` (or skipped because src untouched)
 
 ### Build
 
@@ -297,6 +348,7 @@ Copy this checklist for each release:
 - [ ] Pushed to GitHub (commits + tag)
 - [ ] GitHub Release created with zip asset
 - [ ] Release notes include install instructions
+- [ ] If CLI was bumped: `npm -w packages/mewkit publish` ran (else step 10 skipped)
 
 ### Verify
 
@@ -319,6 +371,8 @@ Push to `main` or `dev` triggers `.github/workflows/release.yml`:
 
 ### Conventional commits → version bumps
 
+The CI mapping below applies to `.claude/`, `tasks/`, and `CLAUDE.md` content. The CLI follows the same SemVer fields, but it only bumps when `packages/mewkit/src/` changes — see step 3.
+
 ```
 feat: new skill            → MINOR (1.0.0 → 1.1.0)
 fix: skill bug             → PATCH (1.1.0 → 1.1.1)
@@ -326,6 +380,14 @@ feat!: breaking change     → MAJOR (1.1.1 → 2.0.0)
 chore: cleanup             → no release
 docs: update readme        → no release
 ```
+
+For CLI changes inside `packages/mewkit/src/`:
+
+| Change shape | Bump |
+|---|---|
+| Bug fix, log tweak, refactor that preserves CLI surface | patch |
+| New flag, new subcommand, new env var, additive behavior | minor |
+| Removed/renamed flag, removed/renamed subcommand, removed env var, contract change | major |
 
 ## Release Scripts
 
@@ -340,7 +402,7 @@ docs: update readme        → no release
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
-| v2.8.5  | 2026-05-10 | Rules Folder Reconsolidation     |
+| v2.8.5  | 2026-05-10 | Rules Folder Reconsolidation + mk:preview |
 | v2.8.4  | 2026-05-10 | Confluence Ecosystem + Macro-Aware Spec Analysis |
 | v2.8.3  | 2026-05-10 | Jira Family + Workflow Discovery     |
 | v2.8.2  | 2026-05-09 | Prompt Enhancer Output Modes         |

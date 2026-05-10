@@ -14,12 +14,36 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
-## 2.8.5 (2026-05-10) — Rules Folder Reconsolidation
+## 2.8.5 (2026-05-10) — Rules Folder Reconsolidation + mk:preview
+
+### Highlights
+
+Two threads land together. The five Phase-Zero conditional rule files move back into `.claude/rules/`, simplifying the rule-availability validator and the upgrade orphan-cleanup pass. Alongside that, `mk:preview` ships as a native MeowKit visual generator — markdown and self-contained HTML for explanations, diagrams, slide decks, git diffs, and plan rendering — with a mandatory theme toggle, anti-slop guarantees, and zero new package dependencies.
+
+### New Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `mk:preview` | Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, git diffs, and plan rendering. Display only; not for plan critique. |
+
+### Features
+
+- 9 modes total — 4 markdown (`--explain`, `--diagram`, `--slides`, `--ascii`) + 5 HTML (`--html --explain`, `--html --diagram`, `--html --slides`, `--html --diff`, `--html --plan-review`).
+- Mandatory theme toggle on every HTML artifact, persisted via localStorage with OS-preference fallback on first load.
+- Zoom and pan engine for diagram pages — mouse wheel cursor-anchored zoom, drag pan, keyboard `+ − 0`.
+- Slide engine for `--html --slides` — scroll-snap + IntersectionObserver + arrow-key nav + bottom progress dots.
+- Plan-aware output paths — `tasks/plans/{slug}/visuals/` when an active plan exists, `tasks/visuals/` fallback. Reads `session-state/active-plan`; handles both absolute-path and slug formats; falls back loudly with stderr `warn:`.
+- Style rotation — palette and typography vary per run via `${CLAUDE_PLUGIN_DATA}/preview/style-rotation.json`; deterministic-hash fallback when env var is unset.
+- 4 clean-room HTML templates in `assets/` — architecture, mermaid-flowchart, slide-deck, data-table — each carrying a clean-room provenance comment.
+- New embedded reference `references/mermaid-essentials.md` (≤ 120 lines) — pinned Mermaid v11.4.1, init pattern, `.node` class trap, layout-direction guidance, color rules. Loaded by 4 other Mermaid-emitting skills via a one-line directive (`mk:cook`, `mk:plan-ceo-review`, `mk:problem-solving`, `mk:jira-relationships`).
+- `--html --diff` PR mode pipes `gh pr diff` through `.claude/hooks/lib/secret-scrub.sh` before HTML interpolation; topic strings are HTML-encoded per element / attribute / CSS / JS context.
 
 ### Improvements
 
 - The five Phase-Zero conditional rule files (`agent-routing.md`, `model-selection-rules.md`, `phase-contracts.md`, `risk-checklist.md`, `scale-adaptive-rules.md`) move from `.claude/rules-conditional/` back to `.claude/rules/`. They keep the same Phase-0 conditional load semantics (read explicitly by `mk:agent-detector` Step 0b — NOT auto-loaded by Claude Code's directory mechanism), but live alongside the always-on rules so the orphan-cleanup pass and the rule-availability validator see them as a single tree.
 - `scripts/validate-rule-availability.sh` regex simplified — drops the `(-conditional)?` group now that the legacy path is gone.
+- `mk:cook`, `mk:plan-ceo-review`, `mk:problem-solving`, `mk:jira-relationships` each gain a one-line directive pointing at `mk:preview/references/mermaid-essentials.md` before any Mermaid emission.
+- `SKILLS_INDEX.md` registers `mk:preview` under "Cross-Cutting (Any Phase)".
 
 ### Bug Fixes
 

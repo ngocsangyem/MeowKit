@@ -67,6 +67,8 @@ For EXPANSION and SELECTIVE EXPANSION modes: expansion opportunities and delight
 
 ## Diagrams (mandatory, produce all that apply)
 
+> Before emitting any Mermaid block, Read `meowkit/.claude/skills/preview/references/mermaid-essentials.md`.
+
 1. System architecture
 2. Data flow (including shadow paths)
 3. State machine
