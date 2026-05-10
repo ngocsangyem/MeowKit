@@ -144,6 +144,19 @@ When resuming work on an existing plan, ALWAYS start the response with:
 
 WHY: Resumption context prevents duplicate work and missed steps.
 
+### B6. Claude Code Context Hygiene
+
+Treat context as a limited resource:
+
+- Explore first, then plan, then code for non-trivial work.
+- Scope file reads and searches narrowly; use subagents for broad investigations.
+- Put long context before the specific request in plans and handoffs.
+- Keep always-loaded guidance concise; move domain-specific procedures into skills.
+- Prefer deterministic verification (tests, build output, screenshots, runtime checks) over plausibility.
+- After two repeated corrections on the same issue, refine the prompt/plan instead of accumulating more failed context.
+
+WHY: Claude Code performance degrades as context fills. MeowKit's skill, rule, hook, and step-file architecture exists to load the right context just in time.
+
 ---
 
 ## Source Provenance
@@ -154,4 +167,5 @@ WHY: Resumption context prevents duplicate work and missed steps.
 | `output-format-rules.md` | 4208 | A1 (Rule 5 verbatim) + B2 (Rules 1–3) + B5 (Rule 4) | Subagent status schema preserved exact |
 | `context-ordering-rules.md` | 2642 | A2 (Rule 4 verbatim) + B3 (Rules 1–3) | |
 | `search-before-building-rules.md` | 3005 | A3 (Rule 4 verbatim) + B4 (Rules 1–3) | |
+| `best-practices-claude-code.md` | 590 lines | B6 | Context hygiene, plan-first flow, verification |
 | **Sum sources** | **11,646** | | |

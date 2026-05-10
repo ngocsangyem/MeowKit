@@ -40,7 +40,7 @@ Create: `git worktree add .worktrees/{agent-name} -b {branch-name}`
 Merge: After all parallel agents complete, merge worktree branches to feature branch.
 Cleanup: `git worktree remove .worktrees/{agent-name}`
 
-WHY: Worktrees provide filesystem-level isolation. Agents cannot accidentally overwrite each other's work. This is how ClaudeKit handles parallel teams — proven pattern.
+WHY: Worktrees provide filesystem-level isolation. Agents cannot accidentally overwrite each other's work. This is the MeowKit pattern for safe parallel teams.
 
 ## Rule 4: Gates Are Never Parallel
 
@@ -66,6 +66,20 @@ Parallel execution is only available for tasks classified as COMPLEX by the orch
 TRIVIAL and STANDARD tasks use the default sequential pipeline.
 
 WHY: Parallel decomposition has coordination overhead. For simple tasks, sequential is faster. Parallelism only pays off when the task is large enough to amortize the setup cost.
+
+## Rule 7: Team Coordination Is Opt-In
+
+Agent Team rules apply only when a MeowKit team/worktree workflow is active. Standard single-session subagent workflows use `orchestration-rules.md`.
+
+When team mode is active:
+
+- Define file ownership in every teammate task.
+- Teammates never force-push.
+- Teammates commit to their worktree branch, not `main` or `dev`.
+- Completion messages must be actionable, not just "done".
+- The lead evaluates docs impact after implementation work.
+
+WHY: Team sessions add messaging, task claiming, and branch discipline that are unnecessary in normal sessions but critical when several agents act like teammates.
 
 ## When to Parallelize
 

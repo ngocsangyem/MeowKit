@@ -1,5 +1,5 @@
 ---
-source: claudekit-engineer
+source: MeowKit
 adapted: yes
 adaptation_notes: >
   Extracted delegation context and parallel/sequential chaining rules.
@@ -26,9 +26,13 @@ When spawning a subagent, ALWAYS include in the prompt:
 1. **Work context path**: the git root of the files being worked on
 2. **Plan reference**: path to the active plan file
 3. **File ownership**: which files this subagent may modify
+4. **Reports path**: `{work_context}/tasks/reports/` when the workflow needs reports
+5. **Plans path**: `{work_context}/tasks/plans/` when the workflow needs plans
 
 WHY: Subagents start with zero context. Without explicit paths and scope,
 they read wrong files, write to wrong locations, or duplicate work.
+
+If current working directory differs from the project being edited, use the work context paths — not CWD-derived paths.
 
 ### Pre-Delegation Checklist
 
@@ -36,6 +40,8 @@ Before spawning any subagent, verify you have included:
 
 - [ ] **Work context path** — git root of the files being worked on
 - [ ] **Plan reference** — path to the active plan file (or "none" if ad-hoc)
+- [ ] **Reports path** — `tasks/reports/` under work context (or "none")
+- [ ] **Plans path** — `tasks/plans/` under work context (or "none")
 - [ ] **File ownership** — glob patterns for files this subagent may modify
 - [ ] **Acceptance criteria** — how to verify the subagent's work is complete
 - [ ] **Constraints** — what the subagent must NOT change or touch
@@ -46,6 +52,8 @@ Before spawning any subagent, verify you have included:
 Task: [specific task description]
 Work context: [project path]
 Plan: [plan file path or "none"]
+Reports: [reports path or "none"]
+Plans: [plans path or "none"]
 Files to modify: [glob patterns]
 Files to read for context: [specific paths]
 Acceptance criteria: [binary pass/fail checks]
@@ -66,7 +74,7 @@ Constraints: [what must NOT change]
 Each agent or subagent MUST own distinct files — no overlapping edits.
 
 - Define ownership via file paths in task descriptions
-- If two agents need the same file: STOP and escalate to the user
+- If two agents need the same file: STOP and have the orchestrator restructure tasks or handle the shared file sequentially
 - Tester agents own test files only; they read implementation files but NEVER edit them
 
 WHY: Concurrent edits to the same file cause merge conflicts and lost work.
@@ -86,6 +94,10 @@ Pattern: Component A + Component B + Tests (separate files)
 ALWAYS plan integration points before starting parallel work.
 NEVER start parallel agents that modify the same files.
 
+Subagents receive only the context they need.
+
+Summarize decisions, provide specific paths, and never pass full session history.
+
 ### Parallel execution infrastructure (Week 2 addition)
 
 For COMPLEX tasks with independent subtasks:
@@ -102,3 +114,14 @@ For architectural discussions and trade-off analysis:
 - Use `mk:party` skill for multi-agent deliberation
 - Party mode is discussion-only — no code changes during party
 - After party decision, resume normal sequential pipeline
+
+## Subagent Completion Handling
+
+Subagents MUST end with the status block defined in `agent-conduct.md` A1.
+
+- `DONE` → proceed to the next step.
+- `DONE_WITH_CONCERNS` → address correctness/security concerns before review; track observational debt separately.
+- `BLOCKED` → change something before retrying: provide context, simplify the task, escalate model tier, or ask the user.
+- `NEEDS_CONTEXT` → provide the missing context and re-dispatch.
+
+Never retry the same blocked approach more than 3 times.

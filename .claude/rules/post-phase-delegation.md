@@ -57,6 +57,7 @@ PM is NOT invoked when ANY of the following is true:
 - `mk:harness` with `MEOWKIT_HARNESS_MODE=MINIMAL` (dead-weight thesis)
 - Environment variable `MEOWKIT_PM_AUTO=off` (user opt-out; `/mk:status` still works)
 - No active plan at `tasks/plans/` (nothing to track)
+- Docs-only or rule-only updates with no active implementation plan; report docs impact directly instead
 
 WHY: Delivery tracking has a cost. Skip paths prevent PM from firing when
 the work has no plan to track, when the model is already self-managing,

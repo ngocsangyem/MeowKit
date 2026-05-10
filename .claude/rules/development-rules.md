@@ -1,14 +1,17 @@
 # Development Rules
 
-These rules apply to all implementation work in project.
+These rules apply to all implementation work in MeowKit-enabled projects.
 
 ## General
 
-- Use `mk:multimodal` skill for describing details of images, videos, documents, etc. if needed
-- Use `mk:multimodal` skill and `imagemagick` skill for generating and editing images, videos, documents, etc. if needed
-- Use `mk:sequential-thinking` and `mk:investigate` skills for sequential thinking, analyzing code, debugging, etc. if needed
-- **[IMPORTANT]** Follow the codebase structure and code standards in `./docs` during implementation.
-- **[IMPORTANT]** Do not just simulate the implementation or mocking them, always implement the real code.
+- Analyze the MeowKit skill catalog before starting and activate only the skills needed for the task domain.
+- Follow YAGNI, KISS, and DRY. Prefer the smallest real change that satisfies the approved scope.
+- Use `mk:docs-finder` for current library/API documentation; do not rely on training data for signatures.
+- Use `mk:multimodal` for describing or processing images, videos, audio, PDFs, and other non-text artifacts.
+- Use `mk:sequential-thinking` and `mk:investigate` for multi-step analysis, root-cause debugging, or uncertain fixes.
+- Use `mk:scout` before broad codebase exploration; keep investigations scoped to avoid context bloat.
+- Follow the codebase structure and code standards in `docs/` when they exist.
+- Do not simulate, fake, stub, or mock production implementation. Always implement the real behavior.
 
 ## File Management
 
@@ -24,6 +27,10 @@ ALWAYS keep code files under 200 lines.
 WHY: Shorter files fit in context windows and reduce merge conflicts.
 INSTEAD of one large file → split into focused modules by concern.
 
+Use composition over inheritance for large UI/components, extract utilities into focused modules, and move business logic into services.
+
+Do not split files mechanically if it makes the system harder to understand. The 200-line limit is a maintainability guard, not a license for needless indirection.
+
 ### No enhanced copies
 
 NEVER create new "enhanced" or "v2" files. ALWAYS update existing files directly.
@@ -36,6 +43,15 @@ WHY: Duplicate files create confusion about which is canonical. The git history 
 ALWAYS run the compile/build command after creating or modifying a code file.
 WHY: Catching syntax errors immediately prevents cascading failures.
 Check: zero compilation errors before proceeding.
+
+For MeowKit itself, the default commands are:
+
+- `npm run build`
+- `npm run lint`
+- `npm run typecheck`
+- `npm test`
+
+For downstream projects, prefer commands documented in that project's `README.md`, `CLAUDE.md`, or `docs/`.
 
 ### Real implementation only
 
@@ -52,6 +68,10 @@ Escalate after 3 failed fix attempts (per tdd-rules.md).
 **Default mode (TDD-optional):** This rule applies IF tests exist in the repo. There is no requirement to create tests for new code in default mode — that's controlled by `tdd-rules.md`, which is opt-in via `MEOWKIT_TDD=1` or `--tdd`. A repo with zero tests is permitted; the reviewer may flag missing tests as a WARN at Gate 2.
 
 **Strict mode (`MEOWKIT_TDD=1` / `--tdd`):** Tests must exist AND pass. The `pre-implement.sh` hook enforces failing-test-first; the rules in `tdd-rules.md` "When TDD is enabled" apply.
+
+NEVER ignore failing tests, delete tests, weaken assertions, or introduce fake data solely to pass CI.
+
+Address the root cause, then re-run the relevant checks.
 
 ## Pre-Commit Rules
 
@@ -82,6 +102,22 @@ After completing implementation tasks, ALWAYS declare docs impact:
 - `Docs impact: major` — new documentation required
 
 WHY: Undocumented changes create knowledge gaps for future sessions.
+
+### Documentation updates
+
+When docs impact is `minor` or `major`, update documentation in the same PR:
+
+- `docs/project-context.md` — conventions, stack, anti-patterns loaded by agents
+- `docs/project-overview.md` — product/system overview
+- `docs/system-architecture.md` — architecture and component relationships
+- `docs/code-standards.md` — code conventions and examples
+- `docs/deployment-guide.md` — release/deploy instructions
+- `docs/development-roadmap.md` — roadmap phase and milestone progress, when present
+- `docs/project-changelog.md` — significant features, fixes, security updates, and breaking changes
+
+If a project uses a different documented docs layout, follow that layout instead.
+
+After shipping feature work, prefer `mk:document-release`; for a project with no docs, use `mk:docs-init`.
 
 ## Tool Output Limits
 

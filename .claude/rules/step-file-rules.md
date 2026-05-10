@@ -22,6 +22,8 @@ ALWAYS complete the current step before reading the next.
 
 WHY: Loading multiple steps wastes context tokens and creates confusion about which instructions to follow. JIT loading keeps the context window lean. Source: BMAD-METHOD step-file pattern.
 
+This is also MeowKit's implementation of Claude Code progressive disclosure: `SKILL.md` stays small, `workflow.md` declares the sequence, and step files load only when needed.
+
 ## Rule 2: Never Skip Steps
 
 NEVER skip steps or optimize the sequence, even if a step seems unnecessary.

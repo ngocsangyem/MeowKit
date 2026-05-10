@@ -78,6 +78,8 @@ Every `SKILL.md` body (excluding YAML frontmatter) MUST stay under 500 lines. Sk
 
 WHY: Once SKILL.md loads, every token competes with conversation history and other context. The 500-line cap is Anthropic's empirically-validated threshold for context efficiency. Beyond this, partial reads (`head -100`) start to miss content.
 
+If a skill has 3+ distinct phases with different context needs, prefer step-file architecture. If it only needs reference material, keep `SKILL.md` concise and link to `references/*.md`.
+
 PERIODIC AUDIT: Run a length check on `mk:*` SKILL.md files quarterly OR on every model-tier upgrade (per `harness-rules.md` Rule 7 dead-weight audit cadence). Flag oversized monoliths for decomposition. Step-filed skills auto-pass — only the SKILL.md entrypoint counts.
 
 MEASURABLE CHECK:
@@ -152,7 +154,7 @@ The following frontmatter fields are advisory (not hook-enforced); they annotate
 
 ## Commands vs Skills (they are not the same)
 
-Slash commands live in `.claude/commands/meow/*.md`. They operate in one of 3 valid patterns — NOT every command has a matching SKILL.md, and that is intentional:
+Slash commands live in `.claude/commands/mk/*.md`. They operate in one of 3 valid patterns — NOT every command has a matching SKILL.md, and that is intentional:
 
 1. **Skill-composing** — command chains existing skills (e.g. `/audit` runs `mk:review` + `mk:cso`).
 2. **Agent-invoking** — command directly spawns an agent without a skill wrapper (e.g. `/arch` uses the `architect` agent).
