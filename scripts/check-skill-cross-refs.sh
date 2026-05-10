@@ -39,6 +39,9 @@ while read -r ref; do
   # Skip allowlisted deprecated aliases
   case " $ALLOWLIST " in *" $name "*) continue ;; esac
 
+  # Skip partial regex captures from wildcard/placeholder families such as mk:jira-* or mk:jira-{leaf}.
+  case "$name" in *-) continue ;; esac
+
   # Skip if resolves as skill OR command
   if echo "$SKILLS" | grep -qx "$name"; then continue; fi
   if echo "$COMMANDS" | grep -qx "$name"; then continue; fi
@@ -49,7 +52,8 @@ done < <(
   find .claude/commands .claude/skills \
     \( -path '*/.*' -o -path '*/.venv/*' -o -path '*/node_modules/*' \) -prune -o \
     -type f \( -name '*.md' -o -name '*.json' \) -print0 \
-    | xargs -0 grep -hoE 'mk:[a-z][a-z0-9-]*' 2>/dev/null \
+    | xargs -0 grep -hoE 'mk:[a-z][a-z0-9-]*-?\*?' 2>/dev/null \
+    | grep -v '\*$' \
     | sort -u
 )
 
