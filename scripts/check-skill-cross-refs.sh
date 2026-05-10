@@ -45,7 +45,13 @@ while read -r ref; do
 
   echo "PHANTOM: mk:$name (no skill dir, no command file)" >&2
   PHANTOM=1
-done < <(grep -rohE --include='*.md' --include='*.json' 'mk:[a-z][a-z0-9-]*' .claude/commands/ .claude/skills/ 2>/dev/null | sort -u)
+done < <(
+  find .claude/commands .claude/skills \
+    \( -path '*/.*' -o -path '*/node_modules/*' \) -prune -o \
+    -type f \( -name '*.md' -o -name '*.json' \) -print0 \
+    | xargs -0 grep -hoE 'mk:[a-z][a-z0-9-]*' 2>/dev/null \
+    | sort -u
+)
 
 if [ "$PHANTOM" -eq 0 ]; then
   echo "OK: all mk:* refs resolve"
