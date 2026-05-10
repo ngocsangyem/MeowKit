@@ -1,6 +1,6 @@
 ---
 title: jira-time
-description: Domain agent for time tracking: log, list/edit/delete worklogs, set estimates, generate reports.
+description: "Domain agent for time tracking: log, list/edit/delete worklogs, set estimates, generate reports."
 ---
 
 # jira-time

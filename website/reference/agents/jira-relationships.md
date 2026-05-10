@@ -1,6 +1,6 @@
 ---
 title: jira-relationships
-description: Domain agent for issue relationships: link, unlink, blockers, dependencies, clone, bulk-link.
+description: "Domain agent for issue relationships: link, unlink, blockers, dependencies, clone, bulk-link."
 ---
 
 # jira-relationships

@@ -1,6 +1,6 @@
 ---
 title: jira-jsm
-description: Domain agent for JIRA Service Management: 8 sub-domains, ~45 verbs. Requires JSM license + agent role.
+description: "Domain agent for JIRA Service Management: 8 sub-domains, ~45 verbs. Requires JSM license + agent role."
 ---
 
 # jira-jsm

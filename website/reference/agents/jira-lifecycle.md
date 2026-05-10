@@ -1,6 +1,6 @@
 ---
 title: jira-lifecycle
-description: Domain agent for JIRA workflow lifecycle: transitions, assignment, resolution, version + component management. Cache-first transition discovery.
+description: "Domain agent for JIRA workflow lifecycle: transitions, assignment, resolution, version + component management. Cache-first transition discovery."
 ---
 
 # jira-lifecycle

@@ -1,6 +1,6 @@
 ---
 title: jira-agile
-description: Domain agent for agile: epics, sprints, backlog, ranking, story points, subtasks, velocity.
+description: "Domain agent for agile: epics, sprints, backlog, ranking, story points, subtasks, velocity."
 ---
 
 # jira-agile

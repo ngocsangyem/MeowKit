@@ -1,6 +1,6 @@
 ---
 title: jira-dev
-description: Domain agent for developer artifact generation: branch names, PR descriptions, commit parsing, smart-commit linking.
+description: "Domain agent for developer artifact generation: branch names, PR descriptions, commit parsing, smart-commit linking."
 ---
 
 # jira-dev
