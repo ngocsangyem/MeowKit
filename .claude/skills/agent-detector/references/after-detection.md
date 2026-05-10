@@ -35,7 +35,7 @@ domain_agents[2]{family,count,list}:
 
 Total: 17 core + 21 domain = 38 agents. Core agents are routed by the orchestrator via the `agent-routing.md` table; domain agents are routed by their hub skill (`mk:jira` / `mk:confluence`) — the orchestrator does NOT score them directly.
 
-See `.claude/rules-conditional/agent-routing.md` for full details.
+See `.claude/rules/agent-routing.md` for full details.
 
 ---
 
@@ -51,6 +51,6 @@ User: "Use only tester for this task"
 
 ---
 
-**Agent routing:** `.claude/rules-conditional/agent-routing.md` (canonical) and `.claude/agents/orchestrator.md` (orchestrator agent definition)
+**Agent routing:** `.claude/rules/agent-routing.md` (canonical) and `.claude/agents/orchestrator.md` (orchestrator agent definition)
 
 **MANDATORY:** Always show agent banner at start of EVERY response.

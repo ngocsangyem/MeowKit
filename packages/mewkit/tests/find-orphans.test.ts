@@ -140,4 +140,22 @@ describe("findOrphans", () => {
 		});
 		expect(orphans).toEqual(["agents/m-middle.md", "rules/a-early.md", "rules/z-late.md"]);
 	});
+
+	// Migration sunset (v2.8.4): rules-conditional/ was merged into rules/.
+	// Users upgrading from v2.8.3 still have the legacy dir on disk; the
+	// orphan-cleanup pass must flag and remove it on the next mewkit upgrade.
+	it("flags legacy rules-conditional/ files as orphans (v2.8.3 → v2.8.4 migration)", () => {
+		fs.mkdirSync(path.join(claudeDir, "rules-conditional"), { recursive: true });
+		fs.writeFileSync(path.join(claudeDir, "rules-conditional", "agent-routing.md"), "legacy");
+		fs.writeFileSync(path.join(claudeDir, "rules-conditional", "phase-contracts.md"), "legacy");
+		fs.writeFileSync(path.join(claudeDir, "rules", "agent-routing.md"), "new canonical");
+		const orphans = findOrphans({
+			claudeDir,
+			manifest: manifestWith(["rules/agent-routing.md"]),
+		});
+		expect(orphans).toEqual([
+			"rules-conditional/agent-routing.md",
+			"rules-conditional/phase-contracts.md",
+		]);
+	});
 });

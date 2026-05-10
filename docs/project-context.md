@@ -164,7 +164,7 @@ All counts from `meowkit-architecture.md` Component Inventory (verified 2026-04-
 - No auto-approve in any mode; human must explicitly type approval
 - Conventional commits are required because semantic-release parses them for version bumps
 
-(source: `gate-rules.md` Gate 2; `.claude/rules-conditional/phase-contracts.md` Phase 5 row)
+(source: `gate-rules.md` Gate 2; `.claude/rules/phase-contracts.md` Phase 5 row)
 
 ---
 

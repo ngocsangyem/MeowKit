@@ -39,7 +39,7 @@ Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 | Deprecated skills                      | 0        | —                                          | `mk:debug`, `mk:documentation`, `mk:shipping` removed in v2.4.4                                                            |
 | Step-file skills                       | 5        | `step-file-rules.md` Applicability section | plan-creator, review, evaluate, harness, trace-analyze                                                                           |
 | Skills with internal agents            | 1        | `AGENTS_INDEX.md` Skill-Scoped section     | planning-engine (2 agents); jira agents moved to project-scoped in v2.8.3                                                                             |
-| Core agents                            | 17       | `ls .claude/agents/*.md` excl. index       | Matches `.claude/rules-conditional/agent-routing.md` agent table. `project-manager`                                                          |
+| Core agents                            | 17       | `ls .claude/agents/*.md` excl. index       | Matches `.claude/rules/agent-routing.md` agent table. `project-manager`                                                          |
 | AGENTS_INDEX rows                      | 17       | `AGENTS_INDEX.md` active table             | Footer "13 agents" phrasing is stale (CF-M34)                                                                                    |
 | Hook events (settings.json)            | 7        | `settings.json` hooks keys                 | SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit, SubagentStart, SubagentStop                                       |
 | Node handlers on disk                  | 8        | `ls .claude/hooks/handlers/*.cjs`          | Re-verified 2026-04-29 — disk has 8, matches HOOKS_INDEX. CF-M2 closed (audit cited stale 12).                                  |
@@ -232,7 +232,7 @@ Hook chain verified against `settings.json` (2026-04-18). All 7 events listed.
 | `UserPromptSubmit`        | tdd-flag-detector.sh → conversation-summary-cache.sh → dispatch.cjs (immediate-capture-handler, orientation-ritual)           | `settings.json:152-173` |
 | `Stop`                    | pre-completion-check.sh → post-session.sh → conversation-summary-cache.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer) | `settings.json:125-151` |
 
-**Phase routing** (source: `.claude/rules-conditional/phase-contracts.md`):
+**Phase routing** (source: `.claude/rules/phase-contracts.md`):
 `Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test → Phase 3 Build → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect`
 
 SubagentStart/SubagentStop: intentionally empty — hooks in these events would
@@ -265,7 +265,7 @@ anchor. See `consolidated.md` Cross-Cutting Pattern 2.
 ## 6. Agent Roster (17)
 
 Source: `AGENTS_INDEX.md` active table (17 rows verified against `ls .claude/agents/*.md`),
-`.claude/rules-conditional/agent-routing.md` agent table. AGENTS_INDEX footer contains stale "13 agents" phrasing
+`.claude/rules/agent-routing.md` agent table. AGENTS_INDEX footer contains stale "13 agents" phrasing
 (CF-M34) — canonical count is 17 (project-manager added 260422).
 
 | Agent           | Type    | Phase           | Role                                                                         |

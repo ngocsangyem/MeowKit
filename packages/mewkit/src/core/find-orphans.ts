@@ -17,8 +17,16 @@ import { existsSync, readdirSync, lstatSync } from "node:fs";
 import { join, relative } from "node:path";
 import type { Manifest } from "./compute-checksums.js";
 
-/** Kit-owned directories where orphan deletion is safe. */
-export const DEFAULT_ORPHAN_SCOPES = ["rules", "skills", "agents", "hooks"] as const;
+/**
+ * Kit-owned directories where orphan deletion is safe.
+ *
+ * `rules-conditional` is included as a one-time migration sunset — the v2.8.4
+ * release merged that directory back into `rules/`, but users upgrading from
+ * v2.8.3 still have the legacy dir on disk. Including it here lets the next
+ * `mewkit upgrade` pass flag and remove the leftover files. Once the dir is
+ * empty across all known installs, this entry can be retired.
+ */
+export const DEFAULT_ORPHAN_SCOPES = ["rules", "rules-conditional", "skills", "agents", "hooks"] as const;
 
 /**
  * Files matching any of these regexes are user customizations and never deleted,

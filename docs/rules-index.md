@@ -22,9 +22,9 @@ All rules are mandatory unless marked [CONTEXTUAL].
 | `skill-authoring-rules.md`        | Mandatory Gotchas section, persistent state in `${CLAUDE_PLUGIN_DATA}`, 500-line SKILL.md cap with decomposition + audit cadence, required `keywords`/`when_to_use`/`user-invocable` frontmatter (Rule 4) | New (Anthropic skill-authoring docs)         | Skill authoring, audits                             |
 | `post-phase-delegation.md`        | Fire points, skip conditions, and invocation form for delegating to project-manager after each phase transition                                    | MeowKit original                             | Orchestration skills [CONTEXTUAL]                   |
 
-### Phase-Zero Conditional Rules (`.claude/rules-conditional/`)
+### Phase-Zero Conditional Rules (`.claude/rules/`)
 
-Loaded explicitly by `mk:agent-detector` Step 0b — NOT auto-loaded by Claude Code's directory mechanism. Out of always-on tier; only reaches context when agent-detector runs (every user message).
+Live alongside the always-on rules but are loaded explicitly by `mk:agent-detector` Step 0b — NOT auto-loaded by Claude Code's directory mechanism. Out of always-on tier; only reaches context when agent-detector runs (every user message).
 
 | Rule | Purpose | Loaded by |
 | ---- | ------- | --------- |
@@ -53,12 +53,12 @@ Rules are applied in this priority (higher = stronger override):
 13. `skill-authoring-rules.md` — apply during skill authoring, scaffolding, and quarterly/model-upgrade audits
 14. `post-phase-delegation.md` — apply during orchestration-skill execution only [CONTEXTUAL]
 
-**Phase-zero conditional** (loaded by `mk:agent-detector` Step 0b only — NOT auto-loaded):
-- `rules-conditional/phase-contracts.md`
-- `rules-conditional/agent-routing.md`
-- `rules-conditional/model-selection-rules.md`
-- `rules-conditional/scale-adaptive-rules.md`
-- `rules-conditional/risk-checklist.md`
+**Phase-zero conditional** (live in `rules/` but loaded by `mk:agent-detector` Step 0b only — NOT auto-loaded by directory mechanism):
+- `rules/phase-contracts.md`
+- `rules/agent-routing.md`
+- `rules/model-selection-rules.md`
+- `rules/scale-adaptive-rules.md`
+- `rules/risk-checklist.md`
 
 ## Hook Enforcement
 

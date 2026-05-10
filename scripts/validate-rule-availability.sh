@@ -42,10 +42,12 @@ for p in "${SWEEP_PATHS[@]}"; do
   [ -e "$p" ] && EXISTING_PATHS+=("$p")
 done
 
-# Extract every `.claude/rules/<name>.md` AND `.claude/rules-conditional/<name>.md`
-# reference. Name pattern matches kebab-case + RULES_INDEX-style ALLCAPS_UNDERSCORE.
+# Extract every `.claude/rules/<name>.md` reference (kebab-case +
+# RULES_INDEX-style ALLCAPS_UNDERSCORE). The legacy `.claude/rules-conditional/`
+# tree was merged into `.claude/rules/` in v2.8.4 — historical references in
+# website/changelog.md are excluded by the `EXISTING_PATHS` not including it.
 REFS=$(grep -rohE "${SWEEP_GLOBS[@]}" \
-  '\.claude/rules(-conditional)?/[A-Za-z0-9_-]+\.md' \
+  '\.claude/rules/[A-Za-z0-9_-]+\.md' \
   "${EXISTING_PATHS[@]}" 2>/dev/null | sort -u)
 
 if [ -z "$REFS" ]; then

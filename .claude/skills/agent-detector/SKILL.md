@@ -43,19 +43,19 @@ user-invocable: false
 
    Do NOT proceed to detection. Do NOT route to any agent. The 5 rules are the deterministic baseline; their absence indicates either repo corruption or a partial install. Replaces the unverified directory-auto-load assumption with a positive existence check.
 
-0b. **Phase-zero rule load.** After the safety baseline is confirmed, `Read` each phase-zero rule from its conditional location. These govern Phase 0 routing and are read once per agent-detector invocation:
-   - `.claude/rules-conditional/phase-contracts.md` — what each phase expects/produces
-   - `.claude/rules-conditional/agent-routing.md` — agent → role → phase table
-   - `.claude/rules-conditional/model-selection-rules.md` — task-type → model-tier mapping
-   - `.claude/rules-conditional/scale-adaptive-rules.md` — domain CSV → complexity routing
-   - `.claude/rules-conditional/risk-checklist.md` — 9 horizontal-risk flags
+0b. **Phase-zero rule load.** After the safety baseline is confirmed, `Read` each phase-zero rule. These govern Phase 0 routing and are read once per agent-detector invocation:
+   - `.claude/rules/phase-contracts.md` — what each phase expects/produces
+   - `.claude/rules/agent-routing.md` — agent → role → phase table
+   - `.claude/rules/model-selection-rules.md` — task-type → model-tier mapping
+   - `.claude/rules/scale-adaptive-rules.md` — domain CSV → complexity routing
+   - `.claude/rules/risk-checklist.md` — 9 horizontal-risk flags
 
    If any `Read` fails: ABORT with `PHASE-ZERO RULE MISSING: <name>` — same fail-fast semantics as Step 0. These rules drive the routing logic in steps 2–4; without them, detection silently degrades to keyword-only.
 
 1. **Check cache** -- reuse cached result if same workflow and phase > 1. See `references/detection-process.md`
 2. **Score agents** -- analyze task content, extract keywords, check project context across all layers (0-4). See `references/multi-layer-detection.md`, `references/scoring-and-thresholds.md`
 3. **Select model + mode** -- map complexity to model tier, check team mode eligibility. See `references/model-selection.md`, `references/complexity-detection.md`, `references/team-mode.md`
-4. **Evaluate risk flags** -- read `.claude/rules-conditional/risk-checklist.md` (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per `rules-conditional/model-selection-rules.md` Rule 2 — regardless of `mk:scale-routing` outcome.
+4. **Evaluate risk flags** -- read `.claude/rules/risk-checklist.md` (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per `rules/model-selection-rules.md` Rule 2 — regardless of `mk:scale-routing` outcome.
 5. **Output + hand off** -- show detection banner (including `matched_flags` line if non-empty), load agent instructions, invoke skill. See `references/detection-process.md`, `references/after-detection.md`
 
 ## References
