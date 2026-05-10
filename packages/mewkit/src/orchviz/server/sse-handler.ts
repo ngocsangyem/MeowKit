@@ -3,18 +3,8 @@
  */
 
 import type { IncomingMessage, ServerResponse } from "node:http";
-import type {
-	AgentEvent,
-	AgentEventType,
-	PauseStartedPayload,
-	PauseClearedPayload,
-} from "../protocol.js";
-import {
-	MAX_SSE_BUFFER,
-	MAX_SSE_CLIENTS,
-	SSE_HEARTBEAT_MS,
-	PAUSE_MIN_DURATION_MS,
-} from "../constants.js";
+import type { AgentEvent, AgentEventType, PauseStartedPayload, PauseClearedPayload } from "../protocol.js";
+import { MAX_SSE_BUFFER, MAX_SSE_CLIENTS, SSE_HEARTBEAT_MS, PAUSE_MIN_DURATION_MS } from "../constants.js";
 
 const SPAWN_TYPE: AgentEventType = "agent_spawn";
 const PAUSE_STARTED: AgentEventType = "pause_started";

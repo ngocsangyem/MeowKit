@@ -46,9 +46,7 @@ export function summarizeInput(toolName: string, input?: Record<string, unknown>
 		case "Agent":
 			return String(input.description || input.prompt || "").slice(0, TASK_MAX);
 		case "TodoWrite": {
-			const todos = input.todos as
-				| Array<{ content?: string; activeForm?: string; status?: string }>
-				| undefined;
+			const todos = input.todos as Array<{ content?: string; activeForm?: string; status?: string }> | undefined;
 			if (Array.isArray(todos) && todos.length > 0) {
 				const active = todos.find((t) => t.status === "in_progress");
 				const label = active?.activeForm || active?.content || todos[0]?.content || "todos";
@@ -117,10 +115,7 @@ export function buildDiscovery(
 	if (!(FILE_TOOLS as readonly string[]).includes(toolName) || !filePath) return undefined;
 	return {
 		type: (PATTERN_TOOLS as readonly string[]).includes(toolName) ? "pattern" : "file",
-		label:
-			filePath.length > DISCOVERY_LABEL_MAX
-				? "..." + filePath.slice(-DISCOVERY_LABEL_TAIL)
-				: filePath,
+		label: filePath.length > DISCOVERY_LABEL_MAX ? "..." + filePath.slice(-DISCOVERY_LABEL_TAIL) : filePath,
 		content: result.slice(0, DISCOVERY_CONTENT_MAX),
 	};
 }

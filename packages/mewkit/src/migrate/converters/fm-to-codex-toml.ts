@@ -56,7 +56,12 @@ function deriveSandboxMode(tools: unknown): { sandboxMode: string | null; warnin
 
 	const toolList = tools
 		.split(/[,;|]/)
-		.map((t) => t.trim().toLowerCase().replace(/\(.*\)$/, ""))
+		.map((t) =>
+			t
+				.trim()
+				.toLowerCase()
+				.replace(/\(.*\)$/, ""),
+		)
 		.filter(Boolean);
 
 	const hasWrite = toolList.some((t) =>
@@ -110,9 +115,7 @@ export function convertFmToCodexToml(item: PortableItem): ConversionResult {
 export function buildCodexConfigEntry(name: string, description?: string): string {
 	const slug = toCodexSlug(name);
 	const desc = description || name;
-	return [
-		`[agents.${slug}]`,
-		`description = ${JSON.stringify(desc)}`,
-		`config_file = "agents/${slug}.toml"`,
-	].join("\n");
+	return [`[agents.${slug}]`, `description = ${JSON.stringify(desc)}`, `config_file = "agents/${slug}.toml"`].join(
+		"\n",
+	);
 }

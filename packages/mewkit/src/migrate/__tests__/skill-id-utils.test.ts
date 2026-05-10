@@ -1,11 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-	BASE_RE,
-	SKILL_ID_RE,
-	_resetWarnState,
-	parseSkillId,
-	resolveLegacy,
-} from "../discovery/skill-id-utils.js";
+import { BASE_RE, SKILL_ID_RE, _resetWarnState, parseSkillId, resolveLegacy } from "../discovery/skill-id-utils.js";
 
 describe("skill-id-utils", () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,9 +38,7 @@ describe("skill-id-utils", () => {
 		});
 
 		it("rejects path-traversal in folder basename", () => {
-			expect(() => parseSkillId(undefined, "meow:../../config")).toThrow(
-				/Invalid skill folder basename/,
-			);
+			expect(() => parseSkillId(undefined, "meow:../../config")).toThrow(/Invalid skill folder basename/);
 		});
 
 		it("rejects basenames with uppercase or invalid chars", () => {

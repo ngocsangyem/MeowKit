@@ -10,11 +10,7 @@ import { convertItem } from "../converters/index.js";
 import { addPortableInstallation, removePortableInstallation } from "../reconcile/portable-registry.js";
 import { providers } from "../provider-registry.js";
 import type { PortableItem, ProviderType } from "../types.js";
-import {
-	getCodexGlobalBoundary,
-	isCanonicalPathWithinBoundary,
-	withCodexTargetLock,
-} from "./codex-path-safety.js";
+import { getCodexGlobalBoundary, isCanonicalPathWithinBoundary, withCodexTargetLock } from "./codex-path-safety.js";
 
 const SENTINEL_START = "# --- mewkit-managed-agents-start ---";
 const SENTINEL_END = "# --- mewkit-managed-agents-end ---";
@@ -38,7 +34,11 @@ async function atomicWrite(target: string, content: string): Promise<void> {
 		await writeFile(tmp, content, "utf-8");
 		await rename(tmp, target);
 	} catch (err) {
-		try { await unlink(tmp); } catch { /* best-effort */ }
+		try {
+			await unlink(tmp);
+		} catch {
+			/* best-effort */
+		}
 		throw err;
 	}
 }
@@ -101,10 +101,11 @@ export async function installCodexAgents(
 
 				const sourceChecksum = computeContentChecksum(agent.body);
 				const targetChecksum = computeContentChecksum(result.content);
-				await addPortableInstallation(
-					agent.name, "agent", "codex", options.global, targetPath, agent.sourcePath,
-					{ sourceChecksum, targetChecksum, installSource: "kit" },
-				);
+				await addPortableInstallation(agent.name, "agent", "codex", options.global, targetPath, agent.sourcePath, {
+					sourceChecksum,
+					targetChecksum,
+					installSource: "kit",
+				});
 
 				entries.push(buildCodexConfigEntry(agent.name, agent.description));
 			}
@@ -125,12 +126,18 @@ export async function installCodexAgents(
 		} catch (err) {
 			// Best-effort rollback: delete files we wrote and registry entries we added
 			for (const path of writtenFiles) {
-				try { await unlink(path); } catch { /* ignore */ }
+				try {
+					await unlink(path);
+				} catch {
+					/* ignore */
+				}
 			}
 			for (const agent of agents) {
 				try {
 					await removePortableInstallation(agent.name, "agent", "codex", options.global);
-				} catch { /* ignore */ }
+				} catch {
+					/* ignore */
+				}
 			}
 			return {
 				provider: "codex",

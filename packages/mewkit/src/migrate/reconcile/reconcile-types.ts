@@ -42,26 +42,46 @@ export type ReconcileReason =
 
 export function getReasonCopy(code: ReconcileReason, _ctx?: Record<string, string>): string {
 	switch (code) {
-		case "new-item": return "New — not previously installed";
-		case "new-provider-for-item": return "New provider for existing item";
-		case "target-deleted-source-changed": return "You deleted this; mewkit has updates — reinstalling";
-		case "target-dir-empty-reinstall": return "Provider directory is empty — reinstalling";
-		case "force-reinstall": return "Force reinstall (target was deleted)";
-		case "force-overwrite": return "Force overwrite (you edited this, --force active)";
-		case "registry-upgrade-reinstall": return "Target deleted — reinstalling after registry upgrade";
-		case "source-changed": return "mewkit updated, you didn't edit — safe to overwrite";
-		case "registry-upgrade-heal": return "Healing stale target after registry upgrade";
-		case "no-changes": return "Already up to date";
-		case "user-edits-preserved": return "You edited this, mewkit unchanged — keeping your edits";
-		case "user-deleted-respected": return "You deleted this, mewkit unchanged — respecting your choice";
-		case "target-up-to-date-backfill": return "Already up to date — registry checksums will be backfilled";
-		case "provider-checksum-unavailable": return "Provider checksum unavailable — cannot verify safely";
-		case "target-state-unknown": return "Target state unavailable, mewkit unchanged — preserving target";
-		case "source-removed-orphan": return "No longer shipped by mewkit — will be removed";
-		case "renamed-cleanup": return "Renamed — cleaning up old path";
-		case "path-migrated-cleanup": return "Path migrated — cleaning up old location";
-		case "both-changed": return "Both you and mewkit changed this — pick one";
-		case "target-state-unknown-source-changed": return "Target state unavailable while mewkit changed — manual review required";
+		case "new-item":
+			return "New — not previously installed";
+		case "new-provider-for-item":
+			return "New provider for existing item";
+		case "target-deleted-source-changed":
+			return "You deleted this; mewkit has updates — reinstalling";
+		case "target-dir-empty-reinstall":
+			return "Provider directory is empty — reinstalling";
+		case "force-reinstall":
+			return "Force reinstall (target was deleted)";
+		case "force-overwrite":
+			return "Force overwrite (you edited this, --force active)";
+		case "registry-upgrade-reinstall":
+			return "Target deleted — reinstalling after registry upgrade";
+		case "source-changed":
+			return "mewkit updated, you didn't edit — safe to overwrite";
+		case "registry-upgrade-heal":
+			return "Healing stale target after registry upgrade";
+		case "no-changes":
+			return "Already up to date";
+		case "user-edits-preserved":
+			return "You edited this, mewkit unchanged — keeping your edits";
+		case "user-deleted-respected":
+			return "You deleted this, mewkit unchanged — respecting your choice";
+		case "target-up-to-date-backfill":
+			return "Already up to date — registry checksums will be backfilled";
+		case "provider-checksum-unavailable":
+			return "Provider checksum unavailable — cannot verify safely";
+		case "target-state-unknown":
+			return "Target state unavailable, mewkit unchanged — preserving target";
+		case "source-removed-orphan":
+			return "No longer shipped by mewkit — will be removed";
+		case "renamed-cleanup":
+			return "Renamed — cleaning up old path";
+		case "path-migrated-cleanup":
+			return "Path migrated — cleaning up old location";
+		case "both-changed":
+			return "Both you and mewkit changed this — pick one";
+		case "target-state-unknown-source-changed":
+			return "Target state unavailable while mewkit changed — manual review required";
 	}
 }
 

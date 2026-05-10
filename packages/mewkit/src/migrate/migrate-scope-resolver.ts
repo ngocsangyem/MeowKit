@@ -36,10 +36,7 @@ function parseOnly(only: string | undefined): Set<ScopeType> | null {
 	return set;
 }
 
-export function resolveMigrationScope(
-	argv: string[],
-	options: MigrateScopeOptions,
-): MigrationScope {
+export function resolveMigrationScope(argv: string[], options: MigrateScopeOptions): MigrationScope {
 	const argSet = new Set(argv);
 
 	const onlySet = parseOnly(options.only);
@@ -78,13 +75,7 @@ export function resolveMigrationScope(
 	const hasNoHooksArg = argSet.has("--no-hooks") || argSet.has("--skip-hooks");
 
 	// "Only" mode: any positive --type flag was specified
-	const hasOnlyFlag =
-		hasConfigArg ||
-		hasRulesArg ||
-		hasHooksArg ||
-		hasAgentsArg ||
-		hasCommandsArg ||
-		hasSkillsArg;
+	const hasOnlyFlag = hasConfigArg || hasRulesArg || hasHooksArg || hasAgentsArg || hasCommandsArg || hasSkillsArg;
 
 	const skipConfig = hasNoConfigArg || options.skipConfig === true || options.config === false;
 	const skipRules = hasNoRulesArg || options.skipRules === true || options.rules === false;

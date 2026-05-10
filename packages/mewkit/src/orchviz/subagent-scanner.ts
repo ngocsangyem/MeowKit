@@ -16,10 +16,7 @@ export class SubagentScanner {
 
 	start(sessionId: string): void {
 		scanSubagentsDir(this.delegate, this.parser, sessionId);
-		this.rescanTimer = setInterval(
-			() => scanSubagentsDir(this.delegate, this.parser, sessionId),
-			SCAN_INTERVAL_MS * 3,
-		);
+		this.rescanTimer = setInterval(() => scanSubagentsDir(this.delegate, this.parser, sessionId), SCAN_INTERVAL_MS * 3);
 		if (typeof this.rescanTimer.unref === "function") this.rescanTimer.unref();
 	}
 

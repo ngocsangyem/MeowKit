@@ -16,10 +16,7 @@ import type { SubagentState, ToolUseBlock, ToolResultBlock } from "./protocol.js
 import { ORCHESTRATOR_NAME, POLL_FALLBACK_MS } from "./constants.js";
 import { readNewFileLines } from "./fs-utils.js";
 import { TranscriptParser } from "./parser/index.js";
-import {
-	handlePermissionDetection,
-	type PermissionDetectionDelegate,
-} from "./permission-detection.js";
+import { handlePermissionDetection, type PermissionDetectionDelegate } from "./permission-detection.js";
 import { _getPauseRecord } from "./parser/handle-system.js";
 import { resolveNameFromMeta } from "./subagent-meta.js";
 import { createLogger } from "./logger.js";
@@ -32,11 +29,7 @@ export interface SubagentWatcherDelegate extends PermissionDetectionDelegate {
 	resetInactivityTimer(sessionId: string): void;
 }
 
-export function scanSubagentsDir(
-	delegate: SubagentWatcherDelegate,
-	parser: TranscriptParser,
-	sessionId: string,
-): void {
+export function scanSubagentsDir(delegate: SubagentWatcherDelegate, parser: TranscriptParser, sessionId: string): void {
 	const session = delegate.getSession(sessionId);
 	if (!session || !session.subagentsDir) return;
 
@@ -125,8 +118,7 @@ function startWatchingSubagentFile(
 		log.debug("Subagent initial read failed:", err);
 	}
 
-	const alreadySpawnedById =
-		spawnToolUseId !== undefined && session.spawnedToolUseIds.has(spawnToolUseId);
+	const alreadySpawnedById = spawnToolUseId !== undefined && session.spawnedToolUseIds.has(spawnToolUseId);
 	const alreadySpawnedByName = session.spawnedSubagents.has(agentName);
 	const alreadySpawned = alreadySpawnedById || alreadySpawnedByName;
 	state.spawnEmitted = pendingToolUseIds.size > 0 || alreadySpawned;
@@ -137,17 +129,12 @@ function startWatchingSubagentFile(
 	}
 
 	try {
-		state.watcher = fs.watch(filePath, () =>
-			readSubagentNewLines(delegate, parser, filePath, sessionId),
-		);
+		state.watcher = fs.watch(filePath, () => readSubagentNewLines(delegate, parser, filePath, sessionId));
 	} catch (err) {
 		log.debug("Subagent file watch failed:", err);
 	}
 	// Poll fallback per red-team #11 (macOS fs.watch unreliable).
-	const poll = setInterval(
-		() => readSubagentNewLines(delegate, parser, filePath, sessionId),
-		POLL_FALLBACK_MS,
-	);
+	const poll = setInterval(() => readSubagentNewLines(delegate, parser, filePath, sessionId), POLL_FALLBACK_MS);
 	if (typeof poll.unref === "function") poll.unref();
 }
 
@@ -174,8 +161,7 @@ export function readSubagentNewLines(
 	if (!state.spawnEmitted) {
 		state.spawnEmitted = true;
 		const alreadySpawnedById =
-			state.spawnToolUseId !== undefined &&
-			session.spawnedToolUseIds.has(state.spawnToolUseId);
+			state.spawnToolUseId !== undefined && session.spawnedToolUseIds.has(state.spawnToolUseId);
 		const alreadySpawnedByName = session.spawnedSubagents.has(state.agentName);
 		if (!alreadySpawnedById && !alreadySpawnedByName) {
 			session.spawnedSubagents.add(state.agentName);
@@ -185,13 +171,7 @@ export function readSubagentNewLines(
 	}
 
 	for (const line of result.lines) {
-		parser.processTranscriptLine(
-			line,
-			state.agentName,
-			state.pendingToolCalls,
-			state.seenToolUseIds,
-			sessionId,
-		);
+		parser.processTranscriptLine(line, state.agentName, state.pendingToolCalls, state.seenToolUseIds, sessionId);
 	}
 
 	handlePermissionDetection(
@@ -206,4 +186,3 @@ export function readSubagentNewLines(
 	);
 	delegate.resetInactivityTimer(sessionId);
 }
-

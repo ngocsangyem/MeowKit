@@ -37,9 +37,7 @@ export function redactedThinkingSignature(block: unknown): string | null {
 }
 
 export function thinkingHashKey(entryUuid: string | undefined, fallbackSource: string): string {
-	return entryUuid
-		? `thinking:${entryUuid}`
-		: `thinking:${fallbackSource.slice(0, HASH_PREFIX_MAX)}`;
+	return entryUuid ? `thinking:${entryUuid}` : `thinking:${fallbackSource.slice(0, HASH_PREFIX_MAX)}`;
 }
 
 export function isSystemInjectedContent(text: string): boolean {

@@ -85,11 +85,7 @@ export type PlanProvider = (slug?: string) => PlanSnapshot;
  *   snapshot.error === "not-found"      → 404
  *   no error                            → 200
  */
-export function handlePlan(
-	res: ServerResponse,
-	provider: PlanProvider,
-	query: URLSearchParams,
-): void {
+export function handlePlan(res: ServerResponse, provider: PlanProvider, query: URLSearchParams): void {
 	try {
 		const slug = query.get("slug") ?? undefined;
 		const snapshot = provider(slug);

@@ -5,21 +5,29 @@ describe("resolveMigrationScope", () => {
 	it("default: all six types enabled", () => {
 		const scope = resolveMigrationScope([], {});
 		expect(scope).toEqual({
-			agents: true, commands: true, skills: true, config: true, rules: true, hooks: true,
+			agents: true,
+			commands: true,
+			skills: true,
+			config: true,
+			rules: true,
+			hooks: true,
 		});
 	});
 
 	it("--only=skills,hooks narrows scope", () => {
 		const scope = resolveMigrationScope([], { only: "skills,hooks" });
 		expect(scope).toEqual({
-			agents: false, commands: false, skills: true, config: false, rules: false, hooks: true,
+			agents: false,
+			commands: false,
+			skills: true,
+			config: false,
+			rules: false,
+			hooks: true,
 		});
 	});
 
 	it("--only conflicts with --skip-config", () => {
-		expect(() =>
-			resolveMigrationScope([], { only: "skills", skipConfig: true }),
-		).toThrow(/mutually exclusive/);
+		expect(() => resolveMigrationScope([], { only: "skills", skipConfig: true })).toThrow(/mutually exclusive/);
 	});
 
 	it("--skip-config excludes config only", () => {
@@ -36,7 +44,12 @@ describe("resolveMigrationScope", () => {
 	it("positive --config flag: only-mode enables only config", () => {
 		const scope = resolveMigrationScope(["--config"], {});
 		expect(scope).toEqual({
-			agents: false, commands: false, skills: false, config: true, rules: false, hooks: false,
+			agents: false,
+			commands: false,
+			skills: false,
+			config: true,
+			rules: false,
+			hooks: false,
 		});
 	});
 

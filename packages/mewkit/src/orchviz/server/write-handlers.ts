@@ -64,8 +64,15 @@ export async function handleTodoWrite(
 	res: ServerResponse,
 	ctx: WriteHandlerContext,
 ): Promise<void> {
-	if (isOrchvizReadonly()) { writeJson(res, 405, { error: "readonly" }); return; }
-	if (req.method !== "POST") { res.writeHead(405, { Allow: "POST" }); res.end(); return; }
+	if (isOrchvizReadonly()) {
+		writeJson(res, 405, { error: "readonly" });
+		return;
+	}
+	if (req.method !== "POST") {
+		res.writeHead(405, { Allow: "POST" });
+		res.end();
+		return;
+	}
 
 	const origin = req.headers["origin"] ?? "";
 	if (!isOriginAllowed(origin, ctx.port)) {
@@ -75,22 +82,34 @@ export async function handleTodoWrite(
 	}
 
 	const ct = req.headers["content-type"] ?? "";
-	if (!ct.toLowerCase().includes("application/json")) { writeJson(res, 415, { error: "unsupported-media-type" }); return; }
+	if (!ct.toLowerCase().includes("application/json")) {
+		writeJson(res, 415, { error: "unsupported-media-type" });
+		return;
+	}
 
 	let rawBuf: Buffer;
 	try {
 		rawBuf = await bufferBody(req, BODY_CAP, reqTimeout());
 	} catch (err) {
-		writeJson(res, err instanceof BodyError ? err.status : 400, { error: err instanceof BodyError ? err.tag : "body-read-error" });
+		writeJson(res, err instanceof BodyError ? err.status : 400, {
+			error: err instanceof BodyError ? err.tag : "body-read-error",
+		});
 		return;
 	}
 
 	let parsed: unknown;
-	try { parsed = JSON.parse(rawBuf.toString("utf-8")); }
-	catch { writeJson(res, 400, { error: "invalid-json" }); return; }
+	try {
+		parsed = JSON.parse(rawBuf.toString("utf-8"));
+	} catch {
+		writeJson(res, 400, { error: "invalid-json" });
+		return;
+	}
 
 	const validated = TodoWriteRequest.safeParse(parsed);
-	if (!validated.success) { writeJson(res, 400, { error: "validation-failed", details: validated.error.issues }); return; }
+	if (!validated.success) {
+		writeJson(res, 400, { error: "validation-failed", details: validated.error.issues });
+		return;
+	}
 	const body: TodoWriteRequestType = validated.data;
 
 	if (!SLUG_RE.test(body.slug)) {
@@ -112,13 +131,20 @@ export async function handleTodoWrite(
 	const { resolvedPlanDir } = boundary;
 
 	// R2-13: orphan cleanup on first write per slug
-	if (!cleanedSlugs.has(body.slug)) { cleanedSlugs.add(body.slug); cleanOrphanedTmps(resolvedPlanDir); }
+	if (!cleanedSlugs.has(body.slug)) {
+		cleanedSlugs.add(body.slug);
+		cleanOrphanedTmps(resolvedPlanDir);
+	}
 
 	// 9. Phase glob — zero-pad regex (R2-1 CRITICAL)
 	const phaseRe = buildPhaseNumberRe(body.phase);
 	let dirEntries: string[];
-	try { dirEntries = fs.readdirSync(resolvedPlanDir); }
-	catch { writeJson(res, 404, { error: "plan-not-found" }); return; }
+	try {
+		dirEntries = fs.readdirSync(resolvedPlanDir);
+	} catch {
+		writeJson(res, 404, { error: "plan-not-found" });
+		return;
+	}
 
 	const matches = dirEntries.filter((n) => !n.startsWith(".") && phaseRe.test(n));
 	if (matches.length !== 1) {
@@ -137,8 +163,12 @@ export async function handleTodoWrite(
 
 	// 12-14. Single read; derive ETag from buffer (avoids second readFileSync)
 	let fileBuf: Buffer;
-	try { fileBuf = fs.readFileSync(resolvedPhaseFile); }
-	catch { writeJson(res, 500, { error: "file-read-failed" }); return; }
+	try {
+		fileBuf = fs.readFileSync(resolvedPhaseFile);
+	} catch {
+		writeJson(res, 500, { error: "file-read-failed" });
+		return;
+	}
 
 	const currentEtag = crypto.createHash("sha256").update(fileBuf).digest("hex");
 	if (currentEtag !== body.etag) {
@@ -149,7 +179,13 @@ export async function handleTodoWrite(
 
 	const result = applyTodoToggle(fileBuf.toString("utf-8"), body.todoIdx, body.checked);
 	if ("error" in result) {
-		log.warn("toggle-error", { slug: body.slug, phase: body.phase, todoIdx: body.todoIdx, errorTag: result.error, httpStatus: 400 });
+		log.warn("toggle-error", {
+			slug: body.slug,
+			phase: body.phase,
+			todoIdx: body.todoIdx,
+			errorTag: result.error,
+			httpStatus: 400,
+		});
 		writeJson(res, 400, { error: result.error });
 		return;
 	}
@@ -162,12 +198,22 @@ export async function handleTodoWrite(
 	}
 
 	// 16. Atomic write
-	try { atomicWriteFileSync(resolvedPhaseFile, result.content); }
-	catch { writeJson(res, 500, { error: "write-failed" }); return; }
+	try {
+		atomicWriteFileSync(resolvedPhaseFile, result.content);
+	} catch {
+		writeJson(res, 500, { error: "write-failed" });
+		return;
+	}
 
 	// 17-18. New etag (hash the just-written content directly, no re-read) + invalidate + respond
 	const newEtag = crypto.createHash("sha256").update(result.content).digest("hex");
 	ctx.planCollector?.invalidate();
-	log.debug("write-success", { slug: body.slug, phase: body.phase, todoIdx: body.todoIdx, changed: true, httpStatus: 200 });
+	log.debug("write-success", {
+		slug: body.slug,
+		phase: body.phase,
+		todoIdx: body.todoIdx,
+		changed: true,
+		httpStatus: 200,
+	});
 	writeJson(res, 200, { ok: true, changed: true, etag: newEtag });
 }

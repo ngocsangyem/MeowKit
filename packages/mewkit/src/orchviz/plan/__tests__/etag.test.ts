@@ -81,9 +81,7 @@ describe("computeAllPhaseEtags", () => {
 
 		const result = computeAllPhaseEtags(dir);
 
-		expect(Object.keys(result).map(Number)).toEqual(
-			expect.arrayContaining([1, 2, 10]),
-		);
+		expect(Object.keys(result).map(Number)).toEqual(expect.arrayContaining([1, 2, 10]));
 		expect(result[1]).toHaveLength(64);
 		expect(result[2]).toHaveLength(64);
 		expect(result[10]).toHaveLength(64);

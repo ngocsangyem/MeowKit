@@ -169,10 +169,7 @@ describe("listPlans", () => {
 		// Create a symlink that points to a temp dir outside the boundary
 		const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), "outside-boundary-"));
 		// Write a valid plan.md in outside dir so it would pass other checks
-		fs.writeFileSync(
-			path.join(outsideDir, "plan.md"),
-			"---\ntitle: Sneaky\nstatus: active\n---\n",
-		);
+		fs.writeFileSync(path.join(outsideDir, "plan.md"), "---\ntitle: Sneaky\nstatus: active\n---\n");
 		const symlinkPath = path.join(plansDir, "evil-symlink");
 		try {
 			fs.symlinkSync(outsideDir, symlinkPath);

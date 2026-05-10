@@ -36,9 +36,7 @@ export const DEFAULT_PROVIDER_MODEL_MAP: Record<string, Record<ModelTier, Resolv
 
 let userOverrides: Record<string, Record<string, ResolvedModel>> | undefined;
 
-export function setTaxonomyOverrides(
-	overrides: Record<string, Record<string, ResolvedModel>> | undefined,
-): void {
+export function setTaxonomyOverrides(overrides: Record<string, Record<string, ResolvedModel>> | undefined): void {
 	userOverrides = overrides;
 }
 
@@ -50,10 +48,7 @@ export function getOpenCodeDefaultModelOverride(): string | undefined {
 	return userOverrides?.opencode?.default?.model;
 }
 
-export function resolveModel(
-	sourceModel: string | undefined,
-	targetProvider: string,
-): ModelResolveResult {
+export function resolveModel(sourceModel: string | undefined, targetProvider: string): ModelResolveResult {
 	if (sourceModel === undefined || sourceModel === null) return { resolved: null };
 	if (typeof sourceModel !== "string") {
 		return {

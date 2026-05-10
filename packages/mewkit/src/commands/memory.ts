@@ -27,9 +27,7 @@ export function findMemoryDir(startDir?: string): string | null {
 			return candidate;
 		}
 		// Stop if we've reached a project root (has CLAUDE.md or .claude/settings.json)
-		const atRoot = PROJECT_ROOT_SENTINELS.some((s) =>
-			fs.existsSync(path.join(current, s)),
-		);
+		const atRoot = PROJECT_ROOT_SENTINELS.some((s) => fs.existsSync(path.join(current, s)));
 		// Sentinel must fire at depth 0 too. If CWD has CLAUDE.md but no memory
 		// dir, the walk must STOP here — not continue into the parent project.
 		if (atRoot) return null;
@@ -176,9 +174,7 @@ function showStats(memoryDir: string): void {
 
 	// Check file modification time as fallback for last updated
 	if (lastUpdated === "unknown") {
-		const files = SPLIT_FILES.map(({ file }) => path.join(memoryDir, file)).filter((f) =>
-			fs.existsSync(f),
-		);
+		const files = SPLIT_FILES.map(({ file }) => path.join(memoryDir, file)).filter((f) => fs.existsSync(f));
 		for (const file of files) {
 			const stat = fs.statSync(file);
 			const mtime = stat.mtime.toISOString();

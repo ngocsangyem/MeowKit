@@ -44,8 +44,6 @@ export function displayDiff(diff: string, options: { color: boolean; maxLines?: 
 
 	if (lines.length > preview.length) {
 		const hiddenCount = lines.length - preview.length;
-		console.log(
-			`  [i] Diff preview truncated (${hiddenCount} more line(s); showing first ${preview.length})`,
-		);
+		console.log(`  [i] Diff preview truncated (${hiddenCount} more line(s); showing first ${preview.length})`);
 	}
 }

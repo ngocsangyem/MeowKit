@@ -4,7 +4,7 @@
  * Backs up before merge, restores on failure.
  */
 import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { dirname } from "node:path";
 import * as log from "./core-logger.js";
 
 interface HookEntry {

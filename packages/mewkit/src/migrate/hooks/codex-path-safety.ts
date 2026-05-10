@@ -10,9 +10,7 @@ const STALE_LOCK_MS = 60 * 1000;
 export function isPathWithinBoundary(targetPath: string, boundaryPath: string): boolean {
 	const resolvedTarget = resolve(targetPath);
 	const resolvedBoundary = resolve(boundaryPath);
-	return (
-		resolvedTarget === resolvedBoundary || resolvedTarget.startsWith(`${resolvedBoundary}${sep}`)
-	);
+	return resolvedTarget === resolvedBoundary || resolvedTarget.startsWith(`${resolvedBoundary}${sep}`);
 }
 
 async function resolveRealPathSafe(path: string): Promise<string> {
@@ -23,10 +21,7 @@ async function resolveRealPathSafe(path: string): Promise<string> {
 	}
 }
 
-export async function isCanonicalPathWithinBoundary(
-	targetPath: string,
-	boundaryPath: string,
-): Promise<boolean> {
+export async function isCanonicalPathWithinBoundary(targetPath: string, boundaryPath: string): Promise<boolean> {
 	const canonicalTarget = await resolveRealPathSafe(targetPath);
 	const canonicalBoundary = await resolveRealPathSafe(boundaryPath);
 	return isPathWithinBoundary(canonicalTarget, canonicalBoundary);
@@ -63,7 +58,11 @@ async function acquireCodexLock(lockPath: string): Promise<void> {
 			const pid = Number.parseInt(pidStr ?? "", 10);
 			const ts = Number.parseInt(tsStr ?? "", 10);
 			if (!isProcessAlive(pid) || (Number.isFinite(ts) && Date.now() - ts > STALE_LOCK_MS)) {
-				try { await unlink(lockPath); } catch { /* race */ }
+				try {
+					await unlink(lockPath);
+				} catch {
+					/* race */
+				}
 				continue;
 			}
 		} catch {
@@ -85,10 +84,7 @@ async function releaseCodexLock(lockPath: string): Promise<void> {
 	}
 }
 
-export async function withCodexTargetLock<T>(
-	targetFilePath: string,
-	operation: () => Promise<T>,
-): Promise<T> {
+export async function withCodexTargetLock<T>(targetFilePath: string, operation: () => Promise<T>): Promise<T> {
 	const resolvedTargetPath = resolve(targetFilePath);
 	const dir = dirname(resolvedTargetPath);
 

@@ -25,7 +25,10 @@ function mapToolsToGroups(toolsStr: string): string[] {
 }
 
 function toSlug(name: string): string {
-	return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+	return name
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-|-$/g, "");
 }
 
 function yamlEscape(str: string): string {

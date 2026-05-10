@@ -46,13 +46,7 @@ describe("handle-system.ts via full parser pipeline", () => {
 		const events: AgentEvent[] = [];
 		const parser = new TranscriptParser(makeDelegate(events));
 
-		parser.processTranscriptLine(
-			STOP_HOOK_SUMMARY_LINE,
-			"orchestrator",
-			new Map(),
-			new Set(),
-			SESSION_ID,
-		);
+		parser.processTranscriptLine(STOP_HOOK_SUMMARY_LINE, "orchestrator", new Map(), new Set(), SESSION_ID);
 
 		// Should have emitted exactly one pause_started event
 		const pauseEvents = events.filter((e) => e.type === "pause_started");
@@ -190,13 +184,7 @@ describe("hook_blocked pause_cleared lifecycle", () => {
 		expect(startPayload.reason).toBe("hook_blocked");
 
 		// Feed assistant text for the SAME agent ("main") — should clear the pause
-		parser.processTranscriptLine(
-			ASSISTANT_TEXT_LINE("main"),
-			"main",
-			new Map(),
-			new Set(),
-			SESSION_ID,
-		);
+		parser.processTranscriptLine(ASSISTANT_TEXT_LINE("main"), "main", new Map(), new Set(), SESSION_ID);
 
 		const pauseCleared = events.filter((e) => e.type === "pause_cleared");
 		expect(pauseCleared).toHaveLength(1);
@@ -221,13 +209,7 @@ describe("hook_blocked pause_cleared lifecycle", () => {
 		expect(events.filter((e) => e.type === "pause_started")).toHaveLength(1);
 
 		// Feed assistant text for a DIFFERENT agent ("researcher-1") — must NOT clear main's pause
-		parser.processTranscriptLine(
-			ASSISTANT_TEXT_LINE("researcher-1"),
-			"researcher-1",
-			new Map(),
-			new Set(),
-			SESSION_ID,
-		);
+		parser.processTranscriptLine(ASSISTANT_TEXT_LINE("researcher-1"), "researcher-1", new Map(), new Set(), SESSION_ID);
 
 		const pauseCleared = events.filter((e) => e.type === "pause_cleared");
 		expect(pauseCleared).toHaveLength(0);
@@ -242,13 +224,7 @@ describe("parser guard fix verification (red-team #5)", () => {
 		const events: AgentEvent[] = [];
 		const parser = new TranscriptParser(makeDelegate(events));
 
-		parser.processTranscriptLine(
-			STOP_HOOK_SUMMARY_LINE,
-			"orchestrator",
-			new Map(),
-			new Set(),
-			SESSION_ID,
-		);
+		parser.processTranscriptLine(STOP_HOOK_SUMMARY_LINE, "orchestrator", new Map(), new Set(), SESSION_ID);
 
 		// The guard fix makes this reachable. Without the fix: 0 events.
 		expect(events.some((e) => e.type === "pause_started")).toBe(true);

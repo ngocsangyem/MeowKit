@@ -1,4 +1,4 @@
-# Migrating from `mk:browse` to `mk:agent-browser`
+# Migrating from the retired browser skill to `mk:agent-browser`
 
 This doc covers the verb-to-verb mapping, copy-paste recipes for capabilities `agent-browser` doesn't ship natively, and a runbook for the developer-machine handoff/auth flow.
 

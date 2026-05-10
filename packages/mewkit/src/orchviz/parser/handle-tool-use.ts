@@ -89,9 +89,7 @@ export function handleToolUse(
 	} else if (toolName === "ExitPlanMode") {
 		// input.plan is observed in real transcripts but undocumented — optional chaining.
 		const rawPlan = (block.input.plan as string | undefined) ?? undefined;
-		const detail: PauseDetail | undefined = rawPlan
-			? { plan: rawPlan.slice(0, PLAN_PREVIEW_MAX) }
-			: undefined;
+		const detail: PauseDetail | undefined = rawPlan ? { plan: rawPlan.slice(0, PLAN_PREVIEW_MAX) } : undefined;
 		const key = `${sessionId ?? ""}:${agentName}`;
 		_getPauseRecord(parser).set(key, {
 			reason: "plan_mode_review",
@@ -119,9 +117,7 @@ export function handleToolUse(
  * Build PauseDetail.questions from the already-extracted inputData for AskUserQuestion.
  * Validates per docs: 1-4 questions, 2-4 options each (best-effort; logs warning if violated).
  */
-function _buildAskUserQuestionDetail(
-	inputData: Record<string, unknown> | undefined,
-): PauseDetail | undefined {
+function _buildAskUserQuestionDetail(inputData: Record<string, unknown> | undefined): PauseDetail | undefined {
 	if (!inputData) return undefined;
 	const rawQs = inputData.questions as
 		| Array<{ question?: string; header?: string; options?: string[]; multiSelect?: boolean }>

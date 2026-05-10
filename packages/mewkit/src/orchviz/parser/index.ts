@@ -35,11 +35,7 @@ export interface TranscriptParserDelegate {
 	emit(event: AgentEvent, sessionId?: string): void;
 	elapsed(sessionId?: string): number;
 	getSession(sessionId: string): WatchedSession | undefined;
-	fireSessionLifecycle(event: {
-		type: "started" | "ended" | "updated";
-		sessionId: string;
-		label: string;
-	}): void;
+	fireSessionLifecycle(event: { type: "started" | "ended" | "updated"; sessionId: string; label: string }): void;
 	emitContextUpdate(agentName: string, session: WatchedSession, sessionId?: string): void;
 }
 
@@ -127,9 +123,7 @@ export class TranscriptParser {
 			if (role === "user" || role === "human") {
 				const text = msg.content.trim();
 				if (!isSystemInjectedContent(text)) {
-					const hash = entry.uuid
-						? `user:${entry.uuid}`
-						: `user:${text.slice(0, HASH_PREFIX_MAX)}`;
+					const hash = entry.uuid ? `user:${entry.uuid}` : `user:${text.slice(0, HASH_PREFIX_MAX)}`;
 					if (!seenMsgs?.has(hash)) {
 						if (seenMsgs) {
 							seenMsgs.add(hash);

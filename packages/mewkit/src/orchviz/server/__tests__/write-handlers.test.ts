@@ -110,7 +110,9 @@ function rawRequest(opts: {
 			}
 			let body = "";
 			res.setEncoding("utf-8");
-			res.on("data", (chunk: string) => { body += chunk; });
+			res.on("data", (chunk: string) => {
+				body += chunk;
+			});
 			res.on("end", () => resolve({ status: res.statusCode ?? 0, headers: resHeaders, body }));
 			res.on("error", reject);
 		});
@@ -120,17 +122,14 @@ function rawRequest(opts: {
 	});
 }
 
-function postTodo(
-	body: unknown,
-	extraHeaders: Record<string, string> = {},
-): Promise<RawResponse> {
+function postTodo(body: unknown, extraHeaders: Record<string, string> = {}): Promise<RawResponse> {
 	const bodyStr = JSON.stringify(body);
 	return rawRequest({
 		method: "POST",
 		path: "/api/plan/todo",
 		headers: {
 			"Content-Type": "application/json",
-			"Origin": `http://127.0.0.1:${serverPort}`,
+			Origin: `http://127.0.0.1:${serverPort}`,
 			...extraHeaders,
 		},
 		body: bodyStr,
@@ -223,7 +222,7 @@ describe("POST /api/plan/todo", () => {
 
 	it("4. 403 disallowed Origin header", async () => {
 		const r = await postTodo(validBody(phaseFile), {
-			"Origin": "http://evil.example.com",
+			Origin: "http://evil.example.com",
 		});
 		expect(r.status).toBe(403);
 	});
@@ -275,7 +274,7 @@ describe("POST /api/plan/todo", () => {
 					headers: {
 						Host: `${u.hostname}:${u.port}`,
 						"Content-Type": "application/json",
-						"Origin": `http://127.0.0.1:${serverPort}`,
+						Origin: `http://127.0.0.1:${serverPort}`,
 						"Content-Length": String(Buffer.byteLength(bodyStr)),
 					},
 				},
@@ -306,7 +305,7 @@ describe("POST /api/plan/todo", () => {
 			path: "/api/plan/todo",
 			headers: {
 				"Content-Type": "text/plain",
-				"Origin": `http://127.0.0.1:${serverPort}`,
+				Origin: `http://127.0.0.1:${serverPort}`,
 			},
 			body: JSON.stringify(validBody(phaseFile)),
 		});
@@ -319,7 +318,7 @@ describe("POST /api/plan/todo", () => {
 			path: "/api/plan/todo",
 			headers: {
 				"Content-Type": "application/json",
-				"Origin": `http://127.0.0.1:${serverPort}`,
+				Origin: `http://127.0.0.1:${serverPort}`,
 			},
 			body: "not valid json {",
 		});
@@ -373,7 +372,7 @@ describe("OPTIONS /api/plan/todo", () => {
 			method: "OPTIONS",
 			path: "/api/plan/todo",
 			headers: {
-				"Origin": `http://127.0.0.1:${serverPort}`,
+				Origin: `http://127.0.0.1:${serverPort}`,
 				"Access-Control-Request-Method": "POST",
 			},
 		});
@@ -387,7 +386,7 @@ describe("OPTIONS /api/plan/todo", () => {
 			method: "OPTIONS",
 			path: "/api/plan/todo",
 			headers: {
-				"Origin": "http://evil.example.com",
+				Origin: "http://evil.example.com",
 				"Access-Control-Request-Method": "POST",
 			},
 		});

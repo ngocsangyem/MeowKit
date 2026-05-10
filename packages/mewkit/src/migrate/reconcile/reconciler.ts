@@ -5,12 +5,7 @@
 // ported verbatim. Reconciler stays pure (no fs, no path I/O).
 import path from "node:path";
 import type { PortableInstallationV3 } from "./portable-registry.js";
-import {
-	UNKNOWN_CHECKSUM,
-	getReasonCopy,
-	isUnknownChecksum,
-	normalizeChecksum,
-} from "./reconcile-types.js";
+import { UNKNOWN_CHECKSUM, getReasonCopy, isUnknownChecksum, normalizeChecksum } from "./reconcile-types.js";
 import type {
 	ReconcileAction,
 	ReconcileBanner,
@@ -53,9 +48,7 @@ function makeDirStateKey(provider: string, type: ReconcileAction["type"], global
 	return JSON.stringify([provider, type, global]);
 }
 
-function dedupeProviderConfigs(
-	providerConfigs: ReconcileProviderInput[],
-): ReconcileProviderInput[] {
+function dedupeProviderConfigs(providerConfigs: ReconcileProviderInput[]): ReconcileProviderInput[] {
 	const seen = new Set<string>();
 	const unique: ReconcileProviderInput[] = [];
 	for (const config of providerConfigs) {
@@ -67,9 +60,7 @@ function dedupeProviderConfigs(
 	return unique;
 }
 
-function buildTargetStateIndex(
-	targetStates: Map<string, TargetFileState>,
-): Map<string, TargetFileState> {
+function buildTargetStateIndex(targetStates: Map<string, TargetFileState>): Map<string, TargetFileState> {
 	const index = new Map<string, TargetFileState>();
 	for (const [mapPath, state] of targetStates) {
 		const normalizedMapPath = normalizePortablePath(mapPath);
@@ -103,9 +94,7 @@ function getManagedSectionKind(type: ReconcileAction["type"]): "agent" | "rule" 
 }
 
 function getExpectedTargetChecksum(source: SourceItemState, provider: string): string {
-	return normalizeChecksum(
-		source.targetChecksums?.[provider] ?? source.convertedChecksums[provider],
-	);
+	return normalizeChecksum(source.targetChecksums?.[provider] ?? source.convertedChecksums[provider]);
 }
 
 function getCurrentTargetChecksum(
@@ -147,7 +136,11 @@ function dedupeActions(actions: ReconcileAction[]): ReconcileAction[] {
 	const deduped: ReconcileAction[] = [];
 	for (const action of actions) {
 		const key = JSON.stringify([
-			action.action, action.item, action.type, action.provider, action.global,
+			action.action,
+			action.item,
+			action.type,
+			action.provider,
+			action.global,
 			normalizePortablePath(action.targetPath),
 		]);
 		if (seen.has(key)) continue;
@@ -219,15 +212,21 @@ function applyEmptyDirOverride(
 		if (respectDeletions) {
 			banners.push({
 				kind: "empty-dir-respected",
-				provider: dirState.provider, type: dirState.type, global: dirState.global,
-				path: dirState.path, itemCount: count,
+				provider: dirState.provider,
+				type: dirState.type,
+				global: dirState.global,
+				path: dirState.path,
+				itemCount: count,
 				message: `Detected empty ${dirState.path} — respecting your deletions (${count} items skipped).`,
 			});
 		} else {
 			banners.push({
 				kind: "empty-dir",
-				provider: dirState.provider, type: dirState.type, global: dirState.global,
-				path: dirState.path, itemCount: count,
+				provider: dirState.provider,
+				type: dirState.type,
+				global: dirState.global,
+				path: dirState.path,
+				itemCount: count,
 				message: `Detected empty ${dirState.path} — ${count} item${count === 1 ? "" : "s"} will be reinstalled. Uncheck any to skip.`,
 			});
 		}
@@ -244,9 +243,7 @@ export function reconcile(input: ReconcileInput): ReconcilePlan {
 
 	for (const sourceItem of input.sourceItems) {
 		for (const providerConfig of uniqueProviderConfigs) {
-			actions.push(
-				determineAction(sourceItem, providerConfig, input, targetStateIndex, deletedIdentityKeys),
-			);
+			actions.push(determineAction(sourceItem, providerConfig, input, targetStateIndex, deletedIdentityKeys));
 		}
 	}
 
@@ -255,9 +252,7 @@ export function reconcile(input: ReconcileInput): ReconcilePlan {
 	const normalizedActions = suppressOverlappingActions(dedupeActions(actions));
 	const dirStates = input.typeDirectoryStates ?? [];
 	const respectDeletions = input.respectDeletions ?? false;
-	const { actions: finalActions, banners } = applyEmptyDirOverride(
-		normalizedActions, dirStates, respectDeletions,
-	);
+	const { actions: finalActions, banners } = applyEmptyDirOverride(normalizedActions, dirStates, respectDeletions);
 
 	return buildPlan(finalActions, banners);
 }
@@ -271,8 +266,10 @@ function determineAction(
 ): ReconcileAction {
 	let registryEntry = findRegistryEntry(source, providerConfig, input.registry);
 	const identityKey = makeRegistryIdentityKey({
-		item: source.item, type: source.type,
-		provider: providerConfig.provider, global: providerConfig.global,
+		item: source.item,
+		type: source.type,
+		provider: providerConfig.provider,
+		global: providerConfig.global,
 	});
 	if (registryEntry && deletedIdentityKeys.has(identityKey)) registryEntry = null;
 
@@ -296,9 +293,11 @@ function determineAction(
 			common.targetPath = registryEntry.path;
 			const code: ReconcileReason = "provider-checksum-unavailable";
 			return {
-				...common, action: "skip",
+				...common,
+				action: "skip",
 				reason: "Provider checksum unavailable — cannot verify safely",
-				reasonCode: code, reasonCopy: getReasonCopy(code),
+				reasonCode: code,
+				reasonCopy: getReasonCopy(code),
 				sourceChecksum: UNKNOWN_CHECKSUM,
 				registeredSourceChecksum: normalizeChecksum(registryEntry.sourceChecksum),
 				registeredTargetChecksum: normalizeChecksum(registryEntry.targetChecksum),
@@ -310,9 +309,11 @@ function determineAction(
 		);
 		const code: ReconcileReason = itemExistsElsewhere ? "new-provider-for-item" : "new-item";
 		return {
-			...common, action: "install",
+			...common,
+			action: "install",
 			reason: itemExistsElsewhere ? "New provider for existing item" : "New item, not previously installed",
-			reasonCode: code, reasonCopy: getReasonCopy(code),
+			reasonCode: code,
+			reasonCopy: getReasonCopy(code),
 			sourceChecksum: UNKNOWN_CHECKSUM,
 		};
 	}
@@ -323,9 +324,11 @@ function determineAction(
 		);
 		const code: ReconcileReason = itemExistsElsewhere ? "new-provider-for-item" : "new-item";
 		return {
-			...common, action: "install",
+			...common,
+			action: "install",
 			reason: itemExistsElsewhere ? "New provider for existing item" : "New item, not previously installed",
-			reasonCode: code, reasonCopy: getReasonCopy(code),
+			reasonCode: code,
+			reasonCopy: getReasonCopy(code),
 			sourceChecksum: convertedChecksum,
 		};
 	}
@@ -344,42 +347,55 @@ function determineAction(
 		if (targetMatchesExpectedOutput) {
 			const code: ReconcileReason = "target-up-to-date-backfill";
 			return {
-				...common, action: "skip",
+				...common,
+				action: "skip",
 				reason: "Target up-to-date after registry upgrade — checksums will be backfilled",
-				reasonCode: code, reasonCopy: getReasonCopy(code),
-				sourceChecksum: convertedChecksum, currentTargetChecksum, backfillRegistry: true,
+				reasonCode: code,
+				reasonCopy: getReasonCopy(code),
+				sourceChecksum: convertedChecksum,
+				currentTargetChecksum,
+				backfillRegistry: true,
 			};
 		}
 		if (!targetState || !targetState.exists) {
 			const code: ReconcileReason = "registry-upgrade-reinstall";
 			return {
-				...common, action: "install",
+				...common,
+				action: "install",
 				reason: "Target deleted — reinstalling after registry upgrade",
-				reasonCode: code, reasonCopy: getReasonCopy(code),
+				reasonCode: code,
+				reasonCopy: getReasonCopy(code),
 				sourceChecksum: convertedChecksum,
 			};
 		}
 		const code: ReconcileReason = "registry-upgrade-heal";
 		return {
-			...common, action: "update",
+			...common,
+			action: "update",
 			reason: "Healing stale target after registry upgrade",
-			reasonCode: code, reasonCopy: getReasonCopy(code),
-			sourceChecksum: convertedChecksum, currentTargetChecksum,
+			reasonCode: code,
+			reasonCopy: getReasonCopy(code),
+			sourceChecksum: convertedChecksum,
+			currentTargetChecksum,
 		};
 	}
 
 	if (
 		targetMatchesExpectedOutput &&
-		(convertedChecksum !== registeredSourceChecksum ||
-			currentTargetChecksum !== registeredTargetChecksum)
+		(convertedChecksum !== registeredSourceChecksum || currentTargetChecksum !== registeredTargetChecksum)
 	) {
 		const code: ReconcileReason = "target-up-to-date-backfill";
 		return {
-			...common, action: "skip",
+			...common,
+			action: "skip",
 			reason: "Target up-to-date — registry checksums will be backfilled",
-			reasonCode: code, reasonCopy: getReasonCopy(code),
-			sourceChecksum: convertedChecksum, registeredSourceChecksum,
-			currentTargetChecksum, registeredTargetChecksum, backfillRegistry: true,
+			reasonCode: code,
+			reasonCopy: getReasonCopy(code),
+			sourceChecksum: convertedChecksum,
+			registeredSourceChecksum,
+			currentTargetChecksum,
+			registeredTargetChecksum,
+			backfillRegistry: true,
 		};
 	}
 
@@ -392,45 +408,55 @@ function determineAction(
 		if (sourceChanged) {
 			const code: ReconcileReason = "target-deleted-source-changed";
 			return {
-				...common, action: "install",
+				...common,
+				action: "install",
 				reason: "Target was deleted, mewkit has updates — reinstalling",
-				reasonCode: code, reasonCopy: getReasonCopy(code),
-				sourceChecksum: convertedChecksum, registeredSourceChecksum,
+				reasonCode: code,
+				reasonCopy: getReasonCopy(code),
+				sourceChecksum: convertedChecksum,
+				registeredSourceChecksum,
 			};
 		}
 
 		if (forceReinstall) {
 			const code: ReconcileReason = "force-reinstall";
 			return {
-				...common, action: "install",
+				...common,
+				action: "install",
 				reason: "Force reinstall (target was deleted)",
-				reasonCode: code, reasonCopy: getReasonCopy(code),
-				sourceChecksum: convertedChecksum, registeredSourceChecksum,
+				reasonCode: code,
+				reasonCopy: getReasonCopy(code),
+				sourceChecksum: convertedChecksum,
+				registeredSourceChecksum,
 			};
 		}
 
 		const code: ReconcileReason = "user-deleted-respected";
 		return {
-			...common, action: "skip",
+			...common,
+			action: "skip",
 			reason: "Target was deleted by user, mewkit unchanged — respecting deletion",
-			reasonCode: code, reasonCopy: getReasonCopy(code),
-			sourceChecksum: convertedChecksum, registeredSourceChecksum,
+			reasonCode: code,
+			reasonCopy: getReasonCopy(code),
+			sourceChecksum: convertedChecksum,
+			registeredSourceChecksum,
 		};
 	}
 
 	if (targetChangeState === "unknown") {
-		const code: ReconcileReason = sourceChanged
-			? "target-state-unknown-source-changed"
-			: "target-state-unknown";
+		const code: ReconcileReason = sourceChanged ? "target-state-unknown-source-changed" : "target-state-unknown";
 		return {
 			...common,
 			action: sourceChanged ? "conflict" : "skip",
 			reason: sourceChanged
 				? "Target state unavailable while mewkit changed — manual review required"
 				: "Target state unavailable, mewkit unchanged — preserving target",
-			reasonCode: code, reasonCopy: getReasonCopy(code),
-			sourceChecksum: convertedChecksum, registeredSourceChecksum,
-			currentTargetChecksum, registeredTargetChecksum,
+			reasonCode: code,
+			reasonCopy: getReasonCopy(code),
+			sourceChecksum: convertedChecksum,
+			registeredSourceChecksum,
+			currentTargetChecksum,
+			registeredTargetChecksum,
 		};
 	}
 
@@ -439,51 +465,70 @@ function determineAction(
 	if (!sourceChanged && !targetChanged) {
 		const code: ReconcileReason = "no-changes";
 		return {
-			...common, action: "skip", reason: "No changes",
-			reasonCode: code, reasonCopy: getReasonCopy(code),
-			sourceChecksum: convertedChecksum, currentTargetChecksum,
+			...common,
+			action: "skip",
+			reason: "No changes",
+			reasonCode: code,
+			reasonCopy: getReasonCopy(code),
+			sourceChecksum: convertedChecksum,
+			currentTargetChecksum,
 		};
 	}
 
 	if (!sourceChanged && targetChanged) {
 		if (input.force) {
 			return {
-				...common, action: "install",
+				...common,
+				action: "install",
 				reason: "Force overwrite (user edits)",
 				reasonCode: "force-overwrite",
 				reasonCopy: getReasonCopy("force-overwrite"),
-				sourceChecksum: convertedChecksum, registeredSourceChecksum,
-				currentTargetChecksum, registeredTargetChecksum,
+				sourceChecksum: convertedChecksum,
+				registeredSourceChecksum,
+				currentTargetChecksum,
+				registeredTargetChecksum,
 			};
 		}
 		const code: ReconcileReason = "user-edits-preserved";
 		return {
-			...common, action: "skip",
+			...common,
+			action: "skip",
 			reason: "User edited, mewkit unchanged — preserving edits",
-			reasonCode: code, reasonCopy: getReasonCopy(code),
-			sourceChecksum: convertedChecksum, registeredSourceChecksum,
-			currentTargetChecksum, registeredTargetChecksum,
+			reasonCode: code,
+			reasonCopy: getReasonCopy(code),
+			sourceChecksum: convertedChecksum,
+			registeredSourceChecksum,
+			currentTargetChecksum,
+			registeredTargetChecksum,
 		};
 	}
 
 	if (sourceChanged && !targetChanged) {
 		const code: ReconcileReason = "source-changed";
 		return {
-			...common, action: "update",
+			...common,
+			action: "update",
 			reason: "mewkit updated, no user edits — safe overwrite",
-			reasonCode: code, reasonCopy: getReasonCopy(code),
-			sourceChecksum: convertedChecksum, registeredSourceChecksum,
-			currentTargetChecksum, registeredTargetChecksum,
+			reasonCode: code,
+			reasonCopy: getReasonCopy(code),
+			sourceChecksum: convertedChecksum,
+			registeredSourceChecksum,
+			currentTargetChecksum,
+			registeredTargetChecksum,
 		};
 	}
 
 	const code: ReconcileReason = "both-changed";
 	return {
-		...common, action: "conflict",
+		...common,
+		action: "conflict",
 		reason: "Both mewkit and user modified this item",
-		reasonCode: code, reasonCopy: getReasonCopy(code),
-		sourceChecksum: convertedChecksum, registeredSourceChecksum,
-		currentTargetChecksum, registeredTargetChecksum,
+		reasonCode: code,
+		reasonCopy: getReasonCopy(code),
+		sourceChecksum: convertedChecksum,
+		registeredSourceChecksum,
+		currentTargetChecksum,
+		registeredTargetChecksum,
 	};
 }
 
@@ -505,10 +550,7 @@ function findRegistryEntry(
 	if (source.type === "config") {
 		return (
 			registry.installations.find(
-				(i) =>
-					i.type === "config" &&
-					i.provider === providerConfig.provider &&
-					i.global === providerConfig.global,
+				(i) => i.type === "config" && i.provider === providerConfig.provider && i.global === providerConfig.global,
 			) || null
 		);
 	}
@@ -519,9 +561,7 @@ function findRegistryEntry(
 function detectOrphans(input: ReconcileInput): ReconcileAction[] {
 	const actions: ReconcileAction[] = [];
 	const sourceItemKeys = new Set(input.sourceItems.map((s) => makeItemTypeKey(s.item, s.type)));
-	const activeProviderKeys = new Set(
-		input.providerConfigs.map((p) => makeProviderConfigKey(p.provider, p.global)),
-	);
+	const activeProviderKeys = new Set(input.providerConfigs.map((p) => makeProviderConfigKey(p.provider, p.global)));
 	const hasConfigSource = input.sourceItems.some((s) => s.type === "config");
 
 	for (const entry of input.registry.installations) {
@@ -537,10 +577,14 @@ function detectOrphans(input: ReconcileInput): ReconcileAction[] {
 			const code: ReconcileReason = "source-removed-orphan";
 			actions.push({
 				action: "delete",
-				item: entry.item, type: entry.type, provider: entry.provider, global: entry.global,
+				item: entry.item,
+				type: entry.type,
+				provider: entry.provider,
+				global: entry.global,
 				targetPath: entry.path,
 				reason: "Item no longer in mewkit source — orphaned",
-				reasonCode: code, reasonCopy: getReasonCopy(code),
+				reasonCode: code,
+				reasonCopy: getReasonCopy(code),
 			});
 		}
 	}

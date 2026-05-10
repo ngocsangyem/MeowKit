@@ -51,10 +51,7 @@ export function scanCandidateDirs(workspace: string): string[] {
 }
 
 /** Find active sessions for a workspace (mtime within ageSeconds). */
-export function findActiveSessions(
-	workspace: string,
-	ageSeconds: number = ACTIVE_SESSION_AGE_S,
-): SessionFile[] {
+export function findActiveSessions(workspace: string, ageSeconds: number = ACTIVE_SESSION_AGE_S): SessionFile[] {
 	const out: SessionFile[] = [];
 	const now = Date.now();
 

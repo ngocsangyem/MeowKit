@@ -6,10 +6,13 @@
  * cache for their own deterministic Path2Ds.
  */
 
-const _path2dCache = new Map<string, Path2D>()
+const _path2dCache = new Map<string, Path2D>();
 
 export function getCachedPath2D(key: string, build: () => Path2D): Path2D {
-  let p = _path2dCache.get(key)
-  if (!p) { p = build(); _path2dCache.set(key, p) }
-  return p
+	let p = _path2dCache.get(key);
+	if (!p) {
+		p = build();
+		_path2dCache.set(key, p);
+	}
+	return p;
 }

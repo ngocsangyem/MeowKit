@@ -86,10 +86,7 @@ function bodyStartsWithHeading(body: string): boolean {
 	return /^#{1,6}\s+/.test(body.trimStart());
 }
 
-export function convertMdToKiroSteering(
-	item: PortableItem,
-	provider: ProviderType,
-): ConversionResult {
+export function convertMdToKiroSteering(item: PortableItem, provider: ProviderType): ConversionResult {
 	const warnings: string[] = [];
 
 	if (item.type === "agent") warnings.push(...checkUnsupportedFields(item));

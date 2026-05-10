@@ -28,14 +28,15 @@ const VALID_PLAN_STATUSES = new Set<PlanStatus>([
 
 function normalizePlanStatus(raw: unknown): PlanStatus {
 	if (typeof raw !== "string") return "unknown";
-	const lower = raw.toLowerCase().replace(/[-\s]+/g, "_").trim();
+	const lower = raw
+		.toLowerCase()
+		.replace(/[-\s]+/g, "_")
+		.trim();
 	if (VALID_PLAN_STATUSES.has(lower as PlanStatus)) return lower as PlanStatus;
 	return "unknown";
 }
 
-function parsePlanFrontmatter(
-	planFile: string,
-): {
+function parsePlanFrontmatter(planFile: string): {
 	title: string;
 	status: PlanStatus;
 	created: string;
@@ -65,17 +66,9 @@ function parsePlanFrontmatter(
 	const status = normalizePlanStatus(obj.status);
 	const title = typeof obj.title === "string" ? obj.title : slug;
 	const created =
-		typeof obj.created === "string"
-			? obj.created
-			: typeof obj.created === "number"
-				? String(obj.created)
-				: "";
+		typeof obj.created === "string" ? obj.created : typeof obj.created === "number" ? String(obj.created) : "";
 	const effort =
-		typeof obj.effort === "string"
-			? obj.effort
-			: typeof obj.effort === "number"
-				? String(obj.effort)
-				: "?";
+		typeof obj.effort === "string" ? obj.effort : typeof obj.effort === "number" ? String(obj.effort) : "?";
 	return { title, status, created, effort };
 }
 

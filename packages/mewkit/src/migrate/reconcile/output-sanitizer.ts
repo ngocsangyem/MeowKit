@@ -31,17 +31,10 @@ function stripControlChars(value: string): string {
 }
 
 export function sanitizeTerminalText(value: string): string {
-	const withoutEscapes = value
-		.replace(CSI_RE, "")
-		.replace(OSC_RE, "")
-		.replace(DCS_RE, "")
-		.replace(ESC_SINGLE_RE, "");
+	const withoutEscapes = value.replace(CSI_RE, "").replace(OSC_RE, "").replace(DCS_RE, "").replace(ESC_SINGLE_RE, "");
 	return stripControlChars(withoutEscapes);
 }
 
 export function sanitizeSingleLineTerminalText(value: string): string {
-	return sanitizeTerminalText(value)
-		.replace(SINGLE_LINE_BREAK_RE, " ")
-		.replace(MULTI_SPACE_RE, " ")
-		.trim();
+	return sanitizeTerminalText(value).replace(SINGLE_LINE_BREAK_RE, " ").replace(MULTI_SPACE_RE, " ").trim();
 }

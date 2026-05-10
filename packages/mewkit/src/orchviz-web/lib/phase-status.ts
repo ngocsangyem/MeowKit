@@ -16,14 +16,7 @@
 
 import type { PlanData } from "@/hooks/use-active-plan";
 
-export type CanonicalPhaseId =
-	| "orient"
-	| "plan"
-	| "test"
-	| "build"
-	| "review"
-	| "ship"
-	| "reflect";
+export type CanonicalPhaseId = "orient" | "plan" | "test" | "build" | "review" | "ship" | "reflect";
 
 export const CANONICAL_PHASES: ReadonlyArray<{ id: CanonicalPhaseId; label: string }> = [
 	{ id: "orient", label: "Orient" },
@@ -53,10 +46,7 @@ export interface GateContext {
  * Heuristic: gates establish lower-bound completion; project-plan in_progress
  * lights "build" by default (most plans are in build phase when active).
  */
-export function derivePhaseStatuses(
-	plan: PlanData | null,
-	gates: GateContext,
-): CanonicalPhaseState[] {
+export function derivePhaseStatuses(plan: PlanData | null, gates: GateContext): CanonicalPhaseState[] {
 	const completed = new Set<CanonicalPhaseId>();
 	const active = new Set<CanonicalPhaseId>();
 
@@ -67,9 +57,7 @@ export function derivePhaseStatuses(
 		if (gates.gate1Approved) completed.add("plan");
 
 		// Check project-phase statuses to detect activity.
-		const anyActive = plan.phases.some(
-			(p) => p.status === "active" || p.status === "in_progress",
-		);
+		const anyActive = plan.phases.some((p) => p.status === "active" || p.status === "in_progress");
 		const anyCompleted = plan.phases.some((p) => p.status === "completed");
 
 		if (gates.gate1Approved && anyActive) {

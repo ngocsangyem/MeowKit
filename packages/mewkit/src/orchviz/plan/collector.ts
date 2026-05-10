@@ -85,11 +85,7 @@ export class PlanCollector {
 		const now = Date.now();
 
 		const cached = this.cache.get(ACTIVE_KEY);
-		if (
-			cached &&
-			cached.mtimeKey === mtimeKey &&
-			now - cached.at < FALLBACK_TIMEOUT_MS
-		) {
+		if (cached && cached.mtimeKey === mtimeKey && now - cached.at < FALLBACK_TIMEOUT_MS) {
 			return { ...cached.snapshot, readonly: isReadonly, generatedAt };
 		}
 
@@ -105,11 +101,7 @@ export class PlanCollector {
 		return snapshot;
 	}
 
-	private snapshotBySlug(
-		slug: string,
-		isReadonly: boolean,
-		generatedAt: string,
-	): PlanSnapshot {
+	private snapshotBySlug(slug: string, isReadonly: boolean, generatedAt: string): PlanSnapshot {
 		// Validate slug regex BEFORE any path resolution (defense vs traversal)
 		if (!SLUG_RE.test(slug)) {
 			return {
@@ -167,11 +159,7 @@ export class PlanCollector {
 		const now = Date.now();
 
 		const cached = this.cache.get(slug);
-		if (
-			cached &&
-			cached.mtimeKey === mtimeKey &&
-			now - cached.at < FALLBACK_TIMEOUT_MS
-		) {
+		if (cached && cached.mtimeKey === mtimeKey && now - cached.at < FALLBACK_TIMEOUT_MS) {
 			return { ...cached.snapshot, readonly: isReadonly, generatedAt };
 		}
 
@@ -197,12 +185,7 @@ export class PlanCollector {
 	}
 
 	/** Soft-reset the cache if it grows too large, then insert the new entry (R2-3). */
-	private writeCache(
-		key: string,
-		snapshot: PlanSnapshot,
-		mtimeKey: string | null,
-		now: number,
-	): void {
+	private writeCache(key: string, snapshot: PlanSnapshot, mtimeKey: string | null, now: number): void {
 		if (this.cache.size >= CACHE_SOFT_RESET_THRESHOLD) {
 			this.cache.clear();
 		}

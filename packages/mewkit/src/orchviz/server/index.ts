@@ -22,11 +22,7 @@ import {
 	type OverlayProvider,
 	type PlanProvider,
 } from "./api-handlers.js";
-import {
-	handleTodoWrite,
-	handleTodoPreflight,
-	type WriteHandlerContext,
-} from "./write-handlers.js";
+import { handleTodoWrite, handleTodoPreflight, type WriteHandlerContext } from "./write-handlers.js";
 import type { PlanCollector } from "../plan/collector.js";
 
 export interface OrchvizServerOptions {
@@ -172,10 +168,7 @@ export class OrchvizServer {
 	private isHostAllowed(req: http.IncomingMessage): boolean {
 		const host = req.headers.host;
 		if (!host) return false;
-		const expected = new Set([
-			`${BIND_HOST}:${this.actualPort}`,
-			`localhost:${this.actualPort}`,
-		]);
+		const expected = new Set([`${BIND_HOST}:${this.actualPort}`, `localhost:${this.actualPort}`]);
 		// Allow stable port match too in case actualPort still 0 during fallback.
 		return expected.has(host) || host === BIND_HOST || host === "localhost";
 	}

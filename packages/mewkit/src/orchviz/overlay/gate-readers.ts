@@ -94,10 +94,7 @@ export function readGate1State(projectRoot: string): Gate1State | null {
 }
 
 export function readGate2State(projectRoot: string): Gate2State | null {
-	const verdictPath = newestFileMatching(
-		path.join(projectRoot, "tasks", "reviews"),
-		"-verdict.md",
-	);
+	const verdictPath = newestFileMatching(path.join(projectRoot, "tasks", "reviews"), "-verdict.md");
 	if (!verdictPath) return null;
 	let raw: string;
 	try {

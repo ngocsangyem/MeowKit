@@ -21,8 +21,7 @@ const MAX_PENDING = 1000;
 
 export function useEventSource(url: string = "/events"): UseEventSourceResult {
 	const [pendingEvents, setPendingEvents] = useState<AgentEvent[]>([]);
-	const [connectionStatus, setConnectionStatus] =
-		useState<ConnectionStatus>("disconnected");
+	const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected");
 	const incomingRef = useRef<AgentEvent[]>([]);
 	const flushScheduledRef = useRef(false);
 

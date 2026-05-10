@@ -21,8 +21,7 @@ export function handleProgressEvent(
 	const innerEntry = data.message as TranscriptEntry | undefined;
 	if (!innerEntry?.message) return;
 
-	const parentToolUseID =
-		typeof parsed.parentToolUseID === "string" ? parsed.parentToolUseID : undefined;
+	const parentToolUseID = typeof parsed.parentToolUseID === "string" ? parsed.parentToolUseID : undefined;
 	if (!parentToolUseID) return;
 
 	let subState = parser.inlineSubagentState.get(parentToolUseID);

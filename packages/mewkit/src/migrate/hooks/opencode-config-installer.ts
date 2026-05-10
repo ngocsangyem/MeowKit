@@ -48,9 +48,7 @@ async function detectAuthenticatedProviders(homeDir?: string): Promise<string[]>
 	return [];
 }
 
-export async function suggestOpenCodeDefaultModel(
-	homeDir?: string,
-): Promise<{ model: string; reason: string }> {
+export async function suggestOpenCodeDefaultModel(homeDir?: string): Promise<{ model: string; reason: string }> {
 	const override = getOpenCodeDefaultModelOverride();
 	if (override) return { model: override, reason: ".ck.json override" };
 	void homeDir;
@@ -87,9 +85,7 @@ const clackPrompter: OpenCodeModelPrompter = async ({ suggestion, reason, detect
 	return { action: "custom", value: custom };
 };
 
-export async function ensureOpenCodeModel(
-	options: EnsureOpenCodeModelOptions,
-): Promise<EnsureOpenCodeModelResult> {
+export async function ensureOpenCodeModel(options: EnsureOpenCodeModelOptions): Promise<EnsureOpenCodeModelResult> {
 	const configPath = getOpenCodeConfigPath(options);
 
 	let existing: Record<string, unknown> | null = null;
@@ -99,14 +95,18 @@ export async function ensureOpenCodeModel(
 		if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
 			existing = parsed as Record<string, unknown>;
 		} else {
-			console.warn(`ensureOpenCodeModel: ${configPath} is valid JSON but not an object; overwriting with default model`);
+			console.warn(
+				`ensureOpenCodeModel: ${configPath} is valid JSON but not an object; overwriting with default model`,
+			);
 		}
 	} catch (err) {
 		const errno = (err as NodeJS.ErrnoException | null)?.code;
 		if (errno === "ENOENT") {
 			// Expected
 		} else if (err instanceof SyntaxError) {
-			console.warn(`ensureOpenCodeModel: ${configPath} is not valid JSON; overwriting (existing contents will be lost)`);
+			console.warn(
+				`ensureOpenCodeModel: ${configPath} is not valid JSON; overwriting (existing contents will be lost)`,
+			);
 		}
 	}
 

@@ -26,10 +26,7 @@ function normalizeProjectPath(path: string): string {
 	return normalized.startsWith(home) ? normalized.replace(home, "~") : normalized;
 }
 
-function getProviderPathTarget(
-	provider: ProviderType | undefined,
-	type: ProviderPathKind,
-): ProviderPathTarget | null {
+function getProviderPathTarget(provider: ProviderType | undefined, type: ProviderPathKind): ProviderPathTarget | null {
 	if (!provider) return null;
 	const pathConfig = providers[provider][type];
 	if (!pathConfig) return null;
@@ -123,11 +120,7 @@ export function truncateAtCleanBoundary(content: string, limit: number): Truncat
 	return { result: preamble.trim(), originalLength, removedSections };
 }
 
-function truncateAtParagraphBoundary(
-	content: string,
-	limit: number,
-	originalLength: number,
-): TruncationResult {
+function truncateAtParagraphBoundary(content: string, limit: number, originalLength: number): TruncationResult {
 	const truncated = content.slice(0, limit);
 	const lastParagraphBreak = truncated.lastIndexOf("\n\n");
 	if (lastParagraphBreak >= limit * 0.5) {
@@ -220,9 +213,7 @@ export function stripClaudeRefs(
 		const slashCmd = matched;
 		const trailingPunctuationMatch = slashCmd.match(/[.,!?;:]$/);
 		const trailingPunctuation = trailingPunctuationMatch?.[0] ?? "";
-		const normalizedSlashCmd = trailingPunctuation
-			? slashCmd.slice(0, -trailingPunctuation.length)
-			: slashCmd;
+		const normalizedSlashCmd = trailingPunctuation ? slashCmd.slice(0, -trailingPunctuation.length) : slashCmd;
 
 		const beforeMatch = result.slice(Math.max(0, offset - 10), offset);
 		if (/https?:\/\/$/.test(beforeMatch)) return slashCmd;
@@ -261,7 +252,10 @@ export function stripClaudeRefs(
 	if (hookTarget) {
 		result = rewriteClaudeDirectoryRefs(result, "hooks", hookTarget, "project hooks directory/", isInCodeBlock);
 	} else {
-		result = result.split("\n").filter((line) => !/\.claude\/hooks\//i.test(line)).join("\n");
+		result = result
+			.split("\n")
+			.filter((line) => !/\.claude\/hooks\//i.test(line))
+			.join("\n");
 	}
 
 	const configReplacement = configTarget?.path ?? "project configuration file";
@@ -272,9 +266,7 @@ export function stripClaudeRefs(
 
 	const subagentSupport = options?.provider ? providers[options.provider].subagents : "none";
 	const preserveDelegation = subagentSupport !== "none";
-	const preserveHookSections = options?.provider
-		? Boolean(providers[options.provider].hooks)
-		: false;
+	const preserveHookSections = options?.provider ? Boolean(providers[options.provider].hooks) : false;
 
 	if (!preserveDelegation) {
 		const delegationPatterns = [
@@ -324,7 +316,10 @@ export function stripClaudeRefs(
 	result = filteredLines.join("\n");
 
 	result = result.replace(/\n{3,}/g, "\n\n");
-	result = result.split("\n").map((line) => line.trimEnd()).join("\n");
+	result = result
+		.split("\n")
+		.map((line) => line.trimEnd())
+		.join("\n");
 	result = result.trim();
 
 	if (options?.charLimit && result.length > options.charLimit) {

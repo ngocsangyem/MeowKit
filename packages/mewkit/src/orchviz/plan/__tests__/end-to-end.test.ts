@@ -29,7 +29,10 @@ beforeEach(async () => {
 });
 afterEach(async () => {
 	delete process.env.MEOWKIT_ORCHVIZ_WRITABLE;
-	if (handle) { await handle.cleanup(); handle = null; }
+	if (handle) {
+		await handle.cleanup();
+		handle = null;
+	}
 });
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -38,12 +41,13 @@ function get(urlPath: string): Promise<{ status: number; body: string }> {
 	const { port } = handle!;
 	return new Promise((resolve, reject) => {
 		const req = http.request(
-			{ hostname: "127.0.0.1", port, path: urlPath, method: "GET",
-				headers: { Host: `127.0.0.1:${port}` } },
+			{ hostname: "127.0.0.1", port, path: urlPath, method: "GET", headers: { Host: `127.0.0.1:${port}` } },
 			(res) => {
 				let body = "";
 				res.setEncoding("utf-8");
-				res.on("data", (c: string) => { body += c; });
+				res.on("data", (c: string) => {
+					body += c;
+				});
 				res.on("end", () => resolve({ status: res.statusCode ?? 0, body }));
 				res.on("error", reject);
 			},
@@ -59,9 +63,13 @@ function post(body: unknown, extraHeaders: Record<string, string> = {}): Promise
 	return new Promise((resolve, reject) => {
 		const req = http.request(
 			{
-				hostname: "127.0.0.1", port, path: "/api/plan/todo", method: "POST",
+				hostname: "127.0.0.1",
+				port,
+				path: "/api/plan/todo",
+				method: "POST",
 				headers: {
-					Host: `127.0.0.1:${port}`, "Content-Type": "application/json",
+					Host: `127.0.0.1:${port}`,
+					"Content-Type": "application/json",
 					Origin: `http://127.0.0.1:${port}`,
 					"Content-Length": String(Buffer.byteLength(bodyStr)),
 					...extraHeaders,
@@ -70,7 +78,9 @@ function post(body: unknown, extraHeaders: Record<string, string> = {}): Promise
 			(res) => {
 				let body = "";
 				res.setEncoding("utf-8");
-				res.on("data", (c: string) => { body += c; });
+				res.on("data", (c: string) => {
+					body += c;
+				});
 				res.on("end", () => resolve({ status: res.statusCode ?? 0, body }));
 				res.on("error", reject);
 			},
@@ -130,7 +140,13 @@ describe("E2E-2: GET→POST→fs diff", () => {
 
 describe("E2E-3: Code-fence e2e", () => {
 	it("fake [ ] inside code fence is NOT toggled; first REAL todo flips", async () => {
-		const phaseFile = path.join(handle!.projectRoot, "tasks", "plans", "260501-fixture-c-codefence", "phase-01-fenced.md");
+		const phaseFile = path.join(
+			handle!.projectRoot,
+			"tasks",
+			"plans",
+			"260501-fixture-c-codefence",
+			"phase-01-fenced.md",
+		);
 		const etag = computePhaseFileEtag(phaseFile);
 
 		const postRes = await post({ slug: "260501-fixture-c-codefence", phase: 1, todoIdx: 0, checked: true, etag });
@@ -139,8 +155,8 @@ describe("E2E-3: Code-fence e2e", () => {
 
 		const after = fs.readFileSync(phaseFile, "utf-8");
 		expect(after).toContain("- [ ] FAKE — should be skipped"); // fence line unchanged
-		expect(after).toContain("- [x] Real todo alpha");          // first real todo flipped
-		expect(after).toContain("- [ ] Real todo beta");           // second real todo unchanged
+		expect(after).toContain("- [x] Real todo alpha"); // first real todo flipped
+		expect(after).toContain("- [ ] Real todo beta"); // second real todo unchanged
 	});
 });
 

@@ -37,7 +37,12 @@ export async function installSkillDirectory(
 	const sanitizedName = sanitizeSkillName(skill.dirName);
 	const targetBase = options.global ? providerConfig.skills.globalPath : providerConfig.skills.projectPath;
 	if (!targetBase) {
-		return { skill: skill.name, provider, success: false, error: `No ${options.global ? "global" : "project"} skills path for ${provider}` };
+		return {
+			skill: skill.name,
+			provider,
+			success: false,
+			error: `No ${options.global ? "global" : "project"} skills path for ${provider}`,
+		};
 	}
 
 	const targetDir = join(targetBase, sanitizedName);
@@ -53,10 +58,11 @@ export async function installSkillDirectory(
 		const sourceChecksum = computeContentChecksum(await readFile(skillMdPath, "utf-8"));
 		const targetChecksum = computeContentChecksum(await readFile(skillMdTarget, "utf-8"));
 
-		await addPortableInstallation(
-			skill.name, "skill", provider, options.global, targetDir, skill.sourcePath,
-			{ sourceChecksum, targetChecksum, installSource: "kit" },
-		);
+		await addPortableInstallation(skill.name, "skill", provider, options.global, targetDir, skill.sourcePath, {
+			sourceChecksum,
+			targetChecksum,
+			installSource: "kit",
+		});
 
 		return { skill: skill.name, provider, success: true, path: targetDir };
 	} catch (err) {
