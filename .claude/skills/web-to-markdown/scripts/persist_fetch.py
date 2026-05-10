@@ -168,7 +168,7 @@ def _atomic_write(dest: Path, content_bytes: bytes) -> None:
 # ---------------------------------------------------------------------------
 
 def _load_injection_audit():
-    """Import injection_audit module via importlib (direct import, not CLI — see security.md §Layer 8)."""
+    """Import injection_audit module via importlib (direct import, not CLI — see security.md Layer 8)."""
     audit_path = PROJECT_ROOT / ".claude" / "scripts" / "injection-audit.py"
     if not audit_path.exists():
         return None
