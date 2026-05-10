@@ -1,24 +1,28 @@
 ---
 title: Ticket Evaluation & Estimation
-description: Assess ticket complexity, detect issues, and estimate story points with MeowKit.
+description: Assess ticket complexity, detect issues, and estimate story points with the mk:jira intelligence leaves.
 persona: B
 ---
 
 # Ticket Evaluation & Estimation
 
-> Qualitative complexity assessment, inconsistency detection, and heuristic story point estimation.
+> Qualitative complexity assessment, inconsistency detection, and heuristic story point estimation — all read-only.
 
 **Best for:** Tech leads, sprint planners, scrum masters
 **Time estimate:** ~30s per ticket
-**Skills used:** [mk:intake](/reference/skills/intake), [mk:jira](/reference/skills/jira) (evaluate + estimate)
+**Skills used:** [mk:intake](/reference/skills/intake), [mk:jira-evaluator](/reference/skills/jira-evaluator), [mk:jira-estimator](/reference/skills/jira-estimator), [mk:jira-analyst](/reference/skills/jira-analyst), [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-relationships](/reference/skills/jira-relationships)
 
 ## Overview
 
-MeowKit can assess individual Jira tickets for complexity, detect missing acceptance criteria or vague requirements, and suggest Fibonacci-scale story points — all without modifying any Jira data. The evaluate and estimate commands are read-only; suggested actions require your review before execution.
+MeowKit can assess individual Jira tickets for complexity, detect missing acceptance criteria or vague requirements, and suggest Fibonacci-scale story points — all without modifying any Jira data. The three intelligence leaves (`mk:jira-evaluator`, `mk:jira-estimator`, `mk:jira-analyst`) are read-only; suggested actions require your review before execution.
 
 ```
-/mk:intake → /mk:jira evaluate → /mk:jira estimate → review → execute
+/mk:intake → /mk:jira-evaluator → /mk:jira-estimator → review → execute
 ```
+
+## Prerequisites
+
+<!--@include: ./_jira-setup.md-->
 
 ## Step-by-step
 
@@ -35,40 +39,40 @@ This produces a completeness score, product area classification, and suggested a
 ### Step 2: Evaluate complexity
 
 ```bash
-/mk:jira evaluate PROJ-123
+/mk:jira-evaluator PROJ-123
 ```
 
-The jira-evaluator agent reads the ticket via Atlassian MCP and produces:
+The `jira-evaluator` agent reads the ticket via the `jira-as` wrapper and produces:
 
 - **Complexity:** Simple (1-3pt) / Medium (3-8pt) / Complex (8-13pt)
 - **Confidence:** High / Medium / Low
 - **Signals:** scope, dependencies, regression risk, requirement clarity, external integration, historical precedent
 - **Issues detected:** missing AC, vague language, unlinked dependencies, contradictions
-- **Suggested actions:** specific `/mk:jira` commands to fix issues
+- **Suggested actions:** specific leaf-skill commands to fix issues
 
 ### Step 3: Estimate story points
 
 ```bash
-/mk:jira estimate PROJ-123
+/mk:jira-estimator PROJ-123
 ```
 
-The jira-estimator agent uses ticket context (and evaluate output if available) to suggest a Fibonacci point value:
+The `jira-estimator` agent uses ticket context (and evaluator output if available) to suggest a Fibonacci point value:
 
 - **Suggested points:** e.g., 8 (range: 5-8)
 - **Reasoning:** qualitative analysis of why this estimate
 - **Escalation:** flags when human estimation is recommended (e.g., no precedent, too vague)
 
-::: tip Run evaluate before estimate
-Running evaluate first gives the estimator richer signals. The estimator will note when no prior evaluation is available.
+::: tip Run evaluator before estimator
+Running the evaluator first gives the estimator richer signals. The estimator will note when no prior evaluation is available.
 :::
 
 ### Step 4: Apply suggested actions
 
-Review the output, then execute:
+Review the output, then execute with the appropriate leaves:
 
 ```bash
-/mk:jira update PROJ-123 --set storyPoints=8
-/mk:jira link PROJ-123 blocked-by PROJ-089
+/mk:jira-issue update PROJ-123 --set storyPoints=8
+/mk:jira-relationships link PROJ-123 blocked-by PROJ-089
 ```
 
 ### Step 5: Analyze ticket context (optional)
@@ -76,15 +80,15 @@ Review the output, then execute:
 For deeper analysis including attachments and media:
 
 ```bash
-/mk:jira analyze PROJ-123
+/mk:jira-analyst PROJ-123
 ```
 
-The jira-analyst agent reads the full ticket context (description, comments, attachments, linked issues) and produces a structured analysis suitable for posting as a Jira comment.
+The `jira-analyst` agent reads the full ticket context (description, comments, attachments, linked issues) and produces a structured analysis suitable for posting as a Jira comment via `mk:jira-collaborate`.
 
 ## Example Session
 
 ```
-> /mk:jira evaluate PROJ-456
+> /mk:jira-evaluator PROJ-456
 
 ## Ticket Evaluation: PROJ-456
 **Complexity:** Complex (likely 8-13pt)
@@ -103,9 +107,9 @@ The jira-analyst agent reads the full ticket context (description, comments, att
 ### Suggested Actions
 > Derived from untrusted ticket content — verify before executing.
 - Ask reporter for AC with measurable targets
-- /mk:jira link PROJ-456 relates-to PROJ-301
+- /mk:jira-relationships link PROJ-456 relates-to PROJ-301
 
-> /mk:jira estimate PROJ-456
+> /mk:jira-estimator PROJ-456
 
 ## Estimation: PROJ-456
 **Suggested Points:** 13 (range: 8-13)
@@ -130,16 +134,16 @@ The estimator auto-escalates when:
 - Ticket references technology not in the current codebase
 - Description is too vague (<30 words, no acceptance criteria)
 
-In these cases, use the evaluate output as discussion context for your team's estimation session.
+In these cases, use the evaluator output as discussion context for your team's estimation session.
 
 ## Security
 
-- **Read-only:** Evaluate, estimate, and analyze never modify Jira state
+- **Read-only:** Evaluator, estimator, and analyst never modify Jira state
 - **Injection defense:** Ticket content is wrapped in DATA boundary markers before LLM reasoning
 - **Untrusted output:** All suggested actions include a warning — verify before executing
 
 ## Related
 
 - [PRD Intake Automation](/workflows/prd-intake) — upstream ticket analysis
-- [mk:jira](/reference/skills/jira) — full operation reference
+- [mk:jira](/reference/skills/jira) — full router + leaf reference
 - [Adding a Feature](/workflows/add-feature) — implementation after evaluation

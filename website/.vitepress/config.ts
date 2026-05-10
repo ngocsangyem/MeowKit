@@ -19,7 +19,7 @@ export default withMermaid(defineConfig({
   sitemap: {
     hostname: 'https://docs.meowkit.dev',
   },
-  srcExclude: ['**/plans/**'],
+  srcExclude: ['**/plans/**', '**/_*.md'],
   head: [
     // Favicons — SVG preferred, raster as legacy fallback
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],

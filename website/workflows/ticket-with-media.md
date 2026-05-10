@@ -8,8 +8,9 @@ persona: B
 
 > Full flow for tickets containing images, video recordings, Figma design links, and PDF documents — with graceful fallback at every step.
 
-**Best for:** Team leads, QA engineers, frontend developers  
-**Skills used:** [mk:intake](/reference/skills/intake), [mk:figma](/reference/skills/figma), [mk:multimodal](/reference/skills/multimodal), [mk:jira](/reference/skills/jira), [mk:investigate](/reference/skills/investigate)
+**Best for:** Team leads, QA engineers, frontend developers
+**Time estimate:** Varies by media type (images ~30s, video 1–2 min, Figma ~1 min)
+**Skills used:** [mk:intake](/reference/skills/intake), [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-collaborate](/reference/skills/jira-collaborate), [mk:figma](/reference/skills/figma), [mk:multimodal](/reference/skills/multimodal), [mk:investigate](/reference/skills/investigate)
 
 ## Overview
 
@@ -27,13 +28,16 @@ Ticket arrives (Jira/Linear/GitHub/manual)
 
 ## Prerequisites
 
-| Tool | Required? | What it enables | Install |
-|------|-----------|----------------|---------|
-| Atlassian MCP | For Jira tickets | Read ticket + attachments | `claude mcp add --transport http atlassian https://mcp.atlassian.com/v1/mcp` |
-| Figma MCP | For Figma links | Exact design data (colors, spacing, tokens) | `claude mcp add figma` |
-| Gemini API key | Optional | Better image/video analysis | Set `GEMINI_API_KEY` in `.claude/.env` |
-| FFmpeg | Optional | Video frame extraction, image optimization | `brew install ffmpeg` or `npx mewkit setup --system-deps` |
-| ImageMagick | Optional | Image resize/conversion | `brew install imagemagick` or `npx mewkit setup --system-deps` |
+<!--@include: ./_jira-setup.md-->
+
+### Optional media tools
+
+| Tool | What it enables | Install |
+|------|----------------|---------|
+| Figma MCP | Exact design data (colors, spacing, tokens) | `claude mcp add figma` |
+| Gemini API key | Better image/video analysis | Set `GEMINI_API_KEY` in `.claude/.env` |
+| FFmpeg | Video frame extraction, image optimization | `brew install ffmpeg` or `npx mewkit setup --system-deps` |
+| ImageMagick | Image resize/conversion | `brew install imagemagick` or `npx mewkit setup --system-deps` |
 
 ::: tip None of these are required
 MeowKit works without all of them. Each missing tool reduces capability but never blocks analysis. Text-only analysis always works.
@@ -47,13 +51,13 @@ MeowKit works without all of them. Each missing tool reduces capability but neve
 
 ```bash
 /mk:intake
-# Paste ticket content, or if Atlassian MCP:
-# mk:intake reads BUG-456 automatically
+# Paste ticket content, OR if MEOW_JIRA_* env vars are populated:
+# mk:intake delegates to mk:jira-issue and reads BUG-456 automatically
 ```
 
 ### Step 2: Detect image attachments
 
-mk:intake finds `.png` files in the ticket attachments.
+mk:intake finds `.png` files in the ticket attachments (read via `mk:jira-issue`).
 
 ### Step 3: Image analysis — fallback chain
 
@@ -239,8 +243,8 @@ Figma MCP available?
 
 User runs `/mk:cook implement the login screen from PRD-123`
 
-→ mk:cook activates mk:figma IMPLEMENT mode  
-→ 7-step Figma→code workflow  
+→ mk:cook activates mk:figma IMPLEMENT mode
+→ 7-step Figma→code workflow
 → Pixel-perfect implementation with exact design values
 
 ---
@@ -277,6 +281,15 @@ Note: Max 20 pages per Read call. For larger PDFs, read in chunks.
 No external tools needed. PDFs work out of the box.
 
 ---
+
+## Posting analysis back to the ticket
+
+After media analysis, post the structured findings via `mk:jira-collaborate`:
+
+```bash
+/mk:jira-collaborate add-comment BUG-789 \
+  --body "$(cat .claude/state/intake-analysis.md)"
+```
 
 ## Fallback Summary
 

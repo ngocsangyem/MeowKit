@@ -148,7 +148,6 @@ Skills that can activate in any phase.
 | Skill | What it does |
 |-------|-------------|
 | `mk:jira` | Jira ticket intelligence via Atlassian MCP. Internal agents: jira-evaluator, jira-estimator, jira-analyst |
-| `mk:confluence` | Confluence spec analysis: fetch pages, extract requirements, detect gaps |
 | `mk:figma` | Figma design analysis + implementation via Figma MCP. 3 modes: analyze, implement, tokens |
 
 ### Infrastructure

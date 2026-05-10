@@ -82,6 +82,7 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 ### Removals
 
 - `mk:confluence` skill removed — 9 files deleted, 3 cross-references updated. Migration: confluence reads no longer have a first-party path; if needed, invoke Atlassian MCP directly per `mk:jira/references/install-and-auth.md`.
+- Documentation cleanup follow-up: deleted orphaned `website/reference/skills/confluence.md` reference page and pruned lingering cross-references from `docs/project-context.md`, `docs/meowkit-architecture.md`, and `website/reference/skills.md` index.
 - The legacy `mk:jira` Atlassian-MCP execute path is gone. The router contains zero `Agent(...)` calls and zero `jira-as` invocations.
 - The 3 intelligence agents previously at skill-scoped `meowkit/.claude/skills/jira/agents/` move to project-scoped `meowkit/.claude/agents/jira-{evaluator,estimator,analyst}.md`. The old directory is deleted.
 

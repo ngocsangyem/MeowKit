@@ -127,7 +127,7 @@ If the developer's self-healing exhausted 3 attempts, the **journal-writer** doc
 ::: tip Jira Integration
 After shipping the fix, update the bug ticket status:
 ```bash
-/mk:jira transition BUG-123 Done --resolution Fixed
+/mk:jira-lifecycle transition BUG-123 Done --resolution Fixed
 ```
 Future: mk:ship will do this automatically on merge.
 :::

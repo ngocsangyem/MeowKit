@@ -85,7 +85,7 @@ Here's what each step does and which agent handles it:
 ::: tip Jira Integration
 After shipping, update the Jira ticket status to reflect deployment:
 ```bash
-/mk:jira transition TICKET-123 "Deployed"
+/mk:jira-lifecycle transition TICKET-123 "Deployed"
 ```
 Future: mk:ship will do this automatically as part of the ship pipeline.
 :::

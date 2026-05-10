@@ -34,11 +34,11 @@ Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 | -------------------------------------- | -------- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
 | Skills on disk                         | 75       | `ls .claude/skills/`         | 3 deprecated skills removed in v2.4.4                                                                                            |
 | Registered skills (SKILLS_INDEX)       | 71       | `SKILLS_INDEX.md` pipe-table rows          |                                                                                                                                  |
-| Orphaned skills (unregistered)         | 4        | `inventory-summary.md:15`                  | mk:chom, mk:pack, mk:confluence, mk:planning-engine                                                                      |
+| Orphaned skills (unregistered)         | 3        | `inventory-summary.md:15`                  | mk:chom, mk:pack, mk:planning-engine                                                                                     |
 | Active (non-deprecated) skills         | 75       | `inventory-summary.md:17`                  |                                                                                                                                  |
 | Deprecated skills                      | 0        | —                                          | `mk:debug`, `mk:documentation`, `mk:shipping` removed in v2.4.4                                                            |
 | Step-file skills                       | 5        | `step-file-rules.md` Applicability section | plan-creator, review, evaluate, harness, trace-analyze                                                                           |
-| Skills with internal agents            | 3        | `AGENTS_INDEX.md` Skill-Scoped section     | jira (3), confluence (2), planning-engine (2) = 7 agents                                                                         |
+| Skills with internal agents            | 1        | `AGENTS_INDEX.md` Skill-Scoped section     | planning-engine (2 agents); jira agents moved to project-scoped in v2.8.3                                                                             |
 | Core agents                            | 17       | `ls .claude/agents/*.md` excl. index       | Matches `.claude/rules-conditional/agent-routing.md` agent table. `project-manager`                                                          |
 | AGENTS_INDEX rows                      | 17       | `AGENTS_INDEX.md` active table             | Footer "13 agents" phrasing is stale (CF-M34)                                                                                    |
 | Hook events (settings.json)            | 7        | `settings.json` hooks keys                 | SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit, SubagentStart, SubagentStop                                       |
@@ -126,7 +126,6 @@ flowchart TD
         PRJO[mk:project-organization]
         VER[mk:verify]
         SEQT[mk:sequential-thinking]
-        CONF[mk:confluence]
     end
 
     subgraph P4["Phase 4 — Review (5 skills)"]
@@ -289,15 +288,14 @@ Source: `AGENTS_INDEX.md` active table (17 rows verified against `ls .claude/age
 | journal-writer  | Support | 6               | Failure docs, root cause analysis                                            |
 | project-manager | Core    | on-demand (0–6) | Cross-workflow delivery tracking, evidence-based status reports (haiku tier) |
 
-### Skill-Scoped Agents (7)
+### Skill-Scoped Agents (4)
 
 Agents that exist only within a specific skill's `agents/` directory.
 Source: `AGENTS_INDEX.md` table footnote; `harness-rules.md` Rule 2.
+Note: jira-evaluator, jira-estimator, jira-analyst moved to project-scoped (`.claude/agents/`) in v2.8.3.
 
 | Skill                | Agents                                       | Role                |
 | -------------------- | -------------------------------------------- | ------------------- |
-| mk:jira            | jira-evaluator, jira-estimator, jira-analyst | Ticket intelligence |
-| mk:confluence      | confluence-reader, spec-analyzer             | Spec analysis       |
 | mk:planning-engine | tech-analyzer, planning-reporter             | Sprint planning     |
 
 ---

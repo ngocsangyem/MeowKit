@@ -1,54 +1,28 @@
 ---
 title: PRD Intake Automation
-description: Analyze incoming PRDs/tickets with MeowKit as the AI engine, powered by Jira MCP integration.
+description: Analyze incoming PRDs/tickets with MeowKit as the AI engine, powered by the mk:jira leaf family.
 persona: B
 ---
 
 # PRD Intake Automation
 
-> Automated ticket analysis: product area classification, completeness scoring, root cause analysis, technical assessment, and structured recommendations — powered by MeowKit skills with Jira MCP.
+> Automated ticket analysis: product area classification, completeness scoring, root cause analysis, technical assessment, and structured recommendations — powered by MeowKit skills with the `mk:jira-*` leaf family.
 
-**Best for:** Team leads, engineering managers, DevOps teams  
-**Time estimate:** ~2 min per ticket (automated)  
-**Skills used:** [mk:scale-routing](/reference/skills/scale-routing), [mk:scout](/reference/skills/scout), [mk:investigate](/reference/skills/investigate), [mk:decision-framework](/reference/skills/decision-framework), [mk:plan-creator](/reference/skills/plan-creator)
+**Best for:** Team leads, engineering managers, DevOps teams
+**Time estimate:** ~2 min per ticket (automated)
+**Skills used:** [mk:intake](/reference/skills/intake), [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-evaluator](/reference/skills/jira-evaluator), [mk:jira-lifecycle](/reference/skills/jira-lifecycle), [mk:jira-relationships](/reference/skills/jira-relationships), [mk:jira-collaborate](/reference/skills/jira-collaborate), [mk:scale-routing](/reference/skills/scale-routing), [mk:scout](/reference/skills/scout), [mk:investigate](/reference/skills/investigate), [mk:decision-framework](/reference/skills/decision-framework)
 
 ## Overview
 
 When a new PRD or ticket lands in Jira, MeowKit can analyze it automatically: classify the product area, score description completeness, run root cause analysis (for bugs), scan the codebase for technical context, and post structured results back as a Jira comment.
 
-MeowKit provides the **analysis engine**. Jira connectivity requires a **Jira MCP server** — MeowKit talks to Jira through MCP tools, the same way it talks to browsers through Playwright MCP.
+MeowKit talks to Jira through the `mk:jira-*` leaf family, which uses the `jira-as` CLI under the hood. `mk:intake` orchestrates the analysis pipeline; the leaves handle Jira I/O.
 
 ## Prerequisites
 
-### 1. Install a Jira MCP Server
+<!--@include: ./_jira-setup.md-->
 
-MeowKit needs a Jira MCP server to read and write tickets. We recommend [mcp-atlassian](https://github.com/sooperset/mcp-atlassian) (community, 49 tools, Cloud + Server/DC):
-
-```bash
-claude mcp add -e JIRA_URL=https://your-company.atlassian.net \
-  -e JIRA_USERNAME=your-email@company.com \
-  -e JIRA_API_TOKEN=your-api-token \
-  atlassian -- uvx mcp-atlassian
-```
-
-Get your API token at [id.atlassian.com](https://id.atlassian.com/manage-profile/security/api-tokens).
-
-Alternatively, use the [official Atlassian Rovo server](https://github.com/atlassian/atlassian-mcp-server) (Cloud-only, OAuth, 13 tools, beta):
-```bash
-claude mcp add --transport http atlassian https://mcp.atlassian.com/v1/mcp
-```
-
-See [mk:jira prerequisites](/reference/skills/jira#prerequisites) for a detailed comparison of both servers.
-
-::: warning MCP Server Required
-Without a Jira MCP server, MeowKit cannot read or write Jira tickets. The analysis skills work standalone (paste ticket text manually), but automated I/O requires the MCP.
-:::
-
-::: tip Alternative: GitHub Issues
-If you use GitHub Issues instead of Jira, MeowKit can use the `gh` CLI directly — no MCP needed. The analysis workflow is identical; only the I/O layer changes.
-:::
-
-### 2. Define Product Areas
+### Define Product Areas
 
 Create a YAML file mapping product areas to code paths and team ownership:
 
@@ -73,7 +47,7 @@ areas:
 
 This feeds into `mk:scale-routing` for automatic product area detection.
 
-### 3. Configure Trigger
+### Configure Trigger
 
 Two options:
 
@@ -104,27 +78,26 @@ The steps below describe what mk:intake does internally.
 
 ### Step 1: Fetch the ticket
 
-MeowKit reads the ticket via Jira MCP:
+MeowKit reads the ticket via `mk:jira-issue`:
 
+```bash
+/mk:jira-issue get PRD-123
 ```
-Analyze Jira ticket PRD-123.
-Read the ticket description, acceptance criteria, and linked tickets.
-```
 
-The [Atlassian MCP server](https://github.com/atlassian/atlassian-mcp-server) provides tools for reading issues, searching, adding comments, and transitioning status. Check the server's README for the exact tool names and parameters.
+The leaf reads the description, acceptance criteria, comments, attachments, and linked issues via the `jira-as` wrapper. See [`mk:jira-issue`](/reference/skills/jira-issue) for the full read surface.
 
-### Step 1.5: Evaluate ticket complexity (mk:jira evaluate)
+### Step 1.5: Evaluate ticket complexity
 
 Optionally, assess ticket complexity before proceeding with full intake:
 
 ```bash
-/mk:jira evaluate PRD-123
+/mk:jira-evaluator PRD-123
 ```
 
-This produces a qualitative complexity assessment (Simple/Medium/Complex), detects missing acceptance criteria, vague language, and unlinked dependencies. The evaluation feeds into estimation and sprint planning. See the [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) workflow for details.
+This produces a qualitative complexity assessment (Simple/Medium/Complex), detects missing acceptance criteria, vague language, and unlinked dependencies. The evaluation feeds into estimation and sprint planning. See [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) for details.
 
-::: tip Evaluate vs completeness scoring
-`mk:jira evaluate` assesses **implementation complexity** for estimation. `mk:plan-creator` scope challenge assesses **structural completeness** of the ticket description. They answer different questions — use both.
+::: tip Evaluator vs completeness scoring
+`mk:jira-evaluator` assesses **implementation complexity** for estimation. `mk:plan-creator` scope challenge assesses **structural completeness** of the ticket description. They answer different questions — use both.
 :::
 
 ### Step 2: Classify product area (mk:scale-routing)
@@ -192,7 +165,7 @@ Suggested fix: Add background token refresh interval (e.g., every 20min)
 
 ### Step 6: Generate structured output
 
-MeowKit posts a structured comment back to Jira (via MCP):
+MeowKit posts a structured comment back to Jira via `mk:jira-collaborate`:
 
 ```markdown
 ## AI PRD Analysis — PRD-123
@@ -240,47 +213,65 @@ Token refresh tied to navigation events. Idle users receive no refresh.
 
 If configured, MeowKit can:
 
-- Assign the ticket to the suggested PIC (via Atlassian MCP)
-- Transition status (e.g., "New" → "In Analysis" via Atlassian MCP)
-- Link related tickets (via Atlassian MCP search + link tools)
+- Assign the ticket to the suggested PIC via `mk:jira-lifecycle`
+- Transition status (e.g., "New" → "In Analysis") via `mk:jira-lifecycle`
+- Link related tickets via `mk:jira-relationships`
 
-::: tip Execute with mk:jira
+::: tip Execute the suggested actions
 After reviewing intake analysis, run the suggested Jira actions directly:
 ```bash
-/mk:jira transition PRD-123 "In Analysis"
-/mk:jira link PRD-123 blocks BUG-045
-/mk:jira assign PRD-123 alice
+/mk:jira-lifecycle transition PRD-123 "In Analysis"
+/mk:jira-relationships link PRD-123 blocks BUG-045
+/mk:jira-lifecycle assign PRD-123 alice
 ```
-See [mk:jira](/reference/skills/jira) for the full operation reference.
 :::
+
+## Skill Graph
+
+```
+mk:intake (orchestrator)
+  ├─ mk:jira-issue          → fetch ticket
+  ├─ mk:scale-routing       → product-area classification
+  ├─ mk:plan-creator        → completeness scoring (scope challenge)
+  ├─ mk:scout               → codebase context
+  ├─ mk:investigate         → RCA (bug tickets)
+  ├─ mk:decision-framework  → triage rules
+  ├─ mk:jira-collaborate    → post analysis comment
+  ├─ mk:jira-lifecycle      → transition + assign (Step 7)
+  └─ mk:jira-relationships  → link related tickets (Step 7)
+```
 
 ## MeowKit Skills Used
 
 | Step                      | Skill                                                           | What It Does                                                        |
 | ------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Ticket I/O                | [mk:jira-issue](/reference/skills/jira-issue)                 | Read issue + attachments + linked tickets via jira-as               |
+| Complexity assessment     | [mk:jira-evaluator](/reference/skills/jira-evaluator)         | Read-only complexity + inconsistency analysis                       |
 | Product area detection    | [mk:scale-routing](/reference/skills/scale-routing)           | Matches keywords against domain-complexity CSV / product-areas YAML |
 | Completeness evaluation   | [mk:plan-creator](/reference/skills/plan-creator)             | Scope challenge validates goal, criteria, constraints, scope        |
 | Codebase scanning         | [mk:scout](/reference/skills/scout)                           | Parallel file discovery + architecture fingerprint                  |
-| Root cause analysis       | [mk:investigate](/reference/skills/investigate)               | 4-phase investigation with RCA method selection (v2.0)              |
-| Structured recommendation | [mk:decision-framework](/reference/skills/decision-framework) | Classify → rules → score → escalate (v2.0)                          |
-| Technical assessment      | [mk:verify](/reference/skills/verify)                         | Build/test status of affected code (v2.0)                           |
+| Root cause analysis       | [mk:investigate](/reference/skills/investigate)               | 4-phase investigation with RCA method selection                     |
+| Structured recommendation | [mk:decision-framework](/reference/skills/decision-framework) | Classify → rules → score → escalate                                 |
+| Comment posting           | [mk:jira-collaborate](/reference/skills/jira-collaborate)     | Post AI analysis as a Jira comment                                  |
+| Lifecycle (Step 7)        | [mk:jira-lifecycle](/reference/skills/jira-lifecycle)         | Transition + assign                                                 |
+| Linking (Step 7)          | [mk:jira-relationships](/reference/skills/jira-relationships) | Link blockers / related issues                                      |
 
 ## What MeowKit Does NOT Do
 
 Be honest about boundaries:
 
 - **Team roster management** — You maintain `.claude/product-areas.yaml`. MeowKit reads it.
-- **Workload balancing** — MeowKit reports open ticket count per PIC (via Jira MCP search). Your rules decide assignment.
+- **Workload balancing** — MeowKit reports open ticket count per PIC (via `mk:jira-search`). Your rules decide assignment.
 - **Jira workflow rules** — MeowKit suggests transitions. Your Jira automation enforces them.
-- **Duplicate detection** — MeowKit finds related tickets via keyword search (Jira MCP). Exact dedup is your JQL.
+- **Duplicate detection** — MeowKit finds related tickets via keyword search. Exact dedup is your JQL.
 
 ## Gotchas
 
-- **No Jira MCP = no Jira I/O**: The analysis skills work standalone (you can paste ticket text), but automated read/write requires the MCP server
+- **No `MEOW_JIRA_*` env = no Jira I/O**: The analysis skills work standalone (you can paste ticket text), but automated read/write requires the three env vars in `.claude/.env`.
 - **Product areas YAML must be maintained**: Stale domain mappings = wrong classification. Update when team structure changes.
-- **RCA only for bugs**: Feature PRDs get completeness scoring + breakdown, not root cause analysis
+- **RCA only for bugs**: Feature PRDs get completeness scoring + breakdown, not root cause analysis.
 - **PIC suggestion ≠ assignment**: MeowKit suggests based on domain + load. Human confirms. Never auto-assign without review unless your team explicitly opts in.
-- **Rate limits**: If running on every Jira webhook, consider batching or filtering (e.g., only PRD type, only specific projects)
+- **Rate limits**: If running on every Jira webhook, consider batching or filtering (e.g., only PRD type, only specific projects).
 
 ## Related
 

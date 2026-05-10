@@ -271,7 +271,7 @@ Notable open issues relevant to agents:
 | CF-H7 | `mk:lazy-agent-loader/SKILL.md:13` | Agent index hardcodes 15; evaluator unreachable via lazy-loader |
 | CF-H11–H15 | `commands/meow/*.md` | Phantom routing targets: mk:command, mk:plan, mk:arch, mk:design, mk:test, mk:audit, mk:validate, mk:summary |
 
-Orphaned skills (not in SKILLS_INDEX): `mk:chom`, `mk:pack`, `mk:confluence`, `mk:planning-engine`
+Orphaned skills (not in SKILLS_INDEX): `mk:chom`, `mk:pack`, `mk:planning-engine`
 
 ---
 
