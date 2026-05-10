@@ -1,10 +1,10 @@
 # Jira Awareness — mk:intake Extension
 
-Loaded ONLY when Atlassian MCP is detected. When no MCP is available, skip this file entirely — mk:intake operates tool-agnostic.
+Loaded when the user has the `mk:jira-*` family available (i.e. `jira-as` installed via `npx mewkit setup` and `.claude/.env` populated with `MEOW_JIRA_*`). When unavailable, skip this file entirely — mk:intake operates tool-agnostic.
 
 ## Metadata Extraction
 
-When Atlassian MCP is available, extract these Jira-specific fields from the ticket before scoring:
+Fetch the ticket via `mk:jira-issue` (or directly: `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all'`). Extract these Jira-specific fields before scoring:
 
 | Field           | Where to find it         | Used for                        |
 | --------------- | ------------------------ | ------------------------------- |

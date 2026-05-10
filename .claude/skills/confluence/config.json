@@ -1,6 +1,0 @@
-{
-  "confluence_url": "",
-  "default_space": "",
-  "mcp_server_name": "atlassian",
-  "_comment": "First-run: if fields are empty, skill asks user via AskUserQuestion. confluence_url example: https://company.atlassian.net/wiki"
-}

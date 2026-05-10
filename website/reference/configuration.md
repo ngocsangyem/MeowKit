@@ -151,6 +151,31 @@ All `MEOWKIT_*` env vars. Set in your shell profile (`~/.zshrc`, `~/.bashrc`) or
 | `MEOWKIT_TDD` | `off` | Enable strict TDD enforcement (RED-phase gate). Values: `1`, `true`, `on`, `enabled` | Production-quality code, payment/auth features. Opt-in — most users leave this off. |
 | `MEOWKIT_MODEL_HINT` | *(none)* | Fallback model ID for tier detection when SessionStart stdin lacks `model` field | Only if `model-detector.cjs` shows "not detected". Most users don't need this — stdin auto-detection is primary since v2.3.0. |
 | `MEOW_HOOK_PROFILE` | `standard` | Hook execution profile. `standard` = normal, `fast` = skip non-critical hooks (post-session, learning-observer, pre-ship), `strict` = all hooks enabled | `fast` for rapid iteration/spike work. `strict` for production sessions needing full memory capture. |
+| `CLAUDE_CODE_FORK_SUBAGENT` | `1` (set in `settings.json` `env` block by default since v2.8.3) | Enables Claude Code's `context: fork` semantics so the 16 `mk:jira-*` thin skills fork into their matching agents. | Leave default. Unset only when explicitly debugging fork-mode behavior. |
+
+### Jira
+
+The `mk:jira-*` family (router + 16 leaves added in v2.8.3) is driven by three `MEOW_JIRA_*` env vars in `.claude/.env` (gitignored). The wrapper script `scripts/jira-as.sh` translates them to `jira-as`'s native `JIRA_*` names per call.
+
+> **Naming exception**: these vars use the legacy `MEOW_*` prefix (one-off exception to the modern `MEOWKIT_*` convention) per migration directive. The upstream `JIRA-Assistant-Skills` README also mentions `JIRA_PROFILE` — that is a plugin-layer concern, NOT consumed by `jira-as` or `mk:jira`.
+
+| Variable | Default | Purpose | Where to set |
+|----------|---------|---------|--------------|
+| `MEOW_JIRA_API_TOKEN` | *(required)* | Atlassian Cloud API token. Get from <https://id.atlassian.com/manage-profile/security/api-tokens>. | `.claude/.env` |
+| `MEOW_JIRA_EMAIL` | *(required)* | Atlassian account email. | `.claude/.env` |
+| `MEOW_JIRA_SITE_URL` | *(required)* | e.g. `https://your-company.atlassian.net`. | `.claude/.env` |
+| `JIRA_OUTPUT` | `json` (set by wrapper) | Default output format for `jira-as`. | Override per-call: `JIRA_OUTPUT=text bash scripts/jira-as.sh ...` |
+| `JIRA_MOCK_MODE` | *(unset)* | When set to `true`, agents surface `**[MOCK MODE]**` in output headers; intelligence agents avoid live writes. | Sandbox / CI testing. |
+
+The SessionStart hook `jira-env-loader.sh` validates `.claude/.env` presence + the 3 required keys. It emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing` to the status line.
+
+**Setup (one-time):**
+
+```bash
+npx mewkit setup           # auto-installs jira-as into .claude/skills/.venv
+cp .claude/.env.example .claude/.env
+# edit MEOW_JIRA_API_TOKEN, MEOW_JIRA_EMAIL, MEOW_JIRA_SITE_URL
+```
 
 ### Harness (Autonomous Build Pipeline)
 

@@ -4,7 +4,7 @@ Connect mk:intake to your task management tool. Five options — pick the one th
 
 ## Contents
 
-- [Option 1: Atlassian (Jira + Confluence)](#option-1-atlassian-jira-confluence)
+- [Option 1: Atlassian (Jira)](#option-1-atlassian-jira)
 - [Option 2: Linear](#option-2-linear)
 - [Option 3: GitHub Issues](#option-3-github-issues)
 - [Option 4: Manual Paste](#option-4-manual-paste)
@@ -13,25 +13,27 @@ Connect mk:intake to your task management tool. Five options — pick the one th
 - [Fallback Behavior](#fallback-behavior)
 
 
-## Option 1: Atlassian (Jira + Confluence)
+## Option 1: Atlassian (Jira)
 
-**Recommended for Jira users.**
+**Recommended for Jira users — uses the `jira-as` CLI via the `mk:jira` skill family.**
 
+Setup:
 ```bash
-# Hosted Rovo endpoint (recommended — no self-hosting required)
-claude mcp add --transport http atlassian https://mcp.atlassian.com/v1/mcp
+# Install jira-as into the meowkit venv (auto-handled by mewkit setup)
+npx mewkit setup
 
-# Self-hosted alternative
-# See: https://github.com/atlassian/atlassian-mcp-server
+# Populate .claude/.env with the three MEOW_JIRA_* vars
+cp .claude/.env.example .claude/.env
+# Edit MEOW_JIRA_API_TOKEN, MEOW_JIRA_EMAIL, MEOW_JIRA_SITE_URL
 ```
 
-After connecting, fetch a ticket:
+After setup, fetch a ticket via the `mk:jira-issue` leaf:
 ```
 /mk:intake
 > Fetch PROJ-123 from Jira
 ```
 
-The MCP exposes: `get_issue`, `search_issues`, `add_comment`, `create_issue`.
+`mk:intake` triages the ticket; structured execution is delegated to the `mk:jira-*` family. See `.claude/skills/jira/references/install-and-auth.md` for full setup details.
 
 ## Option 2: Linear
 

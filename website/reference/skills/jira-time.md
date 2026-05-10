@@ -1,0 +1,49 @@
+---
+title: "mk:jira-time"
+description: "JIRA time tracking: log work, list/edit/delete worklogs, set estimates, generate reports."
+---
+
+# mk:jira-time
+
+## What This Skill Does
+
+Forks the `jira-time` agent to manage worklogs, estimates, and time-tracking reports. Worklog edit / delete is effectively irreversible — the agent confirms before exec.
+
+## When to Use
+
+- **Triggers:** "log 2h on PROJ-123", "show worklog for PROJ-123", "set estimate", "time report for sprint", "bulk-log"
+- **NOT for:** sprint capacity ([`mk:jira-agile`](/reference/skills/jira-agile)).
+
+## Duration Format
+
+`30m`, `2h`, `1d 4h`, `1w 2d`. Jira respects the workday length set per workspace (typically 8h/d, 5d/w).
+
+## Verified Wrapper Invocations
+
+| Operation | Tier | Invocation |
+|---|---|---|
+| Log work | 2 | `... time log PROJ-123 --time 2h --comment "..."` |
+| List worklogs | 1 | `... time worklogs PROJ-123` |
+| Update worklog | 3 | `... time update-worklog PROJ-123 --worklog-id <ID> --time 3h` |
+| Delete worklog | 4 | `... time delete-worklog PROJ-123 --worklog-id <ID>` (data lost) |
+| Set estimate | 3 | `... time estimate PROJ-123 --original 1d --remaining 4h` |
+| Tracking summary | 1 | `... time tracking PROJ-123` |
+| Time report by JQL | 1 | `... time report --jql "<JQL>" --from 2026-04-01 --to 2026-04-30` |
+| Bulk log | 2 | `... time bulk-log --jql "<JQL>" --time 30m --dry-run` |
+
+`time log` takes the issue key positional + `--time` flag (NOT positional duration).
+
+## Domain References
+
+- `references/time-tracking.md` — wrapper patterns
+- `references/time-format-quick-ref.md` — duration syntax reference
+- `references/jql-snippets.md` — copy-paste time-related JQL (worklog by user / date)
+- `references/estimation-guide.md` — story-point vs hours-based estimation tradeoffs
+
+## Peer Leaves
+
+`mk:jira-search` (JQL author for worklog filters) · `mk:jira-agile` (sprint capacity from time data) · `mk:jira-bulk` (bulk-log)
+
+## Agent
+
+[`jira-time`](/reference/agents/jira-time) — A + C, NOT B.

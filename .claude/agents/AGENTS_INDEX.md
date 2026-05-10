@@ -21,6 +21,22 @@
 | `analyst.md` | Core | Cost tracking, pattern extraction, lessons learned | MeowKit original | Phase 0, 6 | Auto at session start/end | 260326 | 260326 |
 | `journal-writer.md` | Support | Failure documentation, root cause analysis, lessons | Credit: Duy Nguyen | Phase 6 (Reflect), escalations | On failure/escalation | 260326 | 260326 |
 | `project-manager.md` | Core | Cross-workflow delivery tracking, evidence-based status reports | MeowKit original | on-demand (0–6) | Explicit delegation, `/mk:status`, or `post-phase-delegation.md` rule | 260422 | 260422 |
+| `jira-issue.md` | Domain | JIRA issue CRUD via jira-as wrapper (create/get/update/delete) | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-issue` skill | 260510 | 260510 |
+| `jira-search.md` | Domain | JIRA search + filter management via jira-as (JQL query/validate/build/export, saved filters) | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-search` skill | 260510 | 260510 |
+| `jira-lifecycle.md` | Domain | Workflow lifecycle: transition / assign / resolve / reopen / version / component | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-lifecycle` skill | 260510 | 260510 |
+| `jira-collaborate.md` | Domain | Comments, attachments, watchers, notifications | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-collaborate` skill | 260510 | 260510 |
+| `jira-relationships.md` | Domain | Issue links, blockers, dependencies, clone, bulk-link | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-relationships` skill | 260510 | 260510 |
+| `jira-time.md` | Domain | Time tracking: log / worklogs / estimates / reports / bulk-log | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-time` skill | 260510 | 260510 |
+| `jira-agile.md` | Domain | Agile: epics / sprints / backlog / rank / story-points / subtasks / velocity | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-agile` skill | 260510 | 260510 |
+| `jira-fields.md` | Domain | Custom field discovery + agile field configuration | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-fields` skill | 260510 | 260510 |
+| `jira-bulk.md` | Domain | Bulk JIRA ops (10+ issues) — dry-run mandatory first | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-bulk` skill | 260510 | 260510 |
+| `jira-jsm.md` | Domain | Service Management: queues, SLAs, customers, requests, approvals (8 sub-domains) | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-jsm` skill | 260510 | 260510 |
+| `jira-admin.md` | Domain | Project / user / group / scheme / automation administration (11 sub-domains) | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-admin` skill | 260510 | 260510 |
+| `jira-dev.md` | Domain | Dev artifacts: branch-name, PR-description, parse-commits, link-commit/PR | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-dev` skill | 260510 | 260510 |
+| `jira-ops.md` | Domain | Diagnostic: cache-status / cache-clear / discover-project | Adapted from JIRA-Assistant-Skills v4.0.1 | on-demand | Forked from `mk:jira-ops` skill | 260510 | 260510 |
+| `jira-evaluator.md` | Intelligence | Ticket complexity + inconsistency analysis (read-only) | Adapted from MeowKit jira/agents/ (skill-scoped → project-scoped, MCP→jira-as) | on-demand | Forked from `mk:jira-evaluator` skill | 260510 | 260510 |
+| `jira-estimator.md` | Intelligence | Heuristic story-point estimation (read-only) | Adapted from MeowKit jira/agents/ | on-demand | Forked from `mk:jira-estimator` skill | 260510 | 260510 |
+| `jira-analyst.md` | Intelligence | Full ticket context analysis incl. media (read-only) | Adapted from MeowKit jira/agents/ | on-demand | Forked from `mk:jira-analyst` skill | 260510 | 260510 |
 
 **CE version**: Context Engineering version — tracks when agents were last improved with context engineering principles.
 
@@ -44,6 +60,8 @@ All phases (0-6) have agent coverage.
 
 - **Core** — Pipeline agents that execute sequentially through phases 0-6. Each owns a distinct workflow phase.
 - **Support** — Invoked on-demand by core agents or explicitly by user. Can be spawned as subagents.
+- **Domain** — Domain-specific execution agents (currently: 13 jira-* domain agents). Forked from a matching `mk:<domain>-*` thin skill via `context: fork`. The skill body becomes the task brief.
+- **Intelligence** — Read-only reasoning agents that produce structured analysis without state changes (currently: 3 jira-{evaluator,estimator,analyst}).
 
 ## Subagent Status Protocol (v1.1.0)
 

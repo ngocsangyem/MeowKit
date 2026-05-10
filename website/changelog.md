@@ -16,6 +16,90 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.8.3 (2026-05-10) — Jira Family + Workflow Discovery
+
+### Highlights
+
+`mk:jira` becomes a pure router. Jira execution moves into 16 thin leaf skills — 13 domain plus 3 intelligence — each forking a dedicated agent in `.claude/agents/`. The Atlassian-MCP coupling is replaced with the `jira-as` CLI (auto-installed via `npx mewkit setup`). Workflow templates are no longer assumed: a new `fetch-workflow.sh` discovers each instance's actual statuses + transitions and caches them under `tasks/jira-workflows/` for `mk:jira-lifecycle`, `mk:jira-bulk`, `mk:planning-engine`, and `mk:jira-evaluator` to consume.
+
+### New Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `mk:jira-issue` | Single-issue CRUD via `jira-as` (create / get / update / delete). |
+| `mk:jira-search` | JQL queries + saved-filter management with mandatory user-input sanitization. |
+| `mk:jira-lifecycle` | Workflow transitions, assignment, resolution, version + component management. Cache-first. |
+| `mk:jira-collaborate` | Comments, attachments, watchers, notifications. Internal-vs-public confirm enforced. |
+| `mk:jira-relationships` | Issue links, blockers, dependencies, clone, bulk-link. |
+| `mk:jira-time` | Worklogs, estimates, time reports, bulk-log. |
+| `mk:jira-agile` | Epics, sprints, backlog, ranking, story points, subtasks, velocity. |
+| `mk:jira-fields` | Custom field discovery + agile field configuration. |
+| `mk:jira-bulk` | Bulk ops on 10+ issues with mandatory dry-run + workflow-cache validation. |
+| `mk:jira-jsm` | Service Management: 8 sub-domains (~45 verbs). Requires JSM license. |
+| `mk:jira-admin` | Project / user / group / scheme / automation administration. 11 sub-domains. |
+| `mk:jira-dev` | Developer artifact generation: branch-name, PR-description, smart-commits. |
+| `mk:jira-ops` | Diagnostic surface: cache-status / cache-clear / discover-project. |
+| `mk:jira-evaluator` | Read-only ticket complexity + inconsistency analysis. Persists report. |
+| `mk:jira-estimator` | Read-only heuristic story-point estimation. Auto-consumes evaluator output. |
+| `mk:jira-analyst` | Read-only full ticket context analysis incl. media. Persists structured RCA. |
+
+### New Agents
+
+- `jira-issue` — JIRA issue CRUD via the `jira-as` wrapper.
+- `jira-search` — JIRA search + saved-filter management.
+- `jira-lifecycle` — Workflow lifecycle with cache-first transition discovery.
+- `jira-collaborate` — Comments, attachments, watchers, notifications.
+- `jira-relationships` — Issue link / unlink / blocker / dependency / clone.
+- `jira-time` — Time tracking + worklog management.
+- `jira-agile` — Sprint / epic / backlog / story-point management.
+- `jira-fields` — Custom field discovery + admin configuration.
+- `jira-bulk` — Bulk operations with mandatory dry-run discipline.
+- `jira-jsm` — JIRA Service Management across 8 sub-domains.
+- `jira-admin` — Highest-blast-radius admin agent with 2-step token confirmation on destructive ops.
+- `jira-dev` — Developer artifact generator (branch / PR / commit linking).
+- `jira-ops` — `jira-as` cache + project-context diagnostics.
+- `jira-evaluator` — Read-only complexity + inconsistency analysis (persists report).
+- `jira-estimator` — Read-only heuristic story-point estimation (persists report).
+- `jira-analyst` — Read-only ticket + media analysis (persists report).
+
+### Features
+
+- New script `scripts/fetch-workflow.sh` — discovers a project's actual workflow via `admin workflow for-issue <KEY>` (admin path) with non-admin fallback to `lifecycle transitions <KEY>`. Cache layout: `tasks/jira-workflows/_schemes/<PROJECT>.md` (project → workflow mapping) + `tasks/jira-workflows/<workflow-slug>.md` (full statuses + transitions).
+- New env vars `MEOW_JIRA_API_TOKEN`, `MEOW_JIRA_EMAIL`, `MEOW_JIRA_SITE_URL` in `.claude/.env`. The wrapper `scripts/jira-as.sh` translates them to `jira-as`'s native `JIRA_*` names per call and sets `JIRA_OUTPUT=json` as default.
+- New SessionStart hook `jira-env-loader.sh` — validates `.claude/.env` presence + the 3 required keys; emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing` to the status line.
+- New env var `CLAUDE_CODE_FORK_SUBAGENT=1` set in `settings.json` `env` block by default — enables `context: fork` semantics for the 16 thin leaves.
+- New pip dependency manifest `meowkit/.claude/skills/jira/scripts/requirements.txt` — `npx mewkit setup` auto-installs `jira-as` (and the `jira-as[keyring]` extra) into `.claude/skills/.venv`.
+- 32 new VitePress reference pages — one per leaf skill + one per agent — grouped under "Jira (Router + Family)" and "Jira Agents" in the sidebar.
+- 30 high-signal references adopted from upstream `JIRA-Assistant-Skills` (issue templates, JQL patterns, workflow patterns, comment templates, field-types reference, voodoo-constants, ITIL workflows, branch-naming + smart-commits guides) — all rewritten to use the `jira-as` wrapper instead of upstream Python scripts.
+
+### Improvements
+
+- `mk:planning-engine` and `mk:intake` no longer reference Atlassian MCP — both now route through the `mk:jira-*` family. `mk:planning-engine` gotchas + `mk:intake/references/jira-{awareness,handoff-protocol}.md` updated accordingly.
+- All 16 `jira-*` agents conform to MeowKit conventions: `Required Context (MeowKit)` block (loads `docs/project-context.md`), `Skill Rule of Two` self-classification, `Memory (MeowKit convention)` block using `##pattern:` / `##note:` / `##decision:` prefixes against typed memory files. The 3 intelligence agents persist their reports to `tasks/reports/jira-{evaluate,estimate,analyze}-*.md` for cross-session continuity.
+- The `jira-estimator` agent verifies the per-instance Story Points field ID at runtime (`fields list --search "Story Points"`) instead of guessing — `customfield_10016` is the documented default but the agent always confirms.
+- Pattern files at `mk:jira-lifecycle/references/patterns/{standard,software-dev,jsm-request,incident}-workflow.md` are now labeled "CONCEPT REFERENCE — NOT AUTHORITATIVE" and point at the discovered workflow cache as the source of truth.
+
+### Removals
+
+- `mk:confluence` skill removed — 9 files deleted, 3 cross-references updated. Migration: confluence reads no longer have a first-party path; if needed, invoke Atlassian MCP directly per `mk:jira/references/install-and-auth.md`.
+- The legacy `mk:jira` Atlassian-MCP execute path is gone. The router contains zero `Agent(...)` calls and zero `jira-as` invocations.
+- The 3 intelligence agents previously at skill-scoped `meowkit/.claude/skills/jira/agents/` move to project-scoped `meowkit/.claude/agents/jira-{evaluator,estimator,analyst}.md`. The old directory is deleted.
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the new defaults — this auto-installs `jira-as` into `.claude/skills/.venv` via the new `requirements.txt`.
+- Populate `.claude/.env` from `.claude/.env.example` with the three `MEOW_JIRA_*` vars.
+- Pre-existing scripts that called `/mk:jira evaluate KEY` should switch to `/mk:jira-evaluator KEY` (and similarly for `estimate` / `analyze`).
+- `mk:confluence` users: there is no drop-in replacement. Use Atlassian MCP directly, or read pages manually before invoking `mk:jira-issue` for ticket creation.
+
+### Breaking Changes
+
+- `mk:jira` is no longer an executor — it only routes. All previous `/mk:jira <verb>` invocations route to the appropriate `mk:jira-*` leaf instead of executing inline.
+- `mk:confluence` removed entirely.
+- Required env vars: `MEOW_JIRA_API_TOKEN`, `MEOW_JIRA_EMAIL`, `MEOW_JIRA_SITE_URL` in `.claude/.env`. Without them, the SessionStart hook surfaces `[mk:jira] <KEY> missing` and wrapper invocations error out.
+
+---
+
 ## 2.8.2 (2026-05-09) — Prompt Enhancer Output Modes
 
 ### Highlights

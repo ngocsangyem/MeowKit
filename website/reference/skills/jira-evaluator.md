@@ -1,0 +1,61 @@
+---
+title: "mk:jira-evaluator"
+description: "Read-only ticket complexity + inconsistency analysis. Persists report for downstream skills."
+---
+
+# mk:jira-evaluator
+
+## What This Skill Does
+
+Forks the `jira-evaluator` agent to analyze a single Jira ticket for **complexity** and **inconsistencies**. Read-only — never mutates Jira. Persists the evaluation to `tasks/reports/jira-evaluate-*.md` for cross-session continuity.
+
+## When to Use
+
+- **Triggers:** "evaluate PROJ-123", "analyze ticket complexity for KEY", "check ticket quality"
+- **NOT for:** estimation ([`mk:jira-estimator`](/reference/skills/jira-estimator)) · full RCA ([`mk:jira-analyst`](/reference/skills/jira-analyst)).
+
+## Output
+
+```markdown
+## Ticket Evaluation: {ISSUE-KEY}
+
+**Complexity:** {Simple|Medium|Complex} (likely {Fibonacci range}pt)
+**Confidence:** {High|Medium|Low}
+
+### Signals
+- Scope, Dependencies, Regression risk, Requirement clarity, External, Historical
+- Workflow shape (read from tasks/jira-workflows/<workflow-slug>.md)
+
+### Issues Detected
+- ⚠️ {issue}
+
+### Suggested Actions
+- {actionable suggestions referencing the right mk:jira-* leaf}
+
+### Open Questions
+- {unresolved ambiguities}
+```
+
+## Workflow Cache Integration
+
+The evaluator reads the discovered workflow cache (`tasks/jira-workflows/<workflow-slug>.md`) — workflow shape (status_count, transition_count, parallel branches) feeds the complexity signal. If the cache is absent, the agent runs `fetch-workflow.sh <KEY>` first.
+
+## Report Persistence
+
+Writes to `tasks/reports/jira-evaluate-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md`. Consumed by:
+
+- `mk:jira-estimator` — auto-incorporates complexity signals
+- `mk:planning-engine` — capacity analysis
+- `mk:cook` (plan-creation input)
+
+## Shared References
+
+- `references/evaluation-rubric.md` (in `mk:jira/references/`)
+
+## Peer Skills
+
+`mk:jira-estimator` (run after evaluator for point estimate) · `mk:jira-analyst` (full ticket synthesis) · `mk:planning-engine` (downstream consumer)
+
+## Agent
+
+[`jira-evaluator`](/reference/agents/jira-evaluator) — A + C (FS write only — NEVER Jira state), NOT B. 2/3 compliant.

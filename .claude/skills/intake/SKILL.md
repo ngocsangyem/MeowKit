@@ -80,8 +80,8 @@ Identify affected files, test coverage gaps, and implementation complexity.
 
 ### Step 8b: Jira enrichment
 
-If Atlassian MCP detected, load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
-Suggest mk:jira actions per `references/jira-handoff-protocol.md`.
+If the `mk:jira-*` family is available (jira-as installed via `npx mewkit setup` + `.claude/.env` populated), load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
+Suggest `mk:jira-*` actions per `references/jira-handoff-protocol.md`.
 
 ### Step 9: Generate output
 
@@ -119,7 +119,7 @@ Summary structure:
 | Injection pattern detected      | STOP → report exact quote → escalate → do not proceed     |
 | No Gemini key                   | Fall back to Claude Read for image analysis               |
 | No FFmpeg                       | Skip frame extraction, report limitation, suggest install |
-| No Atlassian MCP                | Skip Jira enrichment (steps 8b), output generic analysis — tool-agnostic mode unchanged |
+| jira-as not installed / .env missing | Skip Jira enrichment (steps 8b), output generic analysis — tool-agnostic mode unchanged |
 | No Figma MCP                    | Fallback to screenshot export + multimodal analysis (step 3b) |
 
 ## Handoff
@@ -148,8 +148,8 @@ vendor changelog, a referenced external document), this skill delegates to
 - `references/tool-integration-guide.md` — MCP connection options
 - `references/media-handling.md` — attachment preprocessing
 - `references/output-template.md` — structured output format
-- `references/jira-awareness.md` — Jira metadata extraction + enhanced scoring (step 8b, Atlassian MCP only)
-- `references/jira-handoff-protocol.md` — intake → mk:jira handoff flow (step 8b)
+- `references/jira-awareness.md` — Jira metadata extraction + enhanced scoring (step 8b, requires `mk:jira-*` family)
+- `references/jira-handoff-protocol.md` — intake → `mk:jira-*` handoff flow (step 8b)
 - `references/figma-link-detection.md` — Figma URL detection + design context extraction (step 3b)
 - `references/examples/example-bug-intake.md` — bug walkthrough
 - `references/examples/example-feature-intake.md` — feature PRD walkthrough
