@@ -16,6 +16,62 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ---
 
+## 2.8.4 (2026-05-10) — Confluence Ecosystem + Macro-Aware Spec Analysis
+
+### Highlights
+
+`mk:confluence` returns as a 6-skill ecosystem (1 hub + 5 leaves) backed by the `confluence-as` CLI. The differentiator is `mk:confluence-spec-analyst` — it fetches pages as ADF (`atlas_doc_format`) and pipes the body through a new macro-aware walker so panels, decisions, task lists, mentions, expand sections, and Smart Link / Figma embeds survive as explicit markdown labels (`> [INFO]`, `> [DECISION]`, `- [ ]`, `<details>`, `@name`, `![alt](attachment:<id>)`). Macro labels become first-class signals for downstream gap detection. The 2.8.3 removal is reversed: there is now a first-party Confluence read path, with `mk:planning-engine --spec` consuming the resulting Spec Research Report.
+
+### New Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `mk:confluence` | Pure routing hub — recommends the right `mk:confluence-*` leaf; never executes. |
+| `mk:confluence-page` | Single-page CRUD via `confluence-as` plus hierarchy traversal, version restore, and copy / move. |
+| `mk:confluence-search` | CQL queries, validation, space listing, saved-filter management, and export — with mandatory user-input sanitization. |
+| `mk:confluence-spec-analyst` | Read-only deep spec analysis — produces a structured Spec Research Report consumed by `mk:planning-engine`. |
+| `mk:confluence-bulk` | Bulk-label / bulk-move / bulk-delete on 10+ pages with mandatory 3-step dry-run ceremony. |
+| `mk:confluence-collaborate` | Comments, attachments, labels, watchers — folds 4 upstream skill domains into one footer-default agent. |
+
+### New Agents
+
+- `confluence-page` — Page CRUD + hierarchy + version + copy/move agent.
+- `confluence-search` — CQL search + saved-filter agent with unconditional sanitization.
+- `confluence-spec-analyst` — Read-only spec analyst with macro-aware ADF fetch path and persisted reports.
+- `confluence-bulk` — Bulk operations agent with mandatory dry-run + typed-token confirmation.
+- `confluence-collaborate` — Per-page collaboration agent (comments, attachments, labels, watchers) with footer-default discipline.
+
+### Features
+
+- New macro-aware walker `confluence/scripts/adf-to-md.sh` + `adf_to_md.py` — preserves panel / decisionList / decisionItem / taskList / taskItem / expand / mention / media / inlineCard / blockCard nodes with explicit ASCII labels. Two modes: stdin (pipe an ADF body) or `--page-id <N>` (single-call fetch via the wrapper).
+- Single-call fetch pattern in `mk:confluence-spec-analyst` — extracts metadata + body from one ADF response, halving per-page API request count and staying inside the Cloud rate limit (10 req/s).
+- Per-child failure handling — root-page fetch failure aborts the run; child fetch failure appends `[INCOMPLETE: child <id>]` and continues with the partial corpus.
+- Unknown ADF nodes emit `[UNHANDLED_NODE: <type>]` with **keys-only metadata** — type name + sorted attribute keys, never raw text or attribute values. Closes the prompt-injection vector through custom macros.
+- Mention display names are escaped + scanned against the prompt-injection pattern list before emission; matched names are redacted to `[REDACTED_DISPLAY_NAME]`.
+- New env vars `MEOW_CONFLUENCE_API_TOKEN`, `MEOW_CONFLUENCE_EMAIL`, `MEOW_CONFLUENCE_SITE_URL` in `.claude/.env`. The wrapper `scripts/confluence-as.sh` translates them to `confluence-as`'s native `CONFLUENCE_*` names per call and refuses any plaintext-credential fallback in `.claude/settings.local.json`.
+- Cloud-only gate — wrapper exits 3 on non-`*.atlassian.net` URLs and points at the Atlassian MCP escape hatch.
+- `mk:planning-engine` accepts `--spec <report-path>` pointing at a `mk:confluence-spec-analyst` report; the Planning Report gains a `## Spec Context` section.
+- `mk:intake` recognizes Confluence URLs (`*.atlassian.net/wiki/spaces/...`) and raw page IDs as a 5th source.
+- Walker fixture `meowkit/.claude/skills/confluence/scripts/tests/fixtures/adf-macros.json` + `adf-macros.expected.md` for deterministic regression checks.
+- 11 new VitePress reference pages (5 agents + 6 skills) grouped under "Confluence Agents" and "Confluence (Router + Family)" in the sidebar.
+
+### Improvements
+
+- Children traversal cap lowered from 10 to 5 in `mk:confluence-spec-analyst` to stay inside the Confluence Cloud per-user rate limit under the single-call-per-child pattern.
+- ADR `260510-mk-confluence-ecosystem-path-b.md` extended with an addendum documenting the macro-aware fetch path, the ADF coupling rationale, and why a 7th `mk:confluence-convert` skill was rejected (wrapping a lossy upstream function inherits the loss).
+- `confluence/references/cli-idioms.md` gains a "Local conversion helpers" section + macro label convention table.
+- `confluence/references/safety-framework.md` adds new failure-mode rows for the walker's exit codes and a sanitization-addendum note.
+- `confluence-spec-analyst/references/spec-analysis-patterns.md` gains 6 macro-label heuristics (decisions without rationale → INFO; task items without owner → GAP; panels with weasel words → AMB; mentions without context → INFO; media without alt → GAP; `[UNHANDLED_NODE]` → Open Question).
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the new defaults — this auto-installs `confluence-assistant-skills` (CLI distribution) into `.claude/skills/.venv` via the existing `requirements.txt`.
+- Populate `.claude/.env` from `.claude/.env.example` with the three `MEOW_CONFLUENCE_*` vars.
+- Reverse direction (md → adf) is deferred — no consumer in MeowKit currently calls `page update --representation atlas_doc_format --content-file <json>`. Re-add when a real consumer surfaces.
+- The 2.8.3 removal advice ("use Atlassian MCP directly") is superseded — `mk:confluence` is the first-party path again.
+
+---
+
 ## 2.8.3 (2026-05-10) — Jira Family + Workflow Discovery
 
 ### Highlights

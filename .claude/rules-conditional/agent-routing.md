@@ -29,3 +29,16 @@ applies_to: [Phase 0, all]
 No two agents modify the same file type. Conflicts → escalate to human.
 
 **Opt-out:** `MEOWKIT_PM_AUTO=off` disables all silent (background) project-manager fires from orchestration skills. User-invoked `/mk:status` is always honored. See `.claude/rules/post-phase-delegation.md` for fire points and skip conditions.
+
+## Domain Integration Agents (routed by hub skills, NOT by orchestrator)
+
+The 21 domain integration agents below are NOT scored by `mk:agent-detector` and are NOT in the table above. They live behind their hub skill's routing layer; the hub picks the leaf based on intent + verb match.
+
+| Hub skill | Agent count | Agents | CLI backend |
+| --- | ---: | --- | --- |
+| `mk:jira` | 16 | jira-issue, jira-search, jira-lifecycle, jira-collaborate, jira-relationships, jira-time, jira-agile, jira-fields, jira-bulk, jira-jsm, jira-admin, jira-dev, jira-ops, jira-evaluator, jira-estimator, jira-analyst | `jira-as` |
+| `mk:confluence` | 5 | confluence-page, confluence-search, confluence-spec-analyst, confluence-bulk, confluence-collaborate | `confluence-as` |
+
+**Routing flow:** `mk:agent-detector` (Phase 0) → if scale-routing CSV matches `jira` or `confluence` keywords, route to the hub skill → hub disambiguates and forks the leaf agent via the matching `mk:<domain>-<leaf>` skill. Orchestrator never invokes a domain agent directly.
+
+**Why excluded from the core table:** Domain integration agents are scoped to one external system, follow a separate safety model (4-tier per-leaf with the wrapper as the credential boundary), and would dilute the core agent scoring if they shared the orchestrator's keyword surface. The hubs are the routing surface for their families.

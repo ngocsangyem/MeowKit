@@ -147,7 +147,8 @@ Skills that can activate in any phase.
 
 | Skill | What it does |
 |-------|-------------|
-| `mk:jira` | Jira ticket intelligence via Atlassian MCP. Internal agents: jira-evaluator, jira-estimator, jira-analyst |
+| `mk:jira` | Routing hub for the 16-leaf Jira family backed by the `jira-as` CLI |
+| `mk:confluence` | Routing hub for the 5-leaf Confluence Cloud family (page CRUD, CQL search, spec analysis with macro-aware ADF fetch, bulk ops, collaboration) backed by the `confluence-as` CLI |
 | `mk:figma` | Figma design analysis + implementation via Figma MCP. 3 modes: analyze, implement, tokens |
 
 ### Infrastructure

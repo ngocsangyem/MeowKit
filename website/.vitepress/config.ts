@@ -203,6 +203,17 @@ export default withMermaid(defineConfig({
           ],
         },
         {
+          text: 'Confluence Agents',
+          collapsed: true,
+          items: [
+            { text: 'confluence-page', link: '/reference/agents/confluence-page' },
+            { text: 'confluence-search', link: '/reference/agents/confluence-search' },
+            { text: 'confluence-spec-analyst', link: '/reference/agents/confluence-spec-analyst' },
+            { text: 'confluence-bulk', link: '/reference/agents/confluence-bulk' },
+            { text: 'confluence-collaborate', link: '/reference/agents/confluence-collaborate' },
+          ],
+        },
+        {
           text: 'Harness Pipeline',
           collapsed: true,
           items: [
@@ -354,6 +365,18 @@ export default withMermaid(defineConfig({
             { text: 'mk:jira-evaluator', link: '/reference/skills/jira-evaluator' },
             { text: 'mk:jira-estimator', link: '/reference/skills/jira-estimator' },
             { text: 'mk:jira-analyst', link: '/reference/skills/jira-analyst' },
+          ],
+        },
+        {
+          text: 'Confluence (Router + Family)',
+          collapsed: true,
+          items: [
+            { text: 'mk:confluence (router)', link: '/reference/skills/confluence' },
+            { text: 'mk:confluence-page', link: '/reference/skills/confluence-page' },
+            { text: 'mk:confluence-search', link: '/reference/skills/confluence-search' },
+            { text: 'mk:confluence-spec-analyst', link: '/reference/skills/confluence-spec-analyst' },
+            { text: 'mk:confluence-bulk', link: '/reference/skills/confluence-bulk' },
+            { text: 'mk:confluence-collaborate', link: '/reference/skills/confluence-collaborate' },
           ],
         },
         {

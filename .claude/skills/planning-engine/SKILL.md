@@ -4,7 +4,7 @@ version: 1.0.0
 description: "Analyzes ticket complexity and maps dependencies against an existing codebase before sprint planning. Triggers on 'how complex is this ticket', 'what should we work on first', 'can we fit this in the sprint', 'tech review before planning', 'plan the sprint'. NOT for writing implementation plans (see mk:plan-creator); NOT for scope/ambition review (see mk:plan-ceo-review)."
 phase: 1
 source: meowkit
-argument-hint: "review PROJ-123 [--scout] [--graph] | plan --tickets PROJ-101,PROJ-102 [--capacity 40]"
+argument-hint: "review PROJ-123 [--scout] [--graph] | plan --tickets PROJ-101,PROJ-102 [--capacity 40] [--scout] [--spec <report-path>]"
 allowed-tools: [Read, Grep, Glob, Bash]
 keywords: [planning-engine, ticket-complexity, sprint-planning, dependency-mapping, tech-review]
 when_to_use: "Use when analyzing ticket complexity and dependencies against existing codebase before sprint planning. NOT for writing implementation plans (see mk:plan-creator)."
@@ -33,6 +33,7 @@ Scout and graph are optional — skill degrades gracefully without them.
 | `review PROJ-123 --graph` | With third-party code graph context |
 | `plan --tickets PROJ-101,PROJ-102,...` | Multi-ticket planning report |
 | `plan --tickets PROJ-101,PROJ-102 --capacity 40` | With sprint capacity constraint |
+| `plan --tickets PROJ-101,PROJ-102 --spec <report-path>` | With Confluence spec context (path to existing `mk:confluence-spec-analyst` report) |
 
 ## Agent Mode
 
@@ -57,13 +58,25 @@ Note: If scout was NOT run, proceed without it → `[NO_CODEBASE_CONTEXT]` in re
 
 For `plan`:
 ```
-1. Read("agents/planning-reporter.md") → agent_def
-2. Agent(subagent_type: "general-purpose",
-         prompt: "{agent_def}\n\nTask: plan tickets PROJ-101,PROJ-102 --capacity 40")
-3. Capture output → write report
+1. If --spec <report-path> provided:
+   a. Validate the path exists. If not, prompt user with:
+      "No spec report at <path>. Run mk:confluence-spec-analyst <page-id> first,
+       then re-invoke planning-engine with the resulting report path. Exiting."
+      and exit (mirrors --scout's prompt-then-exit pattern). NEVER auto-invoke
+      mk:confluence-spec-analyst — skill-to-skill invocation is forbidden.
+   b. Validate it is a spec-analyst report by checking the H1 prefix:
+      head -1 <report-path> | grep -qE '^# Spec Research Report:'
+      If not matching, exit with the same prompt as (a).
+   c. Read the file; extract ## Requirements / ## Acceptance Criteria /
+      ## Gaps & Ambiguities sections; pass extracted content + report path
+      to the agent as additional input.
+2. Read("agents/planning-reporter.md") → agent_def
+3. Agent(subagent_type: "general-purpose",
+         prompt: "{agent_def}\n\nSpec context:\n{spec_extracted_or_NONE}\n\nTask: plan tickets PROJ-101,PROJ-102 --capacity 40")
+4. Capture output → write report. Report includes ## Spec Context section when --spec was provided.
 ```
 
-**Subagents CANNOT spawn other subagents.** Scout/graph must be called at SKILL.md level.
+**Subagents CANNOT spawn other subagents.** Scout/graph/spec-fetch must be called at SKILL.md level.
 
 **Report persistence:** After agent completes, parent writes report to:
 1. Active plan's `research/` if exists
@@ -73,13 +86,14 @@ For `plan`:
 
 - `--scout` → SKILL.md invokes `/mk:scout`, passes output inline to agent
 - `--graph` → SKILL.md reads graph output from a graph-skill or user-supplied input, passes inline
-- Neither → ticket-only analysis with `[NO_CODEBASE_CONTEXT]` flag
+- `--spec <report-path>` → SKILL.md reads existing `mk:confluence-spec-analyst` report (user runs spec-analyst FIRST), extracts Requirements / AC / Gaps, passes inline. Validation failure → prompt user to run spec-analyst, exit. Read failure mid-flow → `[NO_SPEC_CONTEXT: <error>]` flag, continue without spec
+- None → ticket-only analysis with `[NO_CODEBASE_CONTEXT]` flag
 
 ## Output
 
 Reports are markdown files. See `assets/` for templates:
 - **Tech Review Report:** feasibility, affected files, dependencies, risks, complexity signals
-- **Planning Report:** sprint goal candidate, dependency map, grouping, sequencing, capacity analysis
+- **Planning Report:** sprint goal candidate, dependency map, grouping, sequencing, capacity analysis. With `--spec`, includes a `## Spec Context (mk:confluence-spec-analyst)` section summarizing upstream spec requirements / AC / gaps relevant to the planning tickets.
 
 ## Gotchas
 
@@ -135,6 +149,7 @@ None of these are required. The skill degrades gracefully:
 ## Handoff
 
 - **mk:jira-evaluator / mk:jira-estimator → mk:planning-engine** — evaluate/estimate output enriches tech review
+- **mk:confluence-spec-analyst → mk:planning-engine** — Confluence spec report enriches planning via `--spec <report-path>` (user runs spec-analyst first, then passes the report path)
 - **mk:planning-engine → human** — human reads report, decides what to build
 
 ## References

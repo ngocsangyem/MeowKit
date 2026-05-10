@@ -10,3 +10,5 @@ government,"government,civic,public,admin,regulation",high,enhanced,"accessibili
 internal_tools,"admin,dashboard,internal,backoffice,cms",low,standard,"admin panel patterns, RBAC, data tables"
 docs,"documentation,readme,changelog,wiki,guide",low,one-shot,"documentation generators, static site builders"
 cli,"command_line,cli,terminal,shell,script",medium,standard,"CLI frameworks, argument parsing, shell scripting"
+jira,"jira,ticket,issue,jql,sprint,backlog,epic,story-point,worklog,atlassian",medium,standard,"jira-as CLI, JQL injection-safe sanitizer, workflow discovery cache"
+confluence,"confluence,wiki,spec page,page-id,cql,space-key,atlas_doc_format,adf,panel,decision macro",medium,standard,"confluence-as CLI, CQL injection-safe sanitizer, ADF macro-aware walker"

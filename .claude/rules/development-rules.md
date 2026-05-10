@@ -1,16 +1,14 @@
----
-source: claudekit-engineer
-original_file: development-rules.md
-adapted: yes
-adaptation_notes: >
-  Merged highest-scoring rules from development-rules.md, primary-workflow.md,
-  and team-coordination-rules.md. Added WHY explanations per
-  rule-writing principle #2. Paired every NEVER with an INSTEAD per principle #1.
----
-
 # Development Rules
 
-These rules apply to all implementation work in MeowKit.
+These rules apply to all implementation work in project.
+
+## General
+
+- Use `mk:multimodal` skill for describing details of images, videos, documents, etc. if needed
+- Use `mk:multimodal` skill and `imagemagick` skill for generating and editing images, videos, documents, etc. if needed
+- Use `mk:sequential-thinking` and `mk:investigate` skills for sequential thinking, analyzing code, debugging, etc. if needed
+- **[IMPORTANT]** Follow the codebase structure and code standards in `./docs` during implementation.
+- **[IMPORTANT]** Do not just simulate the implementation or mocking them, always implement the real code.
 
 ## File Management
 
@@ -91,12 +89,12 @@ ALWAYS apply default output limits to prevent context bloat at source.
 PostToolUse hooks cannot truncate tool output (hooks append, not replace).
 Instead, prevent bloat by limiting output at the tool call site.
 
-| Tool | Default Limit | Override |
-|------|--------------|----------|
-| Glob | `head_limit=50` | Increase only when explicitly needing more results |
-| Grep | `head_limit=20` per query | Increase for comprehensive searches |
-| Read | `offset` + `limit` for files >500 lines | Read full file only when necessary |
-| Bash | Pipe through `head -100` for verbose commands | Skip for commands with concise output |
+| Tool | Default Limit                                 | Override                                           |
+| ---- | --------------------------------------------- | -------------------------------------------------- |
+| Glob | `head_limit=50`                               | Increase only when explicitly needing more results |
+| Grep | `head_limit=20` per query                     | Increase for comprehensive searches                |
+| Read | `offset` + `limit` for files >500 lines       | Read full file only when necessary                 |
+| Bash | Pipe through `head -100` for verbose commands | Skip for commands with concise output              |
 
 WHY: Unbounded tool output consumes 14-70% of context window per research measurements.
 Limiting at source is behavioral (agent compliance) but achievable immediately without platform changes.

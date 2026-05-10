@@ -169,9 +169,60 @@ Create a task file for any change affecting > 2 files OR > 30 minutes.
 
 ## Harness Env Vars
 
+Source of truth: `.claude/.env.example`. Most defaults live in `.claude/settings.json` `env` block (team-shared, git-committed); override here per-project / per-user. Uncommented values in `.claude/.env` win over `settings.json`; shell exports win over both.
+
+### Density + budget
+
 | Variable | Values | Effect |
 |----------|--------|--------|
 | `MEOWKIT_HARNESS_MODE` | `MINIMAL` \| `FULL` \| `LEAN` | Override auto-detected scaffolding density |
 | `MEOWKIT_MODEL_HINT` | e.g. `opus-4-6` | Tell harness which model is running (enables LEAN auto-detect) |
-| `MEOWKIT_BUDGET_CAP` | e.g. `50` | Hard budget cap in USD for harness runs |
-| `MEOWKIT_SUMMARY_CACHE` | `off` | Disable conversation-summary cache |
+| `MEOWKIT_BUDGET_WARN` | e.g. `30` | USD warn threshold (prints warning, continues) |
+| `MEOWKIT_BUDGET_BLOCK` | e.g. `100` | USD hard-block threshold (halts the run, sets `final_status=TIMED_OUT`) |
+| `MEOWKIT_BUDGET_CAP` | e.g. `50` | User-set cap; overrides `BUDGET_BLOCK` (can be lower OR higher) |
+
+### Core runtime
+
+| Variable | Values | Effect |
+|----------|--------|--------|
+| `MEOWKIT_TDD` | `0` \| `1` | `1` = strict red-green-refactor (`pre-implement.sh` enforces failing-test-first); `0` = optional (default) |
+| `MEOWKIT_HOOK_PROFILE` | `standard` \| `fast` \| `strict` | Hook profile selector. Legacy alias `MEOW_HOOK_PROFILE` still accepted; new name wins if both set |
+
+### Conversation summary cache
+
+| Variable | Values | Effect |
+|----------|--------|--------|
+| `MEOWKIT_SUMMARY_CACHE` | `on` \| `off` | Master switch for the conversation-summary cache (default `on`) |
+| `MEOWKIT_SUMMARY_THRESHOLD` | bytes (default `20480`) | Min transcript size before summarization fires |
+| `MEOWKIT_SUMMARY_TURN_GAP` | events (default `30`, ≈ 3-6 turns) | Min JSONL events between summary regenerations |
+| `MEOWKIT_SUMMARY_GROWTH_DELTA` | bytes (default `5120`) | Min transcript growth between summary regenerations |
+| `MEOWKIT_SUMMARY_MODE` | auto-detected | Override summary mode (rarely set manually) |
+| `MEOWKIT_SUMMARY_BUDGET_SEC` | seconds | Time budget for summarization |
+| `MEOWKIT_SUMMARY_DEBUG` | `0` \| `1` | Verbose debug output for the summary pipeline |
+
+### Memory loader
+
+| Variable | Values | Effect |
+|----------|--------|--------|
+| `MEOWKIT_MEMORY_BUDGET` | chars (default `4000`, ~1K tokens) | Max memory injected by `memory-loader` per prompt |
+| `MEOWKIT_MEMORY_STALENESS_MONTHS` | months (default `6`) | Skip memory entries older than N months |
+
+### Hook controls
+
+Set to `off` to disable an individual hook; default `on`.
+
+| Variable | Effect |
+|----------|--------|
+| `MEOWKIT_BUILD_VERIFY` | Phase 4 build / lint / typecheck verification hook |
+| `MEOWKIT_LOOP_DETECT` | Loop / regression detection hook |
+| `MEOWKIT_PRECOMPLETION` | Pre-completion guard hook |
+| `MEOWKIT_TDD_FLAG_DETECTOR` | Detects `--tdd` flag and toggles strict mode |
+| `MEOWKIT_PM_AUTO` | `off` disables silent `project-manager` post-phase fires; `/mk:status` still works |
+
+### Precedence reminder
+
+```
+shell export  >  .claude/.env  >  .claude/settings.json "env" block
+```
+
+Unquoted values strip inline comments after `#`. Quote values that contain a literal `#` (e.g. API keys): `VAR="abc#123"`.

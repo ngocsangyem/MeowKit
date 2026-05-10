@@ -54,6 +54,8 @@ See `references/install-and-auth.md` for one-time setup (`npx mewkit setup` inst
 - `mk:intake` → recommends `mk:jira-*` leaf based on triage
 - `mk:cook` (build pipeline) → may invoke `mk:jira-issue` to create implementation tickets
 - `mk:ship` (ship pipeline) → may invoke `mk:jira-dev` for branch-name + PR-description
+- `mk:planning-engine` → consumes Jira tickets via this hub for sprint planning analysis (`mk:jira-evaluator` / `mk:jira-estimator` outputs enrich the planning report)
+- `mk:confluence` → sister hub for Confluence Cloud; `mk:planning-engine` accepts both Jira tickets (`--tickets`) and Confluence specs (`--spec <report-path>`) as input
 
 ## Gotchas
 

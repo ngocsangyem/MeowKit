@@ -21,13 +21,19 @@
 Agents at `.claude/agents/`:
 
 ```toon
-agents[5]{category,count,list}:
+core_agents[6]{category,count,list}:
   Planning,3,orchestrator/planner/architect
-  Development,1,developer
+  Development,2,developer/evaluator
   Quality & Security,3,tester/reviewer/security
-  Operations,3,shipper/documenter/project-manager
+  Operations,4,shipper/git-manager/documenter/project-manager
   Analysis,3,analyst/researcher/brainstormer
+  Design & Failure,2,ui-ux-designer/journal-writer
+domain_agents[2]{family,count,list}:
+  Jira,16,jira-issue/jira-search/jira-lifecycle/jira-collaborate/jira-relationships/jira-time/jira-agile/jira-fields/jira-bulk/jira-jsm/jira-admin/jira-dev/jira-ops/jira-evaluator/jira-estimator/jira-analyst
+  Confluence,5,confluence-page/confluence-search/confluence-spec-analyst/confluence-bulk/confluence-collaborate
 ```
+
+Total: 17 core + 21 domain = 38 agents. Core agents are routed by the orchestrator via the `agent-routing.md` table; domain agents are routed by their hub skill (`mk:jira` / `mk:confluence`) — the orchestrator does NOT score them directly.
 
 See `.claude/rules-conditional/agent-routing.md` for full details.
 

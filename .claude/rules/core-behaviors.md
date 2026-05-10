@@ -3,8 +3,6 @@
 6 mandatory behaviors that apply in ALL modes, ALL phases, ALL skills. Non-negotiable.
 These unify the WHY behind MeowKit's rule files. Rules are the enforcement WHAT.
 
-Source: adapted from agent-skills `using-agent-skills/SKILL.md`
-
 ---
 
 ## 1. Surface Assumptions
@@ -55,6 +53,7 @@ Sycophancy is a failure mode. Honest technical disagreement > false agreement.
 Your natural tendency is to overcomplicate. Actively resist it.
 
 Before finishing any implementation, ask:
+
 - Can this be done in fewer lines?
 - Are these abstractions earning their complexity?
 - Would a staff engineer say "why didn't you just..."?

@@ -1,11 +1,11 @@
 ---
 title: Agents Reference
-description: Complete agent roster — 33 specialist agents (12 core, 5 support, 16 Jira) with type, role, phase, and activation conditions.
+description: Complete agent roster — 38 specialist agents (12 core, 5 support, 16 Jira, 5 Confluence) with type, role, phase, and activation conditions.
 ---
 
 # Agents Reference
 
-MeowKit ships 33 specialist agents across three categories: 12 core pipeline agents, 5 support agents, and 16 Jira integration agents. Each owns a specific phase or concern. No two agents modify the same file type.
+MeowKit ships 38 specialist agents across four categories: 12 core pipeline agents, 5 support agents, 16 Jira integration agents, and 5 Confluence Cloud integration agents. Each owns a specific phase or concern. No two agents modify the same file type.
 
 ## Core Agents
 
@@ -60,6 +60,18 @@ Domain agents for Jira integration via the `jira-as` CLI wrapper. All share a 4-
 | [jira-evaluator](/reference/agents/jira-evaluator) | Ticket complexity scoring (8 dimensions) | Read-only analysis |
 | [jira-estimator](/reference/agents/jira-estimator) | Story point estimation with reasoning | Read-only, never sets points |
 | [jira-analyst](/reference/agents/jira-analyst) | Full context analysis with media and linked issues | Read-only, processes attachments |
+
+## Confluence Agents
+
+Domain agents for Confluence Cloud integration via the `confluence-as` CLI wrapper. Cloud-only (the wrapper exits 3 on non-`*.atlassian.net` URLs); follow the Rule of Two.
+
+| Agent | Role | Safety highlight |
+|-------|------|-----------------|
+| [confluence-page](/reference/agents/confluence-page) | Single-page CRUD + hierarchy + version + copy/move | 4-tier graduated confirmation; ADF-round-trip warning on macro-heavy bodies |
+| [confluence-search](/reference/agents/confluence-search) | CQL queries, validation, space listing, saved filters, export | Mandatory CQL sanitization for any user-derived term |
+| [confluence-spec-analyst](/reference/agents/confluence-spec-analyst) | Read-only deep spec analysis with macro-aware ADF fetch + persisted Spec Research Report | Read-only at Confluence side; `[UNHANDLED_NODE]` keys-only metadata blocks injection |
+| [confluence-bulk](/reference/agents/confluence-bulk) | Bulk-label / bulk-move / bulk-delete on 10+ pages | Mandatory 3-step dry-run + typed-token confirmation |
+| [confluence-collaborate](/reference/agents/confluence-collaborate) | Comments, attachments, labels, watchers per page | Footer-default for comments; path-traversal guard on uploads |
 
 ## Agent communication
 
