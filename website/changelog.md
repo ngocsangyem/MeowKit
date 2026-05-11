@@ -14,6 +14,10 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.3 (2026-05-11) — Optimize rules
+
+Apply Token-Oriented Object Notation (TOON) to rules. Dropped ~26,288 → ~23,234 tokens (~3,054 saved, 11.6%)
+
 ## 2.9.2 (2026-05-11) — Spec-to-tech-breakdown orchestrator
 
 ### Highlights
@@ -63,8 +67,8 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
+| Skill            | Purpose                                                                                                                                                    |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:story-sizer` | Pre-ticket per-story Fibonacci sizing from paste-mode input. Default read-only; opt-in `--auto-create` with mandatory batch dry-run + single confirmation. |
 
 ### New Agents
@@ -92,11 +96,11 @@ Adds a thin, conditionally-loaded Agile/Scrum governance layer covering Definiti
 
 ### New Conditional Rules
 
-| Rule | Purpose |
-|------|---------|
-| `agile-story-gates.md` | DoR (Phase 1 entry) + DoD (Gate 2 PASS) + traceability frontmatter contract |
+| Rule                         | Purpose                                                                      |
+| ---------------------------- | ---------------------------------------------------------------------------- |
+| `agile-story-gates.md`       | DoR (Phase 1 entry) + DoD (Gate 2 PASS) + traceability frontmatter contract  |
 | `agile-sprint-commitment.md` | Sprint goal persistence, mid-sprint amendment ceremony, sprint close hygiene |
-| `agile-feedback-cycle.md` | Retro action-item ceremony, spike governance (timebox + findings doc) |
+| `agile-feedback-cycle.md`    | Retro action-item ceremony, spike governance (timebox + findings doc)        |
 
 ### Skill Integrations
 
@@ -141,8 +145,8 @@ Two threads land together. The five Phase-Zero conditional rule files move back 
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
+| Skill        | Purpose                                                                                                                                                                    |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:preview` | Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, git diffs, and plan rendering. Display only; not for plan critique. |
 
 ### Features
@@ -182,14 +186,14 @@ Two threads land together. The five Phase-Zero conditional rule files move back 
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `mk:confluence` | Pure routing hub — recommends the right `mk:confluence-*` leaf; never executes. |
-| `mk:confluence-page` | Single-page CRUD via `confluence-as` plus hierarchy traversal, version restore, and copy / move. |
-| `mk:confluence-search` | CQL queries, validation, space listing, saved-filter management, and export — with mandatory user-input sanitization. |
-| `mk:confluence-spec-analyst` | Read-only deep spec analysis — produces a structured Spec Research Report consumed by `mk:planning-engine`. |
-| `mk:confluence-bulk` | Bulk-label / bulk-move / bulk-delete on 10+ pages with mandatory 3-step dry-run ceremony. |
-| `mk:confluence-collaborate` | Comments, attachments, labels, watchers — folds 4 upstream skill domains into one footer-default agent. |
+| Skill                        | Purpose                                                                                                               |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `mk:confluence`              | Pure routing hub — recommends the right `mk:confluence-*` leaf; never executes.                                       |
+| `mk:confluence-page`         | Single-page CRUD via `confluence-as` plus hierarchy traversal, version restore, and copy / move.                      |
+| `mk:confluence-search`       | CQL queries, validation, space listing, saved-filter management, and export — with mandatory user-input sanitization. |
+| `mk:confluence-spec-analyst` | Read-only deep spec analysis — produces a structured Spec Research Report consumed by `mk:planning-engine`.           |
+| `mk:confluence-bulk`         | Bulk-label / bulk-move / bulk-delete on 10+ pages with mandatory 3-step dry-run ceremony.                             |
+| `mk:confluence-collaborate`  | Comments, attachments, labels, watchers — folds 4 upstream skill domains into one footer-default agent.               |
 
 ### New Agents
 
@@ -238,24 +242,24 @@ Two threads land together. The five Phase-Zero conditional rule files move back 
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `mk:jira-issue` | Single-issue CRUD via `jira-as` (create / get / update / delete). |
-| `mk:jira-search` | JQL queries + saved-filter management with mandatory user-input sanitization. |
-| `mk:jira-lifecycle` | Workflow transitions, assignment, resolution, version + component management. Cache-first. |
-| `mk:jira-collaborate` | Comments, attachments, watchers, notifications. Internal-vs-public confirm enforced. |
-| `mk:jira-relationships` | Issue links, blockers, dependencies, clone, bulk-link. |
-| `mk:jira-time` | Worklogs, estimates, time reports, bulk-log. |
-| `mk:jira-agile` | Epics, sprints, backlog, ranking, story points, subtasks, velocity. |
-| `mk:jira-fields` | Custom field discovery + agile field configuration. |
-| `mk:jira-bulk` | Bulk ops on 10+ issues with mandatory dry-run + workflow-cache validation. |
-| `mk:jira-jsm` | Service Management: 8 sub-domains (~45 verbs). Requires JSM license. |
-| `mk:jira-admin` | Project / user / group / scheme / automation administration. 11 sub-domains. |
-| `mk:jira-dev` | Developer artifact generation: branch-name, PR-description, smart-commits. |
-| `mk:jira-ops` | Diagnostic surface: cache-status / cache-clear / discover-project. |
-| `mk:jira-evaluator` | Read-only ticket complexity + inconsistency analysis. Persists report. |
-| `mk:jira-estimator` | Read-only heuristic story-point estimation. Auto-consumes evaluator output. |
-| `mk:jira-analyst` | Read-only full ticket context analysis incl. media. Persists structured RCA. |
+| Skill                   | Purpose                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------ |
+| `mk:jira-issue`         | Single-issue CRUD via `jira-as` (create / get / update / delete).                          |
+| `mk:jira-search`        | JQL queries + saved-filter management with mandatory user-input sanitization.              |
+| `mk:jira-lifecycle`     | Workflow transitions, assignment, resolution, version + component management. Cache-first. |
+| `mk:jira-collaborate`   | Comments, attachments, watchers, notifications. Internal-vs-public confirm enforced.       |
+| `mk:jira-relationships` | Issue links, blockers, dependencies, clone, bulk-link.                                     |
+| `mk:jira-time`          | Worklogs, estimates, time reports, bulk-log.                                               |
+| `mk:jira-agile`         | Epics, sprints, backlog, ranking, story points, subtasks, velocity.                        |
+| `mk:jira-fields`        | Custom field discovery + agile field configuration.                                        |
+| `mk:jira-bulk`          | Bulk ops on 10+ issues with mandatory dry-run + workflow-cache validation.                 |
+| `mk:jira-jsm`           | Service Management: 8 sub-domains (~45 verbs). Requires JSM license.                       |
+| `mk:jira-admin`         | Project / user / group / scheme / automation administration. 11 sub-domains.               |
+| `mk:jira-dev`           | Developer artifact generation: branch-name, PR-description, smart-commits.                 |
+| `mk:jira-ops`           | Diagnostic surface: cache-status / cache-clear / discover-project.                         |
+| `mk:jira-evaluator`     | Read-only ticket complexity + inconsistency analysis. Persists report.                     |
+| `mk:jira-estimator`     | Read-only heuristic story-point estimation. Auto-consumes evaluator output.                |
+| `mk:jira-analyst`       | Read-only full ticket context analysis incl. media. Persists structured RCA.               |
 
 ### New Agents
 
@@ -339,8 +343,8 @@ Two threads land together. The five Phase-Zero conditional rule files move back 
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
+| Skill                | Purpose                                                                                                                                                                                                                                                                                                                           |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:prompt-enhancer` | Refine a draft user prompt — decompose, detect weaknesses against a 10-item checklist, emit a model-agnostic rewrite using the universal kernel (plain markdown, no XML, no vendor tokens). Auto-suggests freedom level and verbosity. Optional `--deep` flag scouts allow-listed sources for `[FILL-IN]` placeholder candidates. |
 
 ### New Commands
@@ -369,8 +373,8 @@ Two threads land together. The five Phase-Zero conditional rule files move back 
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
+| Skill              | Purpose                                                                                                                                           |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:context-audit` | Read-only audit of `.claude/` structural overhead. Reports prioritized "remove X save Y tokens" recommendations against the model context window. |
 
 ### New Commands
