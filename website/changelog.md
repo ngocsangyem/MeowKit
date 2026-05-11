@@ -14,6 +14,35 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.0 (2026-05-11) — Pre-ticket story sizing
+
+### Highlights
+
+`mk:story-sizer` ships as MeowKit's first pre-ticket sizing skill — accepts a paste-mode markdown block of stories, produces per-story Fibonacci complexity + rough sizing, and optionally batch-creates tickets via `mk:jira-issue` and `mk:jira-collaborate` (`--internal` audit comments) with mandatory dry-run + single confirmation gate. Closes the spec → ticket-creation gap without violating the "AI provides signals, humans decide" design. v1 ships paste-only; spec/intake adapters are deferred.
+
+### New Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `mk:story-sizer` | Pre-ticket per-story Fibonacci sizing from paste-mode input. Default read-only; opt-in `--auto-create` with mandatory batch dry-run + single confirmation. |
+
+### New Agents
+
+- `story-sizer` — Heuristic complexity + Fibonacci scoring agent. Read-only at the Jira side — delegates create/comment to `mk:jira-issue` and `mk:jira-collaborate`.
+
+### Features
+
+- `--paste` input adapter with strict markdown template and per-story AC validation.
+- Optional `--scout` extracts codebase context from session (matches `mk:planning-engine` extract-or-prompt pattern; never auto-invokes).
+- Advisory split detection for stories sized 13+ points.
+- Audit comments use `--internal` flag on `mk:jira-collaborate add-comment` (team-only, not customer-facing).
+- Audit comment template customizable via `MEOWKIT_STORY_SIZER_COMMENT_TEMPLATE` env var.
+- Workflow page updated — `spec-to-pr-walkthrough` gains Step 3.5.
+
+### Improvements
+
+- The 10-step Spec → PR walkthrough now has a concrete pre-ticket sizing step, not just a feasibility-scan handwave.
+
 ## 2.8.7 (2026-05-11) — Agile/Scrum Rule Layer
 
 ### Highlights

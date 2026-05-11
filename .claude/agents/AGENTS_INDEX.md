@@ -37,6 +37,7 @@
 | `jira-evaluator.md` | Intelligence | Ticket complexity + inconsistency analysis (read-only) | Adapted from the toolkit jira/agents/ (skill-scoped → project-scoped, MCP→jira-as) | on-demand | Forked from `mk:jira-evaluator` skill | 260510 | 260510 |
 | `jira-estimator.md` | Intelligence | Heuristic story-point estimation (read-only) | Adapted from the toolkit jira/agents/ | on-demand | Forked from `mk:jira-estimator` skill | 260510 | 260510 |
 | `jira-analyst.md` | Intelligence | Full ticket context analysis incl. media (read-only) | Adapted from the toolkit jira/agents/ | on-demand | Forked from `mk:jira-analyst` skill | 260510 | 260510 |
+| `story-sizer.md` | Intelligence | Pre-ticket Fibonacci sizing of paste-mode user stories. Read-only at Jira; auto-create delegates to `mk:jira-issue` + `mk:jira-collaborate`. | New in v2.9.0 | on-demand | Forked from `mk:story-sizer` skill | 260511 | 260511 |
 
 **CE version**: Context Engineering version — tracks when agents were last improved with context engineering principles.
 

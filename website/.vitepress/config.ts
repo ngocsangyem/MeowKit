@@ -200,6 +200,7 @@ export default withMermaid(defineConfig({
             { text: 'jira-evaluator', link: '/reference/agents/jira-evaluator' },
             { text: 'jira-estimator', link: '/reference/agents/jira-estimator' },
             { text: 'jira-analyst', link: '/reference/agents/jira-analyst' },
+            { text: 'story-sizer', link: '/reference/agents/story-sizer' },
           ],
         },
         {
@@ -366,6 +367,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:jira-evaluator', link: '/reference/skills/jira-evaluator' },
             { text: 'mk:jira-estimator', link: '/reference/skills/jira-estimator' },
             { text: 'mk:jira-analyst', link: '/reference/skills/jira-analyst' },
+            { text: 'mk:story-sizer', link: '/reference/skills/story-sizer' },
           ],
         },
         {

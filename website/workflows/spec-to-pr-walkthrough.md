@@ -28,21 +28,31 @@ This page exists because the seam between Confluence, Jira, and your codebase is
 
 ```mermaid
 flowchart TD
-    A[Confluence spec] -->|mk:confluence-spec-analyst| B[Spec Research Report]
-    B -->|human review| C{Gaps?}
-    C -->|yes| D[mk:confluence-collaborate]
+    A[Step 1: Confluence spec] -->|mk:confluence-spec-analyst| B["Spec Research Report<br/>tasks/reports/"]
+    B -->|human review| C{Step 2:<br/>Gaps?}
+    C -->|yes| D[mk:confluence-collaborate<br/>footer comment to PM]
     D --> A
-    C -->|no| S[mk:scout + mk:docs-finder<br/>pre-ticket feasibility scan]
-    S --> E[mk:jira-issue create]
-    E --> F[Tickets PROJ-1001..N]
-    F -->|mk:jira-agile + mk:jira-relationships| G[Epic + ranking]
-    G -->|mk:jira-evaluator + mk:jira-estimator| H[Refinement report]
-    H -->|mk:planning-engine review --scout<br/>+ plan --tickets --spec| I[Tech Review &amp; Planning Reports]
-    I -->|mk:plan-creator per ticket<br/>tier-aware: hard/fast/skip| P[tasks/plans/.../plan.md<br/>GATE 1 approved]
-    P -->|/mk:cook PROJ-1001| J[7-phase pipeline]
-    J -->|mk:ship + mk:jira-dev| K[PR + ticket transitions]
-    K -->|mk:memory| L[fixes.md / decisions.md]
+    C -->|no| S["Step 3: pre-ticket feasibility scan<br/>mk:scout + mk:docs-finder<br/>(human cross-reads spec vs codebase)"]
+    S --> Z["Step 3.5: mk:story-sizer<br/>Fibonacci sizing per story<br/>(default: advisory)"]
+    Z --> E[Step 4: mk:jira-issue create with --story-points from 3.5<br/>per validated requirement]
+    E --> F["PROJ-1001..N tickets"]
+    F -->|Step 5: mk:jira-agile + mk:jira-relationships| G[Epic + ranking + blocks links]
+    G -->|Step 6: mk:jira-evaluator + mk:jira-estimator| H["Refinement + tier signal<br/>TRIVIAL / STANDARD / COMPLEX"]
+    H -->|Step 7: mk:planning-engine<br/>review --scout + plan --tickets --spec| I["Tech Review + Planning Reports<br/>tasks/reports/<br/>NOT copied into plan dir"]
+    I -->|Step 8: mk:plan-creator per ticket<br/>--hard COMPLEX / --fast STANDARD / skip TRIVIAL<br/>dev cites Step 7 report manually| P["Approved plans<br/>tasks/plans/&lt;slug&gt;/plan.md<br/><b>GATE 1 fires HERE</b><br/>(STANDARD + COMPLEX)"]
+    P -->|Step 9: /mk:cook &lt;plan-path&gt;<br/>code mode — Phase 1 skipped| J["7-phase pipeline<br/>Phase 0 orient → 3 build → 4 review<br/><b>GATE 2 at Phase 4</b>"]
+    H -.->|TRIVIAL fast-path:<br/>/mk:cook 'implement TICKET'<br/>Phase 1 runs inline, GATE 1 fires inside cook| J
+    J -->|Step 9 P5: mk:ship + mk:jira-dev + mk:jira-lifecycle| K[PR opened<br/>ticket → In Review]
+    J -->|Step 9 P6: mk:memory| L[".claude/memory/<br/>fixes / decisions"]
+    K --> M["Step 10: post-merge close-loop<br/>jira-lifecycle → Done<br/>+ Confluence footer comment<br/>linking back to spec page"]
 ```
+
+::: tip Reading the diagram
+- **Solid arrows** are the default STANDARD / COMPLEX path: Step 3 feasibility scan → Step 8 plan-creator (Gate 1) → Step 9 cook in code mode (Gate 2 only — Phase 1 skipped).
+- **Dashed arrow** is the TRIVIAL fast-path: skip Steps 7 and 8 entirely, hand cook a natural-language task. Cook's Phase 1 runs inline; both Gate 1 and Gate 2 fire inside the cook invocation.
+- **Artifact locations are explicit**: `tasks/reports/` for spec + tech review (no plan exists yet), `tasks/plans/<slug>/` for plan-creator's output. No automatic copy or symlink between them.
+- **Two hard gates**: Gate 1 = plan approved (Step 8 standalone OR cook Phase 1). Gate 2 = review verdict PASS/WARN (cook Phase 4). Both hook-enforced.
+:::
 
 Each arrow is a place where you read an artifact and decide.
 
@@ -218,15 +228,41 @@ A short, hand-written set of notes (kept in the Spec Research Report or a follow
 
 ---
 
+## Step 3.5 — Story sizing
+
+Spec analyst output gives you a list of suggested user stories. Tech feasibility (Step 3) tells you they are buildable. What you still don't know: **how big is each one?** Jira sizing skills require a ticket key, so they can't help yet. `mk:story-sizer` fills the gap — v1 paste-only, advisory by default, with opt-in `--auto-create` behind a single confirmation gate.
+
+### Prompt
+
+`/mk:story-sizer --paste [--scout]` (advisory) or `/mk:story-sizer --paste --auto-create --project AUTH --epic AUTH-100` (delegated). Paste template requires `story:` + `ac:` per block, separated by bare `---`. Optional `description:`. Full schema: [reference](/reference/skills/story-sizer).
+
+### What happens behind the scenes
+
+| Layer | Action |
+|---|---|
+| Adapter | Validates template, emits `StoryRecord` list with SHA-256 source-hash; surfaces `[NO_ACS]` / `[MALFORMED_INPUT]` |
+| Scoring | 5 deterministic dimensions → Fibonacci 1/2/3/5/8/13 + uncertainty + complexity; plus inconsistency / split / DoR (Agile) / codebase signals (`--scout`) |
+| Writer | Renders `tasks/reports/story-sizing-{YYMMDD}-{slug}.md` with per-story sections, summary table, and suggested `mk:jira-issue create` block (v1 field whitelist) |
+| Auto-create | 5 pre-flight checks (NO_ACS, Rule-1 injection, length cap, duplicate via `mk:jira-search`, source-hash); single batch `AskUserQuestion`; no skip-confirm. Per story: `mk:jira-issue create --story-points N` + `mk:jira-collaborate add-comment --internal`. Call A failure stops + cleanup hint; Call B failure logs WARN + continues |
+
+:::warning Advisory by default
+Default mode never calls Jira; suggested create blocks are text you copy in Step 4. `--auto-create` is the only mutating path; see [reference](/reference/skills/story-sizer) for full schema, gating rules, and `MEOWKIT_STORY_SIZER_COMMENT_TEMPLATE`.
+:::
+
+Step 3.5 informs Step 4: create tickets with `--story-points <N>` chosen, or run `--auto-create` for delegated batch creation.
+
+---
+
 ## Step 4 — Create the Jira tickets (your decision)
 
-PM has replied. You now know: Google scopes = `email + profile`; expiry = sliding 24h; OAuth users can add a password later (separate ticket).
+PM has replied. You now know: Google scopes = `email + profile`; expiry = sliding 24h; OAuth users can add a password later (separate ticket). The Step 3.5 Story Sizing Report has rough estimates per story — pick the size from the report and pass via `--story-points`. Alternatively, run `/mk:story-sizer --paste --auto-create --project AUTH` to delegate ticket creation behind the single confirmation gate.
 
 ### Prompt
 
 ```bash
 /mk:jira-issue create --project AUTH --type Story \
   --summary "Sign in with Google OAuth" \
+  --story-points 3 \
   --description "Per spec page 12345 §R1. Scopes: email, profile.
 
   AC:
@@ -697,6 +733,8 @@ Three systems, three artifacts crossing each seam. No more, no less.
 | Step 2 | `mk:confluence-collaborate` | write Confluence | Footer comments for open questions |
 | Step 3 | `mk:scout` | read codebase | Pre-ticket fingerprint (cached for Step 7) |
 | Step 3 | `mk:docs-finder` *(opt)* | read external docs | Current third-party API/library docs |
+| Step 3.5 | `mk:story-sizer --paste --scout` | read all | Per-story Fibonacci sizing + suggested create commands (v1: paste-only) |
+| Step 3.5 | `mk:story-sizer --paste --auto-create --project KEY` *(opt-in)* | delegated write Jira | Batch ticket creation with dry-run + single confirmation gate |
 | Step 4 | `mk:jira-issue` | write Jira | One verb per ticket, no bulk |
 | Step 4 | `mk:jira-fields` *(opt)* | read Jira | Resolves custom required fields |
 | Step 5 | `mk:jira-agile` | write Jira | Epic-add + rank |
@@ -723,6 +761,8 @@ Every gate where automation stops and a human decides.
 |---|---|---|
 | Resolve spec ambiguities | After Step 1 | Dev + PM |
 | Feasibility / defer decision per suggested story | After Step 3 | Dev |
+| Decide which stories to file from sizing report | After Step 3.5 | Dev |
+| Batch auto-create confirmation | Step 3.5 with `--auto-create` | Dev (single AskUserQuestion) |
 | Which suggestions become tickets | Step 4 | Dev |
 | Story-point estimate | After Step 6 | Team (planning poker) |
 | Ticket ranking + dependencies | Step 5 | Dev / tech lead |

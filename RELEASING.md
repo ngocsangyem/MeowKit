@@ -402,6 +402,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                            |
 | ------- | ---------- | -------------------------------- |
+| v2.9.0  | 2026-05-11 | Pre-ticket story sizing                   |
 | v2.8.7  | 2026-05-11 | Agile/Scrum Rule Layer                    |
 | v2.8.6  | 2026-05-10 | Align rules                               |
 | v2.8.5  | 2026-05-10 | Rules Folder Reconsolidation + mk:preview |
