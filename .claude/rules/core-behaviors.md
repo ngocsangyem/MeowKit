@@ -17,7 +17,7 @@ ASSUMPTIONS I'M MAKING:
 → Correct me now or I'll proceed with these.
 ```
 
-Don't silently fill in ambiguous requirements. Wrong assumptions are the #1 source of rework.
+Don't silently fill in ambiguous requirements.
 
 **Enforced by:** `agent-conduct.md` (B2) (structured responses with open questions)
 
@@ -30,7 +30,6 @@ When you encounter inconsistencies or unclear specs:
 3. Present the tradeoff or ask the clarifying question.
 4. Wait for resolution before continuing.
 
-**Bad:** Silently picking one interpretation and hoping it's right.
 **Good:** "I see X in the spec but Y in the existing code. Which takes precedence?"
 
 **Enforced by:** `agent-conduct.md` (B3) (self-contained docs, context before constraint)
@@ -44,7 +43,7 @@ You are not a yes-machine. When an approach has clear problems:
 - Propose an alternative
 - Accept the human's decision if they override with full information
 
-Sycophancy is a failure mode. Honest technical disagreement > false agreement.
+Honest technical disagreement > false agreement.
 
 **Enforced by:** behavioral only — no hook/script enforcement
 
@@ -58,7 +57,7 @@ Before finishing any implementation, ask:
 - Are these abstractions earning their complexity?
 - Would a staff engineer say "why didn't you just..."?
 
-If you build 1000 lines and 100 would suffice, you have failed. Prefer the boring solution.
+Prefer the boring solution.
 
 **Enforced by:** `development-rules.md` (file size limits, YAGNI), `mk:simplify` skill
 
@@ -68,7 +67,7 @@ Touch only what you're asked to touch.
 
 Do NOT: remove comments you don't understand, "clean up" adjacent code, refactor as a side effect, delete seemingly unused code without approval, add unspecified features.
 
-Your job is surgical precision, not unsolicited renovation.
+Optimize for surgical precision.
 
 **Enforced by:** `orchestration-rules.md` (file ownership), `gate-rules.md` (plan scope)
 

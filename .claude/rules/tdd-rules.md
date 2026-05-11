@@ -2,7 +2,7 @@
 
 **TDD enforcement is OPT-IN.** Default mode: tests are recommended but not gated (the rules in "When TDD is disabled" apply). Strict mode: enable via `--tdd` flag on commands OR `export MEOWKIT_TDD=1` (the rules in "When TDD is enabled" apply).
 
-Why optional: matches user feedback that strict TDD adds friction for spike work, tooling, and prototypes. Production-quality work should still enable `--tdd`.
+Why optional: strict TDD adds friction for spikes/tooling/prototypes; production-quality work should still enable `--tdd`.
 
 ## When TDD is enabled (`MEOWKIT_TDD=1` or `--tdd`)
 
@@ -18,7 +18,7 @@ These rules apply to all implementation work in strict mode. No exceptions unles
 
 This is distinct from TRIVIAL in model-selection-rules.md (which means cosmetic-only: rename, typo, format). MICRO-TASK covers non-production code that has logic but doesn't need test coverage.
 
-WHY: Scripts, configs, and tooling don't benefit from TDD. Requiring tests for a 15-line migration script wastes time without improving quality.
+WHY: Tiny non-production changes rarely gain quality from strict RED-first testing.
 
 GUARD: Production-facing code ALWAYS requires TDD regardless of size. When in doubt, require TDD.
 

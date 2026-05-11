@@ -4,6 +4,7 @@
 
 Rules are loaded by the agent at session start.
 All rules are mandatory unless marked [CONTEXTUAL].
+Full background rationale lives in `docs/rule-rationale.md`; read it before modifying rules.
 
 | Rule                              | Purpose                                                                                                                                            | Source                                       | Applies to                                          |
 | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | --------------------------------------------------- |

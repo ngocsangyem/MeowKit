@@ -18,14 +18,14 @@ These rules apply to all implementation work in projects using this workflow.
 ### File naming
 
 ALWAYS use kebab-case for file names with descriptive names.
-WHY: LLM tools (Grep, Glob) must understand file purpose from names alone.
-INSTEAD of: `userAuth.ts` → use: `user-authentication.service.ts`
+WHY: Search tools must infer file purpose from names.
+Example: `user-authentication.service.ts`.
 
 ### File size
 
 ALWAYS keep code files under 200 lines.
 WHY: Shorter files fit in context windows and reduce merge conflicts.
-INSTEAD of one large file → split into focused modules by concern.
+Split large files into focused modules by concern.
 
 Use composition over inheritance for large UI/components, extract utilities into focused modules, and move business logic into services.
 
@@ -34,14 +34,14 @@ Do not split files mechanically if it makes the system harder to understand. The
 ### No enhanced copies
 
 NEVER create new "enhanced" or "v2" files. ALWAYS update existing files directly.
-WHY: Duplicate files create confusion about which is canonical. The git history tracks changes.
+WHY: Duplicate files obscure the canonical implementation.
 
 ## Code Quality
 
 ### Compilation
 
 ALWAYS run the compile/build command after creating or modifying a code file.
-WHY: Catching syntax errors immediately prevents cascading failures.
+WHY: Immediate compile/build checks catch cascading failures early.
 Check: zero compilation errors before proceeding.
 
 For this toolkit itself, the default commands are:
@@ -57,12 +57,12 @@ For downstream projects, prefer commands documented in that project's `README.md
 
 NEVER simulate, mock, or stub implementation code to pass tests or CI.
 WHY: Mocks hide real integration failures that surface in production.
-INSTEAD of mocks → implement real code, use test databases/services.
+Implement real code and use test databases/services.
 
 ### Tests must pass (if tests exist)
 
 NEVER finish a session with failing tests. Fix all failures before completing.
-WHY: Broken tests left behind become ignored and erode the test suite.
+WHY: Leftover failures erode trust in the test suite.
 Escalate after 3 failed fix attempts (per tdd-rules.md).
 
 **Default mode (TDD-optional):** This rule applies IF tests exist in the repo. There is no requirement to create tests for new code in default mode — that's controlled by `tdd-rules.md`, which is opt-in via `MEOWKIT_TDD=1` or `--tdd`. A repo with zero tests is permitted; the reviewer may flag missing tests as a WARN at Gate 2.
@@ -101,7 +101,7 @@ After completing implementation tasks, ALWAYS declare docs impact:
 - `Docs impact: minor` — update existing docs
 - `Docs impact: major` — new documentation required
 
-WHY: Undocumented changes create knowledge gaps for future sessions.
+WHY: Docs impact keeps future sessions aligned.
 
 ### Documentation updates
 
@@ -132,5 +132,4 @@ Instead, prevent bloat by limiting output at the tool call site.
 | Read | `offset` + `limit` for files >500 lines       | Read full file only when necessary                 |
 | Bash | Pipe through `head -100` for verbose commands | Skip for commands with concise output              |
 
-WHY: Unbounded tool output consumes 14-70% of context window per research measurements.
-Limiting at source is behavioral (agent compliance) but achievable immediately without platform changes.
+WHY: Limiting output at source prevents context bloat without platform changes.

@@ -52,7 +52,7 @@ Three opt-in actions via AskUserQuestion. Every step Jira-offline-safe:
 
 ABSENCE = non-Agile mode; rule silently skips all checks.
 
-## Integration touch points
+## Integrations
 
 - `mk:plan-creator` Phase 1 entry → 1
 - `mk:ship` Gate 2 PASS → 2 (LOCKED owner; covers `mk:cook`→`mk:ship` chain)

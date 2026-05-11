@@ -33,8 +33,7 @@ Source: prompt-crafting-for-different-models.md — Model Selection Strategy tab
 ALWAYS print the model tier assignment before starting any task:
 `Task complexity: [TRIVIAL|STANDARD|COMPLEX] → using [model tier]`
 
-WHY: Explicit routing prevents wasting expensive models on trivial tasks
-and prevents using cheap models for security-critical work.
+WHY: Explicit routing prevents overpaying for trivial work and underrouting security work.
 
 ### Rule 2: Escalate on security
 
@@ -49,10 +48,7 @@ ALWAYS use COMPLEX tier for any task involving:
 - External provider behavior (third-party API contract change, payment-provider migration, webhook ingress, SSO IdP)
 - Removing or weakening validation requirements (deleting input checks, relaxing schema constraints, dropping rate limits)
 
-WHY: Security-sensitive code requires the highest reasoning capability.
-Cutting corners on model tier for security work creates real vulnerabilities.
-The expanded list closes three risk categories that a vertical domain-CSV
-match would otherwise miss — they cut across domains.
+WHY: Security-sensitive work needs maximum reasoning, including risks vertical CSV matching can miss.
 
 The `risk-checklist.md` rule emits a `matched_flags` array at Phase 0; any
 flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` triggers this
@@ -63,14 +59,13 @@ escalation regardless of CSV match.
 Once a task is assigned a tier, NEVER downgrade to a cheaper tier mid-task.
 If the task turns out simpler than expected, complete it at the assigned tier.
 
-WHY: Switching models mid-task loses reasoning context and can introduce
-inconsistencies between the planning and implementation phases.
+WHY: Mid-task downgrades lose reasoning context and create phase inconsistency.
 
 ### Rule 4: Domain Override
 
 When `mk:scale-routing` returns a domain match with `level=high`, the model tier MUST be COMPLEX (best available) regardless of any other signal — including manual classification.
 
-WHY: High-complexity domains (fintech, healthcare, IoT, gaming) have regulatory, security, and architectural requirements that cheaper models handle poorly. The cost of using a weaker model on a security-critical task vastly exceeds the token savings. See `rules/scale-adaptive-rules.md` and `mk:scale-routing/data/domain-complexity.csv` for the domain mapping.
+WHY: High-complexity domains carry risks where weaker-model savings are not worth failure cost. See `rules/scale-adaptive-rules.md` and `mk:scale-routing/data/domain-complexity.csv`.
 
 ### Rule 5: Harness Density Follows Tier
 
@@ -82,4 +77,4 @@ For `mk:harness` runs, the model tier auto-selects a scaffolding density (`MINIM
 
 **Single source of truth:** the full decision matrix and rationale live at `.claude/skills/harness/references/adaptive-density-matrix.md`. See also `scale-adaptive-rules.md` Rule 6.
 
-WHY: Capable models (Opus 4.6+ with auto-compaction + 1M context) need less scaffolding per Anthropic's "dead-weight thesis." Forcing full harness on Opus 4.6 **degrades** output.
+WHY: Dead-weight thesis — capable models need less scaffolding; forcing FULL can degrade output.

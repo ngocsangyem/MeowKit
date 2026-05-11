@@ -6,19 +6,17 @@ These rules govern the autonomous multi-hour build pipeline (`mk:harness`) and t
 
 The planner agent in product-level mode (`mk:plan-creator --product-level`) MUST produce user stories, features, and design language — NOT file paths, class names, schemas, or step-by-step code instructions.
 
-**WHY:** Anthropic harness research found that capable models (Opus 4.5+) under-perform when locked into pre-sharded implementation tasks. Micro-sharding the plan causes cascading errors — the model loses room to discover better solutions. The planner's job is to set ambition; the generator's job is to find the path.
+**WHY:** Micro-sharded plans reduce capable-model solution search; planner sets ambition, generator finds the path.
 
-**INSTEAD of:** "Write `src/auth/login.ts` with a `LoginController` class that has a `loginUser(email: string, password: string)` method"
-**USE:** "As a returning user, I want to log in with my email and password so that I can access my saved work."
+Use product stories like "As a returning user, I want to log in with my email and password so that I can access my saved work."
 
 ## Rule 2: Generator ≠ Evaluator (Hard Separation)
 
 The generator (developer agent) and evaluator (evaluator agent) are distinct subagents with isolated contexts. Self-evaluation is forbidden.
 
-**WHY:** Out-of-box Claude has a measurable leniency drift when grading its own output — it identifies legitimate issues, then talks itself into deciding they weren't a big deal. An external evaluator with a skeptic persona is the only known mitigation. See `.claude/agents/evaluator.md`.
+**WHY:** Self-evaluation drifts lenient; an isolated skeptic evaluator mitigates it.
 
-**INSTEAD of:** generator says "PASS" → ship
-**USE:** generator → handoff → evaluator (fresh context) → graded verdict with evidence → ship/loop
+Flow: generator → handoff → evaluator fresh context → graded verdict with evidence → ship/loop.
 
 ## Rule 3: Sprint Contract Required in FULL Density; Optional in LEAN; Skipped in MINIMAL
 
@@ -28,21 +26,21 @@ Per the adaptive density policy (`mk:harness/references/adaptive-density-matrix.
 - `FULL` (Sonnet, Opus 4.5) — contract REQUIRED before any source-code edit; enforced by `gate-enforcement.sh`
 - `LEAN` (Opus 4.6+) — contract OPTIONAL; skip if estimated ACs < 5
 
-**WHY:** Contract negotiation is dead weight on TRIVIAL tier and on capable models that can self-derive testable criteria from a product spec. It's load-bearing on intermediate tiers where the model needs explicit scope to prevent silent feature substitution.
+**WHY:** Contracts prevent silent substitution on intermediate tiers but add dead weight on trivial/capable tiers.
 
 ## Rule 4: Iteration Cap = 3 Rounds Before Escalation
 
 The harness iteration loop (generator ⇄ evaluator) is capped at 3 rounds by default (configurable via `--max-iter`). After round 3, the harness escalates to a human via `AskUserQuestion`.
 
-**WHY:** Agents that can't converge in 3 rounds won't converge in 5 — the failure mode is deeper than iteration count. Forcing more rounds wastes budget and erodes trust in the verdict. Human escalation breaks ties.
+**WHY:** Non-convergence after 3 rounds usually needs human judgment, not more budget.
 
 ## Rule 5: Adaptive Density Decided by `mk:scale-routing` + Model String
 
 The harness scaffolding density (`MINIMAL | FULL | LEAN`) is selected by `mk:scale-routing` based on the detected model tier and model id. The decision matrix is the single source of truth at `.claude/skills/harness/references/adaptive-density-matrix.md`.
 
-**WHY:** Capable models (Opus 4.6+ with auto-compaction + 1M context) **degrade** when forced through full harness scaffolding — Anthropic's measured "dead-weight thesis" finding. The density policy operationalizes this without manual ceremony.
+**WHY:** Dead-weight thesis — over-scaffolding degrades capable models.
 
-**Override:** `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN` env var overrides auto-detection. Logged in the harness run report.
+**Override:** `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN` overrides auto-detection and is logged.
 
 ## Rule 6: Budget Thresholds — Warn at $30, Approve at $100, Hard Block at User Cap
 
@@ -52,42 +50,41 @@ The harness budget tracker (`mk:harness/scripts/budget-tracker.sh`) enforces thr
 - **$100 hard block** — halt the run, set `final_status=TIMED_OUT`
 - **User cap** (`MEOWKIT_BUDGET_CAP` env var or `--budget` flag) — overrides hard block, can be lower OR higher
 
-**WHY:** Multi-hour autonomous runs can rack up cost faster than humans notice. The 3-tier threshold (warn, hard, user) catches both runaway runs and intentional high-budget research.
+**WHY:** Multi-hour runs can spend quickly; thresholds catch runaway and intentional high-budget runs.
 
 ## Rule 7: Dead-Weight Audit Mandatory on Model Upgrade
 
 Every harness component encodes an assumption about what the model CANNOT do. When a new model tier ships (e.g., Sonnet 4.6, Opus 4.7), the dead-weight audit playbook (`docs/dead-weight-audit.md`) MUST be run to verify each component is still load-bearing.
 
-**WHY:** Per the dead-weight thesis, scaffolding that helped Opus 4.5 may hurt Opus 4.7. Components that don't pay their measured-delta keep are dead weight.
+**WHY:** Model upgrades can turn useful scaffolding into dead weight.
 
 **Detection:** `post-session.sh` attempts to flag this via `MEOWKIT_MODEL_HINT` env var, but on Claude Code, `CLAUDE_MODEL` is NOT exported to hooks (verified 260408). Auto-detection only works if the user sets `export MEOWKIT_MODEL_HINT=opus-4-7` at session start. Otherwise the audit must be triggered manually on a calendar reminder OR by reading session metadata from `~/.claude/projects/`.
 
-**INSTEAD of:** assuming the harness still works after a model upgrade
-**USE:** the audit playbook with measured baselines (calendar reminder if no model hint set)
+Use the audit playbook with measured baselines after model upgrades.
 
 ## Rule 8: Active Verification Is a HARD GATE
 
 The evaluator (Phase 3) MUST drive the running build via active verification — browser navigation, curl, CLI invocation. Static-analysis-only verdicts are forbidden. `validate-verdict.sh` rejects PASS verdicts with empty `evidence/` directories and converts them to FAIL.
 
-**WHY:** Tests can pass against mocks while the real endpoint returns 500. Without active verification, the evaluator grades paper. Anthropic's research and our own audit confirmed: 4.5 of 6 red-team scenarios slip past static analysis.
+**WHY:** Static checks miss real runtime failures; evaluator evidence must exercise the artifact.
 
 ## Rule 9: Skeptic Persona Reloaded Per Criterion
 
 The evaluator MUST re-anchor its skeptic persona (`mk:evaluate/prompts/skeptic-persona.md`) before grading each criterion. Leniency drift accumulates over a session.
 
-**WHY:** Out-of-box Claude as a QA agent identifies legitimate issues, then talks itself into accepting them. Re-anchoring the persona is the cheapest mitigation. Reloading is not optional — it's a checkpoint.
+**WHY:** Persona re-anchoring prevents leniency drift during long grading sessions.
 
 ## Rule 10: No Density Override Bypasses Gates
 
 `MEOWKIT_HARNESS_MODE=LEAN` and any `--tier` flag override scaffolding density, NOT gates. Gate 1 (plan), Gate 2 (review verdict), the contract gate (Phase 4), and the active-verification HARD GATE all still apply regardless of density mode.
 
-**WHY:** Density decides HOW MUCH scaffolding the model needs to clear the quality bar. It does not lower the bar.
+**WHY:** Density changes scaffolding amount, not the quality bar.
 
 ## Rule 11: Context Caching via Conversation Summary (Phase 9 — 260408)
 
 Long sessions MUST use the conversation summary cache (`.claude/hooks/conversation-summary-cache.sh`) to avoid re-reading the full transcript on every turn. The hook fires on `Stop` (summarize) and `UserPromptSubmit` (inject) and is throttled by transcript size, turn gap, and growth delta.
 
-**WHY:** Re-reading the full transcript on every turn burns ~48KB of context per injection in mid-to-long sessions. A Haiku-summarized cache costs ~$0.01–$0.02 per long session and preserves the same continuity. On Claude Code, the built-in auto-compaction is opaque, fires late, and produces no inspectable artifact — the explicit cache fires proactively and writes a human-editable markdown file.
+**WHY:** Summary cache preserves continuity while avoiding repeated full-transcript injection.
 
 **Throttle defaults (Q7):** size > `${MEOWKIT_SUMMARY_THRESHOLD:-20480}` bytes AND (event delta ≥ `${MEOWKIT_SUMMARY_TURN_GAP:-30}` JSONL events, ≈ 3–6 turns, OR growth ≥ `${MEOWKIT_SUMMARY_GROWTH_DELTA:-5120}` bytes).
 
@@ -108,9 +105,8 @@ The cache file (`.claude/memory/conversation-summary.md`) is **AUTOMATED-ONLY**.
 
 Manual user edits to the cache file are **NOT preserved** — they are overwritten on next Stop regeneration. The file carries a leading HTML-comment banner restating this contract.
 
-**WHY:** A proactive, editable cache without maintenance discipline degrades to staleness + false confidence. AUTOMATED-ONLY ownership eliminates the drift class entirely. Users who need persistent notes across sessions append to `.claude/memory/notes.md` instead — that file is not auto-generated.
+**WHY:** Automated ownership prevents stale manual edits from masquerading as current context.
 
-**INSTEAD of:** editing the cache file in place
-**USE:** appending to `.claude/memory/notes.md` (per CLAUDE.md `## Memory` section)
+Append persistent notes to `.claude/memory/notes.md` instead of editing the cache file.
 
 The banner header is metadata only — stripped by the injection path so it does NOT consume the 4KB injection budget. It exists for human readers of the cache file.
