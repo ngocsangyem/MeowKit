@@ -62,30 +62,32 @@ Pipe through `jq` for projection:
 
 ## Safety Tiers
 
-| Tier | Verbs | Confirmation |
-|---|---|---|
-| 1 (read) | `search`, `search validate`, `search build`, `search suggest`, `search fields`, `space list`, `space get`, `filter list`, `filter run` | Execute immediately |
-| 2 (create) | `filter create` | None |
-| 3 (modify) | `filter update`, `filter share`, `filter favourite` | Show diff |
-| 4 (destructive) | `filter delete` | Dry-run + confirm |
+```toon
+[4]{tier,verbs,confirmation}
+1 (read)|`search`, `search validate`, `search build`, `search suggest`, `search fields`, `space list`, `space get`, `filter list`, `filter run`|Execute immediately
+2 (create)|`filter create`|None
+3 (modify)|`filter update`, `filter share`, `filter favourite`|Show diff
+4 (destructive)|`filter delete`|Dry-run + confirm
+```
 
 ## Operations
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| Search | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search --cql "<sanitized-CQL>" --max-results 20` |
-| Validate CQL | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search validate "<sanitized-CQL>"` |
-| Build from NL | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search build --description "pages I authored last week"` |
-| Suggest field values | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search suggest --field space` |
-| List fields | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search fields` |
-| Export | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search export --cql "<CQL>" --output-file /tmp/out.csv --format csv` |
-| Space list | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh space list` |
-| Space get | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh space get --space-key ENG` |
-| List filters | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh filter list` |
-| Run a saved filter | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh filter run --filter-id 12345` |
-| Create filter | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh filter create --name "..." --cql "<CQL>"` |
-| Update filter | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh filter update <FILTER_ID> --cql "<CQL>"` |
-| Delete filter | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh filter delete <FILTER_ID>` |
+```toon
+[13]{op,tier,verified_invocation}
+Search|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search --cql "<sanitized-CQL>" --max-results 20`
+Validate CQL|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search validate "<sanitized-CQL>"`
+Build from NL|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search build --description "pages I authored last week"`
+Suggest field values|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search suggest --field space`
+List fields|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search fields`
+Export|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh search export --cql "<CQL>" --output-file /tmp/out.csv --format csv`
+Space list|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh space list`
+Space get|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh space get --space-key ENG`
+List filters|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh filter list`
+Run a saved filter|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh filter run --filter-id 12345`
+Create filter|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh filter create --name "..." --cql "<CQL>"`
+Update filter|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh filter update <FILTER_ID> --cql "<CQL>"`
+Delete filter|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh filter delete <FILTER_ID>`
+```
 
 If a verb is missing in the installed `confluence-as` version, fall back to documenting the gap in Gotchas; do not invent flags.
 

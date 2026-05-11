@@ -116,12 +116,13 @@ Load before starting an evaluation:
 
 ## Skill Loading
 
-| Skill                 | When                                                   |
-| --------------------- | ------------------------------------------------------ |
-| `mk:rubric`         | Always (load preset first)                             |
-| `mk:evaluate`       | Always (your orchestration shell)                      |
-| `mk:agent-browser`  | Frontend targets — navigation, screenshots, autonomous flows |
-| `mk:playwright-cli` | Frontend targets needing scripted flows                |
+```toon
+[4]{skill,when}
+`mk:rubric`|Always (load preset first)
+`mk:evaluate`|Always (your orchestration shell)
+`mk:agent-browser`|Frontend targets — navigation, screenshots, autonomous flows
+`mk:playwright-cli`|Frontend targets needing scripted flows
+```
 
 ## Anti-Rationalization Reminders
 

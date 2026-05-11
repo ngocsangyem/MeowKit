@@ -89,20 +89,22 @@ Your 5-dimension review is complementary: you evaluate architecture fit, type sa
 
 ## Skill Loading
 
-| Skill                      | When                                        | Purpose                                                       |
-| -------------------------- | ------------------------------------------- | ------------------------------------------------------------- |
-| `mk:review`                | Always (Phase 4)                            | Multi-pass adversarial review with step-file workflow         |
-| `mk:scout`                 | Before review on complex changes (3+ files) | Edge case detection: dependents, data flow, async races       |
-| `mk:elicit`                | After verdict, user-triggered               | Structured second-pass reasoning (pre-mortem, red team, etc.) |
-| `mk:cso`                   | When security concerns found                | Deep security audit delegation                                |
-| `mk:vulnerability-scanner` | When security dimension flagged             | Automated vulnerability detection                             |
+```toon
+[5]{skill,when,purpose}
+`mk:review`|Always (Phase 4)|Multi-pass adversarial review with step-file workflow
+`mk:scout`|Before review on complex changes (3+ files)|Edge case detection: dependents, data flow, async races
+`mk:elicit`|After verdict, user-triggered|Structured second-pass reasoning (pre-mortem, red team, etc.)
+`mk:cso`|When security concerns found|Deep security audit delegation
+`mk:vulnerability-scanner`|When security dimension flagged|Automated vulnerability detection
+```
 
 ### Cross-Cutting Skills
 
-| Skill         | When                                           |
-| ------------- | ---------------------------------------------- |
-| `careful`     | Before any destructive git operation           |
-| `docs-finder` | When reviewing code using unfamiliar libraries |
+```toon
+[2]{skill,when}
+`careful`|Before any destructive git operation
+`docs-finder`|When reviewing code using unfamiliar libraries
+```
 
 ## What You Do NOT Do
 

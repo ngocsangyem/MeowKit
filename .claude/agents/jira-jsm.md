@@ -40,29 +40,31 @@ Default to `internal` when uncertain. Misposting an internal comment as public h
 
 ## Sub-domains (8)
 
-| Sub-domain | Common verbs |
-|---|---|
-| `service-desk` | `list`, `get`, `info` |
-| `request-type` | `list`, `get`, `fields` |
-| `request` | `create`, `get`, `list`, `comment add/list`, `participant add/remove`, `transition` |
-| `customer` | `list`, `create`, `get`, `add-to-org`, `remove-from-org` |
-| `organization` | `list`, `create`, `get`, `add-customer`, `list-customers` |
-| `queue` | `list`, `get`, `list-issues` |
-| `sla` | `get`, `list-policies`, `breach-list` |
-| `approval` | `list`, `approve`, `decline`, `get` |
+```toon
+[8]{sub_domain,common_verbs}
+`service-desk`|`list`, `get`, `info`
+`request-type`|`list`, `get`, `fields`
+`request`|`create`, `get`, `list`, `comment add/list`, `participant add/remove`, `transition`
+`customer`|`list`, `create`, `get`, `add-to-org`, `remove-from-org`
+`organization`|`list`, `create`, `get`, `add-customer`, `list-customers`
+`queue`|`list`, `get`, `list-issues`
+`sla`|`get`, `list-policies`, `breach-list`
+`approval`|`list`, `approve`, `decline`, `get`
+```
 
 ## Operations (selection — verify each via `--help`)
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| List service desks | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm service-desk list` |
-| List request types | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm request-type list --service-desk-id <ID>` |
-| Create request | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm request create --service-desk-id <ID> --request-type-id <ID> --summary "..."` |
-| Get request | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm request get <ISSUE_KEY>` |
-| Comment on request | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm request comment add <ISSUE_KEY> --body "..." --visibility internal\|public` |
-| List queue issues | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm queue list-issues --queue-id <ID>` |
-| SLA status | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm sla get <ISSUE_KEY>` |
-| Approve | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm approval approve <APPROVAL_ID>` |
+```toon
+[8]{op,tier,verified_invocation}
+List service desks|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm service-desk list`
+List request types|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm request-type list --service-desk-id <ID>`
+Create request|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm request create --service-desk-id <ID> --request-type-id <ID> --summary "..."`
+Get request|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm request get <ISSUE_KEY>`
+Comment on request|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm request comment add <ISSUE_KEY> --body "..." --visibility internal\|public`
+List queue issues|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm queue list-issues --queue-id <ID>`
+SLA status|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm sla get <ISSUE_KEY>`
+Approve|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh jsm approval approve <APPROVAL_ID>`
+```
 
 For each verb, the canonical flag list is `--help`. The 45-verb total is too large to mirror inline; rely on `--help` over inferred patterns.
 

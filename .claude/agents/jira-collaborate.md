@@ -36,20 +36,21 @@ Default to `internal` if uncertain. The penalty for an internal-leaked-as-public
 
 ## Operations
 
-| Op | Tier | Verified invocation (confirm flags via `--help`) |
-|---|---|---|
-| Comment add | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "text"` |
-| Comment list | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment list PROJ-123` |
-| Comment update | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment update PROJ-123 --comment-id <ID> --body "..."` |
-| Comment delete | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment delete PROJ-123 --comment-id <ID>` (irreversible) |
-| Attachment list | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate attachment list PROJ-123` |
-| Attachment upload | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate attachment upload PROJ-123 --file /path/to/file` |
-| Attachment download | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --attachment-id <ID> --output /tmp/...` |
-| Attachment delete | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate attachment delete PROJ-123 --attachment-id <ID>` |
-| Watcher add | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watcher add PROJ-123 --user <username>` |
-| Watcher list | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watcher list PROJ-123` |
-| Watcher remove | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watcher remove PROJ-123 --user <username>` |
-| Notify | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate notify PROJ-123 --message "..."` |
+```toon
+[12]{op,tier,verified_invocation_confirm_flags_via___help}
+Comment add|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "text"`
+Comment list|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment list PROJ-123`
+Comment update|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment update PROJ-123 --comment-id <ID> --body "..."`
+Comment delete|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment delete PROJ-123 --comment-id <ID>` (irreversible)
+Attachment list|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate attachment list PROJ-123`
+Attachment upload|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate attachment upload PROJ-123 --file /path/to/file`
+Attachment download|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --attachment-id <ID> --output /tmp/...`
+Attachment delete|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate attachment delete PROJ-123 --attachment-id <ID>`
+Watcher add|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watcher add PROJ-123 --user <username>`
+Watcher list|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watcher list PROJ-123`
+Watcher remove|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate watcher remove PROJ-123 --user <username>`
+Notify|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate notify PROJ-123 --message "..."`
+```
 
 If a verb is missing in jira-as 1.1.x, fall back to documenting the gap and surface in Gotchas; do not invent flags.
 

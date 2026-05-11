@@ -38,22 +38,23 @@ Mixing project keys and board IDs is the #1 source of "board not found" errors.
 
 ## Operations
 
-| Op | Tier | Verified invocation (confirm flags via `--help`) |
-|---|---|---|
-| List boards | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile board list [--name "..."]` |
-| List sprints | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint list --board-id <ID>` |
-| Sprint create | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint create --board-id <ID> --name "..." --start <ISO> --end <ISO>` |
-| Sprint start | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint start --sprint-id <ID>` |
-| Sprint close | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint close --sprint-id <ID>` |
-| Add to sprint | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint add --sprint-id <ID> --issues PROJ-1,PROJ-2` |
-| Remove from sprint | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint remove --sprint-id <ID> --issues PROJ-1` |
-| Backlog | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile backlog --board-id <ID>` |
-| Rank | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile rank --issues PROJ-1 --before PROJ-2` |
-| Set story points | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile estimate PROJ-123 --points 5` |
-| Velocity | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile velocity --board-id <ID>` |
-| Epic create | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile epic create --project PROJ --name "Epic Name" --summary "..."` |
-| Epic add issue | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile epic add EPIC-1 --issues PROJ-1,PROJ-2` |
-| Subtask create | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile subtask create PARENT-1 --summary "..."` |
+```toon
+[14]{op,tier,verified_invocation_confirm_flags_via___help}
+List boards|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile board list [--name "..."]`
+List sprints|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint list --board-id <ID>`
+Sprint create|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint create --board-id <ID> --name "..." --start <ISO> --end <ISO>`
+Sprint start|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint start --sprint-id <ID>`
+Sprint close|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint close --sprint-id <ID>`
+Add to sprint|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint add --sprint-id <ID> --issues PROJ-1,PROJ-2`
+Remove from sprint|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile sprint remove --sprint-id <ID> --issues PROJ-1`
+Backlog|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile backlog --board-id <ID>`
+Rank|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile rank --issues PROJ-1 --before PROJ-2`
+Set story points|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile estimate PROJ-123 --points 5`
+Velocity|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile velocity --board-id <ID>`
+Epic create|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile epic create --project PROJ --name "Epic Name" --summary "..."`
+Epic add issue|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile epic add EPIC-1 --issues PROJ-1,PROJ-2`
+Subtask create|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh agile subtask create PARENT-1 --summary "..."`
+```
 
 Run `--help` for the authoritative flag list per verb.
 

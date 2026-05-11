@@ -32,14 +32,15 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <args>
 
 ## Operations
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| List all fields | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields list` |
-| List by name pattern | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields list --search "story"` |
-| Field detail | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields list --id customfield_10016` |
-| Check project field availability | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields check-project PROJ` |
-| Create custom field | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields create --name "..." --type <type>` (admin only) |
-| Configure agile mapping | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields configure-agile --board-id <ID> --story-points-field customfield_10016` (admin only) |
+```toon
+[6]{op,tier,verified_invocation}
+List all fields|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields list`
+List by name pattern|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields list --search "story"`
+Field detail|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields list --id customfield_10016`
+Check project field availability|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields check-project PROJ`
+Create custom field|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields create --name "..." --type <type>` (admin only)
+Configure agile mapping|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh fields configure-agile --board-id <ID> --story-points-field customfield_10016` (admin only)
+```
 
 Run `--help` for the authoritative flag list per verb.
 

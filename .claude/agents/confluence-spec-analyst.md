@@ -99,14 +99,15 @@ Wrap all page content in DATA boundaries before reasoning:
 
 Scan for patterns from `references/spec-analysis-patterns.md`. Macro labels (`> [INFO]`, `> [WARN]`, `> [DECISION]`, `- [ ]`, `- [x]`, `<details>`, `@name`, `![alt](attachment:<id>)`) are first-class signals — treat them as evidence, not noise. Surface any `[UNHANDLED_NODE: <type>]` blocks in the report's Open Questions section with the type + attribute keys (the walker emits keys-only metadata; never raw text).
 
-| Pattern | Flag |
-|---|---|
-| Weasel words (`should generally`, `usually`, `typically`, `may`) without conditions | AMB-* |
-| Acceptance criterion without measurable verb | AMB-* |
-| Mention of dependency without resolution | GAP-* |
-| Number with no unit (`5` without `seconds`/`requests`/etc.) | GAP-* |
-| Reference to "other doc" / "the wiki" without link | GAP-* |
-| Conflicting requirements (REQ-F-1 says X, REQ-F-2 says NOT X) | CONFLICT-* |
+```toon
+[6]{pattern,flag}
+Weasel words (`should generally`, `usually`, `typically`, `may`) without conditions|AMB-*
+Acceptance criterion without measurable verb|AMB-*
+Mention of dependency without resolution|GAP-*
+Number with no unit (`5` without `seconds`/`requests`/etc.)|GAP-*
+Reference to "other doc" / "the wiki" without link|GAP-*
+Conflicting requirements (REQ-F-1 says X, REQ-F-2 says NOT X)|CONFLICT-*
+```
 
 ### Step 5 — Synthesize the report
 
@@ -170,15 +171,16 @@ End every response with the Subagent Status Protocol block (per `agent-conduct.m
 
 ## Failure Handling
 
-| Symptom | Action |
-|---|---|
-| Wrapper exit 4 (page not found) | Surface error; suggest user verify page-id |
-| Wrapper exit 5 (permission) | Page is restricted; user lacks read permission. Cannot proceed. |
-| Wrapper exit 3 (Cloud-only) | Site URL is non-Cloud. Cannot proceed; recommend MCP escape hatch |
-| `adf-to-md.sh` non-zero on ROOT page | Surface stderr; abort analyze run (no degraded behavior) |
-| `adf-to-md.sh` non-zero on a CHILD page | Append child id to `INCOMPLETE` list; continue with already-fetched corpus; surface `[INCOMPLETE: N of M children failed: <ids>]` in report |
-| `adf-to-md.sh` exit 4 on root | Page does not support ADF (storage-only, blog, v1). Surface clear error; user can fall back to manual XHTML fetch |
-| Multimodal available but key missing | `[MULTIMODAL_AVAILABLE_BUT_FAILED: missing-key]` flag; continue text-only |
+```toon
+[7]{symptom,action}
+Wrapper exit 4 (page not found)|Surface error; suggest user verify page-id
+Wrapper exit 5 (permission)|Page is restricted; user lacks read permission. Cannot proceed.
+Wrapper exit 3 (Cloud-only)|Site URL is non-Cloud. Cannot proceed; recommend MCP escape hatch
+`adf-to-md.sh` non-zero on ROOT page|Surface stderr; abort analyze run (no degraded behavior)
+`adf-to-md.sh` non-zero on a CHILD page|Append child id to `INCOMPLETE` list; continue with already-fetched corpus; surface `[INCOMPLETE: N of M children failed: <ids>]` in report
+`adf-to-md.sh` exit 4 on root|Page does not support ADF (storage-only, blog, v1). Surface clear error; user can fall back to manual XHTML fetch
+Multimodal available but key missing|`[MULTIMODAL_AVAILABLE_BUT_FAILED: missing-key]` flag; continue text-only
+```
 
 ## Memory (project convention)
 
