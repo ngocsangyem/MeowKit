@@ -402,6 +402,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.9.4  | 2026-05-11 | Agent rules and TOON agent docs                  |
 | v2.9.3  | 2026-05-12 | TOON Optimization                                |
 | v2.9.2  | 2026-05-11 | Spec-to-tech-breakdown orchestrator              |
 | v2.9.1  | 2026-05-11 | Brand-prose neutralization for migrate targets   |

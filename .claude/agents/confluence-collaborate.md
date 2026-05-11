@@ -38,23 +38,24 @@ Default to `footer` if uncertain.
 
 ## Operations
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| Comment add (footer) | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh comment add --page-id 12345 --body "text"` |
-| Comment add (inline) | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh comment add --page-id 12345 --body "..." --inline --selection "<anchor-text>"` |
-| Comment list | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh comment list --page-id 12345` |
-| Comment update | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh comment update --comment-id <ID> --body "..."` |
-| Comment delete | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh comment delete --comment-id <ID>` (irreversible) |
-| Attachment list | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh attachment list --page-id 12345` |
-| Attachment upload | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh attachment upload --page-id 12345 --file /path/to/file` |
-| Attachment download | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh attachment download --attachment-id <ID> --output /tmp/...` |
-| Attachment delete | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh attachment delete --attachment-id <ID>` |
-| Label add | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh label add --page-id 12345 --label "rfc"` |
-| Label remove | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh label remove --page-id 12345 --label "draft"` |
-| Label list | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh label list --page-id 12345` |
-| Watcher add | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh watch add --page-id 12345 --user <username>` |
-| Watcher list | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh watch list --page-id 12345` |
-| Watcher remove | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh watch remove --page-id 12345 --user <username>` |
+```toon
+[15]{op,tier,verified_invocation}
+Comment add (footer)|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh comment add --page-id 12345 --body "text"`
+Comment add (inline)|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh comment add --page-id 12345 --body "..." --inline --selection "<anchor-text>"`
+Comment list|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh comment list --page-id 12345`
+Comment update|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh comment update --comment-id <ID> --body "..."`
+Comment delete|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh comment delete --comment-id <ID>` (irreversible)
+Attachment list|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh attachment list --page-id 12345`
+Attachment upload|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh attachment upload --page-id 12345 --file /path/to/file`
+Attachment download|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh attachment download --attachment-id <ID> --output /tmp/...`
+Attachment delete|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh attachment delete --attachment-id <ID>`
+Label add|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh label add --page-id 12345 --label "rfc"`
+Label remove|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh label remove --page-id 12345 --label "draft"`
+Label list|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh label list --page-id 12345`
+Watcher add|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh watch add --page-id 12345 --user <username>`
+Watcher list|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh watch list --page-id 12345`
+Watcher remove|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh watch remove --page-id 12345 --user <username>`
+```
 
 If a verb is missing in the installed `confluence-as` version, fall back to documenting the gap in Gotchas; do not invent flags.
 

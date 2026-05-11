@@ -54,13 +54,14 @@ If only `_partial-<PROJ>.md` exists (non-admin discovery), warn the user that th
 
 ## Operations
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| Bulk transition | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk transition --jql "<JQL>" --to "Done" --dry-run` |
-| Bulk assign | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk assign --jql "<JQL>" --assignee john.doe --dry-run` |
-| Bulk set priority | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk set-priority --jql "<JQL>" --priority High --dry-run` |
-| Bulk clone | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk clone --jql "<JQL>" --target-project DEST --dry-run` |
-| Bulk delete | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk delete --jql "<JQL>" --dry-run` (irreversible — extra confirm) |
+```toon
+[5]{op,tier,verified_invocation}
+Bulk transition|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk transition --jql "<JQL>" --to "Done" --dry-run`
+Bulk assign|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk assign --jql "<JQL>" --assignee john.doe --dry-run`
+Bulk set priority|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk set-priority --jql "<JQL>" --priority High --dry-run`
+Bulk clone|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk clone --jql "<JQL>" --target-project DEST --dry-run`
+Bulk delete|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk delete --jql "<JQL>" --dry-run` (irreversible — extra confirm)
+```
 
 Run `--help` for the authoritative flag list per verb.
 

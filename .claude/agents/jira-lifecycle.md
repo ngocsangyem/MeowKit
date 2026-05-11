@@ -65,26 +65,28 @@ The files at `.claude/skills/jira-lifecycle/references/patterns/{standard,softwa
 
 ## Safety Tiers
 
-| Tier | Verbs | Confirmation |
-|---|---|---|
-| 3 (modify) | `transition`, `assign`, `resolve`, `reopen`, version + component create/update | Show diff or `--dry-run` then exec |
-| 4 (destructive) | version delete, component delete | `--dry-run` first; archive instead of delete when possible |
+```toon
+[2]{tier,verbs,confirmation}
+3 (modify)|`transition`, `assign`, `resolve`, `reopen`, version + component create/update|Show diff or `--dry-run` then exec
+4 (destructive)|version delete, component delete|`--dry-run` first; archive instead of delete when possible
+```
 
 ## Operations
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| Transition by name | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --to "In Progress"` |
-| Transition by ID | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --id 21` |
-| Transition w/ resolution | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --to Done --resolution Fixed` |
-| Transition w/ comment | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --to "In Review" --comment "ready for review"` |
-| Assign | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle assign PROJ-123 --assignee john.doe` |
-| Unassign | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle assign PROJ-123 --unassign` |
-| Resolve | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle resolve PROJ-123 --resolution Fixed` |
-| Reopen | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle reopen PROJ-123` |
-| Version create | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle version create PROJ --name "v1.0.0"` |
-| Version release | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle version release PROJ <VERSION_NAME>` |
-| Component create | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle component create PROJ --name "API"` |
+```toon
+[11]{op,tier,verified_invocation}
+Transition by name|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --to "In Progress"`
+Transition by ID|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --id 21`
+Transition w/ resolution|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --to Done --resolution Fixed`
+Transition w/ comment|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --to "In Review" --comment "ready for review"`
+Assign|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle assign PROJ-123 --assignee john.doe`
+Unassign|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle assign PROJ-123 --unassign`
+Resolve|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle resolve PROJ-123 --resolution Fixed`
+Reopen|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle reopen PROJ-123`
+Version create|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle version create PROJ --name "v1.0.0"`
+Version release|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle version release PROJ <VERSION_NAME>`
+Component create|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh lifecycle component create PROJ --name "API"`
+```
 
 Run `--help` for the full flag list per verb.
 

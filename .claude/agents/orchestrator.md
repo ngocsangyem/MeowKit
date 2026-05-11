@@ -31,11 +31,12 @@ After complexity routing, detect TDD mode:
 5. **If OFF (default):** Phase 2 is optional — skip `tester` invocation unless explicitly requested or unless the plan's acceptance criteria require test coverage. Route directly from `planner` → `developer` → `reviewer`
 6. TDD mode does NOT change model tier selection — that's controlled by complexity routing only
 
-| CSV Level               | Model Tier        | Gate 1          |
-| ----------------------- | ----------------- | --------------- |
-| low + one-shot workflow | TRIVIAL (Haiku)   | Bypass eligible |
-| medium                  | STANDARD (Sonnet) | Required        |
-| high                    | COMPLEX (Opus)    | Required        |
+```toon
+[3]{csv_level,model_tier,gate_1}
+low + one-shot workflow|TRIVIAL (Haiku)|Bypass eligible
+medium|STANDARD (Sonnet)|Required
+high|COMPLEX (Opus)|Required
+```
 
 ## What You Do
 
@@ -124,16 +125,17 @@ When a COMPLEX task can be decomposed into independent subtasks with zero file o
 
 At Phase 0, read the active mode's `Planning Depth` section and pass to planner:
 
-| Mode       | Researchers | Parallel | Two Approaches | Per-Phase Scout |
-| ---------- | ----------- | -------- | -------------- | --------------- |
-| default    | 1           | No       | No             | No              |
-| strict     | 2           | Yes      | Yes            | No              |
-| fast       | 0 (skip)    | No       | No             | No              |
-| architect  | 2           | Yes      | Yes            | No              |
-| audit      | 1           | No       | No             | No              |
-| cost-saver | 0 (skip)    | No       | No             | No              |
-| document   | 0 (skip)    | No       | No             | No              |
-| deep       | 1 per phase | No       | No             | Yes             |
+```toon
+[8]{mode,researchers,parallel,two_approaches,per_phase_scout}
+default|1|No|No|No
+strict|2|Yes|Yes|No
+fast|0 (skip)|No|No|No
+architect|2|Yes|Yes|No
+audit|1|No|No|No
+cost-saver|0 (skip)|No|No|No
+document|0 (skip)|No|No|No
+deep|1 per phase|No|No|Yes
+```
 
 `--deep` triggers automatically when: 5+ directories affected OR task type is refactor+complex. Can also be passed explicitly. Planner runs one scout per phase before writing each phase detail file.
 

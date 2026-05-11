@@ -46,29 +46,31 @@ Default field projection for reads (use `jq` to trim output):
 
 ## Safety Tiers (per `references/safety-framework.md`)
 
-| Tier | Verbs | Confirmation |
-|---|---|---|
-| 1 (read) | `page get`, `hierarchy children`, `hierarchy ancestors`, `hierarchy descendants`, `version list` | Execute immediately |
-| 2 (create) | `page create` | None (single). 3+ in batch → preview + confirm |
-| 3 (modify) | `page update`, `page copy`, `page move`, `version restore` | Show diff (current → proposed) before exec |
-| 4 (destructive) | `page delete` | `--dry-run` first → human reviews → re-invoke without dry-run |
+```toon
+[4]{tier,verbs,confirmation}
+1 (read)|`page get`, `hierarchy children`, `hierarchy ancestors`, `hierarchy descendants`, `version list`|Execute immediately
+2 (create)|`page create`|None (single). 3+ in batch → preview + confirm
+3 (modify)|`page update`, `page copy`, `page move`, `version restore`|Show diff (current → proposed) before exec
+4 (destructive)|`page delete`|`--dry-run` first → human reviews → re-invoke without dry-run
+```
 
 ## Operations
 
-| Op | Tier | Verified wrapper invocation |
-|---|---|---|
-| Get | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page get --page-id 12345` |
-| Create (basic) | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page create --space-key ENG --title "..." --content "..."` |
-| Create (template) | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page create --space-key ENG --title "..." --template rfc` |
-| Update | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page update --page-id 12345 --title "..." --content "..."` |
-| Delete | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page delete --page-id 12345` (omit `--force` unless after dry-run review) |
-| Copy | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page copy --page-id 12345 --target-space DEST` |
-| Move | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page move --page-id 12345 --new-parent 67890` |
-| Children | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh hierarchy children --page-id 12345 --depth 2` |
-| Ancestors | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh hierarchy ancestors --page-id 12345` |
-| Descendants | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh hierarchy descendants --page-id 12345 --depth 3` |
-| Version list | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh version list --page-id 12345` |
-| Version restore | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh version restore --page-id 12345 --version 4` |
+```toon
+[12]{op,tier,verified_wrapper_invocation}
+Get|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page get --page-id 12345`
+Create (basic)|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page create --space-key ENG --title "..." --content "..."`
+Create (template)|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page create --space-key ENG --title "..." --template rfc`
+Update|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page update --page-id 12345 --title "..." --content "..."`
+Delete|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page delete --page-id 12345` (omit `--force` unless after dry-run review)
+Copy|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page copy --page-id 12345 --target-space DEST`
+Move|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page move --page-id 12345 --new-parent 67890`
+Children|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh hierarchy children --page-id 12345 --depth 2`
+Ancestors|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh hierarchy ancestors --page-id 12345`
+Descendants|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh hierarchy descendants --page-id 12345 --depth 3`
+Version list|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh version list --page-id 12345`
+Version restore|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh version restore --page-id 12345 --version 4`
+```
 
 For full flag inventory (incl. `--representation storage|view|export_view`, `--label`, `--parent`, `--ancestor`), run `--help` for the specific verb. Verb names not present in the installed `confluence-as` version → fall back to documenting the gap in Gotchas; do not invent flags.
 
@@ -125,13 +127,14 @@ End every response with the Subagent Status Protocol block (per `agent-conduct.m
 
 ## Failure Handling (confluence-as exit codes → user message)
 
-| Exit | Action |
-|---|---|
-| 1 | Validation — re-read your `--help`, fix the flag, retry |
-| 2 | Auth or settings.local.json fallback — wrapper rejected; user moves credentials to `.claude/.env` |
-| 3 | Cloud-only gate — site URL is non-Cloud; user uses MCP escape hatch per install-and-auth.md |
-| 4 | Network / DNS — retry once; check VPN |
-| 5 | Permission (401/403) — token may be rotated; user re-runs `/mk:confluence-setup` |
+```toon
+[5]{exit,action}
+1|Validation — re-read your `--help`, fix the flag, retry
+2|Auth or settings.local.json fallback — wrapper rejected; user moves credentials to `.claude/.env`
+3|Cloud-only gate — site URL is non-Cloud; user uses MCP escape hatch per install-and-auth.md
+4|Network / DNS — retry once; check VPN
+5|Permission (401/403) — token may be rotated; user re-runs `/mk:confluence-setup`
+```
 
 ## Gotchas
 

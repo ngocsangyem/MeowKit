@@ -28,14 +28,15 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <args>
 
 ## Operations
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| Branch name | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev branch-name PROJ-123` |
-| PR description | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev pr-description PROJ-123` |
-| Parse commits for keys | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev parse-commits --range main..HEAD` |
-| Link commit to issue | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev link-commit PROJ-123 --sha <SHA>` |
-| Link PR to issue | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev link-pr PROJ-123 --pr-url https://github.com/.../pull/N` |
-| Get issue commits | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev get-commits PROJ-123` |
+```toon
+[6]{op,tier,verified_invocation}
+Branch name|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev branch-name PROJ-123`
+PR description|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev pr-description PROJ-123`
+Parse commits for keys|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev parse-commits --range main..HEAD`
+Link commit to issue|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev link-commit PROJ-123 --sha <SHA>`
+Link PR to issue|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev link-pr PROJ-123 --pr-url https://github.com/.../pull/N`
+Get issue commits|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev get-commits PROJ-123`
+```
 
 Run `--help` for the authoritative flag list per verb.
 

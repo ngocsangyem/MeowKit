@@ -46,22 +46,24 @@ Default field projection for reads (use `jq` to trim output):
 
 ## Safety Tiers (per `references/safety-framework.md`)
 
-| Tier | Verbs | Confirmation |
-|---|---|---|
-| 1 (read) | `issue get` | Execute immediately |
-| 2 (create) | `issue create` | None (single). 3+ in batch → preview + confirm |
-| 3 (modify) | `issue update` | Show diff (current → proposed) before exec |
-| 4 (destructive) | `issue delete` | `--dry-run` first → human reviews → re-invoke without dry-run |
+```toon
+[4]{tier,verbs,confirmation}
+1 (read)|`issue get`|Execute immediately
+2 (create)|`issue create`|None (single). 3+ in batch → preview + confirm
+3 (modify)|`issue update`|Show diff (current → proposed) before exec
+4 (destructive)|`issue delete`|`--dry-run` first → human reviews → re-invoke without dry-run
+```
 
 ## Operations
 
-| Op | Tier | Verified wrapper invocation |
-|---|---|---|
-| Get | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue get PROJ-123` |
-| Create (basic) | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue create --project PROJ --type Bug --summary "..."` |
-| Create (template) | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue create --project PROJ --template bug --summary "..."` |
-| Update | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue update PROJ-123 --summary "..." --priority High` |
-| Delete | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue delete PROJ-123` (omit `--force` unless after dry-run review) |
+```toon
+[5]{op,tier,verified_wrapper_invocation}
+Get|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue get PROJ-123`
+Create (basic)|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue create --project PROJ --type Bug --summary "..."`
+Create (template)|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue create --project PROJ --template bug --summary "..."`
+Update|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue update PROJ-123 --summary "..." --priority High`
+Delete|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue delete PROJ-123` (omit `--force` unless after dry-run review)
+```
 
 For full flag inventory (incl. `--description`, `--assignee`, `--labels`, `--components`, `--epic`, `--sprint`, `--story-points`, `--blocks`, `--custom-fields`), run `--help` for the specific verb.
 
@@ -112,15 +114,16 @@ End every response with the Subagent Status Protocol block (per `agent-conduct.m
 
 ## Failure Handling (jira-as exit codes → user message)
 
-| Exit | Action |
-|---|---|
-| 1 | Validation — re-read your `--help`, fix the flag, retry |
-| 2 | Auth — escalate; user updates `.claude/.env` |
-| 3 | Permission — report; user lacks Jira permission |
-| 4 | Not found — confirm the issue/project key exists |
-| 5 | Rate limit — backoff + retry once |
-| 6 | Conflict — refresh + retry |
-| 7 | Server — report Atlassian status; retry |
+```toon
+[7]{exit,action}
+1|Validation — re-read your `--help`, fix the flag, retry
+2|Auth — escalate; user updates `.claude/.env`
+3|Permission — report; user lacks Jira permission
+4|Not found — confirm the issue/project key exists
+5|Rate limit — backoff + retry once
+6|Conflict — refresh + retry
+7|Server — report Atlassian status; retry
+```
 
 ## Gotchas
 

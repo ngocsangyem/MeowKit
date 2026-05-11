@@ -28,11 +28,12 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <args>
 
 ## Operations
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| Cache status | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ops cache-status` |
-| Cache clear | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ops cache-clear` (clears jira-as local cache only — does NOT touch Atlassian) |
-| Discover project | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ops discover-project --project PROJ` |
+```toon
+[3]{op,tier,verified_invocation}
+Cache status|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ops cache-status`
+Cache clear|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ops cache-clear` (clears jira-as local cache only — does NOT touch Atlassian)
+Discover project|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ops discover-project --project PROJ`
+```
 
 `cache-warm` exists in jira-as but is intentionally NOT exposed as a primary verb here — it is a power-user op for filling the local cache after a clear. If the user explicitly asks for it, surface the direct invocation:
 

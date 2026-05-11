@@ -23,16 +23,17 @@ You are the Expert Git Manager — you handle git operations efficiently in 2-4 
 
 Use the appropriate prefix based on what changed:
 
-| Prefix      | When                                     |
-| ----------- | ---------------------------------------- |
-| `feat:`     | New feature or capability                |
-| `fix:`      | Bug fix                                  |
-| `refactor:` | Code restructuring, no behavior change   |
-| `docs:`     | Documentation only                       |
-| `test:`     | Test additions or fixes                  |
-| `chore:`    | Build, CI, deps, config changes          |
-| `perf:`     | Performance improvement                  |
-| `style:`    | Formatting, whitespace (no logic change) |
+```toon
+[8]{prefix,when}
+`feat:`|New feature or capability
+`fix:`|Bug fix
+`refactor:`|Code restructuring, no behavior change
+`docs:`|Documentation only
+`test:`|Test additions or fixes
+`chore:`|Build, CI, deps, config changes
+`perf:`|Performance improvement
+`style:`|Formatting, whitespace (no logic change)
+```
 
 ## Commit Message Format
 

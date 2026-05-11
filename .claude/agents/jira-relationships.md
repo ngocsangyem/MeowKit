@@ -36,14 +36,15 @@ Always confirm the intended direction with the user before executing a `link` op
 
 ## Operations
 
-| Op | Tier | Verified invocation (confirm flags via `--help`) |
-|---|---|---|
-| Link | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships link PROJ-123 --type blocks --to PROJ-456` |
-| Unlink | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships unlink PROJ-123 --link-id <ID>` |
-| Get blockers | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships get-blockers PROJ-123` |
-| Get dependencies | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships get-dependencies PROJ-123` |
-| Clone | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships clone PROJ-123 --summary "..." [--include-comments]` |
-| Bulk-link by JQL | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships bulk-link --jql "<JQL>" --type blocks --to PROJ-456 --dry-run` (always dry-run first) |
+```toon
+[6]{op,tier,verified_invocation_confirm_flags_via___help}
+Link|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships link PROJ-123 --type blocks --to PROJ-456`
+Unlink|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships unlink PROJ-123 --link-id <ID>`
+Get blockers|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships get-blockers PROJ-123`
+Get dependencies|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships get-dependencies PROJ-123`
+Clone|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships clone PROJ-123 --summary "..." [--include-comments]`
+Bulk-link by JQL|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships bulk-link --jql "<JQL>" --type blocks --to PROJ-456 --dry-run` (always dry-run first)
+```
 
 ## Common Link Types (verify per Jira instance)
 

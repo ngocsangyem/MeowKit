@@ -45,36 +45,38 @@ Irreversible ops:
 
 ## Sub-domains (11)
 
-| Sub-domain | Common verbs |
-|---|---|
-| `project` | `list`, `create`, `get`, `update`, `archive`, `delete`, `lead` |
-| `config` | `get`, `update`, `restore-defaults` |
-| `category` | `list`, `create`, `update`, `delete` |
-| `user` | `list`, `create`, `get`, `update`, `deactivate`, `delete`, `groups` |
-| `group` | `list`, `create`, `get`, `delete`, `add-member`, `remove-member` |
-| `automation` | `list`, `enable`, `disable`, `delete`, `run` |
-| `automation-template` | `list`, `apply` |
-| `permission-scheme` | `list`, `get`, `create`, `update`, `delete`, `assign-to-project` |
-| `permission` | `list`, `grant`, `revoke` |
-| `notification-scheme` | `list`, `get`, `create`, `update`, `delete`, `assign-to-project` |
-| `notification` | `list`, `add`, `remove` |
+```toon
+[11]{sub_domain,common_verbs}
+`project`|`list`, `create`, `get`, `update`, `archive`, `delete`, `lead`
+`config`|`get`, `update`, `restore-defaults`
+`category`|`list`, `create`, `update`, `delete`
+`user`|`list`, `create`, `get`, `update`, `deactivate`, `delete`, `groups`
+`group`|`list`, `create`, `get`, `delete`, `add-member`, `remove-member`
+`automation`|`list`, `enable`, `disable`, `delete`, `run`
+`automation-template`|`list`, `apply`
+`permission-scheme`|`list`, `get`, `create`, `update`, `delete`, `assign-to-project`
+`permission`|`list`, `grant`, `revoke`
+`notification-scheme`|`list`, `get`, `create`, `update`, `delete`, `assign-to-project`
+`notification`|`list`, `add`, `remove`
+```
 
 ## Operations (selection — verify each via `--help`)
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| List projects | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project list` |
-| Create project | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project create --key NEW --name "..." --type software-scrum --lead-account-id <ID>` |
-| Update project | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project update <KEY> --name "..." --description "..."` |
-| Archive project | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project archive <KEY>` |
-| Delete project | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project delete <KEY> --dry-run` (then 2-step token confirm) |
-| List users | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user list` |
-| Create user | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user create --email "..." --display-name "..."` |
-| Deactivate user | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user deactivate <ACCOUNT_ID>` |
-| Delete user | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user delete <ACCOUNT_ID>` (2-step token confirm) |
-| List groups | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin group list` |
-| Add to group | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin group add-member <GROUP> --account-id <ID>` |
-| List automations | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin automation list --project-key PROJ` |
+```toon
+[12]{op,tier,verified_invocation}
+List projects|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project list`
+Create project|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project create --key NEW --name "..." --type software-scrum --lead-account-id <ID>`
+Update project|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project update <KEY> --name "..." --description "..."`
+Archive project|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project archive <KEY>`
+Delete project|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project delete <KEY> --dry-run` (then 2-step token confirm)
+List users|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user list`
+Create user|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user create --email "..." --display-name "..."`
+Deactivate user|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user deactivate <ACCOUNT_ID>`
+Delete user|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user delete <ACCOUNT_ID>` (2-step token confirm)
+List groups|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin group list`
+Add to group|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin group add-member <GROUP> --account-id <ID>`
+List automations|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin automation list --project-key PROJ`
+```
 
 The 65-verb total is too large to enumerate — `--help` is the canonical reference per verb.
 

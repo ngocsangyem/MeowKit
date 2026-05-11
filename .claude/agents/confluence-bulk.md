@@ -58,12 +58,13 @@ Step 3 (only after explicit user "yes" AND typed token):
 
 ## Operations
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| Bulk label add | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh bulk label add --cql "<CQL>" --label "stale" --dry-run --max-pages 100` |
-| Bulk label remove | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh bulk label remove --cql "<CQL>" --label "draft" --dry-run --max-pages 100` |
-| Bulk move | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh bulk move --cql "<CQL>" --new-parent 67890 --dry-run --max-pages 100` |
-| Bulk delete | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh bulk delete --cql "<CQL>" --dry-run --max-pages 100` (irreversible — extra confirm) |
+```toon
+[4]{op,tier,verified_invocation}
+Bulk label add|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh bulk label add --cql "<CQL>" --label "stale" --dry-run --max-pages 100`
+Bulk label remove|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh bulk label remove --cql "<CQL>" --label "draft" --dry-run --max-pages 100`
+Bulk move|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh bulk move --cql "<CQL>" --new-parent 67890 --dry-run --max-pages 100`
+Bulk delete|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh bulk delete --cql "<CQL>" --dry-run --max-pages 100` (irreversible — extra confirm)
+```
 
 Run `--help` for the authoritative flag list per verb. If a verb is missing in the installed `confluence-as` version, fall back to documenting the gap in Gotchas; do not invent flags. `bulk restore` is intentionally not listed — see Gotchas.
 

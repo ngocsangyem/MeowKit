@@ -34,26 +34,28 @@ Duration format: `30m`, `2h`, `1d 4h`, `1w 2d`. Jira respects the workday length
 
 ## Safety Tiers
 
-| Tier | Verbs | Confirmation |
-|---|---|---|
-| 1 (read) | `worklogs`, `tracking`, `report`, `export` | Execute immediately |
-| 2 (create) | `log`, `bulk-log` | Single — none. Bulk — preview impacted issues |
-| 3 (modify) | `update-worklog`, `estimate` | Show diff |
-| 4 (destructive) | `delete-worklog` | Worklog edit/delete LOSES data — confirm with explicit user typed "yes" |
+```toon
+[4]{tier,verbs,confirmation}
+1 (read)|`worklogs`, `tracking`, `report`, `export`|Execute immediately
+2 (create)|`log`, `bulk-log`|Single — none. Bulk — preview impacted issues
+3 (modify)|`update-worklog`, `estimate`|Show diff
+4 (destructive)|`delete-worklog`|Worklog edit/delete LOSES data — confirm with explicit user typed "yes"
+```
 
 ## Operations
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| Log work | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time log PROJ-123 --time 2h --comment "..."` |
-| List worklogs | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time worklogs PROJ-123` |
-| Update worklog | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time update-worklog PROJ-123 --worklog-id <ID> --time 3h` |
-| Delete worklog | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time delete-worklog PROJ-123 --worklog-id <ID>` |
-| Set estimate | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original 1d --remaining 4h` |
-| Tracking summary | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time tracking PROJ-123` |
-| Time report by JQL | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time report --jql "<JQL>" --from 2026-04-01 --to 2026-04-30` |
-| Export | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time export --jql "<JQL>" --output-file /tmp/worklog.csv` |
-| Bulk log | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time bulk-log --jql "<JQL>" --time 30m --dry-run` (always dry-run first) |
+```toon
+[9]{op,tier,verified_invocation}
+Log work|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time log PROJ-123 --time 2h --comment "..."`
+List worklogs|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time worklogs PROJ-123`
+Update worklog|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time update-worklog PROJ-123 --worklog-id <ID> --time 3h`
+Delete worklog|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time delete-worklog PROJ-123 --worklog-id <ID>`
+Set estimate|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original 1d --remaining 4h`
+Tracking summary|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time tracking PROJ-123`
+Time report by JQL|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time report --jql "<JQL>" --from 2026-04-01 --to 2026-04-30`
+Export|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time export --jql "<JQL>" --output-file /tmp/worklog.csv`
+Bulk log|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh time bulk-log --jql "<JQL>" --time 30m --dry-run` (always dry-run first)
+```
 
 Run `--help` for the authoritative flag list per verb.
 

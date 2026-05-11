@@ -56,30 +56,32 @@ Pipe through `jq` for projection:
 
 ## Safety Tiers
 
-| Tier | Verbs | Confirmation |
-|---|---|---|
-| 1 (read) | `search query`, `search validate`, `search build`, `search suggest`, `search fields`, `search functions`, `filter list/run` | Execute immediately |
-| 2 (create) | `filter create` | None |
-| 3 (modify) | `search bulk-update`, `filter update`, `filter share`, `filter favourite` | Show diff / dry-run |
-| 4 (destructive) | `filter delete` | Dry-run + confirm |
+```toon
+[4]{tier,verbs,confirmation}
+1 (read)|`search query`, `search validate`, `search build`, `search suggest`, `search fields`, `search functions`, `filter list/run`|Execute immediately
+2 (create)|`filter create`|None
+3 (modify)|`search bulk-update`, `filter update`, `filter share`, `filter favourite`|Show diff / dry-run
+4 (destructive)|`filter delete`|Dry-run + confirm
+```
 
 ## Operations
 
-| Op | Tier | Verified invocation |
-|---|---|---|
-| Query | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search query "<JQL>" --max-results 20` |
-| Validate JQL | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search validate "<JQL>"` |
-| Build from NL | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search build --description "tickets assigned to me, in progress"` |
-| Suggest field values | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search suggest --field status` |
-| List fields | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search fields` |
-| List functions | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search functions` |
-| Bulk update by JQL | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search bulk-update "<JQL>" --field labels=urgent --dry-run` (always dry-run first) |
-| Export | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search export "<JQL>" --output-file /tmp/out.csv --format csv` |
-| List filters | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh filter list` |
-| Run a saved filter | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh filter run --filter-id 12345` |
-| Create filter | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh filter create --name "..." --jql "<JQL>"` |
-| Update filter | 3 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh filter update <FILTER_ID> --jql "<JQL>"` |
-| Delete filter | 4 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh filter delete <FILTER_ID>` |
+```toon
+[13]{op,tier,verified_invocation}
+Query|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search query "<JQL>" --max-results 20`
+Validate JQL|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search validate "<JQL>"`
+Build from NL|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search build --description "tickets assigned to me, in progress"`
+Suggest field values|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search suggest --field status`
+List fields|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search fields`
+List functions|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search functions`
+Bulk update by JQL|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search bulk-update "<JQL>" --field labels=urgent --dry-run` (always dry-run first)
+Export|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh search export "<JQL>" --output-file /tmp/out.csv --format csv`
+List filters|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh filter list`
+Run a saved filter|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh filter run --filter-id 12345`
+Create filter|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh filter create --name "..." --jql "<JQL>"`
+Update filter|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh filter update <FILTER_ID> --jql "<JQL>"`
+Delete filter|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh filter delete <FILTER_ID>`
+```
 
 Per-flag verification: run `--help` for any verb before authoring a new pattern.
 
