@@ -28,7 +28,7 @@ trust_level: HIGH
 
 **Concurrent-write safety:** consuming skill MUST `flock` the sprint-state file before any read-modify-write. YAML append is non-atomic across shells.
 
-**INSTEAD of blocking:** log transparently, then proceed.
+Log transparently, then proceed.
 
 ## 3 — Sprint close hygiene
 
@@ -41,7 +41,7 @@ trust_level: HIGH
 
 **NEVER close silently when commitments are unmet. INSTEAD:** prompt — feeds retro and velocity calibration.
 
-## Integration touch points
+## Integrations
 
 - `mk:agent-detector` Step 0b → reads newest sprint-state, surfaces goal
 - `mk:sprint-contract sprint-goal` → 1

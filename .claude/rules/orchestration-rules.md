@@ -29,8 +29,7 @@ When spawning a subagent, ALWAYS include in the prompt:
 4. **Reports path**: `{work_context}/tasks/reports/` when the workflow needs reports
 5. **Plans path**: `{work_context}/tasks/plans/` when the workflow needs plans
 
-WHY: Subagents start with zero context. Without explicit paths and scope,
-they read wrong files, write to wrong locations, or duplicate work.
+WHY: Explicit paths and scope prevent wrong-file edits and duplicate work.
 
 If current working directory differs from the project being edited, use the work context paths — not CWD-derived paths.
 
@@ -77,7 +76,7 @@ Each agent or subagent MUST own distinct files — no overlapping edits.
 - If two agents need the same file: STOP and have the orchestrator restructure tasks or handle the shared file sequentially
 - Tester agents own test files only; they read implementation files but NEVER edit them
 
-WHY: Concurrent edits to the same file cause merge conflicts and lost work.
+WHY: Concurrent same-file edits cause conflicts and lost work.
 
 ## Sequential vs Parallel
 

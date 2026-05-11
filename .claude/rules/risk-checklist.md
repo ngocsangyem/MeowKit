@@ -4,14 +4,7 @@ Phase 0 risk evaluation. Agents surface risk flags BEFORE finalizing tier
 classification. The 9 flags below complement `mk:scale-routing`'s domain CSV
 match — they are an additional signal, not a replacement.
 
-WHY: Domain matching covers vertical risk (fintech, healthcare, IoT). Risk
-flags cover horizontal risk patterns (auth, data loss, external providers)
-that cut across domains. Together they raise the floor on routing accuracy
-without adding new tiers or new lanes.
-
-INSTEAD of: assuming a fintech-typed CSV match captures every risk dimension
-USE: CSV match (vertical) AND risk-flag evaluation (horizontal); both feed
-into the existing TRIVIAL / STANDARD / COMPLEX tier system. No new lanes.
+WHY: CSV match covers vertical risk; flags cover horizontal risk. Both feed the existing TRIVIAL / STANDARD / COMPLEX tiers.
 
 ## Flags
 

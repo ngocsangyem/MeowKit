@@ -41,7 +41,7 @@ The 21 domain integration agents below are NOT scored by `mk:agent-detector` and
 
 **Routing flow:** `mk:agent-detector` (Phase 0) → if scale-routing CSV matches `jira` or `confluence` keywords, route to the hub skill → hub disambiguates and forks the leaf agent via the matching `mk:<domain>-<leaf>` skill. Orchestrator never invokes a domain agent directly.
 
-**Why excluded from the core table:** Domain integration agents are scoped to one external system, follow a separate safety model (4-tier per-leaf with the wrapper as the credential boundary), and would dilute the core agent scoring if they shared the orchestrator's keyword surface. The hubs are the routing surface for their families.
+**Why excluded:** Domain agents use hub-level routing and separate wrapper safety, so core orchestrator scoring stays focused.
 
 ## Skill Domain Routing
 

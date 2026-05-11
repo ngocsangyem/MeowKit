@@ -21,9 +21,7 @@ hooks cannot invoke the Agent tool (verified).
 | `mk:fix`                     | Complex path only, after Phase 4 verdict                   | background  |
 | `mk:worktree`                | After merge integration test passes                        | background  |
 
-WHY: Without a single source of truth for fire points, each skill drifts
-with its own delegation logic. Centralizing in a rule keeps behavior DRY
-and auditable — fire-point changes happen in one file.
+WHY: Centralized fire points keep delegation DRY and auditable.
 
 ## Rule 2: Invocation Form
 
@@ -45,9 +43,7 @@ For `foreground` mode (harness step 5 only), OMIT the background directive
 and wait for PM's result — user needs current delivery state before the
 escalation prompt.
 
-WHY: PM's frontmatter has no `background: true` flag (each invocation
-decides). The prompt text is the dispatch signal. Inline delegation copies
-drift; a fixed invocation pattern prevents subtle semantic differences.
+WHY: Prompt text is the dispatch signal; one pattern prevents drift.
 
 ## Rule 3: Skip Conditions
 
@@ -59,18 +55,13 @@ PM is NOT invoked when ANY of the following is true:
 - No active plan at `tasks/plans/` (nothing to track)
 - Docs-only or rule-only updates with no active implementation plan; report docs impact directly instead
 
-WHY: Delivery tracking has a cost. Skip paths prevent PM from firing when
-the work has no plan to track, when the model is already self-managing,
-or when the user explicitly opts out.
-
-INSTEAD of: firing PM on every trivial fix or MINIMAL harness run
-USE: the skip conditions above, audited once per skill citation
+WHY: Skip paths avoid delivery tracking when there is no useful plan/report surface.
 
 ## Rule 4: Orchestrator Disambiguation
 
 Per `.claude/rules/orchestration-rules.md`, `mk:cook` and `mk:workflow-orchestrator` are mutually exclusive per session. Refer to that rule for the full disambiguation logic.
 
-WHY: Double-firing PM on the same phase transition wastes haiku calls and produces duplicate reports. The mutual-exclusion rule that governs the orchestrators themselves extends to their PM delegation.
+WHY: Orchestrator mutual exclusion also prevents duplicate PM reports.
 
 ## Rule 5: Harness Foreground Exception
 
@@ -82,9 +73,7 @@ state must surface BEFORE the question, not after.
 
 All other fires are background — PM is a reporter, not a blocker.
 
-WHY: Foreground PM during normal flow blocks the main agent for no
-user-visible benefit. Only at iteration cap does the user actively wait
-on the decision, justifying the block.
+WHY: Foreground PM is only useful when the user is actively deciding ship vs abort.
 
 ## Rule 6: Opt-Out Honored Everywhere
 
@@ -93,23 +82,14 @@ Set in the shell environment; not agent-controlled.
 
 User-invoked `/mk:status` is ALWAYS honored regardless of this env var.
 
-WHY: Users who don't want silent PM chatter should have one knob to
-disable it globally. A per-skill opt-out would drift and confuse.
-
-INSTEAD of: per-skill toggles or skill-local env vars
-USE: one env var gating all silent fires
+WHY: One global knob prevents per-skill opt-out drift.
 
 ## Rule 7: No Hook Dispatch
 
 PM MUST NOT be invoked from hook handlers. On Claude Code, hooks cannot call
 the Agent tool (verified via runtime documentation).
 
-INSTEAD of: SubagentStop hook firing PM → infinite-loop risk
-USE: explicit delegation in the orchestration skill body per Rule 2
-
-WHY: Hook-based dispatch would create a loop (PM's own SubagentStop would
-re-fire the hook). Explicit skill-body delegation is both correct and
-auditable.
+WHY: Hook-based dispatch would loop on PM's own SubagentStop; explicit delegation is auditable.
 
 ## Applies To
 

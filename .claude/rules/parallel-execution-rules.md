@@ -8,7 +8,7 @@ Parallel execution is ONLY permitted when subtasks have zero file overlap.
 Each parallel agent MUST declare its owned files via glob patterns before starting.
 If two agents' ownership patterns overlap, STOP and restructure the decomposition.
 
-WHY: Concurrent edits to the same file cause merge conflicts and lost work. No amount of tooling fixes this — prevention is the only reliable strategy.
+WHY: Preventing overlap is the only reliable way to avoid lost concurrent edits.
 
 ### Staged Parallel Mode (Alternative)
 
@@ -31,7 +31,7 @@ When strict zero-overlap is impractical (shared config, utils, types), use stage
 NEVER spawn more than 3 parallel agents simultaneously.
 Token costs scale linearly with parallel agents. 3 is the practical ceiling.
 
-WHY: Each parallel agent consumes a full context window. 3 agents = 3x token cost. Beyond 3, the coordination overhead exceeds the throughput gains.
+WHY: Beyond 3 agents, coordination and token cost exceed throughput gains.
 
 ## Rule 3: Worktree Isolation
 
@@ -40,14 +40,14 @@ Create: `git worktree add .worktrees/{agent-name} -b {branch-name}`
 Merge: After all parallel agents complete, merge worktree branches to feature branch.
 Cleanup: `git worktree remove .worktrees/{agent-name}`
 
-WHY: Worktrees provide filesystem-level isolation. Agents cannot accidentally overwrite each other's work. This is the workflow pattern for safe parallel teams.
+WHY: Worktrees provide filesystem-level isolation.
 
 ## Rule 4: Gates Are Never Parallel
 
 Gate 1 (plan approval) and Gate 2 (review approval) are ALWAYS sequential.
 They ALWAYS require human approval. They NEVER run in parallel with other work.
 
-WHY: Gates are the discipline core. Parallelizing them defeats their purpose.
+WHY: Parallel gates defeat the approval discipline.
 
 ## Rule 5: Integration Test After Merge
 
@@ -58,14 +58,14 @@ After the integration test passes, delegate to `project-manager` per
 `.claude/rules/post-phase-delegation.md` Rule 1 to emit a merge report
 summarizing what each parallel branch contributed.
 
-WHY: Individual branches may pass their own tests but fail when combined. Integration testing catches interaction bugs that per-branch testing misses.
+WHY: Integration tests catch cross-branch interaction bugs.
 
 ## Rule 6: Only COMPLEX Tasks Qualify
 
 Parallel execution is only available for tasks classified as COMPLEX by the orchestrator.
 TRIVIAL and STANDARD tasks use the default sequential pipeline.
 
-WHY: Parallel decomposition has coordination overhead. For simple tasks, sequential is faster. Parallelism only pays off when the task is large enough to amortize the setup cost.
+WHY: Parallelism only pays off when task size amortizes coordination cost.
 
 ## Rule 7: Team Coordination Is Opt-In
 
@@ -79,7 +79,7 @@ When team mode is active:
 - Completion messages must be actionable, not just "done".
 - The lead evaluates docs impact after implementation work.
 
-WHY: Team sessions add messaging, task claiming, and branch discipline that are unnecessary in normal sessions but critical when several agents act like teammates.
+WHY: Team mode needs extra coordination that normal sessions do not.
 
 ## When to Parallelize
 

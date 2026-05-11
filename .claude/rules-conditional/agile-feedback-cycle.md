@@ -36,9 +36,9 @@ trust_level: MED
    - NO test phase, NO ship phase — Phase 5 = "Findings doc written and reviewed"
 4. At completion: "Convert findings to delivery story? [Yes — extract AC | No — research-only | Defer]"
 
-**INSTEAD of letting spikes drift:** enforce timebox as Phase 5 hard prompt — "you said 2d; 2d has passed; what's the state?"
+Enforce spike timeboxes as Phase 5 hard prompts: "you said 2d; 2d has passed; what's the state?"
 
-## Integration touch points
+## Integrations
 
 - `mk:retro` post-narrative step 4.5 → 1 (Agile-context-only; inert when rule not loaded)
 - `mk:plan-creator --spike` → 2 step-00 mode-detection branch + spike template

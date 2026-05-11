@@ -68,4 +68,4 @@ Before presenting Gate 1 or Gate 2 for human approval, the responsible agent MUS
 
 If #2 or #3 contain items, the human sees them BEFORE the approval prompt — not buried in a report.
 
-WHY: Transparency prevents rationalization. If an agent must declare what it skipped, it's less likely to skip things silently.
+WHY: Declaring skipped/uncertain work prevents silent rationalization.

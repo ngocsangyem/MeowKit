@@ -8,16 +8,7 @@ Every `SKILL.md` MUST include a `## Gotchas` section. Empty is acceptable on day
 
 The `mk:skill-creator` template MUST emit this section by default for every new skill it scaffolds.
 
-WHY: Anthropic's field report identifies the Gotchas section as the highest-signal content in any skill — it captures non-default knowledge accumulated from real failures. A skill without a gotchas section discards institutional learning every time Claude hits a new edge case.
-
-**Bad example: No failure log** (institutional knowledge lost):
-
-```markdown
-# Billing Lib
-
-How to use the internal billing library.
-See the lib README for full API docs.
-```
+WHY: Gotchas preserve non-default knowledge learned from real failures.
 
 **Good example: Gotchas section grows over time**:
 
@@ -34,25 +25,15 @@ How to use the internal billing library.
 - Refunds need charge ID, not invoice ID.
 ```
 
-INSTEAD of: a polished SKILL.md with no failure log
-USE: a SKILL.md with `## Gotchas` that grows one bullet per observed edge case
+Use a `## Gotchas` section that grows by one bullet per observed edge case.
 
 ## Rule 2: Persistent Skill State MUST Use ${CLAUDE_PLUGIN_DATA}
 
 When a skill needs to persist data across sessions (append-only logs, JSON state, SQLite databases, history files), it MUST write to `${CLAUDE_PLUGIN_DATA}` — NOT to the skill's own directory.
 
-WHY: Skill-directory state is wiped on plugin upgrade per the runtime's plugin contract. Silent data loss is the failure mode. `${CLAUDE_PLUGIN_DATA}` is the stable, upgrade-safe folder.
+WHY: Skill directories can be wiped on plugin upgrade; `${CLAUDE_PLUGIN_DATA}` is stable.
 
 EXCEPTION: framework-internal infrastructure (`.claude/memory/`, `tasks/`, `session-state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
-
-**Bad example: Skill-dir path** (wiped on plugin upgrade):
-
-```python
-# scripts/append-history.py
-LOG_PATH = ".claude/skills/standup-post/history.log"
-with open(LOG_PATH, "a") as f:
-    f.write(entry)
-```
 
 **Good example: Stable plugin-data path**:
 
@@ -66,8 +47,7 @@ with open(LOG_PATH, "a") as f:
     f.write(entry)
 ```
 
-INSTEAD of: appending to `.claude/skills/foo/log.json`
-USE: appending to `${CLAUDE_PLUGIN_DATA}/foo/log.json`
+Append to `${CLAUDE_PLUGIN_DATA}/foo/log.json`, not `.claude/skills/foo/log.json`.
 
 ## Rule 3: SKILL.md Body MUST Stay Under 500 Lines
 
@@ -77,7 +57,7 @@ Every `SKILL.md` body (excluding YAML frontmatter) MUST stay under 500 lines. Sk
 - Step-file architecture per `step-file-rules.md` — `workflow.md` + `step-NN-*.md` files
 
 <!-- research-citation -->
-WHY: Once SKILL.md loads, every token competes with conversation history and other context. The 500-line cap is Anthropic's empirically-validated threshold for context efficiency. Beyond this, partial reads (`head -100`) start to miss content.
+WHY: Once SKILL.md loads, every token competes with task context; 500 lines keeps entrypoints navigable.
 
 If a skill has 3+ distinct phases with different context needs, prefer step-file architecture. If it only needs reference material, keep `SKILL.md` concise and link to `references/*.md`.
 
@@ -87,13 +67,6 @@ MEASURABLE CHECK:
 
 ```bash
 find .claude/skills -name SKILL.md -exec sh -c 'wc -l "$1" | awk "{if (\$1 > 500) print}"' _ {} \;
-```
-
-**Bad example: Monolithic 900-line SKILL.md** (every load consumes the full file):
-
-```text
-mk:my-skill/
-└── SKILL.md   # 900 lines: overview + all references + all examples + all gotchas inline
 ```
 
 **Good example: Decomposed via progressive disclosure** (load only what's needed):
@@ -119,8 +92,7 @@ mk:my-workflow/
 └── step-03-emit.md
 ```
 
-INSTEAD of: a 900-line monolithic SKILL.md
-USE: a ≤500-line SKILL.md routing to `references/*.md` or step files
+Use a ≤500-line SKILL.md routing to `references/*.md` or step files.
 
 ## Rule 4: Every Skill MUST Carry keywords / when_to_use / user-invocable
 
@@ -134,7 +106,7 @@ Every `SKILL.md` frontmatter MUST include three discovery-and-routing fields:
 
 `when_to_use` overlaps content already in `description`. There is no automated drift detection — false positives on legitimate paraphrasing make heuristics unreliable. Editors MUST keep both in sync: when updating one, update the other. Reviewer responsibility at PR time.
 
-WHY: Standardized metadata enables catalog tooling, downstream consumers, and a predictable user-invocable surface across the skill set.
+WHY: Standardized metadata keeps skill discovery predictable.
 
 ### Validation
 
