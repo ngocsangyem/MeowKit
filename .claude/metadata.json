@@ -1,8 +1,8 @@
 {
-  "version": "2.9.1",
+  "version": "2.9.2",
   "name": "meowkit",
   "description": "AI agent toolkit for Claude Code",
-  "buildDate": "2026-05-11T05:09:07.149Z",
+  "buildDate": "2026-05-11T07:22:31.685Z",
   "repository": {
     "type": "git",
     "url": "https://github.com/ngocsangyem/MeowKit"
