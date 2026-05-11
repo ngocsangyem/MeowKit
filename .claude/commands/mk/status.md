@@ -65,7 +65,7 @@ Example:
 
 ## Notes
 
-- PM has NO `background: true` in frontmatter. `/mk:status` invokes foreground (default Claude Code behavior when the prompt doesn't explicitly say "run in the background"). The command waits for the report path before printing. If the user wants truly async behavior, invoke natural-language `@project-manager ... run in the background`.
+- PM has NO `background: true` in frontmatter. `/mk:status` invokes foreground (default host-runtime behavior when the prompt doesn't explicitly say "run in the background"). The command waits for the report path before printing. If the user wants truly async behavior, invoke natural-language `@project-manager ... run in the background`.
 - Report naming `{YYMMDD}-status.md` — same-day rerun overwrites (idempotent); multi-day history accumulates in the plan's `status-reports/` subdir.
 - Reports travel with the plan — when a plan is archived, its reports archive with it.
 

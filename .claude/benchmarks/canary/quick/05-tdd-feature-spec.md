@@ -10,7 +10,7 @@ requires_tdd_mode: true
 # Task: TDD a Slug Generator (TDD-mode canary)
 
 > **Run with `--tdd`** — this canary specifically tests strict-TDD discipline.
-> Without `--tdd` / `MEOWKIT_TDD=1`, MeowKit's default mode skips the RED-phase gate and this canary's premise is invalid.
+> Without `--tdd` / `MEOWKIT_TDD=1`, the toolkit's default mode skips the RED-phase gate and this canary's premise is invalid.
 >
 > Manual reproduction (no automated runner exists yet):
 > ```bash

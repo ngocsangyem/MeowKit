@@ -14,6 +14,32 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.1 (2026-05-11) — Brand-prose neutralization for migrate targets
+
+### Highlights
+
+`mewkit migrate codex|kiro|cursor` now strips narrative "MeowKit" / "Claude Code" / non-citation "Anthropic" prose at converter time and substitutes the target name. The merged Codex/Kiro AGENTS.md header no longer leaks "MeowKit" branding. Toolkit identifiers (`mk:`, `MEOW_*`, `npx mewkit`, hook event names) stay verbatim. A markdown-only lint guard prevents source regressions, gated in CI on every PR.
+
+### CLI
+
+- `md-strip` converter accepts a new `targetName` option and substitutes "Claude Code" → target display name when set (e.g. "Codex", "Kiro IDE", "Cursor"); falls back to "the host runtime" otherwise.
+- `fm-strip` merged-agents header rewritten — `> Ported from the toolkit via mewkit migrate` replaces the hardcoded "MeowKit agents" string.
+- Citation-aware skip preserves `<!-- research-citation -->` marker, `research` / `thesis` keyword windows, and blockquote-style citations.
+- All `stripClaudeRefs` callers (`md-to-mdc`, `md-to-kiro-steering`, `fm-strip`) now pass the provider display name through.
+
+### Features
+
+- New lint guard `.claude/scripts/lint-brand-prose.sh` (orchestrator) + `.claude/scripts/check-anthropic-context.py` (single source-of-truth check) — runs in under 1 second on the full tree.
+- CI step `Lint brand prose in .claude markdown` blocks PRs that reintroduce banned narrative prose.
+- New `.claude/.brand-allowlist.txt` for toolkit-internal index/log headers, with a 30-entry ceiling.
+- New `docs/branding-style-guide.md` — single-page reference with before/after examples and the documented `On Claude Code, …` factual-prefix form.
+
+### Improvements
+
+- Source cleanup across `.claude/` markdown — narrative "MeowKit" / "Claude Code" prose neutralized in rules, skills, commands, hook references, and benchmark canaries. ~47 hits rewritten.
+- Code emitters `statusline.cjs`, `scripts/memory-migrator.cjs`, and `hooks/project-context-loader.sh` use neutral strings instead of "MeowKit" in user-visible output.
+- One non-citation "per Anthropic's documented behavior" phrase in `rules/skill-authoring-rules.md` rewritten to "per the runtime's plugin contract".
+
 ## 2.9.0 (2026-05-11) — Pre-ticket story sizing
 
 ### Highlights

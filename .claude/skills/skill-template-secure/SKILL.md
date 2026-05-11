@@ -53,4 +53,4 @@ See [references/security-anchor-template.md](references/security-anchor-template
 ## Gotchas
 
 - **Security anchor overridden by skill content**: Long skill content pushes security instructions out of context window → Keep security anchor at BOTH top and bottom of SKILL.md
-- **Injection defense patterns becoming stale**: New attack vectors emerge that existing patterns don't catch → Review injection rules quarterly; update when new Claude Code vulnerabilities are disclosed
+- **Injection defense patterns becoming stale**: New attack vectors emerge that existing patterns don't catch → Review injection rules quarterly; update when new host-runtime vulnerabilities are disclosed

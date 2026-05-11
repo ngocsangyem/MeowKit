@@ -28,4 +28,4 @@ When the user types `/mk:cso`, run this skill.
 
 ## Important: Use the Grep tool for all code searches
 
-The bash blocks throughout this skill show WHAT patterns to search for, not HOW to run them. Use Claude Code's Grep tool (which handles permissions and access correctly) rather than raw bash grep. The bash blocks are illustrative examples — do NOT copy-paste them into a terminal. Do NOT use `| head` to truncate results.
+The bash blocks throughout this skill show WHAT patterns to search for, not HOW to run them. Use the host runtime's Grep tool (which handles permissions and access correctly) rather than raw bash grep. The bash blocks are illustrative examples — do NOT copy-paste them into a terminal. Do NOT use `| head` to truncate results.

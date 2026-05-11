@@ -9,7 +9,7 @@ allowed-tools:
   - Read
 # TOKEN OPTIMIZATION: scanning tools disabled (Glob/Grep/Bash). Read is enabled
 # only for the Step 0 safety-baseline precheck — it stat-confirms the 5 always-on
-# rules exist on disk, replacing the unverified Claude Code platform auto-load
+# rules exist on disk, replacing the unverified host-runtime platform auto-load
 # assumption with a deterministic check. Per-message cost: ~5 small Read calls.
 source: aura-frog
 keywords: [agent-routing, model-tier, phase-0-orient, auto-detect, complexity-classification]

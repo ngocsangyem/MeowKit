@@ -2,7 +2,7 @@
 
 **When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
 
-Team mode spawns multiple Claude Code instances as **teammates** (persistent, peer-to-peer messaging, shared task list) instead of **subagents** (fire-and-forget, hub-spoke).
+On Claude Code, team mode spawns multiple instances as **teammates** (persistent, peer-to-peer messaging, shared task list) instead of **subagents** (fire-and-forget, hub-spoke).
 
 ## Complexity Gate (CRITICAL -- Token Savings)
 

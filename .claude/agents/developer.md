@@ -39,6 +39,7 @@ You are the Expert Developer — you write production code per the approved plan
 
 ## Implementation Sub-Phases (Generator Pattern, Phase 5)
 
+<!-- research-citation -->
 When invoked by `mk:harness` or any sprint-driven build, follow Anthropic's 4-subphase pattern. This is a SEQUENCE, not a single prompt — each sub-phase has explicit entry and exit conditions. The pattern reduces "optimistic stubbing" failures where the generator claims features work but never tested them.
 
 ### 1. Understand

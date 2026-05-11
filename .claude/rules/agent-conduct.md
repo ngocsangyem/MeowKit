@@ -116,6 +116,7 @@ WHY: Structured responses let users review changes in under 30 seconds (codex-pr
 ### B3. Context Ordering
 
 When constructing prompts/plans/handoffs:
+<!-- research-citation -->
 - **Long content first, query last** — background/code/refs at TOP, specific instruction at BOTTOM. Anthropic measured up to 30% quality lift on multi-document inputs (claude-prompting-best-practices).
 - **Context before constraint** — explain WHAT and WHY before stating a NEVER. Pair every NEVER with an INSTEAD.
 - **Self-contained documents** — every plan file / handoff readable cold by an agent with zero prior context. Required: WHAT (goal), WHERE (file paths), WHY (problem), STATUS (done/next).
@@ -144,7 +145,7 @@ When resuming work on an existing plan, ALWAYS start the response with:
 
 WHY: Resumption context prevents duplicate work and missed steps.
 
-### B6. Claude Code Context Hygiene
+### B6. Host-Runtime Context Hygiene
 
 Treat context as a limited resource:
 
@@ -155,7 +156,7 @@ Treat context as a limited resource:
 - Prefer deterministic verification (tests, build output, screenshots, runtime checks) over plausibility.
 - After two repeated corrections on the same issue, refine the prompt/plan instead of accumulating more failed context.
 
-WHY: Claude Code performance degrades as context fills. the toolkit's skill, rule, hook, and step-file architecture exists to load the right context just in time.
+WHY: Host-runtime performance degrades as context fills. The toolkit's skill, rule, hook, and step-file architecture exists to load the right context just in time.
 
 ---
 

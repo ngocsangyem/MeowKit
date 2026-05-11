@@ -35,7 +35,7 @@ source: local
 # /mk:context-audit — Context Window Structural Audit
 
 Read-only audit of `.claude/` structural overhead. Surfaces what is loaded into
-every Claude Code session and how much of the context window it consumes,
+every host-runtime session and how much of the context window it consumes,
 then recommends the highest-leverage trims.
 
 ## When to Use

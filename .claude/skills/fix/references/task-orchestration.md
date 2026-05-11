@@ -1,6 +1,6 @@
 # Task Orchestration
 
-Tracking fix workflows with Claude Code task tools.
+Tracking fix workflows with host-runtime task tools.
 
 ## When to Use Tasks
 

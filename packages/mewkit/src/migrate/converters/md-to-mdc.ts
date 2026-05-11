@@ -1,9 +1,10 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/converters/md-to-mdc.ts
+import { providers } from "../provider-registry.js";
 import type { ConversionResult, PortableItem, ProviderType } from "../types.js";
 import { stripClaudeRefs } from "./md-strip.js";
 
 export function convertMdToMdc(item: PortableItem, provider: ProviderType): ConversionResult {
-	const stripped = stripClaudeRefs(item.body, { provider });
+	const stripped = stripClaudeRefs(item.body, { provider, targetName: providers[provider].displayName });
 	const description = item.description || formatDescription(item.name);
 	const escapedDesc = description.replace(/"/g, '\\"');
 

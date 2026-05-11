@@ -11,6 +11,55 @@ const MAX_CONTENT_SIZE = 512_000;
 export interface MdStripOptions {
 	provider: ProviderType;
 	charLimit?: number;
+	targetName?: string;
+}
+
+// Lines matching these markers are excluded from narrative-brand substitution.
+// Preserves research citations ("Anthropic harness research", "dead-weight thesis").
+// NOTE: "field report" is intentionally NOT a citation keyword — the rewrite regex
+// `per Anthropic('s)? field report` rewrites that phrase as a non-citation appeal.
+const CITATION_KEYWORDS = /\bresearch\b|\bthesis\b/i;
+const CITATION_MARKER = /<!--\s*research-citation\s*-->/;
+const BLOCKQUOTE_LINE = /^\s*>/;
+const CITATION_WINDOW = 2;
+
+function buildCitationLineSet(content: string): Set<number> {
+	const lines = content.split("\n");
+	const citationLines = new Set<number>();
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		const isCitation =
+			CITATION_MARKER.test(line) ||
+			CITATION_KEYWORDS.test(line) ||
+			(BLOCKQUOTE_LINE.test(line) && /Anthropic/.test(line));
+		if (isCitation) {
+			for (let j = Math.max(0, i - CITATION_WINDOW); j <= Math.min(lines.length - 1, i + CITATION_WINDOW); j++) {
+				citationLines.add(j);
+			}
+		}
+	}
+	return citationLines;
+}
+
+function buildLineOffsetMap(content: string): number[] {
+	// Returns a sorted array of byte offsets where each line starts (line 0 starts at 0).
+	const starts: number[] = [0];
+	for (let i = 0; i < content.length; i++) {
+		if (content[i] === "\n") starts.push(i + 1);
+	}
+	return starts;
+}
+
+function lineIndexAtOffset(lineStarts: number[], offset: number): number {
+	// Binary search for the line that contains `offset`.
+	let lo = 0;
+	let hi = lineStarts.length - 1;
+	while (lo < hi) {
+		const mid = (lo + hi + 1) >> 1;
+		if (lineStarts[mid] <= offset) lo = mid;
+		else hi = mid - 1;
+	}
+	return lo;
 }
 
 type ProviderPathKind = "agents" | "commands" | "skills" | "rules" | "config" | "hooks";
@@ -191,6 +240,28 @@ export function stripClaudeRefs(
 		[/\b(?:npx\s+)?meowkit\s+(\w+)\b/gi, "kit $1"],
 	];
 
+	// Narrative brand-prose substitutions run BEFORE CLI replacements so `MeowKit`
+	// (PascalCase brand) does not collide with the case-insensitive `meowkit <verb>`
+	// CLI regex. Skipped inside code blocks AND inside citation-context line windows.
+	const target = options?.targetName ?? "the host runtime";
+	const narrativeBrandReplacements: Array<[RegExp, string]> = [
+		[/\bMeowKit\b/g, "the toolkit"],
+		[/\bClaude Code\b/g, target],
+		[/\bper Anthropic'?s?\s+(documented behavior|field report|spec)\b/gi, "per the runtime's plugin contract"],
+	];
+
+	const citationLines = buildCitationLineSet(result);
+	const lineStarts = buildLineOffsetMap(result);
+	for (const [regex, replacement] of narrativeBrandReplacements) {
+		result = result.replace(regex, (matched, ...args) => {
+			const offset = args[args.length - 2] as number;
+			if (isInCodeBlock(offset)) return matched;
+			const lineIdx = lineIndexAtOffset(lineStarts, offset);
+			if (citationLines.has(lineIdx)) return matched;
+			return replacement;
+		});
+	}
+
 	const allReplacements = [...toolReplacements, ...mewkitCliReplacements];
 
 	for (const [regex, replacement] of allReplacements) {
@@ -347,8 +418,9 @@ export function convertMdStrip(item: PortableItem, provider: ProviderType): Conv
 	const providerConfig = providers[provider];
 	const pathConfig = providerConfig.config ?? providerConfig.rules;
 	const charLimit = pathConfig?.charLimit;
+	const targetName = providerConfig.displayName;
 
-	const result = stripClaudeRefs(item.body, { provider, charLimit });
+	const result = stripClaudeRefs(item.body, { provider, charLimit, targetName });
 
 	return {
 		content: result.content,

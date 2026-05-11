@@ -12,7 +12,7 @@ agent: confluence-page
 
 # mk:confluence-page
 
-Forks to the `confluence-page` agent (system prompt at `.claude/agents/confluence-page.md`). The skill body is the task brief — Claude Code injects this content into the forked agent.
+Forks to the `confluence-page` agent (system prompt at `.claude/agents/confluence-page.md`). The skill body is the task brief — the host runtime injects this content into the forked agent.
 
 ## Triggers
 

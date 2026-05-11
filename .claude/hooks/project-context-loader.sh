@@ -1,5 +1,5 @@
 #!/bin/bash
-# MeowKit Project Context Loader Hook
+# the toolkit Project Context Loader Hook
 # SessionStart: Auto-load docs/project-context.md into agent context.
 # Supports Phase 5 (Project Context System).
 #
@@ -18,9 +18,9 @@ if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" ]; then
 fi
 
 # CWD mismatch guard (Fix 1b — dev-repo only but harmless in production):
-# if MeowKit's dispatch.cjs marker is absent, we're not at a MeowKit root.
+# if the toolkit's dispatch.cjs marker is absent, we're not at a toolkit root.
 if [ ! -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/dispatch.cjs" ]; then
-  echo "## NOTE: MeowKit hooks not detected at project root"
+  echo "## NOTE: the toolkit's hooks not detected at project root"
   echo "MEOWKIT_* config may not be loaded. Run from project root where .claude/ lives."
   echo ""
 fi
@@ -31,11 +31,11 @@ MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
 CONTEXT_FILE="docs/project-context.md"
 VENV_PYTHON=".claude/skills/.venv/bin/python3"
 
-# Check Python venv existence — required for MeowKit scripts
+# Check Python venv existence — required for toolkit scripts
 if [ ! -f "$VENV_PYTHON" ]; then
   echo "## WARNING: Python venv not found"
   echo ""
-  echo "MeowKit scripts require \`.claude/skills/.venv/bin/python3\` but it doesn't exist."
+  echo "the toolkit's scripts require \`.claude/skills/.venv/bin/python3\` but it doesn't exist."
   echo "Run \`npx mewkit setup\` to create the venv and install dependencies."
   echo "Until then, python-based skills (validate, security-scan, multimodal, llms) will fail."
   echo ""
@@ -74,7 +74,7 @@ if [ -n "${HOOK_SESSION_ID:-}" ]; then
     # Note: precompletion-attempts.json is NOT reset here. pre-completion-check.sh
     # owns its own lifecycle — it clears the counter when verification passes
     # (line ~110) or when the 3-attempt soft-nudge cap is hit (line ~152).
-    # Resetting here breaks the cap because Claude Code assigns a new session ID
+    # Resetting here breaks the cap because the host runtime assigns a new session ID
     # for every blocked-Stop cycle, which would otherwise wipe the counter mid-loop.
     echo '{}' > session-state/build-verify-cache.json 2>/dev/null || true
     rm -f session-state/conversation-summary.lock 2>/dev/null || true
@@ -119,14 +119,14 @@ fi
 
 
 # ═══════════════════════════════════════════════════════════════════
-# MeowKit Config Status (stdout bridge — RC-0 / Fix 0c)
+# the toolkit's Config Status (stdout bridge — RC-0 / Fix 0c)
 # ═══════════════════════════════════════════════════════════════════
 # Agent cannot inspect env vars directly. Hooks load them but the LLM has no
 # process.env access. Emit active control vars to stdout so agent context sees
 # them. Gated on new sessions to avoid polluting resume/clear/compact events.
 if [ -n "${HOOK_SESSION_ID:-}" ] && [ "$HOOK_SESSION_ID" != "${LAST_SESSION:-}" ]; then
   echo ""
-  echo "## MeowKit Config"
+  echo "## the toolkit Config"
   [ "${MEOWKIT_TDD:-0}" = "1" ] && echo "- TDD: **enabled** (strict red-green-refactor)" || echo "- TDD: off (default)"
   [ "${MEOWKIT_BUILD_VERIFY:-on}" = "off" ] && echo "- Build verify: **disabled**" || echo "- Build verify: on (default)"
   [ "${MEOWKIT_LOOP_DETECT:-on}" = "off" ] && echo "- Loop detection: **disabled**" || echo "- Loop detection: on (default)"

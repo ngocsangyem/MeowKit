@@ -60,7 +60,7 @@ Every harness component encodes an assumption about what the model CANNOT do. Wh
 
 **WHY:** Per the dead-weight thesis, scaffolding that helped Opus 4.5 may hurt Opus 4.7. Components that don't pay their measured-delta keep are dead weight.
 
-**Detection:** `post-session.sh` attempts to flag this via `MEOWKIT_MODEL_HINT` env var, but Claude Code does NOT export `CLAUDE_MODEL` to hooks (verified 260408). Auto-detection only works if the user sets `export MEOWKIT_MODEL_HINT=opus-4-7` at session start. Otherwise the audit must be triggered manually on a calendar reminder OR by reading session metadata from `~/.claude/projects/`.
+**Detection:** `post-session.sh` attempts to flag this via `MEOWKIT_MODEL_HINT` env var, but on Claude Code, `CLAUDE_MODEL` is NOT exported to hooks (verified 260408). Auto-detection only works if the user sets `export MEOWKIT_MODEL_HINT=opus-4-7` at session start. Otherwise the audit must be triggered manually on a calendar reminder OR by reading session metadata from `~/.claude/projects/`.
 
 **INSTEAD of:** assuming the harness still works after a model upgrade
 **USE:** the audit playbook with measured baselines (calendar reminder if no model hint set)
@@ -87,7 +87,7 @@ The evaluator MUST re-anchor its skeptic persona (`mk:evaluate/prompts/skeptic-p
 
 Long sessions MUST use the conversation summary cache (`.claude/hooks/conversation-summary-cache.sh`) to avoid re-reading the full transcript on every turn. The hook fires on `Stop` (summarize) and `UserPromptSubmit` (inject) and is throttled by transcript size, turn gap, and growth delta.
 
-**WHY:** Re-reading the full transcript on every turn burns ~48KB of context per injection in mid-to-long sessions. A Haiku-summarized cache costs ~$0.01–$0.02 per long session and preserves the same continuity. Claude Code's built-in auto-compaction is opaque, fires late, and produces no inspectable artifact — the explicit cache fires proactively and writes a human-editable markdown file.
+**WHY:** Re-reading the full transcript on every turn burns ~48KB of context per injection in mid-to-long sessions. A Haiku-summarized cache costs ~$0.01–$0.02 per long session and preserves the same continuity. On Claude Code, the built-in auto-compaction is opaque, fires late, and produces no inspectable artifact — the explicit cache fires proactively and writes a human-editable markdown file.
 
 **Throttle defaults (Q7):** size > `${MEOWKIT_SUMMARY_THRESHOLD:-20480}` bytes AND (event delta ≥ `${MEOWKIT_SUMMARY_TURN_GAP:-30}` JSONL events, ≈ 3–6 turns, OR growth ≥ `${MEOWKIT_SUMMARY_GROWTH_DELTA:-5120}` bytes).
 

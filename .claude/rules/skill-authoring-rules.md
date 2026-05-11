@@ -41,7 +41,7 @@ USE: a SKILL.md with `## Gotchas` that grows one bullet per observed edge case
 
 When a skill needs to persist data across sessions (append-only logs, JSON state, SQLite databases, history files), it MUST write to `${CLAUDE_PLUGIN_DATA}` — NOT to the skill's own directory.
 
-WHY: Skill-directory state is wiped on plugin upgrade per Anthropic's documented behavior. Silent data loss is the failure mode. `${CLAUDE_PLUGIN_DATA}` is the stable, upgrade-safe folder.
+WHY: Skill-directory state is wiped on plugin upgrade per the runtime's plugin contract. Silent data loss is the failure mode. `${CLAUDE_PLUGIN_DATA}` is the stable, upgrade-safe folder.
 
 EXCEPTION: framework-internal infrastructure (`.claude/memory/`, `tasks/`, `session-state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
 
@@ -76,6 +76,7 @@ Every `SKILL.md` body (excluding YAML frontmatter) MUST stay under 500 lines. Sk
 - Reference files (one level deep) per progressive-disclosure pattern — link from SKILL.md to `references/*.md`
 - Step-file architecture per `step-file-rules.md` — `workflow.md` + `step-NN-*.md` files
 
+<!-- research-citation -->
 WHY: Once SKILL.md loads, every token competes with conversation history and other context. The 500-line cap is Anthropic's empirically-validated threshold for context efficiency. Beyond this, partial reads (`head -100`) start to miss content.
 
 If a skill has 3+ distinct phases with different context needs, prefer step-file architecture. If it only needs reference material, keep `SKILL.md` concise and link to `references/*.md`.

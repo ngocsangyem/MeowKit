@@ -1,5 +1,6 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/converters/fm-strip.ts
 // TODO(phase-9): truncation uses UTF-16 code units; emojis at boundary may produce malformed surrogates.
+import { providers } from "../provider-registry.js";
 import type { ConversionResult, PortableItem, ProviderType } from "../types.js";
 import { stripClaudeRefs } from "./md-strip.js";
 
@@ -12,7 +13,7 @@ export function convertFmStrip(item: PortableItem, provider: ProviderType): Conv
 
 	let body = item.body;
 	if (PROVIDERS_WITH_BODY_REWRITING.includes(provider)) {
-		const stripped = stripClaudeRefs(body, { provider });
+		const stripped = stripClaudeRefs(body, { provider, targetName: providers[provider].displayName });
 		body = stripped.content;
 		warnings.push(...stripped.warnings);
 	}
@@ -39,6 +40,6 @@ export function convertFmStrip(item: PortableItem, provider: ProviderType): Conv
 }
 
 export function buildMergedAgentsMd(sections: string[], providerName: string): string {
-	const header = `# Agents\n\n> Ported from MeowKit agents via mewkit migrate\n> Target: ${providerName}\n\n`;
+	const header = `# Agents\n\n> Ported from the toolkit via mewkit migrate\n> Target: ${providerName}\n\n`;
 	return header + sections.join("\n---\n\n");
 }

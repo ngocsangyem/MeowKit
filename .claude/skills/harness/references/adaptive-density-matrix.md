@@ -46,11 +46,11 @@ Density resolves via this priority order:
 The auto-detection step tries these env vars in order and uses the first set:
 
 1. `MEOWKIT_MODEL_HINT` (explicit override)
-2. `CLAUDE_MODEL` (Claude Code legacy)
+2. `CLAUDE_MODEL` (host-runtime legacy)
 3. `ANTHROPIC_MODEL` (Anthropic SDK)
 4. (none) → defaults to `STANDARD` tier → `FULL` density (safe fallback)
 
-**Known limitation:** Claude Code does not always export a model id env var to subagent contexts. Users running `/mk:harness` on Opus 4.6 who want LEAN mode should either:
+**Known limitation:** On Claude Code, the model id env var is not always exported to subagent contexts. Users running `/mk:harness` on Opus 4.6 who want LEAN mode should either:
 - Set `export MEOWKIT_MODEL_HINT=opus-4-6` once in their shell, OR
 - Pass `--tier lean` explicitly on the harness invocation, OR
 - Set `export MEOWKIT_HARNESS_MODE=LEAN` for the session

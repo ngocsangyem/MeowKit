@@ -38,7 +38,7 @@ it without needing to `cat` the file by hand.
 
 #### `--status`
 
-1. Read transcript size from the active transcript path (if available via Claude Code).
+1. Read transcript size from the active transcript path (if available via the host runtime).
 2. Read frontmatter from the cache file.
 3. Compute throttle conditions:
    - `THRESHOLD` = `${MEOWKIT_SUMMARY_THRESHOLD:-20480}` bytes
@@ -49,7 +49,7 @@ it without needing to `cat` the file by hand.
 
 ## Notes
 
-- The cache is per-session: when a new Claude Code session starts,
+- The cache is per-session: when a new host-runtime session starts,
   `project-context-loader.sh` clears it automatically.
 - To disable summarization entirely, set `MEOWKIT_SUMMARY_CACHE=off` in your env.
 - See `.claude/rules/harness-rules.md` Rule 11 for the rationale.

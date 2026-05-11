@@ -68,7 +68,7 @@ function main() {
 
   console.log(`Found ${entries.length} entries to migrate`);
 
-  let output = '# MeowKit — Session Lessons\n\n';
+  let output = '# the toolkit — Session Lessons\n\n';
   output += '> Structured format with YAML frontmatter per entry.\n';
   output += '> CRITICAL/SECURITY entries are always loaded. Others filtered by domain tags.\n\n';
 

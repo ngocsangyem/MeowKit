@@ -33,7 +33,7 @@ The CLI binary is `confluence-as`. Both upstream READMEs (`confluence-as` and `C
 
 The wrapper exits 3 if `MEOW_CONFLUENCE_SITE_URL` does not end in `.atlassian.net`. Server / Data Center deployments are out of scope.
 
-**Escape hatch for Server/DC users:** install the MCP Atlassian server (`@sooperset/mcp-atlassian`) and call its Confluence tools directly via your Claude Code MCP config. The `mk:confluence-*` skills do NOT auto-fallback.
+**Escape hatch for Server/DC users:** install the MCP Atlassian server (`@sooperset/mcp-atlassian`) and call its Confluence tools directly via your host-runtime MCP config. The `mk:confluence-*` skills do NOT auto-fallback.
 
 ## Wrapper exit codes
 

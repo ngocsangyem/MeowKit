@@ -39,8 +39,8 @@ Auto-generated output path: `.claude/packs/{YYYYMMDD-HHMM}-{slug}.{ext}` where s
 
 ## Not Exposed by This Skill (use raw `npx repomix` if needed)
 
-- `--copy` (clipboard) — Claude Code doesn't expose clipboard to agents reliably
-- `--token-count-tree` — non-Claude tokenizer produces approximate counts; not a reliable budget signal inside Claude Code sessions
+- `--copy` (clipboard) — On Claude Code, the clipboard isn't reliably exposed to agents
+- `--token-count-tree` — third-party tokenizer produces approximate counts; not a reliable budget signal inside host-runtime sessions
 - `--split-output` — multi-file output complicates handoff
 - Custom config files (`-c`, `--init`) — out of scope; pass flags directly
 

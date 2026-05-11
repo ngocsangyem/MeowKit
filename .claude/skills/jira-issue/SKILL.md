@@ -12,7 +12,7 @@ agent: jira-issue
 
 # mk:jira-issue
 
-Forks to the `jira-issue` agent (system prompt at `.claude/agents/jira-issue.md`). The skill body is the task brief — Claude Code injects this content into the forked agent.
+Forks to the `jira-issue` agent (system prompt at `.claude/agents/jira-issue.md`). The skill body is the task brief — the host runtime injects this content into the forked agent.
 
 ## Triggers
 

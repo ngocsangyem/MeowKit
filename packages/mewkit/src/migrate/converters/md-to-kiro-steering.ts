@@ -1,4 +1,5 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/converters/md-to-kiro-steering.ts
+import { providers } from "../provider-registry.js";
 import type { ConversionResult, PortableItem, ProviderType } from "../types.js";
 import { stripClaudeRefs } from "./md-strip.js";
 
@@ -91,7 +92,7 @@ export function convertMdToKiroSteering(item: PortableItem, provider: ProviderTy
 
 	if (item.type === "agent") warnings.push(...checkUnsupportedFields(item));
 
-	const stripped = stripClaudeRefs(item.body, { provider });
+	const stripped = stripClaudeRefs(item.body, { provider, targetName: providers[provider].displayName });
 	warnings.push(...stripped.warnings);
 
 	const { mode, fileMatch } = determineInclusionMode(item);

@@ -251,7 +251,7 @@ function renderLine5(ctx) {
 async function main() {
   try {
     const raw = await readStdin();
-    if (!raw.trim()) { console.log('\uD83D\uDC31 MeowKit'); return; }
+    if (!raw.trim()) { console.log('\uD83D\uDC31 the toolkit'); return; }
     const ctx = parseInput(raw);
     // Pre-compute context values once (used by line 2 + line 5)
     ctx.ctxUsedTokens = ctx.ctxInput + ctx.ctxCacheCreate + ctx.ctxCacheRead;
@@ -268,4 +268,4 @@ async function main() {
   }
 }
 
-main().catch(() => { console.log('\uD83D\uDC31 MeowKit'); process.exit(0); });
+main().catch(() => { console.log('\uD83D\uDC31 the toolkit'); process.exit(0); });

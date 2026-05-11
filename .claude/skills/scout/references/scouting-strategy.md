@@ -115,7 +115,7 @@ After all agents return (or after 3-minute timeout per agent):
 
 ## Reading File Content (When Needed)
 
-If a downstream agent needs to read files found by scout, use Claude Code's native Read tool with offset/limit — not bash workarounds:
+If a downstream agent needs to read files found by scout, use the host runtime's native Read tool with offset/limit — not bash workarounds:
 
 ```
 Small file (<500 lines):   Read(file_path)

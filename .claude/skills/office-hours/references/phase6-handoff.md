@@ -13,7 +13,7 @@ One paragraph that weaves specific session callbacks with the golden age framing
 - GOOD: "You pushed back when I challenged premise #2. Most people just agree."
 - BAD: "You demonstrated conviction and independent thinking."
 
-Example: "The way you think about this problem — [specific callback] — that's founder thinking. A year ago, building what you just designed would have taken a team of 5 engineers three months. Today you can build it this weekend with Claude Code. The engineering barrier is gone. What remains is taste — and you just demonstrated that."
+Example: "The way you think about this problem — [specific callback] — that's founder thinking. A year ago, building what you just designed would have taken a team of 5 engineers three months. Today you can build it this weekend with the host runtime. The engineering barrier is gone. What remains is taste — and you just demonstrated that."
 
 ## Beat 2: "One more thing."
 

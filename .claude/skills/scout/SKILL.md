@@ -61,7 +61,7 @@ Load these **only when executing** the corresponding step — not upfront.
 - **Read-only** — scout NEVER modifies files
 - **Maximum 6 parallel agents** — beyond this, aggregation cost exceeds benefit
 - **3-minute timeout** per agent — skip non-responders, don't retry
-- **No external tool dependencies** — uses only Claude Code built-in Explore
+- **No external tool dependencies** — uses only the host runtime's built-in Explore
 - **Security** — never access .env, credentials, or SSH keys during scouting
 - **Tier 3 always excluded** — no exceptions regardless of task
 

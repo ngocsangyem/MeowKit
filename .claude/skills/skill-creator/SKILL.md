@@ -117,6 +117,7 @@ If FAIL: fix failing items before registering.
 {checklist with ✓/✗ per item}
 ```
 
+<!-- research-citation -->
 ## Anthropic Skill-Building Lessons
 
 1. **Skills are folders** — use scripts/, references/, assets/, lib/ creatively. See `references/filesystem-patterns.md`.
@@ -137,6 +138,7 @@ If FAIL: fix failing items before registering.
 - [ ] SKILL.md is under 500 lines (Rule 3 — or decomposed via references/ / step files)
 - [ ] Steps are outcome-focused (no railroading)
 - [ ] Uses filesystem beyond SKILL.md (or documents why not needed)
+<!-- research-citation -->
 - [ ] Classified into one Anthropic skill type
 - [ ] Persistent state (if any) writes to `${CLAUDE_PLUGIN_DATA}`, NOT skill directory (Rule 2)
 
@@ -158,5 +160,6 @@ If FAIL: fix failing items before registering.
 ## Gotchas
 
 - **Template must include `## Gotchas` header** — even as a placeholder. `skill-authoring-rules.md` Rule 1 is hard-enforced by `validate-skill.py`. Day-1 skills may use `(none yet — grow from observed failures)` but the header itself is mandatory.
+<!-- research-citation -->
 - **Line cap is 500, not 150** — the canonical threshold comes from `skill-authoring-rules.md` Rule 3 (Anthropic progressive-disclosure guidance). Step-file skills (with `workflow.md`) auto-pass regardless of line count.
 - **Persistent state goes to `${CLAUDE_PLUGIN_DATA}`, not skill directory** — Rule 2 prevents data loss on plugin upgrade. framework-internal paths (`.claude/memory/`, `session-state/`) are exempt.

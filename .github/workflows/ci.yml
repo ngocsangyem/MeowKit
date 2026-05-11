@@ -45,6 +45,9 @@ jobs:
       - name: Validate rule availability
         run: bash scripts/validate-rule-availability.sh
 
+      - name: Lint brand prose in .claude markdown
+        run: bash .claude/scripts/lint-brand-prose.sh
+
       - name: "Reject residual meow: namespace"
         run: |
           if grep -rEn '^name:[[:space:]]*meow:' .claude/skills/*/SKILL.md; then

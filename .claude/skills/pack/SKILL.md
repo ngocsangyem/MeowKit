@@ -1,12 +1,12 @@
 ---
 name: mk:pack
-description: "Pack an EXTERNAL repository into a single AI-friendly file (markdown/xml/json). Use for third-party library analysis, security audits, or handoff to external LLMs. Do NOT use to pack the current project for inbound Claude context — Claude Code already reads files lazily. Triggers: 'pack this repo', 'snapshot of X', 'export codebase', 'repomix'."
+description: "Pack an EXTERNAL repository into a single AI-friendly file (markdown/xml/json). Use for third-party library analysis, security audits, or handoff to external LLMs. Do NOT use to pack the current project for inbound context — the host runtime already reads files lazily. Triggers: 'pack this repo', 'snapshot of X', 'export codebase', 'repomix'."
 argument-hint: "<source> [--style markdown|xml|json|plain] [--include pattern] [--ignore pattern] [--remove-comments] [--compress] [--self] [--no-security-check]"
 trust_level: kit-authored
 injection_risk: medium
 source: local
 keywords: [pack, repomix, external-repo, third-party-snapshot, ai-friendly-export, handoff]
-when_to_use: "Use when packing an EXTERNAL repository into a single AI-friendly file. NOT for packing the current project (Claude Code reads files lazily)."
+when_to_use: "Use when packing an EXTERNAL repository into a single AI-friendly file. NOT for packing the current project (the host runtime reads files lazily)."
 user-invocable: true
 ---
 
@@ -57,7 +57,7 @@ Output lands at `.claude/packs/{YYYYMMDD-HHMM}-{slug}.{ext}`.
 3. **Compute output path** — `.claude/packs/$(date +%Y%m%d-%H%M)-<slug>.<ext>` where `<ext>` maps from `--style` (markdown → md, xml → xml, json → json, plain → txt).
 4. **Invoke repomix** — `npx --yes repomix@^1.11 [computed flags] -o "<output>"`. Use `--remote <source>` for remote inputs; pass the local path directly otherwise.
 5. **Surface secret-scan results** — parse repomix stdout/stderr for security warnings and show them to the user. If `--no-security-check` was passed, emit: "SECURITY SCAN DISABLED — review output manually before sharing."
-6. **Handoff** — print the output path and this reminder: "Do NOT Read this file back into the current Claude Code session — it defeats the purpose. Paste into an external LLM, share with a reviewer, or archive."
+6. **Handoff** — print the output path and this reminder: "Do NOT Read this file back into the current host-runtime session — it defeats the purpose. Paste into an external LLM, share with a reviewer, or archive."
 
 ## Constraints
 

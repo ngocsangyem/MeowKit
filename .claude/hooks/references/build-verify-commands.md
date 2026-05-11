@@ -53,7 +53,7 @@ The hook hashes each file's content and stores the hash in `session-state/build-
 
 ## Output Format
 
-When a command fails, the hook emits a structured block to stdout (Claude Code picks this up and injects into the next turn):
+When a command fails, the hook emits a structured block to stdout (the host runtime picks this up and injects into the next turn):
 
 ```
 @@BUILD_VERIFY_ERROR@@

@@ -8,13 +8,13 @@ user-invocable: true
 ---
 
 <!--
-SKILL METADATA (non-native frontmatter — ignored by Claude Code, used by skill tooling):
+SKILL METADATA (non-native frontmatter — ignored by the host runtime, used by skill tooling):
   version: 1.0.0
   trust_level: kit-authored
   injection_risk: medium
   optional_system_deps: [playwright-chromium]
 
-These fields live in a comment because Claude Code's supported frontmatter schema
+These fields live in a comment because the host runtime's supported frontmatter schema
 (verified 260409) only includes: name, description, argument-hint, disable-model-invocation,
 user-invocable, allowed-tools, model, effort, context, agent, hooks, paths, shell.
 Everything else is silently ignored. The CLI parses optional_system_deps from
@@ -43,7 +43,7 @@ Fetch arbitrary URLs and return clean markdown with injection defense.
 - Library or framework documentation → use `mk:docs-finder` (Context7, Context Hub, WebSearch)
 - Interactive browser testing → use `mk:agent-browser`
 - Playwright test automation → use `mk:playwright-cli`
-- Fetching sensitive/internal URLs → use Claude Code's built-in `WebFetch` tool (Anthropic-proxied)
+- Fetching sensitive/internal URLs → use the host runtime's built-in `WebFetch` tool (proxied by the runtime vendor)
 
 ## Invocation patterns
 

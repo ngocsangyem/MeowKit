@@ -22,7 +22,7 @@ mkdir -p .claude/session-state && echo on > .claude/session-state/tdd-mode
 
 This sentinel persists for the session. Hooks (`pre-implement.sh`), the helper (`tdd-detect.sh`), and downstream agents (developer, tester) read it to detect TDD mode. Without this sentinel, the workflow runs in default mode where Phase 2 is optional.
 
-**Why a sentinel file?** Env vars set in one Bash tool call don't propagate to subsequent tool calls in Claude Code (each Bash invocation spawns a fresh subshell). Filesystem state does. The sentinel is the load-bearing mechanism — do not skip writing it.
+**Why a sentinel file?** On Claude Code, env vars set in one Bash tool call don't propagate to subsequent tool calls (each Bash invocation spawns a fresh subshell). Filesystem state does. The sentinel is the load-bearing mechanism — do not skip writing it.
 
 `MEOWKIT_TDD=1` env var (set in CI / shell rc) is the highest-precedence opt-in and overrides the sentinel.
 

@@ -51,6 +51,7 @@ This prevents trace inflation from redundant records.
 
 Every record passes through `lib/secret-scrub.sh` before write. Patterns redacted:
 - OpenAI keys (`sk-...`)
+<!-- research-citation -->
 - Anthropic keys (`sk-ant-...`)
 - AWS access keys (`AKIA...`)
 - GitHub tokens (`ghp_...`, `gho_...`)

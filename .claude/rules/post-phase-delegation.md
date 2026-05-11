@@ -38,7 +38,7 @@ Run in the background — do not block the caller."
 ```
 
 For `background` mode (default), explicitly include `Run in the background`
-in the prompt so Claude Code spawns PM concurrently — the caller continues
+in the prompt so the host runtime spawns PM concurrently — the caller continues
 to the next phase without blocking.
 
 For `foreground` mode (harness step 5 only), OMIT the background directive
@@ -101,8 +101,8 @@ USE: one env var gating all silent fires
 
 ## Rule 7: No Hook Dispatch
 
-PM MUST NOT be invoked from hook handlers. Claude Code hooks cannot call
-the Agent tool (verified via Anthropic docs).
+PM MUST NOT be invoked from hook handlers. On Claude Code, hooks cannot call
+the Agent tool (verified via runtime documentation).
 
 INSTEAD of: SubagentStop hook firing PM → infinite-loop risk
 USE: explicit delegation in the orchestration skill body per Rule 2

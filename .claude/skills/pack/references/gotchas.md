@@ -49,7 +49,7 @@ Known failure modes and their fixes.
 ### "BLOCKED: refusing to pack the current repo"
 
 **Cause:** You invoked `/mk:pack .` or a local path that resolves to the same git root as your working directory.
-**Reason:** Packing your own repo and reading it back burns context Claude Code already streams lazily. See `SKILL.md` "When NOT to Use."
+**Reason:** Packing your own repo and reading it back burns context the host runtime already streams lazily. See `SKILL.md` "When NOT to Use."
 **Fixes:**
 - For inbound context: use `/mk:scout` instead.
 - For deliberate external export: pass `--self` to override.

@@ -22,7 +22,7 @@ Before reviewing code quality, check: **did they build what was requested — no
 
 ## Plan File Discovery
 
-1. **Conversation context (primary):** Check if there is an active plan file in this conversation — Claude Code system messages include plan file paths when in plan mode. Look for references like `.claude/plans/*.md` or `tasks/plans/*.md` in system messages. If found, use it directly — this is the most reliable signal.
+1. **Conversation context (primary):** Check if there is an active plan file in this conversation — On Claude Code, system messages include plan file paths when in plan mode. Look for references like `.claude/plans/*.md` or `tasks/plans/*.md` in system messages. If found, use it directly — this is the most reliable signal.
 
 2. **Content-based search (fallback):** If no plan file is referenced in conversation context, search by content:
 
