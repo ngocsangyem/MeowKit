@@ -14,6 +14,14 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.4 (2026-05-11) — Agent rules and TOON agent docs
+
+### Improvements
+
+- Added a docs reference for MeowKit agent rules covering status handoffs, context loading, agent naming, search-before-building, and file ownership.
+- Converted uniform `.claude/agents` matrices to TOON blocks so agent registries, operations tables, safety tiers, and review checklists stay compact without changing their stated values.
+- Updated release documentation to include the 2.9.4 release entry.
+
 ## 2.9.3 (2026-05-11) — Optimize rules
 
 Apply Token-Oriented Object Notation (TOON) to rules. Dropped ~26,288 → ~23,234 tokens (~3,054 saved, 11.6%)
