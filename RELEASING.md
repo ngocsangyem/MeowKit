@@ -68,16 +68,16 @@ Check and update these pages if the release affects them:
 
 When a release adds a new agent or skill, update the routing surfaces so the orchestrator and `mk:help` can recommend it.
 
-| File | Update when |
-| --- | --- |
-| `.claude/agents/SKILLS_INDEX.md` | New skill — add a row in the matching phase or "Cross-Cutting (Any Phase)" table |
-| `.claude/agents/AGENTS_INDEX.md` | New agent — add a row to the active-agents table (Type, Role, Source, phases, auto-activate, CE version) |
-| `.claude/rules/agent-routing.md` | New core/support agent — add to the 17-row table; new domain agent → add to the hub-skill family row |
-| `.claude/skills/agent-detector/references/lifecycle-routing.md` | New skill that maps to a user signal — add a Discovery Tree row |
-| `.claude/skills/scale-routing/data/domain-complexity.csv` | New domain match (fintech, healthcare, etc.) — add a row with signals + level + workflow |
-| `website/.vitepress/config.ts` | New skill or agent — add to the matching sidebar group under `reference/skills/*` or `reference/agents/*` |
-| `website/reference/skills/<name>.md` | New skill — create the reference page (use an existing skill page as a template; keep it under 800 lines per `docs.maxLoc`) |
-| `website/reference/agents/<name>.md` | New agent — create the reference page |
+| File                                                            | Update when                                                                                                                 |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `.claude/agents/SKILLS_INDEX.md`                                | New skill — add a row in the matching phase or "Cross-Cutting (Any Phase)" table                                            |
+| `.claude/agents/AGENTS_INDEX.md`                                | New agent — add a row to the active-agents table (Type, Role, Source, phases, auto-activate, CE version)                    |
+| `.claude/rules/agent-routing.md`                                | New core/support agent — add to the 17-row table; new domain agent → add to the hub-skill family row                        |
+| `.claude/skills/agent-detector/references/lifecycle-routing.md` | New skill that maps to a user signal — add a Discovery Tree row                                                             |
+| `.claude/skills/scale-routing/data/domain-complexity.csv`       | New domain match (fintech, healthcare, etc.) — add a row with signals + level + workflow                                    |
+| `website/.vitepress/config.ts`                                  | New skill or agent — add to the matching sidebar group under `reference/skills/*` or `reference/agents/*`                   |
+| `website/reference/skills/<name>.md`                            | New skill — create the reference page (use an existing skill page as a template; keep it under 800 lines per `docs.maxLoc`) |
+| `website/reference/agents/<name>.md`                            | New agent — create the reference page                                                                                       |
 
 Skip rows that don't apply to the current release. The matrix is a checklist, not a mandate to edit every file.
 
@@ -97,27 +97,27 @@ Add a new version section at the **top** (just below the `## Upgrade` block). Us
 
 #### Section schema (in this order)
 
-| Section | When to include | Format |
-|---|---|---|
-| `### Highlights` | Always for feature/breaking releases. Optional for patches. | 1–3 sentences. State the user-visible thesis of the release. No file paths, no internal IDs. |
-| `### New Skills` | Whenever ≥1 new skill ships. | Markdown table: `\| Skill \| Purpose \|` |
-| `### New Agents` | Whenever ≥1 new agent ships. | Bullet list: `- ``agent-name`` — purpose.` |
-| `### New Commands` | Whenever ≥1 new slash command ships. | Bullet list: `- ``/command`` — purpose.` |
-| `### CLI` | Whenever `mewkit` CLI changes. | Bullet list. |
-| `### Features` | New user-facing functionality not covered by the New-* sections. | Bullet list. |
-| `### Improvements` | Refactors, ergonomics, perf, prunes that the user notices. | Bullet list. |
-| `### Removals` | Deletions, deprecations, renames. | Bullet list. State migration path inline. |
-| `### Bug Fixes` | All user-visible fixes. | Bullet list. State the symptom + the fix briefly. |
-| `### Beta` | Opt-in / experimental features (env var or flag-gated). | Bullet list. State the opt-in mechanism. |
-| `### Migration Notes` | Only if user action is required. | Bullet list. Include the exact command or env var. |
-| `### Breaking Changes` | Only if there are any. | Bullet list. State the before/after behavior. |
+| Section                | When to include                                                   | Format                                                                                       |
+| ---------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `### Highlights`       | Always for feature/breaking releases. Optional for patches.       | 1–3 sentences. State the user-visible thesis of the release. No file paths, no internal IDs. |
+| `### New Skills`       | Whenever ≥1 new skill ships.                                      | Markdown table: `\| Skill \| Purpose \|`                                                     |
+| `### New Agents`       | Whenever ≥1 new agent ships.                                      | Bullet list: `- ``agent-name`` — purpose.`                                                   |
+| `### New Commands`     | Whenever ≥1 new slash command ships.                              | Bullet list: `- ``/command`` — purpose.`                                                     |
+| `### CLI`              | Whenever `mewkit` CLI changes.                                    | Bullet list.                                                                                 |
+| `### Features`         | New user-facing functionality not covered by the New-\* sections. | Bullet list.                                                                                 |
+| `### Improvements`     | Refactors, ergonomics, perf, prunes that the user notices.        | Bullet list.                                                                                 |
+| `### Removals`         | Deletions, deprecations, renames.                                 | Bullet list. State migration path inline.                                                    |
+| `### Bug Fixes`        | All user-visible fixes.                                           | Bullet list. State the symptom + the fix briefly.                                            |
+| `### Beta`             | Opt-in / experimental features (env var or flag-gated).           | Bullet list. State the opt-in mechanism.                                                     |
+| `### Migration Notes`  | Only if user action is required.                                  | Bullet list. Include the exact command or env var.                                           |
+| `### Breaking Changes` | Only if there are any.                                            | Bullet list. State the before/after behavior.                                                |
 
 #### Style rules (DRY: enforced by these rules, not duplicated everywhere)
 
 - **One sentence per bullet** unless an env var table or migration command is needed.
 - **No internal IDs** in published bullets — drop `RT-C1`, `M2`, `CF3`, `RF-14`, `phase-XX`, `[CHM]<n>`. They belong in commit messages, not the changelog.
 - **No test counts** (e.g. "40 passed / 3 todo") — that is CI noise, not a user-impact signal.
-- **No audit metadata** ("5 parallel red-team teams audited 78 skills, 64 findings dedup'd") — summarize the *outcome* in Highlights and let bullets describe what changed.
+- **No audit metadata** ("5 parallel red-team teams audited 78 skills, 64 findings dedup'd") — summarize the _outcome_ in Highlights and let bullets describe what changed.
 - **No file counts** ("286 lines, 11 sections, 16 agents wired") — describe what the user gets, not how big the diff was.
 - **No internal plan-directory paths** (`plans/260411-1906-...`).
 - **No `**bold:**` prefix per bullet.** Sentence-case content is enough; bold is reserved for skill / command / agent names referenced inline (use backticks, not bold).
@@ -128,15 +128,15 @@ Add a new version section at the **top** (just below the `## Upgrade` block). Us
 
 #### Patch vs. minor vs. major releases
 
-| Release type | Required sections | Optional sections |
-|---|---|---|
-| Patch (`x.y.Z`) | At least one of: `Bug Fixes`, `Improvements` | `Highlights` (only if non-trivial), CLI |
-| Minor (`x.Y.0`) | `Highlights` + at least one of: `Features`, `New Skills`, `New Agents`, `New Commands` | All others |
-| Major (`X.0.0`) | `Highlights` + `Breaking Changes` + `Migration Notes` (if action required) | All others |
+| Release type    | Required sections                                                                      | Optional sections                       |
+| --------------- | -------------------------------------------------------------------------------------- | --------------------------------------- |
+| Patch (`x.y.Z`) | At least one of: `Bug Fixes`, `Improvements`                                           | `Highlights` (only if non-trivial), CLI |
+| Minor (`x.Y.0`) | `Highlights` + at least one of: `Features`, `New Skills`, `New Agents`, `New Commands` | All others                              |
+| Major (`X.0.0`) | `Highlights` + `Breaking Changes` + `Migration Notes` (if action required)             | All others                              |
 
 #### What goes in `Highlights` vs `Features`
 
-- **Highlights** is the elevator pitch — *what changed in this release at the level the user cares about*. 1–3 sentences. No bullets.
+- **Highlights** is the elevator pitch — _what changed in this release at the level the user cares about_. 1–3 sentences. No bullets.
 - **Features** is the granular list of additions. Bullets, one per addition.
 
 If you only have one feature and it's the whole release, put it in **Highlights** as prose and skip **Features**.
@@ -153,8 +153,8 @@ would want it.
 
 ### New Skills
 
-| Skill | Purpose |
-|-------|---------|
+| Skill        | Purpose           |
+| ------------ | ----------------- |
 | `mk:example` | One-line purpose. |
 
 ### Features
@@ -192,11 +192,11 @@ If the command prints nothing, skip step 3 entirely. The release proceeds at the
 
 Map the size of the change inside `packages/mewkit/src/` to a SemVer field:
 
-| Change shape | Bump | Example | New version from `2.8.5` |
-|---|---|---|---|
-| Minor edits — bug fix, log tweak, refactor that preserves CLI surface | patch (last number) | `2.8.5 → 2.8.6` | `2.8.6` |
-| Big changes — new flag, new subcommand, new env var, behavior addition that does NOT remove or rename existing behavior | minor (middle number) | `2.8.6 → 2.9.0` | `2.9.0` |
-| Breaking changes — removed flag, renamed subcommand, removed/renamed env var, contract change that an existing script would notice | major (first number) | `2.9.0 → 3.0.0` | `3.0.0` |
+| Change shape                                                                                                                       | Bump                  | Example         | New version from `2.8.5` |
+| ---------------------------------------------------------------------------------------------------------------------------------- | --------------------- | --------------- | ------------------------ |
+| Minor edits — bug fix, log tweak, refactor that preserves CLI surface                                                              | patch (last number)   | `2.8.5 → 2.8.6` | `2.8.6`                  |
+| Big changes — new flag, new subcommand, new env var, behavior addition that does NOT remove or rename existing behavior            | minor (middle number) | `2.8.6 → 2.9.0` | `2.9.0`                  |
+| Breaking changes — removed flag, renamed subcommand, removed/renamed env var, contract change that an existing script would notice | major (first number)  | `2.9.0 → 3.0.0` | `3.0.0`                  |
 
 Patch resets minor/patch counters according to standard SemVer (`2.x.x → 3.0.0`, never `3.0.5`).
 
@@ -383,66 +383,67 @@ docs: update readme        → no release
 
 For CLI changes inside `packages/mewkit/src/`:
 
-| Change shape | Bump |
-|---|---|
-| Bug fix, log tweak, refactor that preserves CLI surface | patch |
-| New flag, new subcommand, new env var, additive behavior | minor |
+| Change shape                                                                       | Bump  |
+| ---------------------------------------------------------------------------------- | ----- |
+| Bug fix, log tweak, refactor that preserves CLI surface                            | patch |
+| New flag, new subcommand, new env var, additive behavior                           | minor |
 | Removed/renamed flag, removed/renamed subcommand, removed env var, contract change | major |
 
 ## Release Scripts
 
-| Script                                  | Purpose                                                   |
-| --------------------------------------- | --------------------------------------------------------- |
-| `scripts/sync-package-versions.cjs`     | Sync version across both npm packages                     |
-| `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files          |
-| `scripts/prepare-release-assets.cjs`    | Build metadata.json + manifest + dist/meowkit-release.zip |
+| Script                                  | Purpose                                                                         |
+| --------------------------------------- | ------------------------------------------------------------------------------- |
+| `scripts/sync-package-versions.cjs`     | Sync version across both npm packages                                           |
+| `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files                                |
+| `scripts/prepare-release-assets.cjs`    | Build metadata.json + manifest + dist/meowkit-release.zip                       |
 | `scripts/release.sh`                    | Automated release: bump → build → assets → commit → tag → push → GitHub Release |
 
 ## Release History
 
-| Version | Date       | Title                            |
-| ------- | ---------- | -------------------------------- |
-| v2.9.4  | 2026-05-11 | Agent rules and TOON agent docs |
-| v2.9.2  | 2026-05-11 | Spec-to-tech-breakdown orchestrator |
-| v2.9.1  | 2026-05-11 | Brand-prose neutralization for migrate targets |
-| v2.9.0  | 2026-05-11 | Pre-ticket story sizing                   |
-| v2.8.7  | 2026-05-11 | Agile/Scrum Rule Layer                    |
-| v2.8.6  | 2026-05-10 | Align rules                               |
-| v2.8.5  | 2026-05-10 | Rules Folder Reconsolidation + mk:preview |
+| Version | Date       | Title                                            |
+| ------- | ---------- | ------------------------------------------------ |
+| v2.9.4  | 2026-05-11 | Agent rules and TOON agent docs                  |
+| v2.9.3  | 2026-05-12 | TOON Optimization                                |
+| v2.9.2  | 2026-05-11 | Spec-to-tech-breakdown orchestrator              |
+| v2.9.1  | 2026-05-11 | Brand-prose neutralization for migrate targets   |
+| v2.9.0  | 2026-05-11 | Pre-ticket story sizing                          |
+| v2.8.7  | 2026-05-11 | Agile/Scrum Rule Layer                           |
+| v2.8.6  | 2026-05-10 | Align rules                                      |
+| v2.8.5  | 2026-05-10 | Rules Folder Reconsolidation + mk:preview        |
 | v2.8.4  | 2026-05-10 | Confluence Ecosystem + Macro-Aware Spec Analysis |
-| v2.8.3  | 2026-05-10 | Jira Family + Workflow Discovery     |
-| v2.8.2  | 2026-05-09 | Prompt Enhancer Output Modes         |
-| v2.8.1  | 2026-05-09 | The Prompt Enhancer Release          |
-| v2.8.0  | 2026-05-09 | The Cleanup & Audit Release          |
-| v2.7.6  | 2026-05-09 | Phase 0 risk checklist               |
-| v2.7.5  | 2026-05-09 | CLAUDE.md trim + reference cleanup   |
-| v2.7.4  | 2026-05-02 | Browser skill consolidation          |
-| v2.7.3  | 2026-05-01 | `npx mewkit` resolution fix          |
-| v2.7.2  | 2026-05-01 | Checkpoint subsystem cleanup         |
-| v2.7.1  | 2026-04-30 | Phase Frontmatter Contract           |
-| v2.7.0  | 2026-04-30 | The Namespace Rename Release         |
-| v2.6.2  | 2026-04-29 | The Telemetry & Validator Release    |
-| v2.6.1  | 2026-04-22 | The project-manager Release          |
-| v2.6.0  | 2026-04-22 | The Skills Compliance Release        |
-| v2.5.1  | 2026-04-20 | mk:henshin                         |
-| v2.5.0  | 2026-04-19 | The Native Fit Release               |
-| v2.3.4  | 2026-04-11 | Centralized Dotenv Loading           |
-| v2.3.3  | 2026-04-11 | The Wiring Integrity Release         |
-| v2.3.2  | 2026-04-11 | The Agent-Skills Integration Release |
-| v2.3.1  | 2026-04-11 | The Plan Creator Intelligence Release |
-| v1.4.0  | 2026-04-03 | The Plan Intelligence Release    |
-| v1.3.4  | 2026-04-02 | Hook path resolution fix            |
-| v1.3.3  | 2026-04-02 | The Hook Safety Release             |
-| v1.3.2  | 2026-04-01 | The Plan Quality Release            |
-| v1.3.1  | 2026-04-01 | The Red Team Depth Release         |
-| v1.3.0  | 2026-03-31 | The Integration Integrity Release |
-| v1.2.1  | 2026-03-31 | Memory capture enforcement fix    |
-| v1.2.0  | 2026-03-31 | The Memory Activation Release    |
-| v1.1.0  | 2026-03-30 | The Reasoning Depth Release      |
-| v1.0.0  | 2026-03-30 | The Disciplined Velocity Release |
-| v0.1.2  | 2026-03-29 | Interactive version selection     |
-| v0.1.1  | 2026-03-29 | Runtime dir exclusion fix         |
-| v0.1.0  | 2026-03-29 | Initial pre-release               |
+| v2.8.3  | 2026-05-10 | Jira Family + Workflow Discovery                 |
+| v2.8.2  | 2026-05-09 | Prompt Enhancer Output Modes                     |
+| v2.8.1  | 2026-05-09 | The Prompt Enhancer Release                      |
+| v2.8.0  | 2026-05-09 | The Cleanup & Audit Release                      |
+| v2.7.6  | 2026-05-09 | Phase 0 risk checklist                           |
+| v2.7.5  | 2026-05-09 | CLAUDE.md trim + reference cleanup               |
+| v2.7.4  | 2026-05-02 | Browser skill consolidation                      |
+| v2.7.3  | 2026-05-01 | `npx mewkit` resolution fix                      |
+| v2.7.2  | 2026-05-01 | Checkpoint subsystem cleanup                     |
+| v2.7.1  | 2026-04-30 | Phase Frontmatter Contract                       |
+| v2.7.0  | 2026-04-30 | The Namespace Rename Release                     |
+| v2.6.2  | 2026-04-29 | The Telemetry & Validator Release                |
+| v2.6.1  | 2026-04-22 | The project-manager Release                      |
+| v2.6.0  | 2026-04-22 | The Skills Compliance Release                    |
+| v2.5.1  | 2026-04-20 | mk:henshin                                       |
+| v2.5.0  | 2026-04-19 | The Native Fit Release                           |
+| v2.3.4  | 2026-04-11 | Centralized Dotenv Loading                       |
+| v2.3.3  | 2026-04-11 | The Wiring Integrity Release                     |
+| v2.3.2  | 2026-04-11 | The Agent-Skills Integration Release             |
+| v2.3.1  | 2026-04-11 | The Plan Creator Intelligence Release            |
+| v1.4.0  | 2026-04-03 | The Plan Intelligence Release                    |
+| v1.3.4  | 2026-04-02 | Hook path resolution fix                         |
+| v1.3.3  | 2026-04-02 | The Hook Safety Release                          |
+| v1.3.2  | 2026-04-01 | The Plan Quality Release                         |
+| v1.3.1  | 2026-04-01 | The Red Team Depth Release                       |
+| v1.3.0  | 2026-03-31 | The Integration Integrity Release                |
+| v1.2.1  | 2026-03-31 | Memory capture enforcement fix                   |
+| v1.2.0  | 2026-03-31 | The Memory Activation Release                    |
+| v1.1.0  | 2026-03-30 | The Reasoning Depth Release                      |
+| v1.0.0  | 2026-03-30 | The Disciplined Velocity Release                 |
+| v0.1.2  | 2026-03-29 | Interactive version selection                    |
+| v0.1.1  | 2026-03-29 | Runtime dir exclusion fix                        |
+| v0.1.0  | 2026-03-29 | Initial pre-release                              |
 
 ## Troubleshooting
 
