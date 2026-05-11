@@ -40,6 +40,7 @@ This is the "friendly front door" to the toolkit. Users who don't know which com
 | Question about architecture | Complex (route to `/mk:arch` or `/mk:design`) |
 | "review", "audit", "security" | Route to `/mk:review` or `/mk:audit` directly |
 | "docs", "document" | Route to `/docs:init` or `/docs:sync` |
+| "break down spec", "decompose spec", "spec to stories", "breakdown {source}", "stories from spec" | Route to `/mk:breakdown` |
 
 ### Examples
 

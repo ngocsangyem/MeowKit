@@ -14,6 +14,21 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.2 (2026-05-11) — Spec-to-tech-breakdown orchestrator
+
+### Highlights
+
+`/mk:breakdown` ships as a thin skill-composing command that takes any spec source — Confluence URL, Jira KEY, GitHub issue, Linear ticket, file, or paste — and produces refined user stories, optional per-story Jira tickets, and a codebase-aware tech breakdown report. Stops cleanly before plan creation so the user runs `/mk:plan` later with the report as context. Closes the manual 4-skill chaining gap between spec analysis and planning.
+
+### New Commands
+
+- `/mk:breakdown <source> [--source <type>] [--project <KEY>]` — orchestrates `mk:confluence-spec-analyst` (or `mk:intake` for non-Confluence sources) → story decomposition → per-story `AskUserQuestion` gate → `mk:jira-issue create` per acceptance → `mk:planning-engine plan --tickets` → consolidated `tasks/reports/breakdown-{YYMMDD}-{slug}.md`. Per-story options: Create / Edit-then-create / Skip / Skip-all-remaining. Honors `EXT_SYSTEM` gate — human confirmation precedes every Jira write.
+
+### Improvements
+
+- `/mk:meow` Step 2 heuristics table routes "break down spec", "decompose spec", "spec to stories", and `breakdown <source>` phrasing to the new command.
+- Footer logic emits one of five state-specific next-action messages — covers Jira-not-configured, `--project` missing, partial spec (Confluence child-page failures), tech breakdown skipped, and the happy path with cross-link to the planning report.
+
 ## 2.9.1 (2026-05-11) — Brand-prose neutralization for migrate targets
 
 ### Highlights

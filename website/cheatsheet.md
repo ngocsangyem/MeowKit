@@ -11,6 +11,7 @@ persona: B
 | Command | Phase | What it does |
 |---------|-------|-------------|
 | `/mk:meow [task]` | 0 | Entry point — classifies and routes to right agent |
+| `/mk:breakdown <source>` | pre-1 | Spec/PRD → user stories + optional Jira tickets + tech breakdown — stops before plan |
 | `/mk:plan [feature]` | 1 | Premise challenge + two-lens plan + Gate 1 |
 | `/mk:cook [feature]` | 1→5 | Full pipeline: plan → test → build → review → ship |
 | `/mk:fix [bug]` | varies | Auto-detect complexity, route to fix strategy |
