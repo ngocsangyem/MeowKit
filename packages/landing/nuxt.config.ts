@@ -1,13 +1,7 @@
-import tailwindcss from '@tailwindcss/vite'
-
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   ssr: true,
   devtools: { enabled: true },
-
-  vite: {
-    plugins: [tailwindcss()],
-  },
 
   // @nuxt/ui must be first — it registers the Tailwind v4 Vite plugin internally
   modules: [
