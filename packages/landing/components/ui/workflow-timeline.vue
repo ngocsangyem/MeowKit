@@ -1,4 +1,8 @@
 <script setup lang="ts">
+const props = withDefaults(defineProps<{
+  scrollProgress?: number
+}>(), { scrollProgress: 0 })
+
 const phases = [
   { num: '01', label: 'Orient', desc: 'Detect task domain, classify complexity, assign model tier and agents.', icon: '◎', gate: false },
   { num: '02', label: 'Plan', desc: 'Scope-adaptive plan with acceptance criteria. No code until the plan is approved.', icon: '◈', gate: true },
@@ -9,47 +13,62 @@ const phases = [
   { num: '07', label: 'Reflect', desc: 'Capture lessons, update memory files, run retrospective. Knowledge persists.', icon: '◑', gate: false },
 ]
 
-const phaseRefs = ref<HTMLElement[]>([])
-const activeIndex = ref(-1)
+// Node i activates when line reaches its position (i / (N-1) of total track height)
+const activeIndex = computed(() =>
+  Math.min(Math.floor(props.scrollProgress * (phases.length - 1)), phases.length - 1),
+)
 
-let observer: IntersectionObserver | null = null
+// Measure actual track height: distance from timeline top to top of last node.
+// This equals the center-to-center span since track starts at top:20px (first node center)
+// and should end at last node center (lastNodeTop + 20) — so height = lastNodeTop.
+const timelineRef = ref<HTMLElement | null>(null)
+const trackHeight = ref('0px')
+
+function updateTrackHeight() {
+  const timeline = timelineRef.value
+  if (!timeline) return
+  const nodes = timeline.querySelectorAll<HTMLElement>('.timeline__node')
+  const lastNode = nodes[nodes.length - 1]
+  if (!lastNode) return
+  const lastNodeTop = lastNode.getBoundingClientRect().top - timeline.getBoundingClientRect().top
+  trackHeight.value = `${Math.max(0, lastNodeTop)}px`
+}
 
 onMounted(() => {
-  observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          const idx = Number((entry.target as HTMLElement).dataset.idx)
-          if (!isNaN(idx) && idx > activeIndex.value) activeIndex.value = idx
-        }
-      }
-    },
-    { threshold: 0.5 },
-  )
-
-  phaseRefs.value.forEach(el => observer!.observe(el))
+  updateTrackHeight()
+  window.addEventListener('resize', updateTrackHeight)
 })
 
-onUnmounted(() => observer?.disconnect())
+onUnmounted(() => {
+  window.removeEventListener('resize', updateTrackHeight)
+})
 </script>
 
 <template>
-  <div class="timeline" role="list" aria-label="7-phase workflow">
+  <div ref="timelineRef" class="timeline" role="list" aria-label="7-phase workflow">
+    <!-- Single track line: height measured in JS to span first→last node center exactly -->
+    <div class="timeline__track" aria-hidden="true" :style="{ height: trackHeight }">
+      <div
+        class="timeline__track-fill"
+        :style="{ transform: `scaleY(${scrollProgress})` }"
+      />
+    </div>
+
     <div
       v-for="(phase, i) in phases"
       :key="phase.num"
-      ref="phaseRefs"
-      :data-idx="i"
       role="listitem"
       class="timeline__item"
-      :class="{ 'timeline__item--active': i <= activeIndex, 'timeline__item--gate': phase.gate }"
+      :class="{
+        'timeline__item--active': i <= activeIndex,
+        'timeline__item--current': i === activeIndex,
+        'timeline__item--gate': phase.gate,
+      }"
     >
-      <!-- Connector line -->
-      <div v-if="i < phases.length - 1" class="timeline__line" aria-hidden="true" />
-
-      <!-- Phase node -->
+      <!-- Node: glows when active, pulses when current -->
       <div class="timeline__node" aria-hidden="true">
         <span class="timeline__icon">{{ phase.icon }}</span>
+        <span v-if="i === activeIndex" class="timeline__pulse" />
       </div>
 
       <!-- Content -->
@@ -69,58 +88,112 @@ onUnmounted(() => observer?.disconnect())
 .timeline {
   display: flex;
   flex-direction: column;
-  gap: 0;
   position: relative;
 }
 
+/* ─ Track: full-height background rail + animated fill ─ */
+.timeline__track {
+  position: absolute;
+  left: 19px;   /* center of 40px node */
+  top: 20px;    /* center of first node; height set by JS to reach last node center */
+  width: 2px;
+  background: rgba(102, 204, 255, 0.08);
+  border-radius: 1px;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.timeline__track-fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    #66CCFF 0%,
+    rgba(102, 204, 255, 0.35) 100%
+  );
+  transform-origin: top center;
+  transform: scaleY(0);
+  transition: transform 0.06s linear;
+  will-change: transform;
+}
+
+/* ─ Items ─ */
 .timeline__item {
   display: flex;
   gap: 1.25rem;
   position: relative;
-  padding-bottom: 2rem;
-  opacity: 0.4;
-  transition: opacity 0.5s ease;
-}
-.timeline__item--active { opacity: 1; }
-.timeline__item:last-child { padding-bottom: 0; }
-
-.timeline__line {
-  position: absolute;
-  left: 19px;
-  top: 40px;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(to bottom, rgba(102, 204, 255, 0.3), rgba(102, 204, 255, 0.05));
+  padding-bottom: 1.25rem;
+  opacity: 0.3;
+  transition: opacity 0.45s ease;
 }
 
+.timeline__item--active {
+  opacity: 1;
+}
+
+.timeline__item:last-child {
+  padding-bottom: 0;
+}
+
+/* ─ Node ─ */
 .timeline__node {
   flex-shrink: 0;
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--color-dark-secondary, #0A1F44);
-  border: 2px solid rgba(102, 204, 255, 0.2);
+  background: rgba(10, 31, 68, 0.95);
+  border: 2px solid rgba(102, 204, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
   z-index: 1;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
 }
 
 .timeline__item--active .timeline__node {
-  border-color: rgba(102, 204, 255, 0.6);
-  box-shadow: 0 0 12px rgba(102, 204, 255, 0.25);
+  border-color: rgba(102, 204, 255, 0.5);
+  box-shadow: 0 0 14px rgba(102, 204, 255, 0.22);
+  background: rgba(102, 204, 255, 0.06);
 }
 
-.timeline__item--gate .timeline__node {
-  background: rgba(0, 123, 255, 0.15);
+/* Current node: brighter glow */
+.timeline__item--current .timeline__node {
+  border-color: rgba(102, 204, 255, 0.9);
+  box-shadow: 0 0 24px rgba(102, 204, 255, 0.5), inset 0 0 8px rgba(102, 204, 255, 0.15);
+  background: rgba(102, 204, 255, 0.12);
+}
+
+.timeline__item--gate.timeline__item--active .timeline__node {
+  background: rgba(0, 123, 255, 0.12);
 }
 
 .timeline__icon {
   font-size: 1rem;
   color: #66CCFF;
+  transition: filter 0.4s ease;
 }
 
+.timeline__item--current .timeline__icon {
+  filter: drop-shadow(0 0 5px rgba(102, 204, 255, 0.9));
+}
+
+/* ─ Expanding pulse ring on current node ─ */
+.timeline__pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(102, 204, 255, 0.5);
+  animation: node-pulse 1.6s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes node-pulse {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+/* ─ Content ─ */
 .timeline__content {
   flex: 1;
   padding-top: 0.5rem;
@@ -144,6 +217,11 @@ onUnmounted(() => observer?.disconnect())
   font-weight: 500;
   color: #F8FAFC;
   margin: 0;
+  transition: text-shadow 0.4s ease;
+}
+
+.timeline__item--current .timeline__label {
+  text-shadow: 0 0 20px rgba(102, 204, 255, 0.3);
 }
 
 .timeline__gate-badge {

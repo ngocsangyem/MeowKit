@@ -21,6 +21,34 @@ function toggleMobile() {
 function closeMobile() {
   mobileOpen.value = false
 }
+
+function handleNavClick(event: MouseEvent, href: string, external?: boolean) {
+  if (external || !href.startsWith('#')) return
+  event.preventDefault()
+  closeMobile()
+
+  const target = document.querySelector<HTMLElement>(href)
+  if (!target) return
+
+  const currentY = window.scrollY
+  const targetY = target.getBoundingClientRect().top + currentY
+
+  // If the scroll path crosses the sticky-scroll section, the browser's smooth-scroll
+  // crawls through ~1800px of non-moving sticky content, appearing to freeze.
+  // Detect crossing and jump instantly instead.
+  const scrollTrack = document.querySelector<HTMLElement>('.hiw-scroll-track')
+  let behavior: ScrollBehavior = 'smooth'
+
+  if (scrollTrack) {
+    const trackStart = scrollTrack.getBoundingClientRect().top + currentY
+    const trackEnd = trackStart + scrollTrack.offsetHeight
+    const crossesDown = currentY < trackEnd && targetY > trackEnd
+    const crossesUp = currentY > trackStart && targetY < trackStart
+    if (crossesDown || crossesUp) behavior = 'instant'
+  }
+
+  target.scrollIntoView({ behavior })
+}
 </script>
 
 <template>
@@ -40,7 +68,7 @@ function closeMobile() {
             class="navbar__link"
             :target="link.external ? '_blank' : undefined"
             :rel="link.external ? 'noopener noreferrer' : undefined"
-            @click="closeMobile"
+            @click="handleNavClick($event, link.href, link.external)"
           >{{ link.label }}</a>
         </li>
       </ul>
@@ -87,7 +115,7 @@ function closeMobile() {
               class="navbar__mobile-link"
               :target="link.external ? '_blank' : undefined"
               :rel="link.external ? 'noopener noreferrer' : undefined"
-              @click="closeMobile"
+              @click="handleNavClick($event, link.href, link.external)"
             >{{ link.label }}</a>
           </li>
         </ul>

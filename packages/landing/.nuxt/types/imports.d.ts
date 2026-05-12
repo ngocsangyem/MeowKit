@@ -68,9 +68,9 @@ declare global {
   const defineNuxtPlugin: typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/nuxt').defineNuxtPlugin
   const defineNuxtRouteMiddleware: typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/composables/router').defineNuxtRouteMiddleware
   const defineOffer: typeof import('../../node_modules/.pnpm/@unhead+schema-org@2.1.15_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3__/node_modules/@unhead/schema-org/vue').defineOffer
-  const defineOgImage: typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/mock').defineOgImage
-  const defineOgImageComponent: typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/mock').defineOgImageComponent
-  const defineOgImageScreenshot: typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/mock').defineOgImageScreenshot
+  const defineOgImage: typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/defineOgImage').defineOgImage
+  const defineOgImageComponent: typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/defineOgImageComponent').defineOgImageComponent
+  const defineOgImageScreenshot: typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/defineOgImageScreenshot').defineOgImageScreenshot
   const defineOpeningHours: typeof import('../../node_modules/.pnpm/@unhead+schema-org@2.1.15_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3__/node_modules/@unhead/schema-org/vue').defineOpeningHours
   const defineOrganization: typeof import('../../node_modules/.pnpm/@unhead+schema-org@2.1.15_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3__/node_modules/@unhead/schema-org/vue').defineOrganization
   const definePageMeta: typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/composables/pages').definePageMeta
@@ -108,6 +108,7 @@ declare global {
   const getCurrentInstance: typeof import('vue').getCurrentInstance
   const getCurrentScope: typeof import('vue').getCurrentScope
   const getNitroOrigin: typeof import('../../node_modules/.pnpm/nuxt-site-config@4.0.8_@nuxt+schema@4.4.5_magicast@0.5.2_nuxt@4.4.5_@babel+core@7.29.0__3de9f6d1b6ba6833e2447df348bec4b8/node_modules/nuxt-site-config/dist/runtime/app/composables/getNitroOrigin').getNitroOrigin
+  const getOgImagePath: typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/utils').getOgImagePath
   const getRouteRules: typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/composables/manifest').getRouteRules
   const h: typeof import('vue').h
   const hasInjectionContext: typeof import('vue').hasInjectionContext
@@ -330,7 +331,6 @@ declare global {
   const useNow: typeof import('../../node_modules/.pnpm/@vueuse+core@14.3.0_vue@3.5.34_typescript@6.0.3_/node_modules/@vueuse/core').useNow
   const useNuxtApp: typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/nuxt').useNuxtApp
   const useNuxtData: typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/composables/asyncData').useNuxtData
-  const useNuxtDevTools: typeof import('../../node_modules/.pnpm/@nuxt+devtools@3.2.4_vite@7.3.3_@types+node@25.6.2_jiti@2.7.0_lightningcss@1.32.0_terse_fe5f9d60db064b7de2473f50e0a19669/node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools').useNuxtDevTools
   const useObjectUrl: typeof import('../../node_modules/.pnpm/@vueuse+core@14.3.0_vue@3.5.34_typescript@6.0.3_/node_modules/@vueuse/core').useObjectUrl
   const useOffsetPagination: typeof import('../../node_modules/.pnpm/@vueuse+core@14.3.0_vue@3.5.34_typescript@6.0.3_/node_modules/@vueuse/core').useOffsetPagination
   const useOnline: typeof import('../../node_modules/.pnpm/@vueuse+core@14.3.0_vue@3.5.34_typescript@6.0.3_/node_modules/@vueuse/core').useOnline
@@ -574,9 +574,9 @@ declare module 'vue' {
     readonly defineNuxtPlugin: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/nuxt')['defineNuxtPlugin']>
     readonly defineNuxtRouteMiddleware: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/composables/router')['defineNuxtRouteMiddleware']>
     readonly defineOffer: UnwrapRef<typeof import('../../node_modules/.pnpm/@unhead+schema-org@2.1.15_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3__/node_modules/@unhead/schema-org/vue')['defineOffer']>
-    readonly defineOgImage: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/mock')['defineOgImage']>
-    readonly defineOgImageComponent: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/mock')['defineOgImageComponent']>
-    readonly defineOgImageScreenshot: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/mock')['defineOgImageScreenshot']>
+    readonly defineOgImage: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/defineOgImage')['defineOgImage']>
+    readonly defineOgImageComponent: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/defineOgImageComponent')['defineOgImageComponent']>
+    readonly defineOgImageScreenshot: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/composables/defineOgImageScreenshot')['defineOgImageScreenshot']>
     readonly defineOpeningHours: UnwrapRef<typeof import('../../node_modules/.pnpm/@unhead+schema-org@2.1.15_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3__/node_modules/@unhead/schema-org/vue')['defineOpeningHours']>
     readonly defineOrganization: UnwrapRef<typeof import('../../node_modules/.pnpm/@unhead+schema-org@2.1.15_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3__/node_modules/@unhead/schema-org/vue')['defineOrganization']>
     readonly definePageMeta: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/composables/pages')['definePageMeta']>
@@ -614,6 +614,7 @@ declare module 'vue' {
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly getNitroOrigin: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt-site-config@4.0.8_@nuxt+schema@4.4.5_magicast@0.5.2_nuxt@4.4.5_@babel+core@7.29.0__3de9f6d1b6ba6833e2447df348bec4b8/node_modules/nuxt-site-config/dist/runtime/app/composables/getNitroOrigin')['getNitroOrigin']>
+    readonly getOgImagePath: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt-og-image@6.5.0_@nuxt+schema@4.4.5_@unhead+vue@2.1.15_vue@3.5.34_typescript@6.0.3___14202a2e3778290dfbb654bb87025424/node_modules/nuxt-og-image/dist/runtime/app/utils')['getOgImagePath']>
     readonly getRouteRules: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/composables/manifest')['getRouteRules']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
     readonly hasInjectionContext: UnwrapRef<typeof import('vue')['hasInjectionContext']>
@@ -836,7 +837,6 @@ declare module 'vue' {
     readonly useNow: UnwrapRef<typeof import('../../node_modules/.pnpm/@vueuse+core@14.3.0_vue@3.5.34_typescript@6.0.3_/node_modules/@vueuse/core')['useNow']>
     readonly useNuxtApp: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/nuxt')['useNuxtApp']>
     readonly useNuxtData: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/composables/asyncData')['useNuxtData']>
-    readonly useNuxtDevTools: UnwrapRef<typeof import('../../node_modules/.pnpm/@nuxt+devtools@3.2.4_vite@7.3.3_@types+node@25.6.2_jiti@2.7.0_lightningcss@1.32.0_terse_fe5f9d60db064b7de2473f50e0a19669/node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools')['useNuxtDevTools']>
     readonly useObjectUrl: UnwrapRef<typeof import('../../node_modules/.pnpm/@vueuse+core@14.3.0_vue@3.5.34_typescript@6.0.3_/node_modules/@vueuse/core')['useObjectUrl']>
     readonly useOffsetPagination: UnwrapRef<typeof import('../../node_modules/.pnpm/@vueuse+core@14.3.0_vue@3.5.34_typescript@6.0.3_/node_modules/@vueuse/core')['useOffsetPagination']>
     readonly useOnline: UnwrapRef<typeof import('../../node_modules/.pnpm/@vueuse+core@14.3.0_vue@3.5.34_typescript@6.0.3_/node_modules/@vueuse/core')['useOnline']>
