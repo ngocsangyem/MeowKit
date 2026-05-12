@@ -20,6 +20,9 @@
     "vue": "latest",
     "vue-router": "latest"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "@tailwindcss/vite": "latest",
     "tailwindcss": "latest",
