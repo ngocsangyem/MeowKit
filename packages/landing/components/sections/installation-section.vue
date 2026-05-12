@@ -6,7 +6,7 @@ const installCmd = 'npx meowkit init'
 const steps = [
   { num: '01', title: 'Install', code: 'npx meowkit init', desc: 'Scaffolds the harness into your project.' },
   { num: '02', title: 'Configure', code: 'npx meowkit setup', desc: 'Choose your workflow modes and agents.' },
-  { num: '03', title: 'Run', code: '/ck:cook "add feature X"', desc: 'The 7-phase pipeline enforces the rest.' },
+  { num: '03', title: 'Run', code: '/mk:cook "add feature X"', desc: 'The 7-phase pipeline enforces the rest.' },
 ]
 
 function handleCopy() {
