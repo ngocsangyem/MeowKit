@@ -16,8 +16,10 @@
     "@nuxt/image": "latest",
     "@nuxt/ui": "^4.7.1",
     "@nuxtjs/seo": "latest",
+    "@tailwindcss/vite": "latest",
     "@vueuse/nuxt": "latest",
     "nuxt": "latest",
+    "tailwindcss": "latest",
     "vue": "latest",
     "vue-router": "latest"
   },
@@ -25,8 +27,6 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "latest",
-    "tailwindcss": "latest",
     "typescript": "latest",
     "vue-tsc": "latest"
   }

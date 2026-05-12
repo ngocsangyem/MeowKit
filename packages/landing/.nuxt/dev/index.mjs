@@ -1194,6 +1194,46 @@ const _inlineRuntimeConfig = {
             }
           ],
           "_normalized": true
+        },
+        {
+          "comment": [],
+          "disallow": [],
+          "allow": [
+            "/"
+          ],
+          "userAgent": [
+            "*"
+          ],
+          "contentUsage": [],
+          "contentSignal": [],
+          "_indexable": true,
+          "_rules": [
+            {
+              "pattern": "/",
+              "allow": true
+            }
+          ],
+          "_normalized": true
+        },
+        {
+          "comment": [],
+          "disallow": [],
+          "allow": [
+            "/"
+          ],
+          "userAgent": [
+            "*"
+          ],
+          "contentUsage": [],
+          "contentSignal": [],
+          "_indexable": true,
+          "_rules": [
+            {
+              "pattern": "/",
+              "allow": true
+            }
+          ],
+          "_normalized": true
         }
       ],
       "sitemap": [
@@ -1267,6 +1307,46 @@ const _inlineRuntimeConfig = {
     "debug": false,
     "credits": true,
     "groups": [
+      {
+        "comment": [],
+        "disallow": [],
+        "allow": [
+          "/"
+        ],
+        "userAgent": [
+          "*"
+        ],
+        "contentUsage": [],
+        "contentSignal": [],
+        "_indexable": true,
+        "_rules": [
+          {
+            "pattern": "/",
+            "allow": true
+          }
+        ],
+        "_normalized": true
+      },
+      {
+        "comment": [],
+        "disallow": [],
+        "allow": [
+          "/"
+        ],
+        "userAgent": [
+          "*"
+        ],
+        "contentUsage": [],
+        "contentSignal": [],
+        "_indexable": true,
+        "_rules": [
+          {
+            "pattern": "/",
+            "allow": true
+          }
+        ],
+        "_normalized": true
+      },
       {
         "comment": [],
         "disallow": [],
@@ -3826,7 +3906,22 @@ _AY2aCEjlzFG8a3ItdBJ5MvRzmDQqvadA_DStptbr0,
 _wH6JrtIxmaSoA8lCPWFnE9z4lQeXW6H5z3l5aymEQw
 ];
 
-const assets = {};
+const assets = {
+  "/index.mjs": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": "\"47b47-4j11Eie3b41svv/YuxMZPPj0iDw\"",
+    "mtime": "2026-05-12T05:06:29.916Z",
+    "size": 293703,
+    "path": "index.mjs"
+  },
+  "/index.mjs.map": {
+    "type": "application/json",
+    "etag": "\"1209e0-7Y6dLOipHmgjqzZMb3TaKQyHXq4\"",
+    "mtime": "2026-05-12T05:06:29.917Z",
+    "size": 1182176,
+    "path": "index.mjs.map"
+  }
+};
 
 function readAsset (id) {
   const serverDir = dirname$1(fileURLToPath(globalThis._importMeta_.url));
@@ -5606,7 +5701,7 @@ async function resolveSitemapSources(sources, event) {
   )).flat();
 }
 
-const staticConfig = {"isI18nMapped":false,"sitemapName":"sitemap.xml","isMultiSitemap":false,"excludeAppSources":[],"cacheMaxAgeSeconds":0,"autoLastmod":false,"defaultSitemapsChunkSize":1000,"minify":false,"sortEntries":true,"discoverImages":true,"discoverVideos":true,"sitemapsPathPrefix":"/__sitemap__/","isNuxtContentDocumentDriven":false,"xsl":"/__sitemap__/style.xsl","xslTips":true,"xslColumns":[{"label":"URL","width":"50%"},{"label":"Images","width":"25%","select":"count(image:image)"},{"label":"Last Updated","width":"25%","select":"concat(substring(sitemap:lastmod,0,11),concat(' ', substring(sitemap:lastmod,12,5)),concat(' ', substring(sitemap:lastmod,20,6)))"}],"credits":true,"version":"8.0.15","sitemaps":{"sitemap.xml":{"sitemapName":"sitemap.xml","route":"sitemap.xml","defaults":{},"include":[],"exclude":["/_**","/_nuxt/**","/_nuxt/**","/_nuxt/**","/_nuxt/**","/_nuxt/**"],"includeAppSources":true}}};
+const staticConfig = {"isI18nMapped":false,"sitemapName":"sitemap.xml","isMultiSitemap":false,"excludeAppSources":[],"cacheMaxAgeSeconds":0,"autoLastmod":false,"defaultSitemapsChunkSize":1000,"minify":false,"sortEntries":true,"discoverImages":true,"discoverVideos":true,"sitemapsPathPrefix":"/__sitemap__/","isNuxtContentDocumentDriven":false,"xsl":"/__sitemap__/style.xsl","xslTips":true,"xslColumns":[{"label":"URL","width":"50%"},{"label":"Images","width":"25%","select":"count(image:image)"},{"label":"Last Updated","width":"25%","select":"concat(substring(sitemap:lastmod,0,11),concat(' ', substring(sitemap:lastmod,12,5)),concat(' ', substring(sitemap:lastmod,20,6)))"}],"credits":true,"version":"8.0.15","sitemaps":{"sitemap.xml":{"sitemapName":"sitemap.xml","route":"sitemap.xml","defaults":{},"include":[],"exclude":["/_**","/_nuxt/**","/_nuxt/**","/_nuxt/**","/_nuxt/**","/_nuxt/**","/_nuxt/**","/_nuxt/**"],"includeAppSources":true}}};
 
 function xmlEscape(str) {
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
