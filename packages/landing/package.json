@@ -11,6 +11,7 @@
     "prepare": "nuxt prepare"
   },
   "dependencies": {
+    "@vercel/speed-insights": "latest",
     "@nuxt/fonts": "latest",
     "@nuxt/image": "latest",
     "@nuxt/ui": "^4.7.1",

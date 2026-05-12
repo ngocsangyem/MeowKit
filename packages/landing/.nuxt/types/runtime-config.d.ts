@@ -46,6 +46,14 @@ import { RuntimeConfig as UserRuntimeConfig, PublicRuntimeConfig as UserPublicRu
       version: string,
    },
 
+   "seo-utils-head": {
+      link: Array<{
+
+      }>,
+
+      meta: Array<any>,
+   },
+
    "nuxt-site-config": {
       stack: Array<{
 
@@ -85,70 +93,52 @@ import { RuntimeConfig as UserRuntimeConfig, PublicRuntimeConfig as UserPublicRu
 
       pageMetaRobots: any,
    },
-
-   "nuxt-og-image": {
-      version: string,
-
-      satoriOptions: any,
-
-      resvgOptions: any,
-
-      sharpOptions: any,
-
-      publicStoragePath: string,
-
-      defaults: {
-         emojis: string,
-
-         extension: string,
-
-         width: number,
-
-         height: number,
-
-         cacheMaxAgeSeconds: number,
-      },
-
-      debug: boolean,
-
-      baseCacheKey: string,
-
-      buildCacheDir: any,
-
-      hasNuxtIcon: boolean,
-
-      colorPreference: string,
-
-      isNuxtContentDocumentDriven: boolean,
-
-      cssFramework: string,
-
-      browser: any,
-
-      security: {
-         strict: boolean,
-
-         maxDimension: number,
-
-         maxDpr: number,
-
-         renderTimeout: number,
-
-         imageFetchTimeout: number,
-
-         maxQueryParamSize: any,
-
-         restrictRuntimeImagesToOrigin: boolean,
-
-         secret: string,
-      },
-   },
-
-   ogImage: {
-      secret: string,
-   },
   }
   interface SharedPublicRuntimeConfig {
+   "nuxt-link-checker": {
+      version: string,
+
+      hasSitemapModule: boolean,
+
+      rootDir: string,
+
+      excludeLinks: Array<{
+
+      }>,
+
+      excludePages: Array<any>,
+
+      skipInspections: Array<string>,
+
+      fetchTimeout: number,
+
+      showLiveInspections: boolean,
+
+      fetchRemoteUrls: boolean,
+   },
+
+   "nuxt-schema-org": {
+      reactive: boolean,
+
+      minify: boolean,
+
+      scriptAttributes: {
+         "data-nuxt-schema-org": boolean,
+      },
+
+      identity: {
+         type: string,
+
+         name: string,
+
+         url: string,
+
+         logo: string,
+      },
+
+      version: string,
+   },
+
    "nuxt-seo-utils-version": string,
 
    "seo-utils": {
@@ -189,22 +179,6 @@ import { RuntimeConfig as UserRuntimeConfig, PublicRuntimeConfig as UserPublicRu
       botDetection: boolean,
 
       pageMetaRobots: any,
-   },
-
-   "nuxt-og-image": {
-      defaults: {
-         emojis: string,
-
-         extension: string,
-
-         width: number,
-
-         height: number,
-
-         cacheMaxAgeSeconds: number,
-      },
-
-      hasServerRuntime: boolean,
    },
   }
 declare module '@nuxt/schema' {

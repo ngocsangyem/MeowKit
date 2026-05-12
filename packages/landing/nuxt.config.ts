@@ -3,6 +3,8 @@ export default defineNuxtConfig({
   ssr: true,
   devtools: { enabled: true },
 
+  plugins: ['~/plugins/speed-insights.client.ts'],
+
   // @nuxt/ui must be first — it registers the Tailwind v4 Vite plugin internally
   modules: [
     '@nuxt/ui',
