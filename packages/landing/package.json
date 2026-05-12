@@ -11,6 +11,7 @@
     "prepare": "nuxt prepare"
   },
   "dependencies": {
+    "@vercel/analytics": "latest",
     "@vercel/speed-insights": "latest",
     "@nuxt/fonts": "latest",
     "@nuxt/image": "latest",

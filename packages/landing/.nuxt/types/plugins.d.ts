@@ -34,7 +34,6 @@ type NuxtAppInjections =
   InjectionType<typeof import("../../node_modules/.pnpm/@nuxt+ui@4.7.1_@internationalized+date@3.12.1_@internationalized+number@3.6.6_@tiptap+e_32bc0787a567bc4a7b675a7e9f9ce333/node_modules/@nuxt/ui/dist/runtime/plugins/colors.js")> &
   InjectionType<typeof import("../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/plugins/warn.dev.server.js")> &
   InjectionType<typeof import("../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/app/plugins/check-if-layout-used.js")> &
-  InjectionType<typeof import("../../plugins/speed-insights.client")> &
   InjectionType<typeof import("../../node_modules/.pnpm/nuxt@4.4.5_@babel+core@7.29.0_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@parc_9cfbc89e754cb3a9d8a5de32444e3f9b/node_modules/nuxt/dist/pages/runtime/plugins/prerender.server.js")> &
   InjectionType<typeof import("../../node_modules/.pnpm/nuxt-seo-utils@8.1.11_@nuxt+schema@4.4.5_esbuild@0.28.0_lightningcss@1.32.0_magicast@0._a26f4e0b054d2c9e3979e0c3686c200b/node_modules/nuxt-seo-utils/dist/runtime/app/plugins/1.absoluteImageUrls.server.js")> &
   InjectionType<typeof import("../../node_modules/.pnpm/nuxt-seo-utils@8.1.11_@nuxt+schema@4.4.5_esbuild@0.28.0_lightningcss@1.32.0_magicast@0._a26f4e0b054d2c9e3979e0c3686c200b/node_modules/nuxt-seo-utils/dist/runtime/app/plugins/0.routeRules.js")> &

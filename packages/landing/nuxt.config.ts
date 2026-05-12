@@ -1,9 +1,13 @@
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   ssr: true,
   devtools: { enabled: true },
 
-  plugins: ['~/plugins/speed-insights.client.ts'],
+  vite: {
+    plugins: [tailwindcss()],
+  },
 
   // @nuxt/ui must be first — it registers the Tailwind v4 Vite plugin internally
   modules: [
@@ -12,6 +16,8 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxtjs/seo',
     '@vueuse/nuxt',
+    '@vercel/analytics/nuxt',
+    '@vercel/speed-insights/nuxt',
   ],
 
   css: ['~/assets/css/main.css'],

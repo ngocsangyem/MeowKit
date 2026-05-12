@@ -13,6 +13,8 @@ declare module "#build/root-component.mjs";
 declare module "#build/plugins.server.mjs";
 declare module "#build/test-component-wrapper.mjs";
 declare module "#build/image-options.mjs";
+declare module "#build/vercel-analytics.client.ts";
+declare module "#build/vercel-speed-insights.client.ts";
 declare module "#build/devtools/settings.mjs";
 declare module "#build/runtime.vue-devtools-client.O7wWr0o8FQ41lHiCy_ir6A6EYlgFX2ku8TILwbIYB_Q.js";
 declare module "#build/routes.mjs";

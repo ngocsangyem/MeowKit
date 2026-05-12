@@ -36,8 +36,7 @@ import { captureRawStackTrace, parseRawStackTrace } from 'file:///Users/sangnguy
 import _wH6JrtIxmaSoA8lCPWFnE9z4lQeXW6H5z3l5aymEQw from 'file:///Users/sangnguyen/Desktop/claude-tool/meowkit/packages/landing/node_modules/.pnpm/@nuxt+vite-builder@4.4.5_@babel+plugin-syntax-jsx@7.28.6_@babel+core@7.29.0__@types+nod_76c4fd909faaa9a80f3d34e8a8959a85/node_modules/@nuxt/vite-builder/dist/fix-stacktrace.mjs';
 import fs, { promises } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname as dirname$1, resolve as resolve$2 } from 'file:///Users/sangnguyen/Desktop/claude-tool/meowkit/node_modules/pathe/dist/index.mjs';
-import { basename, resolve as resolve$3, isAbsolute } from 'file:///Users/sangnguyen/Desktop/claude-tool/meowkit/packages/landing/node_modules/.pnpm/pathe@2.0.3/node_modules/pathe/dist/index.mjs';
+import { dirname as dirname$1, resolve as resolve$2, basename, isAbsolute } from 'file:///Users/sangnguyen/Desktop/claude-tool/meowkit/packages/landing/node_modules/.pnpm/pathe@2.0.3/node_modules/pathe/dist/index.mjs';
 import { getIcons } from 'file:///Users/sangnguyen/Desktop/claude-tool/meowkit/packages/landing/node_modules/.pnpm/@iconify+utils@3.1.3/node_modules/@iconify/utils/lib/index.js';
 import { collections } from 'file:///Users/sangnguyen/Desktop/claude-tool/meowkit/packages/landing/.nuxt/nuxt-icon-server-bundle.mjs';
 import { createFilter } from 'file:///Users/sangnguyen/Desktop/claude-tool/meowkit/packages/landing/node_modules/.pnpm/nuxtseo-shared@5.1.3_468a7c970e76c86f98842a06ddba8a2a/node_modules/nuxtseo-shared/dist/utils.mjs';
@@ -1114,126 +1113,6 @@ const _inlineRuntimeConfig = {
             }
           ],
           "_normalized": true
-        },
-        {
-          "comment": [],
-          "disallow": [],
-          "allow": [
-            "/"
-          ],
-          "userAgent": [
-            "*"
-          ],
-          "contentUsage": [],
-          "contentSignal": [],
-          "_indexable": true,
-          "_rules": [
-            {
-              "pattern": "/",
-              "allow": true
-            }
-          ],
-          "_normalized": true
-        },
-        {
-          "comment": [],
-          "disallow": [],
-          "allow": [
-            "/"
-          ],
-          "userAgent": [
-            "*"
-          ],
-          "contentUsage": [],
-          "contentSignal": [],
-          "_indexable": true,
-          "_rules": [
-            {
-              "pattern": "/",
-              "allow": true
-            }
-          ],
-          "_normalized": true
-        },
-        {
-          "comment": [],
-          "disallow": [],
-          "allow": [
-            "/"
-          ],
-          "userAgent": [
-            "*"
-          ],
-          "contentUsage": [],
-          "contentSignal": [],
-          "_indexable": true,
-          "_rules": [
-            {
-              "pattern": "/",
-              "allow": true
-            }
-          ],
-          "_normalized": true
-        },
-        {
-          "comment": [],
-          "disallow": [],
-          "allow": [
-            "/"
-          ],
-          "userAgent": [
-            "*"
-          ],
-          "contentUsage": [],
-          "contentSignal": [],
-          "_indexable": true,
-          "_rules": [
-            {
-              "pattern": "/",
-              "allow": true
-            }
-          ],
-          "_normalized": true
-        },
-        {
-          "comment": [],
-          "disallow": [],
-          "allow": [
-            "/"
-          ],
-          "userAgent": [
-            "*"
-          ],
-          "contentUsage": [],
-          "contentSignal": [],
-          "_indexable": true,
-          "_rules": [
-            {
-              "pattern": "/",
-              "allow": true
-            }
-          ],
-          "_normalized": true
-        },
-        {
-          "comment": [],
-          "disallow": [],
-          "allow": [
-            "/"
-          ],
-          "userAgent": [
-            "*"
-          ],
-          "contentUsage": [],
-          "contentSignal": [],
-          "_indexable": true,
-          "_rules": [
-            {
-              "pattern": "/",
-              "allow": true
-            }
-          ],
-          "_normalized": true
         }
       ],
       "sitemap": [
@@ -1307,126 +1186,6 @@ const _inlineRuntimeConfig = {
     "debug": false,
     "credits": true,
     "groups": [
-      {
-        "comment": [],
-        "disallow": [],
-        "allow": [
-          "/"
-        ],
-        "userAgent": [
-          "*"
-        ],
-        "contentUsage": [],
-        "contentSignal": [],
-        "_indexable": true,
-        "_rules": [
-          {
-            "pattern": "/",
-            "allow": true
-          }
-        ],
-        "_normalized": true
-      },
-      {
-        "comment": [],
-        "disallow": [],
-        "allow": [
-          "/"
-        ],
-        "userAgent": [
-          "*"
-        ],
-        "contentUsage": [],
-        "contentSignal": [],
-        "_indexable": true,
-        "_rules": [
-          {
-            "pattern": "/",
-            "allow": true
-          }
-        ],
-        "_normalized": true
-      },
-      {
-        "comment": [],
-        "disallow": [],
-        "allow": [
-          "/"
-        ],
-        "userAgent": [
-          "*"
-        ],
-        "contentUsage": [],
-        "contentSignal": [],
-        "_indexable": true,
-        "_rules": [
-          {
-            "pattern": "/",
-            "allow": true
-          }
-        ],
-        "_normalized": true
-      },
-      {
-        "comment": [],
-        "disallow": [],
-        "allow": [
-          "/"
-        ],
-        "userAgent": [
-          "*"
-        ],
-        "contentUsage": [],
-        "contentSignal": [],
-        "_indexable": true,
-        "_rules": [
-          {
-            "pattern": "/",
-            "allow": true
-          }
-        ],
-        "_normalized": true
-      },
-      {
-        "comment": [],
-        "disallow": [],
-        "allow": [
-          "/"
-        ],
-        "userAgent": [
-          "*"
-        ],
-        "contentUsage": [],
-        "contentSignal": [],
-        "_indexable": true,
-        "_rules": [
-          {
-            "pattern": "/",
-            "allow": true
-          }
-        ],
-        "_normalized": true
-      },
-      {
-        "comment": [],
-        "disallow": [],
-        "allow": [
-          "/"
-        ],
-        "userAgent": [
-          "*"
-        ],
-        "contentUsage": [],
-        "contentSignal": [],
-        "_indexable": true,
-        "_rules": [
-          {
-            "pattern": "/",
-            "allow": true
-          }
-        ],
-        "_normalized": true
-      },
       {
         "comment": [],
         "disallow": [],
@@ -3906,22 +3665,7 @@ _AY2aCEjlzFG8a3ItdBJ5MvRzmDQqvadA_DStptbr0,
 _wH6JrtIxmaSoA8lCPWFnE9z4lQeXW6H5z3l5aymEQw
 ];
 
-const assets = {
-  "/index.mjs": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": "\"47b47-4j11Eie3b41svv/YuxMZPPj0iDw\"",
-    "mtime": "2026-05-12T05:06:29.916Z",
-    "size": 293703,
-    "path": "index.mjs"
-  },
-  "/index.mjs.map": {
-    "type": "application/json",
-    "etag": "\"1209e0-7Y6dLOipHmgjqzZMb3TaKQyHXq4\"",
-    "mtime": "2026-05-12T05:06:29.917Z",
-    "size": 1182176,
-    "path": "index.mjs.map"
-  }
-};
+const assets = {};
 
 function readAsset (id) {
   const serverDir = dirname$1(fileURLToPath(globalThis._importMeta_.url));
@@ -5701,7 +5445,7 @@ async function resolveSitemapSources(sources, event) {
   )).flat();
 }
 
-const staticConfig = {"isI18nMapped":false,"sitemapName":"sitemap.xml","isMultiSitemap":false,"excludeAppSources":[],"cacheMaxAgeSeconds":0,"autoLastmod":false,"defaultSitemapsChunkSize":1000,"minify":false,"sortEntries":true,"discoverImages":true,"discoverVideos":true,"sitemapsPathPrefix":"/__sitemap__/","isNuxtContentDocumentDriven":false,"xsl":"/__sitemap__/style.xsl","xslTips":true,"xslColumns":[{"label":"URL","width":"50%"},{"label":"Images","width":"25%","select":"count(image:image)"},{"label":"Last Updated","width":"25%","select":"concat(substring(sitemap:lastmod,0,11),concat(' ', substring(sitemap:lastmod,12,5)),concat(' ', substring(sitemap:lastmod,20,6)))"}],"credits":true,"version":"8.0.15","sitemaps":{"sitemap.xml":{"sitemapName":"sitemap.xml","route":"sitemap.xml","defaults":{},"include":[],"exclude":["/_**","/_nuxt/**","/_nuxt/**","/_nuxt/**","/_nuxt/**","/_nuxt/**","/_nuxt/**","/_nuxt/**"],"includeAppSources":true}}};
+const staticConfig = {"isI18nMapped":false,"sitemapName":"sitemap.xml","isMultiSitemap":false,"excludeAppSources":[],"cacheMaxAgeSeconds":0,"autoLastmod":false,"defaultSitemapsChunkSize":1000,"minify":false,"sortEntries":true,"discoverImages":true,"discoverVideos":true,"sitemapsPathPrefix":"/__sitemap__/","isNuxtContentDocumentDriven":false,"xsl":"/__sitemap__/style.xsl","xslTips":true,"xslColumns":[{"label":"URL","width":"50%"},{"label":"Images","width":"25%","select":"count(image:image)"},{"label":"Last Updated","width":"25%","select":"concat(substring(sitemap:lastmod,0,11),concat(' ', substring(sitemap:lastmod,12,5)),concat(' ', substring(sitemap:lastmod,20,6)))"}],"credits":true,"version":"8.0.15","sitemaps":{"sitemap.xml":{"sitemapName":"sitemap.xml","route":"sitemap.xml","defaults":{},"include":[],"exclude":["/_**","/_nuxt/**"],"includeAppSources":true}}};
 
 function xmlEscape(str) {
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
@@ -7523,7 +7267,7 @@ const _VJf7ws = defineEventHandler(async (e) => {
         skipInspections: runtimeConfig.skipInspections
       });
       const filePaths = [
-        resolve$3(runtimeConfig.rootDir, links.find((l) => l.file && l.link === path)?.file || ""),
+        resolve$2(runtimeConfig.rootDir, links.find((l) => l.file && l.link === path)?.file || ""),
         ...paths.map((p) => {
           const [filepath] = p.split(":");
           return filepath;
