@@ -1,0 +1,256 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* ─── Design tokens (Tailwind v4 @theme) ──────────────────────────────── */
+@theme inline {
+  --color-brand:          #007BFF;
+  --color-brand-hover:    #3399FF;
+  --color-brand-dark:     #85C2FF;
+  --color-magic-glow:     #66CCFF;
+  --color-magic-soft:     #99DDFF;
+  --color-dark-bg:        #05070A;
+  --color-dark-secondary: #0A1F44;
+  --color-dark-surface:   #111418;
+  --color-foreground:     #F8FAFC;
+  --color-muted:          #94A3B8;
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "Fira Code", "Geist Mono", monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-glow: 0 0 20px rgba(102, 204, 255, 0.35);
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── CSS custom properties for runtime use ──────────────────────────── */
+:root {
+  --color-bg:           #05070A;
+  --color-bg-secondary: #0A1F44;
+  --color-surface:      #111418;
+  --color-surface-alpha: rgba(17, 20, 24, 0.9);
+  --color-border:       rgba(255, 255, 255, 0.05);
+  --color-brand:        #007BFF;
+  --color-magic-glow:   #66CCFF;
+  --gradient-primary:   linear-gradient(135deg, #007BFF 0%, #66CCFF 100%);
+}
+
+/* ─── Base ────────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    color-scheme: dark;
+    background-color: var(--color-bg);
+    color: #F8FAFC;
+    font-family: "Inter", system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: rgba(102, 204, 255, 0.2);
+    color: #F8FAFC;
+  }
+
+  *:focus-visible {
+    outline: 2px solid rgba(102, 204, 255, 0.6);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* ─── Components ──────────────────────────────────────────────────────── */
+@layer components {
+  .glass {
+    background: var(--color-bg-secondary);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--color-border);
+  }
+
+  .glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    color: white;
+    background: var(--gradient-primary);
+    min-height: 44px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    color: #F8FAFC;
+    border: 1px solid var(--color-border);
+    min-height: 44px;
+    transition: border-color 0.2s ease, color 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
+    background: transparent;
+  }
+  .btn-outline:hover {
+    border-color: rgba(102, 204, 255, 0.4);
+    color: #66CCFF;
+  }
+
+  .code-block {
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    font-family: "Fira Code", "Geist Mono", monospace;
+    overflow-x: auto;
+  }
+
+  .section-padding {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .section-padding {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-padding {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  .container-landing {
+    max-width: 72rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* ─── Scroll reveal ───────────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.stagger-children.visible > * {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─── Hero animations ─────────────────────────────────────────────────── */
+/* CSS animation so hero content is visible immediately (SSR-safe, no JS required) */
+.hero-content {
+  animation: hero-enter 0.9s ease 0.05s both;
+}
+
+@keyframes hero-enter {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.logo-hero-wrap {
+  position: relative;
+  display: inline-block;
+}
+.logo-glow-aura {
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle, rgba(102, 204, 255, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse-glow 3s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.1); }
+}
+
+/* ─── Scroll indicator ────────────────────────────────────────────────── */
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(6px); }
+}
+.animate-bounce-slow {
+  animation: bounce-slow 1.8s ease-in-out infinite;
+}
+
+/* ─── Sparkle ─────────────────────────────────────────────────────────── */
+@keyframes sparkle {
+  0%   { transform: scale(1) rotate(0deg); }
+  40%  { transform: scale(1.6) rotate(20deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.animate-sparkle { animation: sparkle 0.5s ease; }
+
+/* ─── Mobile nav slide ────────────────────────────────────────────────── */
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  overflow: hidden;
+}
+.slide-down-enter-from,
+.slide-down-leave-to  { max-height: 0;    opacity: 0; }
+.slide-down-enter-to,
+.slide-down-leave-from { max-height: 400px; opacity: 1; }
+
+/* ─── Typing animation ────────────────────────────────────────────────── */
+@keyframes typing { from { width: 0; } }
+@keyframes blink  { 50% { border-color: transparent; } }
+
+/* ─── Reduced motion ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

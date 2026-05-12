@@ -1,0 +1,29 @@
+{
+  "name": "@meowkit/landing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt generate",
+    "preview": "nuxt preview",
+    "typecheck": "nuxt typecheck",
+    "prepare": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/fonts": "latest",
+    "@nuxt/image": "latest",
+    "@nuxt/ui": "^4.7.1",
+    "@nuxtjs/seo": "latest",
+    "@vueuse/nuxt": "latest",
+    "nuxt": "latest",
+    "vue": "latest",
+    "vue-router": "latest"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "vue-tsc": "latest"
+  }
+}

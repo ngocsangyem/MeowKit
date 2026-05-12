@@ -1,0 +1,8 @@
+# START nuxt-robots (indexable)
+User-agent: *
+Allow: /
+Allow: Googlebot
+Allow: Bingbot
+
+Sitemap: https://meowkit.dev/sitemap.xml
+# END nuxt-robots
