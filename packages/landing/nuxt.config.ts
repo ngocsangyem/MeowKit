@@ -35,7 +35,6 @@ export default defineNuxtConfig({
 
   robots: {
     sitemap: '/sitemap.xml',
-    allow: ['Googlebot', 'Bingbot'],
   },
 
   sitemap: {

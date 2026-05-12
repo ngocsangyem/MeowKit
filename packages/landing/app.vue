@@ -1,6 +1,17 @@
 <script setup lang="ts">
 useHead({
   htmlAttrs: { lang: 'en' },
+  meta: [
+    { name: 'theme-color', content: '#05070A' },
+  ],
+  link: [
+    // SVG preferred by modern browsers; raster as legacy fallback
+    { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+    { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+    { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' },
+    { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16.png' },
+    { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+  ],
 })
 </script>
 

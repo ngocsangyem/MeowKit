@@ -10,6 +10,8 @@
 </p>
 
 <p align="center">
+  <a href="https://meowkit.dev"><img src="https://img.shields.io/badge/website-meowkit.dev-66CCFF?style=flat" alt="Website" /></a>
+  <a href="https://docs.meowkit.dev/"><img src="https://img.shields.io/badge/docs-docs.meowkit.dev-85C2FF?style=flat" alt="Docs" /></a>
   <a href="https://www.npmjs.com/package/mewkit"><img src="https://img.shields.io/npm/v/mewkit" alt="npm version" /></a>
   <a href="https://github.com/ngocsangyem/MeowKit/releases"><img src="https://img.shields.io/github/v/release/ngocsangyem/MeowKit" alt="GitHub release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License" /></a>
@@ -21,7 +23,7 @@
 
 MeowKit installs a `.claude/` directory that Claude Code reads at session start. It enforces a structured 7-phase workflow with hard gates, TDD, security scanning, and scoped topic-file memory (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`). Zero external dependencies for core workflow.
 
-**Documentation:** [docs.meowkit.dev](https://docs.meowkit.dev/) (VitePress)
+**Homepage:** [meowkit.dev](https://meowkit.dev) &nbsp;·&nbsp; **Docs:** [docs.meowkit.dev](https://docs.meowkit.dev/)
 
 ## Quick Start
 
@@ -79,7 +81,8 @@ meowkit/
 │   └── settings.json
 ├── tasks/                    Task templates
 ├── packages/
-│   └── mewkit/               CLI (npm as mewkit)
+│   ├── mewkit/               CLI (npm as mewkit)
+│   └── landing/              Landing page (meowkit.dev, Nuxt + Tailwind v4)
 ├── scripts/                  Release automation
 ├── website/                  VitePress documentation
 ├── CLAUDE.md                 Entry point for Claude Code

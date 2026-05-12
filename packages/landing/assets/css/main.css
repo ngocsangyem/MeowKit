@@ -200,18 +200,10 @@
   position: relative;
   display: inline-block;
 }
-.logo-glow-aura {
-  position: absolute;
-  inset: -20px;
-  background: radial-gradient(circle, rgba(102, 204, 255, 0.12) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: pulse-glow 3s ease-in-out infinite;
-  will-change: opacity, transform;
-}
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50%       { opacity: 1;   transform: scale(1.1); }
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(1.1); }
 }
 
 /* ─── Scroll indicator ────────────────────────────────────────────────── */

@@ -7,10 +7,10 @@
       </div>
 
       <nav class="footer__nav" aria-label="Footer navigation">
-        <a href="https://meowkit.dev/docs" class="footer__link" target="_blank" rel="noopener noreferrer">Docs</a>
-        <a href="https://github.com/meowkit" class="footer__link" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://www.npmjs.com/package/meowkit" class="footer__link" target="_blank" rel="noopener noreferrer">npm</a>
-        <a href="https://meowkit.dev/changelog" class="footer__link" target="_blank" rel="noopener noreferrer">Changelog</a>
+        <a href="https://docs.meowkit.dev/" class="footer__link" target="_blank" rel="noopener noreferrer">Docs</a>
+        <a href="https://github.com/ngocsangyem/MeowKit" class="footer__link" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.npmjs.com/package/mewkit" class="footer__link" target="_blank" rel="noopener noreferrer">npm</a>
+        <a href="https://docs.meowkit.dev/changelog" class="footer__link" target="_blank" rel="noopener noreferrer">Changelog</a>
       </nav>
 
       <p class="footer__license">MIT License &bull; Open Source</p>

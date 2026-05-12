@@ -51,13 +51,13 @@ onUnmounted(() => observer?.disconnect())
           </UButton>
           <div class="cta__links">
             <a
-              href="https://meowkit.dev/docs"
+              href="https://docs.meowkit.dev/"
               class="cta__link"
               target="_blank"
               rel="noopener noreferrer"
             >Documentation ↗</a>
             <a
-              href="https://github.com/meowkit"
+              href="https://github.com/ngocsangyem/MeowKit"
               class="cta__link"
               target="_blank"
               rel="noopener noreferrer"

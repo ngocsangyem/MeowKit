@@ -12,7 +12,6 @@
     <div class="hero-content container-landing hero__content">
       <!-- Logo with aura -->
       <div class="logo-hero-wrap" aria-hidden="true">
-        <div class="logo-glow-aura" />
         <img
           src="~/assets/branding/meow-logo-animated.svg"
           alt=""

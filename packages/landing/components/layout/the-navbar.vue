@@ -11,7 +11,7 @@ const navLinks = [
   { label: 'Features', href: '#features' },
   { label: 'How It Works', href: '#how-it-works' },
   { label: 'Install', href: '#install' },
-  { label: 'Docs', href: 'https://meowkit.dev/docs', external: true },
+  { label: 'Docs', href: 'https://docs.meowkit.dev/', external: true },
 ]
 
 function toggleMobile() {
@@ -76,7 +76,7 @@ function handleNavClick(event: MouseEvent, href: string, external?: boolean) {
       <!-- Desktop CTA -->
       <UButton
         as="a"
-        href="https://github.com/meowkit"
+        href="https://github.com/ngocsangyem/MeowKit"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="View MeowKit on GitHub"
@@ -120,7 +120,7 @@ function handleNavClick(event: MouseEvent, href: string, external?: boolean) {
           </li>
         </ul>
         <a
-          href="https://github.com/meowkit"
+          href="https://github.com/ngocsangyem/MeowKit"
           class="btn-primary w-full justify-center mt-3"
           target="_blank"
           rel="noopener noreferrer"

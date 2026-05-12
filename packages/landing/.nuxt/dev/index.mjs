@@ -1099,9 +1099,7 @@ const _inlineRuntimeConfig = {
           "comment": [],
           "disallow": [],
           "allow": [
-            "/",
-            "Googlebot",
-            "Bingbot"
+            "/"
           ],
           "userAgent": [
             "*"
@@ -1112,14 +1110,6 @@ const _inlineRuntimeConfig = {
           "_rules": [
             {
               "pattern": "/",
-              "allow": true
-            },
-            {
-              "pattern": "Googlebot",
-              "allow": true
-            },
-            {
-              "pattern": "Bingbot",
               "allow": true
             }
           ],
@@ -1161,7 +1151,14 @@ const _inlineRuntimeConfig = {
     "version": "6.0.4"
   },
   "seo-utils-head": {
-    "link": [],
+    "link": [
+      {
+        "rel": "apple-touch-icon",
+        "href": "/apple-touch-icon.png",
+        "type": "image/png",
+        "sizes": "180x180"
+      }
+    ],
     "meta": []
   },
   "nuxt-site-config": {
@@ -1194,9 +1191,7 @@ const _inlineRuntimeConfig = {
         "comment": [],
         "disallow": [],
         "allow": [
-          "/",
-          "Googlebot",
-          "Bingbot"
+          "/"
         ],
         "userAgent": [
           "*"
@@ -1207,14 +1202,6 @@ const _inlineRuntimeConfig = {
         "_rules": [
           {
             "pattern": "/",
-            "allow": true
-          },
-          {
-            "pattern": "Googlebot",
-            "allow": true
-          },
-          {
-            "pattern": "Bingbot",
             "allow": true
           }
         ],
@@ -3559,7 +3546,7 @@ const _24QyEIeC4w66g4LFn4LqlvddrtRogOqZMiNQ3WzbNMI = defineNitroPlugin(async (ni
 
 const rootDir = "/Users/sangnguyen/Desktop/claude-tool/meowkit/packages/landing";
 
-const appHead = {"link":[],"meta":[{"name":"viewport","content":"width=device-width, initial-scale=1"},{"charset":"utf-8"},{"property":"og:type","content":"website"}],"style":[],"script":[],"noscript":[],"htmlAttrs":{}};
+const appHead = {"link":[{"rel":"apple-touch-icon","href":"/apple-touch-icon.png","type":"image/png","sizes":"180x180"}],"meta":[{"name":"viewport","content":"width=device-width, initial-scale=1"},{"charset":"utf-8"},{"property":"og:type","content":"website"}],"style":[],"script":[],"noscript":[],"htmlAttrs":{}};
 
 const appRootTag = "div";
 
