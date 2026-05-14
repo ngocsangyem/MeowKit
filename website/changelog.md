@@ -14,6 +14,17 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.5 (2026-05-14) — mk:worktree script backing and new commands
+
+### Improvements
+
+- `mk:worktree` is now backed by a Node.js CLI (`scripts/worktree.cjs` + `scripts/lib/worktree-git-helpers.cjs`). All 6 commands emit structured JSON (`--json`) and support `--dry-run` for safe previewing.
+- New `status` command: health audit of all active worktrees showing ahead/behind divergence and dirty state for each.
+- New `prune` command: removes stale `.git/worktrees/` metadata left by manually-deleted worktrees; always dry-run first.
+- New `--orchestrated` flag on `create`: places the worktree at `.worktrees/{agent-name}` on a `parallel/{agent-name}-{timestamp}` branch per `parallel-execution-rules.md` Rule 3.
+- New `references/commands.md`: full option tables, JSON field docs, and error code reference for all 6 commands.
+- SKILL.md updated to document all 6 actions with script invocations, a `## Gotchas` section, and compliance with `skill-authoring-rules.md`.
+
 ## 2.9.4 (2026-05-11) — Agent rules and TOON agent docs
 
 ### Improvements

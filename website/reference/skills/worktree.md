@@ -1,13 +1,15 @@
 ---
 title: "mk:worktree"
-description: "Git worktree management for parallel agent execution. Creates isolated worktrees for parallel agents, merges results, and cleans up."
+description: "Git worktree management for parallel agent execution. Creates isolated worktrees for parallel agents, merges results, audits health, prunes stale metadata, and cleans up."
 ---
 
 # mk:worktree
 
 ## What This Skill Does
 
-Worktree manages git worktrees to enable parallel agent execution. When the orchestrator decomposes a COMPLEX task into independent subtasks with zero file overlap, worktree creates an isolated worktree for each parallel agent, preventing file conflicts. After all agents complete, it merges results back to the feature branch, runs integration tests, and cleans up. It enforces safety constraints to prevent data loss.
+Worktree manages git worktrees to enable parallel agent execution. When the orchestrator decomposes a COMPLEX task into independent subtasks with zero file overlap, worktree creates an isolated worktree for each parallel agent, preventing file conflicts. After all agents complete, it merges results back to the feature branch, runs integration tests, and cleans up. It also audits worktree health (ahead/behind divergence, dirty state) and prunes stale metadata. It enforces safety constraints to prevent data loss.
+
+All actions are backed by `scripts/worktree.cjs` (Node.js). See `references/commands.md` for full option tables and JSON field docs.
 
 ## When to Use
 
@@ -22,27 +24,31 @@ Anti-triggers:
 
 ## Core Capabilities
 
-- **Isolated worktree creation** -- branches from current feature HEAD into `.worktrees/{agent-name}/` on a `parallel/{agent-name}-{timestamp}` branch
+- **Isolated worktree creation** -- orchestrated mode branches from current feature HEAD into `.worktrees/{agent-name}/` on a `parallel/{agent-name}-{timestamp}` branch (`--orchestrated` flag)
 - **No-fast-forward merge** -- merges completed worktree branches back to the feature branch with a merge commit
 - **Conflict detection** -- if merge conflicts occur, lists conflicting files, stops, and reports; never auto-resolves
 - **Integration test gate** -- after merge, runs the full test suite; if tests fail, the decomposition was wrong
 - **Cleanup** -- removes worktree directories and deletes parallel branches after successful merge
-- **Status listing** -- `list` shows all active worktrees and their branches
+- **Status audit** -- `status` reports all worktrees with ahead/behind divergence and dirty state
+- **List** -- `list` shows all active worktrees and their branches
+- **Prune** -- `prune` cleans stale `.git/worktrees/` metadata; supports `--dry-run`
 - **Safety enforcement** -- max 3 active worktrees, feature branches only, no force-delete with uncommitted changes
 
 ## Arguments
 
 | Action | Effect |
 |--------|--------|
-| `create [agent-name]` | Create isolated worktree from current HEAD on `parallel/{agent-name}-{timestamp}` |
+| `create [agent-name] --orchestrated` | Create parallel agent worktree at `.worktrees/{agent-name}` on `parallel/{agent-name}-{timestamp}` |
 | `merge [agent-name]` | No-fast-forward merge of worktree branch back to feature branch |
 | `cleanup [agent-name]` | Remove worktree directory and delete parallel branch (only after successful merge) |
 | `list` | Show all active worktrees with branch names |
+| `status` | Health audit of all worktrees: ahead/behind divergence, dirty state |
+| `prune [--dry-run]` | Remove stale worktree metadata from `.git/worktrees/`; always dry-run first |
 
 ## Workflow
 
 1. **Orchestrator decomposes** -- COMPLEX task split into independent subtasks with zero file overlap
-2. **Create worktrees** -- one per parallel agent: `git worktree add .worktrees/{name} -b parallel/{name}-{timestamp}`
+2. **Create worktrees** -- one per parallel agent using `--orchestrated` flag
 3. **Agents work in isolation** -- each agent edits only files in its worktree; no cross-worktree access
 4. **Merge results** -- after all parallel agents complete, merge worktree branches to the feature branch
 5. **Integration test** -- run full test suite on the merged result; if it fails, the decomposition was wrong
@@ -51,44 +57,171 @@ Anti-triggers:
 ## Usage
 
 ```bash
+# Pre-flight info check
+node .claude/skills/worktree/scripts/worktree.cjs info --json
+
 # Orchestrator creates worktrees for parallel agents
-mk:worktree create agent-auth
-mk:worktree create agent-db
-mk:worktree create agent-api
+node .claude/skills/worktree/scripts/worktree.cjs create agent-auth --orchestrated --json
+node .claude/skills/worktree/scripts/worktree.cjs create agent-db --orchestrated --json
+node .claude/skills/worktree/scripts/worktree.cjs create agent-api --orchestrated --json
 
 # ...agents work independently in their worktrees...
 
 # Orchestrator merges results
-mk:worktree merge agent-auth
-mk:worktree merge agent-db
-mk:worktree merge agent-api
+git merge --no-ff parallel/agent-auth-{ts} -m "merge: parallel/agent-auth into feature-branch"
+git merge --no-ff parallel/agent-db-{ts} -m "merge: parallel/agent-db into feature-branch"
+git merge --no-ff parallel/agent-api-{ts} -m "merge: parallel/agent-api into feature-branch"
 
-# Verify and cleanup
-mk:worktree list
-mk:worktree cleanup agent-auth
-mk:worktree cleanup agent-db
-mk:worktree cleanup agent-api
+# Health audit during parallel run
+node .claude/skills/worktree/scripts/worktree.cjs status --json
+
+# List all worktrees
+node .claude/skills/worktree/scripts/worktree.cjs list --json
+
+# Cleanup after merge
+node .claude/skills/worktree/scripts/worktree.cjs remove agent-auth --json
+node .claude/skills/worktree/scripts/worktree.cjs remove agent-db --json
+node .claude/skills/worktree/scripts/worktree.cjs remove agent-api --json
+
+# Prune stale metadata (always dry-run first)
+node .claude/skills/worktree/scripts/worktree.cjs prune --dry-run --json
+node .claude/skills/worktree/scripts/worktree.cjs prune --json
 ```
 
-## Example Prompt
+## Example Prompts
 
+mk:worktree is orchestrator-internal — users do not invoke it directly. The examples below show the prompts the orchestrator emits, and the commands each scenario maps to.
+
+---
+
+### Use Case 1 — Human on feature branch, agent on parallel branch (no overlap)
+
+**Scenario:** Human is on `feat/user-profile` editing `src/profile/`. Orchestrator assigns an agent to refactor `src/api/users/` — a non-overlapping path.
+
+**Orchestrator prompt to mk:worktree:**
 ```
-This is handled by the orchestrator internally -- users do not invoke mk:worktree directly.
+Create a worktree for agent-api to work on src/api/users/ while the human stays on feat/user-profile.
 ```
+
+**Commands:**
+```bash
+# Pre-flight
+node .claude/skills/worktree/scripts/worktree.cjs info --json
+
+# Create isolated worktree for the agent
+node .claude/skills/worktree/scripts/worktree.cjs create agent-api --orchestrated --json
+# → worktree at .worktrees/agent-api on branch parallel/agent-api-{timestamp}
+
+# Agent works in .worktrees/agent-api/src/api/users/ only
+# Human continues on feat/user-profile without conflict
+
+# After agent completes, merge back from the feature branch
+git merge --no-ff parallel/agent-api-{ts} -m "merge: parallel/agent-api into feat/user-profile"
+
+# Cleanup
+node .claude/skills/worktree/scripts/worktree.cjs remove agent-api --json
+```
+
+---
+
+### Use Case 2 — Three independent modules in parallel (COMPLEX task decomposition)
+
+**Scenario:** A COMPLEX task has three non-overlapping subtasks: database migrations (`src/db/`), REST API endpoints (`src/api/`), and React components (`src/components/`). Orchestrator spawns three agents simultaneously.
+
+**Orchestrator prompt to mk:worktree:**
+```
+Decompose into three parallel agents: agent-db owns src/db/, agent-api owns src/api/, agent-ui owns src/components/.
+Zero file overlap confirmed. Create worktrees.
+```
+
+**Commands:**
+```bash
+# Create all three worktrees
+node .claude/skills/worktree/scripts/worktree.cjs create agent-db  --orchestrated --json
+node .claude/skills/worktree/scripts/worktree.cjs create agent-api --orchestrated --json
+node .claude/skills/worktree/scripts/worktree.cjs create agent-ui  --orchestrated --json
+
+# ...agents work in parallel, each in their own .worktrees/{name}/ ...
+
+# Health check mid-run (catch divergence or dirty state early)
+node .claude/skills/worktree/scripts/worktree.cjs status --json
+
+# After all agents complete, merge in sequence
+git merge --no-ff parallel/agent-db-{ts}  -m "merge: parallel/agent-db into feature"
+git merge --no-ff parallel/agent-api-{ts} -m "merge: parallel/agent-api into feature"
+git merge --no-ff parallel/agent-ui-{ts}  -m "merge: parallel/agent-ui into feature"
+
+# Integration test on merged result — if it fails, decomposition had hidden deps
+npm test
+
+# Cleanup
+node .claude/skills/worktree/scripts/worktree.cjs remove agent-db  --json
+node .claude/skills/worktree/scripts/worktree.cjs remove agent-api --json
+node .claude/skills/worktree/scripts/worktree.cjs remove agent-ui  --json
+```
+
+---
+
+### Use Case 3 — Mid-run health audit
+
+**Scenario:** Orchestrator checks whether any parallel agent has uncommitted changes or fallen behind the base branch after a long-running subtask.
+
+**Orchestrator prompt to mk:worktree:**
+```
+Audit all active worktrees. Report which agents have dirty state or are behind the base branch.
+```
+
+**Commands:**
+```bash
+node .claude/skills/worktree/scripts/worktree.cjs status --json
+# → JSON with { ahead, behind, dirtyState, dirtyDetails } per worktree
+# If any agent shows behind > 0, rebase that worktree before merging
+```
+
+---
+
+### Use Case 4 — Recovery after aborted parallel run
+
+**Scenario:** A session was interrupted mid-parallel-run. Leftover worktrees still exist. Before restarting, the orchestrator lists and removes them.
+
+**Orchestrator prompt to mk:worktree:**
+```
+List all active worktrees. Remove any orphaned parallel worktrees from the aborted run. Prune stale git metadata.
+```
+
+**Commands:**
+```bash
+# Discover state
+node .claude/skills/worktree/scripts/worktree.cjs list --json
+
+# Remove each orphaned worktree (commit or stash first if dirty)
+node .claude/skills/worktree/scripts/worktree.cjs remove agent-auth --dry-run --json  # preview
+node .claude/skills/worktree/scripts/worktree.cjs remove agent-auth --json
+
+# Clean up stale .git/worktrees/ metadata
+node .claude/skills/worktree/scripts/worktree.cjs prune --dry-run --json  # preview
+node .claude/skills/worktree/scripts/worktree.cjs prune --json
+```
+
+---
 
 ## Common Use Cases
 
 - Parallelizing a COMPLEX `mk:cook` task across 3 agents working on independent modules
 - Running multiple code generation subtasks simultaneously without file conflicts
 - Isolating experimental work from the main feature branch during exploration
+- Auditing worktree health mid-run to catch agents that have fallen behind the base branch
 
 ## Pro Tips
 
-- **Branch name collisions are prevented by timestamps.** The `{timestamp}` suffix ensures uniqueness.
+- **Branch name collisions are prevented by timestamps.** The `{timestamp}` suffix in `parallel/{name}-{timestamp}` ensures uniqueness.
 - **Never create worktrees on `main` or `master`.** Only feature branches. The skill enforces this.
 - **Worktrees share the same `.git`.** Force-pushing from a worktree affects the main checkout -- be careful.
-- **macOS path quoting matters.** Worktree paths with `:` in names (derived from skill names like `mk:review`) need quoting in shell commands.
+- **macOS path quoting matters.** Worktree paths with `:` in names need quoting in shell commands.
 - **Integration test is mandatory.** If the test suite fails after merge, the parallel decomposition was wrong -- the subtasks had hidden dependencies.
 - **Uncommitted changes block cleanup.** `git worktree remove` fails if there are uncommitted changes. Commit or stash first.
+- **Always dry-run prune first.** `prune --dry-run` shows what will be removed without changing state.
+- **`.worktrees/` must be gitignored.** Add to `.gitignore` before the first parallel run.
 
 > **Canonical source:** `.claude/skills/worktree/SKILL.md`
+> **Script reference:** `.claude/skills/worktree/references/commands.md`

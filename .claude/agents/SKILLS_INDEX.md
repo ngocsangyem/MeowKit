@@ -20,7 +20,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 `mk:workflow-orchestrator`|orchestrator|cross-cutting|monolithic
 `mk:memory`|analyst|memory|monolithic
 `mk:skill-creator`|orchestrator|utility|monolithic
-`mk:worktree`|orchestrator|utility|monolithic
+`mk:worktree`|orchestrator|utility|script-backed (v2.9.5: Node.js CLI `scripts/worktree.cjs`; 6 commands: create/merge/cleanup/list/status/prune; `--orchestrated` flag for parallel agent isolation; `--json` + `--dry-run` on all commands)
 ```
 
 ### Phase 1 — Plan
