@@ -10,6 +10,9 @@ export default defineNuxtConfig({
     ],
   },
   devtools: { enabled: true },
+  app: {
+    buildAssetsDir: '/assets/',
+  },
 
   // @nuxt/ui must be first — it registers the Tailwind v4 Vite plugin internally
   modules: [
