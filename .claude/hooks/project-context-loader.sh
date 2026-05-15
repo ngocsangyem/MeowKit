@@ -41,10 +41,37 @@ if [ ! -f "$VENV_PYTHON" ]; then
   echo ""
 fi
 
+# Pre-injection size gate. Gates the `cat` call on bytes so oversized
+# project-context.md is truncated BEFORE injection — not warned about after.
+# MEOWKIT_MAX_PROJECT_CONTEXT_BYTES=0 disables the cap entirely.
+MEOWKIT_MAX_PROJECT_CONTEXT_BYTES="${MEOWKIT_MAX_PROJECT_CONTEXT_BYTES:-12288}"
+# Validate integer to prevent arithmetic injection.
+case "$MEOWKIT_MAX_PROJECT_CONTEXT_BYTES" in
+  ''|*[!0-9]*) MEOWKIT_MAX_PROJECT_CONTEXT_BYTES=12288 ;;
+esac
 if [ -f "$CONTEXT_FILE" ]; then
   echo "## Project Context (auto-loaded)"
   echo ""
-  cat "$CONTEXT_FILE"
+  if [ "${MEOWKIT_MAX_PROJECT_CONTEXT_BYTES}" -gt 0 ]; then
+    CTX_BYTES=$(wc -c < "$CONTEXT_FILE" 2>/dev/null | tr -d ' ')
+    CTX_BYTES="${CTX_BYTES:-0}"
+    DOUBLE_THRESHOLD=$(( MEOWKIT_MAX_PROJECT_CONTEXT_BYTES * 2 ))
+    if [ "$CTX_BYTES" -gt "$DOUBLE_THRESHOLD" ]; then
+      echo "## ⚠⚠ project-context.md is ${CTX_BYTES}B (>${DOUBLE_THRESHOLD}B). Truncating to ${MEOWKIT_MAX_PROJECT_CONTEXT_BYTES}B."
+      echo ""
+      head -c "$MEOWKIT_MAX_PROJECT_CONTEXT_BYTES" "$CONTEXT_FILE"
+      echo ""
+    elif [ "$CTX_BYTES" -gt "$MEOWKIT_MAX_PROJECT_CONTEXT_BYTES" ]; then
+      echo "## ⚠ project-context.md is ${CTX_BYTES}B (>${MEOWKIT_MAX_PROJECT_CONTEXT_BYTES}B). Consider trimming."
+      echo ""
+      head -c "$MEOWKIT_MAX_PROJECT_CONTEXT_BYTES" "$CONTEXT_FILE"
+      echo ""
+    else
+      cat "$CONTEXT_FILE"
+    fi
+  else
+    cat "$CONTEXT_FILE"  # cap disabled
+  fi
 else
   echo "## Project Context"
   echo ""
@@ -78,6 +105,11 @@ if [ -n "${HOOK_SESSION_ID:-}" ]; then
     # for every blocked-Stop cycle, which would otherwise wipe the counter mid-loop.
     echo '{}' > session-state/build-verify-cache.json 2>/dev/null || true
     rm -f session-state/conversation-summary.lock 2>/dev/null || true
+    # Truncate the safety/phase-zero sentinel log from prior sessions. The log
+    # is keyed by session_id, so leaving stale entries in place could falsely
+    # match if a session_id were ever recycled. Single-file overwrite (no
+    # per-session-ID glob).
+    : > session-state/session-sentinels.jsonl 2>/dev/null || true
     # CF1 fix: clear TDD sentinel + deprecation flag (written to .claude/session-state/)
     rm -f "${CLAUDE_PROJECT_DIR:-.}/.claude/session-state/tdd-mode" 2>/dev/null || true
     rm -f "${CLAUDE_PROJECT_DIR:-.}/.claude/session-state/tdd-deprecation-warned" 2>/dev/null || true
@@ -243,4 +275,27 @@ echo ""
 echo "## Agent Readiness: ${READY_SCORE}/${READY_MAX}"
 if [ -n "$READY_MISSING" ]; then
   echo "Missing:${READY_MISSING}"
+fi
+
+# Memory dir audit — report .md topic files exceeding 500 lines.
+# Display-only (no mutation); pairs with the auto-prune block in post-session.sh.
+MEM_DIR=".claude/memory"
+if [ -d "$MEM_DIR" ]; then
+  echo ""
+  echo "## Memory files"
+  BLOATED=""
+  for f in "$MEM_DIR"/*.md; do
+    [ -f "$f" ] || continue
+    LINES=$(wc -l < "$f" 2>/dev/null | tr -d ' ')
+    LINES="${LINES:-0}"
+    if [ "$LINES" -gt 500 ]; then
+      BLOATED="${BLOATED} $(basename "$f"):${LINES}lines"
+    fi
+  done
+  if [ -n "$BLOATED" ]; then
+    echo "⚠ Memory files >500 lines:${BLOATED}"
+    echo "  Run \`/mk:memory --prune\` to trim entries >90 days."
+  else
+    echo "OK (all memory topic .md files ≤500 lines)"
+  fi
 fi

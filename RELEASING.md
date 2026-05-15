@@ -402,6 +402,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.9.6  | 2026-05-16 | Context isolation: SessionStart budgeting, agent-detector sentinel, memory auto-prune |
 | v2.9.5  | 2026-05-14 | mk:worktree script backing and new commands       |
 | v2.9.4  | 2026-05-11 | Agent rules and TOON agent docs                  |
 | v2.9.3  | 2026-05-12 | TOON Optimization                                |

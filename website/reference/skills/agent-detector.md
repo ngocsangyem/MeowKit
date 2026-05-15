@@ -131,6 +131,23 @@ Result:
 - The detection cache does NOT invalidate on pivot signals. After any explicit task change ("actually, let's do X instead"), confirm the banner is correct — if not, start a new message explicitly describing the new task.
 - Short messages with domain keywords ("fix the auth token") score high for complex agents even for one-line changes — the detector favors keyword matches over scope signals.
 
+## Session-cached safety/phase-zero load (since 2.9.6)
+
+Steps 0 and 0b first scan the context window for a cached-sentinel marker emitted by the `UserPromptSubmit` handler. When present, the 10-file Read loop (5 safety + 5 phase-zero rules) is skipped and a single-line confirmation is emitted instead.
+
+| Marker | Effect |
+|--------|--------|
+| `## Safety baseline: verified (cached, session <id>)` | Step 0 skips the 5-file safety Read loop |
+| `## Phase-zero rules: verified (cached, session <id>)` | Step 0b skips the 5-file phase-zero Read loop |
+
+**State source:** `session-state/session-sentinels.jsonl` — one JSONL line per Stop with `{session_id, safety, phase_zero, ts}`. The file is truncated on new-session detection (HOOK_SESSION_ID change), so sentinels never cross session boundaries.
+
+**Safety guarantee preserved.** The rules remain in context from the host runtime's auto-load of `CLAUDE.md` + `.claude/rules/`. The sentinel only suppresses redundant re-reads; it does not weaken the existence check on turn 1 of any new session.
+
+**Bypass.** `MEOWKIT_SKIP_SAFETY_SENTINEL=off` disables marker injection. The skill then runs the full 10-file Read loop every turn.
+
+**Scope.** The optimization depends on the inner harness firing the Stop and UserPromptSubmit hooks that write and read the JSONL log. Inner harnesses that do not fire those hooks see no sentinel in context and run the full check on every turn — no safety regression, just no speedup.
+
 ## Step 0b — Agile context detection (additive)
 
 After loading the 5 phase-zero rules, Step 0b checks for an Agile context and conditionally loads 3 additional rules from `.claude/rules-conditional/agile-*.md`. Non-Agile sessions skip this load silently — zero context cost.

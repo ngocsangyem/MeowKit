@@ -14,6 +14,32 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.6 (2026-05-16) — Context isolation: SessionStart budgeting, agent-detector sentinel, memory auto-prune
+
+### Highlights
+
+SessionStart and per-message context costs cut without changing the safety contract. `docs/project-context.md` gains a byte cap before injection; the agent-detector skips its 10-file rule re-read on turns 2..N via a session-scoped sentinel; memory `.md` topic files auto-prune entries older than 90 days on Stop. Combined: ~9,700 tokens saved per turn after turn 1 on a typical session, plus a hard cap at SessionStart on repos with oversized `project-context.md`.
+
+### New Commands
+
+- `/mk:delegate` — assembles a context-isolated subagent prompt from the `orchestration-rules.md` template. Wizards through 7 required fields, runs an injection-pattern guard on each user-provided field, and emits a ≤200-token prompt block for review before the Task tool is invoked. `--silent` mode skips the interactive wizard for inner harnesses that do not support `AskUserQuestion`. Distinct from `mk:spawn` (which launches parallel agents in isolated worktrees).
+
+### Features
+
+- Env var `MEOWKIT_MAX_PROJECT_CONTEXT_BYTES` — pre-injection byte cap on `docs/project-context.md` at SessionStart. Default `12288` (~12 KB ≈ ~3K tokens). Files over the cap are truncated with a visible warning before `cat`; files over 2× the cap emit a stronger warning. `0` disables the cap entirely.
+- Env var `MEOWKIT_SKIP_SAFETY_SENTINEL` — controls the agent-detector cached-marker optimization. Default `on` skips the 10-file safety + phase-zero rule Read on turns 2..N of a session. `off` forces the full check every turn.
+- Env var `MEOWKIT_MEMORY_PRUNE` — auto-prune of stale `.md` topic-file entries on Stop. Default `on`. Entries older than 90 days with a parseable `YYYY-MM-DD` header date are removed; entries with `severity: critical` or `severity: security` are NEVER pruned; entries without a parseable date are NEVER pruned (protects manual notes).
+- Env var `MEOWKIT_MEMORY_PRUNE_AGE_DAYS` — overrides the 90-day cutoff for memory auto-prune.
+- Memory directory size audit — `project-context-loader.sh` now reports any `.claude/memory/*.md` file exceeding 500 lines in the agent-readiness banner.
+
+### Improvements
+
+- `orchestration-rules.md` gains three new sections — Isolation Boundaries (5-row table of what crosses each layer and what does NOT), Inner Harness Compatibility (capability matrix: Task tool surface, context auto-injection root, SubagentStart hook availability), and Rejected Patterns (deliberate non-implementations with reasoning).
+- `mk:agent-detector` step-0 and step-0b first scan the context window for a cached-sentinel marker before invoking the 10-file Read loop. The marker is emitted by a new `UserPromptSubmit` handler when a session-scoped JSONL log records both flags `safety` and `phase_zero` as true. The skill remains `allowed-tools: [Read]` — all filesystem ops live in hook context.
+- `post-session.sh` model-change detection now writes `## YYYY-MM-DD — dead-weight-audit-needed (auto-flagged)` headers so the auto-prune script can parse and eventually rotate them.
+- Single state file `session-state/session-sentinels.jsonl` replaces per-session-ID sentinel files. Truncated on session change.
+- `session-state/prune-log.md` records pruned counts as `{file} | {date} | {N} entries pruned` — no entry content, breaking the `injection-rules.md` Rule 11 carrier chain for memory data.
+
 ## 2.9.5 (2026-05-14) — mk:worktree script backing and new commands
 
 ### Improvements

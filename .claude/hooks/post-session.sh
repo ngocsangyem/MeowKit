@@ -8,6 +8,13 @@ if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 # Load .claude/.env (each hook is a separate subprocess)
 . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 
+# Parse JSON stdin to populate HOOK_SESSION_ID. Required for the sentinel
+# write block at end of file; also used by the cost-log session_id field.
+# Non-fatal if absent (graceful degradation per read-hook-input.sh contract).
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+fi
+
 # Hook profile gating — CF7 fix: run by default, opt-OUT only on fast profile
 # Memory capture, cost tracking, and trace records require this hook to run.
 MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
@@ -135,16 +142,18 @@ if [ ! -f "$LAST_MODEL_FILE" ]; then
 elif [ "$CURRENT_MODEL" != "unknown" ]; then
   LAST_MODEL=$(cat "$LAST_MODEL_FILE" 2>/dev/null || echo "unknown")
   if [ "$CURRENT_MODEL" != "$LAST_MODEL" ] && [ "$LAST_MODEL" != "unknown" ]; then
-    # Write model-change flag to fixes.md (replaces lessons.md NEEDS_CAPTURE marker)
+    # Header-date format — required for memory-prune.py to parse the date.
+    # A sub-bullet date would make these entries permanently immune to pruning.
     cat >> "$MEMORY_DIR/fixes.md" << 'FIXES_EOF'
 
-## dead-weight-audit-needed (auto-flagged)
+## DATE_PLACEHOLDER — dead-weight-audit-needed (auto-flagged)
 - Reason: model version changed — run /mk:trace-analyze
-- Date: TIMESTAMP_PLACEHOLDER
+- Logged at: TIME_PLACEHOLDER
 FIXES_EOF
-    # Replace placeholder — TIMESTAMP contains only digits/colons/hyphens, no injection risk
-    FIXES_TIMESTAMP=$(date "+%Y-%m-%d %H:%M")
-    sed -i.bak "s/TIMESTAMP_PLACEHOLDER/$FIXES_TIMESTAMP/" "$MEMORY_DIR/fixes.md" 2>/dev/null
+    # Replace placeholders — values contain only digits/colons/hyphens/space, no injection risk
+    FIXES_DATE=$(date "+%Y-%m-%d")
+    FIXES_TIME=$(date "+%H:%M")
+    sed -i.bak "s/DATE_PLACEHOLDER/$FIXES_DATE/; s/TIME_PLACEHOLDER/$FIXES_TIME/" "$MEMORY_DIR/fixes.md" 2>/dev/null
     rm -f "$MEMORY_DIR/fixes.md.bak"
     echo "Dead-weight audit flagged: model changed $LAST_MODEL → $CURRENT_MODEL" >&2
   fi
@@ -163,6 +172,60 @@ TOTAL=$(wc -l "$MEMORY_DIR"/fixes.md "$MEMORY_DIR"/review-patterns.md \
 if [ -x "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" ]; then
   bash "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" "session_end" \
     "{\"recent_files\":${RECENT_FILES:-0}}" 2>/dev/null || true
+fi
+
+# Safety/phase-zero sentinel write — enables agent-detector to skip the
+# 10-file rule-load loop on turns 2..N of the same session. State lives in a
+# single append-only JSONL log keyed by session_id, not one file per session.
+# project-context-loader.sh truncates the log on new-session detection so it
+# never accumulates state from prior sessions.
+if [ "${MEOWKIT_SKIP_SAFETY_SENTINEL:-on}" != "off" ] && [ -n "${HOOK_SESSION_ID:-}" ]; then
+  # Refuse to write if session_id contains characters that could break JSON.
+  # Session IDs from the host runtime are UUID-shaped — alphanumeric + dash/underscore/dot.
+  case "$HOOK_SESSION_ID" in
+    *[!A-Za-z0-9_.-]*) ;;  # unsafe → skip silently
+    *)
+      mkdir -p session-state 2>/dev/null
+      _SENTINEL_TS=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null)
+      printf '{"session_id":"%s","safety":true,"phase_zero":true,"ts":"%s"}\n' \
+        "$HOOK_SESSION_ID" "$_SENTINEL_TS" \
+        >> session-state/session-sentinels.jsonl 2>/dev/null || true
+      unset _SENTINEL_TS
+      ;;
+  esac
+fi
+
+# Memory auto-prune (gated by MEOWKIT_MEMORY_PRUNE and daily rate-limit).
+# Failure modes handled:
+#   - empty TODAY (date(1) failure)        → [ -n "$TODAY" ] guard skips cleanly
+#   - Python error (exit != 0)             → LAST_PRUNE_FILE NOT advanced; retries tomorrow
+#   - prune-log location                   → session-state/, NOT .claude/memory/.
+#     Loaders never scan session-state/, which breaks the injection-rules.md Rule 11
+#     carrier chain (memory files are both untrusted input AND sensitive data).
+MEOWKIT_MEMORY_PRUNE="${MEOWKIT_MEMORY_PRUNE:-on}"
+PRUNE_AGE="${MEOWKIT_MEMORY_PRUNE_AGE_DAYS:-90}"
+# Validate PRUNE_AGE is integer to prevent shell→python arg injection.
+case "$PRUNE_AGE" in ''|*[!0-9]*) PRUNE_AGE=90 ;; esac
+LAST_PRUNE_FILE="session-state/last-prune-date"
+TODAY=$(date +%Y-%m-%d 2>/dev/null)
+LAST_PRUNE=$(cat "$LAST_PRUNE_FILE" 2>/dev/null || echo "")
+
+if [ "$MEOWKIT_MEMORY_PRUNE" != "off" ] && [ -n "$TODAY" ] && [ "$TODAY" != "$LAST_PRUNE" ]; then
+  VENV_PY="${CLAUDE_PROJECT_DIR:-.}/.claude/skills/.venv/bin/python3"
+  PRUNE_SCRIPT="${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/memory-prune.py"
+  MEM_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/memory"
+  PRUNE_LOG="session-state/prune-log.md"  # NOT inside .claude/memory/
+  mkdir -p session-state 2>/dev/null
+  if [ -x "$VENV_PY" ] && [ -f "$PRUNE_SCRIPT" ]; then
+    PRUNE_RESULT=$("$VENV_PY" "$PRUNE_SCRIPT" "$MEM_DIR" "$PRUNE_AGE" "$PRUNE_LOG" 2>/dev/null)
+    PRUNE_EXIT=$?
+    [ -n "$PRUNE_RESULT" ] && echo "Memory prune: $PRUNE_RESULT"
+    if [ "$PRUNE_EXIT" -eq 0 ]; then
+      echo "$TODAY" > "$LAST_PRUNE_FILE"
+    else
+      echo "Memory prune failed (exit $PRUNE_EXIT) — will retry tomorrow" >&2
+    fi
+  fi
 fi
 
 echo "Session data captured to .claude/memory/"

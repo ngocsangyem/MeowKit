@@ -62,6 +62,10 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 | `MEOWKIT_SUMMARY_GROWTH_DELTA=N` | Override 5KB growth-delta minimum between summaries |
 | `MEOWKIT_SUMMARY_BUDGET_SEC=N` | Background worker hard budget for `claude -p` (default 180s) |
 | `MEOWKIT_SUMMARY_DEBUG=1` | Verbose stderr from conversation-summary-cache.sh |
+| `MEOWKIT_MAX_PROJECT_CONTEXT_BYTES=N` | project-context.md byte cap at SessionStart (default 12288 = ~12KB ≈ ~3K tokens). `0` disables the cap. |
+| `MEOWKIT_SKIP_SAFETY_SENTINEL=off` | Disable agent-detector sentinel — force full 10-file Read on every turn. Default `on` skips reads on turns 2..N of same session. |
+| `MEOWKIT_MEMORY_PRUNE=off` | Disable auto-prune of stale memory `.md` entries on Stop. Default `on`. Severity-critical/security entries and dateless entries are NEVER pruned. |
+| `MEOWKIT_MEMORY_PRUNE_AGE_DAYS=N` | Override 90-day cutoff for memory auto-prune. |
 
 ## State Files
 
@@ -82,6 +86,9 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 | `session-state/checkpoints/checkpoint-latest.json` | handlers/checkpoint-writer.cjs (Stop), handlers/auto-checkpoint.cjs (PostToolUse phase transitions) | handlers/orientation-ritual.cjs (SessionStart resume/clear/compact) | Single-file checkpoint with model tier, density, plan path, git state, budget. Atomic .tmp+rename; last-writer-wins; sequence display-only. |
 | `.claude/session-state/tdd-mode` | tdd-flag-detector.sh | tdd-detect.sh, pre-implement.sh | TDD sentinel (cleared on new session by project-context-loader.sh) |
 | `.claude/session-state/tdd-deprecation-warned` | tdd-detect.sh | (same) | Legacy profile deprecation one-shot flag (cleared on new session) |
+| `session-state/session-sentinels.jsonl` | post-session.sh (Stop) | handlers/safety-sentinel-inject.cjs (UserPromptSubmit) | Single append-only log. One JSONL line per Stop with `{session_id, safety, phase_zero, ts}`. Line matching current session_id → mk:agent-detector step-0/0b skip their 5-file Read loops on turns 2..N. Truncated by project-context-loader.sh on session change. |
+| `session-state/last-prune-date` | post-session.sh (Stop) | (same) | Daily rate-limit token for memory auto-prune. Holds YYYY-MM-DD of last successful prune; advanced only on Python exit 0. |
+| `session-state/prune-log.md` | lib/memory-prune.py (via post-session.sh Stop) | observability only | Append-only count log of pruned entries (`{file} \| {date} \| {N} entries pruned`). NO entry content is ever logged — breaks the injection-rules.md Rule 11 carrier chain. Lives OUTSIDE `.claude/memory/` deliberately. |
 
 ## Hook Order Independence (Phase 7 P22)
 

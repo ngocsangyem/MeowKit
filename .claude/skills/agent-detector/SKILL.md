@@ -27,7 +27,20 @@ user-invocable: false
 
 ## Workflow
 
-0. **Safety baseline precheck (HARD GATE).** Before any other step, `Read` each of the 5 always-on safety/baseline rules:
+0. **Safety baseline precheck (HARD GATE).** Before any other step, scan the context window for the cached-sentinel marker emitted by `safety-sentinel-inject.cjs`:
+
+   ```
+   ## Safety baseline: verified (cached, session <id>)
+   ```
+
+   If the marker IS present (turns 2..N of the same session): emit
+   `Safety baseline: verified (cached)` and SKIP the 5-file Read loop below.
+   The 5 rules remain in context from the inner harness's CLAUDE.md auto-load;
+   the sentinel only suppresses redundant re-reads.
+
+   If the marker is ABSENT (turn 1 of a new session, OR
+   `MEOWKIT_SKIP_SAFETY_SENTINEL=off`): `Read` each of the 5 always-on
+   safety/baseline rules:
    - `.claude/rules/security-rules.md`
    - `.claude/rules/injection-rules.md`
    - `.claude/rules/gate-rules.md`
@@ -43,7 +56,13 @@ user-invocable: false
 
    Do NOT proceed to detection. Do NOT route to any agent. The 5 rules are the deterministic baseline; their absence indicates either repo corruption or a partial install. Replaces the unverified directory-auto-load assumption with a positive existence check.
 
-0b. **Phase-zero rule load.** After the safety baseline is confirmed, `Read` each phase-zero rule. These govern Phase 0 routing and are read once per agent-detector invocation:
+0b. **Phase-zero rule load.** After the safety baseline is confirmed, scan context for the cached-sentinel marker:
+
+   ```
+   ## Phase-zero rules: verified (cached, session <id>)
+   ```
+
+   If the marker IS present: emit `Phase-zero rules: verified (cached)` and SKIP the 5-file Read loop. If ABSENT (turn 1 or env-var override), `Read` each phase-zero rule. These govern Phase 0 routing and are read once per agent-detector invocation:
    - `.claude/rules/phase-contracts.md` — what each phase expects/produces
    - `.claude/rules/agent-routing.md` — agent → role → phase table
    - `.claude/rules/model-selection-rules.md` — task-type → model-tier mapping
