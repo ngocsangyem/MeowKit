@@ -20,6 +20,7 @@ export default defineNuxtConfig({
       crawlLinks: true,
       routes: ['/'],
     },
+    preset: 'vercel',
   },
 
   // ─── Site / SEO ─────────────────────────────────────────────────────────
