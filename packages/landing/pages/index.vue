@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import { defineAsyncComponent } from 'vue'
+
+const ValuePropSection = defineAsyncComponent(() => import('~/components/sections/value-prop-section.vue'))
+const HowItWorksSection = defineAsyncComponent(() => import('~/components/sections/how-it-works-section.vue'))
+const FeaturesGridSection = defineAsyncComponent(() => import('~/components/sections/features-grid-section.vue'))
+const TechnicalSpecsSection = defineAsyncComponent(() => import('~/components/sections/technical-specs-section.vue'))
+const InstallationSection = defineAsyncComponent(() => import('~/components/sections/installation-section.vue'))
+const CtaSection = defineAsyncComponent(() => import('~/components/sections/cta-section.vue'))
+
 const siteUrl = 'https://meowkit.dev'
 // nuxt-seo-utils auto-appends "| MeowKit" — keep this title without the brand prefix
 const title = 'Enforced Discipline for AI Coding Agents'

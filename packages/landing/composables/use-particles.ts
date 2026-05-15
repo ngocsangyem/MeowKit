@@ -66,7 +66,8 @@ export function useParticles(canvas: Ref<HTMLCanvasElement | null>) {
   }
 
   function init(w: number, h: number) {
-    const count = Math.floor((w * h) / 28000)
+    const rawCount = Math.floor((w * h) / 28000)
+    const count = w < 768 ? Math.min(rawCount, 20) : rawCount
     particles.length = 0
     for (let i = 0; i < count; i++) {
       const p = spawn(w, h)

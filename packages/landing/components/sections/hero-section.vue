@@ -1,4 +1,10 @@
 <script setup lang="ts">
+const logoUrl = new URL('~/assets/branding/meow-logo-animated.svg', import.meta.url).href
+useHead({
+  link: [
+    { rel: 'preload', as: 'image', type: 'image/svg+xml', href: logoUrl },
+  ],
+})
 </script>
 
 <template>

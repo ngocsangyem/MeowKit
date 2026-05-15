@@ -75,6 +75,14 @@
     border: 1px solid var(--color-border);
   }
 
+  @media (max-width: 767px) {
+    .glass {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: rgba(10, 31, 68, 0.95);
+    }
+  }
+
   .glow {
     box-shadow: var(--shadow-glow);
   }
@@ -179,6 +187,12 @@
   transform: translateY(24px);
   transition: opacity 0.5s ease, transform 0.5s ease;
   transition-delay: calc(var(--i, 0) * 80ms);
+}
+
+@media (max-width: 639px) {
+  .stagger-children > * {
+    transition-delay: 0ms !important;
+  }
 }
 .stagger-children.visible > * {
   opacity: 1;

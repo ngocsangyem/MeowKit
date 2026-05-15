@@ -20,6 +20,10 @@ export default defineNuxtConfig({
     // Adding prerender here with preset:'vercel' causes Nitro to emit SSR function routes
     // that intercept /__nuxt__/** asset requests, breaking static asset serving on Vercel.
     preset: 'vercel',
+    compressPublicAssets: {
+      brotli: true,
+      gzip: true,
+    },
   },
 
   // ─── Site / SEO ─────────────────────────────────────────────────────────
@@ -65,8 +69,8 @@ export default defineNuxtConfig({
   // ─── Fonts ──────────────────────────────────────────────────────────────
   fonts: {
     families: [
-      { name: 'Inter', provider: 'google', weights: [400, 500, 600] },
-      { name: 'Fira Code', provider: 'google', weights: [400, 500] },
+      { name: 'Inter', provider: 'google', weights: [400, 600] },
+      { name: 'Fira Code', provider: 'google', weights: [400], display: 'optional' },
     ],
     defaults: { preload: true },
   },
@@ -104,5 +108,26 @@ export default defineNuxtConfig({
 
   typescript: {
     strict: true,
+  },
+
+  experimental: {
+    inlineSSRStyles: true,
+  },
+
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('use-particles') || id.includes('particles-canvas')) {
+              return 'particles'
+            }
+            if (id.includes('node_modules/vue') || id.includes('node_modules/@vue')) {
+              return 'vendor-vue'
+            }
+          },
+        },
+      },
+    },
   },
 })

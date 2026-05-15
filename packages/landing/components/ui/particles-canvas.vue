@@ -7,8 +7,16 @@ const { start, stop, resize } = useParticles(canvasRef)
 
 onMounted(() => {
   if (prefersReducedMotion.value) return
-  start()
-  window.addEventListener('resize', resize, { passive: true })
+  const startWithResize = () => {
+    start()
+    window.addEventListener('resize', resize, { passive: true })
+  }
+  if (typeof requestIdleCallback !== 'undefined') {
+    requestIdleCallback(startWithResize, { timeout: 2000 })
+  }
+  else {
+    setTimeout(startWithResize, 200)
+  }
 })
 
 onUnmounted(() => {
