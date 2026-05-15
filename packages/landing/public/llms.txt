@@ -1,0 +1,57 @@
+# MeowKit
+
+> MeowKit is an AI agent toolkit for Claude Code. It installs a `.claude/` directory that enforces a structured 7-phase workflow with hard gates, TDD, security scanning, and human approval — so your AI agent ships production-quality code, not untested prototypes.
+
+## Quick Start
+
+```bash
+npx mewkit init
+```
+
+## Key Resources
+
+- [Homepage](https://meowkit.dev)
+- [Documentation](https://docs.meowkit.dev)
+- [GitHub](https://github.com/ngocsangyem/MeowKit)
+- [npm package](https://www.npmjs.com/package/mewkit)
+
+## What MeowKit Does
+
+MeowKit enforces a 7-phase workflow for AI coding agents (Claude Code):
+
+1. **Orient** — Classify task, assign model tier
+2. **Plan** — Create approved plan [Gate 1: human must approve]
+3. **Test** — Write failing tests (opt-in TDD mode)
+4. **Build** — Implement against the approved plan
+5. **Review** — Adversarial multi-dimension review [Gate 2: human must approve]
+6. **Ship** — Deploy through CI/CD pipeline
+7. **Reflect** — Update memory with lessons learned
+
+## Key Features
+
+- **Two Hard Gates** — No code ships without an approved plan (Gate 1) and passing review (Gate 2)
+- **77 Domain Skills** — Activates only the skills needed for each task
+- **17 Specialist Agents** — Planner, developer, reviewer, security, tester, and more
+- **4-Layer Security** — Prompt injection defense across input, instruction, context, and output
+- **TDD Pipeline** — Opt-in test-first enforcement with RED → GREEN → REFACTOR cycle
+- **Cross-Session Memory** — Lessons, fixes, and decisions persist across sessions
+- **MIT Licensed** — Free to use, no external API dependencies
+
+## Installation
+
+```bash
+# Initialize MeowKit in your project
+npx mewkit init
+
+# Set up Python skills and optional deps (ImageMagick, FFmpeg, Playwright)
+npx mewkit setup
+
+# Verify environment
+npx mewkit doctor
+```
+
+## Requirements
+
+- Node.js 20+
+- Claude Code CLI
+- Git

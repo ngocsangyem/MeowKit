@@ -18,6 +18,7 @@
           width="230"
           height="80"
           class="hero__logo"
+          fetchpriority="high"
           draggable="false"
         />
       </div>

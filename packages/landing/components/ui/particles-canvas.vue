@@ -1,9 +1,12 @@
 <script setup lang="ts">
+// Skip entirely when user prefers reduced motion — improves accessibility and INP
+const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+
 const canvasRef = ref<HTMLCanvasElement | null>(null)
-// Must call in setup context so useMouse() inside useParticles works correctly
 const { start, stop, resize } = useParticles(canvasRef)
 
 onMounted(() => {
+  if (prefersReducedMotion.value) return
   start()
   window.addEventListener('resize', resize, { passive: true })
 })
@@ -16,6 +19,7 @@ onUnmounted(() => {
 
 <template>
   <canvas
+    v-if="!prefersReducedMotion"
     ref="canvasRef"
     class="particles-canvas"
     aria-hidden="true"

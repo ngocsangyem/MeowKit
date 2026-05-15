@@ -16,10 +16,20 @@ function handleScroll() {
   scrollProgress.value = Math.max(0, Math.min(1, -top / EXTRA_SCROLL))
 }
 
+// rAF-throttled scroll handler — prevents multiple getBoundingClientRect calls per frame
+let rafId: number | null = null
+function onScroll() {
+  if (rafId !== null) return
+  rafId = requestAnimationFrame(() => {
+    handleScroll()
+    rafId = null
+  })
+}
+
 let headerObserver: IntersectionObserver | null = null
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('scroll', onScroll, { passive: true })
   handleScroll()
 
   headerObserver = new IntersectionObserver(
@@ -30,7 +40,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('scroll', onScroll)
+  if (rafId !== null) cancelAnimationFrame(rafId)
   headerObserver?.disconnect()
 })
 </script>

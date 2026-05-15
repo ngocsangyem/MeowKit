@@ -16,10 +16,9 @@ export default defineNuxtConfig({
   ],
 
   nitro: {
-    // prerender: {
-    //   crawlLinks: true,
-    //   routes: ['/'],
-    // },
+    // crawlLinks is intentionally omitted: `nuxt generate` already pre-renders all routes.
+    // Adding prerender here with preset:'vercel' causes Nitro to emit SSR function routes
+    // that intercept /__nuxt__/** asset requests, breaking static asset serving on Vercel.
     preset: 'vercel',
   },
 
@@ -41,6 +40,13 @@ export default defineNuxtConfig({
 
   sitemap: {
     strictNuxtContentPaths: false,
+    urls: [
+      {
+        loc: '/',
+        changefreq: 'weekly',
+        priority: 1.0,
+      },
+    ],
   },
 
   schemaOrg: {
@@ -49,6 +55,10 @@ export default defineNuxtConfig({
       name: 'MeowKit',
       url: 'https://meowkit.dev',
       logo: 'https://meowkit.dev/meow-og.png',
+      sameAs: [
+        'https://github.com/ngocsangyem/MeowKit',
+        'https://www.npmjs.com/package/mewkit',
+      ],
     },
   },
 

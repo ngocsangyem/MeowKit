@@ -3,6 +3,7 @@ useHead({
   htmlAttrs: { lang: 'en' },
   meta: [
     { name: 'theme-color', content: '#05070A' },
+    { name: 'application-name', content: 'MeowKit' },
   ],
   link: [
     // SVG preferred by modern browsers; raster as legacy fallback

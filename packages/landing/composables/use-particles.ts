@@ -6,6 +6,7 @@ interface Particle {
   opacity: number
   targetOpacity: number
   size: number
+  font: string
   charIdx: number
   colorIdx: number
   respawnTimer: number
@@ -29,13 +30,16 @@ const PALETTE: [number, number, number][] = [
   [59, 130, 246],  // bright blue
 ]
 
+// Discrete sizes to minimise ctx.font switches per frame
+const SIZES = [10, 12, 14]
+
 const ATTRACT_RADIUS = 180
 const ATTRACT_STRENGTH = 0.0022
 
 export function useParticles(canvas: Ref<HTMLCanvasElement | null>) {
   let animId = 0
+  let frameCount = 0
   const particles: Particle[] = []
-  // Raw mouse coords — updated via mousemove on window (no VueUse dependency)
   let mouseX = -9999
   let mouseY = -9999
 
@@ -45,6 +49,7 @@ export function useParticles(canvas: Ref<HTMLCanvasElement | null>) {
   }
 
   function spawn(w: number, h: number): Particle {
+    const size = SIZES[Math.floor(Math.random() * SIZES.length)]!
     return {
       x: Math.random() * w,
       y: Math.random() * h,
@@ -52,7 +57,8 @@ export function useParticles(canvas: Ref<HTMLCanvasElement | null>) {
       vy: (Math.random() - 0.5) * 0.14,
       opacity: 0,
       targetOpacity: Math.random() * 0.22 + 0.04,
-      size: Math.random() * 5 + 10,
+      size,
+      font: `${size}px "Fira Code", monospace`,
       charIdx: Math.floor(Math.random() * CODE_CHARS.length),
       colorIdx: Math.floor(Math.random() * PALETTE.length),
       respawnTimer: Math.floor(Math.random() * 500 + 250),
@@ -64,12 +70,17 @@ export function useParticles(canvas: Ref<HTMLCanvasElement | null>) {
     particles.length = 0
     for (let i = 0; i < count; i++) {
       const p = spawn(w, h)
-      p.opacity = Math.random() * p.targetOpacity // stagger initial opacity
+      p.opacity = Math.random() * p.targetOpacity
       particles.push(p)
     }
+    // Initial sort so same-size particles are adjacent — minimises ctx.font calls
+    particles.sort((a, b) => a.size - b.size)
   }
 
   function draw() {
+    // Pause rendering when tab is not visible — resumes on visibilitychange
+    if (document.hidden) return
+
     const el = canvas.value
     if (!el) return
     const ctx = el.getContext('2d')
@@ -81,6 +92,13 @@ export function useParticles(canvas: Ref<HTMLCanvasElement | null>) {
     const mx = mouseX
     const my = mouseY
 
+    // Re-sort every 3 seconds so respawned particles (which change size) stay grouped
+    frameCount++
+    if (frameCount % 180 === 0) {
+      particles.sort((a, b) => a.size - b.size)
+    }
+
+    let lastFont = ''
     for (const p of particles) {
       // Mouse attraction — particles gently drift toward cursor
       const dx = mx - p.x
@@ -121,15 +139,28 @@ export function useParticles(canvas: Ref<HTMLCanvasElement | null>) {
 
       if (p.opacity < 0.005) continue
 
+      // Only call ctx.font when size changes — font setting is expensive
+      if (p.font !== lastFont) {
+        ctx.font = p.font
+        lastFont = p.font
+      }
+
       const [r, g, b] = PALETTE[p.colorIdx]!
       ctx.globalAlpha = p.opacity
-      ctx.font = `${p.size}px "Fira Code", monospace`
       ctx.fillStyle = `rgb(${r},${g},${b})`
       ctx.fillText(CODE_CHARS[p.charIdx]!, p.x, p.y)
     }
 
     ctx.globalAlpha = 1
     animId = requestAnimationFrame(draw)
+  }
+
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      cancelAnimationFrame(animId)
+    } else {
+      draw()
+    }
   }
 
   function resize() {
@@ -144,11 +175,13 @@ export function useParticles(canvas: Ref<HTMLCanvasElement | null>) {
     resize()
     draw()
     window.addEventListener('mousemove', onMouseMove, { passive: true })
+    document.addEventListener('visibilitychange', handleVisibilityChange)
   }
 
   function stop() {
     cancelAnimationFrame(animId)
     window.removeEventListener('mousemove', onMouseMove)
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
   }
 
   return { start, stop, resize }
