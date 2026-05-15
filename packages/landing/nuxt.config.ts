@@ -1,6 +1,14 @@
+import tailwindcss from "@tailwindcss/vite";
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   ssr: true,
+  css: ['./assets/css/main.css'],
+  vite: {
+    plugins: [
+      tailwindcss(),
+    ],
+  },
   devtools: { enabled: true },
 
   // @nuxt/ui must be first — it registers the Tailwind v4 Vite plugin internally
@@ -13,8 +21,6 @@ export default defineNuxtConfig({
     '@vercel/analytics/nuxt',
     '@vercel/speed-insights/nuxt',
   ],
-
-  css: ['~/assets/css/main.css'],
 
   nitro: {
     prerender: {

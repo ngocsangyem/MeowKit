@@ -1,6 +1,0 @@
-# START nuxt-robots (indexable)
-User-agent: *
-Allow: /
-
-Sitemap: https://meowkit.dev/sitemap.xml
-# END nuxt-robots

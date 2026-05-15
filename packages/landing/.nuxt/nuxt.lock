@@ -1,9 +1,0 @@
-{
-  "pid": 9164,
-  "startedAt": 1778548977154,
-  "command": "dev",
-  "cwd": "/Users/sangnguyen/Desktop/claude-tool/meowkit/packages/landing",
-  "port": 3001,
-  "hostname": "::1",
-  "url": "http://[::1]:3001"
-}
