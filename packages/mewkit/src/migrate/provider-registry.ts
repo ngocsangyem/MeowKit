@@ -224,14 +224,9 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 			writeStrategy: "codex-toml",
 			fileExtension: ".toml",
 		},
-		commands: {
-			projectPath: null,
-			globalPath: join(home, ".codex/prompts"),
-			format: "direct-copy",
-			writeStrategy: "per-file",
-			fileExtension: ".md",
-			nestedCommands: false,
-		},
+			// Codex has documented built-in slash/app commands, but the current public docs do
+			// not document a custom command directory. Do not emit unverified .codex/prompts files.
+			commands: null,
 		skills: {
 			projectPath: ".agents/skills",
 			globalPath: join(home, ".agents/skills"),
@@ -264,17 +259,15 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 		detect: async () =>
 			hasBinaryInPath("codex") ||
 			hasAnyInstallSignal([
-				join(cwd, ".codex/config.toml"),
-				join(cwd, ".codex/agents"),
-				join(cwd, ".codex/prompts"),
-				join(cwd, ".codex/hooks.json"),
-				join(home, ".codex/config.toml"),
-				join(home, ".codex/agents"),
-				join(home, ".codex/AGENTS.md"),
-				join(home, ".codex/instructions.md"),
-				join(home, ".codex/prompts"),
-				join(home, ".codex/hooks.json"),
-			]),
+					join(cwd, ".codex/config.toml"),
+					join(cwd, ".codex/agents"),
+					join(cwd, ".codex/hooks.json"),
+					join(home, ".codex/config.toml"),
+					join(home, ".codex/agents"),
+					join(home, ".codex/AGENTS.md"),
+					join(home, ".codex/instructions.md"),
+					join(home, ".codex/hooks.json"),
+				]),
 	},
 	droid: {
 		name: "droid",

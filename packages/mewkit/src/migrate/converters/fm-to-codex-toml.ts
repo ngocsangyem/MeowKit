@@ -12,7 +12,10 @@ const MAX_CODEX_SLUG_LENGTH = 96;
  * Phase 8 installer must read EXACTLY these fields.
  */
 export interface CodexAgentToml {
+	name: string; // top-level: name = "..."
+	description: string; // top-level: description = "..."
 	model?: string; // top-level: model = "..."
+	model_reasoning_effort?: string; // top-level: model_reasoning_effort = "..."
 	sandbox_mode?: string; // top-level: sandbox_mode = "..."
 	developer_instructions: string; // top-level: developer_instructions = """..."""
 }
@@ -82,13 +85,18 @@ export function convertFmToCodexToml(item: PortableItem): ConversionResult {
 	const warnings: string[] = [];
 	const slug = toCodexSlug(item.name);
 	const lines: string[] = [];
+	const displayName = item.displayName || item.frontmatter.name || item.name;
+	const description = item.description || item.frontmatter.description || item.name;
+
+	lines.push(`name = ${JSON.stringify(displayName)}`);
+	lines.push(`description = ${JSON.stringify(description)}`);
 
 	const modelResult = resolveModel(item.frontmatter.model, "codex");
 	if (modelResult.warning) warnings.push(modelResult.warning);
 	if (modelResult.resolved) {
 		lines.push(`model = ${JSON.stringify(modelResult.resolved.model)}`);
 		if (modelResult.resolved.effort) {
-			lines.push(`# effort = ${JSON.stringify(modelResult.resolved.effort)}`);
+			lines.push(`model_reasoning_effort = ${JSON.stringify(modelResult.resolved.effort)}`);
 		}
 	} else if (
 		typeof item.frontmatter.model === "string" &&
@@ -106,7 +114,7 @@ export function convertFmToCodexToml(item: PortableItem): ConversionResult {
 	if (body.length === 0) {
 		warnings.push(`Agent "${item.name}" has empty body; writing empty developer_instructions`);
 	}
-	if (lines.length > 0) lines.push("");
+	lines.push("");
 	lines.push(`developer_instructions = """\n${escapeTomlMultiline(body)}\n"""`);
 
 	return { content: lines.join("\n"), filename: `${slug}.toml`, warnings };

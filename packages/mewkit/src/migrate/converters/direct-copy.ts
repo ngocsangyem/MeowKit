@@ -2,6 +2,7 @@
 // Adapted: replaced gray-matter.stringify fallback with raw body (we never re-stringify).
 import { readFileSync } from "node:fs";
 import { extname } from "node:path";
+import { rewriteConfiguredModelReferences } from "../model-taxonomy.js";
 import type { ConversionResult, PortableItem, ProviderType } from "../types.js";
 
 const PROVIDER_CONFIG_DIR: Partial<Record<ProviderType, string>> = {
@@ -34,6 +35,7 @@ export function convertDirectCopy(item: PortableItem, provider?: ProviderType): 
 		if (targetDir) {
 			content = content.replace(/\.claude\//g, targetDir);
 		}
+		content = rewriteConfiguredModelReferences(content, provider);
 	}
 
 	const namespacedName =

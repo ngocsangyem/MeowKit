@@ -19,6 +19,10 @@ describe("provider registry", () => {
 		expect(hookProviders).toEqual(["claude-code", "codex", "droid", "gemini-cli"]);
 	});
 
+	it("does not advertise undocumented Codex custom commands", () => {
+		expect(providers.codex.commands).toBeNull();
+	});
+
 	it(".agents/skills/ shared by codex+cursor+windsurf+gemini-cli+amp (5 providers)", () => {
 		const collisions = detectProviderPathCollisions(["codex", "cursor", "windsurf", "gemini-cli", "amp"], {
 			global: false,

@@ -33,6 +33,11 @@ export interface HooksMergeResult {
 	warnings: string[];
 }
 
+interface HooksMergeOptions {
+	global: boolean;
+	sourceSettingsPath?: string;
+}
+
 interface SettingsSnapshot {
 	path: string;
 	existed: boolean;
@@ -99,6 +104,79 @@ function buildClaudeHooksSection(hooks: PortableItem[], hookTargetPaths: Map<str
 	return section;
 }
 
+function escapeRegExp(value: string): string {
+	return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function rewriteHookCommand(command: string, hook: PortableItem, hookTargetPaths: Map<string, string>): string {
+	const targetPath = hookTargetPaths.get(hook.name) ?? hook.sourcePath;
+	const sourcePath = hook.sourcePath;
+	const relPath = `.claude/hooks/${hook.name}`;
+	let rewritten = command
+		.replaceAll(sourcePath, targetPath)
+		.replaceAll(`$CLAUDE_PROJECT_DIR/${relPath}`, targetPath)
+		.replaceAll(relPath, targetPath);
+
+	if (rewritten === command && command.includes(hook.name)) {
+		rewritten = command.replace(new RegExp(escapeRegExp(hook.name), "g"), targetPath);
+	}
+
+	return rewritten;
+}
+
+async function buildHooksSectionFromSettings(
+	settingsPath: string | undefined,
+	hooks: PortableItem[],
+	hookTargetPaths: Map<string, string>,
+): Promise<HooksSection | null> {
+	if (!settingsPath || !existsSync(settingsPath)) return null;
+	const settings = await readSettings(settingsPath);
+	const rawHooks = settings.hooks;
+	if (!rawHooks || typeof rawHooks !== "object" || Array.isArray(rawHooks)) return null;
+
+	const migratedHookNames = new Set(hooks.map((hook) => hook.name));
+	const migratedByName = new Map(hooks.map((hook) => [hook.name, hook]));
+	const section: HooksSection = {};
+
+	for (const [event, rawGroups] of Object.entries(rawHooks as Record<string, unknown>)) {
+		if (!Array.isArray(rawGroups)) continue;
+		const groups: HookGroup[] = [];
+
+		for (const rawGroup of rawGroups) {
+			if (!rawGroup || typeof rawGroup !== "object" || Array.isArray(rawGroup)) continue;
+			const group = rawGroup as Record<string, unknown>;
+			const rawEntries = group.hooks;
+			if (!Array.isArray(rawEntries)) continue;
+
+			const entries: HookEntry[] = [];
+			for (const rawEntry of rawEntries) {
+				if (!rawEntry || typeof rawEntry !== "object" || Array.isArray(rawEntry)) continue;
+				const entry = rawEntry as HookEntry;
+				if (typeof entry.command !== "string") continue;
+
+				const matchedName = [...migratedHookNames].find((name) => entry.command.includes(name));
+				if (!matchedName) continue;
+				const hook = migratedByName.get(matchedName);
+				if (!hook) continue;
+
+				entries.push({
+					...entry,
+					command: rewriteHookCommand(entry.command, hook, hookTargetPaths),
+				});
+			}
+
+			if (entries.length > 0) {
+				const matcher = typeof group.matcher === "string" ? group.matcher : undefined;
+				groups.push(matcher === undefined ? { hooks: entries } : { matcher, hooks: entries });
+			}
+		}
+
+		if (groups.length > 0) section[event] = groups;
+	}
+
+	return Object.keys(section).length > 0 ? section : null;
+}
+
 /**
  * Heuristic: derive hook event from hook script filename. mewkit conventions use
  * names like `pretooluse-foo.cjs` or `session-init.cjs`. Falls back to UserPromptSubmit.
@@ -155,7 +233,7 @@ async function mergeIntoSettingsJson(settingsPath: string, section: HooksSection
 async function mergeClaudeCode(
 	hooks: PortableItem[],
 	hookTargetPaths: Map<string, string>,
-	options: { global: boolean },
+	options: HooksMergeOptions,
 ): Promise<HooksMergeResult> {
 	const settingsCfg = providers["claude-code"].settingsJsonPath;
 	if (!settingsCfg) return badResult("claude-code");
@@ -163,7 +241,8 @@ async function mergeClaudeCode(
 
 	const snapshot = await snapshotSettings(settingsPath);
 	try {
-		const section = buildClaudeHooksSection(hooks, hookTargetPaths);
+		const section = (await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
+			buildClaudeHooksSection(hooks, hookTargetPaths);
 		await mergeIntoSettingsJson(settingsPath, section);
 		return {
 			provider: "claude-code",
@@ -182,7 +261,7 @@ async function mergeClaudeCode(
 async function mergeGeminiCli(
 	hooks: PortableItem[],
 	hookTargetPaths: Map<string, string>,
-	options: { global: boolean },
+	options: HooksMergeOptions,
 ): Promise<HooksMergeResult> {
 	const settingsCfg = providers["gemini-cli"].settingsJsonPath;
 	if (!settingsCfg) return badResult("gemini-cli");
@@ -190,7 +269,8 @@ async function mergeGeminiCli(
 
 	const snapshot = await snapshotSettings(settingsPath);
 	try {
-		const claudeSection = buildClaudeHooksSection(hooks, hookTargetPaths);
+		const claudeSection = (await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
+			buildClaudeHooksSection(hooks, hookTargetPaths);
 		const section = requiresHookMapping("gemini-cli") ? applyGeminiMapping(claudeSection) : claudeSection;
 		await mergeIntoSettingsJson(settingsPath, section);
 		return {
@@ -210,7 +290,7 @@ async function mergeGeminiCli(
 async function mergeDroid(
 	hooks: PortableItem[],
 	hookTargetPaths: Map<string, string>,
-	options: { global: boolean },
+	options: HooksMergeOptions,
 ): Promise<HooksMergeResult> {
 	const settingsCfg = providers.droid.settingsJsonPath;
 	if (!settingsCfg) return badResult("droid");
@@ -218,7 +298,8 @@ async function mergeDroid(
 
 	const snapshot = await snapshotSettings(settingsPath);
 	try {
-		const section = buildClaudeHooksSection(hooks, hookTargetPaths);
+		const section = (await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
+			buildClaudeHooksSection(hooks, hookTargetPaths);
 		await mergeIntoSettingsJson(settingsPath, section);
 		return {
 			provider: "droid",
@@ -237,7 +318,7 @@ async function mergeDroid(
 async function mergeCodex(
 	hooks: PortableItem[],
 	hookTargetPaths: Map<string, string>,
-	options: { global: boolean },
+	options: HooksMergeOptions,
 ): Promise<HooksMergeResult> {
 	const settingsCfg = providers.codex.settingsJsonPath;
 	const hooksDir = options.global ? providers.codex.hooks?.globalPath : providers.codex.hooks?.projectPath;
@@ -264,7 +345,9 @@ async function mergeCodex(
 			commandSubstitutions.set(w.originalPath, w.wrapperPath);
 		}
 
-		const claudeSection = buildClaudeHooksSection(hooks, hookTargetPaths);
+			const claudeSection =
+				(await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
+				buildClaudeHooksSection(hooks, hookTargetPaths);
 		const pathRewrite: PathRewriteMap = {
 			sourceDir: dirname(hookSourcePaths[0] ?? ""),
 			targetDir: hooksDir,
@@ -341,7 +424,7 @@ export async function mergeHooksSettings(
 	provider: ProviderType,
 	hooks: PortableItem[],
 	hookTargetPaths: Map<string, string>,
-	options: { global: boolean },
+	options: HooksMergeOptions,
 ): Promise<HooksMergeResult> {
 	if (hooks.length === 0) {
 		return { provider, success: true, hooksWritten: 0, hooksDropped: 0, warnings: [] };

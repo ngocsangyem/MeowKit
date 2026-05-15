@@ -66,7 +66,7 @@ function buildManagedBlock(entries: string[]): string {
  */
 export async function installCodexAgents(
 	agents: PortableItem[],
-	options: { global: boolean },
+	options: { global: boolean; configAgents?: PortableItem[] },
 ): Promise<CodexInstallResult> {
 	const config = providers.codex.agents;
 	if (!config) {
@@ -88,11 +88,12 @@ export async function installCodexAgents(
 	}
 
 	return withCodexTargetLock(configTomlPath, async () => {
-		const writtenFiles: string[] = [];
-		const entries: string[] = [];
+			const writtenFiles: string[] = [];
+			const entries: string[] = [];
+			const configAgents = options.configAgents ?? agents;
 
-		try {
-			for (const agent of agents) {
+			try {
+				for (const agent of agents) {
 				const result = convertItem(agent, "fm-to-codex-toml", "codex");
 				if (result.error) continue;
 				const targetPath = join(agentsDir, result.filename);
@@ -107,8 +108,9 @@ export async function installCodexAgents(
 					installSource: "kit",
 				});
 
-				entries.push(buildCodexConfigEntry(agent.name, agent.description));
-			}
+				}
+
+				for (const agent of configAgents) entries.push(buildCodexConfigEntry(agent.name, agent.description));
 
 			let configContent = "";
 			if (existsSync(configTomlPath)) {

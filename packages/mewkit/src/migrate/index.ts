@@ -5,6 +5,7 @@ export * from "./provider-registry.js";
 export * from "./provider-registry-utils.js";
 export * from "./provider-overrides.js";
 export * from "./model-taxonomy.js";
+export * from "./model-routing-config.js";
 export * from "./codex-capabilities.js";
 export * as discovery from "./discovery/index.js";
 export { convertItem } from "./converters/index.js";

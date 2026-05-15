@@ -2,6 +2,7 @@
 
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { applyMewkitOverrides } from "./provider-overrides.js";
@@ -31,6 +32,8 @@ import {
 import { convertItem } from "./converters/index.js";
 import { executeDeleteAction, executeInstallAction } from "./portable-installer.js";
 import { installSkillDirectory } from "./skill-directory-installer.js";
+import { installCodexAgents, mergeHooksSettings } from "./hooks/index.js";
+import { loadModelRoutingConfig } from "./model-routing-config.js";
 import { printActionDetails, printFinalSummary, printPreflight } from "./migrate-ui-summary.js";
 import type { MigrateOptions, PortableItem, PortableType, ProviderType, SkillInfo } from "./types.js";
 
@@ -53,6 +56,7 @@ export async function runMigrate(options: MigrateOptions, ctx: RunMigrateContext
 	const targets = await selectProviders(options);
 	warnUnverifiedProviders(targets);
 	const isGlobal = await selectScope(options);
+	const modelRouting = await loadModelRoutingConfig();
 
 	const lockResult = await acquireMigrationLock({ scope: isGlobal ? "global" : "project" });
 	if (!lockResult.acquired) {
@@ -61,7 +65,7 @@ export async function runMigrate(options: MigrateOptions, ctx: RunMigrateContext
 	}
 
 	try {
-		return await runMigrateUnderLock(options, ctx, scope, targets, isGlobal);
+		return await runMigrateUnderLock(options, ctx, scope, targets, isGlobal, modelRouting.warnings);
 	} finally {
 		await releaseMigrationLock(lockResult.lockPath);
 	}
@@ -73,6 +77,7 @@ async function runMigrateUnderLock(
 	scope: ReturnType<typeof resolveMigrationScope>,
 	targets: ProviderType[],
 	isGlobal: boolean,
+	modelRoutingWarnings: string[],
 ): Promise<number> {
 	const spinner = process.stdout.isTTY ? p.spinner() : null;
 	spinner?.start("Discovering portable items...");
@@ -117,11 +122,12 @@ async function runMigrateUnderLock(
 		(c) =>
 			`Shared target: ${c.path} (${c.portableType}) used by ${c.providers.join(" + ")} — each provider writes the same content here`,
 	);
+	const modelRoutingBanners = modelRoutingWarnings.map((warning) => `Model routing: ${warning}`);
 
 	printPreflight(plan, {
 		source: { root: discovered.source.root, origin: discovered.source.origin },
 		skippedShellHooks: discovered.skippedShellHooks.length,
-		bannerExtras: collisionBanners,
+		bannerExtras: [...collisionBanners, ...modelRoutingBanners],
 	});
 
 	if (options.dryRun) {
@@ -160,6 +166,7 @@ async function runMigrateUnderLock(
 		targets,
 		isGlobal,
 		scope.skills,
+		join(discovered.source.root, "settings.json"),
 	);
 
 	printFinalSummary(results);
@@ -182,24 +189,85 @@ async function executePlan(
 	targets: ProviderType[],
 	isGlobal: boolean,
 	skillsScopeEnabled: boolean,
+	sourceSettingsPath: string,
 ): Promise<Array<import("./portable-installer.js").InstallResult>> {
 	const results: Array<import("./portable-installer.js").InstallResult> = [];
+	const codexAgentActions = new Set<string>();
+	const codexHookActions = new Set<string>();
+	const hookTargetPathsByProvider = new Map<ProviderType, Map<string, string>>();
+	for (const target of targets) {
+		if (target === "codex" || !providers[target].hooks) continue;
+		const providerMap = new Map<string, string>();
+		for (const hook of ctx.allItems.hooks) {
+			const targetPath = getPortableInstallPath(hook.name, target, "hooks", { global: isGlobal });
+			if (targetPath) providerMap.set(hook.name, targetPath);
+		}
+		if (providerMap.size > 0) hookTargetPathsByProvider.set(target, providerMap);
+	}
 
 	for (const action of actions) {
 		if (action.action === "skip") continue;
 		if (action.action === "conflict" && action.resolution?.type === "keep") continue;
+		if (action.provider === "codex" && action.type === "agent") {
+			if (action.action !== "delete") {
+				codexAgentActions.add(action.item);
+				continue;
+			}
+		}
+		if (action.provider === "codex" && action.type === "hooks") {
+			if (action.action !== "delete") {
+				codexHookActions.add(action.item);
+				continue;
+			}
+		}
 
 		try {
 			if (action.action === "delete") {
 				results.push(await executeDeleteAction(action));
 			} else {
-				results.push(await executeInstallAction(action, ctx));
+				const result = await executeInstallAction(action, ctx);
+				results.push(result);
+				if (result.success && action.type === "hooks") {
+					const provider = action.provider as ProviderType;
+					const providerMap = hookTargetPathsByProvider.get(provider) ?? new Map<string, string>();
+					providerMap.set(action.item, action.targetPath);
+					hookTargetPathsByProvider.set(provider, providerMap);
+				}
 			}
 		} catch (err) {
 			results.push({
 				action,
 				success: false,
 				error: err instanceof Error ? err.message : String(err),
+			});
+		}
+	}
+
+	if (targets.includes("codex") && codexAgentActions.size > 0) {
+		const agentsToWrite = ctx.allItems.agent.filter((agent) => codexAgentActions.has(agent.name));
+		const result = await installCodexAgents(agentsToWrite, { global: isGlobal, configAgents: ctx.allItems.agent });
+		results.push({
+			action: codexBulkActionShim("agent", "codex", isGlobal, result.written),
+			success: result.success,
+			error: result.error,
+		});
+	}
+
+	const hookProviders = targets.filter((target) => providers[target].hooks);
+	if (ctx.allItems.hooks.length > 0 && hookProviders.length > 0) {
+		for (const target of hookProviders) {
+			if (target === "codex" && codexHookActions.size === 0) continue;
+			const hookItems =
+				target === "codex" ? ctx.allItems.hooks.filter((hook) => codexHookActions.has(hook.name)) : ctx.allItems.hooks;
+			if (hookItems.length === 0) continue;
+			const result = await mergeHooksSettings(target, hookItems, hookTargetPathsByProvider.get(target) ?? new Map(), {
+				global: isGlobal,
+				sourceSettingsPath,
+			});
+			results.push({
+				action: codexBulkActionShim("hooks", target, isGlobal, result.hooksWritten),
+				success: result.success,
+				error: result.error,
 			});
 		}
 	}
@@ -231,6 +299,23 @@ function skillActionShim(skill: SkillInfo, provider: ProviderType, global: boole
 		targetPath: path,
 		reason: "Skill directory install",
 		isDirectoryItem: true,
+	};
+}
+
+function codexBulkActionShim(
+	type: "agent" | "hooks",
+	provider: ProviderType,
+	global: boolean,
+	count: number,
+): ReconcileAction {
+	return {
+		action: "install",
+		item: `${count} ${type === "agent" ? "agent" : "hook"}${count === 1 ? "" : "s"}`,
+		type,
+		provider,
+		global,
+		targetPath: "",
+		reason: `Specialized ${provider} ${type} install`,
 	};
 }
 

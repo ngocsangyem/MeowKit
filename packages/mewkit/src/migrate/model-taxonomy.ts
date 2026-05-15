@@ -1,5 +1,5 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/model-taxonomy.ts
-// Provider-agnostic model tier mapping (opus/sonnet/haiku → target equivalents).
+// Provider-agnostic model tier mapping (opus/sonnet/haiku → configured target equivalents).
 
 export type ModelTier = "heavy" | "balanced" | "light";
 
@@ -13,25 +13,10 @@ export interface ModelResolveResult {
 	warning?: string;
 }
 
-export const OPENCODE_DEFAULT_MODEL = "anthropic/claude-sonnet-4-6";
-
 const SOURCE_TIER_MAP: Record<string, ModelTier> = {
 	opus: "heavy",
 	sonnet: "balanced",
 	haiku: "light",
-};
-
-export const DEFAULT_PROVIDER_MODEL_MAP: Record<string, Record<ModelTier, ResolvedModel>> = {
-	codex: {
-		heavy: { model: "gpt-5.4", effort: "xhigh" },
-		balanced: { model: "gpt-5.4", effort: "high" },
-		light: { model: "gpt-5.4-mini", effort: "medium" },
-	},
-	"gemini-cli": {
-		heavy: { model: "gemini-3.1-pro-preview" },
-		balanced: { model: "gemini-3.1-pro-preview" },
-		light: { model: "gemini-3-flash-preview" },
-	},
 };
 
 let userOverrides: Record<string, Record<string, ResolvedModel>> | undefined;
@@ -40,8 +25,8 @@ export function setTaxonomyOverrides(overrides: Record<string, Record<string, Re
 	userOverrides = overrides;
 }
 
-export function resolveOpenCodeDefaultModel(): string {
-	return userOverrides?.opencode?.default?.model ?? OPENCODE_DEFAULT_MODEL;
+export function resolveOpenCodeDefaultModel(): string | undefined {
+	return userOverrides?.opencode?.default?.model;
 }
 
 export function getOpenCodeDefaultModelOverride(): string | undefined {
@@ -71,8 +56,19 @@ export function resolveModel(sourceModel: string | undefined, targetProvider: st
 		if (override) return { resolved: override };
 	}
 
-	const providerMap = DEFAULT_PROVIDER_MODEL_MAP[targetProvider];
-	if (!providerMap) return { resolved: null };
+	return {
+		resolved: null,
+		warning: `No configured ${targetProvider} model for source tier "${trimmed}" — target will inherit its default`,
+	};
+}
 
-	return { resolved: providerMap[tier] };
+export function resolveProviderDefaultModel(targetProvider: string): ResolvedModel | null {
+	return userOverrides?.[targetProvider]?.default ?? null;
+}
+
+export function rewriteConfiguredModelReferences(content: string, targetProvider: string): string {
+	return content.replace(/(--model\s+)(opus|sonnet|haiku)\b/gi, (matched, prefix: string, tierName: string) => {
+		const resolved = resolveModel(tierName.toLowerCase(), targetProvider).resolved;
+		return resolved?.model ? `${prefix}${resolved.model}` : matched;
+	});
 }

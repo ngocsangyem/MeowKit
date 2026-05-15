@@ -259,6 +259,35 @@ npx mewkit migrate                    # interactive multiselect
 | `--respect-deletions`                           | Skip items whose target was deleted by the user (default re-installs)          |
 | `--reinstall-empty-dirs`                        | Re-install items even if the user emptied the target directory (default: true) |
 
+### Model routing
+
+`mewkit migrate` reads model routing from project config before converting agents and commands:
+
+1. `.meowkit.config.json`
+2. `.claude/meowkit.config.json` (legacy fallback)
+3. Target-agent defaults when no config is present
+
+The migration maps Claude source tiers (`opus`, `sonnet`, `haiku`) to configured target tiers (`heavy`, `balanced`, `light`). It does not ship target model IDs in code. If a provider/tier is missing, the migrated item inherits the target agent's default model.
+
+```json
+{
+  "modelRouting": {
+    "providers": {
+      "codex": {
+        "tiers": {
+          "heavy": { "model": "your-codex-heavy-model", "reasoningEffort": "xhigh" },
+          "balanced": { "model": "your-codex-balanced-model", "reasoningEffort": "high" },
+          "light": { "model": "your-codex-light-model", "reasoningEffort": "medium" }
+        }
+      },
+      "opencode": {
+        "default": { "model": "your-provider/your-model" }
+      }
+    }
+  }
+}
+```
+
 ### Capability matrix
 
 What each tool accepts. ✓ supported · — not supported by tool.
@@ -266,7 +295,7 @@ What each tool accepts. ✓ supported · — not supported by tool.
 | Tool                   |   Agents   | Commands | Skills | Config | Rules | Hooks |
 | ---------------------- | :--------: | :------: | :----: | :----: | :---: | :---: |
 | Cursor                 |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Codex                  |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   ✓   |
+| Codex                  |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   ✓   |
 | Droid                  |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   ✓   |
 | OpenCode               |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
 | Goose                  |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
@@ -284,6 +313,8 @@ What each tool accepts. ✓ supported · — not supported by tool.
 **Notes:**
 
 - Antigravity treats agents as skills (no separate concept) — Claude Code agents land in Antigravity's skills directory.
+- Codex command migration is disabled until OpenAI documents a custom command directory. Codex's documented slash/app commands remain built in to Codex itself.
+- Codex rules in OpenAI's docs are exec-policy `.rules` files. MeowKit behavioral rules migrate into `AGENTS.md`; they are not converted into sandbox exec-policy rules.
 - Hooks: only Codex, Droid, and Gemini CLI accept hooks. Other tools warn and skip.
 - Shell hooks (`.sh`/`.ps1`/`.bat`) are filtered at discovery — only node-runnable hooks (`.cjs`/`.mjs`/`.js`) migrate.
 - Kilo Code is `[unverified]` — registry entry is ported verbatim from upstream but no real install was tested. Migration emits a runtime warning.

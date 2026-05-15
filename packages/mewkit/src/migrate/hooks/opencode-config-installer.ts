@@ -4,7 +4,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import * as p from "@clack/prompts";
-import { OPENCODE_DEFAULT_MODEL, getOpenCodeDefaultModelOverride } from "../model-taxonomy.js";
+import { getOpenCodeDefaultModelOverride } from "../model-taxonomy.js";
 
 export interface EnsureOpenCodeModelResult {
 	path: string;
@@ -48,11 +48,11 @@ async function detectAuthenticatedProviders(homeDir?: string): Promise<string[]>
 	return [];
 }
 
-export async function suggestOpenCodeDefaultModel(homeDir?: string): Promise<{ model: string; reason: string }> {
+export async function suggestOpenCodeDefaultModel(homeDir?: string): Promise<{ model: string; reason: string } | null> {
 	const override = getOpenCodeDefaultModelOverride();
-	if (override) return { model: override, reason: ".ck.json override" };
+	if (override) return { model: override, reason: ".meowkit.config.json override" };
 	void homeDir;
-	return { model: OPENCODE_DEFAULT_MODEL, reason: "fallback default" };
+	return null;
 }
 
 const clackPrompter: OpenCodeModelPrompter = async ({ suggestion, reason, detectedProviders }) => {
@@ -115,6 +115,9 @@ export async function ensureOpenCodeModel(options: EnsureOpenCodeModelOptions): 
 	}
 
 	const suggestion = await suggestOpenCodeDefaultModel(options.homeDir);
+	if (!suggestion) {
+		return { path: configPath, action: "skipped", model: "", reason: "no configured opencode default model" };
+	}
 	let chosenModel = suggestion.model;
 
 	if (options.interactive) {
