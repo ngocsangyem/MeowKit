@@ -2,8 +2,10 @@
 // Locks the typed contract that the Phase 8 codex-toml-installer consumes.
 import { createHash } from "node:crypto";
 import { resolveModel } from "../model-taxonomy.js";
+import { providers } from "../provider-registry.js";
 import type { ConversionResult, PortableItem } from "../types.js";
 import { escapeTomlMultiline } from "./md-to-toml.js";
+import { stripClaudeRefs } from "./md-strip.js";
 
 const MAX_CODEX_SLUG_LENGTH = 96;
 
@@ -110,7 +112,9 @@ export function convertFmToCodexToml(item: PortableItem): ConversionResult {
 	if (sandboxResult.warning) warnings.push(sandboxResult.warning);
 	if (sandboxResult.sandboxMode) lines.push(`sandbox_mode = "${sandboxResult.sandboxMode}"`);
 
-	const body = item.body.trim();
+	const stripped = stripClaudeRefs(item.body, { provider: "codex", targetName: providers.codex.displayName });
+	warnings.push(...stripped.warnings);
+	const body = stripped.content.trim();
 	if (body.length === 0) {
 		warnings.push(`Agent "${item.name}" has empty body; writing empty developer_instructions`);
 	}

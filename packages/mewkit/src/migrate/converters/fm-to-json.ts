@@ -1,5 +1,7 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/converters/fm-to-json.ts
+import { providers } from "../provider-registry.js";
 import type { ConversionResult, PortableItem } from "../types.js";
+import { stripClaudeRefs } from "./md-strip.js";
 
 const CLINE_GROUP_MAP: Record<string, string> = {
 	Read: "read",
@@ -40,10 +42,11 @@ export interface ClineCustomMode {
 }
 
 export function convertFmToJson(item: PortableItem): ConversionResult {
+	const stripped = stripClaudeRefs(item.body, { provider: "cline", targetName: providers.cline.displayName });
 	const mode: ClineCustomMode = {
 		slug: toSlug(item.name),
 		name: item.frontmatter.name || item.name,
-		roleDefinition: item.body,
+		roleDefinition: stripped.content,
 		groups: item.frontmatter.tools ? mapToolsToGroups(item.frontmatter.tools) : ["read", "edit", "command", "mcp"],
 		customInstructions: "",
 	};
@@ -51,7 +54,7 @@ export function convertFmToJson(item: PortableItem): ConversionResult {
 	return {
 		content: JSON.stringify(mode, null, 2),
 		filename: `${toSlug(item.name)}.json`,
-		warnings: [],
+		warnings: stripped.warnings,
 	};
 }
 
@@ -60,12 +63,13 @@ export function buildClineModesJson(modes: ClineCustomMode[]): string {
 }
 
 export function convertToClineRule(item: PortableItem): ConversionResult {
-	const content = `# ${item.frontmatter.name || item.name}\n\n${item.body}\n`;
+	const stripped = stripClaudeRefs(item.body, { provider: "cline", targetName: providers.cline.displayName });
+	const content = `# ${item.frontmatter.name || item.name}\n\n${stripped.content}\n`;
 	const namespacedName =
 		item.name.includes("/") || item.name.includes("\\")
 			? item.name.replace(/\\/g, "/")
 			: item.segments && item.segments.length > 0
 				? item.segments.join("/")
 				: item.name;
-	return { content, filename: `${namespacedName}.md`, warnings: [] };
+	return { content, filename: `${namespacedName}.md`, warnings: stripped.warnings };
 }

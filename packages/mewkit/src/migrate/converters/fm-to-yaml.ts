@@ -1,5 +1,7 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/converters/fm-to-yaml.ts
+import { providers } from "../provider-registry.js";
 import type { ConversionResult, PortableItem } from "../types.js";
+import { stripClaudeRefs } from "./md-strip.js";
 
 const TOOL_GROUP_MAP: Record<string, string> = {
 	Read: "read",
@@ -47,18 +49,19 @@ export function convertFmToYaml(item: PortableItem): ConversionResult {
 	const groups = item.frontmatter.tools
 		? mapToolsToGroups(item.frontmatter.tools)
 		: ["read", "edit", "command", "browser", "mcp"];
+	const stripped = stripClaudeRefs(item.body, { provider: "goose", targetName: providers.goose.displayName });
 
 	const lines: string[] = [];
 	lines.push(`  - slug: "${slug}"`);
 	lines.push(`    name: "${yamlEscape(displayName)}"`);
 	if (description) lines.push(`    description: "${yamlEscape(description.slice(0, 200))}"`);
 	lines.push("    roleDefinition: |");
-	for (const line of item.body.split("\n")) lines.push(`      ${line}`);
+	for (const line of stripped.content.split("\n")) lines.push(`      ${line}`);
 	lines.push('    customInstructions: ""');
 	lines.push("    groups:");
 	for (const group of groups) lines.push(`      - ${group}`);
 
-	return { content: lines.join("\n"), filename: slug, warnings: [] };
+	return { content: lines.join("\n"), filename: slug, warnings: stripped.warnings };
 }
 
 export function buildYamlModesFile(convertedEntries: string[]): string {

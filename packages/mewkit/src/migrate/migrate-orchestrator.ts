@@ -35,6 +35,7 @@ import { installSkillDirectory } from "./skill-directory-installer.js";
 import { installCodexAgents, mergeHooksSettings } from "./hooks/index.js";
 import { loadModelRoutingConfig } from "./model-routing-config.js";
 import { printActionDetails, printFinalSummary, printPreflight } from "./migrate-ui-summary.js";
+import { buildPortableSkillsByProvider, filterPlanForPortability } from "./portability-policy.js";
 import type { MigrateOptions, PortableItem, PortableType, ProviderType, SkillInfo } from "./types.js";
 
 export interface RunMigrateContext {
@@ -108,7 +109,11 @@ async function runMigrateUnderLock(
 		respectDeletions: options.respectDeletions,
 	});
 
-	for (const action of plan.actions) {
+	const itemsByT = itemsByType(discovered);
+	const portabilityFiltered = filterPlanForPortability(plan, itemsByT);
+	const portableSkills = await buildPortableSkillsByProvider(discovered.skills, targets);
+
+	for (const action of portabilityFiltered.plan.actions) {
 		if (!action.targetPath) {
 			action.targetPath =
 				getPortableInstallPath(action.item, action.provider as ProviderType, providerKey(action.type), {
@@ -124,23 +129,26 @@ async function runMigrateUnderLock(
 	);
 	const modelRoutingBanners = modelRoutingWarnings.map((warning) => `Model routing: ${warning}`);
 
-	printPreflight(plan, {
+	printPreflight(portabilityFiltered.plan, {
 		source: { root: discovered.source.root, origin: discovered.source.origin },
 		skippedShellHooks: discovered.skippedShellHooks.length,
-		bannerExtras: [...collisionBanners, ...modelRoutingBanners],
+		bannerExtras: [
+			...collisionBanners,
+			...modelRoutingBanners,
+			...portabilityFiltered.skipMessages,
+			...portableSkills.skipMessages,
+		],
 	});
 
 	if (options.dryRun) {
-		printActionDetails(plan.actions);
+		printActionDetails(portabilityFiltered.plan.actions);
 		console.log();
 		console.log(pc.dim("(dry run — no files written)"));
 		return 0;
 	}
 
-	const itemsByT = itemsByType(discovered);
-
 	// Compute diffs lazily for conflicting actions so the "Show diff" prompt has data.
-	for (const action of plan.actions) {
+	for (const action of portabilityFiltered.plan.actions) {
 		if (action.action !== "conflict") continue;
 		await attachConflictDiff(action, itemsByT);
 
@@ -156,13 +164,17 @@ async function runMigrateUnderLock(
 	const confirmed =
 		options.yes ||
 		!process.stdout.isTTY ||
-		(await confirmExecution(plan.summary.install + plan.summary.update + plan.summary.delete));
+		(await confirmExecution(
+			portabilityFiltered.plan.summary.install +
+				portabilityFiltered.plan.summary.update +
+				portabilityFiltered.plan.summary.delete,
+		));
 	if (!confirmed) return 130;
 
 	const results = await executePlan(
-		plan.actions,
+		portabilityFiltered.plan.actions,
 		{ allItems: itemsByT },
-		discovered.skills,
+		portableSkills.skillsByProvider,
 		targets,
 		isGlobal,
 		scope.skills,
@@ -185,7 +197,7 @@ async function confirmExecution(count: number): Promise<boolean> {
 async function executePlan(
 	actions: ReconcileAction[],
 	ctx: { allItems: Record<PortableType, PortableItem[]> },
-	skills: SkillInfo[],
+	skillsByProvider: Map<ProviderType, SkillInfo[]>,
 	targets: ProviderType[],
 	isGlobal: boolean,
 	skillsScopeEnabled: boolean,
@@ -272,9 +284,10 @@ async function executePlan(
 		}
 	}
 
-	if (skillsScopeEnabled && skills.length > 0) {
+	if (skillsScopeEnabled) {
 		for (const target of targets) {
 			if (!providers[target].skills) continue;
+			const skills = skillsByProvider.get(target) ?? [];
 			for (const skill of skills) {
 				const r = await installSkillDirectory(skill, target, { global: isGlobal });
 				results.push({

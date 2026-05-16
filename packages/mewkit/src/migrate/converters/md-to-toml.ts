@@ -1,5 +1,7 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/converters/md-to-toml.ts
+import { providers } from "../provider-registry.js";
 import type { ConversionResult, PortableItem } from "../types.js";
+import { stripClaudeRefs } from "./md-strip.js";
 
 export function escapeTomlMultiline(str: string): string {
 	let escaped = str.replace(/\\/g, "\\\\");
@@ -14,7 +16,11 @@ function mapPlaceholders(body: string): string {
 
 export function convertMdToToml(item: PortableItem): ConversionResult {
 	const description = item.description || item.frontmatter.description || "";
-	const prompt = mapPlaceholders(item.body);
+	const stripped = stripClaudeRefs(item.body, {
+		provider: "gemini-cli",
+		targetName: providers["gemini-cli"].displayName,
+	});
+	const prompt = mapPlaceholders(stripped.content);
 
 	const lines: string[] = [];
 	if (description) lines.push(`description = ${JSON.stringify(description)}`);
@@ -27,5 +33,5 @@ export function convertMdToToml(item: PortableItem): ConversionResult {
 				? item.segments.join("/")
 				: item.name;
 
-	return { content: lines.join("\n"), filename: `${namespacedName}.toml`, warnings: [] };
+	return { content: lines.join("\n"), filename: `${namespacedName}.toml`, warnings: stripped.warnings };
 }

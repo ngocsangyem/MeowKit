@@ -1,5 +1,7 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/converters/fm-to-fm.ts
+import { providers } from "../provider-registry.js";
 import type { ConversionResult, PortableItem, ProviderType } from "../types.js";
+import { stripClaudeRefs } from "./md-strip.js";
 
 const COPILOT_TOOL_MAP: Record<string, string> = {
 	Read: "read",
@@ -42,7 +44,9 @@ function convertForCopilot(item: PortableItem): ConversionResult {
 	}
 	fmLines.push("---");
 
-	const content = `${fmLines.join("\n")}\n\n${item.body}\n`;
+	const stripped = stripClaudeRefs(item.body, { provider: "github-copilot", targetName: providers["github-copilot"].displayName });
+	warnings.push(...stripped.warnings);
+	const content = `${fmLines.join("\n")}\n\n${stripped.content}\n`;
 
 	if (content.length > 30000) {
 		warnings.push(`Content exceeds Copilot 30K char limit (${content.length} chars)`);
@@ -62,8 +66,9 @@ function convertForCursor(item: PortableItem): ConversionResult {
 	}
 	fmLines.push("---");
 
-	const content = `${fmLines.join("\n")}\n\n${item.body}\n`;
-	return { content, filename: `${item.name}.mdc`, warnings: [] };
+	const stripped = stripClaudeRefs(item.body, { provider: "cursor", targetName: providers.cursor.displayName });
+	const content = `${fmLines.join("\n")}\n\n${stripped.content}\n`;
+	return { content, filename: `${item.name}.mdc`, warnings: stripped.warnings };
 }
 
 const OPENCODE_TOOL_MAP: Record<string, string> = {
@@ -84,6 +89,7 @@ function replaceClaudePathsForOpenCode(content: string): string {
 }
 
 function convertOpenCodeAgent(item: PortableItem): ConversionResult {
+	const warnings: string[] = [];
 	const agentName = item.frontmatter.name || item.name;
 	const mode = agentName === "brainstormer" ? "primary" : "subagent";
 
@@ -115,12 +121,15 @@ function convertOpenCodeAgent(item: PortableItem): ConversionResult {
 	}
 	fmLines.push("---");
 
-	const body = replaceClaudePathsForOpenCode(item.body);
+	const stripped = stripClaudeRefs(item.body, { provider: "opencode", targetName: providers.opencode.displayName });
+	warnings.push(...stripped.warnings);
+	const body = replaceClaudePathsForOpenCode(stripped.content);
 	const content = `${fmLines.join("\n")}\n\n${body}\n`;
-	return { content, filename: `${item.name}.md`, warnings: [] };
+	return { content, filename: `${item.name}.md`, warnings };
 }
 
 function convertOpenCodeCommand(item: PortableItem): ConversionResult {
+	const warnings: string[] = [];
 	const fmLines = ["---"];
 	const desc = (item.description || `Command: ${item.name}`).replace(/\n/g, " ").trim();
 	const truncatedDesc = desc.length > 200 ? `${desc.slice(0, 197)}...` : desc;
@@ -131,9 +140,11 @@ function convertOpenCodeCommand(item: PortableItem): ConversionResult {
 	}
 	fmLines.push("---");
 
-	const body = replaceClaudePathsForOpenCode(item.body);
+	const stripped = stripClaudeRefs(item.body, { provider: "opencode", targetName: providers.opencode.displayName });
+	warnings.push(...stripped.warnings);
+	const body = replaceClaudePathsForOpenCode(stripped.content);
 	const content = `${fmLines.join("\n")}\n\n${body}\n`;
-	return { content, filename: `${item.name}.md`, warnings: [] };
+	return { content, filename: `${item.name}.md`, warnings };
 }
 
 export function convertFmToFm(item: PortableItem, provider: ProviderType): ConversionResult {

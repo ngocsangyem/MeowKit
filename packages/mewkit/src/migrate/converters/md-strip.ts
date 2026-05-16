@@ -343,6 +343,10 @@ export function stripClaudeRefs(
 			.filter((line) => !/\.claude\/hooks\//i.test(line))
 			.join("\n");
 	}
+	result = result.replace(/\.claude\//gi, (matched, ...args) => {
+		const offset = args[args.length - 2] as number;
+		return isInCodeBlock(offset) ? matched : "project runtime data/";
+	});
 
 	const configReplacement = configTarget?.path ?? "project configuration file";
 	result = result.replace(/\bCLAUDE\.md\b/g, (matched, ...args) => {
