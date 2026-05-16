@@ -2,8 +2,8 @@
 // to the target provider's skill path. Handles colon→dash sanitization for cross-platform safety.
 
 import { existsSync } from "node:fs";
-import { cp, mkdir, readFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { cp, mkdir, readFile, realpath, rename, rm } from "node:fs/promises";
+import { dirname, join, resolve } from "node:path";
 import { providers } from "./provider-registry.js";
 import { getPortableInstallPath } from "./provider-registry-utils.js";
 import { sanitizeSkillName } from "./discovery/skills-discovery.js";
@@ -17,6 +17,24 @@ export interface SkillInstallResult {
 	success: boolean;
 	path?: string;
 	error?: string;
+}
+
+async function canonicalize(path: string): Promise<string> {
+	try {
+		return await realpath(path);
+	} catch {
+		const parent = dirname(path);
+		if (parent === path) return resolve(path);
+		try {
+			const canonicalParent = await realpath(parent);
+			const absPath = resolve(path);
+			const absParent = resolve(parent);
+			const basename = absPath.slice(absParent.length + 1) || "";
+			return join(canonicalParent, basename);
+		} catch {
+			return resolve(path);
+		}
+	}
 }
 
 /**
@@ -51,7 +69,39 @@ export async function installSkillDirectory(
 		const parent = dirname(targetDir);
 		if (!existsSync(parent)) await mkdir(parent, { recursive: true });
 
-		await cp(skill.sourcePath, targetDir, { recursive: true, force: true, errorOnExist: false });
+		const canonicalSource = await canonicalize(skill.sourcePath);
+		const canonicalTarget = await canonicalize(targetDir);
+		if (canonicalSource === canonicalTarget) {
+			return { skill: skill.name, provider, success: true, path: targetDir };
+		}
+
+		const alreadyExists = existsSync(targetDir);
+		const backupDir = alreadyExists ? `${targetDir}.mewkit-backup-${process.pid}-${Date.now()}` : null;
+		let copied = false;
+
+		if (backupDir) {
+			await rename(targetDir, backupDir);
+		}
+
+		try {
+			await cp(skill.sourcePath, targetDir, { recursive: true, force: true, errorOnExist: false });
+			copied = true;
+		} catch (error) {
+			try {
+				if (copied && existsSync(targetDir)) {
+					await rm(targetDir, { recursive: true, force: true });
+				}
+				if (backupDir && existsSync(backupDir)) {
+					await rename(backupDir, targetDir);
+				}
+			} catch (rollbackError) {
+				const message = error instanceof Error ? error.message : String(error);
+				throw new Error(
+					`${message}; rollback failed: ${rollbackError instanceof Error ? rollbackError.message : String(rollbackError)}`,
+				);
+			}
+			throw error;
+		}
 
 		const skillMdPath = join(skill.sourcePath, "SKILL.md");
 		const skillMdTarget = join(targetDir, "SKILL.md");
@@ -63,6 +113,10 @@ export async function installSkillDirectory(
 			targetChecksum,
 			installSource: "kit",
 		});
+
+		if (backupDir && existsSync(backupDir)) {
+			await rm(backupDir, { recursive: true, force: true });
+		}
 
 		return { skill: skill.name, provider, success: true, path: targetDir };
 	} catch (err) {

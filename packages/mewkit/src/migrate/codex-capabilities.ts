@@ -31,33 +31,42 @@ export interface CodexCapabilities {
 export const CODEX_CAPABILITY_TABLE: CodexCapabilities[] = [
 	{
 		version: "0.124.0-alpha.3",
-			events: {
-				SessionStart: {
-					supported: true,
-					supportsAdditionalContext: true,
-					allowedMatchers: ["startup", "resume", "clear"],
-				},
-				UserPromptSubmit: { supported: true, supportsAdditionalContext: true },
-				PreToolUse: {
-					supported: true,
-					supportsAdditionalContext: false,
-					permissionDecisionValues: ["deny"],
-				},
-				PostToolUse: {
-					supported: true,
-					supportsAdditionalContext: true,
-				},
-				PermissionRequest: {
-					supported: true,
-					supportsAdditionalContext: false,
-					permissionDecisionValues: ["deny"],
-				},
-				Stop: { supported: true, supportsAdditionalContext: false },
+		events: {
+			SessionStart: {
+				supported: true,
+				supportsAdditionalContext: true,
+				allowedMatchers: ["startup", "resume"],
 			},
-			sessionStartMatchersOnly: ["startup", "resume", "clear"],
-			requiresFeatureFlag: false,
+			UserPromptSubmit: {
+				supported: true,
+				supportsAdditionalContext: true,
+			},
+			PreToolUse: {
+				supported: true,
+				supportsAdditionalContext: false,
+				permissionDecisionValues: ["deny"],
+				allowedMatchers: ["Bash"],
+			},
+			PostToolUse: {
+				supported: true,
+				supportsAdditionalContext: true,
+				allowedMatchers: ["Bash"],
+			},
+			PermissionRequest: {
+				supported: true,
+				supportsAdditionalContext: false,
+				permissionDecisionValues: ["deny"],
+				allowedMatchers: ["Bash"],
+			},
+			Stop: {
+				supported: true,
+				supportsAdditionalContext: false,
+			},
 		},
-	];
+		sessionStartMatchersOnly: ["startup", "resume"],
+		requiresFeatureFlag: true,
+	},
+];
 
 if (CODEX_CAPABILITY_TABLE.length > 1) {
 	for (let i = 0; i < CODEX_CAPABILITY_TABLE.length - 1; i++) {

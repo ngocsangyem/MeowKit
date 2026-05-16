@@ -2,8 +2,9 @@
 // merge-single, yaml-merge, json-merge). codex-toml + codex-hooks delegated to Phase 8 mergers.
 
 import { existsSync } from "node:fs";
-import { mkdir, rename, unlink, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { lstat, mkdir, rename, unlink, writeFile } from "node:fs/promises";
+import { homedir } from "node:os";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { providers } from "./provider-registry.js";
 import { addPortableInstallation, removePortableInstallation } from "./reconcile/portable-registry.js";
 import { computeContentChecksum } from "./reconcile/checksum-utils.js";
@@ -23,6 +24,58 @@ export interface InstallResult {
 	success: boolean;
 	error?: string;
 	overwritten?: boolean;
+}
+
+function isPathWithinBoundary(targetPath: string, boundaryPath: string): boolean {
+	const resolvedTarget = resolve(targetPath);
+	const resolvedBoundary = resolve(boundaryPath);
+	return resolvedTarget === resolvedBoundary || resolvedTarget.startsWith(`${resolvedBoundary}${sep}`);
+}
+
+async function validateNoSymlinkComponents(
+	targetPath: string,
+	boundaryPath: string,
+): Promise<string | null> {
+	const resolvedTarget = resolve(targetPath);
+	const resolvedBoundary = resolve(boundaryPath);
+
+	if (!isPathWithinBoundary(resolvedTarget, resolvedBoundary)) {
+		return `Unsafe path: target escapes ${resolvedBoundary}`;
+	}
+
+	const segments = relative(resolvedBoundary, resolvedTarget)
+		.split(/[\\/]+/)
+		.filter(Boolean);
+	let cursor = resolvedBoundary;
+	for (const segment of segments) {
+		cursor = join(cursor, segment);
+		try {
+			const stats = await lstat(cursor);
+			if (stats.isSymbolicLink()) {
+				return `Unsafe path: target path contains symlink (${cursor})`;
+			}
+		} catch (error) {
+			if (
+				typeof error === "object" &&
+				error !== null &&
+				"code" in error &&
+				(error as NodeJS.ErrnoException).code === "ENOENT"
+			) {
+				break;
+			}
+			throw error;
+		}
+	}
+
+	return null;
+}
+
+async function validateWritableTargetPath(
+	targetPath: string,
+	options: { global: boolean },
+): Promise<string | null> {
+	const boundary = options.global ? homedir() : process.cwd();
+	return validateNoSymlinkComponents(targetPath, boundary);
 }
 
 async function atomicWrite(target: string, content: string): Promise<void> {
@@ -92,6 +145,11 @@ export async function executeInstallAction(action: ReconcileAction, ctx: Install
 	const overwritten = existsSync(action.targetPath);
 
 	try {
+		const pathError = await validateWritableTargetPath(action.targetPath, { global: action.global });
+		if (pathError) {
+			return { action, success: false, error: pathError };
+		}
+
 		if (ws === "per-file" || ws === "single-file") {
 			await atomicWrite(action.targetPath, conversion.content);
 		} else if (ws === "merge-single") {
