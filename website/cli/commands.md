@@ -68,12 +68,34 @@ npx mewkit validate
 View token usage and cost tracking.
 
 ```bash
-npx mewkit budget [--monthly]
+npx mewkit budget [--monthly] [--session [id]] [--day [YYYY-MM-DD]]
 ```
 
-| Flag        | Description                                           |
-| ----------- | ----------------------------------------------------- |
-| `--monthly` | Aggregate by month instead of showing last 10 entries |
+| Flag | Description |
+| --- | --- |
+| `--monthly` | Aggregate by month instead of showing the last 10 entries |
+| `--session` | Filter to the current Claude Code session id |
+| `--session <id>` | Filter to a specific session id from `cost-log.json` |
+| `--day` | Filter to today using `YYYY-MM-DD` |
+| `--day <date>` | Filter to a specific day in `YYYY-MM-DD` format |
+
+**Behavior:**
+- Without filters, `budget` shows the latest 10 rows and the all-time token total.
+- `--session` resolves the current session from `HOOK_SESSION_ID` first, then `session-state/last-session-id`.
+- `--day` without a value uses today.
+- Filters compose, so `--session --day` reports the intersection.
+
+**Examples:**
+
+```bash
+npx mewkit budget
+npx mewkit budget --monthly
+npx mewkit budget --session
+npx mewkit budget --session 9adf6a6b-9fbf-45ca-b36b-b0dd55356ac1
+npx mewkit budget --day
+npx mewkit budget --day 2026-05-01
+npx mewkit budget --session --day 2026-05-01
+```
 
 ## memory
 

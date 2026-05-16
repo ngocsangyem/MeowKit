@@ -43,6 +43,8 @@ ${pc.bold("Commands:")}
 ${pc.bold("Options:")}
   --help, -h       Show help
   --version, -v    Show version
+  --session [id]   Budget: filter to current session or a specific session id
+  --day [date]     Budget: filter to today or a specific YYYY-MM-DD
 
 ${pc.bold("Init flags for post-init migration:")}
   --migrate                  After unpack, prompt for providers to export to (interactive)
@@ -122,6 +124,7 @@ async function main(): Promise<void> {
 			"migrate-to",
 			"port",
 			"session",
+			"day",
 			"workspace",
 			"log",
 		],
@@ -164,7 +167,11 @@ async function main(): Promise<void> {
 			await validate();
 			break;
 		case "budget":
-			await budget({ monthly: args.monthly as boolean | undefined });
+			await budget({
+				monthly: args.monthly as boolean | undefined,
+				session: args.session as boolean | string | undefined,
+				day: args.day as boolean | string | undefined,
+			});
 			break;
 		case "memory":
 			await memory({

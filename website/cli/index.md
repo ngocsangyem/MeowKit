@@ -36,4 +36,4 @@ npx mewkit task new --type feature "Add user authentication"
 - **First run:** copies the full MeowKit system (agents, skills, hooks, rules, commands, modes, scripts) into `.claude/`
 - **Subsequent runs:** smart update — overwrites unchanged core files, skips user-modified files, adds new files
 
-`mewkit` is a **runtime toolbox** for daily use — diagnostics, setup, task management, cost tracking.
+`mewkit` is a **runtime toolbox** for daily use — diagnostics, setup, task management, and cost tracking with session/day filtering in `budget`.
