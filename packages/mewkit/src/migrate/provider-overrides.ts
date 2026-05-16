@@ -5,20 +5,36 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { providerDocumentationContracts } from "./provider-documentation-contracts.js";
 import { providers } from "./provider-registry.js";
-import type { PortableType, ProviderType } from "./types.js";
+import type { PortableType, ProviderType, ProviderConfig } from "./types.js";
 
 const home = homedir();
 
 let overridesApplied = false;
 
-const providerConfigKeys: Record<PortableType, keyof (typeof providers)[ProviderType]> = {
-	agent: "agents",
-	command: "commands",
-	skill: "skills",
-	config: "config",
-	rules: "rules",
-	hooks: "hooks",
-};
+const portableTypes: PortableType[] = ["agent", "command", "skill", "config", "rules", "hooks"];
+
+function disablePortableSurface(provider: ProviderConfig, portableType: PortableType): void {
+	switch (portableType) {
+		case "agent":
+			provider.agents = null;
+			return;
+		case "command":
+			provider.commands = null;
+			return;
+		case "skill":
+			provider.skills = null;
+			return;
+		case "config":
+			provider.config = null;
+			return;
+		case "rules":
+			provider.rules = null;
+			return;
+		case "hooks":
+			provider.hooks = null;
+			return;
+	}
+}
 
 export interface OverrideOptions {
 	/** When true (Antigravity), write rules to AGENTS.md instead of GEMINI.md */
@@ -34,11 +50,10 @@ export function applyMewkitOverrides(options: OverrideOptions = {}): void {
 		ProviderType,
 		(typeof providerDocumentationContracts)[ProviderType],
 	][]) {
-		for (const portableType of Object.keys(providerConfigKeys) as PortableType[]) {
+		for (const portableType of portableTypes) {
 			const surface = contract.surfaces[portableType];
 			if (surface?.status === "documented") continue;
-			const configKey = providerConfigKeys[portableType];
-			providers[provider][configKey] = null;
+			disablePortableSurface(providers[provider], portableType);
 		}
 	}
 
