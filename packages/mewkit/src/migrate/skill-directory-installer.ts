@@ -2,8 +2,9 @@
 // to the target provider's skill path. Handles colon→dash sanitization for cross-platform safety.
 
 import { existsSync } from "node:fs";
-import { cp, mkdir, readFile, realpath, rename, rm } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile, realpath, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
+import { stripClaudeRefs } from "./converters/index.js";
 import { providers } from "./provider-registry.js";
 import { getPortableInstallPath } from "./provider-registry-utils.js";
 import { sanitizeSkillName } from "./discovery/skills-discovery.js";
@@ -33,6 +34,28 @@ async function canonicalize(path: string): Promise<string> {
 			return join(canonicalParent, basename);
 		} catch {
 			return resolve(path);
+		}
+	}
+}
+
+async function rewriteMarkdownFilesForProvider(rootDir: string, provider: ProviderType): Promise<void> {
+	const entries = await readdir(rootDir, { withFileTypes: true });
+
+	for (const entry of entries) {
+		const fullPath = join(rootDir, entry.name);
+		if (entry.isDirectory()) {
+			await rewriteMarkdownFilesForProvider(fullPath, provider);
+			continue;
+		}
+		if (!entry.isFile() || !entry.name.toLowerCase().endsWith(".md")) continue;
+
+		const original = await readFile(fullPath, "utf-8");
+		const rewritten = stripClaudeRefs(original, {
+			provider,
+			targetName: providers[provider].displayName,
+		}).content;
+		if (rewritten !== original) {
+			await writeFile(fullPath, rewritten, "utf-8");
 		}
 	}
 }
@@ -86,6 +109,7 @@ export async function installSkillDirectory(
 		try {
 			await cp(skill.sourcePath, targetDir, { recursive: true, force: true, errorOnExist: false });
 			copied = true;
+			await rewriteMarkdownFilesForProvider(targetDir, provider);
 		} catch (error) {
 			try {
 				if (copied && existsSync(targetDir)) {

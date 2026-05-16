@@ -1,5 +1,3 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { getProviderSurfaceContract } from "./provider-documentation-contracts.js";
 import { providers } from "./provider-registry.js";
 import type { PortableItem, PortableType, ProviderType, SkillInfo } from "./types.js";
@@ -37,6 +35,12 @@ function summarizeSignals(content: string): string[] {
 
 function summarizeHardSkipSignals(content: string): string[] {
 	return RUNTIME_BOUND_SIGNALS.filter((signal) => signal.hardSkip && signal.pattern.test(content)).map((signal) => signal.label);
+}
+
+function summarizeSkillSkipSignals(content: string): string[] {
+	return RUNTIME_BOUND_SIGNALS.filter((signal) => signal.label === "orchestrator semantics" && signal.pattern.test(content)).map(
+		(signal) => signal.label,
+	);
 }
 
 export function getRuntimeBoundSignals(content: string): string[] {
@@ -152,41 +156,15 @@ export async function buildPortableSkillsByProvider(
 ): Promise<{ skillsByProvider: Map<ProviderType, SkillInfo[]>; skipMessages: string[]; skips: PortabilitySkip[] }> {
 	const skillsByProvider = new Map<ProviderType, SkillInfo[]>();
 	const skips: PortabilitySkip[] = [];
-	const contentCache = new Map<string, string>();
-
-	async function readSkillContent(skill: SkillInfo): Promise<string> {
-		const cached = contentCache.get(skill.sourcePath);
-		if (cached !== undefined) return cached;
-		const content = await readFile(join(skill.sourcePath, "SKILL.md"), "utf-8");
-		contentCache.set(skill.sourcePath, content);
-		return content;
-	}
 
 	for (const target of targets) {
 		if (!providers[target].skills) continue;
-		const portable: SkillInfo[] = [];
-
-		for (const skill of skills) {
-			const content = await readSkillContent(skill);
-			const signals = summarizeSignals(content);
-			if (signals.length > 0) {
-				skips.push({
-					provider: target,
-					type: "skill",
-					item: skill.name,
-					reason: buildRuntimeBoundReason(signals),
-				});
-				continue;
-			}
-			portable.push(skill);
-		}
-
-		skillsByProvider.set(target, portable);
+		skillsByProvider.set(target, [...skills]);
 	}
 
 	return {
 		skillsByProvider,
-		skipMessages: summarizeSkipCounts(skips),
+		skipMessages: [],
 		skips,
 	};
 }

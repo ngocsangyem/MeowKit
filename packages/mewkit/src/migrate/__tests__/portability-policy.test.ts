@@ -151,7 +151,7 @@ describe("portability policy", () => {
 		);
 	});
 
-	it("skips runtime-bound skills per provider", async () => {
+	it("keeps skills available for provider-specific rewriting during install", async () => {
 		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
 		tempDirs.push(root);
 
@@ -190,8 +190,43 @@ describe("portability policy", () => {
 
 		const result = await buildPortableSkillsByProvider(skills, ["codex", "cursor"] satisfies ProviderType[]);
 
-		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["portable-skill"]);
-		expect(result.skillsByProvider.get("cursor")?.map((skill) => skill.name)).toEqual(["portable-skill"]);
-		expect(result.skipMessages.filter((message) => /Skipped 1 skill/.test(message))).toHaveLength(2);
+		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual([
+			"portable-skill",
+			"workflow-orchestrator",
+		]);
+		expect(result.skillsByProvider.get("cursor")?.map((skill) => skill.name)).toEqual([
+			"portable-skill",
+			"workflow-orchestrator",
+		]);
+		expect(result.skipMessages).toEqual([]);
 	});
+
+	it("does not skip skills only because they mention workflow phases", async () => {
+		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
+		tempDirs.push(root);
+
+		const phaseSkillDir = join(root, "phase-aware-skill");
+		await mkdir(phaseSkillDir, { recursive: true });
+		await writeFile(
+			join(phaseSkillDir, "SKILL.md"),
+			"---\nname: phase-aware-skill\ndescription: Phase-aware helper\n---\nOperates in Phase 3 (Build) and Phase 4 (Review).\n",
+			"utf-8",
+		);
+
+		const skills: SkillInfo[] = [
+			{
+				id: "mk:phase-aware-skill",
+				name: "phase-aware-skill",
+				dirName: "phase-aware-skill",
+				description: "Phase-aware helper",
+				sourcePath: phaseSkillDir,
+			},
+		];
+
+		const result = await buildPortableSkillsByProvider(skills, ["codex"] satisfies ProviderType[]);
+
+		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["phase-aware-skill"]);
+		expect(result.skipMessages).toEqual([]);
+	});
+
 });
