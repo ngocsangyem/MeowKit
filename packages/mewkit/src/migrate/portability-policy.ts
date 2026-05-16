@@ -8,6 +8,7 @@ import type { ReconcileAction, ReconcilePlan } from "./reconcile/reconcile-types
 interface RuntimeBoundSignal {
 	label: string;
 	pattern: RegExp;
+	hardSkip?: boolean;
 }
 
 export interface PortabilitySkip {
@@ -23,15 +24,19 @@ const RUNTIME_BOUND_SIGNALS: RuntimeBoundSignal[] = [
 	{ label: "mk/meow slash command", pattern: /\/(?:mk|meow):/i },
 	{ label: "Claude env var", pattern: /\$CLAUDE_[A-Z0-9_]+\b/ },
 	{ label: "Anthropic env var", pattern: /\$ANTHROPIC_[A-Z0-9_]+\b/ },
-	{ label: "gate semantics", pattern: /\bGate\s+[12]\b/i },
-	{ label: "phase pipeline semantics", pattern: /\bPhase\s+[0-9]+\b/i },
-	{ label: "orchestrator semantics", pattern: /\borchestrator\b/i },
+	{ label: "gate semantics", pattern: /\bGate\s+[12]\b/i, hardSkip: true },
+	{ label: "phase pipeline semantics", pattern: /\bPhase\s+[0-9]+\b/i, hardSkip: true },
+	{ label: "orchestrator semantics", pattern: /\borchestrator\b/i, hardSkip: true },
 ];
 
 const RUNTIME_BOUND_ITEM_TYPES = new Set<PortableType>(["agent", "command", "rules"]);
 
 function summarizeSignals(content: string): string[] {
 	return RUNTIME_BOUND_SIGNALS.filter((signal) => signal.pattern.test(content)).map((signal) => signal.label);
+}
+
+function summarizeHardSkipSignals(content: string): string[] {
+	return RUNTIME_BOUND_SIGNALS.filter((signal) => signal.hardSkip && signal.pattern.test(content)).map((signal) => signal.label);
 }
 
 export function getRuntimeBoundSignals(content: string): string[] {
@@ -56,7 +61,7 @@ function shouldSkipPortableItem(item: PortableItem, provider: ProviderType): Por
 	if (provider === "claude-code") return null;
 	if (!RUNTIME_BOUND_ITEM_TYPES.has(item.type)) return null;
 
-	const signals = summarizeSignals(item.body);
+	const signals = summarizeHardSkipSignals(item.body);
 	if (signals.length === 0) return null;
 
 	return {

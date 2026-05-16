@@ -45,7 +45,7 @@ describe("portability policy", () => {
 	});
 
 	it("filters runtime-bound agents and rules for non-Claude providers", () => {
-		const agent = makeItem("agent", "analyst", "See CLAUDE.md and .claude/memory/ after /mk:budget.");
+		const agent = makeItem("agent", "analyst", "Route findings back to the orchestrator during Phase 6.");
 		const config = makeItem("config", "CLAUDE", "Project contract");
 		const plan = makePlan([
 			{

@@ -18,7 +18,7 @@ describe("provider registry", () => {
 
 	it("only advertises officially documented hook surfaces", () => {
 		const hookProviders = getProvidersSupporting("hooks").sort();
-		expect(hookProviders).toEqual(["claude-code"]);
+		expect(hookProviders).toEqual(["claude-code", "codex"]);
 	});
 
 	it("does not advertise undocumented Codex custom commands", () => {
@@ -102,8 +102,10 @@ describe("provider overrides", () => {
 
 	it("Codex is marked experimental", () => {
 		expect(providers.codex.supportLevel).toBe("experimental");
-		expect(providers.codex.agents).toBeNull();
-		expect(providers.codex.rules).toBeNull();
-		expect(providers.codex.hooks).toBeNull();
+		expect(providers.codex.agents?.projectPath).toBe(".codex/agents");
+		expect(providers.codex.skills?.projectPath).toBe(".agents/skills");
+		expect(providers.codex.rules?.projectPath).toBe("AGENTS.md");
+		expect(providers.codex.hooks?.projectPath).toBe(".codex/hooks");
+		expect(providers.codex.commands).toBeNull();
 	});
 });

@@ -47,12 +47,19 @@ export const providerDocumentationContracts: Record<ProviderType, ProviderDocume
 	},
 	codex: {
 		docs: [
-			"https://openai.com/index/introducing-codex/?video=1084810944",
-			"https://help.openai.com/en/articles/11369540-codex-in-chatgpt",
-			"https://help.openai.com/en/collections/13193998-codex-cli",
+			"https://developers.openai.com/codex/guides/agents-md",
+			"https://developers.openai.com/codex/hooks",
+			"https://developers.openai.com/codex/skills",
+			"https://developers.openai.com/codex/subagents",
+			"https://developers.openai.com/codex/rules",
+			"https://developers.openai.com/codex/cli/slash-commands",
 		],
 		surfaces: {
-			config: { status: "documented", docs: ["https://openai.com/index/introducing-codex/?video=1084810944"] },
+			agent: { status: "documented", docs: ["https://developers.openai.com/codex/subagents"] },
+			config: { status: "documented", docs: ["https://developers.openai.com/codex/guides/agents-md"] },
+			rules: { status: "documented", docs: ["https://developers.openai.com/codex/guides/agents-md"] },
+			hooks: { status: "documented", docs: ["https://developers.openai.com/codex/hooks"] },
+			skill: { status: "documented", docs: ["https://developers.openai.com/codex/skills"] },
 		},
 	},
 	droid: {

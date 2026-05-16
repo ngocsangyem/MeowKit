@@ -24,11 +24,13 @@ describe("provider documentation contracts", () => {
 	});
 
 	it("defaults undocumented surfaces to unsupported", () => {
-		expect(getProviderSurfaceContract("codex", "agent").status).toBe("unsupported");
+		expect(getProviderSurfaceContract("codex", "command").status).toBe("unsupported");
 		expect(getProviderSurfaceContract("openhands", "config").status).toBe("unsupported");
 	});
 
 	it("preserves documented surfaces for strongly documented runtimes", () => {
+		expect(getProviderSurfaceContract("codex", "agent").status).toBe("documented");
+		expect(getProviderSurfaceContract("codex", "hooks").status).toBe("documented");
 		expect(getProviderSurfaceContract("gemini-cli", "command").status).toBe("documented");
 		expect(getProviderSurfaceContract("kiro", "skill").status).toBe("documented");
 		expect(getProviderSurfaceContract("windsurf", "rules").status).toBe("documented");
