@@ -201,6 +201,14 @@ function shouldSkipUnsupportedSurface(action: ReconcileAction): PortabilitySkip 
 }
 
 function summarizeSkipCounts(skips: PortabilitySkip[]): string[] {
+	const typeLabels: Record<PortableType | "skill", { singular: string; plural: string }> = {
+		agent: { singular: "agent", plural: "agents" },
+		command: { singular: "command", plural: "commands" },
+		skill: { singular: "skill", plural: "skills" },
+		config: { singular: "config", plural: "configs" },
+		rules: { singular: "rule", plural: "rules" },
+		hooks: { singular: "hook", plural: "hooks" },
+	};
 	const counts = new Map<string, { count: number; provider: ProviderType; type: PortableType | "skill"; reason: string }>();
 	for (const skip of skips) {
 		const key = JSON.stringify([skip.provider, skip.type, skip.reason]);
@@ -215,7 +223,9 @@ function summarizeSkipCounts(skips: PortabilitySkip[]): string[] {
 	return Array.from(counts.entries())
 		.sort((a, b) => a[0].localeCompare(b[0]))
 		.map(([, entry]) => {
-			return `Skipped ${entry.count} ${entry.type}${entry.count === 1 ? "" : "s"} for ${providers[entry.provider].displayName}: ${entry.reason}`;
+			const label = typeLabels[entry.type];
+			const typeLabel = entry.count === 1 ? label.singular : label.plural;
+			return `Skipped ${entry.count} ${typeLabel} for ${providers[entry.provider].displayName}: ${entry.reason}`;
 		});
 }
 

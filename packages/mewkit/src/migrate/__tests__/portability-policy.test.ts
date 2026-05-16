@@ -182,7 +182,7 @@ describe("portability policy", () => {
 
 		expect(filtered.plan.actions).toHaveLength(0);
 		expect(filtered.skipMessages).toContain(
-			"Skipped 1 rules for Codex: orchestration-only Claude workflow rule: phase workflow, gate workflow, orchestrator role",
+			"Skipped 1 rule for Codex: orchestration-only Claude workflow rule: phase workflow, gate workflow, orchestrator role",
 		);
 	});
 
@@ -211,7 +211,7 @@ describe("portability policy", () => {
 
 		expect(filtered.plan.actions).toHaveLength(0);
 		expect(filtered.skipMessages).toContain(
-			"Skipped 1 rules for Codex: Codex `.rules` files require native `prefix_rule()` entries or a supported Markdown command policy",
+			"Skipped 1 rule for Codex: Codex `.rules` files require native `prefix_rule()` entries or a supported Markdown command policy",
 		);
 	});
 
@@ -253,6 +253,46 @@ describe("portability policy", () => {
 		});
 
 		expect(filtered.plan.actions).toHaveLength(0);
+	});
+
+	it("formats rule skip summaries without duplicated plural suffixes", () => {
+		const rule = makeItem("rules", "engineering/standards", "Keep changes deterministic and test coverage strong.");
+		const plan = makePlan([
+			{
+				action: "install",
+				item: "engineering/standards",
+				type: "rules",
+				provider: "codex",
+				global: false,
+				targetPath: ".codex/rules/engineering/standards.rules",
+				reason: "new-item",
+			},
+			{
+				action: "install",
+				item: "engineering/standards-2",
+				type: "rules",
+				provider: "codex",
+				global: false,
+				targetPath: ".codex/rules/engineering/standards-2.rules",
+				reason: "new-item",
+			},
+		]);
+
+		const filtered = filterPlanForPortability(plan, {
+			agent: [],
+			command: [],
+			skill: [],
+			config: [],
+			rules: [
+				rule,
+				makeItem("rules", "engineering/standards-2", "Keep changes deterministic and test coverage strong."),
+			],
+			hooks: [],
+		});
+
+		expect(filtered.skipMessages).toContain(
+			"Skipped 2 rules for Codex: Codex `.rules` files require native `prefix_rule()` entries or a supported Markdown command policy",
+		);
 	});
 
 	it("keeps skills available for provider-specific rewriting during install", async () => {

@@ -2,7 +2,7 @@
 // merge-single, yaml-merge, json-merge). codex-toml + codex-hooks delegated to Phase 8 mergers.
 
 import { existsSync } from "node:fs";
-import { lstat, mkdir, rename, unlink, writeFile } from "node:fs/promises";
+import { lstat, mkdir, realpath, rename, unlink, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { providers } from "./provider-registry.js";
@@ -32,12 +32,28 @@ function isPathWithinBoundary(targetPath: string, boundaryPath: string): boolean
 	return resolvedTarget === resolvedBoundary || resolvedTarget.startsWith(`${resolvedBoundary}${sep}`);
 }
 
+async function resolveCanonicalPath(path: string): Promise<string> {
+	const resolved = resolve(path);
+	let cursor = resolved;
+	const suffix: string[] = [];
+
+	while (!existsSync(cursor)) {
+		const parent = dirname(cursor);
+		if (parent === cursor) break;
+		suffix.unshift(cursor.slice(parent.length + 1));
+		cursor = parent;
+	}
+
+	const canonicalBase = existsSync(cursor) ? await realpath(cursor) : cursor;
+	return suffix.length === 0 ? canonicalBase : join(canonicalBase, ...suffix);
+}
+
 async function validateNoSymlinkComponents(
 	targetPath: string,
 	boundaryPath: string,
 ): Promise<string | null> {
-	const resolvedTarget = resolve(targetPath);
-	const resolvedBoundary = resolve(boundaryPath);
+	const resolvedTarget = await resolveCanonicalPath(targetPath);
+	const resolvedBoundary = await resolveCanonicalPath(boundaryPath);
 
 	if (!isPathWithinBoundary(resolvedTarget, resolvedBoundary)) {
 		return `Unsafe path: target escapes ${resolvedBoundary}`;
