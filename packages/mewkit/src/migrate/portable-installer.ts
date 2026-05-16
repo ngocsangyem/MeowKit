@@ -7,6 +7,7 @@ import { dirname } from "node:path";
 import { providers } from "./provider-registry.js";
 import { addPortableInstallation, removePortableInstallation } from "./reconcile/portable-registry.js";
 import { computeContentChecksum } from "./reconcile/checksum-utils.js";
+import { auditRuntimeCompatibility } from "./runtime-compat-audit.js";
 import type { ReconcileAction } from "./reconcile/reconcile-types.js";
 import type { PortableType, ProviderType, PortableItem } from "./types.js";
 import { convertItem } from "./converters/index.js";
@@ -78,6 +79,15 @@ export async function executeInstallAction(action: ReconcileAction, ctx: Install
 
 	const conversion = convertItem(sourceItem, pathConfig.format, provider);
 	if (conversion.error) return { action, success: false, error: conversion.error };
+
+	const audit = auditRuntimeCompatibility(conversion.content, sourceItem, provider);
+	if (audit.errors.length > 0) {
+		return {
+			action,
+			success: false,
+			error: `Runtime compatibility audit failed: ${audit.errors.join("; ")}`,
+		};
+	}
 
 	const overwritten = existsSync(action.targetPath);
 

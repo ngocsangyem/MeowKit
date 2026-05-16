@@ -46,6 +46,7 @@ export async function selectProviders(options: MigrateOptions): Promise<Provider
 		if (valid.length === 0) {
 			throw new MewkitMigrateError("No valid tools in --migrate-to list", 2);
 		}
+		enforceProviderSupportPolicy(valid, options.force);
 		return valid;
 	}
 
@@ -54,10 +55,15 @@ export async function selectProviders(options: MigrateOptions): Promise<Provider
 		if (!ALL_TARGET_TYPES.includes(tool)) {
 			throw new MewkitMigrateError(`Unknown tool: ${options.tool}`, 2);
 		}
+		enforceProviderSupportPolicy([tool], options.force);
 		return [tool];
 	}
 
-	if (options.all) return [...ALL_TARGET_TYPES];
+	if (options.all) {
+		const allTargets = [...ALL_TARGET_TYPES];
+		enforceProviderSupportPolicy(allTargets, options.force);
+		return allTargets;
+	}
 
 	if (options.yes) {
 		const result = await safeDetectInstalledTargets();
@@ -69,8 +75,11 @@ export async function selectProviders(options: MigrateOptions): Promise<Provider
 		}
 		if (result.installed.length === 0) {
 			console.log("[i] No installed providers detected; defaulting to all 15 targets.");
-			return [...ALL_TARGET_TYPES];
+			const allTargets = [...ALL_TARGET_TYPES];
+			enforceProviderSupportPolicy(allTargets, options.force);
+			return allTargets;
 		}
+		enforceProviderSupportPolicy(result.installed, options.force);
 		return result.installed;
 	}
 
@@ -102,7 +111,9 @@ export async function selectProviders(options: MigrateOptions): Promise<Provider
 	});
 
 	if (p.isCancel(choice)) throw new MewkitMigrateError("Cancelled", 130);
-	return choice as ProviderType[];
+	const selected = choice as ProviderType[];
+	enforceProviderSupportPolicy(selected, options.force);
+	return selected;
 }
 
 export async function selectScope(options: MigrateOptions): Promise<boolean> {
@@ -124,11 +135,31 @@ export async function selectScope(options: MigrateOptions): Promise<boolean> {
 
 export function warnUnverifiedProviders(providers_: ProviderType[]): void {
 	for (const p of providers_) {
+		const level = providers[p].supportLevel;
+		if (level === "experimental") {
+			const reason = providers[p].supportReason ? ` ${providers[p].supportReason}` : "";
+			console.log(`[!] ${providers[p].displayName} support is EXPERIMENTAL.${reason}`);
+		}
 		if (providers[p]._unverified) {
 			console.log(
 				`[!] ${providers[p].displayName} support is UNVERIFIED. Migration may produce broken output. Report issues at <repo>/issues if it fails.`,
 			);
 		}
+	}
+}
+
+function enforceProviderSupportPolicy(targets: ProviderType[], force = false): void {
+	for (const target of targets) {
+		if (providers[target].supportLevel !== "deprecated") continue;
+		const reason = providers[target].supportReason ? ` ${providers[target].supportReason}` : "";
+		if (force) {
+			console.log(`[!] ${providers[target].displayName} is DEPRECATED, but proceeding because --force was supplied.${reason}`);
+			continue;
+		}
+		throw new MewkitMigrateError(
+			`${providers[target].displayName} is a deprecated migration target and is disabled by default.${reason} Re-run with --force if you still need this export.`,
+			2,
+		);
 	}
 }
 

@@ -69,4 +69,13 @@ describe("provider overrides", () => {
 		applyMewkitOverrides();
 		expect(providers.kilo._unverified).toBe(true);
 	});
+
+	it("Roo is marked deprecated", () => {
+		expect(providers.roo.supportLevel).toBe("deprecated");
+		expect(providers.roo.supportReason).toMatch(/May 15, 2026/);
+	});
+
+	it("Codex is marked experimental", () => {
+		expect(providers.codex.supportLevel).toBe("experimental");
+	});
 });

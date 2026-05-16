@@ -173,6 +173,7 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	"github-copilot": {
 		name: "github-copilot",
 		displayName: "GitHub Copilot",
+		supportLevel: "verified",
 		subagents: "full",
 		agents: {
 			projectPath: ".github/agents",
@@ -216,6 +217,8 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	codex: {
 		name: "codex",
 		displayName: "Codex",
+		supportLevel: "experimental",
+		supportReason: "Public runtime docs do not yet fully document every filesystem surface used by this adapter.",
 		subagents: "full",
 		agents: {
 			projectPath: ".codex/agents",
@@ -272,6 +275,7 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	droid: {
 		name: "droid",
 		displayName: "Droid",
+		supportLevel: "verified",
 		subagents: "full",
 		agents: {
 			projectPath: ".factory/droids",
@@ -337,6 +341,7 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	cursor: {
 		name: "cursor",
 		displayName: "Cursor",
+		supportLevel: "verified",
 		subagents: "full",
 		agents: {
 			projectPath: ".cursor/rules",
@@ -377,6 +382,8 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	roo: {
 		name: "roo",
 		displayName: "Roo Code",
+		supportLevel: "deprecated",
+		supportReason: "Roo Code docs announce product shutdown effective May 15, 2026.",
 		subagents: "full",
 		agents: {
 			projectPath: ".roomodes",
@@ -422,6 +429,8 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	kilo: {
 		name: "kilo",
 		displayName: "Kilo Code",
+		supportLevel: "experimental",
+		supportReason: "Adapter is kept for compatibility, but exact file-level migration contract is not fully verified.",
 		subagents: "full",
 		agents: {
 			projectPath: ".kilocodemodes",
@@ -467,6 +476,7 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	kiro: {
 		name: "kiro",
 		displayName: "Kiro IDE",
+		supportLevel: "verified",
 		subagents: "none",
 		agents: {
 			projectPath: ".kiro/steering",
@@ -511,6 +521,7 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	windsurf: {
 		name: "windsurf",
 		displayName: "Windsurf",
+		supportLevel: "verified",
 		subagents: "none",
 		agents: {
 			projectPath: ".windsurf/rules",
@@ -566,6 +577,8 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	goose: {
 		name: "goose",
 		displayName: "Goose",
+		supportLevel: "experimental",
+		supportReason: "Goose customization is extension-driven; this adapter only covers a subset of native surfaces.",
 		subagents: "full",
 		agents: {
 			projectPath: "AGENTS.md",
@@ -610,6 +623,7 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	"gemini-cli": {
 		name: "gemini-cli",
 		displayName: "Gemini CLI",
+		supportLevel: "verified",
 		subagents: "planned",
 		agents: {
 			projectPath: "AGENTS.md",
@@ -666,6 +680,8 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	amp: {
 		name: "amp",
 		displayName: "Amp",
+		supportLevel: "experimental",
+		supportReason: "Amp supports AGENTS.md natively, but this adapter still relies on shared skills conventions for part of the export.",
 		subagents: "full",
 		agents: {
 			projectPath: "AGENT.md",
@@ -710,6 +726,8 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	antigravity: {
 		name: "antigravity",
 		displayName: "Antigravity",
+		supportLevel: "experimental",
+		supportReason: "Runtime support exists, but parts of this adapter are based on a younger and still-shifting tool surface.",
 		subagents: "full",
 		agents: null,
 		commands: {
@@ -758,6 +776,8 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	cline: {
 		name: "cline",
 		displayName: "Cline",
+		supportLevel: "experimental",
+		supportReason: "Cline has richer native concepts than this adapter currently models, especially around modes and workflows.",
 		subagents: "full",
 		agents: {
 			projectPath: ".clinerules",
@@ -796,6 +816,8 @@ export const providers: Record<ProviderType, ProviderConfig> = {
 	openhands: {
 		name: "openhands",
 		displayName: "OpenHands",
+		supportLevel: "experimental",
+		supportReason: "OpenHands is microagent/setup-script centric; this adapter only approximates that model today.",
 		subagents: "full",
 		agents: {
 			projectPath: ".openhands/skills",

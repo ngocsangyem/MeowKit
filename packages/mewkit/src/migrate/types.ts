@@ -64,11 +64,14 @@ export interface ProviderPathConfig {
 
 /** Provider's level of subagent/delegation support */
 export type SubagentSupport = "full" | "partial" | "none" | "planned";
+export type ProviderSupportLevel = "verified" | "experimental" | "deprecated";
 
 /** Full provider configuration */
 export interface ProviderConfig {
 	name: ProviderType;
 	displayName: string;
+	supportLevel?: ProviderSupportLevel;
+	supportReason?: string;
 	subagents: SubagentSupport;
 	agents: ProviderPathConfig | null;
 	commands: ProviderPathConfig | null;

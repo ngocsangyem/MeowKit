@@ -309,6 +309,21 @@ export function stripClaudeRefs(
 		return trailingPunctuation;
 	});
 
+	const envVarReplacements: Array<[RegExp, string]> = [
+		[/\$CLAUDE_PROJECT_DIR\b/g, "the project root"],
+		[/\$CLAUDE_MODEL\b/g, "the runtime-selected model"],
+		[/\$CLAUDE_[A-Z0-9_]+\b/g, "runtime-specific environment"],
+		[/\$ANTHROPIC_API_KEY\b/g, "your provider API key"],
+		[/\$ANTHROPIC_[A-Z0-9_]+\b/g, "provider-specific environment"],
+	];
+
+	for (const [regex, replacement] of envVarReplacements) {
+		result = result.replace(regex, (matched, ...args) => {
+			const offset = args[args.length - 2] as number;
+			return isInCodeBlock(offset) ? matched : replacement;
+		});
+	}
+
 	const agentTarget = getProviderPathTarget(options?.provider, "agents");
 	const commandTarget = getProviderPathTarget(options?.provider, "commands");
 	const skillTarget = getProviderPathTarget(options?.provider, "skills");

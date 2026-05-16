@@ -52,10 +52,32 @@ describe("stripClaudeRefs — narrative brand prose", () => {
 			expect(content).toContain("the host runtime handles hooks");
 		});
 
+		it("rewrites Claude-specific environment variables outside code blocks", () => {
+			const input = "Runtime uses $CLAUDE_PROJECT_DIR and $CLAUDE_MODEL.";
+			const { content } = stripClaudeRefs(input, { provider: "codex", targetName: "Codex" });
+			expect(content).toContain("the project root");
+			expect(content).toContain("the runtime-selected model");
+			expect(content).not.toContain("$CLAUDE_PROJECT_DIR");
+			expect(content).not.toContain("$CLAUDE_MODEL");
+		});
+
+		it("rewrites Anthropic-specific environment variables outside code blocks", () => {
+			const input = "Export $ANTHROPIC_API_KEY before running.";
+			const { content } = stripClaudeRefs(input, { provider: "codex", targetName: "Codex" });
+			expect(content).toContain("your provider API key");
+			expect(content).not.toContain("$ANTHROPIC_API_KEY");
+		});
+
 		it("preserves 'Claude Code' inside fenced code blocks", () => {
 			const input = "Example:\n```\nClaude Code\n```\nEnd.";
 			const { content } = stripClaudeRefs(input, { provider: "codex", targetName: "Codex" });
 			expect(content).toContain("Claude Code");
+		});
+
+		it("preserves Claude env vars inside fenced code blocks", () => {
+			const input = "```sh\nexport CLAUDE_PROJECT_DIR=$CLAUDE_PROJECT_DIR\n```";
+			const { content } = stripClaudeRefs(input, { provider: "codex", targetName: "Codex" });
+			expect(content).toContain("$CLAUDE_PROJECT_DIR");
 		});
 	});
 
