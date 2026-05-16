@@ -1283,7 +1283,7 @@ This is the most reference-heavy skill (19 files). The existing doc page is 3 pa
 6. **Workflow integration missing.** The chain `mk:bootstrap → mk:docs-init → mk:plan-creator` is undocumented.
 7. **Handoff protocol missing.** The completion message "Docs initialized. Run `mk:document-release` after shipping features to keep them in sync." is absent.
 8. **All gotchas missing (9 total).** Source SKILL.md has 3 gotchas (hallucinating architecture, over-documenting small projects, stale on first run) plus `references/gotchas.md` adds 6 more (duplicating README content, missing entry points, generating deployment docs for non-deployed projects, and 3 more). None in doc.
-9. **Doc mentions generating `ARCHITECTURE` and `CONTRIBUTING`** but source says output files are: `README.md`, `docs/project-overview.md`, `docs/codebase-summary.md`, `docs/code-standards.md`, `docs/system-architecture.md`, optional `docs/deployment-guide.md`, optional `docs/design-guidelines.md`. ARCHITECTURE and CONTRIBUTING are not in the source's output list.
+9. **Doc mentions generating `ARCHITECTURE` and `CONTRIBUTING`** but source says output files are: `README.md`, `docs/project-overview.md`, `docs/codebase-summary.md`, `docs/code-standards.md`, `docs/architecture/system-architecture.md`, optional `docs/deployment-guide.md`, optional `docs/design-guidelines.md`. ARCHITECTURE and CONTRIBUTING are not in the source's output list.
 10. **`mk:project-context` relationship unclear.** Doc says "Also run `mk:project-context` to generate the agent-constitution file" but doesn't explain that `mk:docs-init` generates the full suite while `mk:project-context` generates only the constitution (`docs/project-context.md`).
 
 ### Improved Documentation
@@ -1334,7 +1334,7 @@ This skill creates `docs/` from scratch. For updating existing docs → `mk:docu
    - `docs/project-overview.md` — what this project is, who it's for
    - `docs/codebase-summary.md` — directory map, key modules, entry points
    - `docs/code-standards.md` — conventions found in codebase
-   - `docs/system-architecture.md` — component diagram, data flow
+   - `docs/architecture/system-architecture.md` — component diagram, data flow
 
    Optional (generate only if relevant):
    - `docs/deployment-guide.md` — if CI/CD or Docker config detected

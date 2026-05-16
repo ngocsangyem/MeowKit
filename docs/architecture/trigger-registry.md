@@ -100,5 +100,5 @@ This file is the **canonical source** for skill discovery. Add a row whenever a 
 
 - `.claude/skills/SKILLS_INDEX.md` — operational skill index (different schema; this file is for discovery, that file for runtime metadata)
 - `.claude/agents/AGENTS_INDEX.md` — agent registry
-- `docs/rules-index.md` — rule load order (HUMAN-ONLY navigation aid; not auto-loaded)
+- `docs/governance/rules-index.md` — rule load order (HUMAN-ONLY navigation aid; not auto-loaded)
 - `docs/meowkit-rules.md` — canonical valid `subagent_type` list

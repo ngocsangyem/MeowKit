@@ -51,7 +51,7 @@ Do NOT invoke when: docs already exist and need updating (use `mk:document-relea
    - `docs/project-overview.md` — what this project is, who it's for
    - `docs/codebase-summary.md` — directory map, key modules, entry points
    - `docs/code-standards.md` — conventions found in codebase
-   - `docs/system-architecture.md` — component diagram, data flow
+   - `docs/architecture/system-architecture.md` — component diagram, data flow
      Optional (generate only if relevant):
    - `docs/deployment-guide.md` — if CI/CD or Docker config detected
    - `docs/design-guidelines.md` — if frontend/UI code detected

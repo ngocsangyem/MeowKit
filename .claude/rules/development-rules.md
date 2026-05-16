@@ -109,7 +109,7 @@ When docs impact is `minor` or `major`, update documentation in the same PR:
 
 - `docs/project-context.md` — conventions, stack, anti-patterns loaded by agents
 - `docs/project-overview.md` — product/system overview
-- `docs/system-architecture.md` — architecture and component relationships
+- `docs/architecture/system-architecture.md` — architecture and component relationships
 - `docs/code-standards.md` — code conventions and examples
 - `docs/deployment-guide.md` — release/deploy instructions
 - `docs/development-roadmap.md` — roadmap phase and milestone progress, when present

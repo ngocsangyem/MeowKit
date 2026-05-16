@@ -21,6 +21,7 @@ Use `/mk:harness` when you want to build a new product or substantial green-fiel
 - "Scaffold a REST API with authentication and tests"
 
 **Not for:**
+
 - Single features on an existing codebase → use `/mk:cook`
 - Bug fixes or refactors → use `/mk:fix`
 - Architecture exploration → use `/mk:party`
@@ -146,14 +147,14 @@ evidence/kanban-260408/                                  ← screenshots + curl 
 
 ## Flags
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--tier MINIMAL\|FULL\|LEAN` | auto | Override scaffolding density |
-| `--max-iter N` | 3 | Max generator ⇄ evaluator rounds before escalation |
-| `--budget N` | 100 | Hard budget cap in USD |
-| `--no-boot` | off | Skip project scaffolding (use existing repo) |
-| `--teams` | off | Spawn parallel developer agents (COMPLEX only) |
-| `--resume RUN_ID` | — | Resume interrupted run from last checkpoint |
+| Flag                         | Default | Description                                        |
+| ---------------------------- | ------- | -------------------------------------------------- |
+| `--tier MINIMAL\|FULL\|LEAN` | auto    | Override scaffolding density                       |
+| `--max-iter N`               | 3       | Max generator ⇄ evaluator rounds before escalation |
+| `--budget N`                 | 100     | Hard budget cap in USD                             |
+| `--no-boot`                  | off     | Skip project scaffolding (use existing repo)       |
+| `--teams`                    | off     | Spawn parallel developer agents (COMPLEX only)     |
+| `--resume RUN_ID`            | —       | Resume interrupted run from last checkpoint        |
 
 ## Reading the Verdict
 
@@ -186,4 +187,3 @@ The harness checkpoints state to `tasks/harness-runs/{run-id}/run.md`. Resume wi
 - [Adaptive Density](/guide/adaptive-density) — full density decision matrix and dead-weight thesis
 - [mk:harness reference](/reference/skills/harness) — all flags and configuration
 - [mk:evaluate reference](/reference/skills/evaluate) — evaluator rubric grading detail
-- Canonical runbook: `docs/harness-runbook.md`

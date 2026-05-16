@@ -450,7 +450,6 @@ Two threads land together. The five Phase-Zero conditional rule files move back 
 - New `find-orphans.ts` module exported from `core/index.ts` — reusable for downstream tooling that needs orphan detection independent of the update pipeline.
 - Four behavioral rule files (`naming-rules.md`, `output-format-rules.md`, `context-ordering-rules.md`, `search-before-building-rules.md`) merged into a single `agent-conduct.md`. Tier A preserves orchestrator-consumed schemas (Subagent Status Protocol, Project Context First, Eureka logging) verbatim; Tier B compresses model-default rules. Net: one file instead of four with no behavior change.
 - Conditional rule files moved from `.claude/rules/` to `.claude/rules-conditional/` so the always-loaded bundle stays small. `mk:agent-detector` loads them on demand at Phase 0. Affected files: `agent-routing.md`, `model-selection-rules.md`, `phase-contracts.md`, `risk-checklist.md`, `scale-adaptive-rules.md`.
-- `RULES_INDEX.md` moved from `.claude/rules/` to `docs/rules-index.md` so it does not load into every Claude session.
 
 ### Removals
 

@@ -243,7 +243,7 @@ Priority order (1 = highest override):
 13. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
 14. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
 
-Full index: `docs/rules-index.md`
+Full index: `docs/governance/rules-index.md`
 
 ---
 

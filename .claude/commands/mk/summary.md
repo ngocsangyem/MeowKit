@@ -53,7 +53,7 @@ it without needing to `cat` the file by hand.
   `project-context-loader.sh` clears it automatically.
 - To disable summarization entirely, set `MEOWKIT_SUMMARY_CACHE=off` in your env.
 - See `.claude/rules/harness-rules.md` Rule 11 for the rationale.
-- See `docs/harness-runbook.md` "Token Savings" section for the math + tuning knobs.
+- See `docs/operations/harness-runbook.md` "Token Savings" section for the math + tuning knobs.
 
 ## Related
 

@@ -179,7 +179,7 @@ Review dimensions: Correctness, Maintainability, Performance, Security, Coverage
 **Time budget:** 30 minutes
 
 - Update `docs/project-context.md`: add billing domain, Stripe SDK version, webhook event list
-- Update `docs/system-architecture.md`: add subscription state machine diagram
+- Update `docs/architecture/system-architecture.md`: add subscription state machine diagram
 - `mk:memory` session-capture: log any Stripe API surprises, webhook ordering issues
 - Capture with `##pattern:bug-class Stripe webhook events arrive out of order — always check current_period_end before updating status` → routes to `.claude/memory/fixes.json`
 - Docs impact: major

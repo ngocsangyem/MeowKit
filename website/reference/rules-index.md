@@ -7,7 +7,7 @@ description: "All 19 MeowKit enforcement rules with priority, mechanism, and ove
 
 Rules are loaded at session start. All mandatory unless marked `[CONTEXTUAL]`.
 
-Source file: `docs/rules-index.md`
+Source file: `docs/governance/rules-index.md`
 
 ## Rules
 
