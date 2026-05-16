@@ -156,10 +156,7 @@ export const providerCapabilityRegistry: Record<ProviderType, ProviderCapability
 		surfaces: {
 			agent: documented(["https://developers.openai.com/codex/subagents"]),
 			config: documented(["https://developers.openai.com/codex/guides/agents-md"]),
-			rules: documented(
-				["https://developers.openai.com/codex/rules"],
-				"Codex rules are documented, but they should not be treated as a Claude-style standalone rules folder.",
-			),
+			rules: documented(["https://developers.openai.com/codex/rules"], "Codex loads native `.rules` files from `rules/` under active config layers."),
 			hooks: documented(["https://developers.openai.com/codex/hooks"]),
 			skill: documented(["https://developers.openai.com/codex/skills"]),
 		},
@@ -175,10 +172,7 @@ export const providerCapabilityRegistry: Record<ProviderType, ProviderCapability
 			],
 			{
 				instruction_files: documented(["https://developers.openai.com/codex/guides/agents-md"]),
-				rules: documented(
-					["https://developers.openai.com/codex/rules"],
-					"Rules support is documented, but MeowKit should flatten or convert Claude rules based on semantics rather than folder shape.",
-				),
+				rules: documented(["https://developers.openai.com/codex/rules"], "Rules support is documented via native `.rules` files under active Codex config layers."),
 				hooks: documented(["https://developers.openai.com/codex/hooks"]),
 				agents: documented(["https://developers.openai.com/codex/subagents"]),
 				skills: documented(["https://developers.openai.com/codex/skills"]),

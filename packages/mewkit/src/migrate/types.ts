@@ -38,7 +38,8 @@ export type ConversionFormat =
 	| "md-strip"
 	| "md-to-mdc"
 	| "md-to-kiro-steering"
-	| "fm-to-codex-toml";
+	| "fm-to-codex-toml"
+	| "md-to-codex-rules";
 
 /** Write strategy for target files */
 export type WriteStrategy =

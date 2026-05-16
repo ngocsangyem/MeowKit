@@ -6,6 +6,7 @@ import { convertFmToCodexToml } from "./fm-to-codex-toml.js";
 import { convertFmToFm } from "./fm-to-fm.js";
 import { convertFmToJson } from "./fm-to-json.js";
 import { convertFmToYaml } from "./fm-to-yaml.js";
+import { convertMdToCodexRules } from "./md-to-codex-rules.js";
 import { convertMdStrip } from "./md-strip.js";
 import { convertMdToKiroSteering } from "./md-to-kiro-steering.js";
 import { convertMdToMdc } from "./md-to-mdc.js";
@@ -35,6 +36,8 @@ export function convertItem(item: PortableItem, format: ConversionFormat, provid
 				return convertMdToMdc(item, provider);
 			case "md-to-kiro-steering":
 				return convertMdToKiroSteering(item, provider);
+			case "md-to-codex-rules":
+				return convertMdToCodexRules(item);
 			case "fm-to-codex-toml":
 				return convertFmToCodexToml(item);
 			default: {
@@ -67,3 +70,4 @@ export { buildYamlModesFile } from "./fm-to-yaml.js";
 export { buildClineModesJson, convertToClineRule, type ClineCustomMode } from "./fm-to-json.js";
 export { toCodexSlug, buildCodexConfigEntry, type CodexAgentToml, type CodexConfigEntry } from "./fm-to-codex-toml.js";
 export { escapeTomlMultiline } from "./md-to-toml.js";
+export { analyzeCodexRuleSource, convertMdToCodexRules } from "./md-to-codex-rules.js";

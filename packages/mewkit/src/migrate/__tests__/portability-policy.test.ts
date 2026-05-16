@@ -166,7 +166,7 @@ describe("portability policy", () => {
 				type: "rules",
 				provider: "codex",
 				global: false,
-				targetPath: "AGENTS.md",
+				targetPath: ".codex/rules/workflow/gates.rules",
 				reason: "new-item",
 			},
 		]);
@@ -184,6 +184,75 @@ describe("portability policy", () => {
 		expect(filtered.skipMessages).toContain(
 			"Skipped 1 rules for Codex: orchestration-only Claude workflow rule: phase workflow, gate workflow, orchestrator role",
 		);
+	});
+
+	it("skips Markdown rules that cannot be mapped to Codex exec-policy rules", () => {
+		const rule = makeItem("rules", "engineering/standards", "Keep changes deterministic and test coverage strong.");
+		const plan = makePlan([
+			{
+				action: "install",
+				item: "engineering/standards",
+				type: "rules",
+				provider: "codex",
+				global: false,
+				targetPath: ".codex/rules/engineering/standards.rules",
+				reason: "new-item",
+			},
+		]);
+
+		const filtered = filterPlanForPortability(plan, {
+			agent: [],
+			command: [],
+			skill: [],
+			config: [],
+			rules: [rule],
+			hooks: [],
+		});
+
+		expect(filtered.plan.actions).toHaveLength(0);
+		expect(filtered.skipMessages).toContain(
+			"Skipped 1 rules for Codex: Codex `.rules` files require native `prefix_rule()` entries or a supported Markdown command policy",
+		);
+	});
+
+	it("skips mixed Markdown docs that only embed prefix_rule() as an example", () => {
+		const rule = makeItem(
+			"rules",
+			"engineering/mixed-example",
+			[
+				"# Example",
+				"",
+				"Use this sample when explaining approvals:",
+				"",
+				"```py",
+				'prefix_rule(pattern = ["gh", "pr", "view"], decision = "prompt")',
+				"```",
+				"",
+				"Do not execute the sample directly.",
+			].join("\n"),
+		);
+		const plan = makePlan([
+			{
+				action: "install",
+				item: "engineering/mixed-example",
+				type: "rules",
+				provider: "codex",
+				global: false,
+				targetPath: ".codex/rules/engineering/mixed-example.rules",
+				reason: "new-item",
+			},
+		]);
+
+		const filtered = filterPlanForPortability(plan, {
+			agent: [],
+			command: [],
+			skill: [],
+			config: [],
+			rules: [rule],
+			hooks: [],
+		});
+
+		expect(filtered.plan.actions).toHaveLength(0);
 	});
 
 	it("keeps skills available for provider-specific rewriting during install", async () => {
@@ -267,7 +336,7 @@ describe("portability policy", () => {
 	it("summarizes rule strategy per provider", () => {
 		const summaries = summarizeRuleMigrationByProvider(
 			[
-				makeItem("rules", "engineering/standards", "Keep changes deterministic and test coverage strong."),
+				makeItem("rules", "engineering/standards", "Prefer `rg` for code search. Use `rg` instead of `grep`.\n"),
 				makeItem("rules", "workflow/gates", "Phase 3 and Gate 1 govern orchestrator execution."),
 			],
 			["codex", "amp"] satisfies ProviderType[],

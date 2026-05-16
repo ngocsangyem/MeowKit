@@ -104,7 +104,10 @@ describe("provider overrides", () => {
 		expect(providers.codex.supportLevel).toBe("experimental");
 		expect(providers.codex.agents?.projectPath).toBe(".codex/agents");
 		expect(providers.codex.skills?.projectPath).toBe(".agents/skills");
-		expect(providers.codex.rules?.projectPath).toBe("AGENTS.md");
+		expect(providers.codex.config?.projectPath).toBe("AGENTS.md");
+		expect(providers.codex.rules?.projectPath).toBe(".codex/rules");
+		expect(providers.codex.rules?.format).toBe("md-to-codex-rules");
+		expect(providers.codex.rules?.fileExtension).toBe(".rules");
 		expect(providers.codex.hooks?.projectPath).toBe(".codex/hooks");
 		expect(providers.codex.commands).toBeNull();
 	});

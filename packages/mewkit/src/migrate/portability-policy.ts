@@ -1,4 +1,5 @@
 import { getProviderSurfaceContract } from "./provider-documentation-contracts.js";
+import { analyzeCodexRuleSource } from "./converters/index.js";
 import { classifyRuleSemantic } from "./ir/rule-classifier.js";
 import { providers } from "./provider-registry.js";
 import type { PortableItem, PortableType, ProviderType, SkillInfo } from "./types.js";
@@ -37,7 +38,6 @@ const RUNTIME_BOUND_SIGNALS: RuntimeBoundSignal[] = [
 ];
 
 const RUNTIME_BOUND_ITEM_TYPES = new Set<PortableType>(["agent", "command", "rules"]);
-
 function summarizeSignals(content: string): string[] {
 	return RUNTIME_BOUND_SIGNALS.filter((signal) => signal.pattern.test(content)).map((signal) => signal.label);
 }
@@ -92,6 +92,18 @@ function shouldSkipPortableItem(item: PortableItem, provider: ProviderType): Por
 				reason: `Claude runtime automation rule with no rule-layer portability: ${classified.signals.join(", ")}`,
 			};
 		}
+
+		if (provider === "codex") {
+			const analyzed = analyzeCodexRuleSource(item);
+			if (analyzed.kind === "unsupported") {
+				return {
+					provider,
+					type: item.type,
+					item: item.name,
+					reason: analyzed.reason ?? "Unsupported Codex rule content",
+				};
+			}
+		}
 	}
 
 	const signals = summarizeHardSkipSignals(item.body);
@@ -128,6 +140,14 @@ export function summarizeRuleMigrationByProvider(
 			if (classified.kind === "orchestration" || classified.kind === "runtime-automation") {
 				skipped += 1;
 				continue;
+			}
+
+			if (provider === "codex") {
+				const analyzed = analyzeCodexRuleSource(rule);
+				if (analyzed.kind === "unsupported") {
+					skipped += 1;
+					continue;
+				}
 			}
 
 			if (ruleSurface.status === "documented") {
