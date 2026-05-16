@@ -1,5 +1,5 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/codex-features-flag.ts
-// Idempotently ensures `[features] codex_hooks = true` in ~/.codex/config.toml.
+// Idempotently ensures `[features] hooks = true` in ~/.codex/config.toml.
 // Sentinel renamed: ck-managed → mewkit-managed.
 import { existsSync } from "node:fs";
 import { readFile, rename, unlink, writeFile } from "node:fs/promises";
@@ -11,7 +11,7 @@ const SENTINEL_END = "# --- mewkit-managed-features-end ---";
 
 const MANAGED_BLOCK = `${SENTINEL_START}
 [features]
-codex_hooks = true
+hooks = true
 ${SENTINEL_END}`;
 
 export type FeatureFlagWriteStatus = "written" | "updated" | "already-set" | "failed";
@@ -107,12 +107,27 @@ function ensureFlagInFeaturesSection(content: string, headerStartIdx: number): {
 	const bodyEnd = nextHeaderMatch ? bodyStart + nextHeaderMatch.index + 1 : content.length;
 
 	const body = content.slice(bodyStart, bodyEnd);
-	const flagRegex = /^([ \t]*codex_hooks[ \t]*=[ \t]*)(true|false)([ \t]*#[^\r\n]*)?[ \t]*$/m;
-	const flagMatch = flagRegex.exec(body);
+	const hooksRegex = /^([ \t]*hooks[ \t]*=[ \t]*)(true|false)([ \t]*#[^\r\n]*)?[ \t]*$/m;
+	const deprecatedRegex = /^([ \t]*codex_hooks[ \t]*=[ \t]*)(true|false)([ \t]*#[^\r\n]*)?[ \t]*$/m;
+	const hooksMatch = hooksRegex.exec(body);
+	const deprecatedMatch = deprecatedRegex.exec(body);
 
-	if (flagMatch) {
-		if (flagMatch[2] === "true") return { updated: content, changed: false };
-		const newBody = body.replace(flagRegex, (_m, prefix, _v, trailing) => `${prefix}true${trailing ?? ""}`);
+	if (hooksMatch) {
+		if (hooksMatch[2] === "true" && !deprecatedMatch) return { updated: content, changed: false };
+		let newBody = body.replace(hooksRegex, (_m, prefix, _v, trailing) => `${prefix}true${trailing ?? ""}`);
+		if (deprecatedMatch) {
+			newBody = newBody.replace(deprecatedRegex, "").replace(/\n{3,}/g, "\n\n");
+		}
+		return {
+			updated: content.slice(0, bodyStart) + newBody + content.slice(bodyEnd),
+			changed: true,
+		};
+	}
+
+	if (deprecatedMatch) {
+		const newBody = body
+			.replace(deprecatedRegex, (_m, _prefix, _v, trailing) => `hooks = true${trailing ?? ""}`)
+			.replace(/\n{3,}/g, "\n\n");
 		return {
 			updated: content.slice(0, bodyStart) + newBody + content.slice(bodyEnd),
 			changed: true,
@@ -120,7 +135,7 @@ function ensureFlagInFeaturesSection(content: string, headerStartIdx: number): {
 	}
 
 	if (headerLineEnd === -1) {
-		return { updated: `${content}\ncodex_hooks = true\n`, changed: true };
+		return { updated: `${content}\nhooks = true\n`, changed: true };
 	}
 
 	let insertAt = bodyEnd;
@@ -128,7 +143,7 @@ function ensureFlagInFeaturesSection(content: string, headerStartIdx: number): {
 		insertAt -= 1;
 	}
 	const needsLeadingNewline = insertAt > bodyStart && content[insertAt - 1] !== "\n";
-	const insertion = `${needsLeadingNewline ? "\n" : ""}codex_hooks = true\n`;
+	const insertion = `${needsLeadingNewline ? "\n" : ""}hooks = true\n`;
 
 	return {
 		updated: content.slice(0, insertAt) + insertion + content.slice(insertAt),

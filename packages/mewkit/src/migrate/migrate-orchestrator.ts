@@ -257,7 +257,7 @@ async function executePlan(
 
 	if (targets.includes("codex") && codexAgentActions.size > 0) {
 		const agentsToWrite = ctx.allItems.agent.filter((agent) => codexAgentActions.has(agent.name));
-		const result = await installCodexAgents(agentsToWrite, { global: isGlobal, configAgents: ctx.allItems.agent });
+		const result = await installCodexAgents(agentsToWrite, { global: isGlobal, configAgents: agentsToWrite });
 		results.push({
 			action: codexBulkActionShim("agent", "codex", isGlobal, result.written),
 			success: result.success,
