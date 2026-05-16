@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterBudgetEntries, toBudgetRow } from "../src/commands/budget.js";
+import { filterBudgetEntries, summarizeLiveBudgetState, toBudgetRow } from "../src/commands/budget.js";
 
 describe("toBudgetRow", () => {
 	it("keeps legacy estimated_tokens entries intact", () => {
@@ -95,5 +95,35 @@ describe("toBudgetRow", () => {
 
 		expect(filtered).toHaveLength(1);
 		expect(filtered[0]).toMatchObject({ date: "2026-05-01 11:00", session_id: "sess-b" });
+	});
+
+	it("summarizes live session budget totals from input and output tokens", () => {
+		const summary = summarizeLiveBudgetState({
+			estimated_input_tokens: 1200,
+			estimated_output_tokens: 3400,
+			estimated_cost_usd: 1.23,
+			turn_count: 7,
+		});
+
+		expect(summary).toEqual({
+			inputTokens: 1200,
+			outputTokens: 3400,
+			totalTokens: 4600,
+			humanReads: 7,
+			estimatedCost: 1.23,
+		});
+	});
+
+	it("coerces invalid live session budget fields to zero", () => {
+		const summary = summarizeLiveBudgetState({
+			estimated_input_tokens: " ",
+			estimated_output_tokens: "oops",
+			estimated_cost_usd: undefined,
+			turn_count: null,
+		});
+
+		expect(summary.totalTokens).toBe(0);
+		expect(summary.humanReads).toBe(0);
+		expect(summary.estimatedCost).toBe(0);
 	});
 });

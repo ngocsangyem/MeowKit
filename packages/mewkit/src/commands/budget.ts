@@ -39,6 +39,21 @@ interface BudgetArgs {
 	day?: boolean | string;
 }
 
+interface LiveBudgetState {
+	estimated_input_tokens?: number | string;
+	estimated_output_tokens?: number | string;
+	estimated_cost_usd?: number | string;
+	turn_count?: number | string;
+}
+
+interface LiveBudgetSummary {
+	inputTokens: number;
+	outputTokens: number;
+	totalTokens: number;
+	humanReads: number;
+	estimatedCost: number;
+}
+
 function findCostLog(): string | null {
 	let current = process.cwd();
 	while (true) {
@@ -90,6 +105,20 @@ function resolveCurrentSessionId(projectRoot: string): string | null {
 
 	const sessionId = fs.readFileSync(lastSessionFile, "utf-8").trim();
 	return sessionId.length > 0 ? sessionId : null;
+}
+
+function readLiveBudgetState(projectRoot: string): LiveBudgetState | null {
+	const budgetStateFile = path.join(projectRoot, "session-state", "budget-state.json");
+	if (!fs.existsSync(budgetStateFile)) {
+		return null;
+	}
+
+	try {
+		const parsed = JSON.parse(fs.readFileSync(budgetStateFile, "utf-8")) as LiveBudgetState;
+		return parsed && typeof parsed === "object" ? parsed : null;
+	} catch {
+		return null;
+	}
 }
 
 function resolveDayFilter(value: boolean | string | undefined): string | null {
@@ -197,6 +226,31 @@ function printTable(entries: BudgetRow[]): void {
 	}
 }
 
+export function summarizeLiveBudgetState(budgetState: LiveBudgetState): LiveBudgetSummary {
+	const inputTokens = coerceNumber(budgetState.estimated_input_tokens);
+	const outputTokens = coerceNumber(budgetState.estimated_output_tokens);
+	return {
+		inputTokens,
+		outputTokens,
+		totalTokens: inputTokens + outputTokens,
+		humanReads: coerceNumber(budgetState.turn_count),
+		estimatedCost: coerceNumber(budgetState.estimated_cost_usd),
+	};
+}
+
+function printLiveSessionSummary(sessionId: string, budgetState: LiveBudgetState): void {
+	const summary = summarizeLiveBudgetState(budgetState);
+
+	console.log(`${pc.dim("Session:")} ${sessionId}`);
+	console.log(`${pc.dim("Mode:")} live session accumulator`);
+	console.log();
+	console.log(`${pc.bold("Input tokens:")} ${pc.cyan(summary.inputTokens.toLocaleString())}`);
+	console.log(`${pc.bold("Output tokens:")} ${pc.cyan(summary.outputTokens.toLocaleString())}`);
+	console.log(`${pc.bold("Total tokens used:")} ${pc.cyan(summary.totalTokens.toLocaleString())}`);
+	console.log(`${pc.bold("Human reads:")} ${pc.cyan(summary.humanReads.toLocaleString())}`);
+	console.log(`${pc.bold("Estimated cost:")} ${pc.cyan(`$${summary.estimatedCost.toFixed(2)}`)}`);
+}
+
 function aggregateByMonth(entries: BudgetRow[]): void {
 	const monthly = new Map<string, { tokens: number; count: number }>();
 
@@ -221,6 +275,45 @@ export async function budget(args: BudgetArgs): Promise<void> {
 	console.log();
 
 	const logPath = findCostLog();
+	const projectRoot = logPath ? findProjectRootFromCostLog(logPath) : process.cwd();
+	const currentSessionId = resolveCurrentSessionId(projectRoot);
+	const sessionFlag = normalizeFlagValue(args.session);
+	const sessionId = sessionFlag === null ? null : sessionFlag.length > 0 ? sessionFlag : currentSessionId;
+	let dayFilter: string | null;
+	try {
+		dayFilter = resolveDayFilter(args.day);
+	} catch (error: unknown) {
+		const message = error instanceof Error ? error.message : String(error);
+		console.error(pc.red(message));
+		process.exit(1);
+	}
+
+	const isCurrentSession = Boolean(sessionId && currentSessionId && sessionId === currentSessionId);
+	const liveBudgetState = isCurrentSession ? readLiveBudgetState(projectRoot) : null;
+	const today = new Date().toISOString().slice(0, 10);
+	const liveStateMatchesDay = !dayFilter || dayFilter === today;
+
+	if (sessionFlag !== null && !sessionId) {
+		console.error(pc.red("Could not determine the current session id."));
+		console.log(pc.dim("Expected HOOK_SESSION_ID or session-state/last-session-id."));
+		process.exit(1);
+	}
+
+	if (liveBudgetState && liveStateMatchesDay) {
+		if (logPath) {
+			console.log(`${pc.dim("Source:")} ${logPath}`);
+			console.log(`${pc.dim("Live state:")} ${path.join(projectRoot, "session-state", "budget-state.json")}`);
+		} else {
+			console.log(`${pc.dim("Live state:")} ${path.join(projectRoot, "session-state", "budget-state.json")}`);
+		}
+		console.log();
+		if (dayFilter) {
+			console.log(`${pc.dim("Day:")} ${dayFilter}`);
+			console.log();
+		}
+		printLiveSessionSummary(sessionId!, liveBudgetState);
+		return;
+	}
 
 	if (!logPath) {
 		console.error(pc.red("Could not find .claude/memory/cost-log.json"));
@@ -243,25 +336,6 @@ export async function budget(args: BudgetArgs): Promise<void> {
 	if (entries.length === 0) {
 		console.log(pc.dim("No cost entries recorded yet."));
 		return;
-	}
-
-	const projectRoot = findProjectRootFromCostLog(logPath);
-	const sessionFlag = normalizeFlagValue(args.session);
-	const sessionId =
-		sessionFlag === null ? null : sessionFlag.length > 0 ? sessionFlag : resolveCurrentSessionId(projectRoot);
-	if (sessionFlag !== null && !sessionId) {
-		console.error(pc.red("Could not determine the current session id."));
-		console.log(pc.dim("Expected HOOK_SESSION_ID or session-state/last-session-id."));
-		process.exit(1);
-	}
-
-	let dayFilter: string | null;
-	try {
-		dayFilter = resolveDayFilter(args.day);
-	} catch (error: unknown) {
-		const message = error instanceof Error ? error.message : String(error);
-		console.error(pc.red(message));
-		process.exit(1);
 	}
 
 	const filteredEntries = filterBudgetEntries(entries, { sessionId, day: dayFilter });

@@ -44,6 +44,10 @@ fi
 
 # Get current timestamp
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M")
+PERSISTED_SESSION_ID="${HOOK_SESSION_ID:-}"
+if [ -z "$PERSISTED_SESSION_ID" ] && [ -f "session-state/last-session-id" ]; then
+  PERSISTED_SESSION_ID=$(cat "session-state/last-session-id" 2>/dev/null || echo "")
+fi
 
 # Count files in recent commits (captures actual work done)
 RECENT_FILES=$(git log --oneline -5 --name-only 2>/dev/null | grep -v '^[a-f0-9]' | sort -u | wc -l | tr -d ' ')
@@ -98,7 +102,7 @@ if [ -f "$BUDGET_STATE_FILE" ] && command -v python3 >/dev/null 2>&1; then
   _CLEAN_BUDGET="$CLEAN_BUDGET" \
   _COST_LOG="$MEMORY_DIR/cost-log.json" \
   _TIMESTAMP="$TIMESTAMP" \
-  _SESSION_ID="${HOOK_SESSION_ID:-}" \
+  _SESSION_ID="$PERSISTED_SESSION_ID" \
   _MODEL_HINT="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-unknown}}}" \
   python3 -c '
 import json, os, tempfile
@@ -179,16 +183,16 @@ fi
 # single append-only JSONL log keyed by session_id, not one file per session.
 # project-context-loader.sh truncates the log on new-session detection so it
 # never accumulates state from prior sessions.
-if [ "${MEOWKIT_SKIP_SAFETY_SENTINEL:-on}" != "off" ] && [ -n "${HOOK_SESSION_ID:-}" ]; then
+if [ "${MEOWKIT_SKIP_SAFETY_SENTINEL:-on}" != "off" ] && [ -n "$PERSISTED_SESSION_ID" ]; then
   # Refuse to write if session_id contains characters that could break JSON.
   # Session IDs from the host runtime are UUID-shaped — alphanumeric + dash/underscore/dot.
-  case "$HOOK_SESSION_ID" in
+  case "$PERSISTED_SESSION_ID" in
     *[!A-Za-z0-9_.-]*) ;;  # unsafe → skip silently
     *)
       mkdir -p session-state 2>/dev/null
       _SENTINEL_TS=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null)
       printf '{"session_id":"%s","safety":true,"phase_zero":true,"ts":"%s"}\n' \
-        "$HOOK_SESSION_ID" "$_SENTINEL_TS" \
+        "$PERSISTED_SESSION_ID" "$_SENTINEL_TS" \
         >> session-state/session-sentinels.jsonl 2>/dev/null || true
       unset _SENTINEL_TS
       ;;
