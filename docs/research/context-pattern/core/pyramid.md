@@ -1,6 +1,6 @@
 # The Pyramid
 
-> Source: [contextpatterns.com](https://contextpatterns.com/patterns/pyramid/)
+> Source: https://contextpatterns.com/patterns/select/
 
 Start with general background, progressively add specific details. Give the model altitude before asking it to land. Mirrors how experts brief each other; context first, task second.
 
@@ -58,5 +58,5 @@ The second version gives altitude before asking the model to land. It knows the 
 
 ## Related Patterns
 
-- **[Select, Don’t Dump](./select)** constrains what goes into each layer of the pyramid; structure without selection just produces an organized dump
-- **[Progressive Disclosure](../progressive-disclosure)** extends the pyramid across multiple turns rather than packing it all into one prompt
+- **[Select, Don't Dump](./select.md)** constrains what goes into each layer of the pyramid; structure without selection just produces an organized dump
+- **[Progressive Disclosure](../progressive-disclosure.md)** extends the pyramid across multiple turns rather than packing it all into one prompt
