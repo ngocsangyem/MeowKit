@@ -35,7 +35,12 @@ import { installSkillDirectory } from "./skill-directory-installer.js";
 import { installCodexAgents, mergeHooksSettings } from "./hooks/index.js";
 import { loadModelRoutingConfig } from "./model-routing-config.js";
 import { printActionDetails, printFinalSummary, printPreflight } from "./migrate-ui-summary.js";
-import { buildPortableSkillsByProvider, filterPlanForPortability } from "./portability-policy.js";
+import {
+	buildPortableSkillsByProvider,
+	buildSkillDryRunMessages,
+	filterPlanForPortability,
+	summarizeRuleMigrationByProvider,
+} from "./portability-policy.js";
 import type { MigrateOptions, PortableItem, PortableType, ProviderType, SkillInfo } from "./types.js";
 
 export interface RunMigrateContext {
@@ -112,6 +117,8 @@ async function runMigrateUnderLock(
 	const itemsByT = itemsByType(discovered);
 	const portabilityFiltered = filterPlanForPortability(plan, itemsByT);
 	const portableSkills = await buildPortableSkillsByProvider(discovered.skills, targets);
+	const ruleSummaries = summarizeRuleMigrationByProvider(discovered.rules, targets);
+	const skillDryRunMessages = buildSkillDryRunMessages(portableSkills.skillsByProvider, targets);
 
 	for (const action of portabilityFiltered.plan.actions) {
 		if (!action.targetPath) {
@@ -137,6 +144,8 @@ async function runMigrateUnderLock(
 			...modelRoutingBanners,
 			...portabilityFiltered.skipMessages,
 			...portableSkills.skipMessages,
+			...ruleSummaries.flatMap((summary) => summary.messages),
+			...skillDryRunMessages,
 		],
 	});
 

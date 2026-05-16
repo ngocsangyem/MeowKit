@@ -8,6 +8,7 @@ export * from "./provider-documentation-contracts.js";
 export * from "./model-taxonomy.js";
 export * from "./model-routing-config.js";
 export * from "./codex-capabilities.js";
+export * as ir from "./ir/index.js";
 export * as discovery from "./discovery/index.js";
 export { convertItem } from "./converters/index.js";
 export * as converters from "./converters/index.js";

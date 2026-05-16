@@ -1,4 +1,5 @@
 import { getProviderSurfaceContract } from "./provider-documentation-contracts.js";
+import { classifyRuleSemantic } from "./ir/rule-classifier.js";
 import { providers } from "./provider-registry.js";
 import type { PortableItem, PortableType, ProviderType, SkillInfo } from "./types.js";
 import type { ReconcileAction, ReconcilePlan } from "./reconcile/reconcile-types.js";
@@ -14,6 +15,14 @@ export interface PortabilitySkip {
 	type: PortableType | "skill";
 	item: string;
 	reason: string;
+}
+
+export interface RuleMigrationSummary {
+	provider: ProviderType;
+	native: number;
+	documentationOnly: number;
+	skipped: number;
+	messages: string[];
 }
 
 const RUNTIME_BOUND_SIGNALS: RuntimeBoundSignal[] = [
@@ -65,6 +74,26 @@ function shouldSkipPortableItem(item: PortableItem, provider: ProviderType): Por
 	if (provider === "claude-code") return null;
 	if (!RUNTIME_BOUND_ITEM_TYPES.has(item.type)) return null;
 
+	if (item.type === "rules") {
+		const classified = classifyRuleSemantic(item);
+		if (classified.kind === "orchestration") {
+			return {
+				provider,
+				type: item.type,
+				item: item.name,
+				reason: `orchestration-only Claude workflow rule: ${classified.signals.join(", ")}`,
+			};
+		}
+		if (classified.kind === "runtime-automation") {
+			return {
+				provider,
+				type: item.type,
+				item: item.name,
+				reason: `Claude runtime automation rule with no rule-layer portability: ${classified.signals.join(", ")}`,
+			};
+		}
+	}
+
 	const signals = summarizeHardSkipSignals(item.body);
 	if (signals.length === 0) return null;
 
@@ -74,6 +103,68 @@ function shouldSkipPortableItem(item: PortableItem, provider: ProviderType): Por
 		item: item.name,
 		reason: buildRuntimeBoundReason(signals),
 	};
+}
+
+export function summarizeRuleMigrationByProvider(
+	rules: PortableItem[],
+	targets: ProviderType[],
+): RuleMigrationSummary[] {
+	return targets.map((provider) => {
+		const messages: string[] = [];
+		let native = 0;
+		let documentationOnly = 0;
+		let skipped = 0;
+		const ruleSurface = getProviderSurfaceContract(provider, "rules");
+		const configSurface = getProviderSurfaceContract(provider, "config");
+
+		for (const rule of rules) {
+			const classified = classifyRuleSemantic(rule);
+
+			if (provider === "claude-code") {
+				native += 1;
+				continue;
+			}
+
+			if (classified.kind === "orchestration" || classified.kind === "runtime-automation") {
+				skipped += 1;
+				continue;
+			}
+
+			if (ruleSurface.status === "documented") {
+				native += 1;
+				continue;
+			}
+
+			if (configSurface.status === "documented") {
+				documentationOnly += 1;
+				continue;
+			}
+
+			skipped += 1;
+		}
+
+		if (native > 0) messages.push(`${providers[provider].displayName}: ${native} rule(s) migrate to documented rule surfaces`);
+		if (documentationOnly > 0) {
+			messages.push(
+				`${providers[provider].displayName}: ${documentationOnly} rule(s) require instruction-file flattening; no native rule surface is documented`,
+			);
+		}
+		if (skipped > 0) messages.push(`${providers[provider].displayName}: ${skipped} rule(s) skipped as orchestration/runtime-only content`);
+
+		return { provider, native, documentationOnly, skipped, messages };
+	});
+}
+
+export function buildSkillDryRunMessages(
+	skillsByProvider: Map<ProviderType, SkillInfo[]>,
+	targets: ProviderType[],
+): string[] {
+	return targets
+		.filter((provider) => providers[provider].skills)
+		.map((provider) => {
+			const count = skillsByProvider.get(provider)?.length ?? 0;
+			return `${providers[provider].displayName}: ${count} skill folder${count === 1 ? "" : "s"} scheduled for install`;
+		});
 }
 
 function shouldSkipUnsupportedSurface(action: ReconcileAction): PortabilitySkip | null {

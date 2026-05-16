@@ -2,7 +2,13 @@ import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { buildPortableSkillsByProvider, filterPlanForPortability, getRuntimeBoundSignals } from "../portability-policy.js";
+import {
+	buildPortableSkillsByProvider,
+	buildSkillDryRunMessages,
+	filterPlanForPortability,
+	getRuntimeBoundSignals,
+	summarizeRuleMigrationByProvider,
+} from "../portability-policy.js";
 import type { PortableItem, PortableType, ProviderType, SkillInfo } from "../types.js";
 import type { ReconcilePlan } from "../reconcile/reconcile-types.js";
 
@@ -151,6 +157,35 @@ describe("portability policy", () => {
 		);
 	});
 
+	it("skips orchestration-only rules for non-Claude targets", () => {
+		const rule = makeItem("rules", "workflow/gates", "Phase 4 requires Gate 2 review before the orchestrator continues.");
+		const plan = makePlan([
+			{
+				action: "install",
+				item: "workflow/gates",
+				type: "rules",
+				provider: "codex",
+				global: false,
+				targetPath: "AGENTS.md",
+				reason: "new-item",
+			},
+		]);
+
+		const filtered = filterPlanForPortability(plan, {
+			agent: [],
+			command: [],
+			skill: [],
+			config: [],
+			rules: [rule],
+			hooks: [],
+		});
+
+		expect(filtered.plan.actions).toHaveLength(0);
+		expect(filtered.skipMessages).toContain(
+			"Skipped 1 rules for Codex: orchestration-only Claude workflow rule: phase workflow, gate workflow, orchestrator role",
+		);
+	});
+
 	it("keeps skills available for provider-specific rewriting during install", async () => {
 		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
 		tempDirs.push(root);
@@ -227,6 +262,56 @@ describe("portability policy", () => {
 
 		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["phase-aware-skill"]);
 		expect(result.skipMessages).toEqual([]);
+	});
+
+	it("summarizes rule strategy per provider", () => {
+		const summaries = summarizeRuleMigrationByProvider(
+			[
+				makeItem("rules", "engineering/standards", "Keep changes deterministic and test coverage strong."),
+				makeItem("rules", "workflow/gates", "Phase 3 and Gate 1 govern orchestrator execution."),
+			],
+			["codex", "amp"] satisfies ProviderType[],
+		);
+
+		expect(summaries.find((summary) => summary.provider === "codex")).toMatchObject({
+			native: 1,
+			skipped: 1,
+		});
+		expect(summaries.find((summary) => summary.provider === "amp")).toMatchObject({
+			documentationOnly: 1,
+			skipped: 1,
+		});
+	});
+
+	it("reports skill installs in dry-run planning", async () => {
+		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
+		tempDirs.push(root);
+
+		const skillDir = join(root, "portable-skill");
+		await mkdir(skillDir, { recursive: true });
+		await writeFile(
+			join(skillDir, "SKILL.md"),
+			"---\nname: portable-skill\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+			"utf-8",
+		);
+
+		const result = await buildPortableSkillsByProvider(
+			[
+				{
+					id: "mk:portable-skill",
+					name: "portable-skill",
+					dirName: "portable-skill",
+					description: "Generic helper",
+					sourcePath: skillDir,
+				},
+			],
+			["codex", "cursor"] satisfies ProviderType[],
+		);
+
+		expect(buildSkillDryRunMessages(result.skillsByProvider, ["codex", "cursor"] satisfies ProviderType[])).toEqual([
+			"Codex: 1 skill folder scheduled for install",
+			"Cursor: 1 skill folder scheduled for install",
+		]);
 	});
 
 });
