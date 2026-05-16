@@ -1,6 +1,6 @@
 {
   "name": "mewkit",
-  "version": "1.9.9",
+  "version": "1.9.10",
   "description": "MeowKit CLI — scaffold, upgrade, and manage your AI agent toolkit",
   "type": "module",
   "bin": {

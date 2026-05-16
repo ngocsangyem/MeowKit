@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { getProviderSurfaceContract } from "./provider-documentation-contracts.js";
 import { providers } from "./provider-registry.js";
 import type { PortableItem, PortableType, ProviderType, SkillInfo } from "./types.js";
 import type { ReconcileAction, ReconcilePlan } from "./reconcile/reconcile-types.js";
@@ -66,6 +67,19 @@ function shouldSkipPortableItem(item: PortableItem, provider: ProviderType): Por
 	};
 }
 
+function shouldSkipUnsupportedSurface(action: ReconcileAction): PortabilitySkip | null {
+	const provider = action.provider as ProviderType;
+	const contract = getProviderSurfaceContract(provider, action.type);
+	if (contract.status === "documented") return null;
+
+	return {
+		provider,
+		type: action.type,
+		item: action.item,
+		reason: `unsupported by ${providers[provider].displayName} official docs for ${action.type} migration`,
+	};
+}
+
 function summarizeSkipCounts(skips: PortabilitySkip[]): string[] {
 	const counts = new Map<string, { count: number; provider: ProviderType; type: PortableType | "skill"; reason: string }>();
 	for (const skip of skips) {
@@ -102,6 +116,11 @@ export function filterPlanForPortability(
 	const skips: PortabilitySkip[] = [];
 	const keptActions = plan.actions.filter((action) => {
 		if (action.action === "delete") return true;
+		const unsupportedSurface = shouldSkipUnsupportedSurface(action);
+		if (unsupportedSurface) {
+			skips.push(unsupportedSurface);
+			return false;
+		}
 		const item = findPortableItem(itemsByType, action.type, action.item);
 		if (!item) return true;
 		const skip = shouldSkipPortableItem(item, action.provider as ProviderType);

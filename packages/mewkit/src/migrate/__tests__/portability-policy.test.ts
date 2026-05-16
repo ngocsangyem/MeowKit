@@ -110,6 +110,47 @@ describe("portability policy", () => {
 		expect(filtered.skipMessages).toEqual([]);
 	});
 
+	it("drops actions for provider surfaces that are not officially documented", () => {
+		const command = makeItem("command", "mk/design", "Design the change and summarize the tradeoffs.");
+		const config = makeItem("config", "CLAUDE", "Project contract");
+		const plan = makePlan([
+			{
+				action: "install",
+				item: "mk/design",
+				type: "command",
+				provider: "codex",
+				global: false,
+				targetPath: ".codex/prompts/mk-design.md",
+				reason: "new-item",
+			},
+			{
+				action: "install",
+				item: "CLAUDE",
+				type: "config",
+				provider: "codex",
+				global: false,
+				targetPath: "AGENTS.md",
+				reason: "new-item",
+			},
+		]);
+
+		const filtered = filterPlanForPortability(plan, {
+			agent: [],
+			command: [command],
+			skill: [],
+			config: [config],
+			rules: [],
+			hooks: [],
+		});
+
+		expect(filtered.plan.actions).toHaveLength(1);
+		expect(filtered.plan.actions[0]?.type).toBe("config");
+		expect(filtered.plan.summary.install).toBe(1);
+		expect(filtered.skipMessages).toContain(
+			"Skipped 1 command for Codex: unsupported by Codex official docs for command migration",
+		);
+	});
+
 	it("skips runtime-bound skills per provider", async () => {
 		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
 		tempDirs.push(root);
