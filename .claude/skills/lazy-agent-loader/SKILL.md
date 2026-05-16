@@ -39,7 +39,7 @@ agent_index[15]{id,category,specialty,keywords}:
   reviewer,quality,5-dimension code review/Gate 2,review/audit/quality/standards
   security,quality,Security audit/BLOCK verdicts,security/vulnerability/audit/owasp/injection
   shipper,ops,Deploy pipeline/PR creation,ship/deploy/release/commit/pr/ci
-  documenter,ops,Living docs/changelogs,docs/documentation/changelog/readme
+  documenter,ops,Living documentation and changelogs,documentation:changelog:readme
   analyst,infra,Cost tracking/pattern extraction/memory,cost/budget/patterns/metrics/usage/memory
   researcher,planning,Technology research/library evaluation,research/compare/evaluate/library
   brainstormer,planning,Solution brainstorming/trade-offs,brainstorm/alternatives/tradeoff/explore

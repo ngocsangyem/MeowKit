@@ -68,7 +68,7 @@ agent-browser record stop
 #!/bin/bash
 # Record workflow for documentation
 
-agent-browser record start ./docs/how-to-login.webm
+agent-browser record start ./recordings/login-flow.webm
 
 agent-browser open https://app.example.com/login
 agent-browser wait 1000  # Pause for visibility

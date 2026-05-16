@@ -15,7 +15,6 @@ allowed-tools:
   - Glob
   - Bash
   - AskUserQuestion
-# Inspired by BMAD-METHOD's Advanced Elicitation pattern (docs/explanation/advanced-elicitation.md)
 # Adapted for the review pipeline and gate system
 source: new
 keywords: [elicit, second-pass-reasoning, pre-mortem, red-team-analysis, socratic, inversion]
@@ -39,16 +38,16 @@ Surfaces insights that generic "make it better" requests miss.
 
 ## Reasoning Methods
 
-| Method | Lens | Best For |
-|--------|------|----------|
-| **Pre-mortem** | "Assume this shipped and failed. Why?" | Risk discovery, failure mode analysis |
-| **Inversion** | "What would make this maximally wrong?" | Assumption testing, edge cases |
-| **Red Team** | "You are an attacker. How do you exploit this?" | Security analysis, adversarial thinking |
-| **Socratic** | "What evidence supports each claim?" | Logic validation, gap detection |
-| **First Principles** | "Strip assumptions. What's fundamentally true?" | Architecture decisions, design simplification |
-| **Constraint Removal** | "What if [constraint X] didn't exist?" | Innovation, scope exploration |
-| **Stakeholder Mapping** | "Who else is affected? What do they need?" | Impact analysis, requirements gaps |
-| **Analogical** | "What similar system solved this differently?" | Alternative approaches, pattern matching |
+| Method                  | Lens                                            | Best For                                      |
+| ----------------------- | ----------------------------------------------- | --------------------------------------------- |
+| **Pre-mortem**          | "Assume this shipped and failed. Why?"          | Risk discovery, failure mode analysis         |
+| **Inversion**           | "What would make this maximally wrong?"         | Assumption testing, edge cases                |
+| **Red Team**            | "You are an attacker. How do you exploit this?" | Security analysis, adversarial thinking       |
+| **Socratic**            | "What evidence supports each claim?"            | Logic validation, gap detection               |
+| **First Principles**    | "Strip assumptions. What's fundamentally true?" | Architecture decisions, design simplification |
+| **Constraint Removal**  | "What if [constraint X] didn't exist?"          | Innovation, scope exploration                 |
+| **Stakeholder Mapping** | "Who else is affected? What do they need?"      | Impact analysis, requirements gaps            |
+| **Analogical**          | "What similar system solved this differently?"  | Alternative approaches, pattern matching      |
 
 ## Workflow
 
@@ -66,14 +65,14 @@ Surfaces insights that generic "make it better" requests miss.
 
 When invoked without a method choice, suggest based on context:
 
-| Context | Suggested Method |
-|---------|-----------------|
-| Review found security issues | Red Team |
-| Review found low coverage | Pre-mortem |
-| Plan has many assumptions | First Principles |
-| Architecture decision | Inversion |
+| Context                                | Suggested Method    |
+| -------------------------------------- | ------------------- |
+| Review found security issues           | Red Team            |
+| Review found low coverage              | Pre-mortem          |
+| Plan has many assumptions              | First Principles    |
+| Architecture decision                  | Inversion           |
 | Complex feature with many stakeholders | Stakeholder Mapping |
-| Default / unclear | Socratic |
+| Default / unclear                      | Socratic            |
 
 ## Output Format
 

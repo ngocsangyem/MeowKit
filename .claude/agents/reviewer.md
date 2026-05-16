@@ -62,7 +62,7 @@ Load before starting review:
 - `docs/architecture/`: ADRs for architecture fit dimension
 - `.claude/rules/security-rules.md`: security dimension checklist
 - `red-team-findings.md` from plan directory (if exists) — plan-level adversarial findings to cross-reference
-- `docs/red-team-overview.md`: full system documentation for the adversarial review architecture
+- Adversarial-review architecture: see `skills/review/workflow.md` and the `step-02b-*.md` persona-pass files for the full red-team flow used at Gate 2
 
 ## Failure Behavior
 

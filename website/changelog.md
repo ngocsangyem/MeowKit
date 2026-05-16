@@ -14,6 +14,34 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.7 (2026-05-16) — Docs reference contract + validator
+
+### Highlights
+
+`.claude/` shipped into downstream projects used to leak path references into the kit's own internal docs (`docs/dead-weight-audit.md`, `docs/red-team-overview.md`, `docs/memory-system.md`, etc.) that do not ship via the release zip. This release formalizes the two-tier docs-reference contract, patches every leaked path, and adds a validator that prevents future regressions. Downstream projects no longer carry broken cross-references inside their installed `.claude/`.
+
+### CLI
+
+- `npx mewkit validate` — new check: "Docs references on Type-1 allowlist". Walks every shipped `.claude/` subdir, extracts `docs/<path>` references, and verifies each against the Type-1 allowlist in `.claude/rules/docs-reference-contract.md`. Exit code 1 on any error.
+
+### Features
+
+- New rule `.claude/rules/docs-reference-contract.md` — codifies the two-tier resolution model (target-project docs vs kit-internal docs), the Type-1 allowlist (parsed from a fenced `<!-- ALLOWLIST-START -->` block as the single source of truth), and the skill-author checklist.
+- New rule `.claude/rules/dead-weight-audit-rules.md` — 8 numbered rules covering audit cadence, the benchmark-driven measurement process, decision thresholds (PRUNE / WATCH / KEEP), components that never prune, anti-patterns, and the circular-dependency workaround when the harness itself is under test.
+- New rule in `skill-authoring-rules.md` Rule 5 — Docs References Follow the Two-Tier Contract; enforced mechanically by the validator.
+- New CI step `Validate docs references on Type-1 allowlist` — runs `python3 .claude/scripts/check-docs-references.py .claude` on every PR.
+- New CI step `Unit-test docs-references validator` — runs the 15-case parser/matcher test suite.
+
+### Improvements
+
+- 14 path references inside `.claude/` were re-pointed at in-kit rule files or inlined directly into the consuming context — covers `benchmark/SKILL.md`, `harness/references/adaptive-density-matrix.md`, `harness-rules.md`, `agents/reviewer.md`, `commands/mk/summary.md`, `memory/architecture-decisions.md`, `hooks/HOOKS_INDEX.md`, `scripts/lint-brand-prose.sh`, `benchmarks/README.md`, three attribution citations (prompt-enhancer, elicit, jira), and one template placeholder (`plan-creator/references/phase-template.md`).
+- Five false-positive source rewrites cleaned up: slash-separated category list in `scale-routing/SKILL.md`, CSV example in `lazy-agent-loader/SKILL.md`, example filename in `agent-browser/references/video-recording.md`, attribution prose in `jira-issue/references/issue-templates.md`, heading text in `plan-ceo-review/references/post-review.md`, plus two scheme-prefixed URL fixes in `hooks/HOOKS_INDEX.md` and `hooks/lib/read-hook-input.sh`.
+- Phase-template placeholder `../../../docs/relevant-doc.md` becomes `<path-to-related-doc-in-your-project>` so new phase files emit a clean placeholder by default.
+
+### Removals
+
+- Bare `docs/relevant-doc.md` from the Type-1 allowlist — the phase-template now uses an angle-bracket placeholder, so the literal allowlist entry is no longer needed. No migration action required.
+
 ## 2.9.6 (2026-05-16) — Context isolation: SessionStart budgeting, agent-detector sentinel, memory auto-prune
 
 ### Highlights

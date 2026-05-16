@@ -1,7 +1,7 @@
 #!/bin/bash
 # read-hook-input.sh — Shared JSON-on-stdin parser shim for meowkit hooks.
 #
-# Per Claude Code docs (verified 260408 against code.claude.com/docs/en/hooks):
+# Per Claude Code docs (verified 260408 against https://code.claude.com/docs/en/hooks):
 # hooks receive their input as a JSON object on stdin, NOT as positional args.
 # Phase 7 migration of meowkit hooks to this convention.
 #

@@ -42,6 +42,12 @@ jobs:
       - name: Validate skill frontmatter
         run: .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py
 
+      - name: Validate docs references on Type-1 allowlist
+        run: python3 .claude/scripts/check-docs-references.py .claude
+
+      - name: Unit-test docs-references validator
+        run: python3 .claude/scripts/tests/test-check-docs-references.py
+
       - name: Validate rule availability
         run: bash scripts/validate-rule-availability.sh
 

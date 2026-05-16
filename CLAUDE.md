@@ -118,6 +118,7 @@ WHY: Compaction summarizes; safety rules cannot be summarized without losing enf
 - **Commands vs Skills:** `.claude/rules/skill-authoring-rules.md`
 - **Skill Rule of Two:** `.claude/rules/injection-rules.md` Rule 11
 - **Advisory skill frontmatter fields** (`preamble-tier`, `phase`, `trust_level`, `injection_risk`): `.claude/rules/skill-authoring-rules.md`
+- **Docs reference contract** (which `docs/*` paths may appear in `.claude/`): `.claude/rules/docs-reference-contract.md` — enforced by `npx mewkit validate` and `.claude/scripts/check-docs-references.py`
 
 ## Docs Retrieval
 

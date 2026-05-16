@@ -23,7 +23,7 @@ user-invocable: true
 
 # mk:benchmark — Harness Canary Suite
 
-Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (`docs/dead-weight-audit.md`) consumes to make load-bearing decisions about each harness component.
+Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (per `.claude/rules/dead-weight-audit-rules.md`) consumes to make load-bearing decisions about each harness component.
 
 ## When to Use
 
@@ -148,7 +148,7 @@ Each benchmark run writes a JSON dump to `.claude/benchmarks/results/{run-id}.js
 ## Gotchas
 
 - **`run-canary.sh` is a half-implementation by design.** It writes a manifest with `PENDING` tasks then prints orchestrator instructions. The script CANNOT actually invoke `mk:harness` per task because each invocation requires a fresh subagent context, which only an orchestrator agent can spawn — not a shell process. **The agent invoking this skill MUST follow the printed instructions to fill in each task's results.** Failure to do so leaves the manifest as a stub. Documented in `run-canary.sh:101-115` banner.
-- **Circular dependency with `mk:harness`.** This skill invokes `mk:harness` per task. If a harness bug is exactly what the dead-weight audit is trying to find, the audit can fail to even start. Workaround: run individual canary specs manually via `/mk:cook <spec.md>` for the broken-harness case. See `docs/dead-weight-audit.md` "When the harness is broken".
+- **Circular dependency with `mk:harness`.** This skill invokes `mk:harness` per task. If a harness bug is exactly what the dead-weight audit is trying to find, the audit can fail to even start. The manual fallback is documented in `.claude/rules/dead-weight-audit-rules.md` Rule 8 — run individual canary specs via `/mk:cook <spec.md>` and score by hand.
 - **Don't treat 100% pass as "harness is perfect."** Canary tasks are intentionally simple. Real-world failures live in the long tail; canary catches regressions, not all bugs.
 - **Don't skip `--full` for the dead-weight audit.** The audit needs the heavy task to detect issues that only manifest in real product builds.
 - **Don't compare runs across different model versions** without noting it in the delta table — model upgrade is a confounding variable.

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
+import { checkDocsReferences } from "../core/check-docs-references.js";
 
 interface CheckResult {
 	name: string;
@@ -110,6 +111,46 @@ function checkConfigJson(meowkitDir: string): CheckResult {
 	}
 }
 
+function checkDocsRefsContract(meowkitDir: string): CheckResult[] {
+	const results: CheckResult[] = [];
+	const contractPath = path.join(meowkitDir, "rules", "docs-reference-contract.md");
+	if (!fs.existsSync(contractPath)) {
+		results.push({
+			name: "Docs-reference contract present",
+			passed: false,
+			detail: `Missing: ${contractPath}`,
+		});
+		return results;
+	}
+
+	try {
+		const { scannedFiles, findings, errorCount, warnCount } = checkDocsReferences(meowkitDir);
+		const passed = errorCount === 0;
+		const summary = `Scanned ${scannedFiles} files — ${errorCount} error(s), ${warnCount} warning(s)`;
+		const detail = passed
+			? summary
+			: `${summary}\n         ${findings
+				.filter((f) => f.level === "ERROR")
+				.slice(0, 10)
+				.map((f) => `${f.file}:${f.line}: ${f.token}`)
+				.join("\n         ")}`;
+		results.push({
+			name: "Docs references on Type-1 allowlist",
+			passed,
+			detail,
+		});
+	} catch (error: unknown) {
+		const message = error instanceof Error ? error.message : String(error);
+		results.push({
+			name: "Docs references on Type-1 allowlist",
+			passed: false,
+			detail: `Validator crashed: ${message}`,
+		});
+	}
+
+	return results;
+}
+
 function printResult(result: CheckResult): void {
 	const icon = result.passed ? pc.green("PASS") : pc.red("FAIL");
 	console.log(`  [${icon}] ${result.name}`);
@@ -147,6 +188,9 @@ export async function validate(): Promise<void> {
 
 	// Config JSON
 	results.push(checkConfigJson(meowkitDir));
+
+	// Docs-reference contract (Type-1 allowlist)
+	results.push(...checkDocsRefsContract(meowkitDir));
 
 	for (const result of results) {
 		printResult(result);

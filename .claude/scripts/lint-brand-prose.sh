@@ -33,7 +33,7 @@ if [ -n "$HITS" ]; then
   echo "Brand-prose violations:"
   echo "$HITS"
   echo ""
-  echo "See docs/branding-style-guide.md for replacement rules."
+  echo "See the kit's branding style guide for replacement rules (the patterns this linter rejects are intentionally banned)."
   echo "Or add the file to $ALLOWLIST if it is toolkit-internal navigation."
   exit 1
 fi

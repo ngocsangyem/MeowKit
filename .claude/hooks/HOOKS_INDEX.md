@@ -4,7 +4,7 @@ All hooks in `.claude/hooks/` with their registration, purpose, and input contra
 
 ## Convention (Phase 7 — 260408)
 
-Hooks consume input via **JSON on stdin** (per `code.claude.com/docs/en/hooks`). Shell hooks use the shared parser `lib/read-hook-input.sh`. Node.js hooks use `lib/parse-stdin.cjs`.
+Hooks consume input via **JSON on stdin** (per https://code.claude.com/docs/en/hooks). Shell hooks use the shared parser `lib/read-hook-input.sh`. Node.js hooks use `lib/parse-stdin.cjs`.
 
 Non-security hooks are dispatched via `dispatch.cjs` + `handlers.json` registry. Security hooks (`gate-enforcement.sh`, `privacy-block.sh`) remain independent bash entries in `settings.json` to avoid dispatcher SPOF risk.
 
@@ -39,7 +39,7 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 
 **Hook count:** 13 shell hook scripts + 8 Node.js `.cjs` handlers in `.claude/hooks/handlers/`. Shell hooks registered in `.claude/settings.json` events + `pre-implement.sh` invoked manually by the developer agent. `.cjs` handlers registered via `handlers.json` → `dispatch.cjs` (build-verify, loop-detection, budget-tracker, auto-checkpoint, checkpoint-writer, model-detector, orientation-ritual, immediate-capture-handler) + 1 direct `dispatch.cjs` entry. The shared parser shim at `lib/read-hook-input.sh`, the secret scrubber at `lib/secret-scrub.sh`, and `lib/checkpoint-utils.cjs` are sourceable libraries. `conversation-summary-cache.sh` is registered under TWO events (Stop + UserPromptSubmit), branching on `HOOK_EVENT_NAME`. `SubagentStart`/`SubagentStop` are intentionally empty — hooks in these events would infinite-loop inside subagents.
 
-**Tombstoned (v2.4.0):** `memory-loader.cjs`, `memory-filter.cjs`, `memory-parser.cjs`, `memory-injector.cjs` — auto-inject memory pipeline removed; memory now loads on-demand per skill (see `docs/memory-system.md` Tombstone section).
+**Tombstoned (v2.4.0):** `memory-loader.cjs`, `memory-filter.cjs`, `memory-parser.cjs`, `memory-injector.cjs` — auto-inject memory pipeline removed; memory now loads on-demand per skill. Removed because the auto-inject path widened the prompt-injection surface (memory content is DATA, but injecting it into every prompt blurred the DATA-vs-INSTRUCTIONS boundary).
 
 **Additional registered handler (not in hooks table above):**
 | Handler | Event | Purpose |
@@ -101,5 +101,5 @@ Hooks in the same event must NOT rely on execution order. Cross-hook state passe
 - `lib/shared-state.cjs` — atomic JSON state persistence (Node.js hooks)
 - `handlers.json` — handler registry for `dispatch.cjs`
 - `references/build-verify-commands.md` — per-language build-verify command table
-- `docs/meowkit-rules.md` — Argument Convention
+- Argument convention: hooks receive JSON on stdin only; positional args are not used. See `lib/read-hook-input.sh` for the shared parser used by every shell hook.
 - `.claude/settings.json` — authoritative hook registration

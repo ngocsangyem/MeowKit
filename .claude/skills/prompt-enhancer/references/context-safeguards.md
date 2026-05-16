@@ -6,9 +6,9 @@
 > resilience).
 >
 > All six safeguards are **model-agnostic by construction**: Anthropic's own
-> research (`docs/research/effective-context-engineering-for-ai-agents.md`)
-> states context rot "emerges across all models" — architectural property of
-> transformers, not a Claude artifact.
+> research (Effective Context Engineering for AI Agents) states context rot
+> "emerges across all models" — architectural property of transformers, not a
+> Claude artifact.
 
 ## Contents
 

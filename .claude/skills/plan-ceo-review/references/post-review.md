@@ -12,7 +12,7 @@
 - [REVIEW REPORT](#review-report)
   - [Write to the plan file](#write-to-the-plan-file)
 - [Next Steps — Review Chaining](#next-steps-review-chaining)
-- [docs/designs Promotion (EXPANSION and SELECTIVE EXPANSION only)](#docsdesigns-promotion-expansion-and-selective-expansion-only)
+- [docs/designs/ Promotion (EXPANSION and SELECTIVE EXPANSION only)](#docsdesigns-promotion-expansion-and-selective-expansion-only)
 
 ## Handoff Note Cleanup
 
@@ -175,7 +175,7 @@ Use AskUserQuestion to present the next step. Include only applicable options:
 - **B)** Run /plan-design-review next (only if UI scope detected)
 - **C)** Skip — I'll handle reviews manually
 
-## docs/designs Promotion (EXPANSION and SELECTIVE EXPANSION only)
+## docs/designs/ Promotion (EXPANSION and SELECTIVE EXPANSION only)
 
 At the end of the review, if the vision produced a compelling feature direction, offer to promote the CEO plan to the project repo. AskUserQuestion:
 

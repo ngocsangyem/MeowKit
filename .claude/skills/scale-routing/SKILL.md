@@ -32,7 +32,7 @@ Replace subjective orchestrator judgment with deterministic, auditable domain-ba
 3. **Layer 1:** Analyze task content — classify type and extract mentioned files/modules (load `references/multi-layer-detection.md`)
 4. **Layer 2:** Check project context — files present, directory structure, recent git changes
 5. **Layer 3:** Score confidence per domain (HIGH ≥70, MEDIUM 40–69, LOW <40)
-6. **Classify task type** — map signals to bug_fix/feature/refactor/security/devops/docs/review/intake (load `references/task-type-classification.md`)
+6. **Classify task type** — map signals to one of: `bug_fix`, `feature`, `refactor`, `security`, `devops`, `docs`, `review`, `intake` (load `references/task-type-classification.md`)
 7. **Optional:** Check `.claude/product-areas.yaml` if exists — merge area keywords and paths (see `references/product-area-config.md`)
 8. **Output:** `{domain, level, workflow, model_tier_override, task_type, suggested_skill, confidence, product_area?}`
 9. **Fallback:** No match → return `unknown`, defer to manual classification

@@ -1,6 +1,6 @@
 # MeowKit Benchmark Suite
 
-Canary tasks that measure the harness's ground-truth performance. Backs the dead-weight audit (`docs/dead-weight-audit.md`) with empirical signal.
+Canary tasks that measure the harness's ground-truth performance. Backs the dead-weight audit (per `.claude/rules/dead-weight-audit-rules.md`) with empirical signal.
 
 ## What This Is
 
@@ -103,4 +103,4 @@ Each benchmark run appends a `benchmark_result` record to `.claude/memory/trace-
 
 - `.claude/skills/benchmark/SKILL.md` — runner skill
 - `.claude/skills/trace-analyze/` — consumer of benchmark results
-- `docs/dead-weight-audit.md` — recurring playbook that depends on this suite
+- Dead-weight audit (depends on this suite): cadence, thresholds, and never-prune list in `.claude/rules/dead-weight-audit-rules.md`. Trigger conditions in `.claude/rules/harness-rules.md` Rule 7.
