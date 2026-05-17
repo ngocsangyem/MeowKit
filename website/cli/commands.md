@@ -277,7 +277,6 @@ npx mewkit migrate                    # interactive multiselect
 | `--source PATH`                                 | Override source `.claude/` directory (default: `CWD/.claude/` or bundled kit)  |
 | `--only CSV`                                    | Restrict to listed types: `agents,commands,skills,config,rules,hooks`          |
 | `--skip-config`, `--skip-rules`, `--skip-hooks` | Exclude one or more types                                                      |
-| `--prefer-agents-md`                            | (Antigravity) write rules to `AGENTS.md` instead of `GEMINI.md`                |
 | `--respect-deletions`                           | Skip items whose target was deleted by the user (default re-installs)          |
 | `--reinstall-empty-dirs`                        | Re-install items even if the user emptied the target directory (default: true) |
 
@@ -312,34 +311,56 @@ The migration maps Claude source tiers (`opus`, `sonnet`, `haiku`) to configured
 
 ### Capability matrix
 
-What each tool accepts. ✓ supported · — not supported by tool.
+What each tool emits at runtime. ✓ migrated · — not migrated.
 
-| Tool                   |   Agents   | Commands | Skills | Config | Rules | Hooks |
-| ---------------------- | :--------: | :------: | :----: | :----: | :---: | :---: |
-| Cursor                 |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Codex                  |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   ✓   |
-| Droid                  |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   ✓   |
-| OpenCode               |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
-| Goose                  |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Gemini CLI             |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   ✓   |
-| Antigravity            | — (skills) |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
-| GitHub Copilot         |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Amp                    |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Kilo Code [unverified] |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Kiro IDE               |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Roo Code               |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Windsurf               |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
-| Cline                  |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| OpenHands              |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
+The matrix reflects what `mewkit migrate` actually writes per provider. Each provider's contract (`providers/{id}/contract.ts`) declares which surfaces are first-party documented; surfaces not in that contract are nulled by the runtime disable loop, even if `config.ts` declares a path for them. See "Known limitations" below for documented-upstream surfaces that the runtime currently skips.
+
+| Tool                     |   Agents   | Commands | Skills | Config | Rules | Hooks |
+| ------------------------ | :--------: | :------: | :----: | :----: | :---: | :---: |
+| Cursor                   |     —      |    —     |   —    |   ✓    |   ✓   |   —   |
+| Codex                    |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   ✓   |
+| Droid                    |     ✓      |    ✓     |   ✓    |   ✓    |   —   |   —   |
+| OpenCode                 |     ✓      |    ✓     |   —    |   —    |   —   |   —   |
+| Goose                    |     —      |    —     |   ✓    |   ✓    |   —   |   —   |
+| Gemini CLI               |     —      |    ✓     |   ✓    |   ✓    |   —   |   —   |
+| Antigravity              |     —      |    —     |   —    |   —    |   ✓   |   —   |
+| GitHub Copilot           |     ✓      |    —     |   —    |   ✓    |   ✓   |   —   |
+| Amp                      |     —      |    —     |   —    |   ✓    |   —   |   —   |
+| Kilo Code [unverified]   |     —      |    —     |   —    |   —    |   —   |   —   |
+| Kiro IDE                 |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
+| Roo Code [deprecated]    |     —      |    —     |   —    |   —    |   —   |   —   |
+| Windsurf                 |     —      |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
+| Cline                    |     —      |    —     |   ✓    |   —    |   ✓   |   —   |
+| OpenHands                |     —      |    —     |   —    |   —    |   —   |   —   |
 
 **Notes:**
 
-- Antigravity treats agents as skills (no separate concept) — Claude Code agents land in Antigravity's skills directory.
 - Codex command migration is disabled until OpenAI documents a custom command directory. Codex's documented slash/app commands remain built in to Codex itself.
 - Codex rules in OpenAI's docs are exec-policy `.rules` files. MeowKit behavioral rules migrate into `AGENTS.md`; they are not converted into sandbox exec-policy rules.
-- Hooks: only Codex, Droid, and Gemini CLI accept hooks. Other tools warn and skip.
+- Hooks: only Codex migrates hooks. Other providers' hook surfaces are documented upstream but currently disabled — see "Known limitations".
 - Shell hooks (`.sh`/`.ps1`/`.bat`) are filtered at discovery — only node-runnable hooks (`.cjs`/`.mjs`/`.js`) migrate.
-- Kilo Code is `[unverified]` — registry entry is ported verbatim from upstream but no real install was tested. Migration emits a runtime warning.
+- Kilo Code is `[unverified]` — config paths are ported verbatim from upstream but no real install was tested; the contract is empty and migration emits nothing.
+- Roo Code is `[deprecated]` — upstream announced product shutdown effective May 15, 2026; the contract is empty and migration emits nothing even with `--force`.
+
+### Known limitations
+
+The runtime is **contract-driven, not config-driven**. A provider's `config.ts` may declare file paths and converter formats for a surface, but unless that surface is listed in the provider's `contract.ts` `surfaces` field, the runtime disable loop nulls it before installation. This is intentional — it guarantees that only surfaces with verified first-party documentation are migrated. The trade-off: some surfaces are documented upstream but not yet enabled in the contract.
+
+**Providers whose contracts are intentionally empty (migration emits nothing):**
+
+- **Kilo Code** — config declares modes/skills/rules/instructions paths, but the contract is empty. The adapter is kept for compatibility; converter output has not been verified against a real Kilo install. Migration emits nothing until the contract is populated.
+- **Roo Code** — upstream shut down on May 15, 2026. The contract is empty by design even though `--force` allows selecting Roo as a target.
+- **OpenHands** — config declares paths, but no first-party portable-surface contract has been verified. Migration emits nothing.
+
+**Documented upstream but not yet enabled in the contract:**
+
+- **Gemini CLI hooks** — Gemini documents hooks via `.gemini/settings.json` (`https://github.com/google-gemini/gemini-cli/blob/main/docs/hooks/reference.md`), and a converter (`gemini-hook-event-map.ts`) exists, but the contract currently disables this surface. Hook migration is limited to Codex.
+- **Droid rules and hooks** — Factory documents `.factory/rules/` (`https://docs.factory.ai/guides/power-user/rules-conventions`) and a settings-based hooks system (`https://docs.factory.ai/cli/configuration/hooks-reference`); both surfaces are disabled by contract today.
+- **Kiro IDE hooks** — Kiro documents hooks (`https://kiro.dev/docs/hooks/`); neither `config.ts` nor `contract.ts` currently expose a Kiro hooks path or converter.
+- **Cline hooks and slash-command workflows** — Cline documents hooks (`https://docs.cline.bot/features/hooks/hook-reference`) and slash-command workflows (`https://docs.cline.bot/features/slash-commands/workflows/index`); neither surface has a converter in `config.ts` and both are disabled by contract.
+- **OpenCode config (`AGENTS.md`)** — OpenCode documents config via `AGENTS.md` (`https://opencode.ai/docs/config`); `config.ts` declares the path, but the contract currently exposes only agents and commands.
+
+Filing an issue or PR with a verified converter output is the path to enabling any of the above.
 
 ### Examples
 

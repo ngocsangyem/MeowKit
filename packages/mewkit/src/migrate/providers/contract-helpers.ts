@@ -1,5 +1,5 @@
 // Shared helpers for per-provider contract.ts files.
-// Extracted once to avoid repeating LAST_VERIFIED + helper functions across all 11 contract files.
+// Extracted once to avoid repeating LAST_VERIFIED + helper functions across all 16 contract files.
 import type { ProviderCapabilityName, ProviderSupportContract } from "./contract-types.js";
 
 export const LAST_VERIFIED = "2026-05-16";
