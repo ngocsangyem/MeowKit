@@ -1,86 +1,22 @@
-import fs from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
-
-interface LegacyCostEntry {
-	date: string;
-	command?: string;
-	tier?: string;
-	estimated_tokens?: number | string;
-	task?: string;
-	task_summary?: string;
-}
-
-interface SessionCostEntry {
-	date: string;
-	session_id?: string;
-	model?: string;
-	cost_usd?: number | string;
-	tokens_in?: number | string;
-	tokens_out?: number | string;
-	cache_write_tokens?: number | string;
-	cache_read_tokens?: number | string;
-	estimated_tokens?: number | string;
-}
-
-type CostEntry = LegacyCostEntry | SessionCostEntry;
-
-interface BudgetRow {
-	date: string;
-	command: string;
-	tier: string;
-	tokens: number;
-	task: string;
-}
-
-interface BudgetArgs {
-	monthly?: boolean;
-	session?: boolean | string;
-	day?: boolean | string;
-}
-
-interface LiveBudgetState {
-	estimated_input_tokens?: number | string;
-	estimated_output_tokens?: number | string;
-	estimated_cost_usd?: number | string;
-	turn_count?: number | string;
-}
-
-interface LiveBudgetSummary {
-	inputTokens: number;
-	outputTokens: number;
-	totalTokens: number;
-	humanReads: number;
-	estimatedCost: number;
-}
-
-function findCostLog(): string | null {
-	let current = process.cwd();
-	while (true) {
-		const candidate = path.join(current, ".claude", "memory", "cost-log.json");
-		if (fs.existsSync(candidate)) {
-			return candidate;
-		}
-		const parent = path.dirname(current);
-		if (parent === current) {
-			return null;
-		}
-		current = parent;
-	}
-}
-
-function readCostLog(logPath: string): CostEntry[] {
-	const content = fs.readFileSync(logPath, "utf-8");
-	const parsed: unknown = JSON.parse(content);
-	if (!Array.isArray(parsed)) {
-		throw new Error("cost-log.json must contain an array");
-	}
-	return parsed as CostEntry[];
-}
-
-function findProjectRootFromCostLog(logPath: string): string {
-	return path.dirname(path.dirname(path.dirname(logPath)));
-}
+import {
+	findCostLog,
+	findProjectRootFromCostLog,
+	readCostLog,
+	readLiveBudgetState,
+	resolveCurrentSessionId,
+} from "./budget-cost-log.js";
+import { aggregateByMonth, printLiveSessionSummary, printTable } from "./budget-display.js";
+import type {
+	BudgetArgs,
+	BudgetRow,
+	CostEntry,
+	LegacyCostEntry,
+	LiveBudgetState,
+	LiveBudgetSummary,
+	SessionCostEntry,
+} from "./budget-types.js";
 
 function normalizeFlagValue(value: boolean | string | undefined): string | null {
 	if (value === undefined || value === false) {
@@ -90,35 +26,6 @@ function normalizeFlagValue(value: boolean | string | undefined): string | null 
 		return "";
 	}
 	return value.trim();
-}
-
-function resolveCurrentSessionId(projectRoot: string): string | null {
-	const envSessionId = process.env.HOOK_SESSION_ID?.trim();
-	if (envSessionId) {
-		return envSessionId;
-	}
-
-	const lastSessionFile = path.join(projectRoot, "session-state", "last-session-id");
-	if (!fs.existsSync(lastSessionFile)) {
-		return null;
-	}
-
-	const sessionId = fs.readFileSync(lastSessionFile, "utf-8").trim();
-	return sessionId.length > 0 ? sessionId : null;
-}
-
-function readLiveBudgetState(projectRoot: string): LiveBudgetState | null {
-	const budgetStateFile = path.join(projectRoot, "session-state", "budget-state.json");
-	if (!fs.existsSync(budgetStateFile)) {
-		return null;
-	}
-
-	try {
-		const parsed = JSON.parse(fs.readFileSync(budgetStateFile, "utf-8")) as LiveBudgetState;
-		return parsed && typeof parsed === "object" ? parsed : null;
-	} catch {
-		return null;
-	}
 }
 
 function resolveDayFilter(value: boolean | string | undefined): string | null {
@@ -207,25 +114,6 @@ export function filterBudgetEntries(
 	});
 }
 
-function padEnd(str: string, len: number): string {
-	return str.length >= len ? str.slice(0, len) : str + " ".repeat(len - str.length);
-}
-
-function padStart(str: string, len: number): string {
-	return str.length >= len ? str : " ".repeat(len - str.length) + str;
-}
-
-function printTable(entries: BudgetRow[]): void {
-	const header = `  ${padEnd("Date", 18)}${padEnd("Command", 16)}${padEnd("Tier", 10)}${padStart("Tokens", 12)}  ${padEnd("Task", 30)}`;
-	console.log(pc.bold(header));
-	console.log(pc.dim("  " + "-".repeat(86)));
-
-	for (const entry of entries) {
-		const line = `  ${padEnd(entry.date, 18)}${padEnd(entry.command, 16)}${padEnd(entry.tier, 10)}${padStart(entry.tokens.toLocaleString(), 12)}  ${padEnd(entry.task, 30)}`;
-		console.log(line);
-	}
-}
-
 export function summarizeLiveBudgetState(budgetState: LiveBudgetState): LiveBudgetSummary {
 	const inputTokens = coerceNumber(budgetState.estimated_input_tokens);
 	const outputTokens = coerceNumber(budgetState.estimated_output_tokens);
@@ -236,38 +124,6 @@ export function summarizeLiveBudgetState(budgetState: LiveBudgetState): LiveBudg
 		humanReads: coerceNumber(budgetState.turn_count),
 		estimatedCost: coerceNumber(budgetState.estimated_cost_usd),
 	};
-}
-
-function printLiveSessionSummary(sessionId: string, budgetState: LiveBudgetState): void {
-	const summary = summarizeLiveBudgetState(budgetState);
-
-	console.log(`${pc.dim("Session:")} ${sessionId}`);
-	console.log(`${pc.dim("Mode:")} live session accumulator`);
-	console.log();
-	console.log(`${pc.bold("Input tokens:")} ${pc.cyan(summary.inputTokens.toLocaleString())}`);
-	console.log(`${pc.bold("Output tokens:")} ${pc.cyan(summary.outputTokens.toLocaleString())}`);
-	console.log(`${pc.bold("Total tokens used:")} ${pc.cyan(summary.totalTokens.toLocaleString())}`);
-	console.log(`${pc.bold("Human reads:")} ${pc.cyan(summary.humanReads.toLocaleString())}`);
-	console.log(`${pc.bold("Estimated cost:")} ${pc.cyan(`$${summary.estimatedCost.toFixed(2)}`)}`);
-}
-
-function aggregateByMonth(entries: BudgetRow[]): void {
-	const monthly = new Map<string, { tokens: number; count: number }>();
-
-	for (const entry of entries) {
-		const month = entry.date.slice(0, 7); // YYYY-MM
-		const existing = monthly.get(month) ?? { tokens: 0, count: 0 };
-		existing.tokens += entry.tokens;
-		existing.count += 1;
-		monthly.set(month, existing);
-	}
-
-	console.log(pc.bold(`  ${padEnd("Month", 12)}${padStart("Entries", 10)}${padStart("Tokens", 14)}`));
-	console.log(pc.dim("  " + "-".repeat(36)));
-
-	for (const [month, data] of monthly) {
-		console.log(`  ${padEnd(month, 12)}${padStart(String(data.count), 10)}${padStart(String(data.tokens), 14)}`);
-	}
 }
 
 export async function budget(args: BudgetArgs): Promise<void> {
@@ -311,7 +167,7 @@ export async function budget(args: BudgetArgs): Promise<void> {
 			console.log(`${pc.dim("Day:")} ${dayFilter}`);
 			console.log();
 		}
-		printLiveSessionSummary(sessionId!, liveBudgetState);
+		printLiveSessionSummary(sessionId!, summarizeLiveBudgetState(liveBudgetState));
 		return;
 	}
 

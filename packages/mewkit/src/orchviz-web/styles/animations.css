@@ -1,0 +1,57 @@
+/* Active phase chip pulses; respect prefers-reduced-motion. */
+@keyframes orchviz-pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.55; }
+}
+
+.phase-chip-active {
+	animation: orchviz-pulse 1.6s ease-in-out infinite;
+}
+
+/* Amber pulse on the active chip while any agent is paused. */
+@keyframes orchviz-pulse-amber {
+	0%, 100% { opacity: 1; border-color: var(--mk-ext-paused); }
+	50% { opacity: 0.55; border-color: var(--mk-ext-paused-border); }
+}
+
+.phase-chip-active-paused {
+	animation: orchviz-pulse-amber 1.6s ease-in-out infinite;
+}
+
+/* Amber blink for inline PAUSED dot indicators. */
+@keyframes orchviz-paused-blink {
+	0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--mk-ext-paused); }
+	50% { opacity: 0.4; box-shadow: 0 0 0 var(--mk-ext-paused); }
+}
+
+.orchviz-paused-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--mk-ext-paused);
+	display: inline-block;
+	animation: orchviz-paused-blink 1.6s ease-in-out infinite;
+	margin-right: 6px;
+}
+
+/* Side-panel slide-in transition tied to motion tokens. */
+@keyframes orchviz-panel-slide-in {
+	from { transform: translateX(100%); }
+	to   { transform: translateX(0); }
+}
+
+.orchviz-panel-slide {
+	animation: orchviz-panel-slide-in var(--mk-motion-duration-panel) var(--mk-motion-easing-default);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.phase-chip-active,
+	.phase-chip-active-paused {
+		animation: none !important;
+		outline: 1px solid currentColor;
+	}
+	.orchviz-paused-dot,
+	.orchviz-panel-slide {
+		animation: none !important;
+	}
+}

@@ -1,19 +1,16 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/portable-registry.ts
-// Adapted: greenfield in mewkit (no v1/v2 legacy migrations), PID-based lock instead of
-// proper-lockfile (avoids new dep), registry path namespaced under ~/.mewkit/.
+// Adapted: greenfield in mewkit (no v1/v2 legacy migrations), PID-based lock (extracted to
+// portable-registry-lock.ts), registry path namespaced under ~/.mewkit/.
 import { existsSync } from "node:fs";
 import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { z } from "zod";
 import { UNKNOWN_CHECKSUM, normalizeChecksum } from "./reconcile-types.js";
+import { withRegistryLock } from "./portable-registry-lock.js";
 import type { PortableType, ProviderType } from "../types.js";
 
-const home = homedir();
-
-export const REGISTRY_PATH = join(home, ".mewkit", "portable-registry.json");
-const REGISTRY_LOCK_PATH = join(home, ".mewkit", "portable-registry.lock");
-const STALE_LOCK_MS = 60 * 1000;
+export const REGISTRY_PATH = join(homedir(), ".mewkit", "portable-registry.json");
 
 const PortableInstallationSchemaV3 = z.object({
 	item: z.string(),
@@ -95,79 +92,6 @@ export async function writePortableRegistry(registry: PortableRegistryV3): Promi
 			/* best-effort */
 		}
 		throw error;
-	}
-}
-
-/**
- * PID-based file lock. Acquires lock by writing PID; checks staleness via process.kill(pid, 0).
- * Replaces proper-lockfile dependency for mewkit's leaner footprint.
- */
-async function acquireRegistryLock(): Promise<void> {
-	const lockDir = dirname(REGISTRY_LOCK_PATH);
-	if (!existsSync(lockDir)) await mkdir(lockDir, { recursive: true });
-
-	const myPid = process.pid;
-	const startTime = Date.now();
-
-	while (true) {
-		try {
-			const handle = await import("node:fs").then((m) => m.promises.open(REGISTRY_LOCK_PATH, "wx"));
-			await handle.writeFile(`${myPid}\n${Date.now()}\n`, "utf-8");
-			await handle.close();
-			return;
-		} catch (err) {
-			if (!isErrnoCode(err, "EEXIST")) throw err;
-		}
-
-		try {
-			const content = await readFile(REGISTRY_LOCK_PATH, "utf-8");
-			const [pidStr, tsStr] = content.split("\n");
-			const pid = Number.parseInt(pidStr, 10);
-			const ts = Number.parseInt(tsStr, 10);
-
-			let alive = false;
-			try {
-				if (Number.isFinite(pid) && pid > 0) {
-					process.kill(pid, 0);
-					alive = true;
-				}
-			} catch {
-				alive = false;
-			}
-
-			if (!alive || (Number.isFinite(ts) && Date.now() - ts > STALE_LOCK_MS)) {
-				try {
-					await unlink(REGISTRY_LOCK_PATH);
-				} catch {
-					/* race */
-				}
-				continue;
-			}
-		} catch {
-			// Lock disappeared or unreadable — retry
-		}
-
-		if (Date.now() - startTime > 10_000) {
-			throw new Error("Could not acquire portable-registry lock within 10s");
-		}
-		await new Promise((r) => setTimeout(r, 100));
-	}
-}
-
-async function releaseRegistryLock(): Promise<void> {
-	try {
-		await unlink(REGISTRY_LOCK_PATH);
-	} catch {
-		// Best-effort
-	}
-}
-
-async function withRegistryLock<T>(operation: () => Promise<T>): Promise<T> {
-	await acquireRegistryLock();
-	try {
-		return await operation();
-	} finally {
-		await releaseRegistryLock();
 	}
 }
 

@@ -30,6 +30,7 @@ import {
 	type ReconcileAction,
 } from "./reconcile/index.js";
 import { convertItem } from "./converters/index.js";
+import { codexBulkActionShim, providerKey, skillActionShim } from "./migrate-action-shims.js";
 import { executeDeleteAction, executeInstallAction } from "./portable-installer.js";
 import { installSkillDirectory } from "./skill-directory-installer.js";
 import { installCodexAgents, mergeHooksSettings } from "./hooks/index.js";
@@ -309,53 +310,6 @@ async function executePlan(
 	}
 
 	return results;
-}
-
-function skillActionShim(skill: SkillInfo, provider: ProviderType, global: boolean, path: string): ReconcileAction {
-	return {
-		action: "install",
-		item: skill.name,
-		type: "skill",
-		provider,
-		global,
-		targetPath: path,
-		reason: "Skill directory install",
-		isDirectoryItem: true,
-	};
-}
-
-function codexBulkActionShim(
-	type: "agent" | "hooks",
-	provider: ProviderType,
-	global: boolean,
-	count: number,
-): ReconcileAction {
-	return {
-		action: "install",
-		item: `${count} ${type === "agent" ? "agent" : "hook"}${count === 1 ? "" : "s"}`,
-		type,
-		provider,
-		global,
-		targetPath: "",
-		reason: `Specialized ${provider} ${type} install`,
-	};
-}
-
-function providerKey(type: PortableType): "agents" | "commands" | "skills" | "config" | "rules" | "hooks" {
-	switch (type) {
-		case "agent":
-			return "agents";
-		case "command":
-			return "commands";
-		case "skill":
-			return "skills";
-		case "config":
-			return "config";
-		case "rules":
-			return "rules";
-		case "hooks":
-			return "hooks";
-	}
 }
 
 /**

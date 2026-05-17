@@ -1,19 +1,20 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/reconcile-state-builders.ts
+// Path-resolution and target-checksum helpers extracted to reconcile-state-builder-helpers.ts.
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import {
-	buildMergeSectionContent,
-	computeManagedSectionChecksums,
-	getMergeSectionKey,
-} from "../config-merger/merge-single-sections.js";
+import { computeManagedSectionChecksums } from "../config-merger/merge-single-sections.js";
 import { convertItem } from "../converters/index.js";
 import { providers } from "../provider-registry.js";
 import type { PortableItem, PortableType, ProviderType } from "../types.js";
 import { computeContentChecksum } from "./checksum-utils.js";
 import type { PortableInstallationV3 } from "./portable-registry.js";
+import {
+	buildTargetChecksum,
+	getProviderPathConfig,
+	getProviderPathKeyForPortableType,
+	usesMergeSingleChecksums,
+} from "./reconcile-state-builder-helpers.js";
 import type { SourceItemState, TargetDirectoryState, TargetFileState } from "./reconcile-types.js";
-
-type ProviderPathKey = "agents" | "commands" | "skills" | "config" | "rules" | "hooks";
 
 export interface ConversionFallbackWarning {
 	item: string;
@@ -21,55 +22,6 @@ export interface ConversionFallbackWarning {
 	provider: ProviderType;
 	format: string;
 	error: string;
-}
-
-function getProviderPathKeyForPortableType(type: PortableType): ProviderPathKey {
-	switch (type) {
-		case "agent":
-			return "agents";
-		case "command":
-			return "commands";
-		case "skill":
-			return "skills";
-		case "config":
-			return "config";
-		case "rules":
-			return "rules";
-		case "hooks":
-			return "hooks";
-	}
-}
-
-function getProviderPathConfig(provider: ProviderType, type: PortableType) {
-	return providers[provider]?.[getProviderPathKeyForPortableType(type)] ?? null;
-}
-
-function usesMergeSingleChecksums(entry: PortableInstallationV3): boolean {
-	const pathConfig = getProviderPathConfig(entry.provider as ProviderType, entry.type);
-	return pathConfig?.writeStrategy === "merge-single";
-}
-
-function buildTargetChecksum(
-	item: PortableItem,
-	type: PortableType,
-	provider: ProviderType,
-	convertedContent: string,
-): string | undefined {
-	const pathConfig = getProviderPathConfig(provider, type);
-	if (!pathConfig) return computeContentChecksum(item.body);
-
-	if (pathConfig.writeStrategy === "yaml-merge" || pathConfig.writeStrategy === "json-merge") {
-		return undefined;
-	}
-	if (pathConfig.writeStrategy !== "merge-single") {
-		return computeContentChecksum(convertedContent);
-	}
-
-	const sectionKind = type === "config" ? "config" : type === "rules" ? "rule" : type === "agent" ? "agent" : null;
-	if (!sectionKind) return undefined;
-
-	const sectionKey = getMergeSectionKey(sectionKind, item);
-	return computeContentChecksum(buildMergeSectionContent(sectionKind, sectionKey, convertedContent));
 }
 
 export function buildConvertedChecksums(

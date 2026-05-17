@@ -1,0 +1,9 @@
+/* Orchviz extensions — not in design tokens (Q1/Q2 defaults: amber kept for visual
+ * continuity with paused/tool-call distinction; revisit when design owner signs off). */
+:root {
+	--mk-ext-paused: #ffaa33;
+	--mk-ext-paused-dim: rgba(255, 170, 51, 0.5);
+	--mk-ext-paused-bg: rgba(255, 170, 51, 0.15);
+	--mk-ext-paused-border: rgba(255, 170, 51, 0.35);
+	--mk-ext-tool-calling: #ffbb44;
+}
