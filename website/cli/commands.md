@@ -269,7 +269,7 @@ npx mewkit migrate                    # interactive multiselect
 
 | Flag                                            | Description                                                                    |
 | ----------------------------------------------- | ------------------------------------------------------------------------------ |
-| `--all`                                         | Migrate to all 15 supported tools in one pass                                  |
+| `--all`                                         | Migrate to all 15 selectable targets in one pass                               |
 | `--global`                                      | Install to user's home (`~/.cursor/`, etc.) instead of project-local paths     |
 | `--yes`, `-y`                                   | Non-interactive — auto-confirm prompts                                         |
 | `--dry-run`                                     | Compute and display the plan without writing any files                         |
@@ -277,7 +277,6 @@ npx mewkit migrate                    # interactive multiselect
 | `--source PATH`                                 | Override source `.claude/` directory (default: `CWD/.claude/` or bundled kit)  |
 | `--only CSV`                                    | Restrict to listed types: `agents,commands,skills,config,rules,hooks`          |
 | `--skip-config`, `--skip-rules`, `--skip-hooks` | Exclude one or more types                                                      |
-| `--prefer-agents-md`                            | (Antigravity) write rules to `AGENTS.md` instead of `GEMINI.md`                |
 | `--respect-deletions`                           | Skip items whose target was deleted by the user (default re-installs)          |
 | `--reinstall-empty-dirs`                        | Re-install items even if the user emptied the target directory (default: true) |
 
@@ -312,34 +311,34 @@ The migration maps Claude source tiers (`opus`, `sonnet`, `haiku`) to configured
 
 ### Capability matrix
 
-What each tool accepts. ✓ supported · — not supported by tool.
+What each selectable target accepts at runtime after MeowKit applies provider contracts. ✓ installed · — skipped by MeowKit. The runtime gate is code-driven: config paths that are not marked `documented` in `providers/{id}/contract.ts` are nulled before installation (`packages/mewkit/src/migrate/provider-overrides.ts:44-61`).
 
-| Tool                   |   Agents   | Commands | Skills | Config | Rules | Hooks |
-| ---------------------- | :--------: | :------: | :----: | :----: | :---: | :---: |
-| Cursor                 |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Codex                  |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   ✓   |
-| Droid                  |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   ✓   |
-| OpenCode               |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
-| Goose                  |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Gemini CLI             |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   ✓   |
-| Antigravity            | — (skills) |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
-| GitHub Copilot         |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Amp                    |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Kilo Code [unverified] |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Kiro IDE               |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Roo Code               |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Windsurf               |     ✓      |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
-| Cline                  |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| OpenHands              |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
+| Tool           | Agents | Commands | Skills | Config | Rules | Hooks | Evidence |
+| -------------- | :----: | :------: | :----: | :----: | :---: | :---: | -------- |
+| Cursor         |   —    |    —     |   —    |   ✓    |   ✓   |   —   | Cursor rules provide system-level instructions and live in rule files ([Cursor rules](https://docs.cursor.com/en/context/rules)); custom modes are UI behavior, not portable agent files ([custom modes](https://docs.cursor.com/agent/custom-modes)). |
+| Codex          |   ✓    |    —     |   ✓    |   ✓    |   ✓   |   ✓   | OpenAI documents `AGENTS.md`, subagents, skills, rules, and hooks ([AGENTS.md](https://developers.openai.com/codex/guides/agents-md), [subagents](https://developers.openai.com/codex/subagents), [skills](https://developers.openai.com/codex/skills), [rules](https://developers.openai.com/codex/rules), [hooks](https://developers.openai.com/codex/hooks)). |
+| Droid          |   ✓    |    ✓     |   ✓    |   ✓    |   —   |   —   | Factory documents custom droids, slash commands, skills, and `AGENTS.md` ([custom droids](https://docs.factory.ai/cli/configuration/custom-droids), [slash commands](https://docs.factory.ai/cli/configuration/custom-slash-commands), [skills](https://docs.factory.ai/cli/configuration/skills), [AGENTS.md](https://docs.factory.ai/factory-cli/configuration/agents-md)). |
+| OpenCode       |   ✓    |    ✓     |   —    |   —    |   —   |   —   | OpenCode documents agents and config; MeowKit currently enables only agents and commands by contract ([agents](https://opencode.ai/docs/agents/), [config](https://opencode.ai/docs/config)). |
+| Goose          |   —    |    —     |   ✓    |   ✓    |   —   |   —   | Goose documents skills and Goosehints project context ([skills](https://goose-docs.ai/docs/guides/context-engineering/using-skills/), [Goosehints](https://goose-docs.ai/docs/guides/context-engineering/using-goosehints/)). |
+| Gemini CLI     |   —    |    ✓     |   ✓    |   ✓    |   —   |   —   | Gemini CLI documents custom commands and context files; hooks are documented upstream but not yet enabled by MeowKit's contract ([custom commands](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/custom-commands.md), [configuration](https://github.com/google-gemini/gemini-cli/blob/main/docs/reference/configuration.md), [hooks reference](https://github.com/google-gemini/gemini-cli/blob/main/docs/hooks/reference.md)). |
+| Antigravity    |   —    |    —     |   —    |   —    |   ✓   |   —   | Flutter's Antigravity-related AI rules docs are the only contract-enabled surface ([AI rules](https://docs.flutter.dev/ai/ai-rules)). |
+| GitHub Copilot |   ✓    |    —     |   —    |   ✓    |   ✓   |   —   | GitHub documents custom agents and custom instructions ([custom agents](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents), [custom instructions](https://docs.github.com/en/copilot/reference/custom-instructions-support)). |
+| Amp            |   —    |    —     |   —    |   ✓    |   —   |   —   | Amp documents agent instructions through its manual / `AGENTS.md` guidance ([manual](https://ampcode.com/manual), [AGENTS.md](https://ampcode.com/news/AGENTS.md)). |
+| Kilo Code      |   —    |    —     |   —    |   —    |   —   |   —   | Kilo has provider paths in code, but no surfaces are enabled by `kilo/contract.ts`; update the contract before relying on this target ([Kilo docs](https://kilocode.ai/docs)). |
+| Kiro IDE       |   ✓    |    —     |   ✓    |   ✓    |   ✓   |   —   | Kiro documents custom agents, skills, and steering; hooks are documented upstream but not yet migrated ([custom agents](https://kiro.dev/docs/cli/custom-agents/), [skills](https://kiro.dev/docs/skills/), [steering](https://kiro.dev/docs/steering/), [hooks](https://kiro.dev/docs/hooks/)). |
+| Roo Code       |   —    |    —     |   —    |   —    |   —   |   —   | Roo is deprecated in MeowKit and has no contract-enabled surfaces; first-party docs document modes, instructions, and skills ([custom modes](https://docs.roocode.com/features/custom-modes), [custom instructions](https://docs.roocode.com/features/custom-instructions), [skills](https://docs.roocode.com/features/skills)). |
+| Windsurf       |   —    |    ✓     |   ✓    |   ✓    |   ✓   |   —   | Windsurf documents workflows, skills, memories/rules, and `AGENTS.md` ([workflows](https://docs.windsurf.com/windsurf/cascade/workflows), [skills](https://docs.windsurf.com/windsurf/cascade/skills), [memories](https://docs.windsurf.com/windsurf/cascade/memories), [AGENTS.md](https://docs.windsurf.com/ro/windsurf/cascade/agents-md)). |
+| Cline          |   —    |    —     |   ✓    |   —    |   ✓   |   —   | Cline documents rules and skills; hooks and slash commands are documented upstream but not yet enabled by MeowKit's contract ([rules](https://docs.cline.bot/features/cline-rules), [skills](https://docs.cline.bot/customization/skills), [hooks](https://docs.cline.bot/features/hooks/hook-reference), [slash commands](https://docs.cline.bot/features/slash-commands/new-task)). |
+| OpenHands      |   —    |    —     |   —    |   —    |   —   |   —   | OpenHands has provider paths in code, but no surfaces are enabled by `openhands/contract.ts`; repository customization is documented upstream ([repository customization](https://docs.openhands.dev/openhands/usage/customization/repository)). |
 
-**Notes:**
+**Known limitations:**
 
-- Antigravity treats agents as skills (no separate concept) — Claude Code agents land in Antigravity's skills directory.
-- Codex command migration is disabled until OpenAI documents a custom command directory. Codex's documented slash/app commands remain built in to Codex itself.
+- Code-declared provider paths are not enough to make a surface migrate: MeowKit disables every surface whose provider contract is not marked `documented` (`packages/mewkit/src/migrate/provider-overrides.ts:44-61`).
+- Kilo Code, Roo Code, and OpenHands currently have no contract-enabled runtime surfaces, even though first-party docs document some corresponding concepts. Treat those targets as placeholders until their contracts are updated.
+- Gemini CLI hooks, Droid rules/hooks, Kiro hooks, Cline hooks/commands, and OpenCode config are documented upstream but are not enabled by the current contracts.
+- Codex command migration is disabled intentionally: OpenAI documents built-in slash/app commands, not a custom command directory for portable command files ([Codex slash commands](https://developers.openai.com/codex/cli/slash-commands)).
 - Codex rules in OpenAI's docs are exec-policy `.rules` files. MeowKit behavioral rules migrate into `AGENTS.md`; they are not converted into sandbox exec-policy rules.
-- Hooks: only Codex, Droid, and Gemini CLI accept hooks. Other tools warn and skip.
-- Shell hooks (`.sh`/`.ps1`/`.bat`) are filtered at discovery — only node-runnable hooks (`.cjs`/`.mjs`/`.js`) migrate.
-- Kilo Code is `[unverified]` — registry entry is ported verbatim from upstream but no real install was tested. Migration emits a runtime warning.
+- Shell hooks (`.sh`/`.ps1`/`.bat`/`.cmd`/`.py`) are filtered at discovery — only node-runnable hooks (`.cjs`/`.mjs`/`.js`/`.ts`) migrate (`packages/mewkit/src/migrate/discovery/hooks-discovery.ts:7-33`).
 
 ### Examples
 
@@ -353,7 +352,7 @@ npx mewkit migrate cursor
 # Multi-tool batch (uses interactive picker if TTY)
 npx mewkit migrate
 
-# All 15 tools, non-interactive (CI-friendly)
+# All 15 selectable targets, non-interactive (CI-friendly)
 npx mewkit migrate --all --yes
 
 # Global install scope
@@ -404,7 +403,7 @@ npx mewkit init --migrate
 # Pre-set tools, no picker
 npx mewkit init --migrate-to cursor,codex,droid
 
-# All 15 tools
+# All 15 selectable targets
 npx mewkit init --migrate-to all
 
 # Global install scope
