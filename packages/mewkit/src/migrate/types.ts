@@ -26,67 +26,17 @@ export const ProviderType = z.enum([
 ]);
 export type ProviderType = z.infer<typeof ProviderType>;
 
-/** Conversion format used to transform source files */
-export type ConversionFormat =
-	| "direct-copy"
-	| "fm-to-fm"
-	| "fm-to-yaml"
-	| "fm-strip"
-	| "fm-to-json"
-	| "md-to-toml"
-	| "skill-md"
-	| "md-strip"
-	| "md-to-mdc"
-	| "md-to-kiro-steering"
-	| "fm-to-codex-toml"
-	| "md-to-codex-rules";
-
-/** Write strategy for target files */
-export type WriteStrategy =
-	| "per-file"
-	| "merge-single"
-	| "json-merge"
-	| "yaml-merge"
-	| "single-file"
-	| "codex-toml"
-	| "codex-hooks";
-
-/** Provider path configuration for a specific portable type */
-export interface ProviderPathConfig {
-	projectPath: string | null;
-	globalPath: string | null;
-	format: ConversionFormat;
-	writeStrategy: WriteStrategy;
-	fileExtension: string;
-	charLimit?: number;
-	totalCharLimit?: number;
-	nestedCommands?: boolean;
-}
-
-/** Provider's level of subagent/delegation support */
-export type SubagentSupport = "full" | "partial" | "none" | "planned";
-export type ProviderSupportLevel = "verified" | "experimental" | "deprecated";
-
-/** Full provider configuration */
-export interface ProviderConfig {
-	name: ProviderType;
-	displayName: string;
-	supportLevel?: ProviderSupportLevel;
-	supportReason?: string;
-	subagents: SubagentSupport;
-	agents: ProviderPathConfig | null;
-	commands: ProviderPathConfig | null;
-	skills: ProviderPathConfig | null;
-	config: ProviderPathConfig | null;
-	rules: ProviderPathConfig | null;
-	hooks: ProviderPathConfig | null;
-	settingsJsonPath: { projectPath: string; globalPath: string } | null;
-	detect: () => Promise<boolean>;
-	/** Optional patterns to exclude from discovery (mewkit-internal extension) */
-	excludePatterns?: string[];
-	/** Optional unverified marker — mewkit prints a runtime warning when set */
-	_unverified?: boolean;
-}
+// ProviderConfig + path/format/strategy types moved into per-provider module
+// at `./providers/provider-config-types.ts`. Re-exported here so legacy import
+// paths (`./types.js`) continue to resolve unchanged.
+export type {
+	ConversionFormat,
+	WriteStrategy,
+	ProviderPathConfig,
+	SubagentSupport,
+	ProviderSupportLevel,
+	ProviderConfig,
+} from "./providers/provider-config-types.js";
 
 /** Parsed frontmatter data from a source file */
 export interface ParsedFrontmatter {
@@ -181,7 +131,6 @@ export const MigrateOptionsSchema = z.object({
 	reconcile: z.boolean().optional(),
 	reinstallEmptyDirs: z.boolean().optional(),
 	respectDeletions: z.boolean().optional(),
-	preferAgentsMd: z.boolean().optional(),
 	sourceVersion: z.string().optional(),
 });
 export type MigrateOptions = z.infer<typeof MigrateOptionsSchema>;

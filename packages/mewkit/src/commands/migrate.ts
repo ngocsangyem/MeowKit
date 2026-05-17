@@ -22,7 +22,6 @@ export interface MigrateCliArgs {
 	reconcile?: boolean;
 	"reinstall-empty-dirs"?: boolean;
 	"respect-deletions"?: boolean;
-	"prefer-agents-md"?: boolean;
 	"source-version"?: string;
 }
 
@@ -45,7 +44,6 @@ export async function migrate(args: MigrateCliArgs): Promise<number> {
 		reconcile: args.reconcile,
 		reinstallEmptyDirs: args["reinstall-empty-dirs"],
 		respectDeletions: args["respect-deletions"],
-		preferAgentsMd: args["prefer-agents-md"],
 		sourceVersion: args["source-version"],
 	};
 

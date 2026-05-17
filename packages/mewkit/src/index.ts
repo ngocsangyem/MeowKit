@@ -105,7 +105,6 @@ async function main(): Promise<void> {
 			"reconcile",
 			"reinstall-empty-dirs",
 			"respect-deletions",
-			"prefer-agents-md",
 			"no-cleanup",
 			"migrate",
 			"migrate-global",
@@ -243,7 +242,6 @@ async function main(): Promise<void> {
 				reconcile: args.reconcile as boolean | undefined,
 				"reinstall-empty-dirs": args["reinstall-empty-dirs"] as boolean | undefined,
 				"respect-deletions": args["respect-deletions"] as boolean | undefined,
-				"prefer-agents-md": args["prefer-agents-md"] as boolean | undefined,
 				"source-version": args["source-version"] as string | undefined,
 			});
 			if (exitCode !== 0) process.exit(exitCode);

@@ -50,7 +50,7 @@ export interface RunMigrateContext {
 }
 
 export async function runMigrate(options: MigrateOptions, ctx: RunMigrateContext): Promise<number> {
-	applyMewkitOverrides({ preferAgentsMd: options.preferAgentsMd });
+	applyMewkitOverrides();
 	validateFlags(options, ctx.argv);
 
 	const scope = resolveMigrationScope(ctx.argv, {

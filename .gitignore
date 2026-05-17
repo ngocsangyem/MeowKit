@@ -57,3 +57,4 @@ tasks/reviews/
 .claude/packs/
 release-manifest.json
 
+tmp/

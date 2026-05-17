@@ -19,6 +19,7 @@
     "lint:colors": "bash scripts/check-no-color-literals.sh",
     "lint:no-direct-io": "bash scripts/check-no-direct-io.sh",
     "lint": "npm run tokens:check && npm run lint:colors && npm run lint:no-direct-io",
+    "build:capability-matrix": "node scripts/build-provider-capability-matrix.mjs",
     "prepublishOnly": "npm run build",
     "dev": "npx tsc --watch"
   },

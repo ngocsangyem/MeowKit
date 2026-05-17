@@ -1,13 +1,15 @@
-// MeowKit-side patches to the vendored claudekit-cli registry. Each override is annotated
-// with the verifying source. Apply once at startup via applyMewkitOverrides() before any migration.
+// Disable-undocumented-surfaces pass kept here for compatibility with callers
+// that invoke applyMewkitOverrides() at boot. Per-provider override patches
+// now live next to their provider in `./providers/{id}/overrides.ts` and the
+// composer in `./providers/index.ts` runs them at module load.
+//
+// This file remains because `migrate/index.ts:6` exports it via `export *`,
+// making applyMewkitOverrides + OverrideOptions + _resetOverridesForTest part
+// of the public API. The body is intentionally narrow.
 
-import { homedir } from "node:os";
-import { join } from "node:path";
 import { providerDocumentationContracts } from "./provider-documentation-contracts.js";
 import { providers } from "./provider-registry.js";
-import type { PortableType, ProviderType, ProviderConfig } from "./types.js";
-
-const home = homedir();
+import type { PortableType, ProviderConfig, ProviderType } from "./types.js";
 
 let overridesApplied = false;
 
@@ -36,12 +38,10 @@ function disablePortableSurface(provider: ProviderConfig, portableType: Portable
 	}
 }
 
-export interface OverrideOptions {
-	/** When true (Antigravity), write rules to AGENTS.md instead of GEMINI.md */
-	preferAgentsMd?: boolean;
-}
+/** Retained for backward compatibility; all fields are currently unused. */
+export interface OverrideOptions {}
 
-export function applyMewkitOverrides(options: OverrideOptions = {}): void {
+export function applyMewkitOverrides(_options: OverrideOptions = {}): void {
 	if (overridesApplied) return;
 
 	// Disable undocumented or approximation-only surfaces. Migration should only emit
@@ -56,51 +56,6 @@ export function applyMewkitOverrides(options: OverrideOptions = {}): void {
 			disablePortableSurface(providers[provider], portableType);
 		}
 	}
-
-	providers.kilo._unverified = true;
-
-	// Override A — Kiro paths. Source: https://kiro.dev/docs/steering/
-	if (providers.kiro.agents) {
-		providers.kiro.agents.projectPath = ".kiro/agents";
-		providers.kiro.agents.globalPath = join(home, ".kiro/agents");
-	}
-	if (providers.kiro.config) providers.kiro.config.globalPath = join(home, ".kiro/steering/project.md");
-	if (providers.kiro.rules) providers.kiro.rules.globalPath = join(home, ".kiro/steering");
-	if (providers.kiro.skills) providers.kiro.skills.globalPath = join(home, ".kiro/skills");
-
-	// Override B — Gemini CLI skills. Source: official Gemini CLI docs index.
-	if (providers["gemini-cli"].skills) {
-		providers["gemini-cli"].skills.projectPath = ".gemini/skills";
-		providers["gemini-cli"].skills.globalPath = join(home, ".gemini/skills");
-	}
-
-	// Override C — Windsurf native workflow + skill + global rule paths.
-	// Sources: https://docs.windsurf.com/windsurf/cascade/workflows
-	//          https://docs.windsurf.com/windsurf/cascade/skills
-	//          https://docs.windsurf.com/windsurf/cascade/memories
-	if (providers.windsurf.commands) {
-		providers.windsurf.commands.globalPath = join(home, ".codeium/windsurf/global_workflows");
-		providers.windsurf.commands.charLimit = 12000;
-	}
-	if (providers.windsurf.skills) {
-		providers.windsurf.skills.projectPath = ".windsurf/skills";
-		providers.windsurf.skills.globalPath = join(home, ".codeium/windsurf/skills");
-	}
-	if (providers.windsurf.config) {
-		providers.windsurf.config.globalPath = join(home, ".codeium/windsurf/memories/global_rules.md");
-	}
-	if (providers.windsurf.rules) {
-		providers.windsurf.rules.globalPath = null;
-	}
-
-	// Override D — Amp now documents AGENTS.md (plural) as the active filename.
-	// Source: https://ampcode.com/manual
-	if (providers.amp.config) {
-		providers.amp.config.projectPath = "AGENTS.md";
-		providers.amp.config.globalPath = join(home, ".config/amp/AGENTS.md");
-	}
-
-	void options.preferAgentsMd;
 
 	overridesApplied = true;
 }
