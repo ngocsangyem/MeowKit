@@ -42,6 +42,26 @@ else
   scrub_secrets() { echo "$1"; }
 fi
 
+# Resolve model id from the canonical SessionStart artifact, not env vars
+# Claude Code does not export. See lib/resolve-model.sh.
+_RESOLVED_MODEL="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-}}"
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/resolve-model.sh" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/resolve-model.sh" 2>/dev/null
+  if command -v resolve_model >/dev/null 2>&1; then
+    _RESOLVED_MODEL=$(resolve_model)
+    [ "$_RESOLVED_MODEL" = "unknown" ] && _RESOLVED_MODEL=""
+  fi
+fi
+
+# Resolve run_id from MEOWKIT_RUN_ID env var (harness sets this) OR from
+# session-state/last-session-id (written by SessionStart). Same class of bug
+# as model — host runtime does not export run identity to Stop hooks.
+_RESOLVED_RUN_ID="${MEOWKIT_RUN_ID:-}"
+if [ -z "$_RESOLVED_RUN_ID" ] && [ -f "${CLAUDE_PROJECT_DIR:-.}/session-state/last-session-id" ]; then
+  _RESOLVED_RUN_ID=$(cat "${CLAUDE_PROJECT_DIR:-.}/session-state/last-session-id" 2>/dev/null | tr -d '[:space:]')
+  _RESOLVED_RUN_ID=$(printf '%s' "$_RESOLVED_RUN_ID" | tr -cd 'a-zA-Z0-9._-')
+fi
+
 # Scrub the payload
 SCRUBBED=$(scrub_secrets "$PAYLOAD")
 
@@ -53,7 +73,11 @@ command -v "$PY" >/dev/null 2>&1 || exit 0
 # Pass EVENT and SCRUBBED via env vars (NOT shell string interpolation) to avoid
 # injection from special chars (single/triple quotes, Python escapes). A filename
 # like O'Brien.ts would otherwise crash the parser silently and drop the trace record.
-RECORD=$(MEOWKIT_TRACE_EVENT="$EVENT" MEOWKIT_TRACE_PAYLOAD="$SCRUBBED" "$PY" -c "
+RECORD=$(MEOWKIT_TRACE_EVENT="$EVENT" \
+  MEOWKIT_TRACE_PAYLOAD="$SCRUBBED" \
+  MEOWKIT_TRACE_MODEL="$_RESOLVED_MODEL" \
+  MEOWKIT_TRACE_RUN_ID="$_RESOLVED_RUN_ID" \
+  "$PY" -c "
 import json, sys, os
 from datetime import datetime, timezone
 
@@ -72,9 +96,9 @@ record = {
     'schema_version': '1.0',
     'ts': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
     'event': event,
-    'run_id': os.environ.get('MEOWKIT_RUN_ID', ''),
+    'run_id': os.environ.get('MEOWKIT_TRACE_RUN_ID', ''),
     'harness_version': os.environ.get('MEOWKIT_HARNESS_VERSION', '3.0.0'),
-    'model': os.environ.get('MEOWKIT_MODEL_HINT', os.environ.get('CLAUDE_MODEL', '')),
+    'model': os.environ.get('MEOWKIT_TRACE_MODEL', ''),
     'density': os.environ.get('MEOWKIT_HARNESS_MODE', ''),
     'data': data,
 }

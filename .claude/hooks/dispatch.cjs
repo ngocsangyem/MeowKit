@@ -117,6 +117,31 @@ async function main() {
   if (output) {
     process.stdout.write(output);
   }
+
+  // Gated runtime-truth sentinel: confirms dispatch.cjs Stop handler chain
+  // ran to completion. Off by default; opt in: MEOWKIT_HOOK_DEBUG=1.
+  // Reaches the same file post-session.sh writes (stop-env-<TIMESTAMP>.txt),
+  // distinguished by the dispatch_stop_completed line.
+  if (process.env.MEOWKIT_HOOK_DEBUG === '1' && event === 'Stop') {
+    try {
+      const dbgDir = path.join(ROOT, 'session-state', '.debug');
+      fs.mkdirSync(dbgDir, { recursive: true });
+      // Use a generic sentinel file (Stop event ordering means post-session.sh's
+      // timestamped file may not be deterministically locatable from here).
+      const sentinelPath = path.join(dbgDir, `dispatch-stop-${Date.now()}.txt`);
+      const lines = [
+        'hook=dispatch.cjs',
+        `event=${event}`,
+        `CLAUDE_PROJECT_DIR=${process.env.CLAUDE_PROJECT_DIR || 'UNSET'}`,
+        `ROOT=${ROOT}`,
+        `cwd=${process.cwd()}`,
+        `handlers_count=${handlerPaths.length}`,
+        `dispatch_stop_completed=1`,
+        `ts=${new Date().toISOString()}`,
+      ].join('\n') + '\n';
+      fs.writeFileSync(sentinelPath, lines);
+    } catch (_) { /* graceful — debug never breaks the hook */ }
+  }
 }
 
 main().catch((err) => {

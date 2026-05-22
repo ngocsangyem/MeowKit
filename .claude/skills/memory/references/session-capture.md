@@ -109,12 +109,19 @@ Write to the appropriate topic file based on category:
 - Use descriptive `id` values (e.g., `"nestjs-guard-on-all-controllers"`, `"grep-e-on-macos"`).
 - `severity: critical` if it affects multiple features or would save ≥30 min; `standard` otherwise.
 
-### Step 5: Immediate capture alternative
+### Step 5: Immediate capture alternative (user-typed keyboard shortcut only)
 
-For quick, crash-resilient capture during the session, type:
-- `##pattern: bug-class <description>` → auto-writes to `fixes.json`
-- `##decision: <description>` → auto-writes to `architecture-decisions.json`
-- `##note: <text>` → staging in `quick-notes.md` (classify here at Reflect)
+This section describes the user-typed keyboard shortcut path — the human
+user (not the agent) types these at the start of a prompt and the
+`immediate-capture-handler.cjs` hook persists them on `UserPromptSubmit`.
+Agent output is NOT processed by the handler. Agents writing in this
+skill use direct `Edit` per Steps 1–4 above. See
+`.claude/skills/memory/references/capture-architecture.md`.
+
+For quick, crash-resilient capture during the session, the user types:
+- `##pattern: bug-class <description>` → auto-writes to `fixes.json` (user-typed only)
+- `##decision: <description>` → auto-writes to `architecture-decisions.json` (user-typed only)
+- `##note: <text>` → staging in `quick-notes.md` (user-typed only; classify here at Reflect)
 
 ---
 

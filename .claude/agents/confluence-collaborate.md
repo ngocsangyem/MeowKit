@@ -79,8 +79,19 @@ Confluence accepts ADF (Atlassian Document Format) or markdown that `confluence-
 
 ## Memory (project convention)
 
-- `##pattern: confluence-collaborate: <recurring project pattern>` → `.claude/memory/quick-notes.md`
-- `##decision: confluence-collaborate: <captured choice + rationale>` → `.claude/memory/decisions.md`
+Append observations DIRECTLY via the `Edit` tool. The `##prefix:` syntax
+is a user keyboard shortcut only and does NOT fire from agent output
+(see `.claude/skills/memory/references/capture-architecture.md`).
+
+- Recurring project pattern → `Edit` `.claude/memory/quick-notes.md`, append
+  section `## YYYY-MM-DD — confluence-collaborate — pattern — <slug>` with a
+  3-bullet body (symptom / pattern / rationale).
+- Captured choice + rationale → `Edit` `.claude/memory/decisions.md`,
+  append section `## YYYY-MM-DD — confluence-collaborate — <slug>` with body
+  (decision, context, status).
+
+Scrub secrets in-content before writing — Path 2 (agent-authored) has no
+automatic scrub.
 
 ### Per-leaf observations worth capturing
 

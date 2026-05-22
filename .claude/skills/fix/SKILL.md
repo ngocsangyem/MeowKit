@@ -117,16 +117,53 @@ Task orchestration (Moderate+): `references/task-orchestration.md`.
 
 If verify fails: loop to Step 2. After 3 failures → STOP, question architecture.
 
-## Step 6 — Finalize + Learn (MANDATORY)
+## Step 6 — Finalize + Learn (MANDATORY for Standard/Complex/Parallel; opt-in for Simple)
 
-1. Report: confidence, root cause, changes, files, prevention measures
-2. **Write to memory** — capture the fix pattern for future sessions:
-   - Append to `.claude/memory/fixes.md`: symptom → root cause → fix approach → what prevented recurrence
-   - Update `.claude/memory/fixes.json`: add pattern with `type: "correction"`, `category: "failure"`, `severity`, `applicable_when`, `context`, `pattern`, `frequency: 1`
-   - If pattern already exists → increment frequency + update `lastSeen`
+1. Report: confidence, root cause, changes, files, prevention measures.
+
+2. **Write to memory via direct `Edit` calls** — capture the fix pattern for future sessions. Read both files first to match the live schema, then append.
+
+   - **`.claude/memory/fixes.md`** — append:
+     ```
+     ## <YYYY-MM-DD> — <bug-class slug> (severity: low|medium|high|critical)
+
+     - Symptom: <one line>
+     - Root cause: <one line>
+     - Fix: <one line + file paths>
+     - Prevention: <regression test path OR guard added>
+     ```
+
+   - **`.claude/memory/fixes.json`** — under `patterns`, add or update:
+     ```json
+     {
+       "id": "<kebab-slug>",
+       "type": "failure",
+       "category": "bug-class",
+       "severity": "low|medium|high|critical",
+       "domain": ["<area1>", "<area2>"],
+       "applicable_when": "<one line>",
+       "context": "<one line>",
+       "pattern": "<one line — what to do or avoid>",
+       "frequency": 1,
+       "lastSeen": "<YYYY-MM-DD>"
+     }
+     ```
+
+   - **If the same `id` already exists**, increment `frequency` and update `lastSeen`. Do not duplicate entries.
+
+   - **DO NOT use `##pattern:bug-class` prefixes.** That is a user-typed keyboard shortcut; the handler (`hooks/handlers/immediate-capture-handler.cjs`) only fires on `UserPromptSubmit` — the human typing the prefix at the start of a message. Agent-emitted `##pattern:` text is invisible to the handler. Always call `Edit` directly. See `.claude/skills/memory/references/capture-architecture.md`.
+
+   - **Scrub secrets / tokens / PII before writing.** `Edit` is not secret-scrubbed; you are responsible.
+
+   - **Inside `/mk:cook` full pipeline**: Phase 6 / `mk:memory session-capture` covers this — do NOT double-write here. Standalone `/mk:fix` runs OWN the write themselves.
+
+   - Skip when `/mk:fix --no-capture` was passed.
+
 3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — Gate 1 bypass path means no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
-4. `documenter` agent → update `./docs`
-5. Ask user about commit
+
+4. `documenter` agent → update `./docs`.
+
+5. Ask user about commit.
 
 ## Skill Activation
 

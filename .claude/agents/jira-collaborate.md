@@ -60,11 +60,23 @@ Jira accepts ADF (Atlassian Document Format) or markdown that jira-as converts. 
 
 ## Memory (project convention)
 
-Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
+Append observations DIRECTLY via the `Edit` tool. The `##prefix:` syntax
+is a user keyboard shortcut only and does NOT fire from agent output
+(see `.claude/skills/memory/references/capture-architecture.md`).
 
-- `##pattern: jira-collaborate: <recurring project pattern>` → `.claude/memory/quick-notes.md`
-- `##note: jira-collaborate: <one-off context>` → `.claude/memory/quick-notes.md`
-- `##decision: jira-collaborate: <captured choice + rationale>` → `.claude/memory/decisions.md`
+- <recurring project pattern> → `Edit` `.claude/memory/quick-notes.md`, append
+  section `## YYYY-MM-DD — jira-collaborate — pattern — <slug>` with a 3-bullet body
+  (symptom / pattern / rationale).
+- One-off context → `Edit` `.claude/memory/quick-notes.md`, append section
+  `## YYYY-MM-DD — jira-collaborate — note — <slug>` with a 1–3 line body.
+- Captured choice + rationale → `Edit` `.claude/memory/decisions.md`,
+  append section `## YYYY-MM-DD — jira-collaborate — <slug>` with body (decision,
+  context, status).
+
+Scrub secrets in-content before writing — Path 2 (agent-authored) has no
+automatic scrub. Patterns to redact: API keys (Anthropic / OpenAI / Stripe /
+AWS / GitHub / GitLab / Slack), JWT, Bearer tokens, DB URLs, generic
+`api_key=` / `password=` / `token=` strings.
 
 Topical-file destinations (when the entry has lasting value):
 - Custom field IDs / project schemas → `.claude/memory/architecture-decisions.md`

@@ -84,8 +84,19 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh bulk
 
 ## Memory (project convention)
 
-- `##pattern: confluence-bulk: <recurring project pattern>` → `.claude/memory/quick-notes.md`
-- `##decision: confluence-bulk: <captured choice + rationale>` → `.claude/memory/decisions.md`
+Append observations DIRECTLY via the `Edit` tool. The `##prefix:` syntax
+is a user keyboard shortcut only and does NOT fire from agent output
+(see `.claude/skills/memory/references/capture-architecture.md`).
+
+- Recurring project pattern → `Edit` `.claude/memory/quick-notes.md`, append
+  section `## YYYY-MM-DD — confluence-bulk — pattern — <slug>` with a 3-bullet
+  body (symptom / pattern / rationale).
+- Captured choice + rationale → `Edit` `.claude/memory/decisions.md`,
+  append section `## YYYY-MM-DD — confluence-bulk — <slug>` with body
+  (decision, context, status).
+
+Scrub secrets in-content before writing — Path 2 (agent-authored) has no
+automatic scrub.
 
 ### Per-leaf observations worth capturing
 

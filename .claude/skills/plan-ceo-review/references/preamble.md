@@ -77,4 +77,4 @@ This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 ## Memory
 
 - **Reads memory:** at task start, read `.claude/memory/architecture-decisions.md` for prior decisions that may inform plan review.
-- **Writes memory:** at task end, append the CEO review verdict and any newly-surfaced decisions to `.claude/memory/architecture-decisions.md` with `##decision:` prefix. Do not overwrite prior entries.
+- **Writes memory:** at task end, append the CEO review verdict and any newly-surfaced decisions to `.claude/memory/architecture-decisions.md` via direct `Edit` — `##decision:` is a user-typed keyboard shortcut that does NOT fire from agent output (see `.claude/skills/memory/references/capture-architecture.md`). Append a `## YYYY-MM-DD — plan-ceo-review — <slug>` section; do not overwrite prior entries. Scrub secrets in-content before writing.

@@ -15,6 +15,27 @@ if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
   . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
 fi
 
+# Gated runtime-truth debug. Writes one file per Stop event with the env state
+# the bash hook actually sees, so we can confirm CLAUDE_PROJECT_DIR scope and
+# verify which env vars are exported by the host runtime. Off by default.
+# Opt in: export MEOWKIT_HOOK_DEBUG=1.
+if [ "${MEOWKIT_HOOK_DEBUG:-0}" = "1" ]; then
+  _DBG_DIR="${CLAUDE_PROJECT_DIR:-.}/session-state/.debug"
+  mkdir -p "$_DBG_DIR" 2>/dev/null
+  _DBG_FILE="$_DBG_DIR/stop-env-$(date +%s).txt"
+  {
+    echo "hook=post-session.sh"
+    echo "CLAUDE_PROJECT_DIR=${CLAUDE_PROJECT_DIR:-UNSET}"
+    echo "HOOK_SESSION_ID=${HOOK_SESSION_ID:-UNSET}"
+    echo "PWD=$(pwd)"
+    echo "MEOWKIT_MODEL_HINT=${MEOWKIT_MODEL_HINT:-UNSET}"
+    echo "CLAUDE_MODEL=${CLAUDE_MODEL:-UNSET}"
+    echo "CLAUDE_MODEL_ID=${CLAUDE_MODEL_ID:-UNSET}"
+    echo "ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-UNSET}"
+    echo "ts_start=$(date -u +%FT%TZ)"
+  } > "$_DBG_FILE"
+fi
+
 # Hook profile gating — CF7 fix: run by default, opt-OUT only on fast profile
 # Memory capture, cost tracking, and trace records require this hook to run.
 MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
@@ -82,6 +103,16 @@ acquire_lock() {
 # The retroactive NEEDS_CAPTURE heredoc has been removed. lessons.md is archived.
 # The model-change flag below targets fixes.md.
 
+# Resolve active model id once, via the canonical SessionStart artifact.
+# Claude Code does not export model env vars to Stop hooks — see
+# lib/resolve-model.sh header for the full rationale.
+. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/resolve-model.sh" 2>/dev/null || true
+if command -v resolve_model >/dev/null 2>&1; then
+  RESOLVED_MODEL=$(resolve_model)
+else
+  RESOLVED_MODEL="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-unknown}}}"
+fi
+
 # Initialize cost-log.json if missing
 if [ ! -f "$MEMORY_DIR/cost-log.json" ]; then
   echo "[]" > "$MEMORY_DIR/cost-log.json"
@@ -103,7 +134,7 @@ if [ -f "$BUDGET_STATE_FILE" ] && command -v python3 >/dev/null 2>&1; then
   _COST_LOG="$MEMORY_DIR/cost-log.json" \
   _TIMESTAMP="$TIMESTAMP" \
   _SESSION_ID="$PERSISTED_SESSION_ID" \
-  _MODEL_HINT="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-unknown}}}" \
+  _MODEL_HINT="$RESOLVED_MODEL" \
   python3 -c '
 import json, os, tempfile
 clean_budget = os.environ["_CLEAN_BUDGET"]
@@ -137,14 +168,39 @@ fi
 
 # Detect model-version change → flag dead-weight audit needed.
 # Writes flag to fixes.md (the bug-class topic file).
+# Note: the acquire_lock function defined above is dead code after v2.4.1
+# (retroactive capture was removed). The model-change branch below is the
+# sole remaining consumer of MEMORY_DIR; two concurrent Stop invocations
+# can race on this branch. Mitigation is atomic write of last-model-id.txt
+# (temp + mv) so the file is never partially observable.
 LAST_MODEL_FILE="$MEMORY_DIR/last-model-id.txt"
-CURRENT_MODEL="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-unknown}}}"
+CURRENT_MODEL="$RESOLVED_MODEL"
+
+# One-shot migration: legacy installs have last-model-id.txt = "unknown"
+# from when this hook resolved model via env vars Claude Code does not
+# export. Overwrite once with the resolved value so the dead-weight-audit
+# guard below does not treat "unknown" as a prior model. Only triggers
+# when we now have a real value.
+if [ -f "$LAST_MODEL_FILE" ] && [ "$CURRENT_MODEL" != "unknown" ]; then
+  _LEGACY_CONTENT=$(cat "$LAST_MODEL_FILE" 2>/dev/null | tr -d '[:space:]')
+  if [ "$_LEGACY_CONTENT" = "unknown" ]; then
+    _TMP_LMF="$LAST_MODEL_FILE.tmp.$$"
+    printf '%s\n' "$CURRENT_MODEL" > "$_TMP_LMF" 2>/dev/null \
+      && mv -f "$_TMP_LMF" "$LAST_MODEL_FILE" 2>/dev/null \
+      || rm -f "$_TMP_LMF" 2>/dev/null
+  fi
+  unset _LEGACY_CONTENT _TMP_LMF
+fi
 
 if [ ! -f "$LAST_MODEL_FILE" ]; then
-  # First run: write current model (no comparison yet)
-  echo "$CURRENT_MODEL" > "$LAST_MODEL_FILE"
+  # First run: write current model atomically (no comparison yet)
+  _TMP_LMF="$LAST_MODEL_FILE.tmp.$$"
+  printf '%s\n' "$CURRENT_MODEL" > "$_TMP_LMF" 2>/dev/null \
+    && mv -f "$_TMP_LMF" "$LAST_MODEL_FILE" 2>/dev/null \
+    || rm -f "$_TMP_LMF" 2>/dev/null
+  unset _TMP_LMF
 elif [ "$CURRENT_MODEL" != "unknown" ]; then
-  LAST_MODEL=$(cat "$LAST_MODEL_FILE" 2>/dev/null || echo "unknown")
+  LAST_MODEL=$(cat "$LAST_MODEL_FILE" 2>/dev/null | tr -d '[:space:]' || echo "unknown")
   if [ "$CURRENT_MODEL" != "$LAST_MODEL" ] && [ "$LAST_MODEL" != "unknown" ]; then
     # Header-date format — required for memory-prune.py to parse the date.
     # A sub-bullet date would make these entries permanently immune to pruning.
@@ -161,8 +217,12 @@ FIXES_EOF
     rm -f "$MEMORY_DIR/fixes.md.bak"
     echo "Dead-weight audit flagged: model changed $LAST_MODEL → $CURRENT_MODEL" >&2
   fi
-  # Always update the recorded model for next comparison
-  echo "$CURRENT_MODEL" > "$LAST_MODEL_FILE"
+  # Always update the recorded model for next comparison (atomic write)
+  _TMP_LMF="$LAST_MODEL_FILE.tmp.$$"
+  printf '%s\n' "$CURRENT_MODEL" > "$_TMP_LMF" 2>/dev/null \
+    && mv -f "$_TMP_LMF" "$LAST_MODEL_FILE" 2>/dev/null \
+    || rm -f "$_TMP_LMF" 2>/dev/null
+  unset _TMP_LMF
 fi
 
 # M9 partial fix: threshold hint — sum lines across all topic files
@@ -233,6 +293,16 @@ if [ "$MEOWKIT_MEMORY_PRUNE" != "off" ] && [ -n "$TODAY" ] && [ "$TODAY" != "$LA
 fi
 
 echo "Session data captured to .claude/memory/"
+
+# Gated runtime-truth sentinel: success-path completion marker.
+# Uses sentinel on success path (NOT trap EXIT — that fires on subshell exits
+# and produces false-completion records). Off by default.
+if [ "${MEOWKIT_HOOK_DEBUG:-0}" = "1" ] && [ -n "${_DBG_FILE:-}" ]; then
+  {
+    echo "post_session_completed=1"
+    echo "ts_end=$(date -u +%FT%TZ)"
+  } >> "$_DBG_FILE" 2>/dev/null
+fi
 
 # NOTE: conversation-summary cache clear lives in project-context-loader.sh
 # (SessionStart hook). Stop hook is the wrong home: standard|fast profile

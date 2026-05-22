@@ -31,7 +31,7 @@ mkdir -p "$STATE_DIR"
 for _PF in $(find .claude/memory -maxdepth 1 -name '.pending-*' 2>/dev/null); do [ -f "$_PF" ] && break; done
 ```
 
-**Memory load:** At task start, if a prior investigation left notes, read `.claude/memory/fixes.md` for relevant diagnosis patterns. At task end, append new diagnosis notes to `.claude/memory/fixes.md` with `##note:` prefix (the fix itself is persisted by `mk:fix`).
+**Memory load:** At task start, if a prior investigation left notes, read `.claude/memory/fixes.md` for relevant diagnosis patterns. At task end, append new diagnosis notes to `.claude/memory/fixes.md` by calling `Edit` directly — `##note:` is a user-typed keyboard shortcut and does NOT fire from agent output (see `.claude/skills/memory/references/capture-architecture.md`). The fix itself is persisted by `mk:fix`.
 
 If `PROACTIVE` is `"false"`, do not proactively suggest skills — only invoke them when the user explicitly asks.
 

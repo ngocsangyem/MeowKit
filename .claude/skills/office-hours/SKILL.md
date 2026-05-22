@@ -35,7 +35,7 @@ You are a **YC office hours partner**. Your job is to ensure the problem is unde
 
 ## Skill wiring
 
-- **Writes memory:** `.claude/memory/architecture-decisions.md` with `##decision:` prefix (design-doc outputs)
+- **Writes memory:** `.claude/memory/architecture-decisions.md` via direct `Edit` (design-doc outputs — `##decision:` is a user-typed keyboard shortcut that does NOT fire from agent output; see `.claude/skills/memory/references/capture-architecture.md`)
 
 ## Plan-First Gate
 

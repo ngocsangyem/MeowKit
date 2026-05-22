@@ -14,6 +14,31 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.8 (2026-05-23) — Memory system deep fix
+
+### Highlights
+
+Four verified failures in the memory pipeline removed: `last-model-id.txt` now persists the real model id, `/mk:fix` reliably writes its Step 6 entry, the `##pattern:` / `##decision:` / `##note:` capture surface is finally documented as a user-typed keyboard shortcut (the handler never fired on agent output), and `analyst.md` writes to the v2.4.1 split topic files instead of the deprecated `patterns.json` / `lessons.md` stubs.
+
+### Bug Fixes
+
+- `last-model-id.txt` always wrote `unknown` — `post-session.sh` was reading env vars (`CLAUDE_MODEL`, `MEOWKIT_MODEL_HINT`, `ANTHROPIC_MODEL`) that Claude Code never exports to Stop-hook subprocesses. New `hooks/lib/resolve-model.sh` resolves the model id from `session-state/detected-model.json` (the canonical source) with env-var fallback. `cost-log.json` entries and `trace-log.jsonl` session-end events now carry the real model id.
+- `/mk:fix` Step 6 memory write path is now enforced — the command spec previously had no memory write instructions and `Phase 6 / Reflect` only ran in `/mk:cook`. New entries land in both `fixes.md` and `fixes.json` (with `frequency: 1` and today's `lastSeen`).
+- Agent files instructing `##pattern:` / `##decision:` / `##note:` capture were architecturally broken — the handler is bound to `UserPromptSubmit` and never fires on agent output. 41 files patched (23 agents + 16 skills + 1 command + `docs/memory-system.md`) to use direct `Edit` calls instead. Existing user-typed `##prefix:` flow is unchanged.
+- `analyst.md` agent wrote to `patterns.json` (deprecated stub) and `lessons.md` (archived stub) — Phase 6 entries were functionally lost. Now targets `fixes.{json,md}`, `review-patterns.{json,md}`, `architecture-decisions.{json,md}` per the v2.4.1 schema.
+
+### Improvements
+
+- New reference doc `.claude/skills/memory/references/capture-architecture.md` — the canonical 2-path contract describing user-typed `##prefix:` vs agent-authored direct `Edit`. Referenced from every patched agent and skill.
+- `docs/memory-system.md` §3a clarified that the `##prefix:` handler does NOT fire on agent output; new §3d added describing the agent-direct write path; §8 tombstone gains rows for "Agent-output `##prefix:` as API" and "`patterns.json` / `lessons.md` as active write targets".
+- `mk:memory` SKILL.md gains a "How session-capture is invoked" section clarifying the routine is prose-driven (the agent reads `references/session-capture.md` and follows its steps via `Edit`) — there is no `mewkit memory session-capture` CLI subcommand.
+- New `tests/resolve-model.test.sh` — 7 cases covering happy path, missing file, malformed JSON, literal "unknown" fall-through, env-hint override, file-wins-over-env precedence, and shell-metachar sanitization.
+- New `tests/spec-drift.test.sh` — regression gate ensuring no agent/skill/command file re-introduces `##prefix:` as an agent-output instruction or writes to the deprecated `patterns.json` / `lessons.md` stubs.
+
+### Removals
+
+- `patterns.json` and `lessons.md` remain on disk as gravestone stubs; their write-target status was already removed in v2.4.1 and is now also enforced via `spec-drift.test.sh`. Scheduled for deletion in v2.12.0 — external skills writing to either should migrate to the split topic files before then.
+
 ## 2.9.7 (2026-05-16) — Docs reference contract + validator
 
 ### Highlights

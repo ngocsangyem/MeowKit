@@ -23,9 +23,11 @@ MeowKit stores engineering learnings in `.claude/memory/` — fix patterns, revi
 
 ## How to capture
 
-### Immediate capture (anytime during a session)
+There are **two** write paths. Pick the right one — picking the wrong one means the entry is silently lost. Full contract: `.claude/skills/memory/references/capture-architecture.md`.
 
-Type messages with `##` prefix. The `immediate-capture-handler.cjs` hook routes them:
+### Path 1 — User-typed keyboard shortcut (`##prefix:`)
+
+The **human user** types messages with a `##` prefix. The `immediate-capture-handler.cjs` UserPromptSubmit hook routes them:
 
 | Prefix | Target |
 |--------|--------|
@@ -36,9 +38,17 @@ Type messages with `##` prefix. The `immediate-capture-handler.cjs` hook routes 
 
 Captures pass injection validation and secret scrubbing before writing. All writes are atomic (temp-file + rename).
 
+**The handler does NOT fire on agent or tool output.** It is bound to `UserPromptSubmit` semantics. Agents that need to capture use Path 2 below.
+
+### Path 2 — Agent-authored entry via direct `Edit`
+
+When an agent or skill identifies a learning, it calls `Edit` directly on the appropriate topic file. There is no hook — the agent scrubs secrets in-content before writing. Topic file routing follows the table in `.claude/skills/memory/references/capture-architecture.md`.
+
+The `mk:fix` skill's Step 6 is the canonical example: read the live JSON schema, append a Markdown section + a structured JSON entry, both via `Edit`.
+
 ### Session-end capture
 
-The Stop hook auto-appends cost entries to `cost-log.json`. Phase 6 `mk:memory session-capture` extracts patterns, decisions, and failures from the session.
+The Stop hook auto-appends cost entries to `cost-log.json` and resolves the active model id from `session-state/detected-model.json` via `resolve-model.sh`. Phase 6 (Reflect) runs **prose-driven** session capture — the agent reads `.claude/skills/memory/references/session-capture.md` and follows its 4 steps via direct `Edit`. There is no `mewkit memory session-capture` CLI subcommand; content extraction needs LLM analysis.
 
 ## How to read
 

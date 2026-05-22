@@ -181,7 +181,7 @@ Review dimensions: Correctness, Maintainability, Performance, Security, Coverage
 - Update `docs/project-context.md`: add billing domain, Stripe SDK version, webhook event list
 - Update `docs/architecture/system-architecture.md`: add subscription state machine diagram
 - `mk:memory` session-capture: log any Stripe API surprises, webhook ordering issues
-- Capture with `##pattern:bug-class Stripe webhook events arrive out of order — always check current_period_end before updating status` → routes to `.claude/memory/fixes.json`
+- (User keyboard shortcut example) the user can type `##pattern:bug-class Stripe webhook events arrive out of order — always check current_period_end before updating status` to route via `immediate-capture-handler.cjs` to `.claude/memory/fixes.json`. Agents in this skill instead call `Edit` directly on `fixes.md` + `fixes.json` (see `.claude/skills/memory/references/capture-architecture.md`).
 - Docs impact: major
 
 ---

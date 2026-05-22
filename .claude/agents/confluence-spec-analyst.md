@@ -184,8 +184,19 @@ Multimodal available but key missing|`[MULTIMODAL_AVAILABLE_BUT_FAILED: missing-
 
 ## Memory (project convention)
 
-- `##pattern: confluence-spec-analyst: <recurring spec pattern>` → `.claude/memory/quick-notes.md`
-- `##decision: confluence-spec-analyst: <captured choice + rationale>` → `.claude/memory/decisions.md`
+Append observations DIRECTLY via the `Edit` tool. The `##prefix:` syntax
+is a user keyboard shortcut only and does NOT fire from agent output
+(see `.claude/skills/memory/references/capture-architecture.md`).
+
+- Recurring spec pattern → `Edit` `.claude/memory/quick-notes.md`, append
+  section `## YYYY-MM-DD — confluence-spec-analyst — pattern — <slug>` with a
+  3-bullet body (symptom / pattern / rationale).
+- Captured choice + rationale → `Edit` `.claude/memory/decisions.md`,
+  append section `## YYYY-MM-DD — confluence-spec-analyst — <slug>` with body
+  (decision, context, status).
+
+Scrub secrets in-content before writing — Path 2 (agent-authored) has no
+automatic scrub.
 
 NEVER write page bodies, image bytes, or token values to memory. Patterns and IDs only.
 

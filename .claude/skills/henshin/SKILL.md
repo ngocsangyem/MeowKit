@@ -194,14 +194,23 @@ Spec template (written to conversation; plan-creator persists it to disk):
 ## 8. Out of Scope
 ```
 
-Write the architectural decision to `.claude/memory/architecture-decisions.md`:
+Write the architectural decision to `.claude/memory/architecture-decisions.md` by
+calling `Edit` directly. `##decision:` is a user-typed keyboard shortcut and
+does NOT fire from agent output (see
+`.claude/skills/memory/references/capture-architecture.md`). Append a section:
 
 ```
-##decision: henshin-<slug>-<date>
-Transform <module> into <output-mode>. Surfaces: <list>. Rationale: <one line>. Dissent: <minority position, if any>.
+## YYYY-MM-DD — henshin — <slug>
+
+**Decision:** Transform <module> into <output-mode>.
+**Surfaces:** <list>.
+**Rationale:** <one line>.
+**Dissent:** <minority position, if any>.
+**Status:** live-captured
 ```
 
-Run `mkdir -p .claude/memory` before the append.
+Run `mkdir -p .claude/memory` before the append. Scrub secrets in-content
+before writing — Path 2 (agent-authored) has no automatic scrub.
 
 ### 6. Handoff
 
