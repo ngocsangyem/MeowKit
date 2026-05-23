@@ -1,4 +1,6 @@
-# Anti-Rationalization
+# Anti-Rationalization (Brainstorming)
+
+> For generic implementation-phase rationalizations (plan / code / fix discipline), see `.claude/rules/anti-rationalization.md`. This file covers brainstorming-specific excuses — decomposition, discovery, anti-bias pivot — that are domain-specific to exploration.
 
 Adapted from open-source upstream (MIT). These are the common excuses Claude or the user invents to skip the brainstorming process. When you catch yourself thinking one of these, do the opposite.
 

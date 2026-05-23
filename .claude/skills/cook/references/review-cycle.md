@@ -58,6 +58,22 @@ LOOP:
   Auto mode only automates the fix loop, not the approval.
 ```
 
+## Regression Recovery Options
+
+When the reviewer surfaces a regression, side effect, or broken workflow (verdict includes `Side Effects Detected: Yes` OR a FAIL dimension citing existing-behavior break):
+
+1. **DO NOT silently patch.** Auto-fix loops are for code that the agent introduced and got wrong; they are not for fixing impact on existing callers.
+2. **STOP** the iteration loop.
+3. **Present 2–4 concrete options** to the user via the inner harness's clarifying-question surface (whichever interactive prompt mechanism the runtime exposes). Standard options (offer when applicable):
+   - Revert this slice and re-plan with stricter scope
+   - Keep the implementation and update `<dependents>` to match the new contract
+   - Add a compatibility shim at `<boundary>` so old callers keep working
+   - Accept the regression — old behavior was unintended/buggy
+4. **Record the user's selection** in the verdict file as a `## User Decision Addendum` block including `User selected:` and `Resumption point:` lines. The `validate-gate-2.sh` script blocks the verdict until this addendum is present (positive-presence-only signal; absence of the original side-effect line is never a block).
+5. **Resume** based on the user's choice: revert → return to Phase 1; keep + update dependents → Phase 3 with broader scope; compat shim → Phase 3 with shim added; accept → Gate 2 PASS with the trade-off documented in the addendum.
+
+This pattern preserves the user's decision-making authority on cross-cutting changes and prevents silent scope expansion.
+
 ## Critical Issues (Always Block)
 
 - Security: XSS, SQL injection, OWASP vulnerabilities

@@ -15,10 +15,10 @@ All modes share these phases with mode-specific variations.
   - [[Review Gate] Post-Build (non-auto only)](#review-gate-post-build-non-auto-only)
 - [Phase 4: Review](#phase-4-review)
   - [Code Review (MANDATORY subagent)](#code-review-mandatory-subagent)
-  - [GATE 2 (ALL modes — NO exceptions)](#gate-2-all-modes-no-exceptions)
+  - [GATE 2](#gate-2)
 - [Phase 4.5: Verify (Browser) — only if `--verify` or `--strict` flag](#phase-45-verify-browser-only-if---verify-or---strict-flag)
-  - [--verify: Light Browser Check](#verify-light-browser-check)
-  - [--strict: Full Evaluator (mk:evaluate)](#strict-full-evaluator-meowevaluate)
+  - [--verify [LIGHT]: Light Browser Check](#verify-light-light-browser-check)
+  - [--strict [HEAVY]: Full Evaluator (mk:evaluate)](#strict-heavy-full-evaluator-meowevaluate)
 - [Phase 5: Ship (after Gate 2 approval)](#phase-5-ship-after-gate-2-approval)
 - [Phase 6: Reflect (MANDATORY — never skip)](#phase-6-reflect-mandatory-never-skip)
 - [Mode Flow Summary](#mode-flow-summary)
@@ -77,19 +77,27 @@ Valid flags to pass to `mk:plan-creator`:
 
 ### GATE 1 (Non-Auto Mode)
 
+**Before presenting Gate 1 in non-auto modes**, run `.claude/skills/cook/scripts/validate-gate-1.sh <plan-path>` as a structural pre-check. If exit ≠ 0, surface the blocker message to the user as a preflight WARNING above the Gate 1 prompt — then still present the prompt. In non-auto modes the script is **advisory**: the user retains override authority and may approve a plan that fails structural check. This preserves the "no hidden execution transitions" constraint.
+
 Present plan summary. Use `AskUserQuestion` (header: "Gate 1"):
 
 - "Approve plan" → proceed to Phase 2
 - "Revise plan" → revise based on feedback, re-present
 - "Abort" → stop workflow
 
-**Auto mode:** Skip Gate 1 user prompt. Auto-proceed if plan passes `.claude/skills/cook/scripts/validate-gate-1.sh`.
+**Auto mode:** Skip Gate 1 user prompt. validate-gate-1.sh remains **blocking** in auto mode — auto-proceed only if it passes; otherwise route back to plan-creator.
 
 **Output:** `Phase 1: Plan created — [N] phases, Gate 1 [approved|auto-approved]`
 
 ## Phase 2: Test (skip if no-test mode; RED-phase enforcement only if `--tdd` / `MEOWKIT_TDD=1`)
 
-Write failing tests BEFORE implementation. TDD enforcement per `tdd-rules.md`.
+Write failing tests BEFORE implementation. TDD enforcement per `tdd-rules.md`. Phase 2 behavior by mode:
+
+- `RED-strict` (interactive, auto, parallel, code) — when `--tdd` / `MEOWKIT_TDD=1` is active, failing tests gate Phase 3. When TDD is off, Phase 2 is optional.
+- `Plan-level` (fast) — tests reflect plan intent only; no RED gate.
+- `Skip` (no-test) — Phase 2 omitted entirely.
+
+(Labels canonical in `intent-detection.md` Mode Behaviors table.)
 
 1. Read plan's acceptance criteria and success criteria
 2. Spawn `tester` subagent via `mk:testing`:
@@ -187,9 +195,9 @@ Task(subagent_type="reviewer", prompt="Review changes for [phase]. Return: score
 
 See `review-cycle.md` for interactive vs auto handling.
 
-### GATE 2 (ALL modes — NO exceptions)
+### GATE 2
 
-**Human approval ALWAYS required.** Auto mode auto-fixes issues but does NOT auto-approve Gate 2.
+**Gate 2: human approval mandatory in all modes — see `.claude/rules/gate-rules.md` for the full contract.** Auto mode auto-fixes issues but never auto-approves Gate 2.
 
 Present review verdict. Use `AskUserQuestion` (header: "Gate 2"):
 
@@ -206,7 +214,7 @@ Run `.claude/skills/cook/scripts/validate-gate-2.sh` before presenting for appro
 
 **Skip this phase entirely if neither `--verify` nor `--strict` flag is set.**
 
-### --verify: Light Browser Check
+### --verify [LIGHT]: Light Browser Check
 
 1. **Detect UI files in diff:**
    ```bash
@@ -232,18 +240,18 @@ Run `.claude/skills/cook/scripts/validate-gate-2.sh` before presenting for appro
    - FAIL: Any page blank, error overlay detected, or console errors
    - Emit: `Phase 4.5: Verify — [PASS|FAIL] — [N] pages checked`
 
-5. **On FAIL:** Report findings to user. **This is advisory, NOT a gate.** User decides whether to fix or ship.
+5. **On FAIL:** Report findings to user. **This is advisory, NOT a gate** (see SKILL.md modifier-flags clarification). User decides whether to fix or ship.
 
 6. **Cleanup:** Kill dev server background process.
 
-### --strict: Full Evaluator (mk:evaluate)
+### --strict [HEAVY]: Full Evaluator (mk:evaluate)
 
 **Fires when:** `--strict` flag present OR `mk:scale-routing` returned `level=high` at Phase 0.
 **Supersedes:** `--verify` (strict includes active verification via mk:evaluate step-02/03).
 
 1. **Log trigger reason:**
    - If explicit: `"--strict flag detected, invoking full evaluator"`
-   - If auto: `"scale-routing level=high ({domain}), auto-triggering strict evaluation (~$2-5). Use --no-strict to suppress."`
+   - If auto: `"scale-routing level=high ({domain}), auto-triggering strict evaluation [HEAVY]. Use --no-strict to suppress."`
 
 2. **Spawn evaluator subagent:**
    ```
@@ -259,7 +267,7 @@ Run `.claude/skills/cook/scripts/validate-gate-2.sh` before presenting for appro
    )
    ```
 
-3. **Handle verdict:**
+3. **Handle verdict** (per SKILL.md modifier-flags clarification: `--strict` is a hard gate):
    - **PASS** → proceed to Phase 5
    - **WARN** → present to user, user decides
    - **FAIL** → **BLOCKS Phase 5.** Report verdict + failing criteria. Route back to Phase 3 with evaluator feedback. Max 2 evaluator iterations.
@@ -268,13 +276,13 @@ Run `.claude/skills/cook/scripts/validate-gate-2.sh` before presenting for appro
 
 ## Phase 5: Ship (after Gate 2 approval)
 
-Spawn `shipper` subagent (NOT git-manager — shipper runs full ship sequence including pre-ship checks, CI verification, and rollback docs):
+Spawn `shipper` (which orchestrates pre-ship checks + invokes `git-manager` for commit/PR + CI verification + rollback docs):
 
 ```
 Task(subagent_type="shipper", prompt="Ship changes: 1) Run pre-ship.sh (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use mk:ship skill.", description="Ship + PR")
 ```
 
-Note: `git-manager` handles raw git operations only (commit, push). `shipper` orchestrates the full ship pipeline including validation and documentation.
+Note: `shipper` is the orchestrator — it invokes `git-manager` internally for raw git operations (commit, push). Cook never spawns `git-manager` directly; that is shipper's responsibility. See SKILL.md Required Subagents table.
 
 **Output:** `Phase 5: Ship — committed, PR created, CI verified`
 
@@ -324,7 +332,7 @@ code:        0 → skip → 2 → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
 
 Where `(4.5?)` = only if `--verify` or `--strict` modifier flag set.
 
-**Critical:** Gate 2 is ALWAYS human-approved. No mode bypasses it.
+**Critical:** Gate 2 — see `.claude/rules/gate-rules.md`.
 
 ## Validation
 

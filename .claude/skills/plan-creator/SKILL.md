@@ -65,6 +65,20 @@ Skip when:
 - INCOMPATIBLE with `--product-level` and `mk:harness` FULL density (harness gate breaks). Reject combination "spike incompatible with harness FULL — use --fast or mk:cook"
 - Advisory cap: warn if `story_points > 5` — likely two spikes, or spike + story
 
+## Requirements Capture Contract
+
+Before producing a plan, plan-creator MUST be able to answer all 5 dimensions in concrete sentences (cook's exact-requirements contract — see `.claude/skills/cook/SKILL.md` "Exact-Requirements Contract (Phase 1)"):
+
+1. **Expected output** — concrete artifact(s) the user will see at the end (file paths, feature behavior, UI screen, API endpoint + payload, CLI command + flags).
+2. **Acceptance criteria** — specific behaviors / inputs → outputs / edge cases that MUST work to call it "done".
+3. **Scope boundary** — what is explicitly OUT of scope this round.
+4. **Non-negotiable constraints** — stack, file locations, naming, backward compatibility, deadlines, performance.
+5. **Touchpoints** — which existing files/modules (from scout) will be modified or extended; which contracts must stay stable.
+
+Every clarifying question MUST cite scout findings (file paths) in its options. Abstract options like "Add the feature" without a file path are a failure mode — replace with options of the form "Add to `src/api/users.ts` (matches existing pattern)" or "Create new `src/api/profile.ts`".
+
+Skip when input is an existing plan path (`plan.md` / `phase-*.md`) — the plan already encodes scout output and the 5 dimensions.
+
 ## Workflow
 
 Before starting, read `references/failure-catalog.md` for common planning failure modes to avoid.

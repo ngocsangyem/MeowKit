@@ -157,6 +157,19 @@ Defined in `step-04-verdict.md`. 5-dimension framework with artifact verificatio
 
 FAIL verdict prevents `/mk:ship` from executing (Gate 2 enforcement).
 
+### Side-Effect Signal (additive, positive-presence-only)
+
+When the reviewer detects a regression, side effect, or workflow break in **existing** behavior caused by the diff, the verdict MUST include a line of the form:
+
+```
+Side Effects Detected: Yes
+- <bullet list of detected effects, one per line>
+```
+
+`validate-gate-2.sh` recognizes this signal and blocks Gate 2 UNTIL a `## User Decision Addendum` block is appended containing the user's chosen recovery option. See cook `references/review-cycle.md` "Regression Recovery Options" for the addendum format and the four standard recovery options.
+
+**Backward-compat (CRITICAL):** absence of the `Side Effects Detected` field is NOT a block signal. Existing verdicts that pre-date this contract continue to pass unchanged. The new signal is positive-presence-only — never negative-absence.
+
 ## Pre-Review Scouting (Recommended)
 
 For changes touching 3+ files, run `/mk:scout` BEFORE starting review:

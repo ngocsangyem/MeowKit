@@ -24,7 +24,11 @@ End-to-end implementation following the 7-phase workflow. TDD is opt-in via `--t
 
 Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`
 
-**Modifier flags** (layer on any mode): `--verify` (light browser check ~$1) | `--strict` (full evaluator ~$2-5) | `--no-strict` (suppress auto-strict)
+**Modifier flags** (layer on any mode): `--verify` [LIGHT] (light browser/artifact check) | `--strict` [HEAVY] (full evaluator pass) | `--no-strict` (suppress auto-strict)
+
+Concrete cost depends on the inner harness, model tier, and target surface; treat `[LIGHT]` vs `[HEAVY]` as relative ordering only.
+
+**`--verify` is advisory** (does not block ship). **`--strict` is a hard gate** (FAIL blocks ship and routes back to Phase 3).
 
 ## TDD mode (`--tdd` flag)
 
@@ -48,16 +52,13 @@ User override: If user explicitly says "just code it" or "skip planning", respec
 
 ## Anti-Rationalization
 
-| Thought                         | Reality                                                            |
-| ------------------------------- | ------------------------------------------------------------------ |
-| "This is too simple to plan"    | Simple tasks have hidden complexity. Plan takes 30 seconds.        |
-| "I already know how to do this" | Knowing ≠ planning. Write it down.                                 |
-| "Let me just start coding"      | Undisciplined action wastes tokens. Plan first.                    |
-| "Tests can come after"          | In TDD mode (`--tdd`), no — failing tests define the spec. In default mode, yes — tests after is permitted. Choose your mode explicitly. |
-| "I'll plan as I go"             | That's not planning, that's hoping.                                |
-| "Just this once"                | Every skip is "just this once." No exceptions.                     |
+Generic implementation-phase rationalizations live in `.claude/rules/anti-rationalization.md` — read before any non-trivial implementation step. Cook-specific addition (TDD mode):
 
-Before starting work, read `references/failure-catalog.md` for common implementation failure modes to avoid.
+| Thought                | Reality                                                                                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| "Tests can come after" | In TDD mode (`--tdd`), no — failing tests define the spec. In default mode, yes — tests after is permitted. Choose your mode explicitly. |
+
+Before starting work, read `references/failure-catalog.md` for common implementation failure modes (cross-linked to `## Gotchas` below).
 
 ## Smart Intent Detection
 
@@ -79,14 +80,15 @@ See `references/intent-detection.md` for full detection logic.
 
 ## Process Flow (Authoritative)
 
-> Before emitting any Mermaid block, Read `.claude/skills/preview/references/mermaid-essentials.md`.
-
 ```mermaid
 flowchart TD
     A[Phase 0: Orient] --> B{Has plan?}
     B -->|Yes| D[Load Plan]
-    B -->|No| C[Phase 1: Research + Plan]
-    C --> G1[GATE 1: Human Approval]
+    B -->|No| SP[Present scout summary to user]
+    SP --> C[Phase 1: Research + Plan]
+    C --> RQ{5 dims captured?}
+    RQ -->|No| C
+    RQ -->|Yes| G1[GATE 1: Human Approval]
     G1 -->|approved| D
     G1 -->|rejected| C
     D --> E[Phase 2: Test - RED if --tdd, optional otherwise]
@@ -95,27 +97,61 @@ flowchart TD
     S --> V[mk:verify — MANDATORY]
     V --> G2[Phase 4: Review — GATE 2]
     G2 -->|approved| BV{--verify or --strict?}
-    BV -->|yes| P45[Phase 4.5: Browser Verify]
-    BV -->|no| H[Phase 5: Ship]
-    P45 --> H
+    BV -->|"--verify"| P45A["Phase 4.5 --verify advisory"]
+    BV -->|"--strict"| P45B["Phase 4.5 --strict blocking"]
+    BV -->|neither| H[Phase 5: Ship]
+    P45A --> H
+    P45B --> BG{evaluator FAIL?}
+    BG -->|no| H
+    BG -->|yes| F
     G2 -->|rejected| F
     H --> I[Phase 6: Reflect]
 ```
 
 **This diagram is authoritative.** If prose conflicts, follow the diagram.
 
+### Scout-First Contract (Phase 0)
+
+Before any clarifying question or plan generation, present a 3–6 bullet codebase-context summary to the user:
+
+1. Project type / language / framework
+2. Existing modules/files relevant to the task
+3. Current patterns/conventions for similar features
+4. In-flight plans (`tasks/plans/`) or docs (`docs/`) covering this area
+5. Public APIs / schemas / contracts the task could affect
+
+**Skip when input is a `plan.md` / `phase-*.md` path** — the plan already encodes scout output.
+
+In `--fast` mode the summary is **abbreviated** (1–3 bullets) but still presented; "skip research" reduces external research depth, not codebase-context handoff to the user.
+
+### Exact-Requirements Contract (Phase 1)
+
+`mk:plan-creator` MUST be able to answer all 5 dimensions in concrete sentences before returning a plan:
+
+1. **Expected output** — concrete artifact(s) the user will see (paths, behavior, endpoint, CLI flags)
+2. **Acceptance criteria** — specific inputs → outputs / edge cases
+3. **Scope boundary** — what is explicitly OUT of scope this round
+4. **Non-negotiable constraints** — stack, file locations, naming, compat, deadlines, performance
+5. **Touchpoints** — which existing files (from scout) will be modified / which contracts must stay stable
+
+Every clarifying-question option MUST cite scout findings (e.g., file paths). Vague abstract options are a failure mode — see `references/failure-catalog.md`.
+
+**Skip when input is a `plan.md` / `phase-*.md` path** (plan encodes the 5 dimensions).
+
 ## Workflow Modes
 
-| Mode        | Research | TDD        | Review Gate 2      | Progression                             |
-| ----------- | -------- | ---------- | ------------------ | --------------------------------------- |
-| interactive | Yes      | Yes        | **Human approval** | One at a time                           |
-| auto        | Yes      | Yes        | **Human approval** | Continuous (auto-fix, not auto-approve) |
-| fast        | Skip     | Plan-level | **Human approval** | One at a time                           |
-| parallel    | Optional | Yes        | **Human approval** | Parallel groups                         |
-| no-test     | Yes      | Skip       | **Human approval** | One at a time                           |
-| code        | Skip     | Yes        | **Human approval** | Per plan                                |
+| Mode        | Research | TDD          |
+| ----------- | -------- | ------------ |
+| interactive | Yes      | RED-strict   |
+| auto        | Yes      | RED-strict   |
+| fast        | Skip     | Plan-level   |
+| parallel    | Optional | RED-strict   |
+| no-test     | Yes      | Skip         |
+| code        | Skip     | RED-strict   |
 
-**Gate 2 requires human approval in ALL modes. No exceptions.** Auto mode auto-fixes issues but never auto-approves shipping.
+Gate 1 routing, parallelism, and full per-phase progression live in `references/intent-detection.md` (canonical Mode Behaviors table).
+
+**Gate 2: human approval mandatory in all modes — see `.claude/rules/gate-rules.md` for the full contract.** If the reviewer surfaces a regression / side effect / broken workflow, follow the Regression Recovery Options pattern in `references/review-cycle.md` rather than silently patching.
 
 ## Required Subagents
 
@@ -129,9 +165,11 @@ flowchart TD
 | 3.5 Simplify  | `developer` via `mk:simplify`   | **MANDATORY** after Phase 3 GREEN — run before verify  |
 | 3.6 Verify    | `mk:verify`                     | **MANDATORY** after simplify — unified build+lint+test+coverage check before Phase 4 |
 | 4 Review      | `reviewer` via `mk:review`      | **MUST** spawn — Gate 2                  |
-| 4.5 Verify    | `agent-browser` or `curl`         | Only if `--verify` flag (light browser check) |
+| 4.5 Verify    | `browser-automation subagent` or `HTTP verification tool` | Only if `--verify` flag (light browser check) |
 | 4.5 Verify    | `evaluator` via `mk:evaluate`   | Only if `--strict` flag or auto-triggered     |
-| 5 Ship        | `git-manager` via `mk:ship`     | **MUST** spawn — commit + PR             |
+
+Concrete subagent name and HTTP tool depend on installed skill set; cook treats both as interfaces, not specific implementations.
+| 5 Ship        | `shipper` via `mk:ship`         | **MUST** spawn — runs full pre-ship pipeline (`git-manager` invoked inside shipper for commit + PR) |
 | 6 Reflect     | `documenter`                      | **MUST** spawn — sync-back + docs        |
 | 6 Reflect     | `mk:memory` session-capture     | **MUST** spawn — 3-category learning extraction |
 
@@ -164,6 +202,8 @@ After Gate 2 verdict PASS and before Phase 5 ship, delegate to `project-manager`
 
 ## Gotchas
 
+Operational gotchas live here; pre-build failure modes and rationalizations live in `references/failure-catalog.md`.
+
 - **Skipping mk:simplify before review**: Tests pass but code is still complex → run `/mk:simplify` between Phase 3 and Phase 4 every time, no exceptions
 - **Skipping Gate 1 on "simple" features**: Features that seem simple grow during implementation. Always create a plan file; cancel it if truly trivial
 - **Auto-approve sneaking bugs past Gate 2**: Auto mode can auto-fix but NEVER auto-approve. gate-rules.md says NO exceptions
@@ -174,5 +214,5 @@ After Gate 2 verdict PASS and before Phase 5 ship, delegate to `project-manager`
 - **Missing model tier declaration**: Expensive models on trivial tasks, cheap models on security-critical work. Always declare tier in Phase 0
 - **Forgetting memory read/write**: Prior session learnings lost. Phase 0 reads .claude/memory/fixes.md + .claude/memory/architecture-decisions.md; Phase 6 appends to the relevant topic file by category
 - **Subagent patterns using Agent() not Task()**: Task() enables tracking, blocking, and progress. Always use Task() for phases 2-6
-- **--strict cost surprise**: `--strict` spawns full mk:evaluate (~$2-5). Auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress, or `--verify` for light check (~$1)
+- **--strict cost surprise**: `--strict` spawns the full evaluator (`mk:evaluate`) — a [HEAVY] pass. Auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress, or `--verify` for the [LIGHT] check
 - **--strict vs --verify confusion**: `--verify` = light browser check (advisory). `--strict` = full evaluator with rubrics (FAIL blocks ship). `--strict` supersedes `--verify`
