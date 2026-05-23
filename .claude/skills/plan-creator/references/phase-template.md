@@ -106,7 +106,7 @@ dependencies: []
 ## Todo List
 
 - [ ] {Checkbox item matching implementation steps}
-- [ ] {These become Claude Tasks via hydration}
+- [ ] {These become session tasks via hydration}
 
 ## Success Criteria
 
@@ -166,7 +166,7 @@ These sections are NOT added in default mode (12-section template remains unchan
 - Todo checkboxes map 1:1 to implementation steps
 - Success criteria must be verifiable (command to run or file to check)
 - **Research linking (MANDATORY):** If `{plan-dir}/research/` has reports, Context Links MUST include links to relevant research reports. Step-03 verifies this after writing phase files.
-- **Critical-step markers:** Todo items with high risk can be prefixed with `[CRITICAL]` or `[HIGH]` — these get their own Claude Tasks during hydration (step-08), enabling finer-grained tracking.
+- **Critical-step markers:** Todo items with high risk can be prefixed with `[CRITICAL]` or `[HIGH]` — these get their own session tasks during hydration (step-08), enabling finer-grained tracking.
 
 ## Optional Machine-Written Sections
 

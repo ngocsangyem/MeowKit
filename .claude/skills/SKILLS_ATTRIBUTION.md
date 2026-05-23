@@ -38,7 +38,7 @@ Each skill retains its original author credit in its frontmatter.
 | 31  | frontend-design       | local adaptation            | Adapted from external UI/UX and frontend-design patterns | MIT | .claude/skills/frontend-design/ | 2 |
 | 32  | qa-manual             | local original           | Orchestrates: agent-browser + playwright-cli for QA + E2E gen | MIT | .claude/skills/qa-manual/ | 1 |
 | 33  | henshin               | local adaptation            | Adapted from external skill patterns/agentize — planning front door only; downstream execution owned by plan-creator + cook | MIT | .claude/skills/henshin/ | 2 |
-| 34  | prompt-enhancer       | local original           | Synthesized from 7 source docs: claude-prompting-best-practices, codex-prompt-guide, factoryai/prompt-crafting-for-different-models, context-engineering-guide, effective-context-engineering-for-ai-agents (Anthropic), lessons-build-skill, skill-authoring-guidelines | MIT | .claude/skills/prompt-enhancer/ | 2 |
+| 34  | prompt-enhancer       | local original           | Synthesized from 7 source docs: claude-prompting-best-practices, codex-prompt-guide, factoryai/prompt-crafting-for-different-models, context-engineering-guide, effective-context-engineering-for-ai-agents (Anthropic) <!-- research-citation -->, lessons-build-skill, skill-authoring-guidelines | MIT | .claude/skills/prompt-enhancer/ | 2 |
 
 ## Removed
 

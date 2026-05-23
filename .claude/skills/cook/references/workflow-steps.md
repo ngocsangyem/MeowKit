@@ -25,7 +25,7 @@ All modes share these phases with mode-specific variations.
 - [Validation](#validation)
 
 
-**Task Tool Fallback:** `TaskCreate`/`TaskUpdate`/`TaskGet`/`TaskList` are CLI-only — unavailable in VSCode extension. If they error, use `TodoWrite` for progress tracking. Plan files remain source of truth.
+**Task Tool Fallback:** `TaskCreate`/`TaskUpdate`/`TaskGet`/`TaskList` are CLI-only — unavailable in GUI editor extensions. If they error, use `TodoWrite` for progress tracking. Plan files remain source of truth.
 
 ## Phase 0: Orient
 
@@ -302,7 +302,7 @@ Three mandatory subagents in parallel:
    Task(subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append bug-class patterns to .claude/memory/fixes.md and .claude/memory/fixes.json; append architectural decisions to .claude/memory/architecture-decisions.md and .claude/memory/architecture-decisions.json; append review patterns to .claude/memory/review-patterns.md and .claude/memory/review-patterns.json.", description="Session memory capture")
    ```
 
-4. `TaskUpdate` → mark all Claude Tasks complete after sync-back
+4. `TaskUpdate` → mark all session tasks complete after sync-back
 
 **Auto mode:** After Reflect, check if more plan phases remain → loop to Phase 2 for next phase.
 **Others:** Ask user before continuing to next phase.

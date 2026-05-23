@@ -15,7 +15,7 @@ Compact workflow for `--fast` flag or simple tasks. Skips research, codebase ana
 2. `step-03-draft-plan.md` — Write plan.md overview only (no phase files in fast mode unless task warrants them)
 3. `step-04-semantic-checks.md` — Semantic content checks only; skip structural validation
 4. `step-07-gate.md` — Gate 1 presentation and approval
-5. `step-08-hydrate-tasks.md` — Create Claude Tasks + checkpoint file
+5. `step-08-hydrate-tasks.md` — Create session tasks + checkpoint file
 
 **Skipped:** step-01 (research), step-02 (codebase analysis), step-05 (red team), step-06 (validation interview)
 
@@ -48,7 +48,7 @@ Step 7: Gate 1
     └── Self-check → AskUserQuestion (Approve | Modify | Reject)
          ↓
 Step 8: Hydrate Tasks
-    └── Claude Tasks + .plan-state.json → cook command → STOP
+    └── Session tasks + .plan-state.json → cook command → STOP
 ```
 
 ## Next

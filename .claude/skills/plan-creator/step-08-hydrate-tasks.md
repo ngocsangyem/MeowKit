@@ -1,6 +1,6 @@
 # Step 8: Hydrate Tasks
 
-Create Claude Tasks from plan phases for session-scoped execution tracking.
+Create session tasks from plan phases for session-scoped execution tracking.
 
 ## Instructions
 
@@ -8,7 +8,7 @@ Create Claude Tasks from plan phases for session-scoped execution tracking.
 
 Skip task hydration if:
 - Less than 3 phases (overhead exceeds benefit)
-- Task tools unavailable (VSCode extension) — plan files are the source of truth
+- Task tools unavailable (GUI editor extensions) — plan files are the source of truth
 
 ### 8b. Create Tasks from Phases
 

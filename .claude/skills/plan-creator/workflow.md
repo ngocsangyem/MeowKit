@@ -21,7 +21,7 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 6. `step-05-red-team.md` — Plan red team (hard/deep/parallel/two only): 4-persona scaling, red-team-findings.md, subagent dispatch, adjudication
 7. `step-06-validation-interview.md` — Validation interview (hard/deep/parallel/two only): 3-5 critical questions with detection keywords, section-mapped answer propagation
 8. `step-07-gate.md` — Self-check + Gate 1: AskUserQuestion (Approve | Modify | Reject)
-9. `step-08-hydrate-tasks.md` — Create Claude Tasks from phase checkboxes + critical-step sub-tasks + checkpoint file
+9. `step-08-hydrate-tasks.md` — Create session tasks from phase checkboxes + critical-step sub-tasks + checkpoint file
 10. `step-09-post-plan-handoff.md` — Deterministic mode-pruned `AskUserQuestion`: Cook | Validate | Red-team | End. Writes `handoff.next` to plan.md frontmatter, prints suggested command, STOPs.
 
 ## Variables Passed Between Steps

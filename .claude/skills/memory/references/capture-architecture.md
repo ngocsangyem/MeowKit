@@ -12,7 +12,7 @@ There are exactly **two** mechanisms that write to `.claude/memory/`. They are n
 |---|---|
 | Trigger | A **human user** types `##pattern:` / `##decision:` / `##note:` at the start of (or anywhere in) a message |
 | Hook | `.claude/hooks/handlers/immediate-capture-handler.cjs` |
-| Hook event | `UserPromptSubmit` (Claude Code + Codex CLI). On Gemini CLI this maps to `BeforeAgent`; on Cursor / Kiro the editor-native prompt-submit hook applies. `mewkit migrate <target>` rewrites the event name per harness. |
+| Hook event | `UserPromptSubmit` (`Claude Code` + `Codex CLI`). On `Gemini CLI` this maps to `BeforeAgent`; on `Cursor` / `Kiro` the editor-native prompt-submit hook applies. `mewkit migrate <target>` rewrites the event name per harness. |
 | Guards | (a) `validate-content.cjs` injection scan, (b) `secret-scrub.cjs` redaction |
 | Write target | `fixes.json` / `architecture-decisions.json` / `review-patterns.json` / `quick-notes.md` (routed by prefix) |
 | Atomicity | Temp-file + rename; per-target advisory lock |
@@ -65,7 +65,7 @@ Three bullets per entry — keep it tight:
 
 Path 1 runs `secret-scrub.cjs` automatically. Path 2 does NOT — the agent must scrub before calling `Edit`.
 
-Minimum patterns to redact (mirrors `secret-scrub.cjs`): API keys (Anthropic, OpenAI, Stripe, AWS, GitHub, GitLab, Slack), JWT, Bearer tokens, DB URLs, email addresses in operational context, generic `api_key=` / `password=` / `token=` strings.
+Minimum patterns to redact (mirrors `secret-scrub.cjs`): API keys (`Anthropic`, `OpenAI`, `Stripe`, `AWS`, `GitHub`, `GitLab`, `Slack`), JWT, Bearer tokens, DB URLs, email addresses in operational context, generic `api_key=` / `password=` / `token=` strings.
 
 If the agent cannot determine whether content is sensitive, OMIT the snippet and reference the file path + line range instead.
 

@@ -45,7 +45,7 @@ Skip when:
 
 1. **Adaptive density** — picks scaffolding density via `mk:scale-routing` (or `density-select.sh`); honors `MEOWKIT_HARNESS_MODE` env override
 2. **Budget caps** — warns at $30 spent, requires explicit approval at $100, hard-blocks at user-set `--budget` value
-3. **6-hour wall-clock timeout** — hard limit per Anthropic's observed runs; checkpoints every step for resumability
+3. **6-hour wall-clock timeout** — hard limit per Anthropic's observed runs <!-- research-citation -->; checkpoints every step for resumability
 4. **Max 3 iteration rounds** between generator and evaluator before escalating to human (configurable via `--max-iter`)
 5. **Run report mandatory** — every harness run produces `tasks/harness-runs/YYMMDD-{slug}/run.md` with full audit trail
 6. **Coexists with `mk:cook`** — does not replace it; both route through Gate 1 + Gate 2

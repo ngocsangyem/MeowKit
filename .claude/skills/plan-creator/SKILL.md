@@ -83,7 +83,7 @@ Step 4: Semantic Checks → goal/ACs/constraints + structural validation
 Step 5: Red Team (hard/deep/parallel/two only) → 4-persona scaling, red-team-findings.md, adjudication
 Step 6: Validation Interview (hard/deep/parallel/two only) → 3-5 critical questions with detection keywords, propagate answers
 Step 7: Gate 1 → self-check + AskUserQuestion (Approve | Modify | Reject)
-Step 8: Hydrate Tasks → phase checkboxes → Claude Tasks
+Step 8: Hydrate Tasks → phase checkboxes → session tasks
 Step 9: Post-Plan Handoff → mode-pruned AskUserQuestion (cook|validate|red-team|end) → write `handoff.next` to plan.md → STOP
 ```
 
@@ -165,6 +165,10 @@ tasks/plans/YYMMDD-name/
 | `references/workflow-models/bugfix-model.md`       | Workflow template for bug fix tasks (loaded JIT by step-00)                                                                                                                                                          |
 | `references/workflow-models/refactor-model.md`     | Workflow template for refactor tasks (loaded JIT by step-00)                                                                                                                                                         |
 | `references/workflow-models/security-model.md`     | Workflow template for security tasks (loaded JIT by step-00)                                                                                                                                                         |
+
+## Known Exceptions
+
+- `references/anthropic-example-plan.md` — filename retained as the source-provenance attribution for the few-shot calibration example. The file content is the appendix of a published harness-design article (Prithvi Rajasekaran, Labs); renaming would obscure the research origin. Future brand-prose audits skip this filename per this documented exception.
 
 ## Related Rules
 
