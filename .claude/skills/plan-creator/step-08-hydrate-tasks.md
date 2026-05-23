@@ -12,20 +12,7 @@ Skip task hydration if:
 
 ### 8b. Create Tasks from Phases
 
-For each phase in plan.md:
-
-```
-TaskCreate:
-  subject: "Phase {N}: {phase name}"
-  description: "{phase overview from phase file}"
-  metadata: {
-    phase: {N},
-    priority: "{P1|P2|P3}",
-    effort: "{estimate}",
-    planDir: "{plan_dir}",
-    phaseFile: "phase-{NN}-{name}.md"
-  }
-```
+For each phase in plan.md, create one TaskCreate. For the metadata schema (5 required fields), see `references/task-management.md` "Hydration Pattern Details > Metadata Template" — single source of truth.
 
 ### 8c. Set Dependencies + Critical-Step Tasks
 
@@ -33,33 +20,17 @@ Chain phases with `addBlockedBy`:
 - Phase 2 blockedBy Phase 1 (if Phase 2 depends on Phase 1)
 - Follow the "Depends On" column from plan.md phase table
 
-**Critical-step tasks:** After phase-level tasks, scan each phase's Todo List:
-- Items prefixed with `[CRITICAL]` or `[HIGH]` → create sub-tasks:
-  ```
-  TaskCreate:
-    subject: "Phase {N} — {step description}"
-    metadata: { step: true, critical: true, riskLevel: "high", phaseFile: "..." }
-    addBlockedBy: [parent phase task ID]
-  ```
-- Only create sub-tasks for marked items (most todos stay at phase level)
+**Critical-step tasks:** scan each phase's `## Todo List` for `[CRITICAL]`/`[HIGH]` items and create one sub-task per match (only marked items become sub-tasks). For the sub-task pattern and metadata shape, see `references/task-management.md` "Hydration Pattern Details > Critical-Step Sub-Tasks".
 
-**Parallel Group Hydration** (conditional: `planning_mode = parallel`)
+**Parallel Group Hydration** (active only when `planning_mode = parallel`): read `## Execution Strategy` from plan.md to determine groups. For the within-group / cross-group `addBlockedBy` rules and metadata, see `references/task-management.md` "Hydration Pattern Details > Parallel-Group Rules".
 
-Read `## Execution Strategy` from plan.md to determine groups:
-- Phases in the **same parallel group**: NO `addBlockedBy` between them.
-- Phases in a **later group**: `addBlockedBy` the last phase task ID of the prior group.
-- Add `parallel_group: "{letter}"` to each task's metadata.
-
-**Two-Approach Hydration** (conditional: `planning_mode = two`)
-
-Hydrate tasks ONLY from the selected approach's phase files (`selected_approach = "a"` or `"b"`).
-Do NOT create tasks for the archived (non-selected) approach.
+**Two-Approach Hydration** (active only when `planning_mode = two`): hydrate tasks ONLY from the selected approach's phase files using the `selected_approach` variable (`"a"` or `"b"`). For the selective-hydration filter, see `references/task-management.md` "Hydration Pattern Details > Two-Approach Filter".
 
 ### 8d. Create Checkpoint File
 
 #### Status Read Order (Required)
 
-When populating `phases[*].status` in `.plan-state.json`, read in this order (mirrors `packages/cli/src/orchviz/plan/parse-phase-file.ts:42-106` cascade):
+When populating `phases[*].status` in `.plan-state.json`, read in this order (mirrors the phase-file parser cascade):
 
 1. Frontmatter `status:` field (PREFERRED)
 2. `**Status:**` bold pattern in `## Overview` (legacy fallback)
@@ -115,10 +86,32 @@ Else:
 
 The Context Reminder block and the cook-command print are now emitted by `step-09-post-plan-handoff.md` AFTER the user selects a next-step. Do NOT print them here.
 
+### 8f. Post-Hydration Integrity Checks
+
+Run the three checks defined in `references/task-management.md` "Post-Hydration Integrity Checks":
+
+1. Cycle check — walk `addBlockedBy` chains; assert no node reaches itself
+2. Count-match check — sum of unchecked `[ ]` across all `phase-XX-*.md` files MUST equal Claude Tasks created (phase tasks + critical-step sub-tasks)
+3. Metadata-completeness check — every `TaskCreate` call carries all 5 required fields (`phase`, `priority`, `effort`, `planDir`, `phaseFile`)
+
+**All-pass** → continue to Output and emit the success-log line.
+
+**Any-fail** → print explicit diff and STOP. Do NOT proceed to step-09. Example:
+
+```
+✗ Integrity check failed: expected 5 tasks (3 phases + 2 critical steps), found 4
+   Missing: critical step "[CRITICAL] migrate users table" in phase-02-database.md
+   Required: human resolution before proceeding.
+```
+
+N=0 / M=0 is PASS no-op (zero phases legitimately means zero tasks); only mismatches trigger STOP.
+
 ## Output
 
-- `{N}` tasks created with dependency chain
-- `.plan-state.json` checkpoint created
+On integrity-check pass, emit:
+`✓ Hydrated [N] phase tasks + [M] critical step tasks with dependency chain`
+
+Also: `.plan-state.json` checkpoint created.
 
 ## Next
 

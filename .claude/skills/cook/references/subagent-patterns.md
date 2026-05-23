@@ -107,7 +107,7 @@ Task(subagent_type="git-manager", prompt="Stage and commit changes with conventi
 Sync-back algorithm authority: `.claude/skills/plan-creator/references/task-management.md` (Sync-Back Algorithm).
 
 ```
-Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using the algorithm at .claude/skills/plan-creator/references/task-management.md (Sync-Back Algorithm). For EACH phase-XX-*.md file: (1) read frontmatter status — SKIP if 'failed' or 'abandoned' (terminal states); (2) parse ## Todo List checkboxes — count total and checked; (3) derive new status: total==0 OR checked==0 → pending; checked<total → in_progress; checked==total → completed; (4) if new status differs from current, rewrite frontmatter status AND regenerate Overview block lines (**Status:**, **Priority:**, **Effort:**, **Depends on:**) from frontmatter; (5) update plan.md Phases table status column. NEVER stamp 'completed' when total==0 (empty todo list). NEVER overwrite terminal states. Idempotent: running again on a stable file should produce zero diff. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
+Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
 ```
 
 **Documenter:**

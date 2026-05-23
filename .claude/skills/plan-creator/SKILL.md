@@ -1,6 +1,6 @@
 ---
 name: mk:plan-creator
-version: 1.6.0
+version: 1.6.1
 preamble-tier: 3
 description: >-
   Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks
@@ -116,6 +116,7 @@ tasks/plans/YYMMDD-name/
 - **`consistency_sweeps` frontmatter is optional**: legacy plans without it still validate as `PLAN_COMPLETE`.
 - **Sweep recursion is bounded**: "resolve now" caps at 2 attempts per gate; further unresolved items convert to Risk rows.
 - **`.plan-state.json` v1.2 schema is additive**: consumers MUST treat unknown keys (`verification_tier`, `consistency_sweeps_passed`) as optional and default-empty. v1.1 readers ignore them silently.
+- **Post-hydration integrity-check failure is a hard stop**: cycle / count-mismatch / missing-metadata failures print an explicit diff and STOP — do NOT auto-recover or silently continue. Human resolution required before step-09. See `references/task-management.md` "Post-Hydration Integrity Checks".
 
 ## References
 

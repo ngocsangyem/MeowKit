@@ -14,6 +14,31 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.9 (2026-05-23) — Plan-creator determinism + handoff
+
+### Highlights
+
+`mk:plan-creator` gains a deterministic post-approval handoff and two consistency-sweep gates so red-team and validation-interview edits cannot leave the rest of the plan inconsistent. After Gate 1 + task hydration, the skill fires an `AskUserQuestion` whose options are pruned to the gates not already auto-run in the active mode (cook / validate / red-team / harness / end), writes the choice to `plan.md` frontmatter as a typed enum, and STOPs without auto-invoking. The validator now rejects unknown `handoff.next` values. Static `AskUserQuestion` JSON in seven step / reference files becomes a "Recommend When" decision table; runtime-templated payloads stay as JSON because they carry substitution variables a table cannot express.
+
+### Features
+
+- New step file `step-09-post-plan-handoff.md` — runs after task hydration. Mode-pruned options (≤4), live risk re-scan over plan content for `risk-checklist.md` trigger keywords, defensive fallback advisory when `matched_flags` is unset, writes `handoff: { next, decided_at }` to `plan.md` frontmatter.
+- New gates Whole-Plan Consistency Sweep — Gate W1 at the end of `step-05-red-team.md`, Gate W2 at the end of `step-06-validation-interview.md`. Stage-then-apply algorithm: read-only Pass 1 stages `### Pending Sweep Edits` block; decision check blocks on unresolved contradictions via `AskUserQuestion`; write Pass 2 applies edits, writes summary, updates `consistency_sweeps.{red_team|validation}` frontmatter. Recursion bound: 2 resolve attempts per gate. See `references/whole-plan-sweep.md`.
+- New step-04 sub-step Verification Roles — Fact Checker / Flow Tracer / Scope Auditor / Contract Verifier dispatched as READ-ONLY parallel `Explore` subagents, tier auto-selected by phase count (Light 1–2 / Standard 3–4 / Full 5+). Orchestrator aggregates verdicts and writes ONE `## Verification Log` Edit per phase file. Skipped in fast / product-level modes. FAILED claims surface as targeted step-06 interview questions. See `references/verification-roles.md`.
+- `validate-plan.py` enforces `handoff.next` enum when the `handoff:` frontmatter block is present. Plans without `handoff:` continue to validate.
+- `.plan-state.json` v1.2 — additive schema bump adding optional `verification_tier` and `consistency_sweeps_passed`. v1.1 readers ignore unknown keys; v1.2 readers default missing keys.
+
+### Improvements
+
+- Seven static `AskUserQuestion` JSON blocks across `step-00-scope-challenge.md`, `step-07-gate.md`, `references/gate-1-approval.md`, and `references/archive-workflow.md` converted to "Option / Recommend When / Why" decision tables matching the `ck-plan` Post-Plan Handoff pattern. Runtime-templated and looped payloads (per-finding loop, file-content embedding, fully generated question text) stay as JSON.
+- `references/phase-template.md` documents `## Verification Log` and `## Validation Log` as machine-written, optional sections; hand-edit anti-pattern added.
+- `references/gate-1-approval.md` Context Reminder block moved from step-07 to step-09 (fires AFTER the user picks a next-step option, not on Gate 1 approval); contradictory step-07 instruction reconciled.
+
+### Migration Notes
+
+- Legacy plans without `handoff`, `consistency_sweeps`, `## Validation Log`, or `## Verification Log` continue to validate as `PLAN_COMPLETE`. No migration tool required.
+- Fixtures live at `tests/fixtures/plan-creator/` covering legacy / modernized / partial / interrupted-sweep / handoff-invalid-enum states; runnable via `bash tests/fixtures/plan-creator/validate-fixtures.sh`.
+
 ## 2.9.8 (2026-05-23) — Memory system deep fix
 
 ### Highlights

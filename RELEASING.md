@@ -402,6 +402,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.9.9  | 2026-05-23 | Plan-creator determinism + handoff               |
 | v2.9.8  | 2026-05-23 | Memory system deep fix                           |
 | v2.9.7  | 2026-05-16 | Docs reference contract + validator              |
 | v2.9.6  | 2026-05-16 | Context isolation: SessionStart budgeting, agent-detector sentinel, memory auto-prune |

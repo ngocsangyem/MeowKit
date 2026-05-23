@@ -9,6 +9,67 @@ Hydration bridges the gap: create tasks from plan checkboxes.
 - Skip if < 3 phases (overhead exceeds benefit)
 - Each task: subject, description, phase metadata
 
+### Hydration Pattern Details
+
+**Metadata Template** — every `TaskCreate` MUST include these 5 fields:
+
+```
+metadata: {
+  phase: {N},                       # integer, mirrors phase frontmatter
+  priority: "P1|P2|P3",             # mirrors phase frontmatter
+  effort: "{estimate}",             # "1h", "30m", "2d"
+  planDir: "{plan_dir}",            # workspace-relative path
+  phaseFile: "phase-{NN}-{name}.md" # filename only
+}
+```
+
+**Critical-Step Sub-Tasks** — scan each phase's `## Todo List` for items prefixed `[CRITICAL]` or `[HIGH]`. Per match, create a sub-task:
+
+```
+TaskCreate:
+  subject: "Phase {N} — {step description}"
+  metadata: { step: true, critical: true, riskLevel: "high", phaseFile: "..." }
+  addBlockedBy: [parent phase task ID]
+```
+
+Only marked items become sub-tasks. Most todos stay at phase level.
+
+**Parallel-Group Rules** (active only when `planning_mode = parallel`):
+
+- Within-group: phases in the same parallel group have NO `addBlockedBy` between them
+- Cross-group: phases in a later group `addBlockedBy` the last phase task ID of the prior group
+- Add `parallel_group: "{letter}"` to each task's metadata
+
+**Two-Approach Filter** (active only when `planning_mode = two`): hydrate tasks ONLY from the selected approach's phase files (`selected_approach = "a"` or `"b"`). Do NOT create tasks for the archived (non-selected) approach.
+
+**VSCode Fallback** — when `TaskCreate` is unavailable (e.g., the VSCode Claude extension does not expose CLI task tools), fall back to `TodoWrite` for session-scoped tracking. Plan files remain the source of truth — re-hydration on a fresh CLI session restores the full task chain.
+
+## Post-Hydration Integrity Checks
+
+After hydration completes, run three checks. Any failure is a hard STOP — do NOT auto-recover, do NOT silently continue.
+
+1. **Cycle check** — walk every task's `addBlockedBy` chain; assert no node reaches itself. Cycles indicate malformed dependency declarations (e.g., Phase X declares Y as a dep AND Phase Y declares X).
+2. **Count-match check** — sum of unchecked `[ ]` items across all `phase-XX-*.md` files MUST equal the number of Claude Tasks created (phase tasks + critical-step sub-tasks). Drift indicates a phase file changed between scaffolding and hydration, or a `[CRITICAL]` token was added without a sub-task.
+3. **Metadata-completeness check** — every `TaskCreate` call has all 5 required fields (`phase`, `priority`, `effort`, `planDir`, `phaseFile`). Missing fields break cross-session resume.
+
+**Success log (on all-pass):**
+
+```
+✓ Hydrated [N] phase tasks + [M] critical step tasks with dependency chain
+```
+
+**Failure mode (on any check failure):** print explicit diff and STOP. Do NOT proceed to step-09.
+
+```
+✗ Integrity check failed: expected N tasks, found M
+   Missing: phase-XX-foo.md (or specific TaskCreate call missing field "phaseFile")
+   Required: human resolution before proceeding.
+```
+
+❌ Anti-pattern — auto-recover by inferring missing tasks from phase files. Hydration state must be human-reviewed; silent recovery hides scaffolding drift.
+
+N=0 / M=0 is PASS (no-op): zero phases legitimately means zero tasks; only mismatches trigger STOP.
+
 ## Cross-Session Resume
 New session → read plan.md → check `[ ]` items → re-hydrate unchecked items as tasks.
 Already `[x]` items → skip.
@@ -78,6 +139,20 @@ if new_status != current_status:
 
 **Cross-Session Resume:**
 New session → read `.plan-state.json` → skip completed phases → re-hydrate only pending phases as tasks.
+
+## Status Producer/Consumer Matrix
+
+The phase status enum has 7 values. Each has a documented producer (who writes it) and consumer (who reads it). Sync-back is constrained to write only 3 of these; the remaining 4 are either human-only or parse-failure sentinels.
+
+| Status | Producer | Consumer | Citation |
+|---|---|---|---|
+| `pending` | sync-back algorithm (default when no todos checked); scaffolding (initial state) | cook re-hydration; orchviz | task-management.md "Algorithm (formal)" |
+| `in_progress` | sync-back algorithm (some but not all todos checked) | cook re-hydration; orchviz | task-management.md "Algorithm (formal)" |
+| `completed` | sync-back algorithm (all todos checked AND total > 0) | cook re-hydration (skip phase); orchviz; archive workflow | task-management.md "Algorithm (formal)" |
+| `active` | HUMAN edit only — sync-back NEVER writes `active` | cook re-hydration; orchviz | task-management.md "Invariants" |
+| `failed` | HUMAN edit only — terminal state | cook re-hydration (skip phase); orchviz; journal-writer | task-management.md "Invariants" |
+| `abandoned` | HUMAN edit only — terminal state | cook re-hydration (skip phase); orchviz; archive workflow | task-management.md "Invariants" |
+| `unknown` | parser cascade fallback — emitted only when `status:` is absent or unrecognized; never written from frontmatter | orchviz (display as warning); validator | internal sentinel |
 
 ## Cook Handoff
 After Gate 1: output cook command with absolute path:

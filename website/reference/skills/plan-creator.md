@@ -69,13 +69,16 @@ If the plan frontmatter has non-empty `jira_tickets:`, `mk:plan-creator` runs th
 | 01 | Research | Researcher reports with source citations |
 | 02 | Codebase analysis | Scout findings, existing plan scan, cross-plan dependencies |
 | 03 | Draft (feature) / 03a (product-level) | plan.md with 12-section phase template + YAML frontmatter |
-| 04 | Semantic checks | Validation report, two-approach selection (if applicable) |
-| 05 | Red-team | 4-persona adversarial analysis, red-team-findings.md (7-field findings) |
-| 06 | Validation interview | 5-category questions with propagated answers |
+| 04 | Semantic checks | Validation report, two-approach selection (if applicable), Verification Roles dispatch (sub-step 4d — Light/Standard/Full tier by phase count) writes `## Verification Log` per phase file |
+| 05 | Red-team | 4-persona adversarial analysis, red-team-findings.md (7-field findings); Gate W1 Whole-Plan Consistency Sweep at exit |
+| 06 | Validation interview | 5-category questions with propagated answers; Gate W2 Whole-Plan Consistency Sweep at exit |
 | 07 | Gate 1 | Self-check (Completed/Skipped/Uncertain), AskUserQuestion, memory capture |
-| 08 | Hydrate | TaskCreate with dependency chains, critical-step sub-tasks, `.plan-state.json` |
+| 08 | Hydrate | TaskCreate with dependency chains, critical-step sub-tasks, `.plan-state.json` (v1.2) |
+| 09 | Post-plan handoff | Mode-pruned AskUserQuestion (cook / validate / red-team / harness / end), writes `handoff: { next, decided_at }` to plan.md frontmatter, prints command, STOPs |
 
-**Branching:** product-level mode uses step-03a instead of step-03. Fast mode and product-level mode skip steps 05-06.
+**Branching:** product-level mode uses step-03a instead of step-03. Fast mode and product-level mode skip steps 05-06 and the 4d Verification Roles sub-step.
+
+**Gates W1 / W2** stage edits before applying (read-only Pass 1 stages `### Pending Sweep Edits`; decision check blocks on unresolved contradictions via AskUserQuestion; Pass 2 applies and logs). Algorithm: `references/whole-plan-sweep.md`. Verification Roles algorithm + dispatch brief: `references/verification-roles.md`.
 
 ## Usage
 
