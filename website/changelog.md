@@ -14,6 +14,44 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.10 (2026-05-23) — Cook workflow & context-engineering upgrade
+
+### Highlights
+
+`mk:cook` gains three new context-engineering contracts. The scout-first contract at Phase 0 surfaces a 3–6 bullet codebase summary to the user before any clarifying question. The exact-requirements contract at Phase 1 forces plan-creator to answer 5 dimensions (expected output, acceptance criteria, scope boundary, non-negotiable constraints, touchpoints) before returning a plan. The no-side-effects regression-recovery pattern at Gate 2 makes cook STOP and present 2–4 typed options to the user when the reviewer surfaces a regression in existing behavior, instead of silently patching. Phase 4.5 now distinguishes `--verify` (advisory, no back-edge) from `--strict` (blocking, FAIL routes to Phase 3) in the SKILL.md Mermaid diagram and prose. All changes are prose-only or additive — pre-upgrade plans, verdicts, and sessions continue to work unchanged.
+
+### Features
+
+- New `Side Effects Detected: Yes` signal in reviewer verdicts — plaintext line + bullet list of detected regressions. `validate-gate-2.sh` recognizes the signal and blocks Gate 2 until a `## User Decision Addendum` block (containing `User selected:` + `Resumption point:`) is appended. Positive-presence-only — absence of the field is never a block signal, so pre-upgrade verdicts validate unchanged.
+- New "Regression Recovery Options" subsection in `mk:cook/references/review-cycle.md` — 5-step procedure with 4 standard options (revert + re-plan / keep + update dependents / compatibility shim / accept the regression).
+- New Scout-First Contract + Exact-Requirements Contract sections in `mk:cook/SKILL.md` with skip-on-plan-path notes.
+- New Requirements Capture Contract in `mk:plan-creator/SKILL.md` enumerating the 5 dimensions and the scout-grounded-options rule — every clarifying question MUST cite scout findings; abstract options are a failure mode.
+- New top-level shared rule `.claude/rules/anti-rationalization.md` — generic implementation-phase rationalizations migrated from `mk:cook/SKILL.md`, which retains a 1-row TDD-specific extension.
+- `mk:brainstorming/references/anti-rationalization.md` gained a cross-link to the new shared rule.
+
+### Improvements
+
+- `mk:cook/SKILL.md` Workflow Modes table demoted from 5 columns to 3 (Mode / Research / TDD) — canonical 6-column mode-behaviors matrix lives in `mk:cook/references/intent-detection.md`. Gate 2 absolutism statement collapsed to a 1-line callback to `.claude/rules/gate-rules.md` across SKILL.md, intent-detection.md, workflow-steps.md (review-cycle.md preserved inline for iteration-loop context).
+- TDD column labels unified to `RED-strict` / `Plan-level` / `Skip` across cook SKILL.md, intent-detection.md, workflow-steps.md.
+- Phase 5 ship subagent renamed in cook SKILL.md, workflow-steps.md, and subagent-patterns.md from `git-manager via mk:ship` to `shipper via mk:ship` — shipper orchestrates the full pre-ship pipeline and invokes git-manager internally.
+- `mk:cook/references/subagent-patterns.md` gained a Standard Delegation Skeleton (9-field block per `orchestration-rules.md`) at the top and a `Scope: pass X / do NOT pass Y` annotation on each of the 13 template sections (isolation-boundary contract per `orchestration-rules.md` Isolation Boundaries).
+- `validate-gate-1.sh` runs as an advisory preflight in non-auto modes (surfaces structural-check failures to the user before Gate 1 prompt; user retains override) and remains a blocking gate in `--auto` mode.
+- SKILL.md Mermaid diagram edge labels quoted (`|"--verify"|`, `|"--strict"|`) for renderer compatibility.
+- `mk:cook/references/failure-catalog.md` gained 4 new failure modes — skipped scout summary, vague clarifying questions, scout-first gate fired on plan-path input, silent patch on review-detected regression.
+
+### Bug Fixes
+
+- USD pricing on `--verify` / `--strict` flags removed from cook SKILL.md, intent-detection.md, workflow-steps.md — replaced with `[LIGHT]` / `[HEAVY]` relative-cost labels and a one-line variability note (concrete cost depends on inner harness, model tier, and target surface).
+- Inner-harness Mermaid rendering preamble removed from cook SKILL.md (diagram authority is independent of rendering fidelity).
+- Phase 4.5 subagent column reframed from `agent-browser or curl` to `browser-automation subagent or HTTP verification tool` — concrete subagent name depends on installed skill set.
+- ToC anchors in `mk:cook/references/workflow-steps.md` and `subagent-patterns.md` updated to match renamed Gate 2 / Phase 4.5 / Ship section headers.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the new gates. No script or schema changes required for existing plans / verdicts / sessions.
+- New gates (scout-first, exact-requirements) apply only when starting from a fresh task description. Plan-path invocations (`/mk:cook tasks/plans/.../plan.md`) skip both gates explicitly.
+- Dead-weight audit reminder: next quarterly run (2026-08-23) or earlier on next model-tier release per `.claude/rules/dead-weight-audit-rules.md` Rule 1.
+
 ## 2.9.9 (2026-05-23) — Plan-creator determinism + handoff
 
 ### Highlights
