@@ -31,44 +31,26 @@ Read `tasks/plans/` directory. For each subdirectory:
 
 ### A2. Present Plan List
 
-Via AskUserQuestion:
+Via `AskUserQuestion`. Header: "Archive Plans". Question (composed): print "Found {N} archivable plans:" followed by the `name | status | created | phases` table, then "Which plans to archive?". Single-select.
 
-```json
-{
-  "questions": [{
-    "question": "Found {N} archivable plans:\n\n{table: name | status | created | phases}\n\nWhich plans to archive?",
-    "header": "Archive Plans",
-    "options": [
-      { "label": "All completed + cancelled", "description": "Archive all {N} plans" },
-      { "label": "Completed only", "description": "Archive only completed plans, keep cancelled for review" },
-      { "label": "Select specific plans", "description": "Choose which plans to archive" },
-      { "label": "Cancel", "description": "Don't archive anything" }
-    ],
-    "multiSelect": false
-  }]
-}
-```
+| Option | Recommend When | Why |
+|--------|----------------|-----|
+| All completed + cancelled | Both classes are safely archivable in one shot | Archives all {N} plans |
+| Completed only | Cancelled plans may still need post-mortem | Keeps cancelled for review |
+| Select specific plans | User wants per-plan control (e.g., active reviewer is mid-read on one) | Multi-select follow-up prompt per plan |
+| Cancel | User is exploring, not committing | Aborts without touching any plan |
 
-If "Select specific plans": present each plan as a multi-select AskUserQuestion.
+If "Select specific plans": present each plan as a multi-select `AskUserQuestion`.
 If "Cancel": STOP.
 
 ### A3. Journal Capture (Optional)
 
-For each selected plan, ask:
+For each selected plan, ask via `AskUserQuestion`. Header: "Journal Capture". Question: "Capture learnings from these plans to memory before archiving?" Single-select.
 
-```json
-{
-  "questions": [{
-    "question": "Capture learnings from these plans to memory before archiving?",
-    "header": "Journal Capture",
-    "options": [
-      { "label": "Yes — capture learnings", "description": "Append key decisions and patterns to .claude/memory/architecture-decisions.md" },
-      { "label": "No — just archive", "description": "Archive without capturing learnings" }
-    ],
-    "multiSelect": false
-  }]
-}
-```
+| Option | Recommend When | Why |
+|--------|----------------|-----|
+| Yes — capture learnings | Plan has Red Team Review or Validation Log sections with decisions worth replaying | Appends key decisions and patterns to `.claude/memory/architecture-decisions.md` |
+| No — just archive | Plan was trivial / experimental and has no reusable knowledge | Archives without capturing learnings |
 
 If "Yes": for each selected plan, extract:
 - Key decisions from plan.md (Goal, Constraints, Risk Assessment)
@@ -86,21 +68,12 @@ Append to `.claude/memory/architecture-decisions.md`:
 
 ### A4. Archive Action
 
-Ask:
+Ask via `AskUserQuestion`. Header: "Archive Action". Question: "How to handle the archived plans?" Single-select.
 
-```json
-{
-  "questions": [{
-    "question": "How to handle the archived plans?",
-    "header": "Archive Action",
-    "options": [
-      { "label": "Move to .archive/", "description": "Move to tasks/plans/.archive/{plan-name}/ (preserves in git)" },
-      { "label": "Delete", "description": "Remove plan directories permanently" }
-    ],
-    "multiSelect": false
-  }]
-}
-```
+| Option | Recommend When | Why |
+|--------|----------------|-----|
+| Move to .archive/ | Plan may be useful later for reference, audit, or replay | Moves to `tasks/plans/.archive/{plan-name}/`; preserves history in git |
+| Delete | Plan is throwaway / sensitive / consumes repo space without value | Removes plan directories permanently (confirm before running rm) |
 
 If "Move": `mv tasks/plans/{plan-name} tasks/plans/.archive/{plan-name}`
 If "Delete": `rm -rf tasks/plans/{plan-name}` (confirm with user first)

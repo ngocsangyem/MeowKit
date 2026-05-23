@@ -62,22 +62,13 @@ Ask these 3 questions (internally, don't need to ask user):
 
 **Skip if:** `planning_mode = fast` or trivial.
 
-Present scope mode choice via AskUserQuestion:
+Present scope mode choice via `AskUserQuestion`. Header: "Scope Mode". Question: "How should I approach the scope for this plan?" Single-select. Options (recommended option first when one applies; otherwise leave neutral):
 
-```json
-{
-  "questions": [{
-    "question": "How should I approach the scope for this plan?",
-    "header": "Scope Mode",
-    "options": [
-      { "label": "EXPANSION", "description": "Research deeply, explore alternatives, think big. Up to 7 phases." },
-      { "label": "HOLD", "description": "Scope is right. Focus on bulletproof execution. Standard phases." },
-      { "label": "REDUCTION", "description": "Strip to essentials. Defer non-critical work. Minimal phases (2-3)." }
-    ],
-    "multiSelect": false
-  }]
-}
-```
+| Option | Recommend When | Why |
+|--------|----------------|-----|
+| EXPANSION | Task hints at broader product question or unclear boundaries; research budget available | Research deeply, explore alternatives, think big. Up to 7 phases. |
+| HOLD | Scope is already concrete and matches a known workflow model | Focus on bulletproof execution. Standard 3-5 phases. |
+| REDUCTION | Time-boxed, MVP framing, or single concrete deliverable | Strip to essentials. Defer non-critical work. Minimal 2-3 phases. |
 
 **Scope mode effects:**
 
@@ -135,22 +126,13 @@ Scan the original task description (case-insensitive) for **product-level intent
 **If a signal matches** AND no implementation context exists in the prompt
 (no file names, no class names, no "fix the X bug", no "refactor the Y module"):
 
-Present via AskUserQuestion:
+Present via `AskUserQuestion`. Header: "Plan Mode". Question: "This looks like a green-field product build. Should I produce a product-level spec (user stories, features, design language) or a traditional implementation plan?" Single-select.
 
-```json
-{
-  "questions": [{
-    "question": "This looks like a green-field product build. Should I produce a product-level spec (user stories, features, design language) or a traditional implementation plan?",
-    "header": "Plan Mode",
-    "options": [
-      { "label": "Product-Level (Recommended)", "description": "Ambitious user-story spec, no file paths. Hands off to harness skill for implementation. Best for new app/product builds with capable models." },
-      { "label": "Implementation Plan", "description": "Traditional phase-XX file plan with file paths, schemas, and step-by-step builds. Best for refactors, bug fixes, and well-scoped features." },
-      { "label": "Cancel", "description": "Stop and let me clarify the request." }
-    ],
-    "multiSelect": false
-  }]
-}
-```
+| Option | Recommend When | Why |
+|--------|----------------|-----|
+| Product-Level (Recommended) | Green-field "build a X" prompt with no implementation context AND capable model | Ambitious user-story spec, no file paths. Hands off to harness skill for implementation. |
+| Implementation Plan | User actually wants concrete file paths / schemas / step-by-step | Traditional phase-XX file plan. Best for refactors, bug fixes, well-scoped features. |
+| Cancel | Prompt is ambiguous and user should clarify | Stops the workflow; user re-issues the prompt with more detail. |
 
 **Effect of selection:**
 

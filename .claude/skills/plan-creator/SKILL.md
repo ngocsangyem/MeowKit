@@ -1,6 +1,6 @@
 ---
 name: mk:plan-creator
-version: 1.5.0
+version: 1.6.0
 preamble-tier: 3
 description: >-
   Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks
@@ -84,6 +84,7 @@ Step 5: Red Team (hard/deep/parallel/two only) → 4-persona scaling, red-team-f
 Step 6: Validation Interview (hard/deep/parallel/two only) → 3-5 critical questions with detection keywords, propagate answers
 Step 7: Gate 1 → self-check + AskUserQuestion (Approve | Modify | Reject)
 Step 8: Hydrate Tasks → phase checkboxes → Claude Tasks
+Step 9: Post-Plan Handoff → mode-pruned AskUserQuestion (cook|validate|red-team|end) → write `handoff.next` to plan.md → STOP
 ```
 
 ## Output Structure
@@ -109,6 +110,12 @@ tasks/plans/YYMMDD-name/
 - **Research disconnected**: findings archived but not cited in plan → Step 3 MUST integrate research into Key Insights
 - **Over-planning trivial tasks**: 2-file config change gets full research → Step 0 scope gate exits early
 - **Skipping scout on unfamiliar codebases**: → always run mk:scout if codebase is new
+- **Post-Plan Handoff is deterministic**: step-09 fires `AskUserQuestion`; do NOT auto-invoke the chosen command. User must type it in a fresh session for clean context.
+- **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, harness, end}` fail `validate-plan.py`.
+- **Whole-Plan Consistency Gates W1 / W2 fire after red-team and validation interview**: stage-then-apply algorithm — no edits land until the user resolves any unresolved contradictions. See `references/whole-plan-sweep.md`.
+- **`consistency_sweeps` frontmatter is optional**: legacy plans without it still validate as `PLAN_COMPLETE`.
+- **Sweep recursion is bounded**: "resolve now" caps at 2 attempts per gate; further unresolved items convert to Risk rows.
+- **`.plan-state.json` v1.2 schema is additive**: consumers MUST treat unknown keys (`verification_tier`, `consistency_sweeps_passed`) as optional and default-empty. v1.1 readers ignore them silently.
 
 ## References
 
@@ -123,6 +130,9 @@ tasks/plans/YYMMDD-name/
 | `step-05-red-team.md`                              | Red team review: persona scaling, subagent dispatch, adjudication                                                                                                                                                    |
 | `step-06-validation-interview.md`                  | Critical question generation and answer propagation                                                                                                                                                                  |
 | `step-07-gate.md`                                  | Self-check and Gate 1 AskUserQuestion presentation                                                                                                                                                                   |
+| `step-09-post-plan-handoff.md`                     | Deterministic post-Gate-1 handoff: mode-pruned `AskUserQuestion` (cook \| validate \| red-team \| harness \| end), live risk re-scan, writes `handoff.next` to plan.md frontmatter, prints command + STOPs.        |
+| `references/whole-plan-sweep.md`                   | Whole-Plan Consistency Sweep algorithm (Gates W1 + W2). Stage-then-apply: read-only Pass 1 stages Pending Sweep Edits; decision check blocks on unresolved contradictions; write Pass 2 applies edits and logs.   |
+| `references/verification-roles.md`                 | Verification Roles for step-04 sub-step 4d (Fact Checker / Flow Tracer / Scope Auditor / Contract Verifier) with tier selection by phase count. Subagents are READ-ONLY; orchestrator writes the `## Verification Log`. |
 | `prompts/personas/plan-assumption-destroyer.md`    | Plan-specific assumption skeptic persona                                                                                                                                                                             |
 | `prompts/personas/plan-scope-complexity-critic.md` | Plan-specific YAGNI/scope minimalist persona                                                                                                                                                                         |
 | `prompts/personas/plan-security-adversary.md`      | Plan-specific security adversary (auth bypass, injection, data exposure). Used at 4+ phases.                                                                                                                         |
@@ -158,6 +168,7 @@ tasks/plans/YYMMDD-name/
 ## Related Rules
 
 - `.claude/rules/gate-rules.md` — Gate 1 hard-stop conditions this skill enforces (plan approval before Phase 3)
+- `.claude/rules/orchestration-rules.md` — boundary contract; verification subagents stay READ-ONLY; sweep stays in planner context (never delegated)
 
 ## Start
 

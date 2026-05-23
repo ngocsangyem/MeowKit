@@ -16,22 +16,25 @@ State each category explicitly:
 
 Load `references/gate-1-approval.md` for the exact AskUserQuestion format and Context Reminder block.
 
-Present the plan for approval:
+Present the plan for approval via `AskUserQuestion`. Header: "Gate 1: Plan Approval". Question text composes the self-check summary, plan path, phase count, and mode:
 
-```json
-{
-  "questions": [{
-    "question": "Gate 1 — Plan Ready for Approval\n\n{self-check summary}\n\nPlan: {plan_dir}/plan.md\nPhases: {N} phase files\nMode: {planning_mode}\n\nAll checks passed. Ready to proceed?",
-    "header": "Gate 1: Plan Approval",
-    "options": [
-      { "label": "Approve", "description": "Plan is good — proceed to task hydration" },
-      { "label": "Modify", "description": "Apply changes, re-validate, present again" },
-      { "label": "Reject", "description": "Restart from step-00 with new requirements" }
-    ],
-    "multiSelect": false
-  }]
-}
-```
+> Gate 1 — Plan Ready for Approval
+>
+> {self-check summary}
+>
+> Plan: {plan_dir}/plan.md
+> Phases: {N} phase files
+> Mode: {planning_mode}
+>
+> All checks passed. Ready to proceed?
+
+Single-select.
+
+| Option | Recommend When | Why |
+|--------|----------------|-----|
+| Approve | Self-check has zero Uncertain items and no Skipped item flags correctness risk | Plan is good — proceeds to task hydration |
+| Modify | Minor changes needed before approval | Apply changes, re-validate, present again |
+| Reject | Requirements have fundamentally changed | Restart from step-00 with new requirements |
 
 ### 7c. Handle Decision
 

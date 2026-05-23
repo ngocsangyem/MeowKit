@@ -20,6 +20,10 @@ PLAN_REQUIRED_SECTIONS = [
 # plan.md required frontmatter fields
 PLAN_REQUIRED_FRONTMATTER = ["title", "type", "status", "priority"]
 
+# Optional plan.md frontmatter blocks (additive — legacy plans without these still validate).
+# `handoff.next` is enum-validated when present; unknown values fail the plan.
+HANDOFF_NEXT_VALID = {"cook", "validate", "red-team", "harness", "end"}
+
 # Phase frontmatter schema
 PHASE_VALID_STATUS = {"pending", "active", "in_progress", "completed", "failed", "abandoned"}
 PHASE_FRONTMATTER_FIELDS = ["phase", "title", "status", "priority", "effort", "dependencies"]
@@ -55,6 +59,20 @@ def validate_frontmatter(content, filepath):
                 issues.append(f"{filepath}: Missing frontmatter: {field}")
     return issues
 
+def _extract_plan_frontmatter(content):
+    """Parse plan.md frontmatter as dict. Returns None if absent/malformed."""
+    if not content.startswith("---"):
+        return None
+    match = PHASE_FRONTMATTER_RE.match(content)
+    if not match:
+        return None
+    try:
+        parsed = yaml.safe_load(match.group(1))
+    except yaml.YAMLError:
+        return None
+    return parsed if isinstance(parsed, dict) else None
+
+
 def validate_plan(filepath):
     """Validate plan.md overview file."""
     if not os.path.exists(filepath):
@@ -62,6 +80,15 @@ def validate_plan(filepath):
 
     content = open(filepath, encoding="utf-8").read()
     issues = validate_frontmatter(content, "plan.md")
+
+    # Optional handoff.next enum validation. Plans without `handoff:` still pass.
+    fm = _extract_plan_frontmatter(content)
+    if fm and isinstance(fm.get("handoff"), dict):
+        next_val = fm["handoff"].get("next")
+        if next_val is not None and next_val not in HANDOFF_NEXT_VALID:
+            issues.append(
+                f"plan.md: handoff.next '{next_val}' not in {sorted(HANDOFF_NEXT_VALID)}"
+            )
 
     # Check required sections
     for section in PLAN_REQUIRED_SECTIONS:

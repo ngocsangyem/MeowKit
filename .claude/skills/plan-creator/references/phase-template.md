@@ -168,6 +168,24 @@ These sections are NOT added in default mode (12-section template remains unchan
 - **Research linking (MANDATORY):** If `{plan-dir}/research/` has reports, Context Links MUST include links to relevant research reports. Step-03 verifies this after writing phase files.
 - **Critical-step markers:** Todo items with high risk can be prefixed with `[CRITICAL]` or `[HIGH]` — these get their own Claude Tasks during hydration (step-08), enabling finer-grained tracking.
 
+## Optional Machine-Written Sections
+
+These sections are written by skill steps, not authored by humans. They are OPTIONAL — `validate-plan.py` does NOT require them. Legacy plans without them continue to validate.
+
+### `## Verification Log`
+
+- **Written by:** `step-04-semantic-checks.md` sub-step 4d (Verification Roles)
+- **Inserted:** before `## Next Steps`
+- **Format:** see `references/verification-roles.md`
+- **Do NOT hand-edit** — orchestrator overwrites on re-run.
+
+### `## Validation Log`
+
+- **Written by:** `step-06-validation-interview.md` sub-step 6e and the Whole-Plan Consistency Sweep block from 6f
+- **Inserted:** appended at the end of the phase file (or before `## Next Steps` if you prefer; convention is end-of-file)
+- **Format:** see `references/validation-questions.md` and `references/whole-plan-sweep.md`
+- **Do NOT hand-edit** — sweep regenerates the trailing summary block on re-run.
+
 ## Anti-patterns
 
 - ❌ Writing `status: completed` at phase-file creation — defeats Gate 1, breaks cook re-hydration, corrupts orchviz visualization
@@ -175,3 +193,4 @@ These sections are NOT added in default mode (12-section template remains unchan
 - ❌ Writing `status: draft` or `status: done` — not in the parser union; will normalize to `unknown`. Use `pending` or `completed`.
 - ❌ Hand-editing the Overview `**Status:**` line directly — sync-back regenerates from frontmatter, your edit will be lost. Edit frontmatter instead.
 - ❌ Overwriting terminal states (`failed`, `abandoned`) — sync-back NEVER overwrites these; only a human edit moves them out. If a phase is genuinely unblocked, change the frontmatter directly.
+- ❌ Hand-editing `## Verification Log` or `## Validation Log` — both are machine-written. Edits will be overwritten on the next run.

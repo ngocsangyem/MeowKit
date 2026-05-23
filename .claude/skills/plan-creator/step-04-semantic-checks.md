@@ -79,11 +79,37 @@ Run 4a and 4b semantic checks on BOTH `plan-approach-a.md` and `plan-approach-b.
 
 **Important:** Step-05 red-team reviews ONLY the selected approach's phase files.
 
+### 4d. Verification Roles
+
+**Skip if:** `planning_mode = fast` OR `planning_mode = product-level` — verification has no concrete file-path claims to verify in those modes.
+
+**Skip if:** 4a or 4b failed — fix structural / semantic issues first.
+
+Algorithm: see `references/verification-roles.md` (tier selection, role responsibilities, dispatch brief, output format, aggregation).
+
+1. Count phase files: `glob phase-XX-*.md` in `{plan_dir}`.
+2. Select tier:
+   - 1–2 phases → Light (Fact Checker only)
+   - 3–4 phases → Standard (Fact Checker + Contract Verifier)
+   - 5+ phases → Full (Fact Checker + Flow Tracer + Scope Auditor + Contract Verifier)
+3. Set session variable `verification_tier ∈ {light, standard, full}` for step-06 consumption.
+4. For each role in the tier × each phase file, spawn one read-only Agent subagent (`subagent_type=Explore`) using the dispatch brief in `references/verification-roles.md`. Dispatch ALL roles in PARALLEL via a single message — never serial.
+5. Collect all subagent verdict lists. Drop any line that does not match the verdict grammar.
+6. Group verdicts by phase file. For each phase file:
+   - Read the existing phase file.
+   - Build the `## Verification Log` block with one sub-section per role + ISO timestamp.
+   - Apply ONE Edit per phase file inserting the block BEFORE the existing `## Next Steps` heading. Create the section if missing.
+7. Record verdict counts in session state: `{verified, failed, unverified}` aggregated across all phases. Step-06 reads this to prioritize interview questions from FAILED / UNVERIFIED entries.
+
+**Important — subagent file ownership.** Subagents are READ-ONLY. The orchestrator (planner agent) performs the single Edit per phase file. This avoids the parallel-write race that would violate file-ownership rules.
+
 ## Output
 
 - Semantic check results (pass/fail per row)
 - `PLAN_COMPLETE` from validation script
 - `selected_approach` set (two mode only)
+- `verification_tier` set (skipped in fast / product-level)
+- `## Verification Log` written to each phase file (skipped in fast / product-level)
 
 ## Next
 

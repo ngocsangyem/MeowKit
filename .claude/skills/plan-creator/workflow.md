@@ -22,6 +22,7 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 7. `step-06-validation-interview.md` — Validation interview (hard/deep/parallel/two only): 3-5 critical questions with detection keywords, section-mapped answer propagation
 8. `step-07-gate.md` — Self-check + Gate 1: AskUserQuestion (Approve | Modify | Reject)
 9. `step-08-hydrate-tasks.md` — Create Claude Tasks from phase checkboxes + critical-step sub-tasks + checkpoint file
+10. `step-09-post-plan-handoff.md` — Deterministic mode-pruned `AskUserQuestion`: Cook | Validate | Red-team | End. Writes `handoff.next` to plan.md frontmatter, prints suggested command, STOPs.
 
 ## Variables Passed Between Steps
 
@@ -38,6 +39,9 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 | `red_team_findings` | step-05 | step-06 | Summary string: "{N} findings, {M} accepted" |
 | `selected_approach` | step-04 | step-05, step-08 | `"a"` or `"b"` (two mode only; unset otherwise) |
 | `tdd_mode` | step-00 | step-03 | `true` or `false` (composable flag, independent of planning_mode) |
+| `handoff_next` | step-09 | (terminal) | `cook \| validate \| red-team \| harness \| end` (written to plan.md frontmatter) |
+| `consistency_sweeps_passed` | step-05, step-06 | step-07 | `{ red_team: bool, validation: bool }` — true if `unresolved = 0` |
+| `verification_tier` | step-04 | step-06 | `light`, `standard`, `full` — auto by phase count; unset when fast / product-level |
 
 ## Flow
 
@@ -77,6 +81,11 @@ Step 3: Draft Plan
 Step 4: Semantic Checks
     ├── 4a. Semantic checks (goal=outcome, ACs=binary, constraints non-empty)
     ├── 4b. Structural validation (validate-plan.py) — must output PLAN_COMPLETE
+    ├── 4c. Two-Approach Selection (planning_mode = two only)
+    ├── 4d. Verification Roles (skipped in fast / product-level)
+    │   ├── Tier: 1–2 = Light, 3–4 = Standard, 5+ = Full
+    │   ├── Roles parallel-dispatched as READ-ONLY Explore subagents
+    │   └── Orchestrator aggregates → one Edit per phase file → `## Verification Log`
     └── fast mode → skip to Step 7
          ↓
 Step 5: Red Team (hard/deep/parallel/two only — skipped in fast)
@@ -86,12 +95,20 @@ Step 5: Red Team (hard/deep/parallel/two only — skipped in fast)
     ├── Collect → deduplicate → sort by severity → cap at 15
     ├── Agent adjudicates each: Accept/Reject + rationale
     ├── Write red-team-findings.md (full detail)
-    └── AskUserQuestion: Apply all / Review each / Reject all
+    ├── AskUserQuestion: Apply all / Review each / Reject all
+    └── Gate W1: Whole-Plan Consistency Sweep (stage-then-apply)
+         ├── Pass 1 reads N+2 files, stages Pending Sweep Edits
+         ├── If unresolved > 0 → AskUserQuestion (defer/resolve/skip)
+         └── Pass 2 applies edits + writes sweep block + frontmatter
          ↓
 Step 6: Validation Interview (hard/deep/parallel/two only — skipped in fast)
     ├── Generate 3-5 critical questions using detection keywords framework
     ├── Informed by red-team findings (step-05)
-    └── Propagate answers to phase files via section mapping
+    ├── Propagate answers to phase files via section mapping
+    └── Gate W2: Whole-Plan Consistency Sweep (stage-then-apply)
+         ├── Pass 1 reads N+2 files, stages Pending Sweep Edits
+         ├── If unresolved > 0 → AskUserQuestion (resolve/accept-risk/cancel)
+         └── Pass 2 applies edits + writes Validation Log + frontmatter
          ↓
 Step 7: Gate 1
     ├── Self-check: Completed / Skipped / Uncertain
@@ -100,8 +117,16 @@ Step 7: Gate 1
 Step 8: Hydrate Tasks
     ├── TaskCreate per phase with addBlockedBy chain
     ├── Critical-step sub-tasks for [CRITICAL]/[HIGH] todo items
-    ├── Create .plan-state.json checkpoint
-    └── Output cook command with absolute path → STOP
+    └── Create .plan-state.json checkpoint
+         ↓
+Step 9: Post-Plan Handoff
+    ├── Live risk re-scan over plan + phase files (advisory if new flag)
+    ├── Build mode-pruned option set (cap 4)
+    ├── AskUserQuestion: Cook | Validate | Red-team | End (fast)
+    │   OR Cook | End (hard / deep / parallel / two)
+    │   OR Hand off to mk:harness | End (product-level)
+    ├── Write handoff.next + decided_at to plan.md frontmatter
+    └── Print suggested command + Context Reminder → STOP
 ```
 
 ## Mode Notes

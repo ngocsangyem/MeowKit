@@ -72,7 +72,7 @@ Write `{plan_dir}/.plan-state.json` for cross-session resilience:
 
 ```json
 {
-  "version": "1.1",
+  "version": "1.2",
   "created": "{YYYYMMDD-HHMM}",
   "planning_mode": "{fast|hard|deep|parallel|two|product-level}",
   "scope_mode": "{EXPANSION|HOLD|REDUCTION}",
@@ -85,9 +85,13 @@ Write `{plan_dir}/.plan-state.json` for cross-session resilience:
     "A": ["phase-02-name", "phase-03-name"],
     "B": ["phase-04-name"]
   },
-  "selected_approach": "a"
+  "selected_approach": "a",
+  "verification_tier": "standard",
+  "consistency_sweeps_passed": { "red_team": true, "validation": true }
 }
 ```
+
+**v1.2 schema notes (additive, reader-compatible).** Fields `verification_tier` and `consistency_sweeps_passed` are NEW in v1.2. v1.1 readers ignore them. v1.2 readers MUST treat them as optional and default to `null` / `{}` when missing — so legacy v1.1 plan-state files still load. The schema is additive only; no existing field is renamed or removed.
 
 `tasks_total` = count of `- [ ]` checkboxes in the phase file.
 `status` value above is resolved via the cascade in `### Status Read Order`.
@@ -98,23 +102,9 @@ Fields `parallel_groups` and `selected_approach` are **optional** — omit when 
 
 Consumers reading `.plan-state.json` MUST handle unknown/missing fields gracefully (access only known keys).
 
-### 8e. Output Cook Command
+### 8e. CEO Review Suggestion
 
-Print the Context Reminder block (from `references/gate-1-approval.md`) with:
-- Absolute path to plan.md
-- Mode-matched cook flag
-
-**STOP after this step. Do not auto-proceed to implementation.**
-
-## Output
-
-- `{N}` tasks created with dependency chain
-- `.plan-state.json` checkpoint created
-- Cook command printed with absolute path
-
-## CEO Review Suggestion
-
-After printing the cook command, check `planning_mode` from `.plan-state.json`:
+Check `planning_mode` from `.plan-state.json`:
 
 ```
 If planning_mode in [hard, deep, parallel, two, product-level]:
@@ -123,6 +113,13 @@ Else:
   Print: "📋 Optional: /mk:plan-ceo-review {plan-path} — strategic review."
 ```
 
+The Context Reminder block and the cook-command print are now emitted by `step-09-post-plan-handoff.md` AFTER the user selects a next-step. Do NOT print them here.
+
+## Output
+
+- `{N}` tasks created with dependency chain
+- `.plan-state.json` checkpoint created
+
 ## Next
 
-STOP. User runs `/mk:cook {path}` to begin implementation, or `/mk:plan-ceo-review {path}` for strategic review first.
+Read and follow `step-09-post-plan-handoff.md`.
