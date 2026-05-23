@@ -91,7 +91,7 @@ The Context Reminder block and the cook-command print are now emitted by `step-0
 Run the three checks defined in `references/task-management.md` "Post-Hydration Integrity Checks":
 
 1. Cycle check — walk `addBlockedBy` chains; assert no node reaches itself
-2. Count-match check — sum of unchecked `[ ]` across all `phase-XX-*.md` files MUST equal Claude Tasks created (phase tasks + critical-step sub-tasks)
+2. Count-match check — sum of unchecked `[ ]` across all `phase-XX-*.md` files MUST equal session tasks created (phase tasks + critical-step sub-tasks)
 3. Metadata-completeness check — every `TaskCreate` call carries all 5 required fields (`phase`, `priority`, `effort`, `planDir`, `phaseFile`)
 
 **All-pass** → continue to Output and emit the success-log line.

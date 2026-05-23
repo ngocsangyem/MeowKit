@@ -1,8 +1,10 @@
 # Task Management & Hydration
 
 ## Plan → Task Bridge
-Plans are persistent files. Claude Tasks are session-scoped.
-Hydration bridges the gap: create tasks from plan checkboxes.
+
+Plans are persistent files; session tasks are scoped to the current session — they vanish when the session ends. Hydration bridges the two: read each `[ ]` from phase files, emit one `TaskCreate` per unchecked item. Sync-back closes the loop on completion: `[ ]` → `[x]` and frontmatter status update.
+
+**Tool availability:** `TaskCreate` / `TaskUpdate` / `TaskGet` / `TaskList` are CLI-only — they may be unavailable in non-TTY agentic host environments (e.g., GUI editor extensions). If these tools error, fall back to `TodoWrite`. Plan files remain the source of truth; hydration is an optimization, not a requirement.
 
 ## Hydration Rules
 - Create TaskCreate per phase with `addBlockedBy` chain
@@ -42,14 +44,12 @@ Only marked items become sub-tasks. Most todos stay at phase level.
 
 **Two-Approach Filter** (active only when `planning_mode = two`): hydrate tasks ONLY from the selected approach's phase files (`selected_approach = "a"` or `"b"`). Do NOT create tasks for the archived (non-selected) approach.
 
-**VSCode Fallback** — when `TaskCreate` is unavailable (e.g., the VSCode Claude extension does not expose CLI task tools), fall back to `TodoWrite` for session-scoped tracking. Plan files remain the source of truth — re-hydration on a fresh CLI session restores the full task chain.
-
 ## Post-Hydration Integrity Checks
 
 After hydration completes, run three checks. Any failure is a hard STOP — do NOT auto-recover, do NOT silently continue.
 
 1. **Cycle check** — walk every task's `addBlockedBy` chain; assert no node reaches itself. Cycles indicate malformed dependency declarations (e.g., Phase X declares Y as a dep AND Phase Y declares X).
-2. **Count-match check** — sum of unchecked `[ ]` items across all `phase-XX-*.md` files MUST equal the number of Claude Tasks created (phase tasks + critical-step sub-tasks). Drift indicates a phase file changed between scaffolding and hydration, or a `[CRITICAL]` token was added without a sub-task.
+2. **Count-match check** — sum of unchecked `[ ]` items across all `phase-XX-*.md` files MUST equal the number of session tasks created (phase tasks + critical-step sub-tasks). Drift indicates a phase file changed between scaffolding and hydration, or a `[CRITICAL]` token was added without a sub-task.
 3. **Metadata-completeness check** — every `TaskCreate` call has all 5 required fields (`phase`, `priority`, `effort`, `planDir`, `phaseFile`). Missing fields break cross-session resume.
 
 **Success log (on all-pass):**
@@ -75,7 +75,7 @@ New session → read plan.md → check `[ ]` items → re-hydrate unchecked item
 Already `[x]` items → skip.
 
 ## Sync-Back (on completion)
-1. Mark Claude Tasks complete via TaskUpdate
+1. Mark session tasks complete via `TaskUpdate`
 2. Update phase files: `[ ]` → `[x]` for completed items
 3. Update plan.md status table
 4. Project-manager agent sweeps all phase files
