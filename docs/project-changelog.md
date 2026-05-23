@@ -2,6 +2,33 @@
 
 Significant features, fixes, security updates, and breaking changes shipped on top of MeowKit.
 
+## 2026-05-23 — Plan-creator deep/TDD redesign
+
+**Scope:** `.claude/skills/plan-creator/` + `.claude/skills/cook/` + `tests/fixtures/plan-creator/` + `website/reference/skills/plan-creator.md` + `website/core-concepts/plan-creator-modes-and-flags.md`. Implements `plans/260523-2324-plan-creator-deep-tdd-redesign/plan.md`.
+
+**Summary**
+
+- **Bounded deep mode** — added `references/deep-mode.md` and rewired plan-creator steps so `--deep` creates a compact scope map plus per-phase Deep Phase Map (file inventory, test gap matrix, interface checklist, dependency map). It no longer implies uncontrolled repository-wide scouting or architecture decision-making.
+- **Regression-first TDD mode** — added `references/tdd-mode.md`, optional `tdd: true` / `regression_gate` metadata, RED-phase task hydration from `## Tests Before`, and renamed refactor guidance to `## Protected Change` to clarify behavior preservation.
+- **Scout / brainstorm / plan boundaries** — step 00 now routes unknown files through `mk:scout`, undecided architecture through `mk:brainstorming`, and allows `--deep` to replace explicit scouting only when feature area and approach are already concrete.
+- **Cook handoff safety** — plan-creator step 09 now prints `/mk:cook ... --tdd` for TDD plans. Cook warns when a plan contains TDD markers but execution lacks `--tdd` / `MEOWKIT_TDD`.
+- **Fixtures and public docs** — added `deep-plan`, `tdd-plan`, and `deep-tdd-plan` validator fixtures and updated the website reference page to describe the new contracts.
+- **Core Concepts guidance** — added a runtime-neutral VitePress concept page for plan-creator modes and flags, organized around workflow risk, planning cost, context isolation, lifecycle boundaries, examples, and anti-patterns.
+
+**Migration**
+
+No command changes required for non-deep / non-TDD plans. Existing `--deep` users should expect more compact phase-scoped maps instead of broad analysis prose. Existing `--tdd` users should use the generated `/mk:cook ... --tdd` handoff command so cook enforces RED-first behavior.
+
+**Verification**
+
+- `bash tests/fixtures/plan-creator/validate-fixtures.sh` → 8/8 fixtures pass, including deep-only, TDD-only, and deep+TDD.
+- `.claude/skills/.venv/bin/python3 .claude/skills/plan-creator/scripts/validate-plan.py plans/260523-2324-plan-creator-deep-tdd-redesign/plan.md` → `PLAN_COMPLETE`.
+- `bash .claude/skills/cook/scripts/test-scripts.sh` → 10/10 pass.
+- `npm run typecheck` → pass.
+- `npm run lint` → pass.
+- `./node_modules/.bin/vitepress build --outDir /private/tmp/meowkit-vitepress-build` from `website/` → pass; pre-existing llms plugin warnings remain for `/reference/agents-index` and `/reference/skills-index`.
+- `npm test` → fails on pre-existing unrelated suites: React invalid-hook-call failures in orchviz UI tests plus `.claude/skills/worktree/scripts/worktree.test.cjs` reported as "No test suite found". No failure is in the plan-creator/cook markdown or fixture paths changed here.
+
 ## 2026-05-23 — Cook skill workflow & context-engineering upgrade
 
 **Scope:** `.claude/skills/cook/` + `.claude/skills/plan-creator/SKILL.md` + `.claude/skills/review/SKILL.md` + `.claude/skills/review/step-04-verdict.md` + `.claude/skills/brainstorming/references/anti-rationalization.md` + new `.claude/rules/anti-rationalization.md`. 7-phase upgrade per `plans/260523-1428-meowkit-cook-workflow-context-engineering-upgrade/plan.md`.

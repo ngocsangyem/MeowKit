@@ -108,6 +108,21 @@ After scope assessment, scan the task description for structural signals:
 
 User selection overrides auto-detection. Only present if a signal is clearly detected — do not prompt on every hard-mode plan.
 
+### 0g.5 Scout / Brainstorm / Plan Routing
+
+**Skip if:** input is an existing `plan.md` or `phase-*.md` path — the plan already encodes scout output and decisions.
+
+Before committing to plan creation, classify the request:
+
+| Condition | Route |
+|---|---|
+| Relevant files/tests/contracts are unknown and no feature area is named | Run `mk:scout` first, then resume planning |
+| Architecture/tradeoff is undecided, or two credible approaches exist | Route to `mk:brainstorming` before planning |
+| Touchpoints and approach are concrete enough to answer the 5-dimension contract | Continue planning directly |
+| Both approach and touchpoints are unclear | Refuse to draft implementation phases; ask for scout/brainstorm first |
+
+`--deep` may replace a separate scout only when the task names the feature area and approach clearly enough. It must not be used as a substitute for brainstorming.
+
 ### 0h. Product-Level Intent Detection
 
 **Skip if:** user already passed `--fast`, `--parallel`, `--two`, or `--hard` explicitly,

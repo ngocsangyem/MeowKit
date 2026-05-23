@@ -29,7 +29,7 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 **Agent:** planner
 **Deliverable:** `tasks/plans/YYMMDD-name/plan.md`
 
-- `mk:plan-creator` — full plan creation (9-step workflow). Modes: `--fast`, `--hard`, `--deep`, `--parallel`, `--two`, `--product-level`
+- `mk:plan-creator` — full plan creation (9-step workflow). Modes: `--fast`, `--hard`, `--deep`, `--parallel`, `--two`, `--product-level`, `--spike --timebox <duration>`. See [Plan Creator Modes and Flags](/core-concepts/plan-creator-modes-and-flags).
 - `mk:plan-ceo-review` — product lens + engineering lens
 - `mk:validate-plan` — 8-dimension quality check for COMPLEX tasks
 - For COMPLEX tasks (5+ files): bead decomposition — atomic, independently committable work units
@@ -42,7 +42,7 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 **Agent:** tester
 **Deliverable:** Tests (failing in TDD mode; optional otherwise)
 
-- **TDD mode** (`--tdd` / `MEOWKIT_TDD=1`): failing tests first. `pre-implement.sh` blocks if no failing test exists.
+- **TDD mode** (`--tdd` / `MEOWKIT_TDD=1`): failing tests first. `pre-implement.sh` blocks if no failing test exists. `--tdd` is a flag, not a planning mode; it composes with the selected plan-creator mode.
 - **Default mode:** Phase 2 is optional. Tester invoked on-request.
 - `mk:nyquist` verifies test-to-requirement coverage at end of phase.
 - Security pre-check always runs.

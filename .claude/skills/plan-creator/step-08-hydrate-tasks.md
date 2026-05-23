@@ -22,6 +22,8 @@ Chain phases with `addBlockedBy`:
 
 **Critical-step tasks:** scan each phase's `## Todo List` for `[CRITICAL]`/`[HIGH]` items and create one sub-task per match (only marked items become sub-tasks). For the sub-task pattern and metadata shape, see `references/task-management.md` "Hydration Pattern Details > Critical-Step Sub-Tasks".
 
+**TDD RED tasks:** when `tdd_mode = true`, scan each phase's `## Tests Before` section for unchecked checkboxes and create critical sub-tasks with metadata `{ step: true, critical: true, riskLevel: "red", phaseFile: "..." }`. Attach each to the owning phase task. Do not create a separate task hierarchy.
+
 **Parallel Group Hydration** (active only when `planning_mode = parallel`): read `## Execution Strategy` from plan.md to determine groups. For the within-group / cross-group `addBlockedBy` rules and metadata, see `references/task-management.md` "Hydration Pattern Details > Parallel-Group Rules".
 
 **Two-Approach Hydration** (active only when `planning_mode = two`): hydrate tasks ONLY from the selected approach's phase files using the `selected_approach` variable (`"a"` or `"b"`). For the selective-hydration filter, see `references/task-management.md` "Hydration Pattern Details > Two-Approach Filter".

@@ -7,6 +7,9 @@
 #   partial-v1-6/            → PLAN_COMPLETE (mix of new and legacy)
 #   interrupted-sweep-v1-6/  → PLAN_COMPLETE (Validation Log written, frontmatter not — backward compat: missing frontmatter still validates)
 #   handoff-invalid-enum/    → PLAN_INCOMPLETE (handoff.next is not in enum)
+#   deep-plan/               → PLAN_COMPLETE (deep phase map sections)
+#   tdd-plan/                → PLAN_COMPLETE (TDD sections + metadata)
+#   deep-tdd-plan/           → PLAN_COMPLETE (deep + TDD combined)
 #
 # Bash 3.2 compatible (macOS default).
 #
@@ -33,12 +36,15 @@ if [ ! -f "${VALIDATOR}" ]; then
   exit 2
 fi
 
-FIXTURES="legacy-v1-5 modernized-v1-6 partial-v1-6 interrupted-sweep-v1-6 handoff-invalid-enum"
+FIXTURES="legacy-v1-5 modernized-v1-6 partial-v1-6 interrupted-sweep-v1-6 handoff-invalid-enum deep-plan tdd-plan deep-tdd-plan"
 EXPECTED_legacy_v1_5="PLAN_COMPLETE"
 EXPECTED_modernized_v1_6="PLAN_COMPLETE"
 EXPECTED_partial_v1_6="PLAN_COMPLETE"
 EXPECTED_interrupted_sweep_v1_6="PLAN_COMPLETE"
 EXPECTED_handoff_invalid_enum="PLAN_INCOMPLETE"
+EXPECTED_deep_plan="PLAN_COMPLETE"
+EXPECTED_tdd_plan="PLAN_COMPLETE"
+EXPECTED_deep_tdd_plan="PLAN_COMPLETE"
 
 pass_count=0
 fail_count=0

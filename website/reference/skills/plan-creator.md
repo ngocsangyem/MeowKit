@@ -22,6 +22,7 @@ The planning engine. Creates a complete implementation plan before any code is w
 - **Step-file loading:** 10 sequential step files loaded one at a time, each producing checkpointed output
 - **Research spawning:** up to 2 researcher agents with max 5 calls and ≤150 lines of context each
 - **Codebase analysis:** scout + project docs + existing plan scan for cross-plan dependency detection
+- **Bounded deep mode:** adds a compact scope map and per-phase Deep Phase Map (file inventory, test gaps, interfaces, dependencies) without repo-wide scans
 - **Two-approach mode:** for COMPLEX tasks, produces two alternative approaches with trade-off analysis
 - **Semantic checks:** validates plan against 6 dimensions (goal clarity, AC completeness, constraint realism, risk coverage, line count, product-level specifics)
 - **Red-teaming:** 4 adversarial personas selected by phase count, subagent-dispatched with anti-sycophancy IGNORE instruction
@@ -52,8 +53,8 @@ Skip when input is an existing plan path (`plan.md` / `phase-*.md`) — the plan
 | `--refactor` | Refactoring plan |
 | `--security` | Security-focused plan |
 | `--product-level` | Product-level spec with design language, LIGHT scout with allowlist/blocklist |
-| `--deep` | Deep mode — per-phase scouting, full analysis |
-| `--tdd` | TDD mode — adds 4 TDD-specific phase sections |
+| `--deep` | Deep mode — bounded scope map + per-phase Deep Phase Map |
+| `--tdd` | TDD mode — adds regression-first phase sections and preserves `--tdd` in cook handoff |
 | `--parallel` | Parallel agent mode with ownership matrix |
 | `--two-approach` | Two-alternative design with trade-off comparison |
 | `--no-design` | Skip design language subagent (product-level only) |
@@ -81,8 +82,8 @@ If the plan frontmatter has non-empty `jira_tickets:`, `mk:plan-creator` runs th
 |------|------|-----------|
 | 00 | Scope challenge | Planning mode, workflow model, scope mode, complexity tier |
 | 01 | Research | Researcher reports with source citations |
-| 02 | Codebase analysis | Scout findings, existing plan scan, cross-plan dependencies |
-| 03 | Draft (feature) / 03a (product-level) | plan.md with 12-section phase template + YAML frontmatter |
+| 02 | Codebase analysis | Scout findings, existing plan scan, cross-plan dependencies; deep mode emits compact scope map |
+| 03 | Draft (feature) / 03a (product-level) | plan.md with 12-section phase template + YAML frontmatter; optional Deep Phase Map / TDD sections |
 | 04 | Semantic checks | Validation report, two-approach selection (if applicable), Verification Roles dispatch (sub-step 4d — Light/Standard/Full tier by phase count) writes `## Verification Log` per phase file |
 | 05 | Red-team | 4-persona adversarial analysis, red-team-findings.md (7-field findings); Gate W1 Whole-Plan Consistency Sweep at exit |
 | 06 | Validation interview | 5-category questions with propagated answers; Gate W2 Whole-Plan Consistency Sweep at exit |
@@ -102,6 +103,7 @@ If the plan frontmatter has non-empty `jira_tickets:`, `mk:plan-creator` runs th
 /mk:plan --bugfix "fix race condition in payment processing"
 /mk:plan --deep --two-approach "migrate from REST to GraphQL"
 /mk:plan --tdd "implement rate limiting middleware"
+/mk:plan --deep --tdd "refactor search indexing without changing ranking"
 ```
 
 ## Example Prompt
@@ -125,6 +127,8 @@ Plan the implementation of real-time collaborative editing for our document edit
 - **Step-05 and 06 are skipped in fast mode.** If you need adversarial review, don't use fast mode.
 - **Plan state persists.** `.plan-state.json` enables resumption if context is lost mid-planning.
 - **CEO review after Gate 1.** Consider running `mk:plan-ceo-review` on the approved plan for an additional quality layer.
+- **Deep maps known scope; it does not choose architecture.** If the approach is undecided, run `mk:brainstorming` before planning.
+- **TDD survives handoff.** Plans generated with `--tdd` print `/mk:cook ... --tdd`; cook warns if a TDD plan is run without the flag.
 - **Variables flow between steps.** 10 variables (planning_mode, task_complexity, workflow_model, scope_mode, research_reports, codebase_findings, plan_dir, red_team_findings, selected_approach, tdd_mode) pass between step files.
 
 > **Canonical source:** `.claude/skills/plan-creator/SKILL.md`

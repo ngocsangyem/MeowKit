@@ -2,6 +2,24 @@
 
 Phase status and milestones for MeowKit. Updated as work lands.
 
+## 2026-05-23 — Plan-creator deep/TDD redesign (COMPLETE)
+
+6-phase redesign implementing `plans/260523-2324-plan-creator-deep-tdd-redesign/plan.md`.
+
+### Updated Plan-Creator Contracts
+
+1. **`--deep` is bounded planning depth** — compact scope map plus per-phase Deep Phase Map. It maps selected implementation scope; it does not perform uncontrolled repo-wide scouting or choose architecture.
+2. **`--tdd` is a composable regression flag** — optional phase metadata, RED-first `## Tests Before`, protected-change guidance, exact regression gate command, and explicit `/mk:cook ... --tdd` handoff.
+3. **Scout / brainstorm / plan boundaries are explicit** — unknown files route to `mk:scout`; unresolved architecture routes to `mk:brainstorming`; `--deep` may replace explicit scouting only when approach and feature area are already concrete.
+4. **Cook warns on dropped TDD state** — TDD markers in plan files trigger a warning when cook is run without `--tdd` / `MEOWKIT_TDD`.
+
+### Rollout State
+
+- Skill reference contracts: complete.
+- Step workflow edits: complete.
+- Fixture coverage: deep-only, TDD-only, and deep+TDD fixtures added.
+- Validation: targeted fixtures, plan validator, cook scripts, typecheck, and lint pass. Full `npm test` still has unrelated orchviz React hook failures and a worktree `.cjs` no-suite failure.
+
 ## 2026-05-23 — Cook skill workflow upgrade (COMPLETE)
 
 7-phase upgrade landed. See `docs/project-changelog.md` for the per-phase summary and `plans/260523-1428-meowkit-cook-workflow-context-engineering-upgrade/plan.md` for the full plan.

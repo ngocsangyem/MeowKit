@@ -14,8 +14,8 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 
 1. `step-00-scope-challenge.md` — Assess complexity, select mode (fast|hard|deep|parallel|two|product-level), user scope input (EXPANSION/HOLD/REDUCTION), early-exit trivial tasks
 2. `step-01-research.md` — Spawn researchers (hard/deep/parallel/two only). Bounded: 2-3 researchers, max 5 calls each. REDUCTION = 1 researcher.
-3. `step-02-codebase-analysis.md` — Scout + project docs reading (hard/deep/parallel/two only; deep: 2-3 parallel scouts)
-4. `step-03-draft-plan.md` — Write plan.md overview + phase-XX files. Integrate research findings. Deep: per-phase scouting. TDD: inject 4 TDD sections.
+3. `step-02-codebase-analysis.md` — Scout + project docs reading (hard/deep/parallel/two only; deep: bounded scope map per `references/deep-mode.md`)
+4. `step-03-draft-plan.md` — Write plan.md overview + phase-XX files. Integrate research findings. Deep: phase map. TDD: inject regression-first sections.
    - **Branch:** if `planning_mode = product-level`, use `step-03a-product-spec.md` instead (writes plan.md only — user stories, features, design language; NO phase files).
 5. `step-04-semantic-checks.md` — Semantic checks + structural validation (validate-plan.py). Fast mode: skip validation, go to step-07.
 6. `step-05-red-team.md` — Plan red team (hard/deep/parallel/two only): 4-persona scaling, red-team-findings.md, subagent dispatch, adjudication
@@ -65,15 +65,15 @@ Step 1: Research (hard/deep/parallel/two only)
          ↓
 Step 2: Codebase Analysis (hard/deep/parallel/two only)
     ├── hard: mk:scout on 2-3 relevant dirs
-    ├── deep: mk:scout on 3-5 dirs, 2-3 parallel scouts
+    ├── deep: mk:scout on max 5 roots → compact scope map, tests, contracts, uncertainty
     └── Read project-context.md + docs/
          ↓
 Step 3: Draft Plan
     ├── Read research reports (file paths from Step 1)
     ├── Write plan.md (overview, ≤80 lines, richer frontmatter)
     ├── Write phase-XX files (12-section template, hard/deep mode)
-    ├── If tdd_mode=true: inject 4 TDD sections per phase file
-    ├── If deep mode: per-phase scout → inject File Inventory + Dependency Map
+    ├── If tdd_mode=true: inject Tests Before + Protected Change + Tests After + Regression Gate
+    ├── If deep mode: phase scout → inject Deep Phase Map appendix
     ├── Cross-plan dependency scan (blockedBy/blocks)
     ├── Verify research links in phase Context Links
     └── product-level mode → use step-03a (spec only, NO phase files)
@@ -131,7 +131,7 @@ Step 9: Post-Plan Handoff
 
 ## Mode Notes
 
-- `--deep` requires `--hard` internally (full research pipeline + per-phase scouting after step-03).
+- `--deep` requires `--hard` internally (full research pipeline + bounded phase scouting after step-03). It does not choose an architecture; if the approach is unclear, route to `mk:brainstorming` before planning.
 - `--parallel` and `--two` both require `--hard` internally (full research pipeline runs).
 - `--parallel`: step-03 adds ownership matrix; step-08 uses parallel group hydration.
 - `--two`: step-03 produces 2 approach files (no plan.md yet); step-04 asks user to select before step-05.

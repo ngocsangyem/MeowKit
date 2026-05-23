@@ -5,6 +5,7 @@ Deterministic handoff after task hydration. Presents mode-pruned options via `As
 ## Inputs
 
 - `planning_mode` (from step-00)
+- `tdd_mode` (from step-00)
 - `matched_flags` (from `mk:agent-detector` Phase 0; may be unset when plan-creator invoked directly)
 - `plan_dir` (from step-03)
 
@@ -88,12 +89,17 @@ Print exactly one line matching the selection:
 | Selection | Output line |
 |---|---|
 | Cook | `Run: /mk:cook {absolute-path-to-plan.md}` |
+| Cook with TDD | `Run: /mk:cook {absolute-path-to-plan.md} --tdd` |
 | Cook (parallel mode) | `Run: /mk:cook --parallel {absolute-path-to-plan.md}` |
+| Cook (parallel + TDD) | `Run: /mk:cook --parallel {absolute-path-to-plan.md} --tdd` |
 | Cook (fast mode) | `Run: /mk:cook --auto {absolute-path-to-plan.md}` |
+| Cook (fast + TDD) | `Run: /mk:cook --auto {absolute-path-to-plan.md} --tdd` |
 | Validate | `Run: /mk:plan validate {absolute-path-to-plan.md}` |
 | Red-team | `Run: /mk:plan red-team {absolute-path-to-plan.md}` |
 | Hand off to mk:harness | `Run: /mk:harness {absolute-path-to-plan.md}` |
 | End | (no command line — print "Plan complete. No next command queued.") |
+
+If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.claude/session-state/tdd-mode` surviving a fresh session.
 
 After the command line, print the Context Reminder block from `references/gate-1-approval.md` with the absolute path substituted.
 

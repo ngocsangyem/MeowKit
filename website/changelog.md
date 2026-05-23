@@ -14,6 +14,28 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.11 (2026-05-24) — Plan-creator mode clarity
+
+### Highlights
+
+Plan creation now has clearer mode and flag boundaries. `--deep` is documented and wired as bounded phase-scoped planning, while `--tdd` remains an independent opt-in flag for regression-first execution handoff.
+
+### Improvements
+
+- `mk:plan-creator --deep` now documents bounded scope maps and per-phase Deep Phase Maps instead of implying unrestricted repository scanning.
+- `mk:plan-creator --tdd` now documents `tdd: true`, `regression_gate`, `Tests Before`, `Protected Change`, `Tests After`, and `Regression Gate` as the regression-first phase contract.
+- TDD handoff now keeps strict execution explicit by printing cook commands with `--tdd` when the plan was created with TDD enabled.
+- Cook now warns when a plan contains TDD markers but execution starts without `--tdd` or `MEOWKIT_TDD=1`.
+- Scout, brainstorming, and planning boundaries are clearer: scout finds context, brainstorming chooses an approach, and plan-creator turns a concrete approach into executable phases.
+- New Core Concepts page "Plan Creator Modes and Flags" explains planning cost, context impact, mode selection, composable flags, lifecycle boundaries, examples, migration notes, and anti-patterns.
+- Plan-creator reference docs now describe `--deep` and `--tdd` using the same bounded, runtime-neutral terms as the skill implementation.
+
+### Migration Notes
+
+- Use `npx mewkit upgrade` to pick up the updated skill contracts and docs.
+- Keep using `/mk:plan --deep --tdd` only when both risks apply: broad scope and existing behavior that must be preserved.
+- If a TDD plan prints a cook command with `--tdd`, run that exact command so RED-first execution is enforced.
+
 ## 2.9.10 (2026-05-23) — Skill portability + cook context-engineering + provider diagnostics
 
 ### Highlights

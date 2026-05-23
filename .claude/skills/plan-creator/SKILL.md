@@ -1,6 +1,6 @@
 ---
 name: mk:plan-creator
-version: 1.6.1
+version: 1.6.2
 preamble-tier: 3
 description: >-
   Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks
@@ -60,7 +60,7 @@ Skip when:
 | (default)         | Auto-detect from scope   | Follows mode            | Follows mode                                                                                  | Follows mode                                                                 |
 | `--fast`          | Fast                     | Skip                    | plan.md only                                                                                  | Semantic checks only                                                         |
 | `--hard`          | Hard                     | 2 researchers           | plan.md + phases                                                                              | Full interview                                                               |
-| `--deep`          | Deep                     | 2-3 researchers         | plan.md + phases + per-phase file inventory & dependency maps                                 | Full interview                                                               |
+| `--deep`          | Deep                     | 2-3 researchers         | plan.md + phases + bounded phase map: file inventory, test gaps, interfaces, dependencies     | Full interview                                                               |
 | `--parallel`      | Parallel                 | 2 researchers           | plan.md + phases + ownership matrix                                                           | Full interview                                                               |
 | `--two`           | Two approaches           | 2 researchers           | 2 approach files + trade-off matrix                                                           | After selection                                                              |
 | `--product-level` | Product spec             | 2 researchers (broader) | plan.md only (user stories + features + design language; NO phase files)                      | Semantic + check-product-spec.sh (no red-team, no validation interview — v1) |
@@ -72,6 +72,10 @@ Skip when:
 - Sets plan frontmatter `spike: true`, `timebox:`, and `findings_doc:` (default `tasks/plans/{slug}/findings.md`)
 - INCOMPATIBLE with `--product-level` and `mk:harness` FULL density (harness gate breaks). Reject combination "spike incompatible with harness FULL — use --fast or mk:cook"
 - Advisory cap: warn if `story_points > 5` — likely two spikes, or spike + story
+
+**Composable flags:**
+
+- `--tdd` — add tests-first phase sections and preserve strict TDD in the cook handoff. See `references/tdd-mode.md`.
 
 ## Requirements Capture Contract
 
@@ -99,8 +103,8 @@ Fast mode (`--fast`) uses `workflow-fast.md` (steps 00→03→04→07→08).
 ```
 Step 0: Scope Challenge → trivial (exit) | simple (fast) | complex (hard/deep)
 Step 1: Research (hard/deep/parallel/two only) → 2-3 researchers, max 5 calls each
-Step 2: Codebase Analysis (hard/deep/parallel/two only) → scout + docs (deep: 2-3 parallel scouts)
-Step 3: Draft Plan → plan.md (≤80 lines) + phase-XX files (12-section template; deep: + per-phase file inventory & dependency maps)
+Step 2: Codebase Analysis (hard/deep/parallel/two only) → scout + docs (deep: bounded scope map)
+Step 3: Draft Plan → plan.md (≤80 lines) + phase-XX files (12-section template; deep: + phase map; tdd: + regression sections)
 Step 4: Semantic Checks → goal/ACs/constraints + structural validation
 Step 5: Red Team (hard/deep/parallel/two only) → 4-persona scaling, red-team-findings.md, adjudication
 Step 6: Validation Interview (hard/deep/parallel/two only) → 3-5 critical questions with detection keywords, propagate answers
@@ -132,6 +136,8 @@ tasks/plans/YYMMDD-name/
 - **Research disconnected**: findings archived but not cited in plan → Step 3 MUST integrate research into Key Insights
 - **Over-planning trivial tasks**: 2-file config change gets full research → Step 0 scope gate exits early
 - **Skipping scout on unfamiliar codebases**: → always run mk:scout if codebase is new
+- **Using `--deep` to decide architecture**: deep maps a chosen approach; if the approach is unclear, route to `mk:brainstorming` first.
+- **Dropping TDD at handoff**: when `tdd_mode=true`, step-09 MUST print cook with `--tdd`; sentinel/env state alone is not a cross-session contract.
 - **Post-Plan Handoff is deterministic**: step-09 fires `AskUserQuestion`; do NOT auto-invoke the chosen command. User must type it in a fresh session for clean context.
 - **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, harness, end}` fail `validate-plan.py`.
 - **Whole-Plan Consistency Gates W1 / W2 fire after red-team and validation interview**: stage-then-apply algorithm — no edits land until the user resolves any unresolved contradictions. See `references/whole-plan-sweep.md`.
@@ -155,6 +161,8 @@ tasks/plans/YYMMDD-name/
 | `step-07-gate.md`                                  | Self-check and Gate 1 AskUserQuestion presentation                                                                                                                                                                   |
 | `step-09-post-plan-handoff.md`                     | Deterministic post-Gate-1 handoff: mode-pruned `AskUserQuestion` (cook \| validate \| red-team \| harness \| end), live risk re-scan, writes `handoff.next` to plan.md frontmatter, prints command + STOPs.        |
 | `references/whole-plan-sweep.md`                   | Whole-Plan Consistency Sweep algorithm (Gates W1 + W2). Stage-then-apply: read-only Pass 1 stages Pending Sweep Edits; decision check blocks on unresolved contradictions; write Pass 2 applies edits and logs.   |
+| `references/deep-mode.md`                          | Deep mode contract: when to use/avoid, scout budgets, phase-map appendix, context rules.                                                                                                                             |
+| `references/tdd-mode.md`                           | TDD flag contract: phase sections, optional frontmatter, cook handoff propagation, RED-task hydration.                                                                                                                |
 | `references/verification-roles.md`                 | Verification Roles for step-04 sub-step 4d (Fact Checker / Flow Tracer / Scope Auditor / Contract Verifier) with tier selection by phase count. Subagents are READ-ONLY; orchestrator writes the `## Verification Log`. |
 | `prompts/personas/plan-assumption-destroyer.md`    | Plan-specific assumption skeptic persona                                                                                                                                                                             |
 | `prompts/personas/plan-scope-complexity-critic.md` | Plan-specific YAGNI/scope minimalist persona                                                                                                                                                                         |

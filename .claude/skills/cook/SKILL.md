@@ -42,6 +42,12 @@ This sentinel file is read by `pre-implement.sh`, `tdd-detect.sh`, and downstrea
 
 `MEOWKIT_TDD=1` env var (set in CI / shell rc) is the highest-precedence opt-in and overrides the sentinel.
 
+When loading an existing plan, scan `plan.md` and phase files for `tdd: true`, `## Tests Before`, or `## Regression Gate`. If any are present but this invocation lacks `--tdd` and `MEOWKIT_TDD` is not enabled, warn:
+
+```
+Plan contains TDD sections but cook is not in TDD mode. Re-run with --tdd to enforce RED-first execution, or continue in default mode with TDD guidance only.
+```
+
 **HARD GATE**
 
 Do NOT write implementation code until a plan exists and Gate 1 is approved.

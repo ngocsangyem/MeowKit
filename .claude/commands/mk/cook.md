@@ -26,6 +26,12 @@ This sentinel persists for the session. Hooks (`pre-implement.sh`), the helper (
 
 `MEOWKIT_TDD=1` env var (set in CI / shell rc) is the highest-precedence opt-in and overrides the sentinel.
 
+When a plan path is provided, scan the plan directory for `tdd: true`, `## Tests Before`, or `## Regression Gate`. If found and neither `--tdd` nor `MEOWKIT_TDD=1` is active, print:
+
+```
+Plan contains TDD sections but cook is not in TDD mode. Re-run with --tdd to enforce RED-first execution, or continue in default mode with TDD guidance only.
+```
+
 ## Behavior
 
 Runs the toolkit's 7-phase workflow from planning through shipping. The user intervenes at Gate 1 (plan approval) and Gate 2 (review approval). All other phases proceed automatically.

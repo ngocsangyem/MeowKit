@@ -16,6 +16,7 @@ Every phase file MUST start with a YAML frontmatter block, then contain these 12
   - [Files to Create](#files-to-create)
   - [Files to Modify](#files-to-modify)
   - [Files to Read (Context)](#files-to-read-context)
+- [Optional Deep Phase Map (when `planning_mode = deep`)](#optional-deep-phase-map-when-planning_mode--deep)
 - [Implementation Steps](#implementation-steps)
 - [Todo List](#todo-list)
 - [Success Criteria](#success-criteria)
@@ -24,7 +25,7 @@ Every phase file MUST start with a YAML frontmatter block, then contain these 12
 - [Next Steps](#next-steps)
 - [Optional TDD Sections (when `tdd_mode = true`)](#optional-tdd-sections-when-tddmode-true)
 - [Tests Before](#tests-before)
-- [Refactor Opportunities](#refactor-opportunities)
+- [Protected Change](#protected-change)
 - [Tests After](#tests-after)
 - [Regression Gate](#regression-gate)
 - [Rules](#rules)
@@ -53,6 +54,8 @@ dependencies: []
 | priority | enum | `P1 \| P2 \| P3` | `P2` | matches Overview convention |
 | effort | string | `~Xh`, `Xh`, `Xd`, `?` | `?` | free-form duration |
 | dependencies | int[] | phase numbers | `[]` | replaces "Depends on" prose |
+| tdd | bool | `true \| false` | omitted | optional; set `true` only when `tdd_mode = true` |
+| regression_gate | string | command | omitted | optional; exact command from `## Regression Gate` |
 
 ```markdown
 # Phase {N}: {Name}
@@ -129,19 +132,47 @@ dependencies: []
 - {Follow-up tasks deferred to future work}
 ```
 
-## Optional TDD Sections (when `tdd_mode = true`)
+## Optional Deep Phase Map (when `planning_mode = deep`)
 
-When `--tdd` flag is set or `MEOWKIT_TDD=1` is active, append these after Implementation Steps:
+Follow `references/deep-mode.md`. Add `## Deep Phase Map` after `## Related Code Files` or before `## Implementation Steps`. Keep it compact: max 12 file inventory rows per phase; summarize overflow. Do NOT add in non-deep mode.
 
 ```markdown
+## Deep Phase Map
+
+### File Inventory
+
+| Action | Path | Reason | Test Impact |
+|---|---|---|---|
+| Modify | `path/to/file.ts` | {why touched} | {existing or missing tests} |
+
+### Test Gap Matrix
+
+| Behavior | Existing Coverage | Missing Coverage | Priority |
+|---|---|---|---|
+| {behavior} | {test file or "None found"} | {gap} | High/Medium/Low |
+
+### Interface Checklist
+
+- {function/API/schema/CLI contract to preserve}
+
+### Dependency Map
+
+- {phase/file dependency or risky edge}
+```
+
+## Optional TDD Sections (when `tdd_mode = true`)
+
+When `--tdd` flag is set or `MEOWKIT_TDD=1` is active, set optional frontmatter `tdd: true` and append these after Implementation Steps:
+
+````markdown
 ## Tests Before
 
 - [ ] `test_name_here` — {assertion: what should fail and why}
 - [ ] `test_name_here` — {assertion}
 
-## Refactor Opportunities
+## Protected Change
 
-- {What to clean up after tests pass — extract helpers, rename, simplify}
+- {Code changes protected by Tests Before — extract helpers, preserve behavior, rename, simplify}
 
 ## Tests After
 
@@ -152,7 +183,7 @@ When `--tdd` flag is set or `MEOWKIT_TDD=1` is active, append these after Implem
 ```bash
 {specific test command to verify no regressions, e.g., npm test, pytest -x}
 ```
-```
+````
 
 These sections are NOT added in default mode (12-section template remains unchanged).
 
@@ -160,7 +191,7 @@ These sections are NOT added in default mode (12-section template remains unchan
 
 - **Frontmatter is REQUIRED.** `status: pending` is the only legal initial value. `unknown` is a parser sentinel — never written by humans or skills.
 - The Overview block fields (`**Status:**`, `**Priority:**`, `**Effort:**`, `**Depends on:**`) are derived from frontmatter; sync-back overwrites them.
-- Each phase file: ≤150 lines (≤180 with TDD sections)
+- Each phase file: ≤150 lines (≤180 with TDD or deep sections)
 - Sections can be brief but MUST exist (use "N/A" if not applicable)
 - Key Insights MUST cite research source when available
 - Todo checkboxes map 1:1 to implementation steps

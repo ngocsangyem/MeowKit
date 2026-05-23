@@ -99,10 +99,10 @@ See `references/phase-template.md` for the full template.
 
 ### 3c'. TDD Sections (Conditional: `tdd_mode = true`)
 
-If `tdd_mode = true`, append these 4 sections after "Implementation Steps" in each phase file:
+If `tdd_mode = true`, follow `references/tdd-mode.md`. Add optional frontmatter fields `tdd: true` and `regression_gate: "{command}"` when known, and append these 4 sections after "Implementation Steps" in each phase file:
 
-13. **Tests Before** — what failing tests to write BEFORE implementation (test names, assertions, expected failures)
-14. **Refactor Opportunities** — what to clean up after tests pass (extract helpers, rename, simplify)
+13. **Tests Before** — failing tests to write BEFORE implementation; for refactors, capture current behavior first
+14. **Protected Change** — code changes protected by the tests above
 15. **Tests After** — integration/regression tests to add after refactoring (cross-component, edge cases)
 16. **Regression Gate** — specific test commands to verify no regressions (`npm test`, `pytest -x`, etc.)
 
@@ -145,17 +145,16 @@ For each phase file:
 
 ### 3h. Per-Phase Scouting (Conditional: `planning_mode = deep`)
 
-After writing all phase files (section 3c), run targeted scouting for each phase:
+After writing all phase files (section 3c), follow `references/deep-mode.md` and run targeted scouting for each phase:
 
 1. For each phase file, read its `## Related Code Files` section
-2. Identify unique directories from the file paths listed
+2. Cross-check those paths against the step-02 deep scope map; if the phase paths are guesses, record uncertainty instead of widening the scan
 3. Invoke `mk:scout` on each directory set (max 3 tool calls per phase, max 7 phases)
 4. Inject scout results into the phase file:
-   - Add **File Inventory** subsection under Key Insights: list files found, their size, last modified
-   - Add **Dependency Map** subsection under Architecture: which files import/depend on which
+   - Add `## Deep Phase Map` with **File Inventory**, **Test Gap Matrix**, **Interface Checklist**, and **Dependency Map**
 5. Print: `"Deep scan: {N} phases scouted, {M} files inventoried"`
 
-**Bounds:** max 3 tool calls per phase scout, max 7 phases scouted total. If scout exceeds bounds, prioritize phases with highest risk or most file overlap.
+**Bounds:** max 3 tool calls per phase scout, max 7 phases scouted total, max 12 inventory rows per phase. If scout exceeds bounds, prioritize phases with highest risk or most file overlap.
 
 **Skip if:** `planning_mode` is not `deep`.
 
