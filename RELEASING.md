@@ -402,7 +402,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
-| v2.9.10 | 2026-05-23 | Cook workflow & context-engineering upgrade     |
+| v2.9.10 | 2026-05-23 | Skill portability + cook context-engineering + provider diagnostics |
 | v2.9.9  | 2026-05-23 | Plan-creator determinism + handoff               |
 | v2.9.8  | 2026-05-23 | Memory system deep fix                           |
 | v2.9.7  | 2026-05-16 | Docs reference contract + validator              |

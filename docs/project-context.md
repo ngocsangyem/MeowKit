@@ -56,8 +56,8 @@ Monorepo via npm workspaces (`packages/*`). Active package: `packages/mewkit/`.
 | `.claude/rubrics/` | Evaluator rubric library (frontend-app preset: 4 rubrics) | — |
 | `docs/` | Canonical project docs (this file lives here) | — |
 | `plans/` | Per-task plan artifacts | — |
-| `tasks/` | Ephemeral task state (contracts, reviews, plans) | — |
-| `session-state/` | Session-lifecycle files (cleared on new session) | — |
+| `tasks/` | Durable workflow artifacts (plans, contracts, reviews, harness runs) | — |
+| `session-state/` | Ephemeral runtime state (cleared on session change; gitignored) | — |
 | `packages/mewkit/` | npm workspace TypeScript package | — |
 
 All counts from `meowkit-architecture.md` Component Inventory (verified 2026-04-18).

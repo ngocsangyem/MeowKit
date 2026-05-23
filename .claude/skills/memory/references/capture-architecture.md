@@ -83,7 +83,7 @@ Before:
 
 ## Related
 
-- `docs/memory-system.md` §3a (write path) and §8 (tombstones)
+- Memory system overview sections on write paths and tombstones
 - `.claude/hooks/handlers/immediate-capture-handler.cjs` (the user-keyboard-shortcut handler)
 - `.claude/skills/memory/references/session-capture.md` (Phase 6 Reflect routine — uses Path 2)
 - `.claude/rules/injection-rules.md` Rule 3 (memory is DATA)

@@ -22,6 +22,14 @@ source: local
 keywords: [plan-creator, implementation-plan, phase-files, gate-1, scope-adaptive]
 when_to_use: "Use when creating a structured multi-file implementation plan before build. NOT for ticket analysis (see mk:planning-engine) or scope review (see mk:plan-ceo-review)."
 user-invocable: true
+meowkit:
+  portability: provider-only
+  providers:
+    include: [claude-code]
+  requires:
+    surfaces: [skills]
+    commands: [Agent, AskUserQuestion, Bash]
+  context_cost: high
 ---
 
 # Plan Creator

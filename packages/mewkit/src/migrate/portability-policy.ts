@@ -1,4 +1,6 @@
 import { getProviderSurfaceContract } from "./provider-documentation-contracts.js";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { analyzeCodexRuleSource } from "./converters/index.js";
 import { classifyRuleSemantic } from "./ir/rule-classifier.js";
 import { providers } from "./provider-registry.js";
@@ -38,6 +40,7 @@ const RUNTIME_BOUND_SIGNALS: RuntimeBoundSignal[] = [
 ];
 
 const RUNTIME_BOUND_ITEM_TYPES = new Set<PortableType>(["agent", "command", "rules"]);
+const FIRST_PASS_SKILL_PROVIDERS = new Set<ProviderType>(["codex", "gemini-cli", "antigravity", "opencode"]);
 function summarizeSignals(content: string): string[] {
 	return RUNTIME_BOUND_SIGNALS.filter((signal) => signal.pattern.test(content)).map((signal) => signal.label);
 }
@@ -47,9 +50,12 @@ function summarizeHardSkipSignals(content: string): string[] {
 }
 
 function summarizeSkillSkipSignals(content: string): string[] {
-	return RUNTIME_BOUND_SIGNALS.filter((signal) => signal.label === "orchestrator semantics" && signal.pattern.test(content)).map(
-		(signal) => signal.label,
-	);
+	return RUNTIME_BOUND_SIGNALS.filter(
+		(signal) =>
+			[".claude path", "CLAUDE.md reference", "mk/meow slash command", "Claude env var", "Anthropic env var", "orchestrator semantics"].includes(
+				signal.label,
+			) && signal.pattern.test(content),
+	).map((signal) => signal.label);
 }
 
 export function getRuntimeBoundSignals(content: string): string[] {
@@ -187,6 +193,70 @@ export function buildSkillDryRunMessages(
 		});
 }
 
+function shouldInstallSkillForProvider(skill: SkillInfo, provider: ProviderType): PortabilitySkip | null {
+	if (provider === "claude-code") return null;
+	if (!FIRST_PASS_SKILL_PROVIDERS.has(provider)) {
+		return {
+			provider,
+			type: "skill",
+			item: skill.name,
+			reason: "skill portability metadata first pass is limited to Codex, Gemini CLI, Antigravity, and OpenCode",
+		};
+	}
+
+	const policy = skill.portability;
+	if (!policy) {
+		return {
+			provider,
+			type: "skill",
+			item: skill.name,
+			reason: "skill portability metadata missing; needs review before non-Claude install",
+		};
+	}
+
+	if (policy.providers?.exclude?.includes(provider)) {
+		return { provider, type: "skill", item: skill.name, reason: "provider excluded by skill portability policy" };
+	}
+	if (policy.providers?.include && !policy.providers.include.includes(provider)) {
+		return { provider, type: "skill", item: skill.name, reason: "provider not included by skill portability policy" };
+	}
+
+	if (policy.requires?.surfaces?.includes("skill") && !providers[provider].skills) {
+		return { provider, type: "skill", item: skill.name, reason: "provider has no documented skill surface" };
+	}
+
+	if (policy.portability === "provider-only") {
+		return policy.providers?.include?.includes(provider)
+			? null
+			: { provider, type: "skill", item: skill.name, reason: "provider-only skill is not declared for this provider" };
+	}
+
+	if (policy.portability === "provider-adapted") {
+		return {
+			provider,
+			type: "skill",
+			item: skill.name,
+			reason: "provider-adapted skill requires an explicit adapter before install",
+		};
+	}
+
+	const signals = readSkillRuntimeSignals(skill);
+	if (signals.length > 0) {
+		return { provider, type: "skill", item: skill.name, reason: buildRuntimeBoundReason(signals) };
+	}
+
+	return null;
+}
+
+function readSkillRuntimeSignals(skill: SkillInfo): string[] {
+	try {
+		const content = readFileSync(join(skill.sourcePath, "SKILL.md"), "utf-8");
+		return summarizeSkillSkipSignals(content);
+	} catch {
+		return [];
+	}
+}
+
 function shouldSkipUnsupportedSurface(action: ReconcileAction): PortabilitySkip | null {
 	const provider = action.provider as ProviderType;
 	const contract = getProviderSurfaceContract(provider, action.type);
@@ -280,12 +350,21 @@ export async function buildPortableSkillsByProvider(
 
 	for (const target of targets) {
 		if (!providers[target].skills) continue;
-		skillsByProvider.set(target, [...skills]);
+		const providerSkills: SkillInfo[] = [];
+		for (const skill of skills) {
+			const skip = shouldInstallSkillForProvider(skill, target);
+			if (skip) {
+				skips.push(skip);
+			} else {
+				providerSkills.push(skill);
+			}
+		}
+		skillsByProvider.set(target, providerSkills);
 	}
 
 	return {
 		skillsByProvider,
-		skipMessages: [],
+		skipMessages: summarizeSkipCounts(skips),
 		skips,
 	};
 }

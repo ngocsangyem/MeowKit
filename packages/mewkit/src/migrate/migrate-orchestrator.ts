@@ -37,6 +37,10 @@ import { installCodexAgents, mergeHooksSettings } from "./hooks/index.js";
 import { loadModelRoutingConfig } from "./model-routing-config.js";
 import { printActionDetails, printFinalSummary, printPreflight } from "./migrate-ui-summary.js";
 import {
+	collectProviderContractDiagnostics,
+	summarizeProviderContractDiagnostics,
+} from "./provider-contract-diagnostics.js";
+import {
 	buildPortableSkillsByProvider,
 	buildSkillDryRunMessages,
 	filterPlanForPortability,
@@ -120,6 +124,9 @@ async function runMigrateUnderLock(
 	const portableSkills = await buildPortableSkillsByProvider(discovered.skills, targets);
 	const ruleSummaries = summarizeRuleMigrationByProvider(discovered.rules, targets);
 	const skillDryRunMessages = buildSkillDryRunMessages(portableSkills.skillsByProvider, targets);
+	const providerDiagnosticMessages = options.providers
+		? summarizeProviderContractDiagnostics(collectProviderContractDiagnostics(), targets)
+		: [];
 
 	for (const action of portabilityFiltered.plan.actions) {
 		if (!action.targetPath) {
@@ -145,6 +152,7 @@ async function runMigrateUnderLock(
 			...modelRoutingBanners,
 			...portabilityFiltered.skipMessages,
 			...portableSkills.skipMessages,
+			...providerDiagnosticMessages,
 			...ruleSummaries.flatMap((summary) => summary.messages),
 			...skillDryRunMessages,
 		],

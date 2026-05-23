@@ -45,6 +45,9 @@ ${pc.bold("Options:")}
   --version, -v    Show version
   --session [id]   Budget: filter to current session or a specific session id
   --day [date]     Budget: filter to today or a specific YYYY-MM-DD
+  --providers      Doctor/migrate: include provider contract diagnostics
+  --state          Doctor: include state taxonomy diagnostics
+  --portable       Validate: include portable provider contract checks
 
 ${pc.bold("Init flags for post-init migration:")}
   --migrate                  After unpack, prompt for providers to export to (interactive)
@@ -92,6 +95,9 @@ async function main(): Promise<void> {
 			"show",
 			"stats",
 			"report",
+			"providers",
+			"state",
+			"portable",
 			"all",
 			"dry-run",
 			"force",
@@ -163,7 +169,7 @@ async function main(): Promise<void> {
 			});
 			break;
 		case "validate":
-			await validate();
+			await validate({ portable: args.portable as boolean | undefined });
 			break;
 		case "budget":
 			await budget({
@@ -183,7 +189,11 @@ async function main(): Promise<void> {
 			await setup({ only: args.only as string | undefined, systemDeps: args["system-deps"] as boolean | undefined });
 			break;
 		case "doctor":
-			await doctor({ report: args.report as boolean | undefined });
+			await doctor({
+				report: args.report as boolean | undefined,
+				providers: args.providers as boolean | undefined,
+				state: args.state as boolean | undefined,
+			});
 			break;
 		case "status":
 			await printStatus();
@@ -243,6 +253,7 @@ async function main(): Promise<void> {
 				"reinstall-empty-dirs": args["reinstall-empty-dirs"] as boolean | undefined,
 				"respect-deletions": args["respect-deletions"] as boolean | undefined,
 				"source-version": args["source-version"] as string | undefined,
+				providers: args.providers as boolean | undefined,
 			});
 			if (exitCode !== 0) process.exit(exitCode);
 			break;

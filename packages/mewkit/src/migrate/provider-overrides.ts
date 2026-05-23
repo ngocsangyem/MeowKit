@@ -39,7 +39,7 @@ function disablePortableSurface(provider: ProviderConfig, portableType: Portable
 }
 
 /** Retained for backward compatibility; all fields are currently unused. */
-export interface OverrideOptions {}
+export type OverrideOptions = Record<string, never>;
 
 export function applyMewkitOverrides(_options: OverrideOptions = {}): void {
 	if (overridesApplied) return;

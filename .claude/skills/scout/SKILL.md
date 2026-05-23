@@ -5,6 +5,14 @@ source: local
 keywords: [scout, codebase-search, parallel-explore, file-mapping, architecture-fingerprint, routing-suggestions]
 when_to_use: "Use before planning/debugging or any task spanning multiple directories — fast parallel codebase scouting. NOT for reading a single known file (use Read directly) or semantic find-usages."
 user-invocable: true
+meowkit:
+  portability: provider-only
+  providers:
+    include: [claude-code]
+  requires:
+    surfaces: [skills]
+    commands: [Agent, Grep, Glob]
+  context_cost: medium
 ---
 
 # Scout

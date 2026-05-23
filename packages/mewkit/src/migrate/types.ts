@@ -26,6 +26,23 @@ export const ProviderType = z.enum([
 ]);
 export type ProviderType = z.infer<typeof ProviderType>;
 
+export type SkillPortability = "generic" | "provider-adapted" | "provider-only";
+export type ContextCost = "low" | "medium" | "high";
+
+export interface SkillPortabilityPolicy {
+	portability: SkillPortability;
+	providers?: {
+		include?: ProviderType[];
+		exclude?: ProviderType[];
+	};
+	requires?: {
+		surfaces?: PortableType[];
+		commands?: string[];
+		env?: string[];
+	};
+	contextCost?: ContextCost;
+}
+
 // ProviderConfig + path/format/strategy types moved into per-provider module
 // at `./providers/provider-config-types.ts`. Re-exported here so legacy import
 // paths (`./types.js`) continue to resolve unchanged.
@@ -108,6 +125,8 @@ export interface SkillInfo {
 	version?: string;
 	author?: string;
 	license?: string;
+	/** Explicit non-Claude portability policy from frontmatter `meowkit:`. */
+	portability?: SkillPortabilityPolicy;
 	/** Full path to skill directory */
 	sourcePath: string;
 }
@@ -132,5 +151,6 @@ export const MigrateOptionsSchema = z.object({
 	reinstallEmptyDirs: z.boolean().optional(),
 	respectDeletions: z.boolean().optional(),
 	sourceVersion: z.string().optional(),
+	providers: z.boolean().optional(),
 });
 export type MigrateOptions = z.infer<typeof MigrateOptionsSchema>;

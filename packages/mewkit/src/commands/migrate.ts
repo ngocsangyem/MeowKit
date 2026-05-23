@@ -23,6 +23,7 @@ export interface MigrateCliArgs {
 	"reinstall-empty-dirs"?: boolean;
 	"respect-deletions"?: boolean;
 	"source-version"?: string;
+	providers?: boolean;
 }
 
 export async function migrate(args: MigrateCliArgs): Promise<number> {
@@ -45,6 +46,7 @@ export async function migrate(args: MigrateCliArgs): Promise<number> {
 		reinstallEmptyDirs: args["reinstall-empty-dirs"],
 		respectDeletions: args["respect-deletions"],
 		sourceVersion: args["source-version"],
+		providers: args.providers,
 	};
 
 	const __dirname = dirname(fileURLToPath(import.meta.url));

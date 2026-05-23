@@ -3,7 +3,8 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { parseFrontmatter } from "../frontmatter-parser.js";
-import type { SkillInfo } from "../types.js";
+import { ProviderType } from "../types.js";
+import type { ContextCost, PortableType, SkillInfo, SkillPortability, SkillPortabilityPolicy } from "../types.js";
 import { MEOWKIT_INTERNAL_DIRS } from "./exclusions.js";
 import { parseSkillId } from "./skill-id-utils.js";
 
@@ -46,11 +47,59 @@ async function parseSkillMd(skillDir: string, dirName: string): Promise<SkillInf
 			version: version != null ? String(version) : undefined,
 			author: author != null ? String(author) : undefined,
 			license: typeof license === "string" ? license : undefined,
+			portability: parsePortabilityPolicy(frontmatter.meowkit),
 			sourcePath: skillDir,
 		};
 	} catch {
 		return null;
 	}
+}
+
+function parsePortabilityPolicy(raw: unknown): SkillPortabilityPolicy | undefined {
+	if (!raw || typeof raw !== "object") return undefined;
+	const data = raw as Record<string, unknown>;
+	const portability = parseEnum<SkillPortability>(data.portability, ["generic", "provider-adapted", "provider-only"]);
+	if (!portability) return undefined;
+
+	const providers = data.providers && typeof data.providers === "object" ? (data.providers as Record<string, unknown>) : undefined;
+	const requires = data.requires && typeof data.requires === "object" ? (data.requires as Record<string, unknown>) : undefined;
+	const contextCost = parseEnum<ContextCost>(data.context_cost ?? data.contextCost, ["low", "medium", "high"]);
+
+	return {
+		portability,
+		providers: providers
+			? {
+					include: parseProviders(providers.include),
+					exclude: parseProviders(providers.exclude),
+				}
+			: undefined,
+		requires: requires
+			? {
+					surfaces: parseStringArray(requires.surfaces).filter(isPortableType),
+					commands: parseStringArray(requires.commands),
+					env: parseStringArray(requires.env),
+				}
+			: undefined,
+		contextCost,
+	};
+}
+
+function parseEnum<T extends string>(raw: unknown, allowed: readonly T[]): T | undefined {
+	return typeof raw === "string" && (allowed as readonly string[]).includes(raw) ? (raw as T) : undefined;
+}
+
+function parseProviders(raw: unknown): ProviderType[] | undefined {
+	const providers = parseStringArray(raw).filter((value): value is ProviderType => ProviderType.safeParse(value).success);
+	return providers.length > 0 ? providers : undefined;
+}
+
+function parseStringArray(raw: unknown): string[] {
+	if (!Array.isArray(raw)) return [];
+	return raw.filter((value): value is string => typeof value === "string");
+}
+
+function isPortableType(value: string): value is PortableType {
+	return ["agent", "command", "skill", "config", "rules", "hooks"].includes(value);
 }
 
 export async function discoverSkills(sourcePath: string): Promise<SkillInfo[]> {
