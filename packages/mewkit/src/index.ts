@@ -185,6 +185,7 @@ async function main(): Promise<void> {
 				show: args.show as boolean | undefined,
 				stats: args.stats as boolean | undefined,
 				strict: args.strict as boolean | undefined,
+				check: args.check as boolean | undefined,
 			});
 			break;
 		case "setup":

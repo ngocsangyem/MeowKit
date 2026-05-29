@@ -25,13 +25,13 @@ export interface ValidationReport {
 	warnCount: number;
 }
 
-interface ContentValidator {
+export interface ContentValidator {
 	(text: string): { valid: boolean; pattern?: string; match?: string };
 }
 
 // Load the real validate-content.cjs (DRY — never reimplement the injection
 // patterns) from the project that owns this memory dir. Absent → recheck skipped.
-function loadContentValidator(memoryDir: string): ContentValidator | null {
+export function loadContentValidator(memoryDir: string): ContentValidator | null {
 	const projectRoot = path.resolve(memoryDir, "..", "..");
 	const libPath = path.join(projectRoot, ".claude", "hooks", "lib", "validate-content.cjs");
 	if (!fs.existsSync(libPath)) return null;

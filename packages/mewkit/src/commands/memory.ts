@@ -4,6 +4,7 @@ import readline from "node:readline";
 import pc from "picocolors";
 import { validateMemory } from "../memory/validate.js";
 import { seedFromMd } from "../memory/seed-from-md.js";
+import { renderViews } from "../memory/render-views.js";
 
 interface MemoryArgs {
 	subcommand?: string;
@@ -11,6 +12,7 @@ interface MemoryArgs {
 	show?: boolean;
 	stats?: boolean;
 	strict?: boolean;
+	check?: boolean;
 }
 
 interface PatternEntry {
@@ -281,6 +283,51 @@ function seedCmd(memoryDir: string): void {
 	);
 }
 
+// `mewkit memory render-views [--check] [--strict]` — regenerate human-readable
+// views/*.md from the canonical JSON. --check reports drift without writing (local
+// dev only — views are gitignored, so this is NOT a CI gate). --strict exits
+// nonzero when any entry is flagged by the injection-content recheck.
+function renderViewsCmd(memoryDir: string, check: boolean, strict: boolean): void {
+	const results = renderViews(memoryDir, { check });
+	let staleCount = 0;
+	let flaggedTotal = 0;
+
+	for (const r of results) {
+		const label = `${r.file.replace(/\.json$/, ".md")}:`.padEnd(28);
+		const viewName = `views/${r.file.replace(/\.json$/, ".md")}`;
+		if (check) {
+			if (r.stale) {
+				staleCount++;
+				console.log(`  ${pc.dim(label)} ${pc.yellow(r.exists ? "STALE" : "MISSING")} ${pc.dim(viewName)}`);
+			} else {
+				console.log(`  ${pc.dim(label)} ${pc.green("up-to-date")}`);
+			}
+		} else {
+			console.log(`  ${pc.dim(label)} ${r.wrote ? pc.green(`wrote ${viewName}`) : pc.dim("unchanged")}`);
+		}
+		if (r.flagged.length > 0) {
+			flaggedTotal += r.flagged.length;
+			console.log(`      ${pc.yellow("flagged")} ${r.flagged.join(", ")}`);
+		}
+	}
+
+	console.log();
+	if (check) {
+		if (staleCount > 0) {
+			console.log(pc.yellow(`${staleCount} view(s) stale — run 'mewkit memory render-views'.`));
+			process.exit(1);
+		}
+		console.log(pc.green("All views up-to-date."));
+	} else {
+		console.log(pc.green("Views regenerated."));
+	}
+
+	if (strict && flaggedTotal > 0) {
+		console.log(pc.red(`Strict mode: ${flaggedTotal} flagged entr${flaggedTotal === 1 ? "y" : "ies"}.`));
+		process.exit(1);
+	}
+}
+
 export async function memory(args: MemoryArgs): Promise<void> {
 	console.log(pc.bold(pc.cyan("Agent Memory")));
 	console.log();
@@ -299,6 +346,8 @@ export async function memory(args: MemoryArgs): Promise<void> {
 		validateCmd(memoryDir, args.strict ?? false);
 	} else if (args.subcommand === "seed-from-md") {
 		seedCmd(memoryDir);
+	} else if (args.subcommand === "render-views") {
+		renderViewsCmd(memoryDir, args.check ?? false, args.strict ?? false);
 	} else if (args.clear) {
 		await clearMemory(memoryDir);
 	} else if (args.show) {
