@@ -97,4 +97,15 @@ describe('seedFromMd (Phase 1)', () => {
     expect(data.findings[0].finding).toContain('hardcoded token');
     expect(data.findings[0].severity).toBe('HIGH');
   });
+
+  it('security findings are idempotent across runs with multiple findings (regression: stable line-index ids)', () => {
+    writeFileSync(
+      join(memDir, 'security-log.md'),
+      '# Security Log\n\n[260101] [HIGH] alpha leak\n[260102] [MED] beta misconfig\n[260103] [LOW] gamma warning\n'
+    );
+    seedFromMd(memDir);
+    expect(readJson('security-findings.json').findings).toHaveLength(3);
+    seedFromMd(memDir); // second run must add nothing
+    expect(readJson('security-findings.json').findings).toHaveLength(3);
+  });
 });

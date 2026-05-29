@@ -88,6 +88,7 @@ async function main(): Promise<void> {
 			"help",
 			"version",
 			"check",
+			"strict",
 			"beta",
 			"list",
 			"monthly",

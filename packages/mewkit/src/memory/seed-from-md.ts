@@ -139,6 +139,7 @@ export function seedFromMd(memoryDir: string): SeedResult[] {
 				// ([DATE] [LEVEL] ...). `## ` headers AND fenced format-doc templates
 				// in these files are NOT findings, so both are intentionally skipped.
 				let inFence = false;
+				let lineIndex = 0; // stable across runs (counts every matched finding line, not just added) — keeps ids idempotent
 				for (const line of content.split("\n")) {
 					if (line.trim().startsWith("```")) {
 						inFence = !inFence;
@@ -147,7 +148,8 @@ export function seedFromMd(memoryDir: string): SeedResult[] {
 					if (inFence) continue;
 					const m = line.match(/^\[([^\]]+)\]\s*\[([^\]]+)\]\s*(.+)$/);
 					if (!m) continue;
-					const id = `sec-${slugify(m[3]).slice(0, 40)}-${added}`;
+					const id = `sec-${slugify(m[3]).slice(0, 40)}-${lineIndex}`;
+					lineIndex++;
 					if (existingIds.has(id)) continue;
 					items.push({ id, finding: m[3].trim(), severity: m[2].trim(), status: "migrated", source: "seed-from-md" });
 					existingIds.add(id);
