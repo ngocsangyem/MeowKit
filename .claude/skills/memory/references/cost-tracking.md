@@ -41,7 +41,7 @@ Task tier: [standard] | Model: [claude-opus-4-6]
 
 ## After Task: Log Usage
 
-Append an entry to `memory/cost-log.json` (create if it does not exist).
+Append an entry to `.claude/memory/cost-log.json` (create if it does not exist).
 
 **Schema:**
 ```json
@@ -69,7 +69,7 @@ Append an entry to `memory/cost-log.json` (create if it does not exist).
 
 > Note: `/mk:budget` is a subcommand handled by `mk:memory`, not a standalone skill. Invoke it while `mk:memory` is active: `/mk:budget [--report|--alert N]`.
 
-When the user invokes `/mk:budget`, read `memory/cost-log.json` and display:
+When the user invokes `/mk:budget`, read `.claude/memory/cost-log.json` and display:
 
 ### Last N Entries (default: 10)
 

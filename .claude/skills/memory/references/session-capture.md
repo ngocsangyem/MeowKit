@@ -67,12 +67,12 @@ Write to the appropriate topic file based on category:
 
 | Category | Markdown file | JSON file |
 |----------|--------------|-----------|
-| Bug fix / failure / shell/code pattern | `memory/fixes.md` | `memory/fixes.json` |
-| Review pattern / architecture insight | `memory/review-patterns.md` | `memory/review-patterns.json` |
-| Architectural decision | `memory/architecture-decisions.md` | `memory/architecture-decisions.json` |
-| Security finding | `memory/security-notes.md` | — |
+| Bug fix / failure / shell/code pattern | `.claude/memory/fixes.md` | `.claude/memory/fixes.json` |
+| Review pattern / architecture insight | `.claude/memory/review-patterns.md` | `.claude/memory/review-patterns.json` |
+| Architectural decision | `.claude/memory/architecture-decisions.md` | `.claude/memory/architecture-decisions.json` |
+| Security finding | `.claude/memory/security-notes.md` | — |
 
-**Do NOT write to `memory/lessons.md`** — it is an archived stub. Topic files are the active write targets.
+**Do NOT write to `lessons.md`** — it is an archived stub. Topic files are the active write targets.
 
 #### Markdown format (append to topic file):
 

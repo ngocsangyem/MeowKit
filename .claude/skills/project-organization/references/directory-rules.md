@@ -23,7 +23,7 @@ Every project file belongs to one of these categories:
 ├── skills/          mk: prefixed skills
 ├── rules/           Enforcement rules
 ├── hooks/           Lifecycle hooks
-├── memory/          Cross-session persistence
+├── memory/          Cross-session persistence under `.claude/memory/`
 ├── scripts/         Validation scripts
 │   └── bin/         Shell utilities
 └── settings.json    Hook registrations

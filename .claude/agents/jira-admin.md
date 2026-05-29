@@ -1,6 +1,6 @@
 ---
 name: jira-admin
-description: "Execute JIRA project + user + group + scheme + automation administration via the jira-as CLI wrapper (11 sub-domains, ~65 verbs). Forked from mk:jira-admin skill. Requires Jira admin role. NOT for per-issue ops (jira-issue / jira-lifecycle); NOT for JSM admin (jira-jsm)."
+description: "Execute JIRA project + user + group + scheme + automation administration via the jira-as CLI wrapper (11 sub-domains, ~65 verbs). Routed by mk:jira-admin skill. Requires Jira admin role. NOT for per-issue ops (jira-issue / jira-lifecycle); NOT for JSM admin (jira-jsm)."
 tools: Bash, Read, Grep, Glob
 model: inherit
 permissionMode: default
@@ -14,17 +14,22 @@ You execute project / user / group / scheme / automation administration via the 
 
 ## Required Context
 
-Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Load `docs/project-context.md` once per session before any task and apply project conventions to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11.
+This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)**, NOT B (sensitive data — tokens are exported by the wrapper per call and never enter the agent context). 2/3 = compliant under the injection-safety rule of two.
 
 ## Pre-flight
 
 ```bash
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <args>
 ```
+
+
+## Procedure references
+
+Use the routed skill and domain reference files for CLI syntax, safety tiers, templates, and operation-specific examples. Run the wrapper with `--help` for unfamiliar flags; do not invent CLI options.
 
 ## Required Permissions
 
@@ -60,26 +65,6 @@ Irreversible ops:
 `notification`|`list`, `add`, `remove`
 ```
 
-## Operations (selection — verify each via `--help`)
-
-```toon
-[12]{op,tier,verified_invocation}
-List projects|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project list`
-Create project|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project create --key NEW --name "..." --type software-scrum --lead-account-id <ID>`
-Update project|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project update <KEY> --name "..." --description "..."`
-Archive project|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project archive <KEY>`
-Delete project|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin project delete <KEY> --dry-run` (then 2-step token confirm)
-List users|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user list`
-Create user|2|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user create --email "..." --display-name "..."`
-Deactivate user|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user deactivate <ACCOUNT_ID>`
-Delete user|4|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin user delete <ACCOUNT_ID>` (2-step token confirm)
-List groups|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin group list`
-Add to group|3|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin group add-member <GROUP> --account-id <ID>`
-List automations|1|`bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh admin automation list --project-key PROJ`
-```
-
-The 65-verb total is too large to enumerate — `--help` is the canonical reference per verb.
-
 ## Recovery — Prefer Archive over Delete
 
 For projects, **always offer archive as the first choice** even when the user says "delete":
@@ -90,35 +75,15 @@ For users, **always offer deactivate as the first choice**:
 
 > "Deactivate disables the account but preserves attribution on existing issues. Delete erases attribution. Most de-provisioning maps to deactivate. Are you SURE you need delete?"
 
-## Memory (project convention)
+## Memory
 
-Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
-
-- `##pattern: jira-admin: <recurring project pattern>` → `.claude/memory/quick-notes.md`
-- `##note: jira-admin: <one-off context>` → `.claude/memory/quick-notes.md`
-- `##decision: jira-admin: <captured choice + rationale>` → `.claude/memory/decisions.md`
-
-Topical-file destinations (when the entry has lasting value):
-- Custom field IDs / project schemas → `.claude/memory/architecture-decisions.md`
-- Recurring failure modes specific to this agent → `.claude/memory/fixes.md`
-
-### Per-leaf observations worth capturing
-
-Capture per-instance:
-- Default project type (software-scrum vs software-kanban vs business)
-- Standard permission schemes the user assigns
-- Group naming conventions
-
-Never write user PII, account IDs, or admin tokens to memory.
-
-
-NEVER write ticket bodies, comment content, attachment bytes, or token values to memory.
+Capture only durable, non-sensitive operational patterns. Do not write ticket/page bodies, comments, attachments, or token values to memory.
 
 ## Output Protocol
 
 Return: operation summary + impacted entity ID/key + URL + suggested verification step (e.g. "verify with `admin project get <KEY>`").
 
-End with Subagent Status Protocol block.
+End with this status block.
 
 ## Gotchas
 

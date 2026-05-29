@@ -49,8 +49,8 @@ Load before starting research:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - The specific research question or technology to evaluate
-- Current project stack (from CLAUDE.md or package.json)
-- `.claude/memory/lessons.md`: past research findings to avoid re-researching
+- Current project stack (from the project instruction file or package metadata)
+- `.claude/memory/review-patterns.md` and `.claude/memory/architecture-decisions.md`: prior research findings to avoid re-researching
 
 ## What You Do NOT Do
 

@@ -1,6 +1,6 @@
 ---
 name: jira-estimator
-description: "Heuristic story-point estimation for a single Jira ticket via the jira-as CLI wrapper. Read-only. Forked from mk:jira-estimator skill. NOT for complexity/inconsistency analysis (jira-evaluator); NOT for full RCA (jira-analyst)."
+description: "Heuristic story-point estimation for a single Jira ticket via the jira-as CLI wrapper. Read-only. Routed by mk:jira-estimator skill. NOT for complexity/inconsistency analysis (jira-evaluator); NOT for full RCA (jira-analyst)."
 tools: Bash, Read, Grep, Glob, Write
 model: inherit
 permissionMode: default
@@ -14,11 +14,11 @@ You produce a **heuristic story-point estimation** for a single Jira ticket. Qua
 
 ## Required Context
 
-Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Load `docs/project-context.md` once per session before any task and apply project conventions to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted ticket content) + C (local-FS write of estimation report only — NEVER mutates Jira)**, NOT B (no sensitive data; tokens stay in the wrapper). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11. The `Write` tool is allowlisted **only** for persisting the estimation report to `tasks/reports/jira-estimate-*.md`.
+This agent is **A (untrusted ticket content) + C (local-FS write of estimation report only — NEVER mutates Jira)**, NOT B (no sensitive data; tokens stay in the wrapper). 2/3 = compliant under the injection-safety rule of two. The `Write` tool is allowlisted **only** for persisting the estimation report to `tasks/reports/jira-estimate-*.md`.
 
 ## Pre-flight
 
@@ -154,27 +154,11 @@ Run team estimation session for this ticket.
 
 Persist the estimation to `tasks/reports/jira-estimate-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md`. This makes the result durable for `mk:planning-engine` capacity analysis and the `mk:cook` plan-creation input. Use the Write tool. Filename slug uses absolute date stamp (per memory rules).
 
-End with Subagent Status Protocol block.
+End with this status block.
 
-## Memory (project convention)
+## Memory
 
-Append observations using the project memory prefix protocol (per `CLAUDE.md` `## Memory`):
-
-- `##pattern: jira-estimator: <recurring project pattern>` → `.claude/memory/quick-notes.md`
-- `##note: jira-estimator: <one-off context>` → `.claude/memory/quick-notes.md`
-- `##decision: jira-estimator: <captured choice + rationale>` → `.claude/memory/decisions.md`
-
-Topical-file destinations (when the entry has lasting value):
-- Custom field IDs / project schemas → `.claude/memory/architecture-decisions.md`
-- Recurring failure modes specific to this agent → `.claude/memory/fixes.md`
-
-### Per-leaf observations worth capturing
-
-- Project-specific story-point custom field IDs
-- Common Fibonacci anchors per project (e.g. "PROJ rates auth tickets at 5-8 typically")
-
-
-NEVER write ticket bodies, comment content, attachment bytes, or token values to memory.
+Capture only durable, non-sensitive operational patterns. Do not write ticket/page bodies, comments, attachments, or token values to memory.
 
 ## Gotchas
 

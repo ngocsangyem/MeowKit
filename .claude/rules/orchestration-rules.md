@@ -106,15 +106,15 @@ Constraints that apply when the inner harness's behavior is unknown or differs f
 
 ## Rejected Patterns
 
-Patterns deliberately NOT implemented in MeowKit, with the reason each was rejected.
+Patterns deliberately NOT implemented in the toolkit, with the reason each was rejected.
 
 | Rejected pattern | Why rejected |
 |---|---|
 | `SubagentStart` hook for subagent context injection | Hooks fire inside subagents → infinite-loop risk (verified in `HOOKS_INDEX.md`). |
 | `PreToolUse:Task` hook validating subagent prompts | Violates outer-harness principle. Could break legitimate Task calls. Make-correct-path-easy beats block-incorrect-path. |
 | Per-task memory namespaces | Over-engineering. The 5 boundary types above (Isolation Boundaries) already cover the leakage paths; namespacing memory adds complexity without measured benefit. |
-| AI OS / agent runtime abstraction layer | MeowKit is the outer harness, not a runtime replacement. An abstraction layer would silently break inner-harness diversity — the harness contract is whatever the host runtime exposes, not a wrapper. |
-| Vector embedding / external memory store | YAGNI. `.claude/memory/` topic files + conversation-summary cache already cover MeowKit's recall needs at 4KB injection budget. |
+| AI OS / agent runtime abstraction layer | The toolkit is the outer harness, not a runtime replacement. An abstraction layer would silently break inner-harness diversity — the harness contract is whatever the host runtime exposes, not a wrapper. |
+| Vector embedding / external memory store | YAGNI. `.claude/memory/` topic files + conversation-summary cache already cover the toolkit's recall needs at 4KB injection budget. |
 
 Documented here so future contributors recognize these as decided trade-offs, not gaps awaiting implementation.
 

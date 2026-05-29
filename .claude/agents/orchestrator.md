@@ -57,7 +57,11 @@ high|COMPLEX (Opus)|Required
    - Security is inserted at Phase 2 and Phase 4 for auth/payments/security changes.
    - **Green-field product builds** (signals: "build me a kanban app", "make a retro game maker", "build a SaaS dashboard", "autonomous build", or any prompt asking for a multi-hour autonomous green-field build): route to `mk:harness` instead of the standard pipeline. The harness owns its own planner → contract → generator ⇄ evaluator loop with adaptive density. See `mk:harness/SKILL.md` and CLAUDE.md preference note.
 
-4. **Read memory.** At session start, read `.claude/memory/lessons.md` for prior learnings and `.claude/memory/cost-log.json` for budget context.
+4. **Read scoped memory.** At session start, read only the topic files relevant to routing:
+   - `.claude/memory/fixes.md` for recurring failure classes
+   - `.claude/memory/review-patterns.md` for repeated review outcomes
+   - `.claude/memory/architecture-decisions.md` for active architectural constraints
+   - `.claude/memory/cost-log.json` for budget context
 
 5. **Enforce gates.** Never skip planner for standard/complex tasks (Gate 1). Never skip reviewer for code changes (Gate 2).
 
@@ -68,7 +72,9 @@ high|COMPLEX (Opus)|Required
 Load before starting any routing decision:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
-- `.claude/memory/lessons.md`: prior learnings that affect routing heuristics
+- `.claude/memory/fixes.md`: recurring failure classes that affect routing
+- `.claude/memory/review-patterns.md`: repeated review outcomes that affect routing
+- `.claude/memory/architecture-decisions.md`: active architectural constraints
 - `.claude/memory/cost-log.json`: budget context for model tier decisions
 - `CLAUDE.md` → Agent Roster table: current agent capabilities and ownership
 - `tasks/plans/`: check for any in-progress plans (pipeline state)

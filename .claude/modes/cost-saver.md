@@ -48,4 +48,4 @@ Even in cost-saver mode, these are never disabled:
 
 ## Trade-offs
 
-Lower cost comes at the expense of reduced review depth. Use for low-risk work only. Monitor `memory/cost-log.json` to track savings.
+Lower cost comes at the expense of reduced review depth. Use for low-risk work only. Monitor `.claude/memory/cost-log.json` to track savings.

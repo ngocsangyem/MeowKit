@@ -52,7 +52,7 @@ WHY: Loading project context first prevents conflicting convention guesses.
 When Layer 3 reasoning reveals a genuine insight — something that contradicts the conventional approach with evidence:
 
 - Name it: "EUREKA: Everyone does X because they assume [assumption]. But [evidence] suggests that's wrong here."
-- Log it in `.claude/memory/lessons.md` for future sessions
+- Log it in the relevant `.claude/memory/` topic file for future sessions
 - This is the highest-value output of the search process
 
 WHY: Documented insights survive context reset.
@@ -110,8 +110,7 @@ WHY: Structured responses keep review fast.
 ### B3. Context Ordering
 
 When constructing prompts/plans/handoffs:
-<!-- research-citation -->
-- **Long content first, query last** — background/code/refs at TOP, specific instruction at BOTTOM. Anthropic measured up to 30% quality lift on multi-document inputs (claude-prompting-best-practices).
+- **Long content first, query last** — background/code/refs at TOP, specific instruction at BOTTOM. This improves multi-document task quality.
 - **Context before constraint** — explain WHAT and WHY before stating a NEVER. Pair every NEVER with an INSTEAD.
 - **Self-contained documents** — every plan file / handoff readable cold by an agent with zero prior context. Required: WHAT (goal), WHERE (file paths), WHY (problem), STATUS (done/next).
 
