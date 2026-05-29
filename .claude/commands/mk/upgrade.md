@@ -41,7 +41,8 @@ Self-update the installed toolkit to the latest version. Preserves learned knowl
 ### Safety
 
 - The `.claude/memory/` directory is NEVER overwritten. This ensures:
-  - Topic files in `.claude/memory/` (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`, `security-notes.md`) persist — project learnings live per category
+  - The canonical JSON stores (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`) persist — these are the authoritative curated memory (see `.claude/rules/memory-read-rules.md`)
+  - The matching `.md` files (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`, `security-notes.md`) also persist — these are generated/non-authoritative views; they can be regenerated via `mewkit memory render-views` from the JSON stores
   - `.claude/memory/cost-log.json` (cost history) persists
   - Any other accumulated knowledge is preserved
 - If the update fails mid-way, the previous version's files remain intact.

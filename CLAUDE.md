@@ -17,7 +17,7 @@ Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test (RED if --tdd, else op
 **TDD mode:** opt-in via `--tdd` flag or `MEOWKIT_TDD=1`. See `.claude/rules/tdd-rules.md`.
 **Phase 3 harness contract substep:** developer reads signed `tasks/contracts/{date}-{slug}-sprint-N.md` BEFORE source edits (enforced by `gate-enforcement.sh`; bypass: `MEOWKIT_HARNESS_MODE=LEAN`). See `.claude/rules/harness-rules.md` Rule 3.
 
-**IMPORTANT:** Read `.claude/memory/` topic files (fixes.md, review-patterns.md, architecture-decisions.md) before any task; read `.claude/rules/core-behaviors.md` (6 mandatory behaviors) — both apply in ALL modes.
+**IMPORTANT:** Read canonical `.json` stores before any task — `fixes.json`, `review-patterns.json`, `architecture-decisions.json` (fall back to the matching `.md` only if the `.json` is absent; see `docs/memory-system.md` §4.1); read `.claude/rules/core-behaviors.md` (6 mandatory behaviors) — both apply in ALL modes.
 **IMPORTANT:** Activate only skills needed for the current task domain; declare model tier (TRIVIAL · STANDARD · COMPLEX) before every task.
 **IMPORTANT:** Non-trivial task (>2 files OR >30 min) = approved plan required before any code; for architectural trade-offs use `/mk:party`.
 **IMPORTANT:** COMPLEX tasks with independent subtasks may use parallel execution (max 3 agents, worktree isolation per `.claude/rules/parallel-execution-rules.md`).
@@ -69,7 +69,7 @@ ALWAYS read task file before touching code. NEVER start Phase 3 without Gate 1. 
 
 ## Memory
 
-Read topic files at task start. Update at task end. See `.claude/memory/` (fixes, review-patterns, architecture-decisions, cost-log, decisions, security-log). Consumer skills include a "Load memory" step. Append by category with `##decision:`, `##pattern:`, `##note:` prefixes. Prune via `/mk:memory --prune` (>90 days).
+Read canonical `.json` stores at task start (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`); fall back to the matching `.md` only when the `.json` is absent (see `docs/memory-system.md` §4.1). The `.md` files are generated views — non-authoritative, regenerated via `mewkit memory render-views`. Update the `.json` stores at task end. See `.claude/memory/` (fixes, review-patterns, architecture-decisions, cost-log, decisions, security-log). Consumer skills include a "Load memory" step. Append by category with `##decision:`, `##pattern:`, `##note:` prefixes. Prune via `/mk:memory --prune` (>90 days).
 
 ## Documentation
 

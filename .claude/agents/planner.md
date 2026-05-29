@@ -110,9 +110,9 @@ Load before producing a plan:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - `.claude/rules/gate-rules.md`: Gate 1 hard-stop conditions you enforce
-- `.claude/memory/fixes.md`: recurring failure classes relevant to planning
-- `.claude/memory/review-patterns.md`: repeated review outcomes relevant to planning
-- `.claude/memory/architecture-decisions.md`: active architectural constraints
+- `.claude/memory/fixes.json` (canonical) first, fall back to `fixes.md` if absent — recurring failure classes relevant to planning (see `.claude/rules/memory-read-rules.md`)
+- `.claude/memory/review-patterns.json` (canonical) first, fall back to `review-patterns.md` if absent — repeated review outcomes relevant to planning
+- `.claude/memory/architecture-decisions.json` (canonical) first, fall back to `architecture-decisions.md` if absent — active architectural constraints
 - `docs/architecture/`: existing ADRs that constrain the design space
 - `tasks/templates/plan-template.md` or `plan-quick.md`: plan structure to follow
 - Existing codebase structure (via Glob/Grep — do not read all files upfront)
