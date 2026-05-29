@@ -5,6 +5,10 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
+import {
+  SecurityFindingsSchema,
+  ArchitectureDecisionsSchema,
+} from '../../../packages/mewkit/src/memory/schemas.js';
 
 let memoryDir: string;
 
@@ -97,5 +101,38 @@ describe('Split schema validity (M4 closed)', () => {
         `${file} should be valid JSON`
       ).not.toThrow();
     }
+  });
+});
+
+describe('Zod store schemas (Phase 1)', () => {
+  it('SecurityFindingsSchema accepts the 4th-store narrative shape', () => {
+    const ok = SecurityFindingsSchema.safeParse({
+      version: '2.0.0',
+      scope: 'security-findings',
+      consumer: 'mk:cso,mk:review',
+      findings: [{ id: 's1', finding: 'token in source', severity: 'high', status: 'fixed' }],
+      metadata: {},
+    });
+    expect(ok.success).toBe(true);
+  });
+
+  it('SecurityFindingsSchema rejects the wrong scope literal', () => {
+    const bad = SecurityFindingsSchema.safeParse({
+      version: '2.0.0',
+      scope: 'fixes',
+      consumer: 'x',
+      findings: [],
+    });
+    expect(bad.success).toBe(false);
+  });
+
+  it('ArchitectureDecisionsSchema keeps unknown additive fields (passthrough)', () => {
+    const parsed = ArchitectureDecisionsSchema.safeParse({
+      version: '2.0.0',
+      scope: 'architecture-decisions',
+      consumer: 'mk:plan-creator',
+      patterns: [{ id: 'a1', source: 'seed-from-md', futureKey: true }],
+    });
+    expect(parsed.success).toBe(true);
   });
 });

@@ -17,6 +17,7 @@ import {
 	type DiagResult,
 	type Status,
 } from "./doctor-checks.js";
+import { checkMemoryHealth } from "./doctor-memory-checks.js";
 import {
 	collectProviderContractDiagnostics,
 	summarizeProviderContractDiagnostics,
@@ -104,6 +105,7 @@ export async function doctor(args?: { report?: boolean; providers?: boolean; sta
 
 	if (args?.state) {
 		results.push(...checkStateTaxonomy(root));
+		results.push(...checkMemoryHealth(root));
 	}
 
 	for (const r of results) {

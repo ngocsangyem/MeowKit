@@ -24,10 +24,16 @@ describe('Audit-lock: curated-memory writers', () => {
     expect(p).toMatch(/fixes\.md/);
   });
 
-  it('architecture-decisions.json is empty while its MD holds data (seed-from-md prerequisite)', () => {
-    const json = JSON.parse(read('.claude/memory/architecture-decisions.json')) as { patterns: unknown[] };
+  it('architecture-decisions.json is populated from its MD (post seed-from-md, Phase 1)', () => {
+    // Pre-Phase-1 this store was empty (patterns:[]) while the MD held 5 entries;
+    // `mewkit memory seed-from-md` populated it. The invariant now: JSON holds the
+    // MD knowledge so JSON-first readers (Phase 2) lose nothing.
+    const json = JSON.parse(read('.claude/memory/architecture-decisions.json')) as {
+      patterns: Array<{ source?: string }>;
+    };
     expect(Array.isArray(json.patterns)).toBe(true);
-    expect(json.patterns.length).toBe(0);
+    expect(json.patterns.length).toBeGreaterThan(0);
+    expect(json.patterns.some((p) => p.source === 'seed-from-md')).toBe(true);
     expect(read('.claude/memory/architecture-decisions.md').length).toBeGreaterThan(1000);
   });
 });

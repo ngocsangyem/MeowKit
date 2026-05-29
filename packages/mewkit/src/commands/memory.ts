@@ -2,11 +2,15 @@ import fs from "node:fs";
 import path from "node:path";
 import readline from "node:readline";
 import pc from "picocolors";
+import { validateMemory } from "../memory/validate.js";
+import { seedFromMd } from "../memory/seed-from-md.js";
 
 interface MemoryArgs {
+	subcommand?: string;
 	clear?: boolean;
 	show?: boolean;
 	stats?: boolean;
+	strict?: boolean;
 }
 
 interface PatternEntry {
@@ -228,6 +232,55 @@ function showSummary(memoryDir: string): void {
 	}
 }
 
+// `mewkit memory validate [--strict]` — Zod-validate the curated stores +
+// re-run the injection-content guard per text field. Warn-only by default
+// (exit 0); --strict exits nonzero when any error is present.
+function validateCmd(memoryDir: string, strict: boolean): void {
+	const report = validateMemory(memoryDir);
+
+	for (const store of report.stores) {
+		const label = `${store.file}:`.padEnd(28);
+		if (store.issues.length === 0) {
+			console.log(`  ${pc.dim(label)} ${pc.green(`OK (${store.entryCount} entries)`)}`);
+			continue;
+		}
+		const worst = store.issues.some((i) => i.level === "error") ? pc.red("ISSUES") : pc.yellow("WARN");
+		console.log(`  ${pc.dim(label)} ${worst}`);
+		for (const issue of store.issues) {
+			const tag = issue.level === "error" ? pc.red("error") : pc.yellow("warn");
+			console.log(`      ${tag} ${issue.message}`);
+		}
+	}
+
+	console.log();
+	console.log(
+		`${report.errorCount} error(s), ${report.warnCount} warning(s) across ${report.stores.length} curated stores.`,
+	);
+
+	if (strict && report.errorCount > 0) {
+		console.log(pc.red("Strict mode: failing on errors."));
+		process.exit(1);
+	}
+}
+
+// `mewkit memory seed-from-md` — one-shot, additive, idempotent MD→JSON seeder.
+function seedCmd(memoryDir: string): void {
+	const results = seedFromMd(memoryDir);
+	let totalAdded = 0;
+	for (const r of results) {
+		totalAdded += r.added;
+		const label = `${r.file}:`.padEnd(28);
+		const note = r.added > 0 ? pc.green(`+${r.added} (now ${r.total})`) : pc.dim(`unchanged (${r.total})`);
+		console.log(`  ${pc.dim(label)} ${note}`);
+	}
+	console.log();
+	console.log(
+		totalAdded > 0
+			? pc.green(`Seeded ${totalAdded} entr${totalAdded === 1 ? "y" : "ies"} from markdown.`)
+			: pc.dim("Nothing to seed — JSON stores already current."),
+	);
+}
+
 export async function memory(args: MemoryArgs): Promise<void> {
 	console.log(pc.bold(pc.cyan("Agent Memory")));
 	console.log();
@@ -242,7 +295,11 @@ export async function memory(args: MemoryArgs): Promise<void> {
 	console.log(`${pc.dim("Location:")} ${memoryDir}`);
 	console.log();
 
-	if (args.clear) {
+	if (args.subcommand === "validate") {
+		validateCmd(memoryDir, args.strict ?? false);
+	} else if (args.subcommand === "seed-from-md") {
+		seedCmd(memoryDir);
+	} else if (args.clear) {
 		await clearMemory(memoryDir);
 	} else if (args.show) {
 		showLessons(memoryDir);
