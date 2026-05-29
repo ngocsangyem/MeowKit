@@ -33,17 +33,17 @@ async function writeText(root: string, relPath: string, content: string): Promis
 
 describe("smart update manifest ownership", () => {
 	it("classifies manifest-relative kit paths as core", () => {
-		expect(classifyLayer("rules/primary-workflow.md")).toBe("core");
-		expect(classifyLayer(".claude/rules/primary-workflow.md")).toBe("user");
+		expect(classifyLayer("rules/core-behaviors.md")).toBe("core");
+		expect(classifyLayer(".claude/rules/core-behaviors.md")).toBe("user");
 	});
 
 	it("updates unchanged core files using .claude-relative manifest keys", async () => {
 		const source = await makeTempRoot();
 		const target = await makeTempRoot();
 
-		await writeText(source, ".claude/rules/primary-workflow.md", "new workflow\n");
+		await writeText(source, ".claude/rules/core-behaviors.md", "new behaviors\n");
 		await writeText(source, ".claude/settings.json", "{}\n");
-		await writeText(target, ".claude/rules/primary-workflow.md", "old workflow\n");
+		await writeText(target, ".claude/rules/core-behaviors.md", "old behaviors\n");
 		await writeText(target, ".claude/settings.json", "{}\n");
 
 		const oldManifest = buildManifest(join(target, ".claude"));
@@ -51,35 +51,35 @@ describe("smart update manifest ownership", () => {
 
 		const stats = await smartUpdate(config, source, target, false, false, { cleanup: false });
 
-		await expect(readFile(join(target, ".claude/rules/primary-workflow.md"), "utf-8")).resolves.toBe("new workflow\n");
+		await expect(readFile(join(target, ".claude/rules/core-behaviors.md"), "utf-8")).resolves.toBe("new behaviors\n");
 		expect(stats.updated).toBeGreaterThanOrEqual(1);
 		expect(stats.userModified).toEqual([]);
 		const manifest = readManifest(join(target, ".claude"));
-		expect(manifest?.checksums["rules/primary-workflow.md"]?.owner).toBe("meowkit");
-		expect(manifest?.checksums["rules/primary-workflow.md"]?.sourceChecksum).toMatch(/^[a-f0-9]{64}$/);
+		expect(manifest?.checksums["rules/core-behaviors.md"]?.owner).toBe("meowkit");
+		expect(manifest?.checksums["rules/core-behaviors.md"]?.sourceChecksum).toMatch(/^[a-f0-9]{64}$/);
 	});
 
 	it("skips user-modified core files but still merges settings.json", async () => {
 		const source = await makeTempRoot();
 		const target = await makeTempRoot();
 
-		await writeText(source, ".claude/rules/primary-workflow.md", "release update\n");
+		await writeText(source, ".claude/rules/core-behaviors.md", "release update\n");
 		await writeText(
 			source,
 			".claude/settings.json",
 			JSON.stringify({ permissions: { allow: ["Bash(npm test)"] }, statusLine: { type: "command" } }),
 		);
-		await writeText(target, ".claude/rules/primary-workflow.md", "installed workflow\n");
+		await writeText(target, ".claude/rules/core-behaviors.md", "installed behaviors\n");
 		await writeText(target, ".claude/settings.json", JSON.stringify({ permissions: { allow: ["Bash(git status)"] } }));
 
 		const oldManifest = buildManifest(join(target, ".claude"));
 		writeManifest(join(target, ".claude"), oldManifest);
-		await writeText(target, ".claude/rules/primary-workflow.md", "user edit\n");
+		await writeText(target, ".claude/rules/core-behaviors.md", "user edit\n");
 
 		const stats = await smartUpdate(config, source, target, false, false, { cleanup: false });
 
-		await expect(readFile(join(target, ".claude/rules/primary-workflow.md"), "utf-8")).resolves.toBe("user edit\n");
-		expect(stats.userModified).toEqual([".claude/rules/primary-workflow.md"]);
+		await expect(readFile(join(target, ".claude/rules/core-behaviors.md"), "utf-8")).resolves.toBe("user edit\n");
+		expect(stats.userModified).toEqual([".claude/rules/core-behaviors.md"]);
 
 		const settings = JSON.parse(await readFile(join(target, ".claude/settings.json"), "utf-8")) as {
 			permissions: { allow: string[] };
