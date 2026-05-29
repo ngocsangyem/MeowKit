@@ -95,6 +95,14 @@ export async function writePortableRegistry(registry: PortableRegistryV3): Promi
 	}
 }
 
+export async function updateAppliedManifestVersion(mewkitVersion: string): Promise<void> {
+	await withRegistryLock(async () => {
+		const registry = await readPortableRegistry();
+		registry.appliedManifestVersion = mewkitVersion;
+		await writePortableRegistry(registry);
+	});
+}
+
 export async function addPortableInstallation(
 	item: string,
 	type: PortableType,

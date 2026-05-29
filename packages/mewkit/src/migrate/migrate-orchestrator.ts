@@ -23,10 +23,12 @@ import {
 	buildTargetStates,
 	buildTypeDirectoryStates,
 	generateDiff,
+	loadPortableEvolutionManifest,
 	readPortableRegistry,
 	reconcile,
 	releaseMigrationLock,
 	resolveConflict,
+	updateAppliedManifestVersion,
 	type ReconcileAction,
 } from "./reconcile/index.js";
 import { convertItem } from "./converters/index.js";
@@ -102,6 +104,7 @@ async function runMigrateUnderLock(
 	const sourceItems = flattenForReconcile(discovered).map((item) => buildSourceItemState(item, item.type, targets));
 
 	const registry = await readPortableRegistry();
+	const manifest = await loadPortableEvolutionManifest(ctx.bundledKitDir, registry);
 	const targetStates = await buildTargetStates(registry.installations);
 
 	const typeDirectoryStates = buildTypeDirectoryStates(
@@ -113,6 +116,7 @@ async function runMigrateUnderLock(
 		sourceItems,
 		registry,
 		targetStates,
+		manifest,
 		providerConfigs: targets.map((provider) => ({ provider, global: isGlobal })),
 		typeDirectoryStates,
 		force: options.force,
@@ -143,6 +147,13 @@ async function runMigrateUnderLock(
 			`Shared target: ${c.path} (${c.portableType}) used by ${c.providers.join(" + ")} — each provider writes the same content here`,
 	);
 	const modelRoutingBanners = modelRoutingWarnings.map((warning) => `Model routing: ${warning}`);
+	const manifestCleanupCount = portabilityFiltered.plan.actions.filter(
+		(action) => action.reasonCode === "renamed-cleanup" || action.reasonCode === "path-migrated-cleanup",
+	).length;
+	const manifestBanners =
+		manifest && manifestCleanupCount > 0
+			? [`Portable manifest ${manifest.mewkitVersion}: ${manifestCleanupCount} cleanup action(s) planned`]
+			: [];
 
 	printPreflight(portabilityFiltered.plan, {
 		source: { root: discovered.source.root, origin: discovered.source.origin },
@@ -150,6 +161,7 @@ async function runMigrateUnderLock(
 		bannerExtras: [
 			...collisionBanners,
 			...modelRoutingBanners,
+			...manifestBanners,
 			...portabilityFiltered.skipMessages,
 			...portableSkills.skipMessages,
 			...providerDiagnosticMessages,
@@ -200,7 +212,11 @@ async function runMigrateUnderLock(
 	);
 
 	printFinalSummary(results);
-	return results.some((r) => !r.success) ? 1 : 0;
+	const hasFailures = results.some((r) => !r.success);
+	if (!hasFailures && manifest) {
+		await updateAppliedManifestVersion(manifest.mewkitVersion);
+	}
+	return hasFailures ? 1 : 0;
 }
 
 async function confirmExecution(count: number): Promise<boolean> {

@@ -1,8 +1,8 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/reconcile-types.ts
-// Pure types for idempotent migration planning. Manifest type loosened (mewkit defers
-// rename/path-migration to a follow-up; structure preserved for forward compat).
+// Pure types for idempotent migration planning.
 
 import type { PortableRegistryV3 } from "./portable-registry.js";
+import type { PortableEvolutionManifest } from "./portable-manifest.js";
 
 export const UNKNOWN_CHECKSUM = "unknown" as const;
 
@@ -158,12 +158,7 @@ export interface ReconcileProviderInput {
 	global: boolean;
 }
 
-/** Manifest shape for renames/path migrations. Loose for v1; tighten when implemented. */
-export interface PortableManifest {
-	renames?: Array<{ from: string; to: string; type: string }>;
-	pathMigrations?: Array<{ from: string; to: string; type: string }>;
-	[key: string]: unknown;
-}
+export type PortableManifest = PortableEvolutionManifest;
 
 export interface ReconcileInput {
 	sourceItems: SourceItemState[];

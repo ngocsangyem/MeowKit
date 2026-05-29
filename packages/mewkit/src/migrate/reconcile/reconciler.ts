@@ -1,8 +1,6 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/reconciler.ts
 // Pure reconciler module — zero I/O, fully testable.
-// Mewkit-side adaptation: dropped manifest-driven rename/path-migration entry points
-// (greenfield install — no v1→v2 migrations to encode). The 8-case decision matrix is
-// ported verbatim. Reconciler stays pure (no fs, no path I/O).
+// The 8-case decision matrix is ported verbatim. Reconciler stays pure (no fs, no path I/O).
 import path from "node:path";
 import type { PortableInstallationV3 } from "./portable-registry.js";
 import { UNKNOWN_CHECKSUM, getReasonCopy, isUnknownChecksum, normalizeChecksum } from "./reconcile-types.js";
@@ -247,6 +245,8 @@ export function reconcile(input: ReconcileInput): ReconcilePlan {
 		}
 	}
 
+	actions.push(...detectManifestRenames(input, targetStateIndex));
+	actions.push(...detectProviderPathMigrations(input, targetStateIndex));
 	actions.push(...detectOrphans(input));
 
 	const normalizedActions = suppressOverlappingActions(dedupeActions(actions));
@@ -255,6 +255,99 @@ export function reconcile(input: ReconcileInput): ReconcilePlan {
 	const { actions: finalActions, banners } = applyEmptyDirOverride(normalizedActions, dirStates, respectDeletions);
 
 	return buildPlan(finalActions, banners);
+}
+
+function isActiveProviderEntry(input: ReconcileInput, entry: PortableInstallationV3): boolean {
+	return input.providerConfigs.some((p) => p.provider === entry.provider && p.global === entry.global);
+}
+
+function isRegistryOwnedCleanupCandidate(
+	input: ReconcileInput,
+	entry: PortableInstallationV3,
+	targetStateIndex: Map<string, TargetFileState>,
+): boolean {
+	if (!isActiveProviderEntry(input, entry)) return false;
+	if (entry.installSource === "manual") return false;
+
+	const targetState = lookupTargetState(targetStateIndex, entry.path);
+	const targetChangeState = getTargetChangeState(targetState, entry, normalizeChecksum(entry.targetChecksum));
+	return targetChangeState === "unchanged" || targetChangeState === "deleted";
+}
+
+function buildManifestDeleteAction(entry: PortableInstallationV3, code: ReconcileReason): ReconcileAction {
+	return {
+		action: "delete",
+		item: entry.item,
+		type: entry.type,
+		provider: entry.provider,
+		global: entry.global,
+		targetPath: entry.path,
+		reason: getReasonCopy(code),
+		reasonCode: code,
+		reasonCopy: getReasonCopy(code),
+		isDirectoryItem: entry.type === "skill" || undefined,
+	};
+}
+
+function detectManifestRenames(
+	input: ReconcileInput,
+	targetStateIndex: Map<string, TargetFileState>,
+): ReconcileAction[] {
+	const manifest = input.manifest;
+	if (!manifest?.renames.length) return [];
+
+	const actions: ReconcileAction[] = [];
+	for (const entry of input.registry.installations) {
+		const sourcePath = normalizePortablePath(entry.sourcePath);
+		const matchedRename = manifest.renames.find(
+			(rename) => rename.type === entry.type && normalizePortablePath(rename.from) === sourcePath,
+		);
+		if (!matchedRename) continue;
+		if (!isRegistryOwnedCleanupCandidate(input, entry, targetStateIndex)) continue;
+
+		actions.push(buildManifestDeleteAction(entry, "renamed-cleanup"));
+	}
+	return actions;
+}
+
+function isUnderPath(value: string, parent: string): boolean {
+	const normalizedValue = normalizePortablePath(value);
+	const normalizedParent = normalizePortablePath(parent);
+	return normalizedValue === normalizedParent || normalizedValue.startsWith(`${normalizedParent}/`);
+}
+
+function detectProviderPathMigrations(
+	input: ReconcileInput,
+	targetStateIndex: Map<string, TargetFileState>,
+): ReconcileAction[] {
+	const manifest = input.manifest;
+	if (!manifest?.providerPathMigrations.length) return [];
+
+	const actions: ReconcileAction[] = [];
+	for (const entry of input.registry.installations) {
+		const matchedMigration = manifest.providerPathMigrations.find(
+			(migration) =>
+				migration.provider === entry.provider &&
+				migration.type === entry.type &&
+				isUnderPath(entry.path, migration.from),
+		);
+		if (!matchedMigration) continue;
+		if (!isRegistryOwnedCleanupCandidate(input, entry, targetStateIndex)) continue;
+
+		actions.push(buildManifestDeleteAction(entry, "path-migrated-cleanup"));
+	}
+	return actions;
+}
+
+function hasProviderPathMigrationForEntry(input: ReconcileInput, entry: PortableInstallationV3): boolean {
+	const manifest = input.manifest;
+	if (!manifest?.providerPathMigrations.length) return false;
+	return manifest.providerPathMigrations.some(
+		(migration) =>
+			migration.provider === entry.provider &&
+			migration.type === entry.type &&
+			isUnderPath(entry.path, migration.from),
+	);
 }
 
 function determineAction(
@@ -272,6 +365,7 @@ function determineAction(
 		global: providerConfig.global,
 	});
 	if (registryEntry && deletedIdentityKeys.has(identityKey)) registryEntry = null;
+	if (registryEntry && hasProviderPathMigrationForEntry(input, registryEntry)) registryEntry = null;
 
 	const isDirectoryItem = source.type === "skill";
 

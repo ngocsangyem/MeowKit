@@ -1,7 +1,13 @@
-import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { access, mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
-import { executeInstallAction } from "../portable-installer.js";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("../reconcile/portable-registry.js", () => ({
+	addPortableInstallation: vi.fn(async () => undefined),
+	removePortableInstallation: vi.fn(async () => undefined),
+}));
+
+import { executeDeleteAction, executeInstallAction } from "../portable-installer.js";
 import { providers } from "../provider-registry.js";
 import type { PortableItem } from "../types.js";
 
@@ -218,5 +224,27 @@ describe("portable installer", () => {
 
 		expect(result.success).toBe(true);
 		await expect(readFile(targetPath, "utf-8")).resolves.toContain("# config");
+	});
+
+	it("deletes skill directory cleanup actions recursively", async () => {
+		const projectRoot = await mkdtemp(join(originalCwd, "tmp-mewkit-portable-installer-"));
+		tempDirs.push(projectRoot);
+		const targetPath = join(projectRoot, ".agents", "skills", "old-skill");
+		await mkdir(targetPath, { recursive: true });
+		await writeFile(join(targetPath, "SKILL.md"), "# old skill\n", "utf-8");
+
+		const result = await executeDeleteAction({
+			action: "delete",
+			item: "old-skill",
+			type: "skill",
+			provider: "codex",
+			global: false,
+			targetPath,
+			reason: "test",
+			isDirectoryItem: true,
+		});
+
+		expect(result.success).toBe(true);
+		await expect(access(targetPath)).rejects.toThrow();
 	});
 });

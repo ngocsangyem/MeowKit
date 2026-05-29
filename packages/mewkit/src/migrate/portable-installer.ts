@@ -3,7 +3,7 @@
 // Path-safety helpers extracted to portable-installer-path-safety.ts.
 
 import { existsSync } from "node:fs";
-import { unlink } from "node:fs/promises";
+import { rm, unlink } from "node:fs/promises";
 import { providers } from "./provider-registry.js";
 import { addPortableInstallation, removePortableInstallation } from "./reconcile/portable-registry.js";
 import { computeContentChecksum } from "./reconcile/checksum-utils.js";
@@ -181,7 +181,11 @@ async function jsonMergeWrite(action: ReconcileAction, items: PortableItem[], pr
 export async function executeDeleteAction(action: ReconcileAction): Promise<InstallResult> {
 	try {
 		if (existsSync(action.targetPath)) {
-			await unlink(action.targetPath);
+			if (action.isDirectoryItem || action.type === "skill") {
+				await rm(action.targetPath, { recursive: true, force: true });
+			} else {
+				await unlink(action.targetPath);
+			}
 		}
 		await removePortableInstallation(action.item, action.type, action.provider as ProviderType, action.global);
 		return { action, success: true };

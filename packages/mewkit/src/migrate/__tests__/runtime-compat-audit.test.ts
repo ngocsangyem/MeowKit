@@ -20,4 +20,9 @@ describe("runtime compatibility audit", () => {
 		const result = auditRuntimeCompatibility("See .claude/hooks/test.cjs", { name: "test", type: "hooks" }, "claude-code");
 		expect(result.errors).toEqual([]);
 	});
+
+	it("flags Claude Code command assumptions for non-Claude targets", () => {
+		const result = auditRuntimeCompatibility("Run npx claude doctor", { name: "doctor", type: "command" }, "codex");
+		expect(result.errors).toEqual(expect.arrayContaining([expect.stringContaining("Claude Code command assumption")]));
+	});
 });
