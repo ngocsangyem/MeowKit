@@ -1,13 +1,14 @@
 {
   "name": "mewkit",
-  "version": "1.9.21",
+  "version": "1.10.1",
   "description": "MeowKit CLI — scaffold, upgrade, and manage your AI agent toolkit",
   "type": "module",
   "bin": {
     "mewkit": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "portable-manifest.json"
   ],
   "scripts": {
     "build": "npm run build:cli && npm run build:web",

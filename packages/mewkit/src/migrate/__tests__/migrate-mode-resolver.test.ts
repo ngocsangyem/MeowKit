@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { MewkitMigrateError, selectProviders, warnUnverifiedProviders } from "../migrate-mode-resolver.js";
+import { MewkitMigrateError, selectProviders, validateFlags, warnUnverifiedProviders } from "../migrate-mode-resolver.js";
 import { applyMewkitOverrides } from "../provider-overrides.js";
 
 describe("migrate-mode-resolver", () => {
@@ -11,6 +11,10 @@ describe("migrate-mode-resolver", () => {
 
 	it("allows deprecated providers when forced", async () => {
 		await expect(selectProviders({ tool: "roo", force: true })).resolves.toEqual(["roo"]);
+	});
+
+	it("rejects unused source-version flag", () => {
+		expect(() => validateFlags({ sourceVersion: "1.9.0" }, [])).toThrow("--source-version is not used");
 	});
 
 	it("warns for experimental and unverified providers", () => {

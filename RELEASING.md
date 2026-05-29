@@ -89,6 +89,17 @@ cd website && npx vitepress build
 
 Must complete with no errors. Chunk size warnings are normal.
 
+#### 1d. Update portable migration manifest when paths move
+
+Check `packages/mewkit/portable-manifest.json` whenever a release moves source files or provider install paths used by `mewkit migrate`.
+
+- Add a `renames` entry when a shipped `.claude/` source item moves or is renamed.
+- Add a `providerPathMigrations` entry when a target provider path changes, such as moving Codex skills to a new directory.
+- Do not add entries for new files, deleted files, provider capability changes, or invented history.
+- Keep release checksum manifests, provider manifests, and `portable-manifest.json` separate; they serve different purposes.
+- Do not copy `portable-manifest.json` into `.claude/`. It is an npm package artifact shipped with `packages/mewkit`, not part of the project kit that `npx mewkit init` scaffolds.
+- If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `tasks/`, `CLAUDE.md`, and `release-manifest.json`.
+
 ### 2. Update CHANGELOG (`website/changelog.md`)
 
 > **Note:** Root `CHANGELOG.md` is a stub that points at `website/changelog.md` (the live source). Edit `website/changelog.md`.
@@ -402,6 +413,9 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.9.10 | 2026-05-23 | Skill portability + cook context-engineering + provider diagnostics |
+| v2.9.9  | 2026-05-23 | Plan-creator determinism + handoff               |
+| v2.9.8  | 2026-05-23 | Memory system deep fix                           |
 | v2.9.7  | 2026-05-16 | Docs reference contract + validator              |
 | v2.9.6  | 2026-05-16 | Context isolation: SessionStart budgeting, agent-detector sentinel, memory auto-prune |
 | v2.9.5  | 2026-05-14 | mk:worktree script backing and new commands       |

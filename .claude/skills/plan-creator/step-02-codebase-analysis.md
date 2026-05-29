@@ -10,7 +10,7 @@ Understand existing codebase before drafting plan.
 
 Invoke `mk:scout` on directories related to the task:
 - **Standard (hard):** Identify 2-3 directories most likely to be affected
-- **Deep mode:** Identify 3-5 directories, spawn 2-3 parallel scouts for broader coverage
+- **Deep mode:** Follow `references/deep-mode.md`: scout max 5 roots and produce a compact scope map with roots, existing tests, public contracts, risky dependencies, and an uncertainty list
 - Scout produces: file map, architecture fingerprint, complexity estimate
 
 If `mk:scout` unavailable, manually Glob + Grep the relevant directories.

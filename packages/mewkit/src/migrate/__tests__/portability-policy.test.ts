@@ -295,7 +295,7 @@ describe("portability policy", () => {
 		);
 	});
 
-	it("keeps skills available for provider-specific rewriting during install", async () => {
+	it("installs explicit generic skills only for first-pass providers", async () => {
 		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
 		tempDirs.push(root);
 
@@ -321,6 +321,12 @@ describe("portability policy", () => {
 				name: "portable-skill",
 				dirName: "portable-skill",
 				description: "Generic helper",
+				portability: {
+					portability: "generic",
+					providers: { include: ["codex"] },
+					requires: { surfaces: ["skill"] },
+					contextCost: "low",
+				},
 				sourcePath: portableDir,
 			},
 			{
@@ -328,21 +334,26 @@ describe("portability policy", () => {
 				name: "workflow-orchestrator",
 				dirName: "workflow-orchestrator",
 				description: "Bound",
+				portability: {
+					portability: "generic",
+					providers: { include: ["codex"] },
+					requires: { surfaces: ["skill"] },
+					contextCost: "high",
+				},
 				sourcePath: boundDir,
 			},
 		];
 
 		const result = await buildPortableSkillsByProvider(skills, ["codex", "cursor"] satisfies ProviderType[]);
 
-		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual([
-			"portable-skill",
-			"workflow-orchestrator",
-		]);
-		expect(result.skillsByProvider.get("cursor")?.map((skill) => skill.name)).toEqual([
-			"portable-skill",
-			"workflow-orchestrator",
-		]);
-		expect(result.skipMessages).toEqual([]);
+		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["portable-skill"]);
+		expect(result.skillsByProvider.get("cursor")?.map((skill) => skill.name)).toEqual([]);
+		expect(result.skipMessages).toContain(
+			"Skipped 1 skill for Codex: runtime-bound Claude harness content: .claude path, mk/meow slash command, orchestrator semantics",
+		);
+		expect(result.skipMessages).toContain(
+			"Skipped 2 skills for Cursor: skill portability metadata first pass is limited to Codex, Gemini CLI, Antigravity, and OpenCode",
+		);
 	});
 
 	it("does not skip skills only because they mention workflow phases", async () => {
@@ -363,6 +374,12 @@ describe("portability policy", () => {
 				name: "phase-aware-skill",
 				dirName: "phase-aware-skill",
 				description: "Phase-aware helper",
+				portability: {
+					portability: "generic",
+					providers: { include: ["codex"] },
+					requires: { surfaces: ["skill"] },
+					contextCost: "low",
+				},
 				sourcePath: phaseSkillDir,
 			},
 		];
@@ -408,18 +425,24 @@ describe("portability policy", () => {
 			[
 				{
 					id: "mk:portable-skill",
-					name: "portable-skill",
-					dirName: "portable-skill",
-					description: "Generic helper",
-					sourcePath: skillDir,
+				name: "portable-skill",
+				dirName: "portable-skill",
+				description: "Generic helper",
+				portability: {
+					portability: "generic",
+					providers: { include: ["codex"] },
+					requires: { surfaces: ["skill"] },
+					contextCost: "low",
 				},
-			],
+				sourcePath: skillDir,
+			},
+		],
 			["codex", "cursor"] satisfies ProviderType[],
 		);
 
 		expect(buildSkillDryRunMessages(result.skillsByProvider, ["codex", "cursor"] satisfies ProviderType[])).toEqual([
 			"Codex: 1 skill folder scheduled for install",
-			"Cursor: 1 skill folder scheduled for install",
+			"Cursor: 0 skill folders scheduled for install",
 		]);
 	});
 

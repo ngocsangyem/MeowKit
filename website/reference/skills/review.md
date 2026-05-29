@@ -58,6 +58,19 @@ If total findings across all reviewers = 0, triggers ONE re-analysis with "look 
 
 **Verdict rules:** Any FAIL -> Overall FAIL -> Gate 2 blocks. All PASS -> PASS. Mix PASS/WARN -> WARN.
 
+### Side-Effect Signal (additive, positive-presence-only)
+
+When findings indicate a regression, side effect, or workflow break in **existing** behavior caused by the diff (not new-code bugs), the verdict appends a plaintext signal line:
+
+```
+Side Effects Detected: Yes
+- <one-line bullet per detected effect>
+```
+
+`validate-gate-2.sh` recognizes this signal and blocks Gate 2 UNTIL a `## User Decision Addendum` block (containing `User selected:` + `Resumption point:`) is appended. See `mk:cook/references/review-cycle.md` "Regression Recovery Options" for the 4 standard recovery options the cook orchestrator presents.
+
+**Backward-compat (CRITICAL):** absence of the `Side Effects Detected` field is NOT a block signal. Existing verdicts that pre-date this contract continue to validate unchanged. The new signal is positive-presence-only — never negative-absence.
+
 ### Artifact Verification (Full Scope Only)
 
 4-level post-verdict check:

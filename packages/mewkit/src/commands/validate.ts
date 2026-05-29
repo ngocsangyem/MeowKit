@@ -2,11 +2,16 @@ import fs from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
 import { checkDocsReferences } from "../core/check-docs-references.js";
+import { collectProviderContractDiagnostics } from "../migrate/provider-contract-diagnostics.js";
 
 interface CheckResult {
 	name: string;
 	passed: boolean;
 	detail: string;
+}
+
+interface ValidateOptions {
+	portable?: boolean;
 }
 
 /** Find MeowKit .claude/ in cwd only (no walk-up). */
@@ -159,7 +164,7 @@ function printResult(result: CheckResult): void {
 	}
 }
 
-export async function validate(): Promise<void> {
+export async function validate(args: ValidateOptions = {}): Promise<void> {
 	console.log(pc.bold(pc.cyan("Validating .claude/ project structure...")));
 	console.log();
 
@@ -191,6 +196,17 @@ export async function validate(): Promise<void> {
 
 	// Docs-reference contract (Type-1 allowlist)
 	results.push(...checkDocsRefsContract(meowkitDir));
+
+	if (args.portable) {
+		for (const diagnostic of collectProviderContractDiagnostics()) {
+			if (diagnostic.severity === "pass") continue;
+			results.push({
+				name: `Provider contract: ${diagnostic.providerDisplayName}/${diagnostic.surface}`,
+				passed: diagnostic.severity !== "fail",
+				detail: diagnostic.message,
+			});
+		}
+	}
 
 	for (const result of results) {
 		printResult(result);

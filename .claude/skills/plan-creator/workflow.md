@@ -14,14 +14,15 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 
 1. `step-00-scope-challenge.md` — Assess complexity, select mode (fast|hard|deep|parallel|two|product-level), user scope input (EXPANSION/HOLD/REDUCTION), early-exit trivial tasks
 2. `step-01-research.md` — Spawn researchers (hard/deep/parallel/two only). Bounded: 2-3 researchers, max 5 calls each. REDUCTION = 1 researcher.
-3. `step-02-codebase-analysis.md` — Scout + project docs reading (hard/deep/parallel/two only; deep: 2-3 parallel scouts)
-4. `step-03-draft-plan.md` — Write plan.md overview + phase-XX files. Integrate research findings. Deep: per-phase scouting. TDD: inject 4 TDD sections.
+3. `step-02-codebase-analysis.md` — Scout + project docs reading (hard/deep/parallel/two only; deep: bounded scope map per `references/deep-mode.md`)
+4. `step-03-draft-plan.md` — Write plan.md overview + phase-XX files. Integrate research findings. Deep: phase map. TDD: inject regression-first sections.
    - **Branch:** if `planning_mode = product-level`, use `step-03a-product-spec.md` instead (writes plan.md only — user stories, features, design language; NO phase files).
 5. `step-04-semantic-checks.md` — Semantic checks + structural validation (validate-plan.py). Fast mode: skip validation, go to step-07.
 6. `step-05-red-team.md` — Plan red team (hard/deep/parallel/two only): 4-persona scaling, red-team-findings.md, subagent dispatch, adjudication
 7. `step-06-validation-interview.md` — Validation interview (hard/deep/parallel/two only): 3-5 critical questions with detection keywords, section-mapped answer propagation
 8. `step-07-gate.md` — Self-check + Gate 1: AskUserQuestion (Approve | Modify | Reject)
-9. `step-08-hydrate-tasks.md` — Create Claude Tasks from phase checkboxes + critical-step sub-tasks + checkpoint file
+9. `step-08-hydrate-tasks.md` — Create session tasks from phase checkboxes + critical-step sub-tasks + checkpoint file
+10. `step-09-post-plan-handoff.md` — Deterministic mode-pruned `AskUserQuestion`: Cook | Validate | Red-team | End. Writes `handoff.next` to plan.md frontmatter, prints suggested command, STOPs.
 
 ## Variables Passed Between Steps
 
@@ -38,6 +39,9 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 | `red_team_findings` | step-05 | step-06 | Summary string: "{N} findings, {M} accepted" |
 | `selected_approach` | step-04 | step-05, step-08 | `"a"` or `"b"` (two mode only; unset otherwise) |
 | `tdd_mode` | step-00 | step-03 | `true` or `false` (composable flag, independent of planning_mode) |
+| `handoff_next` | step-09 | (terminal) | `cook \| validate \| red-team \| harness \| end` (written to plan.md frontmatter) |
+| `consistency_sweeps_passed` | step-05, step-06 | step-07 | `{ red_team: bool, validation: bool }` — true if `unresolved = 0` |
+| `verification_tier` | step-04 | step-06 | `light`, `standard`, `full` — auto by phase count; unset when fast / product-level |
 
 ## Flow
 
@@ -61,15 +65,15 @@ Step 1: Research (hard/deep/parallel/two only)
          ↓
 Step 2: Codebase Analysis (hard/deep/parallel/two only)
     ├── hard: mk:scout on 2-3 relevant dirs
-    ├── deep: mk:scout on 3-5 dirs, 2-3 parallel scouts
+    ├── deep: mk:scout on max 5 roots → compact scope map, tests, contracts, uncertainty
     └── Read project-context.md + docs/
          ↓
 Step 3: Draft Plan
     ├── Read research reports (file paths from Step 1)
     ├── Write plan.md (overview, ≤80 lines, richer frontmatter)
     ├── Write phase-XX files (12-section template, hard/deep mode)
-    ├── If tdd_mode=true: inject 4 TDD sections per phase file
-    ├── If deep mode: per-phase scout → inject File Inventory + Dependency Map
+    ├── If tdd_mode=true: inject Tests Before + Protected Change + Tests After + Regression Gate
+    ├── If deep mode: phase scout → inject Deep Phase Map appendix
     ├── Cross-plan dependency scan (blockedBy/blocks)
     ├── Verify research links in phase Context Links
     └── product-level mode → use step-03a (spec only, NO phase files)
@@ -77,6 +81,11 @@ Step 3: Draft Plan
 Step 4: Semantic Checks
     ├── 4a. Semantic checks (goal=outcome, ACs=binary, constraints non-empty)
     ├── 4b. Structural validation (validate-plan.py) — must output PLAN_COMPLETE
+    ├── 4c. Two-Approach Selection (planning_mode = two only)
+    ├── 4d. Verification Roles (skipped in fast / product-level)
+    │   ├── Tier: 1–2 = Light, 3–4 = Standard, 5+ = Full
+    │   ├── Roles parallel-dispatched as READ-ONLY Explore subagents
+    │   └── Orchestrator aggregates → one Edit per phase file → `## Verification Log`
     └── fast mode → skip to Step 7
          ↓
 Step 5: Red Team (hard/deep/parallel/two only — skipped in fast)
@@ -86,12 +95,20 @@ Step 5: Red Team (hard/deep/parallel/two only — skipped in fast)
     ├── Collect → deduplicate → sort by severity → cap at 15
     ├── Agent adjudicates each: Accept/Reject + rationale
     ├── Write red-team-findings.md (full detail)
-    └── AskUserQuestion: Apply all / Review each / Reject all
+    ├── AskUserQuestion: Apply all / Review each / Reject all
+    └── Gate W1: Whole-Plan Consistency Sweep (stage-then-apply)
+         ├── Pass 1 reads N+2 files, stages Pending Sweep Edits
+         ├── If unresolved > 0 → AskUserQuestion (defer/resolve/skip)
+         └── Pass 2 applies edits + writes sweep block + frontmatter
          ↓
 Step 6: Validation Interview (hard/deep/parallel/two only — skipped in fast)
     ├── Generate 3-5 critical questions using detection keywords framework
     ├── Informed by red-team findings (step-05)
-    └── Propagate answers to phase files via section mapping
+    ├── Propagate answers to phase files via section mapping
+    └── Gate W2: Whole-Plan Consistency Sweep (stage-then-apply)
+         ├── Pass 1 reads N+2 files, stages Pending Sweep Edits
+         ├── If unresolved > 0 → AskUserQuestion (resolve/accept-risk/cancel)
+         └── Pass 2 applies edits + writes Validation Log + frontmatter
          ↓
 Step 7: Gate 1
     ├── Self-check: Completed / Skipped / Uncertain
@@ -100,13 +117,21 @@ Step 7: Gate 1
 Step 8: Hydrate Tasks
     ├── TaskCreate per phase with addBlockedBy chain
     ├── Critical-step sub-tasks for [CRITICAL]/[HIGH] todo items
-    ├── Create .plan-state.json checkpoint
-    └── Output cook command with absolute path → STOP
+    └── Create .plan-state.json checkpoint
+         ↓
+Step 9: Post-Plan Handoff
+    ├── Live risk re-scan over plan + phase files (advisory if new flag)
+    ├── Build mode-pruned option set (cap 4)
+    ├── AskUserQuestion: Cook | Validate | Red-team | End (fast)
+    │   OR Cook | End (hard / deep / parallel / two)
+    │   OR Hand off to mk:harness | End (product-level)
+    ├── Write handoff.next + decided_at to plan.md frontmatter
+    └── Print suggested command + Context Reminder → STOP
 ```
 
 ## Mode Notes
 
-- `--deep` requires `--hard` internally (full research pipeline + per-phase scouting after step-03).
+- `--deep` requires `--hard` internally (full research pipeline + bounded phase scouting after step-03). It does not choose an architecture; if the approach is unclear, route to `mk:brainstorming` before planning.
 - `--parallel` and `--two` both require `--hard` internally (full research pipeline runs).
 - `--parallel`: step-03 adds ownership matrix; step-08 uses parallel group hydration.
 - `--two`: step-03 produces 2 approach files (no plan.md yet); step-04 asks user to select before step-05.

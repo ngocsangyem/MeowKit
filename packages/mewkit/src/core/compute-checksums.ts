@@ -4,10 +4,17 @@ import { join, relative } from "node:path";
 
 /** File layer determines update behavior */
 export type FileLayer = "core" | "skill" | "user";
+export type ManifestOwner = "meowkit" | "user" | "meowkit-modified";
 
 export interface ManifestEntry {
 	sha256: string;
 	layer: FileLayer;
+	owner?: ManifestOwner;
+	installedVersion?: string;
+	baseChecksum?: string;
+	sourceChecksum?: string;
+	targetChecksum?: string;
+	installedAt?: string;
 }
 
 export interface Manifest {
@@ -90,20 +97,28 @@ function collectFiles(dir: string, baseDir: string): string[] {
  */
 export function buildManifest(claudeDir: string): Manifest {
 	const checksums: Record<string, ManifestEntry> = {};
+	const generatedAt = new Date().toISOString();
 
 	const files = collectFiles(claudeDir, claudeDir);
 
 	for (const relPath of files) {
 		const fullPath = join(claudeDir, relPath);
+		const sha256 = hashFile(fullPath);
+		const layer = classifyLayer(relPath);
 		checksums[relPath] = {
-			sha256: hashFile(fullPath),
-			layer: classifyLayer(relPath),
+			sha256,
+			layer,
+			owner: layer === "user" ? "user" : "meowkit",
+			baseChecksum: sha256,
+			sourceChecksum: sha256,
+			targetChecksum: sha256,
+			installedAt: generatedAt,
 		};
 	}
 
 	return {
-		version: "0.1.0",
-		generatedAt: new Date().toISOString(),
+		version: "0.2.0",
+		generatedAt,
 		checksums,
 	};
 }

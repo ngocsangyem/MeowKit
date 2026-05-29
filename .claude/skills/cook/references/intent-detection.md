@@ -67,33 +67,35 @@ Detect multiple features from natural language:
 
 ## Mode Behaviors
 
-| Mode        | Research | TDD          | Gate 1             | Gate 2    | Parallel  |
-| ----------- | -------- | ------------ | ------------------ | --------- | --------- |
-| interactive | Yes      | Yes (strict) | Human              | Human     | No        |
-| auto        | Yes      | Yes (strict) | Auto (validated)   | **Human** | Per phase |
-| fast        | Skip     | Plan-level   | Human              | **Human** | No        |
-| parallel    | Optional | Yes (strict) | Human              | **Human** | Yes       |
-| no-test     | Yes      | Skip         | Human              | **Human** | No        |
-| code        | Skip     | Yes (strict) | Skip (plan exists) | **Human** | Per plan  |
+| Mode        | Research | TDD        | Gate 1             | Gate 2    | Parallel  |
+| ----------- | -------- | ---------- | ------------------ | --------- | --------- |
+| interactive | Yes      | RED-strict | Human              | Human     | No        |
+| auto        | Yes      | RED-strict | Auto (validated)   | **Human** | Per phase |
+| fast        | Skip     | Plan-level | Human              | **Human** | No        |
+| parallel    | Optional | RED-strict | Human              | **Human** | Yes       |
+| no-test     | Yes      | Skip       | Human              | **Human** | No        |
+| code        | Skip     | RED-strict | Skip (plan exists) | **Human** | Per plan  |
 
-**Gate 2 is ALWAYS human-approved.** No mode bypasses it.
+**Gate 2: human approval mandatory in all modes — see `.claude/rules/gate-rules.md` for the full contract.**
 
 **TDD column:**
 
-- "Yes (strict)" = failing tests written in Phase 2, implementation fills them in Phase 3
-- "Plan-level" = tests cover plan intent (not research-level edge cases), still written before implementation
-- "Skip" = no-test mode only, user explicitly opted out
+- `RED-strict` = failing tests written in Phase 2 before any implementation. Enforced ONLY when `--tdd` / `MEOWKIT_TDD=1` is active; otherwise Phase 2 stays optional and the developer may implement directly per the approved plan.
+- `Plan-level` = tests cover plan intent (not research-level edge cases), no RED gate.
+- `Skip` = no Phase 2 (`--no-test` mode; user explicitly opted out).
 
 ## Modifier Flags
 
 Modifier flags layer on TOP of the detected mode. They do not change the mode itself.
 
-| Flag | Effect | When It Fires | Cost |
-|------|--------|---------------|------|
-| `--verify` | Light browser check after review passes | Phase 4.5 (between Review and Ship) | ~$1, <5K tokens |
-| `--strict` | Full evaluator (mk:evaluate) after review passes | Phase 4.5 (between Review and Ship) | ~$2-5 |
+| Flag | Effect | When It Fires | Relative cost† |
+|------|--------|---------------|----------------|
+| `--verify` | Light browser check after review passes | Phase 4.5 (between Review and Ship) | [LIGHT] |
+| `--strict` | Full evaluator (mk:evaluate) after review passes | Phase 4.5 (between Review and Ship) | [HEAVY] |
 | `--no-strict` | Suppress auto-strict trigger from scale-routing | — | — |
 | `--tdd` | Write failing tests before implementation | Phase 2 (Test RED) | Varies |
+
+† `[LIGHT]` vs `[HEAVY]` is a relative ordering only. Concrete cost depends on the inner harness, model tier, and target surface — see `SKILL.md` for the canonical variability note.
 
 **Priority:** `--strict` supersedes `--verify` (strict includes verification). If both present, only `--strict` runs.
 **Combination:** All modifiers can combine with any mode (`--verify --fast`, `--strict --parallel`, etc.).

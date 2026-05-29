@@ -50,7 +50,7 @@ user-invocable: true
 ## Skill wiring
 
 - **Reads memory:** `.claude/memory/fixes.md`, `.claude/memory/architecture-decisions.md`
-- **Writes memory:** `.claude/memory/fixes.md` with `##note:` prefix (diagnosis records only — the fix itself is persisted by `mk:fix`)
+- **Writes memory:** `.claude/memory/fixes.md` via direct `Edit` (diagnosis records only — `##note:` is a user-typed keyboard shortcut that does NOT fire from agent output; the fix itself is persisted by `mk:fix`). See `.claude/skills/memory/references/capture-architecture.md`.
 
 ## Plan-First Gate
 

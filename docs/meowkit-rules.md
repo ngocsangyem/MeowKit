@@ -31,6 +31,8 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 
 **Rule:** When referencing any file in a skill or agent, use the FULL path from project root. Never use shortened or assumed paths. Before merging, grep for the path in all consuming files.
 
+**State taxonomy:** Provider artifacts live under provider-owned roots (`.claude/`, `.codex/`, `.gemini/`, `.agents/skills/`). Durable workflow artifacts live under `tasks/` (`plans/`, `contracts/`, `reviews/`, `harness-runs/`). Ephemeral runtime state lives at project-root `session-state/`. Curated reusable memory lives under `.claude/memory/`. `tasks/completed/` is not a canonical active path until an archive writer owns it.
+
 ---
 
 ## 2. Agent Naming

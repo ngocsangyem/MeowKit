@@ -47,7 +47,7 @@ The auto-detection step tries these env vars in order and uses the first set:
 
 1. `MEOWKIT_MODEL_HINT` (explicit override)
 2. `CLAUDE_MODEL` (host-runtime legacy)
-3. `ANTHROPIC_MODEL` (Anthropic SDK)
+3. `ANTHROPIC_MODEL` (`Anthropic` SDK)
 4. (none) → defaults to `STANDARD` tier → `FULL` density (safe fallback)
 
 **Known limitation:** On Claude Code, the model id env var is not always exported to subagent contexts. Users running `/mk:harness` on Opus 4.6 who want LEAN mode should either:
@@ -75,7 +75,7 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 |---|---|
 | Hardcoding LEAN for all Opus models | Opus 4.5 still benefits from FULL — only 4.6+ has the auto-compaction + 1M context that justifies LEAN |
 | Setting MEOWKIT_HARNESS_MODE=LEAN to "save time" on Sonnet | Sonnet without scaffolding produces worse output AND wastes more time on rework |
-| Forcing FULL on Opus 4.6 because "more is safer" | False — over-scaffolding capable models adds noise. Anthropic's measured finding |
+| Forcing FULL on Opus 4.6 because "more is safer" | False — over-scaffolding capable models adds noise. Anthropic's measured finding <!-- research-citation --> |
 | Skipping the calibration replay after a model upgrade | The whole policy depends on measured performance per tier; skipping is how the matrix becomes dead weight itself |
 
 ## See Also
@@ -84,4 +84,4 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 - `.claude/rules/harness-rules.md` Rule 7 — when the dead-weight audit must be re-run
 - `.claude/skills/scale-routing/SKILL.md` Output Schema v2.1 — `harness_density` field
 - `.claude/skills/benchmark/` — calibration replay automation
-- Anthropic harness design article (Prithvi Rajasekaran, Labs)
+- Anthropic harness design article (Prithvi Rajasekaran, Labs) <!-- research-citation -->

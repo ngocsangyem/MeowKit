@@ -67,7 +67,7 @@ Skills load step files JIT (one step at a time). Memory topic files load per-ski
 - `orientation-ritual.cjs`: ~100-token checkpoint recovery on resume (not full transcript re-injection).
 - Step-file JIT architecture: workflow steps load one at a time; never bulk-loaded.
 - Memory tombstone: auto-inject memory pipeline removed (v2.4.0); memory is on-demand per skill.
-- `session-state/` lifecycle: all session files cleared on session ID change.
+- `session-state/` lifecycle: root-level runtime files are cleared on session ID change.
 
 **Moderate:**
 
@@ -102,6 +102,8 @@ Use `mk:spawn` to assemble a context-isolated subagent prompt. The command enfor
 | OpenHands   | Varies     | May not honor CLAUDE.md                       | Not supported       |
 
 For non–Claude Code inner harnesses: do NOT assume rule files are auto-loaded into subagent context. Pass required rule content explicitly in the Task prompt when needed. Keep spawn prompts under 32KB to stay within Codex's AGENTS.md cap.
+
+Provider artifact roots are intentionally separate: Claude Code uses `.claude/`, Codex uses `.codex/`, Gemini CLI uses `.gemini/`, and portable skills may use `.agents/skills/` where that provider has a documented skill surface. MeowKit does not create a project-local `.mewkit/` runtime directory for these installs.
 
 ## Rejected Patterns
 

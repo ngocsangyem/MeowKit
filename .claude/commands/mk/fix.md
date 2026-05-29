@@ -10,6 +10,7 @@
 ## Flags
 
 - `--tdd` — Force regression test BEFORE the fix (writes the `.claude/session-state/tdd-mode` sentinel via Bash). Useful for security-sensitive bugs where you want to prove the bug exists with a failing test before fixing it. Default: regression tests are recommended but not gated.
+- `--no-capture` — Suppress Step 6 memory capture for throwaway one-line fixes. Default: capture is on for Standard and Complex paths; Simple path captures only when the bug class is novel.
 
 ## Behavior
 
@@ -78,6 +79,44 @@ Before fixing, classify the bug:
 
 ### Output
 
-- For simple: the fix itself + test results.
-- For standard: regression test + fix + test results.
-- For complex: full pipeline output (plan → test → fix → review → ship).
+- For simple: the fix itself + test results. Memory capture optional (novel bug class only).
+- For standard: regression test + fix + test results + Step 6 memory capture.
+- For complex: full pipeline output (plan → test → fix → review → ship) + Step 6 memory capture.
+
+### Step 6 — Capture (MANDATORY for standard/complex, unless `--no-capture`)
+
+After tests pass and before yielding:
+
+1. **Edit `.claude/memory/fixes.md`** — append a section using the live schema (read the file first to match heading style):
+
+    ```
+    ## <YYYY-MM-DD> — <bug-class slug> (severity: low|medium|high|critical)
+
+    - Symptom: <one line>
+    - Root cause: <one line>
+    - Fix: <one line + file paths>
+    - Prevention: <regression test path OR architectural guard added>
+    ```
+
+2. **Edit `.claude/memory/fixes.json`** — under `patterns`, add or update one entry matching the live schema (`version: 2.0.0`, `scope: fixes`):
+
+    ```json
+    {
+      "id": "<kebab-slug>",
+      "type": "failure",
+      "category": "bug-class",
+      "severity": "low|medium|high|critical",
+      "domain": ["<area1>", "<area2>"],
+      "applicable_when": "<one line>",
+      "context": "<one line>",
+      "pattern": "<one line — what to do or avoid>",
+      "frequency": 1,
+      "lastSeen": "<YYYY-MM-DD>"
+    }
+    ```
+
+3. **If the same `id` already exists**, increment `frequency` and update `lastSeen`. Do not duplicate entries.
+
+4. **Do NOT use `##pattern:` prefixes.** That is a user-typed keyboard shortcut bound to UserPromptSubmit — it only fires when the human user types the prefix at the start of a message. Agent output does not trigger it. Always call `Edit` directly. See `.claude/skills/memory/references/capture-architecture.md`.
+
+5. **Scrub secrets, tokens, and PII before writing.** `Edit` is not secret-scrubbed; the LLM is responsible.

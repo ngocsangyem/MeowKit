@@ -94,7 +94,7 @@ From the commit timestamps gathered in Step 3, group by date. For each date, cou
 From the discovery JSON, analyze tool usage patterns:
 - Which AI tool is used for which repos (exclusive vs. shared)
 - Session count per tool
-- Behavioral patterns (e.g., "Codex used exclusively for myapp, Claude Code for everything else")
+- Behavioral patterns (e.g., "Codex used exclusively for myapp, the primary CLI for everything else")
 
 ## Global Step 7: Aggregate and generate narrative
 
@@ -224,7 +224,7 @@ Format:
 
 #### Tool Usage Analysis
 Per-tool breakdown with behavioral patterns:
-- Claude Code: N sessions across M repos — patterns observed
+- Primary CLI: N sessions across M repos — patterns observed
 - Codex: N sessions across M repos — patterns observed
 - Gemini: N sessions across M repos — patterns observed
 

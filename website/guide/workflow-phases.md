@@ -13,13 +13,14 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 ## Phase 0 — Orient
 
 **Agent:** orchestrator, analyst
-**Deliverable:** Model tier assignment, execution mode, context loaded
+**Deliverable:** Model tier assignment, execution mode, context loaded, scout summary presented
 
 - Read `docs/project-context.md` (agent constitution — auto-injected by `project-context-loader.sh`)
 - Read relevant topic files on-demand (consumer skills handle this at task start)
 - Run `mk:scale-routing` for domain-based complexity classification
 - Load stack-relevant skills only (lazy loading)
 - Print cost estimate before starting
+- **Scout-first contract (v2.9.10+):** in `mk:cook`, present a 3–6 bullet codebase-context summary to the user before any clarifying question — project type / language / framework, relevant modules, current patterns, in-flight plans, public APIs/schemas. Skipped on `plan.md` / `phase-*.md` input.
 
 **Navigation help:** `/mk:help` scans plans, reviews, tests, and git to determine pipeline state and prints the next action.
 
@@ -28,19 +29,20 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 **Agent:** planner
 **Deliverable:** `tasks/plans/YYMMDD-name/plan.md`
 
-- `mk:plan-creator` — full plan creation (9-step workflow). Modes: `--fast`, `--hard`, `--deep`, `--parallel`, `--two`, `--product-level`
+- `mk:plan-creator` — full plan creation (9-step workflow). Modes: `--fast`, `--hard`, `--deep`, `--parallel`, `--two`, `--product-level`, `--spike --timebox <duration>`. See [Plan Creator Modes and Flags](/core-concepts/plan-creator-modes-and-flags).
 - `mk:plan-ceo-review` — product lens + engineering lens
 - `mk:validate-plan` — 8-dimension quality check for COMPLEX tasks
 - For COMPLEX tasks (5+ files): bead decomposition — atomic, independently committable work units
+- **Exact-requirements contract (v2.9.10+):** in `mk:cook`, plan-creator MUST answer 5 dimensions in concrete sentences before returning a plan — expected output, acceptance criteria, scope boundary, non-negotiable constraints, touchpoints (files from scout). Clarifying-question options MUST cite scout findings (file paths); abstract options are a failure mode. Skipped on plan-path input.
 
-**Gate 1:** Human approval required. `gate-enforcement.sh` blocks all file writes until plan is approved.
+**Gate 1:** Human approval required. `gate-enforcement.sh` blocks all file writes until plan is approved. In non-auto modes `validate-gate-1.sh` runs as an advisory preflight (surfaces structural-check failures to the user; user retains override). In `--auto` mode it remains blocking.
 
 ## Phase 2 — Test
 
 **Agent:** tester
 **Deliverable:** Tests (failing in TDD mode; optional otherwise)
 
-- **TDD mode** (`--tdd` / `MEOWKIT_TDD=1`): failing tests first. `pre-implement.sh` blocks if no failing test exists.
+- **TDD mode** (`--tdd` / `MEOWKIT_TDD=1`): failing tests first. `pre-implement.sh` blocks if no failing test exists. `--tdd` is a flag, not a planning mode; it composes with the selected plan-creator mode.
 - **Default mode:** Phase 2 is optional. Tester invoked on-request.
 - `mk:nyquist` verifies test-to-requirement coverage at end of phase.
 - Security pre-check always runs.
@@ -65,11 +67,15 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 - Optional pre-review: `mk:scout` for edge case detection
 - Optional post-verdict: `mk:elicit` for deeper analysis on WARN dimensions
 
-**Gate 2:** Human approval required. FAIL blocks Phase 5.
+**Gate 2:** Human approval required in all modes — see `.claude/rules/gate-rules.md`. FAIL blocks Phase 5.
+
+**Regression-recovery pattern (v2.9.10+):** when the reviewer surfaces a regression in EXISTING behavior (verdict appends `Side Effects Detected: Yes` plus bullet effects), cook STOPs the iteration loop and presents 2–4 typed options to the user — revert + re-plan / keep + update dependents / compatibility shim / accept the regression. User selection is recorded as a `## User Decision Addendum` block on the verdict file. `validate-gate-2.sh` blocks Gate 2 until the addendum is present (positive-presence-only — absence of the field is never a block).
 
 **Optional flags** (cook only):
-- `--verify`: lightweight browser check (~$1), advisory
-- `--strict`: full evaluator with rubric grading (~$2-5), FAIL blocks ship
+- `--verify` `[LIGHT]`: light browser/artifact check, **advisory** (no back-edge to Phase 3 — FAIL is reported but does not block ship)
+- `--strict` `[HEAVY]`: full evaluator pass, **blocking** (FAIL blocks ship and routes back to Phase 3, max 2 evaluator iterations)
+
+Concrete cost of `[LIGHT]` vs `[HEAVY]` depends on the inner harness, model tier, and target surface; treat the labels as relative ordering only.
 
 ## Phase 5 — Ship
 

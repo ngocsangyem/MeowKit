@@ -10,6 +10,7 @@ import { getPortableInstallPath } from "./provider-registry-utils.js";
 import { sanitizeSkillName } from "./discovery/skills-discovery.js";
 import { computeContentChecksum } from "./reconcile/checksum-utils.js";
 import { addPortableInstallation } from "./reconcile/portable-registry.js";
+import { auditSkillDirectory } from "./skill-directory-audit.js";
 import type { ProviderType, SkillInfo } from "./types.js";
 
 export interface SkillInstallResult {
@@ -110,6 +111,21 @@ export async function installSkillDirectory(
 			await cp(skill.sourcePath, targetDir, { recursive: true, force: true, errorOnExist: false });
 			copied = true;
 			await rewriteMarkdownFilesForProvider(targetDir, provider);
+			const audit = await auditSkillDirectory(targetDir, provider, skill.name);
+			if (audit.errors.length > 0) {
+				throw new Error(`Skill runtime compatibility audit failed: ${audit.errors.map((e) => e.message).join("; ")}`);
+			}
+
+			const skillMdPath = join(skill.sourcePath, "SKILL.md");
+			const skillMdTarget = join(targetDir, "SKILL.md");
+			const sourceChecksum = computeContentChecksum(await readFile(skillMdPath, "utf-8"));
+			const targetChecksum = computeContentChecksum(await readFile(skillMdTarget, "utf-8"));
+
+			await addPortableInstallation(skill.name, "skill", provider, options.global, targetDir, skill.sourcePath, {
+				sourceChecksum,
+				targetChecksum,
+				installSource: "kit",
+			});
 		} catch (error) {
 			try {
 				if (copied && existsSync(targetDir)) {
@@ -126,17 +142,6 @@ export async function installSkillDirectory(
 			}
 			throw error;
 		}
-
-		const skillMdPath = join(skill.sourcePath, "SKILL.md");
-		const skillMdTarget = join(targetDir, "SKILL.md");
-		const sourceChecksum = computeContentChecksum(await readFile(skillMdPath, "utf-8"));
-		const targetChecksum = computeContentChecksum(await readFile(skillMdTarget, "utf-8"));
-
-		await addPortableInstallation(skill.name, "skill", provider, options.global, targetDir, skill.sourcePath, {
-			sourceChecksum,
-			targetChecksum,
-			installSource: "kit",
-		});
 
 		if (backupDir && existsSync(backupDir)) {
 			await rm(backupDir, { recursive: true, force: true });

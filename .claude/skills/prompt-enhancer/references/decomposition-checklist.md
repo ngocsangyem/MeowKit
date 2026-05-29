@@ -82,7 +82,7 @@ Findings cite the exact text fragment from the input. No soft averaging.
 | 4 | **No acceptance criteria** | No binary checkable item | factoryai "Include acceptance criteria" |
 | 5 | **No output format** | No file/PR/JSON/section shape specified | claude "Control the format" |
 | 6 | **Negative-only instruction** | "Don't X" with no INSTEAD | claude "Tell Claude what to do" |
-| 7 | **Laundry-list edge cases** | Long bulleted list of cases without canonical example | effective-context-engineering "Right altitude"; Anthropic anti-pattern |
+| 7 | **Laundry-list edge cases** | Long bulleted list of cases without canonical example | effective-context-engineering "Right altitude"; Anthropic anti-pattern <!-- research-citation --> |
 | 8 | **Mixed instructions/data** | No separator between context dump and command | context-engineering-guide "Structured I/O"; injection-rules.md Rule 1 |
 | 9 | **Wrong section ordering** | Long content placed <200 chars from end | claude "Long context prompting" (up to 30% lift) |
 | 10 | **Model-coupled framing** | Input prompt carries XML tags (`<context>`, `<task>`), role-as-XML wrapping, vendor tokens ("think step by step", `apply_patch`, "Reasoning: high"), or hardcoded model name in the persona | synthesis (C2 role placement) + (deliberate exclusions); factoryai filter map |

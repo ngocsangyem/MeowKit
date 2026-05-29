@@ -50,6 +50,8 @@ Load before session analysis:
 - `.claude/memory/fixes.md`, `.claude/memory/review-patterns.md`, `.claude/memory/architecture-decisions.md`: human-readable context for update
 - Task metadata from the current session (agents involved, outcomes)
 
+`.claude/memory/patterns.json` and `.claude/memory/lessons.md` are v2.4.1 deprecated/archived stubs — do not load them as inputs (entries already migrated to the split topic files above).
+
 ## Failure Behavior
 
 If memory files are corrupted or missing:

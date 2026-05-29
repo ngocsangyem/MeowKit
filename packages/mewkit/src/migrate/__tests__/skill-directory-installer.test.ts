@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -7,12 +7,15 @@ vi.mock("../reconcile/portable-registry.js", () => ({
 }));
 import { installSkillDirectory } from "../skill-directory-installer.js";
 import { providers } from "../provider-registry.js";
+import { addPortableInstallation } from "../reconcile/portable-registry.js";
 import type { SkillInfo } from "../types.js";
 
 const originalCodexSkills = structuredClone(providers.codex.skills);
 
 afterEach(() => {
 	providers.codex.skills = structuredClone(originalCodexSkills);
+	vi.mocked(addPortableInstallation).mockReset();
+	vi.mocked(addPortableInstallation).mockResolvedValue(undefined);
 });
 
 describe("skill directory installer", () => {
@@ -82,5 +85,138 @@ describe("skill directory installer", () => {
 		expect(migratedSkill).not.toContain(".claude/");
 		expect(migratedRef).toContain(".codex/agents");
 		expect(migratedRef).not.toContain("CLAUDE.md");
+	});
+
+	it("fails non-Claude skill install when copied scripts keep Claude runtime variables", async () => {
+		const root = await mkdtemp(join(tmpdir(), "mewkit-skill-installer-"));
+		const skillDir = join(root, ".claude", "skills", "runner");
+		const targetSkillsRoot = join(root, ".agents", "skills");
+		await mkdir(skillDir, { recursive: true });
+		await mkdir(targetSkillsRoot, { recursive: true });
+		await writeFile(join(skillDir, "SKILL.md"), "# runner\n", "utf-8");
+		await writeFile(join(skillDir, "run.sh"), "echo $CLAUDE_PROJECT_DIR\n", "utf-8");
+
+		providers.codex.skills = {
+			...providers.codex.skills!,
+			projectPath: targetSkillsRoot,
+			globalPath: targetSkillsRoot,
+		};
+
+		const result = await installSkillDirectory(
+			{
+				id: "mk:runner",
+				name: "runner",
+				dirName: "runner",
+				description: "runner skill",
+				sourcePath: skillDir,
+			},
+			"codex",
+			{ global: false },
+		);
+
+		expect(result.success).toBe(false);
+		expect(result.error).toContain("Skill runtime compatibility audit failed");
+		expect(result.error).toContain("run.sh");
+		await expect(access(join(targetSkillsRoot, "runner"))).rejects.toThrow();
+		expect(addPortableInstallation).not.toHaveBeenCalled();
+	});
+
+	it("skips binary files during copied skill audit", async () => {
+		const root = await mkdtemp(join(tmpdir(), "mewkit-skill-installer-"));
+		const skillDir = join(root, ".claude", "skills", "binary-safe");
+		const targetSkillsRoot = join(root, ".agents", "skills");
+		await mkdir(skillDir, { recursive: true });
+		await mkdir(targetSkillsRoot, { recursive: true });
+		await writeFile(join(skillDir, "SKILL.md"), "# binary safe\n", "utf-8");
+		await writeFile(join(skillDir, "image.bin"), Buffer.from([0, 1, 2, 3]));
+
+		providers.codex.skills = {
+			...providers.codex.skills!,
+			projectPath: targetSkillsRoot,
+			globalPath: targetSkillsRoot,
+		};
+
+		const result = await installSkillDirectory(
+			{
+				id: "mk:binary-safe",
+				name: "binary-safe",
+				dirName: "binary-safe",
+				description: "binary safe skill",
+				sourcePath: skillDir,
+			},
+			"codex",
+			{ global: false },
+		);
+
+		expect(result.success).toBe(true);
+		expect(addPortableInstallation).toHaveBeenCalledOnce();
+	});
+
+	it("restores a previous target directory when skill audit fails", async () => {
+		const root = await mkdtemp(join(tmpdir(), "mewkit-skill-installer-"));
+		const skillDir = join(root, ".claude", "skills", "runner");
+		const targetSkillsRoot = join(root, ".agents", "skills");
+		const targetSkillDir = join(targetSkillsRoot, "runner");
+		await mkdir(skillDir, { recursive: true });
+		await mkdir(targetSkillDir, { recursive: true });
+		await writeFile(join(skillDir, "SKILL.md"), "# runner\n", "utf-8");
+		await writeFile(join(skillDir, "run.py"), "print('$ANTHROPIC_API_KEY')\n", "utf-8");
+		await writeFile(join(targetSkillDir, "SKILL.md"), "# previous\n", "utf-8");
+
+		providers.codex.skills = {
+			...providers.codex.skills!,
+			projectPath: targetSkillsRoot,
+			globalPath: targetSkillsRoot,
+		};
+
+		const result = await installSkillDirectory(
+			{
+				id: "mk:runner",
+				name: "runner",
+				dirName: "runner",
+				description: "runner skill",
+				sourcePath: skillDir,
+			},
+			"codex",
+			{ global: false },
+		);
+
+		expect(result.success).toBe(false);
+		await expect(readFile(join(targetSkillDir, "SKILL.md"), "utf-8")).resolves.toBe("# previous\n");
+		expect(addPortableInstallation).not.toHaveBeenCalled();
+	});
+
+	it("restores a previous target directory when registry write fails", async () => {
+		const root = await mkdtemp(join(tmpdir(), "mewkit-skill-installer-"));
+		const skillDir = join(root, ".claude", "skills", "registry-fail");
+		const targetSkillsRoot = join(root, ".agents", "skills");
+		const targetSkillDir = join(targetSkillsRoot, "registry-fail");
+		await mkdir(skillDir, { recursive: true });
+		await mkdir(targetSkillDir, { recursive: true });
+		await writeFile(join(skillDir, "SKILL.md"), "# new\n", "utf-8");
+		await writeFile(join(targetSkillDir, "SKILL.md"), "# previous\n", "utf-8");
+		vi.mocked(addPortableInstallation).mockRejectedValueOnce(new Error("registry unavailable"));
+
+		providers.codex.skills = {
+			...providers.codex.skills!,
+			projectPath: targetSkillsRoot,
+			globalPath: targetSkillsRoot,
+		};
+
+		const result = await installSkillDirectory(
+			{
+				id: "mk:registry-fail",
+				name: "registry-fail",
+				dirName: "registry-fail",
+				description: "registry fail skill",
+				sourcePath: skillDir,
+			},
+			"codex",
+			{ global: false },
+		);
+
+		expect(result.success).toBe(false);
+		expect(result.error).toContain("registry unavailable");
+		await expect(readFile(join(targetSkillDir, "SKILL.md"), "utf-8")).resolves.toBe("# previous\n");
 	});
 });

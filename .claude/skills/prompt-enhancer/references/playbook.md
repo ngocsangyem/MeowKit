@@ -152,6 +152,7 @@ to do, ask via placeholder: `INSTEAD: [FILL-IN: positive direction]`.
 **Fix:** Replace the long list with 1–3 canonical examples plus a one-line
 "and similar cases — extrapolate" cue.
 
+<!-- research-citation -->
 **Source:** effective-context-engineering "Right altitude / Goldilocks";
 Anthropic anti-pattern: "diverse canonical examples > exhaustive list".
 

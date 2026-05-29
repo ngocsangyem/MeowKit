@@ -93,6 +93,23 @@ Include Phase B persona sources alongside base reviewers:
 - Artifact Verification: [N] findings across 4 levels
 ```
 
+## Side-Effect Signal (additive, positive-presence-only)
+
+When findings indicate a regression, side effect, or workflow break in **existing** behavior caused by the diff (not new code the agent introduced and got wrong), append a plaintext signal line to the verdict BEFORE the `## After Verdict` section:
+
+```
+Side Effects Detected: Yes
+- <one-line bullet per detected effect>
+```
+
+**Authoring rules:**
+- Emit ONLY when an existing-behavior break is the cause. New-code bugs go in the dimension table as normal CRITICAL/MAJOR findings.
+- Plaintext line only — NOT a markdown header (`## Side Effects Detected: Yes` will not be recognized by `validate-gate-2.sh`).
+- Each bullet names the affected behavior or caller (e.g., `- POST /api/users no longer accepts trailing slashes — breaks 3 existing callers`).
+- Absence of the line = no signal. Backward-compatible.
+
+When this signal is present, the cook orchestrator MUST follow the "Regression Recovery Options" pattern in `.claude/skills/cook/references/review-cycle.md` (presents 2–4 options to the user; user selection recorded as a `## User Decision Addendum` block on the verdict file). `validate-gate-2.sh` blocks Gate 2 until the addendum is present.
+
 ## After Verdict
 
 - **PASS/WARN:** Present to human for Gate 2 approval

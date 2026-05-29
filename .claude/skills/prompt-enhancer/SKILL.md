@@ -44,6 +44,7 @@ injection_risk: medium
 
 Refine a draft user prompt using a 5-step framework — mode-select, decompose,
 detect, (scout if `--deep`), map, rewrite — grounded in 7 source docs
+<!-- research-citation -->
 (Anthropic / OpenAI Codex / FactoryAI prompting + Anthropic context-engineering
 + skill-authoring rules). The rewrite uses the **universal kernel** only:
 plain markdown sections, no XML tags, no vendor tokens, no model overlays.

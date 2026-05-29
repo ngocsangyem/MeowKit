@@ -1,6 +1,6 @@
 # Step 8: Hydrate Tasks
 
-Create Claude Tasks from plan phases for session-scoped execution tracking.
+Create session tasks from plan phases for session-scoped execution tracking.
 
 ## Instructions
 
@@ -8,24 +8,11 @@ Create Claude Tasks from plan phases for session-scoped execution tracking.
 
 Skip task hydration if:
 - Less than 3 phases (overhead exceeds benefit)
-- Task tools unavailable (VSCode extension) — plan files are the source of truth
+- Task tools unavailable (GUI editor extensions) — plan files are the source of truth
 
 ### 8b. Create Tasks from Phases
 
-For each phase in plan.md:
-
-```
-TaskCreate:
-  subject: "Phase {N}: {phase name}"
-  description: "{phase overview from phase file}"
-  metadata: {
-    phase: {N},
-    priority: "{P1|P2|P3}",
-    effort: "{estimate}",
-    planDir: "{plan_dir}",
-    phaseFile: "phase-{NN}-{name}.md"
-  }
-```
+For each phase in plan.md, create one TaskCreate. For the metadata schema (5 required fields), see `references/task-management.md` "Hydration Pattern Details > Metadata Template" — single source of truth.
 
 ### 8c. Set Dependencies + Critical-Step Tasks
 
@@ -33,33 +20,19 @@ Chain phases with `addBlockedBy`:
 - Phase 2 blockedBy Phase 1 (if Phase 2 depends on Phase 1)
 - Follow the "Depends On" column from plan.md phase table
 
-**Critical-step tasks:** After phase-level tasks, scan each phase's Todo List:
-- Items prefixed with `[CRITICAL]` or `[HIGH]` → create sub-tasks:
-  ```
-  TaskCreate:
-    subject: "Phase {N} — {step description}"
-    metadata: { step: true, critical: true, riskLevel: "high", phaseFile: "..." }
-    addBlockedBy: [parent phase task ID]
-  ```
-- Only create sub-tasks for marked items (most todos stay at phase level)
+**Critical-step tasks:** scan each phase's `## Todo List` for `[CRITICAL]`/`[HIGH]` items and create one sub-task per match (only marked items become sub-tasks). For the sub-task pattern and metadata shape, see `references/task-management.md` "Hydration Pattern Details > Critical-Step Sub-Tasks".
 
-**Parallel Group Hydration** (conditional: `planning_mode = parallel`)
+**TDD RED tasks:** when `tdd_mode = true`, scan each phase's `## Tests Before` section for unchecked checkboxes and create critical sub-tasks with metadata `{ step: true, critical: true, riskLevel: "red", phaseFile: "..." }`. Attach each to the owning phase task. Do not create a separate task hierarchy.
 
-Read `## Execution Strategy` from plan.md to determine groups:
-- Phases in the **same parallel group**: NO `addBlockedBy` between them.
-- Phases in a **later group**: `addBlockedBy` the last phase task ID of the prior group.
-- Add `parallel_group: "{letter}"` to each task's metadata.
+**Parallel Group Hydration** (active only when `planning_mode = parallel`): read `## Execution Strategy` from plan.md to determine groups. For the within-group / cross-group `addBlockedBy` rules and metadata, see `references/task-management.md` "Hydration Pattern Details > Parallel-Group Rules".
 
-**Two-Approach Hydration** (conditional: `planning_mode = two`)
-
-Hydrate tasks ONLY from the selected approach's phase files (`selected_approach = "a"` or `"b"`).
-Do NOT create tasks for the archived (non-selected) approach.
+**Two-Approach Hydration** (active only when `planning_mode = two`): hydrate tasks ONLY from the selected approach's phase files using the `selected_approach` variable (`"a"` or `"b"`). For the selective-hydration filter, see `references/task-management.md` "Hydration Pattern Details > Two-Approach Filter".
 
 ### 8d. Create Checkpoint File
 
 #### Status Read Order (Required)
 
-When populating `phases[*].status` in `.plan-state.json`, read in this order (mirrors `packages/cli/src/orchviz/plan/parse-phase-file.ts:42-106` cascade):
+When populating `phases[*].status` in `.plan-state.json`, read in this order (mirrors the phase-file parser cascade):
 
 1. Frontmatter `status:` field (PREFERRED)
 2. `**Status:**` bold pattern in `## Overview` (legacy fallback)
@@ -72,7 +45,7 @@ Write `{plan_dir}/.plan-state.json` for cross-session resilience:
 
 ```json
 {
-  "version": "1.1",
+  "version": "1.2",
   "created": "{YYYYMMDD-HHMM}",
   "planning_mode": "{fast|hard|deep|parallel|two|product-level}",
   "scope_mode": "{EXPANSION|HOLD|REDUCTION}",
@@ -85,9 +58,13 @@ Write `{plan_dir}/.plan-state.json` for cross-session resilience:
     "A": ["phase-02-name", "phase-03-name"],
     "B": ["phase-04-name"]
   },
-  "selected_approach": "a"
+  "selected_approach": "a",
+  "verification_tier": "standard",
+  "consistency_sweeps_passed": { "red_team": true, "validation": true }
 }
 ```
+
+**v1.2 schema notes (additive, reader-compatible).** Fields `verification_tier` and `consistency_sweeps_passed` are NEW in v1.2. v1.1 readers ignore them. v1.2 readers MUST treat them as optional and default to `null` / `{}` when missing — so legacy v1.1 plan-state files still load. The schema is additive only; no existing field is renamed or removed.
 
 `tasks_total` = count of `- [ ]` checkboxes in the phase file.
 `status` value above is resolved via the cascade in `### Status Read Order`.
@@ -98,23 +75,9 @@ Fields `parallel_groups` and `selected_approach` are **optional** — omit when 
 
 Consumers reading `.plan-state.json` MUST handle unknown/missing fields gracefully (access only known keys).
 
-### 8e. Output Cook Command
+### 8e. CEO Review Suggestion
 
-Print the Context Reminder block (from `references/gate-1-approval.md`) with:
-- Absolute path to plan.md
-- Mode-matched cook flag
-
-**STOP after this step. Do not auto-proceed to implementation.**
-
-## Output
-
-- `{N}` tasks created with dependency chain
-- `.plan-state.json` checkpoint created
-- Cook command printed with absolute path
-
-## CEO Review Suggestion
-
-After printing the cook command, check `planning_mode` from `.plan-state.json`:
+Check `planning_mode` from `.plan-state.json`:
 
 ```
 If planning_mode in [hard, deep, parallel, two, product-level]:
@@ -123,6 +86,35 @@ Else:
   Print: "📋 Optional: /mk:plan-ceo-review {plan-path} — strategic review."
 ```
 
+The Context Reminder block and the cook-command print are now emitted by `step-09-post-plan-handoff.md` AFTER the user selects a next-step. Do NOT print them here.
+
+### 8f. Post-Hydration Integrity Checks
+
+Run the three checks defined in `references/task-management.md` "Post-Hydration Integrity Checks":
+
+1. Cycle check — walk `addBlockedBy` chains; assert no node reaches itself
+2. Count-match check — sum of unchecked `[ ]` across all `phase-XX-*.md` files MUST equal session tasks created (phase tasks + critical-step sub-tasks)
+3. Metadata-completeness check — every `TaskCreate` call carries all 5 required fields (`phase`, `priority`, `effort`, `planDir`, `phaseFile`)
+
+**All-pass** → continue to Output and emit the success-log line.
+
+**Any-fail** → print explicit diff and STOP. Do NOT proceed to step-09. Example:
+
+```
+✗ Integrity check failed: expected 5 tasks (3 phases + 2 critical steps), found 4
+   Missing: critical step "[CRITICAL] migrate users table" in phase-02-database.md
+   Required: human resolution before proceeding.
+```
+
+N=0 / M=0 is PASS no-op (zero phases legitimately means zero tasks); only mismatches trigger STOP.
+
+## Output
+
+On integrity-check pass, emit:
+`✓ Hydrated [N] phase tasks + [M] critical step tasks with dependency chain`
+
+Also: `.plan-state.json` checkpoint created.
+
 ## Next
 
-STOP. User runs `/mk:cook {path}` to begin implementation, or `/mk:plan-ceo-review {path}` for strategic review first.
+Read and follow `step-09-post-plan-handoff.md`.

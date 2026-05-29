@@ -77,6 +77,8 @@ tasks/reviews/{date-slug}-evalverdict-evidence/  ← screenshots/curl/CLI captur
 
 After the run, the audit trail at `run.md` shows: density decision, per-step artifacts, budget trail, iteration history, and final status.
 
+`tasks/completed/` is not part of the active harness ledger. Completed work remains traceable through plan status, review verdicts, and `tasks/harness-runs/{run-id}/run.md` until an archive writer is introduced.
+
 ## Verdict Outcomes
 
 | `final_status` | Meaning | Next action |

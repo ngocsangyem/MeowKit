@@ -72,9 +72,9 @@ Each `.json` file declares `version: "2.0.0"` and a `scope` field; handlers reje
 
 Three mechanisms write to memory:
 
-### a) Immediate capture — `##prefix:` syntax
+### a) Immediate capture — `##prefix:` syntax (user-typed keyboard shortcut only)
 
-Type messages with a `##` prefix at any point during a session. The `immediate-capture-handler.cjs` UserPromptSubmit hook routes them:
+The **human user** types messages with a `##` prefix at any point during a session. The `immediate-capture-handler.cjs` UserPromptSubmit hook routes them. **Agent output does NOT trigger this handler** — `UserPromptSubmit` fires only for user-typed prompts, never for agent or tool output. Agents capture via path (d) below. See `.claude/skills/memory/references/capture-architecture.md` for the full contract.
 
 | Prefix | Target | Entry shape |
 |---|---|---|
@@ -98,7 +98,11 @@ The Stop hook:
 
 ### c) Skill-invoked session capture
 
-`mk:memory session-capture` (see `skills/mk:memory/references/session-capture.md`) runs at Phase 6 (Reflect) and extracts patterns / decisions / failures from the session, appending to the right topic files.
+At Phase 6 (Reflect), the agent reads `.claude/skills/memory/references/session-capture.md` and follows its 4 steps to extract patterns / decisions / failures from the session and append to the right topic files via direct `Edit`. This is **prose-driven LLM execution**, not a CLI subcommand — there is no `mewkit memory session-capture` script because content extraction needs LLM analysis a static CLI cannot produce.
+
+### d) Agent-authored entry — direct `Edit`
+
+When an agent (or skill) identifies a learning while running, it calls `Edit` directly on the appropriate topic file. There is no hook — the agent is responsible for scrubbing secrets in-content before writing. Topic file routing follows the table in `.claude/skills/memory/references/capture-architecture.md`. This is the working write path for agents; the user-typed `##prefix:` handler does NOT fire on agent output.
 
 ## 4. Read Path
 
@@ -175,6 +179,8 @@ These pieces of Claude Code's own memory system are **separate** from MeowKit's 
 | `lessons.md` as active store | Archived stub; content migrated to topic files via `memory-topic-file-migrator.cjs` |
 | `patterns.json` monolith | Deprecated stub; replaced by `fixes.json` + `review-patterns.json` + `architecture-decisions.json` |
 | `.claude/memory/*` committed to git | Gitignored — machine-local by default |
+| `##pattern:` / `##decision:` / `##note:` as agent-output API | Agent-authored entries via direct `Edit` (path 3d). `##prefix:` remains a user-typed keyboard shortcut only — the handler does NOT fire on agent or tool output. See `.claude/skills/memory/references/capture-architecture.md`. |
+| `patterns.json` / `lessons.md` as active write targets | Split topic files since v2.4.1 (`fixes.{json,md}`, `review-patterns.{json,md}`, `architecture-decisions.{json,md}`). Any agent or skill writing to the old monolith files is spec drift; the legacy files remain on disk as gravestone markers. |
 
 ## 9. Migration (pre-v2.4.1 → v2.4.1)
 

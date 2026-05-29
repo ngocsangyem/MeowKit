@@ -79,20 +79,23 @@ export async function smartUpdate(
 	}
 
 	// Walk .claude/ files from release
-	const claudeFiles = walkDir(claudeSrc, claudeSrc).map((f) => ({ ...f, relPath: `.claude/${f.relPath}` }));
+	const claudeFiles = walkDir(claudeSrc, claudeSrc).map((f) => {
+		const manifestPath = toManifestPath(f.relPath);
+		return { ...f, manifestPath, targetRelPath: `.claude/${manifestPath}` };
+	});
 
-	for (const { relPath, srcPath } of claudeFiles) {
-		const destPath = join(targetDir, relPath);
-		const layer = classifyLayer(relPath);
+	for (const { manifestPath, targetRelPath, srcPath } of claudeFiles) {
+		const destPath = join(targetDir, targetRelPath);
+		const layer = classifyLayer(manifestPath);
 
-		if (isIgnored(relPath)) {
-			log.debug(`Ignored (protected): ${relPath}`);
+		if (isIgnored(targetRelPath)) {
+			log.debug(`Ignored (protected): ${targetRelPath}`);
 			stats.skipped++;
 			continue;
 		}
 
 		// settings.json uses append-only merge
-		if (relPath === ".claude/settings.json") {
+		if (manifestPath === "settings.json") {
 			mergeSettingsFile(srcPath, destPath, dryRun);
 			stats.updated++;
 			continue;
@@ -101,7 +104,7 @@ export async function smartUpdate(
 		// User layer: never overwrite
 		if (layer === "user") {
 			if (existsSync(destPath)) {
-				log.debug(`Skipped (user layer): ${relPath}`);
+				log.debug(`Skipped (user layer): ${targetRelPath}`);
 				stats.skipped++;
 			} else {
 				copyFile(srcPath, destPath, dryRun);
@@ -113,18 +116,18 @@ export async function smartUpdate(
 		// New file → always add
 		if (!existsSync(destPath)) {
 			copyFile(srcPath, destPath, dryRun);
-			log.debug(`Added (new): ${relPath}`);
+			log.debug(`Added (new): ${targetRelPath}`);
 			stats.added++;
 			continue;
 		}
 
 		// File exists — check if user modified it
 		const currentHash = hashFile(destPath);
-		const manifestEntry = oldChecksums[relPath];
+		const manifestEntry = oldChecksums[manifestPath];
 
 		if (manifestEntry && currentHash !== manifestEntry.sha256) {
-			log.debug(`Skipped (user-modified): ${relPath}`);
-			stats.userModified.push(relPath);
+			log.debug(`Skipped (user-modified): ${targetRelPath}`);
+			stats.userModified.push(targetRelPath);
 			stats.skipped++;
 			continue;
 		}
@@ -148,7 +151,7 @@ export async function smartUpdate(
 		}
 
 		if (!dryRun) {
-			for (const dir of ["tasks/active", "tasks/completed", "tasks/backlog", "tasks/guidelines"]) {
+			for (const dir of ["tasks/active", "tasks/backlog", "tasks/guidelines"]) {
 				mkdirSync(join(targetDir, dir), { recursive: true });
 			}
 		}
@@ -306,6 +309,10 @@ export async function smartUpdate(
 	});
 
 	return stats;
+}
+
+function toManifestPath(relPath: string): string {
+	return relPath.replace(/\\/g, "/").replace(/^\.claude\//, "");
 }
 
 /**

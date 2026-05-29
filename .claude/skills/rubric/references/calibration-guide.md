@@ -62,8 +62,8 @@ If you need to add a 5th example, it can break the alternation, but examples 1-4
 
 **Practical sources:**
 1. `tasks/reviews/*-verdict.md` from prior `/mk:review` runs
-2. The Anthropic harness article appendix (RetroForge PASS, generic-SaaS-clone FAIL)
-3. The Anthropic Labs blog screenshots
+2. The Anthropic harness article appendix (RetroForge PASS, generic-SaaS-clone FAIL) <!-- research-citation -->
+3. The Anthropic Labs blog screenshots <!-- research-citation -->
 4. Anonymized internal QA failures
 
 When pulling from real reviews, **sanitize**:

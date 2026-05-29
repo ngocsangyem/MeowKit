@@ -96,6 +96,14 @@ flowchart LR
 
 **Practical impact:** running `mewkit upgrade` followed by `mewkit migrate cursor` automatically propagates new agents/skills to Cursor without overwriting your local edits.
 
+### Portable evolution manifest
+
+`mewkit migrate` also reads `packages/mewkit/portable-manifest.json` from the installed package. This file has one narrow job: clean up old registry-owned paths after MeowKit moves a source item or changes a provider install path.
+
+The portable evolution manifest is not the release checksum manifest and it is not a provider capability manifest. Release manifests verify packaged files. Provider manifests describe supported surfaces. The portable evolution manifest only records real path evolution that must be reconciled once per registry.
+
+Dry runs show manifest cleanup actions without updating `~/.mewkit/portable-registry.json`. A successful non-dry-run migration records the applied manifest version so the cleanup does not repeat.
+
 ## Resolving conflicts
 
 When source AND target both changed since last install, mewkit prompts:

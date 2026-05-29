@@ -14,24 +14,15 @@ Files affected: [count or list]
 Validation: PLAN_COMPLETE
 ```
 
-**ACTION REQUIRED:** Use `AskUserQuestion` with these options:
+**ACTION REQUIRED:** Use `AskUserQuestion`. Header: "Gate 1". Question: "Plan is ready. How would you like to proceed?" Single-select.
 
-```json
-{
-  "questions": [{
-    "question": "Plan is ready. How would you like to proceed?",
-    "header": "Gate 1",
-    "options": [
-      { "label": "Approve (Recommended)", "description": "Proceed to implementation. No code changes until now." },
-      { "label": "Modify plan", "description": "Discuss changes with AI before approving. I'll help refine the plan." },
-      { "label": "Reject", "description": "Discard this plan and start over with different requirements." }
-    ],
-    "multiSelect": false
-  }]
-}
-```
+| Option | Recommend When | Why |
+|--------|----------------|-----|
+| Approve (Recommended) | Self-check has zero Uncertain items, all sections complete | Proceeds to task hydration. No code changes yet. |
+| Modify plan | Minor changes needed; the agent applies them and re-presents | Iterates on the plan without restarting |
+| Reject | Requirements have fundamentally changed | Discards the plan; user re-issues requirements |
 
-**On "Approve":** Update Agent State, then print the Context Reminder (MANDATORY).
+**On "Approve":** Update Agent State, then proceed to `step-08-hydrate-tasks.md`. The Context Reminder is printed later by `step-09-post-plan-handoff.md` after the user selects a next-step option — do NOT print it from step-07.
 **On "Modify plan":** Ask what to change. Apply modifications. Re-validate. Present for approval again.
 **On "Reject":** Ask for new requirements. Start over from Step 1.
 
@@ -39,7 +30,9 @@ Do NOT infer approval from silence. Do NOT proceed without explicit selection.
 
 ## Context Reminder (MANDATORY)
 
-After plan approval, MUST output with **actual absolute path** and **mode-matched cook flag**:
+> **NOTE — execution location.** The Context Reminder block below is printed by `step-09-post-plan-handoff.md` AFTER the user picks a next-step option (not by step-07 or step-08). Keeping it here as the canonical source so step-09 can substitute the absolute path and the mode-matched flag.
+
+After the user selects the next-step option in step-09, MUST output with **actual absolute path** and **mode-matched cook flag**:
 
 | Plan mode | Cook command |
 |-----------|-------------|

@@ -14,6 +14,129 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.11 (2026-05-24) — Plan-creator mode clarity
+
+### Highlights
+
+Plan creation now has clearer mode and flag boundaries. `--deep` is documented and wired as bounded phase-scoped planning, while `--tdd` remains an independent opt-in flag for regression-first execution handoff.
+
+### Improvements
+
+- `mk:plan-creator --deep` now documents bounded scope maps and per-phase Deep Phase Maps instead of implying unrestricted repository scanning.
+- `mk:plan-creator --tdd` now documents `tdd: true`, `regression_gate`, `Tests Before`, `Protected Change`, `Tests After`, and `Regression Gate` as the regression-first phase contract.
+- TDD handoff now keeps strict execution explicit by printing cook commands with `--tdd` when the plan was created with TDD enabled.
+- Cook now warns when a plan contains TDD markers but execution starts without `--tdd` or `MEOWKIT_TDD=1`.
+- Scout, brainstorming, and planning boundaries are clearer: scout finds context, brainstorming chooses an approach, and plan-creator turns a concrete approach into executable phases.
+- New Core Concepts page "Plan Creator Modes and Flags" explains planning cost, context impact, mode selection, composable flags, lifecycle boundaries, examples, migration notes, and anti-patterns.
+- Plan-creator reference docs now describe `--deep` and `--tdd` using the same bounded, runtime-neutral terms as the skill implementation.
+
+### Migration Notes
+
+- Use `npx mewkit upgrade` to pick up the updated skill contracts and docs.
+- Keep using `/mk:plan --deep --tdd` only when both risks apply: broad scope and existing behavior that must be preserved.
+- If a TDD plan prints a cook command with `--tdd`, run that exact command so RED-first execution is enforced.
+
+## 2.9.10 (2026-05-23) — Skill portability + cook context-engineering + provider diagnostics
+
+### Highlights
+
+Three workstreams ship together. First, four skills (`mk:docs-finder`, `mk:harness`, `mk:plan-creator`, `mk:scout`) gain a `meowkit:` frontmatter block declaring portability policy (`portability`, `providers`, `requires.{surfaces,commands,env}`, `context_cost`) — the first-pass schema that lets the migrate subsystem decide whether each skill can install onto a non-Claude provider. Second, the migrate CLI grows provider-contract diagnostics — a new `provider-contract-diagnostics` module surfaces support gaps per provider, wired into `npx mewkit doctor --providers`, `npx mewkit doctor --state`, and `npx mewkit validate --portable`; first-pass skill providers expand to Codex, Gemini CLI, Antigravity, and OpenCode in addition to Claude Code. Third, `mk:cook` gains three new context-engineering contracts — a scout-first contract at Phase 0 (3–6 bullet codebase summary surfaced before any clarifying question), an exact-requirements contract at Phase 1 (5 dimensions must be answered before plan-creator returns), and a no-side-effects regression-recovery pattern at Gate 2 (2–4 typed options presented to the user when a regression is surfaced instead of silently patching). All changes are additive — pre-upgrade plans, verdicts, sessions, and skills without the `meowkit:` block continue to work unchanged.
+
+### Features
+
+- `meowkit:` frontmatter block on skill SKILL.md — first-pass portability schema with fields `portability` (`generic` / `provider-adapted` / `provider-only`), `providers.{include,exclude}`, `requires.{surfaces,commands,env}`, and `context_cost` (`low` / `medium` / `high`). Parsed by `parsePortabilityPolicy()` in `skills-discovery.ts` and consumed by `portability-policy.ts` to decide install eligibility per provider. Skills without the block continue to migrate under the existing pre-policy heuristics.
+- First-pass skill providers — `portability-policy.ts` enables skill installation for Codex, Gemini CLI, Antigravity, and OpenCode in addition to Claude Code. Skills with `providers.include: [claude-code]` only continue to install for Claude Code; other providers receive a `PortabilitySkip` with reason "needs review before non-Claude install".
+- 4 first-pass skills carry the new metadata — `mk:docs-finder` (provider-only, claude-code, surfaces: [skills], commands: [Bash], context_cost: medium), `mk:scout` (provider-only, claude-code, commands: [Agent, Grep, Glob], context_cost: medium), `mk:plan-creator` (provider-only, claude-code, commands: [Agent, AskUserQuestion, Bash], context_cost: high), `mk:harness` (provider-only, claude-code, commands: [Agent, AskUserQuestion, Bash], env: [CLAUDE_PROJECT_DIR], context_cost: high).
+- New module `migrate/provider-contract-diagnostics.ts` — collects provider-support diagnostics with `pass` / `warn` / `fail` severities, exposes `collectProviderContractDiagnostics()` + `summarizeProviderContractDiagnostics()`.
+- New cook contracts — Scout-First Contract (Phase 0 codebase-summary presentation) and Exact-Requirements Contract (Phase 1 plan-creator must answer expected output / acceptance criteria / scope boundary / non-negotiable constraints / touchpoints), with skip-on-plan-path notes. Plan-creator SKILL.md gained a matching Requirements Capture Contract section enumerating the 5 dimensions and the scout-grounded-options rule.
+- New cook regression-recovery contract — `Side Effects Detected: Yes` reviewer signal recognized by `validate-gate-2.sh`. Blocks Gate 2 until a `## User Decision Addendum` block (`User selected:` + `Resumption point:`) is appended. Positive-presence-only — absence of the field is never a block signal, so pre-upgrade verdicts validate unchanged.
+- New "Regression Recovery Options" subsection in `mk:cook/references/review-cycle.md` — 5-step procedure with 4 standard options (revert + re-plan / keep + update dependents / compatibility shim / accept the regression).
+- New top-level shared rule `.claude/rules/anti-rationalization.md` — generic implementation-phase rationalizations migrated from `mk:cook/SKILL.md`, which retains a 1-row TDD-specific extension.
+
+### CLI
+
+- `npx mewkit doctor --providers` — runs provider-contract diagnostics alongside the standard doctor checks. Wraps the new `collectProviderContractDiagnostics()` output into the doctor report.
+- `npx mewkit doctor --state` — emits state-taxonomy diagnostics.
+- `npx mewkit validate --portable` — adds portable-provider contract checks to the validate pipeline.
+- Top-level CLI help (`mewkit --help`) now lists the three new flags above.
+
+### Improvements
+
+- `mk:cook/SKILL.md` Workflow Modes table demoted from 5 columns to 3 (Mode / Research / TDD) — canonical 6-column mode-behaviors matrix lives in `mk:cook/references/intent-detection.md`. Gate 2 absolutism statement collapsed to a 1-line callback to `.claude/rules/gate-rules.md` across SKILL.md, intent-detection.md, workflow-steps.md (review-cycle.md preserved inline for iteration-loop context).
+- TDD column labels unified to `RED-strict` / `Plan-level` / `Skip` across cook SKILL.md, intent-detection.md, workflow-steps.md.
+- Phase 5 ship subagent renamed in cook SKILL.md, workflow-steps.md, and subagent-patterns.md from `git-manager via mk:ship` to `shipper via mk:ship` — shipper orchestrates the full pre-ship pipeline and invokes git-manager internally.
+- `mk:cook/references/subagent-patterns.md` gained a Standard Delegation Skeleton (9-field block per `orchestration-rules.md`) at the top and a `Scope: pass X / do NOT pass Y` annotation on each of the 13 template sections (isolation-boundary contract per `orchestration-rules.md` Isolation Boundaries).
+- `validate-gate-1.sh` runs as an advisory preflight in non-auto cook modes (surfaces structural-check failures to the user before Gate 1 prompt; user retains override) and remains a blocking gate in `--auto` mode.
+- Cook SKILL.md Mermaid diagram edge labels quoted (`|"--verify"|`, `|"--strict"|`) for renderer compatibility.
+- `mk:cook/references/failure-catalog.md` gained 4 new failure modes — skipped scout summary, vague clarifying questions, scout-first gate fired on plan-path input, silent patch on review-detected regression.
+- `migrate/portability-policy.ts` widens skill-skip signal detection — `.claude` paths, `CLAUDE.md` references, `mk` / `meow` slash commands, Claude env vars, Anthropic env vars, and orchestrator-semantics references all trigger skip-with-reason when migrating to non-Claude providers.
+- `core/smart-update.ts` and `core/compute-checksums.ts` refined for the new portability flow.
+- `migrate/migrate-orchestrator.ts` integrates the new portability policy + diagnostics path.
+
+### Bug Fixes
+
+- USD pricing on cook `--verify` / `--strict` flags removed from cook SKILL.md, intent-detection.md, workflow-steps.md — replaced with `[LIGHT]` / `[HEAVY]` relative-cost labels and a one-line variability note (concrete cost depends on inner harness, model tier, and target surface).
+- Inner-harness Mermaid rendering preamble removed from cook SKILL.md (diagram authority is independent of rendering fidelity).
+- Phase 4.5 subagent column reframed from `agent-browser or curl` to `browser-automation subagent or HTTP verification tool` — concrete subagent name depends on installed skill set.
+- ToC anchors in `mk:cook/references/workflow-steps.md` and `subagent-patterns.md` updated to match renamed Gate 2 / Phase 4.5 / Ship section headers.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the new gates and CLI flags.
+- Skills WITHOUT a `meowkit:` frontmatter block continue to migrate under existing pre-policy heuristics — no immediate action required. To opt-in to first-pass portability, add a `meowkit:` block declaring `portability`, `providers`, `requires`, and `context_cost`; see the 4 first-pass skills for examples.
+- New cook gates (scout-first, exact-requirements) apply only when starting from a fresh task description. Plan-path invocations (`/mk:cook tasks/plans/.../plan.md`) skip both gates explicitly.
+- The new validate-gate-2.sh side-effect signal is positive-presence-only — existing verdicts without `Side Effects Detected: Yes` continue to pass unchanged.
+
+## 2.9.9 (2026-05-23) — Plan-creator determinism + handoff
+
+### Highlights
+
+`mk:plan-creator` gains a deterministic post-approval handoff and two consistency-sweep gates so red-team and validation-interview edits cannot leave the rest of the plan inconsistent. After Gate 1 + task hydration, the skill fires an `AskUserQuestion` whose options are pruned to the gates not already auto-run in the active mode (cook / validate / red-team / harness / end), writes the choice to `plan.md` frontmatter as a typed enum, and STOPs without auto-invoking. The validator now rejects unknown `handoff.next` values. Static `AskUserQuestion` JSON in seven step / reference files becomes a "Recommend When" decision table; runtime-templated payloads stay as JSON because they carry substitution variables a table cannot express.
+
+### Features
+
+- New step file `step-09-post-plan-handoff.md` — runs after task hydration. Mode-pruned options (≤4), live risk re-scan over plan content for `risk-checklist.md` trigger keywords, defensive fallback advisory when `matched_flags` is unset, writes `handoff: { next, decided_at }` to `plan.md` frontmatter.
+- New gates Whole-Plan Consistency Sweep — Gate W1 at the end of `step-05-red-team.md`, Gate W2 at the end of `step-06-validation-interview.md`. Stage-then-apply algorithm: read-only Pass 1 stages `### Pending Sweep Edits` block; decision check blocks on unresolved contradictions via `AskUserQuestion`; write Pass 2 applies edits, writes summary, updates `consistency_sweeps.{red_team|validation}` frontmatter. Recursion bound: 2 resolve attempts per gate. See `references/whole-plan-sweep.md`.
+- New step-04 sub-step Verification Roles — Fact Checker / Flow Tracer / Scope Auditor / Contract Verifier dispatched as READ-ONLY parallel `Explore` subagents, tier auto-selected by phase count (Light 1–2 / Standard 3–4 / Full 5+). Orchestrator aggregates verdicts and writes ONE `## Verification Log` Edit per phase file. Skipped in fast / product-level modes. FAILED claims surface as targeted step-06 interview questions. See `references/verification-roles.md`.
+- `validate-plan.py` enforces `handoff.next` enum when the `handoff:` frontmatter block is present. Plans without `handoff:` continue to validate.
+- `.plan-state.json` v1.2 — additive schema bump adding optional `verification_tier` and `consistency_sweeps_passed`. v1.1 readers ignore unknown keys; v1.2 readers default missing keys.
+
+### Improvements
+
+- Seven static `AskUserQuestion` JSON blocks across `step-00-scope-challenge.md`, `step-07-gate.md`, `references/gate-1-approval.md`, and `references/archive-workflow.md` converted to "Option / Recommend When / Why" decision tables matching the `ck-plan` Post-Plan Handoff pattern. Runtime-templated and looped payloads (per-finding loop, file-content embedding, fully generated question text) stay as JSON.
+- `references/phase-template.md` documents `## Verification Log` and `## Validation Log` as machine-written, optional sections; hand-edit anti-pattern added.
+- `references/gate-1-approval.md` Context Reminder block moved from step-07 to step-09 (fires AFTER the user picks a next-step option, not on Gate 1 approval); contradictory step-07 instruction reconciled.
+
+### Migration Notes
+
+- Legacy plans without `handoff`, `consistency_sweeps`, `## Validation Log`, or `## Verification Log` continue to validate as `PLAN_COMPLETE`. No migration tool required.
+- Fixtures live at `tests/fixtures/plan-creator/` covering legacy / modernized / partial / interrupted-sweep / handoff-invalid-enum states; runnable via `bash tests/fixtures/plan-creator/validate-fixtures.sh`.
+
+## 2.9.8 (2026-05-23) — Memory system deep fix
+
+### Highlights
+
+Four verified failures in the memory pipeline removed: `last-model-id.txt` now persists the real model id, `/mk:fix` reliably writes its Step 6 entry, the `##pattern:` / `##decision:` / `##note:` capture surface is finally documented as a user-typed keyboard shortcut (the handler never fired on agent output), and `analyst.md` writes to the v2.4.1 split topic files instead of the deprecated `patterns.json` / `lessons.md` stubs.
+
+### Bug Fixes
+
+- `last-model-id.txt` always wrote `unknown` — `post-session.sh` was reading env vars (`CLAUDE_MODEL`, `MEOWKIT_MODEL_HINT`, `ANTHROPIC_MODEL`) that Claude Code never exports to Stop-hook subprocesses. New `hooks/lib/resolve-model.sh` resolves the model id from `session-state/detected-model.json` (the canonical source) with env-var fallback. `cost-log.json` entries and `trace-log.jsonl` session-end events now carry the real model id.
+- `/mk:fix` Step 6 memory write path is now enforced — the command spec previously had no memory write instructions and `Phase 6 / Reflect` only ran in `/mk:cook`. New entries land in both `fixes.md` and `fixes.json` (with `frequency: 1` and today's `lastSeen`).
+- Agent files instructing `##pattern:` / `##decision:` / `##note:` capture were architecturally broken — the handler is bound to `UserPromptSubmit` and never fires on agent output. 41 files patched (23 agents + 16 skills + 1 command + `docs/memory-system.md`) to use direct `Edit` calls instead. Existing user-typed `##prefix:` flow is unchanged.
+- `analyst.md` agent wrote to `patterns.json` (deprecated stub) and `lessons.md` (archived stub) — Phase 6 entries were functionally lost. Now targets `fixes.{json,md}`, `review-patterns.{json,md}`, `architecture-decisions.{json,md}` per the v2.4.1 schema.
+
+### Improvements
+
+- New reference doc `.claude/skills/memory/references/capture-architecture.md` — the canonical 2-path contract describing user-typed `##prefix:` vs agent-authored direct `Edit`. Referenced from every patched agent and skill.
+- `docs/memory-system.md` §3a clarified that the `##prefix:` handler does NOT fire on agent output; new §3d added describing the agent-direct write path; §8 tombstone gains rows for "Agent-output `##prefix:` as API" and "`patterns.json` / `lessons.md` as active write targets".
+- `mk:memory` SKILL.md gains a "How session-capture is invoked" section clarifying the routine is prose-driven (the agent reads `references/session-capture.md` and follows its steps via `Edit`) — there is no `mewkit memory session-capture` CLI subcommand.
+- New `tests/resolve-model.test.sh` — 7 cases covering happy path, missing file, malformed JSON, literal "unknown" fall-through, env-hint override, file-wins-over-env precedence, and shell-metachar sanitization.
+- New `tests/spec-drift.test.sh` — regression gate ensuring no agent/skill/command file re-introduces `##prefix:` as an agent-output instruction or writes to the deprecated `patterns.json` / `lessons.md` stubs.
+
+### Removals
+
+- `patterns.json` and `lessons.md` remain on disk as gravestone stubs; their write-target status was already removed in v2.4.1 and is now also enforced via `spec-drift.test.sh`. Scheduled for deletion in v2.12.0 — external skills writing to either should migrate to the split topic files before then.
+
 ## 2.9.7 (2026-05-16) — Docs reference contract + validator
 
 ### Highlights

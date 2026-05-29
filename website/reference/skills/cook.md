@@ -23,7 +23,10 @@ Primary entry point for building features. Given a description or plan path, orc
 - **TDD mode:** Opt-in via `--tdd` — writes failing tests before implementation, enforces RED-GREEN-REFACTOR
 - **Smart intent detection:** Auto-routes to the correct mode based on input patterns (plan path, "fast", "parallel", "auto")
 - **Workflow modes:** interactive (default), auto, fast, parallel, no-test, code — with modifier flags `--verify`, `--strict`, `--no-strict`
-- **Required subagents:** Scout (Phase 0), plan-creator + researcher (Phase 1), tester (Phase 2, TDD only), developer (Phase 3), mk:simplify + mk:verify (post-build), reviewer (Phase 4), git-manager via mk:ship (Phase 5), documenter + memory capture (Phase 6)
+- **Required subagents:** Scout (Phase 0), plan-creator + researcher (Phase 1), tester (Phase 2, TDD only), developer (Phase 3), mk:simplify + mk:verify (post-build), reviewer (Phase 4), shipper via mk:ship (Phase 5 — shipper invokes git-manager internally), documenter + memory capture (Phase 6)
+- **Scout-First Contract (Phase 0):** before any clarifying question or plan generation, a 3–6 bullet codebase-context summary is surfaced to the user (project type/language/framework, relevant modules, current patterns, in-flight plans, public APIs/schemas). Skipped on `plan.md` / `phase-*.md` input.
+- **Exact-Requirements Contract (Phase 1):** `mk:plan-creator` MUST answer 5 dimensions in concrete sentences — expected output, acceptance criteria, scope boundary, non-negotiable constraints, touchpoints — before returning a plan. Clarifying-question options MUST cite scout findings (file paths). Skipped on plan-path input.
+- **Regression Recovery Options (Gate 2):** when the reviewer surfaces a regression in EXISTING behavior (verdict includes `Side Effects Detected: Yes`), cook STOPs the iteration loop and presents 2–4 typed options to the user (revert / keep + update dependents / compatibility shim / accept the regression). User selection recorded as a `## User Decision Addendum` block on the verdict file. `validate-gate-2.sh` blocks Gate 2 until the addendum is present.
 - **Simplify + Verify:** Mandatory post-build steps — reduce complexity, then run unified build+lint+test+coverage before review
 
 ## Usage
@@ -49,7 +52,7 @@ Build a JWT-based authentication system for the API — login, registration, tok
 
 **Flags:** `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`
 
-**Modifier flags:** `--verify` (light browser check ~$1, advisory) | `--strict` (full evaluator ~$2-5, FAIL blocks ship) | `--no-strict` (suppress auto-strict from scale-routing). `--strict` supersedes `--verify`.
+**Modifier flags:** `--verify` `[LIGHT]` (light browser/artifact check, advisory — no back-edge to Phase 3) | `--strict` `[HEAVY]` (full evaluator pass, FAIL blocks ship and routes back to Phase 3) | `--no-strict` (suppress auto-strict from scale-routing). `--strict` supersedes `--verify`. Concrete cost depends on the inner harness, model tier, and target surface; treat `[LIGHT]` vs `[HEAVY]` as relative ordering only.
 
 ## TDD mode (`--tdd` flag)
 
@@ -59,14 +62,16 @@ When `--tdd` is detected, the skill writes `on` to `.claude/session-state/tdd-mo
 
 | Mode | Research | TDD | Gate 2 | Progression |
 |---|---|---|---|---|
-| interactive (default) | Yes | Yes | Human approval | One at a time |
-| auto | Yes | Yes | Human approval | Continuous (auto-fix, not auto-approve) |
+| interactive (default) | Yes | RED-strict | Human approval | One at a time |
+| auto | Yes | RED-strict | Human approval | Continuous (auto-fix, not auto-approve) |
 | fast | Skip | Plan-level | Human approval | One at a time |
-| parallel | Optional | Yes | Human approval | Parallel groups |
+| parallel | Optional | RED-strict | Human approval | Parallel groups |
 | no-test | Yes | Skip | Human approval | One at a time |
-| code | Skip | Yes | Human approval | Per plan |
+| code | Skip | RED-strict | Human approval | Per plan |
 
-Gate 2 requires human approval in ALL modes. No exceptions. Auto mode auto-fixes issues but never auto-approves shipping.
+**TDD column key:** `RED-strict` = failing tests in Phase 2 before any implementation (only enforced when `--tdd` / `MEOWKIT_TDD=1`; otherwise Phase 2 is optional). `Plan-level` = tests reflect plan intent, no RED gate. `Skip` = no Phase 2.
+
+Gate 2: human approval mandatory in all modes — see `.claude/rules/gate-rules.md` for the full contract.
 
 ## Smart intent detection
 

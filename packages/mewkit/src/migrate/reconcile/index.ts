@@ -13,10 +13,17 @@ export {
 	readPortableRegistry,
 	removePortableInstallation,
 	syncPortableRegistry,
+	updateAppliedManifestVersion,
 	writePortableRegistry,
 	type PortableInstallationV3,
 	type PortableRegistryV3,
 } from "./portable-registry.js";
+export {
+	filterApplicableManifestEntries,
+	loadPortableEvolutionManifest,
+	resolvePortableManifestPath,
+	type PortableEvolutionManifest,
+} from "./portable-manifest.js";
 export {
 	buildConvertedChecksums,
 	buildSourceItemState,

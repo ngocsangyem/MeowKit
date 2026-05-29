@@ -80,6 +80,12 @@ run_test "Gate 2: incidental 'failed' in prose" 0 sh -c "printf 'Score: 8.5/10\n
 # Test 7: File not found
 run_test "Gate 2: file not found" 1 sh "$SCRIPT_DIR/validate-gate-2.sh" "$TMPDIR/nonexistent-verdict.md"
 
+# Test 9: Side effects detected without addendum should block
+run_test "Gate 2: side effects no addendum" 1 sh -c "printf 'Score: 8/10\nCritical (0): []\nSide Effects Detected: Yes\n- Regression in auth flow\n' | sh '$SCRIPT_DIR/validate-gate-2.sh' -"
+
+# Test 10: Side effects detected WITH User Decision Addendum should pass
+run_test "Gate 2: side effects with addendum" 0 sh -c "printf 'Score: 8/10\nCritical (0): []\nSide Effects Detected: Yes\n- Regression in auth flow\n\n## User Decision Addendum\nUser selected: Add compatibility shim at auth boundary\nResumption point: Phase 3\n' | sh '$SCRIPT_DIR/validate-gate-2.sh' -"
+
 # --- Summary ---
 echo ""
 echo "Results: $PASS passed, $FAIL failed out of $((PASS + FAIL)) tests"

@@ -25,6 +25,7 @@ This is the **calibration reference** for product-level planning mode.
 - [Handoff](#handoff)
 
 
+<!-- research-citation -->
 It comes from the appendix of Anthropic's harness-design article (Prithvi Rajasekaran, Labs)
 and demonstrates the ambition level, feature density, user-story specificity, and design-language
 texture expected from `step-03a-product-spec.md`.
@@ -177,6 +178,7 @@ Hobbyists, design students, indie devs, and former arcade kids who want to make 
 - [ ] Hitting the limit shows a friendly message with the reset time.
 
 <!-- Real plans should reach 12-20 features. The above 10 are illustrative — see Anthropic article appendix for the full RetroForge example. -->
+<!-- research-citation -->
 
 ## Design Language
 

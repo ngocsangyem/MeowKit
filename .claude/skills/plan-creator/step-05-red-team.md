@@ -209,11 +209,37 @@ Append a **summary section** to plan.md that links to the full report:
 
 If a `## Red Team Review` section already exists (from a previous session), append a new `### Session` subsection — don't overwrite. Similarly, if `red-team-findings.md` already exists, rename it to `red-team-findings-{YYMMDD-prev}.md` before writing the new one.
 
+### 5j. Whole-Plan Consistency Sweep (Gate W1)
+
+After accepted findings have been written into phase files (5g), the planner agent MUST run a Whole-Plan Consistency Sweep before handing off to step-06.
+
+Algorithm: see `references/whole-plan-sweep.md` (stage-then-apply with read-only Pass 1, decision check, write Pass 2).
+
+Inputs to this run:
+- `delta_source = accepted_findings` (the list from 5e)
+- `plan_dir` (from session state)
+
+Outputs:
+- `### Pending Sweep Edits` block appended to `{plan_dir}/red-team-findings.md` (staged before any write)
+- `### Whole-Plan Consistency Sweep` summary block appended to `{plan_dir}/red-team-findings.md` (after Pass 2)
+- plan.md frontmatter updated with `consistency_sweeps.red_team: { reconciled, unresolved, ran_at }`
+
+If `unresolved > 0`, FIRE the W1 `AskUserQuestion` blocker (see decision tree in `references/whole-plan-sweep.md`). BLOCK step-06 until the user selects one of:
+
+- "Apply pending edits and defer unresolved to validation interview" — proceed to step-06, mark deferred items in `## Validation Log`.
+- "Apply pending edits and resolve now" — planner rewrites locally; recursion bounded at 2 attempts.
+- "Skip sweep this round" — drop pending edits, proceed; record in red-team-findings.md that sweep was declined.
+
+If `unresolved = 0`, proceed silently to step-06.
+
+**Cancel safety.** If the user picks any "Skip" / "Cancel" option, Pass 2 does NOT execute. The "Pending Sweep Edits" block stays in red-team-findings.md as a record of what would have changed; phase files remain untouched by the sweep. Accepted-finding edits from 5g remain in place — only the sweep's reconciliations are reverted/skipped.
+
 ## Output
 
-- `{plan_dir}/red-team-findings.md` — full detailed findings report (includes Cross-Persona Blind Spot Pass section)
+- `{plan_dir}/red-team-findings.md` — full detailed findings report (includes Cross-Persona Blind Spot Pass section), Pending Sweep Edits, and Whole-Plan Consistency Sweep summary
 - Findings applied to phase files (Key Insights or Risk Assessment), including any promoted `cross-cutting` findings
 - `## Red Team Review` summary section written to plan.md with cross-persona-blind-spot count and link to findings file
+- plan.md frontmatter `consistency_sweeps.red_team` updated
 - `red_team_findings` variable set: `"{N} findings, {accepted} accepted, {C} cross-persona promoted"`
 
 ## Next
