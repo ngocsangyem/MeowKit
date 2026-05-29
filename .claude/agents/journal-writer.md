@@ -86,7 +86,7 @@ This agent operates in **Phase 6 (Reflect)** of the workflow and during **escala
 - Activated after the documenter and analyst complete their Phase 6 work.
 - Activated whenever the developer exhausts self-healing attempts (3 failures).
 - Activated when the security agent issues a BLOCK verdict.
-- Journal entries feed into the analyst's pattern extraction across the v2.4.1 split topic files (`.claude/memory/fixes.{json,md}`, `review-patterns.{json,md}`, `architecture-decisions.{json,md}`). The legacy `patterns.json` is a deprecated stub.
+- Journal entries feed into the analyst's topic-file pattern extraction.
 
 ## Required Context
 
@@ -96,7 +96,7 @@ Load before writing a journal entry:
 - The failure event details (error output, failing tests, escalation context)
 - Git log of recent changes related to the failure
 - Existing journal entries in `docs/journal/`: avoid duplicating known issues
-- `.claude/memory/fixes.json` (bug-class patterns), `.claude/memory/review-patterns.json` (review patterns), and `.claude/memory/architecture-decisions.json` (decisions): check if this is a recurring pattern. The legacy `patterns.json` is a deprecated stub since v2.4.1.
+- `.claude/memory/fixes.json` and `.claude/memory/review-patterns.json`: check if this is a recurring pattern
 
 ## Constraints
 

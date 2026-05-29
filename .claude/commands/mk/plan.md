@@ -6,34 +6,19 @@
 /mk:plan [feature description]
 ```
 
-## Behavior
+## Purpose
 
-Triggers Phase 1 of the 7-phase workflow via the `mk:plan-creator` skill. Output is documentation only — no code is written during planning.
+Create an implementation plan through `mk:plan-creator`. Output is documentation only; no source or test files are written.
 
-### Process
+## Dispatch
 
-1. **Scope challenge** — check complexity, search for existing solutions, determine scope mode (HOLD/EXPANSION/REDUCTION). See `mk:plan-creator/references/scope-challenge.md`.
+Activate `mk:plan-creator` with the feature description and any user-provided planning flags. Use the planning skill's references for scope challenge, workflow model selection, codebase scouting, and validation.
 
-2. **Select workflow model** — map task type to the correct model (feature/bugfix/refactor/security). See `mk:plan-creator/references/workflow-models/`.
+## Safety notes
 
-3. **Scout + research** (if needed) — spawn `mk:scout` for unfamiliar codebases, researcher subagents for unfamiliar tech. Reports saved to `tasks/plans/YYMMDD-name/reports/`.
-
-4. **Generate plan file** — use `mk:plan-creator` to produce a validated plan. Writes to:
-   ```
-   tasks/plans/YYMMDD-feature-name/plan.md
-   ```
-   Validates via `scripts/validate-plan.py` before presenting.
-
-5. **Gate 1 — Human approval.** Display plan summary and request approval.
-
-### Gate 1 Enforcement
-
-Per `rules/gate-rules.md`:
-- Plan file exists with all required sections (Goal, Context, Scope, Constraints, Acceptance Criteria)
-- Validation script outputs `PLAN_COMPLETE`
-- Human has explicitly typed approval (not inferred from silence)
-
-No code is written. No tests are written. This phase produces documentation only.
+- Plan output goes under `tasks/plans/YYMMDD-feature-name/`.
+- Gate 1 requires an explicit human approval before implementation.
+- A valid plan contains Goal, Context, Scope, Constraints, and Acceptance Criteria.
 
 ### Output
 

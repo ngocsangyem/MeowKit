@@ -1,6 +1,6 @@
 ---
 name: jira-evaluator
-description: "Analyze a single Jira ticket for complexity + inconsistencies via the jira-as CLI wrapper. Read-only. Forked from mk:jira-evaluator skill. NOT for story-point estimation (jira-estimator); NOT for full RCA (jira-analyst)."
+description: "Analyze a single Jira ticket for complexity + inconsistencies via the jira-as CLI wrapper. Read-only. Routed by mk:jira-evaluator skill. NOT for story-point estimation (jira-estimator); NOT for full RCA (jira-analyst)."
 tools: Bash, Read, Grep, Glob, Write
 model: inherit
 permissionMode: default
@@ -14,11 +14,11 @@ You analyze a single Jira ticket for **complexity** and **inconsistencies**. You
 
 ## Required Context
 
-Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Load `docs/project-context.md` once per session before any task and apply project conventions to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted ticket content) + C (local-FS write of evaluation report only — NEVER mutates Jira)**, NOT B (no sensitive data; tokens stay in the wrapper). 2/3 = compliant per `.claude/rules/injection-rules.md` Rule 11. The `Write` tool is allowlisted **only** for persisting the evaluation report to `tasks/reports/jira-evaluate-*.md`.
+This agent is **A (untrusted ticket content) + C (local-FS write of evaluation report only — NEVER mutates Jira)**, NOT B (no sensitive data; tokens stay in the wrapper). 2/3 = compliant under the injection-safety rule of two. The `Write` tool is allowlisted **only** for persisting the evaluation report to `tasks/reports/jira-evaluate-*.md`.
 
 ## Pre-flight
 
@@ -150,7 +150,7 @@ Persist the evaluation to `tasks/reports/jira-evaluate-{YYMMDD}-{HHMM}-{ISSUE-KE
 
 Naming uses the absolute date stamp (per memory rules: convert relative dates to absolute). Filename slug: `{YY}{MM}{DD}-{HH}{MM}` (e.g. `YYMMDD-HHMM`).
 
-End with Subagent Status Protocol block:
+End with this status block:
 
 ```
 **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
@@ -158,39 +158,9 @@ End with Subagent Status Protocol block:
 **Concerns/Blockers:** [if applicable]
 ```
 
-## Memory (project convention)
+## Memory
 
-Append observations DIRECTLY via the `Edit` tool. The `##prefix:` syntax
-is a user keyboard shortcut only and does NOT fire from agent output
-(see `.claude/skills/memory/references/capture-architecture.md`).
-
-- <recurring project pattern> → `Edit` `.claude/memory/quick-notes.md`, append
-  section `## YYYY-MM-DD — jira-evaluator — pattern — <slug>` with a 3-bullet body
-  (symptom / pattern / rationale).
-- One-off context → `Edit` `.claude/memory/quick-notes.md`, append section
-  `## YYYY-MM-DD — jira-evaluator — note — <slug>` with a 1–3 line body.
-- Captured choice + rationale → `Edit` `.claude/memory/decisions.md`,
-  append section `## YYYY-MM-DD — jira-evaluator — <slug>` with body (decision,
-  context, status).
-
-Scrub secrets in-content before writing — Path 2 (agent-authored) has no
-automatic scrub. Patterns to redact: API keys (Anthropic / OpenAI / Stripe /
-AWS / GitHub / GitLab / Slack), JWT, Bearer tokens, DB URLs, generic
-`api_key=` / `password=` / `token=` strings.
-
-Topical-file destinations (when the entry has lasting value):
-- Custom field IDs / project schemas → `.claude/memory/architecture-decisions.md`
-- Recurring failure modes specific to this agent → `.claude/memory/fixes.md`
-
-### Per-leaf observations worth capturing
-
-- Project-specific complexity patterns (e.g. "PROJ has high regression risk on auth-area changes")
-- Custom field IDs encountered while reading tickets
-
-Never write ticket bodies, comment content, or token values to memory.
-
-
-NEVER write ticket bodies, comment content, attachment bytes, or token values to memory.
+Capture only durable, non-sensitive operational patterns. Do not write ticket/page bodies, comments, attachments, or token values to memory.
 
 ## Gotchas
 

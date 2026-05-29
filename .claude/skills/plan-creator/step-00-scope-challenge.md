@@ -10,7 +10,7 @@ Assess task complexity, select planning mode, early-exit trivial tasks.
 2. Read `.claude/memory/architecture-decisions.json` — recurring architectural patterns
 3. If relevant learnings found, note them for inclusion in plan Context section
 
-Skip ONLY if memory/ directory doesn't exist.
+Skip ONLY if `.claude/memory/` doesn't exist.
 
 ### 0b. Select Workflow Model
 

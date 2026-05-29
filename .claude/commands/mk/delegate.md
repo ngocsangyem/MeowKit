@@ -81,7 +81,7 @@ Skip all `AskUserQuestion` prompts. Reads fields from a single structured argume
 
 ## Why This Command Exists
 
-MeowKit's subagent context isolation is currently prompt-protocol-only. `orchestration-rules.md` documents a template with anti-patterns, but no mechanism ensures orchestrators follow it. `mk:delegate` makes the correct path low-friction. The incorrect path (passing 50+ lines of conversation, vague "continue from where we left off") is documented in `orchestration-rules.md` § Rejected Patterns.
+The toolkit's subagent context isolation is currently prompt-protocol-only. `orchestration-rules.md` documents a template with anti-patterns, but no mechanism ensures orchestrators follow it. `mk:delegate` makes the correct path low-friction. The incorrect path (passing 50+ lines of conversation, vague "continue from where we left off") is documented in `orchestration-rules.md` § Rejected Patterns.
 
 ## See Also
 

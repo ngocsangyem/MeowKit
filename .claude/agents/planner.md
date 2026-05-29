@@ -62,7 +62,7 @@ After producing the plan file:
 - If architectural decisions needed → recommend routing to **architect**
 - If implementation-ready → recommend routing to **developer**. In TDD mode (`--tdd` / `MEOWKIT_TDD=1`), insert **tester** (red phase) before the developer. In default mode (TDD off), tester may still be invoked on-request but is not required.
 - **If `mode: product-level`** → recommend routing to **`mk:harness`** skill (NOT directly to developer). The harness owns sprint-contract negotiation and the generator ⇄ evaluator loop. Bypassing the harness defeats the point of product-level planning.
-  - **Stub guard timing (until Phase 5 ships mk:harness):** the stub guard fires AFTER Gate 1 has been approved and AFTER step-08 hydrate-tasks would normally run — it replaces step-08 only, not Gate 1. Gate 1 self-check runs unchanged for product-level plans (Completed: spec drafted, memory capture at Gate 1 recorded to `memory/lessons.md`; Skipped: phase files, red-team-findings.md, validation interview, task hydration; Uncertain: none). If `.claude/skills/harness/SKILL.md` does not exist after Gate 1 approval, print this message in place of step-08 and stop:
+  - **Stub guard timing (until Phase 5 ships mk:harness):** the stub guard fires AFTER Gate 1 has been approved and AFTER step-08 hydrate-tasks would normally run — it replaces step-08 only, not Gate 1. Gate 1 self-check runs unchanged for product-level plans (Completed: spec drafted, memory capture at Gate 1 recorded to `.claude/memory/architecture-decisions.md`; Skipped: phase files, red-team-findings.md, validation interview, task hydration; Uncertain: none). If `.claude/skills/harness/SKILL.md` does not exist after Gate 1 approval, print this message in place of step-08 and stop:
     > "Product spec drafted at {plan_path} and Gate 1 approved. The `mk:harness` skill is not yet available (lands in Phase 5). For now, hand this spec to the developer agent manually, OR wait until `mk:harness` is shipped to run the full generator ⇄ evaluator loop. No tasks were hydrated — re-run task hydration after harness lands."
 - Always include: plan file path, recommended agent sequence, risk flags
 
@@ -70,7 +70,7 @@ After producing the plan file:
 
 Use product-level mode when the user asks for a green-field app/product/tool ("build a kanban app", "make a retro game maker", "create a SaaS dashboard"). Auto-detection happens in `step-00` of `mk:plan-creator`.
 
-**WHY this mode exists:** Capable models (Opus 4.5+) under-perform when locked into pre-sharded implementation tasks. Anthropic's harness research showed that micro-sharding the plan causes cascading errors — the model loses room to discover better solutions. The planner's job in this mode is to set ambition and constraints, not to dictate the path.
+**WHY this mode exists:** Capable models can under-perform when locked into pre-sharded implementation tasks. Micro-sharding the plan causes cascading errors because the model loses room to discover better solutions. The planner's job in this mode is to set ambition and constraints, not to dictate the path.
 
 **Anti-patterns (forbidden in product-level plans):**
 
@@ -110,7 +110,9 @@ Load before producing a plan:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - `.claude/rules/gate-rules.md`: Gate 1 hard-stop conditions you enforce
-- `.claude/memory/lessons.md`: past learnings relevant to planning
+- `.claude/memory/fixes.md`: recurring failure classes relevant to planning
+- `.claude/memory/review-patterns.md`: repeated review outcomes relevant to planning
+- `.claude/memory/architecture-decisions.md`: active architectural constraints
 - `docs/architecture/`: existing ADRs that constrain the design space
 - `tasks/templates/plan-template.md` or `plan-quick.md`: plan structure to follow
 - Existing codebase structure (via Glob/Grep — do not read all files upfront)

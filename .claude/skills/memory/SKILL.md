@@ -26,7 +26,7 @@ Operates in **Phase 0 (Orient)** and **Phase 6 (Reflect)**. Output supports the 
 |-----------|-------------|---------|
 | **[capture-architecture.md](./references/capture-architecture.md)** | Before any agent-side memory write | The 2-path contract — `##prefix:` is user-typed only; agents write via direct `Edit` |
 | **[session-capture.md](./references/session-capture.md)** | Phase 6 | Capturing session learnings in 3 categories (patterns/decisions/failures) |
-| **[pattern-extraction.md](./references/pattern-extraction.md)** | Phase 6 | Extracting high-frequency patterns for CLAUDE.md promotion |
+| **[pattern-extraction.md](./references/pattern-extraction.md)** | Phase 6 | Extracting high-frequency patterns for instruction-file promotion |
 | **[cost-tracking.md](./references/cost-tracking.md)** | Phase 0, 6 | Token usage tracking, cost reporting, budget alerts |
 | **[consolidation.md](./references/consolidation.md)** | Manual | Prune stale entries, merge duplicates, archive cost data (run when memory grows large) |
 

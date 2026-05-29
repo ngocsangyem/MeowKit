@@ -62,7 +62,7 @@ Read `.claude/memory/fixes.json` for prior fix patterns (type: "correction").
 - If a matching fix pattern exists → use it as starting hypothesis in Step 2
 - If a matching success pattern exists → apply the known fix approach directly
 
-This turns repeated bugs into instant fixes. Skip only if memory/ doesn't exist.
+This turns repeated bugs into instant fixes. Skip only if `.claude/memory/` doesn't exist.
 
 ## Step 1 — Scout (MANDATORY — never skip)
 

@@ -115,13 +115,13 @@ is a user keyboard shortcut only and does NOT fire from agent output
   context, status).
 
 Scrub secrets in-content before writing — Path 2 (agent-authored) has no
-automatic scrub. Patterns to redact: API keys (Anthropic / OpenAI / Stripe /
+automatic scrub. Patterns to redact: API keys (model providers / Stripe /
 AWS / GitHub / GitLab / Slack), JWT, Bearer tokens, DB URLs, generic
 `api_key=` / `password=` / `token=` strings.
 
 NEVER write paste-body content, raw story descriptions, comment text, or token values to memory.
 
-End with Subagent Status Protocol block per `.claude/rules/agent-conduct.md` A1.
+End with this status block:
 
 ## Gotchas
 

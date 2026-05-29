@@ -44,7 +44,7 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 **Additional registered handler (not in hooks table above):**
 | Handler | Event | Purpose |
 |---|---|---|
-| `handlers/immediate-capture-handler.cjs` | UserPromptSubmit | Detects `##decision:`, `##pattern:`, `##note:` prefixes in user prompts and writes entries to typed memory files (lessons.md, patterns.json, quick-notes.md). |
+| `handlers/immediate-capture-handler.cjs` | UserPromptSubmit | Detects `##decision:`, `##pattern:`, `##note:` prefixes in user prompts and writes entries to typed memory files (architecture-decisions.json, fixes.json, review-patterns.json, quick-notes.md). |
 
 ## Env Var Bypasses
 

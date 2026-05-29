@@ -107,6 +107,6 @@ Manual user edits to the cache file are **NOT preserved** — they are overwritt
 
 **WHY:** Automated ownership prevents stale manual edits from masquerading as current context.
 
-Append persistent notes to `.claude/memory/notes.md` instead of editing the cache file.
+Append persistent notes to `.claude/memory/quick-notes.md` or the appropriate topic file instead of editing the cache file.
 
 The banner header is metadata only — stripped by the injection path so it does NOT consume the 4KB injection budget. It exists for human readers of the cache file.

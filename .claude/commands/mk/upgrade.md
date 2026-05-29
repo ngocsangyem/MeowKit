@@ -10,7 +10,7 @@
 
 ## Behavior
 
-Self-update the installed toolkit to the latest version. Preserves learned knowledge in `memory/` directory.
+Self-update the installed toolkit to the latest version. Preserves learned knowledge in `.claude/memory/`.
 
 ### Execution Steps
 
@@ -26,7 +26,7 @@ Self-update the installed toolkit to the latest version. Preserves learned knowl
    - Print: "Update available: vX.Y.Z → vA.B.C"
    - Download the new version.
    - Replace `.claude/` files with updated versions: commands, modes, rules, skills, scripts, agents, hooks.
-   - **NEVER overwrite `memory/` directory.** Lessons, cost logs, and learned patterns are preserved across updates.
+   - **NEVER overwrite `.claude/memory/`.** Topic files, cost logs, and learned patterns are preserved across updates.
    - Update version in `the workflow config`.
 
 5. **Post-update validation.** Run `/validate` to confirm the update installed correctly and all scripts are functional.
@@ -40,9 +40,9 @@ Self-update the installed toolkit to the latest version. Preserves learned knowl
 
 ### Safety
 
-- The `memory/` directory is NEVER overwritten. This ensures:
+- The `.claude/memory/` directory is NEVER overwritten. This ensures:
   - Topic files in `.claude/memory/` (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`, `security-notes.md`) persist — project learnings live per category
-  - `memory/cost-log.json` (cost history) persists
+  - `.claude/memory/cost-log.json` (cost history) persists
   - Any other accumulated knowledge is preserved
 - If the update fails mid-way, the previous version's files remain intact.
 - After update, `/validate` confirms everything works.

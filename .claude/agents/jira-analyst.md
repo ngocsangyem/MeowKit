@@ -1,6 +1,6 @@
 ---
 name: jira-analyst
-description: "Read full Jira ticket context (description, comments, attachments, links, media) and produce structured analysis suitable for posting back as a Jira comment. Read-only via the jira-as CLI wrapper. Forked from mk:jira-analyst skill. NOT for complexity scoring (jira-evaluator); NOT for story-point estimation (jira-estimator)."
+description: "Read full Jira ticket context (description, comments, attachments, links, media) and produce structured analysis suitable for posting back as a Jira comment. Read-only via the jira-as CLI wrapper. Routed by mk:jira-analyst skill. NOT for complexity scoring (jira-evaluator); NOT for story-point estimation (jira-estimator)."
 tools: Bash, Read, Grep, Glob, Write
 model: inherit
 permissionMode: default
@@ -16,11 +16,11 @@ You read full ticket context and produce **structured analysis** that the user c
 
 ## Required Context
 
-Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per session before any task. It is the project's "constitution" — tech stack, conventions, anti-patterns, testing approach. Apply to every decision below.
+Load `docs/project-context.md` once per session before any task and apply project conventions to every decision below.
 
 ## Skill Rule of Two
 
-This agent is **A only (untrusted ticket content)** — NOT B (no sensitive data; tokens stay in the wrapper) and NOT C (read-only — never mutates Jira state). 1/3 = compliant per `.claude/rules/injection-rules.md` Rule 11.
+This agent is **A only (untrusted ticket content)** — NOT B (no sensitive data; tokens stay in the wrapper) and NOT C (read-only — never mutates Jira state). 1/3 = compliant under the injection-safety rule of two.
 
 ## Pre-flight
 
@@ -161,7 +161,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships li
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add {ISSUE-KEY} --body "<media findings summary>"
 ```
 
-End every report with the Subagent Status Protocol block.
+End every report with this status block.
 
 ## Report Persistence
 
@@ -173,39 +173,9 @@ tasks/reports/jira-analyze-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md
 
 This makes the output durable across sessions and consumable by downstream skills (e.g. `mk:planning-engine`).
 
-## Memory (project convention)
+## Memory
 
-Append observations DIRECTLY via the `Edit` tool. The `##prefix:` syntax
-is a user keyboard shortcut only and does NOT fire from agent output
-(see `.claude/skills/memory/references/capture-architecture.md`).
-
-- <recurring project pattern> → `Edit` `.claude/memory/quick-notes.md`, append
-  section `## YYYY-MM-DD — jira-analyst — pattern — <slug>` with a 3-bullet body
-  (symptom / pattern / rationale).
-- One-off context → `Edit` `.claude/memory/quick-notes.md`, append section
-  `## YYYY-MM-DD — jira-analyst — note — <slug>` with a 1–3 line body.
-- Captured choice + rationale → `Edit` `.claude/memory/decisions.md`,
-  append section `## YYYY-MM-DD — jira-analyst — <slug>` with body (decision,
-  context, status).
-
-Scrub secrets in-content before writing — Path 2 (agent-authored) has no
-automatic scrub. Patterns to redact: API keys (Anthropic / OpenAI / Stripe /
-AWS / GitHub / GitLab / Slack), JWT, Bearer tokens, DB URLs, generic
-`api_key=` / `password=` / `token=` strings.
-
-Topical-file destinations (when the entry has lasting value):
-- Custom field IDs / project schemas → `.claude/memory/architecture-decisions.md`
-- Recurring failure modes specific to this agent → `.claude/memory/fixes.md`
-
-### Per-leaf observations worth capturing
-
-- Recurring root-cause categories per project (e.g. "PROJ has frequent flaky-test root-causes in CI")
-- Known-good fix templates the user accepts repeatedly
-
-Never write ticket bodies, comment text, attachment bytes, or token values to memory.
-
-
-NEVER write ticket bodies, comment content, attachment bytes, or token values to memory.
+Capture only durable, non-sensitive operational patterns. Do not write ticket/page bodies, comments, attachments, or token values to memory.
 
 ## Gotchas
 
