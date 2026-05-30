@@ -26,6 +26,14 @@ There is no executable runtime. MeowKit shapes LLM behavior through prompt
 engineering, preventive hooks, and structured file conventions.
 Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 
+## Ecosystem Harness (start here)
+
+For the end-to-end integration story (rules + hooks + skills + artifacts), see:
+
+- `docs/core/ecosystem-harness.md`
+
+## 2. Component Inventory (Verified 2026-04-18)
+
 ---
 
 ## 2. Component Inventory (Verified 2026-04-18)
