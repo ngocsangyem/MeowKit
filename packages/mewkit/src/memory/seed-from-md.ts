@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 // One-shot MD→JSON seeder. Populates curated JSON stores from their legacy topic
-// markdown so JSON-first readers (Phase 2) don't read empty stores = silent
+// markdown so JSON-first readers do not read empty stores = silent
 // knowledge loss. Rules: ADDITIVE (only adds entries whose id is new), IDEMPOTENT
 // (re-run adds nothing), NEVER overwrites or reorders existing JSON entries.
 

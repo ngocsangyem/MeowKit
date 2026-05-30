@@ -104,7 +104,7 @@ describe('Split schema validity (M4 closed)', () => {
   });
 });
 
-describe('Zod store schemas (Phase 1)', () => {
+describe('Zod store schemas', () => {
   it('SecurityFindingsSchema accepts the 4th-store narrative shape', () => {
     const ok = SecurityFindingsSchema.safeParse({
       version: '2.0.0',

@@ -1,6 +1,6 @@
-// seed-from-md.test.ts — MD→JSON seeder (Phase 1). The data-loss guard for
-// Phase 2: confirms empty JSON stores are populated from topic markdown, the
-// operation is idempotent + additive (never overwrites existing entries), and
+// seed-from-md.test.ts — MD→JSON seeder. The data-loss guard before JSON-first
+// readers switch over: confirms empty JSON stores are populated from topic markdown,
+// the operation is idempotent + additive (never overwrites existing entries), and
 // security format-doc templates are NOT seeded as findings.
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'fs';
@@ -19,7 +19,7 @@ beforeEach(() => {
 });
 afterEach(() => rmSync(join(memDir, '..', '..'), { recursive: true, force: true }));
 
-describe('seedFromMd (Phase 1)', () => {
+describe('seedFromMd', () => {
   it('populates an empty architecture-decisions.json from its markdown', () => {
     writeFileSync(
       join(memDir, 'architecture-decisions.json'),

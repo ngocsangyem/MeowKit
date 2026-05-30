@@ -57,7 +57,7 @@ function validateStore(memoryDir: string, spec: StoreSpec, contentValidator: Con
 	const result: StoreResult = { file: spec.file, exists: fs.existsSync(filePath), entryCount: 0, issues: [] };
 
 	if (!result.exists) {
-		// Missing curated store is a soft state (CP-4): warn, never fail.
+		// Missing curated store is a soft state: warn, never fail.
 		result.issues.push({ level: "warn", message: `${spec.file} not found` });
 		return result;
 	}
@@ -83,7 +83,7 @@ function validateStore(memoryDir: string, spec: StoreSpec, contentValidator: Con
 	result.entryCount = items.length;
 
 	// Per-field injection recheck — catches entries captured before the
-	// write-path guard existed (CP-7 defense-in-depth).
+	// write-path guard existed (defense-in-depth).
 	if (contentValidator) {
 		for (const item of items) {
 			const id = String(item.id ?? "<unknown>");

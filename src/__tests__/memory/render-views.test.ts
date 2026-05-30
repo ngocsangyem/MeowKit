@@ -1,4 +1,4 @@
-// render-views.test.ts — JSON→MD view generation (Phase 3). Confirms deterministic
+// render-views.test.ts — JSON→MD view generation. Confirms deterministic
 // banner-stamped output, --check drift detection, injection-content flagging, and
 // the idempotent non-authoritative marker on legacy topic MD.
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -23,7 +23,7 @@ beforeEach(() => {
 });
 afterEach(() => rmSync(join(memDir, '..', '..'), { recursive: true, force: true }));
 
-describe('renderViews (Phase 3)', () => {
+describe('renderViews', () => {
   it('creates views/ at runtime and stamps the generated banner', () => {
     writeStore('fixes.json', 'fixes', [{ id: 'f1', pattern: 'use grep -E', context: 'macos bsd grep' }]);
     renderViews(memDir);

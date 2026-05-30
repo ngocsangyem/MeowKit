@@ -1,4 +1,4 @@
-// skill-prose-structure.test.ts — Phase 2 guard. Skill/agent/command prose that
+// skill-prose-structure.test.ts — JSON-first reader prose guard. Skill/agent/command prose that
 // reads curated memory is LLM-executed, not unit-testable behaviorally; this is the
 // automatable half: grep-assert each reader file carries the JSON-first phrasing and
 // references the canonical rule. (Actual conflict-warning behavior is a documented
@@ -26,7 +26,7 @@ const JSON_FIRST_READERS = [
   'CLAUDE.md',
 ];
 
-describe('JSON-first reader prose (Phase 2)', () => {
+describe('JSON-first reader prose', () => {
   it('the canonical memory-read rule file exists and states JSON-first precedence', () => {
     expect(existsSync(resolve(root, RULE_FILE))).toBe(true);
     const rule = read(RULE_FILE);

@@ -1,4 +1,4 @@
-// memory-validate.test.ts — Zod-backed curated-memory validator (Phase 1).
+// memory-validate.test.ts — Zod-backed curated-memory validator.
 // Exercises validateMemory against temp fixtures: clean v2.0.0 passes, malformed
 // JSON / schema violations are errors, empty-store-vs-MD divergence warns, and the
 // security-findings store validates on its own narrative shape.
@@ -30,7 +30,7 @@ beforeEach(() => {
 });
 afterEach(() => rmSync(join(memDir, '..', '..'), { recursive: true, force: true }));
 
-describe('validateMemory (Phase 1)', () => {
+describe('validateMemory', () => {
   it('clean v2.0.0 stores validate with zero errors and zero warnings', () => {
     writeJson('fixes.json', patternStore('fixes', [{ id: 'f1', pattern: 'use grep -E', context: 'ok' }]));
     writeJson('review-patterns.json', patternStore('review-patterns', [{ id: 'r1', pattern: 'p' }]));

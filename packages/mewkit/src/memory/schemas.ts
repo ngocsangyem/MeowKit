@@ -4,7 +4,7 @@ import { z } from "zod";
 // JSON shape (EMPTY_SKELETON in commands/memory.ts) + immediate-capture-handler.
 // Design rules:
 //  - `.passthrough()` everywhere → unknown/future fields are kept, never rejected
-//    (additive forward-compat, CP-4: current data must validate clean).
+//    (additive forward-compat: current data must validate clean).
 //  - Only the structurally load-bearing fields are required (id, version, scope,
 //    consumer) so legacy entries captured before richer fields existed still pass.
 //  - Validators WARN on soft issues; they never hard-fail valid v2.0.0 data.
@@ -52,7 +52,7 @@ export const FixesSchema = patternStore("fixes");
 export const ReviewPatternsSchema = patternStore("review-patterns");
 export const ArchitectureDecisionsSchema = patternStore("architecture-decisions");
 
-// Security findings store (validation Q5) — narrative shape, not the pattern shape.
+// Security findings store — narrative shape, not the pattern shape.
 export const SecurityFindingSchema = z
 	.object({
 		id: z.string().min(1),

@@ -1,4 +1,4 @@
-// verdict-gate.test.ts — Phase 6.5 workflow proof-bundle gate. A valid
+// verdict-gate.test.ts — workflow proof-bundle gate. A valid
 // PASS/PASS_WITH_RISK verdict passes; BLOCKED/invalid/missing blocks; a legacy
 // markdown-only verdict is tolerated during the transition window.
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -36,7 +36,7 @@ afterEach(() => {
   rmSync(root, { recursive: true, force: true });
 });
 
-describe('evaluateVerdictGate (Phase 6.5)', () => {
+describe('evaluateVerdictGate', () => {
   it('passes a valid PASS verdict', () => {
     writeVerdict('demo', VALID);
     const r = evaluateVerdictGate('demo');

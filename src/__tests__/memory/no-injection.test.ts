@@ -1,4 +1,4 @@
-// no-injection.test.ts — Phase 7. Observability/telemetry must never be injected
+// no-injection.test.ts — observability/telemetry must never be injected
 // into model prompt context. The only former auto-injection (the conversation-summary
 // subsystem) was retired, so NO MeowKit hook should now emit memory/telemetry file
 // contents into stdout on a context-injection event (SessionStart / UserPromptSubmit).
@@ -24,7 +24,7 @@ const INJECTION_PATH_HOOKS = [
   '.claude/hooks/tdd-flag-detector.sh', // UserPromptSubmit
 ];
 
-describe('no context pollution (Phase 7)', () => {
+describe('no context pollution', () => {
   it('the conversation-summary auto-injection is fully removed', () => {
     expect(existsSync(resolve(root, '.claude/hooks/conversation-summary-cache.sh'))).toBe(false);
     const settings = read('.claude/settings.json');

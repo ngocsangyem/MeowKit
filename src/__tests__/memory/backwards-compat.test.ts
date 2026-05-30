@@ -1,4 +1,4 @@
-// backwards-compat.test.ts — Phase 7. A pre-migration project (legacy MD topic
+// backwards-compat.test.ts — a pre-migration project (legacy MD topic
 // files, current v2.0.0 JSON, deprecated stubs) must keep working with the new
 // readers/validators: validation WARNS (never hard-fails) on legacy state, the
 // seeder recovers MD-only knowledge, and tombstones/absent files don't crash.
@@ -27,7 +27,7 @@ beforeEach(() => {
 });
 afterEach(() => rmSync(join(memDir, '..', '..'), { recursive: true, force: true }));
 
-describe('backwards compatibility (Phase 7)', () => {
+describe('backwards compatibility', () => {
   it('current v2.0.0 stores validate with zero errors', () => {
     writeFileSync(join(memDir, 'fixes.json'), JSON.stringify(v200('fixes', [{ id: 'f1', pattern: 'p', context: 'c' }])));
     writeFileSync(join(memDir, 'review-patterns.json'), JSON.stringify(v200('review-patterns', [{ id: 'r1', pattern: 'p' }])));

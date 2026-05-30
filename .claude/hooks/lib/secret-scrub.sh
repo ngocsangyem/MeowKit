@@ -1,6 +1,6 @@
 #!/bin/bash
 # secret-scrub.sh — Shared secret-scrubbing helper for meowkit hooks.
-# Phase 8 (Q6 Option A): extracted at first duplication. Reused by
+# Shared secret scrubber, extracted at first duplication. Reused by
 # post-session.sh and append-trace.sh.
 #
 # Usage (sourced):

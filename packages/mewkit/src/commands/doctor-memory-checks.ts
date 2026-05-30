@@ -5,7 +5,7 @@ import type { DiagResult } from "./doctor-checks.js";
 
 // Memory-health diagnostics surfaced under `mewkit doctor --state`. Kept in a
 // separate module because doctor-checks.ts is already over the 200-line guard.
-// Non-blocking by design (CP-4): issues are WARN, never FAIL — existing v2.0.0
+// Non-blocking by design: issues are WARN, never FAIL — existing v2.0.0
 // data must never make doctor exit non-zero.
 export function checkMemoryHealth(root: string | null): DiagResult[] {
 	if (!root) {

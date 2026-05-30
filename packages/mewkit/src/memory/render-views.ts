@@ -7,7 +7,7 @@ import { loadContentValidator, type ContentValidator } from "./validate.js";
 // the canonical curated JSON stores. Pure transform (no LLM). Output is stable
 // (entries sorted by id) for clean diffs, idempotent, and stamped with a banner
 // declaring the file generated + non-authoritative. Re-runs validate-content per
-// text field (CP-7 defense-in-depth) and annotates flagged entries inline.
+// text field (defense-in-depth) and annotates flagged entries inline.
 
 const GENERATED_BANNER = (storeFile: string): string =>
 	`<!-- GENERATED from ${storeFile} by 'mewkit memory render-views' — do not edit; edits are overwritten. Append new entries to ${storeFile} (the canonical source). -->`;
