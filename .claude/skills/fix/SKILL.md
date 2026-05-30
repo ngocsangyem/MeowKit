@@ -56,8 +56,7 @@ If no mode flag: use `AskUserQuestion` (Autonomous / HITL / Quick). See `referen
 
 ## Step 0.5 — Check Fix Memory (before scouting)
 
-Read `.claude/memory/fixes.md` for prior session learnings on bug classes.
-Read `.claude/memory/fixes.json` for prior fix patterns (type: "correction").
+Read `.claude/memory/fixes.json` **first** — it is the canonical, schema-validated store of prior fix patterns. Fall back to `.claude/memory/fixes.md` only when the JSON is absent. If both exist and describe different bug classes, prefer the JSON and emit a one-line conflict warning (`⚠ fixes.md has entries not in fixes.json — JSON is authoritative; run 'mewkit memory seed-from-md'`). See the source-of-truth rule in `.claude/rules/memory-read-rules.md`.
 - Search for similar symptoms, error messages, or affected modules
 - If a matching fix pattern exists → use it as starting hypothesis in Step 2
 - If a matching success pattern exists → apply the known fix approach directly

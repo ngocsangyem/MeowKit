@@ -23,7 +23,6 @@ MeowKit is a **prompt-engineering framework** — no executable runtime. It shap
 
 ```
 UserPromptSubmit event fires
-  ├─ conversation-summary-cache.sh → inject cached summary (≤4KB)
   ├─ immediate-capture-handler.cjs → capture ##prefix messages to topic files
   └─ tdd-flag-detector.sh → check --tdd flag
 
@@ -79,7 +78,6 @@ Claude Code skill matching
 | `##decision: …` | Immediate capture | `architecture-decisions.json` |
 | `##note: …` | Immediate capture | `quick-notes.md` |
 | Stop hook | Cost entry (atomic temp-rename) | `cost-log.json` |
-| Stop hook | Conversation summary (Haiku) | `conversation-summary.md` |
 | Phase 6 Reflect | Categorized learnings | topic files (fixes.md, review-patterns.md, etc.) |
 | Pre-Ship (live) | Non-obvious decisions | appropriate topic file |
 
@@ -91,7 +89,6 @@ Claude Code skill matching
 | review-patterns.md + review-patterns.json | On-demand (mk:review) | Review patterns |
 | architecture-decisions.md + architecture-decisions.json | On-demand (mk:plan-creator) | Architectural decisions |
 | security-notes.md | On-demand (mk:cso) | Security findings |
-| conversation-summary.md | Every turn | Haiku-summarized session cache |
 | cost-log.json | Phase 0/6 | Token usage per task |
 | decisions.md | On-demand (architect) | Long-form ADRs |
 | security-log.md | On-demand (security agent) | Raw security audit log |

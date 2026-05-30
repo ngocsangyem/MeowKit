@@ -38,7 +38,6 @@ persona: B
 | `/mk:rubric` | 4 | Load/compose rubric preset |
 | `/mk:trace-analyze` | any | Scatter-gather analysis of trace log |
 | `/mk:benchmark` | any | Canary suite (quick tier default; `--full` for 6-task tier) |
-| `/mk:summary` | any | Inspect conversation-summary cache |
 
 ## Agents Quick Reference
 
@@ -188,18 +187,6 @@ Source of truth: `.claude/.env.example`. Most defaults live in `.claude/settings
 |----------|--------|--------|
 | `MEOWKIT_TDD` | `0` \| `1` | `1` = strict red-green-refactor (`pre-implement.sh` enforces failing-test-first); `0` = optional (default) |
 | `MEOWKIT_HOOK_PROFILE` | `standard` \| `fast` \| `strict` | Hook profile selector. Legacy alias `MEOW_HOOK_PROFILE` still accepted; new name wins if both set |
-
-### Conversation summary cache
-
-| Variable | Values | Effect |
-|----------|--------|--------|
-| `MEOWKIT_SUMMARY_CACHE` | `on` \| `off` | Master switch for the conversation-summary cache (default `on`) |
-| `MEOWKIT_SUMMARY_THRESHOLD` | bytes (default `20480`) | Min transcript size before summarization fires |
-| `MEOWKIT_SUMMARY_TURN_GAP` | events (default `30`, ≈ 3-6 turns) | Min JSONL events between summary regenerations |
-| `MEOWKIT_SUMMARY_GROWTH_DELTA` | bytes (default `5120`) | Min transcript growth between summary regenerations |
-| `MEOWKIT_SUMMARY_MODE` | auto-detected | Override summary mode (rarely set manually) |
-| `MEOWKIT_SUMMARY_BUDGET_SEC` | seconds | Time budget for summarization |
-| `MEOWKIT_SUMMARY_DEBUG` | `0` \| `1` | Verbose debug output for the summary pipeline |
 
 ### Memory loader
 

@@ -47,7 +47,6 @@ The prior auto-inject pipeline (`memory-loader`, `memory-parser`, `memory-filter
   decisions.md                # Long-form ADRs — owned by architect agent
   security-log.md             # Raw security audit log
   quick-notes.md              # ##note: capture staging — processed at Reflect
-  conversation-summary.md     # Haiku-summarized session cache
   trace-log.jsonl             # Harness trace events (append-trace.sh)
   last-model-id.txt           # Model-change detection for dead-weight audit
   lessons.md                  # ARCHIVED stub — content migrated to topic files (v2.4.1)
@@ -113,6 +112,25 @@ Memory loads **on demand**, never automatically:
 3. Nothing is injected on subsequent turns; re-reads happen only if the skill explicitly requires them.
 
 The files in `.claude/memory/` are plain Markdown and JSON. Claude Code's platform does not treat this path specially; it reads these files the same way it reads any project file.
+
+### 4.1 Source-of-truth rule (JSON-first)
+
+For the curated stores that exist in both `.json` and `.md` form — `fixes`,
+`review-patterns`, `architecture-decisions`, and `security-findings` — the JSON is
+**canonical**. Every consumer (skill, agent, command) reads with this precedence:
+
+1. **Read the `.json` store first** — it is the authoritative, schema-validated source.
+2. **Fall back to the `.md` topic file only when the `.json` is absent** (e.g. a
+   pre-migration project that has not run `mewkit memory seed-from-md`).
+3. **If both exist and disagree** (the `.md` describes an entry not in the `.json`, or
+   vice-versa), prefer the `.json` and **emit a one-line conflict warning** naming the
+   diverging store, e.g. `⚠ review-patterns.md has entries not in review-patterns.json —
+   run 'mewkit memory seed-from-md' (JSON is authoritative)`. Do not silently merge.
+
+The human-readable `.md` views are non-authoritative once `views/*.md` are generated
+(see the dual-write section). New curated entries are written to JSON (via the
+`immediate-capture-handler` or `mk:review`'s capture step); never hand-edit a generated
+view. Memory remains DATA, not instructions (`injection-rules.md` Rule 3).
 
 ## 5. Pruning
 

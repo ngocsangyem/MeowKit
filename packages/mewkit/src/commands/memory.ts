@@ -2,11 +2,16 @@ import fs from "node:fs";
 import path from "node:path";
 import readline from "node:readline";
 import pc from "picocolors";
+import { validateMemory } from "../memory/validate.js";
+import { seedFromMd } from "../memory/seed-from-md.js";
+import { renderViews } from "../memory/render-views.js";
 
 interface MemoryArgs {
+	subcommand?: string;
 	clear?: boolean;
-	show?: boolean;
 	stats?: boolean;
+	strict?: boolean;
+	check?: boolean;
 }
 
 interface PatternEntry {
@@ -116,26 +121,6 @@ async function clearMemory(memoryDir: string): Promise<void> {
 	console.log(pc.green("Memory cleared."));
 }
 
-function showLessons(memoryDir: string): void {
-	const lessonsPath = path.join(memoryDir, "lessons.md");
-
-	if (!fs.existsSync(lessonsPath)) {
-		console.log(pc.dim("No lessons.md file found."));
-		return;
-	}
-
-	const content = fs.readFileSync(lessonsPath, "utf-8");
-
-	if (content.trim().length === 0) {
-		console.log(pc.dim("lessons.md is empty."));
-		return;
-	}
-
-	console.log(pc.bold("Lessons:"));
-	console.log();
-	console.log(content);
-}
-
 function showStats(memoryDir: string): void {
 	let patternsCount = 0;
 	let lastUpdated = "unknown";
@@ -228,6 +213,100 @@ function showSummary(memoryDir: string): void {
 	}
 }
 
+// `mewkit memory validate [--strict]` — Zod-validate the curated stores +
+// re-run the injection-content guard per text field. Warn-only by default
+// (exit 0); --strict exits nonzero when any error is present.
+function validateCmd(memoryDir: string, strict: boolean): void {
+	const report = validateMemory(memoryDir);
+
+	for (const store of report.stores) {
+		const label = `${store.file}:`.padEnd(28);
+		if (store.issues.length === 0) {
+			console.log(`  ${pc.dim(label)} ${pc.green(`OK (${store.entryCount} entries)`)}`);
+			continue;
+		}
+		const worst = store.issues.some((i) => i.level === "error") ? pc.red("ISSUES") : pc.yellow("WARN");
+		console.log(`  ${pc.dim(label)} ${worst}`);
+		for (const issue of store.issues) {
+			const tag = issue.level === "error" ? pc.red("error") : pc.yellow("warn");
+			console.log(`      ${tag} ${issue.message}`);
+		}
+	}
+
+	console.log();
+	console.log(
+		`${report.errorCount} error(s), ${report.warnCount} warning(s) across ${report.stores.length} curated stores.`,
+	);
+
+	if (strict && report.errorCount > 0) {
+		console.log(pc.red("Strict mode: failing on errors."));
+		process.exit(1);
+	}
+}
+
+// `mewkit memory seed-from-md` — one-shot, additive, idempotent MD→JSON seeder.
+function seedCmd(memoryDir: string): void {
+	const results = seedFromMd(memoryDir);
+	let totalAdded = 0;
+	for (const r of results) {
+		totalAdded += r.added;
+		const label = `${r.file}:`.padEnd(28);
+		const note = r.added > 0 ? pc.green(`+${r.added} (now ${r.total})`) : pc.dim(`unchanged (${r.total})`);
+		console.log(`  ${pc.dim(label)} ${note}`);
+	}
+	console.log();
+	console.log(
+		totalAdded > 0
+			? pc.green(`Seeded ${totalAdded} entr${totalAdded === 1 ? "y" : "ies"} from markdown.`)
+			: pc.dim("Nothing to seed — JSON stores already current."),
+	);
+}
+
+// `mewkit memory render-views [--check] [--strict]` — regenerate human-readable
+// views/*.md from the canonical JSON. --check reports drift without writing (local
+// dev only — views are gitignored, so this is NOT a CI gate). --strict exits
+// nonzero when any entry is flagged by the injection-content recheck.
+function renderViewsCmd(memoryDir: string, check: boolean, strict: boolean): void {
+	const results = renderViews(memoryDir, { check });
+	let staleCount = 0;
+	let flaggedTotal = 0;
+
+	for (const r of results) {
+		const label = `${r.file.replace(/\.json$/, ".md")}:`.padEnd(28);
+		const viewName = `views/${r.file.replace(/\.json$/, ".md")}`;
+		if (check) {
+			if (r.stale) {
+				staleCount++;
+				console.log(`  ${pc.dim(label)} ${pc.yellow(r.exists ? "STALE" : "MISSING")} ${pc.dim(viewName)}`);
+			} else {
+				console.log(`  ${pc.dim(label)} ${pc.green("up-to-date")}`);
+			}
+		} else {
+			console.log(`  ${pc.dim(label)} ${r.wrote ? pc.green(`wrote ${viewName}`) : pc.dim("unchanged")}`);
+		}
+		if (r.flagged.length > 0) {
+			flaggedTotal += r.flagged.length;
+			console.log(`      ${pc.yellow("flagged")} ${r.flagged.join(", ")}`);
+		}
+	}
+
+	console.log();
+	if (check) {
+		if (staleCount > 0) {
+			console.log(pc.yellow(`${staleCount} view(s) stale — run 'mewkit memory render-views'.`));
+			process.exit(1);
+		}
+		console.log(pc.green("All views up-to-date."));
+	} else {
+		console.log(pc.green("Views regenerated."));
+	}
+
+	if (strict && flaggedTotal > 0) {
+		console.log(pc.red(`Strict mode: ${flaggedTotal} flagged entr${flaggedTotal === 1 ? "y" : "ies"}.`));
+		process.exit(1);
+	}
+}
+
 export async function memory(args: MemoryArgs): Promise<void> {
 	console.log(pc.bold(pc.cyan("Agent Memory")));
 	console.log();
@@ -242,10 +321,14 @@ export async function memory(args: MemoryArgs): Promise<void> {
 	console.log(`${pc.dim("Location:")} ${memoryDir}`);
 	console.log();
 
-	if (args.clear) {
+	if (args.subcommand === "validate") {
+		validateCmd(memoryDir, args.strict ?? false);
+	} else if (args.subcommand === "seed-from-md") {
+		seedCmd(memoryDir);
+	} else if (args.subcommand === "render-views") {
+		renderViewsCmd(memoryDir, args.check ?? false, args.strict ?? false);
+	} else if (args.clear) {
 		await clearMemory(memoryDir);
-	} else if (args.show) {
-		showLessons(memoryDir);
 	} else if (args.stats) {
 		showStats(memoryDir);
 	} else {

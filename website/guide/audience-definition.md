@@ -97,7 +97,6 @@
 - `reference/hooks.md`
 - `reference/middleware.md`
 - `core-concepts/session-state.md`
-- `core-concepts/conversation-summary.md`
 - Source code (`.claude/hooks/`)
 
 ---

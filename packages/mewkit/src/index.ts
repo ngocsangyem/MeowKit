@@ -10,6 +10,7 @@ import { upgrade } from "./commands/upgrade.js";
 import { validate } from "./commands/validate.js";
 import { budget } from "./commands/budget.js";
 import { memory } from "./commands/memory.js";
+import { verdictGate } from "./commands/verdict-gate.js";
 import { doctor } from "./commands/doctor.js";
 import { migrate } from "./commands/migrate.js";
 import { setup } from "./commands/setup.js";
@@ -88,6 +89,7 @@ async function main(): Promise<void> {
 			"help",
 			"version",
 			"check",
+			"strict",
 			"beta",
 			"list",
 			"monthly",
@@ -180,10 +182,15 @@ async function main(): Promise<void> {
 			break;
 		case "memory":
 			await memory({
+				subcommand: args._[1] as string | undefined,
 				clear: args.clear as boolean | undefined,
-				show: args.show as boolean | undefined,
 				stats: args.stats as boolean | undefined,
+				strict: args.strict as boolean | undefined,
+				check: args.check as boolean | undefined,
 			});
+			break;
+		case "verdict-gate":
+			verdictGate({ slug: args._[1] as string | undefined });
 			break;
 		case "setup":
 			await setup({ only: args.only as string | undefined, systemDeps: args["system-deps"] as boolean | undefined });

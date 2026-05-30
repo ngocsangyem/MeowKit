@@ -73,7 +73,6 @@ describe("mk:context-audit pipeline", () => {
 		expect(md).toContain("## How to Act");
 		// Footer must cross-link the boundary skills.
 		expect(md).toContain("/mk:budget");
-		expect(md).toContain("conversation-summary-cache.sh");
 		expect(md).toContain("mk:lazy-agent-loader");
 	});
 });

@@ -78,7 +78,7 @@ MeowKit stores engineering learnings in `.claude/memory/` — fix patterns, revi
 | `review-patterns.md` + `review-patterns.json` | `mk:review`, `mk:plan-creator` | Code review or planning |
 | `architecture-decisions.md` + `architecture-decisions.json` | `mk:plan-creator`, `mk:cook` | Architecture work |
 
-There is no auto-injection pipeline. Each skill loads only the topic files relevant to its domain. The `conversation-summary-cache.sh` injects a Haiku-summarized session summary (≤4KB) for continuity — that's the only per-turn injection.
+There is no auto-injection pipeline. Each skill loads only the topic files relevant to its domain.
 
 Write paths: immediate capture via `##pattern:` / `##decision:` / `##note:` prefixes during a session, session-end auto-capture via `post-session.sh`, and Phase 6 `mk:memory session-capture`.
 

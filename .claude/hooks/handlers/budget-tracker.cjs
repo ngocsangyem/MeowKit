@@ -1,6 +1,6 @@
 // budget-tracker.cjs — PostToolUse handler: estimate token cost from tool output.
 // PostToolUse stdin provides `tool_response` with full tool output.
-// Replaces dead cost-meter.sh (which exited on standard/fast profiles).
+// Live per-Bash cost tracker (runs in all hook profiles).
 //
 // Estimation: chars / 4 ≈ tokens (rough, English text). Imprecise but order-of-magnitude.
 // Pricing: per 1M tokens (input/output) by model tier.
