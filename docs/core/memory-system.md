@@ -1,6 +1,6 @@
 # MeowKit Memory System
 
-> Per-project, machine-local memory for MeowKit skills. Topic files live at `.claude/memory/` and are read on demand — no auto-injection pipeline. Separate from Claude Code's platform auto-memory.
+> Per-project, machine-local memory for MeowKit skills. Topic files live at `.claude/memory/` and are read on demand — no auto-injection pipeline. Separate from the host runtime's platform auto-memory.
 
 ## 1. Overview
 

@@ -21,12 +21,12 @@ Key characteristics:
 
 - 7-phase workflow contract
 - hard gates + approval requirements
-- expected evidence + verification artifacts
+- expected evidence + verification artifacts (gated by Phase 4 evaluator + review verdict)
 
 ### 2) Hook orchestration config
 
-- `.claude/meowkit.config.json` wires lifecycle hook chain into the runtime.
-- `.claude/settings.json` provides a permissions allowlist that constrains tool execution surfaces.
+- `.claude/settings.json` provides the hook registration + tool execution allowlist.
+- Hook wiring is driven by `.claude/hooks/` + handler dispatch (`.claude/hooks/dispatch.cjs`) and the hook input contract from `.claude/hooks/lib/read-hook-input.sh`.
 
 ### 3) Core rule set
 

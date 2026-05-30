@@ -1,6 +1,6 @@
 # MeowKit Contribution Rules
 
-Rules derived from the full red-team audit (11 batches, 98 items, 43 critical findings). Every rule exists because a real bug was found. Follow these when adding or modifying agents, skills, hooks, or rules.
+Rules derived from in-repo governance and enforcement sources (.claude/rules/*, plus runtime contracts). Every rule exists because a real bug was found in the harness evolution. Follow these when adding or modifying agents, skills, hooks, or rules.
 
 ---
 

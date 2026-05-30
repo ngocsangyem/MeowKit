@@ -1,8 +1,8 @@
 # MeowKit Architecture
 
 > Grounded architecture model derived from the full-system audit (v2.4.0).
-> Every claim cites source files or the consolidated audit report.
-> Last verified: 2026-04-18
+> Every claim cites in-repo source files (rules/hooks/memory contracts) or explicitly marked consolidated-audit synthesis.
+> Last verified: 2026-05-30
 
 ---
 
@@ -444,4 +444,4 @@ Source: `audit-findings/simulation-traces.md` Scenario Verdict Summary table.
 - Regressed: 0
 
 **Next audit trigger:** mandatory on next model upgrade per `harness-rules.md` Rule 7
-(dead-weight audit playbook: `docs/dead-weight-audit.md`).
+(dead-weight audit playbook: `.claude/rules/dead-weight-audit-rules.md`).
