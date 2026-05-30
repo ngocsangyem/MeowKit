@@ -267,7 +267,7 @@ Notable open issues relevant to agents:
 | CF-M34 | `AGENTS_INDEX.md` footer | Says "13 agents" — stale (actual 16) |
 | CF-M1/M2 | `HOOKS_INDEX.md` | Footer says 8 Node handlers; disk has 12; 4 undocumented |
 | CF-H7 | `mk:lazy-agent-loader/SKILL.md:13` | Agent index hardcodes 15; evaluator unreachable via lazy-loader |
-| CF-H11–H15 | `commands/meow/*.md` | Phantom routing targets: mk:command, mk:plan, mk:arch, mk:design, mk:test, mk:audit, mk:validate, mk:summary |
+| CF-H11–H15 | `commands/meow/*.md` | Phantom routing targets: mk:command, mk:plan, mk:arch, mk:design, mk:test, mk:audit, mk:validate |
 
 Orphaned skills (not in SKILLS_INDEX): `mk:chom`, `mk:pack`, `mk:planning-engine`
 
