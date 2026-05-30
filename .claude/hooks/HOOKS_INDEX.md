@@ -68,7 +68,7 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 | `session-state/precompletion-attempts.json` | pre-completion-check.sh | (same) | Forced-re-entry counter per active plan |
 | `session-state/build-verify-cache.json` | handlers/build-verify.cjs | (same) | File-content-hash cache for skip-on-unchanged |
 | `session-state/last-session-id` | project-context-loader.sh | (same) | Session change detection |
-| `session-state/learning-observer.jsonl` | learning-observer.sh | post-session.sh | Churn pattern log |
+| `session-state/learning-observer.jsonl` | learning-observer.sh | (self — edit-frequency state) | Per-file edit ledger; self-read to compute the canonical `file_edited` trace `edit_count`. No external reader; verbose churn record debug-gated (`MEOWKIT_HOOK_DEBUG=1`). |
 | `session-state/active-plan` | mk:harness (Phase 5), mk:plan-creator | pre-completion-check.sh | Currently active plan slug |
 | `session-state/detected-model.json` | handlers/model-detector.cjs | handlers/budget-tracker.cjs, handlers/auto-checkpoint.cjs | Model tier + density detection result |
 | `session-state/budget-state.json` | handlers/budget-tracker.cjs | (same) | Accumulated session cost estimate |
@@ -78,6 +78,16 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 | `session-state/session-sentinels.jsonl` | post-session.sh (Stop) | handlers/safety-sentinel-inject.cjs (UserPromptSubmit) | Single append-only log. One JSONL line per Stop with `{session_id, safety, phase_zero, ts}`. Line matching current session_id → mk:agent-detector step-0/0b skip their 5-file Read loops on turns 2..N. Truncated by project-context-loader.sh on session change. |
 | `session-state/last-prune-date` | post-session.sh (Stop) | (same) | Daily rate-limit token for memory auto-prune. Holds YYYY-MM-DD of last successful prune; advanced only on Python exit 0. |
 | `session-state/prune-log.md` | lib/memory-prune.py (via post-session.sh Stop) | observability only | Append-only count log of pruned entries (`{file} \| {date} \| {N} entries pruned`). NO entry content is ever logged — breaks the injection-rules.md Rule 11 carrier chain. Lives OUTSIDE `.claude/memory/` deliberately. |
+
+## Telemetry / Canonical Event Stream
+
+| Stream | Writer | Reader | Status |
+|---|---|---|---|
+| `.claude/memory/trace-log.jsonl` | `append-trace.sh` (called by `post-session.sh`, `learning-observer.sh`) | `mk:trace-analyze`, `pre-completion-check.sh` | **Canonical structured event stream.** One typed JSONL record per event. Lock `.claude/memory/.trace-log.lock`; rotates at 50 MB. Never injected into prompt context. |
+| `.claude/hooks/.logs/hook-log.jsonl` | `lib/hook-logger.sh` | `scripts/telemetry-decisions.py` (dead-weight-audit gate) | Hook-fire telemetry. Has a reader — keep writing; not debug-gated. |
+| `session-state/learning-observer.jsonl` | `learning-observer.sh` | self (edit-frequency state → `file_edited` trace) | Reader-less churn record is debug-gated (`MEOWKIT_HOOK_DEBUG=1`); edit ledger feeds the canonical trace. |
+
+`trace-log.jsonl` is the single canonical event stream — do not spawn parallel JSONL control planes (`skill-usage.jsonl`, `eureka.jsonl`, `reviews.jsonl`). Durable workflow evidence lives under `tasks/`; reusable knowledge under `.claude/memory/*.json`.
 
 ## Hook Order Independence (Phase 7 P22)
 

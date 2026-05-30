@@ -47,15 +47,25 @@ describe('Audit-lock: trace-log canonical stream', () => {
 });
 
 describe('Audit-lock: telemetry classification', () => {
-  it('hook-log.jsonl HAS a code reader (telemetry-decisions.py) — NOT debug-gateable', () => {
-    const t = read('scripts/telemetry-decisions.py');
-    expect(t).toContain('hook-log.jsonl');
+  it('hook-log.jsonl HAS a code reader (telemetry-decisions.py) and is NOT debug-gated', () => {
+    expect(read('scripts/telemetry-decisions.py')).toContain('hook-log.jsonl');
+    // hook-logger.sh must keep writing unconditionally (its reader needs the data).
+    expect(read('.claude/hooks/lib/hook-logger.sh')).not.toContain('MEOWKIT_HOOK_DEBUG');
   });
 
-  it('learning-observer.jsonl writer exists; only HOOKS_INDEX claims a (stale) reader', () => {
-    expect(read('.claude/hooks/learning-observer.sh')).toContain('learning-observer.jsonl');
-    // The only "reader" reference is a documented (stale) claim in HOOKS_INDEX — not code.
-    expect(read('.claude/hooks/HOOKS_INDEX.md')).toContain('learning-observer.jsonl');
+  it('learning-observer churn record is debug-gated; file_edited trace stays unconditional', () => {
+    const obs = read('.claude/hooks/learning-observer.sh');
+    // The churn printf is guarded by MEOWKIT_HOOK_DEBUG.
+    expect(obs).toMatch(/MEOWKIT_HOOK_DEBUG[\s\S]*"type":"churn"/);
+    // The canonical file_edited trace emission is NOT behind the debug gate.
+    expect(obs).toContain('append-trace.sh');
+    expect(obs).toContain('file_edited');
+  });
+
+  it('trace-log.jsonl is documented as the single canonical event stream', () => {
+    const idx = read('.claude/hooks/HOOKS_INDEX.md');
+    expect(idx).toContain('trace-log.jsonl');
+    expect(idx).toMatch(/canonical.*event stream/i);
   });
 });
 
