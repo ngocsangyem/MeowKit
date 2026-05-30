@@ -76,7 +76,7 @@ Why optional: strict TDD added friction for spike work, tooling, and prototypes.
 
 ### 8. Learn from Every Session
 
-The memory system captures patterns, mistakes, and costs across sessions. Topic files in `.claude/memory/` — `fixes.md`/`fixes.json` for bug-class patterns, `review-patterns.md`/`review-patterns.json` for recurring observations, `architecture-decisions.md`/`architecture-decisions.json` for design choices — are read on-demand by consumer skills at task start. There is no auto-injection pipeline; each skill loads only the topic files relevant to its domain. The `conversation-summary-cache.sh` injects a Haiku-summarized session summary (≤4KB) per turn for continuity — that is the only per-turn injection.
+The memory system captures patterns, mistakes, and costs across sessions. Topic files in `.claude/memory/` — `fixes.md`/`fixes.json` for bug-class patterns, `review-patterns.md`/`review-patterns.json` for recurring observations, `architecture-decisions.md`/`architecture-decisions.json` for design choices — are read on-demand by consumer skills at task start. There is no auto-injection pipeline; each skill loads only the topic files relevant to its domain.
 
 ### 9. Load Only What's Needed
 

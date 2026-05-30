@@ -17,7 +17,8 @@ MeowKit stores engineering learnings in `.claude/memory/` — fix patterns, revi
 | `security-notes.md` | `mk:cso`, `mk:review` | Security audit |
 | `cost-log.json` | analyst, `mk:memory` | Cost reporting |
 | `decisions.md` | architect | Long-form ADRs |
-| `conversation-summary.md` | (auto) | Session continuity (≤4KB per turn) |
+
+**JSON-first.** For the curated stores (`fixes`, `review-patterns`, `architecture-decisions`, `security-findings`) the `.json` file is canonical and schema-validated; the Markdown under `views/` is a generated, non-authoritative view. Consumers read the `.json` first and fall back to Markdown only when it is absent, warning when the two diverge. Long-session continuity is handled by the host runtime's native compaction — MeowKit no longer keeps its own conversation summary.
 
 **Machine-local by default.** `.claude/memory/*` is gitignored — content is developer-specific working state. Only `.gitkeep` is tracked.
 
@@ -53,6 +54,17 @@ The Stop hook auto-appends cost entries to `cost-log.json` and resolves the acti
 ## How to read
 
 Skills include a "Load memory" step in their SKILL.md. The agent uses `Read` to load the relevant topic file at task start. Nothing is injected on subsequent turns.
+
+## Validate and regenerate
+
+```bash
+mewkit memory validate     # Schema-validate the curated stores (--strict to fail on errors)
+mewkit memory seed-from-md # Populate JSON stores from Markdown (run once after upgrading)
+mewkit memory render-views # Regenerate views/*.md from the canonical JSON
+mewkit doctor --state      # Report curated-memory health
+```
+
+The generated `views/*.md` carry a "generated — do not edit" banner — edit the JSON and re-run `render-views`. After an upgrade, run `seed-from-md` once so existing Markdown topic files are migrated into the JSON stores.
 
 ## Pruning
 

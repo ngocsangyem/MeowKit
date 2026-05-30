@@ -34,7 +34,6 @@ SessionStart
   → project-context-loader.sh: injects project context
 
 UserPromptSubmit
-  → conversation-summary-cache.sh: injects cached summary (≤4KB)
   → immediate-capture-handler.cjs: captures ##prefix messages
 
 Every tool call (PostToolUse)

@@ -20,7 +20,6 @@ Walks `.claude/` and tells you how much of the model context window your always-
 | Concern              | Use this instead                                         |
 |----------------------|----------------------------------------------------------|
 | USD cost tracking    | `/mk:budget`                                              |
-| Transcript caching   | `.claude/hooks/conversation-summary-cache.sh`             |
 | Runtime agent trim   | `mk:lazy-agent-loader`                                    |
 | Window utilization   | **`/mk:context-audit`** (this skill)                      |
 
@@ -57,7 +56,6 @@ Walks `.claude/` and tells you how much of the model context window your always-
 
 ## How to Act
 - Cost: see `/mk:budget`
-- Transcript: see `.claude/hooks/conversation-summary-cache.sh`
 - Runtime trim: see `mk:lazy-agent-loader`
 ```
 

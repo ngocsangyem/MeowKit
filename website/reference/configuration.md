@@ -222,17 +222,6 @@ cp .claude/.env.example .claude/.env
 | `MEOWKIT_BUDGET_CAP` | *(none)* | User override for hard block — can be lower OR higher than `BUDGET_BLOCK` | Set `MEOWKIT_BUDGET_CAP=200` for intentional high-budget harness runs. Set `MEOWKIT_BUDGET_CAP=15` for tight budgets. |
 | `MEOWKIT_RUN_ID` | `current` | Harness run identifier for trace and budget tracking | Set automatically by `mk:harness` step-00. Don't set manually unless resuming. |
 
-### Conversation Summary Cache
-
-| Variable | Default | Purpose | When to use |
-|----------|---------|---------|-------------|
-| `MEOWKIT_SUMMARY_CACHE` | `on` | Enable/disable conversation summary. Set `off` to disable. | Disable if using a custom context management strategy or to save ~$0.01–0.02/session. |
-| `MEOWKIT_SUMMARY_THRESHOLD` | `20480` | Min transcript bytes before summarization triggers | Increase for short sessions that don't need summaries. |
-| `MEOWKIT_SUMMARY_TURN_GAP` | `30` | Min JSONL events between summaries (≈ 3–6 turns) | Lower for more frequent summaries in long sessions. |
-| `MEOWKIT_SUMMARY_GROWTH_DELTA` | `5120` | Min transcript growth bytes between summaries | Pair with TURN_GAP — both are OR conditions. |
-| `MEOWKIT_SUMMARY_BUDGET_SEC` | `180` | Background worker timeout for `claude -p` summarization | Increase on slow networks. |
-| `MEOWKIT_SUMMARY_DEBUG` | *(none)* | Set `1` for verbose stderr from summary hook | Debugging summary issues only. |
-
 ### Memory
 
 Memory is loaded on-demand by consumer skills via `Read` calls — there is no per-turn auto-injection pipeline (removed in v2.4.1). See [Memory System](/guide/memory-system) for details.
@@ -266,7 +255,3 @@ export MEOWKIT_BUDGET_CAP=200
 # MEOWKIT_HARNESS_MODE auto-detects LEAN for Opus 4.6
 ```
 
-**Disable conversation summaries:**
-```bash
-export MEOWKIT_SUMMARY_CACHE=off
-```
