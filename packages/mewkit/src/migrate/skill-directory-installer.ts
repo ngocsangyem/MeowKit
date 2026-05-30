@@ -10,6 +10,7 @@ import { getPortableInstallPath } from "./provider-registry-utils.js";
 import { sanitizeSkillName } from "./discovery/skills-discovery.js";
 import { computeContentChecksum } from "./reconcile/checksum-utils.js";
 import { addPortableInstallation } from "./reconcile/portable-registry.js";
+import { resolveInstalledBackRef, type InstalledBackRef } from "../core/install-metadata-backref.js";
 import { auditSkillDirectory } from "./skill-directory-audit.js";
 import type { ProviderType, SkillInfo } from "./types.js";
 
@@ -69,7 +70,7 @@ async function rewriteMarkdownFilesForProvider(rootDir: string, provider: Provid
 export async function installSkillDirectory(
 	skill: SkillInfo,
 	provider: ProviderType,
-	options: { global: boolean },
+	options: { global: boolean; installedBackRef?: InstalledBackRef | null },
 ): Promise<SkillInstallResult> {
 	const providerConfig = providers[provider];
 	if (!providerConfig?.skills) {
@@ -121,10 +122,12 @@ export async function installSkillDirectory(
 			const sourceChecksum = computeContentChecksum(await readFile(skillMdPath, "utf-8"));
 			const targetChecksum = computeContentChecksum(await readFile(skillMdTarget, "utf-8"));
 
+			const backRef = resolveInstalledBackRef(options.installedBackRef ?? null, skill.sourcePath);
 			await addPortableInstallation(skill.name, "skill", provider, options.global, targetDir, skill.sourcePath, {
 				sourceChecksum,
 				targetChecksum,
 				installSource: "kit",
+				...backRef,
 			});
 		} catch (error) {
 			try {

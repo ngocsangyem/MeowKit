@@ -1,7 +1,6 @@
-import fs from "node:fs";
 import { join } from "node:path";
 import pc from "picocolors";
-import { fetchReleases, downloadRelease, cleanupDownload, smartUpdate } from "../core/index.js";
+import { fetchReleases, downloadRelease, cleanupDownload, smartUpdate, readInstallMetadata } from "../core/index.js";
 import type { ReleaseInfo, UserConfig } from "../core/index.js";
 
 export interface UpgradeArgs {
@@ -12,12 +11,14 @@ export interface UpgradeArgs {
 	yes?: boolean;
 }
 
-/** Read installed version from .claude/metadata.json (instant, no npx) */
+/** Read installed version from canonical metadata (instant, no npx), with legacy fallback. */
 function getLocalVersion(): string | null {
 	try {
-		const raw = fs.readFileSync(join(process.cwd(), ".claude", "metadata.json"), "utf-8");
-		const meta = JSON.parse(raw) as { version?: string };
-		return meta.version ?? null;
+		const { source, meta } = readInstallMetadata(join(process.cwd(), ".claude"));
+		if (source === "none" || !meta) return null;
+		// A legacy checksum manifest has no trustworthy version; report it only when
+		// a real version was recovered (never the empty placeholder).
+		return meta.version ? meta.version : null;
 	} catch {
 		return null;
 	}
@@ -144,6 +145,9 @@ async function performUpgrade(
 		console.log(`  ${pc.green("added")}   ${stats.added}`);
 		console.log(`  ${pc.cyan("updated")} ${stats.updated}`);
 		console.log(`  ${pc.dim("skipped")} ${stats.skipped}`);
+		if (stats.deletionsDeleted.length > 0) {
+			console.log(`  ${pc.red("deleted")} ${stats.deletionsDeleted.length}  ${pc.dim("(marked for removal by the release)")}`);
+		}
 		if (stats.orphansDeleted.length > 0) {
 			console.log(`  ${pc.red("removed")} ${stats.orphansDeleted.length}  ${pc.dim("(release no longer ships)")}`);
 		}

@@ -69,13 +69,22 @@ export function classifyLayer(relativePath: string): FileLayer {
 
 /**
  * Recursively collect all files in a directory, returning paths relative to baseDir.
- * Skips __pycache__, node_modules, .DS_Store, .meowkit.manifest.json.
+ * Skips build/cache noise, the legacy checksum manifest, and the CLI's own
+ * installed-state files (metadata.json + its lock) — those are written by the CLI,
+ * not shipped content, so they must never scan themselves into a manifest.
  */
-function collectFiles(dir: string, baseDir: string): string[] {
+export function collectFiles(dir: string, baseDir: string): string[] {
 	const files: string[] = [];
 	if (!existsSync(dir)) return files;
 
-	const SKIP = new Set(["__pycache__", "node_modules", ".DS_Store", MANIFEST_FILENAME]);
+	const SKIP = new Set([
+		"__pycache__",
+		"node_modules",
+		".DS_Store",
+		MANIFEST_FILENAME,
+		"metadata.json",
+		".metadata.lock",
+	]);
 
 	const entries = readdirSync(dir);
 	for (const entry of entries) {

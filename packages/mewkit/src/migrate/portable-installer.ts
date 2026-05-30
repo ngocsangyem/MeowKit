@@ -6,6 +6,7 @@ import { existsSync } from "node:fs";
 import { rm, unlink } from "node:fs/promises";
 import { providers } from "./provider-registry.js";
 import { addPortableInstallation, removePortableInstallation } from "./reconcile/portable-registry.js";
+import { resolveInstalledBackRef, type InstalledBackRef } from "../core/install-metadata-backref.js";
 import { computeContentChecksum } from "./reconcile/checksum-utils.js";
 import { auditRuntimeCompatibility } from "./runtime-compat-audit.js";
 import { atomicWrite, validateWritableTargetPath } from "./portable-installer-path-safety.js";
@@ -32,6 +33,8 @@ function findItem(items: PortableItem[], name: string, type: PortableType): Port
 
 export interface InstallContext {
 	allItems: Record<PortableType, PortableItem[]>;
+	/** Optional link to the installed metadata the source was exported from. */
+	installedBackRef?: InstalledBackRef | null;
 }
 
 export async function executeInstallAction(action: ReconcileAction, ctx: InstallContext): Promise<InstallResult> {
@@ -92,6 +95,7 @@ export async function executeInstallAction(action: ReconcileAction, ctx: Install
 		}
 
 		const targetChecksum = computeContentChecksum(conversion.content);
+		const backRef = resolveInstalledBackRef(ctx.installedBackRef ?? null, sourceItem.sourcePath);
 		await addPortableInstallation(
 			action.item,
 			action.type,
@@ -104,6 +108,7 @@ export async function executeInstallAction(action: ReconcileAction, ctx: Install
 				targetChecksum,
 				ownedSections: action.ownedSections,
 				installSource: "kit",
+				...backRef,
 			},
 		);
 

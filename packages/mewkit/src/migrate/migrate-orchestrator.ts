@@ -35,6 +35,7 @@ import { convertItem } from "./converters/index.js";
 import { codexBulkActionShim, providerKey, skillActionShim } from "./migrate-action-shims.js";
 import { executeDeleteAction, executeInstallAction } from "./portable-installer.js";
 import { installSkillDirectory } from "./skill-directory-installer.js";
+import { buildInstalledBackRef, type InstalledBackRef } from "../core/install-metadata-backref.js";
 import { installCodexAgents, mergeHooksSettings } from "./hooks/index.js";
 import { loadModelRoutingConfig } from "./model-routing-config.js";
 import { printActionDetails, printFinalSummary, printPreflight } from "./migrate-ui-summary.js";
@@ -201,9 +202,13 @@ async function runMigrateUnderLock(
 		));
 	if (!confirmed) return 130;
 
+	// One-way bridge: link exported assets back to the installed metadata they
+	// came from. Absent installed metadata yields null and the bridge is omitted.
+	const installedBackRef = buildInstalledBackRef(discovered.source.root);
+
 	const results = await executePlan(
 		portabilityFiltered.plan.actions,
-		{ allItems: itemsByT },
+		{ allItems: itemsByT, installedBackRef },
 		portableSkills.skillsByProvider,
 		targets,
 		isGlobal,
@@ -230,7 +235,7 @@ async function confirmExecution(count: number): Promise<boolean> {
 
 async function executePlan(
 	actions: ReconcileAction[],
-	ctx: { allItems: Record<PortableType, PortableItem[]> },
+	ctx: { allItems: Record<PortableType, PortableItem[]>; installedBackRef?: InstalledBackRef | null },
 	skillsByProvider: Map<ProviderType, SkillInfo[]>,
 	targets: ProviderType[],
 	isGlobal: boolean,
@@ -323,7 +328,7 @@ async function executePlan(
 			if (!providers[target].skills) continue;
 			const skills = skillsByProvider.get(target) ?? [];
 			for (const skill of skills) {
-				const r = await installSkillDirectory(skill, target, { global: isGlobal });
+				const r = await installSkillDirectory(skill, target, { global: isGlobal, installedBackRef: ctx.installedBackRef });
 				results.push({
 					action: skillActionShim(skill, target, isGlobal, r.path ?? ""),
 					success: r.success,

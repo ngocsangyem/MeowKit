@@ -97,10 +97,25 @@ function main() {
 
   console.log(`Total files: ${allFiles.length}`);
 
+  // Maintainer-curated deletions: files a release intends to remove from an
+  // existing install. Absent file => no deletions. Paths are .claude/-relative,
+  // same convention as files[].path.
+  let deletions = [];
+  const deletionsPath = path.join(projectRoot, "deletions.json");
+  if (fs.existsSync(deletionsPath)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(deletionsPath, "utf8"));
+      if (Array.isArray(parsed.deletions)) deletions = parsed.deletions;
+    } catch {
+      console.warn("Warning: could not parse deletions.json, treating as empty");
+    }
+  }
+
   const manifest = {
     version,
     generatedAt: new Date().toISOString(),
     files: [],
+    deletions,
   };
 
   for (const file of allFiles) {
@@ -112,6 +127,10 @@ function main() {
     if (relativePath.startsWith(".claude/")) {
       relativePath = relativePath.slice(".claude/".length);
     }
+
+    // metadata.json is the installed-state file written by the CLI itself; it is
+    // never a release asset, so it must not appear as a manifest entry.
+    if (relativePath === "metadata.json") continue;
 
     const stats = fs.statSync(file);
     const entry = {

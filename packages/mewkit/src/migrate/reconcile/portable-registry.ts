@@ -1,4 +1,3 @@
-// Vendored from claudekit-cli (MIT). Source: src/commands/portable/portable-registry.ts
 // Adapted: greenfield in mewkit (no v1/v2 legacy migrations), PID-based lock (extracted to
 // portable-registry-lock.ts), registry path namespaced under ~/.mewkit/.
 import { existsSync } from "node:fs";
@@ -25,6 +24,11 @@ const PortableInstallationSchemaV3 = z.object({
 	targetChecksum: z.string(),
 	installSource: z.enum(["kit", "manual"]),
 	ownedSections: z.array(z.string()).optional(),
+	// Optional back-reference to the installed MeowKit metadata this asset was
+	// exported from. Additive-optional: registries written before these fields
+	// existed still validate, so no schema version bump is required.
+	installedVersion: z.string().optional(),
+	installedChecksum: z.string().optional(),
 });
 export type PortableInstallationV3 = z.infer<typeof PortableInstallationSchemaV3>;
 
@@ -115,6 +119,8 @@ export async function addPortableInstallation(
 		targetChecksum?: string;
 		ownedSections?: string[];
 		installSource?: "kit" | "manual";
+		installedVersion?: string;
+		installedChecksum?: string;
 	},
 ): Promise<void> {
 	await withRegistryLock(async () => {
@@ -136,6 +142,8 @@ export async function addPortableInstallation(
 			targetChecksum: normalizeChecksum(options?.targetChecksum) || UNKNOWN_CHECKSUM,
 			installSource: options?.installSource ?? "kit",
 			ownedSections: options?.ownedSections,
+			installedVersion: options?.installedVersion,
+			installedChecksum: options?.installedChecksum,
 		});
 
 		await writePortableRegistry(registry);

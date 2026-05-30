@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Prepare release assets for semantic-release publish step.
- * Generates metadata.json, release manifest, and optional zip archive.
+ * Generates the release manifest and the zip archive.
  *
  * Usage: node scripts/prepare-release-assets.cjs <version>
  */
@@ -21,40 +21,15 @@ if (!/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(version)) {
 }
 
 const projectRoot = process.cwd();
-const claudeDir = path.join(projectRoot, ".claude");
-const metadataPath = path.join(claudeDir, "metadata.json");
 const distDir = path.join(projectRoot, "dist");
 const archivePath = path.join(distDir, "meowkit-release.zip");
 
 try {
-  // Step 1: Read package.json for metadata
-  const packageJson = JSON.parse(
-    fs.readFileSync(path.join(projectRoot, "package.json"), "utf8")
-  );
+  // Release identity is carried by release-manifest.json. The installed
+  // .claude/metadata.json is written by the CLI on install/upgrade, never
+  // shipped in the archive, so the release pipeline does not generate it here.
 
-  // Step 2: Generate .claude/metadata.json
-  let existing = {};
-  if (fs.existsSync(metadataPath)) {
-    try {
-      existing = JSON.parse(fs.readFileSync(metadataPath, "utf8"));
-    } catch {
-      console.warn("Warning: could not parse existing metadata.json, starting fresh");
-    }
-  }
-
-  const metadata = {
-    ...existing,
-    version,
-    name: "meowkit",
-    description: packageJson.description || "AI agent toolkit for Claude Code",
-    buildDate: new Date().toISOString(),
-    repository: packageJson.repository || { type: "git", url: "https://github.com/ngocsangyem/MeowKit" },
-  };
-
-  fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2) + "\n", "utf8");
-  console.log(`Generated metadata.json v${version}`);
-
-  // Step 3: Generate release manifest
+  // Generate release manifest
   execSync(`node scripts/generate-release-manifest.cjs "${version}"`, { stdio: "inherit" });
 
   // Validate manifest exists
@@ -99,6 +74,9 @@ try {
     "-x", ".claude/memory/*",
     "-x", ".claude/logs/*",
     "-x", ".claude/skills/.venv/*",
+    // Defensive guard: a stray installed metadata.json or .env on a dev machine
+    // must never leak into a published archive (the pipeline no longer generates
+    // metadata.json, but a local install might leave one behind).
     "-x", ".claude/metadata.json",
     "-x", ".claude/.env",
     "-x", "*.pyc",

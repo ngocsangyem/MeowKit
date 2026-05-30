@@ -1,13 +1,25 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, isAbsolute } from "node:path";
 import * as log from "./core-logger.js";
 import { processTemplate } from "./substitute-placeholders.js";
 import type { UserConfig } from "./substitute-placeholders.js";
 import { mergeSettingsFile } from "./merge-settings.js";
-import { readManifest, buildManifest, writeManifest, hashFile, classifyLayer } from "./compute-checksums.js";
+import { writeManifest, hashFile, classifyLayer } from "./compute-checksums.js";
 import type { Manifest } from "./compute-checksums.js";
 import { loadIgnorePatterns, walkDir, copyFile } from "./smart-update-utils.js";
 import { findOrphans } from "./find-orphans.js";
+import { readReleaseMetadata, toOrphanManifest, mapPathToLastModified } from "./release-metadata.js";
+import {
+	readInstallMetadata,
+	readLegacyManifestMetadata,
+	buildInstallMetadata,
+	indexByPath,
+	CorruptInstallMetadataError,
+	type InstallFileEntry,
+	type MetadataSource,
+	type ReadInstallMetadataResult,
+} from "./install-metadata.js";
+import { writeInstallMetadata } from "./install-metadata-writer.js";
 
 export interface UpdateStats {
 	updated: number;
@@ -16,6 +28,14 @@ export interface UpdateStats {
 	userModified: string[];
 	orphansDeleted: string[];
 	orphansSkipped: string[];
+	/** Paths from release `deletions[]` removed because they were pristine kit-owned files. */
+	deletionsDeleted: string[];
+	/** Listed deletions left in place (user-modified, not kit-owned, or declined). */
+	deletionsSkipped: string[];
+	/** Listed deletions that were already absent on disk. */
+	deletionsAlreadyGone: string[];
+	/** Listed deletions a dry-run would remove. */
+	deletionsPreview: string[];
 }
 
 export interface SmartUpdateOptions {
@@ -54,7 +74,15 @@ export async function smartUpdate(
 ): Promise<UpdateStats> {
 	const cleanup = options.cleanup !== false; // default-on
 	const assumeYes = options.assumeYes === true;
-	const oldManifest = force ? null : readManifest(join(targetDir, ".claude"));
+	const targetClaudeDir = join(targetDir, ".claude");
+
+	// Single pre-write read of the installed state. Both the user-edit baseline
+	// and the orphan-cleanup guard are derived from THIS value and never re-read
+	// after any write, so write ordering cannot affect either decision.
+	const prior = force ? { source: "none" as MetadataSource, meta: null } : readPriorInstallState(targetClaudeDir);
+	const priorSource = prior.source;
+	const priorEntriesByPath = indexByPath(prior.meta?.files ?? []);
+
 	const stats: UpdateStats = {
 		updated: 0,
 		skipped: 0,
@@ -62,13 +90,17 @@ export async function smartUpdate(
 		userModified: [],
 		orphansDeleted: [],
 		orphansSkipped: [],
+		deletionsDeleted: [],
+		deletionsSkipped: [],
+		deletionsAlreadyGone: [],
+		deletionsPreview: [],
 	};
 
-	if (!oldManifest && existsSync(join(targetDir, ".claude"))) {
-		log.warn("No manifest found — will treat all existing files as unmodified.");
+	if (priorSource === "none" && !force && existsSync(targetClaudeDir)) {
+		log.warn("No installed metadata found — will treat all existing files as unmodified.");
 	}
 
-	const oldChecksums = oldManifest?.checksums ?? {};
+	let settingsMerged = false;
 	const isIgnored = loadIgnorePatterns(targetDir);
 
 	// Source .claude/ from downloaded release
@@ -97,6 +129,7 @@ export async function smartUpdate(
 		// settings.json uses append-only merge
 		if (manifestPath === "settings.json") {
 			mergeSettingsFile(srcPath, destPath, dryRun);
+			settingsMerged = true;
 			stats.updated++;
 			continue;
 		}
@@ -121,11 +154,13 @@ export async function smartUpdate(
 			continue;
 		}
 
-		// File exists — check if user modified it
+		// File exists — check if user modified it. The prior baseline hash comes
+		// from the canonical reader (legacy `sha256` is mapped to `checksum`), so
+		// this comparison is unchanged in meaning from the legacy manifest path.
 		const currentHash = hashFile(destPath);
-		const manifestEntry = oldChecksums[manifestPath];
+		const priorEntry = priorEntriesByPath[manifestPath];
 
-		if (manifestEntry && currentHash !== manifestEntry.sha256) {
+		if (priorEntry && currentHash !== priorEntry.checksum) {
 			log.debug(`Skipped (user-modified): ${targetRelPath}`);
 			stats.userModified.push(targetRelPath);
 			stats.skipped++;
@@ -238,28 +273,97 @@ export async function smartUpdate(
 		mkdirSync(join(targetDir, ".claude", "logs"), { recursive: true });
 	}
 
+	// Single release read, reused by the deletions pass and the metadata write.
+	const release = readReleaseMetadataSafe(sourceDir);
+
+	// Explicit-deletions pass — runs BEFORE orphan cleanup. A path listed in the
+	// release `deletions[]` is removed only when the PRE-WRITE installed metadata
+	// marks it kit-owned AND its on-disk hash is still pristine. Ownership comes
+	// from priorEntriesByPath (a file slated for deletion is absent from the new
+	// release, so it has no fresh entry). On a fresh install this map is empty, so
+	// every gate fails and the pass is a no-op. Suppressed entirely by
+	// `--no-cleanup`, the same safety switch as orphan cleanup (deletions are
+	// intent, orphan cleanup is heuristic — `--no-cleanup` disables both).
+	if (cleanup && release && release.deletions.length > 0) {
+		const eligible: string[] = [];
+		for (const relPath of release.deletions) {
+			const dest = join(claudeDir, relPath);
+			if (!isWithinDir(claudeDir, dest)) {
+				stats.deletionsSkipped.push(relPath);
+				continue;
+			}
+			if (!existsSync(dest)) {
+				stats.deletionsAlreadyGone.push(relPath);
+				continue;
+			}
+			const entry = priorEntriesByPath[relPath];
+			if (!entry || entry.owner !== "meowkit") {
+				stats.deletionsSkipped.push(relPath);
+				continue;
+			}
+			if (hashFile(dest) !== entry.checksum) {
+				stats.deletionsSkipped.push(relPath); // user-modified — preserve
+				continue;
+			}
+			eligible.push(relPath);
+		}
+
+		if (eligible.length > 0) {
+			if (dryRun) {
+				stats.deletionsPreview.push(...eligible);
+			} else {
+				let proceed: boolean;
+				if (assumeYes || force) proceed = true;
+				else if (options.confirmOrphans) proceed = await options.confirmOrphans(eligible);
+				else proceed = await confirmDelete(eligible.length);
+
+				if (!proceed) {
+					stats.deletionsSkipped.push(...eligible);
+				} else {
+					for (const relPath of eligible) {
+						try {
+							unlinkSync(join(claudeDir, relPath));
+							stats.deletionsDeleted.push(relPath);
+						} catch (err) {
+							log.warn(`Failed to delete ${relPath}: ${(err as Error).message}`);
+							stats.deletionsSkipped.push(relPath);
+						}
+					}
+					log.info(`Removed ${stats.deletionsDeleted.length} file(s) marked for deletion by the release.`);
+				}
+			}
+		}
+	}
+
 	// Orphan cleanup pass — removes user-disk files no longer in the release
 	// manifest. Scoped to kit-owned dirs (rules/, skills/, agents/, hooks/);
 	// user-private state (memory/, logs/, .env, secrets/) is never inspected.
 	// Default-on; opt out via `--no-cleanup`. Confirmation required unless
 	// `--yes` / `--force`.
 	//
-	// Safety gate: only run when a prior meowkit.manifest.json exists in the
-	// user's .claude/. Without it the dir is either fresh (no orphans possible)
-	// or owned by another tool (claudekit, etc.) — in the latter case every
-	// existing file would be flagged and we'd offer to delete the user's
-	// other toolkit. `force` is computed from oldManifest at line 47 and is
-	// not a re-read, so we read fresh here.
-	const hasPriorMeowkitInstall = readManifest(claudeDir) !== null;
+	// Safety gate: only run when a prior MeowKit install is detected. Without it
+	// the dir is either fresh (no orphans possible) or owned by another, unrelated
+	// tool — in the latter case every existing file would be flagged and we'd offer
+	// to delete the user's other toolkit. The guard value is taken
+	// from the SINGLE pre-write read at the top of smartUpdate so a later
+	// metadata write cannot flip it. A version-only `metadata.json`
+	// (`legacy-metadata`) does NOT count — it can come from the old pipeline on a
+	// non-checksum install — so only `new` and `legacy-manifest` enable cleanup.
+	const hasPriorMeowkitInstall = priorSource === "new" || priorSource === "legacy-manifest";
 	if (cleanup && hasPriorMeowkitInstall) {
-		const releaseManifest = buildReleaseManifest(sourceDir);
+		const releaseManifest = release ? toOrphanManifest(release) : null;
 		if (!releaseManifest) {
 			log.warn(
 				"release-manifest.json not found in source release — orphan cleanup skipped. " +
 					"Pass --no-cleanup to silence this warning, or report the missing manifest as a release-pipeline bug.",
 			);
 		} else {
-			const orphans = findOrphans({ claudeDir, manifest: releaseManifest });
+			// Paths declared in `deletions[]` are owned by the deletions pass above —
+			// whatever it decided (delete / preserve user-modified) is authoritative.
+			// Excluding them here prevents orphan cleanup from re-deleting a file the
+			// deletions gate deliberately preserved (e.g. a user-modified listed path).
+			const deletionSet = new Set(release?.deletions ?? []);
+			const orphans = findOrphans({ claudeDir, manifest: releaseManifest }).filter((o) => !deletionSet.has(o));
 			if (orphans.length > 0) {
 				const useCallback = options.confirmOrphans && !dryRun && !assumeYes && !force;
 				if (!useCallback) {
@@ -293,54 +397,88 @@ export async function smartUpdate(
 		}
 	}
 
-	// Write manifest
+	// Write installed metadata. `dryRun` writes neither file (matches today).
 	if (!dryRun) {
-		const newManifest = buildManifest(claudeDir);
-		writeManifest(claudeDir, newManifest);
+		const meta = buildInstallMetadata(claudeDir, {
+			version: release?.version ?? "unknown",
+			sourceTimestamps: mapPathToLastModified(release),
+			priorEntriesByPath,
+			scope: "local",
+			mergedSettings: settingsMerged ? ["settings.json"] : undefined,
+		});
+		try {
+			await writeInstallMetadata(claudeDir, meta);
+			// One-release rollback dual-write of the legacy manifest. Only after the
+			// canonical write succeeds — if the canonical write fails, the previous
+			// legacy manifest stays on disk so the next run still detects a prior install.
+			// Derived from the entries just computed, avoiding a second scan+hash of .claude/.
+			writeManifest(claudeDir, legacyManifestFromInstallMeta(meta));
+		} catch (err) {
+			log.warn(`Failed to write installed metadata: ${(err as Error).message}`);
+		}
 	}
 
-	log.setData("update", {
-		updated: stats.updated,
-		skipped: stats.skipped,
-		added: stats.added,
-		userModified: stats.userModified,
-		orphansDeleted: stats.orphansDeleted,
-		orphansSkipped: stats.orphansSkipped,
-	});
+	log.setData("update", stats);
 
 	return stats;
+}
+
+/**
+ * Project canonical install metadata onto the legacy `Manifest` shape for the
+ * one-release dual-write, reproducing `buildManifest`'s output without a second
+ * directory walk (the hashes are already in `meta.files`).
+ */
+function legacyManifestFromInstallMeta(meta: { installedAt: string; files: InstallFileEntry[] }): Manifest {
+	const checksums: Manifest["checksums"] = {};
+	for (const f of meta.files) {
+		checksums[f.path] = {
+			sha256: f.checksum,
+			layer: f.layer,
+			owner: f.layer === "user" ? "user" : "meowkit",
+			baseChecksum: f.checksum,
+			sourceChecksum: f.checksum,
+			targetChecksum: f.checksum,
+			installedAt: meta.installedAt,
+		};
+	}
+	return { version: "0.2.0", generatedAt: meta.installedAt, checksums };
 }
 
 function toManifestPath(relPath: string): string {
 	return relPath.replace(/\\/g, "/").replace(/^\.claude\//, "");
 }
 
+/** True when `target` resolves to a path strictly inside `dir` (no `..` escape, no symlink-free check needed for an exact listed path). */
+function isWithinDir(dir: string, target: string): boolean {
+	const rel = relative(dir, target);
+	return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
+}
+
 /**
- * Build a manifest-shaped object from the release source `.claude/` so we can
- * compare against the user-installed dir without writing anything to disk.
- * The release ships `release-manifest.json` at sourceDir root with `files[]`;
- * we project that onto the same `checksums` shape `findOrphans` expects.
+ * Read the prior installed state for the user-edit baseline and orphan guard.
+ * If the canonical metadata.json is present but corrupt, fall back to the legacy
+ * manifest so user-edit protection still has a baseline, rather than treating
+ * every file as unmodified.
  */
-function buildReleaseManifest(sourceDir: string): Manifest | null {
-	const manifestPath = join(sourceDir, "release-manifest.json");
-	if (!existsSync(manifestPath)) return null;
+function readPriorInstallState(claudeDir: string): ReadInstallMetadataResult {
 	try {
-		const raw = JSON.parse(readFileSync(manifestPath, "utf-8")) as {
-			version?: string;
-			generatedAt?: string;
-			files?: Array<{ path: string; checksum: string }>;
-		};
-		const checksums: Manifest["checksums"] = {};
-		for (const f of raw.files ?? []) {
-			checksums[f.path] = { sha256: f.checksum, layer: "core" };
-		}
-		return {
-			version: raw.version ?? "unknown",
-			generatedAt: raw.generatedAt ?? new Date().toISOString(),
-			checksums,
-		};
+		return readInstallMetadata(claudeDir);
 	} catch (err) {
-		log.warn(`Failed to parse release-manifest.json: ${(err as Error).message}`);
+		if (err instanceof CorruptInstallMetadataError) {
+			log.warn(`Installed metadata is corrupt (${err.detail}); falling back to legacy manifest detection.`);
+			const legacy = readLegacyManifestMetadata(claudeDir);
+			return legacy ? { source: "legacy-manifest", meta: legacy } : { source: "none", meta: null };
+		}
+		throw err;
+	}
+}
+
+/** Parse the release manifest, treating a corrupt one as absent (version becomes "unknown"). */
+function readReleaseMetadataSafe(sourceDir: string): ReturnType<typeof readReleaseMetadata> {
+	try {
+		return readReleaseMetadata(sourceDir);
+	} catch (err) {
+		log.warn(`Failed to read release-manifest.json for installed metadata: ${(err as Error).message}`);
 		return null;
 	}
 }

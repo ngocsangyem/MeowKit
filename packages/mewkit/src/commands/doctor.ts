@@ -23,6 +23,8 @@ import {
 	summarizeProviderContractDiagnostics,
 	type ProviderDiagnosticSeverity,
 } from "../migrate/provider-contract-diagnostics.js";
+import { readInstallMetadata, CorruptInstallMetadataError } from "../core/install-metadata.js";
+import { readPortableRegistry } from "../migrate/reconcile/portable-registry.js";
 
 function statusIcon(status: Status): string {
 	switch (status) {
@@ -103,6 +105,8 @@ export async function doctor(args?: { report?: boolean; providers?: boolean; sta
 		}
 	}
 
+	results.push(...(await checkMetadataHealth(root)));
+
 	if (args?.state) {
 		results.push(...checkStateTaxonomy(root));
 		results.push(...checkMemoryHealth(root));
@@ -145,6 +149,71 @@ export async function doctor(args?: { report?: boolean; providers?: boolean; sta
 	}
 
 	if (fail > 0) process.exit(1);
+}
+
+/**
+ * Installed-metadata + portable-registry health. Read-only: surfaces the metadata
+ * source, schema, installed version, and user-modified count, and reports a corrupt
+ * canonical metadata.json as a clear FAIL rather than silently treating it as absent.
+ * "Pending delete" needs a release manifest to compare against; doctor has none on
+ * disk, so it is reported as n/a rather than fabricated.
+ */
+function checkInstalledMetadata(root: string | null): DiagResult {
+	if (!root) {
+		return { status: "warn", name: "Installed metadata", detail: "Project root not found; skipped metadata health check." };
+	}
+	try {
+		const { source, meta } = readInstallMetadata(path.join(root, ".claude"));
+		if (source === "none" || !meta) {
+			return {
+				status: "warn",
+				name: "Installed metadata",
+				detail: "No installed metadata found. Run `mewkit upgrade` to write canonical metadata.",
+			};
+		}
+		const userModified = meta.files.filter((f) => f.owner === "meowkit-modified").length;
+		const schema = source === "new" ? meta.schemaVersion : "n/a (legacy)";
+		return {
+			status: source === "new" ? "pass" : "warn",
+			name: "Installed metadata",
+			detail:
+				`source=${source}, schema=${schema}, version=${meta.version || "unknown"}, ` +
+				`user-modified=${userModified}, pending-delete=n/a (run upgrade)`,
+		};
+	} catch (err) {
+		if (err instanceof CorruptInstallMetadataError) {
+			return {
+				status: "fail",
+				name: "Installed metadata",
+				detail: `Canonical metadata.json is corrupt: ${err.detail}`,
+				fix: "Re-run `mewkit upgrade` to regenerate .claude/metadata.json.",
+			};
+		}
+		throw err;
+	}
+}
+
+async function checkMetadataHealth(root: string | null): Promise<DiagResult[]> {
+	const results: DiagResult[] = [checkInstalledMetadata(root)];
+
+	// The portable registry is global (~/.mewkit/), not per-project, so it is
+	// checked regardless of whether a project root was found.
+	try {
+		const registry = await readPortableRegistry();
+		results.push({
+			status: "pass",
+			name: "Portable registry",
+			detail: `schema ${registry.version}, ${registry.installations.length} installation(s).`,
+		});
+	} catch (err) {
+		results.push({
+			status: "warn",
+			name: "Portable registry",
+			detail: `Could not read portable registry: ${(err as Error).message}`,
+		});
+	}
+
+	return results;
 }
 
 function checkStateTaxonomy(root: string | null): DiagResult[] {
