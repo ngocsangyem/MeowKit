@@ -70,7 +70,7 @@ Skip when:
 
 - Requires `--timebox <duration>` (e.g., `--timebox 2d`, `--timebox 4h`); reject with "spike requires --timebox" if absent
 - Sets plan frontmatter `spike: true`, `timebox:`, and `findings_doc:` (default `tasks/plans/{slug}/findings.md`)
-- INCOMPATIBLE with `--product-level` and `mk:harness` FULL density (harness gate breaks). Reject combination "spike incompatible with harness FULL — use --fast or mk:cook"
+- INCOMPATIBLE with `--product-level` and `mk:autobuild` FULL density (autobuild gate breaks). Reject combination "spike incompatible with autobuild FULL — use --fast or mk:cook"
 - Advisory cap: warn if `story_points > 5` — likely two spikes, or spike + story
 
 **Composable flags:**
@@ -139,7 +139,7 @@ tasks/plans/YYMMDD-name/
 - **Using `--deep` to decide architecture**: deep maps a chosen approach; if the approach is unclear, route to `mk:brainstorming` first.
 - **Dropping TDD at handoff**: when `tdd_mode=true`, step-09 MUST print cook with `--tdd`; sentinel/env state alone is not a cross-session contract.
 - **Post-Plan Handoff is deterministic**: step-09 fires `AskUserQuestion`; do NOT auto-invoke the chosen command. User must type it in a fresh session for clean context.
-- **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, harness, end}` fail `validate-plan.py`.
+- **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, autobuild, end}` fail `validate-plan.py`.
 - **Whole-Plan Consistency Gates W1 / W2 fire after red-team and validation interview**: stage-then-apply algorithm — no edits land until the user resolves any unresolved contradictions. See `references/whole-plan-sweep.md`.
 - **`consistency_sweeps` frontmatter is optional**: legacy plans without it still validate as `PLAN_COMPLETE`.
 - **Sweep recursion is bounded**: "resolve now" caps at 2 attempts per gate; further unresolved items convert to Risk rows.
@@ -154,12 +154,12 @@ tasks/plans/YYMMDD-name/
 | `workflow-fast.md`                                 | Compact step sequence for `--fast` mode (00→03→04→07→08)                                                                                                                                                             |
 | `step-03a-product-spec.md`                         | Product-level spec drafter: user stories, features, design language. Replaces step-03 when `planning_mode = product-level`.                                                                                          |
 | `assets/product-spec-template.md`                  | Product spec template (Vision, Features, Design Language, AI Integration, Out-of-Scope)                                                                                                                              |
-| `assets/spike-plan-template.md`                    | Spike plan template (used when `planning_mode = spike`). Two phases: investigate + findings. Required frontmatter: `spike: true`, `timebox:`, `findings_doc:`. NOT compatible with `mk:harness` FULL.                |
+| `assets/spike-plan-template.md`                    | Spike plan template (used when `planning_mode = spike`). Two phases: investigate + findings. Required frontmatter: `spike: true`, `timebox:`, `findings_doc:`. NOT compatible with `mk:autobuild` FULL.                |
 | `references/anthropic-example-plan.md`             | RetroForge few-shot calibration example for product-level mode (ambition + feature density reference)                                                                                                                |
 | `step-05-red-team.md`                              | Red team review: persona scaling, subagent dispatch, adjudication                                                                                                                                                    |
 | `step-06-validation-interview.md`                  | Critical question generation and answer propagation                                                                                                                                                                  |
 | `step-07-gate.md`                                  | Self-check and Gate 1 AskUserQuestion presentation                                                                                                                                                                   |
-| `step-09-post-plan-handoff.md`                     | Deterministic post-Gate-1 handoff: mode-pruned `AskUserQuestion` (cook \| validate \| red-team \| harness \| end), live risk re-scan, writes `handoff.next` to plan.md frontmatter, prints command + STOPs.        |
+| `step-09-post-plan-handoff.md`                     | Deterministic post-Gate-1 handoff: mode-pruned `AskUserQuestion` (cook \| validate \| red-team \| autobuild \| end), live risk re-scan, writes `handoff.next` to plan.md frontmatter, prints command + STOPs.        |
 | `references/whole-plan-sweep.md`                   | Whole-Plan Consistency Sweep algorithm (Gates W1 + W2). Stage-then-apply: read-only Pass 1 stages Pending Sweep Edits; decision check blocks on unresolved contradictions; write Pass 2 applies edits and logs.   |
 | `references/deep-mode.md`                          | Deep mode contract: when to use/avoid, scout budgets, phase-map appendix, context rules.                                                                                                                             |
 | `references/tdd-mode.md`                           | TDD flag contract: phase sections, optional frontmatter, cook handoff propagation, RED-task hydration.                                                                                                                |

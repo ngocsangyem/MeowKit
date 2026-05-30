@@ -77,7 +77,7 @@ The skill **does not accept a `--model` flag.** Per the synthesis report (see so
 
 ## Workflow
 
-1. **Mode-Select** — honor `--deep` only when a git repo is available and `MEOWKIT_HARNESS_MODE` is not `MINIMAL`. Otherwise downgrade to default with a one-line note.
+1. **Mode-Select** — honor `--deep` only when a git repo is available and `MEOWKIT_AUTOBUILD_MODE` is not `MINIMAL`. Otherwise downgrade to default with a one-line note.
 2. **Decompose** — read-only on the input; label each of the 5 components.
 3. **Detect** — score the 10-item binary checklist; cite the exact text fragment for every FOUND issue.
 4. **Scout** *(when `--deep`)* — invoke `mk:scout` with allow-list filter; ≤8 files / ≤100 lines/file / ≤30s wall clock; default-deny against `.claude/memory/*`, `.env*`, `tasks/`, secrets.

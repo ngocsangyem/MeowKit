@@ -7,7 +7,7 @@ description: "End-to-end feature pipeline — plan, test, build, review, ship. T
 
 ## What This Skill Does
 
-Primary entry point for building features. Given a description or plan path, orchestrates the full 7-phase pipeline. TDD is opt-in via `--tdd`. For green-field product builds, use `mk:harness` instead.
+Primary entry point for building features. Given a description or plan path, orchestrates the full 7-phase pipeline. TDD is opt-in via `--tdd`. For green-field product builds, use `mk:autobuild` instead.
 
 ## When to Use
 
@@ -15,7 +15,7 @@ Primary entry point for building features. Given a description or plan path, orc
 - Executing an existing implementation plan
 - Rapid iteration with `--fast` mode (skips research)
 - Parallel multi-feature builds with `--parallel`
-- **NOT for:** green-field product builds (use `mk:harness`), workflow orchestration (use `mk:workflow-orchestrator`)
+- **NOT for:** green-field product builds (use `mk:autobuild`), workflow orchestration (use `mk:workflow-orchestrator`)
 
 ## Core Capabilities
 

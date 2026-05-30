@@ -23,7 +23,7 @@ The toolkit ships a thin Agile governance layer covering:
 - **Mid-sprint amendment ceremony** — log scope changes transparently, never silently
 - **Sprint close hygiene** — disposition prompt for non-terminal commits + closure summary
 - **Retro action-item ceremony** — surfaced retro insights become tracked work or documented "no action" decisions
-- **Spike governance** — time-boxed investigations with findings doc; INCOMPATIBLE with `mk:harness` FULL
+- **Spike governance** — time-boxed investigations with findings doc; INCOMPATIBLE with `mk:autobuild` FULL
 
 No new agents, no new hooks, no new gates. Wires into existing skills.
 
@@ -158,7 +158,7 @@ Generates a two-phase plan from `mk:plan-creator/assets/spike-plan-template.md`:
 Frontmatter includes `spike: true`, `timebox: "2d"`, `findings_doc:`. NO test phase, NO ship phase.
 
 ::: warning Harness incompatibility
-Spike plans are INCOMPATIBLE with `mk:harness` FULL density mode. Harness FULL requires Phase 2 (test red) → Phase 3 (build green) → Phase 4 (review) sequence with a sprint-contract gate. Spikes skip Phase 2/Phase 5; the harness flow breaks. Run via `mk:cook` or `mk:plan-creator --fast`.
+Spike plans are INCOMPATIBLE with `mk:autobuild` FULL density mode. Harness FULL requires Phase 2 (test red) → Phase 3 (build green) → Phase 4 (review) sequence with a sprint-contract gate. Spikes skip Phase 2/Phase 5; the harness flow breaks. Run via `mk:cook` or `mk:plan-creator --fast`.
 :::
 
 At spike completion: "Convert findings to delivery story? [Yes — extract AC | No — research-only | Defer]"

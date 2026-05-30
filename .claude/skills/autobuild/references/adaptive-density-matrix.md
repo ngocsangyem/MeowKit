@@ -1,6 +1,6 @@
 # Adaptive Density Matrix
 
-The full decision table for harness scaffolding density (`MINIMAL`, `FULL`, `LEAN`) per model tier × model id. Implements the "dead-weight thesis" from Anthropic's harness research: capable models need less scaffolding, and over-scaffolding capable models actively hurts output quality.
+The full decision table for autobuild scaffolding density (`MINIMAL`, `FULL`, `LEAN`) per model tier x model id. Implements the "dead-weight thesis" from Anthropic's harness research: capable models need less scaffolding, and over-scaffolding capable models actively hurts output quality.
 
 ## The Matrix
 
@@ -23,7 +23,7 @@ Sonnet has good reasoning but benefits from explicit scaffolding to stay coheren
 
 ### COMPLEX (Opus 4.5 / older) → FULL
 
-Opus 4.5 is more capable than Sonnet but still benefits from harness scaffolding for autonomous multi-hour builds. **Why:** the failure mode at this tier shifts from coherence to ambition — Opus 4.5 will under-scope without an explicit contract demanding ambitious AC coverage. Context resets are required because the model's working memory degrades over long sessions.
+Opus 4.5 is more capable than Sonnet but still benefits from autobuild scaffolding for autonomous multi-hour builds. **Why:** the failure mode at this tier shifts from coherence to ambition — Opus 4.5 will under-scope without an explicit contract demanding ambitious AC coverage. Context resets are required because the model's working memory degrades over long sessions.
 
 ### COMPLEX (Opus 4.6+) → LEAN
 
@@ -39,8 +39,8 @@ This is the **load-bearing finding** of Anthropic's harness research. Opus 4.6 w
 
 Density resolves via this priority order:
 
-1. **`MEOWKIT_HARNESS_MODE` env var** (highest) — `MINIMAL`, `FULL`, or `LEAN`
-2. **`--tier` flag on `/mk:harness`** — `auto`, `minimal`, `full`, `lean`
+1. **`MEOWKIT_AUTOBUILD_MODE` env var** (highest) — `MINIMAL`, `FULL`, or `LEAN`
+2. **`--tier` flag on `/mk:autobuild`** — `auto`, `minimal`, `full`, `lean`
 3. **`density-select.sh` auto-detection** from model env vars (lowest)
 
 The auto-detection step tries these env vars in order and uses the first set:
@@ -50,10 +50,10 @@ The auto-detection step tries these env vars in order and uses the first set:
 3. `ANTHROPIC_MODEL` (`Anthropic` SDK)
 4. (none) → defaults to `STANDARD` tier → `FULL` density (safe fallback)
 
-**Known limitation:** On Claude Code, the model id env var is not always exported to subagent contexts. Users running `/mk:harness` on Opus 4.6 who want LEAN mode should either:
+**Known limitation:** On Claude Code, the model id env var is not always exported to subagent contexts. Users running `/mk:autobuild` on Opus 4.6 who want LEAN mode should either:
 - Set `export MEOWKIT_MODEL_HINT=opus-4-6` once in their shell, OR
-- Pass `--tier lean` explicitly on the harness invocation, OR
-- Set `export MEOWKIT_HARNESS_MODE=LEAN` for the session
+- Pass `--tier lean` explicitly on the autobuild invocation, OR
+- Set `export MEOWKIT_AUTOBUILD_MODE=LEAN` for the session
 
 The chosen density and its source are logged in the run report's "Density Decision" section for audit. If auto-detection used the safe fallback, the log records `Source: auto-fallback (no model env var detected)` so users can identify when they're getting `FULL` instead of the expected `LEAN`.
 
@@ -74,7 +74,7 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 | Anti-pattern | Why it's wrong |
 |---|---|
 | Hardcoding LEAN for all Opus models | Opus 4.5 still benefits from FULL — only 4.6+ has the auto-compaction + 1M context that justifies LEAN |
-| Setting MEOWKIT_HARNESS_MODE=LEAN to "save time" on Sonnet | Sonnet without scaffolding produces worse output AND wastes more time on rework |
+| Setting MEOWKIT_AUTOBUILD_MODE=LEAN to "save time" on Sonnet | Sonnet without scaffolding produces worse output AND wastes more time on rework |
 | Forcing FULL on Opus 4.6 because "more is safer" | False — over-scaffolding capable models adds noise. Anthropic's measured finding <!-- research-citation --> |
 | Skipping the calibration replay after a model upgrade | The whole policy depends on measured performance per tier; skipping is how the matrix becomes dead weight itself |
 
@@ -82,6 +82,6 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 
 - `.claude/rules/dead-weight-audit-rules.md` — audit cadence, measurement, thresholds, never-prune list
 - `.claude/rules/harness-rules.md` Rule 7 — when the dead-weight audit must be re-run
-- `.claude/skills/scale-routing/SKILL.md` Output Schema v2.1 — `harness_density` field
+- `.claude/skills/scale-routing/SKILL.md` Output Schema v2.1 — `autobuild_density` field
 - `.claude/skills/benchmark/` — calibration replay automation
 - Anthropic harness design article (Prithvi Rajasekaran, Labs) <!-- research-citation -->

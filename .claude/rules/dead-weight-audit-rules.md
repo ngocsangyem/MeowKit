@@ -76,7 +76,7 @@ WHY: Without a registry, future audits redo work that's already been measured.
 
 ## Rule 8: Circular-Dependency Workaround
 
-`mk:benchmark` invokes `mk:harness` per canary task. If the bug being audited is IN the harness itself, the audit cannot run end-to-end. Workaround:
+`mk:benchmark` invokes `mk:autobuild` per canary task. If the bug being audited is IN the harness itself, the audit cannot run end-to-end. Workaround:
 
 1. Bypass `mk:benchmark`. Run individual canary specs via `/mk:cook <spec.md>` directly.
 2. Manually score each verdict against the spec's acceptance criteria (binary pass/fail).
@@ -90,7 +90,7 @@ WHY: A broken harness cannot self-test; the manual path keeps the audit possible
 ## Applies To
 
 - `.claude/skills/benchmark/` — the measurement runner
-- `.claude/skills/harness/` — adaptive-density decisions consume the audit's output
+- `.claude/skills/autobuild/` — adaptive-density decisions consume the audit's output
 - `.claude/skills/trace-analyze/` — field-data complement to the benchmark
 - `.claude/rules/harness-rules.md` Rule 7 — points at this rule for the audit specifics
 - Every harness component (per Rule 6, must have a registry entry)

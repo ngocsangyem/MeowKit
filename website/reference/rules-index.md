@@ -108,7 +108,7 @@ Rules define _why_. Hooks enforce _what_.
 
 ## harness-rules.md {#harness-rules}
 
-Discipline rules for the autonomous multi-hour build pipeline (`mk:harness`) and the generator/evaluator architecture.
+Discipline rules for the autonomous multi-hour build pipeline (`mk:autobuild`) and the generator/evaluator architecture.
 
 | # | Rule | Gloss |
 |---|------|-------|
@@ -136,10 +136,10 @@ Domain-complexity routing rules that drive Phase 0 classification and harness de
 | 3 | High Complexity Forces COMPLEX Tier | `level=high` → COMPLEX, no exceptions |
 | 4 | One-Shot Workflow Enables Gate 1 Bypass | `workflow=one-shot` + zero blast radius → skip Gate 1 |
 | 5 | Users Can Extend the CSV | `domain-complexity.csv` is user-editable |
-| 6 | Adaptive Density Emission | scale-routing also emits `harness_density` for harness consumers |
+| 6 | Adaptive Density Emission | scale-routing also emits `autobuild_density` for harness consumers |
 | 7 | **Auto-Strict for High-Complexity Cook Runs** | `level=high` during `/mk:cook` → auto-enables `--strict` at Phase 4.5; suppressible via `--no-strict`; fires ONLY in mk:cook |
 
-**Rule 7 detail:** When `mk:scale-routing` returns `level=high` during a `/mk:cook` run, cook auto-enables `--strict` mode (full `mk:evaluate`) at Phase 4.5 — unless the user explicitly passes `--no-strict`. This catches behavioral failures (e.g., a broken payment flow) that structural code review misses. Does NOT fire in `mk:fix`, `mk:harness`, or standalone `mk:review`.
+**Rule 7 detail:** When `mk:scale-routing` returns `level=high` during a `/mk:cook` run, cook auto-enables `--strict` mode (full `mk:evaluate`) at Phase 4.5 — unless the user explicitly passes `--no-strict`. This catches behavioral failures (e.g., a broken payment flow) that structural code review misses. Does NOT fire in `mk:fix`, `mk:autobuild`, or standalone `mk:review`.
 
 Source: `.claude/rules/scale-adaptive-rules.md`. Applies at Phase 0 (Orient) and Phase 4.5 (Verify).
 

@@ -1,16 +1,16 @@
 ---
 title: Autonomous Build
-description: Green-field product builds with /mk:harness — planner, sprint contract, generator/evaluator loop with adaptive density.
+description: Green-field product builds with /mk:autobuild — planner, sprint contract, generator/evaluator loop with adaptive density.
 ---
 
 # Autonomous Build
 
-`/mk:harness` builds entire products from a description. It's for "build me a kanban app" scope — not single features (use `/mk:cook` for those). It runs a planner → contract → generator ⇄ evaluator loop with minimal handholding.
+`/mk:autobuild` builds entire products from a description. It's for "build me a kanban app" scope — not single features (use `/mk:cook` for those). It runs a planner → contract → generator ⇄ evaluator loop with minimal handholding.
 
 ## Quick start
 
 ```bash
-/mk:harness build a kanban board with drag-and-drop
+/mk:autobuild build a kanban board with drag-and-drop
 ```
 
 MeowKit detects your model tier, selects the right scaffolding density, and drives the full build. You approve at Gate 1 (plan) and Gate 2 (review). The evaluator grades the running app against rubrics. If it fails, the harness loops back to the generator — up to 3 rounds.
@@ -19,7 +19,7 @@ MeowKit detects your model tier, selects the right scaffolding density, and driv
 
 | Situation | Use |
 |-----------|-----|
-| Green-field product from scratch | `/mk:harness` |
+| Green-field product from scratch | `/mk:autobuild` |
 | Single feature on existing codebase | `/mk:cook` |
 | Bug fix | `/mk:fix` |
 
@@ -34,17 +34,17 @@ The harness adjusts automatically based on your model tier:
 | Opus 4.5 | FULL | Contract + full pipeline |
 | Opus 4.6+ | LEAN | Single-session, contract optional, 0-1 rounds |
 
-Override with `--tier` or `MEOWKIT_HARNESS_MODE`:
+Override with `--tier` or `MEOWKIT_AUTOBUILD_MODE`:
 
 ```bash
-/mk:harness build a todo app --tier full     # Force FULL density
-/mk:harness build a retro game maker --tier lean  # Force LEAN
+/mk:autobuild build a todo app --tier full     # Force FULL density
+/mk:autobuild build a retro game maker --tier lean  # Force LEAN
 ```
 
 ## Budget control
 
 ```bash
-/mk:harness build a markdown editor --budget 25 --max-iter 2
+/mk:autobuild build a markdown editor --budget 25 --max-iter 2
 ```
 
 - Default budget: $100 hard cap (warns at $30)
@@ -58,12 +58,12 @@ Override with `--tier` or `MEOWKIT_HARNESS_MODE`:
 | Product plan | `tasks/plans/{slug}/plan.md` |
 | Sprint contract | `tasks/contracts/{date}-{slug}-sprint-N.md` |
 | Evaluator verdict | `tasks/reviews/{slug}-evalverdict.md` |
-| Full audit trail | `tasks/harness-runs/YYMMDD-{slug}/run.md` |
+| Full audit trail | `tasks/autobuild-runs/YYMMDD-{slug}/run.md` |
 
 ## Resuming after interruption
 
 ```bash
-/mk:harness --resume 260501-1450-build-kanban
+/mk:autobuild --resume 260501-1450-build-kanban
 ```
 
 Picks up at the last completed step. Run reports are append-only — no work is lost.
@@ -78,7 +78,7 @@ Picks up at the last completed step. Run reports are append-only — no work is 
 | ESCALATED | Human intervention required |
 | TIMED_OUT | Budget cap reached |
 
-## Don't use /mk:harness for
+## Don't use /mk:autobuild for
 
 - **Single features or bug fixes** — use `/mk:cook` or `/mk:fix`
 - **Doc updates or code reviews** — use targeted skills

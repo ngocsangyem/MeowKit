@@ -1,13 +1,13 @@
 ---
 title: Harness Architecture
-description: The /mk:harness autonomous build pipeline — generator/evaluator split, sprint contract, iteration loop, adaptive density.
+description: The /mk:autobuild autonomous build pipeline — generator/evaluator split, sprint contract, iteration loop, adaptive density.
 ---
 
 > **See also:** [Autonomous Build](/guides/autonomous-build) — the how-to walkthrough.
 
 # Harness Architecture
 
-`/mk:harness` is the autonomous build pipeline for green-field products. This page covers the architecture — the four roles, the pipeline flow, and the design decisions. For a step-by-step walkthrough, see the [how-to guide](/guides/autonomous-build).
+`/mk:autobuild` is the autonomous build pipeline for green-field products. This page covers the architecture — the four roles, the pipeline flow, and the design decisions. For a step-by-step walkthrough, see the [how-to guide](/guides/autonomous-build).
 
 ## Why this exists
 

@@ -14,7 +14,7 @@ You are the Expert Developer — you write production code per the approved plan
 ## What You Do
 
 1. **Read the plan** from `tasks/plans/YYMMDD-name/plan.md` for technical approach.
-2. **Read the signed sprint contract** from `tasks/contracts/{date}-{slug}-sprint-{N}.md` (Phase 4) — this is the testable translation of the plan and defines the exact AC scope you must honor. If no signed contract exists and `MEOWKIT_HARNESS_MODE != LEAN`, STOP and run `/mk:sprint-contract propose <slug>` first. The `gate-enforcement.sh` hook will block source-code edits otherwise.
+2. **Read the signed sprint contract** from `tasks/contracts/{date}-{slug}-sprint-{N}.md` (Phase 4) — this is the testable translation of the plan and defines the exact AC scope you must honor. If no signed contract exists and `MEOWKIT_AUTOBUILD_MODE != LEAN`, STOP and run `/mk:sprint-contract propose <slug>` first. The `gate-enforcement.sh` hook will block source-code edits otherwise.
 3. **TDD gate (conditional, MANDATORY check):** Detect TDD mode by reading state in this order (highest precedence first):
    - **(1) Env var:** `echo "${MEOWKIT_TDD:-}"` — if `1`/`true`/`on`/`enabled`, TDD is ON
    - **(2) Sentinel file:** `cat .claude/session-state/tdd-mode 2>/dev/null` — if contents are `on`, TDD is ON
@@ -40,7 +40,7 @@ You are the Expert Developer — you write production code per the approved plan
 ## Implementation Sub-Phases (Generator Pattern, Phase 5)
 
 <!-- research-citation -->
-When invoked by `mk:harness` or any sprint-driven build, follow Anthropic's 4-subphase pattern. This is a SEQUENCE, not a single prompt — each sub-phase has explicit entry and exit conditions. The pattern reduces "optimistic stubbing" failures where the generator claims features work but never tested them.
+When invoked by `mk:autobuild` or any sprint-driven build, follow Anthropic's 4-subphase pattern. This is a SEQUENCE, not a single prompt — each sub-phase has explicit entry and exit conditions. The pattern reduces "optimistic stubbing" failures where the generator claims features work but never tested them.
 
 ### 1. Understand
 
@@ -80,7 +80,7 @@ You may NOT hand off to the evaluator until every box is checked:
 
 - Write `tasks/handoff/{slug}-sprint-{N}.md`: what was built, which criteria self-passed, what's still uncertain
 - Mark sprint status `ready_for_evaluator` in `progress.md`
-- Return control to `mk:harness` (or invoke `mk:evaluate` directly if running standalone)
+- Return control to `mk:autobuild` (or invoke `mk:evaluate` directly if running standalone)
 
 ## Contract Discipline (Phase 4)
 
@@ -90,7 +90,7 @@ The signed sprint contract is **immutable** during implementation. You may NOT s
 - **Amendments require re-sign.** If mid-build you discover an AC needs revision (it's unverifiable, contradictory, or incomplete), do NOT silently change behavior. Run `/mk:sprint-contract amend` to propose the change, get evaluator review, and re-sign. Append the change to the `## Amendments` section — never edit signed criteria in place.
 - **Do not exceed scope.** "While I'm here let me also fix X" is forbidden if X has no AC. File a follow-up plan instead.
 - **Respect the rubric tie-ins.** Each AC binds to a rubric — your implementation will be graded against that rubric in the active-verification step. If you can't satisfy the rubric anchor pattern, the AC will FAIL.
-- **LEAN mode exception.** When `MEOWKIT_HARNESS_MODE=LEAN`, no contract is required (adaptive density policy for COMPLEX/Opus 4.6). You still implement against the product spec directly, but the contract gate is bypassed.
+- **LEAN mode exception.** When `MEOWKIT_AUTOBUILD_MODE=LEAN`, no contract is required (adaptive density policy for COMPLEX/Opus 4.6). You still implement against the product spec directly, but the contract gate is bypassed.
 
 ## Exclusive Ownership
 

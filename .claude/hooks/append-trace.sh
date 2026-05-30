@@ -99,7 +99,7 @@ record = {
     'run_id': os.environ.get('MEOWKIT_TRACE_RUN_ID', ''),
     'harness_version': os.environ.get('MEOWKIT_HARNESS_VERSION', '3.0.0'),
     'model': os.environ.get('MEOWKIT_TRACE_MODEL', ''),
-    'density': os.environ.get('MEOWKIT_HARNESS_MODE', ''),
+    'density': os.environ.get('MEOWKIT_AUTOBUILD_MODE', ''),
     'data': data,
 }
 print(json.dumps(record, separators=(',', ':')))

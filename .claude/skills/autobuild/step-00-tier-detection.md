@@ -1,17 +1,17 @@
 # Step 0: Tier Detection + Density Selection
 
-Pick the harness scaffolding density (`MINIMAL`, `FULL`, `LEAN`) based on the detected model tier. Create the run directory.
+Pick the autobuild scaffolding density (`MINIMAL`, `FULL`, `LEAN`) based on the detected model tier. Create the run directory.
 
 ## Instructions
 
 ### 0a. Resolve density (priority order)
 
 1. **`--tier` flag** (explicit): map `auto → run scale-routing`, `minimal → MINIMAL`, `full → FULL`, `lean → LEAN`
-2. **`MEOWKIT_HARNESS_MODE` env var:** if set, overrides everything below. Log the override in step-06 audit trail.
+2. **`MEOWKIT_AUTOBUILD_MODE` env var:** if set, overrides everything below. Log the override in step-06 audit trail.
 3. **`density-select.sh`** (or invoke `mk:scale-routing` directly): emits the density token based on detected model + tier.
 
 ```bash
-density=$(.claude/skills/harness/scripts/density-select.sh)
+density=$(.claude/skills/autobuild/scripts/density-select.sh)
 ```
 
 The script returns one of: `MINIMAL`, `FULL`, `LEAN`. See `references/adaptive-density-matrix.md` for the full decision table.
@@ -38,7 +38,7 @@ esac
 ```bash
 slug=$(echo "$task_description" | tr '[:upper:] ' '[:lower:]-' | sed -E 's/[^a-z0-9-]//g; s/--+/-/g; s/^-|-$//g' | cut -c1-40)
 run_id=$(date +%y%m%d-%H%M)-${slug}
-run_dir="tasks/harness-runs/${run_id}"
+run_dir="tasks/autobuild-runs/${run_id}"
 mkdir -p "$run_dir"
 ```
 
@@ -60,7 +60,7 @@ status: in_progress
 started: {ISO-8601 timestamp}
 ---
 
-# Harness Run — {task_description}
+# Autobuild Run — {task_description}
 
 ## Density Decision
 - Detected tier: {tier}
@@ -76,11 +76,10 @@ started: {ISO-8601 timestamp}
 | `MINIMAL` | `mk:plan-creator --fast` | SKIP | SKIP — invoke `mk:cook` instead and return |
 | `FULL` | `mk:plan-creator --product-level` | REQUIRED | 1–3 rounds |
 | `LEAN` | `mk:plan-creator --product-level` | OPTIONAL (skip if < 5 ACs needed) | 0–1 rounds |
-| `DEEP` | `mk:plan-creator --deep` | REQUIRED | 1–3 rounds |
 
-> **`--deep` mode:** Available for FULL density (Sonnet/Opus 4.5) when the task spans 5+ directories. Provides per-phase file inventory and dependency maps in addition to standard product-level scaffolding. Triggers automatically when `mk:scale-routing` detects 5+ root-level directories in scope; can also be forced via `MEOWKIT_HARNESS_MODE=DEEP`.
+`--deep` remains a plan-creator/cook planning mode. It is not an autobuild density and cannot be forced through `MEOWKIT_AUTOBUILD_MODE`.
 
-**MINIMAL short-circuit:** if density resolves to MINIMAL, the harness immediately delegates to `mk:cook` and exits — no contract, no iteration loop, no harness scaffolding. The run report still gets written to record the decision.
+**MINIMAL short-circuit:** if density resolves to MINIMAL, the autobuild workflow immediately delegates to `mk:cook` and exits — no contract, no iteration loop, no autobuild scaffolding. The run report still gets written to record the decision.
 
 ## Output
 

@@ -73,5 +73,5 @@ Currently step-file enabled:
 - `mk:plan-creator` — 9-step planning workflow (00-08)
 - `mk:review` — 5-step adversarial review workflow (includes step-02b persona passes)
 - `mk:evaluate` — 5-step behavioral verification (load-rubrics → boot-app → probe → grade → feedback)
-- `mk:harness` — 7-step autonomous build pipeline (tier-detection → plan → contract → generate → evaluate → iterate-or-ship → run-report)
+- `mk:autobuild` — 7-step autonomous build pipeline (tier-detection → plan → contract → generate → evaluate → iterate-or-ship → run-report)
 - `mk:trace-analyze` — 6-step trace analysis (ingest → partition → scatter → gather → suggestions → HITL gate)

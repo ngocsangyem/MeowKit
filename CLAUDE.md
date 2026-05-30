@@ -15,13 +15,13 @@ Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test (RED if --tdd, else op
 ```
 
 **TDD mode:** opt-in via `--tdd` flag or `MEOWKIT_TDD=1`. See `.claude/rules/tdd-rules.md`.
-**Phase 3 harness contract substep:** developer reads signed `tasks/contracts/{date}-{slug}-sprint-N.md` BEFORE source edits (enforced by `gate-enforcement.sh`; bypass: `MEOWKIT_HARNESS_MODE=LEAN`). See `.claude/rules/harness-rules.md` Rule 3.
+**Phase 3 autobuild contract substep:** developer reads signed `tasks/contracts/{date}-{slug}-sprint-N.md` BEFORE source edits (enforced by `gate-enforcement.sh`; bypass: `MEOWKIT_AUTOBUILD_MODE=LEAN`). See `.claude/rules/harness-rules.md` Rule 3.
 
 **IMPORTANT:** Read canonical `.json` stores before any task — `fixes.json`, `review-patterns.json`, `architecture-decisions.json` (fall back to the matching `.md` only if the `.json` is absent; see `docs/memory-system.md`); read `.claude/rules/core-behaviors.md` (6 mandatory behaviors) — both apply in ALL modes.
 **IMPORTANT:** Activate only skills needed for the current task domain; declare model tier (TRIVIAL · STANDARD · COMPLEX) before every task.
 **IMPORTANT:** Non-trivial task (>2 files OR >30 min) = approved plan required before any code; for architectural trade-offs use `/mk:party`.
 **IMPORTANT:** COMPLEX tasks with independent subtasks may use parallel execution (max 3 agents, worktree isolation per `.claude/rules/parallel-execution-rules.md`).
-**IMPORTANT:** For green-field product builds prefer `/mk:harness` over `/mk:cook` — adaptive density (MINIMAL/FULL/LEAN) per model tier.
+**IMPORTANT:** For green-field product builds prefer `/mk:autobuild` over `/mk:cook` — adaptive density (MINIMAL/FULL/LEAN) per model tier.
 
 ## Gates
 
@@ -113,7 +113,7 @@ WHY: Compaction summarizes; safety rules cannot be summarized without losing enf
 - **Agent routing:** `.claude/rules/agent-routing.md` (17-row agent table; loaded by `mk:agent-detector` Step 0b)
 - **Risk checklist:** `.claude/rules/risk-checklist.md` (Phase 0 horizontal-risk flags; loaded by `mk:agent-detector` Step 0b)
 - **Agile/Scrum rules:** `.claude/rules-conditional/agile-*.md` (loaded by `mk:agent-detector` Step 0b when Agile context detected)
-- **Adaptive density:** `.claude/skills/harness/references/adaptive-density-matrix.md` (canonical) — governing rule: `.claude/rules/harness-rules.md` Rule 5
+- **Adaptive density:** `.claude/skills/autobuild/references/adaptive-density-matrix.md` (canonical) — governing rule: `.claude/rules/harness-rules.md` Rule 5
 - **Orchestrator entry rule:** `.claude/rules/orchestration-rules.md`
 - **Commands vs Skills:** `.claude/rules/skill-authoring-rules.md`
 - **Skill Rule of Two:** `.claude/rules/injection-rules.md` Rule 11

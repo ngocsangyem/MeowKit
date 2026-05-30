@@ -69,12 +69,12 @@ WHY: High-complexity domains carry risks where weaker-model savings are not wort
 
 ### Rule 5: Harness Density Follows Tier
 
-For `mk:harness` runs, the model tier auto-selects a scaffolding density (`MINIMAL | FULL | LEAN`).
+For `mk:autobuild` runs, the model tier auto-selects a scaffolding density (`MINIMAL | FULL | LEAN`).
 
 **Auto-detection:** `handlers/model-detector.cjs` reads the `model` field from SessionStart stdin and writes tier + density to `session-state/detected-model.json`. `MEOWKIT_MODEL_HINT` is now a fallback, not a requirement. Detection cascade: (1) stdin `model` field, (2) `MEOWKIT_MODEL_HINT` env var, (3) default STANDARD/FULL.
 
-**Density override:** `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN` env var overrides auto-detected density.
+**Density override:** `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` env var overrides auto-detected density.
 
-**Single source of truth:** the full decision matrix and rationale live at `.claude/skills/harness/references/adaptive-density-matrix.md`. See also `scale-adaptive-rules.md` Rule 6.
+**Single source of truth:** the full decision matrix and rationale live at `.claude/skills/autobuild/references/adaptive-density-matrix.md`. See also `scale-adaptive-rules.md` Rule 6.
 
 WHY: Dead-weight thesis — capable models need less scaffolding; forcing FULL can degrade output.

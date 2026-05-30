@@ -45,7 +45,7 @@ Option set is mode-pruned. First option is `(Recommended)`. AskUserQuestion caps
 | fast | yes | Red-team, Validate, Cook, End |
 | fast | no | Cook, Validate, Red-team, End |
 | hard / deep / parallel / two | (n/a — both prior gates ran) | Cook, End |
-| product-level | (n/a) | Hand off to mk:harness, End |
+| product-level | (n/a) | Hand off to mk:autobuild, End |
 | spike | (n/a) | Cook, End |
 
 ### 9d. Present AskUserQuestion
@@ -80,7 +80,7 @@ handoff:
   decided_at: <ISO-8601 timestamp>
 ```
 
-Where `<choice>` is one of `cook | validate | red-team | harness | end`. Use the Edit tool with the existing `---` boundary as the exact-match context — do NOT overwrite the body.
+Where `<choice>` is one of `cook | validate | red-team | autobuild | end`. Use the Edit tool with the existing `---` boundary as the exact-match context — do NOT overwrite the body.
 
 ### 9f. Print Suggested Command
 
@@ -96,7 +96,7 @@ Print exactly one line matching the selection:
 | Cook (fast + TDD) | `Run: /mk:cook --auto {absolute-path-to-plan.md} --tdd` |
 | Validate | `Run: /mk:plan validate {absolute-path-to-plan.md}` |
 | Red-team | `Run: /mk:plan red-team {absolute-path-to-plan.md}` |
-| Hand off to mk:harness | `Run: /mk:harness {absolute-path-to-plan.md}` |
+| Hand off to mk:autobuild | `Run: /mk:autobuild {absolute-path-to-plan.md}` |
 | End | (no command line — print "Plan complete. No next command queued.") |
 
 If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.claude/session-state/tdd-mode` surviving a fresh session.

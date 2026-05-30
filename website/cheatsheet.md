@@ -32,7 +32,7 @@ persona: B
 | `/mk:status` | any | Delivery status report via project-manager |
 | `/mk:upgrade` | any | Self-update MeowKit |
 | `/mk:help` | any | Scan project state, recommend next pipeline step |
-| `/mk:harness "build a X"` | 0→5 | Autonomous green-field build with generator/evaluator loop |
+| `/mk:autobuild "build a X"` | 0→5 | Autonomous green-field build with generator/evaluator loop |
 | `/mk:evaluate` | 4 | Behavioral rubric grading with active verification |
 | `/mk:sprint-contract` | 3 | Draft contract before harness sprint |
 | `/mk:rubric` | 4 | Load/compose rubric preset |
@@ -127,7 +127,7 @@ persona: B
 | mk:party | "decide architecture" | Multi-agent decision brief |
 | mk:scale-routing | Phase 0 (automatic) | Domain complexity level |
 | mk:worktree | Parallel execution setup | Isolated git worktree |
-| mk:harness | "build a X from scratch" | Autonomous generator/evaluator build loop |
+| mk:autobuild | "build a X from scratch" | Autonomous generator/evaluator build loop |
 | mk:evaluate | Harness Phase 4 | Rubric-graded behavioral verdict with evidence |
 | mk:sprint-contract | Harness FULL density | Acceptance criteria contract before sprint |
 | mk:rubric | Evaluator setup | Load/compose rubric preset |
@@ -175,7 +175,7 @@ Source of truth: `.claude/.env.example`. Most defaults live in `.claude/settings
 
 | Variable | Values | Effect |
 |----------|--------|--------|
-| `MEOWKIT_HARNESS_MODE` | `MINIMAL` \| `FULL` \| `LEAN` | Override auto-detected scaffolding density |
+| `MEOWKIT_AUTOBUILD_MODE` | `MINIMAL` \| `FULL` \| `LEAN` | Override auto-detected scaffolding density |
 | `MEOWKIT_MODEL_HINT` | e.g. `opus-4-6` | Tell harness which model is running (enables LEAN auto-detect) |
 | `MEOWKIT_BUDGET_WARN` | e.g. `30` | USD warn threshold (prints warning, continues) |
 | `MEOWKIT_BUDGET_BLOCK` | e.g. `100` | USD hard-block threshold (halts the run, sets `final_status=TIMED_OUT`) |

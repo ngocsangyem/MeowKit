@@ -18,11 +18,11 @@
 |---|---|---|---|---|
 | 1 | .claude/skills/benchmark/SKILL.md | 26 | docs/dead-weight-audit.md | Hosted URL `https://docs.meowkit.dev/dead-weight-audit` |
 | 2 | .claude/skills/benchmark/SKILL.md | 151 | docs/dead-weight-audit.md | Hosted URL |
-| 3 | .claude/skills/harness/references/adaptive-density-matrix.md | 68 | docs/dead-weight-audit.md | Hosted URL |
-| 4 | .claude/skills/harness/references/adaptive-density-matrix.md | 83 | docs/dead-weight-audit.md | Drop the orphan bullet (stale Phase-6 TODO; Phase 8 shipped) |
+| 3 | .claude/skills/autobuild/references/adaptive-density-matrix.md | 68 | docs/dead-weight-audit.md | Hosted URL |
+| 4 | .claude/skills/autobuild/references/adaptive-density-matrix.md | 83 | docs/dead-weight-audit.md | Drop the orphan bullet (stale Phase-6 TODO; Phase 8 shipped) |
 | 5 | .claude/rules/harness-rules.md | 57 | docs/dead-weight-audit.md | Hosted URL (rules file is always-loaded; cannot inline a multi-page playbook) |
 | 6 | .claude/agents/reviewer.md | 65 | docs/red-team-overview.md | Hosted URL `https://docs.meowkit.dev/red-team-overview` (file lives at docs/operations/red-team-overview.md, do NOT drop) |
-| 7 | .claude/commands/mk/summary.md | 56 | docs/operations/harness-runbook.md | Hosted URL `https://docs.meowkit.dev/harness-runbook` |
+| 7 | .claude/commands/mk/summary.md | 56 | docs/operations/autobuild-runbook.md | Hosted URL `https://docs.meowkit.dev/autobuild-runbook` |
 | 8 | .claude/memory/architecture-decisions.md | 51 | docs/memory-system.md:28-31 | Inline 1–2 sentences capturing the rationale; preserve citation by title |
 | 9 | .claude/memory/architecture-decisions.md | 53 | docs/meowkit-architecture.md line 240-241 | Same — inline the claim with title-only attribution |
 | 10 | .claude/hooks/HOOKS_INDEX.md | 42 | docs/memory-system.md | Hosted URL or inline the tombstone summary |

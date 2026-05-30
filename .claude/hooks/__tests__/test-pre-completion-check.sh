@@ -29,7 +29,7 @@ reset_env() {
 }
 
 run_hook() {
-  printf '{"session_id":"test"}' | CLAUDE_PROJECT_DIR="$(pwd)" MEOWKIT_HARNESS_MODE=FULL bash "$HOOK" 2>/dev/null
+  printf '{"session_id":"test"}' | CLAUDE_PROJECT_DIR="$(pwd)" MEOWKIT_AUTOBUILD_MODE=FULL bash "$HOOK" 2>/dev/null
 }
 
 echo "=== test-pre-completion-check.sh ==="

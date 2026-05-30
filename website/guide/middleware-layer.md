@@ -38,8 +38,8 @@ This is the failure mode the middleware layer was built to interrupt. Without ex
 | `MEOWKIT_BUILD_VERIFY=off` | Skip build verify |
 | `MEOWKIT_LOOP_DETECT=off` | Skip loop detection |
 | `MEOWKIT_PRECOMPLETION=off` | Skip pre-completion check |
-| `MEOWKIT_HARNESS_MODE=LEAN` | PreCompletion: soft nudge; BuildVerify: still runs |
-| `MEOWKIT_HARNESS_MODE=MINIMAL` | Skip BuildVerify + PreCompletion |
+| `MEOWKIT_AUTOBUILD_MODE=LEAN` | PreCompletion: soft nudge; BuildVerify: still runs |
+| `MEOWKIT_AUTOBUILD_MODE=MINIMAL` | Skip BuildVerify + PreCompletion |
 
 ## Next steps
 

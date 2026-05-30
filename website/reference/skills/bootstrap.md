@@ -27,7 +27,7 @@ mk:bootstrap [requirements] --parallel
 **Do NOT invoke when:**
 - Project already has source code — use `mk:plan-creator` + `mk:cook` directly
 - You only need kit setup — use CLI (`npx mewkit init`)
-- You need autonomous multi-hour builds of specified products — use `mk:harness`
+- You need autonomous multi-hour builds of specified products — use `mk:autobuild`
 - You need single-task feature work on existing projects — use `mk:cook`
 
 ## Example Prompt

@@ -132,8 +132,8 @@ case "$tier" in
 esac
 step_cost_usd=$(awk -v s="$elapsed_seconds" -v r="$rate" 'BEGIN { printf "%.2f", (s/60.0)*r }')
 
-MEOWKIT_RUN_ID="$run_id" .claude/skills/harness/scripts/budget-tracker.sh add "$step_cost_usd" "step-04-iter-${iteration}"
-MEOWKIT_RUN_ID="$run_id" .claude/skills/harness/scripts/budget-tracker.sh check
+MEOWKIT_RUN_ID="$run_id" .claude/skills/autobuild/scripts/budget-tracker.sh add "$step_cost_usd" "step-04-iter-${iteration}"
+MEOWKIT_RUN_ID="$run_id" .claude/skills/autobuild/scripts/budget-tracker.sh check
 ```
 
 ## Output

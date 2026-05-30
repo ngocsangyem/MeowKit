@@ -23,7 +23,7 @@ Activate before applying a harness change (baseline) and after (verify delta). A
 
 ## Core Capabilities
 
-- **Run canary suite:** Executes spec files from `.claude/benchmarks/canary/quick/` (and `full/` with `--full`) via `mk:harness`, recording per-task verdicts, scores, duration, and cost.
+- **Run canary suite:** Executes spec files from `.claude/benchmarks/canary/quick/` (and `full/` with `--full`) via `mk:autobuild`, recording per-task verdicts, scores, duration, and cost.
 - **Compare runs:** Reads two prior run JSONs from `.claude/benchmarks/results/` and emits a markdown delta table showing per-task score and cost changes.
 - **Persist baselines:** After each completed run, appends a cost baseline to `.claude/memory/cost-log.json` and emits a `benchmark_result` event to `.claude/memory/trace-log.jsonl`.
 
@@ -41,7 +41,7 @@ Run the benchmark canary suite to baseline current harness performance. Then com
 | `run --full` | Execute quick + heavy tier (6 tasks total, includes `.claude/benchmarks/canary/full/`) |
 | ``compare RUN-ID-A RUN-ID-B`` | Diff two prior run JSONs |
 
-`--full` is strictly opt-in. The heavy task (`06-small-app-build`) triggers `mk:harness` which can run for hours — the script refuses without the flag to prevent accidental cost burn.
+`--full` is strictly opt-in. The heavy task (`06-small-app-build`) triggers `mk:autobuild` which can run for hours — the script refuses without the flag to prevent accidental cost burn.
 
 ## Hard Constraints
 

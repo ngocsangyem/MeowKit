@@ -26,7 +26,7 @@ trust_level: MED
 
 **Triggers:** `mk:plan-creator --spike` flag OR plan frontmatter `spike: true`.
 
-**Compatibility:** Spike plans are INCOMPATIBLE with `mk:harness` FULL (Phase 2/Phase 5 skip breaks the harness gate). Run via `mk:cook` or `mk:plan-creator --fast`, NEVER `mk:harness` FULL.
+**Compatibility:** Spike plans are INCOMPATIBLE with `mk:autobuild` FULL (Phase 2/Phase 5 skip breaks the harness gate). Run via `mk:cook` or `mk:plan-creator --fast`, NEVER `mk:autobuild` FULL.
 
 1. Frontmatter MUST include `spike: true`, `timebox: <duration>` (e.g. `"2d"`), `findings_doc:` (default `tasks/plans/{slug}/findings.md`)
 2. Estimate cap (advisory): warn if `story_points > 5`

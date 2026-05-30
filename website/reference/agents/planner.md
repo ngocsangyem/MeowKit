@@ -54,7 +54,7 @@ The planner is skipped for Trivial tasks (typos, renames, formatting) where a pl
 - [x] Enforces Gate 1 — no implementation agent starts without an approved plan
 - [x] Estimates effort and flags risks before work begins
 - [x] Rejects unclear tasks with specific clarification requests
-- [x] Routes product-level plans to `mk:harness` — never directly to the developer
+- [x] Routes product-level plans to `mk:autobuild` — never directly to the developer
 
 ## Common Use Cases
 
@@ -62,7 +62,7 @@ The planner is skipped for Trivial tasks (typos, renames, formatting) where a pl
 |---|---|
 | "Add a search feature to the dashboard" | Produces a Standard plan with goal, acceptance criteria, scope boundaries, and implementation steps |
 | "Redesign the authentication system" | Produces a Deep plan with per-phase scouting, risk assessment, and recommends routing to the architect |
-| "Build a SaaS analytics dashboard" | Produces a Product-Level plan (vision, features, user stories) and routes to `mk:harness` |
+| "Build a SaaS analytics dashboard" | Produces a Product-Level plan (vision, features, user stories) and routes to `mk:autobuild` |
 | "Should we refactor the API or add a new endpoint?" | Produces a Two-Approach plan with comparison table for user decision |
 | "Quick bug fix for the login form" | Produces a Fast plan — minimal overhead, direct to implementation |
 

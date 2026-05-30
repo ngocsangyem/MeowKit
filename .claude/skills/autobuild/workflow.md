@@ -1,4 +1,4 @@
-# mk:harness — Workflow
+# mk:autobuild — Workflow
 
 7-step workflow (numbered 0–6) orchestrating an autonomous multi-hour build via planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density.
 
@@ -32,7 +32,7 @@ If `next_step` is unset, the agent follows the default linear progression (step-
 3. `step-03-generate.md` — Spawn `developer` subagent with the 4-subphase pattern; generator implements per signed contract
 4. `step-04-evaluate.md` — Spawn `evaluator` subagent via `mk:evaluate`; produces graded verdict
 5. `step-05-iterate-or-ship.md` — Verdict PASS → route to shipper (Phase 5 of the 7-phase model); FAIL → loop back to step-3 with feedback (max `--max-iter` rounds; escalate after)
-6. `step-06-run-report.md` — Write the final audit trail at `tasks/harness-runs/{run-id}/run.md`
+6. `step-06-run-report.md` — Write the final audit trail at `tasks/autobuild-runs/{run-id}/run.md`
 
 ## Variables Passed Between Steps
 
@@ -43,7 +43,7 @@ If `next_step` is unset, the agent follows the default linear progression (step-
 | `model_id` | step-00 | step-06 | e.g., `opus-4-6`, `sonnet-4-5` |
 | `tier` | step-00 | step-06 | `TRIVIAL`, `STANDARD`, `COMPLEX` |
 | `run_id` | step-00 | all | `YYMMDD-HHMM-{slug}` |
-| `run_dir` | step-00 | all | `tasks/harness-runs/{run_id}/` |
+| `run_dir` | step-00 | all | `tasks/autobuild-runs/{run_id}/` |
 | `plan_dir` | step-01 | step-02..06 | Absolute path to product-level plan dir |
 | `slug` | step-01 | step-02..06 | Kebab-case task identifier |
 | `contract_path` | step-02 | step-03..06 | Path to signed contract OR `null` (skipped) |
@@ -60,13 +60,13 @@ If `next_step` is unset, the agent follows the default linear progression (step-
 ## Flow
 
 ```
-/mk:harness "build a kanban app" [--tier auto|full|lean|minimal] [--max-iter 3] [--budget 50]
+/mk:autobuild "build a kanban app" [--tier auto|full|lean|minimal] [--max-iter 3] [--budget 50]
     ↓
 Step 0: Tier Detection
     ├── density-select.sh OR mk:scale-routing
-    ├── env override: MEOWKIT_HARNESS_MODE
+    ├── env override: MEOWKIT_AUTOBUILD_MODE
     ├── --tier flag override
-    └── Create tasks/harness-runs/{run_id}/
+    └── Create tasks/autobuild-runs/{run_id}/
          ↓
 Step 1: Plan
     ├── mk:plan-creator --product-level
@@ -99,7 +99,7 @@ Step 5: Iterate or Ship
          ↓
 Step 6: Run Report
     ├── Aggregate per-step artifacts + budget trail + density decision
-    ├── Write tasks/harness-runs/{run_id}/run.md
+    ├── Write tasks/autobuild-runs/{run_id}/run.md
     └── Print summary to user
 ```
 
@@ -111,7 +111,7 @@ Step 6: Run Report
 
 ## Resume
 
-If a run is killed mid-flight, resume via `/mk:harness --resume {run_id}`. The orchestrator reads `run.md` to find the last completed step and continues from there. Run reports are append-only — no step is re-executed.
+If a run is killed mid-flight, resume via `/mk:autobuild --resume {run_id}`. The orchestrator reads `run.md` to find the last completed step and continues from there. Run reports are append-only — no step is re-executed.
 
 ## Next
 

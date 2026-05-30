@@ -22,7 +22,7 @@ PLAN_REQUIRED_FRONTMATTER = ["title", "type", "status", "priority"]
 
 # Optional plan.md frontmatter blocks (additive — legacy plans without these still validate).
 # `handoff.next` is enum-validated when present; unknown values fail the plan.
-HANDOFF_NEXT_VALID = {"cook", "validate", "red-team", "harness", "end"}
+HANDOFF_NEXT_VALID = {"cook", "validate", "red-team", "autobuild", "end"}
 
 # Phase frontmatter schema
 PHASE_VALID_STATUS = {"pending", "active", "in_progress", "completed", "failed", "abandoned"}

@@ -15,7 +15,7 @@ Adaptive density operationalizes this finding. The harness checks the model tier
 
 ## The Four Tiers
 
-This is a simplified view. The canonical decision matrix with per-cell rationale lives at `.claude/skills/harness/references/adaptive-density-matrix.md`.
+This is a simplified view. The canonical decision matrix with per-cell rationale lives at `.claude/skills/autobuild/references/adaptive-density-matrix.md`.
 
 | Tier | Model | Density | Planner | Contract | Iteration | Context Reset | Rubric |
 |---|---|---|---|---|---|---|---|
@@ -34,10 +34,10 @@ This is a simplified view. The canonical decision matrix with per-cell rationale
 
 ## How It's Selected
 
-`mk:scale-routing` emits a `harness_density` field (`MINIMAL | FULL | LEAN`) based on detected model tier and model string. The resolution order:
+`mk:scale-routing` emits a `autobuild_density` field (`MINIMAL | FULL | LEAN`) based on detected model tier and model string. The resolution order:
 
-1. `MEOWKIT_HARNESS_MODE` env var (highest priority) — `MINIMAL`, `FULL`, or `LEAN`
-2. `--tier` flag on `/mk:harness` — `auto`, `minimal`, `full`, `lean`
+1. `MEOWKIT_AUTOBUILD_MODE` env var (highest priority) — `MINIMAL`, `FULL`, or `LEAN`
+2. `--tier` flag on `/mk:autobuild` — `auto`, `minimal`, `full`, `lean`
 3. `model-detector.cjs` (SessionStart handler, v2.3.0) — reads the `model` field from SessionStart stdin JSON and writes the detected tier + density to `session-state/detected-model.json`
 4. `MEOWKIT_MODEL_HINT` env var — fallback when stdin `model` field is absent
 5. (none) → defaults to STANDARD tier → FULL density (safe fallback)
@@ -66,20 +66,20 @@ export MEOWKIT_MODEL_HINT=opus-4-6
 Or pass the flag per-run:
 
 ```bash
-/mk:harness "build a kanban app" --tier lean
+/mk:autobuild "build a kanban app" --tier lean
 ```
 
 Or force it session-wide:
 
 ```bash
-export MEOWKIT_HARNESS_MODE=LEAN
+export MEOWKIT_AUTOBUILD_MODE=LEAN
 ```
 
 When the fallback fires, the run report records `Source: auto-fallback (no model env var detected)` so you can identify the issue.
 
 ## Density Does Not Bypass Gates
 
-`MEOWKIT_HARNESS_MODE=LEAN` adjusts scaffolding — it does NOT lower the quality bar or skip enforcement.
+`MEOWKIT_AUTOBUILD_MODE=LEAN` adjusts scaffolding — it does NOT lower the quality bar or skip enforcement.
 
 These gates apply regardless of density mode:
 
@@ -104,12 +104,12 @@ Full playbook: `docs/dead-weight-audit.md`.
 
 ## Canonical Source
 
-`.claude/skills/harness/references/adaptive-density-matrix.md` is the single source of truth. This page embeds a simplified 4-row view; the canonical matrix includes per-cell rationale and anti-patterns.
+`.claude/skills/autobuild/references/adaptive-density-matrix.md` is the single source of truth. This page embeds a simplified 4-row view; the canonical matrix includes per-cell rationale and anti-patterns.
 
 ## Related
 
 - [/guide/harness-architecture](/guide/harness-architecture) — full pipeline context
-- [/reference/skills/harness](/reference/skills/harness) — harness skill spec
+- [/reference/skills/autobuild](/reference/skills/autobuild) — autobuild skill spec
 - [/reference/skills/scale-routing](/reference/skills/scale-routing) — density emission
 - [/guide/trace-and-benchmark](/guide/trace-and-benchmark) — dead-weight audit measurement infrastructure
 - [/reference/rules-index#harness-rules](/reference/rules-index#harness-rules) — Rule 5 (density), Rule 7 (dead-weight audit), Rule 10 (no gate bypass)

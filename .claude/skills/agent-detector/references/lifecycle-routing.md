@@ -9,7 +9,7 @@ Advisory only — does not change agent-detector scoring or output format.
 |--------|-------|---------------------|
 | Vague idea, needs refinement | Define | mk:plan-creator |
 | New feature, need spec/plan | Plan | mk:plan-creator |
-| Green-field product build ("build me a kanban app", "make a SaaS dashboard", autonomous multi-hour build) | Plan + Build | mk:harness (preferred over mk:cook for autonomous green-field work; runs planner → contract → generator ⇄ evaluator loop) |
+| Green-field product build ("build me a kanban app", "make a SaaS dashboard", autonomous multi-hour build) | Plan + Build | mk:autobuild (preferred over mk:cook for autonomous green-field work; runs planner → contract → generator ⇄ evaluator loop) |
 | Have plan, ready to implement | Build | mk:cook, mk:development |
 | Rough-size from spec / pre-ticket sizing / estimate stories before tickets exist | Plan | mk:story-sizer |
 | UI/frontend work | Build | mk:frontend-design, mk:cook |
@@ -22,6 +22,7 @@ Advisory only — does not change agent-detector scoring or output format.
 | Reviewing code quality | Review | mk:review |
 | Security audit | Review | mk:cso |
 | Simplify/refactor code | Review | mk:simplify |
+| Optimize a measurable metric (coverage %, bundle size, lint count, latency) through bounded git-tracked iterations | Build | mk:loop (keep/revert per scalar metric; NOT for subjective cleanup — see mk:cook) |
 | Visualize code, draw diagram, build slide deck, render plan as HTML | any | mk:preview |
 | Visualize a git diff or PR before review | Review | mk:preview (`--html --diff`) |
 | Ready to ship/deploy | Ship | mk:ship |

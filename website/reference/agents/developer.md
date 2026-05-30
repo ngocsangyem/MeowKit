@@ -37,7 +37,7 @@ The developer operates at Phase 3 (Build). It is the only agent that writes prod
 - **Type-safe coding** — enforces no `any` types and no unsafe casts. Follows existing codebase patterns; new patterns require an ADR from the architect.
 - **Self-healing** — on test failures, attempts fixes up to 3 times, each with a different approach. After 3 failures, escalates with detailed failure report.
 - **Bead processing** — for Complex tasks with bead decomposition, processes beads sequentially by dependency order, commits per bead, and tracks progress for resume-on-interruption.
-- **Generator pattern** — when invoked by `mk:harness`, follows a 4-subphase sequence: Understand, Design Direction, Implement, and Verify (self-eval checklist).
+- **Generator pattern** — when invoked by `mk:autobuild`, follows a 4-subphase sequence: Understand, Design Direction, Implement, and Verify (self-eval checklist).
 
 ## Behavioral Checklist
 
@@ -62,7 +62,7 @@ The developer operates at Phase 3 (Build). It is the only agent that writes prod
 
 ## Generator Sub-Phases (Harness Mode)
 
-When invoked by `mk:harness` or sprint-driven builds, the developer follows this sequence:
+When invoked by `mk:autobuild` or sprint-driven builds, the developer follows this sequence:
 
 1. **Understand** — read contract and plan, identify unknowns, state in 3 bullets what will be built and how it will be verified.
 2. **Design Direction** — pick existing pattern, sketch data flow in one paragraph, identify integration seams.

@@ -770,7 +770,7 @@ Every gate where automation stops and a human decides.
 | Tickets exist but no spec analysis was done   | Step 6; consider asking the PO to back-fill ACs                                      |
 | Bug, not a feature                            | Use [Fixing a Bug](/workflows/fix-bug); spec-analyst doesn't apply                   |
 | Hotfix (one-shot, zero blast radius)          | `/mk:fix` bypasses Gate 1 per `scale-adaptive-rules.md` Rule 4                       |
-| Green-field product build                     | [Autonomous Build](/workflows/autonomous-build) (`/mk:harness`) — different pipeline |
+| Green-field product build                     | [Autonomous Build](/workflows/autonomous-build) (`/mk:autobuild`) — different pipeline |
 
 ## When things go sideways
 
@@ -788,6 +788,6 @@ Every gate where automation stops and a human decides.
 - [Spec to Sprint Planning](/workflows/spec-to-sprint) — planner-focused upstream of this page
 - [Ticket to Code](/workflows/ticket-to-code) — developer-focused; the per-ticket cycle this page nests inside
 - [Agile / Scrum Workflow](/workflows/agile-scrum) — sprint-level rituals that bracket this loop
-- [Autonomous Build](/workflows/autonomous-build) — `/mk:harness` for green-field builds
+- [Autonomous Build](/workflows/autonomous-build) — `/mk:autobuild` for green-field builds
 - [Code Review](/workflows/code-review) — deep-dive on Gate 2
 - [Shipping Code](/workflows/ship-code) — deep-dive on Phase 5

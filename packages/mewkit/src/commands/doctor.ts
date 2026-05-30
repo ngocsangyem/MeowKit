@@ -232,9 +232,9 @@ function checkStateTaxonomy(root: string | null): DiagResult[] {
 			detail: ".claude/session-state/ is legacy; prefer project-root session-state/ for runtime state.",
 		},
 		{
-			status: fs.existsSync(path.join(root, "tasks", "harness-runs")) ? "pass" : "warn",
-			name: "Harness run ledger",
-			detail: "Harness audit events belong under tasks/harness-runs/.",
+			status: fs.existsSync(path.join(root, "tasks", "autobuild-runs")) ? "pass" : "warn",
+			name: "Autobuild run ledger",
+			detail: "Autobuild audit events belong under tasks/autobuild-runs/.",
 		},
 	];
 	return results;

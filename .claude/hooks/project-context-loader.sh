@@ -132,7 +132,7 @@ if [ -n "${HOOK_SESSION_ID:-}" ] && [ "$HOOK_SESSION_ID" != "${LAST_SESSION:-}" 
   [ "${MEOWKIT_TDD:-0}" = "1" ] && echo "- TDD: **enabled** (strict red-green-refactor)" || echo "- TDD: off (default)"
   [ "${MEOWKIT_BUILD_VERIFY:-on}" = "off" ] && echo "- Build verify: **disabled**" || echo "- Build verify: on (default)"
   [ "${MEOWKIT_LOOP_DETECT:-on}" = "off" ] && echo "- Loop detection: **disabled**" || echo "- Loop detection: on (default)"
-  [ -n "${MEOWKIT_HARNESS_MODE:-}" ] && echo "- Harness density: **${MEOWKIT_HARNESS_MODE}** (overridden)" || echo "- Harness density: auto-detect"
+  [ -n "${MEOWKIT_AUTOBUILD_MODE:-}" ] && echo "- Harness density: **${MEOWKIT_AUTOBUILD_MODE}** (overridden)" || echo "- Harness density: auto-detect"
   echo ""
   echo "_Config sources: settings.json \`env\` (defaults) → .claude/.env (overrides) → shell export (highest). Agent sees this block at session start only._"
 fi

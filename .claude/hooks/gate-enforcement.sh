@@ -8,7 +8,7 @@
 # Allows: plan files, test files, docs, config, contract files themselves, and any write after both gates pass
 #
 # Gate 1 bypass: /mk:fix --simple OR scale-routing one-shot
-# Contract gate bypass: MEOWKIT_HARNESS_MODE=LEAN env var (adaptive density for COMPLEX/Opus 4.6)
+# Contract gate bypass: MEOWKIT_AUTOBUILD_MODE=LEAN env var (adaptive density for COMPLEX/Opus 4.6)
 #
 # Load .claude/.env (each hook is a separate subprocess)
 . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true

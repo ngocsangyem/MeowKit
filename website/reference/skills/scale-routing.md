@@ -98,7 +98,7 @@ When the YAML exists, output includes `product_area` and `pic` fields. When abse
 | high (COMPLEX/Opus) | opus-4-6, opus-4.6, opus-4-7 | LEAN |
 | high (COMPLEX/Opus) | other (opus-4-5, claude-opus-4) | FULL |
 
-Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN` env var.
+Override: `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` env var.
 
 ### Output Schema
 
@@ -115,7 +115,7 @@ Full output includes:
 | confidence | HIGH, MEDIUM, LOW | v2.0 |
 | product_area | string (omitted if no YAML) | v2.0 |
 | pic | string[] (omitted if no YAML or no PIC) | v2.0 |
-| harness_density | MINIMAL, FULL, LEAN | v2.1 |
+| autobuild_density | MINIMAL, FULL, LEAN | v2.1 |
 
 ## Workflow
 
@@ -146,7 +146,7 @@ Output:
   "task_type": "feature",
   "suggested_skill": "mk:cook",
   "confidence": "HIGH",
-  "harness_density": "FULL"
+  "autobuild_density": "FULL"
 }
 ```
 
@@ -155,11 +155,11 @@ Output:
 - **Every Phase 0 task classification** — invoked automatically by orchestrator
 - **Domain-specific routing** — fintech, healthcare, gaming tasks get appropriate complexity and model tier
 - **Team-specific customization** — add `.claude/product-areas.yaml` for path-based routing with PIC suggestions
-- **Harness integration** — harness_density field feeds `mk:harness` for scaffolding decisions
+- **Harness integration** — autobuild_density field feeds `mk:autobuild` for scaffolding decisions
 
 ## Pro Tips
 
 - Multiple domains can match a single task — the HIGHEST complexity match wins.
 - One-shot workflow bypass requires BOTH CSV match AND orchestrator zero-blast-radius confirmation. CSV alone is not sufficient.
 - Adding too many low-signal keywords ("data", "app") creates false positives. Keep signals specific to the domain.
-- The harness density script at `.claude/skills/harness/scripts/density-select.sh` is load-bearing infrastructure — do not remove or rename it.
+- The harness density script at `.claude/skills/autobuild/scripts/density-select.sh` is load-bearing infrastructure — do not remove or rename it.

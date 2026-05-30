@@ -216,11 +216,11 @@ cp .claude/.env.example .claude/.env
 
 | Variable | Default | Purpose | When to use |
 |----------|---------|---------|-------------|
-| `MEOWKIT_HARNESS_MODE` | *(auto-detected)* | Override scaffolding density: `MINIMAL` (Haiku), `FULL` (Sonnet/Opus 4.5), `LEAN` (Opus 4.6+) | When auto-detection picks wrong density. `LEAN` skips contract negotiation; `MINIMAL` short-circuits to `/cook`. Does NOT bypass gates. |
+| `MEOWKIT_AUTOBUILD_MODE` | *(auto-detected)* | Override scaffolding density: `MINIMAL` (Haiku), `FULL` (Sonnet/Opus 4.5), `LEAN` (Opus 4.6+) | When auto-detection picks wrong density. `LEAN` skips contract negotiation; `MINIMAL` short-circuits to `/cook`. Does NOT bypass gates. |
 | `MEOWKIT_BUDGET_WARN` | `30` | USD threshold for budget warning message | Lower for cost-conscious sessions, higher for long research runs. |
 | `MEOWKIT_BUDGET_BLOCK` | `100` | USD threshold for hard session block | Emergency brake. Session halts at this amount. |
 | `MEOWKIT_BUDGET_CAP` | *(none)* | User override for hard block — can be lower OR higher than `BUDGET_BLOCK` | Set `MEOWKIT_BUDGET_CAP=200` for intentional high-budget harness runs. Set `MEOWKIT_BUDGET_CAP=15` for tight budgets. |
-| `MEOWKIT_RUN_ID` | `current` | Harness run identifier for trace and budget tracking | Set automatically by `mk:harness` step-00. Don't set manually unless resuming. |
+| `MEOWKIT_RUN_ID` | `current` | Harness run identifier for trace and budget tracking | Set automatically by `mk:autobuild` step-00. Don't set manually unless resuming. |
 
 ### Memory
 
@@ -252,6 +252,6 @@ export MEOWKIT_BUILD_VERIFY=off
 **High-budget harness run on Opus 4.6:**
 ```bash
 export MEOWKIT_BUDGET_CAP=200
-# MEOWKIT_HARNESS_MODE auto-detects LEAN for Opus 4.6
+# MEOWKIT_AUTOBUILD_MODE auto-detects LEAN for Opus 4.6
 ```
 

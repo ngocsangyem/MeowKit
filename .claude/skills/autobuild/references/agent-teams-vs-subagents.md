@@ -1,6 +1,6 @@
 # Agent Teams vs Subagents
 
-When the harness should use file-based subagent dispatches (default) vs live Agent Teams (opt-in for live generator↔evaluator coupling).
+When the autobuild workflow should use file-based subagent dispatches (default) vs live Agent Teams (opt-in for live generator↔evaluator coupling).
 
 ## Contents
 
@@ -18,7 +18,7 @@ When the harness should use file-based subagent dispatches (default) vs live Age
 
 **Default to subagents (file-based, reproducible).** Agent Teams are an opt-in acceleration for **live generator↔evaluator peer comms** during tight iteration loops where the file-based round-trip overhead becomes the bottleneck.
 
-For 95% of harness runs, subagents are correct. Teams are appropriate when: (a) iteration loops run > 5 rounds in practice, (b) the latency between FAIL verdict and next-iteration generate is the dominant cost, (c) the user explicitly opts in via `--teams` flag.
+For 95% of autobuild runs, subagents are correct. Teams are appropriate when: (a) iteration loops run > 5 rounds in practice, (b) the latency between FAIL verdict and next-iteration generate is the dominant cost, (c) the user explicitly opts in via `--teams` flag.
 
 ## Subagents (Default)
 
@@ -32,7 +32,7 @@ For 95% of harness runs, subagents are correct. Teams are appropriate when: (a) 
 - **Reproducible.** Same inputs → same outputs. Replayable for debugging.
 - **Auditable.** Every step is a git commit; the run report is the audit trail.
 - **No coupling.** Generator and evaluator can't accidentally share assumptions.
-- **Resumable.** Killed harness runs resume from the last completed step.
+- **Resumable.** Killed autobuild runs resume from the last completed step.
 - **Observable.** Every artifact is a file; users can read intermediate state.
 
 **Cons:**
@@ -76,18 +76,18 @@ For 95% of harness runs, subagents are correct. Teams are appropriate when: (a) 
 
 ## Configuration
 
-To opt in to Agent Teams for a harness run:
+To opt in to Agent Teams for a autobuild run:
 
 ```bash
-/mk:harness "build a kanban app" --teams
+/mk:autobuild "build a kanban app" --teams
 ```
 
-The harness then uses `mk:team-config` to spin up a generator + evaluator team, hands off the contract via shared task queue, and runs the iteration loop with live message passing.
+The autobuild workflow then uses `mk:team-config` to spin up a generator + evaluator team, hands off the contract via shared task queue, and runs the iteration loop with live message passing.
 
 To force subagent mode (override any default that might switch):
 
 ```bash
-/mk:harness "..." --no-teams
+/mk:autobuild "..." --no-teams
 ```
 
 Both flags are logged in the run report.
@@ -109,9 +109,9 @@ Both can READ the contract at `tasks/contracts/*.md`. Neither can WRITE to it wi
 
 ## Defaults
 
-- `mk:harness` defaults to **subagents** unless `--teams` flag is set
+- `mk:autobuild` defaults to **subagents** unless `--teams` flag is set
 - `mk:cook` (single-task) always uses subagents — teams are not relevant for single-task pipelines
-- The harness run report records which mode was used in the "Density Decision" section alongside the density choice
+- The autobuild run report records which mode was used in the "Density Decision" section alongside the density choice
 
 ## Risk Notes
 

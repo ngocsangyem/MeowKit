@@ -1,11 +1,11 @@
 ---
-name: mk:harness
+name: mk:autobuild
 version: 1.0.0
 preamble-tier: 3
 description: >-
   Use when running an autonomous multi-hour build of a green-field product —
   orchestrates planner → contract → generator ⇄ evaluator loop with adaptive
-  scaffolding density per model tier. Triggers on /mk:harness, "build me a
+  scaffolding density per model tier. Triggers on /mk:autobuild, "build me a
   kanban app", "build a retro game maker", "autonomous build", or any
   green-field product spec. NOT for scoped single-task work (see mk:cook);
   NOT for initial project scaffolding only (see mk:bootstrap).
@@ -34,14 +34,14 @@ meowkit:
   context_cost: high
 ---
 
-# mk:harness — Autonomous Multi-Hour Build Orchestration
+# mk:autobuild — Autonomous Multi-Hour Build Orchestration
 
 Step-file workflow that runs the complete generator/evaluator harness pipeline as an autonomous build. Handles green-field product builds (Phase 1 product-level plan → Phase 4 sprint contract → Phase 3 evaluator loop → ship decision) with adaptive scaffolding density based on detected model tier.
 
 ## When to Use
 
 Activate when:
-- User runs `/mk:harness "build a X"` (or any green-field product description)
+- User runs `/mk:autobuild "build a X"` (or any green-field product description)
 - Existing kit detection routes a green-field "build me an app" intent here instead of `mk:cook`
 - A multi-hour autonomous build is requested with no manual handholding
 
@@ -52,13 +52,13 @@ Skip when:
 
 ## Hard Constraints
 
-1. **Adaptive density** — picks scaffolding density via `mk:scale-routing` (or `density-select.sh`); honors `MEOWKIT_HARNESS_MODE` env override
+1. **Adaptive density** — picks scaffolding density via `mk:scale-routing` (or `density-select.sh`); honors `MEOWKIT_AUTOBUILD_MODE` env override
 2. **Budget caps** — warns at $30 spent, requires explicit approval at $100, hard-blocks at user-set `--budget` value
 3. **6-hour wall-clock timeout** — hard limit per Anthropic's observed runs <!-- research-citation -->; checkpoints every step for resumability
 4. **Max 3 iteration rounds** between generator and evaluator before escalating to human (configurable via `--max-iter`)
-5. **Run report mandatory** — every harness run produces `tasks/harness-runs/YYMMDD-{slug}/run.md` with full audit trail
+5. **Run report mandatory** — every autobuild run produces `tasks/autobuild-runs/YYMMDD-{slug}/run.md` with full audit trail
 6. **Coexists with `mk:cook`** — does not replace it; both route through Gate 1 + Gate 2
-7. **TDD opt-in (parallel to cook):** harness respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.claude/session-state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `harness-rules.md`) is independent of TDD mode and always applies.
+7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.claude/session-state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `harness-rules.md`) is independent of TDD mode and always applies.
 
 ## Workflow
 
@@ -84,7 +84,7 @@ Step 6: Run Report          → write the audit trail
 
 ## Run Report Schema
 
-Every run writes `tasks/harness-runs/YYMMDD-{slug}/run.md`:
+Every run writes `tasks/autobuild-runs/YYMMDD-{slug}/run.md`:
 
 ```markdown
 ---
@@ -99,7 +99,7 @@ started: 2026-04-08T14:50:00Z
 ended: 2026-04-08T15:18:00Z
 ---
 
-# Harness Run — {task description}
+# Autobuild Run — {task description}
 
 ## Density Decision
 - Detected tier: {tier}
@@ -127,12 +127,12 @@ ended: 2026-04-08T15:18:00Z
 
 ## Gotchas
 
-- **Don't run on a non-green-field task.** Use `mk:cook` for single features, bug fixes, refactors. The harness is for "build me an app" scope.
-- **Density override stays in scope.** `MEOWKIT_HARNESS_MODE=LEAN` does NOT skip Gate 2. Review verdict is still mandatory before ship.
+- **Don't run on a non-green-field task.** Use `mk:cook` for single features, bug fixes, refactors. The autobuild workflow is for "build me an app" scope.
+- **Density override stays in scope.** `MEOWKIT_AUTOBUILD_MODE=LEAN` does NOT skip Gate 2. Review verdict is still mandatory before ship.
 - **Iteration loops are bounded.** Max 3 by default. After round 3, escalate — don't keep iterating blindly.
-- **Budget check is authoritative.** If `budget-tracker.sh` says block, the harness halts even mid-iteration.
+- **Budget check is authoritative.** If `budget-tracker.sh` says block, the autobuild workflow halts even mid-iteration.
 - **Run reports are append-only.** Don't edit prior steps' entries — the report is the audit trail.
-- **Resumable.** If the harness is killed mid-run, `/mk:harness --resume {run-id}` picks up at the last completed step.
+- **Resumable.** If the autobuild workflow is killed mid-run, `/mk:autobuild --resume {run-id}` picks up at the last completed step.
 
 ## References
 
@@ -150,11 +150,11 @@ ended: 2026-04-08T15:18:00Z
 | `references/agent-teams-vs-subagents.md` | When to use teams vs file-based subagents |
 | `scripts/density-select.sh` | Standalone density selector for scriptable use |
 | `scripts/budget-tracker.sh` | Cost-log reader; threshold warnings + hard block |
-| `../mk:plan-creator/` | Phase 1 — product-level planner |
-| `../mk:sprint-contract/` | Phase 4 — contract negotiation |
-| `../mk:rubric/` | Phase 2 — rubric library |
-| `../mk:evaluate/` | Phase 3 — behavioral evaluator |
-| `../mk:scale-routing/` | Tier + density emission |
+| `../plan-creator/` | Phase 1 — product-level planner |
+| `../sprint-contract/` | Phase 4 — contract negotiation |
+| `../rubric/` | Phase 2 — rubric library |
+| `../evaluate/` | Phase 3 — behavioral evaluator |
+| `../scale-routing/` | Tier + density emission |
 
 ## Start
 

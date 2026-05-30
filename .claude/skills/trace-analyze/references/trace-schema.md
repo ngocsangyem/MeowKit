@@ -9,10 +9,10 @@ Reference for `.claude/memory/trace-log.jsonl` records. Append-only JSONL writte
 | `schema_version` | string | yes | always `"1.0"` (current) |
 | `ts` | string | yes | ISO 8601 UTC timestamp `YYYY-MM-DDTHH:MM:SSZ` |
 | `event` | string | yes | one of the canonical event types below |
-| `run_id` | string | optional | `MEOWKIT_RUN_ID` env var (set by `mk:harness` step-00) |
+| `run_id` | string | optional | `MEOWKIT_RUN_ID` env var (set by `mk:autobuild` step-00) |
 | `harness_version` | string | yes | `MEOWKIT_HARNESS_VERSION` env var, default `"3.0.0"` |
 | `model` | string | optional | `MEOWKIT_MODEL_HINT` or `CLAUDE_MODEL` env var |
-| `density` | string | optional | `MEOWKIT_HARNESS_MODE` env var (`MINIMAL\|FULL\|LEAN`) |
+| `density` | string | optional | `MEOWKIT_AUTOBUILD_MODE` env var (`MINIMAL\|FULL\|LEAN`) |
 | `data` | object | yes | event-specific payload (see Event Types below) |
 
 ## Canonical Event Types
@@ -22,7 +22,7 @@ Reference for `.claude/memory/trace-log.jsonl` records. Append-only JSONL writte
 | `file_edited` | `learning-observer.sh` | `{file: str, edit_count: int}` |
 | ~~`build_verify_result`~~ | **DEPRECATED (v2.4.0)** — `.sh` emitter removed; `handlers/build-verify.cjs` does NOT re-emit | `{file: str, exit_code: int, command: str}` (historical only) |
 | ~~`loop_warning`~~ | **DEPRECATED (v2.4.0)** — `.sh` emitter removed; `handlers/loop-detection.cjs` does NOT re-emit | `{file: str, count: int, threshold: 4 \| 8}` (historical only) |
-| `harness_run_start` | `mk:harness` step-00 | `{task: str, density: str, model: str, run_id: str}` |
+| `harness_run_start` | `mk:autobuild` step-00 | `{task: str, density: str, model: str, run_id: str}` |
 | `contract_signed` | `mk:sprint-contract` sign action | `{slug: str, sprint: int, generator_sha: str, evaluator_sha: str}` |
 | `verdict_written` | `mk:evaluate` step-04 | `{slug: str, overall: str, weighted_score: float, hard_fail: bool, evidence_count: int}` |
 | `cost_sample` | `budget-tracker.sh` | `{step: str, usd: float, cumulative_usd: float}` |

@@ -6,7 +6,7 @@ description: |
   from idea to running code. Research → design → plan → scaffold → implement → docs.
   Explicit invocation only — never auto-activates.
   CLI = project infrastructure (.claude/), bootstrap = application code + full pipeline.
-  NOT for autonomous multi-hour builds of specified products (see mk:harness);
+  NOT for autonomous multi-hour builds of specified products (see mk:autobuild);
   NOT for single-task feature work on existing projects (see mk:cook).
 allowed-tools:
   - Bash
@@ -19,7 +19,7 @@ allowed-tools:
   - WebSearch
 source: local
 keywords: [bootstrap, scaffold, new-project, initial-scaffolding, greenfield-init]
-when_to_use: "Use when scaffolding a brand-new project from scratch. NOT for autonomous green-field product builds (see mk:harness) or single-task implementation (see mk:cook)."
+when_to_use: "Use when scaffolding a brand-new project from scratch. NOT for autonomous green-field product builds (see mk:autobuild) or single-task implementation (see mk:cook)."
 user-invocable: true
 ---
 

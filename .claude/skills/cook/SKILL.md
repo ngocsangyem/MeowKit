@@ -1,11 +1,11 @@
 ---
 name: mk:cook
-description: "Orchestrates single-task implementation pipeline: plan → test → build → review → ship. Use for feature work, plan execution, or fixes scoped to a single task. NOT for green-field product builds (see mk:harness); NOT for auto-invoked workflow orchestration (see mk:workflow-orchestrator)."
+description: "Orchestrates single-task implementation pipeline: plan → test → build → review → ship. Use for feature work, plan execution, or fixes scoped to a single task. NOT for green-field product builds (see mk:autobuild); NOT for auto-invoked workflow orchestration (see mk:workflow-orchestrator)."
 source: local
 version: 1.0.0
 argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict]"
 keywords: [cook, implement-pipeline, plan-execution, feature-build, seven-phase, single-task]
-when_to_use: "Use when implementing a single task end-to-end (plan→test→build→review→ship). NOT for green-field product builds (see mk:harness) or auto-invoked workflow orchestration (see mk:workflow-orchestrator)."
+when_to_use: "Use when implementing a single task end-to-end (plan→test→build→review→ship). NOT for green-field product builds (see mk:autobuild) or auto-invoked workflow orchestration (see mk:workflow-orchestrator)."
 user-invocable: true
 ---
 
@@ -70,7 +70,7 @@ Before starting work, read `references/failure-catalog.md` for common implementa
 
 See `references/intent-detection.md` for full detection logic.
 
-> **Green-field product build** (new kanban app, full SaaS from scratch, multi-sprint autonomous build)? Use `mk:harness` instead. Cook handles single features, fixes, and refactors; harness owns the generator↔evaluator loop and adaptive scaffolding density.
+> **Green-field product build** (new kanban app, full SaaS from scratch, multi-sprint autonomous build)? Use `mk:autobuild` instead. Cook handles single features, fixes, and refactors; harness owns the generator↔evaluator loop and adaptive scaffolding density.
 
 | Input Pattern                    | Mode        | Behavior                                      |
 | -------------------------------- | ----------- | --------------------------------------------- |

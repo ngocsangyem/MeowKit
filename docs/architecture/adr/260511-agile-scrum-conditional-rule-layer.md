@@ -48,9 +48,9 @@ Path discipline: leading `sprint-state-` prefix prevents glob collision with the
 
 `mk:jira-agile sprint add|remove` and `mk:sprint-contract sprint-goal set` MUST acquire `flock` on the sprint-state file before any read-modify-write cycle. YAML frontmatter append is non-atomic across shells. Documented in both rule body and consuming skills.
 
-### Spike plans are INCOMPATIBLE with `mk:harness` FULL
+### Spike plans are INCOMPATIBLE with `mk:autobuild` FULL
 
-Harness FULL requires Phase 2 (test red) → Phase 3 (build green) → Phase 4 (review) sequence with sprint-contract gate. Spikes skip Phase 2 and Phase 5. Run via `mk:cook` or `mk:plan-creator --fast`. Documented in `harness-runbook.md` and rejected at `mk:plan-creator` step-00.
+Autobuild FULL requires Phase 2 (test red) → Phase 3 (build green) → Phase 4 (review) sequence with sprint-contract gate. Spikes skip Phase 2 and Phase 5. Run via `mk:cook` or `mk:plan-creator --fast`. Documented in `autobuild-runbook.md` and rejected at `mk:plan-creator` step-00.
 
 ### Pruning-plan dependency
 

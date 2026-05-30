@@ -65,4 +65,4 @@ The orchestrator routes by skill names:
 
 Pick one primary skill per distinct intent.
 
-If a task spans domains, run the workflow skill first (`mk:plan-creator`, `mk:cook`, `mk:fix`, or `mk:harness`) and load the domain skill at the phase where it is needed.
+If a task spans domains, run the workflow skill first (`mk:plan-creator`, `mk:cook`, `mk:fix`, or `mk:autobuild`) and load the domain skill at the phase where it is needed.

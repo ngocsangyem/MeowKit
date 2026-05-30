@@ -23,7 +23,7 @@ Creates and negotiates a sprint contract — a signed agreement between the gene
 - **Git signing:** two-commit-per-agent protocol — each party commits their signature separately, SHA capture for non-repudiation
 - **Amendment protocol:** nullifies existing signatures on amend, append-only changes, re-signing required
 - **Validation:** `validate-contract.sh` checks 7 categories (frontmatter, status enum, rubric_preset, AC count, GWT form, injection patterns, required sections)
-- **Hard constraints:** max 2 negotiation rounds, max 15 ACs, LEAN mode bypass via `MEOWKIT_HARNESS_MODE=LEAN`
+- **Hard constraints:** max 2 negotiation rounds, max 15 ACs, LEAN mode bypass via `MEOWKIT_AUTOBUILD_MODE=LEAN`
 
 ## Arguments
 

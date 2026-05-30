@@ -48,7 +48,7 @@ Must output `PLAN_COMPLETE`. Fix reported issues before proceeding.
 
 **Skip if:** `planning_mode = fast` — go directly to step-07-gate.md.
 
-**Skip if:** `planning_mode = product-level` — the `validate-plan.py` script expects phase files and per-phase schema. Product-level plans have a different schema (product spec). Section 4a' above replaces 4b for this mode. Go directly to step-07-gate.md (step-05 red-team and step-06 validation interview are also skipped for product-level v1 — the spec is the deliverable, phase decomposition happens in `mk:harness`).
+**Skip if:** `planning_mode = product-level` — the `validate-plan.py` script expects phase files and per-phase schema. Product-level plans have a different schema (product spec). Section 4a' above replaces 4b for this mode. Go directly to step-07-gate.md (step-05 red-team and step-06 validation interview are also skipped for product-level v1 — the spec is the deliverable, phase decomposition happens in `mk:autobuild`).
 
 ### 4c. Two-Approach Selection (conditional: `planning_mode = two`)
 

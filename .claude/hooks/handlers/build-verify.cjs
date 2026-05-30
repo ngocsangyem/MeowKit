@@ -64,7 +64,7 @@ function whichSync(cmd) {
 module.exports = function buildVerify(ctx, state) {
   // Bypass checks
   if (process.env.MEOWKIT_BUILD_VERIFY === 'off') return '';
-  if (process.env.MEOWKIT_HARNESS_MODE === 'MINIMAL') return '';
+  if (process.env.MEOWKIT_AUTOBUILD_MODE === 'MINIMAL') return '';
 
   const filePath = ctx.tool_input?.file_path;
   if (!filePath || !fs.existsSync(filePath)) return '';

@@ -1,6 +1,6 @@
 # Step 1: Plan (Product-Level)
 
-Invoke `mk:plan-creator` in product-level mode (Phase 1 of the harness plan). Produces an ambitious user-story spec at `tasks/plans/{date}-{slug}/plan.md` with no implementation details.
+Invoke `mk:plan-creator` in product-level mode (Phase 1 of the autobuild workflow plan). Produces an ambitious user-story spec at `tasks/plans/{date}-{slug}/plan.md` with no implementation details.
 
 ## Instructions
 
@@ -52,7 +52,7 @@ Persist `plan_dir` and `slug` for downstream steps.
 
 ### 1d. Verify Gate 1
 
-The planner enforces Gate 1 internally (user must approve the plan before the plan-creator skill returns). If the planner reports the plan was rejected or modified, halt the harness and surface the user feedback — do NOT proceed to step-02.
+The planner enforces Gate 1 internally (user must approve the plan before the plan-creator skill returns). If the planner reports the plan was rejected or modified, halt the autobuild workflow and surface the user feedback — do NOT proceed to step-02.
 
 ### 1e. Append to run report
 

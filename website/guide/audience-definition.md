@@ -41,7 +41,7 @@
 - What flag do I pass to skip tests? (`--tdd`? no, that enables it...)
 - What does the review verdict format look like?
 - How do I chain cook → review → ship?
-- What's the difference between /mk:cook and /mk:harness?
+- What's the difference between /mk:cook and /mk:autobuild?
 - How do I fix a bug that's already in production?
 
 **Docs they hit:**

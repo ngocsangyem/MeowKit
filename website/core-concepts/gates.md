@@ -25,7 +25,7 @@ Gate 1 ensures the agent cannot start implementing until a human approves the pl
 **Bypass conditions (documented, intentional):**
 - `/mk:fix --quick` for trivial fixes affecting ≤ 2 files
 - Scale-routing one-shot for low-complexity domains (docs, config)
-- `MEOWKIT_HARNESS_MODE=LEAN` for Opus 4.6+ (contract optional, gate still applies)
+- `MEOWKIT_AUTOBUILD_MODE=LEAN` for Opus 4.6+ (contract optional, gate still applies)
 
 ### Gate 2 — Review before ship
 

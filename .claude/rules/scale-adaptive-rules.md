@@ -36,13 +36,13 @@ WHY: User-editable rows keep routing relevant to project-specific domains.
 
 ## Rule 6: Adaptive Density Emission (Phase 5 — 260408)
 
-When `mk:scale-routing` returns a tier classification, it ALSO emits a `harness_density` field (`MINIMAL | FULL | LEAN`) for `mk:harness` consumers.
+When `mk:scale-routing` returns a tier classification, it ALSO emits a `autobuild_density` field (`MINIMAL | FULL | LEAN`) for `mk:autobuild` consumers.
 
-**Single source of truth:** the full decision matrix lives at `.claude/skills/harness/references/adaptive-density-matrix.md`. Do NOT duplicate the table here — it drifts. This rule references the matrix; the matrix is authoritative.
+**Single source of truth:** the full decision matrix lives at `.claude/skills/autobuild/references/adaptive-density-matrix.md`. Do NOT duplicate the table here — it drifts. This rule references the matrix; the matrix is authoritative.
 
 WHY: Dead-weight thesis — over-scaffolding degrades capable models.
 
-Override: `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN` overrides auto-detection and is logged.
+Override: `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` overrides auto-detection and is logged.
 
 GUARD: Density choice does NOT bypass any gate. Gate 1 (plan), Gate 2 (review verdict), and the active-verification HARD GATE on evaluator verdicts ALL still apply regardless of density mode.
 
@@ -52,6 +52,6 @@ When `mk:scale-routing` returns `level=high` during a `/mk:cook` run, the cook w
 
 WHY: High-complexity domains need runtime proof that structural review can miss.
 
-GUARD: Auto-strict fires ONLY in mk:cook, NOT in mk:fix, mk:harness (which has its own evaluator), or standalone mk:review. The `--no-strict` flag is the user escape hatch.
+GUARD: Auto-strict fires ONLY in mk:cook, NOT in mk:fix, mk:autobuild (which has its own evaluator), or standalone mk:review. The `--no-strict` flag is the user escape hatch.
 
 Evaluator drives the running app and verifies critical flows end-to-end.

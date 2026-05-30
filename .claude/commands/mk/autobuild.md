@@ -1,21 +1,21 @@
-# /harness — Autonomous Multi-Hour Build Pipeline
+# /mk:autobuild — Autonomous Product-Build Pipeline
 
 ## Usage
 
 ```
-/harness [product description]
-/harness --resume [run-id]
-/harness --tier [MINIMAL|FULL|LEAN]
-/harness --budget [amount-usd]
-/harness --max-iter [N]
+/mk:autobuild [product description]
+/mk:autobuild --resume [run-id]
+/mk:autobuild --tier [MINIMAL|FULL|LEAN]
+/mk:autobuild --budget [amount-usd]
+/mk:autobuild --max-iter [N]
 ```
 
 ## Behavior
 
-Runs `mk:harness` skill — the autonomous generator⇄evaluator build pipeline for green-field products. Preferred over `/cook` for product-level builds ("build me a kanban app").
+Runs `mk:autobuild` skill — the autonomous generator/evaluator build pipeline for green-field products. Preferred over `/mk:cook` for product-level builds ("build me a kanban app").
 
 Adaptive scaffolding density per model tier:
-- **MINIMAL** (Haiku) — short-circuits to `/cook`
+- **MINIMAL** (Haiku) — short-circuits to `/mk:cook`
 - **FULL** (Sonnet, Opus 4.5) — contract + 1–3 iterations + context resets
 - **LEAN** (Opus 4.6+) — single-session, contract optional
 
@@ -33,7 +33,7 @@ Adaptive scaffolding density per model tier:
 
 | Flag | Behavior |
 |------|----------|
-| `--resume` | Resume a previous harness run from last checkpoint |
+| `--resume` | Resume a previous autobuild run from last checkpoint |
 | `--tier` | Override auto-detected density (MINIMAL/FULL/LEAN) |
 | `--budget` | Set session budget cap in USD (overrides $100 default) |
 | `--max-iter` | Override iteration cap (default: 3) |
@@ -41,5 +41,5 @@ Adaptive scaffolding density per model tier:
 ### Output
 
 - Product build with passing evaluator verdict
-- Run report at `tasks/harness-runs/`
+- Run report at `tasks/autobuild-runs/`
 - Budget tracking in `session-state/budget-state.json`

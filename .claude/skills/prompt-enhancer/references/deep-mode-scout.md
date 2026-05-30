@@ -164,7 +164,7 @@ when:
 | Condition                               | `abort_reason`             | Behavior                                                             |
 | --------------------------------------- | -------------------------- | -------------------------------------------------------------------- |
 | Not in a git repo                       | `NO_GIT_REPO`              | Run as default mode + one-line note                                  |
-| `MEOWKIT_HARNESS_MODE=MINIMAL`          | `MINIMAL_DENSITY`          | Downgrade to default + one-line note (per `harness-rules.md` Rule 3) |
+| `MEOWKIT_AUTOBUILD_MODE=MINIMAL`          | `MINIMAL_DENSITY`          | Downgrade to default + one-line note (per `harness-rules.md` Rule 3) |
 | Allow-list returns zero matches         | `NO_MATCHES`               | Run as default + one-line note "no codebase context found"           |
 | Time/file/line caps exceeded            | `SCOUT_BUDGET_EXCEEDED`    | Use partial hits if any; otherwise fall back to default              |
 | Forbid-list violation detected post-hoc | `SCOUT_BOUNDARY_VIOLATION` | Refuse to save output; emit error                                    |

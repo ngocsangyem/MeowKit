@@ -8,7 +8,7 @@ rubric_preset: fullstack-product
 
 # Task: Build a Mini "Notes" App End-to-End
 
-**`--full` tier ONLY.** This task triggers `mk:harness` for a complete green-field build and can run for 60–90 minutes. Refuses to run without the explicit `--full` flag.
+**`--full` tier ONLY.** This task triggers `mk:autobuild` for a complete green-field build and can run for 60–90 minutes. Refuses to run without the explicit `--full` flag.
 
 ## Product Spec (input to `mk:plan-creator --product-level`)
 

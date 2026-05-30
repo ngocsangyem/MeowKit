@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# density-select.sh — Echoes the harness scaffolding density token (MINIMAL|FULL|LEAN)
-# based on detected model + tier. Used by mk:harness step-00 and any caller that
+# density-select.sh — Echoes the autobuild scaffolding density token (MINIMAL|FULL|LEAN)
+# based on detected model + tier. Used by mk:autobuild step-00 and any caller that
 # needs scriptable density resolution.
 #
 # Usage:  density-select.sh [--tier auto|trivial|standard|complex] [--model <model-id>]
@@ -14,21 +14,21 @@
 #   tier == COMPLEX + other model                              → FULL
 #
 # Override:
-#   MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN  (env var, highest priority)
+#   MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN  (env var, highest priority)
 #   --tier flag                              (cli, second priority)
 #   --model flag                             (cli, supplements tier)
 #   auto-detection from CLAUDE_MODEL env var (fallback)
 set -u
 
-# 1. Highest priority: MEOWKIT_HARNESS_MODE env override
-if [ -n "${MEOWKIT_HARNESS_MODE:-}" ]; then
-  case "$MEOWKIT_HARNESS_MODE" in
+# 1. Highest priority: MEOWKIT_AUTOBUILD_MODE env override
+if [ -n "${MEOWKIT_AUTOBUILD_MODE:-}" ]; then
+  case "$MEOWKIT_AUTOBUILD_MODE" in
     MINIMAL|FULL|LEAN)
-      echo "$MEOWKIT_HARNESS_MODE"
+      echo "$MEOWKIT_AUTOBUILD_MODE"
       exit 0
       ;;
     *)
-      echo "ERROR: invalid MEOWKIT_HARNESS_MODE='$MEOWKIT_HARNESS_MODE' (expected MINIMAL|FULL|LEAN)" >&2
+      echo "ERROR: invalid MEOWKIT_AUTOBUILD_MODE='$MEOWKIT_AUTOBUILD_MODE' (expected MINIMAL|FULL|LEAN)" >&2
       exit 2
       ;;
   esac

@@ -215,10 +215,10 @@ export default withMermaid(defineConfig({
           ],
         },
         {
-          text: 'Harness Pipeline',
+          text: 'Autobuild Pipeline',
           collapsed: true,
           items: [
-            { text: 'mk:harness', link: '/reference/skills/harness' },
+            { text: 'mk:autobuild', link: '/reference/skills/autobuild' },
             { text: 'mk:sprint-contract', link: '/reference/skills/sprint-contract' },
             { text: 'mk:evaluate', link: '/reference/skills/evaluate' },
             { text: 'mk:rubric', link: '/reference/skills/rubric' },
@@ -235,6 +235,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:fix', link: '/reference/skills/fix' },
             { text: 'mk:ship', link: '/reference/skills/ship' },
             { text: 'mk:verify', link: '/reference/skills/verify' },
+            { text: 'mk:loop', link: '/reference/skills/loop' },
             { text: 'mk:workflow-orchestrator', link: '/reference/skills/workflow-orchestrator' },
             { text: 'mk:session-continuation', link: '/reference/skills/session-continuation' },
           ],

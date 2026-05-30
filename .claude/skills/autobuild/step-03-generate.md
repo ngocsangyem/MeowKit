@@ -6,7 +6,7 @@ Spawn the `developer` subagent to implement the build per the signed contract (o
 
 ### 3a. Pre-flight checks
 
-- `gate-enforcement.sh` will block source-code edits unless either (a) a signed contract exists OR (b) `MEOWKIT_HARNESS_MODE=LEAN`
+- `gate-enforcement.sh` will block source-code edits unless either (a) a signed contract exists OR (b) `MEOWKIT_AUTOBUILD_MODE=LEAN`
 - Confirm `plan_dir` is set (from step-01)
 - Confirm `contract_path` is set OR null with reason logged (from step-02)
 - Confirm `budget_spent` is below `budget_cap`
@@ -25,7 +25,7 @@ sed -i.bak "s/^iterations:.*/iterations: $iteration/" "$run_dir/run.md" && rm "$
 echo "Iteration: $iteration / $max_iter"
 ```
 
-The iteration counter lives in the run report frontmatter, NOT in session memory. This makes the harness resumable: a killed run can be restarted with `/mk:harness --resume {run_id}` and the orchestrator reads the last iteration from `$run_dir/run.md`.
+The iteration counter lives in the run report frontmatter, NOT in session memory. This makes the autobuild workflow resumable: a killed run can be restarted with `/mk:autobuild --resume {run_id}` and the orchestrator reads the last iteration from `$run_dir/run.md`.
 
 ### 3c. Dispatch the developer subagent
 
@@ -99,7 +99,7 @@ fi
 
 **Persist cost:**
 
-The harness does not have native access to per-call token costs. The agent estimates `step_cost_usd` from elapsed wall-clock × tier rate (see `references/adaptive-density-matrix.md` for tier rates), or sets it to `0.00` if no estimate is feasible. The cost is a HINT for budget thresholds — not an authoritative billing record.
+The autobuild workflow does not have native access to per-call token costs. The agent estimates `step_cost_usd` from elapsed wall-clock × tier rate (see `references/adaptive-density-matrix.md` for tier rates), or sets it to `0.00` if no estimate is feasible. The cost is a HINT for budget thresholds — not an authoritative billing record.
 
 ```bash
 # Estimate: wall-clock seconds × per-second tier rate.
@@ -117,10 +117,10 @@ case "$tier" in
 esac
 step_cost_usd=$(awk -v s="$elapsed_seconds" -v r="$rate" 'BEGIN { printf "%.2f", (s/60.0)*r }')
 
-MEOWKIT_RUN_ID="$run_id" .claude/skills/harness/scripts/budget-tracker.sh add "$step_cost_usd" "step-03-iter-${iteration}"
+MEOWKIT_RUN_ID="$run_id" .claude/skills/autobuild/scripts/budget-tracker.sh add "$step_cost_usd" "step-03-iter-${iteration}"
 
 # Check thresholds — exit code 0 ok, 1 warn, 2 hard block, 3 user cap
-if ! MEOWKIT_RUN_ID="$run_id" .claude/skills/harness/scripts/budget-tracker.sh check; then
+if ! MEOWKIT_RUN_ID="$run_id" .claude/skills/autobuild/scripts/budget-tracker.sh check; then
   exit_code=$?
   if [ "$exit_code" -ge 2 ]; then
     final_status=TIMED_OUT

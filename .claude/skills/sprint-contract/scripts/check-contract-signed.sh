@@ -9,7 +9,7 @@
 # Reqs:   Bash 3.2+. Tested macOS BSD + GNU coreutils.
 #
 # Behavior:
-#   1. If MEOWKIT_HARNESS_MODE=LEAN  → exit 0 (LEAN mode bypass per adaptive density policy)
+#   1. If MEOWKIT_AUTOBUILD_MODE=LEAN  → exit 0 (LEAN mode bypass per adaptive density policy)
 #   2. Resolve active plan dir (newest tasks/plans/YYMMDD-* directory)
 #   3. Look for signed contract at tasks/contracts/{slug}-sprint-{N}.md where status: signed
 #   4. Exit 0 if found, 1 otherwise
@@ -17,12 +17,12 @@ set -u
 
 # 1. LEAN/MINIMAL mode bypass — per harness-rules.md Rule 3:
 #    MINIMAL (Haiku) = contract skipped, LEAN (Opus 4.6+) = contract optional
-if [ "${MEOWKIT_HARNESS_MODE:-}" = "LEAN" ] || [ "${MEOWKIT_HARNESS_MODE:-}" = "MINIMAL" ]; then
+if [ "${MEOWKIT_AUTOBUILD_MODE:-}" = "LEAN" ] || [ "${MEOWKIT_AUTOBUILD_MODE:-}" = "MINIMAL" ]; then
   # Log the bypass for audit (per security considerations) but don't block
   if [ -d ".claude" ]; then
     log_file=".claude/memory/lean-bypass.log"
     mkdir -p "$(dirname "$log_file")" 2>/dev/null || true
-    echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) MEOWKIT_HARNESS_MODE=LEAN bypassed contract gate" >> "$log_file" 2>/dev/null || true
+    echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) MEOWKIT_AUTOBUILD_MODE=LEAN bypassed contract gate" >> "$log_file" 2>/dev/null || true
   fi
   exit 0
 fi
@@ -62,7 +62,7 @@ if [ ! -d "tasks/contracts" ]; then
   echo "" >&2
   echo "To proceed, do ONE of:" >&2
   echo "  1. Run: /mk:sprint-contract propose $slug" >&2
-  echo "  2. Set: export MEOWKIT_HARNESS_MODE=LEAN  (skips contract for Opus 4.6 tier)" >&2
+  echo "  2. Set: export MEOWKIT_AUTOBUILD_MODE=LEAN  (skips contract for Opus 4.6 tier)" >&2
   exit 1
 fi
 
@@ -107,5 +107,5 @@ echo "" >&2
 echo "To proceed, do ONE of:" >&2
 echo "  1. Run: /mk:sprint-contract propose $slug" >&2
 echo "     Then: /mk:sprint-contract sign (after evaluator review)" >&2
-echo "  2. Set: export MEOWKIT_HARNESS_MODE=LEAN  (Opus 4.6 LEAN mode bypass)" >&2
+echo "  2. Set: export MEOWKIT_AUTOBUILD_MODE=LEAN  (Opus 4.6 LEAN mode bypass)" >&2
 exit 1

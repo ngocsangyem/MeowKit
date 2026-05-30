@@ -6,7 +6,7 @@ Canonical registry of every meowkit skill, its activation triggers, callers, and
 
 | Field | Meaning |
 |---|---|
-| **Skill** | Skill name (e.g., `mk:harness`) |
+| **Skill** | Skill name (e.g., `mk:autobuild`) |
 | **Trigger** | Auto-activation pattern OR explicit user invocation |
 | **Caller** | Which agent/skill/hook/user invokes this |
 | **User phrases** | Natural-language phrases that surface this skill |
@@ -16,21 +16,21 @@ Canonical registry of every meowkit skill, its activation triggers, callers, and
 
 | Skill | Trigger | Caller | User phrases | Outputs |
 |---|---|---|---|---|
-| `mk:harness` | User invocation; auto-suggest on green-field "build me a X" intent | User; orchestrator routing | "build me a kanban app", "make a retro game maker", "create a SaaS dashboard", "autonomous build" | `tasks/harness-runs/{run-id}/run.md` + all per-step artifacts |
-| `mk:plan-creator` | `/mk:plan` or `/mk:cook`; harness step-01 | User; `mk:harness`; `mk:cook` | "create a plan", "plan this feature", "draft a spec" | `tasks/plans/{date-slug}/plan.md` + phase files |
-| `mk:plan-creator --product-level` | step-00 of plan-creator detects green-field intent; harness step-01 | `mk:plan-creator`; `mk:harness` step-01 | "build a kanban app" (auto-detected); explicit `--product-level` flag | `tasks/plans/{date-slug}/plan.md` (product spec form, no phase files) |
-| `mk:sprint-contract` | Harness step-02 (FULL density); pre-developer for any sprint-driven build | `mk:harness` step-02; user via `/mk:sprint-contract` | "draft a sprint contract", "negotiate scope for sprint" | `tasks/contracts/{date}-{slug}-sprint-{N}.md` |
+| `mk:autobuild` | User invocation; auto-suggest on green-field "build me a X" intent | User; orchestrator routing | "build me a kanban app", "make a retro game maker", "create a SaaS dashboard", "autonomous build" | `tasks/autobuild-runs/{run-id}/run.md` + all per-step artifacts |
+| `mk:plan-creator` | `/mk:plan` or `/mk:cook`; harness step-01 | User; `mk:autobuild`; `mk:cook` | "create a plan", "plan this feature", "draft a spec" | `tasks/plans/{date-slug}/plan.md` + phase files |
+| `mk:plan-creator --product-level` | step-00 of plan-creator detects green-field intent; harness step-01 | `mk:plan-creator`; `mk:autobuild` step-01 | "build a kanban app" (auto-detected); explicit `--product-level` flag | `tasks/plans/{date-slug}/plan.md` (product spec form, no phase files) |
+| `mk:sprint-contract` | Harness step-02 (FULL density); pre-developer for any sprint-driven build | `mk:autobuild` step-02; user via `/mk:sprint-contract` | "draft a sprint contract", "negotiate scope for sprint" | `tasks/contracts/{date}-{slug}-sprint-{N}.md` |
 | `mk:rubric` | Loaded by `mk:evaluate` step-01; user via `/mk:rubric` | `evaluator` agent; user | "load rubric", "compose rubric preset", "validate rubric" | Composed prompt fragment to stdout |
-| `mk:evaluate` | Harness step-04; post-developer handoff | `mk:harness` step-04; `evaluator` agent | "evaluate this build", "grade the running app", "verify against the spec" | `tasks/reviews/{date-slug}-evalverdict.md` + `evidence/` directory |
+| `mk:evaluate` | Harness step-04; post-developer handoff | `mk:autobuild` step-04; `evaluator` agent | "evaluate this build", "grade the running app", "verify against the spec" | `tasks/reviews/{date-slug}-evalverdict.md` + `evidence/` directory |
 
 ## Existing Skills (Pre-Harness — Just Documented Here)
 
 | Skill | Trigger | Caller | User phrases |
 |---|---|---|---|
-| `mk:cook` | User invocation; harness MINIMAL short-circuit | User; `mk:harness` step-00 (MINIMAL only) | "implement this feature", "fix this bug", "make this change" |
+| `mk:cook` | User invocation; harness MINIMAL short-circuit | User; `mk:autobuild` step-00 (MINIMAL only) | "implement this feature", "fix this bug", "make this change" |
 | `mk:review` | User invocation; pre-ship Gate 2 | User; `shipper` agent; `reviewer` agent | "review this", "code review", "check before shipping" |
 | `mk:fix` | User invocation; simple bugs | User | "fix this", "/mk:fix" |
-| `mk:scale-routing` | Auto on every Phase 0 (orient); harness step-00 | `orchestrator` agent; `mk:harness` step-00 | (auto — no user phrase) |
+| `mk:scale-routing` | Auto on every Phase 0 (orient); harness step-00 | `orchestrator` agent; `mk:autobuild` step-00 | (auto — no user phrase) |
 | `mk:scout` | Pre-review on COMPLEX changes; user via `/mk:scout` | `reviewer` agent; user | "scout the codebase", "find related files" |
 | `mk:agent-browser` | User invocation; `mk:evaluate` step-03 for frontend probes | `evaluator` agent; user | "navigate to", "click on", "test this URL" |
 | `mk:playwright-cli` | User invocation; `mk:evaluate` step-03 for scripted flows | `evaluator` agent; user | "run playwright script", "automated browser test" |

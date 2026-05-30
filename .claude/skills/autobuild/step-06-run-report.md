@@ -1,6 +1,6 @@
 # Step 6: Run Report
 
-Finalize the audit trail at `tasks/harness-runs/{run_id}/run.md`. Print a user-facing summary. End the harness session.
+Finalize the audit trail at `tasks/autobuild-runs/{run_id}/run.md`. Print a user-facing summary. End the autobuild session.
 
 ## Instructions
 
@@ -16,7 +16,7 @@ Load template from tasks/templates/pm-status-template.md.
 Run in the background — do not block step-06 finalization."
 ```
 
-Do not block on PM — continue to 6a. The run report's Final Verdict section (6b) may cite the PM report path if available, otherwise proceeds without it. Skipped entirely when `MEOWKIT_PM_AUTO=off` or `MEOWKIT_HARNESS_MODE=MINIMAL`.
+Do not block on PM — continue to 6a. The run report's Final Verdict section (6b) may cite the PM report path if available, otherwise proceeds without it. Skipped entirely when `MEOWKIT_PM_AUTO=off` or `MEOWKIT_AUTOBUILD_MODE=MINIMAL`.
 
 ### 6a. Update run report frontmatter
 
@@ -73,7 +73,7 @@ duration: {duration_human}
 - Detected model: {model_id}
 - Density chosen: {density}
 - Source: {scale-routing | env-override | --tier flag}
-- Override env var: {MEOWKIT_HARNESS_MODE | unset}
+- Override env var: {MEOWKIT_AUTOBUILD_MODE | unset}
 
 ## Iteration History
 
@@ -85,7 +85,7 @@ duration: {duration_human}
 ## Resumability
 
 If this run was killed mid-flight:
-- Resume via `/mk:harness --resume {run_id}`
+- Resume via `/mk:autobuild --resume {run_id}`
 - The orchestrator reads this file to find the last completed step
 - Steps are append-only; resume picks up at the next un-started step
 ```
@@ -95,7 +95,7 @@ If this run was killed mid-flight:
 ```bash
 cat <<EOF
 ═══════════════════════════════════════════════════════════════════
-Harness Run Complete — $run_id
+Autobuild Run Complete — $run_id
 ═══════════════════════════════════════════════════════════════════
 Status:     $final_status
 Density:    $density ($model_id)
@@ -121,12 +121,12 @@ Commit the run report so the audit trail is in version control:
 
 ```bash
 git add "$run_dir/run.md"
-git commit -m "harness: complete run $run_id (status=$final_status, density=$density, iters=$iteration)"
+git commit -m "autobuild: complete run $run_id (status=$final_status, density=$density, iters=$iteration)"
 ```
 
 ### 6e. Status protocol return
 
-Return to the caller (user or wrapping harness invocation):
+Return to the caller (user or wrapping autobuild invocation):
 
 ```
 **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED
@@ -144,6 +144,6 @@ Return to the caller (user or wrapping harness invocation):
 
 This is the final step. Return control to the caller.
 
-The orchestrator is responsible for any post-harness actions (e.g., notifying a user, posting to a channel). The harness itself is complete after step-06.
+The orchestrator is responsible for any post-autobuild actions (e.g., notifying a user, posting to a channel). The autobuild workflow itself is complete after step-06.
 
 End the session.

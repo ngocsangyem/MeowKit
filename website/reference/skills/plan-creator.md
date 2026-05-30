@@ -59,7 +59,7 @@ Skip when input is an existing plan path (`plan.md` / `phase-*.md`) — the plan
 | `--two-approach` | Two-alternative design with trade-off comparison |
 | `--no-design` | Skip design language subagent (product-level only) |
 | `--no-scout` | Skip codebase scout (product-level only) |
-| `--spike --timebox <duration>` | Time-boxed investigation (Agile mode). Skips research, codebase analysis, red-team, validation interview. Uses `assets/spike-plan-template.md` (investigate + findings, no test/ship). Incompatible with `--product-level` and `mk:harness` FULL |
+| `--spike --timebox <duration>` | Time-boxed investigation (Agile mode). Skips research, codebase analysis, red-team, validation interview. Uses `assets/spike-plan-template.md` (investigate + findings, no test/ship). Incompatible with `--product-level` and `mk:autobuild` FULL |
 
 ### Spike mode (Agile context)
 
@@ -69,7 +69,7 @@ Governed by `.claude/rules-conditional/agile-feedback-cycle.md` Section 2 (loade
 - Sets plan frontmatter `spike: true`, `timebox:`, `findings_doc:` (default `tasks/plans/{slug}/findings.md`)
 - Two phases only: investigate + document findings — NO test phase, NO ship phase
 - Story-points cap (advisory): warn if `story_points > 5`
-- INCOMPATIBLE with `mk:harness` FULL density (harness gate breaks); use `mk:cook` or `mk:plan-creator --fast`
+- INCOMPATIBLE with `mk:autobuild` FULL density (autobuild gate breaks); use `mk:cook` or `mk:plan-creator --fast`
 - At spike completion: prompt to convert findings to delivery story / close as research-only / defer
 
 ### DoR advisory at Phase 1 entry (Agile context)
@@ -89,7 +89,7 @@ If the plan frontmatter has non-empty `jira_tickets:`, `mk:plan-creator` runs th
 | 06 | Validation interview | 5-category questions with propagated answers; Gate W2 Whole-Plan Consistency Sweep at exit |
 | 07 | Gate 1 | Self-check (Completed/Skipped/Uncertain), AskUserQuestion, memory capture |
 | 08 | Hydrate | TaskCreate with dependency chains, critical-step sub-tasks, `.plan-state.json` (v1.2) |
-| 09 | Post-plan handoff | Mode-pruned AskUserQuestion (cook / validate / red-team / harness / end), writes `handoff: { next, decided_at }` to plan.md frontmatter, prints command, STOPs |
+| 09 | Post-plan handoff | Mode-pruned AskUserQuestion (cook / validate / red-team / autobuild / end), writes `handoff: { next, decided_at }` to plan.md frontmatter, prints command, STOPs |
 
 **Branching:** product-level mode uses step-03a instead of step-03. Fast mode and product-level mode skip steps 05-06 and the 4d Verification Roles sub-step.
 

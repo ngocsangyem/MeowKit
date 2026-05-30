@@ -89,5 +89,5 @@ Spawns up to 3 agents in isolated git worktrees for independent subtasks. Use wh
 ## Next steps
 
 - [Fix a bug](/guides/fix-a-bug) — structured debugging with `/mk:fix`
-- [Autonomous builds](/guides/autonomous-build) — green-field products with `/mk:harness`
+- [Autonomous builds](/guides/autonomous-build) — green-field products with `/mk:autobuild`
 - [Understand the workflow](/core-concepts/workflow) — the 7-phase pipeline in detail

@@ -91,7 +91,7 @@ Phase 6: Reflect ─→ documenter loads: documentation, memory
 | git-manager    | 5, any | ship (git operations only)                                             |
 
 ::: info Evaluator agent (added v2.2.0)
-The `evaluator` is the behavioral counterpart to the structural `reviewer`. It grades running builds against weighted rubrics using active verification (driving the build via browser/curl/CLI). In harness pipelines (`mk:harness`), the generator (developer) and evaluator are hard-separated to prevent self-eval bias. See [Harness Architecture](/guide/harness-architecture) and the [evaluator agent reference](/reference/agents/evaluator).
+The `evaluator` is the behavioral counterpart to the structural `reviewer`. It grades running builds against weighted rubrics using active verification (driving the build via browser/curl/CLI). In harness pipelines (`mk:autobuild`), the generator (developer) and evaluator are hard-separated to prevent self-eval bias. See [Harness Architecture](/guide/harness-architecture) and the [evaluator agent reference](/reference/agents/evaluator).
 :::
 
 ::: tip Hook dispatch layer (added v2.3.0)

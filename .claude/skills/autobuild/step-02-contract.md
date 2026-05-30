@@ -82,7 +82,7 @@ contract_path=$(ls -t tasks/contracts/*-${slug}-sprint-1.md | head -1)
 .claude/skills/sprint-contract/scripts/check-contract-signed.sh
 ```
 
-Must exit 0. If exit 1, the harness halts — escalate to user.
+Must exit 0. If exit 1, the autobuild workflow halts — escalate to user.
 
 ### 2d. Append to run report
 

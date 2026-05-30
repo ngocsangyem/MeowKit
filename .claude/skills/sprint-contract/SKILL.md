@@ -27,7 +27,7 @@ user-invocable: true
 
 Negotiation protocol between generator and evaluator. Produces a signed contract file at `tasks/contracts/{date}-{slug}-sprint-{N}.md` BEFORE the generator writes any source code. Enforced by `gate-enforcement.sh` (Phase 4 extension).
 
-> For single-task plan validation (cook flow), use `mk:validate-plan` instead. `mk:sprint-contract` is for product-level specs feeding into `mk:harness` only.
+> For single-task plan validation (cook flow), use `mk:validate-plan` instead. `mk:sprint-contract` is for product-level specs feeding into `mk:autobuild` only.
 
 ## When to Use
 
@@ -38,7 +38,7 @@ Activate when:
 - A previously signed contract needs amendment due to mid-build scope discovery
 
 Skip when:
-- `MEOWKIT_HARNESS_MODE=LEAN` (adaptive density bypass for COMPLEX/Opus 4.6 tier)
+- `MEOWKIT_AUTOBUILD_MODE=LEAN` (adaptive density bypass for COMPLEX/Opus 4.6 tier)
 - The plan is `--fast` mode (overhead exceeds value)
 - The task is `/mk:fix simple` (Gate 1 already bypassed; contract bypass too)
 
@@ -133,7 +133,7 @@ Original signed criteria stay visible — amendments are append-only history.
 
 ## Adaptive Density Skip
 
-When `MEOWKIT_HARNESS_MODE=LEAN`:
+When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 
 - The contract negotiation is **skipped entirely** (per Phase 5 adaptive density policy for COMPLEX/Opus 4.6 tier — capable models self-derive criteria from the product spec)
 - `gate-enforcement.sh` honors the env var and allows source edits without contract verification

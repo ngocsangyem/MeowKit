@@ -59,7 +59,7 @@ Do NOT reference any of the following from `.claude/`:
 
 - `docs/dead-weight-audit.md`
 - `docs/red-team-overview.md`
-- `docs/operations/harness-runbook.md`
+- `docs/operations/autobuild-runbook.md`
 - `docs/memory-system.md`
 - `docs/branding-style-guide.md`
 - `docs/research/<anything>`

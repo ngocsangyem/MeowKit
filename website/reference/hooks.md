@@ -157,7 +157,7 @@ Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Classifies the written f
 
 - **Opt-out:** `MEOWKIT_BUILD_VERIFY=off`
 - **Timeout override:** `MEOWKIT_BUILD_VERIFY_TIMEOUT=N` (default 30s for TS; 35s hook registration timeout)
-- **Density:** runs in LEAN; skipped in MINIMAL (`MEOWKIT_HARNESS_MODE=MINIMAL`)
+- **Density:** runs in LEAN; skipped in MINIMAL (`MEOWKIT_AUTOBUILD_MODE=MINIMAL`)
 - **Source:** `handlers/build-verify.cjs` (dispatched via `dispatch.cjs`)
 
 ### `loop-detection` (handler)
@@ -173,7 +173,7 @@ Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Counts per-file edits ke
 Fires on the **Stop** event (not SubagentStop). Hard gate: if no verification evidence exists (no evaluator verdict file, no signed sprint contract, no test-pass markers in the trace log), emits `{"decision":"block","reason":"…"}` JSON to block session close. 3-attempt re-entry guard per active plan slug via `session-state/precompletion-attempts.json`; after 3 attempts soft-nudges and allows stop to prevent infinite loop. LEAN density mode: soft nudge only. MINIMAL: skipped entirely.
 
 - **Opt-out:** `MEOWKIT_PRECOMPLETION=off`
-- **Density:** `MEOWKIT_HARNESS_MODE=LEAN` → soft nudge; `MEOWKIT_HARNESS_MODE=MINIMAL` → skip
+- **Density:** `MEOWKIT_AUTOBUILD_MODE=LEAN` → soft nudge; `MEOWKIT_AUTOBUILD_MODE=MINIMAL` → skip
 - **Timeout:** 5s
 - **Source:** `.claude/hooks/pre-completion-check.sh`
 
@@ -221,7 +221,7 @@ node dispatch.cjs <EventName> [Matcher]
 | `session-state/precompletion-attempts.json` | `pre-completion-check.sh`                        | Pre-completion re-entry guard per plan slug                    |
 | `session-state/build-verify-cache.json`     | `handlers/build-verify.cjs`                      | File-content-hash cache for skip-on-unchanged                  |
 | `session-state/learning-observer.jsonl`     | `learning-observer.sh`                           | Churn pattern log                                              |
-| `session-state/active-plan`                 | `mk:harness`, `mk:plan-creator`              | Currently active plan slug (read by `pre-completion-check.sh`) |
+| `session-state/active-plan`                 | `mk:autobuild`, `mk:plan-creator`              | Currently active plan slug (read by `pre-completion-check.sh`) |
 | `session-state/last-session-id`             | `project-context-loader.sh`                      | Session change detection                                       |
 
 ## Env Var Bypasses
@@ -231,6 +231,6 @@ node dispatch.cjs <EventName> [Matcher]
 | `MEOWKIT_BUILD_VERIFY=off`       | Skip `build-verify` handler                                            |
 | `MEOWKIT_LOOP_DETECT=off`        | Skip `loop-detection` handler                                          |
 | `MEOWKIT_PRECOMPLETION=off`      | Skip `pre-completion-check.sh`                                        |
-| `MEOWKIT_HARNESS_MODE=LEAN`      | PreCompletion falls back to soft nudge; BuildVerify still runs        |
-| `MEOWKIT_HARNESS_MODE=MINIMAL`   | Skip BuildVerify + PreCompletion entirely                             |
+| `MEOWKIT_AUTOBUILD_MODE=LEAN`      | PreCompletion falls back to soft nudge; BuildVerify still runs        |
+| `MEOWKIT_AUTOBUILD_MODE=MINIMAL`   | Skip BuildVerify + PreCompletion entirely                             |
 | `MEOW_HOOK_PROFILE=fast`         | Skip `pre-ship`, `post-session`, `learning-observer` (speed)          |

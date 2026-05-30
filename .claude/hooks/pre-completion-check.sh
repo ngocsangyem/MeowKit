@@ -23,7 +23,7 @@ if [ -n "${CLAUDE_PROJECT_DIR:-}" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 [ "${MEOWKIT_PRECOMPLETION:-on}" = "off" ] && exit 0
 
 # Density bypass
-case "${MEOWKIT_HARNESS_MODE:-}" in
+case "${MEOWKIT_AUTOBUILD_MODE:-}" in
   MINIMAL) exit 0 ;;
   LEAN)
     # Soft nudge only — trust the model
@@ -46,7 +46,7 @@ PY=".claude/skills/.venv/bin/python3"
 command -v "$PY" >/dev/null 2>&1 || exit 0
 
 # Verification gate (root-cause fix):
-# enforce ONLY when mk:cook or mk:harness explicitly marks verification-required.
+# enforce ONLY when mk:cook or mk:autobuild explicitly marks verification-required.
 VERIFICATION_REQUIRED_FILE="session-state/verification-required.json"
 if [ ! -f "$VERIFICATION_REQUIRED_FILE" ]; then
   exit 0

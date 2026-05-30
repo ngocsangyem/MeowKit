@@ -1,14 +1,14 @@
-# Harness Runbook
+# Autobuild Runbook
 
-User-facing guide to running `/mk:harness` for autonomous multi-hour product builds.
+User-facing guide to running `/mk:autobuild` for autonomous multi-hour product builds.
 
-## What Is the Harness
+## What Is Autobuild
 
-`mk:harness` is meowkit's autonomous build pipeline. You describe a green-field product in plain English ("build me a kanban app", "make a retro game maker") and the harness orchestrates planner → contract → generator → evaluator → ship without manual handholding.
+`mk:autobuild` is meowkit's autonomous build pipeline. You describe a green-field product in plain English ("build me a kanban app", "make a retro game maker") and the autobuild workflow orchestrates planner → contract → generator → evaluator → ship without manual handholding.
 
 It's distinct from `mk:cook`:
 
-| Use `/mk:cook` for | Use `/mk:harness` for |
+| Use `/mk:cook` for | Use `/mk:autobuild` for |
 |---|---|
 | Single feature | Whole product / app |
 | Bug fix | Green-field build |
@@ -18,10 +18,10 @@ It's distinct from `mk:cook`:
 ## Quick Start
 
 ```bash
-/mk:harness "build a kanban app"
+/mk:autobuild "build a kanban app"
 ```
 
-The harness picks the right scaffolding density based on your model tier and runs the full pipeline.
+The autobuild workflow picks the right scaffolding density based on your model tier and runs the full pipeline.
 
 ## Flags
 
@@ -36,7 +36,7 @@ The harness picks the right scaffolding density based on your model tier and run
 
 ## Density Modes
 
-The harness scales scaffolding to model capability per the dead-weight thesis:
+The autobuild workflow scales scaffolding to model capability per the dead-weight thesis:
 
 | Mode | Tier | What runs |
 |---|---|---|
@@ -44,9 +44,9 @@ The harness scales scaffolding to model capability per the dead-weight thesis:
 | **FULL** | STANDARD (Sonnet), COMPLEX (Opus 4.5) | Full pipeline: contract required, 1–3 iteration rounds, context resets between steps. |
 | **LEAN** | COMPLEX (Opus 4.6+) | Single-session: contract optional, 0–1 iteration, no context reset. Trusts the model's adaptive reasoning. |
 
-**Override:** `export MEOWKIT_HARNESS_MODE=LEAN` (or `FULL` / `MINIMAL`) to force a mode.
+**Override:** `export MEOWKIT_AUTOBUILD_MODE=LEAN` (or `FULL` / `MINIMAL`) to force a mode.
 
-**Auto-detection:** the harness reads `MEOWKIT_MODEL_HINT`, then `CLAUDE_MODEL`, then `ANTHROPIC_MODEL`. If none are set, defaults to STANDARD/FULL (safe fallback). Opus 4.6 users who want LEAN should either set `MEOWKIT_MODEL_HINT=opus-4-6` or pass `--tier lean` explicitly.
+**Auto-detection:** the autobuild workflow reads `MEOWKIT_MODEL_HINT`, then `CLAUDE_MODEL`, then `ANTHROPIC_MODEL`. If none are set, defaults to STANDARD/FULL (safe fallback). Opus 4.6 users who want LEAN should either set `MEOWKIT_MODEL_HINT=opus-4-6` or pass `--tier lean` explicitly.
 
 ## What to Expect
 
@@ -65,7 +65,7 @@ The harness scales scaffolding to model capability per the dead-weight thesis:
 Every run writes:
 
 ```
-tasks/harness-runs/{YYMMDD-HHMM-slug}/
+tasks/autobuild-runs/{YYMMDD-HHMM-slug}/
 └── run.md                              ← audit trail (frontmatter + per-step sections)
 
 tasks/plans/{date-slug}/plan.md          ← product-level spec from step-01
@@ -77,7 +77,7 @@ tasks/reviews/{date-slug}-evalverdict-evidence/  ← screenshots/curl/CLI captur
 
 After the run, the audit trail at `run.md` shows: density decision, per-step artifacts, budget trail, iteration history, and final status.
 
-`tasks/completed/` is not part of the active harness ledger. Completed work remains traceable through plan status, review verdicts, and `tasks/harness-runs/{run-id}/run.md` until an archive writer is introduced.
+`tasks/completed/` is not part of the active harness ledger. Completed work remains traceable through plan status, review verdicts, and `tasks/autobuild-runs/{run-id}/run.md` until an archive writer is introduced.
 
 ## Verdict Outcomes
 
@@ -93,7 +93,7 @@ After the run, the audit trail at `run.md` shows: density decision, per-step art
 
 ### "Density auto-detected as FULL but I'm on Opus 4.6"
 
-The harness couldn't detect your model. Set the env var:
+The autobuild workflow couldn't detect your model. Set the env var:
 
 ```bash
 export MEOWKIT_MODEL_HINT=opus-4-6
@@ -102,12 +102,12 @@ export MEOWKIT_MODEL_HINT=opus-4-6
 OR pass the flag:
 
 ```bash
-/mk:harness "build X" --tier lean
+/mk:autobuild "build X" --tier lean
 ```
 
 ### "Budget breach at iteration 2"
 
-The cost tracker blocked at $100 (or your `--budget`). Read `tasks/harness-runs/{run-id}/run.md` "Budget Trail" section to see which step burned the most. Common causes:
+The cost tracker blocked at $100 (or your `--budget`). Read `tasks/autobuild-runs/{run-id}/run.md` "Budget Trail" section to see which step burned the most. Common causes:
 - Iteration loop oscillating (fix-introduces-new-fail)
 - Generator over-iterating in step-03 (verify the self-eval checklist isn't being skipped)
 - Evaluator probing too many criteria (cap is 15; rubric composition may be too large)
@@ -118,20 +118,20 @@ Read the evidence files at `tasks/reviews/{date}-{slug}-evalverdict-evidence/`. 
 
 ### "The contract negotiation hit round 3"
 
-Two agents couldn't converge on a testable spec in 2 rounds. The harness escalates to you. Common causes:
+Two agents couldn't converge on a testable spec in 2 rounds. The autobuild workflow escalates to you. Common causes:
 - The product spec has irreducible ambiguity (the user prompt was vague)
 - The rubric preset doesn't match the project type
 - One AC is genuinely unverifiable
 
-Fix the product spec OR explicitly skip the contract via `MEOWKIT_HARNESS_MODE=LEAN`.
+Fix the product spec OR explicitly skip the contract via `MEOWKIT_AUTOBUILD_MODE=LEAN`.
 
 ### "I want to resume a killed run"
 
 ```bash
-/mk:harness --resume {run-id}
+/mk:autobuild --resume {run-id}
 ```
 
-The harness reads `tasks/harness-runs/{run-id}/run.md` to find the last completed step and continues from there. Iteration counter is durable in the frontmatter; cost trail is in `cost-log.json`.
+The autobuild workflow reads `tasks/autobuild-runs/{run-id}/run.md` to find the last completed step and continues from there. Iteration counter is durable in the frontmatter; cost trail is in `cost-log.json`.
 
 ## Limitations
 
@@ -139,12 +139,12 @@ The harness reads `tasks/harness-runs/{run-id}/run.md` to find the last complete
 - **Cannot judge highly subjective taste** without rubric anchors — if the project has unique aesthetic constraints, write a custom rubric
 - **Cannot execute closed-source binaries** — the active-verification gate needs source-runnable build
 - **`--resume` is partial in v1.0** — iteration counter resumes correctly, but step entry-point detection is manual; you may need to set `MEOWKIT_HARNESS_RESUME_STEP=N` to skip already-completed steps
-- **Spike plans (`--spike`) are INCOMPATIBLE with `mk:harness` FULL density mode.** Harness FULL requires Phase 2 (test red) → Phase 3 (build green) → Phase 4 (review) sequence with a sprint-contract gate. Spikes skip Phase 2/Phase 5; the harness flow breaks. Use `mk:cook` or `mk:plan-creator --fast` to run a spike. See `.claude/rules-conditional/agile-feedback-cycle.md` 2.
+- **Spike plans (`--spike`) are INCOMPATIBLE with `mk:autobuild` FULL density mode.** Harness FULL requires Phase 2 (test red) → Phase 3 (build green) → Phase 4 (review) sequence with a sprint-contract gate. Spikes skip Phase 2/Phase 5; the autobuild workflow flow breaks. Use `mk:cook` or `mk:plan-creator --fast` to run a spike. See `.claude/rules-conditional/agile-feedback-cycle.md` 2.
 
 ## See Also
 
-- `.claude/skills/harness/SKILL.md` — full skill specification
-- `.claude/skills/harness/references/adaptive-density-matrix.md` — density decision matrix
-- `.claude/skills/harness/references/agent-teams-vs-subagents.md` — when to use `--teams`
-- `docs/dead-weight-audit.md` — playbook for keeping the harness pruned
+- `.claude/skills/autobuild/SKILL.md` — full skill specification
+- `.claude/skills/autobuild/references/adaptive-density-matrix.md` — density decision matrix
+- `.claude/skills/autobuild/references/agent-teams-vs-subagents.md` — when to use `--teams`
+- `docs/dead-weight-audit.md` — playbook for keeping the autobuild workflow pruned
 - `.claude/rules/harness-rules.md` — discipline core

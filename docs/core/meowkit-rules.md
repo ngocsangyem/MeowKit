@@ -17,7 +17,7 @@ Rules derived from in-repo governance and enforcement sources (.claude/rules/*, 
 | Sprint contracts        | `tasks/contracts/YYMMDD-HHMM-name-sprint-N.md`                             | `contracts/`, `tasks/plans/.../contracts/`                          |
 | Sprint-state contracts  | `tasks/contracts/sprint-state-YYMMDD-sprint-N.md`                          | `tasks/contracts/state/`, missing `sprint-state-` prefix            |
 | Evaluator verdicts      | `tasks/reviews/YYMMDD-name-evalverdict.md`                                 | `evalverdicts/`, separate from review verdict                       |
-| Harness runs            | `tasks/harness-runs/YYMMDD-HHMM-name/run.md`                               | `runs/`, `harness/`                                                 |
+| Harness runs            | `tasks/autobuild-runs/YYMMDD-HHMM-name/run.md`                               | `runs/`, `harness/`                                                 |
 | Rubric library          | `.claude/rubrics/<name>.md`                                                | `rubrics/`, `.claude/skills/rubric/rubrics/`                   |
 | Memory files            | `.claude/memory/lessons.md`                                                | `memory/lessons.md` (bare)                                          |
 | Web fetch cache         | `.claude/cache/web-fetches/{YYMMDD}-{HHMMSS}-{host}-{sha256-path[:10]}.md` | `.claude/memory/web-fetches/` (memory is for learnings, not caches) |
@@ -30,7 +30,7 @@ Rules derived from in-repo governance and enforcement sources (.claude/rules/*, 
 
 **Rule:** When referencing any file in a skill or agent, use the FULL path from project root. Never use shortened or assumed paths. Before merging, grep for the path in all consuming files.
 
-**State taxonomy:** Provider artifacts live under provider-owned roots (`.claude/`, `.codex/`, `.gemini/`, `.agents/skills/`). Durable workflow artifacts live under `tasks/` (`plans/`, `contracts/`, `reviews/`, `harness-runs/`). Ephemeral runtime state lives at project-root `session-state/`. Curated reusable memory lives under `.claude/memory/`. `tasks/completed/` is not a canonical active path until an archive writer owns it.
+**State taxonomy:** Provider artifacts live under provider-owned roots (`.claude/`, `.codex/`, `.gemini/`, `.agents/skills/`). Durable workflow artifacts live under `tasks/` (`plans/`, `contracts/`, `reviews/`, `autobuild-runs/`). Ephemeral runtime state lives at project-root `session-state/`. Curated reusable memory lives under `.claude/memory/`. `tasks/completed/` is not a canonical active path until an archive writer owns it.
 
 ---
 
@@ -318,7 +318,7 @@ The toolkit has a thin Agile governance layer. Three rules live in `.claude/rule
 
 **Sprint-state contracts:** sprint-LEVEL state lives at `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files. Template: `mk:sprint-contract/assets/sprint-state-template.md`. Concurrent writes require `flock`; YAML append is non-atomic across shells. The existing `validate-contract.sh` does NOT validate sprint-state files (different schema by design).
 
-**Spike governance:** `mk:plan-creator --spike --timebox <duration>` produces a two-phase investigation plan from `mk:plan-creator/assets/spike-plan-template.md`. INCOMPATIBLE with `mk:harness` FULL density (harness gate breaks). Run via `mk:cook` or `mk:plan-creator --fast`.
+**Spike governance:** `mk:plan-creator --spike --timebox <duration>` produces a two-phase investigation plan from `mk:plan-creator/assets/spike-plan-template.md`. INCOMPATIBLE with `mk:autobuild` FULL density (harness gate breaks). Run via `mk:cook` or `mk:plan-creator --fast`.
 
 ---
 

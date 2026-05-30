@@ -15,8 +15,8 @@ hooks cannot invoke the Agent tool (verified).
 | Skill                          | Fire point                                                 | Mode        |
 | ------------------------------ | ---------------------------------------------------------- | ----------- |
 | `mk:cook`                    | After Gate 2 verdict PASS, before Phase 5 ship             | background  |
-| `mk:harness`                 | Step 5 pre-escalation (before AskUserQuestion on iter cap) | **foreground** |
-| `mk:harness`                 | Step 6 final run report                                    | background  |
+| `mk:autobuild`                 | Step 5 pre-escalation (before AskUserQuestion on iter cap) | **foreground** |
+| `mk:autobuild`                 | Step 6 final run report                                    | background  |
 | `mk:workflow-orchestrator`   | After each phase transition (post-SubagentStop)            | background  |
 | `mk:fix`                     | Complex path only, after Phase 4 verdict                   | background  |
 | `mk:worktree`                | After merge integration test passes                        | background  |
@@ -50,7 +50,7 @@ WHY: Prompt text is the dispatch signal; one pattern prevents drift.
 PM is NOT invoked when ANY of the following is true:
 
 - `mk:fix` with `complexity=simple` (Gate 1 bypass path — no plan to track)
-- `mk:harness` with `MEOWKIT_HARNESS_MODE=MINIMAL` (dead-weight thesis)
+- `mk:autobuild` with `MEOWKIT_AUTOBUILD_MODE=MINIMAL` (dead-weight thesis)
 - Environment variable `MEOWKIT_PM_AUTO=off` (user opt-out; `/mk:status` still works)
 - No active plan at `tasks/plans/` (nothing to track)
 - Docs-only or rule-only updates with no active implementation plan; report docs impact directly instead
@@ -67,7 +67,7 @@ WHY: Orchestrator mutual exclusion also prevents duplicate PM reports.
 
 Step 5 pre-escalation is the ONLY foreground PM invocation.
 
-Rationale: when `mk:harness` iteration cap is reached, the user is
+Rationale: when `mk:autobuild` iteration cap is reached, the user is
 about to decide ship vs abort via AskUserQuestion. Current delivery
 state must surface BEFORE the question, not after.
 
@@ -94,7 +94,7 @@ WHY: Hook-based dispatch would loop on PM's own SubagentStop; explicit delegatio
 ## Applies To
 
 - `mk:cook` (single-task pipeline)
-- `mk:harness` (autonomous build pipeline, steps 5 + 6)
+- `mk:autobuild` (autonomous build pipeline, steps 5 + 6)
 - `mk:workflow-orchestrator` (auto-invoked 7-phase)
 - `mk:fix` (standard/complex paths only; simple path skipped)
 - `mk:worktree` (after parallel merge integration test)

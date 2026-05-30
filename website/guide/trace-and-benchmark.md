@@ -101,7 +101,7 @@ flowchart LR
 
 **Quick tier spec files** (`.claude/benchmarks/canary/quick/`): react-component, api-endpoint, bug-fix, refactor, tdd-feature. Each is a focused 1-sprint task runnable through `mk:cook`.
 
-**Full tier** adds `06-small-app-build-spec.md` — a real product build that runs through `mk:harness`. Requires `--full` explicitly to prevent accidental cost burn.
+**Full tier** adds `06-small-app-build-spec.md` — a real product build that runs through `mk:autobuild`. Requires `--full` explicitly to prevent accidental cost burn.
 
 **Results** are written to `.claude/benchmarks/results/{run-id}.json` and appended to `trace-log.jsonl` as `benchmark_result` events — so trace-analyze can correlate benchmark scores with harness run patterns.
 

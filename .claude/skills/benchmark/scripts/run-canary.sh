@@ -58,7 +58,7 @@ echo "Cost cap: \$${COST_CAP}"
 echo "Started: $STARTED"
 echo "═══════════════════════════════════════════════════════════════"
 
-# Iterate specs and invoke mk:harness per spec.
+# Iterate specs and invoke mk:autobuild per spec.
 # NOTE: this script does NOT actually invoke harness here — it emits a manifest the
 # orchestrator picks up. Each invocation requires a fresh subagent context, which is
 # the orchestrator's job (not a shell script's). The script's role is to enumerate +
@@ -122,7 +122,7 @@ echo "the per-task harness invocation requires fresh subagent contexts"
 echo "which only the orchestrator can spawn). Orchestrator must now:"
 echo "  1. For each PENDING task in $RESULT_FILE:"
 echo "     - Read the spec file"
-echo "     - Invoke /mk:harness with the spec content"
+echo "     - Invoke /mk:autobuild with the spec content"
 echo "     - Capture the verdict, score, duration, cost"
 echo "     - Update the task entry in $RESULT_FILE"
 echo "  2. After all tasks complete, set status='complete', compute summary"

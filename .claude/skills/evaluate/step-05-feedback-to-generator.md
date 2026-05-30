@@ -64,7 +64,7 @@ Leave the evidence directory in place — it's the verdict's source of truth and
 
 ### 5d. Emit the handoff message
 
-Print a structured handoff for the orchestrator/harness:
+Print a structured handoff for the orchestrator/autobuild pipeline:
 
 ```
 EVALUATOR_VERDICT: {overall_verdict}

@@ -49,7 +49,7 @@ You typically do not interact with the orchestrator directly. It runs behind the
 - [x] Enforces Gate 2 (review required) for all code changes
 - [x] Reads memory files at session start for prior learnings and budget context
 - [x] Asks one targeted clarifying question when task is ambiguous — never guesses
-- [x] Routes to `mk:harness` for green-field product builds instead of the standard pipeline
+- [x] Routes to `mk:autobuild` for green-field product builds instead of the standard pipeline
 
 ## Common Use Cases
 
@@ -57,7 +57,7 @@ You typically do not interact with the orchestrator directly. It runs behind the
 |---|---|
 | "Fix this typo in the README" | Classifies as Trivial, routes directly to a specialist |
 | "Add user authentication" | Classifies as Complex (auth = always Complex), routes through full pipeline with security agent at Phase 2 and Phase 4 |
-| "Build me a kanban app" | Detects green-field product build, routes to `mk:harness` instead of the standard pipeline |
+| "Build me a kanban app" | Detects green-field product build, routes to `mk:autobuild` instead of the standard pipeline |
 | "Should we use WebSockets or SSE?" | Detects trade-off language, routes to Party mode for multi-agent discussion |
 | "Refactor the API layer" | Classifies as Standard or Complex based on scope, inserts architect after planner if API contracts change |
 

@@ -13,7 +13,7 @@ A small set of self-contained tasks (5 quick + 1 heavy) that exercise different 
 | **quick** (default) | 5 | ≤$5 | Day-to-day regression check; before/after a hook change |
 | **full** (`--full`) | 6 (quick + heavy) | ≤$30 | Dead-weight audit; major harness release; quarterly check |
 
-The heavy task (`06-small-app-build`) requires explicit `--full` because it triggers `mk:harness` which can run for 60–90 minutes.
+The heavy task (`06-small-app-build`) requires explicit `--full` because it triggers `mk:autobuild` which can run for 60–90 minutes.
 
 ## Running
 

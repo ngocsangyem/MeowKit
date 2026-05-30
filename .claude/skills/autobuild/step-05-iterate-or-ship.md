@@ -17,7 +17,7 @@ Branch on the verdict from step-04. PASS → ship. WARN/FAIL with iterations rem
 
 ### 5b. Compute the next action
 
-This step does NOT branch with `goto`. Bash has no goto, and the harness is JIT step-loaded — branching is done by setting a session variable `next_step` and the agent reading the appropriate file at the end.
+This step does NOT branch with `goto`. Bash has no goto, and the autobuild workflow is JIT step-loaded — branching is done by setting a session variable `next_step` and the agent reading the appropriate file at the end.
 
 Compute `next_action` based on verdict + iteration counter + budget:
 
@@ -26,7 +26,7 @@ Compute `next_action` based on verdict + iteration counter + budget:
 sed -i.bak "s/^iterations:.*/iterations: $iteration/" "$run_dir/run.md" && rm "$run_dir/run.md.bak"
 
 # Check budget — bail early if breached
-if ! .claude/skills/harness/scripts/budget-tracker.sh check >/dev/null 2>&1; then
+if ! .claude/skills/autobuild/scripts/budget-tracker.sh check >/dev/null 2>&1; then
   final_status=TIMED_OUT
   next_step="step-06-run-report.md"
 elif [ "$verdict" = "PASS" ]; then
@@ -55,7 +55,7 @@ When `next_action == ship`, dispatch the shipper subagent BEFORE proceeding to s
 ```
 Task(
   subagent_type="shipper",
-  description="Ship $slug after harness PASS verdict",
+  description="Ship $slug after autobuild PASS verdict",
   prompt="
     Read tasks/reviews/{slug}-evalverdict.md for the passing verdict.
     Read tasks/handoff/{slug}-sprint-1.md for the build summary.
@@ -106,11 +106,11 @@ Then present via AskUserQuestion BEFORE proceeding to step-06:
 
 ```
 AskUserQuestion(
-  question: "Harness reached max iterations ($max_iter) with FAIL verdict on $slug. How do you want to proceed?",
+  question: "Autobuild reached max iterations ($max_iter) with FAIL verdict on $slug. How do you want to proceed?",
   options: [
     { label: "Continue with one more iteration", description: "Increase max_iter by 1 and re-enter step-03" },
     { label: "Ship with FAIL warning", description: "Force-ship despite verdict — accept the risk" },
-    { label: "Abort and triage", description: "Stop the harness; user takes over manually with the evidence" }
+    { label: "Abort and triage", description: "Stop the autobuild workflow; user takes over manually with the evidence" }
   ]
 )
 ```

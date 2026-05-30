@@ -162,7 +162,7 @@ Do NOT proceed to step-04 until the script exits 0.
 
 Do NOT write `phase-XX-*.md` files in this mode.
 
-The harness skill (`mk:harness`, added in Phase 5) will negotiate a sprint contract
+The harness skill (`mk:autobuild`, added in Phase 5) will negotiate a sprint contract
 with the generator and own implementation decomposition. The planner's job ends at the spec.
 
 ### 3a.7. Cross-Plan Dependency Detection

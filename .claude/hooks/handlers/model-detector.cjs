@@ -91,7 +91,7 @@ module.exports = function modelDetector(ctx, state) {
   }
 
   // Allow density override via env var
-  const densityOverride = process.env.MEOWKIT_HARNESS_MODE;
+  const densityOverride = process.env.MEOWKIT_AUTOBUILD_MODE;
   if (densityOverride && ['MINIMAL', 'FULL', 'LEAN'].includes(densityOverride)) {
     result.density = densityOverride;
   }

@@ -14,6 +14,29 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.14 (2026-05-30) — Autobuild Rename + mk:loop
+
+### Highlights
+
+The autonomous green-field build pipeline is now `mk:autobuild` — a name that says what it does — and a new `mk:loop` skill drives one measurable metric (coverage, bundle size, lint count, latency) toward a target through bounded, git-tracked iterations that keep wins and revert regressions.
+
+### New Skills
+
+| Skill | Purpose |
+| --- | --- |
+| `mk:loop` | Improve one scalar metric through bounded, boundary-gated iterations — modify one scoped change, verify, keep or `git revert`. One human approval before the loop, then autonomous up to a hard cap. |
+
+### Removals
+
+- `mk:harness` is renamed to `mk:autobuild` — the same planner → contract → generator ⇄ evaluator pipeline, clearer name. Invoke it as `/mk:autobuild`; `/mk:harness` no longer resolves.
+- `MEOWKIT_HARNESS_MODE` is renamed to `MEOWKIT_AUTOBUILD_MODE` — values `MINIMAL|FULL|LEAN` are unchanged.
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the renamed skill, command, and rules.
+- Replace any `/mk:harness` invocation with `/mk:autobuild`.
+- Replace `MEOWKIT_HARNESS_MODE` with `MEOWKIT_AUTOBUILD_MODE` in your shell config or CI. `MEOWKIT_BUDGET_CAP` and `--budget` are unchanged.
+
 ## 2.9.13 (2026-05-30) — Fix Gate Parity & Workflow Evidence Index
 
 ### Highlights
@@ -103,13 +126,13 @@ Plan creation now has clearer mode and flag boundaries. `--deep` is documented a
 
 ### Highlights
 
-Three workstreams ship together. First, four skills (`mk:docs-finder`, `mk:harness`, `mk:plan-creator`, `mk:scout`) gain a `meowkit:` frontmatter block declaring portability policy (`portability`, `providers`, `requires.{surfaces,commands,env}`, `context_cost`) — the first-pass schema that lets the migrate subsystem decide whether each skill can install onto a non-Claude provider. Second, the migrate CLI grows provider-contract diagnostics — a new `provider-contract-diagnostics` module surfaces support gaps per provider, wired into `npx mewkit doctor --providers`, `npx mewkit doctor --state`, and `npx mewkit validate --portable`; first-pass skill providers expand to Codex, Gemini CLI, Antigravity, and OpenCode in addition to Claude Code. Third, `mk:cook` gains three new context-engineering contracts — a scout-first contract at Phase 0 (3–6 bullet codebase summary surfaced before any clarifying question), an exact-requirements contract at Phase 1 (5 dimensions must be answered before plan-creator returns), and a no-side-effects regression-recovery pattern at Gate 2 (2–4 typed options presented to the user when a regression is surfaced instead of silently patching). All changes are additive — pre-upgrade plans, verdicts, sessions, and skills without the `meowkit:` block continue to work unchanged.
+Three workstreams ship together. First, four skills (`mk:docs-finder`, `mk:autobuild`, `mk:plan-creator`, `mk:scout`) gain a `meowkit:` frontmatter block declaring portability policy (`portability`, `providers`, `requires.{surfaces,commands,env}`, `context_cost`) — the first-pass schema that lets the migrate subsystem decide whether each skill can install onto a non-Claude provider. Second, the migrate CLI grows provider-contract diagnostics — a new `provider-contract-diagnostics` module surfaces support gaps per provider, wired into `npx mewkit doctor --providers`, `npx mewkit doctor --state`, and `npx mewkit validate --portable`; first-pass skill providers expand to Codex, Gemini CLI, Antigravity, and OpenCode in addition to Claude Code. Third, `mk:cook` gains three new context-engineering contracts — a scout-first contract at Phase 0 (3–6 bullet codebase summary surfaced before any clarifying question), an exact-requirements contract at Phase 1 (5 dimensions must be answered before plan-creator returns), and a no-side-effects regression-recovery pattern at Gate 2 (2–4 typed options presented to the user when a regression is surfaced instead of silently patching). All changes are additive — pre-upgrade plans, verdicts, sessions, and skills without the `meowkit:` block continue to work unchanged.
 
 ### Features
 
 - `meowkit:` frontmatter block on skill SKILL.md — first-pass portability schema with fields `portability` (`generic` / `provider-adapted` / `provider-only`), `providers.{include,exclude}`, `requires.{surfaces,commands,env}`, and `context_cost` (`low` / `medium` / `high`). Parsed by `parsePortabilityPolicy()` in `skills-discovery.ts` and consumed by `portability-policy.ts` to decide install eligibility per provider. Skills without the block continue to migrate under the existing pre-policy heuristics.
 - First-pass skill providers — `portability-policy.ts` enables skill installation for Codex, Gemini CLI, Antigravity, and OpenCode in addition to Claude Code. Skills with `providers.include: [claude-code]` only continue to install for Claude Code; other providers receive a `PortabilitySkip` with reason "needs review before non-Claude install".
-- 4 first-pass skills carry the new metadata — `mk:docs-finder` (provider-only, claude-code, surfaces: [skills], commands: [Bash], context_cost: medium), `mk:scout` (provider-only, claude-code, commands: [Agent, Grep, Glob], context_cost: medium), `mk:plan-creator` (provider-only, claude-code, commands: [Agent, AskUserQuestion, Bash], context_cost: high), `mk:harness` (provider-only, claude-code, commands: [Agent, AskUserQuestion, Bash], env: [CLAUDE_PROJECT_DIR], context_cost: high).
+- 4 first-pass skills carry the new metadata — `mk:docs-finder` (provider-only, claude-code, surfaces: [skills], commands: [Bash], context_cost: medium), `mk:scout` (provider-only, claude-code, commands: [Agent, Grep, Glob], context_cost: medium), `mk:plan-creator` (provider-only, claude-code, commands: [Agent, AskUserQuestion, Bash], context_cost: high), `mk:autobuild` (provider-only, claude-code, commands: [Agent, AskUserQuestion, Bash], env: [CLAUDE_PROJECT_DIR], context_cost: high).
 - New module `migrate/provider-contract-diagnostics.ts` — collects provider-support diagnostics with `pass` / `warn` / `fail` severities, exposes `collectProviderContractDiagnostics()` + `summarizeProviderContractDiagnostics()`.
 - New cook contracts — Scout-First Contract (Phase 0 codebase-summary presentation) and Exact-Requirements Contract (Phase 1 plan-creator must answer expected output / acceptance criteria / scope boundary / non-negotiable constraints / touchpoints), with skip-on-plan-path notes. Plan-creator SKILL.md gained a matching Requirements Capture Contract section enumerating the 5 dimensions and the scout-grounded-options rule.
 - New cook regression-recovery contract — `Side Effects Detected: Yes` reviewer signal recognized by `validate-gate-2.sh`. Blocks Gate 2 until a `## User Decision Addendum` block (`User selected:` + `Resumption point:`) is appended. Positive-presence-only — absence of the field is never a block signal, so pre-upgrade verdicts validate unchanged.
@@ -363,7 +386,7 @@ Adds a thin, conditionally-loaded Agile/Scrum governance layer covering Definiti
 
 ### Skill Integrations
 
-- `mk:plan-creator` — DoR advisory at Phase 1 entry; new `--spike --timebox <duration>` flag with two-phase spike template (`assets/spike-plan-template.md`); rejects `--spike --product-level` and `--spike` + `mk:harness` FULL
+- `mk:plan-creator` — DoR advisory at Phase 1 entry; new `--spike --timebox <duration>` flag with two-phase spike template (`assets/spike-plan-template.md`); rejects `--spike --product-level` and `--spike` + `mk:autobuild` FULL
 - `mk:sprint-contract` — new `sprint-goal` subcommand (`set` / `show` / `align`) writing to `tasks/contracts/sprint-state-{date}-sprint-{N}.md` with `flock` discipline; new `assets/sprint-state-template.md`
 - `mk:retro` — post-narrative action-item ceremony parsing `## 3 Things to Improve` and `## 3 Habits for Next Week`; per-item AskUserQuestion (Create Jira story / Add to plan TODO / Document as no-action / Defer)
 - `mk:jira-agile` — `sprint add/remove` post-start: `flock` + amendment append + reason prompt; `sprint close`: per-ticket disposition prompt + closure summary
@@ -385,7 +408,7 @@ Pre-flight check defends against drift: if `.claude/rules-conditional/` director
 
 - Plan-as-source-of-truth retained; Jira receives projections only (verdict comment, status transition) — never authoritative
 - Sprint-state contract path uses leading `sprint-state-` prefix to prevent glob collision with the existing `check-contract-signed.sh` glob
-- Spike plans are INCOMPATIBLE with `mk:harness` FULL density (harness gate breaks); use `mk:cook` or `mk:plan-creator --fast`
+- Spike plans are INCOMPATIBLE with `mk:autobuild` FULL density (harness gate breaks); use `mk:cook` or `mk:plan-creator --fast`
 - Concurrent-write safety: `mk:jira-agile` and `mk:sprint-contract sprint-goal set` MUST acquire `flock` before any read-modify-write on sprint-state files
 
 ADR: `docs/architecture/adr/260511-agile-scrum-conditional-rule-layer.md`. Plan: `plans/260510-2333-agile-scrum-rule-layer-design/`.
@@ -905,7 +928,7 @@ Hook telemetry, schema-validated skill frontmatter, cross-reference CI, and a re
 
 ### Highlights
 
-New 17th core agent `project-manager` — a cross-workflow delivery tracker that aggregates plan, test, review, contract, and cost state into an evidence-based status report classified as done / in progress / blocked / not started. Ships the new `/mk:status` slash command, a new `post-phase-delegation.md` rule, and a new `pm-status-template.md` report schema. Five orchestration skills (`mk:cook`, `mk:harness`, `mk:workflow-orchestrator`, `mk:fix` complex path, `mk:worktree`) now cite the rule to delegate post-phase. Opt-out via `MEOWKIT_PM_AUTO=off`.
+New 17th core agent `project-manager` — a cross-workflow delivery tracker that aggregates plan, test, review, contract, and cost state into an evidence-based status report classified as done / in progress / blocked / not started. Ships the new `/mk:status` slash command, a new `post-phase-delegation.md` rule, and a new `pm-status-template.md` report schema. Five orchestration skills (`mk:cook`, `mk:autobuild`, `mk:workflow-orchestrator`, `mk:fix` complex path, `mk:worktree`) now cite the rule to delegate post-phase. Opt-out via `MEOWKIT_PM_AUTO=off`.
 
 ### New Agents
 
@@ -946,7 +969,7 @@ A 7-agent audit of all 77 `mk:*` skills against Anthropic's Skill-authoring best
 - All skill descriptions normalized to Anthropic third-person format — `mk:cook`, `mk:fix`, `mk:agent-detector`, `mk:session-continuation` rewritten out of imperative/greedy mood that cannibalized sibling routing.
 - Five overlap clusters disambiguated with explicit `NOT for X (see mk:Y)` clauses — bug-fix (fix / investigate / build-fix), pipeline (cook / workflow-orchestrator / harness), browser (browse / playwright-cli / agent-browser / qa-manual), code-quality (review / clean-code / simplify / evaluate), planning (plan-creator / planning-engine). Twenty additional skills got focused exclusion clauses where latent overlap existed.
 - `mk:agent-browser` 8 inter-ref cross-links flattened and `authentication.md ↔ session-management.md` circular reference broken — all 9 reference files remain directly linked one level deep from `SKILL.md`.
-- New `step-file-rules.md` Rule 6 — step-file skills (`mk:review`, `mk:trace-analyze`, `mk:plan-creator`, `mk:harness`, `mk:evaluate`) formally allowed to chain `SKILL.md → step-NN.md → references/X.md` provided each step file opens with a Contents TOC.
+- New `step-file-rules.md` Rule 6 — step-file skills (`mk:review`, `mk:trace-analyze`, `mk:plan-creator`, `mk:autobuild`, `mk:evaluate`) formally allowed to chain `SKILL.md → step-NN.md → references/X.md` provided each step file opens with a Contents TOC.
 - Seven skills that reference `.claude/skills/...` paths directly gained a `> Path convention:` note declaring `$CLAUDE_PROJECT_DIR` as the assumed cwd — `mk:rubric`, `mk:multimodal`, `mk:skill-creator`, `mk:intake`, `mk:llms`, `mk:investigate`, `mk:jira`.
 - MCP prerequisite hardening for `mk:jira`, `mk:confluence`, `mk:planning-engine` — server-key assumption (`.mcp.json` key `atlassian`) documented via Gotchas without hardcoding prefixes, preserving install portability.
 - Twenty-two skills renamed their trigger section to canonical `## When to Use` — previously fragmented across "When to Invoke", "When to Activate", "Trigger Conditions".
@@ -1027,7 +1050,7 @@ Skills stop branding themselves and start reading like the project's own workflo
 - `mk:workflow-orchestrator` bare `"implement"` trigger replaced with `"implement feature"` — no longer fires `autoInvoke:true` on trivial requests.
 - `mk:ship/references/preamble.md` declares a memory-read of `.claude/memory/architecture-decisions.md` at task start. Previously the memory reference existed in frontmatter without a body instruction.
 - `mk:review` and `mk:ship` look up plans from `.claude/plans/` and `tasks/plans/` first; `~/.claude/plans/` is retained only as a legacy fallback with an explanatory comment.
-- `mk:cook` intent-detection table carries a green-field escalation callout pointing at `mk:harness`.
+- `mk:cook` intent-detection table carries a green-field escalation callout pointing at `mk:autobuild`.
 - `mk:help` documents the `/mk:plan` alias — confirmed via the slash-command router at `.claude/commands/meow/plan.md`.
 - `mk:docs-finder` documents Node.js 18+ as a prerequisite for its `.js` scripts and flags unbounded `.claude/memory/docs-cache/` growth in Gotchas.
 - `mk:investigate` Process step 4 clarifies the freeze hook is a no-op without an explicit `mk:freeze TARGET-DIR` invocation.
@@ -1610,7 +1633,7 @@ Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline
 
 | Skill                | Purpose                                                                                                                                                                                                               |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mk:harness`         | Autonomous green-field build pipeline with generator/evaluator split, adaptive density, 3-round iteration loop, budget tracking ($30 warn / $100 block / user cap).                                                   |
+| `mk:autobuild`         | Autonomous green-field build pipeline with generator/evaluator split, adaptive density, 3-round iteration loop, budget tracking ($30 warn / $100 block / user cap).                                                   |
 | `mk:sprint-contract` | File-based sprint contract negotiated between generator and evaluator before source edits begin. Enforced by `gate-enforcement.sh` in FULL density.                                                                   |
 | `mk:rubric`          | Weighted rubric loader; reads `.claude/rubrics/`, validates weights sum to 1.0.                                                                                                                                       |
 | `mk:evaluate`        | Behavioral grader with active verification; skeptic persona, drives running build, rejects static-analysis-only verdicts.                                                                                             |
@@ -1630,7 +1653,7 @@ Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline
 
 - 4 new middleware hooks: `post-write-build-verify.sh`, `post-write-loop-detection.sh`, `pre-completion-check.sh`, `conversation-summary-cache.sh` (Haiku-powered, secret-scrubbed, throttled by size/turns/growth).
 - 2 new rules files: `harness-rules.md` (11 rules for generator/evaluator discipline), `rubric-rules.md` (10 rules for calibration).
-- Adaptive density auto-selected per model tier (TRIVIAL=MINIMAL, STANDARD=FULL, COMPLEX/Opus 4.5=FULL, COMPLEX/Opus 4.6+=LEAN). Override via `MEOWKIT_HARNESS_MODE`.
+- Adaptive density auto-selected per model tier (TRIVIAL=MINIMAL, STANDARD=FULL, COMPLEX/Opus 4.5=FULL, COMPLEX/Opus 4.6+=LEAN). Override via `MEOWKIT_AUTOBUILD_MODE`.
 
 ### CLI
 
@@ -1645,7 +1668,7 @@ Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline
 ### Migration Notes
 
 - `export MEOWKIT_MODEL_HINT=opus-4-6` in your shell profile if on Opus 4.6 — enables LEAN density auto-detection. Without it, Opus 4.6 users silently get FULL density.
-- Try `/mk:harness "build me a THING"` for your next green-field build.
+- Try `/mk:autobuild "build me a THING"` for your next green-field build.
 - Run `/mk:summary --status` after your first long session to verify the conversation cache is healthy.
 
 ### Breaking Changes

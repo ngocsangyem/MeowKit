@@ -180,7 +180,7 @@ Detection precedence: explicit user signal > destructive verbs > default to MEDI
 - `--deep` does NOT read `.claude/memory/*`, `.env*`, `tasks/`, secrets.
 - `--deep` suggestions live in `[FILL-IN]` brackets. Never auto-substitute.
 - `--deep` aborts with `SCOUT_BUDGET_EXCEEDED` if caps hit; falls back to default.
-- `MEOWKIT_HARNESS_MODE=MINIMAL` downgrades `--deep` to default with a one-line note.
+- `MEOWKIT_AUTOBUILD_MODE=MINIMAL` downgrades `--deep` to default with a one-line note.
 - Scout never inlines code bodies — only paths/symbols/1-line summaries.
 
 ## Composition

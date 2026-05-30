@@ -54,7 +54,7 @@ Skills for implementation, debugging, and domain-specific patterns.
 | Skill | What it does |
 |-------|-------------|
 | `mk:cook` | End-to-end feature pipeline: plan → test → build → review → ship |
-| `mk:harness` | Autonomous green-field build pipeline with generator/evaluator loop |
+| `mk:autobuild` | Autonomous green-field build pipeline with generator/evaluator loop |
 | `mk:development` | Code patterns, TDD discipline, skill loading reference |
 | `mk:fix` | Structured bug investigation with auto-complexity detection |
 | `mk:investigate` | Systematic 5-phase root cause debugging |

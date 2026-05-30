@@ -86,7 +86,7 @@ flowchart TD
         SC[mk:scout]
         SR[mk:scale-routing]
         WO[mk:workflow-orchestrator\nautoInvoke:true]
-        H[mk:harness]
+        H[mk:autobuild]
         LAL[mk:lazy-agent-loader]
         PC[mk:project-context]
         SK[mk:skill-creator]
@@ -258,7 +258,7 @@ registration), `RULES_INDEX.md` Enforcement Mechanism Matrix.
 | Gate 1              | After Phase 1, before any code write | **Hook-preventive**: `gate-enforcement.sh` on PreToolUse Edit\|Write; timeout 10s | `/mk:fix` simple; scale-routing one-shot (`scale-adaptive-rules.md` Rule 4) |
 | Gate 2              | After Phase 4, before Phase 5        | **Behavioral**: reviewer verdict at `tasks/reviews/` required                     | None — zero exceptions (`gate-rules.md` Gate 2 section)                       |
 | Active Verification | Phase 4 evaluator PASS               | **Script**: `validate-verdict.sh` rejects PASS with empty `evidence/` dir         | None — hard gate (`harness-rules.md` Rule 8)                                  |
-| Sprint Contract     | FULL density harness Phase 3         | **Hook**: `gate-enforcement.sh` contract gate                                     | `MEOWKIT_HARNESS_MODE=LEAN` or `MINIMAL`                                      |
+| Sprint Contract     | FULL density harness Phase 3         | **Hook**: `gate-enforcement.sh` contract gate                                     | `MEOWKIT_AUTOBUILD_MODE=LEAN` or `MINIMAL`                                      |
 
 **Known issue — gate-owning agents don't reference gate-rules.md:**
 planner (`planner.md` Required Context, CF-M3), reviewer (`reviewer.md:132`, CF-M5),
@@ -336,7 +336,7 @@ does not exist; loads nothing.
 
 ## 8. Harness (Autonomous Build Pipeline)
 
-Source: `harness-rules.md` (11 rules), `.claude/skills/harness/references/adaptive-density-matrix.md` (density matrix single source of truth).
+Source: `harness-rules.md` (11 rules), `.claude/skills/autobuild/references/adaptive-density-matrix.md` (density matrix single source of truth).
 
 7-step step-file pipeline for green-field product builds. Generator/evaluator
 architecture: separate agents, separate contexts; self-evaluation forbidden
@@ -354,13 +354,13 @@ architecture: separate agents, separate contexts; self-evaluation forbidden
 
 ### Density Matrix
 
-Source: `.claude/skills/harness/references/adaptive-density-matrix.md` (canonical).
+Source: `.claude/skills/autobuild/references/adaptive-density-matrix.md` (canonical).
 
 | Density                 | Model        | Contract                           | Iterations | Override                       |
 | ----------------------- | ------------ | ---------------------------------- | ---------- | ------------------------------ |
-| MINIMAL (Haiku)         | Cheapest     | Skip — short-circuits to mk:cook | Skip       | `MEOWKIT_HARNESS_MODE=MINIMAL` |
-| FULL (Sonnet, Opus 4.5) | Default/Best | Required (gate-enforced)           | 1–3 rounds | `MEOWKIT_HARNESS_MODE=FULL`    |
-| LEAN (Opus 4.6+)        | Best         | Optional (skip if ACs < 5)         | 0–1 rounds | `MEOWKIT_HARNESS_MODE=LEAN`    |
+| MINIMAL (Haiku)         | Cheapest     | Skip — short-circuits to mk:cook | Skip       | `MEOWKIT_AUTOBUILD_MODE=MINIMAL` |
+| FULL (Sonnet, Opus 4.5) | Default/Best | Required (gate-enforced)           | 1–3 rounds | `MEOWKIT_AUTOBUILD_MODE=FULL`    |
+| LEAN (Opus 4.6+)        | Best         | Optional (skip if ACs < 5)         | 0–1 rounds | `MEOWKIT_AUTOBUILD_MODE=LEAN`    |
 
 Density override adjusts scaffolding only — **never bypasses gates**
 (`harness-rules.md` Rule 10).
@@ -420,7 +420,7 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | ------------------------------ | ------- | ------------------------------------------------------------------ |
 | S1 — Feature request routing   | PARTIAL | `commands/meow/meow.md:40` phantom routing (CF-H12)                |
 | S2 — `/mk:cook <plan>`       | PARTIAL | `mk:cook/SKILL.md:159` bare memory path (CF-C6)                  |
-| S3 — `/mk:harness "build X"` | PARTIAL | `evaluator.md` Required Context missing rubric-rules.md (CF-M4)    |
+| S3 — `/mk:autobuild "build X"` | PARTIAL | `evaluator.md` Required Context missing rubric-rules.md (CF-M4)    |
 | S4 — Python skill runtime      | BROKEN  | `.claude/skills/.venv/bin/python3` absent (CF-C4)                  |
 | S5 — Session reset mid-phase   | PARTIAL | `plan-creator/step-02:21` loads missing project-context.md (CF-C5) |
 | S6 — `/meow fix` dispatcher    | PARTIAL | `commands/meow/fix.md:58` phantom `/mk:plan` ref (CF-M29)        |

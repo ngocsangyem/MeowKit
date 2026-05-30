@@ -1,6 +1,6 @@
 # Harness Rules
 
-These rules govern the autonomous multi-hour build pipeline (`mk:harness`) and the generator/evaluator architecture introduced by the harness plan (Phases 1–5).
+These rules govern the autonomous multi-hour build pipeline (`mk:autobuild`) and the generator/evaluator architecture introduced by the harness plan (Phases 1–5).
 
 ## Rule 1: Planner Stays Product-Level
 
@@ -20,7 +20,7 @@ Flow: generator → handoff → evaluator fresh context → graded verdict with 
 
 ## Rule 3: Sprint Contract Required in FULL Density; Optional in LEAN; Skipped in MINIMAL
 
-Per the adaptive density policy (`mk:harness/references/adaptive-density-matrix.md`):
+Per the adaptive density policy (`.claude/skills/autobuild/references/adaptive-density-matrix.md`):
 
 - `MINIMAL` (Haiku) — contract skipped (harness short-circuits to `mk:cook`)
 - `FULL` (Sonnet, Opus 4.5) — contract REQUIRED before any source-code edit; enforced by `gate-enforcement.sh`
@@ -36,15 +36,15 @@ The harness iteration loop (generator ⇄ evaluator) is capped at 3 rounds by de
 
 ## Rule 5: Adaptive Density Decided by `mk:scale-routing` + Model String
 
-The harness scaffolding density (`MINIMAL | FULL | LEAN`) is selected by `mk:scale-routing` based on the detected model tier and model id. The decision matrix is the single source of truth at `.claude/skills/harness/references/adaptive-density-matrix.md`.
+The harness scaffolding density (`MINIMAL | FULL | LEAN`) is selected by `mk:scale-routing` based on the detected model tier and model id. The decision matrix is the single source of truth at `.claude/skills/autobuild/references/adaptive-density-matrix.md`.
 
 **WHY:** Dead-weight thesis — over-scaffolding degrades capable models.
 
-**Override:** `MEOWKIT_HARNESS_MODE=MINIMAL|FULL|LEAN` overrides auto-detection and is logged.
+**Override:** `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` overrides auto-detection and is logged.
 
 ## Rule 6: Budget Thresholds — Warn at $30, Approve at $100, Hard Block at User Cap
 
-The harness budget tracker (`mk:harness/scripts/budget-tracker.sh`) enforces three thresholds:
+The harness budget tracker (`mk:autobuild/scripts/budget-tracker.sh`) enforces three thresholds:
 
 - **$30 warn** — print warning, continue
 - **$100 hard block** — halt the run, set `final_status=TIMED_OUT`
@@ -76,6 +76,6 @@ The evaluator MUST re-anchor its skeptic persona (`mk:evaluate/prompts/skeptic-p
 
 ## Rule 10: No Density Override Bypasses Gates
 
-`MEOWKIT_HARNESS_MODE=LEAN` and any `--tier` flag override scaffolding density, NOT gates. Gate 1 (plan), Gate 2 (review verdict), the contract gate (Phase 4), and the active-verification HARD GATE all still apply regardless of density mode.
+`MEOWKIT_AUTOBUILD_MODE=LEAN` and any `--tier` flag override scaffolding density, NOT gates. Gate 1 (plan), Gate 2 (review verdict), the contract gate (Phase 4), and the active-verification HARD GATE all still apply regardless of density mode.
 
 **WHY:** Density changes scaffolding amount, not the quality bar.

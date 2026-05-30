@@ -330,7 +330,7 @@ def main() -> int:
     symbols = [s for s in payload.get("symbols", []) if isinstance(s, str)]
     git_root_hint = payload.get("git_root")
 
-    if os.environ.get("MEOWKIT_HARNESS_MODE") == "MINIMAL":
+    if os.environ.get("MEOWKIT_AUTOBUILD_MODE") == "MINIMAL":
         _emit({"hits": [], "git_sha": None, "abort_reason": "MINIMAL_DENSITY"})
         return 0
 

@@ -50,7 +50,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 ### Phase 3 — Build GREEN
 
 ```toon
-[19]{skill,owner,type,architecture}
+[20]{skill,owner,type,architecture}
 `mk:development`|developer|development|monolithic
 `mk:cook`|developer|development|monolithic
 `mk:fix`|developer|development|monolithic
@@ -62,6 +62,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 `mk:project-organization`|developer|development|monolithic
 `mk:bootstrap`|developer|development|monolithic
 `mk:verify`|developer|development|monolithic
+`mk:loop`|developer|development|monolithic (references; bounded git-tracked metric-optimization loop, boundary-gated, leaf executor — calls no orchestration skill)
 `mk:build-fix`|developer|development|monolithic
 `mk:api-design`|architect|development|monolithic
 `mk:database`|developer|development|monolithic
@@ -91,10 +92,10 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 `mk:review`|reviewer|review|**step-file** (4 steps)
 `mk:rubric`|evaluator|review|monolithic (v1.0.0: 7 rubrics + 4 composition presets at .claude/rubrics/, weighted graded grading with PASS/WARN/FAIL anchors and load/compose/validate scripts; frontend-app preset pruned to 4 distinctive rubrics in v2.0.0 per audit 260408)
 `mk:evaluate`|evaluator|review|**step-file** (v1.0.0: 5 steps — load-rubrics → boot-app → probe-criteria → grade-and-verdict → feedback-to-generator. Active-verification HARD GATE: validate-verdict.sh rejects PASS verdicts with empty evidence/. Skeptic persona enforced on every criterion grading.)
-`mk:sprint-contract`|developer (propose/amend) + evaluator (review)|planning|monolithic (v1.0.0, 130 lines: propose/review/amend/sign actions inline. Phase 4 file-based contract negotiation between generator and evaluator before source edits. Enforced by gate-enforcement.sh; bypassable via MEOWKIT_HARNESS_MODE=LEAN.)
-`mk:harness`|orchestrator (planner/developer/evaluator/shipper agents dispatched per step)|orchestration|**step-file** (v1.0.0: 7 steps — tier-detection → plan → contract → generate → evaluate → iterate-or-ship → run-report. Adaptive density MINIMAL/FULL/LEAN. Budget tracker with $30 warn / $100 block. 6h hard timeout. Resumable via --resume.)
+`mk:sprint-contract`|developer (propose/amend) + evaluator (review)|planning|monolithic (v1.0.0, 130 lines: propose/review/amend/sign actions inline. Phase 4 file-based contract negotiation between generator and evaluator before source edits. Enforced by gate-enforcement.sh; bypassable via MEOWKIT_AUTOBUILD_MODE=LEAN.)
+`mk:autobuild`|orchestrator (planner/developer/evaluator/shipper agents dispatched per step)|orchestration|**step-file** (v1.0.0: 7 steps — tier-detection → plan → contract → generate → evaluate → iterate-or-ship → run-report. Adaptive density MINIMAL/FULL/LEAN. Budget tracker with $30 warn / $100 block. 6h hard timeout. Resumable via --resume.)
 `mk:trace-analyze`|researcher (3 parallel) + main agent synthesis|analysis|**step-file** (v1.0.0: 6 steps — ingest → partition → scatter → gather → suggestions → HITL gate. Reads `.claude/memory/trace-log.jsonl`, finds patterns via error-taxonomy, mandatory HITL approval. Anti-overfit threshold ≥3 occurrences.)
-`mk:benchmark`|orchestrator (invokes mk:harness per spec)|measurement|monolithic (v1.0.0: run/compare subcommands. Quick tier 5 tasks ≤$5; full tier 6 tasks ≤$30. Records to `.claude/benchmarks/results/{run-id}.json` + trace-log.jsonl. Backs the dead-weight audit with measured deltas.)
+`mk:benchmark`|orchestrator (invokes mk:autobuild per spec)|measurement|monolithic (v1.0.0: run/compare subcommands. Quick tier 5 tasks ≤$5; full tier 6 tasks ≤$30. Records to `.claude/benchmarks/results/{run-id}.json` + trace-log.jsonl. Backs the dead-weight audit with measured deltas.)
 `mk:elicit`|reviewer|review|monolithic
 ```
 
@@ -144,7 +145,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 [11]{category,count}
 Planning|6
 Testing|7
-Development|26
+Development|27
 Review|8
 Security|3
 Deployment|2
@@ -152,7 +153,7 @@ Documentation|4
 Memory|2
 Utility|12
 Cross-Cutting|5
-**Total**|**75**
+**Total**|**76**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).
@@ -166,5 +167,5 @@ Currently step-file enabled:
 - `mk:plan-creator` — 9 steps (00–08)
 - `mk:review` — 5 steps (includes step-02b persona passes)
 - `mk:evaluate` — 5 steps
-- `mk:harness` — 7 steps
+- `mk:autobuild` — 7 steps
 - `mk:trace-analyze` — 6 steps
