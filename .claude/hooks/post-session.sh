@@ -101,7 +101,7 @@ acquire_lock() {
 }
 
 # The retroactive NEEDS_CAPTURE heredoc has been removed. lessons.md is archived.
-# The model-change flag below targets fixes.md.
+# The model-change flag below is emitted to the canonical trace stream.
 
 # Resolve active model id once, via the canonical SessionStart artifact.
 # Claude Code does not export model env vars to Stop hooks — see
@@ -167,7 +167,7 @@ except Exception:
 fi
 
 # Detect model-version change → flag dead-weight audit needed.
-# Writes flag to fixes.md (the bug-class topic file).
+# Emits a dead_weight_audit_flagged trace record (telemetry, not curated memory).
 # Note: the acquire_lock function defined above is dead code after v2.4.1
 # (retroactive capture was removed). The model-change branch below is the
 # sole remaining consumer of MEMORY_DIR; two concurrent Stop invocations
@@ -202,19 +202,13 @@ if [ ! -f "$LAST_MODEL_FILE" ]; then
 elif [ "$CURRENT_MODEL" != "unknown" ]; then
   LAST_MODEL=$(cat "$LAST_MODEL_FILE" 2>/dev/null | tr -d '[:space:]' || echo "unknown")
   if [ "$CURRENT_MODEL" != "$LAST_MODEL" ] && [ "$LAST_MODEL" != "unknown" ]; then
-    # Header-date format — required for memory-prune.py to parse the date.
-    # A sub-bullet date would make these entries permanently immune to pruning.
-    cat >> "$MEMORY_DIR/fixes.md" << 'FIXES_EOF'
-
-## DATE_PLACEHOLDER — dead-weight-audit-needed (auto-flagged)
-- Reason: model version changed — run /mk:trace-analyze
-- Logged at: TIME_PLACEHOLDER
-FIXES_EOF
-    # Replace placeholders — values contain only digits/colons/hyphens/space, no injection risk
-    FIXES_DATE=$(date "+%Y-%m-%d")
-    FIXES_TIME=$(date "+%H:%M")
-    sed -i.bak "s/DATE_PLACEHOLDER/$FIXES_DATE/; s/TIME_PLACEHOLDER/$FIXES_TIME/" "$MEMORY_DIR/fixes.md" 2>/dev/null
-    rm -f "$MEMORY_DIR/fixes.md.bak"
+    # Emit the dead-weight-audit signal to the canonical trace stream (the
+    # `dead_weight_audit_needed` event already defined in trace-schema.md, consumed
+    # by mk:trace-analyze) instead of the curated fixes store — it is telemetry, not a fix.
+    if [ -x "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" ]; then
+      bash "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" "dead_weight_audit_needed" \
+        "{\"old_model\":\"$LAST_MODEL\",\"new_model\":\"$CURRENT_MODEL\"}" 2>/dev/null || true
+    fi
     echo "Dead-weight audit flagged: model changed $LAST_MODEL → $CURRENT_MODEL" >&2
   fi
   # Always update the recorded model for next comparison (atomic write)
