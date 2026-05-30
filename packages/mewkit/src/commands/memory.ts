@@ -9,7 +9,6 @@ import { renderViews } from "../memory/render-views.js";
 interface MemoryArgs {
 	subcommand?: string;
 	clear?: boolean;
-	show?: boolean;
 	stats?: boolean;
 	strict?: boolean;
 	check?: boolean;
@@ -120,26 +119,6 @@ async function clearMemory(memoryDir: string): Promise<void> {
 
 	console.log();
 	console.log(pc.green("Memory cleared."));
-}
-
-function showLessons(memoryDir: string): void {
-	const lessonsPath = path.join(memoryDir, "lessons.md");
-
-	if (!fs.existsSync(lessonsPath)) {
-		console.log(pc.dim("No lessons.md file found."));
-		return;
-	}
-
-	const content = fs.readFileSync(lessonsPath, "utf-8");
-
-	if (content.trim().length === 0) {
-		console.log(pc.dim("lessons.md is empty."));
-		return;
-	}
-
-	console.log(pc.bold("Lessons:"));
-	console.log();
-	console.log(content);
 }
 
 function showStats(memoryDir: string): void {
@@ -350,8 +329,6 @@ export async function memory(args: MemoryArgs): Promise<void> {
 		renderViewsCmd(memoryDir, args.check ?? false, args.strict ?? false);
 	} else if (args.clear) {
 		await clearMemory(memoryDir);
-	} else if (args.show) {
-		showLessons(memoryDir);
 	} else if (args.stats) {
 		showStats(memoryDir);
 	} else {

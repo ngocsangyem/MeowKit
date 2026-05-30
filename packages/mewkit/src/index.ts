@@ -183,7 +183,6 @@ async function main(): Promise<void> {
 			await memory({
 				subcommand: args._[1] as string | undefined,
 				clear: args.clear as boolean | undefined,
-				show: args.show as boolean | undefined,
 				stats: args.stats as boolean | undefined,
 				strict: args.strict as boolean | undefined,
 				check: args.check as boolean | undefined,

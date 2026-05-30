@@ -69,14 +69,14 @@ describe('Audit-lock: telemetry classification', () => {
   });
 });
 
-describe('Audit-lock: duplicate / inert writers', () => {
-  it('cost-meter.sh is inert in standard/fast profile and registered in settings.json', () => {
-    const c = read('.claude/hooks/cost-meter.sh');
-    expect(c).toMatch(/standard\|fast\)\s*exit 0/);
-    expect(read('.claude/settings.json')).toContain('cost-meter.sh');
+describe('inert cost-meter retired; budget-tracker is the live writer', () => {
+  it('cost-meter.sh is deleted and de-registered from settings.json', () => {
+    expect(existsSync(resolve(root, '.claude/hooks/cost-meter.sh'))).toBe(false);
+    expect(read('.claude/settings.json')).not.toContain('cost-meter.sh');
   });
 
-  it('budget-tracker.cjs is the live cost writer (cost-meter superseded)', () => {
+  it('the live per-Bash cost path (dispatch.cjs Bash -> budget-tracker.cjs) is intact', () => {
+    expect(read('.claude/settings.json')).toMatch(/dispatch\.cjs\\" PostToolUse Bash/);
     expect(existsSync(resolve(root, '.claude/hooks/handlers/budget-tracker.cjs'))).toBe(true);
   });
 });
@@ -107,12 +107,13 @@ describe('conversation-summary subsystem fully removed', () => {
   });
 });
 
-describe('Audit-lock: unverified session-state artifacts (Phase 6 gated)', () => {
-  it('active-skill has a dormant reader (pre-completion-check) and no writer', () => {
-    expect(read('.claude/hooks/pre-completion-check.sh')).toContain('active-skill');
+describe('session-state retirement outcomes', () => {
+  it('the dead active-skill reader has been removed from pre-completion-check', () => {
+    expect(read('.claude/hooks/pre-completion-check.sh')).not.toContain('active-skill');
   });
 
-  it('build-progress.json is referenced only by the developer agent prose', () => {
+  it('build-progress.json is kept (live harness-resume feature in the developer agent)', () => {
+    // The re-scan proved a live agent-prose producer/consumer, so it is NOT retired.
     expect(read('.claude/agents/developer.md')).toContain('build-progress.json');
   });
 });
