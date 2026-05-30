@@ -47,7 +47,6 @@ The prior auto-inject pipeline (`memory-loader`, `memory-parser`, `memory-filter
   decisions.md                # Long-form ADRs — owned by architect agent
   security-log.md             # Raw security audit log
   quick-notes.md              # ##note: capture staging — processed at Reflect
-  conversation-summary.md     # Haiku-summarized session cache
   trace-log.jsonl             # Harness trace events (append-trace.sh)
   last-model-id.txt           # Model-change detection for dead-weight audit
   lessons.md                  # ARCHIVED stub — content migrated to topic files (v2.4.1)

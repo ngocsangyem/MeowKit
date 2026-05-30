@@ -71,18 +71,29 @@ describe('Audit-lock: duplicate / inert writers', () => {
   });
 });
 
-describe('Audit-lock: conversation-summary subsystem (Phase 4 retirement targets)', () => {
-  it('cache hook exists and is registered on Stop + UserPromptSubmit', () => {
-    expect(existsSync(resolve(root, '.claude/hooks/conversation-summary-cache.sh'))).toBe(true);
-    const settings = read('.claude/settings.json');
-    const count = settings.split('conversation-summary-cache.sh').length - 1;
-    expect(count).toBe(2); // Stop + UserPromptSubmit registrations
+describe('conversation-summary subsystem fully removed', () => {
+  it('cache hook + command + cache file are deleted', () => {
+    expect(existsSync(resolve(root, '.claude/hooks/conversation-summary-cache.sh'))).toBe(false);
+    expect(existsSync(resolve(root, '.claude/commands/mk/summary.md'))).toBe(false);
+    expect(existsSync(resolve(root, '.claude/memory/conversation-summary.md'))).toBe(false);
   });
 
-  it('harness Rule 11 + /mk:summary command + cache file are present (pre-retirement)', () => {
-    expect(read('.claude/rules/harness-rules.md')).toContain('Conversation Summary');
-    expect(existsSync(resolve(root, '.claude/commands/mk/summary.md'))).toBe(true);
-    expect(existsSync(resolve(root, '.claude/memory/conversation-summary.md'))).toBe(true);
+  it('no settings.json registration, env default, or env-example var remains', () => {
+    expect(read('.claude/settings.json')).not.toContain('conversation-summary-cache.sh');
+    expect(read('.claude/settings.json')).not.toContain('MEOWKIT_SUMMARY');
+    expect(read('.claude/.env.example')).not.toContain('MEOWKIT_SUMMARY');
+  });
+
+  it('Stop + UserPromptSubmit still dispatch via dispatch.cjs (other hooks intact)', () => {
+    const settings = read('.claude/settings.json');
+    // settings.json escapes the inner quote, so match dispatch.cjs + the event name.
+    expect(settings).toMatch(/dispatch\.cjs\\" Stop/);
+    expect(settings).toMatch(/dispatch\.cjs\\" UserPromptSubmit/);
+  });
+
+  it('harness Rule 11 is gone and project-context-loader no longer clears a summary cache', () => {
+    expect(read('.claude/rules/harness-rules.md')).not.toContain('## Rule 11');
+    expect(read('.claude/hooks/project-context-loader.sh')).not.toContain('conversation-summary');
   });
 });
 

@@ -36,7 +36,6 @@ MeowKit controls what context is **injected** at session boundaries. It cannot c
 
 | Source                          | Content                    | Token estimate | Cap            |
 | ------------------------------- | -------------------------- | -------------- | -------------- |
-| `conversation-summary-cache.sh` | Prior conversation summary | ≤1000t         | 4096B hard cap |
 
 ### 3. Agent-detector (every message, step 0)
 
@@ -63,7 +62,6 @@ Skills load step files JIT (one step at a time). Memory topic files load per-ski
 
 **Strong:**
 
-- `conversation-summary-cache.sh`: raw transcript → background Haiku summary → ≤4KB injection per turn. Best context management in MeowKit.
 - `orientation-ritual.cjs`: ~100-token checkpoint recovery on resume (not full transcript re-injection).
 - Step-file JIT architecture: workflow steps load one at a time; never bulk-loaded.
 - Memory tombstone: auto-inject memory pipeline removed (v2.4.0); memory is on-demand per skill.
@@ -137,11 +135,9 @@ Memory topic files in `.claude/memory/` have a 90-day automated pruning policy:
 | `MEOWKIT_SKIP_SAFETY_SENTINEL`      | `on`    | Set `off` to always run agent-detector 9-file check  |
 | `MEOWKIT_MEMORY_PRUNE`              | `on`    | Set `off` to disable auto-pruning                    |
 | `MEOWKIT_MEMORY_PRUNE_AGE_DAYS`     | `90`    | Days before memory entries are pruned                |
-| `MEOWKIT_SUMMARY_CACHE`             | `on`    | Set `off` to disable conversation summary injection  |
 
 ## See Also
 
 - `orchestration-rules.md` — delegation template, isolation boundaries, anti-patterns
-- `harness-rules.md` Rule 11 — conversation-summary-cache write protocol
 - `development-rules.md` — tool output limits (Glob 50, Grep 20, Read offset+limit)
 - `docs/memory-system.md` — memory system overview and tombstone history

@@ -1,7 +1,7 @@
 #!/bin/bash
 # secret-scrub.sh — Shared secret-scrubbing helper for meowkit hooks.
-# Phase 8 (Q6 Option A): extracted at first duplication. Reused by Phase 9
-# conversation-summary-cache.sh and append-trace.sh.
+# Phase 8 (Q6 Option A): extracted at first duplication. Reused by
+# post-session.sh and append-trace.sh.
 #
 # Usage (sourced):
 #   . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/secret-scrub.sh"
@@ -30,7 +30,7 @@ scrub_secrets() {
   # in a grouped capture, which would abort the whole pipeline and return empty.
   # Per-scheme -e entries keep it portable across GNU sed and BSD sed.
   # Stripe sk_live_ / sk_test_ / rk_ / pk_ patterns are included so shell-side
-  # scrubbing (post-session.sh, conversation-summary-cache.sh, append-trace.sh)
+  # scrubbing (post-session.sh, append-trace.sh)
   # matches the JS port in secret-scrub.cjs.
   echo "$input" | sed -E \
     -e 's/sk-ant-[A-Za-z0-9_-]{20,}/[REDACTED-ANTHROPIC-KEY]/g' \

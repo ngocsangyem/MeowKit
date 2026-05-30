@@ -32,13 +32,10 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 | `dispatch.cjs` | PostToolUse, Stop, SessionStart, UserPromptSubmit | varies | Central Node.js dispatcher. Loads `handlers.json`, dispatches to registered `.cjs` handler modules. | 10-40s | Full stdin JSON |
 | `cost-meter.sh` | PostToolUse | Bash | Track token cost accumulation | 5s | (none — reads cost log) |
 | `pre-completion-check.sh` | Stop | — | **Phase 7 NEW.** Block session stop if no verification evidence exists. Hard cap 3 re-entries. LEAN mode soft nudge. | 5s | (none — reads plan/contract/trace) |
-| `post-session.sh` | Stop | — | Capture session lessons + model-change detection + cost log initialization + Phase 9 conversation-summary cache clear on session change | 5s | (none — reads memory) |
-| `conversation-summary-cache.sh` | Stop | — | **Phase 9 NEW.** Spawns **background** worker that summarizes transcript via `claude -p --model haiku` (~60–120s wall) when throttle thresholds met. Hook itself returns instantly. Lock at `session-state/conversation-summary.lock`. Atomic write to `.claude/memory/conversation-summary.md`. | 5s | `HOOK_TRANSCRIPT_PATH` + `HOOK_SESSION_ID` |
-| `conversation-summary-cache.sh` | UserPromptSubmit | — | **Phase 9 NEW.** Inject cached summary as `## Prior conversation summary` block (capped 4KB). Skips on session_id mismatch. | 2s | `HOOK_SESSION_ID` |
+| `post-session.sh` | Stop | — | Capture session lessons + model-change detection + cost log initialization | 5s | (none — reads memory) |
 | `jira-env-loader.sh` | SessionStart | — | Validate presence of `.claude/.env` and 3 `MEOW_JIRA_*` vars (token, email, site URL). Emits "[mk:jira] env OK" or "[mk:jira] {key} missing". Does NOT export — wrapper `scripts/jira-as.sh` handles per-call export per "each hook is a separate subprocess" constraint. | 5s | JSON stdin via `lib/read-hook-input.sh` |
 
-**Hook count:** 13 shell hook scripts + 8 Node.js `.cjs` handlers in `.claude/hooks/handlers/`. Shell hooks registered in `.claude/settings.json` events + `pre-implement.sh` invoked manually by the developer agent. `.cjs` handlers registered via `handlers.json` → `dispatch.cjs` (build-verify, loop-detection, budget-tracker, auto-checkpoint, checkpoint-writer, model-detector, orientation-ritual, immediate-capture-handler) + 1 direct `dispatch.cjs` entry. The shared parser shim at `lib/read-hook-input.sh`, the secret scrubber at `lib/secret-scrub.sh`, and `lib/checkpoint-utils.cjs` are sourceable libraries. `conversation-summary-cache.sh` is registered under TWO events (Stop + UserPromptSubmit), branching on `HOOK_EVENT_NAME`. `SubagentStart`/`SubagentStop` are intentionally empty — hooks in these events would infinite-loop inside subagents.
-
+**Hook count:** 12 shell hook scripts + 8 Node.js `.cjs` handlers in `.claude/hooks/handlers/`. Shell hooks registered in `.claude/settings.json` events + `pre-implement.sh` invoked manually by the developer agent. `.cjs` handlers registered via `handlers.json` → `dispatch.cjs` (build-verify, loop-detection, budget-tracker, auto-checkpoint, checkpoint-writer, model-detector, orientation-ritual, immediate-capture-handler) + 1 direct `dispatch.cjs` entry. The shared parser shim at `lib/read-hook-input.sh`, the secret scrubber at `lib/secret-scrub.sh`, and `lib/checkpoint-utils.cjs` are sourceable libraries. `SubagentStart`/`SubagentStop` are intentionally empty — hooks in these events would infinite-loop inside subagents.
 **Tombstoned (v2.4.0):** `memory-loader.cjs`, `memory-filter.cjs`, `memory-parser.cjs`, `memory-injector.cjs` — auto-inject memory pipeline removed; memory now loads on-demand per skill. Removed because the auto-inject path widened the prompt-injection surface (memory content is DATA, but injecting it into every prompt blurred the DATA-vs-INSTRUCTIONS boundary).
 
 **Additional registered handler (not in hooks table above):**
@@ -56,12 +53,6 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 | `MEOWKIT_HARNESS_MODE=LEAN` | PreCompletion falls back to soft nudge; BuildVerify still runs |
 | `MEOWKIT_HARNESS_MODE=MINIMAL` | Skip BuildVerify + PreCompletion entirely |
 | `MEOW_HOOK_PROFILE=fast` | Skip pre-ship, post-session, learning-observer (speed) |
-| `MEOWKIT_SUMMARY_CACHE=off` | Skip conversation-summary-cache.sh (both Stop and UserPromptSubmit paths) |
-| `MEOWKIT_SUMMARY_THRESHOLD=N` | Override 20KB transcript threshold for summarization |
-| `MEOWKIT_SUMMARY_TURN_GAP=N` | Override 30-event minimum gap between summaries (variable kept for back-compat; semantic is JSONL events, ≈ 3–6 turns) |
-| `MEOWKIT_SUMMARY_GROWTH_DELTA=N` | Override 5KB growth-delta minimum between summaries |
-| `MEOWKIT_SUMMARY_BUDGET_SEC=N` | Background worker hard budget for `claude -p` (default 180s) |
-| `MEOWKIT_SUMMARY_DEBUG=1` | Verbose stderr from conversation-summary-cache.sh |
 | `MEOWKIT_MAX_PROJECT_CONTEXT_BYTES=N` | project-context.md byte cap at SessionStart (default 12288 = ~12KB ≈ ~3K tokens). `0` disables the cap. |
 | `MEOWKIT_SKIP_SAFETY_SENTINEL=off` | Disable agent-detector sentinel — force full 10-file Read on every turn. Default `on` skips reads on turns 2..N of same session. |
 | `MEOWKIT_MEMORY_PRUNE=off` | Disable auto-prune of stale memory `.md` entries on Stop. Default `on`. Severity-critical/security entries and dateless entries are NEVER pruned. |
@@ -79,8 +70,6 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 | `session-state/last-session-id` | project-context-loader.sh | (same) | Session change detection |
 | `session-state/learning-observer.jsonl` | learning-observer.sh | post-session.sh | Churn pattern log |
 | `session-state/active-plan` | mk:harness (Phase 5), mk:plan-creator | pre-completion-check.sh | Currently active plan slug |
-| `session-state/conversation-summary.lock` | conversation-summary-cache.sh (Stop bg worker) | conversation-summary-cache.sh next Stop (5min stale GC) | Mutex preventing overlapping background summarizers |
-| `.claude/memory/conversation-summary.md` | conversation-summary-cache.sh (Stop bg worker) | **Consumer 1:** conversation-summary-cache.sh (UserPromptSubmit) → emits to stdout → **Consumer 2: host-runtime context injection (the model itself)** for every meowkit agent. Cleared by project-context-loader.sh on session change. | Persistent conversation summary read by every turn |
 | `session-state/detected-model.json` | handlers/model-detector.cjs | handlers/budget-tracker.cjs, handlers/auto-checkpoint.cjs | Model tier + density detection result |
 | `session-state/budget-state.json` | handlers/budget-tracker.cjs | (same) | Accumulated session cost estimate |
 | `session-state/checkpoints/checkpoint-latest.json` | handlers/checkpoint-writer.cjs (Stop), handlers/auto-checkpoint.cjs (PostToolUse phase transitions) | handlers/orientation-ritual.cjs (SessionStart resume/clear/compact) | Single-file checkpoint with model tier, density, plan path, git state, budget. Atomic .tmp+rename; last-writer-wins; sequence display-only. |

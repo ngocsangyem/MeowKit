@@ -303,8 +303,3 @@ if [ "${MEOWKIT_HOOK_DEBUG:-0}" = "1" ] && [ -n "${_DBG_FILE:-}" ]; then
     echo "ts_end=$(date -u +%FT%TZ)"
   } >> "$_DBG_FILE" 2>/dev/null
 fi
-
-# NOTE: conversation-summary cache clear lives in project-context-loader.sh
-# (SessionStart hook). Stop hook is the wrong home: standard|fast profile
-# short-circuits at top of this file, so a cache-clear branch here would be
-# dead code. SessionStart always runs.

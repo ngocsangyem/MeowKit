@@ -46,7 +46,7 @@ Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
 | Node handlers documented (HOOKS_INDEX) | 5 active | `HOOKS_INDEX.md:39` footer                 | memory-filter, memory-parser, memory-injector, memory-loader deleted (v2.4.0); immediate-capture-handler retained (CF-M1 closed) |
 | Slash commands                         | 21       | `ls .claude/commands/meow/*.md`            | `status.md` added 260422 alongside project-manager agent                                                                         |
 | Rules files                            | 18       | `ls .claude/rules/*.md` excl. RULES_INDEX  | RULES_INDEX table lists 18 rows — matches disk (`risk-checklist.md` added at slot 13b for Phase 0 horizontal-risk evaluation)    |
-| Memory files                           | 8        | `CLAUDE.md` Memory section                 | 6 named + conversation-summary.md + quick-notes.md                                                                               |
+| Memory files                           | 13       | `CLAUDE.md` Memory section                 | fixes.{md,json}, review-patterns.{md,json}, architecture-decisions.{md,json}, security-notes.md, security-log.md, cost-log.json, decisions.md, quick-notes.md, trace-log.jsonl, last-model-id.txt, lessons.md, lessons-archive.md, patterns.json |
 
 **Skill type breakdown** (source: `inventory-summary.md`): workflow 33, verification 17,
 reference 11, business-process 7, scaffolding 5, cicd 3, library-api-reference 2 = **78**.
@@ -229,8 +229,8 @@ Hook chain verified against `settings.json` (2026-04-18). All 7 events listed.
 | `PreToolUse Bash`         | pre-task-check.sh → pre-ship.sh → privacy-block.sh                                                                            | `settings.json:64-85`   |
 | `PostToolUse Edit\|Write` | post-write.sh → learning-observer.sh → dispatch.cjs (build-verify, loop-detection, budget-tracker, auto-checkpoint)           | `settings.json:87-108`  |
 | `PostToolUse Bash`        | cost-meter.sh → dispatch.cjs (budget-tracker)                                                                                 | `settings.json:109-123` |
-| `UserPromptSubmit`        | tdd-flag-detector.sh → conversation-summary-cache.sh → dispatch.cjs (immediate-capture-handler, orientation-ritual)           | `settings.json:152-173` |
-| `Stop`                    | pre-completion-check.sh → post-session.sh → conversation-summary-cache.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer) | `settings.json:125-151` |
+| `UserPromptSubmit`        | tdd-flag-detector.sh → dispatch.cjs (immediate-capture-handler, orientation-ritual)                                           | `settings.json:152-173` |
+| `Stop`                    | pre-completion-check.sh → post-session.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer)                                 | `settings.json:125-151` |
 
 **Phase routing** (source: `.claude/rules/phase-contracts.md`):
 `Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test → Phase 3 Build → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect`
@@ -313,15 +313,14 @@ Source: `CLAUDE.md` Memory section; `HOOKS_INDEX.md` State Files table.
 | `review-patterns.md` + `review-patterns.json`               | On-demand (mk:review, mk:plan-creator)                   | immediate-capture-handler.cjs, session-capture |
 | `architecture-decisions.md` + `architecture-decisions.json` | On-demand (mk:plan-creator, mk:cook)                     | immediate-capture-handler.cjs, session-capture |
 | `security-notes.md`                                         | On-demand (mk:cso)                                         | Manual / session-capture                       |
-| `conversation-summary.md`                                   | Yes — every UserPromptSubmit (conversation-summary-cache.sh) | conversation-summary-cache.sh Stop bg worker   |
 | `cost-log.json`                                             | Phase 0/6                                                    | post-session.sh (atomic temp-rename)           |
 | `decisions.md`                                              | On-demand (architect)                                        | Manual                                         |
 | `security-log.md`                                           | On-demand (security agent)                                   | Manual / injection-audit.py                    |
 | `quick-notes.md`                                            | Phase 6 Reflect                                              | immediate-capture-handler.cjs                  |
 | `trace-log.jsonl`                                           | On-demand                                                    | append-trace.sh                                |
 
-**Per-turn context budget** (~4KB, source: `HOOKS_INDEX.md` handler rows):
-conversation-summary-cache ≤4KB only. memory-loader.cjs deleted in v2.4.0 — no per-turn memory injection. SessionStart also loads
+**Per-turn context budget** (~0KB auto-inject, source: `HOOKS_INDEX.md` handler rows):
+memory-loader.cjs deleted in v2.4.0 — no per-turn memory injection. SessionStart also loads
 `docs/project-context.md` via project-context-loader.sh — **CF-C5 OPEN**: file
 does not exist; loads nothing.
 

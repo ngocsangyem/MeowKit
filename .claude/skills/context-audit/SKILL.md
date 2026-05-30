@@ -6,8 +6,9 @@ description: |
   Read-only audit of `.claude/` structural overhead. Reports prioritized
   "remove X save Y tokens" recommendations against the model context window.
   NOT for monetary cost tracking — that's /mk:budget. NOT for transcript
-  caching — that's conversation-summary-cache.sh. Use when planning to add
-  context capacity, diagnosing perceived slowdowns, or auditing health.
+  size monitoring — long-session continuity defers to Claude Code native
+  compaction. Use when planning to add context capacity, diagnosing perceived
+  slowdowns, or auditing health.
 allowed-tools:
   - Bash
   - Read
@@ -24,7 +25,7 @@ keywords:
   - agents
   - mcp
   - structural
-when_to_use: "Use to audit .claude/ structural overhead and surface 'remove X save Y tokens' recommendations against the model context window. NOT for USD cost tracking (see /mk:budget). NOT for transcript size or conversation cache (see conversation-summary-cache.sh)."
+when_to_use: "Use to audit .claude/ structural overhead and surface 'remove X save Y tokens' recommendations against the model context window. NOT for USD cost tracking (see /mk:budget). NOT for transcript size."
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored
@@ -56,7 +57,6 @@ Three concrete triggers:
 | ------------------------------- | -------------------------------------------------------- | ------------- |
 | Monetary cost                   | `/mk:budget` + `harness/scripts/budget-tracker.sh`        | USD           |
 | Window utilization (this skill) | `/mk:context-audit` + `scripts/inventory-context.sh`      | tokens / %    |
-| Transcript size                 | `.claude/hooks/conversation-summary-cache.sh`            | bytes / events |
 
 The three concerns are deliberately separate. This skill measures only what
 is **statically loaded** into every session — the always-on bundle. Conversation
@@ -111,7 +111,6 @@ Steps:
 
 ## How to Act
 - Cost: see `/mk:budget`
-- Transcript: see `.claude/hooks/conversation-summary-cache.sh`
 - Runtime trim: see `mk:lazy-agent-loader`
 ```
 
