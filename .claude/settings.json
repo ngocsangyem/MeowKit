@@ -123,11 +123,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/cost-meter.sh\"",
-            "timeout": 5
-          },
-          {
-            "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" PostToolUse Bash",
             "timeout": 15
           }
