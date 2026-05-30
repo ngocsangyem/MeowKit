@@ -64,8 +64,8 @@ Operational result:
 
 ### Orchestration visualization (orchviz)
 
-- A server exposes SSE streams and snapshot endpoints.
-- Plan/overlay endpoints allow the UI to render live execution state.
+- A server exposes SSE streams and snapshot providers.
+- Overlay + plan snapshots allow the UI to render live execution state.
 
 ## Orchestration layer (skills + delegations)
 
@@ -86,7 +86,8 @@ Delegation prompts are expected to include:
 
 ### Doc validation & link enforcement
 
-- CI validates `.claude` → `docs/*` references via an allowlist contract.
+- CI validates `.claude` → `docs/*` references via the allowlist contract.
+- The contract is defined in `.claude/rules/docs-reference-contract.md`.
 - CI runs internal doc reference unit tests.
 
 ### Docs build pipeline
@@ -102,6 +103,10 @@ Delegation prompts are expected to include:
 
 - Static architecture diagrams live under `docs/architecture/diagrams/*`.
 - orchviz provides a runtime visualization layer distinct from static images.
+
+## Contracts you can verify in CI
+
+- `.claude/scripts/check-docs-references.py` enforces the `.claude` → `docs/*` contract.
 
 ## How to extend the harness
 
