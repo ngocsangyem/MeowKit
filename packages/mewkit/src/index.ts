@@ -10,6 +10,7 @@ import { upgrade } from "./commands/upgrade.js";
 import { validate } from "./commands/validate.js";
 import { budget } from "./commands/budget.js";
 import { memory } from "./commands/memory.js";
+import { verdictGate } from "./commands/verdict-gate.js";
 import { doctor } from "./commands/doctor.js";
 import { migrate } from "./commands/migrate.js";
 import { setup } from "./commands/setup.js";
@@ -187,6 +188,9 @@ async function main(): Promise<void> {
 				strict: args.strict as boolean | undefined,
 				check: args.check as boolean | undefined,
 			});
+			break;
+		case "verdict-gate":
+			verdictGate({ slug: args._[1] as string | undefined });
 			break;
 		case "setup":
 			await setup({ only: args.only as string | undefined, systemDeps: args["system-deps"] as boolean | undefined });
