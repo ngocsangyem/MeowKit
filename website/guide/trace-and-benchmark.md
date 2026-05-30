@@ -157,8 +157,6 @@ Every trace write passes through `lib/secret-scrub.sh` before flushing to the lo
 
 This is a hard requirement — trace records are often read by `mk:trace-analyze` researchers and included in plan outputs. A single secret in a trace record could propagate widely. The scrubber runs unconditionally; there is no bypass.
 
-Similarly, the conversation summary cache runs the same scrub before writing `.claude/memory/conversation-summary.md`. See [/guide/middleware-layer](/guide/middleware-layer) for the summary cache details.
-
 ## Canonical Sources
 
 - `.claude/memory/trace-log.jsonl` — append-only trace store

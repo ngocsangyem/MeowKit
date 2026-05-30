@@ -28,7 +28,6 @@ Canonical registry of every meowkit skill, its activation triggers, callers, and
 | Skill | Trigger | Caller | User phrases |
 |---|---|---|---|
 | `mk:cook` | User invocation; harness MINIMAL short-circuit | User; `mk:harness` step-00 (MINIMAL only) | "implement this feature", "fix this bug", "make this change" |
-| `mk:summary` | User invocation (Phase 9 inspector) | User | "show conversation summary", "clear summary cache", "/mk:summary", "/mk:summary --clear", "/mk:summary --status" |
 | `mk:review` | User invocation; pre-ship Gate 2 | User; `shipper` agent; `reviewer` agent | "review this", "code review", "check before shipping" |
 | `mk:fix` | User invocation; simple bugs | User | "fix this", "/mk:fix" |
 | `mk:scale-routing` | Auto on every Phase 0 (orient); harness step-00 | `orchestrator` agent; `mk:harness` step-00 | (auto — no user phrase) |
@@ -68,7 +67,6 @@ Each rubric is loaded by `mk:rubric load <name>` or as part of a composition pre
 | `pre-completion-check.sh` middleware | 7 | **Shipped 260408** — Stop hook hard gate, JSON block decision when no verification evidence |
 | `mk:trace-analyze` | 8 | **Shipped 260408** — `/mk:trace-analyze`, scatter-gather over `.claude/memory/trace-log.jsonl`, HITL gate mandatory |
 | `mk:benchmark` | 8 | **Shipped 260408** — `/mk:benchmark run [--full]`, quick tier 5 tasks ≤$5, full tier 6 tasks ≤$30 |
-| `conversation-summary-cache.sh` middleware | 9 | **Shipped 260408** — dual-event hook (Stop summarizes via detached `nohup` `claude -p --model haiku` background worker, UserPromptSubmit injects cached summary as user-visible context). Throttled by size + event gap + growth delta. Cleared on session change by `project-context-loader.sh`. User-facing inspector: `/mk:summary`. Env-var configurable. |
 
 ## Agile Conditional Rule Triggers
 

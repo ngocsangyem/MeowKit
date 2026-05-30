@@ -4,11 +4,11 @@ Assess task complexity, select planning mode, early-exit trivial tasks.
 
 ## Instructions
 
-### 0a. Read Institutional Memory
+### 0a. Read Institutional Memory (JSON-first)
 
-1. Read `.claude/memory/architecture-decisions.md` — prior architectural decisions
-2. Read `.claude/memory/architecture-decisions.json` — recurring architectural patterns
-3. If relevant learnings found, note them for inclusion in plan Context section
+1. Read `.claude/memory/architecture-decisions.json` **first** — the canonical, schema-validated store of prior architectural decisions and recurring patterns.
+2. Fall back to `.claude/memory/architecture-decisions.md` only when the JSON is absent. If both exist and disagree, prefer the JSON and emit a one-line conflict warning (`⚠ architecture-decisions.md has entries not in the JSON — JSON is authoritative; run 'mewkit memory seed-from-md'`). See `.claude/rules/memory-read-rules.md`.
+3. If relevant learnings found, note them for inclusion in plan Context section.
 
 Skip ONLY if `.claude/memory/` doesn't exist.
 

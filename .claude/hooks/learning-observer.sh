@@ -8,8 +8,10 @@
 #
 # Load .claude/.env (each hook is a separate subprocess)
 . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
-# Output: session-state/learning-observer.jsonl (one JSON object per line)
-# Read by: post-session.sh during retroactive capture
+# State: session-state/learning-observer.jsonl — per-file edit ledger, self-read to
+# compute edit_count for the canonical `file_edited` trace. No external reader
+# (the old retroactive-capture path was removed); the verbose churn record below is
+# debug-gated behind MEOWKIT_HOOK_DEBUG.
 
 # Hook profile gating — only active in standard and strict profiles
 MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
@@ -46,9 +48,10 @@ fi
 printf '{"type":"edit","file":"%s","count":%d,"ts":"%s"}\n' \
   "$FILE_PATH" "$EDIT_COUNT" "$TIMESTAMP" >> "$STATE_FILE"
 
-# Detect churn pattern: 3+ edits to the same file this session
-# Churn suggests the change wasn't planned well or the spec was unclear
-if [ "$EDIT_COUNT" -ge 3 ]; then
+# Detect churn pattern: 3+ edits to the same file this session.
+# The churn record has no reader — churn is re-derivable from the canonical
+# `file_edited` trace edit_count via mk:trace-analyze — so emit it only under debug.
+if [ "${MEOWKIT_HOOK_DEBUG:-0}" = "1" ] && [ "$EDIT_COUNT" -ge 3 ]; then
   printf '{"type":"churn","file":"%s","count":%d,"ts":"%s"}\n' \
     "$FILE_PATH" "$EDIT_COUNT" "$TIMESTAMP" >> "$STATE_FILE"
 fi

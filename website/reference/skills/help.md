@@ -67,7 +67,7 @@ Not every task needs the full 7-phase pipeline:
 | Rapid iteration / spike work | `MEOW_HOOK_PROFILE=fast` | post-write scan, pre-ship, pre-task-check, TDD check |
 
 **Quick fix?** Use `/mk:fix` — bypasses Gate 1 for simple changes.
-**Hook profiles:** Set `MEOW_HOOK_PROFILE=fast` for rapid iteration (skips non-critical hooks). Set `MEOW_HOOK_PROFILE=strict` to enable ALL hooks including cost-meter and post-session capture.
+**Hook profiles:** Set `MEOW_HOOK_PROFILE=fast` for rapid iteration (skips non-critical hooks). Set `MEOW_HOOK_PROFILE=strict` to enable ALL hooks including post-session capture.
 
 ## Arguments
 

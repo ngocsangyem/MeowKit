@@ -131,7 +131,7 @@ Slash commands live in `.claude/commands/mk/*.md`. They operate in one of 3 vali
 
 1. **Skill-composing** — command chains existing skills (e.g. `/audit` runs `mk:review` + `mk:cso`).
 2. **Agent-invoking** — command directly spawns an agent without a skill wrapper (e.g. `/arch` uses the `architect` agent).
-3. **Standalone** — command operates via inline behavior, no skill or agent spawn (e.g. `/design`, `/mk:summary`).
+3. **Standalone** — command operates via inline behavior, no skill or agent spawn (e.g. `/design`).
 
 **Do not flag a command as a "phantom skill" just because no `mk:<command>` SKILL.md exists.** A command is only phantom when BOTH no `mk:<name>` skill AND no `.claude/commands/mk/<name>.md` exist for a reference. See audit-rubric RF-14.
 

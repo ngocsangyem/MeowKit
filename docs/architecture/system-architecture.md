@@ -81,7 +81,6 @@ mis-reported state.
 | ----------------------------------------- | -------------------------------------------------- | ---------------- |
 | Cost                                      | `/mk:budget` + `harness/scripts/budget-tracker.sh`  | USD              |
 | Window utilization & structural overhead  | `/mk:context-audit`                                 | tokens / %       |
-| Transcript size                           | `.claude/hooks/conversation-summary-cache.sh`     | bytes / events   |
 
 `/mk:budget` answers "how much have we spent?" (monetary). `/mk:context-audit`
 answers "how much of the context window is consumed by always-on `.claude/`

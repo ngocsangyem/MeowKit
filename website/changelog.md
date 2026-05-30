@@ -14,6 +14,45 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.12 (2026-05-30) — JSON-first memory + observability cleanup
+
+### Highlights
+
+Curated project memory is now JSON-first — the `.json` stores are the canonical, schema-validated source and human-readable Markdown is generated from them. The conversation-summary subsystem is retired, so long-session continuity relies on the host runtime's native compaction, and observability consolidates on a single canonical trace stream.
+
+### CLI
+
+- `mewkit memory validate` — schema-validate the curated memory stores; `--strict` exits non-zero on errors.
+- `mewkit memory seed-from-md` — populate the JSON stores from existing Markdown topic files, run once after upgrading.
+- `mewkit memory render-views` — regenerate the human-readable `views/*.md` from the canonical JSON.
+- `mewkit verdict-gate <slug>` — validate a review verdict's machine-readable proof bundle; blocks on a blocked, invalid, or missing verdict.
+- `mewkit doctor --state` now reports curated-memory health alongside the runtime-state checks.
+
+### Features
+
+- Memory consumers read the `.json` store first and fall back to Markdown only when it is absent, warning when the two diverge.
+- Security findings are now a curated JSON store — `security-findings.json`.
+- `mk:review` emits a schema-validated `tasks/reviews/<slug>-verdict.json` proof bundle alongside the human verdict.
+
+### Improvements
+
+- `trace-log.jsonl` is documented as the single canonical event stream — reader-less debug telemetry is gated behind `MEOWKIT_HOOK_DEBUG`.
+- Generated Markdown views carry a "generated — do not edit" banner so the JSON stays the source of truth.
+
+### Removals
+
+- Removed the conversation-summary subsystem — the `/mk:summary` command, the summary cache hook, and the `MEOWKIT_SUMMARY_*` environment variables are gone, and long-session continuity is now handled automatically by the host runtime's native compaction.
+- Removed the inert `cost-meter.sh` hook — per-call cost tracking is handled by the budget tracker.
+- Removed the archived `lessons.md` and deprecated `patterns.json` stubs.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the new memory layout.
+- Run `mewkit memory seed-from-md` once to migrate existing Markdown memory into the JSON stores.
+- If you relied on `/mk:summary` or any `MEOWKIT_SUMMARY_*` variable, remove them — continuity is now automatic.
+
+---
+
 ## 2.9.11 (2026-05-24) — Plan-creator mode clarity
 
 ### Highlights

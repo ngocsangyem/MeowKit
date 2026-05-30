@@ -79,34 +79,3 @@ The evaluator MUST re-anchor its skeptic persona (`mk:evaluate/prompts/skeptic-p
 `MEOWKIT_HARNESS_MODE=LEAN` and any `--tier` flag override scaffolding density, NOT gates. Gate 1 (plan), Gate 2 (review verdict), the contract gate (Phase 4), and the active-verification HARD GATE all still apply regardless of density mode.
 
 **WHY:** Density changes scaffolding amount, not the quality bar.
-
-## Rule 11: Context Caching via Conversation Summary (Phase 9 — 260408)
-
-Long sessions MUST use the conversation summary cache (`.claude/hooks/conversation-summary-cache.sh`) to avoid re-reading the full transcript on every turn. The hook fires on `Stop` (summarize) and `UserPromptSubmit` (inject) and is throttled by transcript size, turn gap, and growth delta.
-
-**WHY:** Summary cache preserves continuity while avoiding repeated full-transcript injection.
-
-**Throttle defaults (Q7):** size > `${MEOWKIT_SUMMARY_THRESHOLD:-20480}` bytes AND (event delta ≥ `${MEOWKIT_SUMMARY_TURN_GAP:-30}` JSONL events, ≈ 3–6 turns, OR growth ≥ `${MEOWKIT_SUMMARY_GROWTH_DELTA:-5120}` bytes).
-
-**Opt-out:** `MEOWKIT_SUMMARY_CACHE=off` cleanly disables both paths. Graceful degradation: if `claude` CLI is missing or summarization fails, the hook exits 0 silently and the session proceeds with full transcript.
-
-**Security:** the summary is DATA per `injection-rules.md`. Output is secret-scrubbed via `lib/secret-scrub.sh` before writing to cache. The prompt template forbids instruction-shaped content in the summary body.
-
-### Write Protocol
-
-The cache file (`.claude/memory/conversation-summary.md`) is **AUTOMATED-ONLY**. Ownership is single-writer:
-
-| Role | Owner | Trigger |
-|---|---|---|
-| Writer | `conversation-summary-cache.sh` (Stop event) | Throttle thresholds met (size + event delta or size delta) |
-| Reader / Injector | `conversation-summary-cache.sh` (UserPromptSubmit) | Every user prompt; emits ≤4KB body block |
-| Clearer | `project-context-loader.sh` (SessionStart) | Session change detected (new HOOK_SESSION_ID) |
-| Lock holder | `conversation-summary.lock` | Mutex preventing overlapping background summarizers |
-
-Manual user edits to the cache file are **NOT preserved** — they are overwritten on next Stop regeneration. The file carries a leading HTML-comment banner restating this contract.
-
-**WHY:** Automated ownership prevents stale manual edits from masquerading as current context.
-
-Append persistent notes to `.claude/memory/quick-notes.md` or the appropriate topic file instead of editing the cache file.
-
-The banner header is metadata only — stripped by the injection path so it does NOT consume the 4KB injection budget. It exists for human readers of the cache file.

@@ -12,7 +12,7 @@ This is the "friendly front door" to the toolkit. Users who don't know which com
 
 ### Execution Steps
 
-1. **Load context.** Read the relevant topic files in `.claude/memory/` — `fixes.md` for bug-class lessons, `review-patterns.md` for review/architecture patterns, `architecture-decisions.md` for past decisions. Load on demand based on the task at hand.
+1. **Load context.** Read the relevant topic files in `.claude/memory/` on demand based on the task at hand — `.json` store first, `.md` fallback if the `.json` is absent (see `.claude/rules/memory-read-rules.md`): `fixes.json` for bug-class lessons, `review-patterns.json` for review/architecture patterns, `architecture-decisions.json` for past decisions.
 
 2. **Classify task complexity.** Analyze the task description and assign one of three tiers:
    - **Trivial** — single-file change, typo, simple config update, quick question. Route to `/mk:fix` (simple mode) or answer directly.

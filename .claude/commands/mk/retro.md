@@ -24,7 +24,7 @@ Generates a sprint retrospective by analyzing git history, review findings, and 
    - Review findings (from verdict files in `tasks/reviews/`)
    - Security issues found and resolved
 
-3. **Read topic files in `.claude/memory/` for patterns.** Load `fixes.md`, `review-patterns.md`, and `architecture-decisions.md`. Look for:
+3. **Read topic files in `.claude/memory/` for patterns.** Load `fixes.json` first (fall back to `fixes.md` if absent), `review-patterns.json` first (fall back to `review-patterns.md` if absent), and `architecture-decisions.json` first (fall back to `architecture-decisions.md` if absent) — see `.claude/rules/memory-read-rules.md`. Look for:
    - Recurring issues (same type of bug appearing multiple times)
    - Process friction points noted in lessons
    - Things that were learned and applied (or not applied)

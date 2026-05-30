@@ -58,7 +58,7 @@ Load before any design work:
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - Plan file from `tasks/plans/` — what's being designed
 - `docs/design-guidelines.md` — existing design system (if it exists)
-- `.claude/memory/review-patterns.md` and `.claude/memory/architecture-decisions.md` — prior design decisions and gotchas
+- `.claude/memory/review-patterns.json` (canonical) first, fall back to `review-patterns.md` if absent; and `.claude/memory/architecture-decisions.json` (canonical) first, fall back to `architecture-decisions.md` if absent — prior design decisions and gotchas (see `.claude/rules/memory-read-rules.md`)
 - Project stack detection — React, Vue, or vanilla (determines which framework skill to load)
 
 ## Workflow Integration

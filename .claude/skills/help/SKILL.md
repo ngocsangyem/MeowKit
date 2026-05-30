@@ -93,7 +93,7 @@ Not every task needs the full 7-phase pipeline. Mention these when relevant:
 **Small config change?** Scale-routing may auto-bypass Gate 1 when blast radius is zero.
 
 **Hook profiles:** Set `MEOW_HOOK_PROFILE=fast` for rapid iteration (skips non-critical hooks).
-Set `MEOW_HOOK_PROFILE=strict` to enable ALL hooks including cost-meter and post-session capture.
+Set `MEOW_HOOK_PROFILE=strict` to enable ALL hooks including post-session capture.
 
 ## Gotchas
 

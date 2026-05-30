@@ -20,7 +20,6 @@ Rules derived from the full red-team audit (11 batches, 98 items, 43 critical fi
 | Harness runs            | `tasks/harness-runs/YYMMDD-HHMM-name/run.md`                               | `runs/`, `harness/`                                                 |
 | Rubric library          | `.claude/rubrics/<name>.md`                                                | `rubrics/`, `.claude/skills/rubric/rubrics/`                   |
 | Memory files            | `.claude/memory/lessons.md`                                                | `memory/lessons.md` (bare)                                          |
-| Conversation summary    | `.claude/memory/conversation-summary.md`                                   | `memory/conversation-summary.md`, `summary.md`                      |
 | Web fetch cache         | `.claude/cache/web-fetches/{YYMMDD}-{HHMMSS}-{host}-{sha256-path[:10]}.md` | `.claude/memory/web-fetches/` (memory is for learnings, not caches) |
 | Web fetch manifest      | `.claude/cache/web-fetches/index.jsonl` (append-only)                      | `.claude/memory/web-fetches/index.jsonl`                            |
 | Web fetch quarantine    | `.claude/cache/web-fetches/quarantine/{sha256}.quarantined`                | `.claude/memory/quarantine/`, `quarantine/`                         |

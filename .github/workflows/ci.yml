@@ -28,6 +28,11 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Smoke-test memory CLI
+        run: |
+          node packages/mewkit/dist/index.js memory validate
+          node packages/mewkit/dist/index.js memory render-views
+
       - name: Setup Python venv
         run: |
           python3 -m venv .claude/skills/.venv

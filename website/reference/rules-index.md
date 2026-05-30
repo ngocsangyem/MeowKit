@@ -122,7 +122,6 @@ Discipline rules for the autonomous multi-hour build pipeline (`mk:harness`) and
 | 8 | Active Verification Is a HARD GATE | Evaluator drives build via browser/curl/CLI |
 | 9 | Skeptic Persona Reloaded Per Criterion | Prevent leniency drift across criteria |
 | 10 | No Density Override Bypasses Gates | Density ≠ gate bypass |
-| 11 | **Context Caching via Conversation Summary** | Phase 9 — conversation-summary cache hook required |
 
 Source: `.claude/rules/harness-rules.md`. Applies to Phase 3 (Build) + Phase 4 (Review) when harness pipeline is active.
 

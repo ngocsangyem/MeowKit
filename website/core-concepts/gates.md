@@ -89,10 +89,6 @@ These run after the tool call. They provide feedback but don't block — the hoo
 - Evaluator and generator are hard-separated (prevent self-evaluation bias)
 - `dispatch.cjs` crash does not affect security hooks (they're independent bash entries in `settings.json`)
 
-## Conversation summary cache — security note
-
-The `conversation-summary-cache.sh` runs secret scrubbing before writing `.claude/memory/conversation-summary.md`. It strips: Anthropic/OpenAI/Stripe/AWS/GitHub/GitLab/Slack API keys, JWT tokens, DB URLs, Bearer tokens, email addresses, and generic `api_key=` / `password=` / `token=` patterns. This prevents secrets from being re-read into LLM context.
-
 ## Next steps
 
 - [How the workflow phases fit together](/core-concepts/workflow)

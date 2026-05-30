@@ -13,7 +13,7 @@ Read-only audit of `.claude/` structural overhead. Reports prioritized
 "remove X save Y tokens" recommendations against the model context window.
 
 NOT for monetary cost tracking (see `/mk:budget`).
-NOT for transcript caching (see `.claude/hooks/conversation-summary-cache.sh`).
+NOT for transcript size.
 
 ### Execution
 

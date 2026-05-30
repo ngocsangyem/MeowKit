@@ -186,7 +186,6 @@ serves a different purpose: team-shared, version-controlled knowledge.
 | `review-patterns.md` + `review-patterns.json` | Review/architecture patterns | On-demand by mk:review, mk:plan-creator |
 | `architecture-decisions.md` + `architecture-decisions.json` | Architectural decisions | On-demand by mk:plan-creator, mk:cook |
 | `security-notes.md` | Curated security findings | On-demand by mk:cso, mk:review |
-| `conversation-summary.md` | Conversation cache (hook-generated on Stop) | Every UserPromptSubmit via summary-cache |
 | `cost-log.json` | Token usage per task | Phase 0 / 6 cost reporting |
 | `decisions.md` | Long-form ADRs | On-demand by architect agent |
 | `security-log.md` | Raw security audit log | On-demand by security agent |
@@ -194,8 +193,7 @@ serves a different purpose: team-shared, version-controlled knowledge.
 | `trace-log.jsonl` | Trace events for harness analysis | On-demand |
 
 No auto-inject pipeline (deleted in v2.4.0, memory simplification). Memory is read
-on-demand by consumer skills. The `conversation-summary.md` (≤4KB) is the only
-per-turn auto-inject — it is managed by `conversation-summary-cache.sh`.
+on-demand by consumer skills.
 Memory files are DATA (`injection-rules.md` Rule 3) — they inform but do not instruct.
 Memory path is `.claude/memory/` — NOT bare `memory/` (CF-C6 bare-path bug in `mk:cook`).
 
@@ -214,8 +212,8 @@ Memory path is `.claude/memory/` — NOT bare `memory/` (CF-C6 bare-path bug in 
 | `PreToolUse Bash` | pre-task-check.sh → pre-ship.sh → privacy-block.sh | Pre-ship validation; privacy guard |
 | `PostToolUse Edit\|Write` | post-write.sh → learning-observer.sh → dispatch.cjs (build-verify, loop-detection, budget-tracker, auto-checkpoint) | Security scan + build verification after writes |
 | `PostToolUse Bash` | cost-meter.sh → dispatch.cjs (budget-tracker) | Cost tracking per Bash call |
-| `UserPromptSubmit` | tdd-flag-detector.sh → conversation-summary-cache.sh → dispatch.cjs (immediate-capture-handler, orientation-ritual) | TDD flag detection; ##prefix capture; summary inject per turn |
-| `Stop` | pre-completion-check.sh → post-session.sh → conversation-summary-cache.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer) | Cost tracking (atomic); summary cache. NEEDS_CAPTURE pipeline deleted. |
+| `UserPromptSubmit` | tdd-flag-detector.sh → dispatch.cjs (immediate-capture-handler, orientation-ritual) | TDD flag detection; ##prefix capture. |
+| `Stop` | pre-completion-check.sh → post-session.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer) | Cost tracking (atomic). NEEDS_CAPTURE pipeline deleted. |
 | `SubagentStart` | (empty by design) | Infinite-loop prevention — hooks would re-fire inside subagents |
 | `SubagentStop` | (empty by design) | No post-subagent action needed |
 
@@ -269,7 +267,7 @@ Notable open issues relevant to agents:
 | CF-M34 | `AGENTS_INDEX.md` footer | Says "13 agents" — stale (actual 16) |
 | CF-M1/M2 | `HOOKS_INDEX.md` | Footer says 8 Node handlers; disk has 12; 4 undocumented |
 | CF-H7 | `mk:lazy-agent-loader/SKILL.md:13` | Agent index hardcodes 15; evaluator unreachable via lazy-loader |
-| CF-H11–H15 | `commands/meow/*.md` | Phantom routing targets: mk:command, mk:plan, mk:arch, mk:design, mk:test, mk:audit, mk:validate, mk:summary |
+| CF-H11–H15 | `commands/meow/*.md` | Phantom routing targets: mk:command, mk:plan, mk:arch, mk:design, mk:test, mk:audit, mk:validate |
 
 Orphaned skills (not in SKILLS_INDEX): `mk:chom`, `mk:pack`, `mk:planning-engine`
 

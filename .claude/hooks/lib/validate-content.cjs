@@ -1,5 +1,5 @@
 // validate-content.cjs — Shared injection pattern validator for memory content.
-// Used by conversation-summary-cache and immediate-capture-handler.
+// Used by immediate-capture-handler and the mewkit memory validator.
 
 'use strict';
 
