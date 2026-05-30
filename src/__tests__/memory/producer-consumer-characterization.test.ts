@@ -19,23 +19,17 @@ describe('Audit-lock: curated-memory writers', () => {
     expect(h).toContain('review-patterns.json');
   });
 
-  it('post-session.sh writes the model-change flag to fixes.md (pre-retirement state)', () => {
+  it('post-session.sh emits the model-change flag as a trace event, not a fixes.md write', () => {
     const p = read('.claude/hooks/post-session.sh');
-    expect(p).toMatch(/fixes\.md/);
+    expect(p).toContain('dead_weight_audit_needed');
+    // The model-change flag no longer appends to the curated fixes store.
+    expect(p).not.toMatch(/cat >> "\$MEMORY_DIR\/fixes\.md"/);
   });
 
-  it('architecture-decisions.json is populated from its MD (post seed-from-md, Phase 1)', () => {
-    // Pre-Phase-1 this store was empty (patterns:[]) while the MD held 5 entries;
-    // `mewkit memory seed-from-md` populated it. The invariant now: JSON holds the
-    // MD knowledge so JSON-first readers (Phase 2) lose nothing.
-    const json = JSON.parse(read('.claude/memory/architecture-decisions.json')) as {
-      patterns: Array<{ source?: string }>;
-    };
-    expect(Array.isArray(json.patterns)).toBe(true);
-    expect(json.patterns.length).toBeGreaterThan(0);
-    expect(json.patterns.some((p) => p.source === 'seed-from-md')).toBe(true);
-    expect(read('.claude/memory/architecture-decisions.md').length).toBeGreaterThan(1000);
-  });
+  // NOTE: the seed-from-md → architecture-decisions.json population is covered by
+  // seed-from-md.test.ts with tmp fixtures. It is NOT asserted here because
+  // `.claude/memory/*` is gitignored (machine-local), so the live store is absent in
+  // a fresh checkout / CI. Characterization here pins committed wiring only.
 });
 
 describe('Audit-lock: trace-log canonical stream', () => {
