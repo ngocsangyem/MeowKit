@@ -41,24 +41,6 @@ STATE_DIR="session-state"
 ATTEMPTS_FILE="$STATE_DIR/precompletion-attempts.json"
 mkdir -p "$STATE_DIR"
 
-# Soft warning: if mk:fix was the active skill and fixes.md was NOT modified
-# during this session, the agent likely skipped Step 6 (memory capture).
-# Warn only — does not block. Opt out: MEOWKIT_FIX_CAPTURE_WARN=off.
-# Signal: session-state/last-session-id mtime = session start; compare to
-# .claude/memory/fixes.md mtime.
-if [ "${MEOWKIT_FIX_CAPTURE_WARN:-on}" != "off" ] \
-   && [ -f "session-state/active-skill" ] \
-   && grep -q '^mk:fix$' "session-state/active-skill" 2>/dev/null \
-   && [ -f "session-state/last-session-id" ] \
-   && [ -f ".claude/memory/fixes.md" ]; then
-  _SESSION_START=$(stat -f %m "session-state/last-session-id" 2>/dev/null || stat -c %Y "session-state/last-session-id" 2>/dev/null || echo 0)
-  _FIXES_MTIME=$(stat -f %m ".claude/memory/fixes.md" 2>/dev/null || stat -c %Y ".claude/memory/fixes.md" 2>/dev/null || echo 0)
-  if [ -n "$_SESSION_START" ] && [ -n "$_FIXES_MTIME" ] && [ "$_FIXES_MTIME" -le "$_SESSION_START" ] 2>/dev/null; then
-    echo "WARN: /mk:fix session ending without updating .claude/memory/fixes.md (Step 6 skipped). Use /mk:fix --no-capture to suppress this warning." >&2
-  fi
-  unset _SESSION_START _FIXES_MTIME
-fi
-
 PY=".claude/skills/.venv/bin/python3"
 [ -x "$PY" ] || PY="python3"
 command -v "$PY" >/dev/null 2>&1 || exit 0
