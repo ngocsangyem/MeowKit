@@ -71,6 +71,8 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 
 **Regression-recovery pattern (v2.9.10+):** when the reviewer surfaces a regression in EXISTING behavior (verdict appends `Side Effects Detected: Yes` plus bullet effects), cook STOPs the iteration loop and presents 2–4 typed options to the user — revert + re-plan / keep + update dependents / compatibility shim / accept the regression. User selection is recorded as a `## User Decision Addendum` block on the verdict file. `validate-gate-2.sh` blocks Gate 2 until the addendum is present (positive-presence-only — absence of the field is never a block).
 
+**Workflow evidence index (v2.9.13+):** `mk:cook` and `mk:fix` populate one `workflow-evidence.json` per run — a traceable index of task, risk flags, diagnosis/contract, verification, verdict path, and approvals. It mirrors `validate-gate-1.sh` / `validate-gate-2.sh` (the gate scripts stay authoritative) and **never approves anything**; the validator `validate-workflow-evidence.cjs` checks completeness before Gate 2 is presented, and the contract loads on demand from `.claude/rules-conditional/workflow-evidence-rules.md`. `mk:fix --auto` no longer self-approves from a review score — it stops at *ready for user approval*.
+
 **Optional flags** (cook only):
 - `--verify` `[LIGHT]`: light browser/artifact check, **advisory** (no back-edge to Phase 3 — FAIL is reported but does not block ship)
 - `--strict` `[HEAVY]`: full evaluator pass, **blocking** (FAIL blocks ship and routes back to Phase 3, max 2 evaluator iterations)
@@ -83,6 +85,7 @@ Concrete cost of `[LIGHT]` vs `[HEAVY]` depends on the inner harness, model tier
 **Deliverable:** PR URL + rollback documentation
 
 - `pre-ship.sh`: full test + lint + typecheck
+- Pre-flight reads the workflow evidence index when present (after `mk:verify`, which keeps abort authority) — augments proof, never overrides a verify FAIL (v2.9.13+)
 - Conventional commit (auto-generated)
 - PR — never push to main directly
 - Verify CI passes before closing

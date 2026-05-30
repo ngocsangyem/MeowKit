@@ -18,7 +18,7 @@ Unified skill for fixing issues of any complexity with structured diagnosis.
 ```
 Bug → Mode Select → Check Memory → Scout (MANDATORY) → Diagnose
   → [investigate → sequential-thinking → root cause?]
-  → yes → Complexity → Fix ROOT CAUSE → Verify+Prevent (MANDATORY)
+  → yes → Root-Cause Proof (6 fields, HARD GATE) → Complexity → Fix ROOT CAUSE → Verify+Prevent (MANDATORY)
   → pass → Finalize + Write to Memory
   → fail <3 → re-diagnose | fail 3+ → STOP
 ```
@@ -34,7 +34,7 @@ Override: `--quick` allows fast scout→diagnose→fix for trivial issues (lint,
 
 ## Arguments
 
-- `--auto` — Autonomous mode (**default**). Auto-approve if score >= 9.5 & 0 critical.
+- `--auto` — Autonomous mode (**default**). Auto-fixes blocking issues up to the cycle limit, then stops at *ready for user approval*. Never self-approves; score is advisory display only.
 - `--review` — Human-in-the-loop. Pause at each step.
 - `--quick` — Fast cycle for trivial bugs.
 - `--parallel` — Parallel `developer` agents per independent issue.
@@ -70,6 +70,7 @@ Activate `mk:scout` to map affected codebase BEFORE any diagnosis:
 - Affected files, dependencies, related tests, recent changes (`git log`)
 - Quick mode: minimal scout (affected file + direct deps only)
 - Standard/Deep: full scout (module boundaries, test coverage, call chains)
+- **Risk flags:** match the task against `.claude/rules/risk-checklist.md` (the 9 IDs only — do not invent flags) and hold `matchedFlags` for the evidence index. If any of AUTH / AUTHZ / DATA_MODEL / AUDIT_SEC / EXT_SYSTEM / PUBLIC_CONTRACT / WEAK_PROOF matches, set `risk.requiresHumanApproval = true` — auto mode cannot finalize silently (see `references/review-cycle.md`).
 
 **Why mandatory:** Without codebase context, diagnosis guesses instead of reasons from evidence.
 
@@ -87,6 +88,26 @@ Load `references/diagnosis-protocol.md` for the 5-phase protocol: Observe → Hy
 Output: confirmed root cause (not symptom) with evidence chain + confidence level.
 
 **BLOCK:** If confidence < medium → gather more evidence before fixing. Never fix a "maybe."
+
+## Step 2.5 — Root-Cause Proof Checkpoint (HARD GATE)
+
+Operationalizes `.claude/rules/core-behaviors.md` Rule 6 ("Verify, Don't Assume"). The six fields are the named output of the Step 2 diagnosis (`references/diagnosis-protocol.md` Phase 4). **Do NOT start Step 4 (Fix) until all six are populated** — empty fields mean the diagnosis is not yet proven.
+
+Standard/Complex/Parallel — all six required:
+
+1. **Exact symptom** — copy-pasted error/message/behavior, not paraphrased.
+2. **Deterministic reproduction** — exact command(s) or steps that trigger it every time.
+3. **Expected vs actual** — what should happen vs what does.
+4. **Root cause with `file:line`** — the specific source location, traced backward from the symptom (never the symptom site).
+5. **Why now** — what changed / what condition makes it surface (regression commit, data state, env, version).
+6. **Blast radius** — other callers, modules, or behaviors the same root cause touches.
+
+`--quick` compact form (still non-empty — one phrase each):
+exact compiler/lint error · file · direct cause · command-before · command-after · impacted area.
+
+If any field cannot be filled, return to Step 2 and gather more evidence. Do not substitute a guess.
+
+**Write evidence (init):** emit `workflow-evidence.json` with `skill: mk:fix`, `mode`, `task`, `planPath` (if the fix escalated to a plan), `phase`, `risk` (from Step 1), and `fixDiagnosis` (the six fields above; compact form for `--quick`). See the Workflow Evidence Index section below for path + schema.
 
 ## Step 3 — Complexity Assessment
 
@@ -115,6 +136,8 @@ Task orchestration (Moderate+): `references/task-orchestration.md`.
 4. **BLOCK:** No regression test = fix is incomplete.
 
 If verify fails: loop to Step 2. After 3 failures → STOP, question architecture.
+
+**Update evidence:** write `verification.commands` (the re-run commands) and `verification.overall` (pass/fail) to `workflow-evidence.json`.
 
 ## Step 6 — Finalize + Learn (MANDATORY for Standard/Complex/Parallel; opt-in for Simple)
 
@@ -163,6 +186,18 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 4. `documenter` agent → update `./docs`.
 
 5. Ask user about commit.
+
+## Workflow Evidence Index
+
+Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; `--quick` writes the compact form; Simple fixes may skip it.
+
+**Storage path:** `.claude/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per `skill-authoring-rules.md` Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
+
+**Write points:** Step 2.5 (init: skill, mode, task, planPath, phase, risk, fixDiagnosis) → Step 5 (verification) → Step 6 finalize (`approvals.gate2`/`ship` as `required|not_applicable`, `memory.fixPatternWritten`).
+
+**Validate before approval:** run `node .claude/scripts/validate-workflow-evidence.cjs <path> --phase fix` before the user-approval prompt (Step 6 item 5). Surface any `EVIDENCE_BLOCKED:<reasons>` and fill the missing fields — do not present for approval on a blocked index. A high-risk flag (`risk.requiresHumanApproval`) forces explicit human approval before finalize regardless of mode.
+
+**Evidence ≠ memory:** the evidence file is one-run proof; `.claude/memory/fixes.json` is the durable pattern store. Keep them separate — standalone `/mk:fix` owns its evidence write; inside `/mk:cook` the pipeline (Phase 6) owns the evidence write, so do NOT double-write. Scrub secrets / tokens / PII and store pointers/summaries only — never raw command logs.
 
 ## Skill Activation
 

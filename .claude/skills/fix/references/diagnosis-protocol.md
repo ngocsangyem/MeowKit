@@ -55,6 +55,22 @@ Symptom → Immediate cause → Contributing factor → ROOT CAUSE
 
 **RULE:** NEVER fix where the error appears. Trace backward to source.
 
+### Output — Root-Cause Proof Checkpoint (six fields)
+
+The pre-diagnosis capture (lines above) and this trace feed a single proof
+checkpoint that gates Step 4 (Fix) in `SKILL.md` Step 2.5. Phase 4 MUST emit
+all six fields before implementation begins:
+
+1. **Exact symptom** — copy-pasted, not paraphrased (from Pre-Diagnosis #1-3).
+2. **Deterministic reproduction** — exact command/steps (from Phase 1).
+3. **Expected vs actual** — from Phase 1 observation.
+4. **Root cause with `file:line`** — the traced source location, not the symptom site.
+5. **Why now** — the change/condition that surfaced it (from Pre-Diagnosis #5 `git log`).
+6. **Blast radius** — other callers/modules/behaviors the same root cause touches.
+
+`--quick` compact form (still non-empty, one phrase each):
+exact compiler/lint error · file · direct cause · command-before · command-after · impacted area.
+
 ## Phase 5: Escalate (When hypotheses fail)
 
 If 2+ hypotheses REFUTED:

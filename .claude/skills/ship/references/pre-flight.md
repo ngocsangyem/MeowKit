@@ -6,6 +6,7 @@
 - [Step 0: Detect base branch](#step-0-detect-base-branch)
 - [Step 0.5: Ship Mode Detection](#step-05-ship-mode-detection)
 - [Step 0.8: Unified Verification](#step-08-unified-verification)
+- [Step 0.9: Read workflow evidence (if present)](#step-09-read-workflow-evidence-if-present)
 - [Step 1: Pre-flight](#step-1-pre-flight)
 - [Review Readiness Dashboard](#review-readiness-dashboard)
 
@@ -56,9 +57,21 @@ If `mk:verify` returns FAIL:
 - **Abort ship** with message: "Verification failed — fix issues before shipping. Run `/mk:verify` to re-check."
 - Do not proceed to Step 1
 
-If `mk:verify` returns PASS: continue to Step 1.
+If `mk:verify` returns PASS: continue to Step 0.9.
 
 > Skip this step only if `--skip-verify` flag is passed explicitly by the user.
+
+---
+
+## Step 0.9: Read workflow evidence (if present)
+
+`mk:verify` (Step 0.8) stays the abort authority — this step runs AFTER it and only READS. Evidence augments proof; it **never approves** and **never overrides** `mk:verify`. A FAIL from verify still aborts regardless of what evidence says.
+
+1. Look for `workflow-evidence.json` at the planned path `tasks/plans/<plan>/reports/evidence/` first, then the standalone path `.claude/session-state/evidence/<slug>/`.
+2. **If absent** (older runs, `--quick` fixes): proceed exactly as today — no new hard dependency. Do not block on a missing file.
+3. **If present:** report `approvals` (gate1/gate2/ship), `review.verdictPath` + `review.status`, `verification.overall`, and `risk.requiresHumanApproval`. Block ONLY where the existing Gate 2 / ship rules already block — e.g. missing verdict, a FAIL dimension, or an unacknowledged high-risk approval. Evidence cannot turn a `mk:verify` FAIL into a pass and cannot mark Gate 2 approved on its own (human approval per `.claude/rules/gate-rules.md` still required).
+
+Contract: `.claude/rules-conditional/workflow-evidence-rules.md`.
 
 ---
 

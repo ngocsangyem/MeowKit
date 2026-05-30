@@ -170,6 +170,10 @@ Side Effects Detected: Yes
 
 **Backward-compat (CRITICAL):** absence of the `Side Effects Detected` field is NOT a block signal. Existing verdicts that pre-date this contract continue to pass unchanged. The new signal is positive-presence-only — never negative-absence.
 
+### Evidence Index (recording only)
+
+When a workflow evidence index exists for the run (`mk:cook` or standalone `mk:fix`), the verdict file path is recorded as `review.verdictPath` (and `review.sideEffectsDetected` mirrors the signal above). This is a POINTER for traceability — the 5-dimension verdict and the side-effect signal are unchanged, and the evidence index never approves anything. Contract: `.claude/rules-conditional/workflow-evidence-rules.md`.
+
 ## Pre-Review Scouting (Recommended)
 
 For changes touching 3+ files, run `/mk:scout` BEFORE starting review:

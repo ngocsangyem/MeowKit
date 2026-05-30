@@ -4,26 +4,33 @@ Mode-aware review handling for reviewer agent results.
 
 ## Autonomous Mode
 
+Auto mode auto-FIXES; it never auto-APPROVES. The loop terminates in a
+"ready for user approval" state — crossing Gate 2 or any ship boundary always
+requires explicit human approval (`.claude/rules/gate-rules.md`). Score is
+advisory display only and never gates the decision.
+
 ```
 cycle = 0
 LOOP:
-  1. Run reviewer agent → score, critical_count, warnings
+  1. Run reviewer agent → score, critical_count, warnings (score is display-only)
 
-  2. IF score >= 9.5 AND critical_count == 0:
-     → Auto-approve, PROCEED
-
-  3. ELSE IF critical_count > 0 AND cycle < 3:
+  2. IF critical_count > 0 AND cycle < 3:
      → Auto-fix critical issues
      → Re-run tests
      → cycle++, GOTO LOOP
 
-  4. ELSE IF cycle >= 3:
+  3. ELSE IF cycle >= 3 AND critical_count > 0:
      → ESCALATE to user
      → Options: "Fix manually" / "Approve anyway" / "Abort"
 
-  5. ELSE (no critical, score < 9.5):
-     → Approve with warnings logged, PROCEED
+  4. ELSE (no critical remaining):
+     → Log any warnings + evidence completeness
+     → PRESENT for user approval (do NOT self-approve, do NOT cross Gate 2/ship)
 ```
+
+High-risk flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM,
+PUBLIC_CONTRACT, WEAK_PROOF from `.claude/rules/risk-checklist.md`) force
+explicit human approval before finalize regardless of cycle outcome.
 
 ## Human-in-the-Loop Mode
 
@@ -53,9 +60,9 @@ ALWAYS:
 ## Quick Mode Review
 
 Same as Autonomous but:
-- Lower threshold: score >= 8.5 acceptable
 - Only 1 auto-fix cycle before escalate
 - Focus: correctness, security, no regressions
+- Still terminates in "ready for user approval" — score never gates; no self-approve
 
 ## Critical Issues (Always Block)
 

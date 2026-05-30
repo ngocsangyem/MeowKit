@@ -12,7 +12,7 @@ Use `AskUserQuestion` at start of fixing workflow.
     "options": [
       {
         "label": "Autonomous (Recommended)",
-        "description": "Auto-approve if quality high, only ask when stuck"
+        "description": "Auto-fixes blocking issues, then stops at ready-for-approval; never self-approves"
       },
       {
         "label": "Human-in-the-loop",

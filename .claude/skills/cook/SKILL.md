@@ -205,6 +205,7 @@ After Gate 2 verdict PASS and before Phase 5 ship, delegate to `project-manager`
 
 - `.claude/rules/gate-rules.md` — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions this skill enforces across all modes
 - `.claude/rules/post-phase-delegation.md` — PM delegation fire points and skip conditions
+- `.claude/rules-conditional/workflow-evidence-rules.md` — workflow evidence index (traceability over existing Phase 0-6 outputs; mirrors the gate scripts, never approves). See `references/workflow-steps.md` → Workflow Evidence Index
 
 ## Gotchas
 
@@ -212,7 +213,7 @@ Operational gotchas live here; pre-build failure modes and rationalizations live
 
 - **Skipping mk:simplify before review**: Tests pass but code is still complex → run `/mk:simplify` between Phase 3 and Phase 4 every time, no exceptions
 - **Skipping Gate 1 on "simple" features**: Features that seem simple grow during implementation. Always create a plan file; cancel it if truly trivial
-- **Auto-approve sneaking bugs past Gate 2**: Auto mode can auto-fix but NEVER auto-approve. gate-rules.md says NO exceptions
+- **Auto-approve sneaking bugs past Gate 2**: "auto" means automatic execution *between* gates, NOT automatic approval. Auto mode auto-fixes but NEVER auto-approves Gate 2 — gate-rules.md says NO exceptions. The workflow evidence index must be complete before Gate 2 is presented
 - **Context loss between phases**: Long multi-phase workflows exceed context window. Update plan.md Agent State after each phase; next agent reads it first
 - **Parallel mode deadlocks**: Phase dependencies cause deadlock when phase-03 waits for phase-02 results. Map dependency graph before spawning parallel agents
 - **Code mode on stale plans**: Running old plan against changed codebase. Warn if plan.md is >14 days old

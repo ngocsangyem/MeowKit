@@ -164,6 +164,10 @@ gh pr create --base <base> --title "<type>: <summary>" --body "$(cat <<'EOF'
 <If skipped: reason (no plan, no server, no verification section)>
 <If not applicable: omit this section>
 
+## Workflow Evidence
+<If a workflow-evidence.json was read in pre-flight Step 0.9: link its path as a proof pointer (approvals + verdict path + verification overall). Evidence is proof, NOT approval.>
+<If absent: omit this section entirely>
+
 ## TODOS
 <If items marked complete: bullet list of completed items with version>
 <If no items completed: "No TODO items completed in this PR.">

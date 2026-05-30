@@ -28,6 +28,7 @@ Primary entry point for building features. Given a description or plan path, orc
 - **Exact-Requirements Contract (Phase 1):** `mk:plan-creator` MUST answer 5 dimensions in concrete sentences — expected output, acceptance criteria, scope boundary, non-negotiable constraints, touchpoints — before returning a plan. Clarifying-question options MUST cite scout findings (file paths). Skipped on plan-path input.
 - **Regression Recovery Options (Gate 2):** when the reviewer surfaces a regression in EXISTING behavior (verdict includes `Side Effects Detected: Yes`), cook STOPs the iteration loop and presents 2–4 typed options to the user (revert / keep + update dependents / compatibility shim / accept the regression). User selection recorded as a `## User Decision Addendum` block on the verdict file. `validate-gate-2.sh` blocks Gate 2 until the addendum is present.
 - **Simplify + Verify:** Mandatory post-build steps — reduce complexity, then run unified build+lint+test+coverage before review
+- **Workflow evidence index:** populates ONE `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` from existing Phase 0-6 outputs (risk flags, the 5 exact requirements, verification, verdict path, approvals). It is traceability only — mirrors `validate-gate-1.sh`/`validate-gate-2.sh`, **never approves**, carries no score, and adds no new gate. Must be complete before Gate 2 is presented
 
 ## Usage
 

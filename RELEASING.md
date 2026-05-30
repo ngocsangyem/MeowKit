@@ -413,6 +413,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.9.13 | 2026-05-30 | Fix Gate Parity & Workflow Evidence Index        |
 | v2.9.12 | 2026-05-30 | JSON-first memory + observability cleanup        |
 | v2.9.11 | 2026-05-24 | Plan-creator mode clarity                        |
 | v2.9.10 | 2026-05-23 | Skill portability + cook context-engineering + provider diagnostics |

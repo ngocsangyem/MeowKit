@@ -33,9 +33,9 @@ See `references/review-cycle.md` for mode-specific handling.
 **Output:** `Step 3: Review [score]/10 — [status]`
 
 ### Step 4: Complete
-Report summary to user.
-- If autonomous mode + score >= 9.0: ask to commit
-- If HITL mode: ask user next action
+Report summary to user. Score is advisory display only — it never gates the commit prompt.
+- Autonomous mode: present for user approval, then ask to commit (never self-approve)
+- HITL mode: ask user next action
 
 **Output:** `Step 4: Complete — [action]`
 

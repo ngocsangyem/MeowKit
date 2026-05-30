@@ -14,6 +14,30 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.9.13 (2026-05-30) — Fix Gate Parity & Workflow Evidence Index
+
+### Highlights
+
+`mk:fix` now follows the same no-self-approval discipline as the rest of the workflow, and a new MeowKit-native workflow evidence index gives `mk:fix`, `mk:cook`, `mk:review`, and `mk:ship` a single traceable record of what ran — without ever approving anything itself. Gate 1 and Gate 2 remain human authority.
+
+### Features
+
+- Workflow evidence index — `mk:fix` and `mk:cook` populate one `workflow-evidence.json` per run indexing task, risk flags, diagnosis or contract, verification, verdict path, and approvals; it is traceability only, carries no score, and mirrors `validate-gate-1.sh` / `validate-gate-2.sh` rather than replacing them.
+- A zero-dependency validator (`.claude/scripts/validate-workflow-evidence.cjs`) checks evidence completeness before approval prompts; the contract lives in `.claude/rules-conditional/workflow-evidence-rules.md` and loads on demand, adding no always-on context.
+- `mk:ship` pre-flight reads the evidence index when present — after `mk:verify`, which keeps abort authority — and surfaces approvals, verdict, and verification as proof; absent evidence ships exactly as before.
+
+### Improvements
+
+- `mk:fix --auto` no longer self-approves from a review score — it auto-fixes blocking issues up to the cycle limit, then stops at _ready for user approval_, and crossing Gate 2 or a ship boundary always requires explicit human approval.
+- `mk:fix` adds a six-field root-cause proof checkpoint (HARD GATE) before implementation — exact symptom, deterministic reproduction, expected vs actual, root cause with `file:line`, why now, blast radius — with a compact one-phrase form for `--quick`.
+- `mk:cook` records evidence across Phase 0-6 from outputs that already exist with no new phase or gate, and `--auto` wording is clarified — automatic execution between gates, never automatic Gate 2 approval.
+- `mk:review` records the verdict path in the evidence index; the verdict and side-effect behavior are unchanged.
+
+### Migration Notes
+
+- If you relied on `mk:fix --auto` proceeding past review automatically on a high score, you now confirm at the _ready for user approval_ checkpoint — no flag change is required, only the approval step is now explicit.
+- Standalone standard/complex `mk:fix` runs now require the six root-cause fields before a fix is applied; simple and `--quick` fixes use the compact form and are otherwise unaffected.
+
 ## 2.9.12 (2026-05-30) — JSON-first memory + observability cleanup
 
 ### Highlights

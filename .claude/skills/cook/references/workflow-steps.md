@@ -206,7 +206,10 @@ Present review verdict. Use `AskUserQuestion` (header: "Gate 2"):
 
 Max 3 review-fix cycles. After 3: final decision required from user.
 
-Run `.claude/skills/cook/scripts/validate-gate-2.sh` before presenting for approval.
+Before presenting for approval, run BOTH structural checks and surface both:
+
+- `.claude/skills/cook/scripts/validate-gate-2.sh` — the authoritative Gate 2 structural guard (no FAIL dimensions, side-effect addendum present).
+- `node .claude/scripts/validate-workflow-evidence.cjs <evidence-path> --phase cook` — evidence-completeness mirror (blocks on missing `cookContract` dims, empty `verification.commands`, `gate2-approved-without-verdict`, side-effects-without-addendum). It MIRRORS the gate script's status; it never replaces it and never approves. Pass `--plan-input` when the cook input was an existing `plan.md` / `phase-*.md` path.
 
 **Output:** `Phase 4: Review [score]/10, Gate 2 approved`
 
@@ -316,6 +319,26 @@ Three mandatory subagents in parallel:
 **Others:** Ask user before continuing to next phase.
 
 **Output:** `Phase 6: Reflect — sync-back done, docs [impact], memory updated`
+
+## Workflow Evidence Index (traceability — no new gate)
+
+Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist across Phases 0-6 — no extra agent work, no extra user step, no behavior change. The index records pointers + summaries; it **never approves** (Gate 1 / Gate 2 stay human authority) and carries **no score**. The gate scripts (`validate-gate-1.sh`, `validate-gate-2.sh`) remain the structural authority; evidence MIRRORS their result.
+
+**Storage path:** `tasks/plans/<plan>/reports/evidence/workflow-evidence.json`.
+
+| Phase | Existing output → evidence fields |
+|---|---|
+| 0 Orient | `mode`, tier, `risk.matchedFlags` (from `risk-checklist.md` / `mk:agent-detector`), memory-loaded flag |
+| 1 Plan | `planPath`, `cookContract` (the 5 exact requirements), `approvals.gate1` (mirrors `validate-gate-1.sh`) |
+| 3 Build | changed-files summary |
+| 3.5 Simplify | simplify status |
+| 3.6 Verify (`mk:verify`) | `verification.commands`, `verification.overall` |
+| 4 Review | `review.verdictPath`, `review.status`, `review.sideEffectsDetected`, `approvals.gate2` (mirrors `validate-gate-2.sh`) |
+| 4.5 Verify | `--verify`/`--strict` run state only — RECORD result; does NOT change advisory vs hard-gate semantics |
+| 5 Ship | ship pre-flight status → `approvals.ship` |
+| 6 Reflect | `memory.*` capture status |
+
+`cookContract` is populated from the Phase 1 five exact requirements; **skip it only when the input was an existing `plan.md` / `phase-*.md` path** (the contract already lives in the plan — pass `--plan-input` to the validator). Evidence completeness must pass before presenting Gate 2 (see Phase 4 GATE 2). Scrub secrets/PII; store pointers + summaries, not raw logs.
 
 ## Mode Flow Summary
 

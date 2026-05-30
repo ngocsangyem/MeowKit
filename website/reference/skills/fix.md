@@ -23,12 +23,13 @@ Structured debugging pipeline. Instead of immediately editing code, it forces st
 - **Regression test enforcement:** Every fix must include a test that fails without the fix and passes with it
 - **Fix memory:** Reads `.claude/memory/fixes.md` and `fixes.json` for prior patterns — repeated bugs become instant fixes
 - **Defense-in-depth:** After fixing, applies prevention measures: entry validation, business logic guards, error handling, type safety
-- **Mode selection:** `--auto` (default, auto-approve if score ≥ 9.5), `--review` (human-in-the-loop), `--quick` (fast cycle), `--parallel` (per-issue agents), `--tdd` (regression test before fix)
+- **Workflow evidence index:** for standalone standard/complex fixes, writes `.claude/session-state/evidence/<slug>/workflow-evidence.json` indexing risk flags (from `risk-checklist.md`), the six root-cause fields, verification commands, and approvals. Traceability only — it **never approves**, carries no score, and is distinct from the durable `fixes.json` memory store. Validated before the approval prompt
+- **Mode selection:** `--auto` (default, auto-fixes then stops at *ready for user approval* — never self-approves), `--review` (human-in-the-loop), `--quick` (fast cycle), `--parallel` (per-issue agents), `--tdd` (regression test before fix)
 
 ## Usage
 
 ```bash
-/mk:fix login fails after 24 hours --auto              # Autonomous (default) — auto-approve if score ≥ 9.5
+/mk:fix login fails after 24 hours --auto              # Autonomous (default) — auto-fixes, then stops at ready-for-approval
 /mk:fix login fails after 24 hours                     # Same as above (--auto is default)
 /mk:fix payment processing timeout --review            # Human-in-the-loop at each step
 /mk:fix TypeScript error in auth.ts --quick            # Fast cycle for trivial bugs
@@ -46,7 +47,7 @@ Login fails after 24 hours with a 401 error — the refresh token isn't being ro
 
 | Flag | Behavior |
 |------|----------|
-| `--auto` | **Default.** Autonomous mode. Auto-approve if score ≥ 9.5 and 0 critical. |
+| `--auto` | **Default.** Autonomous mode. Auto-fixes blocking issues up to the cycle limit, then stops at *ready for user approval*. Never self-approves; score is advisory display only. |
 | `--review` | Human-in-the-loop. Pause at each step for approval. |
 | `--quick` | Fast cycle for trivial bugs (single file, clear cause). Skips investigation. |
 | `--parallel` | Parallel `developer` agents per independent issue. |
@@ -57,14 +58,14 @@ Login fails after 24 hours with a 401 error — the refresh token isn't being ro
 ```
 Bug → Mode Select → Check Memory → Scout (MANDATORY) → Diagnose
   → [investigate → sequential-thinking → root cause?]
-  → yes → Complexity → Fix ROOT CAUSE → Verify+Prevent (MANDATORY)
+  → yes → Root-Cause Proof (6 fields, HARD GATE) → Complexity → Fix ROOT CAUSE → Verify+Prevent (MANDATORY)
   → pass → Finalize + Write to Memory
   → fail <3 → re-diagnose | fail 3+ → STOP
 ```
 
 ## Step 0 — Mode selection
 
-If no mode flag: `AskUserQuestion` (Autonomous / Human-in-the-loop / Quick). Autonomous auto-approves if score ≥ 9.5 and 0 critical findings.
+If no mode flag: `AskUserQuestion` (Autonomous / Human-in-the-loop / Quick). Autonomous auto-fixes blocking issues up to the cycle limit, then stops at *ready for user approval* — it never self-approves and never crosses Gate 2 or a ship boundary. Score is advisory display only.
 
 ## Step 0.5 — Check fix memory
 
@@ -77,6 +78,8 @@ Activate `mk:scout` to map affected codebase: files, dependencies, related tests
 ## Step 2 — Diagnose (MANDATORY)
 
 Capture pre-fix state: exact error messages, failing test output, stack traces. Then structured diagnosis: `mk:investigate` collects symptoms, traces, reproduction steps. `mk:sequential-thinking` generates hypotheses from evidence, tests each, eliminates, concludes. Output: confirmed root cause with evidence chain + confidence level. **BLOCK:** if confidence < medium → gather more evidence before fixing.
+
+**Step 2.5 — Root-cause proof checkpoint (HARD GATE).** Before any fix, all six fields must be populated: exact symptom, deterministic reproduction, expected vs actual, root cause with `file:line`, why now, blast radius. `--quick` uses a compact one-phrase-each form. Empty fields mean the diagnosis is unproven — return to Step 2.
 
 ## Step 3 — Complexity assessment
 
