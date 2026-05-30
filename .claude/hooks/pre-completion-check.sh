@@ -45,21 +45,79 @@ PY=".claude/skills/.venv/bin/python3"
 [ -x "$PY" ] || PY="python3"
 command -v "$PY" >/dev/null 2>&1 || exit 0
 
-# Find active plan (P14)
-ACTIVE_PLAN=""
-if [ -f "session-state/active-plan" ]; then
-  ACTIVE_PLAN=$(cat session-state/active-plan 2>/dev/null)
-elif [ -d "tasks/plans" ]; then
-  ACTIVE_PLAN=$(ls tasks/plans/ 2>/dev/null | grep -E '^[0-9]{6}(-[0-9]{4})?-' | sort -r | head -1)
-fi
-
-# P12 empty-plans soft nudge
-if [ -z "$ACTIVE_PLAN" ]; then
-  echo "No active plan detected; verification not enforced. Set up a plan before production work." >&2
+# Verification gate (root-cause fix):
+# enforce ONLY when mk:cook or mk:harness explicitly marks verification-required.
+VERIFICATION_REQUIRED_FILE="session-state/verification-required.json"
+if [ ! -f "$VERIFICATION_REQUIRED_FILE" ]; then
   exit 0
 fi
 
-SLUG=$(echo "$ACTIVE_PLAN" | sed -E 's/^[0-9]{6}-([0-9]{4}-)?//')
+VERIFICATION_REQUIRED=$("$PY" -c "
+import json
+try:
+    with open('$VERIFICATION_REQUIRED_FILE') as f:
+        d = json.load(f)
+    print('1' if d.get('required', True) else '0')
+except Exception:
+    print('1')
+" 2>/dev/null)
+if [ "${VERIFICATION_REQUIRED:-1}" != "1" ]; then
+  exit 0
+fi
+
+# Resolve explicit active-plan only (no newest-plan fallback for blocking decisions).
+ACTIVE_PLAN=""
+ACTIVE_PLAN_SLUG=""
+if [ -f "session-state/active-plan.json" ]; then
+  ACTIVE_PLAN=$("$PY" -c "
+import json
+try:
+    with open('session-state/active-plan.json') as f:
+        d = json.load(f)
+    print((d.get('path') or d.get('slug') or '').strip())
+except Exception:
+    print('')
+" 2>/dev/null)
+fi
+
+# Legacy fallback kept for compatibility during state migration.
+if [ -z "$ACTIVE_PLAN" ] && [ -f "session-state/active-plan" ]; then
+  ACTIVE_PLAN=$(cat session-state/active-plan 2>/dev/null | tr -d '\n' | tr -d '\r')
+fi
+
+ACTIVE_PLAN_SLUG=$("$PY" -c "
+import re
+raw = '''$ACTIVE_PLAN'''.strip()
+if not raw:
+    print('')
+else:
+    raw = raw.rstrip('/')
+    slug = raw.split('/')[-1]
+    m = re.match(r'^[0-9]{6}(?:-[0-9]{4})?-(.+)$', slug)
+    print(m.group(1) if m else slug)
+" 2>/dev/null)
+
+if [ -z "${ACTIVE_PLAN_SLUG:-}" ]; then
+  ACTIVE_PLAN_SLUG=$("$PY" -c "
+import json, re
+try:
+    with open('$VERIFICATION_REQUIRED_FILE') as f:
+        d = json.load(f)
+    raw = (d.get('slug') or d.get('plan_slug') or '').strip()
+    m = re.match(r'^[0-9]{6}(?:-[0-9]{4})?-(.+)$', raw)
+    print(m.group(1) if m else raw)
+except Exception:
+    print('')
+" 2>/dev/null)
+fi
+
+# Without explicit active plan slug, do not block stopping.
+if [ -z "${ACTIVE_PLAN_SLUG:-}" ]; then
+  echo "verification-required set but active plan slug missing; skipping block." >&2
+  exit 0
+fi
+
+SLUG="$ACTIVE_PLAN_SLUG"
 
 # Verification evidence check — any ONE of these satisfies
 HAS_VERIFICATION=0
@@ -138,7 +196,7 @@ with open('$ATTEMPTS_FILE', 'w') as f:
 " 2>/dev/null || true
 
   cat <<EOF
-{"decision":"block","reason":"Verification missing for active plan '$ACTIVE_PLAN' (attempt $NEW_ATTEMPTS/3). No evaluator verdict, no signed contract, and no test-pass markers found in this session. Run tests, invoke /mk:evaluate, OR sign the sprint contract before stopping."}
+{"decision":"block","reason":"Verification missing for active plan '${ACTIVE_PLAN:-$SLUG}' (attempt $NEW_ATTEMPTS/3). No evaluator verdict, no signed contract, and no test-pass markers found in this session. Run tests, invoke /mk:evaluate, OR sign the sprint contract before stopping."}
 EOF
   exit 0
 fi

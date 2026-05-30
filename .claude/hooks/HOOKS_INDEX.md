@@ -68,7 +68,9 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 | `session-state/build-verify-cache.json` | handlers/build-verify.cjs | (same) | File-content-hash cache for skip-on-unchanged |
 | `session-state/last-session-id` | project-context-loader.sh | (same) | Session change detection |
 | `session-state/learning-observer.jsonl` | learning-observer.sh | (self — edit-frequency state) | Per-file edit ledger; self-read to compute the canonical `file_edited` trace `edit_count`. No external reader; verbose churn record debug-gated (`MEOWKIT_HOOK_DEBUG=1`). |
-| `session-state/active-plan` | mk:harness (Phase 5), mk:plan-creator | pre-completion-check.sh | Currently active plan slug |
+| `session-state/active-plan.json` | mk:harness (Phase 5), mk:plan-creator | pre-completion-check.sh, handlers/checkpoint-writer.cjs | Active plan state `{ "path": "...", "slug": "..." }` |
+| `session-state/active-plan` | legacy (migration fallback only) | pre-completion-check.sh | Deprecated raw active-plan value; remove after migration |
+| `session-state/verification-required.json` | mk:cook, mk:harness | pre-completion-check.sh | Verification enforcement marker `{ "required": true, "slug": "...", ... }` |
 | `session-state/detected-model.json` | handlers/model-detector.cjs | handlers/budget-tracker.cjs, handlers/auto-checkpoint.cjs | Model tier + density detection result |
 | `session-state/budget-state.json` | handlers/budget-tracker.cjs | (same) | Accumulated session cost estimate |
 | `session-state/checkpoints/checkpoint-latest.json` | handlers/checkpoint-writer.cjs (Stop), handlers/auto-checkpoint.cjs (PostToolUse phase transitions) | handlers/orientation-ritual.cjs (SessionStart resume/clear/compact) | Single-file checkpoint with model tier, density, plan path, git state, budget. Atomic .tmp+rename; last-writer-wins; sequence display-only. |
