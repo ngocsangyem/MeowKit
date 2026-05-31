@@ -3,6 +3,7 @@ import path from "node:path";
 import type { DiagResult } from "./doctor-checks.js";
 import { scaffoldHarnessProject, hasHarness } from "../core/harness-scaffold.js";
 import { runConfiguredHook, type HookRunResult } from "../core/hook-runner.js";
+import { assertOutcome, type ExpectSpec } from "../core/simulation-runner.js";
 
 /**
  * Live behavioral check of the hard gates — the question structural validation cannot
@@ -20,25 +21,12 @@ function findScript(results: HookRunResult[], script: string): HookRunResult | u
 	return results.find((r) => r.script === script);
 }
 
-/** Classify a hard-block probe: PASS iff the hook exited 2 with its marker on stderr. */
-function expectHardBlock(name: string, r: HookRunResult | undefined, marker: string): DiagResult {
-	if (!r) {
-		return {
-			name,
-			status: "fail",
-			detail: "Hook was not configured/run for this event.",
-			fix: "Check settings.json hook registration.",
-		};
-	}
-	if (r.status === 2 && r.stderr.includes(marker)) {
-		return { name, status: "pass", detail: "Blocked as expected (exit 2, marker on stderr)." };
-	}
-	return {
-		name,
-		status: "fail",
-		detail: `Expected a hard block (exit 2, ${marker} on stderr) but got exit ${r.status}.`,
-		fix: "Verify the hook interpreter (bash) and the gate logic in the hook script.",
-	};
+/** Map the shared PASS/FAIL/SKIP outcome onto a doctor DiagResult (SKIP → warn). */
+function toDiag(name: string, r: HookRunResult | undefined, expect: ExpectSpec, fix: string): DiagResult {
+	const outcome = assertOutcome(r, expect);
+	if (outcome.status === "PASS") return { name, status: "pass", detail: outcome.detail };
+	if (outcome.status === "SKIP") return { name, status: "warn", detail: outcome.detail, fix };
+	return { name, status: "fail", detail: outcome.detail, fix };
 }
 
 export async function checkHardGates(root: string | null): Promise<DiagResult[]> {
@@ -75,20 +63,24 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 
 		// Probe 1 — source write BEFORE any plan must hard-block.
 		project.clearPlans();
-		results.push(expectHardBlock("Gate 1: blocks source write with no plan", runWrite(), "@@GATE_BLOCK@@"));
+		results.push(
+			toDiag(
+				"Gate 1: blocks source write with no plan",
+				runWrite(),
+				{ blocked: true, marker: "@@GATE_BLOCK@@", exitCode: 2, expectStream: "stderr" },
+				"Verify the hook interpreter (bash) and the gate logic in gate-enforcement.sh.",
+			),
+		);
 
 		// Probe 2 — source write AFTER a plan must be allowed.
 		project.addPlan({ nested: true });
-		const afterPlan = runWrite();
 		results.push(
-			afterPlan && afterPlan.status === 0
-				? { name: "Gate 1: allows source write once a plan exists", status: "pass", detail: "Allowed (exit 0)." }
-				: {
-						name: "Gate 1: allows source write once a plan exists",
-						status: "fail",
-						detail: `Expected allow (exit 0) but got exit ${afterPlan?.status}.`,
-						fix: "Check the plan allow-list logic in gate-enforcement.sh.",
-					},
+			toDiag(
+				"Gate 1: allows source write once a plan exists",
+				runWrite(),
+				{ blocked: false },
+				"Check the plan allow-list logic in gate-enforcement.sh.",
+			),
 		);
 
 		// Probe 3 — post-signed-contract gate. The sprint-contract validator is not part of
@@ -113,7 +105,14 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 			}),
 			"privacy-block.sh",
 		);
-		results.push(expectHardBlock("Privacy: blocks .env read", envRead, "@@PRIVACY_BLOCK@@"));
+		results.push(
+			toDiag(
+				"Privacy: blocks .env read",
+				envRead,
+				{ blocked: true, marker: "@@PRIVACY_BLOCK@@", exitCode: 2, expectStream: "stderr" },
+				"Verify the hook interpreter (bash) and the privacy logic in privacy-block.sh.",
+			),
+		);
 
 		// Probe 5 — prompt-injection Bash must block (stdout marker, exit 1 — advisory by design).
 		const injection = findScript(
@@ -128,14 +127,12 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 			"pre-task-check.sh",
 		);
 		results.push(
-			injection && injection.status === 1 && injection.stdout.includes("Prompt injection patterns detected")
-				? { name: "Injection: blocks remote-exec Bash", status: "pass", detail: "Blocked as expected (exit 1)." }
-				: {
-						name: "Injection: blocks remote-exec Bash",
-						status: "fail",
-						detail: `Expected injection block (exit 1) but got exit ${injection?.status}.`,
-						fix: "Verify pre-task-check.sh parses HOOK_COMMAND from stdin and its pattern list.",
-					},
+			toDiag(
+				"Injection: blocks remote-exec Bash",
+				injection,
+				{ blocked: true, marker: "Prompt injection patterns detected", exitCode: 1, expectStream: "stdout" },
+				"Verify pre-task-check.sh parses HOOK_COMMAND from stdin and its pattern list.",
+			),
 		);
 
 		// Probe 6 — a normal Bash command must pass.
@@ -151,14 +148,12 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 			"pre-task-check.sh",
 		);
 		results.push(
-			normalBash && normalBash.status === 0
-				? { name: "Injection: allows a normal Bash command", status: "pass", detail: "Allowed (exit 0)." }
-				: {
-						name: "Injection: allows a normal Bash command",
-						status: "fail",
-						detail: `Expected allow (exit 0) but got exit ${normalBash?.status}.`,
-						fix: "Check pre-task-check.sh for over-broad injection patterns.",
-					},
+			toDiag(
+				"Injection: allows a normal Bash command",
+				normalBash,
+				{ blocked: false },
+				"Check pre-task-check.sh for over-broad injection patterns.",
+			),
 		);
 
 		// Probe 7 — every configured shell hook runs without a shell-interpreter error.

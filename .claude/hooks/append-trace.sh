@@ -9,9 +9,11 @@
 #   append-trace.sh file_edited '{"file":"src/foo.ts","edit_count":3}'
 #
 # Behavior:
-#   - Uses flock for atomic appends (concurrent hook safety; falls back to plain
-#     append on macOS where flock(1) is not in the base install — atomicity
-#     guaranteed only for records ≤ PIPE_BUF/512 bytes in fallback mode)
+#   - Uses flock for atomic appends (concurrent hook safety). On macOS, flock(1)
+#     is not in the base install and the fallback is a plain `>>` append with NO
+#     lock: concurrent writers (now multiple — gate/privacy/hook emitters) can
+#     interleave into one torn line. Readers (core/event-log.ts) skip+tally such
+#     malformed lines, so the failure mode is a rare dropped record, not corruption.
 #   - Scrubs secrets via lib/secret-scrub.sh before write
 #   - Rotates the log when it exceeds 50MB → trace-log.{YYMMDD-HHMMSS}.jsonl.gz
 #   - Schema-versioned via top-level `schema_version: 1.0` field

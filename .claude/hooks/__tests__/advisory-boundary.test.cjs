@@ -45,3 +45,33 @@ test('gate-enforcement.sh does not silently skip when CLAUDE_PROJECT_DIR is unse
     'gate-enforcement.sh comment "NEVER skip regardless of profile" removed — gate could be bypassed by hook profile env var'
   );
 });
+
+// --- Typed-event emission wiring (Phase 4 observability) ---
+const PRE_TASK_HOOK = path.join(PROJECT_ROOT, '.claude/hooks/pre-task-check.sh');
+const EMIT_LIB = path.join(PROJECT_ROOT, '.claude/hooks/lib/emit-event.sh');
+
+test('emit-event.sh lib exists and defines emit_event + the failed-trap installer', () => {
+  assert.ok(fs.existsSync(EMIT_LIB), `emit-event.sh missing at ${EMIT_LIB}`);
+  const body = fs.readFileSync(EMIT_LIB, 'utf8');
+  assert.match(body, /emit_event\(\)/, 'emit_event() function removed');
+  assert.match(body, /install_hook_failed_trap\(\)/, 'install_hook_failed_trap() removed');
+  assert.match(body, /BASH_VERSION/, 'BASH_VERSION guard removed — trap could error under dash');
+});
+
+test('gate-enforcement.sh emits gate.blocked on every block path', () => {
+  const body = fs.readFileSync(GATE_HOOK, 'utf8');
+  const emits = body.match(/emit_event gate\.blocked/g) || [];
+  assert.ok(emits.length >= 4, `expected >=4 gate.blocked emit sites, found ${emits.length}`);
+  assert.match(body, /install_hook_failed_trap "gate-enforcement\.sh"/, 'hook.failed trap not installed');
+});
+
+test('privacy-block.sh emits privacy.blocked on every block path', () => {
+  const body = fs.readFileSync(PRIVACY_HOOK, 'utf8');
+  const emits = body.match(/emit_event privacy\.blocked/g) || [];
+  assert.ok(emits.length >= 4, `expected >=4 privacy.blocked emit sites, found ${emits.length}`);
+});
+
+test('pre-task-check.sh emits injection.blocked at the block branch', () => {
+  const body = fs.readFileSync(PRE_TASK_HOOK, 'utf8');
+  assert.match(body, /emit_event injection\.blocked/, 'injection.blocked emit removed');
+});

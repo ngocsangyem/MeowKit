@@ -13,6 +13,13 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
+# Typed-event emission (fire-and-forget; never alters exit/stream). Trap is bash-only
+# (this hook is invoked via bash in settings.json; skipped under a dash invocation).
+# NOTE: install activates `set -E` in THIS shell — any future bare command that can
+# exit non-zero outside a conditional must append `|| true` (see emit-event.sh).
+. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/emit-event.sh" 2>/dev/null || emit_event() { :; }
+install_hook_failed_trap "pre-task-check.sh" 2>/dev/null || true
+
 # Hook profile gating — skip context check in fast profile for speed
 MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
 case "$MEOW_PROFILE" in
@@ -114,6 +121,7 @@ if [ "$HAS_BLOCK" -eq 1 ]; then
   echo ""
   echo "Task execution STOPPED. Review the task description for injection attempts."
   echo "If this is a false positive, modify the task description and retry."
+  emit_event injection.blocked "{\"kind\":\"prompt-injection\",\"severity\":\"advisory\"}"
   exit 1
 fi
 

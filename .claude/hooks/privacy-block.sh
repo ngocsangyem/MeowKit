@@ -21,6 +21,13 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
+# Typed-event emission (fire-and-forget; never alters exit/stream). Payloads carry
+# sanitized descriptors (path or host) only — never the raw blocked command.
+# NOTE: install activates `set -E` in THIS shell — any future bare command that can
+# exit non-zero outside a conditional must append `|| true` (see emit-event.sh).
+. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/emit-event.sh" 2>/dev/null || emit_event() { :; }
+install_hook_failed_trap "privacy-block.sh" 2>/dev/null || true
+
 # Hook profile gating — safety-critical: NEVER skip regardless of profile
 MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
 
@@ -37,6 +44,7 @@ if [ -n "$FILE_PATH" ]; then
     echo "@@PRIVACY_BLOCK@@" >&2
     echo "File '$FILE_PATH' matches sensitive file pattern (injection-rules.md R4)." >&2
     echo "Use AskUserQuestion to get explicit user approval before accessing." >&2
+    emit_event privacy.blocked "{\"kind\":\"sensitive-read\",\"file\":\"$FILE_PATH\"}"
     exit 2
   fi
 
@@ -48,6 +56,7 @@ if [ -n "$FILE_PATH" ]; then
     echo "The manifest contains browsing history; quarantined files contain injection-stopped content." >&2
     echo "Reading these files may disclose browsing history OR re-inject untrusted content into agent context." >&2
     echo "Use AskUserQuestion to get explicit user approval before accessing." >&2
+    emit_event privacy.blocked "{\"kind\":\"web-cache\",\"file\":\"$FILE_PATH\"}"
     exit 2
   fi
 fi
@@ -69,6 +78,7 @@ if [ -n "$COMMAND" ]; then
             echo "@@PRIVACY_BLOCK@@" >&2
             echo "Web fetch target '$HOST' is a private/loopback/metadata address." >&2
             echo "SSRF risk. Use AskUserQuestion for explicit user approval before proceeding." >&2
+            emit_event privacy.blocked "{\"kind\":\"ssrf\",\"file\":\"$HOST\"}"
             exit 2
             ;;
         esac
@@ -78,6 +88,7 @@ if [ -n "$COMMAND" ]; then
             echo "@@PRIVACY_BLOCK@@" >&2
             echo "Web fetch target scheme in '$URL' is not http/https." >&2
             echo "Unsafe scheme — use AskUserQuestion for explicit user approval before proceeding." >&2
+            emit_event privacy.blocked "{\"kind\":\"unsafe-scheme\",\"file\":\"$HOST\"}"
             exit 2
             ;;
         esac

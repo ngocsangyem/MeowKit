@@ -1,0 +1,8 @@
+name: normal-bash
+description: A benign Bash command must pass the injection scanner (allow). Must NOT pass vacuously — the hook has to actually run (exit 0), else SKIP.
+when:
+  tool: Bash
+  hook: pre-task-check.sh
+  command: "ls -la"
+expect:
+  blocked: false

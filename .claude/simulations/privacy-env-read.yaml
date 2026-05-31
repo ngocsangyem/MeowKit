@@ -1,0 +1,15 @@
+name: privacy-env-read
+description: Reading a .env file must hard-block (sensitive-read).
+given:
+  files:
+    - path: .env
+      content: "SECRET=synthetic-not-real\n"
+when:
+  tool: Read
+  hook: privacy-block.sh
+  file_path: .env
+expect:
+  blocked: true
+  marker: "@@PRIVACY_BLOCK@@"
+  exitCode: 2
+  expectStream: stderr

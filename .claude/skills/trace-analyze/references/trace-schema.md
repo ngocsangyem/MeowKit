@@ -29,6 +29,21 @@ Reference for `.claude/memory/trace-log.jsonl` records. Append-only JSONL writte
 | `session_end` | `post-session.sh` | `{duration_seconds: int, total_cost_usd: float, error_count: int}` |
 | `dead_weight_audit_needed` | `post-session.sh` (model change) | `{old_model: str, new_model: str}` |
 | `benchmark_result` | `mk:benchmark/scripts/run-canary.sh` (inline at manifest write — see C2 fix 260408) | `{run_id: str, tier: str, model: str, manifest_path: str}` |
+| `gate.blocked` | `gate-enforcement.sh` | `{gate: str, reason: str, file: str}` | hard block, exit 2. `gate` ∈ `gate1-no-plan` \| `gate1-not-approved` \| `contract-schema` \| `contract-unsigned` \| `suspicious-path`. `file` is a path, never file contents. |
+| `privacy.blocked` | `privacy-block.sh` | `{kind: str, file: str}` | hard block, exit 2. `kind` ∈ `sensitive-read` \| `web-cache` \| `ssrf` \| `unsafe-scheme`. `file` is a **sanitized descriptor** (path or host), never the raw command. |
+| `injection.blocked` | `pre-task-check.sh` | `{kind: "prompt-injection", severity: "advisory"}` | advisory block: marker on **stdout**, exit 1. No command payload — only the descriptor. |
+| `hook.failed` | `trap ERR` in each modified safety hook | `{hook: str, shell: str, exit_code: int}` | emitted when a modified hook hits an unhandled non-zero command. Coverage is limited to hooks given the `trap` (gate-enforcement, privacy-block, pre-task-check). |
+
+### Reserved — not yet emitted
+
+These event types are part of the canonical taxonomy but have **no emitter today**. Consumers (`reflect`, `health`) MUST render them as `N/A — usage events not emitted`, never as a zero-value metric or a full "unused" list.
+
+| Event | Reserved payload | Status |
+|---|---|---|
+| `skill.invoked` | `{skill: str}` | reserved — no emitter exists yet |
+| `memory.write` | `{store: str, category: str}` | reserved — no emitter exists yet |
+
+> **`review.fail` / `review.pass` are intentionally NOT new types.** The existing `verdict_written` event already records review outcomes (`overall` ∈ `PASS`/`WARN`/`FAIL`); consumers discriminate review results on that field. `pre-completion-check.sh` only *reads* the trace log and emits nothing — no parallel `review.*` type is added.
 
 ## Trace Ownership (Phase 8 P23)
 

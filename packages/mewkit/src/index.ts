@@ -18,6 +18,9 @@ import { task } from "./commands/task.js";
 import { orchviz } from "./commands/orchviz.js";
 import { inventory } from "./commands/inventory.js";
 import { pack } from "./commands/pack.js";
+import { reflect } from "./commands/reflect.js";
+import { health } from "./commands/health.js";
+import { simulate } from "./commands/simulate.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -44,6 +47,9 @@ ${pc.bold("Commands:")}
   ${pc.green("orchviz")}    Live web visualizer for the active Claude Code session
   ${pc.green("inventory")}  List harness artifacts with governance metadata
   ${pc.green("pack")}       Manage install packs (list, add, remove)
+  ${pc.green("reflect")}    Retrospective over the event log (gate blocks, hook failures, reviews)
+  ${pc.green("health")}     Harness control panel: gates, budget, memory, portability, failures
+  ${pc.green("simulate")}   Run declarative given→when→expect gate scenarios against a temp harness
 
 ${pc.bold("Options:")}
   --help, -h       Show help
@@ -65,6 +71,12 @@ ${pc.bold("Options:")}
   --portable-missing  Inventory: show artifacts whose runtime is not portable
   --check          Inventory: fail if README/index counts drift from reality
   --emit-counts    Inventory: rewrite README/index count numbers to match reality
+  --last <Nd|Nh>   Reflect/health: limit to the last N days/hours of events
+  --task <id>      Reflect: filter to events whose data.task matches (workflow events
+                   only — gate/privacy/hook events are not task-tagged today)
+  --scenario <n>   Simulate: run a single named scenario
+  --all            Simulate: run every scenario in .claude/simulations/
+  --allow-skip     Simulate: treat SKIP as non-failing (default: SKIP fails --all)
 
 ${pc.bold("Init flags:")}
   --profile <name>           Install a subset: core|developer|product|atlassian|security|research|full
@@ -149,6 +161,7 @@ async function main(): Promise<void> {
 			"portable-missing",
 			"emit-counts",
 			"packs",
+			"allow-skip",
 		],
 		string: [
 			"only",
@@ -165,6 +178,9 @@ async function main(): Promise<void> {
 			"log",
 			"profile",
 			"fail-over",
+			"last",
+			"task",
+			"scenario",
 		],
 		alias: { h: "help", v: "version", y: "yes" },
 	});
@@ -278,6 +294,27 @@ async function main(): Promise<void> {
 				providers: args.providers as boolean | undefined,
 				state: args.state as boolean | undefined,
 				hardGates: args["hard-gates"] as boolean | undefined,
+			});
+			break;
+		case "reflect":
+			reflect({
+				last: args.last as string | undefined,
+				task: args.task as string | undefined,
+				json: args.json as boolean | undefined,
+			});
+			break;
+		case "health":
+			await health({
+				last: args.last as string | undefined,
+				json: args.json as boolean | undefined,
+			});
+			break;
+		case "simulate":
+			await simulate({
+				scenario: args.scenario as string | undefined,
+				all: args.all as boolean | undefined,
+				json: args.json as boolean | undefined,
+				allowSkip: args["allow-skip"] as boolean | undefined,
 			});
 			break;
 		case "status":

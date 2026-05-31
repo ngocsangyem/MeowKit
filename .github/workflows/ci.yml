@@ -93,3 +93,15 @@ jobs:
 
       - name: Hook regression tests
         run: node --test .claude/hooks/__tests__/*.test.cjs
+
+      # Advisory only (never gates). Surfaces the rolled-up harness control panel in
+      # CI logs; the hard-gate panel is independently gated by `doctor --hard-gates`.
+      - name: Harness health (advisory)
+        run: node packages/mewkit/dist/index.js health --json || true
+
+      # Advisory FIRST: current CI has no real-bash gate step, and full-lifecycle
+      # determinism is not yet proven across 5+ runs. Promote to a hard gate (drop
+      # the `|| true`, or gate `--all --allow-skip` minus full-lifecycle) only after
+      # full-lifecycle is shown deterministic.
+      - name: Harness simulations (advisory)
+        run: node packages/mewkit/dist/index.js simulate --all --json || true

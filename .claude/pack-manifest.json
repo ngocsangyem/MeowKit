@@ -25,7 +25,8 @@
       "agent-memory/**",
       "modes/**",
       "rubrics/**",
-      "rules-conditional/**"
+      "rules-conditional/**",
+      "simulations/**"
     ],
     "commands": ["plan", "upgrade", "validate", "status", "cook", "fix"]
   },

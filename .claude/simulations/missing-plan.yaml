@@ -1,0 +1,13 @@
+name: missing-plan
+description: A source write with no approved plan must hard-block at Gate 1.
+given:
+  clearPlans: true
+when:
+  tool: Write
+  hook: gate-enforcement.sh
+  file_path: src/app.ts
+expect:
+  blocked: true
+  marker: "@@GATE_BLOCK@@"
+  exitCode: 2
+  expectStream: stderr

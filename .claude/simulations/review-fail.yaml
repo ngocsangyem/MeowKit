@@ -1,0 +1,18 @@
+name: review-fail
+description: >
+  The approval gate (closest hook-exercisable analog to a failed review/approval):
+  with MEOWKIT_GATE1_REQUIRE_APPROVED=1 and a plan that exists but is NOT marked
+  approved, a source write must still hard-block.
+given:
+  plan: true   # creates an UNAPPROVED plan (status: pending)
+when:
+  tool: Write
+  hook: gate-enforcement.sh
+  file_path: src/app.ts
+  env:
+    MEOWKIT_GATE1_REQUIRE_APPROVED: "1"
+expect:
+  blocked: true
+  marker: "@@GATE_BLOCK@@"
+  exitCode: 2
+  expectStream: stderr

@@ -18,6 +18,13 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
+# Typed-event emission (fire-and-forget; never alters exit/stream). Installs an
+# ERR trap that records hook.failed on unhandled non-zero commands (bash only).
+# NOTE: install activates `set -E` in THIS shell — any future bare command that can
+# exit non-zero outside a conditional must append `|| true` (see emit-event.sh).
+. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/emit-event.sh" 2>/dev/null || emit_event() { :; }
+install_hook_failed_trap "gate-enforcement.sh" 2>/dev/null || true
+
 # Hook profile gating — safety-critical: NEVER skip regardless of profile
 MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
 
@@ -59,6 +66,7 @@ case "$NORMALIZED_PATH" in
           echo "Contract file $FILE_PATH failed schema validation."
           echo "Run for diagnostics: $validator $FILE_PATH"
         } >&2
+        emit_event gate.blocked "{\"gate\":\"contract-schema\",\"reason\":\"contract file failed schema validation\",\"file\":\"$FILE_PATH\"}"
         exit 2
       fi
     fi
@@ -77,6 +85,7 @@ case "$NORMALIZED_PATH" in
       echo "Suspicious backup/legacy directory in path: $NORMALIZED_PATH"
       echo "Move the file to a clean location or rename the parent directory."
     } >&2
+    emit_event gate.blocked "{\"gate\":\"suspicious-path\",\"reason\":\"backup/legacy directory in path\",\"file\":\"$NORMALIZED_PATH\"}"
     exit 2
     ;;
 esac
@@ -126,6 +135,7 @@ if [ "$gate1_passed" -eq 0 ]; then
     echo "Gate 1 requires an approved plan before source code changes."
     echo "Create a plan first: /mk:plan-creator or /mk:fix for simple fixes."
   } >&2
+  emit_event gate.blocked "{\"gate\":\"gate1-no-plan\",\"reason\":\"no approved plan in tasks/plans/\",\"file\":\"$NORMALIZED_PATH\"}"
   exit 2
 fi
 
@@ -158,6 +168,7 @@ if [ "${MEOWKIT_GATE1_REQUIRE_APPROVED:-0}" = "1" ]; then
       echo "A plan exists but is not marked approved (MEOWKIT_GATE1_REQUIRE_APPROVED=1)."
       echo "Add 'status: approved' to the plan frontmatter, or unset the flag."
     } >&2
+    emit_event gate.blocked "{\"gate\":\"gate1-not-approved\",\"reason\":\"plan exists but not marked approved\",\"file\":\"$NORMALIZED_PATH\"}"
     exit 2
   fi
 fi
@@ -169,6 +180,7 @@ if [ -x "$contract_check" ]; then
   if ! "$contract_check"; then
     # check-contract-signed.sh already prints @@CONTRACT_GATE_BLOCK@@ + diagnostics on stderr.
     # Propagate as a hard block (exit 2) so the unsigned-contract write is stopped, not merely flagged.
+    emit_event gate.blocked "{\"gate\":\"contract-unsigned\",\"reason\":\"sprint contract not signed\",\"file\":\"$NORMALIZED_PATH\"}"
     exit 2
   fi
 fi

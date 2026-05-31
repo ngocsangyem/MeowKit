@@ -1,0 +1,38 @@
+name: full-lifecycle
+description: >
+  Genuinely multi-step: the plan→build transition through the gate. Step 1 — a source
+  write with no plan blocks. Step 2 — after a plan exists, the same write is allowed.
+  Step 3 — a sensitive read is blocked regardless of plan state.
+steps:
+  - given:
+      clearPlans: true
+    when:
+      tool: Write
+      hook: gate-enforcement.sh
+      file_path: src/app.ts
+    expect:
+      blocked: true
+      marker: "@@GATE_BLOCK@@"
+      exitCode: 2
+      expectStream: stderr
+  - given:
+      plan: true
+    when:
+      tool: Write
+      hook: gate-enforcement.sh
+      file_path: src/app.ts
+    expect:
+      blocked: false
+  - given:
+      files:
+        - path: .env
+          content: "SECRET=synthetic-not-real\n"
+    when:
+      tool: Read
+      hook: privacy-block.sh
+      file_path: .env
+    expect:
+      blocked: true
+      marker: "@@PRIVACY_BLOCK@@"
+      exitCode: 2
+      expectStream: stderr
