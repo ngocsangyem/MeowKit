@@ -1,9 +1,6 @@
 ---
 name: mk:scale-routing
-description: >-
-  Domain-aware complexity routing. Scans task description for domain keywords,
-  matches against domain-complexity.csv, returns complexity level, workflow
-  intensity, and model tier override. Extends Phase 0 orchestration.
+description: Domain-aware complexity routing. Scans task description for domain keywords, matches against domain-complexity.csv, returns complexity level, workflow intensity, and model tier override. Extends Phase 0 orchestration.
 triggers:
   - task classification
   - complexity routing
@@ -11,8 +8,17 @@ triggers:
 phase: 0
 user-invocable: false
 source: local
-keywords: [scale-routing, domain-classification, complexity-routing, csv-routing, model-tier-override]
-when_to_use: "Auto-invoked at Phase 0 — scans task description for domain keywords, returns complexity tier and model override. Not user-callable directly."
+keywords:
+  - scale-routing
+  - domain-classification
+  - complexity-routing
+  - csv-routing
+  - model-tier-override
+when_to_use: Auto-invoked at Phase 0 — scans task description for domain keywords, returns complexity tier and model override. Not user-callable directly.
+owner: portability
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Scale-Adaptive Routing

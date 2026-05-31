@@ -36,7 +36,7 @@ Task(
   description="Evaluate iteration $iteration of $slug",
   prompt="
     Read your agent constitution at .claude/agents/evaluator.md.
-    Follow the Active Verifier Loop section (Phase 3 — pending Phase 5 integration).
+    Follow the Active Verifier Loop section (the post-build active-verifier role; full verifier-loop integration is still pending).
 
     Use mk:evaluate skill — read its workflow.md and follow steps 1–5.
 

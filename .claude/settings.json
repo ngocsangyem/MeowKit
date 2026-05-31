@@ -20,13 +20,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-skills-venv.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-skills-venv.sh\"",
             "timeout": 30,
             "statusMessage": "Ensuring Python skills venv..."
           },
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/project-context-loader.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/project-context-loader.sh\"",
             "timeout": 5,
             "statusMessage": "Loading project context..."
           },
@@ -50,13 +50,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/gate-enforcement.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/gate-enforcement.sh\"",
             "timeout": 10,
             "statusMessage": "Checking Gate 1 approval..."
           },
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
             "timeout": 5,
             "statusMessage": "Checking file access permissions..."
           }
@@ -67,7 +67,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
             "timeout": 5,
             "statusMessage": "Checking file access permissions..."
           }
@@ -78,18 +78,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-task-check.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-task-check.sh\"",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-ship.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-ship.sh\"",
             "timeout": 30,
             "statusMessage": "Running pre-ship validation..."
           },
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
             "timeout": 5,
             "statusMessage": "Checking web fetch targets..."
           }
@@ -102,13 +102,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-write.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-write.sh\"",
             "timeout": 10,
             "statusMessage": "Security scanning written file..."
           },
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/learning-observer.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/learning-observer.sh\"",
             "timeout": 5
           },
           {
@@ -139,7 +139,7 @@
           },
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-session.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-session.sh\"",
             "timeout": 5
           },
           {
@@ -160,7 +160,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/tdd-flag-detector.sh\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/tdd-flag-detector.sh\"",
             "timeout": 3,
             "statusMessage": "Detecting --tdd flag..."
           },

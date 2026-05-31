@@ -1,16 +1,26 @@
 ---
 name: mk:clean-code
-description: "Enforces KISS/DRY/YAGNI during authoring and ad-hoc quality reviews. Pragmatic standards: concise, direct, no unnecessary comments. NOT for post-hoc diff/PR review (see mk:review); NOT for behavior-preserving simplification passes (see mk:simplify)."
+description: 'Enforces KISS/DRY/YAGNI during authoring and ad-hoc quality reviews. Pragmatic standards: concise, direct, no unnecessary comments. NOT for post-hoc diff/PR review (see mk:review); NOT for behavior-preserving simplification passes (see mk:simplify).'
 allowed-tools: Read, Write, Edit
-version: 2.0
+version: 2
 priority: CRITICAL
 phase: on-demand
 trust_level: third-party
 injection_risk: low
 source: antigravity-kit
-keywords: [clean-code, kiss, dry, yagni, authoring-quality, ad-hoc-review]
-when_to_use: "Use during authoring or ad-hoc quality reviews — KISS/DRY/YAGNI enforcement. NOT for post-hoc diff/PR review (see mk:review) or behavior-preserving simplification (see mk:simplify)."
+keywords:
+  - clean-code
+  - kiss
+  - dry
+  - yagni
+  - authoring-quality
+  - ad-hoc-review
+when_to_use: Use during authoring or ad-hoc quality reviews — KISS/DRY/YAGNI enforcement. NOT for post-hoc diff/PR review (see mk:review) or behavior-preserving simplification (see mk:simplify).
 user-invocable: true
+owner: utility
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Clean Code — Pragmatic AI Coding Standards

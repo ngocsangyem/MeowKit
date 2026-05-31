@@ -13,20 +13,29 @@ allowed-tools:
   - AskUserQuestion
 hooks:
   PreToolUse:
-    - matcher: "Edit"
+    - matcher: Edit
       hooks:
         - type: command
-          command: "bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh"
-          statusMessage: "Checking freeze boundary..."
-    - matcher: "Write"
+          command: bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh
+          statusMessage: Checking freeze boundary...
+    - matcher: Write
       hooks:
         - type: command
-          command: "bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh"
-          statusMessage: "Checking freeze boundary..."
+          command: bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh
+          statusMessage: Checking freeze boundary...
 source: gstack
-keywords: [freeze, scope-edits, directory-restriction, session-scope, edit-lockdown]
-when_to_use: "Use when scoping edits to a specific module/directory — blocks Edit/Write outside allowed path for the session. NOT for blocking destructive shell commands (see mk:careful)."
+keywords:
+  - freeze
+  - scope-edits
+  - directory-restriction
+  - session-scope
+  - edit-lockdown
+when_to_use: Use when scoping edits to a specific module/directory — blocks Edit/Write outside allowed path for the session. NOT for blocking destructive shell commands (see mk:careful).
 user-invocable: true
+owner: lifecycle
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # /freeze — Restrict Edits to a Directory

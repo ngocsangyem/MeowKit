@@ -97,3 +97,13 @@ percentages.
 Always-on rules: `.claude/rules/*.md` — auto-loaded by directory mechanism. Phase-zero conditional: same directory, but loaded explicitly by `mk:agent-detector` Step 0b only.
 
 Agile/Scrum: 3 conditional rules in `.claude/rules-conditional/agile-*.md` — loaded by `mk:agent-detector` Step 0b only when an Agile context is detected (sprint-state contract, `jira_tickets:` frontmatter, `MEOW_JIRA_BASE_URL` env, or Jira-key prompt match). Non-Agile sessions pay zero context cost.
+
+## Install Profiles & Packs (modular install)
+
+The release ships ONE full tarball; install size is controlled at install time, not at packaging time. `.claude/pack-manifest.json` maps 7 profiles (`core`/`developer`/`product`/`atlassian`/`security`/`research`/`full`) onto the governance `owner` field plus a `base` essentials set (safety rules, all hooks, settings, statusline, core `/mk:*` commands).
+
+- **Resolver** (`packages/mewkit/src/core/pack-resolver.ts`): a pure function turning a profile → the exact set of `.claude/`-relative paths. `full`/`*` short-circuits to `collectFiles` (byte-identical to today's install). Skills expand to their whole directory; `depends_on` closure is implemented but inert (no edges yet).
+- **Filter** (`smart-update.ts`): an optional `allowedPaths` skip-predicate writes only a profile's files; `init --profile` records `profile`+`packs` in `metadata.json` (`full`/none ⇒ `packs: undefined` sentinel = auto-adopt). A profile downgrade (full→core) runs an opt-in trim pass (`trimToProfile`, init-only) that deletes pristine excluded files and preserves user-modified ones.
+- **`mewkit pack`** (`commands/pack.ts`): `list`/`add`/`remove` manage domains post-install. `remove` deletes only pristine, pack-exclusive, kit-owned files — base-covered, dual-homed, settings.json-referenced, and user-edited files survive — and rebuilds metadata write-before-delete for crash safety.
+- **Pack-aware `upgrade`**: reads `metadata.packs` (corrupt/absent ⇒ full); a partial install upgrades only its packs, removed packs stay removed.
+- **Guardrails**: `mewkit validate --packs` (manifest coherence, completeness, the exact-path safety invariant) and `mewkit budget context --profile <p> [--fail-over N]` (loadable-context estimator) — both wired into CI. The safety invariant is enforced by an explicit exact-path assertion (not by registering dispatched files in the inventory, which would collide with the Phase-2 ownership check).

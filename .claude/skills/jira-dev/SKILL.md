@@ -1,13 +1,23 @@
 ---
 name: mk:jira-dev
-description: "Generate developer artifacts from Jira tickets via the jira-as wrapper: branch names, PR descriptions, parsed commits, commit/PR-to-issue links. Triggers: 'branch name for KEY', 'PR description for KEY', 'parse commits for issue keys', 'link PR to KEY'. NOT for executing git/gh commands directly (mk:ship); NOT for issue CRUD (mk:jira-issue)."
+description: 'Generate developer artifacts from Jira tickets via the jira-as wrapper: branch names, PR descriptions, parsed commits, commit/PR-to-issue links. Triggers: ''branch name for KEY'', ''PR description for KEY'', ''parse commits for issue keys'', ''link PR to KEY''. NOT for executing git/gh commands directly (mk:ship); NOT for issue CRUD (mk:jira-issue).'
 phase: on-demand
 source: local
-keywords: [jira, jira-dev, branch-name, pr-description, smart-commit, jira-git]
-when_to_use: "Use to generate dev-side artifacts (branch names, PR bodies, commit parsing, smart-commit links) from a Jira issue. NOT for executing git operations."
+keywords:
+  - jira
+  - jira-dev
+  - branch-name
+  - pr-description
+  - smart-commit
+  - jira-git
+when_to_use: Use to generate dev-side artifacts (branch names, PR bodies, commit parsing, smart-commit links) from a Jira issue. NOT for executing git operations.
 user-invocable: true
 context: fork
 agent: jira-dev
+owner: jira
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # mk:jira-dev

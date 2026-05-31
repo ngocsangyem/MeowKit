@@ -1,21 +1,25 @@
 ---
 name: mk:worktree
-description: >-
-  Manages git worktrees for parallel agent isolation. Creates isolated worktrees
-  for parallel agents on parallel/{name}-{timestamp} branches, merges results with
-  conflict detection, prunes stale metadata, and reports health status.
-  NOT for user-initiated feature branches — use git worktree directly for that.
-argument-hint: "[create|merge|cleanup|list|status|prune] [agent-name]"
+description: Manages git worktrees for parallel agent isolation. Creates isolated worktrees for parallel agents on parallel/{name}-{timestamp} branches, merges results with conflict detection, prunes stale metadata, and reports health status. NOT for user-initiated feature branches — use git worktree directly for that.
+argument-hint: '[create|merge|cleanup|list|status|prune] [agent-name]'
 source: local
-keywords: [worktree, git-worktree, parallel-isolation, parallel-agents, branch-setup,
-           task-decomposition, orchestration, worktree-cleanup, worktree-status, worktree-health]
-when_to_use: >-
-  Auto-invoked when orchestrator decomposes COMPLEX tasks into parallel subtasks per
-  parallel-execution-rules.md. Manages the full worktree lifecycle: create before
-  agents start, merge + integration-test after agents complete, cleanup after merge.
-  NOT for user-initiated feature branches (use git worktree directly).
-  NOT invoked directly by users.
+keywords:
+  - worktree
+  - git-worktree
+  - parallel-isolation
+  - parallel-agents
+  - branch-setup
+  - task-decomposition
+  - orchestration
+  - worktree-cleanup
+  - worktree-status
+  - worktree-health
+when_to_use: 'Auto-invoked when orchestrator decomposes COMPLEX tasks into parallel subtasks per parallel-execution-rules.md. Manages the full worktree lifecycle: create before agents start, merge + integration-test after agents complete, cleanup after merge. NOT for user-initiated feature branches (use git worktree directly). NOT invoked directly by users.'
 user-invocable: false
+owner: git
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Git Worktree Manager

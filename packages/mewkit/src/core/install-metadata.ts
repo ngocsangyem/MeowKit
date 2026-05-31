@@ -31,6 +31,13 @@ export const InstallMetadataSchema = z.object({
 	installedAt: z.string(),
 	files: z.array(InstallFileEntrySchema),
 	settings: z.object({ merged: z.array(z.string()) }).optional(),
+	/** Installed profile name ("full" for a whole-tree install). */
+	profile: z.string().optional(),
+	/**
+	 * Resolved pack list for a partial install. Absent/undefined is the "full,
+	 * auto-adopt new packs on upgrade" sentinel — never a frozen all-packs list.
+	 */
+	packs: z.array(z.string()).optional(),
 });
 export type InstallMetadata = z.infer<typeof InstallMetadataSchema>;
 
@@ -153,6 +160,10 @@ export interface BuildInstallMetadataOptions {
 	scope?: string;
 	/** settings.json files merged this install. */
 	mergedSettings?: string[];
+	/** Installed profile name (recorded verbatim; "full" for whole-tree installs). */
+	profile?: string;
+	/** Resolved pack list for a partial install; omit for full/legacy (sentinel). */
+	packs?: string[];
 }
 
 /**
@@ -203,5 +214,7 @@ export function buildInstallMetadata(claudeDir: string, opts: BuildInstallMetada
 	};
 	if (opts.scope) meta.scope = opts.scope;
 	if (opts.mergedSettings && opts.mergedSettings.length > 0) meta.settings = { merged: opts.mergedSettings };
+	if (opts.profile) meta.profile = opts.profile;
+	if (opts.packs) meta.packs = opts.packs;
 	return meta;
 }

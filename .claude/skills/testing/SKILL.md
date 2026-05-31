@@ -1,9 +1,18 @@
 ---
 name: mk:testing
-description: "Use when writing tests, running validation scripts, or (in TDD mode) enforcing red-green-refactor cycle. Activates during Phase 2 (Test) and Phase 3 (Build). NOT for coverage gap mapping (see mk:nyquist); NOT for sprint contract negotiation (see mk:sprint-contract)."
-keywords: [testing, unit-tests, tdd-red-green, validation-scripts, phase-2-test]
-when_to_use: "Use when writing tests, running validation scripts, or enforcing TDD red-green-refactor cycle. NOT for coverage gap mapping (see mk:nyquist) or sprint contract negotiation (see mk:sprint-contract)."
+description: Use when writing tests, running validation scripts, or (in TDD mode) enforcing red-green-refactor cycle. Activates during Phase 2 (Test) and Phase 3 (Build). NOT for coverage gap mapping (see mk:nyquist); NOT for sprint contract negotiation (see mk:sprint-contract).
+keywords:
+  - testing
+  - unit-tests
+  - tdd-red-green
+  - validation-scripts
+  - phase-2-test
+when_to_use: Use when writing tests, running validation scripts, or enforcing TDD red-green-refactor cycle. NOT for coverage gap mapping (see mk:nyquist) or sprint contract negotiation (see mk:sprint-contract).
 user-invocable: true
+owner: testing
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Testing Toolkit

@@ -1,12 +1,23 @@
 ---
 name: mk:frontend-design
-description: "Use when designing UI components, reviewing visual design, building design systems, or checking accessibility. Auto-activates on frontend design tasks and UI reviews."
+description: Use when designing UI components, reviewing visual design, building design systems, or checking accessibility. Auto-activates on frontend design tasks and UI reviews.
 source: local
-original_skills: [ui-ux-pro-max, frontend-design]
+original_skills:
+  - ui-ux-pro-max
+  - frontend-design
 adapted_for: claude-code
-keywords: [frontend-design, ui-mockup, screenshot-replication, design-implementation, best-practices]
-when_to_use: "Use when replicating a mockup/screenshot or building React/TS components with best practices. NOT for design-system audits (see mk:ui-design-system)."
+keywords:
+  - frontend-design
+  - ui-mockup
+  - screenshot-replication
+  - design-implementation
+  - best-practices
+when_to_use: Use when replicating a mockup/screenshot or building React/TS components with best practices. NOT for design-system audits (see mk:ui-design-system).
 user-invocable: true
+owner: utility
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Frontend Design

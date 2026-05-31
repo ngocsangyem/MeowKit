@@ -1,9 +1,6 @@
 ---
 name: mk:party
-description: >-
-  Multi-agent collaboration session. Brings 2-4 agent perspectives into one discussion
-  for architecture decisions and trade-off analysis.
-  Use when asked "should we X or Y?", "let's discuss", or "design review".
+description: Multi-agent collaboration session. Brings 2-4 agent perspectives into one discussion for architecture decisions and trade-off analysis. Use when asked "should we X or Y?", "let's discuss", or "design review".
 argument-hint: '"topic to discuss" [--agents planner,architect,developer]'
 source: local
 allowed-tools:
@@ -12,9 +9,18 @@ allowed-tools:
   - Glob
   - Bash
   - AskUserQuestion
-keywords: [party, multi-agent-deliberation, architecture-decision, trade-off-discussion, design-review]
-when_to_use: "Use when deliberating architecture trade-offs — brings 2-4 agent perspectives into one discussion. NOT for solo brainstorming (see mk:brainstorming), NOT for re-examining a finished review or plan (see mk:elicit), NOT for product validation / 'is this worth building' (see mk:office-hours), NOT for sprint retrospectives (see mk:retro)."
+keywords:
+  - party
+  - multi-agent-deliberation
+  - architecture-decision
+  - trade-off-discussion
+  - design-review
+when_to_use: Use when deliberating architecture trade-offs — brings 2-4 agent perspectives into one discussion. NOT for solo brainstorming (see mk:brainstorming), NOT for re-examining a finished review or plan (see mk:elicit), NOT for product validation / 'is this worth building' (see mk:office-hours), NOT for sprint retrospectives (see mk:retro).
 user-invocable: true
+owner: research
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Party Mode — Multi-Agent Collaboration

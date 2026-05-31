@@ -1,13 +1,24 @@
 ---
 name: mk:confluence-page
-description: "Confluence page CRUD via the confluence-as wrapper. Triggers: 'create page in SPACE', 'show me page 12345', 'update title of page 12345', 'delete page 12345', 'page hierarchy under 12345', 'copy page 12345 to SPACE'. NOT for bulk ops on 10+ pages (mk:confluence-bulk); NOT for spec analysis (mk:confluence-spec-analyst); NOT for comments/attachments/labels (mk:confluence-collaborate)."
+description: 'Confluence page CRUD via the confluence-as wrapper. Triggers: ''create page in SPACE'', ''show me page 12345'', ''update title of page 12345'', ''delete page 12345'', ''page hierarchy under 12345'', ''copy page 12345 to SPACE''. NOT for bulk ops on 10+ pages (mk:confluence-bulk); NOT for spec analysis (mk:confluence-spec-analyst); NOT for comments/attachments/labels (mk:confluence-collaborate).'
 phase: on-demand
 source: local
-keywords: [confluence-page, page-crud, page-hierarchy, blogpost, page-version, copy-page, move-page]
-when_to_use: "Use to create / read / update / delete a single Confluence page or blog post, or to inspect page hierarchy. NOT for bulk page ops (use mk:confluence-bulk); NOT for comments/attachments/labels (use mk:confluence-collaborate)."
+keywords:
+  - confluence-page
+  - page-crud
+  - page-hierarchy
+  - blogpost
+  - page-version
+  - copy-page
+  - move-page
+when_to_use: Use to create / read / update / delete a single Confluence page or blog post, or to inspect page hierarchy. NOT for bulk page ops (use mk:confluence-bulk); NOT for comments/attachments/labels (use mk:confluence-collaborate).
 user-invocable: true
 context: fork
 agent: confluence-page
+owner: confluence
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # mk:confluence-page

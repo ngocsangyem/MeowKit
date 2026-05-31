@@ -16,9 +16,18 @@ allowed-tools:
   - AskUserQuestion
 source: local
 phase: on-demand
-keywords: [docs-init, initial-documentation, docs-scaffolding, new-project-docs, codebase-analysis]
-when_to_use: "Use when a project has no docs/ directory and needs initial documentation generated from codebase analysis. NOT for updating existing docs (see mk:document-release)."
+keywords:
+  - docs-init
+  - initial-documentation
+  - docs-scaffolding
+  - new-project-docs
+  - codebase-analysis
+when_to_use: Use when a project has no docs/ directory and needs initial documentation generated from codebase analysis. NOT for updating existing docs (see mk:document-release).
 user-invocable: true
+owner: docs
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Docs Init

@@ -8,7 +8,7 @@ import pc from "picocolors";
 import { init } from "./commands/init.js";
 import { upgrade } from "./commands/upgrade.js";
 import { validate } from "./commands/validate.js";
-import { budget } from "./commands/budget.js";
+import { budget, contextBudget } from "./commands/budget.js";
 import { memory } from "./commands/memory.js";
 import { verdictGate } from "./commands/verdict-gate.js";
 import { doctor } from "./commands/doctor.js";
@@ -16,6 +16,8 @@ import { migrate } from "./commands/migrate.js";
 import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
 import { orchviz } from "./commands/orchviz.js";
+import { inventory } from "./commands/inventory.js";
+import { pack } from "./commands/pack.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -32,7 +34,7 @@ ${pc.bold("Commands:")}
   ${pc.green("init")}       Scaffold or update MeowKit in the current project
   ${pc.green("upgrade")}    Upgrade MeowKit to the latest version
   ${pc.green("validate")}   Validate .claude/ project structure
-  ${pc.green("budget")}     View token usage and cost log
+  ${pc.green("budget")}     View token usage and cost log ('budget context' for per-profile size)
   ${pc.green("memory")}     Manage agent memory (lessons & patterns)
   ${pc.green("setup")}      Guided post-scaffold configuration
   ${pc.green("doctor")}     Diagnose common environment issues
@@ -40,6 +42,8 @@ ${pc.bold("Commands:")}
   ${pc.green("task")}       Create and list task files (new, list)
   ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
   ${pc.green("orchviz")}    Live web visualizer for the active Claude Code session
+  ${pc.green("inventory")}  List harness artifacts with governance metadata
+  ${pc.green("pack")}       Manage install packs (list, add, remove)
 
 ${pc.bold("Options:")}
   --help, -h       Show help
@@ -48,7 +52,23 @@ ${pc.bold("Options:")}
   --day [date]     Budget: filter to today or a specific YYYY-MM-DD
   --providers      Doctor/migrate: include provider contract diagnostics
   --state          Doctor: include state taxonomy diagnostics
+  --hard-gates     Doctor: live-probe the hard gates (plan/privacy/injection block)
   --portable       Validate: include portable provider contract checks
+  --strict         Validate: treat WARN as failure (exit 1); off by default
+  --workflow       Validate: run only the workflow.yaml drift-check (CI scope)
+  --ownership      Validate: run only the artifact ownership-completeness check
+  --packs          Validate: run only the pack-manifest coherence + safety check
+  --fail-over <N>  Budget context: exit non-zero when a profile exceeds N tokens
+  --json           Inventory: emit the inventory as JSON
+  --stale          Inventory: show only deprecated/experimental artifacts
+  --critical       Inventory: show only criticality=critical artifacts
+  --portable-missing  Inventory: show artifacts whose runtime is not portable
+  --check          Inventory: fail if README/index counts drift from reality
+  --emit-counts    Inventory: rewrite README/index count numbers to match reality
+
+${pc.bold("Init flags:")}
+  --profile <name>           Install a subset: core|developer|product|atlassian|security|research|full
+                             (default full). In update mode, trims an install down to the profile.
 
 ${pc.bold("Init flags for post-init migration:")}
   --migrate                  After unpack, prompt for providers to export to (interactive)
@@ -99,6 +119,7 @@ async function main(): Promise<void> {
 			"report",
 			"providers",
 			"state",
+			"hard-gates",
 			"portable",
 			"all",
 			"dry-run",
@@ -120,6 +141,14 @@ async function main(): Promise<void> {
 			"no-open",
 			"no-color",
 			"verbose",
+			"workflow",
+			"ownership",
+			"json",
+			"stale",
+			"critical",
+			"portable-missing",
+			"emit-counts",
+			"packs",
 		],
 		string: [
 			"only",
@@ -134,6 +163,8 @@ async function main(): Promise<void> {
 			"day",
 			"workspace",
 			"log",
+			"profile",
+			"fail-over",
 		],
 		alias: { h: "help", v: "version", y: "yes" },
 	});
@@ -159,6 +190,7 @@ async function main(): Promise<void> {
 				migrate: args.migrate as boolean | undefined,
 				migrateTo: args["migrate-to"] as string | undefined,
 				migrateGlobal: args["migrate-global"] as boolean | undefined,
+				profile: args.profile as string | undefined,
 			});
 			break;
 		case "upgrade":
@@ -171,15 +203,60 @@ async function main(): Promise<void> {
 			});
 			break;
 		case "validate":
-			await validate({ portable: args.portable as boolean | undefined });
+			await validate({
+				portable: args.portable as boolean | undefined,
+				strict: args.strict as boolean | undefined,
+				workflow: args.workflow as boolean | undefined,
+				ownership: args.ownership as boolean | undefined,
+				packs: args.packs as boolean | undefined,
+			});
 			break;
-		case "budget":
+		case "pack":
+			await pack({
+				subcommand: args._[1] as string | undefined,
+				packs: args._.slice(2).map(String),
+				json: args.json as boolean | undefined,
+				yes: args.yes as boolean | undefined,
+				beta: args.beta as boolean | undefined,
+			});
+			break;
+		case "inventory":
+			await inventory({
+				json: args.json as boolean | undefined,
+				stale: args.stale as boolean | undefined,
+				critical: args.critical as boolean | undefined,
+				portableMissing: args["portable-missing"] as boolean | undefined,
+				check: args.check as boolean | undefined,
+				emitCounts: args["emit-counts"] as boolean | undefined,
+			});
+			break;
+		case "budget": {
+			// `budget context` routes to the per-profile context estimator (positional,
+			// not a flag — minimist parses it as args._[1]).
+			if (args._[1] === "context") {
+				const failOverRaw = args["fail-over"] as string | number | undefined;
+				let failOver: number | undefined;
+				if (failOverRaw !== undefined) {
+					failOver = Number(failOverRaw);
+					if (!Number.isFinite(failOver)) {
+						console.error(pc.red(`Invalid --fail-over value: ${String(failOverRaw)} (expected a number)`));
+						process.exit(2);
+					}
+				}
+				contextBudget({
+					profile: args.profile as string | undefined,
+					failOver,
+					json: args.json as boolean | undefined,
+				});
+				break;
+			}
 			await budget({
 				monthly: args.monthly as boolean | undefined,
 				session: args.session as boolean | string | undefined,
 				day: args.day as boolean | string | undefined,
 			});
 			break;
+		}
 		case "memory":
 			await memory({
 				subcommand: args._[1] as string | undefined,
@@ -200,6 +277,7 @@ async function main(): Promise<void> {
 				report: args.report as boolean | undefined,
 				providers: args.providers as boolean | undefined,
 				state: args.state as boolean | undefined,
+				hardGates: args["hard-gates"] as boolean | undefined,
 			});
 			break;
 		case "status":

@@ -2,7 +2,7 @@
 name: mk:multimodal
 description: Process images, video, audio, PDFs with Gemini API. Generate images (Nano Banana 2), videos (Veo 3), speech (MiniMax TTS), music (MiniMax). Convert documents to Markdown. Multi-provider fallback (Gemini → MiniMax → OpenRouter). Activate when task references media files, asks to analyze/describe/transcribe/extract/generate/convert, or involves non-text binary files.
 version: 2.1.0
-argument-hint: "[file-path] [task]"
+argument-hint: '[file-path] [task]'
 phase: on-demand
 source: local
 trust_level: kit-authored
@@ -10,35 +10,37 @@ injection_risk: low
 requires_env:
   - name: MEOWKIT_GEMINI_API_KEY
     required: true
-    description: "Google Gemini API key (falls back to GEMINI_API_KEY)"
-    setup: "Get from https://aistudio.google.com/apikey"
-    fallback: "Analysis requires this key. Generation falls back to MiniMax/OpenRouter if available."
+    description: Google Gemini API key (falls back to GEMINI_API_KEY)
+    setup: Get from https://aistudio.google.com/apikey
+    fallback: Analysis requires this key. Generation falls back to MiniMax/OpenRouter if available.
   - name: MEOWKIT_MINIMAX_API_KEY
     required: false
-    description: "MiniMax API key for image/video/TTS/music generation"
-    setup: "Get from https://platform.minimax.io/"
+    description: MiniMax API key for image/video/TTS/music generation
+    setup: Get from https://platform.minimax.io/
 keywords:
-  [
-    multimodal,
-    gemini,
-    image-gen,
-    video-gen,
-    tts,
-    transcription,
-    document-conversion,
-    vision,
-    image,
-    video,
-    audio,
-    minimax,
-  ]
-when_to_use: "Use when processing images, video, audio, PDFs or generating media via Gemini/MiniMax/OpenRouter. Activate when task references media files."
+  - multimodal
+  - gemini
+  - image-gen
+  - video-gen
+  - tts
+  - transcription
+  - document-conversion
+  - vision
+  - image
+  - video
+  - audio
+  - minimax
+when_to_use: Use when processing images, video, audio, PDFs or generating media via Gemini/MiniMax/OpenRouter. Activate when task references media files.
 user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+owner: utility
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 <!-- SECURITY ANCHOR

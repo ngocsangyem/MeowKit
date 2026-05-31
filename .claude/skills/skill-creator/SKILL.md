@@ -1,13 +1,22 @@
 ---
 name: mk:skill-creator
-description: "Create new skills with proper structure, compliance checks, and registration. Use when asked to create a skill, build a new skill, or scaffold a skill template. Enforces mk: prefix, sub-agents.md structure, and context engineering principles."
-argument-hint: "[skill-name] [description]"
+description: 'Create new skills with proper structure, compliance checks, and registration. Use when asked to create a skill, build a new skill, or scaffold a skill template. Enforces mk: prefix, sub-agents.md structure, and context engineering principles.'
+argument-hint: '[skill-name] [description]'
 source: local
 original_path: .claude/skills/skill-creator/SKILL.md
 adapted_for: claude-code
-keywords: [skill-creator, new-skill, scaffold-skill, authoring-template, gotchas-section]
-when_to_use: "Use when creating a new skill — scaffolds SKILL.md with required sections per skill-authoring-rules."
+keywords:
+  - skill-creator
+  - new-skill
+  - scaffold-skill
+  - authoring-template
+  - gotchas-section
+when_to_use: Use when creating a new skill — scaffolds SKILL.md with required sections per skill-authoring-rules.
 user-invocable: true
+owner: portability
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Skill Creator

@@ -1,9 +1,6 @@
 ---
 name: mk:project-context
-description: >-
-  Generate or update docs/project-context.md — the single source of truth
-  for project conventions, tech stack, and anti-patterns. Loaded by all
-  agents as a "constitution" to ensure consistent behavior.
+description: Generate or update docs/project-context.md — the single source of truth for project conventions, tech stack, and anti-patterns. Loaded by all agents as a "constitution" to ensure consistent behavior.
 triggers:
   - generate context
   - project context
@@ -12,11 +9,21 @@ actions:
   - generate
   - update
   - init
-argument-hint: "[generate|update|init]"
+argument-hint: '[generate|update|init]'
 source: local
-keywords: [project-context, agent-constitution, tech-stack, conventions, anti-patterns, docs-init]
-when_to_use: "Use when generating or updating docs/project-context.md — single source of truth for project conventions, tech stack, anti-patterns."
+keywords:
+  - project-context
+  - agent-constitution
+  - tech-stack
+  - conventions
+  - anti-patterns
+  - docs-init
+when_to_use: Use when generating or updating docs/project-context.md — single source of truth for project conventions, tech stack, anti-patterns.
 user-invocable: true
+owner: docs
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Project Context Generator

@@ -9,13 +9,17 @@ and ship production-ready code following the 7-phase workflow.
 
 ## Workflow
 
+<!-- Canonical source: .claude/workflow.yaml -->
+
 ```
 Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test (RED if --tdd, else optional)
-→ Phase 3 Build [contract substep for harness] → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect
+→ Phase 3 Build → Phase 3.5 Simplify (mandatory) → Phase 3.6 Verify (mandatory)
+→ Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect
 ```
 
 **TDD mode:** opt-in via `--tdd` flag or `MEOWKIT_TDD=1`. See `.claude/rules/tdd-rules.md`.
-**Phase 3 autobuild contract substep:** developer reads signed `tasks/contracts/{date}-{slug}-sprint-N.md` BEFORE source edits (enforced by `gate-enforcement.sh`; bypass: `MEOWKIT_AUTOBUILD_MODE=LEAN`). See `.claude/rules/harness-rules.md` Rule 3.
+**Phase 3 substeps (mandatory):** after Build GREEN, `mk:simplify` runs first, then `mk:verify` (unified build+lint+test+coverage). Both are mandatory before Phase 4.
+**Phase 3 autobuild contract substep:** developer reads signed `tasks/contracts/*-{slug}-sprint-*.md` BEFORE source edits (enforced by `gate-enforcement.sh`; bypass: `MEOWKIT_AUTOBUILD_MODE=LEAN`). See `.claude/rules/harness-rules.md` Rule 3.
 
 **IMPORTANT:** Read canonical `.json` stores before any task — `fixes.json`, `review-patterns.json`, `architecture-decisions.json` (fall back to the matching `.md` only if the `.json` is absent; see `docs/memory-system.md`); read `.claude/rules/core-behaviors.md` (6 mandatory behaviors) — both apply in ALL modes.
 **IMPORTANT:** Activate only skills needed for the current task domain; declare model tier (TRIVIAL · STANDARD · COMPLEX) before every task.
@@ -27,8 +31,8 @@ Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test (RED if --tdd, else op
 
 Two hard stops. No bypass. No exceptions. See `.claude/rules/gate-rules.md`.
 
-- **Gate 1** — Plan approved in `tasks/plans/` before Phase 3 begins
-- **Gate 2** — Review approved in `tasks/reviews/` before Phase 5 begins
+- **Gate 1** — Formally the Phase 1→2 transition; effectively blocks Phase 3 in default (non-TDD) mode where Phase 2 is skipped. An approved plan (`tasks/plans/*/plan.md`) must exist before any source edits begin.
+- **Gate 2** — Review approved (`tasks/reviews/*-verdict.md`) before Phase 5 begins.
 
 ## Model Routing
 

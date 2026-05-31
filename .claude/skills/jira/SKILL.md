@@ -1,11 +1,21 @@
 ---
 name: mk:jira
-description: "Routing skill — recommends the correct mk:jira-* leaf for any Jira task. Triggers: 'jira', 'jira ticket', ambiguous Jira intent. NOT an executor — every actual operation forks via a leaf skill."
+description: 'Routing skill — recommends the correct mk:jira-* leaf for any Jira task. Triggers: ''jira'', ''jira ticket'', ambiguous Jira intent. NOT an executor — every actual operation forks via a leaf skill.'
 phase: on-demand
 source: local
-keywords: [jira, jira-router, routing-hub, atlassian, mk-jira, ticket]
-when_to_use: "Use when user has a Jira intent but the specific leaf isn't clear. NOT for direct execution — forward to mk:jira-{specific}."
+keywords:
+  - jira
+  - jira-router
+  - routing-hub
+  - atlassian
+  - mk-jira
+  - ticket
+when_to_use: Use when user has a Jira intent but the specific leaf isn't clear. NOT for direct execution — forward to mk:jira-{specific}.
 user-invocable: true
+owner: jira
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # mk:jira — Routing Skill

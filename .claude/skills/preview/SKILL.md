@@ -25,12 +25,16 @@ keywords:
   - ascii-diagram
   - diff-visualization
   - plan-display
-when_to_use: "Use when generating visual artifacts — markdown or self-contained HTML — for code, architecture, plans, or git diffs. Use --html --plan-review to RENDER a plan as HTML (display only, no critique). NOT for plan critique/scope review (mk:plan-ceo-review) or media generation (mk:multimodal)."
+when_to_use: Use when generating visual artifacts — markdown or self-contained HTML — for code, architecture, plans, or git diffs. Use --html --plan-review to RENDER a plan as HTML (display only, no critique). NOT for plan critique/scope review (mk:plan-ceo-review) or media generation (mk:multimodal).
 user-invocable: true
 preamble-tier: 2
 phase: on-demand
 trust_level: kit-authored
 injection_risk: low
+owner: docs
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # mk:preview

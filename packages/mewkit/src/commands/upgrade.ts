@@ -1,6 +1,15 @@
 import { join } from "node:path";
 import pc from "picocolors";
-import { fetchReleases, downloadRelease, cleanupDownload, smartUpdate, readInstallMetadata } from "../core/index.js";
+import {
+	fetchReleases,
+	downloadRelease,
+	cleanupDownload,
+	smartUpdate,
+	readInstallMetadata,
+	hasPackManifest,
+	loadPackManifest,
+	resolvePacks,
+} from "../core/index.js";
 import type { ReleaseInfo, UserConfig } from "../core/index.js";
 
 export interface UpgradeArgs {
@@ -132,9 +141,31 @@ async function performUpgrade(
 			geminiApiKey: null,
 		};
 
+		// Pack-aware upgrade: a partial install upgrades only its installed packs;
+		// removed packs stay removed. Corrupt/absent metadata (or a legacy/full
+		// install with `packs` undefined) falls through to a full upgrade — never
+		// abort the very upgrade that would repair corruption.
+		let installedPacks: string[] | undefined;
+		let installedProfile: string | undefined;
+		try {
+			const { meta } = readInstallMetadata(join(process.cwd(), ".claude"));
+			installedPacks = meta?.packs;
+			installedProfile = meta?.profile;
+		} catch {
+			installedPacks = undefined;
+		}
+		const claudeSrc = join(sourceDir, ".claude");
+		const allowedPaths =
+			installedPacks && hasPackManifest(claudeSrc)
+				? resolvePacks(claudeSrc, loadPackManifest(claudeSrc), installedPacks)
+				: undefined;
+
 		const stats = await smartUpdate(config, sourceDir, process.cwd(), /* dryRun */ false, /* force */ false, {
 			cleanup,
 			assumeYes,
+			allowedPaths,
+			profile: installedProfile,
+			packs: installedPacks,
 		});
 
 		console.log();

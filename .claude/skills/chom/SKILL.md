@@ -1,20 +1,24 @@
 ---
 name: mk:chom
-description:
-  "Use when copy-catting, replicating, or adapting features from external
-  systems, repos, apps, or ideas into the current project. Triggers on 'copy this
-  from', 'replicate', 'clone this feature', 'how does X do Y', 'chom',
-  'like how X does it', 'port from', 'build like', '1:1 copy'. NOT for packing
-  the current project (see mk:pack); NOT for one-shot URL-to-markdown fetches
-  (see mk:web-to-markdown)."
-argument-hint: "<source-url|path|description> [feature] [--compare|--copy|--improve|--port] [--lean|--auto]"
+description: Use when copy-catting, replicating, or adapting features from external systems, repos, apps, or ideas into the current project. Triggers on 'copy this from', 'replicate', 'clone this feature', 'how does X do Y', 'chom', 'like how X does it', 'port from', 'build like', '1:1 copy'. NOT for packing the current project (see mk:pack); NOT for one-shot URL-to-markdown fetches (see mk:web-to-markdown).
+argument-hint: <source-url|path|description> [feature] [--compare|--copy|--improve|--port] [--lean|--auto]
 phase: on-demand
 trust_level: kit-authored
 injection_risk: medium
 source: local
-keywords: [chom, copy-cat, replicate, clone-feature, port-from, build-like]
-when_to_use: "Use when copy-catting or replicating features from external systems/repos into the current project. NOT for packing the current project (see mk:pack) or one-shot URL fetches (see mk:web-to-markdown)."
+keywords:
+  - chom
+  - copy-cat
+  - replicate
+  - clone-feature
+  - port-from
+  - build-like
+when_to_use: Use when copy-catting or replicating features from external systems/repos into the current project. NOT for packing the current project (see mk:pack) or one-shot URL fetches (see mk:web-to-markdown).
 user-invocable: true
+owner: research
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 <!-- SECURITY ANCHOR

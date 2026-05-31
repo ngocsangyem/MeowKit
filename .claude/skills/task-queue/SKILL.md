@@ -1,13 +1,19 @@
 ---
 name: mk:task-queue
-description: >-
-  Task claiming and ownership tracking for parallel agent execution. Agents claim
-  tasks from a shared queue with file ownership enforcement. Use during parallel
-  execution phases when multiple agents work simultaneously.
+description: Task claiming and ownership tracking for parallel agent execution. Agents claim tasks from a shared queue with file ownership enforcement. Use during parallel execution phases when multiple agents work simultaneously.
 source: local
-keywords: [task-queue, ownership-tracking, parallel-execution, claim-task, file-ownership]
-when_to_use: "Auto-invoked when multiple agents claim tasks during parallel execution. Not user-callable directly."
+keywords:
+  - task-queue
+  - ownership-tracking
+  - parallel-execution
+  - claim-task
+  - file-ownership
+when_to_use: Auto-invoked when multiple agents claim tasks during parallel execution. Not user-callable directly.
 user-invocable: false
+owner: git
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Task Queue & Ownership Tracker

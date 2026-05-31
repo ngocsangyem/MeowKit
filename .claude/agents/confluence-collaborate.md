@@ -1,11 +1,15 @@
 ---
 name: confluence-collaborate
-description: "Manage Confluence collaboration surface: comments, attachments, labels, watchers. Routed by mk:confluence-collaborate skill. NOT for page CRUD (confluence-page); NOT for bulk ops (confluence-bulk)."
+description: 'Manage Confluence collaboration surface: comments, attachments, labels, watchers. Routed by mk:confluence-collaborate skill. NOT for page CRUD (confluence-page); NOT for bulk ops (confluence-bulk).'
 tools: Bash, Read, Grep, Glob
 model: inherit
 permissionMode: default
 memory: project
 color: cyan
+owner: confluence
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Confluence Collaborate Agent

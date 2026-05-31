@@ -99,6 +99,40 @@
     "subagent_type": {
       "type": "string",
       "description": "Optional. Observed in some agents (e.g., 'advisory'). Not formally documented."
+    },
+    "owner": {
+      "type": "string",
+      "enum": [
+        "lifecycle", "security", "memory", "jira", "confluence",
+        "portability", "observability", "research", "docs",
+        "testing", "git", "utility"
+      ],
+      "description": "Optional (governance). Domain that owns this artifact. See harness-metadata-schema.json for enum values and heuristics."
+    },
+    "criticality": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"],
+      "description": "Optional (governance). Impact of this artifact being incorrect or absent."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "experimental"],
+      "description": "Optional (governance). Lifecycle state of this artifact."
+    },
+    "runtime": {
+      "type": "string",
+      "enum": ["claude-code", "portable", "experimental"],
+      "description": "Optional (governance). Execution environment required by this artifact."
+    },
+    "context_cost": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Optional (governance). Estimated token footprint when loaded into context. Top-level mirror of meowkit.context_cost; both forms are accepted."
+    },
+    "depends_on": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional (governance). Artifact IDs this skill depends on at runtime."
     }
   }
 }

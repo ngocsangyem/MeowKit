@@ -2,21 +2,35 @@
 name: mk:docs-finder
 description: Retrieve up-to-date library, framework, and project documentation using scripts + MCP tools (Context7, Context Hub) with intelligent fallback. Use this skill whenever the user or agent needs documentation for any library, framework, API, SDK, or internal project spec. Triggers on "docs for [X]", "how does [library] work", "find documentation", "API reference for", "look up [feature] in [library]", "latest docs", "what's the API for", "find our [internal spec]", or any request that requires current, accurate documentation rather than relying on training data. Always prefer this skill over raw WebSearch for documentation retrieval — it returns structured, context-efficient results.
 version: 1.0.0
-argument-hint: "[library-name] [topic]"
+argument-hint: '[library-name] [topic]'
 phase: on-demand
 trust_level: kit-authored
 injection_risk: low
-keywords: [docs-finder, library-docs, context7, api-reference, framework-docs, mcp-fallback]
-when_to_use: "Use when retrieving library/framework/API documentation via Context7 or Context Hub. NOT for fetching arbitrary external pages (see mk:web-to-markdown)."
+keywords:
+  - docs-finder
+  - library-docs
+  - context7
+  - api-reference
+  - framework-docs
+  - mcp-fallback
+when_to_use: Use when retrieving library/framework/API documentation via Context7 or Context Hub. NOT for fetching arbitrary external pages (see mk:web-to-markdown).
 user-invocable: true
 meowkit:
   portability: provider-only
   providers:
-    include: [claude-code]
+    include:
+      - claude-code
   requires:
-    surfaces: [skills]
-    commands: [Bash]
+    surfaces:
+      - skills
+    commands:
+      - Bash
   context_cost: medium
+owner: docs
+criticality: medium
+status: active
+runtime: claude-code
+context_cost: medium
 ---
 
 <!-- SECURITY ANCHOR

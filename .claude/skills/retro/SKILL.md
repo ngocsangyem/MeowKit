@@ -16,9 +16,18 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 source: gstack
-keywords: [retro, sprint-retrospective, git-history, postmortem, reflection]
-when_to_use: "Use when running a sprint retrospective from git history."
+keywords:
+  - retro
+  - sprint-retrospective
+  - git-history
+  - postmortem
+  - reflection
+when_to_use: Use when running a sprint retrospective from git history.
 user-invocable: true
+owner: docs
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # /mk:retro — Weekly Engineering Retrospective

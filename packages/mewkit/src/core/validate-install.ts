@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, statSync, accessSync, constants } from "node:fs";
 import { join } from "node:path";
 import pc from "picocolors";
+import { isHookScript } from "./is-hook-script.js";
 
 export interface ValidationResult {
 	valid: boolean;
@@ -78,7 +79,8 @@ export function validate(targetDir: string): ValidationResult {
 	// Hooks — all must be executable
 	const hooksDir = join(claude, "hooks");
 	if (existsSync(hooksDir)) {
-		const hookFiles = readdirSync(hooksDir);
+		// Only real hook scripts — exclude subdirs and sidecars that accessSync(X_OK) accepts.
+		const hookFiles = readdirSync(hooksDir).filter((f) => isHookScript(join(hooksDir, f)));
 		for (const hookFile of hookFiles) {
 			const hookPath = join(hooksDir, hookFile);
 			let isExecutable = false;

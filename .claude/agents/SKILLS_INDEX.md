@@ -26,13 +26,14 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 ### Phase 1 — Plan
 
 ```toon
-[6]{skill,owner,type,architecture}
+[7]{skill,owner,type,architecture}
 `mk:plan-creator`|planner|planning|step-file (v1.5.0: scope challenge, multi-file output, plan red team, sync-back, **--product-level mode** for green-field app builds via step-03a; **--deep mode** for per-phase scouting; **--tdd flag** injects TDD sections into phase files; **standalone subcommands**: archive/red-team/validate; outputs `red-team-findings.md`; solution design checklist in each phase; memory capture at Gate 1)
 `mk:plan-ceo-review`|planner|planning|monolithic (v2.0: layered verification pipeline — pre-screen + two-lens eval + severity tiers + adversarial necessity + append-only verdict)
 `mk:validate-plan`|planner|planning|monolithic
 `mk:brainstorming`|brainstormer|planning|monolithic
 `mk:office-hours`|brainstormer/planner|planning|monolithic
 `mk:party`|orchestrator/brainstormer|planning|monolithic
+`mk:planning-engine`|planner|planning|monolithic
 ```
 
 ### Phase 2 — Test RED
@@ -85,6 +86,42 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 `mk:ui-design-system`|developer|development|monolithic
 ```
 
+### Integration / On-Demand
+
+Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each leaf skill maps 1-to-1 to a domain agent.
+
+#### Jira sub-skills (routed by `mk:jira` hub)
+
+```toon
+[14]{skill,owner,type,architecture}
+`mk:jira-admin`|jira|integration|monolithic
+`mk:jira-agile`|jira|integration|monolithic
+`mk:jira-analyst`|jira|integration|monolithic
+`mk:jira-bulk`|jira|integration|monolithic
+`mk:jira-dev`|jira|integration|monolithic
+`mk:jira-estimator`|jira|integration|monolithic
+`mk:jira-evaluator`|jira|integration|monolithic
+`mk:jira-fields`|jira|integration|monolithic
+`mk:jira-jsm`|jira|integration|monolithic
+`mk:jira-lifecycle`|jira|integration|monolithic
+`mk:jira-ops`|jira|integration|monolithic
+`mk:jira-relationships`|jira|integration|monolithic
+`mk:jira-search`|jira|integration|monolithic
+`mk:jira-time`|jira|integration|monolithic
+```
+
+#### Confluence skills (hub + sub-skills)
+
+```toon
+[6]{skill,owner,type,architecture}
+`mk:confluence`|confluence|integration|monolithic
+`mk:confluence-bulk`|confluence|integration|monolithic
+`mk:confluence-collaborate`|confluence|integration|monolithic
+`mk:confluence-page`|confluence|integration|monolithic
+`mk:confluence-search`|confluence|integration|monolithic
+`mk:confluence-spec-analyst`|confluence|integration|monolithic
+```
+
 ### Phase 4 — Review
 
 ```toon
@@ -118,17 +155,19 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 ### Phase 6 — Reflect
 
 ```toon
-[4]{skill,owner,type,architecture}
+[6]{skill,owner,type,architecture}
 `mk:document-release`|shipper/documenter|documentation|monolithic
 `mk:docs-init`|documenter|documentation|monolithic
 `mk:llms`|documenter|documentation|monolithic
 `mk:retro`|analyst/documenter|memory|monolithic
+`mk:context-audit`|documenter|documentation|monolithic
+`mk:prompt-enhancer`|documenter|documentation|monolithic
 ```
 
 ### Cross-Cutting (Any Phase)
 
 ```toon
-[8]{skill,owner,trigger}
+[10]{skill,owner,trigger}
 `mk:careful`|any agent|Before destructive commands
 `mk:freeze`|any agent|Debug session scoping
 `mk:docs-finder`|any agent (primary: researcher)|Library/API documentation lookup
@@ -137,6 +176,8 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 `mk:henshin`|any agent|Planning front door for wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `mk:plan-creator` → `mk:cook`. Adapted from external agentization patterns.
 `mk:preview`|any agent|Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, git diffs, and plan rendering. Display only; not for plan critique (mk:plan-ceo-review) or media generation (mk:multimodal).
 `mk:story-sizer`|story-sizer|Pre-ticket Fibonacci sizing of paste-mode user stories. Default writes a Story Sizing Report. Opt-in `--auto-create` delegates to `mk:jira-issue` + `mk:jira-collaborate` with a single batch confirmation gate.
+`mk:chom`|researcher|Copy-cat / replicate features from external systems, repos, or ideas into the current project
+`mk:pack`|developer|Pack an external repository into a single AI-friendly file for third-party analysis or handoff to external LLMs
 ```
 
 ## Summary
@@ -153,7 +194,7 @@ Documentation|4
 Memory|2
 Utility|12
 Cross-Cutting|5
-**Total**|**76**
+**Total**|**102**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

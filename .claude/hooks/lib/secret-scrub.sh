@@ -11,11 +11,9 @@
 # are acceptable; missed secrets are not. Patterns reflect OWASP secret-detection
 # heuristics + provider-specific prefixes.
 #
-# Sourcing guard
-if [ "${BASH_SOURCE[0]:-}" = "${0}" ]; then
-  echo "ERROR: secret-scrub.sh must be sourced, not executed directly" >&2
-  exit 1
-fi
+# This file is meant to be sourced, not executed. The bash-array self-execution
+# guard (BASH_SOURCE) aborts under dash with "Bad substitution", so it is omitted
+# to keep the helper safe under both /bin/sh implementations.
 
 scrub_secrets() {
   local input="$1"

@@ -17,9 +17,18 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 source: gstack
-keywords: [document-release, post-ship-docs, changelog, readme-update, sync-documentation]
-when_to_use: "Use after PR merges or shipping code — updates README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, CHANGELOG. NOT for initial doc creation (see mk:docs-init)."
+keywords:
+  - document-release
+  - post-ship-docs
+  - changelog
+  - readme-update
+  - sync-documentation
+when_to_use: Use after PR merges or shipping code — updates README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, CHANGELOG. NOT for initial doc creation (see mk:docs-init).
 user-invocable: true
+owner: docs
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Document Release: Post-Ship Documentation Update

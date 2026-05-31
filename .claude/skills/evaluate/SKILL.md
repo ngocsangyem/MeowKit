@@ -2,14 +2,8 @@
 name: mk:evaluate
 version: 1.0.0
 preamble-tier: 3
-description: >-
-  Use when grading a running build behaviorally — drives the artifact via
-  browser/curl/CLI and grades against rubric criteria with concrete evidence.
-  Triggers on /mk:evaluate, "evaluate this build", "grade the running app",
-  "check the running site against the spec", or after a generator iteration
-  completes. NOT for structural code audit of a diff/PR (see mk:review);
-  NOT for static linting (see mk:lint-and-validate).
-argument-hint: "[target-url-or-path] [--rubric-preset frontend-app|backend-api|cli-tool|fullstack-product] [--max-criteria 15]"
+description: Use when grading a running build behaviorally — drives the artifact via browser/curl/CLI and grades against rubric criteria with concrete evidence. Triggers on /mk:evaluate, "evaluate this build", "grade the running app", "check the running site against the spec", or after a generator iteration completes. NOT for structural code audit of a diff/PR (see mk:review); NOT for static linting (see mk:lint-and-validate).
+argument-hint: '[target-url-or-path] [--rubric-preset frontend-app|backend-api|cli-tool|fullstack-product] [--max-criteria 15]'
 allowed-tools:
   - Bash
   - Read
@@ -20,9 +14,19 @@ allowed-tools:
   - Agent
   - AskUserQuestion
 source: local
-keywords: [evaluate, behavioral-verification, rubric-grading, running-build, active-verification, skeptic-persona]
-when_to_use: "Use when grading a running build behaviorally — drives artifact via browser/curl/CLI against rubric criteria. NOT for structural code audit of a diff/PR (see mk:review) or static linting (see mk:lint-and-validate)."
+keywords:
+  - evaluate
+  - behavioral-verification
+  - rubric-grading
+  - running-build
+  - active-verification
+  - skeptic-persona
+when_to_use: Use when grading a running build behaviorally — drives artifact via browser/curl/CLI against rubric criteria. NOT for structural code audit of a diff/PR (see mk:review) or static linting (see mk:lint-and-validate).
 user-invocable: true
+owner: testing
+criticality: high
+status: active
+runtime: claude-code
 ---
 
 # mk:evaluate — Behavioral Active Verification

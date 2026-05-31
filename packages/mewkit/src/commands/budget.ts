@@ -1,5 +1,7 @@
 import path from "node:path";
 import pc from "picocolors";
+import { computeContextBudget } from "../core/context-budget.js";
+import { availableProfiles, hasPackManifest, loadPackManifest } from "../core/index.js";
 import {
 	findCostLog,
 	findProjectRootFromCostLog,
@@ -124,6 +126,60 @@ export function summarizeLiveBudgetState(budgetState: LiveBudgetState): LiveBudg
 		humanReads: coerceNumber(budgetState.turn_count),
 		estimatedCost: coerceNumber(budgetState.estimated_cost_usd),
 	};
+}
+
+export interface ContextBudgetArgs {
+	/** Profile to estimate; omitted = all profiles. */
+	profile?: string;
+	/** Exit non-zero when any profile exceeds this token estimate. */
+	failOver?: number;
+	json?: boolean;
+}
+
+function padCell(s: string, n: number): string {
+	return s.length >= n ? s : s + " ".repeat(n - s.length);
+}
+
+/**
+ * `mewkit budget context [--profile <p>] [--fail-over <N>] [--json]` — estimate the
+ * loadable context size of one or all profiles. The CI guardrail proves core stays
+ * small; `--fail-over` makes an oversized profile a non-zero exit.
+ */
+export function contextBudget(args: ContextBudgetArgs): void {
+	const claudeDir = path.join(process.cwd(), ".claude");
+	if (!hasPackManifest(claudeDir)) {
+		console.error(pc.red("Context budget requires .claude/pack-manifest.json — run `mewkit upgrade` first."));
+		process.exit(1);
+	}
+	const manifest = loadPackManifest(claudeDir);
+	const all = availableProfiles(manifest);
+	if (args.profile && !all.includes(args.profile)) {
+		console.error(pc.red(`Unknown profile "${args.profile}". Available: ${all.join(", ")}`));
+		process.exit(1);
+	}
+	const profiles = args.profile ? [args.profile] : all;
+	const reports = profiles.map((p) => computeContextBudget(claudeDir, p));
+
+	if (args.json) {
+		console.log(JSON.stringify(reports, null, 2));
+	} else {
+		console.log(pc.bold(pc.cyan("Context budget")));
+		console.log(pc.dim("Loadable set: always-on rules + skill SKILL.md entrypoints + agents + commands."));
+		console.log();
+		console.log(pc.bold(`  ${padCell("PROFILE", 12)} ${padCell("FILES", 7)} ${padCell("LINES", 9)} ~TOKENS`));
+		for (const r of reports) {
+			console.log(`  ${padCell(r.profile, 12)} ${padCell(String(r.files), 7)} ${padCell(String(r.lines), 9)} ${r.tokens.toLocaleString()}`);
+		}
+	}
+
+	if (args.failOver !== undefined) {
+		const over = reports.filter((r) => r.tokens > args.failOver!);
+		if (over.length > 0) {
+			console.log();
+			console.log(pc.red(`Over --fail-over ${args.failOver}: ${over.map((r) => `${r.profile}=${r.tokens}`).join(", ")}`));
+			process.exit(1);
+		}
+	}
 }
 
 export async function budget(args: BudgetArgs): Promise<void> {

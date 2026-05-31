@@ -1,13 +1,23 @@
 ---
 name: mk:jira-search
-description: "JIRA search + filter management via the jira-as wrapper. Triggers: 'search jira', 'find issues where X', 'jql for ...', 'export search results', 'manage saved filters'. JQL injection-safe via the shared sanitizer. NOT for single-issue CRUD (mk:jira-issue); NOT for bulk write ops (mk:jira-bulk)."
+description: 'JIRA search + filter management via the jira-as wrapper. Triggers: ''search jira'', ''find issues where X'', ''jql for ...'', ''export search results'', ''manage saved filters''. JQL injection-safe via the shared sanitizer. NOT for single-issue CRUD (mk:jira-issue); NOT for bulk write ops (mk:jira-bulk).'
 phase: on-demand
 source: local
-keywords: [jira, jira-search, jql, jql-query, jira-filter, jira-export]
-when_to_use: "Use to find Jira issues by JQL, validate JQL, build queries from natural language, manage saved filters, or export results. NOT for single-issue CRUD."
+keywords:
+  - jira
+  - jira-search
+  - jql
+  - jql-query
+  - jira-filter
+  - jira-export
+when_to_use: Use to find Jira issues by JQL, validate JQL, build queries from natural language, manage saved filters, or export results. NOT for single-issue CRUD.
 user-invocable: true
 context: fork
 agent: jira-search
+owner: jira
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # mk:jira-search

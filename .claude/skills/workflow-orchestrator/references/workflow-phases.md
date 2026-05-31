@@ -1,4 +1,5 @@
 <!-- Aligned to CLAUDE.md 7-phase model (B2-C6 fix) -->
+<!-- Canonical source: .claude/workflow.yaml -->
 
 # 7-Phase Workflow Detail
 
@@ -20,7 +21,7 @@ For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
 | 3     | Build                   | developer            | Implementation (GREEN in TDD mode)                    | Auto             |
 | 4     | Review                  | reviewer + security  | Quality/security audit, verdict                       | **GATE 2**       |
 | 5     | Ship                    | shipper + git-manager| Commit, PR, deploy                                    | Auto             |
-| 6     | Reflect                 | analyst + documenter | Memory capture, docs sync                             | Auto             |
+| 6     | Reflect                 | analyst + documenter + mk:memory | Memory capture, docs sync               | Auto             |
 
 ## Phase Transition Rules
 
@@ -43,7 +44,7 @@ Invalid transitions:
 
 ## Approval Gates (Only 2)
 
-**Gate 1** (after Phase 1 — Plan):
+**Gate 1** (after Phase 1, blocks Phase 3 in default mode / Phase 2 in TDD mode):
 - Plan file exists at `tasks/plans/YYMMDD-name/plan.md`
 - All required sections populated (Problem, Success Criteria, Technical Approach)
 - Human has explicitly approved

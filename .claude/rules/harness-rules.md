@@ -1,6 +1,9 @@
 # Harness Rules
 
-These rules govern the autonomous multi-hour build pipeline (`mk:autobuild`) and the generator/evaluator architecture introduced by the harness plan (Phases 1–5).
+<!-- Canonical lifecycle source: .claude/workflow.yaml -->
+<!-- autobuild pipeline steps are Step 0–6 (not Phase N) to avoid clashing with the 7 lifecycle phases. -->
+
+These rules govern the autonomous multi-hour build pipeline (`mk:autobuild`) and the generator/evaluator architecture.
 
 ## Rule 1: Planner Stays Product-Level
 
@@ -64,7 +67,9 @@ Use the audit playbook with measured baselines after model upgrades.
 
 ## Rule 8: Active Verification Is a HARD GATE
 
-The evaluator (Phase 3) MUST drive the running build via active verification — browser navigation, curl, CLI invocation. Static-analysis-only verdicts are forbidden. `validate-verdict.sh` rejects PASS verdicts with empty `evidence/` directories and converts them to FAIL.
+<!-- The evaluator runs at autobuild Step 4 (the evaluator stage). "Phase 3" was a former -->
+<!-- autobuild-internal label — Step 4 is the correct identifier in the current pipeline. -->
+The evaluator (autobuild Step 4 — evaluator stage) MUST drive the running build via active verification — browser navigation, curl, CLI invocation. Static-analysis-only verdicts are forbidden. `validate-verdict.sh` rejects PASS verdicts with empty `evidence/` directories and converts them to FAIL.
 
 **WHY:** Static checks miss real runtime failures; evaluator evidence must exercise the artifact.
 
@@ -76,6 +81,9 @@ The evaluator MUST re-anchor its skeptic persona (`mk:evaluate/prompts/skeptic-p
 
 ## Rule 10: No Density Override Bypasses Gates
 
-`MEOWKIT_AUTOBUILD_MODE=LEAN` and any `--tier` flag override scaffolding density, NOT gates. Gate 1 (plan), Gate 2 (review verdict), the contract gate (Phase 4), and the active-verification HARD GATE all still apply regardless of density mode.
+<!-- The contract gate is the autobuild sprint-contract stage (Step 2 of the pipeline). -->
+<!-- "Phase 4" was a former autobuild-internal label — use "contract gate" to avoid -->
+<!-- clashing with lifecycle Phase 4 (Review). -->
+`MEOWKIT_AUTOBUILD_MODE=LEAN` and any `--tier` flag override scaffolding density, NOT gates. Gate 1 (plan), Gate 2 (review verdict), the autobuild contract gate (Step 2), and the active-verification HARD GATE all still apply regardless of density mode.
 
 **WHY:** Density changes scaffolding amount, not the quality bar.

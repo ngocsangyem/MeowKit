@@ -2,13 +2,8 @@
 name: mk:plan-creator
 version: 1.6.2
 preamble-tier: 3
-description: >-
-  Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks
-  exit early, simple tasks get fast plans, complex tasks get full research + phase files +
-  validation. Enforces Gate 1. Activated by /mk:plan or /mk:cook.
-  NOT for ticket complexity analysis against an existing codebase (see mk:planning-engine);
-  NOT for CEO-level scope review of existing plans (see mk:plan-ceo-review).
-argument-hint: "[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] OR [archive | red-team {path} | validate {path}]"
+description: 'Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks exit early, simple tasks get fast plans, complex tasks get full research + phase files + validation. Enforces Gate 1. Activated by /mk:plan or /mk:cook. NOT for ticket complexity analysis against an existing codebase (see mk:planning-engine); NOT for CEO-level scope review of existing plans (see mk:plan-ceo-review).'
+argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] OR [archive | red-team {path} | validate {path}]'
 allowed-tools:
   - Bash
   - Read
@@ -19,17 +14,32 @@ allowed-tools:
   - Agent
   - AskUserQuestion
 source: local
-keywords: [plan-creator, implementation-plan, phase-files, gate-1, scope-adaptive]
-when_to_use: "Use when creating a structured multi-file implementation plan before build. NOT for ticket analysis (see mk:planning-engine) or scope review (see mk:plan-ceo-review)."
+keywords:
+  - plan-creator
+  - implementation-plan
+  - phase-files
+  - gate-1
+  - scope-adaptive
+when_to_use: Use when creating a structured multi-file implementation plan before build. NOT for ticket analysis (see mk:planning-engine) or scope review (see mk:plan-ceo-review).
 user-invocable: true
 meowkit:
   portability: provider-only
   providers:
-    include: [claude-code]
+    include:
+      - claude-code
   requires:
-    surfaces: [skills]
-    commands: [Agent, AskUserQuestion, Bash]
+    surfaces:
+      - skills
+    commands:
+      - Agent
+      - AskUserQuestion
+      - Bash
   context_cost: high
+owner: lifecycle
+criticality: critical
+status: active
+runtime: claude-code
+context_cost: high
 ---
 
 # Plan Creator

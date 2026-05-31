@@ -6,7 +6,7 @@ description: |
   Ship workflow: detect + merge base branch, run tests, review diff, bump VERSION, update CHANGELOG, commit, push, create PR. Use when asked to "ship", "deploy", "push to main", "create a PR", or "merge and push".
   Proactively suggest when the user says code is ready or asks about deploying.
   Supports official (→ main) and beta (→ dev/develop) ship modes with auto-detection.
-argument-hint: "[official|beta] [--skip-tests] [--dry-run]"
+argument-hint: '[official|beta] [--skip-tests] [--dry-run]'
 allowed-tools:
   - Bash
   - Read
@@ -18,9 +18,18 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: gstack
-keywords: [ship, pr-creation, branch-push, deploy-pipeline, gate-2-pass]
-when_to_use: "Use when shipping reviewed code — creates PR + branch push after Gate 2 PASS verdict. NOT for code review (see mk:review)."
+keywords:
+  - ship
+  - pr-creation
+  - branch-push
+  - deploy-pipeline
+  - gate-2-pass
+when_to_use: Use when shipping reviewed code — creates PR + branch push after Gate 2 PASS verdict. NOT for code review (see mk:review).
 user-invocable: true
+owner: lifecycle
+criticality: high
+status: active
+runtime: claude-code
 ---
 
 # Ship: Fully Automated Ship Workflow

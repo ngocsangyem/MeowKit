@@ -14,9 +14,19 @@ allowed-tools:
   - Glob
   - Bash
 source: local
-keywords: [sequential-thinking, step-by-step-reasoning, mcp-sequentialthinking, evidence-based, incremental-analysis, chain-of-thought]
-when_to_use: "Use when applying step-by-step evidence-based reasoning. NOT for systematic debugging (see mk:investigate)."
+keywords:
+  - sequential-thinking
+  - step-by-step-reasoning
+  - mcp-sequentialthinking
+  - evidence-based
+  - incremental-analysis
+  - chain-of-thought
+when_to_use: Use when applying step-by-step evidence-based reasoning. NOT for systematic debugging (see mk:investigate).
 user-invocable: true
+owner: research
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Sequential Thinking

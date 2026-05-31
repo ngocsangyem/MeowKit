@@ -2,22 +2,27 @@
 name: mk:rubric
 version: 1.0.0
 preamble-tier: 3
-description: >-
-  Use when loading, listing, composing, or validating graded evaluation
-  rubrics — PASS/WARN/FAIL grading with weighted criteria and balanced
-  PASS/FAIL anchor examples. Triggers on /mk:rubric, "load rubric",
-  "compose rubric preset", "validate rubric", or evaluator-style code review
-  that needs anchor-grounded judgments.
-argument-hint: "[list | load <name> | compose <preset> | validate]"
+description: Use when loading, listing, composing, or validating graded evaluation rubrics — PASS/WARN/FAIL grading with weighted criteria and balanced PASS/FAIL anchor examples. Triggers on /mk:rubric, "load rubric", "compose rubric preset", "validate rubric", or evaluator-style code review that needs anchor-grounded judgments.
+argument-hint: '[list | load <name> | compose <preset> | validate]'
 allowed-tools:
   - Bash
   - Read
   - Grep
   - Glob
 source: local
-keywords: [rubric, graded-evaluation, weighted-criteria, pass-warn-fail, anchor-examples, calibration]
-when_to_use: "Use when loading, listing, composing, or validating graded evaluation rubrics with PASS/WARN/FAIL grading."
+keywords:
+  - rubric
+  - graded-evaluation
+  - weighted-criteria
+  - pass-warn-fail
+  - anchor-examples
+  - calibration
+when_to_use: Use when loading, listing, composing, or validating graded evaluation rubrics with PASS/WARN/FAIL grading.
 user-invocable: true
+owner: testing
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Rubric Library API

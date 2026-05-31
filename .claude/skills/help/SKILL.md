@@ -1,21 +1,26 @@
 ---
 name: mk:help
-description: >-
-  Workflow navigation assistant. Scans project state (plans, reviews, tests, git)
-  and recommends the next step in the 7-phase pipeline. Use when asked
-  "what should I do next?", "where am I?", "help", or at session start.
-  NOT for domain complexity routing (see mk:scale-routing); NOT for skill
-  discovery (descriptions handle that automatically).
-argument-hint: "[--verbose]"
+description: Workflow navigation assistant. Scans project state (plans, reviews, tests, git) and recommends the next step in the 7-phase pipeline. Use when asked "what should I do next?", "where am I?", "help", or at session start. NOT for domain complexity routing (see mk:scale-routing); NOT for skill discovery (descriptions handle that automatically).
+argument-hint: '[--verbose]'
 source: local
 allowed-tools:
   - Read
   - Glob
   - Grep
   - Bash
-keywords: [help, command-reference, skill-discovery, usage-guide, onboarding, catalog-listing]
-when_to_use: "Use when the user asks for help understanding which skills or commands to use. Surfaces available commands and their purposes."
+keywords:
+  - help
+  - command-reference
+  - skill-discovery
+  - usage-guide
+  - onboarding
+  - catalog-listing
+when_to_use: Use when the user asks for help understanding which skills or commands to use. Surfaces available commands and their purposes.
 user-invocable: true
+owner: research
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Navigation Help

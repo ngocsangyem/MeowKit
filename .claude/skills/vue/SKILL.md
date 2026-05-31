@@ -1,12 +1,23 @@
 ---
 name: mk:vue
-description: "Vue 3 Composition API patterns, Pinia state management, reactivity, component design, and performance. Auto-activates on .vue files or Vue-related tasks. Use for Vue architecture decisions, composables, Pinia stores, forms, and optimization."
+description: Vue 3 Composition API patterns, Pinia state management, reactivity, component design, and performance. Auto-activates on .vue files or Vue-related tasks. Use for Vue architecture decisions, composables, Pinia stores, forms, and optimization.
 source: aura-frog
-original_skills: [vue-expert]
+original_skills:
+  - vue-expert
 adapted_for: claude-code
-keywords: [vue, composition-api, pinia, reactivity, composables, framework-specific]
-when_to_use: "Use when working with Vue 3 Composition API, Pinia, reactivity, composables. Auto-activates on .vue files. NOT for React (see mk:react-patterns) or Angular."
+keywords:
+  - vue
+  - composition-api
+  - pinia
+  - reactivity
+  - composables
+  - framework-specific
+when_to_use: Use when working with Vue 3 Composition API, Pinia, reactivity, composables. Auto-activates on .vue files. NOT for React (see mk:react-patterns) or Angular.
 user-invocable: true
+owner: utility
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Vue 3 Expert

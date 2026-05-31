@@ -1,19 +1,39 @@
 ---
 name: mk:loop
-description: "Use when autonomously improving a measurable scalar metric through bounded, git-tracked iterations: modify one scoped change, verify, keep or revert. Triggers on /mk:loop, 'optimize coverage/bundle size/lint count', 'iterate until the metric improves'. NOT for subjective cleanup (see mk:cook), known-root-cause bugs (see mk:fix), behavioral grading (see mk:evaluate), or shipping (see mk:ship)."
+description: 'Use when autonomously improving a measurable scalar metric through bounded, git-tracked iterations: modify one scoped change, verify, keep or revert. Triggers on /mk:loop, ''optimize coverage/bundle size/lint count'', ''iterate until the metric improves''. NOT for subjective cleanup (see mk:cook), known-root-cause bugs (see mk:fix), behavioral grading (see mk:evaluate), or shipping (see mk:ship).'
 version: 1.0.0
-argument-hint: "[Goal: ...] [Scope: globs] [Metric: name] [Direction: higher|lower] [Verify: cmd] [Guard: cmd] [Iterations: N]"
+argument-hint: '[Goal: ...] [Scope: globs] [Metric: name] [Direction: higher|lower] [Verify: cmd] [Guard: cmd] [Iterations: N]'
 source: local
 preamble-tier: 2
 phase: on-demand
 trust_level: kit-authored
 injection_risk: medium
-allowed-tools: [Bash, Read, Edit, Write, Grep, Glob, AskUserQuestion]
-keywords: [loop, optimization, metric, iteration, git-memory, autonomous, keep-or-revert, bounded, regression-guard]
-when_to_use: "Use when an objective scalar metric can drive repeated scoped trials with keep/revert. NOT for subjective goals (mk:cook), known bugs (mk:fix), or behavioral grading (mk:evaluate)."
+allowed-tools:
+  - Bash
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - AskUserQuestion
+keywords:
+  - loop
+  - optimization
+  - metric
+  - iteration
+  - git-memory
+  - autonomous
+  - keep-or-revert
+  - bounded
+  - regression-guard
+when_to_use: Use when an objective scalar metric can drive repeated scoped trials with keep/revert. NOT for subjective goals (mk:cook), known bugs (mk:fix), or behavioral grading (mk:evaluate).
 user-invocable: true
 metadata:
-  attribution: "Loop pattern adapted from autoresearch by Udit Goenka (MIT); MeowKit-native gates, git policy, and artifacts."
+  attribution: Loop pattern adapted from autoresearch by Udit Goenka (MIT); MeowKit-native gates, git policy, and artifacts.
+owner: memory
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # mk:loop — Bounded Optimization Loop

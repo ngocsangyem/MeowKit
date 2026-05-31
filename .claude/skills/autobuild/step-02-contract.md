@@ -1,6 +1,9 @@
+<!-- Lifecycle canonical source: .claude/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
+
 # Step 2: Sprint Contract (Conditional)
 
-Negotiate a sprint contract via `mk:sprint-contract` (Phase 4). Skipped on `MINIMAL` (already short-circuited) and on `LEAN` for small builds.
+<!-- autobuild pipeline steps are named Step 0–6 to avoid clashing with the 7 lifecycle phases. -->
+Negotiate a sprint contract via `mk:sprint-contract` (autobuild contract stage). Skipped on `MINIMAL` (already short-circuited) and on `LEAN` for small builds.
 
 ## Instructions
 

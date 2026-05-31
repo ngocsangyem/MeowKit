@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # read-hook-input.sh — Shared JSON-on-stdin parser shim for meowkit hooks.
 #
 # Per Claude Code docs (verified 260408 against https://code.claude.com/docs/en/hooks):
@@ -21,14 +21,14 @@
 #   HOOK_EVENT_NAME      — hook_event_name
 #   HOOK_TRANSCRIPT_PATH — transcript_path
 #
-# Reqs: Bash 3.2+. Uses Python (.claude/skills/.venv/bin/python3, falls back to system python3).
+# Reqs: POSIX sh (dash-compatible); the caller may be bash or sh. Uses Python
+# (.claude/skills/.venv/bin/python3, falls back to system python3).
 # Graceful degradation: if no python available OR JSON parse error, exports empty vars + warns.
 
-# Sourcing guard — must be sourced, not executed (P3)
-if [ "${BASH_SOURCE[0]:-}" = "${0}" ]; then
-  echo "ERROR: read-hook-input.sh must be sourced, not executed directly" >&2
-  exit 1
-fi
+# This file is meant to be sourced, not executed. We intentionally omit a
+# self-execution guard: the portable detection (BASH_SOURCE) is a bash array and
+# aborts under dash with "Bad substitution", which would nullify the parser the
+# safety hooks depend on. Correctness under both shells outranks the warning.
 
 # Determine python interpreter (P1 graceful degradation)
 _HOOK_PY=""
@@ -74,8 +74,13 @@ if [ -z "$HOOK_INPUT_RAW" ]; then
 fi
 
 # Parse JSON via python (P2 robust try/except)
-# Single python invocation extracts all fields and emits shell-safe export lines
-_HOOK_PARSED=$("$_HOOK_PY" -c '
+# Single python invocation extracts all fields and emits shell-safe export lines.
+# Feed stdin via `printf '%s' | python3` rather than a `<<<` here-string: here-strings
+# are a bash-only construct that is a hard syntax error under dash (POSIX /bin/sh),
+# which would abort the parse and leave every HOOK_* var empty. `printf '%s'` treats
+# the JSON as a literal argument (not a format string), so `%`/`\` in the payload
+# survive intact.
+_HOOK_PARSED=$(printf '%s' "$HOOK_INPUT_RAW" | "$_HOOK_PY" -c '
 import json, sys, shlex
 
 try:
@@ -100,7 +105,7 @@ fields = {
 for k, v in fields.items():
     # shlex.quote ensures the value is shell-safe
     print(f"export {k}={shlex.quote(str(v))}")
-' <<< "$HOOK_INPUT_RAW" 2>/dev/null)
+' 2>/dev/null)
 
 # Eval the export statements (safe — values are shlex-quoted)
 if [ -n "$_HOOK_PARSED" ]; then

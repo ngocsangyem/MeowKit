@@ -1,11 +1,15 @@
 ---
 name: jira-bulk
-description: "Execute bulk JIRA operations on 10+ issues via the jira-as CLI wrapper: bulk transition, assign, set-priority, clone, delete. Dry-run is MANDATORY first. Routed by mk:jira-bulk skill. NOT for single-issue ops (jira-issue / jira-lifecycle); NOT for bulk-update by JQL field changes (jira-search bulk-update — same dry-run discipline)."
+description: 'Execute bulk JIRA operations on 10+ issues via the jira-as CLI wrapper: bulk transition, assign, set-priority, clone, delete. Dry-run is MANDATORY first. Routed by mk:jira-bulk skill. NOT for single-issue ops (jira-issue / jira-lifecycle); NOT for bulk-update by JQL field changes (jira-search bulk-update — same dry-run discipline).'
 tools: Bash, Read, Grep, Glob
 model: inherit
 permissionMode: default
 memory: project
 color: red
+owner: jira
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # JIRA Bulk Agent

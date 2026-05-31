@@ -3,7 +3,7 @@
 ## Active Agents
 
 ```toon
-[34]{agent_file,type,role,source,workflow_phases,auto_activate,ce_version,last_improved}
+[39]{agent_file,type,role,source,workflow_phases,auto_activate,ce_version,last_improved}
 `orchestrator.md`|Core|Task router, complexity classification, model tier assignment|original|Phase 0 (Orient)|Yes — every task|260326|260326
 `planner.md`|Core|Two-lens planning (product + engineering) + product-level mode for green-field builds, Gate 1 enforcement|original|Phase 1 (Plan)|Routed by orchestrator|260326|260408
 `brainstormer.md`|Support|Solution brainstorming, architecture evaluation, trade-off analysis|Credit: Duy Nguyen|Phase 1 (Plan)|Routed by orchestrator or explicit|260326|260326
@@ -38,6 +38,11 @@
 `jira-estimator.md`|Intelligence|Heuristic story-point estimation (read-only)|Adapted from the toolkit jira/agents/|on-demand|Forked from `mk:jira-estimator` skill|260510|260510
 `jira-analyst.md`|Intelligence|Full ticket context analysis incl. media (read-only)|Adapted from the toolkit jira/agents/|on-demand|Forked from `mk:jira-analyst` skill|260510|260510
 `story-sizer.md`|Intelligence|Pre-ticket Fibonacci sizing of paste-mode user stories. Read-only at Jira; auto-create delegates to `mk:jira-issue` + `mk:jira-collaborate`.|New in v2.9.0|on-demand|Forked from `mk:story-sizer` skill|260511|260511
+`confluence-bulk.md`|Support|Execute bulk Confluence operations (bulk-label, bulk-move, bulk-delete) via confluence-as CLI; dry-run mandatory first|Adapted from Confluence-Assistant-Skills|on-demand|Routed by mk:confluence hub|260530|260530
+`confluence-collaborate.md`|Support|Manage Confluence collaboration surface: comments, attachments, labels, watchers|Adapted from Confluence-Assistant-Skills|on-demand|Routed by mk:confluence hub|260530|260530
+`confluence-page.md`|Support|Confluence page CRUD, hierarchy, and version ops via confluence-as CLI wrapper|Adapted from Confluence-Assistant-Skills|on-demand|Routed by mk:confluence hub|260530|260530
+`confluence-search.md`|Support|Find Confluence pages by criteria via confluence-as CLI; CQL filter management and space operations|Adapted from Confluence-Assistant-Skills|on-demand|Routed by mk:confluence hub|260530|260530
+`confluence-spec-analyst.md`|Intelligence|Read full Confluence spec page and produce structured Spec Research Report with requirements, ACs, gaps, and user stories (read-only)|Adapted from Confluence-Assistant-Skills|on-demand|Routed by mk:confluence hub|260530|260530
 ```
 
 **CE version**: Context Engineering version — tracks when agents were last improved with context engineering principles.

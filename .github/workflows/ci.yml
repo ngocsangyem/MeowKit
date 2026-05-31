@@ -44,6 +44,27 @@ jobs:
       - name: Validate hook registration
         run: bash scripts/check-hook-registration.sh
 
+      - name: Validate hook shell consistency
+        run: bash scripts/check-hook-shell-consistency.sh
+
+      - name: Validate workflow spec drift
+        run: node packages/mewkit/dist/index.js validate --workflow
+
+      - name: Validate artifact ownership metadata
+        run: node packages/mewkit/dist/index.js validate --ownership
+
+      - name: Validate pack manifest coherence + safety invariant
+        run: node packages/mewkit/dist/index.js validate --packs
+
+      # Guardrail, not a tight bound. Measured core ~102k tokens; cap = 130000
+      # (~27% headroom). Re-baseline with `mewkit budget context --profile core`
+      # and bump this number when core legitimately grows.
+      - name: Validate core context budget stays small
+        run: node packages/mewkit/dist/index.js budget context --profile core --fail-over 130000
+
+      - name: Validate README/index counts (stale-index)
+        run: node packages/mewkit/dist/index.js inventory --check
+
       - name: Validate skill frontmatter
         run: .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py
 
