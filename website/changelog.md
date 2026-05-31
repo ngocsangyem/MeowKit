@@ -12,7 +12,48 @@ outline: [2, 3]
 npx mewkit upgrade
 ```
 
-Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
+Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`, `Migration Notes`, and `Breaking Changes`.
+
+## 2.10.0 (2026-05-31) — Long-Run Harness Evolution
+
+### Highlights
+
+MeowKit's harness now closes the loop from evidence to safe improvement. Gates, workflow metadata, pack profiles, event traces, memory lifecycle, portability coverage, and policy profiles are surfaced as explicit CLI checks so future changes can be proposed, reviewed, and released without guessing.
+
+### CLI
+
+- `mewkit evolve suggest` and `mewkit evolve report` propose harness improvements from trace evidence, repeated review failures, malformed trace rows, memory signals, and pack signals without applying changes automatically.
+- `mewkit inventory --unused`, `mewkit inventory --rarely-used`, and `mewkit pack suggest-prune` report usage and pruning candidates from evidence, rendering `N/A` when usage emitters are not available.
+- `mewkit memory compact`, `mewkit memory conflicts`, `mewkit memory archive`, and `mewkit memory promote` manage curated JSON memory while surfacing contradictions instead of silently merging them.
+- `mewkit portability matrix`, `mewkit portability explain <provider>`, and `mewkit portability coverage` expose provider capability gaps as a first-class matrix.
+- `mewkit policy explain` and `mewkit policy set strict|balanced|lightweight` make gate strictness explicit while keeping privacy and prompt-injection blocks always enforced.
+- `mewkit doctor --hard-gates`, scoped `mewkit validate --workflow|--ownership|--packs`, `mewkit health`, `mewkit reflect`, and `mewkit simulate` now form the release review surface for hard gates, workflow drift, inventory coverage, pack safety, event evidence, and regression scenarios.
+
+### Features
+
+- Profile packs can install right-sized subsets (`core`, `developer`, `product`, `atlassian`, `security`, `research`, `full`) with context budget checks and pack-manifest validation.
+- Harness events now consolidate on `.claude/memory/trace-log.jsonl` for gate blocks, privacy blocks, injection blocks, and hook failures.
+- Workflow coherence is tracked through `.claude/workflow.yaml`, ownership metadata, and inventory count checks.
+- Review-failure patterns can be clustered into proposal records for future rules, checklists, or regression scenarios.
+
+### Improvements
+
+- Hard-gate validation now emphasizes the exact configured hook path, shell interpreter, exit code, stream, and marker text.
+- Pack add/remove behavior is safer: adding packs is write-only, and removal preserves shared, base-covered, settings-referenced, and user-edited files.
+- Provider portability now treats unsupported or disabled surfaces honestly instead of counting them as passing coverage.
+- Memory docs and CLI behavior clarify that JSON stores are canonical and Markdown views are generated.
+
+### Bug Fixes
+
+- Hook and simulation checks avoid false passes from empty command output or unmatched scenarios.
+- Event emission is placed before blocking exits and outside redirected hook output blocks so event writes do not change hook behavior.
+- Usage pruning no longer infers unused artifacts from static metadata when runtime usage evidence is unavailable.
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the new harness commands, profile packs, docs, and validation checks.
+- Run `npx mewkit doctor --hard-gates` after upgrading if your project customizes hooks or gate policy.
+- Use `npx mewkit validate --packs` and `npx mewkit budget context --profile <name>` before switching an existing project to a smaller profile.
 
 ## 2.9.14 (2026-05-30) — Autobuild Rename + mk:loop
 

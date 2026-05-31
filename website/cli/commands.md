@@ -13,16 +13,21 @@ Runtime tools for managing your MeowKit project. Run from your project root.
 Diagnose environment issues with auto-fix for permissions.
 
 ```bash
-npx mewkit doctor [--report]
+npx mewkit doctor [--report] [--hard-gates] [--providers] [--state]
 ```
 
 **Checks:** Node.js 20+, Python 3.9+, Git, `.claude/` structure, hooks executable, scripts present, memory writable, MCP config, Python venv, config validity.
 
 **Auto-fixes:** Hook file permissions (`chmod +x`).
 
-| Flag       | Description                       |
-| ---------- | --------------------------------- |
+| Flag | Description |
+| ---- | ----------- |
 | `--report` | Print shareable diagnostic report |
+| `--hard-gates` | Live-probe the plan, privacy, and injection hard gates through the configured hook path |
+| `--providers` | Include provider contract diagnostics |
+| `--state` | Include state taxonomy diagnostics |
+
+`--hard-gates` is the release-grade check for gate enforcement. It verifies the same hook wiring the product uses, including exit codes and block markers.
 
 ## setup
 
@@ -58,10 +63,24 @@ npx mewkit task list [--all] [--status done]
 Verify `.claude/` structure integrity.
 
 ```bash
-npx mewkit validate
+npx mewkit validate [--strict]
+npx mewkit validate --workflow
+npx mewkit validate --ownership
+npx mewkit validate --packs
+npx mewkit validate --portable
 ```
 
 **Checks:** Agents (10+), skills (30+), commands dir, modes (5+), rules (10+), hooks executable, scripts present, settings.json, CLAUDE.md, config file.
+
+| Flag | Description |
+| ---- | ----------- |
+| `--strict` | Treat warnings as failures |
+| `--workflow` | Run only the `.claude/workflow.yaml` drift check |
+| `--ownership` | Run only artifact ownership coverage for agents, skills, rules, hooks, and commands |
+| `--packs` | Run only pack-manifest coherence and pack safety checks |
+| `--portable` | Include provider portability contract checks |
+
+Default validation is resilient for normal projects. Scoped validation is stricter and is the better choice for CI or release review of a specific surface.
 
 ## budget
 
@@ -97,6 +116,62 @@ npx mewkit budget --day 2026-05-01
 npx mewkit budget --session --day 2026-05-01
 ```
 
+### Context budget
+
+Estimate loadable context by profile.
+
+```bash
+npx mewkit budget context
+npx mewkit budget context --profile core
+npx mewkit budget context --profile full --fail-over 120000
+```
+
+Use `--fail-over <N>` in CI when a profile has a hard token budget.
+
+## inventory
+
+List shipped harness artifacts and governance metadata.
+
+```bash
+npx mewkit inventory
+npx mewkit inventory --json
+npx mewkit inventory --check
+npx mewkit inventory --stale
+npx mewkit inventory --critical
+npx mewkit inventory --portable-missing
+npx mewkit inventory --unused
+npx mewkit inventory --rarely-used --threshold 2 --since 30d
+```
+
+| Flag | Description |
+| ---- | ----------- |
+| `--json` | Emit machine-readable inventory |
+| `--check` | Fail when README or index counts drift from actual artifacts |
+| `--stale` | Show deprecated or experimental artifacts |
+| `--critical` | Show only critical artifacts |
+| `--portable-missing` | Show artifacts without runtime portability coverage |
+| `--unused` | Show artifacts with no usage evidence |
+| `--rarely-used` | Show artifacts below the usage threshold |
+| `--threshold <N>` | Usage count threshold for `--rarely-used` |
+| `--since <Nd|Nh>` | Usage lookback window |
+
+Usage analysis is evidence-based. Until usage emitters exist for a class of artifact, `--unused` and `--rarely-used` report `N/A` instead of pretending static metadata proves usage.
+
+## pack
+
+Manage installed profile packs after scaffold or upgrade.
+
+```bash
+npx mewkit pack list
+npx mewkit pack add atlassian
+npx mewkit pack remove atlassian
+npx mewkit pack suggest-prune
+```
+
+`pack add` installs files for the requested pack and must not delete existing user files. `pack remove` deletes only pristine, pack-exclusive files; shared files, base safety files, settings-referenced files, and user-edited files are preserved.
+
+`pack suggest-prune` is report-only. It never deletes files.
+
 ## memory
 
 View or manage cross-session memory.
@@ -111,6 +186,43 @@ npx mewkit memory compact      # Dry-run exact duplicate compaction
 npx mewkit memory archive --older-than 90d
 ```
 
+JSON memory stores are canonical. Markdown views are generated from JSON. `conflicts` surfaces contradictions for review instead of silently merging them.
+
+## reflect
+
+Summarize recent harness evidence from the canonical trace log.
+
+```bash
+npx mewkit reflect
+npx mewkit reflect --last 7d
+npx mewkit reflect --task TASK-123
+```
+
+Task filtering only applies to workflow events whose payload includes `data.task`. Gate, privacy, and hook events are not task-tagged today.
+
+## health
+
+Show a one-command harness control panel.
+
+```bash
+npx mewkit health
+npx mewkit health --last 24h
+```
+
+Health combines hard-gate status, inventory, stale-index checks, context budget, memory health, provider portability, and event-derived failure counts. Hook failures are counted as events, not reported as a rate with an undefined denominator.
+
+## simulate
+
+Run declarative gate scenarios against a temporary harness.
+
+```bash
+npx mewkit simulate --all
+npx mewkit simulate --all --allow-skip
+npx mewkit simulate --scenario gate-plan-required
+```
+
+Scenario results are `PASS`, `FAIL`, or `SKIP`. `SKIP` means the scenario did not apply to the current project or provider. It is useful information, but it is not a pass unless you explicitly use `--allow-skip` for an advisory sweep.
+
 ## evolve
 
 Proposal-only harness evolution from the canonical trace log.
@@ -120,6 +232,10 @@ npx mewkit evolve suggest
 npx mewkit evolve suggest --json --last 30d
 npx mewkit evolve report --out plans/reports/evolution-report.md
 ```
+
+`evolve` consumes event clusters, repeated review failures, malformed trace rows, memory signals, and pack signals when available. It returns suggestions with evidence, confidence, impact, and risk. Suggestions are never auto-applied.
+
+Useful suggestion types include rule edits, skill split/merge candidates, hook tests, pack pruning, and new regression scenarios.
 
 ## portability
 
@@ -131,6 +247,8 @@ npx mewkit portability explain codex
 npx mewkit portability coverage --json
 ```
 
+Unsupported or disabled provider surfaces are rendered honestly, not counted as passing coverage. Use `matrix` for the full table, `explain <provider>` for one provider, and `coverage` for summary health.
+
 ## policy
 
 Explain or set explicit gate policy profiles.
@@ -140,6 +258,8 @@ npx mewkit policy explain
 npx mewkit policy set strict
 npx mewkit policy set lightweight --yes
 ```
+
+Profiles tune gate strictness. Missing policy keeps legacy behavior. Malformed policy fails safe as strict. Privacy and prompt-injection blocking are never disabled by policy.
 
 ## upgrade
 

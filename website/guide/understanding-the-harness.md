@@ -54,8 +54,30 @@ Stop
 
 Security hooks (`gate-enforcement.sh`, `privacy-block.sh`) are never routed through `dispatch.cjs`. They remain independent bash entries in `settings.json`. If the dispatcher crashes, security hooks still fire.
 
+## Release-time control surfaces
+
+The harness has several CLI surfaces that keep the system honest as it grows:
+
+| Surface | Command | Purpose |
+| ------- | ------- | ------- |
+| Gate enforcement | `npx mewkit doctor --hard-gates` | Probes the configured hard gates through the same hook path used at runtime. |
+| Workflow coherence | `npx mewkit validate --workflow` | Checks `.claude/workflow.yaml` against the documented workflow. |
+| Ownership coverage | `npx mewkit validate --ownership` and `npx mewkit inventory --check` | Confirms shipped artifacts have governance metadata and count indexes stay current. |
+| Pack safety | `npx mewkit validate --packs` and `npx mewkit pack suggest-prune` | Checks pack manifest coherence and reports prune candidates without deleting files. |
+| Observability | `npx mewkit reflect`, `npx mewkit health`, `npx mewkit simulate --all` | Reads `.claude/memory/trace-log.jsonl` and turns gate blocks, hook failures, and scenarios into reviewable evidence. |
+| Long-run evolution | `npx mewkit evolve suggest` | Proposes rule edits, hook tests, skill changes, pack pruning, or regression scenarios from evidence. |
+| Provider portability | `npx mewkit portability matrix` | Shows which providers support which MeowKit surfaces. |
+| Gate policy | `npx mewkit policy explain` | Explains the active strictness profile for gates. |
+
+The event log is `.claude/memory/trace-log.jsonl`. MeowKit should not create a second event store for gate or hook evidence.
+
+`evolve`, usage pruning, and pack pruning are proposal-only surfaces. They can explain what the evidence suggests, but they do not rewrite rules or delete files by themselves.
+
+Usage-based pruning may render `N/A` until usage emitters exist for the artifact type. That is intentional; MeowKit does not infer usage from static metadata alone.
+
 ## Next steps
 
 - [How agents and skills work](/core-concepts/how-it-works) — the canonical overview
 - [Middleware layer](/guide/middleware-layer) — hook dispatch in depth
+- [Runtime commands](/cli/commands) — CLI checks for gates, inventory, packs, observability, and evolution
 - [Adaptive density](/guide/adaptive-density) — scaffolding by model tier

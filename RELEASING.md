@@ -23,6 +23,35 @@ mewkit CLI fetches zip at npx mewkit init
 | `main` | `@latest` | Stable         | `v1.2.0`        |
 | `dev`  | `@beta`   | Pre-release    | `v1.3.0-beta.1` |
 
+## Harness Release Context
+
+MeowKit is no longer just a zip of rules and skills. The release also carries a harness that enforces gates, tracks ownership, validates packs, records events, and proposes future cleanup. Keep this context fresh so future agents do not rediscover the same failure modes.
+
+| Area | Release invariant |
+| ---- | ----------------- |
+| Enforcement | Test hooks exactly as `.claude/settings.json` invokes them. Bash-only hooks must run with `bash`, not `sh`. Gate failures must keep their expected exit code, stream, and marker text. |
+| Coherence | `.claude/workflow.yaml`, ownership metadata, and the inventory registry are the source of truth for workflow and artifact coverage. Missing governance infra may warn in default validation, but scoped validation stays strict. |
+| Packs | Profiles and pack installs are governed by `pack-manifest.json`. `pack add` must not delete user files. Trimming or downgrade deletes are only valid for explicit init/profile-change intent. |
+| Observability | Use `.claude/memory/trace-log.jsonl` as the event log. Do not add a second state log for events. Event writes must be valid JSON and fire before a blocking hook exits. |
+| Evolution | `mewkit evolve`, usage pruning, memory conflict handling, portability matrix, and policy profiles are advisory or explicit-user-action surfaces. They must propose or explain; they must not silently rewrite rules. |
+
+Current long-run commands to remember during release review:
+
+```bash
+npx mewkit evolve suggest
+npx mewkit evolve report
+npx mewkit inventory --unused
+npx mewkit inventory --rarely-used
+npx mewkit pack suggest-prune
+npx mewkit memory compact
+npx mewkit memory conflicts
+npx mewkit portability matrix
+npx mewkit portability coverage
+npx mewkit policy explain
+```
+
+Usage-based pruning can report `N/A` until usage emitters such as `skill.invoked` or `agent.invoked` exist. That is honest output, not a release blocker by itself.
+
 ## Quick Release (Script)
 
 For standard releases, use the release script:
@@ -63,6 +92,9 @@ Check and update these pages if the release affects them:
 | `guide/model-routing.md`            | Model tier or routing changes                    |
 | `reference/agents/*.md`             | Agent capability changes                         |
 | `reference/skills/*.md`             | Skill behavior or schema changes                 |
+| `docs/architecture/system-architecture.md` | Gates, workflow, inventory, packs, event log, memory, policy, or portability changes |
+| `website/cli/commands.md`           | CLI command, flag, output, or validation behavior changes |
+| `packages/mewkit/README.md`         | Package usage, command overview, or release-facing CLI behavior changes |
 
 #### 1b. Update agent and skill routing (when new agents/skills land)
 
@@ -99,6 +131,18 @@ Check `packages/mewkit/portable-manifest.json` whenever a release moves source f
 - Keep release checksum manifests, provider manifests, and `portable-manifest.json` separate; they serve different purposes.
 - Do not copy `portable-manifest.json` into `.claude/`. It is an npm package artifact shipped with `packages/mewkit`, not part of the project kit that `npx mewkit init` scaffolds.
 - If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `tasks/`, `CLAUDE.md`, and `release-manifest.json`.
+
+#### 1e. Update harness context when release changes the harness
+
+If a release changes hooks, gates, workflow, inventory, packs, simulation, memory, portability, or policy profiles, update the docs that future agents read first:
+
+- `RELEASING.md` — release checks and known harness invariants.
+- `docs/architecture/system-architecture.md` — how the harness pieces fit together.
+- `website/cli/commands.md` — user-facing command and flag behavior.
+- `packages/mewkit/README.md` — package-facing command summary.
+- `website/changelog.md` — user-visible release notes.
+
+Keep the docs practical. Include exact command names, the expected behavior, and any honest `N/A` cases. Avoid phase names, internal finding IDs, and temporary plan paths in published docs.
 
 ### 2. Update CHANGELOG (`website/changelog.md`)
 
@@ -221,12 +265,40 @@ npm -w packages/mewkit version <version> --no-git-tag-version
 
 ### 4. Build and verify
 
+Run release checks from the repository root unless a command explicitly uses an npm workspace. Root `npm test` is the meaningful project signal; package-local test commands can have different current-directory assumptions.
+
 ```bash
 npm run build
 npm run lint
 npm run typecheck
 npm test
 ```
+
+Add targeted checks based on the changed surface:
+
+| Changed surface | Extra checks |
+| --------------- | ------------ |
+| CLI command or TypeScript module | `npm -w packages/mewkit run build:cli` and focused `npx vitest run <test-file>` |
+| Hooks, hard gates, privacy, injection | `npx mewkit doctor --hard-gates`, hook integration tests, and exact exit/stream/marker assertions |
+| Workflow rules or phase docs | `npx mewkit validate --workflow` |
+| Agents, skills, rules, hooks, commands, ownership metadata | `npx mewkit validate --ownership` and `npx mewkit inventory --check` |
+| Packs, profiles, init/upgrade behavior | `npx mewkit validate --packs`, `npx mewkit budget context --profile core`, and pack add/remove focused tests |
+| Event log, reflect, health, simulation | `npx mewkit simulate --all --allow-skip` plus focused event-log tests |
+| Memory compaction or conflict handling | `npx mewkit memory conflicts`, memory view validation, and compaction on a copied fixture if the command would rewrite local memory |
+| Provider migration or portability | `npx mewkit validate --portable`, `npx mewkit portability matrix`, and `npx mewkit portability coverage` |
+| Gate policy profiles | `npx mewkit policy explain` and hard-gate checks under the changed profile |
+
+Do not hide unrelated failures. If a failure is known pre-existing, record the exact command, symptom, and why it is outside this release. Current examples that may appear in local worktrees are Orchviz React invalid-hook test failures and lint color-literal failures in `packages/mewkit/src/orchviz-web/styles/extensions.css`; classify them with evidence instead of editing around them.
+
+#### Harness safety notes
+
+- Hook scripts sourced from `.claude/settings.json` must be tested through the same runner path the product uses.
+- Avoid `ls | head` style checks for hook coverage; they can pass with empty or wrong inputs.
+- `simulate --all` may return `SKIP` for scenarios that do not match the current project. `SKIP` is not `PASS`, and should not be promoted into a hard release gate until the scenario is deterministic.
+- Do not register non-enumerated implementation files in the inventory registry. If the enumerator cannot see a file, add a focused safety assertion instead.
+- Pack parity checks should use the same file collection path used by real installs.
+- Event emitters should write to `.claude/memory/trace-log.jsonl`, not a new events store.
+- `mewkit evolve` and prune suggestions are proposal-only. Never auto-apply rule edits, skill merges, hook tests, pack pruning, or regression scenarios during release.
 
 ### 5. Build release assets
 
@@ -332,11 +404,12 @@ Copy this checklist for each release:
 
 - [ ] Updated affected guide/reference pages (step 1a)
 - [ ] If a new agent or skill landed: updated routing surfaces (step 1b — `SKILLS_INDEX.md`, `AGENTS_INDEX.md`, `agent-routing.md`, `lifecycle-routing.md`, sidebar config, reference page)
+- [ ] If harness behavior changed: updated `RELEASING.md`, `docs/architecture/system-architecture.md`, `website/cli/commands.md`, `packages/mewkit/README.md`, and `website/changelog.md`
 - [ ] VitePress build passes (`npx vitepress build`)
 
 ### Changelog
 
-- [ ] Added v<version> section to `CHANGELOG.md`
+- [ ] Added v<version> section to `website/changelog.md`
 
 ### Version
 
@@ -350,6 +423,18 @@ Copy this checklist for each release:
 - [ ] `npm run lint` passes
 - [ ] `npm run typecheck` passes
 - [ ] `npm test` passes
+- [ ] If CLI changed: `npm -w packages/mewkit run build:cli` passes
+- [ ] Focused tests for changed modules pass
+
+### Harness Safety
+
+- [ ] If hooks or gates changed: `npx mewkit doctor --hard-gates` passes
+- [ ] If workflow changed: `npx mewkit validate --workflow` passes
+- [ ] If ownership or artifacts changed: `npx mewkit validate --ownership` and `npx mewkit inventory --check` pass
+- [ ] If packs or profiles changed: `npx mewkit validate --packs` and context budget checks pass
+- [ ] If observability changed: simulation and event-log tests pass or documented `SKIP` cases are intentional
+- [ ] If portability changed: portable validation and matrix coverage are updated
+- [ ] If policy changed: `npx mewkit policy explain` matches the intended profile behavior
 
 ### Release
 
@@ -413,6 +498,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.10.0 | 2026-05-31 | Long-run harness evolution                       |
 | v2.9.14 | 2026-05-30 | Autobuild rename + mk:loop                       |
 | v2.9.13 | 2026-05-30 | Fix Gate Parity & Workflow Evidence Index        |
 | v2.9.12 | 2026-05-30 | JSON-first memory + observability cleanup        |
@@ -500,3 +586,23 @@ gh release upload v<version> dist/meowkit-release.zip --clobber
 ### Semantic-release skips release
 
 No `feat:` or `fix:` commits since last release. Add a commit with the right prefix, or use `--force` on the workflow dispatch.
+
+### `doctor --hard-gates` fails after hook changes
+
+Check the hook invocation path first. The settings file may invoke a Bash script, so running the same file through `sh` can create a false failure on Linux. Verify sourced helper paths, exit codes, stderr markers, and whether the Gate 1 plan-approval loop still blocks with exit `2` when required.
+
+### `simulate --all` returns `SKIP`
+
+`SKIP` means the scenario did not apply to the current project or provider. It is useful release information, but it is not a passing simulation. Keep `--allow-skip` for advisory sweeps until the scenario is deterministic enough to enforce.
+
+### `inventory --check` or `validate --ownership` fails
+
+Update the ownership metadata, central registry, or generated inventory source so the declared artifacts match what MeowKit actually ships. Do not add registry entries for files that the inventory enumerator cannot see.
+
+### `pack add` wants to delete files
+
+Treat that as a bug. Pack add should be write-only for the target pack. Deletes are only acceptable for explicit init/profile-downgrade or trim flows where the user asked for removal.
+
+### `evolve`, `inventory --unused`, or prune output says `N/A`
+
+That is expected when the event log has no usage emitter for the artifact type. Keep the output honest and propose the missing emitter; do not invent usage counts.
