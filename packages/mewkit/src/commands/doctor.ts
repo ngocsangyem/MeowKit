@@ -18,6 +18,7 @@ import {
 	type Status,
 } from "./doctor-checks.js";
 import { checkMemoryHealth } from "./doctor-memory-checks.js";
+import { checkHardGates } from "./doctor-hard-gates.js";
 import {
 	collectProviderContractDiagnostics,
 	summarizeProviderContractDiagnostics,
@@ -34,6 +35,8 @@ function statusIcon(status: Status): string {
 			return pc.red("FAIL");
 		case "warn":
 			return pc.yellow("WARN");
+		case "na":
+			return pc.dim("N/A");
 	}
 }
 
@@ -56,7 +59,12 @@ function findProjectRoot(): string | null {
 	return null;
 }
 
-export async function doctor(args?: { report?: boolean; providers?: boolean; state?: boolean }): Promise<void> {
+export async function doctor(args?: {
+	report?: boolean;
+	providers?: boolean;
+	state?: boolean;
+	hardGates?: boolean;
+}): Promise<void> {
 	console.log(pc.bold(pc.cyan("MeowKit Doctor")));
 	console.log(pc.dim("Diagnosing common issues...\n"));
 
@@ -112,6 +120,10 @@ export async function doctor(args?: { report?: boolean; providers?: boolean; sta
 		results.push(...checkMemoryHealth(root));
 	}
 
+	if (args?.hardGates) {
+		results.push(...(await checkHardGates(root)));
+	}
+
 	for (const r of results) {
 		console.log(`  [${statusIcon(r.status)}] ${r.name}`);
 		console.log(`         ${pc.dim(r.detail)}`);
@@ -125,9 +137,11 @@ export async function doctor(args?: { report?: boolean; providers?: boolean; sta
 	const pass = results.filter((r) => r.status === "pass").length;
 	const fail = results.filter((r) => r.status === "fail").length;
 	const warn = results.filter((r) => r.status === "warn").length;
+	const na = results.filter((r) => r.status === "na").length;
 
 	const parts: string[] = [pc.green(`${pass} passed`)];
 	if (warn > 0) parts.push(pc.yellow(`${warn} warnings`));
+	if (na > 0) parts.push(pc.dim(`${na} n/a`));
 	if (fail > 0) parts.push(pc.red(`${fail} failed`));
 	console.log(parts.join(", "));
 

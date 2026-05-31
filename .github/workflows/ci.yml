@@ -44,6 +44,9 @@ jobs:
       - name: Validate hook registration
         run: bash scripts/check-hook-registration.sh
 
+      - name: Validate hook shell consistency
+        run: bash scripts/check-hook-shell-consistency.sh
+
       - name: Validate skill frontmatter
         run: .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py
 

@@ -5,8 +5,9 @@ import { commandExists } from "./setup.js";
 import { getRequirementsSource } from "../core/skills-dependencies.js";
 import { verifyPackages } from "../core/dependency-installer.js";
 import { listDeps, isDepCommandPresent, type DoctorContext } from "../lib/system-deps-registry.js";
+import { isHookScript } from "../core/is-hook-script.js";
 
-export type Status = "pass" | "fail" | "warn";
+export type Status = "pass" | "fail" | "warn" | "na";
 
 export interface DiagResult {
 	name: string;
@@ -80,7 +81,12 @@ export function checkHooks(root: string | null): DiagResult {
 		return { name: "Hooks", status: "warn", detail: "No hooks/ directory" };
 	}
 
-	const hooks = fs.readdirSync(hooksDir).filter((f) => !f.startsWith("."));
+	// Only count actual hook scripts — never directories (lib/, handlers/, __tests__/) or
+	// sidecars (HOOKS_INDEX.md, handlers.json), which accessSync(X_OK) would falsely accept.
+	const hooks = fs
+		.readdirSync(hooksDir)
+		.filter((f) => !f.startsWith("."))
+		.filter((f) => isHookScript(path.join(hooksDir, f)));
 	if (hooks.length === 0) {
 		return { name: "Hooks", status: "warn", detail: "No hook files" };
 	}

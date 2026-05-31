@@ -48,7 +48,9 @@ ${pc.bold("Options:")}
   --day [date]     Budget: filter to today or a specific YYYY-MM-DD
   --providers      Doctor/migrate: include provider contract diagnostics
   --state          Doctor: include state taxonomy diagnostics
+  --hard-gates     Doctor: live-probe the hard gates (plan/privacy/injection block)
   --portable       Validate: include portable provider contract checks
+  --strict         Validate: treat WARN as failure (exit 1); off by default
 
 ${pc.bold("Init flags for post-init migration:")}
   --migrate                  After unpack, prompt for providers to export to (interactive)
@@ -99,6 +101,7 @@ async function main(): Promise<void> {
 			"report",
 			"providers",
 			"state",
+			"hard-gates",
 			"portable",
 			"all",
 			"dry-run",
@@ -171,7 +174,10 @@ async function main(): Promise<void> {
 			});
 			break;
 		case "validate":
-			await validate({ portable: args.portable as boolean | undefined });
+			await validate({
+				portable: args.portable as boolean | undefined,
+				strict: args.strict as boolean | undefined,
+			});
 			break;
 		case "budget":
 			await budget({
@@ -200,6 +206,7 @@ async function main(): Promise<void> {
 				report: args.report as boolean | undefined,
 				providers: args.providers as boolean | undefined,
 				state: args.state as boolean | undefined,
+				hardGates: args["hard-gates"] as boolean | undefined,
 			});
 			break;
 		case "status":

@@ -54,10 +54,12 @@ case "$NORMALIZED_PATH" in
     validator=".claude/skills/sprint-contract/scripts/validate-contract.sh"
     if [ -x "$validator" ]; then
       if ! "$validator" "$FILE_PATH" >/dev/null 2>&1; then
-        echo "@@GATE_BLOCK@@"
-        echo "Contract file $FILE_PATH failed schema validation."
-        echo "Run for diagnostics: $validator $FILE_PATH"
-        exit 1
+        {
+          echo "@@GATE_BLOCK@@"
+          echo "Contract file $FILE_PATH failed schema validation."
+          echo "Run for diagnostics: $validator $FILE_PATH"
+        } >&2
+        exit 2
       fi
     fi
     # Contract file edits are otherwise allowed (validator passed or not installed yet)
@@ -70,10 +72,12 @@ esac
 # previously bypassed the gate via substring or extension allowlists.
 case "$NORMALIZED_PATH" in
   *.bak/*|*_legacy/*|*_old/*|*.tmp/*|*.backup/*)
-    echo "@@GATE_BLOCK@@"
-    echo "Suspicious backup/legacy directory in path: $NORMALIZED_PATH"
-    echo "Move the file to a clean location or rename the parent directory."
-    exit 1
+    {
+      echo "@@GATE_BLOCK@@"
+      echo "Suspicious backup/legacy directory in path: $NORMALIZED_PATH"
+      echo "Move the file to a clean location or rename the parent directory."
+    } >&2
+    exit 2
     ;;
 esac
 
@@ -98,22 +102,64 @@ case "$NORMALIZED_PATH" in
   *.test.*|*.spec.*|*/__tests__/*|*/test/*|*/tests/*) exit 0 ;;
 esac
 
-# Gate 1: check if any approved plan exists (directory structure: tasks/plans/YYMMDD-name/plan.md)
+# Gate 1: a real plan file must exist before source writes are allowed.
+# A bare `ls <glob> | head` pipeline returns head's exit status (0) even on empty
+# input, so using it as an `if` condition false-passes when no plan exists. Test
+# each candidate with `[ -f ]` instead: that proves a regular file is present (a
+# directory literally named plan.md cannot satisfy it), and an unmatched glob stays
+# a literal pattern that fails the test. Covers both the nested
+# (tasks/plans/YYMMDD-name/plan.md) and the flat (tasks/plans/*.md) layouts.
 gate1_passed=0
-if ls tasks/plans/*/plan.md 2>/dev/null | head -1 > /dev/null 2>&1; then
-  gate1_passed=1
-fi
-# Also check flat file format for backward compatibility
-if [ "$gate1_passed" -eq 0 ] && ls tasks/plans/*.md 2>/dev/null | head -1 > /dev/null 2>&1; then
-  gate1_passed=1
-fi
+for _plan in tasks/plans/*/plan.md tasks/plans/*.md; do
+  if [ -f "$_plan" ]; then
+    gate1_passed=1
+    break
+  fi
+done
 
 if [ "$gate1_passed" -eq 0 ]; then
-  echo "@@GATE_BLOCK@@"
-  echo "No approved plan found in tasks/plans/."
-  echo "Gate 1 requires an approved plan before source code changes."
-  echo "Create a plan first: /mk:plan-creator or /mk:fix for simple fixes."
-  exit 1
+  # Hard block: emit on stderr and exit 2 so Claude Code STOPS the write and feeds
+  # the message back to the model. exit 1 is advisory (the write would proceed).
+  {
+    echo "@@GATE_BLOCK@@"
+    echo "No approved plan found in tasks/plans/."
+    echo "Gate 1 requires an approved plan before source code changes."
+    echo "Create a plan first: /mk:plan-creator or /mk:fix for simple fixes."
+  } >&2
+  exit 2
+fi
+
+# Opt-in stricter Gate 1: when MEOWKIT_GATE1_REQUIRE_APPROVED=1, a plan file merely
+# existing is not enough — the most recent plan must also carry an approval marker
+# (frontmatter `status: approved` or an Agent-State `Approved by: human` line).
+# Default off: the standard plan/cook flow records approval only later, so requiring
+# it unconditionally would block legitimate writes.
+if [ "${MEOWKIT_GATE1_REQUIRE_APPROVED:-0}" = "1" ]; then
+  approved=0
+  # Newest plan file by mtime, selected with the same `[ -f ]` per-candidate test as the
+  # existence gate (no `ls | head` pipeline whose exit code could mislead). `-nt` is a
+  # regular-file comparison supported by both bash and dash test builtins.
+  _latest_plan=""
+  for _p in tasks/plans/*/plan.md tasks/plans/*.md; do
+    [ -f "$_p" ] || continue
+    if [ -z "$_latest_plan" ] || [ "$_p" -nt "$_latest_plan" ]; then
+      _latest_plan="$_p"
+    fi
+  done
+  if [ -n "$_latest_plan" ]; then
+    if grep -qiE '^[[:space:]]*status:[[:space:]]*approved' "$_latest_plan" \
+       || grep -qiE 'approved by:[[:space:]]*human' "$_latest_plan"; then
+      approved=1
+    fi
+  fi
+  if [ "$approved" -eq 0 ]; then
+    {
+      echo "@@GATE_BLOCK@@"
+      echo "A plan exists but is not marked approved (MEOWKIT_GATE1_REQUIRE_APPROVED=1)."
+      echo "Add 'status: approved' to the plan frontmatter, or unset the flag."
+    } >&2
+    exit 2
+  fi
 fi
 
 # Phase 4: Sprint contract gate. Only runs if a plan-creator-style date-prefixed plan dir exists
@@ -121,8 +167,9 @@ fi
 contract_check=".claude/skills/sprint-contract/scripts/check-contract-signed.sh"
 if [ -x "$contract_check" ]; then
   if ! "$contract_check"; then
-    # check-contract-signed.sh already prints @@CONTRACT_GATE_BLOCK@@ + diagnostics on stderr
-    exit 1
+    # check-contract-signed.sh already prints @@CONTRACT_GATE_BLOCK@@ + diagnostics on stderr.
+    # Propagate as a hard block (exit 2) so the unsigned-contract write is stopped, not merely flagged.
+    exit 2
   fi
 fi
 
