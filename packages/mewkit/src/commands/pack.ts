@@ -17,6 +17,9 @@ import {
 	smartUpdate,
 	type UserConfig,
 } from "../core/index.js";
+import { buildInventory } from "../core/build-inventory.js";
+import { readEvents } from "../core/event-log.js";
+import { analyzeArtifactUsage } from "../core/usage/usage-analyzer.js";
 import {
 	computeRemovablePaths,
 	CorruptInstallMetadataError,
@@ -31,6 +34,8 @@ export interface PackArgs {
 	json?: boolean;
 	yes?: boolean;
 	beta?: boolean;
+	since?: string;
+	threshold?: number;
 }
 
 /** Packs that are core safety surface — never removable. */
@@ -66,10 +71,45 @@ export async function pack(args: PackArgs): Promise<void> {
 			return packAdd(claudeDir, manifest, state.meta, state.installedPacks, args);
 		case "remove":
 			return packRemove(claudeDir, manifest, state.meta, state.installedPacks, args);
+		case "suggest-prune":
+			return packSuggestPrune(claudeDir, manifest, state.meta, state.installedPacks, args);
 		default:
 			console.error(pc.red(`Unknown pack subcommand: ${args.subcommand ?? "(none)"}`));
 			console.log(pc.dim("Usage: mewkit pack <list|add|remove> [packs...]"));
 			process.exit(1);
+	}
+}
+
+function packSuggestPrune(
+	claudeDir: string,
+	manifest: ReturnType<typeof loadPackManifest>,
+	meta: Awaited<ReturnType<typeof readInstalledState>>["meta"],
+	installed: string[],
+	args: PackArgs,
+): void {
+	const entries = buildInventory(claudeDir).entries;
+	const { events } = readEvents(claudeDir, { since: args.since });
+	const usage = analyzeArtifactUsage(entries, events);
+	const installedNonBase = installed.filter((n) => n !== BASE_PACK);
+	const rows = installedNonBase.map((packName) => {
+		const removal = computeRemovablePaths(claudeDir, manifest, installedNonBase, [packName], meta?.files ?? []);
+		return {
+			pack: packName,
+			status: usage.status === "na" ? "insufficient-evidence" : "candidate",
+			deletable: removal.deletable.length,
+			preserved: removal.preserved.length,
+			reason: usage.status === "na" ? usage.reason : `Usage threshold ${args.threshold ?? 1}`,
+		};
+	});
+	if (args.json) {
+		console.log(JSON.stringify(rows, null, 2));
+		return;
+	}
+	console.log(pc.bold(pc.cyan("Pack prune suggestions")));
+	console.log(pc.dim("Report only — no files were deleted."));
+	for (const row of rows) {
+		console.log(`  ${row.pack}: ${row.status}; ${row.deletable} removable, ${row.preserved} preserved`);
+		if (row.reason) console.log(`      ${pc.dim(row.reason)}`);
 	}
 }
 

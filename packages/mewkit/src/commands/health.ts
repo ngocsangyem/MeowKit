@@ -11,6 +11,7 @@ import { readInstallMetadata } from "../core/install-metadata.js";
 import { collectProviderContractDiagnostics } from "../migrate/provider-contract-diagnostics.js";
 import { diagnosticToStatus } from "./validate.js";
 import { readEvents } from "../core/event-log.js";
+import { readGatePolicy } from "../core/gate-policy.js";
 
 /**
  * `mewkit health` — one-command harness control panel. Almost pure composition of
@@ -134,6 +135,15 @@ function repeatedFailuresPanel(claudeDir: string, since: string | undefined, win
 	return { panel: "Top repeated failures", status: "warn", detail: top };
 }
 
+function policyPanel(claudeDir: string): Panel {
+	const current = readGatePolicy(claudeDir);
+	return {
+		panel: "Gate policy",
+		status: current.error ? "warn" : "pass",
+		detail: `${current.policy.profile} (${current.source})${current.error ? ` — ${current.error}` : ""}`,
+	};
+}
+
 function statusChip(status: Status): string {
 	switch (status) {
 		case "pass":
@@ -181,6 +191,7 @@ export async function health(opts: HealthOptions = {}): Promise<void> {
 		contextBudgetPanel(claudeDir, repoRoot, profile),
 		{ panel: "Memory health", status: rollup(memory), detail: memory.map((x) => x.detail).join(" ") },
 		portabilityPanel(),
+		policyPanel(claudeDir),
 		repeatedFailuresPanel(claudeDir, since, windowLabel),
 		{
 			// skill.invoked has no emitter today — computing inventory − invoked-set would

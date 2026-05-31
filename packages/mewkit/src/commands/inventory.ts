@@ -3,6 +3,8 @@ import path from "node:path";
 import pc from "picocolors";
 import { buildInventory, type InventoryEntry } from "../core/build-inventory.js";
 import { checkStaleIndex, emitCounts } from "../core/check-stale-index.js";
+import { readEvents } from "../core/event-log.js";
+import { analyzeArtifactUsage, filterUnused } from "../core/usage/usage-analyzer.js";
 
 interface InventoryOptions {
 	json?: boolean;
@@ -13,6 +15,10 @@ interface InventoryOptions {
 	check?: boolean;
 	/** Rewrite count number tokens in README/index headers to match reality. */
 	emitCounts?: boolean;
+	unused?: boolean;
+	rarelyUsed?: boolean;
+	since?: string;
+	threshold?: number;
 }
 
 function findClaudeDir(): string | null {
@@ -44,6 +50,30 @@ function renderTable(entries: InventoryEntry[]): void {
 					? pc.yellow(pad(e.criticality, 9))
 					: pad(e.criticality, 9);
 		console.log(`  ${pad(e.type, 8)} ${pad(e.id, 26)} ${pad(e.owner, 13)} ${crit} ${pad(e.status, 12)} ${e.runtime}`);
+	}
+}
+
+function renderUsage(entries: InventoryEntry[], opts: InventoryOptions, claudeDir: string): void {
+	const { events } = readEvents(claudeDir, { since: opts.since });
+	const report = analyzeArtifactUsage(entries, events);
+	if (opts.json) {
+		const threshold = opts.rarelyUsed ? (opts.threshold ?? 1) : 1;
+		console.log(JSON.stringify({ ...report, artifacts: filterUnused(report, threshold) }, null, 2));
+		return;
+	}
+	console.log(pc.bold(pc.cyan(opts.rarelyUsed ? "Rarely used artifacts" : "Unused artifacts")));
+	if (report.status === "na") {
+		console.log(pc.yellow(report.reason ?? "Usage tracking unavailable."));
+		console.log(pc.dim("Emit skill.invoked/agent.invoked events before pruning from usage."));
+		return;
+	}
+	const rows = filterUnused(report, opts.rarelyUsed ? (opts.threshold ?? 1) : 1);
+	if (rows.length === 0) {
+		console.log(pc.green("No artifacts matched the usage filter."));
+		return;
+	}
+	for (const row of rows) {
+		console.log(`  ${pc.cyan(String(row.count).padStart(4))}  ${row.type}:${row.id}${row.lastSeen ? pc.dim(` last ${row.lastSeen}`) : ""}`);
 	}
 }
 
@@ -82,6 +112,10 @@ export async function inventory(opts: InventoryOptions = {}): Promise<void> {
 	}
 
 	const { entries, issues } = buildInventory(claudeDir);
+	if (opts.unused || opts.rarelyUsed) {
+		renderUsage(entries, opts, claudeDir);
+		return;
+	}
 	const filtered = applyFilter(entries, opts);
 
 	if (opts.json) {

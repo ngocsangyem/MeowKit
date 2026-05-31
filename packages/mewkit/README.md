@@ -21,6 +21,9 @@ npx mewkit <command>      # Runtime commands
 | `meowkit validate`  | Verify `.claude/` structure integrity (`--packs` for pack coherence) |
 | `meowkit budget`    | Token usage and cost tracking (`--monthly`; `budget context` for per-profile size) |
 | `meowkit memory`    | View/manage cross-session memory (`--show`, `--stats`, `--clear`) |
+| `meowkit evolve`    | Proposal-only harness evolution suggestions from trace evidence    |
+| `meowkit portability` | Provider capability matrix, explain, and coverage                |
+| `meowkit policy`    | Explain or set gate policy profiles                               |
 | `meowkit status`    | Print version, channel, and config                                |
 | `meowkit task new`  | Create structured task file from template                         |
 | `meowkit task list` | List active tasks with status                                     |
@@ -73,6 +76,7 @@ npx mewkit upgrade --list       # Show all available versions
 npx mewkit pack list            # show installed vs available packs
 npx mewkit pack add atlassian   # pull in Jira/Confluence
 npx mewkit pack remove atlassian # remove a pack (preserves shared/edited files)
+npx mewkit pack suggest-prune   # report prune candidates; deletes nothing
 
 # Estimate per-profile context size
 npx mewkit budget context                    # all profiles
@@ -91,6 +95,15 @@ npx mewkit budget --monthly
 # Manage memory
 npx mewkit memory --show        # Display lessons learned
 npx mewkit memory --clear       # Reset memory
+npx mewkit memory conflicts     # Surface contradictory entries
+npx mewkit memory compact       # Dry-run exact duplicate compaction
+npx mewkit memory archive --older-than 90d # Dry-run old-entry archive
+
+# Long-run harness evolution
+npx mewkit evolve suggest       # Proposal-only recommendations from trace evidence
+npx mewkit portability matrix   # Provider x surface capability table
+npx mewkit policy explain       # Effective gate strictness
+npx mewkit policy set strict    # Write explicit policy profile
 ```
 
 ## Visualizer (`meowkit orchviz`)

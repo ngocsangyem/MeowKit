@@ -28,6 +28,42 @@ install_hook_failed_trap "gate-enforcement.sh" 2>/dev/null || true
 # Hook profile gating — safety-critical: NEVER skip regardless of profile
 MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
 
+# Gate policy profile. Missing policy keeps legacy behavior for backward
+# compatibility; malformed policy fails safe as strict.
+POLICY_PROFILE="legacy"
+POLICY_FILE="${CLAUDE_PROJECT_DIR:-.}/.claude/policy.json"
+if [ -f "$POLICY_FILE" ]; then
+  POLICY_PROFILE="$(python3 - "$POLICY_FILE" <<'PY' 2>/dev/null || printf 'strict'
+import json, sys
+try:
+    profile = json.load(open(sys.argv[1], encoding="utf-8")).get("profile", "strict")
+    print(profile if profile in {"strict", "balanced", "lightweight"} else "strict")
+except Exception:
+    print("strict")
+PY
+)"
+fi
+PLAN_GATE_MODE="hard"
+CONTRACT_GATE_MODE="legacy"
+POLICY_REQUIRE_APPROVED="0"
+case "$POLICY_PROFILE" in
+  strict)
+    PLAN_GATE_MODE="hard"
+    CONTRACT_GATE_MODE="hard"
+    POLICY_REQUIRE_APPROVED="1"
+    ;;
+  balanced)
+    PLAN_GATE_MODE="hard"
+    CONTRACT_GATE_MODE="optional"
+    POLICY_REQUIRE_APPROVED="0"
+    ;;
+  lightweight)
+    PLAN_GATE_MODE="advisory"
+    CONTRACT_GATE_MODE="off"
+    POLICY_REQUIRE_APPROVED="0"
+    ;;
+esac
+
 # Phase 7 migration: hooks now source the JSON-on-stdin parser shim and prefer
 # $HOOK_FILE_PATH from stdin. Falls back to $1 positional if stdin empty (back-compat).
 # settings.json may still pass "$TOOL_INPUT_FILE_PATH" as positional — harmless either way.
@@ -129,14 +165,21 @@ done
 if [ "$gate1_passed" -eq 0 ]; then
   # Hard block: emit on stderr and exit 2 so Claude Code STOPS the write and feeds
   # the message back to the model. exit 1 is advisory (the write would proceed).
-  {
-    echo "@@GATE_BLOCK@@"
-    echo "No approved plan found in tasks/plans/."
-    echo "Gate 1 requires an approved plan before source code changes."
-    echo "Create a plan first: /mk:plan-creator or /mk:fix for simple fixes."
-  } >&2
   emit_event gate.blocked "{\"gate\":\"gate1-no-plan\",\"reason\":\"no approved plan in tasks/plans/\",\"file\":\"$NORMALIZED_PATH\"}"
-  exit 2
+  if [ "$PLAN_GATE_MODE" = "advisory" ]; then
+    {
+      echo "@@GATE_ADVISORY@@"
+      echo "No approved plan found in tasks/plans/ (policy: lightweight advisory)."
+    } >&2
+  else
+    {
+      echo "@@GATE_BLOCK@@"
+      echo "No approved plan found in tasks/plans/."
+      echo "Gate 1 requires an approved plan before source code changes."
+      echo "Create a plan first: /mk:plan-creator or /mk:fix for simple fixes."
+    } >&2
+    exit 2
+  fi
 fi
 
 # Opt-in stricter Gate 1: when MEOWKIT_GATE1_REQUIRE_APPROVED=1, a plan file merely
@@ -144,7 +187,7 @@ fi
 # (frontmatter `status: approved` or an Agent-State `Approved by: human` line).
 # Default off: the standard plan/cook flow records approval only later, so requiring
 # it unconditionally would block legitimate writes.
-if [ "${MEOWKIT_GATE1_REQUIRE_APPROVED:-0}" = "1" ]; then
+if [ "${MEOWKIT_GATE1_REQUIRE_APPROVED:-$POLICY_REQUIRE_APPROVED}" = "1" ]; then
   approved=0
   # Newest plan file by mtime, selected with the same `[ -f ]` per-candidate test as the
   # existence gate (no `ls | head` pipeline whose exit code could mislead). `-nt` is a
@@ -176,7 +219,7 @@ fi
 # Phase 4: Sprint contract gate. Only runs if a plan-creator-style date-prefixed plan dir exists
 # (otherwise check-contract-signed.sh defers and exits 0 — no false blocks on legacy plans).
 contract_check=".claude/skills/sprint-contract/scripts/check-contract-signed.sh"
-if [ -x "$contract_check" ]; then
+if [ "$CONTRACT_GATE_MODE" != "off" ] && [ "$CONTRACT_GATE_MODE" != "optional" ] && [ -x "$contract_check" ]; then
   if ! "$contract_check"; then
     # check-contract-signed.sh already prints @@CONTRACT_GATE_BLOCK@@ + diagnostics on stderr.
     # Propagate as a hard block (exit 2) so the unsigned-contract write is stopped, not merely flagged.

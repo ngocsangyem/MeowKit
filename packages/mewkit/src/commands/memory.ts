@@ -5,6 +5,10 @@ import pc from "picocolors";
 import { validateMemory } from "../memory/validate.js";
 import { seedFromMd } from "../memory/seed-from-md.js";
 import { renderViews } from "../memory/render-views.js";
+import { compactMemory } from "../memory/compact.js";
+import { archiveMemory } from "../memory/archive.js";
+import { findMemoryConflicts } from "../memory/conflicts.js";
+import { memoryPromotionCandidates } from "../memory/promote.js";
 
 interface MemoryArgs {
 	subcommand?: string;
@@ -12,6 +16,9 @@ interface MemoryArgs {
 	stats?: boolean;
 	strict?: boolean;
 	check?: boolean;
+	dryRun?: boolean;
+	yes?: boolean;
+	olderThan?: number;
 }
 
 interface PatternEntry {
@@ -307,6 +314,61 @@ function renderViewsCmd(memoryDir: string, check: boolean, strict: boolean): voi
 	}
 }
 
+async function confirmMemoryWrite(action: string, dryRun: boolean, yes: boolean | undefined): Promise<boolean> {
+	if (dryRun || yes) return true;
+	return promptConfirmation(pc.yellow(`${action} will modify canonical memory JSON. Continue? (y/N) `));
+}
+
+async function compactCmd(memoryDir: string, dryRun: boolean, yes: boolean | undefined): Promise<void> {
+	if (!(await confirmMemoryWrite("Memory compaction", dryRun, yes))) {
+		console.log(pc.dim("Aborted."));
+		return;
+	}
+	const results = compactMemory(memoryDir, { dryRun });
+	for (const r of results) {
+		console.log(`  ${pc.dim(`${r.file}:`.padEnd(28))} ${r.removed > 0 ? pc.yellow(`${r.removed} duplicate(s)`) : pc.green("no duplicates")}${r.wrote ? pc.dim(" wrote") : ""}`);
+	}
+	console.log(pc.dim(dryRun ? "Dry run — no files changed." : "Compaction complete."));
+}
+
+function conflictsCmd(memoryDir: string): void {
+	const conflicts = findMemoryConflicts(memoryDir);
+	if (conflicts.length === 0) {
+		console.log(pc.green("No memory conflicts detected."));
+		return;
+	}
+	for (const c of conflicts) {
+		console.log(`  ${pc.yellow(c.store)} ${c.key}`);
+		console.log(`      ${c.reason}: ${c.ids.join(", ")}`);
+	}
+}
+
+async function archiveCmd(memoryDir: string, olderThan: number, dryRun: boolean, yes: boolean | undefined): Promise<void> {
+	if (!(await confirmMemoryWrite("Memory archive", dryRun, yes))) {
+		console.log(pc.dim("Aborted."));
+		return;
+	}
+	const results = archiveMemory(memoryDir, olderThan, { dryRun });
+	for (const r of results) {
+		console.log(`  ${pc.dim(`${r.file}:`.padEnd(28))} ${r.archived > 0 ? pc.yellow(`${r.archived} old entr${r.archived === 1 ? "y" : "ies"}`) : pc.green("none")}${r.wrote ? pc.dim(" wrote") : ""}`);
+	}
+	console.log(pc.dim(dryRun ? "Dry run — no files changed." : "Archive complete."));
+}
+
+function promoteCmd(memoryDir: string): void {
+	const candidates = memoryPromotionCandidates(memoryDir);
+	if (candidates.length === 0) {
+		console.log(pc.green("No promotion candidates found."));
+		return;
+	}
+	for (const c of candidates) {
+		console.log(`${pc.bold(c.title)} ${pc.dim(c.source)}`);
+		console.log(`  ${c.reason}`);
+		console.log(`  proposed: ${c.proposedAction}`);
+	}
+	console.log(pc.dim("Candidate report only — no rules or skills were changed."));
+}
+
 export async function memory(args: MemoryArgs): Promise<void> {
 	console.log(pc.bold(pc.cyan("Agent Memory")));
 	console.log();
@@ -327,6 +389,14 @@ export async function memory(args: MemoryArgs): Promise<void> {
 		seedCmd(memoryDir);
 	} else if (args.subcommand === "render-views") {
 		renderViewsCmd(memoryDir, args.check ?? false, args.strict ?? false);
+	} else if (args.subcommand === "compact") {
+		await compactCmd(memoryDir, args.dryRun !== false, args.yes);
+	} else if (args.subcommand === "conflicts") {
+		conflictsCmd(memoryDir);
+	} else if (args.subcommand === "archive") {
+		await archiveCmd(memoryDir, args.olderThan ?? 90, args.dryRun !== false, args.yes);
+	} else if (args.subcommand === "promote") {
+		promoteCmd(memoryDir);
 	} else if (args.clear) {
 		await clearMemory(memoryDir);
 	} else if (args.stats) {

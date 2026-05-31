@@ -21,6 +21,9 @@ import { pack } from "./commands/pack.js";
 import { reflect } from "./commands/reflect.js";
 import { health } from "./commands/health.js";
 import { simulate } from "./commands/simulate.js";
+import { evolve } from "./commands/evolve.js";
+import { portability } from "./commands/portability.js";
+import { policy } from "./commands/policy.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -50,6 +53,9 @@ ${pc.bold("Commands:")}
   ${pc.green("reflect")}    Retrospective over the event log (gate blocks, hook failures, reviews)
   ${pc.green("health")}     Harness control panel: gates, budget, memory, portability, failures
   ${pc.green("simulate")}   Run declarative given→when→expect gate scenarios against a temp harness
+  ${pc.green("evolve")}     Proposal-only harness evolution suggestions from event evidence
+  ${pc.green("portability")} Provider capability matrix and coverage
+  ${pc.green("policy")}     Explain or set gate policy profiles
 
 ${pc.bold("Options:")}
   --help, -h       Show help
@@ -71,7 +77,14 @@ ${pc.bold("Options:")}
   --portable-missing  Inventory: show artifacts whose runtime is not portable
   --check          Inventory: fail if README/index counts drift from reality
   --emit-counts    Inventory: rewrite README/index count numbers to match reality
+  --unused         Inventory: show artifacts with no usage evidence (N/A until emitters exist)
+  --rarely-used    Inventory: show artifacts below --threshold
+  --threshold <N>  Inventory: rarely-used count threshold (default 1)
+  --since <Nd|Nh>  Inventory/pack: usage lookback window
   --last <Nd|Nh>   Reflect/health: limit to the last N days/hours of events
+  --kind <name>    Evolve: filter suggestions by kind
+  --min-confidence <N> Evolve: minimum confidence 0..1
+  --out <path>     Evolve report: write markdown/json report to path
   --task <id>      Reflect: filter to events whose data.task matches (workflow events
                    only — gate/privacy/hook events are not task-tagged today)
   --scenario <n>   Simulate: run a single named scenario
@@ -162,6 +175,8 @@ async function main(): Promise<void> {
 			"emit-counts",
 			"packs",
 			"allow-skip",
+			"unused",
+			"rarely-used",
 		],
 		string: [
 			"only",
@@ -181,6 +196,12 @@ async function main(): Promise<void> {
 			"last",
 			"task",
 			"scenario",
+			"since",
+			"threshold",
+			"kind",
+			"min-confidence",
+			"out",
+			"older-than",
 		],
 		alias: { h: "help", v: "version", y: "yes" },
 	});
@@ -234,6 +255,8 @@ async function main(): Promise<void> {
 				json: args.json as boolean | undefined,
 				yes: args.yes as boolean | undefined,
 				beta: args.beta as boolean | undefined,
+				since: args.since as string | undefined,
+				threshold: args.threshold ? Number(args.threshold) : undefined,
 			});
 			break;
 		case "inventory":
@@ -244,6 +267,10 @@ async function main(): Promise<void> {
 				portableMissing: args["portable-missing"] as boolean | undefined,
 				check: args.check as boolean | undefined,
 				emitCounts: args["emit-counts"] as boolean | undefined,
+				unused: args.unused as boolean | undefined,
+				rarelyUsed: args["rarely-used"] as boolean | undefined,
+				since: args.since as string | undefined,
+				threshold: args.threshold ? Number(args.threshold) : undefined,
 			});
 			break;
 		case "budget": {
@@ -280,6 +307,9 @@ async function main(): Promise<void> {
 				stats: args.stats as boolean | undefined,
 				strict: args.strict as boolean | undefined,
 				check: args.check as boolean | undefined,
+				dryRun: args["dry-run"] === true ? true : args.yes ? false : true,
+				yes: args.yes as boolean | undefined,
+				olderThan: args["older-than"] ? Number(args["older-than"]) : undefined,
 			});
 			break;
 		case "verdict-gate":
@@ -315,6 +345,32 @@ async function main(): Promise<void> {
 				all: args.all as boolean | undefined,
 				json: args.json as boolean | undefined,
 				allowSkip: args["allow-skip"] as boolean | undefined,
+			});
+			break;
+		case "evolve":
+			evolve({
+				subcommand: args._[1] as string | undefined,
+				json: args.json as boolean | undefined,
+				last: args.last as string | undefined,
+				task: args.task as string | undefined,
+				kind: args.kind as string | undefined,
+				minConfidence: args["min-confidence"] ? Number(args["min-confidence"]) : undefined,
+				out: args.out as string | undefined,
+			});
+			break;
+		case "portability":
+			portability({
+				subcommand: args._[1] as string | undefined,
+				provider: args._[2] as string | undefined,
+				json: args.json as boolean | undefined,
+			});
+			break;
+		case "policy":
+			await policy({
+				subcommand: args._[1] as string | undefined,
+				profile: args._[2] as string | undefined,
+				json: args.json as boolean | undefined,
+				yes: args.yes as boolean | undefined,
 			});
 			break;
 		case "status":

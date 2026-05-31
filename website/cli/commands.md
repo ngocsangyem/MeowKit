@@ -106,6 +106,39 @@ npx mewkit memory              # Summary (line counts, pattern count)
 npx mewkit memory --show       # Display summary of topic files (fixes.md, review-patterns.md, architecture-decisions.md)
 npx mewkit memory --stats      # Sessions captured, patterns learned
 npx mewkit memory --clear      # Clear all memory (with confirmation)
+npx mewkit memory conflicts    # Surface contradictory entries
+npx mewkit memory compact      # Dry-run exact duplicate compaction
+npx mewkit memory archive --older-than 90d
+```
+
+## evolve
+
+Proposal-only harness evolution from the canonical trace log.
+
+```bash
+npx mewkit evolve suggest
+npx mewkit evolve suggest --json --last 30d
+npx mewkit evolve report --out plans/reports/evolution-report.md
+```
+
+## portability
+
+Provider capability matrix built from checked-in provider contracts.
+
+```bash
+npx mewkit portability matrix
+npx mewkit portability explain codex
+npx mewkit portability coverage --json
+```
+
+## policy
+
+Explain or set explicit gate policy profiles.
+
+```bash
+npx mewkit policy explain
+npx mewkit policy set strict
+npx mewkit policy set lightweight --yes
 ```
 
 ## upgrade
