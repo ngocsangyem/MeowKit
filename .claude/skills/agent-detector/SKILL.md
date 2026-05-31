@@ -1,20 +1,25 @@
 ---
 name: mk:agent-detector
-description: "Detects task agent, complexity tier, and model automatically at Phase 0 orient. Invoked first in every workflow. NOT for runtime agent routing inside a single skill (see orchestration-rules.md)."
+description: Detects task agent, complexity tier, and model automatically at Phase 0 orient. Invoked first in every workflow. NOT for runtime agent routing inside a single skill (see orchestration-rules.md).
 model: haiku
 triggers:
-  - "every message"
-  - "always first"
+  - every message
+  - always first
 allowed-tools:
   - Read
-# TOKEN OPTIMIZATION: scanning tools disabled (Glob/Grep/Bash). Read is enabled
-# only for the Step 0 safety-baseline precheck — it stat-confirms the 5 always-on
-# rules exist on disk, replacing the unverified host-runtime platform auto-load
-# assumption with a deterministic check. Per-message cost: ~5 small Read calls.
 source: aura-frog
-keywords: [agent-routing, model-tier, phase-0-orient, auto-detect, complexity-classification]
-when_to_use: "Auto-invoked at Phase 0 by orchestrator to assign agent + model tier. Not user-callable directly."
+keywords:
+  - agent-routing
+  - model-tier
+  - phase-0-orient
+  - auto-detect
+  - complexity-classification
+when_to_use: Auto-invoked at Phase 0 by orchestrator to assign agent + model tier. Not user-callable directly.
 user-invocable: false
+owner: lifecycle
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Agent Detector

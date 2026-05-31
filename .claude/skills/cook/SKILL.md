@@ -1,12 +1,22 @@
 ---
 name: mk:cook
-description: "Orchestrates single-task implementation pipeline: plan → test → build → review → ship. Use for feature work, plan execution, or fixes scoped to a single task. NOT for green-field product builds (see mk:autobuild); NOT for auto-invoked workflow orchestration (see mk:workflow-orchestrator)."
+description: 'Orchestrates single-task implementation pipeline: plan → test → build → review → ship. Use for feature work, plan execution, or fixes scoped to a single task. NOT for green-field product builds (see mk:autobuild); NOT for auto-invoked workflow orchestration (see mk:workflow-orchestrator).'
 source: local
 version: 1.0.0
-argument-hint: "[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict]"
-keywords: [cook, implement-pipeline, plan-execution, feature-build, seven-phase, single-task]
-when_to_use: "Use when implementing a single task end-to-end (plan→test→build→review→ship). NOT for green-field product builds (see mk:autobuild) or auto-invoked workflow orchestration (see mk:workflow-orchestrator)."
+argument-hint: '[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict]'
+keywords:
+  - cook
+  - implement-pipeline
+  - plan-execution
+  - feature-build
+  - seven-phase
+  - single-task
+when_to_use: Use when implementing a single task end-to-end (plan→test→build→review→ship). NOT for green-field product builds (see mk:autobuild) or auto-invoked workflow orchestration (see mk:workflow-orchestrator).
 user-invocable: true
+owner: lifecycle
+criticality: critical
+status: active
+runtime: claude-code
 ---
 
 # Cook — Full Implementation Pipeline
@@ -85,6 +95,9 @@ See `references/intent-detection.md` for full detection logic.
 | `--no-strict`                    | (modifier)  | Suppress auto-strict from scale-routing        |
 
 ## Process Flow (Authoritative)
+
+<!-- Canonical source: .claude/workflow.yaml — this diagram renders the same lifecycle; -->
+<!-- the YAML is the machine-readable authority; this Mermaid diagram is the human-facing render. -->
 
 ```mermaid
 flowchart TD
@@ -176,6 +189,7 @@ Gate 1 routing, parallelism, and full per-phase progression live in `references/
 
 Concrete subagent name and HTTP tool depend on installed skill set; cook treats both as interfaces, not specific implementations.
 | 5 Ship        | `shipper` via `mk:ship`         | **MUST** spawn — runs full pre-ship pipeline (`git-manager` invoked inside shipper for commit + PR) |
+| 6 Reflect     | `analyst`                       | **MUST** spawn — cost + pattern analysis |
 | 6 Reflect     | `documenter`                      | **MUST** spawn — sync-back + docs        |
 | 6 Reflect     | `mk:memory` session-capture     | **MUST** spawn — 3-category learning extraction |
 

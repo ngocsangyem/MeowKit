@@ -1,13 +1,22 @@
 ---
 name: mk:llms
-description: "Generate llms.txt files from project documentation following the llmstxt.org spec. Use when asked to create AI-friendly documentation indexes, generate llms.txt, or make a project discoverable by AI assistants."
-argument-hint: "[path] [--full] [--output path] [--url base]"
+description: Generate llms.txt files from project documentation following the llmstxt.org spec. Use when asked to create AI-friendly documentation indexes, generate llms.txt, or make a project discoverable by AI assistants.
+argument-hint: '[path] [--full] [--output path] [--url base]'
 source: local
 original_path: .claude/skills/llms/SKILL.md
 adapted_for: claude-code
-keywords: [llms, llms-txt, llm-friendly-docs, ai-discoverability, agentic-content]
-when_to_use: "Use when generating llms.txt or LLM-friendly documentation for AI consumers."
+keywords:
+  - llms
+  - llms-txt
+  - llm-friendly-docs
+  - ai-discoverability
+  - agentic-content
+when_to_use: Use when generating llms.txt or LLM-friendly documentation for AI consumers.
 user-invocable: true
+owner: docs
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # llms.txt Generator

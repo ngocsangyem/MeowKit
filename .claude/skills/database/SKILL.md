@@ -1,8 +1,8 @@
 ---
 name: mk:database
-description: "Database patterns: schema design, migrations, query optimization, indexing. PostgreSQL primary. Use for 'database schema', 'migration', 'SQL optimization'."
+description: 'Database patterns: schema design, migrations, query optimization, indexing. PostgreSQL primary. Use for ''database schema'', ''migration'', ''SQL optimization''.'
 version: 1.0.0
-argument-hint: "[schema|migration|query|optimize] [description]"
+argument-hint: '[schema|migration|query|optimize] [description]'
 source: local
 allowed-tools:
   - Bash
@@ -10,9 +10,20 @@ allowed-tools:
   - Edit
   - Write
   - Glob
-keywords: [database, schema-design, migrations, query-optimization, indexing, postgresql, sql]
-when_to_use: "Use when designing schemas, writing migrations, or optimizing SQL queries (PostgreSQL primary). NOT for ORM/code-level data access patterns."
+keywords:
+  - database
+  - schema-design
+  - migrations
+  - query-optimization
+  - indexing
+  - postgresql
+  - sql
+when_to_use: Use when designing schemas, writing migrations, or optimizing SQL queries (PostgreSQL primary). NOT for ORM/code-level data access patterns.
 user-invocable: true
+owner: utility
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Database — Schema, Migrations, Query Optimization

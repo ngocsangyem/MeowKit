@@ -1,10 +1,6 @@
 ---
 name: mk:team-config
-description: >-
-  Set up parallel agent team for COMPLEX tasks. Creates worktree structure,
-  generates ownership map, and initializes task queue. Use when orchestrator
-  decomposes a task into parallel subtasks, or when asked to "set up team",
-  "parallel setup", or "configure worktrees".
+description: Set up parallel agent team for COMPLEX tasks. Creates worktree structure, generates ownership map, and initializes task queue. Use when orchestrator decomposes a task into parallel subtasks, or when asked to "set up team", "parallel setup", or "configure worktrees".
 argument-hint: '"task description" --agents N'
 source: local
 allowed-tools:
@@ -12,9 +8,18 @@ allowed-tools:
   - Glob
   - Bash
   - Write
-keywords: [team-config, worktree-setup, ownership-map, parallel-team-init, task-queue-init]
-when_to_use: "Auto-invoked when orchestrator decomposes a COMPLEX task into parallel subtasks — sets up worktrees, ownership map, task queue. Not user-callable directly."
+keywords:
+  - team-config
+  - worktree-setup
+  - ownership-map
+  - parallel-team-init
+  - task-queue-init
+when_to_use: Auto-invoked when orchestrator decomposes a COMPLEX task into parallel subtasks — sets up worktrees, ownership map, task queue. Not user-callable directly.
 user-invocable: false
+owner: git
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Team Configuration

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "title": "MeowKit harness artifact governance metadata",
+  "description": "Governance metadata applied to every harness artifact (skills, agents, rules, commands, hooks). Skills and agents carry these fields in YAML frontmatter; rules, commands, and hooks carry them as entries in .claude/harness-inventory.json. Four fields are required; context_cost and depends_on are optional.",
+  "type": "object",
+  "required": ["owner", "criticality", "status", "runtime"],
+  "additionalProperties": true,
+  "properties": {
+    "owner": {
+      "type": "string",
+      "enum": [
+        "lifecycle",
+        "security",
+        "memory",
+        "jira",
+        "confluence",
+        "portability",
+        "observability",
+        "research",
+        "docs",
+        "testing",
+        "git",
+        "utility"
+      ],
+      "description": "Governance domain that owns this artifact. Distinct from install-metadata.ts 'owner' (which tracks install provenance: meowkit|user|meowkit-modified). Heuristics: jira-* → jira, confluence-* → confluence, gate-*/privacy-*/secret-scrub* → security, memory* → memory, default → utility."
+    },
+    "criticality": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"],
+      "description": "Impact of this artifact being incorrect or absent. Default seed value: medium. Hand-promote to critical/high only for safety-net artifacts (privacy-block, gate-enforcement, gate-rules, core lifecycle skills). low is an explicit later opt-down."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "experimental"],
+      "description": "Lifecycle state. Default: active. Deprecated artifacts are retained for compatibility; experimental artifacts are opt-in and may change without notice."
+    },
+    "runtime": {
+      "type": "string",
+      "enum": ["claude-code", "portable", "experimental"],
+      "description": "Execution environment. claude-code: requires Claude Code surfaces (Agent tool, hooks). portable: pure-text convention, runnable in any LLM harness. experimental: runtime requirements undefined."
+    },
+    "context_cost": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Optional. Estimated token footprint when this artifact is loaded into context. Promoted from meowkit.context_cost for skills; meowkit block copy preserved for backward compatibility with skills-discovery.ts."
+    },
+    "depends_on": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional. Artifact IDs (skill name, agent name, or registry key) this artifact depends on at runtime. Used by the inventory command for dependency graph analysis."
+    }
+  }
+}

@@ -25,12 +25,16 @@ keywords:
   - agents
   - mcp
   - structural
-when_to_use: "Use to audit .claude/ structural overhead and surface 'remove X save Y tokens' recommendations against the model context window. NOT for USD cost tracking (see /mk:budget). NOT for transcript size."
+when_to_use: Use to audit .claude/ structural overhead and surface 'remove X save Y tokens' recommendations against the model context window. NOT for USD cost tracking (see /mk:budget). NOT for transcript size.
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored
 injection_risk: medium
 source: local
+owner: docs
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # /mk:context-audit — Context Window Structural Audit

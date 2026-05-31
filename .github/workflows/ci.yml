@@ -47,6 +47,15 @@ jobs:
       - name: Validate hook shell consistency
         run: bash scripts/check-hook-shell-consistency.sh
 
+      - name: Validate workflow spec drift
+        run: node packages/mewkit/dist/index.js validate --workflow
+
+      - name: Validate artifact ownership metadata
+        run: node packages/mewkit/dist/index.js validate --ownership
+
+      - name: Validate README/index counts (stale-index)
+        run: node packages/mewkit/dist/index.js inventory --check
+
       - name: Validate skill frontmatter
         run: .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py
 

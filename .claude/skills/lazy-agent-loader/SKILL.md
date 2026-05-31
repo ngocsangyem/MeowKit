@@ -1,14 +1,23 @@
 ---
 name: mk:lazy-agent-loader
-description: "Use when managing agent context budget. Loads agent definitions on-demand instead of all-at-once, reducing token consumption in multi-agent workflows."
+description: Use when managing agent context budget. Loads agent definitions on-demand instead of all-at-once, reducing token consumption in multi-agent workflows.
 triggers:
-  - "when agent is selected"
-  - "agent:load"
+  - when agent is selected
+  - agent:load
 allowed-tools: Read, Glob
 source: aura-frog
-keywords: [lazy-agent-loader, context-budget, on-demand-load, agent-load-signal, multi-agent]
-when_to_use: "Auto-invoked when managing agent context budget — loads agent definitions on-demand. Not user-callable directly."
+keywords:
+  - lazy-agent-loader
+  - context-budget
+  - on-demand-load
+  - agent-load-signal
+  - multi-agent
+when_to_use: Auto-invoked when managing agent context budget — loads agent definitions on-demand. Not user-callable directly.
 user-invocable: false
+owner: research
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Lazy Agent Loader

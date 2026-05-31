@@ -105,7 +105,7 @@ The generator owns:
 - `src/`, `lib/`, `app/` (source code)
 - `progress.md` (its working memory)
 
-Both can READ the contract at `tasks/contracts/*.md`. Neither can WRITE to it without re-triggering the contract negotiation protocol (Phase 4).
+Both can READ the contract at `tasks/contracts/*.md`. Neither can WRITE to it without re-triggering the contract negotiation protocol (the autobuild contract stage).
 
 ## Defaults
 

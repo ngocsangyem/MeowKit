@@ -14,9 +14,19 @@ allowed-tools:
   - WebSearch
   - AskUserQuestion
 source: local
-keywords: [ui-design-system, color-palette, font-pairing, wcag, accessibility-audit, responsive-design]
-when_to_use: "Use when designing UI components, creating design systems, or auditing accessibility (WCAG). Triggers on 'design system', 'UI review', 'color palette'."
+keywords:
+  - ui-design-system
+  - color-palette
+  - font-pairing
+  - wcag
+  - accessibility-audit
+  - responsive-design
+when_to_use: Use when designing UI components, creating design systems, or auditing accessibility (WCAG). Triggers on 'design system', 'UI review', 'color palette'.
 user-invocable: true
+owner: utility
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # UI Design System

@@ -22,20 +22,30 @@ allowed-tools:
   - WebSearch
 hooks:
   PreToolUse:
-    - matcher: "Edit"
+    - matcher: Edit
       hooks:
         - type: command
-          command: "bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh"
-          statusMessage: "Checking debug scope boundary..."
-    - matcher: "Write"
+          command: bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh
+          statusMessage: Checking debug scope boundary...
+    - matcher: Write
       hooks:
         - type: command
-          command: "bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh"
-          statusMessage: "Checking debug scope boundary..."
+          command: bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh
+          statusMessage: Checking debug scope boundary...
 source: gstack
-keywords: [investigate, root-cause, debug, four-phase, iron-law, systematic-debugging]
-when_to_use: "Use when debugging with systematic root-cause investigation (four phases). NOT for applying fixes without investigation (see mk:fix)."
+keywords:
+  - investigate
+  - root-cause
+  - debug
+  - four-phase
+  - iron-law
+  - systematic-debugging
+when_to_use: Use when debugging with systematic root-cause investigation (four phases). NOT for applying fixes without investigation (see mk:fix).
 user-invocable: true
+owner: research
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 <!-- Split for progressive disclosure (checklist #11, #14): 497 → ~65 lines -->

@@ -2,14 +2,8 @@
 name: mk:autobuild
 version: 1.0.0
 preamble-tier: 3
-description: >-
-  Use when running an autonomous multi-hour build of a green-field product —
-  orchestrates planner → contract → generator ⇄ evaluator loop with adaptive
-  scaffolding density per model tier. Triggers on /mk:autobuild, "build me a
-  kanban app", "build a retro game maker", "autonomous build", or any
-  green-field product spec. NOT for scoped single-task work (see mk:cook);
-  NOT for initial project scaffolding only (see mk:bootstrap).
-argument-hint: "[task description] [--tier auto|full|lean|minimal] [--max-iter N] [--budget USD] [--tdd]"
+description: Use when running an autonomous multi-hour build of a green-field product — orchestrates planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density per model tier. Triggers on /mk:autobuild, "build me a kanban app", "build a retro game maker", "autonomous build", or any green-field product spec. NOT for scoped single-task work (see mk:cook); NOT for initial project scaffolding only (see mk:bootstrap).
+argument-hint: '[task description] [--tier auto|full|lean|minimal] [--max-iter N] [--budget USD] [--tdd]'
 allowed-tools:
   - Bash
   - Read
@@ -20,23 +14,44 @@ allowed-tools:
   - Agent
   - AskUserQuestion
 source: local
-keywords: [harness, autonomous-build, green-field, generator-evaluator, harness-contract, adaptive-density]
-when_to_use: "Use when running an autonomous multi-hour build of a green-field product (planner→contract→generator⇄evaluator loop). NOT for scoped single-task work (see mk:cook) or initial scaffolding only (see mk:bootstrap)."
+keywords:
+  - harness
+  - autonomous-build
+  - green-field
+  - generator-evaluator
+  - harness-contract
+  - adaptive-density
+when_to_use: Use when running an autonomous multi-hour build of a green-field product (planner→contract→generator⇄evaluator loop). NOT for scoped single-task work (see mk:cook) or initial scaffolding only (see mk:bootstrap).
 user-invocable: true
 meowkit:
   portability: provider-only
   providers:
-    include: [claude-code]
+    include:
+      - claude-code
   requires:
-    surfaces: [skills]
-    commands: [Agent, AskUserQuestion, Bash]
-    env: [CLAUDE_PROJECT_DIR]
+    surfaces:
+      - skills
+    commands:
+      - Agent
+      - AskUserQuestion
+      - Bash
+    env:
+      - CLAUDE_PROJECT_DIR
   context_cost: high
+owner: lifecycle
+criticality: high
+status: active
+runtime: claude-code
+context_cost: high
 ---
+
+<!-- Lifecycle canonical source: .claude/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
 
 # mk:autobuild — Autonomous Multi-Hour Build Orchestration
 
-Step-file workflow that runs the complete generator/evaluator harness pipeline as an autonomous build. Handles green-field product builds (Phase 1 product-level plan → Phase 4 sprint contract → Phase 3 evaluator loop → ship decision) with adaptive scaffolding density based on detected model tier.
+Step-file workflow that runs the complete generator/evaluator harness pipeline as an autonomous build. Handles green-field product builds (planner stage → contract stage → evaluator loop → ship decision) with adaptive scaffolding density based on detected model tier.
+<!-- Note: autobuild pipeline stages are numbered Step 0–6 (see Workflow section below). -->
+<!-- "Stage" is used to name pipeline roles to avoid clashing with the 7 lifecycle phases. -->
 
 ## When to Use
 
@@ -150,10 +165,10 @@ ended: 2026-04-08T15:18:00Z
 | `references/agent-teams-vs-subagents.md` | When to use teams vs file-based subagents |
 | `scripts/density-select.sh` | Standalone density selector for scriptable use |
 | `scripts/budget-tracker.sh` | Cost-log reader; threshold warnings + hard block |
-| `../plan-creator/` | Phase 1 — product-level planner |
-| `../sprint-contract/` | Phase 4 — contract negotiation |
-| `../rubric/` | Phase 2 — rubric library |
-| `../evaluate/` | Phase 3 — behavioral evaluator |
+| `../plan-creator/` | Planner stage (Step 1) — product-level planner |
+| `../sprint-contract/` | Contract stage (Step 2) — contract negotiation |
+| `../rubric/` | Rubric stage (Step 2/4) — rubric library |
+| `../evaluate/` | Evaluator stage (Step 4) — behavioral evaluator |
 | `../scale-routing/` | Tier + density emission |
 
 ## Start

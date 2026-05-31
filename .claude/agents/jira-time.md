@@ -1,11 +1,15 @@
 ---
 name: jira-time
-description: "Manage JIRA time tracking via the jira-as CLI wrapper: log work, list/edit/delete worklogs, set estimates, generate time reports, bulk-log. Routed by mk:jira-time skill. NOT for sprint capacity (jira-agile)."
+description: 'Manage JIRA time tracking via the jira-as CLI wrapper: log work, list/edit/delete worklogs, set estimates, generate time reports, bulk-log. Routed by mk:jira-time skill. NOT for sprint capacity (jira-agile).'
 tools: Bash, Read, Grep, Glob
 model: inherit
 permissionMode: default
 memory: project
 color: orange
+owner: jira
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # JIRA Time Agent

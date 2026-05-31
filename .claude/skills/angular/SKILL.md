@@ -22,9 +22,20 @@ original_skills:
   - angular-ssr
   - angular-testing
   - angular-tooling
-keywords: [angular, signals, components, ssr, angular-cli, framework-specific, ts-angular]
-when_to_use: "Use when writing Angular v20+ code (components, signals, services, forms, routing, HTTP, SSR). Auto-activates on .ts files in Angular projects. NOT for generic TypeScript (see mk:typescript) or Vue/React."
+keywords:
+  - angular
+  - signals
+  - components
+  - ssr
+  - angular-cli
+  - framework-specific
+  - ts-angular
+when_to_use: Use when writing Angular v20+ code (components, signals, services, forms, routing, HTTP, SSR). Auto-activates on .ts files in Angular projects. NOT for generic TypeScript (see mk:typescript) or Vue/React.
 user-invocable: true
+owner: utility
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Angular

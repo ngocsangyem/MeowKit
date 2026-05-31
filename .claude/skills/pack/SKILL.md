@@ -1,13 +1,23 @@
 ---
 name: mk:pack
-description: "Pack an EXTERNAL repository into a single AI-friendly file (markdown/xml/json). Use for third-party library analysis, security audits, or handoff to external LLMs. Do NOT use to pack the current project for inbound context — the host runtime already reads files lazily. Triggers: 'pack this repo', 'snapshot of X', 'export codebase', 'repomix'."
-argument-hint: "<source> [--style markdown|xml|json|plain] [--include pattern] [--ignore pattern] [--remove-comments] [--compress] [--self] [--no-security-check]"
+description: 'Pack an EXTERNAL repository into a single AI-friendly file (markdown/xml/json). Use for third-party library analysis, security audits, or handoff to external LLMs. Do NOT use to pack the current project for inbound context — the host runtime already reads files lazily. Triggers: ''pack this repo'', ''snapshot of X'', ''export codebase'', ''repomix''.'
+argument-hint: <source> [--style markdown|xml|json|plain] [--include pattern] [--ignore pattern] [--remove-comments] [--compress] [--self] [--no-security-check]
 trust_level: kit-authored
 injection_risk: medium
 source: local
-keywords: [pack, repomix, external-repo, third-party-snapshot, ai-friendly-export, handoff]
-when_to_use: "Use when packing an EXTERNAL repository into a single AI-friendly file. NOT for packing the current project (the host runtime reads files lazily)."
+keywords:
+  - pack
+  - repomix
+  - external-repo
+  - third-party-snapshot
+  - ai-friendly-export
+  - handoff
+when_to_use: Use when packing an EXTERNAL repository into a single AI-friendly file. NOT for packing the current project (the host runtime reads files lazily).
 user-invocable: true
+owner: lifecycle
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 <!-- SECURITY ANCHOR

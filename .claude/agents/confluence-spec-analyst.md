@@ -1,12 +1,16 @@
 ---
 name: confluence-spec-analyst
-description: "Read full Confluence spec page (+ children + images) and produce structured Spec Research Report with requirements, acceptance criteria, gaps, ambiguities, suggested user stories. Read-only via the confluence-as CLI wrapper. Routed by mk:confluence-spec-analyst skill. NOT for raw page CRUD (confluence-page); NOT for ticket complexity scoring (planning-engine)."
+description: Read full Confluence spec page (+ children + images) and produce structured Spec Research Report with requirements, acceptance criteria, gaps, ambiguities, suggested user stories. Read-only via the confluence-as CLI wrapper. Routed by mk:confluence-spec-analyst skill. NOT for raw page CRUD (confluence-page); NOT for ticket complexity scoring (planning-engine).
 tools: Bash, Read, Grep, Glob, Write
 disallowedTools: Edit
 model: inherit
 permissionMode: default
 memory: project
 color: cyan
+owner: confluence
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Confluence Spec Analyst

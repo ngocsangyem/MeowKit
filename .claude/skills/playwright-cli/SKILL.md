@@ -1,11 +1,21 @@
 ---
 name: mk:playwright-cli
-description: "Session-persistent browser automation via Playwright CLI — form filling, screenshots, data extraction, multi-step flows. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, test web applications, or extract information across multiple requests. NOT for AI-driven long-autonomous flows (see mk:agent-browser); NOT for generating .spec.ts E2E code (see mk:qa-manual)."
+description: Session-persistent browser automation via Playwright CLI — form filling, screenshots, data extraction, multi-step flows. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, test web applications, or extract information across multiple requests. NOT for AI-driven long-autonomous flows (see mk:agent-browser); NOT for generating .spec.ts E2E code (see mk:qa-manual).
 allowed-tools: Bash(playwright-cli:*)
 source: microsoft/playwright
-keywords: [playwright-cli, browser-automation, form-fill, screenshot, data-extraction, session-persistent]
-when_to_use: "Use when automating browser via Playwright CLI — form filling, screenshots, data extraction, multi-step flows. NOT for AI-autonomous flows (see mk:agent-browser) or .spec.ts E2E generation (see mk:qa-manual)."
+keywords:
+  - playwright-cli
+  - browser-automation
+  - form-fill
+  - screenshot
+  - data-extraction
+  - session-persistent
+when_to_use: Use when automating browser via Playwright CLI — form filling, screenshots, data extraction, multi-step flows. NOT for AI-autonomous flows (see mk:agent-browser) or .spec.ts E2E generation (see mk:qa-manual).
 user-invocable: true
+owner: testing
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Browser Automation with playwright-cli

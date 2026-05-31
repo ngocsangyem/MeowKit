@@ -1,16 +1,26 @@
 ---
 name: mk:verify
-description: "Unified verification: build→lint→test→type-check→coverage. Use for 'is everything green', 'run all checks', 'verify build'. Auto-called by mk:cook. NOT for lint/format only (see mk:lint-and-validate); NOT for test-to-requirement coverage mapping (see mk:nyquist)."
+description: 'Unified verification: build→lint→test→type-check→coverage. Use for ''is everything green'', ''run all checks'', ''verify build''. Auto-called by mk:cook. NOT for lint/format only (see mk:lint-and-validate); NOT for test-to-requirement coverage mapping (see mk:nyquist).'
 version: 1.0.0
-argument-hint: "[--coverage-threshold N] [--skip-build] [--skip-coverage]"
+argument-hint: '[--coverage-threshold N] [--skip-build] [--skip-coverage]'
 source: local
 allowed-tools:
   - Bash
   - Read
   - Glob
-keywords: [verify, build-check, lint-test-typecheck, coverage, unified-verification, pre-ship]
-when_to_use: "Use for unified verification — build→lint→test→type-check→coverage. Auto-called by mk:cook. NOT for lint/format only (see mk:lint-and-validate) or coverage mapping (see mk:nyquist)."
+keywords:
+  - verify
+  - build-check
+  - lint-test-typecheck
+  - coverage
+  - unified-verification
+  - pre-ship
+when_to_use: Use for unified verification — build→lint→test→type-check→coverage. Auto-called by mk:cook. NOT for lint/format only (see mk:lint-and-validate) or coverage mapping (see mk:nyquist).
 user-invocable: true
+owner: lifecycle
+criticality: high
+status: active
+runtime: claude-code
 ---
 
 # Verify — Unified Verification Loop

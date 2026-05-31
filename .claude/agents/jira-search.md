@@ -1,11 +1,15 @@
 ---
 name: jira-search
-description: "Find JIRA issues by criteria via the jira-as CLI wrapper. Use for: 'search jira', 'find issues where X', 'export search results', JQL filter management. Routed by mk:jira-search skill. NOT for single-issue CRUD (jira-issue); NOT for bulk write ops (jira-bulk)."
+description: 'Find JIRA issues by criteria via the jira-as CLI wrapper. Use for: ''search jira'', ''find issues where X'', ''export search results'', JQL filter management. Routed by mk:jira-search skill. NOT for single-issue CRUD (jira-issue); NOT for bulk write ops (jira-bulk).'
 tools: Bash, Read, Grep, Glob
 model: inherit
 permissionMode: default
 memory: project
 color: green
+owner: jira
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # JIRA Search Agent

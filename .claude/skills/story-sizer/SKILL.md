@@ -1,24 +1,26 @@
 ---
 name: mk:story-sizer
-description: "Pre-ticket Fibonacci sizing for a paste-mode batch of user stories. Default mode is advisory-only (writes a Story Sizing Report). Opt-in `--auto-create` delegates ticket creation to mk:jira-issue + mk:jira-collaborate with mandatory dry-run + single batch confirmation gate. NOT for single-ticket estimation (mk:jira-estimator); NOT for sprint capacity (mk:planning-engine)."
-argument-hint: "--paste [--scout] [--story <id>] | --paste --auto-create --project <KEY> [--epic <KEY>]"
+description: Pre-ticket Fibonacci sizing for a paste-mode batch of user stories. Default mode is advisory-only (writes a Story Sizing Report). Opt-in `--auto-create` delegates ticket creation to mk:jira-issue + mk:jira-collaborate with mandatory dry-run + single batch confirmation gate. NOT for single-ticket estimation (mk:jira-estimator); NOT for sprint capacity (mk:planning-engine).
+argument-hint: '--paste [--scout] [--story <id>] | --paste --auto-create --project <KEY> [--epic <KEY>]'
 phase: on-demand
 source: local
 keywords:
-  [
-    story-sizer,
-    pre-ticket-sizing,
-    story-points,
-    spec-to-sprint,
-    fibonacci-estimation,
-    split-recommendation,
-    auto-create-gated,
-    estimate,
-  ]
-when_to_use: "Use when sizing a batch of suggested user stories BEFORE Jira tickets exist (e.g., after a spec scan). Default emits a Story Sizing Report; --auto-create delegates ticket creation behind a single confirmation gate. NOT for sizing one Jira ticket (use mk:jira-estimator)."
+  - story-sizer
+  - pre-ticket-sizing
+  - story-points
+  - spec-to-sprint
+  - fibonacci-estimation
+  - split-recommendation
+  - auto-create-gated
+  - estimate
+when_to_use: Use when sizing a batch of suggested user stories BEFORE Jira tickets exist (e.g., after a spec scan). Default emits a Story Sizing Report; --auto-create delegates ticket creation behind a single confirmation gate. NOT for sizing one Jira ticket (use mk:jira-estimator).
 user-invocable: true
 context: fork
 agent: story-sizer
+owner: lifecycle
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # mk:story-sizer

@@ -1,11 +1,15 @@
 ---
 name: confluence-bulk
-description: "Execute bulk Confluence operations on 10+ pages via the confluence-as CLI wrapper: bulk-label, bulk-move, bulk-delete. Dry-run is MANDATORY first. Routed by mk:confluence-bulk skill. NOT for single-page ops (confluence-page); NOT for comments/attachments (confluence-collaborate)."
+description: 'Execute bulk Confluence operations on 10+ pages via the confluence-as CLI wrapper: bulk-label, bulk-move, bulk-delete. Dry-run is MANDATORY first. Routed by mk:confluence-bulk skill. NOT for single-page ops (confluence-page); NOT for comments/attachments (confluence-collaborate).'
 tools: Bash, Read, Grep, Glob
 model: inherit
 permissionMode: default
 memory: project
 color: red
+owner: confluence
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Confluence Bulk Agent

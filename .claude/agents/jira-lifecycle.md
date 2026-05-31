@@ -1,11 +1,15 @@
 ---
 name: jira-lifecycle
-description: "Drive JIRA workflow lifecycle via the jira-as CLI wrapper: transition through statuses, assign/unassign, resolve/reopen, manage versions and components. Routed by mk:jira-lifecycle skill. NOT for issue CRUD (jira-issue); NOT for comments (jira-collaborate); NOT for bulk transitions (jira-bulk)."
+description: 'Drive JIRA workflow lifecycle via the jira-as CLI wrapper: transition through statuses, assign/unassign, resolve/reopen, manage versions and components. Routed by mk:jira-lifecycle skill. NOT for issue CRUD (jira-issue); NOT for comments (jira-collaborate); NOT for bulk transitions (jira-bulk).'
 tools: Bash, Read, Grep, Glob
 model: inherit
 permissionMode: default
 memory: project
 color: yellow
+owner: jira
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # JIRA Lifecycle Agent

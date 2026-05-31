@@ -1,14 +1,27 @@
 ---
 name: mk:planning-engine
 version: 1.0.0
-description: "Analyzes ticket complexity and maps dependencies against an existing codebase before sprint planning. Triggers on 'how complex is this ticket', 'what should we work on first', 'can we fit this in the sprint', 'tech review before planning', 'plan the sprint'. NOT for writing implementation plans (see mk:plan-creator); NOT for scope/ambition review (see mk:plan-ceo-review)."
+description: Analyzes ticket complexity and maps dependencies against an existing codebase before sprint planning. Triggers on 'how complex is this ticket', 'what should we work on first', 'can we fit this in the sprint', 'tech review before planning', 'plan the sprint'. NOT for writing implementation plans (see mk:plan-creator); NOT for scope/ambition review (see mk:plan-ceo-review).
 phase: 1
 source: local
-argument-hint: "review PROJ-123 [--scout] [--graph] | plan --tickets PROJ-101,PROJ-102 [--capacity 40] [--scout] [--spec <report-path>]"
-allowed-tools: [Read, Grep, Glob, Bash]
-keywords: [planning-engine, ticket-complexity, sprint-planning, dependency-mapping, tech-review]
-when_to_use: "Use when analyzing ticket complexity and dependencies against existing codebase before sprint planning. NOT for writing implementation plans (see mk:plan-creator)."
+argument-hint: review PROJ-123 [--scout] [--graph] | plan --tickets PROJ-101,PROJ-102 [--capacity 40] [--scout] [--spec <report-path>]
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+keywords:
+  - planning-engine
+  - ticket-complexity
+  - sprint-planning
+  - dependency-mapping
+  - tech-review
+when_to_use: Use when analyzing ticket complexity and dependencies against existing codebase before sprint planning. NOT for writing implementation plans (see mk:plan-creator).
 user-invocable: true
+owner: lifecycle
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # mk:planning-engine — Tech Review & Sprint Planning Analysis

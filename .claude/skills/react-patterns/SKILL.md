@@ -11,9 +11,20 @@ allowed-tools:
   - Grep
   - Glob
 source: local
-keywords: [react, nextjs, tsx, jsx, performance, re-render, bundle-optimization]
-when_to_use: "Use when writing/reviewing/optimizing React/Next.js code. Triggers on .tsx/.jsx files. NOT for generic TypeScript (see mk:typescript) or Vue/Angular."
+keywords:
+  - react
+  - nextjs
+  - tsx
+  - jsx
+  - performance
+  - re-render
+  - bundle-optimization
+when_to_use: Use when writing/reviewing/optimizing React/Next.js code. Triggers on .tsx/.jsx files. NOT for generic TypeScript (see mk:typescript) or Vue/Angular.
 user-invocable: true
+owner: utility
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # React Patterns

@@ -1,14 +1,25 @@
 ---
 name: mk:henshin
-description: "Use when transforming existing code into agent-consumable surfaces — CLI (npm-publishable), MCP server (stdio/SSE/Streamable HTTP), and a companion skill. Triggers on 'agentize', 'henshin', 'expose as MCP', 'wrap as CLI', 'publish to npm', 'make LLM-accessible', 'turn into agent tool', 'expose feature as tool'. Runs when the user has existing code and wants to ship it to agents. NOT for building new code from scratch (see mk:bootstrap); NOT for reviewing or verifying existing code (see mk:review)."
-argument-hint: "[feature-or-module] [--both|--mcp|--cli] [--auto|--ask] [--lean]"
+description: Use when transforming existing code into agent-consumable surfaces — CLI (npm-publishable), MCP server (stdio/SSE/Streamable HTTP), and a companion skill. Triggers on 'agentize', 'henshin', 'expose as MCP', 'wrap as CLI', 'publish to npm', 'make LLM-accessible', 'turn into agent tool', 'expose feature as tool'. Runs when the user has existing code and wants to ship it to agents. NOT for building new code from scratch (see mk:bootstrap); NOT for reviewing or verifying existing code (see mk:review).
+argument-hint: '[feature-or-module] [--both|--mcp|--cli] [--auto|--ask] [--lean]'
 phase: on-demand
 trust_level: kit-authored
 injection_risk: low
 source: local
-keywords: [henshin, agentize, mcp-server, cli-publish, wrap-as-tool, expose-feature, npm-publish]
-when_to_use: "Use when transforming existing code into agent-consumable surfaces — CLI/MCP server/skill. NOT for building new code from scratch (see mk:bootstrap) or reviewing code (see mk:review)."
+keywords:
+  - henshin
+  - agentize
+  - mcp-server
+  - cli-publish
+  - wrap-as-tool
+  - expose-feature
+  - npm-publish
+when_to_use: Use when transforming existing code into agent-consumable surfaces — CLI/MCP server/skill. NOT for building new code from scratch (see mk:bootstrap) or reviewing code (see mk:review).
 user-invocable: true
+owner: research
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 <!-- SECURITY ANCHOR

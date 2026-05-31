@@ -1,21 +1,31 @@
 ---
 name: mk:workflow-orchestrator
-description: "Auto-invoked 7-phase workflow for complex-feature intent. Includes fasttrack mode for pre-approved specs. NOT for explicit user-invoked single tasks (see mk:cook); NOT for green-field autonomous builds (see mk:autobuild); NOT for simple bug fixes (see mk:fix)."
+description: Auto-invoked 7-phase workflow for complex-feature intent. Includes fasttrack mode for pre-approved specs. NOT for explicit user-invoked single tasks (see mk:cook); NOT for green-field autonomous builds (see mk:autobuild); NOT for simple bug fixes (see mk:fix).
 triggers:
-  - "implement feature"
-  - "build feature"
-  - "create feature"
-  - "workflow:start"
-  - "complex task"
-  - "fasttrack:"
-  - "fast-track"
-  - "just build it"
-  - "execute from specs"
+  - implement feature
+  - build feature
+  - create feature
+  - workflow:start
+  - complex task
+  - 'fasttrack:'
+  - fast-track
+  - just build it
+  - execute from specs
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 source: aura-frog
-keywords: [workflow-orchestrator, auto-invoke, phase-routing, intent-detection, fasttrack, complex-feature]
-when_to_use: "Auto-invoked on complex-feature intent — routes through 7-phase workflow. NOT for explicit user-invoked single tasks (see mk:cook). Not user-callable directly."
+keywords:
+  - workflow-orchestrator
+  - auto-invoke
+  - phase-routing
+  - intent-detection
+  - fasttrack
+  - complex-feature
+when_to_use: Auto-invoked on complex-feature intent — routes through 7-phase workflow. NOT for explicit user-invoked single tasks (see mk:cook). Not user-callable directly.
 user-invocable: false
+owner: lifecycle
+criticality: high
+status: active
+runtime: claude-code
 ---
 
 <!-- Split for progressive disclosure (checklist #11, #14): 463 → ~75 lines -->

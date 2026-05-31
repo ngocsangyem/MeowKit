@@ -2,13 +2,8 @@
 name: mk:sprint-contract
 version: 1.0.0
 preamble-tier: 3
-description: >-
-  Use when negotiating a file-based sprint contract between the generator
-  (developer) and evaluator before code is written. Translates a product-level
-  spec into testable acceptance criteria with rubric tie-ins. Triggers on
-  /mk:sprint-contract, "draft a sprint contract", "negotiate scope for sprint",
-  or before any harness-driven sprint kicks off.
-argument-hint: "[propose | review | amend | sign | validate | sprint-goal] [task-slug | sprint-goal-text] [--sprint N]"
+description: Use when negotiating a file-based sprint contract between the generator (developer) and evaluator before code is written. Translates a product-level spec into testable acceptance criteria with rubric tie-ins. Triggers on /mk:sprint-contract, "draft a sprint contract", "negotiate scope for sprint", or before any harness-driven sprint kicks off.
+argument-hint: '[propose | review | amend | sign | validate | sprint-goal] [task-slug | sprint-goal-text] [--sprint N]'
 allowed-tools:
   - Bash
   - Read
@@ -18,9 +13,18 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 source: local
-keywords: [sprint-contract, testable-criteria, generator-evaluator-handshake, scope-negotiation, rubric-tie-in]
-when_to_use: "Use when negotiating a file-based sprint contract between generator (developer) and evaluator before code is written. NOT for plan generation (see mk:plan-creator)."
+keywords:
+  - sprint-contract
+  - testable-criteria
+  - generator-evaluator-handshake
+  - scope-negotiation
+  - rubric-tie-in
+when_to_use: Use when negotiating a file-based sprint contract between generator (developer) and evaluator before code is written. NOT for plan generation (see mk:plan-creator).
 user-invocable: true
+owner: lifecycle
+criticality: high
+status: active
+runtime: claude-code
 ---
 
 # mk:sprint-contract — File-Based Sprint Contract Protocol

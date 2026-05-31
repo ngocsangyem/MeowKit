@@ -12,7 +12,8 @@ description: |
   Proactively suggest when the user is questioning scope or ambition of a plan,
   or when the plan feels like it could be thinking bigger.
   Use AFTER a plan exists. For validating the idea itself before planning, use /mk:office-hours first.
-benefits-from: [office-hours]
+benefits-from:
+  - office-hours
 allowed-tools:
   - Read
   - Grep
@@ -21,9 +22,18 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: gstack
-keywords: [plan-ceo-review, scope-review, ambition-check, plan-evaluation, executive-review]
-when_to_use: "Use when reviewing existing plan for scope/ambition — CEO-level critique. NOT for ticket complexity analysis (see mk:planning-engine) or writing plans (see mk:plan-creator)."
+keywords:
+  - plan-ceo-review
+  - scope-review
+  - ambition-check
+  - plan-evaluation
+  - executive-review
+when_to_use: Use when reviewing existing plan for scope/ambition — CEO-level critique. NOT for ticket complexity analysis (see mk:planning-engine) or writing plans (see mk:plan-creator).
 user-invocable: true
+owner: lifecycle
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Mega Plan Review Mode — CEO/Founder-Level Plan Review

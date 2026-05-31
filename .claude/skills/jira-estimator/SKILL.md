@@ -1,13 +1,22 @@
 ---
 name: mk:jira-estimator
-description: "Heuristic story-point estimation for a single Jira ticket via the jira-estimator agent. Read-only. Triggers: 'estimate KEY', 'story points for KEY', 'how complex is KEY'. NOT for complexity-only analysis (mk:jira-evaluator); NOT for full RCA (mk:jira-analyst)."
+description: 'Heuristic story-point estimation for a single Jira ticket via the jira-estimator agent. Read-only. Triggers: ''estimate KEY'', ''story points for KEY'', ''how complex is KEY''. NOT for complexity-only analysis (mk:jira-evaluator); NOT for full RCA (mk:jira-analyst).'
 phase: on-demand
 source: local
-keywords: [jira, jira-estimator, story-points, fibonacci-estimation, ticket-estimation]
-when_to_use: "Use when user wants a heuristic story-point estimate for a single Jira ticket. Prior `mk:jira-evaluator` output enriches the estimate when present."
+keywords:
+  - jira
+  - jira-estimator
+  - story-points
+  - fibonacci-estimation
+  - ticket-estimation
+when_to_use: Use when user wants a heuristic story-point estimate for a single Jira ticket. Prior `mk:jira-evaluator` output enriches the estimate when present.
 user-invocable: true
 context: fork
 agent: jira-estimator
+owner: jira
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # mk:jira-estimator

@@ -18,9 +18,18 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: local
-keywords: [bootstrap, scaffold, new-project, initial-scaffolding, greenfield-init]
-when_to_use: "Use when scaffolding a brand-new project from scratch. NOT for autonomous green-field product builds (see mk:autobuild) or single-task implementation (see mk:cook)."
+keywords:
+  - bootstrap
+  - scaffold
+  - new-project
+  - initial-scaffolding
+  - greenfield-init
+when_to_use: Use when scaffolding a brand-new project from scratch. NOT for autonomous green-field product builds (see mk:autobuild) or single-task implementation (see mk:cook).
 user-invocable: true
+owner: lifecycle
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Bootstrap

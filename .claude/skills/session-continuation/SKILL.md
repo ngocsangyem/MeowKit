@@ -1,18 +1,27 @@
 ---
 name: mk:session-continuation
-description: "Persists and restores mid-session workflow progress across context resets. Use when resuming workflows, saving state, or handling context compaction. Triggers on: handoff, save state, resume workflow."
+description: 'Persists and restores mid-session workflow progress across context resets. Use when resuming workflows, saving state, or handling context compaction. Triggers on: handoff, save state, resume workflow.'
 model: haiku
 triggers:
-  - "handoff"
-  - "save state"
-  - "resume workflow"
-  - "workflow:handoff"
-  - "workflow:resume"
+  - handoff
+  - save state
+  - resume workflow
+  - workflow:handoff
+  - workflow:resume
 allowed-tools: Read, Write, Bash
 source: aura-frog
-keywords: [session-continuation, session-handoff, resume-workflow, context-reset, state-persistence]
-when_to_use: "Auto-invoked when persisting/restoring mid-session workflow progress across context resets. Not user-callable directly."
+keywords:
+  - session-continuation
+  - session-handoff
+  - resume-workflow
+  - context-reset
+  - state-persistence
+when_to_use: Auto-invoked when persisting/restoring mid-session workflow progress across context resets. Not user-callable directly.
 user-invocable: false
+owner: docs
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 <!-- Split for progressive disclosure (checklist #11, #14): 427 → ~60 lines -->

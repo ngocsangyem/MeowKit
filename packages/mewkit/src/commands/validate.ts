@@ -4,13 +4,15 @@ import pc from "picocolors";
 import { checkDocsReferences } from "../core/check-docs-references.js";
 import { collectProviderContractDiagnostics } from "../migrate/provider-contract-diagnostics.js";
 import { isHookScript } from "../core/is-hook-script.js";
+import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
+import { checkOwnership } from "../core/build-inventory.js";
 import type { Status } from "./doctor-checks.js";
 
 // validate reports STRUCTURE & WIRING only — that gate files exist and are wired, not that
 // they actually block. Behavioral proof is `doctor --hard-gates`. Statuses are honest:
 // PASS / WARN / N/A / FAIL. WARN and N/A do not fail the build unless --strict is passed.
 
-export type Section = "Structure" | "Hooks" | "Portability" | "Docs";
+export type Section = "Structure" | "Hooks" | "Portability" | "Docs" | "Workflow" | "Ownership" | "Inventory";
 
 export interface CheckResult {
 	name: string;
@@ -22,6 +24,10 @@ export interface CheckResult {
 interface ValidateOptions {
 	portable?: boolean;
 	strict?: boolean;
+	/** Scope the run to the workflow drift-check only (used by the CI step). */
+	workflow?: boolean;
+	/** Scope the run to the ownership-completeness check only (used by CI). */
+	ownership?: boolean;
 }
 
 const ok = (cond: boolean): Status => (cond ? "pass" : "fail");
@@ -230,20 +236,37 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 	console.log();
 
 	const projectRoot = path.dirname(meowkitDir);
-	const results: CheckResult[] = [
-		checkDirExists(meowkitDir, "agents"),
-		checkDirExists(meowkitDir, "hooks"),
-		checkFileExists(projectRoot, "CLAUDE.md", "Structure"),
-		checkConfigJson(meowkitDir),
-		...checkHooksExecutable(meowkitDir),
-		...checkDocsRefsContract(meowkitDir),
-	];
 
-	if (args.portable) {
-		results.push(...checkPortability());
+	// `--workflow` / `--ownership` scope the run to a single check (cheap CI
+	// invocations). The default run includes both alongside the structural checks.
+	let results: CheckResult[];
+	if (args.workflow) {
+		results = checkWorkflowDrift(projectRoot);
+	} else if (args.ownership) {
+		results = checkOwnership(meowkitDir);
+	} else {
+		results = [
+			checkDirExists(meowkitDir, "agents"),
+			checkDirExists(meowkitDir, "hooks"),
+			checkFileExists(projectRoot, "CLAUDE.md", "Structure"),
+			checkConfigJson(meowkitDir),
+			...checkHooksExecutable(meowkitDir),
+			...checkDocsRefsContract(meowkitDir),
+			// Default run is advisory: a wholly-absent governance file WARNs
+			// (prompt `mewkit upgrade`) rather than failing an un-synced install.
+			// The scoped `--workflow`/`--ownership` paths above stay strict for CI.
+			...checkWorkflowDrift(projectRoot, { missingSpecSeverity: "warn" }),
+			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
+		];
+		if (args.portable) {
+			results.push(...checkPortability());
+		}
 	}
 
-	const sections: Section[] = ["Structure", "Hooks", "Portability", "Docs"];
+	// "Inventory" is a valid Section but is produced only by `inventory --check`
+	// (stale-index), never by this validate run — listed here for render
+	// completeness so any future inclusion in `results` is printed, not dropped.
+	const sections: Section[] = ["Structure", "Hooks", "Portability", "Docs", "Workflow", "Ownership", "Inventory"];
 	for (const section of sections) {
 		const inSection = results.filter((r) => r.section === section);
 		if (inSection.length === 0) continue;

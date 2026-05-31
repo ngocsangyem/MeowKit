@@ -16,6 +16,7 @@ import { migrate } from "./commands/migrate.js";
 import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
 import { orchviz } from "./commands/orchviz.js";
+import { inventory } from "./commands/inventory.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -40,6 +41,7 @@ ${pc.bold("Commands:")}
   ${pc.green("task")}       Create and list task files (new, list)
   ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
   ${pc.green("orchviz")}    Live web visualizer for the active Claude Code session
+  ${pc.green("inventory")}  List harness artifacts with governance metadata
 
 ${pc.bold("Options:")}
   --help, -h       Show help
@@ -51,6 +53,14 @@ ${pc.bold("Options:")}
   --hard-gates     Doctor: live-probe the hard gates (plan/privacy/injection block)
   --portable       Validate: include portable provider contract checks
   --strict         Validate: treat WARN as failure (exit 1); off by default
+  --workflow       Validate: run only the workflow.yaml drift-check (CI scope)
+  --ownership      Validate: run only the artifact ownership-completeness check
+  --json           Inventory: emit the inventory as JSON
+  --stale          Inventory: show only deprecated/experimental artifacts
+  --critical       Inventory: show only criticality=critical artifacts
+  --portable-missing  Inventory: show artifacts whose runtime is not portable
+  --check          Inventory: fail if README/index counts drift from reality
+  --emit-counts    Inventory: rewrite README/index count numbers to match reality
 
 ${pc.bold("Init flags for post-init migration:")}
   --migrate                  After unpack, prompt for providers to export to (interactive)
@@ -123,6 +133,13 @@ async function main(): Promise<void> {
 			"no-open",
 			"no-color",
 			"verbose",
+			"workflow",
+			"ownership",
+			"json",
+			"stale",
+			"critical",
+			"portable-missing",
+			"emit-counts",
 		],
 		string: [
 			"only",
@@ -177,6 +194,18 @@ async function main(): Promise<void> {
 			await validate({
 				portable: args.portable as boolean | undefined,
 				strict: args.strict as boolean | undefined,
+				workflow: args.workflow as boolean | undefined,
+				ownership: args.ownership as boolean | undefined,
+			});
+			break;
+		case "inventory":
+			await inventory({
+				json: args.json as boolean | undefined,
+				stale: args.stale as boolean | undefined,
+				critical: args.critical as boolean | undefined,
+				portableMissing: args["portable-missing"] as boolean | undefined,
+				check: args.check as boolean | undefined,
+				emitCounts: args["emit-counts"] as boolean | undefined,
 			});
 			break;
 		case "budget":

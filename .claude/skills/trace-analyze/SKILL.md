@@ -2,13 +2,8 @@
 name: mk:trace-analyze
 version: 1.0.0
 preamble-tier: 3
-description: >-
-  Use when analyzing harness trace logs to surface recurring failure patterns
-  and suggest harness improvements. Scatter-gather pattern across last N runs
-  with mandatory HITL gate before any change is applied. Triggers on
-  /mk:trace-analyze, "analyze traces", "find patterns in harness runs",
-  or after a model upgrade flagged dead-weight-audit-needed.
-argument-hint: "[--runs N] [--pattern <type>]"
+description: Use when analyzing harness trace logs to surface recurring failure patterns and suggest harness improvements. Scatter-gather pattern across last N runs with mandatory HITL gate before any change is applied. Triggers on /mk:trace-analyze, "analyze traces", "find patterns in harness runs", or after a model upgrade flagged dead-weight-audit-needed.
+argument-hint: '[--runs N] [--pattern <type>]'
 allowed-tools:
   - Bash
   - Read
@@ -19,9 +14,19 @@ allowed-tools:
   - Agent
   - AskUserQuestion
 source: local
-keywords: [trace-analyze, harness-trace-log, failure-patterns, scatter-gather, hitl-gate, model-upgrade-audit]
-when_to_use: "Use when analyzing harness trace logs to surface recurring failure patterns and suggest improvements. Mandatory HITL gate before changes apply."
+keywords:
+  - trace-analyze
+  - harness-trace-log
+  - failure-patterns
+  - scatter-gather
+  - hitl-gate
+  - model-upgrade-audit
+when_to_use: Use when analyzing harness trace logs to surface recurring failure patterns and suggest improvements. Mandatory HITL gate before changes apply.
 user-invocable: true
+owner: observability
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # mk:trace-analyze — Scatter-Gather Trace Analysis

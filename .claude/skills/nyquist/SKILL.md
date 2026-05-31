@@ -2,23 +2,24 @@
 name: mk:nyquist
 version: 1.0.0
 preamble-tier: 3
-description: >-
-  Test-to-requirement coverage mapping. Reads plan acceptance criteria and test
-  files, produces a coverage gap report showing which requirements have no tests.
-  Use during Phase 2 (Test) or Phase 4 (Review) to verify test completeness.
-  Named after the Nyquist sampling theorem — sufficient test coverage prevents
-  aliased (missed) requirements. NOT for running tests (see mk:testing);
-  NOT for structural code review (see mk:review).
+description: Test-to-requirement coverage mapping. Reads plan acceptance criteria and test files, produces a coverage gap report showing which requirements have no tests. Use during Phase 2 (Test) or Phase 4 (Review) to verify test completeness. Named after the Nyquist sampling theorem — sufficient test coverage prevents aliased (missed) requirements. NOT for running tests (see mk:testing); NOT for structural code review (see mk:review).
 allowed-tools:
   - Read
   - Grep
   - Glob
-# Inspired by GSD's nyquist-auditor agent (test coverage gap detection)
-# Read-only analysis — writes report, never modifies code
 source: new
-keywords: [nyquist, test-coverage, requirement-mapping, coverage-gap, acceptance-criteria]
-when_to_use: "Use during Phase 2 or Phase 4 to map test coverage to plan acceptance criteria — finds aliased (missed) requirements. NOT for running tests (see mk:testing) or structural code review (see mk:review)."
+keywords:
+  - nyquist
+  - test-coverage
+  - requirement-mapping
+  - coverage-gap
+  - acceptance-criteria
+when_to_use: Use during Phase 2 or Phase 4 to map test coverage to plan acceptance criteria — finds aliased (missed) requirements. NOT for running tests (see mk:testing) or structural code review (see mk:review).
 user-invocable: true
+owner: research
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Nyquist — Test-to-Requirement Coverage Mapping

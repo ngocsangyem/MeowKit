@@ -1,17 +1,28 @@
 ---
 name: mk:api-design
-description: "REST/GraphQL API design: resource naming, HTTP methods, status codes, pagination, versioning, error formats. Use for 'design API', 'endpoint patterns'."
+description: 'REST/GraphQL API design: resource naming, HTTP methods, status codes, pagination, versioning, error formats. Use for ''design API'', ''endpoint patterns''.'
 version: 1.0.0
-argument-hint: "[api description] [--rest | --graphql | --both]"
+argument-hint: '[api description] [--rest | --graphql | --both]'
 source: local
 allowed-tools:
   - Read
   - Write
   - Glob
   - Grep
-keywords: [api-design, rest, graphql, resource-naming, status-codes, pagination, versioning]
-when_to_use: "Use when designing REST or GraphQL APIs (resource naming, HTTP methods, error formats, pagination). NOT for backend implementation (use mk:database for schema)."
+keywords:
+  - api-design
+  - rest
+  - graphql
+  - resource-naming
+  - status-codes
+  - pagination
+  - versioning
+when_to_use: Use when designing REST or GraphQL APIs (resource naming, HTTP methods, error formats, pagination). NOT for backend implementation (use mk:database for schema).
 user-invocable: true
+owner: portability
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # API Design

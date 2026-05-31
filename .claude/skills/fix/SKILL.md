@@ -1,12 +1,22 @@
 ---
 name: mk:fix
-description: "Diagnoses and fixes bugs, type errors, lint failures, CI/CD issues, and runtime errors via root-cause-first investigation. Use for defect remediation. NOT for investigation without a fix (see mk:investigate); NOT for build-only compilation errors (see mk:build-fix)."
+description: Diagnoses and fixes bugs, type errors, lint failures, CI/CD issues, and runtime errors via root-cause-first investigation. Use for defect remediation. NOT for investigation without a fix (see mk:investigate); NOT for build-only compilation errors (see mk:build-fix).
 source: local
 version: 0.1.0
-argument-hint: "[issue] --auto|--review|--quick|--parallel|--tdd"
-keywords: [fix, bug-fix, runtime-error, apply-fix, error-recovery, memory-driven-fix]
-when_to_use: "Use when fixing a runtime bug or applying a known fix pattern. NOT for build/compile errors (see mk:build-fix) or architectural debugging (see mk:investigate)."
+argument-hint: '[issue] --auto|--review|--quick|--parallel|--tdd'
+keywords:
+  - fix
+  - bug-fix
+  - runtime-error
+  - apply-fix
+  - error-recovery
+  - memory-driven-fix
+when_to_use: Use when fixing a runtime bug or applying a known fix pattern. NOT for build/compile errors (see mk:build-fix) or architectural debugging (see mk:investigate).
 user-invocable: true
+owner: lifecycle
+criticality: high
+status: active
+runtime: claude-code
 ---
 
 # Fixing

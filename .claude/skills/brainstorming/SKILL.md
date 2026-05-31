@@ -16,9 +16,18 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 source: local
-keywords: [brainstorm, explore-solutions, compare-approaches, trade-off-analysis, alternatives]
-when_to_use: "Use when exploring technical solutions or comparing approaches for a validated problem. NOT for product validation (see mk:office-hours) or after a plan exists (see mk:plan-ceo-review)."
+keywords:
+  - brainstorm
+  - explore-solutions
+  - compare-approaches
+  - trade-off-analysis
+  - alternatives
+when_to_use: Use when exploring technical solutions or comparing approaches for a validated problem. NOT for product validation (see mk:office-hours) or after a plan exists (see mk:plan-ceo-review).
 user-invocable: true
+owner: research
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Brainstorming

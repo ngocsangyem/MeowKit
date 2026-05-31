@@ -1,13 +1,23 @@
 ---
 name: mk:confluence-search
-description: "Confluence CQL search + space list + saved-filter + export via the confluence-as wrapper. Triggers: 'search confluence', 'find pages where X', 'cql for ...', 'export search results', 'list spaces', 'manage saved filters'. CQL injection-safe via the shared sanitizer. NOT for single-page CRUD (mk:confluence-page); NOT for bulk write ops (mk:confluence-bulk)."
+description: 'Confluence CQL search + space list + saved-filter + export via the confluence-as wrapper. Triggers: ''search confluence'', ''find pages where X'', ''cql for ...'', ''export search results'', ''list spaces'', ''manage saved filters''. CQL injection-safe via the shared sanitizer. NOT for single-page CRUD (mk:confluence-page); NOT for bulk write ops (mk:confluence-bulk).'
 phase: on-demand
 source: local
-keywords: [confluence-search, cql, cql-query, confluence-filter, confluence-export, confluence-space-list]
-when_to_use: "Use to find Confluence pages by CQL, validate CQL, build queries from natural language, list spaces, manage saved filters, or export results. NOT for single-page CRUD (use mk:confluence-page)."
+keywords:
+  - confluence-search
+  - cql
+  - cql-query
+  - confluence-filter
+  - confluence-export
+  - confluence-space-list
+when_to_use: Use to find Confluence pages by CQL, validate CQL, build queries from natural language, list spaces, manage saved filters, or export results. NOT for single-page CRUD (use mk:confluence-page).
 user-invocable: true
 context: fork
 agent: confluence-search
+owner: confluence
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # mk:confluence-search

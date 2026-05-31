@@ -12,10 +12,22 @@ allowed-tools:
   - Read
   - Grep
   - Glob
-source: [local, cc-thinking-skills]
-keywords: [problem-solving, first-principles, reasoning-framework, approach-design, decomposition, analytical-thinking]
-when_to_use: "Use when applying first-principles reasoning to a complex problem. General-purpose problem decomposition."
+source:
+  - local
+  - cc-thinking-skills
+keywords:
+  - problem-solving
+  - first-principles
+  - reasoning-framework
+  - approach-design
+  - decomposition
+  - analytical-thinking
+when_to_use: Use when applying first-principles reasoning to a complex problem. General-purpose problem decomposition.
 user-invocable: true
+owner: research
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Problem-Solving — Strategic Unsticking

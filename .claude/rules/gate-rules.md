@@ -1,8 +1,15 @@
 # Phase Gate Rules — HARD STOPS
 
+<!-- Canonical source: .claude/workflow.yaml -->
+
 These are hard stops. No automation may bypass them. No agent may self-approve.
 
 ## GATE 1 — After Phase 1 (Plan)
+
+Gate 1 is formally the Phase 1→Phase 2 transition gate. In default (non-TDD) mode
+Phase 2 is skipped, so Gate 1 is the effective block before Phase 3 Build begins.
+Both statements are true simultaneously: the gate fires after Plan and before
+whichever phase is next (Test in TDD mode; Build otherwise).
 
 ### Conditions for Approval
 
@@ -17,7 +24,7 @@ All must be true:
 
 ### What It Blocks
 
-Proceeding to Phase 2 (Test RED) without an approved plan. No tests are written, no code is written, no reviews happen until the plan is approved.
+Proceeding to Phase 2 (Test RED) in TDD mode, or directly to Phase 3 (Build) in default mode. No tests are written, no code is written, no reviews happen until the plan is approved.
 
 ### Exception
 
