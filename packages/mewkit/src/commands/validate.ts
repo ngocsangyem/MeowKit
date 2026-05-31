@@ -6,13 +6,14 @@ import { collectProviderContractDiagnostics } from "../migrate/provider-contract
 import { isHookScript } from "../core/is-hook-script.js";
 import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
 import { checkOwnership } from "../core/build-inventory.js";
+import { checkPacks } from "../core/check-packs.js";
 import type { Status } from "./doctor-checks.js";
 
 // validate reports STRUCTURE & WIRING only — that gate files exist and are wired, not that
 // they actually block. Behavioral proof is `doctor --hard-gates`. Statuses are honest:
 // PASS / WARN / N/A / FAIL. WARN and N/A do not fail the build unless --strict is passed.
 
-export type Section = "Structure" | "Hooks" | "Portability" | "Docs" | "Workflow" | "Ownership" | "Inventory";
+export type Section = "Structure" | "Hooks" | "Portability" | "Docs" | "Workflow" | "Ownership" | "Inventory" | "Packs";
 
 export interface CheckResult {
 	name: string;
@@ -28,6 +29,8 @@ interface ValidateOptions {
 	workflow?: boolean;
 	/** Scope the run to the ownership-completeness check only (used by CI). */
 	ownership?: boolean;
+	/** Scope the run to the pack-manifest coherence check only (used by CI). */
+	packs?: boolean;
 }
 
 const ok = (cond: boolean): Status => (cond ? "pass" : "fail");
@@ -244,6 +247,8 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = checkWorkflowDrift(projectRoot);
 	} else if (args.ownership) {
 		results = checkOwnership(meowkitDir);
+	} else if (args.packs) {
+		results = checkPacks(meowkitDir);
 	} else {
 		results = [
 			checkDirExists(meowkitDir, "agents"),
@@ -254,19 +259,31 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 			...checkDocsRefsContract(meowkitDir),
 			// Default run is advisory: a wholly-absent governance file WARNs
 			// (prompt `mewkit upgrade`) rather than failing an un-synced install.
-			// The scoped `--workflow`/`--ownership` paths above stay strict for CI.
+			// The scoped `--workflow`/`--ownership`/`--packs` paths above stay strict for CI.
 			...checkWorkflowDrift(projectRoot, { missingSpecSeverity: "warn" }),
 			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
+			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
 		];
 		if (args.portable) {
 			results.push(...checkPortability());
 		}
 	}
 
-	// "Inventory" is a valid Section but is produced only by `inventory --check`
-	// (stale-index), never by this validate run — listed here for render
-	// completeness so any future inclusion in `results` is printed, not dropped.
-	const sections: Section[] = ["Structure", "Hooks", "Portability", "Docs", "Workflow", "Ownership", "Inventory"];
+	// Exhaustiveness guard: the printed `sections` array MUST list every `Section`
+	// union member, or a check's results compute but never render. The mapped type
+	// fails to compile if a member is missing here, keeping union + array in sync.
+	// ("Inventory" is produced only by `inventory --check`, listed for completeness.)
+	const SECTION_ORDER: { [K in Section]: true } = {
+		Structure: true,
+		Hooks: true,
+		Portability: true,
+		Docs: true,
+		Workflow: true,
+		Ownership: true,
+		Packs: true,
+		Inventory: true,
+	};
+	const sections = Object.keys(SECTION_ORDER) as Section[];
 	for (const section of sections) {
 		const inSection = results.filter((r) => r.section === section);
 		if (inSection.length === 0) continue;

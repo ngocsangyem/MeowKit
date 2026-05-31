@@ -13,17 +13,41 @@ npx mewkit <command>      # Runtime commands
 
 | Command             | Description                                                       |
 | ------------------- | ----------------------------------------------------------------- |
-| `meowkit init`      | Scaffold new project or update existing (`--dry-run`, `--force`, `--beta`) |
+| `meowkit init`      | Scaffold new project or update existing (`--dry-run`, `--force`, `--beta`, `--profile`) |
 | `meowkit upgrade`   | Update to latest version (`--check`, `--beta`, `--list`)          |
+| `meowkit pack`      | Manage install packs after install (`list`, `add`, `remove`)      |
 | `meowkit doctor`    | Diagnose environment (Node.js, Python, Git, `.claude/` structure) |
 | `meowkit setup`     | Guided configuration (Python venv, MCP, .env, .gitignore)         |
-| `meowkit validate`  | Verify `.claude/` structure integrity                             |
-| `meowkit budget`    | Token usage and cost tracking (`--monthly`)                       |
+| `meowkit validate`  | Verify `.claude/` structure integrity (`--packs` for pack coherence) |
+| `meowkit budget`    | Token usage and cost tracking (`--monthly`; `budget context` for per-profile size) |
 | `meowkit memory`    | View/manage cross-session memory (`--show`, `--stats`, `--clear`) |
 | `meowkit status`    | Print version, channel, and config                                |
 | `meowkit task new`  | Create structured task file from template                         |
 | `meowkit task list` | List active tasks with status                                     |
 | `meowkit orchviz`   | Live web visualizer for the active Claude Code session            |
+| `meowkit pack`      | `list` / `add <pack>` / `remove <pack>` — manage installed domains |
+
+## Profiles & Packs
+
+`init --profile <name>` installs a right-sized subset instead of the full toolkit.
+Every profile always ships the safety base (gate/privacy hooks, security rules,
+settings, statusline, core `/mk:*` commands).
+
+| Profile     | Contents                                         |
+| ----------- | ------------------------------------------------ |
+| `core`      | base + lifecycle essentials + memory + utility   |
+| `developer` | core + testing + git + docs                      |
+| `product`   | developer + product/autobuild                    |
+| `atlassian` | developer + Jira/Confluence                      |
+| `security`  | core + security audit                            |
+| `research`  | core + research/brainstorming                    |
+| `full`      | everything (default — identical to today)        |
+
+Add or drop domains later with `mewkit pack add|remove`; `pack remove` only deletes
+pristine, pack-exclusive files (shared, base-covered, settings-referenced, and
+user-edited files are preserved). `mewkit budget context` estimates the loadable
+context size of each profile, and `mewkit validate --packs` checks manifest
+coherence + the safety invariant.
 
 ## Usage
 
@@ -34,11 +58,26 @@ npx mewkit init --beta          # Use beta channel
 npx mewkit init --dry-run       # Preview changes without writing
 npx mewkit init --force         # Overwrite all files (bypass user modification checks)
 
-# Upgrade MeowKit
+# Install a subset (profile) instead of the full toolkit
+npx mewkit init --profile core       # smallest: lifecycle essentials only
+npx mewkit init --profile developer  # core + testing + git + docs
+npx mewkit init --profile full       # everything (default)
+
+# Upgrade MeowKit (a partial install upgrades only its installed packs)
 npx mewkit upgrade              # Latest stable
 npx mewkit upgrade --beta       # Latest beta
 npx mewkit upgrade --check      # Check without installing
 npx mewkit upgrade --list       # Show all available versions
+
+# Manage packs after install
+npx mewkit pack list            # show installed vs available packs
+npx mewkit pack add atlassian   # pull in Jira/Confluence
+npx mewkit pack remove atlassian # remove a pack (preserves shared/edited files)
+
+# Estimate per-profile context size
+npx mewkit budget context                    # all profiles
+npx mewkit budget context --profile core     # one profile
+npx mewkit validate --packs                  # pack-manifest coherence + safety
 
 # Post-install setup
 npx mewkit setup

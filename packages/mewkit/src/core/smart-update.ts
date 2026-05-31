@@ -36,6 +36,12 @@ export interface UpdateStats {
 	deletionsAlreadyGone: string[];
 	/** Listed deletions a dry-run would remove. */
 	deletionsPreview: string[];
+	/** Pristine kit files removed because they fall outside the installed profile. */
+	profileTrimmed: string[];
+	/** Out-of-profile files kept (user-modified or declined). */
+	profileTrimSkipped: string[];
+	/** Out-of-profile pristine files a dry-run would trim. */
+	profileTrimPreview: string[];
 }
 
 export interface SmartUpdateOptions {
@@ -53,6 +59,24 @@ export interface SmartUpdateOptions {
 	 * the process hangs on stdin.
 	 */
 	confirmOrphans?: (orphans: string[]) => Promise<boolean>;
+	/**
+	 * Profile install allow-set: `.claude/`-relative paths the resolved profile
+	 * should write. When present, the source walk skips any file NOT in this set,
+	 * and a profile-trim pass removes previously-installed pristine kit files that
+	 * fall outside it (the full→core downgrade). Absent ⇒ today's full install.
+	 */
+	allowedPaths?: Set<string>;
+	/** Installed profile name to record in metadata ("full" for whole-tree). */
+	profile?: string;
+	/** Resolved pack list to record in metadata; omit for full/legacy (sentinel). */
+	packs?: string[];
+	/**
+	 * Opt-in profile-trim: delete previously-installed pristine kit files OUTSIDE
+	 * `allowedPaths` (the full→core downgrade). ONLY `init --profile` sets this —
+	 * `pack add` and `upgrade` pass a narrow allow-set that filters WRITES but must
+	 * never trigger a downgrade delete of everything else.
+	 */
+	trimToProfile?: boolean;
 }
 
 /**
@@ -94,6 +118,9 @@ export async function smartUpdate(
 		deletionsSkipped: [],
 		deletionsAlreadyGone: [],
 		deletionsPreview: [],
+		profileTrimmed: [],
+		profileTrimSkipped: [],
+		profileTrimPreview: [],
 	};
 
 	if (priorSource === "none" && !force && existsSync(targetClaudeDir)) {
@@ -119,6 +146,14 @@ export async function smartUpdate(
 	for (const { manifestPath, targetRelPath, srcPath } of claudeFiles) {
 		const destPath = join(targetDir, targetRelPath);
 		const layer = classifyLayer(manifestPath);
+
+		// Profile filter: a resolved allow-set installs only its files. The set
+		// always ⊇ base (safety rules + hooks + settings), so this never filters a
+		// safety file. Absent ⇒ full tree (unchanged).
+		if (options.allowedPaths && !options.allowedPaths.has(manifestPath)) {
+			stats.skipped++;
+			continue;
+		}
 
 		if (isIgnored(targetRelPath)) {
 			log.debug(`Ignored (protected): ${targetRelPath}`);
@@ -397,6 +432,57 @@ export async function smartUpdate(
 		}
 	}
 
+	// Profile-trim pass — the full→core downgrade. When an allow-set is active and
+	// a prior MeowKit install exists, previously-installed pristine kit files
+	// OUTSIDE the allow-set are removed; otherwise they linger as zombie skills
+	// still auto-loaded by the runtime. User-modified files are preserved + warned.
+	// Orphan logic can't catch these — they ARE in the release manifest — so this
+	// is the dedicated data-safety pass. Suppressed by `--no-cleanup`, never on full.
+	if (cleanup && options.trimToProfile && options.allowedPaths && hasPriorMeowkitInstall) {
+		const allow = options.allowedPaths;
+		const trimEligible: string[] = [];
+		for (const entry of prior.meta?.files ?? []) {
+			// Normalize to forward slashes — `allow` (resolver) uses them, but a
+			// metadata path from collectFiles carries native separators on Windows.
+			const relForward = entry.path.replace(/\\/g, "/");
+			if (allow.has(relForward) || entry.layer === "user") continue;
+			const dest = join(claudeDir, entry.path);
+			if (!isWithinDir(claudeDir, dest) || !existsSync(dest)) continue;
+			// pristine kit-owned only — user-modified (owner flips to meowkit-modified
+			// or disk hash drifts) is preserved, mirroring the deletions-pass guard.
+			if (entry.owner !== "meowkit" || hashFile(dest) !== entry.checksum) {
+				stats.profileTrimSkipped.push(entry.path);
+				continue;
+			}
+			trimEligible.push(entry.path);
+		}
+		if (trimEligible.length > 0) {
+			if (dryRun) {
+				stats.profileTrimPreview.push(...trimEligible);
+			} else {
+				let proceed: boolean;
+				if (assumeYes || force) proceed = true;
+				else if (options.confirmOrphans) proceed = await options.confirmOrphans(trimEligible);
+				else proceed = await confirmDelete(trimEligible.length);
+
+				if (!proceed) {
+					stats.profileTrimSkipped.push(...trimEligible);
+				} else {
+					for (const relPath of trimEligible) {
+						try {
+							unlinkSync(join(claudeDir, relPath));
+							stats.profileTrimmed.push(relPath);
+						} catch (err) {
+							log.warn(`Failed to trim ${relPath}: ${(err as Error).message}`);
+							stats.profileTrimSkipped.push(relPath);
+						}
+					}
+					log.info(`Trimmed ${stats.profileTrimmed.length} file(s) outside the '${options.profile ?? "selected"}' profile.`);
+				}
+			}
+		}
+	}
+
 	// Write installed metadata. `dryRun` writes neither file (matches today).
 	if (!dryRun) {
 		const meta = buildInstallMetadata(claudeDir, {
@@ -405,6 +491,8 @@ export async function smartUpdate(
 			priorEntriesByPath,
 			scope: "local",
 			mergedSettings: settingsMerged ? ["settings.json"] : undefined,
+			profile: options.profile,
+			packs: options.packs,
 		});
 		try {
 			await writeInstallMetadata(claudeDir, meta);

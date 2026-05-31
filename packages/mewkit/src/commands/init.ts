@@ -2,7 +2,18 @@ import fs from "node:fs";
 import { join } from "node:path";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
-import { fetchReleases, downloadRelease, cleanupDownload, smartUpdate, validate } from "../core/index.js";
+import {
+	fetchReleases,
+	downloadRelease,
+	cleanupDownload,
+	smartUpdate,
+	validate,
+	hasPackManifest,
+	loadPackManifest,
+	resolveProfile,
+	flattenProfile,
+	availableProfiles,
+} from "../core/index.js";
 import type { ReleaseInfo, UserConfig } from "../core/index.js";
 import { promptAndInstallSystemDeps } from "./setup.js";
 import { getRequirementsSource, formatPackageList } from "../core/skills-dependencies.js";
@@ -20,6 +31,53 @@ export interface InitArgs {
 	migrateTo?: string;
 	/** When true, scope the post-init migration globally (~/.cursor/, etc.) instead of per-project. */
 	migrateGlobal?: boolean;
+	/**
+	 * Install profile (core/developer/product/atlassian/security/research/full).
+	 * Omitted = full (today's behavior). Works in update mode too, to TRIM an
+	 * existing install down to the selected profile.
+	 */
+	profile?: string;
+}
+
+/** Profile picker options (stable names; resolution validates against the release manifest). */
+const PROFILE_OPTIONS = [
+	{ value: "full", label: "full", hint: "everything (default — same as today)" },
+	{ value: "core", label: "core", hint: "recommended — lifecycle essentials, smallest" },
+	{ value: "developer", label: "developer", hint: "core + testing + git + docs" },
+	{ value: "product", label: "product", hint: "developer + product/autobuild" },
+	{ value: "atlassian", label: "atlassian", hint: "developer + Jira/Confluence" },
+	{ value: "security", label: "security", hint: "core + security audit" },
+	{ value: "research", label: "research", hint: "core + research/brainstorming" },
+];
+
+interface ResolvedInstall {
+	allowedPaths?: Set<string>;
+	profile: string;
+	packs?: string[];
+}
+
+/**
+ * Resolve the install allow-set from a profile name against the extracted release.
+ * `full`/undefined ⇒ no allow-set (byte-identical full install). A release with no
+ * pack-manifest.json (pre-Phase-3) cannot honor a partial profile — warn + full.
+ */
+function resolveInstall(sourceDir: string, profileName: string | undefined): ResolvedInstall {
+	if (!profileName || profileName === "full") return { profile: "full" };
+	const srcClaude = join(sourceDir, ".claude");
+	if (!hasPackManifest(srcClaude)) {
+		p.log.warn(`This release has no pack-manifest.json — installing the full profile instead of '${profileName}'.`);
+		return { profile: "full" };
+	}
+	const manifest = loadPackManifest(srcClaude);
+	if (!availableProfiles(manifest).includes(profileName)) {
+		p.cancel(`Unknown profile "${profileName}". Available: ${availableProfiles(manifest).join(", ")}`);
+		process.exit(1);
+	}
+	return {
+		allowedPaths: resolveProfile(srcClaude, manifest, profileName),
+		profile: profileName,
+		packs: flattenProfile(manifest, profileName).packs,
+	};
 }
 
 /** Detect if this is a fresh install or an update */
@@ -49,7 +107,16 @@ function cancelCheck(value: unknown): void {
 }
 
 /** Prompt the user for project description, skill deps, and Gemini key */
-async function promptNewInstall(): Promise<UserConfig & { installDeps: boolean }> {
+async function promptNewInstall(): Promise<UserConfig & { installDeps: boolean; profile: string }> {
+	// Profile picker first — default `full` preserves current UX; `core` recommended.
+	const profileChoice = await p.select({
+		message: "Select an install profile",
+		options: PROFILE_OPTIONS,
+		initialValue: "full",
+	});
+	cancelCheck(profileChoice);
+	const profile = typeof profileChoice === "string" ? profileChoice : "full";
+
 	const description = await p.text({
 		message: "Describe your project (optional)",
 		placeholder: "Press Enter to skip",
@@ -152,6 +219,7 @@ async function promptNewInstall(): Promise<UserConfig & { installDeps: boolean }
 		geminiApiKey,
 		externalProviderKeys: Object.keys(externalProviderKeys).length > 0 ? externalProviderKeys : undefined,
 		installDeps: shouldInstallDeps,
+		profile,
 	};
 }
 
@@ -254,12 +322,23 @@ export async function init(args: InitArgs): Promise<void> {
 	}
 
 	// Step 3: Config prompts (new installs only)
-	let config: UserConfig & { installDeps: boolean };
+	let config: UserConfig & { installDeps: boolean; profile: string };
 	if (mode === "new") {
 		config = await promptNewInstall();
 	} else {
-		config = { description: "", enableCostTracking: true, enableMemory: true, geminiApiKey: null, installDeps: false };
+		config = {
+			description: "",
+			enableCostTracking: true,
+			enableMemory: true,
+			geminiApiKey: null,
+			installDeps: false,
+			profile: "full",
+		};
 	}
+
+	// `--profile` flag overrides the picker and is the only profile source in
+	// update mode (where it TRIMS an existing install down to the selected set).
+	const profileName = args.profile ?? config.profile;
 
 	// Step 4: Download release
 	const downloadSpinner = p.spinner();
@@ -278,10 +357,17 @@ export async function init(args: InitArgs): Promise<void> {
 	downloadSpinner.stop(`Downloaded v${release.version}`);
 
 	try {
-		// Step 5: Apply via smart update
+		// Step 5: Apply via smart update. Resolve the profile allow-set against the
+		// extracted release (full ⇒ undefined allow-set = byte-identical install).
+		const install = resolveInstall(sourceDir, profileName);
 		const updateSpinner = p.spinner();
 		updateSpinner.start("Applying files...");
 		const stats = await smartUpdate(config, sourceDir, targetDir, dryRun, force, {
+			allowedPaths: install.allowedPaths,
+			profile: install.profile,
+			packs: install.packs,
+			// A profile install owns the full→profile downgrade trim; full does not.
+			trimToProfile: install.allowedPaths !== undefined,
 			// Spinner overwrites inline `[y/N]` prompts → hand the prompt back to
 			// init so we can pause the spinner, ask via clack, then resume.
 			confirmOrphans: async (orphans) => {

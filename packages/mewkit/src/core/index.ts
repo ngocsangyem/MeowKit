@@ -14,3 +14,5 @@ export * from "./release-metadata.js";
 export * from "./core-logger.js";
 export * from "./skills-dependencies.js";
 export * from "./dependency-installer.js";
+export * from "./pack-manifest.js";
+export * from "./pack-resolver.js";

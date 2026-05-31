@@ -53,6 +53,15 @@ jobs:
       - name: Validate artifact ownership metadata
         run: node packages/mewkit/dist/index.js validate --ownership
 
+      - name: Validate pack manifest coherence + safety invariant
+        run: node packages/mewkit/dist/index.js validate --packs
+
+      # Guardrail, not a tight bound. Measured core ~102k tokens; cap = 130000
+      # (~27% headroom). Re-baseline with `mewkit budget context --profile core`
+      # and bump this number when core legitimately grows.
+      - name: Validate core context budget stays small
+        run: node packages/mewkit/dist/index.js budget context --profile core --fail-over 130000
+
       - name: Validate README/index counts (stale-index)
         run: node packages/mewkit/dist/index.js inventory --check
 
