@@ -42,8 +42,10 @@ while read -r ref; do
   # Skip partial regex captures from wildcard/placeholder families such as mk:jira-* or mk:jira-{leaf}.
   case "$name" in *-) continue ;; esac
 
-  # Skip if resolves as skill OR command
+  # Skip if resolves as skill OR command. Skills whose folder keeps the canonical
+  # mk: prefix resolve as mk-<name> directories.
   if echo "$SKILLS" | grep -qx "$name"; then continue; fi
+  if echo "$SKILLS" | grep -qx "mk-$name"; then continue; fi
   if echo "$COMMANDS" | grep -qx "$name"; then continue; fi
 
   echo "PHANTOM: mk:$name (no skill dir, no command file)" >&2
