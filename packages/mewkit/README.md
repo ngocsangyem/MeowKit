@@ -16,6 +16,7 @@ npx mewkit <command>      # Runtime commands
 | `meowkit init`      | Scaffold new project or update existing (`--dry-run`, `--force`, `--beta`, `--profile`) |
 | `meowkit upgrade`   | Update to latest version (`--check`, `--beta`, `--list`)          |
 | `meowkit pack`      | Manage install packs after install (`list`, `add`, `remove`)      |
+| `meowkit providers` | Show the effective provider support matrix (`--json`, `<provider>`) |
 | `meowkit doctor`    | Diagnose environment (Node.js, Python, Git, `.claude/` structure) |
 | `meowkit setup`     | Guided configuration (Python venv, MCP, .env, .gitignore)         |
 | `meowkit validate`  | Verify `.claude/` structure integrity (`--packs` for pack coherence) |
@@ -73,6 +74,11 @@ npx mewkit upgrade --list       # Show all available versions
 npx mewkit pack list            # show installed vs available packs
 npx mewkit pack add atlassian   # pull in Jira/Confluence
 npx mewkit pack remove atlassian # remove a pack (preserves shared/edited files)
+
+# Inspect provider support
+npx mewkit providers            # effective supported-tool matrix
+npx mewkit providers codex      # paths, surfaces, docs, enforcement level
+npx mewkit providers --json     # machine-readable support matrix
 
 # Estimate per-profile context size
 npx mewkit budget context                    # all profiles
