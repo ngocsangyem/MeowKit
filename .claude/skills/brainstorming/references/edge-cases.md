@@ -33,3 +33,11 @@ Anchoring bias on the user side. Before accepting, force a comparison: "Idea #1 
 ## 8. You generated 8 ideas but they're all conservative
 
 If every idea scores ≤ 2 on novelty, you've stayed inside the comfort zone. Force one wild idea before closing: apply `first-principles.md` to the same problem and see what falls out. Even if you don't recommend it, having it on the list re-grounds the conservative options.
+
+## 9. Scout context drowns the decision
+
+The codebase matters, so you run scout and paste a full report into the brainstorm. The output becomes inventory instead of decision support. Compress scout to 3-6 bullets: files, patterns, constraints, and unknowns that affect approach choice.
+
+## 10. The best handoff has no selected idea
+
+The report lists good options but avoids a recommendation. `mk:plan-creator` cannot turn that into phases without repeating discovery. If no idea wins, say "no clear winner" and ask for one tie-break criterion; otherwise emit the handoff packet.

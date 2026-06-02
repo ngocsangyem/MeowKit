@@ -7,6 +7,8 @@
 [One paragraph confirming what was actually asked and the key constraint that bounds the solution space. Must be confirmed by the user before ideas were generated.]
 
 **Binding constraint:** [the single thing that, if violated, makes any solution unacceptable]
+**Success criterion:** [what good looks like after the chosen approach ships]
+**Excluded scope:** [what is explicitly not being solved in this brainstorm]
 
 ### Discovery Trace
 
@@ -42,11 +44,29 @@ Score each idea on all 4 criteria after the full set exists. See `references/sco
 |---|------------------|:----------------:|:-----------:|:---------------:|:------------:|:-----:|
 | 1 | [IDEA] | [1-5] | [1-5] | [1-5] | [1-5] | [9-45] |
 
+### Challenge Pass
+
+| Check | Evidence | Action |
+|---|---|---|
+| Duplicate architecture | [same mechanism?] | [merged/regenerated/pass] |
+| Hard constraint fit | [constraint evidence] | [drop/keep/report conflict] |
+| Category diversity | [category spread] | [pass/regenerated once] |
+| Conservative drift | [novelty evidence] | [surface higher-upside option/pass] |
+| Missing failure mode | [stakeholder/operator/security risk] | [risk added/pass] |
+
 ### Top 3 Recommendations
 
-1. **[IDEA]** (score: [N]/45) — [rationale grounded in the score, not vibes]
+1. **[IDEA]** (score: [N]/45) — [rationale grounded in score and challenge evidence, not vibes]
 2. **[IDEA]** (score: [N]/45) — [rationale]
 3. **[IDEA]** (score: [N]/45) — [rationale]
+
+### Convergence Decision
+
+**Recommended idea:** [IDEA]
+**Why it wins:** [cite score, constraint fit, novelty, scout touchpoint, or rejected alternative]
+**Rejected alternative worth noting:** [IDEA] — [why it lost]
+**Primary risk:** [risk]
+**First planning question:** [question for mk:plan-creator]
 
 ### Risk Note
 
@@ -63,8 +83,29 @@ Score each idea on all 4 criteria after the full set exists. See `references/sco
 
 **Anti-bias check:** [If all ideas cluster in 1-2 categories, flag: "Pivot did not produce real divergence. Consider a focused session on [orthogonal category]."]
 
+### Brainstorm Handoff Packet
+
+```yaml
+problem: "[confirmed problem]"
+binding_constraint: "[binding constraint]"
+success_criterion: "[success criterion]"
+excluded_scope: "[excluded scope]"
+selected_idea: "[recommended idea]"
+why_selected: "[score + evidence summary]"
+scores:
+  "[idea]": [total]
+touchpoints: []
+rejected_alternatives:
+  - idea: "[idea]"
+    reason: "[why it lost]"
+open_risks: []
+planning_questions:
+  - "[first planning question]"
+report_path: "plans/reports/[report-name].md"
+```
+
 ### Next Steps
 
-- Create implementation plan from top idea → ask, then invoke `mk:plan-creator` with `{ idea, problem, constraints, scores, rationale }`
+- Create implementation plan from top idea → ask, then pass report path + handoff packet to `mk:plan-creator`
 - Drill deeper into a specific idea → "explore idea #N"
 - Re-score with different criteria → adjust `references/scoring-criteria.md` weights and re-run

@@ -6,8 +6,11 @@ Update when Claude hits new brainstorming edge cases. Highest-signal content in 
 - **Anchoring on first idea** — the first idea gets disproportionate attention in evaluation. Generate ALL ideas before scoring any; use `scoring-criteria.md` only after the full list is complete.
 - **Confusing brainstorming with planning** — producing implementation steps, file paths, or commands instead of ideas. Hard gate: no code, no file creation outside `plans/reports/`, no implementation details.
 - **Context flooding** — generating 20+ ideas overwhelms context window. Max 8 ideas per run. If the problem needs more, run multiple focused sessions on sub-problems.
+- **Scout by default** — codebase scouting feels responsible but can swamp ideation. Use `mk:scout` only when existing touchpoints change the approach; consume a 3-6 bullet summary.
 - **Overlapping with office-hours** — using brainstorming when the problem isn't validated yet. If the user hasn't confirmed "this is worth building", redirect to `mk:office-hours` first.
+- **Skipping the challenge pass** — an anti-bias pivot is not enough. Before recommending, check duplicate architecture, constraints, category diversity, conservative drift, and missing failure modes.
 - **Scoring bias toward familiar solutions** — known patterns score high on feasibility, novel approaches get dismissed. Score novelty as a separate criterion; flag when all top picks are conservative.
+- **Weak handoff** — "use idea #2" is not enough for planning. Pass report path + packet with problem, constraint, selected idea, why selected, risks, and planning questions.
 - **Scope explosion mid-session** — user keeps adding requirements during ideation. If scope grows past the original ask, STOP and decompose into sub-projects. Each sub-project gets its own brainstorm.
 - **Question fatigue** — asking 5+ clarifying questions before generating any ideas. Cap discovery at 3 questions per batch, then ideate even if some ambiguity remains.
 - **Technique mismatch** — wrong technique for the problem (e.g., `first-principles.md` on a well-known pattern). If a technique produces weak ideas after 3 attempts, switch techniques rather than forcing more ideas.
