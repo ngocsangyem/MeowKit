@@ -56,6 +56,7 @@ The orchestrator routes by skill names:
 | Project documentation updates | `mk:document-release` or `mk:docs-init` |
 | Verification build/lint/test/typecheck | `mk:verify` or `mk:lint-and-validate` |
 | Code review / pre-landing audit | `mk:review` |
+| Review a GitHub PR (shallow verdict) / respond to received PR comments | `mk:review-pr` / `mk:respond-pr` |
 | Browser or UI QA | `mk:qa`, `mk:qa-manual`, `mk:playwright-cli`, or `mk:agent-browser` |
 | Visual explanation / diagrams / slides | `mk:preview` |
 | Media or document analysis/generation | `mk:multimodal` |

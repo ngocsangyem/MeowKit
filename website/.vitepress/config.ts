@@ -245,6 +245,8 @@ export default withMermaid(defineConfig({
           collapsed: true,
           items: [
             { text: 'mk:review', link: '/reference/skills/review' },
+            { text: 'mk:review-pr', link: '/reference/skills/review-pr' },
+            { text: 'mk:respond-pr', link: '/reference/skills/respond-pr' },
             { text: 'mk:elicit', link: '/reference/skills/elicit' },
             { text: 'mk:nyquist', link: '/reference/skills/nyquist' },
             { text: 'mk:cso', link: '/reference/skills/cso' },

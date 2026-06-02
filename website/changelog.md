@@ -14,6 +14,24 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.10.2 (2026-06-02) — PR Review + Response Skills
+
+### Highlights
+
+Two single-purpose PR-collaboration skills join the reviewer's toolkit. `mk:review-pr` gives a fast shallow verdict on someone else's PR, and `mk:respond-pr` triages the comments you receive with verify-before-agree discipline. Both are read-only on code and only write to GitHub when you opt in with `--reply`.
+
+### New Skills
+
+| Skill           | Purpose                                                                                                                                          |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mk:review-pr`  | Reviews a GitHub PR with a single shallow correctness/security/breaking/AI-slop checklist and emits a verdict; optionally posts it via `gh pr review`. |
+| `mk:respond-pr` | Triages reviewer comments on a PR with receiving-review discipline — verify each against the codebase, then accept/push-back/clarify, and optionally reply in-thread. |
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the two new skills.
+- No CLI package version bump is required for this release because the changed commits do not modify `packages/mewkit/src`.
+
 ## 2.10.1 (2026-06-02) — Brainstorming Rigor + Prompt Recipes
 
 ### Highlights

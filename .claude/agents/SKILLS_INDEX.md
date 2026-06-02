@@ -125,7 +125,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ### Phase 4 — Review
 
 ```toon
-[8]{skill,owner,type,architecture}
+[10]{skill,owner,type,architecture}
 `mk:review`|reviewer|review|**step-file** (4 steps)
 `mk:rubric`|evaluator|review|monolithic (v1.0.0: 7 rubrics + 4 composition presets at .claude/rubrics/, weighted graded grading with PASS/WARN/FAIL anchors and load/compose/validate scripts; frontend-app preset pruned to 4 distinctive rubrics in v2.0.0 per audit 260408)
 `mk:evaluate`|evaluator|review|**step-file** (v1.0.0: 5 steps — load-rubrics → boot-app → probe-criteria → grade-and-verdict → feedback-to-generator. Active-verification HARD GATE: validate-verdict.sh rejects PASS verdicts with empty evidence/. Skeptic persona enforced on every criterion grading.)
@@ -134,6 +134,8 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:trace-analyze`|researcher (3 parallel) + main agent synthesis|analysis|**step-file** (v1.0.0: 6 steps — ingest → partition → scatter → gather → suggestions → HITL gate. Reads `.claude/memory/trace-log.jsonl`, finds patterns via error-taxonomy, mandatory HITL approval. Anti-overfit threshold ≥3 occurrences.)
 `mk:benchmark`|orchestrator (invokes mk:autobuild per spec)|measurement|monolithic (v1.0.0: run/compare subcommands. Quick tier 5 tasks ≤$5; full tier 6 tasks ≤$30. Records to `.claude/benchmarks/results/{run-id}.json` + trace-log.jsonl. Backs the dead-weight audit with measured deltas.)
 `mk:elicit`|reviewer|review|monolithic
+`mk:review-pr`|reviewer|review|monolithic (v0.1.0: single shallow correctness/security/breaking/AI-slop pass on a GitHub PR → Summary/Risk/Findings/Verdict. Default prints; --reply posts via gh pr review. Read-only on code. Shallow lane vs mk:review's deep Gate-2 engine.)
+`mk:respond-pr`|reviewer|review|monolithic (v0.1.0: triage reviewer comments with receiving-review discipline — verify each vs codebase, then accept/push-back/clarify. Default dry; --reply posts in-thread. Never edits code — accepted items hand off to mk:fix.)
 ```
 
 ### Security (Phase 2, 4)
@@ -194,7 +196,7 @@ Documentation|4
 Memory|2
 Utility|12
 Cross-Cutting|5
-**Total**|**102**
+**Total**|**104**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

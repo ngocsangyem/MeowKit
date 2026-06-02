@@ -79,7 +79,7 @@ Phase 6: Reflect ─→ documenter loads: documentation, memory
 | architect      | 1      | plan-creator (ADR references)                                          |
 | tester         | 2      | testing, lint-and-validate, qa, qa-manual, nyquist                     |
 | developer      | 3      | development, typescript, vue, frontend-design, clean-code, docs-finder |
-| reviewer       | 4      | review, elicit, scout, cso, vulnerability-scanner                      |
+| reviewer       | 4      | review, review-pr, respond-pr, elicit, scout, cso, vulnerability-scanner |
 | evaluator      | 3, 4   | evaluate, rubric, trace-analyze, benchmark                             |
 | security       | 2, 4   | cso, vulnerability-scanner, skill-template-secure                      |
 | shipper        | 5      | ship, careful                                                          |

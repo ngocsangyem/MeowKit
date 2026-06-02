@@ -413,6 +413,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.10.2 | 2026-06-02 | PR Review + Response Skills                      |
 | v2.10.1 | 2026-06-02 | Brainstorming Rigor + Prompt Recipes            |
 | v2.9.14 | 2026-05-30 | Autobuild rename + mk:loop                       |
 | v2.9.13 | 2026-05-30 | Fix Gate Parity & Workflow Evidence Index        |

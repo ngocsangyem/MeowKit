@@ -20,6 +20,8 @@ Advisory only — does not change agent-detector scoring or output format.
 | Something broke, debugging | Verify | mk:investigate, mk:fix |
 | Browser testing needed | Verify | mk:agent-browser, mk:qa |
 | Reviewing code quality | Review | mk:review |
+| Review a GitHub PR, give a verdict on someone's pull request | Review | mk:review-pr (shallow single-pass; NOT a deep audit of your own diff — see mk:review) |
+| Respond to / triage reviewer comments received on a PR | Review | mk:respond-pr (verify-before-agree; hands accepted fixes to mk:fix) |
 | Security audit | Review | mk:cso |
 | Simplify/refactor code | Review | mk:simplify |
 | Optimize a measurable metric (coverage %, bundle size, lint count, latency) through bounded git-tracked iterations | Build | mk:loop (keep/revert per scalar metric; NOT for subjective cleanup — see mk:cook) |
