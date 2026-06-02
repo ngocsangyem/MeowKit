@@ -40,9 +40,13 @@ Read only files matching these patterns. Listed in priority order:
 docs/project-context.md
 docs/*.md
 CLAUDE.md
+AGENTS.md
 */CLAUDE.md
+**/CLAUDE.md
+**/AGENTS.md
 README.md
 */README.md
+**/README.md
 package.json
 pyproject.toml
 Cargo.toml

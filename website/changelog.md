@@ -14,6 +14,31 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.10.1 (2026-06-02) — Brainstorming Rigor + Prompt Recipes
+
+### Highlights
+
+Two planning-adjacent skills get tighter boundaries. `mk:brainstorming` now challenges its own idea set before recommending, while `mk:prompt-enhancer` gains recipe-mode routing for architecture-review and research-style prompts without turning into a reviewer or researcher.
+
+### Features
+
+- `mk:prompt-enhancer` architecture-review recipe — `--analyze --deep` can rewrite a draft prompt so it asks for architecture findings with severity, evidence, and decisions-needed while the enhancer itself emits no findings.
+- `mk:prompt-enhancer` research recipe — discovery prompts now get grounding, attention-anchored ordering, and explicit acceptance criteria while leaving actual research to `mk:scout` or the downstream agent.
+- `mk:prompt-enhancer` recipe canaries — architecture-review and research prompt canaries guard against role confusion, alongside updated eval-suite guidance for manual LLM-judged checks.
+
+### Improvements
+
+- `mk:brainstorming` now runs a challenge pass before recommendation, checking duplicate architectures, hard-constraint violations, category diversity, conservative drift, and missing stakeholder failure modes.
+- `mk:brainstorming` now tracks context budget explicitly, keeping scout bridge summaries, rejected alternatives, and handoff packets compact instead of passing full transcripts downstream.
+- `mk:brainstorming` reports now self-check for problem, binding constraint, success criterion, excluded scope, technique choice, challenge result, recommendation evidence, and handoff completeness.
+- `mk:prompt-enhancer` mode routing is now centralized, with default, analyze, score, deep, architecture-review, and research behavior documented in one reference.
+- `mk:prompt-enhancer --deep` clarifies that the local scanner is a bounded hint source and broad repository mapping remains `mk:scout`.
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the updated skill contracts, reference docs, and canaries.
+- No CLI package version bump is required for this release because the changed commits do not modify `packages/mewkit/src`.
+
 ## 2.9.14 (2026-05-30) — Autobuild Rename + mk:loop
 
 ### Highlights

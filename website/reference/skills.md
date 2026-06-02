@@ -29,8 +29,8 @@ Skills for planning, research, and ideation.
 | `mk:validate-plan` | 8-dimension plan quality check before Phase 2 |
 | `mk:plan-ceo-review` | CEO-mode plan review (product lens + engineering lens) |
 | `mk:office-hours` | YC-style brainstorming (startup + builder modes) |
-| `mk:brainstorming` | Structured ideation with scoring and plan-creator handoff |
-| `mk:prompt-enhancer` | Refine a draft user prompt — default emits only the rewrite. `--analyze` adds decomposition, detected issues, and suggestions; `--score` adds a deterministic 1–10 quality rating; `--deep` adds an opt-in codebase scout |
+| `mk:brainstorming` | Structured ideation with challenge pass, convergence checks, scoring, and compact plan-creator handoff |
+| `mk:prompt-enhancer` | Refine a draft user prompt — default emits only the rewrite; `--analyze`, `--score`, `--deep`, and recipe routing cover diagnostics, scoring, bounded context hints, architecture-review prompts, and research prompts |
 | `mk:decision-framework` | Triage, escalation, and case management for architecture decisions |
 | `mk:api-design` | REST/GraphQL API design patterns |
 

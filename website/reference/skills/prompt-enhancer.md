@@ -15,6 +15,7 @@ Takes a draft user prompt and emits a **mode-aware** markdown output:
   2. **Identified issues** — scores the input against a fixed 10-item weakness checklist; lists only FOUND issues, citing the exact text fragment that triggered each.
   3. **Improvement suggestions** — one fix per finding, drawn from a citation-grounded playbook.
 - **`--analyze --score`** — inserts a `Score: N/10` block (deterministic rubric) between the suggestions and the rewrite.
+- **Recipe routing** — architecture-review and research-style drafts layer on existing modes. They reshape the rewritten prompt, but the enhancer never performs the architecture review or the research itself.
 
 The **Rewritten prompt** (Section 4 in every mode) is the universal kernel populated with the user's intent, plain markdown headings only, with auto-suggested **Freedom level** (`LOW` / `MEDIUM` / `HIGH`) and **Verbosity** (`terse` / `structured` / `confirmation`).
 
@@ -27,6 +28,8 @@ The rewrite is model-agnostic by construction. Works on Claude, GPT/Codex, and G
 - **You want a numeric quality score on the original** — pass `--score` (auto-promotes to `--analyze --score`) for a deterministic 1–10 rating with rubric breakdown.
 - **Prompt is coupled to one model's framing** — XML tags, role-as-XML, "think step by step", `apply_patch`, "Reasoning: high". Detection item `#10` flags model-coupling; the rewrite strips it.
 - **Codebase-aware suggestions wanted** — pass `--deep` to scout allow-listed sources (`docs/project-context.md`, `CLAUDE.md`, repo file-tree paths, public docstrings) for `[FILL-IN]` placeholder candidates. Suggestions are parenthetical and never auto-substituted.
+- **Architecture-review prompt needs sharpening** — use `--analyze --deep`; the recipe asks the downstream reviewer for findings, severity, evidence, and decisions-needed without producing findings itself.
+- **Research or discovery prompt needs grounding** — the research recipe frames discovery acceptance criteria and long-content ordering while leaving retrieval to `mk:scout` or the downstream agent.
 
 ## When NOT to Use
 
@@ -57,6 +60,9 @@ The rewrite is model-agnostic by construction. Works on Claude, GPT/Codex, and G
 /mk:prompt-enhancer --deep <draft prompt text>
 /mk:prompt-enhancer --analyze --score --deep <draft prompt text>
 
+# Architecture-review recipe (rewrites the prompt, does not perform review)
+/mk:prompt-enhancer --analyze --deep <architecture-review draft>
+
 # Save to a custom path
 /mk:prompt-enhancer --save-to <path> <draft prompt text>
 ```
@@ -74,6 +80,8 @@ The skill **does not accept a `--model` flag.** Per the synthesis report (see so
 | `--analyze --score` | Sections 1, 2, 3 + **Score: N/10** block + Section 4 |
 | `--score` (alone) | Auto-promoted to `--analyze --score` |
 | `--deep` (any mode) | Appends "Suggested context" sub-block to Section 4 when scout returns ≥1 hit |
+| Architecture-review recipe | Layered on `--analyze --deep`; asks the downstream reviewer for findings, trade-offs, and recommendation |
+| Research recipe | Layered on prompt shape; frames discovery and grounding without doing retrieval |
 
 ## Workflow
 
@@ -83,6 +91,17 @@ The skill **does not accept a `--model` flag.** Per the synthesis report (see so
 4. **Scout** *(when `--deep`)* — invoke `mk:scout` with allow-list filter; ≤8 files / ≤100 lines/file / ≤30s wall clock; default-deny against `.claude/memory/*`, `.env*`, `tasks/`, secrets.
 5. **Map** — pick exactly one fix per FOUND issue from the playbook; preserve user intent verbatim; emit `[FILL-IN: <description>]` placeholders for unknown values.
 6. **Rewrite** — populate the universal kernel; auto-suggest freedom level and verbosity; never apply model overlays.
+
+## Recipe Modes
+
+Recipes are documented framings on top of existing modes. They add no new flags and no new repository reads.
+
+| Recipe | Use when | Output emphasis | Boundary |
+|---|---|---|---|
+| Architecture review | The draft asks to assess an existing design and `--analyze --deep` is active | Context prioritizes ADRs, architecture docs, public interfaces, and constraints; acceptance criteria ask for severity, evidence, and decisions-needed; output asks for findings -> trade-offs -> recommendation | The skill rewrites the prompt to ask for a review. It emits no findings, severities, or recommendations of its own. |
+| Research / discovery | The draft asks a downstream agent to discover, compare, or investigate | Long data appears before the ask; acceptance criteria require grounded findings, sources, unknowns, and next-step options | The skill performs no research or retrieval. Use `mk:scout` or a downstream research agent for that work. |
+
+Canaries #11 and #12 guard these boundaries in the eval suite.
 
 ## The 10 Detection Items
 
@@ -117,7 +136,7 @@ Bounded codebase scout. Surfaces `[FILL-IN]` candidates from allow-listed source
 
 | Aspect | Value |
 |---|---|
-| Allow-list | `docs/project-context.md`, `docs/*.md`, `CLAUDE.md`, `README.md`, top-level metadata (`package.json`, `pyproject.toml`, etc.), source files in `**/*.{ts,tsx,js,jsx,py,go,rs,java,rb,kt,swift,vue}` |
+| Allow-list | `docs/project-context.md`, `docs/*.md`, `CLAUDE.md`, `AGENTS.md`, nested `CLAUDE.md` / `AGENTS.md` / `README.md`, top-level metadata (`package.json`, `pyproject.toml`, etc.), source files in `**/*.{ts,tsx,js,jsx,py,go,rs,java,rb,kt,swift,vue}` |
 | Forbid-list (default-deny) | `.claude/memory/*`, `.env*`, `tasks/`, `~/.ssh/`, `*.pem`, `*.key`, `*credentials*`, `*secret*`, anything matched by `.gitignore` |
 | Hard caps | ≤8 files, ≤100 lines per file, ≤30 s wall clock |
 | Output | Path + top-level symbol names + 1-line public docstring summary. **Never** the file body. |
