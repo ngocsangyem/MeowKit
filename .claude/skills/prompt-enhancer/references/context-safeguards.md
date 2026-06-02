@@ -141,6 +141,17 @@ Trigger conditions (any one):
 - User explicitly asks about context-loss resilience.
 - Detection items #7 (laundry-list), #8 (mixed instructions/data), #9 (wrong section ordering) all FOUND on the same input — indicates structural failure that warrants the full safeguard set.
 
+### Precedence vs detections #7 / #8 / #9 (no double-firing)
+
+A *single* detection (#7, #8, or #9 alone) fires only its own `playbook.md`
+fix — the embedded CONSTRAINTS / fence / re-order line in the rewrite. It does
+**not** pull in this file. This safeguards file loads only on the explicit
+long-horizon signals above, OR when #7 **and** #8 **and** #9 fire together on
+the same input (the structural-failure case). So a lone laundry-list (#7) does
+not double-fire both the playbook fix and the full safeguard set — the playbook
+fix handles it; the safeguard set is reserved for the long-horizon / structural
+cases.
+
 When triggered, the skill cites the relevant safeguard in section 3 of the
 output and (when applicable) embeds the recommendation as a CONSTRAINTS line in
 the rewritten prompt.

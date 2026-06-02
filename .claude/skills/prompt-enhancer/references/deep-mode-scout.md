@@ -47,11 +47,15 @@ package.json
 pyproject.toml
 Cargo.toml
 go.mod
-**/*.{ts,tsx,js,jsx,mjs,cjs,py,pyi,go,rs,java,class,rb,kt,kts,swift,c,h,cpp,hpp,cc,cxx,hxx,cs,php,scala,sc,dart,lua,sh,bash,zsh,fish,ps1,psm1,r,jl,nim,zig,v,hs,ml,mli,clj,cljs,cljc,ex,exs,erl,hrl,f90,f95,f03,asm,s,sql,html,htm,css,scss,sass,less,vue,svelte,json,jsonc,json5,yaml,yml,toml,ini,conf,env,xml,xsd,xsl,graphql,gql,proto,md,mdx,txt,adoc,dockerfile,Dockerfile,makefile,Makefile,cmake,gradle,tf,hcl,lock,csv,tsv,ipynb,wasm,wgsl,glsl,vert,frag,ejs,pug,haml,twig,handlebars,hbs,liquid}
+**/*.{ts,tsx,js,jsx,py,go,rs,java,rb,kt,swift,vue}
 ```
 
 Notes:
 
+- Source extensions mirror `scripts/scout-context.py` `SOURCE_EXTENSIONS` exactly.
+  The script is the authoritative reach — the doc must never advertise an
+  extension the scanner cannot read. Widening this set requires red-team
+  re-confirm per this file's header (the 2/3 Rule-of-Two posture depends on it).
 - `package.json` etc. are top-level metadata only — **do not** read lock files
   (`package-lock.json`, `yarn.lock`, `Cargo.lock`, `composer.lock`, `Gemfile.lock`, `pnpm-lock.yaml`).
 - Source files (`*.ts`, `*.py`, …) are read for **first 100 lines max** each.
@@ -184,8 +188,15 @@ The enhancer calls `mk:scout` with:
 
 Then post-filters the result through this allow-list AND forbid-list.
 
-**Do not duplicate `mk:scout`'s discovery logic.** The enhancer is a consumer,
-not a re-implementation.
+**`scripts/scout-context.py` is a bounded hint scanner, not a `mk:scout`
+replacement.** It is the fallback hint source used when a full `mk:scout`
+invocation is unavailable or over-budget; it performs the same
+allow/forbid-filtered, capped walk and inherits this file's allow-list,
+forbid-list, and hard caps. When `mk:scout` is available and within budget,
+prefer it and post-filter its result through the same lists. Either path
+surfaces identifier-only hits — neither broadens the reach beyond the contract
+above. The enhancer remains a *consumer* of bounded discovery, never a broad
+codebase mapper (that is `mk:scout`'s own job).
 
 ---
 

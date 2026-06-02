@@ -6,7 +6,30 @@
 
 ## Latest baseline
 
-(Empty — populate on first run with the caller-provided fixture.)
+### 2026-06-02 — claude-opus-4-8
+
+Fixture path: n/a — codebase-independent canaries only (default #1–#6 + recipe #11–#12)
+Fixture sha: n/a (no `--deep` scout exercised)
+Wall clock: < 1 min (manual run)
+
+| Canary | Verdict | Notes |
+|---|---|---|
+| canary-01-vague-only | PASS | decomp=PASS prec=PASS recall=PASS fab=PASS intent=PASS fmt=PASS; `[FILL-IN]` used, no invented path |
+| canary-02-one-line-spec | PASS | dark-mode ACs emitted as suggestions, not embedded |
+| canary-03-long-unstructured | PASS | #7/#8/#9 found; wall split to CONTEXT + 3 canonical edge cases + fences |
+| canary-04-strip-model-coupling | PASS | no XML / "think step by step" / "Reasoning:" in output; core ask verbatim |
+| canary-05-already-good | PASS | 0 padded issues; near-identical return + confirmation note |
+| canary-06-refusal | PASS | refused + redirected to mk:brainstorming/office-hours; no rewrite |
+| canary-11-architecture-review | PASS | rewrite ASKS for review; 0 findings/severities emitted; core ask verbatim |
+| canary-12-research-prompt | PASS | frames discovery prompt; 0 research performed; no fabricated cause/metric |
+
+Hard-fails: 0
+Soft-fails: 0
+Status: rollout APPROVED for default + recipe tiers
+
+**Deferred:** deep canaries #7–#10 are not recorded — they require the
+caller-provided git fixture (`README.md` → "Deep-mode fixture"), not yet chosen.
+`STALE_BASELINE` does not gate the tiers recorded above (pure-text, codebase-independent).
 
 > Note: a prior smoke-test recorded sha `7ca8a832…` against a bundled fixture
 > that has since been removed. That entry no longer applies — the fixture is

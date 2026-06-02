@@ -34,6 +34,7 @@ Canonical registry of every meowkit skill, its activation triggers, callers, and
 | `mk:scout` | Pre-review on COMPLEX changes; user via `/mk:scout` | `reviewer` agent; user | "scout the codebase", "find related files" |
 | `mk:agent-browser` | User invocation; `mk:evaluate` step-03 for frontend probes | `evaluator` agent; user | "navigate to", "click on", "test this URL" |
 | `mk:playwright-cli` | User invocation; `mk:evaluate` step-03 for scripted flows | `evaluator` agent; user | "run playwright script", "automated browser test" |
+| `mk:prompt-enhancer` | User invocation; explicit prompt-refinement phrases | User; optional pre-plan handoff | "enhance prompt", "optimize prompt", "make this prompt better", "rewrite this prompt" |
 
 ## Rubric Library Triggers (Phase 2)
 

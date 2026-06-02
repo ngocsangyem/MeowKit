@@ -3,11 +3,10 @@
 > Loaded by `mk:prompt-enhancer` during Step 3 (Improvement Mapping). One row per
 > detection item from `decomposition-checklist.md`. Every fix cites a source doc.
 >
-> **Framework:** universal kernel only. The rewrite uses plain markdown
-> sections (Goal / Context / Constraints / Acceptance Criteria / Output
-> Format) and works across coding agents without model dispatch. See
-> `plans/reports/synthesis-260509-2058-prompting-framework.md` for the
-> canonical kernel. The skill does NOT have a `--model` flag.
+> **Framework:** universal kernel only — the authoritative rule lives in
+> `SKILL.md` Hard Constraints item 4 (plain-markdown sections, no XML / vendor
+> tokens / model overlays, no `--model` flag). Canonical derivation:
+> `plans/reports/synthesis-260509-2058-prompting-framework.md`.
 
 ## Contents
 

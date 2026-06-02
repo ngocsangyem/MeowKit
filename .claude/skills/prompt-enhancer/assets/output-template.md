@@ -3,8 +3,8 @@
        --analyze           → Template B: full analysis + rewrite (4 sections)
        --analyze --score   → Template C: full analysis + Score + rewrite
      `--score` alone is auto-promoted to `--analyze --score`.
-     Output is the universal kernel — plain markdown only. No XML, no
-     vendor tokens, no model overlays. Sections are fixed; do not reorder. -->
+     Output is the universal kernel (authoritative rule: SKILL.md Hard
+     Constraints item 4). Sections are fixed; do not reorder. -->
 
 ---
 
@@ -186,3 +186,23 @@ NOT the rewrite. Formula lives in `references/playbook.md` Scoring Rubric.
 - ...
 
 > Deep-mode footer: codebase snapshot `<git-sha>`; `docs/project-context.md` last updated `<YYYY-MM-DD>`.
+
+---
+
+## Optional — Architecture-review OUTPUT FORMAT block (recipe)
+
+<!-- Used ONLY by the architecture-review recipe (references/architecture-review-mode.md)
+     under --analyze --deep. Drop-in replacement for the OUTPUT FORMAT section
+     inside the Section-4 code block. It rewrites the prompt to ASK for a review;
+     the skill never emits findings itself. -->
+
+```
+OUTPUT FORMAT:
+Freedom level: HIGH  ← reason: judgment task — assess, don't follow a procedure
+Verbosity: structured
+Shape:
+- FINDINGS: each as `<severity: blocker|major|minor> — <claim> (evidence: <file/symbol>)`.
+- TRADE-OFFS: for each contested finding, the options weighed and what each costs.
+- RECOMMENDATION: one paragraph + the decisions the reader must now make.
+- No code edits — this prompt requests an assessment, not an implementation.
+```

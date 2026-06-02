@@ -40,8 +40,7 @@ Refine a draft user prompt using a 5-step framework — mode-select, decompose,
 detect, (scout if `--deep`), map, rewrite — grounded in 7 source docs
 <!-- research-citation -->
 (Anthropic / OpenAI Codex / FactoryAI prompting + Anthropic context-engineering
-+ skill-authoring rules). The rewrite uses the **universal kernel** only:
-plain markdown sections, no XML tags, no vendor tokens, no model overlays.
++ skill-authoring rules). The rewrite uses the **universal kernel** only (the rule is Hard Constraints item 4).
 
 ## When to use
 
@@ -51,6 +50,7 @@ plain markdown sections, no XML tags, no vendor tokens, no model overlays.
 - Want a numeric quality score on the original prompt: append `--score` (auto-promotes to `--analyze --score`).
 - For codebase-aware suggestions: append `--deep` (opt-in only).
 - Explicit: `/mk:prompt-enhancer [--analyze] [--score] [--deep] [--save-to <path>] [text]`.
+- Architecture-review prompts: use the recipe in `references/architecture-review-mode.md` via `--analyze --deep` — it rewrites the prompt to ASK for a review; it never performs one (that is `mk:review`). Recipe is opt-in via those flags; default-mode output is unchanged.
 
 ## When NOT to use
 
@@ -63,9 +63,9 @@ plain markdown sections, no XML tags, no vendor tokens, no model overlays.
 ## Workflow
 
 Mode-Select → Decompose → Detect → (Scout if `--deep`) → Map → Rewrite.
-Detail in `references/decomposition-checklist.md`, `references/playbook.md`,
-`references/context-safeguards.md`, and `references/deep-mode-scout.md`. Do not
-invent steps.
+Mode selection + the arch-review / research recipes: `references/mode-routing.md`.
+Step detail in `references/decomposition-checklist.md`, `references/playbook.md`,
+`references/context-safeguards.md`, `references/deep-mode-scout.md`. Do not invent steps.
 
 ## Inputs
 
@@ -92,14 +92,14 @@ Mode-aware. See `assets/output-template.md` for the templates.
 | `--score` (alone) | Auto-promoted to `--analyze --score` |
 | `--deep` (any mode) | Appends "Suggested context" sub-block to Section 4 when scout returns ≥1 hit |
 
-Internal decomposition + detection still run in default mode — they feed the
-rewrite — but they are NOT emitted unless `--analyze` is set. The OUTPUT
-FORMAT line inside the rewrite always carries the auto-suggested **Freedom
-level** (LOW / MEDIUM / HIGH) and **Verbosity** (terse / structured /
-confirmation).
+Internal decomposition + detection still run in default mode (they feed the
+rewrite) but are emitted only with `--analyze`. The rewrite's OUTPUT FORMAT line
+always carries the auto-suggested **Freedom level** (LOW/MEDIUM/HIGH) and
+**Verbosity** (terse/structured/confirmation) — see below.
 
 ## References
 
+- `references/mode-routing.md` — mode-selection table (default / analyze / score / deep) + the arch-review and research recipes (links to `architecture-review-mode.md`).
 - `references/decomposition-checklist.md` — 5 components + 10-item weakness checklist.
 - `references/playbook.md` — improvement fixes, one per checklist item, with doc citation. Includes the deterministic **Scoring Rubric** used by `--score`.
 - `references/context-safeguards.md` — 6 model-agnostic safeguards (right-altitude tone, identifier-based context, long-horizon defenses, tool-result clearing, bloat avoidance, eval discipline). Loaded JIT when input shows long-horizon signals or codebase-context references.
@@ -128,8 +128,8 @@ Default mode (always):
    `.env*`, `tasks/`, secrets).
 10. **Suggest, never substitute.** Scout outputs go in `[FILL-IN: <desc> (suggested: <path>)]`
     brackets. The user is the source of truth.
-11. **Bounded scout.** ≤8 files, ≤100 lines/file, ≤30s wall clock. Exceed → abort with
-    `SCOUT_BUDGET_EXCEEDED`; fall back to default mode.
+11. **Bounded scout.** ≤8 files, ≤100 lines/file, ≤30s. On any cap / no-git /
+    zero-match, follow the Fallback Policy in `references/deep-mode-scout.md` (never reads forbidden files).
 
 The `Skill` tool entry in `allowed-tools` is reserved for invoking `mk:scout`
 under `--deep` only — not a license to spawn other skills.

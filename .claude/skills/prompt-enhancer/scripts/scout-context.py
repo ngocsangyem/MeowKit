@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""scout-context.py — bounded read-only codebase scanner for mk:prompt-enhancer --deep.
+"""scout-context.py — bounded hint scanner for mk:prompt-enhancer --deep.
+
+Role: a fallback HINT source, NOT a mk:scout replacement. It is used when a
+full mk:scout invocation is unavailable or over-budget; it performs the same
+allow/forbid-filtered, capped walk and inherits the contract in
+`references/deep-mode-scout.md`. When mk:scout is available and within budget,
+prefer it and post-filter its result through the same lists. The enhancer is a
+consumer of bounded discovery, never a broad codebase mapper (that is mk:scout).
 
 Enforces the allow-list / forbid-list / hard caps spec'd in
 `references/deep-mode-scout.md`. Default-deny: a path must survive the
@@ -44,8 +51,10 @@ ALLOW_LIST = [
     "docs/project-context.md",
     "docs/*.md",
     "CLAUDE.md",
+    "AGENTS.md",
     "*/CLAUDE.md",
     "**/CLAUDE.md",
+    "**/AGENTS.md",
     "README.md",
     "*/README.md",
     "**/README.md",
