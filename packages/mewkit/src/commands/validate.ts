@@ -7,6 +7,9 @@ import { isHookScript } from "../core/is-hook-script.js";
 import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
 import { checkOwnership } from "../core/build-inventory.js";
 import { checkPacks } from "../core/check-packs.js";
+import { analyzeCodexRuleSource } from "../migrate/converters/index.js";
+import { discoverRules, discoverSkills } from "../migrate/discovery/index.js";
+import { buildPortableSkillsByProvider } from "../migrate/portability-policy.js";
 import type { Status } from "./doctor-checks.js";
 
 // validate reports STRUCTURE & WIRING only — that gate files exist and are wired, not that
@@ -202,6 +205,91 @@ function checkPortability(): CheckResult[] {
 	return results;
 }
 
+function countFiles(dir: string, predicate: (name: string, fullPath: string) => boolean): number {
+	if (!fs.existsSync(dir)) return 0;
+	let count = 0;
+	for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+		if (entry.name.startsWith(".")) continue;
+		const fullPath = path.join(dir, entry.name);
+		if (entry.isDirectory()) {
+			count += countFiles(fullPath, predicate);
+		} else if (entry.isFile() && predicate(entry.name, fullPath)) {
+			count += 1;
+		}
+	}
+	return count;
+}
+
+function countSkillDirs(dir: string): number {
+	if (!fs.existsSync(dir)) return 0;
+	return fs
+		.readdirSync(dir, { withFileTypes: true })
+		.filter((entry) => entry.isDirectory() && fs.existsSync(path.join(dir, entry.name, "SKILL.md"))).length;
+}
+
+function projectionCountResult(name: string, expected: number, actual: number, detail: string): CheckResult {
+	return {
+		name,
+		status: expected === 0 || actual >= expected ? "pass" : "fail",
+		detail: expected === 0 ? `${detail} — no portable source items expected.` : `${detail}: expected ${expected}, found ${actual}.`,
+		section: "Portability",
+	};
+}
+
+export async function checkCodexProjection(projectRoot: string): Promise<CheckResult[]> {
+	const codexDir = path.join(projectRoot, ".codex");
+	const skillsDir = path.join(projectRoot, ".agents", "skills");
+	if (!fs.existsSync(codexDir) && !fs.existsSync(skillsDir)) return [];
+
+	const results: CheckResult[] = [
+		{
+			name: "Codex projection: AGENTS.md",
+			status: ok(fs.existsSync(path.join(projectRoot, "AGENTS.md"))),
+			detail: "Codex project instructions file",
+			section: "Portability",
+		},
+		{
+			name: "Codex projection: unsupported command dirs absent",
+			status: ok(!fs.existsSync(path.join(codexDir, "commands")) && !fs.existsSync(path.join(codexDir, "prompts"))),
+			detail: "Codex custom command directories are not documented; migration must not emit them.",
+			section: "Portability",
+		},
+	];
+
+	const sourceRulesDir = path.join(projectRoot, ".claude", "rules");
+	if (fs.existsSync(sourceRulesDir)) {
+		const sourceRules = await discoverRules(sourceRulesDir);
+		const expectedRules = sourceRules.filter((rule) => analyzeCodexRuleSource(rule).kind !== "unsupported").length;
+		const actualRules = countFiles(path.join(codexDir, "rules"), (name) => name.endsWith(".rules"));
+		results.push(
+			projectionCountResult(
+				"Codex projection: command-policy rules",
+				expectedRules,
+				actualRules,
+				"Translated source rules with Codex-compatible command policies",
+			),
+		);
+	}
+
+	const sourceSkillsDir = path.join(projectRoot, ".claude", "skills");
+	if (fs.existsSync(sourceSkillsDir)) {
+		const sourceSkills = await discoverSkills(sourceSkillsDir);
+		const portableSkills = await buildPortableSkillsByProvider(sourceSkills, ["codex"]);
+		const expectedSkills = portableSkills.skillsByProvider.get("codex")?.length ?? 0;
+		const actualSkills = countSkillDirs(skillsDir);
+		results.push(
+			projectionCountResult(
+				"Codex projection: portable skills",
+				expectedSkills,
+				actualSkills,
+				"Runtime-compatible source skill folders",
+			),
+		);
+	}
+
+	return results;
+}
+
 function statusIcon(status: Status): string {
 	switch (status) {
 		case "pass":
@@ -266,6 +354,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		];
 		if (args.portable) {
 			results.push(...checkPortability());
+			results.push(...(await checkCodexProjection(projectRoot)));
 		}
 	}
 

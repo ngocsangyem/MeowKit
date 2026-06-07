@@ -24,6 +24,36 @@ const TRANSLATION_RULES: Array<{ test: RegExp; build: () => CodexRuleMapping[] }
 		],
 	},
 	{
+		test: /Blocked patterns:\s*(?:.|\n)*`curl`,\s*`wget`,\s*`fetch`\s+to domains not specified in the task/i,
+		build: () => [
+			{
+				pattern: ["curl"],
+				decision: "prompt",
+				justification: "Network egress must be relevant to the current task.",
+			},
+			{
+				pattern: ["wget"],
+				decision: "prompt",
+				justification: "Network egress must be relevant to the current task.",
+			},
+			{
+				pattern: ["fetch"],
+				decision: "prompt",
+				justification: "Network egress must be relevant to the current task.",
+			},
+		],
+	},
+	{
+		test: /Blocked patterns:\s*(?:.|\n)*Base64 encoding of file contents/i,
+		build: () => [
+			{
+				pattern: ["base64"],
+				decision: "prompt",
+				justification: "Encoding file contents can be used for exfiltration; verify task relevance.",
+			},
+		],
+	},
+	{
 		test: /`rm\s+-rf`|`git\s+reset\s+--hard`/i,
 		build: () => [
 			{
