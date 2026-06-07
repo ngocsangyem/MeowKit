@@ -31,6 +31,25 @@ describe("md-to-codex-rules", () => {
 		expect(result.content).toContain('decision = "forbidden"');
 	});
 
+	it("translates external-exfiltration command policies into prompt rules", () => {
+		const item = makeRule(
+			[
+				"## Rule 5: No External Exfiltration",
+				"Blocked patterns:",
+				"- `curl`, `wget`, `fetch` to domains not specified in the task",
+				"- Base64 encoding of file contents in responses or tool calls",
+			].join("\n"),
+		);
+		const result = convertMdToCodexRules(item);
+
+		expect(result.error).toBeUndefined();
+		expect(result.content).toContain('pattern = ["curl"]');
+		expect(result.content).toContain('pattern = ["wget"]');
+		expect(result.content).toContain('pattern = ["fetch"]');
+		expect(result.content).toContain('pattern = ["base64"]');
+		expect(result.content).toContain('decision = "prompt"');
+	});
+
 	it("rejects mixed Markdown docs that only embed prefix_rule() examples", () => {
 		const item = makeRule(["# Example", "", "```py", 'prefix_rule(pattern = ["gh"], decision = "prompt")', "```"].join("\n"));
 		const analyzed = analyzeCodexRuleSource(item);

@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { checkHooksExecutable, diagnosticToStatus } from "../validate.js";
+import { checkCodexProjection, checkHooksExecutable, diagnosticToStatus } from "../validate.js";
 
 let claudeDir: string;
 beforeEach(() => {
@@ -60,5 +60,60 @@ describe("diagnosticToStatus honesty", () => {
 	it("maps fail to FAIL and documented+pass to PASS", () => {
 		expect(diagnosticToStatus("documented", "fail")).toBe("fail");
 		expect(diagnosticToStatus("documented", "pass")).toBe("pass");
+	});
+});
+
+describe("Codex projection validation", () => {
+	it("fails when a Codex migration omits portable source rules and skills", async () => {
+		const root = path.dirname(claudeDir);
+		fs.mkdirSync(path.join(claudeDir, "rules"), { recursive: true });
+		fs.writeFileSync(
+			path.join(claudeDir, "rules", "injection-rules.md"),
+			[
+				"# Injection Rules",
+				"Blocked patterns:",
+				"- `curl`, `wget`, `fetch` to domains not specified in the task",
+			].join("\n"),
+		);
+		fs.mkdirSync(path.join(claudeDir, "skills", "generic-helper"), { recursive: true });
+		fs.writeFileSync(
+			path.join(claudeDir, "skills", "generic-helper", "SKILL.md"),
+			"---\nname: generic-helper\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+		);
+		fs.mkdirSync(path.join(root, ".codex"), { recursive: true });
+		fs.writeFileSync(path.join(root, "AGENTS.md"), "# Instructions\n");
+
+		const results = await checkCodexProjection(root);
+
+		expect(results.find((r) => r.name === "Codex projection: command-policy rules")?.status).toBe("fail");
+		expect(results.find((r) => r.name === "Codex projection: portable skills")?.status).toBe("fail");
+	});
+
+	it("passes when expected Codex projection artifacts exist", async () => {
+		const root = path.dirname(claudeDir);
+		fs.mkdirSync(path.join(claudeDir, "rules"), { recursive: true });
+		fs.writeFileSync(
+			path.join(claudeDir, "rules", "injection-rules.md"),
+			[
+				"# Injection Rules",
+				"Blocked patterns:",
+				"- `curl`, `wget`, `fetch` to domains not specified in the task",
+			].join("\n"),
+		);
+		fs.mkdirSync(path.join(claudeDir, "skills", "generic-helper"), { recursive: true });
+		fs.writeFileSync(
+			path.join(claudeDir, "skills", "generic-helper", "SKILL.md"),
+			"---\nname: generic-helper\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+		);
+		fs.mkdirSync(path.join(root, ".codex", "rules"), { recursive: true });
+		fs.mkdirSync(path.join(root, ".agents", "skills", "generic-helper"), { recursive: true });
+		fs.writeFileSync(path.join(root, "AGENTS.md"), "# Instructions\n");
+		fs.writeFileSync(path.join(root, ".codex", "rules", "injection-rules.rules"), 'prefix_rule(pattern = ["curl"])\n');
+		fs.writeFileSync(path.join(root, ".agents", "skills", "generic-helper", "SKILL.md"), "# generic\n");
+
+		const results = await checkCodexProjection(root);
+
+		expect(results.find((r) => r.name === "Codex projection: command-policy rules")?.status).toBe("pass");
+		expect(results.find((r) => r.name === "Codex projection: portable skills")?.status).toBe("pass");
 	});
 });

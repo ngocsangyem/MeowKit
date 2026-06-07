@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { analyzeCodexRuleSource } from "./converters/index.js";
 import { classifyRuleSemantic } from "./ir/rule-classifier.js";
 import { providers } from "./provider-registry.js";
+import { auditSkillDirectory } from "./skill-directory-audit.js";
 import type { PortableItem, PortableType, ProviderType, SkillInfo } from "./types.js";
 import type { ReconcileAction, ReconcilePlan } from "./reconcile/reconcile-types.js";
 
@@ -81,6 +82,11 @@ function shouldSkipPortableItem(item: PortableItem, provider: ProviderType): Por
 	if (!RUNTIME_BOUND_ITEM_TYPES.has(item.type)) return null;
 
 	if (item.type === "rules") {
+		if (provider === "codex") {
+			const analyzed = analyzeCodexRuleSource(item);
+			if (analyzed.kind !== "unsupported") return null;
+		}
+
 		const classified = classifyRuleSemantic(item);
 		if (classified.kind === "orchestration") {
 			return {
@@ -101,14 +107,12 @@ function shouldSkipPortableItem(item: PortableItem, provider: ProviderType): Por
 
 		if (provider === "codex") {
 			const analyzed = analyzeCodexRuleSource(item);
-			if (analyzed.kind === "unsupported") {
-				return {
-					provider,
-					type: item.type,
-					item: item.name,
-					reason: analyzed.reason ?? "Unsupported Codex rule content",
-				};
-			}
+			return {
+				provider,
+				type: item.type,
+				item: item.name,
+				reason: analyzed.reason ?? "Unsupported Codex rule content",
+			};
 		}
 	}
 
@@ -136,24 +140,31 @@ export function summarizeRuleMigrationByProvider(
 		const configSurface = getProviderSurfaceContract(provider, "config");
 
 		for (const rule of rules) {
-			const classified = classifyRuleSemantic(rule);
-
 			if (provider === "claude-code") {
 				native += 1;
 				continue;
 			}
+
+			if (provider === "codex") {
+				const analyzed = analyzeCodexRuleSource(rule);
+				if (analyzed.kind !== "unsupported") {
+					native += 1;
+					continue;
+				}
+			}
+
+			const classified = classifyRuleSemantic(rule);
 
 			if (classified.kind === "orchestration" || classified.kind === "runtime-automation") {
 				skipped += 1;
 				continue;
 			}
 
+			// Codex requires native prefix_rule() format — rules that failed
+			// analyzeCodexRuleSource cannot use the documented rules surface.
 			if (provider === "codex") {
-				const analyzed = analyzeCodexRuleSource(rule);
-				if (analyzed.kind === "unsupported") {
-					skipped += 1;
-					continue;
-				}
+				skipped += 1;
+				continue;
 			}
 
 			if (ruleSurface.status === "documented") {
@@ -193,7 +204,7 @@ export function buildSkillDryRunMessages(
 		});
 }
 
-function shouldInstallSkillForProvider(skill: SkillInfo, provider: ProviderType): PortabilitySkip | null {
+async function shouldInstallSkillForProvider(skill: SkillInfo, provider: ProviderType): Promise<PortabilitySkip | null> {
 	if (provider === "claude-code") return null;
 	if (!FIRST_PASS_SKILL_PROVIDERS.has(provider)) {
 		return {
@@ -206,12 +217,11 @@ function shouldInstallSkillForProvider(skill: SkillInfo, provider: ProviderType)
 
 	const policy = skill.portability;
 	if (!policy) {
-		return {
-			provider,
-			type: "skill",
-			item: skill.name,
-			reason: "skill portability metadata missing; needs review before non-Claude install",
-		};
+		const signals = readSkillRuntimeSignals(skill);
+		if (signals.length > 0) {
+			return { provider, type: "skill", item: skill.name, reason: buildRuntimeBoundReason(signals) };
+		}
+		return await skipIfSkillDirectoryAuditFails(skill, provider);
 	}
 
 	if (policy.providers?.exclude?.includes(provider)) {
@@ -245,7 +255,19 @@ function shouldInstallSkillForProvider(skill: SkillInfo, provider: ProviderType)
 		return { provider, type: "skill", item: skill.name, reason: buildRuntimeBoundReason(signals) };
 	}
 
-	return null;
+	return await skipIfSkillDirectoryAuditFails(skill, provider);
+}
+
+async function skipIfSkillDirectoryAuditFails(skill: SkillInfo, provider: ProviderType): Promise<PortabilitySkip | null> {
+	const audit = await auditSkillDirectory(skill.sourcePath, provider, skill.name);
+	if (audit.errors.length === 0) return null;
+	const first = audit.errors[0]?.message ?? "runtime-bound Claude references";
+	return {
+		provider,
+		type: "skill",
+		item: skill.name,
+		reason: `skill directory needs provider review before install: ${first}`,
+	};
 }
 
 function readSkillRuntimeSignals(skill: SkillInfo): string[] {
@@ -352,7 +374,7 @@ export async function buildPortableSkillsByProvider(
 		if (!providers[target].skills) continue;
 		const providerSkills: SkillInfo[] = [];
 		for (const skill of skills) {
-			const skip = shouldInstallSkillForProvider(skill, target);
+			const skip = await shouldInstallSkillForProvider(skill, target);
 			if (skip) {
 				skips.push(skip);
 			} else {

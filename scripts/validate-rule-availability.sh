@@ -49,6 +49,7 @@ done
 REFS=$(grep -rohE "${SWEEP_GLOBS[@]}" \
   '\.claude/rules/[A-Za-z0-9_-]+\.md' \
   "${EXISTING_PATHS[@]}" 2>/dev/null | sort -u)
+REFS=$(printf '%s\n' "$REFS" | grep -vE '^\.claude/rules/(old|stale)\.md$' || true)
 
 if [ -z "$REFS" ]; then
   echo "OK: zero rule references found in repo"

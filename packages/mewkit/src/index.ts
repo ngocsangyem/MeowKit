@@ -18,6 +18,7 @@ import { task } from "./commands/task.js";
 import { orchviz } from "./commands/orchviz.js";
 import { inventory } from "./commands/inventory.js";
 import { pack } from "./commands/pack.js";
+import { providersCommand } from "./commands/providers.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -41,6 +42,7 @@ ${pc.bold("Commands:")}
   ${pc.green("status")}     Print version and config summary
   ${pc.green("task")}       Create and list task files (new, list)
   ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
+  ${pc.green("providers")}  Show effective provider support matrix and enforcement levels
   ${pc.green("orchviz")}    Live web visualizer for the active Claude Code session
   ${pc.green("inventory")}  List harness artifacts with governance metadata
   ${pc.green("pack")}       Manage install packs (list, add, remove)
@@ -59,7 +61,7 @@ ${pc.bold("Options:")}
   --ownership      Validate: run only the artifact ownership-completeness check
   --packs          Validate: run only the pack-manifest coherence + safety check
   --fail-over <N>  Budget context: exit non-zero when a profile exceeds N tokens
-  --json           Inventory: emit the inventory as JSON
+  --json           Providers/inventory: emit machine-readable JSON
   --stale          Inventory: show only deprecated/experimental artifacts
   --critical       Inventory: show only criticality=critical artifacts
   --portable-missing  Inventory: show artifacts whose runtime is not portable
@@ -218,6 +220,13 @@ async function main(): Promise<void> {
 				json: args.json as boolean | undefined,
 				yes: args.yes as boolean | undefined,
 				beta: args.beta as boolean | undefined,
+			});
+			break;
+		case "providers":
+		case "explain-support":
+			await providersCommand({
+				provider: args._[1] as string | undefined,
+				json: args.json as boolean | undefined,
 			});
 			break;
 		case "inventory":
