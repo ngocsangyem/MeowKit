@@ -53,9 +53,7 @@ function summarizeHardSkipSignals(content: string): string[] {
 function summarizeSkillSkipSignals(content: string): string[] {
 	return RUNTIME_BOUND_SIGNALS.filter(
 		(signal) =>
-			[".claude path", "CLAUDE.md reference", "mk/meow slash command", "Claude env var", "Anthropic env var", "orchestrator semantics"].includes(
-				signal.label,
-			) && signal.pattern.test(content),
+			["orchestrator semantics"].includes(signal.label) && signal.pattern.test(content),
 	).map((signal) => signal.label);
 }
 
@@ -259,7 +257,7 @@ async function shouldInstallSkillForProvider(skill: SkillInfo, provider: Provide
 }
 
 async function skipIfSkillDirectoryAuditFails(skill: SkillInfo, provider: ProviderType): Promise<PortabilitySkip | null> {
-	const audit = await auditSkillDirectory(skill.sourcePath, provider, skill.name);
+	const audit = await auditSkillDirectory(skill.sourcePath, provider, skill.name, { ignoreRewriteableMarkdown: true });
 	if (audit.errors.length === 0) return null;
 	const first = audit.errors[0]?.message ?? "runtime-bound Claude references";
 	return {

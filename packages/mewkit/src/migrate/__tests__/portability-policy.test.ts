@@ -385,7 +385,7 @@ describe("portability policy", () => {
 		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["portable-skill"]);
 		expect(result.skillsByProvider.get("cursor")?.map((skill) => skill.name)).toEqual([]);
 		expect(result.skipMessages).toContain(
-			"Skipped 1 skill for Codex: runtime-bound Claude harness content: .claude path, mk/meow slash command, orchestrator semantics",
+			"Skipped 1 skill for Codex: runtime-bound Claude harness content: orchestrator semantics",
 		);
 		expect(result.skipMessages).toContain(
 			"Skipped 2 skills for Cursor: skill portability metadata first pass is limited to Codex, Gemini CLI, Antigravity, and OpenCode",
@@ -432,13 +432,14 @@ describe("portability policy", () => {
 			["codex"] satisfies ProviderType[],
 		);
 
-		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["generic-helper"]);
-		expect(result.skipMessages).toContain(
-			"Skipped 1 skill for Codex: runtime-bound Claude harness content: .claude path, mk/meow slash command",
-		);
+		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual([
+			"generic-helper",
+			"claude-bound-helper",
+		]);
+		expect(result.skipMessages).toEqual([]);
 	});
 
-	it("skips otherwise generic skills when reference files still contain runtime coupling", async () => {
+	it("keeps otherwise generic skills when Markdown reference files contain rewriteable path coupling", async () => {
 		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
 		tempDirs.push(root);
 
@@ -464,8 +465,39 @@ describe("portability policy", () => {
 			["codex"] satisfies ProviderType[],
 		);
 
+		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["helper-with-reference"]);
+		expect(result.skipMessages).toEqual([]);
+	});
+
+	it("skips generic skills when executable files contain runtime coupling", async () => {
+		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
+		tempDirs.push(root);
+
+		const skillDir = join(root, "helper-with-script");
+		await mkdir(join(skillDir, "scripts"), { recursive: true });
+		await writeFile(
+			join(skillDir, "SKILL.md"),
+			"---\nname: helper-with-script\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+			"utf-8",
+		);
+		await writeFile(join(skillDir, "scripts", "run.sh"), "echo $CLAUDE_PROJECT_DIR/.claude/hooks/log.json\n");
+
+		const result = await buildPortableSkillsByProvider(
+			[
+				{
+					id: "mk:helper-with-script",
+					name: "helper-with-script",
+					dirName: "helper-with-script",
+					description: "Generic helper",
+					sourcePath: skillDir,
+				},
+			],
+			["codex"] satisfies ProviderType[],
+		);
+
 		expect(result.skillsByProvider.get("codex")).toEqual([]);
 		expect(result.skipMessages[0]).toContain("skill directory needs provider review before install");
+		expect(result.skipMessages[0]).toContain("scripts/run.sh");
 	});
 
 	it("does not skip skills only because they mention workflow phases", async () => {
