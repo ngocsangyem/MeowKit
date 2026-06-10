@@ -11,14 +11,14 @@ MeowKit stores engineering learnings in `.claude/memory/` — fix patterns, revi
 
 | File | Consumer | Read when |
 |------|----------|-----------|
-| `fixes.md` + `fixes.json` | `mk:fix` | Bug diagnosis |
+| `fixes.json` | `mk:fix` | Bug diagnosis |
 | `review-patterns.md` + `review-patterns.json` | `mk:review`, `mk:plan-creator` | Code review or planning |
 | `architecture-decisions.md` + `architecture-decisions.json` | `mk:plan-creator`, `mk:cook` | Architecture work |
 | `security-notes.md` | `mk:cso`, `mk:review` | Security audit |
 | `cost-log.json` | analyst, `mk:memory` | Cost reporting |
 | `decisions.md` | architect | Long-form ADRs |
 
-**JSON-first.** For the curated stores (`fixes`, `review-patterns`, `architecture-decisions`, `security-findings`) the `.json` file is canonical and schema-validated; the Markdown under `views/` is a generated, non-authoritative view. Consumers read the `.json` first and fall back to Markdown only when it is absent, warning when the two diverge. Long-session continuity is handled by the host runtime's native compaction — MeowKit no longer keeps its own conversation summary.
+**JSON-first.** For the curated stores (`fixes`, `review-patterns`, `architecture-decisions`, `security-findings`) the `.json` file is canonical and schema-validated; the Markdown under `views/` is a generated, non-authoritative view. `mk:fix` reads and writes `fixes.json` only for bug-class patterns. Long-session continuity is handled by the host runtime's native compaction — MeowKit no longer keeps its own conversation summary.
 
 **Machine-local by default.** `.claude/memory/*` is gitignored — content is developer-specific working state. Only `.gitkeep` is tracked.
 
@@ -45,7 +45,7 @@ Captures pass injection validation and secret scrubbing before writing. All writ
 
 When an agent or skill identifies a learning, it calls `Edit` directly on the appropriate topic file. There is no hook — the agent scrubs secrets in-content before writing. Topic file routing follows the table in `.claude/skills/memory/references/capture-architecture.md`.
 
-The `mk:fix` skill's Step 6 is the canonical example: read the live JSON schema, append a Markdown section + a structured JSON entry, both via `Edit`.
+The `mk:fix` skill's Step 6 is the canonical example: read the live JSON schema and add or update a structured entry via `Edit`.
 
 ### Session-end capture
 

@@ -364,6 +364,33 @@ describe("POST /api/plan/todo", () => {
 		expect(updatedContent).toContain("- [x] Task A");
 		expect(phaseFile.endsWith("phase-01-setup.md")).toBe(true);
 	});
+
+	it("15. archives the plan when the final unchecked todo is completed", async () => {
+		fs.writeFileSync(
+			phaseFile,
+			[
+				"# Phase 1",
+				"",
+				"## Todo List",
+				"",
+				"- [x] Task A",
+				"- [x] Task B",
+				"- [ ] Task C",
+				"",
+			].join("\n"),
+			"utf-8",
+		);
+		const r = await postTodo(validBody(phaseFile, { todoIdx: 2, checked: true }));
+		expect(r.status).toBe(200);
+		const parsed = JSON.parse(r.body);
+		expect(parsed.ok).toBe(true);
+		expect(parsed.archived).toBe(true);
+
+		const archivedPlanDir = path.join(projectRoot, "tasks", "plans", "archive", "260501-test-plan");
+		expect(fs.existsSync(path.join(projectRoot, "tasks", "plans", "260501-test-plan"))).toBe(false);
+		expect(fs.existsSync(path.join(archivedPlanDir, "phase-01-setup.md"))).toBe(true);
+		expect(fs.readFileSync(path.join(archivedPlanDir, "plan.md"), "utf-8")).toContain("status: completed");
+	});
 });
 
 describe("OPTIONS /api/plan/todo", () => {

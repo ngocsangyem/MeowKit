@@ -96,9 +96,10 @@ Concrete cost of `[LIGHT]` vs `[HEAVY]` depends on the inner harness, model tier
 **Deliverable:** Updated memory + documentation
 
 - Extract learnings as patterns, decisions, or failures
-- Update `.claude/memory/` topic files
+- Update canonical `.claude/memory/*.json` stores
 - Sync affected documentation
 - Close sprint task
+- Auto-complete and archive the plan when all non-abandoned phase todos are checked; this does not wait for Phase 5 ship.
 
 ## Execution modes
 

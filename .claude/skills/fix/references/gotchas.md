@@ -30,7 +30,7 @@ Common failure patterns when fixing bugs. Update this file when Claude produces 
 
 ### Ignoring Memory
 **Symptom:** Same bug class fixed repeatedly.
-**Fix:** Check `.claude/memory/fixes.json` (structured) or `.claude/memory/fixes.md` (narrative) for prior bug-class fixes before starting. Write new fix patterns by calling `Edit` directly on both files (see SKILL.md Step 6 for the live schema). Do NOT use `##pattern:bug-class` — that is a user-typed keyboard shortcut; the handler only fires on `UserPromptSubmit` and agent output is invisible to it. See `.claude/skills/memory/references/capture-architecture.md`.
+**Fix:** Check `.claude/memory/fixes.json` only. Write new fix patterns by calling `Edit` directly on `.claude/memory/fixes.json` only (see SKILL.md Step 6 for the live schema). Do NOT use `##pattern:bug-class` — that is a user-typed keyboard shortcut; the handler only fires on `UserPromptSubmit` and agent output is invisible to it. See `.claude/skills/memory/references/capture-architecture.md`.
 
 ### Fixing Without Reproducing First
 **Symptom:** "I think I know what's wrong" → fix deployed → bug persists.
@@ -39,4 +39,3 @@ Common failure patterns when fixing bugs. Update this file when Claude produces 
 ### Changing Multiple Things at Once
 **Symptom:** Fix touches 5 files, introduces new bug, can't tell which change caused it.
 **Fix:** Change ONE thing, verify, then change the next. Isolate variables.
-

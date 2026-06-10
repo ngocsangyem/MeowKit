@@ -14,6 +14,32 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.10.3 (2026-06-10) — Memory + Plan Completion Cleanup
+
+### Highlights
+
+Fix memory capture is now JSON-only, and plan completion no longer waits for the ship phase. Completed plan todos now close the plan lifecycle immediately.
+
+### CLI
+
+- `POST /api/plan/todo` now marks a plan complete and moves it to `tasks/plans/archive/` when the final non-abandoned phase todo is checked.
+- The `mewkit` package version for this release is `1.10.5`.
+
+### Improvements
+
+- `mk:fix` and `mk:cook` now direct bug-class learnings to `.claude/memory/fixes.json` only.
+- Plan sync-back now treats completed task checkboxes as the source of truth for plan completion.
+- Manual `/mk:plan archive` remains confirmation-based, while completion-driven archiving runs only after every plan todo is checked.
+
+### Bug Fixes
+
+- Fix capture no longer creates an unnecessary duplicate Markdown memory entry.
+- Finished plans are no longer left active until `/mk:ship` runs.
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the updated workflow instructions and plan lifecycle behavior.
+
 ## 2.10.2 (2026-06-02) — PR Review + Response Skills
 
 ### Highlights

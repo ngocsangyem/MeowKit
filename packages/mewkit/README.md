@@ -164,7 +164,7 @@ curl -X POST http://127.0.0.1:3001/api/plan/todo \
   -H "Content-Type: application/json" \
   -H "Origin: http://127.0.0.1:3001" \
   -d '{"slug":"260501-my-plan","phase":1,"todoIdx":0,"checked":true,"etag":"<hex64>"}'
-# 200: { "ok": true, "changed": true, "etag": "<new-hex64>" }
+# 200: { "ok": true, "changed": true, "etag": "<new-hex64>", "archived": false }
 # 409: { "error": "stale", "currentEtag": "<latest-hex64>" }  → re-fetch and retry
 # 403: Origin header missing or not in allowlist
 # 405: server is in read-only mode (the default)

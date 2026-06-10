@@ -34,7 +34,7 @@ All modes share these phases with mode-specific variations.
    - Auth/payments/security → always COMPLEX
    - Feature <5 files → STANDARD
    - Rename/typo/format → TRIVIAL
-3. **Read memory** (if exists): `.claude/memory/fixes.json` first (fall back to `fixes.md` if absent) for bug-class warnings; `.claude/memory/architecture-decisions.json` first (fall back to `architecture-decisions.md` if absent) for prior architectural decisions — note relevant prior learnings (see `.claude/rules/memory-read-rules.md`)
+3. **Read memory** (if exists): `.claude/memory/fixes.json` only for bug-class warnings; `.claude/memory/architecture-decisions.json` first for prior architectural decisions — note relevant prior learnings (see `.claude/rules/memory-read-rules.md`)
 4. If mode=code: load plan path, parse phases
 5. `TaskCreate` for each workflow phase (with `addBlockedBy` chain)
 
@@ -300,6 +300,8 @@ Three mandatory subagents in parallel:
    ```
    Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
    ```
+
+   If sync-back leaves every non-abandoned phase todo checked, mark the plan frontmatter `status: completed` and move the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `/mk:ship`.
 
 2. **Docs update:**
 

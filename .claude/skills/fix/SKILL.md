@@ -66,7 +66,7 @@ If no mode flag: use `AskUserQuestion` (Autonomous / HITL / Quick). See `referen
 
 ## Step 0.5 — Check Fix Memory (before scouting)
 
-Read `.claude/memory/fixes.json` **first** — it is the canonical, schema-validated store of prior fix patterns. Fall back to `.claude/memory/fixes.md` only when the JSON is absent. If both exist and describe different bug classes, prefer the JSON and emit a one-line conflict warning (`⚠ fixes.md has entries not in fixes.json — JSON is authoritative; run 'mewkit memory seed-from-md'`). See the source-of-truth rule in `.claude/rules/memory-read-rules.md`.
+Read `.claude/memory/fixes.json` — it is the canonical, schema-validated store of prior fix patterns. See the source-of-truth rule in `.claude/rules/memory-read-rules.md`.
 - Search for similar symptoms, error messages, or affected modules
 - If a matching fix pattern exists → use it as starting hypothesis in Step 2
 - If a matching success pattern exists → apply the known fix approach directly
@@ -153,17 +153,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 1. Report: confidence, root cause, changes, files, prevention measures.
 
-2. **Write to memory via direct `Edit` calls** — capture the fix pattern for future sessions. Read both files first to match the live schema, then append.
-
-   - **`.claude/memory/fixes.md`** — append:
-     ```
-     ## <YYYY-MM-DD> — <bug-class slug> (severity: low|medium|high|critical)
-
-     - Symptom: <one line>
-     - Root cause: <one line>
-     - Fix: <one line + file paths>
-     - Prevention: <regression test path OR guard added>
-     ```
+2. **Write to memory via direct `Edit` calls** — capture the fix pattern for future sessions. Read `.claude/memory/fixes.json` first to match the live schema, then add/update the canonical JSON store only.
 
    - **`.claude/memory/fixes.json`** — under `patterns`, add or update:
      ```json

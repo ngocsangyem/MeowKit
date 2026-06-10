@@ -16,6 +16,7 @@ import * as path from "node:path";
 import { z } from "zod";
 import { applyTodoToggle } from "../plan/apply-todo-toggle.js";
 import { atomicWriteFileSync, cleanOrphanedTmps } from "../plan/atomic-write.js";
+import { completeAndArchivePlanIfDone } from "../plan/plan-lifecycle.js";
 import { SLUG_RE, buildPhaseNumberRe } from "../plan/plan-constants.js";
 import { isOrchvizReadonly, type PlanCollector } from "../plan/collector.js";
 import { createLogger } from "../logger.js";
@@ -205,15 +206,17 @@ export async function handleTodoWrite(
 		return;
 	}
 
-	// 17-18. New etag (hash the just-written content directly, no re-read) + invalidate + respond
+	// 17-18. New etag (hash the just-written content directly, no re-read) + lifecycle sync + invalidate + respond
 	const newEtag = crypto.createHash("sha256").update(result.content).digest("hex");
+	const lifecycle = completeAndArchivePlanIfDone(resolvedPlanDir, plansDir);
 	ctx.planCollector?.invalidate();
 	log.debug("write-success", {
 		slug: body.slug,
 		phase: body.phase,
 		todoIdx: body.todoIdx,
 		changed: true,
+		archived: lifecycle.archived,
 		httpStatus: 200,
 	});
-	writeJson(res, 200, { ok: true, changed: true, etag: newEtag });
+	writeJson(res, 200, { ok: true, changed: true, etag: newEtag, archived: lifecycle.archived });
 }

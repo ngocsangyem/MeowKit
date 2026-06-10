@@ -96,6 +96,6 @@ Ask if user wants to commit the archival changes.
 ## Rules
 
 - NEVER touch plans with status `draft`, `in-progress`, or `pending`
-- NEVER auto-archive without user confirmation
+- The manual `/mk:plan archive` subcommand never archives without user confirmation. Completion-driven lifecycle archiving is separate and runs only after every plan todo is checked.
 - ALWAYS create `.archive/` directory if it doesn't exist (on move action)
 - Journal capture is optional — respect user choice

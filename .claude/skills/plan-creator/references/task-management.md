@@ -78,7 +78,8 @@ Already `[x]` items → skip.
 1. Mark session tasks complete via `TaskUpdate`
 2. Update phase files: `[ ]` → `[x]` for completed items
 3. Update plan.md status table
-4. Project-manager agent sweeps all phase files
+4. If every non-abandoned phase todo is checked and at least one todo exists, set plan frontmatter `status: completed` and move the plan directory to `tasks/plans/archive/{plan-name}/`
+5. Project-manager agent sweeps all phase files
 
 ## Sync-Back Protocol (Executed by Cook's Finalize Step)
 
@@ -114,6 +115,7 @@ if new_status != current_status:
 **Invariants:**
 - `status: completed` requires `total > 0 AND checked == total`. Empty todo lists never auto-promote.
 - `failed` and `abandoned` are terminal — only a human edit moves out.
+- Auto-archive never waits for `mk:ship`; completed task checkboxes are the source of truth for plan completion.
 - `active` is HUMAN-ONLY — sync-back never writes `active`. The algorithm produces `pending`, `in_progress`, or `completed`. If a human marks a phase `active`, sync-back may demote it to `pending` when no todos are checked. (Use `in_progress` instead — it survives sync-back as long as at least one todo is checked.)
 - Frontmatter is source of truth. The Overview block (`**Status:** ...`) is regenerated from frontmatter on every sync-back, NOT vice versa.
 - Idempotent: re-running sync-back on an unchanged file produces zero diff.
@@ -124,8 +126,9 @@ if new_status != current_status:
 2. For each phase file: apply the algorithm above to derive `new_status` and rewrite frontmatter
 3. Regenerate the Overview mirror lines from frontmatter values
 4. Update plan.md Phases table status column from checkpoint
-5. project-manager subagent sweeps all phase-XX files for cross-file consistency
-6. Git commit captures state transition
+5. Run the completion lifecycle check: if all task checkboxes across non-abandoned phase files are checked, set `plan.md` frontmatter `status: completed` and move the entire plan directory to `tasks/plans/archive/{plan-name}/`
+6. project-manager subagent sweeps all phase-XX files for cross-file consistency
+7. Git commit captures state transition
 
 ### Anti-patterns
 

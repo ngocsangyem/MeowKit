@@ -159,10 +159,10 @@ Task(subagent_type="documenter", prompt="Evaluate docs impact for changes: [file
 
 **Memory capture:**
 ```
-Task(subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Append bug-class patterns to .claude/memory/fixes.md and .claude/memory/fixes.json; append architectural decisions to .claude/memory/architecture-decisions.md and .claude/memory/architecture-decisions.json; append review patterns to .claude/memory/review-patterns.md and .claude/memory/review-patterns.json.", description="Session memory capture")
+Task(subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Write bug-class patterns to .claude/memory/fixes.json (canonical); write architectural decisions to .claude/memory/architecture-decisions.json (canonical); write review patterns to .claude/memory/review-patterns.json (canonical).", description="Session memory capture")
 ```
 
-**Scope (analyst memory):** pass plan-file path, reviewer findings, decisions log, .claude/memory/ topic file paths. Do NOT pass full conversation transcript (the analyst infers learnings from artifacts, not chat).
+**Scope (analyst memory):** pass plan-file path, reviewer findings, decisions log, `.claude/memory/*.json` canonical store paths. Do NOT pass full conversation transcript (the analyst infers learnings from artifacts, not chat).
 
 ## UI Work (Conditional)
 
