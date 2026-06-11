@@ -20,6 +20,8 @@ owner: lifecycle
 criticality: medium
 status: active
 runtime: claude-code
+requires_external_service: ["jira"]
+default_enabled: true
 ---
 
 # Agent Detector
@@ -67,14 +69,15 @@ runtime: claude-code
    ## Phase-zero rules: verified (cached, session <id>)
    ```
 
-   If the marker IS present: emit `Phase-zero rules: verified (cached)` and SKIP the 5-file Read loop. If ABSENT (turn 1 or env-var override), `Read` each phase-zero rule. These govern Phase 0 routing and are read once per agent-detector invocation:
+   If the marker IS present: emit `Phase-zero rules: verified (cached)` and SKIP the 6-file Read loop. If ABSENT (turn 1 or env-var override), `Read` each phase-zero file. These govern Phase 0 routing and are read once per agent-detector invocation:
    - `.claude/rules/phase-contracts.md` — what each phase expects/produces
    - `.claude/rules/agent-routing.md` — agent → role → phase table
    - `.claude/rules/model-selection-rules.md` — task-type → model-tier mapping
    - `.claude/rules/scale-adaptive-rules.md` — domain CSV → complexity routing
    - `.claude/rules/risk-checklist.md` — 9 horizontal-risk flags
+   - `.claude/skills/agent-detector/references/skill-domain-routing.md` — intent → skill dispatch table (used at hand-off, Step 5)
 
-   If any `Read` fails: ABORT with `PHASE-ZERO RULE MISSING: <name>` — same fail-fast semantics as Step 0. These rules drive the routing logic in steps 2–4; without them, detection silently degrades to keyword-only.
+   If any of the 5 rule `Read`s fails: ABORT with `PHASE-ZERO RULE MISSING: <name>` — same fail-fast semantics as Step 0. These rules drive the routing logic in steps 2–4; without them, detection silently degrades to keyword-only. The skill-domain-routing reference is advisory dispatch guidance (not a routing rule): if it is absent, log `skill-domain-routing reference absent; skill dispatch falls back to inline judgment` and continue — do NOT abort.
 
    **Agile context detection (additive — Agile-only load).** After the 5 phase-zero `Read`s succeed:
 

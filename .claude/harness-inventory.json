@@ -247,6 +247,12 @@
       "status": "active",
       "runtime": "claude-code"
     },
+    "commands/mk/help.md": {
+      "owner": "utility",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code"
+    },
     "commands/mk/meow.md": {
       "owner": "utility",
       "criticality": "medium",

@@ -36,6 +36,45 @@ except ImportError as exc:
 # Recommended-but-not-required fields. Missing → WARN (not ERROR).
 RECOMMENDED_FIELDS = ["when_to_use"]
 
+# External-service env-var anchors that mark a SKILL.md body as an external-service
+# entrypoint. Anchored to MEOW_/_API_KEY forms — NOT bare GEMINI_API_KEY (multimodal's
+# real key is MEOWKIT_GEMINI_API_KEY; the bare form appears only in a legacy-fallback
+# description string and would false-positive).
+EXTERNAL_SERVICE_PATTERNS = [
+    re.compile(r"\bMEOW_JIRA_"),
+    re.compile(r"\bMEOW_CONFLUENCE_"),
+    re.compile(r"\bMEOWKIT_GEMINI_API_KEY\b"),
+    re.compile(r"\bMEOWKIT_MINIMAX_API_KEY\b"),
+]
+
+
+def is_external_service_entrypoint(fm: dict, body: str) -> bool:
+    """True when a skill is an external-service entrypoint: its body references an
+    external-service env var, OR its frontmatter marks a user-invocable Jira/Confluence
+    leaf (owner: jira|confluence, or agent: jira-*/confluence-*)."""
+    if any(p.search(body) for p in EXTERNAL_SERVICE_PATTERNS):
+        return True
+    # Non-user-invocable internals are excluded from the frontmatter-marker path.
+    if fm.get("user-invocable") is False:
+        return False
+    owner = fm.get("owner")
+    if owner in ("jira", "confluence"):
+        return True
+    agent = fm.get("agent")
+    if isinstance(agent, str) and (agent.startswith("jira-") or agent.startswith("confluence-")):
+        return True
+    return False
+
+
+def check_tool_contract_fields(fm: dict, body: str) -> list[str]:
+    """Advisory WARNs for the tool-contract fields. Never an ERROR (calibration phase)."""
+    warns: list[str] = []
+    if is_external_service_entrypoint(fm, body) and "requires_external_service" not in fm:
+        warns.append("external-service entrypoint missing 'requires_external_service'")
+    if "requires_external_service" in fm and "default_enabled" not in fm:
+        warns.append("'requires_external_service' present but 'default_enabled' missing")
+    return warns
+
 
 def main() -> int:
     args = [a for a in sys.argv[1:] if a]
@@ -82,6 +121,10 @@ def main() -> int:
                     warnings.append(
                         f"{skill_md.relative_to(root)}: recommended field '{field}' missing"
                     )
+            # Tool-contract advisory checks (WARN-only) — body is everything after frontmatter.
+            body = text[m.end():]
+            for w in check_tool_contract_fields(fm, body):
+                warnings.append(f"{skill_md.relative_to(root)}: {w}")
             valid += 1
         except yaml.YAMLError as exc:
             errors.append(f"{skill_md.relative_to(root)}: YAML parse error: {exc}")

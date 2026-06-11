@@ -16,6 +16,8 @@ owner: confluence
 criticality: medium
 status: active
 runtime: claude-code
+requires_external_service: ["confluence"]
+default_enabled: false
 ---
 
 # mk:confluence — Routing Skill

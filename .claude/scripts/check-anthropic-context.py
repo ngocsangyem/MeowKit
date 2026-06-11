@@ -116,26 +116,52 @@ def scan_file(path: Path) -> list[str]:
     return violations
 
 
+def rel_for(md_path: Path, root: Path) -> str:
+    """Path used for allowlist matching — relative to root.parent (matches full-scan)."""
+    base = root.parent if root.parent.exists() else root
+    try:
+        return md_path.relative_to(base).as_posix()
+    except ValueError:
+        return md_path.as_posix()
+
+
 def main() -> int:
-    if len(sys.argv) < 2:
-        print("usage: check-anthropic-context.py <root> [<allowlist>]", file=sys.stderr)
+    # Parse: <root> [<allowlist>] [--files f1 f2 ...]. Default (no --files) scans the
+    # whole root tree exactly as before — back-compat for the full-tree CI path.
+    argv = sys.argv[1:]
+    files_arg: list[str] = []
+    if "--files" in argv:
+        i = argv.index("--files")
+        files_arg = argv[i + 1 :]
+        argv = argv[:i]
+    if len(argv) < 1:
+        print("usage: check-anthropic-context.py <root> [<allowlist>] [--files <md>...]", file=sys.stderr)
         return 2
-    root = Path(sys.argv[1])
-    allow_path = sys.argv[2] if len(sys.argv) > 2 else ""
+    root = Path(argv[0])
+    allow_path = argv[1] if len(argv) > 1 else ""
     allow_patterns = load_allowlist(allow_path)
-    if not root.is_dir():
-        print(f"check-anthropic-context: {root} not a directory", file=sys.stderr)
-        return 2
+
+    if files_arg:
+        # Scan only the listed markdown files that exist (callers pass changed files,
+        # which may include deletions or non-markdown paths — silently skip those).
+        md_paths = [Path(f) for f in files_arg if f.endswith(".md") and Path(f).is_file()]
+    else:
+        if not root.is_dir():
+            print(f"check-anthropic-context: {root} not a directory", file=sys.stderr)
+            return 2
+        md_paths = sorted(root.rglob("*.md"))
 
     violations: list[str] = []
-    for md_path in sorted(root.rglob("*.md")):
-        rel = md_path.relative_to(root.parent if root.parent.exists() else root).as_posix()
+    for md_path in md_paths:
+        rel = rel_for(md_path, root)
         if is_allowlisted(rel, allow_patterns):
             continue
         violations.extend(scan_file(md_path))
 
     for line in violations:
         print(line)
+    # Contract: violations are reported on STDOUT, not via exit code — this always
+    # returns 0. Callers (lint-brand-prose.sh) MUST check stdout content, not $?.
     return 0
 
 

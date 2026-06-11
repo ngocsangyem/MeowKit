@@ -30,7 +30,7 @@ Live alongside the always-on rules but are loaded explicitly by `mk:agent-detect
 | Rule | Purpose | Loaded by |
 | ---- | ------- | --------- |
 | `phase-contracts.md` | Phase I/O contracts table — what each phase expects/produces | `mk:agent-detector` Step 0b |
-| `agent-routing.md` | Agent → role → phase routing table; PM opt-out env var; MeowKit skill routing map | `mk:agent-detector` Step 0b |
+| `agent-routing.md` | Agent → role → phase routing table; domain-agent exclusions; PM opt-out env var (intent → skill dispatch table relocated to `skills/agent-detector/references/skill-domain-routing.md`) | `mk:agent-detector` Step 0b |
 | `model-selection-rules.md` | Task type → model tier routing, security escalation | `mk:agent-detector` Step 0b |
 | `scale-adaptive-rules.md` | Domain-based complexity routing, CSV match override, Gate 1 one-shot bypass | `mk:agent-detector` Step 0b |
 | `risk-checklist.md` | Phase 0 horizontal-risk flag eval (9 flags); auto-escalation feeds `model-selection-rules.md` Rule 2 | `mk:agent-detector` Step 0b |

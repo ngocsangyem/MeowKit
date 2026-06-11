@@ -151,6 +151,36 @@ Each benchmark run writes a JSON dump to `.claude/benchmarks/results/{run-id}.js
 }
 ```
 
+## Audit Mode
+
+`scripts/git-index-audit.sh` records a reproducible git tracked-state fingerprint as a
+JSON artifact — independent of the canary benchmark loop. Use it to verify two checkouts
+of a repo are identical, or to snapshot tracked state over time.
+
+```bash
+# single-repo snapshot
+bash .claude/skills/benchmark/scripts/git-index-audit.sh [repo-path]
+# comparison (adds local/remote-only counts + recursive diff status)
+bash .claude/skills/benchmark/scripts/git-index-audit.sh <local> <remote>
+```
+
+**Artifact location:** `.claude/benchmarks/audits/{YYMMDD-HHMMSS}-audit.json` — a SIBLING
+of `results/`, NOT inside it. `compare-runs.sh` prefix-globs `results/*.json` and assumes a
+`tier` key; an audit artifact placed in `results/` would crash it. Every audit artifact
+carries a top-level `"type": "audit"` discriminator. Override the output dir with
+`MEOWKIT_AUDIT_OUT_DIR`.
+
+**Artifact schema:** `type`, `run_id`, `ts`, `repo`, `tracked_file_count`,
+`directory_count_excl_git`, `tracked_path_sha256`, `tracked_index_sha256`, `comparison`
+(null in single-repo mode), `working_tree_clean`. A best-effort `audit_result` trace event
+is appended via `append-trace.sh`.
+
+**Index-hash definition (meowkit canonical):** `tracked_index_sha256 = sha256(sort(git
+ls-files -s))`. The `-s` flag includes mode + blob hash + stage, so the index hash captures
+tracked CONTENT, not just paths; `tracked_path_sha256 = sha256(sort(git ls-files))` captures
+paths only. The source method did not specify an index-hash command — this definition is
+meowkit's, documented here and in the script header so future comparisons are reproducible.
+
 ## Gotchas
 
 - **`run-canary.sh` is a half-implementation by design.** It writes a manifest with `PENDING` tasks then prints orchestrator instructions. The script CANNOT actually invoke `mk:autobuild` per task because each invocation requires a fresh subagent context, which only an orchestrator agent can spawn — not a shell process. **The agent invoking this skill MUST follow the printed instructions to fill in each task's results.** Failure to do so leaves the manifest as a stub. Documented in `run-canary.sh:101-115` banner.

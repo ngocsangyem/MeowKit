@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { checkCodexProjection, checkHooksExecutable, diagnosticToStatus } from "../validate.js";
+import { checkCodexProjection, checkHooksExecutable, checkRoutingTableBreadth, diagnosticToStatus } from "../validate.js";
 
 let claudeDir: string;
 beforeEach(() => {
@@ -60,6 +60,69 @@ describe("diagnosticToStatus honesty", () => {
 	it("maps fail to FAIL and documented+pass to PASS", () => {
 		expect(diagnosticToStatus("documented", "fail")).toBe("fail");
 		expect(diagnosticToStatus("documented", "pass")).toBe("pass");
+	});
+});
+
+describe("checkRoutingTableBreadth", () => {
+	let mkDir: string;
+
+	function setup(
+		rules: Record<string, string>,
+		inventory: Record<string, { criticality?: string }> = {},
+	): void {
+		const root = fs.mkdtempSync(path.join(os.tmpdir(), "mewkit-routing-"));
+		mkDir = path.join(root, ".claude");
+		fs.mkdirSync(path.join(mkDir, "rules"), { recursive: true });
+		for (const [name, body] of Object.entries(rules)) {
+			fs.writeFileSync(path.join(mkDir, "rules", name), body);
+		}
+		fs.writeFileSync(
+			path.join(mkDir, "harness-inventory.json"),
+			JSON.stringify({ schema_version: 1, artifacts: inventory }),
+		);
+	}
+	afterEach(() => {
+		if (mkDir) fs.rmSync(path.dirname(mkDir), { recursive: true, force: true });
+	});
+
+	function routingTable(rows: number): string {
+		const data = Array.from({ length: rows }, (_, i) => `| do thing ${i} | \`mk:skill-${i}\` |`).join("\n");
+		return `# Rule\n\n| Intent | Use |\n| --- | --- |\n${data}\n`;
+	}
+
+	it("WARNs on a ≥8-row mk: routing table in a non-critical rule", () => {
+		setup({ "broad-routing.md": routingTable(8) }, { "rules/broad-routing.md": { criticality: "high" } });
+		const results = checkRoutingTableBreadth(mkDir);
+		const warn = results.find((r) => r.name === "Routing-table breadth: rules/broad-routing.md");
+		expect(warn?.status).toBe("warn");
+		expect(warn?.section).toBe("Rules");
+	});
+
+	it("does NOT warn when the same table is in a criticality:critical file", () => {
+		setup({ "broad-routing.md": routingTable(8) }, { "rules/broad-routing.md": { criticality: "critical" } });
+		const results = checkRoutingTableBreadth(mkDir);
+		expect(results.every((r) => r.status !== "warn")).toBe(true);
+	});
+
+	it("does NOT warn on a workflow table whose header is not routing (phase-contracts shape)", () => {
+		const data = Array.from({ length: 9 }, (_, i) => `| Phase ${i} | \`mk:skill-${i}\` | x | y | z |`).join("\n");
+		const body = `# Phase Contracts\n\n| Phase | Skill | Expects | Produces | Breaks-if-Missing |\n| --- | --- | --- | --- | --- |\n${data}\n`;
+		setup({ "phase-shape.md": body }, { "rules/phase-shape.md": { criticality: "medium" } });
+		const results = checkRoutingTableBreadth(mkDir);
+		expect(results.every((r) => r.status !== "warn")).toBe(true);
+	});
+
+	it("ignores the allowlisted phase-contracts.md even with a routing header", () => {
+		setup({ "phase-contracts.md": routingTable(10) }, { "rules/phase-contracts.md": { criticality: "high" } });
+		const results = checkRoutingTableBreadth(mkDir);
+		expect(results.every((r) => r.status !== "warn")).toBe(true);
+	});
+
+	it("does NOT warn on mk: refs in prose with a small table", () => {
+		const body = `# Domain agents\n\nThe orchestrator uses \`mk:jira\` and \`mk:confluence\` hubs.\n\n| Intent | Use |\n| --- | --- |\n| search | \`mk:scout\` |\n`;
+		setup({ "prose.md": body }, { "rules/prose.md": { criticality: "high" } });
+		const results = checkRoutingTableBreadth(mkDir);
+		expect(results.every((r) => r.status !== "warn")).toBe(true);
 	});
 });
 

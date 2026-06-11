@@ -16,6 +16,8 @@ owner: research
 criticality: medium
 status: active
 runtime: claude-code
+requires_external_service: ["jira", "confluence"]
+default_enabled: false
 ---
 
 # mk:intake — Ticket & PRD Intake Analysis

@@ -51,6 +51,13 @@ mk:team-config
 Parallel agents start claiming tasks
 ```
 
+## Team Coordination Rules
+
+When team mode activates, `Read` `references/team-coordination.md` — the team-only
+coordination rules (file ownership per task, no force-push, worktree-branch commits,
+actionable completion messages, lead docs-impact ownership). These were moved out of
+always-loaded `parallel-execution-rules.md` so they load only on team activation.
+
 ## Ownership Map Template
 
 See `templates/ownership-map-template.md` for the format agents use to declare file ownership.

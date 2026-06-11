@@ -19,6 +19,8 @@ owner: jira
 criticality: medium
 status: active
 runtime: claude-code
+requires_external_service: ["jira"]
+default_enabled: false
 ---
 
 # mk:jira-issue

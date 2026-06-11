@@ -164,11 +164,26 @@ export function contextBudget(args: ContextBudgetArgs): void {
 		console.log(JSON.stringify(reports, null, 2));
 	} else {
 		console.log(pc.bold(pc.cyan("Context budget")));
-		console.log(pc.dim("Loadable set: always-on rules + skill SKILL.md entrypoints + agents + commands."));
+		console.log(
+			pc.dim(
+				"Tiers: always-on (CLAUDE.md + rules) · conditional (rules-conditional) · on-demand (agents + commands + SKILL.md).",
+			),
+		);
 		console.log();
-		console.log(pc.bold(`  ${padCell("PROFILE", 12)} ${padCell("FILES", 7)} ${padCell("LINES", 9)} ~TOKENS`));
 		for (const r of reports) {
-			console.log(`  ${padCell(r.profile, 12)} ${padCell(String(r.files), 7)} ${padCell(String(r.lines), 9)} ${r.tokens.toLocaleString()}`);
+			console.log(pc.bold(`  ${r.profile}`));
+			console.log(`    ${padCell("TIER", 12)} ${padCell("FILES", 7)} ${padCell("LINES", 9)} ~TOKENS`);
+			const tierOrder = ["always-on", "conditional", "on-demand"] as const;
+			for (const tier of tierOrder) {
+				const t = r.tiers[tier];
+				console.log(
+					`    ${padCell(tier, 12)} ${padCell(String(t.files), 7)} ${padCell(String(t.lines), 9)} ${t.tokens.toLocaleString()}`,
+				);
+			}
+			console.log(
+				`    ${padCell("total", 12)} ${padCell(String(r.files), 7)} ${padCell(String(r.lines), 9)} ${r.tokens.toLocaleString()}`,
+			);
+			console.log();
 		}
 	}
 

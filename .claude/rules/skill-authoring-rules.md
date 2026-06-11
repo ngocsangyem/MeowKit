@@ -124,6 +124,18 @@ The following frontmatter fields are advisory (not hook-enforced); they annotate
 - `phase: 0 | 1 | 2 | 3 | 4 | 5 | 6 | on-demand` — anchors the skill to a workflow phase. `on-demand` means the skill is invoked by need, not by phase.
 - `trust_level: kit-authored | third-party` — provenance marker. Third-party skills should treat external input as DATA per `injection-rules.md`.
 - `injection_risk: low | medium | high` — advisory risk level for prompt-injection exposure.
+- `requires_external_service: [<service>...]` — external services the skill needs (e.g. `["jira"]`, `["gemini", "minimax"]`). Annotate every external-service entrypoint. `validate-skill-frontmatter.py` emits a WARN (non-blocking) for an external-service entrypoint that lacks this field.
+- `default_enabled: true | false` — whether the skill works without external configuration. External-service skills set `false` (fail-closed until the required env vars are present). A `true` value requires a verified external-service-free path. Declaring `requires_external_service` without `default_enabled` also WARNs.
+- `stable_output_contract: true | false` — `true` when the skill returns stable machine-readable IDs / output for created or bound runtime resources.
+
+### Tool Contract Rule
+
+A skill that creates, binds, or selects external runtime resources MUST honor these contract properties (advisory — documented here, not hook-enforced; promotion to `--strict` is deferred until the WARN check is calibrated over one release):
+
+1. **Fail closed on ambiguity.** When external-resource selection is ambiguous (multiple candidates, missing identifier), stop and ask — never guess a target.
+2. **Return stable machine-readable IDs.** For any created/bound runtime resource, surface a stable ID a downstream step can re-bind to, not a transient label.
+3. **Default-disabled without config.** External services are `default_enabled: false` unless all required env vars are present; the skill degrades gracefully (soft gate) when they are absent.
+4. **Optional artifact schema validation.** A skill that emits a gate/verdict artifact MAY declare schema validation for it.
 
 ## Commands vs Skills (they are not the same)
 

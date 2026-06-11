@@ -1,9 +1,17 @@
 #!/bin/bash
-# check-hook-registration.sh — exits non-zero if a hook script on disk is not
-# registered in .claude/settings.json. Per meowkit-rules.md §3:
-# "Every hook in .claude/hooks/ MUST be registered in .claude/settings.json."
+# check-hook-registration.sh — bidirectional hook-drift check.
+# Per meowkit-rules.md §3: "Every hook in .claude/hooks/ MUST be registered in
+# .claude/settings.json." This script catches drift in BOTH directions plus the
+# handlers.json dispatch registry:
 #
-# Excluded from check (correctly NOT registered):
+#   UNREGISTERED:   a hook script on disk is not registered in settings.json
+#   MISSING-ON-DISK: a hook registered in settings.json has no file on disk
+#   MISSING-HANDLER: a handler path in handlers.json has no file on disk
+#
+# The MISSING-HANDLER pass closes a silent hole: dispatch.cjs exits 0 on a failed
+# handler load, so a deleted handler was previously invisible.
+#
+# Excluded from the disk→settings check (correctly NOT registered):
 #   - lib/*.sh        (sourced helpers)
 #   - handlers/*.cjs  (dispatched via dispatch.cjs, not directly registered)
 #   - .logs/          (log dir)
@@ -11,7 +19,7 @@
 #   - references/     (documentation)
 #
 # Usage: bash scripts/check-hook-registration.sh [project-root]
-# Exit:  0 if clean; 1 if any unregistered hook found.
+# Exit:  0 if clean; 1 if any drift (any of the three classes) found.
 
 set -uo pipefail
 ROOT="${1:-$(pwd)}"
@@ -56,18 +64,114 @@ for n in sorted(out): print(n)
 PY
 )
 
-# Subtract direct registrations + indirect-call allowlist from disk hooks
+# --- disk→settings pass (UNREGISTERED): hook file on disk, not in settings.json ---
 COMBINED=$(printf "%s\n%s\n" "$REGISTERED" "$(echo "$INDIRECT_CALL_ALLOWLIST" | tr ' ' '\n')" | sort -u)
 UNREG=$(comm -23 <(echo "$DISK_HOOKS") <(echo "$COMBINED"))
 
-if [ -z "$UNREG" ]; then
-  total=$(echo "$DISK_HOOKS" | wc -l | tr -d ' ')
-  echo "OK: all $total hook(s) registered or allowlisted (indirect-call)"
-  exit 0
+# --- settings→disk pass (MISSING-ON-DISK): registered hook with no file on disk ---
+# Capture FULL relative paths under hooks/ that look like real scripts (.sh/.cjs,
+# no shell/glob metachars) — this excludes case-statement artifacts like `*)`.
+REGISTERED_PATHS=$("$PY" - "$SETTINGS" <<'PY' 2>/dev/null
+import json, re, sys
+data = json.load(open(sys.argv[1]))
+out = set()
+real = re.compile(r'^[A-Za-z0-9._/-]+\.(sh|cjs)$')
+def walk(node):
+  if isinstance(node, dict):
+    cmd = node.get('command')
+    if isinstance(cmd, str):
+      for m in re.finditer(r'\.claude/hooks/([^"\s]+)', cmd):
+        p = m.group(1)
+        if real.match(p):
+          out.add(p)
+    for v in node.values(): walk(v)
+  elif isinstance(node, list):
+    for v in node: walk(v)
+walk(data.get('hooks', {}))
+for n in sorted(out): print(n)
+PY
+)
+MISSING_ON_DISK=""
+while IFS= read -r p; do
+  [ -z "$p" ] && continue
+  [ -f "$HOOKS_DIR/$p" ] || MISSING_ON_DISK+="$p"$'\n'
+done <<< "$REGISTERED_PATHS"
+
+# --- handlers.json pass (MISSING-HANDLER): dispatched handler with no file on disk ---
+# handlers.json stores paths relative to .claude/hooks/ (e.g. ./handlers/x.cjs);
+# dispatch.cjs resolves them against HOOKS_DIR, so we normalize ./ and resolve the
+# same way. A naive root-relative test -f would false-fail on every clean tree.
+HANDLERS_JSON="$HOOKS_DIR/handlers.json"
+MISSING_HANDLER=""
+if [ -f "$HANDLERS_JSON" ]; then
+  HANDLER_PATHS=$("$PY" - "$HANDLERS_JSON" <<'PY' 2>/dev/null
+import json, sys
+data = json.load(open(sys.argv[1]))
+out = set()
+def walk(node):
+  if isinstance(node, dict):
+    for v in node.values(): walk(v)
+  elif isinstance(node, list):
+    for v in node: walk(v)
+  elif isinstance(node, str) and node.endswith('.cjs'):
+    out.add(node)
+walk(data)
+for n in sorted(out): print(n)
+PY
+)
+  while IFS= read -r p; do
+    [ -z "$p" ] && continue
+    norm="${p#./}"   # strip leading ./ ; anchored at .claude/hooks/
+    [ -f "$HOOKS_DIR/$norm" ] || MISSING_HANDLER+="$norm"$'\n'
+  done <<< "$HANDLER_PATHS"
 fi
 
-echo "Hooks on disk but not registered in $SETTINGS (and not in indirect-call allowlist):" >&2
-echo "$UNREG" | sed 's/^/  - /' >&2
+# --- guard: a command references hooks/ but the path regex extracted nothing ---
+GUARD=$("$PY" - "$SETTINGS" <<'PY' 2>/dev/null
+import json, re, sys
+data = json.load(open(sys.argv[1]))
+bad = []
+def walk(node):
+  if isinstance(node, dict):
+    cmd = node.get('command')
+    if isinstance(cmd, str) and 'hooks/' in cmd and not re.search(r'\.claude/hooks/[^"\s]+', cmd):
+      bad.append(cmd.strip()[:80])
+    for v in node.values(): walk(v)
+  elif isinstance(node, list):
+    for v in node: walk(v)
+walk(data.get('hooks', {}))
+for b in bad: print(b)
+PY
+)
+
+# --- report all classes; exit 1 if any drift found ---
+FAIL=0
+if [ -n "$UNREG" ]; then
+  FAIL=1
+  echo "UNREGISTERED: hook(s) on disk not registered in $SETTINGS (and not allowlisted):" >&2
+  echo "$UNREG" | sed 's/^/  - /' >&2
+fi
+if [ -n "$MISSING_ON_DISK" ]; then
+  FAIL=1
+  echo "MISSING-ON-DISK: hook(s) registered in $SETTINGS with no file in $HOOKS_DIR:" >&2
+  printf '%s' "$MISSING_ON_DISK" | sed '/^$/d; s/^/  - /' >&2
+fi
+if [ -n "$MISSING_HANDLER" ]; then
+  FAIL=1
+  echo "MISSING-HANDLER: handlers.json entr(ies) with no file under $HOOKS_DIR:" >&2
+  printf '%s' "$MISSING_HANDLER" | sed '/^$/d; s/^/  - /' >&2
+fi
+if [ -n "$GUARD" ]; then
+  FAIL=1
+  echo "GUARD: settings command references hooks/ but no .claude/hooks/<path> could be extracted:" >&2
+  echo "$GUARD" | sed 's/^/  - /' >&2
+fi
+
+if [ "$FAIL" -eq 0 ]; then
+  total=$(echo "$DISK_HOOKS" | wc -l | tr -d ' ')
+  echo "OK: all $total hook(s) registered/allowlisted; settings + handlers paths all exist on disk"
+  exit 0
+fi
 echo "" >&2
-echo "Action: register in settings.json OR add to INDIRECT_CALL_ALLOWLIST with comment explaining caller." >&2
+echo "Action: register/restore the listed files, fix handlers.json, or update INDIRECT_CALL_ALLOWLIST with a comment." >&2
 exit 1

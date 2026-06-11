@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history so diff-mode lints can resolve a base ref (merge-base).
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -27,6 +30,21 @@ jobs:
 
       - name: Test
         run: npm test
+
+      - name: Hook-registration drift test
+        run: bash tests/check-hook-registration.test.sh
+
+      - name: Changed-files lint severity test
+        run: bash tests/changed-files-lint.test.sh
+
+      - name: Surface contract test
+        run: bash tests/surface-contract.test.sh
+
+      - name: Git index audit test
+        run: bash tests/git-index-audit.test.sh
+
+      - name: mk:help skill contract test
+        run: bash tests/help-skill-contract.test.sh
 
       - name: Smoke-test memory CLI
         run: |
@@ -56,11 +74,11 @@ jobs:
       - name: Validate pack manifest coherence + safety invariant
         run: node packages/mewkit/dist/index.js validate --packs
 
-      # Guardrail, not a tight bound. Measured core ~102k tokens; cap = 130000
-      # (~27% headroom). Re-baseline with `mewkit budget context --profile core`
+      # Guardrail, not a tight bound. Measured core ~104.7k tokens; cap = 131000
+      # (~25% headroom). Re-baseline with `mewkit budget context --profile core`
       # and bump this number when core legitimately grows.
       - name: Validate core context budget stays small
-        run: node packages/mewkit/dist/index.js budget context --profile core --fail-over 130000
+        run: node packages/mewkit/dist/index.js budget context --profile core --fail-over 131000
 
       - name: Validate README/index counts (stale-index)
         run: node packages/mewkit/dist/index.js inventory --check
@@ -74,11 +92,24 @@ jobs:
       - name: Unit-test docs-references validator
         run: python3 .claude/scripts/tests/test-check-docs-references.py
 
+      - name: Unit-test skill-frontmatter validator
+        run: .claude/skills/.venv/bin/python3 .claude/scripts/tests/test-validate-skill-frontmatter.py
+
       - name: Validate rule availability
         run: bash scripts/validate-rule-availability.sh
 
-      - name: Lint brand prose in .claude markdown
-        run: bash .claude/scripts/lint-brand-prose.sh
+      # Diff-mode brand-prose lint: violations in PR-changed files fail; pre-existing
+      # legacy violations in untouched files are WARN-only. Needs a base ref — resolve
+      # it from the PR base branch (guarded to PR events that set GITHUB_BASE_REF).
+      - name: Resolve lint base ref
+        if: github.base_ref != ''
+        run: |
+          git fetch --no-tags origin "$GITHUB_BASE_REF" || true
+          BASE="$(git merge-base "origin/$GITHUB_BASE_REF" HEAD 2>/dev/null || true)"
+          if [ -n "$BASE" ]; then echo "LINT_BASE_REF=$BASE" >> "$GITHUB_ENV"; fi
+
+      - name: Lint brand prose in changed .claude markdown (diff mode)
+        run: LINT_MODE=diff bash .claude/scripts/lint-brand-prose.sh
 
       - name: "Reject residual meow: namespace"
         run: |

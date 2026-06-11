@@ -82,6 +82,12 @@ Before any file write, check if the file matches the agent's declared ownership.
 - **Orchestrator** monitors queue for completion and triggers integration test
 - Queue is ephemeral (session-state/) — recreated per parallel execution
 
+## Team Coordination
+
+Team-mode coordination rules (file ownership, commit discipline, completion messages) live
+in `.claude/skills/team-config/references/team-coordination.md`, loaded by `mk:team-config`
+on team activation.
+
 ## Gotchas
 
 - **Race condition on claims:** Two agents reading `task-queue.json` simultaneously may both claim the same task. Mitigation: orchestrator is the sole claim-serializer — agents REQUEST claims through orchestrator, never self-claim directly

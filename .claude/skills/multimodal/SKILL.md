@@ -41,6 +41,8 @@ owner: utility
 criticality: medium
 status: active
 runtime: claude-code
+requires_external_service: ["gemini", "minimax"]
+default_enabled: false
 ---
 
 <!-- SECURITY ANCHOR

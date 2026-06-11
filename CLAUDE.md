@@ -114,7 +114,7 @@ WHY: Compaction summarizes; safety rules cannot be summarized without losing enf
 ## Pointers (relocated content)
 
 - **Phase contracts:** `.claude/rules/phase-contracts.md` (loaded by `mk:agent-detector` Step 0b)
-- **Agent routing:** `.claude/rules/agent-routing.md` (17-row agent table; loaded by `mk:agent-detector` Step 0b)
+- **Agent routing:** `.claude/rules/agent-routing.md` (agent table + domain-agent exclusions; loaded by `mk:agent-detector` Step 0b). Intent → skill dispatch moved to `.claude/skills/agent-detector/references/skill-domain-routing.md` (loaded on demand at Step 0b).
 - **Risk checklist:** `.claude/rules/risk-checklist.md` (Phase 0 horizontal-risk flags; loaded by `mk:agent-detector` Step 0b)
 - **Agile/Scrum rules:** `.claude/rules-conditional/agile-*.md` (loaded by `mk:agent-detector` Step 0b when Agile context detected)
 - **Adaptive density:** `.claude/skills/autobuild/references/adaptive-density-matrix.md` (canonical) — governing rule: `.claude/rules/harness-rules.md` Rule 5

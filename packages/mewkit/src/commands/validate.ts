@@ -16,7 +16,16 @@ import type { Status } from "./doctor-checks.js";
 // they actually block. Behavioral proof is `doctor --hard-gates`. Statuses are honest:
 // PASS / WARN / N/A / FAIL. WARN and N/A do not fail the build unless --strict is passed.
 
-export type Section = "Structure" | "Hooks" | "Portability" | "Docs" | "Workflow" | "Ownership" | "Inventory" | "Packs";
+export type Section =
+	| "Structure"
+	| "Hooks"
+	| "Portability"
+	| "Docs"
+	| "Workflow"
+	| "Ownership"
+	| "Inventory"
+	| "Packs"
+	| "Rules";
 
 export interface CheckResult {
 	name: string;
@@ -34,6 +43,8 @@ interface ValidateOptions {
 	ownership?: boolean;
 	/** Scope the run to the pack-manifest coherence check only (used by CI). */
 	packs?: boolean;
+	/** Scope the run to the routing-table-breadth WARN check only. */
+	rules?: boolean;
 }
 
 const ok = (cond: boolean): Status => (cond ? "pass" : "fail");
@@ -290,6 +301,116 @@ export async function checkCodexProjection(projectRoot: string): Promise<CheckRe
 	return results;
 }
 
+// Files exempt from the routing-breadth check: tables that look like routing tables
+// by row count but are workflow/contract tables, not intent→skill dispatch. Keyed by
+// rules-relative basename. The routing-header heuristic already excludes most; this
+// allowlist is belt-and-suspenders for tables that drift toward routing vocabulary.
+const ROUTING_BREADTH_ALLOWLIST = new Set<string>(["phase-contracts.md"]);
+
+/** A header cell (trimmed, lowercased) that marks a table as intent→skill routing. */
+const ROUTING_HEADER_CELLS = new Set<string>(["intent", "use", "user wants", "user intent"]);
+
+function parsePipeCells(line: string): string[] {
+	return line
+		.replace(/^\s*\|/, "")
+		.replace(/\|\s*$/, "")
+		.split("|")
+		.map((c) => c.trim());
+}
+
+function isTableSeparatorRow(line: string): boolean {
+	return /^\s*\|?[\s:|-]+\|?\s*$/.test(line) && line.includes("-");
+}
+
+/** Parse the inventory artifacts map once (criticality lookup); empty map on any error. */
+function loadInventoryArtifacts(meowkitDir: string): Record<string, { criticality?: string }> {
+	const inventoryPath = path.join(meowkitDir, "harness-inventory.json");
+	if (!fs.existsSync(inventoryPath)) return {};
+	try {
+		const inv = JSON.parse(fs.readFileSync(inventoryPath, "utf-8")) as {
+			artifacts?: Record<string, { criticality?: string }>;
+		};
+		return inv.artifacts ?? {};
+	} catch {
+		return {};
+	}
+}
+
+/**
+ * WARN (never FAIL) when an always-loaded rule file carries a broad intent→skill
+ * routing table. Such tables are skill-dispatch guidance — they belong in a skill
+ * reference loaded on demand, not in always-on `.claude/rules/` context. Heuristic
+ * (all must hold): the table's header row names a routing column (Intent/Use/User
+ * wants), it has ≥8 data rows referencing `mk:` skills, the file's inventory
+ * criticality is not `critical`, and it is not on the allowlist.
+ */
+export function checkRoutingTableBreadth(meowkitDir: string): CheckResult[] {
+	const rulesDir = path.join(meowkitDir, "rules");
+	const results: CheckResult[] = [];
+	if (!fs.existsSync(rulesDir)) return results;
+
+	const artifacts = loadInventoryArtifacts(meowkitDir);
+	const files = fs.readdirSync(rulesDir).filter((f) => f.endsWith(".md"));
+	for (const file of files) {
+		if (ROUTING_BREADTH_ALLOWLIST.has(file)) continue;
+		const criticality = artifacts[`rules/${file}`]?.criticality ?? null;
+		if (criticality === "critical") continue;
+
+		const body = fs.readFileSync(path.join(rulesDir, file), "utf-8");
+		const lines = body.split("\n");
+		let inTable = false;
+		let headerIsRouting = false;
+		let mkRows = 0;
+		let flagged = false;
+
+		const finishTable = (): void => {
+			if (headerIsRouting && mkRows >= 8) flagged = true;
+			inTable = false;
+			headerIsRouting = false;
+			mkRows = 0;
+		};
+
+		for (const raw of lines) {
+			const line = raw;
+			const isPipeRow = /^\s*\|/.test(line);
+			if (!isPipeRow) {
+				if (inTable) finishTable();
+				continue;
+			}
+			if (!inTable) {
+				// First pipe row of a table = header row.
+				inTable = true;
+				const cells = parsePipeCells(line).map((c) => c.toLowerCase());
+				headerIsRouting = cells.some((c) => ROUTING_HEADER_CELLS.has(c));
+				continue;
+			}
+			if (isTableSeparatorRow(line)) continue;
+			// Data row.
+			if (/\bmk:[a-z][a-z-]*/.test(line)) mkRows += 1;
+		}
+		if (inTable) finishTable();
+
+		if (flagged) {
+			results.push({
+				name: `Routing-table breadth: rules/${file}`,
+				status: "warn",
+				detail: `An intent→skill routing table (≥8 mk: rows) lives in always-loaded rules/${file}. Move skill-dispatch tables into a skill reference loaded on demand (see agent-detector references/skill-domain-routing.md).`,
+				section: "Rules",
+			});
+		}
+	}
+
+	if (results.length === 0) {
+		results.push({
+			name: "Routing-table breadth",
+			status: "pass",
+			detail: "No broad intent→skill routing tables found in always-loaded rules/.",
+			section: "Rules",
+		});
+	}
+	return results;
+}
+
 function statusIcon(status: Status): string {
 	switch (status) {
 		case "pass":
@@ -337,6 +458,8 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = checkOwnership(meowkitDir);
 	} else if (args.packs) {
 		results = checkPacks(meowkitDir);
+	} else if (args.rules) {
+		results = checkRoutingTableBreadth(meowkitDir);
 	} else {
 		results = [
 			checkDirExists(meowkitDir, "agents"),
@@ -351,6 +474,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 			...checkWorkflowDrift(projectRoot, { missingSpecSeverity: "warn" }),
 			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
 			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
+			...checkRoutingTableBreadth(meowkitDir),
 		];
 		if (args.portable) {
 			results.push(...checkPortability());
@@ -371,6 +495,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		Ownership: true,
 		Packs: true,
 		Inventory: true,
+		Rules: true,
 	};
 	const sections = Object.keys(SECTION_ORDER) as Section[];
 	for (const section of sections) {

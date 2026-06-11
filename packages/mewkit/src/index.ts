@@ -60,6 +60,7 @@ ${pc.bold("Options:")}
   --workflow       Validate: run only the workflow.yaml drift-check (CI scope)
   --ownership      Validate: run only the artifact ownership-completeness check
   --packs          Validate: run only the pack-manifest coherence + safety check
+  --rules          Validate: run only the routing-table-breadth WARN check
   --fail-over <N>  Budget context: exit non-zero when a profile exceeds N tokens
   --json           Providers/inventory: emit machine-readable JSON
   --stale          Inventory: show only deprecated/experimental artifacts
@@ -151,6 +152,7 @@ async function main(): Promise<void> {
 			"portable-missing",
 			"emit-counts",
 			"packs",
+			"rules",
 		],
 		string: [
 			"only",
@@ -211,6 +213,7 @@ async function main(): Promise<void> {
 				workflow: args.workflow as boolean | undefined,
 				ownership: args.ownership as boolean | undefined,
 				packs: args.packs as boolean | undefined,
+				rules: args.rules as boolean | undefined,
 			});
 			break;
 		case "pack":

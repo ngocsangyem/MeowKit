@@ -71,15 +71,9 @@ WHY: Parallelism only pays off when task size amortizes coordination cost.
 
 Agent Team rules apply only when a team/worktree workflow is active. Standard single-session subagent workflows use `orchestration-rules.md`.
 
-When team mode is active:
+The team-mode coordination details (ownership, no-force-push, worktree-branch commits, actionable completion messages, docs-impact ownership) are loaded on demand by `mk:team-config` from `.claude/skills/team-config/references/team-coordination.md` — they cost zero always-on context in standard sessions.
 
-- Define file ownership in every teammate task.
-- Teammates never force-push.
-- Teammates commit to their worktree branch, not `main` or `dev`.
-- Completion messages must be actionable, not just "done".
-- The lead evaluates docs impact after implementation work.
-
-WHY: Team mode needs extra coordination that normal sessions do not.
+WHY: Team mode needs extra coordination that normal sessions do not; keeping the detail skill-local avoids loading it in the common single-session path.
 
 ## When to Parallelize
 

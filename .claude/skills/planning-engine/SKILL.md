@@ -22,6 +22,8 @@ owner: lifecycle
 criticality: medium
 status: active
 runtime: claude-code
+requires_external_service: ["jira"]
+default_enabled: false
 ---
 
 # mk:planning-engine — Tech Review & Sprint Planning Analysis

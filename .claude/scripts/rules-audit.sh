@@ -31,6 +31,9 @@ RULES_DIR=".claude/rules"
 SAFETY_BASELINE=("security-rules" "injection-rules" "gate-rules" "core-behaviors" "development-rules")
 # Rules with coverage_count >= 3 per canary-coverage-matrix.md (Phase 0 V3 deliverable).
 # Update this list when a new audit cycle re-runs the coverage matrix.
+# agent-routing ablation now covers the narrowed file (agent table + domain-agent
+# exclusions only); the intent->skill dispatch table lives in the agent-detector
+# skill reference and is no longer part of this always-loaded rule.
 ELIGIBLE_RULES=("agent-routing" "naming-rules" "phase-contracts")
 
 is_safety() {

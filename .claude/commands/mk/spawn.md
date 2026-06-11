@@ -60,3 +60,10 @@ Launch a specialist agent in an isolated workspace to handle a specific task in 
 - Spawned agent session with role, task, and file boundaries
 - Agent progress updates
 - Final output for review before merge
+
+### Team Coordination
+
+Team-mode coordination rules (ownership, no force-push, worktree-branch commits, actionable
+completion messages, lead docs-impact ownership) live in
+`.claude/skills/team-config/references/team-coordination.md`, loaded by `mk:team-config` on
+team activation.
