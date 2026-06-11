@@ -169,7 +169,8 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ### Cross-Cutting (Any Phase)
 
 ```toon
-[10]{skill,owner,trigger}
+[11]{skill,owner,trigger}
+`mk:ask-me`|any agent|Evidence-grounded project Q&A — "how does X work here", claim-checks, constraint summaries — answered with cited `file:line` sources. Read-only; redirects ideation/decisions/debugging/review to the owning specialist skill.
 `mk:careful`|any agent|Before destructive commands
 `mk:freeze`|any agent|Debug session scoping
 `mk:docs-finder`|any agent (primary: researcher)|Library/API documentation lookup
@@ -195,8 +196,8 @@ Deployment|2
 Documentation|4
 Memory|2
 Utility|12
-Cross-Cutting|5
-**Total**|**104**
+Cross-Cutting|6
+**Total**|**105**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

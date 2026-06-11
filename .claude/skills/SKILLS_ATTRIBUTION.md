@@ -40,6 +40,7 @@ Each skill retains its original author credit in its frontmatter.
 | 33  | henshin               | local adaptation            | Adapted from external skill patterns/agentize — planning front door only; downstream execution owned by plan-creator + cook | MIT | .claude/skills/henshin/ | 2 |
 | 34  | prompt-enhancer       | local original           | Synthesized from 7 source docs: claude-prompting-best-practices, codex-prompt-guide, factoryai/prompt-crafting-for-different-models, context-engineering-guide, effective-context-engineering-for-ai-agents (Anthropic) <!-- research-citation -->, lessons-build-skill, skill-authoring-guidelines | MIT | .claude/skills/prompt-enhancer/ | 2 |
 | 35  | mk-loop               | local adaptation            | Loop pattern (Modify→Verify→Keep/Discard) adapted from autoresearch by Udit Goenka; MeowKit-native boundary-gated autonomy, conventional `*(loop):` commit policy, tasks/reports + session-state artifacts, Skill Rule of Two | MIT | .claude/skills/mk-loop/ | 1 |
+| 36  | ask-me                | local adaptation            | Derived from the external toolkit's `ask` skill (analysis-only consultation), heavily narrowed: source-grounded project Q&A only — adds redirect-first routing, cited file:line evidence contract, depth budgets, fact-vs-inference split | Proprietary | .claude/skills/ask-me/ | 1 |
 
 ## Removed
 

@@ -25,6 +25,7 @@ Advisory only — does not change agent-detector scoring or output format.
 | Security audit | Review | mk:cso |
 | Simplify/refactor code | Review | mk:simplify |
 | Optimize a measurable metric (coverage %, bundle size, lint count, latency) through bounded git-tracked iterations | Build | mk:loop (keep/revert per scalar metric; NOT for subjective cleanup — see mk:cook) |
+| Factual project question with sources ("how does X work *here*", "explain X in this repo", "is it true that ... in the repo", "why is X structured this way") | any | mk:ask-me (cited inline answer; NOT library docs — see mk:docs-finder; NOT "why is X broken" — see mk:investigate) |
 | Visualize code, draw diagram, build slide deck, render plan as HTML | any | mk:preview |
 | Visualize a git diff or PR before review | Review | mk:preview (`--html --diff`) |
 | Ready to ship/deploy | Ship | mk:ship |

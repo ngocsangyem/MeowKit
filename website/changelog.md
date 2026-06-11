@@ -14,6 +14,23 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.11.1 (2026-06-11) — Ask-Me Project Q&A Skill
+
+### Highlights
+
+One new cross-cutting skill joins the catalog. `mk:ask-me` answers factual and explanatory questions about the current project — "how does X work here", "why is X structured this way", claim-checks — with cited `file:line` evidence instead of a long grep session. It is read-only by default, enforces hard read budgets per depth tier, separates verified claims from inference with a mandatory confidence level, and redirects ideation, decisions, debugging, and reviews to the owning specialist skill rather than partially answering.
+
+### New Skills
+
+| Skill       | Purpose                                                                                                                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `mk:ask-me` | Evidence-grounded project Q&A — answers "how does X work here", "why is X structured this way", and claim-checks with cited `file:line` evidence, hard read budgets, and redirect-first routing to specialist skills. Read-only by default. |
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the new skill.
+- No CLI package version bump is required for this release because the changed commits do not modify `packages/mewkit/src`.
+
 ## 2.11.0 (2026-06-11) — Context Tiers + Harness Guardrails
 
 ### Highlights
