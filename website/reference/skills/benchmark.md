@@ -26,6 +26,7 @@ Activate before applying a harness change (baseline) and after (verify delta). A
 - **Run canary suite:** Executes spec files from `.claude/benchmarks/canary/quick/` (and `full/` with `--full`) via `mk:autobuild`, recording per-task verdicts, scores, duration, and cost.
 - **Compare runs:** Reads two prior run JSONs from `.claude/benchmarks/results/` and emits a markdown delta table showing per-task score and cost changes.
 - **Persist baselines:** After each completed run, appends a cost baseline to `.claude/memory/cost-log.json` and emits a `benchmark_result` event to `.claude/memory/trace-log.jsonl`.
+- **Git index audit:** `scripts/git-index-audit.sh` records a reproducible git tracked-state fingerprint as a JSON artifact in `.claude/benchmarks/audits/` (a sibling of `results/`, with a `type: audit` discriminator). Single-repo mode snapshots tracked-file/directory counts plus tracked-path and tracked-index SHA-256; two-arg mode adds local/remote-only counts and a recursive diff status.
 
 ## Example Prompt
 
@@ -40,6 +41,8 @@ Run the benchmark canary suite to baseline current harness performance. Then com
 | `run` (default) | Execute quick tier (5 tasks, under `.claude/benchmarks/canary/quick/`) |
 | `run --full` | Execute quick + heavy tier (6 tasks total, includes `.claude/benchmarks/canary/full/`) |
 | ``compare RUN-ID-A RUN-ID-B`` | Diff two prior run JSONs |
+| ``git-index-audit.sh [repo]`` | Single-repo tracked-state fingerprint → JSON artifact in `audits/` |
+| ``git-index-audit.sh <local> <remote>`` | Compare two checkouts (only-counts + recursive diff) |
 
 `--full` is strictly opt-in. The heavy task (`06-small-app-build`) triggers `mk:autobuild` which can run for hours — the script refuses without the flag to prevent accidental cost burn.
 

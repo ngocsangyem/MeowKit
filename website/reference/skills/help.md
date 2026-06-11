@@ -1,6 +1,6 @@
 ---
 title: "mk:help"
-description: "Navigation assistant — scans project state (plans, reviews, tests, git) and recommends the next step in the 7-phase pipeline."
+description: "Navigation assistant — scans project state (plans, reviews, tests, git, checkpoint/budget/model/verdict sources) and ranks the top next steps in the 7-phase pipeline."
 ---
 
 # mk:help — Workflow Navigation
@@ -22,13 +22,27 @@ Explicit: `/mk:help [--verbose]`
 
 ## Core Capabilities
 
-Scans these sources in order, stops at the first actionable recommendation:
+Collects candidates from all sources below, then ranks them and emits a top-3 of next
+steps with rationale — it does not stop at the first hit. The rank-1 step equals the old
+single recommendation (back-compatible); ranks 2–3 are alternates. The skill is read-only.
+
+Base sources:
 
 1. **Paused Step-File Workflows** — checks `session-state/*-progress.json` for in-progress step-file skills.
 2. **In-Progress Plans** — checks `tasks/plans/` for plans without matching review verdicts, maps to Phase 2/3/4.
 3. **Pending Reviews** — checks `tasks/reviews/` for WARN or FAIL verdicts needing action.
 4. **Uncommitted Changes** — checks `git status` for staged/unstaged changes + review approval status.
 5. **Clean State** — no plans, no reviews, no changes → suggests starting new task or running retro.
+
+Additional sources (each skipped silently when absent):
+
+6. **Checkpoint state** — `session-state/checkpoints/checkpoint-latest.json` (model tier, active plan, branch, budget; staleness demoted past 24h via `created_at`).
+7. **Budget state** — `session-state/budget-state.json` (cost, turn count, warnings) — advisory only.
+8. **Detected model** — `session-state/detected-model.json` (authoritative current-session tier).
+9. **Review verdicts** — `tasks/reviews/<slug>-verdict.json` (`decision`, per-dimension verdicts).
+10. **Roadmap** — `docs/development-roadmap.md` when present.
+
+A review is blocked when `decision === "BLOCKED"` — the verdict enum is `PASS | PASS_WITH_RISK | BLOCKED`; `FAIL` exists only per-dimension. The ranked next-steps are documented as a JSON-compatible shape and rendered as a concise human summary. Backward-looking delivery status stays with `/mk:status`.
 
 ## State-to-Recommendation Map
 
@@ -73,8 +87,8 @@ Not every task needs the full 7-phase pipeline:
 
 | Argument | Effect |
 |---|---|
-| (none) | Quick recommendation |
-| `--verbose` | Full state scan results: plan files found, review files found, test status, git status |
+| (none) | Ranked top-3 next steps (rank-1 is the recommended step) |
+| `--verbose` | Full state scan results: plan/review files, test + git status, and which additional sources (6–10) were present vs skipped |
 
 ## Example Prompt
 

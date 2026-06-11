@@ -14,6 +14,38 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.11.0 (2026-06-11) — Context Tiers + Harness Guardrails
+
+### Highlights
+
+This release tightens the harness's always-on context and adds guardrails across it. The intent → skill routing table moved out of always-loaded rules, context-budget reporting now splits by load tier, hook-registration drift is caught in both directions, skills can declare their external-service contract, and `mk:help` now ranks your next steps with rationale.
+
+### New Commands
+
+- `/mk:help` — thin wrapper for the forward-looking navigator that ranks your next steps.
+
+### CLI
+
+- `mewkit budget context` now reports an always-on / conditional / on-demand tier breakdown; `--json` gains a `tiers` field alongside the existing top-level totals.
+- `mewkit validate --rules` — new scoped check that warns when a broad intent → skill routing table lives in an always-loaded rule.
+- The `mewkit` package version for this release is `1.10.7`.
+
+### Features
+
+- `mk:help` now emits a ranked top-3 of next steps with rationale, reading checkpoint, budget, detected-model, review-verdict, and roadmap state with graceful handling when a source is absent.
+- Skill frontmatter gains three advisory tool-contract fields — `requires_external_service`, `default_enabled`, and `stable_output_contract` — surfaced by the frontmatter validator as warnings.
+- New benchmark audit mode — `git-index-audit.sh` records a reproducible git tracked-state fingerprint (tracked-path and index SHA-256, file and directory counts, optional two-checkout comparison) as a JSON artifact.
+
+### Improvements
+
+- The intent → skill routing table moved out of always-loaded `agent-routing.md` into an on-demand `mk:agent-detector` reference, trimming always-on context.
+- `mewkit budget context` no longer counts conditional rules as always-on.
+- Hook-registration validation now detects drift in both directions — a registered hook missing on disk, and a `handlers.json` entry with no file — not only unregistered scripts.
+- Brand-prose lint gains a diff mode that fails on violations in changed files while treating pre-existing violations in untouched files as warnings.
+- Team-mode coordination detail moved out of always-loaded rules into a `mk:team-config` reference, loaded only when team mode activates.
+
+---
+
 ## 2.10.3 (2026-06-10) — Memory + Plan Completion Cleanup
 
 ### Highlights

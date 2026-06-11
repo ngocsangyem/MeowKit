@@ -413,6 +413,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.11.0 | 2026-06-11 | Context Tiers + Harness Guardrails               |
 | v2.10.3 | 2026-06-10 | Memory + Plan Completion Cleanup                 |
 | v2.10.2 | 2026-06-02 | PR Review + Response Skills                      |
 | v2.10.1 | 2026-06-02 | Brainstorming Rigor + Prompt Recipes            |
