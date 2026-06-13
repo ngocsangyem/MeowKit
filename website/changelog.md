@@ -14,6 +14,23 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.11.2 (2026-06-13) — Grill Plan-Interrogation Skill
+
+### Highlights
+
+One new pre-planning skill joins the catalog. `mk:grill` relentlessly interviews you about your own plan or design — one question at a time — resolving each branch of the decision tree until you both share the same understanding. It is the inverse of the other elicitation skills: Claude is the interviewer and you are the interviewee. Every answer is checkpointed to `docs/knowledge/<slug>.md` so progress survives a context-window reset, anything you cannot answer is flagged as a gap to chase down, and the session ends by handing the front-loaded context to `mk:skill-creator`, `mk:plan-creator` / `mk:brainstorming`, or `mk:project-context`.
+
+### New Skills
+
+| Skill      | Purpose                                                                                                                                                                                                                                          |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mk:grill` | Relentless one-question-at-a-time interview of your own plan or design — resolves every decision-tree branch, checkpoints each answer to `docs/knowledge/<slug>.md`, flags the gaps you cannot answer, and hands off to the right build skill. Read-only on the source doc. |
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the new skill.
+- No CLI package version bump is required for this release because the changed commits do not modify `packages/mewkit/src`.
+
 ## 2.11.1 (2026-06-11) — Ask-Me Project Q&A Skill
 
 ### Highlights

@@ -12,6 +12,7 @@ Advisory only — does not change agent-detector scoring or output format.
 | Green-field product build ("build me a kanban app", "make a SaaS dashboard", autonomous multi-hour build) | Plan + Build | mk:autobuild (preferred over mk:cook for autonomous green-field work; runs planner → contract → generator ⇄ evaluator loop) |
 | Have plan, ready to implement | Build | mk:cook, mk:development |
 | Rough-size from spec / pre-ticket sizing / estimate stories before tickets exist | Plan | mk:story-sizer |
+| Stress-test / interrogate my OWN plan or design ("grill me", "get grilled on my design") until every branch is resolved | Plan | mk:grill (one question at a time; checkpoints to `docs/knowledge/<slug>.md`; NOT proposing options — see mk:brainstorming; NOT "should we build this" — see mk:office-hours; NOT Claude answering repo questions — see mk:ask-me) |
 | UI/frontend work | Build | mk:frontend-design, mk:cook |
 | API/backend work | Build | mk:api-design, mk:cook |
 | Need library/API docs | Build | mk:docs-finder |

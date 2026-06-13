@@ -265,6 +265,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:plan-ceo-review', link: '/reference/skills/plan-ceo-review' },
             { text: 'mk:office-hours', link: '/reference/skills/office-hours' },
             { text: 'mk:brainstorming', link: '/reference/skills/brainstorming' },
+            { text: 'mk:grill', link: '/reference/skills/grill' },
             { text: 'mk:prompt-enhancer', link: '/reference/skills/prompt-enhancer' },
             { text: 'mk:party', link: '/reference/skills/party' },
             { text: 'mk:decision-framework', link: '/reference/skills/decision-framework' },
