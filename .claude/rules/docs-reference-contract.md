@@ -41,6 +41,7 @@ docs/wireframe/
 docs/designs/
 docs/retros/
 docs/rollback/
+docs/knowledge/
 <!-- ALLOWLIST-END -->
 
 The block above is parsed by the validator. One path per line. Comment lines (starting `#`) are ignored. Prefix matches use the trailing `/`.
