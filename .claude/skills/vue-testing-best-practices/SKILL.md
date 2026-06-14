@@ -16,16 +16,29 @@ when_to_use: >-
   E2E spec generation/run (mk:qa-manual), browser driving
   (mk:agent-browser/mk:playwright-cli), or Vue feature code
   (mk:vue/mk:vue-best-practices).
-keywords: [vue-testing, vitest, vue-test-utils, component-testing, composable-testing,
-  pinia-testing, vue-router-testing, async-component-testing, flushpromises,
-  teleport-testing, snapshot-policy, test-smells, e2e-strategy]
+keywords:
+  [
+    vue-testing,
+    vitest,
+    vue-test-utils,
+    component-testing,
+    composable-testing,
+    pinia-testing,
+    vue-router-testing,
+    async-component-testing,
+    flushpromises,
+    teleport-testing,
+    snapshot-policy,
+    test-smells,
+    e2e-strategy,
+  ]
 user-invocable: true
 allowed-tools:
   - Read
   - Grep
   - Glob
 version: 1.0.0
-source: vuejs-ai (vendored, extended for MeowKit)
+source: vuejs-ai (vendored, extended for toolkit)
 ---
 
 # Vue Testing Best Practices
@@ -49,7 +62,7 @@ domain-specialized advisory that you invoke deliberately.
 **Do NOT invoke for** (each routes to its owner):
 
 - Running tests / TDD red-green / non-Vue tests / generic Playwright runner protocol → `mk:testing`
-- Diff/PR structural review or test-*existence* gap detection → `mk:review`
+- Diff/PR structural review or test-_existence_ gap detection → `mk:review`
 - Coverage→requirement mapping → `mk:nyquist`
 - QA of a running app + bug fixes → `mk:qa`
 - Generating or running Playwright `.spec.ts` E2E → `mk:qa-manual`
@@ -58,21 +71,21 @@ domain-specialized advisory that you invoke deliberately.
 
 ## Invocation Decision Guide
 
-| You want to… | Use |
-| --- | --- |
-| Write/refactor Vue feature code | `mk:vue` |
-| Review Vue *feature* code / authoring workflow | `mk:vue-best-practices` |
-| **Design or review Vue *test* code; choose test tooling** | **this skill** |
-| Actually run tests / TDD loop / non-Vue tests | `mk:testing` |
-| Diff/PR review or "does a test exist for this change?" | `mk:review` |
-| Map test coverage → requirements (which criteria are untested) | `mk:nyquist` |
-| "does the running site work? find + fix bugs" | `mk:qa` |
-| Generate runnable Playwright E2E specs from a spec/URL | `mk:qa-manual` |
-| Drive a real browser | `mk:agent-browser` / `mk:playwright-cli` |
+| You want to…                                                   | Use                                      |
+| -------------------------------------------------------------- | ---------------------------------------- |
+| Write/refactor Vue feature code                                | `mk:vue`                                 |
+| Review Vue _feature_ code / authoring workflow                 | `mk:vue-best-practices`                  |
+| **Design or review Vue _test_ code; choose test tooling**      | **this skill**                           |
+| Actually run tests / TDD loop / non-Vue tests                  | `mk:testing`                             |
+| Diff/PR review or "does a test exist for this change?"         | `mk:review`                              |
+| Map test coverage → requirements (which criteria are untested) | `mk:nyquist`                             |
+| "does the running site work? find + fix bugs"                  | `mk:qa`                                  |
+| Generate runnable Playwright E2E specs from a spec/URL         | `mk:qa-manual`                           |
+| Drive a real browser                                           | `mk:agent-browser` / `mk:playwright-cli` |
 
 ### Disambiguation vs mk:vue-best-practices
 
-The seam is *authoring* vs *test-setup*:
+The seam is _authoring_ vs _test-setup_:
 
 - Review how a component **uses** Teleport (when to use it, the API, the fallback boundary)
   → `mk:vue-best-practices`.
@@ -87,23 +100,23 @@ this skill.
 
 Read one level deep from this file. Load only the reference that matches the surface.
 
-| Problem / intent | Reference |
-| --- | --- |
-| Setting up test infrastructure for a Vue 3 project | `reference/testing-vitest-recommended-for-vue.md` |
-| Tests break when refactoring component internals | `reference/testing-component-blackbox-approach.md` |
-| Flaky/intermittent tests, async DOM not updated | `reference/testing-async-await-flushpromises.md` |
-| Composables using lifecycle hooks or `inject` fail to test | `reference/testing-composables-helper-wrapper.md` |
-| "injection Symbol(pinia) not found" errors | `reference/testing-pinia-store-setup.md` |
-| Components with async `setup()` won't render | `reference/testing-suspense-async-components.md` |
-| Snapshot tests pass despite broken functionality | `reference/testing-no-snapshot-only.md` |
-| Choosing an end-to-end framework for a Vue app | `reference/testing-e2e-playwright-recommended.md` |
-| Need to verify computed styles or real DOM events | `reference/testing-browser-vs-node-runners.md` |
-| `defineAsyncComponent` components fail in tests | `reference/async-component-testing.md` |
-| Teleported content can't be found in wrapper queries | `reference/teleport-testing-complexity.md` |
-| Testing routing: `useRoute`/`useRouter`, navigation guards | `reference/vue-router-testing.md` |
-| Testing forms: inputs, validation, submit payloads | `reference/form-testing.md` |
-| Asserting accessibility in tests (roles, focus, keyboard) | `reference/accessibility-testing.md` |
-| Reviewing tests for smells (the severity rubric) | `reference/test-smells-rubric.md` |
+| Problem / intent                                           | Reference                                          |
+| ---------------------------------------------------------- | -------------------------------------------------- |
+| Setting up test infrastructure for a Vue 3 project         | `reference/testing-vitest-recommended-for-vue.md`  |
+| Tests break when refactoring component internals           | `reference/testing-component-blackbox-approach.md` |
+| Flaky/intermittent tests, async DOM not updated            | `reference/testing-async-await-flushpromises.md`   |
+| Composables using lifecycle hooks or `inject` fail to test | `reference/testing-composables-helper-wrapper.md`  |
+| "injection Symbol(pinia) not found" errors                 | `reference/testing-pinia-store-setup.md`           |
+| Components with async `setup()` won't render               | `reference/testing-suspense-async-components.md`   |
+| Snapshot tests pass despite broken functionality           | `reference/testing-no-snapshot-only.md`            |
+| Choosing an end-to-end framework for a Vue app             | `reference/testing-e2e-playwright-recommended.md`  |
+| Need to verify computed styles or real DOM events          | `reference/testing-browser-vs-node-runners.md`     |
+| `defineAsyncComponent` components fail in tests            | `reference/async-component-testing.md`             |
+| Teleported content can't be found in wrapper queries       | `reference/teleport-testing-complexity.md`         |
+| Testing routing: `useRoute`/`useRouter`, navigation guards | `reference/vue-router-testing.md`                  |
+| Testing forms: inputs, validation, submit payloads         | `reference/form-testing.md`                        |
+| Asserting accessibility in tests (roles, focus, keyboard)  | `reference/accessibility-testing.md`               |
+| Reviewing tests for smells (the severity rubric)           | `reference/test-smells-rubric.md`                  |
 
 ## Workflow
 
@@ -127,15 +140,15 @@ tooling advice.
 
 **Stop conditions (hand off, do not attempt):**
 
-| Request | Hand off to |
-| --- | --- |
-| Execute / run tests, TDD loop | `mk:testing` |
-| Generate runnable E2E `.spec.ts` | `mk:qa-manual` |
-| Drive a live browser | `mk:agent-browser` / `mk:playwright-cli` |
-| Coverage→requirement map | `mk:nyquist` |
-| QA a running app + fix bugs | `mk:qa` |
-| Diff/PR review or test-existence gaps | `mk:review` |
-| Root-cause a failing test/bug | `mk:investigate` |
+| Request                               | Hand off to                              |
+| ------------------------------------- | ---------------------------------------- |
+| Execute / run tests, TDD loop         | `mk:testing`                             |
+| Generate runnable E2E `.spec.ts`      | `mk:qa-manual`                           |
+| Drive a live browser                  | `mk:agent-browser` / `mk:playwright-cli` |
+| Coverage→requirement map              | `mk:nyquist`                             |
+| QA a running app + fix bugs           | `mk:qa`                                  |
+| Diff/PR review or test-existence gaps | `mk:review`                              |
+| Root-cause a failing test/bug         | `mk:investigate`                         |
 
 **Escalation:** non-Vue test code → `mk:testing`; running-app bugs → `mk:qa`; root-cause
 debugging → `mk:investigate`; coverage map → `mk:nyquist`.
@@ -152,9 +165,9 @@ restate Vue basics (defer to `mk:vue`), dump whole files, or recite generic test
 3. **Missing Scenarios** — untested behaviors: error states, async/loading, edge inputs,
    a11y states.
 4. **Coverage Risks** — Vue-specific blind spots: Teleported content, Suspense fallback,
-   store actions, router guards. Note: *existence-level* diff coverage gaps are produced
+   store actions, router guards. Note: _existence-level_ diff coverage gaps are produced
    automatically by `mk:review` `references/test-coverage.md` during a full review — this
-   section audits test *quality*, not existence.
+   section audits test _quality_, not existence.
 5. **Tooling Recommendations** — Vitest / runner (happy-dom vs Browser Mode) / library
    (`@vue/test-utils` vs `@testing-library/vue`) / Playwright-vs-Cypress choices, each with a
    one-line rationale.
@@ -209,4 +222,4 @@ Missing Scenarios: empty-query, no-results, API error.
 ## Provenance
 
 Ported and extended from an upstream Vue testing skill — see [SYNC.md](SYNC.md) for the
-upstream path, pinned commit, and which references are vendored-verbatim vs MeowKit-local.
+upstream path, pinned commit, and which references are vendored-verbatim vs toolkit.

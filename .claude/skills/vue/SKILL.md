@@ -20,6 +20,9 @@ keywords:
   - composables
   - file-based-routing
   - definemodel
+  - script-setup-macros
+  - generic-components
+  - vue-3-5
   - framework-specific
 when_to_use: Use when writing/reviewing/refactoring Vue 3 (components, composables, reactivity, Pinia, Pinia Colada, routing). Auto-activates on .vue files. NOT for deep best-practices review/recommendations or the ordered best-practices workflow (see mk:vue-best-practices), generic TypeScript (see mk:typescript), React (see mk:react-patterns), or Angular (see mk:angular).
 user-invocable: true
@@ -92,6 +95,9 @@ Read one level deep from this file. Read multiple when a task spans topics.
 | Direct cache access: `getQueryData`/`setQueryData`/`invalidateQueries` | `references/pinia-colada-cache.md`     |
 | File-based routing, route groups, params, `definePage`, typed router   | `references/routing-pages.md`          |
 | Project stack, structure, commands, conventions, docs research         | `references/project-standards.md`      |
+| 3.4/3.5 core APIs: `useId`, `nextTick`, flush timing, `watch` once/deep, `onWatcherCleanup` | `references/core-new-apis.md`          |
+| `<script setup>` compiler macros — `defineOptions`, `withDefaults`, generic components       | `references/script-setup-macros.md`    |
+| Advanced reactivity: `effectScope`, `customRef`, `triggerRef`, `markRaw`, `shallowReadonly`  | `references/advanced-patterns.md`      |
 
 ## Gotchas
 
@@ -120,6 +126,12 @@ Read one level deep from this file. Read multiple when a task spans topics.
   route name.
 - **Use explicit route param names** — `userId` not `id`, `postSlug` not `slug`, for type-safe,
   self-documenting routes.
+- **Watching a destructured prop needs a getter** — `const { count } = defineProps()` stays reactive
+  in templates, but `watch(count, ...)` watches a snapshot; use `watch(() => count, ...)`
+  (`references/core-new-apis.md`).
+- **`onWatcherCleanup()` must be called synchronously** — invoking it after an `await` throws, since
+  the active-watcher context is gone; use the `onCleanup` callback param for post-await cancellation
+  (`references/core-new-apis.md`).
 
 ## Anti-Patterns
 
