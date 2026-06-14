@@ -1,18 +1,25 @@
 ---
 name: mk:vue
-description: Vue 3 Composition API patterns, Pinia state management, reactivity, component design, and performance. Auto-activates on .vue files or Vue-related tasks. Use for Vue architecture decisions, composables, Pinia stores, forms, and optimization.
-source: aura-frog
-original_skills:
-  - vue-expert
-adapted_for: claude-code
+version: 1.0.0
+description: |
+  Use when writing, reviewing, or refactoring Vue 3 code — components, composables,
+  reactivity, Pinia state, Pinia Colada data-fetching, file-based routing, and forms.
+  Targets Composition API + <script setup> + TypeScript. Auto-activates on .vue files.
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
 keywords:
   - vue
   - composition-api
+  - script-setup
   - pinia
-  - reactivity
+  - pinia-colada
   - composables
+  - file-based-routing
+  - definemodel
   - framework-specific
-when_to_use: Use when working with Vue 3 Composition API, Pinia, reactivity, composables. Auto-activates on .vue files. NOT for React (see mk:react-patterns) or Angular.
+when_to_use: Use when writing/reviewing/refactoring Vue 3 (components, composables, reactivity, Pinia, Pinia Colada, routing). Auto-activates on .vue files. NOT for generic TypeScript (see mk:typescript), React (see mk:react-patterns), or Angular (see mk:angular).
 user-invocable: true
 owner: utility
 criticality: medium
@@ -20,40 +27,91 @@ status: active
 runtime: claude-code
 ---
 
-# Vue 3 Expert
+# Vue 3
 
-Vue 3 Composition API patterns, Pinia, reactivity, component design, forms, and performance.
+Opinionated Vue 3 patterns — Composition API + `<script setup lang="ts">`, Pinia, Pinia
+Colada, file-based routing, and performance. Single entrypoint routing to focused references.
 
-> Use `npx chub search vue` for relevant documentation packages within the Context Hub
+> Use `npx chub search vue` for relevant documentation packages within the Context Hub.
 
 ## When to Use
 
-**Auto-activate on:** `.vue` files, Vue 3 Composition API, Pinia stores, `<script setup>`, Vue Router, composables
+**Auto-activate on:** `.vue` files, Vue 3 Composition API, `<script setup>`, Pinia stores,
+Pinia Colada queries/mutations, Vue Router file-based routes, composables.
 
 **Explicit:** `/mk:vue [concern]`
 
-**Do NOT invoke for:** TypeScript fundamentals (use mk:typescript), visual design (use mk:frontend-design), testing (use mk:testing)
-
-## Workflow Integration
-
-Operates in **Phase 3 (Build GREEN)**. Output supports the `developer` agent.
-
-## Process
-
-1. **Detect concern** — component? composable? store? form? performance?
-2. **Load relevant reference** — vue-patterns, pinia, or forms
-3. **Apply patterns** — implement using Vue 3 best practices from references
-4. **Verify** — component renders, types pass, no console warnings
+**Do NOT invoke for:** TypeScript fundamentals (use `mk:typescript`), React (use
+`mk:react-patterns`), Angular (use `mk:angular`), visual design (use `mk:frontend-design`),
+testing (use `mk:testing` / `mk:qa`).
 
 ## Core Rules (always apply)
 
-- **ALWAYS** use `<script setup lang="ts">` — never Options API
-- **ALWAYS** use `defineProps` with TypeScript interfaces — never runtime validation
-- **ALWAYS** use `storeToRefs()` when destructuring Pinia store state
-- **NEVER** use `v-html` with user content (security-rules.md — XSS vector)
-- **PREFER** composables (`use*`) over mixins
-- **PREFER** `ref()` for primitives, `reactive()` only for complex objects
-- **NAME** components PascalCase, files kebab-case (`agent-conduct.md` (B1))
+Distilled from the rulekit standards. These are non-negotiable defaults; everything else is
+in the references.
+
+- **`<script setup lang="ts">` only** — never Options API, never `defineComponent()` wrapper.
+- **`type` over `interface`** for defining object/prop shapes; keep types alongside the code.
+- **Arrow functions for methods and callbacks.**
+- **Named exports over default exports — except composables, which use `export default`.**
+- **PascalCase component names, kebab-case file names** (`UserProfile` in
+  `user-profile.vue`); composables are `camelCase` with `use` prefix (`useAuth`).
+- **Name general → specific:** `SearchButtonClear.vue`, not `ClearSearchButton.vue`.
+- **TailwindCSS classes, not manual CSS;** never hard-code colors — use the Tailwind color system.
+- **Comments explain _why_, not _what_.**
+- **`ref()` for primitives, `reactive()` only for complex objects;** `computed()` for derived state.
+- **Never `v-html` with user-provided content** — XSS vector (see `mk:` security rules).
+
+## Data Layer (conditional default)
+
+When the project depends on `@pinia/colada`, it is the **preferred async/data-fetching layer**
+— see `references/pinia-colada.md`. Otherwise use plain Pinia stores + composables for state.
+Pinia stores hold global UI/app state; data fetching belongs in Pinia Colada when present.
+
+## When to Read Each Reference
+
+Read one level deep from this file. Read multiple when a task spans topics.
+
+| Task involves                                                          | Read                                   |
+| ---------------------------------------------------------------------- | -------------------------------------- |
+| Components, props/emits, slots, `defineModel`, naming, templates       | `references/components.md`             |
+| Composables (`use*`), shared reactive logic                            | `references/composables.md`            |
+| `ref`/`reactive`/`computed`/`watch`, `toRefs`, performance             | `references/reactivity-performance.md` |
+| Global state with Pinia setup stores, `storeToRefs`                    | `references/state-pinia.md`            |
+| Pinia Colada core: keys, `defineQueryOptions`, `useQuery`, mutations   | `references/pinia-colada.md`           |
+| Optimistic updates, infinite/paginated queries, SSR, cancellation      | `references/pinia-colada-advanced.md`  |
+| Pinia Colada plugins (retry, delay, auto-refetch, persister, hooks)    | `references/pinia-colada-plugins.md`   |
+| Direct cache access: `getQueryData`/`setQueryData`/`invalidateQueries` | `references/pinia-colada-cache.md`     |
+| File-based routing, route groups, params, `definePage`, typed router   | `references/routing-pages.md`          |
+| Project stack, structure, commands, conventions, docs research         | `references/project-standards.md`      |
+
+## Gotchas
+
+- **Destructuring `reactive()` loses reactivity** — `const { count } = reactive({ count: 0 })`
+  makes `count` a plain number; keep the reactive object intact, or use `toRefs()`, or `ref()`.
+- **`storeToRefs()` required when destructuring Pinia state** — `const { user } = useAuthStore()`
+  gives a non-reactive snapshot; use `const { user } = storeToRefs(useAuthStore())`. Methods
+  are destructured directly from the store (not through `storeToRefs`).
+- **Parent `ref` access needs `defineExpose()`** — `childRef.value.method()` returns `undefined`
+  unless the child `<script setup>` explicitly `defineExpose({ method })`.
+- **Use `:slotted()` not `:deep()` for slotted content** — slot content comes from the parent
+  scope, so `:deep(.child-class)` in a scoped style block does not match it; use `:slotted(.child-class)`.
+- **`watchEffect` cleanup race on fast re-renders** — register cleanup to cancel async work:
+  `watchEffect((onCleanup) => { onCleanup(() => controller.abort()) })`, or a fast prop change
+  starts a second effect before the first resolves and writes stale state.
+- **Pinia store not hydrated in SSR** — calling `useMyStore()` outside a component setup context
+  (e.g. a top-level module) creates an instance disconnected from the SSR app; call stores inside
+  `setup()` or pass the `pinia` instance explicitly: `useMyStore(pinia)`.
+- **Query keys must depend on ALL variables used in the query function** — a key that omits a
+  variable serves stale cached data when that variable changes (Pinia Colada).
+- **Dynamic query keys need a getter, not a plain value** — pass `key: () => [...]` so the key
+  re-evaluates reactively; a plain array snapshot never updates.
+- **Prefer `refresh()` over `refetch()`** — `refresh()` reuses in-flight requests and respects
+  `staleTime`; `refetch()` always forces a new fetch.
+- **Avoid `index.vue` route files** — use a named group like `pages/(home).vue` for a meaningful
+  route name.
+- **Use explicit route param names** — `userId` not `id`, `postSlug` not `slug`, for type-safe,
+  self-documenting routes.
 
 ## Anti-Patterns
 
@@ -68,40 +126,7 @@ Operates in **Phase 3 (Build GREEN)**. Output supports the `developer` agent.
 | Global event bus                   | `provide/inject` or Pinia        |
 | `defineComponent()` wrapper        | `<script setup>` directly        |
 
-## Output Format
+## Workflow Integration
 
-```
-## Vue: {concern}
-
-**Files:** {list of .vue files modified}
-**Pattern:** {composition API | pinia store | composable | component}
-
-### Implementation
-{code changes with Vue 3 patterns applied}
-
-### Verification
-{component renders, no console warnings, types pass}
-```
-
-## References
-
-| Reference                                           | When to load              | Content                                                    |
-| --------------------------------------------------- | ------------------------- | ---------------------------------------------------------- |
-| **[vue-patterns.md](./references/vue-patterns.md)** | Component/composable work | Composition API, reactivity, component design, performance |
-
-## Failure Handling
-
-| Failure                             | Recovery                                    |
-| ----------------------------------- | ------------------------------------------- |
-| Vue 2 syntax detected (Options API) | Migrate to Composition API `<script setup>` |
-| Pinia not installed                 | `npm install pinia`                         |
-| Type errors in template             | Fix with `defineProps<T>()` typing          |
-
-## Gotchas
-
-- **Destructuring `reactive()` loses reactivity** — `const { count } = reactive({ count: 0 })` makes `count` a plain number; always use `toRefs()` or keep the reactive object intact, or switch to `ref()`.
-- **`storeToRefs()` not called when destructuring Pinia store** — `const { user } = useAuthStore()` gives a non-reactive snapshot; `const { user } = storeToRefs(useAuthStore())` is required for reactive bindings.
-- **`<script setup>` with `defineExpose()` is required for parent `ref` access** — calling `childRef.value.method()` from a parent always returns `undefined` unless the child explicitly `defineExpose({ method })`; omitting this is silent until runtime.
-- **`:deep()` selector broken when component uses scoped styles + slot content** — slot content comes from the parent scope, so `:deep(.child-class)` in a scoped style block has no effect on slotted content; use `:slotted(.child-class)` instead.
-- **`watchEffect` cleanup race on fast re-renders** — without calling the `onCleanup` callback to cancel async operations, a fast prop change triggers a second effect before the first resolves, causing stale state writes; always register cleanup via `watchEffect((onCleanup) => { onCleanup(() => controller.abort()) })`.
-- **Pinia store state not hydrated in SSR (Nuxt/Vite SSR)** — calling `useMyStore()` outside a component setup context (e.g., in a top-level module) creates a store instance disconnected from the SSR app; always call stores inside `setup()` or pass the `pinia` instance explicitly via `useMyStore(pinia)`.
+Auto-activates during Build when a Vue project is detected (`.vue` files, `vue` in
+`package.json`). Loaded by the `developer` agent alongside `mk:typescript`.
