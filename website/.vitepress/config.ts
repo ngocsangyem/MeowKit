@@ -304,6 +304,8 @@ export default withMermaid(defineConfig({
           items: [
             { text: 'mk:typescript', link: '/reference/skills/typescript' },
             { text: 'mk:vue', link: '/reference/skills/vue' },
+            { text: 'mk:vue-best-practices', link: '/reference/skills/vue-best-practices' },
+            { text: 'mk:vue-testing-best-practices', link: '/reference/skills/vue-testing-best-practices' },
             { text: 'mk:angular', link: '/reference/skills/angular' },
             { text: 'mk:react-patterns', link: '/reference/skills/react-patterns' },
             { text: 'mk:frontend-design', link: '/reference/skills/frontend-design' },

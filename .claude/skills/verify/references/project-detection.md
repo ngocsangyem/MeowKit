@@ -4,6 +4,7 @@ Detailed logic for detecting project type and selecting the correct verification
 
 ## Contents
 
+- [Changed-Files Scope](#changed-files-scope)
 - [Detection Order](#detection-order)
 - [JS/TS Sub-Type Detection](#jsts-sub-type-detection)
   - [Package Manager](#package-manager)
@@ -18,6 +19,50 @@ Detailed logic for detecting project type and selecting the correct verification
 - [Unknown Project Type](#unknown-project-type)
 - [Command Existence Check](#command-existence-check)
 
+
+---
+
+## Changed-Files Scope
+
+Default behavior scopes **lint** and **tests** to the changed files; **build** and
+**type-check** stay whole-program. `--full` runs every step across the whole project.
+
+### Detect the changed set
+
+```bash
+BASE=$(git merge-base HEAD origin/HEAD 2>/dev/null \
+    || git merge-base HEAD main 2>/dev/null \
+    || git merge-base HEAD master 2>/dev/null)
+{ [ -n "$BASE" ] && git diff --name-only "$BASE"...HEAD
+  git diff --name-only            # unstaged
+  git diff --name-only --cached   # staged
+  git ls-files --others --exclude-standard  # untracked
+} | sort -u
+```
+
+Filter to existing files (drop deletions) and to the detected language's extensions.
+If the result is empty, git is absent, or the set includes whole-project config
+(lockfiles, `tsconfig*`, ESLint/test-runner config, CI workflows) → run `--full` instead.
+
+### Scoped commands per language
+
+`{files}` = the filtered changed files for that language. `{pm}` = detected package manager.
+
+| Language | Scoped lint | Scoped tests |
+|----------|-------------|--------------|
+| JS/TS (jest) | `npx eslint {files}` | `npx jest --findRelatedTests {files} --passWithNoTests` |
+| JS/TS (vitest) | `npx eslint {files}` | `npx vitest related {files} --run` |
+| Python | `ruff check {files}` | `pytest {changed test files, or dirs of {files}}` |
+| Go | `golangci-lint run {dirs of files}` | `go test {packages of changed files}` |
+| Ruby | `rubocop {files}` | `bundle exec rspec {related _spec.rb files}` |
+| Rust | `cargo clippy` (crate-scoped) | `cargo test {changed module paths}` |
+
+Notes:
+- **Type-check** is NOT scoped — keep `npx tsc --noEmit` / `mypy .` / build-driven checks
+  whole-program. A per-file type-check is unsound.
+- **Build** is NOT scoped — bundling/compiling is inherently whole-program.
+- If a framework offers no related-tests selector, fall back to running the changed test
+  files directly; if none changed, note `Tests: SCOPED (no related tests for changed files)`.
 
 ---
 

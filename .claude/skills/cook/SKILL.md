@@ -207,7 +207,7 @@ Rationale: Review quality improves when code is already simplified. Reviewers ca
 
 ## Verify Step (Mandatory)
 
-After `mk:simplify` completes, run `mk:verify` for a unified build→lint→type-check→test→coverage check. This confirms simplification didn't break anything and gives the reviewer a clean signal.
+After `mk:simplify` completes, run `mk:verify` for a unified build→lint→type-check→test→coverage check. This confirms simplification didn't break anything and gives the reviewer a clean signal. By default `mk:verify` scopes lint and tests to the changed files (build and type-check stay whole-program); the complete whole-project run happens at ship time. Pass `--full` only when a full sweep is needed here.
 
 If `mk:verify` FAILS after simplify: send back to developer to fix, then re-run verify before proceeding to Phase 4. Do not skip verify or proceed to review with a failing verify result.
 

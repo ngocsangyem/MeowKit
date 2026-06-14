@@ -413,6 +413,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.11.3 | 2026-06-14 | Vue 3 Skill Suite                                |
 | v2.11.2 | 2026-06-13 | Grill Plan-Interrogation Skill                   |
 | v2.11.1 | 2026-06-11 | Ask-Me Project Q&A Skill                         |
 | v2.11.0 | 2026-06-11 | Context Tiers + Harness Guardrails               |

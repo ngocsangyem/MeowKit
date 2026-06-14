@@ -14,10 +14,12 @@ Advisory only — does not change agent-detector scoring or output format.
 | Rough-size from spec / pre-ticket sizing / estimate stories before tickets exist | Plan | mk:story-sizer |
 | Stress-test / interrogate my OWN plan or design ("grill me", "get grilled on my design") until every branch is resolved | Plan | mk:grill (one question at a time; checkpoints to `docs/knowledge/<slug>.md`; NOT proposing options — see mk:brainstorming; NOT "should we build this" — see mk:office-hours; NOT Claude answering repo questions — see mk:ask-me) |
 | UI/frontend work | Build | mk:frontend-design, mk:cook |
+| Review my Vue feature code / "Vue best practices" / ordered Vue authoring workflow | Build | mk:vue-best-practices (deep review + workflow; NOT everyday authoring — see mk:vue; NOT test code — see mk:vue-testing-best-practices) |
 | API/backend work | Build | mk:api-design, mk:cook |
 | Need library/API docs | Build | mk:docs-finder |
 | Database work | Build | mk:database, mk:cook |
 | Writing or running tests | Verify | mk:testing, mk:qa |
+| Design or review Vue test code; choose Vue test tooling ("review my Vue tests", "how should I test this component/composable/store") | Verify | mk:vue-testing-best-practices (advisory test-design + review; NOT running tests — see mk:testing; NOT feature code — see mk:vue-best-practices) |
 | Something broke, debugging | Verify | mk:investigate, mk:fix |
 | Browser testing needed | Verify | mk:agent-browser, mk:qa |
 | Reviewing code quality | Review | mk:review |

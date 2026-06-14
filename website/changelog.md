@@ -14,6 +14,31 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.11.3 (2026-06-14) — Vue 3 Skill Suite
+
+### Highlights
+
+Vue support grows into a full skill suite. `mk:vue` is restructured from a single patterns file into focused references and now covers the Pinia Colada data layer plus Vue 3.4/3.5 core APIs, `<script setup>` compiler macros, and advanced reactivity patterns. Two invoke-only advisors join it — `mk:vue-best-practices` for deep best-practices review and the ordered authoring workflow, and `mk:vue-testing-best-practices` for Vue test design and test-code review.
+
+### New Skills
+
+| Skill                           | Purpose                                                                                                                                                                                                                                                            |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mk:vue-best-practices`         | Deep Vue 3 best-practices review and the full ordered authoring workflow — built-in components, animations, slots, fallthrough attrs, custom directives, async components, render functions, plugins, and a post-functionality performance pass. Invoke-only; complements `mk:vue`. |
+| `mk:vue-testing-best-practices` | Vue 3 test-design advisor and test-code reviewer — audits Vitest + Vue Test Utils tests for components, composables, Pinia stores, router, async/Suspense/Teleport, forms, and accessibility, plus Playwright E2E strategy. Advisory only; never runs tests. |
+
+### Improvements
+
+- `mk:vue` is split from one patterns file into focused references for components, composables, reactivity, routing, and state.
+- `mk:vue` gains Pinia Colada data-layer coverage — core queries/mutations, advanced patterns, plugins, and direct cache access.
+- `mk:vue` adds Vue 3.4/3.5 coverage — new core APIs, `<script setup>` compiler macros, and advanced reactivity patterns.
+- The status line is simplified — heavy rendering and caching logic removed for a leaner, more reliable output.
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the new skills.
+- No CLI package version bump is required for this release because the changed commits do not modify `packages/mewkit/src`.
+
 ## 2.11.2 (2026-06-13) — Grill Plan-Interrogation Skill
 
 ### Highlights
