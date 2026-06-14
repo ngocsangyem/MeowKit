@@ -5,6 +5,8 @@ description: |
   Use when writing, reviewing, or refactoring Vue 3 code — components, composables,
   reactivity, Pinia state, Pinia Colada data-fetching, file-based routing, and forms.
   Targets Composition API + <script setup> + TypeScript. Auto-activates on .vue files.
+  For deep best-practices review/recommendations or the full ordered workflow (built-in
+  components, animations, performance pass), use mk:vue-best-practices.
 allowed-tools:
   - Read
   - Grep
@@ -19,7 +21,7 @@ keywords:
   - file-based-routing
   - definemodel
   - framework-specific
-when_to_use: Use when writing/reviewing/refactoring Vue 3 (components, composables, reactivity, Pinia, Pinia Colada, routing). Auto-activates on .vue files. NOT for generic TypeScript (see mk:typescript), React (see mk:react-patterns), or Angular (see mk:angular).
+when_to_use: Use when writing/reviewing/refactoring Vue 3 (components, composables, reactivity, Pinia, Pinia Colada, routing). Auto-activates on .vue files. NOT for deep best-practices review/recommendations or the ordered best-practices workflow (see mk:vue-best-practices), generic TypeScript (see mk:typescript), React (see mk:react-patterns), or Angular (see mk:angular).
 user-invocable: true
 owner: utility
 criticality: medium
@@ -41,9 +43,14 @@ Pinia Colada queries/mutations, Vue Router file-based routes, composables.
 
 **Explicit:** `/mk:vue [concern]`
 
-**Do NOT invoke for:** TypeScript fundamentals (use `mk:typescript`), React (use
-`mk:react-patterns`), Angular (use `mk:angular`), visual design (use `mk:frontend-design`),
-testing (use `mk:testing` / `mk:qa`).
+**Deep best practices:** for a thorough best-practices **review/recommendations** pass or the
+full ordered workflow — built-in components (Teleport/Suspense/KeepAlive/Transition),
+animation techniques, optional features, and the performance pass — use `mk:vue-best-practices`.
+This skill stays the everyday quick-reference.
+
+**Do NOT invoke for:** deep best-practices review/workflow (use `mk:vue-best-practices`),
+TypeScript fundamentals (use `mk:typescript`), React (use `mk:react-patterns`), Angular (use
+`mk:angular`), visual design (use `mk:frontend-design`), testing (use `mk:testing` / `mk:qa`).
 
 ## Core Rules (always apply)
 
