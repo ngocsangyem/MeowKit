@@ -53,7 +53,7 @@ this skill is the **opinionated workflow + best-practices reviewer** you invoke 
 **Do NOT invoke for:** everyday Vue authoring quick-reference (`mk:vue`), generic diff/PR
 structural review (`mk:review`), TypeScript fundamentals (`mk:typescript`), React
 (`mk:react-patterns`), Angular (`mk:angular`), visual design (`mk:frontend-design`), testing
-(`mk:testing` / `mk:qa`).
+(`mk:testing` / `mk:qa`; Vue *test* design/review → `mk:vue-testing-best-practices`).
 
 ## Foundations Live in mk:vue
 
@@ -105,6 +105,9 @@ Do not add these by default. Read the matching reference when the need is real.
 - Async subtree fallback boundary → [component-suspense](references/component-suspense.md)
 - Enter/leave effects → [component-transition](references/component-transition.md)
 - Animated list mutations → [component-transition-group](references/component-transition-group.md)
+
+> Teleport/Suspense **authoring** (when to use, API, fallback) is owned here; Teleport/Suspense
+> **test-setup** (stubs, `flushPromises`, `attachTo`, `mountSuspense`) → `mk:vue-testing-best-practices`.
 
 **Animation techniques** (pick the simplest that matches the motion)
 

@@ -50,7 +50,8 @@ This skill stays the everyday quick-reference.
 
 **Do NOT invoke for:** deep best-practices review/workflow (use `mk:vue-best-practices`),
 TypeScript fundamentals (use `mk:typescript`), React (use `mk:react-patterns`), Angular (use
-`mk:angular`), visual design (use `mk:frontend-design`), testing (use `mk:testing` / `mk:qa`).
+`mk:angular`), visual design (use `mk:frontend-design`), testing (use `mk:testing` / `mk:qa`;
+Vue test design/review → `mk:vue-testing-best-practices`).
 
 ## Core Rules (always apply)
 

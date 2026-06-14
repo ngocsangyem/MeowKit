@@ -45,3 +45,4 @@ In TDD mode the cycle is RED → GREEN → REFACTOR (failing tests required befo
 
 - **Mocks hiding integration failures**: All mocked tests pass but real service calls fail → Use integration tests for critical paths; mock only external third-party services
 - **Test coverage metric gamed by trivial assertions**: 100% coverage with `expect(true).toBe(true)` → Measure mutation testing score alongside coverage; flag tests with zero assertions
+- **Vue-specific test design/review**: for designing or auditing Vitest + Vue Test Utils tests (components, composables, Pinia, router, Suspense, Teleport) → use `mk:vue-testing-best-practices` (advisory/review only; this skill still owns running tests + TDD)

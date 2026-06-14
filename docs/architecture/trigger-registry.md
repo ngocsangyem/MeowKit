@@ -35,6 +35,7 @@ Canonical registry of every meowkit skill, its activation triggers, callers, and
 | `mk:agent-browser` | User invocation; `mk:evaluate` step-03 for frontend probes | `evaluator` agent; user | "navigate to", "click on", "test this URL" |
 | `mk:playwright-cli` | User invocation; `mk:evaluate` step-03 for scripted flows | `evaluator` agent; user | "run playwright script", "automated browser test" |
 | `mk:prompt-enhancer` | User invocation; explicit prompt-refinement phrases | User; optional pre-plan handoff | "enhance prompt", "optimize prompt", "make this prompt better", "rewrite this prompt" |
+| `mk:vue-testing-best-practices` | Explicit user invocation (no auto-activation) | User (explicit only); surfaced via redirects in `mk:vue` / `mk:vue-best-practices` / `mk:testing` | "review my Vue tests", "how should I test this component/composable/store", "Vitest or Jest for this Vue app" |
 
 ## Rubric Library Triggers (Phase 2)
 

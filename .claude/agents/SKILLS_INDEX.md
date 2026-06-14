@@ -78,13 +78,14 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 #### Language/Framework Skills (Phase 3)
 
 ```toon
-[6]{skill,owner,type,architecture}
+[7]{skill,owner,type,architecture}
 `mk:typescript`|developer|development|monolithic
 `mk:vue`|developer|development|monolithic
 `mk:angular`|developer|development|monolithic
 `mk:react-patterns`|developer|development|monolithic
 `mk:frontend-design`|developer|development|monolithic
 `mk:ui-design-system`|developer|development|monolithic
+`mk:vue-testing-best-practices`|tester|testing|monolithic (invoke-only Vue test-design advisor + test-code reviewer; read-only Read/Grep/Glob; complements mk:vue-best-practices)
 ```
 
 ### Integration / On-Demand
