@@ -172,7 +172,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ### Cross-Cutting (Any Phase)
 
 ```toon
-[12]{skill,owner,trigger}
+[13]{skill,owner,trigger}
 `mk:ask-me`|any agent|Evidence-grounded project Q&A — "how does X work here", claim-checks, constraint summaries — answered with cited `file:line` sources. Read-only; redirects ideation/decisions/debugging/review to the owning specialist skill.
 `mk:careful`|any agent|Before destructive commands
 `mk:freeze`|any agent|Debug session scoping
@@ -185,6 +185,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:chom`|researcher|Copy-cat / replicate features from external systems, repos, or ideas into the current project
 `mk:pack`|developer|Pack an external repository into a single AI-friendly file for third-party analysis or handoff to external LLMs
 `mk:resolving-merge-conflicts`|git-manager|Resolve an in-progress git merge/rebase conflict — read state, recover each side's intent, resolve hunks, run checks, finish the merge/rebase. Most often during ship; always resolves (never --abort); NOT the full ship pipeline (see mk:ship)
+`mk:improve-codebase-architecture`|architect / any agent|Review codebase for deepening opportunities (shallow→deep modules), emit structured candidates for mk:preview to render, then grill a pick into a type-safe patch. Analysis + patch emission only; rendering delegated; NOT trade-off debate (see mk:party); NOT plan critique (see mk:plan-ceo-review)
 ```
 
 ## Summary

@@ -27,6 +27,7 @@ Advisory only — does not change agent-detector scoring or output format.
 | Respond to / triage reviewer comments received on a PR | Review | mk:respond-pr (verify-before-agree; hands accepted fixes to mk:fix) |
 | Security audit | Review | mk:cso |
 | Simplify/refactor code | Review | mk:simplify |
+| Review codebase architecture for deepening opportunities ("find shallow modules", "where to deepen", "improve architecture") | Review | mk:improve-codebase-architecture (structured candidates → mk:preview renders → mk:grill a pick into a type-safe patch; NOT behavior-preserving cleanup of a known target — see mk:simplify; NOT rendering — see mk:preview) |
 | Optimize a measurable metric (coverage %, bundle size, lint count, latency) through bounded git-tracked iterations | Build | mk:loop (keep/revert per scalar metric; NOT for subjective cleanup — see mk:cook) |
 | Factual project question with sources ("how does X work *here*", "explain X in this repo", "is it true that ... in the repo", "why is X structured this way") | any | mk:ask-me (cited inline answer; NOT library docs — see mk:docs-finder; NOT "why is X broken" — see mk:investigate) |
 | Visualize code, draw diagram, build slide deck, render plan as HTML | any | mk:preview |

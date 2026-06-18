@@ -255,6 +255,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:clean-code', link: '/reference/skills/clean-code' },
             { text: 'mk:lint-and-validate', link: '/reference/skills/lint-and-validate' },
             { text: 'mk:simplify', link: '/reference/skills/simplify' },
+            { text: 'mk:improve-codebase-architecture', link: '/reference/skills/improve-codebase-architecture' },
           ],
         },
         {
