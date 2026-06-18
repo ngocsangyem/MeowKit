@@ -140,8 +140,10 @@ if new_status != current_status:
 - **`mk:plan-ceo-review`**: reads phase files for review; YAML frontmatter is informational and parsed by FAILSAFE_SCHEMA — safe to ignore for ceo-review's prose analysis.
 - **`mk:review` step-03b whole-plan-sweep**: gains a NEW drift surface — `dependencies: [N]` array. The sweep flags stale phase-number references when phases are renumbered/removed; this is informational, not blocking.
 
-**Cross-Session Resume:**
-New session → read `.plan-state.json` → skip completed phases → re-hydrate only pending phases as tasks.
+**Cross-Session Resume (canonical source):**
+New session → read plan.md / phase-file `[ ]` checkboxes (and the phase frontmatter `status`, which the Sync-Back Algorithm derives from those checkboxes) → skip completed phases → re-hydrate only unchecked/pending phases as tasks. This matches `## Cross-Session Resume` above — there is ONE canonical resume source.
+
+`.plan-state.json` is a DERIVED convenience cache, NOT the authority: a consumer MAY read it to skip a scan, but MUST recompute from the checkboxes on any disagreement (checkboxes/frontmatter win). It is written at hydration and regenerated at the final sync-back — never hand-mutated mid-run.
 
 ## Status Producer/Consumer Matrix
 
@@ -156,6 +158,8 @@ The phase status enum has 7 values. Each has a documented producer (who writes i
 | `failed` | HUMAN edit only — terminal state | cook re-hydration (skip phase); orchviz; journal-writer | task-management.md "Invariants" |
 | `abandoned` | HUMAN edit only — terminal state | cook re-hydration (skip phase); orchviz; archive workflow | task-management.md "Invariants" |
 | `unknown` | parser cascade fallback — emitted only when `status:` is absent or unrecognized; never written from frontmatter | orchviz (display as warning); validator | internal sentinel |
+
+> `.plan-state.json` is deliberately absent from this matrix: its `status` / `tasks_completed` fields are DERIVED from the phase-file checkboxes (the authoritative producers above), written at hydration and regenerated at the final sync-back. Treat it as a regenerable cache, not a status producer — never hand-mutate it mid-run.
 
 ## Cook Handoff
 After Gate 1: output cook command with absolute path:

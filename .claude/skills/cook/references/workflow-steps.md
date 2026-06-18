@@ -36,7 +36,12 @@ All modes share these phases with mode-specific variations.
    - Rename/typo/format → TRIVIAL
 3. **Read memory** (if exists): `.claude/memory/fixes.json` only for bug-class warnings; `.claude/memory/architecture-decisions.json` first for prior architectural decisions — note relevant prior learnings (see `.claude/rules/memory-read-rules.md`)
 4. If mode=code: load plan path, parse phases
-5. `TaskCreate` for each workflow phase (with `addBlockedBy` chain)
+5. **Autonomy Boundaries (advisory):** if the loaded plan.md has an `## Autonomy Boundaries` block (long-horizon plans only), read it once for the whole run and comply **mode-aware**:
+   - Interactive / `code` mode: an "Ask first" item → raise an immediate `AskUserQuestion` when that decision arises; "Always" items proceed without asking.
+   - Autonomous (`auto` / autobuild): an "Ask first" item → **defer** — skip the action, log the deferred decision to the plan.md Agent State, proceed with the safe default; deferred decisions surface at the next existing touchpoint (Gate 2 / autobuild run-report). NEVER raise an ad-hoc blocking prompt mid-autonomous-run.
+   - Block **absent** (short plans — the common case): default to "proceed on reversible in-scope changes; built-in gates still apply." Do NOT error, do NOT over-ask.
+   - This block is advisory and never bypasses a gate or security rule; its "Never" tier only points at them.
+6. `TaskCreate` for each workflow phase (with `addBlockedBy` chain)
 
 **Output:** `Phase 0: Orient — Mode [X], Tier [Y], [N] prior learnings loaded`
 
@@ -317,6 +322,19 @@ Three mandatory subagents in parallel:
 
 4. `TaskUpdate` → mark all session tasks complete after sync-back
 
+### Per-Phase Checkpoint (MANDATORY — fires after EACH completed plan phase, before the next-phase transition)
+
+On a long multi-phase or auto-mode run, the external-memory write after each completed plan phase is the single most load-bearing action for resumability: it is what lets a fresh session (after a context reset) know which phases are done and resume the correct one. This write is REQUIRED, not advisory.
+
+After each completed plan phase — and BEFORE the auto-mode "loop to Phase 2 for next phase" transition below — you MUST update the two durable, recomputable surfaces:
+
+1. **Phase-file checkboxes** — flip that phase's `[ ]` → `[x]` items via the Sync-Back Algorithm in `.claude/skills/plan-creator/references/task-management.md` (same status enum: `pending | in_progress | completed`).
+2. **plan.md** — update the Phases-table status column and the Agent State block for that phase.
+
+Do NOT hand-write `.plan-state.json` mid-run. It is a DERIVED cache: written once at hydration and regenerated from the checkboxes at the final sync-back (this Phase 6, last pass through the loop). A mid-run JSON edit drifts from the checkbox source of truth, which is the authority.
+
+Idempotent: re-running this checkpoint on an unchanged phase produces zero diff (Sync-Back Algorithm invariant). For a single-phase plan, this checkpoint and the final sync-back coincide.
+
 **Auto mode:** After Reflect, check if more plan phases remain → loop to Phase 2 for next phase.
 **Others:** Ask user before continuing to next phase.
 
@@ -344,11 +362,11 @@ Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. Cook populates
 
 ## Mode Flow Summary
 
-Legend: `[G1]` = Gate 1, `[G2]` = Gate 2, `[R]` = Review Gate
+Legend: `[G1]` = Gate 1, `[G2]` = Gate 2, `[R]` = Review Gate, `[CP]` = Per-Phase Checkpoint (mandatory before each next-phase loop)
 
 ```
 interactive: 0 → 1 → [G1] → 2 → [R] → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
-auto:        0 → 1(auto-G1) → 2 → 3 → 4[G2-human] → (4.5?) → 5 → 6 → next phase
+auto:        0 → 1(auto-G1) → 2 → 3 → 4[G2-human] → (4.5?) → 5 → 6 → [CP] → next phase
 fast:        0 → 1(fast) → [G1] → 2(light) → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
 parallel:    0 → 1(parallel) → [G1] → 2 → 3(multi-agent) → [R] → 4[G2] → (4.5?) → 5 → 6
 no-test:     0 → 1 → [G1] → skip → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
@@ -364,3 +382,4 @@ Where `(4.5?)` = only if `--verify` or `--strict` modifier flag set.
 - If Task() tool calls = 0 at end of workflow → INCOMPLETE
 - All step outputs follow: `Phase [N]: [status] — [metrics]`
 - Phase 6 Reflect is NEVER skipped, even if user says "done"
+- Per-phase checkpoint (phase-file checkboxes + plan.md Agent State) written for every completed plan phase before the next-phase transition

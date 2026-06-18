@@ -58,7 +58,25 @@ blocks: []
 | Risk | L | I | Mitigation |
 ```
 
-**Fast mode:** Write plan.md with Goal, Context, Scope, Constraints, Technical Approach, ACs, Agent State. NO phase files. Use `assets/plan-template.md` format.
+#### Conditional: `## Autonomy Boundaries` (long-horizon plans only)
+
+Add a `## Autonomy Boundaries` section to plan.md **only** when the run is long-horizon — i.e. `planning_mode ∈ {hard, deep, parallel, product-level}` OR phase-count ≥ 3 OR scale-routing returned `level=high`. For fast / trivial / single-phase plans, OMIT this section entirely (it would be permanent dead weight on the high-frequency path).
+
+WHY: across a multi-session or autonomous run, the only signals are global hard-stops (stop) or nothing (proceed). That binary causes both over-asking (interrupting a long run for trivia) and over-reach (silently making a reversible-but-significant choice). A persistent three-tier block, carried in the plan so it survives a cold-start resume, gives the executor a middle tier.
+
+This block is **advisory** and carries only the **extra latitude specific to THIS task** — a delta over the always-on rules, NOT a restatement of them. Derive each item from this task's risk surface; do NOT copy generic defaults (running tests, naming, refactor-in-owned-files, schema-change escalation, budget tier, out-of-scope files) — those already live in the baseline rules and restating them duplicates rules and invites drift. Keep it short (the ≤80-line plan.md budget). The user tunes it at Gate 1.
+
+```markdown
+## Autonomy Boundaries
+
+Baseline rules (security, gates, tests, naming, scope, budget) always apply; below is only the extra per-task latitude for this plan.
+
+- **Always (autonomous):** {reversible, in-scope choices the executor may make without asking — e.g. "pick the internal helper name", "choose the test fixture layout"}
+- **Ask first:** {reversible-but-significant choices to surface before acting — e.g. "swap the charting lib", "change the public API response shape", "add a new top-level route"}
+- **Never:** see `.claude/rules/security-rules.md` and `.claude/rules/gate-rules.md` (hard stops — not restated here).
+```
+
+**Fast mode:** Write plan.md with Goal, Context, Scope, Constraints, Technical Approach, ACs, Agent State. NO phase files. NO Autonomy Boundaries block. Use `assets/plan-template.md` format.
 
 ### 3b'. Solution Design Checklist (Hard Mode Only)
 
@@ -110,13 +128,25 @@ These sections are ONLY added when `--tdd` flag is set or `MEOWKIT_TDD=1` env va
 
 ### 3d. Phase Splitting Rules
 
-Determine phases by analyzing the task:
-- **Setup/infrastructure** → own phase (env, deps, config)
-- **Each major component** → own phase (API, UI, DB, auth)
-- **Testing** → own phase (if substantial test work)
-- **Documentation** → own phase (if docs impact = major)
-- **Min 2 phases** in hard mode
-- **Max 7 phases** (beyond that, decompose the task)
+**Default to vertical slices.** For a feature-shaped task, each phase should deliver ONE thin end-to-end working path — the slice cuts through DB + API + UI as needed — so the system is runnable / demoable after every phase. Horizontal layering (all DB, then all API, then all UI) leaves the system non-functional until the last phase, which is poor for checkpointing, demo, and recovery on a long run.
+
+**Decision rule:** feature-shaped task → vertical slice per phase; pure foundation layer → horizontal phase.
+
+- **Foundation layers** → own horizontal phase, but ONLY for genuinely shared groundwork no single slice owns: migrations, shared types, env/config setup.
+- **Setup/infrastructure** → own phase (env, deps, config) — runs first.
+- **Vertical feature slice** → own phase (one end-to-end path: its DB + API + UI together), NOT one phase per layer.
+- **Testing** → own phase only if substantial test work remains beyond each slice's own tests.
+- **Documentation** → own phase (if docs impact = major).
+- **Min 2 phases** in hard mode.
+- **Max 7 phases** (beyond that, decompose the task).
+
+**`--parallel` precedence:** when `planning_mode = parallel`, file-ownership grouping (§3i) governs decomposition — a vertical slice spans DB + API + UI and overlaps other slices' files, which fights zero-overlap parallelism. Vertical-slice guidance applies to the DEFAULT / sequential decomposition; ownership-based grouping wins in parallel mode.
+
+**Break-down triggers** (heuristics, not hard rules; `Max 7` is the ceiling):
+- "and" in a phase title (e.g. "Auth and profile") → split into two phases.
+- Two clearly separable deliverables in one phase → split.
+
+Do NOT split on acceptance-criteria count — a real end-to-end slice legitimately carries several ACs; counting them re-introduces the horizontal fragmentation this default exists to prevent.
 
 ### 3e. Research Integration
 

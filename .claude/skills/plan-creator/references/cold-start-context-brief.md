@@ -38,7 +38,8 @@ These are what the agent runs to verify AC are met.]
 
 ## Exit Criteria
 [What state the system must be in before this phase is considered complete.
-Includes: all ACs green, all tests passing, no regressions, specific artifact exists at path.]
+Includes: all ACs green, all tests passing, no regressions, specific artifact exists at path.
+Where applicable, the system is left runnable and a demoable increment exists — a feature phase ends with one working end-to-end path, not a half-wired layer. Pure foundation phases (migrations, shared types, env/config) are exempt.]
 ```
 
 ## Anti-Patterns
@@ -50,6 +51,7 @@ Includes: all ACs green, all tests passing, no regressions, specific artifact ex
 | "The goal is obvious from the task name" | Goals must be stated, not inferred | Write the one-sentence goal |
 | ACs like "works correctly" | Cannot be verified mechanically | Rewrite as command + expected output |
 | "Run the test suite" with no path | Agent doesn't know which suite | Specify: `npm run test:unit` or `jest src/auth/` |
+| No autonomy latitude stated (long-horizon plan) | On a multi-session or autonomous run the executor sees only stop-or-proceed — it over-asks on trivia or over-reaches on significant reversible choices | State the per-task Always / Ask-first latitude as a short delta over the baseline rules (long-horizon plans only) |
 
 ## Self-Containment Test
 

@@ -25,8 +25,11 @@ Present the plan for approval via `AskUserQuestion`. Header: "Gate 1: Plan Appro
 > Plan: {plan_dir}/plan.md
 > Phases: {N} phase files
 > Mode: {planning_mode}
+> Autonomy Boundaries: {one-line summary of the Always / Ask-first latitude}   ← include ONLY when plan.md has an `## Autonomy Boundaries` block (long-horizon plans)
 >
 > All checks passed. Ready to proceed?
+
+For long-horizon plans that carry an `## Autonomy Boundaries` block, note in the question that the user may adjust the Always / Ask-first latitude before approving; capture any adjustment into plan.md (and the Agent State / memory capture in 7c) on Approve/Modify. Omit the line entirely for fast / trivial / single-phase plans that have no block.
 
 Single-select.
 
