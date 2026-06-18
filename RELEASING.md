@@ -236,9 +236,10 @@ node scripts/prepare-release-assets.cjs "<version>"
 
 This creates:
 
-- `.claude/metadata.json` — version metadata
 - `release-manifest.json` — SHA-256 checksums for all files
 - `dist/meowkit-release.zip` — the release package (`.claude/` + `tasks/` + `CLAUDE.md` + manifest)
+
+> **Note:** This script does NOT write `.claude/metadata.json` — the `mewkit` CLI writes it on install/upgrade, and `prepare-release-assets.cjs` explicitly excludes it from the zip. The shipped release version lives in `release-manifest.json`.
 
 Verify the zip:
 
@@ -413,7 +414,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
-| v2.11.6 | 2026-06-19 | Merge Conflict Resolution Skill                  |
+| v2.11.6 | 2026-06-19 | Merge Conflict + Codebase Architecture Skills    |
 | v2.11.5 | 2026-06-18 | Long-Horizon Run Hardening                       |
 | v2.11.4 | 2026-06-18 | Post-Compaction Safety Re-Arm                    |
 | v2.11.3 | 2026-06-14 | Vue 3 Skill Suite                                |

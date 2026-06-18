@@ -14,17 +14,20 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
-## 2.11.6 (2026-06-19) — Merge Conflict Resolution Skill
+## 2.11.6 (2026-06-19) — Merge Conflict + Codebase Architecture Skills
 
 ### Highlights
 
 A new on-demand skill, `mk:resolving-merge-conflicts`, walks an in-progress git merge or rebase to a clean finish. It reads the conflict state, recovers the original intent behind each side from commit history and PRs, resolves every hunk — preserving both intents where they are compatible — then runs the project's checks and completes the merge or rebase. It always resolves rather than aborting, and never invents new behavior.
+
+A second on-demand skill, `mk:improve-codebase-architecture`, reviews a codebase for deepening opportunities — shallow modules whose interface nearly matches their implementation — emits them as structured candidates for `mk:preview` to render, then grills a chosen candidate into a precise, type-safe patch. It owns analysis and patch emission only; all rendering is delegated to `mk:preview`.
 
 ### New Skills
 
 | Skill                          | Purpose                                                                                                                                                                        |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:resolving-merge-conflicts` | Resolve an in-progress git merge or rebase conflict end to end — read state, recover each side's intent, resolve hunks, run typecheck/tests/format, and finish the merge or rebase. |
+| `mk:improve-codebase-architecture` | Review a codebase for deepening opportunities, emit structured candidates for `mk:preview` to render, then grill a pick into a type-safe patch — analysis and patch emission only, no embedded rendering. |
 
 ## 2.11.5 (2026-06-18) — Long-Horizon Run Hardening
 

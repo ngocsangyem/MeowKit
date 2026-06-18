@@ -39,6 +39,10 @@ allowed-tools:
   - Glob
 version: 1.0.0
 source: vuejs-ai (vendored, extended for toolkit)
+owner: utility
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Vue Testing Best Practices
