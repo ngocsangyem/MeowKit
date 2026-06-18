@@ -32,6 +32,7 @@ Advisory only — does not change agent-detector scoring or output format.
 | Visualize code, draw diagram, build slide deck, render plan as HTML | any | mk:preview |
 | Visualize a git diff or PR before review | Review | mk:preview (`--html --diff`) |
 | Ready to ship/deploy | Ship | mk:ship |
+| Resolve an in-progress git merge or rebase conflict ("finish the merge", "fix this rebase", unmerged paths) | any | mk:resolving-merge-conflicts (read state → recover intent → resolve hunks → run checks → finish; always resolves, never --abort; NOT the base-branch merge of shipping — see mk:ship) |
 | Need docs updated | Ship | mk:document-release |
 | Session retrospective | Reflect | mk:retro, mk:memory |
 

@@ -413,6 +413,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.11.6 | 2026-06-19 | Merge Conflict Resolution Skill                  |
 | v2.11.5 | 2026-06-18 | Long-Horizon Run Hardening                       |
 | v2.11.4 | 2026-06-18 | Post-Compaction Safety Re-Arm                    |
 | v2.11.3 | 2026-06-14 | Vue 3 Skill Suite                                |

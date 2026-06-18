@@ -172,7 +172,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ### Cross-Cutting (Any Phase)
 
 ```toon
-[11]{skill,owner,trigger}
+[12]{skill,owner,trigger}
 `mk:ask-me`|any agent|Evidence-grounded project Q&A — "how does X work here", claim-checks, constraint summaries — answered with cited `file:line` sources. Read-only; redirects ideation/decisions/debugging/review to the owning specialist skill.
 `mk:careful`|any agent|Before destructive commands
 `mk:freeze`|any agent|Debug session scoping
@@ -184,6 +184,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:story-sizer`|story-sizer|Pre-ticket Fibonacci sizing of paste-mode user stories. Default writes a Story Sizing Report. Opt-in `--auto-create` delegates to `mk:jira-issue` + `mk:jira-collaborate` with a single batch confirmation gate.
 `mk:chom`|researcher|Copy-cat / replicate features from external systems, repos, or ideas into the current project
 `mk:pack`|developer|Pack an external repository into a single AI-friendly file for third-party analysis or handoff to external LLMs
+`mk:resolving-merge-conflicts`|git-manager|Resolve an in-progress git merge/rebase conflict — read state, recover each side's intent, resolve hunks, run checks, finish the merge/rebase. Most often during ship; always resolves (never --abort); NOT the full ship pipeline (see mk:ship)
 ```
 
 ## Summary
@@ -199,8 +200,8 @@ Deployment|2
 Documentation|4
 Memory|2
 Utility|12
-Cross-Cutting|6
-**Total**|**105**
+Cross-Cutting|7
+**Total**|**106**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

@@ -14,6 +14,18 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.11.6 (2026-06-19) — Merge Conflict Resolution Skill
+
+### Highlights
+
+A new on-demand skill, `mk:resolving-merge-conflicts`, walks an in-progress git merge or rebase to a clean finish. It reads the conflict state, recovers the original intent behind each side from commit history and PRs, resolves every hunk — preserving both intents where they are compatible — then runs the project's checks and completes the merge or rebase. It always resolves rather than aborting, and never invents new behavior.
+
+### New Skills
+
+| Skill                          | Purpose                                                                                                                                                                        |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mk:resolving-merge-conflicts` | Resolve an in-progress git merge or rebase conflict end to end — read state, recover each side's intent, resolve hunks, run typecheck/tests/format, and finish the merge or rebase. |
+
 ## 2.11.5 (2026-06-18) — Long-Horizon Run Hardening
 
 ### Highlights

@@ -234,6 +234,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:cook', link: '/reference/skills/cook' },
             { text: 'mk:fix', link: '/reference/skills/fix' },
             { text: 'mk:ship', link: '/reference/skills/ship' },
+            { text: 'mk:resolving-merge-conflicts', link: '/reference/skills/resolving-merge-conflicts' },
             { text: 'mk:verify', link: '/reference/skills/verify' },
             { text: 'mk:loop', link: '/reference/skills/loop' },
             { text: 'mk:workflow-orchestrator', link: '/reference/skills/workflow-orchestrator' },
