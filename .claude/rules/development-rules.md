@@ -133,3 +133,17 @@ Instead, prevent bloat by limiting output at the tool call site.
 | Bash | Pipe through `head -100` for verbose commands | Skip for commands with concise output              |
 
 WHY: Limiting output at source prevents context bloat without platform changes.
+
+### Accumulated observations (long runs)
+
+The caps above bound a SINGLE call. In long autonomous loops, observations also
+accumulate ACROSS turns and crowd out task context even when each call stays within
+its cap. After a tool returns, summarize it to the relevant finding before
+continuing; do not retain full raw output in working context across turns. Budget
+observation tokens and compress or drop the oldest observations once new ones exceed
+that budget. Summarize to the relevant finding — never discard silently; raw output
+stays retrievable by re-running the tool.
+
+WHY: Sub-agent isolation already mitigates this structurally (distilled returns);
+this closes the guidance gap for multi-step in-context loops. Source: Anthropic
+research — Context Engineering for Autonomous Agents.

@@ -6,14 +6,25 @@
 // (Read-only context) to skip the 10-file rule load on turns 2..N.
 //
 // State format: single append-only JSONL log at
-// `session-state/session-sentinels.jsonl`. One line per Stop event:
+// `session-state/session-sentinels.jsonl`. Two line shapes for a session:
 //
-//   {"session_id":"<id>","safety":true,"phase_zero":true,"ts":"<iso>"}
+//   verification (Stop):   {"session_id":"<id>","safety":true,"phase_zero":true,"ts":"<iso>"}
+//   re-arm (PreCompact):   {"session_id":"<id>","event":"precompact_rearm","ts":"<iso>"}
 //
-// Reader scans the file for the latest line matching ctx.session_id and emits
-// markers for whichever flags are true on that line. The file is truncated by
+// Reader finds, for the current session, the latest verification line and the
+// latest re-arm line, then emits a flag's cached marker ONLY when that
+// verification is more recent than the last re-arm. The file is truncated by
 // project-context-loader.sh on new-session detection (HOOK_SESSION_ID change),
 // so it never accumulates state from prior sessions.
+//
+// Why the recency compare: compaction drops the safety-baseline rule TEXT from
+// context but not this sentinel. A verification that PRE-DATES the latest re-arm
+// is therefore stale (its rules are no longer in context), so the skip marker is
+// withheld until a genuine re-read writes a newer verification. The Stop hook's
+// unconditional `true` write is harmless: the post-re-read turn's verification
+// legitimately post-dates the re-arm. The log is append-only within a session, so
+// a later file position == a more recent event — file position is the recency
+// signal (reliable for same-second ts ties).
 //
 // Architectural notes:
 //  - The skill is `allowed-tools: [Read]`. Filesystem ops live in hook
@@ -50,23 +61,36 @@ module.exports = async function (ctx /*, state */) {
     return '';
   }
 
-  // Scan bottom-up: most recent entry for this session wins.
+  // Track, for this session, the latest verification line and the latest re-arm
+  // line by file position (append order == time order within a session).
   const lines = raw.split('\n');
-  let entry = null;
-  for (let i = lines.length - 1; i >= 0; i--) {
+  let verifyIdx = -1;
+  let verifyRow = null;
+  let rearmIdx = -1;
+  for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
     let row;
     try { row = JSON.parse(line); } catch { continue; }
-    if (row && row.session_id === sessionId) { entry = row; break; }
+    if (!row || row.session_id !== sessionId) continue;
+    if (row.event === 'precompact_rearm') {
+      rearmIdx = i;
+    } else if ('safety' in row || 'phase_zero' in row) {
+      verifyIdx = i;
+      verifyRow = row;
+    }
   }
-  if (!entry) return '';
+  if (!verifyRow) return '';
+
+  // A verification is trusted only if it is more recent than the last re-arm.
+  // (rearmIdx === -1 → no re-arm this session → always trusted.)
+  if (verifyIdx <= rearmIdx) return '';
 
   let out = '';
-  if (entry.safety) {
+  if (verifyRow.safety) {
     out += `## Safety baseline: verified (cached, session ${sessionId})\n`;
   }
-  if (entry.phase_zero) {
+  if (verifyRow.phase_zero) {
     out += `## Phase-zero rules: verified (cached, session ${sessionId})\n`;
   }
   return out;

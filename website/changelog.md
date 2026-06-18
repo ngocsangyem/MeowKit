@@ -14,6 +14,20 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.11.4 (2026-06-18) — Post-Compaction Safety Re-Arm
+
+### Highlights
+
+Native compaction no longer leaves a session running without its safety baseline. The `PreCompact` hook now re-arms the per-session verification marker, so the next turn re-reads the safety rules whose text compaction dropped — instead of trusting a stale "already verified" marker and skipping the re-read.
+
+### Bug Fixes
+
+- Safety baseline is no longer skipped after compaction — compaction drops the rule text from context but used to leave the per-session "verified" marker intact, so the `PreCompact` hook now re-arms that marker to force a fresh re-read on the next turn, and the cached-skip resumes only once a genuine re-read re-verifies.
+
+### Improvements
+
+- Long autonomous runs gain an observation-budget rule — summarize tool output to the relevant finding on receipt and drop or compress the oldest observations once new ones exceed the budget, rather than carrying full raw output across turns.
+
 ## 2.11.3 (2026-06-14) — Vue 3 Skill Suite
 
 ### Highlights
@@ -22,10 +36,10 @@ Vue support grows into a full skill suite. `mk:vue` is restructured from a singl
 
 ### New Skills
 
-| Skill                           | Purpose                                                                                                                                                                                                                                                            |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skill                           | Purpose                                                                                                                                                                                                                                                                             |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:vue-best-practices`         | Deep Vue 3 best-practices review and the full ordered authoring workflow — built-in components, animations, slots, fallthrough attrs, custom directives, async components, render functions, plugins, and a post-functionality performance pass. Invoke-only; complements `mk:vue`. |
-| `mk:vue-testing-best-practices` | Vue 3 test-design advisor and test-code reviewer — audits Vitest + Vue Test Utils tests for components, composables, Pinia stores, router, async/Suspense/Teleport, forms, and accessibility, plus Playwright E2E strategy. Advisory only; never runs tests. |
+| `mk:vue-testing-best-practices` | Vue 3 test-design advisor and test-code reviewer — audits Vitest + Vue Test Utils tests for components, composables, Pinia stores, router, async/Suspense/Teleport, forms, and accessibility, plus Playwright E2E strategy. Advisory only; never runs tests.                        |
 
 ### Improvements
 
@@ -47,8 +61,8 @@ One new pre-planning skill joins the catalog. `mk:grill` relentlessly interviews
 
 ### New Skills
 
-| Skill      | Purpose                                                                                                                                                                                                                                          |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skill      | Purpose                                                                                                                                                                                                                                                                     |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:grill` | Relentless one-question-at-a-time interview of your own plan or design — resolves every decision-tree branch, checkpoints each answer to `docs/knowledge/<slug>.md`, flags the gaps you cannot answer, and hands off to the right build skill. Read-only on the source doc. |
 
 ### Migration Notes
@@ -64,8 +78,8 @@ One new cross-cutting skill joins the catalog. `mk:ask-me` answers factual and e
 
 ### New Skills
 
-| Skill       | Purpose                                                                                                                                                                        |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Skill       | Purpose                                                                                                                                                                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:ask-me` | Evidence-grounded project Q&A — answers "how does X work here", "why is X structured this way", and claim-checks with cited `file:line` evidence, hard read budgets, and redirect-first routing to specialist skills. Read-only by default. |
 
 ### Migration Notes
@@ -139,9 +153,9 @@ Two single-purpose PR-collaboration skills join the reviewer's toolkit. `mk:revi
 
 ### New Skills
 
-| Skill           | Purpose                                                                                                                                          |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mk:review-pr`  | Reviews a GitHub PR with a single shallow correctness/security/breaking/AI-slop checklist and emits a verdict; optionally posts it via `gh pr review`. |
+| Skill           | Purpose                                                                                                                                                               |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mk:review-pr`  | Reviews a GitHub PR with a single shallow correctness/security/breaking/AI-slop checklist and emits a verdict; optionally posts it via `gh pr review`.                |
 | `mk:respond-pr` | Triages reviewer comments on a PR with receiving-review discipline — verify each against the codebase, then accept/push-back/clarify, and optionally reply in-thread. |
 
 ### Migration Notes
@@ -182,8 +196,8 @@ The autonomous green-field build pipeline is now `mk:autobuild` — a name that 
 
 ### New Skills
 
-| Skill | Purpose |
-| --- | --- |
+| Skill     | Purpose                                                                                                                                                                                              |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:loop` | Improve one scalar metric through bounded, boundary-gated iterations — modify one scoped change, verify, keep or `git revert`. One human approval before the loop, then autonomous up to a hard cap. |
 
 ### Removals
@@ -1793,7 +1807,7 @@ Largest architectural addition since 1.0.0. Autonomous multi-hour build pipeline
 
 | Skill                | Purpose                                                                                                                                                                                                               |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mk:autobuild`         | Autonomous green-field build pipeline with generator/evaluator split, adaptive density, 3-round iteration loop, budget tracking ($30 warn / $100 block / user cap).                                                   |
+| `mk:autobuild`       | Autonomous green-field build pipeline with generator/evaluator split, adaptive density, 3-round iteration loop, budget tracking ($30 warn / $100 block / user cap).                                                   |
 | `mk:sprint-contract` | File-based sprint contract negotiated between generator and evaluator before source edits begin. Enforced by `gate-enforcement.sh` in FULL density.                                                                   |
 | `mk:rubric`          | Weighted rubric loader; reads `.claude/rubrics/`, validates weights sum to 1.0.                                                                                                                                       |
 | `mk:evaluate`        | Behavioral grader with active verification; skeptic persona, drives running build, rejects static-analysis-only verdicts.                                                                                             |

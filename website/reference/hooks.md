@@ -63,7 +63,10 @@ These hooks are telemetry-only — they log event fires to verify Claude Code su
 | ----------------------------- | ------------------- | ----------------------------------------------------------------------- |
 | `control-probe.sh`            | Stop                | Control signal — confirms Stop event fires reliably, providing a baseline for comparing PreCompact/PostToolUseFailure probe fire rates |
 | `posttoolfailure-probe.sh`    | PostToolUseFailure  | Logs PostToolUseFailure hook fires to verify CC supports the event      |
-| `precompact-probe.sh`         | PreCompact          | Logs PreCompact hook fires to verify CC supports the event              |
+
+### `precompact-probe.sh` — safety-baseline re-arm
+
+`precompact-probe.sh` (PreCompact) is no longer telemetry-only. It still logs the event fire, then appends a re-arm marker to `session-state/session-sentinels.jsonl` for the active session. Compaction drops the safety-baseline rule text from context but leaves the per-session "verified" marker intact, so the re-arm marker invalidates that cached verification and the next turn re-reads the safety baseline. The cached-skip resumes only once a genuine re-read writes a newer verification. The hook never blocks (exit 0 on all paths) and no-ops when no session id is present.
 
 ## Hook runtime profiling
 
