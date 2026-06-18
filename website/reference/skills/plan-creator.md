@@ -28,6 +28,8 @@ The planning engine. Creates a complete implementation plan before any code is w
 - **Red-teaming:** 4 adversarial personas selected by phase count, subagent-dispatched with anti-sycophancy IGNORE instruction
 - **Validation interview:** 5 question categories with detection keywords, 2-4 options each, recommended option marked
 - **Bead decomposition:** for tasks with 5+ files, breaks into atomic work units with dependency chains (beads → strands → ropes)
+- **Vertical-slice default:** decomposes feature-shaped tasks into end-to-end working slices (one runnable path per phase) instead of horizontal layers, with horizontal phases reserved for foundation layers and break-down triggers for oversized phases
+- **Conditional autonomy boundaries:** emits an advisory three-tier (Always / Ask-first / Never) autonomy block in plan.md for long-horizon plans only, tunable at Gate 1 and read mode-aware by `mk:cook`
 - **Hydration:** creates TaskCreate entries with dependency chains, parallelism groups, `.plan-state.json` checkpoint
 
 ## Requirements Capture Contract

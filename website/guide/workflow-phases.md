@@ -99,6 +99,7 @@ Concrete cost of `[LIGHT]` vs `[HEAVY]` depends on the inner harness, model tier
 - Update canonical `.claude/memory/*.json` stores
 - Sync affected documentation
 - Close sprint task
+- Per-phase checkpoint (mandatory): after each completed plan phase, flip the phase-file checkboxes and update the plan.md Agent State before any next-phase transition, so a fresh session can resume the correct phase
 - Auto-complete and archive the plan when all non-abandoned phase todos are checked; this does not wait for Phase 5 ship.
 
 ## Execution modes

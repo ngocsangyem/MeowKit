@@ -14,6 +14,26 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.11.5 (2026-06-18) — Long-Horizon Run Hardening
+
+### Highlights
+
+Multi-phase and autonomous runs survive context resets more reliably. `mk:cook` now treats the external-memory write after each completed plan phase as a mandatory checkpoint, `mk:plan-creator` emits a per-plan autonomy boundary for long-horizon plans, and phase decomposition defaults to runnable vertical slices instead of horizontal layers.
+
+### Improvements
+
+- `mk:cook` makes the per-phase checkpoint mandatory — after each completed plan phase it writes two durable surfaces (phase-file checkboxes and the plan.md Agent State) before the next-phase transition, so a fresh session can resume the correct phase.
+- The plan resume contract is reconciled to a single source of truth — phase-file checkboxes and frontmatter are canonical, and `.plan-state.json` is documented as a derived cache regenerated at the final sync-back rather than hand-edited mid-run.
+- `mk:plan-creator` emits a conditional `Autonomy Boundaries` block for long-horizon plans only — an advisory three-tier (Always / Ask-first / Never) latitude that survives a cold-start resume, while fast, trivial, and single-phase plans omit it to avoid permanent token cost.
+- `mk:cook` reads the autonomy block mode-aware at orientation — interactive runs ask before significant reversible choices, autonomous runs defer and log them to the safe default, and a missing block degrades gracefully to proceeding on reversible in-scope changes.
+- `mk:plan-creator` defaults phase decomposition to vertical slices — each phase delivers one end-to-end working path so the system stays runnable, with horizontal phases reserved for foundation layers like migrations and shared types.
+- Phase splitting gains two break-down triggers — an "and" in a phase title or two clearly separable deliverables signals a split, integrated with the existing minimum-two / maximum-seven phase bounds.
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the updated `mk:cook` and `mk:plan-creator` behavior.
+- No CLI package version bump is required for this release because the changed commits do not modify `packages/mewkit/src`.
+
 ## 2.11.4 (2026-06-18) — Post-Compaction Safety Re-Arm
 
 ### Highlights

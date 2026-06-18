@@ -120,7 +120,7 @@ After Phase 3 GREEN: run `mk:simplify` to reduce complexity before review. Then 
 
 - Skipping `mk:simplify` before review — mandatory between Phase 3 and Phase 4
 - Auto mode can auto-fix but never auto-approve Gate 2
-- Context loss between phases — update plan.md Agent State after each phase
+- Context loss between phases — a mandatory per-phase checkpoint writes the phase-file checkboxes and plan.md Agent State before each next-phase transition; a fresh session reads them to resume the correct phase
 - Parallel mode deadlocks — map dependency graph before spawning
 - Code mode on stale plans — warn if plan >14 days old
 - Fast mode shallow coverage — skipping research means plan-level tests only
