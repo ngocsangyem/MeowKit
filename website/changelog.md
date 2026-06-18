@@ -18,16 +18,18 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ### Highlights
 
-Multi-phase and autonomous runs survive context resets more reliably. `mk:cook` now treats the external-memory write after each completed plan phase as a mandatory checkpoint, `mk:plan-creator` emits a per-plan autonomy boundary for long-horizon plans, and phase decomposition defaults to runnable vertical slices instead of horizontal layers.
+The problem this release fixes: on long, multi-phase plans (and autonomous runs), the context window fills up and gets reset or compacted — and the agent could lose track of which phase it was on, redo finished work, or skip steps.
+
+2.11.5 makes that progress durable on disk instead of trusting in-context memory. After every phase, `mk:cook` writes a mandatory checkpoint, `mk:plan-creator` records how much latitude the agent has so it survives a cold start, and plans are now split into runnable end-to-end slices so the project always works between phases. No new features — this hardens how state survives a reset.
 
 ### Improvements
 
-- `mk:cook` makes the per-phase checkpoint mandatory — after each completed plan phase it writes two durable surfaces (phase-file checkboxes and the plan.md Agent State) before the next-phase transition, so a fresh session can resume the correct phase.
-- The plan resume contract is reconciled to a single source of truth — phase-file checkboxes and frontmatter are canonical, and `.plan-state.json` is documented as a derived cache regenerated at the final sync-back rather than hand-edited mid-run.
-- `mk:plan-creator` emits a conditional `Autonomy Boundaries` block for long-horizon plans only — an advisory three-tier (Always / Ask-first / Never) latitude that survives a cold-start resume, while fast, trivial, and single-phase plans omit it to avoid permanent token cost.
-- `mk:cook` reads the autonomy block mode-aware at orientation — interactive runs ask before significant reversible choices, autonomous runs defer and log them to the safe default, and a missing block degrades gracefully to proceeding on reversible in-scope changes.
-- `mk:plan-creator` defaults phase decomposition to vertical slices — each phase delivers one end-to-end working path so the system stays runnable, with horizontal phases reserved for foundation layers like migrations and shared types.
-- Phase splitting gains two break-down triggers — an "and" in a phase title or two clearly separable deliverables signals a split, integrated with the existing minimum-two / maximum-seven phase bounds.
+- **Resume on the right phase after a reset.** `mk:cook` now writes a checkpoint after every completed phase — it is mandatory, not best-effort. The checkpoint lands in two durable places (the phase-file checkboxes and the `plan.md` Agent State) before moving to the next phase, so a brand-new session reads the disk and knows exactly where to continue.
+- **One source of truth for resume state.** Phase-file checkboxes and frontmatter are now the canonical record of progress. `.plan-state.json` is just a derived cache — regenerated at the final sync-back, never hand-edited mid-run — so the three places that used to drift can no longer disagree.
+- **Autonomy limits that survive a cold start.** For long-horizon plans, `mk:plan-creator` writes an `Autonomy Boundaries` block: a simple three-tier guide (Always allowed / Ask first / Never) for how far the agent may act on its own. It is written into the plan so it is not lost on reset. Fast, trivial, and single-phase plans skip it to avoid paying the token cost forever.
+- **The agent reads those limits according to how you run it.** At startup `mk:cook` applies the block by mode: an interactive run asks you before any significant reversible choice; an autonomous run takes the safe default and logs it instead of stopping. If the block is missing, it degrades gracefully — proceeding on reversible, in-scope changes.
+- **Each phase delivers a working end-to-end path.** `mk:plan-creator` now splits work into vertical slices by default (one complete feature path per phase) instead of horizontal layers (all DB, then all API, then all UI). The system stays runnable after every phase — which matters most when a run is interrupted partway. Horizontal phases are kept only for foundations like migrations and shared types.
+- **Smarter phase splitting.** Two new signals trigger a split: an "and" in a phase title, or two clearly separable deliverables. This works within the existing rule of at least two and at most seven phases.
 
 ### Migration Notes
 
