@@ -28,6 +28,15 @@
 **Chosen:** `[technique-name].md`
 **Why this over alternatives:** [one sentence — typically references the SKILL.md tiebreaker order or a problem-shape match]
 
+### Solution Decompression
+
+(Only when input was a solution. Omit otherwise.)
+
+- Solution-jumping diagnosis: [...]
+- Decompressed problem: [...]
+- Framings: A [...] · B [...] · C [...]
+- Key assumption + risk + validation: [...]
+
 ### Ideas (with anti-bias pivot)
 
 Ideas #1–#3 from one category, then pivot at #4 to an orthogonal category. Generate ALL 8 before scoring.

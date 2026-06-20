@@ -5,6 +5,7 @@ Run before finalizing a brainstorm report.
 ## Required
 
 - Problem, binding constraint, success criterion, and excluded scope are explicit.
+- If input was a solution: decompressed problem + ≥3 problem framings + key-assumption challenge are present BEFORE the ideas section.
 - Scope decision says single concern or names the chosen sub-problem.
 - Technique choice is named with one-sentence rationale.
 - Ideas are generated before evaluation.

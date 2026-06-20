@@ -14,6 +14,18 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.11.7 (2026-06-20) — Brainstorming Solution Decompression
+
+### Highlights
+
+`mk:brainstorming` now handles the case where you arrive holding a solution instead of a problem. When the input is itself a solution ("just build X", a preselected feature, a roadmap item), the skill first decompresses it into the underlying problem and three alternative problem framings before generating any ideas — and redirects to `mk:office-hours` when the problem's value is unvalidated. It stays read-only and never grades evidence inline.
+
+### Improvements
+
+- `mk:brainstorming` decompresses a solution-input to the underlying problem and three or more problem framings before ideating, through a new `solution-decompression` pre-step technique.
+- The pre-decided-user gotcha and the repeated-redirect edge case now recover the problem first, then optionally stress-test the chosen path with `reverse`.
+- Brainstorm reports can be rendered as a self-contained HTML brief through `mk:preview --html --explain`.
+
 ## 2.11.6 (2026-06-19) — Merge Conflict + Codebase Architecture Skills
 
 ### Highlights

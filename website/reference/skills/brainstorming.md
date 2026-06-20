@@ -4,7 +4,7 @@ description: "mk:brainstorming"
 ---
 
 ## What This Skill Does
-Explores technical approaches with structured ideation, challenge, convergence, and plan-creator handoff. Generates 3-8 ideas using one of 7 purpose-built techniques, applies anti-bias pivots, challenges the idea set before recommending, and scores ideas on feasibility/impact/simplicity/novelty when in deep mode. Produces structured reports -- never code.
+Explores technical approaches with structured ideation, challenge, convergence, and plan-creator handoff. Generates 3-8 ideas using one of 7 purpose-built techniques, applies anti-bias pivots, challenges the idea set before recommending, and scores ideas on feasibility/impact/simplicity/novelty when in deep mode. When the input is itself a solution rather than a problem, it first decompresses that solution to the underlying problem before ideating. Produces structured reports -- never code.
 
 **Differentiator:** `mk:office-hours` = "should we build this?" (product validation). `mk:brainstorming` = "how should we build this?" (technical approach). `mk:plan-ceo-review` = plan already exists, want to challenge scope.
 
@@ -38,6 +38,7 @@ Explores technical approaches with structured ideation, challenge, convergence, 
    - `scamper` -- improving existing things, walks 7 lenses (Substitute/Combine/Adapt/Modify/Put/Eliminate/Reverse)
    - `analogical-thinking` -- cross-domain transfer, extracts mechanisms from non-software domains
    - `perspective-shift` -- walks candidate solutions through stakeholder perspectives (SRE, Security, New Hire, PM, End User)
+   - `solution-decompression` -- pre-step (runs before generation, not a generation technique): when the input is itself a solution ("just build X", a preselected feature, a roadmap item), recovers the underlying problem plus three alternative problem framings and the load-bearing assumption before ideas are generated; redirects to `mk:office-hours` when the problem's value is unvalidated
 4. **Anti-Bias Pivot:** After idea #4, pauses and asks "what orthogonal category have I not touched yet?" Forces one pivot per session to break semantic clustering
 5. **Challenge Pass:** Before recommendation, checks duplicate architectures, hard constraints, category diversity, conservative drift, and missing stakeholder failure modes
 6. **Idea Format:** Every idea must include Concept (2-3 sentence mechanism), Novelty (what makes it non-obvious -- mandatory, or idea is dropped), and Category

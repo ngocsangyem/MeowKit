@@ -414,6 +414,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.11.7 | 2026-06-20 | Brainstorming Solution Decompression             |
 | v2.11.6 | 2026-06-19 | Merge Conflict + Codebase Architecture Skills    |
 | v2.11.5 | 2026-06-18 | Long-Horizon Run Hardening                       |
 | v2.11.4 | 2026-06-18 | Post-Compaction Safety Re-Arm                    |

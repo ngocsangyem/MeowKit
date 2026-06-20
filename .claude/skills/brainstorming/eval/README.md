@@ -14,10 +14,14 @@ Canary scenarios for routing, convergence, and handoff behavior. Add fixture fil
 | Same-architecture rejection | Ideas differ only by library/tool | Merges duplicates and regenerates one orthogonal alternative. |
 | Deep scoring tie | Top scores within 2 points | Asks for tie-break criterion or reports no clear winner. |
 | Handoff completeness | Deep mode with selected idea | Emits report path + packet with all required fields. |
+| Solution-input decompression | "just build us a notification system" | Emits decompressed problem + ≥3 problem framings BEFORE ideas; no implementation jump. |
+| Unvalidated-solution redirect | Solution input, problem value unclear | Routes to `mk:office-hours`; no evidence-grading inline. |
 
 ## Hard-Fail Conditions
 
 - Generates code, commands, implementation steps, or files outside `plans/reports/`.
+- Grades Evidence Status / runs validation plan / triages ideas inline (that is `mk:office-hours`).
+- Generates ideas before decompressing when the input is itself a solution.
 - Recommends implementation when product value is unvalidated.
 - Ends with same-architecture top recommendations.
 - Invokes `mk:plan-creator` without user confirmation.

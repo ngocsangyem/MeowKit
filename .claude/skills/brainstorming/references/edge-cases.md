@@ -12,7 +12,7 @@ You generated `WebSocket`, `Socket.IO`, and `ws library` as three approaches. Th
 
 ## 3. The user keeps redirecting to a specific answer
 
-Every clarifying question gets steered back to a preferred solution. The user has already decided. Don't fight it — instead, name it: "It sounds like you've decided on X. Do you want me to brainstorm alternatives, or stress-test the X choice?" If stress-test, switch technique to `reverse.md`.
+Every clarifying question gets steered back to a preferred solution. The user has already decided. Don't fight it. First decompress the solution via `solution-decompression.md` (recover the problem + 3 framings); the user often picks a framing their original solution didn't cover. Then, if they still want to keep their choice, switch to `reverse.md` to stress-test it.
 
 ## 4. The "novel problem" turns out to be a well-known pattern
 

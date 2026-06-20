@@ -1,7 +1,7 @@
 ---
 name: mk:brainstorming
 preamble-tier: 3
-version: 2.0.0
+version: 2.1.0
 description: |
   Use when exploring technical solutions, comparing approaches, or generating
   alternatives for a validated problem. Triggers on "brainstorm solutions",
@@ -22,6 +22,7 @@ keywords:
   - compare-approaches
   - trade-off-analysis
   - alternatives
+  - solution-decompression
 when_to_use: Use when exploring technical solutions or comparing approaches for a validated problem. NOT for product validation (see mk:office-hours) or after a plan exists (see mk:plan-ceo-review).
 user-invocable: true
 owner: research
@@ -66,6 +67,7 @@ Always skips Gate 1 (same as `mk:investigate` and `mk:office-hours`).
 ## Responsibilities
 
 - Confirm the problem, binding constraint, success criterion, and excluded scope.
+- When the input is itself a solution (preselected feature / "just build X" / roadmap item), decompress it to the underlying problem and ≥3 problem framings BEFORE ideating; redirect to `mk:office-hours` if the problem's value is unvalidated.
 - Explore architecturally distinct technical approaches for a validated problem.
 - Generate ideas first, then evaluate them separately.
 - Run one anti-bias pivot and one challenge pass before recommending.
@@ -95,6 +97,7 @@ Run these stages in order. This is outcome-oriented, not a command script.
 4. **Optional scout bridge** — use `mk:scout` only when existing codebase touchpoints affect approach choice. Consume a 3-6 bullet summary, not a full scout report.
 5. **Technique selection** — match problem type to one file in `references/techniques/`. When multiple match, prefer in this order: `multi-alternative` → `first-principles` → `reverse` → `constraint-mapping` → `scamper` → `analogical-thinking` → `perspective-shift`.
    - "How to build X" → `multi-alternative.md`
+   - Input is itself a solution / "just build X" / preselected roadmap item → `solution-decompression.md` (run BEFORE idea generation; not a generation technique)
    - Novel problem, no existing pattern → `first-principles.md`
    - Debugging / preventing failures → `reverse.md`
    - Many constraints, narrow space → `constraint-mapping.md`
@@ -115,6 +118,7 @@ Run these stages in order. This is outcome-oriented, not a command script.
 Stop and route or ask before continuing when:
 
 - Product value or problem validity is unclear → `mk:office-hours`.
+- Input is a solution and decompression shows its problem is unvalidated (evidence would be `none`/`weak`) → STOP, route to `mk:office-hours`. Do NOT grade evidence, run validation plans, or triage ideas inside brainstorming.
 - A plan or verdict already exists → `mk:plan-ceo-review` or `mk:elicit`.
 - The request has 3+ independently shippable concerns.
 - Hard constraints conflict and no idea can satisfy them together.
@@ -193,6 +197,7 @@ mk:plan-creator (plan)
 On completion:
 
 - Output saved to `plans/reports/`
+- To render the report as a self-contained HTML brief: `mk:preview --html --explain <report-path>`
 - Include a `Brainstorm Handoff Packet` using `assets/output-action-plan.md`
 - If `--depth deep`, ask before invoking or recommending `mk:plan-creator`
 - `plan-creator` receives report path + handoff packet as pre-research input; it still owns requirements completeness, phase files, and plan approval
