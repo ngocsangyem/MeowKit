@@ -68,6 +68,8 @@ ${pc.bold("Options:")}
   --portable-missing  Inventory: show artifacts whose runtime is not portable
   --check          Inventory: fail if README/index counts drift from reality
   --emit-counts    Inventory: rewrite README/index count numbers to match reality
+  --substrate      Inventory: print the responsibility×coverage substrate matrix (--emit writes the view)
+                   Validate: run only the responsibility-substrate drift/untagged check
 
 ${pc.bold("Init flags:")}
   --profile <name>           Install a subset: core|developer|product|atlassian|security|research|full
@@ -153,6 +155,8 @@ async function main(): Promise<void> {
 			"emit-counts",
 			"packs",
 			"rules",
+			"substrate",
+			"emit",
 		],
 		string: [
 			"only",
@@ -212,6 +216,7 @@ async function main(): Promise<void> {
 				strict: args.strict as boolean | undefined,
 				workflow: args.workflow as boolean | undefined,
 				ownership: args.ownership as boolean | undefined,
+				substrate: args.substrate as boolean | undefined,
 				packs: args.packs as boolean | undefined,
 				rules: args.rules as boolean | undefined,
 			});
@@ -240,6 +245,8 @@ async function main(): Promise<void> {
 				portableMissing: args["portable-missing"] as boolean | undefined,
 				check: args.check as boolean | undefined,
 				emitCounts: args["emit-counts"] as boolean | undefined,
+				substrate: args.substrate as boolean | undefined,
+				emit: args.emit as boolean | undefined,
 			});
 			break;
 		case "budget": {
