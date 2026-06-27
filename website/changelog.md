@@ -14,6 +14,35 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.12.1 (2026-06-27) — Native Plugin Distribution
+
+### Highlights
+
+MeowKit is now installable as a native plugin in both Claude Code and Codex (`mk`), alongside the existing flat-copy install. The plugin distribution is generated from the same `.claude/` source — no second source of truth — so skills (`/mk:*`), agents (`mk:*`), and hooks all resolve under the plugin. The flat-copy `mewkit init` path is unchanged.
+
+### New Skills
+
+| Skill              | Purpose                                                              |
+| ------------------ | ------------------------------------------------------------------- |
+| `mk:chrome-profile`| Target a real Google Chrome profile for browser automation.         |
+| `mk:ghpm`          | GitHub project management — Issues, Projects, labels, milestones via `gh`. |
+| `mk:html-video`    | Render local MP4 videos from HTML/CSS/JS templates.                 |
+
+### CLI
+
+- `mewkit build-plugin` — generate the native plugin distribution (`plugin/` payload + Claude and Codex marketplaces) from `.claude/`.
+- `mewkit validate --plugin` — guard namespace purity, plugin-manifest contract, and manifest-version alignment; runs in CI.
+- `mewkit doctor` now reports the active install mode and warns when flat-copy and the plugin are installed together.
+
+### Features
+
+- Native plugin install for Claude Code (`claude plugin install mk@meowkit`) and Codex (`codex plugin add mk@meowkit`).
+- Hook parity in plugin mode — `settings.json` hooks are translated into `plugin/hooks/hooks.json`, so gates and safety hooks fire under the plugin too.
+
+### Improvements
+
+- The harness substrate now reports full coverage — a new intervention-recording rule tags the previously-uncovered responsibility, bringing `mewkit inventory --substrate` to 12/12.
+
 ## 2.12.0 (2026-06-27) — Legible Context + Queryable Substrate
 
 ### Highlights
