@@ -33,7 +33,7 @@ The analyst operates at Phase 0 (session start — loads context) and Phase 6 (R
 ## Key Capabilities
 
 - **Token usage tracking** — records task name, model used, tokens consumed, estimated cost, and timestamp in `.claude/memory/cost-log.json` for every session.
-- **Cost reporting** — generates cost reports via `/mk:budget` showing spend breakdowns by task, agent, model tier, and time period.
+- **Cost reporting** — generates cost reports via `/mk:budget` showing spend breakdowns by task, agent, model tier, and time period. For cross-run aggregates it prefers the derived index — `mewkit index` then `mewkit query` and `mewkit trace audit` — over hand-parsing the JSONL logs, falling back to `cost-log.json` when the index is absent.
 - **Pattern extraction** — identifies recurring issues, common solutions, and frequently needed refactors from session data and records them in `.claude/memory/patterns.json`.
 - **Lessons learned** — maintains actionable lessons in `.claude/memory/lessons.md` documenting what worked, what did not, and what to do differently.
 - **Configuration recommendations** — proposes `CLAUDE.md` updates every 10 sessions based on accumulated patterns. These are always proposals for human review, never auto-applied.

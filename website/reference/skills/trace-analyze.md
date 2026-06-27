@@ -26,6 +26,7 @@ Activate when:
 - **Pattern detection with thresholds:** Requires ≥3 occurrences before a pattern becomes a suggestion (anti-overfit). Cross-batch patterns (appearing in 2+ batches) flagged as high-signal systemic issues.
 - **Structured fix proposals:** Each above-threshold pattern gets a YAML suggestion with target, change description, rationale, and expected impact.
 - **Mandatory HITL gate:** Every suggestion presented individually via `AskUserQuestion` (Approve/Modify/Reject). No bulk-approve. No auto-apply. Ever.
+- **Deterministic CLI companion:** Before (or instead of) the LLM scatter-gather, `mewkit trace score|audit|propose` answers the cheap questions over the same log with no subagents and no hook; `mewkit index` + `mewkit query` give relational aggregates over the append logs. Both are advisory — neither gates.
 
 ## Arguments
 
