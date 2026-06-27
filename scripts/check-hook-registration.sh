@@ -1,6 +1,6 @@
 #!/bin/bash
 # check-hook-registration.sh — bidirectional hook-drift check.
-# Per meowkit-rules.md §3: "Every hook in .claude/hooks/ MUST be registered in
+# Per meowkit-rules.md: "Every hook in .claude/hooks/ MUST be registered in
 # .claude/settings.json." This script catches drift in BOTH directions plus the
 # handlers.json dispatch registry:
 #

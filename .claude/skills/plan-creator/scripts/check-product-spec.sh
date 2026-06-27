@@ -2,7 +2,7 @@
 #
 # check-product-spec.sh — Structural validator for product-level plans.
 #
-# Replaces the inline grep self-check from step-03a-product-spec.md §3a.5.
+# Replaces the inline grep self-check from step-03a-product-spec.md.
 # Per lessons-build-skill.md "Store Scripts" — script form is the reliable enforcement layer.
 #
 # Usage:  check-product-spec.sh <path-to-plan.md>

@@ -6,6 +6,7 @@ import { collectProviderContractDiagnostics } from "../migrate/provider-contract
 import { isHookScript } from "../core/is-hook-script.js";
 import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
 import { checkOwnership } from "../core/build-inventory.js";
+import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
 import { analyzeCodexRuleSource } from "../migrate/converters/index.js";
 import { discoverRules, discoverSkills } from "../migrate/discovery/index.js";
@@ -23,6 +24,7 @@ export type Section =
 	| "Docs"
 	| "Workflow"
 	| "Ownership"
+	| "Substrate"
 	| "Inventory"
 	| "Packs"
 	| "Rules";
@@ -41,6 +43,8 @@ interface ValidateOptions {
 	workflow?: boolean;
 	/** Scope the run to the ownership-completeness check only (used by CI). */
 	ownership?: boolean;
+	/** Scope the run to the responsibility-substrate check only (used by CI). */
+	substrate?: boolean;
 	/** Scope the run to the pack-manifest coherence check only (used by CI). */
 	packs?: boolean;
 	/** Scope the run to the routing-table-breadth WARN check only. */
@@ -456,6 +460,8 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = checkWorkflowDrift(projectRoot);
 	} else if (args.ownership) {
 		results = checkOwnership(meowkitDir);
+	} else if (args.substrate) {
+		results = checkSubstrate(meowkitDir);
 	} else if (args.packs) {
 		results = checkPacks(meowkitDir);
 	} else if (args.rules) {
@@ -473,6 +479,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 			// The scoped `--workflow`/`--ownership`/`--packs` paths above stay strict for CI.
 			...checkWorkflowDrift(projectRoot, { missingSpecSeverity: "warn" }),
 			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
+			...checkSubstrate(meowkitDir, { missingViewSeverity: "warn" }),
 			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
 			...checkRoutingTableBreadth(meowkitDir),
 		];
@@ -493,6 +500,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		Docs: true,
 		Workflow: true,
 		Ownership: true,
+		Substrate: true,
 		Packs: true,
 		Inventory: true,
 		Rules: true,

@@ -33,6 +33,18 @@ runtime: claude-code
 
 Step-file workflow that ingests `.claude/memory/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel `researcher` subagents, gathers cross-batch patterns, and gates suggestions through human review before any harness change is applied.
 
+## Deterministic CLI companion
+
+Before (or instead of) the LLM scatter-gather, the deterministic `mewkit trace` command answers the cheap questions over the same log with no subagents and no inner-harness hook:
+
+- `mewkit trace score [--id <run>]` — trace-quality tier per run lane.
+- `mewkit trace audit` — entropy + orphaned / stale / unverified-run / repeated-friction counts.
+- `mewkit trace propose [--commit]` — group repeated friction (≥2) + drift into advisory backlog items (dry-run by default).
+- `mewkit trace --friction "<note>" [--responsibility <r>]` — record friction on demand (the portable write path; the `##friction:` hook prefix is an optional enhancement).
+- `mewkit index` then `mewkit query` — opt-in: build a disposable SQLite index over the same logs and run read-only relational aggregates (events-by-type, friction-by-responsibility, cost-by-model). Use only when a cross-run aggregate is awkward over raw JSONL; logs stay canonical.
+
+Use the CLI for fast deterministic recall; use this skill's scatter-gather when patterns need cross-run LLM synthesis. Both are advisory — neither gates.
+
 ## When to Use
 
 Activate when:

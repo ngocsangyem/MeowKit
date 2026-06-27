@@ -21,6 +21,7 @@ Source file: `docs/governance/rules-index.md`
 | `core-behaviors.md` | 6 mandatory operating behaviors: Surface Assumptions, Manage Confusion, Push Back, Enforce Simplicity, Scope Discipline, Verify Don't Assume + 10 failure modes | Adapted from agent-skills | All modes, all phases |
 | `tdd-rules.md` | TDD enforcement (opt-in via `--tdd` / `MEOWKIT_TDD=1`); MICRO-TASK exemption included | MeowKit original | Phases 2, 3 **when TDD enabled** [CONTEXTUAL] |
 | `agent-conduct.md` | File naming, response structure, context ordering, search-before-building, plan resumption, context hygiene, subagent status protocol | MeowKit original + Claude Code best practices | Implementation, review, all agent responses |
+| `context-budget-rules.md` | Vendor-neutral 7-phase × 3-tier read-set + token-ceiling matrix with retrieval triggers; operationalizes the Context-selection responsibility (references, does not duplicate, agent-conduct B3/B6) | New (Runtime-Substrate synthesis) | All phases (on-demand) |
 | `development-rules.md` | Skill activation, YAGNI/KISS/DRY, file management, code quality, validation commands, pre-commit, git safety, docs impact | User rules + MeowKit | Implementation, commit |
 | `orchestration-rules.md` | Subagent delegation, work/report/plan paths, file ownership, parallel vs sequential, completion-status handling | User rules + MeowKit | Multi-agent `[CONTEXTUAL]` |
 | `model-selection-rules.md` | Task type → model tier routing, security escalation | Prompting best practices | Phase 0 (Orient) |
@@ -66,6 +67,7 @@ Higher number = stronger override:
 15. `parallel-execution-rules.md` — apply during parallel execution `[CONTEXTUAL]`
 16. `orchestration-rules.md` — apply in multi-agent workflows `[CONTEXTUAL]`
 17. `post-phase-delegation.md` — apply during orchestration-skill execution `[CONTEXTUAL]`
+18. `context-budget-rules.md` — advisory read-budget; loaded on demand per phase, never overrides anything `[CONTEXTUAL]`
 
 ## Enforcement Mechanism Matrix
 
@@ -81,6 +83,7 @@ Higher number = stronger override:
 | `core-behaviors.md` | Behavioral | No | — |
 | `tdd-rules.md` | Behavioral | Yes | Default OFF; opt in via `--tdd` / `MEOWKIT_TDD=1` |
 | `agent-conduct.md` | Behavioral | No | Tier A preserves rationale; Tier B includes context hygiene |
+| `context-budget-rules.md` | Behavioral | N/A | Advisory read-budget; loaded on demand, never a gate |
 | `development-rules.md` | Behavioral | No | — |
 | `orchestration-rules.md` | Behavioral | N/A | `[CONTEXTUAL]` |
 | `model-selection-rules.md` | Behavioral | No | Domain override via CSV |

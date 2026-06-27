@@ -24,6 +24,10 @@ export interface InventoryEntry {
 	runtime: string;
 	contextCost?: string;
 	dependsOn?: string[];
+	/** Vendor-neutral substrate responsibility (optional; seed + tag-on-touch). */
+	responsibility?: string;
+	/** Optional implementation-surface cross-reference (7-surface lens). */
+	surface?: string;
 	source: "frontmatter" | "registry";
 }
 
@@ -186,6 +190,8 @@ export function buildInventory(claudeDir: string): Inventory {
 		};
 		if (typeof meta.context_cost === "string") entry.contextCost = meta.context_cost;
 		if (Array.isArray(meta.depends_on)) entry.dependsOn = meta.depends_on.map(String);
+		if (typeof meta.responsibility === "string") entry.responsibility = meta.responsibility;
+		if (typeof meta.surface === "string") entry.surface = meta.surface;
 		entries.push(entry);
 	}
 

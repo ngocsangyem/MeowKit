@@ -87,6 +87,21 @@ WHY: Without a registry, future audits redo work that's already been measured.
 
 WHY: A broken harness cannot self-test; the manual path keeps the audit possible.
 
+## On-Demand Recall Surfaces (deterministic, advisory)
+
+The audit reasons by responsibility, not by file, and consumes recorded friction/entropy.
+Two deterministic CLI surfaces feed it (no subagent, no inner-harness hook, exit 0 — advisory):
+
+- `mewkit inventory --substrate` — artifact coverage by responsibility (covered/partial/missing).
+  Target prune/keep decisions by responsibility; a `missing` responsibility is a real gap, not noise.
+- `mewkit trace audit | propose | score` — entropy + orphaned/stale/unverified/repeated-friction
+  over the append log; `trace propose` groups repeated friction (≥2) into advisory backlog items.
+- `mewkit index` then `mewkit query` — opt-in derived SQLite index over the same logs, for
+  relational/aggregate questions the JSONL scan answers awkwardly (cost-by-model,
+  events-by-type, friction-by-responsibility across many runs). Disposable + rebuild-able;
+  logs stay canonical. Reach for it only when a real cross-run aggregate is needed — the
+  index itself is a WATCH/prune candidate until that need is demonstrated.
+
 ## Applies To
 
 - `.claude/skills/benchmark/` — the measurement runner

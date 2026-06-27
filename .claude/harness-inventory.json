@@ -1,419 +1,495 @@
 {
-  "schema_version": 1,
+  "schema_version": 1.1,
   "artifacts": {
     "rules/agent-conduct.md": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-state"
     },
     "rules/agent-routing.md": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
     },
     "rules/anti-rationalization.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
+    },
+    "rules/context-budget-rules.md": {
+      "owner": "lifecycle",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "portable",
+      "responsibility": "context-selection"
     },
     "rules/core-behaviors.md": {
       "owner": "lifecycle",
       "criticality": "critical",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
     },
     "rules/dead-weight-audit-rules.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "entropy-auditing"
     },
     "rules/development-rules.md": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "verification"
     },
     "rules/docs-reference-contract.md": {
       "owner": "docs",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "permissions"
     },
     "rules/gate-rules.md": {
       "owner": "lifecycle",
       "criticality": "critical",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "rules/harness-rules.md": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "rules/injection-rules.md": {
       "owner": "security",
       "criticality": "critical",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "permissions"
     },
     "rules/memory-read-rules.md": {
       "owner": "memory",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "project-memory"
     },
     "rules/model-selection-rules.md": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
     },
     "rules/orchestration-rules.md": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-state"
     },
     "rules/parallel-execution-rules.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-state"
     },
     "rules/phase-contracts.md": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-state"
     },
     "rules/post-phase-delegation.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "rules/risk-checklist.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
     },
     "rules/rubric-rules.md": {
       "owner": "testing",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "verification"
     },
     "rules/scale-adaptive-rules.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
     },
     "rules/security-rules.md": {
       "owner": "security",
       "criticality": "critical",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "permissions"
     },
     "rules/skill-authoring-rules.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "tool-access"
     },
     "rules/step-file-rules.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "context-selection"
     },
     "rules/tdd-rules.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "verification"
     },
     "rules-conditional/agile-feedback-cycle.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-state"
     },
     "rules-conditional/agile-sprint-commitment.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-state"
     },
     "rules-conditional/agile-story-gates.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "rules-conditional/workflow-evidence-rules.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "commands/mk/arch.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
     },
     "commands/mk/audit.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "permissions"
     },
     "commands/mk/autobuild.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "commands/mk/breakdown.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
     },
     "commands/mk/budget.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "commands/mk/canary.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "commands/mk/confluence-setup.md": {
       "owner": "confluence",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "tool-access"
     },
     "commands/mk/context-audit.md": {
       "owner": "docs",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "context-selection"
     },
     "commands/mk/cook.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "commands/mk/delegate.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
     },
     "commands/mk/design.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
     },
     "commands/mk/docs-init.md": {
       "owner": "docs",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "commands/mk/docs-sync.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "commands/mk/fix.md": {
       "owner": "docs",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "failure-attribution"
     },
     "commands/mk/help.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "commands/mk/meow.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
     },
     "commands/mk/plan.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
     },
     "commands/mk/retro.md": {
       "owner": "docs",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "project-memory"
     },
     "commands/mk/review.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "verification"
     },
     "commands/mk/ship.md": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "commands/mk/spawn.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "task-state"
     },
     "commands/mk/status.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "commands/mk/test.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "verification"
     },
     "commands/mk/upgrade.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "tool-access"
     },
     "commands/mk/validate.md": {
       "owner": "utility",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "verification"
     },
     "hooks/append-trace.sh": {
       "owner": "observability",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "hooks/control-probe.sh": {
       "owner": "observability",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "hooks/ensure-skills-venv.sh": {
       "owner": "lifecycle",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "tool-access"
     },
     "hooks/gate-enforcement.sh": {
       "owner": "security",
       "criticality": "critical",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "hooks/jira-env-loader.sh": {
       "owner": "jira",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "tool-access"
     },
     "hooks/learning-observer.sh": {
       "owner": "observability",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "project-memory"
     },
     "hooks/post-session.sh": {
       "owner": "observability",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "hooks/post-write.sh": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "hooks/posttoolfailure-probe.sh": {
       "owner": "observability",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "failure-attribution"
     },
     "hooks/pre-completion-check.sh": {
       "owner": "security",
       "criticality": "critical",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "hooks/pre-implement.sh": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "hooks/pre-ship.sh": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "hooks/pre-task-check.sh": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
     },
     "hooks/precompact-probe.sh": {
       "owner": "observability",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "observability"
     },
     "hooks/privacy-block.sh": {
       "owner": "security",
       "criticality": "critical",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "permissions"
     },
     "hooks/project-context-loader.sh": {
       "owner": "docs",
       "criticality": "medium",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "context-selection"
     },
     "hooks/tdd-flag-detector.sh": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
-      "runtime": "claude-code"
+      "runtime": "claude-code",
+      "responsibility": "verification"
     }
   }
 }

@@ -43,6 +43,12 @@ Read-only audit of `.claude/` structural overhead. Surfaces what is loaded into
 every host-runtime session and how much of the context window it consumes,
 then recommends the highest-leverage trims.
 
+Complementary lens: `mewkit inventory --substrate` shows the same artifact set
+grouped by the responsibility each serves (covered / partial / missing), so a trim
+can be checked against responsibility coverage before removing an artifact. The
+per-phase read budget that bounds what an audit-driven session should load lives in
+`rules/context-budget-rules.md`.
+
 ## When to Use
 
 Three concrete triggers:

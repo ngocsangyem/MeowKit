@@ -3,6 +3,7 @@ import path from "node:path";
 import pc from "picocolors";
 import { buildInventory, type InventoryEntry } from "../core/build-inventory.js";
 import { checkStaleIndex, emitCounts } from "../core/check-stale-index.js";
+import { aggregateSubstrate, emitSubstrateView, type Coverage } from "../core/substrate.js";
 
 interface InventoryOptions {
 	json?: boolean;
@@ -13,6 +14,10 @@ interface InventoryOptions {
 	check?: boolean;
 	/** Rewrite count number tokens in README/index headers to match reality. */
 	emitCounts?: boolean;
+	/** Print the responsibility×coverage substrate matrix (generated from the registry). */
+	substrate?: boolean;
+	/** With --substrate: rewrite the committed .claude/harness-substrate.md view. */
+	emit?: boolean;
 }
 
 function findClaudeDir(): string | null {
@@ -47,6 +52,35 @@ function renderTable(entries: InventoryEntry[]): void {
 	}
 }
 
+function coverageCell(c: Coverage): string {
+	if (c === "covered") return pc.green(pad("covered", 9));
+	if (c === "partial") return pc.yellow(pad("partial", 9));
+	return pc.dim(pad("missing", 9));
+}
+
+function renderSubstrate(agg: ReturnType<typeof aggregateSubstrate>): void {
+	console.log(pc.bold(pc.cyan("Harness responsibility substrate")));
+	const covered = agg.rows.filter((r) => r.coverage === "covered").length;
+	console.log(pc.dim(`${agg.totalArtifacts} artifacts — ${covered}/${agg.rows.length} responsibilities covered`));
+	console.log();
+	console.log(pc.bold(`  ${pad("RESPONSIBILITY", 24)} ${pad("COVERAGE", 9)} ${pad("TAGGED", 7)} ${pad("ACTIVE", 7)} EXAMPLES`));
+	for (const r of agg.rows) {
+		const label = r.core ? r.label : `${r.label} (kit)`;
+		console.log(
+			`  ${pad(label, 24)} ${coverageCell(r.coverage)} ${pad(String(r.count), 7)} ${pad(String(r.active), 7)} ${pc.dim(r.examples.join(", ") || "—")}`,
+		);
+	}
+	console.log();
+	console.log(
+		pc.dim(
+			`Untagged: ${agg.untaggedRegistry.length} registry + ${agg.untaggedFrontmatter.length} frontmatter (tag-on-touch).`,
+		),
+	);
+	if (agg.invalid.length > 0) {
+		console.log(pc.yellow(`${agg.invalid.length} artifact(s) carry an out-of-enum responsibility — run \`mewkit validate --substrate\`.`));
+	}
+}
+
 export async function inventory(opts: InventoryOptions = {}): Promise<void> {
 	const claudeDir = findClaudeDir();
 	if (!claudeDir) {
@@ -55,6 +89,21 @@ export async function inventory(opts: InventoryOptions = {}): Promise<void> {
 	}
 
 	const repoRoot = path.dirname(claudeDir);
+
+	if (opts.substrate) {
+		if (opts.emit) {
+			const written = emitSubstrateView(claudeDir);
+			console.log(`${pc.green("Wrote substrate view:")} ${written}`);
+			return;
+		}
+		const agg = aggregateSubstrate(claudeDir);
+		if (opts.json) {
+			console.log(JSON.stringify(agg, null, 2));
+			return;
+		}
+		renderSubstrate(agg);
+		return;
+	}
 
 	if (opts.emitCounts) {
 		const changed = emitCounts(repoRoot);

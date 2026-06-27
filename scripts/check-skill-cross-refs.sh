@@ -1,7 +1,7 @@
 #!/bin/bash
 # check-skill-cross-refs.sh — exits non-zero if any mk:* reference fails to resolve.
 # Resolves to either an existing skill at .claude/skills/<name>/ OR a command at
-# .claude/commands/mk/<name>.md, per .claude/rules/skill-authoring-rules.md §"Commands vs Skills" semantics.
+# .claude/commands/mk/<name>.md, per .claude/rules/skill-authoring-rules.md "Commands vs Skills" semantics.
 #
 # Usage: bash scripts/check-skill-cross-refs.sh [project-root]
 # Exit:  0 if clean; 1 if any phantom ref found.
@@ -23,7 +23,7 @@ if [ -z "$SKILLS" ]; then
 fi
 
 # Allowlist:
-#   - Deprecated aliases per meowkit-architecture.md §3 (debug, shipping, documentation)
+#   - Deprecated aliases per meowkit-architecture.md (debug, shipping, documentation)
 #   - Documentation placeholders that are NOT real routing targets:
 #     * command       — generic syntax placeholder in commands/mk/mk.md printf
 #     * my-feature    — example skill name in mk:skill-creator CLI usage docs

@@ -17,6 +17,9 @@ import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
 import { orchviz } from "./commands/orchviz.js";
 import { inventory } from "./commands/inventory.js";
+import { trace } from "./commands/trace.js";
+// NOTE: index-command is imported lazily inside its case — it pulls in `node:sqlite`
+// (experimental), so a static import would load SQLite + emit its warning on EVERY command.
 import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
 
@@ -45,6 +48,9 @@ ${pc.bold("Commands:")}
   ${pc.green("providers")}  Show effective provider support matrix and enforcement levels
   ${pc.green("orchviz")}    Live web visualizer for the active Claude Code session
   ${pc.green("inventory")}  List harness artifacts with governance metadata
+  ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
+  ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
+  ${pc.green("query")}      Read-only aggregate queries over the derived index
   ${pc.green("pack")}       Manage install packs (list, add, remove)
 
 ${pc.bold("Options:")}
@@ -68,6 +74,8 @@ ${pc.bold("Options:")}
   --portable-missing  Inventory: show artifacts whose runtime is not portable
   --check          Inventory: fail if README/index counts drift from reality
   --emit-counts    Inventory: rewrite README/index count numbers to match reality
+  --substrate      Inventory: print the responsibility×coverage substrate matrix (--emit writes the view)
+                   Validate: run only the responsibility-substrate drift/untagged check
 
 ${pc.bold("Init flags:")}
   --profile <name>           Install a subset: core|developer|product|atlassian|security|research|full
@@ -153,6 +161,9 @@ async function main(): Promise<void> {
 			"emit-counts",
 			"packs",
 			"rules",
+			"substrate",
+			"emit",
+			"commit",
 		],
 		string: [
 			"only",
@@ -169,6 +180,9 @@ async function main(): Promise<void> {
 			"log",
 			"profile",
 			"fail-over",
+			"friction",
+			"id",
+			"responsibility",
 		],
 		alias: { h: "help", v: "version", y: "yes" },
 	});
@@ -212,6 +226,7 @@ async function main(): Promise<void> {
 				strict: args.strict as boolean | undefined,
 				workflow: args.workflow as boolean | undefined,
 				ownership: args.ownership as boolean | undefined,
+				substrate: args.substrate as boolean | undefined,
 				packs: args.packs as boolean | undefined,
 				rules: args.rules as boolean | undefined,
 			});
@@ -240,8 +255,30 @@ async function main(): Promise<void> {
 				portableMissing: args["portable-missing"] as boolean | undefined,
 				check: args.check as boolean | undefined,
 				emitCounts: args["emit-counts"] as boolean | undefined,
+				substrate: args.substrate as boolean | undefined,
+				emit: args.emit as boolean | undefined,
 			});
 			break;
+		case "trace":
+			trace({
+				subcommand: args._[1] as string | undefined,
+				id: args.id as string | undefined,
+				friction: args.friction as string | undefined,
+				responsibility: args.responsibility as string | undefined,
+				commit: args.commit as boolean | undefined,
+				json: args.json as boolean | undefined,
+			});
+			break;
+		case "index": {
+			const { indexCommand } = await import("./commands/index-command.js");
+			indexCommand({ json: args.json as boolean | undefined });
+			break;
+		}
+		case "query": {
+			const { queryCommand } = await import("./commands/index-command.js");
+			queryCommand({ json: args.json as boolean | undefined });
+			break;
+		}
 		case "budget": {
 			// `budget context` routes to the per-profile context estimator (positional,
 			// not a flag — minimist parses it as args._[1]).

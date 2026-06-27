@@ -140,7 +140,7 @@ These sections are ONLY added when `--tdd` flag is set or `MEOWKIT_TDD=1` env va
 - **Min 2 phases** in hard mode.
 - **Max 7 phases** (beyond that, decompose the task).
 
-**`--parallel` precedence:** when `planning_mode = parallel`, file-ownership grouping (§3i) governs decomposition — a vertical slice spans DB + API + UI and overlaps other slices' files, which fights zero-overlap parallelism. Vertical-slice guidance applies to the DEFAULT / sequential decomposition; ownership-based grouping wins in parallel mode.
+**`--parallel` precedence:** when `planning_mode = parallel`, file-ownership grouping governs decomposition — a vertical slice spans DB + API + UI and overlaps other slices' files, which fights zero-overlap parallelism. Vertical-slice guidance applies to the DEFAULT / sequential decomposition; ownership-based grouping wins in parallel mode.
 
 **Break-down triggers** (heuristics, not hard rules; `Max 7` is the ceiling):
 - "and" in a phase title (e.g. "Auth and profile") → split into two phases.

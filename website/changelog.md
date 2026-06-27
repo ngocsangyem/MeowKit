@@ -14,6 +14,33 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.12.0 (2026-06-27) — Legible Context + Queryable Substrate
+
+### Highlights
+
+The outer harness gains a legible context layer and a queryable substrate across sessions. A new phase × tier read-budget tells any inner harness how much context to load per phase; every harness artifact now carries a vendor-neutral responsibility so coverage is auditable; and an on-demand trace surface recalls repeated friction, drift, and cost aggregates from the existing append logs. Everything is additive, advisory, and inner-harness-agnostic — no gate, verification, or hook behavior changes.
+
+### CLI
+
+- `mewkit trace score|audit|propose` — on-demand trace-quality tier, entropy/drift audit, and advisory grouping of repeated friction over the append logs.
+- `mewkit trace --friction "<note>" --responsibility <r>` — record friction with no inner-harness hook required.
+- `mewkit inventory --substrate` — print a responsibility×coverage matrix generated from the registry; `--emit` writes the committed view.
+- `mewkit index` and `mewkit query` — opt-in derived SQLite index over the append logs (rebuild-able and disposable; the logs stay canonical) with read-only aggregate queries.
+- `mewkit validate --substrate` — flag untagged registry artifacts and a stale substrate view, now run in CI.
+
+### Features
+
+- New `context-budget-rules` — a vendor-neutral 7-phase × 3-tier read-set and token-ceiling matrix with retrieval triggers, so an agent loads the smallest right context per phase.
+- Every harness artifact now carries a `responsibility` tag (eleven Runtime-Substrate values plus `gate-enforcement`), so the dead-weight audit can target by responsibility instead of by file.
+
+### Improvements
+
+- The Phase-6 `analyst` agent now prefers `mewkit index` + `query` + `trace audit` for cross-run cost and pattern rollups instead of hand-parsing the JSONL logs, and falls back to the raw log when the index is absent.
+
+### Beta
+
+- `mewkit index` / `mewkit query` are opt-in and use the experimental `node:sqlite` builtin — the derived index is disposable and never the source of truth.
+
 ## 2.11.7 (2026-06-20) — Brainstorming Solution Decompression
 
 ### Highlights

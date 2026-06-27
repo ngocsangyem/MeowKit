@@ -48,6 +48,37 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "Optional. Artifact IDs (skill name, agent name, or registry key) this artifact depends on at runtime. Used by the inventory command for dependency graph analysis."
+    },
+    "responsibility": {
+      "type": "string",
+      "enum": [
+        "task-specification",
+        "context-selection",
+        "tool-access",
+        "project-memory",
+        "task-state",
+        "observability",
+        "failure-attribution",
+        "verification",
+        "permissions",
+        "entropy-auditing",
+        "intervention-recording",
+        "gate-enforcement"
+      ],
+      "description": "Optional (seed + tag-on-touch; untagged is allowed and reported, not hidden). The vendor-neutral substrate responsibility this artifact primarily serves. Eleven values are the Runtime-Substrate taxonomy (repo-harness synthesis, Runtime-Substrate-rooted — NOT an Anthropic standard); gate-enforcement is the one MeowKit-specific addition (the gate layer maps only partially onto permissions + audit). Hard cap 13: a new value needs justification. `mewkit inventory --substrate` aggregates artifacts by this field; the dead-weight audit targets by responsibility, not by file."
+    },
+    "surface": {
+      "type": "string",
+      "enum": [
+        "system-prompts",
+        "tool-descriptions",
+        "tool-implementations",
+        "middleware",
+        "skills",
+        "sub-agents",
+        "long-term-memory"
+      ],
+      "description": "Optional implementation-surface cross-reference (vendor-neutral 7-surface lens). Annotates which agent surface an artifact lives on; used only as a secondary axis in the substrate view. Not seeded by default."
     }
   }
 }
