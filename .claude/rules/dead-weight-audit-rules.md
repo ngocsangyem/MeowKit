@@ -96,6 +96,11 @@ Two deterministic CLI surfaces feed it (no subagent, no inner-harness hook, exit
   Target prune/keep decisions by responsibility; a `missing` responsibility is a real gap, not noise.
 - `mewkit trace audit | propose | score` — entropy + orphaned/stale/unverified/repeated-friction
   over the append log; `trace propose` groups repeated friction (≥2) into advisory backlog items.
+- `mewkit index` then `mewkit query` — opt-in derived SQLite index over the same logs, for
+  relational/aggregate questions the JSONL scan answers awkwardly (cost-by-model,
+  events-by-type, friction-by-responsibility across many runs). Disposable + rebuild-able;
+  logs stay canonical. Reach for it only when a real cross-run aggregate is needed — the
+  index itself is a WATCH/prune candidate until that need is demonstrated.
 
 ## Applies To
 
