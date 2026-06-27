@@ -19,6 +19,12 @@
       "status": "active",
       "runtime": "claude-code"
     },
+    "rules/context-budget-rules.md": {
+      "owner": "lifecycle",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "portable"
+    },
     "rules/core-behaviors.md": {
       "owner": "lifecycle",
       "criticality": "critical",

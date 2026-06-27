@@ -149,4 +149,8 @@ Treat context as a limited resource:
 - Prefer deterministic verification (tests, build output, screenshots, runtime checks) over plausibility.
 - After two repeated corrections on the same issue, refine the prompt/plan instead of accumulating more failed context.
 
+For the per-phase × per-tier read-set and token ceiling that operationalizes this hygiene,
+see `context-budget-rules.md` (the Context-selection budget). B3/B6 set the ordering and
+discipline; that rule sets how much to load per phase.
+
 WHY: JIT-loaded context keeps host-runtime performance usable.
