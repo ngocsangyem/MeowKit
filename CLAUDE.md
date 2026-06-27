@@ -73,7 +73,7 @@ ALWAYS read task file before touching code. NEVER start Phase 3 without Gate 1. 
 
 ## Memory
 
-Read canonical `.json` stores at task start (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`); fall back to the matching `.md` only when the `.json` is absent (see `docs/memory-system.md`). The `.md` files are generated views — non-authoritative, regenerated via `mewkit memory render-views`. Update the `.json` stores at task end. See `.claude/memory/` (fixes, review-patterns, architecture-decisions, cost-log, decisions, security-log). Consumer skills include a "Load memory" step. Append by category with `##decision:`, `##pattern:`, `##note:` prefixes. Prune via `/mk:memory --prune` (>90 days).
+Read canonical `.json` stores at task start (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`); fall back to the matching `.md` only when the `.json` is absent (see `docs/memory-system.md`). The `.md` files are generated views — non-authoritative, regenerated via `mewkit memory render-views`. Update the `.json` stores at task end. See `.claude/memory/` (fixes, review-patterns, architecture-decisions, cost-log, decisions, security-log). Consumer skills include a "Load memory" step. Append by category with `##decision:`, `##pattern:`, `##note:` prefixes. Prune via `/mk:memory --prune` (>90 days). For cross-session recall of repeated friction / trace drift, use the on-demand `mewkit trace score|audit|propose` and record friction with `mewkit trace --friction "<note>"` (advisory, no hook needed); responsibility coverage is `mewkit inventory --substrate`.
 
 ## Documentation
 
