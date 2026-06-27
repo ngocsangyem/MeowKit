@@ -18,7 +18,8 @@ import { task } from "./commands/task.js";
 import { orchviz } from "./commands/orchviz.js";
 import { inventory } from "./commands/inventory.js";
 import { trace } from "./commands/trace.js";
-import { indexCommand, queryCommand } from "./commands/index-command.js";
+// NOTE: index-command is imported lazily inside its case — it pulls in `node:sqlite`
+// (experimental), so a static import would load SQLite + emit its warning on EVERY command.
 import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
 
@@ -268,12 +269,16 @@ async function main(): Promise<void> {
 				json: args.json as boolean | undefined,
 			});
 			break;
-		case "index":
+		case "index": {
+			const { indexCommand } = await import("./commands/index-command.js");
 			indexCommand({ json: args.json as boolean | undefined });
 			break;
-		case "query":
+		}
+		case "query": {
+			const { queryCommand } = await import("./commands/index-command.js");
 			queryCommand({ json: args.json as boolean | undefined });
 			break;
+		}
 		case "budget": {
 			// `budget context` routes to the per-profile context estimator (positional,
 			// not a flag — minimist parses it as args._[1]).
