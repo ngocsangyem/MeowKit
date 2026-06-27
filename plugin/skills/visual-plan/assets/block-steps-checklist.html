@@ -1,0 +1,22 @@
+<!-- block: steps-checklist (sentinel .vp-steps-checklist). Core block.
+     Binds to: each phase ## Implementation Steps + ## Todo List + ## Success Criteria.
+     Steps are an ordered list; success criteria render as static checkboxes (display only).
+     Step / criterion text is plan DATA — entity-encode it. One .wf-card per phase. -->
+<section class="vp-section vp-steps-checklist">
+  <h2>Steps &amp; acceptance</h2>
+
+  <div class="wf-card">
+    <h3>Phase {N} — {PHASE_TITLE}</h3>
+    <ol>
+      <li>{IMPLEMENTATION_STEP}</li>
+      <!-- repeat per implementation step -->
+    </ol>
+    <ul class="vp-checks">
+      <li><span aria-hidden="true">&#9744;</span> {SUCCESS_CRITERION}</li>
+      <!-- repeat per success criterion / todo item -->
+    </ul>
+  </div>
+
+  <!-- repeat .wf-card per phase -->
+
+</section>

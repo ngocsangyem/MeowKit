@@ -31,6 +31,7 @@ Advisory only — does not change agent-detector scoring or output format.
 | Optimize a measurable metric (coverage %, bundle size, lint count, latency) through bounded git-tracked iterations | Build | mk:loop (keep/revert per scalar metric; NOT for subjective cleanup — see mk:cook) |
 | Factual project question with sources ("how does X work *here*", "explain X in this repo", "is it true that ... in the repo", "why is X structured this way") | any | mk:ask-me (cited inline answer; NOT library docs — see mk:docs-finder; NOT "why is X broken" — see mk:investigate) |
 | Visualize code, draw diagram, build slide deck, render plan as HTML | any | mk:preview |
+| Render a plan as a shareable, block-disciplined plan.html artifact at the plan-dir root | any | mk:visual-plan (committed shareable artifact, scannable in <30s; NOT ad-hoc plan display — see mk:preview `--html --plan-review`; NOT plan critique — see mk:plan-ceo-review) |
 | Visualize a git diff or PR before review | Review | mk:preview (`--html --diff`) |
 | Ready to ship/deploy | Ship | mk:ship |
 | Resolve an in-progress git merge or rebase conflict ("finish the merge", "fix this rebase", unmerged paths) | any | mk:resolving-merge-conflicts (read state → recover intent → resolve hunks → run checks → finish; always resolves, never --abort; NOT the base-branch merge of shipping — see mk:ship) |

@@ -175,7 +175,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ### Cross-Cutting (Any Phase)
 
 ```toon
-[13]{skill,owner,trigger}
+[14]{skill,owner,trigger}
 `mk:ask-me`|any agent|Evidence-grounded project Q&A — "how does X work here", claim-checks, constraint summaries — answered with cited `file:line` sources. Read-only; redirects ideation/decisions/debugging/review to the owning specialist skill.
 `mk:careful`|any agent|Before destructive commands
 `mk:freeze`|any agent|Debug session scoping
@@ -184,6 +184,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:web-to-markdown`|any agent|Fetch arbitrary URLs as clean markdown — use when URL is not covered by mk:docs-finder. Static-only by default; Playwright opt-in via `.claude/scripts/bin/setup-workflow --system-deps`.
 `mk:henshin`|any agent|Planning front door for wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `mk:plan-creator` → `mk:cook`. Adapted from external agentization patterns.
 `mk:preview`|any agent|Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, git diffs, and plan rendering. Display only; not for plan critique (mk:plan-ceo-review) or media generation (mk:multimodal).
+`mk:visual-plan`|any agent|Render a plan (plan.md + phase-*.md) into ONE shareable, block-disciplined plan.html at the plan-dir root, scannable in <30s. Committed artifact; NOT ad-hoc plan display (mk:preview --plan-review), NOT plan critique (mk:plan-ceo-review).
 `mk:story-sizer`|story-sizer|Pre-ticket Fibonacci sizing of paste-mode user stories. Default writes a Story Sizing Report. Opt-in `--auto-create` delegates to `mk:jira-issue` + `mk:jira-collaborate` with a single batch confirmation gate.
 `mk:chom`|researcher|Copy-cat / replicate features from external systems, repos, or ideas into the current project
 `mk:pack`|developer|Pack an external repository into a single AI-friendly file for third-party analysis or handoff to external LLMs
@@ -204,8 +205,8 @@ Deployment|2
 Documentation|4
 Memory|2
 Utility|12
-Cross-Cutting|7
-**Total**|**113**
+Cross-Cutting|8
+**Total**|**114**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

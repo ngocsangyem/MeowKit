@@ -14,6 +14,18 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.12.2 (2026-06-28) — Visual Plan Rendering
+
+### Highlights
+
+A plan directory (`plan.md` + `phase-*.md`) now renders into ONE self-contained, shareable `plan.html` a reviewer can scan in under 30 seconds — phases, architecture, decisions, risks, and files-touched, without reading prose. Consistency comes from a fixed template, one shared theme, and a disciplined block vocabulary, so two unrelated plans look the same. It is prompt-only and self-contained; the only external dependency is the pinned Mermaid CDN, with a visible source fallback when offline.
+
+### New Skills
+
+| Skill            | Purpose                                                                                 |
+| ---------------- | --------------------------------------------------------------------------------------- |
+| `mk:visual-plan` | Render a plan into one shareable, block-disciplined `plan.html` at the plan-dir root.    |
+
 ## 2.12.1 (2026-06-27) — Native Plugin Distribution
 
 ### Highlights
