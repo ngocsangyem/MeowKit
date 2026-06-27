@@ -18,6 +18,7 @@ import { task } from "./commands/task.js";
 import { orchviz } from "./commands/orchviz.js";
 import { inventory } from "./commands/inventory.js";
 import { trace } from "./commands/trace.js";
+import { indexCommand, queryCommand } from "./commands/index-command.js";
 import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
 
@@ -47,6 +48,8 @@ ${pc.bold("Commands:")}
   ${pc.green("orchviz")}    Live web visualizer for the active Claude Code session
   ${pc.green("inventory")}  List harness artifacts with governance metadata
   ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
+  ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
+  ${pc.green("query")}      Read-only aggregate queries over the derived index
   ${pc.green("pack")}       Manage install packs (list, add, remove)
 
 ${pc.bold("Options:")}
@@ -264,6 +267,12 @@ async function main(): Promise<void> {
 				commit: args.commit as boolean | undefined,
 				json: args.json as boolean | undefined,
 			});
+			break;
+		case "index":
+			indexCommand({ json: args.json as boolean | undefined });
+			break;
+		case "query":
+			queryCommand({ json: args.json as boolean | undefined });
 			break;
 		case "budget": {
 			// `budget context` routes to the per-profile context estimator (positional,
