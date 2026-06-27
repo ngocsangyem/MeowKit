@@ -17,6 +17,7 @@ import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
 import { orchviz } from "./commands/orchviz.js";
 import { inventory } from "./commands/inventory.js";
+import { trace } from "./commands/trace.js";
 import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
 
@@ -45,6 +46,7 @@ ${pc.bold("Commands:")}
   ${pc.green("providers")}  Show effective provider support matrix and enforcement levels
   ${pc.green("orchviz")}    Live web visualizer for the active Claude Code session
   ${pc.green("inventory")}  List harness artifacts with governance metadata
+  ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
   ${pc.green("pack")}       Manage install packs (list, add, remove)
 
 ${pc.bold("Options:")}
@@ -157,6 +159,7 @@ async function main(): Promise<void> {
 			"rules",
 			"substrate",
 			"emit",
+			"commit",
 		],
 		string: [
 			"only",
@@ -173,6 +176,9 @@ async function main(): Promise<void> {
 			"log",
 			"profile",
 			"fail-over",
+			"friction",
+			"id",
+			"responsibility",
 		],
 		alias: { h: "help", v: "version", y: "yes" },
 	});
@@ -247,6 +253,16 @@ async function main(): Promise<void> {
 				emitCounts: args["emit-counts"] as boolean | undefined,
 				substrate: args.substrate as boolean | undefined,
 				emit: args.emit as boolean | undefined,
+			});
+			break;
+		case "trace":
+			trace({
+				subcommand: args._[1] as string | undefined,
+				id: args.id as string | undefined,
+				friction: args.friction as string | undefined,
+				responsibility: args.responsibility as string | undefined,
+				commit: args.commit as boolean | undefined,
+				json: args.json as boolean | undefined,
 			});
 			break;
 		case "budget": {
