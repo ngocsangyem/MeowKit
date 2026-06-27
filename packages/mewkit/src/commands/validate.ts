@@ -8,6 +8,7 @@ import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
 import { checkOwnership } from "../core/build-inventory.js";
 import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
+import { checkPlugin, checkPluginNamespace, checkPluginManifests } from "../core/check-plugin-manifests.js";
 import { analyzeCodexRuleSource } from "../migrate/converters/index.js";
 import { discoverRules, discoverSkills } from "../migrate/discovery/index.js";
 import { buildPortableSkillsByProvider } from "../migrate/portability-policy.js";
@@ -27,6 +28,7 @@ export type Section =
 	| "Substrate"
 	| "Inventory"
 	| "Packs"
+	| "Plugin"
 	| "Rules";
 
 export interface CheckResult {
@@ -49,6 +51,8 @@ interface ValidateOptions {
 	packs?: boolean;
 	/** Scope the run to the routing-table-breadth WARN check only. */
 	rules?: boolean;
+	/** Scope the run to the plugin namespace + manifest guards only (used by CI). */
+	plugin?: boolean;
 }
 
 const ok = (cond: boolean): Status => (cond ? "pass" : "fail");
@@ -466,6 +470,8 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = checkPacks(meowkitDir);
 	} else if (args.rules) {
 		results = checkRoutingTableBreadth(meowkitDir);
+	} else if (args.plugin) {
+		results = checkPlugin(meowkitDir, projectRoot);
 	} else {
 		results = [
 			checkDirExists(meowkitDir, "agents"),
@@ -481,6 +487,10 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
 			...checkSubstrate(meowkitDir, { missingViewSeverity: "warn" }),
 			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
+			// Namespace purity is always enforced (cheap, catches double-prefix /
+			// leaks). Manifest contract is N/A until `mewkit build-plugin` has run.
+			...checkPluginNamespace(meowkitDir),
+			...checkPluginManifests(projectRoot),
 			...checkRoutingTableBreadth(meowkitDir),
 		];
 		if (args.portable) {
@@ -502,6 +512,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		Ownership: true,
 		Substrate: true,
 		Packs: true,
+		Plugin: true,
 		Inventory: true,
 		Rules: true,
 	};

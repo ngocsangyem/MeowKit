@@ -1,0 +1,78 @@
+# Phase Gate Rules — HARD STOPS
+
+<!-- Canonical source: .claude/workflow.yaml -->
+
+These are hard stops. No automation may bypass them. No agent may self-approve.
+
+## GATE 1 — After Phase 1 (Plan)
+
+Gate 1 is formally the Phase 1→Phase 2 transition gate. In default (non-TDD) mode
+Phase 2 is skipped, so Gate 1 is the effective block before Phase 3 Build begins.
+Both statements are true simultaneously: the gate fires after Plan and before
+whichever phase is next (Test in TDD mode; Build otherwise).
+
+### Conditions for Approval
+
+All must be true:
+
+1. **Plan file exists** at `tasks/plans/YYMMDD-name/plan.md`
+2. **All required sections are populated:**
+   - Problem: what problem this solves and for whom
+   - Success Criteria: measurable definition of done
+   - Technical Approach: how it will be built
+3. **Human has explicitly typed approval.** Approval is not inferred from silence, delay, or ambiguous responses.
+
+### What It Blocks
+
+Proceeding to Phase 2 (Test RED) in TDD mode, or directly to Phase 3 (Build) in default mode. No tests are written, no code is written, no reviews happen until the plan is approved.
+
+### Exception
+
+`/mk:fix` with complexity=simple bypasses Gate 1. The fix IS the plan — the scope is small enough that a separate planning document adds overhead without value.
+
+Scale-routing one-shot: When `mk:scale-routing` returns `workflow=one-shot` AND orchestrator confirms zero blast radius, Gate 1 may be bypassed. See `scale-adaptive-rules.md` Rule 4.
+
+### Plan Shape
+
+Plans live under `tasks/plans/YYMMDD-name/`.
+
+- `plan.md` is the overview entrypoint and stays under 80 lines.
+- `phase-XX-name.md` files hold detailed phase instructions, context links, requirements, affected files, implementation steps, success criteria, risks, security notes, and next steps.
+
+Every plan and phase file must be self-contained: goal, scope, assumptions, constraints, acceptance criteria, verification commands, and file paths must be understandable without prior conversation.
+
+## GATE 2 — After Phase 4 (Review)
+
+### Conditions for Approval
+
+All must be true:
+
+1. **Verdict file exists** at `tasks/reviews/YYMMDD-name-verdict.md`
+2. **No FAIL dimensions** in the verdict (all 5 dimensions must be PASS or WARN)
+3. **All WARN items acknowledged** by human (each WARN explicitly seen and accepted)
+4. **Security scan shows no BLOCK items** (from security-rules.md patterns AND security agent verdict — a security agent BLOCK automatically makes the Security dimension FAIL)
+5. **Human has explicitly typed approval.** Same standard as Gate 1 — explicit, not inferred.
+
+### What It Blocks
+
+Proceeding to Phase 5 (Ship). No commit, no PR, no deploy until Gate 2 passes.
+
+### Exceptions
+
+None. Every change ships through Gate 2. There are no exceptions to Gate 2, regardless of:
+- Mode (even fast mode checks for BLOCKs)
+- Urgency
+- Size of change
+- Who requested it
+
+## Self-Check Before Gate Presentation
+
+Before presenting Gate 1 or Gate 2 for human approval, the responsible agent MUST include:
+
+1. **Completed:** List of completed items
+2. **Skipped:** List of intentionally skipped items with justification (empty if none)
+3. **Uncertain:** List of items the agent is uncertain about (empty if none)
+
+If #2 or #3 contain items, the human sees them BEFORE the approval prompt — not buried in a report.
+
+WHY: Declaring skipped/uncertain work prevents silent rationalization.

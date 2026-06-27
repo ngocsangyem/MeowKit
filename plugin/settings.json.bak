@@ -1,0 +1,42 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/post-write.sh \"$TOOL_INPUT_FILE_PATH\"",
+            "timeout": 10000,
+            "statusMessage": "Security scanning written file..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/post-session.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm test)",
+      "Bash(npm run lint)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(python .claude/scripts/*)",
+      "Bash(sh .claude/hooks/*)",
+      "Bash(git *)",
+      "Bash(gh *)",
+      "Bash(wc -l *)",
+      "Bash(ls *)",
+      "Bash(find *)"
+    ]
+  }
+}

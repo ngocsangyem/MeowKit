@@ -16,3 +16,8 @@ export * from "./skills-dependencies.js";
 export * from "./dependency-installer.js";
 export * from "./pack-manifest.js";
 export * from "./pack-resolver.js";
+export * from "./plugin-manifest.js";
+export * from "./plugin-agent-refs.js";
+export * from "./plugin-hooks.js";
+export * from "./plugin-payload.js";
+export * from "./check-plugin-manifests.js";

@@ -1,0 +1,24 @@
+{
+  "PostToolUse": {
+    "Edit|Write": [
+      "./handlers/build-verify.cjs",
+      "./handlers/loop-detection.cjs",
+      "./handlers/budget-tracker.cjs",
+      "./handlers/auto-checkpoint.cjs"
+    ],
+    "Bash": [
+      "./handlers/budget-tracker.cjs"
+    ]
+  },
+  "Stop": [
+    "./handlers/checkpoint-writer.cjs"
+  ],
+  "SessionStart": [
+    "./handlers/model-detector.cjs",
+    "./handlers/orientation-ritual.cjs"
+  ],
+  "UserPromptSubmit": [
+    "./handlers/safety-sentinel-inject.cjs",
+    "./handlers/immediate-capture-handler.cjs"
+  ]
+}

@@ -1,0 +1,125 @@
+---
+# Canonical workflow specification for the MeowKit 7-phase lifecycle.
+#
+# This file is the single source of truth for phase names, gate definitions,
+# and required-output path patterns. All prose files that describe the lifecycle
+# point here and agree with it.
+#
+# Drift-check: parses this file and greps the prose files listed under
+# `sources:` for any required-output token that appears under a different phase
+# or gate label than declared here. CI fails on contradiction.
+#
+# Required-output path patterns below are the exact glob tokens used by
+# gate-enforcement.sh and pre-completion-check.sh — keep them in sync.
+version: 1
+
+phases:
+  - id: 0
+    name: Orient
+    lead: mk:agent-detector
+    transition: auto
+    required_outputs: []
+    note: >
+      Runs at session start. Detects model tier, execution mode, TDD mode,
+      and risk flags. Produces agent assignment for Phase 1.
+
+  - id: 1
+    name: Plan
+    lead: mk:plan-creator
+    gate: gate_1
+    required_outputs:
+      - "tasks/plans/*/plan.md"
+    note: >
+      Gate 1 is formally the Phase 1→Phase 2 transition gate. In default
+      (non-TDD) mode Phase 2 is skipped, so Gate 1 enforcement is the
+      effective block before Phase 3 Build begins. Both are true simultaneously
+      and do not contradict: the gate fires after Plan and before the next
+      active phase (Test in TDD mode; Build otherwise).
+
+  - id: 2
+    name: Test
+    lead: mk:testing
+    transition: auto
+    required_outputs: []
+    note: >
+      TDD mode (--tdd / MEOWKIT_TDD=1): RED-phase tests written before Phase 3.
+      Default mode: optional; Phase 1 may transition directly to Phase 3.
+
+  - id: 3
+    name: Build
+    lead: mk:cook
+    transition: auto
+    required_outputs: []
+    substeps:
+      - id: "3.5"
+        name: Simplify
+        lead: mk:simplify
+        mandatory: true
+        note: Run after Phase 3 GREEN, before Verify. Never skip.
+      - id: "3.6"
+        name: Verify
+        lead: mk:verify
+        mandatory: true
+        note: Unified build+lint+typecheck+test+coverage check. FAIL sends back to Build.
+
+  - id: 4
+    name: Review
+    lead: mk:review
+    gate: gate_2
+    required_outputs:
+      - "tasks/reviews/*-verdict.md"
+
+  - id: 5
+    name: Ship
+    lead: mk:ship
+    transition: auto
+    required_outputs: []
+
+  - id: 6
+    name: Reflect
+    # Canonical lead list is the union across all lifecycle prose files:
+    # analyst + documenter + mk:memory (each mandatory; all three must run).
+    leads:
+      - analyst
+      - documenter
+      - mk:memory
+    transition: auto
+    required_outputs: []
+
+gates:
+  - id: gate_1
+    after_phase: 1
+    # In TDD mode blocks Phase 2 entry; in default mode (Phase 2 skipped) blocks
+    # Phase 3 entry. The enforcement point is the same hook regardless of mode.
+    blocks_phase: 3
+    enforced_by: hook        # gate-enforcement.sh (do not modify hook logic here)
+    # Glob used by gate-enforcement.sh — must match exactly:
+    required_output: "tasks/plans/*/plan.md"
+
+  - id: gate_2
+    after_phase: 4
+    blocks_phase: 5
+    # Behavioral enforcement only (Stop-hook nudge). Hook enforcement is deferred.
+    # See gate-rules.md for the full contract. Do not weaken the "NO EXCEPTIONS"
+    # requirement — behavioral enforcement is real; hook enforcement is a follow-up.
+    enforced_by: behavioral
+    # Glob used by pre-completion-check.sh verdict check:
+    required_output: "tasks/reviews/*-verdict.md"
+
+# autobuild sprint-contract substep (autobuild-only; not part of the 7 lifecycle phases).
+# This is an internal stage of the autobuild pipeline, not a lifecycle phase.
+contract_substep:
+  # Glob used by pre-completion-check.sh contract check:
+  required_output: "tasks/contracts/*-{slug}-sprint-*.md"
+  enforced_by: hook          # gate-enforcement.sh contract validation branch
+
+# Prose lifecycle files that the drift-check will scan.
+# Paths are relative to the MeowKit project root (the parent of .claude/),
+# which is the working directory the validate command runs from.
+# Each file must contain a "Canonical source: .claude/workflow.yaml" pointer.
+sources:
+  - CLAUDE.md
+  - .claude/rules/phase-contracts.md
+  - .claude/rules/gate-rules.md
+  - .claude/skills/workflow-orchestrator/references/workflow-phases.md
+  - .claude/skills/cook/SKILL.md

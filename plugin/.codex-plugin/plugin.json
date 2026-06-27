@@ -1,0 +1,18 @@
+{
+  "name": "mk",
+  "version": "2.12.0",
+  "description": "MeowKit — an opinionated Claude Code harness (skills, agents, hooks).",
+  "author": {
+    "name": "ngocsangyem"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "MeowKit",
+    "shortDescription": "Use MeowKit in Codex.",
+    "longDescription": "MeowKit — an opinionated Claude Code harness (skills, agents, hooks).",
+    "developerName": "ngocsangyem",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Help me use MeowKit."
+  }
+}

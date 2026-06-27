@@ -77,6 +77,9 @@ jobs:
       - name: Validate responsibility substrate (tagging + view drift)
         run: node packages/mewkit/dist/index.js validate --substrate
 
+      - name: Validate plugin namespace + manifest contract
+        run: node packages/mewkit/dist/index.js validate --plugin
+
       # Guardrail, not a tight bound. Measured core ~104.7k tokens; cap = 131000
       # (~25% headroom). Re-baseline with `mewkit budget context --profile core`
       # and bump this number when core legitimately grows.

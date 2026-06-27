@@ -22,6 +22,7 @@ import { trace } from "./commands/trace.js";
 // (experimental), so a static import would load SQLite + emit its warning on EVERY command.
 import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
+import { buildPlugin } from "./commands/build-plugin.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -52,6 +53,7 @@ ${pc.bold("Commands:")}
   ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
   ${pc.green("query")}      Read-only aggregate queries over the derived index
   ${pc.green("pack")}       Manage install packs (list, add, remove)
+  ${pc.green("build-plugin")} Generate the native plugin distribution (plugin/ + marketplaces)
 
 ${pc.bold("Options:")}
   --help, -h       Show help
@@ -229,6 +231,12 @@ async function main(): Promise<void> {
 				substrate: args.substrate as boolean | undefined,
 				packs: args.packs as boolean | undefined,
 				rules: args.rules as boolean | undefined,
+				plugin: args.plugin as boolean | undefined,
+			});
+			break;
+		case "build-plugin":
+			await buildPlugin({
+				json: args.json as boolean | undefined,
 			});
 			break;
 		case "pack":

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# meowkit-repo-mode — detect solo vs collaborative repo mode
+# Adapted from gstack-repo-mode for MeowKit. No external dependencies.
+# Usage: eval "$(meowkit-repo-mode)" → sets REPO_MODE variable
+set -euo pipefail
+
+validate_mode() { case "$1" in solo|collaborative|unknown) echo "$1" ;; *) echo "unknown" ;; esac; }
+
+# Compute from git history (90-day window)
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/||' || true)
+[ -z "$DEFAULT_BRANCH" ] && git rev-parse --verify origin/main &>/dev/null && DEFAULT_BRANCH="origin/main"
+[ -z "$DEFAULT_BRANCH" ] && git rev-parse --verify origin/master &>/dev/null && DEFAULT_BRANCH="origin/master"
+[ -z "$DEFAULT_BRANCH" ] && DEFAULT_BRANCH="HEAD"
+
+SHORTLOG=$(git shortlog -sn --since="90 days ago" --no-merges "$DEFAULT_BRANCH" 2>/dev/null)
+[ -z "$SHORTLOG" ] && { echo "REPO_MODE=unknown"; exit 0; }
+
+TOTAL=$(echo "$SHORTLOG" | awk '{s+=$1} END {print s}')
+TOP=$(echo "$SHORTLOG" | head -1 | awk '{print $1}')
+[ "$TOTAL" -lt 5 ] && { echo "REPO_MODE=unknown"; exit 0; }
+
+TOP_PCT=$(( TOP * 100 / TOTAL ))
+[ "$TOP_PCT" -ge 80 ] && MODE=solo || MODE=collaborative
+echo "REPO_MODE=$MODE"

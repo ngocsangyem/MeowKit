@@ -59,6 +59,14 @@ describe("aggregateSubstrate", () => {
 		expect(agg.untaggedFrontmatter).toContain("skills/mk-foo/SKILL.md");
 	});
 
+	it("marks intervention-recording covered when a registry artifact tags it active", async () => {
+		const c = await makeHarness(REG({ responsibility: "intervention-recording" }));
+		const row = aggregateSubstrate(c).rows.find((r) => r.value === "intervention-recording")!;
+		expect(row.count).toBe(1);
+		expect(row.active).toBe(1);
+		expect(row.coverage).toBe("covered");
+	});
+
 	it("flags a deprecated-only responsibility as partial", async () => {
 		const c = await makeHarness(REG({ responsibility: "verification", status: "deprecated" }));
 		const row = aggregateSubstrate(c).rows.find((r) => r.value === "verification")!;

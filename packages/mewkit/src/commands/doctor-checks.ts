@@ -310,3 +310,47 @@ export async function checkSystemDeps(root: string | null): Promise<DiagResult[]
 
 	return results;
 }
+
+/**
+ * Detect the install mode(s) in effect and warn on coexistence.
+ *
+ * MeowKit can be installed two ways: flat-copy (`mewkit init` writes
+ * `.claude/metadata.json` into the project) or as a native plugin (`mk@meowkit`
+ * in the user's Claude Code config). Having BOTH active resolves the same skills
+ * and agents twice — ambiguous and confusing — so this surfaces it.
+ */
+export function checkInstallMode(root: string | null): DiagResult {
+	const flatCopy = root !== null && fs.existsSync(path.join(root, ".claude", "metadata.json"));
+
+	let pluginInstalled = false;
+	let pluginKnown = true;
+	try {
+		const out = execSync("claude plugin list", {
+			encoding: "utf-8",
+			stdio: ["pipe", "pipe", "pipe"],
+		});
+		pluginInstalled = /\bmk@/.test(out);
+	} catch {
+		pluginKnown = false; // claude CLI absent or errored — cannot determine
+	}
+
+	if (flatCopy && pluginInstalled) {
+		return {
+			name: "Install mode",
+			status: "warn",
+			detail: "both flat-copy and the mk plugin are active — duplicate skill/agent resolution",
+			fix: "use one mode: uninstall the plugin (claude plugin uninstall mk@meowkit) OR remove the flat-copy .claude/",
+		};
+	}
+	if (pluginInstalled) {
+		return { name: "Install mode", status: "pass", detail: "native plugin (mk@meowkit)" };
+	}
+	if (flatCopy) {
+		return {
+			name: "Install mode",
+			status: "pass",
+			detail: pluginKnown ? "flat-copy (mewkit init)" : "flat-copy (mewkit init); plugin status unknown — claude CLI not found",
+		};
+	}
+	return { name: "Install mode", status: "na", detail: "no MeowKit install detected in this project" };
+}

@@ -52,7 +52,7 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 ### Phase 3 — Build GREEN
 
 ```toon
-[20]{skill,owner,type,architecture}
+[23]{skill,owner,type,architecture}
 `mk:development`|developer|development|monolithic
 `mk:cook`|developer|development|monolithic
 `mk:fix`|developer|development|monolithic
@@ -73,6 +73,9 @@ Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
 `mk:jira`|orchestrator|integration|monolithic
 `mk:intake`|orchestrator|integration|monolithic
 `mk:agent-browser`|developer|development|monolithic
+`mk:chrome-profile`|developer|development|monolithic
+`mk:ghpm`|developer|integration|monolithic
+`mk:html-video`|developer|development|monolithic
 ```
 
 #### Language/Framework Skills (Phase 3)
@@ -194,7 +197,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 [11]{category,count}
 Planning|6
 Testing|7
-Development|27
+Development|30
 Review|8
 Security|3
 Deployment|2
@@ -202,7 +205,7 @@ Documentation|4
 Memory|2
 Utility|12
 Cross-Cutting|7
-**Total**|**106**
+**Total**|**113**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

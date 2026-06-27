@@ -1,0 +1,6 @@
+# MeowKit — append to your .gitignore
+.env
+.env.local
+.claude/memory/
+.claude/logs/
+.claude/skills/.venv/
