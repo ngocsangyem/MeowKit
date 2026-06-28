@@ -2,11 +2,11 @@
 name: mk:preview
 version: 1.0.0
 description: |
-  Use when generating visual artifacts — explanations, diagrams, slides,
-  diff visualizations, or plan-display HTML. Triggers on "explain X visually",
-  "diagram this", "show as slides", "render this plan", "diff against main".
-  NOT for live media generation (see mk:multimodal), browser QA (see mk:qa),
-  or plan critique (see mk:plan-ceo-review).
+  Use when generating visual artifacts — explanations, diagrams, slides, or
+  diff visualizations. Triggers on "explain X visually", "diagram this",
+  "show as slides", "diff against main". NOT for rendering a plan as HTML
+  (see mk:visual-plan), live media generation (see mk:multimodal), browser QA
+  (see mk:qa), or plan critique (see mk:plan-ceo-review).
 allowed-tools:
   - Read
   - Write
@@ -24,8 +24,7 @@ keywords:
   - html-output
   - ascii-diagram
   - diff-visualization
-  - plan-display
-when_to_use: Use when generating visual artifacts — markdown or self-contained HTML — for code, architecture, plans, or git diffs. Use --html --plan-review to RENDER a plan as HTML (display only, no critique). NOT for plan critique/scope review (mk:plan-ceo-review) or media generation (mk:multimodal).
+when_to_use: Use when generating visual artifacts — markdown or self-contained HTML — for code, architecture, or git diffs. NOT for rendering a plan as HTML (mk:visual-plan), plan critique/scope review (mk:plan-ceo-review), or media generation (mk:multimodal).
 user-invocable: true
 preamble-tier: 2
 phase: on-demand
@@ -39,7 +38,7 @@ runtime: claude-code
 
 # mk:preview
 
-Generates visual artifacts — markdown and self-contained HTML — for explaining code, drawing diagrams, building slide decks, visualizing diffs, and rendering plans for review.
+Generates visual artifacts — markdown and self-contained HTML — for explaining code, drawing diagrams, building slide decks, and visualizing diffs. Rendering a plan as HTML belongs to `mk:visual-plan`.
 
 No live server. No Python. Pure markdown + HTML + bash file operations. Output writes to `tasks/plans/{active-plan}/visuals/` when an active plan exists; otherwise falls back to `tasks/visuals/`.
 
@@ -49,8 +48,9 @@ No live server. No Python. Pure markdown + HTML + bash file operations. Output w
 - A diagram (flowchart, sequence, ER) would communicate the topology faster than prose
 - Step-by-step content benefits from slides over a single long page
 - A pre-PR diff review needs visual KPIs, file map, and change cards
-- An active plan needs an HTML render for a meeting (display only, not critique)
 - Stakeholders prefer a self-contained HTML page they can open in a browser without a server
+
+For rendering a plan directory as a shareable HTML page, use `mk:visual-plan`.
 
 ## Default (No Arguments)
 
@@ -66,7 +66,6 @@ If invoked with no arguments, present available operations via `AskUserQuestion`
 | `--html --diagram`     | HTML diagram with zoom/pan controls                   |
 | `--html --slides`      | Magazine-quality HTML slide deck                      |
 | `--html --diff`        | HTML diff visualization (KPI grid + file map + cards) |
-| `--html --plan-review` | HTML render of a plan for review meetings             |
 
 Recommended default: `--explain` or `--html --explain`.
 
@@ -88,9 +87,8 @@ Recommended default: `--explain` or `--html --explain`.
 ### Analytical Modes
 
 - `/mk:preview --html --diff [ref]` — visualize a git diff. Default `ref` = `main`. Accepts branch, commit, range, PR number.
-- `/mk:preview --html --plan-review [plan-file]` — render a plan as HTML. Default = active plan from `session-state/active-plan`.
 
-`--ascii` does not combine with `--html` (terminal-only by design).
+`--ascii` does not combine with `--html` (terminal-only by design). To render a plan as HTML, use `mk:visual-plan`.
 
 ## Argument Resolution
 
@@ -98,7 +96,7 @@ Priority order:
 
 1. `--html` flag detected → set HTML output mode
 2. Generation flag detected (`--explain`, `--diagram`, `--slides`, `--ascii`) → load `references/generation-modes.md`
-3. HTML-only flags (`--diff`, `--plan-review`) → imply `--html`; load `references/analytical-modes.md`
+3. HTML-only flag (`--diff`) → implies `--html`; load `references/analytical-modes.md`
 4. Topic missing → ask user via `AskUserQuestion`
 5. Topic present → continue
 
@@ -137,7 +135,6 @@ Detail and the bash detection snippet live in `references/generation-modes.md` �
 | Output path already exists                       | Overwrite without prompting                                   |
 | `--diff` outside a git repo                      | Explain: "No git repository detected"                         |
 | `--diff` with PR number, no `gh`                 | Suggest installing `gh` from https://cli.github.com/          |
-| `--plan-review` with no plan file or active plan | Ask user for the plan path                                    |
 | `--html --ascii` combination                     | Reject; suggest `--html --diagram` instead                    |
 | Active-plan path absolute but missing            | Log warning; fall back to `tasks/visuals/`                    |
 | Active-plan slug with no matching dir            | Log warning; fall back to `tasks/visuals/`                    |
@@ -156,7 +153,6 @@ Every mode reads its references BEFORE writing the output file.
 | `--html --diagram`     | `references/html-design-rules.md`, `references/mermaid-essentials.md`, `mk:frontend-design/references/anti-slop-directives.md` | template `assets/mermaid-flowchart.html`                      |
 | `--html --slides`      | `references/html-design-rules.md`, `mk:frontend-design/references/anti-slop-directives.md`                                     | template `assets/slide-deck.html`                             |
 | `--html --diff`        | `references/html-design-rules.md`, `references/analytical-modes.md`, `mk:frontend-design/references/anti-slop-directives.md`   | template `assets/data-table.html`, `assets/architecture.html` |
-| `--html --plan-review` | `references/html-design-rules.md`, `references/analytical-modes.md`, `mk:frontend-design/references/anti-slop-directives.md`   | template `assets/data-table.html`, `assets/architecture.html` |
 
 Templates in `assets/` are out-of-band — they are not auto-Read; the agent reads the template only when generating the matching mode.
 
@@ -165,7 +161,7 @@ Templates in `assets/` are out-of-band — they are not auto-Read; the agent rea
 - `mk:ui-design-system` — palette and typography selection (`assets/colors.csv` 160 rows, `assets/typography.csv` 73 rows). HTML modes vary palette per run.
 - `mk:frontend-design` — anti-slop forbidden patterns. Cited via `references/anti-slop-directives.md`, not duplicated.
 - `mk:web-to-markdown` — for users who want to view a generated markdown file in a browser, no server bundled here.
-- `mk:scout` — for finding the right files to render in `--html --plan-review`.
+- `mk:visual-plan` — the owner of plan-as-HTML rendering; route plan-render requests there.
 
 ## Gotchas
 
@@ -182,9 +178,9 @@ Templates in `assets/` are out-of-band — they are not auto-Read; the agent rea
 - Phase: on-demand
 - Follows: nothing required
 - Precedes: nothing required
-- Common pairings: invoked after a researcher report or planner output to communicate findings; invoked before a review meeting to render the active plan as HTML.
+- Common pairings: invoked after a researcher report or planner output to communicate findings; invoked before a review meeting to explain a code path or diagram an architecture.
 
 ## Composes Into
 
 - `mk:cook` may invoke `--explain` to communicate a complex implementation phase
-- `mk:plan-ceo-review` consumes the same plan files; it CRITIQUES, this skill RENDERS — the boundary is intentional
+- `mk:visual-plan` owns plan-as-HTML rendering; `mk:plan-ceo-review` CRITIQUES plans — neither overlaps this skill's generic explain/diagram/slides/diff output

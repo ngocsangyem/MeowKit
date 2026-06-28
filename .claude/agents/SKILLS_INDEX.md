@@ -172,6 +172,29 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:prompt-enhancer`|documenter|documentation|monolithic
 ```
 
+### Diagram (Any Phase)
+
+```toon
+[2]{skill,owner,type,architecture}
+`mk:mermaidjs-v11`|developer|diagram|monolithic — Mermaid v11 markdown diagram blocks (flowchart, sequence, class, ER, Gantt, state, timeline, user-journey, 20+ types). Zero external deps; mmdc optional.
+`mk:tech-graph`|developer|diagram|script-backed — Publish-grade SVG+PNG technical diagrams across 8 visual styles. Output to tasks/visuals/ or active-plan visuals/. Requires rsvg-convert for PNG; degrades to SVG-only.
+```
+
+### External-Service Design (On-Demand)
+
+```toon
+[1]{skill,owner,type,architecture}
+`mk:stitch`|developer|development|script-backed (text-prompt → novel UI via Stitch AI; two-script boundary: stitch-api-call.ts [API-only, no writes] + stitch-write-output.ts [schema-validated writes, no API key]; outputs tasks/designs/<plan>/<id>/{design.html,design.png,DESIGN.md}; requires STITCH_API_KEY + tsx; default_enabled: false; 400 credits/day free tier)
+```
+
+### HTML / Browser Packaging (Any Phase)
+
+```toon
+[2]{skill,owner,type,architecture}
+`mk:markdown-reader`|developer|utility|script-backed (Node HTTP server, 127.0.0.1-only bind, explicit start/stop via --stop; npm deps: marked, highlight.js, gray-matter; PID state in CLAUDE_PLUGIN_DATA/markdown-reader/)
+`mk:showcase`|developer|utility|script-backed (self-contained HTML generator; optional Puppeteer screenshots --no-screenshots; publish fail-closed; state in CLAUDE_PLUGIN_DATA/showcase/)
+```
+
 ### Cross-Cutting (Any Phase)
 
 ```toon
@@ -183,8 +206,8 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:multimodal`|any agent|Visual content analysis
 `mk:web-to-markdown`|any agent|Fetch arbitrary URLs as clean markdown — use when URL is not covered by mk:docs-finder. Static-only by default; Playwright opt-in via `.claude/scripts/bin/setup-workflow --system-deps`.
 `mk:henshin`|any agent|Planning front door for wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `mk:plan-creator` → `mk:cook`. Adapted from external agentization patterns.
-`mk:preview`|any agent|Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, git diffs, and plan rendering. Display only; not for plan critique (mk:plan-ceo-review) or media generation (mk:multimodal).
-`mk:visual-plan`|any agent|Render a plan (plan.md + phase-*.md) into ONE shareable, block-disciplined plan.html at the plan-dir root, scannable in <30s. Committed artifact; NOT ad-hoc plan display (mk:preview --plan-review), NOT plan critique (mk:plan-ceo-review).
+`mk:preview`|any agent|Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, and git diffs. Display only; NOT for rendering a plan as HTML (mk:visual-plan), plan critique (mk:plan-ceo-review), or media generation (mk:multimodal).
+`mk:visual-plan`|any agent|Render a plan (plan.md + phase-*.md) into ONE shareable, block-disciplined plan.html at the plan-dir root, scannable in <30s. Canonical plan-as-HTML owner; NOT generic code/diagram/diff visuals (mk:preview), NOT plan critique (mk:plan-ceo-review).
 `mk:story-sizer`|story-sizer|Pre-ticket Fibonacci sizing of paste-mode user stories. Default writes a Story Sizing Report. Opt-in `--auto-create` delegates to `mk:jira-issue` + `mk:jira-collaborate` with a single batch confirmation gate.
 `mk:chom`|researcher|Copy-cat / replicate features from external systems, repos, or ideas into the current project
 `mk:pack`|developer|Pack an external repository into a single AI-friendly file for third-party analysis or handoff to external LLMs
@@ -195,10 +218,10 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ## Summary
 
 ```toon
-[11]{category,count}
+[14]{category,count}
 Planning|6
 Testing|7
-Development|30
+Development|31
 Review|8
 Security|3
 Deployment|2
@@ -206,7 +229,10 @@ Documentation|4
 Memory|2
 Utility|12
 Cross-Cutting|8
-**Total**|**114**
+Diagram|2
+HTML/Browser-Packaging|2
+External-Service-Design|1
+**Total**|**119**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

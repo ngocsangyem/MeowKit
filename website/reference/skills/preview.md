@@ -1,24 +1,24 @@
 ---
 title: "mk:preview"
-description: "Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, git diffs, and plan rendering. Display only; not for plan critique."
+description: "Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, and git diffs. Display only; not for plan rendering or plan critique."
 ---
 
 # mk:preview
 
 ## What This Skill Does
 
-Generates visual artifacts — markdown and self-contained HTML files — for explaining code, drawing diagrams, building slide decks, visualizing git diffs, and rendering plans for review meetings. No live server, no Python, no D3. Pure markdown + HTML + bash file ops. Output writes to `tasks/plans/{active-plan}/visuals/` when an active plan exists, otherwise falls back to `tasks/visuals/`.
+Generates visual artifacts — markdown and self-contained HTML files — for explaining code, drawing diagrams, building slide decks, and visualizing git diffs. Rendering a plan as HTML belongs to `mk:visual-plan`. No live server, no Python, no D3. Pure markdown + HTML + bash file ops. Output writes to `tasks/plans/{active-plan}/visuals/` when an active plan exists, otherwise falls back to `tasks/visuals/`.
 
 ## When to Use
 
 Triggers:
-- "explain X visually", "diagram this", "show as slides", "render this plan"
+- "explain X visually", "diagram this", "show as slides"
 - "diff against main", "visualize the changes", "visual diff for PR"
 - A reader needs to understand an unfamiliar code path or protocol
 - Stakeholders prefer a self-contained HTML they can open without a server
-- An active plan needs an HTML render for a meeting (display only)
 
 Anti-triggers:
+- Render a plan as HTML — use `mk:visual-plan`
 - Plan critique or scope review — use `mk:plan-ceo-review`
 - Image / video / audio generation — use `mk:multimodal`
 - Browser QA testing — use `mk:qa`
@@ -26,7 +26,7 @@ Anti-triggers:
 
 ## Core Capabilities
 
-- **9 modes total** — 4 markdown (`--explain`, `--diagram`, `--slides`, `--ascii`) + 5 HTML (`--html --explain`, `--html --diagram`, `--html --slides`, `--html --diff`, `--html --plan-review`)
+- **8 modes total** — 4 markdown (`--explain`, `--diagram`, `--slides`, `--ascii`) + 4 HTML (`--html --explain`, `--html --diagram`, `--html --slides`, `--html --diff`)
 - **Self-contained HTML** — all CSS and JS inline; CDN for Mermaid v11.4.x, Chart.js v4, Google Fonts; file size ≤ 500 KB
 - **Mandatory theme toggle** — every HTML artifact ships with a fixed top-right light/dark toggle, persisted via localStorage, OS preference respected on first load
 - **Zoom and pan** — diagrams support mouse wheel zoom (cursor-anchored), drag to pan, keyboard shortcuts (`+ − 0`)
@@ -34,7 +34,7 @@ Anti-triggers:
 - **Style rotation** — palette and typography vary per run via `${CLAUDE_PLUGIN_DATA}/preview/style-rotation.json`; deterministic-hash fallback when env var is unset
 - **Plan-aware output paths** — detects `session-state/active-plan` (handles both absolute path and slug formats); falls back loudly with stderr `warn:`
 - **Anti-slop guarantees** — no Inter font, no indigo/violet accent, no gradient text, no glow shadows, no emoji headers, no three-dot chrome
-- **Display, not critique** — `--html --diff` and `--html --plan-review` RENDER; verdict stays with `mk:review` and `mk:plan-ceo-review`
+- **Display, not critique** — `--html --diff` RENDERS; verdict stays with `mk:review` and `mk:plan-ceo-review`, and plan-as-HTML rendering stays with `mk:visual-plan`
 
 ## Usage
 
@@ -55,18 +55,16 @@ Anti-triggers:
 /mk:preview --html --diff HEAD                # uncommitted changes
 /mk:preview --html --diff a3f9c1..main        # commit range
 /mk:preview --html --diff '#142'              # PR number (requires gh)
-/mk:preview --html --plan-review              # active plan from session-state
-/mk:preview --html --plan-review tasks/plans/260510-2115-mk-preview-skill/plan.md
 ```
 
-`--ascii` does not combine with `--html` (terminal-only by design).
+`--ascii` does not combine with `--html` (terminal-only by design). To render a plan as HTML, use `mk:visual-plan`.
 
 ## Argument Resolution
 
 Priority order:
 1. `--html` flag detected → set HTML output mode
 2. Generation flag (`--explain`, `--diagram`, `--slides`, `--ascii`) → load `references/generation-modes.md`
-3. HTML-only flags (`--diff`, `--plan-review`) → imply `--html`; load `references/analytical-modes.md`
+3. HTML-only flag (`--diff`) → implies `--html`; load `references/analytical-modes.md`
 4. Topic missing → ask user via `AskUserQuestion`
 
 Topic-to-slug rules: lowercase, replace special chars with hyphens, strip non-alphanumerics, collapse multiple hyphens, truncate at 80 chars on a word boundary. Title placeholder `{topic}` uses the original input in title case, not the slug.
@@ -83,7 +81,6 @@ Every mode reads its references BEFORE writing the output file.
 | `--html --diagram` | + `references/mermaid-essentials.md` | `assets/mermaid-flowchart.html` |
 | `--html --slides` | `references/html-design-rules.md` | `assets/slide-deck.html` |
 | `--html --diff` | + `references/analytical-modes.md` | `assets/data-table.html`, `assets/architecture.html` |
-| `--html --plan-review` | + `references/analytical-modes.md` | `assets/data-table.html`, `assets/architecture.html` |
 
 Templates in `assets/` are out-of-band — read only when generating the matching mode.
 
@@ -104,7 +101,7 @@ The fallback path is logged on stderr (`warn:`) so silent path mismatches surfac
 - `mk:ui-design-system` — palette and typography selection from `assets/colors.csv` (160 rows) and `assets/typography.csv` (73 rows)
 - `mk:frontend-design` — anti-slop forbidden patterns. Cited via `references/anti-slop-directives.md`, not duplicated.
 - `mk:web-to-markdown` — for users who want to view a generated markdown file in a browser (no server bundled here)
-- `mk:scout` — for finding the right files to render in `--html --plan-review`
+- `mk:visual-plan` — the canonical owner of plan-as-HTML rendering; route plan-render requests there
 
 ## Mermaid v11 Embedded Reference
 
@@ -124,7 +121,6 @@ The fallback path is logged on stderr (`warn:`) so silent path mismatches surfac
 | `--explain` / `--diagram` / `--slides` / `--ascii` | `{topic-slug}.md` | plan-scoped or fallback |
 | `--html --explain` / `--html --diagram` / `--html --slides` | `{topic-slug}.html` | same |
 | `--html --diff` | `diff-{shortref}.html` | same |
-| `--html --plan-review` | `plan-review.html` (singular, fixed) | active plan dir |
 
 ## Workflow Position
 
@@ -142,10 +138,10 @@ The 4 HTML templates in `assets/` are clean-room authored. Each carries the comm
 
 | Template | Used by |
 |---|---|
-| `assets/architecture.html` | `--html --explain`, `--html --diff`, `--html --plan-review` |
+| `assets/architecture.html` | `--html --explain`, `--html --diff` |
 | `assets/mermaid-flowchart.html` | `--html --diagram` |
 | `assets/slide-deck.html` | `--html --slides` |
-| `assets/data-table.html` | `--html --diff`, `--html --plan-review` |
+| `assets/data-table.html` | `--html --diff` |
 
 ## Known Gotchas
 

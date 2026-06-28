@@ -117,4 +117,5 @@ Also: `.plan-state.json` checkpoint created.
 
 ## Next
 
-Read and follow `step-09-post-plan-handoff.md`.
+- If `html_mode = true` → read and follow `step-08b-html-render.md` (renders `plan.html`, then chains to step-09).
+- Otherwise → read and follow `step-09-post-plan-handoff.md`.

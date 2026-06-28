@@ -5,9 +5,9 @@ description: |
   Use when rendering a plan directory (plan.md + phase-*.md) into ONE self-contained,
   template-consistent plan.html a reviewer can scan in under 30 seconds. Triggers on
   "render this plan", "visualize the plan", "make a shareable plan page", "plan.html".
-  NOT for generic plan display (see mk:preview --html --plan-review), NOT for plan
-  critique or scope review (see mk:plan-ceo-review / mk:validate-plan), NOT for live
-  media generation (see mk:multimodal).
+  This is the canonical owner of plan-as-HTML. NOT for plan critique or scope review
+  (see mk:plan-ceo-review / mk:validate-plan), NOT for generic code/diagram/diff
+  visuals (see mk:preview), NOT for live media generation (see mk:multimodal).
 allowed-tools:
   - Read
   - Write
@@ -27,7 +27,7 @@ keywords:
   - wireframe
   - mermaid
   - builderio-blocks
-when_to_use: Use when turning a plan directory (plan.md + phase-*.md) into a single shareable, block-vocabulary-disciplined plan.html at the plan-dir root. NOT for generic ad-hoc plan display (mk:preview --html --plan-review), NOT for plan critique (mk:plan-ceo-review), NOT for plan validation (mk:validate-plan).
+when_to_use: Use when turning a plan directory (plan.md + phase-*.md) into a single shareable, block-vocabulary-disciplined plan.html at the plan-dir root. This is the canonical owner of plan-as-HTML. NOT for generic code/diagram/diff visuals (mk:preview), NOT for plan critique (mk:plan-ceo-review), NOT for plan validation (mk:validate-plan).
 user-invocable: true
 preamble-tier: 2
 phase: on-demand
@@ -144,23 +144,16 @@ blocks. Inline CSS/JS; the only external request is the pinned Mermaid CDN.
 | Self-check fails (missing sentinel, no `--wf-` tokens, injected `<script`/`on*=`) | Fix the content→block mapping and regenerate; never hand-patch `plan.html` |
 | Plan source contains `<script>` / event handlers | Step 6 escaping renders it as literal text; the step-8 scan confirms nothing executable was emitted |
 
-## Boundary vs mk:preview
+## Canonical Owner of plan.html
 
-`mk:preview --html --plan-review` and `mk:visual-plan` both render the same
-`plan.md` + `phase-*.md`. The split is **ergonomic and quality-driven, not
-architectural**: this skill enforces a fixed block vocabulary and a shared theme so
-output is consistent plan-to-plan, and it writes a shareable artifact at the
-plan-dir root. State this honestly — it is not a deeper capability, it is a
-disciplined, committable render.
+`mk:visual-plan` is the single owner of plan-as-HTML rendering. It enforces a fixed
+block vocabulary and a shared theme so output is consistent plan-to-plan, and writes
+one shareable artifact at the plan-dir root (`$PLAN_DIR/plan.html`).
 
-- `mk:preview --html --plan-review` → quick ad-hoc display at
-  `$PLAN_DIR/visuals/plan-review.html`.
-- `mk:visual-plan` → block-disciplined, shareable artifact at `$PLAN_DIR/plan.html`.
+- `mk:visual-plan` → the block-disciplined, shareable `plan.html`.
+- `mk:preview` → generic code/architecture/diff visuals (explain / diagram / slides /
+  diff); it does NOT render plans.
 - `mk:plan-ceo-review` / `mk:validate-plan` → critique and validation, not rendering.
-
-**Dual-artifact rule:** when both outputs exist, `plan.html` (this skill) is the
-shareable / committed artifact; `visuals/plan-review.html` (preview) is the quick
-ad-hoc render.
 
 **Never hand-edit `plan.html`.** It is generated. If the plan changes, edit
 `plan.md` / `phase-*.md` and regenerate.

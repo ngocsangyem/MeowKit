@@ -195,6 +195,14 @@ If `MEOWKIT_TDD=1` env var is set, auto-enable `tdd_mode = true`.
 
 Default: `tdd_mode = false`.
 
+**`--html` flag detection:**
+
+If `--html` is present in the arguments (e.g., `--hard --html`), set `html_mode = true`. This flag is composable with any planning mode. It does NOT change the planning mode — after Gate 1 and task hydration, step-08b renders the approved plan to `plan.html` via `mk:visual-plan`.
+
+`--html` is rejected by the `archive` / `red-team` / `validate` subcommands (those do not produce a plan to render); detection here is the single source of truth for the flag.
+
+Default: `html_mode = false`.
+
 ## Output
 
 - `task_complexity` — trivial, simple, or complex
@@ -202,8 +210,9 @@ Default: `tdd_mode = false`.
 - `workflow_model` — feature, bugfix, refactor, or security
 - `scope_mode` — EXPANSION, HOLD, or REDUCTION (hard mode only; fast = HOLD default; product-level = EXPANSION default; spike skips scope question)
 - `tdd_mode` — true or false (composable flag, independent of planning_mode)
+- `html_mode` — true or false (composable flag, independent of planning_mode)
 - `spike_meta` — `{ timebox, findings_doc, story_points }` when planning_mode = spike; unset otherwise
-- Print: `"Scope: {complexity} → mode: {mode} | model: {workflow_model} | scope: {scope_mode} | tdd: {tdd_mode}"`
+- Print: `"Scope: {complexity} → mode: {mode} | model: {workflow_model} | scope: {scope_mode} | tdd: {tdd_mode} | html: {html_mode}"`
 
 ## Next
 

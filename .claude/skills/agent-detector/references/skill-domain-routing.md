@@ -19,10 +19,18 @@ The orchestrator routes by skill names:
 | Review a GitHub PR (shallow verdict) / respond to received PR comments | `mk:review-pr` / `mk:respond-pr` |
 | Browser or UI QA | `mk:qa`, `mk:qa-manual`, `mk:playwright-cli`, or `mk:agent-browser` |
 | Visual explanation / diagrams / slides | `mk:preview` |
+| Publish-grade SVG/PNG diagram for blog, doc, slide, or editorial use | `mk:tech-graph` |
+| Mermaid v11 markdown diagram block (inline in docs or README) | `mk:mermaidjs-v11` |
+| Diagram inside an HTML page or interactive presentation | `mk:preview --html --diagram` |
 | Media or document analysis/generation | `mk:multimodal` |
 | Security audit | `mk:cso` or `mk:vulnerability-scanner` |
 | Skill creation | `mk:skill-creator` |
 | AI-friendly docs index | `mk:llms` |
+
+| Long-form markdown reading in browser (RFCs, runbooks, plan files, design docs) | `mk:markdown-reader` — NOT for self-contained --html artifacts from mk:brainstorming or mk:plan-creator; those open directly in the browser without a server |
+| Packaged shareable deliverable (demo page, social/portfolio HTML, topic showcase with optional screenshots) | `mk:showcase` — NOT for plan rendering (use mk:visual-plan); NOT for generic explain/diagram visuals (use mk:preview) |
+| Generate a NEW UI design from a text prompt (no existing design source) | `mk:stitch` — NOT for implementing an existing design; use mk:figma (Figma URL) or mk:frontend-design (existing spec/mockup/DESIGN.md) for that |
+| Implement an existing design (Figma URL, mockup, spec, or DESIGN.md) | `mk:figma` (Figma URL) or `mk:frontend-design` (spec/mockup) — NOT mk:stitch (Stitch generates novel designs from text, not from existing sources) |
 
 Pick one primary skill per distinct intent.
 

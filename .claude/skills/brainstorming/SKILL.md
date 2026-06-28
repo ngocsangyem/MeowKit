@@ -86,6 +86,7 @@ Always skips Gate 1 (same as `mk:investigate` and `mk:office-hours`).
 - `--depth quick` — 3-8 ideas, no scoring (default)
 - `--depth deep` — scored ideas + top 3 + optional plan-creator handoff
 - `--technique [name]` — force a specific technique (default: auto-select)
+- `--html` — after the markdown report is written, author a self-contained editorial HTML report beside it (opt-in; markdown stays source of truth)
 
 ## Lifecycle
 
@@ -173,6 +174,7 @@ Bad clarifying questions:
 - **Premature solutioning** — jumping to "how" before confirming "what". Force problem restatement first.
 - **Anchoring on first idea** — generate ALL ideas before evaluating any. Score in a separate pass.
 - **Context flooding** — max 8 ideas per run. If the problem needs more, run multiple focused sessions on sub-problems.
+- **HTML drift** — `--html` is opt-in and derived from the markdown. Never edit the HTML by hand; re-run with `--html` so it stays in sync with the markdown source of truth.
 
 Full list: `references/gotchas.md`
 Edge cases (where the obvious approach is wrong): `references/edge-cases.md`
@@ -197,7 +199,16 @@ mk:plan-creator (plan)
 On completion:
 
 - Output saved to `plans/reports/`
-- To render the report as a self-contained HTML brief: `mk:preview --html --explain <report-path>`
 - Include a `Brainstorm Handoff Packet` using `assets/output-action-plan.md`
 - If `--depth deep`, ask before invoking or recommending `mk:plan-creator`
 - `plan-creator` receives report path + handoff packet as pre-research input; it still owns requirements completeness, phase files, and plan approval
+
+## HTML Output
+
+When `--html` is passed:
+
+- Write the markdown report FIRST (`plans/reports/brainstorm-<date>-<slug>.md`), then author a sibling `plans/reports/brainstorm-<date>-<slug>.html` — same directory and stem.
+- Author the HTML inline using `references/editorial-html.md` as the visual contract. Do NOT route through `mk:preview` and do NOT invoke any implementation skill — this preserves the behavioral hard rule (no writes outside `plans/reports/`).
+- The HTML carries the SAME decision content as the markdown: problem, evidence, options, trade-offs, recommendation, risks, and unresolved questions. It is derived, never authoritative.
+- Keep it self-contained: inline CSS/JS, no build step, no network requirement for layout (a web-font `@import` is the only permitted external request and must degrade to system fonts).
+- `--html` is opt-in; without it, behavior is unchanged.

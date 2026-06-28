@@ -20,7 +20,7 @@ Triggers:
 
 Anti-triggers:
 
-- Generic ad-hoc plan display — use `mk:preview --html --plan-review`
+- Generic code / architecture / diff visuals — use `mk:preview`
 - Plan critique or scope review — use `mk:plan-ceo-review`
 - Plan validation against dimensions — use `mk:validate-plan`
 - Image / video / audio generation — use `mk:multimodal`
@@ -78,14 +78,13 @@ $PLAN_DIR/plan.html
 
 Layout: cover (title / description / status / priority / phase count) → phase-timeline → architecture-diagram → file-map → decision/risk-cards → steps-checklist, plus any conditional or `--wireframe` blocks.
 
-## Boundary vs mk:preview
+## Canonical Owner of plan.html
 
-`mk:preview --html --plan-review` and `mk:visual-plan` both render the same `plan.md` + `phase-*.md`. The split is **ergonomic and quality-driven, not architectural**: this skill enforces a fixed block vocabulary and a shared theme for plan-to-plan consistency, and writes a shareable artifact at the plan-dir root.
+`mk:visual-plan` is the single owner of plan-as-HTML rendering. It enforces a fixed block vocabulary and a shared theme for plan-to-plan consistency, and writes one shareable artifact at the plan-dir root (`$PLAN_DIR/plan.html`).
 
-- `mk:preview --html --plan-review` → quick ad-hoc display at `$PLAN_DIR/visuals/plan-review.html`.
-- `mk:visual-plan` → block-disciplined, shareable artifact at `$PLAN_DIR/plan.html`.
-
-**Dual-artifact rule:** when both exist, `plan.html` (this skill) is the shareable / committed artifact; `visuals/plan-review.html` (preview) is the quick ad-hoc render.
+- `mk:visual-plan` → the block-disciplined, shareable `plan.html`.
+- `mk:preview` → generic code / architecture / diff visuals; it does NOT render plans.
+- `mk:plan-ceo-review` / `mk:validate-plan` → critique and validation, not rendering.
 
 ## Security
 

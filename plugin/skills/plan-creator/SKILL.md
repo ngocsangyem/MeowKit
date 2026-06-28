@@ -3,7 +3,7 @@ name: mk:plan-creator
 version: 1.6.2
 preamble-tier: 3
 description: 'Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks exit early, simple tasks get fast plans, complex tasks get full research + phase files + validation. Enforces Gate 1. Activated by /mk:plan or /mk:cook. NOT for ticket complexity analysis against an existing codebase (see mk:planning-engine); NOT for CEO-level scope review of existing plans (see mk:plan-ceo-review).'
-argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] OR [archive | red-team {path} | validate {path}]'
+argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] [--html] OR [archive | red-team {path} | validate {path}]'
 allowed-tools:
   - Bash
   - Read
@@ -58,6 +58,8 @@ Activate when:
 - User runs `/mk:plan red-team {path}` → route to `references/red-team-standalone.md` (skip planning pipeline)
 - User runs `/mk:plan validate {path}` → route to `references/validate-standalone.md` (skip planning pipeline)
 
+The `archive` / `red-team` / `validate` subcommands reject `--html`: if `--html` accompanies any of them, error with "--html is only valid on a plan-creation run, not on subcommands" and do not route into rendering.
+
 Skip when:
 
 - `/mk:fix` with complexity=simple (Gate 1 exception)
@@ -86,6 +88,7 @@ Skip when:
 **Composable flags:**
 
 - `--tdd` — add tests-first phase sections and preserve strict TDD in the cook handoff. See `references/tdd-mode.md`.
+- `--html` — after Gate 1 approval and task hydration, render the plan to a shareable `{plan_dir}/plan.html` via `mk:visual-plan` (step-08b). Opt-in (Mermaid CDN); markdown plan files stay source of truth. Rejected by the `archive` / `red-team` / `validate` subcommands (they produce no plan to render) — passing `--html` to a subcommand is an error.
 
 ## Requirements Capture Contract
 

@@ -3,12 +3,14 @@
 ## Usage
 
 ```
-/mk:plan [feature description]
+/mk:plan [feature description] [--html]
 ```
+
+`--html` (composable): after Gate 1 approval and task hydration, also render the plan to a shareable `{plan_dir}/plan.html` via `mk:visual-plan`. Opt-in; the markdown plan files stay the source of truth. Not valid on the `archive` / `red-team` / `validate` subcommands.
 
 ## Purpose
 
-Create an implementation plan through `mk:plan-creator`. Output is documentation only; no source or test files are written.
+Create an implementation plan through `mk:plan-creator`. Output is documentation only; no source or test files are written (with `--html`, a derived `plan.html` is rendered from the approved plan).
 
 ## Dispatch
 

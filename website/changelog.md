@@ -14,6 +14,17 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## Unreleased — Visual + HTML Workflow
+
+### Improvements
+
+- `mk:brainstorming --html` — after the markdown report, authors a self-contained editorial HTML report beside it (opt-in; markdown stays source of truth).
+- `mk:plan-creator --html` — after Gate 1 approval and task hydration, renders the plan to a shareable `plan.html` via `mk:visual-plan` (opt-in; markdown plan files stay source of truth).
+
+### Removals
+
+- Removed `mk:preview --html --plan-review`. Plan-as-HTML rendering is now owned solely by `mk:visual-plan`; use `mk:visual-plan <plan-dir>`. `mk:preview` keeps `--explain`, `--diagram`, `--slides`, and `--diff`.
+
 ## 2.12.2 (2026-06-28) — Visual Plan Rendering
 
 ### Highlights
