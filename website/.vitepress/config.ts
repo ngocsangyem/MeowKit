@@ -312,6 +312,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:react-patterns', link: '/reference/skills/react-patterns' },
             { text: 'mk:frontend-design', link: '/reference/skills/frontend-design' },
             { text: 'mk:ui-design-system', link: '/reference/skills/ui-design-system' },
+            { text: 'mk:stitch', link: '/reference/skills/stitch' },
           ],
         },
         {
@@ -331,6 +332,10 @@ export default withMermaid(defineConfig({
             { text: 'mk:llms', link: '/reference/skills/llms' },
             { text: 'mk:preview', link: '/reference/skills/preview' },
             { text: 'mk:visual-plan', link: '/reference/skills/visual-plan' },
+            { text: 'mk:mermaidjs-v11', link: '/reference/skills/mermaidjs-v11' },
+            { text: 'mk:tech-graph', link: '/reference/skills/tech-graph' },
+            { text: 'mk:markdown-reader', link: '/reference/skills/markdown-reader' },
+            { text: 'mk:showcase', link: '/reference/skills/showcase' },
           ],
         },
         {

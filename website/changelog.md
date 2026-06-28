@@ -14,7 +14,21 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
-## Unreleased — Visual + HTML Workflow
+## 2.12.3 (2026-06-28) — Visual + HTML Workflow
+
+### Highlights
+
+Brainstorm reports and approved plans now render to self-contained HTML on demand, and five complementary visual skills join the `mk:` namespace — diagrams, long-form reading, shareable showcases, and text-to-UI design.
+
+### New Skills
+
+| Skill              | Purpose                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------ |
+| `mk:mermaidjs-v11` | Author Mermaid v11 diagram blocks for markdown, READMEs, and code comments.                       |
+| `mk:tech-graph`    | Generate publish-grade SVG/PNG technical diagrams; degrades to SVG-only without `rsvg-convert`.   |
+| `mk:markdown-reader` | Serve long-form markdown in a local reader with an explicit start/stop lifecycle.               |
+| `mk:showcase`      | Package a mission and artifacts into a self-contained, shareable HTML showcase.                   |
+| `mk:stitch`        | Generate new UI designs from a text prompt — external-service-gated, fails closed without a key.  |
 
 ### Improvements
 
@@ -23,7 +37,7 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ### Removals
 
-- Removed `mk:preview --html --plan-review`. Plan-as-HTML rendering is now owned solely by `mk:visual-plan`; use `mk:visual-plan <plan-dir>`. `mk:preview` keeps `--explain`, `--diagram`, `--slides`, and `--diff`.
+- Removed `mk:preview --html --plan-review` — plan-as-HTML rendering is now owned solely by `mk:visual-plan` (`mk:visual-plan <plan-dir>`). `mk:preview` keeps `--explain`, `--diagram`, `--slides`, and `--diff`.
 
 ## 2.12.2 (2026-06-28) — Visual Plan Rendering
 

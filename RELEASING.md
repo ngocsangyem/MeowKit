@@ -457,6 +457,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.12.3 | 2026-06-28 | Visual + HTML Workflow                           |
 | v2.12.2 | 2026-06-28 | Visual Plan Rendering                            |
 | v2.12.1 | 2026-06-27 | Native Plugin Distribution                       |
 | v2.12.0 | 2026-06-27 | Legible Context + Queryable Substrate            |
