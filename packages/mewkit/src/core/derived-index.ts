@@ -2,15 +2,20 @@ import fs from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { parseTraceLog } from "./trace-analysis.js";
+import { WIKI_MIGRATION_SQL } from "../wiki/infrastructure/wiki-schema.js";
+import { ingestWiki, type WikiIngestCounts } from "../wiki/infrastructure/wiki-ingest.js";
 
-// A DERIVED, disposable SQLite index over the append logs. The JSONL/JSON logs stay the
-// canonical write-of-record; this DB is a rebuild-able read index (delete → reindex → identical).
-// Opt-in: nothing builds it automatically and no hook writes to it. All inserts are parameterized
-// (prepared statements); queries are static aggregates with no user-supplied SQL — no injection
-// surface. The DB lives under .claude/memory/ (already git-ignored, machine-local).
+// The consolidated DERIVED, disposable SQLite index. Canonical data stays in the append
+// logs (.claude/memory/*) and the wiki tree (tasks/wikis/<slug>/); this DB is a rebuild-able
+// read index (delete → reindex → identical). Opt-in: nothing builds it automatically and no
+// hook writes to it. All inserts are parameterized (prepared statements); queries are static
+// aggregates with no user-supplied SQL — no injection surface. v2 folds in the wiki tables +
+// FTS5 (was a separate index.db, now unified as wiki-index.db per the consolidation decision).
 
-export const SCHEMA_VERSION = 1;
-const DB_REL = path.join("memory", "index.db");
+export const SCHEMA_VERSION = 2;
+const DB_REL = path.join("memory", "wiki-index.db");
+/** The pre-consolidation DB, removed once on the first unified build. */
+const LEGACY_DB_REL = path.join("memory", "index.db");
 
 /** Forward migrations, applied in order when the DB's PRAGMA user_version is behind. */
 const MIGRATIONS: { version: number; sql: string }[] = [
@@ -30,6 +35,7 @@ const MIGRATIONS: { version: number; sql: string }[] = [
 			tokens INTEGER, task TEXT, raw TEXT
 		);`,
 	},
+	{ version: 2, sql: WIKI_MIGRATION_SQL },
 ];
 
 export function dbPath(claudeDir: string): string {
@@ -113,12 +119,32 @@ export interface IndexResult {
 	schemaVersion: number;
 	traceRows: number;
 	costRows: number;
+	wiki: WikiIngestCounts;
 }
 
-/** Build/refresh the derived index from the canonical logs. Full re-ingest = deterministic and
- *  rebuild-able. Creates the DB (WAL) if absent. Never mutates the source logs. */
+/** Remove the pre-consolidation index.db (and its WAL/SHM sidecars) once. The new
+ *  unified wiki-index.db supersedes it; the logs remain canonical so nothing is lost. */
+function removeLegacyDb(claudeDir: string): void {
+	const legacy = path.join(claudeDir, LEGACY_DB_REL);
+	let removed = false;
+	for (const suffix of ["", "-wal", "-shm"]) {
+		const f = legacy + suffix;
+		if (fs.existsSync(f)) {
+			fs.rmSync(f);
+			removed = true;
+		}
+	}
+	if (removed) {
+		console.error(`[mewkit] removed legacy ${LEGACY_DB_REL} — superseded by ${DB_REL}`);
+	}
+}
+
+/** Build/refresh the derived index from the canonical logs + wiki tree. Full re-ingest =
+ *  deterministic and rebuild-able. Creates the DB (WAL) if absent. Never mutates the sources. */
 export function buildIndex(claudeDir: string): IndexResult {
+	removeLegacyDb(claudeDir);
 	const target = dbPath(claudeDir);
+	const projectRoot = path.dirname(claudeDir);
 	fs.mkdirSync(path.dirname(target), { recursive: true });
 	const db = new DatabaseSync(target);
 	try {
@@ -128,7 +154,8 @@ export function buildIndex(claudeDir: string): IndexResult {
 		db.exec("DELETE FROM cost_entries");
 		const traceRows = ingestTrace(db, claudeDir);
 		const costRows = ingestCost(db, claudeDir);
-		return { dbPath: target, schemaVersion: userVersion(db), traceRows, costRows };
+		const wiki = ingestWiki(db, projectRoot);
+		return { dbPath: target, schemaVersion: userVersion(db), traceRows, costRows, wiki };
 	} finally {
 		db.close();
 	}

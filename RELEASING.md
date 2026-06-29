@@ -49,7 +49,7 @@ Example:
 
 The script automates steps 3-9 below: bump version → build/lint/typecheck/test → prepare release assets → VitePress build check → commit + tag → push → create GitHub Release with zip. Stops on any failure, warns on uncommitted changes.
 
-**Before running the script:** Complete step 2 (update CHANGELOG) manually. If the release affects guide/reference pages, complete step 1a as well. If a new agent or skill landed, complete step 1b (routing surfaces) too.
+**Before running the script:** Complete step 2 (update CHANGELOG) manually. If the release affects guide/reference pages, complete step 1a as well. If a new agent or skill landed, complete step 1b (routing surfaces) too. If the release changes the database/wiki schema or bumps `SCHEMA_VERSION`, complete step 1f (schema touchpoints).
 
 **After the script:** Run step 10 (npm publish) and step 11 (end-to-end test) manually.
 
@@ -133,9 +133,32 @@ When to act manually:
 - If `mewkit validate --plugin` reports a version mismatch → the committed `plugin/` is stale; regenerate it (the release script does this before tagging).
 - Plugin install commands for docs / release notes: `claude plugin marketplace add ngocsangyem/MeowKit` + `claude plugin install mk@meowkit`; Codex equivalents with `codex plugin`.
 
+#### 1f. Update when the derived index or wiki schema changes
+
+`mewkit`'s SQLite index (`.claude/memory/wiki-index.db`) is DERIVED and disposable — canonical data lives in the append logs (`.claude/memory/*.jsonl`) and the wiki tree (`tasks/wikis/<slug>/`). The DB is rebuilt by `mewkit index` (whole index) and `mewkit wiki reindex` (wiki tables); delete → reindex → identical. A schema change therefore needs code + test + doc updates, but NOT a user-data migration.
+
+When you change the index/wiki schema — a new table, a new column, a new FTS shape, or a `SCHEMA_VERSION` bump — update every touchpoint below:
+
+| Touchpoint                                                                   | What to do                                                                                                                                                                                       |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `packages/mewkit/src/core/derived-index.ts` — `SCHEMA_VERSION`               | Bump the constant to the new version number.                                                                                                                                                     |
+| `packages/mewkit/src/core/derived-index.ts` — `MIGRATIONS[]`                 | APPEND a new `{ version: N, sql }` entry. Migrations are forward-only, applied when the DB's `PRAGMA user_version` is behind. NEVER edit an existing migration's SQL — installs that already ran it will not re-run it. |
+| `packages/mewkit/src/wiki/infrastructure/wiki-schema.ts` — `WIKI_DDL_STATEMENTS` / `WIKI_MIGRATION_SQL` | Wiki table + FTS DDL lives here. The v2 migration references this constant; a new wiki-table change is a NEW migration version, not an edit to v2.                            |
+| `packages/mewkit/src/wiki/infrastructure/wiki-ingest.ts`                     | Keep the JSONL → table ingest in sync with any column add/rename, or rebuilt rows silently drop the new field.                                                                                    |
+| `packages/mewkit/src/wiki/domain/types.ts`                                   | If the domain shape changed, update the types the schema mirrors.                                                                                                                                |
+| `packages/mewkit/src/core/__tests__/derived-index.test.ts`                   | This test pins `SCHEMA_VERSION` — update the expected value and add a migration test for the new version.                                                                                         |
+| `docs/architecture/system-architecture.md`                                   | Update the `SCHEMA_VERSION N` line in the Wiki Subsystem section.                                                                                                                                 |
+
+**Additive vs destructive:**
+
+- **Additive** (a new `CREATE TABLE` / `CREATE INDEX` / new column via a forward migration) auto-applies on the next `mewkit index` / `mewkit wiki reindex` — existing installs upgrade transparently, no user action.
+- **Destructive** (drop/rename a column, change an FTS table's shape) cannot be expressed as a forward `CREATE`. Either write a migration that rebuilds the affected table, or — since the DB is disposable — tell users to delete `.claude/memory/wiki-index.db` and re-run `mewkit index`. State the exact step in the CHANGELOG `Migration Notes`.
+
+Every file above lives under `packages/mewkit/src/`, so a schema change ALWAYS triggers a CLI version bump (step 3) and an npm publish (step 10).
+
 ### 2. Update CHANGELOG (`website/changelog.md`)
 
-> **Note:** Root `CHANGELOG.md` is a stub that points at `website/changelog.md` (the live source). Edit `website/changelog.md`.
+> **Note:** The ONLY changelog file you edit is `website/changelog.md` — the VitePress source that renders to https://docs.meowkit.dev/changelog. Root `CHANGELOG.md` is a permanent stub that just refers readers to that published page; never add release notes to it.
 
 Add a new version section at the **top** (just below the `## Upgrade` block). Use the schema below — only include sections that have content. Empty sections are dropped, not stubbed.
 
@@ -375,13 +398,22 @@ Copy this checklist for each release:
 
 ### Changelog
 
-- [ ] Added v<version> section to `CHANGELOG.md`
+- [ ] Added v<version> section to `website/changelog.md` (NOT root `CHANGELOG.md` — it is a stub, leave it untouched)
 
 ### Version
 
 - [ ] Checked `git diff --name-only HEAD~1 -- packages/mewkit/src` — empty means SKIP step 3 and step 10
 - [ ] If `packages/mewkit/src/` changed: chose patch / minor / major bump per the SemVer table in step 3
 - [ ] Ran `npm -w packages/mewkit version <version>` (or skipped because src untouched)
+
+### Schema (only if the index/wiki schema changed — step 1f)
+
+- [ ] Bumped `SCHEMA_VERSION` in `derived-index.ts` and APPENDED a new `MIGRATIONS[]` entry (never edited an existing one)
+- [ ] Updated `wiki-schema.ts` DDL and kept `wiki-ingest.ts` in sync (if wiki tables changed)
+- [ ] Updated the `SCHEMA_VERSION` assertion + added a migration test in `derived-index.test.ts`
+- [ ] Updated the `SCHEMA_VERSION` line in `docs/architecture/system-architecture.md`
+- [ ] CHANGELOG `Migration Notes`: additive = auto-applies on next `mewkit index`; destructive = users delete `wiki-index.db` and reindex
+- [ ] Confirmed this is a `packages/mewkit/src/` change → CLI bump (step 3) + npm publish (step 10)
 
 ### Build
 
@@ -419,7 +451,7 @@ Push to `main` or `dev` triggers `.github/workflows/release.yml`:
 5. `@semantic-release/exec` publishes both packages to npm
 6. `@semantic-release/git` commits version files (and the regenerated `plugin/` + marketplaces) back to repo
 
-**Note:** Automated releases do NOT update `CHANGELOG.md` or affected guide/reference pages. Those must be done manually before the release commit.
+**Note:** Automated releases do NOT update `website/changelog.md` or affected guide/reference pages. Those must be done manually before the release commit. Root `CHANGELOG.md` is a stub and is never updated per-release.
 
 **Plugin guard:** `.github/workflows/ci.yml` runs `mewkit validate --plugin` on every PR — it fails closed if an agent name is non-bare, a skill name is non-`mk:`, a `subagent_type` ref is unknown, a plugin manifest is malformed, or the committed plugin version drifts from the root `package.json`. Keep the committed `plugin/` regenerated (`npx mewkit build-plugin`) so this stays green.
 

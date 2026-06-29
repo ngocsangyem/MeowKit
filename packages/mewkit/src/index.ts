@@ -287,6 +287,15 @@ async function main(): Promise<void> {
 			queryCommand({ json: args.json as boolean | undefined });
 			break;
 		}
+		case "wiki": {
+			const { wikiCommand } = await import("./wiki/interface/cli.js");
+			await wikiCommand({
+				subcommand: args._[1] as string | undefined,
+				rest: args._.slice(2).map(String),
+				flags: args as Record<string, unknown>,
+			});
+			break;
+		}
 		case "budget": {
 			// `budget context` routes to the per-profile context estimator (positional,
 			// not a flag — minimist parses it as args._[1]).

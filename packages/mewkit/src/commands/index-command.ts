@@ -33,9 +33,10 @@ export function indexCommand(opts: IndexOptions = {}): void {
 		console.log(JSON.stringify(result, null, 2));
 		return;
 	}
-	console.log(pc.bold(pc.cyan("Derived index rebuilt")) + pc.dim(" (logs unchanged — canonical)"));
+	console.log(pc.bold(pc.cyan("Derived index rebuilt")) + pc.dim(" (logs + wiki tree unchanged — canonical)"));
 	console.log(`  ${pc.dim(result.dbPath)}`);
 	console.log(`  schema v${result.schemaVersion} · ${result.traceRows} trace row(s) · ${result.costRows} cost row(s)`);
+	console.log(`  wiki: ${result.wiki.pages} page(s) · ${result.wiki.candidates} candidate(s) · ${result.wiki.sources} source(s)`);
 }
 
 export function queryCommand(opts: IndexOptions = {}): void {

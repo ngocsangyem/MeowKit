@@ -107,3 +107,16 @@ The release ships ONE full tarball; install size is controlled at install time, 
 - **`mewkit pack`** (`commands/pack.ts`): `list`/`add`/`remove` manage domains post-install. `remove` deletes only pristine, pack-exclusive, kit-owned files — base-covered, dual-homed, settings.json-referenced, and user-edited files survive — and rebuilds metadata write-before-delete for crash safety.
 - **Pack-aware `upgrade`**: reads `metadata.packs` (corrupt/absent ⇒ full); a partial install upgrades only its packs, removed packs stay removed.
 - **Guardrails**: `mewkit validate --packs` (manifest coherence, completeness, the exact-path safety invariant) and `mewkit budget context --profile <p> [--fail-over N]` (loadable-context estimator) — both wired into CI. The safety invariant is enforced by an explicit exact-path assertion (not by registering dispatched files in the inventory, which would collide with the Phase-2 ownership check).
+
+## Wiki Subsystem (`mewkit wiki`)
+
+Long-term, gated, FTS-searchable project knowledge, built on clean layering under `packages/mewkit/src/wiki/`. The dependency direction is strictly inward: **interface → application → infrastructure → domain**.
+
+- **domain/** — pure types + invariants (no IO): branded `WikiSlug`/`WikiPageId`, the salience rubric (`scoreSalience`, 9 components), `decideWrite` thresholds, and the state machine where *unscanned→approved* and *agent-origin→committed* are structurally impossible.
+- **application/** — `WikiService` orchestrates the write order (scrub → scan → candidate-or-approve → atomic write → index upsert → trace). `commitWrite` is the SOLE caller of `repo.writePage`; `approveCandidate` is the SOLE canonical-page mint. `queries.ts` is read-only (CQS via `Pick<>` port slices). `research.ts` turns fetched DATA into candidates only.
+- **infrastructure/** — `MarkdownWikiRepository` (atomic temp+rename canonical writes under `tasks/wikis/<slug>/`; `writePage` accepts only a scanner-issued `ApprovedWrite` token), `ScannerAdapter` (url-guard → size cap → multi-pass injection scan → secret scrub; TS port of `validate-content.cjs`/`secret-scrub.cjs` so it ships in `dist/`), `SqliteWikiIndex` (FTS over the consolidated `wiki-index.db`), `FetcherAdapter` (web/arXiv/GitHub; per-hop redirect re-validation), `TraceAdapter`, `InventoryAdapter`.
+- **interface/** — `cli.ts` (`mewkit wiki <sub>`) is the only layer that constructs concrete adapters and injects them into the service; `render.ts` emits a self-contained (no-CDN, HTML-escaped) snapshot.
+
+**Anti-self-poisoning core:** external content and agent output are DATA. An agent can only propose a `WikiCandidate`; canonical pages are written only via human `approve`, which always re-runs the scanner. The chokepoint is type-enforced (`ApprovedWrite` private constructor, minted only on a clean multi-pass verdict bound to scrubbed content).
+
+**Persistence:** canonical files in `tasks/wikis/<slug>/` (wiki.json, pages/*.md, sources/claims/candidates/interventions/seeds JSONL) are the source of truth; `.claude/memory/wiki-index.db` (SCHEMA_VERSION 2 — trace + cost + wiki tables + FTS5) is derived and fully rebuildable via `mewkit wiki reindex` / `mewkit index`.
