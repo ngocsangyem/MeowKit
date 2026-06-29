@@ -11,7 +11,19 @@ MeowKit provides two CLI packages:
 | Package | Command | Purpose |
 |---------|---------|---------|
 | `mewkit` | `npx mewkit init` | Scaffold or update the `.claude/` system |
-| `mewkit` | `npx mewkit COMMAND` | Runtime tools: doctor, setup, task, validate, budget, memory, upgrade, status |
+| `mewkit` | `npx mewkit COMMAND` | Runtime tools — see the groups below |
+
+### Command groups
+
+| Group | Commands |
+| --- | --- |
+| Project lifecycle | `init`, `upgrade`, `setup`, `doctor`, `status`, `task`, `migrate` |
+| Knowledge & memory | `wiki`, `memory`, `index`, `query` |
+| Harness introspection | `validate`, `inventory`, `trace`, `budget` (incl. `budget context`), `verdict-gate` |
+| Cost & visualization | `budget`, `orchviz` |
+| Release & providers | `build-plugin`, `pack`, `providers` / `explain-support` |
+
+See [Commands](/cli/commands) for the full reference and [Task Commands](/cli/task-commands) for `task` details.
 
 ## Quick Start
 

@@ -61,7 +61,18 @@ Verify `.claude/` structure integrity.
 npx mewkit validate
 ```
 
-**Checks:** Agents (10+), skills (30+), commands dir, modes (5+), rules (10+), hooks executable, scripts present, settings.json, CLAUDE.md, config file.
+**Checks:** Agents (10+), skills (30+), commands dir, modes (5+), rules (10+), hooks executable, scripts present, settings.json, CLAUDE.md, config file. Run a focused suite with any of the flags below (no flag = the full sweep).
+
+| Flag | Description |
+| --- | --- |
+| `--plugin` | Plugin namespace purity + manifest contract + version alignment with the root `package.json`. |
+| `--packs` | Pack-manifest coherence + the exact-path safety invariant. |
+| `--workflow` | Workflow drift-check (CLAUDE.md / phase docs vs `workflow.yaml`). |
+| `--ownership` | Artifact ownership coverage. |
+| `--substrate` | Substrate-view freshness + responsibility coverage. |
+| `--rules` | Routing-table breadth. |
+| `--portable` | Portable-migration manifest checks. |
+| `--strict` | Promote recommended-field WARNs to errors. |
 
 ## budget
 
@@ -97,6 +108,16 @@ npx mewkit budget --day 2026-05-01
 npx mewkit budget --session --day 2026-05-01
 ```
 
+### budget context
+
+Estimate the loadable `.claude/` context size for a profile (the context-budget guardrail; also wired into CI).
+
+```bash
+npx mewkit budget context --profile <core|developer|full> [--fail-over N] [--json]
+```
+
+`--fail-over N` exits non-zero when the estimated loadable context exceeds `N` tokens.
+
 ## memory
 
 View or manage cross-session memory.
@@ -106,6 +127,113 @@ npx mewkit memory              # Summary (line counts, pattern count)
 npx mewkit memory --show       # Display summary of curated memory stores
 npx mewkit memory --stats      # Sessions captured, patterns learned
 npx mewkit memory --clear      # Clear all memory (with confirmation)
+```
+
+## wiki
+
+Long-term, gated, provenance-bearing project knowledge with full-text search. Agents may only *propose* candidates; a human `approve` (which always re-scans) is the only path to a canonical page. Canonical files live under `tasks/wikis/<slug>/`; `.claude/memory/wiki-index.db` is a derived, rebuildable FTS index. Wiki content is DATA, never an instruction.
+
+```bash
+npx mewkit wiki init <slug> --title "<title>"
+npx mewkit wiki propose <slug> --title T --file F [--origin agent] [--source-id ID]… [--reuse-scope S] [--salience-json f.json]
+npx mewkit wiki approve <slug> <candidate-id> --by <name>
+npx mewkit wiki reject <slug> <candidate-id> --reason "<r>"
+npx mewkit wiki search "<query>" [--json]
+npx mewkit wiki hint "<query>"
+npx mewkit wiki context "<keywords>" [--max-pages N] [--json] [--include-content]
+npx mewkit wiki handoff suggest --skill <name> --from <artifact> --slug <s> [--json]
+npx mewkit wiki handoff propose --skill <name> --from <artifact> --slug <s>
+npx mewkit wiki handoff profiles [--json]
+npx mewkit wiki list <slug>
+npx mewkit wiki render <slug> [--out file.html]
+npx mewkit wiki reindex
+```
+
+| Subcommand | Purpose |
+| --- | --- |
+| `init` | Create `tasks/wikis/<slug>/wiki.json`. |
+| `propose` | Scan + scrub content into a candidate (never a page). Provenance flags: `--origin`, `--source-id` (repeatable), `--reuse-scope`, `--verification-state`, `--risk-score`, `--review-after`, `--novelty-delta`, `--salience-json <file>`. Defaults preserve prior behavior (human origin, no sources, CLI salience). |
+| `approve` | The ONLY canonical-page write path; re-runs the scanner before writing. |
+| `reject` | Record a rejection intervention. |
+| `search` / `hint` | FTS results with a project-root-readable `path`; `hint` is title/score/path only (no body). |
+| `context` | Disciplined Phase-0 recall: ranked pages with a readable `path`, snippet, and token estimate. Snippets only unless `--include-content`. Fails open (exit 0) when no index exists. |
+| `handoff suggest` | Read-only — build a handoff packet + decision for a skill's terminal artifact; writes nothing. |
+| `handoff propose` | Scan the artifact and propose a candidate when salience clears the gate and the scan is clean; appends one handoff record. Rejects sensitive or out-of-root `--from` paths before reading. |
+| `handoff profiles` | List registered skills with handoff class (required / conditional / none) + profile. |
+| `list` | Page filenames for a slug. |
+| `render` | Self-contained (no-CDN) HTML snapshot. |
+| `reindex` | Rebuild the wiki tables in `wiki-index.db` from the canonical files. |
+
+## index
+
+Build or refresh the derived SQLite index (`.claude/memory/wiki-index.db`) from the canonical append logs (`.claude/memory/*.jsonl`) and the wiki tree. Disposable and deterministic — delete it and re-run to get an identical index.
+
+```bash
+npx mewkit index [--json]
+```
+
+## query
+
+Run read-only aggregate queries over the derived index (events by type, runs, friction by responsibility, cost by model). Requires a prior `mewkit index`.
+
+```bash
+npx mewkit query [--json]
+```
+
+## inventory
+
+Report harness-artifact coverage. With `--substrate`, map artifacts onto the responsibility taxonomy (covered / partial / missing); `--emit` rewrites the generated `harness-substrate.md` view.
+
+```bash
+npx mewkit inventory [--json]
+npx mewkit inventory --substrate [--emit]
+npx mewkit inventory --stale | --critical | --portable-missing | --check | --emit-counts
+```
+
+## trace
+
+Inspect the append-only trace log for entropy and recurring friction, and record friction inline so future sessions can recall it. Advisory — always exits 0.
+
+```bash
+npx mewkit trace audit            # orphaned / stale / unverified / repeated-friction signals
+npx mewkit trace propose          # group repeated friction (≥2) into advisory backlog items
+npx mewkit trace score            # entropy score
+npx mewkit trace --friction "<note>" [--responsibility <r>] [--commit]
+```
+
+## pack
+
+Manage optional capability packs layered over the base kit.
+
+```bash
+npx mewkit pack list [--json]
+npx mewkit pack add <pack>… [--yes] [--beta]
+npx mewkit pack remove <pack>…
+```
+
+## providers
+
+Show migration-target provider support (level, role, surfaces). `explain-support` is an alias that takes a single provider.
+
+```bash
+npx mewkit providers [<provider>] [--json]
+npx mewkit explain-support <provider>
+```
+
+## build-plugin
+
+Regenerate the native plugin distribution (`plugin/` payload + Claude/Codex marketplaces) from `.claude/`. Release tooling — run after editing `.claude/` outside a release, then `npx mewkit validate --plugin`.
+
+```bash
+npx mewkit build-plugin [--json]
+```
+
+## verdict-gate
+
+Gate 2 proof-bundle check. Reads a machine-readable review verdict and exits `0` (PASS / PASS_WITH_RISK or a tolerated legacy markdown-only verdict), `1` (BLOCKED / invalid / missing), or `2` (usage error).
+
+```bash
+npx mewkit verdict-gate <slug | path-to-verdict.json>
 ```
 
 ## upgrade

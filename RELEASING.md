@@ -513,6 +513,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.13.1 | 2026-06-29 | Wiki Handoff + Context Recall                    |
 | v2.13.0 | 2026-06-29 | The Wiki Knowledge Subsystem                     |
 | v2.12.3 | 2026-06-28 | Visual + HTML Workflow                           |
 | v2.12.2 | 2026-06-28 | Visual Plan Rendering                            |

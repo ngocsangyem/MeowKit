@@ -14,6 +14,33 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.13.1 (2026-06-29) — Wiki Handoff + Context Recall
+
+### Highlights
+
+Knowledge-producing skills can now hand a finished artifact to the wiki — it is scanned and turned into a *proposed* candidate with full provenance only when it clears the salience gate — and any flow can recall prior knowledge through a disciplined, DATA-bounded `wiki context` surface. The capture path stays gated end to end: agents still only propose, and a human `approve` remains the only route to a canonical page.
+
+### Features
+
+- `mewkit wiki handoff suggest|propose|profiles` — turn a skill's terminal artifact into a scanned candidate, driven by a per-skill registry (class required / conditional / none). `suggest` is read-only; `propose` rejects sensitive or out-of-root artifact paths before reading.
+- `mewkit wiki context "<keywords>"` — disciplined recall returning ranked pages with a project-root-readable path and a snippet; bodies only with `--include-content`, and it fails open when no index exists.
+- `wiki propose` now accepts full provenance — `--origin`, `--source-id` (repeatable), `--reuse-scope`, `--verification-state`, `--risk-score`, `--review-after`, `--novelty-delta`, `--salience-json` — instead of hardcoding origin and salience.
+- New `wiki-context-rules` rule marks all wiki content as DATA and bounds the Phase 0 recall probe.
+
+### CLI
+
+- Documented the full runtime command surface in the CLI reference — `wiki`, `index`, `query`, `inventory`, `trace`, `pack`, `providers` / `explain-support`, `build-plugin`, `verdict-gate`, and `budget context`.
+
+### Improvements
+
+- `wiki hint` and `wiki search` now return a project-root-readable `path` (`tasks/wikis/<slug>/pages/…`) instead of an internal page id.
+
+### Migration Notes
+
+- The derived index schema advances to version 3 (additive `wiki_handoff` + `wiki_candidate_source` tables). It auto-applies on the next `npx mewkit index` or `npx mewkit wiki reindex` — no user action and no data loss.
+
+---
+
 ## 2.13.0 (2026-06-29) — The Wiki Knowledge Subsystem
 
 ### Highlights
