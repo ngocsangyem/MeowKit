@@ -2,6 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import type { WikiPage } from "../domain/index.js";
 import type { WikiIndex, WikiSearchHit } from "../application/ports.js";
 import { searchWiki } from "./wiki-query.js";
+import { ensureIndexSchema } from "../../core/derived-index.js";
 
 // Live read/upsert adapter over the consolidated wiki-index.db. Reads go
 // through the read-only searchWiki helper; the single live mutation is page upsert. Upsert is
@@ -16,6 +17,12 @@ export class SqliteWikiIndex implements WikiIndex {
 		const db = new DatabaseSync(this.dbFile);
 		try {
 			db.exec("PRAGMA journal_mode = WAL");
+			// The derived index is opt-in: nothing builds it before the first canonical write.
+			// Opening it here with a raw DatabaseSync also CREATES an empty file, so without this
+			// the very first `approve` on a fresh wiki throws `no such table: wiki_page`. Migrate
+			// (idempotent) so upsert self-heals a never-built index instead of requiring a prior
+			// `mewkit index` / `wiki reindex`.
+			ensureIndexSchema(db);
 			db.exec("BEGIN IMMEDIATE");
 			try {
 				db.prepare("DELETE FROM wiki_page WHERE id = ?").run(page.id);

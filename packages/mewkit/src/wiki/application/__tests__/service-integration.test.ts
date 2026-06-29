@@ -1,5 +1,6 @@
 import { mkdtemp, mkdir, rm, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { DatabaseSync } from "node:sqlite";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -77,6 +78,57 @@ describe("WikiService end-to-end (real adapters)", () => {
 		const hits = searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), "salience");
 		expect(hits.length).toBe(1);
 		expect(hits[0]!.slug).toBe("demo");
+	});
+
+	it("first approve on a never-built index self-heals the schema (no `no such table`)", async () => {
+		// Regression: the derived index is opt-in, so a fresh wiki has no wiki-index.db schema.
+		// Earlier, the first approve opened the DB raw and INSERTed into wiki_page without
+		// migrating → `Fatal: no such table: wiki_page`. NO buildIndex() here on purpose.
+		const root = await mkdtemp(join(tmpdir(), "wiki-e2e-"));
+		tempDirs.push(root);
+		const claudeDir = join(root, ".claude");
+		await mkdir(join(claudeDir, "memory"), { recursive: true });
+
+		const slug = makeWikiSlug("demo");
+		const svc = new WikiService({
+			repo: new MarkdownWikiRepository(root),
+			scanner: new ScannerAdapter(),
+			index: new SqliteWikiIndex(dbPath(claudeDir)),
+			tracer: new TraceAdapter(claudeDir),
+		});
+
+		svc.createWiki(slug, "Demo Wiki");
+		const { candidate } = svc.proposeCandidate({
+			slug,
+			title: "Salience Rubric",
+			content: "The salience rubric scores candidates before any canonical write.",
+			origin: "agent",
+			whySave: "core defense",
+			evidence: "review accepted",
+			sourceIds: [],
+			salience: HIGH,
+		});
+
+		// The DB was never built — approve must create the schema itself, not throw.
+		expect(() => svc.approveCandidate(slug, candidate!.id, "alice")).not.toThrow();
+		expect(existsSync(join(root, "tasks", "wikis", "demo", "pages", "salience-rubric.md"))).toBe(true);
+
+		const hits = searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), "salience");
+		expect(hits.length).toBe(1);
+	});
+
+	it("read helpers tolerate an empty, never-built index db (no `no such table`)", async () => {
+		// An older mewkit could leave an empty wiki-index.db (raw open on a failed approve).
+		// search/list open it read-only and cannot migrate, so they must degrade to [] not throw.
+		const root = await mkdtemp(join(tmpdir(), "wiki-e2e-"));
+		tempDirs.push(root);
+		const claudeDir = join(root, ".claude");
+		await mkdir(join(claudeDir, "memory"), { recursive: true });
+		// Create an empty (schema-less) but valid DB file, mimicking the stale-DB state.
+		new DatabaseSync(dbPath(claudeDir)).close();
+
+		expect(() => searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), "anything")).not.toThrow();
+		expect(searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), "anything")).toEqual([]);
 	});
 
 	it("a secret in the proposed content is scrubbed out of the canonical page", async () => {

@@ -48,8 +48,12 @@ function userVersion(db: DatabaseSync): number {
 	return typeof v === "number" ? v : 0;
 }
 
-/** Apply any pending forward migrations and stamp the schema version. */
-function migrate(db: DatabaseSync): void {
+/** Apply any pending forward migrations and stamp the schema version. Exported so the live
+ * write adapter (`SqliteWikiIndex.upsertPage`) can self-heal a never-built index DB: the
+ * wiki schema is otherwise created only by `buildIndex` (`mewkit index` / `wiki reindex`),
+ * so a first `approve` on a fresh wiki would hit `no such table: wiki_page`. Idempotent —
+ * a no-op once `user_version` is current. */
+export function ensureIndexSchema(db: DatabaseSync): void {
 	let current = userVersion(db);
 	for (const m of MIGRATIONS) {
 		if (m.version > current) {
@@ -149,7 +153,7 @@ export function buildIndex(claudeDir: string): IndexResult {
 	const db = new DatabaseSync(target);
 	try {
 		db.exec("PRAGMA journal_mode = WAL");
-		migrate(db);
+		ensureIndexSchema(db);
 		db.exec("DELETE FROM trace_events");
 		db.exec("DELETE FROM cost_entries");
 		const traceRows = ingestTrace(db, claudeDir);
