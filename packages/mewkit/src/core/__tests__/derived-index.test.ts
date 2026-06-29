@@ -103,10 +103,10 @@ describe("buildIndex / queryIndex", () => {
 		expect(queryIndex(join(root, ".claude")).eventsByType).toEqual([]);
 	});
 
-	it("stamps the consolidated schema version (v2)", async () => {
+	it("stamps the consolidated schema version (v3)", async () => {
 		const { claudeDir } = await makeLogs();
-		expect(buildIndex(claudeDir).schemaVersion).toBe(2);
-		expect(SCHEMA_VERSION).toBe(2);
+		expect(buildIndex(claudeDir).schemaVersion).toBe(3);
+		expect(SCHEMA_VERSION).toBe(3);
 	});
 
 	it("removes a stale legacy index.db on the first unified build", async () => {

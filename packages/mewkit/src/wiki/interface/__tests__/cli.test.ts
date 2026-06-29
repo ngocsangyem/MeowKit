@@ -81,7 +81,9 @@ describe("mewkit wiki CLI", () => {
 		await wikiCommand({ subcommand: "hint", rest: ["salience"], flags: {} });
 		const hints = JSON.parse(logs.join(""));
 		expect(hints.length).toBe(1);
-		expect(Object.keys(hints[0]).sort()).toEqual(["path", "score", "title"]);
+		expect(Object.keys(hints[0]).sort()).toEqual(["pageId", "pagePath", "path", "score", "title"]);
+		// `path` is now the project-root-readable file target, not the internal pageId.
+		expect(hints[0].path).toMatch(/^tasks\/wikis\/demo\/pages\//);
 		// the page body must NOT appear in a hint
 		expect(logs.join("")).not.toContain("body text");
 	});

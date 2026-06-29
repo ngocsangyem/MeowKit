@@ -101,6 +101,14 @@ export interface WikiSearchHit {
 	title: string;
 	snippet: string;
 	tokenEstimate: number;
+	/** DB slug-relative page path (e.g. "pages/backend-infra.md"). Populated by the
+	 * query layer; optional so synthetic hits (tests/mocks) need not supply it. */
+	pagePath?: string;
+	/** Project-root-readable path composed from the slug + pagePath
+	 * (e.g. "tasks/wikis/<slug>/pages/backend-infra.md"). The agent-facing file target. */
+	path?: string;
+	/** Full page body — present only when the caller explicitly opts in (context --include-content). */
+	content?: string;
 }
 
 export interface WikiIndex {

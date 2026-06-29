@@ -13,6 +13,8 @@ import type {
 } from "../domain/index.js";
 import { assertCanonicalComplete, assertNoTraversal, makeWikiPageId, makeWikiSlug } from "../domain/index.js";
 import type { ApprovedWrite, WikiRepository } from "../application/ports.js";
+import type { HandoffRepository } from "../handoff/service.js";
+import type { WikiHandoffRecord } from "../handoff/domain.js";
 
 // Canonical Markdown repository for tasks/wikis/<slug>/. All writes are atomic (temp-file +
 // rename) via a LOCAL helper — there is no shared IO wrapper and no-direct-io does not cover
@@ -52,7 +54,7 @@ function parseFrontmatter(raw: string): { meta: Record<string, unknown>; body: s
 	return { meta, body: raw.slice(end + 4).replace(/^\r?\n/, "") };
 }
 
-export class MarkdownWikiRepository implements WikiRepository {
+export class MarkdownWikiRepository implements WikiRepository, HandoffRepository {
 	constructor(private readonly projectRoot: string) {}
 
 	private wikiDir(slug: WikiSlug): string {
@@ -162,6 +164,12 @@ export class MarkdownWikiRepository implements WikiRepository {
 
 	appendSource(slug: WikiSlug, source: WikiSource): void {
 		this.appendJsonl(slug, "sources.jsonl", source);
+	}
+
+	/** Append-only handoff outcome record → tasks/wikis/<slug>/handoffs.jsonl (ingested by
+	 * reindex into wiki_handoff). The record never carries raw artifact content. */
+	appendHandoff(slug: WikiSlug, record: WikiHandoffRecord): void {
+		this.appendJsonl(slug, "handoffs.jsonl", record);
 	}
 
 	listCandidates(slug: WikiSlug): WikiCandidate[] {

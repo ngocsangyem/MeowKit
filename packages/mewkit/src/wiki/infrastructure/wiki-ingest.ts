@@ -19,6 +19,8 @@ export interface WikiIngestCounts {
 	seeds: number;
 	interventions: number;
 	links: number;
+	handoffs: number;
+	candidateSources: number;
 }
 
 function s(v: unknown): string | null {
@@ -147,6 +149,10 @@ function ingestSlug(db: DatabaseSync, root: string, slug: string, c: WikiIngestC
 	const salStmt = db.prepare(
 		"INSERT OR REPLACE INTO wiki_salience (candidate_id, explicit_user_intent, verified_outcome, recurrence_or_friction, novelty_vs_existing_wiki, future_reuse_likelihood, source_quality, blast_radius, security_risk_penalty, staleness_penalty, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 	);
+	// v3 relation: candidate↔source, backfilled from each candidate's sourceIds array.
+	// OR IGNORE + gate on .changes keeps re-ingest idempotent; an empty/missing sourceIds
+	// list yields zero rows and is NOT an error (the Aspire-shaped data has no sources).
+	const candSrcStmt = db.prepare("INSERT OR IGNORE INTO wiki_candidate_source (candidate_id, source_id) VALUES (?, ?)");
 	for (const o of readJsonl(path.join(dir, "candidates.jsonl"))) {
 		const id = s(o["id"]);
 		const sal = (o["salience"] && typeof o["salience"] === "object" ? o["salience"] : {}) as Record<string, unknown>;
@@ -162,6 +168,11 @@ function ingestSlug(db: DatabaseSync, root: string, slug: string, c: WikiIngestC
 				n(comp["novelty_vs_existing_wiki"]), n(comp["future_reuse_likelihood"]), n(comp["source_quality"]),
 				n(comp["blast_radius"]), n(comp["security_risk_penalty"]), n(comp["staleness_penalty"]), n(sal["total"]),
 			);
+			const sourceIds = Array.isArray(o["sourceIds"]) ? (o["sourceIds"] as unknown[]) : [];
+			for (const src of sourceIds) {
+				const srcId = s(src);
+				if (srcId && candSrcStmt.run(id, srcId).changes > 0) c.candidateSources += 1;
+			}
 		}
 		c.candidates += 1;
 	}
@@ -171,11 +182,30 @@ function ingestSlug(db: DatabaseSync, root: string, slug: string, c: WikiIngestC
 		intStmt.run(s(o["id"]), s(o["kind"]), s(o["candidateId"]), s(o["reason"]), s(o["actor"]), s(o["createdAt"]));
 		c.interventions += 1;
 	}
+
+	// v3: handoff outcome records. salience is flattened to a total column + a
+	// JSON blob (red-team S1 — no per-component child table). OR IGNORE + .changes
+	// gate keeps re-ingest idempotent. Absent handoffs.jsonl yields zero rows.
+	const hoStmt = db.prepare(
+		"INSERT OR IGNORE INTO wiki_handoff (id, slug, skill_name, skill_owner, handoff_class, profile, artifact_path, artifact_hash, title, why_save, evidence, reuse_scope, verification_state, risk_score, salience_total, salience_json, decision_kind, candidate_id, page_id, status, created_at, review_after) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+	);
+	for (const o of readJsonl(path.join(dir, "handoffs.jsonl"))) {
+		const sal = (o["salience"] && typeof o["salience"] === "object" ? o["salience"] : {}) as Record<string, unknown>;
+		const inserted = hoStmt.run(
+			s(o["id"]), s(o["slug"]) ?? slug, s(o["skillName"]) ?? "", s(o["skillOwner"]),
+			s(o["handoffClass"]) ?? "none", s(o["profile"]) ?? "none", s(o["artifactPath"]) ?? "", s(o["artifactHash"]) ?? "",
+			s(o["title"]) ?? "", s(o["whySave"]), s(o["evidence"]), s(o["reuseScope"]), s(o["verificationState"]),
+			n(o["riskScore"]), n(sal["total"]), JSON.stringify(o["salience"] ?? {}),
+			s(o["decisionKind"]), s(o["candidateId"]), s(o["pageId"]), s(o["status"]) ?? "suggested",
+			s(o["createdAt"]), s(o["reviewAfter"]),
+		).changes > 0;
+		if (inserted) c.handoffs += 1;
+	}
 }
 
 /** Clear and rebuild every wiki table from the canonical tree. Returns row counts. */
 export function ingestWiki(db: DatabaseSync, projectRoot: string): WikiIngestCounts {
-	const counts: WikiIngestCounts = { wikis: 0, pages: 0, sources: 0, claims: 0, candidates: 0, seeds: 0, interventions: 0, links: 0 };
+	const counts: WikiIngestCounts = { wikis: 0, pages: 0, sources: 0, claims: 0, candidates: 0, seeds: 0, interventions: 0, links: 0, handoffs: 0, candidateSources: 0 };
 	for (const table of WIKI_TABLES) {
 		db.exec("DELETE FROM " + table); // table is a constant from WIKI_TABLES, never user input
 	}

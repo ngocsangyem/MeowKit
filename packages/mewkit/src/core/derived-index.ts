@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { parseTraceLog } from "./trace-analysis.js";
-import { WIKI_MIGRATION_SQL } from "../wiki/infrastructure/wiki-schema.js";
+import { WIKI_MIGRATION_SQL, WIKI_V3_MIGRATION_SQL } from "../wiki/infrastructure/wiki-schema.js";
 import { ingestWiki, type WikiIngestCounts } from "../wiki/infrastructure/wiki-ingest.js";
 
 // The consolidated DERIVED, disposable SQLite index. Canonical data stays in the append
@@ -12,7 +12,7 @@ import { ingestWiki, type WikiIngestCounts } from "../wiki/infrastructure/wiki-i
 // aggregates with no user-supplied SQL — no injection surface. v2 folds in the wiki tables +
 // FTS5 (was a separate index.db, now unified as wiki-index.db per the consolidation decision).
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 const DB_REL = path.join("memory", "wiki-index.db");
 /** The pre-consolidation DB, removed once on the first unified build. */
 const LEGACY_DB_REL = path.join("memory", "index.db");
@@ -36,6 +36,7 @@ const MIGRATIONS: { version: number; sql: string }[] = [
 		);`,
 	},
 	{ version: 2, sql: WIKI_MIGRATION_SQL },
+	{ version: 3, sql: WIKI_V3_MIGRATION_SQL },
 ];
 
 export function dbPath(claudeDir: string): string {

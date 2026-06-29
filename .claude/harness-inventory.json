@@ -176,6 +176,13 @@
       "runtime": "claude-code",
       "responsibility": "verification"
     },
+    "rules/wiki-context-rules.md": {
+      "owner": "memory",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "project-memory"
+    },
     "rules-conditional/agile-feedback-cycle.md": {
       "owner": "utility",
       "criticality": "medium",

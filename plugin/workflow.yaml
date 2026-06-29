@@ -21,7 +21,9 @@ phases:
     required_outputs: []
     note: >
       Runs at session start. Detects model tier, execution mode, TDD mode,
-      and risk flags. Produces agent assignment for Phase 1.
+      and risk flags. Produces agent assignment for Phase 1. Class A/B flows
+      SHOULD run the Wiki Context Probe (rules/wiki-context-rules.md) when a
+      wiki index exists — advisory recall, DATA-only, never blocking.
 
   - id: 1
     name: Plan

@@ -30,25 +30,40 @@ function wikiSchemaPresent(db: DatabaseSync): boolean {
 	return row !== undefined;
 }
 
-/** Full-text search over page title + body. Returns provenance (slug/path via the
- * page id) and a snippet with a token-budget estimate. */
-export function searchWiki(dbFile: string, query: string, limit = 10): WikiSearchHit[] {
+/** Compose the project-root-readable page path from a slug + the DB slug-relative path.
+ * The DB stores `wiki_page.path` slug-relative ("pages/x.md"); agents need a path readable
+ * from the project root. Always POSIX-joined (repo-relative), never an absolute path. */
+function readablePagePath(slug: string, pagePath: string): string {
+	return "tasks/wikis/" + slug + "/" + pagePath;
+}
+
+/** Full-text search over page title + body. Returns provenance (slug + slug-relative
+ * `pagePath` + a project-root-readable `path`) and a snippet with a token-budget estimate.
+ * Page bodies are returned ONLY when `includeContent` is true (context-budget discipline). */
+export function searchWiki(dbFile: string, query: string, limit = 10, includeContent = false): WikiSearchHit[] {
 	if (!fs.existsSync(dbFile)) return [];
 	const db = new DatabaseSync(dbFile, { readOnly: true });
 	try {
 		if (!wikiSchemaPresent(db)) return [];
 		const rows = db
 			.prepare(
-				"SELECT f.page_id AS pageId, f.slug AS slug, f.title AS title, snippet(wiki_fts, 3, '[', ']', '…', 12) AS snippet, p.content AS content FROM wiki_fts f JOIN wiki_page p ON p.id = f.page_id WHERE wiki_fts MATCH ? ORDER BY rank LIMIT ?",
+				"SELECT f.page_id AS pageId, f.slug AS slug, f.title AS title, snippet(wiki_fts, 3, '[', ']', '…', 12) AS snippet, p.path AS pagePath, p.content AS content FROM wiki_fts f JOIN wiki_page p ON p.id = f.page_id WHERE wiki_fts MATCH ? ORDER BY rank LIMIT ?",
 			)
-			.all(query, limit) as { pageId: string; slug: string; title: string; snippet: string; content: string }[];
-		return rows.map((r) => ({
-			pageId: r.pageId,
-			slug: r.slug,
-			title: r.title,
-			snippet: r.snippet,
-			tokenEstimate: estimateTokens(r.content ?? ""),
-		}));
+			.all(query, limit) as { pageId: string; slug: string; title: string; snippet: string; pagePath: string; content: string }[];
+		return rows.map((r) => {
+			const pagePath = r.pagePath ?? "";
+			const hit: WikiSearchHit = {
+				pageId: r.pageId,
+				slug: r.slug,
+				title: r.title,
+				snippet: r.snippet,
+				tokenEstimate: estimateTokens(r.content ?? ""),
+				pagePath,
+				path: readablePagePath(r.slug, pagePath),
+			};
+			if (includeContent) hit.content = r.content ?? "";
+			return hit;
+		});
 	} finally {
 		db.close();
 	}

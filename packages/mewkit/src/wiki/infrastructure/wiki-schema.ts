@@ -8,8 +8,10 @@
 // hard-coded constants, never user input, so they are safe to use in a clear loop.
 export const WIKI_TABLES: readonly string[] = [
 	"wiki_fts",
+	"wiki_handoff",
 	"wiki_link",
 	"wiki_salience",
+	"wiki_candidate_source",
 	"wiki_candidate",
 	"wiki_seed",
 	"wiki_claim",
@@ -43,3 +45,20 @@ const WIKI_DDL_STATEMENTS: readonly string[] = [
 ];
 
 export const WIKI_MIGRATION_SQL: string = WIKI_DDL_STATEMENTS.join("\n");
+
+// --- Migration v3 (additive) ------------------------------------------------
+// Handoff provenance + candidate↔source relation. Kept as a SEPARATE export from
+// WIKI_MIGRATION_SQL so a fresh DB does NOT create these tables twice (a fresh build
+// runs every migration in order; folding v3 DDL into v2 would double-create). Salience
+// is stored as a single salience_json TEXT column (red-team S1 — no per-component
+// child table). wiki_handoff is not FTS-mirrored, so no trigger-strand concern.
+// Same interpolation-free discipline: plain string literals joined with "\n".
+const WIKI_V3_DDL_STATEMENTS: readonly string[] = [
+	"CREATE TABLE wiki_handoff (id TEXT PRIMARY KEY, slug TEXT NOT NULL, skill_name TEXT NOT NULL, skill_owner TEXT, handoff_class TEXT NOT NULL, profile TEXT NOT NULL, artifact_path TEXT NOT NULL, artifact_hash TEXT NOT NULL, title TEXT NOT NULL, why_save TEXT, evidence TEXT, reuse_scope TEXT, verification_state TEXT, risk_score REAL, salience_total REAL, salience_json TEXT, decision_kind TEXT, candidate_id TEXT, page_id TEXT, status TEXT NOT NULL, created_at TEXT, review_after TEXT, schema_version INTEGER NOT NULL DEFAULT 1);",
+	"CREATE TABLE wiki_candidate_source (candidate_id TEXT NOT NULL, source_id TEXT NOT NULL, PRIMARY KEY (candidate_id, source_id));",
+	"CREATE INDEX idx_wiki_handoff_skill ON wiki_handoff(skill_name);",
+	"CREATE INDEX idx_wiki_handoff_artifact ON wiki_handoff(artifact_hash);",
+	"CREATE INDEX idx_wiki_handoff_candidate ON wiki_handoff(candidate_id);",
+];
+
+export const WIKI_V3_MIGRATION_SQL: string = WIKI_V3_DDL_STATEMENTS.join("\n");
