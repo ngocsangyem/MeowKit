@@ -1,13 +1,13 @@
 ---
-title: Harness Architecture
+title: Autobuild Architecture
 description: The /mk:autobuild autonomous build pipeline — generator/evaluator split, sprint contract, iteration loop, adaptive density.
 ---
 
-> **See also:** [Autonomous Build](/guides/autonomous-build) — the how-to walkthrough.
+> **See also:** [How MeowKit Works](/core-concepts/how-it-works) — the always-on harness (rules, hooks, skills, gates, memory, wiki). · [Autonomous Build](/guides/autonomous-build) — the how-to walkthrough.
 
-# Harness Architecture
+# Autobuild Architecture
 
-`/mk:autobuild` is the autonomous build pipeline for green-field products. This page covers the architecture — the four roles, the pipeline flow, and the design decisions. For a step-by-step walkthrough, see the [how-to guide](/guides/autonomous-build).
+`/mk:autobuild` is the autonomous build pipeline for green-field products. This page covers **that pipeline's** architecture — the four roles, the flow, and the design decisions. For the always-on harness that underlies every session (rules, hooks, skills, gates, memory, and the wiki knowledge layer), see [How MeowKit Works](/core-concepts/how-it-works). For a step-by-step walkthrough, see the [how-to guide](/guides/autonomous-build).
 
 ## Why this exists
 

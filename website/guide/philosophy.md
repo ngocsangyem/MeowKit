@@ -18,7 +18,7 @@ MeowKit applies the **harness²** concept: Claude Code is already a harness (con
 
 > *"The model is what thinks. The harness is what it thinks about. Getting that distinction right is the entire game."*
 
-For the full architectural breakdown, see [Understanding the Harness](/guide/understanding-the-harness).
+For the full architectural breakdown, see [How MeowKit Works](/core-concepts/how-it-works).
 
 ## Nine Principles
 
@@ -104,7 +104,7 @@ The same principle applies to the hook system: `handlers.json` routes events to 
 
 ## See Also
 
-- [Understanding the Harness](/guide/understanding-the-harness) — the "how" (layers, pillars, lifecycle)
+- [How MeowKit Works](/core-concepts/how-it-works) — the "how" (layers, lifecycle, mechanisms)
 - [Harness Architecture](/guide/harness-architecture) — the `/mk:autobuild` autonomous pipeline
 - [Adaptive Density](/guide/adaptive-density) — scaffolding by model capability
 - [Workflow Phases](/guide/workflow-phases) — the 7-phase pipeline in detail

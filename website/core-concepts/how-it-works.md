@@ -5,7 +5,7 @@ description: The three mechanisms that enforce discipline — rules, hooks, and 
 
 # How MeowKit Works
 
-MeowKit shapes AI behavior through three mechanisms. None of them are an executable runtime — they're conventions that Claude Code reads and acts on.
+MeowKit is a **harness²**: Claude Code is already a harness (tools, context, subagents); MeowKit adds a second harness layer on top — workflows, gates, memory, and hook-based automation. It shapes AI behavior through three mechanisms. None of them are an executable runtime — they're conventions that Claude Code reads and acts on.
 
 ## The three mechanisms
 
@@ -14,6 +14,20 @@ MeowKit shapes AI behavior through three mechanisms. None of them are an executa
 | **Rules** | Behavioral instructions loaded every session | "Never write code before a plan is approved" (`gate-rules.md`) |
 | **Hooks** | Preventive scripts that block unsafe actions | Shell hook blocks file writes until Gate 1 passes |
 | **Skills** | Domain expertise loaded on demand | `mk:fix` loads bug-fixing patterns only when you report a bug |
+
+## The seven-layer taxonomy
+
+The harness isolates different kinds of reasoning into discrete layers, so no single layer becomes an overloaded assistant. Each layer owns one concern and hands off to the next:
+
+| Layer | Owner | What it does |
+|-------|-------|-------------|
+| L1: Builder | Human | Approve plans (Gate 1), approve reviews (Gate 2) |
+| L2: Planner | `mk:plan-creator` | Decompose requests into product-level specs — user stories, not file names |
+| L3: Cook | `/mk:cook` workflow | 7-phase pipeline: Orient → Plan → Test → Build → Review → Ship → Reflect |
+| L4: Native Tasks | `dispatch.cjs` + handlers | Build-verify, budget tracking, checkpoints, immediate capture |
+| L5: Teams | `/mk:scout`, `/mk:party` | Parallel agents with worktree isolation and a context firewall |
+| L6: Skills | 120+ skills | JIT activation — loaded only when the task domain matches |
+| L7: Base Shell | Claude Code | Context compaction, tool validation, subagent models |
 
 ## Rules: behavioral guardrails
 
@@ -34,9 +48,22 @@ Critical design: security hooks (`gate-enforcement.sh`, `privacy-block.sh`) are 
 
 Under the hooks, a Node.js dispatch system (`dispatch.cjs` + `handlers.json`) runs infrastructure handlers: model detection, budget tracking, build verification, loop detection, and checkpoint management. These fire automatically — agents don't invoke them.
 
+### Session lifecycle
+
+Hook events fire at key moments, each dispatching to specific handlers:
+
+```
+SessionStart    → model-detector (tier → density) · orientation-ritual (resume from checkpoint) · project-context-loader
+UserPromptSubmit → immediate-capture-handler (captures ##prefix messages)
+PostToolUse     → build-verify (compile/lint, hash-cached) · loop-detection (warn@4 edits, escalate@8) · budget-tracker (warn $30, block $100) · auto-checkpoint (every 20 calls)
+Stop            → pre-completion-check (block without verification evidence) · checkpoint-writer · post-session (capture patterns to memory)
+```
+
+**Crash recovery:** `auto-checkpoint` saves every 20 calls. If a session crashes before `Stop`, the next session's `orientation-ritual` resumes from the last checkpoint.
+
 ## Skills: domain expertise on demand
 
-77 skills in `.claude/skills/` provide domain-specific knowledge. Each skill's `SKILL.md` is a compact decision router — typically under 150 lines. Detailed procedures live in `references/` and load only when needed. This progressive disclosure saves ~70% context per invocation.
+120+ skills in `.claude/skills/` provide domain-specific knowledge. Each skill's `SKILL.md` is a compact decision router — typically under 150 lines. Detailed procedures live in `references/` and load only when needed. This progressive disclosure saves ~70% context per invocation.
 
 Skills activate by task domain, not all at once. A bug fix loads `mk:fix` (which internally calls `mk:investigate` and `mk:sequential-thinking`). A code review loads `mk:review`. A deployment loads `mk:ship`. No agent loads everything.
 
@@ -81,6 +108,19 @@ MeowKit stores engineering learnings in `.claude/memory/` — fix patterns, revi
 There is no auto-injection pipeline. Each skill loads only the topic files relevant to its domain.
 
 Write paths: immediate capture via `##pattern:` / `##decision:` / `##note:` prefixes during a session, session-end auto-capture via `post-session.sh`, and Phase 6 `mk:memory session-capture`.
+
+### Wiki: gated long-term knowledge
+
+Curated memory above is short-lived, schema-validated JSON for engineering learnings. For long-term, provenance-bearing project knowledge there is a separate layer — the **`mewkit wiki`** subsystem (`mk:wiki` / `mk:wiki-research` / `mk:wiki-render`). Canonical pages live under `tasks/wikis/<slug>/`; a derived, rebuildable FTS index lives in `.claude/memory/wiki-index.db`.
+
+Its defining property is an **anti-self-poisoning write model**: external content and agent output are DATA, so an agent may only *propose* a `WikiCandidate`. A canonical page is written **only** through a human `mewkit wiki approve`, which always re-runs the secret-scrub + multi-pass injection scanner — there is no path from assistant output to a canonical page. This mirrors the same security stance the hooks enforce elsewhere: untrusted input never becomes a trusted instruction.
+
+| | Curated memory (`fixes`, `review-patterns`, …) | Wiki (`mewkit wiki`) |
+|---|---|---|
+| Lifetime | Short-term engineering learnings | Long-term project knowledge |
+| Store | Schema-validated JSON in `.claude/memory/` | Canonical files in `tasks/wikis/<slug>/` + derived FTS index |
+| Write path | Agent/hook capture by prefix | Agent proposes; **human approves** (re-scans) |
+| Read | Skill loads its topic file at task start | `mewkit wiki search` / `hint` (FTS, provenance-bearing) |
 
 ## Putting it together: a feature request
 

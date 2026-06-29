@@ -34,7 +34,7 @@ Parsed from the user message at Stage 0.
 | `Min-Delta` | derived from Noise | Minimum improvement to count as progress |
 | `Stop-At` | none | Target value; crossing it ends the loop early |
 
-**Why Iterations defaults to 10 (not 25):** MeowKit favors bounded autonomy with a human
+**Why Iterations defaults to 10 (not 25):** The toolkit favors bounded autonomy with a human
 re-gate. A low cap reaches Gate B sooner so the user re-confirms intent before more spend;
 the user can approve more at the gate. Larger upstream defaults assume unattended runs,
 which the boundary-gated model deliberately rejects.

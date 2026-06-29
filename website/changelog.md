@@ -14,6 +14,34 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.13.0 (2026-06-29) — The Wiki Knowledge Subsystem
+
+### Highlights
+
+MeowKit gains a gated, long-term knowledge base. Agents and reviewers can capture provenance-bearing project knowledge, search it with full-text search, and render it to a self-contained HTML page — under a security model where agents may only *propose* content and a human approval (which always re-scans) is the only path to a canonical page.
+
+### New Skills
+
+| Skill              | Purpose                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| `mk:wiki`          | Capture, gate, query (FTS), and list long-term project knowledge via `mewkit wiki`.         |
+| `mk:wiki-research` | Fetch external web / arXiv / GitHub sources into scanner-gated candidates (network opt-in). |
+| `mk:wiki-render`   | Render a wiki into one self-contained, offline HTML snapshot with provenance.               |
+
+### CLI
+
+- New `mewkit wiki` command — `init · propose · approve · reject · search · hint · list · render · reindex · enqueue · research`.
+- The derived SQLite index is consolidated into a single rebuildable `wiki-index.db` (trace + cost + wiki tables + FTS5); `mewkit index` and `mewkit query` are preserved.
+
+### Features
+
+- Anti-self-poisoning write model — agents propose candidates only; canonical pages are written solely through `mewkit wiki approve`, which always re-runs the scanner.
+- Every write passes secret-scrub plus a multi-pass injection scan; rejected content is quarantined with an intervention and a trace event.
+
+### Beta
+
+- `mk:wiki-research` external fetch is opt-in and disabled by default — sources are url-guarded against SSRF, size-capped, and redirect-re-validated per hop, and fetched content can only ever become a candidate.
+
 ## 2.12.3 (2026-06-28) — Visual + HTML Workflow
 
 ### Highlights

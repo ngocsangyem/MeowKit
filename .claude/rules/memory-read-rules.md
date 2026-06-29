@@ -1,6 +1,6 @@
 # Memory Read Rules — JSON-First Source of Truth
 
-These rules govern how every consumer (skill, agent, command) reads MeowKit's
+These rules govern how every consumer (skill, agent, command) reads the toolkit's
 curated memory stores. They apply in ALL modes and phases.
 
 ## Rule 1: JSON Is Canonical for Curated Stores

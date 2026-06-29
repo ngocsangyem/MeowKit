@@ -95,7 +95,7 @@ The `evaluator` is the behavioral counterpart to the structural `reviewer`. It g
 :::
 
 ::: tip Hook dispatch layer (added v2.3.0)
-Below the agent/skill layer, MeowKit runs a **Node.js hook dispatch system** (`dispatch.cjs` + `handlers.json`) that handles infrastructure concerns: model detection, budget tracking, build verification, loop detection, memory filtering, and checkpoint/resume. These handlers fire automatically on lifecycle events — agents don't invoke them. See [Understanding MeowKit's Harness](/guide/understanding-the-harness) and [Middleware Layer](/guide/middleware-layer).
+Below the agent/skill layer, MeowKit runs a **Node.js hook dispatch system** (`dispatch.cjs` + `handlers.json`) that handles infrastructure concerns: model detection, budget tracking, build verification, loop detection, memory filtering, and checkpoint/resume. These handlers fire automatically on lifecycle events — agents don't invoke them. See [How MeowKit Works](/core-concepts/how-it-works) and [Middleware Layer](/guide/middleware-layer).
 :::
 
 ## Skill Activation by Phase

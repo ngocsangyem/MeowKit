@@ -175,11 +175,11 @@ carries a top-level `"type": "audit"` discriminator. Override the output dir wit
 (null in single-repo mode), `working_tree_clean`. A best-effort `audit_result` trace event
 is appended via `append-trace.sh`.
 
-**Index-hash definition (meowkit canonical):** `tracked_index_sha256 = sha256(sort(git
+**Index-hash definition (toolkit canonical):** `tracked_index_sha256 = sha256(sort(git
 ls-files -s))`. The `-s` flag includes mode + blob hash + stage, so the index hash captures
 tracked CONTENT, not just paths; `tracked_path_sha256 = sha256(sort(git ls-files))` captures
 paths only. The source method did not specify an index-hash command — this definition is
-meowkit's, documented here and in the script header so future comparisons are reproducible.
+the toolkit's, documented here and in the script header so future comparisons are reproducible.
 
 ## Gotchas
 

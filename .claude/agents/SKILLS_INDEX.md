@@ -1,6 +1,6 @@
 # the toolkit Skills Index
 
-Centralized registry of all skills. Updated: 2026-03-30 (v1.1.0).
+Centralized registry of all skills. Updated: 2026-06-29 (v2.13.0).
 
 ## By Phase
 
@@ -195,6 +195,15 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:showcase`|developer|utility|script-backed (self-contained HTML generator; optional Puppeteer screenshots --no-screenshots; publish fail-closed; state in CLAUDE_PLUGIN_DATA/showcase/)
 ```
 
+### Knowledge / Wiki (Any Phase)
+
+```toon
+[3]{skill,owner,type,architecture}
+`mk:wiki`|any agent|knowledge|monolithic (gated long-term knowledge subsystem over `mewkit wiki`; init/propose/approve/reject/search/hint/list/reindex. Agents PROPOSE candidates only; canonical pages are written via human `approve`, which always re-runs the scanner.)
+`mk:wiki-research`|any agent|knowledge|monolithic (gated external fetch → candidate; web/arXiv/GitHub fetched as DATA, url-guarded + size-capped + redirect-re-validated; produces candidates only.)
+`mk:wiki-render`|any agent|knowledge|monolithic (self-contained, no-CDN HTML snapshot of a wiki.)
+```
+
 ### Cross-Cutting (Any Phase)
 
 ```toon
@@ -218,7 +227,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ## Summary
 
 ```toon
-[14]{category,count}
+[15]{category,count}
 Planning|6
 Testing|7
 Development|31
@@ -232,7 +241,8 @@ Cross-Cutting|8
 Diagram|2
 HTML/Browser-Packaging|2
 External-Service-Design|1
-**Total**|**119**
+Knowledge/Wiki|3
+**Total**|**122**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

@@ -156,6 +156,29 @@ When you change the index/wiki schema — a new table, a new column, a new FTS s
 
 Every file above lives under `packages/mewkit/src/`, so a schema change ALWAYS triggers a CLI version bump (step 3) and an npm publish (step 10).
 
+#### 1g. No product-brand leakage in shipped content
+
+`npx mewkit init` copies `.claude/` + `tasks/` + `CLAUDE.md` into the USER's project, where every loaded skill / agent / rule / command competes for the user's context window. Shipped content MUST NOT refer to the product by name as a self-referential subject — write **"the toolkit"**, **"the harness"**, or **"this workflow"** instead of "MeowKit" / "meowkit".
+
+**Allowed (functional — keep):**
+
+- The `mewkit` CLI binary — `npx mewkit ...`, `mewkit validate`, `mewkit wiki`, etc. (it's the installed command, not brand prose).
+- `MEOWKIT_*` environment variables (e.g. `MEOWKIT_TDD`, `MEOWKIT_AUTOBUILD_MODE`).
+- The `ngocsangyem/MeowKit` repo URL inside plugin-install commands.
+- Attribution / provenance metadata (e.g. `SKILLS_ATTRIBUTION.md`, skill `attribution:` frontmatter) — legitimate credit.
+- Real path / string literals the code depends on (`~/.meowkit/...`, `"meowkit-default"`, `meowkit:` frontmatter keys).
+
+**Scope:** this rule applies ONLY to shipped surfaces — `.claude/`, `tasks/`, and the shipped `CLAUDE.md`. The source repo's `website/`, `packages/`, `docs/`, and `README` are the product's own surfaces and SHOULD use the brand.
+
+**Check before release.** Scope the grep to the context-loaded prose surfaces (skill / agent / command / rule `.md`) and exclude the functional refs above — expect **zero** hits:
+
+```bash
+grep -rinE 'meowkit' .claude/skills .claude/agents .claude/commands .claude/rules --include='*.md' \
+  | grep -vE 'MEOWKIT_|ngocsangyem/MeowKit|attribution|MeowKit-native|meowkit_tier|author: meowkit|~/\.meowkit|meowkit-default|:meowkit:'
+```
+
+A broader `grep -ri meowkit .claude tasks` also surfaces functional hits — config identity (`metadata.json` `"name": "meowkit"`), filenames (`gitignore.meowkit`), hook log prefixes (`[meowkit]`), generated views (`harness-substrate.md`), and the kit's own `memory/` dev log. Those are expected; only **new prose** that names the product as a subject needs neutralizing.
+
 ### 2. Update CHANGELOG (`website/changelog.md`)
 
 > **Note:** The ONLY changelog file you edit is `website/changelog.md` — the VitePress source that renders to https://docs.meowkit.dev/changelog. Root `CHANGELOG.md` is a permanent stub that just refers readers to that published page; never add release notes to it.
@@ -394,6 +417,7 @@ Copy this checklist for each release:
 
 - [ ] Updated affected guide/reference pages (step 1a)
 - [ ] If a new agent or skill landed: updated routing surfaces (step 1b — `SKILLS_INDEX.md`, `AGENTS_INDEX.md`, `agent-routing.md`, `lifecycle-routing.md`, sidebar config, reference page)
+- [ ] No product-brand leakage in shipped `.claude/` / `tasks/` (step 1g — brand grep shows only functional/attribution hits)
 - [ ] VitePress build passes (`npx vitepress build`)
 
 ### Changelog
@@ -489,6 +513,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.13.0 | 2026-06-29 | The Wiki Knowledge Subsystem                     |
 | v2.12.3 | 2026-06-28 | Visual + HTML Workflow                           |
 | v2.12.2 | 2026-06-28 | Visual Plan Rendering                            |
 | v2.12.1 | 2026-06-27 | Native Plugin Distribution                       |

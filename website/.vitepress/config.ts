@@ -130,7 +130,7 @@ export default withMermaid(defineConfig({
         {
           text: 'Core Concepts',
           items: [
-            { text: 'Understanding the MeowKit\'s Harness', link: '/guide/understanding-the-harness' },
+            { text: 'How MeowKit Works', link: '/core-concepts/how-it-works' },
             { text: 'Philosophy', link: '/guide/philosophy' },
             { text: 'Workflow Phases (0-6)', link: '/guide/workflow-phases' },
             { text: 'Plan Creator Modes and Flags', link: '/core-concepts/plan-creator-modes-and-flags' },
@@ -139,7 +139,7 @@ export default withMermaid(defineConfig({
             { text: 'Session State vs --resume', link: '/guide/session-state-vs-resume' },
             { text: 'Agent-Skill Architecture', link: '/guide/agent-skill-architecture' },
             { text: 'Task System', link: '/guide/task-system' },
-            { text: 'Harness Architecture', link: '/guide/harness-architecture' },
+            { text: 'Autobuild Architecture', link: '/guide/harness-architecture' },
             { text: 'Adaptive Density', link: '/guide/adaptive-density' },
             { text: 'Rubric Library', link: '/guide/rubric-library' },
             { text: 'Middleware Layer', link: '/guide/middleware-layer' },
@@ -411,6 +411,15 @@ export default withMermaid(defineConfig({
             { text: 'mk:docs-init', link: '/reference/skills/docs-init' },
             { text: 'mk:document-release', link: '/reference/skills/document-release' },
             { text: 'mk:retro', link: '/reference/skills/retro' },
+          ],
+        },
+        {
+          text: 'Knowledge & Wiki',
+          collapsed: true,
+          items: [
+            { text: 'mk:wiki', link: '/reference/skills/wiki' },
+            { text: 'mk:wiki-research', link: '/reference/skills/wiki-research' },
+            { text: 'mk:wiki-render', link: '/reference/skills/wiki-render' },
           ],
         },
         {

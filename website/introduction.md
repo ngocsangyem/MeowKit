@@ -65,6 +65,6 @@ docs/
 
 ## Next steps
 
-- [How It Works](/guide/understanding-the-harness) — the philosophy behind enforced discipline
+- [How It Works](/core-concepts/how-it-works) — the philosophy behind enforced discipline
 - [Installation](/installation) — get MeowKit running in 2 minutes
 - [Quick Start](/quick-start) — your first task with MeowKit in 5 minutes
