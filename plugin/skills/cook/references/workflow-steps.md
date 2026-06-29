@@ -322,6 +322,16 @@ Three mandatory subagents in parallel:
 
 4. `TaskUpdate` → mark all session tasks complete after sync-back
 
+5. **Terminal wiki handoff (advisory, fail-open):** after sync-back, docs, and memory writes complete, optionally hand the implemented plan off to the wiki per `.claude/skills/wiki/references/terminal-handoff-advisory.md`. Use the status report at `{plan-dir}/status-reports/<YYMMDD>-status.md` if present, else the synced `plan.md`. Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip + print the command). Advisory only — never blocks, never approves; do not add `wiki reindex`:
+
+   ```bash
+   npx mewkit wiki handoff propose \
+     --skill mk:cook \
+     --from {plan-dir}/plan.md \
+     --slug <resolved-wiki-slug> \
+     --verified-outcome
+   ```
+
 ### Per-Phase Checkpoint (MANDATORY — fires after EACH completed plan phase, before the next-phase transition)
 
 On a long multi-phase or auto-mode run, the external-memory write after each completed plan phase is the single most load-bearing action for resumability: it is what lets a fresh session (after a context reset) know which phases are done and resume the correct one. This write is REQUIRED, not advisory.
@@ -338,7 +348,7 @@ Idempotent: re-running this checkpoint on an unchanged phase produces zero diff 
 **Auto mode:** After Reflect, check if more plan phases remain → loop to Phase 2 for next phase.
 **Others:** Ask user before continuing to next phase.
 
-**Output:** `Phase 6: Reflect — sync-back done, docs [impact], memory updated`
+**Output:** `Phase 6: Reflect — sync-back done, docs [impact], memory updated, wiki handoff [proposed|skipped]`
 
 ## Workflow Evidence Index (traceability — no new gate)
 

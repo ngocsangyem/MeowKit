@@ -202,6 +202,15 @@ On completion:
 - Include a `Brainstorm Handoff Packet` using `assets/output-action-plan.md`
 - If `--depth deep`, ask before invoking or recommending `mk:plan-creator`
 - `plan-creator` receives report path + handoff packet as pre-research input; it still owns requirements completeness, phase files, and plan approval
+- **Terminal wiki handoff (advisory, fail-open):** after the markdown report is written, optionally hand it to the wiki per `.claude/skills/wiki/references/terminal-handoff-advisory.md`. Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip + print the command). Advisory only — never blocks, never approves; do not add `wiki reindex`:
+
+  ```bash
+  npx mewkit wiki handoff propose \
+    --skill mk:brainstorming \
+    --from plans/reports/brainstorm-<date>-<slug>.md \
+    --slug <resolved-wiki-slug> \
+    --explicit-intent
+  ```
 
 ## HTML Output
 

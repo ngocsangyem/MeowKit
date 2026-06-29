@@ -138,6 +138,27 @@ Then self-check the bundle: run `npx mewkit verdict-gate <slug>`. It exits 0 on
 verdict remains the authoritative human narrative; the JSON is the machine gate
 input. The bundle stays under `tasks/` and is never injected into model context.
 
+## Terminal Wiki Handoff (advisory, fail-open)
+
+After the verdict markdown is written to `tasks/reviews/<slug>-verdict.md`, optionally hand
+it to the wiki per the shared contract in
+`.claude/skills/wiki/references/terminal-handoff-advisory.md`. Only worth recall when the
+verdict carries a WARN or FAIL pattern, a security finding, or an accepted policy decision —
+**skip a routine clean PASS** (the salience gate would discard it anyway). Advisory only:
+never blocks, never approves.
+
+Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip + print):
+
+```bash
+npx mewkit wiki handoff propose \
+  --skill mk:review \
+  --from tasks/reviews/<slug>-verdict.md \
+  --slug <resolved-wiki-slug> \
+  --verified-outcome
+```
+
+Do NOT run `wiki approve`. Do NOT add `wiki reindex` to this step.
+
 ## After Verdict
 
 - **PASS/WARN:** Present to human for Gate 2 approval

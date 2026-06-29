@@ -187,6 +187,18 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 5. Ask user about commit.
 
+6. **Terminal wiki handoff (standalone runs only; advisory, fail-open):** Inside `/mk:cook`, SKIP — cook's Phase 6 owns the handoff. For a standalone `/mk:fix` of Standard/Complex/Parallel complexity, first write a short, durable fix summary (NEVER raw `workflow-evidence.json`) to `tasks/reports/fix-<YYMMDD-HHMM>-<slug>.md` with only: symptom, root cause, files changed, verification result, recurrence/friction note, and links to the evidence path. Then hand it to the wiki per `.claude/skills/wiki/references/terminal-handoff-advisory.md` — resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip + print), fail-open, never `wiki approve`, no `wiki reindex`:
+
+   ```bash
+   npx mewkit wiki handoff propose \
+     --skill mk:fix \
+     --from tasks/reports/fix-<YYMMDD-HHMM>-<slug>.md \
+     --slug <resolved-wiki-slug> \
+     --verified-outcome --recurring-friction
+   ```
+
+   Omit `--recurring-friction` for a one-off bug. Skip entirely for Simple complexity or when `--no-capture` was passed.
+
 ## Workflow Evidence Index
 
 Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; `--quick` writes the compact form; Simple fixes may skip it.

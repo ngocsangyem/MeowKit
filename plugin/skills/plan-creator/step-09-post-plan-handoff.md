@@ -103,6 +103,26 @@ If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely o
 
 After the command line, print the Context Reminder block from `references/gate-1-approval.md` with the absolute path substituted.
 
+### 9f-bis. Terminal Wiki Handoff (advisory, fail-open)
+
+The plan was just approved, so `plan.md` is a durable, user-chosen artifact. Per the
+shared contract in `.claude/skills/wiki/references/terminal-handoff-advisory.md`, hand it
+to the wiki AFTER the command line is printed and BEFORE the STOP. This adds no gate and
+no prompt; a failure is advisory only.
+
+Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip):
+
+```bash
+npx mewkit wiki handoff propose \
+  --skill mk:plan-creator \
+  --from {plan_dir}/plan.md \
+  --slug <resolved-wiki-slug> \
+  --explicit-intent
+```
+
+If no unique slug resolves, print the command above with a literal `--slug <slug>` for the
+user and continue. Do NOT run `wiki approve`. Do NOT add `wiki reindex` to this step.
+
 ### 9g. Stop
 
 **STOP. Do NOT auto-invoke the next command.** The user must type the suggested command themselves so a fresh session can pick up cleanly without planning-context carryover.
@@ -112,6 +132,7 @@ After the command line, print the Context Reminder block from `references/gate-1
 - `plan.md` frontmatter contains `handoff: { next, decided_at }`.
 - Suggested command printed.
 - Context Reminder block printed.
+- Terminal wiki handoff attempted (advisory, fail-open) per 9f-bis.
 - Session STOPs.
 
 ## Next
