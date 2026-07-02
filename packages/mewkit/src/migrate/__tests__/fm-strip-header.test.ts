@@ -1,6 +1,6 @@
 // Header substitution tests for buildMergedAgentsMd.
-// Verifies the merged-agents header no longer leaks "MeowKit" brand prose while
-// keeping the `mewkit migrate` CLI identifier verbatim and the target name correct.
+// Generated files must be brand-free: no "MeowKit" prose and no provenance
+// attribution line — only the neutral title and target name remain.
 import { describe, expect, it } from "vitest";
 import { buildMergedAgentsMd } from "../converters/fm-strip.js";
 
@@ -27,14 +27,14 @@ describe("buildMergedAgentsMd — header brand neutralization", () => {
 		expect(out).not.toContain("MeowKit");
 	});
 
-	it("keeps the 'mewkit migrate' CLI identifier verbatim in the header", () => {
+	it("does not emit any toolkit identifier in the header", () => {
 		const out = buildMergedAgentsMd(sections, "Codex");
-		expect(out).toContain("mewkit migrate");
+		expect(out).not.toMatch(/mewkit|meowkit/i);
 	});
 
-	it("includes the neutralized attribution phrase", () => {
+	it("does not inject a provenance attribution line", () => {
 		const out = buildMergedAgentsMd(sections, "Codex");
-		expect(out).toContain("> Ported from the toolkit via mewkit migrate");
+		expect(out).not.toContain("Ported from");
 	});
 
 	it("preserves the section join order", () => {

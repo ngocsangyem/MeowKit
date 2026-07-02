@@ -5,6 +5,11 @@ import { existsSync } from "node:fs";
 import { cp, mkdir, readdir, readFile, realpath, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { stripClaudeRefs } from "./converters/index.js";
+import {
+	combineIntegrityIndexes,
+	createReferenceIntegrityIndex,
+	type ReferenceIntegrityIndex,
+} from "./references/fence-aware-reference-rewriter.js";
 import { providers } from "./provider-registry.js";
 import { getPortableInstallPath } from "./provider-registry-utils.js";
 import { sanitizeSkillName } from "./discovery/skills-discovery.js";
@@ -40,24 +45,34 @@ async function canonicalize(path: string): Promise<string> {
 	}
 }
 
-async function rewriteMarkdownFilesForProvider(rootDir: string, provider: ProviderType): Promise<void> {
+async function rewriteMarkdownFilesForProvider(
+	rootDir: string,
+	provider: ProviderType,
+	migratedRefs: ReferenceIntegrityIndex | null | undefined,
+	occurrencesByFile: Map<string, import("./references/reference-types.js").ReferenceOccurrence[]>,
+	baseDir: string = rootDir,
+): Promise<void> {
 	const entries = await readdir(rootDir, { withFileTypes: true });
 
 	for (const entry of entries) {
 		const fullPath = join(rootDir, entry.name);
 		if (entry.isDirectory()) {
-			await rewriteMarkdownFilesForProvider(fullPath, provider);
+			await rewriteMarkdownFilesForProvider(fullPath, provider, migratedRefs, occurrencesByFile, baseDir);
 			continue;
 		}
 		if (!entry.isFile() || !entry.name.toLowerCase().endsWith(".md")) continue;
 
 		const original = await readFile(fullPath, "utf-8");
-		const rewritten = stripClaudeRefs(original, {
+		const stripped = stripClaudeRefs(original, {
 			provider,
 			targetName: providers[provider].displayName,
-		}).content;
-		if (rewritten !== original) {
-			await writeFile(fullPath, rewritten, "utf-8");
+			file: entry.name,
+			migratedRefs,
+		});
+		const relPath = fullPath.slice(baseDir.length + 1).replace(/\\/g, "/");
+		occurrencesByFile.set(relPath, stripped.occurrences);
+		if (stripped.content !== original) {
+			await writeFile(fullPath, stripped.content, "utf-8");
 		}
 	}
 }
@@ -70,7 +85,11 @@ async function rewriteMarkdownFilesForProvider(rootDir: string, provider: Provid
 export async function installSkillDirectory(
 	skill: SkillInfo,
 	provider: ProviderType,
-	options: { global: boolean; installedBackRef?: InstalledBackRef | null },
+	options: {
+		global: boolean;
+		installedBackRef?: InstalledBackRef | null;
+		migratedRefs?: ReferenceIntegrityIndex | null;
+	},
 ): Promise<SkillInstallResult> {
 	const providerConfig = providers[provider];
 	if (!providerConfig?.skills) {
@@ -111,8 +130,17 @@ export async function installSkillDirectory(
 		try {
 			await cp(skill.sourcePath, targetDir, { recursive: true, force: true, errorOnExist: false });
 			copied = true;
-			await rewriteMarkdownFilesForProvider(targetDir, provider);
-			const audit = await auditSkillDirectory(targetDir, provider, skill.name);
+			// The skill being installed is definitionally part of the migration set,
+			// so its own fenced self-references always pass the integrity check.
+			const selfIndex = createReferenceIntegrityIndex([`.claude/skills/${skill.dirName}/`]);
+			const occurrencesByFile = new Map<string, import("./references/reference-types.js").ReferenceOccurrence[]>();
+			await rewriteMarkdownFilesForProvider(
+				targetDir,
+				provider,
+				combineIntegrityIndexes(selfIndex, options.migratedRefs),
+				occurrencesByFile,
+			);
+			const audit = await auditSkillDirectory(targetDir, provider, skill.name, { occurrencesByFile });
 			if (audit.errors.length > 0) {
 				throw new Error(`Skill runtime compatibility audit failed: ${audit.errors.map((e) => e.message).join("; ")}`);
 			}

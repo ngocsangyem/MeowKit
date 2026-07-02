@@ -2,7 +2,7 @@
 
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { applyMewkitOverrides } from "./provider-overrides.js";
@@ -32,6 +32,13 @@ import {
 	type ReconcileAction,
 } from "./reconcile/index.js";
 import { convertItem } from "./converters/index.js";
+import { buildConversionReport } from "./validation/migrate-conversion-report.js";
+import { convertMcpJsonToCodexToml } from "./converters/mcp-json-to-codex-toml.js";
+import { installCodexMcpServers } from "./hooks/codex-mcp-installer.js";
+import {
+	createReferenceIntegrityIndex,
+	type ReferenceIntegrityIndex,
+} from "./references/fence-aware-reference-rewriter.js";
 import { codexBulkActionShim, providerKey, skillActionShim } from "./migrate-action-shims.js";
 import { executeDeleteAction, executeInstallAction } from "./portable-installer.js";
 import { installSkillDirectory } from "./skill-directory-installer.js";
@@ -125,7 +132,7 @@ async function runMigrateUnderLock(
 	});
 
 	const itemsByT = itemsByType(discovered);
-	const portabilityFiltered = filterPlanForPortability(plan, itemsByT);
+	const portabilityFiltered = filterPlanForPortability(plan, itemsByT, { allRules: options.allRules });
 	const portableSkills = await buildPortableSkillsByProvider(discovered.skills, targets);
 	const ruleSummaries = summarizeRuleMigrationByProvider(discovered.rules, targets);
 	const skillDryRunMessages = buildSkillDryRunMessages(portableSkills.skillsByProvider, targets);
@@ -142,6 +149,17 @@ async function runMigrateUnderLock(
 		}
 	}
 
+	const mcpSourcePath = join(process.cwd(), ".mcp.json");
+	const mcpApplicable = targets.includes("codex") && existsSync(mcpSourcePath);
+	const mcpBanners: string[] = [];
+	if (mcpApplicable) {
+		mcpBanners.push(
+			options.includeMcp
+				? ".mcp.json will be merged into .codex/config.toml [mcp_servers] (--include-mcp)"
+				: ".mcp.json detected but not migrated — opt in with --include-mcp",
+		);
+	}
+
 	const collisions = detectProviderPathCollisions(targets, { global: isGlobal });
 	const collisionBanners = collisions.map(
 		(c) =>
@@ -156,6 +174,17 @@ async function runMigrateUnderLock(
 			? [`Portable manifest ${manifest.mewkitVersion}: ${manifestCleanupCount} cleanup action(s) planned`]
 			: [];
 
+	const migratedRefs = buildMigratedRefsIndex(discovered);
+
+	// In-memory conversion pass: classifier decisions, budget projections, and
+	// the unresolved-reference invariant check all land in the preflight report.
+	const conversionReport = buildConversionReport({
+		actions: portabilityFiltered.plan.actions,
+		itemsByType: itemsByT,
+		skillsByProvider: portableSkills.skillsByProvider,
+		migratedRefs,
+	});
+
 	printPreflight(portabilityFiltered.plan, {
 		source: { root: discovered.source.root, origin: discovered.source.origin },
 		skippedShellHooks: discovered.skippedShellHooks.length,
@@ -163,25 +192,32 @@ async function runMigrateUnderLock(
 			...collisionBanners,
 			...modelRoutingBanners,
 			...manifestBanners,
+			...mcpBanners,
 			...portabilityFiltered.skipMessages,
 			...portableSkills.skipMessages,
 			...providerDiagnosticMessages,
 			...ruleSummaries.flatMap((summary) => summary.messages),
 			...skillDryRunMessages,
 		],
+		conversionReport,
 	});
 
 	if (options.dryRun) {
 		printActionDetails(portabilityFiltered.plan.actions);
 		console.log();
 		console.log(pc.dim("(dry run — no files written)"));
-		return 0;
+		return conversionReport.validationErrors.length > 0 ? 1 : 0;
+	}
+
+	if (conversionReport.validationErrors.length > 0) {
+		console.error(pc.red("Aborting before install: the reference rewriter left unexplained source references (see above)."));
+		return 1;
 	}
 
 	// Compute diffs lazily for conflicting actions so the "Show diff" prompt has data.
 	for (const action of portabilityFiltered.plan.actions) {
 		if (action.action !== "conflict") continue;
-		await attachConflictDiff(action, itemsByT);
+		await attachConflictDiff(action, itemsByT, migratedRefs);
 
 		const policy = options.force ? "overwrite" : "keep";
 		const resolution = await resolveConflict(action, {
@@ -208,7 +244,7 @@ async function runMigrateUnderLock(
 
 	const results = await executePlan(
 		portabilityFiltered.plan.actions,
-		{ allItems: itemsByT, installedBackRef },
+		{ allItems: itemsByT, installedBackRef, migratedRefs },
 		portableSkills.skillsByProvider,
 		targets,
 		isGlobal,
@@ -216,12 +252,40 @@ async function runMigrateUnderLock(
 		join(discovered.source.root, "settings.json"),
 	);
 
+	let mcpFailed = false;
+	if (mcpApplicable && options.includeMcp) {
+		mcpFailed = !(await migrateMcpServers(mcpSourcePath, isGlobal));
+	}
+
 	printFinalSummary(results);
 	const hasFailures = results.some((r) => !r.success);
 	if (!hasFailures && manifest) {
 		await updateAppliedManifestVersion(manifest.mewkitVersion);
 	}
-	return hasFailures ? 1 : 0;
+	return hasFailures || mcpFailed ? 1 : 0;
+}
+
+/** Opt-in .mcp.json → config.toml [mcp_servers] migration for the Codex target. */
+async function migrateMcpServers(mcpSourcePath: string, isGlobal: boolean): Promise<boolean> {
+	try {
+		const raw = await readFile(mcpSourcePath, "utf-8");
+		const converted = convertMcpJsonToCodexToml(raw);
+		for (const warning of converted.warnings) {
+			console.log(pc.yellow(`[!] ${warning}`));
+		}
+		if (!converted.content) return true;
+
+		const result = await installCodexMcpServers(converted.content, { global: isGlobal });
+		if (!result.success) {
+			console.error(pc.red(`[x] MCP server merge failed: ${result.error}`));
+			return false;
+		}
+		console.log(pc.green(`[+] Merged ${converted.serverNames.length} MCP server(s) into ${result.configPath}`));
+		return true;
+	} catch (err) {
+		console.error(pc.red(`[x] MCP migration failed: ${err instanceof Error ? err.message : String(err)}`));
+		return false;
+	}
 }
 
 async function confirmExecution(count: number): Promise<boolean> {
@@ -233,9 +297,31 @@ async function confirmExecution(count: number): Promise<boolean> {
 	return choice === true;
 }
 
+/**
+ * Build the migration-set membership index used by the fenced-reference
+ * integrity check: source-relative reference forms of every discovered item.
+ */
+function buildMigratedRefsIndex(discovered: Awaited<ReturnType<typeof discoverAll>>): ReferenceIntegrityIndex {
+	const entries: string[] = [];
+	const root = discovered.source.root;
+	for (const item of [...discovered.agents, ...discovered.commands, ...discovered.rules, ...discovered.hooks]) {
+		const rel = relative(root, item.sourcePath).replace(/\\/g, "/");
+		if (!rel.startsWith("..")) entries.push(`.claude/${rel}`);
+	}
+	if (discovered.config) entries.push("CLAUDE.md");
+	for (const skill of discovered.skills) {
+		entries.push(`.claude/skills/${skill.dirName}/`);
+	}
+	return createReferenceIntegrityIndex(entries);
+}
+
 async function executePlan(
 	actions: ReconcileAction[],
-	ctx: { allItems: Record<PortableType, PortableItem[]>; installedBackRef?: InstalledBackRef | null },
+	ctx: {
+		allItems: Record<PortableType, PortableItem[]>;
+		installedBackRef?: InstalledBackRef | null;
+		migratedRefs?: ReferenceIntegrityIndex | null;
+	},
 	skillsByProvider: Map<ProviderType, SkillInfo[]>,
 	targets: ProviderType[],
 	isGlobal: boolean,
@@ -328,7 +414,11 @@ async function executePlan(
 			if (!providers[target].skills) continue;
 			const skills = skillsByProvider.get(target) ?? [];
 			for (const skill of skills) {
-				const r = await installSkillDirectory(skill, target, { global: isGlobal, installedBackRef: ctx.installedBackRef });
+				const r = await installSkillDirectory(skill, target, {
+					global: isGlobal,
+					installedBackRef: ctx.installedBackRef,
+					migratedRefs: ctx.migratedRefs,
+				});
 				results.push({
 					action: skillActionShim(skill, target, isGlobal, r.path ?? ""),
 					success: r.success,
@@ -350,6 +440,7 @@ async function executePlan(
 async function attachConflictDiff(
 	action: ReconcileAction,
 	itemsByT: Record<PortableType, PortableItem[]>,
+	migratedRefs?: ReferenceIntegrityIndex | null,
 ): Promise<void> {
 	if (action.diff) return;
 	if (!action.targetPath || !existsSync(action.targetPath)) return;
@@ -363,7 +454,7 @@ async function attachConflictDiff(
 
 	try {
 		const targetContent = await readFile(action.targetPath, "utf-8");
-		const conversion = convertItem(sourceItem, pathConfig.format, action.provider as ProviderType);
+		const conversion = convertItem(sourceItem, pathConfig.format, action.provider as ProviderType, { migratedRefs });
 		if (conversion.error) return;
 		action.diff = generateDiff(targetContent, conversion.content, action.item);
 	} catch {

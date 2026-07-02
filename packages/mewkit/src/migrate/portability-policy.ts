@@ -1,7 +1,6 @@
 import { getProviderSurfaceContract } from "./provider-documentation-contracts.js";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { analyzeCodexRuleSource } from "./converters/index.js";
 import { classifyRuleSemantic } from "./ir/rule-classifier.js";
 import { providers } from "./provider-registry.js";
 import { auditSkillDirectory } from "./skill-directory-audit.js";
@@ -75,15 +74,16 @@ function findPortableItem(
 	return itemsByType[type]?.find((item) => item.name === name) ?? null;
 }
 
-function shouldSkipPortableItem(item: PortableItem, provider: ProviderType): PortabilitySkip | null {
+function shouldSkipPortableItem(
+	item: PortableItem,
+	provider: ProviderType,
+	options?: { allRules?: boolean },
+): PortabilitySkip | null {
 	if (provider === "claude-code") return null;
 	if (!RUNTIME_BOUND_ITEM_TYPES.has(item.type)) return null;
 
 	if (item.type === "rules") {
-		if (provider === "codex") {
-			const analyzed = analyzeCodexRuleSource(item);
-			if (analyzed.kind !== "unsupported") return null;
-		}
+		if (options?.allRules) return null;
 
 		const classified = classifyRuleSemantic(item);
 		if (classified.kind === "orchestration") {
@@ -100,16 +100,6 @@ function shouldSkipPortableItem(item: PortableItem, provider: ProviderType): Por
 				type: item.type,
 				item: item.name,
 				reason: `Claude runtime automation rule with no rule-layer portability: ${classified.signals.join(", ")}`,
-			};
-		}
-
-		if (provider === "codex") {
-			const analyzed = analyzeCodexRuleSource(item);
-			return {
-				provider,
-				type: item.type,
-				item: item.name,
-				reason: analyzed.reason ?? "Unsupported Codex rule content",
 			};
 		}
 	}
@@ -143,24 +133,9 @@ export function summarizeRuleMigrationByProvider(
 				continue;
 			}
 
-			if (provider === "codex") {
-				const analyzed = analyzeCodexRuleSource(rule);
-				if (analyzed.kind !== "unsupported") {
-					native += 1;
-					continue;
-				}
-			}
-
 			const classified = classifyRuleSemantic(rule);
 
 			if (classified.kind === "orchestration" || classified.kind === "runtime-automation") {
-				skipped += 1;
-				continue;
-			}
-
-			// Codex requires native prefix_rule() format — rules that failed
-			// analyzeCodexRuleSource cannot use the documented rules surface.
-			if (provider === "codex") {
 				skipped += 1;
 				continue;
 			}
@@ -332,6 +307,7 @@ function recomputePlanSummary(actions: ReconcileAction[]): ReconcilePlan["summar
 export function filterPlanForPortability(
 	plan: ReconcilePlan,
 	itemsByType: Record<PortableType, PortableItem[]>,
+	options?: { allRules?: boolean },
 ): { plan: ReconcilePlan; skipMessages: string[]; skips: PortabilitySkip[] } {
 	const skips: PortabilitySkip[] = [];
 	const keptActions = plan.actions.filter((action) => {
@@ -343,7 +319,7 @@ export function filterPlanForPortability(
 		}
 		const item = findPortableItem(itemsByType, action.type, action.item);
 		if (!item) return true;
-		const skip = shouldSkipPortableItem(item, action.provider as ProviderType);
+		const skip = shouldSkipPortableItem(item, action.provider as ProviderType, options);
 		if (!skip) return true;
 		skips.push(skip);
 		return false;

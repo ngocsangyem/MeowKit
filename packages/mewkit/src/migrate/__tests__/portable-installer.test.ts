@@ -122,16 +122,15 @@ describe("portable installer", () => {
 		await expect(readFile(targetPath, "utf-8")).resolves.toContain("Repository expectations");
 	});
 
-	it("writes Codex rules as native .rules files under .codex/rules", async () => {
+	it("merges Codex rules into AGENTS.md as managed rule sections", async () => {
 		const projectRoot = await mkdtemp(join(originalCwd, "tmp-mewkit-portable-installer-"));
 		tempDirs.push(projectRoot);
-		const rulesRoot = join(projectRoot, ".codex", "rules");
-		const targetPath = join(rulesRoot, "engineering", "standards.rules");
+		const targetPath = join(projectRoot, "AGENTS.md");
 		process.chdir(projectRoot);
 		providers.codex.rules = {
 			...providers.codex.rules!,
-			projectPath: rulesRoot,
-			globalPath: rulesRoot,
+			projectPath: targetPath,
+			globalPath: targetPath,
 		};
 
 		const sourcePath = join(projectRoot, ".claude", "rules", "engineering", "standards.md");
@@ -170,8 +169,54 @@ describe("portable installer", () => {
 		});
 		expect(result.success).toBe(true);
 		const written = await readFile(targetPath, "utf-8");
-		expect(written).toContain('pattern = ["grep"]');
-		expect(written).toContain('decision = "forbidden"');
+		expect(written).toContain("## Rule: engineering/standards");
+		expect(written).toContain("Use `rg` instead of `grep`");
+	});
+
+	it("warns (never truncates) when the merged instruction file exceeds the provider budget", async () => {
+		const projectRoot = await mkdtemp(join(originalCwd, "tmp-mewkit-portable-installer-"));
+		tempDirs.push(projectRoot);
+		const targetPath = join(projectRoot, "AGENTS.md");
+		process.chdir(projectRoot);
+		providers.codex.rules = {
+			...providers.codex.rules!,
+			projectPath: targetPath,
+			globalPath: targetPath,
+			totalCharLimit: 16,
+		};
+
+		const sourcePath = join(projectRoot, ".claude", "rules", "engineering", "standards.md");
+		await mkdir(dirname(sourcePath), { recursive: true });
+		const sourceBody = "Prefer `rg` for code search. Use `rg` instead of `grep`.\n";
+		await writeFile(sourcePath, sourceBody, "utf-8");
+
+		const sourceItem: PortableItem = {
+			name: "engineering/standards",
+			description: "rule",
+			type: "rules",
+			sourcePath,
+			frontmatter: {},
+			body: sourceBody,
+		};
+
+		const result = await executeInstallAction(
+			{
+				action: "install" as const,
+				item: "engineering/standards",
+				type: "rules" as const,
+				provider: "codex",
+				global: false,
+				targetPath,
+				reason: "test",
+			},
+			{ allItems: { agent: [], command: [], skill: [], config: [], rules: [sourceItem], hooks: [] } },
+		);
+
+		expect(result.success).toBe(true);
+		expect(result.warnings?.some((w) => w.includes("instruction budget") && w.includes("Section sizes"))).toBe(true);
+		// Content is written in full despite the warning.
+		const written = await readFile(targetPath, "utf-8");
+		expect(written).toContain("Use `rg` instead of `grep`");
 	});
 
 	it("accepts canonical target paths when the project root is entered through a symlink", async () => {

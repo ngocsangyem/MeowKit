@@ -124,9 +124,9 @@ describe("portability policy", () => {
 				action: "install",
 				item: "mk/design",
 				type: "command",
-				provider: "codex",
+				provider: "goose",
 				global: false,
-				targetPath: ".codex/prompts/mk-design.md",
+				targetPath: ".goose/commands/mk-design.md",
 				reason: "new-item",
 			},
 			{
@@ -153,8 +153,35 @@ describe("portability policy", () => {
 		expect(filtered.plan.actions[0]?.type).toBe("config");
 		expect(filtered.plan.summary.install).toBe(1);
 		expect(filtered.skipMessages).toContain(
-			"Skipped 1 command for Codex: unsupported by Codex official docs for command migration",
+			"Skipped 1 command for Goose: unsupported by Goose official docs for command migration",
 		);
+	});
+
+	it("keeps codex command actions now that commands migrate as Agent Skills", () => {
+		const command = makeItem("command", "mk/design", "Design the change and summarize the tradeoffs.");
+		const plan = makePlan([
+			{
+				action: "install",
+				item: "mk/design",
+				type: "command",
+				provider: "codex",
+				global: false,
+				targetPath: ".agents/skills/source-command-mk-design/SKILL.md",
+				reason: "new-item",
+			},
+		]);
+
+		const filtered = filterPlanForPortability(plan, {
+			agent: [],
+			command: [command],
+			skill: [],
+			config: [],
+			rules: [],
+			hooks: [],
+		});
+
+		expect(filtered.plan.actions).toHaveLength(1);
+		expect(filtered.skipMessages).toEqual([]);
 	});
 
 	it("skips orchestration-only rules for non-Claude targets", () => {
@@ -186,7 +213,7 @@ describe("portability policy", () => {
 		);
 	});
 
-	it("skips Markdown rules that cannot be mapped to Codex exec-policy rules", () => {
+	it("keeps generic guidance rules for Codex — they merge into AGENTS.md", () => {
 		const rule = makeItem("rules", "engineering/standards", "Keep changes deterministic and test coverage strong.");
 		const plan = makePlan([
 			{
@@ -195,7 +222,7 @@ describe("portability policy", () => {
 				type: "rules",
 				provider: "codex",
 				global: false,
-				targetPath: ".codex/rules/engineering/standards.rules",
+				targetPath: "AGENTS.md",
 				reason: "new-item",
 			},
 		]);
@@ -209,10 +236,36 @@ describe("portability policy", () => {
 			hooks: [],
 		});
 
-		expect(filtered.plan.actions).toHaveLength(0);
-		expect(filtered.skipMessages).toContain(
-			"Skipped 1 rule for Codex: Codex `.rules` files require native `prefix_rule()` entries or a supported Markdown command policy",
+		expect(filtered.plan.actions).toHaveLength(1);
+		expect(filtered.skipMessages).toEqual([]);
+	});
+
+	it("bypasses the rule portability filter entirely with allRules", () => {
+		const rule = makeItem(
+			"rules",
+			"workflow/gates",
+			"Phase 4 requires Gate 2 review before the orchestrator continues.",
 		);
+		const plan = makePlan([
+			{
+				action: "install",
+				item: "workflow/gates",
+				type: "rules",
+				provider: "codex",
+				global: false,
+				targetPath: "AGENTS.md",
+				reason: "new-item",
+			},
+		]);
+
+		const filtered = filterPlanForPortability(
+			plan,
+			{ agent: [], command: [], skill: [], config: [], rules: [rule], hooks: [] },
+			{ allRules: true },
+		);
+
+		expect(filtered.plan.actions).toHaveLength(1);
+		expect(filtered.skipMessages).toEqual([]);
 	});
 
 	it("keeps Codex command-policy translations even when the source rule also mentions memory", () => {
@@ -251,7 +304,7 @@ describe("portability policy", () => {
 		expect(filtered.skipMessages).toEqual([]);
 	});
 
-	it("skips mixed Markdown docs that only embed prefix_rule() as an example", () => {
+	it("keeps mixed Markdown docs that embed prefix_rule() examples — merged as guidance", () => {
 		const rule = makeItem(
 			"rules",
 			"engineering/mixed-example",
@@ -274,7 +327,7 @@ describe("portability policy", () => {
 				type: "rules",
 				provider: "codex",
 				global: false,
-				targetPath: ".codex/rules/engineering/mixed-example.rules",
+				targetPath: "AGENTS.md",
 				reason: "new-item",
 			},
 		]);
@@ -288,28 +341,28 @@ describe("portability policy", () => {
 			hooks: [],
 		});
 
-		expect(filtered.plan.actions).toHaveLength(0);
+		expect(filtered.plan.actions).toHaveLength(1);
 	});
 
 	it("formats rule skip summaries without duplicated plural suffixes", () => {
-		const rule = makeItem("rules", "engineering/standards", "Keep changes deterministic and test coverage strong.");
+		const orchestrationBody = "Phase 4 requires Gate 2 review before the orchestrator continues.";
 		const plan = makePlan([
 			{
 				action: "install",
-				item: "engineering/standards",
+				item: "workflow/gates",
 				type: "rules",
 				provider: "codex",
 				global: false,
-				targetPath: ".codex/rules/engineering/standards.rules",
+				targetPath: "AGENTS.md",
 				reason: "new-item",
 			},
 			{
 				action: "install",
-				item: "engineering/standards-2",
+				item: "workflow/gates-2",
 				type: "rules",
 				provider: "codex",
 				global: false,
-				targetPath: ".codex/rules/engineering/standards-2.rules",
+				targetPath: "AGENTS.md",
 				reason: "new-item",
 			},
 		]);
@@ -320,14 +373,14 @@ describe("portability policy", () => {
 			skill: [],
 			config: [],
 			rules: [
-				rule,
-				makeItem("rules", "engineering/standards-2", "Keep changes deterministic and test coverage strong."),
+				makeItem("rules", "workflow/gates", orchestrationBody),
+				makeItem("rules", "workflow/gates-2", orchestrationBody),
 			],
 			hooks: [],
 		});
 
 		expect(filtered.skipMessages).toContain(
-			"Skipped 2 rules for Codex: Codex `.rules` files require native `prefix_rule()` entries or a supported Markdown command policy",
+			"Skipped 2 rules for Codex: orchestration-only Claude workflow rule: phase workflow, gate workflow, orchestrator role",
 		);
 	});
 
@@ -553,7 +606,7 @@ describe("portability policy", () => {
 		});
 	});
 
-	it("counts non-convertible Codex rules as skipped even when rules surface is documented", () => {
+	it("counts portable Codex rules as native (merged) and orchestration rules as skipped", () => {
 		const summaries = summarizeRuleMigrationByProvider(
 			[
 				makeItem("rules", "engineering/standards", "Prefer `rg` for code search. Use `rg` instead of `grep`.\n"),
@@ -564,8 +617,8 @@ describe("portability policy", () => {
 		);
 
 		const codex = summaries.find((s) => s.provider === "codex")!;
-		expect(codex.native).toBe(1);
-		expect(codex.skipped).toBe(2);
+		expect(codex.native).toBe(2);
+		expect(codex.skipped).toBe(1);
 	});
 
 	it("reports skill installs in dry-run planning", async () => {

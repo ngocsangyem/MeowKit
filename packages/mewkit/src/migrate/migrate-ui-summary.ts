@@ -3,11 +3,27 @@
 import pc from "picocolors";
 import type { ReconcileBanner, ReconcileAction, ReconcilePlan } from "./reconcile/reconcile-types.js";
 import type { InstallResult } from "./portable-installer.js";
+import type { ConversionReport } from "./validation/migrate-conversion-report.js";
 
 export interface PreflightContext {
 	source: { root: string; origin: string };
 	skippedShellHooks: number;
 	bannerExtras: string[];
+	conversionReport?: ConversionReport;
+}
+
+const SECTION_DETAIL_CAP = 20;
+
+function printCappedSection(title: string, lines: string[], paint: (line: string) => string): void {
+	if (lines.length === 0) return;
+	console.log();
+	console.log(pc.bold(`${title} (${lines.length}):`));
+	for (const line of lines.slice(0, SECTION_DETAIL_CAP)) {
+		console.log(`  ${paint(line)}`);
+	}
+	if (lines.length > SECTION_DETAIL_CAP) {
+		console.log(pc.dim(`  … and ${lines.length - SECTION_DETAIL_CAP} more`));
+	}
 }
 
 export function printPreflight(plan: ReconcilePlan, ctx: PreflightContext): void {
@@ -37,6 +53,16 @@ export function printPreflight(plan: ReconcilePlan, ctx: PreflightContext): void
 
 	for (const extra of ctx.bannerExtras) {
 		console.log(pc.dim(`[i] ${extra}`));
+	}
+
+	const report = ctx.conversionReport;
+	if (report) {
+		printCappedSection("Preserved references (need attention)", report.warnedReferences, (l) => pc.yellow(`[!] ${l}`));
+		printCappedSection("Conversion notes", report.conversionWarnings, (l) => pc.dim(`[i] ${l}`));
+		printCappedSection("Instruction-file budget", report.budgetLines, (l) =>
+			l.includes("OVER") ? pc.yellow(`[!] ${l}`) : pc.dim(`[i] ${l}`),
+		);
+		printCappedSection("Validation errors", report.validationErrors, (l) => pc.red(`[x] ${l}`));
 	}
 }
 
@@ -74,6 +100,12 @@ export function printFinalSummary(results: InstallResult[]): void {
 	console.log();
 	console.log(pc.bold("Migration complete"));
 	console.log(`  ${pc.green(`${succeeded} succeeded`)}`);
+	const warned = results.filter((r) => r.warnings && r.warnings.length > 0);
+	for (const result of warned.slice(0, SECTION_DETAIL_CAP)) {
+		for (const warning of result.warnings ?? []) {
+			console.log(`  ${pc.yellow(`[!] ${result.action.provider}/${result.action.type}/${result.action.item}: ${warning}`)}`);
+		}
+	}
 	if (failed.length > 0) {
 		console.log(`  ${pc.red(`${failed.length} failed`)}`);
 		for (const result of failed.slice(0, 5)) {

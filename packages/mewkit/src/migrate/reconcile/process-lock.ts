@@ -1,7 +1,7 @@
 // Process-wide migration lock (Red Team Finding 13). Prevents two `mewkit migrate` runs
 // from racing on the same registry. Uses a PID file with stale-detection via process.kill(0).
 import { existsSync } from "node:fs";
-import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rmdir, unlink, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -81,5 +81,13 @@ export async function releaseMigrationLock(lockPath: string): Promise<void> {
 		await unlink(lockPath);
 	} catch {
 		// Best-effort
+	}
+	// Leave no empty lock directory behind in the target project. rmdir only
+	// succeeds on an empty directory, so a home-scope dir that also holds the
+	// portable registry is untouched.
+	try {
+		await rmdir(dirname(lockPath));
+	} catch {
+		// Non-empty or already gone — fine.
 	}
 }

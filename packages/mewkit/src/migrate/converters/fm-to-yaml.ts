@@ -61,7 +61,7 @@ export function convertFmToYaml(item: PortableItem): ConversionResult {
 	lines.push("    groups:");
 	for (const group of groups) lines.push(`      - ${group}`);
 
-	return { content: lines.join("\n"), filename: slug, warnings: stripped.warnings };
+	return { content: lines.join("\n"), filename: slug, warnings: stripped.warnings, occurrences: stripped.occurrences };
 }
 
 export function buildYamlModesFile(convertedEntries: string[]): string {

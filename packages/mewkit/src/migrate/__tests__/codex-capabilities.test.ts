@@ -2,14 +2,33 @@ import { describe, expect, it } from "vitest";
 import { CODEX_CAPABILITY_TABLE } from "../codex-capabilities.js";
 
 describe("codex capabilities", () => {
-	it("uses the conservative v0.124.0-alpha.3 hook baseline", () => {
-		const baseline = CODEX_CAPABILITY_TABLE[0];
-		expect(baseline.version).toBe("0.124.0-alpha.3");
-		expect(baseline.sessionStartMatchersOnly).toEqual(["startup", "resume"]);
-		expect(baseline.requiresFeatureFlag).toBe(true);
-		expect(baseline.events.SessionStart.allowedMatchers).toEqual(["startup", "resume"]);
-		expect(baseline.events.PreToolUse.allowedMatchers).toEqual(["Bash"]);
-		expect(baseline.events.PostToolUse.allowedMatchers).toEqual(["Bash"]);
-		expect(baseline.events.PermissionRequest.allowedMatchers).toEqual(["Bash"]);
+	it("leads with the verified 10-event hook surface (hooks enabled by default)", () => {
+		const head = CODEX_CAPABILITY_TABLE[0];
+		expect(head.version).toBe("0.142.0");
+		expect(head.requiresFeatureFlag).toBe(false);
+		expect(Object.keys(head.events).sort()).toEqual(
+			[
+				"PermissionRequest",
+				"PostCompact",
+				"PostToolUse",
+				"PreCompact",
+				"PreToolUse",
+				"SessionStart",
+				"SubagentStart",
+				"SubagentStop",
+				"Stop",
+				"UserPromptSubmit",
+			].sort(),
+		);
+		expect(head.events.SessionStart.allowedMatchers).toEqual(["startup", "resume"]);
+		expect(head.events.PreToolUse.allowedMatchers).toEqual(["Bash"]);
+	});
+
+	it("keeps the conservative v0.124.0-alpha.3 entry as the unknown-version fallback", () => {
+		const fallback = CODEX_CAPABILITY_TABLE[CODEX_CAPABILITY_TABLE.length - 1];
+		expect(fallback.version).toBe("0.124.0-alpha.3");
+		expect(fallback.requiresFeatureFlag).toBe(true);
+		expect(fallback.sessionStartMatchersOnly).toEqual(["startup", "resume"]);
+		expect(fallback.events.SubagentStart).toBeUndefined();
 	});
 });

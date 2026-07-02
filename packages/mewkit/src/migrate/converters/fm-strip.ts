@@ -12,10 +12,12 @@ export function convertFmStrip(item: PortableItem, provider: ProviderType): Conv
 	const isMergeProvider = ["goose", "gemini-cli", "amp"].includes(provider);
 
 	let body = item.body;
+	let occurrences: ConversionResult["occurrences"];
 	if (PROVIDERS_WITH_BODY_REWRITING.includes(provider)) {
 		const stripped = stripClaudeRefs(body, { provider, targetName: providers[provider].displayName });
 		body = stripped.content;
 		warnings.push(...stripped.warnings);
+		occurrences = stripped.occurrences;
 	}
 
 	let content: string;
@@ -36,10 +38,12 @@ export function convertFmStrip(item: PortableItem, provider: ProviderType): Conv
 		content,
 		filename: isMergeProvider ? "AGENTS.md" : `${item.name}.md`,
 		warnings,
+		occurrences,
 	};
 }
 
 export function buildMergedAgentsMd(sections: string[], providerName: string): string {
-	const header = `# Agents\n\n> Ported from the toolkit via mewkit migrate\n> Target: ${providerName}\n\n`;
+	// No provenance header: generated files must stay free of toolkit branding.
+	const header = `# Agents\n\n> Target: ${providerName}\n\n`;
 	return header + sections.join("\n---\n\n");
 }

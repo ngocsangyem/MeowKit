@@ -10,7 +10,7 @@ export function convertMdToMdc(item: PortableItem, provider: ProviderType): Conv
 
 	const content = ["---", `description: "${escapedDesc}"`, "alwaysApply: true", "---", "", stripped.content].join("\n");
 
-	return { content, filename: `${item.name}.mdc`, warnings: stripped.warnings };
+	return { content, filename: `${item.name}.mdc`, warnings: stripped.warnings, occurrences: stripped.occurrences };
 }
 
 function formatDescription(name: string): string {

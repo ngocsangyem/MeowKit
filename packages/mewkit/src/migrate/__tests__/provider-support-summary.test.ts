@@ -10,16 +10,16 @@ describe("provider support summary", () => {
 			verified: 8,
 			experimental: 7,
 			deprecated: 1,
-			enabledSurfaces: 39,
+			enabledSurfaces: 40,
 		});
 	});
 
-	it("classifies Codex as the non-Claude hard-gate candidate", () => {
+	it("classifies Codex as a full harness now that every surface migrates", () => {
 		const codex = findProviderSupportInfo("codex");
 
 		expect(codex?.supportLevel).toBe("experimental");
-		expect(codex?.role).toBe("hard-gate-candidate");
-		expect(codex?.effectiveSurfaces).toEqual(["agents", "skills", "config", "rules", "hooks"]);
+		expect(codex?.role).toBe("full-harness");
+		expect(codex?.effectiveSurfaces).toEqual(["agents", "commands", "skills", "config", "rules", "hooks"]);
 		expect(codex?.enforcement).toEqual({
 			gate1: "candidate",
 			gate2: "candidate",

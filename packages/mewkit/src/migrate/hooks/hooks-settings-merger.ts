@@ -21,7 +21,9 @@ import type { PortableItem, ProviderType } from "../types.js";
 import { ensureCodexHooksFeatureFlag } from "./codex-features-flag.js";
 import { generateCodexHookWrappers } from "./codex-hook-wrapper.js";
 
-const SENTINEL_KEY = "__mewkit_managed__";
+// Neutral marker: generated files must not carry toolkit branding.
+const SENTINEL_KEY = "__managed_by_migration__";
+const LEGACY_SENTINEL_KEY = "__mewkit_managed__";
 
 export interface HooksMergeResult {
 	provider: ProviderType;
@@ -227,6 +229,7 @@ async function mergeIntoSettingsJson(settingsPath: string, section: HooksSection
 	const settings = await readSettings(settingsPath);
 	settings.hooks = section;
 	settings[SENTINEL_KEY] = { hooks: true };
+	delete settings[LEGACY_SENTINEL_KEY];
 	await atomicWrite(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 }
 
@@ -363,6 +366,7 @@ async function mergeCodex(
 		const settings = await readSettings(hooksJsonPath);
 		settings.hooks = codexSection;
 		settings[SENTINEL_KEY] = { hooks: true };
+		delete settings[LEGACY_SENTINEL_KEY];
 		await atomicWrite(hooksJsonPath, `${JSON.stringify(settings, null, 2)}\n`);
 
 		// Set [features] codex_hooks = true in config.toml

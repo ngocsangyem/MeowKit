@@ -148,7 +148,7 @@ describe("Codex projection validation", () => {
 
 		const results = await checkCodexProjection(root);
 
-		expect(results.find((r) => r.name === "Codex projection: command-policy rules")?.status).toBe("fail");
+		expect(results.find((r) => r.name === "Codex projection: rules merged into AGENTS.md")?.status).toBe("fail");
 		expect(results.find((r) => r.name === "Codex projection: portable skills")?.status).toBe("fail");
 	});
 
@@ -168,15 +168,17 @@ describe("Codex projection validation", () => {
 			path.join(claudeDir, "skills", "generic-helper", "SKILL.md"),
 			"---\nname: generic-helper\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
 		);
-		fs.mkdirSync(path.join(root, ".codex", "rules"), { recursive: true });
+		fs.mkdirSync(path.join(root, ".codex"), { recursive: true });
 		fs.mkdirSync(path.join(root, ".agents", "skills", "generic-helper"), { recursive: true });
-		fs.writeFileSync(path.join(root, "AGENTS.md"), "# Instructions\n");
-		fs.writeFileSync(path.join(root, ".codex", "rules", "injection-rules.rules"), 'prefix_rule(pattern = ["curl"])\n');
+		fs.writeFileSync(
+			path.join(root, "AGENTS.md"),
+			"# Instructions\n\n## Rule: injection-rules\n\nBlocked patterns stay blocked.\n",
+		);
 		fs.writeFileSync(path.join(root, ".agents", "skills", "generic-helper", "SKILL.md"), "# generic\n");
 
 		const results = await checkCodexProjection(root);
 
-		expect(results.find((r) => r.name === "Codex projection: command-policy rules")?.status).toBe("pass");
+		expect(results.find((r) => r.name === "Codex projection: rules merged into AGENTS.md")?.status).toBe("pass");
 		expect(results.find((r) => r.name === "Codex projection: portable skills")?.status).toBe("pass");
 	});
 });

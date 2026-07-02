@@ -92,6 +92,8 @@ export interface ConversionResult {
 	filename: string;
 	warnings: string[];
 	error?: string;
+	/** Classified source-reference decisions made while converting (report layer input) */
+	occurrences?: import("./references/reference-types.js").ReferenceOccurrence[];
 }
 
 /** Result of installing a portable item to a provider */
@@ -152,5 +154,9 @@ export const MigrateOptionsSchema = z.object({
 	respectDeletions: z.boolean().optional(),
 	sourceVersion: z.string().optional(),
 	providers: z.boolean().optional(),
+	/** Merge ALL rules into the provider instruction file, bypassing the portability filter */
+	allRules: z.boolean().optional(),
+	/** Opt-in: convert .mcp.json server definitions into the provider MCP config */
+	includeMcp: z.boolean().optional(),
 });
 export type MigrateOptions = z.infer<typeof MigrateOptionsSchema>;

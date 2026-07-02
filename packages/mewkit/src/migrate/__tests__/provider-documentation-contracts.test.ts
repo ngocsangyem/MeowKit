@@ -36,7 +36,7 @@ describe("provider documentation contracts", () => {
 	});
 
 	it("defaults undocumented surfaces to unsupported", () => {
-		expect(getProviderSurfaceContract("codex", "command").status).toBe("unsupported");
+		expect(getProviderSurfaceContract("goose", "command").status).toBe("unsupported");
 		expect(getProviderSurfaceContract("openhands", "config").status).toBe("unsupported");
 	});
 
@@ -49,7 +49,7 @@ describe("provider documentation contracts", () => {
 	});
 
 	it("exposes capability-level documentation contracts beyond surface allowlists", () => {
-		expect(getProviderCapabilityContract("codex", "commands").status).toBe("partial");
+		expect(getProviderCapabilityContract("codex", "commands").status).toBe("documented");
 		expect(getProviderCapabilityContract("codex", "rules").status).toBe("documented");
 		expect(getProviderCapabilityContract("kilo", "workspace_config").status).toBe("partial");
 	});

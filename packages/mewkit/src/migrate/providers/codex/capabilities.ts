@@ -10,10 +10,14 @@ const execFileAsync = promisify(execFile);
 
 export type CodexHookEvent =
 	| "SessionStart"
+	| "SubagentStart"
 	| "UserPromptSubmit"
 	| "PreToolUse"
 	| "PostToolUse"
 	| "PermissionRequest"
+	| "PreCompact"
+	| "PostCompact"
+	| "SubagentStop"
 	| "Stop";
 
 export interface CodexEventCapabilities {
@@ -31,6 +35,62 @@ export interface CodexCapabilities {
 }
 
 export const CODEX_CAPABILITY_TABLE: CodexCapabilities[] = [
+	{
+		// Hook surface as documented at developers.openai.com/codex/hooks
+		// (verified 2026-07): 10 events, command handlers only, hooks enabled by
+		// default (no [features] flag required).
+		version: "0.142.0",
+		events: {
+			SessionStart: {
+				supported: true,
+				supportsAdditionalContext: true,
+				allowedMatchers: ["startup", "resume"],
+			},
+			SubagentStart: {
+				supported: true,
+				supportsAdditionalContext: false,
+			},
+			UserPromptSubmit: {
+				supported: true,
+				supportsAdditionalContext: true,
+			},
+			PreToolUse: {
+				supported: true,
+				supportsAdditionalContext: false,
+				permissionDecisionValues: ["deny"],
+				allowedMatchers: ["Bash"],
+			},
+			PostToolUse: {
+				supported: true,
+				supportsAdditionalContext: true,
+				allowedMatchers: ["Bash"],
+			},
+			PermissionRequest: {
+				supported: true,
+				supportsAdditionalContext: false,
+				permissionDecisionValues: ["deny"],
+				allowedMatchers: ["Bash"],
+			},
+			PreCompact: {
+				supported: true,
+				supportsAdditionalContext: false,
+			},
+			PostCompact: {
+				supported: true,
+				supportsAdditionalContext: false,
+			},
+			SubagentStop: {
+				supported: true,
+				supportsAdditionalContext: false,
+			},
+			Stop: {
+				supported: true,
+				supportsAdditionalContext: false,
+			},
+		},
+		sessionStartMatchersOnly: ["startup", "resume"],
+		requiresFeatureFlag: false,
+	},
 	{
 		version: "0.124.0-alpha.3",
 		events: {

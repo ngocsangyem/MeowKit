@@ -52,7 +52,7 @@ function convertForCopilot(item: PortableItem): ConversionResult {
 		warnings.push(`Content exceeds Copilot 30K char limit (${content.length} chars)`);
 	}
 
-	return { content, filename: `${item.name}.agent.md`, warnings };
+	return { content, filename: `${item.name}.agent.md`, warnings, occurrences: stripped.occurrences };
 }
 
 function convertForCursor(item: PortableItem): ConversionResult {
@@ -68,7 +68,7 @@ function convertForCursor(item: PortableItem): ConversionResult {
 
 	const stripped = stripClaudeRefs(item.body, { provider: "cursor", targetName: providers.cursor.displayName });
 	const content = `${fmLines.join("\n")}\n\n${stripped.content}\n`;
-	return { content, filename: `${item.name}.mdc`, warnings: stripped.warnings };
+	return { content, filename: `${item.name}.mdc`, warnings: stripped.warnings, occurrences: stripped.occurrences };
 }
 
 const OPENCODE_TOOL_MAP: Record<string, string> = {
@@ -125,7 +125,7 @@ function convertOpenCodeAgent(item: PortableItem): ConversionResult {
 	warnings.push(...stripped.warnings);
 	const body = replaceClaudePathsForOpenCode(stripped.content);
 	const content = `${fmLines.join("\n")}\n\n${body}\n`;
-	return { content, filename: `${item.name}.md`, warnings };
+	return { content, filename: `${item.name}.md`, warnings, occurrences: stripped.occurrences };
 }
 
 function convertOpenCodeCommand(item: PortableItem): ConversionResult {
@@ -144,7 +144,7 @@ function convertOpenCodeCommand(item: PortableItem): ConversionResult {
 	warnings.push(...stripped.warnings);
 	const body = replaceClaudePathsForOpenCode(stripped.content);
 	const content = `${fmLines.join("\n")}\n\n${body}\n`;
-	return { content, filename: `${item.name}.md`, warnings };
+	return { content, filename: `${item.name}.md`, warnings, occurrences: stripped.occurrences };
 }
 
 export function convertFmToFm(item: PortableItem, provider: ProviderType): ConversionResult {

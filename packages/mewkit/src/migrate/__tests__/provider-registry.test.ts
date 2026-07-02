@@ -21,8 +21,9 @@ describe("provider registry", () => {
 		expect(hookProviders).toEqual(["claude-code", "codex"]);
 	});
 
-	it("does not advertise undocumented Codex custom commands", () => {
-		expect(providers.codex.commands).toBeNull();
+	it("advertises Codex commands as Agent Skills", () => {
+		expect(providers.codex.commands?.format).toBe("command-to-codex-skill");
+		expect(providers.codex.commands?.projectPath).toBe(".agents/skills");
 	});
 
 	it("stops advertising the legacy shared .agents/skills path across targets", () => {
@@ -105,10 +106,10 @@ describe("provider overrides", () => {
 		expect(providers.codex.agents?.projectPath).toBe(".codex/agents");
 		expect(providers.codex.skills?.projectPath).toBe(".agents/skills");
 		expect(providers.codex.config?.projectPath).toBe("AGENTS.md");
-		expect(providers.codex.rules?.projectPath).toBe(".codex/rules");
-		expect(providers.codex.rules?.format).toBe("md-to-codex-rules");
-		expect(providers.codex.rules?.fileExtension).toBe(".rules");
+		expect(providers.codex.rules?.projectPath).toBe("AGENTS.md");
+		expect(providers.codex.rules?.format).toBe("md-strip");
+		expect(providers.codex.rules?.fileExtension).toBe(".md");
 		expect(providers.codex.hooks?.projectPath).toBe(".codex/hooks");
-		expect(providers.codex.commands).toBeNull();
+		expect(providers.codex.commands?.projectPath).toBe(".agents/skills");
 	});
 });

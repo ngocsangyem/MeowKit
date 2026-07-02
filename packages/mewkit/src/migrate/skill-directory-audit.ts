@@ -2,6 +2,7 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import { extname, join, relative } from "node:path";
 import { findRuntimeCouplingMatches } from "./runtime-coupling-patterns.js";
 import { isBinaryContent } from "./reconcile/checksum-utils.js";
+import type { ReferenceOccurrence } from "./references/reference-types.js";
 import type { ProviderType } from "./types.js";
 
 export interface SkillDirectoryAuditIssue {
@@ -15,6 +16,8 @@ export interface SkillDirectoryAuditResult {
 
 export interface SkillDirectoryAuditOptions {
 	ignoreRewriteableMarkdown?: boolean;
+	/** Classifier decisions per rewritten markdown file (relative path) */
+	occurrencesByFile?: Map<string, ReferenceOccurrence[]>;
 }
 
 const MAX_TEXT_FILE_BYTES = 512 * 1024;
@@ -90,7 +93,8 @@ export async function auditSkillDirectory(
 		const relativePath = relative(rootDir, filePath).replace(/\\/g, "/");
 		if (options.ignoreRewriteableMarkdown && isMarkdownFile(relativePath)) continue;
 
-		for (const match of findRuntimeCouplingMatches(content)) {
+		const occurrences = options.occurrencesByFile?.get(relativePath) ?? [];
+		for (const match of findRuntimeCouplingMatches(content, occurrences)) {
 			const severity = isHighRiskFile(relativePath) ? "high-risk" : "runtime-coupled";
 			errors.push({
 				filePath: relativePath,

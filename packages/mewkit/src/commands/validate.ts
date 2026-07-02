@@ -9,8 +9,8 @@ import { checkOwnership } from "../core/build-inventory.js";
 import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
 import { checkPlugin, checkPluginNamespace, checkPluginManifests } from "../core/check-plugin-manifests.js";
-import { analyzeCodexRuleSource } from "../migrate/converters/index.js";
-import { discoverRules, discoverSkills } from "../migrate/discovery/index.js";
+import { parseMergedSections } from "../migrate/config-merger/merge-single-sections.js";
+import { discoverSkills } from "../migrate/discovery/index.js";
 import { buildPortableSkillsByProvider } from "../migrate/portability-policy.js";
 import type { Status } from "./doctor-checks.js";
 
@@ -276,18 +276,18 @@ export async function checkCodexProjection(projectRoot: string): Promise<CheckRe
 	];
 
 	const sourceRulesDir = path.join(projectRoot, ".claude", "rules");
-	if (fs.existsSync(sourceRulesDir)) {
-		const sourceRules = await discoverRules(sourceRulesDir);
-		const expectedRules = sourceRules.filter((rule) => analyzeCodexRuleSource(rule).kind !== "unsupported").length;
-		const actualRules = countFiles(path.join(codexDir, "rules"), (name) => name.endsWith(".rules"));
-		results.push(
-			projectionCountResult(
-				"Codex projection: command-policy rules",
-				expectedRules,
-				actualRules,
-				"Translated source rules with Codex-compatible command policies",
-			),
-		);
+	const agentsMdPath = path.join(projectRoot, "AGENTS.md");
+	if (fs.existsSync(sourceRulesDir) && fs.existsSync(agentsMdPath)) {
+		// Markdown rules merge into AGENTS.md as managed "## Rule:" sections;
+		// native prefix_rule() policies are the only content for .codex/rules.
+		const agentsMd = fs.readFileSync(agentsMdPath, "utf-8");
+		const mergedRuleSections = parseMergedSections(agentsMd).sections.filter((s) => s.kind === "rule").length;
+		results.push({
+			name: "Codex projection: rules merged into AGENTS.md",
+			status: ok(mergedRuleSections > 0),
+			detail: `${mergedRuleSections} managed rule section(s) found in AGENTS.md`,
+			section: "Portability",
+		});
 	}
 
 	const sourceSkillsDir = path.join(projectRoot, ".claude", "skills");

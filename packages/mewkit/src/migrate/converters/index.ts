@@ -1,23 +1,34 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/converters/index.ts
+import type { ReferenceIntegrityIndex } from "../references/fence-aware-reference-rewriter.js";
 import type { ConversionFormat, ConversionResult, PortableItem, ProviderType } from "../types.js";
+import { convertCommandToCodexSkill } from "./command-to-codex-skill.js";
 import { convertDirectCopy } from "./direct-copy.js";
 import { convertFmStrip } from "./fm-strip.js";
 import { convertFmToCodexToml } from "./fm-to-codex-toml.js";
 import { convertFmToFm } from "./fm-to-fm.js";
 import { convertFmToJson } from "./fm-to-json.js";
 import { convertFmToYaml } from "./fm-to-yaml.js";
-import { convertMdToCodexRules } from "./md-to-codex-rules.js";
 import { convertMdStrip } from "./md-strip.js";
 import { convertMdToKiroSteering } from "./md-to-kiro-steering.js";
 import { convertMdToMdc } from "./md-to-mdc.js";
 import { convertMdToToml } from "./md-to-toml.js";
 import { convertToSkillMd } from "./skill-md.js";
 
-export function convertItem(item: PortableItem, format: ConversionFormat, provider: ProviderType): ConversionResult {
+export interface ConversionContext {
+	/** Migration-set membership for the fenced-reference integrity check */
+	migratedRefs?: ReferenceIntegrityIndex | null;
+}
+
+export function convertItem(
+	item: PortableItem,
+	format: ConversionFormat,
+	provider: ProviderType,
+	context?: ConversionContext,
+): ConversionResult {
 	try {
 		switch (format) {
 			case "direct-copy":
-				return convertDirectCopy(item, provider);
+				return convertDirectCopy(item, provider, context);
 			case "fm-to-fm":
 				return convertFmToFm(item, provider);
 			case "fm-to-yaml":
@@ -31,15 +42,15 @@ export function convertItem(item: PortableItem, format: ConversionFormat, provid
 			case "skill-md":
 				return convertToSkillMd(item);
 			case "md-strip":
-				return convertMdStrip(item, provider);
+				return convertMdStrip(item, provider, context);
 			case "md-to-mdc":
 				return convertMdToMdc(item, provider);
 			case "md-to-kiro-steering":
 				return convertMdToKiroSteering(item, provider);
-			case "md-to-codex-rules":
-				return convertMdToCodexRules(item);
 			case "fm-to-codex-toml":
 				return convertFmToCodexToml(item);
+			case "command-to-codex-skill":
+				return convertCommandToCodexSkill(item, context);
 			default: {
 				const _exhaustive: never = format;
 				return {
@@ -70,4 +81,9 @@ export { buildYamlModesFile } from "./fm-to-yaml.js";
 export { buildClineModesJson, convertToClineRule, type ClineCustomMode } from "./fm-to-json.js";
 export { toCodexSlug, buildCodexConfigEntry, type CodexAgentToml, type CodexConfigEntry } from "./fm-to-codex-toml.js";
 export { escapeTomlMultiline } from "./md-to-toml.js";
-export { analyzeCodexRuleSource, convertMdToCodexRules } from "./md-to-codex-rules.js";
+export {
+	codexCommandSkillDirName,
+	codexCommandSkillRelativePath,
+	convertCommandToCodexSkill,
+	detectDynamicCommandSyntax,
+} from "./command-to-codex-skill.js";

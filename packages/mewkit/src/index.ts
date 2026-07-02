@@ -79,6 +79,13 @@ ${pc.bold("Options:")}
   --substrate      Inventory: print the responsibility×coverage substrate matrix (--emit writes the view)
                    Validate: run only the responsibility-substrate drift/untagged check
 
+${pc.bold("Migrate flags:")}
+  --dry-run                  Print the migration plan and reference report without writing
+  --only <types>             Limit to item types (agents,commands,skills,config,rules,hooks)
+  --force                    Overwrite user-edited targets on conflict
+  --all-rules                Merge ALL rules into the provider instruction file (skip portability filter)
+  --include-mcp              Also convert .mcp.json servers into the provider MCP config (Codex)
+
 ${pc.bold("Init flags:")}
   --profile <name>           Install a subset: core|developer|product|atlassian|security|research|full
                              (default full). In update mode, trims an install down to the profile.
@@ -147,6 +154,8 @@ async function main(): Promise<void> {
 			"reconcile",
 			"reinstall-empty-dirs",
 			"respect-deletions",
+			"all-rules",
+			"include-mcp",
 			"no-cleanup",
 			"migrate",
 			"migrate-global",
@@ -405,6 +414,8 @@ async function main(): Promise<void> {
 				"respect-deletions": args["respect-deletions"] as boolean | undefined,
 				"source-version": args["source-version"] as string | undefined,
 				providers: args.providers as boolean | undefined,
+				"all-rules": args["all-rules"] as boolean | undefined,
+				"include-mcp": args["include-mcp"] as boolean | undefined,
 			});
 			if (exitCode !== 0) process.exit(exitCode);
 			break;

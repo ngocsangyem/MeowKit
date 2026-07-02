@@ -12,8 +12,13 @@ import { providers } from "../provider-registry.js";
 import type { PortableItem, ProviderType } from "../types.js";
 import { getCodexGlobalBoundary, isCanonicalPathWithinBoundary, withCodexTargetLock } from "./codex-path-safety.js";
 
-const SENTINEL_START = "# --- mewkit-managed-agents-start ---";
-const SENTINEL_END = "# --- mewkit-managed-agents-end ---";
+// Neutral sentinels: generated files must not carry toolkit branding. The
+// legacy branded markers are still stripped so re-runs over older installs
+// replace the old block instead of duplicating it.
+const SENTINEL_START = "# --- managed-agents-start ---";
+const SENTINEL_END = "# --- managed-agents-end ---";
+const LEGACY_SENTINEL_START = "# --- mewkit-managed-agents-start ---";
+const LEGACY_SENTINEL_END = "# --- mewkit-managed-agents-end ---";
 
 export interface CodexInstallResult {
 	provider: ProviderType;
@@ -43,16 +48,21 @@ async function atomicWrite(target: string, content: string): Promise<void> {
 	}
 }
 
-function stripManagedBlock(content: string): string {
-	const startIdx = content.indexOf(SENTINEL_START);
+function stripBlockBetween(content: string, start: string, end: string): string {
+	const startIdx = content.indexOf(start);
 	if (startIdx === -1) return content;
-	const endIdx = content.indexOf(SENTINEL_END, startIdx);
+	const endIdx = content.indexOf(end, startIdx);
 	if (endIdx === -1) return content;
-	const blockEnd = endIdx + SENTINEL_END.length;
+	const blockEnd = endIdx + end.length;
 	const after = content[blockEnd] === "\n" ? blockEnd + 1 : blockEnd;
 	let before = startIdx;
 	if (before > 0 && content[before - 1] === "\n") before -= 1;
 	return content.slice(0, before) + content.slice(after);
+}
+
+function stripManagedBlock(content: string): string {
+	const withoutCurrent = stripBlockBetween(content, SENTINEL_START, SENTINEL_END);
+	return stripBlockBetween(withoutCurrent, LEGACY_SENTINEL_START, LEGACY_SENTINEL_END);
 }
 
 function buildManagedBlock(entries: string[]): string {

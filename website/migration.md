@@ -45,9 +45,24 @@ What each tool can receive from your `.claude/` kit:
 
 **Special cases:**
 - **Antigravity** treats agents as a special case of skills. Your Claude Code agents migrate into Antigravity's skills directory.
-- **Hooks** only migrate to four tools (Claude Code, Codex, Droid, Gemini CLI). For other tools, mewkit skips hooks with a warning.
+- **Codex commands** migrate as Agent Skills (`.agents/skills/source-command-<name>/SKILL.md`) — Codex custom prompts gave way to skills. Dynamic template syntax (`$ARGUMENTS`, `$1`, `{{...}}`, `` !`cmd` ``, `@file`) has no skill equivalent; the template migrates verbatim with a manual-adaptation warning.
+- **Codex rules** merge into `AGENTS.md` as `## Rule:` sections (native `.rules` files only accept `prefix_rule()` command policies). Orchestration/runtime-only rules are skipped by default; pass `--all-rules` to merge everything. The merged file is checked against Codex's 32 KiB `project_doc_max_bytes` budget — over-budget merges warn (with per-section sizes) instead of truncating.
+- **`.mcp.json`** converts to `config.toml [mcp_servers]` entries with the opt-in `--include-mcp` flag (Codex only; project-scoped MCP config loads only in trusted projects).
+- **Hooks** only migrate to four tools (Claude Code, Codex, Droid, Gemini CLI). For other tools, mewkit skips hooks with a warning. Codex events are version-gated: recent Codex (0.142+) supports 10 events with hooks enabled by default; older versions fall back to the conservative 6-event table.
 - **Shell hooks** (`.sh`, `.ps1`, `.bat`) never migrate — only node-runnable hooks (`.cjs`, `.mjs`, `.js`) cross over.
 - **Kilo Code** entries are ported from upstream but unverified by mewkit. A runtime warning appears when you select it.
+
+## Reference rewriting
+
+Markdown content is rewritten with a fence-aware classifier instead of blanket string replacement:
+
+| Reference | Inline prose / frontmatter | Fenced code (runnable) | Citation |
+|-----------|---------------------------|------------------------|----------|
+| Mapped asset (`.claude/skills/x/...`) | rewritten to the provider path | rewritten **only if** the asset migrates in the same run, else preserved + warned | preserved |
+| Unmapped runtime (`.claude/scripts/`, `.claude/memory/`) | neutralized to provider-agnostic phrasing | preserved + warned | preserved |
+| `CLAUDE.md` token | rewritten to the provider config name | preserved (command examples stay runnable) | preserved |
+
+Every preserved reference appears in the preflight/dry-run report with `file:line` and a reason — nothing is silently dropped, and no path is ever fabricated. A post-conversion scanner verifies the invariant: any surviving source reference must be explained by a classifier decision, otherwise the run aborts before writing.
 
 ## Quick start
 
@@ -148,6 +163,12 @@ mewkit migrate gemini-cli --skip-hooks
 
 # Everything except config and rules
 mewkit migrate codex --skip-config --skip-rules
+
+# Merge every rule into AGENTS.md, bypassing the portability filter
+mewkit migrate codex --all-rules
+
+# Also convert .mcp.json servers into config.toml [mcp_servers]
+mewkit migrate codex --include-mcp
 ```
 
 ## Project vs. global scope
@@ -220,7 +241,7 @@ mewkit migrate --all --yes       # explicit all 15
 
 ### Codex hooks require recent Codex version
 
-Codex hooks require Codex >= 0.124.0-alpha.3 (the version mewkit's capability table targets). Older Codex versions silently drop hook events. Upgrade Codex or set `MEWKIT_CODEX_COMPAT=optimistic` to assume newest capabilities.
+mewkit probes `codex --version` and picks a version-gated capability table: Codex 0.142+ gets the full 10-event surface (hooks enabled by default), while older or undetectable versions fall back to the conservative 0.124.0-alpha.3 table (6 events, feature flag written). Unsupported events are skipped with a structured warning. Set `MEWKIT_CODEX_COMPAT=optimistic` to assume the newest capabilities, or `MEWKIT_CODEX_COMPAT=strict` to force the conservative table.
 
 ### "Kilo Code support is UNVERIFIED"
 

@@ -3,26 +3,18 @@
 import { readFileSync } from "node:fs";
 import { extname } from "node:path";
 import { rewriteConfiguredModelReferences } from "../model-taxonomy.js";
+import {
+	rewriteSourceReferences,
+	type ReferenceIntegrityIndex,
+} from "../references/fence-aware-reference-rewriter.js";
+import type { ReferenceOccurrence } from "../references/reference-types.js";
 import type { ConversionResult, PortableItem, ProviderType } from "../types.js";
 
-const PROVIDER_CONFIG_DIR: Partial<Record<ProviderType, string>> = {
-	opencode: ".opencode/",
-	droid: ".factory/",
-	windsurf: ".windsurf/",
-	antigravity: ".agent/",
-	cursor: ".cursor/",
-	roo: ".roo/",
-	kilo: ".kilocode/",
-	goose: ".goose/",
-	"gemini-cli": ".gemini/",
-	amp: ".agents/",
-	cline: ".cline/",
-	openhands: ".openhands/",
-	codex: ".codex/",
-	"github-copilot": ".github/",
-};
-
-export function convertDirectCopy(item: PortableItem, provider?: ProviderType): ConversionResult {
+export function convertDirectCopy(
+	item: PortableItem,
+	provider?: ProviderType,
+	context?: { migratedRefs?: ReferenceIntegrityIndex | null },
+): ConversionResult {
 	let content: string;
 	try {
 		content = readFileSync(item.sourcePath, "utf-8");
@@ -30,11 +22,23 @@ export function convertDirectCopy(item: PortableItem, provider?: ProviderType): 
 		content = item.body;
 	}
 
+	const warnings: string[] = [];
+	let occurrences: ReferenceOccurrence[] = [];
 	if (provider && provider !== "claude-code") {
-		const targetDir = PROVIDER_CONFIG_DIR[provider];
-		if (targetDir) {
-			content = content.replace(/\.claude\//g, targetDir);
-		}
+		// Source references are resolved through the rewrite table instead of a
+		// blanket source-root → provider-dir replace, which fabricated paths that
+		// do not exist on the target (runnable content is only rewritten with
+		// proof that the referenced asset migrates too).
+		const isMarkdown = extname(item.sourcePath).toLowerCase() === ".md";
+		const rewritten = rewriteSourceReferences(content, {
+			provider,
+			file: item.name,
+			migratedRefs: context?.migratedRefs,
+			contentKind: isMarkdown ? "markdown" : "code",
+		});
+		content = rewritten.content;
+		warnings.push(...rewritten.warnings);
+		occurrences = rewritten.occurrences;
 		content = rewriteConfiguredModelReferences(content, provider);
 	}
 
@@ -53,5 +57,5 @@ export function convertDirectCopy(item: PortableItem, provider?: ProviderType): 
 	} else {
 		filename = namespacedName.includes(".") ? namespacedName : `${namespacedName}.md`;
 	}
-	return { content, filename, warnings: [] };
+	return { content, filename, warnings, occurrences };
 }

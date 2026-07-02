@@ -55,6 +55,7 @@ export function convertFmToJson(item: PortableItem): ConversionResult {
 		content: JSON.stringify(mode, null, 2),
 		filename: `${toSlug(item.name)}.json`,
 		warnings: stripped.warnings,
+		occurrences: stripped.occurrences,
 	};
 }
 
@@ -71,5 +72,5 @@ export function convertToClineRule(item: PortableItem): ConversionResult {
 			: item.segments && item.segments.length > 0
 				? item.segments.join("/")
 				: item.name;
-	return { content, filename: `${namespacedName}.md`, warnings: stripped.warnings };
+	return { content, filename: `${namespacedName}.md`, warnings: stripped.warnings, occurrences: stripped.occurrences };
 }

@@ -16,7 +16,7 @@ export type ConversionFormat =
 	| "md-to-mdc"
 	| "md-to-kiro-steering"
 	| "fm-to-codex-toml"
-	| "md-to-codex-rules";
+	| "command-to-codex-skill";
 
 /** Write strategy for target files */
 export type WriteStrategy =

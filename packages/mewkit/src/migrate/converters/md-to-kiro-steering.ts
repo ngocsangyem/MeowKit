@@ -107,5 +107,5 @@ export function convertMdToKiroSteering(item: PortableItem, provider: ProviderTy
 
 	if (mode === "fileMatch" && fileMatch) warnings.push(`Using fileMatch mode with pattern: ${fileMatch}`);
 
-	return { content, filename: `${item.name}.md`, warnings };
+	return { content, filename: `${item.name}.md`, warnings, occurrences: stripped.occurrences };
 }

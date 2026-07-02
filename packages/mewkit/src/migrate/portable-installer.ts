@@ -3,7 +3,9 @@
 // Path-safety helpers extracted to portable-installer-path-safety.ts.
 
 import { existsSync } from "node:fs";
-import { rm, unlink } from "node:fs/promises";
+import { copyFile, rm, unlink } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { basename, join } from "node:path";
 import { providers } from "./provider-registry.js";
 import { addPortableInstallation, removePortableInstallation } from "./reconcile/portable-registry.js";
 import { resolveInstalledBackRef, type InstalledBackRef } from "../core/install-metadata-backref.js";
@@ -25,6 +27,7 @@ export interface InstallResult {
 	success: boolean;
 	error?: string;
 	overwritten?: boolean;
+	warnings?: string[];
 }
 
 function findItem(items: PortableItem[], name: string, type: PortableType): PortableItem | null {
@@ -35,6 +38,8 @@ export interface InstallContext {
 	allItems: Record<PortableType, PortableItem[]>;
 	/** Optional link to the installed metadata the source was exported from. */
 	installedBackRef?: InstalledBackRef | null;
+	/** Migration-set membership for the fenced-reference integrity check */
+	migratedRefs?: import("./references/fence-aware-reference-rewriter.js").ReferenceIntegrityIndex | null;
 }
 
 export async function executeInstallAction(action: ReconcileAction, ctx: InstallContext): Promise<InstallResult> {
@@ -64,10 +69,10 @@ export async function executeInstallAction(action: ReconcileAction, ctx: Install
 		};
 	}
 
-	const conversion = convertItem(sourceItem, pathConfig.format, provider);
+	const conversion = convertItem(sourceItem, pathConfig.format, provider, { migratedRefs: ctx.migratedRefs });
 	if (conversion.error) return { action, success: false, error: conversion.error };
 
-	const audit = auditRuntimeCompatibility(conversion.content, sourceItem, provider);
+	const audit = auditRuntimeCompatibility(conversion.content, sourceItem, provider, conversion.occurrences ?? []);
 	if (audit.errors.length > 0) {
 		return {
 			action,
@@ -78,16 +83,30 @@ export async function executeInstallAction(action: ReconcileAction, ctx: Install
 
 	const overwritten = existsSync(action.targetPath);
 
+	// Overwrites are backed up OUTSIDE the target project (tmp) so a failed
+	// write can restore the previous content; backups are removed on success.
+	let backupPath: string | null = null;
+	if (overwritten) {
+		backupPath = join(tmpdir(), `migrate-backup-${process.pid}-${Date.now()}-${basename(action.targetPath)}`);
+		try {
+			await copyFile(action.targetPath, backupPath);
+		} catch {
+			backupPath = null;
+		}
+	}
+
 	try {
 		const pathError = await validateWritableTargetPath(action.targetPath, { global: action.global });
 		if (pathError) {
+			await discardBackup(backupPath);
 			return { action, success: false, error: pathError };
 		}
 
+		const installWarnings: string[] = [...(conversion.warnings ?? [])];
 		if (ws === "per-file" || ws === "single-file") {
 			await atomicWrite(action.targetPath, conversion.content);
 		} else if (ws === "merge-single") {
-			await mergeSingleWrite(action, items, sourceItem, provider, conversion.content);
+			installWarnings.push(...(await mergeSingleWrite(action, items, sourceItem, provider, conversion.content)));
 		} else if (ws === "yaml-merge") {
 			await yamlMergeWrite(action, items, provider);
 		} else if (ws === "json-merge") {
@@ -112,10 +131,28 @@ export async function executeInstallAction(action: ReconcileAction, ctx: Install
 			},
 		);
 
-		return { action, success: true, overwritten };
+		await discardBackup(backupPath);
+		return { action, success: true, overwritten, warnings: installWarnings.length > 0 ? installWarnings : undefined };
 	} catch (err) {
+		if (backupPath) {
+			try {
+				await copyFile(backupPath, action.targetPath);
+			} catch {
+				// Restore is best-effort; the original error is what matters.
+			}
+			await discardBackup(backupPath);
+		}
 		const msg = err instanceof Error ? err.message : String(err);
 		return { action, success: false, error: msg, overwritten };
+	}
+}
+
+async function discardBackup(backupPath: string | null): Promise<void> {
+	if (!backupPath) return;
+	try {
+		await unlink(backupPath);
+	} catch {
+		// Best-effort cleanup.
 	}
 }
 
@@ -125,13 +162,13 @@ async function mergeSingleWrite(
 	sourceItem: PortableItem,
 	provider: ProviderType,
 	convertedContent: string,
-): Promise<void> {
+): Promise<string[]> {
 	const sectionKind =
 		action.type === "config" ? "config" : action.type === "rules" ? "rule" : action.type === "agent" ? "agent" : null;
 
 	if (!sectionKind) {
 		await atomicWrite(action.targetPath, convertedContent);
-		return;
+		return [];
 	}
 
 	const sectionKey = getMergeSectionKey(sectionKind, sourceItem);
@@ -155,6 +192,37 @@ async function mergeSingleWrite(
 	void buildMergedAgentsMd;
 	await atomicWrite(action.targetPath, `${merged}\n`);
 	action.ownedSections = [sectionKey];
+	return buildMergeBudgetWarnings(action, provider, merged, [
+		{ key: sectionKey, content: sectionContent },
+		...filteredSections.map((s) => ({ key: s.key, content: s.content })),
+	]);
+}
+
+/**
+ * Warn (never truncate) when a merged instruction file exceeds the provider's
+ * documented budget — e.g. Codex stops loading project docs once the combined
+ * size reaches project_doc_max_bytes (32 KiB by default).
+ */
+function buildMergeBudgetWarnings(
+	action: ReconcileAction,
+	provider: ProviderType,
+	merged: string,
+	sections: Array<{ key: string; content: string }>,
+): string[] {
+	const pathConfig = providers[provider]?.[providerTypeToKey(action.type)];
+	const budget = pathConfig?.totalCharLimit;
+	if (!budget) return [];
+
+	const size = Buffer.byteLength(merged, "utf-8");
+	if (size <= budget) return [];
+
+	const sectionSizes = sections
+		.map(({ key, content }) => `${key}: ${Buffer.byteLength(content, "utf-8")} B`)
+		.join(", ");
+	return [
+		`${action.targetPath} is ${size} B — over the ${budget} B instruction budget; the runtime truncates project docs at the cap. ` +
+			`Not truncating. Consider splitting into nested instruction files or migrating fewer rules. Section sizes: ${sectionSizes}`,
+	];
 }
 
 async function yamlMergeWrite(action: ReconcileAction, items: PortableItem[], provider: ProviderType): Promise<void> {

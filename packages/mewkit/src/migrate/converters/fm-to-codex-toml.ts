@@ -121,7 +121,7 @@ export function convertFmToCodexToml(item: PortableItem): ConversionResult {
 	lines.push("");
 	lines.push(`developer_instructions = """\n${escapeTomlMultiline(body)}\n"""`);
 
-	return { content: lines.join("\n"), filename: `${slug}.toml`, warnings };
+	return { content: lines.join("\n"), filename: `${slug}.toml`, warnings, occurrences: stripped.occurrences };
 }
 
 export function buildCodexConfigEntry(name: string, description?: string): string {

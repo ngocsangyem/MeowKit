@@ -2,8 +2,13 @@
 // MewKit additions: mewkit/meowkit CLI command rewrites; /meow: + /mk: slash refs
 // already covered by the existing slash-command regex (matches /[a-z][a-z0-9/._:-]+).
 
-import { homedir } from "node:os";
 import { providers } from "../provider-registry.js";
+import {
+	rewriteSourceReferences,
+	type ReferenceIntegrityIndex,
+} from "../references/fence-aware-reference-rewriter.js";
+import { getReferenceTarget, sourceHooksLinePattern } from "../references/reference-target-registry.js";
+import type { ReferenceOccurrence } from "../references/reference-types.js";
 import type { ConversionResult, PortableItem, ProviderType } from "../types.js";
 
 const MAX_CONTENT_SIZE = 512_000;
@@ -12,6 +17,10 @@ export interface MdStripOptions {
 	provider: ProviderType;
 	charLimit?: number;
 	targetName?: string;
+	/** Filename recorded on reference occurrences */
+	file?: string;
+	/** Migration-set membership for the fenced-reference integrity check */
+	migratedRefs?: ReferenceIntegrityIndex | null;
 }
 
 // Lines matching these markers are excluded from narrative-brand substitution.
@@ -60,64 +69,6 @@ function lineIndexAtOffset(lineStarts: number[], offset: number): number {
 		else hi = mid - 1;
 	}
 	return lo;
-}
-
-type ProviderPathKind = "agents" | "commands" | "skills" | "rules" | "config" | "hooks";
-
-interface ProviderPathTarget {
-	path: string;
-	isDirectory: boolean;
-}
-
-function normalizeProjectPath(path: string): string {
-	const normalized = path.replace(/\\/g, "/").replace(/^\.\//, "");
-	const home = homedir().replace(/\\/g, "/");
-	return normalized.startsWith(home) ? normalized.replace(home, "~") : normalized;
-}
-
-function getProviderPathTarget(provider: ProviderType | undefined, type: ProviderPathKind): ProviderPathTarget | null {
-	if (!provider) return null;
-	const pathConfig = providers[provider][type];
-	if (!pathConfig) return null;
-	const resolvedPath = pathConfig?.projectPath ?? pathConfig?.globalPath;
-	if (!resolvedPath) return null;
-
-	const normalized = normalizeProjectPath(resolvedPath);
-	const isDirectory =
-		pathConfig.writeStrategy === "per-file" ||
-		pathConfig.writeStrategy === "yaml-merge" ||
-		pathConfig.writeStrategy === "json-merge";
-
-	return {
-		path: isDirectory && !normalized.endsWith("/") ? `${normalized}/` : normalized,
-		isDirectory,
-	};
-}
-
-function rewriteClaudeDirectoryRefs(
-	input: string,
-	sourceDir: "agents" | "commands" | "skills" | "rules" | "hooks",
-	target: ProviderPathTarget | null,
-	fallbackPrefix: string,
-	isInCodeBlock: (pos: number) => boolean,
-): string {
-	const withItemsRegex = new RegExp(`\\.claude\\/${sourceDir}\\/([a-zA-Z0-9_./-]+)`, "gi");
-	const withPrefixRegex = new RegExp(`\\.claude\\/${sourceDir}\\/`, "gi");
-
-	let output = input.replace(withItemsRegex, (matched, suffix: string, ...args) => {
-		const offset = args[args.length - 2] as number;
-		if (isInCodeBlock(offset)) return matched;
-		if (!target) return `${fallbackPrefix}${suffix}`;
-		return target.isDirectory ? `${target.path}${suffix}` : target.path;
-	});
-
-	output = output.replace(withPrefixRegex, (matched, ...args) => {
-		const offset = args[args.length - 2] as number;
-		if (isInCodeBlock(offset)) return matched;
-		return target ? target.path : fallbackPrefix;
-	});
-
-	return output;
 }
 
 interface TruncationResult {
@@ -189,14 +140,15 @@ function truncateAtParagraphBoundary(content: string, limit: number, originalLen
 export function stripClaudeRefs(
 	content: string,
 	options?: MdStripOptions,
-): { content: string; warnings: string[]; removedSections: string[] } {
+): { content: string; warnings: string[]; removedSections: string[]; occurrences: ReferenceOccurrence[] } {
 	const warnings: string[] = [];
 	const removedSections: string[] = [];
+	const occurrences: ReferenceOccurrence[] = [];
 	let result = content;
 
 	if (content.length > MAX_CONTENT_SIZE) {
 		warnings.push(`Content exceeds ${MAX_CONTENT_SIZE} chars; stripping skipped for safety`);
-		return { content, warnings, removedSections: [] };
+		return { content, warnings, removedSections: [], occurrences };
 	}
 
 	const codeBlockRanges: Array<[number, number]> = [];
@@ -324,35 +276,25 @@ export function stripClaudeRefs(
 		});
 	}
 
-	const agentTarget = getProviderPathTarget(options?.provider, "agents");
-	const commandTarget = getProviderPathTarget(options?.provider, "commands");
-	const skillTarget = getProviderPathTarget(options?.provider, "skills");
-	const ruleTarget = getProviderPathTarget(options?.provider, "rules");
-	const configTarget = getProviderPathTarget(options?.provider, "config");
-	const hookTarget = getProviderPathTarget(options?.provider, "hooks");
-
-	result = rewriteClaudeDirectoryRefs(result, "rules", ruleTarget, "project rules directory/", isInCodeBlock);
-	result = rewriteClaudeDirectoryRefs(result, "agents", agentTarget, "project subagents directory/", isInCodeBlock);
-	result = rewriteClaudeDirectoryRefs(result, "commands", commandTarget, "project commands directory/", isInCodeBlock);
-	result = rewriteClaudeDirectoryRefs(result, "skills", skillTarget, "project skills directory/", isInCodeBlock);
-	if (hookTarget) {
-		result = rewriteClaudeDirectoryRefs(result, "hooks", hookTarget, "project hooks directory/", isInCodeBlock);
-	} else {
+	// Providers without a hooks surface keep the historical line-drop for hook
+	// references — a hook that cannot run anywhere is noise, not a warning.
+	const hookTarget = getReferenceTarget(options?.provider, "hooks");
+	if (!hookTarget) {
+		const hooksLinePattern = sourceHooksLinePattern();
 		result = result
 			.split("\n")
-			.filter((line) => !/\.claude\/hooks\//i.test(line))
+			.filter((line) => !hooksLinePattern.test(line))
 			.join("\n");
 	}
-	result = result.replace(/\.claude\//gi, (matched, ...args) => {
-		const offset = args[args.length - 2] as number;
-		return isInCodeBlock(offset) ? matched : "project runtime data/";
-	});
 
-	const configReplacement = configTarget?.path ?? "project configuration file";
-	result = result.replace(/\bCLAUDE\.md\b/g, (matched, ...args) => {
-		const offset = args[args.length - 2] as number;
-		return isInCodeBlock(offset) ? matched : configReplacement;
+	const refResult = rewriteSourceReferences(result, {
+		provider: options?.provider,
+		file: options?.file,
+		migratedRefs: options?.migratedRefs,
 	});
+	result = refResult.content;
+	warnings.push(...refResult.warnings);
+	occurrences.push(...refResult.occurrences);
 
 	const subagentSupport = options?.provider ? providers[options.provider].subagents : "none";
 	const preserveDelegation = subagentSupport !== "none";
@@ -430,20 +372,31 @@ export function stripClaudeRefs(
 		warnings.push(`All content was Claude-specific${providerTag}`);
 	}
 
-	return { content: result, warnings, removedSections };
+	return { content: result, warnings, removedSections, occurrences };
 }
 
-export function convertMdStrip(item: PortableItem, provider: ProviderType): ConversionResult {
+export function convertMdStrip(
+	item: PortableItem,
+	provider: ProviderType,
+	context?: { migratedRefs?: ReferenceIntegrityIndex | null },
+): ConversionResult {
 	const providerConfig = providers[provider];
 	const pathConfig = providerConfig.config ?? providerConfig.rules;
 	const charLimit = pathConfig?.charLimit;
 	const targetName = providerConfig.displayName;
 
-	const result = stripClaudeRefs(item.body, { provider, charLimit, targetName });
+	const result = stripClaudeRefs(item.body, {
+		provider,
+		charLimit,
+		targetName,
+		file: `${item.name}.md`,
+		migratedRefs: context?.migratedRefs,
+	});
 
 	return {
 		content: result.content,
 		filename: `${item.name}.md`,
 		warnings: result.warnings,
+		occurrences: result.occurrences,
 	};
 }

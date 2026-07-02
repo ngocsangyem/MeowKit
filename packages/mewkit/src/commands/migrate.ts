@@ -24,6 +24,8 @@ export interface MigrateCliArgs {
 	"respect-deletions"?: boolean;
 	"source-version"?: string;
 	providers?: boolean;
+	"all-rules"?: boolean;
+	"include-mcp"?: boolean;
 }
 
 export async function migrate(args: MigrateCliArgs): Promise<number> {
@@ -47,6 +49,8 @@ export async function migrate(args: MigrateCliArgs): Promise<number> {
 		respectDeletions: args["respect-deletions"],
 		sourceVersion: args["source-version"],
 		providers: args.providers,
+		allRules: args["all-rules"],
+		includeMcp: args["include-mcp"],
 	};
 
 	const __dirname = dirname(fileURLToPath(import.meta.url));

@@ -1,13 +1,18 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/codex-features-flag.ts
 // Idempotently ensures `[features] hooks = true` in ~/.codex/config.toml.
-// Sentinel renamed: ck-managed → mewkit-managed.
 import { existsSync } from "node:fs";
 import { readFile, rename, unlink, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { getCodexGlobalBoundary, isCanonicalPathWithinBoundary, withCodexTargetLock } from "./codex-path-safety.js";
 
-const SENTINEL_START = "# --- mewkit-managed-features-start ---";
-const SENTINEL_END = "# --- mewkit-managed-features-end ---";
+// Neutral sentinels: generated files must not carry toolkit branding. Legacy
+// branded markers are still stripped so re-runs replace old blocks.
+const SENTINEL_START = "# --- managed-features-start ---";
+const SENTINEL_END = "# --- managed-features-end ---";
+const LEGACY_SENTINEL_PAIRS: Array<[string, string]> = [
+	["# --- mewkit-managed-features-start ---", "# --- mewkit-managed-features-end ---"],
+	["# --- ck-managed-features-start ---", "# --- ck-managed-features-end ---"],
+];
 
 const MANAGED_BLOCK = `${SENTINEL_START}
 [features]
@@ -155,13 +160,26 @@ function stripAllManagedBlocks(content: string): { content: string; removed: boo
 	let result = content;
 	let removed = false;
 
+	for (const [start, end] of [[SENTINEL_START, SENTINEL_END] as [string, string], ...LEGACY_SENTINEL_PAIRS]) {
+		const stripped = stripBlocksBetween(result, start, end);
+		removed = removed || stripped.removed;
+		result = stripped.content;
+	}
+
+	return { content: result, removed };
+}
+
+function stripBlocksBetween(content: string, start: string, end: string): { content: string; removed: boolean } {
+	let result = content;
+	let removed = false;
+
 	while (true) {
-		const startIdx = result.indexOf(SENTINEL_START);
+		const startIdx = result.indexOf(start);
 		if (startIdx === -1) break;
-		const endIdx = result.indexOf(SENTINEL_END, startIdx);
+		const endIdx = result.indexOf(end, startIdx);
 		if (endIdx === -1) break;
 
-		const endOfBlock = endIdx + SENTINEL_END.length;
+		const endOfBlock = endIdx + end.length;
 		const afterBlockStart = result[endOfBlock] === "\n" ? endOfBlock + 1 : endOfBlock;
 
 		let beforeBlockEnd = startIdx;

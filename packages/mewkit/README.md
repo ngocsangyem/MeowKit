@@ -27,6 +27,43 @@ npx mewkit <command>      # Runtime commands
 | `meowkit task list` | List active tasks with status                                     |
 | `meowkit orchviz`   | Live web visualizer for the active Claude Code session            |
 | `meowkit pack`      | `list` / `add <pack>` / `remove <pack>` — manage installed domains |
+| `meowkit migrate`   | Export the `.claude/` setup to other coding agents (Codex, Cursor, …) |
+
+## Migrate
+
+`mewkit migrate <tool>` converts a Claude Code setup (agents, commands, skills,
+config, rules, hooks) into the target tool's native surfaces. Idempotent:
+re-running over an unchanged source is a no-op, user-edited targets are kept
+unless `--force`, and every run is previewable with `--dry-run`.
+
+```bash
+npx mewkit migrate codex --dry-run     # plan + reference report, writes nothing
+npx mewkit migrate codex               # migrate into the current project
+npx mewkit migrate codex --include-mcp # also convert .mcp.json → [mcp_servers]
+npx mewkit migrate codex --all-rules   # merge every rule, skip the portability filter
+```
+
+Flags: `--dry-run`, `--only <types>`, `--force`, `--yes`, `--global`,
+`--source <dir>`, `--all-rules`, `--include-mcp`, `--skip-config`,
+`--skip-rules`, `--skip-hooks`.
+
+What migrates where for Codex:
+
+| Source                      | Codex target                                        |
+| --------------------------- | --------------------------------------------------- |
+| `.claude/agents/*.md`       | `.codex/agents/*.toml` + managed `config.toml` block |
+| `.claude/commands/**/*.md`  | `.agents/skills/source-command-<name>/SKILL.md`     |
+| `.claude/skills/**`         | `.agents/skills/<name>/`                            |
+| `CLAUDE.md`                 | `AGENTS.md` (merged, 32 KiB budget warning)         |
+| `.claude/rules/*.md`        | merged into `AGENTS.md` as `## Rule:` sections      |
+| `.claude/hooks/*.cjs`       | `.codex/hooks/` + `hooks.json` (version-gated events) |
+| `.mcp.json` (opt-in)        | `config.toml [mcp_servers]` (`--include-mcp`)       |
+
+Markdown references are rewritten with a fence-aware classifier: inline
+references point at the new locations, runnable fenced commands are only
+rewritten when the referenced asset migrates in the same run (otherwise they
+are preserved and listed in the dry-run report), and citations stay verbatim.
+Generated files carry no toolkit branding.
 
 ## Profiles & Packs
 
