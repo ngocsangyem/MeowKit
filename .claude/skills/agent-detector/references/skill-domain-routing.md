@@ -13,6 +13,7 @@ The orchestrator routes by skill names:
 | Implementation pipeline | `mk:plan-creator` → `mk:cook` |
 | Bug investigation / root cause | `mk:investigate` → `mk:fix` |
 | Current library/API documentation | `mk:docs-finder` |
+| Deep multi-source technical research with cited report (technology evaluation, ecosystem comparison, fact-finding) | `mk:research` — NOT for library/API doc lookup (`mk:docs-finder`) or project-only Q&A (`mk:ask-me`) |
 | Project documentation updates | `mk:document-release` or `mk:docs-init` |
 | Verification build/lint/test/typecheck | `mk:verify` or `mk:lint-and-validate` |
 | Code review / pre-landing audit | `mk:review` |

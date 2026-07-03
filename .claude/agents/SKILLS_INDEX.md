@@ -1,6 +1,6 @@
 # the toolkit Skills Index
 
-Centralized registry of all skills. Updated: 2026-06-29 (v2.13.0).
+Centralized registry of all skills. Updated: 2026-07-03 (v2.13.2).
 
 ## By Phase
 
@@ -207,8 +207,9 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ### Cross-Cutting (Any Phase)
 
 ```toon
-[14]{skill,owner,trigger}
+[15]{skill,owner,trigger}
 `mk:ask-me`|any agent|Evidence-grounded project Q&A — "how does X work here", claim-checks, constraint summaries — answered with cited `file:line` sources. Read-only; redirects ideation/decisions/debugging/review to the owning specialist skill.
+`mk:research`|researcher (delegated)|Deep multi-source technical research producing one cited report — technology evaluation, ecosystem comparison, standards fact-finding, "how do others solve X". Delegates to researcher subagent(s) under primary-source discipline + a retrieval-call cap; optional editorial HTML via `--html`. NOT single-library docs (see mk:docs-finder); NOT project-only Q&A (see mk:ask-me).
 `mk:careful`|any agent|Before destructive commands
 `mk:freeze`|any agent|Debug session scoping
 `mk:docs-finder`|any agent (primary: researcher)|Library/API documentation lookup

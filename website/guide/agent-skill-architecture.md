@@ -247,6 +247,7 @@ Cross-cutting skills are loaded by individual agents as needed — they are not 
 | Plan a feature                                           | `mk:plan-creator`                     | 1     |
 | Validate a plan before building                          | `mk:validate-plan`                    | 1     |
 | Brainstorm approaches                                    | `mk:brainstorming`, `mk:office-hours` | 1     |
+| Research a technology / evaluate options with sources    | `mk:research`                         | 0, 1  |
 | Write tests first (TDD)                                  | `mk:testing`                          | 2     |
 | Check test-to-requirement coverage                       | `mk:nyquist`                          | 2, 4  |
 | Implement a feature                                      | `mk:cook`                             | 0-6   |

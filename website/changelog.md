@@ -14,6 +14,29 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.13.2 (2026-07-03) — Deep Research Skill + Full-Surface Codex Migration
+
+### Highlights
+
+A new `mk:research` skill gives you a standalone front door for deep, multi-source technical research that returns one cited report, and `mewkit migrate` now converts a project's full `.claude/` surface to Codex correctly — references inside fenced code blocks are rewritten instead of left as dead links, Codex commands install as skills, and a conversion report flags anything unresolved.
+
+### New Skills
+
+| Skill         | Purpose                                                                                                                                                           |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mk:research` | Deep multi-source technical research — delegates to a researcher subagent under primary-source discipline and a retrieval-call cap, and returns one cited report. |
+
+### Features
+
+- `mk:research --html` — after the markdown report, author a self-contained editorial HTML report beside it; the markdown stays the source of truth.
+- `mk:research --deep` — split the question across two parallel researcher subagents on independent sub-topics.
+
+### CLI
+
+- `mewkit migrate` rewrites `.claude/` references fence-aware — paths inside fenced code blocks are converted instead of left as dead links, and the previous fence-unaware replace that fabricated nonexistent provider paths is gone.
+- Codex migration re-enables commands as skills and merges rules into `AGENTS.md` instead of dropping most of them.
+- `mewkit migrate` emits a conversion report that scans the migrated output for unresolved references.
+
 ## 2.13.1 (2026-06-29) — Wiki Handoff + Context Recall
 
 ### Highlights

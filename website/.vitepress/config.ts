@@ -279,6 +279,7 @@ export default withMermaid(defineConfig({
           collapsed: true,
           items: [
             { text: 'mk:ask-me', link: '/reference/skills/ask-me' },
+            { text: 'mk:research', link: '/reference/skills/research' },
             { text: 'mk:scout', link: '/reference/skills/scout' },
             { text: 'mk:investigate', link: '/reference/skills/investigate' },
             { text: 'mk:docs-finder', link: '/reference/skills/docs-finder' },
