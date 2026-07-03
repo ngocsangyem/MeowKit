@@ -1,7 +1,15 @@
 {
 	"version": "1.0",
-	"mewkitVersion": "1.10.0",
+	"mewkitVersion": "1.14.0",
 	"renames": [],
-	"providerPathMigrations": [],
+	"providerPathMigrations": [
+		{
+			"provider": "codex",
+			"type": "rules",
+			"from": ".codex/rules",
+			"to": "AGENTS.md",
+			"since": "1.14.0"
+		}
+	],
 	"sectionRenames": []
 }

@@ -1,6 +1,7 @@
 import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
 	filterApplicableManifestEntries,
@@ -8,6 +9,10 @@ import {
 	resolvePortableManifestPath,
 	type PortableEvolutionManifest,
 } from "../reconcile/portable-manifest.js";
+
+// The real shipped manifest lives at packages/mewkit/portable-manifest.json,
+// four levels up from this test file (src/migrate/__tests__).
+const SHIPPED_MANIFEST_PATH = fileURLToPath(new URL("../../../portable-manifest.json", import.meta.url));
 
 function makeManifest(overrides: Partial<PortableEvolutionManifest> = {}): PortableEvolutionManifest {
 	return {
@@ -67,6 +72,28 @@ describe("portable evolution manifest", () => {
 		await expect(loadPortableEvolutionManifest(join(root, ".claude"), {})).rejects.toThrow(
 			"portable-manifest.json schema mismatch",
 		);
+	});
+
+	it("ships a schema-valid manifest recording the Codex rules path migration", async () => {
+		// Guards the real published packages/mewkit/portable-manifest.json against
+		// schema drift or a typo in the shipped data (the loader re-validates it).
+		const manifest = await loadPortableEvolutionManifest(dirname(SHIPPED_MANIFEST_PATH), {});
+
+		expect(manifest).not.toBeNull();
+		expect(manifest?.mewkitVersion).toBe("1.14.0");
+
+		const codexRulesMigration = manifest?.providerPathMigrations.find(
+			(entry) => entry.provider === "codex" && entry.type === "rules",
+		);
+		expect(codexRulesMigration).toEqual({
+			provider: "codex",
+			type: "rules",
+			from: ".codex/rules",
+			to: "AGENTS.md",
+			since: "1.14.0",
+		});
+		// The entry's `since` must be applicable at the manifest's own version.
+		expect(manifest?.mewkitVersion).toBe(codexRulesMigration?.since);
 	});
 
 	it("filters entries already applied by registry version", () => {

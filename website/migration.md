@@ -45,7 +45,7 @@ What each tool can receive from your `.claude/` kit:
 
 **Special cases:**
 - **Antigravity** treats agents as a special case of skills. Your Claude Code agents migrate into Antigravity's skills directory.
-- **Codex commands** migrate as Agent Skills (`.agents/skills/source-command-<name>/SKILL.md`) — Codex custom prompts gave way to skills. Dynamic template syntax (`$ARGUMENTS`, `$1`, `{{...}}`, `` !`cmd` ``, `@file`) has no skill equivalent; the template migrates verbatim with a manual-adaptation warning.
+- **Codex commands** migrate as Agent Skills (`.agents/skills/source-command-<name>/SKILL.md`) — Codex custom prompts gave way to skills. Dynamic template syntax (`$ARGUMENTS`, `$1`, <code v-pre>{{...}}</code>, `` !`cmd` ``, `@file`) has no skill equivalent; the template migrates verbatim with a manual-adaptation warning.
 - **Codex rules** merge into `AGENTS.md` as `## Rule:` sections (native `.rules` files only accept `prefix_rule()` command policies). Orchestration/runtime-only rules are skipped by default; pass `--all-rules` to merge everything. The merged file is checked against Codex's 32 KiB `project_doc_max_bytes` budget — over-budget merges warn (with per-section sizes) instead of truncating.
 - **`.mcp.json`** converts to `config.toml [mcp_servers]` entries with the opt-in `--include-mcp` flag (Codex only; project-scoped MCP config loads only in trusted projects).
 - **Hooks** only migrate to four tools (Claude Code, Codex, Droid, Gemini CLI). For other tools, mewkit skips hooks with a warning. Codex events are version-gated: recent Codex (0.142+) supports 10 events with hooks enabled by default; older versions fall back to the conservative 6-event table.

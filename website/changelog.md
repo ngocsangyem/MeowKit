@@ -18,7 +18,7 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 
 ### Highlights
 
-Knowledge-producing skills can now hand a finished artifact to the wiki — it is scanned and turned into a *proposed* candidate with full provenance only when it clears the salience gate — and any flow can recall prior knowledge through a disciplined, DATA-bounded `wiki context` surface. The capture path stays gated end to end: agents still only propose, and a human `approve` remains the only route to a canonical page.
+Knowledge-producing skills can now hand a finished artifact to the wiki — it is scanned and turned into a _proposed_ candidate with full provenance only when it clears the salience gate — and any flow can recall prior knowledge through a disciplined, DATA-bounded `wiki context` surface. The capture path stays gated end to end: agents still only propose, and a human `approve` remains the only route to a canonical page.
 
 ### Features
 
@@ -45,7 +45,7 @@ Knowledge-producing skills can now hand a finished artifact to the wiki — it i
 
 ### Highlights
 
-MeowKit gains a gated, long-term knowledge base. Agents and reviewers can capture provenance-bearing project knowledge, search it with full-text search, and render it to a self-contained HTML page — under a security model where agents may only *propose* content and a human approval (which always re-scans) is the only path to a canonical page.
+MeowKit gains a gated, long-term knowledge base. Agents and reviewers can capture provenance-bearing project knowledge, search it with full-text search, and render it to a self-contained HTML page — under a security model where agents may only _propose_ content and a human approval (which always re-scans) is the only path to a canonical page.
 
 ### New Skills
 
@@ -77,13 +77,13 @@ Brainstorm reports and approved plans now render to self-contained HTML on deman
 
 ### New Skills
 
-| Skill              | Purpose                                                                                          |
-| ------------------ | ------------------------------------------------------------------------------------------------ |
-| `mk:mermaidjs-v11` | Author Mermaid v11 diagram blocks for markdown, READMEs, and code comments.                       |
-| `mk:tech-graph`    | Generate publish-grade SVG/PNG technical diagrams; degrades to SVG-only without `rsvg-convert`.   |
-| `mk:markdown-reader` | Serve long-form markdown in a local reader with an explicit start/stop lifecycle.               |
-| `mk:showcase`      | Package a mission and artifacts into a self-contained, shareable HTML showcase.                   |
-| `mk:stitch`        | Generate new UI designs from a text prompt — external-service-gated, fails closed without a key.  |
+| Skill                | Purpose                                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------------------ |
+| `mk:mermaidjs-v11`   | Author Mermaid v11 diagram blocks for markdown, READMEs, and code comments.                      |
+| `mk:tech-graph`      | Generate publish-grade SVG/PNG technical diagrams; degrades to SVG-only without `rsvg-convert`.  |
+| `mk:markdown-reader` | Serve long-form markdown in a local reader with an explicit start/stop lifecycle.                |
+| `mk:showcase`        | Package a mission and artifacts into a self-contained, shareable HTML showcase.                  |
+| `mk:stitch`          | Generate new UI designs from a text prompt — external-service-gated, fails closed without a key. |
 
 ### Improvements
 
@@ -102,9 +102,9 @@ A plan directory (`plan.md` + `phase-*.md`) now renders into ONE self-contained,
 
 ### New Skills
 
-| Skill            | Purpose                                                                                 |
-| ---------------- | --------------------------------------------------------------------------------------- |
-| `mk:visual-plan` | Render a plan into one shareable, block-disciplined `plan.html` at the plan-dir root.    |
+| Skill            | Purpose                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| `mk:visual-plan` | Render a plan into one shareable, block-disciplined `plan.html` at the plan-dir root. |
 
 ## 2.12.1 (2026-06-27) — Native Plugin Distribution
 
@@ -114,11 +114,11 @@ MeowKit is now installable as a native plugin in both Claude Code and Codex (`mk
 
 ### New Skills
 
-| Skill              | Purpose                                                              |
-| ------------------ | ------------------------------------------------------------------- |
-| `mk:chrome-profile`| Target a real Google Chrome profile for browser automation.         |
-| `mk:ghpm`          | GitHub project management — Issues, Projects, labels, milestones via `gh`. |
-| `mk:html-video`    | Render local MP4 videos from HTML/CSS/JS templates.                 |
+| Skill               | Purpose                                                                    |
+| ------------------- | -------------------------------------------------------------------------- |
+| `mk:chrome-profile` | Target a real Google Chrome profile for browser automation.                |
+| `mk:ghpm`           | GitHub project management — Issues, Projects, labels, milestones via `gh`. |
+| `mk:html-video`     | Render local MP4 videos from HTML/CSS/JS templates.                        |
 
 ### CLI
 
@@ -184,9 +184,9 @@ A second on-demand skill, `mk:improve-codebase-architecture`, reviews a codebase
 
 ### New Skills
 
-| Skill                          | Purpose                                                                                                                                                                        |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mk:resolving-merge-conflicts` | Resolve an in-progress git merge or rebase conflict end to end — read state, recover each side's intent, resolve hunks, run typecheck/tests/format, and finish the merge or rebase. |
+| Skill                              | Purpose                                                                                                                                                                                                   |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mk:resolving-merge-conflicts`     | Resolve an in-progress git merge or rebase conflict end to end — read state, recover each side's intent, resolve hunks, run typecheck/tests/format, and finish the merge or rebase.                       |
 | `mk:improve-codebase-architecture` | Review a codebase for deepening opportunities, emit structured candidates for `mk:preview` to render, then grill a pick into a type-safe patch — analysis and patch emission only, no embedded rendering. |
 
 ## 2.11.5 (2026-06-18) — Long-Horizon Run Hardening
