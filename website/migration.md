@@ -46,10 +46,11 @@ What each tool can receive from your `.claude/` kit:
 **Special cases:**
 - **Antigravity** treats agents as a special case of skills. Your Claude Code agents migrate into Antigravity's skills directory.
 - **Codex commands** migrate as Agent Skills (`.agents/skills/source-command-<name>/SKILL.md`) — Codex custom prompts gave way to skills. Dynamic template syntax (`$ARGUMENTS`, `$1`, <code v-pre>{{...}}</code>, `` !`cmd` ``, `@file`) has no skill equivalent; the template migrates verbatim with a manual-adaptation warning.
-- **Codex rules** merge into `AGENTS.md` as `## Rule:` sections (native `.rules` files only accept `prefix_rule()` command policies). Orchestration/runtime-only rules are skipped by default; pass `--all-rules` to merge everything. The merged file is checked against Codex's 32 KiB `project_doc_max_bytes` budget — over-budget merges warn (with per-section sizes) instead of truncating.
-- **`.mcp.json`** converts to `config.toml [mcp_servers]` entries with the opt-in `--include-mcp` flag (Codex only; project-scoped MCP config loads only in trusted projects).
+- **Codex rules** merge into `AGENTS.md` as `## Rule:` sections (native `.rules` files only accept `prefix_rule()` command policies). Orchestration/runtime-only rules are skipped by default; pass `--all-rules` to merge everything. The merged file is checked against Codex's 32 KiB `project_doc_max_bytes` budget — over-budget merges warn with the exact config line to add to `~/.codex/config.toml`, but mewkit never truncates the file or writes to your home config.
+- **`.mcp.json`** converts to `config.toml [mcp_servers]` entries with the opt-in `--include-mcp` flag (Codex only; project-scoped MCP config loads only in trusted projects). When `.mcp.json` exists and the flag is off, the preflight tells you the exact re-run command.
+- **`.claude/.env`** converts to a Codex `[shell_environment_policy]` scaffold from key names only. Values are never copied; secret-like key names are omitted and counted only as an aggregate warning.
 - **Hooks** only migrate to four tools (Claude Code, Codex, Droid, Gemini CLI). For other tools, mewkit skips hooks with a warning. Codex events are version-gated: recent Codex (0.142+) supports 10 events with hooks enabled by default; older versions fall back to the conservative 6-event table.
-- **Shell hooks** (`.sh`, `.ps1`, `.bat`) never migrate — only node-runnable hooks (`.cjs`, `.mjs`, `.js`) cross over.
+- **Codex shell hooks** (`.sh`) migrate through generated `.cjs` wrappers that execute the copied script inside `.codex/hooks/`. Unsupported shell-family handlers such as `.ps1`, `.bat`, `.cmd`, and `.py` are reported as skipped with a reason.
 - **Kilo Code** entries are ported from upstream but unverified by mewkit. A runtime warning appears when you select it.
 
 ## Reference rewriting
@@ -62,7 +63,7 @@ Markdown content is rewritten with a fence-aware classifier instead of blanket s
 | Unmapped runtime (`.claude/scripts/`, `.claude/memory/`) | neutralized to provider-agnostic phrasing | preserved + warned | preserved |
 | `CLAUDE.md` token | rewritten to the provider config name | preserved (command examples stay runnable) | preserved |
 
-Every preserved reference appears in the preflight/dry-run report with `file:line` and a reason — nothing is silently dropped, and no path is ever fabricated. A post-conversion scanner verifies the invariant: any surviving source reference must be explained by a classifier decision, otherwise the run aborts before writing.
+Every preserved reference appears in the preflight/dry-run report with `file:line` and a reason — nothing is silently dropped, and no path is ever fabricated. A post-conversion scanner verifies the invariant: any surviving source reference must be explained by a classifier decision, otherwise the run aborts before writing. Codex runs also persist the outcome to `.codex/migration-report.json` and `.codex/migration-report.md`, with one row per migrated, skipped, failed, or narrowed artifact.
 
 ## Quick start
 
@@ -170,6 +171,23 @@ mewkit migrate codex --all-rules
 # Also convert .mcp.json servers into config.toml [mcp_servers]
 mewkit migrate codex --include-mcp
 ```
+
+## Codex migration report
+
+Codex migrations write two managed report files at the end of every run:
+
+| File | Purpose |
+|------|---------|
+| `.codex/migration-report.json` | Machine-readable artifact ledger with counts, budget lines, preserved-reference details, and the minimum supported Codex hook version. |
+| `.codex/migration-report.md` | Human-readable summary with the same data plus next actions for anything skipped, failed, or narrowed. |
+
+The final summary prints a single verdict line:
+
+```text
+Migration: 125 migrated, 67 skipped, 39 need attention -> .codex/migration-report.json
+```
+
+`need attention` does not necessarily mean the run failed. It means at least one artifact migrated with reduced coverage, preserved an out-of-scope runtime reference, or was intentionally skipped by portability policy.
 
 ## Project vs. global scope
 

@@ -34,8 +34,11 @@ A new `mk:research` skill gives you a standalone front door for deep, multi-sour
 ### CLI
 
 - `mewkit migrate` rewrites `.claude/` references fence-aware — paths inside fenced code blocks are converted instead of left as dead links, and the previous fence-unaware replace that fabricated nonexistent provider paths is gone.
-- Codex migration re-enables commands as skills and merges rules into `AGENTS.md` instead of dropping most of them.
-- `mewkit migrate` emits a conversion report that scans the migrated output for unresolved references.
+- Codex migration re-enables commands as skills, converts `.sh` hooks through generated wrappers, preserves matcher coverage where Codex supports it, and records unsupported events instead of dropping them silently.
+- Codex migration emits `[shell_environment_policy]` scaffolds from `.claude/.env` key names, omits secret-like keys, and surfaces `.mcp.json` conversion through `--include-mcp`.
+- Codex migration records every migrated, skipped, failed, or narrowed artifact in `.codex/migration-report.json` and `.codex/migration-report.md`.
+- `mewkit migrate` reports `project_doc_max_bytes` guidance for over-budget Codex `AGENTS.md` output instead of truncating or relying on undocumented nested-file behavior.
+- `mewkit` CLI package version: `1.14.1`.
 
 ## 2.13.1 (2026-06-29) — Wiki Handoff + Context Recall
 
