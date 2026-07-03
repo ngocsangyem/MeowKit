@@ -24,11 +24,23 @@ export interface ConversionFallbackWarning {
 	error: string;
 }
 
+/** Optional shared conversion inputs so PREVIEW output matches INSTALL output. */
+export interface StateBuilderConversionOptions {
+	onConversionFallback?: (warning: ConversionFallbackWarning) => void;
+	/**
+	 * Migration-set membership index. Threaded into convertItem so the reconcile
+	 * PREVIEW checksum for codex agents matches the actual INSTALL output (the
+	 * install path already passes migratedRefs; omitting it here made the upgrade
+	 * path see a phantom diff). Non-codex providers ignore it (identity).
+	 */
+	migratedRefs?: import("../references/fence-aware-reference-rewriter.js").ReferenceIntegrityIndex | null;
+}
+
 export function buildConvertedChecksums(
 	item: PortableItem,
 	type: PortableType,
 	selectedProviders: ProviderType[],
-	options?: { onConversionFallback?: (warning: ConversionFallbackWarning) => void },
+	options?: StateBuilderConversionOptions,
 ): Record<string, string> {
 	const rawChecksum = computeContentChecksum(item.body);
 	const convertedChecksums: Record<string, string> = {};
@@ -40,7 +52,7 @@ export function buildConvertedChecksums(
 			continue;
 		}
 
-		const result = convertItem(item, pathConfig.format, provider);
+		const result = convertItem(item, pathConfig.format, provider, { migratedRefs: options?.migratedRefs });
 		if (result.error) {
 			options?.onConversionFallback?.({
 				item: item.name,
@@ -63,7 +75,7 @@ export function buildSourceItemState(
 	item: PortableItem,
 	type: PortableType,
 	selectedProviders: ProviderType[],
-	options?: { onConversionFallback?: (warning: ConversionFallbackWarning) => void },
+	options?: StateBuilderConversionOptions,
 ): SourceItemState {
 	const rawChecksum = computeContentChecksum(item.body);
 	const convertedChecksums = buildConvertedChecksums(item, type, selectedProviders, options);
@@ -76,7 +88,7 @@ export function buildSourceItemState(
 			continue;
 		}
 
-		const result = convertItem(item, pathConfig.format, provider);
+		const result = convertItem(item, pathConfig.format, provider, { migratedRefs: options?.migratedRefs });
 		if (result.error) {
 			targetChecksums[provider] = rawChecksum;
 			continue;

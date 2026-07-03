@@ -87,14 +87,18 @@ describe("skill directory installer", () => {
 		expect(migratedRef).not.toContain("CLAUDE.md");
 	});
 
-	it("fails non-Claude skill install when copied scripts keep Claude runtime variables", async () => {
+	// Note: previously this asserted that ANY $CLAUDE_* in a script hard-fails. Post
+	// Phase-3 the fail-closed rule is scoped to STATE-CHANGING scripts; a non-state-
+	// changing $CLAUDE_PROJECT_DIR now rewrites (covered below). This case is updated
+	// to a state-changing script so it still fail-closes (the non-regression contract).
+	it("fails non-Claude skill install when a state-changing script keeps Claude runtime variables", async () => {
 		const root = await mkdtemp(join(tmpdir(), "mewkit-skill-installer-"));
 		const skillDir = join(root, ".claude", "skills", "runner");
 		const targetSkillsRoot = join(root, ".agents", "skills");
 		await mkdir(skillDir, { recursive: true });
 		await mkdir(targetSkillsRoot, { recursive: true });
 		await writeFile(join(skillDir, "SKILL.md"), "# runner\n", "utf-8");
-		await writeFile(join(skillDir, "run.sh"), "echo $CLAUDE_PROJECT_DIR\n", "utf-8");
+		await writeFile(join(skillDir, "run.sh"), "rm -rf \"$CLAUDE_PROJECT_DIR/cache\"\n", "utf-8");
 
 		providers.codex.skills = {
 			...providers.codex.skills!,
@@ -160,7 +164,8 @@ describe("skill directory installer", () => {
 		await mkdir(skillDir, { recursive: true });
 		await mkdir(targetSkillDir, { recursive: true });
 		await writeFile(join(skillDir, "SKILL.md"), "# runner\n", "utf-8");
-		await writeFile(join(skillDir, "run.py"), "print('$ANTHROPIC_API_KEY')\n", "utf-8");
+		// State-changing (writes a file) + Claude env var → fail-closed, exercises rollback.
+		await writeFile(join(skillDir, "run.py"), "open('$ANTHROPIC_API_KEY', 'w')\n", "utf-8");
 		await writeFile(join(targetSkillDir, "SKILL.md"), "# previous\n", "utf-8");
 
 		providers.codex.skills = {
@@ -218,5 +223,71 @@ describe("skill directory installer", () => {
 		expect(result.success).toBe(false);
 		expect(result.error).toContain("registry unavailable");
 		await expect(readFile(join(targetSkillDir, "SKILL.md"), "utf-8")).resolves.toBe("# previous\n");
+	});
+
+	async function installOneScript(
+		dirName: string,
+		fileName: string,
+		content: string,
+	): Promise<import("../skill-directory-installer.js").SkillInstallResult> {
+		const root = await mkdtemp(join(tmpdir(), "mewkit-skill-installer-"));
+		const skillDir = join(root, ".claude", "skills", dirName);
+		const targetSkillsRoot = join(root, ".agents", "skills");
+		await mkdir(skillDir, { recursive: true });
+		await mkdir(targetSkillsRoot, { recursive: true });
+		await writeFile(join(skillDir, "SKILL.md"), `# ${dirName}\n`, "utf-8");
+		const filePath = join(skillDir, fileName);
+		await mkdir(join(filePath, ".."), { recursive: true });
+		await writeFile(filePath, content, "utf-8");
+		providers.codex.skills = { ...providers.codex.skills!, projectPath: targetSkillsRoot, globalPath: targetSkillsRoot };
+		const result = await installSkillDirectory(
+			{ id: `mk:${dirName}`, name: dirName, dirName, description: `${dirName} skill`, sourcePath: skillDir },
+			"codex",
+			{ global: false },
+		);
+		return { ...result, path: result.path ?? join(targetSkillsRoot, dirName) };
+	}
+
+	it("rewrites $CLAUDE_PROJECT_DIR in a non-state-changing script and installs with a record", async () => {
+		const result = await installOneScript("reader", "scripts/read.sh", 'cat "$CLAUDE_PROJECT_DIR/config.json"\n');
+		expect(result.success).toBe(true);
+		const migrated = await readFile(join(result.path!, "scripts", "read.sh"), "utf-8");
+		expect(migrated).toContain("$PROJECT_ROOT");
+		expect(migrated).not.toContain("$CLAUDE_PROJECT_DIR");
+		expect(result.records?.some((r) => r.reason === "runtime-neutralized")).toBe(true);
+	});
+
+	it("downgrades a fenced Claude env var in reference-grade markdown to a warn record and installs", async () => {
+		// A fenced example env var survives md-strip (which only rewrites prose/inline);
+		// the severity-aware audit downgrades it to a waiver instead of failing the skill.
+		const result = await installOneScript(
+			"docs-only",
+			"references/guide.md",
+			"Example:\n\n```sh\ncat $CLAUDE_SESSION_ID\n```\n",
+		);
+		expect(result.success).toBe(true);
+		expect(result.records?.some((r) => r.reason === "runtime-neutralized" && r.target === "references/guide.md")).toBe(
+			true,
+		);
+	});
+
+	it("stays fail-closed for a state-changing script exporting a credential with a Claude assumption", async () => {
+		const result = await installOneScript(
+			"credential-runner",
+			"scripts/auth.sh",
+			'export API_TOKEN="$CLAUDE_PROJECT_DIR/secret"\n',
+		);
+		expect(result.success).toBe(false);
+		expect(result.error).toContain("Skill runtime compatibility audit failed");
+		expect(result.error).toContain("state-changing");
+	});
+
+	it("emits a structured failure record (never a silent absence) when the audit fails", async () => {
+		const result = await installOneScript("wiper", "scripts/clean.sh", "rm -rf \"$CLAUDE_PROJECT_DIR/data\"\n");
+		expect(result.success).toBe(false);
+		expect(result.records?.length ?? 0).toBeGreaterThan(0);
+		const failure = result.records?.find((r) => r.outcome === "failed");
+		expect(failure?.reason).toBe("audit-rejected");
+		expect(failure?.source).toContain("scripts/clean.sh");
 	});
 });

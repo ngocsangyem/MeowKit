@@ -7,6 +7,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { convertItem } from "../converters/index.js";
 import { providers } from "../provider-registry.js";
+import { codexBudgetRaiseGuidance } from "../portable-installer.js";
 import {
 	combineIntegrityIndexes,
 	createReferenceIntegrityIndex,
@@ -16,7 +17,41 @@ import {
 import type { ReferenceOccurrence } from "../references/reference-types.js";
 import type { ReconcileAction } from "../reconcile/reconcile-types.js";
 import type { PortableItem, PortableType, ProviderType, SkillInfo } from "../types.js";
+import type { MigrationDecisionRecord } from "./migration-record-types.js";
 import { scanUnresolvedReferences, type ScannedOutput, type ValidationFinding } from "./unresolved-reference-scanner.js";
+
+/**
+ * Run-ledger: an append-only accumulator of per-artifact decision records emitted
+ * across the migration run (Phase 1 reference occurrences, Phase 2 hook decisions,
+ * Phase 3 skill audit/waiver decisions, plus the orchestrator's install outcomes).
+ * The Phase 6 report writer serializes this ledger into `migration-report.{json,md}`.
+ *
+ * This is purely additive to the existing preflight `ConversionReport` — the
+ * preflight builder is unchanged; the ledger is the new run-time collection point.
+ */
+export class MigrationLedger {
+	private readonly records: MigrationDecisionRecord[] = [];
+
+	/** Append one decision record (no-op for null/undefined). */
+	add(record: MigrationDecisionRecord | null | undefined): void {
+		if (record) this.records.push(record);
+	}
+
+	/** Append many decision records; null/undefined entries are ignored. */
+	addAll(records: readonly (MigrationDecisionRecord | null | undefined)[] | undefined): void {
+		if (!records) return;
+		for (const record of records) this.add(record);
+	}
+
+	/** Snapshot of every decision recorded so far (defensive copy). */
+	all(): MigrationDecisionRecord[] {
+		return [...this.records];
+	}
+
+	get size(): number {
+		return this.records.length;
+	}
+}
 
 export interface ConversionReport {
 	/** Preserved-with-warning references: "file:line — ref (reason)" */
@@ -27,6 +62,13 @@ export interface ConversionReport {
 	budgetLines: string[];
 	/** Internal invariant violations from the unresolved-reference scanner */
 	validationErrors: string[];
+	/**
+	 * Raw preserved-with-warning occurrences (file/line/original/reason), for the
+	 * run-report ledger. Additive: the preflight printer reads `warnedReferences`;
+	 * this field lets the ledger attach concrete file:line:pattern detail per
+	 * artifact. The `.env` reason is reclassified downstream via classifyEnvReference.
+	 */
+	preservedOccurrences: ReferenceOccurrence[];
 }
 
 const TYPE_KEY: Record<PortableType, "agents" | "commands" | "skills" | "config" | "rules" | "hooks"> = {
@@ -57,7 +99,7 @@ export function buildConversionReport(input: {
 	const outputs: ScannedOutput[] = [];
 	const occurrences: ReferenceOccurrence[] = [];
 	const conversionWarnings = new Set<string>();
-	const budgetByTarget = new Map<string, { bytes: number; budget: number }>();
+	const budgetByTarget = new Map<string, { bytes: number; budget: number; provider: ProviderType }>();
 
 	for (const action of input.actions) {
 		if (action.action !== "install" && action.action !== "update" && action.action !== "conflict") continue;
@@ -77,7 +119,7 @@ export function buildConversionReport(input: {
 
 		if (pathConfig.writeStrategy === "merge-single" && pathConfig.totalCharLimit) {
 			const key = `${provider}:${pathConfig.projectPath ?? pathConfig.globalPath ?? ""}`;
-			const entry = budgetByTarget.get(key) ?? { bytes: 0, budget: pathConfig.totalCharLimit };
+			const entry = budgetByTarget.get(key) ?? { bytes: 0, budget: pathConfig.totalCharLimit, provider };
 			entry.bytes += Buffer.byteLength(conversion.content, "utf-8");
 			budgetByTarget.set(key, entry);
 		}
@@ -110,13 +152,22 @@ export function buildConversionReport(input: {
 		}
 	}
 
-	const warnedReferences = occurrences
-		.filter((o) => o.decision === "preserve-warn")
-		.map((o) => `${o.file}:${o.line} — ${o.original}${o.reason ? ` (${o.reason})` : ""}`);
+	const preservedOccurrences = occurrences.filter((o) => o.decision === "preserve-warn");
+	const warnedReferences = preservedOccurrences.map(
+		(o) => `${o.file}:${o.line} — ${o.original}${o.reason ? ` (${o.reason})` : ""}`,
+	);
 
-	const budgetLines = Array.from(budgetByTarget.entries()).map(([key, { bytes, budget }]) => {
-		const status = bytes > budget ? "OVER budget — the runtime truncates at the cap" : "within budget";
-		return `${key}: projected ~${bytes} B of ${budget} B (${status})`;
+	// Projection reflects the real single-file layout plus, for Codex over-budget targets, the
+	// doc-grounded config-raise recommendation (project_doc_max_bytes) — NOT a phantom nested
+	// split. Codex applies the cap to the combined instruction chain, so splitting does not raise
+	// the effective budget (https://developers.openai.com/codex/guides/agents-md).
+	const budgetLines = Array.from(budgetByTarget.entries()).flatMap(([key, { bytes, budget, provider }]) => {
+		const over = bytes > budget;
+		const status = over ? "OVER budget — the runtime truncates at the cap" : "within budget";
+		const line = `${key}: projected ~${bytes} B of ${budget} B, single file (${status})`;
+		if (!over) return [line];
+		const guidance = codexBudgetRaiseGuidance(provider, bytes, budget);
+		return guidance ? [line, `${key}: ${guidance}`] : [line];
 	});
 
 	const findings: ValidationFinding[] = scanUnresolvedReferences(outputs);
@@ -127,5 +178,6 @@ export function buildConversionReport(input: {
 		conversionWarnings: Array.from(conversionWarnings),
 		budgetLines,
 		validationErrors,
+		preservedOccurrences,
 	};
 }

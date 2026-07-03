@@ -1,9 +1,17 @@
 // Converts a source command template into a Codex Agent Skill
 // (.agents/skills/<dir>/SKILL.md). Codex has no command-template surface —
-// custom prompts gave way to skills — so each command becomes a skill whose
-// body carries the original template. Dynamic template syntax has no skill
-// equivalent: it is kept verbatim and surfaced as a manual-adaptation warning,
-// never silently stripped.
+// custom prompts are deprecated in favor of skills, which validates converting
+// each command into a skill whose body carries the original template
+// (source: https://developers.openai.com/codex/changelog). Dynamic template
+// syntax has no skill equivalent: it is kept verbatim and surfaced as a
+// manual-adaptation warning, never silently stripped.
+//
+// Positional-argument policy (verified 2026-07 via Context7): the custom-prompt
+// argument/placeholder syntax ($1–$9 / $ARGUMENTS) is NOT surfaced in Codex docs
+// (https://developers.openai.com/codex/import), and custom prompts are deprecated
+// anyway. We therefore do NOT emit native positional args — status quo is kept:
+// placeholders are preserved verbatim and flagged for manual adaptation. Recorded
+// as UNKNOWN.
 
 import type { ReferenceIntegrityIndex } from "../references/fence-aware-reference-rewriter.js";
 import { codexCommandSkillDirName, codexCommandSkillRelativePath } from "../references/codex-command-skill-path.js";
@@ -60,7 +68,9 @@ export function convertCommandToCodexSkill(
 		warnings.push(
 			`Command "${commandName}" uses dynamic template syntax with no Codex skill equivalent (${dynamicSyntax.join(
 				"; ",
-			)}). The template is migrated verbatim — manual adaptation needed.`,
+			)}). Codex custom-prompt argument syntax is unconfirmed in its docs, and custom prompts are ` +
+				`deprecated in favor of skills (https://developers.openai.com/codex/changelog). The template is ` +
+				`migrated verbatim — manual adaptation needed.`,
 		);
 	}
 

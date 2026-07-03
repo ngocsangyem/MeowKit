@@ -3,7 +3,7 @@
 import { existsSync } from "node:fs";
 import { mkdir, readFile, realpath, unlink, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
-import { dirname, join, resolve, sep } from "node:path";
+import { dirname, isAbsolute, join, resolve, sep } from "node:path";
 
 const STALE_LOCK_MS = 60 * 1000;
 
@@ -101,4 +101,41 @@ export async function withCodexTargetLock<T>(targetFilePath: string, operation: 
 
 export function getCodexGlobalBoundary(): string {
 	return join(homedir(), ".codex");
+}
+
+/**
+ * The single canonical Codex root for the given scope.
+ * - global: <home>/.codex
+ * - project: <cwd>/.codex
+ *
+ * Always absolute. This is the ONE place a Codex root is computed so no caller
+ * has to string-concatenate a project root onto a path — the source of the
+ * doubled-root bug (`node "/root//root/.codex/hooks/x.cjs"`) observed in real
+ * migrations, where a relative ".codex/hooks" path config was resolved against
+ * cwd in one place and prefixed with the project root again in another.
+ */
+export function getCodexRoot(options: { global: boolean }): string {
+	return options.global ? getCodexGlobalBoundary() : resolve(process.cwd(), ".codex");
+}
+
+/**
+ * Resolve a Codex target path to a single, absolute, non-doubled form.
+ *
+ * `target` may be:
+ * - already absolute (an installer computed it) → returned as-is (idempotent),
+ * - the literal ".codex/..." project-relative form from the provider registry,
+ * - or any other relative fragment → joined onto the scope's Codex root.
+ *
+ * Never derives the path from string content or interpolation — only from the
+ * literal path table and the computed root, so a project root can never be
+ * prepended twice.
+ */
+export function resolveCodexTargetPath(target: string, options: { global: boolean }): string {
+	if (isAbsolute(target)) return resolve(target);
+
+	const codexRoot = getCodexRoot(options);
+	// Strip a leading ".codex/" (or ".codex") segment so we never nest
+	// ".codex/.codex/..." when the registry path already carries the prefix.
+	const normalized = target.replace(/^\.?[/\\]?\.codex[/\\]?/, "");
+	return normalized.length > 0 ? resolve(codexRoot, normalized) : codexRoot;
 }

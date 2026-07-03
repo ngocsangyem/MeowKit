@@ -15,15 +15,26 @@ import {
 	type HooksSection,
 	type PathRewriteMap,
 } from "../converters/index.js";
-import { detectCodexCapabilities } from "../codex-capabilities.js";
+import {
+	CODEX_MIN_SUPPORTED_VERSION,
+	detectCodexCapabilities,
+	detectCodexVersion,
+	isCodexVersionSupported,
+} from "../codex-capabilities.js";
 import { providers } from "../provider-registry.js";
 import type { PortableItem, ProviderType } from "../types.js";
+import type { MigrationDecisionRecord } from "../validation/migration-record-types.js";
 import { ensureCodexHooksFeatureFlag } from "./codex-features-flag.js";
-import { generateCodexHookWrappers } from "./codex-hook-wrapper.js";
+import { generateCodexHookWrappers, type WrapperGenerateInput } from "./codex-hook-wrapper.js";
+import { getCodexRoot } from "./codex-path-safety.js";
 
 // Neutral marker: generated files must not carry toolkit branding.
 const SENTINEL_KEY = "__managed_by_migration__";
 const LEGACY_SENTINEL_KEY = "__mewkit_managed__";
+
+// Safety hooks that are never-prune class — dropping them silently is the defect
+// this phase fixes. Used to elevate their skip/narrow records to CRITICAL detail.
+const SAFETY_HOOK_NAMES = ["gate-enforcement.sh", "privacy-block.sh"];
 
 export interface HooksMergeResult {
 	provider: ProviderType;
@@ -33,6 +44,19 @@ export interface HooksMergeResult {
 	hooksDropped: number;
 	error?: string;
 	warnings: string[];
+	/** Structured per-hook decisions for the Phase 6 run report (codex only today). */
+	records?: MigrationDecisionRecord[];
+}
+
+function isSafetyHook(name: string): boolean {
+	return SAFETY_HOOK_NAMES.some((s) => name.endsWith(s));
+}
+
+/** Runtime handler type stored on the discovered hook's frontmatter. */
+function handlerTypeOf(hook: PortableItem): "js" | "sh" {
+	const t = hook.frontmatter?.handlerType;
+	if (t === "sh" || t === "js") return t;
+	return hook.name.toLowerCase().endsWith(".sh") ? "sh" : "js";
 }
 
 interface HooksMergeOptions {
@@ -114,16 +138,26 @@ function rewriteHookCommand(command: string, hook: PortableItem, hookTargetPaths
 	const targetPath = hookTargetPaths.get(hook.name) ?? hook.sourcePath;
 	const sourcePath = hook.sourcePath;
 	const relPath = `.claude/hooks/${hook.name}`;
-	let rewritten = command
-		.replaceAll(sourcePath, targetPath)
-		.replaceAll(`$CLAUDE_PROJECT_DIR/${relPath}`, targetPath)
-		.replaceAll(relPath, targetPath);
 
-	if (rewritten === command && command.includes(hook.name)) {
-		rewritten = command.replace(new RegExp(escapeRegExp(hook.name), "g"), targetPath);
+	// Apply the MOST-SPECIFIC matching form ONCE and return immediately. Chaining
+	// replaceAll calls doubled the root: once an early rule expands a relative form
+	// to an absolute targetPath, a later rule re-matched the relative fragment now
+	// embedded inside that absolute path and substituted a second absolute path
+	// (produced `<root>/<root>/.claude/hooks/x.sh`). Ordered single-shot avoids it.
+	if (sourcePath !== targetPath && command.includes(sourcePath)) {
+		return command.replaceAll(sourcePath, targetPath);
 	}
-
-	return rewritten;
+	const projectRelForm = `$CLAUDE_PROJECT_DIR/${relPath}`;
+	if (command.includes(projectRelForm)) {
+		return command.replaceAll(projectRelForm, targetPath);
+	}
+	if (command.includes(relPath)) {
+		return command.replaceAll(relPath, targetPath);
+	}
+	if (command.includes(hook.name)) {
+		return command.replace(new RegExp(escapeRegExp(hook.name), "g"), targetPath);
+	}
+	return command;
 }
 
 async function buildHooksSectionFromSettings(
@@ -136,7 +170,7 @@ async function buildHooksSectionFromSettings(
 	const rawHooks = settings.hooks;
 	if (!rawHooks || typeof rawHooks !== "object" || Array.isArray(rawHooks)) return null;
 
-	const migratedHookNames = new Set(hooks.map((hook) => hook.name));
+	const migratedHookNames = hooks.map((hook) => hook.name).sort((a, b) => b.length - a.length);
 	const migratedByName = new Map(hooks.map((hook) => [hook.name, hook]));
 	const section: HooksSection = {};
 
@@ -156,7 +190,7 @@ async function buildHooksSectionFromSettings(
 				const entry = rawEntry as HookEntry;
 				if (typeof entry.command !== "string") continue;
 
-				const matchedName = [...migratedHookNames].find((name) => entry.command.includes(name));
+				const matchedName = migratedHookNames.find((name) => entry.command.includes(name));
 				if (!matchedName) continue;
 				const hook = migratedByName.get(matchedName);
 				if (!hook) continue;
@@ -324,23 +358,43 @@ async function mergeCodex(
 	options: HooksMergeOptions,
 ): Promise<HooksMergeResult> {
 	const settingsCfg = providers.codex.settingsJsonPath;
-	const hooksDir = options.global ? providers.codex.hooks?.globalPath : providers.codex.hooks?.projectPath;
-	if (!settingsCfg || !hooksDir) return badResult("codex");
-	const hooksJsonPath = options.global ? settingsCfg.globalPath : settingsCfg.projectPath;
+	if (!settingsCfg || !providers.codex.hooks) return badResult("codex");
+	// Centralized single-rooted Codex root/dirs — never string-concatenated with a
+	// project root, which was the source of the doubled-root command bug.
+	const codexRoot = getCodexRoot({ global: options.global });
+	const hooksDir = join(codexRoot, "hooks");
+	const hooksJsonPath = join(codexRoot, "hooks.json");
 
 	const warnings: string[] = [];
+	const records: MigrationDecisionRecord[] = [];
 	const snapshot = await snapshotSettings(hooksJsonPath);
 
 	try {
 		const capabilities = await detectCodexCapabilities();
 
-		// Generate wrappers for each hook
-		const hookSourcePaths = hooks.map((h) => hookTargetPaths.get(h.name) ?? h.sourcePath);
-		const wrappers = generateCodexHookWrappers(hookSourcePaths, hooksDir, capabilities);
+		// Version detection: warn + record when the installed Codex predates the
+		// supported hook tier. Deny-capable safety hooks are named explicitly.
+		const installedVersion = await detectCodexVersion();
+		if (installedVersion && !isCodexVersionSupported(installedVersion)) {
+			const affected = hooks.filter((h) => isSafetyHook(h.name)).map((h) => h.name);
+			const affectedNote = affected.length > 0 ? ` Deny-capable hooks affected: ${affected.join(", ")}.` : "";
+			warnings.push(
+				`Codex ${installedVersion} < ${CODEX_MIN_SUPPORTED_VERSION}: migrated hooks may be ignored by this version.${affectedNote}`,
+			);
+		}
+
+		// Generate one wrapper per handler, carrying each handler's runtime type so
+		// .sh handlers copy their script under the tree + get a shell-exec wrapper.
+		const wrapperInputs: WrapperGenerateInput[] = hooks.map((h) => ({
+			originalPath: hookTargetPaths.get(h.name) ?? h.sourcePath,
+			handlerType: handlerTypeOf(h),
+		}));
+		const wrappers = generateCodexHookWrappers(wrapperInputs, hooksDir, capabilities);
 
 		const successfulWrappers = wrappers.filter((w) => w.success);
 		for (const w of wrappers.filter((w) => !w.success)) {
 			warnings.push(`Wrapper failed for ${w.originalPath}: ${w.error}`);
+			records.push(hookRecord(w.originalPath, "failed", "conversion-error", `Wrapper generation failed: ${w.error}`));
 		}
 
 		const commandSubstitutions = new Map<string, string>();
@@ -348,19 +402,38 @@ async function mergeCodex(
 			commandSubstitutions.set(w.originalPath, w.wrapperPath);
 		}
 
-			const claudeSection =
-				(await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
-				buildClaudeHooksSection(hooks, hookTargetPaths);
+		const claudeSection =
+			(await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
+			buildClaudeHooksSection(hooks, hookTargetPaths);
+		const firstSource = wrapperInputs[0]?.originalPath ?? "";
 		const pathRewrite: PathRewriteMap = {
-			sourceDir: dirname(hookSourcePaths[0] ?? ""),
+			sourceDir: dirname(firstSource),
 			targetDir: hooksDir,
 			commandSubstitutions,
 		};
 		const codexSection = convertClaudeHooksToCodex(claudeSection, capabilities, pathRewrite);
 
+		// Every generated wrapper is a .cjs (node) file. Ensure the emitted command
+		// invokes node on it even when the source command had no `node ` prefix
+		// (e.g. a bare `$CLAUDE_PROJECT_DIR/.claude/hooks/gate-enforcement.sh`).
+		const wrapperPaths = new Set(successfulWrappers.map((w) => w.wrapperPath));
+		normalizeWrapperCommands(codexSection, wrapperPaths);
+
+		// Emit event-drop + matcher-narrow records by diffing source vs migrated.
+		emitEventAndMatcherRecords(claudeSection, codexSection, hooks, warnings, records);
+
+		// Migrated records: every successful wrapper whose event survived.
+		const survivingEvents = new Set(Object.keys(codexSection));
+		for (const w of successfulWrappers) {
+			const hook = hooks.find((h) => (hookTargetPaths.get(h.name) ?? h.sourcePath) === w.originalPath);
+			const name = hook?.name ?? w.originalPath;
+			const targetEvent = eventForHookName(claudeSection, name, hook);
+			if (targetEvent && !survivingEvents.has(targetEvent)) continue; // dropped-event, already recorded
+			records.push(hookRecord(name, "migrated", "converted", `Wrapper: ${w.wrapperPath}`, w.wrapperPath));
+		}
+
 		const droppedEvents = Object.keys(claudeSection).filter((e) => !codexSection[e]);
 		const hooksDropped = droppedEvents.length;
-		for (const e of droppedEvents) warnings.push(`Codex does not support event '${e}' — dropped`);
 
 		// Merge into hooks.json (Codex has standalone hooks.json, not embedded in settings.json)
 		const settings = await readSettings(hooksJsonPath);
@@ -371,7 +444,6 @@ async function mergeCodex(
 
 		// Set [features] codex_hooks = true in config.toml
 		if (capabilities.requiresFeatureFlag) {
-			const codexRoot = options.global ? join(dirname(hooksDir)) : dirname(hooksDir);
 			const configTomlPath = join(codexRoot, "config.toml");
 			const featureResult = await ensureCodexHooksFeatureFlag(configTomlPath, options.global);
 			if (featureResult.status === "failed") {
@@ -386,11 +458,106 @@ async function mergeCodex(
 			hooksWritten: hooks.length - hooksDropped,
 			hooksDropped,
 			warnings,
+			records,
 		};
 	} catch (err) {
 		await restoreSettings(snapshot);
 		return errResult("codex", err, hooks.length, warnings);
 	}
+}
+
+/** Build a hook decision record; safety hooks carry a CRITICAL prefix in detail. */
+function hookRecord(
+	name: string,
+	outcome: MigrationDecisionRecord["outcome"],
+	reason: MigrationDecisionRecord["reason"],
+	detail?: string,
+	target?: string,
+): MigrationDecisionRecord {
+	const critical = isSafetyHook(name) && (outcome === "skipped" || outcome === "failed" || outcome === "partial");
+	return {
+		source: name,
+		type: "hooks",
+		provider: "codex",
+		outcome,
+		reason,
+		detail: critical ? `CRITICAL (never-prune safety hook): ${detail ?? ""}`.trim() : detail,
+		target,
+	};
+}
+
+/** Find which event a hook belongs to in the source section (by command match). */
+function eventForHookName(section: HooksSection, name: string, hook?: PortableItem): string | undefined {
+	const needle = hook?.name ?? name;
+	for (const [event, groups] of Object.entries(section)) {
+		for (const g of groups) {
+			if (g.hooks.some((e) => typeof e.command === "string" && e.command.includes(needle))) return event;
+		}
+	}
+	return undefined;
+}
+
+/** Diff source vs migrated section → event-unsupported + matcher-narrowed records. */
+function emitEventAndMatcherRecords(
+	source: HooksSection,
+	migrated: HooksSection,
+	hooks: PortableItem[],
+	warnings: string[],
+	records: MigrationDecisionRecord[],
+): void {
+	for (const [event, groups] of Object.entries(source)) {
+		if (!migrated[event]) {
+			warnings.push(`Codex does not support event '${event}' — dropped`);
+			for (const hook of hooksInEvent(groups, hooks)) {
+				records.push(hookRecord(hook, "skipped", "event-unsupported", `Event '${event}' unsupported on Codex`));
+			}
+			continue;
+		}
+		const srcMatchers = new Set(groups.flatMap((g) => (g.matcher ? g.matcher.split("|").map((p) => p.trim()) : [])));
+		const migMatchers = new Set(
+			migrated[event].flatMap((g) => (g.matcher ? g.matcher.split("|").map((p) => p.trim()) : [])),
+		);
+		const narrowed = [...srcMatchers].filter((m) => !migMatchers.has(m));
+		if (narrowed.length > 0) {
+			warnings.push(`Event '${event}' matcher narrowed: dropped ${narrowed.join(", ")} (Codex support limit)`);
+			for (const hook of hooksInEvent(groups, hooks)) {
+				records.push(
+					hookRecord(hook, "partial", "matcher-narrowed", `Event '${event}' dropped matchers: ${narrowed.join(", ")}`),
+				);
+			}
+		}
+	}
+}
+
+/**
+ * Ensure every command that points at a generated .cjs wrapper is invoked with
+ * `node`. Uses an argv-shape command string (`node <path>`); the wrapper itself
+ * spawns the copied .sh via an argv array, so a space-containing path stays safe.
+ */
+function normalizeWrapperCommands(section: HooksSection, wrapperPaths: Set<string>): void {
+	for (const groups of Object.values(section)) {
+		for (const g of groups) {
+			for (const entry of g.hooks) {
+				if (typeof entry.command !== "string") continue;
+				const bare = entry.command.replace(/^node\s+/, "").trim();
+				if (wrapperPaths.has(bare) && !/^node\s/.test(entry.command)) {
+					entry.command = `node ${bare}`;
+				}
+			}
+		}
+	}
+}
+
+/** Source hook names referenced by any command in the given groups. */
+function hooksInEvent(groups: HookGroup[], hooks: PortableItem[]): string[] {
+	const names: string[] = [];
+	for (const hook of hooks) {
+		const referenced = groups.some((g) =>
+			g.hooks.some((e) => typeof e.command === "string" && e.command.includes(hook.name)),
+		);
+		if (referenced) names.push(hook.name);
+	}
+	return names;
 }
 
 function badResult(provider: ProviderType): HooksMergeResult {

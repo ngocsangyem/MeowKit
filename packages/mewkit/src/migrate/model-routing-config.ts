@@ -29,6 +29,30 @@ const TIER_ALIASES: Record<string, ModelTier> = {
 
 const EFFORT_KEYS = ["effort", "reasoningEffort", "model_reasoning_effort"] as const;
 
+// Codex documented `model_reasoning_effort` values, mapped per source tier.
+// Codex accepts `minimal | low | medium | high | xhigh`; config keys are `model`
+// + `model_reasoning_effort` (source: https://developers.openai.com/codex/config-sample).
+// We do NOT invent a codex `model` id — that is account/deployment-specific and
+// stays user-supplied (or inherits Codex's default). What IS doc-grounded is the
+// reasoning-effort ladder, so when a user configures a codex tier model but omits
+// the effort, we fill it from this table. Source tier "haiku" therefore no longer
+// silently produces "No configured codex model" with no guidance: either the user
+// supplies a model (and gets the documented effort) or the resolver returns the
+// documented-inherit note (see CODEX_TIER_INHERIT_NOTE).
+export const CODEX_TIER_REASONING_EFFORT: Record<ModelTier, string> = {
+	heavy: "xhigh",
+	balanced: "high",
+	light: "medium",
+};
+
+// Documented-inherit guidance for a tier with no user-configured codex model.
+// Replaces the bare "No configured codex model" gap for source tier haiku (and
+// any other tier) with an explicit, actionable note.
+export const CODEX_TIER_INHERIT_NOTE =
+	"Codex has no built-in model id per source tier; the target inherits Codex's configured default model. " +
+	"To pin a model + reasoning effort per tier, set modelRouting.providers.codex.tiers in .meowkit.config.json " +
+	"(documented reasoning-effort values: minimal|low|medium|high|xhigh). See https://developers.openai.com/codex/config-sample";
+
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return !!value && typeof value === "object" && !Array.isArray(value);
 }
@@ -79,6 +103,13 @@ function addProviderEntry(
 	if (!normalizedKey) {
 		warnings.push(`Ignoring unknown model routing tier "${key}" for ${provider}`);
 		return;
+	}
+
+	// Codex: when the user pins a tier model but omits the reasoning effort, fill
+	// it from the documented per-tier ladder (never overriding an explicit value).
+	if (provider === "codex" && normalizedKey !== "default" && spec.effort === undefined) {
+		const documentedEffort = CODEX_TIER_REASONING_EFFORT[normalizedKey];
+		if (documentedEffort) spec.effort = documentedEffort;
 	}
 
 	const providerMap = overrides[provider] ?? {};

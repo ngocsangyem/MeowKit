@@ -20,7 +20,10 @@ export {
 } from "./portable-registry.js";
 export {
 	filterApplicableManifestEntries,
+	isManagedMigrationReportBasename,
+	isManagedMigrationReportPath,
 	loadPortableEvolutionManifest,
+	MANAGED_MIGRATION_REPORT_BASENAMES,
 	resolvePortableManifestPath,
 	type PortableEvolutionManifest,
 } from "./portable-manifest.js";

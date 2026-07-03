@@ -39,8 +39,14 @@ export const codexConfig: ProviderConfig = {
 		format: "md-strip",
 		writeStrategy: "merge-single",
 		fileExtension: ".md",
-		// Codex stops loading project docs at project_doc_max_bytes (32 KiB default);
-		// the installer warns instead of truncating when the merged file exceeds it.
+		// Codex applies project_doc_max_bytes (32 KiB default) to the COMBINED instruction
+		// chain and stops adding files once the cap is reached; subdirectory AGENTS.md load
+		// only when cwd is inside that subtree
+		// (https://developers.openai.com/codex/guides/agents-md). So splitting into nested
+		// files does NOT raise the effective budget. Over budget, the installer emits a
+		// project_doc_max_bytes raise GUIDANCE (never writing ~/.codex/config.toml) and orders
+		// sections safety-first so any runtime truncation degrades gracefully — it never
+		// truncates the content itself.
 		totalCharLimit: 32768,
 	},
 	// Codex `.rules` files only accept native prefix_rule() command policies —

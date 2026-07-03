@@ -34,6 +34,39 @@ export interface CodexCapabilities {
 	requiresFeatureFlag: boolean;
 }
 
+// Minimum Codex version this migration targets. Below this the hook surface is
+// the 0.124-alpha feature-flag tier — deny-capable hooks (gate-enforcement,
+// privacy-block) may be silently ignored, so the merger emits a hard WARN and
+// records the minimum in the run report. No feature-flag path is built below it.
+export const CODEX_MIN_SUPPORTED_VERSION = "0.142.0";
+
+// Deny protocol (documented at https://developers.openai.com/codex/hooks):
+// a PreToolUse command hook denies a tool call via any of:
+//   1. {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"..."}}
+//   2. {"decision":"block","reason":"..."}
+//   3. exit code 2 + reason on stderr (direct parity with Claude's exit-2 convention)
+// "Any deny decision overrides allow decisions from other hooks." Therefore the
+// safety hooks (gate-enforcement.sh, privacy-block.sh) migrate as REAL blocking
+// wrappers — their exit-2 semantics port directly through the generated wrapper.
+
+/** True when the installed Codex version is at/above the supported hook tier. */
+export function isCodexVersionSupported(version: string): boolean {
+	const coerced = semver.coerce(version);
+	const min = semver.coerce(CODEX_MIN_SUPPORTED_VERSION);
+	if (!coerced || !min) return false;
+	return semver.gte(coerced, min);
+}
+
+/** Read the installed Codex version string, or null when the binary is absent. */
+export async function detectCodexVersion(): Promise<string | null> {
+	try {
+		const { stdout } = await execFileAsync("codex", ["--version"], { timeout: 5000, encoding: "utf8" });
+		return stdout.trim().replace(/^(codex\s+)?v?/i, "").trim();
+	} catch {
+		return null;
+	}
+}
+
 export const CODEX_CAPABILITY_TABLE: CodexCapabilities[] = [
 	{
 		// Hook surface as documented at developers.openai.com/codex/hooks

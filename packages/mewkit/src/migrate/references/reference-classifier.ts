@@ -5,6 +5,50 @@
 
 import type { ReferenceSpan } from "./reference-types.js";
 
+// --- .claude/.env reference classification --------------------------------
+//
+// A `.claude/.env` reference used to fall into the generic "no provider
+// equivalent for this source runtime path" bucket. That is now outdated at the
+// CONFIG level: Codex's documented `[shell_environment_policy]` is the analogue
+// for passing environment into shell subprocesses, and the migration emits a
+// keys-only scaffold for it (see shell-env-policy-emitter). This helper lets the
+// reference rewriter reclassify `.claude/.env` occurrences to POINT AT that
+// scaffold instead of the dead-end "no equivalent" phrase.
+//
+// SECURITY: this helper deals only with the reference PATH text (e.g. the string
+// ".claude/.env"), never with env values.
+
+/** Matches a source `.claude/.env` (optionally `.env.<suffix>`) path reference. */
+const ENV_REFERENCE = /^\.claude\/\.env(\.[A-Za-z0-9_.-]+)?$/i;
+
+export interface EnvReferenceClassification {
+	/** Provider-neutral replacement phrase pointing at the emitted policy scaffold. */
+	neutral: string;
+	/** Human-readable reason for the migration report (supersedes "no equivalent"). */
+	reason: string;
+}
+
+/** True when `path` is a `.claude/.env` (or `.env.*`) source reference. */
+export function isEnvReference(path: string): boolean {
+	return ENV_REFERENCE.test(path.replace(/\\/g, "/").trim());
+}
+
+/**
+ * Classify a `.claude/.env` reference to point at the emitted Codex
+ * `[shell_environment_policy]` scaffold, replacing the old "no provider
+ * equivalent" classification. Returns null for any non-`.env` path so callers
+ * can fall through to their existing classification.
+ */
+export function classifyEnvReference(path: string): EnvReferenceClassification | null {
+	if (!isEnvReference(path)) return null;
+	return {
+		neutral: "the generated [shell_environment_policy] scaffold in config.toml",
+		reason:
+			"environment variables now map to the Codex [shell_environment_policy] scaffold " +
+			"(keys-only, placeholder values); fill values from your environment — do not paste secrets",
+	};
+}
+
 const FENCE_OPEN = /^ {0,3}(`{3,}|~{3,})/;
 const FRONTMATTER_DELIMITER = /^---\s*$/;
 

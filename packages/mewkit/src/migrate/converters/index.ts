@@ -48,7 +48,7 @@ export function convertItem(
 			case "md-to-kiro-steering":
 				return convertMdToKiroSteering(item, provider);
 			case "fm-to-codex-toml":
-				return convertFmToCodexToml(item);
+				return convertFmToCodexToml(item, context);
 			case "command-to-codex-skill":
 				return convertCommandToCodexSkill(item, context);
 			default: {

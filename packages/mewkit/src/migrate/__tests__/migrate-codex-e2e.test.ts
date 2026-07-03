@@ -74,6 +74,17 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 		expect(configToml).not.toContain("mewkit-managed");
 	});
 
+	it("rewrites the agent TOML fenced ref to a migrated skill script, preserving only out-of-set refs", () => {
+		const agentToml = readFileSync(join(env.projectDir, ".codex", "agents", "planner.toml"), "utf-8");
+		// demo-skill IS in the migration set → the fenced script ref is rewritten to
+		// the provider target (previously blanket-preserved because migratedRefs was dropped).
+		expect(agentToml).toContain("python3 .agents/skills/demo-skill/scripts/run.py");
+		// No .claude/skills reference to a migrated asset survives in the agent TOML.
+		expect(agentToml).not.toContain(".claude/skills/demo-skill");
+		// A genuinely out-of-set runtime ref (no provider surface) still preserves — fail-closed.
+		expect(agentToml).toContain("node .claude/scripts/validate-docs.cjs");
+	});
+
 	it("merges the opted-in MCP servers into config.toml", () => {
 		const configToml = readFileSync(join(env.projectDir, ".codex", "config.toml"), "utf-8");
 		expect(configToml).toContain("[mcp_servers.context7]");

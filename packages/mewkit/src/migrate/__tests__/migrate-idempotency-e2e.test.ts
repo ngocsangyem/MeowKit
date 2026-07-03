@@ -34,18 +34,36 @@ afterAll(async () => {
 });
 
 describe("migrate idempotency and conflict handling", () => {
-	it("second run over unchanged source is byte-identical", async () => {
+	// The migration report is a MANAGED artifact carrying a real run timestamp — it
+	// is intentionally non-idempotent and is exempt from the reconciler's churn
+	// surface (see reconcile/portable-manifest.ts isManagedMigrationReportPath). It
+	// is excluded from the byte-identical snapshot for that reason.
+	const REPORT_SKIP = [".claude", join(".codex", "migration-report.json"), join(".codex", "migration-report.md")];
+
+	it("second run over unchanged source is byte-identical (excluding the timestamped report)", async () => {
 		expect(await env.run({})).toBe(0);
-		const first = snapshotTree(env.projectDir, [".claude"]);
+		const first = snapshotTree(env.projectDir, REPORT_SKIP);
 		expect(first.size).toBeGreaterThan(0);
 
 		expect(await env.run({})).toBe(0);
-		const second = snapshotTree(env.projectDir, [".claude"]);
+		const second = snapshotTree(env.projectDir, REPORT_SKIP);
 
 		expect(Array.from(second.keys()).sort()).toEqual(Array.from(first.keys()).sort());
 		for (const [file, content] of second) {
 			expect(content, file).toBe(first.get(file));
 		}
+	});
+
+	it("the migration report's per-artifact section is deterministic across re-runs", async () => {
+		expect(await env.run({})).toBe(0);
+		const reportPath = join(env.projectDir, ".codex", "migration-report.json");
+		const first = JSON.parse(readFileSync(reportPath, "utf-8")) as { header: { timestamp: string }; artifacts: unknown[] };
+
+		expect(await env.run({})).toBe(0);
+		const second = JSON.parse(readFileSync(reportPath, "utf-8")) as { header: { timestamp: string }; artifacts: unknown[] };
+
+		// Artifact keys are stable — only the header timestamp is allowed to vary.
+		expect(JSON.stringify(second.artifacts)).toBe(JSON.stringify(first.artifacts));
 	});
 
 	it("keeps a user-edited target by default and overwrites it with --force", async () => {

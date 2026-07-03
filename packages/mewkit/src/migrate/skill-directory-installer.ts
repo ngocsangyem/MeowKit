@@ -17,7 +17,23 @@ import { computeContentChecksum } from "./reconcile/checksum-utils.js";
 import { addPortableInstallation } from "./reconcile/portable-registry.js";
 import { resolveInstalledBackRef, type InstalledBackRef } from "../core/install-metadata-backref.js";
 import { auditSkillDirectory } from "./skill-directory-audit.js";
+import { applyEnvVarRewrites } from "./apply-env-var-rewrites.js";
+import { detectStateChanging, languageFor } from "./state-changing-script-detector.js";
+import type { MigrationDecisionRecord } from "./validation/migration-record-types.js";
 import type { ProviderType, SkillInfo } from "./types.js";
+
+const NON_STATE_CHANGING_REWRITE_EXTENSIONS = new Set([".sh", ".py", ".js", ".cjs", ".mjs", ".ts", ".tsx"]);
+const REWRITE_SCANNABLE_EXTENSIONS = new Set([
+	...NON_STATE_CHANGING_REWRITE_EXTENSIONS,
+	".md",
+	".mdx",
+	".txt",
+	".json",
+	".jsonc",
+	".yaml",
+	".yml",
+	".toml",
+]);
 
 export interface SkillInstallResult {
 	skill: string;
@@ -25,6 +41,8 @@ export interface SkillInstallResult {
 	success: boolean;
 	path?: string;
 	error?: string;
+	/** Structured decision records (migrated / failed / partial-with-waivers) for the run report. */
+	records?: MigrationDecisionRecord[];
 }
 
 async function canonicalize(path: string): Promise<string> {
@@ -78,6 +96,55 @@ async function rewriteMarkdownFilesForProvider(
 }
 
 /**
+ * Apply the static env-var rewrite table across the copied tree BEFORE the audit.
+ * State-changing scripts are NOT rewritten — a rewrite path must never downgrade a
+ * state-changing script (LOCKED policy 4a); it fail-closes in the audit regardless.
+ * Only "rewrite"-disposition tokens are substituted; "neutralize" tokens remain for
+ * the audit to warn+annotate. Returns one migration record per file that changed.
+ */
+async function applyEnvVarRewritesForProvider(
+	rootDir: string,
+	provider: ProviderType,
+	skill: SkillInfo,
+	baseDir: string = rootDir,
+): Promise<MigrationDecisionRecord[]> {
+	const records: MigrationDecisionRecord[] = [];
+	const entries = await readdir(rootDir, { withFileTypes: true });
+	for (const entry of entries) {
+		const fullPath = join(rootDir, entry.name);
+		if (entry.isDirectory()) {
+			records.push(...(await applyEnvVarRewritesForProvider(fullPath, provider, skill, baseDir)));
+			continue;
+		}
+		if (!entry.isFile()) continue;
+		const ext = fullPath.slice(fullPath.lastIndexOf(".")).toLowerCase();
+		if (!REWRITE_SCANNABLE_EXTENSIONS.has(ext)) continue;
+
+		const original = await readFile(fullPath, "utf-8");
+		// Never rewrite a state-changing script — it stays fail-closed by policy.
+		if (NON_STATE_CHANGING_REWRITE_EXTENSIONS.has(ext) && detectStateChanging(original, languageFor(fullPath)).stateChanging)
+			continue;
+
+		const { content, applied } = applyEnvVarRewrites(original);
+		if (applied.length === 0) continue;
+		await writeFile(fullPath, content, "utf-8");
+		const relPath = fullPath.slice(baseDir.length + 1).replace(/\\/g, "/");
+		for (const a of applied) {
+			records.push({
+				source: `.claude/skills/${skill.dirName}/${relPath}`,
+				type: "skill",
+				provider,
+				outcome: "partial",
+				reason: "runtime-neutralized",
+				detail: a.annotation,
+				target: relPath,
+			});
+		}
+	}
+	return records;
+}
+
+/**
  * Install a single skill directory to the target provider.
  * Source dir → target dir using node fs.cp recursive.
  * Updates registry with sourceChecksum (SKILL.md content) for idempotency.
@@ -108,6 +175,11 @@ export async function installSkillDirectory(
 	}
 
 	const targetDir = join(targetBase, sanitizedName);
+
+	// Structured decision records — populated during install (waivers/rewrites) and
+	// on audit failure (fail-closed). Surfaced on the result so no outcome is silent.
+	const installRecords: MigrationDecisionRecord[] = [];
+	let failureRecords: MigrationDecisionRecord[] = [];
 
 	try {
 		const parent = dirname(targetDir);
@@ -140,9 +212,39 @@ export async function installSkillDirectory(
 				combineIntegrityIndexes(selfIndex, options.migratedRefs),
 				occurrencesByFile,
 			);
+			// Apply the static env-var rewrite table across the tree (scripts + markdown)
+			// BEFORE the audit, so table-known tokens (e.g. $CLAUDE_PROJECT_DIR) are already
+			// neutralized to a provider-neutral literal when the audit runs. State-changing
+			// scripts are skipped inside the helper and stay fail-closed.
+			const rewriteRecords =
+				provider === "claude-code" ? [] : await applyEnvVarRewritesForProvider(targetDir, provider, skill);
+			installRecords.push(...rewriteRecords);
+
 			const audit = await auditSkillDirectory(targetDir, provider, skill.name, { occurrencesByFile });
 			if (audit.errors.length > 0) {
+				// Fail-closed: emit a structured failure record (never a silent absence),
+				// then throw so the catch block rolls the whole skill dir back.
+				failureRecords = audit.errors.map((e) => ({
+					source: `.claude/skills/${skill.dirName}/${e.filePath}`,
+					type: "skill",
+					provider,
+					outcome: "failed",
+					reason: "audit-rejected",
+					detail: e.message,
+				}));
 				throw new Error(`Skill runtime compatibility audit failed: ${audit.errors.map((e) => e.message).join("; ")}`);
+			}
+			// Downgraded matches (warn+annotate) become partial-migration records.
+			for (const w of audit.waivers) {
+				installRecords.push({
+					source: `.claude/skills/${skill.dirName}/${w.filePath}`,
+					type: "skill",
+					provider,
+					outcome: "partial",
+					reason: "runtime-neutralized",
+					detail: `${w.message}: ${w.annotation}`,
+					target: w.filePath,
+				});
 			}
 
 			const skillMdPath = join(skill.sourcePath, "SKILL.md");
@@ -178,13 +280,20 @@ export async function installSkillDirectory(
 			await rm(backupDir, { recursive: true, force: true });
 		}
 
-		return { skill: skill.name, provider, success: true, path: targetDir };
+		return {
+			skill: skill.name,
+			provider,
+			success: true,
+			path: targetDir,
+			records: installRecords.length > 0 ? installRecords : undefined,
+		};
 	} catch (err) {
 		return {
 			skill: skill.name,
 			provider,
 			success: false,
 			error: err instanceof Error ? err.message : String(err),
+			records: failureRecords.length > 0 ? failureRecords : undefined,
 		};
 	}
 }

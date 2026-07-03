@@ -522,7 +522,10 @@ describe("portability policy", () => {
 		expect(result.skipMessages).toEqual([]);
 	});
 
-	it("skips generic skills when executable files contain runtime coupling", async () => {
+	// Post Phase-3: a NON-state-changing script with rewriteable coupling is no longer
+	// skipped — it installs (the install path rewrites env vars, downgrades paths to
+	// warn+preserve). Only STATE-CHANGING scripts stay fail-closed (next test).
+	it("keeps generic skills when a non-state-changing script has rewriteable coupling", async () => {
 		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
 		tempDirs.push(root);
 
@@ -534,6 +537,36 @@ describe("portability policy", () => {
 			"utf-8",
 		);
 		await writeFile(join(skillDir, "scripts", "run.sh"), "echo $CLAUDE_PROJECT_DIR/.claude/hooks/log.json\n");
+
+		const result = await buildPortableSkillsByProvider(
+			[
+				{
+					id: "mk:helper-with-script",
+					name: "helper-with-script",
+					dirName: "helper-with-script",
+					description: "Generic helper",
+					sourcePath: skillDir,
+				},
+			],
+			["codex"] satisfies ProviderType[],
+		);
+
+		expect(result.skillsByProvider.get("codex")?.map((s) => s.name)).toEqual(["helper-with-script"]);
+		expect(result.skipMessages).toEqual([]);
+	});
+
+	it("skips generic skills when a STATE-CHANGING script contains runtime coupling", async () => {
+		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
+		tempDirs.push(root);
+
+		const skillDir = join(root, "helper-with-script");
+		await mkdir(join(skillDir, "scripts"), { recursive: true });
+		await writeFile(
+			join(skillDir, "SKILL.md"),
+			"---\nname: helper-with-script\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+			"utf-8",
+		);
+		await writeFile(join(skillDir, "scripts", "run.sh"), 'rm -rf "$CLAUDE_PROJECT_DIR/.claude/hooks/log.json"\n');
 
 		const result = await buildPortableSkillsByProvider(
 			[

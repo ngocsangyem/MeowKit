@@ -1,5 +1,7 @@
-// Filter handlers.json: drop entries pointing at filtered-out shell hooks so target dispatcher
-// doesn't reference non-existent files at runtime (Red Team Finding 6).
+// Filter handlers.json: drop entries pointing at handlers that have NO portable execution
+// path on the target (.ps1/.bat/.cmd/.py) so the target dispatcher doesn't reference a
+// non-existent file at runtime. `.sh` handlers are NOT dropped — they migrate via a copied
+// script + generated .cjs wrapper, so their handlers.json entries are kept.
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";

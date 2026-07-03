@@ -32,9 +32,18 @@ import {
 	type ReconcileAction,
 } from "./reconcile/index.js";
 import { convertItem } from "./converters/index.js";
-import { buildConversionReport } from "./validation/migrate-conversion-report.js";
+import { buildConversionReport, MigrationLedger } from "./validation/migrate-conversion-report.js";
+import { buildRunRecords, type RunOutcome } from "./validation/migration-ledger-inputs.js";
+import { buildMigrationReport, writeMigrationReport } from "./validation/migration-report-writer.js";
+import type { MigrationDecisionRecord } from "./validation/migration-record-types.js";
+import { discoverEnvKeys } from "./discovery/config-discovery.js";
+import { emitShellEnvPolicyScaffold } from "./providers/codex/shell-env-policy-emitter.js";
+import { getCodexRoot } from "./hooks/codex-path-safety.js";
+import { formatMcpIncludeRerunCommand } from "./migrate-ui-summary.js";
 import { convertMcpJsonToCodexToml } from "./converters/mcp-json-to-codex-toml.js";
 import { installCodexMcpServers } from "./hooks/codex-mcp-installer.js";
+import { installCodexShellEnvPolicy } from "./hooks/codex-shell-env-installer.js";
+import { CODEX_MIN_SUPPORTED_VERSION } from "./providers/codex/capabilities.js";
 import {
 	createReferenceIntegrityIndex,
 	type ReferenceIntegrityIndex,
@@ -45,7 +54,7 @@ import { installSkillDirectory } from "./skill-directory-installer.js";
 import { buildInstalledBackRef, type InstalledBackRef } from "../core/install-metadata-backref.js";
 import { installCodexAgents, mergeHooksSettings } from "./hooks/index.js";
 import { loadModelRoutingConfig } from "./model-routing-config.js";
-import { printActionDetails, printFinalSummary, printPreflight } from "./migrate-ui-summary.js";
+import { printActionDetails, printFinalSummary, printPreflight, printReportPath } from "./migrate-ui-summary.js";
 import {
 	collectProviderContractDiagnostics,
 	summarizeProviderContractDiagnostics,
@@ -109,7 +118,13 @@ async function runMigrateUnderLock(
 	});
 	spinner?.stop("Discovery complete.");
 
-	const sourceItems = flattenForReconcile(discovered).map((item) => buildSourceItemState(item, item.type, targets));
+	// Built once, up front: threaded into BOTH the reconcile preview (buildSourceItemState)
+	// and the install path so the codex-agent preview checksum matches install output.
+	const migratedRefs = buildMigratedRefsIndex(discovered);
+
+	const sourceItems = flattenForReconcile(discovered).map((item) =>
+		buildSourceItemState(item, item.type, targets, { migratedRefs }),
+	);
 
 	const registry = await readPortableRegistry();
 	const manifest = await loadPortableEvolutionManifest(ctx.bundledKitDir, registry);
@@ -159,6 +174,25 @@ async function runMigrateUnderLock(
 				: ".mcp.json detected but not migrated — opt in with --include-mcp",
 		);
 	}
+	// When .mcp.json exists but --include-mcp is off, surface the exact re-run command
+	// (Phase 5 field on PreflightContext); undefined otherwise.
+	const mcpIncludeAdvisory =
+		mcpApplicable && !options.includeMcp
+			? { rerunCommand: formatMcpIncludeRerunCommand(["mewkit", ...ctx.argv]) }
+			: undefined;
+
+	// Phase 5 shell-env scaffold: from .claude/.env KEY NAMES only (no values). The
+	// scaffold text is emitted into the codex config output; the aggregate count of
+	// secret-like key names omitted is recorded in the report (names never surface).
+	let secretKeysOmitted = 0;
+	let shellEnvScaffold = "";
+	if (targets.includes("codex")) {
+		const envKeys = await discoverEnvKeys(join(discovered.source.root, ".env"));
+		const scaffold = emitShellEnvPolicyScaffold(envKeys);
+		secretKeysOmitted = scaffold.omittedSecretCount;
+		shellEnvScaffold = scaffold.content;
+		for (const warning of scaffold.warnings) mcpBanners.push(warning);
+	}
 
 	const collisions = detectProviderPathCollisions(targets, { global: isGlobal });
 	const collisionBanners = collisions.map(
@@ -173,8 +207,6 @@ async function runMigrateUnderLock(
 		manifest && manifestCleanupCount > 0
 			? [`Portable manifest ${manifest.mewkitVersion}: ${manifestCleanupCount} cleanup action(s) planned`]
 			: [];
-
-	const migratedRefs = buildMigratedRefsIndex(discovered);
 
 	// In-memory conversion pass: classifier decisions, budget projections, and
 	// the unresolved-reference invariant check all land in the preflight report.
@@ -200,6 +232,7 @@ async function runMigrateUnderLock(
 			...skillDryRunMessages,
 		],
 		conversionReport,
+		mcpIncludeAdvisory,
 	});
 
 	if (options.dryRun) {
@@ -242,27 +275,84 @@ async function runMigrateUnderLock(
 	// came from. Absent installed metadata yields null and the bridge is omitted.
 	const installedBackRef = buildInstalledBackRef(discovered.source.root);
 
-	const results = await executePlan(
-		portabilityFiltered.plan.actions,
-		{ allItems: itemsByT, installedBackRef, migratedRefs },
-		portableSkills.skillsByProvider,
-		targets,
-		isGlobal,
-		scope.skills,
-		join(discovered.source.root, "settings.json"),
-	);
+	// The ledger accumulates every run-time decision; it is serialized in the
+	// finally-path below so the outcome is persisted even on a partial failure.
+	const ledger = new MigrationLedger();
+	const reportProvider: ProviderType = targets.includes("codex") ? "codex" : targets[0];
+	const reportVersion = manifest?.mewkitVersion ?? "unknown";
+	// Orchestrator-owned accumulators: retained by the finally-path even if
+	// executePlan throws mid-run, so the report captures what happened up to then.
+	const sink: ExecutePlanSink = { results: [], outcomes: new Map<string, RunOutcome>(), phaseRecords: [] };
 
-	let mcpFailed = false;
-	if (mcpApplicable && options.includeMcp) {
-		mcpFailed = !(await migrateMcpServers(mcpSourcePath, isGlobal));
-	}
+	try {
+		const executed = await executePlan(
+			portabilityFiltered.plan.actions,
+			{ allItems: itemsByT, installedBackRef, migratedRefs },
+			portableSkills.skillsByProvider,
+			targets,
+			isGlobal,
+			scope.skills,
+			join(discovered.source.root, "settings.json"),
+			sink,
+		);
 
-	printFinalSummary(results);
-	const hasFailures = results.some((r) => !r.success);
-	if (!hasFailures && manifest) {
-		await updateAppliedManifestVersion(manifest.mewkitVersion);
+		// Emit the [shell_environment_policy] scaffold into the codex config output
+		// (real run, idempotent managed block). Failure is non-fatal but recorded.
+		if (targets.includes("codex") && shellEnvScaffold.length > 0) {
+			const envResult = await installCodexShellEnvPolicy(shellEnvScaffold, { global: isGlobal });
+			if (!envResult.success) {
+				console.error(pc.red(`[x] shell_environment_policy scaffold write failed: ${envResult.error}`));
+			}
+		}
+
+		let mcpFailed = false;
+		if (mcpApplicable && options.includeMcp) {
+			mcpFailed = !(await migrateMcpServers(mcpSourcePath, isGlobal));
+		}
+
+		printFinalSummary(executed.results);
+		const hasFailures = executed.results.some((r) => !r.success);
+		if (!hasFailures && manifest) {
+			await updateAppliedManifestVersion(manifest.mewkitVersion);
+		}
+		return hasFailures || mcpFailed ? 1 : 0;
+	} finally {
+		// Persist what happened — even on partial failure. A failed report write is
+		// logged but NEVER masks the original run exception (it is re-thrown by the
+		// finally semantics because we do not swallow it). The sink holds outcomes
+		// accumulated up to a mid-run throw. The report is provider-parameterized but
+		// codex is the first (and today only) consumer with a resolved output dir, so
+		// non-codex runs are left byte-for-byte unchanged.
+		if (targets.includes("codex")) {
+			ledger.addAll(buildRunRecords({
+				discovered,
+				provider: reportProvider,
+				outcomes: sink.outcomes,
+				phaseRecords: sink.phaseRecords,
+				preservedOccurrences: conversionReport.preservedOccurrences,
+			}));
+
+			const report = buildMigrationReport({
+				provider: reportProvider,
+				version: reportVersion,
+				records: ledger.all(),
+				budgetLines: conversionReport.budgetLines,
+				secretKeysOmitted,
+				codexMinSupportedVersion: CODEX_MIN_SUPPORTED_VERSION,
+			});
+
+			try {
+				const outputDir = getCodexRoot({ global: isGlobal });
+				const written = await writeMigrationReport(report, outputDir);
+				printReportPath(written.verdictLine);
+			} catch (writeErr) {
+				// Log the write failure without masking whatever the run was already doing.
+				console.error(
+					pc.red(`[x] Failed to write migration report: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`),
+				);
+			}
+		}
 	}
-	return hasFailures || mcpFailed ? 1 : 0;
 }
 
 /** Opt-in .mcp.json → config.toml [mcp_servers] migration for the Codex target. */
@@ -315,6 +405,34 @@ function buildMigratedRefsIndex(discovered: Awaited<ReturnType<typeof discoverAl
 	return createReferenceIntegrityIndex(entries);
 }
 
+export interface ExecutePlanResult {
+	results: Array<import("./portable-installer.js").InstallResult>;
+	/** Per-artifact run outcome keyed by `${type}:${source}` for the run-report ledger. */
+	outcomes: Map<string, RunOutcome>;
+	/** Structured Phase 1-3 records surfaced on install results (skills, hooks). */
+	phaseRecords: MigrationDecisionRecord[];
+}
+
+function recordOutcome(
+	outcomes: Map<string, RunOutcome>,
+	type: PortableType,
+	source: string,
+	outcome: RunOutcome,
+): void {
+	outcomes.set(`${type}:${source}`, outcome);
+}
+
+/**
+ * Shared, mutable accumulators the orchestrator owns so that a mid-run throw in
+ * executePlan does NOT lose the outcomes recorded before the throw — the finally
+ * path still writes what happened up to the failure point.
+ */
+export interface ExecutePlanSink {
+	results: Array<import("./portable-installer.js").InstallResult>;
+	outcomes: Map<string, RunOutcome>;
+	phaseRecords: MigrationDecisionRecord[];
+}
+
 async function executePlan(
 	actions: ReconcileAction[],
 	ctx: {
@@ -327,8 +445,11 @@ async function executePlan(
 	isGlobal: boolean,
 	skillsScopeEnabled: boolean,
 	sourceSettingsPath: string,
-): Promise<Array<import("./portable-installer.js").InstallResult>> {
-	const results: Array<import("./portable-installer.js").InstallResult> = [];
+	sink: ExecutePlanSink,
+): Promise<ExecutePlanResult> {
+	const results = sink.results;
+	const outcomes = sink.outcomes;
+	const phaseRecords = sink.phaseRecords;
 	const codexAgentActions = new Set<string>();
 	const codexHookActions = new Set<string>();
 	const hookTargetPathsByProvider = new Map<ProviderType, Map<string, string>>();
@@ -343,8 +464,21 @@ async function executePlan(
 	}
 
 	for (const action of actions) {
-		if (action.action === "skip") continue;
-		if (action.action === "conflict" && action.resolution?.type === "keep") continue;
+		if (action.action === "skip") {
+			// A no-op skip means the artifact is already present on the target — it is
+			// migrated (installed), not absent. Only a user-deleted-respected skip
+			// leaves the target absent. Recording this keeps re-run reports honest and
+			// the migrated/skipped identity stable across idempotent runs.
+			if (action.reasonCode !== "user-deleted-respected" && action.reasonCode !== "source-removed-orphan") {
+				recordOutcome(outcomes, action.type, action.item, { outcome: "migrated", target: action.targetPath || undefined });
+			}
+			continue;
+		}
+		if (action.action === "conflict" && action.resolution?.type === "keep") {
+			// User kept their edited target — the artifact is still installed (migrated).
+			recordOutcome(outcomes, action.type, action.item, { outcome: "migrated", target: action.targetPath || undefined });
+			continue;
+		}
 		if (action.provider === "codex" && action.type === "agent") {
 			if (action.action !== "delete") {
 				codexAgentActions.add(action.item);
@@ -364,6 +498,14 @@ async function executePlan(
 			} else {
 				const result = await executeInstallAction(action, ctx);
 				results.push(result);
+				phaseRecords.push(...(result.records ?? []));
+				if (result.success) {
+					recordOutcome(outcomes, action.type, action.item, { outcome: "migrated", target: action.targetPath });
+				} else {
+					// executeInstallAction returns audit failures as structured errors; treat
+					// any non-success as a failed outcome (audit vs conversion reason is on the record).
+					recordOutcome(outcomes, action.type, action.item, { outcome: "failed", error: result.error });
+				}
 				if (result.success && action.type === "hooks") {
 					const provider = action.provider as ProviderType;
 					const providerMap = hookTargetPathsByProvider.get(provider) ?? new Map<string, string>();
@@ -372,22 +514,37 @@ async function executePlan(
 				}
 			}
 		} catch (err) {
-			results.push({
-				action,
-				success: false,
-				error: err instanceof Error ? err.message : String(err),
-			});
+			// An internal (non-audit) installer exception: record as failed with an
+			// internal-error reason rather than letting the artifact vanish silently.
+			const message = err instanceof Error ? err.message : String(err);
+			results.push({ action, success: false, error: message });
+			if (action.action !== "delete") {
+				recordOutcome(outcomes, action.type, action.item, {
+					outcome: "failed",
+					error: message,
+					internalError: true,
+				});
+			}
 		}
 	}
 
 	if (targets.includes("codex") && codexAgentActions.size > 0) {
 		const agentsToWrite = ctx.allItems.agent.filter((agent) => codexAgentActions.has(agent.name));
-		const result = await installCodexAgents(agentsToWrite, { global: isGlobal, configAgents: agentsToWrite });
+		const result = await installCodexAgents(agentsToWrite, {
+			global: isGlobal,
+			configAgents: agentsToWrite,
+			migratedRefs: ctx.migratedRefs,
+		});
 		results.push({
 			action: codexBulkActionShim("agent", "codex", isGlobal, result.written),
 			success: result.success,
 			error: result.error,
 		});
+		// The bulk install is all-or-nothing; record each batched agent's outcome so the
+		// per-artifact report is not left blank for the 24 codex agents.
+		for (const agent of agentsToWrite) {
+			recordOutcome(outcomes, "agent", agent.name, result.success ? { outcome: "migrated" } : { outcome: "failed", error: result.error });
+		}
 	}
 
 	const hookProviders = targets.filter((target) => providers[target].hooks);
@@ -406,6 +563,12 @@ async function executePlan(
 				success: result.success,
 				error: result.error,
 			});
+			// Thread the Phase 2 per-hook decision records (codex today) into the ledger,
+			// and record a baseline migrated/failed outcome per hook item in the batch.
+			phaseRecords.push(...(result.records ?? []));
+			for (const hook of hookItems) {
+				recordOutcome(outcomes, "hooks", hook.name, result.success ? { outcome: "migrated" } : { outcome: "failed", error: result.error });
+			}
 		}
 	}
 
@@ -423,12 +586,15 @@ async function executePlan(
 					action: skillActionShim(skill, target, isGlobal, r.path ?? ""),
 					success: r.success,
 					error: r.error,
+					records: r.records,
 				});
+				phaseRecords.push(...(r.records ?? []));
+				recordOutcome(outcomes, "skill", skill.name, r.success ? { outcome: "migrated", target: r.path } : { outcome: "failed", error: r.error });
 			}
 		}
 	}
 
-	return results;
+	return { results, outcomes, phaseRecords };
 }
 
 /**

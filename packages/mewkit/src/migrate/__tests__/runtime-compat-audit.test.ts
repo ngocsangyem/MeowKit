@@ -25,4 +25,14 @@ describe("runtime compatibility audit", () => {
 		const result = auditRuntimeCompatibility("Run npx claude doctor", { name: "doctor", type: "command" }, "codex");
 		expect(result.errors).toEqual(expect.arrayContaining([expect.stringContaining("Claude Code command assumption")]));
 	});
+
+	it("downgrades rewriteable Claude env vars in rule markdown to warnings", () => {
+		const result = auditRuntimeCompatibility(
+			"Use ${CLAUDE_PLUGIN_DATA} for plugin data in legacy Claude skills.",
+			{ name: "skill-authoring-rules", type: "rules" },
+			"codex",
+		);
+		expect(result.errors).toEqual([]);
+		expect(result.warnings).toEqual(expect.arrayContaining([expect.stringContaining("Claude-specific environment variable")]));
+	});
 });

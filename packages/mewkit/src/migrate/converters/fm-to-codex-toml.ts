@@ -3,6 +3,7 @@
 import { createHash } from "node:crypto";
 import { resolveModel } from "../model-taxonomy.js";
 import { providers } from "../provider-registry.js";
+import type { ReferenceIntegrityIndex } from "../references/fence-aware-reference-rewriter.js";
 import type { ConversionResult, PortableItem } from "../types.js";
 import { escapeTomlMultiline } from "./md-to-toml.js";
 import { stripClaudeRefs } from "./md-strip.js";
@@ -83,7 +84,10 @@ function deriveSandboxMode(tools: unknown): { sandboxMode: string | null; warnin
 	};
 }
 
-export function convertFmToCodexToml(item: PortableItem): ConversionResult {
+export function convertFmToCodexToml(
+	item: PortableItem,
+	context?: { migratedRefs?: ReferenceIntegrityIndex | null },
+): ConversionResult {
 	const warnings: string[] = [];
 	const slug = toCodexSlug(item.name);
 	const lines: string[] = [];
@@ -112,7 +116,12 @@ export function convertFmToCodexToml(item: PortableItem): ConversionResult {
 	if (sandboxResult.warning) warnings.push(sandboxResult.warning);
 	if (sandboxResult.sandboxMode) lines.push(`sandbox_mode = "${sandboxResult.sandboxMode}"`);
 
-	const stripped = stripClaudeRefs(item.body, { provider: "codex", targetName: providers.codex.displayName });
+	const stripped = stripClaudeRefs(item.body, {
+		provider: "codex",
+		targetName: providers.codex.displayName,
+		file: `${slug}.toml`,
+		migratedRefs: context?.migratedRefs,
+	});
 	warnings.push(...stripped.warnings);
 	const body = stripped.content.trim();
 	if (body.length === 0) {

@@ -9,6 +9,7 @@ import { buildCodexConfigEntry } from "../converters/fm-to-codex-toml.js";
 import { convertItem } from "../converters/index.js";
 import { addPortableInstallation, removePortableInstallation } from "../reconcile/portable-registry.js";
 import { providers } from "../provider-registry.js";
+import type { ReferenceIntegrityIndex } from "../references/fence-aware-reference-rewriter.js";
 import type { PortableItem, ProviderType } from "../types.js";
 import { getCodexGlobalBoundary, isCanonicalPathWithinBoundary, withCodexTargetLock } from "./codex-path-safety.js";
 
@@ -76,7 +77,7 @@ function buildManagedBlock(entries: string[]): string {
  */
 export async function installCodexAgents(
 	agents: PortableItem[],
-	options: { global: boolean; configAgents?: PortableItem[] },
+	options: { global: boolean; configAgents?: PortableItem[]; migratedRefs?: ReferenceIntegrityIndex | null },
 ): Promise<CodexInstallResult> {
 	const config = providers.codex.agents;
 	if (!config) {
@@ -104,7 +105,9 @@ export async function installCodexAgents(
 
 			try {
 				for (const agent of agents) {
-				const result = convertItem(agent, "fm-to-codex-toml", "codex");
+				const result = convertItem(agent, "fm-to-codex-toml", "codex", {
+					migratedRefs: options.migratedRefs,
+				});
 				if (result.error) continue;
 				const targetPath = join(agentsDir, result.filename);
 				await atomicWrite(targetPath, result.content);

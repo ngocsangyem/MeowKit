@@ -10,6 +10,28 @@ export interface PreflightContext {
 	skippedShellHooks: number;
 	bannerExtras: string[];
 	conversionReport?: ConversionReport;
+	/**
+	 * When `.mcp.json` was detected but `--include-mcp` is off, this carries the
+	 * advisory so the preflight can print the exact re-run command. Undefined when
+	 * not applicable (no .mcp.json, or the flag is already on).
+	 */
+	mcpIncludeAdvisory?: McpIncludeAdvisory;
+}
+
+/** Advisory that `.mcp.json` exists but is not being migrated (flag off). */
+export interface McpIncludeAdvisory {
+	/** The exact command the user should re-run to include MCP servers. */
+	rerunCommand: string;
+}
+
+/**
+ * Build the exact `--include-mcp` re-run command from the original argv. The
+ * command is normalized to a `mewkit migrate ... --include-mcp` invocation so the
+ * user can copy-paste it verbatim. `--include-mcp` is appended only when absent.
+ */
+export function formatMcpIncludeRerunCommand(argv: readonly string[]): string {
+	const args = argv.filter((a) => a !== "--include-mcp");
+	return `${args.join(" ")} --include-mcp`.trim();
 }
 
 const SECTION_DETAIL_CAP = 20;
@@ -55,6 +77,13 @@ export function printPreflight(plan: ReconcilePlan, ctx: PreflightContext): void
 		console.log(pc.dim(`[i] ${extra}`));
 	}
 
+	if (ctx.mcpIncludeAdvisory) {
+		console.log();
+		console.log(pc.cyan("[i] .mcp.json detected but not migrated. Re-run with --include-mcp to convert it into"));
+		console.log(pc.cyan("    .codex/config.toml [mcp_servers]:"));
+		console.log(`    ${pc.bold(ctx.mcpIncludeAdvisory.rerunCommand)}`);
+	}
+
 	const report = ctx.conversionReport;
 	if (report) {
 		printCappedSection("Preserved references (need attention)", report.warnedReferences, (l) => pc.yellow(`[!] ${l}`));
@@ -91,6 +120,16 @@ export function printActionDetails(actions: ReconcileAction[]): void {
 		}
 		if (list.length > 10) console.log(pc.dim(`  … and ${list.length - 10} more`));
 	}
+}
+
+/**
+ * Print the persisted migration-report path + verdict line at the end of a run.
+ * The verdict line already embeds the path; this keeps report presentation in the
+ * UI layer alongside the other run printers.
+ */
+export function printReportPath(verdictLine: string): void {
+	console.log();
+	console.log(pc.bold(verdictLine));
 }
 
 export function printFinalSummary(results: InstallResult[]): void {

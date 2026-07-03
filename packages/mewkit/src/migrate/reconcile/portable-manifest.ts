@@ -80,6 +80,33 @@ export function filterApplicableManifestEntries(
 	};
 }
 
+// --- Managed migration-report artifact ------------------------------------
+//
+// The persisted migration report (`migration-report.json` + `.md`) is a MANAGED
+// output artifact: it is (re)written on every run and is intentionally
+// non-idempotent (its header carries a real run timestamp). It is therefore
+// EXEMPT from the reconciler's checksum/conflict surface — it is never registered
+// as a portable installation, and idempotency comparisons must skip it so the
+// timestamp never registers as drift. This is the single source of truth for the
+// report's fixed file names so producers and idempotency checks agree.
+
+/** Fixed base names of the managed migration-report artifacts (provider-neutral). */
+export const MANAGED_MIGRATION_REPORT_BASENAMES: readonly string[] = [
+	"migration-report.json",
+	"migration-report.md",
+];
+
+/** True when a base name is a managed migration-report artifact (exempt from churn). */
+export function isManagedMigrationReportBasename(name: string): boolean {
+	return MANAGED_MIGRATION_REPORT_BASENAMES.includes(name);
+}
+
+/** True when a path ends in a managed migration-report artifact. */
+export function isManagedMigrationReportPath(path: string): boolean {
+	const base = path.replace(/\\/g, "/").split("/").pop() ?? path;
+	return isManagedMigrationReportBasename(base);
+}
+
 export function resolvePortableManifestPath(bundledKitDir: string): string {
 	if (basename(bundledKitDir) === ".claude") return join(dirname(bundledKitDir), "portable-manifest.json");
 	return join(bundledKitDir, "portable-manifest.json");
