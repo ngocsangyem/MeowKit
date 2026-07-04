@@ -87,6 +87,17 @@ EXAMPLES (optional):
 1. <one fix per finding, citing source doc per `references/playbook.md`>
 2. ...
 
+<!-- Optional — renders ONLY when the input explicitly names a target model/runtime.
+     Annotation-only: it never changes Section 4. See references/target-notes.md.
+     Omit this block entirely when no target is named. -->
+### Target-specific notes — <target>
+
+> Steering hints for <target>. The Enhanced Prompt below is unchanged (universal
+> kernel) — apply these only if sending it to <target>.
+
+- <technique 1 relevant to the input>
+- Avoid: <the "must not do" item for this target>
+
 ## 4. Enhanced Prompt
 
 ```
@@ -174,6 +185,10 @@ NOT the rewrite. Formula lives in `references/playbook.md` Scoring Rubric.
 | **Final (clamped 1–10, rounded to nearest int)** | | **<N>/10** |
 
 > Verdict band: 1–3 = severely under-specified · 4–6 = workable but rewrite recommended · 7–9 = minor polish · 10 = ready as-is.
+
+<!-- Optional "### Target-specific notes — <target>" block renders here (after Score,
+     before Section 4) ONLY when the input explicitly names a target. Same rules as
+     Template B; see references/target-notes.md. Annotation-only — never changes Section 4. -->
 
 ## 4. Enhanced Prompt
 

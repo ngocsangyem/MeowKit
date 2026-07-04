@@ -103,12 +103,27 @@ Algorithm: see `references/verification-roles.md` (tier selection, role responsi
 
 **Important — subagent file ownership.** Subagents are READ-ONLY. The orchestrator (planner agent) performs the single Edit per phase file. This avoids the parallel-write race that would violate file-ownership rules.
 
+### 4e. Pruning Pass (before red team)
+
+**Skip if:** `planning_mode = fast` OR `planning_mode = product-level` (no phase files to prune).
+
+Walk plan.md + phase files with this checklist; fix inline:
+
+- (a) Phase with no real implementation step → merge into a neighbor or delete.
+- (b) Section duplicated across phase files → keep one, link from the others.
+- (c) Task/todo without an acceptance criterion → add one or cut the task.
+- (d) plan.md > 80 lines → compress Overview, move detail to phase files.
+- (e) Key Insight / Risk / Requirement / Constraint claim missing `from:` or `[ASSUMPTION]` → tag it.
+
+Set `pruning_result = "{N} items pruned/fixed"` for step-05 context.
+
 ## Output
 
 - Semantic check results (pass/fail per row)
 - `PLAN_COMPLETE` from validation script
 - `selected_approach` set (two mode only)
 - `verification_tier` set (skipped in fast / product-level)
+- `pruning_result` set (skipped in fast / product-level)
 - `## Verification Log` written to each phase file (skipped in fast / product-level)
 
 ## Next

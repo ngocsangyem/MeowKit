@@ -9,6 +9,7 @@ Advisory only — does not change agent-detector scoring or output format.
 |--------|-------|---------------------|
 | Vague idea, needs refinement | Define | mk:plan-creator |
 | New feature, need spec/plan | Plan | mk:plan-creator |
+| Runtime context decision — context near budget, long session degrading, choosing a minimal read-set, or compact vs clear vs sub-agent | Any | mk:context-engineering (routes to one of 25 context patterns per decision; NOT structural .claude/ overhead audit — see mk:context-audit) |
 | Green-field product build ("build me a kanban app", "make a SaaS dashboard", autonomous multi-hour build) | Plan + Build | mk:autobuild (preferred over mk:cook for autonomous green-field work; runs planner → contract → generator ⇄ evaluator loop) |
 | Have plan, ready to implement | Build | mk:cook, mk:development |
 | Rough-size from spec / pre-ticket sizing / estimate stories before tickets exist | Plan | mk:story-sizer |

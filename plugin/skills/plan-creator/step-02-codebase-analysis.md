@@ -6,6 +6,9 @@ Understand existing codebase before drafting plan.
 
 ## Instructions
 
+If `intake_packet_path` is set (not `none`), read the packet's Scope Shape block
+first — do not re-scout areas the packet already covers with `from:` evidence.
+
 ### 2a. Scout Relevant Directories
 
 Invoke `mk:scout` on directories related to the task:

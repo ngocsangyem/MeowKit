@@ -4,6 +4,10 @@ Write plan.md overview + phase files. Integrate research findings into plan cont
 
 ## Instructions
 
+If `intake_packet_path` is set (not `none`): after creating the plan directory,
+move the packet to `{plan_dir}/research/plan-intake-packet.md` and read it FIRST —
+before research reports. Cite it like any research report.
+
 ### 3a. Create Plan Directory
 
 ```
@@ -76,6 +80,13 @@ Baseline rules (security, gates, tests, naming, scope, budget) always apply; bel
 - **Never:** see `.claude/rules/security-rules.md` and `.claude/rules/gate-rules.md` (hard stops — not restated here).
 ```
 
+#### Conditional: `## User-Confirmed Decisions` (intake packet only)
+
+If `intake_packet_path` is set and the packet's Requirements block lists user-confirmed
+decisions: copy them into plan.md as a `## User-Confirmed Decisions` section, each item
+marked `locked: user-confirmed`. These are decisions a human already made upstream —
+step-05 red-team must escalate proposed cuts to the user, never silently remove them.
+
 **Fast mode:** Write plan.md with Goal, Context, Scope, Constraints, Technical Approach, ACs, Agent State. NO phase files. NO Autonomy Boundaries block. Use `assets/plan-template.md` format.
 
 ### 3b'. Solution Design Checklist (Hard Mode Only)
@@ -103,6 +114,7 @@ Each phase file MUST have these 12 sections (after the frontmatter block):
 1. **Context Links** — links to research reports, related files, docs
 2. **Overview** — priority, status, effort, description
 3. **Key Insights** — findings from research (cite source: `from: research/researcher-01-report.md`)
+   - Traceability rule: `from:` applies to Key Insights, Risks, Requirements, and Constraints. Valid values: a path (intake packet / research report / scout output / external artifact) or the tag `[ASSUMPTION]`.
 4. **Requirements** — functional + non-functional
 5. **Architecture** — design, data flow, component interaction
 6. **Related Code Files** — files to create, modify, read

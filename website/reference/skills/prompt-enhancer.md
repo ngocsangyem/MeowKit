@@ -80,6 +80,7 @@ The skill **does not accept a `--model` flag.** Per the synthesis report (see so
 | `--analyze --score` | Sections 1, 2, 3 + **Score: N/10** block + Section 4 |
 | `--score` (alone) | Auto-promoted to `--analyze --score` |
 | `--deep` (any mode) | Appends "Suggested context" sub-block to Section 4 when scout returns ≥1 hit |
+| `--analyze` + explicit target named | Appends "Target-specific notes" block after the analysis (annotation-only; never changes the rewrite) |
 | Architecture-review recipe | Layered on `--analyze --deep`; asks the downstream reviewer for findings, trade-offs, and recommendation |
 | Research recipe | Layered on prompt shape; frames discovery and grounding without doing retrieval |
 
@@ -102,6 +103,26 @@ Recipes are documented framings on top of existing modes. They add no new flags 
 | Research / discovery | The draft asks a downstream agent to discover, compare, or investigate | Long data appears before the ask; acceptance criteria require grounded findings, sources, unknowns, and next-step options | The skill performs no research or retrieval. Use `mk:scout` or a downstream research agent for that work. |
 
 Canaries #11 and #12 guard these boundaries in the eval suite.
+
+## Model-Agnostic by Default
+
+The default rewrite is portable across coding agents (Claude, GPT/Codex, Gemini, Droid) — it never emits XML tags, vendor tokens, or model-specific reasoning triggers. Data separation uses a plain, model-neutral fence:
+
+```
+--- DATA START ---
+<verbatim data>
+--- DATA END ---
+```
+
+Vendor-specific idioms (for example Claude's `<context>` tags) never appear in the default rewrite. They surface only as opt-in target notes.
+
+### Complexity classifier & task recipes
+
+Before rewriting, the skill classifies the input's content shape — simple rewrite, coding, review, research, planning, long-context, migration, debugging, design, or orchestration — to tune output emphasis and length. Per-type recipes reshape which kernel section carries the weight; they never change the universal kernel, never add a role, and the skill never performs the task the reshaped prompt asks for.
+
+### Target-specific notes (opt-in)
+
+When you pass `--analyze` and the input explicitly names a target model or runtime ("for Codex", "targeting Gemini"), the skill appends a short "Target-specific notes" block after the analysis. These are steering hints only — the Section 4 rewrite stays byte-identical to a no-target run. There is no `--target` flag, and default mode shows nothing target-specific.
 
 ## The 10 Detection Items
 

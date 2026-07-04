@@ -1,6 +1,6 @@
 ---
 name: mk:prompt-enhancer
-version: 1.3.0
+version: 1.3.1
 argument-hint: '[prompt text] [--analyze] [--score] [--deep] [--save-to <path>]'
 description: Use when refining a draft user prompt before sending it to a coding agent. Decomposes goal/context/constraints/acceptance/output-format, detects ambiguity and model-coupled framing, then emits a model-agnostic rewrite. Supports --analyze, --score, and --deep. NOT for prompts from scratch (mk:brainstorming), plans/reviews (mk:elicit), implementation plans (mk:plan-creator), or general codebase scouting (mk:scout).
 source: local
@@ -91,6 +91,7 @@ Mode-aware. See `assets/output-template.md` for the templates.
 | `--analyze --score` | Sections 1, 2, 3 + **Score: N/10** block + Section 4 |
 | `--score` (alone) | Auto-promoted to `--analyze --score` |
 | `--deep` (any mode) | Appends "Suggested context" sub-block to Section 4 when scout returns ≥1 hit |
+| `--analyze` + explicit target named | Appends "Target-specific notes" block after Section 3 (annotation-only; rewrite unchanged). See `references/target-notes.md` |
 
 Internal decomposition + detection still run in default mode (they feed the
 rewrite) but are emitted only with `--analyze`. The rewrite's OUTPUT FORMAT line
@@ -104,6 +105,9 @@ always carries the auto-suggested **Freedom level** (LOW/MEDIUM/HIGH) and
 - `references/playbook.md` — improvement fixes, one per checklist item, with doc citation. Includes the deterministic **Scoring Rubric** used by `--score`.
 - `references/context-safeguards.md` — 6 model-agnostic safeguards (right-altitude tone, identifier-based context, long-horizon defenses, tool-result clearing, bloat avoidance, eval discipline). Loaded JIT when input shows long-horizon signals or codebase-context references.
 - `references/deep-mode-scout.md` — `--deep` allow-list, forbid-list, hard caps, fallback.
+- `references/complexity-classifier.md` — content-shape lens (10 prompt types → strategy + output length + research framing). Loaded at Step 1; orthogonal to flag modes.
+- `references/task-recipes.md` — per-type emphasis maps (coding / review / research / planning / long-context / migration / debugging / design / orchestration). Loaded at Step 3 when the classifier matches a non-trivial type. Reshape emphasis only — never performs the task.
+- `references/target-notes.md` — optional model-specific steering notes. Renders ONLY in `--analyze` when the input explicitly names a target; annotation-only (never changes the rewrite); no `--target` flag; silent in default mode.
 
 ## Hard Constraints (read every run)
 
@@ -112,7 +116,7 @@ Default mode (always):
 1. **Preserve user intent verbatim.** Never silently change the core ask.
 2. **Never invent facts.** Unknown values become `[FILL-IN: <description>]` placeholders.
 3. **No padding.** Only emit suggestions for FOUND issues. (Default mode hides suggestions entirely; `--analyze` reveals them.)
-4. **Universal kernel only.** Plain markdown sections (Goal / Context / Constraints / Acceptance Criteria / Output Format). No XML tags, no role-as-XML, no model overlays. If the input prompt contains model-coupled framing, flag it as detection #10 and strip during rewrite.
+4. **Universal kernel only.** Plain markdown sections (Goal / Context / Constraints / Acceptance Criteria / Output Format). No XML tags, no role-as-XML, no model overlays. If the input prompt contains model-coupled framing, flag it as detection #10 and strip during rewrite. **Why:** the rewrite must stay portable across coding agents (Claude, Codex, Gemini, Droid) — a vendor token optimizes for one and can degrade another. Model-specific tips surface only via `--analyze` target-notes when the user names a target; they never enter the default rewrite.
 5. **Default = enhanced prompt only.** Without `--analyze`, emit ONLY the Section 4 code block. No Section 1/2/3 headings, no preamble prose, no score. The rewrite is the deliverable; everything else is diagnostics.
 
 `--analyze` mode (additional):
@@ -133,6 +137,30 @@ Default mode (always):
 
 The `Skill` tool entry in `allowed-tools` is reserved for invoking `mk:scout`
 under `--deep` only — not a license to spawn other skills.
+
+## Prompt Complexity Classifier
+
+At Step 1, classify the input's *content shape* to pick enhancement strategy,
+output length, and whether to frame a research/discovery step. This is orthogonal
+to the flag modes (which pick which sections render). Full table + per-type detail:
+`references/complexity-classifier.md`.
+
+Quick signal → type (pick the strongest single match; precedence: explicit user
+signal > destructive/security verb > default):
+
+| Signal | Type | Output |
+|---|---|---|
+| 1 line, verb+object, no metric | Simple rewrite | Short |
+| "add/build", file paths | Coding implementation | Medium |
+| "review/audit" existing artifact | Code review (ask for findings) | Medium |
+| "research/compare/evaluate" | Research (frame discovery) | Medium–long |
+| "plan / don't implement" | Planning | Medium |
+| "migrate/port/upgrade" | Migration (Freedom LOW) | Medium–long |
+| >5000 chars / NOTES.md / multi-turn | Long-context | Long |
+
+The type tunes emphasis + length only — never the universal kernel, never a new
+role, never the task itself. A simple prompt must stay short; do not inflate it
+into a heavy template.
 
 ## Freedom Level Auto-Suggestion
 

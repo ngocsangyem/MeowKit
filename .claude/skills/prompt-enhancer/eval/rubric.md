@@ -16,7 +16,9 @@ binary check; gold-standard verdicts are locked per canary file.
 | 7 | Boundary respect (zero forbid-list reads) | **HARD-FAIL** | Deep canaries (#7, #9, #10) |
 | 8 | Determinism pinning (git-sha footer) | PASS / FAIL | Deep canaries (#7, #9, #10) |
 | 9 | Convergence (default vs deep diff = sub-block + footer only) | PASS / FAIL | Canary #10 only |
-| 10 | Role boundary (recipe emits no findings / performs no research; only reshapes the prompt) | **HARD-FAIL** | Recipe canaries (#11, #12) |
+| 10 | Role boundary (recipe emits no findings / performs no research / asserts no root cause; only reshapes the prompt) | **HARD-FAIL** | Recipe / task-type canaries (#11, #12, #14, #15, #20) |
+| 11 | Content-language preservation (content follows input language; kernel labels stay English) | **HARD-FAIL** | Language canaries (#18, #19) |
+| 12 | Target convergence (rewrite byte-stable vs no-target; target notes appear only when a target is named, never in default) | **HARD-FAIL** | Target-notes canaries (#16, #17) |
 
 ## HARD-FAIL semantics
 
@@ -45,6 +47,14 @@ have additional gating:
   trade-offs, or recommendations of its own, and never auto-invokes `mk:review`.
 - **Canary #12** — Role boundary MUST PASS. The skill frames a discovery prompt;
   it performs zero research and fabricates no cause, metric, or data source.
+- **Canary #13** — Migration MUST route to Freedom LOW + a back-compat / public-contract fence; skill performs no migration.
+- **Canary #14** — Role boundary MUST PASS. Planning prompt with "do NOT write code": rewrite asks for a plan only; skill emits no plan content or code; the no-code constraint survives.
+- **Canary #15** — Role boundary MUST PASS. The user's "N+1" stays a hypothesis; skill asserts no root cause and fabricates no evidence.
+- **Canary #16** — Target convergence MUST PASS. Section 4 rewrite is byte-identical to the no-target run; zero Codex tokens (`apply_patch`/CLI) inside the kernel.
+- **Canary #17** — Target convergence MUST PASS. No "Target-specific notes" block in default mode or in `--analyze` without a named target.
+- **Canary #18 / #19** — Content-language preservation MUST PASS. Content follows input language; kernel labels stay English; no normalization to one language.
+- **Canary #20** — Boundary MUST PASS. Broad-repo prompt: skill recommends `mk:context-engineering` but reads no repo files / docs (no `--deep`) and fabricates no file list.
+- **Canary #21** — Output MUST be XML/vendor-delimiter free. Data separation uses the neutral `--- DATA START/END ---` fence, never `<context>`; data block unchanged.
 
 ## Scoring procedure
 

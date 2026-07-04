@@ -18,6 +18,7 @@
 4. [Tool-result clearing](#4-tool-result-clearing)
 5. [Bloat avoidance](#5-bloat-avoidance)
 6. [Eval discipline](#6-eval-discipline)
+7. [Context-engineering lazy gate](#7-context-engineering-lazy-gate)
 
 ---
 
@@ -131,6 +132,38 @@ canary scenarios with expected outputs before broadening this prompt."
 
 ---
 
+## 7. Context-engineering lazy gate
+
+When the input prompt signals a context-risk the rewrite alone cannot resolve,
+**RECOMMEND** `mk:context-engineering` — never auto-run it, never inline its
+patterns. The enhancer stays a prompt refiner; deciding read-more / stop / ask /
+assume / delegate is that skill's job.
+
+Trigger the recommendation when ANY holds:
+
+- The prompt asks for multi-file codebase work but gives no file / context boundary.
+- The prompt says "use all docs", "scan the whole repo", "read everything", or dumps large context.
+- The prompt is long-horizon / multi-agent / compaction-sensitive / tool-heavy.
+- `--deep` is active and the minimal read-set is uncertain.
+- The prompt carries conflicting source claims needing ask / assume / verify discipline.
+
+Do NOT trigger for: a self-contained 1–2 file prompt, a simple rewrite with no
+context risk, or pure copywriting / report formatting.
+
+When triggered, add ONE line — to Section 3 (analyze modes) or as a CONSTRAINTS
+note in the rewrite:
+
+> Context risk detected (`<which trigger>`). Consider `mk:context-engineering`
+> (intent → one `references/pattern-index.md` section, e.g. retrieval /
+> delegation / less-noise) to pick a minimal read-set before executing.
+
+The enhancer NAMES the intent; it does not load the pattern or read the codebase
+itself. This keeps the default rewrite read-free and preserves the boundary:
+`mk:prompt-enhancer` shapes the prompt; `mk:context-engineering` decides context
+moves.
+
+---
+
 ## When this file is loaded
 
 Trigger conditions (any one):
@@ -138,6 +171,7 @@ Trigger conditions (any one):
 - Input prompt length >5000 chars.
 - Input mentions "long task", "checkpoint", "resumable", "compact", "session restart", "NOTES.md", "agentic loop", "multi-turn".
 - Input enumerates 10+ tools or 5+ system-prompt rules (bloat signal).
+- Input requests broad codebase work ("scan the repo", "use all docs", "read everything") or multi-file work with no file boundary (Section 7 lazy gate).
 - User explicitly asks about context-loss resilience.
 - Detection items #7 (laundry-list), #8 (mixed instructions/data), #9 (wrong section ordering) all FOUND on the same input — indicates structural failure that warrants the full safeguard set.
 

@@ -24,6 +24,12 @@
 Default output is byte-stable vs `--deep` for Sections 1–3 (convergence canary).
 `--deep` only *adds* the sub-block + footer; it never alters the rewrite body.
 
+**Orthogonal axis — content shape.** Flag modes above decide *which sections
+render*. The **complexity classifier** (`references/complexity-classifier.md`,
+loaded at Step 1) decides *emphasis + output length + research framing* from the
+input's shape. The two compose: any prompt type runs in any flag mode. The
+classifier never changes the universal kernel or the flag-mode output contract.
+
 ## Recipes (layered, not flags)
 
 Recipes are documented framings on top of existing modes — **no new flag, no
@@ -38,6 +44,18 @@ reshaped prompt asks for.
 Both recipes are guarded by canaries (`eval/canary-11-architecture-review.md`,
 `eval/canary-12-research-prompt.md`) that fail on role confusion.
 
+**General task-type recipes** — the per-type emphasis maps for the other
+classifier types (coding / review / research / planning / long-context /
+migration / debugging / design / orchestration) live in
+`references/task-recipes.md`, loaded at Step 3 when the classifier matches a
+non-trivial type. Same rule: reshape emphasis, never perform the task.
+
+**Target-specific notes (annotation, not a recipe)** — ONLY when `--analyze` is
+active AND the input explicitly names a target model/runtime, load
+`references/target-notes.md` to append a "Target-specific notes" block after
+Section 3. It is annotation-only: it never changes the Section-4 rewrite, there
+is no `--target` flag, and default mode emits nothing from it.
+
 ## Rule owners
 
 Single authoritative location for each cross-cutting rule — do not restate:
@@ -48,3 +66,6 @@ Single authoritative location for each cross-cutting rule — do not restate:
   → `references/deep-mode-scout.md`.
 - **5 components + 10 detections** → `references/decomposition-checklist.md`.
 - **Per-finding fixes + `--score` rubric** → `references/playbook.md`.
+- **Content-shape classifier** (type → strategy + length) → `references/complexity-classifier.md`.
+- **Per-type recipe emphasis maps** → `references/task-recipes.md`.
+- **Target-specific notes (analysis-only, no flag)** → `references/target-notes.md`.

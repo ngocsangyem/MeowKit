@@ -31,6 +31,16 @@ Status: rollout APPROVED for default + recipe tiers
 caller-provided git fixture (`README.md` → "Deep-mode fixture"), not yet chosen.
 `STALE_BASELINE` does not gate the tiers recorded above (pure-text, codebase-independent).
 
+### Pending — v1.3.1 canaries #13–#21 (added 2026-07-04)
+
+Canaries #13–#21 (classifier / task-recipes / target-notes / language /
+context-gate / data-fence) are NEW and have **NOT** yet been run. They are
+codebase-independent (no fixture) and must be scored by a fresh-instance
+manual / LLM-judge pass before v1.3.1 is declared rollout-APPROVED. Do not mark
+them PASS without an actual run — record verdicts here after running.
+
+Also re-run #4 (strip-model-coupling) after the playbook #8 de-coupling change.
+
 > Note: a prior smoke-test recorded sha `7ca8a832…` against a bundled fixture
 > that has since been removed. That entry no longer applies — the fixture is
 > now caller-provided per `README.md` → "Deep-mode fixture".

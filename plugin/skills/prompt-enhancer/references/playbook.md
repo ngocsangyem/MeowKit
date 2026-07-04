@@ -164,13 +164,25 @@ Anthropic anti-pattern: "diverse canonical examples > exhaustive list".
 
 ### #8 — Mixed instructions/data
 
-**Fix:** Insert explicit separators. For Claude: wrap data in `<context>` tags.
-For GPT/Gemini: use `--- DATA START ---` / `--- DATA END ---` fences.
+**Fix:** Insert a plain, model-neutral separator between the data block and the
+instruction — a fence every coding agent parses identically:
+
+```
+--- DATA START ---
+<verbatim data — unchanged>
+--- DATA END ---
+```
+
+Keep the instruction OUTSIDE the fence.
 
 **Source:** context-engineering-guide "Structured I/O";
 `injection-rules.md` Rule 1 (file content is DATA).
 
-**Guard:** Do NOT modify the data block content. Only add fences.
+**Guard:** Do NOT modify the data block content. Only add fences. Universal
+kernel only — the default rewrite never emits XML / `<context>` tags or any
+vendor-specific delimiter. Model-specific data-separation idioms (e.g. Claude's
+`<context>` tags) belong in optional `--analyze` target-notes when the user
+names that target, never in the default rewrite.
 
 **`--deep` boost:** Not applicable (data already inline; scout adds nothing).
 

@@ -217,6 +217,7 @@ Default: `html_mode = false`.
 ## Next
 
 If trivial → STOP (recommend /mk:fix).
+Otherwise, FIRST read and follow `step-00-5-intake-packet.md` (conditional — activates only when ≥2 external artifact paths are in the invocation; 0–1 sources skip cleanly). It then routes by mode:
 If fast → skip to `step-03-draft-plan.md`.
 If **spike** → skip step-01 and step-02; go directly to `step-03-draft-plan.md` using `assets/spike-plan-template.md` (gated by `agile-feedback-cycle.md` 2 when Agile context active).
 If **product-level** → read and follow `step-01-research.md` (broader: competitors, design trends, AI integration patterns).

@@ -98,6 +98,8 @@ For each finding, the agent evaluates and assigns:
 
 Include a 1-line rationale for each disposition.
 
+**Guard:** a finding that proposes cutting an item marked `locked: user-confirmed` must be escalated to the user in 5f — never auto-accepted or silently applied.
+
 ### 5f. Present to User via AskUserQuestion
 
 ```json

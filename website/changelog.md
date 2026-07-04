@@ -14,11 +14,11 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
-## Unreleased
+## 2.13.3 (2026-07-04) — Context-Engineering + Prompt-Enhancer Hardening
 
 ### Highlights
 
-A new `mk:context-engineering` skill gives the agent a runtime front door for context decisions — what to read, when to stop, when to ask vs assume, and when to compact or delegate — routing to 25 context patterns one reference at a time so the skill that manages context does not itself bloat it. Alongside it, `mk:plan-creator` gains a Plan Intake Packet step that folds several upstream artifacts into one deduplicated brief before planning starts.
+A new `mk:context-engineering` skill gives the agent a runtime front door for context decisions — what to read, when to stop, when to ask vs assume, and when to compact or delegate — routing to 25 context patterns one reference at a time so the skill that manages context does not itself bloat it. Alongside it, `mk:plan-creator` gains a Plan Intake Packet step that folds several upstream artifacts into one deduplicated brief before planning starts, and `mk:prompt-enhancer` is hardened to stay model-agnostic by default — a model-coupled data-separation default is replaced with a neutral fence, a complexity classifier tunes emphasis without changing the portable rewrite, and model-specific steering becomes an opt-in annotation shown only under `--analyze` when you name a target.
 
 ### New Skills
 
@@ -30,6 +30,9 @@ A new `mk:context-engineering` skill gives the agent a runtime front door for co
 
 - **`mk:plan-creator` — Plan Intake Packet.** When two or more upstream artifacts already exist (office-hours, brainstorming, planning-engine, confluence-spec, or `mk:intake` output), a new conditional step consolidates them into a single Plan Intake Packet before research and drafting — so planning starts from one deduplicated brief instead of several overlapping documents. It clean-skips when fewer than two artifacts are present, adding no cost to ordinary plans.
 - **`mk:context-audit`** now carries a reciprocal boundary note pointing runtime context decisions to `mk:context-engineering`, so the two context skills disambiguate in both directions.
+- `mk:prompt-enhancer` keeps its default data-separation fix model-neutral — a plain `--- DATA ---` fence replaces the previous Claude-specific `<context>` wrapper, so the rewrite stays portable across coding agents.
+- `mk:prompt-enhancer` adds a complexity classifier and per-type recipes — migration, planning, debugging, review, research, long-context, design, and orchestration — that tune output emphasis and length without changing the universal kernel or adding a role.
+- `mk:prompt-enhancer` model-specific steering is now an opt-in target-notes annotation that renders only under `--analyze` when the input names a target and never alters the portable rewrite.
 
 ## 2.13.2 (2026-07-03) — Deep Research Skill + Full-Surface Codex Migration
 

@@ -1,11 +1,18 @@
 # `mk:prompt-enhancer` Eval Suite
 
-> 12 canary cases: #1–#6 default mode, #7–#10 deep mode, #11–#12 recipe mode
-> (architecture-review, research). Run before any rollout of changes to the
-> skill body, references, or scripts.
+> 21 canary cases: #1–#6 default mode, #7–#10 deep mode, #11–#12 recipe mode
+> (architecture-review, research), #13–#21 classifier / target-notes / language /
+> context-gate / data-fence. Run before any rollout of changes to the skill body,
+> references, or scripts.
 >
-> **Tiers by fixture need:** #1–#6 and #11–#12 are codebase-independent (pure
-> text — no fixture). #7, #9, #10 require the caller-provided git fixture below.
+> **Tiers by fixture need:** #1–#6, #11–#12, and #13–#21 are codebase-independent
+> (pure text — no fixture). #7, #9, #10 require the caller-provided git fixture below.
+>
+> #13–#21 cover the v1.3.1 additions: complexity classifier + task recipes
+> (#13 migration, #14 planning-no-implementation, #15 debugging-hypothesis),
+> annotation-only target notes (#16 target-Codex, #17 target-silent), language
+> preservation (#18 Vietnamese, #19 mixed), context-engineering lazy gate (#20),
+> and the playbook #8 neutral-fence de-coupling (#21).
 
 ## Run
 
@@ -15,7 +22,11 @@ For codebase-independent canaries (default mode #1–#6 + recipe mode #11–#12)
 # Feed canary input through the skill, save output, diff vs gold-standard.
 for c in canary-01-vague-only canary-02-one-line-spec canary-03-long-unstructured \
          canary-04-strip-model-coupling canary-05-already-good canary-06-refusal \
-         canary-11-architecture-review canary-12-research-prompt; do
+         canary-11-architecture-review canary-12-research-prompt \
+         canary-13-migration canary-14-planning-no-implementation \
+         canary-15-debugging-hypothesis canary-16-target-notes-codex \
+         canary-17-target-notes-silent canary-18-vietnamese \
+         canary-19-mixed-language canary-20-context-gate canary-21-data-fence; do
   echo "=== $c ==="
   cat eval/$c.md
 done
@@ -53,8 +64,9 @@ skill carrying disk weight.
 |---|---|---|
 | Default | 6 (canaries #1–#6) | < 2 min |
 | Recipe | 2 (canaries #11–#12) | < 1 min |
+| Classifier / target / language / gate | 9 (canaries #13–#21) | < 3 min |
 | Deep | 4 (canaries #7–#10) | < 3 min |
-| Total | 12 | **< 6 min** |
+| Total | 21 | **< 9 min** |
 
 ## STALE_BASELINE check
 
@@ -81,6 +93,19 @@ These canaries block rollout if they fail:
   to ASK for a review; emits zero findings / severities / recommendations of its own).
 - **Canary #12** — research role boundary (skill frames a discovery prompt;
   performs zero research and fabricates no cause/data).
+- **Canary #14** — planning role boundary (rewrite asks for a plan; skill emits
+  no plan content/code; the "no code" constraint survives).
+- **Canary #15** — debugging role boundary (user's hypothesis stays a hypothesis;
+  no asserted root cause, no fabricated evidence).
+- **Canary #16** — target convergence (Section 4 byte-identical to no-target run;
+  zero Codex tokens in the kernel).
+- **Canary #17** — target silence (no target block in default mode or in
+  `--analyze` without a named target).
+- **Canary #18 / #19** — language preservation (content follows input language;
+  kernel labels stay English; no normalization).
+- **Canary #20** — context-gate boundary (recommends `mk:context-engineering`;
+  reads no repo/docs without `--deep`; no fabricated file list).
+- **Canary #21** — neutral data fence (no `<context>`/XML delimiter; data block unchanged).
 
 A soft FAIL on any other canary → fix and re-run; does not block but must be
 addressed before next eval pass.

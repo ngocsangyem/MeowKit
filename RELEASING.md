@@ -513,6 +513,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.13.3 | 2026-07-04 | Context-Engineering + Prompt-Enhancer Hardening  |
 | v2.13.2 | 2026-07-03 | Deep Research Skill + Full-Surface Codex Migration |
 | v2.13.1 | 2026-06-29 | Wiki Handoff + Context Recall                    |
 | v2.13.0 | 2026-06-29 | The Wiki Knowledge Subsystem                     |
