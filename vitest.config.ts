@@ -11,7 +11,9 @@ export default defineConfig({
 	},
 	test: {
 		fileParallelism: false,
-		exclude: ["**/node_modules/**", "**/dist/**", ".claude/hooks/__tests__/**/*.cjs"],
+		// plugin/** is a generated mirror of .claude/ (via `mewkit build-plugin`); its
+		// test files are duplicates of source tests and must not be collected here.
+		exclude: ["**/node_modules/**", "**/dist/**", ".claude/hooks/__tests__/**/*.cjs", "plugin/**"],
 		environmentMatchGlobs: [
 			["packages/mewkit/src/**/__tests__/**/*.test.tsx", "jsdom"],
 			["packages/**/*.test.tsx", "jsdom"],
