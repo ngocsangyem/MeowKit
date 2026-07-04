@@ -13,6 +13,7 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 ## Steps
 
 1. `step-00-scope-challenge.md` — Assess complexity, select mode (fast|hard|deep|parallel|two|product-level), user scope input (EXPANSION/HOLD/REDUCTION), early-exit trivial tasks
+   - 1b. `step-00-5-intake-packet.md` — Conditional (≥2 external artifacts in invocation): consolidate pre-existing upstream artifacts into a Plan Intake Packet. 0–1 sources → clean skip, no planning behavior change (only the activation-log line is written).
 2. `step-01-research.md` — Spawn researchers (hard/deep/parallel/two only). Bounded: 2-3 researchers, max 5 calls each. REDUCTION = 1 researcher.
 3. `step-02-codebase-analysis.md` — Scout + project docs reading (hard/deep/parallel/two only; deep: bounded scope map per `references/deep-mode.md`)
 4. `step-03-draft-plan.md` — Write plan.md overview + phase-XX files. Integrate research findings. Deep: phase map. TDD: inject regression-first sections.
@@ -35,10 +36,13 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 | `task_complexity` | step-00 | step-03 | `trivial` (exit), `simple`, `complex` |
 | `workflow_model` | step-00 | step-03 | `feature`, `bugfix`, `refactor`, `security` |
 | `scope_mode` | step-00 | step-01, step-03 | `EXPANSION`, `HOLD`, `REDUCTION` (hard mode; fast defaults to HOLD; product-level defaults to EXPANSION) |
+| `intake_packet_path` | step-00.5 | step-01, step-02, step-03 | Path to Plan Intake Packet, or `none` when < 2 external artifacts |
+| `intake_sources_count` | step-00.5 | step-03 | Integer count of external artifacts consolidated |
 | `research_reports` | step-01 | step-03 | List of report file paths |
 | `codebase_findings` | step-02 | step-03 | Scout + docs summary |
 | `plan_dir` | step-03 | step-04, step-05, step-06, step-07, step-08, step-08b | Absolute path to plan directory |
 | `red_team_findings` | step-05 | step-06 | Summary string: "{N} findings, {M} accepted" |
+| `pruning_result` | step-04 | step-05 | Summary string: "{N} items pruned/fixed" (unset in fast / product-level) |
 | `selected_approach` | step-04 | step-05, step-08 | `"a"` or `"b"` (two mode only; unset otherwise) |
 | `tdd_mode` | step-00 | step-03 | `true` or `false` (composable flag, independent of planning_mode) |
 | `html_mode` | step-00 | step-08, step-08b | `true` or `false` (composable flag, independent of planning_mode) |
@@ -57,8 +61,12 @@ Step 0: Scope Challenge
     └── complex → hard or deep mode
          ├── deep auto-detected: 5+ dirs OR refactor+complex
          ├── User scope input: EXPANSION / HOLD / REDUCTION
-         └── → Step 1
+         └── → Step 0.5
               ↓
+Step 0.5: Intake Packet (conditional — ≥2 external artifacts)
+    ├── < 2 sources → skip clean (intake_packet_path = none)
+    └── ≥ 2 sources → consolidate into .claude/session-state/plan-creator-intake-packet.md
+         ↓
 Step 1: Research (hard/deep/parallel/two only)
     ├── EXPANSION: 2 researchers, broader questions
     ├── HOLD: 2 researchers, standard

@@ -52,6 +52,7 @@ Activate when:
 
 - User runs `/mk:plan [task]` or `/mk:cook [task]`
 - Non-trivial task (> 2 files OR > 1h OR architectural decisions)
+- User supplies ≥2 upstream reports/specs (office-hours, brainstorming, planning-engine, confluence-spec, intake output…) → step-00.5 consolidates them into a Plan Intake Packet before planning (see `references/plan-intake-packet.md`)
 - Gate 1 requires a plan before Phase 3
 - Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
 - User runs `/mk:plan archive` → route to `references/archive-workflow.md` (skip planning pipeline)
@@ -115,6 +116,7 @@ Fast mode (`--fast`) uses `workflow-fast.md` (steps 00→03→04→07→08).
 
 ```
 Step 0: Scope Challenge → trivial (exit) | simple (fast) | complex (hard/deep)
+Step 0.5: Intake Packet (conditional: ≥2 external artifacts) → consolidate upstream artifacts, else clean skip
 Step 1: Research (hard/deep/parallel/two only) → 2-3 researchers, max 5 calls each
 Step 2: Codebase Analysis (hard/deep/parallel/two only) → scout + docs (deep: bounded scope map)
 Step 3: Draft Plan → plan.md (≤80 lines) + phase-XX files (12-section template; deep: + phase map; tdd: + regression sections)
@@ -169,6 +171,8 @@ tasks/plans/YYMMDD-name/
 | `assets/product-spec-template.md`                  | Product spec template (Vision, Features, Design Language, AI Integration, Out-of-Scope)                                                                                                                              |
 | `assets/spike-plan-template.md`                    | Spike plan template (used when `planning_mode = spike`). Two phases: investigate + findings. Required frontmatter: `spike: true`, `timebox:`, `findings_doc:`. NOT compatible with `mk:autobuild` FULL.                |
 | `references/anthropic-example-plan.md`             | RetroForge few-shot calibration example for product-level mode (ambition + feature density reference)                                                                                                                |
+| `step-00-5-intake-packet.md`                       | Conditional intake packet builder: consolidates ≥2 pre-existing external artifacts before research/drafting                                                                                                          |
+| `references/plan-intake-packet.md`                 | Plan Intake Packet contract: purpose, activation, 6-block schema, quality rules, boundaries                                                                                                                          |
 | `step-05-red-team.md`                              | Red team review: persona scaling, subagent dispatch, adjudication                                                                                                                                                    |
 | `step-06-validation-interview.md`                  | Critical question generation and answer propagation                                                                                                                                                                  |
 | `step-07-gate.md`                                  | Self-check and Gate 1 AskUserQuestion presentation                                                                                                                                                                   |

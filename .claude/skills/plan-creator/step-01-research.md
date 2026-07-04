@@ -6,6 +6,9 @@ Spawn bounded researchers to investigate unknowns before planning.
 
 ## Instructions
 
+If `intake_packet_path` is set (not `none`), read the packet FIRST — do not spawn
+researchers for questions the packet already answers with `from:` evidence.
+
 ### 1a. Determine Research Aspects
 
 From the task description, identify 2 distinct research questions:

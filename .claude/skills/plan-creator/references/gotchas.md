@@ -23,3 +23,5 @@
 - **Parallel ownership misses shared utilities**: Utility files used by multiple phases have no single owner → Setup/infrastructure phase always runs first and owns shared files; parallel phases own only their layer-specific files
 
 - **Step renumbering broke references**: After renumbering steps 04-08, old "step-04" or "step-05" references became stale → Always grep for `step-NN` patterns across all mk:plan-creator files before renaming or deleting step files
+
+- **Skipping the intake packet under context pressure**: Under context pressure agents may skip the packet; the activation check in step-00.5 is mandatory when ≥2 external artifacts are supplied — skipping silently loses traceability (`from:` provenance for every upstream claim)

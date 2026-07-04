@@ -12,6 +12,7 @@ Compact workflow for `--fast` flag or simple tasks. Skips research, codebase ana
 ## Steps
 
 1. `step-00-scope-challenge.md` — Assess complexity, confirm fast mode, early-exit trivial tasks
+   - 1b. `step-00-5-intake-packet.md` — Conditional (≥2 external artifacts in invocation): consolidate pre-existing upstream artifacts into a Plan Intake Packet. 0–1 sources → clean skip.
 2. `step-03-draft-plan.md` — Write plan.md overview only (no phase files in fast mode unless task warrants them)
 3. `step-04-semantic-checks.md` — Semantic content checks only; skip structural validation
 4. `step-07-gate.md` — Gate 1 presentation and approval
@@ -27,6 +28,8 @@ Compact workflow for `--fast` flag or simple tasks. Skips research, codebase ana
 | `task_complexity` | step-00 | step-03 | `simple` (trivial exits at step-00) |
 | `workflow_model` | step-00 | step-03 | `feature`, `bugfix`, `refactor`, `security` |
 | `tdd_mode` | step-00 | step-03 | `true` or `false` (composable flag, independent of planning_mode) |
+| `intake_packet_path` | step-00.5 | step-03 | Path to Plan Intake Packet, or `none` when < 2 external artifacts |
+| `intake_sources_count` | step-00.5 | step-03 | Integer count of external artifacts consolidated |
 | `plan_dir` | step-03 | step-04, step-07, step-08 | Absolute path to plan directory |
 
 ## Flow
@@ -37,6 +40,10 @@ Task description
 Step 0: Scope Challenge
     ├── trivial → "Use /mk:fix" → STOP
     └── simple/complex → fast mode confirmed
+         ↓
+Step 0.5: Intake Packet (conditional — ≥2 external artifacts)
+    ├── < 2 sources → skip clean (intake_packet_path = none)
+    └── ≥ 2 sources → consolidate into .claude/session-state/plan-creator-intake-packet.md
          ↓
 Step 3: Draft Plan
     └── plan.md only (≤80 lines, goal + ACs + constraints + approach)
