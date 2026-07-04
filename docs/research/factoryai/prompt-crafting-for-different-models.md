@@ -10,7 +10,7 @@
 Different AI models respond better to different prompting styles. This guide covers model-specific techniques and provides ready-to-use prompt refiner skills.
 
 <Info>
-  **Works everywhere:** These prompting techniques apply to both CLI and [Factory App](/web/getting-started/overview).
+  **Works everywhere:** These prompting techniques apply to both the Droid CLI and the [Factory App](/web/getting-started/overview).
 </Info>
 
 ---
@@ -415,7 +415,7 @@ Match the model to the task:
 
 | Task Type                   | Recommended Model           | Reasoning Level |
 | --------------------------- | --------------------------- | --------------- |
-| **Complex architecture**    | Opus 4.7 or Opus 4.6        | High-Max        |
+| **Complex architecture**    | Opus 4.8 or Opus 4.7        | High-Max        |
 | **Feature implementation**  | Sonnet 4.5 or GPT-5.1-Codex | Medium          |
 | **Quick edits, formatting** | Haiku 4.5                   | Off/Low         |
 | **Code review**             | GPT-5.1-Codex-Max           | High            |
