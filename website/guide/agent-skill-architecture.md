@@ -234,6 +234,7 @@ Some skills activate across multiple phases rather than being owned by a single 
 | `docs-finder`          | Any phase needing up-to-date library docs                                                                                                                      |
 | `multimodal`           | Any phase with visual content or images                                                                                                                        |
 | `session-continuation` | Cross-session handoff required                                                                                                                                 |
+| `context-engineering`  | Any phase needing a runtime context decision — what to read, when to stop / ask / assume, when to compact or delegate (NOT structural `.claude/` audit — see `context-audit`)   |
 | `henshin`              | Wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `mk:plan-creator` → `mk:cook`. |
 
 ::: warning

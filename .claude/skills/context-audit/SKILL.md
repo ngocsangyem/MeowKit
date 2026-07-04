@@ -7,8 +7,9 @@ description: |
   "remove X save Y tokens" recommendations against the model context window.
   NOT for monetary cost tracking — that's /mk:budget. NOT for transcript
   size monitoring — long-session continuity defers to Claude Code native
-  compaction. Use when planning to add context capacity, diagnosing perceived
-  slowdowns, or auditing health.
+  compaction. NOT for runtime context decisions (what to read, when to
+  compact) — see mk:context-engineering. Use when planning to add context
+  capacity, diagnosing perceived slowdowns, or auditing health.
 allowed-tools:
   - Bash
   - Read
@@ -25,7 +26,7 @@ keywords:
   - agents
   - mcp
   - structural
-when_to_use: Use to audit .claude/ structural overhead and surface 'remove X save Y tokens' recommendations against the model context window. NOT for USD cost tracking (see /mk:budget). NOT for transcript size.
+when_to_use: Use to audit .claude/ structural overhead and surface 'remove X save Y tokens' recommendations against the model context window. NOT for USD cost tracking (see /mk:budget). NOT for transcript size. NOT for runtime context decisions (see mk:context-engineering).
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored

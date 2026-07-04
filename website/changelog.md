@@ -14,6 +14,23 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## Unreleased
+
+### Highlights
+
+A new `mk:context-engineering` skill gives the agent a runtime front door for context decisions — what to read, when to stop, when to ask vs assume, and when to compact or delegate — routing to 25 context patterns one reference at a time so the skill that manages context does not itself bloat it. Alongside it, `mk:plan-creator` gains a Plan Intake Packet step that folds several upstream artifacts into one deduplicated brief before planning starts.
+
+### New Skills
+
+| Skill                    | Purpose                                                                                                                                                                                                                                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mk:context-engineering` | Runtime router for context decisions — read-more / stop / ask / assume / delegate, pick a minimal read-set, and time compaction. Front page is Write / Select / Compress / Isolate; a lazy pattern index routes to 25 patterns, one reference per decision. Complements `mk:context-audit` (which owns the structural `.claude/` overhead question) with the runtime-decision half. |
+
+### Improvements
+
+- **`mk:plan-creator` — Plan Intake Packet.** When two or more upstream artifacts already exist (office-hours, brainstorming, planning-engine, confluence-spec, or `mk:intake` output), a new conditional step consolidates them into a single Plan Intake Packet before research and drafting — so planning starts from one deduplicated brief instead of several overlapping documents. It clean-skips when fewer than two artifacts are present, adding no cost to ordinary plans.
+- **`mk:context-audit`** now carries a reciprocal boundary note pointing runtime context decisions to `mk:context-engineering`, so the two context skills disambiguate in both directions.
+
 ## 2.13.2 (2026-07-03) — Deep Research Skill + Full-Surface Codex Migration
 
 ### Highlights

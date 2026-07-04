@@ -360,6 +360,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:bootstrap', link: '/reference/skills/bootstrap' },
             { text: 'mk:worktree', link: '/reference/skills/worktree' },
             { text: 'mk:context-audit', link: '/reference/skills/context-audit' },
+            { text: 'mk:context-engineering', link: '/reference/skills/context-engineering' },
           ],
         },
         {

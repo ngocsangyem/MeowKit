@@ -7,7 +7,7 @@ description: "Creates structured multi-file implementation plans before any code
 
 ## What This Skill Does
 
-The planning engine. Creates a complete implementation plan before any code is written. Uses a step-file architecture (one step loaded at a time to save context) with 10 phases: scope challenge → research → codebase analysis → draft → semantic checks → red-team → validation interview → Gate 1 → hydrate.
+The planning engine. Creates a complete implementation plan before any code is written. Uses a step-file architecture (one step loaded at a time to save context): scope challenge → *(conditional Plan Intake Packet)* → research → codebase analysis → draft → semantic checks → red-team → validation interview → Gate 1 → hydrate.
 
 ## When to Use
 
@@ -19,6 +19,7 @@ The planning engine. Creates a complete implementation plan before any code is w
 
 - **Scope detection:** auto-detects product-level intent via regex patterns (feature requests, greenfield builds, spec documents) and presents scope mode (EXPANSION / HOLD / REDUCTION)
 - **Complexity routing:** 5 signals determine scope depth — file count, domain keywords, cross-cutting concerns, security surface, data model changes
+- **Plan Intake Packet (conditional):** when ≥2 pre-existing upstream artifacts are supplied, consolidates them into one traceable brief before drafting; 0–1 sources → clean skip, no behavior change
 - **Step-file loading:** 10 sequential step files loaded one at a time, each producing checkpointed output
 - **Research spawning:** up to 2 researcher agents with max 5 calls and ≤150 lines of context each
 - **Codebase analysis:** scout + project docs + existing plan scan for cross-plan dependency detection
@@ -45,6 +46,16 @@ Before producing a plan, plan-creator MUST answer all 5 dimensions in concrete s
 Every clarifying question MUST cite scout findings (file paths). Abstract options ("Add the feature") without a file path are a failure mode — replace with options of the form "Add to `src/api/users.ts` (matches existing pattern)" or "Create new `src/api/profile.ts`".
 
 Skip when input is an existing plan path (`plan.md` / `phase-*.md`) — the plan already encodes scout output and the 5 dimensions.
+
+## Plan Intake Packet (conditional)
+
+When two or more upstream artifacts already exist — `mk:office-hours` design docs, `mk:brainstorming` reports, `mk:planning-engine` assessments, `mk:confluence-spec-analyst` specs, `mk:intake` triage output, `mk:jira-analyst` findings, or spec documents you supply directly — a conditional step (0.5) consolidates them into ONE Plan Intake Packet before drafting, so the plan reads one traceable brief instead of N scattered reports.
+
+- **Activation:** ≥2 external artifact paths in the invocation → build the packet. 0–1 sources → skip entirely, no planning behavior change (only an activation-log line is written).
+- **Adapter, not generator:** only for artifacts that exist *before* plan-creator runs. Its own step-01 research and step-02 scout output are consumed directly by the draft step, never routed through the packet. One lone ticket is single-ticket triage — that is `mk:intake`, not a packet.
+- **Six blocks, under 120 lines:** Request · Routing · Requirements · Evidence · Scope Shape · Handoff. Every load-bearing claim carries `from: <path>` or an `[ASSUMPTION]` tag; user-confirmed upstream decisions are LOCKED (red-team may challenge but must escalate, never silently cut).
+- **Output:** drafted to `.claude/session-state/plan-creator-intake-packet.md`, then moved to `{plan_dir}/research/plan-intake-packet.md` and cited like any research report. Its path flows to steps 01–03 via the `intake_packet_path` variable (`none` when fewer than 2 artifacts).
+- **NOT for:** single ticket/PRD triage (→ `mk:intake`), ticket complexity + dependency scoring (→ `mk:planning-engine`), or choosing an approach (→ `mk:brainstorming`). Route those; the packet only consolidates what those skills or you already produced.
 
 ## Arguments
 
@@ -78,11 +89,12 @@ Governed by `.claude/rules-conditional/agile-feedback-cycle.md` Section 2 (loade
 
 If the plan frontmatter has non-empty `jira_tickets:`, `mk:plan-creator` runs the DoR advisory checklist (5 mechanical checks per ticket) BEFORE generating phase files. Advisory only — never blocks. Skip silently when `jira_tickets:` absent or rule not loaded. Governed by `agile-story-gates.md` Section 1.
 
-## Workflow (10 step files)
+## Workflow (step files)
 
 | Step | Name | Key Output |
 |------|------|-----------|
 | 00 | Scope challenge | Planning mode, workflow model, scope mode, complexity tier |
+| 0.5 | Intake packet *(conditional: ≥2 external artifacts)* | Consolidated Plan Intake Packet, or clean skip |
 | 01 | Research | Researcher reports with source citations |
 | 02 | Codebase analysis | Scout findings, existing plan scan, cross-plan dependencies; deep mode emits compact scope map |
 | 03 | Draft (feature) / 03a (product-level) | plan.md with 12-section phase template + YAML frontmatter; optional Deep Phase Map / TDD sections |
