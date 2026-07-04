@@ -14,6 +14,32 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## Unreleased
+
+### Highlights
+
+`mk:figma` is refactored from a "does everything" skill into an honest read-first gateway. The default path stays lean — design analysis, Figma-to-code for small screens, token extraction, and a screenshot fallback — while advanced operations (Code Connect, canvas writes, and design-system/library patterns) become gated references that load only on explicit intent with confirmed prerequisites. A capability router maps any Figma intent to the right mode or gated reference in one lookup, so advanced work is no longer routed to external skills that may not exist in your environment.
+
+`mk:agent-browser` expands into a fuller browser-automation gateway — a specialized-workflow router (exploratory QA/dogfooding, Electron desktop apps, Slack automation, and cloud browser providers), a consolidated trust-boundaries safety reference, and scoped MCP tool profiles so a task exposes only the browser tools it needs.
+
+### Improvements
+
+- `mk:figma` advanced workflows (Code Connect, canvas writes, design-system rules) are gated behind explicit intent and confirmed prerequisites instead of loading by default.
+- The Figma pre-flight checklist is now per mode — read-only analysis no longer runs the full write-path checklist.
+- Token extraction normalizes Figma Variables against Color Styles and surfaces the Enterprise permission caveat for local variables.
+- Large or truncated designs fall back to `get_metadata` with targeted child fetches instead of proceeding on a partial tree.
+- The Figma-to-code validation checklist now covers accessibility, interaction states, component reuse, and asset scale.
+- `mk:agent-browser` gains a specialized-workflow router for exploratory QA/dogfooding, Electron desktop apps, Slack automation, and cloud browser providers (Browserbase, AWS AgentCore, Vercel Sandbox).
+- A consolidated trust-boundaries reference gathers the safety rules for authenticated, third-party, production, and user-data browser tasks in one place.
+- New Slack browser-automation workflows and a dogfood issue taxonomy ship with report templates for QA and Slack analysis.
+- MCP tool profiles (`core`, `network`, `react`, and more) let `mk:agent-browser` expose only the browser tools a task needs.
+
+### Bug Fixes
+
+- Prototype (`/proto/`) links are no longer sent to `get_design_context` — the skill asks for the `/design/` editor URL, resolving a contradiction between the URL rules and the implement workflow.
+- Figma page switching uses the async `setCurrentPageAsync` API instead of the legacy synchronous assignment.
+- Figma variable creation no longer defaults to `ALL_SCOPES`, which previously polluted property pickers with variables visible everywhere.
+
 ## 2.13.3 (2026-07-04) — Context-Engineering + Prompt-Enhancer Hardening
 
 ### Highlights

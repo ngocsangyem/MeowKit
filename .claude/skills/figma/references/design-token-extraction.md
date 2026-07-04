@@ -11,6 +11,7 @@ Load this file only when mk:figma is in **tokens** mode.
 - [Shadow Tokens](#shadow-tokens)
 - [Border Radius Tokens](#border-radius-tokens)
 - [Variable Naming Convention](#variable-naming-convention)
+- [Variable API Caveats & Permissions](#variable-api-caveats--permissions)
 - [Output File Structure](#output-file-structure)
 
 
@@ -116,6 +117,19 @@ font/heading/lg       → --font-size-lg + --font-weight-semibold
 shadow/card           → --shadow-md
 radius/button         → --radius-md
 ```
+
+## Variable API Caveats & Permissions
+
+Fail loud and early on plan/permission limits instead of writing a half-broken token file.
+
+- **Local variables are gated to full members of Enterprise orgs.** The local-variables endpoints
+  return 403 for non-eligible plans/seats — surface the permission requirement to the user, do not retry blindly.
+- **Variable endpoints require specific scopes** — request the narrowest scope needed.
+- **Published vs local variables differ** — published variables come from a library; local variables live
+  in the file. Confirm which set the user wants before extracting.
+- **Format differs: Variables vs Color Styles.** Figma Variables export colors as `{ r, g, b, a }` float
+  objects (0–1 range); Color Styles (`search_design_system`) return `rgba()` strings. Normalize to ONE
+  format before writing token files — mixing them silently produces half the tokens in the wrong format.
 
 ## Output File Structure
 

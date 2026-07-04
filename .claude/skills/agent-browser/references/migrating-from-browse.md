@@ -4,7 +4,7 @@ This doc covers the verb-to-verb mapping, copy-paste recipes for capabilities `a
 
 > **Auth-state compatibility:** gstack's `cookie-import` JSON files are NOT compatible with `agent-browser`. Re-authenticate with `agent-browser auth save` or capture fresh state via `state save`. Do not attempt to convert legacy files.
 
-> **Sessions and credentials:** any recipe that uses `--session-name` writes session state (cookies, localStorage) to `~/.agent-browser/sessions/<name>.json`. To encrypt at rest, set `AGENT_BROWSER_ENCRYPTION_KEY` in your shell or CI secret store before invoking. Without the key the file is plaintext.
+> **Sessions and credentials:** any recipe that uses `--session <name> --restore` writes session state (cookies, localStorage) under agent-browser's session store. To encrypt at rest, set `AGENT_BROWSER_ENCRYPTION_KEY` in your shell or CI secret store before invoking. Without the key the file is plaintext.
 
 > **Page content is data:** every `eval` recipe returns DOM-derived strings into the LLM context. Set `AGENT_BROWSER_CONTENT_BOUNDARIES=1` so page content arrives wrapped in nonce markers and an attacker page can't impersonate tool delimiters.
 
@@ -48,15 +48,15 @@ Replaces `$B responsive`. Pin a session so viewport changes persist between comm
 ```bash
 URL="https://example.com"
 PREFIX="/tmp/rsp"
-SN="responsive-$(uuidgen 2>/dev/null || echo $$-$RANDOM)"
+SN="$(agent-browser session id --scope worktree --prefix responsive)"
 
-agent-browser open "$URL" --session-name "$SN"
+agent-browser --session "$SN" open "$URL"
 for vp in "375 667 mobile" "768 1024 tablet" "1440 900 desktop"; do
   set -- $vp
-  agent-browser set viewport "$1" "$2" --session-name "$SN"
-  agent-browser screenshot "${PREFIX}-${3}.png" --session-name "$SN"
+  agent-browser --session "$SN" set viewport "$1" "$2"
+  agent-browser --session "$SN" screenshot "${PREFIX}-${3}.png"
 done
-agent-browser close --session-name "$SN"
+agent-browser --session "$SN" close
 ```
 
 ### Anchor enumeration
@@ -130,7 +130,7 @@ agent-browser wait --load networkidle
 
 ```bash
 # 1. Open a visible browser window
-agent-browser open "$LOGIN_URL" --headed --session-name "auth-flow"
+agent-browser --session auth-flow --restore open "$LOGIN_URL" --headed
 
 # 2. (User completes CAPTCHA / MFA in the visible window.)
 
