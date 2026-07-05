@@ -1,6 +1,6 @@
 ---
 name: mk:plan-creator
-version: 1.6.2
+version: 1.6.3
 preamble-tier: 3
 description: 'Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks exit early, simple tasks get fast plans, complex tasks get full research + phase files + validation. Enforces Gate 1. Activated by /mk:plan or /mk:cook. NOT for ticket complexity analysis against an existing codebase (see mk:planning-engine); NOT for CEO-level scope review of existing plans (see mk:plan-ceo-review).'
 argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] [--html] OR [archive | red-team {path} | validate {path}]'
@@ -20,7 +20,8 @@ keywords:
   - phase-files
   - gate-1
   - scope-adaptive
-when_to_use: Use when creating a structured multi-file implementation plan before build. NOT for ticket analysis (see mk:planning-engine) or scope review (see mk:plan-ceo-review).
+  - design-evidence
+when_to_use: Use when creating a structured multi-file implementation plan before build, including plans that consume a design evidence packet (e.g. from mk:figma) without re-analyzing the design source. NOT for ticket analysis (see mk:planning-engine) or scope review (see mk:plan-ceo-review).
 user-invocable: true
 meowkit:
   portability: provider-only
@@ -53,6 +54,7 @@ Activate when:
 - User runs `/mk:plan [task]` or `/mk:cook [task]`
 - Non-trivial task (> 2 files OR > 1h OR architectural decisions)
 - User supplies ≥2 upstream reports/specs (office-hours, brainstorming, planning-engine, confluence-spec, intake output…) → step-00.5 consolidates them into a Plan Intake Packet before planning (see `references/plan-intake-packet.md`)
+- User supplies a design evidence packet (e.g. from `mk:figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
 - Gate 1 requires a plan before Phase 3
 - Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
 - User runs `/mk:plan archive` → route to `references/archive-workflow.md` (skip planning pipeline)
@@ -160,6 +162,7 @@ tasks/plans/YYMMDD-name/
 - **Sweep recursion is bounded**: "resolve now" caps at 2 attempts per gate; further unresolved items convert to Risk rows.
 - **`.plan-state.json` v1.2 schema is additive**: consumers MUST treat unknown keys (`verification_tier`, `consistency_sweeps_passed`) as optional and default-empty. v1.1 readers ignore them silently.
 - **Post-hydration integrity-check failure is a hard stop**: cycle / count-mismatch / missing-metadata failures print an explicit diff and STOP — do NOT auto-recover or silently continue. Human resolution required before step-09. See `references/task-management.md` "Post-Hydration Integrity Checks".
+- **Re-analyzing a design source that already has a packet duplicates interpretation**: when a design evidence packet path is present, cite the packet — do NOT call the design source's tools or re-parse its raw JSON. See `references/design-evidence-consumption.md`.
 
 ## References
 
@@ -173,6 +176,7 @@ tasks/plans/YYMMDD-name/
 | `references/anthropic-example-plan.md`             | RetroForge few-shot calibration example for product-level mode (ambition + feature density reference)                                                                                                                |
 | `step-00-5-intake-packet.md`                       | Conditional intake packet builder: consolidates ≥2 pre-existing external artifacts before research/drafting                                                                                                          |
 | `references/plan-intake-packet.md`                 | Plan Intake Packet contract: purpose, activation, 6-block schema, quality rules, boundaries                                                                                                                          |
+| `references/design-evidence-consumption.md`        | Consuming a design evidence packet (e.g. Figma): do/don't, adjudication precedence, decision-ledger, flow→validation-matrix, `blocked_on:` phase blocking. Never re-analyzes the design source.                        |
 | `step-05-red-team.md`                              | Red team review: persona scaling, subagent dispatch, adjudication                                                                                                                                                    |
 | `step-06-validation-interview.md`                  | Critical question generation and answer propagation                                                                                                                                                                  |
 | `step-07-gate.md`                                  | Self-check and Gate 1 AskUserQuestion presentation                                                                                                                                                                   |

@@ -191,6 +191,19 @@ def validate_phase_frontmatter(content, basename):
         except (ValueError, TypeError):
             errors.append(f"{basename}: frontmatter 'phase' is not an integer")
 
+    # Optional `blocked_on:` field (design-evidence flow blocking). Additive: absent = fine.
+    # Must be a list of strings when present; malformed → WARN, never a new status value.
+    if "blocked_on" in fm:
+        blocked_on = fm["blocked_on"]
+        if not isinstance(blocked_on, list):
+            warnings.append(
+                f"{basename}: frontmatter 'blocked_on' should be a list of strings"
+            )
+        elif not all(isinstance(item, str) for item in blocked_on):
+            warnings.append(
+                f"{basename}: frontmatter 'blocked_on' items should all be strings"
+            )
+
     # Drift: completed with unchecked todos
     if status == "completed":
         total, checked = count_checkbox_state(content)

@@ -60,6 +60,10 @@ Confirm the render landed exactly where expected:
 
 On success, print `✓ Rendered {plan_dir}/plan.html`.
 
+If `{plan_dir}/research/prototype-flow.json` exists, `mk:visual-plan` also writes a companion
+`{plan_dir}/prototype-flow.html` (interactive flow explorer). When present, report BOTH paths
+in the handoff so the reviewer sees the flow explorer alongside the plan.
+
 ### 8b-e. Fail-Open
 
 If `mk:visual-plan` errors, times out, or `{plan_dir}/plan.html` is absent after it

@@ -1,6 +1,6 @@
 ---
 name: mk:visual-plan
-version: 1.0.0
+version: 1.1.0
 description: |
   Use when rendering a plan directory (plan.md + phase-*.md) into ONE self-contained,
   template-consistent plan.html a reviewer can scan in under 30 seconds. Triggers on
@@ -119,6 +119,13 @@ if that is absent, ask the user for the plan directory via `AskUserQuestion`.
 9. **Optional open.** Offer to open the file (`open` on macOS, `xdg-open` on Linux);
    skip the auto-open in headless / SSH / WSL environments and print the path
    instead.
+10. **Companion flow explorer (conditional).** After `plan.html`, if
+    `$PLAN_DIR/research/prototype-flow.json` exists, read
+    `references/prototype-flow-explorer.md`, fill `assets/prototype-flow-template.html`
+    (replace ONLY the `flow-data` JSON block with the file body), write
+    `$PLAN_DIR/prototype-flow.html`, and run its self-check (sentinel `vp-flow-explorer`;
+    no injected `<script`/`on*=`; no CDN). This is a SEPARATE artifact — `plan.html` is
+    byte-identical for plans without the JSON. Skip silently when the JSON is absent.
 
 ## Output Format
 
@@ -132,6 +139,16 @@ A single self-contained page: cover (title / description / status / priority /
 phase count) → phase-timeline → architecture-diagram → file-map →
 decision/risk-cards → steps-checklist, plus any conditional or `--wireframe`
 blocks. Inline CSS/JS; the only external request is the pinned Mermaid CDN.
+
+When `$PLAN_DIR/research/prototype-flow.json` exists, a SEPARATE companion file is also
+written at the plan-dir root:
+
+```
+$PLAN_DIR/prototype-flow.html
+```
+
+A fully offline (zero-CDN) interactive layered flow explorer driven by the JSON. See
+`references/prototype-flow-explorer.md`.
 
 ## Failure Handling
 
@@ -197,3 +214,8 @@ done. The rendered page is a review aid; it does not replace Gate 1 approval.
 - **Token drift** → `block-vocabulary.md` is the single source of truth for tokens
   and classes; the assets implement it. If they disagree, fix the asset, not the
   reference.
+- **Flow JSON is DATA — escape everything; the explorer never fetches** → every
+  `prototype-flow.json` string reaches the DOM via `textContent`, never `innerHTML`; a
+  malicious node label renders as literal text. The `prototype-flow.html` self-check (no
+  injected `<script`/`on*=`, no CDN) is the load-bearing guard. See
+  `references/prototype-flow-explorer.md`.

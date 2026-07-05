@@ -138,6 +138,23 @@ If `tdd_mode = true`, follow `references/tdd-mode.md`. Add optional frontmatter 
 
 These sections are ONLY added when `--tdd` flag is set or `MEOWKIT_TDD=1` env var is active. Phase files without TDD mode retain the standard 12-section template.
 
+### 3c''. Design Evidence Packet Consumption (Conditional)
+
+If a design evidence packet path (e.g. `figma-evidence-packet/v1` from `mk:figma`) is present
+in the invocation, intake packet, or task description: read
+`references/design-evidence-consumption.md` and apply it while drafting. Do NOT call the
+design source's tools (e.g. Figma MCP) or re-parse raw design JSON — consume packet fields.
+
+- Cite packet fields in Key Insights (reference the packet path, not raw JSON).
+- Derive acceptance criteria from `validation_contract.required_viewports` / `required_states`.
+- Derive validation-matrix items from critical prototype actions only (not trivial transitions).
+- Adjudicate flow conflicts per the precedence order; record a decision-ledger row for each.
+- For unresolved high-risk flow ambiguity, set the additive optional `blocked_on:` frontmatter
+  field on ONLY the affected phase (list of `"<ledger-id>: <question>"`); leave `status:`
+  unchanged. Block only affected phases, never the whole plan.
+
+Skip entirely when no packet path is present.
+
 ### 3d. Phase Splitting Rules
 
 **Default to vertical slices.** For a feature-shaped task, each phase should deliver ONE thin end-to-end working path — the slice cuts through DB + API + UI as needed — so the system is runnable / demoable after every phase. Horizontal layering (all DB, then all API, then all UI) leaves the system non-functional until the last phase, which is poor for checkpointing, demo, and recovery on a long run.

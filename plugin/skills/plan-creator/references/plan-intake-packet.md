@@ -55,6 +55,9 @@ Six blocks, in this order. Target the whole packet at UNDER 120 lines.
 
 ## Evidence
 - Sources: {one line per artifact: path + 1-line role}
+- Design evidence packets: {for a packet-type artifact (e.g. `figma-evidence-packet/v1`),
+  record `path + schema_version + 1-line summary` only — never inline the packet body.
+  Consumption rules live in `references/design-evidence-consumption.md`.}
 - Unknowns: {questions the sources leave open}
 
 ## Scope Shape

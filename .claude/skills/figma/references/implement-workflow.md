@@ -45,6 +45,11 @@ Extract and record:
 - Color styles: fills, strokes, background colors
 - Effect styles: shadows, blurs
 
+When a Figma Evidence Packet is requested (plan/cook pipeline or multi-screen work), write
+these Step 2–4 outputs directly into the packet's `intent_summary`, `scope`, and
+`validation_contract` fields (see `figma-evidence-packet.md`) — concise summaries + artifact
+paths, never raw node JSON in context.
+
 ## Step 3: Get Screenshot
 
 Call `get_screenshot` for the target node.
@@ -115,3 +120,10 @@ Interaction states (hover/focus/active) are ADVISORY: validate only states deriv
 design variants or user confirmation — never from guessed prototype flows.
 
 If visual parity fails: identify the delta, fix the specific property, re-validate.
+
+Visual parity is NOT "done" for production-grade requests. When the caller wants
+production implementation, route through the validation handoff instead of claiming done at
+visual parity: Figma Evidence Packet → `mk:plan-creator` (scope, ACs, validation matrix) →
+`mk:agent-browser` (rendered evidence) → `mk:playwright-cli` / `mk:qa-manual` (deterministic
+checks). This skill produces implementation-ready evidence and starter code, not standalone
+production proof.
