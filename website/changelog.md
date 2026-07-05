@@ -14,13 +14,15 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
-## Unreleased
+## 2.13.4 (2026-07-05) — Figma Gateway + Agent-Browser Hardening
 
 ### Highlights
 
 `mk:figma` is refactored from a "does everything" skill into an honest read-first gateway. The default path stays lean — design analysis, Figma-to-code for small screens, token extraction, and a screenshot fallback — while advanced operations (Code Connect, canvas writes, and design-system/library patterns) become gated references that load only on explicit intent with confirmed prerequisites. A capability router maps any Figma intent to the right mode or gated reference in one lookup, so advanced work is no longer routed to external skills that may not exist in your environment.
 
 `mk:agent-browser` expands into a fuller browser-automation gateway — a specialized-workflow router (exploratory QA/dogfooding, Electron desktop apps, Slack automation, and cloud browser providers), a consolidated trust-boundaries safety reference, and scoped MCP tool profiles so a task exposes only the browser tools it needs.
+
+`mk:figma` also gains a versioned Figma Evidence Packet — a compact, provenance-bearing handoff of design intent that `mk:plan-creator` turns into viewport/state acceptance criteria and a critical-action validation matrix without re-analyzing the design source. Prototype-flow artifacts make navigation flow reviewable — extracted, inferred, confirmed, or blocked — instead of silently guessed, and `mk:visual-plan` can render it as an offline interactive flow explorer.
 
 ### Improvements
 
@@ -33,6 +35,12 @@ Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem
 - A consolidated trust-boundaries reference gathers the safety rules for authenticated, third-party, production, and user-data browser tasks in one place.
 - New Slack browser-automation workflows and a dogfood issue taxonomy ship with report templates for QA and Slack analysis.
 - MCP tool profiles (`core`, `network`, `react`, and more) let `mk:agent-browser` expose only the browser tools a task needs.
+- `mk:figma` emits an optional versioned Figma Evidence Packet — design intent, provenance, tokens, states, and a validation contract — as the stable handoff for planning and implementation.
+- `mk:figma` Mode 2 no longer claims standalone production-ready output — production now flows through the packet, plan, browser evidence, and deterministic checks.
+- `mk:figma` captures prototype-flow artifacts with an ambiguity ledger, distinguishing extracted from inferred and blocked navigation instead of guessing from screenshots.
+- `mk:plan-creator` consumes a design evidence packet directly — deriving viewport/state acceptance criteria and a critical-action validation matrix — and never re-analyzes the design source.
+- `mk:plan-creator` blocks only affected phases on unresolved high-risk flow ambiguity via an additive phase field, keeping the overall plan approvable at Gate 1.
+- `mk:visual-plan` renders an optional offline prototype-flow explorer alongside `plan.html` when a flow graph is present.
 
 ### Bug Fixes
 
