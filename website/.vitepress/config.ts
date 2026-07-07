@@ -144,6 +144,7 @@ export default withMermaid(defineConfig({
             { text: 'Rubric Library', link: '/guide/rubric-library' },
             { text: 'Middleware Layer', link: '/guide/middleware-layer' },
             { text: 'Trace & Benchmark', link: '/guide/trace-and-benchmark' },
+            { text: 'Using MeowKit Productively', link: '/guide/using-meowkit-productively' },
           ],
         },
       ],
