@@ -6,6 +6,7 @@ import path from "node:path";
 import pc from "picocolors";
 import { buildCapabilities } from "../core/build-capabilities.js";
 import { validateCapabilities } from "../core/validate-capabilities.js";
+import { resolveCapabilities } from "../core/resolve-capabilities.js";
 import type { CapabilityEntry } from "../core/capability.js";
 
 function findClaudeDir(): string | null {
@@ -17,6 +18,8 @@ interface CapabilitiesOptions {
 	subcommand?: string;
 	target?: string;
 	json?: boolean;
+	intent?: string;
+	provider?: string;
 }
 
 export async function capabilities(args: CapabilitiesOptions = {}): Promise<void> {
@@ -33,8 +36,12 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 		explain(entries, args.target, args.json ?? false);
 		return;
 	}
+	if (sub === "resolve") {
+		resolve(entries, args.intent ?? args.target, args.provider ?? null, args.json ?? false);
+		return;
+	}
 	if (sub !== "list") {
-		console.error(pc.red(`Unknown capabilities subcommand "${sub}". Expected list|explain.`));
+		console.error(pc.red(`Unknown capabilities subcommand "${sub}". Expected list|explain|resolve.`));
 		process.exit(1);
 	}
 
@@ -86,4 +93,28 @@ function explain(entries: CapabilityEntry[], target: string | undefined, json: b
 	console.log(`  requires:    ${entry.requirements.length ? entry.requirements.map((r) => `${r.type}:${r.id}`).join(", ") : pc.dim("(none)")}`);
 	console.log(`  verify:      ${entry.verification.kind}${entry.verification.id ? `:${entry.verification.id}` : ""}`);
 	console.log(`  provenance:  ${Object.entries(entry.provenance).map(([k, v]) => `${k}=${v}`).join(", ") || pc.dim("(none)")}`);
+}
+
+function resolve(entries: CapabilityEntry[], intent: string | undefined, provider: string | null, json: boolean): void {
+	if (!intent) {
+		console.error(pc.red("`capabilities resolve` requires an intent (--intent \"…\" or a positional phrase)."));
+		process.exit(1);
+	}
+	const result = resolveCapabilities(entries, intent, provider);
+	if (json) {
+		console.log(JSON.stringify(result, null, 2));
+		return;
+	}
+	console.log(pc.bold(pc.cyan(`Resolve: "${intent}"${provider ? ` (provider: ${provider})` : ""}`)));
+	if (result.candidates.length === 0) {
+		console.log(pc.yellow("  No capability matched this intent."));
+		return;
+	}
+	if (result.ambiguous) {
+		console.log(pc.yellow("  Ambiguous — candidates returned, none auto-selected:"));
+	}
+	for (const c of result.candidates) {
+		console.log(`  ${c.id} ${pc.dim(`(${c.kind}, score ${c.score})`)} — ${c.reason}`);
+		console.log(pc.dim(`      invocable: ${c.invocable}; verify: ${c.verification.kind}`));
+	}
 }

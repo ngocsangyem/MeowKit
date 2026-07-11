@@ -77,3 +77,18 @@ export const AUTHORED_CAPABILITIES: CapabilityEntry[] = [
 		requirements: [{ type: "skill_script", id: "trace", provenance: "authored" }],
 	}),
 ];
+
+/**
+ * Flagship intent overlay for disk-backed capabilities. Batch 1: scout/research +
+ * plan→cook→review. When a built capability's id is here, its inferred keyword intents
+ * are REPLACED by this curated, bounded set and its `intents` provenance becomes
+ * `authored` — deterministic resolution for the highest-traffic flows. Keys must be real
+ * capability ids (validated by the live-harness test).
+ */
+export const AUTHORED_INTENTS: Record<string, { intents: string[]; aliases?: string[] }> = {
+	"mk:scout": { intents: ["scout the codebase", "find related files", "orient in the code", "locate code"], aliases: ["scout"] },
+	"mk:research": { intents: ["research a library", "evaluate a technology", "gather best practices"], aliases: ["research"] },
+	"mk:plan-creator": { intents: ["plan this feature", "create a plan", "draft a spec", "design the approach"], aliases: ["plan"] },
+	"mk:cook": { intents: ["implement this feature", "build this", "write the code", "make this change"], aliases: ["cook", "implement"] },
+	"mk:review": { intents: ["review this code", "code review", "check before shipping", "audit the change"], aliases: ["review"] },
+};

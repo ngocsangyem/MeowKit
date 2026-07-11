@@ -5,6 +5,7 @@
 // intent across capabilities). No check ever executes a script or trusts a command string.
 import { buildCapabilities } from "./build-capabilities.js";
 import { buildInventory, type InventoryEntry } from "./build-inventory.js";
+import { AUTHORED_INTENTS } from "./capability-authored.js";
 import { KNOWN_INVOCATION_IDS, type CapabilityEntry } from "./capability.js";
 
 export interface CapabilityIssue {
@@ -127,6 +128,16 @@ export function validateCapabilityEntries(entries: CapabilityEntry[], inventoryE
 	// dependency cycle (ERROR)
 	const cycle = findCycle(entries);
 	if (cycle) issues.push({ level: "error", capabilityId: null, message: `dependency cycle: ${cycle.join(" → ")}` });
+
+	// Authored-intent overlay key with no matching capability (WARN): expected on a partial
+	// consumer install that omits a flagship skill, but on a full authoring install it means
+	// a dead key (e.g. after a skill rename) silently dropping curated intents. The hard guard
+	// against a rename is the resolver test asserting every authored phrase resolves to its owner.
+	for (const key of Object.keys(AUTHORED_INTENTS)) {
+		if (!capIds.has(key)) {
+			issues.push({ level: "warn", capabilityId: key, message: `AUTHORED_INTENTS key has no matching capability (partial install or renamed skill): ${key}` });
+		}
+	}
 
 	return issues;
 }

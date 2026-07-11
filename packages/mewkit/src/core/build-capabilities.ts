@@ -7,7 +7,7 @@
 // and repo/context/state-service capabilities have no disk artifact (provenance `authored`).
 import { buildInventory, enumerateArtifacts, readFrontmatter, type ArtifactType } from "./build-inventory.js";
 import type { CapabilityEntry, CapabilityKind, Invocation, Provenance } from "./capability.js";
-import { AUTHORED_CAPABILITIES } from "./capability-authored.js";
+import { AUTHORED_CAPABILITIES, AUTHORED_INTENTS } from "./capability-authored.js";
 
 /** Disk artifact types that project to a capability, mapped to their capability kind.
  * `rule` is intentionally absent — rules are always-on context, not invocable capabilities. */
@@ -64,7 +64,6 @@ export function buildCapabilities(claudeDir: string): CapabilityEntry[] {
 		const inv = invByPath.get(ref.rel);
 		const description = typeof meta.description === "string" ? meta.description : "";
 		const whenToUse = typeof meta.when_to_use === "string" ? meta.when_to_use : null;
-		const intents = inferredIntents(meta);
 
 		const provenance: Record<string, Provenance> = {
 			kind: "inferred",
@@ -74,14 +73,28 @@ export function buildCapabilities(claudeDir: string): CapabilityEntry[] {
 		};
 		if (description) provenance.description = "inferred";
 		if (whenToUse !== null) provenance.whenToUse = "inferred";
-		if (intents.length > 0) provenance.intents = "inferred";
 		if (inv?.dependsOn && inv.dependsOn.length > 0) provenance.dependencies = "inferred";
+
+		// Flagship overlay wins over inferred keywords: curated, bounded, authored intents.
+		const overlay = AUTHORED_INTENTS[ref.id];
+		let intents: string[];
+		let aliases: string[];
+		if (overlay) {
+			intents = overlay.intents;
+			aliases = overlay.aliases ?? [];
+			provenance.intents = "authored";
+			if (aliases.length > 0) provenance.aliases = "authored";
+		} else {
+			intents = inferredIntents(meta);
+			aliases = [];
+			if (intents.length > 0) provenance.intents = "inferred";
+		}
 
 		entries.push({
 			id: ref.id,
 			kind,
 			description,
-			aliases: [],
+			aliases,
 			sourcePath: ref.rel,
 			inventoryId: inv?.id ?? ref.id,
 			owner: inv?.owner ?? "",

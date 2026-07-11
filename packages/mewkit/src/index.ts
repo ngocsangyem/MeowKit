@@ -40,7 +40,7 @@ ${pc.bold("Commands:")}
   ${pc.green("init")}       Scaffold or update MeowKit in the current project
   ${pc.green("upgrade")}    Upgrade MeowKit to the latest version
   ${pc.green("validate")}   Validate .claude/ project structure (--mode authoring|flat-copy; auto-detected)
-  ${pc.green("capabilities")} Inspect the capability manifest ('capabilities list|explain <id>' [--json])
+  ${pc.green("capabilities")} Inspect/resolve the capability manifest ('capabilities list|explain <id>|resolve --intent "…"' [--json])
   ${pc.green("budget")}     View token usage and cost log ('budget context' for per-profile size)
   ${pc.green("memory")}     Manage agent memory (lessons & patterns)
   ${pc.green("setup")}      Guided post-scaffold configuration
@@ -181,6 +181,8 @@ async function main(): Promise<void> {
 		],
 		string: [
 			"mode",
+			"intent",
+			"provider",
 			"only",
 			"type",
 			"priority",
@@ -264,6 +266,8 @@ async function main(): Promise<void> {
 				subcommand: args._[1] as string | undefined,
 				target: args._[2] as string | undefined,
 				json: args.json as boolean | undefined,
+				intent: args.intent as string | undefined,
+				provider: args.provider as string | undefined,
 			});
 			break;
 		case "pack":
