@@ -9,6 +9,7 @@ import { validateCapabilities } from "../core/validate-capabilities.js";
 import { resolveWithHost } from "../core/resolve-capabilities.js";
 import { renderCapabilityView } from "../core/generate-capability-view.js";
 import { renderBootstrap, BOOTSTRAP_FILENAME, type BootstrapProvider } from "../core/bootstrap.js";
+import { PROVIDER_PROJECTIONS, isProjectedProvider } from "../core/provider-projection.js";
 import type { AvailabilityProbes } from "../core/availability.js";
 import { commandExists } from "./setup.js";
 import type { CapabilityEntry } from "../core/capability.js";
@@ -30,11 +31,17 @@ interface CapabilitiesOptions {
 export async function capabilities(args: CapabilitiesOptions = {}): Promise<void> {
 	const sub = args.subcommand ?? "list";
 
+	// `projections` reports how the capability surface reaches each provider — static.
+	if (sub === "projections") {
+		projections(args.json ?? false);
+		return;
+	}
+
 	// `bootstrap` is a static trusted constant — no `.claude/` scan required.
 	if (sub === "bootstrap") {
 		const provider = args.provider ?? "claude-code";
-		if (provider !== "claude-code") {
-			console.error(pc.red(`No bootstrap projection for provider "${provider}" yet (claude-code only).`));
+		if (!isProjectedProvider(provider)) {
+			console.error(pc.red(`No bootstrap projection for provider "${provider}" (report-only). Projected: ${Object.keys(PROVIDER_PROJECTIONS).join(", ")}.`));
 			process.exit(1);
 		}
 		const text = renderBootstrap(provider as BootstrapProvider);
@@ -76,7 +83,7 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 		return;
 	}
 	if (sub !== "list") {
-		console.error(pc.red(`Unknown capabilities subcommand "${sub}". Expected list|explain|resolve|view|bootstrap.`));
+		console.error(pc.red(`Unknown capabilities subcommand "${sub}". Expected list|explain|resolve|view|bootstrap|projections.`));
 		process.exit(1);
 	}
 
@@ -136,6 +143,24 @@ function explain(entries: CapabilityEntry[], target: string | undefined, json: b
  * that returns `null` for a bare, absent id (a logical name we can't resolve to a path),
  * so it surfaces as `unknown` rather than a false `unavailable`.
  */
+/** Report how the capability surface projects into each provider + the four support levels. */
+function projections(json: boolean): void {
+	const all = Object.values(PROVIDER_PROJECTIONS);
+	if (json) {
+		console.log(JSON.stringify(all, null, 2));
+		return;
+	}
+	console.log(pc.bold(pc.cyan("Capability provider projections")));
+	console.log(pc.dim("Four independent levels; `enforceable` is claimed only where a real gating hook exists.\n"));
+	for (const p of all) {
+		console.log(`${pc.bold(p.provider)} ${pc.dim(`(${p.status}, placement: ${p.bootstrapPlacement})`)}`);
+		const l = p.levels;
+		console.log(`  discoverable=${l.discoverable}  selectable=${l.selectable}  invocable=${l.invocable}  enforceable=${l.enforceable}`);
+		console.log(pc.dim(`  ${p.evidence}\n`));
+	}
+	console.log(pc.dim("Providers not listed are report-only — no capability behavior is claimed for them."));
+}
+
 export function hostProbes(projectRoot: string): AvailabilityProbes {
 	return {
 		// NOTE: PATH-only binary detection under-reports package-local CLIs (e.g. a `mewkit`

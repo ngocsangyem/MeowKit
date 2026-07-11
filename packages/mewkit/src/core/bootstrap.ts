@@ -18,8 +18,10 @@ export const BOOTSTRAP_END = "<!-- GENERATED:capability-bootstrap END -->";
  * it against the source constant. */
 export const BOOTSTRAP_FILENAME = "capability-bootstrap.md";
 
-/** Providers with a bootstrap projection today. Others are report-only until adapted. */
-export type BootstrapProvider = "claude-code";
+/** Providers with an authored bootstrap projection. The bootstrap TEXT is identical across
+ * them — the resolver invocation (`mewkit capabilities resolve`) is CLI-universal; only the
+ * PLACEMENT differs (see provider-projection.ts). Other providers are report-only. */
+export type BootstrapProvider = "claude-code" | "claude-plugin" | "codex";
 
 const CLAUDE_CODE_BOOTSTRAP = `## Capability resolution
 
@@ -37,12 +39,10 @@ How: run \`mewkit capabilities resolve --intent "<what you're trying to do>"\`. 
 
 Trust the availability verdict: an \`unavailable\` capability will not become available by calling it again.`;
 
-/** Return the approved bootstrap text for a provider (a trusted constant). */
-export function renderBootstrap(provider: BootstrapProvider = "claude-code"): string {
-	switch (provider) {
-		case "claude-code":
-			return CLAUDE_CODE_BOOTSTRAP;
-	}
+/** Return the approved bootstrap text for a provider (a trusted constant). The text is the
+ * same for every projected provider — the resolver invocation is CLI-universal. */
+export function renderBootstrap(_provider: BootstrapProvider = "claude-code"): string {
+	return CLAUDE_CODE_BOOTSTRAP;
 }
 
 /** Cheap token estimate (chars/4) — matches the Phase-1 context-surface measurement. */
