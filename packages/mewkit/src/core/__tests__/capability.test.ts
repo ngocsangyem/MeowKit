@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { buildCapabilities } from "../build-capabilities.js";
 import { validateCapabilities, validateCapabilityEntries } from "../validate-capabilities.js";
 import { CapabilityEntrySchema, type CapabilityEntry } from "../capability.js";
+import { renderCapabilityView } from "../generate-capability-view.js";
 import { enumerateArtifacts, type InventoryEntry } from "../build-inventory.js";
 
 const dirs: string[] = [];
@@ -88,6 +89,18 @@ describe("buildCapabilities", () => {
 		for (const c of buildCapabilities(makeClaudeDir())) {
 			expect(() => CapabilityEntrySchema.parse(c)).not.toThrow();
 		}
+	});
+});
+
+describe("renderCapabilityView", () => {
+	it("renders a stable table of only capabilities that carry intents, sorted by id", () => {
+		const claudeDir = makeClaudeDir();
+		const view = renderCapabilityView(buildCapabilities(claudeDir));
+		expect(view).toContain("| Capability | Kind | Invocation | Intent source | Intents (user phrases) |");
+		// The fixture skill mk:foo has inferred keyword intents ⇒ it appears.
+		expect(view).toContain("`mk:foo`");
+		// A command with no intents (baz) does not appear.
+		expect(view).not.toContain("`baz`");
 	});
 });
 

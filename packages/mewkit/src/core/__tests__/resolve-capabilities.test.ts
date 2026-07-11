@@ -86,6 +86,15 @@ describe("resolveCapabilities", () => {
 		expect(none.candidates[0]?.support).toBeNull();
 	});
 
+	it("describe-only tool entries (jira/browser) carry no intents and do not win user intents", () => {
+		const caps = buildCapabilities(join(process.cwd(), ".claude"));
+		const jira = caps.find((c) => c.id === "jira" && c.kind === "tool");
+		expect(jira?.intents).toEqual([]);
+		// A jira user intent must not resolve to the non-invocable tool entry as top-1.
+		const top = resolveCapabilities(caps, "create a jira issue").candidates[0];
+		expect(top?.id).not.toBe("jira");
+	});
+
 	it("resolves EVERY authored flagship phrase to its owner as top-1 on the LIVE harness", () => {
 		const caps = buildCapabilities(join(process.cwd(), ".claude"));
 		// Guard: overlay actually applied (real .claude present, not an empty subdir).

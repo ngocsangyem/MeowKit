@@ -9,6 +9,7 @@ import { checkOwnership } from "../core/build-inventory.js";
 import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
 import { checkPlugin, checkPluginNamespace, checkPluginManifests } from "../core/check-plugin-manifests.js";
+import { validateCapabilities } from "../core/validate-capabilities.js";
 import { parseMergedSections } from "../migrate/config-merger/merge-single-sections.js";
 import { discoverSkills } from "../migrate/discovery/index.js";
 import { buildPortableSkillsByProvider } from "../migrate/portability-policy.js";
@@ -29,7 +30,8 @@ export type Section =
 	| "Inventory"
 	| "Packs"
 	| "Plugin"
-	| "Rules";
+	| "Rules"
+	| "Capabilities";
 
 export interface CheckResult {
 	name: string;
@@ -70,6 +72,8 @@ interface ValidateOptions {
 	rules?: boolean;
 	/** Scope the run to the plugin namespace + manifest guards only (used by CI). */
 	plugin?: boolean;
+	/** Scope the run to the capability-manifest coherence check only (CI-adoptable). */
+	capabilities?: boolean;
 }
 
 const ok = (cond: boolean): Status => (cond ? "pass" : "fail");
@@ -468,6 +472,25 @@ function printResult(result: CheckResult): void {
 }
 
 /**
+ * Capability-manifest coherence as validate CheckResults (authoring only). An ERROR-level
+ * capability issue (broken cross-ref, containment, uniqueness, unknown invocation id, or a
+ * dependency cycle) fails the section; WARN-level (coverage, duplicate intent, dangling dep,
+ * dead overlay key) is advisory. A clean manifest reports a single PASS.
+ */
+export function checkCapabilitiesSection(meowkitDir: string): CheckResult[] {
+	const issues = validateCapabilities(meowkitDir);
+	if (issues.length === 0) {
+		return [{ name: "Capability manifest coherent", status: "pass", detail: "No cross-ref, containment, uniqueness, or cycle issues.", section: "Capabilities" }];
+	}
+	return issues.map((i) => ({
+		name: `Capability ${i.level}: ${i.capabilityId ?? "-"}`,
+		status: i.level === "error" ? "fail" : "warn",
+		detail: i.message,
+		section: "Capabilities",
+	}));
+}
+
+/**
  * Assemble the default-run checks for a given mode. Consumer-actionable checks run in
  * both modes; authoring-coherence checks run only in `authoring` mode — in a flat-copy
  * consumer they would be false failures (consumer customization of CLAUDE.md/rules trips
@@ -506,6 +529,7 @@ export async function buildDefaultChecks(
 			// Manifest contract is N/A until `mewkit build-plugin` has run.
 			...checkPluginManifests(projectRoot),
 			...checkRoutingTableBreadth(meowkitDir),
+			...checkCapabilitiesSection(meowkitDir),
 		);
 	}
 
@@ -550,6 +574,8 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = checkRoutingTableBreadth(meowkitDir);
 	} else if (args.plugin) {
 		results = checkPlugin(meowkitDir, projectRoot);
+	} else if (args.capabilities) {
+		results = checkCapabilitiesSection(meowkitDir);
 	} else {
 		const mode = args.mode ?? detectValidateMode(projectRoot);
 		console.log(
@@ -579,6 +605,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		Plugin: true,
 		Inventory: true,
 		Rules: true,
+		Capabilities: true,
 	};
 	const sections = Object.keys(SECTION_ORDER) as Section[];
 	for (const section of sections) {

@@ -7,6 +7,7 @@ import pc from "picocolors";
 import { buildCapabilities } from "../core/build-capabilities.js";
 import { validateCapabilities } from "../core/validate-capabilities.js";
 import { resolveCapabilities } from "../core/resolve-capabilities.js";
+import { renderCapabilityView } from "../core/generate-capability-view.js";
 import type { CapabilityEntry } from "../core/capability.js";
 
 function findClaudeDir(): string | null {
@@ -40,8 +41,13 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 		resolve(entries, args.intent ?? args.target, args.provider ?? null, args.json ?? false);
 		return;
 	}
+	if (sub === "view") {
+		// Generated compatible portion of the trigger registry (maintainer/CI diffs it in).
+		console.log(renderCapabilityView(entries));
+		return;
+	}
 	if (sub !== "list") {
-		console.error(pc.red(`Unknown capabilities subcommand "${sub}". Expected list|explain|resolve.`));
+		console.error(pc.red(`Unknown capabilities subcommand "${sub}". Expected list|explain|resolve|view.`));
 		process.exit(1);
 	}
 

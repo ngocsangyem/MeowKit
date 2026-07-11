@@ -34,18 +34,23 @@ function authored(
 
 /** Minimal, real authored set. Expanded in later slices as adapter evidence lands. */
 export const AUTHORED_CAPABILITIES: CapabilityEntry[] = [
+	// Tool entries are describe-only (no user-facing intents): they model the external
+	// integration + its requirement and stay discoverable via `list`/`explain`, but a user
+	// intent like "create a jira issue" must resolve to the INVOCABLE skill, not to a tool
+	// entry whose invocation is `none`. Wiring a tool's invocation to its skill entrypoint
+	// is adapter work (deferred), so until then the tool must not win intent resolution.
 	authored({
 		id: "jira",
 		kind: "tool",
-		description: "Jira issue tracking integration (hub-routed).",
-		intents: ["create a jira issue", "search jira", "update jira issue"],
+		description: "Jira issue tracking integration (surfaced via the mk:jira hub skills).",
+		intents: [],
 		requirements: [{ type: "mcp_or_app", id: "jira", provenance: "authored" }],
 	}),
 	authored({
 		id: "browser",
 		kind: "tool",
-		description: "Browser automation for navigation and scripted flows.",
-		intents: ["navigate to a url", "run a browser script", "test a web page"],
+		description: "Browser automation (surfaced via mk:agent-browser / mk:playwright-cli).",
+		intents: [],
 		requirements: [{ type: "external_binary", id: "chromium", provenance: "authored" }],
 	}),
 	authored({
@@ -86,9 +91,18 @@ export const AUTHORED_CAPABILITIES: CapabilityEntry[] = [
  * capability ids (validated by the live-harness test).
  */
 export const AUTHORED_INTENTS: Record<string, { intents: string[]; aliases?: string[] }> = {
+	// Batch 1: scout/research + plan→cook→review.
 	"mk:scout": { intents: ["scout the codebase", "find related files", "orient in the code", "locate code"], aliases: ["scout"] },
 	"mk:research": { intents: ["research a library", "evaluate a technology", "gather best practices"], aliases: ["research"] },
 	"mk:plan-creator": { intents: ["plan this feature", "create a plan", "draft a spec", "design the approach"], aliases: ["plan"] },
 	"mk:cook": { intents: ["implement this feature", "build this", "write the code", "make this change"], aliases: ["cook", "implement"] },
 	"mk:review": { intents: ["review this code", "code review", "check before shipping", "audit the change"], aliases: ["review"] },
+	// Batch 2: fix/test/ship + wiki authoring + memory. jira/browser stay owned by their
+	// authored tool entries; wiki-recall (read service) keeps the recall intents, so mk:wiki
+	// here owns only the authoring verbs — no phrase collides across capabilities.
+	"mk:fix": { intents: ["fix this bug", "fix the failing test", "debug this error"], aliases: ["fix"] },
+	"mk:testing": { intents: ["run the tests", "write tests for this", "check test coverage"], aliases: ["test"] },
+	"mk:ship": { intents: ["ship this change", "open a pull request", "create the PR"], aliases: ["ship"] },
+	"mk:wiki": { intents: ["propose a wiki page", "initialize the wiki", "approve a wiki page"], aliases: ["wiki"] },
+	"mk:memory": { intents: ["remember this decision", "recall a past fix", "prune old memory"], aliases: ["memory"] },
 };

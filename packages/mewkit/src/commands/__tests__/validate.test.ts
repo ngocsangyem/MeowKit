@@ -6,6 +6,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {
+	checkCapabilitiesSection,
 	checkCodexProjection,
 	checkHooksExecutable,
 	checkRoutingTableBreadth,
@@ -186,6 +187,17 @@ describe("Codex projection validation", () => {
 
 		expect(results.find((r) => r.name === "Codex projection: rules merged into AGENTS.md")?.status).toBe("pass");
 		expect(results.find((r) => r.name === "Codex projection: portable skills")?.status).toBe("pass");
+	});
+});
+
+describe("checkCapabilitiesSection", () => {
+	it("returns results in the Capabilities section with no ERROR/fail on a minimal tree", () => {
+		// beforeEach creates a hooks-only .claude; no skills/agents ⇒ coverage/overlay WARNs,
+		// but never a hard fail (no broken cross-ref, cycle, or unknown invocation id).
+		const results = checkCapabilitiesSection(claudeDir);
+		expect(results.length).toBeGreaterThan(0);
+		expect(results.every((r) => r.section === "Capabilities")).toBe(true);
+		expect(results.some((r) => r.status === "fail")).toBe(false);
 	});
 });
 
