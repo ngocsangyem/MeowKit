@@ -40,7 +40,7 @@ ${pc.bold("Commands:")}
   ${pc.green("init")}       Scaffold or update MeowKit in the current project
   ${pc.green("upgrade")}    Upgrade MeowKit to the latest version
   ${pc.green("validate")}   Validate .claude/ project structure (--mode authoring|flat-copy; auto-detected)
-  ${pc.green("capabilities")} Inspect/resolve/view the capability manifest ('capabilities list|explain <id>|resolve --intent "…"|view' [--json])
+  ${pc.green("capabilities")} Inspect/resolve/view the capability manifest ('capabilities list|explain <id>|resolve --intent "…"|view|bootstrap' [--json])
   ${pc.green("budget")}     View token usage and cost log ('budget context' for per-profile size)
   ${pc.green("memory")}     Manage agent memory (lessons & patterns)
   ${pc.green("setup")}      Guided post-scaffold configuration

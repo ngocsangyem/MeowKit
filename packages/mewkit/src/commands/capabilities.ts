@@ -8,6 +8,7 @@ import { buildCapabilities } from "../core/build-capabilities.js";
 import { validateCapabilities } from "../core/validate-capabilities.js";
 import { resolveCapabilities } from "../core/resolve-capabilities.js";
 import { renderCapabilityView } from "../core/generate-capability-view.js";
+import { renderBootstrap, type BootstrapProvider } from "../core/bootstrap.js";
 import type { CapabilityEntry } from "../core/capability.js";
 
 function findClaudeDir(): string | null {
@@ -24,6 +25,19 @@ interface CapabilitiesOptions {
 }
 
 export async function capabilities(args: CapabilitiesOptions = {}): Promise<void> {
+	const sub = args.subcommand ?? "list";
+
+	// `bootstrap` is a static trusted constant — no `.claude/` scan required.
+	if (sub === "bootstrap") {
+		const provider = args.provider ?? "claude-code";
+		if (provider !== "claude-code") {
+			console.error(pc.red(`No bootstrap projection for provider "${provider}" yet (claude-code only).`));
+			process.exit(1);
+		}
+		console.log(renderBootstrap(provider as BootstrapProvider));
+		return;
+	}
+
 	const claudeDir = findClaudeDir();
 	if (!claudeDir) {
 		console.error(pc.red("Could not find .claude/ directory in the current directory."));
@@ -31,7 +45,6 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 	}
 
 	const entries = buildCapabilities(claudeDir);
-	const sub = args.subcommand ?? "list";
 
 	if (sub === "explain") {
 		explain(entries, args.target, args.json ?? false);
@@ -47,7 +60,7 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 		return;
 	}
 	if (sub !== "list") {
-		console.error(pc.red(`Unknown capabilities subcommand "${sub}". Expected list|explain|resolve|view.`));
+		console.error(pc.red(`Unknown capabilities subcommand "${sub}". Expected list|explain|resolve|view|bootstrap.`));
 		process.exit(1);
 	}
 
