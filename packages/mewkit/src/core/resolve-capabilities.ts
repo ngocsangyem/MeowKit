@@ -4,6 +4,13 @@
 // host availability snapshot, so every candidate reports `invocable: "pending-host-snapshot"`.
 // Pure and free of time/randomness so results are reproducible.
 import type { CapabilityEntry, SupportLevels, TypedRequirement, Verification } from "./capability.js";
+import {
+	computeAvailability,
+	rollUpInvocability,
+	type AvailabilityContext,
+	type AvailabilitySnapshot,
+	type AvailabilityStatus,
+} from "./availability.js";
 
 // Field-class weights. A query term is credited ONCE at its highest-matching class
 // (never summed across a capability's many keyword strings — that inflates keyword-heavy
@@ -108,4 +115,48 @@ export function resolveCapabilities(entries: CapabilityEntry[], intent: string, 
 		(candidates.length >= 2 && candidates[0].score - candidates[1].score < AMBIGUITY_EPSILON);
 
 	return { intent, provider, candidates, ambiguous };
+}
+
+/** A resolved candidate enriched with this host's real availability (Phase 3). */
+export interface HostResolvedCandidate extends Omit<ResolvedCandidate, "invocable"> {
+	availability: AvailabilitySnapshot[];
+	/** Rolled-up host invocability — replaces the at-rest `pending-host-snapshot`. */
+	invocable: AvailabilityStatus;
+}
+
+export interface HostResolveResult {
+	intent: string;
+	provider: string;
+	ambiguous: boolean;
+	/** Selection outcome. `not_needed` is an agent-side decision, never emitted here. */
+	status: "selected" | "ambiguous" | "unavailable" | "unsupported";
+	candidates: HostResolvedCandidate[];
+}
+
+/**
+ * Resolve an intent AND check this host's real availability for each candidate. Selection
+ * (score-based) and invocability (availability-based) are surfaced SEPARATELY per the
+ * four-levels model: each candidate keeps its own `invocable` verdict, while the top-level
+ * `status` is the aggregate envelope outcome (which does fold in the top candidate's
+ * invocability and support). A provider that does not support the top candidate's surface
+ * → `unsupported`; a top candidate whose requirements are hard-blocked → `unavailable`.
+ */
+export function resolveWithHost(entries: CapabilityEntry[], intent: string, ctx: AvailabilityContext): HostResolveResult {
+	const byId = new Map(entries.map((e) => [e.id, e]));
+	const base = resolveCapabilities(entries, intent, ctx.provider);
+
+	const candidates: HostResolvedCandidate[] = base.candidates.map((c) => {
+		const entry = byId.get(c.id);
+		const availability = entry ? computeAvailability(entry, ctx) : [];
+		// Spread-override the at-rest `pending-host-snapshot` invocable with the host verdict.
+		return { ...c, availability, invocable: rollUpInvocability(availability) };
+	});
+
+	let status: HostResolveResult["status"];
+	if (candidates.length === 0) status = "unavailable";
+	else if (base.ambiguous) status = "ambiguous";
+	else if (candidates[0].support && candidates[0].support.discoverable === false) status = "unsupported";
+	else status = candidates[0].invocable === "unavailable" ? "unavailable" : "selected";
+
+	return { intent: base.intent, provider: ctx.provider, ambiguous: base.ambiguous, status, candidates };
 }
