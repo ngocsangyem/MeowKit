@@ -61,6 +61,20 @@ export function mapPathToLastModified(release: ReleaseManifest | null): Record<s
 }
 
 /**
+ * Map each release file path to its incoming payload checksum. Feeds
+ * `buildInstallMetadata`'s `expectedChecksums` so a byte-identical forward copy of
+ * a file that changed between releases is recognized as toolkit-owned rather than
+ * mislabeled `meowkit-modified`.
+ */
+export function mapPathToChecksum(release: ReleaseManifest | null): Record<string, string> {
+	const out: Record<string, string> = {};
+	for (const f of release?.files ?? []) {
+		out[f.path] = f.checksum;
+	}
+	return out;
+}
+
+/**
  * Project a release manifest onto the `Manifest` shape `findOrphans` consumes —
  * only the checksum keys matter for orphan detection.
  */

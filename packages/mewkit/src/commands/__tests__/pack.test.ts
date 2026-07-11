@@ -116,6 +116,18 @@ describe("pack-helpers: installed state + settings refs", () => {
 		expect(after.meta?.packs).toEqual(["base", "lifecycle-core"]);
 		expect(after.meta?.files.length).toBeGreaterThan(0);
 	});
+
+	it("rebuildMetadata preserves kit ownership — no false meowkit-modified on unchanged files", async () => {
+		const claudeDir = await makeInstall();
+		const { meta } = readInstallMetadata(claudeDir);
+		// A pack rebuild has no incoming release payload; unchanged kit files on disk
+		// must stay meowkit (disk == advanced baseChecksum), never flip to modified.
+		await rebuildMetadata(claudeDir, meta, ["base", "lifecycle-core"]);
+		const after = readInstallMetadata(claudeDir);
+		const gate = after.meta?.files.find((f) => f.path === "rules/gate-rules.md");
+		expect(gate?.owner).toBe("meowkit");
+		expect(after.meta?.files.some((f) => f.layer !== "user" && f.owner === "meowkit-modified")).toBe(false);
+	});
 });
 
 describe("computeRemovablePaths exclusivity (the safety property)", () => {

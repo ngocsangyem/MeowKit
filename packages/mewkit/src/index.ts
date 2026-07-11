@@ -8,6 +8,7 @@ import pc from "picocolors";
 import { init } from "./commands/init.js";
 import { upgrade } from "./commands/upgrade.js";
 import { validate } from "./commands/validate.js";
+import { capabilities } from "./commands/capabilities.js";
 import { budget, contextBudget } from "./commands/budget.js";
 import { memory } from "./commands/memory.js";
 import { verdictGate } from "./commands/verdict-gate.js";
@@ -38,11 +39,12 @@ ${pc.bold("Usage:")}
 ${pc.bold("Commands:")}
   ${pc.green("init")}       Scaffold or update MeowKit in the current project
   ${pc.green("upgrade")}    Upgrade MeowKit to the latest version
-  ${pc.green("validate")}   Validate .claude/ project structure
+  ${pc.green("validate")}   Validate .claude/ project structure (--mode authoring|flat-copy; auto-detected)
+  ${pc.green("capabilities")} Inspect/resolve/view the capability manifest ('capabilities list|explain <id>|resolve --intent "…"|view|bootstrap' [--json])
   ${pc.green("budget")}     View token usage and cost log ('budget context' for per-profile size)
   ${pc.green("memory")}     Manage agent memory (lessons & patterns)
   ${pc.green("setup")}      Guided post-scaffold configuration
-  ${pc.green("doctor")}     Diagnose common environment issues
+  ${pc.green("doctor")}     Diagnose common environment issues ('doctor provenance --explain' for a read-only provenance report)
   ${pc.green("status")}     Print version and config summary
   ${pc.green("task")}       Create and list task files (new, list)
   ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
@@ -173,10 +175,16 @@ async function main(): Promise<void> {
 			"packs",
 			"rules",
 			"substrate",
+			"capabilities",
 			"emit",
 			"commit",
+			"explain",
+			"write",
 		],
 		string: [
+			"mode",
+			"intent",
+			"provider",
 			"only",
 			"type",
 			"priority",
@@ -231,8 +239,14 @@ async function main(): Promise<void> {
 				yes: args.yes as boolean | undefined,
 			});
 			break;
-		case "validate":
+		case "validate": {
+			const modeArg = args.mode as string | undefined;
+			if (modeArg !== undefined && modeArg !== "authoring" && modeArg !== "flat-copy") {
+				console.error(`Invalid --mode "${modeArg}". Expected "authoring" or "flat-copy".`);
+				process.exit(1);
+			}
 			await validate({
+				mode: modeArg as "authoring" | "flat-copy" | undefined,
 				portable: args.portable as boolean | undefined,
 				strict: args.strict as boolean | undefined,
 				workflow: args.workflow as boolean | undefined,
@@ -241,11 +255,23 @@ async function main(): Promise<void> {
 				packs: args.packs as boolean | undefined,
 				rules: args.rules as boolean | undefined,
 				plugin: args.plugin as boolean | undefined,
+				capabilities: args.capabilities as boolean | undefined,
 			});
 			break;
+		}
 		case "build-plugin":
 			await buildPlugin({
 				json: args.json as boolean | undefined,
+			});
+			break;
+		case "capabilities":
+			await capabilities({
+				subcommand: args._[1] as string | undefined,
+				target: args._[2] as string | undefined,
+				json: args.json as boolean | undefined,
+				intent: args.intent as string | undefined,
+				provider: args.provider as string | undefined,
+				write: args.write as boolean | undefined,
 			});
 			break;
 		case "pack":
@@ -353,6 +379,9 @@ async function main(): Promise<void> {
 				providers: args.providers as boolean | undefined,
 				state: args.state as boolean | undefined,
 				hardGates: args["hard-gates"] as boolean | undefined,
+				// `doctor provenance [--explain]`: read-only provenance report.
+				provenance: args._[1] === "provenance" || undefined,
+				explain: args.explain as boolean | undefined,
 			});
 			break;
 		case "status":

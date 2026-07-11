@@ -9,6 +9,7 @@ import { checkOwnership } from "../core/build-inventory.js";
 import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
 import { checkPlugin, checkPluginNamespace, checkPluginManifests } from "../core/check-plugin-manifests.js";
+import { validateCapabilities } from "../core/validate-capabilities.js";
 import { parseMergedSections } from "../migrate/config-merger/merge-single-sections.js";
 import { discoverSkills } from "../migrate/discovery/index.js";
 import { buildPortableSkillsByProvider } from "../migrate/portability-policy.js";
@@ -29,7 +30,8 @@ export type Section =
 	| "Inventory"
 	| "Packs"
 	| "Plugin"
-	| "Rules";
+	| "Rules"
+	| "Capabilities";
 
 export interface CheckResult {
 	name: string;
@@ -38,9 +40,26 @@ export interface CheckResult {
 	section: Section;
 }
 
+/**
+ * Consumer profile for a validate run.
+ * - `authoring`: the MeowKit source checkout. Gets the full authoring-coherence
+ *   suite (workflow drift, ownership/substrate completeness, pack-manifest
+ *   coherence, routing-table breadth, plugin manifests) alongside consumer checks.
+ * - `flat-copy`: a project that installed `.claude/` by copy. Gets only
+ *   consumer-actionable checks; authoring-coherence checks are suppressed because a
+ *   consumer legitimately customizes `CLAUDE.md`/`rules` (tripping workflow-drift and
+ *   routing-breadth) and has no `plugin/` build output (plugin-manifest N/A), so those
+ *   checks would surface as false failures in a healthy consumer install.
+ * Provider projection/plugin payloads are validated by adapter-specific paths
+ * (e.g. `--portable`, `--plugin`), not by guessing a third mode here.
+ */
+export type ValidateMode = "authoring" | "flat-copy";
+
 interface ValidateOptions {
 	portable?: boolean;
 	strict?: boolean;
+	/** Explicit mode override. When absent, mode is auto-detected from the project. */
+	mode?: ValidateMode;
 	/** Scope the run to the workflow drift-check only (used by the CI step). */
 	workflow?: boolean;
 	/** Scope the run to the ownership-completeness check only (used by CI). */
@@ -53,9 +72,22 @@ interface ValidateOptions {
 	rules?: boolean;
 	/** Scope the run to the plugin namespace + manifest guards only (used by CI). */
 	plugin?: boolean;
+	/** Scope the run to the capability-manifest coherence check only (CI-adoptable). */
+	capabilities?: boolean;
 }
 
 const ok = (cond: boolean): Status => (cond ? "pass" : "fail");
+
+/**
+ * Deterministically detect the validate mode from the project layout. The MeowKit
+ * source checkout ships the CLI TypeScript source (`packages/mewkit/src`) beside its
+ * `.claude/`; a consumer flat-copy install has `.claude/` but no CLI source tree.
+ * That single filesystem signal is the discriminator. An explicit `--mode` overrides it.
+ */
+export function detectValidateMode(projectRoot: string): ValidateMode {
+	const cliSource = path.join(projectRoot, "packages", "mewkit", "src");
+	return fs.existsSync(cliSource) ? "authoring" : "flat-copy";
+}
 
 /** Find MeowKit .claude/ in cwd only (no walk-up). */
 function findMeowkitDir(startDir: string): string | null {
@@ -439,6 +471,76 @@ function printResult(result: CheckResult): void {
 	}
 }
 
+/**
+ * Capability-manifest coherence as validate CheckResults (authoring only). An ERROR-level
+ * capability issue (broken cross-ref, containment, uniqueness, unknown invocation id, or a
+ * dependency cycle) fails the section; WARN-level (coverage, duplicate intent, dangling dep,
+ * dead overlay key) is advisory. A clean manifest reports a single PASS.
+ */
+export function checkCapabilitiesSection(meowkitDir: string): CheckResult[] {
+	const issues = validateCapabilities(meowkitDir);
+	if (issues.length === 0) {
+		return [{ name: "Capability manifest coherent", status: "pass", detail: "No cross-ref, containment, uniqueness, or cycle issues.", section: "Capabilities" }];
+	}
+	return issues.map((i) => ({
+		name: `Capability ${i.level}: ${i.capabilityId ?? "-"}`,
+		status: i.level === "error" ? "fail" : "warn",
+		detail: i.message,
+		section: "Capabilities",
+	}));
+}
+
+/**
+ * Assemble the default-run checks for a given mode. Consumer-actionable checks run in
+ * both modes; authoring-coherence checks run only in `authoring` mode — in a flat-copy
+ * consumer they would be false failures (consumer customization of CLAUDE.md/rules trips
+ * drift + routing-breadth; no `plugin/` build makes plugin manifests N/A). Pure and
+ * side-effect-free so it can be tested directly against a fixture.
+ */
+export async function buildDefaultChecks(
+	meowkitDir: string,
+	projectRoot: string,
+	mode: ValidateMode,
+	portable: boolean,
+): Promise<CheckResult[]> {
+	// Consumer-actionable checks — a flat-copy install must still have present dirs, a
+	// valid config, executable hooks, and docs references that resolve in its own `.claude/`.
+	const results: CheckResult[] = [
+		checkDirExists(meowkitDir, "agents"),
+		checkDirExists(meowkitDir, "hooks"),
+		checkFileExists(projectRoot, "CLAUDE.md", "Structure"),
+		checkConfigJson(meowkitDir),
+		...checkHooksExecutable(meowkitDir),
+		...checkDocsRefsContract(meowkitDir),
+		// Namespace purity is cheap and consumer-relevant (a leaked double-prefix would
+		// misbehave in the consumer too), so it runs in both modes.
+		...checkPluginNamespace(meowkitDir),
+	];
+
+	if (mode === "authoring") {
+		results.push(
+			// Advisory in the default run: a wholly-absent governance file WARNs
+			// (prompt `mewkit upgrade`) rather than failing an un-synced install.
+			// The scoped `--workflow`/`--ownership`/`--packs` paths stay strict for CI.
+			...checkWorkflowDrift(projectRoot, { missingSpecSeverity: "warn" }),
+			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
+			...checkSubstrate(meowkitDir, { missingViewSeverity: "warn" }),
+			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
+			// Manifest contract is N/A until `mewkit build-plugin` has run.
+			...checkPluginManifests(projectRoot),
+			...checkRoutingTableBreadth(meowkitDir),
+			...checkCapabilitiesSection(meowkitDir),
+		);
+	}
+
+	if (portable) {
+		results.push(...checkPortability());
+		results.push(...(await checkCodexProjection(projectRoot)));
+	}
+
+	return results;
+}
+
 export async function validate(args: ValidateOptions = {}): Promise<void> {
 	console.log(pc.bold(pc.cyan("Validating .claude/ project structure...")));
 	console.log(
@@ -472,31 +574,19 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = checkRoutingTableBreadth(meowkitDir);
 	} else if (args.plugin) {
 		results = checkPlugin(meowkitDir, projectRoot);
+	} else if (args.capabilities) {
+		results = checkCapabilitiesSection(meowkitDir);
 	} else {
-		results = [
-			checkDirExists(meowkitDir, "agents"),
-			checkDirExists(meowkitDir, "hooks"),
-			checkFileExists(projectRoot, "CLAUDE.md", "Structure"),
-			checkConfigJson(meowkitDir),
-			...checkHooksExecutable(meowkitDir),
-			...checkDocsRefsContract(meowkitDir),
-			// Default run is advisory: a wholly-absent governance file WARNs
-			// (prompt `mewkit upgrade`) rather than failing an un-synced install.
-			// The scoped `--workflow`/`--ownership`/`--packs` paths above stay strict for CI.
-			...checkWorkflowDrift(projectRoot, { missingSpecSeverity: "warn" }),
-			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
-			...checkSubstrate(meowkitDir, { missingViewSeverity: "warn" }),
-			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
-			// Namespace purity is always enforced (cheap, catches double-prefix /
-			// leaks). Manifest contract is N/A until `mewkit build-plugin` has run.
-			...checkPluginNamespace(meowkitDir),
-			...checkPluginManifests(projectRoot),
-			...checkRoutingTableBreadth(meowkitDir),
-		];
-		if (args.portable) {
-			results.push(...checkPortability());
-			results.push(...(await checkCodexProjection(projectRoot)));
-		}
+		const mode = args.mode ?? detectValidateMode(projectRoot);
+		console.log(
+			`${pc.dim("Mode:")} ${mode}${args.mode ? " (override)" : " (auto-detected)"} — ${
+				mode === "flat-copy"
+					? "consumer checks only; authoring-coherence checks suppressed"
+					: "full authoring-coherence suite"
+			}`,
+		);
+		console.log();
+		results = await buildDefaultChecks(meowkitDir, projectRoot, mode, args.portable ?? false);
 	}
 
 	// Exhaustiveness guard: the printed `sections` array MUST list every `Section`
@@ -515,6 +605,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		Plugin: true,
 		Inventory: true,
 		Rules: true,
+		Capabilities: true,
 	};
 	const sections = Object.keys(SECTION_ORDER) as Section[];
 	for (const section of sections) {
