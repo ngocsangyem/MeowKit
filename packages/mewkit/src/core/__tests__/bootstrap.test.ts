@@ -1,10 +1,13 @@
 // Phase 3 slice 2: the capability-resolution bootstrap. It is a TRUSTED CONSTANT — a
 // static, human-approved, generic-functional block. These tests gate (a) the model-visible
 // budget (fails CI on unapproved growth) and (b) injection-safety / brand-neutrality.
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
 	renderBootstrap,
 	estimateTokens,
+	BOOTSTRAP_FILENAME,
 	BOOTSTRAP_MAX_LINES,
 	BOOTSTRAP_MAX_TOKENS,
 } from "../bootstrap.js";
@@ -37,6 +40,16 @@ describe("bootstrap content contract", () => {
 
 	it("tells the model when NOT to resolve (no forced call before ordinary edits)", () => {
 		expect(bootstrap.toLowerCase()).toContain("don't resolve");
+	});
+});
+
+describe("committed bootstrap file (SessionStart hook source) matches the constant", () => {
+	it("the live .claude/capability-bootstrap.md is in sync with renderBootstrap()", () => {
+		const file = join(process.cwd(), ".claude", BOOTSTRAP_FILENAME);
+		// The hook emits this committed file; it must not drift from the source constant.
+		// Regenerate with `mewkit capabilities bootstrap --write` if this fails.
+		expect(existsSync(file), `${BOOTSTRAP_FILENAME} should be committed for the SessionStart hook`).toBe(true);
+		expect(readFileSync(file, "utf-8")).toBe(renderBootstrap("claude-code") + "\n");
 	});
 });
 

@@ -13,6 +13,11 @@ export const BOOTSTRAP_MAX_TOKENS = 500;
 export const BOOTSTRAP_START = "<!-- GENERATED:capability-bootstrap START -->";
 export const BOOTSTRAP_END = "<!-- GENERATED:capability-bootstrap END -->";
 
+/** `.claude/`-relative path of the committed, generated bootstrap file the SessionStart
+ * hook emits. Regenerate with `mewkit capabilities bootstrap --write`; a drift test guards
+ * it against the source constant. */
+export const BOOTSTRAP_FILENAME = "capability-bootstrap.md";
+
 /** Providers with a bootstrap projection today. Others are report-only until adapted. */
 export type BootstrapProvider = "claude-code";
 

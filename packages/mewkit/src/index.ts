@@ -179,6 +179,7 @@ async function main(): Promise<void> {
 			"emit",
 			"commit",
 			"explain",
+			"write",
 		],
 		string: [
 			"mode",
@@ -270,6 +271,7 @@ async function main(): Promise<void> {
 				json: args.json as boolean | undefined,
 				intent: args.intent as string | undefined,
 				provider: args.provider as string | undefined,
+				write: args.write as boolean | undefined,
 			});
 			break;
 		case "pack":

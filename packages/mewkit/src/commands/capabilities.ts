@@ -8,7 +8,7 @@ import { buildCapabilities } from "../core/build-capabilities.js";
 import { validateCapabilities } from "../core/validate-capabilities.js";
 import { resolveCapabilities } from "../core/resolve-capabilities.js";
 import { renderCapabilityView } from "../core/generate-capability-view.js";
-import { renderBootstrap, type BootstrapProvider } from "../core/bootstrap.js";
+import { renderBootstrap, BOOTSTRAP_FILENAME, type BootstrapProvider } from "../core/bootstrap.js";
 import type { CapabilityEntry } from "../core/capability.js";
 
 function findClaudeDir(): string | null {
@@ -22,6 +22,7 @@ interface CapabilitiesOptions {
 	json?: boolean;
 	intent?: string;
 	provider?: string;
+	write?: boolean;
 }
 
 export async function capabilities(args: CapabilitiesOptions = {}): Promise<void> {
@@ -34,7 +35,20 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 			console.error(pc.red(`No bootstrap projection for provider "${provider}" yet (claude-code only).`));
 			process.exit(1);
 		}
-		console.log(renderBootstrap(provider as BootstrapProvider));
+		const text = renderBootstrap(provider as BootstrapProvider);
+		if (args.write) {
+			// Regenerate the committed file the SessionStart hook emits. Requires .claude/.
+			const dir = findClaudeDir();
+			if (!dir) {
+				console.error(pc.red("Could not find .claude/ directory to write the bootstrap file."));
+				process.exit(1);
+			}
+			const dest = path.join(dir, BOOTSTRAP_FILENAME);
+			fs.writeFileSync(dest, text + "\n", "utf-8");
+			console.log(pc.green(`Wrote ${path.relative(process.cwd(), dest)}`));
+			return;
+		}
+		console.log(text);
 		return;
 	}
 
