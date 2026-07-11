@@ -62,6 +62,13 @@ describe("computeAvailability", () => {
 		expect(computeAvailability(e, ctx({ mcpServerConfigured: () => null }))[0].status).toBe("unknown");
 	});
 
+	it("skill_script / file_or_config: null probe (bare logical id, no path) ⇒ unknown, not unavailable", () => {
+		const e = cap("x", [{ type: "skill_script", id: "some-logical-id", provenance: "authored" }]);
+		const snap = computeAvailability(e, ctx({ containedFileExists: () => null }))[0];
+		expect(snap.status).toBe("unknown");
+		expect(snap.evidence).toMatch(/logical id/);
+	});
+
 	it("host_tool / subagent_surface / lifecycle_event: honestly unknown (never inferred)", () => {
 		for (const type of ["host_tool", "subagent_surface", "lifecycle_event"] as const) {
 			const e = cap("x", [{ type, id: "t", provenance: "authored" }]);

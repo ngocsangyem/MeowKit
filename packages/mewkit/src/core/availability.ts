@@ -24,10 +24,11 @@ export interface AvailabilitySnapshot {
 export interface AvailabilityProbes {
 	/** Is an external binary resolvable on PATH? (reuses the CLI's cross-platform detector) */
 	commandExists: (cmd: string) => boolean;
-	/** Does a resolved path exist AND stay contained under the tree? The caller must pass a
-	 * real path — resolve any logical id (e.g. a skill_script id) to a path BEFORE this call;
-	 * this probe is a dumb path-existence check, not a logical-id interpreter. */
-	containedFileExists: (relPath: string) => boolean;
+	/** Path-existence check for a requirement id. Returns `true`/`false` when the id resolves
+	 * to a real contained path, and `null` when the id is not a checkable path (e.g. a bare
+	 * logical skill-script id with no path mapping) — the caller resolves logical→path; this
+	 * probe never interprets logical ids, and `null` surfaces honestly as `unknown`. */
+	containedFileExists: (relPath: string) => boolean | null;
 	/** Is an MCP server / app named `id` configured? null ⇒ cannot tell (no config on disk). */
 	mcpServerConfigured: (id: string) => boolean | null;
 }
@@ -48,6 +49,7 @@ function snapshotFor(req: TypedRequirement, ctx: AvailabilityContext): Availabil
 		case "skill_script":
 		case "file_or_config": {
 			const ok = ctx.probes.containedFileExists(req.id);
+			if (ok === null) return { ...base, status: "unknown", evidence: `"${req.id}" is a logical id with no path mapping — availability undetermined (not executed)` };
 			return { ...base, status: ok ? "available" : "unavailable", evidence: `contained path "${req.id}": ${ok ? "present" : "absent"} (not executed)` };
 		}
 		case "mcp_or_app": {

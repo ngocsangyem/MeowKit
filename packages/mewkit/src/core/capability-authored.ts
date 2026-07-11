@@ -65,7 +65,9 @@ export const AUTHORED_CAPABILITIES: CapabilityEntry[] = [
 		kind: "context-service",
 		description: "Disciplined recall of long-term, provenance-bearing project knowledge.",
 		intents: ["search project knowledge", "recall prior decisions"],
-		requirements: [{ type: "skill_script", id: "wiki-context", provenance: "authored" }],
+		// Provided by the `mewkit wiki context` subcommand — availability = CLI present,
+		// not a file on disk (a path probe would misreport a CLI subcommand as missing).
+		requirements: [{ type: "external_binary", id: "mewkit", provenance: "authored" }],
 	}),
 	authored({
 		id: "task-record",
@@ -79,7 +81,8 @@ export const AUTHORED_CAPABILITIES: CapabilityEntry[] = [
 		kind: "state-service",
 		description: "Append-only trace/friction log for cross-session recall.",
 		intents: ["record friction", "audit trace"],
-		requirements: [{ type: "skill_script", id: "trace", provenance: "authored" }],
+		// Provided by the `mewkit trace` subcommand — availability = CLI present.
+		requirements: [{ type: "external_binary", id: "mewkit", provenance: "authored" }],
 	}),
 ];
 
