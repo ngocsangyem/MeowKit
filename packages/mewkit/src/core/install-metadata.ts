@@ -154,6 +154,14 @@ export interface BuildInstallMetadataOptions {
 	version: string;
 	/** Per-path source commit timestamp (release-manifest `lastModified`). */
 	sourceTimestamps?: Record<string, string>;
+	/**
+	 * Incoming release payload hash per `.claude/`-relative path (release-manifest
+	 * `checksum`). When a kit file's disk hash equals its incoming payload hash, it
+	 * is a clean forward copy of the new release — toolkit-owned, and its as-shipped
+	 * `baseChecksum` advances to the new payload. Absent for flows with no incoming
+	 * release (e.g. pack rebuild), which fall back to prior-state comparison.
+	 */
+	expectedChecksums?: Record<string, string>;
 	/** Prior installed entries, indexed by `.claude/`-relative path. */
 	priorEntriesByPath?: Record<string, InstallFileEntry>;
 	/** Optional install scope marker (e.g. "local"). */
@@ -168,26 +176,65 @@ export interface BuildInstallMetadataOptions {
 
 /**
  * Scan an installed `.claude/` and build canonical metadata. Ownership for kit
- * (core/skill) files is computed against the prior state: a kit file whose disk
- * hash differs from its prior `baseChecksum` is labeled `meowkit-modified`;
- * `baseChecksum` preserves the as-shipped hash across upgrades.
+ * (core/skill) files is computed with this precedence:
+ *   1. Disk hash equals the incoming release payload (`expectedChecksums`) — a
+ *      clean forward copy. Labeled `meowkit`, and `baseChecksum` ADVANCES to the
+ *      new payload so the next upgrade compares against the current release, not
+ *      a stale one. This is what stops a byte-identical forward copy from being
+ *      mislabeled `meowkit-modified` when the file changed between releases.
+ *   2. No prior entry — a fresh file. When the incoming payload is known and disk
+ *      differs from it, the file was edited after copy: `meowkit-modified` with
+ *      `baseChecksum` set to the as-shipped payload. Otherwise `meowkit`.
+ *   3. Prior entry present — compare disk to the prior `baseChecksum`: unchanged
+ *      is `meowkit`, otherwise `meowkit-modified`. `baseChecksum` is preserved.
+ * With no `expectedChecksums`, behavior is identical to the prior-state-only model.
  */
 export function buildInstallMetadata(claudeDir: string, opts: BuildInstallMetadataOptions): InstallMetadata {
 	const installedAt = new Date().toISOString();
 	const prior = opts.priorEntriesByPath ?? {};
 	const timestamps = opts.sourceTimestamps ?? {};
+	const expected = opts.expectedChecksums ?? {};
+	// Release-manifest-derived maps (expected/timestamps) key on forward-slash paths
+	// (generate-release-manifest.cjs normalizes separators); `collectFiles` yields
+	// native separators on Windows. Look those maps up by a normalized key so the
+	// forward-copy recognition is not a silent no-op for nested paths on Windows.
+	// `prior` stays keyed by the raw relPath — its entries come from our own metadata,
+	// written with the same native separators.
+	const mergedSet = new Set((opts.mergedSettings ?? []).map((p) => p.replace(/\\/g, "/")));
 	const files: InstallFileEntry[] = [];
 
 	for (const relPath of collectFiles(claudeDir, claudeDir)) {
 		const diskHash = hashFile(join(claudeDir, relPath));
 		const layer = classifyLayer(relPath);
 		const priorEntry = prior[relPath];
-		const baseChecksum = priorEntry ? priorEntry.baseChecksum : diskHash;
+		const normKey = relPath.replace(/\\/g, "/");
+		const expectedHash = expected[normKey];
 
 		let owner: InstallFileEntry["owner"];
-		if (layer === "user") owner = "user";
-		else if (!priorEntry || diskHash === priorEntry.baseChecksum) owner = "meowkit";
-		else owner = "meowkit-modified";
+		let baseChecksum: string;
+		if (layer === "user") {
+			owner = "user";
+			baseChecksum = priorEntry ? priorEntry.baseChecksum : diskHash;
+		} else if (expectedHash !== undefined && diskHash === expectedHash) {
+			// Clean forward copy of the incoming payload — advance the as-shipped baseline.
+			owner = "meowkit";
+			baseChecksum = diskHash;
+		} else if (!priorEntry) {
+			if (expectedHash !== undefined && !mergedSet.has(normKey)) {
+				// Incoming payload is known and disk differs — edited after copy.
+				owner = "meowkit-modified";
+				baseChecksum = expectedHash;
+			} else {
+				// A merged file (e.g. settings.json) legitimately differs from the shipped
+				// payload — the merge is recorded in `meta.settings.merged`, not counted as
+				// a local modification. Fresh files with no incoming hash also land here.
+				owner = "meowkit";
+				baseChecksum = diskHash;
+			}
+		} else {
+			baseChecksum = priorEntry.baseChecksum;
+			owner = diskHash === priorEntry.baseChecksum ? "meowkit" : "meowkit-modified";
+		}
 
 		const entry: InstallFileEntry = {
 			path: relPath,
@@ -198,7 +245,7 @@ export function buildInstallMetadata(claudeDir: string, opts: BuildInstallMetada
 			installedVersion: opts.version,
 			installedAt,
 		};
-		const sourceTimestamp = timestamps[relPath];
+		const sourceTimestamp = timestamps[normKey];
 		if (sourceTimestamp) entry.sourceTimestamp = sourceTimestamp;
 		files.push(entry);
 	}

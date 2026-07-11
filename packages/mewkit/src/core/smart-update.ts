@@ -8,7 +8,7 @@ import { writeManifest, hashFile, classifyLayer } from "./compute-checksums.js";
 import type { Manifest } from "./compute-checksums.js";
 import { loadIgnorePatterns, walkDir, copyFile } from "./smart-update-utils.js";
 import { findOrphans } from "./find-orphans.js";
-import { readReleaseMetadata, toOrphanManifest, mapPathToLastModified } from "./release-metadata.js";
+import { readReleaseMetadata, toOrphanManifest, mapPathToLastModified, mapPathToChecksum } from "./release-metadata.js";
 import {
 	readInstallMetadata,
 	readLegacyManifestMetadata,
@@ -488,22 +488,24 @@ export async function smartUpdate(
 		const meta = buildInstallMetadata(claudeDir, {
 			version: release?.version ?? "unknown",
 			sourceTimestamps: mapPathToLastModified(release),
+			expectedChecksums: mapPathToChecksum(release),
 			priorEntriesByPath,
 			scope: "local",
 			mergedSettings: settingsMerged ? ["settings.json"] : undefined,
 			profile: options.profile,
 			packs: options.packs,
 		});
-		try {
-			await writeInstallMetadata(claudeDir, meta);
-			// One-release rollback dual-write of the legacy manifest. Only after the
-			// canonical write succeeds — if the canonical write fails, the previous
-			// legacy manifest stays on disk so the next run still detects a prior install.
-			// Derived from the entries just computed, avoiding a second scan+hash of .claude/.
-			writeManifest(claudeDir, legacyManifestFromInstallMeta(meta));
-		} catch (err) {
-			log.warn(`Failed to write installed metadata: ${(err as Error).message}`);
-		}
+		// Content has already been mutated on disk. A metadata write failure here is
+		// fatal, not a warning: silently leaving new content under stale metadata is
+		// exactly the provenance divergence this flow must never produce. The atomic
+		// writer leaves the prior metadata.json intact on failure, so re-running the
+		// install/upgrade rebuilds correct metadata from disk — the recovery path.
+		await writeInstallMetadata(claudeDir, meta);
+		// One-release rollback dual-write of the legacy manifest. Only after the
+		// canonical write succeeds — if the canonical write fails above we never reach
+		// here, so the previous legacy manifest stays on disk for the next run.
+		// Derived from the entries just computed, avoiding a second scan+hash of .claude/.
+		writeManifest(claudeDir, legacyManifestFromInstallMeta(meta));
 	}
 
 	log.setData("update", stats);

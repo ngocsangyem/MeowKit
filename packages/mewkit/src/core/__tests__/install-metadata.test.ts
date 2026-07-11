@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, rm, writeFile, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -153,6 +153,99 @@ describe("buildInstallMetadata ownership", () => {
 			sourceTimestamps: { "rules/a.md": "2026-05-09T00:12:45+07:00" },
 		});
 		expect(meta.files[0]?.sourceTimestamp).toBe("2026-05-09T00:12:45+07:00");
+	});
+});
+
+describe("buildInstallMetadata forward-copy provenance", () => {
+	it("labels a clean forward copy of a CHANGED file as meowkit and advances baseChecksum", async () => {
+		const claudeDir = await makeClaudeDir();
+		// v1 shipped and recorded as the prior baseline.
+		await writeFileAt(claudeDir, "rules/a.md", "v1 shipped\n");
+		const v1Hash = hashFile(join(claudeDir, "rules/a.md"));
+		const prior = indexByPath(buildInstallMetadata(claudeDir, { version: "2.9.13" }).files);
+		expect(prior["rules/a.md"]?.baseChecksum).toBe(v1Hash);
+
+		// A forward upgrade cleanly overwrites the file with the v2 payload.
+		await writeFileAt(claudeDir, "rules/a.md", "v2 shipped\n");
+		const v2Hash = hashFile(join(claudeDir, "rules/a.md"));
+		expect(v2Hash).not.toBe(v1Hash);
+
+		const meta = buildInstallMetadata(claudeDir, {
+			version: "2.9.14",
+			priorEntriesByPath: prior,
+			expectedChecksums: { "rules/a.md": v2Hash },
+		});
+
+		const entry = meta.files[0];
+		// The bug: without expectedChecksums this was mislabeled meowkit-modified
+		// because v2 disk != v1 prior baseChecksum.
+		expect(entry?.owner).toBe("meowkit");
+		// Baseline advances to the new payload so the NEXT upgrade compares correctly.
+		expect(entry?.baseChecksum).toBe(v2Hash);
+	});
+
+	it("labels disk that differs from the incoming payload (no prior) as meowkit-modified with base=expected", async () => {
+		const claudeDir = await makeClaudeDir();
+		await writeFileAt(claudeDir, "rules/a.md", "user edited before we tracked it\n");
+		const meta = buildInstallMetadata(claudeDir, {
+			version: "2.9.14",
+			expectedChecksums: { "rules/a.md": "deadbeefexpectedhash" },
+		});
+		const entry = meta.files[0];
+		expect(entry?.owner).toBe("meowkit-modified");
+		expect(entry?.baseChecksum).toBe("deadbeefexpectedhash");
+	});
+
+	it("without expectedChecksums, a changed file stays meowkit-modified (backward compatible)", async () => {
+		const claudeDir = await makeClaudeDir();
+		await writeFileAt(claudeDir, "rules/a.md", "v1\n");
+		const prior = indexByPath(buildInstallMetadata(claudeDir, { version: "2.9.13" }).files);
+		await writeFileAt(claudeDir, "rules/a.md", "v2\n");
+		const meta = buildInstallMetadata(claudeDir, { version: "2.9.14", priorEntriesByPath: prior });
+		expect(meta.files[0]?.owner).toBe("meowkit-modified");
+	});
+
+	it("recognizes a clean forward copy at a NESTED path (forward-slash manifest key)", async () => {
+		const claudeDir = await makeClaudeDir();
+		await writeFileAt(claudeDir, "skills/foo/bar/deep.md", "v1\n");
+		const prior = indexByPath(buildInstallMetadata(claudeDir, { version: "2.9.13" }).files);
+		await writeFileAt(claudeDir, "skills/foo/bar/deep.md", "v2\n");
+		const v2Hash = hashFile(join(claudeDir, "skills/foo/bar/deep.md"));
+		const meta = buildInstallMetadata(claudeDir, {
+			version: "2.9.14",
+			priorEntriesByPath: prior,
+			// Manifest keys are always forward-slash; the builder normalizes the scan key
+			// so this matches even where the OS scan would use backslashes.
+			expectedChecksums: { "skills/foo/bar/deep.md": v2Hash },
+		});
+		expect(meta.files[0]?.owner).toBe("meowkit");
+		expect(meta.files[0]?.baseChecksum).toBe(v2Hash);
+	});
+
+	it("keeps a merged settings.json labeled meowkit on fresh install, not meowkit-modified", async () => {
+		const claudeDir = await makeClaudeDir();
+		// Disk is the merged result; the incoming shipped payload differs.
+		await writeFileAt(claudeDir, "settings.json", '{"permissions":{"allow":["Bash(git status)","Bash(npm test)"]}}\n');
+		const meta = buildInstallMetadata(claudeDir, {
+			version: "2.9.14",
+			expectedChecksums: { "settings.json": "shipped-payload-hash-differs" },
+			mergedSettings: ["settings.json"],
+		});
+		const entry = meta.files[0];
+		expect(entry?.owner).toBe("meowkit");
+		// Not counted as locally modified — the merge is recorded via meta.settings.merged.
+		expect(entry?.baseChecksum).toBe(hashFile(join(claudeDir, "settings.json")));
+	});
+
+	it("skips a symlink under .claude/ instead of following it into the scan", async () => {
+		const claudeDir = await makeClaudeDir();
+		await writeFileAt(claudeDir, "rules/real.md", "shipped\n");
+		// A symlink pointing at the real file — must not be scanned/hashed.
+		await symlink(join(claudeDir, "rules/real.md"), join(claudeDir, "rules/link.md"));
+		const meta = buildInstallMetadata(claudeDir, { version: "2.9.14" });
+		const paths = meta.files.map((f) => f.path);
+		expect(paths).toContain("rules/real.md");
+		expect(paths).not.toContain("rules/link.md");
 	});
 });
 

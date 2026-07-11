@@ -39,7 +39,13 @@ async function makeSource(version: string, files: Record<string, string>): Promi
 	const manifestFiles: Array<{ path: string; checksum: string; lastModified: string }> = [];
 	for (const [rel, content] of Object.entries(files)) {
 		await writeText(source, `.claude/${rel}`, content);
-		manifestFiles.push({ path: rel, checksum: "x", lastModified: "2026-05-09T00:12:45+07:00" });
+		// Real payload checksum, mirroring scripts/generate-release-manifest.cjs — the
+		// CLI now uses this to recognize a clean forward copy as toolkit-owned.
+		manifestFiles.push({
+			path: rel,
+			checksum: hashFile(join(source, ".claude", rel)),
+			lastModified: "2026-05-09T00:12:45+07:00",
+		});
 	}
 	await writeFile(
 		join(source, "release-manifest.json"),

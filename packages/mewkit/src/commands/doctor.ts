@@ -65,7 +65,14 @@ export async function doctor(args?: {
 	providers?: boolean;
 	state?: boolean;
 	hardGates?: boolean;
+	provenance?: boolean;
+	explain?: boolean;
 }): Promise<void> {
+	if (args?.provenance) {
+		explainProvenance(findProjectRoot(), args.explain ?? false);
+		return;
+	}
+
 	console.log(pc.bold(pc.cyan("MeowKit Doctor")));
 	console.log(pc.dim("Diagnosing common issues...\n"));
 
@@ -206,6 +213,114 @@ function checkInstalledMetadata(root: string | null): DiagResult {
 			};
 		}
 		throw err;
+	}
+}
+
+/** A file's provenance verifiability, decided only from locally available evidence. */
+type ProvenanceClass = "verified" | "known-modified" | "unknown";
+
+/**
+ * Classify one installed entry's provenance from metadata alone (no fetching).
+ * `trustedBaseline` is true only when the `baseChecksum` is a real as-shipped hash
+ * (canonical `new` metadata). Legacy sources reconstruct `baseChecksum` from the disk
+ * itself, so a `checksum === baseChecksum` match proves nothing about what shipped —
+ * such kit files are `unknown`, never `verified`.
+ */
+export function classifyProvenance(
+	entry: { owner: string; checksum: string; baseChecksum: string },
+	trustedBaseline: boolean,
+): ProvenanceClass {
+	// No as-shipped baseline recorded ⇒ we cannot prove what shipped.
+	if (!entry.baseChecksum) return "unknown";
+	if (entry.owner === "user") return "verified"; // user-owned by design, not a kit claim
+	if (entry.owner === "meowkit-modified") return "known-modified";
+	// Kit-owned pristine match is provable ONLY against a trusted (release-sourced)
+	// baseline; a disk-reconstructed legacy baseline cannot attest as-shipped identity.
+	if (entry.checksum !== entry.baseChecksum) return "known-modified";
+	return trustedBaseline ? "verified" : "unknown";
+}
+
+/**
+ * Read-only `doctor provenance --explain`. Reports what provenance can and cannot be
+ * proven from locally available evidence, in three honest classes: verified (as-shipped
+ * identity provable), known-modified (diverged from a KNOWN baseline), and unknown (no
+ * baseline recorded). It NEVER fetches a release, and it proposes a repair only when an
+ * exact trusted payload is locally available — doctor has none on disk, so it proposes
+ * none and says so, rather than relabeling or reconstructing silently.
+ */
+export function explainProvenance(root: string | null, explain: boolean): void {
+	console.log(pc.bold(pc.cyan("MeowKit Provenance")));
+	console.log(pc.dim("Read-only: reports what can and cannot be proven locally. No fetch, no relabel.\n"));
+
+	if (!root) {
+		console.log(pc.yellow("  Project root not found — nothing to explain."));
+		return;
+	}
+
+	let source: string;
+	let files: Array<{ path: string; owner: string; checksum: string; baseChecksum: string }>;
+	try {
+		const result = readInstallMetadata(path.join(root, ".claude"));
+		if (result.source === "none" || !result.meta) {
+			console.log(pc.yellow("  No installed metadata found — provenance cannot be established."));
+			console.log(pc.dim("  Run `mewkit upgrade` to write canonical metadata, then re-run this command."));
+			return;
+		}
+		source = result.source;
+		files = result.meta.files;
+	} catch (err) {
+		if (err instanceof CorruptInstallMetadataError) {
+			console.log(pc.red(`  Canonical metadata.json is corrupt: ${err.detail}`));
+			console.log(pc.dim("  Provenance is unprovable until it is regenerated (`mewkit upgrade`)."));
+			return;
+		}
+		throw err;
+	}
+
+	// Only canonical `new` metadata carries a trusted as-shipped baseline. Legacy
+	// sources reconstruct baselines from disk, so their "matches" prove nothing.
+	const trustedBaseline = source === "new";
+	const buckets: Record<ProvenanceClass, string[]> = { verified: [], "known-modified": [], unknown: [] };
+	for (const f of files) buckets[classifyProvenance(f, trustedBaseline)].push(f.path);
+
+	console.log(`  ${pc.dim("Metadata source:")} ${source}`);
+	if (!trustedBaseline) {
+		console.log(
+			pc.yellow(
+				`  Baseline is reconstructed from disk (source=${source}), not a trusted release payload —\n` +
+					"  as-shipped identity is NOT provable for these files. Run `mewkit upgrade` to write\n" +
+					"  canonical metadata with real baselines.",
+			),
+		);
+	}
+	if (files.length === 0) {
+		console.log(pc.red("  No file-level provenance recorded — nothing can be proven. Run `mewkit upgrade`."));
+		return;
+	}
+	console.log(`  ${pc.green("verified")}       ${buckets.verified.length} — as-shipped identity provable`);
+	console.log(`  ${pc.yellow("known-modified")} ${buckets["known-modified"].length} — diverged from a known baseline`);
+	console.log(`  ${pc.red("unknown")}        ${buckets.unknown.length} — as-shipped identity not provable\n`);
+
+	if (explain) {
+		const sample = (paths: string[]): string =>
+			paths.length === 0 ? "(none)" : paths.slice(0, 10).join(", ") + (paths.length > 10 ? `, …(+${paths.length - 10})` : "");
+		console.log(`  ${pc.yellow("known-modified")}: ${sample(buckets["known-modified"])}`);
+		console.log(`  ${pc.red("unknown")}: ${sample(buckets.unknown)}\n`);
+	}
+
+	// Repair proposal is gated on a locally-available trusted payload. doctor never
+	// downloads a release, so it cannot repair here — it says so instead of guessing.
+	const repairable = buckets["known-modified"].length + buckets.unknown.length;
+	if (repairable === 0) {
+		console.log(pc.green("  All tracked files have provable provenance. No repair needed."));
+	} else {
+		console.log(
+			pc.dim(
+				`  ${repairable} file(s) are modified or lack a baseline. No repair is proposed here: doctor has no\n` +
+					"  trusted release payload on disk. Exact historical repair requires the matching release\n" +
+					"  payload and a separately-approved repair flow — it is never reconstructed silently.",
+			),
+		);
 	}
 }
 

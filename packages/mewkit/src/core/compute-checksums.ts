@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync, lstatSync } from "node:fs";
 import { join, relative } from "node:path";
 
 /** File layer determines update behavior */
@@ -90,7 +90,12 @@ export function collectFiles(dir: string, baseDir: string): string[] {
 	for (const entry of entries) {
 		if (SKIP.has(entry)) continue;
 		const fullPath = join(dir, entry);
-		const stat = statSync(fullPath);
+		// lstat (not stat) so a symlink is inspected as a link, never followed. A
+		// symlinked directory or file under `.claude/` must not let the scan traverse
+		// or hash content outside the tree — the kit ships only regular files, so a
+		// symlink here is either noise or an escape attempt. Skip it either way.
+		const stat = lstatSync(fullPath);
+		if (stat.isSymbolicLink()) continue;
 		if (stat.isDirectory()) {
 			files.push(...collectFiles(fullPath, baseDir));
 		} else {

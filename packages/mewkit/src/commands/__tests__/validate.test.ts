@@ -5,7 +5,13 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { checkCodexProjection, checkHooksExecutable, checkRoutingTableBreadth, diagnosticToStatus } from "../validate.js";
+import {
+	checkCodexProjection,
+	checkHooksExecutable,
+	checkRoutingTableBreadth,
+	detectValidateMode,
+	diagnosticToStatus,
+} from "../validate.js";
 
 let claudeDir: string;
 beforeEach(() => {
@@ -180,5 +186,23 @@ describe("Codex projection validation", () => {
 
 		expect(results.find((r) => r.name === "Codex projection: rules merged into AGENTS.md")?.status).toBe("pass");
 		expect(results.find((r) => r.name === "Codex projection: portable skills")?.status).toBe("pass");
+	});
+});
+
+describe("detectValidateMode", () => {
+	let root: string;
+	beforeEach(() => {
+		root = fs.mkdtempSync(path.join(os.tmpdir(), "mewkit-mode-"));
+	});
+	afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
+
+	it("detects authoring when the CLI source tree is present", () => {
+		fs.mkdirSync(path.join(root, "packages", "mewkit", "src"), { recursive: true });
+		expect(detectValidateMode(root)).toBe("authoring");
+	});
+
+	it("detects flat-copy for a consumer project with no CLI source tree", () => {
+		fs.mkdirSync(path.join(root, ".claude", "rules"), { recursive: true });
+		expect(detectValidateMode(root)).toBe("flat-copy");
 	});
 });
