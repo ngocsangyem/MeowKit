@@ -6,9 +6,11 @@ import path from "node:path";
 import pc from "picocolors";
 import { buildCapabilities } from "../core/build-capabilities.js";
 import { validateCapabilities } from "../core/validate-capabilities.js";
-import { resolveCapabilities } from "../core/resolve-capabilities.js";
+import { resolveWithHost } from "../core/resolve-capabilities.js";
 import { renderCapabilityView } from "../core/generate-capability-view.js";
 import { renderBootstrap, BOOTSTRAP_FILENAME, type BootstrapProvider } from "../core/bootstrap.js";
+import type { AvailabilityProbes } from "../core/availability.js";
+import { commandExists } from "./setup.js";
 import type { CapabilityEntry } from "../core/capability.js";
 
 function findClaudeDir(): string | null {
@@ -65,7 +67,7 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 		return;
 	}
 	if (sub === "resolve") {
-		resolve(entries, args.intent ?? args.target, args.provider ?? null, args.json ?? false);
+		resolve(entries, args.intent ?? args.target, args.provider ?? null, path.dirname(claudeDir), args.json ?? false);
 		return;
 	}
 	if (sub === "view") {
@@ -128,26 +130,77 @@ function explain(entries: CapabilityEntry[], target: string | undefined, json: b
 	console.log(`  provenance:  ${Object.entries(entry.provenance).map(([k, v]) => `${k}=${v}`).join(", ") || pc.dim("(none)")}`);
 }
 
-function resolve(entries: CapabilityEntry[], intent: string | undefined, provider: string | null, json: boolean): void {
+/**
+ * Real host-availability probes for the CLI. External binaries via PATH; MCP/apps via
+ * `.mcp.json` presence (no secrets read); files via a containment-checked existence probe
+ * that returns `null` for a bare, absent id (a logical name we can't resolve to a path),
+ * so it surfaces as `unknown` rather than a false `unavailable`.
+ */
+export function hostProbes(projectRoot: string): AvailabilityProbes {
+	return {
+		// NOTE: PATH-only binary detection under-reports package-local CLIs (e.g. a `mewkit`
+		// runnable via `npx`/workspace bin but not on global PATH reads as not-found). The
+		// per-requirement evidence stays truthful ("PATH lookup: not found").
+		commandExists: (cmd) => commandExists(cmd),
+		containedFileExists: (id) => {
+			if (!id || id === ".") return null; // not a concrete requirement path
+			const abs = path.resolve(projectRoot, id);
+			const escapes = (from: string, to: string): boolean => {
+				const rel = path.relative(from, to);
+				return rel === ".." || rel.startsWith(".." + path.sep) || path.isAbsolute(rel);
+			};
+			if (escapes(projectRoot, abs)) return false; // lexical escape
+			if (fs.existsSync(abs)) {
+				// True containment: resolve symlinks so an in-root link pointing outside the
+				// tree is rejected, not followed (a lexical check alone would pass it).
+				try {
+					if (escapes(fs.realpathSync(projectRoot), fs.realpathSync(abs))) return false;
+				} catch {
+					return false;
+				}
+				return true;
+			}
+			// Absent: a path-shaped id is definitively absent; a bare logical id is undetermined
+			// (→ unknown). Extensionless real-file names (Makefile, .gitignore) also read as bare
+			// here — an accepted bias toward `unknown` over a false `unavailable`.
+			const looksLikePath = id.includes("/") || id.includes("\\") || path.extname(id) !== "";
+			return looksLikePath ? false : null;
+		},
+		mcpServerConfigured: (id) => {
+			const mcpPath = path.join(projectRoot, ".mcp.json");
+			if (!fs.existsSync(mcpPath)) return null;
+			try {
+				const parsed = JSON.parse(fs.readFileSync(mcpPath, "utf-8")) as { mcpServers?: Record<string, unknown>; servers?: Record<string, unknown> };
+				const servers = parsed.mcpServers ?? parsed.servers ?? {};
+				return Object.prototype.hasOwnProperty.call(servers, id);
+			} catch {
+				return null;
+			}
+		},
+	};
+}
+
+function resolve(entries: CapabilityEntry[], intent: string | undefined, provider: string | null, projectRoot: string, json: boolean): void {
 	if (!intent) {
 		console.error(pc.red("`capabilities resolve` requires an intent (--intent \"…\" or a positional phrase)."));
 		process.exit(1);
 	}
-	const result = resolveCapabilities(entries, intent, provider);
+	const ctx = { provider: provider ?? "claude-code", checkedAt: new Date().toISOString(), probes: hostProbes(projectRoot) };
+	const result = resolveWithHost(entries, intent, ctx);
 	if (json) {
 		console.log(JSON.stringify(result, null, 2));
 		return;
 	}
-	console.log(pc.bold(pc.cyan(`Resolve: "${intent}"${provider ? ` (provider: ${provider})` : ""}`)));
+	console.log(pc.bold(pc.cyan(`Resolve: "${intent}" (host: ${ctx.provider}) — status: ${result.status}`)));
 	if (result.candidates.length === 0) {
 		console.log(pc.yellow("  No capability matched this intent."));
 		return;
 	}
-	if (result.ambiguous) {
-		console.log(pc.yellow("  Ambiguous — candidates returned, none auto-selected:"));
-	}
 	for (const c of result.candidates) {
 		console.log(`  ${c.id} ${pc.dim(`(${c.kind}, score ${c.score})`)} — ${c.reason}`);
 		console.log(pc.dim(`      invocable: ${c.invocable}; verify: ${c.verification.kind}`));
+		for (const a of c.availability) {
+			console.log(pc.dim(`      • ${a.requirementType}:${a.id} → ${a.status}`));
+		}
 	}
 }
