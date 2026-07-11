@@ -8,6 +8,7 @@ import pc from "picocolors";
 import { init } from "./commands/init.js";
 import { upgrade } from "./commands/upgrade.js";
 import { validate } from "./commands/validate.js";
+import { capabilities } from "./commands/capabilities.js";
 import { budget, contextBudget } from "./commands/budget.js";
 import { memory } from "./commands/memory.js";
 import { verdictGate } from "./commands/verdict-gate.js";
@@ -39,6 +40,7 @@ ${pc.bold("Commands:")}
   ${pc.green("init")}       Scaffold or update MeowKit in the current project
   ${pc.green("upgrade")}    Upgrade MeowKit to the latest version
   ${pc.green("validate")}   Validate .claude/ project structure (--mode authoring|flat-copy; auto-detected)
+  ${pc.green("capabilities")} Inspect the capability manifest ('capabilities list|explain <id>' [--json])
   ${pc.green("budget")}     View token usage and cost log ('budget context' for per-profile size)
   ${pc.green("memory")}     Manage agent memory (lessons & patterns)
   ${pc.green("setup")}      Guided post-scaffold configuration
@@ -254,6 +256,13 @@ async function main(): Promise<void> {
 		}
 		case "build-plugin":
 			await buildPlugin({
+				json: args.json as boolean | undefined,
+			});
+			break;
+		case "capabilities":
+			await capabilities({
+				subcommand: args._[1] as string | undefined,
+				target: args._[2] as string | undefined,
 				json: args.json as boolean | undefined,
 			});
 			break;

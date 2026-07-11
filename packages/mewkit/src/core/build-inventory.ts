@@ -125,7 +125,7 @@ export function enumerateArtifacts(claudeDir: string): { refs: ArtifactRef[]; is
 }
 
 /** Extract the YAML frontmatter block of a markdown file, or {} if none. */
-function readFrontmatter(abs: string): Record<string, unknown> {
+export function readFrontmatter(abs: string): Record<string, unknown> {
 	try {
 		const body = fs.readFileSync(abs, "utf-8");
 		const m = /^---\n([\s\S]*?)\n---/.exec(body);
