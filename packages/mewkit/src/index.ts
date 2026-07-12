@@ -69,6 +69,7 @@ ${pc.bold("Options:")}
   --providers      Doctor/migrate: include provider contract diagnostics
   --state          Doctor: include state taxonomy diagnostics
   --hard-gates     Doctor: live-probe the hard gates (plan/privacy/injection block)
+  --consolidation  Doctor: show the Phase-7 consolidation/deprecation ledger (status ≠ runtime availability)
   --portable       Validate: include portable provider contract checks
   --strict         Validate: treat WARN as failure (exit 1); off by default
   --workflow       Validate: run only the workflow.yaml drift-check (CI scope)
@@ -146,6 +147,7 @@ async function main(): Promise<void> {
 			"providers",
 			"state",
 			"hard-gates",
+			"consolidation",
 			"portable",
 			"all",
 			"dry-run",
@@ -391,6 +393,7 @@ async function main(): Promise<void> {
 				// `doctor provenance [--explain]`: read-only provenance report.
 				provenance: args._[1] === "provenance" || undefined,
 				explain: args.explain as boolean | undefined,
+				consolidation: args.consolidation as boolean | undefined,
 			});
 			break;
 		case "status":
