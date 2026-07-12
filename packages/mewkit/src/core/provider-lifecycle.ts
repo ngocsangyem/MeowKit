@@ -95,3 +95,36 @@ export function gatingEvents(provider: string): LifecycleEvent[] {
 	const map = getLifecycleMap(provider);
 	return LIFECYCLE_EVENTS.filter((e) => map[e].gate);
 }
+
+/** The deny-capable events that carry security/privacy enforcement: a hook here can BLOCK a
+ * dangerous tool call, a risky prompt, or an unsafe stop (the gate-enforcement / privacy-block
+ * class of safety hooks). */
+export const SECURITY_ENFORCEMENT_EVENTS: readonly LifecycleEvent[] = ["pre_tool", "prompt_submitted", "stop"];
+
+export interface EnforcementGap {
+	event: LifecycleEvent;
+	/** The event's lifecycle status on this provider (why the gate can't be guaranteed). */
+	status: LifecycleStatus;
+	reason: string;
+}
+
+/**
+ * Security/privacy ENFORCEMENT GAPS: the safety-critical deny events (`SECURITY_ENFORCEMENT_EVENTS`)
+ * that this provider CANNOT statically guarantee a block on (`gate:false`). An empty list means the
+ * provider can enforce all of them. A non-empty list is the honest "this provider cannot guarantee
+ * <safety hook> will block here" signal — surfaced prominently so a consumer never assumes a
+ * privacy/gate-enforcement hook is enforced when it is only advisory.
+ */
+export function enforcementGaps(provider: string): EnforcementGap[] {
+	const map = getLifecycleMap(provider);
+	return SECURITY_ENFORCEMENT_EVENTS.filter((e) => !map[e].gate).map((e) => ({
+		event: e,
+		status: map[e].status,
+		reason:
+			map[e].status === "unsupported"
+				? `no ${e} event — a safety hook here cannot run at all`
+				: map[e].status === "unknown"
+					? `${e} support unproven for this provider — enforcement cannot be assumed`
+					: `${e} fires but cannot guarantee a block (${map[e].evidence})`,
+	}));
+}

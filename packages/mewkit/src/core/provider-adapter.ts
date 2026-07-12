@@ -5,7 +5,8 @@
 // It composes trusted adapter constants; it introduces no new provider-native claim of its own.
 import { getProjection, type ProviderProjection } from "./provider-projection.js";
 import { getAcquisitionDescriptor, type AcquisitionDescriptor } from "./repo-context-adapter.js";
-import { getLifecycleMap, gatingEvents, type LifecycleMap, type LifecycleEvent } from "./provider-lifecycle.js";
+import { getLifecycleMap, gatingEvents, enforcementGaps, type LifecycleMap, type LifecycleEvent, type EnforcementGap } from "./provider-lifecycle.js";
+import { getInvocationShapes, type InvocationShapeMap } from "./provider-invocation.js";
 
 export interface ProviderAdapterView {
 	provider: string;
@@ -19,6 +20,10 @@ export interface ProviderAdapterView {
 	lifecycle: LifecycleMap;
 	/** The events this provider can actually GATE on (proven deny/block) — may be empty. */
 	gatingEvents: LifecycleEvent[];
+	/** Security/privacy deny events this provider CANNOT guarantee a block on — may be empty. */
+	enforcementGaps: EnforcementGap[];
+	/** Logical invocation id → the provider-native operation shape (adapter-owned constants). */
+	invocation: InvocationShapeMap;
 	/** Where durable task state lives for this provider. */
 	storageBoundary: string;
 }
@@ -38,6 +43,8 @@ export function describeProvider(provider: string): ProviderAdapterView {
 		acquisition: getAcquisitionDescriptor(provider),
 		lifecycle: getLifecycleMap(provider),
 		gatingEvents: gatingEvents(provider),
+		enforcementGaps: enforcementGaps(provider),
+		invocation: getInvocationShapes(provider),
 		storageBoundary: STORAGE_BOUNDARY,
 	};
 }

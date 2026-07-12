@@ -21,11 +21,19 @@ describe("describeProvider", () => {
 		}
 	});
 
-	it("codex composes to shell-mediated acquisition + no proven gate", () => {
+	it("codex composes to shell-mediated acquisition + no proven gate + enforcement gaps + advisory invocation", () => {
 		const v = describeProvider("codex");
 		expect(v.status).toBe("partial");
 		expect(v.acquisition.status).toBe("partial");
 		expect(v.gatingEvents).toEqual([]);
+		expect(v.enforcementGaps.length).toBe(3); // pre_tool / prompt_submitted / stop unenforceable
+		expect(v.invocation["invoke-skill"].support).toBe("advisory");
+	});
+
+	it("claude-code composes to zero enforcement gaps + typed invocation shapes", () => {
+		const v = describeProvider("claude-code");
+		expect(v.enforcementGaps).toEqual([]);
+		expect(v.invocation["invoke-skill"].support).toBe("supported");
 	});
 
 	it("an unknown provider composes to report-only everywhere (claims nothing)", () => {

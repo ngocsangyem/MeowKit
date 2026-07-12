@@ -175,6 +175,19 @@ function printAdapterDetail(view: ProviderAdapterView): void {
 	console.log(`  ${pc.dim("acquisition:")} read ${view.acquisition.read?.tool ?? "(none)"}, search ${view.acquisition.search?.tool ?? "(none)"} [${view.acquisition.status}]`);
 	console.log(`  ${pc.dim("storage:")} ${view.storageBoundary}`);
 	console.log(`  ${pc.dim("gating events:")} ${view.gatingEvents.length ? view.gatingEvents.join(", ") : pc.yellow("none (no proven deny/block)")}`);
+	// Security/privacy enforcement gaps — prominent, never buried (Phase 6 acceptance).
+	if (view.enforcementGaps.length > 0) {
+		console.log(pc.bold(pc.red(`  ⚠ security/privacy enforcement gaps (${view.enforcementGaps.length}):`)));
+		for (const g of view.enforcementGaps) console.log(pc.red(`      ${g.event}: ${g.reason}`));
+	} else {
+		console.log(`  ${pc.dim("enforcement gaps:")} ${pc.green("none — all safety deny events can block")}`);
+	}
+	console.log();
+	console.log(pc.bold("  Invocation shapes"));
+	for (const [id, shape] of Object.entries(view.invocation)) {
+		const tag = shape.support === "supported" ? pc.green(shape.support) : shape.support === "advisory" ? pc.yellow(shape.support) : shape.support === "unsupported" ? pc.dim(shape.support) : pc.dim(shape.support);
+		console.log(`    ${pad(id, 16)} ${pad(tag, 12)} ${pc.dim(shape.operation)}`);
+	}
 	console.log();
 	console.log(pc.bold("  Lifecycle events"));
 	for (const event of LIFECYCLE_EVENTS) {

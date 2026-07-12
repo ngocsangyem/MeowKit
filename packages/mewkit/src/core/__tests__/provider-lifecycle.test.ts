@@ -2,7 +2,7 @@
 // claims a `gate` (deny/block) without a runtime-hook proof, and the codex map does not drift from
 // the authoritative migrate capability table.
 import { describe, expect, it } from "vitest";
-import { LIFECYCLE_EVENTS, getLifecycleMap, gatingEvents, type LifecycleEvent } from "../provider-lifecycle.js";
+import { LIFECYCLE_EVENTS, getLifecycleMap, gatingEvents, enforcementGaps, SECURITY_ENFORCEMENT_EVENTS, type LifecycleEvent } from "../provider-lifecycle.js";
 import { CODEX_SUPPORTED_EVENTS } from "../../migrate/providers/codex/capabilities.js";
 
 describe("getLifecycleMap", () => {
@@ -47,6 +47,24 @@ describe("enforceable invariant — no gate without proof", () => {
 				expect(m[e].evidence, `${provider}.${e}`).toMatch(/deny|block|exit 2/i);
 			}
 		}
+	});
+});
+
+describe("enforcementGaps — honest security/privacy enforcement signal", () => {
+	it("claude-code has NO gaps (all safety deny events can block)", () => {
+		expect(enforcementGaps("claude-code")).toEqual([]);
+	});
+
+	it("codex has a gap on EVERY safety deny event (version-gated, not statically guaranteed)", () => {
+		const gaps = enforcementGaps("codex").map((g) => g.event).sort();
+		expect(gaps).toEqual([...SECURITY_ENFORCEMENT_EVENTS].sort());
+		expect(enforcementGaps("codex")[0].reason).toBeTruthy();
+	});
+
+	it("an unknown provider gaps on all safety events with an 'unproven' reason", () => {
+		const gaps = enforcementGaps("some-future-runtime");
+		expect(gaps.map((g) => g.event).sort()).toEqual([...SECURITY_ENFORCEMENT_EVENTS].sort());
+		expect(gaps.every((g) => g.status === "unknown")).toBe(true);
 	});
 });
 

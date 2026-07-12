@@ -124,6 +124,20 @@ describe("resolveWithHost", () => {
 		expect(r.acquisition.read?.tool).toBe("Read");
 	});
 
+	it("cites the adapter + evidence behind the provider claims (P6 slice 2, self-auditing)", () => {
+		const r = resolveWithHost(entries, "run a browser test", ctx());
+		expect(r.adapterCitation.provider).toBe("claude-code");
+		expect(r.adapterCitation.projectionStatus).toBe("supported");
+		expect(r.adapterCitation.projectionEvidence.length).toBeGreaterThan(0);
+		expect(r.adapterCitation.gatingEvents).toContain("pre_tool");
+	});
+
+	it("citation is honest for an unknown provider (report-only, no gating events)", () => {
+		const r = resolveWithHost(entries, "run a browser test", { ...ctx(), provider: "some-future-runtime" });
+		expect(r.adapterCitation.projectionStatus).toBe("report-only");
+		expect(r.adapterCitation.gatingEvents).toEqual([]);
+	});
+
 	it("acquisition is report-only (null read/search) for an unknown provider — claims nothing", () => {
 		const r = resolveWithHost(entries, "run a browser test", { ...ctx(), provider: "some-future-runtime" });
 		expect(r.acquisition.status).toBe("report-only");

@@ -237,4 +237,8 @@ function resolve(entries: CapabilityEntry[], intent: string | undefined, provide
 		console.log(pc.dim(`      read:   ${acq.read ? `${acq.read.tool} — ${acq.read.note}` : "(no read surface — host-provided paths only)"}`));
 		console.log(pc.dim(`      search: ${acq.search ? `${acq.search.tool} — ${acq.search.note}` : "(no search surface — report-only)"}`));
 	}
+	// Self-auditing: cite the adapter + evidence behind this result's provider claims (Phase 6).
+	const cite = result.adapterCitation;
+	console.log(pc.dim(`  adapter: ${cite.provider} [${cite.projectionStatus}] — ${cite.projectionEvidence}`));
+	console.log(pc.dim(`  can gate on: ${cite.gatingEvents.length ? cite.gatingEvents.join(", ") : "no events (advisory host)"}`));
 }

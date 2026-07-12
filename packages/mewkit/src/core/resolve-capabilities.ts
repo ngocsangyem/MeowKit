@@ -12,6 +12,8 @@ import {
 	type AvailabilityStatus,
 } from "./availability.js";
 import { getAcquisitionDescriptor, type AcquisitionDescriptor } from "./repo-context-adapter.js";
+import { getProjection } from "./provider-projection.js";
+import { gatingEvents, type LifecycleEvent } from "./provider-lifecycle.js";
 
 // Field-class weights. A query term is credited ONCE at its highest-matching class
 // (never summed across a capability's many keyword strings — that inflates keyword-heavy
@@ -140,6 +142,14 @@ export interface HostResolveResult {
 	 * the selected candidate carries a `contextRequirement`; the orchestrator — not MeowKit —
 	 * runs the named read/search tools and records the envelope via `context record`. */
 	acquisition: AcquisitionDescriptor;
+	/** Self-auditing provenance (Phase 6 slice 2): which adapter + evidence justified the provider
+	 * claims in this result, and the events this provider can actually gate on. */
+	adapterCitation: {
+		provider: string;
+		projectionStatus: string;
+		projectionEvidence: string;
+		gatingEvents: LifecycleEvent[];
+	};
 }
 
 /**
@@ -174,5 +184,11 @@ export function resolveWithHost(entries: CapabilityEntry[], intent: string, ctx:
 		status,
 		candidates,
 		acquisition: getAcquisitionDescriptor(ctx.provider),
+		adapterCitation: {
+			provider: ctx.provider,
+			projectionStatus: getProjection(ctx.provider).status,
+			projectionEvidence: getProjection(ctx.provider).evidence,
+			gatingEvents: gatingEvents(ctx.provider),
+		},
 	};
 }
