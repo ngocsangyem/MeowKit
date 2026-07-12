@@ -20,6 +20,7 @@ function cap(id: string, requirements: TypedRequirement[], over: Partial<Capabil
 		whenToUse: null,
 		invocation: { kind: "skill", id: "invoke-skill" },
 		requirements,
+		contextRequirement: null,
 		support: {},
 		verification: { kind: "unknown" },
 		dependencies: { upstream: [], downstream: [] },
@@ -114,6 +115,30 @@ describe("resolveWithHost", () => {
 		const after = resolveWithHost(entries, "run a browser test", ctx({ commandExists: () => false }));
 		expect(before.candidates[0].invocable).toBe("available");
 		expect(after.candidates[0].invocable).toBe("unavailable");
+	});
+
+	it("attaches the provider's acquisition descriptor (slice 3): typed tools for claude-code", () => {
+		const r = resolveWithHost(entries, "run a browser test", ctx());
+		expect(r.acquisition.provider).toBe("claude-code");
+		expect(r.acquisition.status).toBe("supported");
+		expect(r.acquisition.read?.tool).toBe("Read");
+	});
+
+	it("acquisition is report-only (null read/search) for an unknown provider — claims nothing", () => {
+		const r = resolveWithHost(entries, "run a browser test", { ...ctx(), provider: "some-future-runtime" });
+		expect(r.acquisition.status).toBe("report-only");
+		expect(r.acquisition.read).toBeNull();
+		expect(r.acquisition.search).toBeNull();
+	});
+
+	it("a source-grounded candidate surfaces contextRequirement alongside the acquisition surface", () => {
+		const grounded = [
+			cap("mk:cook", [], { intents: ["build this"], contextRequirement: { scope: "task-repo", reason: "edits source" } }),
+		];
+		const r = resolveWithHost(grounded, "build this", ctx());
+		expect(r.candidates[0].contextRequirement?.scope).toBe("task-repo");
+		// The pairing the orchestrator acts on: needs context + here is how THIS provider acquires it.
+		expect(r.acquisition.read?.tool).toBe("Read");
 	});
 
 	it("provider that does not support the surface ⇒ status unsupported", () => {

@@ -11,6 +11,7 @@ import {
 	type AvailabilitySnapshot,
 	type AvailabilityStatus,
 } from "./availability.js";
+import { getAcquisitionDescriptor, type AcquisitionDescriptor } from "./repo-context-adapter.js";
 
 // Field-class weights. A query term is credited ONCE at its highest-matching class
 // (never summed across a capability's many keyword strings — that inflates keyword-heavy
@@ -135,6 +136,10 @@ export interface HostResolveResult {
 	/** Selection outcome. `not_needed` is an agent-side decision, never emitted here. */
 	status: "selected" | "ambiguous" | "unavailable" | "unsupported";
 	candidates: HostResolvedCandidate[];
+	/** How THIS provider acquires repo-context evidence (Phase 5 slice 3). Actionable only when
+	 * the selected candidate carries a `contextRequirement`; the orchestrator — not MeowKit —
+	 * runs the named read/search tools and records the envelope via `context record`. */
+	acquisition: AcquisitionDescriptor;
 }
 
 /**
@@ -162,5 +167,12 @@ export function resolveWithHost(entries: CapabilityEntry[], intent: string, ctx:
 	else if (candidates[0].support && candidates[0].support.discoverable === false) status = "unsupported";
 	else status = candidates[0].invocable === "unavailable" ? "unavailable" : "selected";
 
-	return { intent: base.intent, provider: ctx.provider, ambiguous: base.ambiguous, status, candidates };
+	return {
+		intent: base.intent,
+		provider: ctx.provider,
+		ambiguous: base.ambiguous,
+		status,
+		candidates,
+		acquisition: getAcquisitionDescriptor(ctx.provider),
+	};
 }

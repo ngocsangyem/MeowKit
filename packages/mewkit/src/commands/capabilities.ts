@@ -228,4 +228,13 @@ function resolve(entries: CapabilityEntry[], intent: string | undefined, provide
 			console.log(pc.dim(`      • ${a.requirementType}:${a.id} → ${a.status}`));
 		}
 	}
+	// When the selected candidate needs task-scoped repo context, show HOW this provider acquires
+	// it (Phase 5). The agent runs these host-native tools, then records via `context record`.
+	const top = result.candidates[0];
+	if (top?.contextRequirement) {
+		const acq = result.acquisition;
+		console.log(pc.bold(`  needs repo context (${top.contextRequirement.reason}) — acquire via ${acq.provider} [${acq.status}]:`));
+		console.log(pc.dim(`      read:   ${acq.read ? `${acq.read.tool} — ${acq.read.note}` : "(no read surface — host-provided paths only)"}`));
+		console.log(pc.dim(`      search: ${acq.search ? `${acq.search.tool} — ${acq.search.note}` : "(no search surface — report-only)"}`));
+	}
 }
