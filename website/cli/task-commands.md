@@ -60,3 +60,37 @@ npx mewkit task list --all
 npx mewkit task list --status blocked
 # Lists only blocked tasks
 ```
+
+## task-state show
+
+Reconstruct durable resume state from the task records under `tasks/active/` — files only, no network. Marks the record whose plan matches the active-plan pointer as current, and surfaces any incompatible/corrupt record as an issue rather than crashing.
+
+```bash
+npx mewkit task-state show [--json]
+```
+
+## task-state update
+
+Atomically update a durable task record (created for planned / long-running work). Used by orchestration workflows to record status, the last completed step, the next action, and capability decisions so a fresh session can resume. Advisory — a failed write is surfaced but never blocks the workflow.
+
+```bash
+npx mewkit task-state update <id> [--status <active|blocked|done>] [--step "<what just finished>"] [--next "<next action>"] [--plan <path>] [--json]
+```
+
+**Flags:**
+
+| Flag       | Description                                             | Default  |
+| ---------- | ------------------------------------------------------- | -------- |
+| `--status` | Task status: `active`, `blocked`, `done`                | `active` |
+| `--step`   | What just finished (the last completed step)            | —        |
+| `--next`   | The next action to take on resume                       | —        |
+| `--plan`   | Path to the plan this record joins                      | —        |
+
+**Examples:**
+
+```bash
+npx mewkit task-state show
+# Lists active task records + the current-plan marker
+
+npx mewkit task-state update feat-auth --status active --step "wired login route" --next "add refresh-token test"
+```

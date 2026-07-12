@@ -20,9 +20,10 @@ npx mewkit doctor [--report]
 
 **Auto-fixes:** Hook file permissions (`chmod +x`).
 
-| Flag       | Description                       |
-| ---------- | --------------------------------- |
-| `--report` | Print shareable diagnostic report |
+| Flag              | Description                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------ |
+| `--report`        | Print shareable diagnostic report                                                                      |
+| `--consolidation` | Show the consolidation/deprecation ledger — each candidate's status (canonical / keep-legacy / authoring-only / experimental / deprecated). Status is a classification, **not** a runtime-availability claim. |
 
 ## setup
 
@@ -213,12 +214,57 @@ npx mewkit pack remove <pack>…
 
 ## providers
 
-Show migration-target provider support (level, role, surfaces). `explain-support` is an alias that takes a single provider.
+Show migration-target provider support (level, role, surfaces). `explain-support` is an alias that takes a single provider. With `--lifecycle`, show the capability-adapter view instead: the four support levels, repo-context acquisition tools, storage boundary, and the per-lifecycle-event matrix (which events a provider fires and which it can actually gate/deny on).
 
 ```bash
 npx mewkit providers [<provider>] [--json]
 npx mewkit explain-support <provider>
+npx mewkit providers --lifecycle              # event × provider matrix (proven-gate markers)
+npx mewkit providers <provider> --lifecycle   # one provider: levels, acquisition, lifecycle, evidence
 ```
+
+| Flag          | Description                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------- |
+| `--lifecycle` | Capability-adapter view: support levels + acquisition + lifecycle-event support. A `gate` is claimed only where a runtime hook can deny/block (never for version-gated or observe-only events). |
+| `--json`      | Machine-readable output.                                                                                      |
+
+## capabilities
+
+Inspect and resolve the capability manifest — the semantic map of installed skills/agents/commands/hooks plus authored tool and context/state services. The manifest is a resolution surface; it is **never** injected into a model session.
+
+```bash
+npx mewkit capabilities list [--json]
+npx mewkit capabilities explain <id> [--json]
+npx mewkit capabilities resolve --intent "implement this feature" [--provider <id>] [--json]
+npx mewkit capabilities view          # render the trigger-registry table from the manifest
+npx mewkit capabilities bootstrap [--provider <id>]   # the always-visible discovery bootstrap
+npx mewkit capabilities projections [--json]          # per-provider discovery + 4 support levels
+```
+
+| Subcommand    | Purpose                                                                                                                             |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `list`        | All capabilities with kind, owner, install state, and intents.                                                                      |
+| `explain <id>`| One capability's requirements, support levels, verification, and provenance.                                                        |
+| `resolve`     | Rank capabilities for an `--intent` and, with `--provider`, report host availability, the safe invocation, any repo-context requirement + how that provider acquires it, and the adapter + evidence behind the claim. |
+| `view`        | Render the capabilities table (the generated portion of the trigger registry).                                                      |
+| `bootstrap`   | Print the bounded, brand-neutral discovery bootstrap for a provider (`--write` regenerates the committed file).                     |
+| `projections` | Per-provider discovery projection + the four support levels (`discoverable`/`selectable`/`invocable`/`enforceable`).                |
+
+## context
+
+Task-scoped repository-context evidence — an on-demand freshness + provenance ledger, not a retrieval engine. MeowKit records and verifies evidence; the host's own tools acquire the content. Each path resolves to its **own** owning repository, so a folder containing many repos (e.g. an Aspire-style parent) never conflates their context.
+
+```bash
+npx mewkit context resolve <path> [--root <boundary>] [--json]         # owning repo, revision, content hash, redaction
+npx mewkit context check <envelope.json> [--root <boundary>] [--json]  # per-path freshness, grouped by owning repo
+npx mewkit context record --task <id> <envelope.json> [--root <boundary>] [--json]  # merge evidence into a durable task record
+```
+
+| Subcommand | Purpose                                                                                                                                            |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `resolve`  | Build an evidence ref for a path: owning repo + revision (read from git refs, no `git` binary), content hash, and a redaction flag for secret-shaped paths. |
+| `check`    | Re-hash a recorded envelope's evidence and report `fresh` / `stale` / `missing` / `out-of-scope` per path, grouped by owning repo (with its revision). Boundary-scoped: paths outside `--root` are never stat-ed. |
+| `record`   | Merge an envelope's distinct owning repos + evidence paths into an **existing** durable task record (advisory, best-effort). |
 
 ## build-plugin
 
