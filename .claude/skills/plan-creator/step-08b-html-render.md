@@ -76,6 +76,14 @@ returns:
 
 The handoff in step-09 is never gated on this render.
 
+### Visual-plan export (gated: `visual_requirement != none`)
+
+When the plan carries an approved visual artifact, prefer exporting `plan.html` FROM
+that artifact once Phase 4 ships `mewkit visual-plan export --format html` (no
+independent prose re-inference). Interim (pre-Phase 4): the `mk:visual-plan` static
+render above is available but is NON-CANONICAL and does not replace the approved
+artifact. See `references/visual-plan-integration.md` §9.
+
 ## Output
 
 - On success: `{plan_dir}/plan.html` exists; success line printed.

@@ -1,6 +1,6 @@
 ---
 name: mk:visual-plan
-version: 1.1.0
+version: 1.2.0
 description: |
   Use when rendering a plan directory (plan.md + phase-*.md) into ONE self-contained,
   template-consistent plan.html a reviewer can scan in under 30 seconds. Triggers on
@@ -65,6 +65,25 @@ Block set (v1):
   decision/risk-cards, steps-checklist.
 - **Conditional (only if present):** data-model, api-endpoint.
 - **Flag-gated:** wireframe-screen (only with `--wireframe`).
+
+## Structured Visual Plan (v1 contracts + CLI)
+
+Alongside this prompt-only static render, there is now a CLI-backed **structured**
+visual-plan workflow — the canonical path for UI-bearing plans that must gate at
+Gate 1. It is owned by `mk:plan-creator` (generation) + the deterministic
+`mewkit visual-plan` CLI (validation/approval), not by this skill's HTML render.
+
+- **Canonical artifact:** `{plan_dir}/visual-plan/plan.json` (schema `visual-plan/v1`)
+  — coverage ledger + frames + connectors + annotations. Generated at plan-creator
+  step-03 §3V; see `plan-creator/references/visual-plan-integration.md`.
+- **CLI commands** (mewkit ≥ 1.16.0): `visual-plan validate|status|approve --revision <n>|rehash <plan-dir> [--json]` (Phase 1); `edit|view|export --format html` land in Phase 4.
+- **Gate 1** for a `required` plan blocks unless the artifact validates with
+  `unresolved == 0` and `mewkit visual-plan approve` has recorded the reviewed revision.
+
+This static `plan.html` render remains the **legacy / complementary** path: a quick
+shareable page (incl. `--wireframe` mockups) that does NOT replace the approved
+structured artifact. Once Phase 4 ships `export --format html`, the canonical
+`plan.html` is exported FROM the approved artifact.
 
 ## When to Use
 

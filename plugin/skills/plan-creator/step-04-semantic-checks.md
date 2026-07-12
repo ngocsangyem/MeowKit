@@ -46,7 +46,10 @@ Run the validation script:
 
 Must output `PLAN_COMPLETE`. Fix reported issues before proceeding.
 
-**Skip if:** `planning_mode = fast` — go directly to step-07-gate.md.
+**Skip if:** `planning_mode = fast` — skip the structural validator (4b). BUT if
+`visual_requirement != none`, you MUST still run §4f (visual CLI probe + validate)
+before leaving this step; only then go to step-07-gate.md. If `visual_requirement =
+none`, go directly to step-07-gate.md.
 
 **Skip if:** `planning_mode = product-level` — the `validate-plan.py` script expects phase files and per-phase schema. Product-level plans have a different schema (product spec). Section 4a' above replaces 4b for this mode. Go directly to step-07-gate.md (step-05 red-team and step-06 validation interview are also skipped for product-level v1 — the spec is the deliverable, phase decomposition happens in `mk:autobuild`).
 
@@ -116,6 +119,22 @@ Walk plan.md + phase files with this checklist; fix inline:
 - (e) Key Insight / Risk / Requirement / Constraint claim missing `from:` or `[ASSUMPTION]` → tag it.
 
 Set `pruning_result = "{N} items pruned/fixed"` for step-05 context.
+
+### 4f. Visual CLI Probe + Validate (gated: `visual_requirement != none`; ALL modes)
+
+Runs whenever `visual_requirement != none` — including fast mode (fast skips the
+Markdown validator 4b, but a `required` plan MUST still be probed + validated here).
+
+1. **Capability probe** — confirm the LOCAL `mewkit` install has the `visual-plan`
+   subcommand (never a registry-fetching `npx`). Version floor: **1.16.0** (first
+   release shipping the CLI); subcommand-presence is the primary check.
+2. On probe failure: `required` → HARD BLOCK with install/upgrade instructions (Gate 1
+   cannot skip); `optional` → record typed `cli-unavailable` skip + legacy fallback.
+3. **Validate** — `mewkit visual-plan validate {plan_dir} --json`. On failure, read the
+   exact JSON-path errors, self-repair the offending frame/state, re-validate. Bounded
+   retry (~3) then surface to the user.
+
+Detail + remediation loop: `references/visual-plan-integration.md` §4.
 
 ## Output
 

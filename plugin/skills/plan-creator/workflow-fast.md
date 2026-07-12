@@ -20,6 +20,18 @@ Compact workflow for `--fast` flag or simple tasks. Skips research, codebase ana
 
 **Skipped:** step-01 (research), step-02 (codebase analysis), step-05 (red team), step-06 (validation interview)
 
+**Visual (all modes incl. fast):** step-00 classifies `visual_requirement`. When it is
+`required`/`optional`, the visual sub-steps still fire even in fast mode — step-03 §3V
+(generate `visual-plan/plan.json` + minimal inline UI inventory), step-04 §4f (CLI
+probe + `mewkit visual-plan validate`, run BEFORE the fast exit to step-07), step-07
+§7v/§7c (visual preconditions + `mewkit visual-plan approve`), and step-08 (schema-1.3
+`visual` block, CLI-managed). Because fast mode skips step-06 §6v (the studio-review
+step), a fast-mode `required` plan MUST surface the interim static export
+(`mk:visual-plan`, non-canonical) at Gate 1 so the human genuinely reviews the current
+revision before `approve` — otherwise the §7v "reviewed current revision" precondition
+is pro-forma. Most fast plans classify `none` and skip all of it.
+See `references/visual-plan-integration.md`.
+
 ## Variables
 
 | Variable | Set by | Used by | Values |
@@ -28,6 +40,7 @@ Compact workflow for `--fast` flag or simple tasks. Skips research, codebase ana
 | `task_complexity` | step-00 | step-03 | `simple` (trivial exits at step-00) |
 | `workflow_model` | step-00 | step-03 | `feature`, `bugfix`, `refactor`, `security` |
 | `tdd_mode` | step-00 | step-03 | `true` or `false` (composable flag, independent of planning_mode) |
+| `visual_requirement` | step-00 | step-03, step-04, step-07 | `required`, `optional`, `none` |
 | `intake_packet_path` | step-00.5 | step-03 | Path to Plan Intake Packet, or `none` when < 2 external artifacts |
 | `intake_sources_count` | step-00.5 | step-03 | Integer count of external artifacts consolidated |
 | `plan_dir` | step-03 | step-04, step-07, step-08 | Absolute path to plan directory |

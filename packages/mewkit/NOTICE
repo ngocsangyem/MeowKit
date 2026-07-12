@@ -1,0 +1,27 @@
+MeowKit (mewkit)
+Copyright (c) 2026 MeowKit Contributors
+
+This product is licensed under the MIT License (see LICENSE) and includes
+software ported from third-party sources under their own licenses:
+
+------------------------------------------------------------------------
+agent-flow — https://github.com/patoles/agent-flow (commit 59ccf4e)
+Copyright the agent-flow authors
+Licensed under the Apache License, Version 2.0.
+
+Portions of the loopback HTTP server lifecycle, the static-file handler
+(including its path-traversal guard), and the cross-platform browser
+launcher were ported from agent-flow. The affected files carry an
+attribution header referencing this NOTICE:
+
+  - src/local-web/local-server.ts
+  - src/local-web/static-handler.ts
+  - src/local-web/open-browser.ts
+  - src/orchviz/server/index.ts
+  - src/orchviz/server/static-handler.ts
+  - src/orchviz/open-url.ts
+  (and related orchviz modules — see their per-file headers)
+
+A copy of the Apache License, Version 2.0 is available at:
+  https://www.apache.org/licenses/LICENSE-2.0
+------------------------------------------------------------------------

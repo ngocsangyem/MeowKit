@@ -10,6 +10,10 @@ Skip task hydration if:
 - Less than 3 phases (overhead exceeds benefit)
 - Task tools unavailable (GUI editor extensions) — plan files are the source of truth
 
+Skipping hydration skips only the TaskCreate calls (8b/8c). The §8d checkpoint
+(`.plan-state.json`, including PRESERVING the CLI-written `visual` block for
+`visual_requirement != none` plans) still runs regardless.
+
 ### 8b. Create Tasks from Phases
 
 For each phase in plan.md, create one TaskCreate. For the metadata schema (5 required fields), see `references/task-management.md` "Hydration Pattern Details > Metadata Template" — single source of truth.
@@ -45,7 +49,7 @@ Write `{plan_dir}/.plan-state.json` for cross-session resilience:
 
 ```json
 {
-  "version": "1.2",
+  "version": "1.3",
   "created": "{YYYYMMDD-HHMM}",
   "planning_mode": "{fast|hard|deep|parallel|two|product-level}",
   "scope_mode": "{EXPANSION|HOLD|REDUCTION}",
@@ -60,11 +64,32 @@ Write `{plan_dir}/.plan-state.json` for cross-session resilience:
   },
   "selected_approach": "a",
   "verification_tier": "standard",
-  "consistency_sweeps_passed": { "red_team": true, "validation": true }
+  "consistency_sweeps_passed": { "red_team": true, "validation": true },
+  "visual": {
+    "schema": "visual-plan/v1",
+    "path": "visual-plan/plan.json",
+    "revision": 4,
+    "hash": "sha256:...",
+    "source_plan_hash": "sha256:...",
+    "review_status": "approved",
+    "pending_feedback": []
+  }
 }
 ```
 
-**v1.2 schema notes (additive, reader-compatible).** Fields `verification_tier` and `consistency_sweeps_passed` are NEW in v1.2. v1.1 readers ignore them. v1.2 readers MUST treat them as optional and default to `null` / `{}` when missing — so legacy v1.1 plan-state files still load. The schema is additive only; no existing field is renamed or removed.
+**v1.3 schema notes (additive, reader-compatible).** The `visual` block is NEW in
+v1.3 and present ONLY when `visual_requirement != none`. It is CLI-MANAGED: written
+by `mewkit visual-plan approve`/`rehash` (which do read-modify-write, preserving
+every other field). Do NOT hand-write it. Because `approve` already ran at step-07,
+this step MUST PRESERVE the existing `visual` block — read the current
+`.plan-state.json`, keep its `visual` key verbatim, and write your other fields
+around it (never clobber it). For `none` plans, omit `visual` entirely. See
+`references/visual-plan-integration.md` §8.
+
+**v1.2 fields still apply.** `verification_tier` and `consistency_sweeps_passed`
+(v1.2) remain optional-and-additive. All readers MUST treat unknown/missing fields
+as optional (default `null`/`{}`), so legacy v1.1/v1.2 plan-state files still load.
+The schema is additive only; no existing field is renamed or removed.
 
 `tasks_total` = count of `- [ ]` checkboxes in the phase file.
 `status` value above is resolved via the cascade in `### Status Read Order`.

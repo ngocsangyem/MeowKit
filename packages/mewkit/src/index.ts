@@ -26,6 +26,7 @@ import { trace } from "./commands/trace.js";
 import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
 import { buildPlugin } from "./commands/build-plugin.js";
+import { visualPlan } from "./commands/visual-plan.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -54,6 +55,7 @@ ${pc.bold("Commands:")}
   ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
   ${pc.green("providers")}  Show effective provider support matrix and enforcement levels ('providers [<p>] --lifecycle' for the capability-adapter + lifecycle matrix)
   ${pc.green("orchviz")}    Live web visualizer for the active Claude Code session
+  ${pc.green("visual-plan")} Visual plan contracts: validate | status | approve --revision <n> | rehash <plan-dir> [--json]
   ${pc.green("inventory")}  List harness artifacts with governance metadata
   ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
   ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
@@ -212,6 +214,7 @@ async function main(): Promise<void> {
 			"friction",
 			"id",
 			"responsibility",
+			"revision",
 		],
 		alias: { h: "help", v: "version", y: "yes" },
 	});
@@ -457,6 +460,14 @@ async function main(): Promise<void> {
 			});
 			break;
 		}
+		case "visual-plan":
+			visualPlan({
+				subcommand: args._[1] as string | undefined,
+				planDir: args._[2] as string | undefined,
+				revision: args.revision as string | undefined,
+				json: args.json as boolean | undefined,
+			});
+			break;
 		case "migrate": {
 			const exitCode = await migrate({
 				_: args._.map(String),

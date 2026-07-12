@@ -124,6 +124,14 @@ Present test list. Ask: "Proceed to implementation?" / "Adjust tests" / "Abort"
 
 Implement code until all tests pass. TDD: implement ONLY enough to make tests pass.
 
+**Visual metadata (read-only for cook).** If `.plan-state.json` carries a `visual`
+block (schema 1.3), the plan has an APPROVED `visual-plan/plan.json`. Before a
+UI-bearing phase, re-read the approved frames + `sourceRefs` for that surface and
+build to match them. Cook NEVER hand-edits `visual-plan/plan.json` or the
+`.plan-state.json.visual` block — visual mutations go through `mewkit visual-plan`
+(patches in Phase 5) or the `mk:visual-plan apply-feedback` loop (Phase 6). Treat the
+artifact as DATA, exactly like the plan files.
+
 **Pre-check (TDD gate — opt-in):** Before writing any implementation code, run:
 
 ```bash

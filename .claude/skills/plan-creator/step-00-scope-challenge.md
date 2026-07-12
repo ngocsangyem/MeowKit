@@ -203,6 +203,20 @@ If `--html` is present in the arguments (e.g., `--hard --html`), set `html_mode 
 
 Default: `html_mode = false`.
 
+### 0j. Visual Requirement Classification (all modes)
+
+Classify the plan's UI-visibility into `visual_requirement ∈ {required, optional, none}`
+with one-sentence reasons. This runs in ALL planning modes including fast
+(Validation Session 1 user decision; fast-mode friction accepted — rule table only,
+no extended interview). Do NOT reuse `html_mode` (legacy static-export intent).
+
+Quick rule: rendered-UI change / storyboard / state-heavy flow (onboarding, auth,
+checkout, permissions) / multiple user-visible branches → `required`. UI touched but
+trivial/single control → `optional`. Backend-only / migration / copy-only / refactor /
+tooling / docs → `none`.
+
+Full activation table + downstream effects: `references/visual-plan-integration.md` §1.
+
 ## Output
 
 - `task_complexity` — trivial, simple, or complex
@@ -212,7 +226,9 @@ Default: `html_mode = false`.
 - `tdd_mode` — true or false (composable flag, independent of planning_mode)
 - `html_mode` — true or false (composable flag, independent of planning_mode)
 - `spike_meta` — `{ timebox, findings_doc, story_points }` when planning_mode = spike; unset otherwise
-- Print: `"Scope: {complexity} → mode: {mode} | model: {workflow_model} | scope: {scope_mode} | tdd: {tdd_mode} | html: {html_mode}"`
+- `visual_requirement` — `required`, `optional`, or `none` (all modes)
+- `visual_reasons` — short bullet list justifying the classification
+- Print: `"Scope: {complexity} → mode: {mode} | model: {workflow_model} | scope: {scope_mode} | tdd: {tdd_mode} | html: {html_mode} | visual: {visual_requirement}"`
 
 ## Next
 

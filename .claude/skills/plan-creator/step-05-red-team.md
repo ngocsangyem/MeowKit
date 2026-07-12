@@ -236,6 +236,17 @@ If `unresolved = 0`, proceed silently to step-06.
 
 **Cancel safety.** If the user picks any "Skip" / "Cancel" option, Pass 2 does NOT execute. The "Pending Sweep Edits" block stays in red-team-findings.md as a record of what would have changed; phase files remain untouched by the sweep. Accepted-finding edits from 5g remain in place — only the sweep's reconciliations are reverted/skipped.
 
+### 5v. Visual Coverage Challenge (gated: `visual_requirement != none`)
+
+Skip when `visual_requirement = none`. Otherwise, in addition to the Markdown
+red-team, challenge EVERY `planned`/`omitted` coverage classification in
+`visual-plan/plan.json` against the step-02 `ui_evidence`: the validator guarantees
+no structurally-unaccounted state but CANNOT detect a DISHONEST tag (a state marked
+`omitted`/`planned` that is really a missing frame). Also challenge omitted roles /
+flags / error paths that never became states. Any artifact/Markdown edit this
+challenge triggers requires `mewkit visual-plan rehash` before Gate 1 (per §6v —
+rehash clears prior approval). Detail: `references/visual-plan-integration.md` §5.
+
 ## Output
 
 - `{plan_dir}/red-team-findings.md` — full detailed findings report (includes Cross-Persona Blind Spot Pass section), Pending Sweep Edits, and Whole-Plan Consistency Sweep summary

@@ -109,12 +109,28 @@ If `unresolved > 0`, FIRE the W2 `AskUserQuestion` blocker (see decision tree in
 
 If `unresolved = 0`, proceed silently to step-07.
 
+### 6v. Visual Propagation + Rehash + Studio Review (gated: `visual_requirement != none`)
+
+Skip when `visual_requirement = none`. Otherwise:
+
+- Propagate every UX decision from the interview to BOTH the Markdown AND
+  `visual-plan/plan.json`.
+- Any Markdown edit in steps 5/6 staled the artifact's pinned source hashes → run
+  `mewkit visual-plan rehash {plan_dir}` then re-validate. **Rehash clears prior
+  visual approval** (red-team M1) — a stale review cannot ride refreshed bytes.
+- **Step 6V review:** once Phase 4 ships, open `mewkit visual-plan edit {plan_dir}`.
+  UNTIL then, review = `validate` + a static export (`mk:visual-plan`, labeled
+  non-canonical); the human decision still transitions via `approve` at Gate 1.
+
+Detail: `references/visual-plan-integration.md` §6.
+
 ## Output
 
 - Phase files updated with validated decisions
 - Risk assessments updated where applicable
 - plan.md frontmatter `consistency_sweeps.validation` updated
 - Affected phase files have `## Validation Log` with Whole-Plan Consistency Sweep block
+- Visual artifact re-validated (and rehashed if Markdown changed) when `visual_requirement != none`
 
 ## Next
 
