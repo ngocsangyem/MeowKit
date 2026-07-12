@@ -215,10 +215,15 @@ If `mk:verify` FAILS after simplify: send back to developer to fix, then re-run 
 
 After Gate 2 verdict PASS and before Phase 5 ship, delegate to `project-manager` per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Do not block on PM — continue to ship. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
 
+## Durable Task State (when an active task record exists)
+
+When this run drives an **active durable task** (a `tasks/active/<id>.json` exists), emit status/step at phase transitions and record each acted-on `mewkit capabilities resolve` outcome (`selected|skipped|unavailable|unsupported`) via `mewkit task-state update` — per `.claude/rules/task-state-emission.md`. Advisory + best-effort: a failed or unavailable command is surfaced but never blocks the pipeline, and one-off work with no record emits nothing.
+
 ## Related Rules
 
 - `.claude/rules/gate-rules.md` — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions this skill enforces across all modes
 - `.claude/rules/post-phase-delegation.md` — PM delegation fire points and skip conditions
+- `.claude/rules/task-state-emission.md` — when/what/how to emit durable task-state events (advisory; active durable tasks only)
 - `.claude/rules-conditional/workflow-evidence-rules.md` — workflow evidence index (traceability over existing Phase 0-6 outputs; mirrors the gate scripts, never approves). See `references/workflow-steps.md` → Workflow Evidence Index
 
 ## Gotchas

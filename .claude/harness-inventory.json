@@ -8,6 +8,13 @@
       "runtime": "claude-code",
       "responsibility": "task-state"
     },
+    "rules/task-state-emission.md": {
+      "owner": "lifecycle",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "task-state"
+    },
     "rules/agent-routing.md": {
       "owner": "lifecycle",
       "criticality": "high",

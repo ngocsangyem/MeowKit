@@ -225,6 +225,7 @@ tasks/plans/YYMMDD-name/
 
 - `.claude/rules/gate-rules.md` — Gate 1 hard-stop conditions this skill enforces (plan approval before Phase 3)
 - `.claude/rules/orchestration-rules.md` — boundary contract; verification subagents stay READ-ONLY; sweep stays in planner context (never delegated)
+- `.claude/rules/task-state-emission.md` — when an active durable task record exists, emit status/step via `mewkit task-state update` (advisory; active durable tasks only)
 
 ## Start
 
