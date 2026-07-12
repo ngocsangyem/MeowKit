@@ -8,7 +8,12 @@ import { buildCapabilities } from "../build-capabilities.js";
 import { AUTHORED_INTENTS } from "../capability-authored.js";
 import type { CapabilityEntry } from "../capability.js";
 
-function cap(id: string, intents: string[], aliases: string[] = []): CapabilityEntry {
+function cap(
+	id: string,
+	intents: string[],
+	aliases: string[] = [],
+	contextRequirement: CapabilityEntry["contextRequirement"] = null,
+): CapabilityEntry {
 	return {
 		id,
 		kind: "skill",
@@ -22,6 +27,7 @@ function cap(id: string, intents: string[], aliases: string[] = []): CapabilityE
 		whenToUse: null,
 		invocation: { kind: "skill", id: "invoke-skill" },
 		requirements: [],
+		contextRequirement,
 		support: { "claude-code": { discoverable: true, selectable: true, invocable: true, enforceable: false } },
 		verification: { kind: "unknown" },
 		dependencies: { upstream: [], downstream: [] },
@@ -30,8 +36,8 @@ function cap(id: string, intents: string[], aliases: string[] = []): CapabilityE
 }
 
 const flagship: CapabilityEntry[] = [
-	cap("mk:plan-creator", ["plan this feature", "create a plan", "draft a spec"], ["plan"]),
-	cap("mk:cook", ["implement this feature", "build this", "write the code"], ["cook", "implement"]),
+	cap("mk:plan-creator", ["plan this feature", "create a plan", "draft a spec"], ["plan"], { scope: "task-repo", reason: "plans against real files" }),
+	cap("mk:cook", ["implement this feature", "build this", "write the code"], ["cook", "implement"], { scope: "task-repo", reason: "edits source" }),
 	cap("mk:review", ["review this code", "code review", "check before shipping"], ["review"]),
 	cap("mk:scout", ["scout the codebase", "find related files"], ["scout"]),
 ];
@@ -48,6 +54,15 @@ describe("resolveCapabilities", () => {
 		const r = resolveCapabilities(flagship, "review this code");
 		expect(r.candidates[0]?.id).toBe("mk:review");
 		expect(r.candidates.every((c) => c.invocable === "pending-host-snapshot")).toBe(true);
+	});
+
+	it("surfaces a source-grounded candidate's contextRequirement (orchestrator acquires; resolver stays pure)", () => {
+		const r = resolveCapabilities(flagship, "build this feature");
+		expect(r.candidates[0]?.id).toBe("mk:cook");
+		expect(r.candidates[0]?.contextRequirement?.scope).toBe("task-repo");
+		// A non-grounded flow surfaces null — the requirement is per-capability, never assumed.
+		const rev = resolveCapabilities(flagship, "review this code");
+		expect(rev.candidates[0]?.contextRequirement).toBeNull();
 	});
 
 	it("returns ambiguous with no candidates when nothing matches", () => {

@@ -10,6 +10,7 @@ import { validateCapabilities, validateCapabilityEntries } from "../validate-cap
 import { CapabilityEntrySchema, type CapabilityEntry } from "../capability.js";
 import { renderCapabilityView } from "../generate-capability-view.js";
 import { enumerateArtifacts, type InventoryEntry } from "../build-inventory.js";
+import { AUTHORED_CONTEXT_REQUIREMENTS } from "../capability-authored.js";
 
 const dirs: string[] = [];
 afterEach(() => dirs.splice(0).forEach((d) => rmSync(d, { recursive: true, force: true })));
@@ -92,6 +93,43 @@ describe("buildCapabilities", () => {
 	});
 });
 
+describe("contextRequirement overlay (Phase 5 slice 2)", () => {
+	/** A `.claude/` with a source-grounded flagship skill (mk:cook) and a non-grounded one (mk:ship). */
+	function makeFlagshipDir(): string {
+		const root = mkdtempSync(join(tmpdir(), "mewkit-cap-ctx-"));
+		dirs.push(root);
+		const c = join(root, ".claude");
+		const w = (rel: string, body: string): void => {
+			mkdirSync(join(c, rel, ".."), { recursive: true });
+			writeFileSync(join(c, rel), body);
+		};
+		w("skills/cook/SKILL.md", "---\nname: mk:cook\ndescription: Build\nkeywords:\n  - build\nwhen_to_use: build\n---\n# Cook\n");
+		w("skills/ship/SKILL.md", "---\nname: mk:ship\ndescription: Ship\nkeywords:\n  - ship\nwhen_to_use: ship\n---\n# Ship\n");
+		return c;
+	}
+
+	it("sets contextRequirement (authored) on a source-grounded flagship flow (mk:cook)", () => {
+		const cook = buildCapabilities(makeFlagshipDir()).find((c) => c.id === "mk:cook")!;
+		expect(cook.contextRequirement).not.toBeNull();
+		expect(cook.contextRequirement?.scope).toBe("task-repo");
+		expect(cook.contextRequirement?.reason).toMatch(/verif|source|evidence/i);
+		expect(cook.provenance.contextRequirement).toBe("authored");
+	});
+
+	it("leaves contextRequirement null on flows that need no repo grounding (mk:ship)", () => {
+		const ship = buildCapabilities(makeFlagshipDir()).find((c) => c.id === "mk:ship")!;
+		expect(ship.contextRequirement).toBeNull();
+		expect(ship.provenance.contextRequirement).toBeUndefined();
+	});
+
+	it("authored tool/service entries never carry a contextRequirement", () => {
+		const caps = buildCapabilities(makeFlagshipDir());
+		for (const id of ["jira", "browser", "project-context", "task-record", "trace-log", "wiki-recall"]) {
+			expect(caps.find((c) => c.id === id)?.contextRequirement, id).toBeNull();
+		}
+	});
+});
+
 describe("renderCapabilityView", () => {
 	it("renders a stable table of only capabilities that carry intents, sorted by id", () => {
 		const claudeDir = makeClaudeDir();
@@ -120,6 +158,14 @@ describe("validateCapabilities", () => {
 		const errors = validateCapabilities(live).filter((i) => i.level === "error");
 		// WARN (coverage/intent-overlap) is expected on the real harness; ERROR is not.
 		expect(errors).toEqual([]);
+	});
+
+	it("every repo-context overlay key resolves to a real live capability (rename guard)", () => {
+		const caps = buildCapabilities(join(process.cwd(), ".claude"));
+		const ids = new Set(caps.map((c) => c.id));
+		for (const key of Object.keys(AUTHORED_CONTEXT_REQUIREMENTS)) expect(ids.has(key), key).toBe(true);
+		// And those flagship flows actually carry the requirement on the live harness.
+		expect(caps.find((c) => c.id === "mk:cook")?.contextRequirement?.scope).toBe("task-repo");
 	});
 });
 

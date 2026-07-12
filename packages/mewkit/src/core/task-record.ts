@@ -10,6 +10,7 @@ import { rename, unlink, writeFile } from "node:fs/promises";
 import { join, relative, isAbsolute, sep } from "node:path";
 import { z } from "zod";
 import { withFileLock } from "./file-lock.js";
+import { distinctRepos, type ContextEnvelope } from "./repo-context.js";
 
 /** The record schema version THIS CLI writes. Bump on any breaking record shape change. */
 export const TASK_RECORD_SCHEMA_VERSION = "1.0";
@@ -191,6 +192,41 @@ export async function updateTaskRecord(
 		const next = TaskRecordSchema.parse(mutate(existing));
 		await atomicReplace(target, next);
 		return next;
+	});
+}
+
+/**
+ * Record a repo-context envelope's evidence into an EXISTING durable task record (Phase 5
+ * slice 2). Merges — never replaces — so evidence accumulates across a task's steps:
+ * - `repos`: the DISTINCT owning repos of the envelope's evidence (via `distinctRepos`), unioned
+ *   with the record's repos by identity; the newest envelope's revision wins for a repo already
+ *   present. Multi-repo context is preserved: every owning repo stays its own entry.
+ * - `evidenceRefs`: the evidence PATHS unioned with the record's, deduped. The record stays a
+ *   COMPACT resume summary — the full envelope (with content hashes) lives on disk and is
+ *   re-checked on demand via `context check`, not duplicated here.
+ *
+ * Refuses to create a record: context evidence belongs to an active durable task (task-state
+ * emission Rule 1). `now` is passed in — the pure core never reads the clock.
+ */
+export async function recordContextEvidence(
+	projectRoot: string,
+	taskId: string,
+	envelope: ContextEnvelope,
+	now: string,
+): Promise<TaskRecord> {
+	return updateTaskRecord(projectRoot, taskId, (existing) => {
+		if (!existing)
+			throw new Error(`no active task record "${taskId}" — context evidence is recorded only for an existing durable task`);
+		// Union owning repos by identity (newest revision wins for a repo already recorded).
+		const revByIdentity = new Map(existing.repos.map((r) => [r.identity, r.revision]));
+		for (const r of distinctRepos(envelope.evidence)) revByIdentity.set(r.identity, r.revision);
+		const repos = [...revByIdentity]
+			.map(([identity, revision]) => ({ identity, revision }))
+			.sort((a, b) => (a.identity < b.identity ? -1 : a.identity > b.identity ? 1 : 0));
+		// Union evidence paths (compact resume summary — never the hashes).
+		const paths = new Set(existing.evidenceRefs);
+		for (const e of envelope.evidence) paths.add(e.path);
+		return { ...existing, repos, evidenceRefs: [...paths].sort(), updatedAt: now };
 	});
 }
 

@@ -3,7 +3,7 @@
 // it never auto-picks. Runtime invocability is NOT decided here: that needs Phase 3's
 // host availability snapshot, so every candidate reports `invocable: "pending-host-snapshot"`.
 // Pure and free of time/randomness so results are reproducible.
-import type { CapabilityEntry, SupportLevels, TypedRequirement, Verification } from "./capability.js";
+import type { CapabilityEntry, ContextRequirement, SupportLevels, TypedRequirement, Verification } from "./capability.js";
 import {
 	computeAvailability,
 	rollUpInvocability,
@@ -32,6 +32,9 @@ export interface ResolvedCandidate {
 	/** Static per-provider support, or null when that provider has no recorded evidence. */
 	support: SupportLevels | null;
 	requirements: TypedRequirement[];
+	/** Set when the candidate must acquire a task-scoped repo-context envelope before
+	 * source-grounded work (Phase 5). The orchestrator — not this pure resolver — acquires it. */
+	contextRequirement: ContextRequirement | null;
 	verification: Verification;
 	/** Runtime invocability is deferred to Phase 3's host snapshot — never asserted here. */
 	invocable: "pending-host-snapshot";
@@ -106,6 +109,7 @@ export function resolveCapabilities(entries: CapabilityEntry[], intent: string, 
 		reason,
 		support: provider ? e.support[provider] ?? null : null,
 		requirements: e.requirements,
+		contextRequirement: e.contextRequirement,
 		verification: e.verification,
 		invocable: "pending-host-snapshot",
 	}));

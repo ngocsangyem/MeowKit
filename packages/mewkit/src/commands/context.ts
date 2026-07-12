@@ -1,7 +1,8 @@
-// `mewkit context resolve|check` — inspect the repository-context evidence ledger (Phase 5).
-// `resolve` builds an evidence ref for a path (owning repo, revision, hash, redaction);
-// `check` re-hashes a recorded envelope's evidence and reports per-path freshness. MeowKit
-// records + verifies evidence; the host's own tools acquire content.
+// `mewkit context resolve|check|record` — inspect + record the repository-context evidence
+// ledger (Phase 5). `resolve` builds an evidence ref for a path (owning repo, revision, hash,
+// redaction); `check` re-hashes a recorded envelope's evidence and reports per-path freshness;
+// `record` merges an envelope's owning repos + evidence paths into an active durable task record
+// (advisory, best-effort). MeowKit records + verifies evidence; the host's own tools acquire it.
 import fs from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
@@ -12,11 +13,14 @@ import {
 	distinctRepos,
 	isWithinBoundary,
 } from "../core/repo-context.js";
+import { recordContextEvidence } from "../core/task-record.js";
 
 export interface ContextOptions {
 	subcommand?: string;
 	target?: string;
 	root?: string;
+	/** `context record`: the active durable task id to merge the envelope's evidence into. */
+	task?: string;
 	json?: boolean;
 }
 
@@ -92,6 +96,46 @@ export async function context(args: ContextOptions = {}): Promise<void> {
 		return;
 	}
 
-	console.error(pc.red(`Unknown context subcommand "${sub}". Expected resolve|check.`));
+	if (sub === "record") {
+		if (!args.task) {
+			console.error(pc.red("`context record` requires --task <id> (the active durable task to record into)."));
+			process.exit(1);
+		}
+		if (!args.target) {
+			console.error(pc.red("`context record` requires an envelope JSON path."));
+			process.exit(1);
+		}
+		const envPath = path.resolve(boundary, args.target);
+		if (!fs.existsSync(envPath)) {
+			console.error(pc.red(`Envelope not found: ${args.target}`));
+			process.exit(1);
+		}
+		let envelope;
+		try {
+			envelope = ContextEnvelopeSchema.parse(JSON.parse(fs.readFileSync(envPath, "utf-8")));
+		} catch (err) {
+			console.error(pc.red(`Invalid context envelope: ${(err as Error).message.split("\n")[0]}`));
+			process.exit(1);
+		}
+		// Advisory + best-effort (task-state-emission Rule 3): merge the envelope's owning repos +
+		// evidence paths into the CONSUMER PROJECT's task record (cwd-keyed, per task-record.ts).
+		// A missing/incompatible record surfaces non-zero but is never fatal to the caller's flow.
+		try {
+			const rec = await recordContextEvidence(process.cwd(), args.task, envelope, new Date().toISOString());
+			if (args.json) {
+				console.log(JSON.stringify({ taskId: rec.taskId, repos: rec.repos, evidenceRefs: rec.evidenceRefs }, null, 2));
+				return;
+			}
+			console.log(pc.bold(pc.cyan(`Recorded context evidence → task ${rec.taskId}`)));
+			for (const r of rec.repos) console.log(`  repo: ${r.identity} ${pc.dim(`@ ${r.revision ?? "(non-git)"}`)}`);
+			console.log(pc.dim(`  ${rec.evidenceRefs.length} evidence path(s) tracked`));
+			return;
+		} catch (err) {
+			console.error(pc.yellow(`context record skipped (advisory): ${(err as Error).message}`));
+			process.exit(1);
+		}
+	}
+
+	console.error(pc.red(`Unknown context subcommand "${sub}". Expected resolve|check|record.`));
 	process.exit(1);
 }

@@ -24,6 +24,9 @@ function authored(
 		whenToUse: null,
 		invocation: { kind: "none", id: "none" },
 		requirements: [],
+		// Authored tool / context-/state-service entries are describe-only and are themselves the
+		// context/state providers — none needs to acquire a repo-context envelope before running.
+		contextRequirement: null,
 		support: {},
 		verification: { kind: "unknown" },
 		dependencies: { upstream: [], downstream: [] },
@@ -108,4 +111,22 @@ export const AUTHORED_INTENTS: Record<string, { intents: string[]; aliases?: str
 	"mk:ship": { intents: ["ship this change", "open a pull request", "create the PR"], aliases: ["ship"] },
 	"mk:wiki": { intents: ["propose a wiki page", "initialize the wiki", "approve a wiki page"], aliases: ["wiki"] },
 	"mk:memory": { intents: ["remember this decision", "recall a past fix", "prune old memory"], aliases: ["memory"] },
+};
+
+/**
+ * Capabilities that must acquire a task-scoped repo-context envelope before source-grounded work
+ * (Phase 5, slice 2). Applied as an authored overlay in build-capabilities. Only the
+ * source-grounded flagship flows are here — scout/research/planning + build/fix/test + review.
+ * Ship (VCS operation), memory, wiki authoring, and the external-tool entries need no repo
+ * grounding before they run, so they are deliberately absent. Keys must be real capability ids
+ * (validated by the live-harness test).
+ */
+export const AUTHORED_CONTEXT_REQUIREMENTS: Record<string, { reason: string }> = {
+	"mk:scout": { reason: "orients in the code by reading task-relevant files" },
+	"mk:research": { reason: "grounds findings in the repository's actual code and config" },
+	"mk:plan-creator": { reason: "plans against the real affected files and their revisions" },
+	"mk:cook": { reason: "edits source and must verify against fresh, correctly-scoped evidence" },
+	"mk:review": { reason: "reviews a change against the repository state it targets" },
+	"mk:fix": { reason: "proves a bug's cause in the actual source before changing behavior" },
+	"mk:testing": { reason: "writes/runs tests against the real code under test" },
 };

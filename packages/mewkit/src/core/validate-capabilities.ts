@@ -5,7 +5,7 @@
 // intent across capabilities). No check ever executes a script or trusts a command string.
 import { buildCapabilities } from "./build-capabilities.js";
 import { buildInventory, type InventoryEntry } from "./build-inventory.js";
-import { AUTHORED_INTENTS } from "./capability-authored.js";
+import { AUTHORED_CONTEXT_REQUIREMENTS, AUTHORED_INTENTS } from "./capability-authored.js";
 import { KNOWN_INVOCATION_IDS, type CapabilityEntry } from "./capability.js";
 
 export interface CapabilityIssue {
@@ -136,6 +136,15 @@ export function validateCapabilityEntries(entries: CapabilityEntry[], inventoryE
 	for (const key of Object.keys(AUTHORED_INTENTS)) {
 		if (!capIds.has(key)) {
 			issues.push({ level: "warn", capabilityId: key, message: `AUTHORED_INTENTS key has no matching capability (partial install or renamed skill): ${key}` });
+		}
+	}
+
+	// Symmetric dead-key guard for the repo-context overlay (Phase 5): an
+	// AUTHORED_CONTEXT_REQUIREMENTS key with no capability is a partial install or a rename that
+	// silently drops the context requirement from a source-grounded flow.
+	for (const key of Object.keys(AUTHORED_CONTEXT_REQUIREMENTS)) {
+		if (!capIds.has(key)) {
+			issues.push({ level: "warn", capabilityId: key, message: `AUTHORED_CONTEXT_REQUIREMENTS key has no matching capability (partial install or renamed skill): ${key}` });
 		}
 	}
 

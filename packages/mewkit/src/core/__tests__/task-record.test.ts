@@ -10,12 +10,27 @@ import {
 	writeTaskRecord,
 	readTaskRecord,
 	updateTaskRecord,
+	recordContextEvidence,
 	reconstructResumeState,
 	readActivePlanPointer,
 	IncompatibleTaskRecordError,
 	TASK_RECORD_SCHEMA_VERSION,
 	type TaskRecord,
 } from "../task-record.js";
+import type { ContextEnvelope, EvidenceRef } from "../repo-context.js";
+
+/** A minimal envelope with hand-authored evidence refs (no fs needed for record-merge tests). */
+function envelope(refs: Array<Pick<EvidenceRef, "path" | "owningRepoIdentity" | "revision">>): ContextEnvelope {
+	return {
+		schemaVersion: "1.0",
+		boundaryRoot: "/work",
+		queryDescriptor: "",
+		toolDescriptor: "",
+		timestamp: "2026-07-12T00:00:00.000Z",
+		omissions: [],
+		evidence: refs.map((r) => ({ contentHash: "h", provenance: "host-read" as const, redacted: false, ...r })),
+	};
+}
 
 const roots: string[] = [];
 afterEach(() => roots.splice(0).forEach((d) => rmSync(d, { recursive: true, force: true })));
@@ -45,6 +60,67 @@ function record(over: Partial<TaskRecord> = {}): TaskRecord {
 		...over,
 	};
 }
+
+describe("recordContextEvidence (Phase 5 slice 2 — multi-repo, compact, merge-not-replace)", () => {
+	const now = "2026-07-12T01:00:00.000Z";
+
+	it("records DISTINCT owning repos + evidence paths from a multi-repo envelope", async () => {
+		const root = makeRoot();
+		await writeTaskRecord(root, record({ taskId: "multi", repos: [], evidenceRefs: [] }));
+		const env = envelope([
+			{ path: "/work/customer-frontend/app.ts", owningRepoIdentity: "/work/customer-frontend", revision: "a".repeat(40) },
+			{ path: "/work/aspire-api/server.ts", owningRepoIdentity: "/work/aspire-api", revision: "b".repeat(40) },
+			{ path: "/work/customer-frontend/util.ts", owningRepoIdentity: "/work/customer-frontend", revision: "a".repeat(40) },
+		]);
+		const rec = await recordContextEvidence(root, "multi", env, now);
+		// Two repos (the two customer-frontend files collapse to one repo), each with its own rev.
+		expect(rec.repos).toEqual([
+			{ identity: "/work/aspire-api", revision: "b".repeat(40) },
+			{ identity: "/work/customer-frontend", revision: "a".repeat(40) },
+		]);
+		expect(rec.evidenceRefs).toEqual([
+			"/work/aspire-api/server.ts",
+			"/work/customer-frontend/app.ts",
+			"/work/customer-frontend/util.ts",
+		]);
+		expect(rec.updatedAt).toBe(now);
+	});
+
+	it("MERGES across calls (accumulates evidence) and dedups; newest revision wins per repo", async () => {
+		const root = makeRoot();
+		await writeTaskRecord(root, record({ taskId: "merge", repos: [{ identity: "/work/repo-a", revision: "old" }], evidenceRefs: ["/work/repo-a/x.ts"] }));
+		const rec = await recordContextEvidence(
+			root,
+			"merge",
+			envelope([
+				{ path: "/work/repo-a/x.ts", owningRepoIdentity: "/work/repo-a", revision: "new" }, // same path + repo, advanced rev
+				{ path: "/work/repo-b/y.ts", owningRepoIdentity: "/work/repo-b", revision: null }, // a second repo, non-git
+			]),
+			now,
+		);
+		expect(rec.repos).toEqual([
+			{ identity: "/work/repo-a", revision: "new" }, // newest revision wins
+			{ identity: "/work/repo-b", revision: null }, // non-git preserved, null revision
+		]);
+		expect(rec.evidenceRefs).toEqual(["/work/repo-a/x.ts", "/work/repo-b/y.ts"]); // path deduped
+	});
+
+	it("refuses to create a record — context evidence belongs to an EXISTING durable task", async () => {
+		const root = makeRoot();
+		await expect(recordContextEvidence(root, "ghost", envelope([]), now)).rejects.toThrow(/no active task record/);
+	});
+
+	it("is idempotent — re-recording the same envelope changes nothing but updatedAt", async () => {
+		const root = makeRoot();
+		await writeTaskRecord(root, record({ taskId: "idem", repos: [], evidenceRefs: [] }));
+		const env = envelope([{ path: "/work/r/a.ts", owningRepoIdentity: "/work/r", revision: "z".repeat(40) }]);
+		const first = await recordContextEvidence(root, "idem", env, now);
+		const second = await recordContextEvidence(root, "idem", env, "2026-07-12T02:00:00.000Z");
+		expect(second.repos).toEqual(first.repos);
+		expect(second.evidenceRefs).toEqual(first.evidenceRefs);
+		expect(second.updatedAt).not.toBe(first.updatedAt);
+	});
+});
 
 describe("task record write/read", () => {
 	it("round-trips atomically through tasks/active/<id>.json", async () => {

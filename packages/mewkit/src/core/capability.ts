@@ -62,6 +62,18 @@ export const SupportLevelsSchema = z.object({
 });
 export type SupportLevels = z.infer<typeof SupportLevelsSchema>;
 
+/** Declares that a capability needs a bounded task-scoped repository-context envelope acquired
+ * BEFORE source-grounded work (Phase 5). This is an ORCHESTRATION precondition, not a host
+ * dependency: the envelope is acquired on demand (host-native read/search) and recorded, never
+ * probed for presence — so it is deliberately NOT a `TypedRequirement` (those feed availability
+ * adapters). `scope: "task-repo"` = evidence resolved per owning repo under the task boundary
+ * (multi-repo aware; see repo-context.ts). */
+export const ContextRequirementSchema = z.object({
+	scope: z.literal("task-repo").default("task-repo"),
+	reason: z.string().default(""),
+});
+export type ContextRequirement = z.infer<typeof ContextRequirementSchema>;
+
 /** How to verify the capability did its job. `unknown` is explicit, not a silent gap. */
 export const VerificationSchema = z.object({
 	kind: z.enum(["command", "file", "runtime", "none", "unknown"]),
@@ -86,6 +98,10 @@ export const CapabilityEntrySchema = z.object({
 	whenToUse: z.string().nullable().default(null),
 	invocation: InvocationSchema,
 	requirements: z.array(TypedRequirementSchema).default([]),
+	/** Set when this capability must acquire a task-scoped repo-context envelope before
+	 * source-grounded work (Phase 5). Null = no repo grounding needed. Orchestration-only —
+	 * never fed to availability adapters. */
+	contextRequirement: ContextRequirementSchema.nullable().default(null),
 	/** Per-provider support levels; absent provider ⇒ unknown support for that provider. */
 	support: z.record(z.string(), SupportLevelsSchema).default({}),
 	verification: VerificationSchema.default({ kind: "unknown" }),

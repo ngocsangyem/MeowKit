@@ -49,7 +49,7 @@ ${pc.bold("Commands:")}
   ${pc.green("doctor")}     Diagnose common environment issues ('doctor provenance --explain' for a read-only provenance report)
   ${pc.green("status")}     Print version and config summary
   ${pc.green("task-state")} Durable task record ('task-state show [--json]' | 'task-state update <id> --status --step --next --plan')
-  ${pc.green("context")}    Repo-context evidence ('context resolve <path> [--root]' | 'context check <envelope.json>')
+  ${pc.green("context")}    Repo-context evidence ('context resolve <path> [--root]' | 'context check <envelope.json>' | 'context record --task <id> <envelope.json>')
   ${pc.green("task")}       Create and list task files (new, list)
   ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
   ${pc.green("providers")}  Show effective provider support matrix and enforcement levels
@@ -412,6 +412,7 @@ async function main(): Promise<void> {
 				subcommand: args._[1] as string | undefined,
 				target: args._[2] as string | undefined,
 				root: args.root as string | undefined,
+				task: args.task as string | undefined,
 				json: args.json as boolean | undefined,
 			});
 			break;

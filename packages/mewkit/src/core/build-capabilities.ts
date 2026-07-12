@@ -7,7 +7,7 @@
 // and repo/context/state-service capabilities have no disk artifact (provenance `authored`).
 import { buildInventory, enumerateArtifacts, readFrontmatter, type ArtifactType } from "./build-inventory.js";
 import type { CapabilityEntry, CapabilityKind, Invocation, Provenance } from "./capability.js";
-import { AUTHORED_CAPABILITIES, AUTHORED_INTENTS } from "./capability-authored.js";
+import { AUTHORED_CAPABILITIES, AUTHORED_CONTEXT_REQUIREMENTS, AUTHORED_INTENTS } from "./capability-authored.js";
 
 /** Disk artifact types that project to a capability, mapped to their capability kind.
  * `rule` is intentionally absent — rules are always-on context, not invocable capabilities. */
@@ -90,6 +90,12 @@ export function buildCapabilities(claudeDir: string): CapabilityEntry[] {
 			if (intents.length > 0) provenance.intents = "inferred";
 		}
 
+		// Repo-context requirement overlay (Phase 5): source-grounded flagship flows declare that
+		// they must acquire a task-scoped envelope before source-grounded work.
+		const ctxReq = AUTHORED_CONTEXT_REQUIREMENTS[ref.id];
+		const contextRequirement = ctxReq ? { scope: "task-repo" as const, reason: ctxReq.reason } : null;
+		if (contextRequirement) provenance.contextRequirement = "authored";
+
 		entries.push({
 			id: ref.id,
 			kind,
@@ -105,6 +111,7 @@ export function buildCapabilities(claudeDir: string): CapabilityEntry[] {
 			whenToUse,
 			invocation: invocationFor(kind),
 			requirements: [],
+			contextRequirement,
 			support: {},
 			verification: { kind: "unknown" },
 			dependencies: { upstream: inv?.dependsOn ?? [], downstream: [] },
