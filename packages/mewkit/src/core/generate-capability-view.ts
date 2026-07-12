@@ -32,3 +32,29 @@ export function renderCapabilityView(entries: CapabilityEntry[]): string {
 		...rows,
 	].join("\n");
 }
+
+/**
+ * Extract the content strictly between the generated-region markers, trimmed. Returns null when
+ * either marker is absent or END precedes START (malformed / not yet spliced) — the caller treats
+ * that as "no generated region", NOT as drift.
+ */
+export function extractGeneratedRegion(docText: string): string | null {
+	const start = docText.indexOf(VIEW_START);
+	const end = docText.indexOf(VIEW_END);
+	if (start === -1 || end === -1 || end < start) return null;
+	return docText.slice(start + VIEW_START.length, end).trim();
+}
+
+export type ViewDriftState = "absent-markers" | "in-sync" | "drift";
+
+/**
+ * Compare a doc's spliced generated region against a freshly-rendered view. The registry
+ * (`entries`) is the source of truth; the doc must NOT become a second editable truth. A doc with
+ * no markers is `absent-markers` (the region has not been spliced yet — honest, not a failure);
+ * matching content is `in-sync`; differing content is `drift` (regenerate + re-splice).
+ */
+export function capabilityViewDrift(docText: string, entries: CapabilityEntry[]): ViewDriftState {
+	const region = extractGeneratedRegion(docText);
+	if (region === null) return "absent-markers";
+	return region === renderCapabilityView(entries).trim() ? "in-sync" : "drift";
+}

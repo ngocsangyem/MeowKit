@@ -10,6 +10,8 @@ import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
 import { checkPlugin, checkPluginNamespace, checkPluginManifests } from "../core/check-plugin-manifests.js";
 import { validateCapabilities } from "../core/validate-capabilities.js";
+import { buildCapabilities } from "../core/build-capabilities.js";
+import { capabilityViewDrift } from "../core/generate-capability-view.js";
 import { parseMergedSections } from "../migrate/config-merger/merge-single-sections.js";
 import { discoverSkills } from "../migrate/discovery/index.js";
 import { buildPortableSkillsByProvider } from "../migrate/portability-policy.js";
@@ -491,6 +493,27 @@ export function checkCapabilitiesSection(meowkitDir: string): CheckResult[] {
 }
 
 /**
+ * Generated-view drift (Phase 7, authoring only): the capabilities table in
+ * docs/architecture/trigger-registry.md is GENERATED from the registry, so a spliced region must
+ * not become a second editable truth. Honest states: doc absent or region not yet spliced → N/A
+ * (no false failure); region matches a fresh render → PASS; region diverged → FAIL (regenerate).
+ */
+export function checkCapabilityViewDrift(meowkitDir: string, projectRoot: string): CheckResult[] {
+	const docPath = path.join(projectRoot, "docs", "architecture", "trigger-registry.md");
+	if (!fs.existsSync(docPath)) {
+		return [{ name: "Capability view drift", status: "na", detail: "docs/architecture/trigger-registry.md not present (authoring-only doc).", section: "Capabilities" }];
+	}
+	const state = capabilityViewDrift(fs.readFileSync(docPath, "utf-8"), buildCapabilities(meowkitDir));
+	if (state === "absent-markers") {
+		return [{ name: "Capability view drift", status: "na", detail: "Generated region not spliced into the doc yet (GENERATED:capabilities markers absent).", section: "Capabilities" }];
+	}
+	if (state === "in-sync") {
+		return [{ name: "Capability view drift", status: "pass", detail: "Generated capabilities table matches the registry.", section: "Capabilities" }];
+	}
+	return [{ name: "Capability view drift", status: "fail", detail: "Generated capabilities region has DRIFTED from the registry — regenerate + re-splice (do not hand-edit the region).", section: "Capabilities" }];
+}
+
+/**
  * Assemble the default-run checks for a given mode. Consumer-actionable checks run in
  * both modes; authoring-coherence checks run only in `authoring` mode — in a flat-copy
  * consumer they would be false failures (consumer customization of CLAUDE.md/rules trips
@@ -530,6 +553,7 @@ export async function buildDefaultChecks(
 			...checkPluginManifests(projectRoot),
 			...checkRoutingTableBreadth(meowkitDir),
 			...checkCapabilitiesSection(meowkitDir),
+			...checkCapabilityViewDrift(meowkitDir, projectRoot),
 		);
 	}
 
