@@ -52,7 +52,7 @@ ${pc.bold("Commands:")}
   ${pc.green("context")}    Repo-context evidence ('context resolve <path> [--root]' | 'context check <envelope.json>' | 'context record --task <id> <envelope.json>')
   ${pc.green("task")}       Create and list task files (new, list)
   ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
-  ${pc.green("providers")}  Show effective provider support matrix and enforcement levels
+  ${pc.green("providers")}  Show effective provider support matrix and enforcement levels ('providers [<p>] --lifecycle' for the capability-adapter + lifecycle matrix)
   ${pc.green("orchviz")}    Live web visualizer for the active Claude Code session
   ${pc.green("inventory")}  List harness artifacts with governance metadata
   ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
@@ -296,6 +296,7 @@ async function main(): Promise<void> {
 			await providersCommand({
 				provider: args._[1] as string | undefined,
 				json: args.json as boolean | undefined,
+				lifecycle: args.lifecycle as boolean | undefined,
 			});
 			break;
 		case "inventory":

@@ -5,10 +5,14 @@ import {
 	type ProviderSupportInfo,
 	type ProviderSupportMatrix,
 } from "../migrate/provider-support-summary.js";
+import { describeProvider, ADAPTED_PROVIDERS, type ProviderAdapterView } from "../core/provider-adapter.js";
+import { LIFECYCLE_EVENTS } from "../core/provider-lifecycle.js";
 
 export interface ProvidersCliArgs {
 	provider?: string;
 	json?: boolean;
+	/** Show the Phase-6 capability-adapter view: 4 support levels + acquisition + lifecycle matrix. */
+	lifecycle?: boolean;
 }
 
 const ROLE_LABELS: Record<ProviderSupportInfo["role"], string> = {
@@ -22,6 +26,12 @@ const ROLE_LABELS: Record<ProviderSupportInfo["role"], string> = {
 };
 
 export async function providersCommand(args: ProvidersCliArgs = {}): Promise<void> {
+	// Phase-6 capability-adapter view (additive; the default matrix below is unchanged).
+	if (args.lifecycle === true) {
+		renderAdapterView(args.provider, args.json === true);
+		return;
+	}
+
 	const matrix = collectProviderSupportMatrix();
 	if (args.json === true) {
 		const payload = args.provider ? findProviderSupportInfo(args.provider, matrix) : matrix;
@@ -115,4 +125,61 @@ function formatSurfaceList(surfaces: string[]): string {
 
 function pad(value: string, width: number): string {
 	return value.length >= width ? value : value + " ".repeat(width - value.length);
+}
+
+// ── Phase-6 capability-adapter view ────────────────────────────────────────────────────────
+
+/** Render the P6 adapter view: a lifecycle-event matrix (all providers) or a single provider's
+ * full adapter detail. JSON dumps `describeProvider` verbatim (auditable, machine-readable). */
+function renderAdapterView(provider: string | undefined, json: boolean): void {
+	if (json) {
+		const payload = provider ? describeProvider(provider) : ADAPTED_PROVIDERS.map((p) => describeProvider(p));
+		console.log(JSON.stringify(payload, null, 2));
+		return;
+	}
+	if (provider) {
+		printAdapterDetail(describeProvider(provider));
+		return;
+	}
+	printLifecycleMatrix();
+}
+
+/** Glyph for a lifecycle status; a trailing `!` marks a proven gate (deny/block). */
+function lifecycleCell(status: string, gate: boolean): string {
+	const g = gate ? "!" : " ";
+	if (status === "supported") return pc.green(`ok${g}`);
+	if (status === "advisory") return pc.yellow(`adv${g}`);
+	if (status === "unsupported") return pc.red(`no ${g}`);
+	return pc.dim(`?  `);
+}
+
+function printLifecycleMatrix(): void {
+	console.log(pc.bold(pc.cyan("Provider lifecycle-event support (Phase 6)")));
+	console.log(pc.dim("ok = fires · adv = fires, version-gated/observe · no = absent · ? = unknown · ! = proven gate (deny/block)"));
+	console.log();
+	const views = ADAPTED_PROVIDERS.map((p) => describeProvider(p));
+	console.log(`  ${pad("EVENT", 18)}${views.map((v) => pad(v.provider, 15)).join("")}`);
+	for (const event of LIFECYCLE_EVENTS) {
+		const cells = views.map((v) => pad(lifecycleCell(v.lifecycle[event].status, v.lifecycle[event].gate), 15)).join("");
+		console.log(`  ${pad(event, 18)}${cells}`);
+	}
+	console.log();
+	console.log(pc.dim("Run `mewkit providers <provider> --lifecycle` for support levels, acquisition, storage, and evidence."));
+}
+
+function printAdapterDetail(view: ProviderAdapterView): void {
+	const p = view.projection;
+	console.log(pc.bold(pc.cyan(`Capability adapter — ${view.provider} [${view.status}]`)));
+	console.log(`  ${pc.dim("support levels:")} discoverable ${p.levels.discoverable}, selectable ${p.levels.selectable}, invocable ${p.levels.invocable}, enforceable ${p.levels.enforceable}`);
+	console.log(`  ${pc.dim("bootstrap:")} ${p.bootstrapPlacement}`);
+	console.log(`  ${pc.dim("acquisition:")} read ${view.acquisition.read?.tool ?? "(none)"}, search ${view.acquisition.search?.tool ?? "(none)"} [${view.acquisition.status}]`);
+	console.log(`  ${pc.dim("storage:")} ${view.storageBoundary}`);
+	console.log(`  ${pc.dim("gating events:")} ${view.gatingEvents.length ? view.gatingEvents.join(", ") : pc.yellow("none (no proven deny/block)")}`);
+	console.log();
+	console.log(pc.bold("  Lifecycle events"));
+	for (const event of LIFECYCLE_EVENTS) {
+		const s = view.lifecycle[event];
+		const tag = s.status === "supported" ? pc.green(s.status) : s.status === "advisory" ? pc.yellow(s.status) : s.status === "unsupported" ? pc.red(s.status) : pc.dim(s.status);
+		console.log(`    ${pad(event, 18)} ${tag}${s.gate ? pc.bold(" [gate]") : ""} ${pc.dim(`— ${s.evidence}`)}`);
+	}
 }
