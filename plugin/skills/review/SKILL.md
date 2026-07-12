@@ -213,6 +213,7 @@ If verdict is WARN with coverage gaps → suggest `pre-mortem`.
 ## Related Rules
 
 - `.claude/rules/gate-rules.md` — Gate 2 conditions this skill enforces; FAIL verdict blocks Phase 5 (Ship)
+- `.claude/rules/task-state-emission.md` — when an active durable task record exists, record the review verdict/step via `mewkit task-state update` (advisory; active durable tasks only)
 
 ## Gotchas
 

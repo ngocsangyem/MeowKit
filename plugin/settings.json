@@ -40,6 +40,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/jira-env-loader.sh\"",
             "timeout": 5,
             "statusMessage": "Validating Jira env..."
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/capability-bootstrap.sh\"",
+            "timeout": 5,
+            "statusMessage": "Loading capability resolution..."
           }
         ]
       }

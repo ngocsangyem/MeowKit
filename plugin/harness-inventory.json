@@ -8,6 +8,13 @@
       "runtime": "claude-code",
       "responsibility": "task-state"
     },
+    "rules/task-state-emission.md": {
+      "owner": "lifecycle",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "task-state"
+    },
     "rules/agent-routing.md": {
       "owner": "lifecycle",
       "criticality": "high",
@@ -420,6 +427,13 @@
       "status": "active",
       "runtime": "claude-code",
       "responsibility": "tool-access"
+    },
+    "hooks/capability-bootstrap.sh": {
+      "owner": "lifecycle",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "context-selection"
     },
     "hooks/learning-observer.sh": {
       "owner": "observability",
