@@ -44,9 +44,13 @@ export async function taskState(args: TaskStateOptions = {}): Promise<void> {
 			return;
 		}
 		console.log(pc.bold(pc.cyan("Durable task state")));
+		if (state.activePlanPointer) console.log(pc.dim(`  active plan: ${state.activePlanPointer}`));
 		if (state.records.length === 0) console.log(pc.dim("  No active task records."));
 		for (const r of state.records) {
-			console.log(`  ${pc.bold(r.taskId)} ${pc.dim(`[${r.status}]`)}${r.planPath ? pc.dim(` ${r.planPath}`) : ""}`);
+			// Checkpoint join: mark the record whose plan matches the active-plan pointer.
+			const isCurrent = state.activePlanPointer !== null && r.planPath !== null && r.planPath.includes(state.activePlanPointer);
+			const marker = isCurrent ? pc.green(" ◀ current") : "";
+			console.log(`  ${pc.bold(r.taskId)} ${pc.dim(`[${r.status}]`)}${r.planPath ? pc.dim(` ${r.planPath}`) : ""}${marker}`);
 			console.log(`    step: ${r.currentStep || pc.dim("(none)")}  next: ${r.nextAction || pc.dim("(none)")}`);
 			if (r.repos.length) console.log(`    repos: ${r.repos.map((x) => `${x.identity}@${x.revision ?? "(no-rev)"}`).join(", ")}`);
 			if (r.blockers.length) console.log(`    ${pc.yellow(`blockers: ${r.blockers.join("; ")}`)}`);

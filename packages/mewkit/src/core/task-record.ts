@@ -65,9 +65,41 @@ export class IncompatibleTaskRecordError extends Error {
 	}
 }
 
-/** `<projectRoot>/tasks/active` — the durable task-record home for a flat-copy install. */
+/**
+ * `<projectRoot>/tasks/active` — the durable task-record home. This is the SAME path for a
+ * flat-copy AND a plugin install: task records are the CONSUMER PROJECT's state (keyed to the
+ * project the agent is working in, `process.cwd()`), not plugin-owned state. `tasks/` is
+ * framework-internal state that keeps its path (skill-authoring Rule 2's exception), so it does
+ * NOT move to `${CLAUDE_PLUGIN_DATA}` — that root is for a plugin's OWN cross-session data, and
+ * putting consumer task records there would misplace them. Resolves P4 open decision #2.
+ */
 function activeDir(projectRoot: string): string {
 	return join(projectRoot, "tasks", "active");
+}
+
+/**
+ * The current active-plan pointer, mirroring the existing hook contract
+ * (`session-state/active-plan.json` → `path` || `slug`, else legacy plain-text
+ * `session-state/active-plan`). Null when absent. This is the CHECKPOINT JOIN: the task record
+ * whose `planPath` matches the pointer is the current task (resolves P4 open decision #3).
+ */
+export function readActivePlanPointer(projectRoot: string): string | null {
+	const jsonPath = join(projectRoot, "session-state", "active-plan.json");
+	if (existsSync(jsonPath)) {
+		try {
+			const d = JSON.parse(readFileSync(jsonPath, "utf-8")) as { path?: unknown; slug?: unknown };
+			const p = (typeof d.path === "string" && d.path) || (typeof d.slug === "string" && d.slug) || "";
+			if (p.trim()) return p.trim();
+		} catch {
+			/* fall through to legacy */
+		}
+	}
+	const legacy = join(projectRoot, "session-state", "active-plan");
+	if (existsSync(legacy)) {
+		const txt = readFileSync(legacy, "utf-8").trim();
+		if (txt) return txt;
+	}
+	return null;
 }
 
 /** Resolve a task-record path and assert it stays contained under tasks/active (realpath). */
@@ -181,11 +213,20 @@ export function listTaskRecordIds(projectRoot: string): string[] {
 export interface ResumeState {
 	records: TaskRecord[];
 	issues: { taskId: string; problem: string }[];
+	/** The active-plan pointer (checkpoint join); a record whose planPath matches is current. */
+	activePlanPointer: string | null;
 }
 export function reconstructResumeState(projectRoot: string): ResumeState {
 	const records: TaskRecord[] = [];
 	const issues: { taskId: string; problem: string }[] = [];
-	for (const id of listTaskRecordIds(projectRoot)) {
+	// Listing itself is guarded so a dir-removal race can't crash the whole reconstruction.
+	let ids: string[] = [];
+	try {
+		ids = listTaskRecordIds(projectRoot);
+	} catch (err) {
+		issues.push({ taskId: "(listing)", problem: (err as Error).message });
+	}
+	for (const id of ids) {
 		try {
 			const r = readTaskRecord(projectRoot, id);
 			if (r) records.push(r);
@@ -193,5 +234,5 @@ export function reconstructResumeState(projectRoot: string): ResumeState {
 			issues.push({ taskId: id, problem: (err as Error).message });
 		}
 	}
-	return { records, issues };
+	return { records, issues, activePlanPointer: readActivePlanPointer(projectRoot) };
 }

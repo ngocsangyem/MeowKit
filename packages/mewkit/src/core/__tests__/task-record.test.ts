@@ -5,12 +5,13 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import {
 	writeTaskRecord,
 	readTaskRecord,
 	updateTaskRecord,
 	reconstructResumeState,
+	readActivePlanPointer,
 	IncompatibleTaskRecordError,
 	TASK_RECORD_SCHEMA_VERSION,
 	type TaskRecord,
@@ -120,6 +121,45 @@ describe("updateTaskRecord (read-modify-write under one lock)", () => {
 		});
 		expect(out.taskId).toBe("u3");
 		expect(readTaskRecord(root, "u3")?.status).toBe("active");
+	});
+});
+
+describe("storage root (flat-copy == plugin: consumer project tasks/active)", () => {
+	it("writes the record at <projectRoot>/tasks/active/<id>.json", async () => {
+		const root = makeRoot();
+		await writeTaskRecord(root, record({ taskId: "loc" }));
+		expect(existsSync(join(root, "tasks", "active", "loc.json"))).toBe(true);
+	});
+});
+
+describe("checkpoint join (active-plan pointer)", () => {
+	it("reads the pointer from active-plan.json (path), slug fallback, then legacy text, else null", () => {
+		const a = makeRoot();
+		mkdirSync(join(a, "session-state"), { recursive: true });
+		writeFileSync(join(a, "session-state", "active-plan.json"), JSON.stringify({ path: "plans/p1/plan.md" }));
+		expect(readActivePlanPointer(a)).toBe("plans/p1/plan.md");
+
+		const b = makeRoot();
+		mkdirSync(join(b, "session-state"), { recursive: true });
+		writeFileSync(join(b, "session-state", "active-plan.json"), JSON.stringify({ slug: "260712-x" }));
+		expect(readActivePlanPointer(b)).toBe("260712-x");
+
+		const c = makeRoot();
+		mkdirSync(join(c, "session-state"), { recursive: true });
+		writeFileSync(join(c, "session-state", "active-plan"), "plans/legacy/plan.md\n");
+		expect(readActivePlanPointer(c)).toBe("plans/legacy/plan.md");
+
+		expect(readActivePlanPointer(makeRoot())).toBeNull();
+	});
+
+	it("resume state exposes the active-plan pointer alongside records", async () => {
+		const root = makeRoot();
+		await writeTaskRecord(root, record({ taskId: "cur", planPath: "plans/p1/plan.md" }));
+		mkdirSync(join(root, "session-state"), { recursive: true });
+		writeFileSync(join(root, "session-state", "active-plan.json"), JSON.stringify({ path: "plans/p1/plan.md" }));
+		const state = reconstructResumeState(root);
+		expect(state.activePlanPointer).toBe("plans/p1/plan.md");
+		expect(state.records.find((r) => r.planPath === state.activePlanPointer)?.taskId).toBe("cur");
 	});
 });
 
