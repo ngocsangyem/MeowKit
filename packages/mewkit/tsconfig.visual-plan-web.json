@@ -1,0 +1,25 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"jsx": "react-jsx",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true,
+		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+		"types": ["node", "react", "react-dom"],
+		"baseUrl": "visual-plan-web/src",
+		"paths": { "@/*": ["./*"] }
+	},
+	"include": [
+		"visual-plan-web/src/**/*.ts",
+		"visual-plan-web/src/**/*.tsx",
+		"src/visual-plan/domain/sanitizer-config.ts"
+	],
+	"exclude": ["visual-plan-web/src/**/__tests__/**"]
+}

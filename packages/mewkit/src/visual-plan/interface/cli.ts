@@ -8,12 +8,16 @@
  * the surface stays unit-testable.
  */
 
+import * as path from "node:path";
 import pc from "picocolors";
 import { validatePlan } from "../application/validate-plan.js";
 import { planStatus } from "../application/status.js";
 import { approvePlan } from "../application/approve.js";
 import { rehashPlan } from "../application/rehash.js";
+import { exportPlanHtml } from "../application/export-plan.js";
+import { runStudio } from "./studio.js";
 import { resolvePlanDir, PlanPathError } from "../infrastructure/visual-plan-repository.js";
+import { atomicWriteFileSync } from "../infrastructure/atomic-write.js";
 import type { ValidationError } from "../domain/errors.js";
 
 export interface VisualPlanCliArgs {
@@ -21,6 +25,11 @@ export interface VisualPlanCliArgs {
 	planDir?: string;
 	revision?: string | number;
 	json?: boolean;
+	open?: boolean;
+	noOpen?: boolean;
+	force?: boolean;
+	port?: number;
+	format?: string;
 }
 
 const emit = (value: unknown): void => console.log(JSON.stringify(value, null, 2));
@@ -85,6 +94,26 @@ function runApprove(planDir: string, revisionArg: string | number | undefined, j
 	process.exitCode = r.ok ? 0 : 1;
 }
 
+function runExport(planDir: string, format: string | undefined, json: boolean): void {
+	if (format !== undefined && format !== "html") {
+		console.error(pc.red(`export --format ${format} not supported (only 'html')`));
+		process.exitCode = 2;
+		return;
+	}
+	const r = exportPlanHtml(planDir);
+	if (!r.ok || !r.html) {
+		if (json) emit(r);
+		else console.error(`${pc.red("✗")} export failed — ${r.error ?? "unknown"}`);
+		process.exitCode = 1;
+		return;
+	}
+	const out = path.join(planDir, "plan.html");
+	atomicWriteFileSync(out, r.html);
+	if (json) emit({ ok: true, path: out });
+	else console.log(`${pc.green("✓")} exported ${out}`);
+	process.exitCode = 0;
+}
+
 function runRehash(planDir: string, json: boolean): void {
 	const r = rehashPlan(planDir);
 	if (json) {
@@ -97,12 +126,16 @@ function runRehash(planDir: string, json: boolean): void {
 	process.exitCode = r.ok ? 0 : 1;
 }
 
-/** Dispatch a `visual-plan` subcommand. */
-export function visualPlanCommand(args: VisualPlanCliArgs): void {
+/** Dispatch a `visual-plan` subcommand. Returns a promise for the long-running studio commands. */
+export function visualPlanCommand(args: VisualPlanCliArgs): void | Promise<void> {
 	const sub = args.subcommand;
-	const known = new Set(["validate", "status", "approve", "rehash"]);
+	// Long-running studio commands (own their plan-dir resolution + browser lifecycle).
+	if (sub === "edit" || sub === "view") {
+		return runStudio({ mode: sub, planDir: args.planDir, open: args.open, noOpen: args.noOpen, force: args.force, port: args.port });
+	}
+	const known = new Set(["validate", "status", "approve", "rehash", "export"]);
 	if (!sub || !known.has(sub)) {
-		console.error(pc.red(`visual-plan: expected one of validate|status|approve|rehash (got ${sub ?? "nothing"})`));
+		console.error(pc.red(`visual-plan: expected one of validate|status|approve|rehash|export|edit|view (got ${sub ?? "nothing"})`));
 		process.exitCode = 2;
 		return;
 	}
@@ -123,5 +156,6 @@ export function visualPlanCommand(args: VisualPlanCliArgs): void {
 	if (sub === "validate") runValidate(planDir, json);
 	else if (sub === "status") runStatus(planDir, json);
 	else if (sub === "approve") runApprove(planDir, args.revision, json);
+	else if (sub === "export") runExport(planDir, args.format, json);
 	else runRehash(planDir, json);
 }

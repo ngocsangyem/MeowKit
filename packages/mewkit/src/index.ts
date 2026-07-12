@@ -55,7 +55,7 @@ ${pc.bold("Commands:")}
   ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
   ${pc.green("providers")}  Show effective provider support matrix and enforcement levels ('providers [<p>] --lifecycle' for the capability-adapter + lifecycle matrix)
   ${pc.green("orchviz")}    Live web visualizer for the active Claude Code session
-  ${pc.green("visual-plan")} Visual plan contracts: validate | status | approve --revision <n> | rehash <plan-dir> [--json]
+  ${pc.green("visual-plan")} Visual plan contracts: validate | status | approve --revision <n> | rehash | export --format html | edit | view <plan-dir> [--json] [--no-open] [--port N]
   ${pc.green("inventory")}  List harness artifacts with governance metadata
   ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
   ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
@@ -215,6 +215,7 @@ async function main(): Promise<void> {
 			"id",
 			"responsibility",
 			"revision",
+			"format",
 		],
 		alias: { h: "help", v: "version", y: "yes" },
 	});
@@ -460,14 +461,30 @@ async function main(): Promise<void> {
 			});
 			break;
 		}
-		case "visual-plan":
-			visualPlan({
+		case "visual-plan": {
+			const vpPortRaw = args.port as string | number | undefined;
+			let vpPort: number | undefined;
+			if (vpPortRaw !== undefined) {
+				const parsed = typeof vpPortRaw === "number" ? vpPortRaw : parseInt(String(vpPortRaw), 10);
+				if (!Number.isInteger(parsed) || parsed < 0 || parsed > 65535) {
+					console.error(pc.red(`Invalid --port value: ${String(vpPortRaw)} (must be 0-65535; 0 = random)`));
+					process.exit(2);
+				}
+				vpPort = parsed;
+			}
+			await visualPlan({
 				subcommand: args._[1] as string | undefined,
 				planDir: args._[2] as string | undefined,
 				revision: args.revision as string | undefined,
 				json: args.json as boolean | undefined,
+				open: args.open as boolean | undefined,
+				noOpen: args["no-open"] as boolean | undefined,
+				force: args.force as boolean | undefined,
+				port: vpPort,
+				format: args.format as string | undefined,
 			});
 			break;
+		}
 		case "migrate": {
 			const exitCode = await migrate({
 				_: args._.map(String),

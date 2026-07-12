@@ -53,3 +53,12 @@ export function checkWireframeHtml(html: string): SanitizeCheck {
 		reason: "wireframe HTML contains disallowed or unsafe markup (sanitizer would strip content — reject, not repair)",
 	};
 }
+
+/**
+ * Return the SANITIZED wireframe HTML (safe to embed). Used by the HTML export
+ * to inline wireframes offline. The artifact was already reject-validated at
+ * save time; this re-sanitize is the export's own boundary.
+ */
+export function sanitizeWireframeHtml(html: string): string {
+	return purify.sanitize(html, WIREFRAME_SANITIZE_CONFIG);
+}

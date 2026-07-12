@@ -15,10 +15,12 @@ export default defineConfig({
 			"tests/**/*.test.ts",
 			"src/**/__tests__/**/*.test.{ts,tsx}",
 			"packages/**/__tests__/**/*.test.{ts,tsx}",
+			"visual-plan-web/**/__tests__/**/*.test.{ts,tsx}",
 		],
 		environmentMatchGlobs: [
 			["src/**/__tests__/**/*.test.tsx", "jsdom"],
 			["packages/**/*.test.tsx", "jsdom"],
+			["visual-plan-web/**/__tests__/**/*.test.tsx", "jsdom"],
 		],
 	},
 });

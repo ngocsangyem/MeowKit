@@ -11,14 +11,24 @@ export interface VisualPlanArgs {
 	planDir?: string;
 	revision?: string | number;
 	json?: boolean;
+	open?: boolean;
+	noOpen?: boolean;
+	force?: boolean;
+	port?: number;
+	format?: string;
 }
 
-export function visualPlan(args: VisualPlanArgs): void {
+export async function visualPlan(args: VisualPlanArgs): Promise<void> {
 	const cliArgs: VisualPlanCliArgs = {
 		subcommand: args.subcommand,
 		planDir: args.planDir,
 		revision: args.revision,
 		json: args.json,
+		open: args.open,
+		noOpen: args.noOpen,
+		force: args.force,
+		port: args.port,
+		format: args.format,
 	};
-	visualPlanCommand(cliArgs);
+	await visualPlanCommand(cliArgs);
 }
