@@ -41,7 +41,7 @@ ledger must never become a reason a real task cannot proceed.
 
 ## Rule 4: Never Fabricate
 
-Record only what is true: real repository identities and revisions or a folder contains multiple repositories (null revision for non-git
+Record only what is true: real repository identities and revisions, or a folder that contains multiple repositories (null revision for non-git
 roots — never invent one), real verification results, real capability decisions. A record write
 that cannot be confirmed is reported honestly, not asserted as done.
 
