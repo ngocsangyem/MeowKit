@@ -110,11 +110,25 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 		expect(budgetLines).toContain("project_doc_max_bytes");
 	});
 
+	it("keeps one idempotent resolver bootstrap and writes a capability snapshot", () => {
+		const agentsMd = readFileSync(join(env.projectDir, "AGENTS.md"), "utf-8");
+		expect(agentsMd.match(/GENERATED:capability-bootstrap START/g)).toHaveLength(1);
+		expect(agentsMd).toContain("npx mewkit capabilities resolve --intent");
+		const snapshot = JSON.parse(readFileSync(join(env.projectDir, ".codex", "capabilities.json"), "utf-8")) as {
+			schemaVersion: string;
+			entries: unknown[];
+		};
+		expect(snapshot.schemaVersion).toBe("1.0");
+		expect(snapshot.entries.length).toBeGreaterThan(0);
+	});
+
 	it("is idempotent on a second run over the generated output", async () => {
 		expect(await env.run({ includeMcp: true })).toBe(0);
 		const report = readReport();
 		const { counts } = report.header;
 		expect(counts.migrated + counts.skipped + counts.failed + counts.narrowed).toBe(counts.total);
 		expect(hookCommands()).toHaveLength(22);
+		const agentsMd = readFileSync(join(env.projectDir, "AGENTS.md"), "utf-8");
+		expect(agentsMd.match(/GENERATED:capability-bootstrap START/g)).toHaveLength(1);
 	});
 });

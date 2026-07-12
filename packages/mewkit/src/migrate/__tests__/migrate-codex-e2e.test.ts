@@ -59,6 +59,18 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 		expect(agentsMd).not.toContain("Ported from");
 	});
 
+	it("projects the bounded resolver bootstrap and a data-only manifest for Codex", () => {
+		const agentsMd = readFileSync(join(env.projectDir, "AGENTS.md"), "utf-8");
+		expect(agentsMd).toContain("<!-- GENERATED:capability-bootstrap START -->");
+		expect(agentsMd).toContain("npx mewkit capabilities resolve --intent");
+		const snapshot = JSON.parse(readFileSync(join(env.projectDir, ".codex", "capabilities.json"), "utf-8")) as {
+			schemaVersion: string;
+			entries: Array<{ id: string }>;
+		};
+		expect(snapshot.schemaVersion).toBe("1.0");
+		expect(snapshot.entries.length).toBeGreaterThan(0);
+	});
+
 	it("installs the skill directory with rewritten mapped fenced references", () => {
 		const skillMd = readFileSync(join(env.projectDir, ".agents", "skills", "demo-skill", "SKILL.md"), "utf-8");
 		expect(skillMd).toContain("python3 .agents/skills/demo-skill/scripts/run.py");
@@ -92,10 +104,14 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 	});
 
 	it("leaves zero toolkit branding and no toolkit files in the target project", () => {
-		const generated = collectFiles(env.projectDir).filter((f) => !f.includes(`${env.projectDir}/.claude`) && !f.endsWith(".mcp.json"));
+		const generated = collectFiles(env.projectDir).filter(
+			(f) => !f.includes(`${env.projectDir}/.claude`) && !f.endsWith(".mcp.json") && !f.endsWith(".codex/capabilities.json"),
+		);
 		expect(generated.length).toBeGreaterThan(0);
 		for (const file of generated) {
-			const content = readFileSync(file, "utf-8");
+			// The bounded bootstrap intentionally names the documented CLI invocation.
+			// Strip that exact trusted operation before asserting no narrative/toolkit branding.
+			const content = readFileSync(file, "utf-8").replace(/npx mewkit capabilities resolve --intent/g, "");
 			expect(content, file).not.toMatch(/MeowKit|mewkit|meowkit/);
 		}
 		expect(existsSync(join(env.projectDir, ".mewkit"))).toBe(false);

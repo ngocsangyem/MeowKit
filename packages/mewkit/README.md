@@ -25,6 +25,7 @@ npx mewkit <command>      # Runtime commands
 | `meowkit status`    | Print version, channel, and config                                |
 | `meowkit task new`  | Create structured task file from template                         |
 | `meowkit task list` | List active tasks with status                                     |
+| `meowkit capabilities` | Resolve installed skills/commands/tools for an intent (`list`, `explain`, `resolve`, `projections`) |
 | `meowkit orchviz`   | Live web visualizer for the active Claude Code session            |
 | `meowkit pack`      | `list` / `add <pack>` / `remove <pack>` — manage installed domains |
 | `meowkit migrate`   | Export the `.claude/` setup to other coding agents (Codex, Cursor, …) |
@@ -58,6 +59,12 @@ What migrates where for Codex:
 | `.claude/rules/*.md`        | merged into `AGENTS.md` as `## Rule:` sections      |
 | `.claude/hooks/*.cjs`       | `.codex/hooks/` + `hooks.json` (version-gated events) |
 | `.mcp.json` (opt-in)        | `config.toml [mcp_servers]` (`--include-mcp`)       |
+
+For Codex, migration also writes a bounded capability-resolution instruction to
+`AGENTS.md` and a data-only `.codex/capabilities.json` snapshot. This lets an
+agent run `npx mewkit capabilities resolve --intent "..." --provider codex`
+even when the original `.claude/` directory is no longer present. The snapshot
+is resolver data; it is not injected into model context.
 
 Markdown references are rewritten with a fence-aware classifier: inline
 references point at the new locations, runnable fenced commands are only

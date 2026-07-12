@@ -10,6 +10,7 @@ import { resolveWithHost } from "../core/resolve-capabilities.js";
 import { renderCapabilityView } from "../core/generate-capability-view.js";
 import { renderBootstrap, BOOTSTRAP_FILENAME, type BootstrapProvider } from "../core/bootstrap.js";
 import { PROVIDER_PROJECTIONS, isProjectedProvider } from "../core/provider-projection.js";
+import { findCapabilitySource } from "../core/capability-snapshot.js";
 import type { AvailabilityProbes } from "../core/availability.js";
 import { commandExists } from "./setup.js";
 import type { CapabilityEntry } from "../core/capability.js";
@@ -61,20 +62,20 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 		return;
 	}
 
-	const claudeDir = findClaudeDir();
-	if (!claudeDir) {
-		console.error(pc.red("Could not find .claude/ directory in the current directory."));
+	const source = findCapabilitySource();
+	if (!source) {
+		console.error(pc.red("Could not find a capability source. Expected .claude/ or a Codex projection at .codex/capabilities.json. Run `npx mewkit init` or `npx mewkit migrate codex`."));
 		process.exit(1);
 	}
 
-	const entries = buildCapabilities(claudeDir);
+	const entries = source.entries;
 
 	if (sub === "explain") {
 		explain(entries, args.target, args.json ?? false);
 		return;
 	}
 	if (sub === "resolve") {
-		resolve(entries, args.intent ?? args.target, args.provider ?? null, path.dirname(claudeDir), args.json ?? false);
+		resolve(entries, args.intent ?? args.target, args.provider ?? null, process.cwd(), args.json ?? false);
 		return;
 	}
 	if (sub === "view") {
@@ -93,7 +94,7 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 	}
 
 	console.log(pc.bold(pc.cyan("MeowKit Capabilities")));
-	const issues = validateCapabilities(claudeDir);
+	const issues = source.kind === "claude-directory" ? validateCapabilities(source.path) : [];
 	const errors = issues.filter((i) => i.level === "error");
 	const warns = issues.filter((i) => i.level === "warn");
 	console.log(pc.dim(`${entries.length} capabilities — ${errors.length} error(s), ${warns.length} warning(s)\n`));

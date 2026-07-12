@@ -513,6 +513,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.13.5 | 2026-07-12 | Capability Discovery + Durable Task State        |
 | v2.13.4 | 2026-07-05 | Figma Gateway + Agent-Browser Hardening          |
 | v2.13.3 | 2026-07-04 | Context-Engineering + Prompt-Enhancer Hardening  |
 | v2.13.2 | 2026-07-03 | Deep Research Skill + Full-Surface Codex Migration |

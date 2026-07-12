@@ -230,7 +230,7 @@ npx mewkit providers <provider> --lifecycle   # one provider: levels, acquisitio
 
 ## capabilities
 
-Inspect and resolve the capability manifest — the semantic map of installed skills/agents/commands/hooks plus authored tool and context/state services. The manifest is a resolution surface; it is **never** injected into a model session.
+Inspect and resolve the capability manifest — the semantic map of installed skills/agents/commands/hooks plus authored tool and context/state services. The manifest is a resolution surface; it is **never** injected into a model session. The CLI reads the live `.claude/` install when present; a Codex-migrated project without it falls back to the validated `.codex/capabilities.json` projection written by `mewkit migrate codex`.
 
 ```bash
 npx mewkit capabilities list [--json]
@@ -245,7 +245,7 @@ npx mewkit capabilities projections [--json]          # per-provider discovery +
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `list`        | All capabilities with kind, owner, install state, and intents.                                                                      |
 | `explain <id>`| One capability's requirements, support levels, verification, and provenance.                                                        |
-| `resolve`     | Rank capabilities for an `--intent` and, with `--provider`, report host availability, the safe invocation, any repo-context requirement + how that provider acquires it, and the adapter + evidence behind the claim. |
+| `resolve`     | Rank capabilities for an `--intent` and, with `--provider`, report host availability, the safe invocation, any repo-context requirement + how that provider acquires it, and the adapter + evidence behind the claim. In a Codex-only project, resolve uses the validated migration snapshot. |
 | `view`        | Render the capabilities table (the generated portion of the trigger registry).                                                      |
 | `bootstrap`   | Print the bounded, brand-neutral discovery bootstrap for a provider (`--write` regenerates the committed file).                     |
 | `projections` | Per-provider discovery projection + the four support levels (`discoverable`/`selectable`/`invocable`/`enforceable`).                |

@@ -80,6 +80,7 @@ A common over-claim is that the two layers are "fully orthogonal." That's too cl
 | ✓ Yes | Skill content | `.claude/skills/**/SKILL.md` |
 | ✓ Yes | Agent definitions | `.claude/agents/*.md` |
 | ✓ Yes | Project context | `docs/project-context.md` |
+| ✓ Yes | Durable task record — resume state + capability decisions (v2.13.5+) | `tasks/active/<id>.json` |
 | ✗ No | Edit counters (doom-loop) | `session-state/edit-counts.json` |
 | ✗ No | Build-skip cache | `session-state/build-verify-cache.json` |
 | ✗ No | Stop-gate re-entry counter | `session-state/precompletion-attempts.json` |
@@ -88,6 +89,8 @@ A common over-claim is that the two layers are "fully orthogonal." That's too cl
 | ✗ No | Git drift (last commit hash) | `session-state/checkpoints/checkpoint-latest.json` |
 
 The gap MeowKit fills is **specifically the runtime-policy state** — counters, caches, hashes, drift — that lives in files Claude Code does not load.
+
+The durable task record (`tasks/active/<id>.json`, v2.13.5+) is a different kind of survivor: it persists as a project file, but unlike `CLAUDE.md` it is **not** auto-injected — a fresh session reconstructs the active task (status, last step, next action, capability decisions) on demand via `mewkit task-state show`, so resume state survives without spending context until it's needed.
 
 ## File-by-file map
 

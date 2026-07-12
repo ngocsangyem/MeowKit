@@ -3,6 +3,7 @@
 // budget (fails CI on unapproved growth) and (b) injection-safety / brand-neutrality.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
 	renderBootstrap,
@@ -13,6 +14,8 @@ import {
 } from "../bootstrap.js";
 
 const bootstrap = renderBootstrap("claude-code");
+
+const repositoryClaudeDir = fileURLToPath(new URL("../../../../../.claude/", import.meta.url));
 
 describe("bootstrap budget (CI-gated growth)", () => {
 	it("stays within the approved line ceiling", () => {
@@ -32,7 +35,7 @@ describe("bootstrap is a deterministic trusted constant", () => {
 
 describe("bootstrap content contract", () => {
 	it("names the resolver invocation and the outcome vocabulary", () => {
-		expect(bootstrap).toContain("mewkit capabilities resolve --intent");
+		expect(bootstrap).toContain("npx mewkit capabilities resolve --intent");
 		for (const outcome of ["selected", "ambiguous", "unavailable", "unsupported"]) {
 			expect(bootstrap).toContain(`\`${outcome}\``);
 		}
@@ -45,7 +48,7 @@ describe("bootstrap content contract", () => {
 
 describe("committed bootstrap file (SessionStart hook source) matches the constant", () => {
 	it("the live .claude/capability-bootstrap.md is in sync with renderBootstrap()", () => {
-		const file = join(process.cwd(), ".claude", BOOTSTRAP_FILENAME);
+		const file = join(repositoryClaudeDir, BOOTSTRAP_FILENAME);
 		// The hook emits this committed file; it must not drift from the source constant.
 		// Regenerate with `mewkit capabilities bootstrap --write` if this fails.
 		expect(existsSync(file), `${BOOTSTRAP_FILENAME} should be committed for the SessionStart hook`).toBe(true);
@@ -71,7 +74,7 @@ describe("bootstrap injection-safety / brand-neutrality", () => {
 	it("is brand-neutral prose — no toolkit-architecture narrative (only the invocation names the CLI)", () => {
 		// The single unavoidable CLI reference is the `mewkit capabilities resolve` invocation
 		// line; the surrounding prose must not narrate what MeowKit is.
-		const prose = bootstrap.replace(/`mewkit capabilities resolve[^`]*`/g, "");
+		const prose = bootstrap.replace(/`npx mewkit capabilities resolve[^`]*`/g, "");
 		expect(prose.toLowerCase()).not.toContain("meowkit");
 	});
 });

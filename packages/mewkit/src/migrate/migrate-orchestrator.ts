@@ -53,6 +53,7 @@ import { executeDeleteAction, executeInstallAction } from "./portable-installer.
 import { installSkillDirectory } from "./skill-directory-installer.js";
 import { buildInstalledBackRef, type InstalledBackRef } from "../core/install-metadata-backref.js";
 import { installCodexAgents, mergeHooksSettings } from "./hooks/index.js";
+import { installCodexCapabilityProjection } from "./capability-bootstrap-projection.js";
 import { loadModelRoutingConfig } from "./model-routing-config.js";
 import { printActionDetails, printFinalSummary, printPreflight, printReportPath } from "./migrate-ui-summary.js";
 import {
@@ -295,6 +296,27 @@ async function runMigrateUnderLock(
 			join(discovered.source.root, "settings.json"),
 			sink,
 		);
+
+		// This projection is not a migrated source artifact. It is CLI-owned trusted context
+		// plus data-only manifest snapshot, so it is installed after normal AGENTS.md merging.
+		// A Codex project can then resolve capabilities even when `.claude/` is not retained.
+		if (targets.includes("codex")) {
+			const projection = await installCodexCapabilityProjection(discovered.source.root, { global: isGlobal });
+			executed.results.push({
+				action: {
+					action: "install",
+					item: "capability resolver projection",
+					type: "config",
+					provider: "codex",
+					global: isGlobal,
+					targetPath: projection.agentsPath,
+					reason: "Trusted capability bootstrap and data-only manifest projection",
+				},
+				success: projection.success,
+				error: projection.error,
+			});
+			if (!projection.success) console.error(pc.red(`[x] Capability resolver projection failed: ${projection.error}`));
+		}
 
 		// Emit the [shell_environment_policy] scaffold into the codex config output
 		// (real run, idempotent managed block). Failure is non-fatal but recorded.

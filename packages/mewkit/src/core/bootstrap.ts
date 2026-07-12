@@ -19,7 +19,7 @@ export const BOOTSTRAP_END = "<!-- GENERATED:capability-bootstrap END -->";
 export const BOOTSTRAP_FILENAME = "capability-bootstrap.md";
 
 /** Providers with an authored bootstrap projection. The bootstrap TEXT is identical across
- * them — the resolver invocation (`mewkit capabilities resolve`) is CLI-universal; only the
+ * them — the resolver invocation (`npx mewkit capabilities resolve`) is CLI-universal; only the
  * PLACEMENT differs (see provider-projection.ts). Other providers are report-only. */
 export type BootstrapProvider = "claude-code" | "claude-plugin" | "codex";
 
@@ -31,7 +31,7 @@ Resolve when the task needs: an external/specialized tool, integration, or servi
 
 Don't resolve for ordinary in-context work — reading, editing, or running a file you already have is not a capability lookup. If nothing specialized is required, proceed directly.
 
-How: run \`mewkit capabilities resolve --intent "<what you're trying to do>"\`. It returns a ranked, evidence-based result:
+How: run \`npx mewkit capabilities resolve --intent "<what you're trying to do>"\`. It returns a ranked, evidence-based result:
 - \`selected\` — one capability fits and is available; use the returned invocation.
 - \`ambiguous\` — several fit; choose by the reasons given, or ask the user.
 - \`unavailable\` — it exists but a requirement (binary, integration, permission) is missing; fall back or escalate — do not retry blindly.

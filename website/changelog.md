@@ -14,6 +14,31 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.13.5 (2026-07-12) — Capability Discovery + Durable Task State
+
+### Highlights
+
+An installed kit can now tell an agent, at session start, that a capability resolver exists — a bounded, brand-neutral discovery bootstrap surfaces on the SessionStart hook so the agent resolves an intent to the right skill/agent/command instead of guessing. A new contextual rule records durable task state — status, the last completed step, the next action, and capability decisions — so a fresh session resumes a long-running task from files alone.
+
+### Features
+
+- Capability-discovery bootstrap — a SessionStart hook emits a small, budget-capped, injection-safe pointer to the capability resolver. It carries generic functional language only; the full capability manifest is never injected into a session.
+- Task-state emission rule — orchestration flows record status, the last step, the next action, and capability decisions to a durable per-task record, so a fresh session reconstructs an active task from files without replaying the transcript.
+
+### Improvements
+
+- `mk:cook`, `mk:plan-creator`, and `mk:review` reference the task-state emission rule at their orchestration boundaries — emission is advisory and best-effort, so a missing CLI never blocks the workflow.
+
+### CLI
+
+The `mewkit` CLI (published separately as 1.15.0) adds the surface behind these features:
+
+- `mewkit capabilities` — inspect and resolve the capability manifest (`list`, `explain`, `resolve --intent`, `view`, `bootstrap`, `projections`).
+- `mewkit context` — task-scoped repository-context evidence (`resolve`, `check`, `record`); each path resolves to its own owning repository, so a folder holding many repos never conflates their context.
+- `mewkit providers --lifecycle` — per-provider lifecycle-event matrix + the capability-adapter view (support levels, acquisition, invocation shapes, enforcement gaps).
+- `mewkit task-state` — inspect and update the durable task record (`show`, `update`).
+- `mewkit doctor --consolidation` — the consolidation/deprecation ledger (classification, not a runtime-availability claim).
+
 ## 2.13.4 (2026-07-05) — Figma Gateway + Agent-Browser Hardening
 
 ### Highlights

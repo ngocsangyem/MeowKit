@@ -6,7 +6,7 @@ Resolve when the task needs: an external/specialized tool, integration, or servi
 
 Don't resolve for ordinary in-context work — reading, editing, or running a file you already have is not a capability lookup. If nothing specialized is required, proceed directly.
 
-How: run `mewkit capabilities resolve --intent "<what you're trying to do>"`. It returns a ranked, evidence-based result:
+How: run `npx mewkit capabilities resolve --intent "<what you're trying to do>"`. It returns a ranked, evidence-based result:
 - `selected` — one capability fits and is available; use the returned invocation.
 - `ambiguous` — several fit; choose by the reasons given, or ask the user.
 - `unavailable` — it exists but a requirement (binary, integration, permission) is missing; fall back or escalate — do not retry blindly.

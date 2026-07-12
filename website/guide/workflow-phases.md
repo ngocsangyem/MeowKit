@@ -21,6 +21,7 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 - Load stack-relevant skills only (lazy loading)
 - Print cost estimate before starting
 - **Scout-first contract (v2.9.10+):** in `mk:cook`, present a 3–6 bullet codebase-context summary to the user before any clarifying question — project type / language / framework, relevant modules, current patterns, in-flight plans, public APIs/schemas. Skipped on `plan.md` / `phase-*.md` input.
+- **Capability-discovery bootstrap (v2.13.5+):** a SessionStart hook emits a small, budget-capped, injection-safe pointer so the agent knows a capability resolver exists and can map an intent to the right skill/agent/command (`mewkit capabilities resolve --intent "…"`) instead of guessing. It carries generic functional language only — the full capability manifest is never injected into the session.
 
 **Navigation help:** `/mk:help` scans plans, reviews, tests, and git to determine pipeline state and prints the next action.
 

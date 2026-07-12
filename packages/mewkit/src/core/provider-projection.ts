@@ -58,7 +58,7 @@ export const PROVIDER_PROJECTIONS: Record<string, ProviderProjection> = {
 		// skills/commands, but its hook enforcement is version-gated and limited — so behavior
 		// is prompt-advisory, NOT host-guaranteed. `enforceable` is honestly unsupported.
 		levels: { discoverable: "supported", selectable: "supported", invocable: "advisory", enforceable: "unsupported" },
-		evidence: "Bootstrap via AGENTS instruction surface (no gating hook); skill/command projection per the Codex migration contract; hook enforcement version-gated ⇒ not enforceable.",
+			evidence: "Migration writes a bounded AGENTS bootstrap plus validated .codex/capabilities.json; skill/command projection is advisory and hook enforcement version-gated ⇒ not enforceable.",
 	},
 };
 
