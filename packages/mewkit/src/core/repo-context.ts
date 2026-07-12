@@ -135,8 +135,10 @@ export type EvidenceRef = z.infer<typeof EvidenceRefSchema>;
 
 export const ContextEnvelopeSchema = z.object({
 	schemaVersion: z.literal("1.0"),
-	repoIdentity: z.string(),
-	revision: z.string().nullable().default(null),
+	/** The task's scope/container (e.g. an Aspire-style parent holding many repos). It is NOT
+	 * itself a repository — each evidence ref names its OWN owning repo + revision. Multi-repo
+	 * context is therefore never collapsed into one identity. */
+	boundaryRoot: z.string(),
 	evidence: z.array(EvidenceRefSchema).default([]),
 	queryDescriptor: z.string().default(""),
 	toolDescriptor: z.string().default(""),
@@ -144,6 +146,24 @@ export const ContextEnvelopeSchema = z.object({
 	omissions: z.array(z.string()).default([]),
 });
 export type ContextEnvelope = z.infer<typeof ContextEnvelopeSchema>;
+
+export interface RepoRef {
+	identity: string;
+	revision: string | null;
+}
+
+/**
+ * The DISTINCT owning repositories represented in an evidence set, each with its own revision.
+ * This is the multi-repo context view: a task touching several repos under one container (e.g.
+ * Aspire) surfaces every repo separately — no repo's identity/revision is lost or conflated.
+ */
+export function distinctRepos(refs: EvidenceRef[]): RepoRef[] {
+	const byIdentity = new Map<string, string | null>();
+	for (const r of refs) if (!byIdentity.has(r.owningRepoIdentity)) byIdentity.set(r.owningRepoIdentity, r.revision);
+	return [...byIdentity]
+		.map(([identity, revision]) => ({ identity, revision }))
+		.sort((a, b) => (a.identity < b.identity ? -1 : a.identity > b.identity ? 1 : 0));
+}
 
 /** Hash an evidence file for freshness; null when it does not exist (missing evidence). */
 export function hashEvidence(absPath: string): string | null {

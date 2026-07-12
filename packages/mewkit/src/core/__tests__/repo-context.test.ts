@@ -11,6 +11,7 @@ import {
 	resolveOwningRepo,
 	buildEvidenceRef,
 	checkEvidenceFreshness,
+	distinctRepos,
 	isSecretPath,
 	isWithinBoundary,
 } from "../repo-context.js";
@@ -122,6 +123,87 @@ describe("per-path freshness", () => {
 		expect(ref.contentHash).toBeNull();
 		writeFileSync(join(root, "absent.ts"), "now here\n");
 		expect(checkEvidenceFreshness([ref])[0].status).toBe("stale");
+	});
+});
+
+describe("multi-repo context — one task, many owning repos (Aspire-style)", () => {
+	it("distinctRepos surfaces EVERY owning repo with its own revision (no conflation)", () => {
+		const aspire = makeRoot();
+		const repoA = join(aspire, "customer-frontend");
+		const repoB = join(aspire, "aspire-api");
+		mkdirSync(repoA, { recursive: true });
+		mkdirSync(repoB, { recursive: true });
+		fakeGitRepo(repoA, "a".repeat(40));
+		fakeGitRepo(repoB, "b".repeat(40));
+		writeFileSync(join(repoA, "app.ts"), "a\n");
+		writeFileSync(join(repoB, "server.ts"), "b\n");
+
+		// One envelope's evidence spans two repos under the same container.
+		const evidence = [
+			buildEvidenceRef(join(repoA, "app.ts"), aspire),
+			buildEvidenceRef(join(repoB, "server.ts"), aspire),
+		];
+		const repos = distinctRepos(evidence);
+		expect(repos).toHaveLength(2);
+		expect(repos.map((r) => r.identity).sort()).toEqual([repoB, repoA].sort());
+		// Each repo keeps ITS OWN revision — the two are never merged into one identity.
+		expect(repos.find((r) => r.identity === repoA)?.revision).toBe("a".repeat(40));
+		expect(repos.find((r) => r.identity === repoB)?.revision).toBe("b".repeat(40));
+	});
+
+	it("de-duplicates multiple files from the same repo into a single RepoRef", () => {
+		const aspire = makeRoot();
+		const repoA = join(aspire, "customer-frontend");
+		mkdirSync(join(repoA, "src"), { recursive: true });
+		fakeGitRepo(repoA, "a".repeat(40));
+		writeFileSync(join(repoA, "src", "a.ts"), "1\n");
+		writeFileSync(join(repoA, "src", "b.ts"), "2\n");
+		const evidence = [
+			buildEvidenceRef(join(repoA, "src", "a.ts"), aspire),
+			buildEvidenceRef(join(repoA, "src", "b.ts"), aspire),
+		];
+		expect(distinctRepos(evidence)).toHaveLength(1);
+	});
+
+	it("freshness is per-path: editing one repo's file never marks another repo's evidence stale", () => {
+		const aspire = makeRoot();
+		const repoA = join(aspire, "customer-frontend");
+		const repoB = join(aspire, "aspire-api");
+		mkdirSync(repoA, { recursive: true });
+		mkdirSync(repoB, { recursive: true });
+		fakeGitRepo(repoA, "a".repeat(40));
+		fakeGitRepo(repoB, "b".repeat(40));
+		const fileA = join(repoA, "app.ts");
+		const fileB = join(repoB, "server.ts");
+		writeFileSync(fileA, "a v1\n");
+		writeFileSync(fileB, "b v1\n");
+		const evidence = [buildEvidenceRef(fileA, aspire), buildEvidenceRef(fileB, aspire)];
+
+		// Change ONLY repoA's file (and advance ONLY repoA's revision).
+		writeFileSync(fileA, "a v2 edited\n");
+		writeFileSync(join(repoA, ".git", "refs", "heads", "main"), "f".repeat(40) + "\n");
+
+		const results = checkEvidenceFreshness(evidence, aspire);
+		const byPath = Object.fromEntries(results.map((r) => [r.path, r.status]));
+		expect(byPath[fileA]).toBe("stale"); // the repo that changed
+		expect(byPath[fileB]).toBe("fresh"); // the untouched repo keeps its context
+	});
+
+	it("a non-git dir under the container does NOT borrow a sibling repo's identity", () => {
+		const aspire = makeRoot();
+		const repoA = join(aspire, "customer-frontend");
+		const plainDir = join(aspire, "backend"); // no .git — a plain folder, not a repo
+		mkdirSync(repoA, { recursive: true });
+		mkdirSync(plainDir, { recursive: true });
+		fakeGitRepo(repoA, "a".repeat(40));
+		writeFileSync(join(plainDir, "notes.md"), "n\n");
+
+		const owner = resolveOwningRepo(join(plainDir, "notes.md"), aspire);
+		// Falls back to the container identity with a NULL revision — never repoA's, never a fabricated rev.
+		expect(owner.isGit).toBe(false);
+		expect(owner.identity).toBe(aspire);
+		expect(owner.identity).not.toBe(repoA);
+		expect(owner.revision).toBeNull();
 	});
 });
 

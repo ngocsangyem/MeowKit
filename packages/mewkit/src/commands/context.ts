@@ -9,6 +9,7 @@ import {
 	buildEvidenceRef,
 	checkEvidenceFreshness,
 	ContextEnvelopeSchema,
+	distinctRepos,
 	isWithinBoundary,
 } from "../core/repo-context.js";
 
@@ -66,23 +67,24 @@ export async function context(args: ContextOptions = {}): Promise<void> {
 		// Boundary-scope the freshness check: an untrusted envelope's evidence paths are never
 		// stat-ed/hashed outside the boundary (no arbitrary-path existence/hash oracle).
 		const results = checkEvidenceFreshness(envelope.evidence, boundary);
+		// Pair each result with its evidence ref (1:1, same order) to group BY OWNING REPO.
+		const paired = results.map((r, i) => ({ ...r, ref: envelope.evidence[i] }));
 		if (args.json) {
-			console.log(JSON.stringify({ repoIdentity: envelope.repoIdentity, results }, null, 2));
+			console.log(JSON.stringify({ boundaryRoot: envelope.boundaryRoot, repos: distinctRepos(envelope.evidence), results }, null, 2));
 			return;
 		}
-		const needsAction = results.filter((r) => r.status !== "fresh");
-		console.log(pc.bold(pc.cyan(`Context freshness — ${envelope.repoIdentity}`)));
-		for (const r of results) {
-			const tag =
-				r.status === "fresh"
-					? pc.green("fresh")
-					: r.status === "stale"
-						? pc.yellow("stale")
-						: r.status === "out-of-scope"
-							? pc.red("out-of-scope")
-							: pc.red("missing");
-			console.log(`  [${tag}] ${r.path}`);
+		const tagFor = (s: string): string =>
+			s === "fresh" ? pc.green("fresh") : s === "stale" ? pc.yellow("stale") : s === "out-of-scope" ? pc.red("out-of-scope") : pc.red("missing");
+		console.log(pc.bold(pc.cyan(`Context freshness — scope: ${envelope.boundaryRoot}`)));
+		// Per-repo grouping: each owning repo (with its own revision) is reported separately, so a
+		// multi-repo task never loses which repo an evidence file — and its freshness — belongs to.
+		for (const repo of distinctRepos(envelope.evidence)) {
+			console.log(pc.bold(`  ${repo.identity} ${pc.dim(`@ ${repo.revision ?? "(non-git)"}`)}`));
+			for (const p of paired.filter((x) => x.ref.owningRepoIdentity === repo.identity)) {
+				console.log(`    [${tagFor(p.status)}] ${p.ref.path}`);
+			}
 		}
+		const needsAction = results.filter((r) => r.status !== "fresh");
 		if (needsAction.length > 0) {
 			console.log(pc.dim(`\n  ${needsAction.length} evidence path(s) need reacquisition or are out of scope.`));
 			process.exit(1);
