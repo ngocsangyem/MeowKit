@@ -132,7 +132,7 @@ if new_status != current_status:
 
 ### Anti-patterns
 
-- ❌ "Stamp at creation" — writing `status: completed` when scaffolding the phase file. Defeats Gate 1, breaks cook re-hydration (phases skip as "completed"), corrupts orchviz visualization.
+- ❌ "Stamp at creation" — writing `status: completed` when scaffolding the phase file. Defeats Gate 1, breaks cook re-hydration (phases skip as "completed").
 - ❌ "Stamp completed without counting `[x]`" — drift between frontmatter and todo state. Validator (`scripts/validate-plan.py`) catches this with a hard error.
 
 ### Cross-Skill Notes
@@ -151,13 +151,13 @@ The phase status enum has 7 values. Each has a documented producer (who writes i
 
 | Status | Producer | Consumer | Citation |
 |---|---|---|---|
-| `pending` | sync-back algorithm (default when no todos checked); scaffolding (initial state) | cook re-hydration; orchviz | task-management.md "Algorithm (formal)" |
-| `in_progress` | sync-back algorithm (some but not all todos checked) | cook re-hydration; orchviz | task-management.md "Algorithm (formal)" |
-| `completed` | sync-back algorithm (all todos checked AND total > 0) | cook re-hydration (skip phase); orchviz; archive workflow | task-management.md "Algorithm (formal)" |
-| `active` | HUMAN edit only — sync-back NEVER writes `active` | cook re-hydration; orchviz | task-management.md "Invariants" |
-| `failed` | HUMAN edit only — terminal state | cook re-hydration (skip phase); orchviz; journal-writer | task-management.md "Invariants" |
-| `abandoned` | HUMAN edit only — terminal state | cook re-hydration (skip phase); orchviz; archive workflow | task-management.md "Invariants" |
-| `unknown` | parser cascade fallback — emitted only when `status:` is absent or unrecognized; never written from frontmatter | orchviz (display as warning); validator | internal sentinel |
+| `pending` | sync-back algorithm (default when no todos checked); scaffolding (initial state) | cook re-hydration | task-management.md "Algorithm (formal)" |
+| `in_progress` | sync-back algorithm (some but not all todos checked) | cook re-hydration | task-management.md "Algorithm (formal)" |
+| `completed` | sync-back algorithm (all todos checked AND total > 0) | cook re-hydration (skip phase); archive workflow | task-management.md "Algorithm (formal)" |
+| `active` | HUMAN edit only — sync-back NEVER writes `active` | cook re-hydration | task-management.md "Invariants" |
+| `failed` | HUMAN edit only — terminal state | cook re-hydration (skip phase); journal-writer | task-management.md "Invariants" |
+| `abandoned` | HUMAN edit only — terminal state | cook re-hydration (skip phase); archive workflow | task-management.md "Invariants" |
+| `unknown` | parser cascade fallback — emitted only when `status:` is absent or unrecognized; never written from frontmatter | validator | internal sentinel |
 
 > `.plan-state.json` is deliberately absent from this matrix: its `status` / `tasks_completed` fields are DERIVED from the phase-file checkboxes (the authoritative producers above), written at hydration and regenerated at the final sync-back. Treat it as a regenerable cache, not a status producer — never hand-mutate it mid-run.
 

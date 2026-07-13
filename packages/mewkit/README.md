@@ -26,7 +26,7 @@ npx mewkit <command>      # Runtime commands
 | `meowkit task new`  | Create structured task file from template                         |
 | `meowkit task list` | List active tasks with status                                     |
 | `meowkit capabilities` | Resolve installed skills/commands/tools for an intent (`list`, `explain`, `resolve`, `projections`) |
-| `meowkit orchviz`   | Live web visualizer for the active Claude Code session            |
+| `meowkit visual-plan` | Structured visual plan: validate/approve/edit/view + feedback loop |
 | `meowkit pack`      | `list` / `add <pack>` / `remove <pack>` — manage installed domains |
 | `meowkit migrate`   | Export the `.claude/` setup to other coding agents (Codex, Cursor, …) |
 
@@ -143,80 +143,39 @@ npx mewkit memory --show        # Display lessons learned
 npx mewkit memory --clear       # Reset memory
 ```
 
-## Visualizer (`meowkit orchviz`)
+## Visual Plan (`meowkit visual-plan`)
 
-Live web visualizer for the active Claude Code session. Tails the JSONL
-transcript at `~/.claude/projects/<encoded-cwd>/<session>.jsonl`, parses it
-into structured `AgentEvent`s, and serves them at `http://127.0.0.1:<port>/`
-as a Canvas2D + d3-force interactive graph plus a live transcript panel and
-meowkit-specific overlays (Gate state, model tier, today's tokens, phase).
+Structured visual review for UI-bearing plans. A plan's `visual-plan/plan.json`
+(schema `visual-plan/v1`) is a coverage ledger + canvas (lanes, surface-locked
+artboards, semantic-HTML wireframes, connectors, annotations). The CLI validates
+and gates it; a transient 127.0.0.1 React studio renders and edits it.
 
 ```bash
-# Default: random port, auto-open browser
-npx mewkit orchviz
+# Deterministic contract commands
+npx mewkit visual-plan validate <plan-dir> [--json]     # schema + coverage + refs + safe-HTML + hashes
+npx mewkit visual-plan status <plan-dir> [--json]       # coverage summary + review status
+npx mewkit visual-plan approve <plan-dir> --revision <n> # single writer of review.status (Gate 1)
+npx mewkit visual-plan rehash <plan-dir>                # refresh source hashes (clears approval)
+npx mewkit visual-plan export <plan-dir> --format html  # self-contained plan.html from the artifact
 
-# Custom flags
-npx mewkit orchviz --port 3001       # fixed port (0 = random)
-npx mewkit orchviz --no-open         # don't auto-launch browser
-npx mewkit orchviz --session <uuid>  # pin to a single session id
-npx mewkit orchviz --workspace .     # override watched workspace (default: cwd)
-npx mewkit orchviz --verbose         # print sanitized AgentEvents to stderr
-npx mewkit orchviz --log             # persist to .claude/logs/orchviz-<sid>.md
-npx mewkit orchviz --log /tmp/run.md # custom path (must end .md)
+# Transient studio (127.0.0.1, exits with the process)
+npx mewkit visual-plan view <plan-dir> [--no-open] [--port N]   # read-only
+npx mewkit visual-plan edit <plan-dir> [--force]               # editable (single-editor lock)
+
+# Feedback loop
+npx mewkit visual-plan prepare-feedback <plan-dir> --ops <f.json>          # freeze an immutable batch
+npx mewkit visual-plan apply-feedback <plan-dir> --batch <id> --check      # pre-apply stale gate
+npx mewkit visual-plan apply-feedback <plan-dir> --batch <id> --receipt <f> # record per-op outcomes
+npx mewkit visual-plan patch <plan-dir> --op <op.json>                     # apply one typed visual op
 ```
 
-**Security:** server binds 127.0.0.1 only; Host-header guarded against DNS
-rebinding; SSE frames sanitized (ANSI strip + strict-prefix secret scrub on
-`sk-…`, `ghp_…`, `AKIA…`, PEM blocks); path traversal blocked.
-
-**Limitations (v1):** simplified canvas renderer (no bloom / detail panels /
-multi-session tabs); v1.1 ports the full agent-flow visualizer. Ported (in
-part) from [`patoles/agent-flow`](https://github.com/patoles/agent-flow)
-under the Apache-2.0 license — see `NOTICE`.
-
-### orchviz API Endpoints (v1.2)
-
-The orchviz server exposes these HTTP endpoints on `http://127.0.0.1:<port>`:
-
-**GET /api/plans** — list non-archived plans sorted by mtime (newest first):
-```bash
-curl http://127.0.0.1:3001/api/plans
-# { "plans": [{ "slug": "260501-my-plan", "title": "...", "status": "draft", ... }] }
-```
-
-**GET /api/plan?slug=\<slug\>** — full plan state with per-phase ETags:
-```bash
-curl "http://127.0.0.1:3001/api/plan?slug=260501-my-plan"
-# { "plan": { ... }, "phaseEtags": { "1": "<hex64>", "2": "<hex64>" }, "readonly": true }
-# Omit ?slug= to get the most-recently-modified plan.
-```
-
-**Read-only by default.** The visualizer is a viewer, not an editor — graph,
-plan tree, and todos all render read-only. The hamburger drawer browses the
-plan tree (plan → phase → todo) without exposing edit affordances. To opt
-into write mode (legacy todo-toggle endpoint), launch with
-`MEOWKIT_ORCHVIZ_WRITABLE=1`. The legacy `MEOWKIT_ORCHVIZ_READONLY=0` flag
-also opts in for backwards compatibility; `MEOWKIT_ORCHVIZ_READONLY=1`
-forces read-only as a defensive lock.
-
-**POST /api/plan/todo** — toggle a todo checkbox (write mode only):
-```bash
-# Default (no env): returns 405 { "error": "readonly" }
-MEOWKIT_ORCHVIZ_WRITABLE=1 npx mewkit orchviz   # opt in to write mode
-
-curl -X POST http://127.0.0.1:3001/api/plan/todo \
-  -H "Content-Type: application/json" \
-  -H "Origin: http://127.0.0.1:3001" \
-  -d '{"slug":"260501-my-plan","phase":1,"todoIdx":0,"checked":true,"etag":"<hex64>"}'
-# 200: { "ok": true, "changed": true, "etag": "<new-hex64>", "archived": false }
-# 409: { "error": "stale", "currentEtag": "<latest-hex64>" }  → re-fetch and retry
-# 403: Origin header missing or not in allowlist
-# 405: server is in read-only mode (the default)
-```
-
-**Origin requirement:** POST requests must include `Origin: http://127.0.0.1:<port>`
-or `Origin: http://localhost:<port>`. This prevents cross-origin writes from
-browser tabs served by other origins.
+**Security:** the studio server binds 127.0.0.1 only, Host-header guarded against
+DNS rebinding, path-traversal blocked, with a strict CSP (`script-src 'self'`).
+Wireframe HTML is DOMPurify-sanitized at both save and render time via one shared
+allowlist. Writes use optimistic concurrency (`PATCH` requires `If-Match`; 409 on
+stale). These loopback primitives live in `src/local-web/`, ported in part from
+[`patoles/agent-flow`](https://github.com/patoles/agent-flow) under Apache-2.0 —
+see `NOTICE`.
 
 ## Related
 

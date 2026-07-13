@@ -1,13 +1,15 @@
 /**
  * `mewkit visual-plan <subcommand>` dispatch + reporter.
  *
- * Subcommands (Phase 1): validate | status | approve | rehash. Each resolves
+ * Subcommands: validate | status | approve | rehash | export | prepare-feedback
+ * (sync) and edit | view (long-running studio). Each resolves
  * the plan directory, runs the matching application function, and reports in
  * human or `--json` form. Exit codes: 0 ok, 1 contract/precondition failure,
  * 2 usage/path error. Sets `process.exitCode` (never calls `process.exit`) so
  * the surface stays unit-testable.
  */
 
+import * as fs from "node:fs";
 import * as path from "node:path";
 import pc from "picocolors";
 import { validatePlan } from "../application/validate-plan.js";
@@ -15,6 +17,10 @@ import { planStatus } from "../application/status.js";
 import { approvePlan } from "../application/approve.js";
 import { rehashPlan } from "../application/rehash.js";
 import { exportPlanHtml } from "../application/export-plan.js";
+import { prepareFeedback } from "../application/prepare-feedback.js";
+import { checkBatchFresh, recordResolution } from "../application/apply-feedback.js";
+import { patchPlan } from "../application/patch-plan.js";
+import { PatchOpSchema } from "../domain/patches.js";
 import { runStudio } from "./studio.js";
 import { resolvePlanDir, PlanPathError } from "../infrastructure/visual-plan-repository.js";
 import { atomicWriteFileSync } from "../infrastructure/atomic-write.js";
@@ -30,6 +36,11 @@ export interface VisualPlanCliArgs {
 	force?: boolean;
 	port?: number;
 	format?: string;
+	ops?: string;
+	batch?: string;
+	check?: boolean;
+	receipt?: string;
+	op?: string;
 }
 
 const emit = (value: unknown): void => console.log(JSON.stringify(value, null, 2));
@@ -114,6 +125,106 @@ function runExport(planDir: string, format: string | undefined, json: boolean): 
 	process.exitCode = 0;
 }
 
+function readJsonFile(file: string): unknown {
+	return JSON.parse(fs.readFileSync(file, "utf-8"));
+}
+
+/** `patch <dir> --op <file>` — apply one typed visual op (single-writer; no If-Match). */
+function runPatch(planDir: string, opFile: string | undefined, json: boolean): void {
+	if (!opFile) {
+		console.error(pc.red("patch requires --op <op.json> (a single typed patch op)"));
+		process.exitCode = 2;
+		return;
+	}
+	let opJson: unknown;
+	try {
+		opJson = readJsonFile(opFile);
+	} catch (e) {
+		console.error(pc.red(`could not read --op file: ${e instanceof Error ? e.message : String(e)}`));
+		process.exitCode = 2;
+		return;
+	}
+	const op = PatchOpSchema.safeParse(opJson);
+	if (!op.success) {
+		console.error(pc.red(`invalid patch op: ${op.error.issues[0]?.message ?? "schema"}`));
+		process.exitCode = 2;
+		return;
+	}
+	const r = patchPlan(planDir, op.data);
+	if (json) emit(r);
+	else if (r.status === "ok") console.log(`${pc.green("✓")} patched → revision ${r.revision}`);
+	else console.error(`${pc.red("✗")} ${r.status}${r.message ? `: ${r.message}` : ""}`);
+	process.exitCode = r.status === "ok" ? 0 : 1;
+}
+
+/** `apply-feedback <dir> --batch <id> [--check | --receipt <file>]` — deterministic loop mechanics. */
+function runApplyFeedback(planDir: string, args: VisualPlanCliArgs, json: boolean): void {
+	if (!args.batch) {
+		console.error(pc.red("apply-feedback requires --batch <batch-id>"));
+		process.exitCode = 2;
+		return;
+	}
+	if (args.check) {
+		const r = checkBatchFresh(planDir, args.batch);
+		if (json) emit(r);
+		else if (r.ok) console.log(`${pc.green("✓")} batch ${args.batch} is fresh — safe to apply`);
+		else console.error(`${pc.red("✗")} ${r.stale ? "STALE" : "cannot apply"}: ${r.reason}`);
+		process.exitCode = r.ok ? 0 : 1;
+		return;
+	}
+	if (args.receipt) {
+		let entries: unknown;
+		try {
+			entries = readJsonFile(args.receipt);
+		} catch (e) {
+			console.error(pc.red(`could not read --receipt file: ${e instanceof Error ? e.message : String(e)}`));
+			process.exitCode = 2;
+			return;
+		}
+		const r = recordResolution(planDir, args.batch, entries);
+		if (json) emit(r);
+		else if (r.ok) {
+			console.log(`${pc.green("✓")} receipt written: ${r.receiptPath}`);
+			console.log(`  reopen: ${pc.cyan(r.reopenCommand ?? "")}`);
+		} else console.error(`${pc.red("✗")} ${r.error}`);
+		process.exitCode = r.ok ? 0 : 1;
+		return;
+	}
+	console.error(pc.red("apply-feedback requires --check (pre-apply gate) or --receipt <file> (record outcomes)"));
+	process.exitCode = 2;
+}
+
+function runPrepareFeedback(planDir: string, opsFile: string | undefined, json: boolean): void {
+	if (!opsFile) {
+		console.error(pc.red("prepare-feedback requires --ops <operations.json> (a JSON array of feedback operations)"));
+		process.exitCode = 2;
+		return;
+	}
+	let operations: unknown;
+	try {
+		operations = JSON.parse(fs.readFileSync(opsFile, "utf-8"));
+	} catch (e) {
+		console.error(pc.red(`could not read --ops file: ${e instanceof Error ? e.message : String(e)}`));
+		process.exitCode = 2;
+		return;
+	}
+	if (!Array.isArray(operations)) {
+		console.error(pc.red("--ops file must contain a JSON array of operations"));
+		process.exitCode = 2;
+		return;
+	}
+	const r = prepareFeedback(planDir, operations);
+	if (json) {
+		emit(r);
+	} else if (r.ok) {
+		console.log(`${pc.green("✓")} feedback batch ${pc.bold(r.batchId ?? "")}`);
+		console.log(`  copy: ${pc.cyan(r.copyCommand ?? "")}`);
+	} else {
+		console.error(`${pc.red("✗")} ${r.error ?? "prepare failed"}`);
+	}
+	process.exitCode = r.ok ? 0 : 1;
+}
+
 function runRehash(planDir: string, json: boolean): void {
 	const r = rehashPlan(planDir);
 	if (json) {
@@ -133,9 +244,9 @@ export function visualPlanCommand(args: VisualPlanCliArgs): void | Promise<void>
 	if (sub === "edit" || sub === "view") {
 		return runStudio({ mode: sub, planDir: args.planDir, open: args.open, noOpen: args.noOpen, force: args.force, port: args.port });
 	}
-	const known = new Set(["validate", "status", "approve", "rehash", "export"]);
+	const known = new Set(["validate", "status", "approve", "rehash", "export", "prepare-feedback", "apply-feedback", "patch"]);
 	if (!sub || !known.has(sub)) {
-		console.error(pc.red(`visual-plan: expected one of validate|status|approve|rehash|export|edit|view (got ${sub ?? "nothing"})`));
+		console.error(pc.red(`visual-plan: expected one of validate|status|approve|rehash|export|prepare-feedback|apply-feedback|patch|edit|view (got ${sub ?? "nothing"})`));
 		process.exitCode = 2;
 		return;
 	}
@@ -157,5 +268,8 @@ export function visualPlanCommand(args: VisualPlanCliArgs): void | Promise<void>
 	else if (sub === "status") runStatus(planDir, json);
 	else if (sub === "approve") runApprove(planDir, args.revision, json);
 	else if (sub === "export") runExport(planDir, args.format, json);
+	else if (sub === "prepare-feedback") runPrepareFeedback(planDir, args.ops, json);
+	else if (sub === "apply-feedback") runApplyFeedback(planDir, args, json);
+	else if (sub === "patch") runPatch(planDir, args.op, json);
 	else runRehash(planDir, json);
 }

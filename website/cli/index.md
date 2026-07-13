@@ -20,7 +20,7 @@ MeowKit provides two CLI packages:
 | Project lifecycle | `init`, `upgrade`, `setup`, `doctor`, `status`, `task`, `migrate` |
 | Knowledge & memory | `wiki`, `memory`, `index`, `query` |
 | Harness introspection | `validate`, `inventory`, `trace`, `budget` (incl. `budget context`), `verdict-gate`, `capabilities`, `context` |
-| Cost & visualization | `budget`, `orchviz` |
+| Cost & visualization | `budget`, `visual-plan` |
 | Release & providers | `build-plugin`, `pack`, `providers` / `explain-support` |
 
 See [Commands](/cli/commands) for the full reference and [Task Commands](/cli/task-commands) for `task` details.

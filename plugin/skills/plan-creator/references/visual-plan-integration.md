@@ -140,10 +140,16 @@ omitted roles / flags / error paths that never became states.
   After such an edit you MUST run `mewkit visual-plan rehash {plan_dir}` then
   re-validate. **Rehash clears any prior visual approval** (red-team M1) — a stale
   review cannot ride through on refreshed bytes.
-- **Step 6V (studio review):** once Phase 4 ships, open `mewkit visual-plan edit
-  {plan_dir}` for interactive review. UNTIL Phase 4 ships, review = `mewkit
-  visual-plan validate` + a static export (`mk:visual-plan` `plan.html`, clearly
-  labeled non-canonical); the human still transitions the decision via `approve`.
+- **Step 6V (studio review):** open `mewkit visual-plan edit {plan_dir}` for
+  interactive review (Phase 4 shipped). The human transitions the decision via
+  `approve`.
+- **Reopen loop (Phase 6):** when the reviewer's studio session produces a
+  feedback batch (Copy Command), a fresh agent session applies it via
+  `/mk:visual-plan apply-feedback` (see the visual-plan skill's
+  `references/apply-feedback-protocol.md`): visual-only ops via `mewkit visual-plan
+  patch`, plan-semantic ops as Markdown edits + `rehash`, then a resolution
+  receipt. A receipt with an `unresolved` op BLOCKS `approve` at that revision.
+  After resolution, reopen (`edit`) → re-review → `approve` the new revision.
 
 ## 7. Gate 1 Visual Preconditions (Step 7)
 

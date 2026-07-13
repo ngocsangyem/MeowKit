@@ -131,7 +131,7 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
 
 ## Integration Points
 
-- **Reuses, does not duplicate:** `packages/cli/src/orchviz/token-estimator.ts`
+- **Reuses, does not duplicate:** `packages/mewkit/src/token-estimator/index.ts`
   is the canonical chars/4 source. Shell scripts inline the same heuristic with
   a citation comment, avoiding a Node bridge that would require `dist/`.
 - **Reads, does not write:** `.claude/memory/cost-log.json`,

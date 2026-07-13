@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /**
- * Visual Plan studio bundle budget (red-team M7 — separate from the orchviz
- * budget so the two bundles are gated independently). Gzips dist/visual-plan-web
- * {index.js,index.css} in-memory and fails the build if the total exceeds the cap.
+ * Visual Plan studio bundle budget. Gzips dist/visual-plan-web {index.js,index.css}
+ * in-memory and fails the build if the total exceeds the cap.
  */
 "use strict";
 const fs = require("node:fs");

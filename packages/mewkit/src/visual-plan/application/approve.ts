@@ -14,6 +14,7 @@
 import { validatePlan } from "./validate-plan.js";
 import { writeArtifact } from "../infrastructure/visual-plan-repository.js";
 import { buildVisualBlock, writeVisualBlock } from "../infrastructure/plan-state.js";
+import { listReceipts } from "../infrastructure/receipt-repository.js";
 import { nowIso } from "./clock.js";
 
 export interface ApproveResult {
@@ -42,6 +43,13 @@ export function approvePlan(planDir: string, revision: number): ApproveResult {
 	}
 	if (plan.review.pendingFeedbackBatchIds.length > 0) {
 		failed.push(`cannot approve with ${plan.review.pendingFeedbackBatchIds.length} pending feedback batch(es)`);
+	}
+	// Receipt-aware refusal (Phase 6): a resolution receipt at the CURRENT revision
+	// with any unresolved semantic op means the feedback was not fully applied.
+	for (const receipt of listReceipts(planDir)) {
+		if (receipt.resolvedAtRevision === revision && receipt.entries.some((e) => e.outcome === "unresolved")) {
+			failed.push(`resolution receipt ${receipt.batchId} has unresolved operations at revision ${revision}`);
+		}
 	}
 	if (failed.length > 0) return { ok: false, revision, failedPreconditions: failed };
 

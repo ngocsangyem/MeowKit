@@ -16,6 +16,11 @@ export interface VisualPlanArgs {
 	force?: boolean;
 	port?: number;
 	format?: string;
+	ops?: string;
+	batch?: string;
+	check?: boolean;
+	receipt?: string;
+	op?: string;
 }
 
 export async function visualPlan(args: VisualPlanArgs): Promise<void> {
@@ -29,6 +34,11 @@ export async function visualPlan(args: VisualPlanArgs): Promise<void> {
 		force: args.force,
 		port: args.port,
 		format: args.format,
+		ops: args.ops,
+		batch: args.batch,
+		check: args.check,
+		receipt: args.receipt,
+		op: args.op,
 	};
 	await visualPlanCommand(cliArgs);
 }

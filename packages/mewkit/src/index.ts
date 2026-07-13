@@ -18,7 +18,6 @@ import { doctor } from "./commands/doctor.js";
 import { migrate } from "./commands/migrate.js";
 import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
-import { orchviz } from "./commands/orchviz.js";
 import { inventory } from "./commands/inventory.js";
 import { trace } from "./commands/trace.js";
 // NOTE: index-command is imported lazily inside its case — it pulls in `node:sqlite`
@@ -54,8 +53,7 @@ ${pc.bold("Commands:")}
   ${pc.green("task")}       Create and list task files (new, list)
   ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
   ${pc.green("providers")}  Show effective provider support matrix and enforcement levels ('providers [<p>] --lifecycle' for the capability-adapter + lifecycle matrix)
-  ${pc.green("orchviz")}    Live web visualizer for the active Claude Code session
-  ${pc.green("visual-plan")} Visual plan contracts: validate | status | approve --revision <n> | rehash | export --format html | edit | view <plan-dir> [--json] [--no-open] [--port N]
+  ${pc.green("visual-plan")} Visual plan contracts: validate|status|approve --revision <n>|rehash|export --format html|prepare-feedback --ops <f>|apply-feedback --batch <id> [--check|--receipt <f>]|patch --op <f>|edit|view <plan-dir> [--json]
   ${pc.green("inventory")}  List harness artifacts with governance metadata
   ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
   ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
@@ -104,13 +102,13 @@ ${pc.bold("Init flags for post-init migration:")}
   --migrate-to <csv|all>     After unpack, export to listed providers (e.g. cursor,codex)
   --migrate-global           Use global install paths (~/.cursor/, etc.) instead of project-local
 
-${pc.bold("orchviz flags:")}
+${pc.bold("visual-plan flags:")}
   --port <number>            Bind to fixed port (default: random)
   --open / --no-open         Auto-launch browser (default: --open)
-  --session <id>             Pin to a single Claude Code session id
-  --workspace <path>         Override watched workspace (default: cwd)
-  --verbose                  Print sanitized AgentEvents to stderr
-  --log [path]               Persist events to markdown (default: .claude/logs/orchviz-<sid>.md)
+  --revision <n>             approve: pin to the exact reviewed revision
+  --batch <id>               apply-feedback: target feedback batch
+  --check / --receipt <f>    apply-feedback: pre-apply gate / record outcomes
+  --op <f> / --ops <f>       patch / prepare-feedback operations file
 `);
 }
 
@@ -216,6 +214,10 @@ async function main(): Promise<void> {
 			"responsibility",
 			"revision",
 			"format",
+			"ops",
+			"batch",
+			"receipt",
+			"op",
 		],
 		alias: { h: "help", v: "version", y: "yes" },
 	});
@@ -438,29 +440,6 @@ async function main(): Promise<void> {
 			});
 			break;
 		}
-		case "orchviz": {
-			const portRaw = args.port as string | number | undefined;
-			let port: number | undefined;
-			if (portRaw !== undefined) {
-				const parsed = typeof portRaw === "number" ? portRaw : parseInt(String(portRaw), 10);
-				if (!Number.isInteger(parsed) || parsed < 0 || parsed > 65535) {
-					console.error(pc.red(`Invalid --port value: ${String(portRaw)} (must be 0-65535; 0 = random)`));
-					process.exit(2);
-				}
-				port = parsed;
-			}
-			await orchviz({
-				port,
-				open: args.open as boolean | undefined,
-				noOpen: args["no-open"] as boolean | undefined,
-				session: args.session as string | undefined,
-				workspace: args.workspace as string | undefined,
-				noColor: args["no-color"] as boolean | undefined,
-				verbose: args.verbose as boolean | undefined,
-				log: args.log as string | boolean | undefined,
-			});
-			break;
-		}
 		case "visual-plan": {
 			const vpPortRaw = args.port as string | number | undefined;
 			let vpPort: number | undefined;
@@ -482,6 +461,11 @@ async function main(): Promise<void> {
 				force: args.force as boolean | undefined,
 				port: vpPort,
 				format: args.format as string | undefined,
+				ops: args.ops as string | undefined,
+				batch: args.batch as string | undefined,
+				check: args.check as boolean | undefined,
+				receipt: args.receipt as string | undefined,
+				op: args.op as string | undefined,
 			});
 			break;
 		}

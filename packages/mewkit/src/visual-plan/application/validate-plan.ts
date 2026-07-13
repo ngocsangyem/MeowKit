@@ -36,6 +36,27 @@ function fromZod(error: z.ZodError): ValidationError[] {
 	return error.issues.map((i) => err(jsonPath(i.path) || "<root>", ErrorCode.SCHEMA, i.message));
 }
 
+/**
+ * Run the deterministic passes on an ALREADY-PARSED plan (cross-refs, coverage,
+ * HTML safety, source freshness). Used by `validatePlan` and by the patch
+ * pipeline (Phase 5) to re-validate a mutated plan in memory before writing —
+ * so a patch can never persist a structurally-invalid or unsafe artifact.
+ */
+export function validateParsed(plan: VisualPlan, planDir: string): { errors: ValidationError[]; coverage: CoverageSummary } {
+	const errors: ValidationError[] = [];
+	errors.push(...checkCrossReferences(plan));
+	const coverage = computeCoverage(plan);
+	errors.push(...coverage.errors);
+	plan.canvas.frames.forEach((frame, i) => {
+		const check = checkWireframeHtml(frame.wireframe.html);
+		if (!check.safe) {
+			errors.push(err(`canvas.frames[${i}].wireframe.html`, ErrorCode.UNSAFE_HTML, check.reason ?? "unsafe HTML"));
+		}
+	});
+	errors.push(...checkSourceFreshness(plan, planDir));
+	return { errors, coverage: coverage.summary };
+}
+
 /** Run every deterministic pass against the artifact in `planDir`. */
 export function validatePlan(planDir: string): ValidatePlanResult {
 	const read = readArtifactRaw(planDir);
@@ -45,20 +66,6 @@ export function validatePlan(planDir: string): ValidatePlanResult {
 	if (!parsed.success) return { ok: false, errors: fromZod(parsed.error) };
 	const plan = parsed.data;
 
-	const errors: ValidationError[] = [];
-	errors.push(...checkCrossReferences(plan));
-
-	const coverage = computeCoverage(plan);
-	errors.push(...coverage.errors);
-
-	plan.canvas.frames.forEach((frame, i) => {
-		const check = checkWireframeHtml(frame.wireframe.html);
-		if (!check.safe) {
-			errors.push(err(`canvas.frames[${i}].wireframe.html`, ErrorCode.UNSAFE_HTML, check.reason ?? "unsafe HTML"));
-		}
-	});
-
-	errors.push(...checkSourceFreshness(plan, planDir));
-
-	return { ok: errors.length === 0, errors, plan, coverage: coverage.summary };
+	const { errors, coverage } = validateParsed(plan, planDir);
+	return { ok: errors.length === 0, errors, plan, coverage };
 }

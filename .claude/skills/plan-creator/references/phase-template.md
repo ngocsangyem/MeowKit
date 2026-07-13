@@ -220,7 +220,7 @@ These sections are written by skill steps, not authored by humans. They are OPTI
 
 ## Anti-patterns
 
-- ❌ Writing `status: completed` at phase-file creation — defeats Gate 1, breaks cook re-hydration, corrupts orchviz visualization
+- ❌ Writing `status: completed` at phase-file creation — defeats Gate 1, breaks cook re-hydration
 - ❌ Writing `status: unknown` from frontmatter — `unknown` is a parser sentinel for parse failures only
 - ❌ Writing `status: draft` or `status: done` — not in the parser union; will normalize to `unknown`. Use `pending` or `completed`.
 - ❌ Hand-editing the Overview `**Status:**` line directly — sync-back regenerates from frontmatter, your edit will be lost. Edit frontmatter instead.

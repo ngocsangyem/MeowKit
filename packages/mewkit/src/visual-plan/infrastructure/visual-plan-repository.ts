@@ -92,7 +92,17 @@ export function readArtifactRaw(planDir: string): RawArtifactRead {
 	}
 }
 
-/** Atomically write the artifact as pretty JSON (trailing newline for clean diffs). */
+/**
+ * Canonical on-disk serialization for the artifact (pretty JSON + trailing
+ * newline). Exposed so a caller can hash the EXACT bytes a subsequent
+ * `writeArtifact` will persist (used by prepare-feedback for a crash-safe
+ * batch-then-artifact write order).
+ */
+export function serializeArtifact(artifact: unknown): string {
+	return `${JSON.stringify(artifact, null, 2)}\n`;
+}
+
+/** Atomically write the artifact as canonical pretty JSON. */
 export function writeArtifact(planDir: string, artifact: unknown): void {
-	atomicWriteFileSync(artifactPath(planDir), `${JSON.stringify(artifact, null, 2)}\n`);
+	atomicWriteFileSync(artifactPath(planDir), serializeArtifact(artifact));
 }

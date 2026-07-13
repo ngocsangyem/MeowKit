@@ -62,3 +62,20 @@ export function checkWireframeHtml(html: string): SanitizeCheck {
 export function sanitizeWireframeHtml(html: string): string {
 	return purify.sanitize(html, WIREFRAME_SANITIZE_CONFIG);
 }
+
+/**
+ * Replace the TEXT content of a schema-backed wireframe field (Phase 5 edit).
+ * The field is targeted by a `wf-field-<fieldId>` class (class is allowlisted, so
+ * no sanitizer-config change is needed). `textContent` assignment escapes the
+ * new value, so an edit can never introduce markup. `fieldId` is charset-safe
+ * (ENTITY_ID_RE) so it is a valid class token. Returns null if the field is
+ * absent (the caller rejects the patch).
+ */
+export function editWireframeField(html: string, fieldId: string, text: string): string | null {
+	const el = jsdomWindow.document.createElement("div");
+	el.innerHTML = html;
+	const target = el.querySelector(`.wf-field-${fieldId}`);
+	if (!target) return null;
+	target.textContent = text;
+	return el.innerHTML;
+}

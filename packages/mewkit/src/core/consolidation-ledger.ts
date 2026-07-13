@@ -1,13 +1,15 @@
-// Consolidation & safe-deprecation ledger (Phase 7). This phase REMOVES nothing: the plan's
-// mandate is "remove duplicate sources only after runtime traces, Aspire validation, plugin
+// Consolidation & safe-deprecation ledger. The ledger itself SCHEDULES no deletions: the
+// discipline is "remove duplicate sources only after runtime traces, Aspire validation, plugin
 // payload checks, and a transition release show which path is canonical" and "no candidate is
 // deleted solely due to absent static references." This module is the durable RECORD of that
 // discipline — every consolidation candidate carries its purpose, static + runtime evidence,
 // external-consumer risk, confidence, transition behavior, rollback, verification, and the gates
 // still outstanding before any removal. `deletionThisPhase` is the literal `false` for every entry
-// (a compile-time guarantee that nothing is scheduled for deletion here). Doctor surfaces the
-// status HONESTLY — an authoring-only/experimental/deprecated label is NOT a runtime-availability
-// claim (a deprecated artifact may still be fully functional at runtime).
+// (a compile-time guarantee that this ledger schedules no deletion). When a candidate is actually
+// removed elsewhere — e.g. the orchviz command, retired by the visual-plan work once mk:visual-plan
+// superseded it — its entry is retained here for provenance, with staticEvidence recording the
+// removal. Doctor surfaces the status HONESTLY — an authoring-only/experimental/deprecated label is
+// NOT a runtime-availability claim (a deprecated artifact may still be fully functional at runtime).
 
 /** Classification. `canonical` = the source of truth; `keep-legacy` = retained cheap read path;
  * `authoring-only`/`experimental` = present but not production-critical; `deprecated` = flagged for
@@ -118,17 +120,17 @@ export const CONSOLIDATION_LEDGER: ConsolidationCandidate[] = [
 	},
 	{
 		id: "orchviz",
-		purpose: "Orchestration visualization surface.",
+		purpose: "Orchestration visualization surface (removed).",
 		status: "experimental",
-		staticEvidence: "orchviz command exists; no evidence of a production consumer.",
+		staticEvidence: "orchviz command REMOVED 2026-07 (superseded by mk:visual-plan + the local-web primitives); it was experimental with no production consumer.",
 		runtimeEvidence: NO_RUNTIME,
 		externalConsumerRisk: "low",
 		confidence: "low",
-		transitionBehavior: "Mark experimental/opt-in; do not ship as production until a real consumer justifies it.",
-		rollback: "n/a — no removal.",
-		verification: "not verified against a consumer.",
+		transitionBehavior: "Removed; the reusable loopback primitives were extracted to src/local-web/ and the studio to mk:visual-plan.",
+		rollback: "Reintroduction is a separate product decision; Visual Plan must never depend on it.",
+		verification: "removal verified: no orchviz imports remain; full suite green.",
 		deletionThisPhase: false,
-		remainingGates: ["a real consumer would justify production status"],
+		remainingGates: ["code removed via the visual-plan plan; ledger entry retained for provenance"],
 	},
 	{
 		id: "trace-index",

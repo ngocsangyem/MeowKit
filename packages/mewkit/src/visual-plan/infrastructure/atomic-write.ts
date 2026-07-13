@@ -1,11 +1,10 @@
 /**
  * Crash-safe same-directory atomic write (Phase-1 inline copy).
  *
- * Mirrors orchviz's atomic-write contract (same-dir tmp + renameSync, atomic on
- * POSIX because tmp and target share a filesystem). Phase 2 extracts a single
- * canonical `local-web/atomic-write.ts`; until then this self-contained copy
- * keeps the visual-plan module free of any orchviz import. The tmp prefix keeps
- * orphaned temps from ever matching the `phase-NN-*.md` glob.
+ * Same-dir tmp + renameSync (atomic on POSIX because tmp and target share a
+ * filesystem). A self-contained copy local to the visual-plan module; the
+ * shared `local-web/atomic-write.ts` is the general-purpose primitive. The tmp
+ * prefix keeps orphaned temps from ever matching the `phase-NN-*.md` glob.
  */
 
 import * as crypto from "node:crypto";

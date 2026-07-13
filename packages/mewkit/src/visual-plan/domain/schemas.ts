@@ -129,7 +129,7 @@ const ConnectorSchema = z
 	.object({ id: EntityId, from: EntityId, to: EntityId, label: z.string().optional() })
 	.strict();
 
-const AnnotationSchema = z
+export const AnnotationSchema = z
 	.object({
 		id: EntityId,
 		kind: z.enum(["note", "markup"]),
@@ -188,3 +188,4 @@ export type VisualPlan = z.infer<typeof VisualPlanSchema>;
 export type Frame = z.infer<typeof FrameSchema>;
 export type CoverageState = z.infer<typeof CoverageStateSchema>;
 export type CoverageSurface = z.infer<typeof CoverageSurfaceSchema>;
+export type Annotation = z.infer<typeof AnnotationSchema>;

@@ -76,9 +76,14 @@ Gate 1. It is owned by `mk:plan-creator` (generation) + the deterministic
 - **Canonical artifact:** `{plan_dir}/visual-plan/plan.json` (schema `visual-plan/v1`)
   — coverage ledger + frames + connectors + annotations. Generated at plan-creator
   step-03 §3V; see `plan-creator/references/visual-plan-integration.md`.
-- **CLI commands** (mewkit ≥ 1.16.0): `visual-plan validate|status|approve --revision <n>|rehash <plan-dir> [--json]` (Phase 1); `edit|view|export --format html` land in Phase 4.
+- **CLI commands** (mewkit ≥ 1.16.0): `visual-plan validate|status|approve --revision <n>|rehash|export --format html|edit|view|prepare-feedback --ops <f>|apply-feedback --batch <id> [--check|--receipt <f>]|patch --op <f> <plan-dir> [--json]`.
 - **Gate 1** for a `required` plan blocks unless the artifact validates with
   `unresolved == 0` and `mewkit visual-plan approve` has recorded the reviewed revision.
+- **apply-feedback loop**: a fresh agent session applies an immutable feedback batch
+  from the Copy Command. The agent classifies each op (visual-only → CLI `patch`;
+  plan-semantic → Markdown edit + `rehash`; implementation → deferred; ambiguous →
+  ask) and records a resolution receipt; the CLI owns the stale-stop + receipt
+  write + double-apply refusal. Protocol: `references/apply-feedback-protocol.md`.
 
 This static `plan.html` render remains the **legacy / complementary** path: a quick
 shareable page (incl. `--wireframe` mockups) that does NOT replace the approved

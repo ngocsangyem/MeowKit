@@ -1,12 +1,11 @@
 /**
- * VisualPlanApp — the studio shell. Fetches the artifact, runs the deterministic
- * layout, and composes the toolbar + canvas (lanes + artboards) + coverage panel
- * + read-only inspector. Read-only in Phase 4a; editing + feedback are Phase 5.
+ * VisualPlanApp — the studio shell. Loads the artifact through the editable-plan
+ * hook (serialized save queue), runs the deterministic layout, and composes the
+ * toolbar (+ save status, sketch toggle) + canvas + coverage panel + inspector
+ * (with bounded edit controls) + feedback draft panel.
  */
 
-import { useEffect, useMemo, useState } from "react";
-import type { VisualPlan } from "../domain/artifact-types.js";
-import { fetchPlan } from "../api/client.js";
+import { useMemo, useState } from "react";
 import { layoutCanvas } from "../canvas/lane-layout.js";
 import { CanvasViewport } from "../canvas/canvas-viewport.js";
 import { LaneLayer } from "../canvas/lane-layer.js";
@@ -15,37 +14,41 @@ import { ArtboardLayer } from "../canvas/artboard-layer.js";
 import { AnnotationLayer } from "../canvas/annotation-layer.js";
 import { SketchOverlay } from "../canvas/sketch-overlay.js";
 import { CoveragePanel } from "./coverage-panel.js";
+import { FeedbackDraftPanel } from "./feedback-draft.js";
 import { FrameInspector } from "../inspector/frame-inspector.js";
+import { EditControls } from "../inspector/edit-controls.js";
+import { useEditablePlan } from "./use-editable-plan.js";
+
+const SAVE_LABEL: Record<string, string> = { clean: "saved", dirty: "editing…", saving: "saving…", stale: "stale — reload", error: "save failed" };
 
 export function VisualPlanApp() {
-	const [plan, setPlan] = useState<VisualPlan | null>(null);
-	const [error, setError] = useState<string | null>(null);
+	const { plan, error, saveState, edit } = useEditablePlan();
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [sketch, setSketch] = useState(false);
-
-	useEffect(() => {
-		fetchPlan()
-			.then((r) => setPlan(r.plan))
-			.catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
-	}, []);
 
 	const layout = useMemo(() => (plan ? layoutCanvas(plan.canvas.lanes, plan.canvas.frames) : null), [plan]);
 	const framesById = useMemo(() => new Map((plan?.canvas.frames ?? []).map((f) => [f.id, f])), [plan]);
 	const placedById = useMemo(() => new Map((layout?.frames ?? []).map((p) => [p.id, p])), [layout]);
 	const selectedFrame = selectedId ? framesById.get(selectedId) ?? null : null;
 
-	if (error) return <div className="vp-error" role="alert">Could not load the visual plan: {error}</div>;
-	if (!plan || !layout) return <div className="vp-loading">Loading visual plan…</div>;
+	// Full-screen only on the INITIAL load failure; a mid-session reload error
+	// becomes a non-blocking banner so a loaded plan is never discarded.
+	if (!plan || !layout) {
+		if (error) return <div className="vp-error" role="alert">Could not load the visual plan: {error}</div>;
+		return <div className="vp-loading">Loading visual plan…</div>;
+	}
 
 	return (
 		<div className={`vp-app${sketch ? " vp-sketch" : ""}`}>
 			<header className="vp-toolbar">
 				<span className="vp-toolbar-title">{plan.id}</span>
 				<span className="vp-toolbar-meta">rev {plan.revision}</span>
+				<span className="vp-save-status" data-state={saveState}>{SAVE_LABEL[saveState] ?? saveState}</span>
 				<button type="button" className="vp-mode-toggle" aria-pressed={sketch} onClick={() => setSketch((s) => !s)}>
 					{sketch ? "Clean" : "Sketch"}
 				</button>
 				<span className="vp-toolbar-review" data-status={plan.review.status}>{plan.review.status}</span>
+				{error ? <span className="vp-error-banner" role="alert">{error}</span> : null}
 			</header>
 			<div className="vp-body">
 				<CanvasViewport worldWidth={layout.width} worldHeight={layout.height}>
@@ -56,7 +59,11 @@ export function VisualPlanApp() {
 					<AnnotationLayer annotations={plan.canvas.annotations} placedById={placedById} />
 				</CanvasViewport>
 				<CoveragePanel plan={plan} />
-				<FrameInspector plan={plan} frame={selectedFrame} />
+				<div className="vp-side">
+					<FrameInspector plan={plan} frame={selectedFrame} />
+					{selectedFrame ? <EditControls frame={selectedFrame} lanes={plan.canvas.lanes} onEdit={edit} /> : null}
+					<FeedbackDraftPanel canPrepare={saveState === "clean"} />
+				</div>
 			</div>
 		</div>
 	);

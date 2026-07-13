@@ -10,17 +10,14 @@ Copyright the agent-flow authors
 Licensed under the Apache License, Version 2.0.
 
 Portions of the loopback HTTP server lifecycle, the static-file handler
-(including its path-traversal guard), and the cross-platform browser
-launcher were ported from agent-flow. The affected files carry an
-attribution header referencing this NOTICE:
+(including its path-traversal guard), the cross-platform browser launcher,
+and the token-estimation heuristic were ported from agent-flow. The affected
+files carry an attribution header referencing this NOTICE:
 
   - src/local-web/local-server.ts
   - src/local-web/static-handler.ts
   - src/local-web/open-browser.ts
-  - src/orchviz/server/index.ts
-  - src/orchviz/server/static-handler.ts
-  - src/orchviz/open-url.ts
-  (and related orchviz modules — see their per-file headers)
+  - src/token-estimator/index.ts
 
 A copy of the Apache License, Version 2.0 is available at:
   https://www.apache.org/licenses/LICENSE-2.0
