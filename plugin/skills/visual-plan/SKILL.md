@@ -2,12 +2,15 @@
 name: mk:visual-plan
 version: 1.2.0
 description: |
-  Use when rendering a plan directory (plan.md + phase-*.md) into ONE self-contained,
-  template-consistent plan.html a reviewer can scan in under 30 seconds. Triggers on
-  "render this plan", "visualize the plan", "make a shareable plan page", "plan.html".
-  This is the canonical owner of plan-as-HTML. NOT for plan critique or scope review
-  (see mk:plan-ceo-review / mk:validate-plan), NOT for generic code/diagram/diff
-  visuals (see mk:preview), NOT for live media generation (see mk:multimodal).
+  Use when a plan directory (plan.md + phase-*.md) needs a visual review. By DEFAULT
+  this drives the STRUCTURED visual-plan artifact (visual-plan/plan.json) via the
+  mewkit visual-plan CLI — generate if absent, validate, open the local studio
+  (view/edit), and export plan.html from the approved artifact. Pass --static for the
+  legacy prompt-only single-file plan.html template render. Triggers on "render this
+  plan", "visualize the plan", "open the plan studio", "make a shareable plan page",
+  "plan.html". This is the canonical owner of plan-as-visual-review. NOT for plan
+  critique or scope review (see mk:plan-ceo-review / mk:validate-plan), NOT for generic
+  code/diagram/diff visuals (see mk:preview), NOT for live media generation (see mk:multimodal).
 allowed-tools:
   - Read
   - Write
@@ -27,7 +30,7 @@ keywords:
   - wireframe
   - mermaid
   - builderio-blocks
-when_to_use: Use when turning a plan directory (plan.md + phase-*.md) into a single shareable, block-vocabulary-disciplined plan.html at the plan-dir root. This is the canonical owner of plan-as-HTML. NOT for generic code/diagram/diff visuals (mk:preview), NOT for plan critique (mk:plan-ceo-review), NOT for plan validation (mk:validate-plan).
+when_to_use: Use to visually review a plan directory (plan.md + phase-*.md). Default = the structured visual-plan artifact + local studio (view/edit) + export; --static = the legacy single-file plan.html template render. Canonical owner of plan-as-visual-review. NOT for generic code/diagram/diff visuals (mk:preview), NOT for plan critique (mk:plan-ceo-review), NOT for plan validation (mk:validate-plan).
 user-invocable: true
 preamble-tier: 2
 phase: on-demand
@@ -41,23 +44,49 @@ runtime: claude-code
 
 # mk:visual-plan
 
-Turns a plan (`plan.md` + `phase-*.md`) into ONE self-contained `plan.html`
-that a reviewer can scan in under 30 seconds — phases, architecture, decisions,
-risks, and files-touched, without reading prose.
+Visual review of a plan directory (`plan.md` + `phase-*.md`). Two routes, one flag:
 
-Prompt-only. No backend, no Python, no CLI change. Consistency comes from a fixed
-HTML template, one shared embedded `--wf-*` theme, and a disciplined block
-vocabulary — not from a renderer. Output is a single portable file (inline CSS/JS;
-the only external dependency is the pinned Mermaid CDN, with a `<pre>` source
-fallback when it is unreachable).
+- **Default (no flag) — Structured artifact + studio.** Drives the canonical
+  `visual-plan/plan.json` workflow via the `mewkit visual-plan` CLI: generate the
+  artifact if absent, validate it, open the local studio to review/edit, and export
+  `plan.html` from the approved artifact. This is the path UI-bearing plans are built
+  and reviewed with.
+- **`--static` — Legacy single-file HTML.** Prompt-only block-template render: one
+  self-contained `plan.html` a reviewer scans in under 30 seconds. No CLI, no studio.
 
-## Overview
+## Default Route — Structured Artifact + Studio
 
-The skill reads the plan, maps each kind of content to a fixed block, fills the
+The canonical, CLI-backed **structured** visual-plan workflow. The artifact is the
+source of truth; the deterministic `mewkit visual-plan` CLI owns validation, hashing,
+approval, studio, and export.
+
+- **Canonical artifact:** `{plan_dir}/visual-plan/plan.json` (schema `visual-plan/v1`)
+  — coverage ledger + frames + connectors + annotations. Generation contract:
+  `plan-creator/references/visual-plan-integration.md` §3.
+- **CLI commands** (mewkit ≥ 1.16.0): `visual-plan validate|status|approve --revision <n>|rehash|export --format html|edit|view|prepare-feedback --ops <f>|apply-feedback --batch <id> [--check|--receipt <f>]|patch --op <f> <plan-dir> [--json]`.
+- **Studio:** `edit` (single-editor lock) or `view` (read-only) serve a transient
+  127.0.0.1 React studio to review/edit frames, connectors, and annotations.
+- **Gate 1** (when a plan-creator run used `--html`) blocks unless the artifact
+  validates with `unresolved == 0` and `mewkit visual-plan approve` recorded the
+  reviewed revision.
+- **apply-feedback loop**: a fresh agent session applies an immutable feedback batch
+  from the Copy Command. The agent classifies each op (visual-only → CLI `patch`;
+  plan-semantic → Markdown edit + `rehash`; implementation → deferred; ambiguous →
+  ask) and records a resolution receipt; the CLI owns the stale-stop + receipt
+  write + double-apply refusal. Protocol: `references/apply-feedback-protocol.md`.
+
+## Static Route (`--static`)
+
+Prompt-only. No backend, no CLI. Consistency comes from a fixed HTML template, one
+shared embedded `--wf-*` theme, and a disciplined block vocabulary. Output is a single
+portable file (inline CSS/JS; the only external dependency is the pinned Mermaid CDN,
+with a `<pre>` source fallback when unreachable).
+
+The route reads the plan, maps each kind of content to a fixed block, fills the
 `assets/plan-template.html` skeleton with the matching block snippets, escapes all
-plan-sourced text, writes `$PLAN_DIR/plan.html`, and runs a post-generation
-self-check. The block set and the theme tokens are the contract in
-`references/block-vocabulary.md`; the quality bar is `references/plan-document-quality.md`.
+plan-sourced text, writes `$PLAN_DIR/plan.html`, and runs a post-generation self-check.
+Block/theme contract: `references/block-vocabulary.md`; quality bar:
+`references/plan-document-quality.md`.
 
 Block set (v1):
 
@@ -66,44 +95,51 @@ Block set (v1):
 - **Conditional (only if present):** data-model, api-endpoint.
 - **Flag-gated:** wireframe-screen (only with `--wireframe`).
 
-## Structured Visual Plan (v1 contracts + CLI)
-
-Alongside this prompt-only static render, there is now a CLI-backed **structured**
-visual-plan workflow — the canonical path for UI-bearing plans that must gate at
-Gate 1. It is owned by `mk:plan-creator` (generation) + the deterministic
-`mewkit visual-plan` CLI (validation/approval), not by this skill's HTML render.
-
-- **Canonical artifact:** `{plan_dir}/visual-plan/plan.json` (schema `visual-plan/v1`)
-  — coverage ledger + frames + connectors + annotations. Generated at plan-creator
-  step-03 §3V; see `plan-creator/references/visual-plan-integration.md`.
-- **CLI commands** (mewkit ≥ 1.16.0): `visual-plan validate|status|approve --revision <n>|rehash|export --format html|edit|view|prepare-feedback --ops <f>|apply-feedback --batch <id> [--check|--receipt <f>]|patch --op <f> <plan-dir> [--json]`.
-- **Gate 1** for a `required` plan blocks unless the artifact validates with
-  `unresolved == 0` and `mewkit visual-plan approve` has recorded the reviewed revision.
-- **apply-feedback loop**: a fresh agent session applies an immutable feedback batch
-  from the Copy Command. The agent classifies each op (visual-only → CLI `patch`;
-  plan-semantic → Markdown edit + `rehash`; implementation → deferred; ambiguous →
-  ask) and records a resolution receipt; the CLI owns the stale-stop + receipt
-  write + double-apply refusal. Protocol: `references/apply-feedback-protocol.md`.
-
-This static `plan.html` render remains the **legacy / complementary** path: a quick
-shareable page (incl. `--wireframe` mockups) that does NOT replace the approved
-structured artifact. Once Phase 4 ships `export --format html`, the canonical
-`plan.html` is exported FROM the approved artifact.
-
 ## When to Use
 
-- A plan is ready and someone needs a shareable page to review the phases,
-  architecture, decisions, and blast radius at a glance.
-- You want a committed, template-consistent artifact beside `plan.md`, not an
-  ad-hoc one-off render.
-- A UI-bearing plan needs screen mockups alongside its phases (`--wireframe`).
+- **Default (structured):** a plan needs a real visual review surface — generate/open
+  the structured artifact in the studio, review, and export a shareable `plan.html`
+  from the approved artifact.
+- **`--static`:** you just want a quick, committed single-file `plan.html` beside
+  `plan.md` (incl. `--wireframe` mockups), with no artifact/studio overhead.
 
-Invocation: `/mk:visual-plan <plan-dir | plan.md> [--wireframe]`
+Invocation: `/mk:visual-plan <plan-dir | plan.md> [--static] [--wireframe]`
+(`--wireframe` applies to the `--static` route.)
 
 If no argument is given, resolve the active plan from `session-state/active-plan`;
 if that is absent, ask the user for the plan directory via `AskUserQuestion`.
 
 ## Process
+
+**Route by flag first.** If `--static` is passed → run the **Static Route** steps
+below. Otherwise (default) → run the **Structured Route** immediately below.
+
+### Structured Route (default)
+
+1. **Resolve `$PLAN_DIR`.** Accept a plan directory or a `plan.md` path; derive the
+   directory. If no argument, resolve `session-state/active-plan`, else ask.
+2. **Probe the CLI.** Confirm the LOCAL `mewkit` install has the `visual-plan`
+   subcommand (never a registry-fetching `npx`; floor 1.16.0). If absent, print
+   install/upgrade instructions and stop — this route needs the CLI. (Offer `--static`
+   as the no-CLI fallback.)
+3. **Ensure the artifact.** If `$PLAN_DIR/visual-plan/plan.json` is ABSENT, generate
+   it per the generation contract in
+   `plan-creator/references/visual-plan-integration.md` §2–§3 (UI evidence inventory →
+   one frame per state, real labels, stable ids, adjacent-transition connectors,
+   `.wf-*` semantic HTML, coverage closes every state), then
+   `mewkit visual-plan rehash {plan_dir}` to stamp source hashes. If PRESENT, skip to 4.
+4. **Validate.** `mewkit visual-plan validate {plan_dir} --json`. On failure, read the
+   JSON-path errors, self-repair the offending frame/state, re-validate (bounded ~3).
+5. **Open the studio.** `mewkit visual-plan edit {plan_dir}` (or `view` for read-only).
+   The studio binds 127.0.0.1, exits with the process. Let the human review/edit.
+6. **Export (optional).** When a shareable page is wanted,
+   `mewkit visual-plan export {plan_dir} --format html` writes `plan.html` from the
+   approved artifact. Approval, patches, and the apply-feedback loop go through the CLI
+   (see the Default Route section + `references/apply-feedback-protocol.md`).
+
+The skill NEVER hand-edits `visual-plan/plan.json` — all mutations go through the CLI.
+
+### Static Route (`--static`)
 
 1. **Resolve input.** Accept a plan directory or a `plan.md` path. Derive
    `$PLAN_DIR` (the directory containing `plan.md`). `glob "$PLAN_DIR/phase-*.md"`.

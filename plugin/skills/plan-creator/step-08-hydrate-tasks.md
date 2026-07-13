@@ -12,7 +12,7 @@ Skip task hydration if:
 
 Skipping hydration skips only the TaskCreate calls (8b/8c). The §8d checkpoint
 (`.plan-state.json`, including PRESERVING the CLI-written `visual` block for
-`visual_requirement != none` plans) still runs regardless.
+`html_mode == true` plans) still runs regardless.
 
 ### 8b. Create Tasks from Phases
 
@@ -78,12 +78,12 @@ Write `{plan_dir}/.plan-state.json` for cross-session resilience:
 ```
 
 **v1.3 schema notes (additive, reader-compatible).** The `visual` block is NEW in
-v1.3 and present ONLY when `visual_requirement != none`. It is CLI-MANAGED: written
+v1.3 and present ONLY when `html_mode == true`. It is CLI-MANAGED: written
 by `mewkit visual-plan approve`/`rehash` (which do read-modify-write, preserving
 every other field). Do NOT hand-write it. Because `approve` already ran at step-07,
 this step MUST PRESERVE the existing `visual` block — read the current
 `.plan-state.json`, keep its `visual` key verbatim, and write your other fields
-around it (never clobber it). For `none` plans, omit `visual` entirely. See
+around it (never clobber it). When `html_mode == false`, omit `visual` entirely. See
 `references/visual-plan-integration.md` §8.
 
 **v1.2 fields still apply.** `verification_tier` and `consistency_sweeps_passed`

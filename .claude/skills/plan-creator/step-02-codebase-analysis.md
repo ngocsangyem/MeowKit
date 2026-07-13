@@ -35,9 +35,9 @@ Scan `tasks/plans/` for unfinished plans (status ≠ completed/cancelled):
 - Check for overlapping scope (shared files, same feature area)
 - If overlap detected: note for cross-plan dependency in step-03
 
-### 2d. UI Evidence Inventory (gated: `visual_requirement != none`)
+### 2d. UI Evidence Inventory (gated: `html_mode == true`)
 
-Skip entirely when `visual_requirement = none`. Otherwise gather a bounded,
+Skip entirely when `html_mode == false`. Otherwise gather a bounded,
 in-memory inventory of UI surfaces/states + their code evidence (routes, shells,
 component hierarchy, state sources, roles/flags, per-screen default/loading/empty/
 error/disabled/success states, secondary surfaces, reusable components/tokens,
@@ -45,14 +45,14 @@ proving tests/stories). This feeds `uiCoverage` at step-03V. Existing UI needs
 code evidence refs; net-new UI cites plan requirements (`planned`). Full checklist:
 `references/visual-plan-integration.md` §2.
 
-(Fast mode skips step-02; a fast-mode `required` plan gathers a minimal inline
-inventory at step-03V instead — most fast plans classify `none`.)
+(Fast mode skips step-02; a fast-mode `--html` plan gathers a minimal inline
+inventory at step-03V instead. Without `--html` there is no visual work at all.)
 
 ## Output
 
 - `codebase_findings` — summary of relevant architecture, patterns, conventions
 - `existing_plans` — list of plans with potential overlap (for dependency detection)
-- `ui_evidence` — bounded UI inventory when `visual_requirement != none` (else unset)
+- `ui_evidence` — bounded UI inventory when `html_mode == true` (else unset)
 - Print: `"Codebase: {N} docs read, {M} existing plans checked"`
 
 ## Next

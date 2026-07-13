@@ -39,7 +39,8 @@ mewkit visual-plan apply-feedback <plan-dir> --batch <id>     # apply a batch (-
 
 ### Improvements
 
-- `mk:plan-creator` folds a visual review into the planning workflow — a plan classified as visual routes through `validate` and a human `approve` at Gate 1 before build.
+- `mk:plan-creator` gates the structured visual pipeline behind the `--html` flag — it is opt-in and off by default, so ordinary (backend/refactor) plans stay light. With `--html`, the plan generates a visual artifact and routes through `validate` and a human `approve` at Gate 1 before build.
+- `mk:visual-plan` now defaults to the structured artifact + local studio (generate/validate/view/edit/export); the legacy single-file `plan.html` template render moves behind `--static`.
 
 ### Removals
 

@@ -24,17 +24,19 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 8. `step-07-gate.md` — Self-check + Gate 1: AskUserQuestion (Approve | Modify | Reject)
 9. `step-08-hydrate-tasks.md` — Create session tasks from phase checkboxes + critical-step sub-tasks + checkpoint file
    - **Branch:** if `html_mode = true`, read `step-08b-html-render.md` next; otherwise go to step-09.
-10. `step-08b-html-render.md` — Conditional (`html_mode` only): render the Gate-1-approved, hydrated plan to `plan.html` via `mk:visual-plan` (explicit absolute `plan_dir`). Fail-open. Chains to step-09.
+10. `step-08b-html-render.md` — Conditional (`html_mode` only): export the Gate-1-approved artifact to `plan.html` via `mewkit visual-plan export --format html` (explicit absolute `plan_dir`). Fail-open. Chains to step-09.
 11. `step-09-post-plan-handoff.md` — Deterministic mode-pruned `AskUserQuestion`: Cook | Validate | Red-team | End. Writes `handoff.next` to plan.md frontmatter, prints suggested command, STOPs.
 
-**Visual sub-steps (conditional, all modes).** step-00 §0j classifies
-`visual_requirement`. When `required`/`optional`, these gated sub-steps fire:
-step-02 §2d (UI evidence inventory) → step-03 §3V (generate `visual-plan/plan.json`)
-→ step-04 §4f (CLI capability probe + `mewkit visual-plan validate`) → step-05 §5v
-(coverage honesty challenge) → step-06 §6v (propagate + `rehash`) → step-07 §7v/§7c
-(Gate 1 visual preconditions + `mewkit visual-plan approve`) → step-08 (schema-1.3
-`visual` block, CLI-managed). `none` plans skip all of it. Detail lives in
-`references/visual-plan-integration.md` (loaded on demand).
+**Visual sub-steps (opt-in via `--html`).** The structured visual pipeline is
+**off by default** — it fires ONLY when `html_mode == true`. There is no per-plan
+visual classification; `--html` is the single switch. When on, these gated sub-steps
+run in every mode (incl. fast): step-02 §2d (UI evidence inventory) → step-03 §3V
+(generate `visual-plan/plan.json`) → step-04 §4f (CLI capability probe +
+`mewkit visual-plan validate`) → step-05 §5v (coverage honesty challenge) → step-06
+§6v (propagate + `rehash`) → step-07 §7v/§7c (Gate 1 visual preconditions +
+`mewkit visual-plan approve`) → step-08 (schema-1.3 `visual` block, CLI-managed) →
+step-08b (export `plan.html` from the approved artifact). Without `--html`, none of
+it runs. Detail lives in `references/visual-plan-integration.md` (loaded on demand).
 
 ## Variables Passed Between Steps
 
@@ -54,9 +56,8 @@ step-02 §2d (UI evidence inventory) → step-03 §3V (generate `visual-plan/pla
 | `pruning_result` | step-04 | step-05 | Summary string: "{N} items pruned/fixed" (unset in fast / product-level) |
 | `selected_approach` | step-04 | step-05, step-08 | `"a"` or `"b"` (two mode only; unset otherwise) |
 | `tdd_mode` | step-00 | step-03 | `true` or `false` (composable flag, independent of planning_mode) |
-| `html_mode` | step-00 | step-08, step-08b | `true` or `false` (composable flag, independent of planning_mode) |
-| `visual_requirement` | step-00 | step-02, step-03, step-04, step-05, step-06, step-07, step-08 | `required`, `optional`, `none` |
-| `ui_evidence` | step-02 | step-03 | Bounded UI inventory (set when `visual_requirement != none`) |
+| `html_mode` | step-00 | step-02, step-03, step-04, step-05, step-06, step-07, step-08, step-08b | `true` or `false` (composable flag; the single switch for ALL visual sub-steps) |
+| `ui_evidence` | step-02 | step-03 | Bounded UI inventory (set when `html_mode == true`) |
 | `handoff_next` | step-09 | (terminal) | `cook \| validate \| red-team \| autobuild \| end` (written to plan.md frontmatter) |
 | `consistency_sweeps_passed` | step-05, step-06 | step-07 | `{ red_team: bool, validation: bool }` — true if `unresolved = 0` |
 | `verification_tier` | step-04 | step-06 | `light`, `standard`, `full` — auto by phase count; unset when fast / product-level |
@@ -142,10 +143,10 @@ Step 8: Hydrate Tasks
     ├── Create .plan-state.json checkpoint
     └── html_mode=true → Step 8b   |   else → Step 9
          ↓
-Step 8b: HTML Render (html_mode only)
+Step 8b: HTML Export (html_mode only)
     ├── Gate-1 durable re-check (plan.md frontmatter: approved_by + validation)
-    ├── mk:visual-plan {absolute plan_dir} → {plan_dir}/plan.html
-    ├── Self-check rendered path == {plan_dir}/plan.html
+    ├── mewkit visual-plan export {absolute plan_dir} --format html → {plan_dir}/plan.html
+    ├── Self-check exported path == {plan_dir}/plan.html
     └── Fail-open: on error write .html-failed marker → Step 9 (never strands)
          ↓
 Step 9: Post-Plan Handoff

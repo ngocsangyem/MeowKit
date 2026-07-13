@@ -39,26 +39,25 @@ Single-select.
 | Modify | Minor changes needed before approval | Apply changes, re-validate, present again |
 | Reject | Requirements have fundamentally changed | Restart from step-00 with new requirements |
 
-### 7v. Visual Preconditions (gated: `visual_requirement != none`)
+### 7v. Visual Preconditions (gated: `html_mode == true`)
 
-For a `required` plan, Gate 1 additionally requires an APPROVED visual artifact:
+When `html_mode == true`, Gate 1 additionally requires an APPROVED visual artifact:
 artifact exists; schema+security valid; `uiCoverage.summary.unresolved == 0`; every
 frame complete; refs resolve; source hashes fresh; current revision reviewed; no
 pending feedback batch. Surface these in the 7a self-check. Full list:
 `references/visual-plan-integration.md` §7.
 
-- `optional` plan → may pass with the typed skip reason recorded at step-04.
-- `none` plan → no visual precondition; Gate 1 unchanged.
+- `html_mode == false` (the default) → no visual precondition; Gate 1 unchanged.
 
 ### 7c. Handle Decision
 
 **On Approve:**
 - Update Agent State in plan.md: `Approved by: human`, `Validation: approved`
-- **Visual approval (gated: `visual_requirement != none`):** run
+- **Visual approval (gated: `html_mode == true`):** run
   `mewkit visual-plan approve {plan_dir} --revision <n>` (n = artifact's current
   revision). The CLI is the single writer of `review.status`. Non-zero exit ⇒ a
   precondition failed ⇒ do NOT proceed to step-08; print the failed preconditions and
-  return to Modify. `optional` skipped-plans and `none` plans skip this call.
+  return to Modify. When `html_mode == false`, skip this call.
 - **Memory capture** (lightweight, no subagent): Append to `.claude/memory/architecture-decisions.md`:
   ```markdown
   ## Plan: {plan-dir-name} ({YYYY-MM-DD})

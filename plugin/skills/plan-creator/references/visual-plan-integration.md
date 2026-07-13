@@ -2,33 +2,32 @@
 
 Single source of truth for the visual-plan planning steps. The step files carry
 tight hooks that point here; this file holds the detail so the step files stay
-lean. Loaded ONLY when `visual_requirement != none`.
+lean. In plan-creator it is loaded ONLY when `html_mode == true`; the `mk:visual-plan`
+skill's structured route also reuses §2–§3 (the generation contract) standalone.
 
 Contract split (locked by the approved design): the SKILL owns reasoning and
-artifact generation; the deterministic `mewkit visual-plan` CLI (shipped Phase 1)
-owns validation, hashing, approval, and the `.plan-state.json` visual block. A
-prompt alone cannot guarantee schema validity — generation AND CLI validation
-run together.
+artifact generation; the deterministic `mewkit visual-plan` CLI owns validation,
+hashing, approval, and the `.plan-state.json` visual block. A prompt alone cannot
+guarantee schema validity — generation AND CLI validation run together.
 
-## 1. Classification — `visual_requirement` (Step 0)
+## 1. Activation — the `--html` flag (Step 0)
 
-Classify EVERY plan (all planning modes, including fast — Validation Session 1
-user decision) into one of three values, and record one-sentence reasons:
+The structured visual pipeline is **opt-in via `--html`** — there is NO per-plan
+classification. step-00 sets `html_mode = true` when `--html` is in the arguments;
+that boolean is the single switch for every visual sub-step below. When
+`html_mode == false` (the default), plan-creator writes NO visual metadata at all —
+no inventory, no artifact, no Gate-1 visual precondition, keeping the default plan
+path light.
 
-| Value | Activation signals | Effect |
-|-------|--------------------|--------|
-| `required` | Rendered-UI change; storyboard/flow/journey request; state-heavy flow (onboarding, auth, checkout, permissions); multiple user-visible branches | Full visual pipeline; Gate 1 blocks without an approved artifact |
-| `optional` | UI touched but trivial/single control; user may want a mockup but it is not load-bearing | Artifact encouraged; may skip with a typed reason (Step 4); legacy static flow allowed |
-| `none` | Backend-only, migration, copy-only, single trivial control, pure refactor, tooling/docs | No visual metadata written at all |
+When `html_mode == true`, treat the plan as fully visual: run the whole pipeline
+(inventory → generate → validate → approve → export) and let Gate 1 block on an
+unapproved/invalid artifact. This applies in every planning mode, including fast.
 
-Output variable `visual_requirement ∈ {required, optional, none}` plus
-`visual_reasons` (short bullet list). Do NOT reuse `html_mode` — that flag is the
-legacy static-export intent and is orthogonal.
+Rationale: an always-on classifier ran visual reasoning on every plan (including
+pure backend/refactor work). Gating on an explicit user flag removes that per-plan
+cost and makes visual planning a deliberate choice.
 
-Fast-mode note: run the rule table only (no extended interview); friction is
-accepted (Validation Session 1). `none` is the correct answer for most fast plans.
-
-## 2. UI Evidence Inventory (Step 2, gated on `visual_requirement != none`)
+## 2. UI Evidence Inventory (Step 2, gated on `html_mode == true`)
 
 Bounded, in-memory inventory → later serialized into `uiCoverage`. Capture:
 routes/screens, shells/layouts, component hierarchy, state sources, roles, feature
@@ -43,7 +42,7 @@ audit.
 
 ## 3. Generation Contract — `visual-plan/plan.json` (Step 3V)
 
-Generate for `required` (and `optional` unless skipped) AFTER the Markdown draft.
+Generate whenever `html_mode == true`, AFTER the Markdown draft.
 Write to `{plan_dir}/visual-plan/plan.json`, schema `visual-plan/v1`.
 
 Rules:
@@ -112,12 +111,10 @@ visual gating:
 2. **Version floor:** the first 1.x release shipping the Phase-1 CLI is **1.16.0**.
    The subcommand-presence check is primary (robust if the exact release number
    differs); the floor is the documented minimum.
-3. **On probe failure:**
-   - `required` plan → HARD, non-skippable BLOCK. Print install/upgrade
-     instructions (`npm i -g mewkit@latest` / update the project's mewkit). Gate 1
-     CANNOT silently skip.
-   - `optional` plan → record a typed `cli-unavailable` skip reason and fall back to
-     the legacy static HTML flow.
+3. **On probe failure:** HARD, non-skippable BLOCK — the user opted into `--html`,
+   so the visual artifact is required. Print install/upgrade instructions
+   (`npm i -g mewkit@latest` / update the project's mewkit). Gate 1 CANNOT silently
+   skip. (To plan without visuals, re-run without `--html`.)
 4. **Validate:** run `mewkit visual-plan validate {plan_dir} --json`. On failure,
    read the exact JSON-path errors and self-repair the artifact (regenerate the
    offending frame/state), then re-validate. Bounded retry (max ~3) before surfacing
@@ -138,12 +135,11 @@ omitted roles / flags / error paths that never became states.
   and the artifact.
 - Any Markdown edit in Steps 5/6 invalidates the artifact's pinned source hashes.
   After such an edit you MUST run `mewkit visual-plan rehash {plan_dir}` then
-  re-validate. **Rehash clears any prior visual approval** (red-team M1) — a stale
+  re-validate. **Rehash clears any prior visual approval** — a stale
   review cannot ride through on refreshed bytes.
 - **Step 6V (studio review):** open `mewkit visual-plan edit {plan_dir}` for
-  interactive review (Phase 4 shipped). The human transitions the decision via
-  `approve`.
-- **Reopen loop (Phase 6):** when the reviewer's studio session produces a
+  interactive review. The human transitions the decision via `approve`.
+- **Reopen loop:** when the reviewer's studio session produces a
   feedback batch (Copy Command), a fresh agent session applies it via
   `/mk:visual-plan apply-feedback` (see the visual-plan skill's
   `references/apply-feedback-protocol.md`): visual-only ops via `mewkit visual-plan
@@ -153,7 +149,7 @@ omitted roles / flags / error paths that never became states.
 
 ## 7. Gate 1 Visual Preconditions (Step 7)
 
-For a `required` plan, Gate 1 blocks unless ALL hold (these are what `approve`
+When `html_mode == true`, Gate 1 blocks unless ALL hold (these are what `approve`
 checks — the CLI is the single writer of `review.status`):
 
 - artifact exists; schema + security valid; `uiCoverage.summary.unresolved == 0`;
@@ -166,8 +162,7 @@ On human Approve, the skill runs **`mewkit visual-plan approve {plan_dir}
 --revision <n>`** (n = the artifact's current revision). Non-zero exit ⇒ a
 precondition failed ⇒ do NOT pass Gate 1; surface the failed preconditions.
 
-- `optional` plan: may pass with a typed skip reason recorded in Step 4.
-- `none` plan: no visual metadata, no visual precondition — Gate 1 unchanged.
+- `html_mode == false` (the default): no visual metadata, no visual precondition — Gate 1 unchanged.
 
 ## 8. Schema 1.3 `.plan-state.json` visual block (Step 8)
 
@@ -198,14 +193,16 @@ known keys.
 
 ## 9. Export from the approved artifact (Step 8b)
 
-Once Phase 4 ships `mewkit visual-plan export --format html`, export `plan.html`
-FROM the approved artifact (no independent prose re-inference). Interim (pre-Phase
-4): the existing `mk:visual-plan` static render is available but clearly labeled
-non-canonical, and does not replace the approved artifact.
+step-08b exports `plan.html` FROM the approved artifact via
+`mewkit visual-plan export {plan_dir} --format html` — self-contained, escaped,
+re-sanitized, no independent prose re-inference. This is the canonical `plan.html`
+for an `--html` plan. (The `mk:visual-plan` skill's legacy prompt-only static
+template render still exists behind its `--static` flag, but it is NOT part of this
+pipeline and does not replace the approved artifact.)
 
 ## Cook consumption (downstream)
 
 `mk:cook` reads the approved visual metadata and re-reads the approved frames +
 source refs before UI-bearing phases. Cook NEVER hand-edits the visual artifact or
-`.plan-state.json.visual` — mutations go through `mewkit visual-plan` (patches in
-Phase 5) or the apply-feedback loop (Phase 6).
+`.plan-state.json.visual` — mutations go through `mewkit visual-plan` (`patch`) or
+the apply-feedback loop.

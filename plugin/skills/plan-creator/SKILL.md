@@ -91,7 +91,7 @@ Skip when:
 **Composable flags:**
 
 - `--tdd` — add tests-first phase sections and preserve strict TDD in the cook handoff. See `references/tdd-mode.md`.
-- `--html` — after Gate 1 approval and task hydration, render the plan to a shareable `{plan_dir}/plan.html` via `mk:visual-plan` (step-08b). Opt-in (Mermaid CDN); markdown plan files stay source of truth. Rejected by the `archive` / `red-team` / `validate` subcommands (they produce no plan to render) — passing `--html` to a subcommand is an error.
+- `--html` — the single opt-in for the **structured visual pipeline**. When present, plan-creator generates a `visual-plan/plan.json` artifact (UI evidence → generate → validate → Gate-1 `mewkit visual-plan approve`), then step-08b exports `{plan_dir}/plan.html` from the approved artifact via `mewkit visual-plan export --format html`. Without `--html`, plan-creator does NO visual work at all (light default). Markdown plan files stay source of truth. Rejected by the `archive` / `red-team` / `validate` subcommands (they produce no plan to render) — passing `--html` to a subcommand is an error.
 
 ## Requirements Capture Contract
 

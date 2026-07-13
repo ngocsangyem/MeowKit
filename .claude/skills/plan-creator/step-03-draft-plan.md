@@ -251,9 +251,9 @@ Instead of writing plan.md and phase files directly:
 
 Print: `"Two approaches drafted. User selects at step-04 before red-team."`
 
-### 3V. Visual Artifact Generation (gated: `visual_requirement != none`)
+### 3V. Visual Artifact Generation (gated: `html_mode == true`)
 
-Skip when `visual_requirement = none`. Otherwise, AFTER the Markdown draft, generate
+Skip when `html_mode == false`. Otherwise, AFTER the Markdown draft, generate
 the coverage ledger + `{plan_dir}/visual-plan/plan.json` (schema `visual-plan/v1`)
 from `ui_evidence` (step-02; fast mode gathers a minimal inline inventory here).
 
@@ -264,12 +264,10 @@ closes every state via one mode) + a compact valid example artifact:
 `mewkit visual-plan rehash {plan_dir}` once to stamp source hashes (do NOT hand-write
 `source.planHash`/`phaseHashes`).
 
-`optional` plans may generate the artifact or defer to the typed-skip path at step-04.
-
 ## Output
 
 - `plan_dir` — absolute path to the created plan directory
-- `visual-plan/plan.json` written when `visual_requirement != none` (else no visual metadata)
+- `visual-plan/plan.json` written when `html_mode == true` (else no visual metadata)
 - Print: `"Plan: {plan_dir}/plan.md ({N} phases)"` (parallel/hard mode)
 - Print: `"Two approaches drafted. User selects at step-04 before red-team."` (two mode)
 

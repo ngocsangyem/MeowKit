@@ -1,13 +1,15 @@
-# Step 8b: HTML Render (conditional)
+# Step 8b: HTML Export (conditional)
 
-Conditional step. Runs ONLY when `html_mode = true`. Renders the approved, hydrated
-plan into a single shareable `plan.html` by delegating to `mk:visual-plan`. No new
-renderer lives here — this step only gates and delegates. Fail-open: a render failure
-never strands the session; it always proceeds to step-09.
+Conditional step. Runs ONLY when `html_mode = true` — which means the structured
+visual pipeline already ran and produced a Gate-1-approved `visual-plan/plan.json`.
+This step exports that approved artifact to a single shareable `{plan_dir}/plan.html`
+via `mewkit visual-plan export --format html` — no independent prose re-inference,
+no separate renderer. Fail-open: an export failure never strands the session; it
+always proceeds to step-09.
 
 ## Contents
 
-- This step delegates to: `mk:visual-plan` (the `plan.html` owner).
+- This step delegates to: the `mewkit visual-plan export` CLI (the canonical `plan.html`).
 - It reads the durable Gate-1 record from: `{plan_dir}/plan.md` frontmatter.
 - Next step: `step-09-post-plan-handoff.md`.
 
@@ -37,52 +39,40 @@ record that step-07 wrote to `{plan_dir}/plan.md` frontmatter:
 Never resolve the plan from `session-state/active-plan`; always use the explicit
 absolute `plan_dir` passed from step-03.
 
-### 8b-c. Delegate to mk:visual-plan
+### 8b-c. Export from the approved artifact
 
-Invoke the render with the explicit absolute plan directory:
+Export with the explicit absolute plan directory:
 
 ```
-mk:visual-plan {plan_dir}
+mewkit visual-plan export {plan_dir} --format html
 ```
 
-Pass `{plan_dir}` verbatim (absolute). This produces `{plan_dir}/plan.html`.
-
-`--html` is opt-in; the rendered page pulls Mermaid from a pinned CDN. Do not
+Pass `{plan_dir}` verbatim (absolute). This writes `{plan_dir}/plan.html` from the
+approved `visual-plan/plan.json` — self-contained, escaped, and re-sanitized. Do not
 auto-open it for the user.
 
 ### 8b-d. Self-Check (path equality)
 
-Confirm the render landed exactly where expected:
+Confirm the export landed exactly where expected:
 
 - Assert `{plan_dir}/plan.html` exists and is non-empty.
-- The rendered path MUST equal `{plan_dir}/plan.html` — not a `visuals/` subpath,
-  not the active-plan default.
+- The path MUST equal `{plan_dir}/plan.html` — not a `visuals/` subpath, not the
+  active-plan default.
 
-On success, print `✓ Rendered {plan_dir}/plan.html`.
-
-If `{plan_dir}/research/prototype-flow.json` exists, `mk:visual-plan` also writes a companion
-`{plan_dir}/prototype-flow.html` (interactive flow explorer). When present, report BOTH paths
-in the handoff so the reviewer sees the flow explorer alongside the plan.
+On success, print `✓ Exported {plan_dir}/plan.html`.
 
 ### 8b-e. Fail-Open
 
-If `mk:visual-plan` errors, times out, or `{plan_dir}/plan.html` is absent after it
+If the export command errors, times out, or `{plan_dir}/plan.html` is absent after it
 returns:
 
 - Do NOT retry in a loop and do NOT block the session.
 - Write a marker file `{plan_dir}/.html-failed` containing a one-line reason.
-- Print `HTML render failed (continuing) — see {plan_dir}/.html-failed`.
+- Print `HTML export failed (continuing) — see {plan_dir}/.html-failed`.
 - Proceed to step-09 unchanged.
 
-The handoff in step-09 is never gated on this render.
-
-### Visual-plan export (gated: `visual_requirement != none`)
-
-When the plan carries an approved visual artifact, prefer exporting `plan.html` FROM
-that artifact once Phase 4 ships `mewkit visual-plan export --format html` (no
-independent prose re-inference). Interim (pre-Phase 4): the `mk:visual-plan` static
-render above is available but is NON-CANONICAL and does not replace the approved
-artifact. See `references/visual-plan-integration.md` §9.
+The handoff in step-09 is never gated on this export. Full contract:
+`references/visual-plan-integration.md` §9.
 
 ## Output
 
