@@ -1,6 +1,6 @@
 {
   "name": "mewkit",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "description": "MeowKit CLI — scaffold, upgrade, and manage your AI agent toolkit",
   "type": "module",
   "bin": {
@@ -14,7 +14,7 @@
   "scripts": {
     "build": "npm run clean && npm run build:cli && npm run build:web",
     "clean": "node -e \"const fs=require('node:fs');fs.rmSync('dist',{recursive:true,force:true});fs.rmSync('tsconfig.tsbuildinfo',{force:true})\"",
-    "build:cli": "npx tsc",
+    "build:cli": "npx tsc && node -e \"require('node:fs').chmodSync('dist/index.js',0o755)\"",
     "build:web": "npm run build:web:visual-plan",
     "build:web:visual-plan": "npx tsc -p tsconfig.visual-plan-web.json --noEmit && npx vite build --config vite.config.visual-plan-web.ts && node scripts/check-visual-plan-bundle-budget.cjs",
     "test": "vitest run",

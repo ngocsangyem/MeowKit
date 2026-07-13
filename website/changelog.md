@@ -14,6 +14,37 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.13.6 (2026-07-13) — Local Visual Plan Review
+
+### Highlights
+
+Plans that carry UI can now be reviewed visually and locally. A plan directory gains a structured `visual-plan/plan.json` artifact — a coverage ledger plus a canvas of surface-locked wireframes, connectors, and annotations — that a deterministic CLI validates and gates, and a transient `127.0.0.1` studio renders and edits. Reviewer edits become immutable feedback batches an agent applies back through a receipted, stale-safe loop. The experimental `mewkit orchviz` visualizer is retired in favor of this workflow.
+
+### CLI
+
+- `mewkit visual-plan` — new subcommands to validate, gate, review, and edit a plan's visual artifact with no hosted service:
+
+```bash
+mewkit visual-plan validate <plan-dir>                # schema + coverage closure + refs + safe-HTML + hash freshness
+mewkit visual-plan status <plan-dir>                  # coverage summary + review status
+mewkit visual-plan approve <plan-dir> --revision <n>  # the Gate-1 transition (single writer of review.status)
+mewkit visual-plan export <plan-dir> --format html    # self-contained plan.html from the approved artifact
+mewkit visual-plan view <plan-dir>                    # read-only local studio
+mewkit visual-plan edit <plan-dir>                    # editable local studio (single-editor lock)
+mewkit visual-plan prepare-feedback <plan-dir> --ops <file>   # freeze an immutable feedback batch
+mewkit visual-plan apply-feedback <plan-dir> --batch <id>     # apply a batch (--check / --receipt)
+```
+
+- The studio binds `127.0.0.1` only, guards the Host header against DNS rebinding, serves under a strict CSP, and sanitizes wireframe HTML at both save and render; writes use optimistic concurrency via `If-Match`.
+
+### Improvements
+
+- `mk:plan-creator` folds a visual review into the planning workflow — a plan classified as visual routes through `validate` and a human `approve` at Gate 1 before build.
+
+### Removals
+
+- Removed the experimental `mewkit orchviz` visualizer and its web bundle — superseded by `mewkit visual-plan` and the reusable local-web loopback primitives it shares. No external consumers; the token-estimation heuristic it carried is preserved for `mk:context-audit`.
+
 ## 2.13.5 (2026-07-12) — Capability Discovery + Durable Task State
 
 ### Highlights
