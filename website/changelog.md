@@ -36,6 +36,7 @@ mewkit visual-plan apply-feedback <plan-dir> --batch <id>     # apply a batch (-
 ```
 
 - The studio binds `127.0.0.1` only, guards the Host header against DNS rebinding, serves under a strict CSP, and sanitizes wireframe HTML at both save and render; writes use optimistic concurrency via `If-Match`.
+- The studio renders wireframes in a hand-drawn sketch register by default — a scoped design-token theme styles the full `.wf-*` vocabulary, rough.js redraws each element outline hand-drawn, and a Clean toggle switches to crisp borders; the same theme is embedded in the exported `plan.html` so studio and export match.
 
 ### Improvements
 

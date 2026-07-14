@@ -13,6 +13,7 @@
 import { readArtifactRaw } from "../infrastructure/visual-plan-repository.js";
 import { sanitizeWireframeHtml } from "../infrastructure/wireframe-sanitizer.js";
 import { computeCoverage } from "../domain/coverage.js";
+import { WIREFRAME_THEME_CSS } from "../domain/wireframe-theme.js";
 import { VisualPlanSchema, type VisualPlan } from "../domain/schemas.js";
 
 export interface ExportResult {
@@ -31,12 +32,12 @@ function coverageSection(plan: VisualPlan): string {
 	const rows = plan.uiCoverage.surfaces
 		.flatMap((s) => s.states.map((st) => `<tr><td>${esc(s.label ?? s.id)}</td><td>${esc(st.label ?? st.id)}</td><td>${st.frameIds.length > 0 ? "framed" : st.omitted ? esc(st.omitted.reason) : "unresolved"}</td></tr>`))
 		.join("");
-	return `<h2>Coverage</h2><p class="vp-sum">${summary.resolved} resolved · ${summary.planned} planned · ${summary.omitted} omitted · ${summary.unresolved} unresolved</p><table><thead><tr><th>Surface</th><th>State</th><th>Closure</th></tr></thead><tbody>${rows}</tbody></table>`;
+	return `<h2>Coverage</h2><p class="vp-sum">${summary.resolved} resolved · ${summary.planned} planned · ${summary.omitted} omitted · ${summary.unresolved} unresolved</p><table class="vp-coverage-table"><thead><tr><th>Surface</th><th>State</th><th>Closure</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function framesSection(plan: VisualPlan): string {
 	const cards = plan.canvas.frames
-		.map((f) => `<article class="vp-frame"><header><strong>${esc(f.label)}</strong> <span class="vp-badge">${esc(f.surface)} · ${esc(f.changeMode)}</span></header><div class="wf-root">${sanitizeWireframeHtml(f.wireframe.html)}</div></article>`)
+		.map((f) => `<article class="vp-frame" data-surface="${esc(f.surface)}"><header><strong>${esc(f.label)}</strong> <span class="vp-badge">${esc(f.surface)} · ${esc(f.changeMode)}</span></header><div class="vp-frame-body"><div class="wf-root">${sanitizeWireframeHtml(f.wireframe.html)}</div></div></article>`)
 		.join("");
 	return `<h2>Frames</h2><div class="vp-frames">${cards}</div>`;
 }
@@ -47,14 +48,29 @@ function docsSection(plan: VisualPlan): string {
 	return `<h2>Mechanics</h2><ul>${items}</ul>`;
 }
 
-const STYLE = `body{font:14px/1.5 system-ui,sans-serif;margin:0;padding:24px;background:#fff;color:#1c2430}
-h1{margin:0 0 4px}h2{margin:24px 0 8px;border-bottom:1px solid #d7dbe0;padding-bottom:4px}
-table{border-collapse:collapse;width:100%}th,td{border:1px solid #d7dbe0;padding:4px 8px;text-align:left;font-size:13px}
-.vp-sum{color:#64707d}.vp-frames{display:flex;flex-wrap:wrap;gap:16px}
-.vp-frame{border:1px solid #d7dbe0;border-radius:8px;overflow:hidden;width:340px}
-.vp-frame header{padding:6px 10px;border-bottom:1px solid #d7dbe0;background:#f4f5f7}
-.vp-badge{color:#64707d;font-size:12px}.wf-root{padding:10px}.wf-root .wf-button{display:inline-block;padding:6px 12px;background:#3563e9;color:#fff;border-radius:6px;text-decoration:none}
-.wf-root .wf-input{height:30px;border:1px solid #d7dbe0;border-radius:6px;background:#eef1f4}.wf-root .wf-error{color:#c0392b}`;
+/**
+ * Page shell CSS; the wireframe look itself comes from the SHARED theme.
+ * Shell selectors are scoped (`body>h2`, `.vp-coverage-table`) so they never
+ * leak into `.wf-root` wireframe content — parity with the studio. Frame
+ * bodies are auto-height (plan content is never clipped); widths follow the
+ * surface footprint so mobile frames keep their studio aspect.
+ */
+const PAGE_STYLE = `body{font:14px/1.5 system-ui,sans-serif;margin:0;padding:24px;background:#eef0f3;color:#1c2430}
+body>h1{margin:0 0 4px}body>h2{margin:24px 0 8px;border-bottom:1px solid #d7dbe0;padding-bottom:4px}
+.vp-coverage-table{border-collapse:collapse;width:100%}
+.vp-coverage-table th,.vp-coverage-table td{border:1px solid #d7dbe0;padding:4px 8px;text-align:left;font-size:13px}
+.vp-sum{color:#64707d}.vp-frames{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.vp-frame{width:420px;max-width:100%}
+.vp-frame[data-surface="mobile"]{width:300px}
+.vp-frame[data-surface="popover"]{width:360px}
+.vp-frame header{padding:0 2px 6px;font-size:13px}
+.vp-frame-body{border:1.5px solid #d3d9e0;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(16,22,32,.06)}
+.vp-frame-body .wf-root{height:auto;min-height:120px}
+.vp-frame[data-surface="mobile"] .vp-frame-body{border-radius:30px}
+.vp-badge{color:#64707d;font-size:11px}
+@media (prefers-color-scheme: dark){body{background:#0b0e13;color:#e8edf3}body>h2{border-color:#263041}.vp-frame-body{border-color:#2c3646}}`;
+
+const STYLE = `${PAGE_STYLE}\n${WIREFRAME_THEME_CSS}`;
 
 /** Build the self-contained plan.html string from the artifact at `planDir`. */
 export function exportPlanHtml(planDir: string): ExportResult {

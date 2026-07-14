@@ -12,7 +12,7 @@ import { LaneLayer } from "../canvas/lane-layer.js";
 import { ConnectorLayer } from "../canvas/connector-layer.js";
 import { ArtboardLayer } from "../canvas/artboard-layer.js";
 import { AnnotationLayer } from "../canvas/annotation-layer.js";
-import { SketchOverlay } from "../canvas/sketch-overlay.js";
+import { WobbleFilterDefs } from "../canvas/wobble-filter.js";
 import { CoveragePanel } from "./coverage-panel.js";
 import { FeedbackDraftPanel } from "./feedback-draft.js";
 import { FrameInspector } from "../inspector/frame-inspector.js";
@@ -24,7 +24,9 @@ const SAVE_LABEL: Record<string, string> = { clean: "saved", dirty: "editing…"
 export function VisualPlanApp() {
 	const { plan, error, saveState, edit } = useEditablePlan();
 	const [selectedId, setSelectedId] = useState<string | null>(null);
-	const [sketch, setSketch] = useState(false);
+	// Sketchy (hand-drawn) is the DEFAULT register, matching agent-native; the
+	// toggle switches to the crisp clean mode.
+	const [sketch, setSketch] = useState(true);
 
 	const layout = useMemo(() => (plan ? layoutCanvas(plan.canvas.lanes, plan.canvas.frames) : null), [plan]);
 	const framesById = useMemo(() => new Map((plan?.canvas.frames ?? []).map((f) => [f.id, f])), [plan]);
@@ -39,7 +41,8 @@ export function VisualPlanApp() {
 	}
 
 	return (
-		<div className={`vp-app${sketch ? " vp-sketch" : ""}`}>
+		<div className={`vp-app${sketch ? " vp-sketch" : ""}`} data-style={sketch ? "sketchy" : "clean"}>
+			{sketch ? <WobbleFilterDefs /> : null}
 			<header className="vp-toolbar">
 				<span className="vp-toolbar-title">{plan.id}</span>
 				<span className="vp-toolbar-meta">rev {plan.revision}</span>
@@ -54,8 +57,7 @@ export function VisualPlanApp() {
 				<CanvasViewport worldWidth={layout.width} worldHeight={layout.height}>
 					<LaneLayer lanes={layout.lanes} />
 					<ConnectorLayer connectors={plan.canvas.connectors} placedById={placedById} width={layout.width} height={layout.height} />
-					<ArtboardLayer placed={layout.frames} framesById={framesById} selectedId={selectedId} onSelect={setSelectedId} />
-					{sketch ? <SketchOverlay frames={layout.frames} width={layout.width} height={layout.height} /> : null}
+					<ArtboardLayer placed={layout.frames} framesById={framesById} selectedId={selectedId} sketch={sketch} onSelect={setSelectedId} />
 					<AnnotationLayer annotations={plan.canvas.annotations} placedById={placedById} />
 				</CanvasViewport>
 				<CoveragePanel plan={plan} />

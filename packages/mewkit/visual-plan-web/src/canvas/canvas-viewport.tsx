@@ -15,6 +15,8 @@ interface Props {
 }
 
 const PAN_STEP = 80;
+/** Board line-grid cell size (world px) — scaled with zoom, shifted with pan. */
+const GRID_CELL = 28;
 
 export function CanvasViewport({ worldWidth, worldHeight, children }: Props) {
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -68,6 +70,10 @@ export function CanvasViewport({ worldWidth, worldHeight, children }: Props) {
 			tabIndex={0}
 			onWheel={onWheel}
 			onKeyDown={onKeyDown}
+			style={{
+				backgroundSize: `${GRID_CELL * vp.zoom}px ${GRID_CELL * vp.zoom}px`,
+				backgroundPosition: `${vp.panX}px ${vp.panY}px`,
+			}}
 		>
 			<div
 				className="vp-world"

@@ -10,15 +10,17 @@ import type { Surface } from "../domain/artifact-types.js";
 export interface Size {
 	width: number;
 	height: number;
+	/** Frame corner radius — device-shaped (mobile bezel round, window soft). */
+	radius: number;
 }
 
 export const SURFACE_PRESETS: Record<Surface, Size> = {
-	browser: { width: 900, height: 560 },
-	desktop: { width: 840, height: 520 },
-	mobile: { width: 300, height: 624 },
-	popover: { width: 360, height: 360 },
-	panel: { width: 420, height: 560 },
-	dialog: { width: 520, height: 420 },
+	browser: { width: 900, height: 560, radius: 14 },
+	desktop: { width: 840, height: 520, radius: 14 },
+	mobile: { width: 300, height: 624, radius: 30 },
+	popover: { width: 360, height: 360, radius: 16 },
+	panel: { width: 420, height: 560, radius: 16 },
+	dialog: { width: 520, height: 420, radius: 16 },
 };
 
 /** Footprint for a surface (defaults to browser for any unknown value). */
