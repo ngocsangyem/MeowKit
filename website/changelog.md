@@ -22,6 +22,8 @@ Plans that carry UI can now be reviewed visually and locally. A plan directory g
 
 ### CLI
 
+The `mewkit` CLI (published separately as 1.16.1) adds the surface behind this workflow:
+
 - `mewkit visual-plan` — new subcommands to validate, gate, review, and edit a plan's visual artifact with no hosted service:
 
 ```bash

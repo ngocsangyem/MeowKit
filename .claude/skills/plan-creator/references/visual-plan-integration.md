@@ -46,6 +46,7 @@ Generate whenever `html_mode == true`, AFTER the Markdown draft.
 Write to `{plan_dir}/visual-plan/plan.json`, schema `visual-plan/v1`.
 
 Rules:
+
 - **One frame per UI state.** Real labels (never "Screen 1"). Stable ids
   (`fr-<slug>`), reused across regeneration.
 - **Coverage ledger closes every state** via exactly one mode: `frameIds` (framed),
@@ -64,33 +65,60 @@ Compact valid example (minimal — real artifacts have more states):
 
 ```json
 {
-  "schemaVersion": "visual-plan/v1",
-  "id": "sample-plan",
-  "revision": 0,
-  "source": { "planPath": "plan.md", "planHash": "", "phaseHashes": {} },
-  "uiCoverage": { "surfaces": [ { "id": "s-auth", "label": "Auth", "states": [
-    { "id": "st-login", "frameIds": ["fr-login"], "sourceRefIds": ["ref-login"] },
-    { "id": "st-error", "frameIds": ["fr-error"], "sourceRefIds": [] }
-  ] } ] },
-  "canvas": {
-    "lanes": [ { "id": "lane-primary", "label": "Primary flow" } ],
-    "frames": [
-      { "id": "fr-login", "label": "Login", "surface": "browser", "laneId": "lane-primary",
-        "order": 0, "changeMode": "current", "coverageStateIds": ["st-login"],
-        "sourceRefIds": ["ref-login"],
-        "wireframe": { "format": "semantic-html",
-          "html": "<section class=\"wf-screen\"><h1>Sign in</h1><a href=\"#go\" class=\"wf-button\">Continue</a></section>" } },
-      { "id": "fr-error", "label": "Login error", "surface": "browser", "laneId": "lane-primary",
-        "order": 1, "changeMode": "target", "coverageStateIds": ["st-error"], "sourceRefIds": [],
-        "wireframe": { "format": "semantic-html",
-          "html": "<section class=\"wf-screen\"><p class=\"wf-error\">Incorrect password.</p></section>" } }
-    ],
-    "connectors": [ { "id": "c1", "from": "fr-login", "to": "fr-error", "label": "invalid" } ],
-    "annotations": [ { "id": "an1", "kind": "note", "text": "Primary CTA", "targetId": "fr-login", "placement": "top" } ]
-  },
-  "documentBlocks": [ { "id": "db1", "title": "Mechanics", "body": "Session cookie on success." } ],
-  "sourceRefs": [ { "id": "ref-login", "kind": "code", "ref": "src/auth/login.tsx" } ],
-  "review": { "status": "draft", "approvedRevision": null, "approvedAt": null, "pendingFeedbackBatchIds": [] }
+	"schemaVersion": "visual-plan/v1",
+	"id": "sample-plan",
+	"revision": 0,
+	"source": { "planPath": "plan.md", "planHash": "", "phaseHashes": {} },
+	"uiCoverage": {
+		"surfaces": [
+			{
+				"id": "s-auth",
+				"label": "Auth",
+				"states": [
+					{ "id": "st-login", "frameIds": ["fr-login"], "sourceRefIds": ["ref-login"] },
+					{ "id": "st-error", "frameIds": ["fr-error"], "sourceRefIds": [] }
+				]
+			}
+		]
+	},
+	"canvas": {
+		"lanes": [{ "id": "lane-primary", "label": "Primary flow" }],
+		"frames": [
+			{
+				"id": "fr-login",
+				"label": "Login",
+				"surface": "browser",
+				"laneId": "lane-primary",
+				"order": 0,
+				"changeMode": "current",
+				"coverageStateIds": ["st-login"],
+				"sourceRefIds": ["ref-login"],
+				"wireframe": {
+					"format": "semantic-html",
+					"html": "<section class=\"wf-screen\"><h1>Sign in</h1><a href=\"#go\" class=\"wf-button\">Continue</a></section>"
+				}
+			},
+			{
+				"id": "fr-error",
+				"label": "Login error",
+				"surface": "browser",
+				"laneId": "lane-primary",
+				"order": 1,
+				"changeMode": "target",
+				"coverageStateIds": ["st-error"],
+				"sourceRefIds": [],
+				"wireframe": {
+					"format": "semantic-html",
+					"html": "<section class=\"wf-screen\"><p class=\"wf-error\">Incorrect password.</p></section>"
+				}
+			}
+		],
+		"connectors": [{ "id": "c1", "from": "fr-login", "to": "fr-error", "label": "invalid" }],
+		"annotations": [{ "id": "an1", "kind": "note", "text": "Primary CTA", "targetId": "fr-login", "placement": "top" }]
+	},
+	"documentBlocks": [{ "id": "db1", "title": "Mechanics", "body": "Session cookie on success." }],
+	"sourceRefs": [{ "id": "ref-login", "kind": "code", "ref": "src/auth/login.tsx" }],
+	"review": { "status": "draft", "approvedRevision": null, "approvedAt": null, "pendingFeedbackBatchIds": [] }
 }
 ```
 
@@ -108,7 +136,7 @@ visual gating:
    subcommand exists (e.g. `mewkit visual-plan status <dir>` is recognized, or
    `mewkit --help` lists it). NEVER shell out to a registry-fetching `npx` — offline
    is a design guarantee.
-2. **Version floor:** the first 1.x release shipping the Phase-1 CLI is **1.16.0**.
+2. **Version floor:** the first 1.x release shipping the Phase-1 CLI is **>=1.16.0**.
    The subcommand-presence check is primary (robust if the exact release number
    differs); the floor is the documented minimum.
 3. **On probe failure:** HARD, non-skippable BLOCK — the user opted into `--html`,

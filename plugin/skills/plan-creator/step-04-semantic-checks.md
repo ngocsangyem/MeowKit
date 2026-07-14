@@ -8,26 +8,26 @@ Semantic quality checks and structural validation. Runs in all modes.
 
 Check the plan.md and fix inline if any fail:
 
-| Check | Pass | Fail (fix it) |
-|-------|------|---------------|
-| Goal is outcome | "Users can log in with OAuth" | "Implement OAuth flow" → rewrite |
-| ACs are binary | `- [ ] Login returns JWT token` | "Code is clean" → make specific |
-| Constraints non-empty | Has ≥1 constraint | Empty → add "MUST preserve existing tests" |
-| ≥1 risk identified | Risk table has entries | Empty → add at least 1 risk |
-| plan.md ≤80 lines | Under limit | Over → move detail to phase files |
+| Check                 | Pass                            | Fail (fix it)                              |
+| --------------------- | ------------------------------- | ------------------------------------------ |
+| Goal is outcome       | "Users can log in with OAuth"   | "Implement OAuth flow" → rewrite           |
+| ACs are binary        | `- [ ] Login returns JWT token` | "Code is clean" → make specific            |
+| Constraints non-empty | Has ≥1 constraint               | Empty → add "MUST preserve existing tests" |
+| ≥1 risk identified    | Risk table has entries          | Empty → add at least 1 risk                |
+| plan.md ≤80 lines     | Under limit                     | Over → move detail to phase files          |
 
 ### 4a'. Product-Level Semantic Checks (conditional: `planning_mode = product-level`)
 
 Product-level plans use a different schema (product spec, not phase plan). Run these checks instead of 4a:
 
-| Check | Pass | Fail (fix it) |
-|-------|------|---------------|
-| Product Vision populated | 3-5 sentences, ambitious | Empty / single sentence → rewrite |
-| Feature count ≥8 | `grep -c '^### [0-9]' plan.md` ≥ 8 | < 8 → expand feature set |
-| Each feature has ≥2 user stories | "As a X, I want Y, so that Z" format, 2+ per feature | Missing → add |
-| Each feature has ≥2 ACs | Binary, behavior-facing | Missing → add |
-| No forbidden patterns | POSIX greps from step-03a return zero matches | Any match → rewrite feature at user-story level |
-| Out-of-Scope populated | ≥2 anti-features with rationale | Empty → add |
+| Check                            | Pass                                                 | Fail (fix it)                                   |
+| -------------------------------- | ---------------------------------------------------- | ----------------------------------------------- |
+| Product Vision populated         | 3-5 sentences, ambitious                             | Empty / single sentence → rewrite               |
+| Feature count ≥8                 | `grep -c '^### [0-9]' plan.md` ≥ 8                   | < 8 → expand feature set                        |
+| Each feature has ≥2 user stories | "As a X, I want Y, so that Z" format, 2+ per feature | Missing → add                                   |
+| Each feature has ≥2 ACs          | Binary, behavior-facing                              | Missing → add                                   |
+| No forbidden patterns            | POSIX greps from step-03a return zero matches        | Any match → rewrite feature at user-story level |
+| Out-of-Scope populated           | ≥2 anti-features with rationale                      | Empty → add                                     |
 
 Run the dedicated product-spec validator (same script invoked at step-03a; running it twice is cheap and catches edits made between steps):
 
@@ -40,6 +40,7 @@ Must exit 0 with `PRODUCT_SPEC_COMPLETE: N features, M user stories`. Fix any re
 ### 4b. Structural Validation
 
 Run the validation script:
+
 ```bash
 .claude/skills/.venv/bin/python3 .claude/skills/plan-creator/scripts/validate-plan.py {plan_dir}/plan.md
 ```
@@ -62,15 +63,17 @@ Run 4a and 4b semantic checks on BOTH `plan-approach-a.md` and `plan-approach-b.
 
 ```json
 {
-  "questions": [{
-    "question": "Select the implementation approach to proceed with",
-    "header": "Approach Selection",
-    "options": [
-      { "label": "Approach A: {name from file}", "description": "{Goal line from plan-approach-a.md}" },
-      { "label": "Approach B: {name from file}", "description": "{Goal line from plan-approach-b.md}" }
-    ],
-    "multiSelect": false
-  }]
+	"questions": [
+		{
+			"question": "Select the implementation approach to proceed with",
+			"header": "Approach Selection",
+			"options": [
+				{ "label": "Approach A: {name from file}", "description": "{Goal line from plan-approach-a.md}" },
+				{ "label": "Approach B: {name from file}", "description": "{Goal line from plan-approach-b.md}" }
+			],
+			"multiSelect": false
+		}
+	]
 }
 ```
 
@@ -126,7 +129,7 @@ Runs whenever `html_mode == true` — including fast mode (fast skips the
 Markdown validator 4b, but a `--html` plan MUST still be probed + validated here).
 
 1. **Capability probe** — confirm the LOCAL `mewkit` install has the `visual-plan`
-   subcommand (never a registry-fetching `npx`). Version floor: **1.16.0** (first
+   subcommand (never a registry-fetching `npx`). Version floor: **>=1.16.0** (first
    release shipping the CLI); subcommand-presence is the primary check.
 2. On probe failure: HARD BLOCK with install/upgrade instructions (the user opted into
    `--html`, so Gate 1 cannot silently skip the visual artifact).
