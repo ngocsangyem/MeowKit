@@ -19,6 +19,7 @@ import { migrate } from "./commands/migrate.js";
 import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
 import { inventory } from "./commands/inventory.js";
+import { plan } from "./commands/plan.js";
 import { trace } from "./commands/trace.js";
 // NOTE: index-command is imported lazily inside its case — it pulls in `node:sqlite`
 // (experimental), so a static import would load SQLite + emit its warning on EVERY command.
@@ -55,6 +56,7 @@ ${pc.bold("Commands:")}
   ${pc.green("providers")}  Show effective provider support matrix and enforcement levels ('providers [<p>] --lifecycle' for the capability-adapter + lifecycle matrix)
   ${pc.green("visual-plan")} Visual plan contracts: validate|status|approve --revision <n>|rehash|export --format html|prepare-feedback --ops <f>|apply-feedback --batch <id> [--check|--receipt <f>]|patch --op <f>|edit|view <plan-dir> [--json]
   ${pc.green("inventory")}  List harness artifacts with governance metadata
+  ${pc.green("plan")}       Read-only plan inspection (status <plan-dir> | check <phase-file>)
   ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
   ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
   ${pc.green("query")}      Read-only aggregate queries over the derived index
@@ -311,6 +313,13 @@ async function main(): Promise<void> {
 				provider: args._[1] as string | undefined,
 				json: args.json as boolean | undefined,
 				lifecycle: args.lifecycle as boolean | undefined,
+			});
+			break;
+		case "plan":
+			await plan({
+				subcommand: args._[1] as string | undefined,
+				target: args._[2] as string | undefined,
+				json: args.json as boolean | undefined,
 			});
 			break;
 		case "inventory":

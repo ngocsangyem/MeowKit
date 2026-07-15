@@ -26,6 +26,37 @@ native plugin: claude/codex plugin install mk@meowkit (reads the tracked marketp
 
 **Key insight (plugin):** the plugin manifests carry `version` = the **root** `package.json` version. `mewkit validate --plugin` fails the build if that version drifts from the root version, or if an agent name is non-bare / a skill name is non-`mk:` / a manifest is malformed. Regenerate after any change so the committed `plugin/` stays aligned.
 
+## Version Independence — kit/plugin vs npm CLI
+
+There are **two independently versioned things** in this repo, and they are
+deliberately not synchronized:
+
+| Version field | What it versions | Today |
+| --- | --- | --- |
+| root `package.json` → `version` | The **kit**: `.claude/` content, and the generated `plugin/` + marketplace manifests that carry it | `2.13.6` |
+| `packages/mewkit/package.json` → `version` | The **npm CLI** (`mewkit`) — the installer/validator binary | `1.16.1` |
+
+The plugin manifests intentionally track the **root** version (see the Architecture
+key-insight above); `mewkit validate --plugin` fails if they drift from it. That
+is the one binding, and it exists because the plugin *is* the kit.
+
+**Do not synchronize the two version fields.** They answer different questions:
+"which harness content am I running" and "which binary installed it". A user can
+hold a new CLI against an old kit, or the reverse — that is the point of shipping
+them separately. Aligning the numbers would look tidy and would then force a CLI
+release for every prose edit, and a kit release for every CLI bugfix, which is
+how two independent things acquire one shared release cadence and stop being
+independent.
+
+Bump each **only** for its own change:
+
+- Kit content changed (`.claude/`, rules, skills, agents) → bump the **root** version, regenerate `plugin/`.
+- CLI code changed (`packages/mewkit/src/`) → bump the **CLI** version.
+- Both changed → bump both, independently, in the same release. Not to the same number.
+
+A version-field change is a release decision. Never edit one to make the other
+match, and never let tooling do it automatically.
+
 ## Version Channels
 
 | Branch | npm Tag   | GitHub Release | Example         |
