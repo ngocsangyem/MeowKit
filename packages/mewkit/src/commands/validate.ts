@@ -5,6 +5,9 @@ import { checkDocsReferences } from "../core/check-docs-references.js";
 import { collectProviderContractDiagnostics } from "../migrate/provider-contract-diagnostics.js";
 import { isHookScript } from "../core/is-hook-script.js";
 import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
+import { checkGateAuthority } from "../core/check-gate-authority.js";
+import { assertOperationsNotInvocable } from "../core/provider-operations.js";
+import { findPseudoCapabilities } from "../core/check-pseudo-capabilities.js";
 import { checkOwnership } from "../core/build-inventory.js";
 import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
@@ -33,6 +36,7 @@ export type Section =
 	| "Packs"
 	| "Plugin"
 	| "Rules"
+	| "Gates"
 	| "Capabilities";
 
 export interface CheckResult {
@@ -64,6 +68,8 @@ interface ValidateOptions {
 	mode?: ValidateMode;
 	/** Scope the run to the workflow drift-check only (used by the CI step). */
 	workflow?: boolean;
+	/** Scope the run to the gate-authority contract check only (used by CI). */
+	gates?: boolean;
 	/** Scope the run to the ownership-completeness check only (used by CI). */
 	ownership?: boolean;
 	/** Scope the run to the responsibility-substrate check only (used by CI). */
@@ -225,6 +231,44 @@ export function diagnosticToStatus(surfaceStatus: string, severity: "pass" | "wa
 	if (severity === "fail") return "fail";
 	if (severity === "warn") return "warn";
 	return "pass";
+}
+
+/**
+ * Operation-level conformance for the capability adapter.
+ *
+ * Two properties, both cheap and both load-bearing:
+ *  1. No logical operation leaked into the frontmatter-reachable invocation enum.
+ *     That enum's entire value is what it excludes, so erosion is silent and fatal.
+ *  2. No unresolved pseudo-capability aliases in the canonical tree. `build-plugin`
+ *     already refuses to ship one; surfacing it here means an author sees it at
+ *     `validate` time instead of at release time.
+ */
+function checkOperationConformance(meowkitDir: string): CheckResult[] {
+	const results: CheckResult[] = [];
+
+	const leaks = assertOperationsNotInvocable();
+	results.push({
+		name: "Logical operations stay out of the invocation enum",
+		status: leaks.length === 0 ? "pass" : "fail",
+		detail:
+			leaks.length === 0
+				? "run_shell / delegate_agent / ask_user / manage_plan are not frontmatter-reachable"
+				: leaks.join("\n         "),
+		section: "Portability",
+	});
+
+	const pseudo = findPseudoCapabilities(meowkitDir);
+	results.push({
+		name: "No unresolved pseudo-capability aliases",
+		status: pseudo.length === 0 ? "pass" : "fail",
+		detail:
+			pseudo.length === 0
+				? "0 unsubstituted operation placeholders in prose"
+				: pseudo.map((f) => `${f.file}:${f.line} "${f.found}"`).join("\n         "),
+		section: "Portability",
+	});
+
+	return results;
 }
 
 function checkPortability(): CheckResult[] {
@@ -546,6 +590,10 @@ export async function buildDefaultChecks(
 			// (prompt `mewkit upgrade`) rather than failing an un-synced install.
 			// The scoped `--workflow`/`--ownership`/`--packs` paths stay strict for CI.
 			...checkWorkflowDrift(projectRoot, { missingSpecSeverity: "warn" }),
+			// Gate-authority stays strict even in the default run: an un-synced
+			// install cannot explain a file that grants automated gate approval.
+			...checkGateAuthority(projectRoot),
+			...checkOperationConformance(meowkitDir),
 			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
 			...checkSubstrate(meowkitDir, { missingViewSeverity: "warn" }),
 			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
@@ -588,6 +636,8 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 	let results: CheckResult[];
 	if (args.workflow) {
 		results = checkWorkflowDrift(projectRoot);
+	} else if (args.gates) {
+		results = checkGateAuthority(projectRoot);
 	} else if (args.ownership) {
 		results = checkOwnership(meowkitDir);
 	} else if (args.substrate) {
@@ -623,6 +673,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		Portability: true,
 		Docs: true,
 		Workflow: true,
+		Gates: true,
 		Ownership: true,
 		Substrate: true,
 		Packs: true,

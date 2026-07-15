@@ -102,10 +102,16 @@ function walkMd(dir: string, out: string[] = []): string[] {
 	for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
 		const full = path.join(dir, entry.name);
 		if (entry.isDirectory()) {
+			// `__tests__` joins `tests` here: a docs/ path inside a test file is
+			// fixture data, not a runtime reference. The contract exists because a
+			// reference to a non-shipped docs/ path breaks in a consumer project —
+			// a fixture string is never resolved, so it cannot break anything.
+			// Kept identical to .claude/scripts/check-docs-references.py (parity).
 			if (
 				entry.name === "node_modules" ||
 				entry.name === ".venv" ||
 				entry.name === "tests" ||
+				entry.name === "__tests__" ||
 				entry.name === "__pycache__"
 			) continue;
 			walkMd(full, out);

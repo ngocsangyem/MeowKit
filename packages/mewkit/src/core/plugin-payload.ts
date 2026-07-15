@@ -27,6 +27,7 @@ import {
 } from "./plugin-manifest.js";
 import { collectAgentNames, rewriteAgentRefs } from "./plugin-agent-refs.js";
 import { buildPluginHooks, readSettingsHooks } from "./plugin-hooks.js";
+import { findPseudoCapabilities, formatPseudoCapabilityError } from "./check-pseudo-capabilities.js";
 
 /** File extensions whose contents are scanned for agent references. */
 const TEXT_EXTENSIONS = new Set([
@@ -120,6 +121,15 @@ export function generatePluginPayload(opts: GeneratePayloadOptions): GeneratePay
 			writeFileSync(file, content);
 			refsRewritten += count;
 		}
+	}
+
+	// Reject unresolved pseudo-capability aliases in the PROJECTED tree, before the
+	// manifests are written. Scanning the output (not the source) is deliberate: it
+	// catches placeholders that survived projection, including any this build step
+	// itself could introduce. A payload carrying broken instructions must not ship.
+	const pseudo = findPseudoCapabilities(opts.outDir);
+	if (pseudo.length > 0) {
+		throw new Error(formatPseudoCapabilityError(pseudo));
 	}
 
 	// Write both runtime plugin manifests into the plugin root.

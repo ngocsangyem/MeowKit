@@ -68,6 +68,9 @@ jobs:
       - name: Validate workflow spec drift
         run: node packages/mewkit/dist/index.js validate --workflow
 
+      - name: Validate gate-authority contract
+        run: node packages/mewkit/dist/index.js validate --gates
+
       - name: Validate artifact ownership metadata
         run: node packages/mewkit/dist/index.js validate --ownership
 

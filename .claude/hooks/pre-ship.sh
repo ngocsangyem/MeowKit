@@ -7,20 +7,53 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
-# Load .claude/.env (each hook is a separate subprocess)
-. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
-
-# Hook profile gating — skip pre-deploy checks in fast profile
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
-case "$MEOW_PROFILE" in
-  fast) exit 0 ;;
-esac
+# Load .claude/.env (each hook is a separate subprocess).
+# The `[ -f ]` guard is load-bearing: `.` is a POSIX special builtin, so sourcing
+# a MISSING file aborts the whole script — `2>/dev/null || true` does not catch
+# it. That would kill this hook before the Gate 2 check below ever runs, and an
+# aborted hook exits non-2, which is advisory: the ship would proceed unchecked.
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
+fi
 
 # Phase 7 (260408): JSON-on-stdin parser; prefer $HOOK_COMMAND, fall back to $1.
 if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
   . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
 fi
 COMMAND="${HOOK_COMMAND:-$1}"
+
+# ---------------------------------------------------------------------------
+# Gate 2 structural check — safety-critical: NEVER skip regardless of profile.
+# ---------------------------------------------------------------------------
+# Placed ABOVE the fast-profile early-exit ON PURPOSE. gate-rules.md: Gate 2 has
+# no exceptions, "even fast mode". A check that any profile can switch off is not
+# a gate — and `fast` is exactly the profile under which someone is most tempted
+# to ship unreviewed. The build/lint/test checks below stay profile-gated: those
+# are speed trade-offs, this is not.
+#
+# Exits 2 (hard block) rather than 1: per this repo's hook contract, exit 1 is
+# ADVISORY and the tool call proceeds — printing "BLOCKED" and shipping anyway.
+GATE2_CHECK="${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/gate2-check.sh"
+if [ -f "$GATE2_CHECK" ]; then
+  sh "$GATE2_CHECK" "$COMMAND" || exit 2
+else
+  # Missing checker = NOT a quiet pass. A broken install must not silently
+  # downgrade to "no Gate 2 enforcement" — that is indistinguishable from a
+  # passing gate at the one moment it matters. Say so out loud instead of
+  # blocking every commit on an install problem the user cannot see.
+  case "$COMMAND" in
+    *"git commit"*|*"git push"*|*"git merge"*)
+      echo "Gate 2 WARNING: $GATE2_CHECK not found — Gate 2 is NOT being enforced." >&2
+      echo "  This ship is unchecked. Reinstall or restore the hook library." >&2
+      ;;
+  esac
+fi
+
+# Hook profile gating — skip pre-deploy checks in fast profile
+MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+case "$MEOW_PROFILE" in
+  fast) exit 0 ;;
+esac
 
 # Only run pre-ship checks on git commit or push commands
 case "$COMMAND" in

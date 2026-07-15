@@ -70,13 +70,13 @@ Detect multiple features from natural language:
 | Mode        | Research | TDD        | Gate 1             | Gate 2    | Parallel  |
 | ----------- | -------- | ---------- | ------------------ | --------- | --------- |
 | interactive | Yes      | RED-strict | Human              | Human     | No        |
-| auto        | Yes      | RED-strict | Auto (validated)   | **Human** | Per phase |
+| auto        | Yes      | RED-strict | **Human**          | **Human** | Per phase |
 | fast        | Skip     | Plan-level | Human              | **Human** | No        |
 | parallel    | Optional | RED-strict | Human              | **Human** | Yes       |
 | no-test     | Yes      | Skip       | Human              | **Human** | No        |
 | code        | Skip     | RED-strict | Skip (plan exists) | **Human** | Per plan  |
 
-**Gate 2: human approval mandatory in all modes — see `.claude/rules/gate-rules.md` for the full contract.**
+**Gate 1 and Gate 2: human approval mandatory in every mode — see `.claude/rules/gate-rules.md` for the full contract.** No mode auto-approves a gate. Auto mode automates the work between gates; validator and evaluator output is evidence presented at a gate, never the approval itself. (`code` mode skips Gate 1 because the plan it executes was already approved at Gate 1 when it was created.)
 
 **TDD column:**
 

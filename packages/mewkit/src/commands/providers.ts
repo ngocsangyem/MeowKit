@@ -189,6 +189,21 @@ function printAdapterDetail(view: ProviderAdapterView): void {
 		console.log(`    ${pad(id, 16)} ${pad(tag, 12)} ${pc.dim(shape.operation)}`);
 	}
 	console.log();
+	console.log(pc.bold("  Workflow operations"));
+	for (const [op, shape] of Object.entries(view.operations)) {
+		const tag =
+			shape.support === "supported"
+				? pc.green(shape.support)
+				: shape.support === "local-fallback"
+					? pc.yellow(shape.support)
+					: shape.support === "permission-blocked"
+						? pc.red(shape.support)
+						: pc.dim(shape.support);
+		console.log(`    ${pad(op, 16)} ${pad(tag, 12)} ${pc.dim(shape.operation)}`);
+		// A fallback nobody is told about is indistinguishable from real support.
+		if (shape.fallback) console.log(`    ${pad("", 16)} ${pc.dim(`↳ fallback: ${shape.fallback}`)}`);
+	}
+	console.log();
 	console.log(pc.bold("  Lifecycle events"));
 	for (const event of LIFECYCLE_EVENTS) {
 		const s = view.lifecycle[event];

@@ -102,7 +102,10 @@ def walk_files(root: Path) -> list[Path]:
     for path in root.rglob("*"):
         if not path.is_file():
             continue
-        if any(part in {"node_modules", ".venv", "tests", "__pycache__"} for part in path.parts):
+        # `__tests__` joins `tests`: a docs/ path inside a test file is fixture
+        # data, not a runtime reference, and a fixture string never resolves.
+        # Kept identical to core/check-docs-references.ts (parity is enforced).
+        if any(part in {"node_modules", ".venv", "tests", "__tests__", "__pycache__"} for part in path.parts):
             continue
         if path.suffix in SCAN_SUFFIXES:
             out.append(path)

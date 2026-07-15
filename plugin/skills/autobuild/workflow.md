@@ -31,7 +31,7 @@ If `next_step` is unset, the agent follows the default linear progression (step-
 2. `step-02-contract.md` — Invoke `mk:sprint-contract propose → review → sign` (skipped on LEAN with small sprint OR MINIMAL)
 3. `step-03-generate.md` — Spawn `developer` subagent with the 4-subphase pattern; generator implements per signed contract
 4. `step-04-evaluate.md` — Spawn `evaluator` subagent via `mk:evaluate`; produces graded verdict
-5. `step-05-iterate-or-ship.md` — Verdict PASS → route to shipper (Phase 5 of the 7-phase model); FAIL → loop back to step-3 with feedback (max `--max-iter` rounds; escalate after)
+5. `step-05-iterate-or-ship.md` — Verdict PASS → present Gate 2 to the human, then route to shipper on approval (Phase 5 of the 7-phase model); FAIL → loop back to step-3 with feedback (max `--max-iter` rounds; escalate after)
 6. `step-06-run-report.md` — Write the final audit trail at `tasks/autobuild-runs/{run-id}/run.md`
 
 ## Variables Passed Between Steps
@@ -91,7 +91,7 @@ Step 4: Evaluate
     └── Output: tasks/reviews/{slug}-evalverdict.md + verdict (PASS|WARN|FAIL)
          ↓
 Step 5: Iterate or Ship
-    ├── PASS → route to shipper, set final_status=PASS, go to step-06
+    ├── PASS → present Gate 2 to human → on approval route to shipper, set final_status=PASS, go to step-06
     ├── WARN + iteration < max_iter → loop to step-3 with feedback
     ├── FAIL + iteration < max_iter → loop to step-3 with feedback
     ├── iteration == max_iter → escalate to human via AskUserQuestion

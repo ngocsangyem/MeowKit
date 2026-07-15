@@ -232,6 +232,7 @@ Operational gotchas live here; pre-build failure modes and rationalizations live
 
 - **Skipping mk:simplify before review**: Tests pass but code is still complex → run `/mk:simplify` between Phase 3 and Phase 4 every time, no exceptions
 - **Skipping Gate 1 on "simple" features**: Features that seem simple grow during implementation. Always create a plan file; cancel it if truly trivial
+<!-- lint-allow-gate-authority -->
 - **Auto-approve sneaking bugs past Gate 2**: "auto" means automatic execution *between* gates, NOT automatic approval. Auto mode auto-fixes but NEVER auto-approves Gate 2 — gate-rules.md says NO exceptions. The workflow evidence index must be complete before Gate 2 is presented
 - **Context loss between phases**: Long multi-phase workflows exceed the context window — the external-memory write after each completed plan phase is the load-bearing action that lets a fresh session resume the correct phase. This is a mandatory step, not a habit: see the **Per-Phase Checkpoint** in `references/workflow-steps.md` (Phase 6) — flip the phase-file checkboxes and update plan.md Agent State before any next-phase transition
 - **Parallel mode deadlocks**: Phase dependencies cause deadlock when phase-03 waits for phase-02 results. Map dependency graph before spawning parallel agents

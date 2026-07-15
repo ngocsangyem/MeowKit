@@ -7,6 +7,7 @@ import { getProjection, type ProviderProjection } from "./provider-projection.js
 import { getAcquisitionDescriptor, type AcquisitionDescriptor } from "./repo-context-adapter.js";
 import { getLifecycleMap, gatingEvents, enforcementGaps, type LifecycleMap, type LifecycleEvent, type EnforcementGap } from "./provider-lifecycle.js";
 import { getInvocationShapes, type InvocationShapeMap } from "./provider-invocation.js";
+import { getOperationShapes, type OperationShapeMap } from "./provider-operations.js";
 
 export interface ProviderAdapterView {
 	provider: string;
@@ -24,6 +25,9 @@ export interface ProviderAdapterView {
 	enforcementGaps: EnforcementGap[];
 	/** Logical invocation id → the provider-native operation shape (adapter-owned constants). */
 	invocation: InvocationShapeMap;
+	/** Logical workflow operation → its shape here. Distinct from `invocation`: these are named
+	 * in skill PROSE and are deliberately NOT frontmatter-reachable (see provider-operations.ts). */
+	operations: OperationShapeMap;
 	/** Where durable task state lives for this provider. */
 	storageBoundary: string;
 }
@@ -45,6 +49,7 @@ export function describeProvider(provider: string): ProviderAdapterView {
 		gatingEvents: gatingEvents(provider),
 		enforcementGaps: enforcementGaps(provider),
 		invocation: getInvocationShapes(provider),
+		operations: getOperationShapes(provider),
 		storageBoundary: STORAGE_BOUNDARY,
 	};
 }

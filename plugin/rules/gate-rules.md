@@ -4,6 +4,32 @@
 
 These are hard stops. No automation may bypass them. No agent may self-approve.
 
+## The Gate Authority Invariant
+
+**Automation executes BETWEEN gates. It never supplies the authority OF a gate.**
+
+Evaluator verdicts, reviewer scores, validator exit codes, evaluator "stamps", passing
+test suites, and structural pre-checks are **evidence**. Evidence is what the human reads
+at the gate. It is never a substitute for the approval the gate requires.
+
+This invariant holds in every mode, including `--auto` and `--fast`. "Auto" means the
+workflow advances between gates without prompting for each step — it does NOT mean the
+workflow approves its own gates. A PASS verdict routes to gate *presentation*; it does
+not clear the gate.
+
+Concretely, the following are all forbidden regardless of wording:
+
+- Skipping a gate prompt because a script, score, or verdict passed
+- Treating an evaluator PASS as the Gate 2 approval itself
+<!-- lint-allow-gate-authority -->
+- Any mode that "auto-approves" Gate 1 or Gate 2
+
+The two exceptions to Gate 1 below are exhaustive and are bypasses of the *gate*, not
+grants of authority to automation. Gate 2 has no exceptions at all.
+
+WHY: The moment automation can approve its own work, the gate measures whether the
+automation is confident — not whether the change is correct. Confidence is not review.
+
 ## GATE 1 — After Phase 1 (Plan)
 
 Gate 1 is formally the Phase 1→Phase 2 transition gate. In default (non-TDD) mode
@@ -64,6 +90,81 @@ None. Every change ships through Gate 2. There are no exceptions to Gate 2, rega
 - Urgency
 - Size of change
 - Who requested it
+
+## Gate 2 Applicability at Ship Boundaries
+
+Gate 2 has no exceptions — but it does have a scope. A change that ships no code has
+nothing for Gate 2 to review. That is **N/A**, and N/A is declared out loud, never
+silently skipped: a check that quietly passes is indistinguishable from a check that
+never ran.
+
+`.claude/hooks/lib/gate2-check.sh` enforces this at `git commit` / `push` / `merge`.
+
+| Change contains | Gate 2 | Enforcement |
+|---|---|---|
+| Any source, config, hook, script, or `.claude/**` file | **Required** | Structural proof or hard block (exit 2) |
+| Only `docs/**`, `tasks/reports/**`, or `*.md` outside `.claude/**` | **N/A** | Allowed, N/A stated explicitly |
+| A mix of the two | **Required** | The source file in it still ships |
+
+### Classifier
+
+Only the **no-ship** set is enumerated:
+
+- `docs/**`
+- `tasks/reports/**`
+- `*.md` — but **not** under `.claude/**`, where markdown *is* the product
+
+Everything else is ship-capable. The list is one-sided on purpose: enumerating
+ship-capable paths instead would be unportable (a consumer project's layout is not this
+repo's) and fail-open (an unrecognized path would sail through). Unknown path ⇒
+ship-capable.
+
+Any single ship-capable file makes the whole change ship-capable. A mixed change is not
+partially exempt.
+
+### Which verdict applies
+
+The verdict is resolved from the **active-plan pointer**
+(`session-state/active-plan.json` → `path` / `slug`), then
+`tasks/reviews/<YYMMDD>-<slug>-verdict.md` (or `-evalverdict.md`).
+
+Missing pointer, unresolvable slug, zero verdicts, or **more than one** matching verdict
+on a ship-capable change all **fail closed**. "Most recent verdict wins" is forbidden: it
+would let an unrelated review authorize this ship.
+
+### What the structural check proves — and does not
+
+| Proven | Not proven |
+|---|---|
+| A verdict for the active plan exists | That a human approved it |
+| It names no FAIL dimension, no security BLOCK | Which revision the human actually reviewed |
+| A present evidence index does not contradict it | That the verdict was not authored by the acting session |
+
+Every artifact the check reads is writable by the same session that produced the change,
+so a session can author all of them. **A pass means the paperwork is present and
+self-consistent — not that a human approved.** No hook output and no evidence field
+(e.g. `approvals.gate2`) may be read as approval proof. Closing this requires a
+host-authenticated approval receipt: see
+`docs/architecture/adr/260715-gate2-approval-receipt.md` (designed; not yet enforced).
+
+## Reviewer Checklist — Gate Authority (standing item)
+
+`mewkit validate --gates` mechanically rejects the KNOWN wordings that grant automated
+gate approval. It is a **floor, not the contract**: it matches a fixed pattern set, and
+any paraphrase walks straight through it.
+
+So at Gate 2, whenever a change touches `.claude/rules/`, `.claude/modes/`,
+`.claude/skills/cook/`, or `.claude/skills/autobuild/`, the reviewer MUST answer:
+
+> **Does any prose in this change grant approval authority to something that is not a
+> human — in any wording?**
+
+Look for the intent, not the phrase: a mode that "proceeds when the score is high enough",
+a step that "continues once the verdict is clean", a flag that "runs unattended through
+ship". If automation decides whether to advance past a gate, it is a violation no matter
+how it is written.
+
+A passing lint is not an answer to this question.
 
 ## Self-Check Before Gate Presentation
 

@@ -30,5 +30,7 @@ This is the recommended mode for most work. It balances quality enforcement with
 ## What's Different from Other Modes
 
 Compared to Strict: allows WARN dimensions to pass with acknowledgment (Strict requires all PASS).
-Compared to Fast: enforces both gates fully (Fast auto-approves Gate 2 if tests pass).
+Compared to Fast: both modes require human approval at both gates. Fast surfaces less
+evidence at Gate 2 — WARN findings are auto-acknowledged and only BLOCKs and test
+failures reach the human. Default surfaces every finding.
 Compared to specialized modes (Architect, Audit, Document): runs the full implementation pipeline.

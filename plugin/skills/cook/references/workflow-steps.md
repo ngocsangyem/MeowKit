@@ -90,9 +90,14 @@ Present plan summary. Use `AskUserQuestion` (header: "Gate 1"):
 - "Revise plan" → revise based on feedback, re-present
 - "Abort" → stop workflow
 
-**Auto mode:** Skip Gate 1 user prompt. validate-gate-1.sh remains **blocking** in auto mode — auto-proceed only if it passes; otherwise route back to plan-creator.
+**Auto mode:** Gate 1 is presented, exactly as in every other mode. `validate-gate-1.sh`
+remains **blocking** in auto mode — a failing check routes back to plan-creator without
+reaching the human. A passing check does NOT approve the plan; it means the plan is
+well-formed enough to present, and its result is shown as evidence above the prompt. Auto
+mode automates the path *to* Gate 1, never the approval *at* it (see
+`.claude/rules/gate-rules.md` — The Gate Authority Invariant).
 
-**Output:** `Phase 1: Plan created — [N] phases, Gate 1 [approved|auto-approved]`
+**Output:** `Phase 1: Plan created — [N] phases, Gate 1 approved by human`
 
 ## Phase 2: Test (skip if no-test mode; RED-phase enforcement only if `--tdd` / `MEOWKIT_TDD=1`)
 
