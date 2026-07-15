@@ -79,7 +79,7 @@ other devices on the network — this is intentional.
 | `--no-open` | Suppress auto-open | — |
 | `--stop` | Stop all running instances | — |
 | `--background` | Spawn detached child and exit (legacy) | false |
-| `--foreground` | Run in-process (for Claude Code background tasks) | false |
+| `--foreground` | Run in-process (for host-runtime background tasks) | false |
 
 ## Features
 

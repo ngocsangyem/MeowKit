@@ -30,7 +30,7 @@ For production changes, support gradual rollout with monitoring checkpoints and 
 - **Ship successful** (PR created, CI passing) → recommend routing to **documenter** for Phase 6
 - **Pre-ship checks fail** → recommend routing to **developer** or **tester** for fixes
 - **CI fails** → route back for fixes based on failure type
-- Always include: PR URL, branch name, commit hash, rollback doc location, CI status
+- Always include: PR URL, branch name, commit hash, rollback doc location, CI status, and deploy applicability (`deployed`, `not-applicable`, or `PR-only`)
 
 ## Required Context
 

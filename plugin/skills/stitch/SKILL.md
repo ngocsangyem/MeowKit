@@ -89,7 +89,7 @@ STITCH_QUOTA_LIMIT=400                          # Override daily credit limit
 
 ### 4. MCP (optional)
 
-See `references/stitch-mcp-setup.md` for native Stitch design context in Claude Code.
+See `references/stitch-mcp-setup.md` for native Stitch design context in the host runtime.
 
 ## Fail-Closed Gate
 

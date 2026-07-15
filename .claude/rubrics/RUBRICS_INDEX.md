@@ -1,4 +1,4 @@
-# MeowKit Rubric Library — Index
+# Toolkit Rubric Library — Index
 
 Catalog of all evaluation rubrics and composition presets used by the `evaluator` agent (via `mk:evaluate`) and the standalone `mk:rubric` skill.
 

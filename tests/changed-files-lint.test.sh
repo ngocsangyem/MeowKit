@@ -10,6 +10,7 @@
 #   4. legacy_violation     — violation only in an UNCHANGED file → exit 0 + WARN
 #   5. no_base_local_warn   — diff mode, no base, local → exit 0 (warn-only)
 #   6. no_base_ci_error     — diff mode, no base, GITHUB_ACTIONS=true → exit 1
+#   7. invalid allowlist entries fail before linting begins
 
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -79,6 +80,25 @@ rm -rf "$D"
 D="$(mktemp -d)"; stage_repo "$D"
 ( cd "$D" && env -u LINT_BASE_REF -u GITHUB_BASE_REF LINT_MODE=diff GITHUB_ACTIONS=true bash .claude/scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
 [ "$RC" = "1" ] && assert "diff mode, no base, CI env → exit 1" 1 || assert "diff mode, no base, CI env → exit 1" 0
+rm -rf "$D"
+
+# ---- Cases 7–9: invalid allowlist entries → exit 1 ----
+D="$(mktemp -d)"; stage_repo "$D"
+( cd "$D" && printf '.claude/clean.md\n' > .claude/.brand-allowlist.txt \
+    && bash .claude/scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
+[ "$RC" = "1" ] && assert "allowlist entry without reason → exit 1" 1 || assert "allowlist entry without reason → exit 1" 0
+rm -rf "$D"
+
+D="$(mktemp -d)"; stage_repo "$D"
+( cd "$D" && printf 'plugin/clean.md # wrong root\n' > .claude/.brand-allowlist.txt \
+    && bash .claude/scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
+[ "$RC" = "1" ] && assert "allowlist entry outside .claude → exit 1" 1 || assert "allowlist entry outside .claude → exit 1" 0
+rm -rf "$D"
+
+D="$(mktemp -d)"; stage_repo "$D"
+( cd "$D" && printf '.claude/**/*.md # broad exclusion\n' > .claude/.brand-allowlist.txt \
+    && bash .claude/scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
+[ "$RC" = "1" ] && assert "allowlist glob entry → exit 1" 1 || assert "allowlist glob entry → exit 1" 0
 rm -rf "$D"
 
 echo

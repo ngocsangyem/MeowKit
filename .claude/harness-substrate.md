@@ -3,7 +3,7 @@
 
 # Harness Responsibility Substrate
 
-Coverage of each vendor-neutral substrate responsibility, generated from the harness registry + artifact frontmatter. Eleven core values are the Runtime-Substrate taxonomy (repo-harness synthesis, Runtime-Substrate-rooted); `Gate enforcement` is the MeowKit-specific addition.
+Coverage of each vendor-neutral substrate responsibility, generated from the harness registry + artifact frontmatter. Eleven core values are the Runtime-Substrate taxonomy (repo-harness synthesis, Runtime-Substrate-rooted); `Gate enforcement` is the toolkit-specific addition.
 
 | Responsibility | Coverage | Tagged | Active | Examples |
 | -------------- | -------- | -----: | -----: | -------- |
@@ -22,4 +22,3 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 
 **Coverage:** 12/12 responsibilities have active artifacts.
 **Untagged:** 0 registry + 159 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).
-

@@ -107,7 +107,7 @@ Expected exit codes:
 
 ## Updating the allowlist
 
-`meowkit/.claude/.brand-allowlist.txt` accepts one glob per line. Add a file only when it is genuinely toolkit-internal navigation (index headers, archived state, research-only references). Hard ceiling: 30 entries. Above that, the lint stops paying for itself — fix the source instead.
+`meowkit/.claude/.brand-allowlist.txt` accepts one exact `.claude/`-rooted path followed by `# reason` per line; globs are rejected. Add a file only when it is genuinely toolkit-internal navigation, provider-specific host instructions, or research-only attribution. Hard ceiling: 30 entries. Above that, the lint stops paying for itself — fix the source instead.
 
 ## Related
 

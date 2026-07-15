@@ -50,6 +50,12 @@ def load_allowlist(path: str) -> list[str]:
         line = raw.strip()
         if not line or line.startswith("#"):
             continue
+        # Allow a reason comment after a full-path pattern. The lint consumes
+        # only the pattern; a separate format guard enforces that the reason is
+        # present and that the pattern is not dangerously broad.
+        line = line.split("#", 1)[0].strip()
+        if not line:
+            continue
         patterns.append(line)
     return patterns
 

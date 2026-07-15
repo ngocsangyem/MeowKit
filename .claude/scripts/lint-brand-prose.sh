@@ -41,6 +41,30 @@ if ! command -v python3 >/dev/null 2>&1; then
   exit 2
 fi
 
+validate_allowlist() {
+  [ -f "$ALLOWLIST" ] || {
+    echo "lint-brand-prose: $ALLOWLIST is required." >&2
+    return 1
+  }
+
+  local line number=0 pattern
+  while IFS= read -r line || [ -n "$line" ]; do
+    number=$((number + 1))
+    [[ "$line" =~ ^[[:space:]]*$ || "$line" =~ ^[[:space:]]*# ]] && continue
+    if [[ ! "$line" =~ ^\.claude/.+[[:space:]]+\#[[:space:]]+.+$ ]]; then
+      echo "lint-brand-prose: invalid allowlist entry at $ALLOWLIST:$number; use '.claude/path.md # reason'." >&2
+      return 1
+    fi
+    pattern="${line%%[[:space:]]#*}"
+    if [[ "$pattern" == *"*"* || "$pattern" == *"?"* || "$pattern" == *"["* ]]; then
+      echo "lint-brand-prose: allowlist entry at $ALLOWLIST:$number must be an exact full path, not a glob." >&2
+      return 1
+    fi
+  done < "$ALLOWLIST"
+}
+
+validate_allowlist
+
 run_full() {
   # Original behavior — positional args only, never --files.
   local hits

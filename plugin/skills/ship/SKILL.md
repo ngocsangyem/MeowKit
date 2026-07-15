@@ -85,6 +85,16 @@ Shipping requires an approved plan or review verdict:
 
 Skip: Hotfixes explicitly approved by human via PR comment.
 
+## Deploy Applicability
+
+Classify the result before the final summary. This records what the ship workflow actually did; it does not imply a deployment step that the repository lacks.
+
+- `deployed` — a production or preview deployment was intentionally performed and its result was verified.
+- `PR-only` — a branch and pull request were created, but deployment is deferred to CI, platform automation, or a later approval.
+- `not-applicable` — the repository has no deployment target for this change (for example, documentation, configuration, or a library-only release).
+
+Report exactly one classification and one short evidence line in the final summary.
+
 ## Workflow
 
 **Pre-ship** — Initialize session, detect base branch (official → main, beta → dev), verify on feature branch, check review readiness dashboard. If `--dry-run`: output plan and stop. Verify distribution pipeline for new standalone artifacts. Fetch/merge base branch, bootstrap test framework if missing. Run test suites and triage failures (in-branch vs pre-existing — skip if `--skip-tests`). Run evals if prompt-related files changed. Trace coverage, write missing tests. Cross-reference plan items against diff; if plan has a verification section, remind the user to run `/mk:qa` post-deploy. See `references/pre-flight.md`, `references/distribution-pipeline.md`, `references/merge-and-test-bootstrap.md`, `references/test-execution.md`, `references/eval-suites.md`, `references/test-coverage-audit.md`, `references/plan-completion-audit.md`
@@ -111,6 +121,7 @@ After pipeline completes, output this summary:
 ✓ Committed: {conventional commit message}
 ✓ Pushed: origin/{branch}
 ✓ PR: {URL} (linked: {#issues})
+✓ Deploy: {deployed|PR-only|not-applicable} — {evidence}
 ```
 
 ## When to Stop (blocking)

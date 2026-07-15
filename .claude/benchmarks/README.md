@@ -1,4 +1,4 @@
-# MeowKit Benchmark Suite
+# Toolkit Benchmark Suite
 
 Canary tasks that measure the harness's ground-truth performance. Backs the dead-weight audit (per `.claude/rules/dead-weight-audit-rules.md`) with empirical signal.
 

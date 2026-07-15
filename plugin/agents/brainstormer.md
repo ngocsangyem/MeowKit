@@ -42,7 +42,7 @@ Load before brainstorming:
 - Task description and user's initial framing of the problem
 - Existing codebase structure (via Glob — understand what exists before proposing)
 - `docs/architecture/`: existing ADRs that constrain the solution space
-- `.claude/memory/architecture-decisions.md`: past decisions relevant to this domain
+- `.claude/memory/architecture-decisions.json`: canonical past decisions relevant to this domain; use the generated `.md` view only when it improves readability
 
 ## What You Do NOT Do
 
