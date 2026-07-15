@@ -54,13 +54,7 @@ After every successful operation, return:
 3. One-line summary of what changed
 4. One suggested next action (e.g. "transition to In Progress with `mk:jira-lifecycle`")
 
-End every response with this status block:
-
-```
-**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-**Summary:** [1–2 sentence summary]
-**Concerns/Blockers:** [if applicable]
-```
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Failure Handling (jira-as exit codes → user message)
 

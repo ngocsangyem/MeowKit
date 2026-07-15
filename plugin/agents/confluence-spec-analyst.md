@@ -165,13 +165,7 @@ After successful run, return to the user:
 3. One-line headline (e.g. `"Spec is mostly complete — 3 gaps in the SLA section need clarification"`)
 4. Suggested next action (e.g. "Run `mk:planning-engine plan --tickets ... --spec <report-path>` once tickets are scoped")
 
-End every response with this status block:
-
-```
-**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-**Summary:** [1–2 sentence summary]
-**Concerns/Blockers:** [if applicable]
-```
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Failure Handling
 

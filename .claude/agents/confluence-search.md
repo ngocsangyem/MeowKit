@@ -76,13 +76,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: result count + projected page list (id + title + space + last-modified). For export, return: file path + record count.
 
-End with this status block:
-
-```
-**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-**Summary:** [1–2 sentence summary]
-**Concerns/Blockers:** [if applicable]
-```
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Gotchas
 

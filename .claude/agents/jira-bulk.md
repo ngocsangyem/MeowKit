@@ -85,7 +85,7 @@ For dry-run: return: impacted-count + sample 5 issues + full `would_*` JSON for 
 
 For exec: return: issues-changed-count + first 5 + last 5 + URL to JQL search reflecting the change.
 
-End with this status block.
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Gotchas
 

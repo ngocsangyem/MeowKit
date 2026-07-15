@@ -59,7 +59,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: sprint ID + sprint name + issue count + URL. For epic ops, return: epic key + child issue count.
 
-End with this status block.
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Gotchas
 

@@ -89,13 +89,7 @@ For dry-run: return: impacted-count + first 5 affected page titles + the exact c
 
 For exec: return: pages-changed-count + first 5 + last 5 + URL to the CQL search reflecting the change.
 
-End with this status block:
-
-```
-**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-**Summary:** [1–2 sentence summary]
-**Concerns/Blockers:** [if applicable]
-```
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Gotchas
 

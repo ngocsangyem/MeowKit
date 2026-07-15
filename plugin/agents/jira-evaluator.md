@@ -154,13 +154,7 @@ Persist the evaluation to `tasks/reports/jira-evaluate-{YYMMDD}-{HHMM}-{ISSUE-KE
 
 Naming uses the absolute date stamp (per memory rules: convert relative dates to absolute). Filename slug: `{YY}{MM}{DD}-{HH}{MM}` (e.g. `YYMMDD-HHMM`).
 
-End with this status block:
-
-```
-**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-**Summary:** [1-2 sentence summary]
-**Concerns/Blockers:** [if applicable]
-```
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Memory
 

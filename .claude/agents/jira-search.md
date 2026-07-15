@@ -71,7 +71,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: result count + projected issue list (key + summary + status). For bulk-update, return: dry-run summary + impacted-count + suggested confirmation command.
 
-End with this status block.
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Gotchas
 

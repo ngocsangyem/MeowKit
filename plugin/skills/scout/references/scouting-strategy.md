@@ -112,10 +112,9 @@ For each segment, spawn:
     ## Unresolved Questions
     - What you could not establish, and why. Empty is fine.
 
-    **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-    **Summary:** [1-2 sentences]
-    **Concerns/Blockers:** [if applicable]
 ```
+
+Append the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1) after the report template.
 
 **Important:**
 
@@ -136,8 +135,8 @@ that reason. See the `explore executor` entry in
 `.claude/memory/dead-weight-registry.md`.
 
 **On non-Claude providers** (no typed subagent spawn — see
-`provider-operations.ts`, where `delegate_agent` is not `supported` outside
-Claude Code): there is no Explore to spawn. Fall back to scanning sequentially in
+`provider-operations.ts`, where `delegate_agent` is not `supported` outside the
+Claude host runtime): there is no Explore to spawn. Fall back to scanning sequentially in
 the main context, and **say so in the scout output**:
 
 ```

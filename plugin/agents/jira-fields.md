@@ -57,7 +57,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: field ID + name + type + scope (global vs project) + sample usage in a `jira-as issue create --custom-fields '{...}'` invocation.
 
-End with this status block.
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Gotchas
 

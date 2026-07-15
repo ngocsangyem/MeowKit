@@ -51,7 +51,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: issue key + new total logged + remaining estimate + URL.
 
-End with this status block.
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Gotchas
 

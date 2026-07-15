@@ -125,7 +125,7 @@ AWS / GitHub / GitLab / Slack), JWT, Bearer tokens, DB URLs, generic
 
 NEVER write paste-body content, raw story descriptions, comment text, or token values to memory.
 
-End with this status block:
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Gotchas
 

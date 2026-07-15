@@ -165,7 +165,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships li
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate comment add {ISSUE-KEY} --body "<media findings summary>"
 ```
 
-End every report with this status block.
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
 ## Report Persistence
 
