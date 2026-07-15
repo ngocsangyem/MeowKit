@@ -88,6 +88,7 @@ Delegation prompts are expected to include:
 - CI validates `.claude` → `docs/*` references via the allowlist contract.
 - The contract is defined in `.claude/rules/docs-reference-contract.md`.
 - CI runs internal doc reference unit tests.
+- The allowlist covers target-project documentation, including UI specifications (`docs/ui-specs/`) and a supported recording output (`docs/how-to-login.webm`). Consumers must continue gracefully when an allowed target-project doc is absent.
 
 ### Docs build pipeline
 

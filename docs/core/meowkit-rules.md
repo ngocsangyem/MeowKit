@@ -215,6 +215,8 @@ Gate 2: after Phase 4 (human approval required, NO EXCEPTIONS)
 
 **Rule:** Never use a 5-phase model. If you see one, fix it. The workflow-orchestrator was migrated from 5-phase to 7-phase in the audit.
 
+`mk:cook` reports the completed review after Gate 2, then stops for user direction. It enters Phase 5 only after an explicit ship request, and Phase 6 only after an explicit close/reflect request.
+
 ---
 
 ## 7. Memory System
@@ -281,6 +283,10 @@ Missing `category`/`severity`/`applicable_when` are allowed for backward compati
 - Every referenced file MUST exist. grep for paths before merging.
 - Use `mk:` prefix in skill names. Never use `ck:` prefix (that's ClaudeKit).
 - Reference paths must use full `.claude/skills/*/references/*` form, not short `domain/file.md` form.
+- Match instruction precision and deterministic gates to the step's risk. Do not require fixed reporting, memory, or ideation ceremony for trivial work.
+- Keep generic skill bodies, references, and templates portable. Provider-specific tools, models, limits, and style steering belong in a provider adapter or projection.
+- When a caller and a supported command disagree, migrate the caller to the supported contract; do not invent an unimplemented flag. Use `tasks/reports/` for canonical reports paths.
+- Brand-prose checks block violations in changed files; untouched legacy violations remain warnings until a separately approved clean-baseline change.
 
 ---
 

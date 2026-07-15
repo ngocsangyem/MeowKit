@@ -160,6 +160,8 @@ Pick from Doc B's 9 categories. If your skill straddles multiple, split it. Cros
 - **Don't railroad** open-ended tasks with step-by-step commands.
 - **Provide a default with escape hatch** when listing tool/library choices.
 - **Examples pattern** for style-sensitive output (input/output pairs).
+- Match exact controls and deterministic gates to fragile, destructive, security-sensitive, or otherwise deterministic work. For judgment work, state the outcome without adding ceremony such as finding quotas or mandatory reports.
+- Keep generic skill bodies, references, and templates portable. Put provider tool names, model details, context limits, and provider-specific style steering in an adapter or projection rather than the generic core.
 
 ### 5.5 Filesystem layout
 
@@ -190,6 +192,8 @@ mk:my-skill/
 - Validator → fix → repeat loop for quality-critical output.
 - Conditional workflows ("creating new? → ... editing existing? → ...") for branching.
 - Push very long workflows into separate files; SKILL.md routes to them.
+- Do not invent flags to bridge a caller/command mismatch; migrate callers to the supported contract. Keep reports at `tasks/reports/`.
+- A workflow that includes shipping must make it an explicit, human-approved follow-up after the review gate; report completion and stop until that direction is given.
 
 ### 5.8 Setup, memory, hooks
 
@@ -248,6 +252,9 @@ Adapted from Doc A's checklist + Doc B's lessons:
 - [ ] Decided: checked-in vs marketplace
 - [ ] Usage measurement plan (PreToolUse hook) if go-to-market
 - [ ] Composition: declared which other skills it references by name
+- [ ] Generic core contains no provider-specific tool/model/limit prose or provider-specific style bans
+- [ ] Any workflow shipping step is explicit and user-approved after review
+- [ ] `docs/*` references use the target-project allowlist; missing target docs degrade gracefully
 
 ---
 

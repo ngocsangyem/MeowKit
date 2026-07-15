@@ -30,6 +30,8 @@ docs/modules.md
 docs/setup.md
 docs/cost-report.md
 docs/design-guidelines.md
+docs/ui-specs/
+docs/how-to-login.webm
 docs/architecture/
 docs/architecture/adr/
 docs/architecture/system-architecture.md

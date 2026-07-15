@@ -1,6 +1,6 @@
 ---
 name: mk:cook
-description: 'Orchestrates single-task implementation pipeline: plan → test → build → review → ship. Use for feature work, plan execution, or fixes scoped to a single task. NOT for green-field product builds (see mk:autobuild); NOT for auto-invoked workflow orchestration (see mk:workflow-orchestrator).'
+description: 'Orchestrates single-task implementation pipeline: plan → test → build → review. Shipping is an explicit follow-up. Use for feature work, plan execution, or fixes scoped to a single task. NOT for green-field product builds (see mk:autobuild); NOT for auto-invoked workflow orchestration (see mk:workflow-orchestrator).'
 source: local
 version: 1.0.0
 argument-hint: '[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict]'
@@ -11,7 +11,7 @@ keywords:
   - feature-build
   - seven-phase
   - single-task
-when_to_use: Use when implementing a single task end-to-end (plan→test→build→review→ship). NOT for green-field product builds (see mk:autobuild) or auto-invoked workflow orchestration (see mk:workflow-orchestrator).
+when_to_use: Use when implementing a single task through review (plan→test→build→review); invoke shipping separately after explicit user direction. NOT for green-field product builds (see mk:autobuild) or auto-invoked workflow orchestration (see mk:workflow-orchestrator).
 user-invocable: true
 owner: lifecycle
 criticality: critical
@@ -118,13 +118,16 @@ flowchart TD
     G2 -->|approved| BV{--verify or --strict?}
     BV -->|"--verify"| P45A["Phase 4.5 --verify advisory"]
     BV -->|"--strict"| P45B["Phase 4.5 --strict blocking"]
-    BV -->|neither| H[Phase 5: Ship]
-    P45A --> H
+    BV -->|neither| SR[Report completion]
+    P45A --> SR
     P45B --> BG{evaluator FAIL?}
-    BG -->|no| H
+    BG -->|no| SR
     BG -->|yes| F
     G2 -->|rejected| F
-    H --> I[Phase 6: Reflect]
+    SR --> STOP[Stop and await user direction]
+    STOP -->|explicit ship request| H[Phase 5: Ship]
+    STOP -->|explicit close request| I[Phase 6: Reflect]
+    H --> I
 ```
 
 **This diagram is authoritative.** If prose conflicts, follow the diagram.
@@ -188,7 +191,7 @@ Gate 1 routing, parallelism, and full per-phase progression live in `references/
 | 4.5 Verify    | `evaluator` via `mk:evaluate`   | Only if `--strict` flag or auto-triggered     |
 
 Concrete subagent name and HTTP tool depend on installed skill set; cook treats both as interfaces, not specific implementations.
-| 5 Ship        | `shipper` via `mk:ship`         | **MUST** spawn — runs full pre-ship pipeline (`git-manager` invoked inside shipper for commit + PR) |
+| 5 Ship        | `shipper` via `mk:ship`         | Only after an explicit ship request — runs full pre-ship pipeline (`git-manager` invoked inside shipper for commit + PR) |
 | 6 Reflect     | `analyst`                       | **MUST** spawn — cost + pattern analysis |
 | 6 Reflect     | `documenter`                      | **MUST** spawn — sync-back + docs        |
 | 6 Reflect     | `mk:memory` session-capture     | **MUST** spawn — 3-category learning extraction |
@@ -213,7 +216,7 @@ If `mk:verify` FAILS after simplify: send back to developer to fix, then re-run 
 
 ## Status Report (Post-Gate 2)
 
-After Gate 2 verdict PASS and before Phase 5 ship, delegate to `project-manager` per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Do not block on PM — continue to ship. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
+After a Gate 2 verdict PASS, delegate to `project-manager` per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Stop after reporting completion; invoke `mk:ship` only when the user explicitly requests shipping. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
 
 ## Durable Task State (when an active task record exists)
 

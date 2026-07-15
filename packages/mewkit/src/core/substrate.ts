@@ -10,8 +10,8 @@ import type { Status } from "../commands/doctor-checks.js";
 // would lie about state. A committed view (.claude/harness-substrate.md) is regenerated via
 // `inventory --substrate --emit` and drift-checked by `validate`.
 
-/** Canonical taxonomy: 11 vendor-neutral responsibilities + 1 MeowKit-specific. Order is the
- *  display order; `core` marks the 11 Runtime-Substrate values vs the kit-specific addition. */
+/** Canonical taxonomy: 11 vendor-neutral responsibilities plus one kit-specific addition. Order
+ *  is display order; `core` marks the 11 Runtime-Substrate values versus that addition. */
 export const TAXONOMY: { value: string; label: string; core: boolean }[] = [
 	{ value: "task-specification", label: "Task specification", core: true },
 	{ value: "context-selection", label: "Context selection", core: true },
@@ -135,7 +135,7 @@ export function renderSubstrateView(agg: SubstrateAggregate): string {
 	lines.push(
 		"Coverage of each vendor-neutral substrate responsibility, generated from the harness registry " +
 			"+ artifact frontmatter. Eleven core values are the Runtime-Substrate taxonomy (repo-harness " +
-			"synthesis, Runtime-Substrate-rooted); `Gate enforcement` is the MeowKit-specific addition.",
+			"synthesis, Runtime-Substrate-rooted); `Gate enforcement` is the kit-specific addition.",
 	);
 	lines.push("");
 	lines.push("| Responsibility | Coverage | Tagged | Active | Examples |");
@@ -154,7 +154,6 @@ export function renderSubstrateView(agg: SubstrateAggregate): string {
 		`**Untagged:** ${agg.untaggedRegistry.length} registry + ${agg.untaggedFrontmatter.length} frontmatter ` +
 			`artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).`,
 	);
-	lines.push("");
 	return lines.join("\n");
 }
 

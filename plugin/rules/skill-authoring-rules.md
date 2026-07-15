@@ -160,10 +160,57 @@ Kit-internal docs (any path under a `docs/` tree that lives only in the source k
 
 **ENFORCEMENT:** Mechanically checked by the kit's `validate` command and by `.claude/scripts/check-docs-references.py` in CI. Both parse the allowlist from the `<!-- ALLOWLIST-START -->` block in `docs-reference-contract.md` (single source of truth).
 
+## Rule 6: Match Control to Risk
+
+Use exact, low-freedom instructions and deterministic gates only for fragile,
+destructive, security-sensitive, or otherwise deterministic steps. For judgment
+tasks, define the outcome and leave the method proportionate to the risk.
+
+Do not require finding quotas, reports, memory writes, wiki updates, or a fixed
+number of ideas for trivial runs. Those requirements create ceremony without
+making the result safer or more reliable.
+
+## Rule 7: Keep Generic Content Portable
+
+Generic skill bodies, references, and templates must use portable capability
+language. Provider tool names, model names or IDs, context-window constants,
+and model-specific style bans belong in adapter metadata or a provider-specific
+projection, never in the generic core.
+
+The toolkit name may appear only in a literal namespace or CLI token in code
+or a command example. It must not appear in narrative prose, including
+frontmatter descriptions and routing text, in generic skill bodies, references,
+or templates. Use “the toolkit” or “the harness” instead.
+
+Style or taste denylists do not belong in the generic core. Describe the
+undesired outcome and use a divergence technique or a provider adapter where a
+specific model needs additional steering.
+
+## Rule 8: Preserve Contracted Workflow Choices
+
+When repairing a caller/command mismatch, migrate callers to the supported
+contract instead of inventing an unimplemented flag. New flags require an
+explicit owner decision and a complete implementation.
+
+The canonical reports location is `tasks/reports/`; migrate legacy report-path
+references rather than preserving both locations. Host-level tool mapping is
+unverified, so a provider projection must remain conditional until the target
+host contract has been verified.
+
+The default cook workflow stops before shipping. Shipping remains an explicit,
+human-approved action. A plan Insert or Split requires Gate 1 re-approval;
+Skip or Reorder must notify the user and leave an audit-log entry.
+
+## Rule 9: Enforce Brand Prose Incrementally
+
+Brand-prose lint remains diff-mode blocking: violations in changed files fail,
+while pre-existing untouched violations remain warnings. Revisit full-tree
+blocking only after a separately approved CI scope change and a clean baseline.
+
 ## Applies to
 
 - `mk:skill-creator` (must enforce Rules 1 + 3 + 4 + 5 in templates)
-- All future skill authoring (all 5 rules)
+- All future skill authoring (all 9 rules)
 - Quarterly audits and model-upgrade audits (Rule 3 measurable check)
 - Skill maintenance for any skill with persistent state (Rule 2)
 - Every PR that touches `.claude/` (Rule 5 mechanical check in CI)

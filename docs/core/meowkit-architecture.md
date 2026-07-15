@@ -190,7 +190,7 @@ flowchart TD
     SR -->|calls| PLANC
     PLANC -->|calls| COOK
     COOK -->|calls| REV
-    REV -->|calls| SHIP
+    REV -->|reports completion; explicit user request| SHIP
     H -->|calls| SC_P
     H -->|calls| EVAL
     EVAL -->|calls| RUB

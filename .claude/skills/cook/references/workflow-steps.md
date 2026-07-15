@@ -19,8 +19,8 @@ All modes share these phases with mode-specific variations.
 - [Phase 4.5: Verify (Browser) — only if `--verify` or `--strict` flag](#phase-45-verify-browser-only-if---verify-or---strict-flag)
   - [--verify [LIGHT]: Light Browser Check](#verify-light-light-browser-check)
   - [--strict [HEAVY]: Full Evaluator (mk:evaluate)](#strict-heavy-full-evaluator-meowevaluate)
-- [Phase 5: Ship (after Gate 2 approval)](#phase-5-ship-after-gate-2-approval)
-- [Phase 6: Reflect (MANDATORY — never skip)](#phase-6-reflect-mandatory-never-skip)
+- [Phase 5: Ship (explicit request only)](#phase-5-ship-explicit-request-only)
+- [Phase 6: Reflect (on explicit close request)](#phase-6-reflect-on-explicit-close-request)
 - [Mode Flow Summary](#mode-flow-summary)
 - [Validation](#validation)
 
@@ -241,7 +241,7 @@ Before presenting for approval, run BOTH structural checks and surface both:
    ```bash
    git diff --name-only HEAD~1 | grep -E '\.(vue|tsx|jsx|html|css|scss|svelte|astro)$'
    ```
-   If no matches → log `"No UI changes detected, skipping browser verify"` → skip to Phase 5.
+   If no matches → log `"No UI changes detected, skipping browser verify"` → report completion and stop for user direction.
 
 2. **Boot dev server** (if not already running):
    - Read `package.json` → detect `dev` or `start` script
@@ -289,13 +289,16 @@ Before presenting for approval, run BOTH structural checks and surface both:
    ```
 
 3. **Handle verdict** (per SKILL.md modifier-flags clarification: `--strict` is a hard gate):
-   - **PASS** → proceed to Phase 5
+   - **PASS** → report completion and stop for user direction
    - **WARN** → present to user, user decides
-   - **FAIL** → **BLOCKS Phase 5.** Report verdict + failing criteria. Route back to Phase 3 with evaluator feedback. Max 2 evaluator iterations.
+   - **FAIL** → blocks completion. Report verdict + failing criteria. Route back to Phase 3 with evaluator feedback. Max 2 evaluator iterations.
 
 **Output:** `Phase 4.5: Verify — [PASS|FAIL|WARN] — [light|strict] mode`
 
-## Phase 5: Ship (after Gate 2 approval)
+## Phase 5: Ship (explicit request only)
+
+After Gate 2 reporting, stop. Spawn the shipper only when the user explicitly
+requests shipping; Gate 2 approval alone is not shipping authority.
 
 Spawn `shipper` (which orchestrates pre-ship checks + invokes `git-manager` for commit/PR + CI verification + rollback docs):
 
@@ -307,7 +310,10 @@ Note: `shipper` is the orchestrator — it invokes `git-manager` internally for 
 
 **Output:** `Phase 5: Ship — committed, PR created, CI verified`
 
-## Phase 6: Reflect (MANDATORY — never skip)
+## Phase 6: Reflect (on explicit close request)
+
+Do not enter Phase 6 automatically after Gate 2 reporting. Run it after shipping
+or when the user explicitly asks to close the implementation run without shipping.
 
 Three mandatory subagents in parallel:
 
@@ -358,7 +364,7 @@ Do NOT hand-write `.plan-state.json` mid-run. It is a DERIVED cache: written onc
 
 Idempotent: re-running this checkpoint on an unchanged phase produces zero diff (Sync-Back Algorithm invariant). For a single-phase plan, this checkpoint and the final sync-back coincide.
 
-**Auto mode:** After Reflect, check if more plan phases remain → loop to Phase 2 for next phase.
+**Auto mode:** After an explicit close request, check if more plan phases remain → loop to Phase 2 for next phase.
 **Others:** Ask user before continuing to next phase.
 
 **Output:** `Phase 6: Reflect — sync-back done, docs [impact], memory updated, wiki handoff [proposed|skipped]`
@@ -388,15 +394,17 @@ Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. Cook populates
 Legend: `[G1]` = Gate 1, `[G2]` = Gate 2, `[R]` = Review Gate, `[CP]` = Per-Phase Checkpoint (mandatory before each next-phase loop)
 
 ```
-interactive: 0 → 1 → [G1] → 2 → [R] → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
-auto:        0 → 1(auto-G1) → 2 → 3 → 4[G2-human] → (4.5?) → 5 → 6 → [CP] → next phase
-fast:        0 → 1(fast) → [G1] → 2(light) → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
-parallel:    0 → 1(parallel) → [G1] → 2 → 3(multi-agent) → [R] → 4[G2] → (4.5?) → 5 → 6
-no-test:     0 → 1 → [G1] → skip → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
-code:        0 → skip → 2 → 3 → [R] → 4[G2] → (4.5?) → 5 → 6
+interactive: 0 → 1 → [G1] → 2 → [R] → 3 → [R] → 4[G2] → (4.5?) → report → stop
+auto:        0 → 1(auto-G1) → 2 → 3 → 4[G2-human] → (4.5?) → report → stop
+fast:        0 → 1(fast) → [G1] → 2(light) → 3 → [R] → 4[G2] → (4.5?) → report → stop
+parallel:    0 → 1(parallel) → [G1] → 2 → 3(multi-agent) → [R] → 4[G2] → (4.5?) → report → stop
+no-test:     0 → 1 → [G1] → skip → 3 → [R] → 4[G2] → (4.5?) → report → stop
+code:        0 → skip → 2 → 3 → [R] → 4[G2] → (4.5?) → report → stop
 ```
 
 Where `(4.5?)` = only if `--verify` or `--strict` modifier flag set.
+After reporting, an explicit ship request enters Phase 5; an explicit close request enters
+Phase 6. Neither phase starts automatically.
 
 **Critical:** Gate 2 — see `.claude/rules/gate-rules.md`.
 
@@ -404,5 +412,5 @@ Where `(4.5?)` = only if `--verify` or `--strict` modifier flag set.
 
 - If Task() tool calls = 0 at end of workflow → INCOMPLETE
 - All step outputs follow: `Phase [N]: [status] — [metrics]`
-- Phase 6 Reflect is NEVER skipped, even if user says "done"
+- Once Phase 6 begins, run all required reflection steps before reporting it complete.
 - Per-phase checkpoint (phase-file checkboxes + plan.md Agent State) written for every completed plan phase before the next-phase transition
