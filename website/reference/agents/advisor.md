@@ -1,0 +1,67 @@
+---
+title: advisor
+description: "Isolated advisory executor behind mk:advise."
+---
+
+# advisor
+
+The advisor is the isolated executor behind **[mk:advise](/reference/skills/advise)**.
+It is not a lifecycle agent or a direct user route: invoke `/mk:advise`, not the
+agent itself.
+
+## Role
+
+The advisor turns a pre-framed request into one honest recommendation. It first
+finds and confirms the real problem, then returns a verdict with its costs — not
+a menu of options or an implementation plan.
+
+## Turn Model
+
+The advisor is started fresh for each turn. It reads the prior interview and the
+user’s newest answer from `session-state/<advise-run>/transcript.json`, then
+updates that checkpoint before ending. This preserves a one-question-per-turn
+interview without treating the advisor as a persistent conversation.
+
+It generally uses two to six turns and stops questioning when it can state the
+problem, requirements, goals, non-goals, and constraints, or when further
+answers no longer change the reframe.
+
+## Hard Reframing Gate
+
+Before giving a verdict, the advisor asks the user to confirm or correct a
+reframing containing:
+
+- Problem
+- Requirements
+- Goals
+- Non-goals
+- Constraints
+
+Only then does it return the advice packet: verified context, confirmed
+reframing, verdict, do/don't guidance, cheaper alternatives, benefits,
+trade-offs, ordered checklist, success metrics, and unresolved questions.
+
+## Artifacts and Boundaries
+
+The advisor maintains only the interview checkpoint and, when the user requests
+it, one saved advice report at
+`tasks/reports/advise-<YYMMDD-HHMM>-<slug>.md`.
+
+It does not produce plans, ADRs, source or test changes, review verdicts, or
+curated memory decisions. It never begins `mk:plan-creator` or `mk:cook`; acting
+on the recommendation remains the user’s decision.
+
+## Statuses
+
+| Status | Meaning |
+|---|---|
+| `NEEDS_CONTEXT` | One next question, or the reframing awaiting confirmation. |
+| `DONE` | The completed advice packet. |
+| `DONE_WITH_CONCERNS` | Advice is complete but a load-bearing input remains uncertain. |
+| `BLOCKED` | Grounding needed for advice cannot be obtained through another question. |
+
+## Related Reference
+
+- **[mk:advise](/reference/skills/advise)** — the user-facing entry point.
+- **[mk:grill](/reference/skills/grill)** — interview-only alternative.
+- **[mk:office-hours](/reference/skills/office-hours)** — product-validation alternative.

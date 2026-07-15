@@ -14,11 +14,10 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
-## Unreleased — Gate Contract Safety, Portability, DX
+## 2.13.7 (2026-07-15) — Gate Contract Safety, Portability, DX
 
-Kit changes below are merged but **not yet released** — no kit version is cut for
-them. The `mewkit` CLI ships separately as **1.17.0** (see `CLI` below); the two
-version independently, so a CLI release does not imply a kit release.
+The `mewkit` CLI ships separately as **1.17.0** (see `CLI` below); the two
+are versioned independently, so this kit release does not imply a new CLI release.
 
 ### Highlights
 

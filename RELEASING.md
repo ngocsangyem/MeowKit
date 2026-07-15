@@ -548,6 +548,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.13.7 | 2026-07-15 | Gate Contract Safety, Portability, DX            |
 | v2.13.6 | 2026-07-13 | Local Visual Plan Review                          |
 | v2.13.5 | 2026-07-12 | Capability Discovery + Durable Task State        |
 | v2.13.4 | 2026-07-05 | Figma Gateway + Agent-Browser Hardening          |
