@@ -14,6 +14,75 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## Unreleased — Gate Contract Safety, Portability, DX
+
+Kit changes below are merged but **not yet released** — no kit version is cut for
+them. The `mewkit` CLI ships separately as **1.17.0** (see `CLI` below); the two
+version independently, so a CLI release does not imply a kit release.
+
+### Highlights
+
+Automation can no longer approve its own gates. The contract said Gate 1 and Gate 2
+were human-only, but prose across modes, cook, and autobuild had drifted into
+granting approval authority to a script, a score, or an evaluator stamp — and
+autobuild's PASS path shipped with no human step at all. The invariant is now
+stated once, enforced by a lint that fails CI, and backed by a structural Gate 2
+check at the commit/push boundary that actually blocks (`exit 2`) rather than
+printing "BLOCKED" and proceeding.
+
+### New Skills
+
+| Skill        | Purpose                                                                                                                                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mk:advise`  | Turn a raw idea into ONE honest recommendation: interviews one question at a time until the problem, requirements, goals, non-goals, and constraints are confirmed, then delivers a single verdict with trade-offs, an ordered checklist, and success metrics. Fenced against `mk:grill` (interrogation, no verdict), `mk:brainstorming` (options for a settled framing), `mk:office-hours` (is it worth building), and `mk:party` (multi-perspective debate). |
+
+### New Agents
+
+| Agent     | Purpose                                                                                                                                                                                                            |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `advisor` | Isolated advisory executor behind `mk:advise`. Respawns per turn against a session checkpoint (the harness has no subagent pause/resume), and may write only its transcript plus one optional advice report — never a plan, ADR, verdict, or memory entry. |
+
+### New Commands
+
+| Command      | Purpose                                                              |
+| ------------ | -------------------------------------------------------------------- |
+| `/mk:advise` | Thin dispatcher for `mk:advise` — usage, flags, and one authority note. |
+
+### CLI
+
+The `mewkit` CLI (published separately as **1.17.0**) adds the enforcement surface:
+
+- `mewkit plan status <plan-dir>` / `mewkit plan check <phase-file>` — read-only plan inspection: checkbox progress across `plan.md` + phase files, and a required-section report for one phase. Writes nothing (the plan Markdown stays the sole authority); there is deliberately no scaffold or edit subcommand.
+
+```bash
+mewkit plan status tasks/plans/260715-my-plan     # progress across every phase
+mewkit plan check  tasks/plans/260715-my-plan/phase-02-thing.md
+```
+
+- `mewkit validate --gates` — fails on any prose granting automated gate approval, in either word order, plus command-vs-skill drift for the `fix` / `cook` / `plan` / `advise` dispatchers.
+- `mewkit validate --parity` — regenerates the plugin into a scratch dir and diffs it against the committed `plugin/`, catching both a forgotten regenerate and a hand-edit.
+- `mewkit validate` now also reports stale README/index counts (previously only `mewkit inventory --check`).
+
+### Features
+
+- **Gate Authority Invariant** (`gate-rules.md`) — automation executes *between* gates and never supplies the authority *of* one. Verdicts, scores, and validator exit codes are evidence presented at a gate, never a substitute for it. Holds in every mode, including `--auto` and `--fast`.
+- **Structural Gate 2 at the ship boundary** (`hooks/lib/gate2-check.sh`) — on `git commit` / `push` / `merge`, resolves the active plan's verdict and blocks with `exit 2` when a ship-capable change has none. Profile-immune: it runs above the fast-profile early-exit, because Gate 2 has no exceptions. Docs/report-only changes take an explicit **N/A** path rather than a silent skip.
+- **Logical workflow operations** (`ask_user`, `manage_plan`, `run_shell`, `delegate_agent`) with per-provider conformance in `mewkit providers <p> --lifecycle`. Kept deliberately out of the frontmatter-reachable invocation enum — that enum's value is what it excludes — and a build-time check fails if the two sets ever intersect.
+- **Fable 5 advisory model profile** — `model: fable` resolves to the verified `claude-fable-5` on Claude Code, and on other providers falls back to the configured heavy tier with a **disclosed** warning naming both models. Tier-orthogonal: the `ModelTier` union is unchanged.
+- **Approval-receipt ADR** (`docs/architecture/adr/260715-gate2-approval-receipt.md`) — designs what would actually prove a human approved, and states plainly why the structural check cannot.
+
+### Improvements
+
+- `/mk:fix` is now a thin dispatcher. It previously described a Simple path that skipped the scout its own skill marks MANDATORY, and dual memory writes the skill forbids.
+- `mk:scout`'s Explore workers now carry secret-file guards, a scope fence, and two sections the old prompt never asked for — `Risks` and `Unresolved Questions` — plus the A1 status block, so a scout worker terminates with the same vocabulary as every other subagent. Scouting still runs on Claude Code's built-in `Explore` (Haiku, read-only): a custom executor would be the same model class behind the same subagent boundary, so it was evaluated and not built.
+- Plan validation presents a recap — path, objective, scope, phase count, top risks, and the section each answer may change — before the first question, and every question is self-contained.
+- README and index counts are regenerated from the canonical inventory rather than hand-maintained.
+
+### Bug Fixes
+
+- `pre-ship.sh` sourced a hook lib without an existence guard; because `.` is a POSIX special builtin, a missing lib aborted the whole hook — and an aborted hook exits non-2, which is advisory, so the ship proceeded unchecked.
+- The `git add . && git commit` pattern shipped brand-new source files ungated: at PreToolUse the `add` has not run, and neither a staged nor a `HEAD` diff shows an untracked file.
+
 ## 2.13.6 (2026-07-13) — Local Visual Plan Review
 
 ### Highlights

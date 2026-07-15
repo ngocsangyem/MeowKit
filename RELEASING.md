@@ -31,10 +31,14 @@ native plugin: claude/codex plugin install mk@meowkit (reads the tracked marketp
 There are **two independently versioned things** in this repo, and they are
 deliberately not synchronized:
 
-| Version field | What it versions | Today |
-| --- | --- | --- |
-| root `package.json` → `version` | The **kit**: `.claude/` content, and the generated `plugin/` + marketplace manifests that carry it | `2.13.6` |
-| `packages/mewkit/package.json` → `version` | The **npm CLI** (`mewkit`) — the installer/validator binary | `1.16.1` |
+| Version field | What it versions |
+| --- | --- |
+| root `package.json` → `version` | The **kit**: `.claude/` content, and the generated `plugin/` + marketplace manifests that carry it |
+| `packages/mewkit/package.json` → `version` | The **npm CLI** (`mewkit`) — the installer/validator binary |
+
+Read the current numbers from those files, never from this page — a version
+pasted into prose is stale the next time either is bumped, and the two are bumped
+on different cadences by design.
 
 The plugin manifests intentionally track the **root** version (see the Architecture
 key-insight above); `mewkit validate --plugin` fails if they drift from it. That
