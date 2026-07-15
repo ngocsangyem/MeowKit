@@ -232,6 +232,13 @@
       "runtime": "claude-code",
       "responsibility": "permissions"
     },
+    "commands/mk/advise.md": {
+      "owner": "research",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "task-specification"
+    },
     "commands/mk/autobuild.md": {
       "owner": "lifecycle",
       "criticality": "medium",
