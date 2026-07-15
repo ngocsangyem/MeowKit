@@ -24,13 +24,14 @@ Rules derived from in-repo governance and enforcement sources (.claude/rules/*, 
 | Web fetch manifest      | `.claude/cache/web-fetches/index.jsonl` (append-only)                      | `.claude/memory/web-fetches/index.jsonl`                            |
 | Web fetch quarantine    | `.claude/cache/web-fetches/quarantine/{sha256}.quarantined`                | `.claude/memory/quarantine/`, `quarantine/`                         |
 | ADR files               | `docs/architecture/adr/YYMMDD-title.md`                                    | `docs/architecture/NNNN-title.md`                                   |
-| Session state           | `session-state/` (project root)                                            | `.claude/session-state/`                                            |
+| Runtime session state   | `session-state/` (project root)                                            | `.claude/session-state/` for general runtime state                  |
+| Provider session exceptions | `.claude/session-state/` for TDD sentinels, workflow evidence, and plan intake | `session-state/` for those provider-scoped artifacts                |
 | Skill references        | `.claude/skills/*/references/*.md`                                    | `domain/file.md` (short form)                                       |
 | Gate validation scripts | `.claude/skills/cook/scripts/validate-gate-*.sh`                      | `scripts/validate-gate-*.sh`                                        |
 
 **Rule:** When referencing any file in a skill or agent, use the FULL path from project root. Never use shortened or assumed paths. Before merging, grep for the path in all consuming files.
 
-**State taxonomy:** Provider artifacts live under provider-owned roots (`.claude/`, `.codex/`, `.gemini/`, `.agents/skills/`). Durable workflow artifacts live under `tasks/` (`plans/`, `contracts/`, `reviews/`, `autobuild-runs/`). Ephemeral runtime state lives at project-root `session-state/`. Curated reusable memory lives under `.claude/memory/`. `tasks/completed/` is not a canonical active path until an archive writer owns it.
+**State taxonomy:** Project-root `session-state/` is the canonical ephemeral runtime root for active-plan, model, budget, checkpoint, task-queue, and hook-progress state. `.claude/session-state/` is a provider-scoped exception root: TDD sentinels, workflow evidence, and plan-creator intake packets live there. Durable workflow artifacts live under `tasks/` (`plans/`, `contracts/`, `reviews/`, `autobuild-runs/`); curated reusable memory lives under `.claude/memory/`. `tasks/completed/` is not a canonical active path until an archive writer owns it.
 
 ---
 
