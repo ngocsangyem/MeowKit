@@ -8,7 +8,41 @@ Critical questions to validate plan decisions with the user. Runs in hard/deep/p
 
 **Skip if:** `planning_mode = fast` → read and follow `step-07-gate.md`.
 
-### 6b. Generate Questions
+### 6b. Present Before Asking (recap — required)
+
+**Present the plan back BEFORE the first question.** The user is about to make
+decisions that rewrite phase files they may not have read since drafting. Asking
+cold makes them reconstruct the plan from memory, and an answer given against a
+misremembered plan silently propagates into the real one.
+
+Emit this recap once, before any question:
+
+```
+Plan:     {plan_dir}/plan.md
+Objective: {one sentence — what this plan delivers}
+Scope:     {in scope} · NOT in scope: {out of scope}
+Phases:    {N} ({phase-01 name} → {phase-0N name})
+Top risks: {2-3 highest-severity items from the Risk Assessment / red-team findings}
+
+I have {M} questions. Each one changes a specific section:
+  1. {question topic} → {phase-XX §section}
+  2. …
+```
+
+Naming the section each answer may change is the point of the recap, not
+decoration: it is how the user knows what a "yes" costs before they say it.
+
+**Every question must be self-contained.** Restate the decision, the plan's
+current position, and the options inside the question itself. Do not write "as
+discussed above" or "per the earlier question" — the user may answer after a
+context reset, or days later, and a question that only makes sense in sequence is
+unanswerable out of sequence.
+
+**Ownership:** this step PRESENTS and RECORDS. The planner owns plan mutation
+(6e propagates; 6f logs). The interviewer never edits a phase file directly —
+one writer per artifact, per `orchestration-rules.md` file ownership.
+
+### 6c. Generate Questions
 
 Generate 3–5 critical questions from the plan content. Load the full question framework from
 `references/validation-questions.md` — it defines:
@@ -40,7 +74,7 @@ Which is correct: the plan, the codebase, or neither?
 
 FAILED claims rank above keyword-detected questions (they are higher-signal). Cap total interview questions at 5 regardless of source mix.
 
-### 6c. Present via AskUserQuestion
+### 6d. Present via AskUserQuestion
 
 Present each question with 2-4 concrete options (per format rules). Mark the recommended option.
 
@@ -59,7 +93,7 @@ Present each question with 2-4 concrete options (per format rules). Mark the rec
 
 Group related questions (max 4 per AskUserQuestion call).
 
-### 6d. Propagate Answers to Phase Files
+### 6e. Propagate Answers to Phase Files
 
 After all answers received, use the **section mapping** from `references/validation-questions.md`:
 
@@ -73,7 +107,7 @@ Also:
 - Add note: `"Validated: {answer summary}"` in phase overview
 - If an answer reveals scope change, update plan.md Constraints
 
-### 6e. Write Validation Log
+### 6f. Write Validation Log
 
 Append `## Validation Log` section to plan.md (or update existing). Follow recording rules from `references/validation-questions.md`:
 
@@ -86,14 +120,14 @@ Append `## Validation Log` section to plan.md (or update existing). Follow recor
 **Impact:** {which phase sections were updated}
 ```
 
-### 6f. Whole-Plan Consistency Sweep (Gate W2)
+### 6g. Whole-Plan Consistency Sweep (Gate W2)
 
-After answer propagation has edited phase files (6d) and the Validation Log has been written (6e), the planner agent MUST run a Whole-Plan Consistency Sweep before handing off to step-07.
+After answer propagation has edited phase files (6e) and the Validation Log has been written (6f), the planner agent MUST run a Whole-Plan Consistency Sweep before handing off to step-07.
 
 Algorithm: see `references/whole-plan-sweep.md` (stage-then-apply).
 
 Inputs to this run:
-- `delta_source = propagated_answers` (the list from 6d)
+- `delta_source = propagated_answers` (the list from 6e)
 - `plan_dir` (from session state)
 
 Outputs:

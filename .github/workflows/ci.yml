@@ -71,6 +71,12 @@ jobs:
       - name: Validate gate-authority contract
         run: node packages/mewkit/dist/index.js validate --gates
 
+      # plugin/ is generated from .claude/. Regenerate into a scratch dir and
+      # diff: catches both a forgotten regenerate (plugin ships stale behavior)
+      # and a hand-edit (the next build silently discards it).
+      - name: Validate plugin parity
+        run: node packages/mewkit/dist/index.js validate --parity
+
       - name: Validate artifact ownership metadata
         run: node packages/mewkit/dist/index.js validate --ownership
 

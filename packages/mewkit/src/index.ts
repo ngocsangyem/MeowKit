@@ -74,6 +74,7 @@ ${pc.bold("Options:")}
   --strict         Validate: treat WARN as failure (exit 1); off by default
   --workflow       Validate: run only the workflow.yaml drift-check (CI scope)
   --gates          Validate: run only the gate-authority contract check (CI scope)
+  --parity         Validate: regenerate the plugin and diff it against the committed tree
   --ownership      Validate: run only the artifact ownership-completeness check
   --packs          Validate: run only the pack-manifest coherence + safety check
   --rules          Validate: run only the routing-table-breadth WARN check
@@ -174,6 +175,7 @@ async function main(): Promise<void> {
 			"verbose",
 			"workflow",
 			"gates",
+			"parity",
 			"ownership",
 			"json",
 			"stale",
@@ -269,6 +271,7 @@ async function main(): Promise<void> {
 				strict: args.strict as boolean | undefined,
 				workflow: args.workflow as boolean | undefined,
 				gates: args.gates as boolean | undefined,
+				parity: args.parity as boolean | undefined,
 				ownership: args.ownership as boolean | undefined,
 				substrate: args.substrate as boolean | undefined,
 				packs: args.packs as boolean | undefined,

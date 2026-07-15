@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { checkGateAuthority, scanForGateAuthority } from "../check-gate-authority.js";
+import { checkGateAuthority, scanForGateAuthority, checkCommandDrift, scanCommandForDrift } from "../check-gate-authority.js";
 
 const tempDirs: string[] = [];
 
@@ -225,5 +225,116 @@ describe("checkGateAuthority", () => {
 		const root = await projectWith({ "README.md": "no claude tree here" });
 		const [result] = checkGateAuthority(root, { missingRootSeverity: "warn" });
 		expect(result.status).toBe("warn");
+	});
+});
+
+// ── Command-vs-skill drift ───────────────────────────────────────────────────
+
+/** A project root with a governed command/skill pair. */
+async function pairedProject(commandBody: string, name = "fix"): Promise<string> {
+	return projectWith({
+		[`.claude/commands/mk/${name}.md`]: commandBody,
+		[`.claude/skills/${name}/SKILL.md`]: "---\nname: mk:fix\n---\n\nThe skill owns the procedure.\n",
+	});
+}
+
+const THIN_DISPATCHER = [
+	"# /fix — Bug Fix",
+	"",
+	"## Usage",
+	"",
+	"```",
+	"/fix [bug description]",
+	"```",
+	"",
+	"## Purpose",
+	"",
+	"Diagnose and fix a defect root-cause-first. The authoritative procedure lives in `mk:fix`.",
+	"",
+	"## Dispatch",
+	"",
+	"Activate `mk:fix` with the user's bug description and any flags.",
+	"",
+	"## Flags",
+	"",
+	"- `--tdd` — Force a failing regression test before the fix.",
+	"",
+	"## Safety notes",
+	"",
+	"- Gate 1 and Gate 2 are human-approved per `.claude/rules/gate-rules.md`.",
+].join("\n");
+
+describe("command-vs-skill drift", () => {
+	it("a thin dispatcher is clean", async () => {
+		const root = await pairedProject(THIN_DISPATCHER);
+		expect(scanCommandForDrift(root, ".claude/commands/mk/fix.md")).toEqual([]);
+		expect(checkCommandDrift(root)[0].status).toBe("pass");
+	});
+
+	// The mutation test the criterion names: a seeded workflow sentence must fail.
+	// This is the exact `/mk:fix` defect — the command described a procedure that
+	// contradicted its own skill, and nothing caught the contradiction.
+	it("FAILS on a seeded workflow procedure", async () => {
+		const root = await pairedProject(
+			[THIN_DISPATCHER, "", "### Execution by Complexity", "", "1. Identify the issue.", "2. Apply the fix.", "3. Run tests."].join("\n"),
+		);
+		const [result] = checkCommandDrift(root);
+		expect(result.status).toBe("fail");
+		expect(result.detail).toContain("commands/mk/fix.md");
+	});
+
+	it("FAILS on a seeded memory-write instruction", async () => {
+		const root = await pairedProject([THIN_DISPATCHER, "", "Edit `.claude/memory/fixes.json` and append the pattern."].join("\n"));
+		expect(checkCommandDrift(root)[0].status).toBe("fail");
+	});
+
+	it("FAILS on a seeded complexity-classification table", async () => {
+		const root = await pairedProject([THIN_DISPATCHER, "", "| Signal | Complexity |", "|---|---|", "| One file | Simple |"].join("\n"));
+		expect(checkCommandDrift(root)[0].status).toBe("fail");
+	});
+
+	it("does not flag a lone numbered line in a safety note", async () => {
+		// One "1." is a list, not a procedure. Flagging it would make the lint
+		// noise, and a noisy lint gets switched off.
+		const root = await pairedProject([THIN_DISPATCHER, "", "1. Gate 2 still applies to anything this ships."].join("\n"));
+		expect(checkCommandDrift(root)[0].status).toBe("pass");
+	});
+
+	it("ignores an unpaired command — it has nowhere to delegate to", async () => {
+		const root = await projectWith({
+			".claude/commands/mk/design.md": "# /design\n\n1. Sketch.\n2. Build.\n",
+			".claude/skills/other/SKILL.md": "---\nname: mk:other\n---\n\nx\n",
+		});
+		expect(checkCommandDrift(root)[0].status).toBe("pass");
+	});
+
+	it("ignores a paired command outside the governed dispatcher set", async () => {
+		// Six paired commands carry known pre-existing drift; the governed set is a
+		// deliberate floor, not a claim they are clean.
+		const root = await projectWith({
+			".claude/commands/mk/review.md": "# /review\n\n1. Scope.\n2. Audit.\n3. Verdict.\n",
+			".claude/skills/review/SKILL.md": "---\nname: mk:review\n---\n\nx\n",
+		});
+		expect(checkCommandDrift(root)[0].status).toBe("pass");
+	});
+
+	it("honors the suppression marker", async () => {
+		const root = await pairedProject([THIN_DISPATCHER, "", "2. Quoted anti-pattern <!-- lint-allow-gate-authority -->"].join("\n"));
+		expect(checkCommandDrift(root)[0].status).toBe("pass");
+	});
+
+	// The criterion: exactly ONE gate-phrase detector exists in the codebase.
+	it("does not re-implement gate detection — the gate blacklist is shared", async () => {
+		const root = await pairedProject([THIN_DISPATCHER, "", "Fast auto-approves Gate 2 if tests pass."].join("\n"));
+		// checkCommandDrift must NOT own gate semantics...
+		expect(checkCommandDrift(root)[0].status).toBe("pass");
+		// ...checkGateAuthority does, for the same file. Two blacklists would drift.
+		expect(checkGateAuthority(root)[0].status).toBe("fail");
+	});
+});
+
+describe("the live repo's governed dispatchers", () => {
+	it("are all thin", () => {
+		expect(checkCommandDrift(process.cwd())[0].status).toBe("pass");
 	});
 });

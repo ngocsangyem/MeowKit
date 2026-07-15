@@ -26,7 +26,7 @@ Centralized registry of all skills. Updated: 2026-07-03 (v2.13.2).
 ### Phase 1 — Plan
 
 ```toon
-[8]{skill,owner,type,architecture}
+[9]{skill,owner,type,architecture}
 `mk:plan-creator`|planner|planning|step-file (v1.5.0: scope challenge, multi-file output, plan red team, sync-back, **--product-level mode** for green-field app builds via step-03a; **--deep mode** for per-phase scouting; **--tdd flag** injects TDD sections into phase files; **standalone subcommands**: archive/red-team/validate; outputs `red-team-findings.md`; solution design checklist in each phase; memory capture at Gate 1)
 `mk:plan-ceo-review`|planner|planning|monolithic (v2.0: layered verification pipeline — pre-screen + two-lens eval + severity tiers + adversarial necessity + append-only verdict)
 `mk:validate-plan`|planner|planning|monolithic
@@ -34,6 +34,7 @@ Centralized registry of all skills. Updated: 2026-07-03 (v2.13.2).
 `mk:office-hours`|brainstormer/planner|planning|monolithic
 `mk:grill`|brainstormer|planning|monolithic (one-question-at-a-time interview of the user's plan/design; checkpoints to `docs/knowledge/<slug>.md`; read-only on source; hands off to skill-creator/plan-creator/project-context)
 `mk:party`|orchestrator/brainstormer|planning|monolithic
+`mk:advise`|advisor|planning|monolithic (interview one question at a time → user confirms a reframing of their problem → ONE verdict packet; never a plan/ADR/verdict; isolated advisor by default, disclosed inline fallback)
 `mk:planning-engine`|planner|planning|monolithic
 ```
 
@@ -244,7 +245,7 @@ Diagram|2
 HTML/Browser-Packaging|2
 External-Service-Design|1
 Knowledge/Wiki|3
-**Total**|**122**
+**Total**|**125**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

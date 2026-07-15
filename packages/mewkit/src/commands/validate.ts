@@ -5,9 +5,11 @@ import { checkDocsReferences } from "../core/check-docs-references.js";
 import { collectProviderContractDiagnostics } from "../migrate/provider-contract-diagnostics.js";
 import { isHookScript } from "../core/is-hook-script.js";
 import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
-import { checkGateAuthority } from "../core/check-gate-authority.js";
+import { checkGateAuthority, checkCommandDrift } from "../core/check-gate-authority.js";
 import { assertOperationsNotInvocable } from "../core/provider-operations.js";
 import { findPseudoCapabilities } from "../core/check-pseudo-capabilities.js";
+import { checkStaleIndex } from "../core/check-stale-index.js";
+import { checkPluginParity } from "../core/check-plugin-parity.js";
 import { checkOwnership } from "../core/build-inventory.js";
 import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
@@ -70,6 +72,8 @@ interface ValidateOptions {
 	workflow?: boolean;
 	/** Scope the run to the gate-authority contract check only (used by CI). */
 	gates?: boolean;
+	/** Scope the run to the canonical↔plugin parity check only (used by CI). */
+	parity?: boolean;
 	/** Scope the run to the ownership-completeness check only (used by CI). */
 	ownership?: boolean;
 	/** Scope the run to the responsibility-substrate check only (used by CI). */
@@ -593,7 +597,13 @@ export async function buildDefaultChecks(
 			// Gate-authority stays strict even in the default run: an un-synced
 			// install cannot explain a file that grants automated gate approval.
 			...checkGateAuthority(projectRoot),
+			...checkCommandDrift(projectRoot),
 			...checkOperationConformance(meowkitDir),
+			// Declared doc counts vs the real inventory. `mewkit inventory --check`
+			// owns the same check for the CI step; surfacing it here means an author
+			// sees a stale README at validate time instead of at CI time. Counts are
+			// derived from buildInventory, so this can only drift when a doc lies.
+			...checkStaleIndex(projectRoot),
 			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
 			...checkSubstrate(meowkitDir, { missingViewSeverity: "warn" }),
 			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
@@ -637,7 +647,9 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 	if (args.workflow) {
 		results = checkWorkflowDrift(projectRoot);
 	} else if (args.gates) {
-		results = checkGateAuthority(projectRoot);
+		results = [...checkGateAuthority(projectRoot), ...checkCommandDrift(projectRoot)];
+	} else if (args.parity) {
+		results = checkPluginParity(projectRoot);
 	} else if (args.ownership) {
 		results = checkOwnership(meowkitDir);
 	} else if (args.substrate) {

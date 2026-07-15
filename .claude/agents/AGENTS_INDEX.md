@@ -3,10 +3,11 @@
 ## Active Agents
 
 ```toon
-[39]{agent_file,type,role,source,workflow_phases,auto_activate,ce_version,last_improved}
+[40]{agent_file,type,role,source,workflow_phases,auto_activate,ce_version,last_improved}
 `orchestrator.md`|Core|Task router, complexity classification, model tier assignment|original|Phase 0 (Orient)|Yes — every task|260326|260326
 `planner.md`|Core|Two-lens planning (product + engineering) + product-level mode for green-field builds, Gate 1 enforcement|original|Phase 1 (Plan)|Routed by orchestrator|260326|260408
 `brainstormer.md`|Support|Solution brainstorming, architecture evaluation, trade-off analysis|Credit: Duy Nguyen|Phase 1 (Plan)|Routed by orchestrator or explicit|260326|260326
+`advisor.md`|Support|Reframe-then-recommend advisory executor: interviews one question per turn, confirms the real problem, emits ONE verdict packet|original|on-demand|Invoked ONLY by mk:advise — never orchestrator-routed|260715|260715
 `researcher.md`|Support|Technology research, library evaluation, documentation gathering|Credit: Duy Nguyen|Phase 0, 1, 4|Routed by orchestrator or explicit|260326|260326
 `architect.md`|Core|ADR generation, system design, architecture review|original|Phase 1 (Plan)|Routed by orchestrator for complex tasks|260326|260326
 `tester.md`|Core|Test writing; TDD enforcement (red/green/refactor) when `--tdd` / `MEOWKIT_TDD=1`; non-blocking test writing in default mode|original|Phase 2 (Test)|Routed by orchestrator (always in TDD mode; on-request in default mode)|260326|260409

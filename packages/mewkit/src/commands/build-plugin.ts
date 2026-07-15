@@ -16,11 +16,11 @@ import {
 	buildCodexMarketplaceJson,
 } from "../core/plugin-manifest.js";
 
-const DESCRIPTION = "MeowKit — an opinionated Claude Code harness (skills, agents, hooks).";
+export const DESCRIPTION = "MeowKit — an opinionated Claude Code harness (skills, agents, hooks).";
 const OWNER = { name: "ngocsangyem" };
-const AUTHOR = { name: "ngocsangyem", email: "nnsang24@gmail.com" };
+export const AUTHOR = { name: "ngocsangyem", email: "nnsang24@gmail.com" };
 const MARKETPLACE_NAME = "meowkit";
-const PAYLOAD_DIRNAME = "plugin";
+export const PAYLOAD_DIRNAME = "plugin";
 
 export interface BuildPluginOptions {
 	/** Repo root; defaults to the current working directory. */

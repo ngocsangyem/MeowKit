@@ -163,6 +163,161 @@ function collectMarkdown(root: string, dir: string, acc: string[] = []): string[
 	return acc;
 }
 
+// ─── Command-vs-skill drift ──────────────────────────────────────────────────
+//
+// A slash command and its same-named skill are two descriptions of one behavior,
+// and two descriptions drift. The rule (skill-authoring-rules.md → Commands vs
+// Skills): the command is a DISPATCHER — usage, flags, dispatch, and a concise
+// safety note pointing at the authority. The skill owns the procedure.
+//
+// When a command re-states the workflow, the two copies disagree the moment
+// either changes, and an agent reading the command follows a stale procedure it
+// has no reason to distrust. That is exactly the `/mk:fix` defect this lint
+// exists to keep closed: the command described a Simple path that skipped the
+// scout its own skill marked MANDATORY.
+//
+// Gate semantics are NOT re-detected here — `checkGateAuthority` above is the
+// one gate-phrase detector, deliberately shared. Two blacklists drift apart, and
+// the weaker one becomes the de-facto contract.
+
+/**
+ * The dispatchers this check contracts.
+ *
+ * Deliberately an allowlist, not "every same-name pair". Calibrating against all
+ * paired commands surfaced 7 REAL drift findings (0 false positives) in six
+ * commands outside this contract — autobuild, docs-init, help, retro, review,
+ * ship — e.g. `review.md` carries a full "### Execution Steps" procedure that
+ * duplicates its skill's. Those are pre-existing and each needs a considered
+ * rewrite, not a lint flip; widening this set is the follow-up that does them.
+ *
+ * So this set is a floor that holds the line where it was drawn, not a claim
+ * that the rest are clean. They are not. Widen it as each is thinned.
+ */
+const GOVERNED_DISPATCHERS = new Set(["fix", "cook", "plan", "advise"]);
+
+/** Governed same-name command/skill pairs — the only files this drift check reads. */
+function pairedCommands(root: string): string[] {
+	const cmdDir = path.join(root, ".claude", "commands", "mk");
+	const skillsDir = path.join(root, ".claude", "skills");
+	if (!fs.existsSync(cmdDir) || !fs.existsSync(skillsDir)) return [];
+
+	return fs
+		.readdirSync(cmdDir)
+		.filter((f) => f.endsWith(".md"))
+		.filter((f) => GOVERNED_DISPATCHERS.has(f.replace(/\.md$/, "")))
+		// A command with no same-name skill has nowhere to delegate its procedure to,
+		// so the same prose there is correct (skill-authoring-rules.md: "not every
+		// command has a matching SKILL.md, and that is intentional").
+		.filter((f) => fs.existsSync(path.join(skillsDir, f.replace(/\.md$/, ""), "SKILL.md")))
+		.map((f) => path.join(".claude", "commands", "mk", f));
+}
+
+/**
+ * Prose that belongs to the SKILL, found in a command file.
+ *
+ * Scoped tightly on purpose. A command legitimately carries usage, flags, a
+ * dispatch line, and a safety note — flagging those would make the lint noise,
+ * and a noisy lint gets disabled. These patterns target the two things a
+ * dispatcher can never own: step-by-step procedure, and memory writes.
+ */
+const COMMAND_DRIFT_PATTERNS: { name: string; re: RegExp; expected: string }[] = [
+	{
+		name: "numbered workflow steps",
+		// "1. Do X" / "2. Then Y" — a procedure. One numbered line is a list; the
+		// pattern needs a SECOND step on a later line to fire, so a lone "1." in a
+		// safety note stays clean.
+		//
+		// `[ \t]*`, never `\s*`: `\s` matches newlines, so with `m` the match could
+		// begin on the preceding blank line and report a line number one too low —
+		// which silently pointed the allow-marker lookup at the wrong line.
+		re: /^[ \t]*2\.[ \t]+\S/gm,
+		expected: "the skill owns the procedure — the command dispatches to it",
+	},
+	{
+		name: "memory-write instruction",
+		re: /\b(Edit|write|append|update)\b[^.\n]{0,40}\.claude\/memory\//gi,
+		expected: "memory writes belong to the skill's capture step, not the command",
+	},
+	{
+		name: "memory store schema",
+		re: /\b(fixes|review-patterns|architecture-decisions|security-findings)\.(json|md)\b/gi,
+		expected: "the store's schema is the skill's business; the command must not restate it",
+	},
+	{
+		name: "complexity classification table",
+		re: /\|\s*(Simple|Standard|Complex|Moderate|Parallel)\s*\|/gi,
+		expected: "classification is the skill's routing decision, not the command's",
+	},
+];
+
+export interface CommandDriftFinding {
+	file: string;
+	line: number;
+	found: string;
+	expected: string;
+}
+
+/** Scan one command file for skill-owned prose. */
+export function scanCommandForDrift(root: string, relPath: string): CommandDriftFinding[] {
+	const abs = path.join(root, relPath);
+	if (!fs.existsSync(abs)) return [];
+
+	const findings: CommandDriftFinding[] = [];
+	const lines = fs.readFileSync(abs, "utf-8").split("\n");
+	const body = lines.join("\n");
+
+	for (const { re, expected } of COMMAND_DRIFT_PATTERNS) {
+		re.lastIndex = 0;
+		const m = re.exec(body);
+		if (!m) continue;
+		// Locate the match's line for an actionable file:line.
+		const line = body.slice(0, m.index).split("\n").length;
+		if (lines[line - 1]?.includes(ALLOW_MARKER)) continue;
+		findings.push({ file: relPath, line, found: m[0].trim().slice(0, 80), expected });
+	}
+
+	return findings;
+}
+
+/**
+ * Command-vs-skill drift for every same-name pair.
+ *
+ * Scoped to PAIRED commands only. A standalone command (no matching skill) has
+ * nowhere to delegate its procedure to, so the same prose there is correct —
+ * per skill-authoring-rules.md, "not every command has a matching SKILL.md, and
+ * that is intentional".
+ */
+export function checkCommandDrift(root: string): CheckResult[] {
+	const commands = pairedCommands(root);
+	if (commands.length === 0) {
+		return [{ name: "Command-vs-skill drift", status: "pass", detail: "no same-name command/skill pairs", section: "Gates" }];
+	}
+
+	const findings = commands.flatMap((rel) => scanCommandForDrift(root, rel));
+
+	if (findings.length === 0) {
+		return [
+			{
+				name: "No command-vs-skill drift",
+				status: "pass",
+				detail: `${commands.length} paired command(s) are dispatchers: ${commands.map((c) => path.basename(c, ".md")).join(", ")}`,
+				section: "Gates",
+			},
+		];
+	}
+
+	return [
+		{
+			name: `Command-vs-skill drift (${findings.length})`,
+			status: "fail",
+			detail: findings
+				.map((f) => `${f.file}:${f.line} found "${f.found}" — expected "${f.expected}"`)
+				.join("\n         "),
+			section: "Gates",
+		},
+	];
+}
+
 /**
  * Run the gate-authority check over a tree of prose.
  *
