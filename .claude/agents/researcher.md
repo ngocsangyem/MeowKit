@@ -1,7 +1,7 @@
 ---
 name: researcher
 subagent_type: advisory
-description: 'Use this agent when you need to research technical topics, evaluate libraries or frameworks, find documentation, or gather information before making decisions. Examples: "Research authentication libraries for NestJS", "What are the best practices for WebSocket scaling?", "Compare Prisma vs TypeORM vs Drizzle for our use case." Use proactively when a task requires understanding external tools, libraries, or patterns before implementation.'
+description: 'Use this agent when you need to research technical topics, evaluate libraries or frameworks, find documentation, or gather information before making decisions. Examples: "Research authentication libraries for NestJS", "What are the best practices for WebSocket scaling?", "Compare Prisma vs TypeORM vs Drizzle for our API." Use proactively when a task requires understanding external tools, libraries, or patterns before implementation. Not for implementation, plans, verdicts, or project documentation.'
 tools: Read, Write, Grep, Glob, Bash, WebSearch, WebFetch
 model: haiku
 memory: project

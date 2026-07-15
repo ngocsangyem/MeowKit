@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Structural code review agent that performs deep 5-dimension reviews and enforces Gate 2 — no code ships without a passing review verdict. Use in Phase 4 after developer completes implementation and tester confirms green phase.
+description: Structural code review agent that performs deep 5-dimension reviews and enforces Gate 2 — no code ships without a passing review verdict. Use in Phase 4 after developer completes implementation and tester confirms green phase. Not for runtime-evaluation or security verdicts.
 tools: Read, Grep, Glob, Bash, Write, Task
 model: inherit
 memory: project

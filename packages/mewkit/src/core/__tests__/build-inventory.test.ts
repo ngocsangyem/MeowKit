@@ -20,7 +20,7 @@ const SCHEMA = JSON.stringify({
 });
 
 const FM = (over: Record<string, string> = {}): string => {
-	const base = { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code", ...over };
+	const base = { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code", model: "inherit", tools: "Read", ...over };
 	const lines = Object.entries(base).map(([k, v]) => `${k}: ${v}`);
 	return `---\nname: mk:foo\n${lines.join("\n")}\n---\n# Body\n`;
 };
@@ -86,6 +86,8 @@ describe("buildInventory", () => {
 		const hook = entries.find((e) => e.type === "hook")!;
 		expect(hook.source).toBe("registry");
 		expect(hook.criticality).toBe("critical");
+		const agent = entries.find((e) => e.type === "agent")!;
+		expect(agent).toMatchObject({ model: "inherit", tools: ["Read"], agentClass: "core-support", routing: "direct-only", public: true });
 	});
 });
 
@@ -107,6 +109,13 @@ describe("checkOwnership", () => {
 		const c = await makeHarness({ skillFm: fm });
 		const results = checkOwnership(c);
 		expect(results.some((r) => r.status === "fail" && r.detail.includes("missing runtime"))).toBe(true);
+	});
+
+	it("FAILS when an agent omits model or tools", async () => {
+		const c = await makeHarness();
+		await writeFile(join(c, "agents", "dev.md"), FM().replace("model: inherit\ntools: Read\n", ""));
+		const results = checkOwnership(c);
+		expect(results.some((r) => r.status === "fail" && r.detail.includes("missing model") && r.detail.includes("missing tools"))).toBe(true);
 	});
 
 	it("FAILS on an out-of-enum value", async () => {

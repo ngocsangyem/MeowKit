@@ -28,6 +28,22 @@ export interface InventoryEntry {
 	responsibility?: string;
 	/** Optional implementation-surface cross-reference (7-surface lens). */
 	surface?: string;
+	/** Agent-only model declaration from canonical frontmatter. */
+	model?: string;
+	/** Agent-only comma-delimited tool allowlist from canonical frontmatter. */
+	tools?: string[];
+	/** Generated agent-contract classification; never a hand-maintained roster. */
+	agentClass?: "core-support" | "domain" | "intelligence" | "internal";
+	/** Generated entry route used by the agent-contract inventory views. */
+	routing?: "direct-only" | "hub-only" | "harness";
+	/** Whether the agent can be invoked outside its internal executor path. */
+	public?: boolean;
+	/** Agent-only owned paths/patterns parsed from its ownership declaration. */
+	ownedArtifacts?: string[];
+	/** Agent-only trigger/negative-boundary declaration derived from description. */
+	triggerOwner?: boolean;
+	/** Agent-only status-protocol declaration. */
+	statusReference?: "a1" | "none";
 	source: "frontmatter" | "registry";
 }
 
@@ -157,6 +173,23 @@ function str(v: unknown): string {
 	return typeof v === "string" ? v : "";
 }
 
+function agentContractFields(id: string): Pick<InventoryEntry, "agentClass" | "routing" | "public"> {
+	if (id === "advisor") return { agentClass: "internal", routing: "harness", public: false };
+	if (id === "story-sizer") return { agentClass: "intelligence", routing: "direct-only", public: true };
+	if (id.startsWith("jira-") || id.startsWith("confluence-")) {
+		return { agentClass: "domain", routing: "hub-only", public: true };
+	}
+	return { agentClass: "core-support", routing: "direct-only", public: true };
+}
+
+function agentDeclaredArtifacts(body: string): string[] {
+	const heading = /^## (?:Exclusive|Artifact) Ownership\s*$/m.exec(body);
+	const ownership = heading ? body.slice((heading.index ?? 0) + heading[0].length).split(/^## /m, 1)[0] : body;
+	return [...ownership.matchAll(/`([^`]+)`/g)]
+		.map((match) => match[1])
+		.filter((value) => value.includes("/") && !value.startsWith("mk:"));
+}
+
 /**
  * Build the unified inventory. Each artifact's metadata comes from frontmatter
  * (skills/agents) or the registry (rules/commands/hooks). Missing records and
@@ -192,6 +225,18 @@ export function buildInventory(claudeDir: string): Inventory {
 		if (Array.isArray(meta.depends_on)) entry.dependsOn = meta.depends_on.map(String);
 		if (typeof meta.responsibility === "string") entry.responsibility = meta.responsibility;
 		if (typeof meta.surface === "string") entry.surface = meta.surface;
+		if (ref.type === "agent") {
+			const body = fs.readFileSync(ref.abs, "utf-8");
+			entry.model = str(meta.model);
+			entry.tools = str(meta.tools)
+				.split(",")
+				.map((tool) => tool.trim())
+				.filter(Boolean);
+			Object.assign(entry, agentContractFields(ref.id));
+			entry.ownedArtifacts = agentDeclaredArtifacts(body);
+			entry.triggerOwner = /\b(?:use|runs?|activated|auto-activates|invoked|routed)\b/i.test(str(meta.description)) && /\b(?:not|never|does not)\b/i.test(str(meta.description));
+			entry.statusReference = body.includes("End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).") ? "a1" : "none";
+		}
 		entries.push(entry);
 	}
 
@@ -280,6 +325,10 @@ export function checkOwnership(claudeDir: string, opts: { missingInfraSeverity?:
 			} else if (!enumOf[field].has(value)) {
 				problems.push(`${field}="${value}" not in enum`);
 			}
+		}
+		if (e.type === "agent") {
+			if (!e.model) problems.push("missing model");
+			if (!e.tools || e.tools.length === 0) problems.push("missing tools");
 		}
 		if (problems.length > 0) {
 			results.push({ name: `Ownership: ${e.path}`, status: "fail", detail: problems.join("; "), section: "Ownership" });

@@ -79,6 +79,14 @@
         "long-term-memory"
       ],
       "description": "Optional implementation-surface cross-reference (vendor-neutral 7-surface lens). Annotates which agent surface an artifact lives on; used only as a secondary axis in the substrate view. Not seeded by default."
+    },
+    "model": {
+      "type": "string",
+      "description": "Required for agent frontmatter only. Must be inherit, a source model tier, or a named profile resolvable by the model taxonomy."
+    },
+    "tools": {
+      "type": "string",
+      "description": "Required for agent frontmatter only. Comma-delimited host tool allowlist."
     }
   }
 }

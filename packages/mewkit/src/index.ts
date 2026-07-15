@@ -78,6 +78,7 @@ ${pc.bold("Options:")}
   --gates          Validate: run only the gate-authority contract check (CI scope)
   --parity         Validate: regenerate the plugin and diff it against the committed tree
   --ownership      Validate: run only the artifact ownership-completeness check
+  --agents         Validate: run only declared agent-contract conformance checks
   --packs          Validate: run only the pack-manifest coherence + safety check
   --rules          Validate: run only the routing-table-breadth WARN check
   --fail-over <N>  Budget context: exit non-zero when a profile exceeds N tokens
@@ -179,6 +180,7 @@ async function main(): Promise<void> {
 			"gates",
 			"parity",
 			"ownership",
+			"agents",
 			"json",
 			"stale",
 			"critical",
@@ -275,6 +277,7 @@ async function main(): Promise<void> {
 				gates: args.gates as boolean | undefined,
 				parity: args.parity as boolean | undefined,
 				ownership: args.ownership as boolean | undefined,
+				agents: args.agents as boolean | undefined,
 				substrate: args.substrate as boolean | undefined,
 				packs: args.packs as boolean | undefined,
 				rules: args.rules as boolean | undefined,

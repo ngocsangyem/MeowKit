@@ -11,6 +11,7 @@ import { findPseudoCapabilities } from "../core/check-pseudo-capabilities.js";
 import { checkStaleIndex } from "../core/check-stale-index.js";
 import { checkPluginParity } from "../core/check-plugin-parity.js";
 import { checkOwnership } from "../core/build-inventory.js";
+import { checkAgentConformance } from "../core/check-agent-conformance.js";
 import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
 import { checkPlugin, checkPluginNamespace, checkPluginManifests } from "../core/check-plugin-manifests.js";
@@ -39,7 +40,8 @@ export type Section =
 	| "Plugin"
 	| "Rules"
 	| "Gates"
-	| "Capabilities";
+	| "Capabilities"
+	| "Agents";
 
 export interface CheckResult {
 	name: string;
@@ -86,6 +88,8 @@ interface ValidateOptions {
 	plugin?: boolean;
 	/** Scope the run to the capability-manifest coherence check only (CI-adoptable). */
 	capabilities?: boolean;
+	/** Scope the run to the declared agent-contract conformance check. */
+	agents?: boolean;
 }
 
 const ok = (cond: boolean): Status => (cond ? "pass" : "fail");
@@ -605,6 +609,7 @@ export async function buildDefaultChecks(
 			// derived from buildInventory, so this can only drift when a doc lies.
 			...checkStaleIndex(projectRoot),
 			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
+			...checkAgentConformance(projectRoot),
 			...checkSubstrate(meowkitDir, { missingViewSeverity: "warn" }),
 			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
 			// Manifest contract is N/A until `mewkit build-plugin` has run.
@@ -662,6 +667,8 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = checkPlugin(meowkitDir, projectRoot);
 	} else if (args.capabilities) {
 		results = checkCapabilitiesSection(meowkitDir);
+	} else if (args.agents) {
+		results = checkAgentConformance(projectRoot);
 	} else {
 		const mode = args.mode ?? detectValidateMode(projectRoot);
 		console.log(
@@ -693,6 +700,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		Inventory: true,
 		Rules: true,
 		Capabilities: true,
+		Agents: true,
 	};
 	const sections = Object.keys(SECTION_ORDER) as Section[];
 	for (const section of sections) {

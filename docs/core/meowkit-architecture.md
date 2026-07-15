@@ -47,8 +47,7 @@ For the end-to-end integration story (rules + hooks + skills + artifacts), see:
 | Deprecated skills                      | 0        | —                                          | `mk:debug`, `mk:documentation`, `mk:shipping` removed in v2.4.4                                                            |
 | Step-file skills                       | 5        | `step-file-rules.md` Applicability section | plan-creator, review, evaluate, harness, trace-analyze                                                                           |
 | Skills with internal agents            | 1        | `AGENTS_INDEX.md` Skill-Scoped section     | planning-engine (2 agents); jira agents moved to project-scoped in v2.8.3                                                                             |
-| Core agents                            | 17       | `ls .claude/agents/*.md` excl. index       | Matches `.claude/rules/agent-routing.md` agent table. `project-manager`                                                          |
-| AGENTS_INDEX rows                      | 17       | `AGENTS_INDEX.md` active table             | Footer "13 agents" phrasing is stale (CF-M34)                                                                                    |
+| Agent registry views                   | generated | `AGENTS_INDEX.md` generated view block     | Counts are derived from canonical agent frontmatter and validated by `mewkit validate --agents`.                                  |
 | Hook events (settings.json)            | 7        | `settings.json` hooks keys                 | SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit, SubagentStart, SubagentStop                                       |
 | Node handlers on disk                  | 8        | `ls .claude/hooks/handlers/*.cjs`          | Re-verified 2026-04-29 — disk has 8, matches HOOKS_INDEX. CF-M2 closed (audit cited stale 12).                                  |
 | Node handlers documented (HOOKS_INDEX) | 5 active | `HOOKS_INDEX.md:39` footer                 | memory-filter, memory-parser, memory-injector, memory-loader deleted (v2.4.0); immediate-capture-handler retained (CF-M1 closed) |
@@ -168,7 +167,7 @@ flowchart TD
         QA[mk:qa]
     end
 
-    subgraph AGENTS["Key Agents (17)"]
+    subgraph AGENTS["Key Agents"]
         AGT_ORC(orchestrator)
         AGT_PLN(planner)
         AGT_DEV(developer)
@@ -270,11 +269,10 @@ anchor. See `consolidated.md` Cross-Cutting Pattern 2.
 
 ---
 
-## 6. Agent Roster (17)
+## 6. Agent Roster
 
-Source: `AGENTS_INDEX.md` active table (17 rows verified against `ls .claude/agents/*.md`),
-`.claude/rules/agent-routing.md` agent table. AGENTS_INDEX footer contains stale "13 agents" phrasing
-(CF-M34) — canonical count is 17 (project-manager added 260422).
+Source: the generated agent-registry views in `AGENTS_INDEX.md`, validated against canonical
+agent frontmatter by `mewkit validate --agents`.
 
 | Agent           | Type    | Phase           | Role                                                                         |
 | --------------- | ------- | --------------- | ---------------------------------------------------------------------------- |

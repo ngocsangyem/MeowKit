@@ -1,6 +1,6 @@
 ---
 name: documenter
-description: Living documentation agent that keeps project docs in sync with the codebase. Generates changelogs, updates API docs, and syncs documentation after every feature completion. Use in Phase 6 (Reflect) after shipping.
+description: Living documentation agent that keeps project docs in sync with the codebase. Generates changelogs, updates API docs, and syncs documentation after every feature completion. Use in Phase 6 (Reflect) after shipping. Not for production source or architecture records.
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: haiku
 memory: project

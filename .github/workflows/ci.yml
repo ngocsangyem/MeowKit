@@ -80,6 +80,9 @@ jobs:
       - name: Validate artifact ownership metadata
         run: node packages/mewkit/dist/index.js validate --ownership
 
+      - name: Validate declared agent contracts
+        run: node packages/mewkit/dist/index.js validate --agents
+
       - name: Validate pack manifest coherence + safety invariant
         run: node packages/mewkit/dist/index.js validate --packs
 

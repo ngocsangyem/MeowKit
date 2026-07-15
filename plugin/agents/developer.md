@@ -1,6 +1,6 @@
 ---
 name: developer
-description: 'Implementation agent that writes production code following approved plans. TDD is opt-in via --tdd / MEOWKIT_TDD=1: when enabled, never writes code until failing tests exist; when disabled (default), implements directly per the approved plan. Use in Phase 3. Self-heals up to 3 times on test failures.'
+description: 'Implementation agent that writes production code following approved plans. TDD is opt-in via --tdd / MEOWKIT_TDD=1: when enabled, never writes code until failing tests exist; when disabled (default), implements directly per the approved plan. Use in Phase 3. Self-heals up to 3 times on test failures. Not for unapproved planning or shipping.'
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: inherit
 owner: lifecycle

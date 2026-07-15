@@ -1,6 +1,6 @@
 ---
 name: analyst
-description: Cost and learning analysis agent that tracks token usage, generates cost reports, extracts patterns from sessions, and maintains institutional memory. Runs automatically at session end (Phase 6) and on demand via /mk:budget command.
+description: Cost and learning analysis agent that tracks token usage, generates cost reports, extracts patterns from sessions, and maintains institutional memory. Runs automatically at session end (Phase 6) and on demand via /mk:budget command. Not for implementation, planning, or review decisions.
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: haiku
 memory: project

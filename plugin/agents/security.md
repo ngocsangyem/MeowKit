@@ -1,6 +1,6 @@
 ---
 name: security
-description: Risk-triggered deep security audit specialist for Phase 2 (pre-implementation) and Phase 4 (review). Issues BLOCK verdicts that halt the pipeline for critical vulnerabilities. Auto-activates on changes touching auth, payments, user data, API endpoints, encryption, or another flagged risk surface; the deterministic post-write scan runs on every write in all modes.
+description: Risk-triggered deep security audit specialist for Phase 2 (pre-implementation) and Phase 4 (review). Issues BLOCK verdicts that halt the pipeline for critical vulnerabilities. Auto-activates on changes touching auth, payments, user data, API endpoints, encryption, or another flagged risk surface; the deterministic post-write scan runs on every write in all modes. Not for general structural review verdicts.
 tools: Read, Grep, Glob, Bash, Write
 model: inherit
 owner: security

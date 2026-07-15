@@ -2,6 +2,11 @@
 
 ## Active Agents
 
+<!-- GENERATED:agent-views START -->
+**Agent registry views (generated):** 17 core/support direct-only; 21 domain hub-only; 1 intelligence direct-only; 1 internal harness.
+<!-- GENERATED:agent-views END -->
+
+<!-- GENERATED:agent-table-cardinality (`mewkit inventory --emit-counts`; validated by `mewkit validate --agents`) -->
 ```toon
 [40]{agent_file,type,role,source,workflow_phases,auto_activate,ce_version,last_improved}
 `orchestrator.md`|Core|Task router, complexity classification, model tier assignment|original|Phase 0 (Orient)|Yes — every task|260326|260326
@@ -69,8 +74,8 @@ All phases (0-6) have agent coverage.
 
 - **Core** — Pipeline agents that execute sequentially through phases 0-6. Each owns a distinct workflow phase.
 - **Support** — Invoked on-demand by core agents or explicitly by user. Can be spawned as subagents.
-- **Domain** — Domain-specific execution agents (currently: 13 jira-* domain agents). Forked from a matching `mk:<domain>-*` thin skill via `context: fork`. The skill body becomes the task brief.
-- **Intelligence** — Read-only reasoning agents that produce structured analysis without state changes (currently: 3 jira-{evaluator,estimator,analyst}).
+- **Domain** — Domain-specific execution agents. Forked from a matching `mk:<domain>-*` thin skill via `context: fork`. The skill body becomes the task brief.
+- **Intelligence** — Read-only reasoning agents that produce structured analysis without state changes.
 
 ## Subagent Status Protocol (v1.1.0)
 

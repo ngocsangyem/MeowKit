@@ -1,6 +1,6 @@
 ---
 name: shipper
-description: 'Deployment pipeline agent that executes the full ship sequence: pre-ship checks, conventional commit, feature branch + PR, CI verification, and rollback documentation. Use in Phase 5 after Gate 2 passes. Never commits directly to main.'
+description: 'Deployment pipeline agent that executes the full ship sequence: pre-ship checks, conventional commit, feature branch + PR, CI verification, and rollback documentation. Use in Phase 5 after Gate 2 passes. Never commits directly to main. Not for implementation or review approval.'
 tools: Read, Grep, Glob, Bash
 model: haiku
 owner: lifecycle

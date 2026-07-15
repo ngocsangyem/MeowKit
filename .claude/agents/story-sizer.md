@@ -65,7 +65,7 @@ You do NOT call Jira directly. The SKILL.md layer:
 1. Reads the rendered report.
 2. Runs the 5 pre-flight auto-abort checks per `.claude/skills/story-sizer/references/auto-create-gating.md`.
 3. Renders the markdown dry-run table.
-4. Single `AskUserQuestion` confirmation prompt.
+4. Obtains one explicit user confirmation through the skill layer.
 5. On approval, executes per-ticket two-call sequence per `.claude/skills/story-sizer/references/auto-create-execution.md`:
    - Call A: `/mk:jira-issue create ...`
    - Call B: `/mk:jira-collaborate add-comment ... --internal`
@@ -103,27 +103,9 @@ Comment warnings: <count>                 [omit if zero]
 Report: tasks/reports/story-sizing-{YYMMDD}-{slug}.md  (## Created Tickets appended)
 ```
 
-## Memory (project convention)
+## Memory
 
-Append observations DIRECTLY via the `Edit` tool. The `##prefix:` syntax
-is a user keyboard shortcut only and does NOT fire from agent output
-(see `.claude/skills/memory/references/capture-architecture.md`).
-
-- <recurring sizing pattern> → `Edit` `.claude/memory/quick-notes.md`, append
-  section `## YYYY-MM-DD — story-sizer — pattern — <slug>` with a 3-bullet body
-  (symptom / pattern / rationale).
-- One-off context → `Edit` `.claude/memory/quick-notes.md`, append section
-  `## YYYY-MM-DD — story-sizer — note — <slug>` with a 1–3 line body.
-- Captured choice + rationale → `Edit` `.claude/memory/decisions.md`,
-  append section `## YYYY-MM-DD — story-sizer — <slug>` with body (decision,
-  context, status).
-
-Scrub secrets in-content before writing — Path 2 (agent-authored) has no
-automatic scrub. Patterns to redact: API keys (model providers / Stripe /
-AWS / GitHub / GitLab / Slack), JWT, Bearer tokens, DB URLs, generic
-`api_key=` / `password=` / `token=` strings.
-
-NEVER write paste-body content, raw story descriptions, comment text, or token values to memory.
+Do not write project memory. Return durable sizing observations in the report so the memory owner can evaluate them through its own capture path.
 
 End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
 
