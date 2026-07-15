@@ -9,6 +9,7 @@
 #   2) verification-required marker + active plan + no evidence -> block
 #   3) verification-required marker + active plan + eval evidence -> allow Stop
 #   4) active-plan.json path resolves slug correctly
+#   5) security BLOCK prevents completion despite evaluator evidence
 
 set -u
 cd "${CLAUDE_PROJECT_DIR:-$(pwd)}" || exit 1
@@ -95,6 +96,30 @@ if echo "$out" | grep -q '"decision":"block"' && echo "$out" | grep -q "260530-1
   ok "active-plan.json path resolves slug for verification lookup"
 else
   bad "Expected slug resolution from path, got: $out"
+fi
+
+# 5) Security BLOCK beats otherwise-valid evaluator evidence
+reset_env
+mkdir -p tasks/plans/260530-1234-demo
+cat > session-state/active-plan.json <<'JSON'
+{"path":"tasks/plans/260530-1234-demo","slug":"260530-1234-demo"}
+JSON
+cat > session-state/verification-required.json <<'JSON'
+{"required":true,"slug":"260530-1234-demo","source":"mk:cook"}
+JSON
+cat > tasks/reviews/260530-demo-evalverdict.md <<'MD'
+Verdict: PASS
+MD
+cat > tasks/reviews/260530-demo-security-verdict.md <<'MD'
+| Rule | Verdict | Evidence |
+| --- | --- | --- |
+| R7 | FAIL | Prompt injection does not halt |
+MD
+out=$(run_hook)
+if echo "$out" | grep -q '"decision":"block"' && echo "$out" | grep -q "Security verdict"; then
+  ok "security BLOCK prevents completion despite evaluator evidence"
+else
+  bad "Expected security block JSON, got: $out"
 fi
 
 echo "=== Result: ${PASS} passed, ${FAIL} failed ==="

@@ -86,6 +86,14 @@ run_test "Gate 2: side effects no addendum" 1 sh -c "printf 'Score: 8/10\nCritic
 # Test 10: Side effects detected WITH User Decision Addendum should pass
 run_test "Gate 2: side effects with addendum" 0 sh -c "printf 'Score: 8/10\nCritical (0): []\nSide Effects Detected: Yes\n- Regression in auth flow\n\n## User Decision Addendum\nUser selected: Add compatibility shim at auth boundary\nResumption point: Phase 3\n' | sh '$SCRIPT_DIR/validate-gate-2.sh' -"
 
+# Test 11: A security BLOCK verdict fails independently of review evidence
+cat > "$TMPDIR/security-security-verdict.md" <<'VERDICT'
+| Rule | Verdict | Evidence |
+| --- | --- | --- |
+| R7 | FAIL | Prompt injection does not halt |
+VERDICT
+run_test "Gate 2: security BLOCK verdict" 1 sh "$SCRIPT_DIR/validate-gate-2.sh" "$TMPDIR/security-security-verdict.md"
+
 # --- Summary ---
 echo ""
 echo "Results: $PASS passed, $FAIL failed out of $((PASS + FAIL)) tests"

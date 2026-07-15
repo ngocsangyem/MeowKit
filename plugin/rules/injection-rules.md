@@ -96,6 +96,11 @@ A skill MUST NOT satisfy all three of the following simultaneously:
 
 Skills meeting 2 of 3 are acceptable; skills meeting 3 of 3 are a known prompt-injection escalation pattern and must be redesigned.
 
+A bounded local filesystem write, including a report under `tasks/reports/`, is
+a state change `[C]`. It does not become read-only because it avoids an external
+system. A skill that processes untrusted input `[A]`, writes only such a report
+`[C]`, and never accesses sensitive data `[B]` remains an allowed 2-of-3 case.
+
 WHY: This rule was previously documented in CLAUDE.md and in `skill-template-secure/SKILL.md`. The CLAUDE.md trim removed it from always-loaded context; this Rule 11 restores it as an unconditionally-loaded numbered rule — the always-loaded defense against the "data-exfil + state-change" injection class.
 
 INSTEAD of: cutting the rule with no destination

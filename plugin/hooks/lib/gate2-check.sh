@@ -197,7 +197,18 @@ if [ -z "$SLUG" ]; then
   block "Active-plan pointer '$ACTIVE_PLAN' did not resolve to a plan slug."
 fi
 
-# Same globs as pre-completion-check.sh: an mk:review verdict or an evaluator one.
+# A security BLOCK is independently ship-blocking. Security verdicts do not
+# authorize a ship and are therefore intentionally excluded from VERDICT_COUNT.
+for _security_verdict in tasks/reviews/[0-9]*-"$SLUG"-security-verdict.md; do
+  [ -f "$_security_verdict" ] || continue
+  if ! sh .claude/skills/cook/scripts/validate-gate-2.sh "$_security_verdict" >/dev/null; then
+    block \
+      "Security verdict '$_security_verdict' blocks plan '$SLUG'." \
+      "Fix: resolve the security findings and obtain a new PASS security verdict."
+  fi
+done
+
+# An mk:review or evaluator verdict provides the structural Gate 2 evidence.
 VERDICT=""
 VERDICT_COUNT=0
 for _v in tasks/reviews/[0-9]*-"$SLUG"-verdict.md tasks/reviews/[0-9]*-"$SLUG"-evalverdict.md; do

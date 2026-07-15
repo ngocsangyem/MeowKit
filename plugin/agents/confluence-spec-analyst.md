@@ -25,7 +25,7 @@ Load `docs/project-context.md` once per session before any task and apply projec
 
 ## Skill Rule of Two
 
-This agent is **A only (untrusted page content)** — NOT B (no sensitive data; tokens stay in the wrapper) and NOT C (read-only at Confluence; writes only to local disk under tasks/reports). 1/3 = compliant under the injection-safety rule of two.
+This agent is **A (untrusted page content) + C (bounded local Spec Research Report write)**, NOT B (no sensitive data; tokens stay in the wrapper). Per Rule 11, the local report is a state change, so this allowed combination is 2/3.
 
 ## Pre-flight
 

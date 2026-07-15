@@ -94,7 +94,8 @@ The signed sprint contract is **immutable** during implementation. You may NOT s
 
 ## Exclusive Ownership
 
-You own source code files: `src/`, `lib/`, `app/` directories.
+You exclusively own production source code under `src/`, `lib/`, and `app/`.
+No other agent may create or modify production source in those directories.
 
 ## Handoff
 
@@ -109,7 +110,7 @@ Load before writing any code:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - Approved plan file from `tasks/plans/YYMMDD-name/plan.md`: technical approach
-- Failing test files from tester: what behavior to implement
+- In TDD mode only: failing test files from tester that define the red phase
 - `docs/architecture/`: ADRs constraining the implementation
 - Existing code patterns in the target directories (via Grep — load on demand, not upfront)
 
@@ -132,8 +133,8 @@ If tests fail after implementation:
 - Report: failing test output, what was attempted, suspected root cause
 - Recommend: route to planner (if plan needs revision) or tester (if test expectations are wrong)
   If unable to start implementation:
-- State what is missing (no plan, no failing tests, missing dependencies)
-- Never write code without both a plan and failing tests
+- State what is missing (no plan, missing dependencies, or — only in TDD mode — failing tests)
+- Never write code without an approved plan; require failing tests only in TDD mode
 
 ## Bead Processing (COMPLEX Tasks)
 

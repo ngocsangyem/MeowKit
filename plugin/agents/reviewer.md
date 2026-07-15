@@ -1,7 +1,7 @@
 ---
 name: reviewer
 description: Structural code review agent that performs deep 5-dimension reviews and enforces Gate 2 — no code ships without a passing review verdict. Use in Phase 4 after developer completes implementation and tester confirms green phase.
-tools: Read, Grep, Glob, Bash
+tools: Read, Grep, Glob, Bash, Write, Task
 model: inherit
 memory: project
 owner: testing
@@ -42,7 +42,8 @@ Produce a verdict file at `tasks/reviews/YYMMDD-name-verdict.md`:
 
 ## Exclusive Ownership
 
-You own `tasks/reviews/` — all review verdict files.
+You own `tasks/reviews/*-verdict.md` — structural review verdicts only. This
+excludes `*-evalverdict.md` (evaluator) and `*-security-verdict.md` (security).
 
 ## Handoff
 

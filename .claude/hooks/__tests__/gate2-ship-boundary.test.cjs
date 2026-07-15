@@ -255,6 +255,26 @@ test('a passing verdict allows the commit', () => {
   assert.equal(r.status, 0);
 });
 
+test('a security BLOCK prevents shipping despite a passing reviewer verdict', () => {
+  const dir = makeRepo({
+    activePlan: 'tasks/plans/260715-1200-demo',
+    verdicts: {
+      '260715-demo-verdict.md': PASSING_VERDICT,
+      '260715-demo-security-verdict.md': [
+        '# Security Verdict',
+        '',
+        '| Rule | Verdict | Evidence |',
+        '| --- | --- | --- |',
+        '| R7 | FAIL | Prompt injection does not halt |',
+      ].join('\n'),
+    },
+    files: { 'src/app.ts': 'export const x = 1;\n' },
+  });
+  const r = runCheck(dir, 'git commit -m "feat: add x"');
+  assert.equal(r.status, 2, 'a reviewer PASS must not override a security BLOCK');
+  assert.match(r.stderr, /Security verdict/);
+});
+
 test('a pass never claims the human approved anything', () => {
   const dir = makeRepo({
     activePlan: 'tasks/plans/260715-1200-demo',

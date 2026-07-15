@@ -1,5 +1,5 @@
 #!/bin/sh
-# validate-gate-2.sh — Check review verdict has no FAIL dimensions for Gate 2
+# validate-gate-2.sh — Check a review or security verdict has no blocking state for Gate 2
 # Usage: sh validate-gate-2.sh <path-to-verdict-or-review-output>
 # Can also read from stdin: echo "Score: 9/10..." | sh validate-gate-2.sh -
 # Exit 0 = GATE_2_READY, Exit 1 = GATE_2_BLOCKED
@@ -7,6 +7,10 @@
 set -e
 
 INPUT="${1:--}"
+VERDICT_KIND="review"
+case "$INPUT" in
+  *-security-verdict.md) VERDICT_KIND="security" ;;
+esac
 
 if [ "$INPUT" = "-" ]; then
   CONTENT=$(cat)
@@ -18,8 +22,10 @@ else
 fi
 
 # Check for FAIL dimensions — match structured patterns only to avoid false positives
-# Matches: "FAIL", "VERDICT: FAIL", "Security: FAIL", "BLOCK" at word boundaries
-FAIL_COUNT=$(printf '%s\n' "$CONTENT" | grep -cE '^FAIL:|: FAIL|VERDICT.*FAIL|^BLOCK:|GATE.*BLOCK' 2>/dev/null || true)
+# Matches structured verdict states only, including the security agent's
+# documented `Verdict: BLOCK` form and Markdown-table findings. Incidental
+# prose such as "blocked by" is deliberately ignored.
+FAIL_COUNT=$(printf '%s\n' "$CONTENT" | grep -ciE '^FAIL:|: FAIL|VERDICT[[:space:]]*:?[[:space:]]*(FAIL|BLOCK)|^BLOCK:|GATE.*BLOCK|^\|[^|]*\|[[:space:]]*(FAIL|BLOCK)[[:space:]]*\|' 2>/dev/null || true)
 FAIL_COUNT=$(echo "$FAIL_COUNT" | tr -d '[:space:]')
 FAIL_COUNT=${FAIL_COUNT:-0}
 
@@ -61,10 +67,10 @@ if [ "$SIDE_EFFECT" -gt 0 ] && [ "$ADDENDUM" -eq 0 ]; then
 fi
 
 if [ -n "$ISSUES" ]; then
-  echo "GATE_2_BLOCKED:$ISSUES — score: $SCORE/10"
+  echo "GATE_2_BLOCKED:$ISSUES — $VERDICT_KIND verdict, score: $SCORE/10"
   echo "Human approval required to override."
   exit 1
 fi
 
-echo "GATE_2_READY — score: $SCORE/10, 0 critical, 0 FAIL"
+echo "GATE_2_READY — $VERDICT_KIND verdict, score: $SCORE/10, 0 critical, 0 FAIL"
 exit 0

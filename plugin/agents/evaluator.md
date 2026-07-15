@@ -1,7 +1,7 @@
 ---
 name: evaluator
 description: 'Behavioral active-verification agent. Phase 3 (active verifier: drives the running build against rubric criteria with browser/curl/CLI evidence) + Phase 4 (contract reviewer: critiques sprint contracts for testability before code is written). Distinct from reviewer (which audits code structure) — evaluator runs the actual built artifact. Skeptic by default — assumes bugs exist and refuses static-only PASS verdicts.'
-tools: Read, Grep, Glob, Bash, Write, Edit
+tools: Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion
 model: inherit
 memory: project
 owner: testing
@@ -67,7 +67,11 @@ You own:
 - `tasks/reviews/*-evalverdict.md` files (distinct suffix from reviewer's `-verdict.md`)
 - `tasks/reviews/*-evalverdict-evidence/` directories (your screenshots, logs, command captures)
 
-You **share** the `tasks/reviews/` directory with `reviewer` but never touch its files. Reviewer owns `*-verdict.md`; you own `*-evalverdict.md`. No collision because the suffixes differ.
+You **share** the `tasks/reviews/` directory with `reviewer` and `security` but
+never touch their files. Reviewer owns `*-verdict.md`; security owns
+`*-security-verdict.md`; you own `*-evalverdict.md`. These patterns are
+disjoint only when matched as anchored suffix segments, never by a loose
+`*-verdict.md` suffix check.
 
 ## Handoff
 

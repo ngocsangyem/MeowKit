@@ -28,6 +28,12 @@ applies_to: [Phase 0, all]
 
 No two agents modify the same file type. Conflicts → escalate to human.
 
+## Artifact Ownership
+
+Each agent's `## Exclusive Ownership` section is the authoritative source for
+write-artifact patterns. This routing table deliberately does not duplicate a
+pattern-to-owner registry; the generated inventory is the consolidated view.
+
 **Opt-out:** `MEOWKIT_PM_AUTO=off` disables all silent (background) project-manager fires from orchestration skills. User-invoked `/mk:status` is always honored. See `.claude/rules/post-phase-delegation.md` for fire points and skip conditions.
 
 ## Domain Integration Agents (routed by hub skills, NOT by orchestrator)

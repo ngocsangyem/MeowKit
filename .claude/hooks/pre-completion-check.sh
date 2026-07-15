@@ -127,6 +127,18 @@ for f in tasks/reviews/[0-9]*-"$SLUG"-evalverdict.md; do
   [ -f "$f" ] && HAS_VERIFICATION=1 && break
 done
 
+# A security BLOCK must prevent completion even when another verification
+# artifact exists. Security verdicts do not themselves satisfy verification.
+for f in tasks/reviews/[0-9]*-"$SLUG"-security-verdict.md; do
+  [ -f "$f" ] || continue
+  if ! sh .claude/skills/cook/scripts/validate-gate-2.sh "$f" >/dev/null; then
+    cat <<EOF
+{"decision":"block","reason":"Security verdict '$f' blocks active plan '${ACTIVE_PLAN:-$SLUG}'. Resolve the finding and obtain a new PASS security verdict before stopping."}
+EOF
+    exit 0
+  fi
+done
+
 # 2. Signed sprint contract exists for this slug
 if [ "$HAS_VERIFICATION" -eq 0 ]; then
   for c in tasks/contracts/*-"$SLUG"-sprint-*.md; do

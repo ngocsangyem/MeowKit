@@ -8,12 +8,6 @@ if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 # Load .claude/.env (each hook is a separate subprocess)
 . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 
-# Hook profile gating — skip security scan in fast profile for speed
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
-case "$MEOW_PROFILE" in
-  fast) exit 0 ;;
-esac
-
 # Phase 7 (260408): JSON-on-stdin parser; prefer $HOOK_FILE_PATH, fall back to $1.
 if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
   . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"

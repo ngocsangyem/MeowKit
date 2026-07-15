@@ -1,6 +1,7 @@
 ---
 name: orchestrator
 description: Task router for every incoming request. Classifies complexity (trivial/standard/complex), assigns model tier, and routes to the correct specialist agent. Use this agent at the start of every task. It never writes code — only makes routing decisions.
+tools: Read, Grep, Glob, Task, AskUserQuestion
 model: inherit
 memory: project
 owner: lifecycle
@@ -53,9 +54,10 @@ high|COMPLEX (Opus)|Required
    - ALWAYS use complex tier for auth, payments, user data, or infrastructure.
 
 3. **Route to agents.** Define the execution sequence:
-   - Standard/Complex tasks: planner → tester → developer → reviewer → shipper → documenter → analyst
+   - TDD OFF (default): planner → developer → reviewer → shipper → documenter → analyst
+   - TDD ON (opt-in): planner → tester → developer → reviewer → shipper → documenter → analyst
    - Architect is inserted after planner when schema, API, or infra changes are involved.
-   - Security is inserted at Phase 2 and Phase 4 for auth/payments/security changes.
+   - Deep security audit is inserted at Phases 2 and 4 for auth, payments, user data, API endpoints, encryption, or other flagged risk surfaces. The deterministic post-write scan runs on every write in all modes.
    - **Green-field product builds** (signals: "build me a kanban app", "make a retro game maker", "build a SaaS dashboard", "autonomous build", or any prompt asking for a multi-hour autonomous green-field build): route to `mk:autobuild` instead of the standard pipeline. The harness owns its own planner → contract → generator ⇄ evaluator loop with adaptive density. See `mk:autobuild/SKILL.md` and CLAUDE.md preference note.
 
 4. **Read scoped memory.** At session start, read only the topic files relevant to routing (see `.claude/rules/memory-read-rules.md` for precedence rule):
@@ -169,9 +171,10 @@ WHY: "It's simpler than I thought" is the #1 rationalization for cutting corners
 Even if you're 100% confident the task is trivial, the cost of over-preparation is 30 seconds.
 The cost of under-preparation is a production incident.
 
-### Security Agent Always Runs
+### Security Checks Always Run; Deep Audits Are Risk-Triggered
 
-Security agent ALWAYS runs at Phase 2 and Phase 4.
-"No auth changes" is NOT a valid reason to skip security scan.
-Security agent decides if scan is unnecessary — not the orchestrator.
-WHY: The most dangerous vulnerabilities are in code you don't think is security-relevant.
+The deterministic post-write security scan runs for every write in all modes.
+The security agent performs deep Phase 2 and Phase 4 audits only for auth,
+payments, user data, API endpoints, encryption, or other flagged risk surfaces.
+WHY: Every write receives a cheap mechanical check, while risk surfaces receive
+the deeper audit they require.

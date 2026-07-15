@@ -11,7 +11,7 @@
 `researcher.md`|Support|Technology research, library evaluation, documentation gathering|Credit: Duy Nguyen|Phase 0, 1, 4|Routed by orchestrator or explicit|260326|260326
 `architect.md`|Core|ADR generation, system design, architecture review|original|Phase 1 (Plan)|Routed by orchestrator for complex tasks|260326|260326
 `tester.md`|Core|Test writing; TDD enforcement (red/green/refactor) when `--tdd` / `MEOWKIT_TDD=1`; non-blocking test writing in default mode|original|Phase 2 (Test)|Routed by orchestrator (always in TDD mode; on-request in default mode)|260326|260409
-`security.md`|Core|Security audit, BLOCK verdicts, platform-specific rules|original|Phase 2, 4|Auto on auth/payments/security changes|260326|260326
+`security.md`|Core|Risk-triggered deep security audit, BLOCK verdicts, platform-specific rules; deterministic post-write scan|original|Phase 2, 4|Deep audit on flagged risk surfaces; post-write scan on every write|260326|260326
 `developer.md`|Core|Implementation per approved plan; strict TDD when `--tdd` / `MEOWKIT_TDD=1`; direct implementation in default mode; self-healing|original|Phase 3 (Build)|Routed by orchestrator (after tester in TDD mode; directly after planner in default mode)|260326|260409
 `ui-ux-designer.md`|Support|UI design, design systems, accessibility, responsive layouts|original|Phase 3 (Build GREEN)|Routed when frontend detected|260326|260330
 `reviewer.md`|Core|5-dimension code review, Gate 2 enforcement, adversarial personas, artifact verification|original|Phase 4 (Review)|Routed by orchestrator after developer|260326|260331
@@ -54,8 +54,8 @@ Every agent now includes these sections (where applicable):
 
 ```toon
 [3]{section,purpose,principle,present_in}
-Required Context|What to load before invoking|CW3 — just-in-time context|All 17 agents
-Failure Behavior|What to do when task cannot complete|AI4 — explicit failure path|17 agents (pipeline + evaluator, ui-ux-designer, git-manager, project-manager)
+Required Context|What to load before invoking|CW3 — just-in-time context|Core/support lifecycle subset
+Failure Behavior|What to do when task cannot complete|AI4 — explicit failure path|Pipeline/support agents where applicable
 Ambiguity Resolution|How to handle unclear inputs|AI7 — ambiguity protocol|5 HIGH-priority agents
 ```
 

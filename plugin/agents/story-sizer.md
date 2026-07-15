@@ -24,7 +24,7 @@ Per `.claude/rules/agent-conduct.md` A2, load `docs/project-context.md` once per
 
 Per `.claude/rules/injection-rules.md` Rule 11:
 
-- **Default mode:** **A** (untrusted paste content) + **C** (local-FS write of the sizing report). 1-of-3 effective state-change vector (the FS write is bounded to `tasks/reports/`). NOT **B** — no sensitive data; credentials live in `jira-as` (held by peer skills).
+- **Default mode:** **A** (untrusted paste content) + **C** (local-FS write of the sizing report). Per Rule 11, this bounded report write is a state change, so the allowed combination is 2-of-3. NOT **B** — no sensitive data; credentials live in `jira-as` (held by peer skills).
 - **Auto-create mode:** **A** (untrusted paste content) + **C** (delegated state change via `mk:jira-issue` + `mk:jira-collaborate`). Still NOT **B** — credentials remain in `jira-as` wrapper invoked by the peer skills, never by this agent.
 
 The `Write` tool is allowlisted **only** for persisting the Story Sizing Report under `tasks/reports/story-sizing-*.md`.
