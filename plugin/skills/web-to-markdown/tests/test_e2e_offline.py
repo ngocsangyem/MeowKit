@@ -14,8 +14,8 @@ How to run:
     pytest tests/test_e2e_offline.py -v
 
 These tests do NOT require MEOWKIT_RUN_SMOKE_TESTS — they are offline-safe.
-They require the skill's Python deps to be importable (requests, lxml, etc.)
-or the test fixtures will gracefully skip.
+They require the skill's Python dependencies, which CI installs before running
+this suite.
 """
 
 import importlib
@@ -32,25 +32,9 @@ _SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _SKILL_DIR not in sys.path:
     sys.path.insert(0, _SKILL_DIR)
 
-# Skip the entire module if scripts.* deps are not importable.
-# This keeps the test file syntactically valid in environments where the venv
-# isn't installed, without producing a hard FAIL during compile/lint.
-try:
-    from scripts.fetch_as_markdown import fetch_as_markdown  # noqa: E402
-    from scripts.injection_detect import scan as injection_scan  # noqa: E402
-    from scripts.persist_fetch import quarantine as persist_quarantine  # noqa: E402
-    _DEPS_OK = True
-except ImportError as e:
-    _DEPS_OK = False
-    _IMPORT_ERR = str(e)
-
-pytestmark = pytest.mark.skipif(
-    not _DEPS_OK,
-    reason=(
-        "Skill deps not importable — install with: "
-        ".claude/skills/.venv/bin/pip install -r scripts/requirements.txt"
-    ),
-)
+from scripts.fetch_as_markdown import fetch_as_markdown  # noqa: E402
+from scripts.injection_detect import scan as injection_scan  # noqa: E402
+from scripts.persist_fetch import quarantine as persist_quarantine  # noqa: E402
 
 _DATA_FENCE = "```fetched-markdown"
 _INJECTION_STOP_PREFIX = "INJECTION_STOP:"

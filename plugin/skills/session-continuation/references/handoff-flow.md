@@ -4,9 +4,9 @@
 
 ## Step 1: Detect Need
 
-Triggers: Token count ≥150K (75%), user request ("handoff", "save", "pause"), long workflow (Phases 1-2 complete).
+Triggers: the host reports that its context budget is approaching the warning threshold, user request ("handoff", "save", "pause"), long workflow (Phases 1-2 complete).
 
-Auto-prompt: "Token usage is at 75%. Would you like to save workflow state for continuation?"
+Auto-prompt: "Context budget is nearing the host warning threshold. Would you like to save workflow state for continuation?"
 
 ## Step 2: Save State
 

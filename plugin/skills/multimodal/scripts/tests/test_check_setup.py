@@ -15,6 +15,9 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from env_isolation import disable_env_file_loading
+
+disable_env_file_loading()
 from check_setup import check_api_key, check_dependencies
 
 passed = 0

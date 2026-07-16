@@ -20,7 +20,7 @@
 
 ## Auto-Save Behavior
 
-Events: Phase completion, every 5 minutes, token milestones (100K, 150K, 175K), before external writes. Silent — no user notification for routine saves.
+Events: Phase completion, every 5 minutes, host-reported context-warning milestones, before external writes. Silent — no user notification for routine saves.
 
 ## State File Structure
 

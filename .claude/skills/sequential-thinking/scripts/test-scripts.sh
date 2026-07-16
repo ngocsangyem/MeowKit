@@ -6,6 +6,15 @@ SCRIPTS_DIR="$(dirname "$0")"
 PASS=0
 FAIL=0
 
+cleanup_history() {
+  if ! node "$SCRIPTS_DIR/process-thought.js" --reset > /dev/null 2>&1; then
+    echo "  FAIL: Reset thought history during cleanup"
+    exit 1
+  fi
+}
+
+trap cleanup_history EXIT
+
 assert_exit() {
   TEST_NAME="$1"; EXPECTED_EXIT="$2"; shift 2
   "$@" > /dev/null 2>&1
@@ -60,9 +69,6 @@ assert_contains "Summary output" '"totalThoughts"' \
 # Test 6: History
 assert_contains "History output" '"thoughts"' \
   node "$SCRIPTS_DIR/process-thought.js" --history
-
-# Reset after tests
-node "$SCRIPTS_DIR/process-thought.js" --reset > /dev/null 2>&1
 
 echo ""
 echo "=== format-thought.js ==="

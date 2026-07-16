@@ -112,22 +112,25 @@ addressed before next eval pass.
 
 ## Automation status
 
-The suite is **manual / LLM-judged**, not a pass/fail script — by design on this
-harness:
+`run-canaries.cjs` is a local Track M runner, never a CI job. It is inert unless
+`PROMPT_ENHANCER_EVAL=1` is set and the caller supplies executable subject and
+judge adapters plus an output directory. Each adapter receives one JSON request
+on stdin and must return one JSON response on stdout. The subject must include
+`output` and a captured `transcript`; the judge returns applicable rubric
+dimensions with `PASS` or `FAIL` verdicts.
 
-- Default + recipe canaries (#1–#6, #11–#12) compare model output against a prose
-  **gold standard** (`## Expected`). Verdicts need semantic judgment ("emitted no
-  findings of its own", "ACs offered as suggestions, not embedded"), which a
-  string diff cannot decide. An LLM judge runs them; results land in
-  `baseline-results.md`.
-- Canary #9's transcript audit (zero forbidden `Read` calls) needs tool-call
-  transcript observability the skill cannot self-inspect here. It stays a
-  **manual** assertion.
+```bash
+PROMPT_ENHANCER_EVAL=1 node eval/run-canaries.cjs \
+  --subject-adapter /abs/path/subject --judge-adapter /abs/path/judge \
+  --subject-model-label subject --judge-model-label judge \
+  --tier core --out /abs/path/eval-output
+```
 
-A fully automated CI runner is therefore **not wired**: it would require an
-out-of-band LLM-judge harness + transcript capture — ecosystem infrastructure,
-not skill scope. Re-evaluate if such a harness ships. Until then, run the suite
-manually per the procedure above before any rollout.
+`--tier deep` or `all` also requires `--fixture`; it refuses before adapter
+execution when the fixture SHA is not a recorded deep baseline. The runner
+compares paired target/default and deep/default kernels where required, records
+PASS-to-fail regressions, and writes only verdict metadata, output digests, and
+tool-call counts to `--out` (never raw output or transcript data).
 
 ## Files
 

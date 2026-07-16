@@ -5,7 +5,7 @@ description: "mk:scale-routing"
 
 ## What This Skill Does
 
-`mk:scale-routing` is an internal sub-skill of Phase 0 (Orient) that replaces subjective orchestrator judgment with deterministic, auditable domain-based routing. It scans task descriptions against `data/domain-complexity.csv` and runs additional detection layers to classify task type, complexity level, workflow intensity, model tier, and suggested skill. A fintech auth change auto-classifies as COMPLEX without human intervention.
+`mk:scale-routing` is an internal sub-skill of Phase 0 (Orient) that replaces subjective orchestrator judgment with deterministic, auditable domain-based routing. It scans task descriptions against `data/domain-complexity.csv` and runs additional detection layers to classify task type, complexity level, workflow intensity, provider-neutral execution tier, and suggested skill. A fintech auth change auto-classifies as high complexity without human intervention; the active provider adapter selects any model policy.
 
 ## When to Use
 
@@ -55,15 +55,15 @@ Extend by adding rows to `data/domain-complexity.csv`. Keep signals specific —
 | docs | docs, README, changelog, API docs | mk:docs-init or mk:document-release | 4 |
 | review | review, PR, pull request, check | mk:review | 4 |
 
-Security always wins and forces COMPLEX tier — no downgrade possible. `suggested_skill` is a recommendation the orchestrator may override.
+Security always wins in task-type classification. The active provider adapter applies any required model-tier escalation. `suggested_skill` is a recommendation the orchestrator may override.
 
 ### Routing Logic
 
-| Level | Model Tier | Gate 1 | Workflow |
+| Level | Execution Tier | Gate 1 | Workflow |
 |-------|-----------|--------|----------|
-| low | TRIVIAL (Haiku) | Bypass eligible (one-shot) | Minimal |
-| medium | STANDARD (Sonnet) | Required | Standard phases |
-| high | COMPLEX (Opus) | Required | Full phases + security |
+| low | minimal | Bypass eligible (one-shot) | Minimal |
+| medium | standard | Required | Standard phases |
+| high | high-assurance | Required | Full phases + security |
 
 One-shot bypass requires BOTH CSV match AND orchestrator zero-blast-radius confirmation.
 
@@ -91,14 +91,13 @@ When the YAML exists, output includes `product_area` and `pic` fields. When abse
 
 ### Harness Density (v2.1)
 
-| Level (Model) | Model ID contains | Density |
-|---------------|-------------------|---------|
-| low (TRIVIAL/Haiku) | any | MINIMAL |
-| medium (STANDARD/Sonnet) | any | FULL |
-| high (COMPLEX/Opus) | opus-4-6, opus-4.6, opus-4-7 | LEAN |
-| high (COMPLEX/Opus) | other (opus-4-5, claude-opus-4) | FULL |
+| Level | Neutral baseline | Density |
+|-------|------------------|---------|
+| low | none | MINIMAL |
+| medium | none | FULL |
+| high | none | FULL |
 
-Override: `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` env var.
+An autobuild adapter can refine the final density from its known model capabilities. Override: `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` env var.
 
 ### Output Schema
 
@@ -109,7 +108,7 @@ Full output includes:
 | domain | snake_case string or "unknown" | v1.0 |
 | level | low, medium, high | v1.0 |
 | workflow | one-shot, standard, enhanced, advanced | v1.0 |
-| model_tier_override | TRIVIAL, STANDARD, COMPLEX | v1.0 |
+| execution_tier | minimal, standard, high-assurance | v1.0 |
 | task_type | bug_fix, feature, refactor, security, devops, docs, review, intake | v2.0 |
 | suggested_skill | mk:fix, mk:cook, mk:cso, mk:review, mk:intake, etc. | v2.0 |
 | confidence | HIGH, MEDIUM, LOW | v2.0 |
@@ -142,7 +141,7 @@ Output:
   "domain": "fintech",
   "level": "high",
   "workflow": "enhanced",
-  "model_tier_override": "COMPLEX",
+  "execution_tier": "high-assurance",
   "task_type": "feature",
   "suggested_skill": "mk:cook",
   "confidence": "HIGH",
@@ -153,7 +152,7 @@ Output:
 ## Common Use Cases
 
 - **Every Phase 0 task classification** — invoked automatically by orchestrator
-- **Domain-specific routing** — fintech, healthcare, gaming tasks get appropriate complexity and model tier
+- **Domain-specific routing** — fintech, healthcare, and gaming tasks get appropriate complexity, workflow, and execution tier
 - **Team-specific customization** — add `.claude/product-areas.yaml` for path-based routing with PIC suggestions
 - **Harness integration** — autobuild_density field feeds `mk:autobuild` for scaffolding decisions
 

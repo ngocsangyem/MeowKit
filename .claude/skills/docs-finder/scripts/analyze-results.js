@@ -41,7 +41,13 @@ const PRIORITY_KEYWORDS = {
  * Categorize a URL by priority
  */
 function categorizeUrl(url) {
-  const urlLower = url.toLowerCase();
+  let urlLower = url.toLowerCase();
+  try {
+    const parsed = new URL(url);
+    urlLower = parsed.pathname.toLowerCase();
+  } catch {
+    // Keep the legacy text fallback for malformed or relative inputs.
+  }
   const priorities = ['critical', 'important', 'supplementary'];
 
   for (const priority of priorities) {

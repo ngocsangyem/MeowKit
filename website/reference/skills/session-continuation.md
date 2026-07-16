@@ -7,7 +7,7 @@ description: "mk:session-continuation"
 Persists and restores mid-session workflow progress across context resets. Captures plan state, active agents, current phase, key decisions, and file state at handoff. On resume, reads the saved state and continues from the exact interruption point -- no context lost.
 
 ## When to Use
-- Token count approaching 150K (75% of context limit) -- auto-prompts
+- The host reports that its context budget is nearing its warning threshold -- auto-prompts
 - User says "handoff", "save state", "pause", or "resume workflow"
 - Session ending with an incomplete workflow
 - Resuming an incomplete workflow from a previous session
@@ -15,7 +15,7 @@ Persists and restores mid-session workflow progress across context resets. Captu
 ## Core Capabilities
 1. **Handoff:** Saves complete workflow state (phase, agents, decisions, deliverables, token usage) to `.claude/logs/workflows/[workflow-id]/workflow-state.json` and generates a summary with exact resume instructions
 2. **Resume:** Loads state from file, validates it (exists, valid JSON, compatible version, status is "paused"), restores context (project, agents, phase rules, key decisions), and continues from the saved phase
-3. **Auto-Save:** Silent background saves on phase completion, every 5 minutes, at token milestones (100K, 150K, 175K), and before external writes -- no user notification for routine saves
+3. **Auto-Save:** Silent background saves on phase completion, every 5 minutes, at host-reported context-warning milestones, and before external writes -- no user notification for routine saves
 4. **List:** `workflow:list` shows all saved workflows with their status
 5. **Plan State Variables:** Tracks MEOWKIT_ACTIVE_PLAN, MEOWKIT_SUGGESTED_PLAN, MEOWKIT_COMPLEXITY, and MEOWKIT_ACTIVE_AGENTS across sessions
 6. **TOON format:** Token-efficient state representation (~160 tokens vs ~600 tokens JSON, 73% reduction)
@@ -28,7 +28,7 @@ Persists and restores mid-session workflow progress across context resets. Captu
 | List | `workflow:list` | Show all saved workflows |
 
 ## Workflow
-1. Detect trigger -- token limit, user command, or session ending
+1. Detect trigger -- host context warning, user command, or session ending
 2. If handoff: load `references/handoff-flow.md`, save full state to JSON, generate summary with workflow ID, progress, state file path, key decisions, and resume command
 3. If resume: load `references/resume-and-state.md`, validate state file, restore context, show resume summary, continue from saved phase
 4. If list: display all saved workflows from `.claude/logs/workflows/`

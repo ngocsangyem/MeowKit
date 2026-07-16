@@ -34,7 +34,7 @@ This is a simplified view. The canonical decision matrix with per-cell rationale
 
 ## How It's Selected
 
-`mk:scale-routing` emits a `autobuild_density` field (`MINIMAL | FULL | LEAN`) based on detected model tier and model string. The resolution order:
+`mk:scale-routing` emits a provider-neutral `autobuild_density` recommendation from task complexity. For Claude Code harness builds, the adapter resolves the final density from the model tier and model string. The adapter resolution order:
 
 1. `MEOWKIT_AUTOBUILD_MODE` env var (highest priority) — `MINIMAL`, `FULL`, or `LEAN`
 2. `--tier` flag on `/mk:autobuild` — `auto`, `minimal`, `full`, `lean`

@@ -39,6 +39,9 @@ assertEqual(categorizeUrl('https://docs.example.com/guide/routing'), 'important'
 assertEqual(categorizeUrl('https://docs.example.com/api-reference'), 'important', 'api-reference → important');
 assertEqual(categorizeUrl('https://docs.example.com/advanced/internals'), 'supplementary', 'internals → supplementary');
 assertEqual(categorizeUrl('https://docs.example.com/migration'), 'supplementary', 'migration → supplementary');
+assertEqual(categorizeUrl('https://api.example.com/migration'), 'supplementary', 'Hostname keywords do not affect priority');
+assertEqual(categorizeUrl('https://docs.example.com/random-page?migration=1'), 'important', 'Query keywords do not affect priority');
+assertEqual(categorizeUrl('https://docs.example.com/random-page#api'), 'important', 'Hash keywords do not affect priority');
 assertEqual(categorizeUrl('https://docs.example.com/random-page'), 'important', 'Unknown → default important');
 
 // ─── parseUrls ──────────────────────────────────────────────────────

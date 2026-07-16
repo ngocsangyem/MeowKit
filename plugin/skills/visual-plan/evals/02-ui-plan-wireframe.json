@@ -1,6 +1,6 @@
 {
   "skills": ["visual-plan"],
-  "query": "Render the UI-bearing plan at the given plan directory as plan.html with the --wireframe flag so the reviewer sees the screen mockups the plan describes alongside the phases and files-touched.",
+  "query": "Render the UI-bearing plan at the given plan directory as plan.html with --static --wireframe so the reviewer sees the screen mockups the plan describes alongside the phases and files-touched.",
   "files": ["tasks/plans/<ui-plan-slug>/plan.md", "tasks/plans/<ui-plan-slug>/phase-02-*.md"],
   "expected_behavior": [
     "Loads wireframe-rules.md only because --wireframe was passed; without the flag no wireframe-screen block is emitted",

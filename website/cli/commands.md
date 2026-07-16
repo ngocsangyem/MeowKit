@@ -62,7 +62,7 @@ Verify `.claude/` structure integrity.
 npx mewkit validate
 ```
 
-**Checks:** Agents (10+), skills (30+), commands dir, modes (5+), rules (10+), hooks executable, scripts present, settings.json, CLAUDE.md, config file. Run a focused suite with any of the flags below (no flag = the full sweep).
+**Checks:** Agents (10+), skills (30+), commands dir, modes (5+), rules (10+), hooks executable, scripts present, settings.json, CLAUDE.md, config file. In the MeowKit authoring checkout, the full sweep also reports provider-specific vocabulary found in generic skill bodies as advisory portability WARNs; `--strict` promotes WARNs to errors. Run a focused suite with any of the flags below (no flag = the full sweep).
 
 | Flag | Description |
 | --- | --- |

@@ -31,6 +31,33 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Wiki-research security corpus
+        run: npx vitest run packages/mewkit/src/wiki/infrastructure/__tests__/fetcher-adapter.test.ts packages/mewkit/src/wiki/infrastructure/__tests__/scanner-adapter.test.ts packages/mewkit/src/wiki/application/__tests__/research-quarantine.test.ts
+
+      - name: Validate visual-plan eval fixtures
+        run: node scripts/validate-visual-plan-evals.cjs
+
+      - name: Worktree command contract tests
+        run: node .claude/skills/worktree/scripts/worktree.test.cjs
+
+      - name: Sequential-thinking script tests
+        run: bash .claude/skills/sequential-thinking/scripts/test-scripts.sh
+
+      - name: Cook gate contract tests
+        run: bash .claude/skills/cook/scripts/test-scripts.sh
+
+      - name: Fix skill contract tests
+        run: bash tests/fix-skill-contract.test.sh
+
+      - name: Docs-finder offline tests
+        run: node .claude/skills/docs-finder/scripts/tests/run-tests.js
+
+      - name: Intake ticket sanitizer tests
+        run: node .claude/skills/intake/scripts/sanitize-ticket.test.cjs
+
+      - name: Validate rubric schemas and presets
+        run: bash .claude/skills/rubric/scripts/validate-rubric.sh
+
       - name: Hook-registration drift test
         run: bash tests/check-hook-registration.test.sh
 
@@ -54,7 +81,29 @@ jobs:
       - name: Setup Python venv
         run: |
           python3 -m venv .claude/skills/.venv
-          .claude/skills/.venv/bin/pip install --quiet pyyaml jsonschema
+          .claude/skills/.venv/bin/pip install --quiet pyyaml jsonschema pytest
+
+      - name: Multimodal mock tests
+        run: .claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/tests/run_tests.py
+
+      - name: Validate Figma evidence packet fixtures
+        run: .claude/skills/.venv/bin/python3 .claude/skills/figma/evals/validate-evidence-packets.py
+
+      - name: Test web-to-markdown URL SSRF guard
+        run: |
+          .claude/skills/.venv/bin/pip install --quiet -r .claude/skills/web-to-markdown/scripts/requirements.txt
+          .claude/skills/.venv/bin/python3 -m pytest \
+            .claude/skills/web-to-markdown/tests/test_safe_url.py \
+            .claude/skills/web-to-markdown/tests/test_e2e_offline.py -q
+
+      - name: Validate plan-creator compatibility fixtures
+        run: bash tests/fixtures/plan-creator/validate-fixtures.sh
+
+      - name: Validate skill-creator fixtures
+        run: bash tests/fixtures/skill-creator/validate-fixtures.sh
+
+      - name: Story-sizer deterministic tests
+        run: bash tests/story-sizer-all.test.sh
 
       - name: Validate skill cross-refs
         run: bash scripts/check-skill-cross-refs.sh
@@ -151,3 +200,13 @@ jobs:
 
       - name: Hook regression tests
         run: node --test .claude/hooks/__tests__/*.test.cjs
+
+      - name: Generate skill evaluation results
+        run: node scripts/generate-eval-results.cjs "$RUNNER_TEMP/skill-eval-results.md"
+
+      - name: Publish skill evaluation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: skill-eval-results
+          path: ${{ runner.temp }}/skill-eval-results.md
+          if-no-files-found: error

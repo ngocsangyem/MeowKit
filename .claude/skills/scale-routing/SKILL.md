@@ -61,6 +61,10 @@ Replace subjective orchestrator judgment with deterministic, auditable domain-ba
 | medium | standard | Required | Standard phases |
 | high | high-assurance | Required | Full phases + security |
 
+## Provider Boundary
+
+This skill emits only task complexity, risk, workflow intensity, and scaffolding density. It does not select a model or name a provider. The active harness resolves any provider-specific model policy after this routing result is produced.
+
 ## Usage
 
 Called automatically by orchestrator at Phase 0. Not invoked directly by users.
@@ -114,7 +118,7 @@ New fields (v2.1 — Phase 5 of harness plan, 260408):
 
 Used by `mk:autobuild` to choose how much scaffolding to apply per run. The decision rules:
 
-| `level` | provider adapter decision | `autobuild_density` |
+| `level` | neutral baseline | `autobuild_density` |
 |---|---|---|
 | low | none | `MINIMAL` |
 | medium | none | `FULL` |

@@ -5,11 +5,11 @@ description: How MeowKit assigns the right AI model tier to each task — Trivia
 
 # Model Routing
 
-The orchestrator classifies every task by complexity before work begins. Trivial tasks use the cheapest model. Complex tasks get the best reasoning power.
+The orchestrator classifies every task by complexity before work begins. `mk:scale-routing` emits provider-neutral complexity, workflow, and execution-tier signals; the active provider adapter maps those signals to its available models. The table below describes the Claude Code adapter.
 
 ## Routing table
 
-| Complexity | Model | Examples |
+| Complexity | Claude Code model | Examples |
 |---|---|---|
 | Trivial | Haiku | Rename, typo, format, version bump |
 | Standard | Sonnet | Feature (<5 files), bug fix, test writing |
@@ -20,21 +20,21 @@ The orchestrator classifies every task by complexity before work begins. Trivial
 - **Always Complex:** authentication, payment processing, database schema, security audit
 - **Never downgrade:** once assigned, a task stays at its tier for the session
 - **Code review always Complex:** structural audits need highest reasoning
-- **Domain override:** `mk:scale-routing` checks a CSV of domain keywords (fintech, healthcare → force COMPLEX)
+- **Domain override:** `mk:scale-routing` checks a CSV of domain keywords (fintech, healthcare → high-assurance); the Claude Code adapter maps high-assurance to COMPLEX.
 
 ## Domain-based routing (Phase 0)
 
 Before manual classification, `mk:scale-routing` reads keywords from the task and matches against `domain-complexity.csv`:
 
-| Domain | Keywords | Effect |
+| Domain | Keywords | Execution tier / Claude Code mapping |
 |--------|----------|--------|
-| fintech | payment, stripe, billing, invoice | Force COMPLEX |
-| healthcare | hipaa, phi, ehr, patient data | Force COMPLEX |
-| auth | oauth, jwt, session, credentials | Force COMPLEX |
+| fintech | payment, stripe, billing, invoice | high-assurance → COMPLEX |
+| healthcare | hipaa, phi, ehr, patient data | high-assurance → COMPLEX |
+| auth | oauth, jwt, session, credentials | high-assurance → COMPLEX |
 | docs | readme, changelog, comment | Allow one-shot |
 | config | env, .yaml, version bump | Allow one-shot |
 
-The CSV is user-editable. Add rows for your project's domains. Scale-routing verdicts cannot be downgraded mid-task.
+The CSV is user-editable. Add rows for your project's domains. Scale-routing verdicts cannot be downgraded mid-task; each provider adapter then applies its own model policy.
 
 ## Planning depth per mode
 
@@ -46,7 +46,7 @@ The CSV is user-editable. Add rows for your project's domains. Scale-routing ver
 
 ## Adaptive density
 
-For harness builds, density auto-adjusts per model tier: Haiku → MINIMAL, Sonnet → FULL, Opus 4.6+ → LEAN. See [Adaptive Density](/guide/adaptive-density).
+For Claude Code harness builds, density auto-adjusts per model tier: Haiku → MINIMAL, Sonnet → FULL, Opus 4.6+ → LEAN. See [Adaptive Density](/guide/adaptive-density).
 
 ## See also
 

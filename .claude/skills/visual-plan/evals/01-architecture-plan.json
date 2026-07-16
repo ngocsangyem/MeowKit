@@ -1,6 +1,6 @@
 {
   "skills": ["visual-plan"],
-  "query": "Render the architecture-heavy plan at the given plan directory as a single shareable plan.html so a reviewer can see the phases, the system architecture, the key decisions and risks, and the files each phase touches without reading prose.",
+  "query": "Render the architecture-heavy plan at the given plan directory with --static as a single shareable plan.html so a reviewer can see the phases, the system architecture, the key decisions and risks, and the files each phase touches without reading prose.",
   "files": ["tasks/plans/<architecture-plan-slug>/plan.md", "tasks/plans/<architecture-plan-slug>/phase-01-*.md"],
   "expected_behavior": [
     "Writes exactly one plan.html at the plan-directory root, beside plan.md, not under a visuals/ subdirectory",

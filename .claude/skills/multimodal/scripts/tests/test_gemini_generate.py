@@ -16,6 +16,9 @@ from unittest.mock import patch, MagicMock
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from env_isolation import disable_env_file_loading
+
+disable_env_file_loading()
 # Mock google.genai before import
 mock_genai = MagicMock()
 mock_types = MagicMock()

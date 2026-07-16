@@ -1,6 +1,6 @@
 {
   "skills": ["visual-plan"],
-  "query": "Render a multi-phase plan (four or more phases) as plan.html, then render a second unrelated multi-phase plan, and confirm both pages share the same theme and layout so the output is template-consistent plan-to-plan.",
+  "query": "Render a multi-phase plan (four or more phases) with --static as plan.html, then render a second unrelated multi-phase plan, and confirm both pages share the same theme and layout so the output is template-consistent plan-to-plan.",
   "files": ["tasks/plans/<multiphase-plan-slug>/plan.md", "tasks/plans/<multiphase-plan-slug>/phase-01-*.md", "tasks/plans/<multiphase-plan-slug>/phase-04-*.md"],
   "expected_behavior": [
     "Renders every phase in the phase-timeline block in plan order, each carrying status/priority/dependencies/effort, so a four-phase plan shows four phase cards",

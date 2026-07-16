@@ -2,14 +2,15 @@
 source: new
 original_file: n/a
 adapted: no
+adapter_scope: claude-code
 adaptation_notes: >
   "Complex architecture → Opus, Feature implementation → Sonnet, Quick edits → Haiku"
   Cross-referenced with the toolkit's existing Model Routing table in CLAUDE.md.
 ---
 
-# Model Selection Rules
+# Claude Code Model-Selection Adapter
 
-These rules govern which model tier is assigned to each task.
+These rules are the Claude Code adapter for model selection. Generic skills emit provider-neutral task tiers; this adapter maps those tiers to the models available in Claude Code.
 The orchestrator agent MUST declare the tier before any task begins.
 
 ## Routing Table

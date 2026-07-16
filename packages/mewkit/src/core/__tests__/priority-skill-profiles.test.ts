@@ -71,6 +71,17 @@ describe("priority skill profile contracts", () => {
 		}
 	});
 
+	it("keeps session handoff thresholds host-neutral", () => {
+		const handoff = reference("session-continuation", "handoff-flow.md");
+		const resume = reference("session-continuation", "resume-and-state.md");
+		expect(handoff).toContain("host reports that its context budget is approaching the warning threshold");
+		expect(resume).toContain("host-reported context-warning milestones");
+		for (const fixedThreshold of ["75%", "100K", "150K", "175K"]) {
+			expect(handoff).not.toContain(fixedThreshold);
+			expect(resume).not.toContain(fixedThreshold);
+		}
+	});
+
 	it("keeps cook shipping explicit and routes lifecycle authority to workflow.yaml", () => {
 		const body = skill("cook");
 		expect(body).toContain("workflow.yaml` is the only lifecycle phase-sequence authority");

@@ -8,6 +8,7 @@ import path from "node:path";
 import {
 	checkCapabilitiesSection,
 	checkCodexProjection,
+	checkGenericCoreTokens,
 	checkHooksExecutable,
 	checkRoutingTableBreadth,
 	detectValidateMode,
@@ -198,6 +199,17 @@ describe("checkCapabilitiesSection", () => {
 		expect(results.length).toBeGreaterThan(0);
 		expect(results.every((r) => r.section === "Capabilities")).toBe(true);
 		expect(results.some((r) => r.status === "fail")).toBe(false);
+	});
+});
+
+describe("checkGenericCoreTokens", () => {
+	it("reports an advisory portability baseline rather than a hard failure", () => {
+		fs.mkdirSync(path.join(claudeDir, "skills", "demo"), { recursive: true });
+		fs.writeFileSync(path.join(claudeDir, "skills", "demo", "SKILL.md"), "---\nruntime: claude-code\n---\nAskUserQuestion\n");
+		const result = checkGenericCoreTokens(claudeDir);
+		expect(result.status).toBe("warn");
+		expect(result.detail).toContain("provider-tool=1");
+		expect(result.detail).toContain('skills/demo/SKILL.md:4 "AskUserQuestion"');
 	});
 });
 

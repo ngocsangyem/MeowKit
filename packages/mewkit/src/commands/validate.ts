@@ -8,6 +8,7 @@ import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
 import { checkGateAuthority, checkCommandDrift } from "../core/check-gate-authority.js";
 import { assertOperationsNotInvocable } from "../core/provider-operations.js";
 import { findPseudoCapabilities } from "../core/check-pseudo-capabilities.js";
+import { findGenericCoreTokens, summarizeGenericCoreTokens } from "../core/check-generic-core-tokens.js";
 import { checkStaleIndex } from "../core/check-stale-index.js";
 import { checkPluginParity } from "../core/check-plugin-parity.js";
 import { checkOwnership } from "../core/build-inventory.js";
@@ -277,6 +278,21 @@ function checkOperationConformance(meowkitDir: string): CheckResult[] {
 	});
 
 	return results;
+}
+
+/** Advisory baseline while skill bodies are migrated to semantic capability prose. */
+export function checkGenericCoreTokens(meowkitDir: string): CheckResult {
+	const findings = findGenericCoreTokens(meowkitDir);
+	const locations = findings.slice(0, 8).map((finding) => `${finding.file}:${finding.line} "${finding.token}"`).join("\n         ");
+	return {
+		name: "Generic-core provider token baseline",
+		status: findings.length === 0 ? "pass" : "warn",
+		detail:
+			findings.length === 0
+				? "0 provider-specific body tokens"
+				: `${findings.length} finding(s); ${summarizeGenericCoreTokens(findings)}.\n         ${locations}`,
+		section: "Portability",
+	};
 }
 
 function checkPortability(): CheckResult[] {
@@ -603,6 +619,7 @@ export async function buildDefaultChecks(
 			...checkGateAuthority(projectRoot),
 			...checkCommandDrift(projectRoot),
 			...checkOperationConformance(meowkitDir),
+			checkGenericCoreTokens(meowkitDir),
 			// Declared doc counts vs the real inventory. `mewkit inventory --check`
 			// owns the same check for the CI step; surfacing it here means an author
 			// sees a stale README at validate time instead of at CI time. Counts are
