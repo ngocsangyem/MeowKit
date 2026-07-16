@@ -18,7 +18,7 @@ Common failure patterns when fixing bugs. Update this file when Claude produces 
 
 ### No Regression Test
 **Symptom:** Bug resurfaces next sprint.
-**Fix:** Every fix includes a test that fails without the fix and passes with it.
+**Fix:** When behavior, security, or a public contract can regress, include a test that fails without the fix and passes with it. Lint-only, formatting-only, and configuration-only changes may omit it only with the rationale required by `SKILL.md` Step 5.
 
 ### Insanity Loop (3+ Failed Attempts)
 **Symptom:** Same approach tried repeatedly with minor variations.
@@ -32,9 +32,9 @@ Common failure patterns when fixing bugs. Update this file when Claude produces 
 **Symptom:** Same bug class fixed repeatedly.
 **Fix:** Check `.claude/memory/fixes.json` only. Write new fix patterns by calling `Edit` directly on `.claude/memory/fixes.json` only (see SKILL.md Step 6 for the live schema). Do NOT use `##pattern:bug-class` — that is a user-typed keyboard shortcut; the handler only fires on `UserPromptSubmit` and agent output is invisible to it. See `.claude/skills/memory/references/capture-architecture.md`.
 
-### Fixing Without Reproducing First
+### Fixing Without Evidence
 **Symptom:** "I think I know what's wrong" → fix deployed → bug persists.
-**Fix:** Always reproduce the bug before fixing. If you can't reproduce it, you don't understand it.
+**Fix:** Capture a deterministic reproducer or bounded intermittent evidence before fixing. If neither exists, gather more evidence instead of guessing.
 
 ### Changing Multiple Things at Once
 **Symptom:** Fix touches 5 files, introduces new bug, can't tell which change caused it.

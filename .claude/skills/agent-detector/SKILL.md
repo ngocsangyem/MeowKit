@@ -1,7 +1,6 @@
 ---
 name: mk:agent-detector
-description: Detects task agent, complexity tier, and model automatically at Phase 0 orient. Invoked first in every workflow. NOT for runtime agent routing inside a single skill (see orchestration-rules.md).
-model: haiku
+description: Detects task agent and complexity tier at Phase 0 orient. Invoked first in every workflow. Provider adapters select any model/runtime policy. NOT for runtime agent routing inside a single skill (see orchestration-rules.md).
 triggers:
   - every message
   - always first

@@ -6,12 +6,12 @@ Use when the run risks becoming broad, codebase-dependent, or handoff-heavy.
 
 | Stage | Budget |
 |---|---|
-| Discovery | Up to 3 questions per batch |
+| Discovery (deep only) | Up to 3 focused questions per batch |
 | Scout bridge | 3-6 bullets, max 10 file paths |
 | Technique loading | 1 technique file per run |
-| Idea generation | 3-8 ideas |
-| Anti-bias pivot | 1 pivot |
-| Challenge pass | 5 checks, 1 regeneration |
+| Idea generation (deep only) | 3-8 ideas, never more than 8 |
+| Anti-bias pivot (deep only) | 1 pivot |
+| Challenge pass (deep only) | 5 checks, 1 regeneration |
 | Rejected alternatives | Keep only those needed to explain the recommendation |
 | Handoff packet | 10 fields plus report path |
 
@@ -31,3 +31,5 @@ Scout summary shape:
 ```
 
 Never include secrets, raw logs, full transcripts, or sensitive file contents.
+
+Quick runs do not load this reference: state a material assumption and return 2-4 inline options instead of running discovery or scout.

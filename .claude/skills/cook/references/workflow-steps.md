@@ -322,7 +322,7 @@ Three mandatory subagents in parallel:
    Sync-back algorithm authority: `.claude/skills/plan-creator/references/task-management.md` (Sync-Back Algorithm).
 
    ```
-   Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
+Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
    ```
 
    If sync-back leaves every non-abandoned phase todo checked, mark the plan frontmatter `status: completed` and move the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `/mk:ship`.

@@ -3,12 +3,10 @@ name: mk:office-hours
 preamble-tier: 3
 version: 2.0.0
 description: |
-  YC Office Hours — two modes. Startup mode: six forcing questions that expose
-  demand reality, status quo, desperate specificity, narrowest wedge, observation,
-  and future-fit. Builder mode: design thinking brainstorming for side projects,
-  hackathons, learning, and open source. Saves a design doc.
-  Use when asked to "brainstorm this", "I have an idea", "help me think through
-  this", "office hours", or "is this worth building".
+  YC Office Hours — product validation for a new product, feature, or side-project
+  concept. Startup mode tests demand; Builder mode develops an unvalidated product
+  idea. Use when the user asks whether something is worth building or has an idea
+  whose problem/value is not yet validated.
   Proactively suggest when the user describes a new product idea or is exploring
   whether something is worth building — before any code is written.
   Use BEFORE a plan exists. For reviewing an existing plan, use /mk:plan-ceo-review.
@@ -29,7 +27,7 @@ keywords:
   - forcing-questions
   - brainstorm-builder
   - design-doc
-when_to_use: Use when validating an idea (startup mode) or brainstorming side projects (builder mode). NOT for technical solution exploration after validation (see mk:brainstorming).
+when_to_use: Use when validating a new product, feature, or side-project concept. NOT for multiple technical approaches to a validated requirement (see mk:brainstorming).
 user-invocable: true
 owner: research
 criticality: medium
@@ -57,9 +55,11 @@ Skip: Always — office-hours is a pre-planning skill. It feeds plan-creator, no
 
 ## When to Use
 
-- User says "brainstorm this", "I have an idea", "help me think through this", "office hours", or "is this worth building"
-- User describes a new product idea or is exploring whether something is worth building
+- User describes a new product, feature, or side-project concept whose problem/value is unvalidated
+- User asks whether something is worth building, who needs it, or what smallest wedge to validate
 - Before running `/mk:plan-ceo-review`
+
+A bare “brainstorm” request is ambiguous: ask whether the user wants product discovery/validation or technical approaches. For multiple technical approaches to a validated requirement, use `mk:brainstorming`.
 
 ## Workflow
 

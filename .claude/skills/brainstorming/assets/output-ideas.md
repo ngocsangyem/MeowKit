@@ -1,6 +1,6 @@
 ## Brainstorm: [PROMPT_SUMMARY]
 
-**Technique:** [TECHNIQUE_USED] · **Generated:** [TIMESTAMP] · **Depth:** quick
+**Technique:** [TECHNIQUE_USED] · **Generated:** [TIMESTAMP] · **Depth:** deep-unscored
 
 ### Problem Restatement
 
@@ -27,15 +27,6 @@
 
 **Chosen:** `[technique-name].md`
 **Why this over alternatives:** [one sentence — typically references the SKILL.md tiebreaker order or a problem-shape match]
-
-### Solution Decompression
-
-(Only when input was a solution. Omit otherwise.)
-
-- Solution-jumping diagnosis: [...]
-- Decompressed problem: [...]
-- Framings: A [...] · B [...] · C [...]
-- Key assumption + risk + validation: [...]
 
 ### Ideas
 
@@ -76,7 +67,7 @@
 
 ### Top 3 to Explore (qualitative — no scoring)
 
-These are subjective picks after the challenge pass, not formal scoring. For weighted scoring, re-run with `--depth deep`.
+These are subjective picks after the challenge pass, not formal scoring. For weighted scoring, use `assets/output-scored.md` in the same deep run.
 
 1. **[MNEMONIC_TITLE]** — [one sentence why this stands out vs the others]
 2. **[MNEMONIC_TITLE]** — [one sentence why]
@@ -107,5 +98,5 @@ report_path: "tasks/reports/[report-name].md"
 
 - Drill deeper into a specific idea → "explore idea #N"
 - Ready to plan → ask before passing the packet to `mk:plan-creator`
-- Score these ideas → re-run with `--depth deep`
+- Need weighted scores → use `assets/output-scored.md` in the same deep run
 - Need product validation first → `mk:office-hours`

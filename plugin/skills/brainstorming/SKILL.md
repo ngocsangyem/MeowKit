@@ -2,13 +2,7 @@
 name: mk:brainstorming
 preamble-tier: 3
 version: 2.1.0
-description: |
-  Use when exploring technical solutions, comparing approaches, or generating
-  alternatives for a validated problem. Triggers on "brainstorm solutions",
-  "explore approaches", "compare options", "trade-off analysis", "how should
-  we build". Do NOT use for product validation ("is this worth building?" →
-  use mk:office-hours instead). Do NOT use when a plan already exists
-  (→ use mk:plan-ceo-review or mk:elicit instead).
+description: Generate or compare multiple technical approaches for one validated decision. Do not use for product discovery or an existing plan.
 allowed-tools:
   - Read
   - Grep
@@ -22,8 +16,7 @@ keywords:
   - compare-approaches
   - trade-off-analysis
   - alternatives
-  - solution-decompression
-when_to_use: Use when exploring technical solutions or comparing approaches for a validated problem. NOT for product validation (see mk:office-hours) or after a plan exists (see mk:plan-ceo-review).
+when_to_use: Use for generating or comparing multiple technical approaches to one validated decision. NOT for product validation (mk:office-hours), debugging (mk:investigate), or critique of an existing plan (mk:plan-ceo-review or mk:elicit).
 user-invocable: true
 owner: research
 criticality: medium
@@ -33,188 +26,45 @@ runtime: claude-code
 
 # Brainstorming
 
-Explore technical approaches with structured ideation, challenge, convergence, and plan-creator handoff.
+Use for generating or comparing multiple technical approaches to one validated decision.
 
-**Differentiator:** office-hours = "should we build this?", brainstorming = "how should we build this?"
-
-## When to Use
-
-- Multiple architecturally-distinct approaches exist for a known requirement
-- Trade-off analysis between candidate solutions is needed
-- Novel problem with no obvious pattern in the codebase
-- Pre-mortem / failure-mode exploration before committing to a design
-- Constraint-rich problem (budget, time, stack) where the solution space is narrow
-
-**NOT this skill if:** you are stuck on a specific existing approach with forced assumptions — use `mk:problem-solving`. **NOT this skill if:** you want to deepen an existing verdict or plan — use `mk:elicit`.
-
-## When NOT to Use
-
-| Situation                                             | Use instead                      |
-| ----------------------------------------------------- | -------------------------------- |
-| "Is this worth building?" — product validation        | `mk:office-hours`              |
-| Plan already exists, want to challenge scope          | `mk:plan-ceo-review`           |
-| Existing brainstorm, verdict, or plan needs deeper reasoning | `mk:elicit`              |
-| Broad codebase inventory before planning              | `mk:scout`                     |
-| High-stakes multi-perspective architecture debate      | `mk:party`                     |
-| Bug investigation / root cause                        | `mk:investigate`               |
-| Implementation detail (which library, which API call) | `mk:docs-finder` + just decide |
-
-## Plan-First Gate
-
-Brainstorming precedes planning — it produces input FOR plans.
-Always skips Gate 1 (same as `mk:investigate` and `mk:office-hours`).
-
-## Responsibilities
-
-- Confirm the problem, binding constraint, success criterion, and excluded scope.
-- When the input is itself a solution (preselected feature / "just build X" / roadmap item), decompress it to the underlying problem and ≥3 problem framings BEFORE ideating; redirect to `mk:office-hours` if the problem's value is unvalidated.
-- Explore architecturally distinct technical approaches for a validated problem.
-- Generate ideas first, then evaluate them separately.
-- Run one anti-bias pivot and one challenge pass before recommending.
-- Emit a compact report under `tasks/reports/` plus a handoff packet for `mk:plan-creator`.
-
-## Non-Responsibilities
-
-- Product validation (`mk:office-hours`)
-- Broad codebase inventory (`mk:scout`)
-- Multi-perspective debate (`mk:party`)
-- Implementation plans and phase files (`mk:plan-creator`)
-- Build, tests, edits, commits, or implementation (`mk:cook`)
+**Boundary:** `mk:office-hours` answers “should we build this?”; this skill answers “how should we build it?” A bare “brainstorm” request is ambiguous: ask whether the user wants product discovery/validation or technical approaches. Do not route from that word alone.
 
 ## Profiles
 
-- `quick` / `--depth quick` (default) — restate the problem, give 2-4 orthogonal options and a recommendation in the response. Do not create a report, plan, wiki candidate, or memory entry.
-- `deep` / `--depth deep` — use the technique, scoring, and challenge references. Write a report only when the user requests one or an active plan requires it.
-- `--technique [name]` — force a specific technique (default: auto-select)
-- `--html` — only with a requested report; author a self-contained editorial HTML report beside the markdown source.
+- **quick** / `--depth quick` (default) — restate the decision in one line; give 2-4 technically distinct options and one recommendation. If a material fact is missing, state the assumption rather than running discovery. Return inline and stop. Do not load techniques, scout, scoring, challenge, reports, plans, wiki candidates, memory, or handoff.
+- **deep** / `--depth deep` — load the needed technique and use the deep workflow below. A report, HTML output, or handoff is optional and only produced when requested or needed by an active plan.
 
-## Lifecycle
+## Routing
 
-Run these stages in order. This is outcome-oriented, not a command script.
+| Situation | Route |
+| --- | --- |
+| New product, feature, or side-project value is unvalidated | `mk:office-hours` |
+| Observed failure or root-cause work | `mk:investigate` |
+| Existing plan, verdict, or brainstorm needs critique | `mk:plan-ceo-review` or `mk:elicit` |
+| Generic Q&A or a single implementation detail | answer directly or use `mk:docs-finder` |
 
-1. **Entry routing** — redirect product validation, existing plans/verdicts, broad codebase discovery, debugging, and implementation requests to the adjacent skill.
-2. **Problem understanding** — confirm the problem, binding constraint, success criterion, and excluded scope. Use `AskUserQuestion` if needed, capped at 3 questions per batch.
-3. **Scope split** — if the request bundles 3+ independently-shippable concerns, ask the user to pick one concern or decompose before ideating.
-4. **Optional scout bridge** — use `mk:scout` only when existing codebase touchpoints affect approach choice. Consume a 3-6 bullet summary, not a full scout report.
-5. **Technique selection** — match problem type to one file in `references/techniques/`. When multiple match, prefer in this order: `multi-alternative` → `first-principles` → `reverse` → `constraint-mapping` → `scamper` → `analogical-thinking` → `perspective-shift`.
-   - "How to build X" → `multi-alternative.md`
-   - Input is itself a solution / "just build X" / preselected roadmap item → `solution-decompression.md` (run BEFORE idea generation; not a generation technique)
-   - Novel problem, no existing pattern → `first-principles.md`
-   - Debugging / preventing failures → `reverse.md`
-   - Many constraints, narrow space → `constraint-mapping.md`
-   - Improving / iterating an existing thing → `scamper.md`
-   - Cross-domain transfer → `analogical-thinking.md`
-   - Stakeholder / persona angles → `perspective-shift.md`
-6. **Exploration** — generate 3-8 ideas. Do not score or compare while generating; the full set must exist before any ranking.
-7. **Anti-bias pivot** — after idea #4 or midpoint, pause and ask: "what orthogonal category have I not touched yet?" Generate the rest from that angle. One pivot per session.
-8. **Challenge pass** — before recommendation, load `references/challenge-pass.md`; check duplicate architectures, hard constraints, category diversity, conservative drift, and missing failure modes.
-9. **Convergence** — recommend only after challenge. If top deep scores are within 2 points, ask for one tie-break criterion or mark "no clear winner."
-10. **Output and handoff** — quick returns options inline. Deep uses `assets/output-scored.md` and the handoff packet only when a report is requested or an active plan needs one.
+## Defaults
 
-## Hard Stops
+Use at least two alternatives. Quick returns 2-4; deep generates 3-8 and never more than 8. Keep multiple dimensions in one run when they serve one decision or report; split only 3+ independently shippable concerns.
 
-Stop and route or ask before continuing when:
+## Quick Workflow
 
-- Product value or problem validity is unclear → `mk:office-hours`.
-- Input is a solution and decompression shows its problem is unvalidated (evidence would be `none`/`weak`) → STOP, route to `mk:office-hours`. Do NOT grade evidence, run validation plans, or triage ideas inside brainstorming.
-- A plan or verdict already exists → `mk:plan-ceo-review` or `mk:elicit`.
-- The request has 3+ independently shippable concerns.
-- Hard constraints conflict and no idea can satisfy them together.
-- All ideas remain variants of one architecture after the pivot and one regeneration attempt.
-- No selected idea, binding constraint, or success criterion exists for handoff.
+1. Restate the validated decision and any material assumption.
+2. Give 2-4 technically distinct options with the key trade-off for each.
+3. Recommend one option and return inline. Do not create a report, plan, wiki candidate, or memory entry.
 
-**Behavioral hard rule (not hook-enforced — see `gate-rules.md` for actual gates):** brainstorming MUST NOT write code or invoke implementation skills. Reports are opt-in; output is _ideas_, never _code_.
+## Deep Workflow
 
-## Idea Format Template
+1. Confirm the decision, binding constraint, success criterion, and excluded scope. Ask at most three focused questions when needed.
+2. If 3+ independently shippable concerns are bundled, ask to choose one. Use a compact scout summary only when current codebase touchpoints change the decision.
+3. Load one technique from `references/techniques/`; generate 3-8 technical approaches without scoring while generating.
+4. Run one anti-bias pivot, then the challenge pass in `references/challenge-pass.md` before recommending.
+5. Load scoring only for deep scoring. Write a report, HTML output, or handoff only when requested or needed by an active plan. For a requested report, an optional `mewkit wiki handoff suggest` follows `.claude/skills/wiki/references/terminal-handoff-advisory.md`; it is fail-open and never runs for quick.
 
-Capture every idea with this shape — not bare table rows:
+## References
 
-```
-[#N] [Mnemonic Title]
-  Concept: [2-3 sentence mechanism — what it is and how it works]
-  Novelty: [What makes this non-obvious; why a senior eng wouldn't dismiss it]
-```
-
-The Novelty line is mandatory. If you cannot write one, the idea is a duplicate of a more obvious option — drop it and try another orthogonal angle.
-
-## Anti-Rationalization
-
-When tempted to skip discovery, scope, or the pivot — read `references/anti-rationalization.md`. It catalogs the common excuses and their counter-arguments.
-
-## Discovery Protocol
-
-Use `AskUserQuestion` to clarify, but cap at **3 questions per batch**. Avoid question fatigue.
-
-Good clarifying questions target:
-
-- The actual constraint that bounds the solution (budget, latency, team size, deadline)
-- The success criteria (what does "good" look like once we ship?)
-- What the user has already ruled out and why
-
-Bad clarifying questions:
-
-- Asking the user to design the solution ("would you prefer X or Y?")
-- Asking for information already in the request
-- Asking 5+ questions before generating any ideas
-
-## Context Loading Rules
-
-- Load only one technique file per run unless the challenge pass proves the technique is mismatched.
-- Load `references/scoring-criteria.md` only in `--depth deep`.
-- Load output templates only when writing the final report.
-- Load `references/context-budget.md` when a run is becoming long or scout context is involved.
-- Keep selected idea, key trade-offs, and relevant rejected alternatives. Drop exploratory dead ends.
-- Never pass a full brainstorm transcript or full scout transcript downstream; pass report path + handoff packet.
-
-## Gotchas (top 3)
-
-- **Premature solutioning** — jumping to "how" before confirming "what". Force problem restatement first.
-- **Anchoring on first idea** — generate ALL ideas before evaluating any. Score in a separate pass.
-- **Context flooding** — max 8 ideas per run. If the problem needs more, run multiple focused sessions on sub-problems.
-- **HTML drift** — `--html` is opt-in and derived from the markdown. Never edit the HTML by hand; re-run with `--html` so it stays in sync with the markdown source of truth.
-
-Full list: `references/gotchas.md`
-Edge cases (where the obvious approach is wrong): `references/edge-cases.md`
-Challenge checks: `references/challenge-pass.md`
-Context budget: `references/context-budget.md`
-Final report self-check: `references/report-self-check.md`
-
-## Workflow Integration
-
-Phase 1 (Plan) — pre-planning. Runs after problem validation, before plan creation.
-
-```
-mk:office-hours (validate)
-  ↓
-mk:brainstorming (explore)
-  ↓
-mk:plan-creator (plan)
-```
-
-## Handoff Protocol
-
-On completion:
-
-- Quick profile: return the recommendation inline and stop.
-- Reported deep run: save to `tasks/reports/` and include a `Brainstorm Handoff Packet` using `assets/output-action-plan.md`.
-- If `--depth deep`, ask before invoking or recommending `mk:plan-creator`.
-- `plan-creator` receives report path + handoff packet as pre-research input; it still owns requirements completeness, phase files, and plan approval
-- **Terminal wiki handoff (advisory, fail-open):** after the markdown report is written, optionally hand it to the wiki per `.claude/skills/wiki/references/terminal-handoff-advisory.md`. Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip + print the command). Advisory only — never blocks, never approves; do not add `wiki reindex`:
-
-  ```bash
-  npx mewkit wiki handoff propose \
-    --skill mk:brainstorming \
-    --from tasks/reports/brainstorm-<date>-<slug>.md \
-    --slug <resolved-wiki-slug> \
-    --explicit-intent
-  ```
-
-## HTML Output
-
-When `--html` is passed:
-
-- Write the markdown report FIRST (`tasks/reports/brainstorm-<date>-<slug>.md`), then author a sibling `tasks/reports/brainstorm-<date>-<slug>.html` — same directory and stem.
-- Author the HTML inline using `references/editorial-html.md` as the visual contract. Do NOT route through `mk:preview` and do NOT invoke any implementation skill — this preserves the behavioral hard rule (no writes outside `tasks/reports/`).
-- The HTML carries the SAME decision content as the markdown: problem, evidence, options, trade-offs, recommendation, risks, and unresolved questions. It is derived, never authoritative.
-- Keep it self-contained: inline CSS/JS, no build step, no network requirement for layout (a web-font `@import` is the only permitted external request and must degrade to system fonts).
-- `--html` is opt-in; without it, behavior is unchanged.
+- `references/context-budget.md` — deep clarification, count, pivot, and challenge limits
+- `references/techniques/` — choose one technique for a deep run
+- `references/challenge-pass.md` and `references/scoring-criteria.md` — deep convergence only
+- `references/editorial-html.md` — HTML only for a requested report

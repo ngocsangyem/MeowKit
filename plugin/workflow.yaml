@@ -120,9 +120,15 @@ contract_substep:
 # which is the working directory the validate command runs from.
 # Each file must contain a "Canonical source: .claude/workflow.yaml" pointer.
 sources:
-  - CLAUDE.md
-  - .claude/rules/phase-contracts.md
-  - .claude/rules/gate-rules.md
-  - .claude/skills/workflow-orchestrator/SKILL.md
-  - .claude/skills/workflow-orchestrator/references/workflow-phases.md
-  - .claude/skills/cook/SKILL.md
+  - path: CLAUDE.md
+    lifecycle_render: true
+  - path: .claude/rules/phase-contracts.md
+    lifecycle_render: true
+  - path: .claude/rules/gate-rules.md
+    lifecycle_render: false
+  - path: .claude/skills/workflow-orchestrator/SKILL.md
+    lifecycle_render: false
+  - path: .claude/skills/workflow-orchestrator/references/workflow-phases.md
+    lifecycle_render: true
+  - path: .claude/skills/cook/SKILL.md
+    lifecycle_render: true

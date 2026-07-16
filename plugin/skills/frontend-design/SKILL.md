@@ -50,10 +50,10 @@ Every design output MUST pass these checks:
 |----------|---------------------|------------|
 | **Typography** | System font stack only, single weight | 2-3 weights, intentional font pairing (use mk:ui-design-system/assets/typography.csv) |
 | **Typography** | All text same size/weight | Clear hierarchy: display → heading → body → caption |
-| **Typography** | Inter as default font | Choose font from typography.csv matching project mood |
-| **Color** | Pure black (#000) on pure white (#fff) | Softened: #111827 on #fafafa or similar |
+| **Typography** | Unexamined default font choice | Choose a typeface that matches project mood and legibility needs |
+| **Color** | Unchecked extreme contrast | Verify readable contrast and deliberate palette balance |
 | **Color** | Rainbow of unrelated colors | 1 primary + 1 accent + neutrals (use mk:ui-design-system/assets/colors.csv) |
-| **Color** | Purple gradient as hero background | Use brand-appropriate gradient or solid color |
+| **Color** | Decorative treatment that obscures hierarchy | Use color and gradients only when they reinforce the content hierarchy |
 | **Layout** | Centered everything, card grid with equal spacing | Asymmetric layouts, intentional whitespace variation |
 | **Layout** | Default padding/margin everywhere | Design tokens: consistent spacing scale (4px base) |
 | **Layout** | 3-column equal card grid | Vary card sizes, use bento grid, or 2-column with feature highlight |

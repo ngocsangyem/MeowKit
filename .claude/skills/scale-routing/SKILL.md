@@ -1,6 +1,6 @@
 ---
 name: mk:scale-routing
-description: Domain-aware complexity routing. Scans task description for domain keywords, matches against domain-complexity.csv, returns complexity level, workflow intensity, and model tier override. Extends Phase 0 orchestration.
+description: Domain-aware complexity routing. Scans task description for domain keywords, matches against domain-complexity.csv, returns complexity level, workflow intensity, and execution tier. Extends Phase 0 orchestration.
 triggers:
   - task classification
   - complexity routing
@@ -13,8 +13,8 @@ keywords:
   - domain-classification
   - complexity-routing
   - csv-routing
-  - model-tier-override
-when_to_use: Auto-invoked at Phase 0 — scans task description for domain keywords, returns complexity tier and model override. Not user-callable directly.
+  - execution-tier
+when_to_use: Auto-invoked at Phase 0 — scans task description for domain keywords, returns complexity tier and execution tier. Not user-callable directly.
 owner: portability
 criticality: medium
 status: active
@@ -40,7 +40,7 @@ Replace subjective orchestrator judgment with deterministic, auditable domain-ba
 5. **Layer 3:** Score confidence per domain (HIGH ≥70, MEDIUM 40–69, LOW <40)
 6. **Classify task type** — map signals to one of: `bug_fix`, `feature`, `refactor`, `security`, `devops`, `docs`, `review`, `intake` (load `references/task-type-classification.md`)
 7. **Optional:** Check `.claude/product-areas.yaml` if exists — merge area keywords and paths (see `references/product-area-config.md`)
-8. **Output:** `{domain, level, workflow, model_tier_override, task_type, suggested_skill, confidence, product_area?}`
+8. **Output:** `{domain, level, workflow, execution_tier, task_type, suggested_skill, confidence, product_area?}`
 9. **Fallback:** No match → return `unknown`, defer to manual classification
 
 ## CSV Schema
@@ -55,11 +55,11 @@ Replace subjective orchestrator judgment with deterministic, auditable domain-ba
 
 ## Routing Logic
 
-| Level | Model Tier | Gate 1 | Workflow |
+| Level | Execution Tier | Gate 1 | Workflow |
 |-------|-----------|--------|---------|
-| low | TRIVIAL (Haiku) | Bypass eligible (one-shot) | Minimal |
-| medium | STANDARD (Sonnet) | Required | Standard phases |
-| high | COMPLEX (Opus) | Required | Full phases + security |
+| low | minimal | Bypass eligible (one-shot) | Minimal |
+| medium | standard | Required | Standard phases |
+| high | high-assurance | Required | Full phases + security |
 
 ## Usage
 
@@ -68,8 +68,8 @@ Called automatically by orchestrator at Phase 0. Not invoked directly by users.
 ```
 Orchestrator Phase 0:
   1. Run mk:scale-routing on task description
-  2. If match found → use returned level/workflow/model_tier
-  3. If no match → fall back to manual classification per model-selection-rules.md
+  2. If match found → use returned level/workflow/execution_tier
+  3. If no match → fall back to manual classification
 ```
 
 ## Extending
@@ -93,7 +93,7 @@ Base fields (v1.0):
 | `domain` | snake_case string | Matched domain or `unknown` |
 | `level` | low, medium, high | Complexity classification |
 | `workflow` | one-shot, standard, enhanced, advanced | Workflow intensity |
-| `model_tier_override` | TRIVIAL, STANDARD, COMPLEX | Forced model tier |
+| `execution_tier` | minimal, standard, high-assurance | Provider-neutral execution intensity |
 
 New fields (v2.0):
 
@@ -114,12 +114,11 @@ New fields (v2.1 — Phase 5 of harness plan, 260408):
 
 Used by `mk:autobuild` to choose how much scaffolding to apply per run. The decision rules:
 
-| `level` (model_tier) | model id contains | `autobuild_density` |
+| `level` | provider adapter decision | `autobuild_density` |
 |---|---|---|
-| low (TRIVIAL/Haiku) | any | `MINIMAL` |
-| medium (STANDARD/Sonnet) | any | `FULL` |
-| high (COMPLEX/Opus) | `opus-4-6` or `opus-4.6` or `opus-4-7` | `LEAN` |
-| high (COMPLEX/Opus) | other (e.g., `opus-4-5`, `claude-opus-4`) | `FULL` |
+| low | none | `MINIMAL` |
+| medium | none | `FULL` |
+| high | none | `FULL` |
 
 **Override:** `MEOWKIT_AUTOBUILD_MODE=MINIMAL\|FULL\|LEAN` env var, when set, overrides the auto-detected value. The override is logged in the autobuild run report for audit.
 

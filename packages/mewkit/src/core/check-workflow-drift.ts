@@ -40,8 +40,13 @@ export interface CanonicalSpec {
 	outputDirs: Set<string>; // e.g. {plans, reviews, contracts}
 	/** Reflect-phase canonical leads (all must co-occur where leads are listed). */
 	reflectLeads: string[];
-	/** Prose files to scan, relative to project root. */
-	sources: string[];
+	/** Prose files to scan, relative to project root, with validation scope. */
+	sources: WorkflowSource[];
+}
+
+export interface WorkflowSource {
+	path: string;
+	lifecycleRender: boolean;
 }
 
 export class WorkflowSpecError extends Error {
@@ -76,7 +81,7 @@ interface RawSpec {
 	phases?: RawPhase[];
 	gates?: RawGate[];
 	contract_substep?: { required_output?: string };
-	sources?: string[];
+	sources?: Array<string | { path?: unknown; lifecycle_render?: unknown }>;
 }
 
 /** Pull the second path segment out of a `tasks/<dir>/...` glob. */
@@ -147,7 +152,19 @@ export function loadWorkflowSpec(projectRoot: string): CanonicalSpec {
 		if (dir) outputDirs.add(dir);
 	}
 
-	const sources = (raw.sources ?? []).map(String);
+	if (raw.sources !== undefined && !Array.isArray(raw.sources)) {
+		throw new WorkflowSpecError(`Canonical workflow spec malformed (sources must be an array): ${specPath}`, "malformed");
+	}
+	const sources = (raw.sources ?? []).map((source, index): WorkflowSource => {
+		if (typeof source === "string" && source.trim()) return { path: source, lifecycleRender: false };
+		if (!source || typeof source !== "object" || typeof source.path !== "string" || !source.path.trim()) {
+			throw new WorkflowSpecError(`Canonical workflow spec malformed (invalid sources[${index}] entry): ${specPath}`, "malformed");
+		}
+		if (source.lifecycle_render !== undefined && typeof source.lifecycle_render !== "boolean") {
+			throw new WorkflowSpecError(`Canonical workflow spec malformed (sources[${index}].lifecycle_render must be boolean): ${specPath}`, "malformed");
+		}
+		return { path: source.path, lifecycleRender: source.lifecycle_render === true };
+	});
 
 	return { phaseNames, nameById, integerPhaseIds, gateOutput, outputDirs, reflectLeads, sources };
 }
@@ -159,13 +176,25 @@ const APPLIES_TO_RE = /applies_to:\s*\[([^\]]*)\]/;
 const TASKS_PATH_RE = /tasks\/([A-Za-z0-9_-]+)\//g;
 
 /** Scan one prose file for tokens that contradict the canonical spec. */
-export function scanForViolations(spec: CanonicalSpec, projectRoot: string, relPath: string): Violation[] {
+export function scanForViolations(spec: CanonicalSpec, projectRoot: string, relPath: string, lifecycleRender = false): Violation[] {
 	const abs = path.join(projectRoot, relPath);
 	if (!fs.existsSync(abs)) {
 		return [{ file: relPath, line: 0, found: "missing source file", expected: "file listed in workflow.yaml sources must exist" }];
 	}
 	const violations: Violation[] = [];
 	const lines = fs.readFileSync(abs, "utf-8").split("\n");
+	const body = lines.join("\n");
+	const canonicalPointer = "Canonical source: .claude/workflow.yaml";
+	if (!body.includes(canonicalPointer)) {
+		violations.push({ file: relPath, line: 0, found: "missing canonical source pointer", expected: canonicalPointer });
+	}
+	if (lifecycleRender) {
+		const sequence = [...spec.nameById].map(([id, name]) => `${id}:${name}`).join(" > ");
+		const expectedMarker = `<!-- Workflow phase sequence: ${sequence} -->`;
+		if (!body.includes(expectedMarker)) {
+			violations.push({ file: relPath, line: 0, found: "missing or reordered workflow phase sequence marker", expected: expectedMarker });
+		}
+	}
 
 	// Confusable singular forms of the canonical output dirs (the realistic typo).
 	const dirTypos = new Map<string, string>(); // typo -> canonical
@@ -231,7 +260,6 @@ export function scanForViolations(spec: CanonicalSpec, projectRoot: string, relP
 	// 5. Reflect lead list (file-level). A file that enumerates the Reflect leads
 	//    (mentions Reflect and ≥2 of the canonical leads) must carry ALL of them.
 	//    Gating on ≥2 avoids flagging files that mention one agent incidentally.
-	const body = lines.join("\n");
 	if (/\bReflect\b/.test(body)) {
 		const present = spec.reflectLeads.filter((l) => body.includes(l));
 		if (present.length >= 2 && present.length < spec.reflectLeads.length) {
@@ -251,7 +279,8 @@ function globToProbe(glob: string): string {
 /**
  * Run the full drift check. Returns CheckResults under the "Workflow" section:
  * a hard FAIL if the spec can't load, a per-source PASS/FAIL otherwise, and a
- * spec-level FAIL if any canonical phase name appears in NO source file.
+ * hard FAIL if a configured source lacks its canonical pointer or required
+ * lifecycle marker.
  */
 export function checkWorkflowDrift(projectRoot: string, opts: { missingSpecSeverity?: Status } = {}): CheckResult[] {
 	let spec: CanonicalSpec;
@@ -268,36 +297,16 @@ export function checkWorkflowDrift(projectRoot: string, opts: { missingSpecSever
 	}
 
 	const results: CheckResult[] = [];
-	const seenNames = new Set<string>();
-
-	for (const rel of spec.sources) {
-		const violations = scanForViolations(spec, projectRoot, rel);
-		// Record which canonical names this file mentions (for global presence).
-		const abs = path.join(projectRoot, rel);
-		if (fs.existsSync(abs)) {
-			const body = fs.readFileSync(abs, "utf-8");
-			for (const n of spec.phaseNames) if (body.includes(n)) seenNames.add(n);
-		}
+	for (const source of spec.sources) {
+		const violations = scanForViolations(spec, projectRoot, source.path, source.lifecycleRender);
 		if (violations.length === 0) {
-			results.push({ name: `No drift: ${rel}`, status: "pass", detail: rel, section: "Workflow" });
+			results.push({ name: `No drift: ${source.path}`, status: "pass", detail: source.path, section: "Workflow" });
 		} else {
 			const detail = violations
 				.map((v) => `${v.file}:${v.line} found "${v.found}" — expected "${v.expected}"`)
 				.join("\n         ");
-			results.push({ name: `Drift in ${rel}`, status: "fail", detail, section: "Workflow" });
+			results.push({ name: `Drift in ${source.path}`, status: "fail", detail, section: "Workflow" });
 		}
-	}
-
-	const absentNames = [...spec.phaseNames].filter((n) => !seenNames.has(n));
-	if (absentNames.length > 0) {
-		results.push({
-			name: "Canonical phase coverage",
-			status: "fail",
-			detail: `Phase name(s) defined in workflow.yaml but absent from all sources: ${absentNames.join(", ")}`,
-			section: "Workflow",
-		});
-	} else {
-		results.push({ name: "Canonical phase coverage", status: "pass", detail: `${spec.phaseNames.size} phase names present across sources`, section: "Workflow" });
 	}
 
 	return results;

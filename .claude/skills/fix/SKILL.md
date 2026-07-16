@@ -44,8 +44,8 @@ Unified skill for fixing issues of any complexity with structured diagnosis.
 
 ```
 Bug → Mode Select → [Check Memory: standard/deep] → Scout (MANDATORY) → Diagnose
-  → [investigate (ALWAYS) → sequential-thinking → root cause?]
-  → yes → Root-Cause Proof → Complexity → Fix ROOT CAUSE → Verify + Prevent (MANDATORY)
+  → [quick: confirm the known cause directly | standard/deep: investigate → sequential-thinking]
+  → root cause? → yes → Root-Cause Proof → Complexity → Fix ROOT CAUSE → Verify + Prevent (MANDATORY)
   → pass → Report + capture only when recurrence/salience warrants it
   → fail <3 → re-diagnose | fail 3+ → STOP
 ```
@@ -112,10 +112,10 @@ Activate `mk:scout` to map affected codebase BEFORE any diagnosis:
 
 **Capture pre-fix state first:** exact error messages, failing test output, stack traces.
 
-Then structured diagnosis using two skills:
+Then choose the evidence path that matches the profile:
 
-1. **mk:investigate** — always collect and validate symptoms, traces, and reproduction steps; use a supplied diagnostic report as evidence, never as a bypass.
-2. **mk:sequential-thinking** — generate hypotheses from evidence, test each, eliminate, conclude
+1. **Quick** — validate the supplied known cause against the error and affected code directly. Do not delegate to `mk:investigate`; if the cause is no longer clear, escalate to standard before editing.
+2. **Standard/Deep** — use **mk:investigate** to collect and validate symptoms, traces, and reproduction steps, then **mk:sequential-thinking** to generate hypotheses from evidence, test each, eliminate, and conclude. A supplied diagnostic report is evidence to validate and extend, never a bypass.
 
 Load `references/diagnosis-protocol.md` for the 5-phase protocol: Observe → Hypothesize → Test → Trace → Escalate.
 
@@ -130,16 +130,16 @@ Operationalizes `.claude/rules/core-behaviors.md` Rule 6 ("Verify, Don't Assume"
 Standard/Complex/Parallel — all six required:
 
 1. **Exact symptom** — copy-pasted error/message/behavior, not paraphrased.
-2. **Deterministic reproduction** — exact command(s) or steps that trigger it every time.
+2. **Reproduction evidence** — either exact command(s) or steps that trigger it every time, or, for an intermittent failure, the observed attempts, failure rate, conditions, and supporting trace/log correlation.
 3. **Expected vs actual** — what should happen vs what does.
 4. **Root cause with `file:line`** — the specific source location, traced backward from the symptom (never the symptom site).
-5. **Why now** — what changed / what condition makes it surface (regression commit, data state, env, version).
+5. **Why now / uncertainty record** — what changed or condition makes it surface (regression commit, data state, env, version); if unknown, state that explicitly with eliminated hypotheses and the monitoring or next observation needed. Never invent a cause for timing.
 6. **Blast radius** — other callers, modules, or behaviors the same root cause touches.
 
 `--quick` compact form (still non-empty — one phrase each):
 exact compiler/lint error · file · direct cause · command-before · command-after · impacted area.
 
-If any field cannot be filled, return to Step 2 and gather more evidence. Do not substitute a guess.
+If any field cannot be filled, return to Step 2 and gather more evidence. Intermittent failures may use bounded probabilistic evidence; a documented unknown is valid only for the uncertainty record, never as a substitute for the root cause.
 
 **Write evidence (init):** standard/deep runs emit `workflow-evidence.json` with `skill: mk:fix`, `mode`, `task`, `planPath` (if the fix escalated to a plan), `phase`, `risk`, and `fixDiagnosis`. Quick runs keep evidence in the response only.
 
@@ -237,7 +237,7 @@ Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index reco
 
 ## Skill Activation
 
-**Always:** `mk:scout` (Step 1) + `mk:investigate` + `mk:sequential-thinking` (Step 2). A supplied diagnostic report informs investigation; it never bypasses it.
+**Always:** `mk:scout` (Step 1) + direct diagnosis (Step 2). **Standard/Deep:** `mk:investigate` + `mk:sequential-thinking` for the full evidence chain. A supplied diagnostic report informs investigation; it never bypasses it.
 **Conditional:** `mk:brainstorming` (complex, multiple approaches) | `mk:docs-finder` (unfamiliar APIs)
 
 ## Gotchas

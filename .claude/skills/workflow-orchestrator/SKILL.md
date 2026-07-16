@@ -45,6 +45,8 @@ dependency_edges:
 
 # Workflow Orchestrator
 
+<!-- Canonical source: .claude/workflow.yaml -->
+
 **Priority:** CRITICAL — Use for complex feature implementations.
 
 > Only activates on session start for complex-feature intent. If `/mk:cook` was explicitly invoked in this session, do not activate — `mk:cook` owns the pipeline. See `.claude/rules/orchestration-rules.md`"Orchestrator Entry Point Rule".

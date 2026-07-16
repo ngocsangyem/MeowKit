@@ -43,12 +43,16 @@ gates:
   - id: gate_2
     required_output: "tasks/reviews/*-verdict.md"
 sources:
-  - lifecycle.md
+  - path: lifecycle.md
+    lifecycle_render: true
 `;
 
 // A clean prose file that mentions every canonical phase name (so coverage
 // passes) and contains no contradictions.
 const CLEAN_PROSE = `# Lifecycle
+
+<!-- Canonical source: .claude/workflow.yaml -->
+<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
 
 Phase 0 Orient → Phase 1 Plan → Phase 2 Test → Phase 3 Build →
 Phase 3.5 Simplify → Phase 3.6 Verify → Phase 4 Review → Phase 5 Ship →
@@ -59,12 +63,13 @@ applies_to: [Phase 0, 1, 2, 3, 4, 5, 6]
 Phase 6 Reflect leads: analyst + documenter + mk:memory.
 `;
 
-async function makeHarness(spec: string, prose: string): Promise<string> {
+async function makeHarness(spec: string, prose: string, extraSources: Record<string, string> = {}): Promise<string> {
 	const root = await mkdtemp(join(tmpdir(), "mewkit-wfdrift-"));
 	tempDirs.push(root);
 	await mkdir(join(root, ".claude"), { recursive: true });
 	await writeFile(join(root, ".claude", "workflow.yaml"), spec);
 	await writeFile(join(root, "lifecycle.md"), prose);
+	for (const [file, content] of Object.entries(extraSources)) await writeFile(join(root, file), content);
 	return root;
 }
 
@@ -133,12 +138,45 @@ describe("checkWorkflowDrift", () => {
 		expect(hasFail(results)).toBe(true);
 	});
 
-	it("FAILS when a canonical phase name appears in no source file", async () => {
-		const prose = CLEAN_PROSE.replace(/Phase 5 Ship/g, "Phase 5").replace("Phase 6 Reflect →\n", "").replace(/Ship/g, "");
-		const root = await makeHarness(SPEC, prose);
+	it("FAILS when one lifecycle render omits a substep even if another source is complete", async () => {
+		const spec = SPEC.replace(
+			"    lifecycle_render: true\n",
+			"    lifecycle_render: true\n  - path: lifecycle-two.md\n    lifecycle_render: true\n  - path: pointer-only.md\n    lifecycle_render: false\n",
+		);
+		const prose = CLEAN_PROSE.replace("3.5:Simplify > 3.6:Verify > ", "");
+		const root = await makeHarness(spec, prose, {
+			"lifecycle-two.md": CLEAN_PROSE,
+			"pointer-only.md": CLEAN_PROSE.replace("<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->\n", ""),
+		});
 		const results = checkWorkflowDrift(root);
 		expect(hasFail(results)).toBe(true);
-		expect(failDetail(results)).toContain("absent from all sources");
+		expect(failDetail(results)).toContain("workflow phase sequence marker");
+	});
+
+	it("FAILS when a lifecycle marker orders phases incorrectly", async () => {
+		const prose = CLEAN_PROSE.replace("3.5:Simplify > 3.6:Verify", "3.6:Verify > 3.5:Simplify");
+		const root = await makeHarness(SPEC, prose);
+		expect(hasFail(checkWorkflowDrift(root))).toBe(true);
+	});
+
+	it("FAILS when a configured source lacks the canonical pointer", async () => {
+		const root = await makeHarness(SPEC, CLEAN_PROSE.replace("<!-- Canonical source: .claude/workflow.yaml -->\n", ""));
+		expect(failDetail(checkWorkflowDrift(root))).toContain("missing canonical source pointer");
+	});
+
+	it("allows pointer-only sources without a lifecycle marker and supports legacy string sources", async () => {
+		const spec = SPEC.replace(
+			"  - path: lifecycle.md\n    lifecycle_render: true",
+			"  - lifecycle.md",
+		);
+		const root = await makeHarness(spec, CLEAN_PROSE.replace("<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->\n", ""));
+		expect(hasFail(checkWorkflowDrift(root))).toBe(false);
+	});
+
+	it("allows object-form pointer-only sources without a lifecycle marker", async () => {
+		const spec = SPEC.replace("lifecycle_render: true", "lifecycle_render: false");
+		const root = await makeHarness(spec, CLEAN_PROSE.replace("<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->\n", ""));
+		expect(hasFail(checkWorkflowDrift(root))).toBe(false);
 	});
 
 	it("loadWorkflowSpec throws WorkflowSpecError on a missing spec", async () => {
@@ -160,5 +198,10 @@ describe("checkWorkflowDrift", () => {
 		const root = await makeHarness("version: 1\nphases: [unbalanced", CLEAN_PROSE);
 		const results = checkWorkflowDrift(root, { missingSpecSeverity: "warn" });
 		expect(results.some((r) => r.status === "fail")).toBe(true);
+	});
+
+	it("FAILS cleanly when sources is not an array", async () => {
+		const root = await makeHarness(SPEC.replace("sources:\n  - path: lifecycle.md\n    lifecycle_render: true", "sources: lifecycle.md"), CLEAN_PROSE);
+		expect(failDetail(checkWorkflowDrift(root))).toContain("sources must be an array");
 	});
 });

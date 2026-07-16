@@ -104,6 +104,9 @@ jobs:
       - name: Verify high-traffic dependency metadata
         run: node scripts/scan-skill-dependency-edges.mjs --check-high-traffic
 
+      - name: Report generic-core provider vocabulary baseline
+        run: node scripts/core-skill-token-baseline.cjs
+
       - name: Lint website terminology
         run: node scripts/terminology-linter.cjs
 

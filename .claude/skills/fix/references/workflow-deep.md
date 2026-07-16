@@ -4,8 +4,8 @@ Full pipeline with research, brainstorming, and planning for complex issues.
 
 ## Steps
 
-### Step 1: Debug & Parallel Investigation
-Activate `mk:investigate` skill. Launch parallel Explore subagents:
+### Step 1: Scout, Debug & Parallel Investigation
+Run `mk:scout`, then activate `mk:investigate` and `mk:sequential-thinking`. Launch parallel exploration only for independent evidence paths:
 ```
 Agent("Explore", "Find error origin and trace")
 Agent("Explore", "Find affected components and dependencies")

@@ -4,21 +4,20 @@ Full pipeline for moderate complexity issues. Uses task tracking for phase coord
 
 ## Steps
 
-### Step 1: Debug & Investigate
-Activate `mk:investigate` skill. Use researcher agent if external docs needed.
+### Step 1: Scout, Debug & Investigate
+Run `mk:scout`, then activate `mk:investigate` and `mk:sequential-thinking`. Use a researcher only if external docs are needed.
 - Read error messages, logs, stack traces
-- Reproduce the issue
+- Capture deterministic reproduction or bounded intermittent evidence
 - Trace backward to root cause
 - Identify all affected files
 
 **Output:** `Step 1: Root cause — [summary], [N] files affected`
 
-### Step 2: Scout Related Code
-Launch parallel `Explore` subagents to scout affected areas.
-Use `mk:scout` for large codebases.
+### Step 2: Extend Scout Coverage
+Extend the mandatory scout when the initial blast radius is larger than the direct module.
 
-- Only if unclear which files need changes
-- Find patterns, similar implementations, dependencies
+- Find patterns, similar implementations, dependencies, and callers
+- Use parallel exploration only for independent affected areas
 
 **Output:** `Step 2: Scouted [N] areas — Found [M] related files`
 

@@ -4,16 +4,18 @@ description: "mk:office-hours"
 ---
 
 ## What This Skill Does
-YC Office Hours -- a structured product validation and design thinking session with two modes. Startup mode: six forcing questions that expose demand reality, status quo, desperate specificity, narrowest wedge, observation, and future-fit. Builder mode: generative brainstorming for side projects, hackathons, learning, and open source. Saves a design doc. Produces no code.
+YC Office Hours -- a structured product-validation and design-thinking session for a new product, feature, or side-project concept. Startup mode tests demand; Builder mode develops an unvalidated product idea. Saves a design doc. Produces no code.
 
 **HARD GATE:** Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action. The only output is a design document.
 
 ## When to Use
-- User says "brainstorm this", "I have an idea", "help me think through this", "office hours", or "is this worth building"
-- User describes a new product idea or is exploring whether something is worth building
+- User describes a new product, feature, or side-project concept whose problem/value is unvalidated
+- User asks whether something is worth building or what smallest wedge to validate
 - BEFORE a plan exists -- office hours IS the planning step
 - For reviewing an existing plan, use `mk:plan-ceo-review` instead
 - For evaluating an existing product's health, request Product Lens Modes (PMF scoring or User Journey Audit)
+
+A bare “brainstorm” request is ambiguous. Ask whether product discovery/validation or technical approaches are needed. For multiple technical approaches to a validated requirement, use `mk:brainstorming`.
 
 ## Core Capabilities
 1. **Mode Detection:** Asks the user about their goal and maps to Startup mode (building a startup, intrapreneurship) or Builder mode (hackathon, open source, learning, side project, having fun)

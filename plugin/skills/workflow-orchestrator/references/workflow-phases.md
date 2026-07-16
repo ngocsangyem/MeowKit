@@ -1,5 +1,6 @@
 <!-- Aligned to CLAUDE.md 7-phase model (B2-C6 fix) -->
 <!-- Canonical source: .claude/workflow.yaml -->
+<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
 
 # 7-Phase Workflow Detail
 
@@ -19,6 +20,8 @@ For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
 | 1     | Plan                    | planner → architect  | Requirements, technical design                        | **GATE 1**       |
 | 2     | Test (RED if `--tdd`)   | tester               | Failing tests in TDD mode; tests on-request otherwise | Auto / Skipped   |
 | 3     | Build                   | developer            | Implementation (GREEN in TDD mode)                    | Auto             |
+| 3.5   | Simplify                | mk:simplify          | Simplified code with behavior preserved                | Auto             |
+| 3.6   | Verify                  | mk:verify            | Clean build, lint, typecheck, test, and coverage       | Auto             |
 | 4     | Review                  | reviewer + security  | Quality/security audit, verdict                       | **GATE 2**       |
 | 5     | Ship                    | shipper + git-manager| Commit, PR, deploy                                    | Auto             |
 | 6     | Reflect                 | analyst + documenter + mk:memory | Memory capture, docs sync               | Auto             |
@@ -31,7 +34,7 @@ Phase 1 → Phase 2: GATE 1 — HUMAN APPROVAL REQUIRED
 Phase 2 → Phase 3:
   - In TDD mode: AUTO-CONTINUE (if tests fail as expected)
   - In default mode: Phase 2 may be skipped entirely; Phase 1 → Phase 3 directly
-Phase 3 → Phase 4: AUTO-CONTINUE (optional review gate in interactive mode)
+Phase 3 → Phase 3.5 → Phase 3.6 → Phase 4: AUTO-CONTINUE
 Phase 4 → Phase 5: GATE 2 — HUMAN APPROVAL REQUIRED (NO EXCEPTIONS)
 Phase 5 → Phase 6: AUTO-CONTINUE
 Phase 6 → DONE: AUTO-COMPLETE

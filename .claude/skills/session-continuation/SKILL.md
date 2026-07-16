@@ -1,7 +1,6 @@
 ---
 name: mk:session-continuation
 description: 'Persists and restores mid-session workflow progress across context resets. Use when resuming workflows, saving state, or handling context compaction. Triggers on: handoff, save state, resume workflow.'
-model: haiku
 triggers:
   - handoff
   - save state
@@ -32,7 +31,7 @@ Manage workflow state across sessions with handoff and resume.
 
 ## When to Use
 
-- Token count approaching 150K (75% of limit)
+- Runtime reports that the session is approaching its context-warning threshold
 - User says "handoff", "save", "pause"
 - User says "resume" + workflow ID
 - Session ending with incomplete workflow

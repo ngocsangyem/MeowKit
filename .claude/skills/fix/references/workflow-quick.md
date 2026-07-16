@@ -1,45 +1,28 @@
 # Quick Workflow
 
-Fast debug-fix-review cycle for simple issues. No task tracking overhead.
+Focused diagnose-fix-verify cycle for a known-cause, one- or two-file issue. No persistent artifacts or task-tracking overhead.
 
 ## Steps
 
-### Step 1: Debug
-Activate `mk:investigate` skill. Find root cause quickly.
-- Read error message/logs
-- Locate affected file(s)
-- Identify exact fix needed
+### Step 1: Scout + Confirm Cause
+- Read the exact error message or observed behavior.
+- Locate the affected file and direct dependencies.
+- Confirm the supplied cause against the code and symptom directly.
+- If the cause is unclear, the issue is intermittent without bounded evidence, or the blast radius exceeds two files, stop and escalate to the Standard workflow before editing.
 
-Use parallel `Explore` subagents if root cause spans multiple areas.
-
-**Output:** `Step 1: Root cause — [brief description]`
+**Output:** `Step 1: Root cause — [brief description + direct evidence]`
 
 ### Step 2: Fix & Verify
-Implement the fix directly. Make minimal changes following existing patterns.
+Implement the smallest root-cause fix following local patterns. Run the exact focused command before and after the change; add a focused regression test when the behavior can regress.
 
-**Parallel Verification** — launch in single message:
-```
-Agent(subagent_type="Bash", prompt="Run typecheck")
-Agent(subagent_type="Bash", prompt="Run lint")
-```
+**Output:** `Step 2: Fixed — [N] files, focused before/after result`
 
-**Output:** `Step 2: Fixed — [N] files, verified (types/lint passed)`
+### Step 3: Complete
+Return the root cause, changed files, and verification result inline. Do not create a plan, report, wiki candidate, memory entry, reviewer task, or commit prompt.
 
-### Step 3: Review
-Use reviewer agent for quick review.
-
-See `references/review-cycle.md` for mode-specific handling.
-
-**Output:** `Step 3: Review [score]/10 — [status]`
-
-### Step 4: Complete
-Report summary to user. Score is advisory display only — it never gates the commit prompt.
-- Autonomous mode: present for user approval, then ask to commit (never self-approve)
-- HITL mode: ask user next action
-
-**Output:** `Step 4: Complete — [action]`
+**Output:** `Step 3: Complete — [summary]`
 
 ## Notes
-- If review fails → escalate to Standard workflow
-- Total steps: 4 (vs 6 in Standard, 8 in Deep)
+- If the direct cause or focused verification fails → escalate to Standard workflow
+- Total steps: 3
 - No planning phase needed

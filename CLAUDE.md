@@ -10,6 +10,7 @@ and ship production-ready code following the 7-phase workflow.
 ## Workflow
 
 <!-- Canonical source: .claude/workflow.yaml -->
+<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
 
 ```
 Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test (RED if --tdd, else optional)

@@ -8,6 +8,7 @@ applies_to: [Phase 0, 1, 2, 3, 4, 5, 6]
 ---
 
 <!-- Canonical source: .claude/workflow.yaml -->
+<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
 
 # Phase Composition Contracts
 

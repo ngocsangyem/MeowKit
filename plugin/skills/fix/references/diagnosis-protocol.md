@@ -16,12 +16,12 @@ This becomes the baseline for Step 5 verification.
 
 ## Phase 1: Observe (What is actually happening?)
 
-Use `mk:investigate`:
+For Standard/Deep, use `mk:investigate`:
 
 - What is the exact error message?
 - Where does it occur? (file, line, function)
 - When did it start? (`git log`, `git bisect`)
-- Can it be reproduced consistently?
+- Can it be reproduced consistently, or is there bounded intermittent evidence (attempts, failure rate, conditions, and trace/log correlation)?
 - Expected vs actual behavior?
 
 ## Phase 2: Hypothesize (Why might this happen?)
@@ -47,7 +47,7 @@ Spawn parallel Explore subagents (max 3):
 
 ## Phase 4: Trace (Follow the root cause chain)
 
-Use `mk:investigate` (root-cause-tracing):
+For Standard/Deep, use `mk:investigate` (root-cause-tracing):
 
 ```
 Symptom → Immediate cause → Contributing factor → ROOT CAUSE
@@ -62,14 +62,16 @@ checkpoint that gates Step 4 (Fix) in `SKILL.md` Step 2.5. Phase 4 MUST emit
 all six fields before implementation begins:
 
 1. **Exact symptom** — copy-pasted, not paraphrased (from Pre-Diagnosis #1-3).
-2. **Deterministic reproduction** — exact command/steps (from Phase 1).
+2. **Reproduction evidence** — exact command/steps, or for an intermittent failure the observed attempts, failure rate, conditions, and supporting trace/log correlation.
 3. **Expected vs actual** — from Phase 1 observation.
 4. **Root cause with `file:line`** — the traced source location, not the symptom site.
-5. **Why now** — the change/condition that surfaced it (from Pre-Diagnosis #5 `git log`).
+5. **Why now / uncertainty record** — the change/condition that surfaced it, or an explicit unknown with eliminated hypotheses and the next monitoring/observation needed. Never invent a timing cause.
 6. **Blast radius** — other callers/modules/behaviors the same root cause touches.
 
 `--quick` compact form (still non-empty, one phrase each):
 exact compiler/lint error · file · direct cause · command-before · command-after · impacted area.
+
+Quick runs confirm a known cause directly; this full protocol applies when the issue needs Standard/Deep investigation.
 
 ## Phase 5: Escalate (When hypotheses fail)
 
