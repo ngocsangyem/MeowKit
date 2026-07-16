@@ -74,11 +74,11 @@ Activate when:
 - User supplies a design evidence packet (e.g. from `mk:figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
 - Gate 1 requires a plan before Phase 3
 - Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
-- User runs `/mk:plan archive` → route to `references/archive-workflow.md` (skip planning pipeline)
-- User runs `/mk:plan red-team {path}` → route to `references/red-team-standalone.md` (skip planning pipeline)
-- User runs `/mk:plan validate {path}` → route to `references/validate-standalone.md` (skip planning pipeline)
+- Existing-plan audit → `mk:validate-plan`; archive → lifecycle CLI; visual rendering → `mk:visual-plan`.
+- Hard/deep plan creation still runs its built-in red-team and validation interview before Gate 1. These are design-quality gates, not standalone subcommands, and must never be routed away.
+- Compatibility aliases: `/mk:plan archive` → [archive workflow](references/archive-workflow.md); `/mk:plan red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `/mk:plan validate {path}` → [standalone validation workflow](references/validate-standalone.md).
 
-The `archive` / `red-team` / `validate` subcommands reject `--html`: if `--html` accompanies any of them, error with "--html is only valid on a plan-creation run, not on subcommands" and do not route into rendering.
+Standalone aliases route to their compatibility references; they do not replace hard/deep red-team or validation. `--html` routes to `mk:visual-plan`.
 
 Skip when:
 
@@ -108,7 +108,7 @@ Skip when:
 **Composable flags:**
 
 - `--tdd` — add tests-first phase sections and preserve strict TDD in the cook handoff. See `references/tdd-mode.md`.
-- `--html` — the single opt-in for the **structured visual pipeline**. When present, plan-creator generates a `visual-plan/plan.json` artifact (UI evidence → generate → validate → Gate-1 `mewkit visual-plan approve`), then step-08b exports `{plan_dir}/plan.html` from the approved artifact via `mewkit visual-plan export --format html`. Without `--html`, plan-creator does NO visual work at all (light default). Markdown plan files stay source of truth. Rejected by the `archive` / `red-team` / `validate` subcommands (they produce no plan to render) — passing `--html` to a subcommand is an error.
+- Visual work belongs to `mk:visual-plan`. Plan-creator emits only the handoff metadata needed for that skill; Markdown plan files remain source of truth.
 
 ## Requirements Capture Contract
 
@@ -221,9 +221,6 @@ tasks/plans/YYMMDD-name/
 | `references/solution-evaluation.md`                | Trade-off scoring criteria                                                                                                                                                                                           |
 | `references/gotchas.md`                            | Full gotchas list                                                                                                                                                                                                    |
 | `references/solution-design-checklist.md`          | Trade-off analysis checklist for Architecture/Risk/Security sections (5 dimensions)                                                                                                                                  |
-| `references/archive-workflow.md`                   | Archive subcommand: scan completed plans, journal, archive/delete                                                                                                                                                    |
-| `references/red-team-standalone.md`                | Red-team standalone subcommand: adversarial review on existing plan                                                                                                                                                  |
-| `references/validate-standalone.md`                | Validate standalone subcommand: critical question interview on existing plan                                                                                                                                         |
 | `references/adr-generation.md`                     | Architecture Decision Record generation                                                                                                                                                                              |
 | `references/parallel-mode.md`                      | Ownership matrix template, parallel group rules                                                                                                                                                                      |
 | `references/two-approach-mode.md`                  | Approach file template, trade-off matrix, selection flow                                                                                                                                                             |
