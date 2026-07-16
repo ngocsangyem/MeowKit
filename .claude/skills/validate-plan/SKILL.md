@@ -25,8 +25,10 @@ runtime: claude-code
 
 # Plan Validation — 8-Dimension Quality Check
 
-Validates a plan file against 8 dimensions to catch gaps before implementation begins.
-Does NOT replace Gate 1 (human approval). Supplements it with systematic checks.
+Audits an approved plan against 8 dimensions to catch gaps before implementation begins.
+Does NOT replace Gate 1 (human approval), modify plans, or route edits itself. If it
+finds an Insert or Split mutation is needed, the planner performs it and returns to
+Gate 1 for re-approval; Skip and Reorder changes require notification plus audit log.
 
 > For green-field harness sprints (generator↔evaluator loop), use `mk:sprint-contract` instead. `mk:validate-plan` operates on plans from `mk:plan-creator` (cook flow only).
 

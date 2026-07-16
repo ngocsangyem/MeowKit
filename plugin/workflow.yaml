@@ -123,5 +123,6 @@ sources:
   - CLAUDE.md
   - .claude/rules/phase-contracts.md
   - .claude/rules/gate-rules.md
+  - .claude/skills/workflow-orchestrator/SKILL.md
   - .claude/skills/workflow-orchestrator/references/workflow-phases.md
   - .claude/skills/cook/SKILL.md

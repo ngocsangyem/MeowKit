@@ -20,9 +20,15 @@ export interface MigrateE2eEnv {
 	cleanup(): Promise<void>;
 }
 
-export async function setupMigrateE2e(prefix: string): Promise<MigrateE2eEnv> {
+type CodexCompatibilityMode = "strict" | "optimistic";
+
+export async function setupMigrateE2e(
+	prefix: string,
+	compatibility: CodexCompatibilityMode = "strict",
+): Promise<MigrateE2eEnv> {
 	const originalHome = process.env.HOME;
 	const originalCwd = process.cwd();
+	const originalCompat = process.env.MEWKIT_CODEX_COMPAT;
 	const tempHome = mkdtempSync(join(tmpdir(), `${prefix}-home-`));
 	const projectDir = mkdtempSync(join(tmpdir(), `${prefix}-project-`));
 	const sourceDir = join(projectDir, ".claude");
@@ -30,6 +36,9 @@ export async function setupMigrateE2e(prefix: string): Promise<MigrateE2eEnv> {
 	await mkdir(join(tempHome, ".mewkit"), { recursive: true });
 
 	process.env.HOME = tempHome;
+	// Tests select a capability tier explicitly so a locally installed Codex CLI
+	// cannot make the fixture slow or change its converted hook surface.
+	process.env.MEWKIT_CODEX_COMPAT = compatibility;
 	process.chdir(projectDir);
 	const { runMigrate } = await import("../../migrate-orchestrator.js");
 
@@ -56,14 +65,19 @@ export async function setupMigrateE2e(prefix: string): Promise<MigrateE2eEnv> {
 		async cleanup(): Promise<void> {
 			process.chdir(originalCwd);
 			process.env.HOME = originalHome;
+			if (originalCompat === undefined) delete process.env.MEWKIT_CODEX_COMPAT;
+			else process.env.MEWKIT_CODEX_COMPAT = originalCompat;
 			await rm(tempHome, { recursive: true, force: true });
 			await rm(projectDir, { recursive: true, force: true });
 		},
 	};
 }
 
-export async function setupKitInstallMigrateE2e(prefix: string): Promise<MigrateE2eEnv> {
-	const env = await setupMigrateE2e(prefix);
+export async function setupKitInstallMigrateE2e(
+	prefix: string,
+	compatibility: CodexCompatibilityMode = "strict",
+): Promise<MigrateE2eEnv> {
+	const env = await setupMigrateE2e(prefix, compatibility);
 	await writeFile(
 		join(env.projectDir, ".mcp.json"),
 		JSON.stringify({ mcpServers: { context7: { command: "npx", args: ["-y", "@upstash/context7-mcp"] } } }),

@@ -56,8 +56,8 @@ Meta skill — not tied to a specific Phase. Invoked on-demand for skill develop
 3. **Fill content** — Claude completes each TODO section in the generated template
 4. **Add references/** — if skill body would exceed ~100 lines, split into references
 5. **Security boundaries** — load `mk:skill-template-secure` template for trust model if needed
-6. **Validate** — run `validate-skill.py` to check compliance (7-point checklist)
-7. **Fix failures** — if validation score < 6/7, fix failing items
+6. **Validate** — run `validate-skill.py` to check compliance (8-point checklist)
+7. **Fix failures** — if validation score < 7/8, fix failing items
 8. **Register** — add row to `SKILLS_ATTRIBUTION.md`
 9. **Report** — output creation summary
 
@@ -130,7 +130,7 @@ If FAIL: fix failing items before registering.
 ## Anthropic Skill-Building Lessons
 
 1. **Skills are folders** — use scripts/, references/, assets/, lib/ creatively. See `references/filesystem-patterns.md`.
-2. **Gotchas = highest signal** — every skill MUST have a `## Gotchas` section with real failure modes, not placeholder text. Start with 2-3 gotchas; grow them as Claude hits new edge cases.
+2. **Gotchas = highest signal** — every skill MUST have a `## Gotchas` section. A day-1 placeholder is allowed; replace it as real failures emerge.
 3. **Progressive disclosure** — SKILL.md stays under 500 lines per `skill-authoring-rules.md` Rule 3. Details live in references/ loaded on-demand. Step-file skills (with `workflow.md`) auto-pass.
 4. **Avoid railroading** — describe outcomes, not step-by-step procedures. See `references/good-vs-bad-examples.md`.
 5. **Description = trigger condition** — must answer "When should I use this?" not "What does this do?" Start with "Use when..."

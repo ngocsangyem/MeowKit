@@ -100,7 +100,7 @@ rejected_alternatives:
     reason: "[why it lost or why it remains a secondary option]"
 open_risks: []
 planning_questions: []
-report_path: "plans/reports/[report-name].md"
+report_path: "tasks/reports/[report-name].md"
 ```
 
 ### Next Steps

@@ -55,7 +55,7 @@ Skip: Fasttrack mode with pre-approved spec.
 ## Pre-Execution Checklist
 
 1. **agent-detector** → Select lead agent (MANDATORY)
-2. **Load context** → Read `.claude/memory/fixes.md` + `.claude/memory/architecture-decisions.json` (Phase 0 Orient)
+2. **Load context** → Read canonical `.claude/memory/fixes.json` + `.claude/memory/architecture-decisions.json` (Phase 0 Orient; fall back to matching `.md` views only when JSON is absent)
 3. **Show agent banner** at start of response
 4. **Verify task complexity** — if simple, suggest lighter approach
 5. **Challenge requirements** → Ask clarifying questions before Phase 1
@@ -74,6 +74,7 @@ See `.claude/rules/phase-contracts.md` for input/output expectations per phase. 
    - Phase 2: Test — in TDD mode (`--tdd` / `MEOWKIT_TDD=1`), write failing tests; in default mode, optional / on-request only. Auto-continue.
    - Phase 3: Build — implement per the plan. In TDD mode, code must make failing tests pass. Auto-continue.
    - Phase 3.5: Simplify — run `mk:simplify` after build (after tests pass in TDD mode). **MANDATORY before Phase 4.** Auto-continue.
+   - Phase 3.6: Verify — run `mk:verify` after simplify. **MANDATORY before Phase 4.** Auto-continue.
    - Phase 4: Review — quality/security audit → **GATE 2** (human approval required, NO EXCEPTIONS)
    - Phase 5: Ship — commit, PR, deploy. Auto-continue.
    - Phase 6: Reflect — memory capture, docs sync. Auto-complete.

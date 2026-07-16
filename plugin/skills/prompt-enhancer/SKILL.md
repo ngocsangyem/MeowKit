@@ -76,7 +76,7 @@ Step detail in `references/decomposition-checklist.md`, `references/playbook.md`
 - Optional: `--save-to <path>` (default: active plan dir if any, else `${CLAUDE_PLUGIN_DATA}/...`).
 
 The skill **does not accept a `--model` flag.** Per the synthesis report
-(`plans/reports/synthesis-260509-2058-prompting-framework.md`), model
+(`tasks/reports/synthesis-260509-2058-prompting-framework.md`), model
 detection violates the model-agnostic mandate; dispatch by model-tier lives
 in `harness-rules.md` Rule 5, not here.
 

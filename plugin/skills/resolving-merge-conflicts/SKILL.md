@@ -5,7 +5,7 @@ version: 1.0.0
 description: |
   Resolve an in-progress git merge or rebase conflict end to end: read the
   conflict state, recover each side's original intent, resolve every hunk,
-  run the project's checks, and finish the merge/rebase with a commit.
+  run the project's checks, and prepare the merge/rebase for an explicitly approved finish.
   Use when asked to "resolve merge conflicts", "fix this rebase", "finish the
   merge", or when `git status` shows conflicted (unmerged) paths.
   NOT for the full ship pipeline that merges the base branch first (see mk:ship);
@@ -39,8 +39,9 @@ runtime: claude-code
 
 **Iron Laws**
 
-- **Always resolve. Never `git merge --abort` / `git rebase --abort`** — finishing the
-  operation is the goal. Abort only if the user explicitly asks.
+- **Resolve every conflict; do not abandon by default.** `git merge --abort` or
+  `git rebase --abort` requires explicit user direction. Completing the operation with
+  a commit or `git rebase --continue` also requires explicit user go-ahead.
 - **Do not invent new behaviour.** Resolution combines existing intents; it is not a
   place to add features or refactor.
 
@@ -68,7 +69,7 @@ Copy this checklist and track progress:
 - [ ] 2. Find the primary sources (why each side changed)
 - [ ] 3. Resolve each hunk (preserve both intents)
 - [ ] 4. Run the project's automated checks
-- [ ] 5. Finish the merge/rebase
+- [ ] 5. Present resolved state and obtain approval to finish the merge/rebase
 ```
 
 ### 1. See the current state
@@ -134,8 +135,10 @@ Run what exists (for this kit: `npm run typecheck`, `npm test`, `npm run lint`).
 anything the merge broke — a resolution can be marker-free yet semantically wrong (e.g.
 a function both sides renamed differently). Re-run until green.
 
-### 5. Finish the merge/rebase
+### 5. Obtain approval, then finish the merge/rebase
 
+- **Ask first:** present the resolved files and check results. Do not run the following
+  commands until the user explicitly approves completion.
 - **Merge:** stage everything, then commit. The prepared message is usually correct;
   keep it conventional and free of AI references.
   ```bash
@@ -162,7 +165,7 @@ handing off.
 - {file}: {kept both | chose {side} because {merge goal} — dropped {discarded intent}}
 
 **Checks:** typecheck {pass/fail} · tests {pass/fail} · format {pass/fail}
-**Finished:** {commit sha | rebase complete}
+**Finished:** {awaiting approval | commit sha | rebase complete}
 ```
 
 ## Failure Handling

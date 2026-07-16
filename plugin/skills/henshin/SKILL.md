@@ -87,7 +87,7 @@ Understand the target code and the local project.
 When delegating to `mk:scout` or `researcher`, pass:
 
 - work context path (git root of the target)
-- reports path (`plans/reports/`)
+- reports path (`tasks/reports/`)
 - plans path (`plans/`)
 - required status format (`DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT`)
 
@@ -205,9 +205,8 @@ Spec template (written to conversation; plan-creator persists it to disk):
 ## 8. Out of Scope
 ```
 
-Write the architectural decision to `.claude/memory/architecture-decisions.md` by
-calling `Edit` directly. `##decision:` is a user-typed keyboard shortcut and
-does NOT fire from agent output (see
+Write the architectural decision to canonical `.claude/memory/architecture-decisions.json`,
+then regenerate Markdown views. `##decision:` is a user-typed keyboard shortcut and does NOT fire from agent output (see
 `.claude/skills/memory/references/capture-architecture.md`). Append a section:
 
 ```

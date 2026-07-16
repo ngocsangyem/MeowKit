@@ -2,7 +2,7 @@
 name: mk:benchmark
 version: 1.0.0
 preamble-tier: 3
-description: Use when measuring harness changes against ground truth — runs a small canary suite (5 quick tasks, 6 with --full) and records scores in trace-log.jsonl. Backs the dead-weight audit with measured deltas. Triggers on /mk:benchmark, "run benchmark", "measure harness", or before/after a harness change.
+description: Experimental/manual harness canary procedure. It records benchmark manifests and scores but does not provide a fully automated runner.
 argument-hint: '[run | compare <a> <b>] [--full]'
 allowed-tools:
   - Bash
@@ -19,7 +19,7 @@ keywords:
   - measure-harness
   - dead-weight-audit
   - ground-truth
-when_to_use: Use when measuring harness changes against ground truth — runs canary suite, records scores. NOT for production performance benchmarking.
+when_to_use: Experimental/manual use when measuring harness changes against ground truth. NOT for production performance benchmarking.
 user-invocable: true
 owner: testing
 criticality: medium
@@ -27,7 +27,7 @@ status: active
 runtime: claude-code
 ---
 
-# mk:benchmark — Harness Canary Suite
+# mk:benchmark — Experimental Harness Canary Suite
 
 Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (per `.claude/rules/dead-weight-audit-rules.md`) consumes to make load-bearing decisions about each harness component.
 

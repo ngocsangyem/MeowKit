@@ -2,7 +2,7 @@
 name: mk:evaluate
 version: 1.0.0
 preamble-tier: 3
-description: Use when grading a running build behaviorally — drives the artifact via browser/curl/CLI and grades against rubric criteria with concrete evidence. Triggers on /mk:evaluate, "evaluate this build", "grade the running app", "check the running site against the spec", or after a generator iteration completes. NOT for structural code audit of a diff/PR (see mk:review); NOT for static linting (see mk:lint-and-validate).
+description: Experimental behavioral evaluator. Drives a running artifact via browser/curl/CLI and records rubric evidence; the runner is not yet a fully implemented automated evaluation system.
 argument-hint: '[target-url-or-path] [--rubric-preset frontend-app|backend-api|cli-tool|fullstack-product] [--max-criteria 15]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - running-build
   - active-verification
   - skeptic-persona
-when_to_use: Use when grading a running build behaviorally — drives artifact via browser/curl/CLI against rubric criteria. NOT for structural code audit of a diff/PR (see mk:review) or static linting (see mk:lint-and-validate).
+when_to_use: Experimental/manual use when grading a running build behaviorally. NOT for structural code audit of a diff/PR (see mk:review) or static linting (see mk:lint-and-validate).
 user-invocable: true
 owner: testing
 criticality: high
@@ -29,7 +29,7 @@ status: active
 runtime: claude-code
 ---
 
-# mk:evaluate — Behavioral Active Verification
+# mk:evaluate — Experimental Behavioral Verification
 
 Step-file workflow that drives a running build, probes each rubric criterion via active verification, and produces a graded verdict with runtime evidence. Owned by the `evaluator` agent (Phase 3+).
 
@@ -74,7 +74,7 @@ Step 5: Generator Feedback → produce one-line fix guidance per FAIL/WARN; emit
 
 ## Memory Write
 
-After each completed evaluation, append a summary line to `.claude/memory/review-patterns.md`. Create the file with a header row if it does not exist:
+After each completed evaluation, update the canonical `.claude/memory/review-patterns.json` store and regenerate Markdown views. Do not write the generated `review-patterns.md` view directly.
 
 ```
 | {date} | {artifact-id} | {verdict: PASS/WARN/FAIL} | {top-criterion} | {score} |

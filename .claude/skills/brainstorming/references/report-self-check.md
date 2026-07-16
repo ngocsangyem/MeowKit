@@ -20,4 +20,4 @@ Run before finalizing a brainstorm report.
 - Top ideas are same-architecture variants.
 - Deep scores are tied within 2 points and no tie-break is requested or noted.
 - Handoff packet passes raw transcript instead of compact decision context.
-- Output includes code, implementation steps, commands, secrets, or files outside `plans/reports/`.
+- Output includes code, implementation steps, commands, secrets, or files outside `tasks/reports/`.

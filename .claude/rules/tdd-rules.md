@@ -4,6 +4,20 @@
 
 Why optional: strict TDD adds friction for spikes/tooling/prototypes; production-quality work should still enable `--tdd`.
 
+## Flag precedence
+
+`--tdd` and `--no-test` are mutually exclusive. If both are present, stop and ask
+the user which intent applies; never silently disable TDD. An explicit `--tdd` or
+`MEOWKIT_TDD=1` enables the RED-phase rules below. `--no-test` is an explicit
+opt-out only when TDD is not enabled.
+
+## Regression-Test Rule
+
+A regression test is required when a behavior, security boundary, or public contract
+can regress. It is optional for lint-only, formatting-only, or configuration-only
+changes when the author records a rationale. For flaky failures, use the most reliable
+probabilistic reproducer available and record its limits.
+
 ## When TDD is enabled (`MEOWKIT_TDD=1` or `--tdd`)
 
 These rules apply to all implementation work in strict mode. No exceptions unless explicitly noted.

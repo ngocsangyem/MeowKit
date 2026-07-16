@@ -24,7 +24,7 @@ open_risks:
   - "[risk]"
 planning_questions:
   - "[first question plan-creator must resolve]"
-report_path: "plans/reports/[report-name].md"
+report_path: "tasks/reports/[report-name].md"
 ```
 
 ## Handoff Rules

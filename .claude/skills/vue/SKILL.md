@@ -34,7 +34,7 @@ runtime: claude-code
 
 # Vue 3
 
-Opinionated Vue 3 patterns — Composition API + `<script setup lang="ts">`, Pinia, Pinia
+Vue 3 patterns — Composition API + `<script setup lang="ts">`, Pinia, Pinia
 Colada, file-based routing, and performance. Single entrypoint routing to focused references.
 
 > Use `npx chub search vue` for relevant documentation packages within the Context Hub.
@@ -58,8 +58,8 @@ Vue test design/review → `mk:vue-testing-best-practices`).
 
 ## Core Rules (always apply)
 
-Distilled from the rulekit standards. These are non-negotiable defaults; everything else is
-in the references.
+Follow the repository's established conventions first. When it has no convention, use
+these defaults; project requirements may override them. Everything else is in the references.
 
 - **`<script setup lang="ts">` only** — never Options API, never `defineComponent()` wrapper.
 - **`type` over `interface`** for defining object/prop shapes; keep types alongside the code.

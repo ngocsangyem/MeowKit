@@ -110,7 +110,7 @@ rejected_alternatives:
 open_risks: []
 planning_questions:
   - "[first planning question]"
-report_path: "plans/reports/[report-name].md"
+report_path: "tasks/reports/[report-name].md"
 ```
 
 ### Next Steps

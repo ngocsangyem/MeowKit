@@ -71,7 +71,7 @@ Always skips Gate 1 (same as `mk:investigate` and `mk:office-hours`).
 - Explore architecturally distinct technical approaches for a validated problem.
 - Generate ideas first, then evaluate them separately.
 - Run one anti-bias pivot and one challenge pass before recommending.
-- Emit a compact report under `plans/reports/` plus a handoff packet for `mk:plan-creator`.
+- Emit a compact report under `tasks/reports/` plus a handoff packet for `mk:plan-creator`.
 
 ## Non-Responsibilities
 
@@ -126,7 +126,7 @@ Stop and route or ask before continuing when:
 - All ideas remain variants of one architecture after the pivot and one regeneration attempt.
 - No selected idea, binding constraint, or success criterion exists for handoff.
 
-**Behavioral hard rule (not hook-enforced — see `gate-rules.md` for actual gates):** brainstorming MUST NOT write code, create files outside `plans/reports/`, or invoke implementation skills. Output is _ideas_, never _code_.
+**Behavioral hard rule (not hook-enforced — see `gate-rules.md` for actual gates):** brainstorming MUST NOT write code, create files outside `tasks/reports/`, or invoke implementation skills. Output is _ideas_, never _code_.
 
 ## Idea Format Template
 
@@ -198,7 +198,7 @@ mk:plan-creator (plan)
 
 On completion:
 
-- Output saved to `plans/reports/`
+- Output saved to `tasks/reports/`
 - Include a `Brainstorm Handoff Packet` using `assets/output-action-plan.md`
 - If `--depth deep`, ask before invoking or recommending `mk:plan-creator`
 - `plan-creator` receives report path + handoff packet as pre-research input; it still owns requirements completeness, phase files, and plan approval
@@ -207,7 +207,7 @@ On completion:
   ```bash
   npx mewkit wiki handoff propose \
     --skill mk:brainstorming \
-    --from plans/reports/brainstorm-<date>-<slug>.md \
+    --from tasks/reports/brainstorm-<date>-<slug>.md \
     --slug <resolved-wiki-slug> \
     --explicit-intent
   ```
@@ -216,8 +216,8 @@ On completion:
 
 When `--html` is passed:
 
-- Write the markdown report FIRST (`plans/reports/brainstorm-<date>-<slug>.md`), then author a sibling `plans/reports/brainstorm-<date>-<slug>.html` — same directory and stem.
-- Author the HTML inline using `references/editorial-html.md` as the visual contract. Do NOT route through `mk:preview` and do NOT invoke any implementation skill — this preserves the behavioral hard rule (no writes outside `plans/reports/`).
+- Write the markdown report FIRST (`tasks/reports/brainstorm-<date>-<slug>.md`), then author a sibling `tasks/reports/brainstorm-<date>-<slug>.html` — same directory and stem.
+- Author the HTML inline using `references/editorial-html.md` as the visual contract. Do NOT route through `mk:preview` and do NOT invoke any implementation skill — this preserves the behavioral hard rule (no writes outside `tasks/reports/`).
 - The HTML carries the SAME decision content as the markdown: problem, evidence, options, trade-offs, recommendation, risks, and unresolved questions. It is derived, never authoritative.
 - Keep it self-contained: inline CSS/JS, no build step, no network requirement for layout (a web-font `@import` is the only permitted external request and must degrade to system fonts).
 - `--html` is opt-in; without it, behavior is unchanged.

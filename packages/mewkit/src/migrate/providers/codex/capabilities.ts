@@ -59,6 +59,9 @@ export function isCodexVersionSupported(version: string): boolean {
 
 /** Read the installed Codex version string, or null when the binary is absent. */
 export async function detectCodexVersion(): Promise<string | null> {
+	if (process.env.MEWKIT_CODEX_COMPAT === "strict" || process.env.MEWKIT_CODEX_COMPAT === "optimistic") {
+		return null;
+	}
 	try {
 		const { stdout } = await execFileAsync("codex", ["--version"], { timeout: 5000, encoding: "utf8" });
 		return stdout.trim().replace(/^(codex\s+)?v?/i, "").trim();
@@ -181,6 +184,9 @@ const FALLBACK_CAPABILITIES: CodexCapabilities =
 export async function detectCodexCapabilities(): Promise<CodexCapabilities> {
 	if (process.env.MEWKIT_CODEX_COMPAT === "strict") {
 		return CODEX_CAPABILITY_TABLE[CODEX_CAPABILITY_TABLE.length - 1];
+	}
+	if (process.env.MEWKIT_CODEX_COMPAT === "optimistic") {
+		return CODEX_CAPABILITY_TABLE[0];
 	}
 
 	try {

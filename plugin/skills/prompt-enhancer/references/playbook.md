@@ -6,7 +6,7 @@
 > **Framework:** universal kernel only — the authoritative rule lives in
 > `SKILL.md` Hard Constraints item 4 (plain-markdown sections, no XML / vendor
 > tokens / model overlays, no `--model` flag). Canonical derivation:
-> `plans/reports/synthesis-260509-2058-prompting-framework.md`.
+> `tasks/reports/synthesis-260509-2058-prompting-framework.md`.
 
 ## Contents
 

@@ -161,10 +161,9 @@ code and emit a **structured findings list** — one row per finding:
 ## Gotchas
 
 - (grow this from observed failures)
-- **Reactivity primitive guidance diverges from `mk:vue`.** This skill follows `shallowRef()`
-  for primitives (see `references/reactivity-advanced.md`); `mk:vue` states `ref()` for
-  primitives. Both are accepted in this codebase — prefer the project's existing convention
-  when one is established. The reactivity-advanced reference carries the full divergence note.
+- **Reactivity foundation belongs to `mk:vue`.** Follow the repository convention first,
+  then `mk:vue`'s `ref()` guidance for primitives unless the advanced reference documents a
+  task-specific reason to use `shallowRef()`.
 - Cross-skill gotchas (destructuring `reactive()`, `storeToRefs`, `defineExpose`, `:slotted()`,
   `watchEffect` cleanup, SSR store hydration, Pinia Colada keys) live in `mk:vue` — read them
   there rather than duplicating.

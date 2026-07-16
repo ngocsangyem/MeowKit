@@ -4,6 +4,12 @@ Plans are living documents. When reality diverges from the plan, the plan must c
 
 ## The 5 Mutations
 
+## Approval Effects
+
+- **Insert** and **Split** change the approved implementation shape. Return to Gate 1 for explicit re-approval and record the mutation plus rationale.
+- **Skip** and **Reorder** require user notification and an audit-log entry; they do not silently reuse or revoke the existing approval.
+- **Abandon** already requires explicit approval and archives the original plan.
+
 ### 1. Split Step
 
 Divide one step into two or more steps.

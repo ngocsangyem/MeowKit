@@ -113,7 +113,9 @@ export function checkAgentConformance(repoRoot: string): CheckResult[] {
 		}
 	}
 
-	const routing = fs.readFileSync(path.join(claudeDir, "rules", "agent-routing.md"), "utf-8");
+	const routingPath = path.join(claudeDir, "rules", "agent-routing.md");
+	const routing = fs.existsSync(routingPath) ? fs.readFileSync(routingPath, "utf-8") : "";
+	if (!routing) results.push(fail("Agent routing index", "Missing .claude/rules/agent-routing.md"));
 	for (const entry of inventory.entries.filter((item) => item.type === "agent" && item.routing === "hub-only")) {
 		if (!routing.includes(entry.id)) results.push(warn(`Agent hub route: ${entry.path}`, "hub leaf is not listed in the prose routing table"));
 	}
@@ -124,10 +126,15 @@ export function checkAgentConformance(repoRoot: string): CheckResult[] {
 	if (results.length === 0) {
 		results.push({ name: "Agent conformance", status: "pass", detail: "Declared contracts are consistent; this is not runtime tool or path enforcement", section: "Agents" });
 	}
-	const agentsIndex = fs.readFileSync(path.join(claudeDir, "agents", "AGENTS_INDEX.md"), "utf-8");
-	const generatedView = renderAgentViewCounts(claudeDir);
-	const viewRegion = new RegExp(`${VIEW_START}[\\s\\S]*?${VIEW_END}`).exec(agentsIndex)?.[0];
-	if (viewRegion !== generatedView) results.push(fail("Agent registry views", "AGENTS_INDEX generated view counts are missing or stale"));
+	const agentsIndexPath = path.join(claudeDir, "agents", "AGENTS_INDEX.md");
+	if (!fs.existsSync(agentsIndexPath)) {
+		results.push(fail("Agent registry views", "Missing .claude/agents/AGENTS_INDEX.md"));
+	} else {
+		const agentsIndex = fs.readFileSync(agentsIndexPath, "utf-8");
+		const generatedView = renderAgentViewCounts(claudeDir);
+		const viewRegion = new RegExp(`${VIEW_START}[\\s\\S]*?${VIEW_END}`).exec(agentsIndex)?.[0];
+		if (viewRegion !== generatedView) results.push(fail("Agent registry views", "AGENTS_INDEX generated view counts are missing or stale"));
+	}
 	results.push(...checkStaleIndex(repoRoot));
 	return results;
 }

@@ -26,7 +26,7 @@ Default composition for any frontend / browser-rendered build. **Pruned in v2.0.
 
 ## What Changed in v2.0.0
 
-The red-team necessity audit (`plans/reports/red-team-260408-1117-rubric-necessity-audit.md`) found that `code-quality`, `craft`, and `ux-usability` rubrics overlap with existing `mk:review` 5-dim verdict, security-rules, and tdd-rules. Loading them by default duplicated work the existing layers already do.
+The red-team necessity audit (`tasks/reports/red-team-260408-1117-rubric-necessity-audit.md`) found that `code-quality`, `craft`, and `ux-usability` rubrics overlap with existing `mk:review` 5-dim verdict, security-rules, and tdd-rules. Loading them by default duplicated work the existing layers already do.
 
 The 4 retained rubrics each close a verified gap:
 

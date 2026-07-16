@@ -104,7 +104,7 @@ For skill suggestions based on task type, see `mk:agent-detector` (its `referenc
 
 ## State-to-Recommendation Map
 
-> Alias: `/mk:plan` routes to `mk:plan-creator` (slash-command wrapper at `.claude/commands/meow/plan.md`). Subcommands `red-team`, `validate`, `archive` are handled by the same skill.
+> Alias: `/mk:plan` routes to `mk:plan-creator` (slash-command wrapper at `.claude/commands/mk/plan.md`). Subcommands `red-team`, `validate`, `archive` are handled by the same skill.
 
 | State | Pipeline Phase | Recommendation |
 |-------|---------------|----------------|

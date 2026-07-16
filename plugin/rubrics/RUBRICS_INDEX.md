@@ -28,7 +28,7 @@ Catalog of all evaluation rubrics and composition presets used by the `evaluator
 | `cli-tool` | functionality, product-depth, code-quality, ux-usability | design-quality, originality, craft (CLI has no visual surface; craft folded into ux-usability) | CLI binaries, npm CLIs, shell utilities |
 | `fullstack-product` | All 7 rubrics, ux-usability weighted 3x higher | — | End-to-end product builds (UI + backend + persistence) |
 
-> **Pruning rationale (260408):** `frontend-app` was pruned from 7→4 rubrics per the necessity audit (`plans/reports/red-team-260408-1117-rubric-necessity-audit.md`). The 3 excluded rubrics overlap existing meowkit layers (review 5-dim verdict, security-rules, qa health-score). Each retained rubric closes a verified gap the rest of the ecosystem doesn't catch.
+> **Pruning rationale (260408):** `frontend-app` was pruned from 7→4 rubrics per the necessity audit (`tasks/reports/red-team-260408-1117-rubric-necessity-audit.md`). The 3 excluded rubrics overlap existing toolkit layers (review 5-dim verdict, security-rules, qa health-score). Each retained rubric closes a verified gap the rest of the ecosystem doesn't catch.
 
 ## Schema
 

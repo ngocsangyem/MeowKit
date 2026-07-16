@@ -97,8 +97,8 @@ This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 
 ## Memory
 
-- **Reads memory:** at task start, read `.claude/memory/review-patterns.md` and `.claude/memory/security-log.md` for prior patterns that inform this review.
-- **Writes memory:** at task end, append newly-observed review patterns to `.claude/memory/review-patterns.md` via direct `Edit` (section header `## YYYY-MM-DD — review — <slug> (severity: <level>)`). `##pattern:` is a user-typed keyboard shortcut that does NOT fire from agent output (see `.claude/skills/memory/references/capture-architecture.md`). Do not overwrite prior entries — always append. Scrub secrets in-content before writing.
+- **Reads memory:** at task start, read canonical `.claude/memory/review-patterns.json` and `.claude/memory/security-findings.json`; use a matching Markdown view only if its JSON store is absent.
+- **Writes memory:** at task end, append newly-observed patterns to canonical `.claude/memory/review-patterns.json`, validate it, then regenerate views. Do not write `review-patterns.md`; it is non-authoritative. Scrub secrets before writing.
 
 ## AskUserQuestion Format
 

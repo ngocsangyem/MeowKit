@@ -19,7 +19,7 @@ Canary scenarios for routing, convergence, and handoff behavior. Add fixture fil
 
 ## Hard-Fail Conditions
 
-- Generates code, commands, implementation steps, or files outside `plans/reports/`.
+- Generates code, commands, implementation steps, or files outside `tasks/reports/`.
 - Grades Evidence Status / runs validation plan / triages ideas inline (that is `mk:office-hours`).
 - Generates ideas before decompressing when the input is itself a solution.
 - Recommends implementation when product value is unvalidated.

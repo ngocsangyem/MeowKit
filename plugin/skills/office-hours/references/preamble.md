@@ -85,7 +85,7 @@ This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 
 ## Memory
 
-- **Writes memory:** when the session produces a design-doc decision, append to `.claude/memory/architecture-decisions.md` via direct `Edit` — `##decision:` is a user-typed keyboard shortcut that does NOT fire from agent output (see `.claude/skills/memory/references/capture-architecture.md`). Append a `## YYYY-MM-DD — office-hours — <slug>` section; do not overwrite prior entries — always append. Scrub secrets in-content before writing.
+- **Writes memory:** when the session produces a design-doc decision, append the structured record to canonical `.claude/memory/architecture-decisions.json`, validate it, then regenerate the Markdown view. Do not write `architecture-decisions.md`; it is non-authoritative. Scrub secrets before writing.
 
 ## SETUP (run this check BEFORE any browser command)
 

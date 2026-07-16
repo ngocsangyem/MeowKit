@@ -76,5 +76,5 @@ This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 
 ## Memory
 
-- **Reads memory:** at task start, read `.claude/memory/review-patterns.md` and `.claude/memory/architecture-decisions.md` for prior patterns/decisions that should be surfaced in the retro narrative.
-- **Writes memory:** at task end, append newly-extracted patterns to `.claude/memory/review-patterns.md` via direct `Edit` (section header `## YYYY-MM-DD — retro — <slug> (severity: <level>)`). If the retro surfaces a new architectural decision (not just a pattern), append to `.claude/memory/architecture-decisions.md` via direct `Edit`. `##pattern:` and `##decision:` are user-typed keyboard shortcuts that do NOT fire from agent output (see `.claude/skills/memory/references/capture-architecture.md`). Do not overwrite prior entries — always append. Scrub secrets in-content before writing.
+- **Reads memory:** at task start, read canonical `.claude/memory/review-patterns.json` and `.claude/memory/architecture-decisions.json`; use a matching Markdown view only if its JSON store is absent.
+- **Writes memory:** at task end, append patterns to canonical `review-patterns.json` and decisions to canonical `architecture-decisions.json`, validate them, then regenerate views. Do not write generated Markdown views. Scrub secrets before writing.

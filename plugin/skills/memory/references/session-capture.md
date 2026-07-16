@@ -61,30 +61,18 @@ Identify mistakes, blockers, and wasted effort:
 
 For each failure, identify the **root cause** and a **prevention rule** (what should future agents do differently?). These are the most valuable learnings.
 
-### Step 4: Write to topic files
+### Step 4: Write to canonical JSON stores
 
 Write to the appropriate topic file based on category:
 
-| Category | Markdown file | JSON file |
-|----------|--------------|-----------|
-| Bug fix / failure / shell/code pattern | `.claude/memory/fixes.md` | `.claude/memory/fixes.json` |
-| Review pattern / architecture insight | `.claude/memory/review-patterns.md` | `.claude/memory/review-patterns.json` |
-| Architectural decision | `.claude/memory/architecture-decisions.md` | `.claude/memory/architecture-decisions.json` |
-| Security finding | `.claude/memory/security-notes.md` | — |
+| Category | Canonical JSON file |
+|----------|---------------------|
+| Bug fix / failure / shell/code pattern | `.claude/memory/fixes.json` |
+| Review pattern / architecture insight | `.claude/memory/review-patterns.json` |
+| Architectural decision | `.claude/memory/architecture-decisions.json` |
+| Security finding | `.claude/memory/security-findings.json` |
 
-**Do NOT write to `lessons.md`** — it is an archived stub. Topic files are the active write targets.
-
-#### Markdown format (append to topic file):
-
-```markdown
-## YYYY-MM-DD — [Brief description] (status: live-captured, severity: critical|standard)
-
-### What happened
-[Description]
-
-### Prevention rule
-[Actionable rule for future agents]
-```
+**Do NOT write to `lessons.md` or generated Markdown views.** JSON stores are the active write targets; run `mewkit memory render-views` after capture.
 
 #### JSON format (append pattern entry to split JSON file):
 

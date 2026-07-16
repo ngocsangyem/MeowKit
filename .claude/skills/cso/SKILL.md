@@ -54,7 +54,7 @@ Run `/mk:cso` when the user requests a security audit, threat model, pentest rev
 ## Plan-First Gate
 
 Security audits use the security-model workflow:
-1. If comprehensive mode → invoke `mk:plan-creator --type security` to scope the audit
+1. If comprehensive mode → invoke `mk:plan-creator "security audit: {scope}"` to scope the audit
 2. If daily mode → skip planning (scope is predefined: changed files only)
 
 Skip: Daily mode (`--daily`) — scope is automatic.

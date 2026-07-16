@@ -27,7 +27,9 @@ interface ReportShape {
 }
 
 beforeAll(async () => {
-	env = await setupKitInstallMigrateE2e("target-codex-acceptance");
+	// This fixture covers the documented 0.142 hook surface. The fallback tier
+	// intentionally omits newer events when no Codex binary is available.
+	env = await setupKitInstallMigrateE2e("target-codex-acceptance", "optimistic");
 	exitCode = await env.run({ includeMcp: true });
 }, 60_000);
 

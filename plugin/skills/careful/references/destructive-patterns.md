@@ -134,7 +134,7 @@ Pattern matching is command-scoped — the hook checks the actual bash command s
 
 ### Override Mechanism
 
-When the hook triggers a warning, the user is prompted to confirm. Overrides are logged to `.claude/memory/security-log.md` with timestamp and command for audit trail.
+When the hook triggers a warning, the user is prompted to confirm. Overrides are logged to the canonical `.claude/memory/security-findings.json` store with timestamp and command for audit trail.
 
 ---
 

@@ -18,7 +18,7 @@
 - [Verification Results](#verification-results)
 - [TODOS](#todos)
 - [Test plan](#test-plan)
-- [Step 8.5: Auto-invoke /document-release](#step-85-auto-invoke-document-release)
+- [Step 8.5: Offer /document-release](#step-85-offer-document-release)
 - [Step 8.75: Persist ship metrics](#step-875-persist-ship-metrics)
 
 ## Step 6: Commit (bisectable chunks)
@@ -191,28 +191,16 @@ gh pr edit "$EXISTING_PR" --title "<type>: <summary>" --body "<same body as abov
 
 **Include linked issues** in PR body: add `Closes #N` or `Relates to #N` lines from Step 7.5.
 
-**Output the PR URL** — then proceed to Step 8.5.
+**Output the PR URL** — then offer Step 8.5.
 
 ---
 
-## Step 8.5: Auto-invoke /document-release
+## Step 8.5: Offer /document-release
 
-After the PR is created, automatically sync project documentation. Read the
-`document-release/SKILL.md` skill file (adjacent to this skill's directory) and
-execute its full workflow:
-
-1. Read the `/document-release` skill: `cat ${CLAUDE_SKILL_DIR}/../document-release/SKILL.md`
-2. Follow its instructions — it reads all .md files in the project, cross-references
-   the diff, and updates anything that drifted (README, ARCHITECTURE, CONTRIBUTING,
-   CLAUDE.md, TODOS, etc.)
-3. If any docs were updated, commit the changes and push to the same branch:
-   ```bash
-   git add -A && git commit -m "docs: sync documentation with shipped changes" && git push
-   ```
-4. If no docs needed updating, say "Documentation is current — no updates needed."
-
-This step is automatic. Do not ask the user for confirmation. The goal is zero-friction
-doc updates — the user runs `/mk:ship` and documentation stays current without a separate command.
+After the PR is created, report whether the diff appears to affect project documentation
+and offer `/mk:document-release`. Do not invoke it automatically. Documentation edits,
+commits, and pushes require the user's explicit request and the confirmations defined by
+the document-release workflow.
 
 ---
 

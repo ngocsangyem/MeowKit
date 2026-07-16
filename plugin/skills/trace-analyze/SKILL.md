@@ -49,7 +49,7 @@ Use the CLI for fast deterministic recall; use this skill's scatter-gather when 
 
 Activate when:
 - User runs `/mk:trace-analyze [--runs N]` (default N=20)
-- `dead-weight-audit-needed` flag in `.claude/memory/fixes.md` (set by `post-session.sh` on model version change)
+- `dead-weight-audit-needed` flag in `.claude/memory/fixes.json` (set by `post-session.sh` on model version change)
 - After 3+ consecutive harness failures on the same task
 - Quarterly schedule for the dead-weight audit
 

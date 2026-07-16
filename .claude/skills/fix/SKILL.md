@@ -3,7 +3,7 @@ name: mk:fix
 description: Diagnoses and fixes bugs, type errors, lint failures, CI/CD issues, and runtime errors via root-cause-first investigation. Use for defect remediation. NOT for investigation without a fix (see mk:investigate); NOT for build-only compilation errors (see mk:build-fix).
 source: local
 version: 0.1.0
-argument-hint: '[issue] --auto|--review|--quick|--parallel|--tdd'
+argument-hint: '[issue|diagnostic-report-path] --auto|--review|--quick|--parallel|--tdd'
 keywords:
   - fix
   - bug-fix
@@ -54,8 +54,8 @@ Override: `--quick` allows fast scout→diagnose→fix for trivial issues (lint,
 
 For moderate/complex bugs:
 
-1. Run `mk:investigate` to confirm root cause
-2. If fix affects > 2 files → `mk:plan-creator --type bugfix`
+1. If the user supplied a diagnostic report, validate that it contains the investigate output contract and use it; otherwise run `mk:investigate` to confirm root cause.
+2. If fix affects > 2 files → request an approved plan with `mk:plan-creator "bug fix: {symptom and affected area}"`
 3. Wait for Gate 1 approval
 
 Skip: `--quick` mode (single file, clear cause).
@@ -90,7 +90,7 @@ Activate `mk:scout` to map affected codebase BEFORE any diagnosis:
 
 Then structured diagnosis using two skills:
 
-1. **mk:investigate** — collect symptoms, traces, reproduction steps
+1. **mk:investigate** — collect symptoms, traces, reproduction steps only when no supplied diagnostic report already satisfies the output contract
 2. **mk:sequential-thinking** — generate hypotheses from evidence, test each, eliminate, conclude
 
 Load `references/diagnosis-protocol.md` for the 5-phase protocol: Observe → Hypothesize → Test → Trace → Escalate.
@@ -141,9 +141,9 @@ Task orchestration (Moderate+): `references/task-orchestration.md`.
 ## Step 5 — Verify + Prevent (MANDATORY)
 
 1. **Iron-law verify:** Re-run exact pre-fix commands. Compare before/after.
-2. **Regression test:** Test that fails WITHOUT fix, passes WITH fix.
+2. **Regression test:** Follow `.claude/rules/tdd-rules.md`; when required, the test fails WITHOUT the fix and passes WITH it.
 3. **Defense-in-depth:** Load `references/prevention-gate.md` — consider entry validation, business logic guards, error handling, type safety.
-4. **BLOCK:** No regression test = fix is incomplete.
+4. **BLOCK:** Missing a required regression test is incomplete; record the allowed omission rationale for lint/format/config-only changes.
 
 If verify fails: loop to Step 2. After 3 failures → STOP, question architecture.
 
@@ -213,7 +213,7 @@ Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index reco
 
 ## Skill Activation
 
-**Always:** `mk:scout` (Step 1) + `mk:investigate` (Step 2) + `mk:sequential-thinking` (Step 2)
+**Always:** `mk:scout` (Step 1) + `mk:sequential-thinking` (Step 2). Invoke `mk:investigate` only when no supplied diagnostic report satisfies its output contract.
 **Conditional:** `mk:brainstorming` (complex, multiple approaches) | `mk:docs-finder` (unfamiliar APIs)
 
 ## Gotchas
@@ -221,7 +221,7 @@ Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index reco
 - **Guessing root causes**: "I think it's X" without evidence → use mk:sequential-thinking to generate + test hypotheses from evidence
 - **Fixing symptoms**: test passes but underlying issue remains → always trace backward: symptom → cause → ROOT cause
 - **Skipping scout**: fixing without codebase context → mandatory scout maps what you're touching
-- **No regression test**: bug resurfaces next sprint → every fix includes a test that fails without the fix
+- **Missing required regression test**: bug resurfaces next sprint → follow `tdd-rules.md` and record any allowed omission rationale
 - **3+ failed attempts without stopping**: insanity loop → STOP, question architecture, discuss with user
 
 Full list: `references/gotchas.md` (update when Claude produces wrong fix patterns)

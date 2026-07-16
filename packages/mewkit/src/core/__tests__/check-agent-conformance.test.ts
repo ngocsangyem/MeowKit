@@ -48,4 +48,14 @@ describe("agent conformance", () => {
 		expect(results.some((result) => result.name.includes("Agent ownership"))).toBe(true);
 		expect(results.some((result) => result.name.includes("Agent model"))).toBe(true);
 	});
+
+	it("reports missing routing and generated index files without throwing", async () => {
+		const root = await harness({});
+		await rm(join(root, ".claude", "rules", "agent-routing.md"));
+		await rm(join(root, ".claude", "agents", "AGENTS_INDEX.md"));
+
+		const results = checkAgentConformance(root);
+		expect(results.some((result) => result.name === "Agent routing index" && result.status === "fail")).toBe(true);
+		expect(results.some((result) => result.name === "Agent registry views" && result.status === "fail")).toBe(true);
+	});
 });

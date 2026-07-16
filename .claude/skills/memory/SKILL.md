@@ -1,6 +1,6 @@
 ---
 name: mk:memory
-description: Topic-file-scoped session memory. Use when capturing session learnings, extracting patterns, or tracking costs — persists to .claude/memory/ topic files (fixes.md, review-patterns.md, architecture-decisions.md). Activates during Phase 0 (Orient) to load context and Phase 6 (Reflect) to persist it. NOT for weekly-cadence engineering retrospectives (see mk:retro); NOT for arbitrary file storage.
+description: JSON-canonical session memory. Use when capturing session learnings, extracting patterns, or tracking costs — persists to .claude/memory JSON stores; matching Markdown files are generated views. Activates during Phase 0 (Orient) to load context and Phase 6 (Reflect) to persist it. NOT for weekly-cadence engineering retrospectives (see mk:retro); NOT for arbitrary file storage.
 keywords:
   - memory
   - topic-files
@@ -8,7 +8,7 @@ keywords:
   - architecture-decisions
   - review-patterns
   - persistence
-when_to_use: Use when reading or updating .claude/memory/ topic files (fixes, review-patterns, architecture-decisions, cost-log).
+when_to_use: Use when reading or updating canonical .claude/memory JSON stores (fixes, review-patterns, architecture-decisions, cost-log).
 user-invocable: true
 owner: memory
 criticality: high
@@ -48,12 +48,10 @@ Operates in **Phase 0 (Orient)** and **Phase 6 (Reflect)**. Output supports the 
 
 ### `--prune`
 
-Archive old standard-severity entries from topic files to `lessons-archive.md`.
+Prune old standard-severity entries from canonical JSON stores, then regenerate Markdown views.
 
-**Topic files subject to pruning:**
-- `fixes.md` — bug-class session learnings
-- `review-patterns.md` — process/review learnings
-- `architecture-decisions.md` — architectural decision records
+**Stores subject to pruning:** `fixes.json`, `review-patterns.json`, and
+`architecture-decisions.json`.
 
 **What gets pruned:**
 - `## headings` with a date `(YYYY-MM-DD, severity: standard)` older than threshold (default: 90 days)
@@ -69,12 +67,8 @@ Archive old standard-severity entries from topic files to `lessons-archive.md`.
 /mk:memory --prune --dry-run    # show what would be archived without moving
 ```
 
-**Mechanism (grep-based — no parser dependency):**
-1. For each topic file: grep for `## ` headings + date pattern `(YYYY-MM-DD, severity: standard)`
-2. Compute age from today's date; identify entries older than threshold
-3. Append stale entries to `.claude/memory/lessons-archive.md`
-4. Remove stale entry blocks from topic file (rewrite without them)
-5. Report: "Archived N entries across M files"
+**Mechanism:** prune schema entries in JSON by `lastSeen` and severity, then run
+`mewkit memory render-views`. Report the affected stores and entries.
 
 **Recovery:** Copy entries from `lessons-archive.md` back to the appropriate topic file.
 
@@ -86,4 +80,4 @@ Split JSON files (`fixes.json`, `review-patterns.json`, `architecture-decisions.
 
 - **Stale patterns applied to changed codebase**: Memory suggests patterns from old architecture → Run consolidation when patterns exceed 50 entries; flag patterns with lastSeen > 6 months
 - **cost-log.json growing unbounded**: Every session appends without pruning → Run consolidation to archive entries older than 90 days
-- **lessons.md is now archived**: Do not write to lessons.md — it is a stub. Write to topic files (fixes.md, architecture-decisions.md, review-patterns.md) instead.
+- **Generated views are not writable**: Do not write `lessons.md` or Markdown topic files. Update the canonical JSON store, then render views.

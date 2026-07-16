@@ -34,7 +34,7 @@ Task(
     - Return the absolute plan path
 
     Work context: $(pwd)
-    Reports: tasks/plans/reports/
+    Reports: tasks/reports/
   "
 )
 ```

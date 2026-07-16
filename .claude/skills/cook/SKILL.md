@@ -64,7 +64,7 @@ Do NOT write implementation code until a plan exists and Gate 1 is approved.
 In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): do NOT skip Test RED phase — write failing tests BEFORE implementation.
 In default mode: Phase 2 is optional; the developer may implement directly per the approved plan.
 Exception: `--fast` mode skips research but still requires plan + (in TDD mode) TDD-flavored tests.
-User override: If user explicitly says "just code it" or "skip planning", respect their instruction.
+User override: Planning may be skipped only when the user explicitly says "just code it" or "skip planning" **and** Phase 0 found zero matched risk flags. Record the human override and rationale per `.claude/rules/intervention-recording-rules.md`; otherwise explain why Gate 1 still applies.
 
 ## Anti-Rationalization
 
@@ -88,7 +88,7 @@ See `references/intent-detection.md` for full detection logic.
 | "fast", "quick"                  | fast        | Skip research, plan→test→code                 |
 | "trust me", "auto"               | auto        | Auto-fix issues, human gates still enforced   |
 | 3+ features OR "parallel"        | parallel    | Multi-agent execution                         |
-| "no test", "skip test"           | no-test     | Skip Test phase entirely (force off, even if `--tdd`) |
+| "no test", "skip test"           | no-test     | Skip Test phase only when TDD is not enabled; `--no-test` + `--tdd` is invalid and requires user resolution |
 | Default                          | interactive | Full workflow with user approval at each gate |
 | `--verify`                       | (modifier)  | Light browser check after review (Phase 4.5)  |
 | `--strict`                       | (modifier)  | Full evaluator after review (Phase 4.5)        |

@@ -24,7 +24,7 @@ Concretely, the following are all forbidden regardless of wording:
 <!-- lint-allow-gate-authority -->
 - Any mode that "auto-approves" Gate 1 or Gate 2
 
-The two exceptions to Gate 1 below are exhaustive and are bypasses of the *gate*, not
+The three exceptions to Gate 1 below are exhaustive and are bypasses of the *gate*, not
 grants of authority to automation. Gate 2 has no exceptions at all.
 
 WHY: The moment automation can approve its own work, the gate measures whether the
@@ -57,6 +57,12 @@ Proceeding to Phase 2 (Test RED) in TDD mode, or directly to Phase 3 (Build) in 
 `/mk:fix` with complexity=simple bypasses Gate 1. The fix IS the plan — the scope is small enough that a separate planning document adds overhead without value.
 
 Scale-routing one-shot: When `mk:scale-routing` returns `workflow=one-shot` AND orchestrator confirms zero blast radius, Gate 1 may be bypassed. See `scale-adaptive-rules.md` Rule 4.
+
+Explicit user override: `/mk:cook` may bypass Gate 1 only when the user explicitly says
+to skip planning **and** Phase 0 found zero matched risk flags. The agent records the
+override and rationale in the active plan or security log per
+`.claude/rules/intervention-recording-rules.md`; a keyword match or risk heuristic can
+never grant this exception on its own.
 
 ### Plan Shape
 

@@ -91,9 +91,9 @@ Extracted:
 
 ```bash
 # 1. Check topic files for cached project context (on-demand reads):
-.claude/memory/fixes.md + fixes.json                      # bug-class lessons (mk:fix)
-.claude/memory/review-patterns.md + review-patterns.json  # review/architecture patterns
-.claude/memory/architecture-decisions.md + *.json         # past architectural decisions
+.claude/memory/fixes.json                                  # bug-class lessons (mk:fix)
+.claude/memory/review-patterns.json                        # review/architecture patterns
+.claude/memory/architecture-decisions.json                 # past architectural decisions
 
 # 2. If context is insufficient:
    -> Run mk:scout for codebase structure

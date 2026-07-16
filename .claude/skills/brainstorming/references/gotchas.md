@@ -4,7 +4,7 @@ Update when Claude hits new brainstorming edge cases. Highest-signal content in 
 
 - **Premature solutioning** — jumping to "how" before confirming "what". Force problem restatement first; do not generate ideas until the problem is confirmed via `AskUserQuestion`.
 - **Anchoring on first idea** — the first idea gets disproportionate attention in evaluation. Generate ALL ideas before scoring any; use `scoring-criteria.md` only after the full list is complete.
-- **Confusing brainstorming with planning** — producing implementation steps, file paths, or commands instead of ideas. Hard gate: no code, no file creation outside `plans/reports/`, no implementation details.
+- **Confusing brainstorming with planning** — producing implementation steps, file paths, or commands instead of ideas. Hard gate: no code, no file creation outside `tasks/reports/`, no implementation details.
 - **Context flooding** — generating 20+ ideas overwhelms context window. Max 8 ideas per run. If the problem needs more, run multiple focused sessions on sub-problems.
 - **Scout by default** — codebase scouting feels responsible but can swamp ideation. Use `mk:scout` only when existing touchpoints change the approach; consume a 3-6 bullet summary.
 - **Overlapping with office-hours** — using brainstorming when the problem isn't validated yet. If the user hasn't confirmed "this is worth building", redirect to `mk:office-hours` first.

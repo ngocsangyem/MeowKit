@@ -15,7 +15,7 @@
 
 ## Important Rules
 
-- Narrative output goes directly to the user in the conversation. Persistent writes are limited to `.claude/memory/retros/` (JSON snapshot) plus the memory topic files declared in SKILL.md wiring (`review-patterns.md` and `architecture-decisions.md`) via direct `Edit` — `##pattern:` and `##decision:` are user-typed keyboard shortcuts only and do NOT fire from agent output (see `.claude/skills/memory/references/capture-architecture.md`).
+- Narrative output goes directly to the user in the conversation. Persistent writes are limited to `.claude/memory/retros/` (JSON snapshot) plus the canonical JSON stores declared in SKILL.md wiring (`review-patterns.json` and `architecture-decisions.json`), followed by view regeneration. Generated Markdown views are never memory authority.
 - Use `origin/<default>` for all git queries (not local main which may be stale)
 - Display all timestamps in the user's local timezone (do not override `TZ`)
 - If the window has zero commits, say so and suggest a different window

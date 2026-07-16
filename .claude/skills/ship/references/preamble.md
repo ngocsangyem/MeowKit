@@ -20,7 +20,7 @@
 
 ## Memory — At task start
 
-Read `.claude/memory/architecture-decisions.md` for release context (recent architectural decisions that may affect the release scope or rollback strategy). If the file is absent, proceed without it — ship does not block on missing memory.
+Read `.claude/memory/architecture-decisions.json` for release context; fall back to the generated Markdown view only when JSON is absent. If neither exists, proceed without memory.
 
 ## Preamble (run first)
 

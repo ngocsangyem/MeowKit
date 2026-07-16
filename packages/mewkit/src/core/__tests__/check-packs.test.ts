@@ -21,9 +21,9 @@ describe("checkPacks on the live harness", () => {
 		expect(results.some((r) => r.name === "Pack coherence" && r.status === "pass")).toBe(true);
 	});
 
-	it("WARNs that depends_on edges are empty (inert closure)", () => {
+	it("does not warn about an inert dependency closure when declared edges exist", () => {
 		const results = checkPacks(LIVE);
-		expect(results.some((r) => r.status === "warn" && r.detail.includes("no depends_on edges"))).toBe(true);
+		expect(results.some((r) => r.status === "warn" && r.detail.includes("no depends_on edges"))).toBe(false);
 	});
 });
 
