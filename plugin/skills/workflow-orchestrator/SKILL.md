@@ -49,15 +49,11 @@ dependency_edges:
 
 > Only activates on session start for complex-feature intent. If `/mk:cook` was explicitly invoked in this session, do not activate — `mk:cook` owns the pipeline. See `.claude/rules/orchestration-rules.md`"Orchestrator Entry Point Rule".
 
-## Plan-First Gate
+## Canonical Lifecycle
 
-Orchestrator enforces the plan-first pattern for all workflows:
+`.claude/workflow.yaml` is the sole source for phase sequence, gates, leads, and required outputs. This adapter must not restate phase details. For execution load `references/workflow-phases.md`, which renders that contract.
 
-1. On task received → check for existing approved plan
-2. If no plan and task is non-trivial → route to `mk:plan-creator` first
-3. After Gate 1 approval → select workflow model and execute phases
-
-Skip: Fasttrack mode with pre-approved spec.
+On a non-trivial task, route to `mk:plan-creator`; proceed only after Gate 1. Fasttrack accepts only a pre-approved spec. Gate 2 remains human approval before an explicit ship request.
 
 ## When to Use
 
@@ -81,20 +77,11 @@ See `.claude/rules/phase-contracts.md` for input/output expectations per phase. 
 
 2. **Detect workflow mode** — check for `fasttrack:` prefix or Agent Teams trigger; if present load `references/fasttrack-and-teams.md`. Otherwise proceed with standard 7-phase flow.
 
-3. **Execute phases sequentially** — load `references/workflow-phases.md` then run:
-   - Phase 0: Orient — model tier, execution mode, **TDD mode detection**, read memory. Auto-continue.
-   - Phase 1: Plan → **GATE 1** (human approval required)
-   - Phase 2: Test — in TDD mode (`--tdd` / `MEOWKIT_TDD=1`), write failing tests; in default mode, optional / on-request only. Auto-continue.
-   - Phase 3: Build — implement per the plan. In TDD mode, code must make failing tests pass. Auto-continue.
-   - Phase 3.5: Simplify — run `mk:simplify` after build (after tests pass in TDD mode). **MANDATORY before Phase 4.** Auto-continue.
-   - Phase 3.6: Verify — run `mk:verify` after simplify. **MANDATORY before Phase 4.** Auto-continue.
-   - Phase 4: Review — quality/security audit → **GATE 2** (human approval required, NO EXCEPTIONS)
-   - Phase 5: Ship — commit, PR, deploy. Auto-continue.
-   - Phase 6: Reflect — memory capture, docs sync. Auto-complete.
+3. **Execute the canonical lifecycle** — load `references/workflow-phases.md` and follow `.claude/workflow.yaml`; do not duplicate or override its phase ordering, TDD rules, required outputs, or gates.
 
 4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit. Also delegate to `project-manager` after each phase transition per `.claude/rules/post-phase-delegation.md` Rule 1 (background, non-blocking — include "Run in the background" in the prompt). Skipped when `MEOWKIT_PM_AUTO=off`.
 
-**Only 2 approval gates:** Phase 1 (Plan) and Phase 4 (Review). Everything else auto-continues.
+Only the canonical gates authorize transition. Shipping and reflection require explicit user direction; they do not auto-run after review.
 
 ## References
 

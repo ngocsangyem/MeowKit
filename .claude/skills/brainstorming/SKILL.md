@@ -81,12 +81,12 @@ Always skips Gate 1 (same as `mk:investigate` and `mk:office-hours`).
 - Implementation plans and phase files (`mk:plan-creator`)
 - Build, tests, edits, commits, or implementation (`mk:cook`)
 
-## Arguments
+## Profiles
 
-- `--depth quick` — 3-8 ideas, no scoring (default)
-- `--depth deep` — scored ideas + top 3 + optional plan-creator handoff
+- `quick` / `--depth quick` (default) — restate the problem, give 2-4 orthogonal options and a recommendation in the response. Do not create a report, plan, wiki candidate, or memory entry.
+- `deep` / `--depth deep` — use the technique, scoring, and challenge references. Write a report only when the user requests one or an active plan requires it.
 - `--technique [name]` — force a specific technique (default: auto-select)
-- `--html` — after the markdown report is written, author a self-contained editorial HTML report beside it (opt-in; markdown stays source of truth)
+- `--html` — only with a requested report; author a self-contained editorial HTML report beside the markdown source.
 
 ## Lifecycle
 
@@ -109,10 +109,7 @@ Run these stages in order. This is outcome-oriented, not a command script.
 7. **Anti-bias pivot** — after idea #4 or midpoint, pause and ask: "what orthogonal category have I not touched yet?" Generate the rest from that angle. One pivot per session.
 8. **Challenge pass** — before recommendation, load `references/challenge-pass.md`; check duplicate architectures, hard constraints, category diversity, conservative drift, and missing failure modes.
 9. **Convergence** — recommend only after challenge. If top deep scores are within 2 points, ask for one tie-break criterion or mark "no clear winner."
-10. **Output and handoff** —
-   - `--depth quick` → `assets/output-ideas.md`
-   - `--depth deep` → `assets/output-scored.md` (score via `references/scoring-criteria.md`)
-   - Handoff packet shape → `assets/output-action-plan.md`
+10. **Output and handoff** — quick returns options inline. Deep uses `assets/output-scored.md` and the handoff packet only when a report is requested or an active plan needs one.
 
 ## Hard Stops
 
@@ -126,7 +123,7 @@ Stop and route or ask before continuing when:
 - All ideas remain variants of one architecture after the pivot and one regeneration attempt.
 - No selected idea, binding constraint, or success criterion exists for handoff.
 
-**Behavioral hard rule (not hook-enforced — see `gate-rules.md` for actual gates):** brainstorming MUST NOT write code, create files outside `tasks/reports/`, or invoke implementation skills. Output is _ideas_, never _code_.
+**Behavioral hard rule (not hook-enforced — see `gate-rules.md` for actual gates):** brainstorming MUST NOT write code or invoke implementation skills. Reports are opt-in; output is _ideas_, never _code_.
 
 ## Idea Format Template
 
@@ -198,9 +195,9 @@ mk:plan-creator (plan)
 
 On completion:
 
-- Output saved to `tasks/reports/`
-- Include a `Brainstorm Handoff Packet` using `assets/output-action-plan.md`
-- If `--depth deep`, ask before invoking or recommending `mk:plan-creator`
+- Quick profile: return the recommendation inline and stop.
+- Reported deep run: save to `tasks/reports/` and include a `Brainstorm Handoff Packet` using `assets/output-action-plan.md`.
+- If `--depth deep`, ask before invoking or recommending `mk:plan-creator`.
 - `plan-creator` receives report path + handoff packet as pre-research input; it still owns requirements completeness, phase files, and plan approval
 - **Terminal wiki handoff (advisory, fail-open):** after the markdown report is written, optionally hand it to the wiki per `.claude/skills/wiki/references/terminal-handoff-advisory.md`. Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip + print the command). Advisory only — never blocks, never approves; do not add `wiki reindex`:
 

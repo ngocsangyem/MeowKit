@@ -44,7 +44,7 @@ dependency_edges:
 
 # Cook — Full Implementation Pipeline
 
-End-to-end implementation following the 7-phase workflow. TDD is opt-in via `--tdd`.
+Implementation entry adapter. `.claude/workflow.yaml` is the only lifecycle phase-sequence authority; this skill selects a profile, invokes the relevant owners, and presents the required gates. TDD is opt-in via `--tdd`.
 
 ## Usage
 
@@ -55,7 +55,9 @@ End-to-end implementation following the 7-phase workflow. TDD is opt-in via `--t
 /cook tasks/plans/260329-feature/plan.md --auto
 ```
 
-Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`
+Profiles: `quick`/`--fast` (inspect → edit → focused verify → summary), `standard` (plan if needed → implement → verify → review), `release` (standard + explicit `mk:ship` request), and `high-assurance` (`--tdd --strict`, with human gates). Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`.
+
+Quick runs do not create a plan, wiki candidate, memory entry, or ship action by default. They still stop if a risk flag or changed contract requires the standard profile.
 
 **Modifier flags** (layer on any mode): `--verify` [LIGHT] (light browser/artifact check) | `--strict` [HEAVY] (full evaluator pass) | `--no-strict` (suppress auto-strict)
 
@@ -117,7 +119,7 @@ See `references/intent-detection.md` for full detection logic.
 | `--strict`                       | (modifier)  | Full evaluator after review (Phase 4.5)        |
 | `--no-strict`                    | (modifier)  | Suppress auto-strict from scale-routing        |
 
-## Process Flow (Authoritative)
+## Lifecycle Adapter
 
 <!-- Canonical source: .claude/workflow.yaml — this diagram renders the same lifecycle; -->
 <!-- the YAML is the machine-readable authority; this Mermaid diagram is the human-facing render. -->
@@ -153,7 +155,7 @@ flowchart TD
     H --> I
 ```
 
-**This diagram is authoritative.** If prose conflicts, follow the diagram.
+The YAML specification is authoritative. This diagram is a convenience rendering only; phase details and transitions live in `.claude/workflow.yaml` and `references/workflow-steps.md`.
 
 ### Scout-First Contract (Phase 0)
 

@@ -3,7 +3,7 @@ name: mk:fix
 description: Diagnoses and fixes bugs, type errors, lint failures, CI/CD issues, and runtime errors via root-cause-first investigation. Use for defect remediation. NOT for investigation without a fix (see mk:investigate); NOT for build-only compilation errors (see mk:build-fix).
 source: local
 version: 0.1.0
-argument-hint: '[issue|diagnostic-report-path] --auto|--review|--quick|--parallel|--tdd'
+argument-hint: "[issue|diagnostic-report-path] --auto|--review|--quick|--parallel|--tdd"
 keywords:
   - fix
   - bug-fix
@@ -40,30 +40,36 @@ dependency_edges:
 
 Unified skill for fixing issues of any complexity with structured diagnosis.
 
-## Process Flow (Authoritative)
+## Common Workflow (Authoritative)
 
 ```
-Bug → Mode Select → Check Memory → Scout (MANDATORY) → Diagnose
-  → [investigate → sequential-thinking → root cause?]
-  → yes → Root-Cause Proof (6 fields, HARD GATE) → Complexity → Fix ROOT CAUSE → Verify+Prevent (MANDATORY)
-  → pass → Finalize + Write to Memory
+Bug → Mode Select → [Check Memory: standard/deep] → Scout (MANDATORY) → Diagnose
+  → [investigate (ALWAYS) → sequential-thinking → root cause?]
+  → yes → Root-Cause Proof → Complexity → Fix ROOT CAUSE → Verify + Prevent (MANDATORY)
+  → pass → Report + capture only when recurrence/salience warrants it
   → fail <3 → re-diagnose | fail 3+ → STOP
 ```
 
 **This flow is authoritative.** If prose conflicts, follow the flow.
+
+## Profiles
+
+- **quick** — known cause and one or two files: minimal scout, compact root-cause proof, edit, focused before/after check, and summary. No default plan, report, wiki, memory, commit prompt, or subagent fan-out.
+- **standard** (default) — full evidence chain, root-cause proof, focused regression test, relevant suite, and review.
+- **deep** — standard plus an approved plan when a contract or architecture changes.
 
 **HARD GATE**
 
 Do NOT propose or implement fixes before completing Steps 1-2 (Scout + Diagnose).
 Symptom fixes are failure. Find the cause first through structured analysis, NEVER guessing.
 If 3+ fix attempts fail, STOP and question the architecture — discuss with user.
-Override: `--quick` allows fast scout→diagnose→fix for trivial issues (lint, type errors).
+`--quick` may use the compact proof, but it never bypasses Scout, Diagnose, root-cause evidence, Verify + Prevent, or the three-failed-attempt stop.
 
 ## Arguments
 
-- `--auto` — Autonomous mode (**default**). Auto-fixes blocking issues up to the cycle limit, then stops at *ready for user approval*. Never self-approves; score is advisory display only.
+- `--auto` — Standard profile with automatic progress through diagnosis and verification. It stops at any required human gate and never self-approves.
 - `--review` — Human-in-the-loop. Pause at each step.
-- `--quick` — Fast cycle for trivial bugs.
+- `--quick` — Quick profile for a known cause and ≤2 files.
 - `--parallel` — Parallel `developer` agents per independent issue.
 - `--tdd` — Force regression test BEFORE the fix (writes the `.claude/session-state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not gated. Useful for security-sensitive fixes where you want to prove the bug first.
 
@@ -71,7 +77,7 @@ Override: `--quick` allows fast scout→diagnose→fix for trivial issues (lint,
 
 For moderate/complex bugs:
 
-1. If the user supplied a diagnostic report, validate that it contains the investigate output contract and use it; otherwise run `mk:investigate` to confirm root cause.
+1. Run `mk:investigate` to confirm root cause. A supplied diagnostic report is evidence to validate and extend, never a substitute for investigation.
 2. If fix affects > 2 files → request an approved plan with `mk:plan-creator "bug fix: {symptom and affected area}"`
 3. Wait for Gate 1 approval
 
@@ -79,16 +85,17 @@ Skip: `--quick` mode (single file, clear cause).
 
 ## Step 0 — Mode Selection
 
-If no mode flag: use `AskUserQuestion` (Autonomous / HITL / Quick). See `references/mode-selection.md`.
+Without a mode flag, use the standard profile. Use quick only when its boundary is already proven; otherwise use standard. See `references/mode-selection.md` for escalation.
 
-## Step 0.5 — Check Fix Memory (before scouting)
+## Step 0.5 — Check Fix Memory (standard/deep only)
 
 Read `.claude/memory/fixes.json` — it is the canonical, schema-validated store of prior fix patterns. See the source-of-truth rule in `.claude/rules/memory-read-rules.md`.
+
 - Search for similar symptoms, error messages, or affected modules
 - If a matching fix pattern exists → use it as starting hypothesis in Step 2
 - If a matching success pattern exists → apply the known fix approach directly
 
-This turns repeated bugs into instant fixes. Skip only if `.claude/memory/` doesn't exist.
+This turns repeated bugs into instant fixes. Skip for quick, or if `.claude/memory/` does not exist.
 
 ## Step 1 — Scout (MANDATORY — never skip)
 
@@ -107,7 +114,7 @@ Activate `mk:scout` to map affected codebase BEFORE any diagnosis:
 
 Then structured diagnosis using two skills:
 
-1. **mk:investigate** — collect symptoms, traces, reproduction steps only when no supplied diagnostic report already satisfies the output contract
+1. **mk:investigate** — always collect and validate symptoms, traces, and reproduction steps; use a supplied diagnostic report as evidence, never as a bypass.
 2. **mk:sequential-thinking** — generate hypotheses from evidence, test each, eliminate, conclude
 
 Load `references/diagnosis-protocol.md` for the 5-phase protocol: Observe → Hypothesize → Test → Trace → Escalate.
@@ -134,7 +141,7 @@ exact compiler/lint error · file · direct cause · command-before · command-a
 
 If any field cannot be filled, return to Step 2 and gather more evidence. Do not substitute a guess.
 
-**Write evidence (init):** emit `workflow-evidence.json` with `skill: mk:fix`, `mode`, `task`, `planPath` (if the fix escalated to a plan), `phase`, `risk` (from Step 1), and `fixDiagnosis` (the six fields above; compact form for `--quick`). See the Workflow Evidence Index section below for path + schema.
+**Write evidence (init):** standard/deep runs emit `workflow-evidence.json` with `skill: mk:fix`, `mode`, `task`, `planPath` (if the fix escalated to a plan), `phase`, `risk`, and `fixDiagnosis`. Quick runs keep evidence in the response only.
 
 ## Step 3 — Complexity Assessment
 
@@ -164,27 +171,27 @@ Task orchestration (Moderate+): `references/task-orchestration.md`.
 
 If verify fails: loop to Step 2. After 3 failures → STOP, question architecture.
 
-**Update evidence:** write `verification.commands` (the re-run commands) and `verification.overall` (pass/fail) to `workflow-evidence.json`.
+**Update evidence:** standard/deep runs write `verification.commands` and `verification.overall` to `workflow-evidence.json`; quick runs report the same focused before/after check inline.
 
 ## Step 6 — Finalize + Learn (MANDATORY for Standard/Complex/Parallel; opt-in for Simple)
 
 1. Report: confidence, root cause, changes, files, prevention measures.
 
-2. **Write to memory via direct `Edit` calls** — capture the fix pattern for future sessions. Read `.claude/memory/fixes.json` first to match the live schema, then add/update the canonical JSON store only.
-
+2. **Write to memory only for recurrence or durable salience** — read `.claude/memory/fixes.json` first, then add/update the canonical JSON store only when the pattern is likely to help a future run. Quick runs never write memory.
    - **`.claude/memory/fixes.json`** — under `patterns`, add or update:
+
      ```json
      {
-       "id": "<kebab-slug>",
-       "type": "failure",
-       "category": "bug-class",
-       "severity": "low|medium|high|critical",
-       "domain": ["<area1>", "<area2>"],
-       "applicable_when": "<one line>",
-       "context": "<one line>",
-       "pattern": "<one line — what to do or avoid>",
-       "frequency": 1,
-       "lastSeen": "<YYYY-MM-DD>"
+      "id": "<kebab-slug>",
+      "type": "failure",
+      "category": "bug-class",
+      "severity": "low|medium|high|critical",
+      "domain": ["<area1>", "<area2>"],
+      "applicable_when": "<one line>",
+      "context": "<one line>",
+      "pattern": "<one line — what to do or avoid>",
+      "frequency": 1,
+      "lastSeen": "<YYYY-MM-DD>"
      }
      ```
 
@@ -196,7 +203,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
    - **Inside `/mk:cook` full pipeline**: Phase 6 / `mk:memory session-capture` covers this — do NOT double-write here. Standalone `/mk:fix` runs OWN the write themselves.
 
-   - Skip when `/mk:fix --no-capture` was passed.
+   - Skip when `/mk:fix --no-capture` was passed, the run is quick, or the result is a one-off with no durable lesson.
 
 3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — Gate 1 bypass path means no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
 
@@ -218,11 +225,11 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 ## Workflow Evidence Index
 
-Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; `--quick` writes the compact form; Simple fixes may skip it.
+Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
 
 **Storage path:** `.claude/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per `skill-authoring-rules.md` Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
 
-**Write points:** Step 2.5 (init: skill, mode, task, planPath, phase, risk, fixDiagnosis) → Step 5 (verification) → Step 6 finalize (`approvals.gate2`/`ship` as `required|not_applicable`, `memory.fixPatternWritten`).
+**Write points (standard/deep only):** Step 2.5 (init: skill, mode, task, planPath, phase, risk, fixDiagnosis) → Step 5 (verification) → Step 6 finalize (`approvals.gate2`/`ship` as `required|not_applicable`, `memory.fixPatternWritten`).
 
 **Validate before approval:** run `node .claude/scripts/validate-workflow-evidence.cjs <path> --phase fix` before the user-approval prompt (Step 6 item 5). Surface any `EVIDENCE_BLOCKED:<reasons>` and fill the missing fields — do not present for approval on a blocked index. A high-risk flag (`risk.requiresHumanApproval`) forces explicit human approval before finalize regardless of mode.
 
@@ -230,7 +237,7 @@ Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index reco
 
 ## Skill Activation
 
-**Always:** `mk:scout` (Step 1) + `mk:sequential-thinking` (Step 2). Invoke `mk:investigate` only when no supplied diagnostic report satisfies its output contract.
+**Always:** `mk:scout` (Step 1) + `mk:investigate` + `mk:sequential-thinking` (Step 2). A supplied diagnostic report informs investigation; it never bypasses it.
 **Conditional:** `mk:brainstorming` (complex, multiple approaches) | `mk:docs-finder` (unfamiliar APIs)
 
 ## Gotchas
