@@ -149,17 +149,17 @@ Every mode reads its references BEFORE writing the output file.
 | `--diagram`            | `references/generation-modes.md`, `references/mermaid-essentials.md`                                                           | —                                                             |
 | `--slides`             | `references/generation-modes.md`, `references/mermaid-essentials.md`                                                           | —                                                             |
 | `--ascii`              | `references/generation-modes.md`                                                                                               | —                                                             |
-| `--html --explain`     | `references/html-design-rules.md`, `mk:frontend-design/references/anti-slop-directives.md`                                     | template `assets/architecture.html`                           |
-| `--html --diagram`     | `references/html-design-rules.md`, `references/mermaid-essentials.md`, `mk:frontend-design/references/anti-slop-directives.md` | template `assets/mermaid-flowchart.html`                      |
-| `--html --slides`      | `references/html-design-rules.md`, `mk:frontend-design/references/anti-slop-directives.md`                                     | template `assets/slide-deck.html`                             |
-| `--html --diff`        | `references/html-design-rules.md`, `references/analytical-modes.md`, `mk:frontend-design/references/anti-slop-directives.md`   | template `assets/data-table.html`, `assets/architecture.html` |
+| `--html --explain`     | `references/html-design-rules.md`, `../frontend-design/references/anti-slop-directives.md`                                     | template `assets/architecture.html`                           |
+| `--html --diagram`     | `references/html-design-rules.md`, `references/mermaid-essentials.md`, `../frontend-design/references/anti-slop-directives.md` | template `assets/mermaid-flowchart.html`                      |
+| `--html --slides`      | `references/html-design-rules.md`, `../frontend-design/references/anti-slop-directives.md`                                     | template `assets/slide-deck.html`                             |
+| `--html --diff`        | `references/html-design-rules.md`, `references/analytical-modes.md`, `../frontend-design/references/anti-slop-directives.md`   | template `assets/data-table.html`, `assets/architecture.html` |
 
 Templates in `assets/` are out-of-band — they are not auto-Read; the agent reads the template only when generating the matching mode.
 
 ## Composes With
 
 - `mk:ui-design-system` — palette and typography selection (`assets/colors.csv` 160 rows, `assets/typography.csv` 73 rows). HTML modes vary palette per run.
-- `mk:frontend-design` — anti-slop forbidden patterns. Cited via `references/anti-slop-directives.md`, not duplicated.
+- `mk:frontend-design` — anti-slop forbidden patterns. Cited via `../frontend-design/references/anti-slop-directives.md`, not duplicated.
 - `mk:web-to-markdown` — for users who want to view a generated markdown file in a browser, no server bundled here.
 - `mk:visual-plan` — the owner of plan-as-HTML rendering; route plan-render requests there.
 

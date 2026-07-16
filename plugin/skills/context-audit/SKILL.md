@@ -66,7 +66,7 @@ Three concrete triggers:
 
 | Concern                         | Mechanism                                                | Unit          |
 | ------------------------------- | -------------------------------------------------------- | ------------- |
-| Monetary cost                   | `/mk:budget` + `harness/scripts/budget-tracker.sh`        | USD           |
+| Monetary cost                   | `/mk:budget` + `../autobuild/scripts/budget-tracker.sh`  | USD           |
 | Window utilization (this skill) | `/mk:context-audit` + `scripts/inventory-context.sh`      | tokens / %    |
 
 The three concerns are deliberately separate. This skill measures only what

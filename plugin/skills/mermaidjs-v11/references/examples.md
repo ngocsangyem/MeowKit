@@ -1,5 +1,13 @@
 # Mermaid.js Practical Examples
 
+## Contents
+
+- [Architecture and API](#software-architecture)
+- [Data and state](#database-design)
+- [Planning and CI/CD](#project-planning)
+- [UX, cloud, data visualization](#user-experience)
+- [Best practices](#best-practices)
+
 Real-world patterns and use cases for common documentation scenarios.
 
 ## Software Architecture

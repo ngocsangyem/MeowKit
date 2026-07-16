@@ -100,7 +100,7 @@ Collect candidates from all sources, then rank:
 
 Each candidate's rationale MUST cite the source file(s) it came from.
 
-For skill suggestions based on task type, see `mk:agent-detector` (its `references/lifecycle-routing.md` maps task patterns to skills).
+For skill suggestions based on task type, see `mk:agent-detector` (its `../agent-detector/references/lifecycle-routing.md` maps task patterns to skills).
 
 ## State-to-Recommendation Map
 

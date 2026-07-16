@@ -59,9 +59,9 @@ structural review (`mk:review`), TypeScript fundamentals (`mk:typescript`), Reac
 
 This skill does not restate the basics. For day-to-day foundations, read `mk:vue`:
 
-- `ref`/`reactive`/`computed`/`watch`, `toRefs`, destructuring → `mk:vue` `references/reactivity-performance.md`
-- props / emits / `defineModel` / naming / basic slots → `mk:vue` `references/components.md`
-- composable naming, default export, state scope, shared→Pinia → `mk:vue` `references/composables.md`
+- `ref`/`reactive`/`computed`/`watch`, `toRefs`, destructuring → `mk:vue` `../vue/references/reactivity-performance.md`
+- props / emits / `defineModel` / naming / basic slots → `mk:vue` `../vue/references/components.md`
+- composable naming, default export, state scope, shared→Pinia → `mk:vue` `../vue/references/composables.md`
 - Pinia / Pinia Colada / file-based routing → `mk:vue` `references/{state-pinia,pinia-colada*,routing-pages}.md`
 
 This skill adds the **deltas** and the topics `mk:vue` does not cover (below).

@@ -24,7 +24,7 @@ default_enabled: false
 
 # mk:jira-search
 
-Forks to the `jira-search` agent. JQL is positional on `search query` and `search validate`; flags everywhere else. The agent enforces JQL sanitization for any user-derived term via `scripts/jql-sanitize.sh`.
+Forks to the `jira-search` agent. JQL is positional on `search query` and `search validate`; flags everywhere else. The agent enforces JQL sanitization for any user-derived term via `../jira/scripts/jql-sanitize.sh`.
 
 ## Triggers
 

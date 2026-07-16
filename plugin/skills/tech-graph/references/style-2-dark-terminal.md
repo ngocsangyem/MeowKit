@@ -1,5 +1,11 @@
 # Style 2: Dark Terminal
 
+## Contents
+
+- [Colors and background](#colors)
+- [Typography and boxes](#typography)
+- [Glow, arrows, and SVG](#glow-effect-optional-for-key-nodes)
+
 Neon-on-dark hacker aesthetic. Matches CLAUDE.md standard tech diagram style.
 
 ## Colors

@@ -1,5 +1,12 @@
 # Style 7: OpenAI Official
 
+## Contents
+
+- [Palette and typography](#color-palette)
+- [Nodes and arrows](#node-boxes)
+- [Containers and content](#grouping-containers)
+- [Layout and template](#layout-principles)
+
 Clean, modern aesthetic matching OpenAI's documentation and research diagrams — minimal but precise.
 
 ## Color Palette

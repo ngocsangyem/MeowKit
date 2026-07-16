@@ -1,5 +1,12 @@
 # Stitch SDK API Reference
 
+## Contents
+
+- [Installation and authentication](#installation)
+- [Core API](#core-api)
+- [Types and errors](#type-definitions)
+- [Project resolution](#project-resolution-priority)
+
 Condensed reference for `@google/stitch-sdk`. Agent-optimized — covers common operations only.
 
 ## Installation

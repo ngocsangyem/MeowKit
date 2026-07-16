@@ -1,5 +1,12 @@
 # Style 3: Blueprint
 
+## Contents
+
+- [Colors and grid](#colors)
+- [Typography and boxes](#typography)
+- [Annotations and title block](#arrows--annotations)
+- [SVG template](#svg-template)
+
 Engineering blueprint aesthetic with grid background and technical annotation style.
 
 ## Colors

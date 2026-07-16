@@ -24,7 +24,7 @@ default_enabled: false
 
 # mk:confluence-search
 
-Forks to the `confluence-search` agent. CQL is positional on `search` (and on validate / build helpers); flags everywhere else. The agent enforces CQL sanitization for any user-derived term via `scripts/cql-sanitize.sh`.
+Forks to the `confluence-search` agent. CQL is positional on `search` (and on validate / build helpers); flags everywhere else. The agent enforces CQL sanitization for any user-derived term via `../confluence/scripts/cql-sanitize.sh`.
 
 ## Triggers
 

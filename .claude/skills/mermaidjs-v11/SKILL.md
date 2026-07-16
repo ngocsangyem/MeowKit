@@ -30,10 +30,6 @@ runtime: claude-code
 
 # Mermaid.js v11
 
-## Overview
-
-Create text-based diagrams using Mermaid.js v11 declarative syntax. Convert code to SVG/PNG/PDF via CLI or render in browsers/markdown files.
-
 ## Quick Start
 
 **Basic Diagram Structure:**
@@ -42,16 +38,9 @@ Create text-based diagrams using Mermaid.js v11 declarative syntax. Convert code
   {diagram-content}
 ```
 
-**Common Diagram Types:**
-- `flowchart` - Process flows, decision trees
-- `sequenceDiagram` - Actor interactions, API flows
-- `classDiagram` - OOP structures, data models
-- `stateDiagram` - State machines, workflows
-- `erDiagram` - Database relationships
-- `gantt` - Project timelines
-- `journey` - User experience flows
-
-See `references/diagram-types.md` for all 24+ types with syntax.
+Common types: `flowchart`, `sequenceDiagram`, `classDiagram`, `stateDiagram`, `erDiagram`,
+`gantt`, and `journey`. Load [references/diagram-types.md](references/diagram-types.md) for
+the complete v11 syntax catalog.
 
 ## Creating Diagrams
 
@@ -131,15 +120,17 @@ Load `references/examples.md` for:
 - State machines
 - User journey maps
 
-## Resources
+## References
 
-- `references/diagram-types.md` - Syntax for all 24+ diagram types
-- `references/configuration.md` - Config, theming, accessibility
-- `references/cli-usage.md` - CLI commands and workflows
-- `references/integration.md` - JavaScript API and embedding
-- `references/examples.md` - Practical patterns and use cases
+| Need | Load |
+|---|---|
+| Diagram syntax | [references/diagram-types.md](references/diagram-types.md) |
+| Config, theming, accessibility | [references/configuration.md](references/configuration.md) |
+| CLI, Docker, batch export | [references/cli-usage.md](references/cli-usage.md) |
+| JavaScript integration | [references/integration.md](references/integration.md) |
+| Common patterns | [references/examples.md](references/examples.md) |
 
-For universal SVG layout rules (component spacing, arrow routing, label placement, z-index ordering, anti-pattern catalog) when reviewing rendered output for collisions or unreadable labels, see `mk:tech-graph`'s `references/svg-layout-best-practices.md`.
+For rendered SVG layout review, load `mk:tech-graph` and follow its SVG-layout route.
 
 ## Gotchas
 

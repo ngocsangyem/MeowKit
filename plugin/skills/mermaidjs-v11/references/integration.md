@@ -1,5 +1,12 @@
 # Mermaid.js Integration Patterns
 
+## Contents
+
+- [Browser and Node](#htmlbrowser-integration)
+- [Frameworks and markdown](#react-integration)
+- [API and events](#api-reference)
+- [Advanced and platform patterns](#advanced-patterns)
+
 JavaScript API integration, HTML embedding, and platform-specific usage.
 
 ## HTML/Browser Integration

@@ -1,5 +1,13 @@
 # Mermaid.js Diagram Types
 
+## Contents
+
+- [Core and planning diagrams](#core-diagrams)
+- [Architecture diagrams](#architecture-diagrams)
+- [Data visualization](#data-visualization)
+- [Technical diagrams](#technical-diagrams)
+- [Quick reference](#quick-reference)
+
 Comprehensive syntax reference for all 24+ diagram types in Mermaid.js v11.
 
 ## Core Diagrams

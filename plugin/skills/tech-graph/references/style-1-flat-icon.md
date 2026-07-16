@@ -1,5 +1,12 @@
 # Style 1: Flat Icon (Default)
 
+## Contents
+
+- [Colors](#colors)
+- [Typography](#typography)
+- [Shapes and arrows](#box-shapes)
+- [Legend and SVG](#legend)
+
 Inspired by draw.io defaults and Apple documentation style.
 
 ## Colors

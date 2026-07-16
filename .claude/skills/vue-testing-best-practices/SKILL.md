@@ -170,7 +170,7 @@ restate Vue basics (defer to `mk:vue`), dump whole files, or recite generic test
    a11y states.
 4. **Coverage Risks** — Vue-specific blind spots: Teleported content, Suspense fallback,
    store actions, router guards. Note: _existence-level_ diff coverage gaps are produced
-   automatically by `mk:review` `references/test-coverage.md` during a full review — this
+   automatically by `mk:review` `../review/references/test-coverage.md` during a full review — this
    section audits test _quality_, not existence.
 5. **Tooling Recommendations** — Vitest / runner (happy-dom vs Browser Mode) / library
    (`@vue/test-utils` vs `@testing-library/vue`) / Playwright-vs-Cypress choices, each with a

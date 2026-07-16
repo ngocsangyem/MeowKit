@@ -1,5 +1,13 @@
 # Mermaid.js CLI Usage
 
+## Contents
+
+- [Install and basic commands](#installation)
+- [Flags and advanced usage](#cli-flags)
+- [Docker and config](#docker-workflows)
+- [Node and common workflows](#nodejs-api)
+- [Troubleshooting](#troubleshooting)
+
 Command-line interface for converting Mermaid diagrams to SVG/PNG/PDF.
 
 ## Installation

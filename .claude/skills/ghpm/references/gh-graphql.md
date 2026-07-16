@@ -1,5 +1,12 @@
 # GitHub Projects v2 — GraphQL Bulk Operations
 
+## Contents
+
+- [Project node ID](#get-project-node-id)
+- [Bulk status updates](#bulk-update-item-status-via-graphql)
+- [Bulk addition](#add-multiple-issues-to-a-project-in-a-loop)
+- [Status counts](#get-project-item-count-by-status)
+
 Use `gh api graphql` for batch updates that would require too many REST calls.
 
 ## Get project node ID

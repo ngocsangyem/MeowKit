@@ -1,5 +1,12 @@
 # Mermaid.js Configuration & Theming
 
+## Contents
+
+- [Configuration and options](#configuration-methods)
+- [Theming and accessibility](#theming)
+- [Icons, math, security](#icon-configuration)
+- [Layouts and validation](#layout-algorithms)
+
 Configuration options, theming, and customization for Mermaid.js v11.
 
 ## Configuration Methods

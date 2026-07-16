@@ -1,5 +1,12 @@
 # Design-to-Code Pipeline Patterns
 
+## Contents
+
+- [Basic pipeline](#basic-pipeline)
+- [Variants](#advanced-pipeline-with-variants)
+- [DESIGN.md contract](#designmd-specification)
+- [Routing, handoff, quota](#skill-routing)
+
 Orchestration workflows chaining Stitch design generation with implementation skills.
 
 ## Basic Pipeline

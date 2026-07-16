@@ -1,5 +1,12 @@
 # Style 8 — Dark Luxury
 
+## Contents
+
+- [Tokens and typography](#color-tokens)
+- [Nodes and arrows](#node-semantic-color-buckets)
+- [Containers and background](#container--cluster-style)
+- [Style and layout](#full-style-block)
+
 Inspired by the `dark-gold` theme from [Understand-Anything](https://github.com/nicholasgasior/understand-anything).
 Deep black canvas with warm champagne-gold accents and hybrid serif/sans typography.
 Uniquely warm among all dark styles — closest peer is style-2 (Dark Terminal) but with a premium editorial feel.

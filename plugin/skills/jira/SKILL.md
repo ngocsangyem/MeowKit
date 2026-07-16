@@ -59,7 +59,7 @@ See `references/install-and-auth.md` for one-time setup (`.claude/scripts/bin/se
 - `references/safety-framework.md` — 4-tier safety model
 - `references/evaluation-rubric.md` — used by `mk:jira-evaluator`
 - `references/estimation-guide.md` — used by `mk:jira-estimator`
-- `references/field-discovery.md` — used by `mk:jira-fields` (moved from `jira/references/`)
+- `../jira-fields/references/field-discovery.md` — used by `mk:jira-fields` (moved from `jira/references/`)
 
 ## Handoff
 

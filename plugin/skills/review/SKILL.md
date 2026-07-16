@@ -176,7 +176,7 @@ Side Effects Detected: Yes
 - <bullet list of detected effects, one per line>
 ```
 
-`validate-gate-2.sh` recognizes this signal and blocks Gate 2 UNTIL a `## User Decision Addendum` block is appended containing the user's chosen recovery option. See cook `references/review-cycle.md` "Regression Recovery Options" for the addendum format and the four standard recovery options.
+`validate-gate-2.sh` recognizes this signal and blocks Gate 2 UNTIL a `## User Decision Addendum` block is appended containing the user's chosen recovery option. See cook `../cook/references/review-cycle.md` "Regression Recovery Options" for the addendum format and the four standard recovery options.
 
 **Backward-compat (CRITICAL):** absence of the `Side Effects Detected` field is NOT a block signal. Existing verdicts that pre-date this contract continue to pass unchanged. The new signal is positive-presence-only — never negative-absence.
 

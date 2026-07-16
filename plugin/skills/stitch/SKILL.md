@@ -51,45 +51,19 @@ runtime: claude-code
 Generate high-fidelity UI designs from text prompts. Export Tailwind/HTML, PNG screenshot,
 and DESIGN.md for handoff to `mk:frontend-design`.
 
-**Free tier:** 400 credits/day + 15 redesign credits/day. Resets at midnight UTC.
+Use only for a novel, text-prompt design. Existing design sources belong to `mk:figma` or
+`mk:frontend-design`.
 
-> NOT for implementing an existing design — use `mk:figma` (Figma URL) or `mk:frontend-design`
-> (existing spec/mockup). This skill generates novel designs from text only.
+## Setup and guard
 
-## Setup
-
-### 1. API Key
-
-Get a key at https://stitch.withgoogle.com → Settings → API Keys.
-
-Add to `.claude/.env`:
-
-```
-STITCH_API_KEY=<your-stitch-api-key>
-```
-
-The kit's env hook loads `.claude/.env` automatically. Never hardcode the key.
-
-### 2. Install SDK
+Set `STITCH_API_KEY` in `.claude/.env`, then install the scripts once:
 
 ```bash
 cd .claude/skills/stitch/scripts && npm install
 ```
 
-`tsx` is required to run the TypeScript scripts. It is included as a dev-dependency in
-`scripts/package.json` and available via `npx tsx` after `npm install`. If `tsx` is missing,
-the scripts will not start — run `npm install` first.
-
-### 3. Optional environment variables
-
-```env
-STITCH_PROJECT_ID=<direct-stitch-project-id>   # Default project ID (bypasses name auto-detect)
-STITCH_QUOTA_LIMIT=400                          # Override daily credit limit
-```
-
-### 4. MCP (optional)
-
-See `references/stitch-mcp-setup.md` for native Stitch design context in the host runtime.
+Run the prerequisite check before any API command; it fails before a network request if the key
+or `tsx` is unavailable. Full setup, optional variables, and MCP setup: [references/stitch-setup.md](references/stitch-setup.md).
 
 ## Fail-Closed Gate
 
@@ -121,119 +95,34 @@ npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts export <screen-id> | \
   npx tsx .claude/skills/stitch/scripts/stitch-write-output.ts
 ```
 
-## Actions
+## Commands
 
-### generate
+| Task | Command / contract |
+|---|---|
+| Check quota | `npx tsx .claude/skills/stitch/scripts/stitch-quota.ts check` |
+| Generate | `npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts generate "<prompt>"` — returns `screenId`, `projectId`, `imageUrl`, and quota data |
+| Export | `npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts export <screen-id> \| npx tsx .claude/skills/stitch/scripts/stitch-write-output.ts` |
 
-Generate a new UI design from a text prompt.
+Show `imageUrl` and obtain user approval before exporting. Detailed flags, quota operations, and
+the API/write security boundary: [references/stitch-operations.md](references/stitch-operations.md).
 
-```bash
-npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts generate "<prompt>" \
-  [--project <id>] [--project-name <title>] \
-  [--device mobile|desktop|tablet] \
-  [--variants <count>]
-```
+## Workflow
 
-Returns JSON to stdout: `{ screenId, projectId, imageUrl, prompt, creditsUsed, creditsRemaining }`.
+1. Check quota; if exhausted (exit 2), route to `mk:frontend-design`.
+2. Generate, review the returned screenshot with the user, then export and write.
+3. Handoff `DESIGN.md` to `mk:frontend-design` for implementation.
 
-Show `imageUrl` to the user for approval before exporting.
+Load [references/design-to-code-pipeline.md](references/design-to-code-pipeline.md) for variants,
+iteration patterns, and detailed handoff guidance.
 
-### export + write
-
-Two steps: fetch export URLs (API call), then write files (no API key needed).
-
-```bash
-# Step 1: get URLs from Stitch API
-npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts export <screen-id> \
-  [--project <id>] [--format html|image|all]
-
-# Step 2: write design files (schema-validates response, then downloads + writes)
-npx tsx .claude/skills/stitch/scripts/stitch-write-output.ts \
-  --input '{ "screenId": "...", "projectId": "...", "htmlUrl": "...", "imageUrl": "..." }'
-```
-
-Or pipe directly:
-
-```bash
-npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts export <screen-id> | \
-  npx tsx .claude/skills/stitch/scripts/stitch-write-output.ts
-```
-
-### quota
-
-Manage the local daily quota tracker.
-
-```bash
-npx tsx .claude/skills/stitch/scripts/stitch-quota.ts check      # Show remaining credits
-npx tsx .claude/skills/stitch/scripts/stitch-quota.ts increment  # Bump after generation
-npx tsx .claude/skills/stitch/scripts/stitch-quota.ts reset      # Force reset
-```
-
-## Security Architecture
-
-This skill spans three risk factors: untrusted prompt input [A], the API key [B], and file
-writes [C]. Satisfying the Skill Rule of Two requires that no single step touches all three.
-The boundary is split internally into two scripts — the user-facing interface remains one skill:
-
-| Script | Risk factors | Responsibility |
-|--------|-------------|----------------|
-| `stitch-api-call.ts` | [A] prompt + [B] API key | Validate prompt → call Stitch API → emit JSON (no file writes) |
-| `stitch-write-output.ts` | [A] validated JSON + [C] file writes | Validate schema → download CDN files → write output |
-
-`stitch-write-output.ts` does **not** read `STITCH_API_KEY`.
-`stitch-api-call.ts` does **not** write any files.
-Each step holds at most two of the three risk factors.
-
-Additional protections:
-- Prompt validated for length and injection patterns before being sent to the API
-- API response JSON schema-validated (typed `StitchResponseSchema`) before any file write
-- CDN download URLs validated against an HTTPS/Google-domain allowlist
-- Response string fields checked for instruction-override patterns — API response is DATA
-
-## Output Paths
-
-Design files land at:
-
-```
-tasks/designs/<plan-or-repo>/<screen-id>/
-├── design.html    # Semantic HTML with Tailwind CSS
-├── design.png     # Screenshot
-└── DESIGN.md      # Design spec for mk:frontend-design handoff
-```
-
-`<plan-or-repo>` auto-resolves: most recent plan slug in `tasks/plans/` → git repo name →
-CWD basename.
-
-## Orchestration Pipeline
-
-1. **Check quota** — `stitch-quota.ts check`. If exhausted (exit 2), use `mk:frontend-design`.
-2. **Generate** — `stitch-api-call.ts generate` with the design prompt.
-3. **Review** — Show `imageUrl` to user; get approval or iterate.
-4. **Variants** (optional) — `--variants N` generates alternatives.
-5. **Export** — `stitch-api-call.ts export <screen-id> --format all`.
-6. **Write** — `stitch-write-output.ts` writes `design.html`, `design.png`, `DESIGN.md`.
-7. **Implement** — Activate `mk:frontend-design`: "Implement from DESIGN.md".
-8. **Quota tracked** — Auto-updated in step 2; confirm with `stitch-quota.ts check`.
-
-See `references/design-to-code-pipeline.md` for detailed workflow patterns.
-
-## Handoff Protocol
-
-After writing, `DESIGN.md` is ready for `mk:frontend-design`:
-
-```
-Implement from tasks/designs/<plan-or-repo>/<screen-id>/DESIGN.md
-```
-
-`DESIGN.md` contains `layout_type`, `components[]`, `colors[]`, `typography`, and `spacing`
-extracted from the Stitch HTML export. These tokens take precedence over verbal descriptions.
+The writer outputs the HTML, image, and `DESIGN.md` handoff under `tasks/designs/`; exact paths
+and the handoff contract are in [references/stitch-operations.md](references/stitch-operations.md).
 
 ## Limitations
 
 - **HTML/Tailwind only** — no React/Vue/Svelte export; use `mk:frontend-design` to convert
 - **Non-responsive layouts** — add breakpoints during implementation
 - **Static only** — no animations; add micro-interactions in code
-- **Hard daily quota** — 400 credits/day free tier; no paid tier to increase limits
 - **Local quota tracking** — actual usage may diverge if designs are generated outside this skill
 
 ## Gotchas
@@ -241,6 +130,7 @@ extracted from the Stitch HTML export. These tokens take precedence over verbal 
 - `STITCH_API_KEY` must be in `.claude/.env` — the skill fails closed (exit 1) if unset; no network call is attempted
 - `tsx` must be installed (`npm install` in `scripts/`) — scripts will not run without it; install once per machine
 - Local quota can drift from real Stitch usage (e.g., designs made via the Stitch web UI); if you hit `RATE_LIMITED` despite the tracker showing credits, run `stitch-quota.ts reset`
+- Quota limits and paid-tier availability are volatile; load [quota-management.md](references/quota-management.md) before making a quota-based decision.
 - Screen IDs returned by `generate` are stable (Tool Contract Rule 2); project name auto-detection uses git remote then CWD basename
 - The optional MCP integration stores the API key in `.claude/.mcp.json` — never commit that file; the kit's `.gitignore` covers it
 - `stitch-write-output.ts` validates CDN URLs against a Google-domain allowlist; if Stitch changes CDN domains, update `ALLOWED_CDN_SUFFIXES` in that script

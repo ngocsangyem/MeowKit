@@ -1,5 +1,12 @@
 # Style-to-Diagram-Type Adaptation Guide
 
+## Contents
+
+- [Architecture and data](#architecture-diagram)
+- [Structure and flow](#class-diagram--er-diagram)
+- [Planning and state](#timeline--gantt)
+- [Agents and memory](#agent--memory-architecture)
+
 Not all styles work equally well for every diagram type. Use this guide to pick the best style.
 
 ## Architecture Diagram

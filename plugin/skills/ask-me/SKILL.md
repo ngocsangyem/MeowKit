@@ -40,33 +40,14 @@ workflows, rationale, constraints — with minimal cited `file:line` evidence.
 Gives the agent deep, fast project understanding instead of long grep/search
 sessions. Read-only by default; the answer is the deliverable.
 
-## Redirect First
+## Route first
 
-Classify the request BEFORE answering. If a specialist skill owns it, name that
-skill and STOP — do not partially answer.
+Classify the request before gathering evidence. If a specialist owns it, name that skill and stop;
+do not partially answer. The complete routing table is
+[references/specialist-routes.md](references/specialist-routes.md).
 
-| Request asks for... | Route to |
-|---|---|
-| Alternatives / options / "how should we build" | `mk:brainstorming` |
-| "Should we X or Y" / debate / design review | `mk:party` |
-| Stuck / impossible / too complex | `mk:problem-solving` |
-| Product idea validation / "is this worth building" | `mk:office-hours` |
-| Review of an existing plan | `mk:plan-ceo-review` |
-| Re-examining an output / verdict / analysis | `mk:elicit` |
-| API design (endpoints, status codes, pagination) | `mk:api-design` |
-| DB schema / migration design | `mk:database` |
-| Bug / error / "why is X broken" / root cause | `mk:investigate` |
-| Review of a diff / PR | `mk:review` |
-| Grading a running build | `mk:evaluate` |
-| Security audit / threat model | `mk:cso` or `mk:vulnerability-scanner` |
-| "What should I do next" / which command | `mk:help` |
-| Broad file discovery / whole-repo inventory | `mk:scout` |
-| Library / framework docs (not this project) | `mk:docs-finder` |
-| Diagram / slides / visual or exportable artifact | `mk:preview --explain` |
-| "Which requirements lack tests" | `mk:nyquist` |
-
-Scope test: this skill answers **what is true / how it works here / why it
-exists / what constraints apply** — about the *current project only*.
+This skill answers what is true, how it works here, why it exists, and what constraints apply —
+about the current project only.
 
 ## When to Use
 
@@ -103,13 +84,7 @@ no scouting).
    save-path policy below. On unsafe path or conflict, refuse the write and
    return the answer inline.
 
-### Depth Budgets (hard caps)
-
-| Depth | Max greps | Max files read | Max lines/file | Output style |
-|---|---:|---:|---:|---|
-| `quick` | 2 | 3 | 80 | Direct answer only |
-| `standard` | 5 | 8 | 140 | Answer + evidence |
-| `deep` | 8 | 14 | 220 | Saved report allowed |
+Depth budgets and output/failure contracts: [references/answer-contract.md](references/answer-contract.md).
 
 ### Forbidden Paths (never read)
 
@@ -124,51 +99,12 @@ root, `tasks/reports/`, or `${CLAUDE_PLUGIN_DATA}/ask-me/`. Path escapes a safe
 root → refuse and answer inline. Target exists → ask before overwrite or use a
 timestamped name.
 
-## Output Format
+## Answer contract
 
-```markdown
-## Answer
-
-[Direct answer in 1-3 paragraphs.]
-
-**Confidence:** high | medium | low
-
-## Evidence
-
-| Claim | Source |
-|---|---|
-| [claim] | [path:line] |
-
-## Inference
-
-- [Only if needed — points not directly source-backed.]
-
-## Limitations
-
-- [Missing docs, partial evidence, stale source, or budget cap.]
-
-## Related Next Skill
-
-[Only if the user likely needs a specialist workflow next.]
-
-## Unresolved Questions
-
-[Only if any.]
-```
-
-## Failure Handling
-
-| Failure | Condition | Handling |
-|---|---|---|
-| `ROUTE_REDIRECT` | Specialist skill clearly owns request | Name owning skill and why; do not answer here |
-| `QUESTION_MISSING` | No concrete question | Ask for one specific project question |
-| `SCOPE_TOO_BROAD` | Needs whole-repo inventory | Redirect to `mk:scout` or ask user to narrow |
-| `EVIDENCE_NOT_FOUND` | No relevant source within caps | Answer low-confidence only if generally useful; list missing evidence |
-| `FORBIDDEN_PATH` | Needed source is a secret/local-state path | Refuse that path; ask for sanitized excerpt or alternative |
-| `CONFLICTING_EVIDENCE` | Sources disagree | Show conflict, cite both; choose only if source precedence is obvious |
-| `BUDGET_EXCEEDED` | Depth cap hit before sufficient evidence | Stop reading, downgrade confidence, suggest deeper scoped run or `mk:scout` |
-| `SAVE_PATH_UNSAFE` | Output path escapes safe roots | Refuse write; return inline answer |
-| `OUTPUT_EXISTS` | Save target exists | Ask before overwrite or use timestamped path |
+Return a direct answer, confidence, cited evidence, and only needed inference/limitations. Include
+one related specialist only when the likely next action leaves this scope. Load
+[references/answer-contract.md](references/answer-contract.md) for the exact template and failure
+handling.
 
 ## Workflow Integration
 

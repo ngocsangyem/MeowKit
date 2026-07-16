@@ -1,5 +1,12 @@
 # Style 6: Claude Official
 
+## Contents
+
+- [Shapes and arrows](#box-shapes)
+- [Labels and content](#arrow-semantics)
+- [Layers and legend](#layer-labels)
+- [Layout and philosophy](#layout-principles)
+
 Inspired by Anthropic's Claude blog technical diagrams — warm, approachable, professional.
 s
 

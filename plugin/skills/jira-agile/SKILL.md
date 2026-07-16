@@ -83,7 +83,7 @@ If sprint-state contract is absent OR `status: closed` → skip the amendment ce
 - Domain refs:
   - `references/sprint-operations.md` — board/sprint/velocity wrapper patterns
   - `references/agile-field-reference.md` — agile-specific field IDs (Sprint, Epic Link, Story Points)
-- Peer leaves: `mk:jira-fields` (`references/agile-field-ids.md` is the canonical instance-discovery source), `mk:jira-time` (capacity = velocity ÷ team time), `mk:jira-relationships` (epic-children outside epic-link via issue links)
+- Peer leaves: `mk:jira-fields` (`../jira-fields/references/agile-field-ids.md` is the canonical instance-discovery source), `mk:jira-time` (capacity = velocity ÷ team time), `mk:jira-relationships` (epic-children outside epic-link via issue links)
 
 ## Gotchas
 
