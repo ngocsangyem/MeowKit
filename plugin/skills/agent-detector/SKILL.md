@@ -19,6 +19,7 @@ owner: lifecycle
 criticality: medium
 status: active
 runtime: claude-code
+adapted_for: claude-code
 requires_external_service: ["jira"]
 default_enabled: true
 ---

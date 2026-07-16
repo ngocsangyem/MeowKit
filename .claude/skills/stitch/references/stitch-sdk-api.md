@@ -125,4 +125,4 @@ Both `stitch-api-call.ts` subcommands use this precedence:
 2. `--project-name <title>` — title-based lookup-or-create
 3. `STITCH_PROJECT_ID` env — user's global override (direct ID)
 4. Auto-detect from `git remote get-url origin` repo name
-5. `"meowkit-default"` fallback
+5. Hardcoded default project-name fallback (see `scripts/stitch-api-call.ts`)

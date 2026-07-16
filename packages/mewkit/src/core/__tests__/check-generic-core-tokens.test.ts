@@ -79,4 +79,10 @@ describe("findGenericCoreTokens", () => {
 	it("keeps scale-routing provider-neutral", () => {
 		expect(findGenericCoreTokens(join(process.cwd(), ".claude"), "skills/scale-routing")).toEqual([]);
 	});
+
+	it("keeps the cleaned light-touch skills free of generic-core tokens", () => {
+		for (const skill of ["multimodal", "advise", "visual-plan", "stitch"]) {
+			expect(findGenericCoreTokens(join(process.cwd(), ".claude"), `skills/${skill}`)).toEqual([]);
+		}
+	});
 });

@@ -11,7 +11,7 @@ per-operation CLASSIFICATION and the semantic edits. Invoked by the Copy Command
 Plain-text fallback for hosts without slash routing:
 
 ```
-Apply MeowKit visual feedback: read <plan-dir>/visual-plan/feedback/<batch-id>.json
+Apply visual feedback: read <plan-dir>/visual-plan/feedback/<batch-id>.json
 and follow the apply-feedback protocol.
 ```
 

@@ -112,8 +112,8 @@ Stop asking when either is true:
 - The last two answers did not change your reframing — more questions are now
   costing turns without moving the verdict.
 
-Use `AskUserQuestion` when the answer is a choice between concrete options;
-plain prose when it is open-ended.
+Ask the user to choose when the answer is a choice between concrete options;
+use plain prose when it is open-ended.
 
 ### 3. The reframing gate (HARD)
 

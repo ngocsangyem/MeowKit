@@ -27,6 +27,7 @@ owner: observability
 criticality: medium
 status: active
 runtime: claude-code
+adapted_for: claude-code
 ---
 
 # mk:trace-analyze — Scatter-Gather Trace Analysis

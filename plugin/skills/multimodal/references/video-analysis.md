@@ -7,7 +7,7 @@
 | `default` | ~263 | Scene detail, OCR, object detection |
 | `low-res` | ~100 | Content summary, speaker ID, audio focus |
 
-**Savings:** 62% token reduction with low-res. Use for audio-focused tasks.
+**Savings:** 62% reduction in tokens with low-res. Use for audio-focused tasks.
 
 ## Cost Math (gemini-2.5-flash, input tokens only)
 
