@@ -17,6 +17,29 @@ owner: lifecycle
 criticality: critical
 status: active
 runtime: claude-code
+dependency_edges:
+  - id: mk:autobuild
+    type: peer
+  - id: mk:evaluate
+    type: peer
+  - id: mk:investigate
+    type: peer
+  - id: mk:memory
+    type: peer
+  - id: mk:plan-creator
+    type: peer
+  - id: mk:review
+    type: peer
+  - id: mk:scout
+    type: peer
+  - id: mk:ship
+    type: peer
+  - id: mk:simplify
+    type: peer
+  - id: mk:testing
+    type: peer
+  - id: mk:verify
+    type: peer
 ---
 
 # Cook — Full Implementation Pipeline

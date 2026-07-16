@@ -185,6 +185,6 @@ Every rule file follows:
 
 ## See Also
 
-- [Agents Reference](/reference/agents) — all 17 agents
+- [Agents Reference](/reference/agents) — all 40 agents
 - [Skills Reference](/reference/skills) — all skills organized by phase
 - [Hooks Reference](/reference/hooks) — lifecycle hooks

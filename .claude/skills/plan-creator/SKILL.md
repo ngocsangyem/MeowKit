@@ -41,6 +41,23 @@ criticality: critical
 status: active
 runtime: claude-code
 context_cost: high
+dependency_edges:
+  - id: mk:agent-detector
+    type: peer
+  - id: mk:autobuild
+    type: peer
+  - id: mk:brainstorming
+    type: peer
+  - id: mk:cook
+    type: peer
+  - id: mk:figma
+    type: peer
+  - id: mk:fix
+    type: peer
+  - id: mk:scale-routing
+    type: peer
+  - id: mk:scout
+    type: peer
 ---
 
 # Plan Creator

@@ -13,6 +13,22 @@ import type { Status } from "../commands/doctor-checks.js";
 
 export type ArtifactType = "skill" | "agent" | "rule" | "command" | "hook";
 
+export const DEPENDENCY_EDGE_TYPES = [
+	"requires",
+	"peer",
+	"optional_bridge",
+	"redirect",
+	"consumes_artifact",
+	"human_handoff",
+	"provider_adapter",
+] as const;
+export type DependencyEdgeType = (typeof DEPENDENCY_EDGE_TYPES)[number];
+
+export interface DependencyEdge {
+	id: string;
+	type: DependencyEdgeType;
+}
+
 /** Frozen contract — the stale-index check consumes this shape. */
 export interface InventoryEntry {
 	type: ArtifactType;
@@ -23,6 +39,9 @@ export interface InventoryEntry {
 	status: string;
 	runtime: string;
 	contextCost?: string;
+	/** Typed dependency graph metadata; preserves edge semantics for future consumers. */
+	dependencyEdges?: DependencyEdge[];
+	/** Flat compatibility projection used by existing pack closure and validation. */
 	dependsOn?: string[];
 	/** Vendor-neutral substrate responsibility (optional; seed + tag-on-touch). */
 	responsibility?: string;
@@ -173,6 +192,28 @@ function str(v: unknown): string {
 	return typeof v === "string" ? v : "";
 }
 
+function dependencyEdges(meta: Record<string, unknown>, issues: InventoryIssue[], artifactPath: string): DependencyEdge[] {
+	if (!Array.isArray(meta.dependency_edges)) return [];
+	const edges: DependencyEdge[] = [];
+	const typesById = new Map<string, DependencyEdgeType>();
+	for (const [index, raw] of meta.dependency_edges.entries()) {
+		const edge = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : null;
+		if (!edge || typeof edge.id !== "string" || !edge.id.trim() || typeof edge.type !== "string" || !DEPENDENCY_EDGE_TYPES.includes(edge.type as DependencyEdgeType)) {
+			issues.push({ path: artifactPath, type: "unknown", problem: `invalid dependency_edges[${index}]` });
+			continue;
+		}
+		const type = edge.type as DependencyEdgeType;
+		const priorType = typesById.get(edge.id);
+		if (priorType && priorType !== type) {
+			issues.push({ path: artifactPath, type: "unknown", problem: `conflicting dependency_edges types for "${edge.id}"` });
+			continue;
+		}
+		typesById.set(edge.id, type);
+		if (!priorType) edges.push({ id: edge.id, type });
+	}
+	return edges;
+}
+
 function agentContractFields(id: string): Pick<InventoryEntry, "agentClass" | "routing" | "public"> {
 	if (id === "advisor") return { agentClass: "internal", routing: "harness", public: false };
 	if (id === "story-sizer") return { agentClass: "intelligence", routing: "direct-only", public: true };
@@ -222,7 +263,20 @@ export function buildInventory(claudeDir: string): Inventory {
 			source: ref.metaSource,
 		};
 		if (typeof meta.context_cost === "string") entry.contextCost = meta.context_cost;
-		if (Array.isArray(meta.depends_on)) entry.dependsOn = meta.depends_on.map(String);
+		const edges = dependencyEdges(meta, allIssues, ref.rel);
+		if (edges.length > 0) entry.dependencyEdges = edges;
+		const legacy = Array.isArray(meta.depends_on) ? meta.depends_on.filter((id): id is string => typeof id === "string") : [];
+		const typedRequires = edges.filter((edge) => edge.type === "requires").map((edge) => edge.id);
+		if (edges.length > 0 && legacy.length > 0) {
+			const legacyIds = new Set(legacy);
+			const typedIds = new Set(typedRequires);
+			const matches = legacyIds.size === typedIds.size && [...legacyIds].every((id) => typedIds.has(id));
+			if (!matches) {
+				allIssues.push({ path: ref.rel, type: ref.type, problem: "depends_on must match dependency_edges of type requires" });
+			}
+		}
+		const flattened = [...new Set(edges.length > 0 ? typedRequires : legacy)];
+		if (flattened.length > 0) entry.dependsOn = flattened;
 		if (typeof meta.responsibility === "string") entry.responsibility = meta.responsibility;
 		if (typeof meta.surface === "string") entry.surface = meta.surface;
 		if (ref.type === "agent") {

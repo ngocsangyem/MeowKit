@@ -166,6 +166,17 @@ class TestSchemaAcceptsNewFields(unittest.TestCase):
         }
         jsonschema.validate(fm, schema)  # raises on failure
 
+    def test_schema_rejects_unknown_dependency_edge_type(self):
+        import jsonschema
+        schema = json.loads(SCHEMA.read_text())
+        fm = {
+            "name": "mk:test",
+            "description": "A skill with an invalid dependency edge type.",
+            "dependency_edges": [{"id": "mk:other", "type": "unsupported"}],
+        }
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(fm, schema)
+
 
 if __name__ == "__main__":
     unittest.main()

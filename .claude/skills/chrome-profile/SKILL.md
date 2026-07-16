@@ -19,7 +19,9 @@ runtime: claude-code
 requires_external_service: ["chrome"]
 default_enabled: false
 stable_output_contract: true
-depends_on: ["mk:agent-browser"]
+dependency_edges:
+  - id: mk:agent-browser
+    type: requires
 allowed-tools:
   - Bash
   - Read

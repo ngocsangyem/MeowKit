@@ -89,6 +89,41 @@ describe("buildInventory", () => {
 		const agent = entries.find((e) => e.type === "agent")!;
 		expect(agent).toMatchObject({ model: "inherit", tools: ["Read"], agentClass: "core-support", routing: "direct-only", public: true });
 	});
+
+	it("normalizes typed dependency edges while preserving the flat compatibility projection", async () => {
+		const c = await makeHarness({
+			skillFm: FM({ dependency_edges: "" }).replace(
+			"dependency_edges: \n",
+			"dependency_edges:\n  - id: mk:peer\n    type: peer\n  - id: mk:required\n    type: requires\ndepends_on: [mk:required]\n",
+		),
+		});
+		const skill = buildInventory(c).entries.find((entry) => entry.type === "skill")!;
+		expect(skill.dependencyEdges).toEqual([
+			{ id: "mk:peer", type: "peer" },
+			{ id: "mk:required", type: "requires" },
+		]);
+		expect(skill.dependsOn).toEqual(["mk:required"]);
+	});
+
+	it("reports conflicting legacy and typed dependency aliases", async () => {
+		const c = await makeHarness({
+			skillFm: FM({ dependency_edges: "" }).replace(
+				"dependency_edges: \n",
+				"dependency_edges:\n  - id: mk:peer\n    type: peer\ndepends_on: [mk:peer]\n",
+			),
+		});
+		expect(buildInventory(c).issues.some((issue) => issue.problem.includes("depends_on must match"))).toBe(true);
+	});
+
+	it("reports an id declared with opposing edge types", async () => {
+		const c = await makeHarness({
+			skillFm: FM({ dependency_edges: "" }).replace(
+				"dependency_edges: \n",
+				"dependency_edges:\n  - id: mk:other\n    type: peer\n  - id: mk:other\n    type: requires\n",
+			),
+		});
+		expect(buildInventory(c).issues.some((issue) => issue.problem.includes("conflicting dependency_edges types"))).toBe(true);
+	});
 });
 
 describe("checkOwnership", () => {

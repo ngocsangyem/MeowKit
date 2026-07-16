@@ -24,24 +24,8 @@ const RULES = [
     note: 'Budget thresholds are $30 (warn) / $100 (block), not $10/$25',
     ignoreFiles: ['changelog.md'], // historical accuracy
   },
-  {
-    canonical: '77 skills',
-    wrong: [/\b75 skills?\b/gi, /\b76 skills?\b/gi, /\b78 skills?\b/gi],
-    note: 'Current count is 77 skills. Verify before changing.',
-    ignoreFiles: ['changelog.md'],
-  },
-  {
-    canonical: '17 agents',
-    wrong: [/\b16 agents?\b/gi, /\b18 agents?\b/gi, /\b19 agents?\b/gi],
-    note: 'Current count is 17 agents. Verify before changing.',
-    ignoreFiles: ['changelog.md'],
-  },
-  {
-    canonical: '21 commands',
-    wrong: [/\b20 commands?\b/gi, /\b22 commands?\b/gi],
-    note: 'Current count is 21 commands. Verify before changing.',
-    ignoreFiles: ['changelog.md'],
-  },
+  // Inventory-derived counts are checked by \`mewkit inventory --check\`; this
+  // terminology-only linter must not carry a second volatile count source.
   // Legacy: memory-loader was deleted in v2.4.1
   {
     canonical: 'on-demand memory (no loader)',

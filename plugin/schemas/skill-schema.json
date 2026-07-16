@@ -132,7 +132,23 @@
     "depends_on": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Optional (governance). Artifact IDs this skill depends on at runtime."
+      "description": "Optional legacy alias for flat required artifact IDs. New skills should use dependency_edges."
+    },
+    "dependency_edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "type": {
+            "type": "string",
+            "enum": ["requires", "peer", "optional_bridge", "redirect", "consumes_artifact", "human_handoff", "provider_adapter"]
+          }
+        }
+      },
+      "description": "Optional typed cross-artifact edges. requires and peer are active; the remaining enum values are reserved."
     },
     "requires_external_service": {
       "type": "array",

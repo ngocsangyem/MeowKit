@@ -192,7 +192,7 @@ Source of truth: `.claude/.env.example`. Most defaults live in `.claude/settings
 
 | Variable | Values | Effect |
 |----------|--------|--------|
-| `MEOWKIT_MEMORY_BUDGET` | chars (default `4000`, ~1K tokens) | Max memory injected by `memory-loader` per prompt |
+| `MEOWKIT_MEMORY_BUDGET` | chars (default `4000`, ~1K tokens) | Max on-demand memory context selected per prompt |
 | `MEOWKIT_MEMORY_STALENESS_MONTHS` | months (default `6`) | Skip memory entries older than N months |
 
 ### Hook controls

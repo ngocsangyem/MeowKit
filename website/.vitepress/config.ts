@@ -13,7 +13,7 @@ export default withMermaid(defineConfig({
     },
   },
   title: 'MeowKit',
-  description: 'AI agent toolkit for Claude Code — 74+ skills, 16 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
+  description: 'AI agent toolkit for Claude Code — 125 skills, 40 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
   lang: 'en-US',
   cleanUrls: true,
   sitemap: {
@@ -40,7 +40,7 @@ export default withMermaid(defineConfig({
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
       name: 'MeowKit',
-      description: 'AI agent toolkit for Claude Code with 74+ skills, 16 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
+      description: 'AI agent toolkit for Claude Code with 125 skills, 40 agents, structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.',
       applicationCategory: 'DeveloperApplication',
       operatingSystem: 'macOS, Linux, Windows',
       url: 'https://docs.meowkit.dev',
@@ -236,6 +236,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:cook', link: '/reference/skills/cook' },
             { text: 'mk:fix', link: '/reference/skills/fix' },
             { text: 'mk:ship', link: '/reference/skills/ship' },
+            { text: 'mk:ghpm', link: '/reference/skills/ghpm' },
             { text: 'mk:resolving-merge-conflicts', link: '/reference/skills/resolving-merge-conflicts' },
             { text: 'mk:verify', link: '/reference/skills/verify' },
             { text: 'mk:loop', link: '/reference/skills/loop' },
@@ -265,6 +266,7 @@ export default withMermaid(defineConfig({
           collapsed: true,
           items: [
             { text: 'mk:plan-creator', link: '/reference/skills/plan-creator' },
+            { text: 'mk:planning-engine', link: '/reference/skills/planning-engine' },
             { text: 'mk:validate-plan', link: '/reference/skills/validate-plan' },
             { text: 'mk:plan-ceo-review', link: '/reference/skills/plan-ceo-review' },
             { text: 'mk:office-hours', link: '/reference/skills/office-hours' },
@@ -292,6 +294,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:chom', link: '/reference/skills/chom' },
             { text: 'mk:henshin', link: '/reference/skills/henshin' },
             { text: 'mk:pack', link: '/reference/skills/pack' },
+            { text: 'mk:help', link: '/reference/skills/help' },
           ],
         },
         {
@@ -301,6 +304,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:qa-manual', link: '/reference/skills/qa-manual' },
             { text: 'mk:qa', link: '/reference/skills/qa' },
             { text: 'mk:agent-browser', link: '/reference/skills/agent-browser' },
+            { text: 'mk:chrome-profile', link: '/reference/skills/chrome-profile' },
             { text: 'mk:playwright-cli', link: '/reference/skills/playwright-cli' },
           ],
         },
@@ -339,6 +343,7 @@ export default withMermaid(defineConfig({
             { text: 'mk:mermaidjs-v11', link: '/reference/skills/mermaidjs-v11' },
             { text: 'mk:tech-graph', link: '/reference/skills/tech-graph' },
             { text: 'mk:markdown-reader', link: '/reference/skills/markdown-reader' },
+            { text: 'mk:html-video', link: '/reference/skills/html-video' },
             { text: 'mk:showcase', link: '/reference/skills/showcase' },
           ],
         },
@@ -364,6 +369,9 @@ export default withMermaid(defineConfig({
             { text: 'mk:worktree', link: '/reference/skills/worktree' },
             { text: 'mk:context-audit', link: '/reference/skills/context-audit' },
             { text: 'mk:context-engineering', link: '/reference/skills/context-engineering' },
+            { text: 'mk:project-context', link: '/reference/skills/project-context' },
+            { text: 'mk:task-queue', link: '/reference/skills/task-queue' },
+            { text: 'mk:team-config', link: '/reference/skills/team-config' },
           ],
         },
         {
@@ -450,8 +458,8 @@ export default withMermaid(defineConfig({
           text: 'Indexes',
           items: [
             { text: 'Rules Index', link: '/reference/rules-index' },
-            { text: 'Agents Index', link: '/reference/agents-index' },
-            { text: 'Skills Index', link: '/reference/skills-index' },
+            { text: 'Agents Index', link: '/reference/agents' },
+            { text: 'Skills Index', link: '/reference/skills' },
           ],
         },
         {

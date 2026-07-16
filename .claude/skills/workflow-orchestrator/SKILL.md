@@ -26,6 +26,19 @@ owner: lifecycle
 criticality: high
 status: active
 runtime: claude-code
+dependency_edges:
+  - id: mk:agent-detector
+    type: peer
+  - id: mk:cook
+    type: peer
+  - id: mk:fix
+    type: peer
+  - id: mk:plan-creator
+    type: peer
+  - id: mk:simplify
+    type: peer
+  - id: mk:verify
+    type: peer
 ---
 
 <!-- Split for progressive disclosure (checklist #11, #14): 463 → ~75 lines -->

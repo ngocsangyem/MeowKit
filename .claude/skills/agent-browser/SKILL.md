@@ -22,6 +22,11 @@ owner: utility
 criticality: medium
 status: active
 runtime: claude-code
+dependency_edges:
+  - id: mk:chrome-profile
+    type: peer
+  - id: mk:qa-manual
+    type: peer
 ---
 
 # agent-browser

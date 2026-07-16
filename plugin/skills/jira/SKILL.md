@@ -18,6 +18,49 @@ status: active
 runtime: claude-code
 requires_external_service: ["jira"]
 default_enabled: false
+dependency_edges:
+  - id: mk:confluence
+    type: peer
+  - id: mk:cook
+    type: peer
+  - id: mk:intake
+    type: peer
+  - id: mk:jira-admin
+    type: peer
+  - id: mk:jira-agile
+    type: peer
+  - id: mk:jira-analyst
+    type: peer
+  - id: mk:jira-bulk
+    type: peer
+  - id: mk:jira-collaborate
+    type: peer
+  - id: mk:jira-dev
+    type: peer
+  - id: mk:jira-estimator
+    type: peer
+  - id: mk:jira-evaluator
+    type: peer
+  - id: mk:jira-fields
+    type: peer
+  - id: mk:jira-issue
+    type: peer
+  - id: mk:jira-jsm
+    type: peer
+  - id: mk:jira-lifecycle
+    type: peer
+  - id: mk:jira-ops
+    type: peer
+  - id: mk:jira-relationships
+    type: peer
+  - id: mk:jira-search
+    type: peer
+  - id: mk:jira-time
+    type: peer
+  - id: mk:planning-engine
+    type: peer
+  - id: mk:ship
+    type: peer
 ---
 
 # mk:jira — Routing Skill

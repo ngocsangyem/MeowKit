@@ -26,7 +26,7 @@ The harness isolates different kinds of reasoning into discrete layers, so no si
 | L3: Cook | `/mk:cook` workflow | 7-phase pipeline: Orient → Plan → Test → Build → Review → Ship → Reflect |
 | L4: Native Tasks | `dispatch.cjs` + handlers | Build-verify, budget tracking, checkpoints, immediate capture |
 | L5: Teams | `/mk:scout`, `/mk:party` | Parallel agents with worktree isolation and a context firewall |
-| L6: Skills | 120+ skills | JIT activation — loaded only when the task domain matches |
+| L6: Skills | 125 skills | JIT activation — loaded only when the task domain matches |
 | L7: Base Shell | Claude Code | Context compaction, tool validation, subagent models |
 
 ## Rules: behavioral guardrails
@@ -63,7 +63,7 @@ Stop            → pre-completion-check (block without verification evidence) �
 
 ## Skills: domain expertise on demand
 
-120+ skills in `.claude/skills/` provide domain-specific knowledge. Each skill's `SKILL.md` is a compact decision router — typically under 150 lines. Detailed procedures live in `references/` and load only when needed. This progressive disclosure saves ~70% context per invocation.
+125 skills in `.claude/skills/` provide domain-specific knowledge. Each skill's `SKILL.md` is a compact decision router — typically under 150 lines. Detailed procedures live in `references/` and load only when needed. This progressive disclosure saves ~70% context per invocation.
 
 Skills activate by task domain, not all at once. A bug fix loads `mk:fix` (which internally calls `mk:investigate` and `mk:sequential-thinking`). A code review loads `mk:review`. A deployment loads `mk:ship`. No agent loads everything.
 

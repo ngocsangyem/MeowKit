@@ -128,6 +128,7 @@ Skills that can activate in any phase.
 | `mk:freeze` | Restrict edits to one directory during debugging |
 | `mk:multimodal` | Image/video/audio/PDF analysis via Gemini API |
 | `mk:agent-browser` | Chrome/CDP with session persistence and auth |
+| `mk:chrome-profile` | Connect browser automation to a named local Chrome profile |
 | `mk:web-to-markdown` | Convert web pages to markdown for context injection |
 | `mk:llms` | Generate llms.txt per llmstxt.org spec |
 | `mk:session-continuation` | Save/resume workflow state across sessions |
@@ -142,6 +143,8 @@ Skills that can activate in any phase.
 | `mk:qa` | Systematic QA with bug fixing and health scores |
 | `mk:qa-manual` | Spec-driven manual QA + Playwright E2E code generation |
 | `mk:playwright-cli` | Playwright MCP with code generation |
+| `mk:ghpm` | GitHub Issues, Projects v2, labels, milestones, and handoff summaries |
+| `mk:html-video` | Deterministically render local HTML animation into MP4 |
 
 ### External Integrations
 

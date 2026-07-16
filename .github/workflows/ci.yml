@@ -98,8 +98,14 @@ jobs:
       - name: Validate core context budget stays small
         run: node packages/mewkit/dist/index.js budget context --profile core --fail-over 131000
 
-      - name: Validate README/index counts (stale-index)
+      - name: Validate README, website, and index counts (stale-index)
         run: node packages/mewkit/dist/index.js inventory --check
+
+      - name: Verify high-traffic dependency metadata
+        run: node scripts/scan-skill-dependency-edges.mjs --check-high-traffic
+
+      - name: Lint website terminology
+        run: node scripts/terminology-linter.cjs
 
       - name: Validate skill frontmatter
         run: .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py

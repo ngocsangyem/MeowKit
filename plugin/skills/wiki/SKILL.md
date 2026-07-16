@@ -18,6 +18,9 @@ owner: lifecycle
 criticality: medium
 status: active
 runtime: portable
+dependency_edges:
+  - id: mk:cook
+    type: peer
 ---
 
 # mk:wiki

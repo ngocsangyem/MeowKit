@@ -1,0 +1,34 @@
+---
+title: "mk:chrome-profile"
+description: "Connect browser automation to a named local Google Chrome profile through CDP without guessing or replacing the user's session."
+---
+
+# mk:chrome-profile
+
+## What This Skill Does
+
+Targets a named local Chrome profile for browser automation through the Chrome DevTools Protocol.
+It preserves that profile's cookies, extensions, and existing logged-in sessions while connecting
+`mk:agent-browser` to a dedicated debug port.
+
+## When to Use
+
+- Automate a site with the user's selected Work or Personal Chrome profile.
+- Use a saved browser session rather than a clean automation profile.
+
+Do not use it for clean headless browsing; use `mk:agent-browser` directly instead.
+
+## Safety Contract
+
+The skill lists available profiles from Chrome's Local State data and proceeds only when the
+requested name has exactly one match. It never kills an existing Chrome process and stops on a
+debug-port conflict rather than guessing.
+
+## Workflow
+
+1. Discover and select one profile.
+2. Start Chrome with `--remote-debugging-port` when needed.
+3. Run `agent-browser connect <port>`.
+4. Continue normal browser automation with `mk:agent-browser`.
+
+See the canonical [`mk:chrome-profile` skill](https://github.com/ngocsangyem/MeowKit/tree/main/.claude/skills/chrome-profile) for platform commands and recovery details.

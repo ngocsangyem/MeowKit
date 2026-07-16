@@ -18,6 +18,27 @@ status: active
 runtime: claude-code
 requires_external_service: ["confluence"]
 default_enabled: false
+dependency_edges:
+  - id: mk:confluence-bulk
+    type: peer
+  - id: mk:confluence-collaborate
+    type: peer
+  - id: mk:confluence-page
+    type: peer
+  - id: mk:confluence-search
+    type: peer
+  - id: mk:confluence-spec-analyst
+    type: peer
+  - id: mk:cook
+    type: peer
+  - id: mk:intake
+    type: peer
+  - id: mk:jira
+    type: peer
+  - id: mk:jira-issue
+    type: peer
+  - id: mk:planning-engine
+    type: peer
 ---
 
 # mk:confluence — Routing Skill

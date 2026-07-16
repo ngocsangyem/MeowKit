@@ -15,7 +15,7 @@ Automatically invoked by `mk:agent-detector` during agent selection. Not user-in
 
 ### Agent Index (Summaries Only)
 
-The skill maintains a compact index of all 15 agents:
+The skill maintains a compact index of all 40 agents:
 
 | Agent | Category | Specialty | Signal Keywords |
 |-------|----------|-----------|-----------------|

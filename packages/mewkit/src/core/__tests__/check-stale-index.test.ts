@@ -49,6 +49,15 @@ async function makeRepo(readme: string, skillsIndex: string, agentsIndex: string
 		}),
 	);
 	await writeFile(join(root, "README.md"), readme);
+	await mkdir(join(root, "website", ".vitepress"), { recursive: true });
+	await writeFile(join(root, "website", ".vitepress", "config.ts"), "const description = '1 skills, 1 agents';\nconst jsonLd = '1 skills, 1 agents';\n");
+	await mkdir(join(root, "website", "workflows"), { recursive: true });
+	await writeFile(join(root, "website", "workflows", "new-project.md"), "1 agents, 1 skills\n");
+	await mkdir(join(root, "website", "reference", "skills"), { recursive: true });
+	await writeFile(join(root, "website", "reference", "rules-index.md"), "all 1 agents\n");
+	await writeFile(join(root, "website", "reference", "skills", "lazy-agent-loader.md"), "all 1 agents\n");
+	await mkdir(join(root, "website", "core-concepts"), { recursive: true });
+	await writeFile(join(root, "website", "core-concepts", "how-it-works.md"), "1 skills\n");
 	await mkdir(join(c, "agents"), { recursive: true });
 	await writeFile(join(c, "agents", "SKILLS_INDEX.md"), skillsIndex);
 	await writeFile(join(c, "agents", "AGENTS_INDEX.md"), agentsIndex);
@@ -73,6 +82,18 @@ describe("checkStaleIndex", () => {
 		const root = await makeRepo("9 skills · 1 agents · 1 commands · 1 rules · 1 hook scripts\n", SKILLS_OK, AGENTS_OK, HOOKS_OK);
 		const results = checkStaleIndex(root);
 		expect(results.some((r) => r.status === "fail" && r.detail.includes("declared 9, found 1"))).toBe(true);
+	});
+
+	it("FAILS when a website count drifts from the inventory", async () => {
+		const root = await makeRepo(README_OK, SKILLS_OK, AGENTS_OK, HOOKS_OK);
+		await writeFile(join(root, "website", ".vitepress", "config.ts"), "const description = '9 skills, 1 agents';\nconst jsonLd = '1 skills, 1 agents';\n");
+		expect(compareCounts(root).some((d) => d.source.includes("website/.vitepress") && d.declared === 9 && d.actual === 1)).toBe(true);
+	});
+
+	it("FAILS when a workflow page count drifts from the inventory", async () => {
+		const root = await makeRepo(README_OK, SKILLS_OK, AGENTS_OK, HOOKS_OK);
+		await writeFile(join(root, "website", "workflows", "new-project.md"), "1 agents, 9 skills\n");
+		expect(compareCounts(root).some((d) => d.source.includes("workflows/new-project") && d.declared === 9 && d.actual === 1)).toBe(true);
 	});
 
 	it("FAILS on completeness (an agent id is missing from AGENTS_INDEX)", async () => {

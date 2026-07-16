@@ -17,6 +17,23 @@ owner: lifecycle
 criticality: high
 status: active
 runtime: claude-code
+dependency_edges:
+  - id: mk:brainstorming
+    type: peer
+  - id: mk:cook
+    type: peer
+  - id: mk:docs-finder
+    type: peer
+  - id: mk:investigate
+    type: peer
+  - id: mk:memory
+    type: peer
+  - id: mk:plan-creator
+    type: peer
+  - id: mk:scout
+    type: peer
+  - id: mk:sequential-thinking
+    type: peer
 ---
 
 # Fixing

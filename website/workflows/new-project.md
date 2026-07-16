@@ -32,7 +32,7 @@ npx mewkit init
 
 The CLI auto-detects your tech stack and asks configuration questions (project name, stack, team size, mode, memory, optional Gemini API key). Takes ~30 seconds.
 
-**What gets created:** A `.claude/` directory with 13 agents, 42 skills, lifecycle hooks, security rules, and a memory system. Plus `CLAUDE.md` (the entry point Claude reads at session start).
+**What gets created:** A `.claude/` directory with 40 agents, 125 skills, lifecycle hooks, security rules, and a memory system. Plus `CLAUDE.md` (the entry point Claude reads at session start).
 
 ### Step 2: Verify installation
 
