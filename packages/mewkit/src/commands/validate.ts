@@ -7,6 +7,7 @@ import { isHookScript } from "../core/is-hook-script.js";
 import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
 import { checkGateAuthority, checkCommandDrift } from "../core/check-gate-authority.js";
 import { assertOperationsNotInvocable } from "../core/provider-operations.js";
+import { findOperationConformance, isBlockingGap, summarizeOperationConformance } from "../core/check-operation-conformance.js";
 import { findPseudoCapabilities } from "../core/check-pseudo-capabilities.js";
 import { findGenericCoreTokens, summarizeGenericCoreTokens } from "../core/check-generic-core-tokens.js";
 import { checkStaleIndex } from "../core/check-stale-index.js";
@@ -274,6 +275,28 @@ function checkOperationConformance(meowkitDir: string): CheckResult[] {
 			pseudo.length === 0
 				? "0 unsubstituted operation placeholders in prose"
 				: pseudo.map((f) => `${f.file}:${f.line} "${f.found}"`).join("\n         "),
+		section: "Portability",
+	});
+
+	// Every operation an installed skill references (via its declared host tools) must
+	// resolve on each advertised provider. Disclosed local-fallbacks are fine; an
+	// `unsupported`/`unknown` combo is a real cross-harness gap and must be surfaced,
+	// not silently advertised.
+	const conformance = findOperationConformance(meowkitDir);
+	const blocking = conformance.filter(isBlockingGap);
+	const example = blocking
+		.slice(0, 5)
+		.map((f) => `${f.skill}: ${f.operation} is ${f.support} on ${f.provider}`)
+		.join("\n         ");
+	results.push({
+		name: "Installed-skill operations resolve on every advertised provider",
+		status: blocking.length === 0 ? "pass" : "warn",
+		detail:
+			conformance.length === 0
+				? "every operation referenced by an installed skill is supported on all advertised providers"
+				: `${conformance.length} non-supported combo(s) [${summarizeOperationConformance(conformance)}]; ` +
+					`${blocking.length} are unsupported/unknown (rest are disclosed local-fallbacks)` +
+					(blocking.length > 0 ? `:\n         ${example}` : ""),
 		section: "Portability",
 	});
 
