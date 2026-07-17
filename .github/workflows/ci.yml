@@ -105,6 +105,9 @@ jobs:
       - name: Story-sizer deterministic tests
         run: bash tests/story-sizer-all.test.sh
 
+      - name: Routing eval (Track D, EN + VI)
+        run: .claude/skills/.venv/bin/python3 .claude/skills/scale-routing/eval/run-routing-eval.py
+
       - name: Validate skill cross-refs
         run: bash scripts/check-skill-cross-refs.sh
 
