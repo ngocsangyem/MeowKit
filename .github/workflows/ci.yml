@@ -111,6 +111,9 @@ jobs:
       - name: Critical-skill contract coverage suites
         run: bash tests/skill-contract-coverage.test.sh
 
+      - name: Real-world journey specs frozen + valid
+        run: .claude/skills/.venv/bin/python3 tests/journey-validation/check-journey-specs.py
+
       - name: Validate skill cross-refs
         run: bash scripts/check-skill-cross-refs.sh
 
