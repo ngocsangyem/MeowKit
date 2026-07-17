@@ -108,6 +108,9 @@ jobs:
       - name: Routing eval (Track D, EN + VI)
         run: .claude/skills/.venv/bin/python3 .claude/skills/scale-routing/eval/run-routing-eval.py
 
+      - name: Critical-skill contract coverage suites
+        run: bash tests/skill-contract-coverage.test.sh
+
       - name: Validate skill cross-refs
         run: bash scripts/check-skill-cross-refs.sh
 
