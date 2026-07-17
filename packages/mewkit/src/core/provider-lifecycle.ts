@@ -26,22 +26,35 @@ export interface LifecycleSupport {
 	status: LifecycleStatus;
 	/** True ONLY where a runtime hook can deny/block (proven). Observe-only or version-gated ⇒ false. */
 	gate: boolean;
-	/** In-repo basis for the claim — what proves the status/gate. */
+	/** In-repo basis for the claim — what proves the status/gate. Capability citations live HERE, never in `proof`. */
 	evidence: string;
+	/**
+	 * Repo-relative path (optionally `path#marker`) to the in-repo artifact that DEMONSTRATES the
+	 * deny/block emission. REQUIRED whenever `gate === true` — `assertGateProofs()` (and its test)
+	 * fail closed if a gate lacks a proof whose file exists. A gate without a proof file is exactly
+	 * the over-claim this field exists to prevent: it keeps "documented capability" (evidence prose)
+	 * from ever passing as "proven enforcement" (a real artifact on disk).
+	 */
+	proof?: string;
 }
 
 export type LifecycleMap = Record<LifecycleEvent, LifecycleSupport>;
 
 /** Claude Code: all 9 events are registered hooks in the shipped `.claude/settings.json`
  * (SessionStart, PreToolUse, PostToolUse, PostToolUseFailure, UserPromptSubmit, Stop, PreCompact,
- * SubagentStart, SubagentStop). Deny/block is real on PreToolUse, UserPromptSubmit, and Stop. */
+ * SubagentStart, SubagentStop). Deny/block is PROVEN in-repo on PreToolUse (exit-2 integration
+ * tests) and Stop (pre-completion-check security-BLOCK path + its shell test). UserPromptSubmit is
+ * a documented HOST capability, but no shipped hook blocks there (the UserPromptSubmit handlers are
+ * inject/capture only, `.claude/hooks/handlers.json`) — so `prompt_submitted` is `gate: false`: no
+ * in-repo proof. Promotion path: add a blocking UserPromptSubmit handler + conformance test, then
+ * flip `gate: true` with a `proof`. */
 const CLAUDE_CODE_LIFECYCLE: LifecycleMap = {
 	session_start: { status: "supported", gate: false, evidence: "SessionStart hook in shipped settings.json (observe/inject)" },
-	pre_tool: { status: "supported", gate: true, evidence: "PreToolUse hook denies a tool call via exit 2 / permissionDecision:deny" },
+	pre_tool: { status: "supported", gate: true, evidence: "PreToolUse hook denies a tool call via exit 2 / permissionDecision:deny", proof: "src/__tests__/hooks/gate-enforcement.integration.test.ts" },
 	post_tool: { status: "supported", gate: false, evidence: "PostToolUse hook in shipped settings.json (observe)" },
 	tool_failure: { status: "supported", gate: false, evidence: "PostToolUseFailure hook in shipped settings.json (observe)" },
-	prompt_submitted: { status: "supported", gate: true, evidence: "UserPromptSubmit hook can block/annotate the prompt" },
-	stop: { status: "supported", gate: true, evidence: "Stop hook can block the stop (exit 2)" },
+	prompt_submitted: { status: "supported", gate: false, evidence: "UserPromptSubmit block is a documented host capability, but no shipped hook blocks there (handlers are inject/capture only) — no in-repo proof" },
+	stop: { status: "supported", gate: true, evidence: "Stop hook can block the stop (pre-completion-check security-BLOCK, exit 2)", proof: ".claude/hooks/__tests__/test-pre-completion-check.sh" },
 	pre_compaction: { status: "supported", gate: false, evidence: "PreCompact hook in shipped settings.json (observe)" },
 	subagent_start: { status: "supported", gate: false, evidence: "SubagentStart hook in shipped settings.json (observe)" },
 	subagent_stop: { status: "supported", gate: false, evidence: "SubagentStop hook in shipped settings.json (observe)" },
@@ -127,4 +140,34 @@ export function enforcementGaps(provider: string): EnforcementGap[] {
 					? `${e} support unproven for this provider — enforcement cannot be assumed`
 					: `${e} fires but cannot guarantee a block (${map[e].evidence})`,
 	}));
+}
+
+/** A `gate: true` claim that lacks a `proof` artifact reference — the over-claim shape. */
+export interface GateProofViolation {
+	provider: string;
+	event: LifecycleEvent;
+	reason: string;
+}
+
+/**
+ * The enforced-without-proof invariant: every `gate: true` lifecycle entry MUST declare a `proof`
+ * (a repo-relative artifact path). Returns a violation per gate lacking one. This is the in-module
+ * half of the check — it proves a proof is DECLARED; the accompanying test proves the referenced
+ * file EXISTS and cites a real deny/block artifact (it holds the repo root). Together they keep a
+ * "documented capability" from ever masquerading as "proven enforcement".
+ */
+export function gateProofViolationsInMap(provider: string, map: LifecycleMap): GateProofViolation[] {
+	const out: GateProofViolation[] = [];
+	for (const event of LIFECYCLE_EVENTS) {
+		if (!map[event].gate) continue;
+		const proof = map[event].proof;
+		if (proof === undefined || proof.trim().length === 0) {
+			out.push({ provider, event, reason: `gate:true without a proof artifact — declare proof or set gate:false` });
+		}
+	}
+	return out;
+}
+
+export function gateProofViolations(providers: readonly string[]): GateProofViolation[] {
+	return providers.flatMap((provider) => gateProofViolationsInMap(provider, getLifecycleMap(provider)));
 }

@@ -79,6 +79,12 @@ function printProviderMatrix(matrix: ProviderSupportMatrix): void {
 function printProviderDetail(provider: ProviderSupportInfo): void {
 	console.log(pc.bold(pc.cyan(`${provider.displayName} (${provider.id})`)));
 	console.log(`  ${pc.dim("Support level:")} ${formatLevel(provider.supportLevel)}`);
+	// The adapter's capability headline — the SAME value `--lifecycle` prints, so the two views can
+	// never state contradictory support (Phase 1 truth unification). Shown only where an adapter
+	// projection exists; migration-only providers have no capability claim to make.
+	if (provider.capabilityStatus !== null) {
+		console.log(`  ${pc.dim("Capability:")} ${formatCapabilityStatus(provider.capabilityStatus)} ${pc.dim("(adapter truth — see `--lifecycle`)")}`);
+	}
 	if (provider.supportReason !== null && provider.supportReason.length > 0) {
 		console.log(`  ${pc.dim("Reason:")} ${provider.supportReason}`);
 	}
@@ -117,6 +123,12 @@ function formatLevel(level: ProviderSupportInfo["supportLevel"]): string {
 	if (level === "verified") return pc.green(level);
 	if (level === "experimental") return pc.yellow(level);
 	return pc.red(level);
+}
+
+function formatCapabilityStatus(status: NonNullable<ProviderSupportInfo["capabilityStatus"]>): string {
+	if (status === "supported") return pc.green(status);
+	if (status === "partial" || status === "experimental") return pc.yellow(status);
+	return pc.red(status);
 }
 
 function formatSurfaceList(surfaces: string[]): string {

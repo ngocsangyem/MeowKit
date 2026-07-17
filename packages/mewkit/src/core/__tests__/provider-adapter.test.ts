@@ -30,10 +30,28 @@ describe("describeProvider", () => {
 		expect(v.invocation["invoke-skill"].support).toBe("advisory");
 	});
 
-	it("claude-code composes to zero enforcement gaps + typed invocation shapes", () => {
+	it("claude-code composes to one enforcement gap (prompt_submitted) + typed invocation shapes", () => {
 		const v = describeProvider("claude-code");
-		expect(v.enforcementGaps).toEqual([]);
+		expect(v.enforcementGaps.map((g) => g.event)).toEqual(["prompt_submitted"]);
 		expect(v.invocation["invoke-skill"].support).toBe("supported");
+	});
+
+	it("summary is the single capability headline: claude-code enforced/supported, codex advisory/partial", () => {
+		const cc = describeProvider("claude-code").summary;
+		expect(cc.supportState).toBe("supported");
+		expect(cc.gatesProven).toBe(true);
+		expect(cc.enforcement).toEqual({ gate1: "enforced", gate2: "enforced", secretProtection: "enforced" });
+
+		const cx = describeProvider("codex").summary;
+		expect(cx.supportState).toBe("partial");
+		expect(cx.gatesProven).toBe(false);
+		expect(cx.enforcement).toEqual({ gate1: "advisory", gate2: "advisory", secretProtection: "advisory" });
+	});
+
+	it("a report-only provider summarizes to unsupported enforcement (claims nothing)", () => {
+		const s = describeProvider("some-future-runtime").summary;
+		expect(s.supportState).toBe("unsupported");
+		expect(s.enforcement).toEqual({ gate1: "unsupported", gate2: "unsupported", secretProtection: "unsupported" });
 	});
 
 	it("an unknown provider composes to report-only everywhere (claims nothing)", () => {

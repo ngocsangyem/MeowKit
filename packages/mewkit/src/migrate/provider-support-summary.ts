@@ -3,6 +3,8 @@ import { ProviderType as ProviderTypeSchema } from "./types.js";
 import type { ProviderConfig, ProviderSupportLevel } from "./providers/provider-config-types.js";
 import type { ProviderSupportStatus } from "./providers/contract-types.js";
 import { buildProviders, manifestRegistry, type ProviderManifest } from "./providers/index.js";
+import { providerSummary, type SurfaceEnforcement, type ProviderSupportState } from "../core/provider-adapter.js";
+import { isProjectedProvider } from "../core/provider-projection.js";
 
 export type ProviderHarnessRole =
 	| "full-harness"
@@ -13,7 +15,9 @@ export type ProviderHarnessRole =
 	| "disabled"
 	| "deprecated";
 
-export type EnforcementLevel = "hard" | "candidate" | "advisory" | "unsupported";
+/** Re-export the unified enforcement vocabulary so legacy import sites keep resolving. The support
+ * summary no longer owns an enforcement enum — it derives from the adapter (Phase 1 truth model). */
+export type EnforcementLevel = SurfaceEnforcement;
 
 interface SurfaceField {
 	surface: PortableType;
@@ -59,6 +63,10 @@ export interface ProviderSupportInfo {
 	disabledSurfaces: string[];
 	role: ProviderHarnessRole;
 	enforcement: ProviderEnforcementSummary;
+	/** Capability headline from the adapter truth model — present ONLY for providers with an
+	 * authored adapter projection (claude-code, codex, …); `null` for migration-only providers that
+	 * the adapter treats as report-only. Both CLI views render this so they cannot disagree. */
+	capabilityStatus: ProviderSupportState | null;
 	docs: string[];
 	surfaces: ProviderSurfaceSupport[];
 }
@@ -104,7 +112,9 @@ export function collectProviderSupportMatrix(manifests: ProviderManifest[] = man
 		});
 		const effectiveSurfaces = surfaces.filter((surface) => surface.enabled).map((surface) => surface.label);
 		const disabledSurfaces = surfaces.filter((surface) => !surface.enabled).map((surface) => surface.label);
-		const role = classifyProviderRole(supportLevel, effectiveSurfaces);
+		const enforcement = summarizeEnforcement(id, effectiveSurfaces);
+		const capabilityStatus = isProjectedProvider(id) ? providerSummary(id).supportState : null;
+		const role = classifyProviderRole(supportLevel, effectiveSurfaces, enforcement.gate1 === "enforced");
 		infos.push({
 			id,
 			displayName: config.displayName,
@@ -114,7 +124,8 @@ export function collectProviderSupportMatrix(manifests: ProviderManifest[] = man
 			effectiveSurfaces,
 			disabledSurfaces,
 			role,
-			enforcement: summarizeEnforcement(supportLevel, effectiveSurfaces),
+			enforcement,
+			capabilityStatus,
 			docs: manifest.contract.docs,
 			surfaces,
 		});
@@ -136,23 +147,37 @@ export function findProviderSupportInfo(id: string, matrix = collectProviderSupp
 	return matrix.providers.find((provider) => provider.id === id) ?? null;
 }
 
-function classifyProviderRole(supportLevel: ProviderSupportLevel, effectiveSurfaces: string[]): ProviderHarnessRole {
+/**
+ * A provider is `full-harness` ONLY when it exposes every surface AND the adapter proves it can
+ * actually enforce (`enforces`). Having a hooks surface configured is NOT enough — that is exactly
+ * the codex over-claim MK-P0-01 fixed: codex migrates every surface but cannot prove a gate, so it
+ * is a hard-gate CANDIDATE, not a full harness.
+ */
+function classifyProviderRole(
+	supportLevel: ProviderSupportLevel,
+	effectiveSurfaces: string[],
+	enforces: boolean,
+): ProviderHarnessRole {
 	if (supportLevel === "deprecated") return "deprecated";
 	if (effectiveSurfaces.length === 0) return "disabled";
-	if (hasEverySurface(effectiveSurfaces)) return "full-harness";
+	if (hasEverySurface(effectiveSurfaces) && enforces) return "full-harness";
 	if (effectiveSurfaces.includes("hooks")) return "hard-gate-candidate";
 	if (effectiveSurfaces.includes("commands") || effectiveSurfaces.includes("skills")) return "procedure";
 	if (effectiveSurfaces.includes("rules") || effectiveSurfaces.includes("agents")) return "policy-advisory";
 	return "config-only";
 }
 
-function summarizeEnforcement(
-	supportLevel: ProviderSupportLevel,
-	effectiveSurfaces: string[],
-): ProviderEnforcementSummary {
-	if (effectiveSurfaces.includes("hooks")) {
-		const level: EnforcementLevel = supportLevel === "experimental" ? "candidate" : "hard";
-		return { gate1: level, gate2: level, secretProtection: level };
+/**
+ * Enforcement is sourced from ONE truth model. For a provider with an authored adapter projection
+ * (claude-code, codex) the adapter's proven-gate derivation is authoritative — no surface heuristic
+ * may re-decide it. For migration-only providers (no adapter) the surface shape is the honest signal:
+ * a rules/config surface advises (prompt-level), everything else is unsupported. The only providers
+ * with a hooks surface are adapter-projected, so a hooks surface never reaches the heuristic branch
+ * to claim enforcement it cannot prove.
+ */
+function summarizeEnforcement(id: ProviderType, effectiveSurfaces: string[]): ProviderEnforcementSummary {
+	if (isProjectedProvider(id)) {
+		return providerSummary(id).enforcement;
 	}
 	if (effectiveSurfaces.includes("rules") || effectiveSurfaces.includes("config")) {
 		return { gate1: "advisory", gate2: "advisory", secretProtection: "advisory" };

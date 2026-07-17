@@ -38,9 +38,11 @@ npx mewkit init
 
 The CLI fetches the latest release from GitHub, prompts for config, and scaffolds `.claude/` into your project. Skills resolve as `/mk:*`, agents as `mk:*`.
 
-### Native plugin (recommended — Claude Code & Codex)
+### Native plugin (recommended on Claude Code; experimental on Codex)
 
 Installs the `mk` plugin from the MeowKit marketplace. Skills (`/mk:*`), agents (`mk:*`), and hooks all resolve under the plugin; nothing is copied into your project.
+
+> **Codex support is an experimental projection.** MeowKit is fully enforced on Claude Code (real hooks gate behavior); on Codex the capability projection is advisory — hook enforcement is version-gated and not statically guaranteed, so gates deter but do not block. Run `mewkit providers codex --lifecycle` to see exactly what is enforced vs advisory. Full semantic parity is a staged, measured track.
 
 ```bash
 # Claude Code
