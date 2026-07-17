@@ -14,6 +14,32 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.14.0 (2026-07-17) — Provider Conformance, Contract Safety & Evals
+
+The `mewkit` CLI ships alongside this kit as **1.18.0** (see `CLI` below).
+
+### Highlights
+
+This release hardens skill contracts and provider portability. Generic skill bodies are cleaned of provider-specific tool names and model IDs so they stay honest per harness, `mewkit validate` now reports operation-level conformance, and the `cook` workflow stops after reporting — shipping and reflection are explicit, user-invoked steps rather than automatic.
+
+### CLI
+
+- `mewkit validate` now reports operation-level conformance — it flags a logical operation an installed skill relies on (via its declared tools) that an advertised provider cannot honor, so a cross-harness payload never silently advertises an unsupported capability.
+- Skill metadata now carries typed dependency edges, surfaced through the generated inventory.
+
+### Improvements
+
+- `cook` stops after reporting — shipping and reflection are explicit, user-invoked steps, so a run makes no unrequested commit or push.
+- Canonical workflow definitions and stricter execution gates across skills, with contract repairs that remove duplicated or conflicting phase ownership.
+- Generic skill bodies no longer carry provider tool names, model IDs, or brand tokens; skills genuinely tied to one harness are annotated honestly instead of claiming portability.
+- The quick workflow is formalized with a tighter context budget for low-complexity tasks.
+- `plan-creator` is slimmed — visual rendering and lifecycle tasks moved into dedicated skills.
+- `scale-routing` gains a bilingual English + Vietnamese routing eval covering the common task clusters.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the new skill contracts and the CLI — a `cook` run that previously auto-shipped now stops after reporting, so invoke shipping explicitly.
+
 ## 2.13.7 (2026-07-15) — Gate Contract Safety, Portability, DX
 
 The `mewkit` CLI ships separately as **1.17.0** (see `CLI` below); the two
@@ -31,20 +57,20 @@ printing "BLOCKED" and proceeding.
 
 ### New Skills
 
-| Skill        | Purpose                                                                                                                                                                                                                                                          |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mk:advise`  | Turn a raw idea into ONE honest recommendation: interviews one question at a time until the problem, requirements, goals, non-goals, and constraints are confirmed, then delivers a single verdict with trade-offs, an ordered checklist, and success metrics. Fenced against `mk:grill` (interrogation, no verdict), `mk:brainstorming` (options for a settled framing), `mk:office-hours` (is it worth building), and `mk:party` (multi-perspective debate). |
+| Skill       | Purpose                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mk:advise` | Turn a raw idea into ONE honest recommendation: interviews one question at a time until the problem, requirements, goals, non-goals, and constraints are confirmed, then delivers a single verdict with trade-offs, an ordered checklist, and success metrics. Fenced against `mk:grill` (interrogation, no verdict), `mk:brainstorming` (options for a settled framing), `mk:office-hours` (is it worth building), and `mk:party` (multi-perspective debate). |
 
 ### New Agents
 
-| Agent     | Purpose                                                                                                                                                                                                            |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Agent     | Purpose                                                                                                                                                                                                                                                    |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `advisor` | Isolated advisory executor behind `mk:advise`. Respawns per turn against a session checkpoint (the harness has no subagent pause/resume), and may write only its transcript plus one optional advice report — never a plan, ADR, verdict, or memory entry. |
 
 ### New Commands
 
-| Command      | Purpose                                                              |
-| ------------ | -------------------------------------------------------------------- |
+| Command      | Purpose                                                                 |
+| ------------ | ----------------------------------------------------------------------- |
 | `/mk:advise` | Thin dispatcher for `mk:advise` — usage, flags, and one authority note. |
 
 ### CLI
@@ -64,7 +90,7 @@ mewkit plan check  tasks/plans/260715-my-plan/phase-02-thing.md
 
 ### Features
 
-- **Gate Authority Invariant** (`gate-rules.md`) — automation executes *between* gates and never supplies the authority *of* one. Verdicts, scores, and validator exit codes are evidence presented at a gate, never a substitute for it. Holds in every mode, including `--auto` and `--fast`.
+- **Gate Authority Invariant** (`gate-rules.md`) — automation executes _between_ gates and never supplies the authority _of_ one. Verdicts, scores, and validator exit codes are evidence presented at a gate, never a substitute for it. Holds in every mode, including `--auto` and `--fast`.
 - **Structural Gate 2 at the ship boundary** (`hooks/lib/gate2-check.sh`) — on `git commit` / `push` / `merge`, resolves the active plan's verdict and blocks with `exit 2` when a ship-capable change has none. Profile-immune: it runs above the fast-profile early-exit, because Gate 2 has no exceptions. Docs/report-only changes take an explicit **N/A** path rather than a silent skip.
 - **Logical workflow operations** (`ask_user`, `manage_plan`, `run_shell`, `delegate_agent`) with per-provider conformance in `mewkit providers <p> --lifecycle`. Kept deliberately out of the frontmatter-reachable invocation enum — that enum's value is what it excludes — and a build-time check fails if the two sets ever intersect.
 - **Fable 5 advisory model profile** — `model: fable` resolves to the verified `claude-fable-5` on Claude Code, and on other providers falls back to the configured heavy tier with a **disclosed** warning naming both models. Tier-orthogonal: the `ModelTier` union is unchanged.
@@ -184,8 +210,8 @@ A new `mk:context-engineering` skill gives the agent a runtime front door for co
 
 ### New Skills
 
-| Skill                    | Purpose                                                                                                                                                                                                                                                                                             |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skill                    | Purpose                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:context-engineering` | Runtime router for context decisions — read-more / stop / ask / assume / delegate, pick a minimal read-set, and time compaction. Front page is Write / Select / Compress / Isolate; a lazy pattern index routes to 25 patterns, one reference per decision. Complements `mk:context-audit` (which owns the structural `.claude/` overhead question) with the runtime-decision half. |
 
 ### Improvements
@@ -205,7 +231,7 @@ A new `mk:research` skill gives you a standalone front door for deep, multi-sour
 ### New Skills
 
 | Skill         | Purpose                                                                                                                                                           |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mk:research` | Deep multi-source technical research — delegates to a researcher subagent under primary-source discipline and a retrieval-call cap, and returns one cited report. |
 
 ### Features
