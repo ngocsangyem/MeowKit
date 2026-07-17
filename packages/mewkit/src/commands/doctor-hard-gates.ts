@@ -77,21 +77,36 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 		project.clearPlans();
 		results.push(expectHardBlock("Gate 1: blocks source write with no plan", runWrite(), "@@GATE_BLOCK@@"));
 
-		// Probe 2 — source write AFTER a plan must be allowed.
-		project.addPlan({ nested: true });
-		const afterPlan = runWrite();
+		// Probe 2 — a plan WITHOUT an approval receipt must still hard-block (default-on
+		// receipt gate). A plan alone no longer opens Gate 1.
+		const planPath = project.addPlan({ nested: true });
 		results.push(
-			afterPlan && afterPlan.status === 0
-				? { name: "Gate 1: allows source write once a plan exists", status: "pass", detail: "Allowed (exit 0)." }
-				: {
-						name: "Gate 1: allows source write once a plan exists",
-						status: "fail",
-						detail: `Expected allow (exit 0) but got exit ${afterPlan?.status}.`,
-						fix: "Check the plan allow-list logic in gate-enforcement.sh.",
-					},
+			expectHardBlock("Gate 1: blocks source write when the plan is not approved", runWrite(), "@@GATE_BLOCK@@"),
 		);
 
-		// Probe 3 — post-signed-contract gate. The sprint-contract validator is not part of
+		// Probe 3 — after the approval receipt is stamped, the source write is allowed.
+		const stamped = project.approvePlan(planPath);
+		if (!stamped) {
+			results.push({
+				name: "Gate 1: allows source write once the plan is approved",
+				status: "warn",
+				detail: "Could not stamp the approval receipt in the sandbox (approval-receipt.sh absent?).",
+			});
+		} else {
+			const afterApprove = runWrite();
+			results.push(
+				afterApprove && afterApprove.status === 0
+					? { name: "Gate 1: allows source write once the plan is approved", status: "pass", detail: "Allowed (exit 0) after receipt." }
+					: {
+							name: "Gate 1: allows source write once the plan is approved",
+							status: "fail",
+							detail: `Expected allow (exit 0) after approval but got exit ${afterApprove?.status}.`,
+							fix: "Check the approval-receipt verify path in gate-enforcement.sh.",
+						},
+			);
+		}
+
+		// Probe 4 — post-signed-contract gate. The sprint-contract validator is not part of
 		// the hooks-only probe sandbox, so the contract gate is inert here. Report honestly as
 		// not-verified rather than faking a pass.
 		results.push({
@@ -100,7 +115,7 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 			detail: "Not verified — contract validator (.claude/skills/sprint-contract) is outside the hook probe sandbox.",
 		});
 
-		// Probe 4 — .env read must hard-block.
+		// Probe 5 — .env read must hard-block.
 		project.addEnvFile();
 		const envRead = findScript(
 			runConfiguredHook(settings, {
@@ -115,7 +130,7 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 		);
 		results.push(expectHardBlock("Privacy: blocks .env read", envRead, "@@PRIVACY_BLOCK@@"));
 
-		// Probe 5 — prompt-injection Bash must block (stdout marker, exit 1 — advisory by design).
+		// Probe 6 — prompt-injection Bash must block (stdout marker, exit 1 — advisory by design).
 		const injection = findScript(
 			runConfiguredHook(settings, {
 				projectDir: project.dir,
@@ -138,7 +153,7 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 					},
 		);
 
-		// Probe 6 — a normal Bash command must pass.
+		// Probe 7 — a normal Bash command must pass.
 		const normalBash = findScript(
 			runConfiguredHook(settings, {
 				projectDir: project.dir,
@@ -161,7 +176,7 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 					},
 		);
 
-		// Probe 7 — every configured shell hook runs without a shell-interpreter error.
+		// Probe 8 — every configured shell hook runs without a shell-interpreter error.
 		const events: Array<{ event: string; tool?: string; toolInput?: Record<string, unknown> }> = [
 			{ event: "SessionStart" },
 			{ event: "PreToolUse", tool: "Write", toolInput: { file_path: "src/app.ts" } },

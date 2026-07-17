@@ -1,6 +1,14 @@
 #!/bin/sh
-# post-write.sh — Security scan on every written file.
+# post-write.sh — DETECT-AFTER-WRITE security scan on every written file.
 # Usage: post-write.sh <file-path>
+#
+# This is a PostToolUse hook: it runs AFTER the write has already happened, so it
+# DETECTS a bad pattern — it does not and cannot PREVENT the write (the bytes are
+# already on disk). A finding's "BLOCK" severity classifies the pattern, not the
+# outcome: exit 2 fails the tool RESULT and feeds the finding back to the model to
+# fix, but the file was written. Preventing a write is the PreToolUse gates' job
+# (gate-enforcement.sh / privacy-block.sh), not this scan's. Quarantining a
+# detected-bad write is out of scope; this hook reports honestly and exits 2.
 
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi

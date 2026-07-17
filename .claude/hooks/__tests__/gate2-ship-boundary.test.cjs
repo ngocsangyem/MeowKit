@@ -30,7 +30,7 @@ const CHECK = path.join(PROJECT_ROOT, '.claude/hooks/lib/gate2-check.sh');
  * `committed`  → part of the baseline commit (already tracked).
  * `unstaged`   → written but not staged, for the `git commit -a`/`-am` path.
  */
-function makeRepo({ files = {}, activePlan, verdicts = {}, committed = {}, unstaged = {} } = {}) {
+function makeRepo({ files = {}, activePlan, verdicts = {}, committed = {}, unstaged = {}, bindRevision = false } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'gate2-'));
   const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'pipe' });
 
@@ -57,8 +57,15 @@ function makeRepo({ files = {}, activePlan, verdicts = {}, committed = {}, unsta
   if (activePlan !== undefined) {
     write(dir, 'session-state/active-plan.json', JSON.stringify({ path: activePlan }));
   }
+  // The Gate 2 revision binding requires the verdict to name current HEAD. Bind it
+  // here so a "passing" fixture actually reaches (and passes) that check; tests that
+  // exercise the binding itself pass bindRevision:false and assert the block.
+  const head = git('rev-parse', '--short', 'HEAD').toString().trim();
   for (const [name, body] of Object.entries(verdicts)) {
-    write(dir, `tasks/reviews/${name}`, body);
+    const withRev = bindRevision && !new RegExp(`\\b${head}`).test(body)
+      ? `${body}\nRevision: ${head}\n`
+      : body;
+    write(dir, `tasks/reviews/${name}`, withRev);
   }
 
   // Staged changes = what the pending commit would ship.
@@ -245,14 +252,40 @@ test('missing active-plan pointer fails closed on a ship-capable change', () => 
   assert.equal(r.status, 2, 'no pointer means no way to know which verdict applies');
 });
 
-test('a passing verdict allows the commit', () => {
+test('a passing verdict bound to the shipped revision allows the commit', () => {
+  const dir = makeRepo({
+    activePlan: 'tasks/plans/260715-1200-demo',
+    verdicts: { '260715-demo-verdict.md': PASSING_VERDICT },
+    files: { 'src/app.ts': 'export const x = 1;\n' },
+    bindRevision: true,
+  });
+  const r = runCheck(dir, 'git commit -m "feat: x"');
+  assert.equal(r.status, 0);
+});
+
+// --- Revision binding (anti-accidental) ------------------------------------
+test('a passing verdict that names NO revision blocks with exit 2', () => {
+  // Without a revision the verdict cannot be tied to the code — a stale verdict
+  // from an earlier state would look identical. This is the WARN→BLOCK upgrade.
   const dir = makeRepo({
     activePlan: 'tasks/plans/260715-1200-demo',
     verdicts: { '260715-demo-verdict.md': PASSING_VERDICT },
     files: { 'src/app.ts': 'export const x = 1;\n' },
   });
   const r = runCheck(dir, 'git commit -m "feat: x"');
-  assert.equal(r.status, 0);
+  assert.equal(r.status, 2, 'a verdict with no revision must not authorize a ship');
+  assert.match(r.stderr, /revision under review/);
+});
+
+test('a passing verdict naming a DIFFERENT revision blocks with exit 2', () => {
+  const dir = makeRepo({
+    activePlan: 'tasks/plans/260715-1200-demo',
+    verdicts: { '260715-demo-verdict.md': `${PASSING_VERDICT}\nRevision: deadbeef0000\n` },
+    files: { 'src/app.ts': 'export const x = 1;\n' },
+  });
+  const r = runCheck(dir, 'git commit -m "feat: x"');
+  assert.equal(r.status, 2, 'a stale revision must not authorize a ship');
+  assert.match(r.stderr, /revision under review/);
 });
 
 test('a security BLOCK prevents shipping despite a passing reviewer verdict', () => {
@@ -280,6 +313,7 @@ test('a pass never claims the human approved anything', () => {
     activePlan: 'tasks/plans/260715-1200-demo',
     verdicts: { '260715-demo-verdict.md': PASSING_VERDICT },
     files: { 'src/app.ts': 'export const x = 1;\n' },
+    bindRevision: true,
   });
   const out = runCheck(dir, 'git commit -m "feat: x"').stdout;
   assert.match(out, /UNPROVEN/, 'the pass must name what it did NOT establish');
@@ -350,11 +384,19 @@ test('sourcing a missing hook lib cannot abort the script before Gate 2 runs', (
   }
 });
 
-test('pre-ship.sh warns rather than silently passing when the checker is absent', () => {
-  const body = fs.readFileSync(PRE_SHIP, 'utf8');
-  const elseBranch = body.slice(body.indexOf('gate2-check.sh'));
-  assert.match(elseBranch, /NOT being enforced/,
-    'a missing checker must be announced, not treated as a pass');
+test('pre-ship.sh FAILS CLOSED (exit 2) on a ship command when the checker is absent', () => {
+  // A missing checker at a ship boundary must not silently downgrade to "no Gate 2".
+  // Run the real hook with the gate2-check lib deleted from an otherwise-real install.
+  const dir = makeRepo({ activePlan: 'tasks/plans/260715-1200-demo', files: { 'src/app.ts': 'export const x = 1;\n' } });
+  copyIn(dir, '.claude/hooks/pre-ship.sh');
+  copyIn(dir, '.claude/hooks/lib/load-dotenv.sh');
+  copyIn(dir, '.claude/hooks/lib/read-hook-input.sh');
+  // Deliberately do NOT copy gate2-check.sh — simulate the broken install.
+  const r = spawnSync('sh', [path.join(dir, '.claude/hooks/pre-ship.sh'), 'git commit -m "feat: x"'], {
+    cwd: dir, encoding: 'utf8', env: { ...process.env, CLAUDE_PROJECT_DIR: dir },
+  });
+  assert.equal(r.status, 2, 'a ship with no enforceable Gate 2 must be blocked, not waved through');
+  assert.match(r.stderr, /cannot be enforced|@@GATE_BLOCK@@/);
 });
 
 test('end-to-end: pre-ship.sh blocks a ship-capable commit under the fast profile', () => {

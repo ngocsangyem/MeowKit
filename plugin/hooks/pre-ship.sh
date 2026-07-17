@@ -38,13 +38,20 @@ if [ -f "$GATE2_CHECK" ]; then
   sh "$GATE2_CHECK" "$COMMAND" || exit 2
 else
   # Missing checker = NOT a quiet pass. A broken install must not silently
-  # downgrade to "no Gate 2 enforcement" — that is indistinguishable from a
-  # passing gate at the one moment it matters. Say so out loud instead of
-  # blocking every commit on an install problem the user cannot see.
+  # downgrade to "no Gate 2 enforcement" — at a ship boundary that is
+  # indistinguishable from a passing gate at the one moment it matters. On a ship
+  # command, FAIL CLOSED (exit 2): a ship with no enforceable Gate 2 is exactly
+  # what the gate exists to stop. Non-ship commands are none of this hook's
+  # business and pass through untouched.
   case "$COMMAND" in
     *"git commit"*|*"git push"*|*"git merge"*)
-      echo "Gate 2 WARNING: $GATE2_CHECK not found — Gate 2 is NOT being enforced." >&2
-      echo "  This ship is unchecked. Reinstall or restore the hook library." >&2
+      {
+        echo "@@GATE_BLOCK@@"
+        echo "Gate 2 checker $GATE2_CHECK not found — Gate 2 cannot be enforced."
+        echo "A ship with no enforceable Gate 2 is blocked, not waved through."
+        echo "Fix: reinstall or restore the hook library, then retry."
+      } >&2
+      exit 2
       ;;
   esac
 fi
@@ -161,8 +168,11 @@ echo "=== Summary ==="
 echo "Checks run:$CHECKS_RUN"
 
 if [ "$FAIL_COUNT" -gt 0 ]; then
-  echo "PRE-SHIP BLOCKED:$CHECKS_FAILED failed"
-  exit 1
+  # exit 2, NOT 1: per this repo's hook contract exit 1 is ADVISORY — it prints
+  # "BLOCKED" and lets the ship proceed anyway. A failed pre-ship check must
+  # actually stop the ship.
+  echo "PRE-SHIP BLOCKED:$CHECKS_FAILED failed" >&2
+  exit 2
 fi
 
 echo "PRE-SHIP PASS: All checks passed. Ready to ship."

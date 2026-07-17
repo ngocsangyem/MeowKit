@@ -129,16 +129,26 @@ if [ "$gate1_passed" -eq 0 ]; then
   exit 2
 fi
 
-# Opt-in stricter Gate 1: when MEOWKIT_GATE1_REQUIRE_APPROVED=1, a plan file merely
-# existing is not enough — the most recent plan must also carry an approval marker
-# (frontmatter `status: approved` or an Agent-State `Approved by: human` line).
-# Default off: the standard plan/cook flow records approval only later, so requiring
-# it unconditionally would block legitimate writes.
-if [ "${MEOWKIT_GATE1_REQUIRE_APPROVED:-0}" = "1" ]; then
-  approved=0
-  # Newest plan file by mtime, selected with the same `[ -f ]` per-candidate test as the
-  # existence gate (no `ls | head` pipeline whose exit code could mislead). `-nt` is a
-  # regular-file comparison supported by both bash and dash test builtins.
+# Gate 1 approval receipt — DEFAULT ON (anti-accidental threat model).
+# A plan file merely existing is not enough: the newest plan must carry a fresh
+# approval receipt (an `approval:` block whose plan_hash still matches the plan
+# body). Editing the plan body after approval invalidates the receipt ⇒ re-approval,
+# so an approval can never silently carry over to changed scope.
+#
+# This proves "an approval was stamped against THIS plan revision", NOT "a human
+# approved" — the receipt is agent-writable (ADR 260715). The binding is the value.
+#
+# Escape hatch: MEOWKIT_GATE1_PRESENCE_ONLY=1 downgrades to the old presence check
+# (an explicit, logged opt-out). The former opt-in MEOWKIT_GATE1_REQUIRE_APPROVED
+# is now the default and needs no flag.
+if [ "${MEOWKIT_GATE1_PRESENCE_ONLY:-0}" = "1" ]; then
+  # No Silent Override (intervention-recording-rules.md Rule 1): announce the downgrade
+  # on stderr so the bypass is never invisible.
+  echo "Gate 1: downgraded to presence-only via MEOWKIT_GATE1_PRESENCE_ONLY=1 (approval receipt NOT verified)." >&2
+fi
+if [ "${MEOWKIT_GATE1_PRESENCE_ONLY:-0}" != "1" ]; then
+  # Newest plan file by mtime (same `[ -f ]`/`-nt` per-candidate test as the existence
+  # gate — no `ls | head` pipeline whose exit code could mislead).
   _latest_plan=""
   for _p in tasks/plans/*/plan.md tasks/plans/*.md; do
     [ -f "$_p" ] || continue
@@ -146,19 +156,36 @@ if [ "${MEOWKIT_GATE1_REQUIRE_APPROVED:-0}" = "1" ]; then
       _latest_plan="$_p"
     fi
   done
-  if [ -n "$_latest_plan" ]; then
-    if grep -qiE '^[[:space:]]*status:[[:space:]]*approved' "$_latest_plan" \
-       || grep -qiE 'approved by:[[:space:]]*human' "$_latest_plan"; then
-      approved=1
+
+  _receipt_lib=".claude/hooks/lib/approval-receipt.sh"
+  # Enforce only when both the plan and the receipt helper are present. A missing
+  # helper is an install problem, not a licence to ship — but the presence gate above
+  # already passed, so degrade to presence-only rather than blocking every write on a
+  # tooling gap the user cannot see. (Phase 8's drift check guards helper presence.)
+  if [ -n "$_latest_plan" ] && [ -f "$_receipt_lib" ]; then
+    sh "$_receipt_lib" verify "$_latest_plan" >/dev/null 2>&1
+    _rc=$?
+    if [ "$_rc" -eq 10 ]; then
+      {
+        echo "@@GATE_BLOCK@@"
+        echo "Plan '$_latest_plan' has no approval receipt."
+        echo "Gate 1 requires a human-approved plan before source edits (anti-accidental)."
+        echo "After the human approves, stamp it: npx mewkit plan approve $_latest_plan"
+        echo "Override (explicit downgrade): MEOWKIT_GATE1_PRESENCE_ONLY=1"
+      } >&2
+      exit 2
+    elif [ "$_rc" -eq 11 ]; then
+      {
+        echo "@@GATE_BLOCK@@"
+        echo "Plan '$_latest_plan' was edited after approval — the receipt is stale."
+        echo "Changed scope needs re-approval (gate-rules.md: Insert/Split ⇒ re-approve)."
+        echo "Re-approve after the human confirms: npx mewkit plan approve $_latest_plan"
+        echo "Override (explicit downgrade): MEOWKIT_GATE1_PRESENCE_ONLY=1"
+      } >&2
+      exit 2
     fi
-  fi
-  if [ "$approved" -eq 0 ]; then
-    {
-      echo "@@GATE_BLOCK@@"
-      echo "A plan exists but is not marked approved (MEOWKIT_GATE1_REQUIRE_APPROVED=1)."
-      echo "Add 'status: approved' to the plan frontmatter, or unset the flag."
-    } >&2
-    exit 2
+    # _rc 0 (fresh) ⇒ allow; any other code (helper error) ⇒ presence-only, do not
+    # manufacture a block on a tooling quirk when a plan demonstrably exists.
   fi
 fi
 

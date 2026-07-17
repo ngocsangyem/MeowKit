@@ -47,6 +47,9 @@ All must be true:
    - Success Criteria: measurable definition of done
    - Technical Approach: how it will be built
 3. **Human has explicitly typed approval.** Approval is not inferred from silence, delay, or ambiguous responses.
+4. **A fresh approval receipt is stamped on the plan** (default-on, anti-accidental). After the human approves, stamp it with `npx mewkit plan approve <plan-dir>`, which writes an `approval:` frontmatter block binding the approval to the current plan body (`plan_hash`). `gate-enforcement.sh` blocks source edits until this receipt exists, and blocks again if the plan body is edited after approval (the hash goes stale ⇒ re-approve). Escape hatch: `MEOWKIT_GATE1_PRESENCE_ONLY=1` downgrades Gate 1 to a plan-presence check only — an explicit, logged opt-out.
+
+**What the receipt proves — and does not.** The receipt is written by the agent, not the host, so it proves *an approval was stamped against this plan revision*, **never** *a human approved*. Its value is the revision binding (changed scope cannot silently inherit an old approval), not authenticity. Host-authenticated approval stays deferred (ADR 260715, Gate 2 approval receipt). Per `intervention-recording-rules.md` Rule 3, the agent may run `plan approve` only after a real human approval; it never self-approves.
 
 ### What It Blocks
 
@@ -143,15 +146,19 @@ would let an unrelated review authorize this ship.
 | Proven | Not proven |
 |---|---|
 | A verdict for the active plan exists | That a human approved it |
-| It names no FAIL dimension, no security BLOCK | Which revision the human actually reviewed |
-| A present evidence index does not contradict it | That the verdict was not authored by the acting session |
+| It names no FAIL dimension, no security BLOCK | That the verdict was not authored by the acting session |
+| It is bound to the revision being shipped (names current HEAD) | That a human — rather than the agent — recorded that revision |
+| A present evidence index does not contradict it | |
 
-Every artifact the check reads is writable by the same session that produced the change,
-so a session can author all of them. **A pass means the paperwork is present and
-self-consistent — not that a human approved.** No hook output and no evidence field
-(e.g. `approvals.gate2`) may be read as approval proof. Closing this requires a
-host-authenticated approval receipt: see
-`docs/architecture/adr/260715-gate2-approval-receipt.md` (designed; not yet enforced).
+Every artifact the check reads — including the revision the verdict names — is writable
+by the same session that produced the change, so a session can author all of them. The
+revision binding is **anti-accidental**: it blocks a stale verdict from an earlier state
+(exit 2, since this phase — formerly a WARN), so an approval cannot silently carry over to
+changed scope. It is **not** unforgeable. **A pass means the paperwork is present,
+self-consistent, and bound to this revision — not that a human approved.** No hook output
+and no evidence field (e.g. `approvals.gate2`) may be read as approval proof. Closing the
+authenticity gap requires a host-authenticated approval receipt (ADR 260715,
+Gate 2 approval receipt; designed, not yet enforced).
 
 ## Reviewer Checklist — Gate Authority (standing item)
 

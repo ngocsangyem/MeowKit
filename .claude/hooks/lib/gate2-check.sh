@@ -10,17 +10,19 @@
 #
 # WHAT THIS PROVES
 #   A verdict file for the active plan exists, names no FAIL dimension and no
-#   security BLOCK, and — when a workflow-evidence index is present — that the
-#   index does not contradict it.
+#   security BLOCK, is bound to the revision being shipped (it names current HEAD),
+#   and — when a workflow-evidence index is present — that the index does not
+#   contradict it.
 #
 # WHAT THIS DOES NOT PROVE
-#   That a human approved anything. Every artifact read here is writable by the
-#   same session that produced the change under review, so a session can author
-#   all of them. Human approval and verdict provenance are UNPROVEN by
-#   construction. A pass means "the paperwork is present and self-consistent",
-#   NOT "a human approved this". Closing that gap requires a host-authenticated
-#   approval receipt — designed in
-#   docs/architecture/adr/260715-gate2-approval-receipt.md, enforced later.
+#   That a HUMAN approved anything. Every artifact read here — including the
+#   revision the verdict names — is writable by the same session that produced the
+#   change, so a session can author all of them. The revision binding is
+#   anti-accidental (it catches a stale verdict from an earlier state); it is not
+#   unforgeable. A pass means "the paperwork is present, self-consistent, and bound
+#   to this revision", NOT "a human approved this". Closing the authenticity gap
+#   requires a host-authenticated approval receipt — designed in ADR 260715
+#   (Gate 2 approval receipt), enforced later.
 #
 # This is the single shared Gate 2 helper. Do not re-implement verdict parsing
 # in a hook: the parsers live in cook/scripts/validate-gate-2.sh and
@@ -262,23 +264,35 @@ if [ -n "$EVIDENCE" ] && [ -f "$EVIDENCE_VALIDATOR" ] && command -v node >/dev/n
 fi
 
 # ---------------------------------------------------------------------------
-# 5. Cheap provenance binding — WARN only, never block
+# 5. Revision binding — HARD BLOCK (anti-accidental)
 # ---------------------------------------------------------------------------
-# A verdict that names no revision cannot be tied to the code being shipped, so
-# a stale verdict from an earlier state looks identical to a current one. This
-# only WARNS: a structural check has no way to prove which revision a human
-# actually reviewed. That is the approval receipt's job, not this script's.
+# A verdict that names no revision cannot be tied to the code being shipped: a
+# stale verdict from an earlier state looks identical to a current one, so an
+# approval could silently carry over to changed scope. The verdict MUST name the
+# revision it reviewed. At `git commit` time HEAD is the base the review was done
+# against (the new commit does not exist yet); at push/merge HEAD is the tip being
+# shipped — in both cases the honest binding is "the verdict names current HEAD".
+#
+# This does NOT prove a human approved (that is the deferred signed receipt, ADR
+# 260715). It proves the verdict is bound to THIS revision — deter/detect, not
+# unforgeable. Match the short HEAD as a hex prefix so a verdict may record the
+# short OR full SHA. If HEAD does not resolve (first commit, no history) there is
+# no prior revision to bind to, so the check is skipped rather than blocking.
 HEAD_SHA=$(git rev-parse --short HEAD 2>/dev/null)
 if [ -n "$HEAD_SHA" ]; then
-  if ! grep -qiE "\b${HEAD_SHA}[0-9a-f]*\b|\bdigest\b|\bsha\b" "$VERDICT" 2>/dev/null; then
-    echo "Gate 2 WARNING: $VERDICT names no commit SHA or content digest." >&2
-    echo "  Cannot bind it to the code being shipped — it may review an older state." >&2
-    echo "  This is a warning, not a block: provenance is unprovable structurally." >&2
+  if ! grep -qiE "\b${HEAD_SHA}[0-9a-f]*\b" "$VERDICT" 2>/dev/null; then
+    block \
+      "Verdict $VERDICT does not name the revision under review ($HEAD_SHA)." \
+      "A verdict with no matching revision cannot be tied to this code — a stale" \
+      "verdict from an earlier state would look identical to a current one." \
+      "Fix: record the reviewed revision in the verdict (e.g. a 'Revision: $HEAD_SHA'" \
+      "line), or re-review at the current HEAD and record its SHA."
   fi
 fi
 
 echo "Gate 2 structural check PASSED for plan '$SLUG' (verdict: $VERDICT)."
-echo "  PROVEN:    verdict present, no FAIL dimension, no security BLOCK."
-echo "  UNPROVEN:  human approval and verdict provenance — this check cannot"
-echo "             establish either. Gate 2 approval remains the human's, at the gate."
+echo "  PROVEN:    verdict present, no FAIL dimension, no security BLOCK, and bound"
+echo "             to the shipped revision ($HEAD_SHA)."
+echo "  UNPROVEN:  human approval — this check cannot establish it (the verdict is"
+echo "             agent-writable). Gate 2 approval remains the human's, at the gate."
 exit 0

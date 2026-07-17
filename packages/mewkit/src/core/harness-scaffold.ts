@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -17,8 +18,13 @@ export interface HarnessProject {
 	dir: string;
 	/** Remove the temp project. Safe to call multiple times. */
 	cleanup: () => void;
-	/** Create a plan file so Gate 1 passes. Returns the plan path. */
+	/** Create a plan file so Gate 1's presence check passes. Returns the plan path.
+	 * NOTE: a plan alone no longer opens Gate 1 — it also needs an approval receipt
+	 * (see `approvePlan`). */
 	addPlan: (opts?: { nested?: boolean; approved?: boolean; slug?: string }) => string;
+	/** Stamp the Gate 1 approval receipt on a plan via the copied approval-receipt.sh
+	 * helper (the same code path the live hook verifies). Returns true on success. */
+	approvePlan: (planPath: string) => boolean;
 	/** Remove all plan files (return Gate 1 to the no-plan state). */
 	clearPlans: () => void;
 	/** Create a sensitive file (default `.env`) in the project root. Returns its path. */
@@ -69,6 +75,16 @@ export function scaffoldHarnessProject(srcRoot: string): HarnessProject {
 			}
 			fs.writeFileSync(planPath, frontmatter(opts.approved ?? false));
 			return planPath;
+		},
+		approvePlan: (planPath: string): boolean => {
+			const helper = path.join(dir, ".claude", "hooks", "lib", "approval-receipt.sh");
+			if (!fs.existsSync(helper)) return false;
+			try {
+				execFileSync("sh", [helper, "stamp", planPath, "doctor"], { stdio: "pipe" });
+				return true;
+			} catch {
+				return false;
+			}
 		},
 		clearPlans: () => {
 			fs.rmSync(plansDir, { recursive: true, force: true });

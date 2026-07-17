@@ -39,18 +39,39 @@ describe("gate-enforcement (configured-hook integration)", () => {
 		expect(r.stdout).not.toContain("@@GATE_BLOCK@@");
 	});
 
-	it("flat plan present → source write allowed (exit 0, no marker)", () => {
+	it("plan present but UNAPPROVED (no receipt) → hard-blocks by default (exit 2)", () => {
+		// A plan alone no longer opens Gate 1 — the approval receipt is default-on.
 		project = scaffold();
 		project.addPlan({ nested: false });
+		const r = runGate("src/app.ts");
+		expect(r.status).toBe(2);
+		expect(r.stderr).toContain("@@GATE_BLOCK@@");
+		expect(r.stderr).toMatch(/no approval receipt/);
+	});
+
+	it("approved (receipt-stamped) plan → source write allowed (exit 0)", () => {
+		project = scaffold();
+		const planPath = project.addPlan({ nested: true });
+		expect(project.approvePlan(planPath)).toBe(true);
 		const r = runGate("src/app.ts");
 		expect(r.status).toBe(0);
 		expect(r.stderr).not.toContain("@@GATE_BLOCK@@");
 	});
 
-	it("nested plan present → source write allowed (exit 0)", () => {
+	it("plan edited after approval → stale receipt re-blocks (exit 2)", () => {
 		project = scaffold();
-		project.addPlan({ nested: true });
+		const planPath = project.addPlan({ nested: true });
+		expect(project.approvePlan(planPath)).toBe(true);
+		fs.appendFileSync(planPath, "\nAdded scope after approval.\n"); // addPlan returns an absolute path
 		const r = runGate("src/app.ts");
+		expect(r.status).toBe(2);
+		expect(r.stderr).toMatch(/edited after approval/);
+	});
+
+	it("MEOWKIT_GATE1_PRESENCE_ONLY=1 → plan presence alone allows (escape hatch, exit 0)", () => {
+		project = scaffold();
+		project.addPlan({ nested: true }); // unapproved
+		const r = runGate("src/app.ts", { MEOWKIT_GATE1_PRESENCE_ONLY: "1" });
 		expect(r.status).toBe(0);
 	});
 
@@ -72,21 +93,6 @@ describe("gate-enforcement (configured-hook integration)", () => {
 	it("writes to a test file are never blocked (exit 0)", () => {
 		project = scaffold();
 		const r = runGate("src/app.test.ts");
-		expect(r.status).toBe(0);
-	});
-
-	it("MEOWKIT_GATE1_REQUIRE_APPROVED=1 blocks a draft plan (exit 2)", () => {
-		project = scaffold();
-		project.addPlan({ nested: true, approved: false });
-		const r = runGate("src/app.ts", { MEOWKIT_GATE1_REQUIRE_APPROVED: "1" });
-		expect(r.status).toBe(2);
-		expect(r.stderr).toContain("@@GATE_BLOCK@@");
-	});
-
-	it("MEOWKIT_GATE1_REQUIRE_APPROVED=1 allows an approved plan (exit 0)", () => {
-		project = scaffold();
-		project.addPlan({ nested: true, approved: true });
-		const r = runGate("src/app.ts", { MEOWKIT_GATE1_REQUIRE_APPROVED: "1" });
 		expect(r.status).toBe(0);
 	});
 });

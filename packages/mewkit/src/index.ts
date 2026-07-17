@@ -20,6 +20,7 @@ import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
 import { inventory } from "./commands/inventory.js";
 import { plan } from "./commands/plan.js";
+import { planApprove } from "./commands/plan-approve.js";
 import { trace } from "./commands/trace.js";
 // NOTE: index-command is imported lazily inside its case — it pulls in `node:sqlite`
 // (experimental), so a static import would load SQLite + emit its warning on EVERY command.
@@ -202,6 +203,7 @@ async function main(): Promise<void> {
 			"step",
 			"next",
 			"plan",
+			"by",
 			"root",
 			"only",
 			"type",
@@ -319,11 +321,20 @@ async function main(): Promise<void> {
 			});
 			break;
 		case "plan":
-			await plan({
-				subcommand: args._[1] as string | undefined,
-				target: args._[2] as string | undefined,
-				json: args.json as boolean | undefined,
-			});
+			// `approve` MUTATES (stamps the receipt) — route it to the separate
+			// plan-approve module so the read-only `plan` command stays write-free.
+			if ((args._[1] as string | undefined) === "approve") {
+				await planApprove({
+					target: args._[2] as string | undefined,
+					by: args.by as string | undefined,
+				});
+			} else {
+				await plan({
+					subcommand: args._[1] as string | undefined,
+					target: args._[2] as string | undefined,
+					json: args.json as boolean | undefined,
+				});
+			}
 			break;
 		case "inventory":
 			await inventory({
