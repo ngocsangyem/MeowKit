@@ -14,6 +14,26 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.14.2 (2026-07-18) — Composed Capability Recall
+
+The `mewkit` CLI ships alongside this kit as **1.18.2** (see `CLI` below).
+
+### Highlights
+
+When `capabilities resolve` selects a knowledge-sensitive capability, it now composes a bounded, read-only recall of prior project knowledge directly into the result — the agent reads one `knowledgeRecall` envelope instead of running a separate wiki lookup. The same activation policy reaches both Claude Code and Codex.
+
+### CLI
+
+- `capabilities resolve` now attaches a `knowledgeRecall` envelope to a selected capability — a `required`-class capability gets exactly one bounded wiki recall (≤3 snippets, no page bodies); `conditional`, `none`, and every non-selected outcome perform zero automatic wiki access.
+- Missing, empty, and errored wiki indexes are now reported distinctly and always fail open — recall never blocks a resolution.
+- `capabilities resolve --record` — opt-in flag that logs one recall decision (counts and status only, never recalled content) through the trace log; default runs stay write-free.
+- A capability provided by the running `mewkit` CLI (invoked via `npx` or a workspace bin) now resolves as available with "current CLI process" evidence instead of a false "not on PATH".
+- `mewkit --help` now lists the `wiki` command.
+
+### Improvements
+
+- `wiki context` routes through a shared read-only probe that sanitizes free-text queries into valid full-text-search terms and reads the index without creating `-wal`/`-shm` sidecar files.
+
 ## 2.14.1 (2026-07-18) — Harness Integrity & Provider Parity
 
 The `mewkit` CLI ships alongside this kit as **1.18.1** (see `CLI` below).

@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "mk",
-  "version": "2.14.1",
+  "version": "2.14.2",
   "description": "MeowKit — an opinionated Claude Code harness (skills, agents, hooks).",
   "author": {
     "name": "ngocsangyem",
