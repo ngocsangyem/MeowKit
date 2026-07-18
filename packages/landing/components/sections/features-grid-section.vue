@@ -1,173 +1,97 @@
 <script setup lang="ts">
 const features = [
   {
-    icon: '◈',
-    title: '17 Specialist Agents',
+    name: '17 specialist agents',
     body: 'Dedicated agents for planning, security, review, testing, documentation, and more — each with scoped file ownership and model-tier routing.',
   },
   {
-    icon: '◆',
-    title: '77 Domain Skills',
+    name: '77 domain skills',
     body: 'From database migrations to multimodal AI, frontend design to CTF research — skills activate only when the task demands them.',
   },
   {
-    icon: '◑',
-    title: 'Cross-Session Memory',
+    name: 'Cross-session memory',
     body: 'Lessons, fixes, review patterns, and architecture decisions persist across sessions. The harness learns from every run.',
   },
   {
-    icon: '◎',
-    title: 'Scale-Adaptive Intelligence',
-    body: 'Domain complexity CSV classifies every task into TRIVIAL, STANDARD, or COMPLEX — routing the right model and scaffolding density automatically.',
+    name: 'Scale-adaptive intelligence',
+    body: 'Domain complexity classification routes every task into TRIVIAL, STANDARD, or COMPLEX — picking the right model and scaffolding density automatically.',
   },
   {
-    icon: '✦',
-    title: 'Party Mode',
+    name: 'Party mode',
     body: 'Multi-agent deliberation for architectural decisions. Multiple agents argue different positions before a decision is made.',
   },
   {
-    icon: '◉',
-    title: 'Adversarial Review',
+    name: 'Adversarial review',
     body: 'Gate 2 runs parallel reviewers across correctness, security, design, scope, and craft. Any FAIL blocks the ship.',
   },
   {
-    icon: '⬡',
-    title: 'Zero External Dependencies',
+    name: 'Zero external dependencies',
     body: 'Pure prompt engineering — no SDK required. Works offline, works in any Claude Code environment, no vendor lock-in.',
   },
   {
-    icon: '⊞',
-    title: 'TDD Pipeline',
+    name: 'TDD pipeline',
     body: 'Opt-in test-first enforcement with RED → GREEN → REFACTOR gates. Self-healing loop with 3-attempt cap and human escalation.',
   },
 ]
-
-const gridRef = ref<HTMLElement | null>(null)
-
-let observer: IntersectionObserver | null = null
-
-onMounted(() => {
-  observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible')
-          observer?.unobserve(entry.target)
-        }
-      }
-    },
-    { threshold: 0.12 },
-  )
-
-  if (gridRef.value) {
-    observer.observe(gridRef.value)
-    gridRef.value.querySelectorAll('.feat-card').forEach((el, i) => {
-      ;(el as HTMLElement).style.setProperty('--i', String(i))
-    })
-  }
-})
-
-onUnmounted(() => observer?.disconnect())
 </script>
 
 <template>
-  <section id="features" class="section-padding" aria-labelledby="features-heading">
+  <section id="features" class="spec" aria-labelledby="features-heading">
     <div class="container-landing">
-      <!-- Header -->
-      <div class="feat-header reveal">
-        <p class="feat-eyebrow">Capabilities</p>
-        <h2 id="features-heading" class="feat-heading">
-          Everything the harness<br />
-          <span class="gradient-text">enforces for you</span>
+      <div class="section-head">
+        <h2 id="features-heading" class="section-head__title">
+          Everything the harness enforces for you.
         </h2>
       </div>
 
-      <!-- Grid -->
-      <div ref="gridRef" class="feat-grid stagger-children">
-        <article
-          v-for="feat in features"
-          :key="feat.title"
-          class="feat-card glass"
-        >
-          <span class="feat-card__icon" aria-hidden="true">{{ feat.icon }}</span>
-          <h3 class="feat-card__title">{{ feat.title }}</h3>
-          <p class="feat-card__body">{{ feat.body }}</p>
-        </article>
-      </div>
+      <!-- Spec sheet: each capability is a row, not a card -->
+      <dl class="spec__sheet">
+        <div v-for="feat in features" :key="feat.name" class="spec__row">
+          <dt class="spec__name">{{ feat.name }}</dt>
+          <dd class="spec__body">{{ feat.body }}</dd>
+        </div>
+      </dl>
     </div>
   </section>
 </template>
 
 <style scoped>
-.feat-header {
-  text-align: center;
-  margin-bottom: 3rem;
+.spec {
+  padding-block: var(--space-3xl);
 }
 
-.feat-eyebrow {
-  font-size: 0.8125rem;
-  font-family: "Fira Code", monospace;
-  color: #66CCFF;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin: 0 0 0.875rem;
-}
-
-.feat-heading {
-  font-size: clamp(1.875rem, 4vw, 3rem);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: #F8FAFC;
+.spec__sheet {
   margin: 0;
+  border-block-start: var(--rule-hair) solid var(--color-rule);
 }
 
-.feat-grid {
+.spec__row {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
+  gap: var(--space-2xs) var(--space-xl);
+  padding-block: var(--space-md);
+  border-block-end: var(--rule-hair) solid var(--color-rule-2);
 }
 
-@media (min-width: 640px) {
-  .feat-grid { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 40rem) {
+  .spec__row {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    padding-block: var(--space-lg);
+  }
 }
 
-@media (min-width: 1024px) {
-  .feat-grid { grid-template-columns: repeat(4, 1fr); }
-}
-
-.feat-card {
-  border-radius: var(--radius-md, 10px);
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
-}
-
-.feat-card:hover {
-  box-shadow: 0 0 20px rgba(102, 204, 255, 0.1);
-  transform: translateY(-2px);
-  border-color: rgba(102, 204, 255, 0.15);
-}
-
-.feat-card__icon {
-  font-size: 1.375rem;
-  color: #66CCFF;
-  line-height: 1;
-}
-
-.feat-card__title {
-  font-size: 0.9375rem;
+.spec__name {
   font-weight: 500;
-  color: #F8FAFC;
+  font-size: var(--text-base);
+  color: var(--color-ink);
   margin: 0;
 }
 
-.feat-card__body {
-  font-size: 0.875rem;
-  color: #94A3B8;
-  line-height: 1.6;
+.spec__body {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  line-height: 1.65;
+  max-width: 64ch;
   margin: 0;
 }
 </style>

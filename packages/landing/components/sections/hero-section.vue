@@ -1,179 +1,81 @@
-<script setup lang="ts">
-const logoUrl = new URL('~/assets/branding/meow-logo-animated.svg', import.meta.url).href
-useHead({
-  link: [
-    { rel: 'preload', as: 'image', type: 'image/svg+xml', href: logoUrl },
-  ],
-})
-</script>
-
 <template>
-  <section
-    class="hero"
-    aria-labelledby="hero-heading"
-  >
-    <!-- Radial gradient wash behind content -->
-    <div class="hero__glow-wash" aria-hidden="true" />
-
+  <section class="hero" aria-labelledby="hero-heading">
     <div class="hero-content container-landing hero__content">
-      <!-- Logo with aura -->
-      <div class="logo-hero-wrap" aria-hidden="true">
-        <img
-          src="~/assets/branding/meow-logo-animated.svg"
-          alt=""
-          width="230"
-          height="80"
-          class="hero__logo"
-          fetchpriority="high"
-          draggable="false"
-        />
-      </div>
-
-      <!-- Headline -->
+      <!-- Marquee statement — left-biased, bottom-anchored -->
       <h1 id="hero-heading" class="hero__heading">
-        Enforced Discipline<br />
-        <span class="gradient-text">for AI Coding Agents</span>
+        Enforced discipline for AI&nbsp;coding agents.
       </h1>
 
-      <!-- Subheadline -->
       <p class="hero__sub">
-        Hard gates, TDD, security scanning, and human approval —<br class="hidden sm:inline" />
-        so your AI agent ships production-quality code, not untested prototypes.
+        Hard gates, TDD, security scanning, and human approval — so your AI agent
+        ships production-quality code, not untested prototypes.
       </p>
 
-      <!-- CTAs -->
-      <div class="hero__ctas">
-        <UButton
-          as="a"
-          href="#install"
-          size="xl"
-          trailing-icon="i-heroicons-arrow-right"
-          class="hero__cta-primary"
-        >
-          Get Started
-        </UButton>
-        <UButton
-          as="a"
-          href="#how-it-works"
-          color="neutral"
-          variant="outline"
-          size="xl"
-        >
-          How It Works
-        </UButton>
+      <div class="hero__rule" aria-hidden="true" />
+
+      <div class="hero__actions">
+        <a href="#install" class="btn-fill">Install in one command</a>
+        <a href="#how-it-works" class="btn-text">How it works <span aria-hidden="true">↓</span></a>
       </div>
 
-      <!-- Badges -->
-      <div class="hero__badges" aria-label="Key stats">
-        <span class="hero__badge">77 Skills</span>
-        <span class="hero__badge-sep" aria-hidden="true">·</span>
-        <span class="hero__badge">17 Agents</span>
-        <span class="hero__badge-sep" aria-hidden="true">·</span>
-        <span class="hero__badge">7-Phase Workflow</span>
-        <span class="hero__badge-sep" aria-hidden="true">·</span>
-        <span class="hero__badge">MIT Licensed</span>
-      </div>
-    </div>
-
-    <!-- Scroll indicator -->
-    <div class="hero__scroll">
-      <ScrollIndicator />
+      <p class="hero__meta mono" aria-label="Key stats">
+        77&nbsp;skills&ensp;·&ensp;17&nbsp;agents&ensp;·&ensp;7&nbsp;phases&ensp;·&ensp;2&nbsp;gates&ensp;·&ensp;MIT
+      </p>
     </div>
   </section>
 </template>
 
 <style scoped>
 .hero {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  padding-top: 5rem; /* clear fixed navbar */
-}
-
-.hero__glow-wash {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 123, 255, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(102, 204, 255, 0.05) 0%, transparent 60%);
-  pointer-events: none;
+  min-height: 82dvh;
+  display: grid;
+  align-content: end;
+  padding-block: var(--space-3xl) var(--space-2xl);
 }
 
 .hero__content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 1.75rem;
-  padding: 3rem 1rem;
-}
-
-.hero__logo {
-  width: clamp(140px, 30vw, 230px);
-  height: auto;
-  filter: drop-shadow(0 0 16px rgba(102, 204, 255, 0.2));
+  display: grid;
+  gap: var(--space-lg);
+  justify-items: start;
+  text-align: left;
 }
 
 .hero__heading {
-  font-size: clamp(2rem, 5vw, 3.75rem);
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  color: #F8FAFC;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-display);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+  max-width: 16ch;
   margin: 0;
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 
 .hero__sub {
-  font-size: clamp(1rem, 2vw, 1.25rem);
-  color: #94A3B8;
-  line-height: 1.7;
-  max-width: 42rem;
+  font-size: var(--text-md);
+  color: var(--color-muted);
+  line-height: 1.6;
+  max-width: 54ch;
   margin: 0;
 }
 
-.hero__ctas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.875rem;
-  justify-content: center;
+.hero__rule {
+  width: 100%;
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+  margin-block-start: var(--space-md);
 }
 
-.hero__cta-primary {
-  padding: 0.875rem 1.75rem;
-  font-size: 1rem;
-}
-
-.hero__badges {
+.hero__actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  font-size: 0.8125rem;
-  color: #94A3B8;
-  margin-top: 0.5rem;
+  gap: var(--space-lg);
 }
 
-.hero__badge {
-  font-family: "Fira Code", monospace;
-  color: rgba(102, 204, 255, 0.7);
-}
-
-.hero__badge-sep {
-  color: rgba(255, 255, 255, 0.15);
-}
-
-.hero__scroll {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1;
+.hero__meta {
+  margin: 0;
+  letter-spacing: 0.02em;
 }
 </style>

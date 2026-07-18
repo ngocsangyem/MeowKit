@@ -2,7 +2,7 @@
 useHead({
   htmlAttrs: { lang: 'en' },
   meta: [
-    { name: 'theme-color', content: '#05070A' },
+    { name: 'theme-color', content: '#060A13' },
     { name: 'application-name', content: 'MeowKit' },
   ],
   link: [
@@ -21,11 +21,6 @@ useHead({
 </script>
 
 <template>
-  <!-- Global magic particle canvas — fixed, behind all content, loaded after hydration -->
-  <ClientOnly>
-    <LazyParticlesCanvas />
-  </ClientOnly>
-
   <!-- UApp required for @nuxt/ui Toast, Tooltip, and Programmatic Overlays -->
   <UApp>
     <div class="relative z-10 min-h-screen flex flex-col">

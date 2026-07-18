@@ -1,15 +1,9 @@
 <script setup lang="ts">
 const mobileOpen = ref(false)
-const scrolled = ref(false)
-
-onMounted(() => {
-  const { y } = useScroll(document.documentElement)
-  watchEffect(() => { scrolled.value = y.value > 40 })
-})
 
 const navLinks = [
-  { label: 'Features', href: '#features' },
-  { label: 'How It Works', href: '#how-it-works' },
+  { label: 'How it works', href: '#how-it-works' },
+  { label: 'Capabilities', href: '#features' },
   { label: 'Install', href: '#install' },
   { label: 'Docs', href: 'https://docs.meowkit.dev/', external: true },
 ]
@@ -52,20 +46,16 @@ function handleNavClick(event: MouseEvent, href: string, external?: boolean) {
 </script>
 
 <template>
-  <header
-    class="navbar"
-    :class="{ 'navbar--scrolled': scrolled }"
-    role="banner"
-  >
-    <nav class="navbar__inner container-landing" aria-label="Main navigation">
+  <header role="banner">
+    <!-- Floating pill: detached from page edges, blur sits over the dark canvas -->
+    <nav class="nav-pill" aria-label="Main navigation">
       <TheLogo size="sm" />
 
-      <!-- Desktop links -->
-      <ul class="navbar__links" role="list">
+      <ul class="nav-pill__links" role="list">
         <li v-for="link in navLinks" :key="link.href">
           <a
             :href="link.href"
-            class="navbar__link"
+            class="nav-pill__link"
             :target="link.external ? '_blank' : undefined"
             :rel="link.external ? 'noopener noreferrer' : undefined"
             @click="handleNavClick($event, link.href, link.external)"
@@ -73,157 +63,179 @@ function handleNavClick(event: MouseEvent, href: string, external?: boolean) {
         </li>
       </ul>
 
-      <!-- Desktop CTA -->
-      <UButton
-        as="a"
+      <a
         href="https://github.com/ngocsangyem/MeowKit"
+        class="nav-pill__cta"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="View MeowKit on GitHub"
-        icon="i-simple-icons-github"
-        size="sm"
-        class="navbar__cta hidden sm:inline-flex"
-      >
-        GitHub
-      </UButton>
+      >GitHub</a>
 
       <!-- Mobile toggle -->
       <button
-        class="navbar__toggle sm:hidden"
+        class="nav-pill__toggle"
         :aria-expanded="mobileOpen"
         aria-controls="mobile-menu"
         aria-label="Toggle navigation menu"
         @click="toggleMobile"
       >
-        <span class="sr-only">Menu</span>
-        <svg v-if="!mobileOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg v-if="!mobileOpen" class="nav-pill__toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
-        <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg v-else class="nav-pill__toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </nav>
 
-    <!-- Mobile menu -->
+    <!-- Mobile menu: sheet below the pill -->
     <Transition name="slide-down">
-      <div v-if="mobileOpen" id="mobile-menu" class="navbar__mobile sm:hidden">
-        <ul role="list" class="navbar__mobile-links">
+      <div v-if="mobileOpen" id="mobile-menu" class="nav-sheet">
+        <ul role="list" class="nav-sheet__links">
           <li v-for="link in navLinks" :key="link.href">
             <a
               :href="link.href"
-              class="navbar__mobile-link"
+              class="nav-sheet__link"
               :target="link.external ? '_blank' : undefined"
               :rel="link.external ? 'noopener noreferrer' : undefined"
               @click="handleNavClick($event, link.href, link.external)"
             >{{ link.label }}</a>
           </li>
+          <li>
+            <a
+              href="https://github.com/ngocsangyem/MeowKit"
+              class="nav-sheet__link"
+              target="_blank"
+              rel="noopener noreferrer"
+              @click="closeMobile"
+            >GitHub</a>
+          </li>
         </ul>
-        <a
-          href="https://github.com/ngocsangyem/MeowKit"
-          class="btn-primary w-full justify-center mt-3"
-          target="_blank"
-          rel="noopener noreferrer"
-          @click="closeMobile"
-        >GitHub</a>
       </div>
     </Transition>
   </header>
 </template>
 
 <style scoped>
-.navbar {
+.nav-pill {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  padding: 0.75rem 1rem;
-  transition: background-color 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
-}
-
-.navbar--scrolled {
-  background: var(--color-surface-alpha);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.navbar__inner {
-  display: flex;
+  top: var(--space-md);
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: var(--space-lg);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-nav-veil);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  z-index: var(--z-nav);
+  max-width: calc(100vw - 2rem);
 }
 
-.navbar__links {
+.nav-pill__links {
   display: none;
   align-items: center;
-  gap: 1.5rem;
+  gap: var(--space-lg);
   margin: 0;
   padding: 0;
   list-style: none;
-  flex: 1;
-  margin-left: 1rem;
 }
 
-@media (min-width: 640px) {
-  .navbar__links { display: flex; }
+@media (min-width: 40rem) {
+  .nav-pill__links { display: flex; }
 }
 
-.navbar__link {
-  font-size: 0.875rem;
-  color: var(--color-muted, #94A3B8);
+.nav-pill__link {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
   text-decoration: none;
-  transition: color 0.2s ease;
+  white-space: nowrap;
+  transition: color var(--dur-short) var(--ease-out);
 }
-.navbar__link:hover { color: #F8FAFC; }
+.nav-pill__link:hover { color: var(--color-ink); }
 
-.navbar__cta {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  margin-left: auto;
+.nav-pill__cta {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-accent);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--dur-short) var(--ease-out);
+}
+.nav-pill__cta:hover { color: var(--color-focus); }
+
+@media (min-width: 40rem) {
+  .nav-pill__cta { display: inline-flex; }
 }
 
-.navbar__toggle {
-  margin-left: auto;
-  padding: 0.375rem;
-  border-radius: 6px;
+.nav-pill__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin: calc(var(--space-xs) * -1) calc(var(--space-xs) * -1);
   border: none;
   background: transparent;
-  color: #94A3B8;
+  color: var(--color-ink-2);
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: color var(--dur-short) var(--ease-out);
 }
-.navbar__toggle:hover { color: #F8FAFC; }
+.nav-pill__toggle:hover { color: var(--color-ink); }
 
-.navbar__mobile {
-  padding: 1rem;
-  border-top: 1px solid var(--color-border);
-  background: var(--color-surface-alpha);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+@media (min-width: 40rem) {
+  .nav-pill__toggle { display: none; }
 }
 
-.navbar__mobile-links {
+.nav-pill__toggle-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* ─ Mobile sheet ─ */
+.nav-sheet {
+  position: fixed;
+  top: calc(var(--space-md) + 3.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(20rem, calc(100vw - 2rem));
+  padding: var(--space-sm);
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-sm);
+  z-index: var(--z-nav);
+}
+
+@media (min-width: 40rem) {
+  .nav-sheet { display: none; }
+}
+
+.nav-sheet__links {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.navbar__mobile-link {
+.nav-sheet__link {
   display: block;
-  padding: 0.625rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.9375rem;
-  color: #94A3B8;
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  color: var(--color-ink-2);
   text-decoration: none;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  white-space: nowrap;
+  transition: color var(--dur-short) var(--ease-out),
+              background-color var(--dur-short) var(--ease-out);
 }
-.navbar__mobile-link:hover {
-  color: #F8FAFC;
-  background: rgba(255, 255, 255, 0.05);
+.nav-sheet__link:hover {
+  color: var(--color-ink);
+  background: var(--color-paper-3);
 }
 </style>

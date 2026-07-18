@@ -69,8 +69,8 @@ export default defineNuxtConfig({
   // ─── Fonts ──────────────────────────────────────────────────────────────
   fonts: {
     families: [
-      { name: 'Inter', provider: 'google', weights: [400, 600] },
-      { name: 'Fira Code', provider: 'google', weights: [400], display: 'optional' },
+      { name: 'Geist', provider: 'google', weights: [400, 500, 700] },
+      { name: 'Geist Mono', provider: 'google', weights: [400], display: 'optional' },
     ],
     defaults: { preload: true },
   },

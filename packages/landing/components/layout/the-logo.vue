@@ -29,10 +29,10 @@ defineProps<{ size?: 'sm' | 'md' | 'lg' }>()
 .logo-link {
   display: inline-flex;
   align-items: center;
-  transition: filter 0.2s ease;
+  transition: opacity var(--dur-short) var(--ease-out);
 }
 .logo-link:hover {
-  filter: drop-shadow(0 0 8px rgba(102, 204, 255, 0.5));
+  opacity: 0.85;
 }
 .logo-svg {
   width: auto;

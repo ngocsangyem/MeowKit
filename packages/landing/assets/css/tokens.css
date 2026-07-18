@@ -1,0 +1,65 @@
+/* MeowKit design tokens — single source of truth.
+ * Every colour and font in components must reference these by name. */
+:root {
+  /* ─── Colour · dark cool palette, brand-blue anchor (hue 250) ───────── */
+  --color-paper:      oklch(13% 0.015 250);
+  --color-paper-2:    oklch(17% 0.017 250);
+  --color-paper-3:    oklch(21% 0.018 250);
+  --color-ink:        oklch(94% 0.008 250);
+  --color-ink-2:      oklch(80% 0.010 250);
+  --color-muted:      oklch(64% 0.014 250);
+  --color-rule:       oklch(29% 0.020 250);
+  --color-rule-2:     oklch(22% 0.016 250);
+  --color-accent:     oklch(64% 0.17 252);
+  --color-accent-ink: oklch(13% 0.030 250);
+  --color-focus:      oklch(70% 0.20 252);
+  --color-bloom:      oklch(30% 0.09 252 / 0.35);
+  --color-selection:  oklch(64% 0.17 252 / 0.3);
+  --color-nav-veil:   oklch(17% 0.017 250 / 0.78);
+
+  /* ─── Type ──────────────────────────────────────────────────────────── */
+  --font-display: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* 1.25 major-third scale from 16px */
+  --text-xs:   0.8rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-md:   1.125rem;
+  --text-lg:   1.5625rem;
+  --text-xl:   1.9531rem;
+  --text-2xl:  2.4414rem;
+  --text-3xl:  3.0518rem;
+  --text-display-s: clamp(1.9531rem, 2.5vw + 1rem, 3.0518rem);
+  --text-display:   clamp(2.75rem, 5vw + 1rem, 5.25rem);
+
+  /* ─── Space · 4pt scale ─────────────────────────────────────────────── */
+  --space-2xs: 0.25rem;
+  --space-xs:  0.5rem;
+  --space-sm:  0.75rem;
+  --space-md:  1rem;
+  --space-lg:  1.5rem;
+  --space-xl:  2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+  --page-gutter: clamp(1rem, 4vw, 2.5rem);
+
+  /* ─── Motion ────────────────────────────────────────────────────────── */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long:  420ms;
+
+  /* ─── Shape / depth ─────────────────────────────────────────────────── */
+  --rule-hair: 1px;
+  --radius-sm: 6px;
+  --radius-pill: 999px;
+
+  --z-base: 1;
+  --z-raised: 10;
+  --z-sticky: 200;
+  --z-nav: 300;
+}

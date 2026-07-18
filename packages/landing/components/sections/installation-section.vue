@@ -3,193 +3,104 @@ const { copied, copy } = useClipboard()
 
 const installCmd = 'npx mewkit init'
 
-const steps = [
-  { num: '01', title: 'Install', code: 'npx mewkit init', desc: 'Scaffolds the harness into your project.' },
-  { num: '02', title: 'Configure', code: 'npx meowkit setup', desc: 'Choose your workflow modes and agents.' },
-  { num: '03', title: 'Run', code: '/mk:cook "add feature X"', desc: 'The 7-phase pipeline enforces the rest.' },
-]
-
 function handleCopy() {
   copy(installCmd)
 }
 </script>
 
 <template>
-  <section id="install" class="section-padding" aria-labelledby="install-heading">
+  <section id="install" class="install" aria-labelledby="install-heading">
     <div class="container-landing">
-      <div class="install__header">
-        <p class="install__eyebrow">Quick Start</p>
-        <h2 id="install-heading" class="install__heading">
-          One command to<br />
-          <span class="gradient-text">enforce discipline</span>
+      <div class="section-head">
+        <h2 id="install-heading" class="section-head__title">
+          One command to enforce discipline.
         </h2>
       </div>
 
-      <!-- Main install block -->
-      <div class="install__block glass">
-        <div class="install__cmd-row">
-          <code class="install__cmd">{{ installCmd }}</code>
+      <!-- Terminal-true quick start: real commands, typographic frame, no fake chrome -->
+      <div class="code-frame install__frame">
+        <div class="install__frame-head">
+          <p class="code-frame__label">Quick start</p>
           <button
             class="install__copy"
             :class="{ 'install__copy--done': copied }"
-            :aria-label="copied ? 'Copied!' : 'Copy install command'"
+            :aria-label="copied ? 'Copied' : 'Copy install command'"
             @click="handleCopy"
           >
-            <!-- Copy icon -->
-            <svg v-if="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-            <!-- Check icon -->
-            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            <span class="animate-sparkle">{{ copied ? 'Copied ✦' : 'Copy' }}</span>
+            {{ copied ? 'Copied' : 'Copy' }}
           </button>
         </div>
+        <pre aria-label="Quick start commands"><code><span class="tok-prompt">$</span> <span class="tok-cmd">npx mewkit init</span>          <span class="tok-comment"># scaffold the harness into your project</span>
+<span class="tok-prompt">$</span> <span class="tok-cmd">npx mewkit setup</span>        <span class="tok-comment"># choose your workflow modes and agents</span>
+<span class="tok-prompt">$</span> <span class="tok-cmd">/mk:cook "add feature X"</span> <span class="tok-comment"># the 7-phase pipeline enforces the rest</span><span class="install__caret" aria-hidden="true">▮</span></code></pre>
       </div>
-
-      <!-- Steps -->
-      <ol class="install__steps" aria-label="Quick start steps">
-        <li
-          v-for="(step, i) in steps"
-          :key="step.num"
-          class="install__step glass"
-          :style="{ '--i': i }"
-        >
-          <span class="install__step-num">{{ step.num }}</span>
-          <div class="install__step-body">
-            <h3 class="install__step-title">{{ step.title }}</h3>
-            <code class="install__step-code">{{ step.code }}</code>
-            <p class="install__step-desc">{{ step.desc }}</p>
-          </div>
-        </li>
-      </ol>
     </div>
   </section>
 </template>
 
 <style scoped>
-.install__header {
-  text-align: center;
-  margin-bottom: 2.5rem;
+.install {
+  padding-block: var(--space-3xl);
 }
 
-.install__eyebrow {
-  font-size: 0.8125rem;
-  font-family: "Fira Code", monospace;
-  color: #66CCFF;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin: 0 0 0.875rem;
+.install__frame {
+  max-width: 48rem;
 }
 
-.install__heading {
-  font-size: clamp(1.875rem, 4vw, 3rem);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: #F8FAFC;
-  margin: 0;
-}
-
-.install__block {
-  border-radius: var(--radius-lg, 16px);
-  padding: 1.5rem 2rem;
-  margin-bottom: 2rem;
-  max-width: 42rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.install__cmd-row {
+.install__frame-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
-}
-
-.install__cmd {
-  font-family: "Fira Code", monospace;
-  font-size: clamp(1rem, 2.5vw, 1.375rem);
-  color: #99DDFF;
-  word-break: break-all;
+  gap: var(--space-md);
 }
 
 .install__copy {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
-  border-radius: 6px;
-  border: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: var(--space-2xs) var(--space-sm);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-sm);
   background: transparent;
-  color: #94A3B8;
-  font-size: 0.8125rem;
+  color: var(--color-muted);
   cursor: pointer;
-  flex-shrink: 0;
-  transition: border-color 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+  transition: border-color var(--dur-short) var(--ease-out),
+              color var(--dur-short) var(--ease-out);
 }
 .install__copy:hover {
-  border-color: rgba(102, 204, 255, 0.3);
-  color: #F8FAFC;
+  border-color: var(--color-accent);
+  color: var(--color-ink);
+}
+.install__copy:active {
+  transform: translateY(1px);
+}
+.install__copy:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .install__copy--done {
-  border-color: rgba(102, 204, 255, 0.4);
-  color: #66CCFF;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
-.install__steps {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  max-width: 42rem;
-  margin: 0 auto;
-  padding: 0;
-  list-style: none;
+.tok-prompt { color: var(--color-accent); }
+.tok-cmd { color: var(--color-ink); }
+.tok-comment { color: var(--color-muted); }
+
+.install__caret {
+  display: inline-block;
+  width: 1ch;
+  color: var(--color-accent);
+  animation: caret-blink 1s steps(2) infinite;
 }
 
-@media (min-width: 768px) {
-  .install__steps { grid-template-columns: repeat(3, 1fr); }
+@keyframes caret-blink {
+  50% { opacity: 0; }
 }
 
-.install__step {
-  border-radius: var(--radius-md, 10px);
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.install__step-num {
-  font-family: "Fira Code", monospace;
-  font-size: 0.75rem;
-  color: rgba(102, 204, 255, 0.5);
-}
-
-.install__step-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
-
-.install__step-title {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: #F8FAFC;
-  margin: 0;
-}
-
-.install__step-code {
-  font-family: "Fira Code", monospace;
-  font-size: 0.8125rem;
-  color: #99DDFF;
-  word-break: break-all;
-}
-
-.install__step-desc {
-  font-size: 0.8125rem;
-  color: #94A3B8;
-  line-height: 1.55;
-  margin: 0;
+@media (prefers-reduced-motion: reduce) {
+  .install__caret { animation: none; }
 }
 </style>

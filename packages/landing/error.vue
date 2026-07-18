@@ -11,7 +11,7 @@ function handleError() {
 <template>
   <div class="error-page">
     <div class="error-page__inner">
-      <span class="error-page__code gradient-text">{{ error.statusCode }}</span>
+      <span class="error-page__code">{{ error.statusCode }}</span>
       <h1 class="error-page__heading">
         {{ error.statusCode === 404 ? 'Page not found' : 'Something went wrong' }}
       </h1>
@@ -20,46 +20,49 @@ function handleError() {
           ? "The page you're looking for doesn't exist."
           : error.statusMessage || 'An unexpected error occurred.' }}
       </p>
-      <button class="btn-primary" @click="handleError">Back to home</button>
+      <button class="btn-fill" @click="handleError">Back to home</button>
     </div>
   </div>
 </template>
 
 <style scoped>
 .error-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  text-align: center;
+  padding: var(--space-xl) var(--page-gutter);
 }
 
 .error-page__inner {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  align-items: flex-start;
+  gap: var(--space-md);
+  text-align: left;
 }
 
 .error-page__code {
-  font-size: 6rem;
-  font-weight: 500;
+  font-family: var(--font-mono);
+  font-size: var(--text-3xl);
+  font-variant-numeric: tabular-nums;
   line-height: 1;
-  font-family: "Fira Code", monospace;
+  color: var(--color-accent);
 }
 
 .error-page__heading {
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: #F8FAFC;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-xl);
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
   margin: 0;
 }
 
 .error-page__sub {
-  font-size: 1rem;
-  color: #94A3B8;
-  max-width: 28rem;
-  margin: 0 0 0.5rem;
+  font-size: var(--text-base);
+  color: var(--color-muted);
+  max-width: 44ch;
+  margin: 0 0 var(--space-xs);
 }
 </style>
