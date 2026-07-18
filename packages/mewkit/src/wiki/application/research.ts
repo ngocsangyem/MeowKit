@@ -1,5 +1,12 @@
 import { makeWikiPageId } from "../domain/index.js";
-import type { DupCheck, SalienceComponents, WikiSeed, WikiSlug, WikiSource, WikiWriteDecision } from "../domain/index.js";
+import type {
+	DupCheck,
+	SalienceComponents,
+	WikiSeed,
+	WikiSlug,
+	WikiSource,
+	WikiWriteDecision,
+} from "../domain/index.js";
 import type { Fetcher, ProposeInput, ProposeResult, WikiIndex } from "./ports.js";
 
 // runResearchStep: seed → fetch (DATA) → novelty (FTS dup) → proposeCandidate ONLY. Fetched

@@ -18,7 +18,10 @@ interface TokenRule {
 const TOKEN_RULES: readonly TokenRule[] = [
 	{ category: "provider-tool", pattern: /\bAskUserQuestion\b|\bAgent\s*\(|\bTask\s*\(/g },
 	{ category: "model-or-tier", pattern: /\b(?:haiku|sonnet|opus|claude-[a-z0-9.-]+)\b/gi },
-	{ category: "context-window", pattern: /\b\d{2,3}K\b|\b(?:[5-9]\d|100)%\s+(?:of\s+)?(?:the\s+)?(?:context|token)\b/gi },
+	{
+		category: "context-window",
+		pattern: /\b\d{2,3}K\b|\b(?:[5-9]\d|100)%\s+(?:of\s+)?(?:the\s+)?(?:context|token)\b/gi,
+	},
 	{ category: "brand", pattern: /\bmeowkit\b/gi },
 ];
 
@@ -63,7 +66,8 @@ export function findGenericCoreTokens(root: string, scanDir = "skills"): Generic
 			for (const rule of TOKEN_RULES) {
 				rule.pattern.lastIndex = 0;
 				for (const match of line.text.matchAll(rule.pattern)) {
-					if (rule.category === "brand" && isCliBrandMention(line.text, match.index ?? 0, match[0], line.codeFence)) continue;
+					if (rule.category === "brand" && isCliBrandMention(line.text, match.index ?? 0, match[0], line.codeFence))
+						continue;
 					findings.push({ file, line: line.line, token: match[0], category: rule.category });
 				}
 			}

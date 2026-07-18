@@ -35,23 +35,24 @@ export const RepoRefSchema = z.object({
 	revision: z.string().nullable(),
 });
 
-export const TaskRecordSchema = z.object({
-	schemaVersion: z.literal("1.0"),
-	taskId: z.string().regex(TASK_ID_RE),
-	planPath: z.string().nullable().default(null),
-	status: z.enum(["active", "blocked", "done"]),
-	currentStep: z.string().default(""),
-	repos: z.array(RepoRefSchema).default([]),
-	blockers: z.array(z.string()).default([]),
-	nextAction: z.string().default(""),
-	verificationSummaries: z.array(z.object({ ref: z.string(), result: z.string() })).default([]),
-	evidenceRefs: z.array(z.string()).default([]),
-	capabilityDecisions: z.array(CapabilityDecisionSchema).default([]),
-	/** Provenance only (never the compatibility gate): who wrote this record. */
-	writtenByCli: z.string().default(""),
-	writtenByKit: z.string().default(""),
-	updatedAt: z.string(),
-})
+export const TaskRecordSchema = z
+	.object({
+		schemaVersion: z.literal("1.0"),
+		taskId: z.string().regex(TASK_ID_RE),
+		planPath: z.string().nullable().default(null),
+		status: z.enum(["active", "blocked", "done"]),
+		currentStep: z.string().default(""),
+		repos: z.array(RepoRefSchema).default([]),
+		blockers: z.array(z.string()).default([]),
+		nextAction: z.string().default(""),
+		verificationSummaries: z.array(z.object({ ref: z.string(), result: z.string() })).default([]),
+		evidenceRefs: z.array(z.string()).default([]),
+		capabilityDecisions: z.array(CapabilityDecisionSchema).default([]),
+		/** Provenance only (never the compatibility gate): who wrote this record. */
+		writtenByCli: z.string().default(""),
+		writtenByKit: z.string().default(""),
+		updatedAt: z.string(),
+	})
 	// Preserve unknown keys through a read→write round-trip. A future CLI may add an
 	// additive field WITHOUT bumping schemaVersion (per the versioning note above); an older
 	// CLI must not silently strip it when it updates the record.
@@ -110,7 +111,8 @@ function recordPath(projectRoot: string, taskId: string): string {
 	const abs = join(dir, `${taskId}.json`);
 	// Lexical + realpath containment: the id regex already bars separators/.., this is defense in depth.
 	const rel = relative(dir, abs);
-	if (rel === ".." || rel.startsWith(".." + sep) || isAbsolute(rel)) throw new Error(`task path escapes tasks/active: ${taskId}`);
+	if (rel === ".." || rel.startsWith(".." + sep) || isAbsolute(rel))
+		throw new Error(`task path escapes tasks/active: ${taskId}`);
 	return abs;
 }
 
@@ -216,7 +218,9 @@ export async function recordContextEvidence(
 ): Promise<TaskRecord> {
 	return updateTaskRecord(projectRoot, taskId, (existing) => {
 		if (!existing)
-			throw new Error(`no active task record "${taskId}" — context evidence is recorded only for an existing durable task`);
+			throw new Error(
+				`no active task record "${taskId}" — context evidence is recorded only for an existing durable task`,
+			);
 		// Union owning repos by identity (newest revision wins for a repo already recorded).
 		const revByIdentity = new Map(existing.repos.map((r) => [r.identity, r.revision]));
 		for (const r of distinctRepos(envelope.evidence)) revByIdentity.set(r.identity, r.revision);

@@ -3,12 +3,7 @@
 // canonical page — the strongest outcome is a candidate. Canonical pages come
 // only from the human approve path in the application layer.
 
-import type {
-	DupCheck,
-	InjectionVerdict,
-	SalienceScore,
-	WikiWriteDecision,
-} from "./types.js";
+import type { DupCheck, InjectionVerdict, SalienceScore, WikiWriteDecision } from "./types.js";
 import { isClean } from "./types.js";
 
 /** Salience thresholds, kept in one place for tuning. */
@@ -42,11 +37,7 @@ function hasStrongVerifiedSignal(score: SalienceScore): boolean {
  *  5. Total ≥ 8 and scan clean → propose a candidate for approval.
  *  6. Otherwise → discard.
  */
-export function decideWrite(
-	score: SalienceScore,
-	verdict: InjectionVerdict,
-	dup: DupCheck,
-): WikiWriteDecision {
+export function decideWrite(score: SalienceScore, verdict: InjectionVerdict, dup: DupCheck): WikiWriteDecision {
 	if (!isClean(verdict)) {
 		return {
 			kind: "quarantine",

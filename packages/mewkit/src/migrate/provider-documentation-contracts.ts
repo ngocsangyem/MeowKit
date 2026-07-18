@@ -33,7 +33,11 @@ export type {
 	ProviderCapabilityRegistryEntry,
 } from "./providers/contract-types.js";
 
-import type { ProviderCapabilityName, ProviderCapabilityRegistryEntry, ProviderSupportContract } from "./providers/contract-types.js";
+import type {
+	ProviderCapabilityName,
+	ProviderCapabilityRegistryEntry,
+	ProviderSupportContract,
+} from "./providers/contract-types.js";
 
 export const providerCapabilityRegistry: Record<ProviderType, ProviderCapabilityRegistryEntry> = {
 	"claude-code": claudeCodeContract,
@@ -63,10 +67,7 @@ export function getProviderCapabilityContract(
 	return providerCapabilityRegistry[provider].capabilities[capability];
 }
 
-export function getProviderSurfaceContract(
-	provider: ProviderType,
-	type: PortableType,
-): ProviderSupportContract {
+export function getProviderSurfaceContract(provider: ProviderType, type: PortableType): ProviderSupportContract {
 	return (
 		providerCapabilityRegistry[provider].surfaces[type] ?? {
 			status: "unsupported",
@@ -76,10 +77,7 @@ export function getProviderSurfaceContract(
 	);
 }
 
-export function hasProviderCapability(
-	provider: ProviderType,
-	capability: ProviderCapabilityName,
-): boolean {
+export function hasProviderCapability(provider: ProviderType, capability: ProviderCapabilityName): boolean {
 	return getProviderCapabilityContract(provider, capability).status === "documented";
 }
 

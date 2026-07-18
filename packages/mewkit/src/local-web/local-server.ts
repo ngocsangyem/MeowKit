@@ -51,7 +51,8 @@ export class LocalServer {
 		} catch (err) {
 			const e = err as NodeJS.ErrnoException;
 			if (desiredPort !== 0 && (e.code === "EADDRINUSE" || e.code === "EACCES")) {
-				if (this.opts.verbose) process.stderr.write(`[local-web] port ${desiredPort} unavailable (${e.code}); falling back to random\n`);
+				if (this.opts.verbose)
+					process.stderr.write(`[local-web] port ${desiredPort} unavailable (${e.code}); falling back to random\n`);
 				await this.listen(0);
 			} else {
 				throw err;

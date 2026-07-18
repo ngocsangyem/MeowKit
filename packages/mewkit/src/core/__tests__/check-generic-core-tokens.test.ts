@@ -47,7 +47,14 @@ describe("findGenericCoreTokens", () => {
 	});
 
 	it("exempts documented mk and mewkit CLI command syntax but not brand prose", async () => {
-		const root = await tree(["Run `mewkit validate`, `mk:plan`, or npx mewkit doctor. MeowKit installs skills.", "```sh", "mewkit wiki render", "```"].join("\n"));
+		const root = await tree(
+			[
+				"Run `mewkit validate`, `mk:plan`, or npx mewkit doctor. MeowKit installs skills.",
+				"```sh",
+				"mewkit wiki render",
+				"```",
+			].join("\n"),
+		);
 		expect(findGenericCoreTokens(root)).toEqual([
 			{ file: "skills/demo/references/nested.md", line: 1, token: "MeowKit", category: "brand" },
 		]);

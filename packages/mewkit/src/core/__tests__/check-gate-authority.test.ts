@@ -2,7 +2,12 @@ import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { checkGateAuthority, scanForGateAuthority, checkCommandDrift, scanCommandForDrift } from "../check-gate-authority.js";
+import {
+	checkGateAuthority,
+	scanForGateAuthority,
+	checkCommandDrift,
+	scanCommandForDrift,
+} from "../check-gate-authority.js";
 
 const tempDirs: string[] = [];
 
@@ -26,7 +31,10 @@ describe("scanForGateAuthority — statements that grant automated approval", ()
 	// Both word orders, because a fixed pattern set that only knows one is a
 	// pattern set that a rewrite walks straight through.
 	it.each([
-		["auto-approve then gate", "Compared to Fast: enforces both gates fully (Fast auto-approves Gate 2 if tests pass)."],
+		[
+			"auto-approve then gate",
+			"Compared to Fast: enforces both gates fully (Fast auto-approves Gate 2 if tests pass).",
+		],
 		["gate then auto-approved", "**Output:** `Phase 1: Plan created — [N] phases, Gate 1 [approved|auto-approved]`"],
 		["gate bound to auto", "| auto | Yes | RED-strict | Gate 1: Auto (validated) | Human |"],
 		["stamp as authority", "      - Gate 2 review verdict satisfied (the evaluator stamp counts)"],
@@ -71,7 +79,8 @@ describe("scanForGateAuthority — prose that states the contract is not a viola
 
 	it("does not flag a skill's own HARD GATE vocabulary", async () => {
 		const root = await projectWith({
-			".claude/skills/chom/SKILL.md": "- `--auto`: auto-approve non-HARD-GATE steps. HARD GATE still requires human approval.",
+			".claude/skills/chom/SKILL.md":
+				"- `--auto`: auto-approve non-HARD-GATE steps. HARD GATE still requires human approval.",
 		});
 		expect(scanForGateAuthority(root, ".claude/skills/chom/SKILL.md")).toEqual([]);
 	});
@@ -128,7 +137,8 @@ describe("scanForGateAuthority — negation is scoped to the clause it governs",
 
 	it("flags an asserting clause even when a contract-stating clause shares the line", async () => {
 		const root = await projectWith({
-			".claude/modes/x.md": "Gate 2 is never auto-approved in default mode, but fast mode auto-approves Gate 2 when tests pass.",
+			".claude/modes/x.md":
+				"Gate 2 is never auto-approved in default mode, but fast mode auto-approves Gate 2 when tests pass.",
 		});
 		expect(scanForGateAuthority(root, ".claude/modes/x.md")).toHaveLength(1);
 	});
@@ -137,14 +147,18 @@ describe("scanForGateAuthority — negation is scoped to the clause it governs",
 describe("scanForGateAuthority — suppression marker", () => {
 	it("suppresses a line carrying the marker", async () => {
 		const root = await projectWith({
-			".claude/rules/gate-rules.md": "- Any mode that auto-approves Gate 1 or Gate 2 <!-- lint-allow-gate-authority -->",
+			".claude/rules/gate-rules.md":
+				"- Any mode that auto-approves Gate 1 or Gate 2 <!-- lint-allow-gate-authority -->",
 		});
 		expect(scanForGateAuthority(root, ".claude/rules/gate-rules.md")).toEqual([]);
 	});
 
 	it("suppresses via a marker on the preceding line", async () => {
 		const root = await projectWith({
-			".claude/rules/gate-rules.md": ["<!-- lint-allow-gate-authority -->", "- Any mode that auto-approves Gate 1 or Gate 2"].join("\n"),
+			".claude/rules/gate-rules.md": [
+				"<!-- lint-allow-gate-authority -->",
+				"- Any mode that auto-approves Gate 1 or Gate 2",
+			].join("\n"),
 		});
 		expect(scanForGateAuthority(root, ".claude/rules/gate-rules.md")).toEqual([]);
 	});
@@ -191,7 +205,8 @@ describe("checkGateAuthority", () => {
 
 	it("scans nested skill trees, not just top-level files", async () => {
 		const root = await projectWith({
-			".claude/skills/autobuild/step-05-iterate-or-ship.md": "- Gate 2 review verdict satisfied (the evaluator stamp counts)",
+			".claude/skills/autobuild/step-05-iterate-or-ship.md":
+				"- Gate 2 review verdict satisfied (the evaluator stamp counts)",
 		});
 		const [result] = checkGateAuthority(root);
 		expect(result.status).toBe("fail");
@@ -276,7 +291,15 @@ describe("command-vs-skill drift", () => {
 	// contradicted its own skill, and nothing caught the contradiction.
 	it("FAILS on a seeded workflow procedure", async () => {
 		const root = await pairedProject(
-			[THIN_DISPATCHER, "", "### Execution by Complexity", "", "1. Identify the issue.", "2. Apply the fix.", "3. Run tests."].join("\n"),
+			[
+				THIN_DISPATCHER,
+				"",
+				"### Execution by Complexity",
+				"",
+				"1. Identify the issue.",
+				"2. Apply the fix.",
+				"3. Run tests.",
+			].join("\n"),
 		);
 		const [result] = checkCommandDrift(root);
 		expect(result.status).toBe("fail");
@@ -284,19 +307,25 @@ describe("command-vs-skill drift", () => {
 	});
 
 	it("FAILS on a seeded memory-write instruction", async () => {
-		const root = await pairedProject([THIN_DISPATCHER, "", "Edit `.claude/memory/fixes.json` and append the pattern."].join("\n"));
+		const root = await pairedProject(
+			[THIN_DISPATCHER, "", "Edit `.claude/memory/fixes.json` and append the pattern."].join("\n"),
+		);
 		expect(checkCommandDrift(root)[0].status).toBe("fail");
 	});
 
 	it("FAILS on a seeded complexity-classification table", async () => {
-		const root = await pairedProject([THIN_DISPATCHER, "", "| Signal | Complexity |", "|---|---|", "| One file | Simple |"].join("\n"));
+		const root = await pairedProject(
+			[THIN_DISPATCHER, "", "| Signal | Complexity |", "|---|---|", "| One file | Simple |"].join("\n"),
+		);
 		expect(checkCommandDrift(root)[0].status).toBe("fail");
 	});
 
 	it("does not flag a lone numbered line in a safety note", async () => {
 		// One "1." is a list, not a procedure. Flagging it would make the lint
 		// noise, and a noisy lint gets switched off.
-		const root = await pairedProject([THIN_DISPATCHER, "", "1. Gate 2 still applies to anything this ships."].join("\n"));
+		const root = await pairedProject(
+			[THIN_DISPATCHER, "", "1. Gate 2 still applies to anything this ships."].join("\n"),
+		);
 		expect(checkCommandDrift(root)[0].status).toBe("pass");
 	});
 
@@ -319,7 +348,9 @@ describe("command-vs-skill drift", () => {
 	});
 
 	it("honors the suppression marker", async () => {
-		const root = await pairedProject([THIN_DISPATCHER, "", "2. Quoted anti-pattern <!-- lint-allow-gate-authority -->"].join("\n"));
+		const root = await pairedProject(
+			[THIN_DISPATCHER, "", "2. Quoted anti-pattern <!-- lint-allow-gate-authority -->"].join("\n"),
+		);
 		expect(checkCommandDrift(root)[0].status).toBe("pass");
 	});
 

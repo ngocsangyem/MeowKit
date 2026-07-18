@@ -349,7 +349,9 @@ export function checkInstallMode(root: string | null): DiagResult {
 		return {
 			name: "Install mode",
 			status: "pass",
-			detail: pluginKnown ? "flat-copy (mewkit init)" : "flat-copy (mewkit init); plugin status unknown — claude CLI not found",
+			detail: pluginKnown
+				? "flat-copy (mewkit init)"
+				: "flat-copy (mewkit init); plugin status unknown — claude CLI not found",
 		};
 	}
 	return { name: "Install mode", status: "na", detail: "no MeowKit install detected in this project" };

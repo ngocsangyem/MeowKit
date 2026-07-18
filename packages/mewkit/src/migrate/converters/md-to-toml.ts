@@ -33,5 +33,10 @@ export function convertMdToToml(item: PortableItem): ConversionResult {
 				? item.segments.join("/")
 				: item.name;
 
-	return { content: lines.join("\n"), filename: `${namespacedName}.toml`, warnings: stripped.warnings, occurrences: stripped.occurrences };
+	return {
+		content: lines.join("\n"),
+		filename: `${namespacedName}.toml`,
+		warnings: stripped.warnings,
+		occurrences: stripped.occurrences,
+	};
 }

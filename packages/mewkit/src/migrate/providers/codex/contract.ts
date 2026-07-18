@@ -43,9 +43,7 @@ export const codexContract: ProviderCapabilityRegistryEntry = {
 		),
 		orchestration: documented(["https://developers.openai.com/codex/subagents"]),
 		persistent_context: documented(["https://developers.openai.com/codex/guides/agents-md"]),
-		workspace_config: documented([
-			"https://developers.openai.com/codex/config-basic#feature-flags",
-		]),
+		workspace_config: documented(["https://developers.openai.com/codex/config-basic#feature-flags"]),
 		system_prompts: documented(["https://developers.openai.com/codex/guides/agents-md"]),
 	}),
 };

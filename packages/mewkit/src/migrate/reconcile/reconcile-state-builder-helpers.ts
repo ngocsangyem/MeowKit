@@ -1,9 +1,6 @@
 // Helpers for reconcile-state-builders.ts: provider path resolution and target-checksum
 // computation across the four write strategies (per-file, merge-single, yaml-merge, json-merge).
-import {
-	buildMergeSectionContent,
-	getMergeSectionKey,
-} from "../config-merger/merge-single-sections.js";
+import { buildMergeSectionContent, getMergeSectionKey } from "../config-merger/merge-single-sections.js";
 import { providers } from "../provider-registry.js";
 import type { PortableItem, PortableType, ProviderType } from "../types.js";
 import { computeContentChecksum } from "./checksum-utils.js";

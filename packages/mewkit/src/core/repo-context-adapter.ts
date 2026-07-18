@@ -33,7 +33,8 @@ export const ACQUISITION_DESCRIPTORS: Record<string, AcquisitionDescriptor> = {
 		status: "supported",
 		read: { tool: "Read", note: "typed host-native file read" },
 		search: { tool: "Grep+Glob", note: "typed content search (Grep) + filename search (Glob)" },
-		evidence: "Claude Code exposes typed Read/Grep/Glob tools the agent invokes to acquire evidence; MeowKit records the resulting envelope.",
+		evidence:
+			"Claude Code exposes typed Read/Grep/Glob tools the agent invokes to acquire evidence; MeowKit records the resulting envelope.",
 	},
 	"claude-plugin": {
 		provider: "claude-plugin",
@@ -49,7 +50,8 @@ export const ACQUISITION_DESCRIPTORS: Record<string, AcquisitionDescriptor> = {
 		// name the shell tools it actually uses (cat/ripgrep) and mark the whole surface advisory.
 		read: { tool: "shell:cat", note: "shell-mediated read — no typed read tool (advisory)" },
 		search: { tool: "shell:ripgrep", note: "shell-mediated search — no typed search tool (advisory)" },
-		evidence: "Codex acquires via its shell (cat/ripgrep), not a typed tool contract; acquisition works but is shell-mediated (advisory) ⇒ partial.",
+		evidence:
+			"Codex acquires via its shell (cat/ripgrep), not a typed tool contract; acquisition works but is shell-mediated (advisory) ⇒ partial.",
 	},
 };
 
@@ -61,7 +63,8 @@ export function getAcquisitionDescriptor(provider: string): AcquisitionDescripto
 			status: "report-only",
 			read: null,
 			search: null,
-			evidence: "No tested acquisition surface for this provider — report-only; the orchestrator relies on host-provided paths only.",
+			evidence:
+				"No tested acquisition surface for this provider — report-only; the orchestrator relies on host-provided paths only.",
 		}
 	);
 }

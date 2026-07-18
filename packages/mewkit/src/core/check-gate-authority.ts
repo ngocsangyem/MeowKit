@@ -201,15 +201,17 @@ function pairedCommands(root: string): string[] {
 	const skillsDir = path.join(root, ".claude", "skills");
 	if (!fs.existsSync(cmdDir) || !fs.existsSync(skillsDir)) return [];
 
-	return fs
-		.readdirSync(cmdDir)
-		.filter((f) => f.endsWith(".md"))
-		.filter((f) => GOVERNED_DISPATCHERS.has(f.replace(/\.md$/, "")))
-		// A command with no same-name skill has nowhere to delegate its procedure to,
-		// so the same prose there is correct (skill-authoring-rules.md: "not every
-		// command has a matching SKILL.md, and that is intentional").
-		.filter((f) => fs.existsSync(path.join(skillsDir, f.replace(/\.md$/, ""), "SKILL.md")))
-		.map((f) => path.join(".claude", "commands", "mk", f));
+	return (
+		fs
+			.readdirSync(cmdDir)
+			.filter((f) => f.endsWith(".md"))
+			.filter((f) => GOVERNED_DISPATCHERS.has(f.replace(/\.md$/, "")))
+			// A command with no same-name skill has nowhere to delegate its procedure to,
+			// so the same prose there is correct (skill-authoring-rules.md: "not every
+			// command has a matching SKILL.md, and that is intentional").
+			.filter((f) => fs.existsSync(path.join(skillsDir, f.replace(/\.md$/, ""), "SKILL.md")))
+			.map((f) => path.join(".claude", "commands", "mk", f))
+	);
 }
 
 /**
@@ -290,7 +292,9 @@ export function scanCommandForDrift(root: string, relPath: string): CommandDrift
 export function checkCommandDrift(root: string): CheckResult[] {
 	const commands = pairedCommands(root);
 	if (commands.length === 0) {
-		return [{ name: "Command-vs-skill drift", status: "pass", detail: "no same-name command/skill pairs", section: "Gates" }];
+		return [
+			{ name: "Command-vs-skill drift", status: "pass", detail: "no same-name command/skill pairs", section: "Gates" },
+		];
 	}
 
 	const findings = commands.flatMap((rel) => scanCommandForDrift(root, rel));

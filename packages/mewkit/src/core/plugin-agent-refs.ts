@@ -16,12 +16,7 @@ import { join } from "node:path";
  * Built-in agent types the host runtime provides. References to these are left
  * bare in the plugin payload — they are not kit agents and are never prefixed.
  */
-export const BUILTIN_AGENT_TYPES = new Set<string>([
-	"Explore",
-	"Bash",
-	"general-purpose",
-	"Plan",
-]);
+export const BUILTIN_AGENT_TYPES = new Set<string>(["Explore", "Bash", "general-purpose", "Plan"]);
 
 /** Read the bare `name:` frontmatter value from each agent file in a dir. */
 export function collectAgentNames(agentsDir: string): Set<string> {
@@ -71,11 +66,7 @@ export interface RewriteResult {
  * `subagent_type` assignment, so `subagent_type="mk:developer"` is never
  * double-prefixed.
  */
-export function rewriteAgentRefs(
-	content: string,
-	agentNames: Set<string>,
-	pluginName = "mk",
-): RewriteResult {
+export function rewriteAgentRefs(content: string, agentNames: Set<string>, pluginName = "mk"): RewriteResult {
 	const targets = [...agentNames].filter((n) => !BUILTIN_AGENT_TYPES.has(n));
 	if (targets.length === 0) return { content, count: 0 };
 
@@ -88,10 +79,7 @@ export function rewriteAgentRefs(
 	// group1: the `subagent_type` assignment up to an optional opening quote.
 	// group2: the bare agent name, bounded by a quote/space/comma/paren/EOL so
 	// it cannot be a fragment of a longer identifier.
-	const re = new RegExp(
-		`(subagent_type\\s*[:=]\\s*["']?)(${alternation})(?=["'\\s),]|$)`,
-		"g",
-	);
+	const re = new RegExp(`(subagent_type\\s*[:=]\\s*["']?)(${alternation})(?=["'\\s),]|$)`, "g");
 
 	let count = 0;
 	const rewritten = content.replace(re, (_match, prefix: string, name: string) => {

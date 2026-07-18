@@ -44,7 +44,10 @@ export function routeTableEquivalence(artifacts: readonly ReportArtifact[]): Jou
 			name: "route-table equivalence",
 			layer: "deterministic",
 			pass: false,
-			detail: `silent degradation on ${silent.length} artifact(s): ${silent.slice(0, 5).map((a) => `${a.type}:${a.sourcePath}`).join(", ")}`,
+			detail: `silent degradation on ${silent.length} artifact(s): ${silent
+				.slice(0, 5)
+				.map((a) => `${a.type}:${a.sourcePath}`)
+				.join(", ")}`,
 		};
 	}
 	return {

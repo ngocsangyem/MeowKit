@@ -19,7 +19,9 @@ import {
 
 const fixedNow = (): Date => new Date("2020-01-02T03:04:05.000Z");
 
-function rec(over: Partial<MigrationDecisionRecord> & Pick<MigrationDecisionRecord, "source" | "outcome">): MigrationDecisionRecord {
+function rec(
+	over: Partial<MigrationDecisionRecord> & Pick<MigrationDecisionRecord, "source" | "outcome">,
+): MigrationDecisionRecord {
 	return { type: "agent", provider: "codex", reason: "converted", ...over } as MigrationDecisionRecord;
 }
 

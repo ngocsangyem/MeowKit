@@ -1,10 +1,5 @@
 import { randomUUID } from "node:crypto";
-import {
-	canTransition,
-	decideWrite,
-	makeWikiPageId,
-	scoreSalience,
-} from "../domain/index.js";
+import { canTransition, decideWrite, makeWikiPageId, scoreSalience } from "../domain/index.js";
 import type {
 	SalienceComponents,
 	SalienceScore,
@@ -30,7 +25,10 @@ export type { ProposeInput, ProposeResult, WikiServiceDeps } from "./ports.js";
 // content has no code path to a canonical page. Reads live in queries.ts (no write port).
 
 function slugifyTitle(title: string): string {
-	const s = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+	const s = title
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "");
 	return s || "page";
 }
 
@@ -164,7 +162,14 @@ export class WikiService {
 		);
 	}
 
-	private recordIntervention(slug: WikiSlug, kind: WikiIntervention["kind"], candidateId: string | undefined, reason: string, actor: WikiOrigin, scan?: ScanOutput): void {
+	private recordIntervention(
+		slug: WikiSlug,
+		kind: WikiIntervention["kind"],
+		candidateId: string | undefined,
+		reason: string,
+		actor: WikiOrigin,
+		scan?: ScanOutput,
+	): void {
 		const intervention: WikiIntervention = {
 			id: "int-" + randomUUID().slice(0, 8),
 			kind,

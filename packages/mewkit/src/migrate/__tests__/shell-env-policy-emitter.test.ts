@@ -13,7 +13,15 @@ const SENTINEL = "SUPER_SECRET_SENTINEL_VALUE_do_not_leak_9f3c2a";
 
 describe("shell_environment_policy scaffold emitter", () => {
 	it("classifies secret-like key names case-insensitively", () => {
-		for (const key of ["MY_SECRET", "api_token", "DB_PASSWORD", "PASS", "OPENAI_API_KEY", "SIGNING_KEY", "AWS_CREDENTIAL"]) {
+		for (const key of [
+			"MY_SECRET",
+			"api_token",
+			"DB_PASSWORD",
+			"PASS",
+			"OPENAI_API_KEY",
+			"SIGNING_KEY",
+			"AWS_CREDENTIAL",
+		]) {
 			expect(isSecretLikeKey(key)).toBe(true);
 		}
 		for (const key of ["DATABASE_URL", "LOG_LEVEL", "PROJECT_ID", "FEATURE_FLAG"]) {
@@ -88,7 +96,7 @@ describe("shell_environment_policy scaffold emitter", () => {
 		expect(scaffold.content).not.toContain(SENTINEL);
 		expect(JSON.stringify(scaffold)).not.toContain(SENTINEL);
 		// And the secret-named key is excluded, non-secret key scaffolded inert.
-		expect(scaffold.content).toContain("DATABASE_URL = \"<fill-me>\"");
+		expect(scaffold.content).toContain('DATABASE_URL = "<fill-me>"');
 		expect(scaffold.content).not.toContain("OPENAI_API_KEY");
 		expect(scaffold.omittedSecretCount).toBe(1);
 	});

@@ -73,9 +73,18 @@ export async function pack(args: PackArgs): Promise<void> {
 	}
 }
 
-function packList(claudeDir: string, manifest: ReturnType<typeof loadPackManifest>, installed: string[], json: boolean): void {
+function packList(
+	claudeDir: string,
+	manifest: ReturnType<typeof loadPackManifest>,
+	installed: string[],
+	json: boolean,
+): void {
 	const installedSet = new Set(installed);
-	const detailed = resolvePacksDetailed(claudeDir, manifest, installed.filter((n) => n !== BASE_PACK));
+	const detailed = resolvePacksDetailed(
+		claudeDir,
+		manifest,
+		installed.filter((n) => n !== BASE_PACK),
+	);
 	const rows = availablePacks(manifest).map((name) => ({
 		pack: name,
 		installed: installedSet.has(name),
@@ -186,7 +195,10 @@ async function packRemove(
 	}
 
 	if (!args.yes) {
-		const confirm = await p.confirm({ message: `Delete ${deletable.length} file(s) for ${requested.join(", ")}?`, initialValue: false });
+		const confirm = await p.confirm({
+			message: `Delete ${deletable.length} file(s) for ${requested.join(", ")}?`,
+			initialValue: false,
+		});
 		if (p.isCancel(confirm) || confirm !== true) {
 			console.log(pc.dim("Cancelled."));
 			return;

@@ -11,10 +11,7 @@ import fs from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
 import { generatePluginPayload } from "../core/plugin-payload.js";
-import {
-	buildClaudeMarketplaceJson,
-	buildCodexMarketplaceJson,
-} from "../core/plugin-manifest.js";
+import { buildClaudeMarketplaceJson, buildCodexMarketplaceJson } from "../core/plugin-manifest.js";
 
 export const DESCRIPTION = "MeowKit — an opinionated Claude Code harness (skills, agents, hooks).";
 const OWNER = { name: "ngocsangyem" };

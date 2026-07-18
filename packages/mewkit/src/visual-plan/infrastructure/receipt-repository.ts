@@ -48,7 +48,9 @@ export function listReceipts(planDir: string): ResolutionReceipt[] {
 	for (const name of entries) {
 		if (!name.endsWith(".json")) continue;
 		try {
-			const parsed = ResolutionReceiptSchema.safeParse(JSON.parse(fs.readFileSync(path.join(planDir, RESOLUTIONS_DIR, name), "utf-8")) as unknown);
+			const parsed = ResolutionReceiptSchema.safeParse(
+				JSON.parse(fs.readFileSync(path.join(planDir, RESOLUTIONS_DIR, name), "utf-8")) as unknown,
+			);
 			if (parsed.success) out.push(parsed.data);
 		} catch {
 			// skip unreadable/invalid receipt

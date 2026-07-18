@@ -165,10 +165,20 @@ export function checkSubstrate(claudeDir: string, opts: { missingViewSeverity?: 
 	const agg = aggregateSubstrate(claudeDir);
 
 	for (const inv of agg.invalid) {
-		results.push({ name: `Substrate: ${inv.path}`, status: "fail", detail: `responsibility="${inv.value}" not in taxonomy enum`, section });
+		results.push({
+			name: `Substrate: ${inv.path}`,
+			status: "fail",
+			detail: `responsibility="${inv.value}" not in taxonomy enum`,
+			section,
+		});
 	}
 	for (const p of agg.untaggedRegistry) {
-		results.push({ name: `Substrate: ${p}`, status: "fail", detail: "registry artifact has no responsibility (seed it)", section });
+		results.push({
+			name: `Substrate: ${p}`,
+			status: "fail",
+			detail: "registry artifact has no responsibility (seed it)",
+			section,
+		});
 	}
 	if (agg.untaggedFrontmatter.length > 0) {
 		results.push({

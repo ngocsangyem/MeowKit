@@ -12,8 +12,7 @@ const ALL_AUTHORED = (fields: string[]): Record<string, Provenance> =>
 const AUTHORED_FIELDS = ["kind", "description", "intents", "whenToUse", "invocation", "requirements", "owner"];
 
 function authored(
-	partial: Pick<CapabilityEntry, "id" | "kind" | "description" | "intents"> &
-		Partial<CapabilityEntry>,
+	partial: Pick<CapabilityEntry, "id" | "kind" | "description" | "intents"> & Partial<CapabilityEntry>,
 ): CapabilityEntry {
 	return {
 		aliases: [],
@@ -98,11 +97,26 @@ export const AUTHORED_CAPABILITIES: CapabilityEntry[] = [
  */
 export const AUTHORED_INTENTS: Record<string, { intents: string[]; aliases?: string[] }> = {
 	// Batch 1: scout/research + plan→cook→review.
-	"mk:scout": { intents: ["scout the codebase", "find related files", "orient in the code", "locate code"], aliases: ["scout"] },
-	"mk:research": { intents: ["research a library", "evaluate a technology", "gather best practices"], aliases: ["research"] },
-	"mk:plan-creator": { intents: ["plan this feature", "create a plan", "draft a spec", "design the approach"], aliases: ["plan"] },
-	"mk:cook": { intents: ["implement this feature", "build this", "write the code", "make this change"], aliases: ["cook", "implement"] },
-	"mk:review": { intents: ["review this code", "code review", "check before shipping", "audit the change"], aliases: ["review"] },
+	"mk:scout": {
+		intents: ["scout the codebase", "find related files", "orient in the code", "locate code"],
+		aliases: ["scout"],
+	},
+	"mk:research": {
+		intents: ["research a library", "evaluate a technology", "gather best practices"],
+		aliases: ["research"],
+	},
+	"mk:plan-creator": {
+		intents: ["plan this feature", "create a plan", "draft a spec", "design the approach"],
+		aliases: ["plan"],
+	},
+	"mk:cook": {
+		intents: ["implement this feature", "build this", "write the code", "make this change"],
+		aliases: ["cook", "implement"],
+	},
+	"mk:review": {
+		intents: ["review this code", "code review", "check before shipping", "audit the change"],
+		aliases: ["review"],
+	},
 	// Batch 2: fix/test/ship + wiki authoring + memory. jira/browser stay owned by their
 	// authored tool entries; wiki-recall (read service) keeps the recall intents, so mk:wiki
 	// here owns only the authoring verbs — no phrase collides across capabilities.

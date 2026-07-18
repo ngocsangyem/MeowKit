@@ -1,11 +1,7 @@
 import type { ProviderCapabilityRegistryEntry } from "../contract-types.js";
 import { LAST_VERIFIED, buildCapabilities, documented, partial } from "../contract-helpers.js";
 
-const AMP_DOCS = [
-	"https://ampcode.com/manual",
-	"https://ampcode.com/news/AGENTS.md",
-	"https://ampcode.com/agent.md",
-];
+const AMP_DOCS = ["https://ampcode.com/manual", "https://ampcode.com/news/AGENTS.md", "https://ampcode.com/agent.md"];
 
 export const ampContract: ProviderCapabilityRegistryEntry = {
 	docs: AMP_DOCS,

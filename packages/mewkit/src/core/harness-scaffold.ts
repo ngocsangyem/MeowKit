@@ -57,8 +57,7 @@ export function scaffoldHarnessProject(srcRoot: string): HarnessProject {
 	fs.mkdirSync(path.join(dir, "tasks", "contracts"), { recursive: true });
 	fs.writeFileSync(path.join(dir, "CLAUDE.md"), "# test project\n");
 
-	const frontmatter = (approved: boolean): string =>
-		`---\nstatus: ${approved ? "approved" : "pending"}\n---\n# plan\n`;
+	const frontmatter = (approved: boolean): string => `---\nstatus: ${approved ? "approved" : "pending"}\n---\n# plan\n`;
 
 	return {
 		dir,

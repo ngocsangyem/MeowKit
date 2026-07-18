@@ -3,12 +3,7 @@
 import { describe, expect, it } from "vitest";
 import type { CheckResult } from "../../commands/validate.js";
 import type { ReportArtifact } from "../../migrate/validation/migration-report-writer.js";
-import {
-	artifactSetEquivalence,
-	deniedTokenCleanliness,
-	routeTableEquivalence,
-	sideEffectDenial,
-} from "../oracles.js";
+import { artifactSetEquivalence, deniedTokenCleanliness, routeTableEquivalence, sideEffectDenial } from "../oracles.js";
 
 const artifact = (o: Partial<ReportArtifact>): ReportArtifact => ({
 	type: "skill",
@@ -16,7 +11,13 @@ const artifact = (o: Partial<ReportArtifact>): ReportArtifact => ({
 	status: "migrated",
 	...o,
 });
-const check = (o: Partial<CheckResult>): CheckResult => ({ name: "n", status: "pass", detail: "", section: "Target", ...o });
+const check = (o: Partial<CheckResult>): CheckResult => ({
+	name: "n",
+	status: "pass",
+	detail: "",
+	section: "Target",
+	...o,
+});
 
 describe("routeTableEquivalence", () => {
 	it("passes when routable artifacts migrated or skipped-with-reason and a non-routable was skipped", () => {
@@ -64,10 +65,14 @@ describe("artifactSetEquivalence", () => {
 
 describe("deniedTokenCleanliness", () => {
 	it("passes when the tool-token check passes", () => {
-		expect(deniedTokenCleanliness([check({ name: "Codex installed skills tool-token clean", status: "pass" })]).pass).toBe(true);
+		expect(
+			deniedTokenCleanliness([check({ name: "Codex installed skills tool-token clean", status: "pass" })]).pass,
+		).toBe(true);
 	});
 	it("fails when the tool-token check FAILs", () => {
-		expect(deniedTokenCleanliness([check({ name: "Codex installed skills tool-token clean", status: "fail" })]).pass).toBe(false);
+		expect(
+			deniedTokenCleanliness([check({ name: "Codex installed skills tool-token clean", status: "fail" })]).pass,
+		).toBe(false);
 	});
 	it("passes (no skills) when the tool-token check is absent", () => {
 		expect(deniedTokenCleanliness([check({ name: "something else" })]).pass).toBe(true);

@@ -74,11 +74,23 @@ export async function context(args: ContextOptions = {}): Promise<void> {
 		// Pair each result with its evidence ref (1:1, same order) to group BY OWNING REPO.
 		const paired = results.map((r, i) => ({ ...r, ref: envelope.evidence[i] }));
 		if (args.json) {
-			console.log(JSON.stringify({ boundaryRoot: envelope.boundaryRoot, repos: distinctRepos(envelope.evidence), results }, null, 2));
+			console.log(
+				JSON.stringify(
+					{ boundaryRoot: envelope.boundaryRoot, repos: distinctRepos(envelope.evidence), results },
+					null,
+					2,
+				),
+			);
 			return;
 		}
 		const tagFor = (s: string): string =>
-			s === "fresh" ? pc.green("fresh") : s === "stale" ? pc.yellow("stale") : s === "out-of-scope" ? pc.red("out-of-scope") : pc.red("missing");
+			s === "fresh"
+				? pc.green("fresh")
+				: s === "stale"
+					? pc.yellow("stale")
+					: s === "out-of-scope"
+						? pc.red("out-of-scope")
+						: pc.red("missing");
 		console.log(pc.bold(pc.cyan(`Context freshness — scope: ${envelope.boundaryRoot}`)));
 		// Per-repo grouping: each owning repo (with its own revision) is reported separately, so a
 		// multi-repo task never loses which repo an evidence file — and its freshness — belongs to.

@@ -185,7 +185,11 @@ describe("portability policy", () => {
 	});
 
 	it("skips orchestration-only rules for non-Claude targets", () => {
-		const rule = makeItem("rules", "workflow/gates", "Phase 4 requires Gate 2 review before the orchestrator continues.");
+		const rule = makeItem(
+			"rules",
+			"workflow/gates",
+			"Phase 4 requires Gate 2 review before the orchestrator continues.",
+		);
 		const plan = makePlan([
 			{
 				action: "install",
@@ -438,7 +442,9 @@ describe("portability policy", () => {
 		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["portable-skill"]);
 		expect(result.skillsByProvider.get("cursor")?.map((skill) => skill.name)).toEqual([]);
 		// Default-deny: the claude-code skill is skipped for Codex with no adapter.
-		expect(result.skipMessages.some((m) => /Skipped 1 skill for Codex:.*runtime: claude-code.*default-deny/.test(m))).toBe(true);
+		expect(
+			result.skipMessages.some((m) => /Skipped 1 skill for Codex:.*runtime: claude-code.*default-deny/.test(m)),
+		).toBe(true);
 		expect(result.skipMessages).toContain(
 			"Skipped 2 skills for Cursor: skill portability metadata first pass is limited to Codex, Gemini CLI, Antigravity, and OpenCode",
 		);
@@ -487,7 +493,9 @@ describe("portability policy", () => {
 		);
 
 		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["generic-helper"]);
-		expect(result.skipMessages.some((m) => /Skipped 1 skill for Codex:.*runtime: claude-code.*default-deny/.test(m))).toBe(true);
+		expect(
+			result.skipMessages.some((m) => /Skipped 1 skill for Codex:.*runtime: claude-code.*default-deny/.test(m)),
+		).toBe(true);
 	});
 
 	it("keeps otherwise generic skills when Markdown reference files contain rewriteable path coupling", async () => {
@@ -633,7 +641,15 @@ describe("portability policy", () => {
 		await writeFile(join(skillDir, "scripts", "run.sh"), 'rm -rf "$CLAUDE_PROJECT_DIR/.claude/hooks/log.json"\n');
 
 		const result = await buildPortableSkillsByProvider(
-			[{ id: "mk:forced-destructive", name: "forced-destructive", dirName: "forced-destructive", description: "bound", sourcePath: skillDir }],
+			[
+				{
+					id: "mk:forced-destructive",
+					name: "forced-destructive",
+					dirName: "forced-destructive",
+					description: "bound",
+					sourcePath: skillDir,
+				},
+			],
 			["codex"] satisfies ProviderType[],
 			{ includeUnportable: true },
 		);
@@ -658,7 +674,12 @@ describe("portability policy", () => {
 					name: "excluded-skill",
 					dirName: "excluded-skill",
 					description: "bound",
-					portability: { portability: "generic", providers: { exclude: ["codex"] }, requires: { surfaces: ["skill"] }, contextCost: "low" },
+					portability: {
+						portability: "generic",
+						providers: { exclude: ["codex"] },
+						requires: { surfaces: ["skill"] },
+						contextCost: "low",
+					},
 					sourcePath: skillDir,
 				},
 			],
@@ -719,18 +740,18 @@ describe("portability policy", () => {
 			[
 				{
 					id: "mk:portable-skill",
-				name: "portable-skill",
-				dirName: "portable-skill",
-				description: "Generic helper",
-				portability: {
-					portability: "generic",
-					providers: { include: ["codex"] },
-					requires: { surfaces: ["skill"] },
-					contextCost: "low",
+					name: "portable-skill",
+					dirName: "portable-skill",
+					description: "Generic helper",
+					portability: {
+						portability: "generic",
+						providers: { include: ["codex"] },
+						requires: { surfaces: ["skill"] },
+						contextCost: "low",
+					},
+					sourcePath: skillDir,
 				},
-				sourcePath: skillDir,
-			},
-		],
+			],
 			["codex", "cursor"] satisfies ProviderType[],
 		);
 
@@ -739,5 +760,4 @@ describe("portability policy", () => {
 			"Cursor: 0 skill folders scheduled for install",
 		]);
 	});
-
 });

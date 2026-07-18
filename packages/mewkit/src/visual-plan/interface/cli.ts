@@ -55,7 +55,9 @@ function runValidate(planDir: string, json: boolean): void {
 		emit({ ok: r.ok, coverage: r.coverage ?? null, errors: r.errors });
 	} else if (r.ok) {
 		const c = r.coverage;
-		const cov = c ? ` (coverage ${c.resolved} resolved / ${c.planned} planned / ${c.omitted} omitted / ${c.unresolved} unresolved)` : "";
+		const cov = c
+			? ` (coverage ${c.resolved} resolved / ${c.planned} planned / ${c.omitted} omitted / ${c.unresolved} unresolved)`
+			: "";
 		console.log(`${pc.green("✓")} visual-plan valid${cov}`);
 	} else {
 		console.error(`${pc.red("✗")} visual-plan invalid — ${r.errors.length} error(s):`);
@@ -230,7 +232,9 @@ function runRehash(planDir: string, json: boolean): void {
 	if (json) {
 		emit(r);
 	} else if (r.ok) {
-		console.log(`${pc.green("✓")} source hashes refreshed${r.clearedApproval ? pc.yellow(" — prior approval cleared") : ""}`);
+		console.log(
+			`${pc.green("✓")} source hashes refreshed${r.clearedApproval ? pc.yellow(" — prior approval cleared") : ""}`,
+		);
 	} else {
 		printErrors(r.errors);
 	}
@@ -242,11 +246,31 @@ export function visualPlanCommand(args: VisualPlanCliArgs): void | Promise<void>
 	const sub = args.subcommand;
 	// Long-running studio commands (own their plan-dir resolution + browser lifecycle).
 	if (sub === "edit" || sub === "view") {
-		return runStudio({ mode: sub, planDir: args.planDir, open: args.open, noOpen: args.noOpen, force: args.force, port: args.port });
+		return runStudio({
+			mode: sub,
+			planDir: args.planDir,
+			open: args.open,
+			noOpen: args.noOpen,
+			force: args.force,
+			port: args.port,
+		});
 	}
-	const known = new Set(["validate", "status", "approve", "rehash", "export", "prepare-feedback", "apply-feedback", "patch"]);
+	const known = new Set([
+		"validate",
+		"status",
+		"approve",
+		"rehash",
+		"export",
+		"prepare-feedback",
+		"apply-feedback",
+		"patch",
+	]);
 	if (!sub || !known.has(sub)) {
-		console.error(pc.red(`visual-plan: expected one of validate|status|approve|rehash|export|prepare-feedback|apply-feedback|patch|edit|view (got ${sub ?? "nothing"})`));
+		console.error(
+			pc.red(
+				`visual-plan: expected one of validate|status|approve|rehash|export|prepare-feedback|apply-feedback|patch|edit|view (got ${sub ?? "nothing"})`,
+			),
+		);
 		process.exitCode = 2;
 		return;
 	}

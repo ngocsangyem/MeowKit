@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { MewkitMigrateError, selectProviders, validateFlags, warnUnverifiedProviders } from "../migrate-mode-resolver.js";
+import {
+	MewkitMigrateError,
+	selectProviders,
+	validateFlags,
+	warnUnverifiedProviders,
+} from "../migrate-mode-resolver.js";
 import { applyMewkitOverrides } from "../provider-overrides.js";
 
 describe("migrate-mode-resolver", () => {

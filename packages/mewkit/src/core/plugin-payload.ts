@@ -19,30 +19,13 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { extname, join, relative } from "node:path";
-import {
-	buildClaudePluginJson,
-	buildCodexPluginJson,
-	PLUGIN_NAME,
-	type PluginIdentity,
-} from "./plugin-manifest.js";
+import { buildClaudePluginJson, buildCodexPluginJson, PLUGIN_NAME, type PluginIdentity } from "./plugin-manifest.js";
 import { collectAgentNames, rewriteAgentRefs } from "./plugin-agent-refs.js";
 import { buildPluginHooks, readSettingsHooks } from "./plugin-hooks.js";
 import { findPseudoCapabilities, formatPseudoCapabilityError } from "./check-pseudo-capabilities.js";
 
 /** File extensions whose contents are scanned for agent references. */
-const TEXT_EXTENSIONS = new Set([
-	".md",
-	".json",
-	".sh",
-	".cjs",
-	".mjs",
-	".js",
-	".ts",
-	".py",
-	".txt",
-	".yaml",
-	".yml",
-]);
+const TEXT_EXTENSIONS = new Set([".md", ".json", ".sh", ".cjs", ".mjs", ".js", ".ts", ".py", ".txt", ".yaml", ".yml"]);
 
 /** Top-level `.claude` entries excluded from the plugin payload (runtime state). */
 const EXCLUDED_DIRS = new Set(["session-state", "memory", "logs"]);

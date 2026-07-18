@@ -174,7 +174,9 @@ export async function loadModelRoutingConfig(cwd = process.cwd()): Promise<Model
 		setTaxonomyOverrides(overrides);
 		return { path, overrides, warnings };
 	} catch (err) {
-		warnings.push(`${path} could not be read as JSON; model routing ignored (${err instanceof Error ? err.message : String(err)})`);
+		warnings.push(
+			`${path} could not be read as JSON; model routing ignored (${err instanceof Error ? err.message : String(err)})`,
+		);
 		setTaxonomyOverrides(undefined);
 		return { path, overrides: undefined, warnings };
 	}

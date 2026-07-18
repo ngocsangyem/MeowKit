@@ -57,10 +57,16 @@ describe("migrate idempotency and conflict handling", () => {
 	it("the migration report's per-artifact section is deterministic across re-runs", async () => {
 		expect(await env.run({})).toBe(0);
 		const reportPath = join(env.projectDir, ".codex", "migration-report.json");
-		const first = JSON.parse(readFileSync(reportPath, "utf-8")) as { header: { timestamp: string }; artifacts: unknown[] };
+		const first = JSON.parse(readFileSync(reportPath, "utf-8")) as {
+			header: { timestamp: string };
+			artifacts: unknown[];
+		};
 
 		expect(await env.run({})).toBe(0);
-		const second = JSON.parse(readFileSync(reportPath, "utf-8")) as { header: { timestamp: string }; artifacts: unknown[] };
+		const second = JSON.parse(readFileSync(reportPath, "utf-8")) as {
+			header: { timestamp: string };
+			artifacts: unknown[];
+		};
 
 		// Artifact keys are stable — only the header timestamp is allowed to vary.
 		expect(JSON.stringify(second.artifacts)).toBe(JSON.stringify(first.artifacts));

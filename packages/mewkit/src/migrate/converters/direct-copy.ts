@@ -3,10 +3,7 @@
 import { readFileSync } from "node:fs";
 import { extname } from "node:path";
 import { rewriteConfiguredModelReferences } from "../model-taxonomy.js";
-import {
-	rewriteSourceReferences,
-	type ReferenceIntegrityIndex,
-} from "../references/fence-aware-reference-rewriter.js";
+import { rewriteSourceReferences, type ReferenceIntegrityIndex } from "../references/fence-aware-reference-rewriter.js";
 import type { ReferenceOccurrence } from "../references/reference-types.js";
 import type { ConversionResult, PortableItem, ProviderType } from "../types.js";
 

@@ -81,9 +81,13 @@ describe("findOperationConformance", () => {
 
 describe("isBlockingGap", () => {
 	it("treats unsupported/unknown as blocking and local-fallback as disclosed", () => {
-		expect(isBlockingGap({ skill: "s", operation: "delegate_agent", provider: "codex", support: "unsupported" })).toBe(true);
+		expect(isBlockingGap({ skill: "s", operation: "delegate_agent", provider: "codex", support: "unsupported" })).toBe(
+			true,
+		);
 		expect(isBlockingGap({ skill: "s", operation: "run_shell", provider: "codex", support: "unknown" })).toBe(true);
-		expect(isBlockingGap({ skill: "s", operation: "ask_user", provider: "codex", support: "local-fallback" })).toBe(false);
+		expect(isBlockingGap({ skill: "s", operation: "ask_user", provider: "codex", support: "local-fallback" })).toBe(
+			false,
+		);
 	});
 });
 

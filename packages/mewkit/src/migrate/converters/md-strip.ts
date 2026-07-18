@@ -3,10 +3,7 @@
 // already covered by the existing slash-command regex (matches /[a-z][a-z0-9/._:-]+).
 
 import { providers } from "../provider-registry.js";
-import {
-	rewriteSourceReferences,
-	type ReferenceIntegrityIndex,
-} from "../references/fence-aware-reference-rewriter.js";
+import { rewriteSourceReferences, type ReferenceIntegrityIndex } from "../references/fence-aware-reference-rewriter.js";
 import { getReferenceTarget, sourceHooksLinePattern } from "../references/reference-target-registry.js";
 import type { ReferenceOccurrence } from "../references/reference-types.js";
 import type { ConversionResult, PortableItem, ProviderType } from "../types.js";

@@ -65,7 +65,9 @@ function recordFriction(claudeDir: string, opts: TraceOptions): void {
 		data,
 	};
 	fs.appendFileSync(path.join(memDir, "trace-log.jsonl"), JSON.stringify(record) + "\n");
-	console.log(`${pc.green("Recorded friction.")} ${pc.dim(opts.responsibility ? `[${opts.responsibility}] ` : "")}${data["message"] as string}`);
+	console.log(
+		`${pc.green("Recorded friction.")} ${pc.dim(opts.responsibility ? `[${opts.responsibility}] ` : "")}${data["message"] as string}`,
+	);
 }
 
 function runScore(records: TraceRecord[], opts: TraceOptions): void {
@@ -103,7 +105,9 @@ function runAudit(records: TraceRecord[], opts: TraceOptions): void {
 	if (audit.repeatedFriction.length > 0) {
 		console.log(pc.bold("  Repeated friction (≥2):"));
 		for (const g of audit.repeatedFriction)
-			console.log(`    ${pc.yellow(`×${g.count}`)} ${g.message}${g.responsibility ? pc.dim(` [${g.responsibility}]`) : ""}`);
+			console.log(
+				`    ${pc.yellow(`×${g.count}`)} ${g.message}${g.responsibility ? pc.dim(` [${g.responsibility}]`) : ""}`,
+			);
 	} else {
 		console.log(pc.dim("  No repeated friction."));
 	}
@@ -118,7 +122,9 @@ function runPropose(claudeDir: string, records: TraceRecord[], opts: TraceOption
 	}
 	console.log(pc.bold(pc.cyan(`Trace propose — ${items.length} advisory item(s)${opts.commit ? "" : " (dry-run)"}`)));
 	for (const it of items)
-		console.log(`  [${it.kind}] ${it.title} ${pc.dim(`(evidence ×${it.evidenceCount}${it.responsibility ? `, ${it.responsibility}` : ""})`)}`);
+		console.log(
+			`  [${it.kind}] ${it.title} ${pc.dim(`(evidence ×${it.evidenceCount}${it.responsibility ? `, ${it.responsibility}` : ""})`)}`,
+		);
 	if (items.length === 0) console.log(pc.dim("  Nothing to propose — no repeated friction or drift."));
 
 	if (opts.commit && items.length > 0) {
@@ -127,7 +133,9 @@ function runPropose(claudeDir: string, records: TraceRecord[], opts: TraceOption
 		const stamp = new Date().toISOString().slice(0, 10);
 		const lines = [`\n## ${stamp} — advisory proposals (trace propose)`];
 		for (const it of items)
-			lines.push(`- [${it.kind}] ${it.title} (evidence ×${it.evidenceCount}${it.responsibility ? `, ${it.responsibility}` : ""})`);
+			lines.push(
+				`- [${it.kind}] ${it.title} (evidence ×${it.evidenceCount}${it.responsibility ? `, ${it.responsibility}` : ""})`,
+			);
 		fs.appendFileSync(backlog, lines.join("\n") + "\n");
 		console.log(pc.green(`\nAppended ${items.length} item(s) to ${backlog}`));
 	} else if (!opts.commit) {

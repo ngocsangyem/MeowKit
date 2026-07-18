@@ -67,7 +67,8 @@ export const ENV_VAR_REWRITE_TABLE: readonly EnvVarRewriteEntry[] = [
 	{
 		tokens: ["$CLAUDE_MODEL", "${CLAUDE_MODEL}"],
 		disposition: "neutralize",
-		annotation: "references $CLAUDE_MODEL, which has no provider-portable value — wire it to the provider's model variable manually",
+		annotation:
+			"references $CLAUDE_MODEL, which has no provider-portable value — wire it to the provider's model variable manually",
 	},
 ];
 

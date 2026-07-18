@@ -27,10 +27,7 @@ async function resolveCanonicalPath(path: string): Promise<string> {
 	return suffix.length === 0 ? canonicalBase : join(canonicalBase, ...suffix);
 }
 
-async function validateNoSymlinkComponents(
-	targetPath: string,
-	boundaryPath: string,
-): Promise<string | null> {
+async function validateNoSymlinkComponents(targetPath: string, boundaryPath: string): Promise<string | null> {
 	const resolvedTarget = await resolveCanonicalPath(targetPath);
 	const resolvedBoundary = await resolveCanonicalPath(boundaryPath);
 

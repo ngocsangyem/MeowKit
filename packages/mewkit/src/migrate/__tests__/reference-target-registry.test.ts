@@ -66,7 +66,6 @@ describe("reference target registry", () => {
 		expect(projectTarget?.path).toBe("AGENTS.md");
 		expect(globalTarget?.path).toBe("~/.codex/AGENTS.md");
 	});
-
 });
 
 describe("converter source hygiene", () => {
@@ -76,10 +75,7 @@ describe("converter source hygiene", () => {
 
 	it("refactored converters contain no source-root or provider-root literals", () => {
 		for (const file of guardedFiles) {
-			const source = readFileSync(
-				fileURLToPath(new URL(`../converters/${file}`, import.meta.url)),
-				"utf-8",
-			);
+			const source = readFileSync(fileURLToPath(new URL(`../converters/${file}`, import.meta.url)), "utf-8");
 			expect(source, `${file} must not embed ".claude" literals`).not.toMatch(/\.claude/);
 			expect(source, `${file} must not embed provider root literals`).not.toMatch(
 				/"\.(codex|cursor|gemini|opencode|factory|windsurf|agent|roo|kilocode|goose|agents|cline|openhands|github)\//,

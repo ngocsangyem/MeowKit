@@ -105,10 +105,9 @@ describe("stripClaudeRefs — narrative brand prose", () => {
 		});
 
 		it("preserves Anthropic when explicit <!-- research-citation --> marker is nearby", () => {
-			const input = [
-				"<!-- research-citation -->",
-				"Anthropic's published guidance suggests minimizing wrappers.",
-			].join("\n");
+			const input = ["<!-- research-citation -->", "Anthropic's published guidance suggests minimizing wrappers."].join(
+				"\n",
+			);
 			const { content } = stripClaudeRefs(input, { provider: "codex" });
 			expect(content).toContain("Anthropic");
 		});

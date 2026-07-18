@@ -66,7 +66,9 @@ function assertSafeArtifactPath(projectRoot: string, artifactPath: string): stri
 	const lower = resolved.toLowerCase();
 	const base = path.basename(lower);
 	if (SENSITIVE_BASENAME.test(base) || lower.includes("credentials") || lower.includes("secret")) {
-		throw new Error("artifact path matches a sensitive-file pattern (injection-rules.md R4): " + JSON.stringify(artifactPath));
+		throw new Error(
+			"artifact path matches a sensitive-file pattern (injection-rules.md R4): " + JSON.stringify(artifactPath),
+		);
 	}
 	return resolved;
 }
@@ -75,7 +77,12 @@ export class HandoffService {
 	constructor(private readonly deps: HandoffServiceDeps) {}
 
 	/** Read-only: build the packet + decision for an artifact. Writes NOTHING. */
-	suggest(skillName: string, artifactPath: string, slug: WikiSlug, overrides: Partial<ArtifactSignal> = {}): SuggestResult {
+	suggest(
+		skillName: string,
+		artifactPath: string,
+		slug: WikiSlug,
+		overrides: Partial<ArtifactSignal> = {},
+	): SuggestResult {
 		const built = this.build(skillName, artifactPath, slug, overrides);
 		return { packet: built.packet, decision: built.decision };
 	}
@@ -83,7 +90,12 @@ export class HandoffService {
 	/** Scan → (clean + eligible) propose a candidate → append exactly one handoff outcome
 	 * record. Dirty or non-suggested artifacts create no candidate; a metadata-only record
 	 * (never raw content) is still appended for provenance. */
-	propose(skillName: string, artifactPath: string, slug: WikiSlug, overrides: Partial<ArtifactSignal> = {}): { record: WikiHandoffRecord; result?: ProposeResult } {
+	propose(
+		skillName: string,
+		artifactPath: string,
+		slug: WikiSlug,
+		overrides: Partial<ArtifactSignal> = {},
+	): { record: WikiHandoffRecord; result?: ProposeResult } {
 		const built = this.build(skillName, artifactPath, slug, overrides);
 		const { packet, scanClean, shouldSuggest } = built;
 

@@ -33,11 +33,7 @@ async function writeText(root: string, relPath: string, content: string): Promis
 }
 
 /** Source release that ships `files` and declares `deletions[]`. */
-async function makeSource(
-	version: string,
-	files: Record<string, string>,
-	deletions: string[],
-): Promise<string> {
+async function makeSource(version: string, files: Record<string, string>, deletions: string[]): Promise<string> {
 	const source = await makeTempRoot();
 	const manifestFiles: Array<{ path: string; checksum: string }> = [];
 	for (const [rel, content] of Object.entries(files)) {
@@ -102,7 +98,10 @@ describe("smartUpdate deletions processing", () => {
 		const target = await makeTempRoot();
 		await seedInstall(target, { "rules/old.md": "shipped\n" });
 
-		const stats = await smartUpdate(config, source, target, /* dryRun */ true, false, { cleanup: true, assumeYes: true });
+		const stats = await smartUpdate(config, source, target, /* dryRun */ true, false, {
+			cleanup: true,
+			assumeYes: true,
+		});
 
 		expect(stats.deletionsPreview).toEqual(["rules/old.md"]);
 		expect(stats.deletionsDeleted).toEqual([]);

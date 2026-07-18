@@ -64,7 +64,10 @@ export async function detectCodexVersion(): Promise<string | null> {
 	}
 	try {
 		const { stdout } = await execFileAsync("codex", ["--version"], { timeout: 5000, encoding: "utf8" });
-		return stdout.trim().replace(/^(codex\s+)?v?/i, "").trim();
+		return stdout
+			.trim()
+			.replace(/^(codex\s+)?v?/i, "")
+			.trim();
 	} catch {
 		return null;
 	}
@@ -171,15 +174,12 @@ if (CODEX_CAPABILITY_TABLE.length > 1) {
 		const newer = semver.coerce(CODEX_CAPABILITY_TABLE[i].version);
 		const older = semver.coerce(CODEX_CAPABILITY_TABLE[i + 1].version);
 		if (newer && older && !semver.gte(newer, older)) {
-			throw new Error(
-				`[mewkit] CODEX_CAPABILITY_TABLE ordering violation: entry[${i}] must be >= entry[${i + 1}]`,
-			);
+			throw new Error(`[mewkit] CODEX_CAPABILITY_TABLE ordering violation: entry[${i}] must be >= entry[${i + 1}]`);
 		}
 	}
 }
 
-const FALLBACK_CAPABILITIES: CodexCapabilities =
-	CODEX_CAPABILITY_TABLE[CODEX_CAPABILITY_TABLE.length - 1];
+const FALLBACK_CAPABILITIES: CodexCapabilities = CODEX_CAPABILITY_TABLE[CODEX_CAPABILITY_TABLE.length - 1];
 
 export async function detectCodexCapabilities(): Promise<CodexCapabilities> {
 	if (process.env.MEWKIT_CODEX_COMPAT === "strict") {
@@ -199,13 +199,9 @@ export async function detectCodexCapabilities(): Promise<CodexCapabilities> {
 		const match = findCapabilitiesForVersion(version);
 		if (match) return match;
 
-		return process.env.MEWKIT_CODEX_COMPAT === "optimistic"
-			? CODEX_CAPABILITY_TABLE[0]
-			: FALLBACK_CAPABILITIES;
+		return process.env.MEWKIT_CODEX_COMPAT === "optimistic" ? CODEX_CAPABILITY_TABLE[0] : FALLBACK_CAPABILITIES;
 	} catch {
-		return process.env.MEWKIT_CODEX_COMPAT === "optimistic"
-			? CODEX_CAPABILITY_TABLE[0]
-			: FALLBACK_CAPABILITIES;
+		return process.env.MEWKIT_CODEX_COMPAT === "optimistic" ? CODEX_CAPABILITY_TABLE[0] : FALLBACK_CAPABILITIES;
 	}
 }
 
@@ -219,10 +215,7 @@ function findCapabilitiesForVersion(version: string): CodexCapabilities | null {
 	for (const entry of CODEX_CAPABILITY_TABLE) {
 		const coercedEntry = semver.coerce(entry.version);
 		if (!coercedEntry) continue;
-		if (
-			coercedDetected.major === coercedEntry.major &&
-			coercedDetected.minor === coercedEntry.minor
-		) {
+		if (coercedDetected.major === coercedEntry.major && coercedDetected.minor === coercedEntry.minor) {
 			return entry;
 		}
 		if (semver.gte(coercedDetected, coercedEntry)) return entry;
@@ -232,7 +225,5 @@ function findCapabilitiesForVersion(version: string): CodexCapabilities | null {
 }
 
 export const CODEX_SUPPORTED_EVENTS = new Set<string>(
-	Object.keys(CODEX_CAPABILITY_TABLE[0].events).filter(
-		(e) => CODEX_CAPABILITY_TABLE[0].events[e].supported,
-	),
+	Object.keys(CODEX_CAPABILITY_TABLE[0].events).filter((e) => CODEX_CAPABILITY_TABLE[0].events[e].supported),
 );

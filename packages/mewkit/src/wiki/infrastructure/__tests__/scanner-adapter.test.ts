@@ -48,7 +48,7 @@ describe("ScannerAdapter.scan", () => {
 	});
 
 	it("flags a context-flood payload (R9)", () => {
-		const out = scanner.scan({ content: ("spam line\n").repeat(2000), origin: "agent" });
+		const out = scanner.scan({ content: "spam line\n".repeat(2000), origin: "agent" });
 		expect(out.verdict.status).toBe("injection");
 		expect(out.verdict.findings).toContain("context-flood");
 	});
@@ -146,7 +146,9 @@ describe("ApprovedWrite.issue (write chokepoint)", () => {
 
 	it("refuses an under-scanned clean verdict", () => {
 		const thin: InjectionVerdict = { status: "clean", passes: 1, findings: [] };
-		expect(() => ApprovedWrite.issue(buildPage(), { verdict: thin, scrubbed: "body", secretsFound: false })).toThrow(/pass/);
+		expect(() => ApprovedWrite.issue(buildPage(), { verdict: thin, scrubbed: "body", secretsFound: false })).toThrow(
+			/pass/,
+		);
 	});
 });
 

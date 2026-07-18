@@ -34,17 +34,27 @@ function makeTarget(): string {
 		join(dir, ".codex", "hooks.json"),
 		JSON.stringify({ hooks: { PreToolUse: [{ hooks: [{ type: "command", command: `bash "${wrapper}"` }] }] } }),
 	);
-	writeFileSync(join(dir, ".agents", "skills", "demo", "SKILL.md"), "---\nname: demo\nruntime: portable\n---\n\n# Demo\nPure guidance.\n");
+	writeFileSync(
+		join(dir, ".agents", "skills", "demo", "SKILL.md"),
+		"---\nname: demo\nruntime: portable\n---\n\n# Demo\nPure guidance.\n",
+	);
 	return dir;
 }
 
-const status = (rs: CheckResult[], nameStart: string): string | undefined => rs.find((r) => r.name.startsWith(nameStart))?.status;
+const status = (rs: CheckResult[], nameStart: string): string | undefined =>
+	rs.find((r) => r.name.startsWith(nameStart))?.status;
 const anyFail = (rs: CheckResult[]): boolean => rs.some((r) => r.status === "fail");
 
 describe("codex target validation", () => {
 	it("a valid generated target passes every check (no FAIL)", async () => {
 		const rs = await codexTargetProfile.check(makeTarget());
-		expect(anyFail(rs), rs.filter((r) => r.status === "fail").map((r) => `${r.name}: ${r.detail}`).join("; ")).toBe(false);
+		expect(
+			anyFail(rs),
+			rs
+				.filter((r) => r.status === "fail")
+				.map((r) => `${r.name}: ${r.detail}`)
+				.join("; "),
+		).toBe(false);
 		expect(status(rs, "Codex config.toml parses")).toBe("pass");
 		expect(status(rs, "Codex hook deny contract")).toBe("pass");
 		expect(status(rs, "Codex installed skills tool-token clean")).toBe("pass");
@@ -95,21 +105,30 @@ describe("codex target validation", () => {
 
 	it("an installed skill with a tool token (/mk:) → FAIL tool-token clean", async () => {
 		const d = makeTarget();
-		writeFileSync(join(d, ".agents", "skills", "demo", "SKILL.md"), "---\nname: demo\nruntime: portable\n---\n\nRun /mk:cook now.\n");
+		writeFileSync(
+			join(d, ".agents", "skills", "demo", "SKILL.md"),
+			"---\nname: demo\nruntime: portable\n---\n\nRun /mk:cook now.\n",
+		);
 		const rs = await codexTargetProfile.check(d);
 		expect(status(rs, "Codex installed skills tool-token clean")).toBe("fail");
 	});
 
 	it("an installed runtime: claude-code skill → FAIL runtime-supported (default-deny breach)", async () => {
 		const d = makeTarget();
-		writeFileSync(join(d, ".agents", "skills", "demo", "SKILL.md"), "---\nname: demo\nruntime: claude-code\n---\n\nGuidance.\n");
+		writeFileSync(
+			join(d, ".agents", "skills", "demo", "SKILL.md"),
+			"---\nname: demo\nruntime: claude-code\n---\n\nGuidance.\n",
+		);
 		const rs = await codexTargetProfile.check(d);
 		expect(status(rs, "Codex installed skills runtime-supported")).toBe("fail");
 	});
 
 	it("a preserved .claude/ path ref → WARN (not FAIL) — no-fabricate policy", async () => {
 		const d = makeTarget();
-		writeFileSync(join(d, ".agents", "skills", "demo", "SKILL.md"), "---\nname: demo\nruntime: portable\n---\n\nSee .claude/scripts/x.py (out-of-set).\n");
+		writeFileSync(
+			join(d, ".agents", "skills", "demo", "SKILL.md"),
+			"---\nname: demo\nruntime: portable\n---\n\nSee .claude/scripts/x.py (out-of-set).\n",
+		);
 		const rs = await codexTargetProfile.check(d);
 		expect(status(rs, "Codex installed skills tool-token clean")).toBe("pass"); // path is not a tool token
 		expect(status(rs, "Codex installed skills path refs")).toBe("warn");

@@ -49,7 +49,11 @@ export async function runStudio(args: StudioArgs): Promise<void> {
 		return;
 	}
 	if (!artifactExists(planDir)) {
-		console.error(pc.red(`No visual artifact at ${path.join(planDir, "visual-plan", "plan.json")}. Generate one via mk:plan-creator first.`));
+		console.error(
+			pc.red(
+				`No visual artifact at ${path.join(planDir, "visual-plan", "plan.json")}. Generate one via mk:plan-creator first.`,
+			),
+		);
 		process.exitCode = 2;
 		return;
 	}
@@ -62,7 +66,11 @@ export async function runStudio(args: StudioArgs): Promise<void> {
 		const lock = acquireEditLock(planDir, server.port, args.force === true);
 		if (!lock.ok) {
 			await server.stop();
-			console.error(pc.red(`Another edit session holds this plan (pid ${lock.heldBy?.pid}, port ${lock.heldBy?.port}). Use --force to override.`));
+			console.error(
+				pc.red(
+					`Another edit session holds this plan (pid ${lock.heldBy?.pid}, port ${lock.heldBy?.port}). Use --force to override.`,
+				),
+			);
 			process.exitCode = 1;
 			return;
 		}

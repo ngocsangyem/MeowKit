@@ -31,12 +31,42 @@ export interface AdapterTokenRule {
 }
 
 export const CODEX_TOKEN_ADAPTERS: readonly AdapterTokenRule[] = [
-	{ label: "mk/meow slash command", pattern: /\/(?:mk|meow):([a-z0-9-]+)/gi, replacement: "the $1 skill", degraded: true, kind: "tool" },
-	{ label: "AskUserQuestion tool", pattern: /\bAskUserQuestion\b/g, replacement: "stop and ask the user in chat", degraded: true, kind: "tool" },
-	{ label: "Task( tool call", pattern: /\bTask\(/g, replacement: "delegate a sub-task (", degraded: true, kind: "tool" },
+	{
+		label: "mk/meow slash command",
+		pattern: /\/(?:mk|meow):([a-z0-9-]+)/gi,
+		replacement: "the $1 skill",
+		degraded: true,
+		kind: "tool",
+	},
+	{
+		label: "AskUserQuestion tool",
+		pattern: /\bAskUserQuestion\b/g,
+		replacement: "stop and ask the user in chat",
+		degraded: true,
+		kind: "tool",
+	},
+	{
+		label: "Task( tool call",
+		pattern: /\bTask\(/g,
+		replacement: "delegate a sub-task (",
+		degraded: true,
+		kind: "tool",
+	},
 	{ label: "subagent primitive", pattern: /\bsubagents?\b/gi, replacement: "sub-task", degraded: true, kind: "tool" },
-	{ label: "Claude env var", pattern: /\$\{?CLAUDE_[A-Z0-9_]+\}?/g, replacement: "the project environment", degraded: true, kind: "tool" },
-	{ label: "Anthropic env var", pattern: /\$\{?ANTHROPIC_[A-Z0-9_]+\}?/g, replacement: "the provider API key", degraded: true, kind: "tool" },
+	{
+		label: "Claude env var",
+		pattern: /\$\{?CLAUDE_[A-Z0-9_]+\}?/g,
+		replacement: "the project environment",
+		degraded: true,
+		kind: "tool",
+	},
+	{
+		label: "Anthropic env var",
+		pattern: /\$\{?ANTHROPIC_[A-Z0-9_]+\}?/g,
+		replacement: "the provider API key",
+		degraded: true,
+		kind: "tool",
+	},
 	{ label: "CLAUDE.md reference", pattern: /\bCLAUDE\.md\b/g, replacement: "AGENTS.md", kind: "path" },
 	{ label: ".claude path", pattern: /\.claude\//g, replacement: ".agents/", kind: "path" },
 ];

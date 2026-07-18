@@ -177,7 +177,9 @@ async function performUpgrade(
 		console.log(`  ${pc.cyan("updated")} ${stats.updated}`);
 		console.log(`  ${pc.dim("skipped")} ${stats.skipped}`);
 		if (stats.deletionsDeleted.length > 0) {
-			console.log(`  ${pc.red("deleted")} ${stats.deletionsDeleted.length}  ${pc.dim("(marked for removal by the release)")}`);
+			console.log(
+				`  ${pc.red("deleted")} ${stats.deletionsDeleted.length}  ${pc.dim("(marked for removal by the release)")}`,
+			);
 		}
 		if (stats.orphansDeleted.length > 0) {
 			console.log(`  ${pc.red("removed")} ${stats.orphansDeleted.length}  ${pc.dim("(release no longer ships)")}`);

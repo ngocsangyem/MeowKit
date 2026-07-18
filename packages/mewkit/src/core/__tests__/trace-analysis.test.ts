@@ -86,7 +86,9 @@ describe("auditTraces", () => {
 	});
 
 	it("a run with both work and verification is NOT unverified", () => {
-		const a = auditTraces([rec({ run_id: "ok", event: "file_edited" }), rec({ run_id: "ok", event: "test_run" })], { now });
+		const a = auditTraces([rec({ run_id: "ok", event: "file_edited" }), rec({ run_id: "ok", event: "test_run" })], {
+			now,
+		});
 		expect(a.unverifiedRuns).toBe(0);
 	});
 });

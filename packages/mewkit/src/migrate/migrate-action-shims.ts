@@ -3,7 +3,12 @@
 import type { ReconcileAction } from "./reconcile/reconcile-types.js";
 import type { PortableType, ProviderType, SkillInfo } from "./types.js";
 
-export function skillActionShim(skill: SkillInfo, provider: ProviderType, global: boolean, path: string): ReconcileAction {
+export function skillActionShim(
+	skill: SkillInfo,
+	provider: ProviderType,
+	global: boolean,
+	path: string,
+): ReconcileAction {
 	return {
 		action: "install",
 		item: skill.name,

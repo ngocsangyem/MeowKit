@@ -9,11 +9,7 @@ import { makeWikiSlug } from "./domain/index.js";
 // or <img src>, so the artifact opens offline with zero network requests.
 
 function esc(s: string): string {
-	return s
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;");
+	return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 const STYLE =
@@ -44,22 +40,35 @@ export function renderWiki(projectRoot: string, slugStr: string): string {
 			const page = repo.readPage(slug, file);
 			if (!page) return "";
 			const prov =
-				"origin: " + esc(page.provenance.origin) +
+				"origin: " +
+				esc(page.provenance.origin) +
 				(page.provenance.approvedBy ? " · approved by " + esc(page.provenance.approvedBy) : "") +
 				(page.provenance.sourceIds.length ? " · sources: " + esc(page.provenance.sourceIds.join(", ")) : "");
 			return (
-				"<article><h2>" + esc(page.title) + "</h2>" +
-				"<pre>" + esc(page.content) + "</pre>" +
-				'<div class="prov">' + prov + "</div></article>"
+				"<article><h2>" +
+				esc(page.title) +
+				"</h2>" +
+				"<pre>" +
+				esc(page.content) +
+				"</pre>" +
+				'<div class="prov">' +
+				prov +
+				"</div></article>"
 			);
 		})
 		.join("\n");
 
 	return (
-		"<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">" +
+		'<!doctype html><html lang="en"><head><meta charset="utf-8">' +
 		'<meta name="viewport" content="width=device-width,initial-scale=1">' +
-		"<title>" + esc(title) + "</title><style>" + STYLE + "</style></head>" +
-		"<body><h1>" + esc(title) + "</h1>" +
+		"<title>" +
+		esc(title) +
+		"</title><style>" +
+		STYLE +
+		"</style></head>" +
+		"<body><h1>" +
+		esc(title) +
+		"</h1>" +
 		(articles || "<p>No pages yet.</p>") +
 		"</body></html>\n"
 	);

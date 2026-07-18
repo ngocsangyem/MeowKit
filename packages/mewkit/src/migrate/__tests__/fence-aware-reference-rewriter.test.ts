@@ -79,7 +79,11 @@ describe("fence-aware reference rewriter", () => {
 		const result = rewriteSourceReferences("```bash\nnode .claude/scripts/x.cjs\n```", { provider: "codex" });
 		expect(result.content).toContain("node .claude/scripts/x.cjs");
 		expect(result.content).not.toContain(".codex/scripts");
-		expect(result.occurrences[0]).toMatchObject({ kind: "unmapped-runtime", decision: "preserve-warn", span: "fenced" });
+		expect(result.occurrences[0]).toMatchObject({
+			kind: "unmapped-runtime",
+			decision: "preserve-warn",
+			span: "fenced",
+		});
 		expect(result.warnings).toHaveLength(1);
 	});
 

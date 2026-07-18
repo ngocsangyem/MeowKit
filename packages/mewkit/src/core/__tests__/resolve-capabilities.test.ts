@@ -36,8 +36,14 @@ function cap(
 }
 
 const flagship: CapabilityEntry[] = [
-	cap("mk:plan-creator", ["plan this feature", "create a plan", "draft a spec"], ["plan"], { scope: "task-repo", reason: "plans against real files" }),
-	cap("mk:cook", ["implement this feature", "build this", "write the code"], ["cook", "implement"], { scope: "task-repo", reason: "edits source" }),
+	cap("mk:plan-creator", ["plan this feature", "create a plan", "draft a spec"], ["plan"], {
+		scope: "task-repo",
+		reason: "plans against real files",
+	}),
+	cap("mk:cook", ["implement this feature", "build this", "write the code"], ["cook", "implement"], {
+		scope: "task-repo",
+		reason: "edits source",
+	}),
 	cap("mk:review", ["review this code", "code review", "check before shipping"], ["review"]),
 	cap("mk:scout", ["scout the codebase", "find related files"], ["scout"]),
 ];

@@ -13,9 +13,15 @@ import { isSecretLikeKey } from "../../migrate/providers/codex/shell-env-policy-
 // check by name.
 
 const SECTION = "Target" as const;
-function pass(name: string, detail: string): CheckResult { return { name, status: "pass", detail, section: SECTION }; }
-function fail(name: string, detail: string): CheckResult { return { name, status: "fail", detail, section: SECTION }; }
-function warn(name: string, detail: string): CheckResult { return { name, status: "warn", detail, section: SECTION }; }
+function pass(name: string, detail: string): CheckResult {
+	return { name, status: "pass", detail, section: SECTION };
+}
+function fail(name: string, detail: string): CheckResult {
+	return { name, status: "fail", detail, section: SECTION };
+}
+function warn(name: string, detail: string): CheckResult {
+	return { name, status: "warn", detail, section: SECTION };
+}
 
 /** `X_OK` bit set for owner/group/other. */
 function isExecutable(file: string): boolean {
@@ -28,7 +34,10 @@ function isExecutable(file: string): boolean {
 
 function listFiles(dir: string, ext: string): string[] {
 	if (!fs.existsSync(dir)) return [];
-	return fs.readdirSync(dir).filter((f) => f.endsWith(ext)).map((f) => path.join(dir, f));
+	return fs
+		.readdirSync(dir)
+		.filter((f) => f.endsWith(ext))
+		.map((f) => path.join(dir, f));
 }
 
 // 1. config.toml parses and its [agents.X] entries point at real agent files.
@@ -53,7 +62,10 @@ function checkConfig(dir: string): CheckResult[] {
 		});
 		out.push(
 			dangling.length === 0
-				? pass("Codex config.toml agent wiring", `${names.length} agent entr${names.length === 1 ? "y" : "ies"}, all config_file refs resolve`)
+				? pass(
+						"Codex config.toml agent wiring",
+						`${names.length} agent entr${names.length === 1 ? "y" : "ies"}, all config_file refs resolve`,
+					)
 				: fail("Codex config.toml agent wiring", `config_file missing for: ${dangling.join(", ")}`),
 		);
 	}
@@ -80,7 +92,8 @@ function checkConfig(dir: string): CheckResult[] {
 // gates a permission event declares the deny contract (static — no live Codex binary needed).
 function checkHooks(dir: string): CheckResult[] {
 	const hooksJsonPath = path.join(dir, ".codex", "hooks.json");
-	if (!fs.existsSync(hooksJsonPath)) return [warn("Codex hooks.json present", `No hooks.json at ${hooksJsonPath} (target has no hooks)`)];
+	if (!fs.existsSync(hooksJsonPath))
+		return [warn("Codex hooks.json present", `No hooks.json at ${hooksJsonPath} (target has no hooks)`)];
 	let parsed: { hooks?: Record<string, Array<{ hooks?: Array<{ command?: string }> }>> };
 	try {
 		parsed = JSON.parse(fs.readFileSync(hooksJsonPath, "utf-8"));
@@ -104,7 +117,9 @@ function checkHooks(dir: string): CheckResult[] {
 	} else if (missing.length > 0) {
 		out.push(fail("Codex hook wrappers exist", `missing: ${missing.map((p) => path.basename(p)).join(", ")}`));
 	} else if (notExec.length > 0) {
-		out.push(fail("Codex hook wrappers executable", `not executable: ${notExec.map((p) => path.basename(p)).join(", ")}`));
+		out.push(
+			fail("Codex hook wrappers executable", `not executable: ${notExec.map((p) => path.basename(p)).join(", ")}`),
+		);
 	} else {
 		out.push(pass("Codex hook wrappers exist + executable", `${wrapperPaths.length} wrapper script(s)`));
 	}
@@ -132,8 +147,14 @@ function checkHooks(dir: string): CheckResult[] {
 	if (wrapperPaths.length > 0) {
 		out.push(
 			denyCapable.length > 0
-				? pass("Codex hook deny contract", `${denyCapable.length} wrapper(s) carry the PreToolUse/PermissionRequest deny scrub rule`)
-				: warn("Codex hook deny contract", "no wrapper declares an allowedPermissionValues deny rule (no gating hook migrated?)"),
+				? pass(
+						"Codex hook deny contract",
+						`${denyCapable.length} wrapper(s) carry the PreToolUse/PermissionRequest deny scrub rule`,
+					)
+				: warn(
+						"Codex hook deny contract",
+						"no wrapper declares an allowedPermissionValues deny rule (no gating hook migrated?)",
+					),
 		);
 	}
 	return out;
@@ -176,12 +197,18 @@ function checkSkills(dir: string): CheckResult[] {
 	const pathLeaks: string[] = [];
 	for (const d of skillDirs) {
 		const md = path.join(skillsDir, d.name, "SKILL.md");
-		if (!fs.existsSync(md)) { badFm.push(`${d.name} (no SKILL.md)`); continue; }
+		if (!fs.existsSync(md)) {
+			badFm.push(`${d.name} (no SKILL.md)`);
+			continue;
+		}
 		const content = fs.readFileSync(md, "utf-8");
 		const fm = parseFrontmatter(content);
 		// parseFrontmatter never throws; an unparseable/absent block yields empty frontmatter.
 		// A valid SKILL.md always declares `name`, so its absence signals a broken/missing block.
-		if (!fm.frontmatter || fm.frontmatter.name === undefined) { badFm.push(d.name); continue; }
+		if (!fm.frontmatter || fm.frontmatter.name === undefined) {
+			badFm.push(d.name);
+			continue;
+		}
 		// Codex installs only portable/adapted skills — a claude-code runtime should never reach here.
 		const runtime = (fm.frontmatter as Record<string, unknown>).runtime;
 		if (runtime === "claude-code") badRuntime.push(d.name);
@@ -200,15 +227,26 @@ function checkSkills(dir: string): CheckResult[] {
 	out.push(
 		badRuntime.length === 0
 			? pass("Codex installed skills runtime-supported", "no runtime: claude-code among installed skills")
-			: fail("Codex installed skills runtime-supported", `runtime: claude-code installed (default-deny breach): ${badRuntime.join(", ")}`),
+			: fail(
+					"Codex installed skills runtime-supported",
+					`runtime: claude-code installed (default-deny breach): ${badRuntime.join(", ")}`,
+				),
 	);
 	out.push(
 		toolLeaks.length === 0
 			? pass("Codex installed skills tool-token clean", "no Claude tool/invocation tokens in installed skill bodies")
-			: fail("Codex installed skills tool-token clean", `host-bound tool tokens present: ${toolLeaks.slice(0, 5).join("; ")}${toolLeaks.length > 5 ? ` (+${toolLeaks.length - 5} more)` : ""}`),
+			: fail(
+					"Codex installed skills tool-token clean",
+					`host-bound tool tokens present: ${toolLeaks.slice(0, 5).join("; ")}${toolLeaks.length > 5 ? ` (+${toolLeaks.length - 5} more)` : ""}`,
+				),
 	);
 	if (pathLeaks.length > 0) {
-		out.push(warn("Codex installed skills path refs", `preserved out-of-set path ref(s) — verify they resolve on Codex: ${pathLeaks.slice(0, 5).join("; ")}${pathLeaks.length > 5 ? ` (+${pathLeaks.length - 5} more)` : ""}`));
+		out.push(
+			warn(
+				"Codex installed skills path refs",
+				`preserved out-of-set path ref(s) — verify they resolve on Codex: ${pathLeaks.slice(0, 5).join("; ")}${pathLeaks.length > 5 ? ` (+${pathLeaks.length - 5} more)` : ""}`,
+			),
+		);
 	}
 	return out;
 }

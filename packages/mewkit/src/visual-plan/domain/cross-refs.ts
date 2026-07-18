@@ -79,7 +79,13 @@ export function checkCrossReferences(plan: VisualPlan): ValidationError[] {
 	plan.canvas.frames.forEach((f, i) => {
 		need(f.laneId, ids.lanes, `canvas.frames[${i}].laneId`, ErrorCode.DANGLING_LANE, "lane");
 		f.coverageStateIds.forEach((sid, j) =>
-			need(sid, ids.states, `canvas.frames[${i}].coverageStateIds[${j}]`, ErrorCode.DANGLING_COVERAGE_FRAME, "coverage state"),
+			need(
+				sid,
+				ids.states,
+				`canvas.frames[${i}].coverageStateIds[${j}]`,
+				ErrorCode.DANGLING_COVERAGE_FRAME,
+				"coverage state",
+			),
 		);
 		f.sourceRefIds.forEach((sid, j) =>
 			need(sid, ids.sourceRefs, `canvas.frames[${i}].sourceRefIds[${j}]`, ErrorCode.DANGLING_SOURCE_REF, "source ref"),
@@ -108,12 +114,18 @@ function checkAnnotations(plan: VisualPlan, frames: Set<string>, errors: Validat
 		const base = `canvas.annotations[${i}]`;
 		if (a.kind === "note") {
 			if (a.targetId === undefined || a.placement === undefined) {
-				errors.push(err(`${base}`, ErrorCode.DANGLING_ANNOTATION_TARGET, "note annotation requires targetId + placement"));
+				errors.push(
+					err(`${base}`, ErrorCode.DANGLING_ANNOTATION_TARGET, "note annotation requires targetId + placement"),
+				);
 			} else if (!frames.has(a.targetId)) {
-				errors.push(err(`${base}.targetId`, ErrorCode.DANGLING_ANNOTATION_TARGET, `references unknown frame "${a.targetId}"`));
+				errors.push(
+					err(`${base}.targetId`, ErrorCode.DANGLING_ANNOTATION_TARGET, `references unknown frame "${a.targetId}"`),
+				);
 			}
 		} else if (a.points === undefined || a.points.length === 0) {
-			errors.push(err(`${base}.points`, ErrorCode.DANGLING_ANNOTATION_TARGET, "markup annotation requires at least one point"));
+			errors.push(
+				err(`${base}.points`, ErrorCode.DANGLING_ANNOTATION_TARGET, "markup annotation requires at least one point"),
+			);
 		}
 	});
 }

@@ -49,14 +49,41 @@ export type LifecycleMap = Record<LifecycleEvent, LifecycleSupport>;
  * in-repo proof. Promotion path: add a blocking UserPromptSubmit handler + conformance test, then
  * flip `gate: true` with a `proof`. */
 const CLAUDE_CODE_LIFECYCLE: LifecycleMap = {
-	session_start: { status: "supported", gate: false, evidence: "SessionStart hook in shipped settings.json (observe/inject)" },
-	pre_tool: { status: "supported", gate: true, evidence: "PreToolUse hook denies a tool call via exit 2 / permissionDecision:deny", proof: "src/__tests__/hooks/gate-enforcement.integration.test.ts" },
+	session_start: {
+		status: "supported",
+		gate: false,
+		evidence: "SessionStart hook in shipped settings.json (observe/inject)",
+	},
+	pre_tool: {
+		status: "supported",
+		gate: true,
+		evidence: "PreToolUse hook denies a tool call via exit 2 / permissionDecision:deny",
+		proof: "src/__tests__/hooks/gate-enforcement.integration.test.ts",
+	},
 	post_tool: { status: "supported", gate: false, evidence: "PostToolUse hook in shipped settings.json (observe)" },
-	tool_failure: { status: "supported", gate: false, evidence: "PostToolUseFailure hook in shipped settings.json (observe)" },
-	prompt_submitted: { status: "supported", gate: false, evidence: "UserPromptSubmit block is a documented host capability, but no shipped hook blocks there (handlers are inject/capture only) — no in-repo proof" },
-	stop: { status: "supported", gate: true, evidence: "Stop hook can block the stop (pre-completion-check security-BLOCK, exit 2)", proof: ".claude/hooks/__tests__/test-pre-completion-check.sh" },
+	tool_failure: {
+		status: "supported",
+		gate: false,
+		evidence: "PostToolUseFailure hook in shipped settings.json (observe)",
+	},
+	prompt_submitted: {
+		status: "supported",
+		gate: false,
+		evidence:
+			"UserPromptSubmit block is a documented host capability, but no shipped hook blocks there (handlers are inject/capture only) — no in-repo proof",
+	},
+	stop: {
+		status: "supported",
+		gate: true,
+		evidence: "Stop hook can block the stop (pre-completion-check security-BLOCK, exit 2)",
+		proof: ".claude/hooks/__tests__/test-pre-completion-check.sh",
+	},
 	pre_compaction: { status: "supported", gate: false, evidence: "PreCompact hook in shipped settings.json (observe)" },
-	subagent_start: { status: "supported", gate: false, evidence: "SubagentStart hook in shipped settings.json (observe)" },
+	subagent_start: {
+		status: "supported",
+		gate: false,
+		evidence: "SubagentStart hook in shipped settings.json (observe)",
+	},
 	subagent_stop: { status: "supported", gate: false, evidence: "SubagentStop hook in shipped settings.json (observe)" },
 };
 
@@ -64,7 +91,11 @@ const CLAUDE_CODE_LIFECYCLE: LifecycleMap = {
  * `build-plugin` — identical lifecycle surface to the flat copy. */
 const CLAUDE_PLUGIN_LIFECYCLE: LifecycleMap = {
 	...CLAUDE_CODE_LIFECYCLE,
-	session_start: { status: "supported", gate: false, evidence: "SessionStart hook propagated into the plugin payload by build-plugin (observe/inject)" },
+	session_start: {
+		status: "supported",
+		gate: false,
+		evidence: "SessionStart hook propagated into the plugin payload by build-plugin (observe/inject)",
+	},
 };
 
 /** Codex: per `migrate/providers/codex/capabilities.ts` CODEX_CAPABILITY_TABLE (v0.142). Codex
@@ -72,7 +103,8 @@ const CLAUDE_PLUGIN_LIFECYCLE: LifecycleMap = {
  * version-gated (CODEX_MIN_SUPPORTED_VERSION 0.142). Statically we cannot prove the installed
  * version, so `gate` stays false here (advisory); a runtime `detectCodexCapabilities()` probe is
  * what would promote it. `tool_failure` has no codex event ⇒ unsupported. */
-const CODEX_VERSION_NOTE = "codex hooks are version-gated (CODEX_MIN_SUPPORTED_VERSION 0.142); deny needs a runtime version probe";
+const CODEX_VERSION_NOTE =
+	"codex hooks are version-gated (CODEX_MIN_SUPPORTED_VERSION 0.142); deny needs a runtime version probe";
 const CODEX_LIFECYCLE: LifecycleMap = {
 	session_start: { status: "supported", gate: false, evidence: "codex SessionStart (capability table 0.142)" },
 	pre_tool: { status: "advisory", gate: false, evidence: `codex PreToolUse deny documented but ${CODEX_VERSION_NOTE}` },
@@ -94,7 +126,8 @@ const LIFECYCLE_BY_PROVIDER: Record<string, LifecycleMap> = {
 /** An all-`unknown` lifecycle map for a provider with no tested projection (claims nothing). */
 function unknownLifecycle(): LifecycleMap {
 	const out = {} as LifecycleMap;
-	for (const e of LIFECYCLE_EVENTS) out[e] = { status: "unknown", gate: false, evidence: "no tested lifecycle projection for this provider" };
+	for (const e of LIFECYCLE_EVENTS)
+		out[e] = { status: "unknown", gate: false, evidence: "no tested lifecycle projection for this provider" };
 	return out;
 }
 

@@ -2,7 +2,13 @@
 // region must not become a second editable truth. Absent markers ⇒ not-yet-spliced (never a false
 // drift); matching ⇒ in-sync; diverged ⇒ drift.
 import { describe, expect, it } from "vitest";
-import { renderCapabilityView, extractGeneratedRegion, capabilityViewDrift, VIEW_START, VIEW_END } from "../generate-capability-view.js";
+import {
+	renderCapabilityView,
+	extractGeneratedRegion,
+	capabilityViewDrift,
+	VIEW_START,
+	VIEW_END,
+} from "../generate-capability-view.js";
 import type { CapabilityEntry } from "../capability.js";
 
 function cap(id: string, intents: string[]): CapabilityEntry {
@@ -54,7 +60,9 @@ describe("capabilityViewDrift", () => {
 	});
 
 	it("drift when the region diverges from the registry", () => {
-		const doc = docWith(renderCapabilityView(ENTRIES) + "\n| `mk:ghost` | skill | skill:invoke-skill | authored | stale |");
+		const doc = docWith(
+			renderCapabilityView(ENTRIES) + "\n| `mk:ghost` | skill | skill:invoke-skill | authored | stale |",
+		);
 		expect(capabilityViewDrift(doc, ENTRIES)).toBe("drift");
 	});
 

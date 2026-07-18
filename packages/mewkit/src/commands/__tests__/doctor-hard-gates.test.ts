@@ -42,9 +42,7 @@ describe("doctor --hard-gates", () => {
 			path.join(fixtureDir, ".claude", "settings.json"),
 			JSON.stringify({
 				hooks: {
-					SessionStart: [
-						{ hooks: [{ type: "command", command: 'sh "$CLAUDE_PROJECT_DIR/.claude/hooks/bad.sh"' }] },
-					],
+					SessionStart: [{ hooks: [{ type: "command", command: 'sh "$CLAUDE_PROJECT_DIR/.claude/hooks/bad.sh"' }] }],
 				},
 			}),
 		);

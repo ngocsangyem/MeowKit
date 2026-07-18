@@ -27,7 +27,13 @@ afterAll(async () => {
 
 describe("J10 deterministic cross-harness parity", () => {
 	it("passes every deterministic oracle on a fresh migration (structural parity)", () => {
-		expect(result.pass, result.oracles.filter((o) => !o.pass).map((o) => `${o.name}: ${o.detail}`).join("; ")).toBe(true);
+		expect(
+			result.pass,
+			result.oracles
+				.filter((o) => !o.pass)
+				.map((o) => `${o.name}: ${o.detail}`)
+				.join("; "),
+		).toBe(true);
 	});
 
 	it("runs all four named oracles at the deterministic layer", () => {
@@ -42,7 +48,9 @@ describe("J10 deterministic cross-harness parity", () => {
 
 	it("reports structural parity counts sourced from the migration report", () => {
 		expect(result.structuralParity.routable).toBeGreaterThan(0);
-		expect(result.structuralParity.migrated + result.structuralParity.documentedSkips).toBe(result.structuralParity.routable);
+		expect(result.structuralParity.migrated + result.structuralParity.documentedSkips).toBe(
+			result.structuralParity.routable,
+		);
 	});
 
 	it("migration produced no unrequested durable side effect", () => {

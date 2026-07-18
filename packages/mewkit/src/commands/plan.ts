@@ -62,7 +62,9 @@ function renderStatus(summary: PlanSummary): void {
 	}
 
 	const a = summary.checklist;
-	console.log(`  ${pc.bold("Overall")}  ${bar(a.checked, a.total)} ${pct(a.checked, a.total)} ${pc.dim(`(${a.checked}/${a.total} boxes)`)}`);
+	console.log(
+		`  ${pc.bold("Overall")}  ${bar(a.checked, a.total)} ${pct(a.checked, a.total)} ${pc.dim(`(${a.checked}/${a.total} boxes)`)}`,
+	);
 
 	// Checkboxes record what a human ticked. Saying so keeps the number honest —
 	// it is a claim about the plan file, not about the code.
@@ -83,7 +85,9 @@ function renderCheck(file: string): number {
 	console.log(`  ${pc.dim("file:")}   ${file}`);
 	console.log(`  ${pc.dim("status:")} ${statusTag(phase.status)}`);
 	if (phase.dependencies.length > 0) console.log(`  ${pc.dim("deps:")}   ${phase.dependencies.join(", ")}`);
-	console.log(`  ${pc.dim("tasks:")}  ${phase.checklist.checked}/${phase.checklist.total} ${pc.dim(`(${pct(phase.checklist.checked, phase.checklist.total)})`)}`);
+	console.log(
+		`  ${pc.dim("tasks:")}  ${phase.checklist.checked}/${phase.checklist.total} ${pc.dim(`(${pct(phase.checklist.checked, phase.checklist.total)})`)}`,
+	);
 	console.log();
 
 	console.log(pc.bold("  Required sections"));

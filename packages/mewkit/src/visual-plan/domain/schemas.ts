@@ -104,9 +104,7 @@ const WireframeSchema = z
 	})
 	.strict();
 
-const LaneSchema = z
-	.object({ id: EntityId, label: z.string().optional(), kind: z.string().optional() })
-	.strict();
+const LaneSchema = z.object({ id: EntityId, label: z.string().optional(), kind: z.string().optional() }).strict();
 
 const FrameSchema = z
 	.object({
@@ -125,9 +123,7 @@ const FrameSchema = z
 	})
 	.strict();
 
-const ConnectorSchema = z
-	.object({ id: EntityId, from: EntityId, to: EntityId, label: z.string().optional() })
-	.strict();
+const ConnectorSchema = z.object({ id: EntityId, from: EntityId, to: EntityId, label: z.string().optional() }).strict();
 
 export const AnnotationSchema = z
 	.object({
@@ -149,9 +145,7 @@ const CanvasSchema = z
 	})
 	.strict();
 
-const DocumentBlockSchema = z
-	.object({ id: EntityId, title: z.string().optional(), body: z.string() })
-	.strict();
+const DocumentBlockSchema = z.object({ id: EntityId, title: z.string().optional(), body: z.string() }).strict();
 
 const SourceSchema = z
 	.object({

@@ -81,7 +81,8 @@ describe("validatePlan — failure classes", () => {
 
 	it("UNSAFE_HTML on a scripted wireframe", () => {
 		const planDir = seed((p) => {
-			(p.canvas as { frames: { wireframe: { html: string } }[] }).frames[0].wireframe.html = "<div>x<script>alert(1)</script></div>";
+			(p.canvas as { frames: { wireframe: { html: string } }[] }).frames[0].wireframe.html =
+				"<div>x<script>alert(1)</script></div>";
 		});
 		const e = validatePlan(planDir).errors.find((x) => x.code === ErrorCode.UNSAFE_HTML);
 		expect(e?.path).toBe("canvas.frames[0].wireframe.html");
@@ -89,7 +90,8 @@ describe("validatePlan — failure classes", () => {
 
 	it("SCHEMA (oversized) on wireframe HTML over the byte cap", () => {
 		const planDir = seed((p) => {
-			(p.canvas as { frames: { wireframe: { html: string } }[] }).frames[0].wireframe.html = "<div>" + "a".repeat(CAPS.HTML_BYTES + 10) + "</div>";
+			(p.canvas as { frames: { wireframe: { html: string } }[] }).frames[0].wireframe.html =
+				"<div>" + "a".repeat(CAPS.HTML_BYTES + 10) + "</div>";
 		});
 		const e = validatePlan(planDir).errors.find((x) => x.path === "canvas.frames[0].wireframe.html");
 		expect(e?.code).toBe(ErrorCode.SCHEMA);

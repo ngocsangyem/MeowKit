@@ -91,8 +91,7 @@ export const OPERATION_AUTHORITY: Record<LogicalOperation, OperationAuthority> =
 	},
 	run_shell: {
 		mayNot: "Be named by capability frontmatter, or be reached from any author-controlled string.",
-		rationale:
-			"This is the exact string KNOWN_INVOCATION_IDS exists to keep out of hostile frontmatter's reach.",
+		rationale: "This is the exact string KNOWN_INVOCATION_IDS exists to keep out of hostile frontmatter's reach.",
 	},
 	delegate_agent: {
 		mayNot:
@@ -145,7 +144,8 @@ const CODEX_OPERATIONS: OperationShapeMap = {
 		operation: "question asked inline in the assistant's prose",
 		support: "local-fallback",
 		evidence: "no typed prompt primitive; codex surfaces are prompt-projected (provider-projection.ts)",
-		fallback: "The agent asks in prose and waits. There is no structured option list and no host guarantee that the turn actually blocks.",
+		fallback:
+			"The agent asks in prose and waits. There is no structured option list and no host guarantee that the turn actually blocks.",
 	},
 	manage_plan: {
 		operation: "plan files under tasks/plans/ (no typed task tool)",
@@ -162,7 +162,8 @@ const CODEX_OPERATIONS: OperationShapeMap = {
 	delegate_agent: {
 		operation: "codex subagent surface",
 		support: "unsupported",
-		evidence: "subagent surface exists (SubagentStart) but is not a typed invoke — invoke-agent is advisory on codex (provider-invocation.ts)",
+		evidence:
+			"subagent surface exists (SubagentStart) but is not a typed invoke — invoke-agent is advisory on codex (provider-invocation.ts)",
 		fallback: null,
 	},
 };

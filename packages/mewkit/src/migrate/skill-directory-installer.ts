@@ -122,7 +122,10 @@ async function applyEnvVarRewritesForProvider(
 
 		const original = await readFile(fullPath, "utf-8");
 		// Never rewrite a state-changing script — it stays fail-closed by policy.
-		if (NON_STATE_CHANGING_REWRITE_EXTENSIONS.has(ext) && detectStateChanging(original, languageFor(fullPath)).stateChanging)
+		if (
+			NON_STATE_CHANGING_REWRITE_EXTENSIONS.has(ext) &&
+			detectStateChanging(original, languageFor(fullPath)).stateChanging
+		)
 			continue;
 
 		const { content, applied } = applyEnvVarRewrites(original);

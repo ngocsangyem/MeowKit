@@ -5,7 +5,15 @@
 // It composes trusted adapter constants; it introduces no new provider-native claim of its own.
 import { getProjection, type ProviderProjection } from "./provider-projection.js";
 import { getAcquisitionDescriptor, type AcquisitionDescriptor } from "./repo-context-adapter.js";
-import { getLifecycleMap, gatingEvents, enforcementGaps, type LifecycleMap, type LifecycleEvent, type EnforcementGap, type LifecycleSupport } from "./provider-lifecycle.js";
+import {
+	getLifecycleMap,
+	gatingEvents,
+	enforcementGaps,
+	type LifecycleMap,
+	type LifecycleEvent,
+	type EnforcementGap,
+	type LifecycleSupport,
+} from "./provider-lifecycle.js";
 import { getInvocationShapes, type InvocationShapeMap } from "./provider-invocation.js";
 import { getOperationShapes, type OperationShapeMap } from "./provider-operations.js";
 

@@ -103,12 +103,27 @@ async function makeSource(): Promise<string> {
 	const registry = {
 		schema_version: 1,
 		artifacts: {
-			"rules/security-rules.md": { owner: "security", criticality: "critical", status: "active", runtime: "claude-code" },
-			"rules/injection-rules.md": { owner: "security", criticality: "critical", status: "active", runtime: "claude-code" },
+			"rules/security-rules.md": {
+				owner: "security",
+				criticality: "critical",
+				status: "active",
+				runtime: "claude-code",
+			},
+			"rules/injection-rules.md": {
+				owner: "security",
+				criticality: "critical",
+				status: "active",
+				runtime: "claude-code",
+			},
 			"rules/gate-rules.md": { owner: "lifecycle", criticality: "critical", status: "active", runtime: "claude-code" },
 			"commands/mk/plan.md": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
 			"commands/mk/validate.md": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
-			"hooks/gate-enforcement.sh": { owner: "security", criticality: "critical", status: "active", runtime: "claude-code" },
+			"hooks/gate-enforcement.sh": {
+				owner: "security",
+				criticality: "critical",
+				status: "active",
+				runtime: "claude-code",
+			},
 		},
 	};
 	await w("harness-inventory.json", JSON.stringify(registry));
@@ -148,8 +163,12 @@ describe("profile install filter", () => {
 		const target = await makeTarget();
 		await smartUpdate(config, source, target, false, false, { profile: "full", assumeYes: true });
 
-		const installed = new Set(collectFiles(join(target, ".claude"), join(target, ".claude")).map((p) => p.replace(/\\/g, "/")));
-		const sourceTree = new Set(collectFiles(join(source, ".claude"), join(source, ".claude")).map((p) => p.replace(/\\/g, "/")));
+		const installed = new Set(
+			collectFiles(join(target, ".claude"), join(target, ".claude")).map((p) => p.replace(/\\/g, "/")),
+		);
+		const sourceTree = new Set(
+			collectFiles(join(source, ".claude"), join(source, ".claude")).map((p) => p.replace(/\\/g, "/")),
+		);
 		// every source file is installed (meowkit.config.json is generated extra on target)
 		for (const p of sourceTree) expect(installed.has(p), `missing ${p}`).toBe(true);
 		expect(installed.has("skills/jira-a/SKILL.md")).toBe(true);

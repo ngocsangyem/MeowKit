@@ -72,11 +72,10 @@ describe("reference rewrite idempotency", () => {
 				const { content, occurrences } = rewriteSourceReferences(original, { provider, migratedRefs, file });
 				const survivors = content.match(sourceReferencePattern()) ?? [];
 				for (const survivor of survivors) {
-					const explained = occurrences.some(
-						(o) =>
-							(o.decision === "preserve" || o.decision === "preserve-warn") && o.original === survivor
-								? true
-								: o.decision === "rewrite" && o.rewrittenTo?.includes(survivor),
+					const explained = occurrences.some((o) =>
+						(o.decision === "preserve" || o.decision === "preserve-warn") && o.original === survivor
+							? true
+							: o.decision === "rewrite" && o.rewrittenTo?.includes(survivor),
 					);
 					expect(explained, `${provider}: unexplained "${survivor}" in ${file}`).toBe(true);
 				}

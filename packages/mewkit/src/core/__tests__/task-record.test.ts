@@ -53,7 +53,9 @@ function record(over: Partial<TaskRecord> = {}): TaskRecord {
 		nextAction: "write tests",
 		verificationSummaries: [],
 		evidenceRefs: [],
-		capabilityDecisions: [{ capabilityId: "mk:cook", decision: "selected", reason: "impl intent", adapterSnapshotId: "s1" }],
+		capabilityDecisions: [
+			{ capabilityId: "mk:cook", decision: "selected", reason: "impl intent", adapterSnapshotId: "s1" },
+		],
 		writtenByCli: "1.14.1",
 		writtenByKit: "2.13.3",
 		updatedAt: "2026-07-12T00:00:00.000Z",
@@ -68,9 +70,17 @@ describe("recordContextEvidence (Phase 5 slice 2 — multi-repo, compact, merge-
 		const root = makeRoot();
 		await writeTaskRecord(root, record({ taskId: "multi", repos: [], evidenceRefs: [] }));
 		const env = envelope([
-			{ path: "/work/customer-frontend/app.ts", owningRepoIdentity: "/work/customer-frontend", revision: "a".repeat(40) },
+			{
+				path: "/work/customer-frontend/app.ts",
+				owningRepoIdentity: "/work/customer-frontend",
+				revision: "a".repeat(40),
+			},
 			{ path: "/work/aspire-api/server.ts", owningRepoIdentity: "/work/aspire-api", revision: "b".repeat(40) },
-			{ path: "/work/customer-frontend/util.ts", owningRepoIdentity: "/work/customer-frontend", revision: "a".repeat(40) },
+			{
+				path: "/work/customer-frontend/util.ts",
+				owningRepoIdentity: "/work/customer-frontend",
+				revision: "a".repeat(40),
+			},
 		]);
 		const rec = await recordContextEvidence(root, "multi", env, now);
 		// Two repos (the two customer-frontend files collapse to one repo), each with its own rev.
@@ -88,7 +98,14 @@ describe("recordContextEvidence (Phase 5 slice 2 — multi-repo, compact, merge-
 
 	it("MERGES across calls (accumulates evidence) and dedups; newest revision wins per repo", async () => {
 		const root = makeRoot();
-		await writeTaskRecord(root, record({ taskId: "merge", repos: [{ identity: "/work/repo-a", revision: "old" }], evidenceRefs: ["/work/repo-a/x.ts"] }));
+		await writeTaskRecord(
+			root,
+			record({
+				taskId: "merge",
+				repos: [{ identity: "/work/repo-a", revision: "old" }],
+				evidenceRefs: ["/work/repo-a/x.ts"],
+			}),
+		);
 		const rec = await recordContextEvidence(
 			root,
 			"merge",
@@ -151,14 +168,20 @@ describe("schemaVersion compatibility handshake", () => {
 	it("rejects a record whose schemaVersion is outside the supported range (loud)", () => {
 		const root = makeRoot();
 		mkdirSync(join(root, "tasks", "active"), { recursive: true });
-		writeFileSync(join(root, "tasks", "active", "future.json"), JSON.stringify({ schemaVersion: "99.0", taskId: "future" }));
+		writeFileSync(
+			join(root, "tasks", "active", "future.json"),
+			JSON.stringify({ schemaVersion: "99.0", taskId: "future" }),
+		);
 		expect(() => readTaskRecord(root, "future")).toThrow(IncompatibleTaskRecordError);
 	});
 
 	it("writeTaskRecord refuses to overwrite an incompatible on-disk record (fails closed)", async () => {
 		const root = makeRoot();
 		mkdirSync(join(root, "tasks", "active"), { recursive: true });
-		writeFileSync(join(root, "tasks", "active", "feat-x.json"), JSON.stringify({ schemaVersion: "99.0", taskId: "feat-x" }));
+		writeFileSync(
+			join(root, "tasks", "active", "feat-x.json"),
+			JSON.stringify({ schemaVersion: "99.0", taskId: "feat-x" }),
+		);
 		await expect(writeTaskRecord(root, record({ taskId: "feat-x" }))).rejects.toThrow(IncompatibleTaskRecordError);
 		// The incompatible record is left untouched.
 		expect(JSON.parse(readFileSync(join(root, "tasks", "active", "feat-x.json"), "utf-8")).schemaVersion).toBe("99.0");

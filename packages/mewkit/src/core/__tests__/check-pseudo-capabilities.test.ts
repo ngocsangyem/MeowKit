@@ -36,7 +36,9 @@ describe("scanForPseudoCapabilities", () => {
 	});
 
 	it("reports file and line", async () => {
-		const root = await treeWith({ "skills/x/SKILL.md": ["# Skill", "", "use `manage_plan capability` now"].join("\n") });
+		const root = await treeWith({
+			"skills/x/SKILL.md": ["# Skill", "", "use `manage_plan capability` now"].join("\n"),
+		});
 		const [found] = scanForPseudoCapabilities(root, "skills/x/SKILL.md");
 		expect(found).toEqual({ file: "skills/x/SKILL.md", line: 3, found: "manage_plan capability" });
 	});

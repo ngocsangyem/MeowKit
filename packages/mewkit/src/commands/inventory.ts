@@ -63,7 +63,9 @@ function renderSubstrate(agg: ReturnType<typeof aggregateSubstrate>): void {
 	const covered = agg.rows.filter((r) => r.coverage === "covered").length;
 	console.log(pc.dim(`${agg.totalArtifacts} artifacts — ${covered}/${agg.rows.length} responsibilities covered`));
 	console.log();
-	console.log(pc.bold(`  ${pad("RESPONSIBILITY", 24)} ${pad("COVERAGE", 9)} ${pad("TAGGED", 7)} ${pad("ACTIVE", 7)} EXAMPLES`));
+	console.log(
+		pc.bold(`  ${pad("RESPONSIBILITY", 24)} ${pad("COVERAGE", 9)} ${pad("TAGGED", 7)} ${pad("ACTIVE", 7)} EXAMPLES`),
+	);
 	for (const r of agg.rows) {
 		const label = r.core ? r.label : `${r.label} (kit)`;
 		console.log(
@@ -77,7 +79,11 @@ function renderSubstrate(agg: ReturnType<typeof aggregateSubstrate>): void {
 		),
 	);
 	if (agg.invalid.length > 0) {
-		console.log(pc.yellow(`${agg.invalid.length} artifact(s) carry an out-of-enum responsibility — run \`mewkit validate --substrate\`.`));
+		console.log(
+			pc.yellow(
+				`${agg.invalid.length} artifact(s) carry an out-of-enum responsibility — run \`mewkit validate --substrate\`.`,
+			),
+		);
 	}
 }
 
@@ -123,7 +129,11 @@ export async function inventory(opts: InventoryOptions = {}): Promise<void> {
 		}
 		console.log();
 		if (fails.length > 0) {
-			console.log(pc.red(`${fails.length} drift/incompleteness issue(s). Run \`mewkit inventory --emit-counts\` for numbers; add missing rows by hand.`));
+			console.log(
+				pc.red(
+					`${fails.length} drift/incompleteness issue(s). Run \`mewkit inventory --emit-counts\` for numbers; add missing rows by hand.`,
+				),
+			);
 			process.exit(1);
 		}
 		console.log(pc.green("Docs match the inventory."));

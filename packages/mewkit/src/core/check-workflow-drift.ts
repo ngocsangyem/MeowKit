@@ -153,15 +153,24 @@ export function loadWorkflowSpec(projectRoot: string): CanonicalSpec {
 	}
 
 	if (raw.sources !== undefined && !Array.isArray(raw.sources)) {
-		throw new WorkflowSpecError(`Canonical workflow spec malformed (sources must be an array): ${specPath}`, "malformed");
+		throw new WorkflowSpecError(
+			`Canonical workflow spec malformed (sources must be an array): ${specPath}`,
+			"malformed",
+		);
 	}
 	const sources = (raw.sources ?? []).map((source, index): WorkflowSource => {
 		if (typeof source === "string" && source.trim()) return { path: source, lifecycleRender: false };
 		if (!source || typeof source !== "object" || typeof source.path !== "string" || !source.path.trim()) {
-			throw new WorkflowSpecError(`Canonical workflow spec malformed (invalid sources[${index}] entry): ${specPath}`, "malformed");
+			throw new WorkflowSpecError(
+				`Canonical workflow spec malformed (invalid sources[${index}] entry): ${specPath}`,
+				"malformed",
+			);
 		}
 		if (source.lifecycle_render !== undefined && typeof source.lifecycle_render !== "boolean") {
-			throw new WorkflowSpecError(`Canonical workflow spec malformed (sources[${index}].lifecycle_render must be boolean): ${specPath}`, "malformed");
+			throw new WorkflowSpecError(
+				`Canonical workflow spec malformed (sources[${index}].lifecycle_render must be boolean): ${specPath}`,
+				"malformed",
+			);
 		}
 		return { path: source.path, lifecycleRender: source.lifecycle_render === true };
 	});
@@ -176,10 +185,22 @@ const APPLIES_TO_RE = /applies_to:\s*\[([^\]]*)\]/;
 const TASKS_PATH_RE = /tasks\/([A-Za-z0-9_-]+)\//g;
 
 /** Scan one prose file for tokens that contradict the canonical spec. */
-export function scanForViolations(spec: CanonicalSpec, projectRoot: string, relPath: string, lifecycleRender = false): Violation[] {
+export function scanForViolations(
+	spec: CanonicalSpec,
+	projectRoot: string,
+	relPath: string,
+	lifecycleRender = false,
+): Violation[] {
 	const abs = path.join(projectRoot, relPath);
 	if (!fs.existsSync(abs)) {
-		return [{ file: relPath, line: 0, found: "missing source file", expected: "file listed in workflow.yaml sources must exist" }];
+		return [
+			{
+				file: relPath,
+				line: 0,
+				found: "missing source file",
+				expected: "file listed in workflow.yaml sources must exist",
+			},
+		];
 	}
 	const violations: Violation[] = [];
 	const lines = fs.readFileSync(abs, "utf-8").split("\n");
@@ -192,7 +213,12 @@ export function scanForViolations(spec: CanonicalSpec, projectRoot: string, relP
 		const sequence = [...spec.nameById].map(([id, name]) => `${id}:${name}`).join(" > ");
 		const expectedMarker = `<!-- Workflow phase sequence: ${sequence} -->`;
 		if (!body.includes(expectedMarker)) {
-			violations.push({ file: relPath, line: 0, found: "missing or reordered workflow phase sequence marker", expected: expectedMarker });
+			violations.push({
+				file: relPath,
+				line: 0,
+				found: "missing or reordered workflow phase sequence marker",
+				expected: expectedMarker,
+			});
 		}
 	}
 
@@ -218,7 +244,9 @@ export function scanForViolations(spec: CanonicalSpec, projectRoot: string, relP
 					file: relPath,
 					line: lineNo,
 					found: `Phase ${id} ${word}`,
-					expected: expected ? `Phase ${id} ${expected}` : `${word} is canonical Phase ${[...spec.nameById].find(([, n]) => n === word)?.[0]}, not ${id}`,
+					expected: expected
+						? `Phase ${id} ${expected}`
+						: `${word} is canonical Phase ${[...spec.nameById].find(([, n]) => n === word)?.[0]}, not ${id}`,
 				});
 			}
 		}
@@ -239,10 +267,20 @@ export function scanForViolations(spec: CanonicalSpec, projectRoot: string, relP
 		const hasGate1 = /\bGate\s*1\b/.test(text);
 		const hasGate2 = /\bGate\s*2\b/.test(text);
 		if (hasGate1 && !hasGate2 && reviewOut && new RegExp(globToProbe(reviewOut)).test(text)) {
-			violations.push({ file: relPath, line: lineNo, found: `Gate 1 referencing ${reviewOut}`, expected: `Gate 2 owns ${reviewOut}` });
+			violations.push({
+				file: relPath,
+				line: lineNo,
+				found: `Gate 1 referencing ${reviewOut}`,
+				expected: `Gate 2 owns ${reviewOut}`,
+			});
 		}
 		if (hasGate2 && !hasGate1 && planOut && new RegExp(globToProbe(planOut)).test(text)) {
-			violations.push({ file: relPath, line: lineNo, found: `Gate 2 referencing ${planOut}`, expected: `Gate 1 owns ${planOut}` });
+			violations.push({
+				file: relPath,
+				line: lineNo,
+				found: `Gate 2 referencing ${planOut}`,
+				expected: `Gate 1 owns ${planOut}`,
+			});
 		}
 
 		// 4. applies_to must enumerate every integer phase id.
@@ -251,10 +289,14 @@ export function scanForViolations(spec: CanonicalSpec, projectRoot: string, relP
 			const present = new Set((am[1].match(/\d+/g) ?? []).map(Number));
 			const missing = spec.integerPhaseIds.filter((n) => !present.has(n));
 			if (missing.length > 0) {
-				violations.push({ file: relPath, line: lineNo, found: `applies_to omits Phase ${missing.join(", ")}`, expected: `applies_to includes Phase ${spec.integerPhaseIds.join(", ")}` });
+				violations.push({
+					file: relPath,
+					line: lineNo,
+					found: `applies_to omits Phase ${missing.join(", ")}`,
+					expected: `applies_to includes Phase ${spec.integerPhaseIds.join(", ")}`,
+				});
 			}
 		}
-
 	});
 
 	// 5. Reflect lead list (file-level). A file that enumerates the Reflect leads
@@ -264,7 +306,12 @@ export function scanForViolations(spec: CanonicalSpec, projectRoot: string, relP
 		const present = spec.reflectLeads.filter((l) => body.includes(l));
 		if (present.length >= 2 && present.length < spec.reflectLeads.length) {
 			const missingLeads = spec.reflectLeads.filter((l) => !body.includes(l));
-			violations.push({ file: relPath, line: 0, found: `Reflect leads missing ${missingLeads.join(", ")}`, expected: `Reflect leads = ${spec.reflectLeads.join(" + ")}` });
+			violations.push({
+				file: relPath,
+				line: 0,
+				found: `Reflect leads missing ${missingLeads.join(", ")}`,
+				expected: `Reflect leads = ${spec.reflectLeads.join(" + ")}`,
+			});
 		}
 	}
 

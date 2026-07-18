@@ -32,14 +32,7 @@ import { antigravityManifest } from "./antigravity/index.js";
 import { clineManifest } from "./cline/index.js";
 import { openhandsManifest } from "./openhands/index.js";
 
-const PORTABLE_SURFACES: readonly PortableType[] = [
-	"agent",
-	"command",
-	"skill",
-	"config",
-	"rules",
-	"hooks",
-];
+const PORTABLE_SURFACES: readonly PortableType[] = ["agent", "command", "skill", "config", "rules", "hooks"];
 
 const SURFACE_FIELDS = {
 	agent: "agents",
@@ -81,10 +74,7 @@ function cloneConfig(config: ProviderConfig): ProviderConfig {
 }
 
 /** Apply the per-provider override callback, if any. */
-export function applyOverrides(
-	config: ProviderConfig,
-	overrides: ProviderManifest["overrides"],
-): void {
+export function applyOverrides(config: ProviderConfig, overrides: ProviderManifest["overrides"]): void {
 	if (overrides) overrides(config);
 }
 
@@ -92,10 +82,7 @@ export function applyOverrides(
  * Null any portable-surface field whose contract status is not "documented".
  * Mirrors the legacy `applyMewkitOverrides()` disable loop.
  */
-export function disableUndocumentedSurfaces(
-	config: ProviderConfig,
-	contract: ProviderCapabilityRegistryEntry,
-): void {
+export function disableUndocumentedSurfaces(config: ProviderConfig, contract: ProviderCapabilityRegistryEntry): void {
 	for (const surface of PORTABLE_SURFACES) {
 		const documented = contract.surfaces[surface]?.status === "documented";
 		if (documented) continue;
@@ -119,9 +106,7 @@ function assertUniqueIds(manifests: ProviderManifest[]): void {
  * Applies overrides and disables undocumented surfaces.
  * Order is preserved — first manifest wins position in the resulting record.
  */
-export function buildProviders(
-	manifests: ProviderManifest[] = manifestRegistry,
-): Record<ProviderType, ProviderConfig> {
+export function buildProviders(manifests: ProviderManifest[] = manifestRegistry): Record<ProviderType, ProviderConfig> {
 	assertUniqueIds(manifests);
 	const out = {} as Record<ProviderType, ProviderConfig>;
 	for (const manifest of manifests) {

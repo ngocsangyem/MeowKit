@@ -45,7 +45,13 @@ function req(method: string, pathName: string, opts: { body?: unknown; ifMatch?:
 		const r = http.request({ hostname: "127.0.0.1", port: server.port, method, path: pathName, headers }, (res) => {
 			let b = "";
 			res.on("data", (c) => (b += c));
-			res.on("end", () => resolve({ status: res.statusCode ?? 0, json: b ? (JSON.parse(b) as Record<string, unknown>) : {}, etag: res.headers.etag as string | undefined }));
+			res.on("end", () =>
+				resolve({
+					status: res.statusCode ?? 0,
+					json: b ? (JSON.parse(b) as Record<string, unknown>) : {},
+					etag: res.headers.etag as string | undefined,
+				}),
+			);
 		});
 		r.on("error", reject);
 		if (payload) r.write(payload);
@@ -56,19 +62,27 @@ function req(method: string, pathName: string, opts: { body?: unknown; ifMatch?:
 describe("PATCH /api/visual-plan", () => {
 	it("applies a valid op (with If-Match) and returns a new ETag", async () => {
 		const current = await req("GET", "/api/visual-plan");
-		const r = await req("PATCH", "/api/visual-plan", { body: { type: "reorder-frame", frameId: "fr-login", order: 4 }, ifMatch: current.etag });
+		const r = await req("PATCH", "/api/visual-plan", {
+			body: { type: "reorder-frame", frameId: "fr-login", order: 4 },
+			ifMatch: current.etag,
+		});
 		expect(r.status).toBe(200);
 		expect(r.json.ok).toBe(true);
 		expect(r.etag).toMatch(/^[0-9a-f]{64}$/);
 	});
 
 	it("refuses a PATCH with no If-Match (428 precondition required)", async () => {
-		const r = await req("PATCH", "/api/visual-plan", { body: { type: "reorder-frame", frameId: "fr-login", order: 8 } });
+		const r = await req("PATCH", "/api/visual-plan", {
+			body: { type: "reorder-frame", frameId: "fr-login", order: 8 },
+		});
 		expect(r.status).toBe(428);
 	});
 
 	it("returns 409 on a stale If-Match without mutating", async () => {
-		const r = await req("PATCH", "/api/visual-plan", { body: { type: "reorder-frame", frameId: "fr-login", order: 7 }, ifMatch: "0".repeat(64) });
+		const r = await req("PATCH", "/api/visual-plan", {
+			body: { type: "reorder-frame", frameId: "fr-login", order: 7 },
+			ifMatch: "0".repeat(64),
+		});
 		expect(r.status).toBe(409);
 		expect(r.json.error).toBe("stale");
 	});
@@ -81,7 +95,9 @@ describe("PATCH /api/visual-plan", () => {
 
 describe("feedback routes", () => {
 	it("POST persists a batch and GET reads it back", async () => {
-		const post = await req("POST", "/api/visual-plan/feedback", { body: { operations: [{ type: "copy-change", intent: "shorten CTA" }] } });
+		const post = await req("POST", "/api/visual-plan/feedback", {
+			body: { operations: [{ type: "copy-change", intent: "shorten CTA" }] },
+		});
 		expect(post.status).toBe(201);
 		expect(String(post.json.copyCommand)).toContain("apply-feedback");
 		const id = post.json.id as string;

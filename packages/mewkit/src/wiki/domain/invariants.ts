@@ -74,11 +74,7 @@ export interface TransitionResult {
  *  - Only `scanned` content can reach `approved` (unscanned content is barred).
  *  - Agent-origin content can never reach `committed` (no self-commit).
  */
-export function canTransition(
-	from: WikiState,
-	to: WikiState,
-	ctx: TransitionContext,
-): TransitionResult {
+export function canTransition(from: WikiState, to: WikiState, ctx: TransitionContext): TransitionResult {
 	if (from === to) {
 		return { ok: false, reason: `no-op transition: ${from} → ${to}` };
 	}
@@ -93,11 +89,7 @@ export function canTransition(
 
 /** Throwing wrapper around `canTransition` for call sites that treat an illegal
  * transition as a programming error. */
-export function assertTransition(
-	from: WikiState,
-	to: WikiState,
-	ctx: TransitionContext,
-): void {
+export function assertTransition(from: WikiState, to: WikiState, ctx: TransitionContext): void {
 	const result = canTransition(from, to, ctx);
 	if (!result.ok) {
 		throw new Error(result.reason);

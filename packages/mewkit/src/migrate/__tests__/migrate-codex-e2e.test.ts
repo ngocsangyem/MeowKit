@@ -105,7 +105,8 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 
 	it("leaves zero toolkit branding and no toolkit files in the target project", () => {
 		const generated = collectFiles(env.projectDir).filter(
-			(f) => !f.includes(`${env.projectDir}/.claude`) && !f.endsWith(".mcp.json") && !f.endsWith(".codex/capabilities.json"),
+			(f) =>
+				!f.includes(`${env.projectDir}/.claude`) && !f.endsWith(".mcp.json") && !f.endsWith(".codex/capabilities.json"),
 		);
 		expect(generated.length).toBeGreaterThan(0);
 		for (const file of generated) {

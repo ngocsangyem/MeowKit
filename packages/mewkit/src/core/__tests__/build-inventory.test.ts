@@ -20,14 +20,24 @@ const SCHEMA = JSON.stringify({
 });
 
 const FM = (over: Record<string, string> = {}): string => {
-	const base = { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code", model: "inherit", tools: "Read", ...over };
+	const base = {
+		owner: "utility",
+		criticality: "medium",
+		status: "active",
+		runtime: "claude-code",
+		model: "inherit",
+		tools: "Read",
+		...over,
+	};
 	const lines = Object.entries(base).map(([k, v]) => `${k}: ${v}`);
 	return `---\nname: mk:foo\n${lines.join("\n")}\n---\n# Body\n`;
 };
 
 const REGISTRY_ENTRY = { owner: "lifecycle", criticality: "high", status: "active", runtime: "claude-code" };
 
-async function makeHarness(opts: { skillFm?: string; registry?: Record<string, unknown>; extraSkillDir?: boolean } = {}): Promise<string> {
+async function makeHarness(
+	opts: { skillFm?: string; registry?: Record<string, unknown>; extraSkillDir?: boolean } = {},
+): Promise<string> {
 	const root = await mkdtemp(join(tmpdir(), "mewkit-inv-"));
 	tempDirs.push(root);
 	const c = join(root, ".claude");
@@ -80,22 +90,30 @@ describe("buildInventory", () => {
 		const { entries } = buildInventory(c);
 		expect(entries).toHaveLength(5);
 		const skill = entries.find((e) => e.type === "skill")!;
-		expect(Object.keys(skill).sort()).toEqual(["criticality", "id", "owner", "path", "runtime", "source", "status", "type"].sort());
+		expect(Object.keys(skill).sort()).toEqual(
+			["criticality", "id", "owner", "path", "runtime", "source", "status", "type"].sort(),
+		);
 		expect(skill.id).toBe("mk:foo");
 		expect(skill.source).toBe("frontmatter");
 		const hook = entries.find((e) => e.type === "hook")!;
 		expect(hook.source).toBe("registry");
 		expect(hook.criticality).toBe("critical");
 		const agent = entries.find((e) => e.type === "agent")!;
-		expect(agent).toMatchObject({ model: "inherit", tools: ["Read"], agentClass: "core-support", routing: "direct-only", public: true });
+		expect(agent).toMatchObject({
+			model: "inherit",
+			tools: ["Read"],
+			agentClass: "core-support",
+			routing: "direct-only",
+			public: true,
+		});
 	});
 
 	it("normalizes typed dependency edges while preserving the flat compatibility projection", async () => {
 		const c = await makeHarness({
 			skillFm: FM({ dependency_edges: "" }).replace(
-			"dependency_edges: \n",
-			"dependency_edges:\n  - id: mk:peer\n    type: peer\n  - id: mk:required\n    type: requires\ndepends_on: [mk:required]\n",
-		),
+				"dependency_edges: \n",
+				"dependency_edges:\n  - id: mk:peer\n    type: peer\n  - id: mk:required\n    type: requires\ndepends_on: [mk:required]\n",
+			),
 		});
 		const skill = buildInventory(c).entries.find((entry) => entry.type === "skill")!;
 		expect(skill.dependencyEdges).toEqual([
@@ -122,7 +140,9 @@ describe("buildInventory", () => {
 				"dependency_edges:\n  - id: mk:other\n    type: peer\n  - id: mk:other\n    type: requires\n",
 			),
 		});
-		expect(buildInventory(c).issues.some((issue) => issue.problem.includes("conflicting dependency_edges types"))).toBe(true);
+		expect(buildInventory(c).issues.some((issue) => issue.problem.includes("conflicting dependency_edges types"))).toBe(
+			true,
+		);
 	});
 });
 
@@ -150,7 +170,11 @@ describe("checkOwnership", () => {
 		const c = await makeHarness();
 		await writeFile(join(c, "agents", "dev.md"), FM().replace("model: inherit\ntools: Read\n", ""));
 		const results = checkOwnership(c);
-		expect(results.some((r) => r.status === "fail" && r.detail.includes("missing model") && r.detail.includes("missing tools"))).toBe(true);
+		expect(
+			results.some(
+				(r) => r.status === "fail" && r.detail.includes("missing model") && r.detail.includes("missing tools"),
+			),
+		).toBe(true);
 	});
 
 	it("FAILS on an out-of-enum value", async () => {

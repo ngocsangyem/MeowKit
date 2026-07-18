@@ -15,7 +15,8 @@ export const MAX_CONTENT_BYTES = 1_000_000;
 /** Scan passes performed on clean content — satisfies the domain MIN_SCAN_PASSES floor. */
 const SCAN_PASSES = 4;
 
-const BLOCKED_V4 = /^(10\.|127\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.|198\.1[89]\.)/;
+const BLOCKED_V4 =
+	/^(10\.|127\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.|198\.1[89]\.)/;
 
 function isBlockedIpv4(host: string): boolean {
 	if (/^0x/i.test(host)) return true; // hex IP encoding (e.g. 0x7f000001) — no legit host starts 0x

@@ -145,13 +145,14 @@ function summarizeSignals(content: string): string[] {
 }
 
 function summarizeHardSkipSignals(content: string): string[] {
-	return RUNTIME_BOUND_SIGNALS.filter((signal) => signal.hardSkip && signal.pattern.test(content)).map((signal) => signal.label);
+	return RUNTIME_BOUND_SIGNALS.filter((signal) => signal.hardSkip && signal.pattern.test(content)).map(
+		(signal) => signal.label,
+	);
 }
 
 function summarizeSkillSkipSignals(content: string): string[] {
 	return RUNTIME_BOUND_SIGNALS.filter(
-		(signal) =>
-			["orchestrator semantics"].includes(signal.label) && signal.pattern.test(content),
+		(signal) => ["orchestrator semantics"].includes(signal.label) && signal.pattern.test(content),
 	).map((signal) => signal.label);
 }
 
@@ -252,13 +253,17 @@ export function summarizeRuleMigrationByProvider(
 			skipped += 1;
 		}
 
-		if (native > 0) messages.push(`${providers[provider].displayName}: ${native} rule(s) migrate to documented rule surfaces`);
+		if (native > 0)
+			messages.push(`${providers[provider].displayName}: ${native} rule(s) migrate to documented rule surfaces`);
 		if (documentationOnly > 0) {
 			messages.push(
 				`${providers[provider].displayName}: ${documentationOnly} rule(s) require instruction-file flattening; no native rule surface is documented`,
 			);
 		}
-		if (skipped > 0) messages.push(`${providers[provider].displayName}: ${skipped} rule(s) skipped as orchestration/runtime-only content`);
+		if (skipped > 0)
+			messages.push(
+				`${providers[provider].displayName}: ${skipped} rule(s) skipped as orchestration/runtime-only content`,
+			);
 
 		return { provider, native, documentationOnly, skipped, messages };
 	});
@@ -355,7 +360,10 @@ async function shouldInstallSkillForProvider(
 	return await skipIfSkillDirectoryAuditFails(skill, provider);
 }
 
-async function skipIfSkillDirectoryAuditFails(skill: SkillInfo, provider: ProviderType): Promise<PortabilitySkip | null> {
+async function skipIfSkillDirectoryAuditFails(
+	skill: SkillInfo,
+	provider: ProviderType,
+): Promise<PortabilitySkip | null> {
 	const audit = await auditSkillDirectory(skill.sourcePath, provider, skill.name, { ignoreRewriteableMarkdown: true });
 	if (audit.errors.length === 0) return null;
 	const first = audit.errors[0]?.message ?? "runtime-bound Claude references";
@@ -398,7 +406,10 @@ function summarizeSkipCounts(skips: PortabilitySkip[]): string[] {
 		rules: { singular: "rule", plural: "rules" },
 		hooks: { singular: "hook", plural: "hooks" },
 	};
-	const counts = new Map<string, { count: number; provider: ProviderType; type: PortableType | "skill"; reason: string }>();
+	const counts = new Map<
+		string,
+		{ count: number; provider: ProviderType; type: PortableType | "skill"; reason: string }
+	>();
 	for (const skip of skips) {
 		const key = JSON.stringify([skip.provider, skip.type, skip.reason]);
 		const entry = counts.get(key);
@@ -509,7 +520,11 @@ export interface SkillParity {
  * installs are counted separately and do NOT lift the parity percent — that is the measured
  * metric of the staged full-semantic-parity track. Provider-neutral: pass any non-Claude provider.
  */
-export function computeSkillParity(skills: SkillInfo[], provider: ProviderType, opts: RuntimeGateOptions = {}): SkillParity {
+export function computeSkillParity(
+	skills: SkillInfo[],
+	provider: ProviderType,
+	opts: RuntimeGateOptions = {},
+): SkillParity {
 	const counts = { portable: 0, adapted: 0, adaptedDegraded: 0, includedUnportable: 0, skipped: 0 };
 	for (const skill of skills) {
 		const { cls } = classifySkillForProvider(skill, provider, opts);

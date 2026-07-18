@@ -44,7 +44,10 @@ async function makeHarness(ruleMeta: Record<string, unknown>): Promise<string> {
 	);
 	await mkdir(join(c, "rules"), { recursive: true });
 	await writeFile(join(c, "rules", "r1.md"), "# rule body");
-	await writeFile(join(c, "harness-inventory.json"), JSON.stringify({ schema_version: 1.1, artifacts: { "rules/r1.md": ruleMeta } }));
+	await writeFile(
+		join(c, "harness-inventory.json"),
+		JSON.stringify({ schema_version: 1.1, artifacts: { "rules/r1.md": ruleMeta } }),
+	);
 	return c;
 }
 

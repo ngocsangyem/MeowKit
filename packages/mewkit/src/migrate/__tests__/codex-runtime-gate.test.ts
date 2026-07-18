@@ -49,7 +49,12 @@ describe("Codex runtime gate (default-deny)", () => {
 	});
 
 	it("parity = portable+adapted / total; skipped counted apart, not in the percent", () => {
-		const skills = [skill("p1", "portable"), skill("p2", "portable"), skill("cc1", "claude-code"), skill("cc2", "claude-code")];
+		const skills = [
+			skill("p1", "portable"),
+			skill("p2", "portable"),
+			skill("cc1", "claude-code"),
+			skill("cc2", "claude-code"),
+		];
 		const parity = computeSkillParity(skills, "codex");
 		expect(parity.total).toBe(4);
 		expect(parity.portable).toBe(2);

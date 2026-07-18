@@ -262,7 +262,9 @@ async function runMigrateUnderLock(
 	}
 
 	if (conversionReport.validationErrors.length > 0) {
-		console.error(pc.red("Aborting before install: the reference rewriter left unexplained source references (see above)."));
+		console.error(
+			pc.red("Aborting before install: the reference rewriter left unexplained source references (see above)."),
+		);
 		return 1;
 	}
 
@@ -364,13 +366,15 @@ async function runMigrateUnderLock(
 		// codex is the first (and today only) consumer with a resolved output dir, so
 		// non-codex runs are left byte-for-byte unchanged.
 		if (targets.includes("codex")) {
-			ledger.addAll(buildRunRecords({
-				discovered,
-				provider: reportProvider,
-				outcomes: sink.outcomes,
-				phaseRecords: sink.phaseRecords,
-				preservedOccurrences: conversionReport.preservedOccurrences,
-			}));
+			ledger.addAll(
+				buildRunRecords({
+					discovered,
+					provider: reportProvider,
+					outcomes: sink.outcomes,
+					phaseRecords: sink.phaseRecords,
+					preservedOccurrences: conversionReport.preservedOccurrences,
+				}),
+			);
 
 			const report = buildMigrationReport({
 				provider: reportProvider,
@@ -388,7 +392,9 @@ async function runMigrateUnderLock(
 			} catch (writeErr) {
 				// Log the write failure without masking whatever the run was already doing.
 				console.error(
-					pc.red(`[x] Failed to write migration report: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`),
+					pc.red(
+						`[x] Failed to write migration report: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`,
+					),
 				);
 			}
 		}
@@ -510,13 +516,19 @@ async function executePlan(
 			// leaves the target absent. Recording this keeps re-run reports honest and
 			// the migrated/skipped identity stable across idempotent runs.
 			if (action.reasonCode !== "user-deleted-respected" && action.reasonCode !== "source-removed-orphan") {
-				recordOutcome(outcomes, action.type, action.item, { outcome: "migrated", target: action.targetPath || undefined });
+				recordOutcome(outcomes, action.type, action.item, {
+					outcome: "migrated",
+					target: action.targetPath || undefined,
+				});
 			}
 			continue;
 		}
 		if (action.action === "conflict" && action.resolution?.type === "keep") {
 			// User kept their edited target — the artifact is still installed (migrated).
-			recordOutcome(outcomes, action.type, action.item, { outcome: "migrated", target: action.targetPath || undefined });
+			recordOutcome(outcomes, action.type, action.item, {
+				outcome: "migrated",
+				target: action.targetPath || undefined,
+			});
 			continue;
 		}
 		if (action.provider === "codex" && action.type === "agent") {
@@ -583,7 +595,12 @@ async function executePlan(
 		// The bulk install is all-or-nothing; record each batched agent's outcome so the
 		// per-artifact report is not left blank for the 24 codex agents.
 		for (const agent of agentsToWrite) {
-			recordOutcome(outcomes, "agent", agent.name, result.success ? { outcome: "migrated" } : { outcome: "failed", error: result.error });
+			recordOutcome(
+				outcomes,
+				"agent",
+				agent.name,
+				result.success ? { outcome: "migrated" } : { outcome: "failed", error: result.error },
+			);
 		}
 	}
 
@@ -607,7 +624,12 @@ async function executePlan(
 			// and record a baseline migrated/failed outcome per hook item in the batch.
 			phaseRecords.push(...(result.records ?? []));
 			for (const hook of hookItems) {
-				recordOutcome(outcomes, "hooks", hook.name, result.success ? { outcome: "migrated" } : { outcome: "failed", error: result.error });
+				recordOutcome(
+					outcomes,
+					"hooks",
+					hook.name,
+					result.success ? { outcome: "migrated" } : { outcome: "failed", error: result.error },
+				);
 			}
 		}
 	}
@@ -629,7 +651,12 @@ async function executePlan(
 					records: r.records,
 				});
 				phaseRecords.push(...(r.records ?? []));
-				recordOutcome(outcomes, "skill", skill.name, r.success ? { outcome: "migrated", target: r.path } : { outcome: "failed", error: r.error });
+				recordOutcome(
+					outcomes,
+					"skill",
+					skill.name,
+					r.success ? { outcome: "migrated", target: r.path } : { outcome: "failed", error: r.error },
+				);
 			}
 		}
 	}

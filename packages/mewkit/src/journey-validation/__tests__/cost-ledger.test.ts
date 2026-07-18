@@ -21,7 +21,11 @@ afterEach(() => {
 });
 
 const tasks = (n: number) =>
-	Array.from({ length: n }, (_, i) => ({ journeyId: `j${i}`, provider: "codex" as RunRequest["provider"], prompt: `p${i}` }));
+	Array.from({ length: n }, (_, i) => ({
+		journeyId: `j${i}`,
+		provider: "codex" as RunRequest["provider"],
+		prompt: `p${i}`,
+	}));
 
 describe("cost ledger cap resolution (Rule 6)", () => {
 	it("precedence: override > MEOWKIT_BUDGET_CAP > tier cap > $100 default", () => {

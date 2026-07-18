@@ -6,10 +6,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { CODEX_MIN_SUPPORTED_VERSION } from "../providers/codex/capabilities.js";
-import {
-	setupKitInstallMigrateE2e,
-	type MigrateE2eEnv,
-} from "./helpers/migrate-e2e-harness.js";
+import { setupKitInstallMigrateE2e, type MigrateE2eEnv } from "./helpers/migrate-e2e-harness.js";
 import { codexTargetProfile } from "../../validate/targets/codex-target.js";
 
 let env: MigrateE2eEnv;
@@ -44,7 +41,9 @@ function readReport(): ReportShape {
 
 function hookCommands(): string[] {
 	const hooksJson = JSON.parse(readFileSync(join(env.projectDir, ".codex", "hooks.json"), "utf-8")) as HooksJson;
-	return Object.values(hooksJson.hooks).flatMap((groups) => groups.flatMap((group) => group.hooks.map((h) => h.command)));
+	return Object.values(hooksJson.hooks).flatMap((groups) =>
+		groups.flatMap((group) => group.hooks.map((h) => h.command)),
+	);
 }
 
 describe("migrate codex acceptance — kit-install completeness", () => {

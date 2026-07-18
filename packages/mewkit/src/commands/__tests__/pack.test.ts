@@ -70,7 +70,12 @@ async function makeInstall(): Promise<string> {
 		artifacts: {
 			"rules/gate-rules.md": { owner: "lifecycle", criticality: "critical", status: "active", runtime: "claude-code" },
 			"commands/mk/plan.md": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
-			"hooks/gate-enforcement.sh": { owner: "security", criticality: "critical", status: "active", runtime: "claude-code" },
+			"hooks/gate-enforcement.sh": {
+				owner: "security",
+				criticality: "critical",
+				status: "active",
+				runtime: "claude-code",
+			},
 			"hooks/jira-env-loader.sh": { owner: "jira", criticality: "medium", status: "active", runtime: "claude-code" },
 		},
 	};

@@ -193,13 +193,10 @@ async function mergeSingleWrite(
 	// (https://developers.openai.com/codex/guides/agents-md), so any truncation is a tail
 	// cut — safety/injection/core rules must sit at the front. For non-codex providers this
 	// is an identity ordering (rank is a no-op), so merge-single semantics stay unchanged.
-	const orderedSections = rankMergedSections(
-		provider,
-		[
-			{ kind: sectionKind, key: sectionKey, content: sectionContent },
-			...filteredSections.map((s) => ({ kind: s.kind, key: s.key, content: s.content })),
-		],
-	);
+	const orderedSections = rankMergedSections(provider, [
+		{ kind: sectionKind, key: sectionKey, content: sectionContent },
+		...filteredSections.map((s) => ({ kind: s.kind, key: s.key, content: s.content })),
+	]);
 
 	// Prepend the provider's instruction-file title so the merged doc opens with an H1
 	// heading (fixes the previously dangling leading "## Config" section that had no title

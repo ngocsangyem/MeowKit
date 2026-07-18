@@ -95,9 +95,7 @@ async function collectFiles(rootDir: string): Promise<string[]> {
 	return files;
 }
 
-type Verdict =
-	| { kind: "fail"; message: string }
-	| { kind: "warn"; message: string; annotation: string };
+type Verdict = { kind: "fail"; message: string } | { kind: "warn"; message: string; annotation: string };
 
 /**
  * Severity-aware, per-pattern verdict. This is where the LOCKED script policy and
@@ -123,7 +121,8 @@ function verdictFor(
 	if (fileClass === "script" && scriptIsStateChanging) {
 		return {
 			kind: "fail",
-			message: `${match.message} (state-changing script ${stateChangingReason ?? ""}; fail-closed — no rewrite path downgrades it)`.trimEnd(),
+			message:
+				`${match.message} (state-changing script ${stateChangingReason ?? ""}; fail-closed — no rewrite path downgrades it)`.trimEnd(),
 		};
 	}
 

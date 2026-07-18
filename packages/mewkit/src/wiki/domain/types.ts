@@ -42,13 +42,7 @@ export function makeWikiPageId(value: string): WikiPageId {
 export type WikiOrigin = "agent" | "human" | "system";
 
 /** Lifecycle state shared by candidates and pages. */
-export type WikiState =
-	| "proposed"
-	| "scanned"
-	| "approved"
-	| "committed"
-	| "quarantined"
-	| "rejected";
+export type WikiState = "proposed" | "scanned" | "approved" | "committed" | "quarantined" | "rejected";
 
 export type WikiSourceKind = "web" | "arxiv" | "github" | "internal";
 

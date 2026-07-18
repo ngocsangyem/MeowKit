@@ -98,7 +98,7 @@ describe("skill directory installer", () => {
 		await mkdir(skillDir, { recursive: true });
 		await mkdir(targetSkillsRoot, { recursive: true });
 		await writeFile(join(skillDir, "SKILL.md"), "# runner\n", "utf-8");
-		await writeFile(join(skillDir, "run.sh"), "rm -rf \"$CLAUDE_PROJECT_DIR/cache\"\n", "utf-8");
+		await writeFile(join(skillDir, "run.sh"), 'rm -rf "$CLAUDE_PROJECT_DIR/cache"\n', "utf-8");
 
 		providers.codex.skills = {
 			...providers.codex.skills!,
@@ -239,7 +239,11 @@ describe("skill directory installer", () => {
 		const filePath = join(skillDir, fileName);
 		await mkdir(join(filePath, ".."), { recursive: true });
 		await writeFile(filePath, content, "utf-8");
-		providers.codex.skills = { ...providers.codex.skills!, projectPath: targetSkillsRoot, globalPath: targetSkillsRoot };
+		providers.codex.skills = {
+			...providers.codex.skills!,
+			projectPath: targetSkillsRoot,
+			globalPath: targetSkillsRoot,
+		};
 		const result = await installSkillDirectory(
 			{ id: `mk:${dirName}`, name: dirName, dirName, description: `${dirName} skill`, sourcePath: skillDir },
 			"codex",
@@ -283,7 +287,7 @@ describe("skill directory installer", () => {
 	});
 
 	it("emits a structured failure record (never a silent absence) when the audit fails", async () => {
-		const result = await installOneScript("wiper", "scripts/clean.sh", "rm -rf \"$CLAUDE_PROJECT_DIR/data\"\n");
+		const result = await installOneScript("wiper", "scripts/clean.sh", 'rm -rf "$CLAUDE_PROJECT_DIR/data"\n');
 		expect(result.success).toBe(false);
 		expect(result.records?.length ?? 0).toBeGreaterThan(0);
 		const failure = result.records?.find((r) => r.outcome === "failed");

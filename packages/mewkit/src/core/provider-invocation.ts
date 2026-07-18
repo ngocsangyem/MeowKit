@@ -22,29 +22,77 @@ export type InvocationShapeMap = Record<string, InvocationShape>;
 // tool, slash commands, and settings.json hook registration. A "workflow" is not a distinct host
 // primitive — it runs as its entry skill/command — so invoke-workflow is honestly advisory.
 const CLAUDE_CODE_INVOCATION: InvocationShapeMap = {
-	"invoke-skill": { operation: "Skill tool (by skill name)", support: "supported", note: "host invokes the skill directly" },
-	"invoke-agent": { operation: "Agent/Task tool (by agent type)", support: "supported", note: "host spawns the subagent" },
+	"invoke-skill": {
+		operation: "Skill tool (by skill name)",
+		support: "supported",
+		note: "host invokes the skill directly",
+	},
+	"invoke-agent": {
+		operation: "Agent/Task tool (by agent type)",
+		support: "supported",
+		note: "host spawns the subagent",
+	},
 	"invoke-command": { operation: "slash command", support: "supported", note: "user- or model-invoked command" },
-	"invoke-workflow": { operation: "entry skill/command composition", support: "advisory", note: "no distinct workflow primitive — runs as its entry skill" },
-	"lifecycle-hook": { operation: "hook registered in settings.json", support: "supported", note: "host fires the hook on the mapped event" },
-	none: { operation: "(not directly invocable)", support: "unsupported", note: "e.g. a describe-only tool or a hook capability" },
+	"invoke-workflow": {
+		operation: "entry skill/command composition",
+		support: "advisory",
+		note: "no distinct workflow primitive — runs as its entry skill",
+	},
+	"lifecycle-hook": {
+		operation: "hook registered in settings.json",
+		support: "supported",
+		note: "host fires the hook on the mapped event",
+	},
+	none: {
+		operation: "(not directly invocable)",
+		support: "unsupported",
+		note: "e.g. a describe-only tool or a hook capability",
+	},
 };
 
 const CLAUDE_PLUGIN_INVOCATION: InvocationShapeMap = {
 	...CLAUDE_CODE_INVOCATION,
-	"invoke-command": { operation: "plugin slash command", support: "supported", note: "command shipped in the plugin payload" },
-	"lifecycle-hook": { operation: "hook in the plugin payload (via build-plugin)", support: "supported", note: "propagated hook fires on the mapped event" },
+	"invoke-command": {
+		operation: "plugin slash command",
+		support: "supported",
+		note: "command shipped in the plugin payload",
+	},
+	"lifecycle-hook": {
+		operation: "hook in the plugin payload (via build-plugin)",
+		support: "supported",
+		note: "propagated hook fires on the mapped event",
+	},
 };
 
 // Codex reaches skills/commands/agents through its instruction/prompt projection (the migration
 // contract), not typed invoke tools — so these are advisory, matching provider-projection's codex
 // invocable=advisory. Hooks are version-gated (see provider-lifecycle).
 const CODEX_INVOCATION: InvocationShapeMap = {
-	"invoke-skill": { operation: "skill projected into the AGENTS instruction surface", support: "advisory", note: "prompt-projected, not a typed invoke tool" },
-	"invoke-agent": { operation: "codex subagent surface", support: "advisory", note: "subagent exists (SubagentStart) but is not a typed invoke" },
-	"invoke-command": { operation: "command projected into the instruction surface", support: "advisory", note: "prompt-projected" },
-	"invoke-workflow": { operation: "instruction-surface composition", support: "advisory", note: "no workflow primitive" },
-	"lifecycle-hook": { operation: "codex hook (config.toml)", support: "advisory", note: "version-gated (CODEX_MIN_SUPPORTED_VERSION 0.142)" },
+	"invoke-skill": {
+		operation: "skill projected into the AGENTS instruction surface",
+		support: "advisory",
+		note: "prompt-projected, not a typed invoke tool",
+	},
+	"invoke-agent": {
+		operation: "codex subagent surface",
+		support: "advisory",
+		note: "subagent exists (SubagentStart) but is not a typed invoke",
+	},
+	"invoke-command": {
+		operation: "command projected into the instruction surface",
+		support: "advisory",
+		note: "prompt-projected",
+	},
+	"invoke-workflow": {
+		operation: "instruction-surface composition",
+		support: "advisory",
+		note: "no workflow primitive",
+	},
+	"lifecycle-hook": {
+		operation: "codex hook (config.toml)",
+		support: "advisory",
+		note: "version-gated (CODEX_MIN_SUPPORTED_VERSION 0.142)",
+	},
 	none: { operation: "(not directly invocable)", support: "unsupported", note: "describe-only / hook capability" },
 };
 
@@ -70,5 +118,11 @@ export function getInvocationShapes(provider: string): InvocationShapeMap {
 
 /** The shape for one logical invocation id on a provider (unknown-fallback if unrecognized). */
 export function getInvocationShape(provider: string, invocationId: string): InvocationShape {
-	return getInvocationShapes(provider)[invocationId] ?? { operation: "(unknown)", support: "unknown", note: "unrecognized invocation id" };
+	return (
+		getInvocationShapes(provider)[invocationId] ?? {
+			operation: "(unknown)",
+			support: "unknown",
+			note: "unrecognized invocation id",
+		}
+	);
 }

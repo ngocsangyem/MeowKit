@@ -116,7 +116,12 @@ function classifyLines(lines: string[]): LineKind[] {
 		if (fenceMarker) {
 			kinds[i] = "fenced";
 			const close = line.match(FENCE_OPEN);
-			if (close && close[1][0] === fenceMarker.char && close[1].length >= fenceMarker.length && !line.trim().slice(close[1].length)) {
+			if (
+				close &&
+				close[1][0] === fenceMarker.char &&
+				close[1].length >= fenceMarker.length &&
+				!line.trim().slice(close[1].length)
+			) {
 				fenceMarker = null;
 			}
 			continue;

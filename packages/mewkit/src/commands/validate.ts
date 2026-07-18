@@ -7,7 +7,11 @@ import { isHookScript } from "../core/is-hook-script.js";
 import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
 import { checkGateAuthority, checkCommandDrift } from "../core/check-gate-authority.js";
 import { assertOperationsNotInvocable } from "../core/provider-operations.js";
-import { findOperationConformance, isBlockingGap, summarizeOperationConformance } from "../core/check-operation-conformance.js";
+import {
+	findOperationConformance,
+	isBlockingGap,
+	summarizeOperationConformance,
+} from "../core/check-operation-conformance.js";
 import { findPseudoCapabilities } from "../core/check-pseudo-capabilities.js";
 import { findGenericCoreTokens, summarizeGenericCoreTokens } from "../core/check-generic-core-tokens.js";
 import { checkStaleIndex } from "../core/check-stale-index.js";
@@ -162,7 +166,12 @@ export function checkHooksExecutable(meowkitDir: string): CheckResult[] {
 	const skipped = entries.length - hookFiles.length;
 
 	if (hookFiles.length === 0) {
-		results.push({ name: "Hooks present", status: "fail", detail: "No hook scripts found in hooks/", section: "Hooks" });
+		results.push({
+			name: "Hooks present",
+			status: "fail",
+			detail: "No hook scripts found in hooks/",
+			section: "Hooks",
+		});
 		return results;
 	}
 
@@ -211,7 +220,9 @@ function checkConfigJson(meowkitDir: string): CheckResult {
 function checkDocsRefsContract(meowkitDir: string): CheckResult[] {
 	const contractPath = path.join(meowkitDir, "rules", "docs-reference-contract.md");
 	if (!fs.existsSync(contractPath)) {
-		return [{ name: "Docs-reference contract present", status: "fail", detail: `Missing: ${contractPath}`, section: "Docs" }];
+		return [
+			{ name: "Docs-reference contract present", status: "fail", detail: `Missing: ${contractPath}`, section: "Docs" },
+		];
 	}
 	try {
 		const { scannedFiles, findings, errorCount, warnCount } = checkDocsReferences(meowkitDir);
@@ -228,7 +239,14 @@ function checkDocsRefsContract(meowkitDir: string): CheckResult[] {
 		return [{ name: "Docs references on Type-1 allowlist", status, detail, section: "Docs" }];
 	} catch (error: unknown) {
 		const message = error instanceof Error ? error.message : String(error);
-		return [{ name: "Docs references on Type-1 allowlist", status: "fail", detail: `Validator crashed: ${message}`, section: "Docs" }];
+		return [
+			{
+				name: "Docs references on Type-1 allowlist",
+				status: "fail",
+				detail: `Validator crashed: ${message}`,
+				section: "Docs",
+			},
+		];
 	}
 }
 
@@ -313,7 +331,10 @@ function checkOperationConformance(meowkitDir: string): CheckResult[] {
 /** Advisory baseline while skill bodies are migrated to semantic capability prose. */
 export function checkGenericCoreTokens(meowkitDir: string): CheckResult {
 	const findings = findGenericCoreTokens(meowkitDir);
-	const locations = findings.slice(0, 8).map((finding) => `${finding.file}:${finding.line} "${finding.token}"`).join("\n         ");
+	const locations = findings
+		.slice(0, 8)
+		.map((finding) => `${finding.file}:${finding.line} "${finding.token}"`)
+		.join("\n         ");
 	return {
 		name: "Generic-core provider token baseline",
 		status: findings.length === 0 ? "pass" : "warn",
@@ -382,7 +403,10 @@ function projectionCountResult(name: string, expected: number, actual: number, d
 	return {
 		name,
 		status: expected === 0 || actual >= expected ? "pass" : "fail",
-		detail: expected === 0 ? `${detail} — no portable source items expected.` : `${detail}: expected ${expected}, found ${actual}.`,
+		detail:
+			expected === 0
+				? `${detail} — no portable source items expected.`
+				: `${detail}: expected ${expected}, found ${actual}.`,
 		section: "Portability",
 	};
 }
@@ -580,7 +604,14 @@ function printResult(result: CheckResult): void {
 export function checkCapabilitiesSection(meowkitDir: string): CheckResult[] {
 	const issues = validateCapabilities(meowkitDir);
 	if (issues.length === 0) {
-		return [{ name: "Capability manifest coherent", status: "pass", detail: "No cross-ref, containment, uniqueness, or cycle issues.", section: "Capabilities" }];
+		return [
+			{
+				name: "Capability manifest coherent",
+				status: "pass",
+				detail: "No cross-ref, containment, uniqueness, or cycle issues.",
+				section: "Capabilities",
+			},
+		];
 	}
 	return issues.map((i) => ({
 		name: `Capability ${i.level}: ${i.capabilityId ?? "-"}`,
@@ -599,16 +630,45 @@ export function checkCapabilitiesSection(meowkitDir: string): CheckResult[] {
 export function checkCapabilityViewDrift(meowkitDir: string, projectRoot: string): CheckResult[] {
 	const docPath = path.join(projectRoot, "docs", "architecture", "trigger-registry.md");
 	if (!fs.existsSync(docPath)) {
-		return [{ name: "Capability view drift", status: "na", detail: "docs/architecture/trigger-registry.md not present (authoring-only doc).", section: "Capabilities" }];
+		return [
+			{
+				name: "Capability view drift",
+				status: "na",
+				detail: "docs/architecture/trigger-registry.md not present (authoring-only doc).",
+				section: "Capabilities",
+			},
+		];
 	}
 	const state = capabilityViewDrift(fs.readFileSync(docPath, "utf-8"), buildCapabilities(meowkitDir));
 	if (state === "absent-markers") {
-		return [{ name: "Capability view drift", status: "na", detail: "Generated region not spliced into the doc yet (GENERATED:capabilities markers absent).", section: "Capabilities" }];
+		return [
+			{
+				name: "Capability view drift",
+				status: "na",
+				detail: "Generated region not spliced into the doc yet (GENERATED:capabilities markers absent).",
+				section: "Capabilities",
+			},
+		];
 	}
 	if (state === "in-sync") {
-		return [{ name: "Capability view drift", status: "pass", detail: "Generated capabilities table matches the registry.", section: "Capabilities" }];
+		return [
+			{
+				name: "Capability view drift",
+				status: "pass",
+				detail: "Generated capabilities table matches the registry.",
+				section: "Capabilities",
+			},
+		];
 	}
-	return [{ name: "Capability view drift", status: "fail", detail: "Generated capabilities region has DRIFTED from the registry — regenerate + re-splice (do not hand-edit the region).", section: "Capabilities" }];
+	return [
+		{
+			name: "Capability view drift",
+			status: "fail",
+			detail:
+				"Generated capabilities region has DRIFTED from the registry — regenerate + re-splice (do not hand-edit the region).",
+			section: "Capabilities",
+		},
+	];
 }
 
 /**

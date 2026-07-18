@@ -463,7 +463,7 @@ async function runPostInitMigrate(args: InitArgs, projectDir: string): Promise<v
 		global: args.migrateGlobal ?? false,
 		yes: !!args.migrateTo, // CSV/all → non-interactive; bare --migrate stays interactive
 		source: join(projectDir, ".claude"),
-		force: true
+		force: true,
 	};
 
 	if (args.migrateTo) {

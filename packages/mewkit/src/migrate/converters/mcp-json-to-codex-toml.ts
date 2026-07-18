@@ -79,12 +79,7 @@ export function convertMcpJsonToCodexToml(mcpJsonContent: string): McpConversion
 	};
 }
 
-function reportUnknownFields(
-	name: string,
-	server: McpJsonServer,
-	known: Set<string>,
-	warnings: string[],
-): void {
+function reportUnknownFields(name: string, server: McpJsonServer, known: Set<string>, warnings: string[]): void {
 	const unknown = Object.keys(server).filter((key) => !known.has(key));
 	if (unknown.length > 0) {
 		warnings.push(`MCP server "${name}": no TOML mapping for field(s) ${unknown.join(", ")} — skipped`);

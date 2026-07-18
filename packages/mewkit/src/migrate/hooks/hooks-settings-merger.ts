@@ -278,7 +278,8 @@ async function mergeClaudeCode(
 
 	const snapshot = await snapshotSettings(settingsPath);
 	try {
-		const section = (await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
+		const section =
+			(await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
 			buildClaudeHooksSection(hooks, hookTargetPaths);
 		await mergeIntoSettingsJson(settingsPath, section);
 		return {
@@ -306,7 +307,8 @@ async function mergeGeminiCli(
 
 	const snapshot = await snapshotSettings(settingsPath);
 	try {
-		const claudeSection = (await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
+		const claudeSection =
+			(await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
 			buildClaudeHooksSection(hooks, hookTargetPaths);
 		const section = requiresHookMapping("gemini-cli") ? applyGeminiMapping(claudeSection) : claudeSection;
 		await mergeIntoSettingsJson(settingsPath, section);
@@ -335,7 +337,8 @@ async function mergeDroid(
 
 	const snapshot = await snapshotSettings(settingsPath);
 	try {
-		const section = (await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
+		const section =
+			(await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
 			buildClaudeHooksSection(hooks, hookTargetPaths);
 		await mergeIntoSettingsJson(settingsPath, section);
 		return {

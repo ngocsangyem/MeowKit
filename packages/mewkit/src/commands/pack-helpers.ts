@@ -33,9 +33,7 @@ export function readInstalledState(claudeDir: string, manifest: PackManifest): I
 	const { meta } = readInstallMetadata(claudeDir);
 	const declared = meta?.packs;
 	const isFull = !declared;
-	const installedPacks = declared
-		? [...new Set([BASE_PACK, ...declared])]
-		: [BASE_PACK, ...availablePacks(manifest)];
+	const installedPacks = declared ? [...new Set([BASE_PACK, ...declared])] : [BASE_PACK, ...availablePacks(manifest)];
 	return { meta, installedPacks, isFull };
 }
 

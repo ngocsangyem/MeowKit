@@ -344,9 +344,7 @@ function hasProviderPathMigrationForEntry(input: ReconcileInput, entry: Portable
 	if (!manifest?.providerPathMigrations.length) return false;
 	return manifest.providerPathMigrations.some(
 		(migration) =>
-			migration.provider === entry.provider &&
-			migration.type === entry.type &&
-			isUnderPath(entry.path, migration.from),
+			migration.provider === entry.provider && migration.type === entry.type && isUnderPath(entry.path, migration.from),
 	);
 }
 

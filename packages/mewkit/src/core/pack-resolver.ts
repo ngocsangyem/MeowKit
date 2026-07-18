@@ -7,13 +7,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { collectFiles } from "./compute-checksums.js";
 import { buildInventory, type Inventory, type InventoryEntry } from "./build-inventory.js";
-import {
-	availablePacks,
-	BASE_PACK,
-	flattenProfile,
-	PackManifestError,
-	type PackManifest,
-} from "./pack-manifest.js";
+import { availablePacks, BASE_PACK, flattenProfile, PackManifestError, type PackManifest } from "./pack-manifest.js";
 
 export interface ResolveResult {
 	/** All `.claude/`-relative paths for the resolved profile/packs (incl. base). */

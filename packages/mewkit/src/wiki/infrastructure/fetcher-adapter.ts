@@ -17,7 +17,10 @@ interface FetchResponse {
 	body: { getReader(): { read(): Promise<{ done: boolean; value?: Uint8Array }>; cancel(): Promise<void> } } | null;
 	text(): Promise<string>;
 }
-export type FetchImpl = (url: string, init: { redirect: "manual"; signal: unknown; headers: Record<string, string> }) => Promise<FetchResponse>;
+export type FetchImpl = (
+	url: string,
+	init: { redirect: "manual"; signal: unknown; headers: Record<string, string> },
+) => Promise<FetchResponse>;
 
 export interface FetcherOptions {
 	fetchImpl?: FetchImpl;
@@ -50,7 +53,9 @@ export class FetcherAdapter implements Fetcher {
 			case "web":
 				return seed.query;
 			case "arxiv":
-				return "http://export.arxiv.org/api/query?search_query=all:" + encodeURIComponent(seed.query) + "&max_results=1";
+				return (
+					"http://export.arxiv.org/api/query?search_query=all:" + encodeURIComponent(seed.query) + "&max_results=1"
+				);
 			case "github":
 				return "https://api.github.com/search/repositories?q=" + encodeURIComponent(seed.query) + "&per_page=1";
 			default:
@@ -80,7 +85,11 @@ export class FetcherAdapter implements Fetcher {
 			const timer = setTimeout(() => ctrl.abort(), this.timeoutMs);
 			let res: FetchResponse;
 			try {
-				res = await this.fetchImpl(url, { redirect: "manual", signal: ctrl.signal, headers: { "user-agent": "mewkit-wiki-research" } });
+				res = await this.fetchImpl(url, {
+					redirect: "manual",
+					signal: ctrl.signal,
+					headers: { "user-agent": "mewkit-wiki-research" },
+				});
 			} finally {
 				clearTimeout(timer);
 			}

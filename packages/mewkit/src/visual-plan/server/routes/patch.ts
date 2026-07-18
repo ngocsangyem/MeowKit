@@ -24,7 +24,9 @@ export async function handlePatch(req: IncomingMessage, res: ServerResponse, pla
 	try {
 		raw = await bufferBody(req, BODY_CAP, TIMEOUT_MS);
 	} catch (e) {
-		writeJson(res, e instanceof BodyError ? e.status : 400, { error: e instanceof BodyError ? e.tag : "body-read-error" });
+		writeJson(res, e instanceof BodyError ? e.status : 400, {
+			error: e instanceof BodyError ? e.tag : "body-read-error",
+		});
 		return;
 	}
 	let parsedJson: unknown;

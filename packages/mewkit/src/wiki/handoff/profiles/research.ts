@@ -18,7 +18,14 @@ export const researchProfiles: SkillHandoffProfile[] = [
 				blast_radius: 1,
 			},
 		},
-		["mk:brainstorming", "mk:plan-ceo-review", "mk:plan-creator", "mk:planning-engine", "mk:sprint-contract", "mk:story-sizer"],
+		[
+			"mk:brainstorming",
+			"mk:plan-ceo-review",
+			"mk:plan-creator",
+			"mk:planning-engine",
+			"mk:sprint-contract",
+			"mk:story-sizer",
+		],
 	),
 	...defineGroup(
 		{

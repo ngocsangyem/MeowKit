@@ -42,7 +42,11 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 	if (sub === "bootstrap") {
 		const provider = args.provider ?? "claude-code";
 		if (!isProjectedProvider(provider)) {
-			console.error(pc.red(`No bootstrap projection for provider "${provider}" (report-only). Projected: ${Object.keys(PROVIDER_PROJECTIONS).join(", ")}.`));
+			console.error(
+				pc.red(
+					`No bootstrap projection for provider "${provider}" (report-only). Projected: ${Object.keys(PROVIDER_PROJECTIONS).join(", ")}.`,
+				),
+			);
 			process.exit(1);
 		}
 		const text = renderBootstrap(provider as BootstrapProvider);
@@ -64,7 +68,11 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 
 	const source = findCapabilitySource();
 	if (!source) {
-		console.error(pc.red("Could not find a capability source. Expected .claude/ or a Codex projection at .codex/capabilities.json. Run `npx mewkit init` or `npx mewkit migrate codex`."));
+		console.error(
+			pc.red(
+				"Could not find a capability source. Expected .claude/ or a Codex projection at .codex/capabilities.json. Run `npx mewkit init` or `npx mewkit migrate codex`.",
+			),
+		);
 		process.exit(1);
 	}
 
@@ -84,7 +92,9 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 		return;
 	}
 	if (sub !== "list") {
-		console.error(pc.red(`Unknown capabilities subcommand "${sub}". Expected list|explain|resolve|view|bootstrap|projections.`));
+		console.error(
+			pc.red(`Unknown capabilities subcommand "${sub}". Expected list|explain|resolve|view|bootstrap|projections.`),
+		);
 		process.exit(1);
 	}
 
@@ -133,9 +143,17 @@ function explain(entries: CapabilityEntry[], target: string | undefined, json: b
 	console.log(`  owner:       ${entry.owner || pc.dim("(unknown)")} / ${entry.installedState}`);
 	console.log(`  invocation:  ${entry.invocation.kind}:${entry.invocation.id}`);
 	console.log(`  intents:     ${entry.intents.length ? entry.intents.join(", ") : pc.dim("(none)")}`);
-	console.log(`  requires:    ${entry.requirements.length ? entry.requirements.map((r) => `${r.type}:${r.id}`).join(", ") : pc.dim("(none)")}`);
+	console.log(
+		`  requires:    ${entry.requirements.length ? entry.requirements.map((r) => `${r.type}:${r.id}`).join(", ") : pc.dim("(none)")}`,
+	);
 	console.log(`  verify:      ${entry.verification.kind}${entry.verification.id ? `:${entry.verification.id}` : ""}`);
-	console.log(`  provenance:  ${Object.entries(entry.provenance).map(([k, v]) => `${k}=${v}`).join(", ") || pc.dim("(none)")}`);
+	console.log(
+		`  provenance:  ${
+			Object.entries(entry.provenance)
+				.map(([k, v]) => `${k}=${v}`)
+				.join(", ") || pc.dim("(none)")
+		}`,
+	);
 }
 
 /**
@@ -156,7 +174,9 @@ function projections(json: boolean): void {
 	for (const p of all) {
 		console.log(`${pc.bold(p.provider)} ${pc.dim(`(${p.status}, placement: ${p.bootstrapPlacement})`)}`);
 		const l = p.levels;
-		console.log(`  discoverable=${l.discoverable}  selectable=${l.selectable}  invocable=${l.invocable}  enforceable=${l.enforceable}`);
+		console.log(
+			`  discoverable=${l.discoverable}  selectable=${l.selectable}  invocable=${l.invocable}  enforceable=${l.enforceable}`,
+		);
 		console.log(pc.dim(`  ${p.evidence}\n`));
 	}
 	console.log(pc.dim("Providers not listed are report-only — no capability behavior is claimed for them."));
@@ -196,7 +216,10 @@ export function hostProbes(projectRoot: string): AvailabilityProbes {
 			const mcpPath = path.join(projectRoot, ".mcp.json");
 			if (!fs.existsSync(mcpPath)) return null;
 			try {
-				const parsed = JSON.parse(fs.readFileSync(mcpPath, "utf-8")) as { mcpServers?: Record<string, unknown>; servers?: Record<string, unknown> };
+				const parsed = JSON.parse(fs.readFileSync(mcpPath, "utf-8")) as {
+					mcpServers?: Record<string, unknown>;
+					servers?: Record<string, unknown>;
+				};
 				const servers = parsed.mcpServers ?? parsed.servers ?? {};
 				return Object.prototype.hasOwnProperty.call(servers, id);
 			} catch {
@@ -206,12 +229,22 @@ export function hostProbes(projectRoot: string): AvailabilityProbes {
 	};
 }
 
-function resolve(entries: CapabilityEntry[], intent: string | undefined, provider: string | null, projectRoot: string, json: boolean): void {
+function resolve(
+	entries: CapabilityEntry[],
+	intent: string | undefined,
+	provider: string | null,
+	projectRoot: string,
+	json: boolean,
+): void {
 	if (!intent) {
-		console.error(pc.red("`capabilities resolve` requires an intent (--intent \"…\" or a positional phrase)."));
+		console.error(pc.red('`capabilities resolve` requires an intent (--intent "…" or a positional phrase).'));
 		process.exit(1);
 	}
-	const ctx = { provider: provider ?? "claude-code", checkedAt: new Date().toISOString(), probes: hostProbes(projectRoot) };
+	const ctx = {
+		provider: provider ?? "claude-code",
+		checkedAt: new Date().toISOString(),
+		probes: hostProbes(projectRoot),
+	};
 	const result = resolveWithHost(entries, intent, ctx);
 	if (json) {
 		console.log(JSON.stringify(result, null, 2));
@@ -234,12 +267,24 @@ function resolve(entries: CapabilityEntry[], intent: string | undefined, provide
 	const top = result.candidates[0];
 	if (top?.contextRequirement) {
 		const acq = result.acquisition;
-		console.log(pc.bold(`  needs repo context (${top.contextRequirement.reason}) — acquire via ${acq.provider} [${acq.status}]:`));
-		console.log(pc.dim(`      read:   ${acq.read ? `${acq.read.tool} — ${acq.read.note}` : "(no read surface — host-provided paths only)"}`));
-		console.log(pc.dim(`      search: ${acq.search ? `${acq.search.tool} — ${acq.search.note}` : "(no search surface — report-only)"}`));
+		console.log(
+			pc.bold(`  needs repo context (${top.contextRequirement.reason}) — acquire via ${acq.provider} [${acq.status}]:`),
+		);
+		console.log(
+			pc.dim(
+				`      read:   ${acq.read ? `${acq.read.tool} — ${acq.read.note}` : "(no read surface — host-provided paths only)"}`,
+			),
+		);
+		console.log(
+			pc.dim(
+				`      search: ${acq.search ? `${acq.search.tool} — ${acq.search.note}` : "(no search surface — report-only)"}`,
+			),
+		);
 	}
 	// Self-auditing: cite the adapter + evidence behind this result's provider claims (Phase 6).
 	const cite = result.adapterCitation;
 	console.log(pc.dim(`  adapter: ${cite.provider} [${cite.projectionStatus}] — ${cite.projectionEvidence}`));
-	console.log(pc.dim(`  can gate on: ${cite.gatingEvents.length ? cite.gatingEvents.join(", ") : "no events (advisory host)"}`));
+	console.log(
+		pc.dim(`  can gate on: ${cite.gatingEvents.length ? cite.gatingEvents.join(", ") : "no events (advisory host)"}`),
+	);
 }

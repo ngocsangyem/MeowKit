@@ -19,7 +19,7 @@ function planWith(mutate: (p: Record<string, unknown>) => void): VisualPlan {
 
 type State = { id: string; frameIds: string[]; sourceRefIds: string[]; omitted?: Record<string, unknown> };
 const states = (p: Record<string, unknown>): State[] =>
-	((p.uiCoverage as { surfaces: { states: State[] }[] }).surfaces[0].states);
+	(p.uiCoverage as { surfaces: { states: State[] }[] }).surfaces[0].states;
 
 describe("computeCoverage summary (computed, not trusted)", () => {
 	it("classifies resolved / planned / omitted with unresolved=0 on the valid fixture", () => {

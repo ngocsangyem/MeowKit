@@ -32,15 +32,10 @@ const SCAN_DIRS = [
 ];
 
 // Files allowed to mention banned paths (because they DEFINE the bans).
-const FILE_WHITELIST = new Set([
-	"rules/docs-reference-contract.md",
-	"rules/skill-authoring-rules.md",
-]);
+const FILE_WHITELIST = new Set(["rules/docs-reference-contract.md", "rules/skill-authoring-rules.md"]);
 
 // Skill dirs whose Grep-of-user-project semantics need an opt-out from path checks.
-const SKILL_DIR_WHITELIST = new Set([
-	"skills/docs-finder",
-]);
+const SKILL_DIR_WHITELIST = new Set(["skills/docs-finder"]);
 
 interface AllowlistData {
 	allowed: string[];
@@ -113,11 +108,16 @@ function walkMd(dir: string, out: string[] = []): string[] {
 				entry.name === "tests" ||
 				entry.name === "__tests__" ||
 				entry.name === "__pycache__"
-			) continue;
+			)
+				continue;
 			walkMd(full, out);
 		} else if (
 			entry.isFile() &&
-			(entry.name.endsWith(".md") || entry.name.endsWith(".sh") || entry.name.endsWith(".py") || entry.name.endsWith(".cjs") || entry.name.endsWith(".js"))
+			(entry.name.endsWith(".md") ||
+				entry.name.endsWith(".sh") ||
+				entry.name.endsWith(".py") ||
+				entry.name.endsWith(".cjs") ||
+				entry.name.endsWith(".js"))
 		) {
 			out.push(full);
 		}
@@ -189,8 +189,6 @@ export function formatReport(result: DocsRefResult): string {
 	for (const f of result.findings) {
 		lines.push(`${f.file}:${f.line}: ${f.level}: ${f.token} — ${f.reason}`);
 	}
-	lines.push(
-		`\nScanned ${result.scannedFiles} files. ${result.errorCount} error(s), ${result.warnCount} warning(s).`
-	);
+	lines.push(`\nScanned ${result.scannedFiles} files. ${result.errorCount} error(s), ${result.warnCount} warning(s).`);
 	return lines.join("\n");
 }

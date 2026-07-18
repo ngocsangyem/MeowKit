@@ -61,8 +61,10 @@ function parsePortabilityPolicy(raw: unknown): SkillPortabilityPolicy | undefine
 	const portability = parseEnum<SkillPortability>(data.portability, ["generic", "provider-adapted", "provider-only"]);
 	if (!portability) return undefined;
 
-	const providers = data.providers && typeof data.providers === "object" ? (data.providers as Record<string, unknown>) : undefined;
-	const requires = data.requires && typeof data.requires === "object" ? (data.requires as Record<string, unknown>) : undefined;
+	const providers =
+		data.providers && typeof data.providers === "object" ? (data.providers as Record<string, unknown>) : undefined;
+	const requires =
+		data.requires && typeof data.requires === "object" ? (data.requires as Record<string, unknown>) : undefined;
 	const contextCost = parseEnum<ContextCost>(data.context_cost ?? data.contextCost, ["low", "medium", "high"]);
 
 	return {
@@ -89,7 +91,9 @@ function parseEnum<T extends string>(raw: unknown, allowed: readonly T[]): T | u
 }
 
 function parseProviders(raw: unknown): ProviderType[] | undefined {
-	const providers = parseStringArray(raw).filter((value): value is ProviderType => ProviderType.safeParse(value).success);
+	const providers = parseStringArray(raw).filter(
+		(value): value is ProviderType => ProviderType.safeParse(value).success,
+	);
 	return providers.length > 0 ? providers : undefined;
 }
 

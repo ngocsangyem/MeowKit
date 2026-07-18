@@ -45,10 +45,14 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 	const srcRoot = root ?? process.cwd();
 
 	if (process.platform === "win32") {
-		return [{ name: "Hard gates", status: "warn", detail: "Skipped on Windows — POSIX shell hooks cannot be probed here." }];
+		return [
+			{ name: "Hard gates", status: "warn", detail: "Skipped on Windows — POSIX shell hooks cannot be probed here." },
+		];
 	}
 	if (!hasHarness(srcRoot)) {
-		return [{ name: "Hard gates", status: "warn", detail: "No .claude/settings.json + hooks/ found; nothing to probe." }];
+		return [
+			{ name: "Hard gates", status: "warn", detail: "No .claude/settings.json + hooks/ found; nothing to probe." },
+		];
 	}
 
 	const settings = JSON.parse(fs.readFileSync(path.join(srcRoot, ".claude", "settings.json"), "utf8")) as Record<
@@ -96,7 +100,11 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 			const afterApprove = runWrite();
 			results.push(
 				afterApprove && afterApprove.status === 0
-					? { name: "Gate 1: allows source write once the plan is approved", status: "pass", detail: "Allowed (exit 0) after receipt." }
+					? {
+							name: "Gate 1: allows source write once the plan is approved",
+							status: "pass",
+							detail: "Allowed (exit 0) after receipt.",
+						}
 					: {
 							name: "Gate 1: allows source write once the plan is approved",
 							status: "fail",

@@ -44,7 +44,10 @@ function convertForCopilot(item: PortableItem): ConversionResult {
 	}
 	fmLines.push("---");
 
-	const stripped = stripClaudeRefs(item.body, { provider: "github-copilot", targetName: providers["github-copilot"].displayName });
+	const stripped = stripClaudeRefs(item.body, {
+		provider: "github-copilot",
+		targetName: providers["github-copilot"].displayName,
+	});
 	warnings.push(...stripped.warnings);
 	const content = `${fmLines.join("\n")}\n\n${stripped.content}\n`;
 

@@ -25,7 +25,15 @@ export function planStatus(planDir: string): PlanStatus {
 	const result = validatePlan(planDir);
 	const missing = result.errors.some((e) => e.code === ErrorCode.ARTIFACT_MISSING);
 	if (missing) {
-		return { exists: false, valid: false, revision: null, reviewStatus: null, coverage: null, pendingFeedback: [], errorCount: 0 };
+		return {
+			exists: false,
+			valid: false,
+			revision: null,
+			reviewStatus: null,
+			coverage: null,
+			pendingFeedback: [],
+			errorCount: 0,
+		};
 	}
 	return {
 		exists: true,

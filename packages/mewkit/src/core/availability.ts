@@ -44,23 +44,49 @@ function snapshotFor(req: TypedRequirement, ctx: AvailabilityContext): Availabil
 	switch (req.type) {
 		case "external_binary": {
 			const ok = ctx.probes.commandExists(req.id);
-			return { ...base, status: ok ? "available" : "unavailable", evidence: `PATH lookup for "${req.id}": ${ok ? "found" : "not found"}` };
+			return {
+				...base,
+				status: ok ? "available" : "unavailable",
+				evidence: `PATH lookup for "${req.id}": ${ok ? "found" : "not found"}`,
+			};
 		}
 		case "skill_script":
 		case "file_or_config": {
 			const ok = ctx.probes.containedFileExists(req.id);
-			if (ok === null) return { ...base, status: "unknown", evidence: `"${req.id}" is a logical id with no path mapping — availability undetermined (not executed)` };
-			return { ...base, status: ok ? "available" : "unavailable", evidence: `contained path "${req.id}": ${ok ? "present" : "absent"} (not executed)` };
+			if (ok === null)
+				return {
+					...base,
+					status: "unknown",
+					evidence: `"${req.id}" is a logical id with no path mapping — availability undetermined (not executed)`,
+				};
+			return {
+				...base,
+				status: ok ? "available" : "unavailable",
+				evidence: `contained path "${req.id}": ${ok ? "present" : "absent"} (not executed)`,
+			};
 		}
 		case "mcp_or_app": {
 			const configured = ctx.probes.mcpServerConfigured(req.id);
-			if (configured === null) return { ...base, status: "unknown", evidence: `no MCP config on disk to confirm "${req.id}"` };
-			return { ...base, status: configured ? "available" : "unavailable", evidence: `MCP config ${configured ? "declares" : "omits"} "${req.id}"` };
+			if (configured === null)
+				return { ...base, status: "unknown", evidence: `no MCP config on disk to confirm "${req.id}"` };
+			return {
+				...base,
+				status: configured ? "available" : "unavailable",
+				evidence: `MCP config ${configured ? "declares" : "omits"} "${req.id}"`,
+			};
 		}
 		case "host_tool":
-			return { ...base, status: "unknown", evidence: "host does not expose a queryable tool contract to the CLI (never inferred from PATH)" };
+			return {
+				...base,
+				status: "unknown",
+				evidence: "host does not expose a queryable tool contract to the CLI (never inferred from PATH)",
+			};
 		case "subagent_surface":
-			return { ...base, status: "unknown", evidence: "subagent availability is a provider-contract fact, undeclared until a provider manifest asserts it" };
+			return {
+				...base,
+				status: "unknown",
+				evidence: "subagent availability is a provider-contract fact, undeclared until a provider manifest asserts it",
+			};
 		case "lifecycle_event":
 			return { ...base, status: "unknown", evidence: "lifecycle enforcement mapping is deferred to Phase 6" };
 	}

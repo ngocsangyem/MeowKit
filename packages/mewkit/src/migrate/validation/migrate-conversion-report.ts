@@ -18,7 +18,11 @@ import type { ReferenceOccurrence } from "../references/reference-types.js";
 import type { ReconcileAction } from "../reconcile/reconcile-types.js";
 import type { PortableItem, PortableType, ProviderType, SkillInfo } from "../types.js";
 import type { MigrationDecisionRecord } from "./migration-record-types.js";
-import { scanUnresolvedReferences, type ScannedOutput, type ValidationFinding } from "./unresolved-reference-scanner.js";
+import {
+	scanUnresolvedReferences,
+	type ScannedOutput,
+	type ValidationFinding,
+} from "./unresolved-reference-scanner.js";
 
 /**
  * Run-ledger: an append-only accumulator of per-artifact decision records emitted

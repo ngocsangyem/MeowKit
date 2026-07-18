@@ -116,7 +116,10 @@ export function checkPacks(claudeDir: string, opts: { missingInfraSeverity?: Sta
 		results.push(
 			FAIL(
 				"Pack completeness",
-				`${strays.length} artifact(s) in no pack/base: ${strays.slice(0, 8).map((e) => `${e.id}(${e.owner || "no-owner"})`).join(", ")}`,
+				`${strays.length} artifact(s) in no pack/base: ${strays
+					.slice(0, 8)
+					.map((e) => `${e.id}(${e.owner || "no-owner"})`)
+					.join(", ")}`,
 			),
 		);
 	}

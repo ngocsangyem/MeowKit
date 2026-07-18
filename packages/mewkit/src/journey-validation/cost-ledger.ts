@@ -46,10 +46,20 @@ export function resolveCapUsd(opts: { override?: number; tierCapUsd?: number; en
  */
 export function evaluateSpend(totalUsd: number, capUsd: number): SpendEvaluation {
 	if (totalUsd >= capUsd) {
-		return { level: "halt", totalUsd, capUsd, message: `cost cap reached: $${totalUsd.toFixed(2)} ≥ $${capUsd.toFixed(2)} — halting run` };
+		return {
+			level: "halt",
+			totalUsd,
+			capUsd,
+			message: `cost cap reached: $${totalUsd.toFixed(2)} ≥ $${capUsd.toFixed(2)} — halting run`,
+		};
 	}
 	if (capUsd > WARN_USD && totalUsd >= WARN_USD) {
-		return { level: "warn", totalUsd, capUsd, message: `cost warning: $${totalUsd.toFixed(2)} ≥ $${WARN_USD} (cap $${capUsd.toFixed(2)})` };
+		return {
+			level: "warn",
+			totalUsd,
+			capUsd,
+			message: `cost warning: $${totalUsd.toFixed(2)} ≥ $${WARN_USD} (cap $${capUsd.toFixed(2)})`,
+		};
 	}
 	return { level: "ok", totalUsd, capUsd };
 }

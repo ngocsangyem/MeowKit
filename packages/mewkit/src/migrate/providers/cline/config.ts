@@ -6,7 +6,8 @@ export const clineConfig: ProviderConfig = {
 	name: "cline",
 	displayName: "Cline",
 	supportLevel: "experimental",
-	supportReason: "Cline has richer native concepts than this adapter currently models, especially around modes and workflows.",
+	supportReason:
+		"Cline has richer native concepts than this adapter currently models, especially around modes and workflows.",
 	subagents: "full",
 	agents: {
 		projectPath: ".clinerules",

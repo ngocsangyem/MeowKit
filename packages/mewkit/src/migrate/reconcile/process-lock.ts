@@ -61,16 +61,16 @@ export async function acquireMigrationLock(options: ProcessLockOptions): Promise
 		return { acquired: true, lockPath };
 	} catch (err: unknown) {
 		const e = err as NodeJS.ErrnoException;
-			if (e.code === "EEXIST") {
-				try {
-					const content = (await readFile(lockPath, "utf-8")).trim();
-					const pid = Number.parseInt(content.split("\n")[0] ?? "", 10);
-					if (isProcessAlive(pid)) return { acquired: false, heldBy: pid, lockPath };
-					await unlink(lockPath);
-					return acquireMigrationLock(options);
-				} catch {
-					return { acquired: false, lockPath };
-				}
+		if (e.code === "EEXIST") {
+			try {
+				const content = (await readFile(lockPath, "utf-8")).trim();
+				const pid = Number.parseInt(content.split("\n")[0] ?? "", 10);
+				if (isProcessAlive(pid)) return { acquired: false, heldBy: pid, lockPath };
+				await unlink(lockPath);
+				return acquireMigrationLock(options);
+			} catch {
+				return { acquired: false, lockPath };
+			}
 		}
 		throw err;
 	}

@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-	buildProviders,
-	disableUndocumentedSurfaces,
-	type ProviderManifest,
-} from "../providers/index.js";
+import { buildProviders, disableUndocumentedSurfaces, type ProviderManifest } from "../providers/index.js";
 import type { ProviderCapabilityRegistryEntry } from "../providers/contract-types.js";
 import type { ProviderConfig } from "../providers/provider-config-types.js";
 

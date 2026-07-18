@@ -76,11 +76,7 @@ describe("generateCodexHookWrappers — sh handler", () => {
 		writeFileSync(original, '#!/bin/sh\nprintf "%s" "$CLAUDE_PROJECT_DIR"\n', { mode: 0o755 });
 
 		try {
-			const [result] = generateCodexHookWrappers(
-				[{ originalPath: original, handlerType: "sh" }],
-				spaceWrap,
-				CAPS,
-			);
+			const [result] = generateCodexHookWrappers([{ originalPath: original, handlerType: "sh" }], spaceWrap, CAPS);
 			expect(result.success).toBe(true);
 			const run = spawnSync(process.execPath, [result.wrapperPath], {
 				input: JSON.stringify({ hook_event_name: "PostToolUse" }),
@@ -127,7 +123,7 @@ describe("generateCodexHookWrappers — sh handler", () => {
 describe("generateCodexHookWrappers — js handler (unchanged behavior)", () => {
 	it("generates a .cjs wrapper for a node handler without copying a script", () => {
 		const original = join(srcDir, "dispatch.cjs");
-		writeFileSync(original, 'process.exit(0)\n', { mode: 0o755 });
+		writeFileSync(original, "process.exit(0)\n", { mode: 0o755 });
 		const [result] = generateCodexHookWrappers([{ originalPath: original, handlerType: "js" }], wrapperDir, CAPS);
 		expect(result.success).toBe(true);
 		expect(result.handlerType).toBe("js");
@@ -136,7 +132,7 @@ describe("generateCodexHookWrappers — js handler (unchanged behavior)", () => 
 
 	it("accepts the legacy string[] form and defaults to js", () => {
 		const original = join(srcDir, "legacy.cjs");
-		writeFileSync(original, 'process.exit(0)\n', { mode: 0o755 });
+		writeFileSync(original, "process.exit(0)\n", { mode: 0o755 });
 		const [result] = generateCodexHookWrappers([original], wrapperDir, CAPS);
 		expect(result.success).toBe(true);
 		expect(result.handlerType).toBe("js");

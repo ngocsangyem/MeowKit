@@ -22,13 +22,23 @@ const Placement = z.enum(["top", "right", "bottom", "left"]);
 const Points = z.array(z.object({ x: z.number(), y: z.number() }).strict());
 
 const MoveFrameLane = z.object({ type: z.literal("move-frame-lane"), frameId: EntityId, laneId: EntityId }).strict();
-const ReorderFrame = z.object({ type: z.literal("reorder-frame"), frameId: EntityId, order: z.number().int() }).strict();
+const ReorderFrame = z
+	.object({ type: z.literal("reorder-frame"), frameId: EntityId, order: z.number().int() })
+	.strict();
 const UpdateAnnotation = z
-	.object({ type: z.literal("update-annotation"), annotationId: EntityId, text: z.string().min(1).optional(), placement: Placement.optional(), points: Points.optional() })
+	.object({
+		type: z.literal("update-annotation"),
+		annotationId: EntityId,
+		text: z.string().min(1).optional(),
+		placement: Placement.optional(),
+		points: Points.optional(),
+	})
 	.strict();
 const AppendAnnotation = z.object({ type: z.literal("append-annotation"), annotation: AnnotationSchema }).strict();
 const RemoveAnnotation = z.object({ type: z.literal("remove-annotation"), annotationId: EntityId }).strict();
-const UpdateConnectorLabel = z.object({ type: z.literal("update-connector-label"), connectorId: EntityId, label: z.string() }).strict();
+const UpdateConnectorLabel = z
+	.object({ type: z.literal("update-connector-label"), connectorId: EntityId, label: z.string() })
+	.strict();
 const UpdateWireframeField = z
 	.object({ type: z.literal("update-wireframe-field"), frameId: EntityId, fieldId: EntityId, text: z.string() })
 	.strict();

@@ -2,7 +2,12 @@
 // so every case is deterministic. Adapters never execute a capability's script and never
 // infer host_tool/subagent/lifecycle from PATH — those stay honestly `unknown`.
 import { describe, expect, it } from "vitest";
-import { computeAvailability, rollUpInvocability, type AvailabilityContext, type AvailabilityProbes } from "../availability.js";
+import {
+	computeAvailability,
+	rollUpInvocability,
+	type AvailabilityContext,
+	type AvailabilityProbes,
+} from "../availability.js";
 import { resolveWithHost } from "../resolve-capabilities.js";
 import type { CapabilityEntry, TypedRequirement } from "../capability.js";
 
@@ -86,16 +91,27 @@ describe("computeAvailability", () => {
 });
 
 describe("rollUpInvocability", () => {
-	const s = (status: "available" | "unavailable" | "unknown") => ({ requirementType: "external_binary" as const, id: "x", status, evidence: "", checkedAt: "", provider: "p" });
-	it("any unavailable ⇒ unavailable", () => expect(rollUpInvocability([s("available"), s("unavailable")])).toBe("unavailable"));
+	const s = (status: "available" | "unavailable" | "unknown") => ({
+		requirementType: "external_binary" as const,
+		id: "x",
+		status,
+		evidence: "",
+		checkedAt: "",
+		provider: "p",
+	});
+	it("any unavailable ⇒ unavailable", () =>
+		expect(rollUpInvocability([s("available"), s("unavailable")])).toBe("unavailable"));
 	it("all available ⇒ available", () => expect(rollUpInvocability([s("available"), s("available")])).toBe("available"));
 	it("empty ⇒ unknown (host contract unproven)", () => expect(rollUpInvocability([])).toBe("unknown"));
-	it("unknown present, none unavailable ⇒ unknown", () => expect(rollUpInvocability([s("available"), s("unknown")])).toBe("unknown"));
+	it("unknown present, none unavailable ⇒ unknown", () =>
+		expect(rollUpInvocability([s("available"), s("unknown")])).toBe("unknown"));
 });
 
 describe("resolveWithHost", () => {
 	const entries = [
-		cap("browser-tester", [{ type: "external_binary", id: "chromium", provenance: "authored" }], { intents: ["run a browser test"] }),
+		cap("browser-tester", [{ type: "external_binary", id: "chromium", provenance: "authored" }], {
+			intents: ["run a browser test"],
+		}),
 	];
 
 	it("available requirement ⇒ status selected, candidate invocable available", () => {
@@ -147,7 +163,10 @@ describe("resolveWithHost", () => {
 
 	it("a source-grounded candidate surfaces contextRequirement alongside the acquisition surface", () => {
 		const grounded = [
-			cap("mk:cook", [], { intents: ["build this"], contextRequirement: { scope: "task-repo", reason: "edits source" } }),
+			cap("mk:cook", [], {
+				intents: ["build this"],
+				contextRequirement: { scope: "task-repo", reason: "edits source" },
+			}),
 		];
 		const r = resolveWithHost(grounded, "build this", ctx());
 		expect(r.candidates[0].contextRequirement?.scope).toBe("task-repo");
@@ -157,7 +176,10 @@ describe("resolveWithHost", () => {
 
 	it("provider that does not support the surface ⇒ status unsupported", () => {
 		const unsupported = [
-			cap("x", [], { intents: ["do the thing"], support: { codex: { discoverable: false, selectable: false, invocable: false, enforceable: false } } }),
+			cap("x", [], {
+				intents: ["do the thing"],
+				support: { codex: { discoverable: false, selectable: false, invocable: false, enforceable: false } },
+			}),
 		];
 		const r = resolveWithHost(unsupported, "do the thing", { ...ctx(), provider: "codex" });
 		expect(r.status).toBe("unsupported");

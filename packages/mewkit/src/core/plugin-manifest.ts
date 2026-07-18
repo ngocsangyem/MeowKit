@@ -75,9 +75,7 @@ export function buildClaudeMarketplaceJson(opts: ClaudeMarketplaceOptions): Clau
 		$schema: "https://anthropic.com/claude-code/marketplace.schema.json",
 		name: opts.marketplaceName,
 		owner: opts.owner,
-		plugins: [
-			{ name: opts.name ?? PLUGIN_NAME, source: opts.source, description: opts.description },
-		],
+		plugins: [{ name: opts.name ?? PLUGIN_NAME, source: opts.source, description: opts.description }],
 	};
 }
 

@@ -49,7 +49,14 @@ export function searchWiki(dbFile: string, query: string, limit = 10, includeCon
 			.prepare(
 				"SELECT f.page_id AS pageId, f.slug AS slug, f.title AS title, snippet(wiki_fts, 3, '[', ']', '…', 12) AS snippet, p.path AS pagePath, p.content AS content FROM wiki_fts f JOIN wiki_page p ON p.id = f.page_id WHERE wiki_fts MATCH ? ORDER BY rank LIMIT ?",
 			)
-			.all(query, limit) as { pageId: string; slug: string; title: string; snippet: string; pagePath: string; content: string }[];
+			.all(query, limit) as {
+			pageId: string;
+			slug: string;
+			title: string;
+			snippet: string;
+			pagePath: string;
+			content: string;
+		}[];
 		return rows.map((r) => {
 			const pagePath = r.pagePath ?? "";
 			const hit: WikiSearchHit = {
@@ -76,9 +83,7 @@ export function listWikiPages(dbFile: string, slug?: string): WikiPageRow[] {
 	try {
 		if (!wikiSchemaPresent(db)) return [];
 		const sql =
-			"SELECT id, slug, title, path, state FROM wiki_page" +
-			(slug ? " WHERE slug = ?" : "") +
-			" ORDER BY slug, title";
+			"SELECT id, slug, title, path, state FROM wiki_page" + (slug ? " WHERE slug = ?" : "") + " ORDER BY slug, title";
 		const stmt = db.prepare(sql);
 		const rows = (slug ? stmt.all(slug) : stmt.all()) as WikiPageRow[];
 		return rows;

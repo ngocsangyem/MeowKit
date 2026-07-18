@@ -24,7 +24,9 @@ export async function handlePostFeedback(req: IncomingMessage, res: ServerRespon
 	try {
 		raw = await bufferBody(req, BODY_CAP, TIMEOUT_MS);
 	} catch (e) {
-		writeJson(res, e instanceof BodyError ? e.status : 400, { error: e instanceof BodyError ? e.tag : "body-read-error" });
+		writeJson(res, e instanceof BodyError ? e.status : 400, {
+			error: e instanceof BodyError ? e.tag : "body-read-error",
+		});
 		return;
 	}
 	let body: unknown;

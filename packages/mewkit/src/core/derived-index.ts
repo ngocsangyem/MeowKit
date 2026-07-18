@@ -85,7 +85,15 @@ function ingestTrace(db: DatabaseSync, claudeDir: string): number {
 	for (const r of records) {
 		const data = r.data ?? {};
 		const resp = typeof data["responsibility"] === "string" ? (data["responsibility"] as string) : null;
-		stmt.run(asString(r.ts), asString(r.event), asString(r.run_id), asString(r.model), asString(r.density), resp, asString(data));
+		stmt.run(
+			asString(r.ts),
+			asString(r.event),
+			asString(r.run_id),
+			asString(r.model),
+			asString(r.density),
+			resp,
+			asString(data),
+		);
 	}
 	return records.length;
 }
@@ -184,7 +192,9 @@ export function queryIndex(claudeDir: string): QueryResult {
 			.prepare("SELECT event, COUNT(*) AS n FROM trace_events GROUP BY event ORDER BY n DESC, event")
 			.all() as { event: string; n: number }[];
 		const runsByTier = db
-			.prepare("SELECT run_id, COUNT(*) AS events FROM trace_events WHERE run_id <> '' GROUP BY run_id ORDER BY events DESC, run_id")
+			.prepare(
+				"SELECT run_id, COUNT(*) AS events FROM trace_events WHERE run_id <> '' GROUP BY run_id ORDER BY events DESC, run_id",
+			)
 			.all() as { run_id: string; events: number }[];
 		const frictionByResponsibility = db
 			.prepare(

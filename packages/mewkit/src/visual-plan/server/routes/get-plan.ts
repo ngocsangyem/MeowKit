@@ -15,7 +15,10 @@ import { artifactPath } from "../../infrastructure/visual-plan-repository.js";
 /** Write a small JSON response. */
 export function writeJson(res: ServerResponse, status: number, body: unknown): void {
 	const text = JSON.stringify(body);
-	res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Content-Length": String(Buffer.byteLength(text)) });
+	res.writeHead(status, {
+		"Content-Type": "application/json; charset=utf-8",
+		"Content-Length": String(Buffer.byteLength(text)),
+	});
 	res.end(text);
 }
 

@@ -3,7 +3,13 @@
 // it never auto-picks. Runtime invocability is NOT decided here: that needs Phase 3's
 // host availability snapshot, so every candidate reports `invocable: "pending-host-snapshot"`.
 // Pure and free of time/randomness so results are reproducible.
-import type { CapabilityEntry, ContextRequirement, SupportLevels, TypedRequirement, Verification } from "./capability.js";
+import type {
+	CapabilityEntry,
+	ContextRequirement,
+	SupportLevels,
+	TypedRequirement,
+	Verification,
+} from "./capability.js";
 import {
 	computeAvailability,
 	rollUpInvocability,
@@ -51,7 +57,23 @@ export interface ResolveResult {
 	ambiguous: boolean;
 }
 
-const STOPWORDS = new Set(["the", "a", "an", "to", "of", "in", "on", "this", "that", "for", "and", "or", "my", "me", "it"]);
+const STOPWORDS = new Set([
+	"the",
+	"a",
+	"an",
+	"to",
+	"of",
+	"in",
+	"on",
+	"this",
+	"that",
+	"for",
+	"and",
+	"or",
+	"my",
+	"me",
+	"it",
+]);
 
 /** Normalize free text to a set of lowercase terms (drop punctuation, stopwords, 1-char). */
 function terms(text: string): Set<string> {
@@ -77,7 +99,11 @@ function fieldTerms(strings: string[]): Set<string> {
  * inferred keywords. Order: score desc, then id asc (stable). Zero-score candidates are
  * dropped; if none remain the result is `ambiguous` with an empty list.
  */
-export function resolveCapabilities(entries: CapabilityEntry[], intent: string, provider: string | null = null): ResolveResult {
+export function resolveCapabilities(
+	entries: CapabilityEntry[],
+	intent: string,
+	provider: string | null = null,
+): ResolveResult {
 	const query = terms(intent);
 
 	const scored = entries
@@ -97,7 +123,8 @@ export function resolveCapabilities(entries: CapabilityEntry[], intent: string, 
 			}
 			const score = intentHits * intentWeight + aliasHits * WEIGHT_ALIAS + textHits * WEIGHT_TEXT;
 			const parts: string[] = [];
-			if (intentHits) parts.push(`${intentHits} ${e.provenance.intents === "authored" ? "authored " : ""}intent term(s)`);
+			if (intentHits)
+				parts.push(`${intentHits} ${e.provenance.intents === "authored" ? "authored " : ""}intent term(s)`);
 			if (aliasHits) parts.push(`${aliasHits} alias term(s)`);
 			if (textHits) parts.push(`${textHits} description term(s)`);
 			return { e, score, reason: parts.length ? `matched ${parts.join(", ")}` : "no term overlap" };
@@ -110,7 +137,7 @@ export function resolveCapabilities(entries: CapabilityEntry[], intent: string, 
 		kind: e.kind,
 		score,
 		reason,
-		support: provider ? e.support[provider] ?? null : null,
+		support: provider ? (e.support[provider] ?? null) : null,
 		requirements: e.requirements,
 		contextRequirement: e.contextRequirement,
 		verification: e.verification,
@@ -160,7 +187,11 @@ export interface HostResolveResult {
  * invocability and support). A provider that does not support the top candidate's surface
  * → `unsupported`; a top candidate whose requirements are hard-blocked → `unavailable`.
  */
-export function resolveWithHost(entries: CapabilityEntry[], intent: string, ctx: AvailabilityContext): HostResolveResult {
+export function resolveWithHost(
+	entries: CapabilityEntry[],
+	intent: string,
+	ctx: AvailabilityContext,
+): HostResolveResult {
 	const byId = new Map(entries.map((e) => [e.id, e]));
 	const base = resolveCapabilities(entries, intent, ctx.provider);
 

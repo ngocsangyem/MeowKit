@@ -118,7 +118,11 @@ export async function setupKitInstallMigrateE2e(
 			await writeFile(join(hooksDir, name), "process.exit(0);\n", "utf-8");
 		}
 	}
-	await writeFile(join(env.sourceDir, "settings.json"), JSON.stringify({ hooks: groupHooksByEvent(registrations) }, null, 2), "utf-8");
+	await writeFile(
+		join(env.sourceDir, "settings.json"),
+		JSON.stringify({ hooks: groupHooksByEvent(registrations) }, null, 2),
+		"utf-8",
+	);
 	return env;
 }
 

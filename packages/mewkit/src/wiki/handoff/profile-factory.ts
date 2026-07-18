@@ -40,10 +40,7 @@ export function defaultShouldSuggest(handoffClass: WikiHandoffClass, signal: Art
 	if (signal.contentBytes <= 0) return false;
 	if (handoffClass === "required") return true;
 	return Boolean(
-		signal.verifiedOutcome ||
-			signal.explicitUserIntent ||
-			signal.recurringFriction ||
-			(signal.noveltyDelta ?? 0) > 0,
+		signal.verifiedOutcome || signal.explicitUserIntent || signal.recurringFriction || (signal.noveltyDelta ?? 0) > 0,
 	);
 }
 
@@ -77,9 +74,6 @@ export function makeSkillProfile(spec: ProfileSpec): SkillHandoffProfile {
 
 /** Expand a shared profile spec across many skill names — one registry row each.
  * Keeps family files declarative: a profile group is a `common` spec plus a name list. */
-export function defineGroup(
-	common: Omit<ProfileSpec, "skillName">,
-	skillNames: string[],
-): SkillHandoffProfile[] {
+export function defineGroup(common: Omit<ProfileSpec, "skillName">, skillNames: string[]): SkillHandoffProfile[] {
 	return skillNames.map((skillName) => makeSkillProfile({ ...common, skillName }));
 }

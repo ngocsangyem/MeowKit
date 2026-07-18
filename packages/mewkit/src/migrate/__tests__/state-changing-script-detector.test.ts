@@ -6,7 +6,7 @@ describe("state-changing script detector", () => {
 		['rm -rf "$DIR"', /rm/],
 		["git push origin main", /git push/],
 		['curl -X POST https://api/x -d "{}"', /mutating HTTP/],
-		['curl --request DELETE https://api/x', /mutating HTTP/],
+		["curl --request DELETE https://api/x", /mutating HTTP/],
 		['echo "{}" > "$out.json"', /redirection/],
 		['echo x >> "$log"', /redirection/],
 		['export API_TOKEN="$SECRET"', /security-sensitive/],
@@ -24,7 +24,7 @@ describe("state-changing script detector", () => {
 		'cat "$PROJECT_ROOT/config.json"',
 		'echo "hello world"',
 		"grep -n foo file.txt",
-		"model=\"${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-}}\"",
+		'model="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-}}"',
 		'result=$(awk "{print}" file)',
 		"exit 1 2>&1",
 	])("does not flag read-only content: %s", (content) => {
@@ -42,7 +42,7 @@ describe("state-changing script detector", () => {
 		["  if (end > 0) print substr(s, 1, end - 1)", "shell"], // awk comparison in a heredoc
 		["  validate.sh <rubric.md>     Validate a single rubric file", "shell"], // usage placeholder
 		["# rm -rf $HOME would be dangerous", "shell"], // rm only in a comment
-		["  // https://x\";rm -rf $HOME;echo would escape the quote boundary.", "node"], // rm in a JS comment
+		['  // https://x";rm -rf $HOME;echo would escape the quote boundary.', "node"], // rm in a JS comment
 		["# export API_TOKEN=abc (documented, not executed)", "shell"], // export only in a comment
 		["    print('> Model differs between runs')", "shell"], // > inside a quoted string
 	] as const)("does not flag read-only/comment/usage content: %s", (content, lang) => {

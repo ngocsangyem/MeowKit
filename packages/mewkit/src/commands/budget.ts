@@ -77,10 +77,10 @@ export function toBudgetRow(entry: CostEntry): BudgetRow {
 		"unknown";
 	const task =
 		(typeof legacy.task === "string" && legacy.task.trim().length > 0 && legacy.task.trim()) ||
-		(typeof legacy.task_summary === "string" &&
-			legacy.task_summary.trim().length > 0 &&
-			legacy.task_summary.trim()) ||
-		(typeof session.session_id === "string" && session.session_id.trim().length > 0 && `session ${session.session_id.trim()}`) ||
+		(typeof legacy.task_summary === "string" && legacy.task_summary.trim().length > 0 && legacy.task_summary.trim()) ||
+		(typeof session.session_id === "string" &&
+			session.session_id.trim().length > 0 &&
+			`session ${session.session_id.trim()}`) ||
 		"session snapshot";
 
 	return {
@@ -191,7 +191,9 @@ export function contextBudget(args: ContextBudgetArgs): void {
 		const over = reports.filter((r) => r.tokens > args.failOver!);
 		if (over.length > 0) {
 			console.log();
-			console.log(pc.red(`Over --fail-over ${args.failOver}: ${over.map((r) => `${r.profile}=${r.tokens}`).join(", ")}`));
+			console.log(
+				pc.red(`Over --fail-over ${args.failOver}: ${over.map((r) => `${r.profile}=${r.tokens}`).join(", ")}`),
+			);
 			process.exit(1);
 		}
 	}

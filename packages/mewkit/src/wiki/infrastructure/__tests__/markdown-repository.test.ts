@@ -74,10 +74,21 @@ describe("MarkdownWikiRepository", () => {
 		const repo = new MarkdownWikiRepository(root);
 		const slug = makeWikiSlug("demo");
 		repo.appendCandidate({
-			id: "demo/cand-1", slug, origin: "agent", title: "Good", content: "body",
-			whySave: "", evidence: "", sourceIds: [], noveltyDelta: 0, reuseScope: "",
-			verificationState: "unverified", riskScore: 0,
-			salience: { total: 0, components: {} as never }, state: "proposed", createdAt: "t",
+			id: "demo/cand-1",
+			slug,
+			origin: "agent",
+			title: "Good",
+			content: "body",
+			whySave: "",
+			evidence: "",
+			sourceIds: [],
+			noveltyDelta: 0,
+			reuseScope: "",
+			verificationState: "unverified",
+			riskScore: 0,
+			salience: { total: 0, components: {} as never },
+			state: "proposed",
+			createdAt: "t",
 		});
 		// A malformed line (missing required fields) appended directly to the store.
 		await writeFile(join(root, "tasks", "wikis", "demo", "candidates.jsonl"), '{"id":"x"}\n', { flag: "a" });

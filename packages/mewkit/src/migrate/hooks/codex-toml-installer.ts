@@ -99,12 +99,12 @@ export async function installCodexAgents(
 	}
 
 	return withCodexTargetLock(configTomlPath, async () => {
-			const writtenFiles: string[] = [];
-			const entries: string[] = [];
-			const configAgents = options.configAgents ?? agents;
+		const writtenFiles: string[] = [];
+		const entries: string[] = [];
+		const configAgents = options.configAgents ?? agents;
 
-			try {
-				for (const agent of agents) {
+		try {
+			for (const agent of agents) {
 				const result = convertItem(agent, "fm-to-codex-toml", "codex", {
 					migratedRefs: options.migratedRefs,
 				});
@@ -120,10 +120,9 @@ export async function installCodexAgents(
 					targetChecksum,
 					installSource: "kit",
 				});
+			}
 
-				}
-
-				for (const agent of configAgents) entries.push(buildCodexConfigEntry(agent.name, agent.description));
+			for (const agent of configAgents) entries.push(buildCodexConfigEntry(agent.name, agent.description));
 
 			let configContent = "";
 			if (existsSync(configTomlPath)) {

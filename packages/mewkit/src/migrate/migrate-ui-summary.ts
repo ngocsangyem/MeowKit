@@ -142,7 +142,9 @@ export function printFinalSummary(results: InstallResult[]): void {
 	const warned = results.filter((r) => r.warnings && r.warnings.length > 0);
 	for (const result of warned.slice(0, SECTION_DETAIL_CAP)) {
 		for (const warning of result.warnings ?? []) {
-			console.log(`  ${pc.yellow(`[!] ${result.action.provider}/${result.action.type}/${result.action.item}: ${warning}`)}`);
+			console.log(
+				`  ${pc.yellow(`[!] ${result.action.provider}/${result.action.type}/${result.action.item}: ${warning}`)}`,
+			);
 		}
 	}
 	if (failed.length > 0) {

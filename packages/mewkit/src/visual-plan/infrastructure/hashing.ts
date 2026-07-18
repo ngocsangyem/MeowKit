@@ -77,7 +77,13 @@ export function checkSourceFreshness(plan: VisualPlan, planDir: string): Validat
 	const errors: ValidationError[] = [];
 	const fresh = computeSourceHashes(planDir, plan.source.planPath);
 	if (fresh.planHash !== plan.source.planHash) {
-		errors.push(err("source.planHash", ErrorCode.STALE_SOURCE_HASH, `plan.md hash diverged (expected ${plan.source.planHash || "<empty>"}, on disk ${fresh.planHash || "<missing>"})`));
+		errors.push(
+			err(
+				"source.planHash",
+				ErrorCode.STALE_SOURCE_HASH,
+				`plan.md hash diverged (expected ${plan.source.planHash || "<empty>"}, on disk ${fresh.planHash || "<missing>"})`,
+			),
+		);
 	}
 	const keys = new Set([...Object.keys(plan.source.phaseHashes), ...Object.keys(fresh.phaseHashes)]);
 	for (const k of keys) {

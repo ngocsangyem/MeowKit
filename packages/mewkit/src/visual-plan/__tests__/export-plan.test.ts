@@ -34,7 +34,8 @@ describe("exportPlanHtml", () => {
 
 	it("re-sanitizes wireframes: a scripted frame exports inert", () => {
 		const planDir = seed((p) => {
-			(p.canvas as { frames: { wireframe: { html: string } }[] }).frames[0].wireframe.html = '<section class="wf-screen"><h1>X</h1><script>alert(1)</script></section>';
+			(p.canvas as { frames: { wireframe: { html: string } }[] }).frames[0].wireframe.html =
+				'<section class="wf-screen"><h1>X</h1><script>alert(1)</script></section>';
 		});
 		const html = exportPlanHtml(planDir).html ?? "";
 		expect(html).not.toContain("<script>alert");

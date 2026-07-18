@@ -68,15 +68,33 @@ function checkEquivalence(
 	while (current?.omitted?.reason === "equivalent-layout") {
 		const target = current.omitted.representedBy;
 		if (target === undefined) {
-			errors.push(err(`${path}.omitted`, ErrorCode.COVERAGE_MISSING_REPRESENTED_BY, "equivalent-layout omission requires representedBy"));
+			errors.push(
+				err(
+					`${path}.omitted`,
+					ErrorCode.COVERAGE_MISSING_REPRESENTED_BY,
+					"equivalent-layout omission requires representedBy",
+				),
+			);
 			return;
 		}
 		if (!byId.has(target)) {
-			errors.push(err(`${path}.omitted.representedBy`, ErrorCode.DANGLING_REPRESENTED_BY, `references unknown coverage state "${target}"`));
+			errors.push(
+				err(
+					`${path}.omitted.representedBy`,
+					ErrorCode.DANGLING_REPRESENTED_BY,
+					`references unknown coverage state "${target}"`,
+				),
+			);
 			return;
 		}
 		if (visited.has(target)) {
-			errors.push(err(`${path}.omitted.representedBy`, ErrorCode.COVERAGE_EQUIVALENCE_CYCLE, `equivalence cycle through "${target}"`));
+			errors.push(
+				err(
+					`${path}.omitted.representedBy`,
+					ErrorCode.COVERAGE_EQUIVALENCE_CYCLE,
+					`equivalence cycle through "${target}"`,
+				),
+			);
 			return;
 		}
 		visited.add(target);
@@ -84,7 +102,13 @@ function checkEquivalence(
 	}
 	// Terminal reached (a non-equivalent-layout state). It must render a frame.
 	if (current === undefined || current.frameIds.length === 0) {
-		errors.push(err(`${path}.omitted.representedBy`, ErrorCode.COVERAGE_EQUIVALENCE_UNBACKED, "equivalent-layout chain must terminate at a framed state (it resolves to no rendered layout)"));
+		errors.push(
+			err(
+				`${path}.omitted.representedBy`,
+				ErrorCode.COVERAGE_EQUIVALENCE_UNBACKED,
+				"equivalent-layout chain must terminate at a framed state (it resolves to no rendered layout)",
+			),
+		);
 	}
 }
 
@@ -103,7 +127,13 @@ export function computeCoverage(plan: VisualPlan): CoverageResult {
 			const mode = closureMode(state);
 			if (mode === "unresolved") {
 				summary.unresolved += 1;
-				errors.push(err(path, ErrorCode.COVERAGE_UNRESOLVED, "state closes via zero or multiple modes (need exactly one of frameIds / omitted)"));
+				errors.push(
+					err(
+						path,
+						ErrorCode.COVERAGE_UNRESOLVED,
+						"state closes via zero or multiple modes (need exactly one of frameIds / omitted)",
+					),
+				);
 				return;
 			}
 			if (mode === "framed") {
@@ -114,7 +144,9 @@ export function computeCoverage(plan: VisualPlan): CoverageResult {
 			summary.omitted += 1;
 			const o = state.omitted!;
 			if (o.reason === "accepted-risk" && (o.riskId === undefined || o.riskId.length === 0)) {
-				errors.push(err(`${path}.omitted`, ErrorCode.COVERAGE_MISSING_RISK_ID, "accepted-risk omission requires a riskId"));
+				errors.push(
+					err(`${path}.omitted`, ErrorCode.COVERAGE_MISSING_RISK_ID, "accepted-risk omission requires a riskId"),
+				);
 			}
 			if (o.reason === "equivalent-layout") checkEquivalence(state.id, byId, path, errors);
 		}),

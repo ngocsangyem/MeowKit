@@ -35,7 +35,12 @@ function packet(overrides: Partial<WikiHandoffPacket> = {}): WikiHandoffPacket {
 		verificationState: "verified",
 		riskScore: 0,
 		noveltyDelta: 1,
-		salience: salienceComponents({ verified_outcome: 3, source_quality: 2, future_reuse_likelihood: 2, blast_radius: 1 }),
+		salience: salienceComponents({
+			verified_outcome: 3,
+			source_quality: 2,
+			future_reuse_likelihood: 2,
+			blast_radius: 1,
+		}),
 		createdAt: "2026-06-29T00:00:00.000Z",
 		...overrides,
 	};

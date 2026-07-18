@@ -1,10 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import {
-	listModelProfiles,
-	providerSupportsProfile,
-	resolveModel,
-	setTaxonomyOverrides,
-} from "../model-taxonomy.js";
+import { listModelProfiles, providerSupportsProfile, resolveModel, setTaxonomyOverrides } from "../model-taxonomy.js";
 
 afterEach(() => setTaxonomyOverrides(undefined));
 
@@ -87,14 +82,11 @@ describe("the profile is tier-orthogonal", () => {
 describe("genuinely unknown models keep the existing warn + comment-out behavior", () => {
 	// Regression guard: the profile lookup must not swallow unknown strings, or a
 	// typo'd model silently resolves to something instead of being flagged.
-	it.each([["gpt-4"], ["fable-5"], ["claude-fable-5"], ["totally-made-up"]])(
-		"still warns for %s",
-		(model) => {
-			const result = resolveModel(model, "codex");
-			expect(result.resolved).toBeNull();
-			expect(result.warning).toMatch(/not in taxonomy, commented out/);
-		},
-	);
+	it.each([["gpt-4"], ["fable-5"], ["claude-fable-5"], ["totally-made-up"]])("still warns for %s", (model) => {
+		const result = resolveModel(model, "codex");
+		expect(result.resolved).toBeNull();
+		expect(result.warning).toMatch(/not in taxonomy, commented out/);
+	});
 
 	it("still ignores `inherit` and empty values", () => {
 		expect(resolveModel("inherit", "codex")).toEqual({ resolved: null });

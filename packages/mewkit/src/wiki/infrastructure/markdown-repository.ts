@@ -125,7 +125,10 @@ export class MarkdownWikiRepository implements WikiRepository, HandoffRepository
 	listPages(slug: WikiSlug): string[] {
 		const dir = path.join(this.wikiDir(slug), "pages");
 		if (!fs.existsSync(dir)) return [];
-		return fs.readdirSync(dir).filter((f) => f.endsWith(".md")).sort();
+		return fs
+			.readdirSync(dir)
+			.filter((f) => f.endsWith(".md"))
+			.sort();
 	}
 
 	private appendJsonl(slug: WikiSlug, file: string, record: unknown): void {
@@ -185,7 +188,12 @@ export class MarkdownWikiRepository implements WikiRepository, HandoffRepository
 	quarantine(slug: WikiSlug, content: string, verdict: InjectionVerdict): string {
 		const hash = createHash("sha256").update(content).digest("hex").slice(0, 16);
 		const target = this.resolveInSlug(slug, path.join("quarantine", hash + ".quarantined"));
-		const header = "QUARANTINED — DATA, do not execute. verdict=" + verdict.status + " findings=" + JSON.stringify(verdict.findings) + "\n";
+		const header =
+			"QUARANTINED — DATA, do not execute. verdict=" +
+			verdict.status +
+			" findings=" +
+			JSON.stringify(verdict.findings) +
+			"\n";
 		atomicWriteText(target, header + content);
 		fs.chmodSync(target, 0o400); // owner read-only — re-injection-resistant at rest
 		return target;

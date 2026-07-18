@@ -201,7 +201,11 @@ export function proposeImprovements(audit: AuditResult): ProposalItem[] {
 		items.push({ kind: "friction", title: g.message, evidenceCount: g.count, responsibility: g.responsibility });
 	}
 	if (audit.unverifiedRuns > 0)
-		items.push({ kind: "drift", title: "Runs with work but no verification event", evidenceCount: audit.unverifiedRuns });
+		items.push({
+			kind: "drift",
+			title: "Runs with work but no verification event",
+			evidenceCount: audit.unverifiedRuns,
+		});
 	if (audit.orphaned > 0)
 		items.push({ kind: "drift", title: "Unattributed trace records (no run_id)", evidenceCount: audit.orphaned });
 	if (audit.stale > 0) items.push({ kind: "drift", title: "Stale trace records", evidenceCount: audit.stale });

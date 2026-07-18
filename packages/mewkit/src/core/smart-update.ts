@@ -477,7 +477,9 @@ export async function smartUpdate(
 							stats.profileTrimSkipped.push(relPath);
 						}
 					}
-					log.info(`Trimmed ${stats.profileTrimmed.length} file(s) outside the '${options.profile ?? "selected"}' profile.`);
+					log.info(
+						`Trimmed ${stats.profileTrimmed.length} file(s) outside the '${options.profile ?? "selected"}' profile.`,
+					);
 				}
 			}
 		}

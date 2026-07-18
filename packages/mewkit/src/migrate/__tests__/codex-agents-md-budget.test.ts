@@ -17,11 +17,7 @@ vi.mock("../reconcile/portable-registry.js", () => ({
 	removePortableInstallation: vi.fn(async () => undefined),
 }));
 
-import {
-	codexBudgetRaiseGuidance,
-	executeInstallAction,
-	suggestedProjectDocMaxBytes,
-} from "../portable-installer.js";
+import { codexBudgetRaiseGuidance, executeInstallAction, suggestedProjectDocMaxBytes } from "../portable-installer.js";
 import { providers } from "../provider-registry.js";
 import { createReferenceIntegrityIndex } from "../references/fence-aware-reference-rewriter.js";
 import { buildConversionReport } from "../validation/migrate-conversion-report.js";
@@ -64,7 +60,14 @@ function ruleItem(root: string, name: string, body: string): PortableItem {
 }
 
 function configItem(root: string, body: string): PortableItem {
-	return { name: "CLAUDE", description: "config", type: "config", sourcePath: join(root, "CLAUDE.md"), frontmatter: {}, body };
+	return {
+		name: "CLAUDE",
+		description: "config",
+		type: "config",
+		sourcePath: join(root, "CLAUDE.md"),
+		frontmatter: {},
+		body,
+	};
 }
 
 async function install(
@@ -80,7 +83,14 @@ async function install(
 	);
 }
 
-const EMPTY: Record<PortableType, PortableItem[]> = { agent: [], command: [], skill: [], config: [], rules: [], hooks: [] };
+const EMPTY: Record<PortableType, PortableItem[]> = {
+	agent: [],
+	command: [],
+	skill: [],
+	config: [],
+	rules: [],
+	hooks: [],
+};
 
 describe("codex AGENTS.md title heading", () => {
 	it("opens the merged AGENTS.md with a '# AGENTS.md' title (no dangling '## Config')", async () => {

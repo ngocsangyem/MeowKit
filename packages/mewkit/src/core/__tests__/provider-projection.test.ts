@@ -2,12 +2,7 @@
 // honesty invariant: `enforceable` is only "supported" where a real gating hook exists —
 // never for prompt-only surfaces (Codex) — and unknown providers are report-only.
 import { describe, expect, it } from "vitest";
-import {
-	PROVIDER_PROJECTIONS,
-	getProjection,
-	isProjectedProvider,
-	type LevelSupport,
-} from "../provider-projection.js";
+import { PROVIDER_PROJECTIONS, getProjection, isProjectedProvider, type LevelSupport } from "../provider-projection.js";
 
 describe("provider projections", () => {
 	it("claude-code + claude-plugin support all four levels (real hooks enforce)", () => {

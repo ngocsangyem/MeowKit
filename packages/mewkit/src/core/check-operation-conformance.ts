@@ -38,7 +38,11 @@ function baseToolName(raw: string): string {
 function declaredTools(meta: Record<string, unknown>): string[] {
 	const value = meta["allowed-tools"];
 	if (Array.isArray(value)) return value.filter((tool): tool is string => typeof tool === "string");
-	if (typeof value === "string") return value.split(",").map((tool) => tool.trim()).filter(Boolean);
+	if (typeof value === "string")
+		return value
+			.split(",")
+			.map((tool) => tool.trim())
+			.filter(Boolean);
 	return [];
 }
 

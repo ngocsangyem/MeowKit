@@ -48,7 +48,8 @@ export const PROVIDER_PROJECTIONS: Record<string, ProviderProjection> = {
 		status: "supported",
 		bootstrapPlacement: "sessionstart-hook-via-plugin-build",
 		levels: { discoverable: "supported", selectable: "supported", invocable: "supported", enforceable: "supported" },
-		evidence: "Same SessionStart hook, propagated into the plugin payload by `build-plugin`; plugin hooks gate behavior.",
+		evidence:
+			"Same SessionStart hook, propagated into the plugin payload by `build-plugin`; plugin hooks gate behavior.",
 	},
 	codex: {
 		provider: "codex",
@@ -58,7 +59,8 @@ export const PROVIDER_PROJECTIONS: Record<string, ProviderProjection> = {
 		// skills/commands, but its hook enforcement is version-gated and limited — so behavior
 		// is prompt-advisory, NOT host-guaranteed. `enforceable` is honestly unsupported.
 		levels: { discoverable: "supported", selectable: "supported", invocable: "advisory", enforceable: "unsupported" },
-			evidence: "Migration writes a bounded AGENTS bootstrap plus validated .codex/capabilities.json; skill/command projection is advisory and hook enforcement version-gated ⇒ not enforceable.",
+		evidence:
+			"Migration writes a bounded AGENTS bootstrap plus validated .codex/capabilities.json; skill/command projection is advisory and hook enforcement version-gated ⇒ not enforceable.",
 	},
 };
 

@@ -52,7 +52,10 @@ describe("wiki handoff suggest / propose", () => {
 	it("suggest writes nothing and returns a packet + decision", async () => {
 		const root = await project();
 		await mkdir(join(root, "tasks", "reports"), { recursive: true });
-		await writeFile(join(root, "tasks", "reports", "run.md"), "A reusable lifecycle decision verified by passing tests.");
+		await writeFile(
+			join(root, "tasks", "reports", "run.md"),
+			"A reusable lifecycle decision verified by passing tests.",
+		);
 		const logs = captureLogs();
 		await wikiCommand({
 			subcommand: "handoff",
@@ -68,7 +71,10 @@ describe("wiki handoff suggest / propose", () => {
 	it("propose creates a candidate and appends a handoff record for a clean class-A artifact", async () => {
 		const root = await project();
 		await mkdir(join(root, "tasks", "reports"), { recursive: true });
-		await writeFile(join(root, "tasks", "reports", "run.md"), "A reusable lifecycle decision verified by passing tests.");
+		await writeFile(
+			join(root, "tasks", "reports", "run.md"),
+			"A reusable lifecycle decision verified by passing tests.",
+		);
 		const logs = captureLogs();
 		await wikiCommand({
 			subcommand: "handoff",
@@ -102,7 +108,10 @@ describe("wiki handoff suggest / propose", () => {
 describe("wiki propose metadata flags (A1 passthrough)", () => {
 	it("passes origin/source-id/reuse-scope/salience-json into ProposeInput and the candidate", async () => {
 		const root = await project();
-		await writeFile(join(root, "sal.json"), JSON.stringify({ explicit_user_intent: 3, verified_outcome: 3, source_quality: 2 }));
+		await writeFile(
+			join(root, "sal.json"),
+			JSON.stringify({ explicit_user_intent: 3, verified_outcome: 3, source_quality: 2 }),
+		);
 		const logs = captureLogs();
 		await wikiCommand({
 			subcommand: "propose",
@@ -126,7 +135,16 @@ describe("wiki propose metadata flags (A1 passthrough)", () => {
 
 	it("a low-salience file is discarded — the gate scores the passed components", async () => {
 		const root = await project();
-		await writeFile(join(root, "low.json"), JSON.stringify({ explicit_user_intent: 1, novelty_vs_existing_wiki: 0, future_reuse_likelihood: 0, source_quality: 0, blast_radius: 0 }));
+		await writeFile(
+			join(root, "low.json"),
+			JSON.stringify({
+				explicit_user_intent: 1,
+				novelty_vs_existing_wiki: 0,
+				future_reuse_likelihood: 0,
+				source_quality: 0,
+				blast_radius: 0,
+			}),
+		);
 		const logs = captureLogs();
 		await wikiCommand({
 			subcommand: "propose",
@@ -140,7 +158,11 @@ describe("wiki propose metadata flags (A1 passthrough)", () => {
 	it("bare propose preserves prior behavior (human origin, no sourceIds, CLI salience)", async () => {
 		const root = await project();
 		const logs = captureLogs();
-		await wikiCommand({ subcommand: "propose", rest: ["demo", "Bare"], flags: { content: "A clean body about salience defaults." } });
+		await wikiCommand({
+			subcommand: "propose",
+			rest: ["demo", "Bare"],
+			flags: { content: "A clean body about salience defaults." },
+		});
 		expect(logs.join("")).toContain("propose →");
 		const candidates = await readFile(join(root, "tasks", "wikis", "demo", "candidates.jsonl"), "utf-8");
 		const cand = JSON.parse(candidates.trim().split("\n").at(-1)!);
@@ -153,7 +175,11 @@ describe("wiki context", () => {
 	async function seedApprovedPage(root: string): Promise<void> {
 		const logs = captureLogs();
 		await wikiCommand({ subcommand: "init", rest: ["demo"], flags: { title: "Demo" } });
-		await wikiCommand({ subcommand: "propose", rest: ["demo", "Salience"], flags: { content: "The salience rubric scores candidates before any write." } });
+		await wikiCommand({
+			subcommand: "propose",
+			rest: ["demo", "Salience"],
+			flags: { content: "The salience rubric scores candidates before any write." },
+		});
 		const cid = logs.find((l) => l.includes("propose →"))!.match(/\((demo\/cand-[a-z0-9]+)\)/)![1];
 		await wikiCommand({ subcommand: "approve", rest: ["demo", cid], flags: { by: "alice" } });
 		logs.length = 0;

@@ -49,7 +49,11 @@ function renderEntry(entry: Record<string, unknown>, spec: StoreSpec, validator:
 	return lines.join("\n");
 }
 
-export function renderStore(data: Record<string, unknown>, spec: StoreSpec, validator: ContentValidator | null): { md: string; flagged: string[] } {
+export function renderStore(
+	data: Record<string, unknown>,
+	spec: StoreSpec,
+	validator: ContentValidator | null,
+): { md: string; flagged: string[] } {
 	const items = ((data[spec.itemsKey] as Array<Record<string, unknown>>) ?? [])
 		.slice()
 		.sort((a, b) => String(a.id).localeCompare(String(b.id)));

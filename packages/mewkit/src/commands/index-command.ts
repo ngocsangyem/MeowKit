@@ -36,7 +36,9 @@ export function indexCommand(opts: IndexOptions = {}): void {
 	console.log(pc.bold(pc.cyan("Derived index rebuilt")) + pc.dim(" (logs + wiki tree unchanged — canonical)"));
 	console.log(`  ${pc.dim(result.dbPath)}`);
 	console.log(`  schema v${result.schemaVersion} · ${result.traceRows} trace row(s) · ${result.costRows} cost row(s)`);
-	console.log(`  wiki: ${result.wiki.pages} page(s) · ${result.wiki.candidates} candidate(s) · ${result.wiki.sources} source(s)`);
+	console.log(
+		`  wiki: ${result.wiki.pages} page(s) · ${result.wiki.candidates} candidate(s) · ${result.wiki.sources} source(s)`,
+	);
 }
 
 export function queryCommand(opts: IndexOptions = {}): void {
@@ -66,6 +68,7 @@ export function queryCommand(opts: IndexOptions = {}): void {
 	}
 	if (result.costByModel.length > 0) {
 		console.log(pc.bold("  Cost by model:"));
-		for (const r of result.costByModel.slice(0, 12)) console.log(`    ${r.model || "(unknown)"}: ${r.entries} entr(ies), ${r.tokens} tokens`);
+		for (const r of result.costByModel.slice(0, 12))
+			console.log(`    ${r.model || "(unknown)"}: ${r.entries} entr(ies), ${r.tokens} tokens`);
 	}
 }

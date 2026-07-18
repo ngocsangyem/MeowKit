@@ -21,13 +21,7 @@ function makeAgent(body: string): PortableItem {
 
 describe("convertFmToCodexToml reference integrity", () => {
 	it("rewrites a fenced ref to a migrated skill script to its provider target", () => {
-		const body = [
-			"# Planner",
-			"",
-			"```bash",
-			"python3 .claude/skills/demo-skill/scripts/run.py",
-			"```",
-		].join("\n");
+		const body = ["# Planner", "", "```bash", "python3 .claude/skills/demo-skill/scripts/run.py", "```"].join("\n");
 		const migratedRefs = createReferenceIntegrityIndex([".claude/skills/demo-skill/"]);
 
 		const result = convertFmToCodexToml(makeAgent(body), { migratedRefs });
@@ -42,13 +36,7 @@ describe("convertFmToCodexToml reference integrity", () => {
 	});
 
 	it("preserves and warns a fenced ref to an asset outside the migration set", () => {
-		const body = [
-			"# Planner",
-			"",
-			"```bash",
-			"python3 .claude/skills/other-skill/scripts/run.py",
-			"```",
-		].join("\n");
+		const body = ["# Planner", "", "```bash", "python3 .claude/skills/other-skill/scripts/run.py", "```"].join("\n");
 		// demo-skill migrates, other-skill does NOT — the ref must fail closed.
 		const migratedRefs = createReferenceIntegrityIndex([".claude/skills/demo-skill/"]);
 

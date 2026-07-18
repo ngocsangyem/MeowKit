@@ -143,7 +143,8 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 		case "search": {
 			const hits = searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), rest.join(" "));
 			if (flags["json"]) return void console.log(JSON.stringify(hits, null, 2));
-			for (const h of hits) console.log(`${h.title} [${h.slug}] ${h.path ?? h.pageId} ~${h.tokenEstimate}tok\n  ${h.snippet}`);
+			for (const h of hits)
+				console.log(`${h.title} [${h.slug}] ${h.path ?? h.pageId} ~${h.tokenEstimate}tok\n  ${h.snippet}`);
 			if (!hits.length) console.log("(no results)");
 			return;
 		}
@@ -151,12 +152,19 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 			// Context-discipline surface: title + score + path ONLY, never content. `path` is the
 			// project-root-readable file target; pageId/pagePath are kept for callers that need them.
 			const hits = searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), rest.join(" "), 5);
-			const hints = hits.map((h) => ({ title: h.title, score: h.tokenEstimate, path: h.path ?? h.pageId, pageId: h.pageId, pagePath: h.pagePath }));
+			const hints = hits.map((h) => ({
+				title: h.title,
+				score: h.tokenEstimate,
+				path: h.path ?? h.pageId,
+				pageId: h.pageId,
+				pagePath: h.pagePath,
+			}));
 			console.log(JSON.stringify(hints));
 			return;
 		}
 		case "list": {
-			for (const p of listWikiPages(new MarkdownWikiRepository(projectRoot), makeWikiSlug(rest[0] ?? ""))) console.log(p);
+			for (const p of listWikiPages(new MarkdownWikiRepository(projectRoot), makeWikiSlug(rest[0] ?? "")))
+				console.log(p);
 			return;
 		}
 		case "render": {
@@ -235,7 +243,8 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 			if (sub === "profiles") {
 				const list = handoff.profiles();
 				if (flags["json"]) return void console.log(JSON.stringify(list, null, 2));
-				for (const p of list) console.log(`${p.skillName}  [${p.handoffClass}]  ${p.profile}  ${p.artifactPatterns.join(", ")}`);
+				for (const p of list)
+					console.log(`${p.skillName}  [${p.handoffClass}]  ${p.profile}  ${p.artifactPatterns.join(", ")}`);
 				console.log(`(${list.length} registered; unregistered skills default to class "none")`);
 				return;
 			}
@@ -243,7 +252,9 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 			const from = str(flags["from"]);
 			const slug = makeWikiSlug(str(flags["slug"]) ?? "");
 			if ((sub !== "suggest" && sub !== "propose") || !skill || !from) {
-				console.error("usage: mewkit wiki handoff <suggest|propose|profiles> --skill <name> --from <artifact> --slug <s> [--json] [--verified-outcome] [--explicit-intent] [--recurring-friction] [--novelty-delta N]");
+				console.error(
+					"usage: mewkit wiki handoff <suggest|propose|profiles> --skill <name> --from <artifact> --slug <s> [--json] [--verified-outcome] [--explicit-intent] [--recurring-friction] [--novelty-delta N]",
+				);
 				return;
 			}
 			const overrides = signalOverrides(flags);
@@ -251,12 +262,19 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 				if (sub === "suggest") {
 					const out = handoff.suggest(skill, from, slug, overrides);
 					if (flags["json"]) return void console.log(JSON.stringify(out, null, 2));
-					console.log(`handoff suggest [${out.packet.handoffClass}/${out.packet.profile}] → ${out.decision.kind} (salience ${scoreSalience(out.packet.salience).total})`);
+					console.log(
+						`handoff suggest [${out.packet.handoffClass}/${out.packet.profile}] → ${out.decision.kind} (salience ${scoreSalience(out.packet.salience).total})`,
+					);
 					return;
 				}
 				const { record, result } = handoff.propose(skill, from, slug, overrides);
-				if (flags["json"]) return void console.log(JSON.stringify({ record, candidateId: result?.candidate?.id, decision: result?.decision }, null, 2));
-				console.log(`handoff propose → ${record.status} (${record.decisionKind})${record.candidateId ? " " + record.candidateId : ""}`);
+				if (flags["json"])
+					return void console.log(
+						JSON.stringify({ record, candidateId: result?.candidate?.id, decision: result?.decision }, null, 2),
+					);
+				console.log(
+					`handoff propose → ${record.status} (${record.decisionKind})${record.candidateId ? " " + record.candidateId : ""}`,
+				);
 			} catch (err) {
 				console.error("handoff " + sub + " failed: " + (err instanceof Error ? err.message : String(err)));
 			}
@@ -304,7 +322,9 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 			return;
 		}
 		default:
-			console.log("usage: mewkit wiki <init|propose|approve|reject|search|hint|context|handoff|list|render|reindex|enqueue|research>");
+			console.log(
+				"usage: mewkit wiki <init|propose|approve|reject|search|hint|context|handoff|list|render|reindex|enqueue|research>",
+			);
 			return;
 	}
 }

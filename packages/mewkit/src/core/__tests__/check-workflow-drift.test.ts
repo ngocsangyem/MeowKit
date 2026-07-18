@@ -75,7 +75,10 @@ async function makeHarness(spec: string, prose: string, extraSources: Record<str
 
 const hasFail = (results: ReturnType<typeof checkWorkflowDrift>) => results.some((r) => r.status === "fail");
 const failDetail = (results: ReturnType<typeof checkWorkflowDrift>) =>
-	results.filter((r) => r.status === "fail").map((r) => r.detail).join("\n");
+	results
+		.filter((r) => r.status === "fail")
+		.map((r) => r.detail)
+		.join("\n");
 
 describe("checkWorkflowDrift", () => {
 	it("PASSES on a consistent harness", async () => {
@@ -101,7 +104,10 @@ describe("checkWorkflowDrift", () => {
 	});
 
 	it("FAILS when applies_to omits Phase 0", async () => {
-		const prose = CLEAN_PROSE.replace("applies_to: [Phase 0, 1, 2, 3, 4, 5, 6]", "applies_to: [Phase 1, 2, 3, 4, 5, 6]");
+		const prose = CLEAN_PROSE.replace(
+			"applies_to: [Phase 0, 1, 2, 3, 4, 5, 6]",
+			"applies_to: [Phase 1, 2, 3, 4, 5, 6]",
+		);
 		const root = await makeHarness(SPEC, prose);
 		const results = checkWorkflowDrift(root);
 		expect(hasFail(results)).toBe(true);
@@ -146,7 +152,10 @@ describe("checkWorkflowDrift", () => {
 		const prose = CLEAN_PROSE.replace("3.5:Simplify > 3.6:Verify > ", "");
 		const root = await makeHarness(spec, prose, {
 			"lifecycle-two.md": CLEAN_PROSE,
-			"pointer-only.md": CLEAN_PROSE.replace("<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->\n", ""),
+			"pointer-only.md": CLEAN_PROSE.replace(
+				"<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->\n",
+				"",
+			),
 		});
 		const results = checkWorkflowDrift(root);
 		expect(hasFail(results)).toBe(true);
@@ -165,17 +174,26 @@ describe("checkWorkflowDrift", () => {
 	});
 
 	it("allows pointer-only sources without a lifecycle marker and supports legacy string sources", async () => {
-		const spec = SPEC.replace(
-			"  - path: lifecycle.md\n    lifecycle_render: true",
-			"  - lifecycle.md",
+		const spec = SPEC.replace("  - path: lifecycle.md\n    lifecycle_render: true", "  - lifecycle.md");
+		const root = await makeHarness(
+			spec,
+			CLEAN_PROSE.replace(
+				"<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->\n",
+				"",
+			),
 		);
-		const root = await makeHarness(spec, CLEAN_PROSE.replace("<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->\n", ""));
 		expect(hasFail(checkWorkflowDrift(root))).toBe(false);
 	});
 
 	it("allows object-form pointer-only sources without a lifecycle marker", async () => {
 		const spec = SPEC.replace("lifecycle_render: true", "lifecycle_render: false");
-		const root = await makeHarness(spec, CLEAN_PROSE.replace("<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->\n", ""));
+		const root = await makeHarness(
+			spec,
+			CLEAN_PROSE.replace(
+				"<!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->\n",
+				"",
+			),
+		);
 		expect(hasFail(checkWorkflowDrift(root))).toBe(false);
 	});
 
@@ -201,7 +219,10 @@ describe("checkWorkflowDrift", () => {
 	});
 
 	it("FAILS cleanly when sources is not an array", async () => {
-		const root = await makeHarness(SPEC.replace("sources:\n  - path: lifecycle.md\n    lifecycle_render: true", "sources: lifecycle.md"), CLEAN_PROSE);
+		const root = await makeHarness(
+			SPEC.replace("sources:\n  - path: lifecycle.md\n    lifecycle_render: true", "sources: lifecycle.md"),
+			CLEAN_PROSE,
+		);
 		expect(failDetail(checkWorkflowDrift(root))).toContain("sources must be an array");
 	});
 });

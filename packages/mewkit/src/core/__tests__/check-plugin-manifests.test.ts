@@ -17,7 +17,10 @@ async function scaffold(): Promise<string> {
 	await mkdir(join(claude, "skills", "cook"), { recursive: true });
 	await writeFile(join(root, "package.json"), JSON.stringify({ version: "2.12.0" }));
 	await writeFile(join(claude, "agents", "developer.md"), "---\nname: developer\n---\nd");
-	await writeFile(join(claude, "skills", "cook", "SKILL.md"), '---\nname: mk:cook\n---\nTask(subagent_type="developer")');
+	await writeFile(
+		join(claude, "skills", "cook", "SKILL.md"),
+		'---\nname: mk:cook\n---\nTask(subagent_type="developer")',
+	);
 	return root;
 }
 
@@ -77,7 +80,15 @@ describe("checkPluginManifests", () => {
 				version: "2.12.0",
 				description: "x",
 				skills: "./skills/",
-				interface: { displayName: "MeowKit", shortDescription: "s", longDescription: "l", developerName: "d", category: "Productivity", capabilities: [], defaultPrompt: "p" },
+				interface: {
+					displayName: "MeowKit",
+					shortDescription: "s",
+					longDescription: "l",
+					developerName: "d",
+					category: "Productivity",
+					capabilities: [],
+					defaultPrompt: "p",
+				},
 			}),
 		);
 		await writeFile(
@@ -86,7 +97,11 @@ describe("checkPluginManifests", () => {
 		);
 		await writeFile(
 			join(root, ".agents", "plugins", "marketplace.json"),
-			JSON.stringify({ name: "meowkit", interface: { displayName: "meowkit" }, plugins: [{ name: "mk", source: { source: "local", path: "./plugin" } }] }),
+			JSON.stringify({
+				name: "meowkit",
+				interface: { displayName: "meowkit" },
+				plugins: [{ name: "mk", source: { source: "local", path: "./plugin" } }],
+			}),
 		);
 		const r = checkPluginManifests(root);
 		// Claude plugin.json version is misaligned (9.9.9 vs 2.12.0).

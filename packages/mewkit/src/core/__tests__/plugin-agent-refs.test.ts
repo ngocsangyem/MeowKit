@@ -2,11 +2,7 @@ import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import {
-	BUILTIN_AGENT_TYPES,
-	collectAgentNames,
-	rewriteAgentRefs,
-} from "../plugin-agent-refs.js";
+import { BUILTIN_AGENT_TYPES, collectAgentNames, rewriteAgentRefs } from "../plugin-agent-refs.js";
 
 const tempDirs: string[] = [];
 afterEach(async () => {

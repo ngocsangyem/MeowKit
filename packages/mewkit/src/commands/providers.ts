@@ -82,7 +82,9 @@ async function printCodexParity(provider: string | undefined): Promise<void> {
 				pc.dim(`(${p.parityCount}/${p.total} portable+adapted; ${p.skipped} skipped, ${p.adaptedDegraded} degraded)`),
 		);
 		console.log(pc.dim("  Full semantic parity is a staged, measured track — a claude-code skill installs on Codex"));
-		console.log(pc.dim("  only via a tested adapter, else it is skipped (default-deny). Raise it by porting skills to portable."));
+		console.log(
+			pc.dim("  only via a tested adapter, else it is skipped (default-deny). Raise it by porting skills to portable."),
+		);
 	} catch {
 		// Discovery is best-effort here; never fail `providers` on a parity read.
 	}
@@ -114,7 +116,9 @@ function printProviderDetail(provider: ProviderSupportInfo): void {
 	// never state contradictory support (Phase 1 truth unification). Shown only where an adapter
 	// projection exists; migration-only providers have no capability claim to make.
 	if (provider.capabilityStatus !== null) {
-		console.log(`  ${pc.dim("Capability:")} ${formatCapabilityStatus(provider.capabilityStatus)} ${pc.dim("(adapter truth — see `--lifecycle`)")}`);
+		console.log(
+			`  ${pc.dim("Capability:")} ${formatCapabilityStatus(provider.capabilityStatus)} ${pc.dim("(adapter truth — see `--lifecycle`)")}`,
+		);
 	}
 	if (provider.supportReason !== null && provider.supportReason.length > 0) {
 		console.log(`  ${pc.dim("Reason:")} ${provider.supportReason}`);
@@ -133,7 +137,9 @@ function printProviderDetail(provider: ProviderSupportInfo): void {
 		const path = surface.enabled ? ` → ${surface.projectPath ?? "(global only)"}` : "";
 		console.log(`  ${pad(surface.label, 10)} ${pad(surface.status, 12)} ${status}${path}`);
 		if (surface.enabled) {
-			console.log(`  ${" ".repeat(24)}${pc.dim(`${surface.format ?? "unknown"} / ${surface.writeStrategy ?? "unknown"}`)}`);
+			console.log(
+				`  ${" ".repeat(24)}${pc.dim(`${surface.format ?? "unknown"} / ${surface.writeStrategy ?? "unknown"}`)}`,
+			);
 		}
 		if (surface.note !== undefined && surface.note.length > 0) {
 			console.log(`  ${" ".repeat(24)}${pc.dim(surface.note)}`);
@@ -198,7 +204,11 @@ function lifecycleCell(status: string, gate: boolean): string {
 
 function printLifecycleMatrix(): void {
 	console.log(pc.bold(pc.cyan("Provider lifecycle-event support (Phase 6)")));
-	console.log(pc.dim("ok = fires · adv = fires, version-gated/observe · no = absent · ? = unknown · ! = proven gate (deny/block)"));
+	console.log(
+		pc.dim(
+			"ok = fires · adv = fires, version-gated/observe · no = absent · ? = unknown · ! = proven gate (deny/block)",
+		),
+	);
 	console.log();
 	const views = ADAPTED_PROVIDERS.map((p) => describeProvider(p));
 	console.log(`  ${pad("EVENT", 18)}${views.map((v) => pad(v.provider, 15)).join("")}`);
@@ -207,17 +217,25 @@ function printLifecycleMatrix(): void {
 		console.log(`  ${pad(event, 18)}${cells}`);
 	}
 	console.log();
-	console.log(pc.dim("Run `mewkit providers <provider> --lifecycle` for support levels, acquisition, storage, and evidence."));
+	console.log(
+		pc.dim("Run `mewkit providers <provider> --lifecycle` for support levels, acquisition, storage, and evidence."),
+	);
 }
 
 function printAdapterDetail(view: ProviderAdapterView): void {
 	const p = view.projection;
 	console.log(pc.bold(pc.cyan(`Capability adapter — ${view.provider} [${view.status}]`)));
-	console.log(`  ${pc.dim("support levels:")} discoverable ${p.levels.discoverable}, selectable ${p.levels.selectable}, invocable ${p.levels.invocable}, enforceable ${p.levels.enforceable}`);
+	console.log(
+		`  ${pc.dim("support levels:")} discoverable ${p.levels.discoverable}, selectable ${p.levels.selectable}, invocable ${p.levels.invocable}, enforceable ${p.levels.enforceable}`,
+	);
 	console.log(`  ${pc.dim("bootstrap:")} ${p.bootstrapPlacement}`);
-	console.log(`  ${pc.dim("acquisition:")} read ${view.acquisition.read?.tool ?? "(none)"}, search ${view.acquisition.search?.tool ?? "(none)"} [${view.acquisition.status}]`);
+	console.log(
+		`  ${pc.dim("acquisition:")} read ${view.acquisition.read?.tool ?? "(none)"}, search ${view.acquisition.search?.tool ?? "(none)"} [${view.acquisition.status}]`,
+	);
 	console.log(`  ${pc.dim("storage:")} ${view.storageBoundary}`);
-	console.log(`  ${pc.dim("gating events:")} ${view.gatingEvents.length ? view.gatingEvents.join(", ") : pc.yellow("none (no proven deny/block)")}`);
+	console.log(
+		`  ${pc.dim("gating events:")} ${view.gatingEvents.length ? view.gatingEvents.join(", ") : pc.yellow("none (no proven deny/block)")}`,
+	);
 	// Security/privacy enforcement gaps — prominent, never buried (Phase 6 acceptance).
 	if (view.enforcementGaps.length > 0) {
 		console.log(pc.bold(pc.red(`  ⚠ security/privacy enforcement gaps (${view.enforcementGaps.length}):`)));
@@ -228,7 +246,14 @@ function printAdapterDetail(view: ProviderAdapterView): void {
 	console.log();
 	console.log(pc.bold("  Invocation shapes"));
 	for (const [id, shape] of Object.entries(view.invocation)) {
-		const tag = shape.support === "supported" ? pc.green(shape.support) : shape.support === "advisory" ? pc.yellow(shape.support) : shape.support === "unsupported" ? pc.dim(shape.support) : pc.dim(shape.support);
+		const tag =
+			shape.support === "supported"
+				? pc.green(shape.support)
+				: shape.support === "advisory"
+					? pc.yellow(shape.support)
+					: shape.support === "unsupported"
+						? pc.dim(shape.support)
+						: pc.dim(shape.support);
 		console.log(`    ${pad(id, 16)} ${pad(tag, 12)} ${pc.dim(shape.operation)}`);
 	}
 	console.log();
@@ -250,7 +275,14 @@ function printAdapterDetail(view: ProviderAdapterView): void {
 	console.log(pc.bold("  Lifecycle events"));
 	for (const event of LIFECYCLE_EVENTS) {
 		const s = view.lifecycle[event];
-		const tag = s.status === "supported" ? pc.green(s.status) : s.status === "advisory" ? pc.yellow(s.status) : s.status === "unsupported" ? pc.red(s.status) : pc.dim(s.status);
+		const tag =
+			s.status === "supported"
+				? pc.green(s.status)
+				: s.status === "advisory"
+					? pc.yellow(s.status)
+					: s.status === "unsupported"
+						? pc.red(s.status)
+						: pc.dim(s.status);
 		console.log(`    ${pad(event, 18)} ${tag}${s.gate ? pc.bold(" [gate]") : ""} ${pc.dim(`— ${s.evidence}`)}`);
 	}
 }

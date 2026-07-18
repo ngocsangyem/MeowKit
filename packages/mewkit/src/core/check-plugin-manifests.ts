@@ -87,7 +87,8 @@ export function checkPluginNamespace(claudeDir: string): CheckResult[] {
 	results.push({
 		name: "subagent_type refs resolve",
 		status: stray.length === 0 ? "pass" : "warn",
-		detail: stray.length === 0 ? "all refs are kit agents or built-ins" : `unknown refs: ${stray.slice(0, 5).join("; ")}`,
+		detail:
+			stray.length === 0 ? "all refs are kit agents or built-ins" : `unknown refs: ${stray.slice(0, 5).join("; ")}`,
 		section: SECTION,
 	});
 
@@ -109,9 +110,27 @@ export function checkPluginManifests(projectRoot: string): CheckResult[] {
 	}
 
 	const expectedVersion = readRootVersion(projectRoot);
-	const manifests: { label: string; file: string; schema: { parse: (v: unknown) => unknown }; name?: string; version?: boolean }[] = [
-		{ label: "Claude plugin.json", file: "plugin/.claude-plugin/plugin.json", schema: ClaudePluginJsonSchema, name: PLUGIN_NAME, version: true },
-		{ label: "Codex plugin.json", file: "plugin/.codex-plugin/plugin.json", schema: CodexPluginJsonSchema, name: PLUGIN_NAME, version: true },
+	const manifests: {
+		label: string;
+		file: string;
+		schema: { parse: (v: unknown) => unknown };
+		name?: string;
+		version?: boolean;
+	}[] = [
+		{
+			label: "Claude plugin.json",
+			file: "plugin/.claude-plugin/plugin.json",
+			schema: ClaudePluginJsonSchema,
+			name: PLUGIN_NAME,
+			version: true,
+		},
+		{
+			label: "Codex plugin.json",
+			file: "plugin/.codex-plugin/plugin.json",
+			schema: CodexPluginJsonSchema,
+			name: PLUGIN_NAME,
+			version: true,
+		},
 		{ label: "Claude marketplace.json", file: ".claude-plugin/marketplace.json", schema: ClaudeMarketplaceJsonSchema },
 		{ label: "Codex marketplace.json", file: ".agents/plugins/marketplace.json", schema: CodexMarketplaceJsonSchema },
 	];
@@ -127,7 +146,12 @@ export function checkPluginManifests(projectRoot: string): CheckResult[] {
 		try {
 			parsed = m.schema.parse(JSON.parse(fs.readFileSync(full, "utf-8"))) as Record<string, unknown>;
 		} catch (err) {
-			results.push({ name: m.label, status: "fail", detail: `invalid: ${(err as Error).message.split("\n")[0]}`, section: SECTION });
+			results.push({
+				name: m.label,
+				status: "fail",
+				detail: `invalid: ${(err as Error).message.split("\n")[0]}`,
+				section: SECTION,
+			});
 			continue;
 		}
 		const issues: string[] = [];

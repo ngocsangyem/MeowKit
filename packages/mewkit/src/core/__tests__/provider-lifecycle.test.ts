@@ -5,7 +5,17 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { LIFECYCLE_EVENTS, getLifecycleMap, gatingEvents, enforcementGaps, gateProofViolations, gateProofViolationsInMap, SECURITY_ENFORCEMENT_EVENTS, type LifecycleEvent, type LifecycleMap } from "../provider-lifecycle.js";
+import {
+	LIFECYCLE_EVENTS,
+	getLifecycleMap,
+	gatingEvents,
+	enforcementGaps,
+	gateProofViolations,
+	gateProofViolationsInMap,
+	SECURITY_ENFORCEMENT_EVENTS,
+	type LifecycleEvent,
+	type LifecycleMap,
+} from "../provider-lifecycle.js";
 import { CODEX_SUPPORTED_EVENTS } from "../../migrate/providers/codex/capabilities.js";
 
 // Repo root = five segments up from this file (packages/mewkit/src/core/__tests__ → repo).
@@ -65,7 +75,9 @@ describe("enforcementGaps — honest security/privacy enforcement signal", () =>
 	});
 
 	it("codex has a gap on EVERY safety deny event (version-gated, not statically guaranteed)", () => {
-		const gaps = enforcementGaps("codex").map((g) => g.event).sort();
+		const gaps = enforcementGaps("codex")
+			.map((g) => g.event)
+			.sort();
 		expect(gaps).toEqual([...SECURITY_ENFORCEMENT_EVENTS].sort());
 		expect(enforcementGaps("codex")[0].reason).toBeTruthy();
 	});
@@ -118,7 +130,9 @@ describe("enforced-without-proof invariant — no gate:true without a real artif
 				expect(proof, `${provider}.${e} gate:true must declare a proof`).toBeTruthy();
 				const proofPath = resolve(REPO_ROOT, (proof as string).split("#")[0]);
 				const contents = readFileSync(proofPath, "utf8"); // throws if the artifact does not exist
-				expect(/deny|block|exit 2/i.test(contents), `${provider}.${e} proof must exercise a deny/block: ${proof}`).toBe(true);
+				expect(/deny|block|exit 2/i.test(contents), `${provider}.${e} proof must exercise a deny/block: ${proof}`).toBe(
+					true,
+				);
 			}
 		}
 	});
@@ -130,7 +144,12 @@ describe("enforced-without-proof invariant — no gate:true without a real artif
 		const violations = gateProofViolationsInMap("forged", forged);
 		expect(violations.map((v) => v.event)).toEqual(["pre_tool"]);
 		// And a proof-bearing gate does NOT trip it.
-		forged.pre_tool = { status: "supported", gate: true, evidence: "ok", proof: "src/__tests__/hooks/gate-enforcement.integration.test.ts" };
+		forged.pre_tool = {
+			status: "supported",
+			gate: true,
+			evidence: "ok",
+			proof: "src/__tests__/hooks/gate-enforcement.integration.test.ts",
+		};
 		expect(gateProofViolationsInMap("forged", forged)).toEqual([]);
 	});
 });

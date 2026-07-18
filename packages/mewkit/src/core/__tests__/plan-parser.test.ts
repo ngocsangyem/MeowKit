@@ -67,7 +67,12 @@ describe("parsePhaseFile", () => {
 	it("names every missing required section", async () => {
 		const dir = await planDir({ "phase-01-x.md": "---\ntitle: x\n---\n\n## Overview\nOnly this.\n" });
 		const phase = parsePhaseFile(join(dir, "phase-01-x.md"));
-		expect(phase.missingSections).toEqual(["Requirements", "Implementation Steps", "Success Criteria", "Risk Assessment"]);
+		expect(phase.missingSections).toEqual([
+			"Requirements",
+			"Implementation Steps",
+			"Success Criteria",
+			"Risk Assessment",
+		]);
 	});
 
 	it("matches a required section inside a longer heading", async () => {

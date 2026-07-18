@@ -203,7 +203,11 @@ export async function doctor(args?: {
  */
 function checkInstalledMetadata(root: string | null): DiagResult {
 	if (!root) {
-		return { status: "warn", name: "Installed metadata", detail: "Project root not found; skipped metadata health check." };
+		return {
+			status: "warn",
+			name: "Installed metadata",
+			detail: "Project root not found; skipped metadata health check.",
+		};
 	}
 	try {
 		const { source, meta } = readInstallMetadata(path.join(root, ".claude"));
@@ -323,7 +327,9 @@ export function explainProvenance(root: string | null, explain: boolean): void {
 
 	if (explain) {
 		const sample = (paths: string[]): string =>
-			paths.length === 0 ? "(none)" : paths.slice(0, 10).join(", ") + (paths.length > 10 ? `, …(+${paths.length - 10})` : "");
+			paths.length === 0
+				? "(none)"
+				: paths.slice(0, 10).join(", ") + (paths.length > 10 ? `, …(+${paths.length - 10})` : "");
 		console.log(`  ${pc.yellow("known-modified")}: ${sample(buckets["known-modified"])}`);
 		console.log(`  ${pc.red("unknown")}: ${sample(buckets.unknown)}\n`);
 	}

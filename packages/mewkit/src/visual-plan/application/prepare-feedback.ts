@@ -49,10 +49,17 @@ export function prepareFeedback(planDir: string, operations: unknown[]): Prepare
 	// with a placeholder hash just to run the op schema).
 	const id = `feedback-${stamp()}-${crypto.randomBytes(4).toString("hex")}`;
 	const opCheck = FeedbackBatchSchema.safeParse({
-		schemaVersion: "visual-feedback/v1", id, planId: plan.id, baseRevision: plan.revision,
-		baseHash: "0".repeat(64), createdAt: new Date().toISOString(), operations, status: "open",
+		schemaVersion: "visual-feedback/v1",
+		id,
+		planId: plan.id,
+		baseRevision: plan.revision,
+		baseHash: "0".repeat(64),
+		createdAt: new Date().toISOString(),
+		operations,
+		status: "open",
 	});
-	if (!opCheck.success) return { ok: false, error: `invalid feedback operations: ${opCheck.error.issues[0]?.message ?? "schema"}` };
+	if (!opCheck.success)
+		return { ok: false, error: `invalid feedback operations: ${opCheck.error.issues[0]?.message ?? "schema"}` };
 
 	// Transition review → feedback-pending: outstanding feedback makes the current
 	// approval stale and BLOCKS approve (the "no pending feedback batch" gate).

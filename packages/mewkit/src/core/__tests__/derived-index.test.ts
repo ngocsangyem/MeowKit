@@ -15,8 +15,20 @@ afterEach(async () => {
 const TRACE_LINES = [
 	{ schema_version: "1.0", ts: "2026-06-20T10:00:00Z", event: "file_edited", run_id: "r1", data: { file: "a.ts" } },
 	{ schema_version: "1.0", ts: "2026-06-20T10:01:00Z", event: "test_run", run_id: "r1", data: {} },
-	{ schema_version: "1.0", ts: "2026-06-20T10:02:00Z", event: "friction", run_id: "r1", data: { message: "build failed", responsibility: "verification" } },
-	{ schema_version: "1.0", ts: "2026-06-20T10:03:00Z", event: "friction", run_id: "r2", data: { message: "build failed", responsibility: "verification" } },
+	{
+		schema_version: "1.0",
+		ts: "2026-06-20T10:02:00Z",
+		event: "friction",
+		run_id: "r1",
+		data: { message: "build failed", responsibility: "verification" },
+	},
+	{
+		schema_version: "1.0",
+		ts: "2026-06-20T10:03:00Z",
+		event: "friction",
+		run_id: "r2",
+		data: { message: "build failed", responsibility: "verification" },
+	},
 	{ schema_version: "1.0", ts: "2026-06-20T10:04:00Z", event: "review", run_id: "r2", data: {} },
 ];
 const COST = [
@@ -80,7 +92,9 @@ describe("buildIndex / queryIndex", () => {
 		buildIndex(claudeDir);
 		const db = new DatabaseSync(dbPath(claudeDir), { readOnly: true });
 		try {
-			expect((db.prepare("PRAGMA journal_mode").get() as { journal_mode: string }).journal_mode.toLowerCase()).toBe("wal");
+			expect((db.prepare("PRAGMA journal_mode").get() as { journal_mode: string }).journal_mode.toLowerCase()).toBe(
+				"wal",
+			);
 			expect((db.prepare("PRAGMA user_version").get() as { user_version: number }).user_version).toBe(SCHEMA_VERSION);
 		} finally {
 			db.close();
@@ -141,7 +155,15 @@ async function makeWiki(): Promise<{ claudeDir: string; root: string }> {
 	);
 	await writeFile(
 		join(root, "tasks", "wikis", "demo", "candidates.jsonl"),
-		JSON.stringify({ id: "c1", slug: "demo", origin: "agent", title: "T", content: "B", state: "proposed", salience: { total: 9, components: { explicit_user_intent: 3 } } }) + "\n",
+		JSON.stringify({
+			id: "c1",
+			slug: "demo",
+			origin: "agent",
+			title: "T",
+			content: "B",
+			state: "proposed",
+			salience: { total: 9, components: { explicit_user_intent: 3 } },
+		}) + "\n",
 	);
 	return { claudeDir, root };
 }

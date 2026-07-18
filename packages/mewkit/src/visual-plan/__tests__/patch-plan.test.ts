@@ -32,29 +32,45 @@ function seed(mutate?: (p: Record<string, unknown>) => void): string {
 describe("patchPlan — op application", () => {
 	it("move-frame-lane, reorder, connector-label, annotation edits, wireframe field all apply", () => {
 		const planDir = seed();
-		expect(patchPlan(planDir, { type: "move-frame-lane", frameId: "fr-login", laneId: "lane-secondary" }).status).toBe("ok");
+		expect(patchPlan(planDir, { type: "move-frame-lane", frameId: "fr-login", laneId: "lane-secondary" }).status).toBe(
+			"ok",
+		);
 		expect(patchPlan(planDir, { type: "reorder-frame", frameId: "fr-login", order: 5 }).status).toBe("ok");
-		expect(patchPlan(planDir, { type: "update-connector-label", connectorId: "c-login-error", label: "bad creds" }).status).toBe("ok");
-		expect(patchPlan(planDir, { type: "update-annotation", annotationId: "an-note-1", text: "New text" }).status).toBe("ok");
-		const r = patchPlan(planDir, { type: "update-wireframe-field", frameId: "fr-login", fieldId: "cta", text: "Sign in now" });
+		expect(
+			patchPlan(planDir, { type: "update-connector-label", connectorId: "c-login-error", label: "bad creds" }).status,
+		).toBe("ok");
+		expect(patchPlan(planDir, { type: "update-annotation", annotationId: "an-note-1", text: "New text" }).status).toBe(
+			"ok",
+		);
+		const r = patchPlan(planDir, {
+			type: "update-wireframe-field",
+			frameId: "fr-login",
+			fieldId: "cta",
+			text: "Sign in now",
+		});
 		expect(r.status).toBe("ok");
 		const art = readPlanArtifact(planDir);
 		expect(JSON.stringify(art)).toContain("Sign in now");
-		expect(((art.canvas as { frames: { id: string; laneId: string }[] }).frames.find((f) => f.id === "fr-login"))?.laneId).toBe("lane-secondary");
+		expect(
+			(art.canvas as { frames: { id: string; laneId: string }[] }).frames.find((f) => f.id === "fr-login")?.laneId,
+		).toBe("lane-secondary");
 	});
 
 	it("rejects an op with an unknown target (no write)", () => {
 		const planDir = seed();
 		const r = patchPlan(planDir, { type: "move-frame-lane", frameId: "fr-login", laneId: "lane-ghost" });
 		expect(r.status).toBe("op-rejected");
-		expect((readPlanArtifact(planDir).revision as number)).toBe(0);
+		expect(readPlanArtifact(planDir).revision as number).toBe(0);
 	});
 
 	it("does not persist a patch that would break validation", () => {
 		const planDir = seed();
-		const r = patchPlan(planDir, { type: "append-annotation", annotation: { id: "an-x", kind: "note", text: "x", targetId: "fr-ghost", placement: "top" } });
+		const r = patchPlan(planDir, {
+			type: "append-annotation",
+			annotation: { id: "an-x", kind: "note", text: "x", targetId: "fr-ghost", placement: "top" },
+		});
 		expect(r.status).toBe("invalid-result");
-		expect((readPlanArtifact(planDir).revision as number)).toBe(0); // not written
+		expect(readPlanArtifact(planDir).revision as number).toBe(0); // not written
 	});
 });
 
@@ -63,7 +79,7 @@ describe("patchPlan — concurrency + approval", () => {
 		const planDir = seed();
 		const r = patchPlan(planDir, { type: "reorder-frame", frameId: "fr-login", order: 9 }, "deadbeef".repeat(8));
 		expect(r.status).toBe("stale");
-		expect((readPlanArtifact(planDir).revision as number)).toBe(0);
+		expect(readPlanArtifact(planDir).revision as number).toBe(0);
 	});
 
 	it("accepts a matching If-Match and returns a new ETag", () => {
@@ -89,6 +105,6 @@ describe("patchPlan — concurrency + approval", () => {
 		const planDir = seed();
 		patchPlan(planDir, { type: "reorder-frame", frameId: "fr-login", order: 1 });
 		patchPlan(planDir, { type: "reorder-frame", frameId: "fr-login", order: 2 });
-		expect((readPlanArtifact(planDir).revision as number)).toBe(2);
+		expect(readPlanArtifact(planDir).revision as number).toBe(2);
 	});
 });

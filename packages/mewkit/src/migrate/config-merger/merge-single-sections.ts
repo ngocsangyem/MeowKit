@@ -161,7 +161,10 @@ export function parseMergedSections(content: string): ParsedMergedSections {
 	// forms) so they don't accumulate on rerun.
 	preamble = preamble
 		.replace(/^# Agents\r?\n\r?\n> Target: .*\r?\n+/is, "")
-		.replace(/^# Agents\r?\n\r?\n> Ported from (?:MeowKit agents|the toolkit) via mewkit migrate\r?\n> Target: .*\r?\n+/is, "")
+		.replace(
+			/^# Agents\r?\n\r?\n> Ported from (?:MeowKit agents|the toolkit) via mewkit migrate\r?\n> Target: .*\r?\n+/is,
+			"",
+		)
 		.replace(/^# Rules\r?\n\r?\n> Ported from MeowKit rules via mewkit migrate.*\r?\n> Target: .*\r?\n+/is, "")
 		.replace(/^# Config\r?\n\r?\n> Ported from MeowKit config via mewkit migrate.*\r?\n+/is, "")
 		.trimEnd();

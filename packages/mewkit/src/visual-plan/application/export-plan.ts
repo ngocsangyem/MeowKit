@@ -24,27 +24,40 @@ export interface ExportResult {
 
 /** HTML-entity-encode a plan-sourced string for safe text/attribute placement. */
 function esc(s: string): string {
-	return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string);
+	return s.replace(
+		/[&<>"']/g,
+		(c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string,
+	);
 }
 
 function coverageSection(plan: VisualPlan): string {
 	const { summary } = computeCoverage(plan);
 	const rows = plan.uiCoverage.surfaces
-		.flatMap((s) => s.states.map((st) => `<tr><td>${esc(s.label ?? s.id)}</td><td>${esc(st.label ?? st.id)}</td><td>${st.frameIds.length > 0 ? "framed" : st.omitted ? esc(st.omitted.reason) : "unresolved"}</td></tr>`))
+		.flatMap((s) =>
+			s.states.map(
+				(st) =>
+					`<tr><td>${esc(s.label ?? s.id)}</td><td>${esc(st.label ?? st.id)}</td><td>${st.frameIds.length > 0 ? "framed" : st.omitted ? esc(st.omitted.reason) : "unresolved"}</td></tr>`,
+			),
+		)
 		.join("");
 	return `<h2>Coverage</h2><p class="vp-sum">${summary.resolved} resolved · ${summary.planned} planned · ${summary.omitted} omitted · ${summary.unresolved} unresolved</p><table class="vp-coverage-table"><thead><tr><th>Surface</th><th>State</th><th>Closure</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function framesSection(plan: VisualPlan): string {
 	const cards = plan.canvas.frames
-		.map((f) => `<article class="vp-frame" data-surface="${esc(f.surface)}"><header><strong>${esc(f.label)}</strong> <span class="vp-badge">${esc(f.surface)} · ${esc(f.changeMode)}</span></header><div class="vp-frame-body"><div class="wf-root">${sanitizeWireframeHtml(f.wireframe.html)}</div></div></article>`)
+		.map(
+			(f) =>
+				`<article class="vp-frame" data-surface="${esc(f.surface)}"><header><strong>${esc(f.label)}</strong> <span class="vp-badge">${esc(f.surface)} · ${esc(f.changeMode)}</span></header><div class="vp-frame-body"><div class="wf-root">${sanitizeWireframeHtml(f.wireframe.html)}</div></div></article>`,
+		)
 		.join("");
 	return `<h2>Frames</h2><div class="vp-frames">${cards}</div>`;
 }
 
 function docsSection(plan: VisualPlan): string {
 	if (plan.documentBlocks.length === 0) return "";
-	const items = plan.documentBlocks.map((b) => `<li>${b.title ? `<strong>${esc(b.title)}:</strong> ` : ""}${esc(b.body)}</li>`).join("");
+	const items = plan.documentBlocks
+		.map((b) => `<li>${b.title ? `<strong>${esc(b.title)}:</strong> ` : ""}${esc(b.body)}</li>`)
+		.join("");
 	return `<h2>Mechanics</h2><ul>${items}</ul>`;
 }
 

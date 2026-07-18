@@ -54,11 +54,19 @@ async function makeHarness(o: SynthOpts): Promise<string> {
 	await w("schemas/harness-metadata-schema.json", SCHEMA);
 	await w(
 		"pack-manifest.json",
-		JSON.stringify({ schemaVersion: "1.0", base: { files: o.baseFiles ?? [], globs: [], commands: [] }, packs: o.packs, profiles: o.profiles }),
+		JSON.stringify({
+			schemaVersion: "1.0",
+			base: { files: o.baseFiles ?? [], globs: [], commands: [] },
+			packs: o.packs,
+			profiles: o.profiles,
+		}),
 	);
 	for (const s of o.skills) {
 		const deps = s.dependsOn ? `depends_on: [${s.dependsOn.join(", ")}]\n` : "";
-		await w(`skills/${s.id.replace("mk:", "")}/SKILL.md`, `---\nname: ${s.id}\nowner: ${s.owner}\ncriticality: medium\nstatus: active\nruntime: claude-code\n${deps}---\n# ${s.id}\n`);
+		await w(
+			`skills/${s.id.replace("mk:", "")}/SKILL.md`,
+			`---\nname: ${s.id}\nowner: ${s.owner}\ncriticality: medium\nstatus: active\nruntime: claude-code\n${deps}---\n# ${s.id}\n`,
+		);
 	}
 	await w("harness-inventory.json", JSON.stringify({ schema_version: 1, artifacts: {} }));
 	return c;
@@ -69,7 +77,10 @@ describe("checkPacks failure modes (synthetic)", () => {
 		const c = await makeHarness({
 			packs: { life: { owners: ["lifecycle"] } },
 			profiles: { core: ["base", "life"], full: ["*"] },
-			skills: [{ id: "mk:ok", owner: "lifecycle" }, { id: "mk:stray", owner: "ghost" }],
+			skills: [
+				{ id: "mk:ok", owner: "lifecycle" },
+				{ id: "mk:stray", owner: "ghost" },
+			],
 		});
 		expect(hasFail(checkPacks(c), "Pack completeness")).toBe(true);
 	});

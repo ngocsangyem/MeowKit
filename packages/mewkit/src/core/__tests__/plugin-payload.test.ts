@@ -3,10 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { generatePluginPayload } from "../plugin-payload.js";
-import {
-	ClaudePluginJsonSchema,
-	CodexPluginJsonSchema,
-} from "../plugin-manifest.js";
+import { ClaudePluginJsonSchema, CodexPluginJsonSchema } from "../plugin-manifest.js";
 
 const tempDirs: string[] = [];
 afterEach(async () => {
@@ -36,9 +33,7 @@ async function fixtureSource(): Promise<string> {
 				PreToolUse: [
 					{
 						matcher: "Edit|Write",
-						hooks: [
-							{ type: "command", command: 'bash "$CLAUDE_PROJECT_DIR/.claude/hooks/gate.sh"' },
-						],
+						hooks: [{ type: "command", command: 'bash "$CLAUDE_PROJECT_DIR/.claude/hooks/gate.sh"' }],
 					},
 				],
 			},
@@ -69,10 +64,7 @@ describe("generatePluginPayload", () => {
 
 		// Refs: developer rewritten, built-in Explore left bare.
 		expect(result.refsRewritten).toBe(1);
-		const patterns = await readFile(
-			join(outDir, "skills", "cook", "references", "patterns.md"),
-			"utf-8",
-		);
+		const patterns = await readFile(join(outDir, "skills", "cook", "references", "patterns.md"), "utf-8");
 		expect(patterns).toContain('subagent_type="mk:developer"');
 		expect(patterns).toContain('subagent_type="Explore"');
 
@@ -82,12 +74,8 @@ describe("generatePluginPayload", () => {
 		await expect(stat(join(outDir, "skills", "mk-loop"))).rejects.toThrow();
 
 		// Both manifests present and schema-valid with the release version.
-		const claudeManifest = JSON.parse(
-			await readFile(join(outDir, ".claude-plugin", "plugin.json"), "utf-8"),
-		);
-		const codexManifest = JSON.parse(
-			await readFile(join(outDir, ".codex-plugin", "plugin.json"), "utf-8"),
-		);
+		const claudeManifest = JSON.parse(await readFile(join(outDir, ".claude-plugin", "plugin.json"), "utf-8"));
+		const codexManifest = JSON.parse(await readFile(join(outDir, ".codex-plugin", "plugin.json"), "utf-8"));
 		expect(ClaudePluginJsonSchema.parse(claudeManifest).version).toBe("2.12.0");
 		expect(CodexPluginJsonSchema.parse(codexManifest).version).toBe("2.12.0");
 		expect(claudeManifest.name).toBe("mk");
@@ -109,9 +97,7 @@ describe("generatePluginPayload", () => {
 		// Plugin hooks.json generated with plugin-root command paths.
 		expect(result.hooksGenerated).toBe(true);
 		const hooksJson = JSON.parse(await readFile(join(outDir, "hooks", "hooks.json"), "utf-8"));
-		expect(hooksJson.hooks.PreToolUse[0].hooks[0].command).toBe(
-			'bash "${CLAUDE_PLUGIN_ROOT}/hooks/gate.sh"',
-		);
+		expect(hooksJson.hooks.PreToolUse[0].hooks[0].command).toBe('bash "${CLAUDE_PLUGIN_ROOT}/hooks/gate.sh"');
 	});
 
 	it("is idempotent across repeated runs", async () => {

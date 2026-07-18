@@ -6,8 +6,7 @@ export const codexConfig: ProviderConfig = {
 	name: "codex",
 	displayName: "Codex",
 	supportLevel: "experimental",
-	supportReason:
-		"Public runtime docs do not yet fully document every filesystem surface used by this adapter.",
+	supportReason: "Public runtime docs do not yet fully document every filesystem surface used by this adapter.",
 	subagents: "full",
 	agents: {
 		projectPath: ".codex/agents",

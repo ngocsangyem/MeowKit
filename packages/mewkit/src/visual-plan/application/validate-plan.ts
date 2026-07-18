@@ -42,7 +42,10 @@ function fromZod(error: z.ZodError): ValidationError[] {
  * pipeline (Phase 5) to re-validate a mutated plan in memory before writing —
  * so a patch can never persist a structurally-invalid or unsafe artifact.
  */
-export function validateParsed(plan: VisualPlan, planDir: string): { errors: ValidationError[]; coverage: CoverageSummary } {
+export function validateParsed(
+	plan: VisualPlan,
+	planDir: string,
+): { errors: ValidationError[]; coverage: CoverageSummary } {
 	const errors: ValidationError[] = [];
 	errors.push(...checkCrossReferences(plan));
 	const coverage = computeCoverage(plan);

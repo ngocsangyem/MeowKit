@@ -16,7 +16,14 @@ interface SeedSource {
 }
 
 const SEED_SOURCES: SeedSource[] = [
-	{ file: "fixes.json", scope: "fixes", consumer: "mk:fix", itemsKey: "patterns", mdSources: ["fixes.md"], category: "bug-class" },
+	{
+		file: "fixes.json",
+		scope: "fixes",
+		consumer: "mk:fix",
+		itemsKey: "patterns",
+		mdSources: ["fixes.md"],
+		category: "bug-class",
+	},
 	{
 		file: "review-patterns.json",
 		scope: "review-patterns",

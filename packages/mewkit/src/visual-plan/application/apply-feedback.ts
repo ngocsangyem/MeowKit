@@ -38,7 +38,11 @@ export function checkBatchFresh(planDir: string, batchId: string): FreshnessResu
 	if (!parsed.success) return { ok: false, reason: "artifact not schema-valid" };
 	const currentHash = etagFromFile(artifactPath(planDir));
 	if (batch.baseRevision !== parsed.data.revision || batch.baseHash !== currentHash) {
-		return { ok: false, stale: true, reason: `batch base (rev ${batch.baseRevision}) no longer matches artifact (rev ${parsed.data.revision}) — regenerate feedback` };
+		return {
+			ok: false,
+			stale: true,
+			reason: `batch base (rev ${batch.baseRevision}) no longer matches artifact (rev ${parsed.data.revision}) — regenerate feedback`,
+		};
 	}
 	return { ok: true };
 }
@@ -59,7 +63,8 @@ export function recordResolution(planDir: string, batchId: string, entries: unkn
 	if (!isValidFeedbackBatchId(batchId)) return { ok: false, error: `invalid batch id: ${JSON.stringify(batchId)}` };
 	const batch = readBatch(planDir, batchId);
 	if (!batch) return { ok: false, error: `batch ${batchId} not found or invalid` };
-	if (receiptExists(planDir, batchId)) return { ok: false, error: `batch ${batchId} already resolved (receipt exists)` };
+	if (receiptExists(planDir, batchId))
+		return { ok: false, error: `batch ${batchId} already resolved (receipt exists)` };
 	const read = readArtifactRaw(planDir);
 	if (read.error) return { ok: false, error: "no visual artifact" };
 	const parsed = VisualPlanSchema.safeParse(read.raw);
@@ -74,7 +79,8 @@ export function recordResolution(planDir: string, batchId: string, entries: unkn
 		resolvedAt: nowIso(),
 		entries,
 	});
-	if (!receipt.success) return { ok: false, error: `invalid receipt entries: ${receipt.error.issues[0]?.message ?? "schema"}` };
+	if (!receipt.success)
+		return { ok: false, error: `invalid receipt entries: ${receipt.error.issues[0]?.message ?? "schema"}` };
 	if (!writeReceipt(planDir, receipt.data)) return { ok: false, error: `receipt for ${batchId} already exists` };
 
 	// Clear the batch from the pending list (it is now resolved). When none remain,
@@ -87,5 +93,9 @@ export function recordResolution(planDir: string, batchId: string, entries: unkn
 	writeArtifact(planDir, plan);
 	writeVisualBlock(planDir, buildVisualBlock(plan, planDir));
 
-	return { ok: true, receiptPath: `visual-plan/resolutions/${batchId}.json`, reopenCommand: `mewkit visual-plan edit ${planDir}` };
+	return {
+		ok: true,
+		receiptPath: `visual-plan/resolutions/${batchId}.json`,
+		reopenCommand: `mewkit visual-plan edit ${planDir}`,
+	};
 }

@@ -13,11 +13,17 @@ describe("runtime compatibility audit", () => {
 			{ name: "bootstrap", type: "hooks" },
 			"droid",
 		);
-		expect(result.errors).toEqual(expect.arrayContaining([expect.stringContaining("Claude-specific environment variable")]));
+		expect(result.errors).toEqual(
+			expect.arrayContaining([expect.stringContaining("Claude-specific environment variable")]),
+		);
 	});
 
 	it("ignores Claude-specific content when target is claude-code", () => {
-		const result = auditRuntimeCompatibility("See .claude/hooks/test.cjs", { name: "test", type: "hooks" }, "claude-code");
+		const result = auditRuntimeCompatibility(
+			"See .claude/hooks/test.cjs",
+			{ name: "test", type: "hooks" },
+			"claude-code",
+		);
 		expect(result.errors).toEqual([]);
 	});
 
@@ -33,6 +39,8 @@ describe("runtime compatibility audit", () => {
 			"codex",
 		);
 		expect(result.errors).toEqual([]);
-		expect(result.warnings).toEqual(expect.arrayContaining([expect.stringContaining("Claude-specific environment variable")]));
+		expect(result.warnings).toEqual(
+			expect.arrayContaining([expect.stringContaining("Claude-specific environment variable")]),
+		);
 	});
 });

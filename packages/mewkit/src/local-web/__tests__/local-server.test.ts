@@ -54,11 +54,14 @@ function request(opts: { method?: string; path?: string; host?: string; body?: s
 	return new Promise((resolve, reject) => {
 		const headers: Record<string, string> = {};
 		if (opts.host) headers.Host = opts.host;
-		const req = http.request({ hostname: "127.0.0.1", port, method: opts.method ?? "GET", path: opts.path ?? "/", headers }, (res) => {
-			let body = "";
-			res.on("data", (c) => (body += c));
-			res.on("end", () => resolve({ status: res.statusCode ?? 0, body }));
-		});
+		const req = http.request(
+			{ hostname: "127.0.0.1", port, method: opts.method ?? "GET", path: opts.path ?? "/", headers },
+			(res) => {
+				let body = "";
+				res.on("data", (c) => (body += c));
+				res.on("end", () => resolve({ status: res.statusCode ?? 0, body }));
+			},
+		);
 		req.on("error", reject);
 		if (opts.body) req.write(opts.body);
 		req.end();

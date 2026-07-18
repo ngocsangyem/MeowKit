@@ -54,7 +54,10 @@ export function validateCapabilities(claudeDir: string): CapabilityIssue[] {
 }
 
 /** Pure validation over a built manifest + inventory. Injectable for testing. */
-export function validateCapabilityEntries(entries: CapabilityEntry[], inventoryEntries: InventoryEntry[]): CapabilityIssue[] {
+export function validateCapabilityEntries(
+	entries: CapabilityEntry[],
+	inventoryEntries: InventoryEntry[],
+): CapabilityIssue[] {
 	const issues: CapabilityIssue[] = [];
 
 	const invById = new Map(inventoryEntries.map((e) => [e.id, e]));
@@ -76,9 +79,17 @@ export function validateCapabilityEntries(entries: CapabilityEntry[], inventoryE
 		if (c.inventoryId !== null && c.sourcePath !== null) {
 			const inv = invById.get(c.inventoryId);
 			if (!inv) {
-				issues.push({ level: "error", capabilityId: c.id, message: `inventoryId has no matching inventory entry: ${c.inventoryId}` });
+				issues.push({
+					level: "error",
+					capabilityId: c.id,
+					message: `inventoryId has no matching inventory entry: ${c.inventoryId}`,
+				});
 			} else if (inv.owner && c.owner && inv.owner !== c.owner) {
-				issues.push({ level: "error", capabilityId: c.id, message: `denormalized owner "${c.owner}" disagrees with inventory "${inv.owner}"` });
+				issues.push({
+					level: "error",
+					capabilityId: c.id,
+					message: `denormalized owner "${c.owner}" disagrees with inventory "${inv.owner}"`,
+				});
 			}
 		}
 
@@ -90,7 +101,8 @@ export function validateCapabilityEntries(entries: CapabilityEntry[], inventoryE
 		// alias uniqueness across entries
 		for (const a of c.aliases) {
 			const prior = aliasOwners.get(a);
-			if (prior && prior !== c.id) issues.push({ level: "error", capabilityId: c.id, message: `alias "${a}" also on ${prior}` });
+			if (prior && prior !== c.id)
+				issues.push({ level: "error", capabilityId: c.id, message: `alias "${a}" also on ${prior}` });
 			aliasOwners.set(a, c.id);
 		}
 
@@ -102,7 +114,11 @@ export function validateCapabilityEntries(entries: CapabilityEntry[], inventoryE
 
 	for (const [intent, owners] of intentOwners) {
 		if (owners.length > 1) {
-			issues.push({ level: "warn", capabilityId: null, message: `intent "${intent}" maps to multiple capabilities: ${owners.join(", ")}` });
+			issues.push({
+				level: "warn",
+				capabilityId: null,
+				message: `intent "${intent}" maps to multiple capabilities: ${owners.join(", ")}`,
+			});
 		}
 	}
 
@@ -111,7 +127,11 @@ export function validateCapabilityEntries(entries: CapabilityEntry[], inventoryE
 	for (const c of entries) {
 		for (const dep of c.dependencies.upstream) {
 			if (!capIds.has(dep)) {
-				issues.push({ level: "warn", capabilityId: c.id, message: `upstream dependency has no matching capability: ${dep}` });
+				issues.push({
+					level: "warn",
+					capabilityId: c.id,
+					message: `upstream dependency has no matching capability: ${dep}`,
+				});
 			}
 		}
 	}
@@ -135,7 +155,11 @@ export function validateCapabilityEntries(entries: CapabilityEntry[], inventoryE
 	// against a rename is the resolver test asserting every authored phrase resolves to its owner.
 	for (const key of Object.keys(AUTHORED_INTENTS)) {
 		if (!capIds.has(key)) {
-			issues.push({ level: "warn", capabilityId: key, message: `AUTHORED_INTENTS key has no matching capability (partial install or renamed skill): ${key}` });
+			issues.push({
+				level: "warn",
+				capabilityId: key,
+				message: `AUTHORED_INTENTS key has no matching capability (partial install or renamed skill): ${key}`,
+			});
 		}
 	}
 
@@ -144,7 +168,11 @@ export function validateCapabilityEntries(entries: CapabilityEntry[], inventoryE
 	// silently drops the context requirement from a source-grounded flow.
 	for (const key of Object.keys(AUTHORED_CONTEXT_REQUIREMENTS)) {
 		if (!capIds.has(key)) {
-			issues.push({ level: "warn", capabilityId: key, message: `AUTHORED_CONTEXT_REQUIREMENTS key has no matching capability (partial install or renamed skill): ${key}` });
+			issues.push({
+				level: "warn",
+				capabilityId: key,
+				message: `AUTHORED_CONTEXT_REQUIREMENTS key has no matching capability (partial install or renamed skill): ${key}`,
+			});
 		}
 	}
 

@@ -24,7 +24,10 @@ function makeClaudeDir(): string {
 		mkdirSync(join(c, rel, ".."), { recursive: true });
 		writeFileSync(join(c, rel), body);
 	};
-	w("skills/foo/SKILL.md", "---\nname: mk:foo\ndescription: Foo skill\nowner: lifecycle\nkeywords:\n  - alpha\n  - beta\nwhen_to_use: use foo\n---\n# Foo\n");
+	w(
+		"skills/foo/SKILL.md",
+		"---\nname: mk:foo\ndescription: Foo skill\nowner: lifecycle\nkeywords:\n  - alpha\n  - beta\nwhen_to_use: use foo\n---\n# Foo\n",
+	);
 	w("agents/bar.md", "---\nname: bar\ndescription: Bar agent\nowner: review\n---\n# Bar\n");
 	w("commands/mk/baz.md", "# baz\n");
 	w("hooks/qux.sh", "#!/bin/bash\nexit 0\n");
@@ -78,7 +81,10 @@ describe("buildCapabilities", () => {
 	it("covers 100% of enumerated invocable-kind artifacts", () => {
 		const claudeDir = makeClaudeDir();
 		const { refs } = enumerateArtifacts(claudeDir);
-		const expected = refs.filter((r) => r.type !== "rule").map((r) => r.rel).sort();
+		const expected = refs
+			.filter((r) => r.type !== "rule")
+			.map((r) => r.rel)
+			.sort();
 		const covered = buildCapabilities(claudeDir)
 			.map((c) => c.sourcePath)
 			.filter((p): p is string => p !== null)
@@ -103,8 +109,14 @@ describe("contextRequirement overlay (Phase 5 slice 2)", () => {
 			mkdirSync(join(c, rel, ".."), { recursive: true });
 			writeFileSync(join(c, rel), body);
 		};
-		w("skills/cook/SKILL.md", "---\nname: mk:cook\ndescription: Build\nkeywords:\n  - build\nwhen_to_use: build\n---\n# Cook\n");
-		w("skills/ship/SKILL.md", "---\nname: mk:ship\ndescription: Ship\nkeywords:\n  - ship\nwhen_to_use: ship\n---\n# Ship\n");
+		w(
+			"skills/cook/SKILL.md",
+			"---\nname: mk:cook\ndescription: Build\nkeywords:\n  - build\nwhen_to_use: build\n---\n# Cook\n",
+		);
+		w(
+			"skills/ship/SKILL.md",
+			"---\nname: mk:ship\ndescription: Ship\nkeywords:\n  - ship\nwhen_to_use: ship\n---\n# Ship\n",
+		);
 		return c;
 	}
 
@@ -217,14 +229,30 @@ describe("validateCapabilityEntries (pure)", () => {
 	});
 
 	it("warns on a dangling upstream dependency (no matching capability)", () => {
-		const issues = validateCapabilityEntries([base({ dependencies: { upstream: ["ghost"], downstream: [] } })], [inv({})]);
+		const issues = validateCapabilityEntries(
+			[base({ dependencies: { upstream: ["ghost"], downstream: [] } })],
+			[inv({})],
+		);
 		expect(issues.some((i) => i.level === "warn" && /no matching capability: ghost/.test(i.message))).toBe(true);
 	});
 
 	it("errors on a dependency cycle", () => {
-		const a = base({ id: "a", inventoryId: "a", sourcePath: "skills/a/SKILL.md", dependencies: { upstream: ["b"], downstream: [] } });
-		const b = base({ id: "b", inventoryId: "b", sourcePath: "skills/b/SKILL.md", dependencies: { upstream: ["a"], downstream: [] } });
-		const issues = validateCapabilityEntries([a, b], [inv({ id: "a", path: "skills/a/SKILL.md" }), inv({ id: "b", path: "skills/b/SKILL.md" })]);
+		const a = base({
+			id: "a",
+			inventoryId: "a",
+			sourcePath: "skills/a/SKILL.md",
+			dependencies: { upstream: ["b"], downstream: [] },
+		});
+		const b = base({
+			id: "b",
+			inventoryId: "b",
+			sourcePath: "skills/b/SKILL.md",
+			dependencies: { upstream: ["a"], downstream: [] },
+		});
+		const issues = validateCapabilityEntries(
+			[a, b],
+			[inv({ id: "a", path: "skills/a/SKILL.md" }), inv({ id: "b", path: "skills/b/SKILL.md" })],
+		);
 		expect(issues.some((i) => i.level === "error" && /cycle/.test(i.message))).toBe(true);
 	});
 });

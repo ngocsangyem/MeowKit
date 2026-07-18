@@ -10,14 +10,18 @@ export const githubCopilotContract: ProviderCapabilityRegistryEntry = {
 	docs: COPILOT_DOCS,
 	lastVerified: LAST_VERIFIED,
 	surfaces: {
-		agent: documented(["https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents"]),
+		agent: documented([
+			"https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents",
+		]),
 		config: documented(["https://docs.github.com/en/copilot/reference/custom-instructions-support"]),
 		rules: documented(["https://docs.github.com/en/copilot/reference/custom-instructions-support"]),
 	},
 	capabilities: buildCapabilities(COPILOT_DOCS, {
 		instruction_files: documented(["https://docs.github.com/en/copilot/reference/custom-instructions-support"]),
 		rules: documented(["https://docs.github.com/en/copilot/reference/custom-instructions-support"]),
-		agents: documented(["https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents"]),
+		agents: documented([
+			"https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents",
+		]),
 		hooks: partial(
 			["https://docs.github.com/en/copilot/reference/custom-instructions-support"],
 			"GitHub documents hooks in broader Copilot surfaces, but a repo-local migration contract was not verified in the sources used here.",
@@ -34,7 +38,9 @@ export const githubCopilotContract: ProviderCapabilityRegistryEntry = {
 			["https://docs.github.com/en/copilot/reference/custom-instructions-support"],
 			"MCP support is documented broadly for Copilot, but a repo-local migration contract was not verified in the sources used here.",
 		),
-		orchestration: documented(["https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents"]),
+		orchestration: documented([
+			"https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents",
+		]),
 		persistent_context: documented(["https://docs.github.com/en/copilot/reference/custom-instructions-support"]),
 		workspace_config: documented(["https://docs.github.com/en/copilot/reference/custom-instructions-support"]),
 	}),

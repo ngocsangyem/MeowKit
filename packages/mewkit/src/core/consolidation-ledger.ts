@@ -50,13 +50,16 @@ const NO_RUNTIME = "none yet — no runtime traces or transition release in this
 export const CONSOLIDATION_LEDGER: ConsolidationCandidate[] = [
 	{
 		id: "generated-tables",
-		purpose: "Trigger/capability tables + contributor indexes rendered FROM the registry (the manual docs/architecture/trigger-registry.md drifts).",
+		purpose:
+			"Trigger/capability tables + contributor indexes rendered FROM the registry (the manual docs/architecture/trigger-registry.md drifts).",
 		status: "canonical",
-		staticEvidence: "generate-capability-view.ts renders the table + declares region markers for an in-place splice/drift-check; the registry (buildCapabilities) is the source of truth.",
+		staticEvidence:
+			"generate-capability-view.ts renders the table + declares region markers for an in-place splice/drift-check; the registry (buildCapabilities) is the source of truth.",
 		runtimeEvidence: NO_RUNTIME,
 		externalConsumerRisk: "low",
 		confidence: "high",
-		transitionBehavior: "Splice the generated region into the doc between markers; CI drift-checks that region. Human rationale stays OUTSIDE the generated region.",
+		transitionBehavior:
+			"Splice the generated region into the doc between markers; CI drift-checks that region. Human rationale stays OUTSIDE the generated region.",
 		rollback: "Remove the spliced region; the manual doc remains readable.",
 		verification: "capability view unit-tested; doc splice + drift-check not yet wired.",
 		deletionThisPhase: false,
@@ -70,7 +73,8 @@ export const CONSOLIDATION_LEDGER: ConsolidationCandidate[] = [
 		runtimeEvidence: NO_RUNTIME,
 		externalConsumerRisk: "medium",
 		confidence: "low",
-		transitionBehavior: "Prune from the plugin payload only after confirming no dynamic consumer; keep in the authoring repo.",
+		transitionBehavior:
+			"Prune from the plugin payload only after confirming no dynamic consumer; keep in the authoring repo.",
 		rollback: "Re-include the index in the plugin payload build.",
 		verification: "plugin payload check not yet run for this candidate.",
 		deletionThisPhase: false,
@@ -84,7 +88,8 @@ export const CONSOLIDATION_LEDGER: ConsolidationCandidate[] = [
 		runtimeEvidence: NO_RUNTIME,
 		externalConsumerRisk: "medium",
 		confidence: "medium",
-		transitionBehavior: "Retire legacy WRITES only after the rollback window; keep cheap legacy READS for version-skipping consumers.",
+		transitionBehavior:
+			"Retire legacy WRITES only after the rollback window; keep cheap legacy READS for version-skipping consumers.",
 		rollback: "Re-enable the legacy writer (kept behind the read path).",
 		verification: "upgrade/migrate suites green; rollback window not yet elapsed.",
 		deletionThisPhase: false,
@@ -94,11 +99,13 @@ export const CONSOLIDATION_LEDGER: ConsolidationCandidate[] = [
 		id: "json-canonical-memory",
 		purpose: "JSON as the canonical memory WRITE path; Markdown as generated views.",
 		status: "canonical",
-		staticEvidence: "memory-read-rules.md: JSON is canonical, .md are generated views (mewkit memory render-views); permanent .md fallback for pre-migration projects.",
+		staticEvidence:
+			"memory-read-rules.md: JSON is canonical, .md are generated views (mewkit memory render-views); permanent .md fallback for pre-migration projects.",
 		runtimeEvidence: NO_RUNTIME,
 		externalConsumerRisk: "medium",
 		confidence: "medium",
-		transitionBehavior: "Keep generated MD views + permanent .md fallback until every CLI/skill/agent consumer is proven to read JSON.",
+		transitionBehavior:
+			"Keep generated MD views + permanent .md fallback until every CLI/skill/agent consumer is proven to read JSON.",
 		rollback: "Fallback to .md read path (already permanent).",
 		verification: "render-views exists; full consumer audit pending.",
 		deletionThisPhase: false,
@@ -108,11 +115,13 @@ export const CONSOLIDATION_LEDGER: ConsolidationCandidate[] = [
 		id: "substrate",
 		purpose: "Responsibility-substrate coverage view (inventory --substrate).",
 		status: "authoring-only",
-		staticEvidence: "substrate.ts renders a coverage view for authoring/audit; no production runtime path depends on it.",
+		staticEvidence:
+			"substrate.ts renders a coverage view for authoring/audit; no production runtime path depends on it.",
 		runtimeEvidence: NO_RUNTIME,
 		externalConsumerRisk: "low",
 		confidence: "medium",
-		transitionBehavior: "Classify authoring-only; keep available, not shipped as a production capability, until a real consumer justifies production status.",
+		transitionBehavior:
+			"Classify authoring-only; keep available, not shipped as a production capability, until a real consumer justifies production status.",
 		rollback: "n/a — no removal; reclassify if a consumer appears.",
 		verification: "substrate view unit-tested; no production consumer identified.",
 		deletionThisPhase: false,
@@ -122,11 +131,13 @@ export const CONSOLIDATION_LEDGER: ConsolidationCandidate[] = [
 		id: "orchviz",
 		purpose: "Orchestration visualization surface (removed).",
 		status: "experimental",
-		staticEvidence: "orchviz command REMOVED 2026-07 (superseded by mk:visual-plan + the local-web primitives); it was experimental with no production consumer.",
+		staticEvidence:
+			"orchviz command REMOVED 2026-07 (superseded by mk:visual-plan + the local-web primitives); it was experimental with no production consumer.",
 		runtimeEvidence: NO_RUNTIME,
 		externalConsumerRisk: "low",
 		confidence: "low",
-		transitionBehavior: "Removed; the reusable loopback primitives were extracted to src/local-web/ and the studio to mk:visual-plan.",
+		transitionBehavior:
+			"Removed; the reusable loopback primitives were extracted to src/local-web/ and the studio to mk:visual-plan.",
 		rollback: "Reintroduction is a separate product decision; Visual Plan must never depend on it.",
 		verification: "removal verified: no orchviz imports remain; full suite green.",
 		deletionThisPhase: false,
@@ -136,11 +147,13 @@ export const CONSOLIDATION_LEDGER: ConsolidationCandidate[] = [
 		id: "trace-index",
 		purpose: "Opt-in derived SQLite index over the append logs (mewkit index/query).",
 		status: "experimental",
-		staticEvidence: "derived-index.ts builds a disposable index; logs stay canonical; dead-weight-audit-rules flags it a WATCH/prune candidate until a cross-run aggregate need is demonstrated.",
+		staticEvidence:
+			"derived-index.ts builds a disposable index; logs stay canonical; dead-weight-audit-rules flags it a WATCH/prune candidate until a cross-run aggregate need is demonstrated.",
 		runtimeEvidence: NO_RUNTIME,
 		externalConsumerRisk: "low",
 		confidence: "medium",
-		transitionBehavior: "Keep experimental/opt-in; the index is rebuildable, so removal is always safe once disuse is shown.",
+		transitionBehavior:
+			"Keep experimental/opt-in; the index is rebuildable, so removal is always safe once disuse is shown.",
 		rollback: "Rebuild the index from canonical logs.",
 		verification: "index build unit-tested; no demonstrated cross-run aggregate consumer.",
 		deletionThisPhase: false,
@@ -164,7 +177,8 @@ export const CONSOLIDATION_LEDGER: ConsolidationCandidate[] = [
 		id: "state-stores",
 		purpose: "task/checkpoint/progress state stores whose names overlap.",
 		status: "undecided",
-		staticEvidence: "Phase 4 task record + existing checkpoint/progress files coexist; name overlap is not proof of duplication.",
+		staticEvidence:
+			"Phase 4 task record + existing checkpoint/progress files coexist; name overlap is not proof of duplication.",
 		runtimeEvidence: NO_RUNTIME,
 		externalConsumerRisk: "medium",
 		confidence: "low",

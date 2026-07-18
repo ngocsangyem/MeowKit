@@ -119,7 +119,11 @@ const SCHEMA = JSON.stringify({
 	},
 });
 
-async function makeHarness(manifestObj: unknown, dependsOn?: string[], dependencyEdges?: Array<{ id: string; type: string }>): Promise<string> {
+async function makeHarness(
+	manifestObj: unknown,
+	dependsOn?: string[],
+	dependencyEdges?: Array<{ id: string; type: string }>,
+): Promise<string> {
 	const root = await mkdtemp(join(tmpdir(), "mewkit-pack-"));
 	tempDirs.push(root);
 	const c = join(root, ".claude");
@@ -129,7 +133,10 @@ async function makeHarness(manifestObj: unknown, dependsOn?: string[], dependenc
 		`---\nname: ${name}\nowner: lifecycle\ncriticality: medium\nstatus: active\nruntime: claude-code\n${edges ? `dependency_edges:\n${edges.map((edge) => `  - id: ${edge.id}\n    type: ${edge.type}`).join("\n")}\n` : ""}${deps ? `depends_on: [${deps.join(", ")}]\n` : ""}---\n# body\n`;
 	for (const id of ["mk:a", "mk:b"]) {
 		await mkdir(join(c, "skills", id.replace("mk:", "")), { recursive: true });
-		await writeFile(join(c, "skills", id.replace("mk:", ""), "SKILL.md"), fm(id, id === "mk:a" ? dependsOn : undefined, id === "mk:a" ? dependencyEdges : undefined));
+		await writeFile(
+			join(c, "skills", id.replace("mk:", ""), "SKILL.md"),
+			fm(id, id === "mk:a" ? dependsOn : undefined, id === "mk:a" ? dependencyEdges : undefined),
+		);
 	}
 	await writeFile(join(c, "harness-inventory.json"), JSON.stringify({ schema_version: 1, artifacts: {} }));
 	await writeFile(join(c, "pack-manifest.json"), JSON.stringify(manifestObj));
@@ -166,7 +173,9 @@ describe("resolver edge cases (synthetic)", () => {
 	});
 
 	it("runs closure for a typed requires edge without legacy depends_on", async () => {
-		const c = await makeHarness(SYNTH_MANIFEST({ p: { artifactsAdd: ["mk:a"] } }, { only: ["p"] }), undefined, [{ id: "mk:b", type: "requires" }]);
+		const c = await makeHarness(SYNTH_MANIFEST({ p: { artifactsAdd: ["mk:a"] } }, { only: ["p"] }), undefined, [
+			{ id: "mk:b", type: "requires" },
+		]);
 		const m = loadPackManifest(c);
 		const set = resolveProfile(c, m, "only");
 		expect(set.has("skills/a/SKILL.md")).toBe(true);

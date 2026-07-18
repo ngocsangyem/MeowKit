@@ -14,7 +14,17 @@ afterEach(async () => {
 });
 
 function page(id: string, title: string, body: string): string {
-	return "---\nid: " + id + "\nslug: " + id.split("/")[0] + "\ntitle: " + title + "\nstate: committed\norigin: human\n---\n" + body + "\n";
+	return (
+		"---\nid: " +
+		id +
+		"\nslug: " +
+		id.split("/")[0] +
+		"\ntitle: " +
+		title +
+		"\nstate: committed\norigin: human\n---\n" +
+		body +
+		"\n"
+	);
 }
 
 /** Full v3 fixture: a page, a candidate with two sourceIds, two sources, one handoff record. */
@@ -26,15 +36,29 @@ async function makeV3Wiki(): Promise<string> {
 	const dir = join(root, "tasks", "wikis", "demo");
 	await mkdir(join(dir, "pages"), { recursive: true });
 	await writeFile(join(dir, "wiki.json"), JSON.stringify({ slug: "demo", title: "Demo" }));
-	await writeFile(join(dir, "pages", "intro.md"), page("demo/intro", "Salience Rubric", "The salience rubric scores candidates."));
+	await writeFile(
+		join(dir, "pages", "intro.md"),
+		page("demo/intro", "Salience Rubric", "The salience rubric scores candidates."),
+	);
 	await writeFile(
 		join(dir, "candidates.jsonl"),
-		JSON.stringify({ id: "demo/c1", slug: "demo", origin: "agent", title: "T", content: "B", state: "proposed", sourceIds: ["s1", "s2"], salience: { total: 9, components: { explicit_user_intent: 3 } } }) + "\n",
+		JSON.stringify({
+			id: "demo/c1",
+			slug: "demo",
+			origin: "agent",
+			title: "T",
+			content: "B",
+			state: "proposed",
+			sourceIds: ["s1", "s2"],
+			salience: { total: 9, components: { explicit_user_intent: 3 } },
+		}) + "\n",
 	);
 	await writeFile(
 		join(dir, "sources.jsonl"),
-		JSON.stringify({ id: "s1", kind: "internal", url: "tasks/reports/a.md" }) + "\n" +
-			JSON.stringify({ id: "s2", kind: "internal", url: "tasks/reports/b.md" }) + "\n",
+		JSON.stringify({ id: "s1", kind: "internal", url: "tasks/reports/a.md" }) +
+			"\n" +
+			JSON.stringify({ id: "s2", kind: "internal", url: "tasks/reports/b.md" }) +
+			"\n",
 	);
 	await writeFile(
 		join(dir, "handoffs.jsonl"),
@@ -52,7 +76,10 @@ async function makeV3Wiki(): Promise<string> {
 			reuseScope: "lifecycle",
 			verificationState: "verified",
 			riskScore: 0,
-			salience: { total: 9, components: { verified_outcome: 3, source_quality: 2, future_reuse_likelihood: 2, blast_radius: 2 } },
+			salience: {
+				total: 9,
+				components: { verified_outcome: 3, source_quality: 2, future_reuse_likelihood: 2, blast_radius: 2 },
+			},
 			decisionKind: "propose-candidate",
 			candidateId: "demo/c1",
 			status: "proposed",
@@ -71,10 +98,22 @@ async function makeAspireShapedWiki(): Promise<string> {
 	const dir = join(root, "tasks", "wikis", "aspire-cf");
 	await mkdir(join(dir, "pages"), { recursive: true });
 	await writeFile(join(dir, "wiki.json"), JSON.stringify({ slug: "aspire-cf", title: "Aspire CF" }));
-	await writeFile(join(dir, "pages", "backend-infra.md"), page("aspire-cf/backend", "Backend Infra", "The backend infra notes."));
+	await writeFile(
+		join(dir, "pages", "backend-infra.md"),
+		page("aspire-cf/backend", "Backend Infra", "The backend infra notes."),
+	);
 	await writeFile(
 		join(dir, "candidates.jsonl"),
-		JSON.stringify({ id: "aspire-cf/c1", slug: "aspire-cf", origin: "human", title: "T", content: "B", state: "proposed", sourceIds: [], salience: { total: 10, components: {} } }) + "\n",
+		JSON.stringify({
+			id: "aspire-cf/c1",
+			slug: "aspire-cf",
+			origin: "human",
+			title: "T",
+			content: "B",
+			state: "proposed",
+			sourceIds: [],
+			salience: { total: 10, components: {} },
+		}) + "\n",
 	);
 	return claudeDir;
 }
@@ -83,7 +122,9 @@ function tableNames(file: string, names: string[]): string[] {
 	const db = new DatabaseSync(file, { readOnly: true });
 	try {
 		const rows = db
-			.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name IN (" + names.map(() => "?").join(",") + ")")
+			.prepare(
+				"SELECT name FROM sqlite_master WHERE type = 'table' AND name IN (" + names.map(() => "?").join(",") + ")",
+			)
 			.all(...names) as { name: string }[];
 		return rows.map((r) => r.name).sort();
 	} finally {
@@ -97,7 +138,10 @@ describe("migration v3 — fresh build", () => {
 		const res = buildIndex(claudeDir);
 		expect(res.schemaVersion).toBe(3);
 		expect(SCHEMA_VERSION).toBe(3);
-		expect(tableNames(dbPath(claudeDir), ["wiki_handoff", "wiki_candidate_source"])).toEqual(["wiki_candidate_source", "wiki_handoff"]);
+		expect(tableNames(dbPath(claudeDir), ["wiki_handoff", "wiki_candidate_source"])).toEqual([
+			"wiki_candidate_source",
+			"wiki_handoff",
+		]);
 	});
 
 	it("ingests handoffs.jsonl with salience flattened to total + json", async () => {
@@ -106,7 +150,11 @@ describe("migration v3 — fresh build", () => {
 		expect(res.wiki.handoffs).toBe(1);
 		const db = new DatabaseSync(dbPath(claudeDir), { readOnly: true });
 		try {
-			const row = db.prepare("SELECT skill_name, salience_total, salience_json, candidate_id, status FROM wiki_handoff WHERE id = ?").get("demo/ho1") as {
+			const row = db
+				.prepare(
+					"SELECT skill_name, salience_total, salience_json, candidate_id, status FROM wiki_handoff WHERE id = ?",
+				)
+				.get("demo/ho1") as {
 				skill_name: string;
 				salience_total: number;
 				salience_json: string;
@@ -129,7 +177,11 @@ describe("migration v3 — fresh build", () => {
 		expect(res.wiki.candidateSources).toBe(2);
 		const db = new DatabaseSync(dbPath(claudeDir), { readOnly: true });
 		try {
-			const n = (db.prepare("SELECT COUNT(*) AS n FROM wiki_candidate_source WHERE candidate_id = ?").get("demo/c1") as { n: number }).n;
+			const n = (
+				db.prepare("SELECT COUNT(*) AS n FROM wiki_candidate_source WHERE candidate_id = ?").get("demo/c1") as {
+					n: number;
+				}
+			).n;
 			expect(n).toBe(2);
 		} finally {
 			db.close();
@@ -170,25 +222,24 @@ describe("migration v3 — Aspire-shaped v2 data", () => {
 		const seed = new DatabaseSync(file);
 		seed.exec("PRAGMA journal_mode = WAL");
 		seed.exec(WIKI_MIGRATION_SQL);
-		seed.prepare("INSERT INTO wiki_page (id, slug, title, path, content, state, origin, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(
-			"aspire-cf/backend",
-			"aspire-cf",
-			"Backend Infra",
-			"pages/backend-infra.md",
-			"The backend infra notes about salience.",
-			"committed",
-			"human",
-			null,
-			null,
-		);
-		seed.prepare("INSERT INTO wiki_candidate (id, slug, origin, title, content, state) VALUES (?, ?, ?, ?, ?, ?)").run(
-			"aspire-cf/c1",
-			"aspire-cf",
-			"human",
-			"T",
-			"B",
-			"proposed",
-		);
+		seed
+			.prepare(
+				"INSERT INTO wiki_page (id, slug, title, path, content, state, origin, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			)
+			.run(
+				"aspire-cf/backend",
+				"aspire-cf",
+				"Backend Infra",
+				"pages/backend-infra.md",
+				"The backend infra notes about salience.",
+				"committed",
+				"human",
+				null,
+				null,
+			);
+		seed
+			.prepare("INSERT INTO wiki_candidate (id, slug, origin, title, content, state) VALUES (?, ?, ?, ?, ?, ?)")
+			.run("aspire-cf/c1", "aspire-cf", "human", "T", "B", "proposed");
 		seed.exec("PRAGMA user_version = 2");
 		seed.close();
 
@@ -219,7 +270,13 @@ describe("migration v3 — query contract intact", () => {
 		await mkdir(join(claudeDir, "memory"), { recursive: true });
 		await writeFile(
 			join(claudeDir, "memory", "trace-log.jsonl"),
-			JSON.stringify({ schema_version: "1.0", ts: "2026-06-29T10:00:00Z", event: "friction", run_id: "r1", data: { responsibility: "verification" } }) + "\n",
+			JSON.stringify({
+				schema_version: "1.0",
+				ts: "2026-06-29T10:00:00Z",
+				event: "friction",
+				run_id: "r1",
+				data: { responsibility: "verification" },
+			}) + "\n",
 		);
 		buildIndex(claudeDir);
 		const q = queryIndex(claudeDir);

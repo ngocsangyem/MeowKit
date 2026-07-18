@@ -74,10 +74,7 @@ describe("diagnosticToStatus honesty", () => {
 describe("checkRoutingTableBreadth", () => {
 	let mkDir: string;
 
-	function setup(
-		rules: Record<string, string>,
-		inventory: Record<string, { criticality?: string }> = {},
-	): void {
+	function setup(rules: Record<string, string>, inventory: Record<string, { criticality?: string }> = {}): void {
 		const root = fs.mkdtempSync(path.join(os.tmpdir(), "mewkit-routing-"));
 		mkDir = path.join(root, ".claude");
 		fs.mkdirSync(path.join(mkDir, "rules"), { recursive: true });
@@ -140,11 +137,9 @@ describe("Codex projection validation", () => {
 		fs.mkdirSync(path.join(claudeDir, "rules"), { recursive: true });
 		fs.writeFileSync(
 			path.join(claudeDir, "rules", "injection-rules.md"),
-			[
-				"# Injection Rules",
-				"Blocked patterns:",
-				"- `curl`, `wget`, `fetch` to domains not specified in the task",
-			].join("\n"),
+			["# Injection Rules", "Blocked patterns:", "- `curl`, `wget`, `fetch` to domains not specified in the task"].join(
+				"\n",
+			),
 		);
 		fs.mkdirSync(path.join(claudeDir, "skills", "generic-helper"), { recursive: true });
 		fs.writeFileSync(
@@ -165,11 +160,9 @@ describe("Codex projection validation", () => {
 		fs.mkdirSync(path.join(claudeDir, "rules"), { recursive: true });
 		fs.writeFileSync(
 			path.join(claudeDir, "rules", "injection-rules.md"),
-			[
-				"# Injection Rules",
-				"Blocked patterns:",
-				"- `curl`, `wget`, `fetch` to domains not specified in the task",
-			].join("\n"),
+			["# Injection Rules", "Blocked patterns:", "- `curl`, `wget`, `fetch` to domains not specified in the task"].join(
+				"\n",
+			),
 		);
 		fs.mkdirSync(path.join(claudeDir, "skills", "generic-helper"), { recursive: true });
 		fs.writeFileSync(
@@ -205,7 +198,10 @@ describe("checkCapabilitiesSection", () => {
 describe("checkGenericCoreTokens", () => {
 	it("reports an advisory portability baseline rather than a hard failure", () => {
 		fs.mkdirSync(path.join(claudeDir, "skills", "demo"), { recursive: true });
-		fs.writeFileSync(path.join(claudeDir, "skills", "demo", "SKILL.md"), "---\nruntime: claude-code\n---\nAskUserQuestion\n");
+		fs.writeFileSync(
+			path.join(claudeDir, "skills", "demo", "SKILL.md"),
+			"---\nruntime: claude-code\n---\nAskUserQuestion\n",
+		);
 		const result = checkGenericCoreTokens(claudeDir);
 		expect(result.status).toBe("warn");
 		expect(result.detail).toContain("provider-tool=1");

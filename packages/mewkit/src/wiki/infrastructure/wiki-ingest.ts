@@ -98,20 +98,24 @@ function ingestSlug(db: DatabaseSync, root: string, slug: string, c: WikiIngestC
 	const linkStmt = db.prepare("INSERT OR IGNORE INTO wiki_link (from_page_id, to_page_id) VALUES (?, ?)");
 	const pagesDir = path.join(dir, "pages");
 	if (fs.existsSync(pagesDir)) {
-		for (const file of fs.readdirSync(pagesDir).filter((f) => f.endsWith(".md")).sort()) {
+		for (const file of fs
+			.readdirSync(pagesDir)
+			.filter((f) => f.endsWith(".md"))
+			.sort()) {
 			const { meta, body } = parseFrontmatter(fs.readFileSync(path.join(pagesDir, file), "utf-8"));
 			const id = s(meta["id"]) ?? `${slug}/${file}`;
-			const inserted = pageStmt.run(
-				id,
-				s(meta["slug"]) ?? slug,
-				s(meta["title"]) ?? file.replace(/\.md$/, ""),
-				`pages/${file}`,
-				body,
-				s(meta["state"]) ?? "committed",
-				s(meta["origin"]) ?? "human",
-				s(meta["createdAt"]),
-				s(meta["updatedAt"]),
-			).changes > 0;
+			const inserted =
+				pageStmt.run(
+					id,
+					s(meta["slug"]) ?? slug,
+					s(meta["title"]) ?? file.replace(/\.md$/, ""),
+					`pages/${file}`,
+					body,
+					s(meta["state"]) ?? "committed",
+					s(meta["origin"]) ?? "human",
+					s(meta["createdAt"]),
+					s(meta["updatedAt"]),
+				).changes > 0;
 			if (!inserted) continue; // duplicate id ignored — skip the page and its links
 			c.pages += 1;
 			const links = Array.isArray(meta["links"]) ? (meta["links"] as unknown[]) : [];
@@ -125,19 +129,25 @@ function ingestSlug(db: DatabaseSync, root: string, slug: string, c: WikiIngestC
 		}
 	}
 
-	const srcStmt = db.prepare("INSERT OR REPLACE INTO wiki_source (id, kind, url, title, fetched_at, content_hash) VALUES (?, ?, ?, ?, ?, ?)");
+	const srcStmt = db.prepare(
+		"INSERT OR REPLACE INTO wiki_source (id, kind, url, title, fetched_at, content_hash) VALUES (?, ?, ?, ?, ?, ?)",
+	);
 	for (const o of readJsonl(path.join(dir, "sources.jsonl"))) {
 		srcStmt.run(s(o["id"]), s(o["kind"]), s(o["url"]), s(o["title"]), s(o["fetchedAt"]), s(o["contentHash"]));
 		c.sources += 1;
 	}
 
-	const claimStmt = db.prepare("INSERT OR REPLACE INTO wiki_claim (id, text, external, source_id, page_id) VALUES (?, ?, ?, ?, ?)");
+	const claimStmt = db.prepare(
+		"INSERT OR REPLACE INTO wiki_claim (id, text, external, source_id, page_id) VALUES (?, ?, ?, ?, ?)",
+	);
 	for (const o of readJsonl(path.join(dir, "claims.jsonl"))) {
 		claimStmt.run(s(o["id"]), s(o["text"]), o["external"] ? 1 : 0, s(o["sourceId"]), s(o["pageId"]));
 		c.claims += 1;
 	}
 
-	const seedStmt = db.prepare("INSERT OR REPLACE INTO wiki_seed (id, query, kind, status, created_at) VALUES (?, ?, ?, ?, ?)");
+	const seedStmt = db.prepare(
+		"INSERT OR REPLACE INTO wiki_seed (id, query, kind, status, created_at) VALUES (?, ?, ?, ?, ?)",
+	);
 	for (const o of readJsonl(path.join(dir, "seeds.jsonl"))) {
 		seedStmt.run(s(o["id"]), s(o["query"]), s(o["kind"]), s(o["status"]), s(o["createdAt"]));
 		c.seeds += 1;
@@ -156,17 +166,40 @@ function ingestSlug(db: DatabaseSync, root: string, slug: string, c: WikiIngestC
 	for (const o of readJsonl(path.join(dir, "candidates.jsonl"))) {
 		const id = s(o["id"]);
 		const sal = (o["salience"] && typeof o["salience"] === "object" ? o["salience"] : {}) as Record<string, unknown>;
-		const comp = (sal["components"] && typeof sal["components"] === "object" ? sal["components"] : {}) as Record<string, unknown>;
+		const comp = (sal["components"] && typeof sal["components"] === "object" ? sal["components"] : {}) as Record<
+			string,
+			unknown
+		>;
 		candStmt.run(
-			id, s(o["slug"]) ?? slug, s(o["origin"]) ?? "agent", s(o["title"]) ?? "", s(o["content"]) ?? "",
-			s(o["whySave"]), s(o["evidence"]), n(o["noveltyDelta"]), s(o["reuseScope"]), s(o["verificationState"]),
-			n(o["riskScore"]), n(sal["total"]), s(o["state"]) ?? "proposed", s(o["createdAt"]), s(o["reviewAfter"]),
+			id,
+			s(o["slug"]) ?? slug,
+			s(o["origin"]) ?? "agent",
+			s(o["title"]) ?? "",
+			s(o["content"]) ?? "",
+			s(o["whySave"]),
+			s(o["evidence"]),
+			n(o["noveltyDelta"]),
+			s(o["reuseScope"]),
+			s(o["verificationState"]),
+			n(o["riskScore"]),
+			n(sal["total"]),
+			s(o["state"]) ?? "proposed",
+			s(o["createdAt"]),
+			s(o["reviewAfter"]),
 		);
 		if (id) {
 			salStmt.run(
-				id, n(comp["explicit_user_intent"]), n(comp["verified_outcome"]), n(comp["recurrence_or_friction"]),
-				n(comp["novelty_vs_existing_wiki"]), n(comp["future_reuse_likelihood"]), n(comp["source_quality"]),
-				n(comp["blast_radius"]), n(comp["security_risk_penalty"]), n(comp["staleness_penalty"]), n(sal["total"]),
+				id,
+				n(comp["explicit_user_intent"]),
+				n(comp["verified_outcome"]),
+				n(comp["recurrence_or_friction"]),
+				n(comp["novelty_vs_existing_wiki"]),
+				n(comp["future_reuse_likelihood"]),
+				n(comp["source_quality"]),
+				n(comp["blast_radius"]),
+				n(comp["security_risk_penalty"]),
+				n(comp["staleness_penalty"]),
+				n(sal["total"]),
 			);
 			const sourceIds = Array.isArray(o["sourceIds"]) ? (o["sourceIds"] as unknown[]) : [];
 			for (const src of sourceIds) {
@@ -177,7 +210,9 @@ function ingestSlug(db: DatabaseSync, root: string, slug: string, c: WikiIngestC
 		c.candidates += 1;
 	}
 
-	const intStmt = db.prepare("INSERT OR REPLACE INTO wiki_intervention (id, kind, candidate_id, reason, actor, created_at) VALUES (?, ?, ?, ?, ?, ?)");
+	const intStmt = db.prepare(
+		"INSERT OR REPLACE INTO wiki_intervention (id, kind, candidate_id, reason, actor, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+	);
 	for (const o of readJsonl(path.join(dir, "interventions.jsonl"))) {
 		intStmt.run(s(o["id"]), s(o["kind"]), s(o["candidateId"]), s(o["reason"]), s(o["actor"]), s(o["createdAt"]));
 		c.interventions += 1;
@@ -191,21 +226,49 @@ function ingestSlug(db: DatabaseSync, root: string, slug: string, c: WikiIngestC
 	);
 	for (const o of readJsonl(path.join(dir, "handoffs.jsonl"))) {
 		const sal = (o["salience"] && typeof o["salience"] === "object" ? o["salience"] : {}) as Record<string, unknown>;
-		const inserted = hoStmt.run(
-			s(o["id"]), s(o["slug"]) ?? slug, s(o["skillName"]) ?? "", s(o["skillOwner"]),
-			s(o["handoffClass"]) ?? "none", s(o["profile"]) ?? "none", s(o["artifactPath"]) ?? "", s(o["artifactHash"]) ?? "",
-			s(o["title"]) ?? "", s(o["whySave"]), s(o["evidence"]), s(o["reuseScope"]), s(o["verificationState"]),
-			n(o["riskScore"]), n(sal["total"]), JSON.stringify(o["salience"] ?? {}),
-			s(o["decisionKind"]), s(o["candidateId"]), s(o["pageId"]), s(o["status"]) ?? "suggested",
-			s(o["createdAt"]), s(o["reviewAfter"]),
-		).changes > 0;
+		const inserted =
+			hoStmt.run(
+				s(o["id"]),
+				s(o["slug"]) ?? slug,
+				s(o["skillName"]) ?? "",
+				s(o["skillOwner"]),
+				s(o["handoffClass"]) ?? "none",
+				s(o["profile"]) ?? "none",
+				s(o["artifactPath"]) ?? "",
+				s(o["artifactHash"]) ?? "",
+				s(o["title"]) ?? "",
+				s(o["whySave"]),
+				s(o["evidence"]),
+				s(o["reuseScope"]),
+				s(o["verificationState"]),
+				n(o["riskScore"]),
+				n(sal["total"]),
+				JSON.stringify(o["salience"] ?? {}),
+				s(o["decisionKind"]),
+				s(o["candidateId"]),
+				s(o["pageId"]),
+				s(o["status"]) ?? "suggested",
+				s(o["createdAt"]),
+				s(o["reviewAfter"]),
+			).changes > 0;
 		if (inserted) c.handoffs += 1;
 	}
 }
 
 /** Clear and rebuild every wiki table from the canonical tree. Returns row counts. */
 export function ingestWiki(db: DatabaseSync, projectRoot: string): WikiIngestCounts {
-	const counts: WikiIngestCounts = { wikis: 0, pages: 0, sources: 0, claims: 0, candidates: 0, seeds: 0, interventions: 0, links: 0, handoffs: 0, candidateSources: 0 };
+	const counts: WikiIngestCounts = {
+		wikis: 0,
+		pages: 0,
+		sources: 0,
+		claims: 0,
+		candidates: 0,
+		seeds: 0,
+		interventions: 0,
+		links: 0,
+		handoffs: 0,
+		candidateSources: 0,
+	};
 	for (const table of WIKI_TABLES) {
 		db.exec("DELETE FROM " + table); // table is a constant from WIKI_TABLES, never user input
 	}

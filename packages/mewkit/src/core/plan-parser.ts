@@ -75,7 +75,10 @@ function arrayField(fm: string[], key: string): string[] {
 	if (!raw) return [];
 	const inner = raw.replace(/^\[|\]$/g, "").trim();
 	if (!inner) return [];
-	return inner.split(",").map((s) => s.trim().replace(/^["']|["']$/g, "")).filter(Boolean);
+	return inner
+		.split(",")
+		.map((s) => s.trim().replace(/^["']|["']$/g, ""))
+		.filter(Boolean);
 }
 
 /** Count `- [ ]` / `- [x]` task boxes. */

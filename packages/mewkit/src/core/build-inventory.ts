@@ -119,7 +119,11 @@ export function enumerateArtifacts(claudeDir: string): { refs: ArtifactRef[]; is
 				const id = typeof fm.name === "string" ? fm.name : entry;
 				refs.push({ type: "skill", rel: `skills/${entry}/SKILL.md`, abs: skillMd, id, metaSource: "frontmatter" });
 			} else {
-				issues.push({ path: `skills/${entry}`, type: "unknown", problem: "skill directory has no SKILL.md (not a known runtime dir)" });
+				issues.push({
+					path: `skills/${entry}`,
+					type: "unknown",
+					problem: "skill directory has no SKILL.md (not a known runtime dir)",
+				});
 			}
 		}
 	}
@@ -128,21 +132,45 @@ export function enumerateArtifacts(claudeDir: string): { refs: ArtifactRef[]; is
 	const agentsDir = path.join(claudeDir, "agents");
 	for (const f of listMarkdown(agentsDir)) {
 		if (f.endsWith("_INDEX.md")) continue;
-		refs.push({ type: "agent", rel: `agents/${f}`, abs: path.join(agentsDir, f), id: f.replace(/\.md$/, ""), metaSource: "frontmatter" });
+		refs.push({
+			type: "agent",
+			rel: `agents/${f}`,
+			abs: path.join(agentsDir, f),
+			id: f.replace(/\.md$/, ""),
+			metaSource: "frontmatter",
+		});
 	}
 
 	// rules + rules-conditional — separate buckets, registry-sourced
 	for (const f of listMarkdown(path.join(claudeDir, "rules"))) {
-		refs.push({ type: "rule", rel: `rules/${f}`, abs: path.join(claudeDir, "rules", f), id: f.replace(/\.md$/, ""), metaSource: "registry" });
+		refs.push({
+			type: "rule",
+			rel: `rules/${f}`,
+			abs: path.join(claudeDir, "rules", f),
+			id: f.replace(/\.md$/, ""),
+			metaSource: "registry",
+		});
 	}
 	for (const f of listMarkdown(path.join(claudeDir, "rules-conditional"))) {
-		refs.push({ type: "rule", rel: `rules-conditional/${f}`, abs: path.join(claudeDir, "rules-conditional", f), id: f.replace(/\.md$/, ""), metaSource: "registry" });
+		refs.push({
+			type: "rule",
+			rel: `rules-conditional/${f}`,
+			abs: path.join(claudeDir, "rules-conditional", f),
+			id: f.replace(/\.md$/, ""),
+			metaSource: "registry",
+		});
 	}
 
 	// commands — commands/mk/*.md, registry-sourced
 	const cmdDir = path.join(claudeDir, "commands", "mk");
 	for (const f of listMarkdown(cmdDir)) {
-		refs.push({ type: "command", rel: `commands/mk/${f}`, abs: path.join(cmdDir, f), id: f.replace(/\.md$/, ""), metaSource: "registry" });
+		refs.push({
+			type: "command",
+			rel: `commands/mk/${f}`,
+			abs: path.join(cmdDir, f),
+			id: f.replace(/\.md$/, ""),
+			metaSource: "registry",
+		});
 	}
 
 	// hooks — isHookScript-true files, registry-sourced
@@ -192,20 +220,34 @@ function str(v: unknown): string {
 	return typeof v === "string" ? v : "";
 }
 
-function dependencyEdges(meta: Record<string, unknown>, issues: InventoryIssue[], artifactPath: string): DependencyEdge[] {
+function dependencyEdges(
+	meta: Record<string, unknown>,
+	issues: InventoryIssue[],
+	artifactPath: string,
+): DependencyEdge[] {
 	if (!Array.isArray(meta.dependency_edges)) return [];
 	const edges: DependencyEdge[] = [];
 	const typesById = new Map<string, DependencyEdgeType>();
 	for (const [index, raw] of meta.dependency_edges.entries()) {
 		const edge = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : null;
-		if (!edge || typeof edge.id !== "string" || !edge.id.trim() || typeof edge.type !== "string" || !DEPENDENCY_EDGE_TYPES.includes(edge.type as DependencyEdgeType)) {
+		if (
+			!edge ||
+			typeof edge.id !== "string" ||
+			!edge.id.trim() ||
+			typeof edge.type !== "string" ||
+			!DEPENDENCY_EDGE_TYPES.includes(edge.type as DependencyEdgeType)
+		) {
 			issues.push({ path: artifactPath, type: "unknown", problem: `invalid dependency_edges[${index}]` });
 			continue;
 		}
 		const type = edge.type as DependencyEdgeType;
 		const priorType = typesById.get(edge.id);
 		if (priorType && priorType !== type) {
-			issues.push({ path: artifactPath, type: "unknown", problem: `conflicting dependency_edges types for "${edge.id}"` });
+			issues.push({
+				path: artifactPath,
+				type: "unknown",
+				problem: `conflicting dependency_edges types for "${edge.id}"`,
+			});
 			continue;
 		}
 		typesById.set(edge.id, type);
@@ -245,7 +287,7 @@ export function buildInventory(claudeDir: string): Inventory {
 
 	for (const ref of refs) {
 		const meta: Record<string, unknown> =
-			ref.metaSource === "frontmatter" ? readFrontmatter(ref.abs) : registry[ref.rel] ?? {};
+			ref.metaSource === "frontmatter" ? readFrontmatter(ref.abs) : (registry[ref.rel] ?? {});
 
 		const hasRecord = ref.metaSource === "frontmatter" ? Object.keys(meta).length > 0 : ref.rel in registry;
 		if (!hasRecord) {
@@ -265,14 +307,20 @@ export function buildInventory(claudeDir: string): Inventory {
 		if (typeof meta.context_cost === "string") entry.contextCost = meta.context_cost;
 		const edges = dependencyEdges(meta, allIssues, ref.rel);
 		if (edges.length > 0) entry.dependencyEdges = edges;
-		const legacy = Array.isArray(meta.depends_on) ? meta.depends_on.filter((id): id is string => typeof id === "string") : [];
+		const legacy = Array.isArray(meta.depends_on)
+			? meta.depends_on.filter((id): id is string => typeof id === "string")
+			: [];
 		const typedRequires = edges.filter((edge) => edge.type === "requires").map((edge) => edge.id);
 		if (edges.length > 0 && legacy.length > 0) {
 			const legacyIds = new Set(legacy);
 			const typedIds = new Set(typedRequires);
 			const matches = legacyIds.size === typedIds.size && [...legacyIds].every((id) => typedIds.has(id));
 			if (!matches) {
-				allIssues.push({ path: ref.rel, type: ref.type, problem: "depends_on must match dependency_edges of type requires" });
+				allIssues.push({
+					path: ref.rel,
+					type: ref.type,
+					problem: "depends_on must match dependency_edges of type requires",
+				});
 			}
 		}
 		const flattened = [...new Set(edges.length > 0 ? typedRequires : legacy)];
@@ -288,8 +336,14 @@ export function buildInventory(claudeDir: string): Inventory {
 				.filter(Boolean);
 			Object.assign(entry, agentContractFields(ref.id));
 			entry.ownedArtifacts = agentDeclaredArtifacts(body);
-			entry.triggerOwner = /\b(?:use|runs?|activated|auto-activates|invoked|routed)\b/i.test(str(meta.description)) && /\b(?:not|never|does not)\b/i.test(str(meta.description));
-			entry.statusReference = body.includes("End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).") ? "a1" : "none";
+			entry.triggerOwner =
+				/\b(?:use|runs?|activated|auto-activates|invoked|routed)\b/i.test(str(meta.description)) &&
+				/\b(?:not|never|does not)\b/i.test(str(meta.description));
+			entry.statusReference = body.includes(
+				"End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).",
+			)
+				? "a1"
+				: "none";
 		}
 		entries.push(entry);
 	}
@@ -353,14 +407,26 @@ export function checkOwnership(claudeDir: string, opts: { missingInfraSeverity?:
 	}
 	const enums = loadSchemaEnums(claudeDir);
 	if (!enums) {
-		return [{ name: "Governance schema loads", status: "fail", detail: "Unreadable .claude/schemas/harness-metadata-schema.json", section: "Ownership" }];
+		return [
+			{
+				name: "Governance schema loads",
+				status: "fail",
+				detail: "Unreadable .claude/schemas/harness-metadata-schema.json",
+				section: "Ownership",
+			},
+		];
 	}
 
 	const { entries, issues } = buildInventory(claudeDir);
 	const results: CheckResult[] = [];
 
 	for (const issue of issues) {
-		results.push({ name: `Ownership: ${issue.path}`, status: "fail", detail: `${issue.type}: ${issue.problem}`, section: "Ownership" });
+		results.push({
+			name: `Ownership: ${issue.path}`,
+			status: "fail",
+			detail: `${issue.type}: ${issue.problem}`,
+			section: "Ownership",
+		});
 	}
 
 	const enumOf: Record<(typeof REQUIRED_FIELDS)[number], Set<string>> = {
@@ -393,7 +459,10 @@ export function checkOwnership(claudeDir: string, opts: { missingInfraSeverity?:
 	results.push({
 		name: "Ownership coverage",
 		status: failed === 0 ? "pass" : "fail",
-		detail: failed === 0 ? `${entries.length} artifacts, 100% governance coverage` : `${failed} artifact(s) with missing/invalid metadata`,
+		detail:
+			failed === 0
+				? `${entries.length} artifacts, 100% governance coverage`
+				: `${failed} artifact(s) with missing/invalid metadata`,
 		section: "Ownership",
 	});
 

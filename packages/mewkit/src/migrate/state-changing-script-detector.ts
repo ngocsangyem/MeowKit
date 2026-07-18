@@ -26,8 +26,14 @@ const COMMON_PATTERNS: ReadonlyArray<{ pattern: RegExp; reason: string }> = [
 	{ pattern: /\bgit\s+push\b/, reason: "runs git push" },
 	// Mutating HTTP verbs.
 	{ pattern: /\bcurl\b[^\n]*\s-X\s*(POST|PUT|DELETE|PATCH)\b/i, reason: "issues a mutating HTTP request (curl -X)" },
-	{ pattern: /\bcurl\b[^\n]*--request\s*(POST|PUT|DELETE|PATCH)\b/i, reason: "issues a mutating HTTP request (curl --request)" },
-	{ pattern: /\bwget\b[^\n]*--method=(POST|PUT|DELETE|PATCH)\b/i, reason: "issues a mutating HTTP request (wget --method)" },
+	{
+		pattern: /\bcurl\b[^\n]*--request\s*(POST|PUT|DELETE|PATCH)\b/i,
+		reason: "issues a mutating HTTP request (curl --request)",
+	},
+	{
+		pattern: /\bwget\b[^\n]*--method=(POST|PUT|DELETE|PATCH)\b/i,
+		reason: "issues a mutating HTTP request (wget --method)",
+	},
 	// Security-sensitive env mutation: export/unset of a credential/secret var.
 	{
 		pattern: /\b(export|unset)\s+[A-Z0-9_]*(TOKEN|SECRET|KEY|PASSWORD|CREDENTIAL|API)[A-Z0-9_]*/,

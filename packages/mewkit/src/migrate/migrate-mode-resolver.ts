@@ -159,7 +159,9 @@ function enforceProviderSupportPolicy(targets: ProviderType[], force = false): v
 		if (providers[target].supportLevel !== "deprecated") continue;
 		const reason = providers[target].supportReason ? ` ${providers[target].supportReason}` : "";
 		if (force) {
-			console.log(`[!] ${providers[target].displayName} is DEPRECATED, but proceeding because --force was supplied.${reason}`);
+			console.log(
+				`[!] ${providers[target].displayName} is DEPRECATED, but proceeding because --force was supplied.${reason}`,
+			);
 			continue;
 		}
 		throw new MewkitMigrateError(

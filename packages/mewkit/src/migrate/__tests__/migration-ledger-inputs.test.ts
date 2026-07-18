@@ -50,7 +50,13 @@ describe("migration-ledger-inputs", () => {
 			["rules:security-rules", { outcome: "migrated" }],
 			["skill:demo", { outcome: "migrated" }],
 		]);
-		const records = buildRunRecords({ discovered: d, provider: "codex", outcomes, phaseRecords: [], preservedOccurrences: [] });
+		const records = buildRunRecords({
+			discovered: d,
+			provider: "codex",
+			outcomes,
+			phaseRecords: [],
+			preservedOccurrences: [],
+		});
 		expect(records).toHaveLength(5);
 		const migrated = records.filter((r) => r.outcome === "migrated").length;
 		const skipped = records.filter((r) => r.outcome === "skipped").length;
@@ -61,7 +67,13 @@ describe("migration-ledger-inputs", () => {
 
 	it("marks shell hooks with no outcome as skipped (not failed)", () => {
 		const d = discovered({ skippedShellHooks: ["gate-enforcement.sh"] });
-		const records = buildRunRecords({ discovered: d, provider: "codex", outcomes: new Map(), phaseRecords: [], preservedOccurrences: [] });
+		const records = buildRunRecords({
+			discovered: d,
+			provider: "codex",
+			outcomes: new Map(),
+			phaseRecords: [],
+			preservedOccurrences: [],
+		});
 		expect(records).toHaveLength(1);
 		expect(records[0].outcome).toBe("skipped");
 	});
@@ -71,7 +83,13 @@ describe("migration-ledger-inputs", () => {
 		const outcomes = new Map<string, RunOutcome>([
 			["agent:planner", { outcome: "failed", error: "ENOSPC", internalError: true }],
 		]);
-		const records = buildRunRecords({ discovered: d, provider: "codex", outcomes, phaseRecords: [], preservedOccurrences: [] });
+		const records = buildRunRecords({
+			discovered: d,
+			provider: "codex",
+			outcomes,
+			phaseRecords: [],
+			preservedOccurrences: [],
+		});
 		expect(records[0].outcome).toBe("failed");
 		expect(records[0].detail).toBe("internal-error: ENOSPC");
 	});
@@ -84,7 +102,14 @@ describe("migration-ledger-inputs", () => {
 			provider: "codex",
 			outcomes,
 			phaseRecords: [
-				{ source: ".claude/skills/demo-skill/SKILL.md", type: "skill", provider: "codex", outcome: "failed", reason: "audit-rejected", detail: "runtime coupling" },
+				{
+					source: ".claude/skills/demo-skill/SKILL.md",
+					type: "skill",
+					provider: "codex",
+					outcome: "failed",
+					reason: "audit-rejected",
+					detail: "runtime coupling",
+				},
 			],
 			preservedOccurrences: [],
 		});
@@ -106,7 +131,12 @@ describe("migration-ledger-inputs", () => {
 		expect(reason).toContain("shell_environment_policy");
 		expect(reason).not.toContain("no provider equivalent");
 
-		const nonEnv: ReferenceOccurrence = { ...envOcc, original: ".claude/scripts/x.cjs", kind: "unmapped-runtime", reason: "no provider equivalent" };
+		const nonEnv: ReferenceOccurrence = {
+			...envOcc,
+			original: ".claude/scripts/x.cjs",
+			kind: "unmapped-runtime",
+			reason: "no provider equivalent",
+		};
 		expect(reportReasonForOccurrence(nonEnv)).toBe("no provider equivalent");
 	});
 
@@ -119,7 +149,15 @@ describe("migration-ledger-inputs", () => {
 			outcomes,
 			phaseRecords: [],
 			preservedOccurrences: [
-				{ file: "codex/agent/planner", line: 12, span: "prose", kind: "env", decision: "preserve-warn", original: ".claude/.env", reason: "old" },
+				{
+					file: "codex/agent/planner",
+					line: 12,
+					span: "prose",
+					kind: "env",
+					decision: "preserve-warn",
+					original: ".claude/.env",
+					reason: "old",
+				},
 			],
 		});
 		expect(records[0].occurrences).toHaveLength(1);

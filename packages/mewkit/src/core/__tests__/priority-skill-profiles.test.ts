@@ -13,7 +13,9 @@ describe("priority skill profile contracts", () => {
 		const body = skill("brainstorming");
 		expect(body).toContain("Do not create a report, plan, wiki candidate, or memory entry.");
 		expect(body).toContain("give 2-4 technically distinct options and one recommendation");
-		expect(body).toContain("Do not load techniques, scout, scoring, challenge, reports, plans, wiki candidates, memory, or handoff.");
+		expect(body).toContain(
+			"Do not load techniques, scout, scoring, challenge, reports, plans, wiki candidates, memory, or handoff.",
+		);
 		expect(body).not.toContain("## HTML Output");
 		expect(body).not.toContain("npx mewkit wiki handoff propose");
 	});
@@ -28,7 +30,9 @@ describe("priority skill profile contracts", () => {
 		expect(brainstorming).toContain("mewkit wiki handoff suggest");
 		expect(brainstorming).toContain("terminal-handoff-advisory");
 		expect(officeHours).toContain("new product, feature, or side-project concept");
-		expect(officeHours).toContain("For multiple technical approaches to a validated requirement, use `mk:brainstorming`.");
+		expect(officeHours).toContain(
+			"For multiple technical approaches to a validated requirement, use `mk:brainstorming`.",
+		);
 	});
 
 	it("keeps the unscored deep asset aligned with the deep workflow", () => {
@@ -58,7 +62,9 @@ describe("priority skill profile contracts", () => {
 	it("keeps quick workflow free of investigation, reviewer, and commit ceremony", () => {
 		const quickWorkflow = reference("fix", "workflow-quick.md");
 		expect(quickWorkflow).toContain("Confirm the supplied cause");
-		expect(quickWorkflow).toContain("Do not create a plan, report, wiki candidate, memory entry, reviewer task, or commit prompt.");
+		expect(quickWorkflow).toContain(
+			"Do not create a plan, report, wiki candidate, memory entry, reviewer task, or commit prompt.",
+		);
 		expect(quickWorkflow).not.toContain("Activate `mk:investigate`");
 	});
 
@@ -90,7 +96,9 @@ describe("priority skill profile contracts", () => {
 
 	it("keeps Plan Creator's full hard/deep workflow bundle available before Gate 1", () => {
 		const body = skill("plan-creator");
-		expect(body).toContain("Hard/deep plan creation still runs its built-in red-team and validation interview before Gate 1.");
+		expect(body).toContain(
+			"Hard/deep plan creation still runs its built-in red-team and validation interview before Gate 1.",
+		);
 		expect(body).toContain("mk:validate-plan");
 		expect(body).toContain("Step 8: Hydrate Tasks");
 		expect(body).toContain("Step 9: Post-Plan Handoff");

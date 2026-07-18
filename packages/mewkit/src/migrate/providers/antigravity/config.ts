@@ -6,7 +6,8 @@ export const antigravityConfig: ProviderConfig = {
 	name: "antigravity",
 	displayName: "Antigravity",
 	supportLevel: "experimental",
-	supportReason: "Runtime support exists, but parts of this adapter are based on a younger and still-shifting tool surface.",
+	supportReason:
+		"Runtime support exists, but parts of this adapter are based on a younger and still-shifting tool surface.",
 	subagents: "full",
 	agents: null,
 	commands: {

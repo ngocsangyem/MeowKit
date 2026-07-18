@@ -143,7 +143,10 @@ export function collectProviderSupportMatrix(manifests: ProviderManifest[] = man
 	};
 }
 
-export function findProviderSupportInfo(id: string, matrix = collectProviderSupportMatrix()): ProviderSupportInfo | null {
+export function findProviderSupportInfo(
+	id: string,
+	matrix = collectProviderSupportMatrix(),
+): ProviderSupportInfo | null {
 	return matrix.providers.find((provider) => provider.id === id) ?? null;
 }
 

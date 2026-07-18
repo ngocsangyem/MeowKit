@@ -34,8 +34,12 @@ describe("FetcherAdapter.buildUrl", () => {
 	const f = new FetcherAdapter({ fetchImpl: async () => makeResponse({}) });
 	it("maps each kind to a URL", () => {
 		expect(f.buildUrl(webSeed("https://example.com/x"))).toBe("https://example.com/x");
-		expect(f.buildUrl({ id: "s", query: "memory", kind: "arxiv", status: "queued", createdAt: "t" })).toContain("export.arxiv.org");
-		expect(f.buildUrl({ id: "s", query: "repo", kind: "github", status: "queued", createdAt: "t" })).toContain("api.github.com");
+		expect(f.buildUrl({ id: "s", query: "memory", kind: "arxiv", status: "queued", createdAt: "t" })).toContain(
+			"export.arxiv.org",
+		);
+		expect(f.buildUrl({ id: "s", query: "repo", kind: "github", status: "queued", createdAt: "t" })).toContain(
+			"api.github.com",
+		);
 		expect(() => f.buildUrl({ id: "s", query: "x", kind: "internal", status: "queued", createdAt: "t" })).toThrow();
 	});
 });
@@ -54,7 +58,8 @@ describe("FetcherAdapter SSRF + size guards", () => {
 
 	it("re-validates EVERY redirect hop — a redirect to a private host is blocked", async () => {
 		const fetchImpl: FetchImpl = async (url) => {
-			if (url.includes("example.com")) return makeResponse({ status: 302, headers: { location: "http://169.254.169.254/" } });
+			if (url.includes("example.com"))
+				return makeResponse({ status: 302, headers: { location: "http://169.254.169.254/" } });
 			return makeResponse({ bodyText: "should never reach here" });
 		};
 		const f = new FetcherAdapter({ fetchImpl });
@@ -75,7 +80,8 @@ describe("FetcherAdapter SSRF + size guards", () => {
 
 	it("caps redirect hops", async () => {
 		let n = 0;
-		const fetchImpl: FetchImpl = async () => makeResponse({ status: 302, headers: { location: "https://example.com/hop" + n++ } });
+		const fetchImpl: FetchImpl = async () =>
+			makeResponse({ status: 302, headers: { location: "https://example.com/hop" + n++ } });
 		const f = new FetcherAdapter({ fetchImpl, maxHops: 2 });
 		await expect(f.fetch(webSeed("https://example.com/start"))).rejects.toThrow(/too many redirects/);
 	});

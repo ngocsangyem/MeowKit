@@ -59,8 +59,7 @@ const NAMED_PROFILES: Record<string, ModelProfile> = {
 		// Claude model would be an over-claim, so they take the disclosed fallback.
 		supportedProviders: ["claude-code"],
 		fallbackTier: "heavy",
-		evidence:
-			"claude-api skill model table (cached 2026-06-24) + its shared/models.md — exact id, no date suffix",
+		evidence: "claude-api skill model table (cached 2026-06-24) + its shared/models.md — exact id, no date suffix",
 	},
 };
 

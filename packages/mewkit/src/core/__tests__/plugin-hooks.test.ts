@@ -21,9 +21,7 @@ describe("buildPluginHooks", () => {
 		const settingsHooks = {
 			SessionStart: [
 				{
-					hooks: [
-						{ type: "command", command: 'bash "$CLAUDE_PROJECT_DIR/.claude/hooks/a.sh"', timeout: 5 },
-					],
+					hooks: [{ type: "command", command: 'bash "$CLAUDE_PROJECT_DIR/.claude/hooks/a.sh"', timeout: 5 }],
 				},
 			],
 			PreToolUse: [
@@ -50,8 +48,6 @@ describe("buildPluginHooks", () => {
 			Stop: [{ hooks: [{ type: "command", command: 'node "$CLAUDE_PROJECT_DIR/.claude/hooks/s.cjs"' }] }],
 		};
 		buildPluginHooks(input);
-		expect((input.Stop as any)[0].hooks[0].command).toBe(
-			'node "$CLAUDE_PROJECT_DIR/.claude/hooks/s.cjs"',
-		);
+		expect((input.Stop as any)[0].hooks[0].command).toBe('node "$CLAUDE_PROJECT_DIR/.claude/hooks/s.cjs"');
 	});
 });

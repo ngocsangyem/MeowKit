@@ -5,7 +5,12 @@ import fs from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import { buildCapabilities } from "./build-capabilities.js";
-import { CapabilityManifestSchema, KNOWN_INVOCATION_IDS, type CapabilityEntry, type CapabilityManifest } from "./capability.js";
+import {
+	CapabilityManifestSchema,
+	KNOWN_INVOCATION_IDS,
+	type CapabilityEntry,
+	type CapabilityManifest,
+} from "./capability.js";
 
 export const CODEX_CAPABILITY_SNAPSHOT_FILENAME = "capabilities.json";
 
@@ -22,7 +27,9 @@ export function capabilityManifestFromClaude(claudeDir: string): CapabilityManif
 function validateSnapshot(manifest: CapabilityManifest, snapshotPath: string): CapabilityEntry[] {
 	for (const entry of manifest.entries) {
 		if (!KNOWN_INVOCATION_IDS.has(entry.invocation.id)) {
-			throw new Error(`Capability snapshot at ${snapshotPath} contains unknown invocation id for ${entry.id}. Regenerate it with \`npx mewkit migrate codex\`.`);
+			throw new Error(
+				`Capability snapshot at ${snapshotPath} contains unknown invocation id for ${entry.id}. Regenerate it with \`npx mewkit migrate codex\`.`,
+			);
 		}
 	}
 	return manifest.entries;
@@ -34,11 +41,15 @@ export function readCapabilitySnapshot(snapshotPath: string): CapabilityEntry[] 
 		raw = JSON.parse(fs.readFileSync(snapshotPath, "utf-8"));
 	} catch (error) {
 		const detail = error instanceof Error ? error.message : String(error);
-		throw new Error(`Could not read capability snapshot at ${snapshotPath}: ${detail}. Regenerate it with \`npx mewkit migrate codex\`.`);
+		throw new Error(
+			`Could not read capability snapshot at ${snapshotPath}: ${detail}. Regenerate it with \`npx mewkit migrate codex\`.`,
+		);
 	}
 	const parsed = CapabilityManifestSchema.safeParse(raw);
 	if (!parsed.success) {
-		throw new Error(`Capability snapshot at ${snapshotPath} is invalid: ${parsed.error.issues[0]?.message ?? "schema validation failed"}. Regenerate it with \`npx mewkit migrate codex\`.`);
+		throw new Error(
+			`Capability snapshot at ${snapshotPath} is invalid: ${parsed.error.issues[0]?.message ?? "schema validation failed"}. Regenerate it with \`npx mewkit migrate codex\`.`,
+		);
 	}
 	return validateSnapshot(parsed.data, snapshotPath);
 }
