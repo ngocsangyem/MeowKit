@@ -54,6 +54,26 @@ describe("computeAvailability", () => {
 		expect(computeAvailability(e, ctx({ commandExists: () => false }))[0].status).toBe("unavailable");
 	});
 
+	it("external_binary: not on PATH but self-provided ⇒ available with current-CLI-process evidence", () => {
+		const e = cap("x", [{ type: "external_binary", id: "mewkit", provenance: "authored" }]);
+		const snap = computeAvailability(e, ctx({ commandExists: () => false, isSelf: (id) => id === "mewkit" }))[0];
+		expect(snap.status).toBe("available");
+		expect(snap.evidence).toMatch(/current CLI process/);
+	});
+
+	it("external_binary: PATH hit keeps path-lookup evidence even when self-probe present", () => {
+		const e = cap("x", [{ type: "external_binary", id: "mewkit", provenance: "authored" }]);
+		const snap = computeAvailability(e, ctx({ commandExists: () => true, isSelf: (id) => id === "mewkit" }))[0];
+		expect(snap.status).toBe("available");
+		expect(snap.evidence).toMatch(/PATH lookup/);
+	});
+
+	it("external_binary: self-probe never over-claims for a non-self binary (chromium stays PATH-only)", () => {
+		const e = cap("x", [{ type: "external_binary", id: "chromium", provenance: "authored" }]);
+		const snap = computeAvailability(e, ctx({ commandExists: () => false, isSelf: (id) => id === "mewkit" }))[0];
+		expect(snap.status).toBe("unavailable");
+	});
+
 	it("skill_script / file_or_config: presence via containment check, never executed", () => {
 		const e = cap("x", [{ type: "skill_script", id: "trace", provenance: "authored" }]);
 		const snap = computeAvailability(e, ctx({ containedFileExists: () => true }))[0];
