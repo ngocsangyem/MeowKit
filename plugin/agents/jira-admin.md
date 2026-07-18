@@ -2,7 +2,7 @@
 name: jira-admin
 description: Execute JIRA project + user + group + scheme + automation administration via the jira-as CLI wrapper (11 sub-domains, ~65 verbs). Routed by mk:jira-admin skill. Requires Jira admin role. NOT for per-issue ops (jira-issue / jira-lifecycle); NOT for JSM admin (jira-jsm).
 tools: Bash, Read, Grep, Glob
-model: inherit
+model: haiku
 permissionMode: default
 memory: project
 color: red

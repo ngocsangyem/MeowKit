@@ -19,7 +19,7 @@ The jira-lifecycle agent's most important discipline is workflow discovery. Stat
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | yellow |
 | **Safety** | Tier 3 (modify), Tier 4 (version/component delete) |
 | **Never does** | Issue CRUD (jira-issue), add comments (jira-collaborate), bulk transitions (jira-bulk), assume workflow status names |

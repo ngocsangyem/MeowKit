@@ -19,7 +19,7 @@ The jira-relationships agent handles the link layer between issues. It creates a
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | purple |
 | **Safety** | Tier 3 (link/unlink), Tier 2 (clone) |
 | **Never does** | Sprint/epic relationships (jira-agile), parent/subtask hierarchy (jira-agile), issue CRUD (jira-issue) |

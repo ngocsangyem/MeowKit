@@ -19,7 +19,7 @@ The confluence-search agent is a domain-specific agent for query authorship + re
 |---|---|
 | **Type** | Domain (Confluence) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | green |
 | **Safety** | Mandatory CQL sanitization for any user-derived term |
 | **Never does** | Single-page CRUD (confluence-page), bulk write ops (confluence-bulk) |

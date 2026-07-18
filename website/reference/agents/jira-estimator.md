@@ -19,7 +19,7 @@ The jira-estimator agent is a read-only analysis agent that produces story point
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | teal |
 | **Safety** | Read-only — never modifies Jira state or sets story points |
 | **Never does** | Set story points (jira-agile), evaluate complexity only (jira-evaluator), perform full RCA (jira-analyst) |

@@ -19,7 +19,7 @@ The jira-collaborate agent handles all per-issue collaboration operations. Its k
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | cyan |
 | **Safety** | Comment visibility gate, Tier 4 for deletes |
 | **Never does** | Issue CRUD (jira-issue), link issues (jira-relationships), transition issues (jira-lifecycle), write comment content to memory |

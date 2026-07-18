@@ -19,7 +19,7 @@ The agent is the value-creating differentiator of the Confluence ecosystem. Read
 |---|---|
 | **Type** | Domain (Confluence) — intelligence leaf |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | cyan |
 | **Tools** | Bash, Read, Grep, Glob, Write |
 | **Disallowed** | Edit |

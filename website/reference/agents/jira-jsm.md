@@ -19,7 +19,7 @@ The jira-jsm agent handles the service management layer that sits on top of core
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | blue |
 | **Required** | JSM-licensed tenant + agent role |
 | **Safety** | Tier 2 (create request), Tier 3 (modify), Tier 4 (delete) |

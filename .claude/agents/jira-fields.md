@@ -2,7 +2,7 @@
 name: jira-fields
 description: 'Discover and configure JIRA custom fields via the jira-as CLI wrapper: list fields, find field IDs, check per-project field availability, configure agile field mappings. Routed by mk:jira-fields skill. NOT for setting per-issue field values (jira-issue update); NOT for project admin (jira-admin).'
 tools: Bash, Read, Grep, Glob
-model: inherit
+model: haiku
 permissionMode: default
 memory: project
 color: red

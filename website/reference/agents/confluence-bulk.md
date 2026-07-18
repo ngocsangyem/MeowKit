@@ -19,7 +19,7 @@ The agent is the highest-blast-radius surface in the Confluence ecosystem. Skipp
 |---|---|
 | **Type** | Domain (Confluence) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | red |
 | **Safety** | 3-step ceremony — dry-run → typed-token confirm → execute |
 | **Never does** | Single-page ops (confluence-page), comments / attachments / labels at single-page scope (confluence-collaborate), spec analysis (confluence-spec-analyst) |

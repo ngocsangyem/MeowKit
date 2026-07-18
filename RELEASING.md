@@ -548,6 +548,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.14.3 | 2026-07-19 | Jira & Confluence Agents on Haiku                |
 | v2.14.2 | 2026-07-18 | Composed Capability Recall                       |
 | v2.14.1 | 2026-07-18 | Harness Integrity & Provider Parity              |
 | v2.14.0 | 2026-07-17 | Provider Conformance, Contract Safety & Evals    |

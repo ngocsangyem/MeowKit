@@ -19,7 +19,7 @@ The jira-agile agent drives sprint and epic management. Its most important techn
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | pink |
 | **Safety** | Tier 2 (create sprint), Tier 3 (modify), Tier 4 (delete) |
 | **Never does** | Issue CRUD (jira-issue), issue links (jira-relationships), time tracking (jira-time) |

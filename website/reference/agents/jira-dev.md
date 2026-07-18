@@ -19,7 +19,7 @@ The jira-dev agent is the connector between Jira's project management layer and 
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | blue |
 | **Safety** | Read-only Jira operations, output generation only |
 | **Never does** | Execute git/gh commands (git-manager/shipper), issue CRUD (jira-issue), modify Jira state |

@@ -19,7 +19,7 @@ The jira-evaluator agent is a read-only analysis agent. It never modifies Jira s
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | teal |
 | **Safety** | Read-only — never modifies Jira state |
 | **Never does** | Modify issues, estimate story points (jira-estimator), perform full RCA (jira-analyst) |

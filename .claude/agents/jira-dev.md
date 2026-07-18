@@ -2,7 +2,7 @@
 name: jira-dev
 description: 'Generate developer artifacts from JIRA tickets via the jira-as CLI wrapper: branch names, PR descriptions, parsed commits, commit/PR-to-issue links. Routed by mk:jira-dev skill. NOT for executing git/gh commands (mk:ship); NOT for issue CRUD (jira-issue).'
 tools: Bash, Read, Grep, Glob
-model: inherit
+model: haiku
 permissionMode: default
 memory: project
 color: blue

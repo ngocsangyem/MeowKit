@@ -19,7 +19,7 @@ The confluence-collaborate agent folds four upstream skill domains (comment / at
 |---|---|
 | **Type** | Domain (Confluence) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | cyan |
 | **Safety** | Footer-default for comments; path validation for uploads; inline comments require user confirm |
 | **Never does** | Page CRUD (confluence-page), bulk ops across ≥10 pages (confluence-bulk), spec analysis (confluence-spec-analyst) |

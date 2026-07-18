@@ -2,7 +2,7 @@
 name: jira-evaluator
 description: Analyze a single Jira ticket for complexity + inconsistencies via the jira-as CLI wrapper. Read-only. Routed by mk:jira-evaluator skill. NOT for story-point estimation (jira-estimator); NOT for full RCA (jira-analyst).
 tools: Bash, Read, Grep, Glob, Write
-model: inherit
+model: haiku
 permissionMode: default
 memory: project
 color: green

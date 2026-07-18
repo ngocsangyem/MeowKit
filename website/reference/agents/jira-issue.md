@@ -19,7 +19,7 @@ The jira-issue agent is a domain-specific agent for single-issue CRUD. It operat
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | blue |
 | **Safety** | 4-tier (read → create → modify → destructive) |
 | **Never does** | Transition issues (jira-lifecycle), add comments (jira-collaborate), bulk operations (jira-bulk), link issues (jira-relationships) |

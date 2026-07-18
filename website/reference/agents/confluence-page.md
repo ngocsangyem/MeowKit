@@ -19,7 +19,7 @@ The confluence-page agent is a domain-specific agent for single-page CRUD + hier
 |---|---|
 | **Type** | Domain (Confluence) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | blue |
 | **Safety** | 4-tier (read → create → modify → destructive) |
 | **Never does** | Bulk ops on 10+ pages (confluence-bulk), comments / attachments / labels (confluence-collaborate), spec analysis (confluence-spec-analyst) |

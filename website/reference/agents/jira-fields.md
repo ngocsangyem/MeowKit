@@ -19,7 +19,7 @@ The jira-fields agent solves the fundamental problem that custom field IDs are o
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | gray |
 | **Safety** | Read operations open; create/configure-agile require admin |
 | **Never does** | Set per-issue field values (jira-issue update), manage schemes (jira-admin) |

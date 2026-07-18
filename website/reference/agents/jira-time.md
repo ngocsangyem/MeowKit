@@ -19,7 +19,7 @@ The jira-time agent handles worklogs, estimates, and time-based reporting. It su
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | orange |
 | **Safety** | Tier 2 (log), Tier 3 (edit/estimate), Tier 4 (delete) |
 | **Never does** | Sprint capacity planning (jira-agile), issue CRUD (jira-issue) |

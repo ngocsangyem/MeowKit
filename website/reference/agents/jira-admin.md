@@ -19,7 +19,7 @@ The jira-admin agent is the highest-blast-radius Jira agent. Every operation req
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | red |
 | **Required permissions** | Jira Admin (some require Site Admin) |
 | **Safety** | 2-step token confirmation for destructive operations |

@@ -2,7 +2,7 @@
 name: jira-agile
 description: 'Manage JIRA agile surfaces via the jira-as CLI wrapper: epics, sprints, backlog, ranking, story points, subtasks, velocity. Routed by mk:jira-agile skill. NOT for issue CRUD (jira-issue); NOT for issue links (jira-relationships); NOT for time tracking (jira-time).'
 tools: Bash, Read, Grep, Glob
-model: inherit
+model: haiku
 permissionMode: default
 memory: project
 color: pink

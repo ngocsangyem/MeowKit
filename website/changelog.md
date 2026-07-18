@@ -14,6 +14,14 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.14.3 (2026-07-19) — Jira & Confluence Agents on Haiku
+
+The `mewkit` CLI is unchanged at **1.18.2** — this release ships kit content only.
+
+### Improvements
+
+- The 16 Jira and 5 Confluence domain agents now pin to the Haiku model tier instead of inheriting the session model, so their CLI-wrapper operations (issue and page CRUD, search, bulk, lifecycle) run on the cheapest tier.
+
 ## 2.14.2 (2026-07-18) — Composed Capability Recall
 
 The `mewkit` CLI ships alongside this kit as **1.18.2** (see `CLI` below).

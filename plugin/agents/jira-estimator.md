@@ -2,7 +2,7 @@
 name: jira-estimator
 description: Heuristic story-point estimation for a single Jira ticket via the jira-as CLI wrapper. Read-only. Routed by mk:jira-estimator skill. NOT for complexity/inconsistency analysis (jira-evaluator); NOT for full RCA (jira-analyst).
 tools: Bash, Read, Grep, Glob, Write
-model: inherit
+model: haiku
 permissionMode: default
 memory: project
 color: orange

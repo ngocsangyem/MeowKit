@@ -2,7 +2,7 @@
 name: jira-collaborate
 description: 'Manage JIRA collaboration surface: comments, attachments, watchers, notifications. Routed by mk:jira-collaborate skill. NOT for issue CRUD (jira-issue); NOT for issue links (jira-relationships); NOT for transitions (jira-lifecycle).'
 tools: Bash, Read, Grep, Glob
-model: inherit
+model: haiku
 permissionMode: default
 memory: project
 color: cyan

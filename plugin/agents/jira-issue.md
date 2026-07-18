@@ -2,7 +2,7 @@
 name: jira-issue
 description: 'Execute JIRA issue CRUD via the jira-as CLI wrapper. Use for: ''create bug/task/story'', ''show me PROJ-123'', ''update issue'', ''delete PROJ-123''. Routed by mk:jira-issue skill — receives task brief via skill-content injection. NOT for transitions (jira-lifecycle); NOT for comments/attachments (jira-collaborate); NOT for bulk ops on 10+ issues (jira-bulk); NOT for issue links (jira-relationships); NOT for time logging (jira-time); NOT for sprint/epic (jira-agile).'
 tools: Bash, Read, Grep, Glob
-model: inherit
+model: haiku
 permissionMode: default
 memory: project
 color: blue

@@ -19,7 +19,7 @@ The jira-bulk agent handles high-volume operations that would be impractical one
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | red |
 | **Safety** | Mandatory dry-run for all operations. Tier 3 (modify), Tier 4 (delete) |
 | **Never does** | Single-issue operations (jira-issue), skip dry-run, execute without user confirmation |

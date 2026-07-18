@@ -19,7 +19,7 @@ The jira-ops agent maintains the infrastructure that all other Jira agents depen
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | gray |
 | **Safety** | Diagnostic-only — no Atlassian state changes |
 | **Never does** | Modify Jira state, issue CRUD (jira-issue), project administration (jira-admin) |

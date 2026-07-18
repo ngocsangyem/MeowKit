@@ -19,7 +19,7 @@ The jira-search agent is a domain-specific agent for finding and filtering issue
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | green |
 | **Safety** | 4-tier (search → filter create → bulk-update → filter delete) |
 | **Never does** | Single-issue CRUD (jira-issue), bulk write operations (jira-bulk), skip JQL sanitization |

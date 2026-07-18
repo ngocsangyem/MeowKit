@@ -19,7 +19,7 @@ The jira-analyst agent is a read-only analysis agent that produces comprehensive
 |---|---|
 | **Type** | Domain (Jira) |
 | **Phase** | On-demand |
-| **Model** | inherit |
+| **Model** | haiku |
 | **Color** | indigo |
 | **Safety** | Read-only — never modifies Jira state |
 | **Never does** | Modify issues, skip media analysis when attachments exist, estimate story points (jira-estimator), score complexity only (jira-evaluator) |
