@@ -1,19 +1,12 @@
 packages:
   - "packages/*"
 
-# esbuild's native binary is required for Vitest/Vite TypeScript transform.
-# The other flagged postinstall scripts (@parcel/watcher, sharp, vue-demi) are
-# not needed to build or test this repo, so they stay unbuilt.
-onlyBuiltDependencies:
-  - esbuild
-
-ignoredBuiltDependencies:
-  - "@parcel/watcher"
-  - sharp
-  - vue-demi
-
+# Build-script decisions for native/postinstall deps (pnpm gates these).
+# esbuild is required for Vitest/Vite TypeScript transform → allow it.
+# The rest belong to packages/landing (Nuxt) and are not needed to run the
+# test suite, so they stay unbuilt.
 allowBuilds:
-  '@parcel/watcher': set this to true or false
-  esbuild: set this to true or false
-  sharp: set this to true or false
-  vue-demi: set this to true or false
+  esbuild: true
+  "@parcel/watcher": false
+  sharp: false
+  vue-demi: false
