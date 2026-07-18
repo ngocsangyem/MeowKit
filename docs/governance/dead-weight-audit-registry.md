@@ -20,6 +20,8 @@ Delta convention: `measured_delta = baseline_avg − disabled_avg` on the calibr
 | `hooks/lib/approval-receipt.sh` | The model may write source before a human approved the plan (Gate 1) | N/A (**NEVER-PRUNE** — Gate 1 flow, Rule 4) | Opus 4.8 | 2026-07-18 | KEEP |
 | `commands/plan-approve.ts` (`mewkit plan approve`) | A human approval is not recorded against the plan revision, so stale approvals carry over | N/A (**NEVER-PRUNE** — Gate 1 write path, Rule 4) | Opus 4.8 | 2026-07-18 | KEEP |
 | `hooks/lib/gate2-check.sh` — revision binding | A verdict with no revision can authorize a ship of code it never reviewed | N/A (**NEVER-PRUNE** — Gate 2 flow, Rule 4) | Opus 4.8 | 2026-07-18 | KEEP |
+| `skills/evaluate/scripts/recompute-score.py` | The evaluator can declare a passing weighted_score that its own per-rubric verdicts do not support (INCONSISTENT forged PASS — the audit's shape). Does NOT catch a self-consistent fabrication (all-PASS with weak evidence); that is the skeptic-evaluator's + evidence's job. | N/A (**NEVER-PRUNE** — active-verification / evaluator integrity, Rule 4) | Opus 4.8 | 2026-07-18 | KEEP |
+| `skills/evaluate/scripts/validate-verdict.sh` v2 (recompute + evidence manifest + evaluator identity) | A well-formed verdict is trusted without checking the score follows from the rubrics or that evidence/identity exist | N/A (**NEVER-PRUNE** — active-verification hard gate, Rule 4) | Opus 4.8 | 2026-07-18 | KEEP |
 
 ## Notes
 

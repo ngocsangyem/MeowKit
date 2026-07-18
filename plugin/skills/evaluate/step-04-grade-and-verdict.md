@@ -70,6 +70,7 @@ slug: {slug}
 evaluator_run: {ISO-8601 timestamp}
 rubric_preset: {preset-name}
 model: {model-id}
+evaluator: {agent: evaluator, session: {host-session-id}, date: {YYYY-MM-DD}}
 overall: PASS | WARN | FAIL
 weighted_score: 0.78
 hard_fail_triggered: false
@@ -77,6 +78,13 @@ iterations: {N — incremented per generator loop}
 batch_index: {if multi-batch}
 batches_total: {if multi-batch}
 ---
+```
+
+**`evaluator:` is REQUIRED (validator v2).** It records who produced the verdict — anti-accidental provenance, not an unforgeable identity. **`weighted_score` and `overall` are recomputed and checked by the validator** from the per-rubric verdicts below and the preset's canonical weights: a declared score/overall that does not follow from the per-rubric verdicts (the audit's forged-PASS shape) is rejected. Emit the per-rubric section with EVERY preset rubric exactly once, each header carrying its weight and verdict:
+
+> **Boundary (anti-accidental, not unforgeable):** the validator checks that the score and overall *follow from* the per-rubric verdicts — it does NOT judge whether each per-rubric verdict is itself honest. A self-consistent fabricated verdict (every rubric marked PASS with weak evidence) still passes recompute; catching that is the skeptic-evaluator's job (Rule 9) and the evidence's, not this arithmetic check. The check closes the *inconsistent* forgery (PASS with a score that cannot be derived), which is the audit's shape.
+
+```markdown
 
 # Evaluation Verdict — {task name}
 
@@ -112,13 +120,14 @@ This is the active-verification enforcement. Run after writing the verdict file:
 .claude/skills/evaluate/scripts/validate-verdict.sh "$verdict_file"
 ```
 
-The validator checks:
-1. Frontmatter has all required fields
+The validator checks (v2):
+1. Frontmatter has all required fields, including the `evaluator:` identity block
 2. `evidence_dir` exists and is non-empty (per the active-verification HARD GATE locked 260408)
-3. Every PASS verdict on `functionality` rubric cites at least one evidence file in the directory
-4. Evidence files referenced in the verdict actually exist on disk
-5. `weighted_score` matches the recomputed value (no manual fudging)
-6. `overall` matches the derivation rules in 4d
+3. Every PASS/WARN rubric cites at least one evidence file in its section
+4. Evidence files referenced in the verdict actually exist on disk; a per-file SHA-256 + type manifest is written next to the evidence dir
+5. `weighted_score` is RECOMPUTED from the preset weights × per-rubric verdicts and must match the declared value within 0.01
+6. Rubric coverage: every preset rubric appears exactly once (no missing, extra, or duplicate)
+7. `overall` matches the derivation rules in 4d, and any triggered hard-fail forces `hard_fail_triggered: true`
 
 **If validator exits non-zero:**
 
@@ -136,9 +145,10 @@ The validator appends a stamp section to the verdict file:
 ```markdown
 ## Validator Stamp
 
-- validator_version: 1.0.0
+- validator_version: 2.0.0
 - validated_at: {ISO-8601}
 - evidence_files_counted: 7
+- score_recomputed: true
 - verdict_accepted: true
 ```
 

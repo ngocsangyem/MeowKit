@@ -34,10 +34,12 @@ get_field() {
   ' "$verdict"
 }
 
-# 1. Required frontmatter fields
-for field in "task" "evaluator_run" "rubric_preset" "overall" "weighted_score" "hard_fail_triggered"; do
+# 1. Required frontmatter fields. `evaluator` (identity: agent/session/date) is required
+#    as of validator v2 — anti-accidental provenance (not claimed unforgeable; consistent
+#    with Gate 2's authority note). A verdict with no evaluator identity is rejected.
+for field in "task" "evaluator_run" "rubric_preset" "overall" "weighted_score" "hard_fail_triggered" "evaluator"; do
   if [ -z "$(get_field "$field")" ]; then
-    echo "FAIL: missing required frontmatter field: $field" >&2
+    echo "VERDICT_INVALID: missing required frontmatter field: $field" >&2
     fail=1
   fi
 done
@@ -148,22 +150,99 @@ score=$(get_field "weighted_score")
 if [ -n "$score" ]; then
   ok=$(awk -v s="$score" 'BEGIN { if (s >= 0 && s <= 1) print "ok"; else print "bad" }')
   if [ "$ok" != "ok" ]; then
-    echo "FAIL: weighted_score $score out of range [0.0, 1.0]" >&2
+    echo "VERDICT_INVALID: weighted_score $score out of range [0.0, 1.0]" >&2
     fail=1
   fi
 fi
 
-# 8. Stamp the verdict if it passed validation.
+# 8. RECOMPUTE (validator v2) — the declared score/overall/coverage must FOLLOW from the
+#    per-rubric verdicts and the canonical preset weights. This is what closes the forged-PASS
+#    path: a verdict that declares PASS + weighted_score 0.01 (or whose rubric set does not
+#    cover the preset) is rejected even though every field is individually well-formed.
+PY=".claude/skills/.venv/bin/python3"
+[ -x "$PY" ] || PY="$(command -v python3 || true)"
+recompute_script="$(dirname "$0")/recompute-score.py"
+recomputed_ran=0
+if [ -z "$PY" ]; then
+  # python3 is a hard dependency of the recompute gate. No interpreter ⇒ cannot verify the
+  # score is honest ⇒ fail closed rather than accept an unverifiable PASS/WARN.
+  if [ "$overall" = "PASS" ] || [ "$overall" = "WARN" ]; then
+    echo "VERDICT_INVALID: python3 not found — cannot recompute the weighted score for a $overall verdict" >&2
+    fail=1
+  fi
+elif [ ! -f "$recompute_script" ]; then
+  # Same principle: the recompute script missing (partial install / mirror drift) means the
+  # score cannot be verified. Fail closed for PASS/WARN rather than accept it AND falsely stamp
+  # score_recomputed:true. A missing checker at the one moment it matters is a block, not a pass.
+  if [ "$overall" = "PASS" ] || [ "$overall" = "WARN" ]; then
+    echo "VERDICT_INVALID: recompute-score.py not found at $recompute_script — cannot verify the score for a $overall verdict" >&2
+    fail=1
+  fi
+else
+  recompute_out=$("$PY" "$recompute_script" "$verdict" 2>&1)
+  recompute_rc=$?
+  recomputed_ran=1
+  if [ "$recompute_rc" -ne 0 ]; then
+    echo "VERDICT_INVALID: recomputation rejected the verdict:" >&2
+    printf '%s\n' "$recompute_out" | "$PY" -c "import sys,json
+try:
+    d=json.load(sys.stdin)
+    for r in d.get('reasons',[]): print('  - '+r)
+except Exception:
+    print('  '+sys.stdin.read())" >&2 2>/dev/null || printf '%s\n' "$recompute_out" >&2
+    fail=1
+  fi
+fi
+
+# 9. EVIDENCE MANIFEST (validator v2) — record a per-file SHA-256 + inferred type next to the
+#    evidence dir so a later reader can tell WHAT was captured, not just that files exist. An
+#    all-unknown-type evidence set for a PASS/WARN verdict is a WARN (advisory) — diverse projects
+#    carry evidence types this allowlist does not know; only EMPTY evidence blocks (handled above).
+if [ -d "$evidence_dir" ] && [ "$evidence_count" -gt 0 ]; then
+  manifest="$verdict_dir/${verdict_base}-evidence.manifest.json"
+  sha() { if command -v shasum >/dev/null 2>&1; then shasum -a 256 "$1" | awk '{print $1}'; elif command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | awk '{print $1}'; else echo "unavailable"; fi; }
+  classify() {
+    case "$1" in
+      *.txt|*.log|*.md) echo transcript ;;
+      *.png|*.jpg|*.jpeg|*.gif|*.webp|*.svg) echo screenshot ;;
+      *.json|*.html|*.csv|*.xml|*.yaml|*.yml|*.har) echo command-output ;;
+      *) echo unknown ;;
+    esac
+  }
+  {
+    echo "["
+    _first=1
+    find "$evidence_dir" -type f | while IFS= read -r _f; do
+      _type=$(classify "$_f")
+      [ "$_first" -eq 0 ] && echo ","
+      _first=0
+      printf '  {"file": "%s", "sha256": "%s", "type": "%s"}' "$_f" "$(sha "$_f")" "$_type"
+    done
+    echo ""
+    echo "]"
+  } > "$manifest"
+  # All-unknown-type evidence for a PASS/WARN verdict is a WARN (advisory), not a block.
+  if ! find "$evidence_dir" -type f | grep -qE '\.(txt|log|md|png|jpg|jpeg|gif|webp|svg|json|html|csv|xml|yaml|yml|har)$'; then
+    if [ "$overall" = "PASS" ] || [ "$overall" = "WARN" ]; then
+      echo "VERDICT_WARN: evidence has no recognized type (transcript/screenshot/command-output) — cannot confirm active verification captured a usable artifact." >&2
+    fi
+  fi
+fi
+
+# 10. Stamp the verdict if it passed validation.
 if [ "$fail" -eq 0 ]; then
-  stamp_block=$(printf "\n## Validator Stamp\n\n- validator_version: 1.0.0\n- validated_at: %s\n- evidence_files_counted: %d\n- verdict_accepted: true\n" \
-    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$evidence_count")
+  # score_recomputed reflects whether recompute ACTUALLY ran — never a fixed "true". A FAIL verdict
+  # accepted without an interpreter/script stamps false, so the attestation is honest.
+  if [ "$recomputed_ran" -eq 1 ]; then score_recomputed="true"; else score_recomputed="false"; fi
+  stamp_block=$(printf "\n## Validator Stamp\n\n- validator_version: 2.0.0\n- validated_at: %s\n- evidence_files_counted: %d\n- score_recomputed: %s\n- verdict_accepted: true\n" \
+    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$evidence_count" "$score_recomputed")
 
   # Only append the stamp if not already present.
   if ! grep -q "^## Validator Stamp" "$verdict"; then
     printf '%s\n' "$stamp_block" >> "$verdict"
   fi
 
-  echo "VERDICT_VALID: $verdict ($evidence_count evidence files, overall=$overall)"
+  echo "VERDICT_VALID: $verdict ($evidence_count evidence files, overall=$overall, score recomputed)"
   exit 0
 fi
 
