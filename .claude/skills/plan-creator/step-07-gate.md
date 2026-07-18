@@ -58,16 +58,21 @@ pending feedback batch. Surface these in the 7a self-check. Full list:
   revision). The CLI is the single writer of `review.status`. Non-zero exit ⇒ a
   precondition failed ⇒ do NOT proceed to step-08; print the failed preconditions and
   return to Modify. When `html_mode == false`, skip this call.
-- **Memory capture** (lightweight, no subagent): Append to `.claude/memory/architecture-decisions.md`:
-  ```markdown
-  ## Plan: {plan-dir-name} ({YYYY-MM-DD})
-  - **Mode:** {planning_mode} | **Scope:** {scope_mode} | **Model:** {workflow_model} | **TDD:** {tdd_mode}
-  - **Key decisions:** {1-2 bullet summary of architectural choices or scope decisions}
-  - **Research highlights:** {1-2 most important research findings, or "no research (fast mode)"}
-  - **Red-team accepted:** {N} findings (or "skipped (fast mode)")
-  - **Status:** live-captured
+- **Memory capture** (lightweight, no subagent): append the decision to the CANONICAL
+  store `.claude/memory/architecture-decisions.json` — NOT the `.md` view (a `.md` write is
+  invisible to JSON-first readers; see `.claude/rules/memory-read-rules.md` → Write Rules).
+  Add an entry to the `patterns` array (create the file with the v2.0.0 skeleton if absent),
+  bump `metadata.last_updated`, and never touch `version`. The entry body:
   ```
-  Skip silently if `.claude/memory/architecture-decisions.md` doesn't exist or write fails.
+  id: {plan-dir-name}
+  type: decision
+  pattern: {1-2 sentence summary of the architectural / scope choices}
+  context: mode={planning_mode}, scope={scope_mode}, model={workflow_model}, tdd={tdd_mode}; red-team accepted {N}
+  date: {YYYY-MM-DD}
+  ```
+  (Match the canonical entry shape `immediate-capture-handler.cjs` writes: `type` + `pattern` + `context` — the recompute/render layers scan `pattern`/`context`, not a `decision` key.)
+  If the write fails, print a one-line notice (`⚠ memory capture skipped: <reason>`) — do
+  NOT skip silently (Write Rules: no silent skip).
 - Print Context Reminder block (from `references/gate-1-approval.md`) with absolute path to plan.md
 - Proceed to step-08
 

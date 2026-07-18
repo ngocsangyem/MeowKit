@@ -29,10 +29,11 @@ The human user keyboard shortcut is documented at `CLAUDE.md` in the project roo
 | Tool | `Edit` (or `Write` for a fresh file) |
 | Hook | None — this is a normal file write |
 | Guards | The agent is responsible for scrubbing secrets in-content before calling `Edit` |
-| Write target | Same topic files: `fixes.md` / `review-patterns.md` / `architecture-decisions.md` / `quick-notes.md` / `decisions.md` |
+| Write target | For a **canonical-JSON** store (`fixes` / `review-patterns` / `architecture-decisions` / `security-findings`) write the **`.json`** (append to its items array, bump `metadata.last_updated`, leave `version`) — NOT the `.md`, which is a legacy/generated view JSON-first readers ignore. For a **markdown-native** store (`quick-notes.md` / `decisions.md`) write the `.md`. See `.claude/rules/memory-read-rules.md` → Store Taxonomy + Write Rules (authoritative). |
 | Atomicity | Whatever `Edit` provides (atomic at the OS level for replace-file operations) |
+| On failure | Surface a one-line notice — never skip silently (Write Rules) |
 
-This is the path agents MUST use. The `fix` skill already follows it correctly at Step 6 — see `.claude/skills/fix/SKILL.md`.
+This is the path agents MUST use. The `fix` skill is the reference implementation — Step 6 reads and appends to the canonical `fixes.json` (see `.claude/skills/fix/SKILL.md`).
 
 ## Target File Routing
 
@@ -45,9 +46,17 @@ Pick the right topic file based on the kind of observation. If unsure, default t
 | Architectural decision (load-bearing) | `architecture-decisions.md` | `architecture-decisions.json` | `## YYYY-MM-DD — <slug>` |
 | ADR (long-form, owned by architect agent) | `decisions.md` | — | `## YYYY-MM-DD — <slug>` |
 | One-off note / workflow pattern that doesn't belong in a structured file | `quick-notes.md` | — | `## YYYY-MM-DD — <agent-or-skill-name> — <kind> — <slug>` |
-| Security finding | `security-notes.md` | — | `## YYYY-MM-DD — <slug> (severity: <level>)` |
+| Security finding | `security-notes.md` (legacy seed source) | `security-findings.json` | `## YYYY-MM-DD — <slug> (severity: <level>)` |
 
-The structured `.json` siblings declare `version: "2.0.0"` and a `scope` field. When writing JSON, append to the `patterns` array and bump `metadata.last_updated`. Do not touch the `version` field.
+For the four rows WITH a structured sibling (`fixes` / `review-patterns` /
+`architecture-decisions` / `security-findings`), the **`.json` is the write target** — the
+Markdown column is the legacy/generated view (for `security-findings` the legacy topic is
+`security-notes.md`, kept only as a `seed-from-md` source + read fallback). The `.json`
+declares `version: "2.0.0"` and a `scope` field; append to the items array (`patterns`, or
+`findings` for `security-findings`) and bump `metadata.last_updated` — do NOT touch
+`version`. Rows with no sibling (`decisions.md`, `quick-notes.md`) are markdown-native —
+write the `.md` directly. `security-log.md` is a separate markdown-native forensic
+override/injection trail (not the curated findings store).
 
 ## Body Convention (agent-authored entries)
 

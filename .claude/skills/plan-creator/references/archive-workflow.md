@@ -49,7 +49,7 @@ For each selected plan, ask via `AskUserQuestion`. Header: "Journal Capture". Qu
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
-| Yes — capture learnings | Plan has Red Team Review or Validation Log sections with decisions worth replaying | Appends key decisions and patterns to `.claude/memory/architecture-decisions.md` |
+| Yes — capture learnings | Plan has Red Team Review or Validation Log sections with decisions worth replaying | Appends key decisions and patterns to the canonical `.claude/memory/architecture-decisions.json` |
 | No — just archive | Plan was trivial / experimental and has no reusable knowledge | Archives without capturing learnings |
 
 If "Yes": for each selected plan, extract:
@@ -57,14 +57,20 @@ If "Yes": for each selected plan, extract:
 - Red Team findings (if Red Team Review section exists)
 - Validation answers (if Validation Log section exists)
 
-Append to `.claude/memory/architecture-decisions.md`:
-```markdown
-## Archive: {plan-name} ({date})
-- **Goal:** {goal from plan}
-- **Key decisions:** {1-2 bullet summary}
-- **Learnings:** {red-team findings, validation answers — 1-2 bullets}
-- **Status:** archived-{completed|cancelled}
+Append the entry to the CANONICAL store `.claude/memory/architecture-decisions.json` — NOT
+the `.md` view (a `.md` write is invisible to JSON-first readers; see
+`.claude/rules/memory-read-rules.md` → Write Rules). Add to the `patterns` array (create the
+file with the v2.0.0 skeleton if absent), bump `metadata.last_updated`, leave `version`:
 ```
+id: archive-{plan-name}
+type: decision
+pattern: {goal from plan} — {1-2 bullet summary of key decisions}
+context: learnings — {red-team findings, validation answers, 1-2 bullets}
+status: archived-{completed|cancelled}
+date: {date}
+```
+(Match the canonical shape `immediate-capture-handler.cjs` writes: `type` + `pattern` + `context`.)
+If the write fails, print `⚠ memory capture skipped: <reason>` — do not skip silently.
 
 ### A4. Archive Action
 

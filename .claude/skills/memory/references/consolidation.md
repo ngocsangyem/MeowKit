@@ -118,9 +118,11 @@ Transient, noisy, or not reusable (e.g., one-off command output, ephemeral env s
 - **Never delete the only instance of a lesson.** Only delete duplicates or contradicted entries.
 - **Preserve frequency counts** when merging JSON patterns (sum the frequencies).
 - **Run validation checks** after every consolidation pass.
-- **Log what was changed** — append a summary to `fixes.md` or the relevant topic file:
+- **Log what was changed** — append the summary to the markdown-native `quick-notes.md`
+  (NOT a canonical-store view like `fixes.md`; per `.claude/rules/memory-read-rules.md` →
+  Write Rules, a write to a canonical `.md` view is invisible to JSON-first readers):
   ```
-  ## Consolidation YYYY-MM-DD (status: live-captured, severity: standard)
+  ## YYYY-MM-DD — mk:memory — consolidation
   - Patterns merged: N
   - Patterns removed (stale): N
   - Cost entries archived: N
