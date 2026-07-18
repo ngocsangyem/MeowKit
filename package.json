@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit -p packages/mewkit/tsconfig.json",
     "format": "npx prettier --write \"packages/*/src/**/*.{ts,js,json}\"",
     "format:check": "npx prettier --check \"packages/*/src/**/*.{ts,js,json}\"",
-    "test": "vitest run --exclude .claude/skills/worktree/scripts/worktree.test.cjs",
+    "test": "vitest run",
+    "release:check": "bash scripts/release-check.sh",
+    "sync-versions": "node scripts/sync-versions.cjs",
     "test:watch": "vitest"
   },
   "devDependencies": {

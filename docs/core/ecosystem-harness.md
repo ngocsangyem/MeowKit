@@ -15,7 +15,7 @@ Describe how MeowKit’s ecosystem integrates Claude Code runtime artifacts (tra
 
 ### 1) Claude Code entry document
 
-- `.qwen/CLAUDE.md` is the canonical workflow description that shapes all agent behavior.
+- `CLAUDE.md` (repo root) is the canonical workflow description that shapes all agent behavior.
 
 Key characteristics:
 

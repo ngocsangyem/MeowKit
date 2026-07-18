@@ -50,7 +50,10 @@ async function makeRepo(readme: string, skillsIndex: string, agentsIndex: string
 	);
 	await writeFile(join(root, "README.md"), readme);
 	await mkdir(join(root, "website", ".vitepress"), { recursive: true });
-	await writeFile(join(root, "website", ".vitepress", "config.ts"), "const description = '1 skills, 1 agents';\nconst jsonLd = '1 skills, 1 agents';\n");
+	await writeFile(
+		join(root, "website", ".vitepress", "config.ts"),
+		"const description = '1 skills, 1 agents';\nconst jsonLd = '1 skills, 1 agents';\n",
+	);
 	await mkdir(join(root, "website", "workflows"), { recursive: true });
 	await writeFile(join(root, "website", "workflows", "new-project.md"), "1 agents, 1 skills\n");
 	await mkdir(join(root, "website", "reference", "skills"), { recursive: true });
@@ -58,6 +61,8 @@ async function makeRepo(readme: string, skillsIndex: string, agentsIndex: string
 	await writeFile(join(root, "website", "reference", "skills", "lazy-agent-loader.md"), "all 1 agents\n");
 	await mkdir(join(root, "website", "core-concepts"), { recursive: true });
 	await writeFile(join(root, "website", "core-concepts", "how-it-works.md"), "1 skills\n");
+	await mkdir(join(root, "docs", "core"), { recursive: true });
+	await writeFile(join(root, "docs", "core", "meowkit-architecture.md"), "1 domain skills; 1 rule files\n");
 	await mkdir(join(c, "agents"), { recursive: true });
 	await writeFile(join(c, "agents", "SKILLS_INDEX.md"), skillsIndex);
 	await writeFile(join(c, "agents", "AGENTS_INDEX.md"), agentsIndex);
@@ -79,27 +84,41 @@ describe("checkStaleIndex", () => {
 	});
 
 	it("FAILS on a count drift (README claims wrong skill count)", async () => {
-		const root = await makeRepo("9 skills · 1 agents · 1 commands · 1 rules · 1 hook scripts\n", SKILLS_OK, AGENTS_OK, HOOKS_OK);
+		const root = await makeRepo(
+			"9 skills · 1 agents · 1 commands · 1 rules · 1 hook scripts\n",
+			SKILLS_OK,
+			AGENTS_OK,
+			HOOKS_OK,
+		);
 		const results = checkStaleIndex(root);
 		expect(results.some((r) => r.status === "fail" && r.detail.includes("declared 9, found 1"))).toBe(true);
 	});
 
 	it("FAILS when a website count drifts from the inventory", async () => {
 		const root = await makeRepo(README_OK, SKILLS_OK, AGENTS_OK, HOOKS_OK);
-		await writeFile(join(root, "website", ".vitepress", "config.ts"), "const description = '9 skills, 1 agents';\nconst jsonLd = '1 skills, 1 agents';\n");
-		expect(compareCounts(root).some((d) => d.source.includes("website/.vitepress") && d.declared === 9 && d.actual === 1)).toBe(true);
+		await writeFile(
+			join(root, "website", ".vitepress", "config.ts"),
+			"const description = '9 skills, 1 agents';\nconst jsonLd = '1 skills, 1 agents';\n",
+		);
+		expect(
+			compareCounts(root).some((d) => d.source.includes("website/.vitepress") && d.declared === 9 && d.actual === 1),
+		).toBe(true);
 	});
 
 	it("FAILS when a workflow page count drifts from the inventory", async () => {
 		const root = await makeRepo(README_OK, SKILLS_OK, AGENTS_OK, HOOKS_OK);
 		await writeFile(join(root, "website", "workflows", "new-project.md"), "1 agents, 9 skills\n");
-		expect(compareCounts(root).some((d) => d.source.includes("workflows/new-project") && d.declared === 9 && d.actual === 1)).toBe(true);
+		expect(
+			compareCounts(root).some((d) => d.source.includes("workflows/new-project") && d.declared === 9 && d.actual === 1),
+		).toBe(true);
 	});
 
 	it("FAILS on completeness (an agent id is missing from AGENTS_INDEX)", async () => {
 		const root = await makeRepo(README_OK, SKILLS_OK, "[1]{agent_file,role}\n`other.md`|core\n", HOOKS_OK);
 		const results = checkStaleIndex(root);
-		expect(results.some((r) => r.status === "fail" && r.name.includes("AGENTS_INDEX") && r.detail.includes("dev"))).toBe(true);
+		expect(
+			results.some((r) => r.status === "fail" && r.name.includes("AGENTS_INDEX") && r.detail.includes("dev")),
+		).toBe(true);
 	});
 
 	it("FAILS when a count token cannot be found (never pass-on-no-match)", async () => {
@@ -109,8 +128,14 @@ describe("checkStaleIndex", () => {
 	});
 
 	it("emitCounts rewrites numbers but not curated prose", async () => {
-		const staleReadme = "77 skills · 17 agents · 21 commands · 19 rules · 27 hook scripts\nKeep this curated sentence.\n";
-		const root = await makeRepo(staleReadme, "Curated intro.\n`mk:foo`|utility|x|monolithic\n**Total**|**76**\n", AGENTS_OK, HOOKS_OK);
+		const staleReadme =
+			"77 skills · 17 agents · 21 commands · 19 rules · 27 hook scripts\nKeep this curated sentence.\n";
+		const root = await makeRepo(
+			staleReadme,
+			"Curated intro.\n`mk:foo`|utility|x|monolithic\n**Total**|**76**\n",
+			AGENTS_OK,
+			HOOKS_OK,
+		);
 		const changed = emitCounts(root);
 		expect(changed).toContain("README.md");
 		const readme = await readFile(join(root, "README.md"), "utf-8");

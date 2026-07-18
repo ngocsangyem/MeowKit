@@ -55,6 +55,9 @@ jobs:
       - name: Intake ticket sanitizer tests
         run: node .claude/skills/intake/scripts/sanitize-ticket.test.cjs
 
+      - name: Prompt-enhancer canary runner tests
+        run: node .claude/skills/prompt-enhancer/eval/run-canaries.test.cjs
+
       - name: Validate rubric schemas and presets
         run: bash .claude/skills/rubric/scripts/validate-rubric.sh
 

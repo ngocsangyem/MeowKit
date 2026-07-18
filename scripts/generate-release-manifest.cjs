@@ -17,7 +17,7 @@ const INCLUDE_FILES = ["CLAUDE.md"];
 
 const SKIP_DIRS = new Set([
   "node_modules", ".venv", "venv", "__pycache__", ".git",
-  "dist", "build", "logs", "memory", ".DS_Store",
+  "dist", "build", "logs", "memory", "agent-memory", ".DS_Store",
 ]);
 
 const SKIP_EXTENSIONS = new Set([".pyc", ".pyo", ".env"]);
@@ -111,8 +111,18 @@ function main() {
     }
   }
 
+  // The CLI package (`packages/mewkit`) rides its own semver track; record it so the manifest
+  // states which CLI shipped this kit release without conflating the two versions.
+  let cliVersion = "unknown";
+  try {
+    cliVersion = JSON.parse(fs.readFileSync(path.join(projectRoot, "packages", "mewkit", "package.json"), "utf8")).version;
+  } catch {
+    console.warn("Warning: could not read CLI package version");
+  }
+
   const manifest = {
     version,
+    cliVersion,
     generatedAt: new Date().toISOString(),
     files: [],
     deletions,

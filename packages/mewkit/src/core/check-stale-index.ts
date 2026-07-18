@@ -63,16 +63,81 @@ export function countSpecs(repoRoot: string): CountSpec[] {
 		{ source: "README.md", label: "commands", pattern: /(\d+)\s+(?:slash\s+)?commands/g, actual: a.commands.length },
 		{ source: "README.md", label: "rules", pattern: /(\d+)\s+(?:enforcement\s+)?rules/g, actual: a.rules.length },
 		{ source: "README.md", label: "hook scripts", pattern: /(\d+)\s+hook scripts/g, actual: a.hooks.length },
-		{ source: "website/.vitepress/config.ts", label: "website skills", pattern: /(\d+)\+?\s+skills/g, actual: a.skills.length },
-		{ source: "website/.vitepress/config.ts", label: "website agents", pattern: /(\d+)\s+agents/g, actual: a.agents.length },
-		{ source: "website/workflows/new-project.md", label: "new-project skills", pattern: /(\d+)\s+skills/g, actual: a.skills.length },
-		{ source: "website/workflows/new-project.md", label: "new-project agents", pattern: /(\d+)\s+agents/g, actual: a.agents.length },
-		{ source: "website/reference/rules-index.md", label: "rules index agents", pattern: /all\s+(\d+)\s+agents/g, actual: a.agents.length },
-		{ source: "website/reference/skills/lazy-agent-loader.md", label: "lazy loader agents", pattern: /all\s+(\d+)\s+agents/g, actual: a.agents.length },
-		{ source: "website/core-concepts/how-it-works.md", label: "how-it-works skills", pattern: /(\d+)\+?\s+skills/g, actual: a.skills.length },
-		{ source: ".claude/agents/SKILLS_INDEX.md", label: "skills total", pattern: /\*\*Total\*\*\|\*\*(\d+)\*\*/g, actual: a.skills.length },
-		{ source: ".claude/agents/AGENTS_INDEX.md", label: "agents index header", pattern: /\[(\d+)\]\{agent_file/g, actual: a.agents.length },
-		{ source: ".claude/hooks/HOOKS_INDEX.md", label: "shell hooks", pattern: /(\d+)\s+shell hook/g, actual: a.hooks.length },
+		{
+			source: "website/.vitepress/config.ts",
+			label: "website skills",
+			pattern: /(\d+)\+?\s+skills/g,
+			actual: a.skills.length,
+		},
+		{
+			source: "website/.vitepress/config.ts",
+			label: "website agents",
+			pattern: /(\d+)\s+agents/g,
+			actual: a.agents.length,
+		},
+		{
+			source: "website/workflows/new-project.md",
+			label: "new-project skills",
+			pattern: /(\d+)\s+skills/g,
+			actual: a.skills.length,
+		},
+		{
+			source: "website/workflows/new-project.md",
+			label: "new-project agents",
+			pattern: /(\d+)\s+agents/g,
+			actual: a.agents.length,
+		},
+		{
+			source: "website/reference/rules-index.md",
+			label: "rules index agents",
+			pattern: /all\s+(\d+)\s+agents/g,
+			actual: a.agents.length,
+		},
+		{
+			source: "website/reference/skills/lazy-agent-loader.md",
+			label: "lazy loader agents",
+			pattern: /all\s+(\d+)\s+agents/g,
+			actual: a.agents.length,
+		},
+		{
+			source: "website/core-concepts/how-it-works.md",
+			label: "how-it-works skills",
+			pattern: /(\d+)\+?\s+skills/g,
+			actual: a.skills.length,
+		},
+		{
+			source: ".claude/agents/SKILLS_INDEX.md",
+			label: "skills total",
+			pattern: /\*\*Total\*\*\|\*\*(\d+)\*\*/g,
+			actual: a.skills.length,
+		},
+		{
+			source: ".claude/agents/AGENTS_INDEX.md",
+			label: "agents index header",
+			pattern: /\[(\d+)\]\{agent_file/g,
+			actual: a.agents.length,
+		},
+		{
+			source: ".claude/hooks/HOOKS_INDEX.md",
+			label: "shell hooks",
+			pattern: /(\d+)\s+shell hook/g,
+			actual: a.hooks.length,
+		},
+		// docs/core/meowkit-architecture.md — the UNDATED overview prose only. The dated
+		// "Component Inventory (Verified …)" table below it is a historical snapshot and is
+		// intentionally NOT count-generated (bumping it would falsify the audit record).
+		{
+			source: "docs/core/meowkit-architecture.md",
+			label: "arch overview skills",
+			pattern: /(\d+)\s+domain skills/g,
+			actual: a.skills.length,
+		},
+		{
+			source: "docs/core/meowkit-architecture.md",
+			label: "arch overview rules",
+			pattern: /(\d+)\s+rule files/g,
+			actual: a.rules.length,
+		},
 	];
 }
 
@@ -105,11 +170,13 @@ export function missingRows(repoRoot: string): { source: string; type: string; m
 
 	const skillsIndex = read(repoRoot, ".claude/agents/SKILLS_INDEX.md");
 	const missSkills = a.skills.filter((e) => !skillsIndex.includes(e.id)).map((e) => e.id);
-	if (missSkills.length > 0) out.push({ source: ".claude/agents/SKILLS_INDEX.md", type: "skill", missingIds: missSkills });
+	if (missSkills.length > 0)
+		out.push({ source: ".claude/agents/SKILLS_INDEX.md", type: "skill", missingIds: missSkills });
 
 	const agentsIndex = read(repoRoot, ".claude/agents/AGENTS_INDEX.md");
 	const missAgents = a.agents.filter((e) => !agentsIndex.includes(e.id)).map((e) => e.id);
-	if (missAgents.length > 0) out.push({ source: ".claude/agents/AGENTS_INDEX.md", type: "agent", missingIds: missAgents });
+	if (missAgents.length > 0)
+		out.push({ source: ".claude/agents/AGENTS_INDEX.md", type: "agent", missingIds: missAgents });
 
 	const hooksIndex = read(repoRoot, ".claude/hooks/HOOKS_INDEX.md");
 	const missHooks = a.hooks.filter((e) => !hooksIndex.includes(e.id)).map((e) => e.id);
@@ -144,7 +211,12 @@ export function checkStaleIndex(repoRoot: string): CheckResult[] {
 	}
 
 	if (diffs.length === 0 && missing.length === 0) {
-		results.push({ name: "Index counts & completeness", status: "pass", detail: "README + index files match the inventory", section: "Inventory" });
+		results.push({
+			name: "Index counts & completeness",
+			status: "pass",
+			detail: "README + index files match the inventory",
+			section: "Inventory",
+		});
 	}
 	return results;
 }

@@ -53,6 +53,11 @@ tasks/plans/**/*.html
 # Only .gitkeep is tracked so the directory exists after install.
 .claude/memory/*
 !.claude/memory/.gitkeep
+
+# Agent scratch memory (subagent-written, machine-local — like .claude/memory).
+# Swept into plugin/agent-memory/ by build-plugin; never committed or shipped.
+.claude/agent-memory/
+plugin/agent-memory/
 .claude/cache/
 .claude/logs/
 .claude/metadata.json

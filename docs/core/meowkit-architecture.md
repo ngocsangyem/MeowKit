@@ -9,18 +9,19 @@
 ## 1. System Overview
 
 MeowKit is a prompt-engineering framework that extends Claude Code with structured
-workflows, quality gates, memory persistence, and 78 domain skills. It operates
+workflows, quality gates, memory persistence, and 125 domain skills. It operates
 through three mechanisms:
 
 1. **Rules** (`.claude/rules/*.md`) — behavioral instructions loaded every session;
-   18 rule files, priority-ordered; 2 are NEVER-override (`security-rules.md`,
+   27 rule files, priority-ordered; 2 are NEVER-override (`security-rules.md`,
    `injection-rules.md`). Source: `RULES_INDEX.md` loading-priority table.
 2. **Hooks** (`.claude/hooks/*.sh`, `.cjs`) — shell/Node scripts triggered by
    Claude Code events before or after tool calls. Source: `settings.json` (7 hook
    events registered).
 3. **Skills** (`.claude/skills/*/SKILL.md`) — context-loaded domain expertise
    activated by user intent or `autoInvoke: true`. Source: `skill-inventory.json`
-   (78 entries, verified 2026-04-18).
+   (the live count is the "domain skills" figure in the overview above, generated from
+   the inventory; the 78-entry snapshot below was verified 2026-04-18).
 
 There is no executable runtime. MeowKit shapes LLM behavior through prompt
 engineering, preventive hooks, and structured file conventions.

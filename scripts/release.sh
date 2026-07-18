@@ -48,6 +48,23 @@ fi
 echo "=== MeowKit Release v$VERSION ==="
 echo ""
 
+# Step 0: Version-source assertion → stamp derived surfaces → release-readiness gate.
+# Root package.json is the single source of truth for the kit version; the release version MUST
+# match it (bump package.json first). We then stamp the derived surfaces from root
+# (.claude/meowkit.config.json, then mirror into plugin/ via build-plugin) so the version bump is
+# applied consistently, and run the full gate (--no-drift, because the bump legitimately dirties
+# plugin/ before the Step-5 commit; CI re-checks drift on the committed result).
+echo "[0/7] Release-readiness gate..."
+ROOT_VERSION=$(node -p "require('./package.json').version")
+if [ "$VERSION" != "$ROOT_VERSION" ]; then
+  echo "Error: release version ($VERSION) != root package.json ($ROOT_VERSION)."
+  echo "Root package.json is the single source of truth — bump it first, then release the matching version."
+  exit 1
+fi
+node scripts/sync-versions.cjs --write   # stamp .claude/meowkit.config.json (+ manifest if present)
+node packages/mewkit/dist/index.js build-plugin >/dev/null   # mirror the stamp into plugin/
+bash scripts/release-check.sh --no-drift
+
 # Step 1: Bump version (metadata only — packages/mewkit is released separately)
 echo "[1/7] Bumping version to $VERSION..."
 # metadata.json is updated by prepare-release-assets.cjs in step 3
