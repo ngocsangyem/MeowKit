@@ -1,2 +1,12 @@
+packages:
+  - "packages/*"
+
+# Build-script decisions for native/postinstall deps (pnpm gates these).
+# esbuild is required for Vitest/Vite TypeScript transform → allow it.
+# The rest belong to packages/landing (Nuxt) and are not needed to run the
+# test suite, so they stay unbuilt.
 allowBuilds:
   esbuild: true
+  "@parcel/watcher": false
+  sharp: false
+  vue-demi: false

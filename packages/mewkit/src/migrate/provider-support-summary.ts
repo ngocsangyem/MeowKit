@@ -7,13 +7,7 @@ import { providerSummary, type SurfaceEnforcement, type ProviderSupportState } f
 import { isProjectedProvider } from "../core/provider-projection.js";
 
 export type ProviderHarnessRole =
-	| "full-harness"
-	| "hard-gate-candidate"
-	| "procedure"
-	| "policy-advisory"
-	| "config-only"
-	| "disabled"
-	| "deprecated";
+	"full-harness" | "hard-gate-candidate" | "procedure" | "policy-advisory" | "config-only" | "disabled" | "deprecated";
 
 /** Re-export the unified enforcement vocabulary so legacy import sites keep resolving. The support
  * summary no longer owns an enforcement enum — it derives from the adapter (Phase 1 truth model). */

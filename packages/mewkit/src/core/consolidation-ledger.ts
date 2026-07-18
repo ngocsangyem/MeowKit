@@ -15,12 +15,7 @@
  * `authoring-only`/`experimental` = present but not production-critical; `deprecated` = flagged for
  * eventual retirement; `undecided` = needs evidence before any classification. */
 export type ConsolidationStatus =
-	| "canonical"
-	| "keep-legacy"
-	| "authoring-only"
-	| "experimental"
-	| "deprecated"
-	| "undecided";
+	"canonical" | "keep-legacy" | "authoring-only" | "experimental" | "deprecated" | "undecided";
 
 export interface ConsolidationCandidate {
 	id: string;
