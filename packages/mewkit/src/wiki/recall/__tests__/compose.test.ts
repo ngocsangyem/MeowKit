@@ -22,7 +22,14 @@ function result(status: HostResolveResult["status"], topId?: string): HostResolv
 	};
 }
 
-const hit = (): WikiSearchHit => ({ pageId: "p", slug: "s", title: "T", snippet: "…", tokenEstimate: 10, path: "tasks/wikis/s/pages/x.md" });
+const hit = (): WikiSearchHit => ({
+	pageId: "p",
+	slug: "s",
+	title: "T",
+	snippet: "…",
+	tokenEstimate: 10,
+	path: "tasks/wikis/s/pages/x.md",
+});
 
 describe("attachRecall — selection-behavior gate", () => {
 	const dbFile = "/tmp/nope/wiki-index.db";

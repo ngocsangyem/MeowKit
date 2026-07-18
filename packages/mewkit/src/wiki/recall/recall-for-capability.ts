@@ -25,7 +25,12 @@ function conditionalHint(profile: SkillHandoffProfile): string {
 	);
 }
 
-function envelope(status: RecallStatus, policy: KnowledgeRecall["policy"], hits: RecallHit[], meta: Partial<KnowledgeRecall["metadata"]> & { source: string; query: string }): KnowledgeRecall {
+function envelope(
+	status: RecallStatus,
+	policy: KnowledgeRecall["policy"],
+	hits: RecallHit[],
+	meta: Partial<KnowledgeRecall["metadata"]> & { source: string; query: string },
+): KnowledgeRecall {
 	return {
 		status,
 		policy,

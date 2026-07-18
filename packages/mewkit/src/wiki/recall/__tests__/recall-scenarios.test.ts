@@ -27,14 +27,7 @@ const hit = (title: string): WikiSearchHit => ({
 
 describe("knowledge-recall contract", () => {
 	it("declares exactly the six-status union, all fail-open", () => {
-		const statuses: RecallStatus[] = [
-			"not-required",
-			"conditional",
-			"ready",
-			"empty",
-			"index-missing",
-			"query-failed",
-		];
+		const statuses: RecallStatus[] = ["not-required", "conditional", "ready", "empty", "index-missing", "query-failed"];
 		// A compile-time exhaustiveness guard: any added/removed status breaks this map.
 		const failOpen: Record<RecallStatus, true> = {
 			"not-required": true,
