@@ -20,7 +20,7 @@ user-invocable: true
 owner: utility
 criticality: medium
 status: active
-runtime: claude-code
+runtime: portable
 ---
 
 # Clean Code — Pragmatic AI Coding Standards

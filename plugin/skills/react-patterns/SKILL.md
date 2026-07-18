@@ -24,7 +24,7 @@ user-invocable: true
 owner: utility
 criticality: medium
 status: active
-runtime: claude-code
+runtime: portable
 ---
 
 # React Patterns

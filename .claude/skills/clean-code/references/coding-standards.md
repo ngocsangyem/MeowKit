@@ -65,15 +65,17 @@
 
 ## Verification Scripts
 
-Shared validation scripts live at `.claude/scripts/`, not inside individual skills:
+If the harness ships shared validation scripts, prefer them over per-skill copies. Common ones:
 
-| Script               | Purpose                     | Command                                     |
-| -------------------- | --------------------------- | ------------------------------------------- |
-| `validate.py`        | General code validation     | `.claude/skills/.venv/bin/python3 .claude/scripts/validate.py`        |
-| `security-scan.py`   | Security pattern scanning   | `.claude/skills/.venv/bin/python3 .claude/scripts/security-scan.py`   |
-| `injection-audit.py` | Prompt injection detection  | `.claude/skills/.venv/bin/python3 .claude/scripts/injection-audit.py` |
-| `validate-docs.py`   | Documentation consistency   | `.claude/skills/.venv/bin/python3 .claude/scripts/validate-docs.py`   |
-| `checklist.py`       | Review checklist automation | `.claude/skills/.venv/bin/python3 .claude/scripts/checklist.py`       |
+| Script               | Purpose                     |
+| -------------------- | --------------------------- |
+| `validate`           | General code validation     |
+| `security-scan`      | Security pattern scanning   |
+| `injection-audit`    | Prompt injection detection  |
+| `validate-docs`      | Documentation consistency   |
+| `checklist`          | Review checklist automation |
+
+Run them through the harness's configured script runner (the host resolves the interpreter and path).
 
 **For project-specific linting/testing:** Use the project's own toolchain (e.g., `npm run lint`, `npm test`, `pytest`). The developer agent handles this automatically.
 

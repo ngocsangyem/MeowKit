@@ -22,7 +22,7 @@ user-invocable: true
 owner: portability
 criticality: medium
 status: active
-runtime: claude-code
+runtime: portable
 ---
 
 # API Design
