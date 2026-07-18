@@ -1,6 +1,6 @@
 {
   "name": "mk",
-  "version": "2.14.0",
+  "version": "2.14.1",
   "description": "MeowKit — an opinionated Claude Code harness (skills, agents, hooks).",
   "author": {
     "name": "ngocsangyem"

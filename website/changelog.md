@@ -14,6 +14,37 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.14.1 (2026-07-18) — Harness Integrity & Provider Parity
+
+The `mewkit` CLI ships alongside this kit as **1.18.1** (see `CLI` below).
+
+### Highlights
+
+This release closes the 2.14.0 harness audit. Gates now prove authority rather than paperwork, the evaluator rejects forged verdicts, provider support is stated from one honest source, Codex migration is default-deny with a measured parity score and a post-migration validator, and the release now gates on its own quality checks.
+
+### CLI
+
+- `mewkit validate --target codex <dir>` — a read-only post-migration gate for a generated Codex project that checks the config/hook wiring, that hook wrappers exist, are executable, and carry the deny contract, that agent TOMLs parse, and that installed skills declare a supported runtime and carry no host-bound tool tokens.
+- `mewkit providers codex` and `--lifecycle` now render from a single provider-truth source, and both the migration output and README report a `skill parity: N%` score.
+- `mewkit migrate codex` is default-deny — a portable skill installs, a host-bound skill installs only through a tested adapter or is skipped with a report reason; `mewkit migrate codex --include-unportable` overrides the policy with an EXPERIMENTAL marker.
+- The cross-harness journey (J10) runs a deterministic layer in CI — migration, target validation, then route/artifact/denied-token/side-effect oracles — with no model calls, reporting structural (not semantic) parity.
+- The benchmark path now enforces its cost cap: a run halts when cumulative cost reaches the effective cap (`--budget` or `MEOWKIT_BUDGET_CAP` override the tier cap).
+- `mewkit inventory --emit-counts` regenerates documentation count tokens from the inventory; `npm run release:check` aggregates the release-readiness gates for contributors.
+
+### Improvements
+
+- Gate 1 now requires a fresh approval receipt bound to the plan revision — plan-presence alone no longer opens it, and editing the plan after approval re-arms the gate.
+- Every pre-ship blocked path exits with a structured deny (`exit 2`), and a missing gate checker fails closed for ship commands.
+- The evaluator recomputes its weighted score from the rubric preset and verifies evidence provenance, so a verdict whose score does not follow from its rubrics is rejected.
+- Curated memory has a single JSON write path — a write to a non-canonical view is corrected, and a failed capture surfaces a notice instead of skipping silently.
+- The release gates on its own checks (tests, lint, typecheck, format, portable validation, inventory, version sync, and plugin-payload drift), versions sync from the root as the single source, and documentation counts generate from the inventory.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the hardened gates and provider changes — a plan now needs `npx mewkit plan approve <plan-dir>` after human approval (or `MEOWKIT_GATE1_PRESENCE_ONLY=1` to opt out).
+
+---
+
 ## 2.14.0 (2026-07-17) — Provider Conformance, Contract Safety & Evals
 
 The `mewkit` CLI ships alongside this kit as **1.18.0** (see `CLI` below).

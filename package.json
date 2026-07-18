@@ -40,7 +40,7 @@
     "node": ">=20"
   },
   "license": "MIT",
-  "version": "2.14.0",
+  "version": "2.14.1",
   "overrides": {
     "npm": "^11.14.1"
   }
