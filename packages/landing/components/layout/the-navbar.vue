@@ -5,6 +5,8 @@ const navLinks = [
   { label: 'How it works', href: '#how-it-works' },
   { label: 'Capabilities', href: '#features' },
   { label: 'Install', href: '#install' },
+  // external flag = open in a new tab (also skips the smooth-scroll handler)
+  { label: 'Demo', href: '/demo', external: true },
   { label: 'Docs', href: 'https://docs.meowkit.dev/', external: true },
 ]
 

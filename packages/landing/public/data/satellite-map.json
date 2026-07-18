@@ -1,0 +1,1262 @@
+{
+  "version": 1,
+  "meta": {
+    "name": "meowkit",
+    "tagline": "How meowkit skills, agents, commands, and hooks orbit each other",
+    "date": "2026-07-18"
+  },
+  "stats": {
+    "skills": 125,
+    "agents": 40,
+    "commands": 26,
+    "hooks": 9,
+    "edges": 728
+  },
+  "planets": [
+    {
+      "id": "cook",
+      "label": "mk:cook",
+      "kind": "skill",
+      "sub": "Orchestrates single-task implementation…",
+      "detail": "Orchestrates single-task implementation pipeline: plan → test → build → review.",
+      "sourceRef": "plugin/skills/cook/SKILL.md",
+      "group": "lifecycle-core",
+      "criticality": "critical",
+      "satellites": [
+        {
+          "id": "review",
+          "label": "mk:review",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "help",
+            "loop",
+            "ask-me"
+          ],
+          "detail": "Multi-pass structural code review with adversarial analysis, scope-aware dispatch, adversarial persona passes, and forced-finding protocol.",
+          "sourceRef": "plugin/skills/review/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "ship",
+          "label": "mk:ship",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "jira",
+            "help",
+            "loop"
+          ],
+          "detail": "Ship workflow with explicit scopes: prepare stages and commits locally; release pushes and creates a PR; publish manages issues and versioning.",
+          "sourceRef": "plugin/skills/ship/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "autobuild",
+          "label": "mk:autobuild",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "plan-creator",
+            "loop"
+          ],
+          "detail": "Use when running an autonomous multi-hour build of a green-field product — orchestrates planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density per model tier.",
+          "sourceRef": "plugin/skills/autobuild/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "investigate",
+          "label": "mk:investigate",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "intake",
+            "fix",
+            "loop",
+            "ask-me"
+          ],
+          "detail": "Systematic debugging with root cause investigation.",
+          "sourceRef": "plugin/skills/investigate/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "scout",
+          "label": "mk:scout",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "intake",
+            "fix",
+            "plan-creator",
+            "loop",
+            "chom"
+          ],
+          "detail": "Fast parallel codebase scouting.",
+          "sourceRef": "plugin/skills/scout/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "evaluate",
+          "label": "mk:evaluate",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "loop"
+          ],
+          "detail": "Experimental behavioral evaluator.",
+          "sourceRef": "plugin/skills/evaluate/SKILL.md",
+          "group": "testing",
+          "criticality": "high"
+        },
+        {
+          "id": "developer",
+          "label": "developer",
+          "kind": "agent",
+          "edge": "spawns",
+          "sharedWith": [
+            "party",
+            "fix"
+          ],
+          "detail": "Implementation agent that writes production code following approved plans.",
+          "sourceRef": "plugin/agents/developer.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "testing",
+          "label": "mk:testing",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Use when writing tests, running validation scripts, or (in TDD mode) enforcing red-green-refactor cycle.",
+          "sourceRef": "plugin/skills/testing/SKILL.md",
+          "group": "testing",
+          "criticality": "medium"
+        }
+      ]
+    },
+    {
+      "id": "jira",
+      "label": "mk:jira",
+      "kind": "skill",
+      "sub": "Routing skill — recommends the correct…",
+      "detail": "Routing skill — recommends the correct mk:jira-* leaf for any Jira task.",
+      "sourceRef": "plugin/skills/jira/SKILL.md",
+      "group": "atlassian",
+      "criticality": "medium",
+      "satellites": [
+        {
+          "id": "jira-issue",
+          "label": "mk:jira-issue",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "intake"
+          ],
+          "detail": "JIRA issue CRUD via the jira-as wrapper.",
+          "sourceRef": "plugin/skills/jira-issue/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "planning-engine",
+          "label": "mk:planning-engine",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "intake",
+            "plan-creator"
+          ],
+          "detail": "Analyzes ticket complexity and maps dependencies against an existing codebase before sprint planning.",
+          "sourceRef": "plugin/skills/planning-engine/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "medium"
+        },
+        {
+          "id": "ship",
+          "label": "mk:ship",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "help",
+            "loop"
+          ],
+          "detail": "Ship workflow with explicit scopes: prepare stages and commits locally; release pushes and creates a PR; publish manages issues and versioning.",
+          "sourceRef": "plugin/skills/ship/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "jira-agile",
+          "label": "mk:jira-agile",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "JIRA agile via the jira-as wrapper: epics, sprints, backlog, ranking, story points, subtasks, velocity.",
+          "sourceRef": "plugin/skills/jira-agile/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "jira-collaborate",
+          "label": "mk:jira-collaborate",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "intake"
+          ],
+          "detail": "Manage JIRA collaboration surface via the jira-as wrapper: comments, attachments, watchers, notify.",
+          "sourceRef": "plugin/skills/jira-collaborate/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "jira-lifecycle",
+          "label": "mk:jira-lifecycle",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Drive JIRA workflow lifecycle via the jira-as wrapper: transition, assign, resolve, reopen, manage versions and components.",
+          "sourceRef": "plugin/skills/jira-lifecycle/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "jira-analyst",
+          "label": "mk:jira-analyst",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Full Jira ticket context analysis via the jira-analyst agent — including media (attached images / PDFs / screenshots) and linked issues.",
+          "sourceRef": "plugin/skills/jira-analyst/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "jira-bulk",
+          "label": "mk:jira-bulk",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Bulk JIRA operations on 10+ issues via the jira-as wrapper: bulk transition / assign / set-priority / clone / delete.",
+          "sourceRef": "plugin/skills/jira-bulk/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        }
+      ]
+    },
+    {
+      "id": "party",
+      "label": "mk:party",
+      "kind": "skill",
+      "sub": "Multi-agent collaboration session.",
+      "detail": "Multi-agent collaboration session.",
+      "sourceRef": "plugin/skills/party/SKILL.md",
+      "group": "research",
+      "criticality": "medium",
+      "satellites": [
+        {
+          "id": "brainstorming",
+          "label": "mk:brainstorming",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "fix",
+            "plan-creator",
+            "loop",
+            "ask-me",
+            "chom"
+          ],
+          "detail": "Generate or compare multiple technical approaches for one validated decision.",
+          "sourceRef": "plugin/skills/brainstorming/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "developer",
+          "label": "developer",
+          "kind": "agent",
+          "edge": "spawns",
+          "sharedWith": [
+            "cook",
+            "fix"
+          ],
+          "detail": "Implementation agent that writes production code following approved plans.",
+          "sourceRef": "plugin/agents/developer.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "elicit",
+          "label": "mk:elicit",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Structured second-pass reasoning after code review or plan evaluation.",
+          "sourceRef": "plugin/skills/elicit/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "ui-ux-designer",
+          "label": "ui-ux-designer",
+          "kind": "agent",
+          "edge": "spawns",
+          "detail": "Use when frontend work requires UI/UX design decisions — component design, design systems, wireframes, visual review, accessibility audits, or responsive layout.",
+          "sourceRef": "plugin/agents/ui-ux-designer.md",
+          "group": "docs",
+          "criticality": "medium"
+        },
+        {
+          "id": "reviewer",
+          "label": "reviewer",
+          "kind": "agent",
+          "edge": "spawns",
+          "detail": "Structural code review agent that performs deep 5-dimension reviews and enforces Gate 2 — no code ships without a passing review verdict.",
+          "sourceRef": "plugin/agents/reviewer.md",
+          "group": "testing",
+          "criticality": "high"
+        },
+        {
+          "id": "office-hours",
+          "label": "mk:office-hours",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "YC Office Hours — product validation for a new product, feature, or side-project concept.",
+          "sourceRef": "plugin/skills/office-hours/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "orchestrator",
+          "label": "orchestrator",
+          "kind": "agent",
+          "edge": "spawns",
+          "detail": "Task router for every incoming request.",
+          "sourceRef": "plugin/agents/orchestrator.md",
+          "group": "lifecycle-core",
+          "criticality": "critical"
+        },
+        {
+          "id": "researcher",
+          "label": "researcher",
+          "kind": "agent",
+          "edge": "spawns",
+          "sharedWith": [
+            "chom"
+          ],
+          "detail": "Use this agent when you need to research technical topics, evaluate libraries or frameworks, find documentation, or gather information before making decisions.",
+          "sourceRef": "plugin/agents/researcher.md",
+          "group": "research",
+          "criticality": "medium"
+        }
+      ]
+    },
+    {
+      "id": "intake",
+      "label": "mk:intake",
+      "kind": "skill",
+      "sub": "Ticket/PRD intake: product area…",
+      "detail": "Ticket/PRD intake: product area classification, completeness scoring, RCA, technical assessment.",
+      "sourceRef": "plugin/skills/intake/SKILL.md",
+      "group": "research",
+      "criticality": "medium",
+      "satellites": [
+        {
+          "id": "jira-issue",
+          "label": "mk:jira-issue",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "jira"
+          ],
+          "detail": "JIRA issue CRUD via the jira-as wrapper.",
+          "sourceRef": "plugin/skills/jira-issue/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "planning-engine",
+          "label": "mk:planning-engine",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "jira",
+            "plan-creator"
+          ],
+          "detail": "Analyzes ticket complexity and maps dependencies against an existing codebase before sprint planning.",
+          "sourceRef": "plugin/skills/planning-engine/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "medium"
+        },
+        {
+          "id": "investigate",
+          "label": "mk:investigate",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "fix",
+            "loop",
+            "ask-me"
+          ],
+          "detail": "Systematic debugging with root cause investigation.",
+          "sourceRef": "plugin/skills/investigate/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "scout",
+          "label": "mk:scout",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "fix",
+            "plan-creator",
+            "loop",
+            "chom"
+          ],
+          "detail": "Fast parallel codebase scouting.",
+          "sourceRef": "plugin/skills/scout/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "confluence-spec-analyst",
+          "label": "confluence-spec-analyst",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Deep spec analysis on a Confluence page.",
+          "sourceRef": "plugin/skills/confluence-spec-analyst/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "web-to-markdown",
+          "label": "mk:web-to-markdown",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "chom"
+          ],
+          "detail": "Fetch a URL and return clean markdown.",
+          "sourceRef": "plugin/skills/web-to-markdown/SKILL.md",
+          "group": "docs",
+          "criticality": "medium"
+        },
+        {
+          "id": "jira-collaborate",
+          "label": "mk:jira-collaborate",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "jira"
+          ],
+          "detail": "Manage JIRA collaboration surface via the jira-as wrapper: comments, attachments, watchers, notify.",
+          "sourceRef": "plugin/skills/jira-collaborate/SKILL.md",
+          "group": "atlassian",
+          "criticality": "medium"
+        },
+        {
+          "id": "scale-routing",
+          "label": "mk:scale-routing",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "plan-creator",
+            "help"
+          ],
+          "detail": "Domain-aware complexity routing.",
+          "sourceRef": "plugin/skills/scale-routing/SKILL.md",
+          "group": "portability",
+          "criticality": "medium"
+        }
+      ]
+    },
+    {
+      "id": "fix",
+      "label": "mk:fix",
+      "kind": "skill",
+      "sub": "Diagnoses and fixes bugs, type errors,…",
+      "detail": "Diagnoses and fixes bugs, type errors, lint failures, CI/CD issues, and runtime errors via root-cause-first investigation.",
+      "sourceRef": "plugin/skills/fix/SKILL.md",
+      "group": "lifecycle-core",
+      "criticality": "high",
+      "satellites": [
+        {
+          "id": "brainstorming",
+          "label": "mk:brainstorming",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "party",
+            "plan-creator",
+            "loop",
+            "ask-me",
+            "chom"
+          ],
+          "detail": "Generate or compare multiple technical approaches for one validated decision.",
+          "sourceRef": "plugin/skills/brainstorming/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "investigate",
+          "label": "mk:investigate",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "intake",
+            "loop",
+            "ask-me"
+          ],
+          "detail": "Systematic debugging with root cause investigation.",
+          "sourceRef": "plugin/skills/investigate/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "scout",
+          "label": "mk:scout",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "intake",
+            "plan-creator",
+            "loop",
+            "chom"
+          ],
+          "detail": "Fast parallel codebase scouting.",
+          "sourceRef": "plugin/skills/scout/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "developer",
+          "label": "developer",
+          "kind": "agent",
+          "edge": "spawns",
+          "sharedWith": [
+            "cook",
+            "party"
+          ],
+          "detail": "Implementation agent that writes production code following approved plans.",
+          "sourceRef": "plugin/agents/developer.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "docs-finder",
+          "label": "mk:docs-finder",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "ask-me"
+          ],
+          "detail": "Retrieve up-to-date library, framework, and project documentation using scripts + MCP tools (Context7, Context Hub) with intelligent fallback.",
+          "sourceRef": "plugin/skills/docs-finder/SKILL.md",
+          "group": "docs",
+          "criticality": "medium"
+        },
+        {
+          "id": "documenter",
+          "label": "documenter",
+          "kind": "agent",
+          "edge": "spawns",
+          "detail": "Living documentation agent that keeps project docs in sync with the codebase.",
+          "sourceRef": "plugin/agents/documenter.md",
+          "group": "docs",
+          "criticality": "medium"
+        },
+        {
+          "id": "project-manager",
+          "label": "project-manager",
+          "kind": "agent",
+          "edge": "spawns",
+          "detail": "Cross-workflow delivery tracker.",
+          "sourceRef": "plugin/agents/project-manager.md",
+          "group": "lifecycle-core",
+          "criticality": "medium"
+        },
+        {
+          "id": "memory",
+          "label": "mk:memory",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "JSON-canonical session memory.",
+          "sourceRef": "plugin/skills/memory/SKILL.md",
+          "group": "memory",
+          "criticality": "high"
+        }
+      ]
+    },
+    {
+      "id": "plan-creator",
+      "label": "mk:plan-creator",
+      "kind": "skill",
+      "sub": "Creates structured multi-file…",
+      "detail": "Creates structured multi-file implementation plans before build.",
+      "sourceRef": "plugin/skills/plan-creator/SKILL.md",
+      "group": "lifecycle-core",
+      "criticality": "critical",
+      "satellites": [
+        {
+          "id": "planning-engine",
+          "label": "mk:planning-engine",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "jira",
+            "intake"
+          ],
+          "detail": "Analyzes ticket complexity and maps dependencies against an existing codebase before sprint planning.",
+          "sourceRef": "plugin/skills/planning-engine/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "medium"
+        },
+        {
+          "id": "brainstorming",
+          "label": "mk:brainstorming",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "party",
+            "fix",
+            "loop",
+            "ask-me",
+            "chom"
+          ],
+          "detail": "Generate or compare multiple technical approaches for one validated decision.",
+          "sourceRef": "plugin/skills/brainstorming/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "autobuild",
+          "label": "mk:autobuild",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "loop"
+          ],
+          "detail": "Use when running an autonomous multi-hour build of a green-field product — orchestrates planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density per model tier.",
+          "sourceRef": "plugin/skills/autobuild/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "scout",
+          "label": "mk:scout",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "intake",
+            "fix",
+            "loop",
+            "chom"
+          ],
+          "detail": "Fast parallel codebase scouting.",
+          "sourceRef": "plugin/skills/scout/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "plan-ceo-review",
+          "label": "mk:plan-ceo-review",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "CEO/founder-mode plan review.",
+          "sourceRef": "plugin/skills/plan-ceo-review/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "medium"
+        },
+        {
+          "id": "scale-routing",
+          "label": "mk:scale-routing",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "intake",
+            "help"
+          ],
+          "detail": "Domain-aware complexity routing.",
+          "sourceRef": "plugin/skills/scale-routing/SKILL.md",
+          "group": "portability",
+          "criticality": "medium"
+        },
+        {
+          "id": "agent-detector",
+          "label": "mk:agent-detector",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "help"
+          ],
+          "detail": "Detects task agent and complexity tier at Phase 0 orient.",
+          "sourceRef": "plugin/skills/agent-detector/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "medium"
+        },
+        {
+          "id": "figma",
+          "label": "mk:figma",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Read-first Figma gateway via Figma MCP: analyze designs, implement Figma-to-code for 1–3 screens, extract design tokens, produce a Figma Evidence Packet for planning handoff, screenshot fallback.",
+          "sourceRef": "plugin/skills/figma/SKILL.md",
+          "group": "utility",
+          "criticality": "medium"
+        }
+      ]
+    },
+    {
+      "id": "help",
+      "label": "mk:help",
+      "kind": "skill",
+      "sub": "Workflow navigation assistant.",
+      "detail": "Workflow navigation assistant.",
+      "sourceRef": "plugin/skills/help/SKILL.md",
+      "group": "research",
+      "criticality": "medium",
+      "satellites": [
+        {
+          "id": "review",
+          "label": "mk:review",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "loop",
+            "ask-me"
+          ],
+          "detail": "Multi-pass structural code review with adversarial analysis, scope-aware dispatch, adversarial persona passes, and forced-finding protocol.",
+          "sourceRef": "plugin/skills/review/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "ship",
+          "label": "mk:ship",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "jira",
+            "loop"
+          ],
+          "detail": "Ship workflow with explicit scopes: prepare stages and commits locally; release pushes and creates a PR; publish manages issues and versioning.",
+          "sourceRef": "plugin/skills/ship/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "scale-routing",
+          "label": "mk:scale-routing",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "intake",
+            "plan-creator"
+          ],
+          "detail": "Domain-aware complexity routing.",
+          "sourceRef": "plugin/skills/scale-routing/SKILL.md",
+          "group": "portability",
+          "criticality": "medium"
+        },
+        {
+          "id": "verify",
+          "label": "mk:verify",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "loop"
+          ],
+          "detail": "Unified verification: build→lint→test→type-check→coverage.",
+          "sourceRef": "plugin/skills/verify/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "agent-detector",
+          "label": "mk:agent-detector",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "plan-creator"
+          ],
+          "detail": "Detects task agent and complexity tier at Phase 0 orient.",
+          "sourceRef": "plugin/skills/agent-detector/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "medium"
+        },
+        {
+          "id": "retro",
+          "label": "mk:retro",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Weekly-cadence engineering retrospective.",
+          "sourceRef": "plugin/skills/retro/SKILL.md",
+          "group": "docs",
+          "criticality": "medium"
+        },
+        {
+          "id": "api-design",
+          "label": "mk:api-design",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "REST/GraphQL API design: resource naming, HTTP methods, status codes, pagination, versioning, error formats.",
+          "sourceRef": "plugin/skills/api-design/SKILL.md",
+          "group": "portability",
+          "criticality": "medium"
+        },
+        {
+          "id": "decision-framework",
+          "label": "mk:decision-framework",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Operational decision frameworks: triage, escalation, case management, billing ops.",
+          "sourceRef": "plugin/skills/decision-framework/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        }
+      ]
+    },
+    {
+      "id": "loop",
+      "label": "mk:loop",
+      "kind": "skill",
+      "sub": "Use when autonomously improving a…",
+      "detail": "Use when autonomously improving a measurable scalar metric through bounded, git-tracked iterations: modify one scoped change, verify, keep or revert.",
+      "sourceRef": "plugin/skills/loop/SKILL.md",
+      "group": "memory",
+      "criticality": "medium",
+      "satellites": [
+        {
+          "id": "review",
+          "label": "mk:review",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "help",
+            "ask-me"
+          ],
+          "detail": "Multi-pass structural code review with adversarial analysis, scope-aware dispatch, adversarial persona passes, and forced-finding protocol.",
+          "sourceRef": "plugin/skills/review/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "ship",
+          "label": "mk:ship",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "jira",
+            "help"
+          ],
+          "detail": "Ship workflow with explicit scopes: prepare stages and commits locally; release pushes and creates a PR; publish manages issues and versioning.",
+          "sourceRef": "plugin/skills/ship/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "brainstorming",
+          "label": "mk:brainstorming",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "party",
+            "fix",
+            "plan-creator",
+            "ask-me",
+            "chom"
+          ],
+          "detail": "Generate or compare multiple technical approaches for one validated decision.",
+          "sourceRef": "plugin/skills/brainstorming/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "autobuild",
+          "label": "mk:autobuild",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "plan-creator"
+          ],
+          "detail": "Use when running an autonomous multi-hour build of a green-field product — orchestrates planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density per model tier.",
+          "sourceRef": "plugin/skills/autobuild/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "investigate",
+          "label": "mk:investigate",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "intake",
+            "fix",
+            "ask-me"
+          ],
+          "detail": "Systematic debugging with root cause investigation.",
+          "sourceRef": "plugin/skills/investigate/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "scout",
+          "label": "mk:scout",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "intake",
+            "fix",
+            "plan-creator",
+            "chom"
+          ],
+          "detail": "Fast parallel codebase scouting.",
+          "sourceRef": "plugin/skills/scout/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "evaluate",
+          "label": "mk:evaluate",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook"
+          ],
+          "detail": "Experimental behavioral evaluator.",
+          "sourceRef": "plugin/skills/evaluate/SKILL.md",
+          "group": "testing",
+          "criticality": "high"
+        },
+        {
+          "id": "verify",
+          "label": "mk:verify",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "help"
+          ],
+          "detail": "Unified verification: build→lint→test→type-check→coverage.",
+          "sourceRef": "plugin/skills/verify/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        }
+      ]
+    },
+    {
+      "id": "ask-me",
+      "label": "mk:ask-me",
+      "kind": "skill",
+      "sub": "Use when answering factual or…",
+      "detail": "Use when answering factual or explanatory questions about the current project — codebase, architecture, conventions, workflows, constraints — with minimal cited evidence.",
+      "sourceRef": "plugin/skills/ask-me/SKILL.md",
+      "group": "research",
+      "criticality": "medium",
+      "satellites": [
+        {
+          "id": "review",
+          "label": "mk:review",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "help",
+            "loop"
+          ],
+          "detail": "Multi-pass structural code review with adversarial analysis, scope-aware dispatch, adversarial persona passes, and forced-finding protocol.",
+          "sourceRef": "plugin/skills/review/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "high"
+        },
+        {
+          "id": "brainstorming",
+          "label": "mk:brainstorming",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "party",
+            "fix",
+            "plan-creator",
+            "loop",
+            "chom"
+          ],
+          "detail": "Generate or compare multiple technical approaches for one validated decision.",
+          "sourceRef": "plugin/skills/brainstorming/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "investigate",
+          "label": "mk:investigate",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "intake",
+            "fix",
+            "loop"
+          ],
+          "detail": "Systematic debugging with root cause investigation.",
+          "sourceRef": "plugin/skills/investigate/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "preview",
+          "label": "mk:preview",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Use when generating visual artifacts — explanations, diagrams, slides, or diff visualizations.",
+          "sourceRef": "plugin/skills/preview/SKILL.md",
+          "group": "docs",
+          "criticality": "medium"
+        },
+        {
+          "id": "cso",
+          "label": "mk:cso",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Chief Security Officer mode.",
+          "sourceRef": "plugin/skills/cso/SKILL.md",
+          "group": "security-audit",
+          "criticality": "high"
+        },
+        {
+          "id": "docs-finder",
+          "label": "mk:docs-finder",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "fix"
+          ],
+          "detail": "Retrieve up-to-date library, framework, and project documentation using scripts + MCP tools (Context7, Context Hub) with intelligent fallback.",
+          "sourceRef": "plugin/skills/docs-finder/SKILL.md",
+          "group": "docs",
+          "criticality": "medium"
+        },
+        {
+          "id": "nyquist",
+          "label": "mk:nyquist",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Test-to-requirement coverage mapping.",
+          "sourceRef": "plugin/skills/nyquist/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        }
+      ]
+    },
+    {
+      "id": "chom",
+      "label": "mk:chom",
+      "kind": "skill",
+      "sub": "Use when copy-catting, replicating, or…",
+      "detail": "Use when copy-catting, replicating, or adapting features from external systems, repos, apps, or ideas into the current project.",
+      "sourceRef": "plugin/skills/chom/SKILL.md",
+      "group": "research",
+      "criticality": "medium",
+      "satellites": [
+        {
+          "id": "brainstorming",
+          "label": "mk:brainstorming",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "party",
+            "fix",
+            "plan-creator",
+            "loop",
+            "ask-me"
+          ],
+          "detail": "Generate or compare multiple technical approaches for one validated decision.",
+          "sourceRef": "plugin/skills/brainstorming/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "scout",
+          "label": "mk:scout",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "cook",
+            "intake",
+            "fix",
+            "plan-creator",
+            "loop"
+          ],
+          "detail": "Fast parallel codebase scouting.",
+          "sourceRef": "plugin/skills/scout/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "web-to-markdown",
+          "label": "mk:web-to-markdown",
+          "kind": "skill",
+          "edge": "calls",
+          "sharedWith": [
+            "intake"
+          ],
+          "detail": "Fetch a URL and return clean markdown.",
+          "sourceRef": "plugin/skills/web-to-markdown/SKILL.md",
+          "group": "docs",
+          "criticality": "medium"
+        },
+        {
+          "id": "agent-browser",
+          "label": "mk:agent-browser",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Browser automation CLI for AI agents using agent-browser.",
+          "sourceRef": "plugin/skills/agent-browser/SKILL.md",
+          "group": "utility",
+          "criticality": "medium"
+        },
+        {
+          "id": "multimodal",
+          "label": "mk:multimodal",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Process images, video, audio, PDFs with Gemini API.",
+          "sourceRef": "plugin/skills/multimodal/SKILL.md",
+          "group": "utility",
+          "criticality": "medium"
+        },
+        {
+          "id": "sequential-thinking",
+          "label": "mk:sequential-thinking",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Use when a problem requires structured step-by-step reasoning before acting.",
+          "sourceRef": "plugin/skills/sequential-thinking/SKILL.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "researcher",
+          "label": "researcher",
+          "kind": "agent",
+          "edge": "spawns",
+          "sharedWith": [
+            "party"
+          ],
+          "detail": "Use this agent when you need to research technical topics, evaluate libraries or frameworks, find documentation, or gather information before making decisions.",
+          "sourceRef": "plugin/agents/researcher.md",
+          "group": "research",
+          "criticality": "medium"
+        },
+        {
+          "id": "pack",
+          "label": "mk:pack",
+          "kind": "skill",
+          "edge": "calls",
+          "detail": "Pack an EXTERNAL repository into a single AI-friendly file (markdown/xml/json).",
+          "sourceRef": "plugin/skills/pack/SKILL.md",
+          "group": "lifecycle-core",
+          "criticality": "medium"
+        }
+      ]
+    }
+  ],
+  "crossLinks": [
+    {
+      "from": "cook",
+      "to": "plan-creator"
+    },
+    {
+      "from": "plan-creator",
+      "to": "cook"
+    },
+    {
+      "from": "fix",
+      "to": "cook"
+    },
+    {
+      "from": "jira",
+      "to": "cook"
+    },
+    {
+      "from": "intake",
+      "to": "cook"
+    },
+    {
+      "from": "fix",
+      "to": "plan-creator"
+    },
+    {
+      "from": "plan-creator",
+      "to": "fix"
+    },
+    {
+      "from": "help",
+      "to": "cook"
+    },
+    {
+      "from": "chom",
+      "to": "cook"
+    },
+    {
+      "from": "loop",
+      "to": "cook"
+    },
+    {
+      "from": "help",
+      "to": "plan-creator"
+    },
+    {
+      "from": "ask-me",
+      "to": "plan-creator"
+    },
+    {
+      "from": "chom",
+      "to": "plan-creator"
+    },
+    {
+      "from": "loop",
+      "to": "plan-creator"
+    },
+    {
+      "from": "intake",
+      "to": "fix"
+    }
+  ],
+  "belt": {
+    "count": 147,
+    "byKind": {
+      "skills": 79,
+      "agents": 33,
+      "commands": 26,
+      "hooks": 9
+    },
+    "sample": [
+      "vue",
+      "sprint-contract",
+      "frontend-design",
+      "jira-estimator",
+      "jira-evaluator",
+      "jira-search",
+      "vue-testing-best-practices",
+      "confluence-page",
+      "confluence",
+      "grill",
+      "jira-admin",
+      "jira-fields"
+    ]
+  }
+}
