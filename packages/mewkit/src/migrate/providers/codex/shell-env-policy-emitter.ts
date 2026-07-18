@@ -101,12 +101,15 @@ export function emitShellEnvPolicyScaffold(discovery: EnvKeyDiscovery | null): S
 		"# Fill each value from your environment, or prefer inherit/OS-level injection for secrets.",
 		"# Secret-like key names (SECRET/TOKEN/PASSWORD/PASS/API_KEY/KEY/CREDENTIAL) were intentionally omitted.",
 		"[shell_environment_policy]",
-		"set = {",
+		"",
+		// A nested standard table, NOT a multi-line inline `set = { … }` — TOML inline tables must
+		// be single-line with no trailing comma, so the old form produced INVALID TOML (rejected by
+		// strict parsers / `validate --target codex`). A sub-table is valid and scales to many keys.
+		"[shell_environment_policy.set]",
 	];
 	for (const key of includedKeys) {
-		lines.push(`  ${tomlKey(key)} = ${JSON.stringify(PLACEHOLDER)},`);
+		lines.push(`${tomlKey(key)} = ${JSON.stringify(PLACEHOLDER)}`);
 	}
-	lines.push("}");
 
 	return { content: lines.join("\n") + "\n", includedKeys, omittedSecretCount, warnings };
 }

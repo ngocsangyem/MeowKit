@@ -21,23 +21,38 @@ export interface AdapterTokenRule {
 	replacement: string;
 	/** True when the mapping loses fidelity (no real Codex primitive; a prose fallback). */
 	degraded?: boolean;
+	/**
+	 * "tool" = a Claude tool/invocation token with NO legitimate preserve case on Codex (always safe
+	 * to rewrite). "path" = a filesystem/config path — rewriting these blindly FABRICATES targets
+	 * (e.g. `.claude/scripts/x` has no `.agents/scripts/x`), so the migration's ref-integrity layer
+	 * (`stripClaudeRefs`) owns path handling; the path rules here are only for a fully-adapted skill.
+	 */
+	kind: "tool" | "path";
 }
 
 export const CODEX_TOKEN_ADAPTERS: readonly AdapterTokenRule[] = [
-	{ label: "mk/meow slash command", pattern: /\/(?:mk|meow):([a-z0-9-]+)/gi, replacement: "the $1 skill", degraded: true },
-	{ label: "AskUserQuestion tool", pattern: /\bAskUserQuestion\b/g, replacement: "stop and ask the user in chat", degraded: true },
-	{ label: "CLAUDE.md reference", pattern: /\bCLAUDE\.md\b/g, replacement: "AGENTS.md" },
-	{ label: ".claude path", pattern: /\.claude\//g, replacement: ".agents/" },
-	{ label: "Task( tool call", pattern: /\bTask\(/g, replacement: "delegate a sub-task (", degraded: true },
-	{ label: "subagent primitive", pattern: /\bsubagents?\b/gi, replacement: "sub-task", degraded: true },
-	{ label: "Claude env var", pattern: /\$\{?CLAUDE_[A-Z0-9_]+\}?/g, replacement: "the project environment", degraded: true },
-	{ label: "Anthropic env var", pattern: /\$\{?ANTHROPIC_[A-Z0-9_]+\}?/g, replacement: "the provider API key", degraded: true },
+	{ label: "mk/meow slash command", pattern: /\/(?:mk|meow):([a-z0-9-]+)/gi, replacement: "the $1 skill", degraded: true, kind: "tool" },
+	{ label: "AskUserQuestion tool", pattern: /\bAskUserQuestion\b/g, replacement: "stop and ask the user in chat", degraded: true, kind: "tool" },
+	{ label: "Task( tool call", pattern: /\bTask\(/g, replacement: "delegate a sub-task (", degraded: true, kind: "tool" },
+	{ label: "subagent primitive", pattern: /\bsubagents?\b/gi, replacement: "sub-task", degraded: true, kind: "tool" },
+	{ label: "Claude env var", pattern: /\$\{?CLAUDE_[A-Z0-9_]+\}?/g, replacement: "the project environment", degraded: true, kind: "tool" },
+	{ label: "Anthropic env var", pattern: /\$\{?ANTHROPIC_[A-Z0-9_]+\}?/g, replacement: "the provider API key", degraded: true, kind: "tool" },
+	{ label: "CLAUDE.md reference", pattern: /\bCLAUDE\.md\b/g, replacement: "AGENTS.md", kind: "path" },
+	{ label: ".claude path", pattern: /\.claude\//g, replacement: ".agents/", kind: "path" },
 ];
 
-/** Apply every token rule to `content`. Ordered so path/config rules run before the broad ones. */
-export function applyCodexAdapters(content: string): string {
+/**
+ * Apply adapter token rules to `content`. By default applies ALL rules (for a fully-adapted skill).
+ * Pass `{ kinds: ["tool"] }` to clean only tool/invocation tokens and leave path refs to the
+ * migration's ref-integrity layer (which preserves genuinely out-of-set paths rather than fabricate).
+ */
+export function applyCodexAdapters(content: string, opts?: { kinds?: Array<AdapterTokenRule["kind"]> }): string {
+	const kinds = opts?.kinds;
 	let out = content;
-	for (const rule of CODEX_TOKEN_ADAPTERS) out = out.replace(rule.pattern, rule.replacement);
+	for (const rule of CODEX_TOKEN_ADAPTERS) {
+		if (kinds && !kinds.includes(rule.kind)) continue;
+		out = out.replace(rule.pattern, rule.replacement);
+	}
 	return out;
 }
 

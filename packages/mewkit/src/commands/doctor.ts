@@ -28,6 +28,7 @@ import {
 import { readInstallMetadata, CorruptInstallMetadataError } from "../core/install-metadata.js";
 import { readPortableRegistry } from "../migrate/reconcile/portable-registry.js";
 import { getConsolidationLedger, type ConsolidationStatus } from "../core/consolidation-ledger.js";
+import { TARGET_PROFILES } from "../validate/targets/target-profile.js";
 
 function statusIcon(status: Status): string {
 	switch (status) {
@@ -121,6 +122,19 @@ export async function doctor(args?: {
 				name: "Provider contracts",
 				detail: "All effective provider surfaces match documented contracts.",
 			});
+		}
+
+		// Recognize a GENERATED provider target (a migrated project has no `.claude/`, so the normal
+		// doctor checks read as "no MeowKit project"). Point at the target validator instead.
+		const cwd = process.cwd();
+		for (const [name, profile] of Object.entries(TARGET_PROFILES)) {
+			if (profile.detect(cwd)) {
+				results.push({
+					status: "pass",
+					name: `Generated ${name} target detected`,
+					detail: `This directory is a migrated ${name} project (not a MeowKit .claude/ install). Validate it with: mewkit validate --target ${name} ${cwd}`,
+				});
+			}
 		}
 	}
 

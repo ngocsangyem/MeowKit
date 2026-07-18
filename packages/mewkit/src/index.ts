@@ -207,6 +207,7 @@ async function main(): Promise<void> {
 			"next",
 			"plan",
 			"by",
+			"target",
 			"root",
 			"only",
 			"type",
@@ -276,6 +277,9 @@ async function main(): Promise<void> {
 			}
 			await validate({
 				mode: modeArg as "authoring" | "flat-copy" | undefined,
+				// `validate --target codex <dir>`: the target provider (string) + the dir positional.
+				target: args.target as string | undefined,
+				targetDir: args._[1] as string | undefined,
 				portable: args.portable as boolean | undefined,
 				strict: args.strict as boolean | undefined,
 				workflow: args.workflow as boolean | undefined,

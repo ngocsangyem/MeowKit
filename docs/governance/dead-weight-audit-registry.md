@@ -24,7 +24,8 @@ Delta convention: `measured_delta = baseline_avg − disabled_avg` on the calibr
 | `skills/evaluate/scripts/validate-verdict.sh` v2 (recompute + evidence manifest + evaluator identity) | A well-formed verdict is trusted without checking the score follows from the rubrics or that evidence/identity exist | N/A (**NEVER-PRUNE** — active-verification hard gate, Rule 4) | Opus 4.8 | 2026-07-18 | KEEP |
 | `migrate/denied-token-scan.ts` | Claude-Code-bound tokens (`/mk:`, `AskUserQuestion`, `.claude/`, `subagent`, …) leak into content installed for a non-Claude provider | N/A (correctness — provider-parity honesty; shared by the Codex classifier + Phase-6 target validator) | Opus 4.8 | 2026-07-18 | KEEP |
 | `migrate/portability-policy.ts` runtime gate (`classifySkillForProvider` / `computeSkillParity`) | Migration silently copies `runtime: claude-code` skills to Codex as if portable (they installed unadapted) | N/A (correctness — default-deny + measured parity score) | Opus 4.8 | 2026-07-18 | KEEP |
-| `migrate/providers/codex/adapter-map.ts` | A host-bound token has no declared Codex equivalent, so an adapted skill still leaks it | N/A (scaffold — empty skill-adapter table this phase; token rules projection-tested) | Opus 4.8 | 2026-07-18 | WATCH |
+| `migrate/providers/codex/adapter-map.ts` | A host-bound token has no declared Codex equivalent, so an adapted skill still leaks it | N/A (scaffold — empty skill-adapter table this phase; token rules projection-tested; now also cleans command→codex-skill tool tokens) | Opus 4.8 | 2026-07-18 | WATCH |
+| `validate/targets/` (`target-profile.ts` + `codex-target.ts`) | A generated Codex project has no post-migration quality gate — a broken/leaky target ships undetected | N/A (correctness — provider-target validation; provider-keyed so new providers add a profile, not a command) | Opus 4.8 | 2026-07-18 | KEEP |
 
 ## Notes
 

@@ -17,6 +17,7 @@ import type { ReferenceIntegrityIndex } from "../references/fence-aware-referenc
 import { codexCommandSkillDirName, codexCommandSkillRelativePath } from "../references/codex-command-skill-path.js";
 import type { ConversionResult, PortableItem } from "../types.js";
 import { stripClaudeRefs } from "./md-strip.js";
+import { applyCodexAdapters } from "../providers/codex/adapter-map.js";
 
 export { codexCommandSkillDirName, codexCommandSkillRelativePath };
 
@@ -109,8 +110,15 @@ export function convertCommandToCodexSkill(
 	}
 	sections.push(stripped.content.trim(), "");
 
+	// stripClaudeRefs already owns `.claude/` path handling (it preserves genuinely out-of-set refs
+	// rather than fabricate a Codex path). Here we clean only the TOOL/INVOCATION tokens a command
+	// body naturally carries — `/mk:` slash-invocations, AskUserQuestion, subagent, Task(, env vars —
+	// which have no Codex primitive and no legitimate preserve case. `/mk:x` becomes "the x skill",
+	// etc. (degraded but portable). Path rules are deliberately NOT applied (would fabricate targets).
+	const content = applyCodexAdapters(sections.join("\n"), { kinds: ["tool"] });
+
 	return {
-		content: sections.join("\n"),
+		content,
 		filename,
 		warnings,
 		occurrences: stripped.occurrences,

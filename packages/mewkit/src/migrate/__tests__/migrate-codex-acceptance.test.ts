@@ -10,6 +10,7 @@ import {
 	setupKitInstallMigrateE2e,
 	type MigrateE2eEnv,
 } from "./helpers/migrate-e2e-harness.js";
+import { codexTargetProfile } from "../../validate/targets/codex-target.js";
 
 let env: MigrateE2eEnv;
 let exitCode: number;
@@ -132,5 +133,15 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 		expect(hookCommands()).toHaveLength(22);
 		const agentsMd = readFileSync(join(env.projectDir, "AGENTS.md"), "utf-8");
 		expect(agentsMd.match(/GENERATED:capability-bootstrap START/g)).toHaveLength(1);
+	});
+
+	// Phase 6: the migration validates its OWN output — the target validator finds no FAIL on a
+	// fresh, correct Codex tree. Generating the fixture by real migration (not a checked-in snapshot)
+	// keeps this honest as the output evolves.
+	it("passes `validate --target codex` on its own generated output (no FAIL)", async () => {
+		const results = await codexTargetProfile.check(env.projectDir);
+		const fails = results.filter((r) => r.status === "fail");
+		expect(fails, fails.map((f) => `${f.name}: ${f.detail}`).join("; ")).toEqual([]);
+		expect(results.find((r) => r.name.startsWith("Codex installed skills tool-token clean"))?.status).toBe("pass");
 	});
 });

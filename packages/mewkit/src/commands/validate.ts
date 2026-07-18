@@ -23,6 +23,7 @@ import { capabilityViewDrift } from "../core/generate-capability-view.js";
 import { parseMergedSections } from "../migrate/config-merger/merge-single-sections.js";
 import { discoverSkills } from "../migrate/discovery/index.js";
 import { buildPortableSkillsByProvider } from "../migrate/portability-policy.js";
+import { getTargetProfile, targetProfileNames } from "../validate/targets/target-profile.js";
 import type { Status } from "./doctor-checks.js";
 
 // validate reports STRUCTURE & WIRING only — that gate files exist and are wired, not that
@@ -43,7 +44,8 @@ export type Section =
 	| "Rules"
 	| "Gates"
 	| "Capabilities"
-	| "Agents";
+	| "Agents"
+	| "Target";
 
 export interface CheckResult {
 	name: string;
@@ -92,6 +94,11 @@ interface ValidateOptions {
 	capabilities?: boolean;
 	/** Scope the run to the declared agent-contract conformance check. */
 	agents?: boolean;
+	/** Validate a GENERATED provider target instead of a `.claude/` project: the provider key
+	 * (e.g. "codex"). Requires `targetDir`. Mutually exclusive with `--portable`. */
+	target?: string;
+	/** The generated target directory to validate (with `--target`). */
+	targetDir?: string;
 }
 
 const ok = (cond: boolean): Status => (cond ? "pass" : "fail");
@@ -669,6 +676,30 @@ export async function buildDefaultChecks(
 }
 
 export async function validate(args: ValidateOptions = {}): Promise<void> {
+	// `--target <provider> <dir>`: validate a GENERATED provider project (no `.claude/`), so this
+	// path bypasses the .claude/ requirement below. Mutually exclusive with `--portable`.
+	if (args.target) {
+		if (args.portable) {
+			console.error(pc.red("`--target` and `--portable` are mutually exclusive."));
+			process.exit(2);
+		}
+		const profile = getTargetProfile(args.target);
+		if (!profile) {
+			console.error(pc.red(`Unknown --target "${args.target}". Known targets: ${targetProfileNames().join(", ")}.`));
+			process.exit(2);
+		}
+		const dir = path.resolve(args.targetDir ?? process.cwd());
+		console.log(pc.bold(pc.cyan(`Validating ${profile.name} target: ${dir}`)));
+		console.log();
+		if (!profile.detect(dir)) {
+			console.log(pc.red(`Not a ${profile.name} target (no generated ${profile.name} layout found at ${dir}).`));
+			process.exit(1);
+		}
+		const targetResults = await profile.check(dir);
+		renderResultsAndExit(targetResults, args.strict ?? false);
+		return;
+	}
+
 	console.log(pc.bold(pc.cyan("Validating .claude/ project structure...")));
 	console.log(
 		pc.dim("Scope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block."),
@@ -722,10 +753,17 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = await buildDefaultChecks(meowkitDir, projectRoot, mode, args.portable ?? false);
 	}
 
-	// Exhaustiveness guard: the printed `sections` array MUST list every `Section`
-	// union member, or a check's results compute but never render. The mapped type
-	// fails to compile if a member is missing here, keeping union + array in sync.
-	// ("Inventory" is produced only by `inventory --check`, listed for completeness.)
+	renderResultsAndExit(results, args.strict ?? false);
+}
+
+/**
+ * Print CheckResults grouped by section, print the pass/warn/na/fail summary, and exit(1) on any
+ * FAIL (or any WARN under --strict). Shared by the default `.claude/` flow and the `--target` flow.
+ */
+function renderResultsAndExit(results: CheckResult[], strict: boolean): void {
+	// Exhaustiveness guard: this map MUST list every `Section` union member, or a check's results
+	// compute but never render. The mapped type fails to compile if a member is missing, keeping
+	// the union + this array in sync. ("Inventory" is produced only by `inventory --check`.)
 	const SECTION_ORDER: { [K in Section]: true } = {
 		Structure: true,
 		Hooks: true,
@@ -741,6 +779,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		Rules: true,
 		Capabilities: true,
 		Agents: true,
+		Target: true,
 	};
 	const sections = Object.keys(SECTION_ORDER) as Section[];
 	for (const section of sections) {
@@ -764,7 +803,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 	console.log(parts.join(", "));
 
 	// FAIL always fails the build. WARN fails only under --strict (off by default).
-	if (fail > 0 || (args.strict && warn > 0)) {
+	if (fail > 0 || (strict && warn > 0)) {
 		process.exit(1);
 	}
 }
