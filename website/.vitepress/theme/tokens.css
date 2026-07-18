@@ -1,0 +1,102 @@
+/* Hallmark · genre: modern-minimal · macrostructure: VP-home + Long Document · theme: custom (Cobalt register)
+ * vibe: engineered instrument-panel docs, brand royal blue preserved
+ * paper: oklch(98% 0.003 250) light / oklch(20% 0.03 262) dark · accent: oklch(55% 0.21 263) cool-blue
+ * display: Space Grotesk · body: Inter · mono: JetBrains Mono
+ * axes: light+dark paper / grotesk-sans display / cool accent · design-system: design.md · designed-as-app
+ * pre-emit critique: P4 H5 E4 S4 R5 V4
+ * contrast: pass (40–41) · honest: pass (46) · chrome: pass (47) · tokens: pass (48)
+ * responsive: pass (49) · icons: pass (30) · mobile: pass (34, 49, 50–57)
+ * nav+footer: VitePress-owned chrome, preserved per design.md (not hand-built)
+ */
+
+/* ==================================================================
+ * MeowKit Design System — Layer 1: Brand Primitives (theme-independent)
+ * Source of truth for every color, font, space, radius, and motion
+ * value on the site. Layers 2–4 (theme mappings + component overrides)
+ * live in custom.css and must reference these tokens by name.
+ * ================================================================== */
+
+:root {
+  /* Royal Blue — brand primary. oklch(55% 0.21 263) is the /meow slash blue (#2563EB). */
+  --mk-blue-50: oklch(97% 0.013 255);
+  --mk-blue-100: oklch(93% 0.032 255);
+  --mk-blue-200: oklch(88% 0.058 254);
+  --mk-blue-300: oklch(80% 0.096 252);
+  --mk-blue-400: oklch(70% 0.145 258);
+  --mk-blue-500: oklch(62% 0.19 260);
+  --mk-blue-600: oklch(55% 0.21 263); /* brand primary */
+  --mk-blue-700: oklch(50% 0.22 264);
+  --mk-blue-800: oklch(44% 0.2 265);
+  --mk-blue-900: oklch(32% 0.07 255); /* "deep space" — dark-mode surface accent */
+
+  /* Accent — lighter brand steps for dark-mode highlights */
+  --mk-accent-glow: var(--mk-blue-400);
+  --mk-accent-soft: var(--mk-blue-300);
+
+  /* Neutrals — slate family, blue-tinted (never zero-chroma) */
+  --mk-neutral-0: oklch(99.4% 0.002 250);
+  --mk-neutral-50: oklch(98% 0.003 250);
+  --mk-neutral-100: oklch(91% 0.01 250);
+  --mk-neutral-200: oklch(85% 0.014 250);
+  --mk-neutral-300: oklch(70% 0.02 250);
+  --mk-neutral-500: oklch(55% 0.025 253);
+  --mk-neutral-700: oklch(37% 0.03 257);
+  --mk-neutral-800: oklch(28% 0.03 258);
+  --mk-neutral-900: oklch(20% 0.03 262); /* dark paper */
+  --mk-neutral-950: oklch(13% 0.01 255); /* deep-space ink */
+
+  /* Semantic */
+  --mk-success: oklch(67% 0.15 160);
+  --mk-warning: oklch(72% 0.16 60);
+  --mk-danger: oklch(62% 0.19 25);
+  --mk-info: var(--mk-blue-600);
+
+  /* Typography — Space Grotesk display · Inter body · JetBrains Mono code */
+  --mk-font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --mk-font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mk-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* Spacing — 4-based scale */
+  --mk-space-0: 0;
+  --mk-space-1: 4px;
+  --mk-space-2: 8px;
+  --mk-space-3: 12px;
+  --mk-space-4: 16px;
+  --mk-space-5: 20px;
+  --mk-space-6: 24px;
+  --mk-space-8: 32px;
+  --mk-space-10: 40px;
+  --mk-space-12: 48px;
+  --mk-space-16: 64px;
+  --mk-space-20: 80px;
+
+  /* Radii */
+  --mk-radius-xs: 4px;
+  --mk-radius-sm: 6px;
+  --mk-radius-md: 10px;
+  --mk-radius-lg: 16px;
+  --mk-radius-xl: 24px;
+  --mk-radius-pill: 9999px;
+
+  /* Shadows — soft, neutral; no colored glow */
+  --mk-shadow-soft: 0 4px 12px oklch(13% 0.01 255 / 0.08);
+  --mk-shadow-card: 0 2px 8px oklch(20% 0.03 262 / 0.06), 0 1px 2px oklch(20% 0.03 262 / 0.04);
+  --mk-shadow-lift: 0 8px 24px oklch(20% 0.03 262 / 0.1);
+
+  /* Motion */
+  --mk-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --mk-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --mk-dur-fast: 150ms;
+  --mk-dur-normal: 250ms;
+  --mk-dur-slow: 400ms;
+  --mk-transition-fast: var(--mk-dur-fast) var(--mk-ease-out);
+  --mk-transition-normal: var(--mk-dur-normal) var(--mk-ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mk-dur-fast: 1ms;
+    --mk-dur-normal: 1ms;
+    --mk-dur-slow: 1ms;
+  }
+}
