@@ -98,6 +98,8 @@ ${pc.bold("Migrate flags:")}
   --force                    Overwrite user-edited targets on conflict
   --all-rules                Merge ALL rules into the provider instruction file (skip portability filter)
   --include-mcp              Also convert .mcp.json servers into the provider MCP config (Codex)
+  --include-unportable       Install runtime: claude-code skills for a non-Claude provider without
+                             an adapter (EXPERIMENTAL; overrides Codex default-deny, not safety)
 
 ${pc.bold("Init flags:")}
   --profile <name>           Install a subset: core|developer|product|atlassian|security|research|full
@@ -170,6 +172,7 @@ async function main(): Promise<void> {
 			"respect-deletions",
 			"all-rules",
 			"include-mcp",
+			"include-unportable",
 			"no-cleanup",
 			"migrate",
 			"migrate-global",
@@ -519,6 +522,7 @@ async function main(): Promise<void> {
 				providers: args.providers as boolean | undefined,
 				"all-rules": args["all-rules"] as boolean | undefined,
 				"include-mcp": args["include-mcp"] as boolean | undefined,
+				"include-unportable": args["include-unportable"] as boolean | undefined,
 			});
 			if (exitCode !== 0) process.exit(exitCode);
 			break;

@@ -42,7 +42,9 @@ The CLI fetches the latest release from GitHub, prompts for config, and scaffold
 
 Installs the `mk` plugin from the MeowKit marketplace. Skills (`/mk:*`), agents (`mk:*`), and hooks all resolve under the plugin; nothing is copied into your project.
 
-> **Codex support is an experimental projection.** MeowKit is fully enforced on Claude Code (real hooks gate behavior); on Codex the capability projection is advisory — hook enforcement is version-gated and not statically guaranteed, so gates deter but do not block. Run `mewkit providers codex --lifecycle` to see exactly what is enforced vs advisory. Full semantic parity is a staged, measured track.
+> **Codex support is an experimental projection.** MeowKit is fully enforced on Claude Code (real hooks gate behavior); on Codex the capability projection is advisory — hook enforcement is version-gated and not statically guaranteed, so gates deter but do not block. Run `mewkit providers codex --lifecycle` to see exactly what is enforced vs advisory.
+>
+> **Full semantic parity is a staged, measured track — reported as a parity score.** Migration to Codex is default-deny: a `runtime: portable` skill installs; a `runtime: claude-code` skill installs only through a tested adapter, otherwise it is skipped with a report reason (never copied unadapted). `mewkit providers codex` and the migration output print `skill parity: N%` (portable+adapted ÷ total). The score starts low on purpose — it is the honest roadmap of the parity track, raised by porting skills to `runtime: portable`. Override the policy with `mewkit migrate codex --include-unportable` (installs host-bound skills with an EXPERIMENTAL marker).
 
 ```bash
 # Claude Code

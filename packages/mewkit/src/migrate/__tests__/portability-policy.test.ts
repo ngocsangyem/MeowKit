@@ -392,7 +392,7 @@ describe("portability policy", () => {
 		await mkdir(portableDir, { recursive: true });
 		await writeFile(
 			join(portableDir, "SKILL.md"),
-			"---\nname: portable-skill\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+			"---\nname: portable-skill\nruntime: portable\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
 			"utf-8",
 		);
 
@@ -400,7 +400,7 @@ describe("portability policy", () => {
 		await mkdir(boundDir, { recursive: true });
 		await writeFile(
 			join(boundDir, "SKILL.md"),
-			"---\nname: workflow-orchestrator\ndescription: Bound\n---\nSee .claude/rules/orchestration-rules.md and run /mk:cook.\n",
+			"---\nname: workflow-orchestrator\nruntime: claude-code\ndescription: Bound\n---\nSee .claude/rules/orchestration-rules.md and run /mk:cook.\n",
 			"utf-8",
 		);
 
@@ -437,15 +437,16 @@ describe("portability policy", () => {
 
 		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["portable-skill"]);
 		expect(result.skillsByProvider.get("cursor")?.map((skill) => skill.name)).toEqual([]);
-		expect(result.skipMessages).toContain(
-			"Skipped 1 skill for Codex: runtime-bound Claude harness content: orchestrator semantics",
-		);
+		// Default-deny: the claude-code skill is skipped for Codex with no adapter.
+		expect(result.skipMessages.some((m) => /Skipped 1 skill for Codex:.*runtime: claude-code.*default-deny/.test(m))).toBe(true);
 		expect(result.skipMessages).toContain(
 			"Skipped 2 skills for Cursor: skill portability metadata first pass is limited to Codex, Gemini CLI, Antigravity, and OpenCode",
 		);
 	});
 
-	it("treats unannotated skills as implicit generic when no runtime-bound signals are present", async () => {
+	it("Codex default-deny: runtime: portable installs, runtime: claude-code is skipped", async () => {
+		// Post-Phase-5: the runtime field is authoritative. A portable skill installs; a claude-code
+		// skill is skipped with a default-deny reason (was: unannotated treated as implicit-generic).
 		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
 		tempDirs.push(root);
 
@@ -453,7 +454,7 @@ describe("portability policy", () => {
 		await mkdir(genericDir, { recursive: true });
 		await writeFile(
 			join(genericDir, "SKILL.md"),
-			"---\nname: generic-helper\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+			"---\nname: generic-helper\nruntime: portable\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
 			"utf-8",
 		);
 
@@ -461,7 +462,7 @@ describe("portability policy", () => {
 		await mkdir(boundDir, { recursive: true });
 		await writeFile(
 			join(boundDir, "SKILL.md"),
-			"---\nname: claude-bound-helper\ndescription: Bound helper\n---\nRead .claude/rules/core-behaviors.md before running /mk:review.\n",
+			"---\nname: claude-bound-helper\nruntime: claude-code\ndescription: Bound helper\n---\nRead .claude/rules/core-behaviors.md before running /mk:review.\n",
 			"utf-8",
 		);
 
@@ -485,11 +486,8 @@ describe("portability policy", () => {
 			["codex"] satisfies ProviderType[],
 		);
 
-		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual([
-			"generic-helper",
-			"claude-bound-helper",
-		]);
-		expect(result.skipMessages).toEqual([]);
+		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["generic-helper"]);
+		expect(result.skipMessages.some((m) => /Skipped 1 skill for Codex:.*runtime: claude-code.*default-deny/.test(m))).toBe(true);
 	});
 
 	it("keeps otherwise generic skills when Markdown reference files contain rewriteable path coupling", async () => {
@@ -500,7 +498,7 @@ describe("portability policy", () => {
 		await mkdir(join(skillDir, "references"), { recursive: true });
 		await writeFile(
 			join(skillDir, "SKILL.md"),
-			"---\nname: helper-with-reference\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+			"---\nname: helper-with-reference\nruntime: portable\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
 			"utf-8",
 		);
 		await writeFile(join(skillDir, "references", "notes.md"), "Use $CLAUDE_PROJECT_DIR/.claude/hooks/log.json.\n");
@@ -533,7 +531,7 @@ describe("portability policy", () => {
 		await mkdir(join(skillDir, "scripts"), { recursive: true });
 		await writeFile(
 			join(skillDir, "SKILL.md"),
-			"---\nname: helper-with-script\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+			"---\nname: helper-with-script\nruntime: portable\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
 			"utf-8",
 		);
 		await writeFile(join(skillDir, "scripts", "run.sh"), "echo $CLAUDE_PROJECT_DIR/.claude/hooks/log.json\n");
@@ -563,7 +561,7 @@ describe("portability policy", () => {
 		await mkdir(join(skillDir, "scripts"), { recursive: true });
 		await writeFile(
 			join(skillDir, "SKILL.md"),
-			"---\nname: helper-with-script\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+			"---\nname: helper-with-script\nruntime: portable\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
 			"utf-8",
 		);
 		await writeFile(join(skillDir, "scripts", "run.sh"), 'rm -rf "$CLAUDE_PROJECT_DIR/.claude/hooks/log.json"\n');
@@ -594,7 +592,7 @@ describe("portability policy", () => {
 		await mkdir(phaseSkillDir, { recursive: true });
 		await writeFile(
 			join(phaseSkillDir, "SKILL.md"),
-			"---\nname: phase-aware-skill\ndescription: Phase-aware helper\n---\nOperates in Phase 3 (Build) and Phase 4 (Review).\n",
+			"---\nname: phase-aware-skill\nruntime: portable\ndescription: Phase-aware helper\n---\nOperates in Phase 3 (Build) and Phase 4 (Review).\n",
 			"utf-8",
 		);
 
@@ -618,6 +616,57 @@ describe("portability policy", () => {
 
 		expect(result.skillsByProvider.get("codex")?.map((skill) => skill.name)).toEqual(["phase-aware-skill"]);
 		expect(result.skipMessages).toEqual([]);
+	});
+
+	it("--include-unportable overrides the runtime deny but NOT the destructive-script audit", async () => {
+		// Safety is orthogonal to portability: a forced claude-code skill whose STATE-CHANGING script
+		// carries runtime coupling stays fail-closed even under --include-unportable.
+		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
+		tempDirs.push(root);
+		const skillDir = join(root, "forced-destructive");
+		await mkdir(join(skillDir, "scripts"), { recursive: true });
+		await writeFile(
+			join(skillDir, "SKILL.md"),
+			"---\nname: forced-destructive\nruntime: claude-code\ndescription: bound\n---\nRun /mk:cook.\n",
+			"utf-8",
+		);
+		await writeFile(join(skillDir, "scripts", "run.sh"), 'rm -rf "$CLAUDE_PROJECT_DIR/.claude/hooks/log.json"\n');
+
+		const result = await buildPortableSkillsByProvider(
+			[{ id: "mk:forced-destructive", name: "forced-destructive", dirName: "forced-destructive", description: "bound", sourcePath: skillDir }],
+			["codex"] satisfies ProviderType[],
+			{ includeUnportable: true },
+		);
+		expect(result.skillsByProvider.get("codex")).toEqual([]);
+		expect(result.skipMessages[0]).toContain("skill directory needs provider review before install");
+	});
+
+	it("--include-unportable does NOT override an authored provider exclude", async () => {
+		const root = await mkdtemp(join(tmpdir(), "mewkit-portability-"));
+		tempDirs.push(root);
+		const skillDir = join(root, "excluded-skill");
+		await mkdir(skillDir, { recursive: true });
+		await writeFile(
+			join(skillDir, "SKILL.md"),
+			"---\nname: excluded-skill\nruntime: claude-code\ndescription: bound\n---\nGeneric body.\n",
+			"utf-8",
+		);
+		const result = await buildPortableSkillsByProvider(
+			[
+				{
+					id: "mk:excluded-skill",
+					name: "excluded-skill",
+					dirName: "excluded-skill",
+					description: "bound",
+					portability: { portability: "generic", providers: { exclude: ["codex"] }, requires: { surfaces: ["skill"] }, contextCost: "low" },
+					sourcePath: skillDir,
+				},
+			],
+			["codex"] satisfies ProviderType[],
+			{ includeUnportable: true },
+		);
+		expect(result.skillsByProvider.get("codex")).toEqual([]);
+		expect(result.skipMessages.some((m) => /excluded by skill portability policy/.test(m))).toBe(true);
 	});
 
 	it("summarizes rule strategy per provider", () => {
@@ -662,7 +711,7 @@ describe("portability policy", () => {
 		await mkdir(skillDir, { recursive: true });
 		await writeFile(
 			join(skillDir, "SKILL.md"),
-			"---\nname: portable-skill\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+			"---\nname: portable-skill\nruntime: portable\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
 			"utf-8",
 		);
 

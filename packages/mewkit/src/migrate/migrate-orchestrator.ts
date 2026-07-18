@@ -63,8 +63,10 @@ import {
 import {
 	buildPortableSkillsByProvider,
 	buildSkillDryRunMessages,
+	computeSkillParity,
 	filterPlanForPortability,
 	summarizeRuleMigrationByProvider,
+	type SkillParity,
 } from "./portability-policy.js";
 import type { MigrateOptions, PortableItem, PortableType, ProviderType, SkillInfo } from "./types.js";
 
@@ -149,9 +151,24 @@ async function runMigrateUnderLock(
 
 	const itemsByT = itemsByType(discovered);
 	const portabilityFiltered = filterPlanForPortability(plan, itemsByT, { allRules: options.allRules });
-	const portableSkills = await buildPortableSkillsByProvider(discovered.skills, targets);
+	const portableSkills = await buildPortableSkillsByProvider(discovered.skills, targets, {
+		includeUnportable: options.includeUnportable,
+	});
 	const ruleSummaries = summarizeRuleMigrationByProvider(discovered.rules, targets);
 	const skillDryRunMessages = buildSkillDryRunMessages(portableSkills.skillsByProvider, targets);
+	// Codex parity score (Phase 5): the measured metric of the staged full-semantic-parity track.
+	// Printed in the migration output; portable+adapted / total (degraded + forced excluded).
+	const codexParity: SkillParity | null = targets.includes("codex")
+		? computeSkillParity(discovered.skills, "codex", { includeUnportable: options.includeUnportable })
+		: null;
+	const parityBanners = codexParity
+		? [
+				`Codex skill parity: ${codexParity.parityPct}% — ${codexParity.parityCount}/${codexParity.total} portable+adapted` +
+					` (${codexParity.portable} portable, ${codexParity.adapted} adapted; ${codexParity.adaptedDegraded} degraded, ` +
+					`${codexParity.includedUnportable} forced, ${codexParity.skipped} skipped as unportable). ` +
+					`Full semantic parity is a staged track — see the parity roadmap.`,
+			]
+		: [];
 	const providerDiagnosticMessages = options.providers
 		? summarizeProviderContractDiagnostics(collectProviderContractDiagnostics(), targets)
 		: [];
@@ -231,6 +248,7 @@ async function runMigrateUnderLock(
 			...providerDiagnosticMessages,
 			...ruleSummaries.flatMap((summary) => summary.messages),
 			...skillDryRunMessages,
+			...parityBanners,
 		],
 		conversionReport,
 		mcpIncludeAdvisory,

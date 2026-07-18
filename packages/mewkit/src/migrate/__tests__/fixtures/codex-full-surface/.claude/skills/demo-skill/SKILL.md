@@ -1,5 +1,6 @@
 ---
 name: demo-skill
+runtime: portable
 description: Demonstration skill exercising reference categories
 ---
 

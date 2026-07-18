@@ -158,5 +158,8 @@ export const MigrateOptionsSchema = z.object({
 	allRules: z.boolean().optional(),
 	/** Opt-in: convert .mcp.json server definitions into the provider MCP config */
 	includeMcp: z.boolean().optional(),
+	/** Escape hatch: install runtime: claude-code skills for a non-Claude provider even without an
+	 * adapter, with an EXPERIMENTAL banner. Default off = default-deny (Codex portability policy). */
+	includeUnportable: z.boolean().optional(),
 });
 export type MigrateOptions = z.infer<typeof MigrateOptionsSchema>;

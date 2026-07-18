@@ -149,7 +149,7 @@ describe("Codex projection validation", () => {
 		fs.mkdirSync(path.join(claudeDir, "skills", "generic-helper"), { recursive: true });
 		fs.writeFileSync(
 			path.join(claudeDir, "skills", "generic-helper", "SKILL.md"),
-			"---\nname: generic-helper\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+			"---\nname: generic-helper\nruntime: portable\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
 		);
 		fs.mkdirSync(path.join(root, ".codex"), { recursive: true });
 		fs.writeFileSync(path.join(root, "AGENTS.md"), "# Instructions\n");
@@ -174,7 +174,7 @@ describe("Codex projection validation", () => {
 		fs.mkdirSync(path.join(claudeDir, "skills", "generic-helper"), { recursive: true });
 		fs.writeFileSync(
 			path.join(claudeDir, "skills", "generic-helper", "SKILL.md"),
-			"---\nname: generic-helper\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
+			"---\nname: generic-helper\nruntime: portable\ndescription: Generic helper\n---\nSummarize files and prepare a checklist.\n",
 		);
 		fs.mkdirSync(path.join(root, ".codex"), { recursive: true });
 		fs.mkdirSync(path.join(root, ".agents", "skills", "generic-helper"), { recursive: true });

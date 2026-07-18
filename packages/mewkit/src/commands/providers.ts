@@ -7,6 +7,10 @@ import {
 } from "../migrate/provider-support-summary.js";
 import { describeProvider, ADAPTED_PROVIDERS, type ProviderAdapterView } from "../core/provider-adapter.js";
 import { LIFECYCLE_EVENTS } from "../core/provider-lifecycle.js";
+import { join } from "node:path";
+import { existsSync } from "node:fs";
+import { discoverSkills } from "../migrate/discovery/index.js";
+import { computeSkillParity } from "../migrate/portability-policy.js";
 
 export interface ProvidersCliArgs {
 	provider?: string;
@@ -29,6 +33,7 @@ export async function providersCommand(args: ProvidersCliArgs = {}): Promise<voi
 	// Phase-6 capability-adapter view (additive; the default matrix below is unchanged).
 	if (args.lifecycle === true) {
 		renderAdapterView(args.provider, args.json === true);
+		if (args.json !== true) await printCodexParity(args.provider);
 		return;
 	}
 
@@ -51,10 +56,36 @@ export async function providersCommand(args: ProvidersCliArgs = {}): Promise<voi
 			process.exit(2);
 		}
 		printProviderDetail(provider);
+		await printCodexParity(args.provider);
 		return;
 	}
 
 	printProviderMatrix(matrix);
+}
+
+/**
+ * Print the Codex skill parity score (Phase 5) under a `providers codex` view. Discovers the
+ * source skills from `.claude/skills` (graceful no-op when absent, e.g. outside a project) and
+ * reuses the SAME classifier the migration uses, so the CLI and the migration output agree.
+ */
+async function printCodexParity(provider: string | undefined): Promise<void> {
+	if (provider !== "codex") return;
+	const skillsDir = join(process.cwd(), ".claude", "skills");
+	if (!existsSync(skillsDir)) return;
+	try {
+		const skills = await discoverSkills(skillsDir);
+		if (skills.length === 0) return;
+		const p = computeSkillParity(skills, "codex");
+		console.log();
+		console.log(
+			`  ${pc.dim("skill parity:")} ${pc.yellow(`${p.parityPct}%`)} ` +
+				pc.dim(`(${p.parityCount}/${p.total} portable+adapted; ${p.skipped} skipped, ${p.adaptedDegraded} degraded)`),
+		);
+		console.log(pc.dim("  Full semantic parity is a staged, measured track — a claude-code skill installs on Codex"));
+		console.log(pc.dim("  only via a tested adapter, else it is skipped (default-deny). Raise it by porting skills to portable."));
+	} catch {
+		// Discovery is best-effort here; never fail `providers` on a parity read.
+	}
 }
 
 function printProviderMatrix(matrix: ProviderSupportMatrix): void {

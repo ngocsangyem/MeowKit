@@ -26,6 +26,7 @@ export interface MigrateCliArgs {
 	providers?: boolean;
 	"all-rules"?: boolean;
 	"include-mcp"?: boolean;
+	"include-unportable"?: boolean;
 }
 
 export async function migrate(args: MigrateCliArgs): Promise<number> {
@@ -51,6 +52,7 @@ export async function migrate(args: MigrateCliArgs): Promise<number> {
 		providers: args.providers,
 		allRules: args["all-rules"],
 		includeMcp: args["include-mcp"],
+		includeUnportable: args["include-unportable"],
 	};
 
 	const __dirname = dirname(fileURLToPath(import.meta.url));

@@ -4,8 +4,107 @@ import { join } from "node:path";
 import { classifyRuleSemantic } from "./ir/rule-classifier.js";
 import { providers } from "./provider-registry.js";
 import { auditSkillDirectory } from "./skill-directory-audit.js";
+import { lookupCodexSkillAdapter } from "./providers/codex/adapter-map.js";
 import type { PortableItem, PortableType, ProviderType, SkillInfo } from "./types.js";
 import type { ReconcileAction, ReconcilePlan } from "./reconcile/reconcile-types.js";
+
+// ── Runtime-based portability classification (Phase 5, Codex default-deny) ────────────────────
+// The primary portability signal is the skill's `runtime:` frontmatter, NOT the older weak
+// heuristics (portability metadata + "orchestrator" keyword + directory audit) that let 96
+// runtime: claude-code skills silently install for Codex. A claude-code skill is host-bound; it
+// installs for a non-Claude provider ONLY through an authored+tested adapter, else it is skipped
+// with a report reason (default-deny). `--include-unportable` overrides with an EXPERIMENTAL banner.
+
+export type SkillPortabilityClass =
+	| "portable" // runtime: portable — installs directly
+	| "adapted" // claude-code with a full authored adapter — installs transformed
+	| "adapted-degraded" // adapter uses a degraded (prose fallback) mapping — installs, counts apart
+	| "unportable-included" // claude-code, no adapter, forced in via --include-unportable
+	| "skipped"; // claude-code, no adapter — default-denied
+
+export interface SkillClassification {
+	skill: string;
+	cls: SkillPortabilityClass;
+	reason: string;
+}
+
+export interface RuntimeGateOptions {
+	includeUnportable?: boolean;
+}
+
+/** Read a skill's top-level `runtime:` frontmatter (portable | claude-code), or undefined. */
+export function readSkillRuntime(skill: SkillInfo): "portable" | "claude-code" | undefined {
+	try {
+		const content = readFileSync(join(skill.sourcePath, "SKILL.md"), "utf-8");
+		// Read `runtime:` from the YAML frontmatter ONLY, so a body line (prose / code block) can
+		// never masquerade as the declared runtime.
+		const fm = /^---\n([\s\S]*?)\n---/.exec(content);
+		const scope = fm ? fm[1] : "";
+		const m = /^runtime:[ \t]*([a-z-]+)[ \t]*$/im.exec(scope);
+		const value = m?.[1];
+		return value === "portable" || value === "claude-code" ? value : undefined;
+	} catch {
+		return undefined;
+	}
+}
+
+/**
+ * Classify a skill for a NON-Claude provider by its runtime. Codex is the only provider with an
+ * adapter table today; other non-Claude providers have none, so a claude-code skill there is
+ * skipped (or forced) exactly the same way. Both the install/skip decision and the parity score
+ * classify through THIS function; the install path additionally applies safety guards (explicit
+ * provider exclude + the destructive-script directory audit), so a `portable` skill that fails the
+ * script audit is not installed even though it counts toward the parity classification. Parity is
+ * therefore a portability-intent measure, a slight ceiling over actually-installed.
+ */
+export function classifySkillForProvider(
+	skill: SkillInfo,
+	provider: ProviderType,
+	opts: RuntimeGateOptions = {},
+): SkillClassification {
+	const runtime = readSkillRuntime(skill);
+	if (runtime === "portable") {
+		return { skill: skill.name, cls: "portable", reason: "runtime: portable" };
+	}
+	const adapter = provider === "codex" ? lookupCodexSkillAdapter(skill.name) : null;
+	if (adapter) {
+		return {
+			skill: skill.name,
+			cls: adapter.degraded ? "adapted-degraded" : "adapted",
+			reason: `runtime: ${runtime ?? "unspecified"} — installed via ${provider} adapter${adapter.degraded ? " (degraded)" : ""}`,
+		};
+	}
+	if (opts.includeUnportable) {
+		return {
+			skill: skill.name,
+			cls: "unportable-included",
+			reason: `runtime: ${runtime ?? "unspecified"} — forced in via --include-unportable (EXPERIMENTAL; unadapted host-bound content)`,
+		};
+	}
+	return {
+		skill: skill.name,
+		cls: "skipped",
+		reason: `runtime: ${runtime ?? "unspecified"} — no ${providers[provider].displayName} adapter (default-deny; use --include-unportable to override)`,
+	};
+}
+
+/** True when a classification means the skill is installed (directly, adapted, or forced). */
+export function isInstalledClass(cls: SkillPortabilityClass): boolean {
+	return cls !== "skipped";
+}
+
+/** Honor a skill's explicit `meowkit:` provider include/exclude policy (orthogonal to runtime). */
+function shouldExcludeByExplicitPolicy(skill: SkillInfo, provider: ProviderType): PortabilitySkip | null {
+	const policy = skill.portability;
+	if (!policy) return null;
+	if (policy.providers?.exclude?.includes(provider)) {
+		return { provider, type: "skill", item: skill.name, reason: "provider excluded by skill portability policy" };
+	}
+	if (policy.providers?.include && !policy.providers.include.includes(provider)) {
+		return { provider, type: "skill", item: skill.name, reason: "provider not included by skill portability policy" };
+	}
+	return null;
+}
 
 interface RuntimeBoundSignal {
 	label: string;
@@ -177,7 +276,11 @@ export function buildSkillDryRunMessages(
 		});
 }
 
-async function shouldInstallSkillForProvider(skill: SkillInfo, provider: ProviderType): Promise<PortabilitySkip | null> {
+async function shouldInstallSkillForProvider(
+	skill: SkillInfo,
+	provider: ProviderType,
+	opts: RuntimeGateOptions = {},
+): Promise<PortabilitySkip | null> {
 	if (provider === "claude-code") return null;
 	if (!FIRST_PASS_SKILL_PROVIDERS.has(provider)) {
 		return {
@@ -186,6 +289,27 @@ async function shouldInstallSkillForProvider(skill: SkillInfo, provider: Provide
 			item: skill.name,
 			reason: "skill portability metadata first pass is limited to Codex, Gemini CLI, Antigravity, and OpenCode",
 		};
+	}
+
+	// Codex default-deny (Phase 5): the runtime classification is authoritative for the DENY
+	// decision — it supersedes the weaker runtime-coupling heuristic below that let host-bound
+	// claude-code skills through. A claude-code skill with no adapter is skipped unless forced.
+	// A portable/adapted skill still passes through the SAFETY checks (explicit provider policy +
+	// the state-changing-script directory audit) — the runtime field authorizes portability, it
+	// does not waive those guards. A forced (--include-unportable) install is an explicit override
+	// and bypasses them by design.
+	if (provider === "codex") {
+		const classification = classifySkillForProvider(skill, provider, opts);
+		if (classification.cls === "skipped") {
+			return { provider, type: "skill", item: skill.name, reason: classification.reason };
+		}
+		// portable / adapted / unportable-included all pass the SAFETY guards. --include-unportable
+		// overrides ONLY the runtime default-deny — never an authored provider exclude, and never the
+		// destructive-script audit (a `rm -rf`-class state-changing script stays fail-closed even when
+		// forced). Those two axes are orthogonal to portability.
+		const policyExcludes = shouldExcludeByExplicitPolicy(skill, provider);
+		if (policyExcludes) return policyExcludes;
+		return await skipIfSkillDirectoryAuditFails(skill, provider);
 	}
 
 	const policy = skill.portability;
@@ -340,6 +464,7 @@ export function filterPlanForPortability(
 export async function buildPortableSkillsByProvider(
 	skills: SkillInfo[],
 	targets: ProviderType[],
+	opts: RuntimeGateOptions = {},
 ): Promise<{ skillsByProvider: Map<ProviderType, SkillInfo[]>; skipMessages: string[]; skips: PortabilitySkip[] }> {
 	const skillsByProvider = new Map<ProviderType, SkillInfo[]>();
 	const skips: PortabilitySkip[] = [];
@@ -348,7 +473,7 @@ export async function buildPortableSkillsByProvider(
 		if (!providers[target].skills) continue;
 		const providerSkills: SkillInfo[] = [];
 		for (const skill of skills) {
-			const skip = await shouldInstallSkillForProvider(skill, target);
+			const skip = await shouldInstallSkillForProvider(skill, target, opts);
 			if (skip) {
 				skips.push(skip);
 			} else {
@@ -362,5 +487,44 @@ export async function buildPortableSkillsByProvider(
 		skillsByProvider,
 		skipMessages: summarizeSkipCounts(skips),
 		skips,
+	};
+}
+
+export interface SkillParity {
+	total: number;
+	portable: number;
+	adapted: number;
+	adaptedDegraded: number;
+	includedUnportable: number;
+	skipped: number;
+	/** Full-parity count = portable + adapted (degraded and forced installs excluded). */
+	parityCount: number;
+	/** parityCount / total, rounded to a whole percent. `parity: adapted+portable/total`. */
+	parityPct: number;
+}
+
+/**
+ * The Codex skill parity score: how much of the skill surface is portable-or-adapted (full
+ * parity), reported honestly against the total. Degraded adapters and `--include-unportable`
+ * installs are counted separately and do NOT lift the parity percent — that is the measured
+ * metric of the staged full-semantic-parity track. Provider-neutral: pass any non-Claude provider.
+ */
+export function computeSkillParity(skills: SkillInfo[], provider: ProviderType, opts: RuntimeGateOptions = {}): SkillParity {
+	const counts = { portable: 0, adapted: 0, adaptedDegraded: 0, includedUnportable: 0, skipped: 0 };
+	for (const skill of skills) {
+		const { cls } = classifySkillForProvider(skill, provider, opts);
+		if (cls === "portable") counts.portable += 1;
+		else if (cls === "adapted") counts.adapted += 1;
+		else if (cls === "adapted-degraded") counts.adaptedDegraded += 1;
+		else if (cls === "unportable-included") counts.includedUnportable += 1;
+		else counts.skipped += 1;
+	}
+	const total = skills.length;
+	const parityCount = counts.portable + counts.adapted;
+	return {
+		total,
+		...counts,
+		parityCount,
+		parityPct: total === 0 ? 0 : Math.round((parityCount / total) * 100),
 	};
 }

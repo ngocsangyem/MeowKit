@@ -47,6 +47,7 @@ cat CLAUDE.md
 exports[`codex full-surface characterization: direct-copy > never fabricates provider paths: fenced refs without migration proof are preserved + warned > direct-copy-skill-md-codex 1`] = `
 "---
 name: demo-skill
+runtime: portable
 description: Demonstration skill exercising reference categories
 ---
 
@@ -77,6 +78,7 @@ Read \`references/usage.md\` and .agents/skills/demo-skill/references/usage.md.
 exports[`codex full-surface characterization: direct-copy > pins per-provider direct-copy output for skill markdown > direct-copy-skill-md-codex 1`] = `
 "---
 name: demo-skill
+runtime: portable
 description: Demonstration skill exercising reference categories
 ---
 
@@ -107,6 +109,7 @@ Read \`references/usage.md\` and .agents/skills/demo-skill/references/usage.md.
 exports[`codex full-surface characterization: direct-copy > pins per-provider direct-copy output for skill markdown > direct-copy-skill-md-cursor 1`] = `
 "---
 name: demo-skill
+runtime: portable
 description: Demonstration skill exercising reference categories
 ---
 
@@ -137,6 +140,7 @@ Read \`references/usage.md\` and .agents/skills/demo-skill/references/usage.md.
 exports[`codex full-surface characterization: direct-copy > pins per-provider direct-copy output for skill markdown > direct-copy-skill-md-gemini-cli 1`] = `
 "---
 name: demo-skill
+runtime: portable
 description: Demonstration skill exercising reference categories
 ---
 
@@ -167,6 +171,7 @@ Read \`references/usage.md\` and .gemini/skills/demo-skill/references/usage.md.
 exports[`codex full-surface characterization: direct-copy > pins per-provider direct-copy output for skill markdown > direct-copy-skill-md-opencode 1`] = `
 "---
 name: demo-skill
+runtime: portable
 description: Demonstration skill exercising reference categories
 ---
 
