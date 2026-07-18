@@ -26,6 +26,8 @@ Delta convention: `measured_delta = baseline_avg − disabled_avg` on the calibr
 | `migrate/portability-policy.ts` runtime gate (`classifySkillForProvider` / `computeSkillParity`) | Migration silently copies `runtime: claude-code` skills to Codex as if portable (they installed unadapted) | N/A (correctness — default-deny + measured parity score) | Opus 4.8 | 2026-07-18 | KEEP |
 | `migrate/providers/codex/adapter-map.ts` | A host-bound token has no declared Codex equivalent, so an adapted skill still leaks it | N/A (scaffold — empty skill-adapter table this phase; token rules projection-tested; now also cleans command→codex-skill tool tokens) | Opus 4.8 | 2026-07-18 | WATCH |
 | `validate/targets/` (`target-profile.ts` + `codex-target.ts`) | A generated Codex project has no post-migration quality gate — a broken/leaky target ships undetected | N/A (correctness — provider-target validation; provider-keyed so new providers add a profile, not a command) | Opus 4.8 | 2026-07-18 | KEEP |
+| `journey-validation/` (`deterministic-runner.ts` + `oracles.ts` + `side-effect-observer.ts`) | Cross-harness parity (J10) is claimed but never machine-checked — a payload could silently diverge | N/A (correctness — deterministic structural-parity oracles run in CI, no model calls; reuses migration + target validation as libraries) | Opus 4.8 | 2026-07-18 | KEEP |
+| `journey-validation/cost-ledger.ts` (+ `run-canary.sh check-cap`) | A benchmark / live run overspends because the `cost_cap_usd` is recorded but never enforced | N/A (correctness — Rule 6 cap enforcement; proven against a mock backend so deferred live backends inherit it) | Opus 4.8 | 2026-07-18 | KEEP |
 
 ## Notes
 

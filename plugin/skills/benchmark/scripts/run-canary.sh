@@ -1,22 +1,62 @@
 #!/bin/bash
 # run-canary.sh — Execute the canary benchmark suite against the current harness.
 #
-# Usage:  run-canary.sh [--full]
-# Exit:   0 if all tasks completed (regardless of verdict); 1 on infrastructure failure
+# Usage:  run-canary.sh [--full] [--budget N]
+#         run-canary.sh check-cap <ledger.jsonl> [cap]   # enforce the cost cap between tasks
+# Exit:   0 all tasks completed / cap not reached; 1 infra failure; 2 cost cap reached (halt)
 # Reqs:   Bash 3.2+, .claude/skills/.venv/bin/python3
 #
 # Quick tier (default): 5 tasks under .claude/benchmarks/canary/quick/, ≤$5
 # Full tier (--full): quick + 1 heavy task under .claude/benchmarks/canary/full/, ≤$30
+# Budget: --budget N or MEOWKIT_BUDGET_CAP override the tier cap (harness-rules Rule 6:
+#         warn at $30, halt at the effective cap — the override may be lower OR higher).
 set -u
+
+# Rule 6 fixed warn threshold (USD). The hard cap is the effective (tier/override) cap.
+WARN_USD=30
+
+# check-cap subcommand: sum costUsd across a JSONL ledger and enforce the cap. The orchestrator
+# calls this after appending each task's receipt, so a runaway loop halts at the shell boundary
+# with the SAME semantics the TypeScript cost-ledger enforces for the (deferred) live backends.
+if [ "${1:-}" = "check-cap" ]; then
+  LEDGER="${2:-}"
+  CAP="${MEOWKIT_BUDGET_CAP:-${3:-100}}"
+  [ -f "$LEDGER" ] || { echo "ERROR: ledger not found: $LEDGER" >&2; exit 1; }
+  PY=".claude/skills/.venv/bin/python3"; [ -x "$PY" ] || PY="python3"
+  LEDGER="$LEDGER" CAP="$CAP" WARN_USD="$WARN_USD" "$PY" - <<'PYEOF'
+import json, os, sys
+cap = float(os.environ["CAP"]); warn = float(os.environ["WARN_USD"])
+total = 0.0
+for line in open(os.environ["LEDGER"], encoding="utf-8"):
+    line = line.strip()
+    if line:
+        try: total += float(json.loads(line).get("costUsd") or 0)
+        except Exception: pass
+if total >= cap:
+    print(f"HALT: cost cap reached: ${total:.2f} >= ${cap:.2f}"); sys.exit(2)
+if cap > warn and total >= warn:
+    print(f"WARN: ${total:.2f} >= ${warn:.0f} (cap ${cap:.2f})")
+else:
+    print(f"OK: ${total:.2f} of ${cap:.2f}")
+sys.exit(0)
+PYEOF
+  exit $?
+fi
 
 TIER="quick"
 COST_CAP=5
-case "${1:-}" in
-  --full) TIER="full"; COST_CAP=30 ;;
-  -h|--help) sed -n '2,11p' "$0"; exit 0 ;;
-  "") ;;
-  *) echo "ERROR: unknown arg: $1" >&2; exit 1 ;;
-esac
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --full) TIER="full"; COST_CAP=30 ;;
+    --budget) shift; COST_CAP="${1:-}"; [ -n "$COST_CAP" ] || { echo "ERROR: --budget needs a value" >&2; exit 1; } ;;
+    -h|--help) sed -n '2,13p' "$0"; exit 0 ;;
+    "") ;;
+    *) echo "ERROR: unknown arg: $1" >&2; exit 1 ;;
+  esac
+  shift
+done
+# MEOWKIT_BUDGET_CAP overrides the tier/flag cap (Rule 6 operator override).
+[ -n "${MEOWKIT_BUDGET_CAP:-}" ] && COST_CAP="$MEOWKIT_BUDGET_CAP"
 
 # Resolve project root
 [ -n "${CLAUDE_PROJECT_DIR:-}" ] && cd "$CLAUDE_PROJECT_DIR"
@@ -49,6 +89,7 @@ fi
 
 RUN_ID=$(date +%y%m%d-%H%M%S)-bench  # second precision prevents same-minute collisions
 RESULT_FILE="$RESULTS_DIR/${RUN_ID}.json"
+LEDGER_FILE="$RESULTS_DIR/${RUN_ID}.ledger.jsonl"  # append one {costUsd,...} receipt per task
 STARTED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
 echo "═══════════════════════════════════════════════════════════════"
@@ -101,7 +142,7 @@ manifest = {
 }
 with open(os.environ["RESULT_FILE"], "w") as f:
     json.dump(manifest, f, indent=2)
-print(f"Manifest: {os.environ[\"RESULT_FILE\"]}")
+print("Manifest: " + os.environ["RESULT_FILE"])
 '
 
 echo ""
@@ -125,10 +166,16 @@ echo "     - Read the spec file"
 echo "     - Invoke /mk:autobuild with the spec content"
 echo "     - Capture the verdict, score, duration, cost"
 echo "     - Update the task entry in $RESULT_FILE"
+echo "     - Append a receipt to the ledger, then enforce the cap BEFORE the next task:"
+echo "         echo '{\"name\":\"<task>\",\"costUsd\":<cost>}' >> $LEDGER_FILE"
+echo "         bash .claude/skills/benchmark/scripts/run-canary.sh check-cap $LEDGER_FILE $COST_CAP"
+echo "       (exit 2 = cap reached — STOP the run; do not start further tasks)"
 echo "  2. After all tasks complete, set status='complete', compute summary"
 echo "  3. Append a benchmark_result trace record:"
 echo "     bash .claude/hooks/append-trace.sh benchmark_result \"\$(cat $RESULT_FILE)\""
 echo "═══════════════════════════════════════════════════════════════"
 
 echo "RUN_ID=$RUN_ID"
+echo "LEDGER=$LEDGER_FILE"
+echo "COST_CAP=$COST_CAP"
 exit 0

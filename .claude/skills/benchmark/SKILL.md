@@ -183,7 +183,9 @@ the toolkit's, documented here and in the script header so future comparisons ar
 
 ## Gotchas
 
-- **`run-canary.sh` is a half-implementation by design.** It writes a manifest with `PENDING` tasks then prints orchestrator instructions. The script CANNOT actually invoke `mk:autobuild` per task because each invocation requires a fresh subagent context, which only an orchestrator agent can spawn — not a shell process. **The agent invoking this skill MUST follow the printed instructions to fill in each task's results.** Failure to do so leaves the manifest as a stub. Documented in `run-canary.sh:101-115` banner.
+- **`run-canary.sh` is an orchestrator-driven runner for the model-in-loop canary.** It writes a manifest with `PENDING` tasks then prints orchestrator instructions. The script CANNOT itself invoke `mk:autobuild` per task because each invocation requires a fresh subagent context, which only an orchestrator agent can spawn — not a shell process. **The agent invoking this skill MUST follow the printed instructions to fill in each task's results.** Failure to do so leaves the manifest as a stub.
+- **The cost cap is now enforced (not just recorded).** After each task the orchestrator appends a `{costUsd,…}` receipt to the run's `.ledger.jsonl` and runs `run-canary.sh check-cap <ledger> <cap>`; exit 2 means the cap was reached and the run STOPS. Thresholds follow `harness-rules.md` Rule 6 (warn at $30, halt at the effective cap; `--budget N` / `MEOWKIT_BUDGET_CAP` override the tier cap). This mirrors the TypeScript cost-ledger the deferred live backends inherit.
+- **The cross-harness journey (J10) IS automated.** Its deterministic layer runs offline in CI via the TypeScript journey runner (`packages/mewkit/src/journey-validation`) — migration → target validation → route/artifact/denied-token/side-effect oracles — with no model calls. Only the model-in-loop (live) canary above still needs the orchestrator handoff.
 - **Circular dependency with `mk:autobuild`.** This skill invokes `mk:autobuild` per task. If a harness bug is exactly what the dead-weight audit is trying to find, the audit can fail to even start. The manual fallback is documented in `.claude/rules/dead-weight-audit-rules.md` Rule 8 — run individual canary specs via `/mk:cook <spec.md>` and score by hand.
 - **Don't treat 100% pass as "harness is perfect."** Canary tasks are intentionally simple. Real-world failures live in the long tail; canary catches regressions, not all bugs.
 - **Don't skip `--full` for the dead-weight audit.** The audit needs the heavy task to detect issues that only manifest in real product builds.
@@ -194,7 +196,7 @@ the toolkit's, documented here and in the script header so future comparisons ar
 
 | File | Purpose |
 |---|---|
-| `scripts/run-canary.sh` | Step 1 of 2: emits a task manifest with PENDING rows for each canary spec. Prints orchestrator instructions for step 2 (spawning per-task harness subagents). The script does NOT invoke `mk:autobuild` directly — it cannot, because harness requires a fresh subagent context that only the orchestrator can spawn. |
+| `scripts/run-canary.sh` | Emits a task manifest + a cost-ledger path; prints orchestrator instructions for the per-task harness runs. Does NOT invoke `mk:autobuild` directly (needs a fresh subagent context only the orchestrator can spawn). `run-canary.sh check-cap <ledger> <cap>` enforces the Rule 6 cost cap between tasks (exit 2 = halt). |
 | `scripts/compare-runs.sh` | Reads two prior run JSONs, emits delta table |
 | `../../benchmarks/README.md` | How to add new canary tasks |
 | `../../benchmarks/canary/` | Spec files |
