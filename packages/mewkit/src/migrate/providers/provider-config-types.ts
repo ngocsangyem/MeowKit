@@ -20,13 +20,7 @@ export type ConversionFormat =
 
 /** Write strategy for target files */
 export type WriteStrategy =
-	| "per-file"
-	| "merge-single"
-	| "json-merge"
-	| "yaml-merge"
-	| "single-file"
-	| "codex-toml"
-	| "codex-hooks";
+	"per-file" | "merge-single" | "json-merge" | "yaml-merge" | "single-file" | "codex-toml" | "codex-hooks";
 
 /** Provider path configuration for a specific portable type */
 export interface ProviderPathConfig {

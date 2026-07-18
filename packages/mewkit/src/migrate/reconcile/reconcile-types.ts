@@ -88,10 +88,7 @@ export function getReasonCopy(code: ReconcileReason, _ctx?: Record<string, strin
 export type ReconcileActionType = "install" | "update" | "skip" | "conflict" | "delete";
 
 export type ConflictResolution =
-	| { type: "overwrite" }
-	| { type: "keep" }
-	| { type: "smart-merge" }
-	| { type: "resolved"; content: string };
+	{ type: "overwrite" } | { type: "keep" } | { type: "smart-merge" } | { type: "resolved"; content: string };
 
 export interface ReconcileAction {
 	action: ReconcileActionType;
