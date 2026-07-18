@@ -8,7 +8,7 @@ import { TraceAdapter } from "../infrastructure/trace-adapter.js";
 import { FetcherAdapter } from "../infrastructure/fetcher-adapter.js";
 import { WikiService } from "../application/service.js";
 import { listWikiPages, searchWiki } from "../application/queries.js";
-import { searchWiki as searchWikiDb } from "../infrastructure/wiki-query.js";
+import { probeWiki } from "../recall/probe-wiki.js";
 import { HandoffService } from "../handoff/service.js";
 import type { ArtifactSignal } from "../handoff/domain.js";
 import { renderWiki } from "../render.js";
@@ -286,12 +286,11 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 			const query = rest.join(" ").trim();
 			const max = num(flags["max-pages"]) ?? 3;
 			const includeContent = Boolean(flags["include-content"]);
-			let hits: ReturnType<typeof searchWikiDb> = [];
-			try {
-				hits = query ? searchWikiDb(dbPath(claudeDir), query, max, includeContent) : [];
-			} catch {
-				hits = [];
-			}
+			// Route through the shared probe so index-missing/empty/query-failed
+			// discrimination + intent sanitization live in one place. UX unchanged:
+			// any non-`ready` outcome renders as "(no wiki context)".
+			const probe = probeWiki(dbPath(claudeDir), query, { maxPages: max, includeContent });
+			const hits = probe.hits;
 			const results = hits.map((h, i) => ({
 				slug: h.slug,
 				title: h.title,

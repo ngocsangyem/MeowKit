@@ -24,6 +24,11 @@ export interface AvailabilitySnapshot {
 export interface AvailabilityProbes {
 	/** Is an external binary resolvable on PATH? (reuses the CLI's cross-platform detector) */
 	commandExists: (cmd: string) => boolean;
+	/** Is `binaryId` provided by the currently-running CLI process itself? Lets a binary
+	 * invoked via `npx`/workspace bin (not on global PATH) report as available with honest
+	 * "current CLI process" evidence instead of a false `unavailable`. Optional: absent ⇒
+	 * PATH is the only evidence. The CLI supplies it; it must match ONLY its own binary id. */
+	isSelf?: (binaryId: string) => boolean;
 	/** Path-existence check for a requirement id. Returns `true`/`false` when the id resolves
 	 * to a real contained path, and `null` when the id is not a checkable path (e.g. a bare
 	 * logical skill-script id with no path mapping) — the caller resolves logical→path; this
@@ -43,12 +48,19 @@ function snapshotFor(req: TypedRequirement, ctx: AvailabilityContext): Availabil
 	const base = { requirementType: req.type, id: req.id, checkedAt: ctx.checkedAt, provider: ctx.provider };
 	switch (req.type) {
 		case "external_binary": {
-			const ok = ctx.probes.commandExists(req.id);
-			return {
-				...base,
-				status: ok ? "available" : "unavailable",
-				evidence: `PATH lookup for "${req.id}": ${ok ? "found" : "not found"}`,
-			};
+			// PATH first — a real PATH hit keeps its truthful `path-lookup` evidence.
+			if (ctx.probes.commandExists(req.id)) {
+				return { ...base, status: "available", evidence: `PATH lookup for "${req.id}": found` };
+			}
+			// Not on PATH: the running process may itself BE this binary (npx/workspace bin).
+			if (ctx.probes.isSelf?.(req.id)) {
+				return {
+					...base,
+					status: "available",
+					evidence: `provided by the current CLI process (not on PATH): "${req.id}"`,
+				};
+			}
+			return { ...base, status: "unavailable", evidence: `PATH lookup for "${req.id}": not found` };
 		}
 		case "skill_script":
 		case "file_or_config": {

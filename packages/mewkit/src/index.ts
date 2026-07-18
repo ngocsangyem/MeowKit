@@ -59,6 +59,7 @@ ${pc.bold("Commands:")}
   ${pc.green("inventory")}  List harness artifacts with governance metadata
   ${pc.green("plan")}       Read-only plan inspection (status <plan-dir> | check <phase-file>)
   ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
+  ${pc.green("wiki")}       Long-term project knowledge ('wiki context "<keywords>" [--max-pages N] [--include-content] [--json]' | init|propose|approve|search|reindex)
   ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
   ${pc.green("query")}      Read-only aggregate queries over the derived index
   ${pc.green("pack")}       Manage install packs (list, add, remove)
@@ -198,6 +199,7 @@ async function main(): Promise<void> {
 			"commit",
 			"explain",
 			"write",
+			"record",
 		],
 		string: [
 			"mode",
@@ -308,6 +310,7 @@ async function main(): Promise<void> {
 				intent: args.intent as string | undefined,
 				provider: args.provider as string | undefined,
 				write: args.write as boolean | undefined,
+				record: args.record as boolean | undefined,
 			});
 			break;
 		case "pack":

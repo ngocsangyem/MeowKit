@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { pathToFileURL } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 import type { WikiSearchHit } from "../application/ports.js";
 
@@ -7,6 +8,16 @@ import type { WikiSearchHit } from "../application/ports.js";
 // interpolated, so a query like '" OR 1=1' is treated as search text, not SQL.
 
 export type { WikiSearchHit };
+
+/** Open the derived index for reading WITHOUT touching the filesystem. A plain
+ * `{ readOnly: true }` open of a WAL-mode DB still creates `-wal`/`-shm` sidecar files;
+ * `immutable=1` reads the DB as fixed media and writes nothing. The derived index is
+ * disposable and rebuildable and recall is advisory, so assuming no concurrent writer
+ * for the life of the read is safe. Callers MUST guard `fs.existsSync` first — an
+ * immutable open of a missing path errors rather than creating it. */
+export function openReadOnlyImmutable(dbFile: string): DatabaseSync {
+	return new DatabaseSync(pathToFileURL(dbFile).href + "?immutable=1", { readOnly: true });
+}
 
 export type WikiPageRow = {
 	id: string;
@@ -42,7 +53,7 @@ function readablePagePath(slug: string, pagePath: string): string {
  * Page bodies are returned ONLY when `includeContent` is true (context-budget discipline). */
 export function searchWiki(dbFile: string, query: string, limit = 10, includeContent = false): WikiSearchHit[] {
 	if (!fs.existsSync(dbFile)) return [];
-	const db = new DatabaseSync(dbFile, { readOnly: true });
+	const db = openReadOnlyImmutable(dbFile);
 	try {
 		if (!wikiSchemaPresent(db)) return [];
 		const rows = db
@@ -79,7 +90,7 @@ export function searchWiki(dbFile: string, query: string, limit = 10, includeCon
 /** List committed/approved pages for a slug (or all slugs when omitted). */
 export function listWikiPages(dbFile: string, slug?: string): WikiPageRow[] {
 	if (!fs.existsSync(dbFile)) return [];
-	const db = new DatabaseSync(dbFile, { readOnly: true });
+	const db = openReadOnlyImmutable(dbFile);
 	try {
 		if (!wikiSchemaPresent(db)) return [];
 		const sql =
