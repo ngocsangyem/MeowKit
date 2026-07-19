@@ -10,7 +10,17 @@ import { describe, expect, it } from "vitest";
 
 // Resolve relative to THIS test file (cwd-independent) — the suite's canonical run is from the repo
 // root, where a process.cwd()-relative `../../.claude` would point outside the repo.
-const ORCH = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..", "..", ".claude", "agents", "orchestrator.md");
+const ORCH = resolve(
+	dirname(fileURLToPath(import.meta.url)),
+	"..",
+	"..",
+	"..",
+	"..",
+	"..",
+	".claude",
+	"agents",
+	"orchestrator.md",
+);
 const text = readFileSync(ORCH, "utf-8");
 const lower = text.toLowerCase();
 
