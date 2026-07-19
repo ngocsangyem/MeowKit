@@ -9,9 +9,10 @@
 #   append-trace.sh file_edited '{"file":"src/foo.ts","edit_count":3}'
 #
 # Behavior:
-#   - Uses flock for atomic appends (concurrent hook safety; falls back to plain
-#     append on macOS where flock(1) is not in the base install — atomicity
-#     guaranteed only for records ≤ PIPE_BUF/512 bytes in fallback mode)
+#   - Serializes appends with the shared sidecar lock protocol (same lock file +
+#     PID/timestamp shape + reclaim rule as core/file-lock.ts), so a shell writer
+#     and a TypeScript writer mutually exclude on one lock object. Portable (no
+#     flock dependency); advisory — drops the record if the lock can't be taken.
 #   - Scrubs secrets via lib/secret-scrub.sh before write
 #   - Rotates the log when it exceeds 50MB → trace-log.{YYMMDD-HHMMSS}.jsonl.gz
 #   - Schema-versioned via top-level `schema_version: 1.0` field
@@ -107,27 +108,66 @@ print(json.dumps(record, separators=(',', ':')))
 
 [ -z "$RECORD" ] && exit 0
 
-# Atomic append via flock
-if command -v flock >/dev/null 2>&1; then
-  exec 9>> "$LOG_FILE"
-  flock -x -w 2 9 || exit 0
-  echo "$RECORD" >&9
-  exec 9>&- 2>/dev/null || true
-else
-  # macOS may not have flock — fall back to atomic append (single write call is atomic on POSIX for small writes)
-  echo "$RECORD" >> "$LOG_FILE"
-fi
+# Shared sidecar lock — the SAME protocol as core/file-lock.ts, contending on the SAME
+# LOCK_FILE (.trace-log.lock): exclusive-create a lock file holding `<pid>\n<ms-epoch>\n`,
+# reclaim it when its owner PID is dead OR its timestamp is older than 60s, spin with a 10s
+# timeout. This replaces the previous flock-on-fd approach (which locked a DIFFERENT object
+# than the TS writer, so the two could not mutually exclude).
+_now_ms() { echo $(( $(date +%s) * 1000 )); }
 
-# Rotate if file exceeds max size
-if [ -f "$LOG_FILE" ]; then
-  SIZE=$(stat -f %z "$LOG_FILE" 2>/dev/null || stat -c %s "$LOG_FILE" 2>/dev/null || echo 0)
-  if [ "$SIZE" -gt "$MAX_BYTES" ] 2>/dev/null; then
-    TS=$(date +%y%m%d-%H%M%S)
-    ROTATED="$LOG_DIR/trace-log.${TS}.jsonl"
-    mv "$LOG_FILE" "$ROTATED" 2>/dev/null && \
-      gzip "$ROTATED" 2>/dev/null && \
-      : > "$LOG_FILE"
+_lock_acquire() {
+  local start content pid ts nowms dead
+  start=$(date +%s)
+  while :; do
+    if ( set -o noclobber; printf '%s\n%s\n' "$$" "$(_now_ms)" > "$LOCK_FILE" ) 2>/dev/null; then
+      return 0
+    fi
+    if content=$(cat "$LOCK_FILE" 2>/dev/null); then
+      pid=$(printf '%s\n' "$content" | sed -n '1p')
+      ts=$(printf '%s\n' "$content" | sed -n '2p')
+      dead=1
+      if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then dead=0; fi
+      nowms=$(_now_ms)
+      if [ "$dead" -eq 1 ] || { [ -n "$ts" ] && [ $(( nowms - ts )) -gt 60000 ]; }; then
+        # Reclaim without ever deleting an unverified lock: atomically mv the entry to a private
+        # name (only one racer wins), then confirm the moved file is the SAME stale one we read.
+        # If it changed under us (a fresh acquirer), restore it via `ln` (fails, never clobbers).
+        RECLAIM="$LOCK_FILE.$$.reclaim"
+        if mv "$LOCK_FILE" "$RECLAIM" 2>/dev/null; then
+          if [ "$(cat "$RECLAIM" 2>/dev/null)" = "$content" ]; then
+            rm -f "$RECLAIM" 2>/dev/null
+          else
+            ln "$RECLAIM" "$LOCK_FILE" 2>/dev/null || true
+            rm -f "$RECLAIM" 2>/dev/null
+          fi
+        fi
+        continue
+      fi
+    fi
+    [ $(( $(date +%s) - start )) -ge 10 ] && return 1
+    sleep 0.1
+  done
+}
+_lock_release() { rm -f "$LOCK_FILE" 2>/dev/null; }
+
+# Advisory writer: if the lock cannot be acquired within the timeout, drop the record rather
+# than block the hook chain. Append + rotation both run under the lock so a concurrent rotate
+# cannot interleave a rename with another writer's append.
+if _lock_acquire; then
+  trap '_lock_release' EXIT
+  echo "$RECORD" >> "$LOG_FILE"
+  if [ -f "$LOG_FILE" ]; then
+    SIZE=$(stat -f %z "$LOG_FILE" 2>/dev/null || stat -c %s "$LOG_FILE" 2>/dev/null || echo 0)
+    if [ "$SIZE" -gt "$MAX_BYTES" ] 2>/dev/null; then
+      TS=$(date +%y%m%d-%H%M%S)
+      ROTATED="$LOG_DIR/trace-log.${TS}.jsonl"
+      mv "$LOG_FILE" "$ROTATED" 2>/dev/null && \
+        gzip "$ROTATED" 2>/dev/null && \
+        : > "$LOG_FILE"
+    fi
   fi
+  _lock_release
+  trap - EXIT
 fi
 
 exit 0

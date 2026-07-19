@@ -12,7 +12,7 @@ import { ingestWiki, type WikiIngestCounts } from "../wiki/infrastructure/wiki-i
 // aggregates with no user-supplied SQL — no injection surface. v2 folds in the wiki tables +
 // FTS5 (was a separate index.db, now unified as wiki-index.db per the consolidation decision).
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 const DB_REL = path.join("memory", "wiki-index.db");
 /** The pre-consolidation DB, removed once on the first unified build. */
 const LEGACY_DB_REL = path.join("memory", "index.db");
@@ -37,6 +37,13 @@ const MIGRATIONS: { version: number; sql: string }[] = [
 	},
 	{ version: 2, sql: WIKI_MIGRATION_SQL },
 	{ version: 3, sql: WIKI_V3_MIGRATION_SQL },
+	{
+		version: 4,
+		sql: `
+		ALTER TABLE trace_events ADD COLUMN task_id TEXT;
+		ALTER TABLE trace_events ADD COLUMN plan_path TEXT;
+		CREATE INDEX idx_trace_task ON trace_events(task_id);`,
+	},
 ];
 
 export function dbPath(claudeDir: string): string {
@@ -80,11 +87,15 @@ function ingestTrace(db: DatabaseSync, claudeDir: string): number {
 	if (!fs.existsSync(logPath)) return 0;
 	const records = parseTraceLog(fs.readFileSync(logPath, "utf-8"));
 	const stmt = db.prepare(
-		"INSERT INTO trace_events (ts, event, run_id, model, density, responsibility, data) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		"INSERT INTO trace_events (ts, event, run_id, model, density, responsibility, task_id, plan_path, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
 	);
 	for (const r of records) {
 		const data = r.data ?? {};
 		const resp = typeof data["responsibility"] === "string" ? (data["responsibility"] as string) : null;
+		// Task identity is top-level on fresh logs; fall back to data for any record that carried
+		// it inside the payload. Legacy logs have neither → null (never matched by --task).
+		const taskId = r.task_id ?? (typeof data["task_id"] === "string" ? (data["task_id"] as string) : null);
+		const planPath = r.plan_path ?? (typeof data["plan_path"] === "string" ? (data["plan_path"] as string) : null);
 		stmt.run(
 			asString(r.ts),
 			asString(r.event),
@@ -92,6 +103,8 @@ function ingestTrace(db: DatabaseSync, claudeDir: string): number {
 			asString(r.model),
 			asString(r.density),
 			resp,
+			taskId,
+			planPath,
 			asString(data),
 		);
 	}
@@ -207,6 +220,41 @@ export function queryIndex(claudeDir: string): QueryResult {
 			)
 			.all() as { model: string; entries: number; tokens: number }[];
 		return { schemaVersion: userVersion(db), eventsByType, runsByTier, frictionByResponsibility, costByModel };
+	} finally {
+		db.close();
+	}
+}
+
+export interface TaskQueryResult {
+	schemaVersion: number;
+	taskId: string;
+	events: { ts: string | null; event: string | null; run_id: string | null; plan_path: string | null }[];
+	/** Distinct plan paths this task's events linked to (its plan linkage). */
+	plans: string[];
+}
+
+/**
+ * Task-joined query: every trace event whose canonical `task_id` matches, ordered oldest-first,
+ * plus the distinct plan paths those events reference. Parameterized (no SQL injection surface).
+ * Returns an empty event list for an unknown task id — never throws for a missing task.
+ */
+export function queryByTask(claudeDir: string, taskId: string): TaskQueryResult {
+	const target = dbPath(claudeDir);
+	if (!fs.existsSync(target)) throw new Error("no index — run `mewkit index` first");
+	const db = new DatabaseSync(target, { readOnly: true });
+	try {
+		const events = db
+			.prepare(
+				"SELECT ts, event, run_id, plan_path FROM trace_events WHERE task_id = ? ORDER BY ts, id",
+			)
+			.all(taskId) as TaskQueryResult["events"];
+		const plans = db
+			.prepare(
+				"SELECT DISTINCT plan_path FROM trace_events WHERE task_id = ? AND plan_path IS NOT NULL ORDER BY plan_path",
+			)
+			.all(taskId)
+			.map((r) => (r as { plan_path: string }).plan_path);
+		return { schemaVersion: userVersion(db), taskId, events, plans };
 	} finally {
 		db.close();
 	}

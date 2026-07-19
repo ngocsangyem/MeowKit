@@ -51,6 +51,7 @@ ${pc.bold("Commands:")}
   ${pc.green("doctor")}     Diagnose common environment issues ('doctor provenance --explain' for a read-only provenance report)
   ${pc.green("status")}     Print version and config summary
   ${pc.green("task-state")} Durable task record ('task-state show [--json]' | 'task-state update <id> --status --step --next --plan')
+  ${pc.green("orient")}     Safe resume orientation from durable task state ('orient [--json]') — reads records only, no plan/wiki scan
   ${pc.green("context")}    Repo-context evidence ('context resolve <path> [--root]' | 'context check <envelope.json>' | 'context record --task <id> <envelope.json>')
   ${pc.green("task")}       Create and list task files (new, list)
   ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
@@ -144,6 +145,7 @@ async function main(): Promise<void> {
 		boolean: [
 			"help",
 			"version",
+			"activate",
 			"check",
 			"strict",
 			"beta",
@@ -337,6 +339,9 @@ async function main(): Promise<void> {
 				await planApprove({
 					target: args._[2] as string | undefined,
 					by: args.by as string | undefined,
+					// minimist maps `--no-activate` to `activate === false` (negation convention).
+					noActivate: args.activate === false,
+					cliVersion: VERSION,
 				});
 			} else {
 				await plan({
@@ -375,7 +380,12 @@ async function main(): Promise<void> {
 		}
 		case "query": {
 			const { queryCommand } = await import("./commands/index-command.js");
-			queryCommand({ json: args.json as boolean | undefined });
+			queryCommand({ json: args.json as boolean | undefined, task: args.task as string | undefined });
+			break;
+		}
+		case "orient": {
+			const { orient } = await import("./commands/orient.js");
+			orient({ json: args.json as boolean | undefined });
 			break;
 		}
 		case "wiki": {
@@ -452,6 +462,10 @@ async function main(): Promise<void> {
 				step: args.step as string | undefined,
 				next: args.next as string | undefined,
 				plan: args.plan as string | undefined,
+				blocker: args.blocker as string | string[] | undefined,
+				verification: args.verification as string | string[] | undefined,
+				evidenceRef: args["evidence-ref"] as string | string[] | undefined,
+				capabilityDecision: args["capability-decision"] as string | string[] | undefined,
 				json: args.json as boolean | undefined,
 				cliVersion: VERSION,
 			});
@@ -469,13 +483,15 @@ async function main(): Promise<void> {
 			const subcommand = args._[1] as string | undefined;
 			// positional description: everything after the subcommand that isn't a flag
 			const description = args._.slice(2).join(" ");
-			task({
+			await task({
 				subcommand,
 				type: args.type as string | undefined,
 				priority: args.priority as string | undefined,
 				all: args.all as boolean | undefined,
 				status: args.status as string | undefined,
 				description: description || undefined,
+				activate: args.activate === true,
+				cliVersion: VERSION,
 			});
 			break;
 		}

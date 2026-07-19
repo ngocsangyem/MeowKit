@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
-import { buildIndex, queryIndex } from "../core/derived-index.js";
+import { buildIndex, queryIndex, queryByTask } from "../core/derived-index.js";
 
 // `mewkit index` / `mewkit query` — the opt-in derived SQLite index over the append logs.
 // Build is explicit (never automatic, no hook). Query is read-only. Both advisory: exit 0,
@@ -9,6 +9,8 @@ import { buildIndex, queryIndex } from "../core/derived-index.js";
 
 interface IndexOptions {
 	json?: boolean;
+	/** `mewkit query --task <id>` — task-joined evidence + plan linkage instead of aggregates. */
+	task?: string;
 }
 
 function findClaudeDir(): string | null {
@@ -47,6 +49,30 @@ export function queryCommand(opts: IndexOptions = {}): void {
 		console.error(pc.red("Could not find .claude/ directory."));
 		process.exit(0);
 	}
+
+	// Task-joined query: `mewkit query --task <id>` returns one task's evidence + plan linkage.
+	if (opts.task) {
+		let taskResult;
+		try {
+			taskResult = queryByTask(claudeDir, opts.task);
+		} catch {
+			console.log(pc.dim("No derived index yet — run `mewkit index` first (opt-in)."));
+			return;
+		}
+		if (opts.json) {
+			console.log(JSON.stringify(taskResult, null, 2));
+			return;
+		}
+		console.log(pc.bold(pc.cyan(`Task evidence — ${taskResult.taskId}`)) + pc.dim(` (read-only, schema v${taskResult.schemaVersion})`));
+		if (taskResult.plans.length) console.log(pc.dim(`  plan: ${taskResult.plans.join(", ")}`));
+		if (taskResult.events.length === 0) {
+			console.log(pc.dim("  no task-joined events (unknown task, or index predates task ids)."));
+			return;
+		}
+		for (const e of taskResult.events) console.log(`  ${pc.dim(e.ts ?? "?")}  ${e.event ?? "?"}${e.run_id ? pc.dim(` [${e.run_id}]`) : ""}`);
+		return;
+	}
+
 	let result;
 	try {
 		result = queryIndex(claudeDir);

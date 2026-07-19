@@ -2,6 +2,9 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
+import { activateTask, ActivationError, normalizeTaskId } from "../core/task-record.js";
+import { appendTraceRecord } from "../core/trace-append.js";
+import { readInstallMetadata } from "../core/install-metadata.js";
 
 // `mewkit plan approve <plan-dir|plan.md> [--by <approver>]` — stamp the Gate 1
 // approval receipt onto a plan after a human has approved it.
@@ -24,6 +27,67 @@ export interface PlanApproveArgs {
 	target?: string;
 	/** Recorded in the receipt as `approved_by`. */
 	by?: string;
+	/** Opt out of durable activation (approval-only). Activation is on by default. */
+	noActivate?: boolean;
+	/** Invoking CLI version, for record provenance. */
+	cliVersion?: string;
+}
+
+/** Best-effort installed kit version (provenance only). */
+function kitVersion(projectRoot: string): string {
+	try {
+		return readInstallMetadata(path.join(projectRoot, ".claude")).meta?.version ?? "";
+	} catch {
+		return "";
+	}
+}
+
+/**
+ * Durably activate the plan as a task: write the active record + canonical pointer, then emit an
+ * advisory transition trace. Stamp and activation are SEPARATE facts — a failure here does not
+ * un-stamp the receipt, but it MUST exit non-zero and never claim activation succeeded.
+ */
+async function activatePlan(planFile: string, cliVersion: string | undefined): Promise<boolean> {
+	const projectRoot = process.cwd();
+	const planPath = path.relative(projectRoot, planFile) || planFile;
+	const planSlug = path.basename(path.dirname(planFile));
+	const taskId = normalizeTaskId(planSlug);
+	try {
+		const result = await activateTask(projectRoot, {
+			taskId,
+			planPath,
+			planSlug,
+			now: new Date().toISOString(),
+			cliVersion,
+			kitVersion: kitVersion(projectRoot),
+			nextAction: "begin approved plan",
+		});
+		console.log(pc.green(`✓ Activated task ${pc.bold(taskId)} → tasks/active/${taskId}.json (+ active pointer).`));
+		// Transition trace is advisory: a failed append never fails an already-durable activation.
+		try {
+			await appendTraceRecord(path.join(projectRoot, ".claude"), {
+				event: "task_transition",
+				taskId,
+				planPath,
+				data: { status: "active", trigger: "plan-approve", createdRecord: result.createdRecord },
+			});
+		} catch (emitErr) {
+			console.log(pc.yellow(`⚠ activated, but transition trace emission failed: ${(emitErr as Error).message}`));
+		}
+		return true;
+	} catch (err) {
+		if (err instanceof ActivationError) {
+			console.log(pc.red(`✗ Activation FAILED for task ${pc.bold(err.taskId)} — approval was stamped, but this task is NOT active.`));
+			console.log(
+				err.rolledBack
+					? pc.dim("  The partial record was rolled back. Re-run `mewkit plan approve` after resolving the cause.")
+					: pc.yellow(`  A partial record may remain at tasks/active/${err.taskId}.json — inspect and repair before re-approving.`),
+			);
+			console.log(pc.dim(`  cause: ${err.message}`));
+			return false;
+		}
+		throw err;
+	}
 }
 
 /** Resolve a plan.md from either a directory or a direct file path. */
@@ -72,7 +136,15 @@ export async function planApprove(args: PlanApproveArgs): Promise<void> {
 				"Anti-accidental: this records an approval against THIS plan revision, not a host-authenticated human approval. Editing the plan body invalidates it (re-approval required).",
 			),
 		);
-		process.exitCode = 0;
+		// Durable activation is on by default; --no-activate is the explicit opt-out. A failed
+		// activation exits non-zero without claiming success (the receipt stays stamped either way).
+		if (args.noActivate) {
+			console.log(pc.dim("Skipped durable activation (--no-activate)."));
+			process.exitCode = 0;
+		} else {
+			const activated = await activatePlan(planFile, args.cliVersion);
+			process.exitCode = activated ? 0 : 1;
+		}
 	} catch (error: unknown) {
 		const msg = error instanceof Error ? error.message : String(error);
 		console.log(pc.red(`plan approve: failed to stamp receipt — ${msg}`));

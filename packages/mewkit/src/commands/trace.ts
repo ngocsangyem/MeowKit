@@ -9,6 +9,7 @@ import {
 	proposeImprovements,
 	type TraceRecord,
 } from "../core/trace-analysis.js";
+import { appendTraceRecordSync } from "../core/trace-append.js";
 
 // On-demand trace recall: score trace quality, audit entropy/drift, propose advisory
 // improvements, and record friction — all over the existing append log, with NO inner-harness
@@ -51,22 +52,13 @@ function readLog(claudeDir: string): TraceRecord[] {
 }
 
 function recordFriction(claudeDir: string, opts: TraceOptions): void {
-	const memDir = path.join(claudeDir, "memory");
-	fs.mkdirSync(memDir, { recursive: true });
-	const data: Record<string, unknown> = { message: redact(opts.friction ?? "") };
+	const message = redact(opts.friction ?? "");
+	const data: Record<string, unknown> = { message };
 	if (opts.responsibility) data["responsibility"] = opts.responsibility;
-	const record: TraceRecord = {
-		schema_version: "1.0",
-		ts: new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
-		event: "friction",
-		run_id: opts.id ?? "",
-		model: "",
-		density: "",
-		data,
-	};
-	fs.appendFileSync(path.join(memDir, "trace-log.jsonl"), JSON.stringify(record) + "\n");
+	// Route through the ONE shared append primitive (lock + scrub + rotation) — no local append.
+	appendTraceRecordSync(claudeDir, { event: "friction", runId: opts.id ?? "", data });
 	console.log(
-		`${pc.green("Recorded friction.")} ${pc.dim(opts.responsibility ? `[${opts.responsibility}] ` : "")}${data["message"] as string}`,
+		`${pc.green("Recorded friction.")} ${pc.dim(opts.responsibility ? `[${opts.responsibility}] ` : "")}${message}`,
 	);
 }
 

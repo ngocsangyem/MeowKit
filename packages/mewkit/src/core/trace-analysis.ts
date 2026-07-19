@@ -10,6 +10,9 @@ export interface TraceRecord {
 	run_id?: string;
 	model?: string;
 	density?: string;
+	/** Canonical task identity for task-joined queries (absent on legacy/pre-task logs). */
+	task_id?: string;
+	plan_path?: string;
 	data?: Record<string, unknown>;
 }
 

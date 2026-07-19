@@ -136,8 +136,7 @@ describe("migration v3 — fresh build", () => {
 	it("creates wiki_handoff + wiki_candidate_source exactly once, no duplicate-DDL error", async () => {
 		const claudeDir = await makeV3Wiki();
 		const res = buildIndex(claudeDir);
-		expect(res.schemaVersion).toBe(3);
-		expect(SCHEMA_VERSION).toBe(3);
+		expect(res.schemaVersion).toBe(SCHEMA_VERSION);
 		expect(tableNames(dbPath(claudeDir), ["wiki_handoff", "wiki_candidate_source"])).toEqual([
 			"wiki_candidate_source",
 			"wiki_handoff",
@@ -218,9 +217,24 @@ describe("migration v3 — Aspire-shaped v2 data", () => {
 		const file = dbPath(claudeDir);
 		await mkdir(join(claudeDir, "memory"), { recursive: true });
 
-		// Simulate a live v2 install: v2 wiki schema + a page + a candidate, stamped at v2.
+		// Simulate a live v2 install: a real DB reaches v2 by applying v1 (trace/cost tables)
+		// THEN v2 (wiki), so seed both before stamping v2 — otherwise a later additive migration
+		// that alters a v1 table has nothing to alter.
 		const seed = new DatabaseSync(file);
 		seed.exec("PRAGMA journal_mode = WAL");
+		seed.exec(`
+			CREATE TABLE trace_events (
+				id INTEGER PRIMARY KEY,
+				ts TEXT, event TEXT, run_id TEXT, model TEXT, density TEXT,
+				responsibility TEXT, data TEXT
+			);
+			CREATE INDEX idx_trace_event ON trace_events(event);
+			CREATE INDEX idx_trace_run ON trace_events(run_id);
+			CREATE TABLE cost_entries (
+				id INTEGER PRIMARY KEY,
+				date TEXT, command TEXT, tier TEXT, model TEXT,
+				tokens INTEGER, task TEXT, raw TEXT
+			);`);
 		seed.exec(WIKI_MIGRATION_SQL);
 		seed
 			.prepare(
@@ -248,7 +262,7 @@ describe("migration v3 — Aspire-shaped v2 data", () => {
 		const db = new DatabaseSync(file);
 		ensureIndexSchema(db);
 		try {
-			expect((db.prepare("PRAGMA user_version").get() as { user_version: number }).user_version).toBe(3);
+			expect((db.prepare("PRAGMA user_version").get() as { user_version: number }).user_version).toBe(SCHEMA_VERSION);
 			expect((db.prepare("SELECT COUNT(*) AS n FROM wiki_page").get() as { n: number }).n).toBe(1);
 			expect((db.prepare("SELECT COUNT(*) AS n FROM wiki_candidate").get() as { n: number }).n).toBe(1);
 			// v3 tables now exist and are empty.
@@ -280,7 +294,7 @@ describe("migration v3 — query contract intact", () => {
 		);
 		buildIndex(claudeDir);
 		const q = queryIndex(claudeDir);
-		expect(q.schemaVersion).toBe(3);
+		expect(q.schemaVersion).toBe(SCHEMA_VERSION);
 		expect(q.eventsByType.find((e) => e.event === "friction")!.n).toBe(1);
 	});
 });

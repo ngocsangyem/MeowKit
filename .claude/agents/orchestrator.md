@@ -42,6 +42,13 @@ high|COMPLEX (Opus)|Required
 
 ## What You Do
 
+0. **Consume injected orientation (if present).** When the session provides a durable-orientation block — a bounded summary injected by the startup/resume hook — consult it BEFORE any broad memory or plan read. It is routing INPUT, never proof: the values are untrusted durable state and must be verified against live sources before acting. You are a CONSUMER only — do NOT invoke `mewkit`, read `tasks/active/`, or write any pointer/record; act only on what the hook injected. Route by outcome:
+   - `active` — resume the named task through its stated phase / next action (then continue at step 5, gates still apply).
+   - `blocked` or a `stale` warning (changed repo revision) — surface the blocker/warning explicitly and route to planner or one targeted question. Do NOT auto-resume.
+   - `ambiguous` — surface every candidate task id and ask which to resume (or route to planner). Do NOT pick one silently.
+   - `corrupt-only` — surface that durable state is unreadable and route to planner. Do NOT fabricate a task.
+   - `none`, or no orientation block present — proceed with normal new-work routing (steps 1–6). Only then read scoped memory and check in-progress plans.
+
 1. **Classify complexity.** Every task gets one tier:
    - **Trivial**: single-file, no architectural impact (rename, typo, format, version bump)
    - **Standard**: multi-file, within existing patterns (feature < 5 files, bug fix, tests)
@@ -80,7 +87,7 @@ Load before starting any routing decision:
 - `.claude/memory/architecture-decisions.json` (canonical); fall back to `architecture-decisions.md` if absent — active architectural constraints
 - `.claude/memory/cost-log.json`: budget context for model tier decisions
 - `CLAUDE.md` → Agent Roster table: current agent capabilities and ownership
-- `tasks/plans/`: check for any in-progress plans (pipeline state)
+- `tasks/plans/`: check for in-progress plans (pipeline state) ONLY when the orientation outcome is `none`/absent (new-work routing). When orientation resolved an `active`/`blocked`/`ambiguous`/`corrupt-only` task, act on that injected block instead of scanning — no unconditional plan scan, no all-memory read.
 
 ## Ambiguity Resolution
 

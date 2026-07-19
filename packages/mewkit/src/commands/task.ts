@@ -14,11 +14,16 @@ import {
 	typeSuffix,
 	type TaskType,
 } from "./task-utils.js";
+import { activateTask, ActivationError, normalizeTaskId } from "../core/task-record.js";
+import { appendTraceRecord } from "../core/trace-append.js";
 
 interface TaskNewArgs {
 	type?: TaskType;
 	priority?: string;
 	description: string;
+	/** Durably activate no-plan work: write an active record + canonical pointer keyed by task id. */
+	activate?: boolean;
+	cliVersion?: string;
 }
 
 interface TaskListArgs {
@@ -64,7 +69,7 @@ function priorityColor(priority: string): string {
 // ── Commands ─────────────────────────────────────────────────────────────────
 
 /** meowkit task new --type feature "description" */
-function taskNew(args: TaskNewArgs): void {
+async function taskNew(args: TaskNewArgs): Promise<void> {
 	const type: TaskType = (args.type as TaskType) ?? "feature";
 	const validTypes: TaskType[] = ["feature", "bug-fix", "refactor", "security"];
 	if (!validTypes.includes(type)) {
@@ -129,6 +134,46 @@ function taskNew(args: TaskNewArgs): void {
 	fs.writeFileSync(destPath, frontmatter + body, "utf-8");
 
 	console.log(`\n  ${pc.green("✓")} Created: ${pc.bold(destPath)}\n`);
+
+	// --activate: durable no-plan activation (record + canonical pointer keyed by task id). This
+	// is all-or-fail from the caller's view; a failed pointer commit exits non-zero, never claiming
+	// activation. The scaffolded FILE above is independent of the durable record.
+	if (args.activate) {
+		const projectRoot = process.cwd();
+		const taskId = normalizeTaskId(slug);
+		try {
+			await activateTask(projectRoot, {
+				taskId,
+				planPath: null,
+				planSlug: null,
+				now: new Date().toISOString(),
+				cliVersion: args.cliVersion,
+				nextAction: "begin work",
+			});
+			console.log(`  ${pc.green("✓")} Activated task ${pc.bold(taskId)} (no-plan) → tasks/active/${taskId}.json\n`);
+			try {
+				await appendTraceRecord(path.join(projectRoot, ".claude"), {
+					event: "task_transition",
+					taskId,
+					data: { status: "active", trigger: "task-new" },
+				});
+			} catch (emitErr) {
+				console.log(pc.yellow(`  ⚠ activated, but transition trace emission failed: ${(emitErr as Error).message}`));
+			}
+		} catch (err) {
+			if (err instanceof ActivationError) {
+				console.error(pc.red(`  ✗ Activation FAILED for task ${err.taskId} — NOT active.`));
+				console.error(
+					err.rolledBack
+						? pc.dim("    The partial record was rolled back.")
+						: pc.yellow(`    A partial record may remain at tasks/active/${err.taskId}.json — inspect before retrying.`),
+				);
+				console.error(pc.dim(`    cause: ${err.message}`));
+				process.exit(1);
+			}
+			throw err;
+		}
+	}
 }
 
 /** meowkit task list [--all] [--status done] */
@@ -213,17 +258,21 @@ export interface TaskArgs {
 	all?: boolean;
 	status?: string;
 	description?: string;
+	activate?: boolean;
+	cliVersion?: string;
 }
 
-export function task(args: TaskArgs): void {
+export async function task(args: TaskArgs): Promise<void> {
 	const sub = args.subcommand;
 
 	switch (sub) {
 		case "new":
-			taskNew({
+			await taskNew({
 				type: args.type as TaskType | undefined,
 				priority: args.priority,
 				description: args.description ?? "",
+				activate: args.activate,
+				cliVersion: args.cliVersion,
 			});
 			break;
 

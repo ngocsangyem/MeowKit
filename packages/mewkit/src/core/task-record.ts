@@ -104,6 +104,131 @@ export function readActivePlanPointer(projectRoot: string): string | null {
 	return null;
 }
 
+/** The canonical active-task pointer schema version THIS CLI writes. */
+export const ACTIVE_TASK_POINTER_SCHEMA_VERSION = "1.0";
+
+/**
+ * The canonical active-task pointer: it identifies a TASK by id, not a fuzzy plan string. The
+ * optional plan fields are provenance/join hints; `taskId` is authoritative. Unknown keys pass
+ * through so a legacy `path`/`slug` mirror (kept for the checkpoint reader) survives a round-trip.
+ */
+export const ActiveTaskPointerSchema = z
+	.object({
+		schemaVersion: z.literal("1.0"),
+		taskId: z.string().regex(TASK_ID_RE),
+		planPath: z.string().nullable().default(null),
+		planSlug: z.string().nullable().default(null),
+	})
+	.passthrough();
+export type ActiveTaskPointer = z.infer<typeof ActiveTaskPointerSchema>;
+
+/**
+ * A read of the pointer file. `canonical` carries a task-identified pointer (the only shape this
+ * CLI writes). `legacy` carries a normalized plan path/slug from a pre-canonical pointer; it is
+ * resolved to a task ONLY by EXACT normalized matching (never substring), and support is
+ * temporary. `null` means no pointer is present.
+ */
+export type ActiveTaskPointerResult =
+	| { kind: "canonical"; pointer: ActiveTaskPointer }
+	| { kind: "legacy"; planRef: string }
+	| null;
+
+const pointerJsonPath = (projectRoot: string): string => join(projectRoot, "session-state", "active-plan.json");
+const pointerLegacyPath = (projectRoot: string): string => join(projectRoot, "session-state", "active-plan");
+
+/**
+ * Read the active-task pointer. JSON is parsed FIRST: a payload with a valid `taskId` is a
+ * canonical pointer; a payload with only `path`/`slug` is a legacy plan reference. The legacy
+ * plain-text file is the last fallback. Returns null when no readable pointer exists.
+ */
+export function readActiveTaskPointer(projectRoot: string): ActiveTaskPointerResult {
+	const jsonPath = pointerJsonPath(projectRoot);
+	if (existsSync(jsonPath)) {
+		try {
+			const raw = JSON.parse(readFileSync(jsonPath, "utf-8")) as {
+				taskId?: unknown;
+				path?: unknown;
+				slug?: unknown;
+			};
+			if (typeof raw.taskId === "string" && TASK_ID_RE.test(raw.taskId)) {
+				return { kind: "canonical", pointer: ActiveTaskPointerSchema.parse(raw) };
+			}
+			const planRef = ((typeof raw.path === "string" && raw.path) || (typeof raw.slug === "string" && raw.slug) || "").trim();
+			if (planRef) return { kind: "legacy", planRef };
+		} catch {
+			/* fall through to the plain-text legacy file */
+		}
+	}
+	const legacy = pointerLegacyPath(projectRoot);
+	if (existsSync(legacy)) {
+		const planRef = readFileSync(legacy, "utf-8").trim();
+		if (planRef) return { kind: "legacy", planRef };
+	}
+	return null;
+}
+
+/** Atomic temp+rename write of a JSON payload (caller holds any needed lock). */
+async function atomicWriteJson(target: string, payload: unknown): Promise<void> {
+	const serialized = JSON.stringify(payload, null, 2) + "\n";
+	const tmp = `${target}.tmp-${process.pid}`;
+	try {
+		await writeFile(tmp, serialized, "utf-8");
+		await rename(tmp, target);
+	} catch (err) {
+		try {
+			await unlink(tmp);
+		} catch {
+			/* best-effort cleanup */
+		}
+		throw err;
+	}
+}
+
+/**
+ * Write the canonical active-task pointer atomically under a per-file lock. Always writes the
+ * canonical `{schemaVersion, taskId, planPath, planSlug}` shape and mirrors `path`/`slug` so the
+ * existing checkpoint reader (which reads `active-plan.json` → `path`) keeps working during the
+ * transition. Never writes the plain-text legacy pointer.
+ */
+export async function writeActiveTaskPointer(
+	projectRoot: string,
+	pointer: Omit<ActiveTaskPointer, "schemaVersion">,
+): Promise<void> {
+	const validated = ActiveTaskPointerSchema.parse({ schemaVersion: ACTIVE_TASK_POINTER_SCHEMA_VERSION, ...pointer });
+	const dir = join(projectRoot, "session-state");
+	mkdirSync(dir, { recursive: true });
+	const payload: Record<string, unknown> = {
+		schemaVersion: validated.schemaVersion,
+		taskId: validated.taskId,
+		planPath: validated.planPath,
+		planSlug: validated.planSlug,
+	};
+	// Legacy mirror for the checkpoint reader — omitted when there is no plan association.
+	if (validated.planPath) payload.path = validated.planPath;
+	if (validated.planSlug) payload.slug = validated.planSlug;
+	const lockPath = join(dir, ".active-plan.lock");
+	await withFileLock(lockPath, () => atomicWriteJson(pointerJsonPath(projectRoot), payload));
+}
+
+/**
+ * Clear the active-task pointer ONLY when it points at `taskId` (exact match). A pointer naming a
+ * different task is left untouched — completing one task never silently clears another's pointer.
+ * Returns true when a pointer for `taskId` was removed.
+ */
+export async function clearActiveTaskPointer(projectRoot: string, taskId: string): Promise<boolean> {
+	const dir = join(projectRoot, "session-state");
+	const lockPath = join(dir, ".active-plan.lock");
+	if (!existsSync(pointerJsonPath(projectRoot))) return false;
+	return withFileLock(lockPath, async () => {
+		const current = readActiveTaskPointer(projectRoot);
+		if (current?.kind === "canonical" && current.pointer.taskId === taskId) {
+			await unlink(pointerJsonPath(projectRoot));
+			return true;
+		}
+		return false;
+	});
+}
+
 /** Resolve a task-record path and assert it stays contained under tasks/active (realpath). */
 function recordPath(projectRoot: string, taskId: string): string {
 	if (!TASK_ID_RE.test(taskId)) throw new Error(`invalid task id: ${JSON.stringify(taskId)}`);
@@ -232,6 +357,127 @@ export async function recordContextEvidence(
 		for (const e of envelope.evidence) paths.add(e.path);
 		return { ...existing, repos, evidenceRefs: [...paths].sort(), updatedAt: now };
 	});
+}
+
+/** Remove a task-record file (rollback / cleanup). Returns true when a file was removed. */
+export async function removeTaskRecord(projectRoot: string, taskId: string): Promise<boolean> {
+	const abs = recordPath(projectRoot, taskId);
+	if (!existsSync(abs)) return false;
+	await unlink(abs);
+	return true;
+}
+
+/**
+ * Coerce an arbitrary string (e.g. a plan slug) into a valid task id: lowercase, non-slug
+ * characters collapsed to hyphens, trimmed, capped at 64 chars. Falls back to "task" if empty.
+ */
+export function normalizeTaskId(raw: string): string {
+	const s = raw
+		.toLowerCase()
+		.replace(/[^a-z0-9-]+/g, "-")
+		.replace(/^-+/, "")
+		.replace(/-+$/, "")
+		.slice(0, 64)
+		.replace(/-+$/, "");
+	return s || "task";
+}
+
+/** Raised when durable activation cannot commit atomically; carries whether a rollback ran. */
+export class ActivationError extends Error {
+	constructor(
+		public readonly taskId: string,
+		public readonly rolledBack: boolean,
+		message: string,
+	) {
+		super(message);
+		this.name = "ActivationError";
+	}
+}
+
+export interface ActivateTaskInput {
+	taskId: string;
+	planPath?: string | null;
+	planSlug?: string | null;
+	now: string;
+	cliVersion?: string;
+	kitVersion?: string;
+	currentStep?: string;
+	nextAction?: string;
+}
+
+export interface ActivationResult {
+	taskId: string;
+	record: TaskRecord;
+	/** True when this call created the record (vs. reactivating an existing one — idempotent). */
+	createdRecord: boolean;
+}
+
+/**
+ * Commit durable authority for a task as ONE all-or-fail operation from the caller's view: write
+ * (or idempotently update) the active record, then the canonical pointer. If the pointer commit
+ * fails and this call created the record, the new record is rolled back; otherwise it is left with
+ * a repairable diagnostic (the ActivationError names the task id). Re-activating an existing task
+ * keeps exactly one record. Transition-trace emission is the caller's separate, advisory step.
+ */
+export async function activateTask(projectRoot: string, input: ActivateTaskInput): Promise<ActivationResult> {
+	// `createdRecord` is decided INSIDE the lock (from the mutator's view of the current record),
+	// so a concurrent same-id creator can never make us believe we created a record we did not —
+	// which would let our rollback delete their record. updateTaskRecord's read also surfaces an
+	// incompatible on-disk record LOUDLY (throws) before any write, so no separate pre-read is needed.
+	let createdRecord = false;
+	const record = await updateTaskRecord(projectRoot, input.taskId, (cur) => {
+		createdRecord = cur === null;
+		const base: TaskRecord = cur ?? {
+			schemaVersion: TASK_RECORD_SCHEMA_VERSION,
+			taskId: input.taskId,
+			planPath: null,
+			status: "active",
+			currentStep: "",
+			repos: [],
+			blockers: [],
+			nextAction: "",
+			verificationSummaries: [],
+			evidenceRefs: [],
+			capabilityDecisions: [],
+			writtenByCli: "",
+			writtenByKit: "",
+			updatedAt: "",
+		};
+		return {
+			...base,
+			status: "active",
+			planPath: input.planPath ?? base.planPath ?? null,
+			currentStep: input.currentStep ?? base.currentStep,
+			nextAction: input.nextAction ?? base.nextAction,
+			writtenByCli: input.cliVersion ?? base.writtenByCli,
+			writtenByKit: input.kitVersion ?? base.writtenByKit,
+			updatedAt: input.now,
+		};
+	});
+
+	try {
+		await writeActiveTaskPointer(projectRoot, {
+			taskId: input.taskId,
+			planPath: input.planPath ?? null,
+			planSlug: input.planSlug ?? null,
+		});
+	} catch (err) {
+		let rolledBack = false;
+		if (createdRecord) {
+			try {
+				rolledBack = await removeTaskRecord(projectRoot, input.taskId);
+			} catch {
+				/* rollback failed — leave the record with a diagnostic (below) for manual repair */
+			}
+		}
+		throw new ActivationError(
+			input.taskId,
+			rolledBack,
+			`activation pointer commit failed for task "${input.taskId}": ${(err as Error).message}`,
+		);
+	}
+
+	return { taskId: input.taskId, record, createdRecord };
 }
 
 /** List all active-dir task ids (record filenames), for resume reconstruction. */
