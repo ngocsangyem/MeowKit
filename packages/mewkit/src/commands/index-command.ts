@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
-import { buildIndex, queryIndex, queryByTask } from "../core/derived-index.js";
+import { buildIndex, queryIndex, queryByTask, queryPresets } from "../core/derived-index.js";
 
 // `mewkit index` / `mewkit query` — the opt-in derived SQLite index over the append logs.
 // Build is explicit (never automatic, no hook). Query is read-only. Both advisory: exit 0,
@@ -11,6 +11,8 @@ interface IndexOptions {
 	json?: boolean;
 	/** `mewkit query --task <id>` — task-joined evidence + plan linkage instead of aggregates. */
 	task?: string;
+	/** `mewkit query --presets` — the recovery-measurement presets over orient/transition events. */
+	presets?: boolean;
 }
 
 function findClaudeDir(): string | null {
@@ -70,6 +72,36 @@ export function queryCommand(opts: IndexOptions = {}): void {
 			return;
 		}
 		for (const e of taskResult.events) console.log(`  ${pc.dim(e.ts ?? "?")}  ${e.event ?? "?"}${e.run_id ? pc.dim(` [${e.run_id}]`) : ""}`);
+		return;
+	}
+
+	// Recovery-measurement presets: `mewkit query --presets`.
+	if (opts.presets) {
+		let presets;
+		try {
+			presets = queryPresets(claudeDir);
+		} catch {
+			console.log(pc.dim("No derived index yet — run `mewkit index` first (opt-in)."));
+			return;
+		}
+		if (opts.json) {
+			console.log(JSON.stringify(presets, null, 2));
+			return;
+		}
+		console.log(pc.bold(pc.cyan("Recovery measurement")) + pc.dim(` (read-only, schema v${presets.schemaVersion})`));
+		console.log(pc.bold("  Recovery outcomes:"));
+		for (const r of presets.recoveryOutcomes) console.log(`    ${r.n}× ${r.outcome}`);
+		if (presets.recoveryOutcomes.length === 0) console.log(pc.dim("    (no orient runs recorded)"));
+		console.log(
+			`  Stale-warning frequency: ${presets.staleWarnings.runsWithStale}/${presets.staleWarnings.totalRuns} orient run(s)`,
+		);
+		console.log(
+			`  Transitions missing task context: ${presets.transitionsMissingTask.missing}/${presets.transitionsMissingTask.total}`,
+		);
+		if (presets.verificationRuns.length > 0) {
+			console.log(pc.bold("  Verification runs by task:"));
+			for (const v of presets.verificationRuns) console.log(`    ${v.runs}× ${v.taskId}`);
+		}
 		return;
 	}
 

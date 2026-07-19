@@ -147,6 +147,7 @@ async function main(): Promise<void> {
 			"version",
 			"activate",
 			"record",
+			"presets",
 			"check",
 			"strict",
 			"beta",
@@ -381,7 +382,11 @@ async function main(): Promise<void> {
 		}
 		case "query": {
 			const { queryCommand } = await import("./commands/index-command.js");
-			queryCommand({ json: args.json as boolean | undefined, task: args.task as string | undefined });
+			queryCommand({
+				json: args.json as boolean | undefined,
+				task: args.task as string | undefined,
+				presets: args.presets as boolean | undefined,
+			});
 			break;
 		}
 		case "orient": {

@@ -225,6 +225,61 @@ export function queryIndex(claudeDir: string): QueryResult {
 	}
 }
 
+export interface PresetResult {
+	schemaVersion: number;
+	/** Recovery-outcome distribution over orient runs. */
+	recoveryOutcomes: { outcome: string; n: number }[];
+	/** How often an orient run carried at least one stale-revision warning. */
+	staleWarnings: { totalRuns: number; runsWithStale: number };
+	/** Task transitions that carried no canonical task context (an activation-path gap signal). */
+	transitionsMissingTask: { total: number; missing: number };
+	/** Verification-bearing transitions per task (a count > 1 indicates re-runs). */
+	verificationRuns: { taskId: string; runs: number }[];
+}
+
+/**
+ * The Phase-7 measurement presets over the append log's advisory events (`orient_run`,
+ * `task_transition`). Read-only, static aggregates (json_extract on canonical event data — no
+ * user-supplied SQL). Answers: recovery-outcome distribution, stale-warning frequency, transitions
+ * missing task context, and verification re-run counts.
+ */
+export function queryPresets(claudeDir: string): PresetResult {
+	const target = dbPath(claudeDir);
+	if (!fs.existsSync(target)) throw new Error("no index — run `mewkit index` first");
+	const db = new DatabaseSync(target, { readOnly: true });
+	try {
+		const recoveryOutcomes = db
+			.prepare(
+				"SELECT COALESCE(json_extract(data,'$.outcome'),'(unknown)') AS outcome, COUNT(*) AS n FROM trace_events WHERE event='orient_run' GROUP BY outcome ORDER BY n DESC, outcome",
+			)
+			.all() as { outcome: string; n: number }[];
+		const stale = db
+			.prepare(
+				"SELECT COUNT(*) AS totalRuns, COALESCE(SUM(CASE WHEN CAST(json_extract(data,'$.staleWarnings') AS INTEGER) > 0 THEN 1 ELSE 0 END),0) AS runsWithStale FROM trace_events WHERE event='orient_run'",
+			)
+			.get() as { totalRuns: number; runsWithStale: number };
+		const missing = db
+			.prepare(
+				"SELECT COUNT(*) AS total, COALESCE(SUM(CASE WHEN task_id IS NULL OR task_id='' THEN 1 ELSE 0 END),0) AS missing FROM trace_events WHERE event='task_transition'",
+			)
+			.get() as { total: number; missing: number };
+		const verificationRuns = db
+			.prepare(
+				"SELECT task_id AS taskId, COUNT(*) AS runs FROM trace_events WHERE event='task_transition' AND json_extract(data,'$.verifications') IS NOT NULL AND task_id IS NOT NULL AND task_id <> '' GROUP BY task_id ORDER BY runs DESC, task_id",
+			)
+			.all() as { taskId: string; runs: number }[];
+		return {
+			schemaVersion: userVersion(db),
+			recoveryOutcomes,
+			staleWarnings: stale,
+			transitionsMissingTask: missing,
+			verificationRuns,
+		};
+	} finally {
+		db.close();
+	}
+}
+
 export interface TaskQueryResult {
 	schemaVersion: number;
 	taskId: string;
