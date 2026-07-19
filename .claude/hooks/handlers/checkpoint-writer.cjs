@@ -8,9 +8,33 @@
 //
 // Checkpoint dir: session-state/checkpoints/
 
+const fs = require('fs');
+const path = require('path');
 const { gitHead, gitBranch, gitStatus, writeCheckpoint } = require(
   require('path').join(process.env.CLAUDE_PROJECT_DIR || process.cwd(), '.claude', 'hooks', 'lib', 'checkpoint-utils.cjs')
 );
+
+const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+const TASK_ID_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
+
+// READ-ONLY cache of the active durable task, for the checkpoint summary. The checkpoint never
+// WRITES task state — it consumes the canonical pointer (active-plan.json → taskId) and the record
+// as a summary. Best-effort: any absence/parse error yields null (no fabrication).
+function activeTaskSummary() {
+  try {
+    const pointer = JSON.parse(fs.readFileSync(path.join(ROOT, 'session-state', 'active-plan.json'), 'utf8'));
+    const taskId = pointer && typeof pointer.taskId === 'string' ? pointer.taskId : null;
+    if (!taskId || !TASK_ID_RE.test(taskId)) return null;
+    const record = JSON.parse(fs.readFileSync(path.join(ROOT, 'tasks', 'active', taskId + '.json'), 'utf8'));
+    return {
+      taskId,
+      status: typeof record.status === 'string' ? record.status : null,
+      nextAction: typeof record.nextAction === 'string' ? record.nextAction : '',
+    };
+  } catch {
+    return null;
+  }
+}
 
 module.exports = function checkpointWriter(ctx, state) {
   const budget = state.load('budget-state');
@@ -31,6 +55,9 @@ module.exports = function checkpointWriter(ctx, state) {
     },
     progress: {
       plan_path: activePlan?.path || null,
+      // Read-only summary of the active durable task (null when none) — the checkpoint never
+      // writes task state; it caches it for resume orientation.
+      task: activeTaskSummary(),
     },
     environment: {
       git_branch: branch,

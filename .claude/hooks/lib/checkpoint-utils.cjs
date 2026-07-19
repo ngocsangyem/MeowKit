@@ -11,13 +11,15 @@ const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const CHECKPOINT_DIR = path.join(ROOT, 'session-state', 'checkpoints');
 const LATEST_FILE = path.join(CHECKPOINT_DIR, 'checkpoint-latest.json');
 
+// Unavailable git values are NULL, never the string 'unknown' — a fabricated-looking token in a
+// durable record is worse than an honest absent value the reader must handle.
 function gitHead() {
   try {
     return execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
       cwd: ROOT, timeout: 3000, stdio: ['pipe', 'pipe', 'pipe'],
     }).toString().trim();
   } catch {
-    return 'unknown';
+    return null;
   }
 }
 
@@ -27,7 +29,7 @@ function gitBranch() {
       cwd: ROOT, timeout: 3000, stdio: ['pipe', 'pipe', 'pipe'],
     }).toString().trim();
   } catch {
-    return 'unknown';
+    return null;
   }
 }
 

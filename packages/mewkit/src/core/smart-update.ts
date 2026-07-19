@@ -20,6 +20,7 @@ import {
 	type ReadInstallMetadataResult,
 } from "./install-metadata.js";
 import { writeInstallMetadata } from "./install-metadata-writer.js";
+import { writeRuntimeDescriptor, resolveInProjectExecutable } from "./hook-runtime.js";
 
 export interface UpdateStats {
 	updated: number;
@@ -508,6 +509,24 @@ export async function smartUpdate(
 		// here, so the previous legacy manifest stays on disk for the next run.
 		// Derived from the entries just computed, avoiding a second scan+hash of .claude/.
 		writeManifest(claudeDir, legacyManifestFromInstallMeta(meta));
+
+		// Write the hook runtime descriptor when an in-project mewkit executable exists (so the
+		// SessionStart hook can run `orient` without npx / parent-node_modules scanning). This is
+		// ADVISORY, unlike the metadata write above: if no in-project executable is installed yet,
+		// write NO descriptor (honest "no runtime" → the hook uses its checkpoint fallback) rather
+		// than record one the hook would reject. Refreshed on every install/upgrade.
+		try {
+			const executable = resolveInProjectExecutable(targetDir);
+			if (executable) {
+				await writeRuntimeDescriptor(claudeDir, {
+					executable,
+					packageVersion: release?.version ?? "",
+					now: new Date().toISOString(),
+				});
+			}
+		} catch (err) {
+			log.warn(`Could not write hook runtime descriptor (non-fatal): ${(err as Error).message}`);
+		}
 	}
 
 	log.setData("update", stats);

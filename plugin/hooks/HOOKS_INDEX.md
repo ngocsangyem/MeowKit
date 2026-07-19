@@ -72,7 +72,7 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 | `session-state/build-verify-cache.json` | handlers/build-verify.cjs | (same) | File-content-hash cache for skip-on-unchanged |
 | `session-state/last-session-id` | project-context-loader.sh | (same) | Session change detection |
 | `session-state/learning-observer.jsonl` | learning-observer.sh | (self — edit-frequency state) | Per-file edit ledger; self-read to compute the canonical `file_edited` trace `edit_count`. No external reader; verbose churn record debug-gated (`MEOWKIT_HOOK_DEBUG=1`). |
-| `session-state/active-plan.json` | mk:autobuild (Phase 5), mk:plan-creator | pre-completion-check.sh, handlers/checkpoint-writer.cjs | Active plan state `{ "path": "...", "slug": "..." }` |
+| `session-state/active-plan.json` | `mewkit plan approve` / `mewkit task new --activate` (canonical pointer), mk:autobuild (Phase 5), mk:plan-creator | pre-completion-check.sh, handlers/checkpoint-writer.cjs, `mewkit orient` | Active-task pointer. Canonical shape `{ "schemaVersion", "taskId", "planPath", "planSlug" }`; `path`/`slug` are mirrored for the checkpoint reader during the transition. Identifies a TASK by id, never a fuzzy plan substring. |
 | `session-state/active-plan` | legacy (migration fallback only) | pre-completion-check.sh | Deprecated raw active-plan value; remove after migration |
 | `session-state/verification-required.json` | mk:cook, mk:autobuild | pre-completion-check.sh | Verification enforcement marker `{ "required": true, "slug": "...", ... }` |
 | `session-state/detected-model.json` | handlers/model-detector.cjs | handlers/budget-tracker.cjs, handlers/auto-checkpoint.cjs | Model tier + density detection result |
