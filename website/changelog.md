@@ -14,6 +14,33 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.14.4 (2026-07-19) — The Orientation & Transition Spine
+
+The `mewkit` CLI ships alongside this kit as **1.19.0** (see `CLI` below).
+
+### Highlights
+
+A fresh session can now recover what it was doing from durable task state alone — no plan or wiki scanning. Explicit activation records one active task plus a canonical pointer, `mewkit orient` returns a bounded, honest resume envelope (active / none / ambiguous / corrupt-only), and the resume hook injects it through a trust-gated installed runtime with a labeled checkpoint fallback. Trace logging is now one shared append primitive across the shell and CLI, task work is queryable by id, and wiki recall verifies its own index before research trusts it.
+
+### CLI
+
+- `mewkit orient [--json]` — safe resume orientation built only from durable task state; reports active, none, ambiguous, or corrupt-only, and never scans plans or the wiki.
+- `mewkit plan approve` now durably activates the plan by default (one active record + canonical task pointer); `--no-activate` opts out, and a failed activation exits non-zero rather than claiming success.
+- `mewkit task new --activate` — durably activate no-plan work.
+- `mewkit task-state update` gained `--blocker`, `--verification`, `--evidence-ref`, and `--capability-decision`, and emits a task-transition trace after a successful write.
+- `mewkit query --task <id>` — task-joined evidence and plan linkage; `mewkit query --presets` — recovery-measurement metrics (outcome distribution, stale-warning frequency, transitions missing task context, verification re-runs).
+- `mewkit wiki verify [--json]` — canonical-vs-index consistency check (page set, per-page body hash, provenance, FTS parity); research refuses to run against an inconsistent index, and `wiki context` warns when the index looks stale.
+
+### Improvements
+
+- One shared trace-append primitive now backs every writer — the shell hook and the CLI contend on the same sidecar lock, so concurrent appends can no longer interleave or corrupt a line.
+- The resume/clear/compact orientation hook runs through a trust-gated installed runtime (absolute, in-project, symlink-resolved executable) and falls back to a clearly labeled checkpoint summary when no runtime is available; fresh-session startup stays disabled pending its release gate.
+- Providers surface an explicit, report-only Qwen entry (no support claimed), and the session-orientation instruction is documented in the capability bootstrap.
+
+### Migration Notes
+
+- The derived index schema is now v4 (adds `task_id` / `plan_path` columns for task-joined queries). Additive — it auto-applies on the next `mewkit index` / `mewkit wiki reindex`; no user action required.
+
 ## 2.14.3 (2026-07-19) — Jira & Confluence Agents on Haiku
 
 The `mewkit` CLI is unchanged at **1.18.2** — this release ships kit content only.

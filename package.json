@@ -42,7 +42,7 @@
     "node": ">=24"
   },
   "license": "MIT",
-  "version": "2.14.3",
+  "version": "2.14.4",
   "overrides": {
     "npm": "^11.14.1"
   }
