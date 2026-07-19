@@ -12,6 +12,7 @@ const { execSync } = require('child_process');
 const path = require('path');
 
 const SCRIPT_PATH = path.join(__dirname, 'worktree.cjs');
+const reviewPr = require('./lib/worktree-review-pr.cjs');
 // Run tests from the current git root so we have a real repo context
 const TEST_CWD = execSync('git rev-parse --show-toplevel', {
   encoding: 'utf-8',
@@ -280,6 +281,173 @@ test('create --orchestrated without agent name returns MISSING_AGENT_NAME', () =
   assert(!result.success, 'Should fail');
   const json = assertJSON(result.output);
   assert(json.error.code === 'MISSING_AGENT_NAME', `Expected MISSING_AGENT_NAME, got: ${json.error.code}`);
+});
+
+// ─── REVIEW-PR: input validation (pure) ────────────────────────────────────────
+console.log('\n🔎 review-pr input validation (pure functions)');
+
+test('validateSession accepts a safe id', () => {
+  assert(reviewPr.validateSession('feat-42_x.1') === 'feat-42_x.1', 'safe id should pass through');
+});
+
+['../evil', 'a/b', 'a\\b', '/abs', '..', 'a/../b', '.hidden-start'].forEach((bad) => {
+  test(`validateSession rejects path-unsafe id: ${JSON.stringify(bad)}`, () => {
+    let code = null;
+    try { reviewPr.validateSession(bad); } catch (e) { code = e.code; }
+    assert(code === 'INVALID_SESSION' || (bad === '.hidden-start' && code === 'INVALID_SESSION'), `Expected INVALID_SESSION, got: ${code}`);
+  });
+});
+
+test('validatePr rejects non-positive / non-integer', () => {
+  ['0', '-2', 'abc', '3.5'].forEach((bad) => {
+    let code = null;
+    try { reviewPr.validatePr(bad); } catch (e) { code = e.code; }
+    assert(code === 'INVALID_PR', `Expected INVALID_PR for ${bad}, got: ${code}`);
+  });
+  assert(reviewPr.validatePr('12') === 12, 'valid PR should coerce to number');
+});
+
+test('validateRemote requires a remote name', () => {
+  let code = null;
+  try { reviewPr.validateRemote(null); } catch (e) { code = e.code; }
+  assert(code === 'MISSING_REMOTE', `Expected MISSING_REMOTE, got: ${code}`);
+});
+
+test('parseRemoteGitHub parses https and ssh forms, rejects non-github', () => {
+  const https = reviewPr.parseRemoteGitHub('https://github.com/ngocsangyem/MeowKit.git');
+  assert(https && https.owner === 'ngocsangyem' && https.repo === 'MeowKit', `https parse failed: ${JSON.stringify(https)}`);
+  const ssh = reviewPr.parseRemoteGitHub('git@github.com:acme/repo.git');
+  assert(ssh && ssh.owner === 'acme' && ssh.repo === 'repo', `ssh parse failed: ${JSON.stringify(ssh)}`);
+  assert(reviewPr.parseRemoteGitHub('https://gitlab.com/a/b.git') === null, 'non-github should be null');
+});
+
+// ─── REVIEW-PR: cleanup ownership guard (pure) ──────────────────────────────────
+console.log('\n🛡️  review-pr cleanup ownership guard (pure functions)');
+
+const OWNED_MANIFEST = { pr: 7, session: 'sess', nonce: 'NONCE123', worktreePath: '.worktrees/review-pr-7-sess' };
+const OWNED_RECORD = { path: '/repo/.worktrees/review-pr-7-sess', branch: 'detached', detached: true, isMainWorktree: false };
+const OWNED_BACKREF = { session: 'sess', nonce: 'NONCE123', pr: 7 };
+
+test('guard OKs a matching detached owned review worktree', () => {
+  const g = reviewPr.isOwnedReviewWorktree(OWNED_MANIFEST, OWNED_RECORD, OWNED_BACKREF);
+  assert(g.ok === true, `Expected ok, got: ${JSON.stringify(g)}`);
+});
+
+test('guard OKs even when the worktree is dirty (ownership, not cleanliness, is the gate)', () => {
+  const dirtyRecord = { ...OWNED_RECORD, dirty: true };
+  const g = reviewPr.isOwnedReviewWorktree(OWNED_MANIFEST, dirtyRecord, OWNED_BACKREF);
+  assert(g.ok === true, `Dirty owned worktree should still be cleanable: ${JSON.stringify(g)}`);
+});
+
+test('guard REFUSES a nonce mismatch', () => {
+  const g = reviewPr.isOwnedReviewWorktree(OWNED_MANIFEST, OWNED_RECORD, { ...OWNED_BACKREF, nonce: 'OTHER' });
+  assert(g.ok === false && /nonce/.test(g.reason), `Expected nonce refusal: ${JSON.stringify(g)}`);
+});
+
+test('guard REFUSES a path outside .worktrees/review-pr-', () => {
+  const feat = { path: '/repo/.worktrees/feat-something', branch: 'detached', detached: true, isMainWorktree: false };
+  const g = reviewPr.isOwnedReviewWorktree({ ...OWNED_MANIFEST, worktreePath: '.worktrees/feat-something' }, feat, { nonce: 'NONCE123' });
+  assert(g.ok === false, `Expected refusal for non-review path: ${JSON.stringify(g)}`);
+});
+
+test('guard REFUSES a non-detached worktree (has a branch)', () => {
+  const branched = { ...OWNED_RECORD, branch: 'feature/x', detached: false };
+  const g = reviewPr.isOwnedReviewWorktree(OWNED_MANIFEST, branched, OWNED_BACKREF);
+  assert(g.ok === false && /detached/.test(g.reason), `Expected detached refusal: ${JSON.stringify(g)}`);
+});
+
+test('guard REFUSES the main worktree', () => {
+  const main = { ...OWNED_RECORD, isMainWorktree: true };
+  const g = reviewPr.isOwnedReviewWorktree(OWNED_MANIFEST, main, OWNED_BACKREF);
+  assert(g.ok === false && /main/.test(g.reason), `Expected main refusal: ${JSON.stringify(g)}`);
+});
+
+test('guard REFUSES when the target worktree is absent', () => {
+  const g = reviewPr.isOwnedReviewWorktree(OWNED_MANIFEST, undefined, OWNED_BACKREF);
+  assert(g.ok === false, `Expected refusal when record missing: ${JSON.stringify(g)}`);
+});
+
+test('guard REFUSES when the in-worktree back-reference is missing', () => {
+  const g = reviewPr.isOwnedReviewWorktree(OWNED_MANIFEST, OWNED_RECORD, null);
+  assert(g.ok === false && /back-reference/.test(g.reason), `Expected backref refusal: ${JSON.stringify(g)}`);
+});
+
+// ─── REVIEW-PR: injection-class regression (manifest field format) ─────────────
+console.log('\n💥 review-pr injection-class regression (assertManifestShape)');
+
+const GOOD_MANIFEST = {
+  schemaVersion: '1.0.0', session: 'sess', nonce: 'N', worktreePath: '.worktrees/review-pr-7-sess',
+  pr: 7, ref: 'refs/mewkit/review-pr-7-sess', headSha: 'abc', baseSha: 'def', baseBranch: 'main',
+  baseRemote: 'origin', host: 'github', owner: 'o', repo: 'r', createdAt: 't',
+};
+
+test('assertManifestShape accepts a well-formed manifest', () => {
+  assert(reviewPr.assertManifestShape(GOOD_MANIFEST) === GOOD_MANIFEST, 'valid manifest should pass');
+});
+
+test('assertManifestShape REJECTS a ref with shell metacharacters (C2 regression)', () => {
+  let code = null;
+  try { reviewPr.assertManifestShape({ ...GOOD_MANIFEST, ref: 'refs/x ; touch PWNED #' }); } catch (e) { code = e.code; }
+  assert(code === 'INVALID_MANIFEST', `Expected INVALID_MANIFEST for injected ref, got: ${code}`);
+});
+
+test('assertManifestShape REJECTS a worktreePath outside .worktrees/review-pr- (H1 regression)', () => {
+  ['../../etc', '/abs/review-pr-7-sess', '.worktrees/feat-x', '.worktrees/review-pr-7-sess/../..'].forEach((bad) => {
+    let code = null;
+    try { reviewPr.assertManifestShape({ ...GOOD_MANIFEST, worktreePath: bad }); } catch (e) { code = e.code; }
+    assert(code === 'INVALID_MANIFEST', `Expected INVALID_MANIFEST for worktreePath ${bad}, got: ${code}`);
+  });
+});
+
+test('assertManifestShape REJECTS a ref inconsistent with pr/session', () => {
+  let code = null;
+  try { reviewPr.assertManifestShape({ ...GOOD_MANIFEST, ref: 'refs/mewkit/review-pr-9-other' }); } catch (e) { code = e.code; }
+  assert(code === 'INVALID_MANIFEST', `Expected INVALID_MANIFEST for mismatched ref, got: ${code}`);
+});
+
+// ─── REVIEW-PR: CLI validation + dry-run (no network) ──────────────────────────
+console.log('\n🌐 review-pr CLI (dry-run, no network)');
+
+test('review-pr --dry-run emits a schema-shaped manifest', () => {
+  const json = assertJSON(run('review-pr --pr 7 --remote origin --session ci-dry --dry-run --json').output);
+  assert(json.success && json.dryRun, 'should be a successful dry run');
+  const m = json.wouldCreate.manifest;
+  assert(m.worktreePath === '.worktrees/review-pr-7-ci-dry', `worktreePath: ${m.worktreePath}`);
+  assert(m.ref === 'refs/mewkit/review-pr-7-ci-dry', `ref: ${m.ref}`);
+  reviewPr.assertManifestShape(m); // throws if a required field is missing
+});
+
+test('review-pr rejects a path-unsafe session id at the CLI', () => {
+  const r = run('review-pr --pr 7 --remote origin --session bad/slash --json');
+  assert(!r.success, 'should fail');
+  const json = assertJSON(r.output);
+  assert(json.error.code === 'INVALID_SESSION', `Expected INVALID_SESSION, got: ${json.error.code}`);
+});
+
+test('review-pr without --pr returns MISSING_PR', () => {
+  const json = assertJSON(run('review-pr --remote origin --session x --json').output);
+  assert(json.error.code === 'MISSING_PR', `Expected MISSING_PR, got: ${json.error.code}`);
+});
+
+test('review-pr without --remote returns MISSING_REMOTE', () => {
+  const json = assertJSON(run('review-pr --pr 7 --session x --json').output);
+  assert(json.error.code === 'MISSING_REMOTE', `Expected MISSING_REMOTE, got: ${json.error.code}`);
+});
+
+test('review-pr-cleanup without --manifest returns MISSING_MANIFEST', () => {
+  const json = assertJSON(run('review-pr-cleanup --json').output);
+  assert(json.error.code === 'MISSING_MANIFEST', `Expected MISSING_MANIFEST, got: ${json.error.code}`);
+});
+
+test('review-pr-cleanup with a nonexistent manifest returns MANIFEST_NOT_FOUND', () => {
+  const json = assertJSON(run('review-pr-cleanup --manifest /nope/manifest.json --json').output);
+  assert(json.error.code === 'MANIFEST_NOT_FOUND', `Expected MANIFEST_NOT_FOUND, got: ${json.error.code}`);
+});
+
+test('review-pr-cleanup --sweep --dry-run lists candidates without applying', () => {
+  const json = assertJSON(run('review-pr-cleanup --sweep --dry-run --json').output);
+  assert(json.success && json.sweep === true && json.applied === false, `Expected sweep dry-run: ${JSON.stringify(json).slice(0,120)}`);
+  assert(Array.isArray(json.worktrees), 'sweep should return a worktrees array');
 });
 
 // ─── Summary ──────────────────────────────────────────────────────────────────

@@ -7,7 +7,8 @@
       "./handlers/auto-checkpoint.cjs"
     ],
     "Bash": [
-      "./handlers/budget-tracker.cjs"
+      "./handlers/budget-tracker.cjs",
+      "./handlers/review-evidence-tag.cjs"
     ]
   },
   "Stop": [

@@ -112,8 +112,41 @@ node .claude/skills/worktree/scripts/worktree.cjs prune --dry-run --json
 node .claude/skills/worktree/scripts/worktree.cjs prune --json
 ```
 
+### review-pr
+
+Create an isolated, **detached**, SHA-bound worktree from a PR head for a
+high-assurance review (never mutates the user's checkout). The base remote is a
+required argument — `pull/N/head` exists only on the PR's base repo, so a fork PR is
+fetched from the base remote, never a fork remote. Writes a manifest to the persistent
+session dir `tasks/reviews/<session>/manifest.json` (survives worktree removal) and a
+`.mewkit-review.json` back-reference (ownership nonce) inside the worktree.
+
+```bash
+# Preview only (no fetch, no worktree) — validates inputs, prints the manifest
+node .claude/skills/worktree/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --dry-run --json
+# Create for real
+node .claude/skills/worktree/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --json
+```
+
+### review-pr-cleanup
+
+Remove a review worktree. Accepts **only a manifest path** — nothing else. Removal
+proceeds only when the manifest's nonce matches the in-worktree back-reference AND the
+target is a detached `.worktrees/review-pr-*` worktree (never the main checkout, never a
+feature worktree). Force is allowed (review worktrees are legitimately dirty after
+build/test); ownership, not cleanliness, is the guard.
+
+```bash
+node .claude/skills/worktree/scripts/worktree.cjs review-pr-cleanup --manifest tasks/reviews/<id>/manifest.json --json
+# Stale-session sweep — dry-run by default; --apply to execute
+node .claude/skills/worktree/scripts/worktree.cjs review-pr-cleanup --sweep --dry-run --json
+```
+
 ## Gotchas
 
+- `review-pr` worktrees are DETACHED (no branch) and owned by their manifest nonce;
+  `review-pr-cleanup` refuses any worktree whose in-worktree back-reference nonce does not
+  match the manifest — this is what makes cross-session deletion impossible
 - Worktree creation fails if the branch name already exists — script handles this with
   BRANCH_CHECKED_OUT error; timestamps in orchestrated branches prevent collisions
 - `git worktree remove` fails silently if the directory was already deleted manually —

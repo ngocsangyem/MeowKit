@@ -2,6 +2,33 @@
 
 Categorize findings to separate signal from noise. Only current-change findings block shipping.
 
+## Coverage Gate (assured PR mode only)
+
+When this review runs against a `mewkit review prepare` session (assured PR mode),
+run the coverage gate BEFORE composing the verdict:
+
+```bash
+mewkit review coverage --session <session-id> --json
+```
+
+- **Non-zero exit → STOP.** Do not compose a verdict. The JSON `gaps[]` names each
+  missing reviewer / unread brief / unopened diff / missing required read. Re-run only
+  the named reviewer(s) through the wrapper, then re-run coverage. Coverage failure is
+  never waved through.
+- **`evidenceLevel: attested`** (CLI receipts without hook corroboration — the normal
+  case for subagent-driven reviews on this host, per the capability spike): the review
+  may proceed to a verdict, but **Approve / Gate 2 PASS is capped** — `mewkit review
+  compose` (Phase 6) refuses PASS/Approve on an attested session. Disclose this in the
+  verdict: "evidence level: attested — session-observed access recorded via CLI
+  receipts; individual-reviewer provenance is not host-provable."
+- **`evidenceLevel: session-observed`** (hook-corroborated, driving-session reads):
+  full Approve eligibility. **Honesty caveat:** the evidence logs are session-dir
+  files the acting session can write, so `session-observed` is *anti-accidental*
+  corroboration, not tamper-proof, and never establishes independent-reviewer
+  provenance. It is evidence a human reads at Gate 2, not authority that clears it.
+
+Skip this gate for branch-diff / `--pending` / commit reviews (no session).
+
 ## Zero-Finding Check (Forced-Finding Protocol)
 
 Before categorizing, check total findings count from all reviewers (Phase A + Phase B if applicable).

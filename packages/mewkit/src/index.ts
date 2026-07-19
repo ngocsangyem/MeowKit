@@ -28,6 +28,10 @@ import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
 import { buildPlugin } from "./commands/build-plugin.js";
 import { visualPlan } from "./commands/visual-plan.js";
+import { reviewPrepare } from "./commands/review/prepare.js";
+import { reviewRead } from "./commands/review/read.js";
+import { reviewCoverage } from "./commands/review/coverage.js";
+import type { ReviewTier } from "./review/roster.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -57,6 +61,7 @@ ${pc.bold("Commands:")}
   ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
   ${pc.green("providers")}  Show effective provider support matrix and enforcement levels ('providers [<p>] --lifecycle' for the capability-adapter + lifecycle matrix)
   ${pc.green("visual-plan")} Visual plan contracts: validate|status|approve --revision <n>|rehash|export --format html|prepare-feedback --ops <f>|apply-feedback --batch <id> [--check|--receipt <f>]|patch --op <f>|edit|view <plan-dir> [--json]
+  ${pc.green("review")}     High-assurance PR review ('review prepare <pr>' → session; 'review read --session <id> --as <role> <path>' → observed read; 'review coverage --session <id>' → gap gate)
   ${pc.green("inventory")}  List harness artifacts with governance metadata
   ${pc.green("plan")}       Read-only plan inspection (status <plan-dir> | check <phase-file>)
   ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
@@ -238,6 +243,9 @@ async function main(): Promise<void> {
 			"batch",
 			"receipt",
 			"op",
+			"remote",
+			"as",
+			"tier",
 		],
 		alias: { h: "help", v: "version", y: "yes" },
 	});
@@ -306,6 +314,32 @@ async function main(): Promise<void> {
 				json: args.json as boolean | undefined,
 			});
 			break;
+		case "review": {
+			const sub = args._[1] as string | undefined;
+			if (sub === "prepare") {
+				await reviewPrepare({
+					target: args._[2] as string,
+					remote: args.remote as string | undefined,
+					json: args.json as boolean | undefined,
+				});
+			} else if (sub === "read") {
+				await reviewRead({
+					session: args.session as string,
+					as: args.as as string,
+					target: args._[2] as string,
+				});
+			} else if (sub === "coverage") {
+				await reviewCoverage({
+					session: args.session as string,
+					tier: args.tier as ReviewTier | undefined,
+					json: args.json as boolean | undefined,
+				});
+			} else {
+				console.error(`Unknown review subcommand "${sub ?? ""}". Available: prepare, read, coverage`);
+				process.exit(1);
+			}
+			break;
+		}
 		case "capabilities":
 			await capabilities({
 				subcommand: args._[1] as string | undefined,

@@ -29,6 +29,7 @@
 const fs = require('fs');
 const path = require('path');
 const helpers = require('./lib/worktree-git-helpers.cjs');
+const reviewPr = require('./lib/worktree-review-pr.cjs');
 
 const {
   sanitizeBranchPrefix, isSafeEnvFileName, sanitizeBaseBranch,
@@ -748,9 +749,17 @@ function main() {
     case 'list':   cmdList();   break;
     case 'status': cmdStatus(); break;
     case 'prune':  cmdPrune();  break;
+    case 'review-pr': {
+      if (explicitBaseError) outputError('INVALID_BASE_BRANCH', explicitBaseError.message || 'Invalid --base branch');
+      reviewPr.cmdReviewPr({ args, dryRun, explicitBase, output, outputError });
+      break;
+    }
+    case 'review-pr-cleanup':
+      reviewPr.cmdReviewPrCleanup({ args, dryRun, output, outputError });
+      break;
     default:
       outputError('UNKNOWN_COMMAND', `Unknown command: ${command || '(none)'}`, {
-        suggestion: 'Available commands: create, remove, info, list, status, prune. Use --help for usage.'
+        suggestion: 'Available commands: create, remove, info, list, status, prune, review-pr, review-pr-cleanup. Use --help for usage.'
       });
   }
 }
