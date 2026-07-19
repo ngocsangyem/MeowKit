@@ -4,10 +4,13 @@
 // prescribing that the agent invoke the CLI, read task records, or write durable state. This guards
 // the contract against drift.
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-const ORCH = resolve(process.cwd(), "..", "..", ".claude", "agents", "orchestrator.md");
+// Resolve relative to THIS test file (cwd-independent) — the suite's canonical run is from the repo
+// root, where a process.cwd()-relative `../../.claude` would point outside the repo.
+const ORCH = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..", "..", ".claude", "agents", "orchestrator.md");
 const text = readFileSync(ORCH, "utf-8");
 const lower = text.toLowerCase();
 

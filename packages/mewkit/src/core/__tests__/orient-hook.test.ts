@@ -7,13 +7,17 @@
 // real-install path is the (externally gated) acceptance demo.
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, copyFileSync, chmodSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join, resolve, dirname } from "node:path";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 const require = createRequire(import.meta.url);
-const HOOK = resolve(process.cwd(), "..", "..", ".claude", "hooks", "handlers", "orientation-ritual.cjs");
-const CHECKPOINT_UTILS = resolve(process.cwd(), "..", "..", ".claude", "hooks", "lib", "checkpoint-utils.cjs");
+// Resolve the repo `.claude` relative to THIS test file (cwd-independent) — the suite's canonical
+// run is from the repo root, so a process.cwd()-relative path would break there.
+const REPO_CLAUDE = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..", "..", ".claude");
+const HOOK = join(REPO_CLAUDE, "hooks", "handlers", "orientation-ritual.cjs");
+const CHECKPOINT_UTILS = join(REPO_CLAUDE, "hooks", "lib", "checkpoint-utils.cjs");
 
 const roots: string[] = [];
 let savedEnv: string | undefined;

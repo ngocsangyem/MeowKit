@@ -5,9 +5,14 @@
 import { mkdtempSync, rmSync, mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { spawn, spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join, resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import { appendTraceRecord, appendTraceRecordSync, TRACE_MAX_BYTES } from "../trace-append.js";
+
+// Repo `.claude` relative to THIS file (cwd-independent) — under the canonical root run a
+// process.cwd()-relative path would miss the shell writer and silently skip the parity test.
+const REPO_CLAUDE = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..", "..", ".claude");
 
 const roots: string[] = [];
 afterEach(() => roots.splice(0).forEach((d) => rmSync(d, { recursive: true, force: true })));
@@ -93,14 +98,14 @@ describe("appendTraceRecord — concurrency (no interleaving/corruption)", () =>
 });
 
 function python3Available(): boolean {
-	if (existsSync(resolve(process.cwd(), "..", "..", ".claude", "skills", ".venv", "bin", "python3"))) return true;
+	if (existsSync(join(REPO_CLAUDE, "skills", ".venv", "bin", "python3"))) return true;
 	return spawnSync("python3", ["--version"], { stdio: "ignore" }).status === 0;
 }
 
 describe("shell + TS parity (shared sidecar lock across languages)", () => {
 	it("neither writer interleaves or corrupts a line under concurrent append", async () => {
 		if (!python3Available()) return; // the shell writer builds its record via python3
-		const scriptPath = resolve(process.cwd(), "..", "..", ".claude", "hooks", "append-trace.sh");
+		const scriptPath = join(REPO_CLAUDE, "hooks", "append-trace.sh");
 		if (!existsSync(scriptPath)) return;
 		const { root, claudeDir, logPath } = makeClaudeDir();
 		const N = 6;
