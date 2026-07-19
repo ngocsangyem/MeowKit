@@ -1,13 +1,14 @@
 // `mewkit orient` end-to-end over real files: reconstructs durable state, resolves the pointer,
 // probes repo revisions (degrading to null on missing/unreadable repos), and prints either the
 // full JSON envelope or the bounded human block. It never scans plans or the wiki.
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { orient } from "../orient.js";
 import { writeTaskRecord, writeActiveTaskPointer, type TaskRecord } from "../../core/task-record.js";
 import { ORIENT_UNTRUSTED_HEADER } from "../../core/orient-context-renderer.js";
+import { parseTraceLog } from "../../core/trace-analysis.js";
 
 const roots: string[] = [];
 let cwd: string;
@@ -96,5 +97,50 @@ describe("mewkit orient", () => {
 		orient({});
 		expect(out.join("\n")).toContain(ORIENT_UNTRUSTED_HEADER);
 		expect(out.join("\n")).toContain("orientation: active");
+	});
+});
+
+describe("mewkit orient — measurement emission", () => {
+	function traceEvents(root: string): ReturnType<typeof parseTraceLog> {
+		const logPath = join(root, ".claude", "memory", "trace-log.jsonl");
+		return existsSync(logPath) ? parseTraceLog(readFileSync(logPath, "utf-8")) : [];
+	}
+
+	it("emits one orient_run event with outcome + duration; taskId only when active", async () => {
+		const root = makeRoot();
+		await writeTaskRecord(root, rec({ taskId: "active-x" }));
+		await writeActiveTaskPointer(root, { taskId: "active-x", planPath: "plans/260711-x/plan.md" });
+		process.chdir(root);
+		orient({ json: true, now: () => 1000 });
+		const ev = traceEvents(root).find((e) => e.event === "orient_run");
+		expect(ev?.task_id).toBe("active-x");
+		expect((ev?.data as { outcome?: string }).outcome).toBe("active");
+		expect(typeof (ev?.data as { durationMs?: number }).durationMs).toBe("number");
+	});
+
+	it("emits orient_run WITHOUT a taskId for a none outcome", async () => {
+		const root = makeRoot();
+		process.chdir(root);
+		orient({ json: true });
+		const ev = traceEvents(root).find((e) => e.event === "orient_run");
+		expect(ev).toBeDefined();
+		expect(ev?.task_id).toBeUndefined();
+		expect((ev?.data as { outcome?: string }).outcome).toBe("none");
+	});
+
+	it("--no-record suppresses the measurement event", async () => {
+		const root = makeRoot();
+		process.chdir(root);
+		orient({ json: true, noRecord: true });
+		expect(traceEvents(root)).toEqual([]);
+	});
+
+	it("a failed trace append never fails orientation (advisory)", async () => {
+		const root = makeRoot();
+		// Make .claude a FILE so the trace-append mkdir fails; orient must still print its JSON.
+		writeFileSync(join(root, ".claude"), "not a dir");
+		process.chdir(root);
+		orient({ json: true });
+		expect(parseJson().outcome).toBe("none"); // orientation still produced despite emit failure
 	});
 });

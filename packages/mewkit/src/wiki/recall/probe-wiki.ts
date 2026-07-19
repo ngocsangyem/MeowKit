@@ -60,6 +60,10 @@ export interface WikiProbeDeps {
 	indexExists?: (dbFile: string) => boolean;
 	search?: (dbFile: string, query: string, limit: number, includeContent: boolean) => WikiSearchHit[];
 	countPages?: (dbFile: string) => number;
+	/** Optional canonical-tree page counter. When provided, the probe emits a one-line staleness
+	 * warning if the canonical page count differs from the indexed page count. Omitted on the
+	 * latency-sensitive recall path so `capabilities resolve` stays fast. */
+	countCanonical?: () => number;
 }
 
 export type WikiProbeStatus = "ready" | "empty" | "index-missing" | "query-failed";
@@ -71,6 +75,9 @@ export interface WikiProbeResult {
 	query: string;
 	/** Present only on `empty`: total wiki pages (0 = no pages vs >0 = no match). */
 	wikiPageCount?: number;
+	/** A one-line staleness warning when canonical vs indexed page counts diverge (cheap subset
+	 * of `wiki verify`); present only when a canonical counter was injected. */
+	staleness?: string;
 }
 
 export interface WikiProbeOptions {
@@ -95,18 +102,29 @@ export function probeWiki(dbFile: string, rawQuery: string, opts: WikiProbeOptio
 
 	const query = sanitizeIntentToFtsQuery(rawQuery);
 
-	if (!indexExists(dbFile)) return { status: "index-missing", hits: [], query };
+	// Cheap staleness signal (canonical vs indexed page-count parity) — only when a canonical
+	// counter is injected, so the latency-sensitive recall path is unaffected.
+	const staleness = ((): string | undefined => {
+		if (!deps.countCanonical) return undefined;
+		const canonical = deps.countCanonical();
+		const indexed = indexExists(dbFile) ? countPages(dbFile) : 0;
+		return canonical !== indexed
+			? `wiki index may be stale: ${canonical} canonical page(s) vs ${indexed} indexed — run 'mewkit wiki verify'`
+			: undefined;
+	})();
+
+	if (!indexExists(dbFile)) return { status: "index-missing", hits: [], query, staleness };
 
 	// No usable terms after sanitization: nothing to match, but the index IS present.
-	if (query === "") return { status: "empty", hits: [], query, wikiPageCount: countPages(dbFile) };
+	if (query === "") return { status: "empty", hits: [], query, wikiPageCount: countPages(dbFile), staleness };
 
 	let hits: WikiSearchHit[];
 	try {
 		hits = search(dbFile, query, opts.maxPages, opts.includeContent);
 	} catch {
-		return { status: "query-failed", hits: [], query };
+		return { status: "query-failed", hits: [], query, staleness };
 	}
 
-	if (hits.length === 0) return { status: "empty", hits: [], query, wikiPageCount: countPages(dbFile) };
-	return { status: "ready", hits, query };
+	if (hits.length === 0) return { status: "empty", hits: [], query, wikiPageCount: countPages(dbFile), staleness };
+	return { status: "ready", hits, query, staleness };
 }

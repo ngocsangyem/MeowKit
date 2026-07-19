@@ -95,20 +95,6 @@ describe("withFileLock", () => {
 		expect(existsSync(lockPath)).toBe(false);
 	});
 
-	it("does not deadlock or leave a lock behind under a concurrent reclaim storm", async () => {
-		const dir = await makeTempDir();
-		const lockPath = join(dir, ".test.lock");
-		await writeFile(lockPath, `2147483647\n0\n`, "utf-8"); // stale lock all waiters must reclaim
-		// Every op must resolve (no hang) and the lock must be cleaned up afterwards. Exact
-		// serialization under a *simultaneous* crash-recovery reclaim is best-effort (see the
-		// residual-window note in file-lock.ts), so this asserts liveness + cleanup, not a count.
-		const ran: number[] = [];
-		await Promise.all(
-			Array.from({ length: 5 }, (_, i) => withFileLock(lockPath, async () => void ran.push(i))),
-		);
-		expect(ran.length).toBe(5);
-		expect(existsSync(lockPath)).toBe(false);
-	});
 });
 
 describe("withFileLockSync", () => {

@@ -255,6 +255,41 @@ function ingestSlug(db: DatabaseSync, root: string, slug: string, c: WikiIngestC
 	}
 }
 
+/** One canonical wiki page as ingest sees it: the same id/path/body the index stores. */
+export interface CanonicalPage {
+	id: string;
+	slug: string;
+	path: string;
+	body: string;
+}
+
+/**
+ * Read the canonical wiki pages exactly as `ingestSlug` ingests them — same frontmatter parse,
+ * same id derivation (`meta.id` else `<slug>/<file>`), same first-file-wins dedup on duplicate
+ * ids (mirrors the INSERT OR IGNORE). Exported so `wiki verify` compares canonical vs indexed
+ * bodies through ONE parsing path (no drift between ingest and verify).
+ */
+export function readCanonicalPages(projectRoot: string): CanonicalPage[] {
+	const root = path.join(projectRoot, "tasks", "wikis");
+	const out: CanonicalPage[] = [];
+	for (const slug of listDirs(root)) {
+		const pagesDir = path.join(root, slug, "pages");
+		if (!fs.existsSync(pagesDir)) continue;
+		const seen = new Set<string>();
+		for (const file of fs
+			.readdirSync(pagesDir)
+			.filter((f) => f.endsWith(".md"))
+			.sort()) {
+			const { meta, body } = parseFrontmatter(fs.readFileSync(path.join(pagesDir, file), "utf-8"));
+			const id = s(meta["id"]) ?? `${slug}/${file}`;
+			if (seen.has(id)) continue; // duplicate id — first file wins, mirroring INSERT OR IGNORE
+			seen.add(id);
+			out.push({ id, slug: s(meta["slug"]) ?? slug, path: `pages/${file}`, body });
+		}
+	}
+	return out;
+}
+
 /** Clear and rebuild every wiki table from the canonical tree. Returns row counts. */
 export function ingestWiki(db: DatabaseSync, projectRoot: string): WikiIngestCounts {
 	const counts: WikiIngestCounts = {

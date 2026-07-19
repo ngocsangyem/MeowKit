@@ -156,6 +156,7 @@ export class WikiService {
 				propose: (i) => this.proposeCandidate(i),
 				appendSource: (s, src) => this.deps.repo.appendSource(s, src),
 				trace: (e, d) => this.deps.tracer.recordWikiTrace(e, d),
+				verify: this.deps.verifier,
 			},
 			slug,
 			seed,

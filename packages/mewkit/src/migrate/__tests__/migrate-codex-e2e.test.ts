@@ -110,9 +110,12 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 		);
 		expect(generated.length).toBeGreaterThan(0);
 		for (const file of generated) {
-			// The bounded bootstrap intentionally names the documented CLI invocation.
-			// Strip that exact trusted operation before asserting no narrative/toolkit branding.
-			const content = readFileSync(file, "utf-8").replace(/npx mewkit capabilities resolve --intent/g, "");
+			// The bounded bootstrap intentionally names documented CLI invocations (allowed as
+			// literal CLI tokens per skill-authoring Rule 7). Strip those exact trusted operations
+			// before asserting no narrative/toolkit branding remains.
+			const content = readFileSync(file, "utf-8")
+				.replace(/npx mewkit capabilities resolve --intent/g, "")
+				.replace(/npx mewkit orient/g, "");
 			expect(content, file).not.toMatch(/MeowKit|mewkit|meowkit/);
 		}
 		expect(existsSync(join(env.projectDir, ".mewkit"))).toBe(false);

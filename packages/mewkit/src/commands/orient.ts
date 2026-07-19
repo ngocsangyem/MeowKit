@@ -5,14 +5,20 @@
 // the full structured envelope for tooling. Read-only: it never writes task state, a pointer, or
 // a trace event, and it never scans plans or the wiki.
 import { existsSync } from "node:fs";
+import path from "node:path";
 import pc from "picocolors";
 import { reconstructResumeState, readActiveTaskPointer } from "../core/task-record.js";
 import { buildOrientEnvelope, type RepoRevisionProbe } from "../core/orient-envelope.js";
 import { renderOrientContext } from "../core/orient-context-renderer.js";
 import { resolveOwningRepo } from "../core/repo-context.js";
+import { appendTraceRecordSync } from "../core/trace-append.js";
 
 export interface OrientOptions {
 	json?: boolean;
+	/** Suppress the advisory `orient_run` measurement trace (for strictly pure invocations). */
+	noRecord?: boolean;
+	/** Injected clock for deterministic duration in tests. */
+	now?: () => number;
 }
 
 /** Current revision of a recorded repo identity, or null (non-git, missing, or any read error). */
@@ -27,6 +33,8 @@ function probeRevision(identity: string): string | null {
 
 export function orient(opts: OrientOptions = {}): void {
 	const projectRoot = process.cwd();
+	const clock = opts.now ?? Date.now;
+	const started = clock();
 	const resume = reconstructResumeState(projectRoot);
 	const pointer = readActiveTaskPointer(projectRoot);
 
@@ -42,6 +50,25 @@ export function orient(opts: OrientOptions = {}): void {
 	}));
 
 	const envelope = buildOrientEnvelope(resume, pointer, probes);
+
+	// Advisory measurement: one `orient_run` event per run, write-tolerant (a failed append never
+	// fails orient), read-only for task state. `--no-record` opts out for strictly pure calls.
+	if (!opts.noRecord) {
+		try {
+			appendTraceRecordSync(path.join(projectRoot, ".claude"), {
+				event: "orient_run",
+				// taskId only for an unambiguous active outcome (never for none/ambiguous/corrupt-only).
+				...(envelope.outcome === "active" && envelope.activeTask ? { taskId: envelope.activeTask.taskId } : {}),
+				data: {
+					outcome: envelope.outcome,
+					staleWarnings: envelope.staleWarnings.length,
+					durationMs: Math.max(0, clock() - started),
+				},
+			});
+		} catch {
+			/* measurement is advisory — never fail orientation on a trace-append error */
+		}
+	}
 
 	if (opts.json) {
 		console.log(JSON.stringify(envelope, null, 2));

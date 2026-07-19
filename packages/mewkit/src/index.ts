@@ -146,6 +146,7 @@ async function main(): Promise<void> {
 			"help",
 			"version",
 			"activate",
+			"record",
 			"check",
 			"strict",
 			"beta",
@@ -385,7 +386,8 @@ async function main(): Promise<void> {
 		}
 		case "orient": {
 			const { orient } = await import("./commands/orient.js");
-			orient({ json: args.json as boolean | undefined });
+			// minimist maps `--no-record` to `record === false`.
+			orient({ json: args.json as boolean | undefined, noRecord: args.record === false });
 			break;
 		}
 		case "wiki": {

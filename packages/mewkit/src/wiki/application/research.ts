@@ -7,7 +7,8 @@ import type {
 	WikiSource,
 	WikiWriteDecision,
 } from "../domain/index.js";
-import type { Fetcher, ProposeInput, ProposeResult, WikiIndex } from "./ports.js";
+import type { Fetcher, ProposeInput, ProposeResult, WikiIndex, WikiVerifier } from "./ports.js";
+import { failingSections } from "./verify.js";
 
 // runResearchStep: seed → fetch (DATA) → novelty (FTS dup) → proposeCandidate ONLY. Fetched
 // content NEVER calls writePage/approveCandidate — the canonical write still needs a separate
@@ -21,6 +22,8 @@ export interface ResearchContext {
 	propose: (input: ProposeInput) => ProposeResult;
 	appendSource: (slug: WikiSlug, source: WikiSource) => void;
 	trace: (event: string, data: Record<string, unknown>) => void;
+	/** Optional index-consistency gate; when present, research refuses on an inconsistent index. */
+	verify?: WikiVerifier;
 }
 
 export interface ResearchOutcome {
@@ -59,6 +62,17 @@ function computeDup(index: Pick<WikiIndex, "searchFts">, title: string): DupChec
 }
 
 export async function runResearchStep(ctx: ResearchContext, slug: WikiSlug, seed: WikiSeed): Promise<ResearchOutcome> {
+	// Gate on index consistency BEFORE any fetch: an inconsistent index would let research write
+	// candidates against stale/partial recall. Absent provenance (0/0/0) passes — the gate blocks
+	// INCONSISTENT state, not absent state. Names the failing section + remediation.
+	if (ctx.verify) {
+		const report = ctx.verify();
+		if (!report.fresh) {
+			throw new Error(
+				`wiki index is inconsistent (${failingSections(report).join(", ")}) — run 'mewkit wiki reindex' before research`,
+			);
+		}
+	}
 	const doc = await ctx.fetcher.fetch(seed); // url-guard + size-cap + redirect re-validation enforced in the fetcher
 	ctx.appendSource(slug, doc.source);
 	const title = titleFor(seed, doc.content);

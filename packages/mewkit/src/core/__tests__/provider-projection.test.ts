@@ -47,4 +47,14 @@ describe("provider projections", () => {
 		expect(isProjectedProvider("codex")).toBe(true);
 		expect(isProjectedProvider("nope")).toBe(false);
 	});
+
+	it("qwen is an explicit report-only entry — enumerable but claims no support", () => {
+		expect("qwen" in PROVIDER_PROJECTIONS).toBe(true); // auditable: shows up in projection inspection
+		const p = getProjection("qwen");
+		expect(p.status).toBe("report-only");
+		expect(p.bootstrapPlacement).toBe("none");
+		expect((Object.values(p.levels) as LevelSupport[]).every((l) => l === "unknown")).toBe(true);
+		// A report-only entry is NOT a projected provider, so it never gains a computed support state.
+		expect(isProjectedProvider("qwen")).toBe(false);
+	});
 });

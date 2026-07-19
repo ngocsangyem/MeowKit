@@ -62,6 +62,17 @@ export const PROVIDER_PROJECTIONS: Record<string, ProviderProjection> = {
 		evidence:
 			"Migration writes a bounded AGENTS bootstrap plus validated .codex/capabilities.json; skill/command projection is advisory and hook enforcement version-gated ⇒ not enforceable.",
 	},
+	// Explicit report-only entry so projection inspection can enumerate qwen — but every level is
+	// `unknown` and there is NO authored placement, so no capability behavior is claimed. This does
+	// NOT make qwen a projected provider (see isProjectedProvider) and does NOT bump any support
+	// level; a real adapter would have to be written to change that.
+	qwen: {
+		provider: "qwen",
+		status: "report-only",
+		bootstrapPlacement: "none",
+		levels: { discoverable: "unknown", selectable: "unknown", invocable: "unknown", enforceable: "unknown" },
+		evidence: "No tested projection — report-only; no capability behavior is claimed until a qwen adapter is authored.",
+	},
 };
 
 /** Bootstrap providers that have an authored placement (supported or partial). */
@@ -79,7 +90,9 @@ export function getProjection(provider: string): ProviderProjection {
 	);
 }
 
-/** True when the provider has an authored bootstrap placement (not report-only). */
+/** True when the provider has an AUTHORED bootstrap placement — i.e. present AND not report-only.
+ * A report-only entry (e.g. qwen) is enumerable for inspection but is NOT a projected provider, so
+ * it never gains a computed support state. */
 export function isProjectedProvider(provider: string): provider is ProjectedProvider {
-	return provider in PROVIDER_PROJECTIONS;
+	return provider in PROVIDER_PROJECTIONS && PROVIDER_PROJECTIONS[provider].status !== "report-only";
 }

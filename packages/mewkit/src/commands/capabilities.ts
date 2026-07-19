@@ -50,7 +50,7 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 		if (!isProjectedProvider(provider)) {
 			console.error(
 				pc.red(
-					`No bootstrap projection for provider "${provider}" (report-only). Projected: ${Object.keys(PROVIDER_PROJECTIONS).join(", ")}.`,
+					`No bootstrap projection for provider "${provider}" (report-only). Projected: ${Object.keys(PROVIDER_PROJECTIONS).filter(isProjectedProvider).join(", ")}.`,
 				),
 			);
 			process.exit(1);

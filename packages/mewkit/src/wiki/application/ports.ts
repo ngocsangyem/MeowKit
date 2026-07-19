@@ -133,7 +133,12 @@ export interface WikiServiceDeps {
 	tracer: Tracer;
 	/** Optional — present only when the research loop is enabled. */
 	fetcher?: Fetcher;
+	/** Optional index-consistency check; when present, research refuses on an inconsistent index. */
+	verifier?: WikiVerifier;
 }
+
+/** A read-only wiki index-consistency check (see application/verify.ts). */
+export type WikiVerifier = () => import("./verify.js").WikiVerifyReport;
 
 export interface ProposeInput {
 	slug: WikiSlug;
