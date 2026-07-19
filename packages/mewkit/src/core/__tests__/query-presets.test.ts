@@ -12,11 +12,35 @@ afterEach(() => roots.splice(0).forEach((d) => rmSync(d, { recursive: true, forc
 // Two orient runs active (one with a stale warning), one none; two transitions with task context
 // (one carrying a verification, twice for the same task) and one transition with no task id.
 const LINES = [
-	{ schema_version: "1.0", ts: "t1", event: "orient_run", task_id: "feat-x", data: { outcome: "active", staleWarnings: 1 } },
-	{ schema_version: "1.0", ts: "t2", event: "orient_run", task_id: "feat-x", data: { outcome: "active", staleWarnings: 0 } },
+	{
+		schema_version: "1.0",
+		ts: "t1",
+		event: "orient_run",
+		task_id: "feat-x",
+		data: { outcome: "active", staleWarnings: 1 },
+	},
+	{
+		schema_version: "1.0",
+		ts: "t2",
+		event: "orient_run",
+		task_id: "feat-x",
+		data: { outcome: "active", staleWarnings: 0 },
+	},
 	{ schema_version: "1.0", ts: "t3", event: "orient_run", data: { outcome: "none", staleWarnings: 0 } },
-	{ schema_version: "1.0", ts: "t4", event: "task_transition", task_id: "feat-x", data: { status: "active", verifications: [{ ref: "build", result: "pass" }] } },
-	{ schema_version: "1.0", ts: "t5", event: "task_transition", task_id: "feat-x", data: { status: "blocked", verifications: [{ ref: "build", result: "fail" }] } },
+	{
+		schema_version: "1.0",
+		ts: "t4",
+		event: "task_transition",
+		task_id: "feat-x",
+		data: { status: "active", verifications: [{ ref: "build", result: "pass" }] },
+	},
+	{
+		schema_version: "1.0",
+		ts: "t5",
+		event: "task_transition",
+		task_id: "feat-x",
+		data: { status: "blocked", verifications: [{ ref: "build", result: "fail" }] },
+	},
 	{ schema_version: "1.0", ts: "t6", event: "task_transition", data: { status: "active" } }, // no task id
 ];
 

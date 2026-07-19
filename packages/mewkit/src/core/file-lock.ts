@@ -10,7 +10,17 @@
 // protocol, so a bash writer and a TypeScript writer mutually exclude. The sync
 // variant below exists so a synchronous caller (the wiki trace adapter) shares
 // that one primitive instead of forking a second locking scheme.
-import { existsSync, mkdirSync, openSync, closeSync, writeSync, readFileSync, unlinkSync, renameSync, linkSync } from "node:fs";
+import {
+	existsSync,
+	mkdirSync,
+	openSync,
+	closeSync,
+	writeSync,
+	readFileSync,
+	unlinkSync,
+	renameSync,
+	linkSync,
+} from "node:fs";
 import { mkdir, open, readFile, unlink, rename, link } from "node:fs/promises";
 import { dirname } from "node:path";
 

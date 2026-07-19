@@ -52,10 +52,7 @@ describe("renderOrientContext", () => {
 	});
 
 	it("omits a plan path that escapes the project root", () => {
-		const e = buildOrientEnvelope(
-			fixtures.activePlanned.state,
-			fixtures.activePlanned.pointer,
-		);
+		const e = buildOrientEnvelope(fixtures.activePlanned.state, fixtures.activePlanned.pointer);
 		// Force an out-of-project absolute plan path and confirm containment guard fires.
 		if (e.activeTask) e.activeTask.planPath = "/etc/passwd";
 		const out = renderOrientContext(e, { projectRoot: "/work/project" });

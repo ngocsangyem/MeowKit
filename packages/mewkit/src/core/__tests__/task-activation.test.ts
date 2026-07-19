@@ -34,7 +34,12 @@ describe("normalizeTaskId", () => {
 describe("activateTask", () => {
 	it("commits exactly one active record + canonical pointer", async () => {
 		const root = makeRoot();
-		const res = await activateTask(root, { taskId: "feat-x", planPath: "plans/260711-x/plan.md", planSlug: "260711-x", now: NOW });
+		const res = await activateTask(root, {
+			taskId: "feat-x",
+			planPath: "plans/260711-x/plan.md",
+			planSlug: "260711-x",
+			now: NOW,
+		});
 		expect(res.createdRecord).toBe(true);
 		expect(readTaskRecord(root, "feat-x")?.status).toBe("active");
 		const pointer = readActiveTaskPointer(root);
@@ -63,9 +68,9 @@ describe("activateTask", () => {
 		// Force writeActiveTaskPointer to fail: occupy session-state with a regular FILE so the
 		// pointer dir cannot be created.
 		writeFileSync(join(root, "session-state"), "not a dir");
-		await expect(activateTask(root, { taskId: "feat-x", planPath: "plans/x/plan.md", now: NOW })).rejects.toBeInstanceOf(
-			ActivationError,
-		);
+		await expect(
+			activateTask(root, { taskId: "feat-x", planPath: "plans/x/plan.md", now: NOW }),
+		).rejects.toBeInstanceOf(ActivationError);
 		// The partial (newly created) record was rolled back — never left claiming activation.
 		expect(existsSync(join(root, "tasks", "active", "feat-x.json"))).toBe(false);
 	});
@@ -90,9 +95,9 @@ describe("activateTask", () => {
 		await activateTask(root, { taskId: "feat-z", planPath: "plans/z/plan.md", now: NOW });
 		rmSync(join(root, "session-state"), { recursive: true, force: true });
 		writeFileSync(join(root, "session-state"), "not a dir");
-		await expect(activateTask(root, { taskId: "feat-z", planPath: "plans/z/plan.md", now: NOW })).rejects.toBeInstanceOf(
-			ActivationError,
-		);
+		await expect(
+			activateTask(root, { taskId: "feat-z", planPath: "plans/z/plan.md", now: NOW }),
+		).rejects.toBeInstanceOf(ActivationError);
 		// The pre-existing record survives (repairable), never deleted.
 		expect(existsSync(join(root, "tasks", "active", "feat-z.json"))).toBe(true);
 	});

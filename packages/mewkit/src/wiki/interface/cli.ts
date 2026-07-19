@@ -193,10 +193,15 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 			} else if (report.fresh) {
 				console.log(`wiki index consistent: ${report.sections.pages.indexedCount} page(s), FTS + provenance ok.`);
 			} else {
-				console.log(`wiki index STALE — failing: ${failingSections(report).join(", ")}. Remediation: mewkit wiki reindex`);
-				if (report.sections.pages.mismatches.length) console.log(`  pages: ${report.sections.pages.mismatches.join(", ")}`);
-				if (report.sections.hashes.mismatched.length) console.log(`  changed bodies: ${report.sections.hashes.mismatched.join(", ")}`);
-				if (!report.sections.fts.ok) console.log(`  fts: ${report.sections.fts.pageRows} page rows vs ${report.sections.fts.ftsRows} fts rows`);
+				console.log(
+					`wiki index STALE — failing: ${failingSections(report).join(", ")}. Remediation: mewkit wiki reindex`,
+				);
+				if (report.sections.pages.mismatches.length)
+					console.log(`  pages: ${report.sections.pages.mismatches.join(", ")}`);
+				if (report.sections.hashes.mismatched.length)
+					console.log(`  changed bodies: ${report.sections.hashes.mismatched.join(", ")}`);
+				if (!report.sections.fts.ok)
+					console.log(`  fts: ${report.sections.fts.pageRows} page rows vs ${report.sections.fts.ftsRows} fts rows`);
 			}
 			// Advisory exit convention: 0 fresh / 1 stale.
 			process.exitCode = report.fresh ? 0 : 1;

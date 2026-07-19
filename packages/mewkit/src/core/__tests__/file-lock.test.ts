@@ -94,7 +94,6 @@ describe("withFileLock", () => {
 		expect(await readFile(counterPath, "utf-8")).toBe("3");
 		expect(existsSync(lockPath)).toBe(false);
 	});
-
 });
 
 describe("withFileLockSync", () => {

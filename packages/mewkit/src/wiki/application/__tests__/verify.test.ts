@@ -20,7 +20,10 @@ interface PageSpec {
 
 /** Create a project with a canonical wiki (one slug), optional claims/sources JSONL, and BUILD
  * the index. Returns paths so tests can then mutate canonical files or the DB to induce drift. */
-function makeWiki(pages: PageSpec[], opts: { claims?: object[]; sources?: object[] } = {}): {
+function makeWiki(
+	pages: PageSpec[],
+	opts: { claims?: object[]; sources?: object[] } = {},
+): {
 	claudeDir: string;
 	projectRoot: string;
 	pagePath: (file: string) => string;
@@ -34,8 +37,10 @@ function makeWiki(pages: PageSpec[], opts: { claims?: object[]; sources?: object
 	for (const p of pages) {
 		writeFileSync(join(pagesDir, p.file), `---\nid: ${p.id}\ntitle: ${p.title}\n---\n${p.body}\n`);
 	}
-	if (opts.sources) writeFileSync(join(slugDir, "sources.jsonl"), opts.sources.map((s) => JSON.stringify(s)).join("\n") + "\n");
-	if (opts.claims) writeFileSync(join(slugDir, "claims.jsonl"), opts.claims.map((c) => JSON.stringify(c)).join("\n") + "\n");
+	if (opts.sources)
+		writeFileSync(join(slugDir, "sources.jsonl"), opts.sources.map((s) => JSON.stringify(s)).join("\n") + "\n");
+	if (opts.claims)
+		writeFileSync(join(slugDir, "claims.jsonl"), opts.claims.map((c) => JSON.stringify(c)).join("\n") + "\n");
 	const claudeDir = join(root, ".claude");
 	mkdirSync(join(claudeDir, "memory"), { recursive: true });
 	buildIndex(claudeDir);

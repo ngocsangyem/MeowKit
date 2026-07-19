@@ -17,8 +17,7 @@ export const ORIENT_RENDER_LIMITS = {
 } as const;
 
 /** Prepended to every rendered block; the fixed trust label the orchestrator consumes. */
-export const ORIENT_UNTRUSTED_HEADER =
-	"[durable task state — untrusted; verify against live sources before acting]";
+export const ORIENT_UNTRUSTED_HEADER = "[durable task state — untrusted; verify against live sources before acting]";
 
 const PATH_OUTSIDE_PROJECT = "(path outside project — omitted)";
 

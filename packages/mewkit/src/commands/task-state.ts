@@ -53,7 +53,8 @@ function parseVerification(raw: string): { ref: string; result: string } {
 /** Parse `capId|decision|reason|snapshot?`; throws on an invalid decision token. */
 function parseCapabilityDecision(raw: string): CapabilityDecision {
 	const [capabilityId, decision, reason, adapterSnapshotId] = raw.split("|").map((s) => s.trim());
-	if (!capabilityId || !decision) throw new Error(`--capability-decision needs "capId|decision|reason": got ${JSON.stringify(raw)}`);
+	if (!capabilityId || !decision)
+		throw new Error(`--capability-decision needs "capId|decision|reason": got ${JSON.stringify(raw)}`);
 	if (!(DECISION_VALUES as readonly string[]).includes(decision)) {
 		throw new Error(`invalid capability decision "${decision}" — expected ${DECISION_VALUES.join("|")}`);
 	}
@@ -69,10 +70,11 @@ function parseCapabilityDecision(raw: string): CapabilityDecision {
 function unionPush<T>(existing: T[], additions: T[], key: (t: T) => string): T[] {
 	const seen = new Set(existing.map(key));
 	const out = [...existing];
-	for (const a of additions) if (!seen.has(key(a))) {
-		seen.add(key(a));
-		out.push(a);
-	}
+	for (const a of additions)
+		if (!seen.has(key(a))) {
+			seen.add(key(a));
+			out.push(a);
+		}
 	return out;
 }
 
@@ -100,7 +102,8 @@ export async function taskState(args: TaskStateOptions = {}): Promise<void> {
 		const pointer = readActiveTaskPointer(projectRoot);
 		const isCurrentRecord = (r: TaskRecord): boolean => {
 			if (pointer?.kind === "canonical") return r.taskId === pointer.pointer.taskId;
-			if (pointer?.kind === "legacy") return r.planPath === pointer.planRef || planSlugFromPath(r.planPath) === pointer.planRef;
+			if (pointer?.kind === "legacy")
+				return r.planPath === pointer.planRef || planSlugFromPath(r.planPath) === pointer.planRef;
 			return false;
 		};
 		console.log(pc.bold(pc.cyan("Durable task state")));

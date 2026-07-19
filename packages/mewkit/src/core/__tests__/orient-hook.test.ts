@@ -137,7 +137,11 @@ describe("orientation-ritual hook", () => {
 		installFakeRuntime(root, "orientation: active\n");
 		writeFileSync(
 			join(root, ".claude", "runtime.json"),
-			JSON.stringify({ schemaVersion: "2.0", executable: join(root, "node_modules", ".bin", "mewkit"), writtenAt: "t" }),
+			JSON.stringify({
+				schemaVersion: "2.0",
+				executable: join(root, "node_modules", ".bin", "mewkit"),
+				writtenAt: "t",
+			}),
 		);
 		expect(loadHook(root)({ source: "resume" })).toContain("orientation fallback");
 	});

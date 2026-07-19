@@ -80,7 +80,10 @@ describe("mewkit orient", () => {
 
 	it("degrades cleanly when a recorded repo identity is missing (no crash, no stale warning)", async () => {
 		const root = makeRoot();
-		await writeTaskRecord(root, rec({ taskId: "with-repo", repos: [{ identity: "/nonexistent/repo", revision: "a".repeat(40) }] }));
+		await writeTaskRecord(
+			root,
+			rec({ taskId: "with-repo", repos: [{ identity: "/nonexistent/repo", revision: "a".repeat(40) }] }),
+		);
 		await writeActiveTaskPointer(root, { taskId: "with-repo" });
 		process.chdir(root);
 		orient({ json: true });

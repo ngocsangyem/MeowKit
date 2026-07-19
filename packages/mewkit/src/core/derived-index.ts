@@ -299,9 +299,7 @@ export function queryByTask(claudeDir: string, taskId: string): TaskQueryResult 
 	const db = new DatabaseSync(target, { readOnly: true });
 	try {
 		const events = db
-			.prepare(
-				"SELECT ts, event, run_id, plan_path FROM trace_events WHERE task_id = ? ORDER BY ts, id",
-			)
+			.prepare("SELECT ts, event, run_id, plan_path FROM trace_events WHERE task_id = ? ORDER BY ts, id")
 			.all(taskId) as TaskQueryResult["events"];
 		const plans = db
 			.prepare(

@@ -166,7 +166,9 @@ async function taskNew(args: TaskNewArgs): Promise<void> {
 				console.error(
 					err.rolledBack
 						? pc.dim("    The partial record was rolled back.")
-						: pc.yellow(`    A partial record may remain at tasks/active/${err.taskId}.json — inspect before retrying.`),
+						: pc.yellow(
+								`    A partial record may remain at tasks/active/${err.taskId}.json — inspect before retrying.`,
+							),
 				);
 				console.error(pc.dim(`    cause: ${err.message}`));
 				process.exit(1);

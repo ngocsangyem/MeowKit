@@ -77,11 +77,17 @@ async function activatePlan(planFile: string, cliVersion: string | undefined): P
 		return true;
 	} catch (err) {
 		if (err instanceof ActivationError) {
-			console.log(pc.red(`✗ Activation FAILED for task ${pc.bold(err.taskId)} — approval was stamped, but this task is NOT active.`));
+			console.log(
+				pc.red(
+					`✗ Activation FAILED for task ${pc.bold(err.taskId)} — approval was stamped, but this task is NOT active.`,
+				),
+			);
 			console.log(
 				err.rolledBack
 					? pc.dim("  The partial record was rolled back. Re-run `mewkit plan approve` after resolving the cause.")
-					: pc.yellow(`  A partial record may remain at tasks/active/${err.taskId}.json — inspect and repair before re-approving.`),
+					: pc.yellow(
+							`  A partial record may remain at tasks/active/${err.taskId}.json — inspect and repair before re-approving.`,
+						),
 			);
 			console.log(pc.dim(`  cause: ${err.message}`));
 			return false;

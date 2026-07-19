@@ -6,11 +6,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync, readFileSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import {
-	writeActiveTaskPointer,
-	readActiveTaskPointer,
-	clearActiveTaskPointer,
-} from "../task-record.js";
+import { writeActiveTaskPointer, readActiveTaskPointer, clearActiveTaskPointer } from "../task-record.js";
 import { buildOrientEnvelope, planSlugFromPath } from "../orient-envelope.js";
 import { fixtures } from "./fixtures/recovery-states.js";
 

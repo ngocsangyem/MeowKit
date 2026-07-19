@@ -65,13 +65,17 @@ export function queryCommand(opts: IndexOptions = {}): void {
 			console.log(JSON.stringify(taskResult, null, 2));
 			return;
 		}
-		console.log(pc.bold(pc.cyan(`Task evidence — ${taskResult.taskId}`)) + pc.dim(` (read-only, schema v${taskResult.schemaVersion})`));
+		console.log(
+			pc.bold(pc.cyan(`Task evidence — ${taskResult.taskId}`)) +
+				pc.dim(` (read-only, schema v${taskResult.schemaVersion})`),
+		);
 		if (taskResult.plans.length) console.log(pc.dim(`  plan: ${taskResult.plans.join(", ")}`));
 		if (taskResult.events.length === 0) {
 			console.log(pc.dim("  no task-joined events (unknown task, or index predates task ids)."));
 			return;
 		}
-		for (const e of taskResult.events) console.log(`  ${pc.dim(e.ts ?? "?")}  ${e.event ?? "?"}${e.run_id ? pc.dim(` [${e.run_id}]`) : ""}`);
+		for (const e of taskResult.events)
+			console.log(`  ${pc.dim(e.ts ?? "?")}  ${e.event ?? "?"}${e.run_id ? pc.dim(` [${e.run_id}]`) : ""}`);
 		return;
 	}
 

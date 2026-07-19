@@ -129,9 +129,7 @@ export type ActiveTaskPointer = z.infer<typeof ActiveTaskPointerSchema>;
  * temporary. `null` means no pointer is present.
  */
 export type ActiveTaskPointerResult =
-	| { kind: "canonical"; pointer: ActiveTaskPointer }
-	| { kind: "legacy"; planRef: string }
-	| null;
+	{ kind: "canonical"; pointer: ActiveTaskPointer } | { kind: "legacy"; planRef: string } | null;
 
 const pointerJsonPath = (projectRoot: string): string => join(projectRoot, "session-state", "active-plan.json");
 const pointerLegacyPath = (projectRoot: string): string => join(projectRoot, "session-state", "active-plan");
@@ -153,7 +151,11 @@ export function readActiveTaskPointer(projectRoot: string): ActiveTaskPointerRes
 			if (typeof raw.taskId === "string" && TASK_ID_RE.test(raw.taskId)) {
 				return { kind: "canonical", pointer: ActiveTaskPointerSchema.parse(raw) };
 			}
-			const planRef = ((typeof raw.path === "string" && raw.path) || (typeof raw.slug === "string" && raw.slug) || "").trim();
+			const planRef = (
+				(typeof raw.path === "string" && raw.path) ||
+				(typeof raw.slug === "string" && raw.slug) ||
+				""
+			).trim();
 			if (planRef) return { kind: "legacy", planRef };
 		} catch {
 			/* fall through to the plain-text legacy file */
