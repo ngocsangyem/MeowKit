@@ -14,6 +14,43 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.14.5 (2026-07-20) — High-Assurance PR Review
+
+The `mewkit` CLI ships alongside this kit as **1.19.1** (see `CLI` below).
+
+### Highlights
+
+A new evidence-gated PR-review path. `mk:review-pr --assured` runs a deterministic `ReviewSession`: an isolated, SHA-bound, detached review worktree (the user's checkout is provably untouched), one immutable hash-pinned diff, a diff-scoped impact map with targeted scout escalation, a scope-driven reviewer roster, session-observed coverage, and a mechanical verdict gate that cannot emit a PASS/Approve without complete, hook-corroborated coverage. GitHub writes happen only through `--reply` plus an immediate user confirmation bound to the reviewed revision.
+
+### New Commands
+
+- `mewkit review prepare <pr-url | owner/repo#n | n> [--remote <name>]` — provision an isolated SHA-bound worktree from a PR (fork-safe: `pull/N/head` fetched from the base-repo remote), capture one immutable hash-pinned diff + PR metadata/CI as untrusted DATA, and write a deterministic impact map + reviewer roster/briefs under `tasks/reviews/<session>/`.
+- `mewkit review read --session <id> --as <role> <path>` — path-confined, evidence-recording read wrapper (assigned reviewer reads flow through it so coverage is observable).
+- `mewkit review coverage --session <id>` — roster ∩ evidence gap gate; reports `evidenceLevel` (`session-observed` vs `attested`) and exits non-zero on any gap.
+- `mewkit review compose --session <id>` — the mechanical gate: verify the diff hash, re-run coverage, apply the deterministic verdict cap table, resolve inline anchors by snippet, and emit a `verdict-gate`-compatible proof bundle + `SubmitPayload`.
+- `mewkit review submit --session <id> --reply --confirm <payload-hash>` — the sole GitHub write path; re-checks the PR head SHA (aborts without posting if it changed) and is idempotent.
+- `mewkit review cleanup --session <id>` — remove the ephemeral review worktree (manifest-nonce-owned); the session audit trail is kept.
+- `mk:worktree review-pr` / `review-pr-cleanup` — detached, nonce-owned review worktrees; cleanup refuses anything but a matching manifest.
+
+### Features
+
+- `mk:review-pr` gains an opt-in `--assured` lane (full ReviewSession pipeline) and keeps its fast, read-only default lane unchanged.
+- Scope-driven review topology (small / medium / large tiers) with whole-diff roles a per-chunk territory reviewer cannot own, plus heavy-file invariant slices.
+
+### Improvements
+
+- `mk:review` PR mode consumes the prepared session; step-03 runs the coverage gate before verdict composition, and step-04 composes the verdict through `mewkit review compose`.
+- Gate 2 (`gate2-check.sh`) gains a narrow review-session extension that validates a review verdict's embedded coverage block (hash-clean, no gaps, `session-observed` required for PASS); inert for non-review verdicts.
+
+### Security
+
+- All git/gh invocations in the review pipeline use array-argv `execFileSync` (no shell). Untrusted PR content is quarantined under `untrusted/` and never treated as instructions; the read wrapper is realpath-confined against symlink exfiltration.
+- Honest capability limit: subagent tool calls do not reach the parent PostToolUse hook, so `session-observed` is anti-accidental corroboration (not unforgeable) and proves session-level — not individual-reviewer — access; subagent-driven reviews are `attested` and cannot earn Approve.
+
+### CLI
+
+- The `mewkit` CLI is bumped to **1.19.1** for the `review` command group (`prepare` / `read` / `coverage` / `compose` / `submit` / `cleanup`).
+
 ## 2.14.4 (2026-07-19) — The Orientation & Transition Spine
 
 The `mewkit` CLI ships alongside this kit as **1.19.0** (see `CLI` below).
