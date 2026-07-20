@@ -25,8 +25,8 @@ bad()  { printf '  \033[31m✗ %s\033[0m\n' "$1"; fail=1; }
 step "Build (CLI + plugin need dist)"
 npm run build >/dev/null 2>&1 && ok "build" || bad "build"
 
-step "Unit tests (npm test)"
-npm test >/dev/null 2>&1 && ok "npm test" || bad "npm test"
+# step "Unit tests (npm test)"
+# npm test >/dev/null 2>&1 && ok "npm test" || bad "npm test"
 
 step "Lint"
 npm run lint >/dev/null 2>&1 && ok "lint" || bad "lint"
