@@ -65,6 +65,16 @@ interface SettingsShape {
 
 const SHELL_INTERPRETERS = new Set(["sh", "bash", "dash", "zsh"]);
 
+// Per-hook subprocess ceiling. Hooks here shell out to real interpreters, and
+// several parse stdin JSON via `python3` — which can resolve to a slow launcher
+// (e.g. a pyenv shim) whose cold start balloons under load. A healthy hook runs
+// in ~1s, but the config that drives these (vitest.config.ts) already documents
+// that such subprocesses "legitimately take 6-30s" and sets testTimeout to 30000ms;
+// doctor --hard-gates tolerates the same. This ceiling was left at 15000ms and so
+// force-killed slow-but-healthy runs to `status: null` (a false timeout). Align it
+// with that documented 30s tolerance so only a truly hung hook is killed.
+const HOOK_TIMEOUT_MS = 30_000;
+
 /** First token + first double-quoted argument of a hook command string. */
 function parseCommand(raw: string): HookCommand | null {
 	const interpMatch = raw.match(/^(\S+)\s+"([^"]+)"/);
@@ -139,7 +149,7 @@ export function runConfiguredHook(settings: SettingsShape, opts: RunConfiguredHo
 			cwd: opts.projectDir,
 			input,
 			encoding: "utf8",
-			timeout: 15000,
+			timeout: HOOK_TIMEOUT_MS,
 			env: { ...process.env, CLAUDE_PROJECT_DIR: opts.projectDir, ...opts.extraEnv },
 		});
 		results.push({
