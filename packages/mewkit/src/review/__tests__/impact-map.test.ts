@@ -171,13 +171,15 @@ diff --git a/src/c/three.ts b/src/c/three.ts
 
 describe("enrichWithSearches", () => {
 	it("maps each search term to injected search hits", () => {
-		const m = deriveImpactFromDiff(diff(`
+		const m = deriveImpactFromDiff(
+			diff(`
 diff --git a/src/api/users.ts b/src/api/users.ts
 --- a/src/api/users.ts
 +++ b/src/api/users.ts
 @@
 +export function getUserById(id: string) {}
-`));
+`),
+		);
 		const enriched = enrichWithSearches(m, (t) => (t === "getUserById" ? ["src/routes/users.ts:12"] : []));
 		expect(enriched.callers).toEqual([{ term: "getUserById", hits: ["src/routes/users.ts:12"] }]);
 	});

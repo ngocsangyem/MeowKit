@@ -15,9 +15,15 @@ beforeEach(() => {
 	fs.mkdirSync(sessionDir, { recursive: true });
 	calls = [];
 });
-afterEach(() => { fs.rmSync(cwd, { recursive: true, force: true }); process.exitCode = 0; });
+afterEach(() => {
+	fs.rmSync(cwd, { recursive: true, force: true });
+	process.exitCode = 0;
+});
 
-const exec = (ok: boolean) => (file: string, args: string[]) => { calls.push([file, ...args]); return { ok, out: ok ? "removed" : "", err: ok ? "" : "refused" }; };
+const exec = (ok: boolean) => (file: string, args: string[]) => {
+	calls.push([file, ...args]);
+	return { ok, out: ok ? "removed" : "", err: ok ? "" : "refused" };
+};
 
 describe("reviewCleanup", () => {
 	it("errors when the session does not exist", async () => {
@@ -28,17 +34,34 @@ describe("reviewCleanup", () => {
 	it("delegates to the manifest-owned worktree cleanup and keeps the session dir", async () => {
 		fs.writeFileSync(path.join(sessionDir, "manifest.json"), "{}");
 		fs.writeFileSync(path.join(sessionDir, "verdict.md"), "audit trail");
-		const r = await reviewCleanup({ session: SESSION, cwd, json: true, deps: { exec: exec(true), worktreeScript: "/x/worktree.cjs" } });
+		const r = await reviewCleanup({
+			session: SESSION,
+			cwd,
+			json: true,
+			deps: { exec: exec(true), worktreeScript: "/x/worktree.cjs" },
+		});
 		expect(r.ok).toBe(true);
 		const call = calls[0];
-		expect(call).toEqual(["node", "/x/worktree.cjs", "review-pr-cleanup", "--manifest", path.join("tasks", "reviews", SESSION, "manifest.json"), "--json"]);
+		expect(call).toEqual([
+			"node",
+			"/x/worktree.cjs",
+			"review-pr-cleanup",
+			"--manifest",
+			path.join("tasks", "reviews", SESSION, "manifest.json"),
+			"--json",
+		]);
 		// audit trail preserved
 		expect(fs.existsSync(path.join(sessionDir, "verdict.md"))).toBe(true);
 	});
 
 	it("surfaces a refused worktree cleanup as an error (never silent)", async () => {
 		fs.writeFileSync(path.join(sessionDir, "manifest.json"), "{}");
-		const r = await reviewCleanup({ session: SESSION, cwd, json: true, deps: { exec: exec(false), worktreeScript: "/x/worktree.cjs" } });
+		const r = await reviewCleanup({
+			session: SESSION,
+			cwd,
+			json: true,
+			deps: { exec: exec(false), worktreeScript: "/x/worktree.cjs" },
+		});
 		expect(r.ok).toBe(false);
 		expect(r.error).toMatch(/refused|failed/);
 	});

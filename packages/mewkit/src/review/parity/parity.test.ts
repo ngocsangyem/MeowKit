@@ -22,42 +22,90 @@ import { reviewSubmit } from "../../commands/review/submit.js";
 // from the design report + plan contracts), not a line-traced comparison — the residual
 // gap is documented in the Phase 7 report.
 
-const REPO = execFileSync("git", ["rev-parse", "--show-toplevel"], { cwd: path.dirname(new URL(import.meta.url).pathname), encoding: "utf-8" }).trim();
+const REPO = execFileSync("git", ["rev-parse", "--show-toplevel"], {
+	cwd: path.dirname(new URL(import.meta.url).pathname),
+	encoding: "utf-8",
+}).trim();
 const readRepo = (rel: string) => fs.readFileSync(path.join(REPO, rel), "utf-8");
 const require = createRequire(import.meta.url);
 // The worktree ownership guard is CommonJS (.cjs) — load it via require for the
 // isolation/cleanup scenarios (02, 20).
 const reviewPrCjs = require(path.join(REPO, ".claude/skills/worktree/scripts/lib/worktree-review-pr.cjs"));
-const cleanVerdict: VerdictInput = { confirmedCritical: false, coverageComplete: true, evidenceLevel: "session-observed", ciRed: false, ciAllSkipped: false, contextUnavailable: [], selfPR: false };
+const cleanVerdict: VerdictInput = {
+	confirmedCritical: false,
+	coverageComplete: true,
+	evidenceLevel: "session-observed",
+	ciRed: false,
+	ciAllSkipped: false,
+	contextUnavailable: [],
+	selfPR: false,
+};
 
 let cwd: string;
-beforeEach(() => { cwd = fs.mkdtempSync(path.join(os.tmpdir(), "mk-parity-")); });
-afterEach(() => { fs.rmSync(cwd, { recursive: true, force: true }); process.exitCode = 0; });
+beforeEach(() => {
+	cwd = fs.mkdtempSync(path.join(os.tmpdir(), "mk-parity-"));
+});
+afterEach(() => {
+	fs.rmSync(cwd, { recursive: true, force: true });
+	process.exitCode = 0;
+});
 
 // Seed a review session under cwd for coverage/compose scenarios.
 const IMPACT = { scoutRequired: false, stats: { sourceChanged: 40, totalChanged: 50 }, changedFiles: [] };
 const DIFF = "diff --git a/src/a.ts b/src/a.ts\n--- a/src/a.ts\n+++ b/src/a.ts\n@@ -1,0 +1,1 @@\n+const x = 1;\n";
-function seedSession(session: string, opts: { observed?: boolean; complete?: boolean; findings?: unknown[]; ci?: string } = {}) {
+function seedSession(
+	session: string,
+	opts: { observed?: boolean; complete?: boolean; findings?: unknown[]; ci?: string } = {},
+) {
 	const dir = path.join(cwd, "tasks", "reviews", session);
 	fs.mkdirSync(path.join(dir, "untrusted"), { recursive: true });
 	fs.writeFileSync(path.join(dir, "diff.patch"), DIFF);
 	fs.writeFileSync(path.join(dir, "impact-map.json"), JSON.stringify(IMPACT));
-	fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify({
-		schemaVersion: "1.0.0", session, nonce: "n", worktreePath: `.worktrees/review-pr-7-${session}`, pr: 7,
-		ref: `refs/mewkit/review-pr-7-${session}`, headSha: "h".repeat(40), baseSha: "b".repeat(40), baseBranch: "main",
-		baseRemote: "origin", host: "github", owner: "o", repo: "r", createdAt: "t",
-		diffSha256: crypto.createHash("sha256").update(DIFF).digest("hex"),
-	}));
+	fs.writeFileSync(
+		path.join(dir, "manifest.json"),
+		JSON.stringify({
+			schemaVersion: "1.0.0",
+			session,
+			nonce: "n",
+			worktreePath: `.worktrees/review-pr-7-${session}`,
+			pr: 7,
+			ref: `refs/mewkit/review-pr-7-${session}`,
+			headSha: "h".repeat(40),
+			baseSha: "b".repeat(40),
+			baseBranch: "main",
+			baseRemote: "origin",
+			host: "github",
+			owner: "o",
+			repo: "r",
+			createdAt: "t",
+			diffSha256: crypto.createHash("sha256").update(DIFF).digest("hex"),
+		}),
+	);
 	const reads = buildRoster(IMPACT).entries.flatMap((e) => e.expectedReads.map((t) => ({ reviewer: e.id, target: t })));
 	const usable = opts.complete === false ? reads.filter((r) => r.reviewer !== "security") : reads;
-	fs.writeFileSync(path.join(dir, "evidence.jsonl"), usable.map((r) => JSON.stringify({ session, kind: "read", target: r.target, at: "t", reviewer: r.reviewer, source: "cli" })).join("\n"));
-	if (opts.observed) fs.writeFileSync(path.join(dir, "hook-evidence.jsonl"), [...new Set(reads.map((r) => r.target))].map((t) => JSON.stringify({ session, kind: "read", target: t, at: "t", source: "hook" })).join("\n"));
+	fs.writeFileSync(
+		path.join(dir, "evidence.jsonl"),
+		usable
+			.map((r) =>
+				JSON.stringify({ session, kind: "read", target: r.target, at: "t", reviewer: r.reviewer, source: "cli" }),
+			)
+			.join("\n"),
+	);
+	if (opts.observed)
+		fs.writeFileSync(
+			path.join(dir, "hook-evidence.jsonl"),
+			[...new Set(reads.map((r) => r.target))]
+				.map((t) => JSON.stringify({ session, kind: "read", target: t, at: "t", source: "hook" }))
+				.join("\n"),
+		);
 	if (opts.findings) fs.writeFileSync(path.join(dir, "findings.json"), JSON.stringify(opts.findings));
 	if (opts.ci !== undefined) fs.writeFileSync(path.join(dir, "untrusted", "ci-checks.txt"), opts.ci);
 	return dir;
 }
 const noGh = { exec: () => ({ ok: false, out: "", err: "" }) };
-const REMOTES = parseGitRemotes("origin\tgit@github.com:me/fork.git (fetch)\nupstream\thttps://github.com/acme/widget.git (fetch)\n");
+const REMOTES = parseGitRemotes(
+	"origin\tgit@github.com:me/fork.git (fetch)\nupstream\thttps://github.com/acme/widget.git (fetch)\n",
+);
 
 describe("Parity matrix (20 capability rows)", () => {
 	it("01 PR target parsing rejects ambiguous/invalid input", () => {
@@ -67,7 +115,13 @@ describe("Parity matrix (20 capability rows)", () => {
 
 	it("02 [SC] same-repo isolation: the main worktree can never be cleaned by a review flow", () => {
 		const main = { path: "/repo", branch: "main", detached: false, isMainWorktree: true };
-		expect(reviewPrCjs.isOwnedReviewWorktree({ pr: 7, session: "s", nonce: "n", worktreePath: ".worktrees/review-pr-7-s" }, main, { nonce: "n" }).ok).toBe(false);
+		expect(
+			reviewPrCjs.isOwnedReviewWorktree(
+				{ pr: 7, session: "s", nonce: "n", worktreePath: ".worktrees/review-pr-7-s" },
+				main,
+				{ nonce: "n" },
+			).ok,
+		).toBe(false);
 	});
 
 	it("03 [SC] wrong / ambiguous remote rejected", () => {
@@ -84,11 +138,36 @@ describe("Parity matrix (20 capability rows)", () => {
 
 	it("05 [SC] head change before submit → abort/restart, no post", async () => {
 		const dir = seedSession("s05");
-		fs.writeFileSync(path.join(dir, "submit-payload.json"), JSON.stringify({ host: "github", owner: "o", repo: "r", pr: 7, headSha: "h".repeat(40), event: "APPROVE", body: "x" }));
+		fs.writeFileSync(
+			path.join(dir, "submit-payload.json"),
+			JSON.stringify({
+				host: "github",
+				owner: "o",
+				repo: "r",
+				pr: 7,
+				headSha: "h".repeat(40),
+				event: "APPROVE",
+				body: "x",
+			}),
+		);
 		const payload = JSON.parse(fs.readFileSync(path.join(dir, "submit-payload.json"), "utf-8"));
 		const hash = crypto.createHash("sha256").update(JSON.stringify(payload)).digest("hex");
 		const calls: string[][] = [];
-		const r = await reviewSubmit({ session: "s05", reply: true, confirm: hash, cwd, json: true, deps: { exec: (f, a) => { calls.push([f, ...a]); return f === "gh" && a[0] === "api" ? { ok: true, out: "DIFFERENT".padEnd(40, "x"), err: "" } : { ok: true, out: "", err: "" }; } } });
+		const r = await reviewSubmit({
+			session: "s05",
+			reply: true,
+			confirm: hash,
+			cwd,
+			json: true,
+			deps: {
+				exec: (f, a) => {
+					calls.push([f, ...a]);
+					return f === "gh" && a[0] === "api"
+						? { ok: true, out: "DIFFERENT".padEnd(40, "x"), err: "" }
+						: { ok: true, out: "", err: "" };
+				},
+			},
+		});
 		expect(r.ok).toBe(false);
 		expect(calls.some((c) => c[1] === "pr" && c[2] === "review")).toBe(false);
 	});
@@ -107,15 +186,25 @@ describe("Parity matrix (20 capability rows)", () => {
 	});
 
 	it("08 small diff → dimension roster; large diff → territory + whole-diff roster", () => {
-		expect(buildRoster({ scoutRequired: false, stats: { sourceChanged: 50, totalChanged: 60 }, changedFiles: [] }).tier).toBe("small");
-		const large = buildRoster({ scoutRequired: false, stats: { sourceChanged: 5000, totalChanged: 6000 }, changedFiles: [{ path: "src/a.ts", kind: "source", deleted: false, added: 3, removed: 1 }] });
+		expect(
+			buildRoster({ scoutRequired: false, stats: { sourceChanged: 50, totalChanged: 60 }, changedFiles: [] }).tier,
+		).toBe("small");
+		const large = buildRoster({
+			scoutRequired: false,
+			stats: { sourceChanged: 5000, totalChanged: 6000 },
+			changedFiles: [{ path: "src/a.ts", kind: "source", deleted: false, added: 3, removed: 1 }],
+		});
 		expect(large.tier).toBe("large");
 		expect(large.entries.some((e) => e.dimension === "territory")).toBe(true);
 		expect(large.entries.some((e) => e.wholeDiff)).toBe(true);
 	});
 
 	it("09 all review lenses present in generated briefs", () => {
-		const dims = buildRoster({ scoutRequired: false, stats: { sourceChanged: 50, totalChanged: 60 }, changedFiles: [] }).entries.map((e) => e.dimension);
+		const dims = buildRoster({
+			scoutRequired: false,
+			stats: { sourceChanged: 50, totalChanged: 60 },
+			changedFiles: [],
+		}).entries.map((e) => e.dimension);
 		expect(dims).toEqual(expect.arrayContaining(["issue-fidelity", "correctness", "security", "tests", "build-test"]));
 	});
 
@@ -159,22 +248,50 @@ describe("Parity matrix (20 capability rows)", () => {
 		expect(fs.existsSync(proofPath)).toBe(true);
 		// the gate2 coverage validator accepts a session-observed complete PASS bundle
 		let code = 0;
-		try { execFileSync("node", [path.join(REPO, ".claude/scripts/validate-review-coverage.cjs"), proofPath], { stdio: ["pipe", "pipe", "pipe"] }); } catch (e) { code = (e as { status?: number }).status ?? 1; }
+		try {
+			execFileSync("node", [path.join(REPO, ".claude/scripts/validate-review-coverage.cjs"), proofPath], {
+				stdio: ["pipe", "pipe", "pipe"],
+			});
+		} catch (e) {
+			code = (e as { status?: number }).status ?? 1;
+		}
 		expect(code).toBe(0);
 	});
 
 	it("18 [SC] submit without --reply + confirmation cannot write GitHub", async () => {
 		const dir = path.join(cwd, "tasks", "reviews", "s18");
 		fs.mkdirSync(dir, { recursive: true });
-		fs.writeFileSync(path.join(dir, "submit-payload.json"), JSON.stringify({ host: "github", owner: "o", repo: "r", pr: 7, headSha: "h".repeat(40), event: "APPROVE", body: "x" }));
+		fs.writeFileSync(
+			path.join(dir, "submit-payload.json"),
+			JSON.stringify({
+				host: "github",
+				owner: "o",
+				repo: "r",
+				pr: 7,
+				headSha: "h".repeat(40),
+				event: "APPROVE",
+				body: "x",
+			}),
+		);
 		const calls: string[][] = [];
-		const r = await reviewSubmit({ session: "s18", cwd, json: true, deps: { exec: (f, a) => { calls.push([f, ...a]); return { ok: true, out: "", err: "" }; } } });
+		const r = await reviewSubmit({
+			session: "s18",
+			cwd,
+			json: true,
+			deps: {
+				exec: (f, a) => {
+					calls.push([f, ...a]);
+					return { ok: true, out: "", err: "" };
+				},
+			},
+		});
 		expect(r.ok).toBe(false);
 		expect(calls).toHaveLength(0);
 	});
 
 	it("19 [SC] deleted export breaking a caller is surfaced (removed-behavior + scout)", () => {
-		const d = "diff --git a/src/api.ts b/src/api.ts\ndeleted file mode 100644\n--- a/src/api.ts\n+++ /dev/null\n@@\n-export const getUser = 1;\n";
+		const d =
+			"diff --git a/src/api.ts b/src/api.ts\ndeleted file mode 100644\n--- a/src/api.ts\n+++ /dev/null\n@@\n-export const getUser = 1;\n";
 		const m = deriveImpactFromDiff(d);
 		expect(m.removedOrRenamed.length).toBeGreaterThan(0);
 		expect(m.scoutRequired).toBe(true);
@@ -182,7 +299,13 @@ describe("Parity matrix (20 capability rows)", () => {
 
 	it("20 [SC] cleanup removes only session worktree; a non-session worktree survives", () => {
 		const feature = { path: "/repo/.worktrees/feat-x", branch: "feat/x", detached: false, isMainWorktree: false };
-		expect(reviewPrCjs.isOwnedReviewWorktree({ pr: 7, session: "s", nonce: "n", worktreePath: ".worktrees/review-pr-7-s" }, feature, { nonce: "n" }).ok).toBe(false);
+		expect(
+			reviewPrCjs.isOwnedReviewWorktree(
+				{ pr: 7, session: "s", nonce: "n", worktreePath: ".worktrees/review-pr-7-s" },
+				feature,
+				{ nonce: "n" },
+			).ok,
+		).toBe(false);
 	});
 });
 
@@ -200,12 +323,37 @@ describe("Additional gating scenarios (21-23)", () => {
 		fs.writeFileSync(path.join(dir, "diff.patch"), DIFF);
 		const { writeRoster } = await import("../roster.js");
 		writeRoster(dir, buildRoster(IMPACT), session);
-		fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify({ schemaVersion: "1.0.0", session, nonce: "n", worktreePath: `.worktrees/review-pr-7-${session}`, pr: 7, ref: `refs/mewkit/review-pr-7-${session}`, headSha: "h".repeat(40), baseSha: "b".repeat(40), baseBranch: "main", baseRemote: "origin", host: "github", owner: "o", repo: "r", createdAt: "t" }));
+		fs.writeFileSync(
+			path.join(dir, "manifest.json"),
+			JSON.stringify({
+				schemaVersion: "1.0.0",
+				session,
+				nonce: "n",
+				worktreePath: `.worktrees/review-pr-7-${session}`,
+				pr: 7,
+				ref: `refs/mewkit/review-pr-7-${session}`,
+				headSha: "h".repeat(40),
+				baseSha: "b".repeat(40),
+				baseBranch: "main",
+				baseRemote: "origin",
+				host: "github",
+				owner: "o",
+				repo: "r",
+				createdAt: "t",
+			}),
+		);
 		const dispatch = path.join(REPO, ".claude/hooks/dispatch.cjs");
 		for (const e of buildRoster(IMPACT).entries) {
 			for (const t of e.expectedReads) {
 				await reviewRead({ session, as: e.id, target: t, cwd });
-				execFileSync("node", [dispatch, "PostToolUse", "Bash"], { input: JSON.stringify({ tool_input: { command: `mewkit review read --session ${session} --as ${e.id} ${t}` }, cwd }), encoding: "utf-8", env: { ...process.env, CLAUDE_PROJECT_DIR: REPO } });
+				execFileSync("node", [dispatch, "PostToolUse", "Bash"], {
+					input: JSON.stringify({
+						tool_input: { command: `mewkit review read --session ${session} --as ${e.id} ${t}` },
+						cwd,
+					}),
+					encoding: "utf-8",
+					env: { ...process.env, CLAUDE_PROJECT_DIR: REPO },
+				});
 			}
 		}
 		const cov = await reviewCoverage({ session, cwd, json: false, silent: true });

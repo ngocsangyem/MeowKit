@@ -18,8 +18,14 @@ import { reviewCoverage, type CoverageReport } from "./coverage.js";
 
 type Exec = (file: string, args: string[], cwd?: string) => { ok: boolean; out: string };
 const realExec: Exec = (file, args, cwd) => {
-	try { return { ok: true, out: execFileSync(file, args, { cwd, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).toString() }; }
-	catch { return { ok: false, out: "" }; }
+	try {
+		return {
+			ok: true,
+			out: execFileSync(file, args, { cwd, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).toString(),
+		};
+	} catch {
+		return { ok: false, out: "" };
+	}
 };
 
 export interface ComposeOptions {
@@ -56,27 +62,35 @@ export async function reviewCompose(options: ComposeOptions): Promise<ComposeRes
 	const emit = (r: ComposeResult): ComposeResult => {
 		if (options.json) console.log(JSON.stringify(r, null, 2));
 		else if (r.error) console.error(`✗ ${r.error}`);
-		else console.log(`${r.decision === "PASS" ? "✓" : r.decision === "BLOCKED" ? "✗" : "⚠"} ${r.decision} (${r.event}) — ${r.reasons?.length ? r.reasons.join("; ") : "clean"}`);
+		else
+			console.log(
+				`${r.decision === "PASS" ? "✓" : r.decision === "BLOCKED" ? "✗" : "⚠"} ${r.decision} (${r.event}) — ${r.reasons?.length ? r.reasons.join("; ") : "clean"}`,
+			);
 		if (!r.ok) process.exitCode = 1;
 		return r;
 	};
 	const bail = (error: string) => emit({ ok: false, error });
 
-	if (!fs.existsSync(path.join(sessionDir, "manifest.json"))) return bail(`no review session at ${path.relative(cwd, sessionDir)}`);
+	if (!fs.existsSync(path.join(sessionDir, "manifest.json")))
+		return bail(`no review session at ${path.relative(cwd, sessionDir)}`);
 	const manifest = readJson(path.join(sessionDir, "manifest.json"));
 
 	// 1. Tamper-evident diff: recompute the hash and refuse on mismatch (restart).
 	const diffPath = path.join(sessionDir, "diff.patch");
 	const diffText = fs.existsSync(diffPath) ? fs.readFileSync(diffPath, "utf-8") : "";
 	const diffSha = crypto.createHash("sha256").update(diffText).digest("hex");
-	if (manifest.diffSha256 && manifest.diffSha256 !== diffSha) return bail("diff.patch hash does not match the manifest — the captured diff was modified; restart the review");
+	if (manifest.diffSha256 && manifest.diffSha256 !== diffSha)
+		return bail("diff.patch hash does not match the manifest — the captured diff was modified; restart the review");
 
 	// 2. Re-run coverage; HARD-REFUSE (no verdict) on any gap. This is the mechanical
 	//    coverage→verdict gate: a PASS cannot exist without complete coverage.
 	const coverage = options.deps?.coverage
 		? await options.deps.coverage(options.session, cwd)
 		: await reviewCoverage({ session: options.session, cwd, silent: true });
-	if (!coverage.ok || !coverage.complete) return bail(`coverage incomplete (${coverage.gaps.length} gap(s)) — complete reviewer coverage before composing; run 'mewkit review coverage --session ${options.session}'`);
+	if (!coverage.ok || !coverage.complete)
+		return bail(
+			`coverage incomplete (${coverage.gaps.length} gap(s)) — complete reviewer coverage before composing; run 'mewkit review coverage --session ${options.session}'`,
+		);
 
 	// 3. Validate findings against the Zod schema.
 	const findingsPath = path.join(sessionDir, "findings.json");
@@ -92,14 +106,22 @@ export async function reviewCompose(options: ComposeOptions): Promise<ComposeRes
 	}
 
 	// 4. Cap table (pure). CI + self-PR + context feed the caps.
-	const ci = ciStatus(fs.existsSync(path.join(sessionDir, "untrusted", "ci-checks.txt")) ? fs.readFileSync(path.join(sessionDir, "untrusted", "ci-checks.txt"), "utf-8") : null);
+	const ci = ciStatus(
+		fs.existsSync(path.join(sessionDir, "untrusted", "ci-checks.txt"))
+			? fs.readFileSync(path.join(sessionDir, "untrusted", "ci-checks.txt"), "utf-8")
+			: null,
+	);
 	let selfPR = false;
 	try {
 		const me = exec("gh", ["api", "user", "--jq", ".login"], cwd);
-		const meta = fs.existsSync(path.join(sessionDir, "untrusted", "pr-metadata.json")) ? readJson(path.join(sessionDir, "untrusted", "pr-metadata.json")) : null;
+		const meta = fs.existsSync(path.join(sessionDir, "untrusted", "pr-metadata.json"))
+			? readJson(path.join(sessionDir, "untrusted", "pr-metadata.json"))
+			: null;
 		const author = meta?.author?.login ?? meta?.author;
 		if (me.ok && author && me.out.trim() === String(author).trim()) selfPR = true;
-	} catch { /* selfPR stays false when identity is unavailable */ }
+	} catch {
+		/* selfPR stays false when identity is unavailable */
+	}
 
 	const verdict = computeVerdict({
 		confirmedCritical: findings.some((f) => f.severity === "CRITICAL"),
@@ -120,28 +142,48 @@ export async function reviewCompose(options: ComposeOptions): Promise<ComposeRes
 		});
 
 	// 6. Emit proof bundle (verdict-gate compatible) + SubmitPayload.
-	const coverageBlock = { report: coverage, sha256: crypto.createHash("sha256").update(JSON.stringify(coverage)).digest("hex") };
-	const dimensionVerdict = verdict.decision === "BLOCKED" ? "FAIL" : verdict.decision === "PASS_WITH_RISK" ? "WARN" : "PASS";
+	const coverageBlock = {
+		report: coverage,
+		sha256: crypto.createHash("sha256").update(JSON.stringify(coverage)).digest("hex"),
+	};
+	const dimensionVerdict =
+		verdict.decision === "BLOCKED" ? "FAIL" : verdict.decision === "PASS_WITH_RISK" ? "WARN" : "PASS";
 	const proof = {
 		schema_version: "1.0.0",
 		slug: options.session,
 		gate: "review" as const,
 		decision: verdict.decision,
 		dimensions: [{ name: "Review", verdict: dimensionVerdict, note: verdict.reasons.join("; ") || undefined }],
-		evidence_refs: [`tasks/reviews/${options.session}/impact-map.json`, `tasks/reviews/${options.session}/evidence.jsonl`],
+		evidence_refs: [
+			`tasks/reviews/${options.session}/impact-map.json`,
+			`tasks/reviews/${options.session}/evidence.jsonl`,
+		],
 		created_at: manifest.createdAt ?? new Date().toISOString(),
 		review_session: options.session,
 		coverage: coverageBlock,
 		findings: inline,
 	};
 	const submitPayload = {
-		host: manifest.host, owner: manifest.owner, repo: manifest.repo, pr: manifest.pr,
-		headSha: manifest.headSha, event: verdict.event,
+		host: manifest.host,
+		owner: manifest.owner,
+		repo: manifest.repo,
+		pr: manifest.pr,
+		headSha: manifest.headSha,
+		event: verdict.event,
 		body: `${verdict.decision}${verdict.reasons.length ? ` — ${verdict.reasons.join("; ")}` : ""}`,
 	};
 	fs.writeFileSync(path.join(sessionDir, `${options.session}-verdict.json`), `${JSON.stringify(proof, null, 2)}\n`);
 	fs.writeFileSync(path.join(sessionDir, "submit-payload.json"), `${JSON.stringify(submitPayload, null, 2)}\n`);
-	fs.writeFileSync(path.join(sessionDir, "verdict.md"), `# Review verdict — ${verdict.decision}\n\nEvent: ${verdict.event}\nEvidence level: ${coverage.evidenceLevel}\n${verdict.reasons.length ? `\nCaps/risks:\n${verdict.reasons.map((r) => `- ${r}`).join("\n")}\n` : ""}`);
+	fs.writeFileSync(
+		path.join(sessionDir, "verdict.md"),
+		`# Review verdict — ${verdict.decision}\n\nEvent: ${verdict.event}\nEvidence level: ${coverage.evidenceLevel}\n${verdict.reasons.length ? `\nCaps/risks:\n${verdict.reasons.map((r) => `- ${r}`).join("\n")}\n` : ""}`,
+	);
 
-	return emit({ ok: true, decision: verdict.decision, event: verdict.event, reasons: verdict.reasons, verdictPath: path.relative(cwd, path.join(sessionDir, `${options.session}-verdict.json`)) });
+	return emit({
+		ok: true,
+		decision: verdict.decision,
+		event: verdict.event,
+		reasons: verdict.reasons,
+		verdictPath: path.relative(cwd, path.join(sessionDir, `${options.session}-verdict.json`)),
+	});
 }

@@ -75,11 +75,7 @@ export function parseGitRemotes(remoteV: string): Remote[] {
 // - bare number        → only when exactly ONE github remote exists; else error.
 // - explicitOverride   → that remote must exist and (when owner/repo known) match; a
 //   mismatch is an error, never a silent trust of the override.
-export function matchRemote(
-	remotes: Remote[],
-	target: PrTarget,
-	explicitOverride?: string,
-): Parsed<RemoteMatch> {
+export function matchRemote(remotes: Remote[], target: PrTarget, explicitOverride?: string): Parsed<RemoteMatch> {
 	const asMatch = (r: Remote): RemoteMatch => ({ remote: r.name, host: r.host, owner: r.owner, repo: r.repo });
 	const sameRepo = (r: Remote) =>
 		target.owner != null &&
@@ -91,7 +87,10 @@ export function matchRemote(
 		const r = remotes.find((x) => x.name === explicitOverride);
 		if (!r) return { ok: false, error: `remote "${explicitOverride}" not found` };
 		if (target.owner != null && !sameRepo(r)) {
-			return { ok: false, error: `remote "${explicitOverride}" points at ${r.owner}/${r.repo}, not the PR base ${target.owner}/${target.repo}` };
+			return {
+				ok: false,
+				error: `remote "${explicitOverride}" points at ${r.owner}/${r.repo}, not the PR base ${target.owner}/${target.repo}`,
+			};
 		}
 		return { ok: true, value: asMatch(r) };
 	}
@@ -99,13 +98,26 @@ export function matchRemote(
 	if (target.owner != null && target.repo != null) {
 		const matches = remotes.filter(sameRepo);
 		const names = [...new Set(matches.map((m) => m.name))];
-		if (names.length === 0) return { ok: false, error: `no remote points at the PR base ${target.owner}/${target.repo}; pass --remote <name>` };
-		if (names.length > 1) return { ok: false, error: `multiple remotes point at ${target.owner}/${target.repo} (${names.join(", ")}); pass --remote <name>` };
+		if (names.length === 0)
+			return {
+				ok: false,
+				error: `no remote points at the PR base ${target.owner}/${target.repo}; pass --remote <name>`,
+			};
+		if (names.length > 1)
+			return {
+				ok: false,
+				error: `multiple remotes point at ${target.owner}/${target.repo} (${names.join(", ")}); pass --remote <name>`,
+			};
 		return { ok: true, value: asMatch(matches[0]) };
 	}
 
 	// bare number
-	if (remotes.length === 0) return { ok: false, error: "no github remote found; pass owner/repo#<n> and --remote <name>" };
-	if (remotes.length > 1) return { ok: false, error: `bare PR number is ambiguous across ${remotes.length} remotes; use owner/repo#<n> or --remote <name>` };
+	if (remotes.length === 0)
+		return { ok: false, error: "no github remote found; pass owner/repo#<n> and --remote <name>" };
+	if (remotes.length > 1)
+		return {
+			ok: false,
+			error: `bare PR number is ambiguous across ${remotes.length} remotes; use owner/repo#<n> or --remote <name>`,
+		};
 	return { ok: true, value: asMatch(remotes[0]) };
 }

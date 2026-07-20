@@ -70,13 +70,19 @@ function topDir(path: string): string {
 function exportSymbols(line: string): string[] {
 	const out: string[] = [];
 	// export function/const/class/interface/type/enum NAME
-	const decl = line.match(/export\s+(?:async\s+)?(?:default\s+)?(?:function|const|let|var|class|interface|type|enum)\s+([A-Za-z0-9_$]+)/);
+	const decl = line.match(
+		/export\s+(?:async\s+)?(?:default\s+)?(?:function|const|let|var|class|interface|type|enum)\s+([A-Za-z0-9_$]+)/,
+	);
 	if (decl) out.push(decl[1]);
 	// export { A, B as C }
 	const named = line.match(/export\s*\{([^}]+)\}/);
 	if (named) {
 		for (const part of named[1].split(",")) {
-			const name = part.trim().split(/\s+as\s+/i).pop()?.trim();
+			const name = part
+				.trim()
+				.split(/\s+as\s+/i)
+				.pop()
+				?.trim();
 			if (name && /^[A-Za-z0-9_$]+$/.test(name)) out.push(name);
 		}
 	}
@@ -134,7 +140,8 @@ export function deriveImpactFromDiff(diffText: string): ImpactMap {
 	for (const f of files) {
 		if (!f.deleted && !f.renamedFrom) continue;
 		if (f.kind === "test" || f.kind === "docs" || f.kind === "lockfile") continue;
-		if (f.deleted) removedOrRenamed.push({ file: f.path, symbol: f.kind === "source" ? "<file deleted>" : "<config/file deleted>" });
+		if (f.deleted)
+			removedOrRenamed.push({ file: f.path, symbol: f.kind === "source" ? "<file deleted>" : "<config/file deleted>" });
 		if (f.renamedFrom) removedOrRenamed.push({ file: f.renamedFrom, symbol: `<renamed → ${f.path}>` });
 		if (f.kind === "source") sourceRemovals++;
 	}
@@ -143,14 +150,18 @@ export function deriveImpactFromDiff(diffText: string): ImpactMap {
 	const productionDirs = [...new Set(sourceFiles.map((f) => topDir(f.path)))].sort();
 	if (changedExports.length > 0 || sourceRemovals > 0) riskFlags.add("PUBLIC_API");
 	// New util/lib/helper source file → prior-art search warranted.
-	if (sourceFiles.some((f) => !f.deleted && /(^|\/)(lib|utils?|helpers?|shared|common)(\/|[.-])/i.test(f.path))) riskFlags.add("ABSTRACTION");
+	if (sourceFiles.some((f) => !f.deleted && /(^|\/)(lib|utils?|helpers?|shared|common)(\/|[.-])/i.test(f.path)))
+		riskFlags.add("ABSTRACTION");
 
-	const searchTerms = [...new Set([...changedExports, ...removedOrRenamed].map((s) => s.symbol).filter((s) => /^[A-Za-z0-9_$]+$/.test(s)))];
+	const searchTerms = [
+		...new Set([...changedExports, ...removedOrRenamed].map((s) => s.symbol).filter((s) => /^[A-Za-z0-9_$]+$/.test(s))),
+	];
 
 	// ── scout escalation ──────────────────────────────────────────────────────
 	const scoutReasons: string[] = [];
 	if (removedOrRenamed.length > 0) scoutReasons.push("public symbol / file / config removed or renamed");
-	for (const flag of ["AUTH", "PAYMENT", "DATA_MODEL", "CONCURRENCY"]) if (riskFlags.has(flag)) scoutReasons.push(`touches ${flag}`);
+	for (const flag of ["AUTH", "PAYMENT", "DATA_MODEL", "CONCURRENCY"])
+		if (riskFlags.has(flag)) scoutReasons.push(`touches ${flag}`);
 	if (productionDirs.length >= 3) scoutReasons.push(`spans ${productionDirs.length} production directories`);
 	if (sourceFiles.length >= 5) scoutReasons.push(`${sourceFiles.length} source files changed`);
 	if (riskFlags.has("ABSTRACTION")) scoutReasons.push("introduces a utility/abstraction (prior-art search)");

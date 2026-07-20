@@ -19,7 +19,10 @@ import type { EvidenceEvent, EvidenceLevel } from "../../review/schema.js";
 // Canonicalize a read target so CLI (relative-normalized) and hook (raw command
 // token) representations of the same file corroborate: drop a leading "./" and any
 // trailing slash. Fail-safe either way (a mismatch only ever downgrades to attested).
-const normTarget = (t: unknown): string => String(t ?? "").replace(/^\.\//, "").replace(/\/+$/, "");
+const normTarget = (t: unknown): string =>
+	String(t ?? "")
+		.replace(/^\.\//, "")
+		.replace(/\/+$/, "");
 
 export interface CoverageGap {
 	type: "reviewer-never-launched" | "brief-never-read" | "diff-never-opened" | "required-read-missing";
@@ -53,7 +56,11 @@ function readJsonl(file: string): EvidenceEvent[] {
 		.split("\n")
 		.filter(Boolean)
 		.flatMap((line) => {
-			try { return [JSON.parse(line) as EvidenceEvent]; } catch { return []; }
+			try {
+				return [JSON.parse(line) as EvidenceEvent];
+			} catch {
+				return [];
+			}
 		});
 }
 
@@ -64,17 +71,33 @@ export async function reviewCoverage(options: CoverageOptions): Promise<Coverage
 		if (options.silent) return r;
 		if (options.json) console.log(JSON.stringify(r, null, 2));
 		else if (r.error) console.error(`✗ ${r.error}`);
-		else console.log(`${r.complete ? "✓" : "✗"} coverage ${r.complete ? "complete" : "INCOMPLETE"} · level=${r.evidenceLevel} · ${r.gaps.length} gap(s)`);
+		else
+			console.log(
+				`${r.complete ? "✓" : "✗"} coverage ${r.complete ? "complete" : "INCOMPLETE"} · level=${r.evidenceLevel} · ${r.gaps.length} gap(s)`,
+			);
 		if (!r.complete) process.exitCode = 1;
 		return r;
 	};
 	const bail = (error: string): CoverageReport =>
-		emit({ ok: false, session: options.session, evidenceLevel: "attested", complete: false, approveEligible: false, gaps: [], error });
+		emit({
+			ok: false,
+			session: options.session,
+			evidenceLevel: "attested",
+			complete: false,
+			approveEligible: false,
+			gaps: [],
+			error,
+		});
 
 	const impactPath = path.join(sessionDir, "impact-map.json");
-	if (!fs.existsSync(impactPath)) return bail(`no impact-map.json in ${path.relative(cwd, sessionDir)} (run 'mewkit review prepare' first)`);
+	if (!fs.existsSync(impactPath))
+		return bail(`no impact-map.json in ${path.relative(cwd, sessionDir)} (run 'mewkit review prepare' first)`);
 	let impact: ImpactMap;
-	try { impact = JSON.parse(fs.readFileSync(impactPath, "utf-8")); } catch (e) { return bail(`cannot read impact-map.json: ${(e as Error).message}`); }
+	try {
+		impact = JSON.parse(fs.readFileSync(impactPath, "utf-8"));
+	} catch (e) {
+		return bail(`cannot read impact-map.json: ${(e as Error).message}`);
+	}
 
 	// Defensive defaults so a pre-Phase-5 impact map (no stats/changedFiles) still
 	// yields a roster (selects the small tier) rather than crashing.
@@ -100,7 +123,12 @@ export async function reviewCoverage(options: CoverageOptions): Promise<Coverage
 		for (const target of entry.expectedReads) {
 			requiredReads.push(target);
 			if (!readTargets.has(target)) {
-				const type: CoverageGap["type"] = target === "diff.patch" ? "diff-never-opened" : target.startsWith("briefs/") ? "brief-never-read" : "required-read-missing";
+				const type: CoverageGap["type"] =
+					target === "diff.patch"
+						? "diff-never-opened"
+						: target.startsWith("briefs/")
+							? "brief-never-read"
+							: "required-read-missing";
 				gaps.push({ type, reviewer: entry.id, target });
 			}
 		}
@@ -110,9 +138,17 @@ export async function reviewCoverage(options: CoverageOptions): Promise<Coverage
 	// via the CLI is corroborated by a hook-tagged event (driving-session Bash). Any
 	// missing corroboration → attested (Phase 6 caps Approve).
 	const performedRequired = cli.filter((e) => e.kind === "read" && requiredReads.includes(String(e.target)));
-	const allCorroborated = performedRequired.length > 0 && performedRequired.every((e) => hookTargets.has(normTarget(e.target)));
+	const allCorroborated =
+		performedRequired.length > 0 && performedRequired.every((e) => hookTargets.has(normTarget(e.target)));
 	const evidenceLevel: EvidenceLevel = allCorroborated ? "session-observed" : "attested";
 
 	const complete = gaps.length === 0;
-	return emit({ ok: complete, session: options.session, evidenceLevel, complete, approveEligible: complete && evidenceLevel === "session-observed", gaps });
+	return emit({
+		ok: complete,
+		session: options.session,
+		evidenceLevel,
+		complete,
+		approveEligible: complete && evidenceLevel === "session-observed",
+		gaps,
+	});
 }

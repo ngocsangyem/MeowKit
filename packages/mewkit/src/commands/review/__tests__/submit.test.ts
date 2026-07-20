@@ -31,7 +31,10 @@ beforeEach(() => {
 	fs.writeFileSync(path.join(sessionDir, "submit-payload.json"), JSON.stringify(PAYLOAD));
 	calls = [];
 });
-afterEach(() => { fs.rmSync(cwd, { recursive: true, force: true }); process.exitCode = 0; });
+afterEach(() => {
+	fs.rmSync(cwd, { recursive: true, force: true });
+	process.exitCode = 0;
+});
 
 describe("reviewSubmit — write guards", () => {
 	it("refuses without --reply (no write authority)", async () => {
@@ -48,13 +51,27 @@ describe("reviewSubmit — write guards", () => {
 	});
 
 	it("refuses a stale/wrong confirmation hash", async () => {
-		const r = await reviewSubmit({ session: SESSION, reply: true, confirm: "wronghash", cwd, json: true, deps: { exec: fakeExec() } });
+		const r = await reviewSubmit({
+			session: SESSION,
+			reply: true,
+			confirm: "wronghash",
+			cwd,
+			json: true,
+			deps: { exec: fakeExec() },
+		});
 		expect(r.ok).toBe(false);
 		expect(calls).toHaveLength(0); // never re-fetches / posts
 	});
 
 	it("posts exactly one review with the correct event flag when authorized", async () => {
-		const r = await reviewSubmit({ session: SESSION, reply: true, confirm: HASH, cwd, json: true, deps: { exec: fakeExec() } });
+		const r = await reviewSubmit({
+			session: SESSION,
+			reply: true,
+			confirm: HASH,
+			cwd,
+			json: true,
+			deps: { exec: fakeExec() },
+		});
 		expect(r).toMatchObject({ ok: true, posted: true });
 		const review = calls.find((c) => c[1] === "pr" && c[2] === "review");
 		expect(review).toContain("--approve");
@@ -62,7 +79,14 @@ describe("reviewSubmit — write guards", () => {
 	});
 
 	it("aborts WITHOUT posting when the PR head changed since prepare", async () => {
-		const r = await reviewSubmit({ session: SESSION, reply: true, confirm: HASH, cwd, json: true, deps: { exec: fakeExec("b".repeat(40)) } });
+		const r = await reviewSubmit({
+			session: SESSION,
+			reply: true,
+			confirm: HASH,
+			cwd,
+			json: true,
+			deps: { exec: fakeExec("b".repeat(40)) },
+		});
 		expect(r.ok).toBe(false);
 		expect(r.error).toMatch(/head changed/);
 		expect(calls.some((c) => c[1] === "pr" && c[2] === "review")).toBe(false); // no post
@@ -72,7 +96,14 @@ describe("reviewSubmit — write guards", () => {
 	it("is idempotent — a second submit does not double-post", async () => {
 		await reviewSubmit({ session: SESSION, reply: true, confirm: HASH, cwd, json: true, deps: { exec: fakeExec() } });
 		calls = [];
-		const r2 = await reviewSubmit({ session: SESSION, reply: true, confirm: HASH, cwd, json: true, deps: { exec: fakeExec() } });
+		const r2 = await reviewSubmit({
+			session: SESSION,
+			reply: true,
+			confirm: HASH,
+			cwd,
+			json: true,
+			deps: { exec: fakeExec() },
+		});
 		expect(r2.alreadyPosted).toBe(true);
 		expect(calls.some((c) => c[1] === "pr" && c[2] === "review")).toBe(false);
 	});

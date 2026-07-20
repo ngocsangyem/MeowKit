@@ -30,13 +30,30 @@ beforeEach(() => {
 	fs.writeFileSync(path.join(sessionDir, "impact-map.json"), JSON.stringify(IMPACT));
 	fs.writeFileSync(path.join(sessionDir, "diff.patch"), "diff\n");
 	writeRoster(sessionDir, buildRoster(IMPACT), SESSION); // materializes briefs/*.md
-	fs.writeFileSync(path.join(sessionDir, "manifest.json"), JSON.stringify({
-		schemaVersion: "1.0.0", session: SESSION, nonce: "n", worktreePath: `.worktrees/review-pr-7-${SESSION}`,
-		pr: 7, ref: `refs/mewkit/review-pr-7-${SESSION}`, headSha: "h".repeat(40), baseSha: "b".repeat(40),
-		baseBranch: "main", baseRemote: "origin", host: "github", owner: "o", repo: "r", createdAt: "t",
-	}));
+	fs.writeFileSync(
+		path.join(sessionDir, "manifest.json"),
+		JSON.stringify({
+			schemaVersion: "1.0.0",
+			session: SESSION,
+			nonce: "n",
+			worktreePath: `.worktrees/review-pr-7-${SESSION}`,
+			pr: 7,
+			ref: `refs/mewkit/review-pr-7-${SESSION}`,
+			headSha: "h".repeat(40),
+			baseSha: "b".repeat(40),
+			baseBranch: "main",
+			baseRemote: "origin",
+			host: "github",
+			owner: "o",
+			repo: "r",
+			createdAt: "t",
+		}),
+	);
 });
-afterEach(() => { fs.rmSync(cwd, { recursive: true, force: true }); process.exitCode = 0; });
+afterEach(() => {
+	fs.rmSync(cwd, { recursive: true, force: true });
+	process.exitCode = 0;
+});
 
 // Fire the REAL dispatcher exactly as Claude Code would for a Bash PostToolUse.
 function fireBashHook(command: string) {
@@ -47,7 +64,8 @@ function fireBashHook(command: string) {
 	});
 }
 
-const assignedReads = () => buildRoster(IMPACT).entries.flatMap((e) => e.expectedReads.map((t) => ({ as: e.id, target: t })));
+const assignedReads = () =>
+	buildRoster(IMPACT).entries.flatMap((e) => e.expectedReads.map((t) => ({ as: e.id, target: t })));
 
 describe("live-capture evidence chain (real dispatcher)", () => {
 	it("every roster read done via CLI + real hook tag → coverage session-observed & approve-eligible", async () => {

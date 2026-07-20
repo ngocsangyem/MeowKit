@@ -355,7 +355,9 @@ async function main(): Promise<void> {
 					json: args.json as boolean | undefined,
 				});
 			} else {
-				console.error(`Unknown review subcommand "${sub ?? ""}". Available: prepare, read, coverage, compose, submit, cleanup`);
+				console.error(
+					`Unknown review subcommand "${sub ?? ""}". Available: prepare, read, coverage, compose, submit, cleanup`,
+				);
 				process.exit(1);
 			}
 			break;

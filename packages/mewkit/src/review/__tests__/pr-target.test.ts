@@ -13,7 +13,10 @@ describe("parsePrTarget", () => {
 	});
 
 	it("parses owner/repo#123", () => {
-		expect(parsePrTarget("acme/widget#123")).toEqual({ ok: true, value: { host: "github", owner: "acme", repo: "widget", pr: 123 } });
+		expect(parsePrTarget("acme/widget#123")).toEqual({
+			ok: true,
+			value: { host: "github", owner: "acme", repo: "widget", pr: 123 },
+		});
 	});
 
 	it("parses a bare number and a #-prefixed number without owner/repo", () => {

@@ -28,12 +28,14 @@ export interface ComputedVerdict {
 
 export function computeVerdict(input: VerdictInput): ComputedVerdict {
 	// Hard block: a confirmed Critical finding is the top of the table.
-	if (input.confirmedCritical) return { decision: "BLOCKED", event: "REQUEST_CHANGES", reasons: ["confirmed Critical finding"] };
+	if (input.confirmedCritical)
+		return { decision: "BLOCKED", event: "REQUEST_CHANGES", reasons: ["confirmed Critical finding"] };
 
 	// Risk states — each caps the outcome below Approve/PASS to Comment/PASS_WITH_RISK.
 	const reasons: string[] = [];
 	if (!input.coverageComplete) reasons.push("incomplete reviewer coverage");
-	if (input.evidenceLevel !== "session-observed") reasons.push(`evidence level: ${input.evidenceLevel} — Approve unavailable`);
+	if (input.evidenceLevel !== "session-observed")
+		reasons.push(`evidence level: ${input.evidenceLevel} — Approve unavailable`);
 	if (input.ciRed) reasons.push("CI red");
 	if (input.ciAllSkipped) reasons.push("all CI checks skipped");
 	for (const c of input.contextUnavailable) reasons.push(`context unavailable: ${c}`);

@@ -41,12 +41,14 @@ export async function reviewRead(options: ReadOptions): Promise<ReadResult> {
 		return { ok: false, error };
 	};
 
-	if (!options.session || options.session.includes("..") || !SESSION_RE.test(options.session)) return fail(`invalid --session "${options.session}"`);
+	if (!options.session || options.session.includes("..") || !SESSION_RE.test(options.session))
+		return fail(`invalid --session "${options.session}"`);
 	if (!options.as || !SESSION_RE.test(options.as)) return fail(`invalid --as reviewer id "${options.as}"`);
 	if (!options.target) return fail("a <path> to read is required");
 
 	const sessionDir = path.join(cwd, "tasks", "reviews", options.session);
-	if (!fs.existsSync(path.join(sessionDir, "manifest.json"))) return fail(`no review session at ${path.relative(cwd, sessionDir)}`);
+	if (!fs.existsSync(path.join(sessionDir, "manifest.json")))
+		return fail(`no review session at ${path.relative(cwd, sessionDir)}`);
 
 	// Resolve the worktree root from the manifest (validated) for the source-read root.
 	let worktreeAbs: string | null = null;
@@ -83,14 +85,24 @@ export async function reviewRead(options: ReadOptions): Promise<ReadResult> {
 		loggedTarget = path.relative(realRoot, real);
 		break;
 	}
-	if (!resolved || loggedTarget == null) return fail(`"${options.target}" not found inside the session dir or review worktree (reads are confined to those roots; symlinks may not escape them)`);
+	if (!resolved || loggedTarget == null)
+		return fail(
+			`"${options.target}" not found inside the session dir or review worktree (reads are confined to those roots; symlinks may not escape them)`,
+		);
 
 	const content = fs.readFileSync(resolved, "utf-8");
 	process.stdout.write(content);
 
 	// Append the CLI evidence receipt (best-effort; a logging failure must not hide the read).
 	try {
-		const event = { session: options.session, kind: "read", target: loggedTarget, at: now, reviewer: options.as, source: "cli" as const };
+		const event = {
+			session: options.session,
+			kind: "read",
+			target: loggedTarget,
+			at: now,
+			reviewer: options.as,
+			source: "cli" as const,
+		};
 		fs.appendFileSync(path.join(sessionDir, "evidence.jsonl"), `${JSON.stringify(event)}\n`);
 	} catch (e) {
 		console.error(`⚠ evidence not recorded: ${(e as Error).message}`);

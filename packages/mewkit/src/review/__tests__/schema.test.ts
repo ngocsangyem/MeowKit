@@ -109,9 +109,7 @@ describe("VerdictStateSchema", () => {
 	});
 
 	it("rejects a decision-level WARN", () => {
-		expect(
-			VerdictStateSchema.safeParse({ decision: "WARN", dimensions: [] }).success,
-		).toBe(false);
+		expect(VerdictStateSchema.safeParse({ decision: "WARN", dimensions: [] }).success).toBe(false);
 	});
 });
 
@@ -138,7 +136,18 @@ describe("worktree.cjs manifest ↔ schema parity", () => {
 	it("dry-run manifest parses under ReviewManifestSchema", () => {
 		const out = execFileSync(
 			"node",
-			[WORKTREE_CJS, "review-pr", "--pr", "7", "--remote", "origin", "--session", "parity-check", "--dry-run", "--json"],
+			[
+				WORKTREE_CJS,
+				"review-pr",
+				"--pr",
+				"7",
+				"--remote",
+				"origin",
+				"--session",
+				"parity-check",
+				"--dry-run",
+				"--json",
+			],
 			{ cwd: REPO_ROOT, encoding: "utf-8" },
 		);
 		const parsed = JSON.parse(out);

@@ -10,8 +10,16 @@ import path from "node:path";
 
 type Exec = (file: string, args: string[], cwd?: string) => { ok: boolean; out: string; err: string };
 const realExec: Exec = (file, args, cwd) => {
-	try { return { ok: true, out: execFileSync(file, args, { cwd, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).toString(), err: "" }; }
-	catch (e) { const x = e as { stdout?: Buffer; stderr?: Buffer; message?: string }; return { ok: false, out: x.stdout?.toString() ?? "", err: x.stderr?.toString() ?? x.message ?? "exec failed" }; }
+	try {
+		return {
+			ok: true,
+			out: execFileSync(file, args, { cwd, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).toString(),
+			err: "",
+		};
+	} catch (e) {
+		const x = e as { stdout?: Buffer; stderr?: Buffer; message?: string };
+		return { ok: false, out: x.stdout?.toString() ?? "", err: x.stderr?.toString() ?? x.message ?? "exec failed" };
+	}
 };
 
 export interface CleanupOptions {
@@ -40,9 +48,11 @@ export async function reviewCleanup(options: CleanupOptions): Promise<CleanupRes
 		return r;
 	};
 
-	if (!fs.existsSync(manifestPath)) return emit({ ok: false, error: `no review session at ${path.relative(cwd, sessionDir)}` });
+	if (!fs.existsSync(manifestPath))
+		return emit({ ok: false, error: `no review session at ${path.relative(cwd, sessionDir)}` });
 
-	const worktreeScript = options.deps?.worktreeScript ?? path.join(cwd, ".claude", "skills", "worktree", "scripts", "worktree.cjs");
+	const worktreeScript =
+		options.deps?.worktreeScript ?? path.join(cwd, ".claude", "skills", "worktree", "scripts", "worktree.cjs");
 	const rel = path.relative(cwd, manifestPath);
 	const res = exec("node", [worktreeScript, "review-pr-cleanup", "--manifest", rel, "--json"], cwd);
 	if (!res.ok) return emit({ ok: false, error: `worktree cleanup refused/failed: ${res.err || res.out}` });

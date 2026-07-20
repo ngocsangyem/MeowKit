@@ -17,17 +17,40 @@ beforeEach(() => {
 	fs.mkdirSync(path.join(worktreeDir, "src"), { recursive: true });
 	fs.writeFileSync(path.join(sessionDir, "diff.patch"), "the diff\n");
 	fs.writeFileSync(path.join(worktreeDir, "src", "a.ts"), "source\n");
-	fs.writeFileSync(path.join(sessionDir, "manifest.json"), JSON.stringify({
-		schemaVersion: "1.0.0", session: SESSION, nonce: "n", worktreePath: `.worktrees/review-pr-7-${SESSION}`,
-		pr: 7, ref: `refs/mewkit/review-pr-7-${SESSION}`, headSha: "h".repeat(40), baseSha: "b".repeat(40),
-		baseBranch: "main", baseRemote: "origin", host: "github", owner: "o", repo: "r", createdAt: "t",
-	}));
+	fs.writeFileSync(
+		path.join(sessionDir, "manifest.json"),
+		JSON.stringify({
+			schemaVersion: "1.0.0",
+			session: SESSION,
+			nonce: "n",
+			worktreePath: `.worktrees/review-pr-7-${SESSION}`,
+			pr: 7,
+			ref: `refs/mewkit/review-pr-7-${SESSION}`,
+			headSha: "h".repeat(40),
+			baseSha: "b".repeat(40),
+			baseBranch: "main",
+			baseRemote: "origin",
+			host: "github",
+			owner: "o",
+			repo: "r",
+			createdAt: "t",
+		}),
+	);
 });
-afterEach(() => { fs.rmSync(cwd, { recursive: true, force: true }); process.exitCode = 0; });
+afterEach(() => {
+	fs.rmSync(cwd, { recursive: true, force: true });
+	process.exitCode = 0;
+});
 
 const evidence = () => {
 	const f = path.join(sessionDir, "evidence.jsonl");
-	return fs.existsSync(f) ? fs.readFileSync(f, "utf-8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
+	return fs.existsSync(f)
+		? fs
+				.readFileSync(f, "utf-8")
+				.split("\n")
+				.filter(Boolean)
+				.map((l) => JSON.parse(l))
+		: [];
 };
 
 describe("reviewRead", () => {
@@ -37,7 +60,13 @@ describe("reviewRead", () => {
 		expect(r.content).toBe("the diff\n");
 		const ev = evidence();
 		expect(ev).toHaveLength(1);
-		expect(ev[0]).toMatchObject({ session: SESSION, kind: "read", target: "diff.patch", reviewer: "correctness", source: "cli" });
+		expect(ev[0]).toMatchObject({
+			session: SESSION,
+			kind: "read",
+			target: "diff.patch",
+			reviewer: "correctness",
+			source: "cli",
+		});
 	});
 
 	it("reads a source file inside the review worktree", async () => {
