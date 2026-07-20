@@ -15,6 +15,13 @@ export default defineConfig({
 	},
 	test: {
 		fileParallelism: false,
+		// Many suites here spawn real subprocesses (hooks, python, git). Running tests
+		// within a file concurrently (vitest's default) bursts several subprocess-heavy
+		// tests at once, and under load the OS kills some (a hook returns exit `null`),
+		// which surfaces as a load-dependent flake. `fileParallelism: false` already
+		// serializes files; this serializes tests WITHIN a file too, so peak subprocess
+		// contention stays bounded. Determinism over raw speed for an integration suite.
+		maxConcurrency: 1,
 		// Integration tests here shell out to real hooks, python, git, and migrations,
 		// which legitimately take 6-30s (e.g. doctor-hard-gates already sets a 30000ms
 		// per-test timeout and passes at ~28s). Vitest's 5000ms default is too low for
