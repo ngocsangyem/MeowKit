@@ -10,6 +10,13 @@ export interface ChangedFile {
 	kind: "source" | "test" | "docs" | "config" | "lockfile" | "other";
 	deleted: boolean;
 	renamedFrom?: string;
+	added: number; // added lines in this file's hunks
+	removed: number; // removed lines
+}
+
+export interface DiffStats {
+	sourceChanged: number; // added+removed lines in source files (drives topology tier)
+	totalChanged: number; // added+removed lines across all files
 }
 
 export interface SymbolRef {
@@ -27,6 +34,7 @@ export interface ImpactMap {
 	searchTerms: string[]; // symbols to grep for callers/consumers/read-sites
 	scoutRequired: boolean;
 	scoutReasons: string[];
+	stats: DiffStats; // line counts for topology-tier selection (Phase 5)
 	// Populated by enrichWithSearches(); each maps a search term to cited hits.
 	callers?: { term: string; hits: string[] }[];
 }
@@ -88,7 +96,7 @@ export function deriveImpactFromDiff(diffText: string): ImpactMap {
 	for (const line of lines) {
 		const header = line.match(/^diff --git a\/(.+?) b\/(.+)$/);
 		if (header) {
-			cur = { path: header[2], kind: classify(header[2]), deleted: false };
+			cur = { path: header[2], kind: classify(header[2]), deleted: false, added: 0, removed: 0 };
 			files.push(cur);
 			continue;
 		}
@@ -100,6 +108,8 @@ export function deriveImpactFromDiff(diffText: string): ImpactMap {
 		const added = line.startsWith("+") && !line.startsWith("+++");
 		const removed = line.startsWith("-") && !line.startsWith("---");
 		if (!added && !removed) continue;
+		if (added) cur.added++;
+		else cur.removed++;
 		const content = line.slice(1);
 
 		// risk flags from changed content
@@ -148,6 +158,11 @@ export function deriveImpactFromDiff(diffText: string): ImpactMap {
 	const nonSource = files.every((f) => f.kind === "docs" || f.kind === "lockfile" || f.kind === "test");
 	const scoutRequired = !nonSource && scoutReasons.length > 0;
 
+	const stats: DiffStats = {
+		sourceChanged: sourceFiles.reduce((n, f) => n + f.added + f.removed, 0),
+		totalChanged: files.reduce((n, f) => n + f.added + f.removed, 0),
+	};
+
 	return {
 		changedFiles: files,
 		changedExports,
@@ -158,6 +173,7 @@ export function deriveImpactFromDiff(diffText: string): ImpactMap {
 		searchTerms,
 		scoutRequired,
 		scoutReasons,
+		stats,
 	};
 }
 

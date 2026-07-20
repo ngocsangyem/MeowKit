@@ -31,7 +31,9 @@ import { visualPlan } from "./commands/visual-plan.js";
 import { reviewPrepare } from "./commands/review/prepare.js";
 import { reviewRead } from "./commands/review/read.js";
 import { reviewCoverage } from "./commands/review/coverage.js";
-import type { ReviewTier } from "./review/roster.js";
+import { reviewCompose } from "./commands/review/compose.js";
+import { reviewSubmit } from "./commands/review/submit.js";
+import { reviewCleanup } from "./commands/review/cleanup.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -209,6 +211,7 @@ async function main(): Promise<void> {
 			"explain",
 			"write",
 			"record",
+			"reply",
 		],
 		string: [
 			"mode",
@@ -246,6 +249,7 @@ async function main(): Promise<void> {
 			"remote",
 			"as",
 			"tier",
+			"confirm",
 		],
 		alias: { h: "help", v: "version", y: "yes" },
 	});
@@ -331,11 +335,27 @@ async function main(): Promise<void> {
 			} else if (sub === "coverage") {
 				await reviewCoverage({
 					session: args.session as string,
-					tier: args.tier as ReviewTier | undefined,
+					json: args.json as boolean | undefined,
+				});
+			} else if (sub === "compose") {
+				await reviewCompose({
+					session: args.session as string,
+					json: args.json as boolean | undefined,
+				});
+			} else if (sub === "submit") {
+				await reviewSubmit({
+					session: args.session as string,
+					reply: args.reply as boolean | undefined,
+					confirm: args.confirm as string | undefined,
+					json: args.json as boolean | undefined,
+				});
+			} else if (sub === "cleanup") {
+				await reviewCleanup({
+					session: args.session as string,
 					json: args.json as boolean | undefined,
 				});
 			} else {
-				console.error(`Unknown review subcommand "${sub ?? ""}". Available: prepare, read, coverage`);
+				console.error(`Unknown review subcommand "${sub ?? ""}". Available: prepare, read, coverage, compose, submit, cleanup`);
 				process.exit(1);
 			}
 			break;

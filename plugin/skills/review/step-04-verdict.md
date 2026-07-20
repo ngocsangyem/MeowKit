@@ -12,6 +12,40 @@ Synthesize triaged findings into a 5-dimension verdict for Gate 2.
 | **Security** | No security findings | MINOR security notes | Any CRITICAL security issue |
 | **Coverage** | All ACs covered + tested | Partial AC coverage | Missing AC implementation |
 
+## Verification Layer (assured PR mode)
+
+Before finalizing the verdict, run this bounded verification against the session's
+immutable diff (`diff.patch`, hash-pinned) + the review worktree:
+
+1. **Batch verification.** Every **Critical** finding and every **low-confidence**
+   finding gets an independent verify pass (re-derive the failure against the diff +
+   worktree) before it may influence the verdict. Unverified Critical/low-confidence
+   findings do not count.
+2. **Bounded reverse audit — exactly ONE round.** After aggregation, run a single
+   adversarial re-check asking "what did the roster structurally miss?" New findings
+   from it go through the same batch verification. **No second round** — the reverse
+   audit never loops.
+3. **Build/test evidence.** Discover and run the relevant checks inside the session
+   worktree; attach `command + exit code + summary` to the session dir. A red or
+   unrun check is disclosed, never omitted.
+
+Each finding must carry: location (file:line), failure scenario, severity, confidence,
+and a suggested direction (the Phase 2 schema enforces this at `mewkit review compose`).
+
+## Compose (assured PR mode)
+
+For a `mewkit review prepare` session, DO NOT hand-write the verdict decision. Write
+findings to `tasks/reviews/<id>/findings.json` (each: location, failureScenario,
+severity, confidence, suggested direction; add a `snippet` for an inline anchor), then
+run `mewkit review compose --session <id>`. Compose is the mechanical gate: it verifies
+the immutable diff hash, re-runs coverage (refusing to emit a verdict on any gap),
+applies the deterministic cap table, resolves anchors by snippet, and writes the
+verdict proof bundle (`<id>-verdict.json`, embedding the coverage block + hash) plus a
+`SubmitPayload`. A `PASS` decision is emitted ONLY with complete, `session-observed`
+coverage; attested sessions cap at `PASS_WITH_RISK`. The composed decision is
+Gate-2-eligible only at `session-observed` — `gate2-check.sh` re-validates the embedded
+coverage block for review-session verdicts.
+
 ## Verdict Rules
 
 - **Any FAIL dimension** → Overall FAIL → Gate 2 blocks

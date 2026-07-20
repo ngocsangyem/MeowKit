@@ -41,6 +41,32 @@ PR ref → gh pr view / gh pr diff / gh pr checks → read changed files for con
 
 - `<#PR | URL>` — PR number (`123`) or full GitHub PR URL. Required.
 - `--reply` — opt-in. Post the verdict to GitHub via `gh pr review`. **Default writes nothing.**
+- `--assured` — opt-in. Run the full high-assurance ReviewSession pipeline instead of the
+  shallow lane (see below). Does NOT create a Gate 2 approval by itself.
+
+## Lanes
+
+- **Default (shallow):** the one-pass checklist below — read-only, fast. Unchanged.
+- **`--assured` (high-assurance ReviewSession):** run the deterministic pipeline:
+  1. `mewkit review prepare <pr> [--remote <name>]` → isolated SHA-bound worktree +
+     immutable hash-pinned diff + impact map + scope-driven roster/briefs.
+  2. Run the roster's reviewers; each reads its assigned artifacts through
+     `mewkit review read --session <id> --as <role> <path>` (so coverage is observable).
+  3. `mewkit review coverage --session <id>` — STOP on any gap; it also reports the
+     `evidenceLevel` (attested vs session-observed).
+  4. `mewkit review compose --session <id>` — the mechanical gate: verifies the diff
+     hash, re-runs coverage, applies the deterministic cap table, resolves inline
+     anchors by snippet, and emits the verdict proof bundle + a `SubmitPayload`.
+     **It cannot emit a PASS/Approve without complete, session-observed coverage.**
+  5. `mewkit review cleanup --session <id>` when done (removes only the worktree; the
+     session dir stays as the audit trail).
+- **`--reply` (the only write authority):** after `--assured` compose, show the composed
+  body, obtain an **immediate interactive user confirmation** (AskUserQuestion — an
+  agent-written `--reply` is NOT proof of user intent), then run
+  `mewkit review submit --session <id> --reply --confirm <payload-hash>`. Submit
+  re-fetches the PR head SHA and aborts without posting if it changed, and is idempotent
+  (never double-posts). On a host without interactive confirmation, submit is
+  unavailable and the run stays review-only. `--fix`, commit, and push remain out of scope.
 
 ## Data Boundary (NON-NEGOTIABLE)
 

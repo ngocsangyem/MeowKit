@@ -263,6 +263,21 @@ if [ -n "$EVIDENCE" ] && [ -f "$EVIDENCE_VALIDATOR" ] && command -v node >/dev/n
   fi
 fi
 
+# Review-session narrow extension: if the verdict's sibling JSON is a review-session
+# proof bundle (has a `review_session` field), its embedded coverage block must exist,
+# hash clean, report no gaps, and — for a PASS — be session-observed. Inert for normal
+# verdicts. This couples coverage→verdict at the gate, not only in compose.
+REVIEW_COV_VALIDATOR=".claude/scripts/validate-review-coverage.cjs"
+VERDICT_JSON="${VERDICT%.md}.json"
+if [ -f "$VERDICT_JSON" ] && [ -f "$REVIEW_COV_VALIDATOR" ] && command -v node >/dev/null 2>&1; then
+  if ! RC_OUT=$(node "$REVIEW_COV_VALIDATOR" "$VERDICT_JSON" 2>&1); then
+    block \
+      "Review-session verdict is contradicted by its embedded coverage block:" \
+      "  $RC_OUT" \
+      "Fix: complete coverage (session-observed for PASS) and recompose with 'mewkit review compose'."
+  fi
+fi
+
 # ---------------------------------------------------------------------------
 # 5. Revision binding — HARD BLOCK (anti-accidental)
 # ---------------------------------------------------------------------------

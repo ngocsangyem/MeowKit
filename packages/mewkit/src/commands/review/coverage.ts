@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { ImpactMap } from "../../review/impact-map.js";
-import { buildRoster, type ReviewTier } from "../../review/roster.js";
+import { buildRoster } from "../../review/roster.js";
 import type { EvidenceEvent, EvidenceLevel } from "../../review/schema.js";
 
 // `mewkit review coverage --session <id>` — compare the REQUIRED roster (rebuilt
@@ -39,9 +39,11 @@ export interface CoverageReport {
 
 export interface CoverageOptions {
 	session: string;
-	tier?: ReviewTier;
 	cwd?: string;
 	json?: boolean;
+	// When called as a sub-step (e.g. by compose), suppress all console output and the
+	// process.exitCode side effect so the caller owns its own I/O and exit semantics.
+	silent?: boolean;
 }
 
 function readJsonl(file: string): EvidenceEvent[] {
@@ -59,6 +61,7 @@ export async function reviewCoverage(options: CoverageOptions): Promise<Coverage
 	const cwd = options.cwd ?? process.cwd();
 	const sessionDir = path.join(cwd, "tasks", "reviews", options.session);
 	const emit = (r: CoverageReport): CoverageReport => {
+		if (options.silent) return r;
 		if (options.json) console.log(JSON.stringify(r, null, 2));
 		else if (r.error) console.error(`✗ ${r.error}`);
 		else console.log(`${r.complete ? "✓" : "✗"} coverage ${r.complete ? "complete" : "INCOMPLETE"} · level=${r.evidenceLevel} · ${r.gaps.length} gap(s)`);
@@ -73,7 +76,14 @@ export async function reviewCoverage(options: CoverageOptions): Promise<Coverage
 	let impact: ImpactMap;
 	try { impact = JSON.parse(fs.readFileSync(impactPath, "utf-8")); } catch (e) { return bail(`cannot read impact-map.json: ${(e as Error).message}`); }
 
-	const roster = buildRoster(impact, options.tier ?? "minimal");
+	// Defensive defaults so a pre-Phase-5 impact map (no stats/changedFiles) still
+	// yields a roster (selects the small tier) rather than crashing.
+	if (!impact.stats) impact.stats = { sourceChanged: 0, totalChanged: 0 };
+	if (!impact.changedFiles) impact.changedFiles = [];
+	// Always recompute the tier from the persisted impact.stats — the same input
+	// `prepare` used — so coverage checks the SAME roster reviewers actually received.
+	// No tier override: a mismatched override would gate against the wrong roster.
+	const roster = buildRoster(impact);
 	const cli = readJsonl(path.join(sessionDir, "evidence.jsonl")).filter((e) => e.source !== "hook");
 	const hook = readJsonl(path.join(sessionDir, "hook-evidence.jsonl"));
 	const hookTargets = new Set(hook.filter((e) => e.kind === "read").map((e) => normTarget(e.target)));

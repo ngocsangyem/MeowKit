@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { deriveImpactFromDiff, enrichWithSearches } from "../../review/impact-map.js";
 import { matchRemote, parseGitRemotes, parsePrTarget } from "../../review/pr-target.js";
+import { buildRoster, writeRoster } from "../../review/roster.js";
 import { safeParseReviewManifest } from "../../review/schema.js";
 
 // `mewkit review prepare <pr>` — parse target → match the PR BASE remote → provision
@@ -131,6 +132,11 @@ export async function reviewPrepare(options: PrepareOptions): Promise<PrepareRes
 			.slice(0, 20);
 	});
 	writeJson(path.join(sessionDir, "impact-map.json"), impact);
+
+	// Scope-driven roster + one brief per reviewer (Phase 5). Briefs instruct each
+	// reviewer to read its assigned artifacts through `mewkit review read` so coverage
+	// is observable; coverage rebuilds the roster deterministically as source of truth.
+	writeRoster(sessionDir, buildRoster(impact), session);
 
 	// 6. Augment + re-validate + persist the manifest (tamper-evident diff hash).
 	manifest.diffSha256 = diffSha256;
