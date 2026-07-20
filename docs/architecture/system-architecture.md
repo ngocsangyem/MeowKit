@@ -88,3 +88,38 @@ Long-term, gated, FTS-searchable project knowledge, built on clean layering unde
 **Anti-self-poisoning core:** external content and agent output are DATA. An agent can only propose a `WikiCandidate` — whether via `propose`, `research`, or `handoff` — never write a canonical page; canonical pages are written only via human `approve`, which always re-runs the scanner. The chokepoint is type-enforced (`ApprovedWrite` private constructor, minted only on a clean multi-pass verdict bound to scrubbed content). Recall (`context`) is read-only and DATA-bounded by `rules/wiki-context-rules.md`: wiki content never overrides rules or instructions, and the probe fails open when no index exists.
 
 **Persistence:** canonical files in `tasks/wikis/<slug>/` (wiki.json, pages/*.md, sources/claims/candidates/interventions/seeds/**handoffs** JSONL) are the source of truth; `.claude/memory/wiki-index.db` (SCHEMA_VERSION 4 — trace + cost + wiki tables + FTS5, the additive v3 `wiki_handoff` + `wiki_candidate_source` relation, and the additive v4 `trace_events.task_id` + `plan_path` columns for task-joined queries) is derived and fully rebuildable via `mewkit wiki reindex` / `mewkit index`.
+
+## High-assurance PR review pipeline (`src/review/`, `src/commands/review/`)
+
+The `mewkit review *` command group + the `mk:review-pr --assured` lane run a
+deterministic, evidence-gated PR review as a `ReviewSession` under
+`tasks/reviews/<session>/`. All git/gh calls use array-argv `execFileSync` (no shell).
+
+- **`review/schema.ts`** — canonical Zod contract (ReviewSession, ReviewManifest,
+  EvidenceEvent, Finding, VerdictState, SubmitPayload); `ref`/`worktreePath` are
+  regex-pinned to the `review-pr-` namespace. **`review/pr-target.ts`** parses a PR
+  target and selects the BASE-repo remote (fork-safe, never guesses). **`review/impact-map.ts`**
+  derives a deterministic, diff-scoped impact map + scout-escalation. **`review/roster.ts`**
+  selects a scope-driven topology (small/medium/large tiers, whole-diff roles that
+  per-chunk territory reviewers cannot own, heavy-file invariant slices).
+  **`review/verdict.ts`** is the pure cap table; **`review/anchors.ts`** resolves inline
+  comment anchors by snippet, never by agent-reported line number.
+- **`commands/review/`** — `prepare` (isolated SHA-bound worktree via
+  `worktree.cjs review-pr` + immutable hash-pinned diff + `untrusted/` quarantine +
+  roster/briefs), `read` (path-confined evidence-recording wrapper), `coverage`
+  (roster ∩ evidence gap gate + evidence level), `compose` (the mechanical gate: verify
+  diff hash → re-run coverage → cap table → anchors → verdict-gate-compatible proof
+  bundle + SubmitPayload; a PASS is impossible without complete, session-observed
+  coverage), `submit` (the sole GitHub write — `--reply` + payload-hash-bound
+  confirmation + head-SHA recheck + idempotency), `cleanup` (manifest-owned worktree
+  removal; keeps the session audit trail).
+- **Worktree safety** (`.claude/skills/worktree/scripts/lib/worktree-review-pr.cjs`):
+  a review worktree is detached and owned by a manifest nonce; cleanup removes only a
+  worktree whose in-worktree back-reference nonce matches — the user's checkout and
+  unrelated feature worktrees are provably untouchable.
+- **Evidence honesty:** subagent tool calls do not reach the parent PostToolUse
+  dispatcher and carry no agent id, so `session-observed` (Bash-hook-corroborated) is
+  anti-accidental, not unforgeable, and proves session-level (not individual-reviewer)
+  access; subagent-driven reviews are `attested` and cannot earn Approve. The Gate 2
+  narrow extension (`.claude/scripts/validate-review-coverage.cjs`, called from
+  `gate2-check.sh`) validates a review verdict's embedded coverage block.
