@@ -1,0 +1,361 @@
+{
+  "schemaVersion": "1.0",
+  "entries": [
+    {
+      "aliases": [],
+      "sourcePath": null,
+      "inventoryId": null,
+      "owner": "integration",
+      "installedState": "unknown",
+      "whenToUse": null,
+      "invocation": {
+        "kind": "none",
+        "id": "none"
+      },
+      "requirements": [
+        {
+          "type": "external_binary",
+          "id": "chromium",
+          "provenance": "authored"
+        }
+      ],
+      "contextRequirement": null,
+      "support": {},
+      "verification": {
+        "kind": "unknown"
+      },
+      "dependencies": {
+        "upstream": [],
+        "downstream": []
+      },
+      "provenance": {
+        "kind": "authored",
+        "description": "authored",
+        "intents": "authored",
+        "whenToUse": "authored",
+        "invocation": "authored",
+        "requirements": "authored",
+        "owner": "authored"
+      },
+      "id": "browser",
+      "kind": "tool",
+      "description": "Browser automation (surfaced via mk:agent-browser / mk:playwright-cli).",
+      "intents": []
+    },
+    {
+      "id": "demo-skill",
+      "kind": "skill",
+      "description": "Demonstration skill exercising reference categories",
+      "aliases": [],
+      "sourcePath": "skills/demo-skill/SKILL.md",
+      "inventoryId": "demo-skill",
+      "owner": "",
+      "installedState": "installed",
+      "intents": [],
+      "whenToUse": null,
+      "invocation": {
+        "kind": "skill",
+        "id": "invoke-skill"
+      },
+      "requirements": [],
+      "contextRequirement": null,
+      "support": {},
+      "verification": {
+        "kind": "unknown"
+      },
+      "dependencies": {
+        "upstream": [],
+        "downstream": []
+      },
+      "provenance": {
+        "kind": "inferred",
+        "owner": "inferred",
+        "installedState": "inferred",
+        "invocation": "inferred",
+        "description": "inferred"
+      }
+    },
+    {
+      "id": "fix",
+      "kind": "command",
+      "description": "",
+      "aliases": [],
+      "sourcePath": "commands/mk/fix.md",
+      "inventoryId": "fix",
+      "owner": "",
+      "installedState": "installed",
+      "intents": [],
+      "whenToUse": null,
+      "invocation": {
+        "kind": "command",
+        "id": "invoke-command"
+      },
+      "requirements": [],
+      "contextRequirement": null,
+      "support": {},
+      "verification": {
+        "kind": "unknown"
+      },
+      "dependencies": {
+        "upstream": [],
+        "downstream": []
+      },
+      "provenance": {
+        "kind": "inferred",
+        "owner": "inferred",
+        "installedState": "inferred",
+        "invocation": "inferred"
+      }
+    },
+    {
+      "aliases": [],
+      "sourcePath": null,
+      "inventoryId": null,
+      "owner": "integration",
+      "installedState": "unknown",
+      "whenToUse": null,
+      "invocation": {
+        "kind": "none",
+        "id": "none"
+      },
+      "requirements": [
+        {
+          "type": "mcp_or_app",
+          "id": "jira",
+          "provenance": "authored"
+        }
+      ],
+      "contextRequirement": null,
+      "support": {},
+      "verification": {
+        "kind": "unknown"
+      },
+      "dependencies": {
+        "upstream": [],
+        "downstream": []
+      },
+      "provenance": {
+        "kind": "authored",
+        "description": "authored",
+        "intents": "authored",
+        "whenToUse": "authored",
+        "invocation": "authored",
+        "requirements": "authored",
+        "owner": "authored"
+      },
+      "id": "jira",
+      "kind": "tool",
+      "description": "Jira issue tracking integration (surfaced via the mk:jira hub skills).",
+      "intents": []
+    },
+    {
+      "id": "planner",
+      "kind": "agent",
+      "description": "Planning agent for implementation plans",
+      "aliases": [],
+      "sourcePath": "agents/planner.md",
+      "inventoryId": "planner",
+      "owner": "",
+      "installedState": "installed",
+      "intents": [],
+      "whenToUse": null,
+      "invocation": {
+        "kind": "agent",
+        "id": "invoke-agent"
+      },
+      "requirements": [],
+      "contextRequirement": null,
+      "support": {},
+      "verification": {
+        "kind": "unknown"
+      },
+      "dependencies": {
+        "upstream": [],
+        "downstream": []
+      },
+      "provenance": {
+        "kind": "inferred",
+        "owner": "inferred",
+        "installedState": "inferred",
+        "invocation": "inferred",
+        "description": "inferred"
+      }
+    },
+    {
+      "aliases": [],
+      "sourcePath": null,
+      "inventoryId": null,
+      "owner": "integration",
+      "installedState": "unknown",
+      "whenToUse": null,
+      "invocation": {
+        "kind": "none",
+        "id": "none"
+      },
+      "requirements": [
+        {
+          "type": "file_or_config",
+          "id": "docs/project-context.md",
+          "provenance": "authored"
+        }
+      ],
+      "contextRequirement": null,
+      "support": {},
+      "verification": {
+        "kind": "unknown"
+      },
+      "dependencies": {
+        "upstream": [],
+        "downstream": []
+      },
+      "provenance": {
+        "kind": "authored",
+        "description": "authored",
+        "intents": "authored",
+        "whenToUse": "authored",
+        "invocation": "authored",
+        "requirements": "authored",
+        "owner": "authored"
+      },
+      "id": "project-context",
+      "kind": "context-service",
+      "description": "Loads project conventions and context at session start.",
+      "intents": [
+        "load project context",
+        "read project conventions"
+      ]
+    },
+    {
+      "aliases": [],
+      "sourcePath": null,
+      "inventoryId": null,
+      "owner": "integration",
+      "installedState": "unknown",
+      "whenToUse": null,
+      "invocation": {
+        "kind": "none",
+        "id": "none"
+      },
+      "requirements": [
+        {
+          "type": "file_or_config",
+          "id": "tasks",
+          "provenance": "authored"
+        }
+      ],
+      "contextRequirement": null,
+      "support": {},
+      "verification": {
+        "kind": "unknown"
+      },
+      "dependencies": {
+        "upstream": [],
+        "downstream": []
+      },
+      "provenance": {
+        "kind": "authored",
+        "description": "authored",
+        "intents": "authored",
+        "whenToUse": "authored",
+        "invocation": "authored",
+        "requirements": "authored",
+        "owner": "authored"
+      },
+      "id": "task-record",
+      "kind": "state-service",
+      "description": "Durable task/plan records under tasks/.",
+      "intents": [
+        "record task state",
+        "resume a plan"
+      ]
+    },
+    {
+      "aliases": [],
+      "sourcePath": null,
+      "inventoryId": null,
+      "owner": "integration",
+      "installedState": "unknown",
+      "whenToUse": null,
+      "invocation": {
+        "kind": "none",
+        "id": "none"
+      },
+      "requirements": [
+        {
+          "type": "external_binary",
+          "id": "mewkit",
+          "provenance": "authored"
+        }
+      ],
+      "contextRequirement": null,
+      "support": {},
+      "verification": {
+        "kind": "unknown"
+      },
+      "dependencies": {
+        "upstream": [],
+        "downstream": []
+      },
+      "provenance": {
+        "kind": "authored",
+        "description": "authored",
+        "intents": "authored",
+        "whenToUse": "authored",
+        "invocation": "authored",
+        "requirements": "authored",
+        "owner": "authored"
+      },
+      "id": "trace-log",
+      "kind": "state-service",
+      "description": "Append-only trace/friction log for cross-session recall.",
+      "intents": [
+        "record friction",
+        "audit trace"
+      ]
+    },
+    {
+      "aliases": [],
+      "sourcePath": null,
+      "inventoryId": null,
+      "owner": "integration",
+      "installedState": "unknown",
+      "whenToUse": null,
+      "invocation": {
+        "kind": "none",
+        "id": "none"
+      },
+      "requirements": [
+        {
+          "type": "external_binary",
+          "id": "mewkit",
+          "provenance": "authored"
+        }
+      ],
+      "contextRequirement": null,
+      "support": {},
+      "verification": {
+        "kind": "unknown"
+      },
+      "dependencies": {
+        "upstream": [],
+        "downstream": []
+      },
+      "provenance": {
+        "kind": "authored",
+        "description": "authored",
+        "intents": "authored",
+        "whenToUse": "authored",
+        "invocation": "authored",
+        "requirements": "authored",
+        "owner": "authored"
+      },
+      "id": "wiki-recall",
+      "kind": "context-service",
+      "description": "Disciplined recall of long-term, provenance-bearing project knowledge.",
+      "intents": [
+        "search project knowledge",
+        "recall prior decisions"
+      ]
+    }
+  ]
+}

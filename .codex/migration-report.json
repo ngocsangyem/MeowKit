@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "header": {
+    "provider": "codex",
+    "version": "unknown",
+    "timestamp": "2026-07-20T04:19:46.995Z",
+    "counts": {
+      "migrated": 6,
+      "skipped": 1,
+      "failed": 0,
+      "narrowed": 0,
+      "total": 7
+    },
+    "budget": {
+      "lines": []
+    },
+    "secretKeysOmitted": 0,
+    "codexMinSupportedVersion": "0.142.0"
+  },
+  "artifacts": [
+    {
+      "type": "agent",
+      "sourcePath": "planner",
+      "status": "migrated",
+      "reason": "converted",
+      "targetPath": ".codex/agents/planner.toml"
+    },
+    {
+      "type": "command",
+      "sourcePath": "mk/fix",
+      "status": "migrated",
+      "reason": "converted",
+      "targetPath": ".agents/skills/source-command-mk-fix/SKILL.md"
+    },
+    {
+      "type": "config",
+      "sourcePath": "CLAUDE",
+      "status": "migrated",
+      "reason": "converted",
+      "targetPath": "AGENTS.md"
+    },
+    {
+      "type": "hooks",
+      "sourcePath": "validate-docs.cjs",
+      "status": "skipped",
+      "reason": "event-unsupported"
+    },
+    {
+      "type": "rules",
+      "sourcePath": "security-rules",
+      "status": "migrated",
+      "reason": "converted",
+      "targetPath": "AGENTS.md"
+    },
+    {
+      "type": "rules",
+      "sourcePath": "tool-rules",
+      "status": "migrated",
+      "reason": "converted",
+      "targetPath": "AGENTS.md"
+    },
+    {
+      "type": "skill",
+      "sourcePath": "demo-skill",
+      "status": "migrated",
+      "reason": "converted",
+      "targetPath": ".agents/skills/demo-skill",
+      "detail": {
+        "file": "codex/skill/demo-skill/SKILL.md",
+        "line": 20,
+        "pattern": ".claude/scripts/validate-docs.cjs"
+      }
+    }
+  ]
+}

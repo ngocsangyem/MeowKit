@@ -11,6 +11,10 @@ export default defineConfig({
 	},
 	test: {
 		fileParallelism: false,
+		// Match the root config: integration tests here shell out to real subprocesses
+		// (hooks, python, git, migrations) that legitimately run 6-30s; the 5000ms default
+		// produces load-dependent timeout flakes. See vitest.config.ts (root) for rationale.
+		testTimeout: 30000,
 		include: [
 			"tests/**/*.test.ts",
 			"src/**/__tests__/**/*.test.{ts,tsx}",

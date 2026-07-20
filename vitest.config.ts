@@ -15,6 +15,15 @@ export default defineConfig({
 	},
 	test: {
 		fileParallelism: false,
+		// Integration tests here shell out to real hooks, python, git, and migrations,
+		// which legitimately take 6-30s (e.g. doctor-hard-gates already sets a 30000ms
+		// per-test timeout and passes at ~28s). Vitest's 5000ms default is too low for
+		// this suite and produces load-dependent timeout flakes — and a mid-migration
+		// timeout cascades into a sibling assertion failure. Raise the global ceiling to
+		// match the slowest legitimate test rather than sprinkle per-test overrides.
+		// This is not masking: the tests complete and pass well under this ceiling; only
+		// the ceiling was wrong.
+		testTimeout: 30000,
 		// plugin/** is a generated mirror of .claude/ (via `mewkit build-plugin`); its
 		// test files are duplicates of source tests and must not be collected here.
 		// `*.test.cjs` under `.claude/` are node-native `assert` tests (run via `node`/`node --test`
