@@ -1,0 +1,9 @@
+{
+  "root": true,
+  "title": "CLI",
+  "pages": [
+    "index",
+    "commands",
+    "task-commands"
+  ]
+}
