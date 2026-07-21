@@ -87,9 +87,9 @@ node scripts/prepare-release-assets.cjs "$VERSION"
 ZIP_SIZE=$(python3 -c "import os; print(f'{os.path.getsize(\"dist/meowkit-release.zip\")/1024:.0f}')")
 echo "  Release zip: ${ZIP_SIZE} KB"
 
-# Step 4: VitePress build check
-echo "[4/7] Verifying VitePress build..."
-(cd website && npx vitepress build) 2>&1 | tail -1
+# Step 4: Docs build check
+echo "[4/7] Verifying docs build..."
+npm run build -w packages/docs 2>&1 | tail -1
 
 # Step 5: Commit and tag (idempotent — reuse existing tag if present)
 echo "[5/7] Committing and tagging..."

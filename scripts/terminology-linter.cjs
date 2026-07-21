@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * terminology-linter.cjs — Flags non-canonical terms across website/**\/*.md
+ * terminology-linter.cjs — Flags non-canonical terms across the docs content tree (*.mdx)
  *
  * Usage: node scripts/terminology-linter.cjs
  */
@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const WEBSITE_DIR = path.resolve(__dirname, '..', 'website');
+const DOCS_DIR = path.resolve(__dirname, '..', 'packages', 'docs', 'content', 'docs');
 
 // Canonical terms — if one of the "wrong" patterns is found, flag it
 const RULES = [
@@ -16,13 +16,13 @@ const RULES = [
     canonical: '7-phase pipeline / Workflow',
     wrong: [/\b5[ -]?phase\s+(workflow|pipeline|process)/gi, /\bfive[ -]?phase\s+(workflow|pipeline|process)/gi],
     note: 'Use "7-phase pipeline" or "Workflow" (Orient→Plan→Test→Build→Review→Ship→Reflect)',
-    ignoreFiles: ['changelog.md'], // historical accuracy
+    ignoreFiles: ['changelog.mdx'], // historical accuracy
   },
   {
     canonical: '$30/$100 budget thresholds',
     wrong: [/\$10\b/g, /\$25\b/g],
     note: 'Budget thresholds are $30 (warn) / $100 (block), not $10/$25',
-    ignoreFiles: ['changelog.md'], // historical accuracy
+    ignoreFiles: ['changelog.mdx'], // historical accuracy
   },
   // Inventory-derived counts are checked by \`mewkit inventory --check\`; this
   // terminology-only linter must not carry a second volatile count source.
@@ -31,7 +31,7 @@ const RULES = [
     canonical: 'on-demand memory (no loader)',
     wrong: [/memory-loader/g],
     note: 'memory-loader was deleted in v2.4.1. Memory is on-demand, no auto-loader.',
-    ignoreFiles: ['changelog.md', 'hooks.md'], // historical accuracy
+    ignoreFiles: ['changelog.mdx', 'hooks.mdx'], // historical accuracy
   },
 ];
 
@@ -39,13 +39,13 @@ function getAllMarkdownFiles(dir) {
   const results = [];
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
-    if (entry.name.startsWith('.') && entry.name !== '.vitepress') continue;
+    if (entry.name.startsWith('.')) continue;
     if (entry.name === 'node_modules') continue;
     if (entry.name === 'dist') continue; // skip build output
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       results.push(...getAllMarkdownFiles(fullPath));
-    } else if (entry.name.endsWith('.md')) {
+    } else if (entry.name.endsWith('.mdx')) {
       results.push(fullPath);
     }
   }
@@ -53,12 +53,12 @@ function getAllMarkdownFiles(dir) {
 }
 
 function main() {
-  const files = getAllMarkdownFiles(WEBSITE_DIR);
+  const files = getAllMarkdownFiles(DOCS_DIR);
   const violations = [];
 
   for (const file of files) {
     const content = fs.readFileSync(file, 'utf-8');
-    const relPath = path.relative(WEBSITE_DIR, file);
+    const relPath = path.relative(DOCS_DIR, file);
 
     for (const rule of RULES) {
       if (rule.ignoreFiles && rule.ignoreFiles.includes(path.basename(file))) continue;

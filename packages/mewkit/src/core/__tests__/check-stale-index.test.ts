@@ -49,18 +49,14 @@ async function makeRepo(readme: string, skillsIndex: string, agentsIndex: string
 		}),
 	);
 	await writeFile(join(root, "README.md"), readme);
-	await mkdir(join(root, "website", ".vitepress"), { recursive: true });
-	await writeFile(
-		join(root, "website", ".vitepress", "config.ts"),
-		"const description = '1 skills, 1 agents';\nconst jsonLd = '1 skills, 1 agents';\n",
-	);
-	await mkdir(join(root, "website", "workflows"), { recursive: true });
-	await writeFile(join(root, "website", "workflows", "new-project.md"), "1 agents, 1 skills\n");
-	await mkdir(join(root, "website", "reference", "skills"), { recursive: true });
-	await writeFile(join(root, "website", "reference", "rules-index.md"), "all 1 agents\n");
-	await writeFile(join(root, "website", "reference", "skills", "lazy-agent-loader.md"), "all 1 agents\n");
-	await mkdir(join(root, "website", "core-concepts"), { recursive: true });
-	await writeFile(join(root, "website", "core-concepts", "how-it-works.md"), "1 skills\n");
+	const docsContent = join(root, "packages", "docs", "content", "docs");
+	await mkdir(join(docsContent, "workflows"), { recursive: true });
+	await writeFile(join(docsContent, "workflows", "new-project.mdx"), "1 agents, 1 skills\n");
+	await mkdir(join(docsContent, "reference", "skills"), { recursive: true });
+	await writeFile(join(docsContent, "reference", "rules-index.mdx"), "all 1 agents\n");
+	await writeFile(join(docsContent, "reference", "skills", "lazy-agent-loader.mdx"), "all 1 agents\n");
+	await mkdir(join(docsContent, "core-concepts"), { recursive: true });
+	await writeFile(join(docsContent, "core-concepts", "how-it-works.mdx"), "1 skills\n");
 	await mkdir(join(root, "docs", "core"), { recursive: true });
 	await writeFile(join(root, "docs", "core", "meowkit-architecture.md"), "1 domain skills; 1 rule files\n");
 	await mkdir(join(c, "agents"), { recursive: true });
@@ -94,20 +90,25 @@ describe("checkStaleIndex", () => {
 		expect(results.some((r) => r.status === "fail" && r.detail.includes("declared 9, found 1"))).toBe(true);
 	});
 
-	it("FAILS when a website count drifts from the inventory", async () => {
+	it("FAILS when a docs content count drifts from the inventory", async () => {
 		const root = await makeRepo(README_OK, SKILLS_OK, AGENTS_OK, HOOKS_OK);
 		await writeFile(
-			join(root, "website", ".vitepress", "config.ts"),
-			"const description = '9 skills, 1 agents';\nconst jsonLd = '1 skills, 1 agents';\n",
+			join(root, "packages", "docs", "content", "docs", "core-concepts", "how-it-works.mdx"),
+			"9 skills\n",
 		);
 		expect(
-			compareCounts(root).some((d) => d.source.includes("website/.vitepress") && d.declared === 9 && d.actual === 1),
+			compareCounts(root).some(
+				(d) => d.source.includes("core-concepts/how-it-works") && d.declared === 9 && d.actual === 1,
+			),
 		).toBe(true);
 	});
 
 	it("FAILS when a workflow page count drifts from the inventory", async () => {
 		const root = await makeRepo(README_OK, SKILLS_OK, AGENTS_OK, HOOKS_OK);
-		await writeFile(join(root, "website", "workflows", "new-project.md"), "1 agents, 9 skills\n");
+		await writeFile(
+			join(root, "packages", "docs", "content", "docs", "workflows", "new-project.mdx"),
+			"1 agents, 9 skills\n",
+		);
 		expect(
 			compareCounts(root).some((d) => d.source.includes("workflows/new-project") && d.declared === 9 && d.actual === 1),
 		).toBe(true);
