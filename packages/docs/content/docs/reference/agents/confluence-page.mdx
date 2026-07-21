@@ -1,0 +1,84 @@
+---
+title: "confluence-page"
+description: "Confluence page CRUD agent — creates, reads, updates, and deletes individual pages, plus hierarchy + version + copy/move ops via the confluence-as CLI wrapper."
+---
+
+The confluence-page agent handles single-page operations in Confluence Cloud. It creates pages and blog posts, retrieves page content, updates titles and bodies, deletes pages, walks the page hierarchy, lists and restores versions, and copies / moves pages between spaces — all through the `confluence-as` CLI wrapper with safety tiers that escalate confirmation requirements based on operation risk.
+
+## Cognitive Framing
+
+> *"One page at a time. Reads run immediately; updates show a diff; deletes need a dry-run review."*
+
+The confluence-page agent is a domain-specific agent for single-page CRUD + hierarchy + version. It operates on demand and uses the same 4-tier safety model as `jira-issue`: reads execute immediately, creates need no confirmation for single pages, updates show a current → proposed diff, and deletes require a dry-run review first.
+
+## Key Facts
+
+| | |
+|---|---|
+| **Type** | Domain (Confluence) |
+| **Phase** | On-demand |
+| **Model** | haiku |
+| **Color** | blue |
+| **Safety** | 4-tier (read → create → modify → destructive) |
+| **Never does** | Bulk ops on 10+ pages (confluence-bulk), comments / attachments / labels (confluence-collaborate), spec analysis (confluence-spec-analyst) |
+
+## When to Use
+
+- When you need to **create a page or blog post** in a space — direct or from an RFC / Runbook / Decision Record template.
+- When you need to **view a page's body** in `storage`, `view`, `export_view`, or `atlas_doc_format` representation.
+- When you need to **update title or body** on an existing page (the agent shows a current → proposed diff first).
+- When you need to **delete a page** (with mandatory dry-run first).
+- When you need to **list children / ancestors / descendants** under a page id.
+- When you need to **list versions** of a page or **restore** to an earlier version (creates a new version atop head — not in-place rollback).
+- When you need to **copy** or **move** a page between spaces.
+
+## Key Capabilities
+
+- **Page CRUD** — full create / read / update / delete for single Confluence pages and blog posts.
+- **Template support** — RFC / Runbook / Decision Record templates seed structured page bodies.
+- **Hierarchy navigation** — `hierarchy children`, `ancestors`, and `descendants` with depth-bounded traversal.
+- **Version operations** — list previous versions and restore (always as a new version on top of head).
+- **Copy / move** — relocate pages between spaces while preserving body and metadata.
+- **Field projection** — trims JSON output to essential fields (id, title, space, version) using `jq` for readable results.
+
+## Behavioral Checklist
+
+- [x] Uses the `confluence-as` wrapper for all operations — never invokes the binary directly
+- [x] Shows current-vs-proposed diff before page updates (Tier 3)
+- [x] Runs `--dry-run` before deletes (Tier 4) and waits for user review
+- [x] Validates `--page-id` is numeric and `--space-key` matches the uppercase pattern at the agent boundary
+- [x] Prefers markdown via `--content` for fresh page bodies; warns when round-tripping macro-heavy bodies via `update`
+- [x] Captures common space keys and page IDs in memory for future sessions
+- [x] Never writes page bodies, image bytes, or token values to memory
+
+## Common Use Cases
+
+| Scenario | What the agent does |
+|---|---|
+| "Create a Q3 Roadmap page in ENG" | Calls `page create --space-key ENG --title "Q3 Roadmap" --content "..."` |
+| "Show me page 12345" | Retrieves page with projected fields (id, title, space, version) |
+| "Update page 12345 title to 'Q3 Roadmap (final)'" | Shows current vs proposed diff, then executes update |
+| "Delete page 12345" | Runs `--dry-run` first; on confirmation re-runs with `--confirm` |
+| "List children of page 12345 with depth 2" | Calls `hierarchy children --page-id 12345 --depth 2` |
+| "Restore page 12345 to version 7" | Calls `version restore`; explains a NEW version is appended on top of head |
+
+## Pro Tips
+
+### Prefer Markdown Bodies on Create
+
+`confluence-as` accepts `--content '<markdown>'` and converts internally. Hand-writing storage XHTML is brittle — the parser is regex-based and malformed nesting fails silently. Reserve `--representation storage --content '<xhtml>'` for surgical edits where you must preserve existing macros.
+
+### Don't Round-Trip Macro-Heavy Bodies
+
+ADF round-trip is lossy on `panel`, `expand`, `mention`, `emoji`, `media`, `decision`, `task-list`. If you need to read a page that uses these macros (for analysis, not editing), use [`mk:confluence-spec-analyst`](/reference/skills/confluence-spec-analyst) — its fetch path runs the body through the macro-aware walker.
+
+## Key Takeaway
+
+The confluence-page agent provides safe, single-page CRUD plus hierarchy and version operations with the same graduated safety tiers as `jira-issue`. Reads are instant, creates are smooth, updates show diffs, and deletes always require dry-run review.
+
+## Related Agents
+
+- **[confluence-search](/reference/agents/confluence-search)** — finds pages by CQL criteria
+- **[confluence-collaborate](/reference/agents/confluence-collaborate)** — handles comments, attachments, labels, watchers
+- **[confluence-bulk](/reference/agents/confluence-bulk)** — handles operations on 10+ pages
+- **[confluence-spec-analyst](/reference/agents/confluence-spec-analyst)** — read-only deep spec analysis with macro preservation

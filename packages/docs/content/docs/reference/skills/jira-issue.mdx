@@ -1,0 +1,39 @@
+---
+title: "mk:jira-issue"
+description: "JIRA issue CRUD via the jira-as wrapper. Forks the jira-issue agent."
+---
+
+## What This Skill Does
+
+Forks the `jira-issue` agent to handle single-issue CRUD: create / get / update / delete. Backed by `jira-as` CLI through the env-translating wrapper.
+
+## When to Use
+
+- **Triggers:** "create bug/task/story", "show me PROJ-123", "get/view issue", "update PROJ-123", "delete PROJ-123"
+- **NOT for:** state transitions ([`mk:jira-lifecycle`](/reference/skills/jira-lifecycle)), comments / attachments ([`mk:jira-collaborate`](/reference/skills/jira-collaborate)), bulk ops ≥10 issues ([`mk:jira-bulk`](/reference/skills/jira-bulk)), issue links ([`mk:jira-relationships`](/reference/skills/jira-relationships)), time logging ([`mk:jira-time`](/reference/skills/jira-time)), sprint / epic ([`mk:jira-agile`](/reference/skills/jira-agile)).
+
+## Verified CLI Idioms
+
+| Operation | Tier | Wrapper invocation |
+|---|---|---|
+| Get | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue get PROJ-123` |
+| Create | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue create --project PROJ --type Bug --summary "..."` |
+| Create from template | 2 | `... issue create --project PROJ --template bug --summary "..."` |
+| Update | 3 | `... issue update PROJ-123 --summary "..." --priority High` |
+| Delete | 4 | `... issue delete PROJ-123` (omit `--force` unless after dry-run review) |
+
+`--project` is a flag (not positional). Run `--help` per verb for the authoritative flag list.
+
+## Domain References
+
+- `references/issue-templates.md` — canonical Bug / Story / Epic / Task templates + body markdown
+- `references/field-formats.md` — ADF, user assignment, custom-field formats (531 lines, adopted from upstream)
+- `references/decision-matrices.md` — issue-type / priority / template decision tables
+
+## Peer Leaves
+
+`mk:jira-fields` (custom field IDs) · `mk:jira-lifecycle` (post-create transitions) · `mk:jira-collaborate` (comments / attachments) · `mk:jira-relationships` (linking)
+
+## Agent
+
+[`jira-issue`](/reference/agents/jira-issue) — A + C, NOT B (Skill Rule of Two: 2/3 compliant).

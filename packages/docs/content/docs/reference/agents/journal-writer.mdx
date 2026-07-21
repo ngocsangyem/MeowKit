@@ -1,0 +1,96 @@
+---
+title: "journal-writer"
+description: "Post-mortem documentation agent — captures unvarnished accounts of failures, root causes, and lessons learned for institutional memory."
+---
+
+The journal-writer is your brutally honest documenter of what went wrong. When tests fail after multiple attempts, bugs hit production, or architectural decisions prove problematic, the journal-writer captures the unvarnished truth — what happened, what was tried, and what was learned. No sugarcoating, no euphemisms.
+
+## Cognitive Framing
+
+> *"If the architecture was wrong, say so. If testing was inadequate, say so. Euphemisms help no one."*
+
+The journal-writer operates at Phase 6 (Reflect) and during escalations at any phase. It is an escalation-type subagent — activated when things go wrong rather than during normal workflow. Its core principle is that honest documentation of failures is more valuable than polished narratives that hide systemic issues.
+
+## Key Facts
+
+| | |
+|---|---|
+| **Type** | Support (escalation subagent) |
+| **Phase** | 6 (Reflect), any phase (escalation) |
+| **Model** | haiku (lightweight, fast) |
+| **Auto-activates** | After self-healing exhausted, on BLOCK verdicts, during escalations |
+| **Owns** | `docs/journal/` |
+| **Never does** | Modify source code, tests, plans, reviews, or deployment configs. Never fabricates or exaggerates events. Never skips the "Brutal Truth" section. |
+
+## When to Use
+
+- When **test suites fail after multiple fix attempts** — the developer has exhausted self-healing (3 attempts).
+- When **critical bugs are found in production**.
+- When **major refactoring efforts fail or stall**.
+- When **security vulnerabilities are discovered** and the security agent issues a BLOCK.
+- When **architectural decisions prove problematic** in practice.
+- When **integration failures** occur between components.
+- During **Phase 6 (Reflect)** after the documenter and analyst complete their work.
+
+## Key Capabilities
+
+- **Structured journal entries** — writes entries at `docs/journal/YYMMDD-title.md` with a consistent structure: What Happened, The Brutal Truth, What Was Tried, Root Cause, Lessons Learned, Next Steps.
+- **Brutally honest assessment** — the "Brutal Truth" section captures whether the failure was preventable, whether there were warning signs, and whether corners were cut. This section is never skipped.
+- **Evidence-based documentation** — references specific files, line numbers, error messages, and commit hashes. "Tests failed" is not acceptable; "the auth middleware test failed because the JWT mock didn't match the production token format" is.
+- **Pattern feeding** — journal entries feed into the analyst's pattern extraction (`memory/patterns.json`), enabling systemic issue detection across sessions.
+- **Prevention focus** — every journal entry must answer: "How do we prevent this next time?" with specific, actionable next steps.
+
+## Journal Entry Structure
+
+Every journal entry follows this structure:
+
+1. **Title, Date, Severity, Component, Status** — metadata for tracking and classification
+2. **What Happened** — facts only. What broke, when, and what was the impact. No editorializing.
+3. **The Brutal Truth** — honest assessment: was this preventable? Were there warning signs? Were corners cut?
+4. **What Was Tried** — numbered list of each attempt and why it did or did not work.
+5. **Root Cause** — the actual underlying cause, not the symptom.
+6. **Lessons Learned** — actionable, specific takeaways.
+7. **Next Steps** — concrete action items as a checklist.
+
+## Behavioral Checklist
+
+- [x] Writes journal entries with all required sections — never skips "Brutal Truth" or "Lessons Learned"
+- [x] Documents facts and evidence — never fabricates or exaggerates events
+- [x] References specific files, line numbers, error messages, and commit hashes
+- [x] Checks existing journal entries to avoid duplicating known issues
+- [x] Checks `patterns.json` to determine if this is a recurring pattern
+- [x] Focuses on prevention — every entry answers "how do we prevent this next time?"
+- [x] Keeps entries concise — every sentence earns its place
+- [x] Never modifies source code, tests, plans, reviews, or deployment configs
+- [x] Never includes sensitive information (API keys, credentials, passwords)
+
+## Common Use Cases
+
+| Scenario | What the journal-writer does |
+|---|---|
+| Developer exhausts 3 self-heal attempts | Documents: what the tests expected, what failed, each fix attempted and why it did not work, root cause analysis |
+| Security BLOCK issued | Documents: what vulnerability was found, why existing security measures missed it, prevention steps |
+| Production bug discovered | Documents: what broke, when, impact, root cause, and specific prevention measures |
+| Refactoring stall | Documents: why the refactor stalled, what assumptions were wrong, lessons for future refactoring scope |
+| Architectural regret | Documents: what decision proved problematic, what the warning signs were, what the better approach would have been |
+
+## Pro Tips
+
+### Use Journal Entries as Pattern Fuel
+
+Journal entries feed directly into the analyst's pattern extraction. A single failure might seem random, but three journal entries about similar JWT mock mismatches across different sessions reveal a systemic issue. Write journal entries with enough specificity that the analyst can detect these patterns.
+
+### Review Journals Before Similar Work
+
+Before starting work in an area that has previous journal entries, check `docs/journal/` for relevant entries. If a previous refactoring of the auth system failed, reading that journal entry before attempting a similar change will save hours and prevent repeating the same mistakes.
+
+## Key Takeaway
+
+The journal-writer exists because honest failure documentation is more valuable than polished success narratives. By capturing what actually happened — including the uncomfortable truths — it builds the institutional memory that prevents teams from repeating the same mistakes across sessions.
+
+## Related Agents
+
+- **[developer](/reference/agents/developer)** — triggers the journal-writer when self-healing is exhausted (3 failures)
+- **[security](/reference/agents/security)** — triggers the journal-writer when a BLOCK verdict is issued
+- **[analyst](/reference/agents/analyst)** — consumes journal entries for pattern extraction
+- **[documenter](/reference/agents/documenter)** — owns `docs/` but defers `docs/journal/` to the journal-writer

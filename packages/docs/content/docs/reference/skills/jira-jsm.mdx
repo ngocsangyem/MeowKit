@@ -1,0 +1,60 @@
+---
+title: "mk:jira-jsm"
+description: "JIRA Service Management: service desks, requests, customers, queues, SLAs, approvals. Requires JSM license."
+---
+
+## What This Skill Does
+
+Forks the `jira-jsm` agent to execute JIRA Service Management operations across 8 sub-domains (~45 verbs total). Requires JSM-licensed tenant + agent or admin role.
+
+## When to Use
+
+- **Triggers:** "create JSM request", "list service desks", "SLA status for KEY", "approve request", "list queue NAME"
+- **NOT for:** core Jira issue ops ([`mk:jira-issue`](/reference/skills/jira-issue)) · project admin ([`mk:jira-admin`](/reference/skills/jira-admin)).
+
+## Required Permissions
+
+JSM-licensed tenant + agent or admin role. Insufficient permission → exit code 3.
+
+## Internal-vs-Public Comments (privacy)
+
+JSM tickets cross the customer boundary: an "internal" comment is team-only; a "public" comment is visible to the customer who raised the request. The agent confirms intent before posting any comment that could be customer-facing.
+
+## Sub-Domains (8)
+
+| Sub-domain | Common verbs |
+|---|---|
+| `service-desk` | `list`, `get`, `info` |
+| `request-type` | `list`, `get`, `fields` |
+| `request` | `create`, `get`, `list`, `comment add/list`, `participant`, `transition` |
+| `customer` | `list`, `create`, `get`, `add-to-org`, `remove-from-org` |
+| `organization` | `list`, `create`, `get`, `add-customer`, `list-customers` |
+| `queue` | `list`, `get`, `list-issues` |
+| `sla` | `get`, `list-policies`, `breach-list` |
+| `approval` | `list`, `approve`, `decline`, `get` |
+
+## Verified Wrapper Invocations (selection)
+
+| Operation | Tier | Invocation |
+|---|---|---|
+| List service desks | 1 | `... jsm service-desk list` |
+| List request types | 1 | `... jsm request-type list --service-desk-id <ID>` |
+| Create request | 2 | `... jsm request create --service-desk-id <ID> --request-type-id <ID> --summary "..."` |
+| Comment on request | 2 | `... jsm request comment add <KEY> --body "..." --visibility internal\|public` |
+| SLA status | 1 | `... jsm sla get <KEY>` |
+| Approve | 3 | `... jsm approval approve <APPROVAL_ID>` |
+
+For each verb, `--help` is the canonical reference.
+
+## Domain References
+
+- `references/decision-tree.md` — when to use `mk:jira-jsm` vs `mk:jira-{issue,lifecycle,collaborate}`
+- `references/itil-workflows.md` — ITIL 4 process implementations (incident / service request / problem / change)
+
+## Peer Leaves
+
+`mk:jira-collaborate` (internal-vs-public discipline shared) · `mk:jira-lifecycle` (`patterns/jsm-request-workflow.md`) · `mk:jira-admin` (request-type / queue config)
+
+## Agent
+
+[`jira-jsm`](/reference/agents/jira-jsm) — A + C, NOT B.

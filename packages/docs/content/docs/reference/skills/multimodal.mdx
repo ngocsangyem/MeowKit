@@ -26,7 +26,7 @@ Analyzes non-text media files (images, video, audio, PDFs) using Gemini API. Gen
 |-----------|--------|---------------|
 | Image analysis (caption, classify, Q&A, object detection, OCR) | `gemini_analyze.py` | gemini-2.5-flash |
 | Video analysis (multi-resolution) | `gemini_analyze.py` | gemini-2.5-flash |
-| Audio transcription (<15 min) | `gemini_analyze.py` | gemini-2.5-flash |
+| Audio transcription (\<15 min) | `gemini_analyze.py` | gemini-2.5-flash |
 | PDF/document extraction | `gemini_analyze.py` or `document_converter.py` | gemini-2.5-flash |
 | Document to Markdown | `document_converter.py` | local conversion |
 
@@ -42,9 +42,9 @@ Analyzes non-text media files (images, video, audio, PDFs) using Gemini API. Gen
 
 | Script | Arguments |
 |--------|----------|
-| `gemini_analyze.py` | `--files <PATH> --task <analyze|transcribe|extract> [--resolution low-res] [--json] [--verbose]` |
-| `gemini_generate.py` | `--task <generate-image|generate-video> --prompt "..." [--provider minimax|openrouter] [--json]` |
-| `minimax_generate.py` | `--task <generate-image|generate-video|generate-speech|generate-music> --prompt "..." [--json]` |
+| `gemini_analyze.py` | `--files <PATH> --task <analyze\|transcribe\|extract> [--resolution low-res] [--json] [--verbose]` |
+| `gemini_generate.py` | `--task <generate-image\|generate-video> --prompt "..." [--provider minimax\|openrouter] [--json]` |
+| `minimax_generate.py` | `--task <generate-image\|generate-video\|generate-speech\|generate-music> --prompt "..." [--json]` |
 | `document_converter.py` | `--files doc.pdf --output ./docs/ [--json] [--verbose]` |
 | `check_setup.py` | (no args) — verify API keys and dependencies |
 

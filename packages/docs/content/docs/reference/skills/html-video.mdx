@@ -1,0 +1,33 @@
+---
+title: "mk:html-video"
+description: "Render a local HTML, CSS, and JavaScript animation as an MP4 using Playwright frame capture and ffmpeg."
+---
+
+## What This Skill Does
+
+Captures deterministic frames from a local HTML animation with Playwright and encodes them to an
+H.264 MP4 with ffmpeg. It is designed for authored web animation, canvas, WebGL, and GSAP output.
+
+## When to Use
+
+- Export a local HTML animation as MP4.
+- Produce a video from a deterministic web template.
+
+Do not use it for live browser recording, desktop capture, or AI-generated video.
+
+## Prerequisites
+
+Install `@playwright/test`, the Playwright Chromium browser, and `ffmpeg`. The bundled renderer
+captures `fps × duration` PNG frames, writes an MP4 with `yuv420p` compatibility, and removes its
+temporary frame directory on success or failure.
+
+## Usage
+
+```bash
+bash .claude/skills/html-video/scripts/render-html-to-mp4.sh template.html output.mp4 30 5 1920 1080
+```
+
+Use even width and height values. For fast deterministic animation, expose a `window.onFrame`
+hook in the template.
+
+See the canonical [`mk:html-video` skill](https://github.com/ngocsangyem/MeowKit/tree/main/.claude/skills/html-video) for the capture contract and troubleshooting.

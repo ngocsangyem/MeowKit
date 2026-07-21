@@ -1,6 +1,6 @@
 ---
-title: Runtime Commands
-description: MeowKit CLI runtime commands reference.
+title: "Runtime Commands"
+description: "MeowKit CLI runtime commands reference."
 ---
 
 Runtime tools for managing your MeowKit project. Run from your project root.
@@ -238,14 +238,14 @@ npx mewkit capabilities bootstrap [--provider <id>]   # the always-visible disco
 npx mewkit capabilities projections [--json]          # per-provider discovery + 4 support levels
 ```
 
-| Subcommand    | Purpose                                                                                                                              |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `list`        | All capabilities with kind, owner, install state, and intents.                                                                       |
-| `explain <id>`| One capability's requirements, support levels, verification, and provenance.                                                         |
+| Subcommand    | Purpose                                                                                                                             |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `list`        | All capabilities with kind, owner, install state, and intents.                                                                      |
+| `explain <id>`| One capability's requirements, support levels, verification, and provenance.                                                        |
 | `resolve`     | Rank capabilities for an `--intent` and, with `--provider`, report host availability, the safe invocation, any repo-context requirement + how that provider acquires it, and the adapter + evidence behind the claim. In a Codex-only project, resolve uses the validated migration snapshot. |
-| `view`        | Render the capabilities table (the generated portion of the trigger registry).                                                       |
-| `bootstrap`   | Print the bounded, brand-neutral discovery bootstrap for a provider (`--write` regenerates the committed file).                      |
-| `projections` | Per-provider discovery projection + the four support levels (`discoverable`/`selectable`/`invocable`/`enforceable`).                 |
+| `view`        | Render the capabilities table (the generated portion of the trigger registry).                                                      |
+| `bootstrap`   | Print the bounded, brand-neutral discovery bootstrap for a provider (`--write` regenerates the committed file).                     |
+| `projections` | Per-provider discovery projection + the four support levels (`discoverable`/`selectable`/`invocable`/`enforceable`).                |
 
 ## context
 
@@ -257,8 +257,8 @@ npx mewkit context check <envelope.json> [--root <boundary>] [--json]  # per-pat
 npx mewkit context record --task <id> <envelope.json> [--root <boundary>] [--json]  # merge evidence into a durable task record
 ```
 
-| Subcommand | Purpose                                                                                                                                             |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Subcommand | Purpose                                                                                                                                            |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `resolve`  | Build an evidence ref for a path: owning repo + revision (read from git refs, no `git` binary), content hash, and a redaction flag for secret-shaped paths. |
 | `check`    | Re-hash a recorded envelope's evidence and report `fresh` / `stale` / `missing` / `out-of-scope` per path, grouped by owning repo (with its revision). Boundary-scoped: paths outside `--root` are never stat-ed. |
 | `record`   | Merge an envelope's distinct owning repos + evidence paths into an **existing** durable task record (advisory, best-effort). |
@@ -341,13 +341,13 @@ npx mewkit visual-plan <subcommand> <plan-dir> [flags]
 ### Subcommands
 
 | Subcommand                          | Description                                                                 |
-| ----------------------------------- | --------------------------------------------------------------------------- |
+| ----------------------------------- | -------------------------------------------------------------------------- |
 | `validate`                          | Schema + coverage closure + ref resolution + safe-HTML + source-hash freshness (exact JSON-path errors) |
-| `status`                            | Coverage summary (resolved/planned/omitted/unresolved) + review status      |
+| `status`                            | Coverage summary (resolved/planned/omitted/unresolved) + review status     |
 | `approve --revision <n>`            | Single writer of `review.status`; the Gate-1 transition (pins the reviewed revision) |
 | `rehash`                            | Refresh pinned source hashes after an intentional Markdown edit (clears approval) |
-| `export --format html`              | Self-contained `plan.html` from the approved artifact                       |
-| `view` / `edit`                     | Transient studio — read-only / editable (single-editor lock)                |
+| `export --format html`             | Self-contained `plan.html` from the approved artifact                       |
+| `view` / `edit`                     | Transient studio — read-only / editable (single-editor lock)               |
 | `prepare-feedback --ops <f>`        | Freeze accumulated semantic ops into an immutable `visual-feedback/v1` batch + Copy Command |
 | `apply-feedback --batch <id>`       | `--check` (pre-apply stale gate) / `--receipt <f>` (record per-op outcomes) |
 | `patch --op <f>`                    | Apply one typed visual op (lane/order/annotation/connector-label/field)     |
@@ -355,11 +355,11 @@ npx mewkit visual-plan <subcommand> <plan-dir> [flags]
 ### Flags
 
 | Flag                   | Description                                              |
-| ---------------------- | -------------------------------------------------------- |
-| `--port <number>`      | `edit`/`view`: bind to fixed port (`0` = random)         |
-| `--open` / `--no-open` | `edit`/`view`: auto-launch browser (default: `--open`)   |
-| `--force`              | `edit`: override another session's single-editor lock    |
-| `--json`               | Machine-readable output for the deterministic subcommands |
+| ---------------------- | ------------------------------------------------------- |
+| `--port <number>`      | `edit`/`view`: bind to fixed port (`0` = random)        |
+| `--open` / `--no-open` | `edit`/`view`: auto-launch browser (default: `--open`)  |
+| `--force`              | `edit`: override another session's single-editor lock   |
+| `--json`              | Machine-readable output for the deterministic subcommands |
 
 ### Security
 

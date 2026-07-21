@@ -1,0 +1,171 @@
+---
+title: "Tickets to Sprint Planning"
+description: "Research-driven workflow from ticket evaluation through codebase review to sprint planning."
+---
+
+> Evaluate, estimate, review against codebase, produce planning reports — then decide what to commit.
+
+**Best for:** Tech leads, engineering managers, sprint planners
+**Time estimate:** 5-15 min (depending on ticket count)
+**Skills used:** [mk:intake](/reference/skills/intake), [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-evaluator](/reference/skills/jira-evaluator), [mk:jira-estimator](/reference/skills/jira-estimator), [mk:jira-relationships](/reference/skills/jira-relationships), [mk:planning-engine](/reference/skills/planning-engine), [mk:scout](/reference/skills/scout) (optional), [mk:web-to-markdown](/reference/skills/web-to-markdown) (optional)
+
+<Callout title="Not for standalone bugs or hotfixes" type="warn">
+
+This workflow is for **planning new work into a sprint**. If you have an existing ticket to fix or implement, use the [Ticket to Code](/workflows/ticket-to-code) workflow instead.
+
+</Callout>
+
+## Prerequisites
+
+{/*
+  Shared partial — included by workflow docs that require Jira access.
+  Host page provides the surrounding H2 (e.g. "## Prerequisites").
+  Source of truth: meowkit/.claude/skills/jira/references/install-and-auth.md
+*/}
+
+Install the `jira-as` CLI (used by every `mk:jira-*` leaf):
+
+```bash
+npx mewkit setup
+```
+
+This installs `jira-as` into `.claude/skills/.venv/bin/jira-as`. No global install needed.
+
+Then populate `.claude/.env` (gitignored) with three vars:
+
+| Var | Purpose |
+|---|---|
+| `MEOW_JIRA_API_TOKEN` | Atlassian Cloud API token — get one at [id.atlassian.com](https://id.atlassian.com/manage-profile/security/api-tokens) |
+| `MEOW_JIRA_EMAIL` | Atlassian account email |
+| `MEOW_JIRA_SITE_URL` | e.g. `https://your-company.atlassian.net` |
+
+Verify with the SessionStart hook output: `[mk:jira] env OK` means all three keys are loaded.
+
+<details>
+<summary>Escape hatch — Atlassian MCP (mTLS, multi-profile, or non-jira-as workflows)</summary>
+
+If `jira-as` is unusable (e.g. mTLS-required tenants, multi-profile setups), the leaves accept Atlassian MCP as a fallback transport:
+
+</details>
+```bash
+claude mcp add --transport http atlassian https://mcp.atlassian.com/v1/mcp
+```
+
+The router does NOT auto-fallback — you invoke the leaf with the MCP transport explicitly. See [`mk:jira` reference](/reference/skills/jira) for details.
+:::
+
+## The Principle
+
+Every step produces a **report**. Human reads and decides before proceeding. No automation. No auto-creation. No auto-assignment.
+
+## Step-by-step
+
+### Step 1: Have tickets in your backlog
+
+This workflow assumes the work is already represented as Jira tickets. If you're starting from a spec document instead, see the **"Importing a spec"** sidebar below.
+
+<Callout title="Importing a spec (alternative entry point)" type="info">
+
+Two paths depending on where the spec lives:
+
+**Confluence (first-party path):**
+
+1. `/mk:confluence-spec-analyst analyze <PAGE-ID>` — produces a Spec Research Report with requirements, ACs, gaps, and suggested user stories (read-only — no tickets created)
+2. Resolve `[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` flags with the PM via `/mk:confluence-collaborate add-comment <PAGE-ID> ... --footer`
+3. Optional pre-ticket feasibility scan with `/mk:scout` + `/mk:docs-finder` (see the [Spec → PR walkthrough](/workflows/spec-to-pr-walkthrough#step-3-tech-feasibility-breakdown-pre-ticket) for the full pattern)
+4. Create tickets manually (Step 2 below) — never auto-creation
+5. At Step 5, pass the report path back in: `/mk:planning-engine plan --tickets ... --spec <report-path>` brings the spec context into the Planning Report
+
+**Notion / generic URL (fallback):**
+
+1. `/mk:web-to-markdown <spec-url>` — convert the page to markdown
+2. `/mk:intake` and paste/reference the markdown — produces a similar Spec Research Report
+3. Create tickets manually (Step 2)
+
+Both paths are manual and human-gated. No path auto-creates Jira tickets from the spec.
+
+For a step-by-step walkthrough showing what every skill does behind the scenes, see [Spec → PR: Behind the Scenes](/workflows/spec-to-pr-walkthrough).
+
+</Callout>
+
+### Step 2: Create tickets (your decision)
+
+For stories you approve from the report:
+
+```bash
+/mk:jira-issue create --project AUTH --type Story --summary "Implement OAuth2 login" \
+  --description "OAuth2 flow for Google and GitHub providers"
+```
+
+You decide which stories to create, what priority to set, and how to word them.
+
+### Step 3: Evaluate and estimate
+
+```bash
+/mk:jira-evaluator AUTH-201
+/mk:jira-estimator AUTH-201
+```
+
+Produces complexity assessment and story point suggestion. The **team** makes the final estimate in planning poker — the AI provides signals, not decisions.
+
+### Step 4: Tech review (optional, with codebase context)
+
+Run scout first for codebase context:
+
+```bash
+/mk:scout
+/mk:planning-engine review AUTH-201 --scout
+```
+
+Produces a **Tech Review Report**: affected files, feasibility rating, dependencies, risks, complexity signals.
+
+### Step 5: Sprint planning
+
+```bash
+/mk:planning-engine plan --tickets AUTH-201,AUTH-202,AUTH-203 --capacity 40
+```
+
+If the tickets originated from a Confluence spec (see the sidebar above), pass the Spec Research Report back in to preserve spec context end-to-end:
+
+```bash
+/mk:planning-engine plan \
+  --tickets AUTH-201,AUTH-202,AUTH-203 \
+  --capacity 40 \
+  --scout \
+  --spec tasks/reports/spec-research-260511-q3-auth-refresh.md
+```
+
+Produces a **Planning Report**: sprint goal candidate, dependency map, grouping suggestions, capacity analysis. With `--spec`, the report includes a `## Spec Context (mk:confluence-spec-analyst)` section summarizing the upstream requirements / ACs / gaps relevant to the planning tickets.
+
+The **team** negotiates the sprint goal, self-selects work, and commits.
+
+## You Can Start Anywhere
+
+| Starting point | Skip to |
+|---|---|
+| Have tickets ready | Step 3 (evaluate) |
+| Have a spec/URL | "Importing a spec" sidebar above, then Step 2 |
+| One ticket only | Step 4 (tech review) |
+| Ready for sprint planning | Step 5 |
+
+No step requires the previous step's output as a hard dependency.
+
+## Human Gates
+
+| Gate | Who decides | AI provides |
+|---|---|---|
+| Which stories to create | **You** | Suggestions in spec / intake report |
+| Story point estimates | **Team** (planning poker) | Complexity signals |
+| Which tickets enter sprint | **Team** (self-selection) | Grouping suggestions |
+| Sprint goal | **PO + team** (negotiation) | Candidate draft |
+| Dependency resolution | **Team** | Cycle detection |
+
+## Related
+
+- [mk:jira-issue](/reference/skills/jira-issue) — ticket CRUD
+- [mk:jira-evaluator](/reference/skills/jira-evaluator) — complexity assessment
+- [mk:jira-estimator](/reference/skills/jira-estimator) — story-point suggestion
+- [mk:planning-engine](/reference/skills/planning-engine) — tech review + sprint planning
+- [PRD Intake Automation](/workflows/prd-intake) — raw ticket triage (different workflow)
+- [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) — single-ticket evaluation
+- [Spec → PR: Behind the Scenes](/workflows/spec-to-pr-walkthrough) — deep-dive walkthrough showing every skill, agent fork, and gate

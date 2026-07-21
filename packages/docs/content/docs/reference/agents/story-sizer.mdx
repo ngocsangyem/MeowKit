@@ -1,0 +1,73 @@
+---
+title: "story-sizer"
+description: "Pre-ticket Fibonacci sizing agent for paste-mode batches of user stories. Read-only at Jira; auto-create delegates ticket creation to peer skills."
+---
+
+The story-sizer agent applies deterministic heuristics to a batch of suggested user stories and emits a Story Sizing Report with Fibonacci point estimates, complexity verdicts, inconsistency flags, and optional split proposals. It never mutates Jira directly — auto-create mode delegates to `mk:jira-issue` and `mk:jira-collaborate`.
+
+## Cognitive Framing
+
+> *"Size the work before the ticket exists, so the ticket creation step is informed instead of arbitrary."*
+
+The story-sizer is a read-only sizing agent. It does NOT write story points to existing Jira tickets ([`jira-estimator`](/reference/agents/jira-estimator) does that for single tickets). It produces an advisory artifact for the dev to review, and — when the user opts in — drives a single-confirmation batch handoff to peer execution skills.
+
+## Key Facts
+
+| | |
+|---|---|
+| **Type** | Intelligence (pre-ticket) |
+| **Phase** | On-demand |
+| **Model** | inherit |
+| **Color** | orange |
+| **Safety** | Read-only at Jira. Local-FS write to `tasks/reports/`. Skill Rule of Two: 1-of-3 default · 2-of-3 with `--auto-create` (delegated; never 3-of-3). |
+| **Never does** | Read Jira credentials · invoke the credentialed Jira wrapper · call Atlassian REST directly · auto-invoke `/mk:scout` · use `--public` for audit comments · emit v1-forbidden flags (assignee, priority, sprint, blocks, custom-fields). |
+
+## When to Use
+
+- When you need **rough sizing for a batch of stories** before tickets exist.
+- After a `mk:confluence-spec-analyst` run that produced suggested user stories — reformat to the paste template and run story-sizer.
+- When you want to **delegate ticket creation** behind a single confirmation gate instead of running `mk:jira-issue create` once per story.
+
+## NOT For
+
+- Sizing a single existing Jira ticket — use [`jira-estimator`](/reference/agents/jira-estimator).
+- Sprint capacity analysis — use [`mk:planning-engine`](/reference/skills/planning-engine).
+- Auto-invoking scout, plan-creator, or any other skill.
+
+## Sizing Flow
+
+1. Receive `List<StoryRecord>` parsed by `scripts/parse-paste-stories.py`.
+2. Apply heuristics from `references/sizing-heuristics.md` (5 dimensions, integer math).
+3. Emit per-story `points`, `uncertainty`, `complexity`, `inconsistencies`, optional `split_proposal`, optional `codebase_signals`, optional `dor_status`.
+4. Refuse to size stories with `[NO_ACS]` flag from the adapter.
+5. Render via the template + writer (`scripts/write-sizing-report.py`).
+6. Return the report path.
+
+## Auto-create Handoff
+
+The agent does not call Jira itself. The SKILL.md orchestration layer:
+
+1. Runs the 5 pre-flight checks (`references/auto-create-gating.md`).
+2. Renders the dry-run table.
+3. Asks the user one yes/no question.
+4. Executes the per-ticket two-call sequence (`references/auto-create-execution.md`):
+   - Call A: `/mk:jira-issue create ...`
+   - Call B: `/mk:jira-collaborate add-comment ... --internal`
+5. Appends `## Created Tickets` to the report.
+
+## Determinism
+
+Same `StoryRecord` produces the same `points` / `drivers_score` / `complexity` every run. Reasoning prose may vary; the numeric output does not.
+
+## Gotchas
+
+- Source-body hash records the SHA-256 of the paste; editing locally between sizing and auto-create triggers a mismatch ABORT.
+- DoR advisory only renders when Agile rules are loaded for the session.
+- Comment template can be overridden via the `MEOWKIT_STORY_SIZER_COMMENT_TEMPLATE` env var (file path; must include the three placeholders).
+
+## See Also
+
+- Skill: [mk:story-sizer](/reference/skills/story-sizer)
+- Peer execution: [`jira-issue`](/reference/agents/jira-issue), [`jira-collaborate`](/reference/agents/jira-collaborate)
+- Peer intelligence: [`jira-evaluator`](/reference/agents/jira-evaluator), [`jira-estimator`](/reference/agents/jira-estimator), [`jira-analyst`](/reference/agents/jira-analyst)
+- Workflow: [Spec → PR walkthrough](/workflows/spec-to-pr-walkthrough) — Step 3.5
