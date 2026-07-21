@@ -15,7 +15,7 @@
 
 - Designed to work across:
   - CLI
-  - Docs (VitePress)
+  - Docs (Fumadocs)
   - UI components
 
 ---
@@ -260,7 +260,7 @@ Since MeowKit is a **developer tooling ecosystem**, your logo should support:
 
 - CLI (low-detail rendering)
 - Favicon (clear at 16–32px)
-- Docs (VitePress)
+- Docs (Fumadocs)
 - UI components
 
 **Recommended**
