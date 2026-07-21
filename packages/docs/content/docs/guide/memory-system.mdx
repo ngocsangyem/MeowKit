@@ -1,0 +1,83 @@
+---
+title: Memory System
+description: How MeowKit persists learnings across sessions — topic files, immediate capture, pruning.
+---
+
+MeowKit stores engineering learnings in `.claude/memory/` — fix patterns, review findings, architecture decisions. Skills read only the topic files relevant to their domain. There is no auto-injection pipeline.
+
+## Topic files
+
+| File | Consumer | Read when |
+|------|----------|-----------|
+| `fixes.json` | `mk:fix` | Bug diagnosis |
+| `review-patterns.md` + `review-patterns.json` | `mk:review`, `mk:plan-creator` | Code review or planning |
+| `architecture-decisions.md` + `architecture-decisions.json` | `mk:plan-creator`, `mk:cook` | Architecture work |
+| `security-notes.md` | `mk:cso`, `mk:review` | Security audit |
+| `cost-log.json` | analyst, `mk:memory` | Cost reporting |
+| `decisions.md` | architect | Long-form ADRs |
+
+**JSON-first.** For the curated stores (`fixes`, `review-patterns`, `architecture-decisions`, `security-findings`) the `.json` file is canonical and schema-validated; the Markdown under `views/` is a generated, non-authoritative view. `mk:fix` reads and writes `fixes.json` only for bug-class patterns. Long-session continuity is handled by the host runtime's native compaction — MeowKit no longer keeps its own conversation summary.
+
+**Machine-local by default.** `.claude/memory/*` is gitignored — content is developer-specific working state. Only `.gitkeep` is tracked.
+
+## How to capture
+
+There are **two** write paths. Pick the right one — picking the wrong one means the entry is silently lost. Full contract: `.claude/skills/memory/references/capture-architecture.md`.
+
+### Path 1 — User-typed keyboard shortcut (`##prefix:`)
+
+The **human user** types messages with a `##` prefix. The `immediate-capture-handler.cjs` UserPromptSubmit hook routes them:
+
+| Prefix | Target |
+|--------|--------|
+| `##pattern: bug-class DESCRIPTION` | `fixes.json` |
+| `##pattern: DESCRIPTION` | `review-patterns.json` |
+| `##decision: chose X over Y because…` | `architecture-decisions.json` |
+| `##note: TEXT` | `quick-notes.md` |
+
+Captures pass injection validation and secret scrubbing before writing. All writes are atomic (temp-file + rename).
+
+**The handler does NOT fire on agent or tool output.** It is bound to `UserPromptSubmit` semantics. Agents that need to capture use Path 2 below.
+
+### Path 2 — Agent-authored entry via direct `Edit`
+
+When an agent or skill identifies a learning, it calls `Edit` directly on the appropriate topic file. There is no hook — the agent scrubs secrets in-content before writing. Topic file routing follows the table in `.claude/skills/memory/references/capture-architecture.md`.
+
+The `mk:fix` skill's Step 6 is the canonical example: read the live JSON schema and add or update a structured entry via `Edit`.
+
+### Session-end capture
+
+The Stop hook auto-appends cost entries to `cost-log.json` and resolves the active model id from `session-state/detected-model.json` via `resolve-model.sh`. Phase 6 (Reflect) runs **prose-driven** session capture — the agent reads `.claude/skills/memory/references/session-capture.md` and follows its 4 steps via direct `Edit`. There is no `mewkit memory session-capture` CLI subcommand; content extraction needs LLM analysis.
+
+## How to read
+
+Skills include a "Load memory" step in their SKILL.md. The agent uses `Read` to load the relevant topic file at task start. Nothing is injected on subsequent turns.
+
+## Validate and regenerate
+
+```bash
+mewkit memory validate     # Schema-validate the curated stores (--strict to fail on errors)
+mewkit memory seed-from-md # Populate JSON stores from Markdown (run once after upgrading)
+mewkit memory render-views # Regenerate views/*.md from the canonical JSON
+mewkit doctor --state      # Report curated-memory health
+```
+
+The generated `views/*.md` carry a "generated — do not edit" banner — edit the JSON and re-run `render-views`. After an upgrade, run `seed-from-md` once so existing Markdown topic files are migrated into the JSON stores.
+
+## Pruning
+
+```bash
+/mk:memory --prune              # Archive entries older than 90 days
+/mk:memory --prune --days 180   # Custom threshold
+/mk:memory --prune --dry-run    # Preview without writing
+```
+
+Entries move to `lessons-archive.md`. Exempt: entries marked `severity: critical` or `severity: security`. Prune when a single topic file exceeds 300 lines or all topic files exceed 500 lines.
+
+## Separate from Claude Code auto-memory
+
+Claude Code has its own auto-memory at `~/.claude/projects/PROJECT/memory/`. It is separate from MeowKit's `.claude/memory/`. Use Claude Code auto-memory for personal habits; use MeowKit memory for project-specific engineering artifacts.
+
+## See also
+
+- [How It Works](/core-concepts/how-it-works) — memory in the architecture overview

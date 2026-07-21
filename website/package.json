@@ -1,5 +1,5 @@
 {
-  "name": "meowkit-docs",
+  "name": "meowkit-docs-vitepress-legacy",
   "type": "module",
   "private": true,
   "scripts": {

@@ -1,0 +1,100 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* ==================================================================
+ * MeowKit brand theme — ported from website/.vitepress/theme
+ * Layer 1 primitives (--mk-*) + Fumadocs slot mappings (--color-fd-*).
+ * Royal blue oklch(55% 0.21 263) is the brand primary; neutrals are
+ * blue-tinted slate (never zero-chroma).
+ * ================================================================== */
+
+:root {
+  /* Royal Blue — brand primary */
+  --mk-blue-300: oklch(80% 0.096 252);
+  --mk-blue-400: oklch(70% 0.145 258); /* accent glow (dark-mode primary) */
+  --mk-blue-500: oklch(62% 0.19 260);
+  --mk-blue-600: oklch(55% 0.21 263); /* brand primary */
+  --mk-blue-700: oklch(50% 0.22 264);
+  --mk-blue-900: oklch(32% 0.07 255); /* deep-space surface accent */
+
+  /* Neutrals — blue-tinted slate */
+  --mk-neutral-0: oklch(99.4% 0.002 250);
+  --mk-neutral-50: oklch(98% 0.003 250);
+  --mk-neutral-100: oklch(91% 0.01 250);
+  --mk-neutral-200: oklch(85% 0.014 250);
+  --mk-neutral-300: oklch(70% 0.02 250);
+  --mk-neutral-500: oklch(55% 0.025 253);
+  --mk-neutral-700: oklch(37% 0.03 257);
+  --mk-neutral-800: oklch(28% 0.03 258);
+  --mk-neutral-900: oklch(20% 0.03 262); /* dark paper */
+  --mk-neutral-950: oklch(13% 0.01 255); /* deep-space ink */
+
+  /* Light theme → Fumadocs slots */
+  --color-fd-background: var(--mk-neutral-50);
+  --color-fd-foreground: var(--mk-neutral-950);
+  --color-fd-card: var(--mk-neutral-0);
+  --color-fd-card-foreground: var(--mk-neutral-950);
+  --color-fd-popover: var(--mk-neutral-0);
+  --color-fd-popover-foreground: var(--mk-neutral-950);
+  --color-fd-primary: var(--mk-blue-600);
+  --color-fd-primary-foreground: var(--mk-neutral-0);
+  --color-fd-secondary: var(--mk-neutral-100);
+  --color-fd-secondary-foreground: var(--mk-neutral-700);
+  --color-fd-muted: var(--mk-neutral-100);
+  --color-fd-muted-foreground: var(--mk-neutral-500);
+  --color-fd-accent: color-mix(in oklab, var(--mk-blue-600) 8%, transparent);
+  --color-fd-accent-foreground: var(--mk-blue-700);
+  --color-fd-border: var(--mk-neutral-100);
+  --color-fd-ring: var(--mk-blue-600);
+}
+
+.dark {
+  /* Dark theme — blue-tinted deep-space palette */
+  --color-fd-background: var(--mk-neutral-900);
+  --color-fd-foreground: var(--mk-neutral-50);
+  --color-fd-card: var(--mk-neutral-800);
+  --color-fd-card-foreground: var(--mk-neutral-50);
+  --color-fd-popover: var(--mk-neutral-800);
+  --color-fd-popover-foreground: var(--mk-neutral-50);
+  --color-fd-primary: var(--mk-blue-400);
+  --color-fd-primary-foreground: var(--mk-neutral-950);
+  --color-fd-secondary: var(--mk-blue-900);
+  --color-fd-secondary-foreground: var(--mk-neutral-100);
+  --color-fd-muted: var(--mk-blue-900);
+  --color-fd-muted-foreground: var(--mk-neutral-300);
+  --color-fd-accent: color-mix(in oklab, var(--mk-blue-600) 15%, transparent);
+  --color-fd-accent-foreground: var(--mk-blue-300);
+  --color-fd-border: color-mix(in oklab, var(--mk-neutral-0) 8%, transparent);
+  --color-fd-ring: var(--mk-blue-400);
+}
+
+@theme inline {
+  /* Space Grotesk display · Inter body · JetBrains Mono code */
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-display: var(--font-space-grotesk), var(--font-inter), sans-serif;
+}
+
+/* Display typography — Space Grotesk carries headings site-wide */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.prose h1 {
+  font-weight: 700;
+}
+
+.prose h2,
+.prose h3 {
+  font-weight: 600;
+}
+
+/* Tables — tabular numerals, matching the instrument-panel register */
+.prose table {
+  font-variant-numeric: tabular-nums;
+}
