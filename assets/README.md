@@ -28,7 +28,7 @@ The face of the brand is not a character — it's the command itself. Signals: C
 | Surface | What it is | Where the visuals come from |
 |---|---|---|
 | **CLI** (`mewkit`) | npm-distributed command runner — `init`, `setup`, `doctor`, `validate`, `budget`, `memory` | Monospace terminal output with ✓/✗ glyphs and `mk:` namespaced skill calls |
-| **Docs website** | VitePress site at `docs.meowkit.dev` — home, guide, workflows, reference, cheatsheet | `website/.vitepress/theme/custom.css` — full 4-layer token system |
+| **Docs website** | Fumadocs site at `docs.meowkit.dev` — home, guide, workflows, reference, cheatsheet | `packages/docs/app/global.css` — full token system + Fumadocs `--color-fd-*` mappings |
 | **`.claude/` runtime** | Markdown agents / skills / rules consumed by Claude Code itself | Plain Markdown, code blocks, tables — very CLI-native |
 
 ### Sources
@@ -36,9 +36,9 @@ The face of the brand is not a character — it's the command itself. Signals: C
 All visual context was pulled from the public repo **[ngocsangyem/MeowKit](https://github.com/ngocsangyem/MeowKit)** (default branch `main`). Key files:
 
 - `assets/branding/design-tokens.json` — canonical theme JSON
-- `website/.vitepress/theme/custom.css` — 4-layer CSS variable system with full light + dark themes
-- `website/index.md` — hero copy + feature list
-- `website/introduction.md`, `why-meowkit.md`, `cheatsheet.md`, `quick-start.md` — tone + voice samples
+- `packages/docs/app/global.css` — brand token system + Fumadocs `--color-fd-*` mappings, full light + dark themes
+- `packages/docs/app/(home)/page.tsx` + `packages/docs/components/home/` — hero copy + feature clusters
+- `packages/docs/content/docs/introduction.mdx`, `why-meowkit.mdx`, `cheatsheet.mdx`, `quick-start.mdx` — tone + voice samples
 - `README.md` + `CLAUDE.md` — product positioning
 
 No Figma was provided. All tokens were reconstructed from the CSS + JSON above — which is itself the source of truth in the repo.
@@ -54,7 +54,7 @@ No Figma was provided. All tokens were reconstructed from the CSS + JSON above �
 | `colors_and_type.css` | All CSS variables (brand primitives, light/dark tokens, typography roles) |
 | `assets/branding/` | `design-tokens.json` canonical token source |
 | `preview/` | Design-system preview cards (colors, type, spacing, components, brand) |
-| `ui_kits/website/` | VitePress-style docs site recreation — hero, features, sidebar, code blocks |
+| `ui_kits/website/` | Docs-site design recreation — hero, features, sidebar, code blocks |
 | `ui_kits/cli/` | Terminal UI kit — `mewkit init`, `/mk:cook`, `/mk:ship` simulated sessions |
 
 ---
@@ -226,5 +226,5 @@ The logo is produced in code (Fira Code 500 + gradient + caret); there are no bi
 
 - **Fonts not bundled.** The repo references Inter + Fira Code by name but doesn't ship `.ttf` / `.woff2` files. This system loads them from Google Fonts via `<link>`. **Ask the user for self-hosted font files if you need offline / commercial distribution.**
 - **No icon set.** Flagged above. If you add Lucide, note the substitution in the output's footer.
-- **No Figma file.** All component recreations are reconstructed from CSS + screenshots of the live VitePress site. Minor rendering differences from the official site are expected.
-- **Light-mode is secondary.** The website ships dark-mode by default visually. Light mode tokens are complete but less exercised.
+- **No Figma file.** All component recreations are reconstructed from CSS + screenshots of the live docs site. Minor rendering differences from the official site are expected.
+- **Light-mode is secondary.** The docs site ships dark-mode by default visually. Light mode tokens are complete but less exercised.

@@ -82,7 +82,7 @@ Example:
 ./scripts/release.sh 2.3.2 "The Agent-Skills Integration Release"
 ```
 
-The script automates steps 3-9 below: bump version → build/lint/typecheck/test → prepare release assets → VitePress build check → commit + tag → push → create GitHub Release with zip. Stops on any failure, warns on uncommitted changes.
+The script automates steps 3-9 below: bump version → build/lint/typecheck/test → prepare release assets → docs build check → commit + tag → push → create GitHub Release with zip. Stops on any failure, warns on uncommitted changes.
 
 **Before running the script:** Complete step 2 (update CHANGELOG) manually. If the release affects guide/reference pages, complete step 1a as well. If a new agent or skill landed, complete step 1b (routing surfaces) too. If the release changes the database/wiki schema or bumps `SCHEMA_VERSION`, complete step 1f (schema touchpoints).
 
@@ -94,7 +94,7 @@ The script automates steps 3-9 below: bump version → build/lint/typecheck/test
 
 Update the changelog and any affected guide/reference pages BEFORE tagging.
 
-**Patch releases:** Only update `website/changelog.md` (step 2). Skip the doc update step below unless a guide page documents behavior that changed.
+**Patch releases:** Only update `packages/docs/content/docs/changelog.mdx` (step 2). Skip the doc update step below unless a guide page documents behavior that changed.
 
 #### 1a. Update affected guide pages
 
@@ -120,16 +120,16 @@ When a release adds a new agent or skill, update the routing surfaces so the orc
 | `.claude/rules/agent-routing.md`                                | New core/support agent — add to the 17-row table; new domain agent → add to the hub-skill family row                        |
 | `.claude/skills/agent-detector/references/lifecycle-routing.md` | New skill that maps to a user signal — add a Discovery Tree row                                                             |
 | `.claude/skills/scale-routing/data/domain-complexity.csv`       | New domain match (fintech, healthcare, etc.) — add a row with signals + level + workflow                                    |
-| `website/.vitepress/config.ts`                                  | New skill or agent — add to the matching sidebar group under `reference/skills/*` or `reference/agents/*`                   |
-| `website/reference/skills/<name>.md`                            | New skill — create the reference page (use an existing skill page as a template; keep it under 800 lines per `docs.maxLoc`) |
-| `website/reference/agents/<name>.md`                            | New agent — create the reference page                                                                                       |
+| `packages/docs/content/docs/reference/meta.json`                                  | New skill or agent — add to the matching group in `packages/docs/content/docs/reference/meta.json`                   |
+| `packages/docs/content/docs/reference/skills/<name>.mdx`                            | New skill — create the reference page (use an existing skill page as a template; keep it under 800 lines per `docs.maxLoc`) |
+| `packages/docs/content/docs/reference/agents/<name>.mdx`                            | New agent — create the reference page                                                                                       |
 
 Skip rows that don't apply to the current release. The matrix is a checklist, not a mandate to edit every file.
 
-#### 1c. Verify VitePress builds
+#### 1c. Verify docs build
 
 ```bash
-cd website && npx vitepress build
+npm run build -w packages/docs
 ```
 
 Must complete with no errors. Chunk size warnings are normal.
@@ -203,7 +203,7 @@ Every file above lives under `packages/mewkit/src/`, so a schema change ALWAYS t
 - Attribution / provenance metadata (e.g. `SKILLS_ATTRIBUTION.md`, skill `attribution:` frontmatter) — legitimate credit.
 - Real path / string literals the code depends on (`~/.meowkit/...`, `"meowkit-default"`, `meowkit:` frontmatter keys).
 
-**Scope:** this rule applies ONLY to shipped surfaces — `.claude/`, `tasks/`, and the shipped `CLAUDE.md`. The source repo's `website/`, `packages/`, `docs/`, and `README` are the product's own surfaces and SHOULD use the brand.
+**Scope:** this rule applies ONLY to shipped surfaces — `.claude/`, `tasks/`, and the shipped `CLAUDE.md`. The source repo's `packages/`, `docs/`, and `README` are the product's own surfaces and SHOULD use the brand.
 
 **Check before release.** Scope the grep to the context-loaded prose surfaces (skill / agent / command / rule `.md`) and exclude the functional refs above — expect **zero** hits:
 
@@ -214,9 +214,9 @@ grep -rinE 'meowkit' .claude/skills .claude/agents .claude/commands .claude/rule
 
 A broader `grep -ri meowkit .claude tasks` also surfaces functional hits — config identity (`metadata.json` `"name": "meowkit"`), filenames (`gitignore.meowkit`), hook log prefixes (`[meowkit]`), generated views (`harness-substrate.md`), and the kit's own `memory/` dev log. Those are expected; only **new prose** that names the product as a subject needs neutralizing.
 
-### 2. Update CHANGELOG (`website/changelog.md`)
+### 2. Update CHANGELOG (`packages/docs/content/docs/changelog.mdx`)
 
-> **Note:** The ONLY changelog file you edit is `website/changelog.md` — the VitePress source that renders to https://docs.meowkit.dev/changelog. Root `CHANGELOG.md` is a permanent stub that just refers readers to that published page; never add release notes to it.
+> **Note:** The ONLY changelog file you edit is `packages/docs/content/docs/changelog.mdx` — the Fumadocs source that renders to https://docs.meowkit.dev/changelog. Root `CHANGELOG.md` is a permanent stub that just refers readers to that published page; never add release notes to it.
 
 Add a new version section at the **top** (just below the `## Upgrade` block). Use the schema below — only include sections that have content. Empty sections are dropped, not stubbed.
 
@@ -304,7 +304,7 @@ would want it.
 
 #### When to bump
 
-Only bump `packages/mewkit` when the release ships **changes inside `packages/mewkit/src/`**. Edits to `.claude/`, `tasks/`, `CLAUDE.md`, the website, or rules do NOT require a CLI version bump — those ride out via the release zip and `npx mewkit upgrade`.
+Only bump `packages/mewkit` when the release ships **changes inside `packages/mewkit/src/`**. Edits to `.claude/`, `tasks/`, `CLAUDE.md`, the docs site, or rules do NOT require a CLI version bump — those ride out via the release zip and `npx mewkit upgrade`.
 
 ```bash
 # Decide first — does this release touch CLI code?
@@ -453,11 +453,11 @@ Copy this checklist for each release:
 - [ ] Updated affected guide/reference pages (step 1a)
 - [ ] If a new agent or skill landed: updated routing surfaces (step 1b — `SKILLS_INDEX.md`, `AGENTS_INDEX.md`, `agent-routing.md`, `lifecycle-routing.md`, sidebar config, reference page)
 - [ ] No product-brand leakage in shipped `.claude/` / `tasks/` (step 1g — brand grep shows only functional/attribution hits)
-- [ ] VitePress build passes (`npx vitepress build`)
+- [ ] Docs build passes (`npm run build -w packages/docs`)
 
 ### Changelog
 
-- [ ] Added v<version> section to `website/changelog.md` (NOT root `CHANGELOG.md` — it is a stub, leave it untouched)
+- [ ] Added v<version> section to `packages/docs/content/docs/changelog.mdx` (NOT root `CHANGELOG.md` — it is a stub, leave it untouched)
 
 ### Version
 
@@ -510,7 +510,7 @@ Push to `main` or `dev` triggers `.github/workflows/release.yml`:
 5. `@semantic-release/exec` publishes both packages to npm
 6. `@semantic-release/git` commits version files (and the regenerated `plugin/` + marketplaces) back to repo
 
-**Note:** Automated releases do NOT update `website/changelog.md` or affected guide/reference pages. Those must be done manually before the release commit. Root `CHANGELOG.md` is a stub and is never updated per-release.
+**Note:** Automated releases do NOT update `packages/docs/content/docs/changelog.mdx` or affected guide/reference pages. Those must be done manually before the release commit. Root `CHANGELOG.md` is a stub and is never updated per-release.
 
 **Plugin guard:** `.github/workflows/ci.yml` runs `mewkit validate --plugin` on every PR — it fails closed if an agent name is non-bare, a skill name is non-`mk:`, a `subagent_type` ref is unknown, a plugin manifest is malformed, or the committed plugin version drifts from the root `package.json`. Keep the committed `plugin/` regenerated (`npx mewkit build-plugin`) so this stays green.
 

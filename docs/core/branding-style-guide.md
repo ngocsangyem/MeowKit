@@ -9,7 +9,7 @@ Brand prose belongs at the **repo level**, not inside the runtime markdown:
 - `README.md`
 - `CHANGELOG.md`
 - `package.json`
-- `website/**`
+- `packages/docs/**`
 - `docs/branding-*`
 - `assets/**`
 

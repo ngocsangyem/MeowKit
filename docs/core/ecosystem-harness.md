@@ -92,8 +92,8 @@ Delegation prompts are expected to include:
 
 ### Docs build pipeline
 
-- The website/docs tree is built via VitePress.
-- Releases verify VitePress build output.
+- The docs site is built via Fumadocs (Next.js) at `packages/docs`.
+- Releases verify the Fumadocs build output.
 
 ### LLM doc indexes
 

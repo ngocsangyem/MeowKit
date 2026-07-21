@@ -113,7 +113,7 @@ meowkit/
 │   ├── mewkit/               CLI (npm as mewkit)
 │   └── landing/              Landing page (meowkit.dev, Nuxt + Tailwind v4)
 ├── scripts/                  Release automation
-├── website/                  VitePress documentation
+├── packages/docs/            Fumadocs documentation
 ├── CLAUDE.md                 Entry point for Claude Code
 ├── .releaserc.cjs            Semantic release config
 └── .github/workflows/        CI/CD (release, beta, PR validation)

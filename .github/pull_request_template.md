@@ -24,7 +24,7 @@
 - [ ] Tests pass (`npm test`)
 - [ ] Lint passes (`npm run lint`)
 - [ ] Build passes (`npm run build`)
-- [ ] VitePress builds (`cd website && npx vitepress build`)
+- [ ] Docs build passes (`npm run build -w packages/docs`)
 - [ ] Manual testing: <!-- describe -->
 
 ## Checklist
@@ -34,7 +34,7 @@
 - [ ] Uses progressive disclosure (references/, templates/ for complex skills)
 - [ ] Description field is trigger-oriented (for new skills)
 - [ ] RULES_INDEX.md updated (if new rule added)
-- [ ] VitePress docs updated (if user-facing change)
+- [ ] Docs updated (if user-facing change)
 - [ ] Changelog updated
 - [ ] No hardcoded secrets or `.env` values
 
