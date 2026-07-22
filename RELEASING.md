@@ -145,28 +145,65 @@ Check `packages/mewkit/portable-manifest.json` whenever a release moves source f
 - Do not copy `portable-manifest.json` into `.claude/`. It is an npm package artifact shipped with `packages/mewkit`, not part of the project kit that `npx mewkit init` scaffolds.
 - If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `tasks/`, `CLAUDE.md`, and `release-manifest.json`.
 
-#### 1e. Regenerate the native plugin distribution (when `.claude/` content changes)
+#### 1e. Sync the authored Codex bundle (when `.claude/` content changes)
 
-The native plugin (`plugin/` + `.claude-plugin/marketplace.json` + `.agents/plugins/marketplace.json`) is a GENERATED mirror of `.claude/`. The release script (`prepare-release-assets.cjs`) regenerates it automatically, so a normal `./scripts/release.sh` run keeps it current. Regenerate manually after editing `.claude/` outside a release:
+The Codex migration target is a HAND-AUTHORED bundle at
+`packages/mewkit/src/migrate/modules/codex/`, ported from `.claude/` into Codex-native
+shapes. It is NOT a runtime transform — `mewkit migrate codex` copies this bundle
+verbatim. When a release adds or changes any **skill, agent, rule, command, or hook**
+in `.claude/`, re-port so the Codex bundle stays consistent with the Codex Harness.
+
+**Always check the official Codex docs FIRST** — the formats change, so verify each
+surface against the source of truth before porting:
+
+- Subagents (agents): https://learn.chatgpt.com/docs/agent-configuration/subagents
+- Rules: https://learn.chatgpt.com/docs/agent-configuration/rules
+- Environment variables: https://learn.chatgpt.com/docs/config-file/environment-variables
+- AGENTS.md: https://learn.chatgpt.com/docs/agent-configuration/agents-md
+- Config (advanced): https://learn.chatgpt.com/docs/config-file/config-advanced
+- Config (basic): https://learn.chatgpt.com/docs/config-file/config-basic
+- Hooks: https://learn.chatgpt.com/docs/hooks
+- Skills: https://learn.chatgpt.com/docs/build-skills
+
+**Surface mapping (current, per the docs above):**
+
+| `.claude/` surface | Codex shape | Notes |
+| --- | --- | --- |
+| `agents/*.md` | `.codex/agents/<name>.toml` | `name` + `description` + `developer_instructions` (+ optional `model_reasoning_effort`, `sandbox_mode`); Codex auto-loads them — NO `config.toml` `config_file` wiring |
+| `skills/<name>/` | `.agents/skills/<name>/SKILL.md` | Codex uses the SAME `SKILL.md` (name + description frontmatter); references/scripts copied |
+| `commands/**` | `.agents/skills/command-<name>/` | Codex has no command surface → represented as skills |
+| `rules/*`, `rules-conditional/*` | `.agents/skills/rule-<name>/` | Codex native `.rules` are Starlark command policies, NOT markdown guidance → guidance rules become skills |
+| `modes/*` | `.agents/skills/mode-<name>/` | guidance → skills |
+| `settings.json` hooks | `.codex/hooks.json` | same JSON schema; resolve the project root via `$(git rev-parse --show-toplevel)` — Codex exposes no `CLAUDE_PROJECT_DIR` |
+
+Index files (`agents/AGENTS_INDEX.md` / `SKILLS_INDEX.md`, no `name:` frontmatter) are
+NOT agents; the porter skips them.
+
+**Re-port + verify:**
 
 ```bash
-npx mewkit build-plugin     # rewrites plugin/ + both marketplaces from .claude/
-npx mewkit validate --plugin # namespace purity + manifest contract + version alignment
+# Regenerate agents/ + skills/ from .claude/ into the bundle. Authored AGENTS.md,
+# config.toml, hooks.json, hooks/, and manifest.json are preserved.
+npx tsx packages/mewkit/scripts/run-codex-port.ts
+
+# Consistency gate: the bundle must contain ZERO `claude` references.
+grep -rli claude packages/mewkit/src/migrate/modules/codex   # expect: no output
+
+# Structural gate: the copied bundle must pass the Codex target validator.
+npx vitest run --config vitest.config.ts "src/migrate/modules/"
 ```
 
-What stays correct automatically (do NOT hand-edit the generated tree):
+The porter neutralizes Claude-isms (memory → `.meowkit/`, `CLAUDE.md` → `AGENTS.md`,
+`CLAUDE_PROJECT_DIR` → `$(git rev-parse …)`, `CLAUDE_PLUGIN_ROOT/DATA` → Codex's
+`PLUGIN_ROOT/DATA`, product wording → Codex, tool/invocation tokens via the adapter
+rules). If a NEW Claude-specific token appears, extend `neutralize()` in
+`packages/mewkit/src/migrate/modules/porter/port-claude-to-codex.ts` and re-run — do
+NOT hand-patch generated files.
 
-- **New skill** — appears under `plugin/skills/<dir>/` and resolves as `/mk:<dir>` (the plugin derives the slash command from the DIRECTORY name). A skill whose `name:` slug differs from its directory will resolve wrong in plugin mode — keep `dir == slug` (the lone historical exception, `mk-loop` → `mk:loop`, is auto-renamed to `loop` by the builder; do not add new mismatches).
-- **New agent** — keep its `name:` frontmatter BARE (e.g. `name: developer`). The plugin runtime auto-prefixes the plugin name, so a bare `developer` registers as `mk:developer`. A `name: mk:developer` would double-prefix to `mk:mk:developer` and break — `mewkit validate --plugin` blocks this.
-- **New `subagent_type` reference to a kit agent** — write it BARE in `.claude/` (matches flat-copy). The builder rewrites it to `mk:<agent>` in the plugin payload. Built-ins (`Explore`, `Bash`, `general-purpose`, `Plan`) stay bare.
-- **New hook** — wire it in `.claude/settings.json` as usual (`$CLAUDE_PROJECT_DIR/.claude/...`). The builder translates it into `plugin/hooks/hooks.json` with `${CLAUDE_PLUGIN_ROOT}/...` paths. Hook scripts and `handlers.json` travel unchanged.
-- **Index files** — `agents/AGENTS_INDEX.md` / `SKILLS_INDEX.md` (no `name:` frontmatter) are pruned from the plugin payload so they are not registered as agents.
-
-When to act manually:
-
-- After adding/removing/renaming any skill, agent, hook, or rule outside a `release.sh` run → `npx mewkit build-plugin` and commit the regenerated `plugin/` + marketplaces.
-- If `mewkit validate --plugin` reports a version mismatch → the committed `plugin/` is stale; regenerate it (the release script does this before tagging).
-- Plugin install commands for docs / release notes: `claude plugin marketplace add ngocsangyem/MeowKit` + `claude plugin install mk@meowkit`; Codex equivalents with `codex plugin`.
+**Bundle phasing (author-first, delete-converters-last):** each
+`modules/codex/manifest.json` entry carries an `active` flag. While draft
+(`active: false`) the migrate overlay is inert and the legacy converters still
+generate Codex output; flip surfaces live per batch, then retire the converters.
 
 #### 1f. Update when the derived index or wiki schema changes
 
@@ -485,8 +522,7 @@ Copy this checklist for each release:
 
 - [ ] `prepare-release-assets.cjs` ran successfully
 - [ ] `dist/meowkit-release.zip` exists with expected size
-- [ ] Plugin distribution regenerated: `plugin/` + `.claude-plugin/marketplace.json` + `.agents/plugins/marketplace.json` present and staged
-- [ ] `npx mewkit validate --plugin` passes (namespace purity + manifest contract + version alignment)
+- [ ] Codex bundle synced when `.claude/` changed (step 1e): `npx tsx packages/mewkit/scripts/run-codex-port.ts` re-run; `grep -rli claude packages/mewkit/src/migrate/modules/codex` → no output; `npx vitest run --config vitest.config.ts "src/migrate/modules/"` green
 - [ ] Committed and tagged
 - [ ] Pushed to GitHub (commits + tag)
 - [ ] GitHub Release created with zip asset
