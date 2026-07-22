@@ -109,7 +109,11 @@ function checkHooks(dir: string): CheckResult[] {
 	}
 	const wrapperPaths = commands
 		.map((c) => c.match(/"([^"]+\.cjs)"/)?.[1] ?? c.match(/(\S+\.cjs)/)?.[1])
-		.filter((p): p is string => Boolean(p));
+		.filter((p): p is string => Boolean(p))
+		// Real Codex hook commands resolve the project root via `$(git rev-parse
+		// --show-toplevel)` (Codex exposes no project-dir env var). The target being
+		// validated IS that root, so substitute it to resolve the wrapper on disk.
+		.map((p) => p.replace(/\$\(git rev-parse --show-toplevel\)/g, dir));
 	const missing = wrapperPaths.filter((p) => !fs.existsSync(p));
 	const notExec = wrapperPaths.filter((p) => fs.existsSync(p) && !isExecutable(p));
 	if (wrapperPaths.length === 0) {

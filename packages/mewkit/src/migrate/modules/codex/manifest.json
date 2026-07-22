@@ -31,8 +31,8 @@
       "active": false
     },
     {
-      "sourcePath": "hooks/capture.sh",
-      "targetPath": ".codex/hooks/capture.sh",
+      "sourcePath": "hooks/capture.cjs",
+      "targetPath": ".codex/hooks/capture.cjs",
       "provider": "codex",
       "mode": "0755",
       "ownership": "managed-replace",

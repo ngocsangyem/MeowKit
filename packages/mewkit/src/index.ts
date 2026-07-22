@@ -483,6 +483,7 @@ async function main(): Promise<void> {
 				stats: args.stats as boolean | undefined,
 				strict: args.strict as boolean | undefined,
 				check: args.check as boolean | undefined,
+				promptArgs: args._.slice(2).map(String),
 			});
 			break;
 		case "verdict-gate":

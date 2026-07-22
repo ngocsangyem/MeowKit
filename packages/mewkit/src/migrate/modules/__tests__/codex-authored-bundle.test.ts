@@ -35,7 +35,7 @@ describe("authored codex bundle", () => {
 				".codex/agents/planner.toml",
 				".codex/config.toml",
 				".codex/hooks.json",
-				".codex/hooks/capture.sh",
+				".codex/hooks/capture.cjs",
 				"AGENTS.md",
 			].sort(),
 		);
@@ -52,7 +52,7 @@ describe("authored codex bundle", () => {
 		// Hooks resolve the project root via git (Codex exposes no CODEX_PROJECT_DIR).
 		expect(readFileSync(join(target, ".codex", "hooks.json"), "utf-8")).toContain("git rev-parse --show-toplevel");
 		// The capture wrapper is installed executable.
-		expect(statSync(join(target, ".codex", "hooks", "capture.sh")).mode & 0o777).toBe(0o755);
+		expect(statSync(join(target, ".codex", "hooks", "capture.cjs")).mode & 0o777).toBe(0o755);
 	});
 
 	it("the copied bundle passes the Codex target validator (no failures)", async () => {

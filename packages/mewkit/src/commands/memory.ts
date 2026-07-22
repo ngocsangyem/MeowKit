@@ -6,6 +6,7 @@ import { validateMemory } from "../memory/validate.js";
 import { seedFromMd } from "../memory/seed-from-md.js";
 import { renderViews } from "../memory/render-views.js";
 import { resolveProjectRoot } from "../state/meowkit-root-resolver.js";
+import { captureFromPrompt } from "./memory-capture.js";
 
 interface MemoryArgs {
 	subcommand?: string;
@@ -13,6 +14,20 @@ interface MemoryArgs {
 	stats?: boolean;
 	strict?: boolean;
 	check?: boolean;
+	/** Positional prompt words for `mewkit memory capture <prompt>`; falls back to stdin. */
+	promptArgs?: string[];
+}
+
+/** Read all of stdin (used when `memory capture` gets its prompt piped, e.g. from a hook). */
+function readStdin(): Promise<string> {
+	return new Promise((resolve) => {
+		let data = "";
+		if (process.stdin.isTTY) return resolve("");
+		process.stdin.setEncoding("utf-8");
+		process.stdin.on("data", (chunk) => (data += chunk));
+		process.stdin.on("end", () => resolve(data));
+		process.stdin.on("error", () => resolve(data));
+	});
 }
 
 interface PatternEntry {
@@ -318,6 +333,16 @@ function renderViewsCmd(memoryDir: string, check: boolean, strict: boolean): voi
 }
 
 export async function memory(args: MemoryArgs): Promise<void> {
+	// `capture` is the hook write path: it routes a ##prefix prompt into the
+	// .meowkit/memory store via the write contract, creating the store if needed.
+	// It bypasses the interactive header + legacy guard (it targets .meowkit/ directly).
+	if (args.subcommand === "capture") {
+		const prompt = args.promptArgs && args.promptArgs.length > 0 ? args.promptArgs.join(" ") : await readStdin();
+		const result = await captureFromPrompt(prompt);
+		if (result.captured) console.log(pc.green(`memory: captured to ${result.store}`));
+		return; // non-capture prompt → silent no-op, exit 0
+	}
+
 	console.log(pc.bold(pc.cyan("Agent Memory")));
 	console.log();
 
