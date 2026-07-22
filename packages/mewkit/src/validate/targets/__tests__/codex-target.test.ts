@@ -142,4 +142,26 @@ describe("codex target validation", () => {
 		expect(codexTargetProfile.detect(bare)).toBe(false);
 		rmSync(bare, { recursive: true, force: true });
 	});
+
+	it("a clean target passes the legacy-surface checks", async () => {
+		const rs = await codexTargetProfile.check(makeTarget());
+		expect(status(rs, "Codex no native memory surface")).toBe("pass");
+		expect(status(rs, "Codex no legacy prompts surface")).toBe("pass");
+	});
+
+	it("a `.codex/memory` surface → FAIL (memory must stay in .meowkit/)", async () => {
+		const d = makeTarget();
+		mkdirSync(join(d, ".codex", "memory"), { recursive: true });
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex no native memory surface")).toBe("fail");
+		expect(anyFail(rs)).toBe(true);
+	});
+
+	it("a deprecated `.codex/prompts` surface → FAIL (must be Agent Skills)", async () => {
+		const d = makeTarget();
+		mkdirSync(join(d, ".codex", "prompts"), { recursive: true });
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex no legacy prompts surface")).toBe("fail");
+		expect(anyFail(rs)).toBe(true);
+	});
 });

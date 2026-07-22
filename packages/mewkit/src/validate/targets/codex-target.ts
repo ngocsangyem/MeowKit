@@ -251,6 +251,28 @@ function checkSkills(dir: string): CheckResult[] {
 	return out;
 }
 
+// 7. Reject legacy / disallowed Codex surfaces. MeowKit never writes native Codex
+// memory (`.codex/memory` — memory lives in the runtime-neutral `.meowkit/` store,
+// and native memories stay opt-in/user-local), and it represents deprecated custom
+// prompts as Agent Skills rather than emitting a `.codex/prompts` surface. A generated
+// target that contains either is a defect, not a valid output.
+function checkLegacySurfaces(dir: string): CheckResult[] {
+	const out: CheckResult[] = [];
+	const memoryDir = path.join(dir, ".codex", "memory");
+	out.push(
+		fs.existsSync(memoryDir)
+			? fail("Codex no native memory surface", "`.codex/memory` present — MeowKit must never write native Codex memory")
+			: pass("Codex no native memory surface", "no `.codex/memory` (memory stays in `.meowkit/`)"),
+	);
+	const promptsDir = path.join(dir, ".codex", "prompts");
+	out.push(
+		fs.existsSync(promptsDir)
+			? fail("Codex no legacy prompts surface", "`.codex/prompts` present — deprecated custom prompts must be Agent Skills")
+			: pass("Codex no legacy prompts surface", "no deprecated `.codex/prompts` surface"),
+	);
+	return out;
+}
+
 export const codexTargetProfile: TargetProfile = {
 	name: "codex",
 	detect(dir: string): boolean {
@@ -267,6 +289,7 @@ export const codexTargetProfile: TargetProfile = {
 		results.push(...checkHooks(dir));
 		results.push(...checkAgents(dir));
 		results.push(...checkSkills(dir));
+		results.push(...checkLegacySurfaces(dir));
 		return results;
 	},
 };
