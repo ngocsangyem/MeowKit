@@ -46,11 +46,13 @@ function tomlMultiline(body: string): string {
 	return body.replace(/\\/g, "\\\\").replace(/"{3,}/g, (m) => m.replace(/"/g, '\\"'));
 }
 
-/** Port one `.claude/agents/<name>.md` to a Codex agent TOML. */
-export function portAgent(srcMd: string): { name: string; toml: string } {
+/** Port one `.claude/agents/<name>.md` to a Codex agent TOML. Returns null for a
+ *  markdown file that is not an agent (no `name:` frontmatter — e.g. an index doc). */
+export function portAgent(srcMd: string): { name: string; toml: string } | null {
 	const { frontmatter, body } = parseFrontmatter(srcMd);
 	const fm = (frontmatter ?? {}) as Record<string, unknown>;
-	const name = String(fm.name ?? "agent");
+	if (!fm.name) return null;
+	const name = String(fm.name);
 	const description = flattenDescription(fm.description);
 	const di = neutralize(body.trim());
 	const lines = [`name = ${JSON.stringify(name)}`, `description = ${JSON.stringify(description)}`];
@@ -102,9 +104,10 @@ export function portAll(claudeDir: string, outDir: string): PortSummary {
 
 	// Agents → .codex/agents/*.toml
 	for (const file of listMd(join(claudeDir, "agents"))) {
-		const { name, toml } = portAgent(readFileSync(join(claudeDir, "agents", file), "utf-8"));
+		const ported = portAgent(readFileSync(join(claudeDir, "agents", file), "utf-8"));
+		if (!ported) continue; // skip non-agent markdown (index/reference docs)
 		mkdirSync(agentsOut, { recursive: true });
-		writeFileSync(join(agentsOut, `${name}.toml`), toml, "utf-8");
+		writeFileSync(join(agentsOut, `${ported.name}.toml`), ported.toml, "utf-8");
 		summary.agents++;
 	}
 

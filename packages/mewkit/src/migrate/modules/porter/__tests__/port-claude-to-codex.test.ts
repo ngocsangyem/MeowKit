@@ -26,7 +26,9 @@ describe("portAgent", () => {
 			"",
 			"You research topics. Write findings to .claude/memory/notes.",
 		].join("\n");
-		const { name, toml } = portAgent(md);
+		const ported = portAgent(md);
+		expect(ported).not.toBeNull();
+		const { name, toml } = ported!;
 		expect(name).toBe("researcher");
 		expect(toml).toContain('name = "researcher"');
 		expect(toml).toContain('description = "Research agent for libraries."');
