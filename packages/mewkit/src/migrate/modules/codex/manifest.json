@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "provider": "codex",
-  "generatedFrom": "hand-authored",
+  "generatedFrom": "hand-authored + porter (scripts/run-codex-port.ts)",
   "entries": [
     {
       "sourcePath": "AGENTS.md",
@@ -40,8 +40,8 @@
       "active": false
     },
     {
-      "sourcePath": "agents/planner.toml",
-      "targetPath": ".codex/agents/planner.toml",
+      "sourcePath": "agents",
+      "targetPath": ".codex/agents",
       "provider": "codex",
       "mode": "0644",
       "ownership": "managed-replace",
@@ -49,8 +49,8 @@
       "active": false
     },
     {
-      "sourcePath": "agents/analyst.toml",
-      "targetPath": ".codex/agents/analyst.toml",
+      "sourcePath": "skills",
+      "targetPath": ".agents/skills",
       "provider": "codex",
       "mode": "0644",
       "ownership": "managed-replace",

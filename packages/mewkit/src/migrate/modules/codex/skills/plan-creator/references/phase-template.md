@@ -1,0 +1,228 @@
+# Phase File Template
+
+Every phase file MUST start with a YAML frontmatter block, then contain these 12 sections in order. Use "N/A" for sections that don't apply.
+
+## Contents
+
+- [Frontmatter Block (Required)](#frontmatter-block-required)
+- [Context Links](#context-links)
+- [Overview](#overview)
+- [Key Insights](#key-insights)
+- [Requirements](#requirements)
+  - [Functional](#functional)
+  - [Non-Functional](#non-functional)
+- [Architecture](#architecture)
+- [Related Code Files](#related-code-files)
+  - [Files to Create](#files-to-create)
+  - [Files to Modify](#files-to-modify)
+  - [Files to Read (Context)](#files-to-read-context)
+- [Optional Deep Phase Map (when `planning_mode = deep`)](#optional-deep-phase-map-when-planning_mode--deep)
+- [Implementation Steps](#implementation-steps)
+- [Todo List](#todo-list)
+- [Success Criteria](#success-criteria)
+- [Risk Assessment](#risk-assessment)
+- [Security Considerations](#security-considerations)
+- [Next Steps](#next-steps)
+- [Optional TDD Sections (when `tdd_mode = true`)](#optional-tdd-sections-when-tddmode-true)
+- [Tests Before](#tests-before)
+- [Protected Change](#protected-change)
+- [Tests After](#tests-after)
+- [Regression Gate](#regression-gate)
+- [Rules](#rules)
+- [Anti-patterns](#anti-patterns)
+
+## Frontmatter Block (Required)
+
+Prepend the file with the following block. `status` is **always** `pending` at creation — never `completed`. The Overview block markdown below is a human-readable mirror; sync-back regenerates it from frontmatter.
+
+```yaml
+---
+phase: 1
+title: "Plan parser (server-side)"
+status: pending
+priority: P1
+effort: "~1.75h"
+dependencies: []
+---
+```
+
+| Field | Type | Allowed values | Default | Notes |
+|-------|------|----------------|---------|-------|
+| phase | int | ≥1 (max enforced by `step-03-draft-plan.md`, currently 7) | filename-derived | required |
+| title | string | — | heading-derived | required |
+| status | enum | `pending \| active \| in_progress \| completed \| failed \| abandoned` | `pending` | NEVER `completed` at creation. `unknown` is reserved as a parser sentinel — never written from frontmatter. |
+| priority | enum | `P1 \| P2 \| P3` | `P2` | matches Overview convention |
+| effort | string | `~Xh`, `Xh`, `Xd`, `?` | `?` | free-form duration |
+| dependencies | int[] | phase numbers | `[]` | replaces "Depends on" prose |
+| tdd | bool | `true \| false` | omitted | optional; set `true` only when `tdd_mode = true` |
+| regression_gate | string | command | omitted | optional; exact command from `## Regression Gate` |
+
+```markdown
+# Phase {N}: {Name}
+
+## Context Links
+
+- [Related report](../research/researcher-01-topic.md)
+- [Related doc](<path-to-related-doc-in-your-project>)
+
+## Overview
+
+- **Priority:** P1 | P2 | P3
+- **Status:** Pending
+- **Effort:** ~Xh
+- **Depends on:** Phase N (or "—" if independent)
+- **Description:** {1-2 sentences}
+
+## Key Insights
+
+- {Finding from research, cite source: `(from: research/researcher-01-topic.md)`}
+- {Critical consideration for this phase}
+
+## Requirements
+
+### Functional
+1. {What the system must do}
+
+### Non-Functional
+- {Performance, security, compatibility constraints}
+
+## Architecture
+
+{Design, data flow, component interaction — ASCII diagrams or bullet descriptions}
+
+## Related Code Files
+
+### Files to Create
+- `path/to/new-file.ts`
+
+### Files to Modify
+- `path/to/existing-file.ts` — {what to change}
+
+### Files to Read (Context)
+- `path/to/reference-file.ts` — {why read it}
+
+## Implementation Steps
+
+1. {Numbered, specific, file-referenced steps}
+2. {Each step is actionable by a developer}
+
+## Todo List
+
+- [ ] {Checkbox item matching implementation steps}
+- [ ] {These become session tasks via hydration}
+
+## Success Criteria
+
+1. {Binary pass/fail check}
+2. {Reference specific command or file to verify}
+
+## Risk Assessment
+
+| Risk | L | I | Mitigation |
+|------|---|---|------------|
+| {risk description} | L/M/H | L/M/H | {mitigation strategy} |
+
+## Security Considerations
+
+- {Auth, data protection, injection concerns — or "N/A"}
+
+## Next Steps
+
+- {Dependencies on other phases}
+- {Follow-up tasks deferred to future work}
+```
+
+## Optional Deep Phase Map (when `planning_mode = deep`)
+
+Follow `references/deep-mode.md`. Add `## Deep Phase Map` after `## Related Code Files` or before `## Implementation Steps`. Keep it compact: max 12 file inventory rows per phase; summarize overflow. Do NOT add in non-deep mode.
+
+```markdown
+## Deep Phase Map
+
+### File Inventory
+
+| Action | Path | Reason | Test Impact |
+|---|---|---|---|
+| Modify | `path/to/file.ts` | {why touched} | {existing or missing tests} |
+
+### Test Gap Matrix
+
+| Behavior | Existing Coverage | Missing Coverage | Priority |
+|---|---|---|---|
+| {behavior} | {test file or "None found"} | {gap} | High/Medium/Low |
+
+### Interface Checklist
+
+- {function/API/schema/CLI contract to preserve}
+
+### Dependency Map
+
+- {phase/file dependency or risky edge}
+```
+
+## Optional TDD Sections (when `tdd_mode = true`)
+
+When `--tdd` flag is set or `MEOWKIT_TDD=1` is active, set optional frontmatter `tdd: true` and append these after Implementation Steps:
+
+````markdown
+## Tests Before
+
+- [ ] `test_name_here` — {assertion: what should fail and why}
+- [ ] `test_name_here` — {assertion}
+
+## Protected Change
+
+- {Code changes protected by Tests Before — extract helpers, preserve behavior, rename, simplify}
+
+## Tests After
+
+- [ ] `integration_test_name` — {cross-component or edge case test}
+
+## Regression Gate
+
+```bash
+{specific test command to verify no regressions, e.g., npm test, pytest -x}
+```
+````
+
+These sections are NOT added in default mode (12-section template remains unchanged).
+
+## Rules
+
+- **Frontmatter is REQUIRED.** `status: pending` is the only legal initial value. `unknown` is a parser sentinel — never written by humans or skills.
+- The Overview block fields (`**Status:**`, `**Priority:**`, `**Effort:**`, `**Depends on:**`) are derived from frontmatter; sync-back overwrites them.
+- Each phase file: ≤150 lines (≤180 with TDD or deep sections)
+- Sections can be brief but MUST exist (use "N/A" if not applicable)
+- Key Insights MUST cite research source when available
+- Todo checkboxes map 1:1 to implementation steps
+- Success criteria must be verifiable (command to run or file to check)
+- **Runnable increment:** where applicable, the Success Criteria should confirm the phase leaves the system runnable / a demoable increment exists (e.g. a command boots, an endpoint responds, a screen renders). This pairs with vertical-slice decomposition (one end-to-end path per phase). Pure foundation phases — migrations, shared types, env/config — are exempt.
+- **Research linking (MANDATORY):** If `{plan-dir}/research/` has reports, Context Links MUST include links to relevant research reports. Step-03 verifies this after writing phase files.
+- **Critical-step markers:** Todo items with high risk can be prefixed with `[CRITICAL]` or `[HIGH]` — these get their own session tasks during hydration (step-08), enabling finer-grained tracking.
+
+## Optional Machine-Written Sections
+
+These sections are written by skill steps, not authored by humans. They are OPTIONAL — `validate-plan.py` does NOT require them. Legacy plans without them continue to validate.
+
+### `## Verification Log`
+
+- **Written by:** `step-04-semantic-checks.md` sub-step 4d (Verification Roles)
+- **Inserted:** before `## Next Steps`
+- **Format:** see `references/verification-roles.md`
+- **Do NOT hand-edit** — orchestrator overwrites on re-run.
+
+### `## Validation Log`
+
+- **Written by:** `step-06-validation-interview.md` sub-step 6e and the Whole-Plan Consistency Sweep block from 6f
+- **Inserted:** appended at the end of the phase file (or before `## Next Steps` if you prefer; convention is end-of-file)
+- **Format:** see `references/validation-questions.md` and `references/whole-plan-sweep.md`
+- **Do NOT hand-edit** — sweep regenerates the trailing summary block on re-run.
+
+## Anti-patterns
+
+- ❌ Writing `status: completed` at phase-file creation — defeats Gate 1, breaks cook re-hydration
+- ❌ Writing `status: unknown` from frontmatter — `unknown` is a parser sentinel for parse failures only
+- ❌ Writing `status: draft` or `status: done` — not in the parser union; will normalize to `unknown`. Use `pending` or `completed`.
+- ❌ Hand-editing the Overview `**Status:**` line directly — sync-back regenerates from frontmatter, your edit will be lost. Edit frontmatter instead.
+- ❌ Overwriting terminal states (`failed`, `abandoned`) — sync-back NEVER overwrites these; only a human edit moves them out. If a phase is genuinely unblocked, change the frontmatter directly.
+- ❌ Hand-editing `## Verification Log` or `## Validation Log` — both are machine-written. Edits will be overwritten on the next run.

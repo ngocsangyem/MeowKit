@@ -1,0 +1,13 @@
+{
+  "skills": ["visual-plan"],
+  "query": "Render a multi-phase plan (four or more phases) with --static as plan.html, then render a second unrelated multi-phase plan, and confirm both pages share the same theme and layout so the output is template-consistent plan-to-plan.",
+  "files": ["tasks/plans/<multiphase-plan-slug>/plan.md", "tasks/plans/<multiphase-plan-slug>/phase-01-*.md", "tasks/plans/<multiphase-plan-slug>/phase-04-*.md"],
+  "expected_behavior": [
+    "Renders every phase in the phase-timeline block in plan order, each carrying status/priority/dependencies/effort, so a four-phase plan shows four phase cards",
+    "Renders a file-map block from each phase Related Code Files section, grouping files by Create / Modify / Read so the blast radius is visible",
+    "Renders a steps-checklist block from Implementation Steps, Todo List, and Success Criteria as checkable items",
+    "Omits the conditional data-model and api-endpoint blocks when the plan has no schema or endpoint content, rather than emitting empty blocks",
+    "Two unrelated plans render with visibly identical theme tokens, layout regions, and block styling — confirmed by the same --wf-* sentinel tokens and block sentinel classes appearing in both files",
+    "Re-rendering after a plan.md edit (e.g. adding a phase) reproduces the structure with no manual edits to plan.html"
+  ]
+}

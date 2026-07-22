@@ -8,7 +8,7 @@
 // later batch — codex migration is never left in a broken half-authored state.
 // When every surface is active, the converter pipeline is retired and the copy
 // becomes the whole codex migration.
-import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ArtifactManifestSchema, type ArtifactManifest, type ArtifactManifestEntry } from "./artifact-manifest-schema.js";
@@ -60,6 +60,13 @@ function copyOne(moduleDir: string, targetDir: string, entry: ArtifactManifestEn
 	const src = join(moduleDir, entry.sourcePath);
 	if (!existsSync(src)) throw new Error(`authored codex artifact missing: ${entry.sourcePath}`);
 	const dest = join(targetDir, entry.targetPath);
+	// Directory entries (e.g. the whole agents/ or skills/ tree) copy recursively;
+	// the entry `mode` applies only to single-file artifacts (hooks/scripts).
+	if (statSync(src).isDirectory()) {
+		mkdirSync(dest, { recursive: true });
+		cpSync(src, dest, { recursive: true });
+		return;
+	}
 	mkdirSync(dirname(dest), { recursive: true });
 	cpSync(src, dest);
 	chmodSync(dest, Number.parseInt(entry.mode, 8));
