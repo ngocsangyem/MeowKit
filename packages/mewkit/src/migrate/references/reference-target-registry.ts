@@ -66,10 +66,7 @@ export function getReferenceTarget(
 	if (!resolvedPath) return null;
 
 	const normalized = normalizeTargetPath(resolvedPath);
-	const isDirectory =
-		pathConfig.writeStrategy === "per-file" ||
-		pathConfig.writeStrategy === "yaml-merge" ||
-		pathConfig.writeStrategy === "json-merge";
+	const isDirectory = pathConfig.writeStrategy === "per-file";
 
 	return {
 		path: isDirectory && !normalized.endsWith("/") ? `${normalized}/` : normalized,

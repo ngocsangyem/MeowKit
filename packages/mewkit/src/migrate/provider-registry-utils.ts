@@ -53,7 +53,7 @@ export function getPortableInstallPath(
 	if (!basePath) return null;
 
 	const ws = pathConfig.writeStrategy;
-	if (ws === "merge-single" || ws === "yaml-merge" || ws === "json-merge" || ws === "single-file") {
+	if (ws === "merge-single" || ws === "single-file") {
 		return basePath;
 	}
 

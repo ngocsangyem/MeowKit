@@ -6,24 +6,7 @@ import { z } from "zod";
 export type PortableType = "agent" | "command" | "skill" | "config" | "rules" | "hooks";
 
 /** Supported coding agent/provider identifiers */
-export const ProviderType = z.enum([
-	"claude-code",
-	"cursor",
-	"codex",
-	"droid",
-	"opencode",
-	"goose",
-	"gemini-cli",
-	"antigravity",
-	"github-copilot",
-	"amp",
-	"kilo",
-	"kiro",
-	"roo",
-	"windsurf",
-	"cline",
-	"openhands",
-]);
+export const ProviderType = z.enum(["claude-code", "codex", "cursor"]);
 export type ProviderType = z.infer<typeof ProviderType>;
 
 export type SkillPortability = "generic" | "provider-adapted" | "provider-only";

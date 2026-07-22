@@ -28,14 +28,10 @@ const originalCwd = process.cwd();
 const tempDirs: string[] = [];
 const originalCodexConfig = structuredClone(providers.codex.config);
 const originalCodexRules = structuredClone(providers.codex.rules);
-const originalGeminiConfig = structuredClone(providers["gemini-cli"].config);
-const originalGeminiRules = structuredClone(providers["gemini-cli"].rules);
 
 afterEach(() => {
 	providers.codex.config = structuredClone(originalCodexConfig);
 	providers.codex.rules = structuredClone(originalCodexRules);
-	providers["gemini-cli"].config = structuredClone(originalGeminiConfig);
-	providers["gemini-cli"].rules = structuredClone(originalGeminiRules);
 	process.chdir(originalCwd);
 	return Promise.all(tempDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
 });
@@ -204,7 +200,7 @@ describe("codex AGENTS.md budget guidance (config-raise, never truncate, never w
 
 	it("codexBudgetRaiseGuidance is codex-scoped (undefined for other providers)", () => {
 		expect(codexBudgetRaiseGuidance("codex", 41914, 32768)).toContain("project_doc_max_bytes = 65536");
-		expect(codexBudgetRaiseGuidance("gemini-cli", 41914, 32768)).toBeUndefined();
+		expect(codexBudgetRaiseGuidance("cursor", 41914, 32768)).toBeUndefined();
 	});
 });
 
@@ -252,30 +248,5 @@ describe("conversion-report budget projection reflects the single-file + config-
 
 		expect(report.budgetLines.some((l) => l.includes("within budget") && l.includes("single file"))).toBe(true);
 		expect(report.budgetLines.every((l) => !l.includes("project_doc_max_bytes"))).toBe(true);
-	});
-});
-
-describe("non-codex merge-single is behaviorally unchanged", () => {
-	it("gemini-cli merged output gets no '# AGENTS.md' title and no codex budget guidance", async () => {
-		const { root, target } = await makeProject("tmp-gemini-budget-");
-		providers["gemini-cli"].rules = {
-			...providers["gemini-cli"].rules!,
-			projectPath: target,
-			globalPath: target,
-			totalCharLimit: 8,
-		};
-		const rule = ruleItem(root, "security-rules", "Prefer `rg` for code search here.\n");
-
-		const result = await install(rule, "rules", "gemini-cli", target, { ...EMPTY, rules: [rule] });
-		expect(result.success).toBe(true);
-
-		const written = await readFile(target, "utf-8");
-		expect(written).not.toContain("# AGENTS.md");
-
-		// Over budget still warns (contract preserved), but with the generic wording — no codex
-		// project_doc_max_bytes guidance leaks into a non-codex provider.
-		const warning = result.warnings?.find((w) => w.includes("instruction budget"));
-		expect(warning).toBeDefined();
-		expect(warning).not.toContain("project_doc_max_bytes");
 	});
 });

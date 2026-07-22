@@ -11,7 +11,6 @@ import { homedir, platform } from "node:os";
 export const home = homedir();
 export const cwd = process.cwd();
 export const isWin = platform() === "win32";
-export const OPENCODE_BINARY_NAME = isWin ? "opencode.exe" : "opencode";
 
 export const binaryCache = new Map<string, boolean>();
 

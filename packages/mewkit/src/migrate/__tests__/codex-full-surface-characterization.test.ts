@@ -18,7 +18,7 @@ import type { PortableItem, ProviderType } from "../types.js";
 
 const fixtureRoot = fileURLToPath(new URL("./fixtures/codex-full-surface/.claude", import.meta.url));
 
-const SNAPSHOT_PROVIDERS: ProviderType[] = ["codex", "cursor", "gemini-cli", "opencode"];
+const SNAPSHOT_PROVIDERS: ProviderType[] = ["codex", "cursor", "claude-code"];
 
 let agent: PortableItem;
 let config: PortableItem;

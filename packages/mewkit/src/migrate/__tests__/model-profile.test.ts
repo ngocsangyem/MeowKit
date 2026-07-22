@@ -103,7 +103,7 @@ describe("genuinely unknown models keep the existing warn + comment-out behavior
 
 describe("user overrides still win for tiers", () => {
 	it("a configured tier override resolves ahead of the inherit warning", () => {
-		setTaxonomyOverrides({ opencode: { balanced: { model: "some/model" } } });
-		expect(resolveModel("sonnet", "opencode").resolved?.model).toBe("some/model");
+		setTaxonomyOverrides({ cursor: { balanced: { model: "some/model" } } });
+		expect(resolveModel("sonnet", "cursor").resolved?.model).toBe("some/model");
 	});
 });

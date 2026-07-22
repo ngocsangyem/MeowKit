@@ -2,17 +2,19 @@ import { describe, expect, it } from "vitest";
 import { collectProviderSupportMatrix, findProviderSupportInfo } from "../provider-support-summary.js";
 import { providerSummary } from "../../core/provider-adapter.js";
 import { isProjectedProvider } from "../../core/provider-projection.js";
+import { cursorManifest } from "../providers/cursor/index.js";
+import type { ProviderManifest } from "../providers/manifest-types.js";
 
 describe("provider support summary", () => {
 	it("summarizes the effective provider registry after contract filtering", () => {
 		const matrix = collectProviderSupportMatrix();
 
 		expect(matrix.counts).toEqual({
-			total: 16,
-			verified: 8,
-			experimental: 7,
-			deprecated: 1,
-			enabledSurfaces: 40,
+			total: 3,
+			verified: 2,
+			experimental: 1,
+			deprecated: 0,
+			enabledSurfaces: 14,
 		});
 	});
 
@@ -39,20 +41,39 @@ describe("provider support summary", () => {
 
 	it("classifies policy-only providers as advisory instead of hard-gate capable", () => {
 		const cursor = findProviderSupportInfo("cursor");
-		const antigravity = findProviderSupportInfo("antigravity");
 
 		expect(cursor?.role).toBe("policy-advisory");
 		expect(cursor?.effectiveSurfaces).toEqual(["config", "rules"]);
 		expect(cursor?.enforcement.gate1).toBe("advisory");
-		expect(antigravity?.role).toBe("policy-advisory");
-		expect(antigravity?.effectiveSurfaces).toEqual(["rules"]);
-		expect(antigravity?.enforcement.secretProtection).toBe("advisory");
 	});
 
 	it("does not market disabled or deprecated providers as practical support", () => {
-		expect(findProviderSupportInfo("kilo")?.role).toBe("disabled");
-		expect(findProviderSupportInfo("openhands")?.role).toBe("disabled");
-		expect(findProviderSupportInfo("roo")?.role).toBe("deprecated");
+		// Synthesize disabled/deprecated variants from a real manifest (cursor) — no
+		// keeper provider is naturally disabled or deprecated, so the role classifier's
+		// branches are exercised via manifest overrides rather than global mutation.
+		const disabledManifest: ProviderManifest = {
+			...cursorManifest,
+			config: {
+				...cursorManifest.config,
+				agents: null,
+				commands: null,
+				skills: null,
+				config: null,
+				rules: null,
+				hooks: null,
+			},
+		};
+		const deprecatedManifest: ProviderManifest = {
+			...cursorManifest,
+			config: { ...cursorManifest.config, supportLevel: "deprecated", supportReason: "test override" },
+		};
+
+		expect(findProviderSupportInfo("cursor", collectProviderSupportMatrix([disabledManifest]))?.role).toBe(
+			"disabled",
+		);
+		expect(findProviderSupportInfo("cursor", collectProviderSupportMatrix([deprecatedManifest]))?.role).toBe(
+			"deprecated",
+		);
 	});
 });
 

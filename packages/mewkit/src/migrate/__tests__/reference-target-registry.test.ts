@@ -44,8 +44,8 @@ describe("reference target registry", () => {
 	});
 
 	it("returns null for types the provider does not support", () => {
-		expect(getReferenceTarget("goose", "commands")).toBeNull();
-		const table = buildReferenceRewriteTable("goose");
+		expect(getReferenceTarget("cursor", "commands")).toBeNull();
+		const table = buildReferenceRewriteTable("cursor");
 		expect(resolveReferenceTarget(table, ".claude/commands/mk/fix.md")).toBeNull();
 	});
 

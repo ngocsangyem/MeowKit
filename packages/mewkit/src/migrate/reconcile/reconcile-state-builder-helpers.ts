@@ -43,9 +43,6 @@ export function buildTargetChecksum(
 	const pathConfig = getProviderPathConfig(provider, type);
 	if (!pathConfig) return computeContentChecksum(item.body);
 
-	if (pathConfig.writeStrategy === "yaml-merge" || pathConfig.writeStrategy === "json-merge") {
-		return undefined;
-	}
 	if (pathConfig.writeStrategy !== "merge-single") {
 		return computeContentChecksum(convertedContent);
 	}

@@ -7,9 +7,6 @@ import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import {
 	convertClaudeHooksToCodex,
-	mapEventName,
-	rewriteMatcherToolNames,
-	requiresHookMapping,
 	type HookEntry,
 	type HookGroup,
 	type HooksSection,
@@ -232,19 +229,6 @@ function inferEventFromName(name: string): string {
 	return "UserPromptSubmit";
 }
 
-function applyGeminiMapping(section: HooksSection): HooksSection {
-	const mapped: HooksSection = {};
-	for (const [event, groups] of Object.entries(section)) {
-		const mappedEvent = mapEventName(event);
-		const mappedGroups = groups.map((g) => ({
-			...g,
-			matcher: g.matcher ? rewriteMatcherToolNames(g.matcher) : g.matcher,
-		}));
-		mapped[mappedEvent] = mapped[mappedEvent] ? [...mapped[mappedEvent], ...mappedGroups] : mappedGroups;
-	}
-	return mapped;
-}
-
 async function readSettings(path: string): Promise<Record<string, unknown>> {
 	if (!existsSync(path)) return {};
 	try {
@@ -293,65 +277,6 @@ async function mergeClaudeCode(
 	} catch (err) {
 		await restoreSettings(snapshot);
 		return errResult("claude-code", err, hooks.length);
-	}
-}
-
-async function mergeGeminiCli(
-	hooks: PortableItem[],
-	hookTargetPaths: Map<string, string>,
-	options: HooksMergeOptions,
-): Promise<HooksMergeResult> {
-	const settingsCfg = providers["gemini-cli"].settingsJsonPath;
-	if (!settingsCfg) return badResult("gemini-cli");
-	const settingsPath = options.global ? settingsCfg.globalPath : settingsCfg.projectPath;
-
-	const snapshot = await snapshotSettings(settingsPath);
-	try {
-		const claudeSection =
-			(await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
-			buildClaudeHooksSection(hooks, hookTargetPaths);
-		const section = requiresHookMapping("gemini-cli") ? applyGeminiMapping(claudeSection) : claudeSection;
-		await mergeIntoSettingsJson(settingsPath, section);
-		return {
-			provider: "gemini-cli",
-			success: true,
-			settingsPath,
-			hooksWritten: hooks.length,
-			hooksDropped: 0,
-			warnings: [],
-		};
-	} catch (err) {
-		await restoreSettings(snapshot);
-		return errResult("gemini-cli", err, hooks.length);
-	}
-}
-
-async function mergeDroid(
-	hooks: PortableItem[],
-	hookTargetPaths: Map<string, string>,
-	options: HooksMergeOptions,
-): Promise<HooksMergeResult> {
-	const settingsCfg = providers.droid.settingsJsonPath;
-	if (!settingsCfg) return badResult("droid");
-	const settingsPath = options.global ? settingsCfg.globalPath : settingsCfg.projectPath;
-
-	const snapshot = await snapshotSettings(settingsPath);
-	try {
-		const section =
-			(await buildHooksSectionFromSettings(options.sourceSettingsPath, hooks, hookTargetPaths)) ??
-			buildClaudeHooksSection(hooks, hookTargetPaths);
-		await mergeIntoSettingsJson(settingsPath, section);
-		return {
-			provider: "droid",
-			success: true,
-			settingsPath,
-			hooksWritten: hooks.length,
-			hooksDropped: 0,
-			warnings: [],
-		};
-	} catch (err) {
-		await restoreSettings(snapshot);
-		return errResult("droid", err, hooks.length);
 	}
 }
 
@@ -607,10 +532,6 @@ export async function mergeHooksSettings(
 	switch (provider) {
 		case "claude-code":
 			return mergeClaudeCode(hooks, hookTargetPaths, options);
-		case "gemini-cli":
-			return mergeGeminiCli(hooks, hookTargetPaths, options);
-		case "droid":
-			return mergeDroid(hooks, hookTargetPaths, options);
 		case "codex":
 			return mergeCodex(hooks, hookTargetPaths, options);
 		default:

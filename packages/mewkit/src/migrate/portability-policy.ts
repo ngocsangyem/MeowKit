@@ -139,7 +139,7 @@ const RUNTIME_BOUND_SIGNALS: RuntimeBoundSignal[] = [
 ];
 
 const RUNTIME_BOUND_ITEM_TYPES = new Set<PortableType>(["agent", "command", "rules"]);
-const FIRST_PASS_SKILL_PROVIDERS = new Set<ProviderType>(["codex", "gemini-cli", "antigravity", "opencode"]);
+const FIRST_PASS_SKILL_PROVIDERS = new Set<ProviderType>(["codex"]);
 function summarizeSignals(content: string): string[] {
 	return RUNTIME_BOUND_SIGNALS.filter((signal) => signal.pattern.test(content)).map((signal) => signal.label);
 }
@@ -292,7 +292,7 @@ async function shouldInstallSkillForProvider(
 			provider,
 			type: "skill",
 			item: skill.name,
-			reason: "skill portability metadata first pass is limited to Codex, Gemini CLI, Antigravity, and OpenCode",
+			reason: "skill portability metadata first pass is limited to Codex",
 		};
 	}
 

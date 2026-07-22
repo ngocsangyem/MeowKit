@@ -102,14 +102,6 @@ export function setTaxonomyOverrides(overrides: Record<string, Record<string, Re
 	userOverrides = overrides;
 }
 
-export function resolveOpenCodeDefaultModel(): string | undefined {
-	return userOverrides?.opencode?.default?.model;
-}
-
-export function getOpenCodeDefaultModelOverride(): string | undefined {
-	return userOverrides?.opencode?.default?.model;
-}
-
 export function resolveModel(sourceModel: string | undefined, targetProvider: string): ModelResolveResult {
 	if (sourceModel === undefined || sourceModel === null) return { resolved: null };
 	if (typeof sourceModel !== "string") {

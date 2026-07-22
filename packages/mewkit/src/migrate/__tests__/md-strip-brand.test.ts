@@ -34,12 +34,6 @@ describe("stripClaudeRefs — narrative brand prose", () => {
 			expect(content).not.toContain("Claude Code");
 		});
 
-		it("substitutes 'Claude Code' with the Kiro displayName for kiro target", () => {
-			const input = "Tested on Claude Code.";
-			const { content } = stripClaudeRefs(input, { provider: "kiro", targetName: "Kiro IDE" });
-			expect(content).toContain("Tested on Kiro IDE");
-		});
-
 		it("substitutes 'Claude Code' with the Cursor displayName for cursor target", () => {
 			const input = "Compatible with Claude Code.";
 			const { content } = stripClaudeRefs(input, { provider: "cursor", targetName: "Cursor" });
@@ -142,9 +136,9 @@ describe("stripClaudeRefs — narrative brand prose", () => {
 			expect(content).toContain("Anthropic's harness research");
 		});
 
-		it("kiro golden", () => {
-			const { content } = stripClaudeRefs(source, { provider: "kiro", targetName: "Kiro IDE" });
-			expect(content).toContain("the toolkit runs on Kiro IDE today");
+		it("claude-code golden", () => {
+			const { content } = stripClaudeRefs(source, { provider: "claude-code", targetName: "Claude Code" });
+			expect(content).toContain("the toolkit runs on Claude Code today");
 			expect(content).toContain("per the runtime's plugin contract");
 			expect(content).toContain("Anthropic's harness research");
 		});

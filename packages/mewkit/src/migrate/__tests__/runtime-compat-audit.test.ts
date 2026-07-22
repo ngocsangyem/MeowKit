@@ -11,7 +11,7 @@ describe("runtime compatibility audit", () => {
 		const result = auditRuntimeCompatibility(
 			"export ROOT=$CLAUDE_PROJECT_DIR",
 			{ name: "bootstrap", type: "hooks" },
-			"droid",
+			"cursor",
 		);
 		expect(result.errors).toEqual(
 			expect.arrayContaining([expect.stringContaining("Claude-specific environment variable")]),

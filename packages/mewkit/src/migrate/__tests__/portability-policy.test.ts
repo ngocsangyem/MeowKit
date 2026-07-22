@@ -9,6 +9,7 @@ import {
 	getRuntimeBoundSignals,
 	summarizeRuleMigrationByProvider,
 } from "../portability-policy.js";
+import { providerCapabilityRegistry } from "../provider-documentation-contracts.js";
 import type { PortableItem, PortableType, ProviderType, SkillInfo } from "../types.js";
 import type { ReconcilePlan } from "../reconcile/reconcile-types.js";
 
@@ -96,9 +97,9 @@ describe("portability policy", () => {
 				action: "install",
 				item: "docs/init",
 				type: "command",
-				provider: "gemini-cli",
+				provider: "codex",
 				global: false,
-				targetPath: ".gemini/commands/docs/init.toml",
+				targetPath: ".agents/skills/source-command-docs-init/SKILL.md",
 				reason: "new-item",
 			},
 		]);
@@ -124,9 +125,9 @@ describe("portability policy", () => {
 				action: "install",
 				item: "mk/design",
 				type: "command",
-				provider: "goose",
+				provider: "cursor",
 				global: false,
-				targetPath: ".goose/commands/mk-design.md",
+				targetPath: ".cursor/commands/mk-design.md",
 				reason: "new-item",
 			},
 			{
@@ -153,7 +154,7 @@ describe("portability policy", () => {
 		expect(filtered.plan.actions[0]?.type).toBe("config");
 		expect(filtered.plan.summary.install).toBe(1);
 		expect(filtered.skipMessages).toContain(
-			"Skipped 1 command for Goose: unsupported by Goose official docs for command migration",
+			"Skipped 1 command for Cursor: unsupported by Cursor official docs for command migration",
 		);
 	});
 
@@ -446,7 +447,7 @@ describe("portability policy", () => {
 			result.skipMessages.some((m) => /Skipped 1 skill for Codex:.*runtime: claude-code.*default-deny/.test(m)),
 		).toBe(true);
 		expect(result.skipMessages).toContain(
-			"Skipped 2 skills for Cursor: skill portability metadata first pass is limited to Codex, Gemini CLI, Antigravity, and OpenCode",
+			"Skipped 2 skills for Cursor: skill portability metadata first pass is limited to Codex",
 		);
 	});
 
@@ -691,22 +692,34 @@ describe("portability policy", () => {
 	});
 
 	it("summarizes rule strategy per provider", () => {
-		const summaries = summarizeRuleMigrationByProvider(
-			[
-				makeItem("rules", "engineering/standards", "Prefer `rg` for code search. Use `rg` instead of `grep`.\n"),
-				makeItem("rules", "workflow/gates", "Phase 3 and Gate 1 govern orchestrator execution."),
-			],
-			["codex", "amp"] satisfies ProviderType[],
-		);
+		// Force cursor's `rules` surface to undocumented (config stays documented) so the
+		// documentation-only-flattening branch is exercised without a fabricated provider.
+		const originalCursorRules = providerCapabilityRegistry.cursor.surfaces.rules;
+		providerCapabilityRegistry.cursor.surfaces.rules = {
+			status: "unsupported",
+			docs: [],
+			note: "test override: rules surface undocumented",
+		};
+		try {
+			const summaries = summarizeRuleMigrationByProvider(
+				[
+					makeItem("rules", "engineering/standards", "Prefer `rg` for code search. Use `rg` instead of `grep`.\n"),
+					makeItem("rules", "workflow/gates", "Phase 3 and Gate 1 govern orchestrator execution."),
+				],
+				["codex", "cursor"] satisfies ProviderType[],
+			);
 
-		expect(summaries.find((summary) => summary.provider === "codex")).toMatchObject({
-			native: 1,
-			skipped: 1,
-		});
-		expect(summaries.find((summary) => summary.provider === "amp")).toMatchObject({
-			documentationOnly: 1,
-			skipped: 1,
-		});
+			expect(summaries.find((summary) => summary.provider === "codex")).toMatchObject({
+				native: 1,
+				skipped: 1,
+			});
+			expect(summaries.find((summary) => summary.provider === "cursor")).toMatchObject({
+				documentationOnly: 1,
+				skipped: 1,
+			});
+		} finally {
+			providerCapabilityRegistry.cursor.surfaces.rules = originalCursorRules;
+		}
 	});
 
 	it("counts portable Codex rules as native (merged) and orchestration rules as skipped", () => {
