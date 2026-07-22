@@ -29,9 +29,9 @@ Tracks and reports AI model usage costs. Reads from `.meowkit/memory/cost-log.js
    ┌──────────────────────┬──────────┬───────────┬────────┬────────┐
    │ Task                 │ Tier     │ Model     │ Tokens │ Cost   │
    ├──────────────────────┼──────────┼───────────┼────────┼────────┤
-   │ Add avatar upload    │ Standard │ claude-4  │ 12.4k  │ $0.18  │
+   │ Add avatar upload    │ Standard │ codex-4  │ 12.4k  │ $0.18  │
    │ Fix login typo       │ Simple   │ haiku     │ 1.2k   │ $0.01  │
-   │ Migrate auth service │ Complex  │ claude-4  │ 45.8k  │ $0.68  │
+   │ Migrate auth service │ Complex  │ codex-4  │ 45.8k  │ $0.68  │
    └──────────────────────┴──────────┴───────────┴────────┴────────┘
    Total (last 10): $1.23
    ```

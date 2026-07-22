@@ -17,7 +17,7 @@ This is the "friendly front door" to the toolkit. Users who don't know which com
 
 ### Execution Steps
 
-1. **Load context.** Read the relevant topic files in `.meowkit/memory/` on demand based on the task at hand — `.json` store first, `.md` fallback if the `.json` is absent (see `.claude/rules/memory-read-rules.md`): `fixes.json` for bug-class lessons, `review-patterns.json` for review/architecture patterns, `architecture-decisions.json` for past decisions.
+1. **Load context.** Read the relevant topic files in `.meowkit/memory/` on demand based on the task at hand — `.json` store first, `.md` fallback if the `.json` is absent (see `.agents/skills/rule-memory-read-rules.md`): `fixes.json` for bug-class lessons, `review-patterns.json` for review/architecture patterns, `architecture-decisions.json` for past decisions.
 
 2. **Classify task complexity.** Analyze the task description and assign one of three tiers:
    - **Trivial** — single-file change, typo, simple config update, quick question. Route to `the fix skill` (simple mode) or answer directly.

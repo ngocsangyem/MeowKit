@@ -6,7 +6,7 @@ Mode-aware review handling for reviewer agent results.
 
 Auto mode auto-FIXES; it never auto-APPROVES. The loop terminates in a
 "ready for user approval" state — crossing Gate 2 or any ship boundary always
-requires explicit human approval (`.claude/rules/gate-rules.md`). Score is
+requires explicit human approval (`.agents/skills/rule-gate-rules.md`). Score is
 advisory display only and never gates the decision.
 
 ```
@@ -29,7 +29,7 @@ LOOP:
 ```
 
 High-risk flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM,
-PUBLIC_CONTRACT, WEAK_PROOF from `.claude/rules/risk-checklist.md`) force
+PUBLIC_CONTRACT, WEAK_PROOF from `.agents/skills/rule-risk-checklist.md`) force
 explicit human approval before finalize regardless of cycle outcome.
 
 ## Human-in-the-Loop Mode

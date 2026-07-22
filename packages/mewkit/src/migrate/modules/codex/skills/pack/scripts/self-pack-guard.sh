@@ -33,7 +33,7 @@ current_root="$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null || echo "")"
 if [ "$target_root" = "$current_root" ] && [ "$self_flag" != "--self" ]; then
   echo "BLOCKED: refusing to pack the current repo ($current_root)." >&2
   echo "" >&2
-  echo "  For inbound Claude context, use /mk:scout instead." >&2
+  echo "  For inbound Codex context, use the scout skill instead." >&2
   echo "  To deliberately export the current repo, pass --self." >&2
   exit 1
 fi

@@ -30,13 +30,13 @@ This skill is a **pure routing layer**. Its sole purpose: identify the right `mk
 
 ## Setup
 
-See `references/install-and-auth.md` for one-time setup (`.claude/scripts/bin/setup-workflow` installs `jira-as` into `.agents/skills/.venv`; populate `.claude/.env` with the 3 `MEOW_JIRA_*` vars).
+See `references/install-and-auth.md` for one-time setup (`.codex/scripts/bin/setup-workflow` installs `jira-as` into `.agents/skills/.venv`; populate `.codex/.env` with the 3 `MEOW_JIRA_*` vars).
 
 ## Shared Resources (used by leaves)
 
 - `scripts/jira-as.sh` — env-translating wrapper (`MEOW_JIRA_*` → `JIRA_*`, sets `JIRA_OUTPUT=json`)
 - `scripts/jql-sanitize.sh` — JQL escaping for user-derived terms
-- `scripts/requirements.txt` — pip dependency manifest auto-discovered by `.claude/scripts/bin/setup-workflow`
+- `scripts/requirements.txt` — pip dependency manifest auto-discovered by `.codex/scripts/bin/setup-workflow`
 - `references/install-and-auth.md` — setup, exit codes, DC/mTLS caveats
 - `references/cli-idioms.md` — verified jira-as syntax + `jq` projection rules
 - `references/safety-framework.md` — 4-tier safety model

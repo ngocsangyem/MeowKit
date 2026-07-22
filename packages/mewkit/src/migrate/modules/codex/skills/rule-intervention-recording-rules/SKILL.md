@@ -27,7 +27,7 @@ Record a durable entry whenever any of these occur:
 
 ## Where Records Live
 
-- **Injection STOP events** → `.claude/scripts/injection-audit.py` appends a
+- **Injection STOP events** → `.codex/scripts/injection-audit.py` appends a
   structured entry. Run it when Rule 10 fires; the log is the durable record.
 - **Overrides and gate exceptions** → the active plan file (the override + reason
   travel with the plan, per `security-rules.md` and `gate-rules.md`), and the
@@ -64,5 +64,5 @@ approval after the fact — the recording must reflect a genuine human decision.
 
 - `injection-rules.md` (Rule 10 STOP→LOG), `security-rules.md` (override record),
   `gate-rules.md` (gate exceptions), `scale-adaptive-rules.md` (one-shot bypass)
-- `.claude/scripts/injection-audit.py` (the STOP→LOG mechanism)
+- `.codex/scripts/injection-audit.py` (the STOP→LOG mechanism)
 - The `.meowkit/memory/security-log` curated store

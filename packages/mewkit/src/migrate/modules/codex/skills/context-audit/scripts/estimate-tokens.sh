@@ -45,7 +45,7 @@ def enrich(arr, byte_field="bytes"):
         total += t
     return total
 
-claude_md_tokens = enrich(data.get("claude_md_chain", []))
+codex_md_tokens = enrich(data.get("codex_md_chain", []))
 agents_tokens    = enrich(data.get("agents", []))
 skills_tokens    = enrich(data.get("skills", []))
 rules_tokens     = enrich(data.get("rules", []))
@@ -53,13 +53,13 @@ commands_tokens  = enrich(data.get("commands", []))
 mcp_tokens       = enrich(data.get("mcp_servers", []), byte_field="estimated_bytes")
 
 structural = (
-    claude_md_tokens + agents_tokens + skills_tokens
+    codex_md_tokens + agents_tokens + skills_tokens
     + rules_tokens + commands_tokens + mcp_tokens
 )
 pct = (structural / window) * 100 if window > 0 else 0
 
 data["totals"] = {
-    "claude_md_tokens":           claude_md_tokens,
+    "codex_md_tokens":           codex_md_tokens,
     "agents_tokens":              agents_tokens,
     "skills_tokens":              skills_tokens,
     "rules_tokens":               rules_tokens,

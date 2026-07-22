@@ -25,17 +25,17 @@ mkdir -p .meowkit/memory/sessions
 touch .meowkit/memory/sessions/"$PPID"
 _SESSIONS=$(find .meowkit/memory/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
 find .meowkit/memory/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(.claude/scripts/bin/workflow-config get contributor 2>/dev/null || true)
-_PROACTIVE=$(.claude/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
+_CONTRIB=$(.codex/scripts/bin/workflow-config get contributor 2>/dev/null || true)
+_PROACTIVE=$(.codex/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
 echo "PROACTIVE: $_PROACTIVE"
-source <(.claude/scripts/bin/workflow-repo-mode 2>/dev/null) || true
+source <(.codex/scripts/bin/workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
 _LAKE_SEEN=$([ -f .meowkit/memory/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(.claude/scripts/bin/workflow-config get telemetry 2>/dev/null || true)
+_TEL=$(.codex/scripts/bin/workflow-config get telemetry 2>/dev/null || true)
 _TEL_PROMPTED=$([ -f .meowkit/memory/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
@@ -73,7 +73,7 @@ Options:
 - A) Help improve the workflow! (recommended)
 - B) No thanks
 
-If A: run `.claude/scripts/bin/workflow-config set telemetry community`
+If A: run `.codex/scripts/bin/workflow-config set telemetry community`
 
 If B: ask a follow-up stop and ask the user in chat:
 
@@ -84,8 +84,8 @@ Options:
 - A) Sure, anonymous is fine
 - B) No thanks, fully off
 
-If B→A: run `.claude/scripts/bin/workflow-config set telemetry anonymous`
-If B→B: run `.claude/scripts/bin/workflow-config set telemetry off`
+If B→A: run `.codex/scripts/bin/workflow-config set telemetry anonymous`
+If B→B: run `.codex/scripts/bin/workflow-config set telemetry off`
 
 Always run:
 ```bash
@@ -146,7 +146,7 @@ Never let a noticed issue silently pass. The whole point is proactive communicat
 
 ## Search Before Building
 
-Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `# Project philosophy — see CLAUDE.md for the full philosophy.
+Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `# Project philosophy — see AGENTS.md for the full philosophy.
 
 **Three layers of knowledge:**
 - **Layer 1** (tried and true — in distribution). Don't reinvent the wheel. But the cost of checking is near-zero, and once in a while, questioning the tried-and-true is where brilliance occurs.
@@ -263,7 +263,7 @@ When you are in plan mode and about to call ExitPlanMode:
 3. If it does NOT — run this command:
 
 ```bash
-.claude/scripts/bin/workflow-review-log
+.codex/scripts/bin/workflow-review-log
 ```
 
 Then write a `## REVIEW REPORT` section to the end of the plan file:
@@ -279,7 +279,7 @@ Then write a `## REVIEW REPORT` section to the end of the plan file:
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `the plan-ceo-review skill` | Scope & strategy | 0 | — | — |
-| Outside Voice | Claude adversarial sub-task | Independent 2nd opinion | 0 | — | — |
+| Outside Voice | Codex adversarial sub-task | Independent 2nd opinion | 0 | — | — |
 | Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
 
 **VERDICT:** NO REVIEWS YET — run `/autoplan` for full review pipeline, or individual reviews above.

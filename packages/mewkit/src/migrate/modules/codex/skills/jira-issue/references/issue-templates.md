@@ -178,7 +178,7 @@ Story Points:         Sub-task points do NOT roll up automatically in all Jira c
 Use one of these as the body of the `--description` flag when creating an issue via the wrapper:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh issue create \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh issue create \
   --project PROJ --type Bug --summary "..." \
   --description "$(cat /tmp/desc.md)"
 ```

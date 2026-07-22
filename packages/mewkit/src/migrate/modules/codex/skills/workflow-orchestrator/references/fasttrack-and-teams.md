@@ -58,7 +58,7 @@ If Agent Teams not enabled: sequential execution with standard sub-task behavior
 ## State Management
 
 ```
-workflow:handoff  → Saves to .claude/logs/workflows/[workflow-id]/
+workflow:handoff  → Saves to .codex/logs/workflows/[workflow-id]/
 workflow:resume <id> → Loads saved state, continues from last phase
 workflow:status   → Shows current phase, completed phases, pending tasks
 ```
@@ -67,7 +67,7 @@ workflow:status   → Shows current phase, completed phases, pending tasks
 
 Phase-specific context is loaded from the kit's built-in rules:
 
-- Phase 1: `.claude/rules/gate-rules.md` (Gate 1 approval)
-- Phase 2-3: `.claude/rules/tdd-rules.md` (RED/GREEN enforcement)
-- Phase 4: `.claude/rules/gate-rules.md` (Gate 2 approval) + `.claude/rules/security-rules.md`
-- Phase 5: `.claude/rules/development-rules.md` (pre-commit checks)
+- Phase 1: `.agents/skills/rule-gate-rules.md` (Gate 1 approval)
+- Phase 2-3: `.agents/skills/rule-tdd-rules.md` (RED/GREEN enforcement)
+- Phase 4: `.agents/skills/rule-gate-rules.md` (Gate 2 approval) + `.agents/skills/rule-security-rules.md`
+- Phase 5: `.agents/skills/rule-development-rules.md` (pre-commit checks)

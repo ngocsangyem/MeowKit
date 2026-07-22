@@ -2,13 +2,13 @@
 # Restrict diagnostic-only investigations to their report directory.
 set -euo pipefail
 
-PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+PROJECT_ROOT="$(git rev-parse --show-toplevel):-$(pwd)}"
 cd "$PROJECT_ROOT"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOOK_INPUT_HELPER="$SCRIPT_DIR/../../../hooks/lib/read-hook-input.sh"
 if [ ! -f "$HOOK_INPUT_HELPER" ]; then
-  HOOK_INPUT_HELPER="$PROJECT_ROOT/.claude/hooks/lib/read-hook-input.sh"
+  HOOK_INPUT_HELPER="$PROJECT_ROOT/.codex/hooks/lib/read-hook-input.sh"
 fi
 
 if [ ! -f "$HOOK_INPUT_HELPER" ]; then

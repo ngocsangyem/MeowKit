@@ -71,7 +71,7 @@ browser profiles. No WebSearch — current-docs lookup belongs to `mk:docs-finde
 ### Save-Path Policy
 
 Write only when asked, and only under: an explicit user path inside the project
-root, `tasks/reports/`, or `the project environment/ask-me/`. Path escapes a safe
+root, `tasks/reports/`, or `${PLUGIN_DATA}/ask-me/`. Path escapes a safe
 root → refuse and answer inline. Target exists → ask before overwrite or use a
 timestamped name.
 

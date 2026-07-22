@@ -1,6 +1,6 @@
 # Incident Management Workflow Pattern
 
-> **CONCEPT REFERENCE — NOT AUTHORITATIVE.** This file describes a common workflow shape for orientation. **Your project may use different status names + transitions.** Always consult `tasks/jira-workflows/<workflow-slug>.md` (discovered via `bash the project environment/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>`) for the actual workflow. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md`.
+> **CONCEPT REFERENCE — NOT AUTHORITATIVE.** This file describes a common workflow shape for orientation. **Your project may use different status names + transitions.** Always consult `tasks/jira-workflows/<workflow-slug>.md` (discovered via `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>`) for the actual workflow. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md`.
 
 **Use this pattern for:** Managing incidents, outages, and urgent issues.
 
@@ -56,26 +56,26 @@ Open --> Investigating --> In Progress --> Monitoring --> Resolved --> Closed
 
 ```bash
 # Start investigation immediately
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition INC-456 --name "Investigating"
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle assign INC-456 --user oncall@example.com
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition INC-456 --name "Investigating"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle assign INC-456 --user oncall@example.com
 
 # Move to active fix
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition INC-456 --name "In Progress" \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition INC-456 --name "In Progress" \
   --comment "Root cause identified: Database connection pool exhausted"
 
 # Deploy fix and monitor
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition INC-456 --name "Monitoring" \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition INC-456 --name "Monitoring" \
   --comment "Fix deployed, monitoring for 24 hours"
 
 # Resolve after monitoring period
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle resolve INC-456 --resolution "Fixed" \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle resolve INC-456 --resolution "Fixed" \
   --comment "Incident resolved. No recurrence in 24h. Post-mortem scheduled."
 ```
 
 ### False Alarm
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition INC-789 --name "False Alarm" \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition INC-789 --name "False Alarm" \
   --comment "Alert triggered by scheduled maintenance, not an actual incident"
 ```
 
@@ -97,7 +97,7 @@ After resolution:
 
 ```bash
 # Close after post-mortem
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition INC-456 --name "Closed" \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition INC-456 --name "Closed" \
   --comment "Post-mortem completed. See confluence.com/INC-456-postmortem"
 ```
 

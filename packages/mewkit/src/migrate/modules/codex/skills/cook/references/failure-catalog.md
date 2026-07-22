@@ -2,7 +2,7 @@
 
 Common failure modes during code implementation. Read before starting any build work.
 
-For post-build operational gotchas (parallel deadlocks, stale plans, model tier, memory), see cook `SKILL.md` `## Gotchas`. For implementation-phase generic rationalizations, see `.claude/rules/anti-rationalization.md`.
+For post-build operational gotchas (parallel deadlocks, stale plans, model tier, memory), see cook `SKILL.md` `## Gotchas`. For implementation-phase generic rationalizations, see `.agents/skills/rule-anti-rationalization.md`.
 
 ## Common Rationalizations
 

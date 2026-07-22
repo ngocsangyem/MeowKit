@@ -60,7 +60,7 @@ After merging parallel worktrees, run the FULL test suite on the merged result.
 If tests fail, the parallel decomposition was wrong — fix before proceeding.
 
 After the integration test passes, delegate to `project-manager` per
-`.claude/rules/post-phase-delegation.md` Rule 1 to emit a merge report
+`.agents/skills/rule-post-phase-delegation.md` Rule 1 to emit a merge report
 summarizing what each parallel branch contributed.
 
 WHY: Integration tests catch cross-branch interaction bugs.

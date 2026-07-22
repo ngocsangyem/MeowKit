@@ -52,8 +52,8 @@ Load before architectural evaluation:
 - Plan file from `tasks/plans/`: proposed technical approach
 - Existing ADRs from `docs/architecture/adr/`: prior decisions and patterns
 - Current codebase structure (via Glob/Grep — navigate, don't dump)
-- Technology stack constraints from CLAUDE.md
-- `.claude/rules/security-rules.md` + `.claude/rules/gate-rules.md`: rules that constrain architectural decisions
+- Technology stack constraints from AGENTS.md
+- `.agents/skills/rule-security-rules.md` + `.agents/skills/rule-gate-rules.md`: rules that constrain architectural decisions
 
 ## Ambiguity Resolution
 

@@ -1,7 +1,7 @@
 /**
  * Process manager — handles PID files and server lifecycle.
- * PID files are written to CLAUDE_PLUGIN_DATA/markdown-reader/ (stable across upgrades).
- * Falls back to ~/.cache/mewkit/markdown-reader/ when CLAUDE_PLUGIN_DATA is unset.
+ * PID files are written to PLUGIN_DATA/markdown-reader/ (stable across upgrades).
+ * Falls back to ~/.cache/mewkit/markdown-reader/ when PLUGIN_DATA is unset.
  */
 
 const fs = require('fs');
@@ -9,9 +9,9 @@ const path = require('path');
 const os = require('os');
 
 // Stable data directory per skill-authoring-rules Rule 2.
-// Skill directories can be wiped on plugin upgrade; CLAUDE_PLUGIN_DATA persists.
-const DATA_DIR = process.env.CLAUDE_PLUGIN_DATA
-  ? path.join(process.env.CLAUDE_PLUGIN_DATA, 'markdown-reader')
+// Skill directories can be wiped on plugin upgrade; PLUGIN_DATA persists.
+const DATA_DIR = process.env.PLUGIN_DATA
+  ? path.join(process.env.PLUGIN_DATA, 'markdown-reader')
   : path.join(os.homedir(), '.cache', 'mewkit', 'markdown-reader');
 
 const PID_PREFIX = 'mk-markdown-reader-';

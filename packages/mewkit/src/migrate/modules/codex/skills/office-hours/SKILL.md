@@ -1,6 +1,6 @@
 ---
 name: "office-hours"
-description: "YC Office Hours — product validation for a new product, feature, or side-project concept. Startup mode tests demand; Builder mode develops an unvalidated product idea. Use when the user asks whether something is worth building or has an idea whose problem/value is not yet validated. Proactively suggest when the user describes a new product idea or is exploring whether something is worth building — before any code is written. Use BEFORE a plan exists. For reviewing an existing plan, use /mk:plan-"
+description: "YC Office Hours — product validation for a new product, feature, or side-project concept. Startup mode tests demand; Builder mode develops an unvalidated product idea. Use when the user asks whether something is worth building or has an idea whose problem/value is not yet validated. Proactively suggest when the user describes a new product idea or is exploring whether something is worth building — before any code is written. Use BEFORE a plan exists. For reviewing an existing plan, use the plan- skill"
 ---
 
 # YC Office Hours
@@ -43,7 +43,7 @@ A bare “brainstorm” request is ambiguous: ask whether the user wants product
 - `references/phase1-context-gathering.md` — Context gathering, mode selection, product stage assessment
 - `references/phase2a-startup-mode.md` — Startup mode operating principles, response posture, anti-sycophancy rules, pushback patterns, six forcing questions with smart routing
 - `references/phase2b-builder-mode.md` — Builder mode operating principles, generative questions, escape hatches, vibe-shift handling
-- `references/phase2.5-landscape-and-premises.md` — Related design discovery, landscape awareness, premise challenge, adversarial second opinion via Claude sub-task
+- `references/phase2.5-landscape-and-premises.md` — Related design discovery, landscape awareness, premise challenge, adversarial second opinion via Codex sub-task
 - `references/phase4-alternatives-and-sketch.md` — Alternatives generation, visual sketch wireframe, outside design voices
 - `references/phase4.5-signals-and-design-doc.md` — Founder signal synthesis, design doc templates (startup + builder), spec review loop with adversarial sub-task
 - `references/phase6-handoff.md` — Three-beat closing sequence, tiered Garry plea, next-skill recommendations

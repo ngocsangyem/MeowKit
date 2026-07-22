@@ -48,18 +48,18 @@ If the impacted_count differs by > 5% between dry-run and execute, surface as a 
 - Any user-derived input flowing to `--cql` MUST pass through `cql-sanitize.sh` first. Sanitization is **unconditional** — there is no trusted-input path.
 - Any user-derived input flowing to `--page-id` MUST be numeric-validated: `[[ "$id" =~ ^[0-9]+$ ]]`
 - Any user-derived input flowing to `--space-key` MUST match `^[A-Z][A-Z0-9_]+$`
-- File paths for `--upload` MUST be under `the project environment` or an explicitly allowlisted `/tmp/conf-*` prefix. Reject `..` traversal even though `confluence-as` also validates.
-- The wrapper rejects credentials in `.claude/settings.local.json` and any non-Cloud site URL.
+- File paths for `--upload` MUST be under `$(git rev-parse --show-toplevel)` or an explicitly allowlisted `/tmp/conf-*` prefix. Reject `..` traversal even though `confluence-as` also validates.
+- The wrapper rejects credentials in `.codex/settings.local.json` and any non-Cloud site URL.
 
 ## Failure Modes
 
 | Symptom | Likely cause | Remediation |
 |---|---|---|
-| Wrapper exits 2 | Credentials in `.claude/settings.local.json` instead of `.claude/.env` | Move `MEOW_CONFLUENCE_*` vars to `.claude/.env`; chmod 0600 |
+| Wrapper exits 2 | Credentials in `.codex/settings.local.json` instead of `.codex/.env` | Move `MEOW_CONFLUENCE_*` vars to `.codex/.env`; chmod 0600 |
 | Wrapper exits 3 | Non-Cloud site URL | Use MCP escape hatch per `install-and-auth.md` |
 | Wrapper exits 4 | Network / DNS / page not found | Retry once; check VPN; verify page-id |
 | Wrapper exits 5 | 401 / 403 — token rotated or permission missing | Re-run `the confluence-setup skill`; verify user has Confluence access to space |
-| Wrapper exits 127 | Binary not installed | Run `.claude/scripts/bin/setup-workflow` |
+| Wrapper exits 127 | Binary not installed | Run `.codex/scripts/bin/setup-workflow` |
 | JSON parse error | Wrapper stdout filter missed an edge case | File issue; fall back to passthrough; tighten filter |
 | CQL sanitizer rejects valid query | False positive in regex | File issue with example; tune sanitizer (v2) |
 | Bulk delete partial failure | Rate limit / per-page permission error mid-run | Re-invoke on remaining set with `id NOT IN (<completed>)` |

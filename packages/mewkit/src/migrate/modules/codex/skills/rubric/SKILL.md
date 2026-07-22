@@ -1,13 +1,13 @@
 ---
 name: "rubric"
-description: "Use when loading, listing, composing, or validating graded evaluation rubrics — PASS/WARN/FAIL grading with weighted criteria and balanced PASS/FAIL anchor examples. Triggers on /mk:rubric, \"load rubric\", \"compose rubric preset\", \"validate rubric\", or evaluator-style code review that needs anchor-grounded judgments."
+description: "Use when loading, listing, composing, or validating graded evaluation rubrics — PASS/WARN/FAIL grading with weighted criteria and balanced PASS/FAIL anchor examples. Triggers on the rubric skill, \"load rubric\", \"compose rubric preset\", \"validate rubric\", or evaluator-style code review that needs anchor-grounded judgments."
 ---
 
 # Rubric Library API
 
-Discovery, composition, and validation for the rubric library at `.claude/rubrics/`.
+Discovery, composition, and validation for the rubric library at `.codex/rubrics/`.
 
-> **Path convention:** Commands below assume cwd is `the project environment` (project root). Prefix paths with `"the project environment/"` when invoking from subdirectories.
+> **Path convention:** Commands below assume cwd is `$(git rev-parse --show-toplevel)` (project root). Prefix paths with `"$(git rev-parse --show-toplevel)/"` when invoking from subdirectories.
 
 > **Consumed by `evaluator` agent + `mk:evaluate` skill (Phase 3, shipped 260408).** The dedicated `evaluator` sub-task (`.codex/agents/evaluator.md`) drives the running build via active verification and grades it against rubrics composed from this library. The `mk:evaluate` skill (`.agents/skills/evaluate/`) is the orchestration shell. This skill (`mk:rubric`) remains independently invokable via `the rubric skill <subcommand>` for manual rubric inspection, validation, or composition outside the evaluator workflow.
 
@@ -81,7 +81,7 @@ Activate when:
 
 ## Schema
 
-Rubrics MUST conform to `.claude/rubrics/schema.md`. The validator enforces:
+Rubrics MUST conform to `.codex/rubrics/schema.md`. The validator enforces:
 - Required frontmatter fields (`name`, `version`, `weight_default`, `applies_to`, `hard_fail_threshold`)
 - Required sections in order
 - ≥1 PASS + ≥1 FAIL anchor example, balanced (±1)
@@ -98,7 +98,7 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 
 ## Gotchas
 
-- **Adding a new rubric:** drop a `.md` file into `.claude/rubrics/`, run `validate-rubric.sh`, register weight in any preset that should include it.
+- **Adding a new rubric:** drop a `.md` file into `.codex/rubrics/`, run `validate-rubric.sh`, register weight in any preset that should include it.
 - **Weight drift:** if you change a rubric's `weight_default`, all presets that reference it must be re-checked for sum=1.0.
 - **Anti-patterns are FIXED:** they trigger FAIL regardless of the surrounding criteria. Don't add subjective ones.
 - **Don't load all rubrics:** the evaluator should load only the relevant preset, not the whole library — context efficiency.

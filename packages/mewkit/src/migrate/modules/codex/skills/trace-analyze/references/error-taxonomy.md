@@ -88,7 +88,7 @@ Each entry has:
 
 - **Trace signal:** `verdict_written` with `overall: PASS` followed by user manual override OR a follow-up plan addressing the same task within 24h
 - **Threshold:** ≥2 occurrences
-- **Root cause:** Out-of-box Claude as a QA agent identifies legitimate issues, then talks itself into approving them. Leniency drift.
+- **Root cause:** Out-of-box Codex as a QA agent identifies legitimate issues, then talks itself into approving them. Leniency drift.
 - **Mitigation:** Verify skeptic persona is being reloaded per criterion (Phase 3 evaluator). Strengthen the persona prompt; add more anti-rationalization counters.
 
 ### `stub-feature`

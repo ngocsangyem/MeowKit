@@ -8,13 +8,13 @@ description: "Systematic debugging with root cause investigation. Produces a dia
 
 # Systematic Investigation
 
-> **Path convention:** Commands below assume cwd is `the project environment` (project root). Prefix paths with `"the project environment/"` when invoking from subdirectories.
+> **Path convention:** Commands below assume cwd is `$(git rev-parse --show-toplevel)` (project root). Prefix paths with `"$(git rev-parse --show-toplevel)/"` when invoking from subdirectories.
 
 **Iron Law: NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST.**
 
 ## Skill wiring
 
-- **Reads memory:** canonical `.meowkit/memory/fixes.json` and `architecture-decisions.json`; fall back to matching generated Markdown views only when JSON is absent. See `.claude/rules/memory-read-rules.md`.
+- **Reads memory:** canonical `.meowkit/memory/fixes.json` and `architecture-decisions.json`; fall back to matching generated Markdown views only when JSON is absent. See `.agents/skills/rule-memory-read-rules.md`.
 - **Writes:** a diagnostic report only, under `tasks/reports/**`; the hook enforces this path. `mk:fix` owns remediation and any memory capture after a fix.
 
 ## Plan-First Gate

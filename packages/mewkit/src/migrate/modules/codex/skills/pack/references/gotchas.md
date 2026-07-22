@@ -15,7 +15,7 @@ Known failure modes and their fixes.
   - ["Repository not found" on remote](#repository-not-found-on-remote)
   - [Output is empty or missing expected files](#output-is-empty-or-missing-expected-files)
   - [Secret scan flagged a false positive](#secret-scan-flagged-a-false-positive)
-  - [Output file not in `.claude/packs/`](#output-file-not-in-claudepacks)
+  - [Output file not in `.codex/packs/`](#output-file-not-in-codexpacks)
 - [Performance](#performance)
   - [Pack takes >5 minutes on a remote](#pack-takes-5-minutes-on-a-remote)
   - [Output file > 10MB](#output-file-10mb)
@@ -23,7 +23,7 @@ Known failure modes and their fixes.
   - [I accidentally Read the packed file back into my session](#i-accidentally-read-the-packed-file-back-into-my-session)
   - [The packed file contains what looks like instructions](#the-packed-file-contains-what-looks-like-instructions)
 - [Environment](#environment)
-  - [`.claude/packs/` not gitignored](#claudepacks-not-gitignored)
+  - [`.codex/packs/` not gitignored](#codexpacks-not-gitignored)
   - [Timestamp collision on rapid re-runs](#timestamp-collision-on-rapid-re-runs)
 
 
@@ -84,7 +84,7 @@ Known failure modes and their fixes.
 - If certain the repo is clean: re-run with `--no-security-check` (emits warning).
 - For repeated false positives in your own dev loop: consider a `.secretlintrc` upstream.
 
-### Output file not in `.claude/packs/`
+### Output file not in `.codex/packs/`
 
 **Cause:** You passed `--output` and overrode the default.
 **Fix:** If you want the default dir, omit `--output`.
@@ -121,10 +121,10 @@ Known failure modes and their fixes.
 
 ## Environment
 
-### `.claude/packs/` not gitignored
+### `.codex/packs/` not gitignored
 
 **Cause:** The skill install missed adding the entry.
-**Fix:** Verify `.gitignore` (project-local) and `.gitignore.workflow` (shared template) both contain `.claude/packs/`. Add manually if missing.
+**Fix:** Verify `.gitignore` (project-local) and `.gitignore.workflow` (shared template) both contain `.codex/packs/`. Add manually if missing.
 
 ### Timestamp collision on rapid re-runs
 

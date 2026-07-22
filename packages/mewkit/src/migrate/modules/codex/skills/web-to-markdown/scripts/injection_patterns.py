@@ -2,7 +2,7 @@
 """
 injection_patterns.py — Pattern data for Layer 5 injection scanner.
 
-Pattern set vendored from github.com/lasso-security/claude-hooks (MIT, 260409)
+Pattern set vendored from github.com/lasso-security/codex-hooks (MIT, 260409)
 Workflow-specific patterns added for DATA-fence injection and tool-call hijack.
 
 Imported by injection_detect.py — do NOT import scan() from here.
@@ -100,9 +100,9 @@ _ENCODING_OBFUSCATION: list[tuple[str, str]] = [
 
 # contextManipulationPatterns
 _CONTEXT_MANIPULATION: list[tuple[str, str]] = [
-    (r"(?i)\b(anthropic|openai|claude\s*team|google|meta)\s+(says?|requires?|demands?|orders?|instructs?)\b",
+    (r"(?i)\b(anthropic|openai|codex\s*team|google|meta)\s+(says?|requires?|demands?|orders?|instructs?)\b",
      "False authority invocation (AI company)"),
-    (r"(?i)\b(official|authorized|verified)\s+(instruction|message|update|command)\s+from\s+(anthropic|openai|claude)",
+    (r"(?i)\b(official|authorized|verified)\s+(instruction|message|update|command)\s+from\s+(anthropic|openai|codex)",
      "Fake official message"),
     (r"(?i)\b(system\s+)?(administrator|admin|root|superuser)\s+(message|override|instruction|command)",
      "Fake admin message"),

@@ -30,7 +30,7 @@ Activate `mk:cook` with the user's task or plan path. Keep Gate 1 (plan approval
 If the user invocation contains `--tdd`, the first action before any workflow step is to write the TDD sentinel file:
 
 ```bash
-mkdir -p .claude/session-state && echo on > .claude/session-state/tdd-mode
+mkdir -p .codex/session-state && echo on > .codex/session-state/tdd-mode
 ```
 
 This sentinel is the compatibility mechanism used by workflow helpers. `MEOWKIT_TDD=1` remains a higher-precedence environment opt-in for existing automation.

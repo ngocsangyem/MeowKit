@@ -1,6 +1,6 @@
 ---
 name: "sprint-contract"
-description: "Use when negotiating a file-based sprint contract between the generator (developer) and evaluator before code is written. Translates a product-level spec into testable acceptance criteria with rubric tie-ins. Triggers on /mk:sprint-contract, \"draft a sprint contract\", \"negotiate scope for sprint\", or before any harness-driven sprint kicks off."
+description: "Use when negotiating a file-based sprint contract between the generator (developer) and evaluator before code is written. Translates a product-level spec into testable acceptance criteria with rubric tie-ins. Triggers on the sprint-contract skill, \"draft a sprint contract\", \"negotiate scope for sprint\", or before any harness-driven sprint kicks off."
 ---
 
 # mk:sprint-contract — File-Based Sprint Contract Protocol
@@ -145,7 +145,7 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 
 ## Related Rules
 
-- `.claude/rules/gate-rules.md` — Gate 1 contract-signing requirement this skill enforces before source edits are allowed
+- `.agents/skills/rule-gate-rules.md` — Gate 1 contract-signing requirement this skill enforces before source edits are allowed
 
 ## Start
 

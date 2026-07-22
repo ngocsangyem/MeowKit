@@ -24,7 +24,7 @@ tasks/reports/loop-{YYMMDD-HHMM}-{slug}/
 ```
 
 `{slug}` is a short kebab-case derivation of the Goal. These are project artifacts under the
-framework `tasks/` tree — no skill-directory writes, and no `the project environment` needed
+framework `tasks/` tree — no skill-directory writes, and no `${PLUGIN_DATA}` needed
 (framework dirs are exempt from the persistent-state rule).
 
 ---
@@ -120,6 +120,6 @@ Holds resumable state and the concurrent-run lock:
 }
 ```
 
-Framework dir → exempt from the persistent-state rule (no `the project environment`). A second
+Framework dir → exempt from the persistent-state rule (no `${PLUGIN_DATA}`). A second
 `mk:loop` in the same session refuses to start while this file marks an active run; a stale
 lock from a different `session_id` is cleared on start. The file is removed at Stage 4.

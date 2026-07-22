@@ -8,10 +8,10 @@ description: "rule-workflow-evidence-rules"
 **Core rule:** ONE JSON file per run indexes pointers + normalized summaries of
 what already exists (plan, diagnosis, verify output, verdict, approvals). It is
 an INDEX, not a second source of truth, and it **never approves anything**.
-Gate 1 and Gate 2 remain human authority (`.claude/rules/gate-rules.md`).
+Gate 1 and Gate 2 remain human authority (`.agents/skills/rule-gate-rules.md`).
 
 Validator (executable source of truth for these rules):
-`.claude/scripts/validate-workflow-evidence.cjs`. Zero runtime deps, Node
+`.codex/scripts/validate-workflow-evidence.cjs`. Zero runtime deps, Node
 builtins, native JSON. Exit 0 = `EVIDENCE_OK`; exit 1 = `EVIDENCE_BLOCKED:<reasons>`.
 
 ## 1 — The Hard Line
@@ -42,7 +42,7 @@ never an approval predicate.
 ## 3 — Validation Rules (enforced by the `.cjs`)
 
 - `skill` ∈ {`mk:fix`, `mk:cook`}; `task` non-empty.
-- `risk.matchedFlags` ⊆ the 9 IDs in `.claude/rules/risk-checklist.md`
+- `risk.matchedFlags` ⊆ the 9 IDs in `.agents/skills/rule-risk-checklist.md`
   (`AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF`).
 - `mk:fix` → all six `fixDiagnosis` fields populated before implementation.
 - `mk:cook` → all five `cookContract` dimensions populated before Gate 1, **unless**
@@ -54,16 +54,16 @@ never an approval predicate.
 - **No score validation anywhere.**
 
 Run before presenting for approval:
-`node .claude/scripts/validate-workflow-evidence.cjs <path> --phase fix|cook [--plan-input]`.
+`node .codex/scripts/validate-workflow-evidence.cjs <path> --phase fix|cook [--plan-input]`.
 
 ## 4 — Storage Rules
 
 | Run type | Path |
 |---|---|
 | Planned `mk:cook` work | `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` |
-| Standalone `mk:fix` standard/complex | `.claude/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` |
+| Standalone `mk:fix` standard/complex | `.codex/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` |
 
-`session-state/` is framework-internal state — the `the project environment` rule
+`session-state/` is framework-internal state — the `${PLUGIN_DATA}` rule
 (`skill-authoring-rules.md` Rule 2) explicitly exempts it. `--quick` fixes write
 the compact `fixDiagnosis` form; simple fixes may skip evidence entirely.
 

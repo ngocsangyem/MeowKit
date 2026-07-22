@@ -22,7 +22,7 @@ Reference guide for "magic numbers" and constants used in JIRA administration.
 
 ```bash
 # View project configuration with field IDs
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh ops discover-project PROJ
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh ops discover-project PROJ
 
 # Use jira-fields skill for comprehensive discovery
 python .agents/skills/jira-fields/scripts/list_fields.py --custom-only
@@ -59,10 +59,10 @@ python .agents/skills/jira-fields/scripts/get_field.py customfield_10016
 
 ```bash
 # Add notification using event name (preferred)
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh admin notification add 10000 --event "Issue created" --notify Reporter
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh admin notification add 10000 --event "Issue created" --notify Reporter
 
 # Add notification using event ID (when name doesn't match)
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh admin notification add 10000 --event-id 1 --notify Reporter
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh admin notification add 10000 --event-id 1 --notify Reporter
 ```
 
 ---
@@ -248,19 +248,19 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh admin notifi
 
 ```bash
 # Discover custom field IDs
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh ops discover-project PROJ
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh ops discover-project PROJ
 
 # List all statuses with IDs
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh admin status list --output json
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh admin status list --output json
 
 # List all permissions
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh admin permission list
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh admin permission list
 
 # List all issue types with IDs
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh admin issue-type list --format json
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh admin issue-type list --format json
 
 # Get notification event IDs
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh admin notification-scheme get 10000 --output json
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh admin notification-scheme get 10000 --output json
 ```
 
 ---

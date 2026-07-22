@@ -48,25 +48,25 @@ Concrete edge cases and operational surprises. Each entry explains why it matter
 
 **Why it matters:** Playwright rendering is triple-gated. ALL three must be true simultaneously:
 
-1. `playwright` package installed (via `.claude/scripts/bin/setup-workflow --system-deps`, ~200MB download)
+1. `playwright` package installed (via `.codex/scripts/bin/setup-workflow --system-deps`, ~200MB download)
 2. `MEOWKIT_WEB_FETCH_JS=1` environment variable set
 3. Per-call `js=True` argument passed to `fetch_as_markdown()`
 
 Missing any single gate silently falls back to static fetch. If static fetch returns thin content and all three gates are not met, the skill returns an error, not a Playwright result.
 
-**Mitigation:** Run `.claude/scripts/bin/setup-workflow --system-deps` to install Playwright, then set `MEOWKIT_WEB_FETCH_JS=1` in your environment, and pass `js=True` at the call site. Verify all three before assuming JS rendering is active.
+**Mitigation:** Run `.codex/scripts/bin/setup-workflow --system-deps` to install Playwright, then set `MEOWKIT_WEB_FETCH_JS=1` in your environment, and pass `js=True` at the call site. Verify all three before assuming JS rendering is active.
 
 ---
 
 ## Gotcha: Fetch reports accumulate unbounded on disk
 
-**Why it matters:** Every successful fetch writes a report file to `.claude/cache/web-fetches/`. There is no TTL-based cleanup in v1. A session that fetches dozens of pages will grow the cache proportionally and permanently. The cache is never pruned automatically.
+**Why it matters:** Every successful fetch writes a report file to `.codex/cache/web-fetches/`. There is no TTL-based cleanup in v1. A session that fetches dozens of pages will grow the cache proportionally and permanently. The cache is never pruned automatically.
 
 **Mitigation:** Manual cleanup:
 
 ```bash
-rm -rf .claude/cache/web-fetches/*.md         # clear regular reports
-rm -rf .claude/cache/web-fetches/quarantine/  # clear quarantine (REVIEW FIRST)
+rm -rf .codex/cache/web-fetches/*.md         # clear regular reports
+rm -rf .codex/cache/web-fetches/quarantine/  # clear quarantine (REVIEW FIRST)
 ```
 
 TTL auto-cleanup is deferred to v2 (`setup cleanup command`). Add the cache directory to `.gitignore`
@@ -75,9 +75,9 @@ TTL auto-cleanup is deferred to v2 (`setup cleanup command`). Add the cache dire
 
 ## Gotcha: Reports may contain PII — secret scrub is regex-based
 
-**Why it matters:** The pre-write secret scrub covers known patterns (API keys, JWTs, AWS credentials, bearer tokens, basic auth URLs). It does not catch free-text PII (names, emails, phone numbers embedded in page content), custom token formats, or novel secret layouts. A report file written to `.claude/cache/web-fetches/` may contain sensitive information not caught by the scrubber.
+**Why it matters:** The pre-write secret scrub covers known patterns (API keys, JWTs, AWS credentials, bearer tokens, basic auth URLs). It does not catch free-text PII (names, emails, phone numbers embedded in page content), custom token formats, or novel secret layouts. A report file written to `.codex/cache/web-fetches/` may contain sensitive information not caught by the scrubber.
 
-**Mitigation:** Never commit `.claude/cache/` to git (`.gitignore` covers this). Treat all report files as potentially sensitive. If a page is known to contain PII, review the report before sharing or persisting it outside the cache directory.
+**Mitigation:** Never commit `.codex/cache/` to git (`.gitignore` covers this). Treat all report files as potentially sensitive. If a page is known to contain PII, review the report before sharing or persisting it outside the cache directory.
 
 ---
 

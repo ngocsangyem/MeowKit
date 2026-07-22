@@ -5,7 +5,7 @@
 ## Resume Steps
 
 1. **Parse command:** `workflow:resume AUTH-123`
-2. **Load state:** `.claude/logs/workflows/[id]/workflow-state.json` — validate exists, valid JSON, compatible version, status is "paused"
+2. **Load state:** `.codex/logs/workflows/[id]/workflow-state.json` — validate exists, valid JSON, compatible version, status is "paused"
 3. **Restore context:** Load project context, activate saved agents, load phase rules, restore key decisions + deliverables
 4. **Show resume summary:** Workflow ID, task, restored state, completed phases, key decisions, "CONTINUING FROM: Phase [N]"
 5. **Continue:** Resume from saved phase, show agent banner, execute remaining steps
@@ -25,7 +25,7 @@ Events: Phase completion, every 5 minutes, host-reported context-warning milesto
 ## State File Structure
 
 ```
-.claude/logs/workflows/
+.codex/logs/workflows/
 ├── AUTH-123/
 │   ├── workflow-state.json
 │   ├── requirements.md

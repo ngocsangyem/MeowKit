@@ -15,7 +15,7 @@ All other modes (fast, hard, parallel, two) continue to use `step-03-draft-plan.
 
 Pulls product context (brand, tone, prior specs) from existing repos without leaking source-code structure. **Skip entirely if `--no-scout` is set or the repo is empty.**
 
-**Empty repo check:** `find . -type f -not -path './.git/*' -not -path './.claude/*' -not -path './node_modules/*' -not -path './.venv/*' | head -1` — if empty, skip and proceed to 3a.1.
+**Empty repo check:** `find . -type f -not -path './.git/*' -not -path './.codex/*' -not -path './node_modules/*' -not -path './.venv/*' | head -1` — if empty, skip and proceed to 3a.1.
 
 **Dispatch `mk:scout` with this strict scope:**
 

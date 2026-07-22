@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # smoke-live.sh — manual live-credentials smoke test.
-# Run after `.claude/scripts/bin/setup-workflow` + populating .claude/.env.
+# Run after `.codex/scripts/bin/setup-workflow` + populating .codex/.env.
 # Verifies: wrapper resolves, env vars load, Cloud-only gate passes,
 # binary returns valid JSON, expected stdout-filter behavior.
 #
@@ -32,5 +32,5 @@ echo "=== smoke 2: print_success channel detection ==="
 echo "Run these manually and inspect output:"
 echo "  $WRAPPER space list 2>/dev/null | tail -3"
 echo "  → if a non-JSON ✓ line appears: print_success goes to STDOUT"
-echo "    set MEOW_CONFLUENCE_STDOUT_FILTER=trim-tail in .claude/.env"
+echo "    set MEOW_CONFLUENCE_STDOUT_FILTER=trim-tail in .codex/.env"
 echo "  → if only JSON shows: print_success goes to STDERR (no filter needed)"

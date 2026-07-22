@@ -112,7 +112,7 @@ MCP servers are optional. Skill degrades gracefully:
 - **Context Hub**: `npx chub` → curated docs, no install
 - **Neither**: falls back to llms.txt direct fetch + WebSearch
 
-Config: `.mcp.json` — MCP server endpoints. Copy from `.claude/mcp.json.example`.
+Config: `.mcp.json` — MCP server endpoints. Copy from `.codex/mcp.json.example`.
 
 ## Failure Handling
 
@@ -176,7 +176,7 @@ mk:docs-finder/
 ## Gotchas
 
 - **Cache growth**: `.meowkit/memory/docs-cache/` is NOT pruned automatically by `mk:memory --prune`. Run `rm -rf .meowkit/memory/docs-cache/` to clear manually, or add a periodic prune step if the directory exceeds 50MB.
-- **Python venv required**: if you get `python3: command not found` or import errors, run `.claude/scripts/bin/setup-workflow` once from the project root.
+- **Python venv required**: if you get `python3: command not found` or import errors, run `.codex/scripts/bin/setup-workflow` once from the project root.
 - **Silent tier-by-tier fallback produces stale or off-target docs with no warning** — if Context7 returns a 404 and chub returns no results, the skill falls through to WebSearch without telling the user which tier succeeded; the agent may present a 2-year-old blog post as "documentation" without attribution; always check the `source` field in the JSON response from each script to know which tier actually won.
 - **Context7 library ID is not the same as the npm package name** — `fetch-context7.js "react-query"` may fail because the Context7 repo path is `tanstack/query`, not `react-query`; run `detect-source.js` first to resolve the canonical Context7 repo path from the library alias map, rather than guessing the package name directly.
 - **`mk:web-to-markdown` delegation requires `--wtm-accept-risk` flag and will silently refuse cross-skill calls without it** — calling `fetch-web-to-markdown.js` from a different skill without the flag causes the script to return an empty `delegationCommand` and the tier-4 fallback appears to produce no output; the flag is not optional for cross-skill invocation.

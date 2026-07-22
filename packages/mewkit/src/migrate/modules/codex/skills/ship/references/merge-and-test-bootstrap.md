@@ -12,7 +12,7 @@
   - [B5. Verify](#b5-verify)
   - [B5.5. CI/CD pipeline](#b55-cicd-pipeline)
   - [B6. Create TESTING.md](#b6-create-testingmd)
-  - [B7. Update CLAUDE.md](#b7-update-claudemd)
+  - [B7. Update AGENTS.md](#b7-update-codexmd)
   - [B8. Commit](#b8-commit)
 
 ## Step 2: Merge the base branch (BEFORE tests)
@@ -156,9 +156,9 @@ Write TESTING.md with:
 - Test layers: Unit tests (what, where, when), Integration tests, Smoke tests, E2E tests
 - Conventions: file naming, assertion style, setup/teardown patterns
 
-### B7. Update CLAUDE.md
+### B7. Update AGENTS.md
 
-First check: If CLAUDE.md already has a `## Testing` section → skip. Don't duplicate.
+First check: If AGENTS.md already has a `## Testing` section → skip. Don't duplicate.
 
 Append a `## Testing` section:
 - Run command and test directory
@@ -177,5 +177,5 @@ Append a `## Testing` section:
 git status --porcelain
 ```
 
-Only commit if there are changes. Stage all bootstrap files (config, test directory, TESTING.md, CLAUDE.md, .github/workflows/test.yml if created):
+Only commit if there are changes. Stage all bootstrap files (config, test directory, TESTING.md, AGENTS.md, .github/workflows/test.yml if created):
 `git commit -m "chore: bootstrap test framework ({framework name})"`

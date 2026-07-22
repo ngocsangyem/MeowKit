@@ -314,7 +314,7 @@ Write the report to both local and project-scoped locations:
 
 **Project-scoped:** Write test outcome artifact for cross-session context:
 ```bash
-eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/memory/projects
+eval "$(.codex/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/memory/projects
 ```
 Write to `.meowkit/memory/projects/{slug}/{user}-{branch}-test-outcome-{datetime}.md`
 

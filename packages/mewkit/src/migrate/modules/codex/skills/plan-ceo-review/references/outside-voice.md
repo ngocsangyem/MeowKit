@@ -1,12 +1,12 @@
 # Outside Voice — Independent Plan Challenge (optional, recommended)
 
-After all review sections are complete, dispatch a Claude adversarial sub-task for an independent second opinion. The sub-task has fresh context — it catches structural blind spots that are hard to see from inside the review.
+After all review sections are complete, dispatch a Codex adversarial sub-task for an independent second opinion. The sub-task has fresh context — it catches structural blind spots that are hard to see from inside the review.
 
 ## Offer the outside voice
 
 Use stop and ask the user in chat:
 
-> "All review sections are complete. Want an outside voice? A Claude sub-task with fresh context can give a brutally honest, independent challenge of this plan — logical gaps, feasibility risks, and blind spots. Takes about 2 minutes."
+> "All review sections are complete. Want an outside voice? A Codex sub-task with fresh context can give a brutally honest, independent challenge of this plan — logical gaps, feasibility risks, and blind spots. Takes about 2 minutes."
 >
 > RECOMMENDATION: Choose A — the independent pass catches structural blind spots the primary reviewer is blind to.
 
@@ -28,12 +28,12 @@ Construct this prompt (substitute the actual plan content — if plan content ex
 THE PLAN:
 <plan content>"
 
-## Dispatch the Claude sub-task
+## Dispatch the Codex sub-task
 
-Dispatch via the Agent tool with the prompt above. Present findings under an `OUTSIDE VOICE (Claude sub-task):` header:
+Dispatch via the Agent tool with the prompt above. Present findings under an `OUTSIDE VOICE (Codex sub-task):` header:
 
 ```
-OUTSIDE VOICE (Claude sub-task):
+OUTSIDE VOICE (Codex sub-task):
 ════════════════════════════════════════════════════════════
 <full sub-task output, verbatim — do not truncate or summarize>
 ════════════════════════════════════════════════════════════
@@ -64,7 +64,7 @@ If no tension points exist, note: "No cross-pass tension — both passes agree."
 ## Persist the Result
 
 ```bash
-.claude/scripts/bin/workflow-review-log '{"skill":"plan-review-outside-voice","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"claude","commit":"'"$(git rev-parse --short HEAD)"'"}'
+.codex/scripts/bin/workflow-review-log '{"skill":"plan-review-outside-voice","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"codex","commit":"'"$(git rev-parse --short HEAD)"'"}'
 ```
 
 Substitute STATUS: "clean" if no findings, "issues_found" if findings exist. If the sub-task failed, do NOT persist.

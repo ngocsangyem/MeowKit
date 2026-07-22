@@ -36,7 +36,7 @@ At the start of each task, assess the complexity tier:
 
 Print the estimate:
 ```
-Task tier: [standard] | Model: [claude-opus-4-6]
+Task tier: [standard] | Model: [codex-opus-4-6]
 ```
 
 ## After Task: Log Usage

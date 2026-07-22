@@ -75,7 +75,7 @@ See `templates/project-context-template.md` for the full structure.
 - The template asks for "rejected alternatives" — this is the highest-value content. If you chose Zustand over Redux, say WHY
 - Don't list every file path — agents can Glob for that. Focus on RULES and CONVENTIONS
 - `<!-- manual -->` sections survive `update` action but NOT `generate` — backup before regenerating from scratch
-- If project-context.md conflicts with CLAUDE.md, CLAUDE.md wins (it's the higher-priority document)
+- If project-context.md conflicts with AGENTS.md, AGENTS.md wins (it's the higher-priority document)
 - `init` refuses to overwrite an existing `docs/project-context.md` — this is intentional. Delete the file manually if you truly want to reset to a blank skeleton.
 
 ## Integration

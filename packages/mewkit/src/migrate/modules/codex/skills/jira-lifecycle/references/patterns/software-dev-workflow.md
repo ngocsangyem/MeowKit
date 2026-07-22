@@ -1,6 +1,6 @@
 # Software Development Workflow Pattern
 
-> **CONCEPT REFERENCE — NOT AUTHORITATIVE.** This file describes a common workflow shape for orientation. **Your project may use different status names + transitions.** Always consult `tasks/jira-workflows/<workflow-slug>.md` (discovered via `bash the project environment/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>`) for the actual workflow. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md`.
+> **CONCEPT REFERENCE — NOT AUTHORITATIVE.** This file describes a common workflow shape for orientation. **Your project may use different status names + transitions.** Always consult `tasks/jira-workflows/<workflow-slug>.md` (discovered via `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>`) for the actual workflow. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md`.
 
 **Use this pattern for:** Development teams with code review and QA processes.
 
@@ -48,30 +48,30 @@ Backlog --> To Do --> In Progress --> In Review --> In QA --> Done
 
 ```bash
 # Pick up work from sprint
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In Progress"
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle assign PROJ-123 --self
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In Progress"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle assign PROJ-123 --self
 
 # Submit for review
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In Review" \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In Review" \
   --comment "PR: https://github.com/org/repo/pull/456"
 
 # After approval, move to QA
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In QA"
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle assign PROJ-123 --user qa-lead@example.com
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In QA"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle assign PROJ-123 --user qa-lead@example.com
 
 # Complete
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle resolve PROJ-123 --resolution "Fixed"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle resolve PROJ-123 --resolution "Fixed"
 ```
 
 ### Handling Rejections
 
 ```bash
 # Code review needs changes
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In Progress" \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In Progress" \
   --comment "Addressing review feedback"
 
 # QA found bug
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In Progress" \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In Progress" \
   --comment "Fixing: Null pointer on edge case"
 ```
 

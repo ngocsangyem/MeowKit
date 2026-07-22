@@ -18,7 +18,7 @@ This agent is **A (untrusted CQL + page content) + C (filter CRUD via wrapper)**
 SessionStart hook validated env. All invocations go through:
 
 ```bash
-bash the project environment/.agents/skills/confluence/scripts/confluence-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh <args>
 ```
 
 
@@ -31,7 +31,7 @@ Use the routed skill and domain reference files for CLI syntax, safety tiers, te
 Sanitization is **unconditional**. There is no trusted-input path. Before embedding ANY user-supplied term into a CQL query (page title, label, space-key fragment, free-text term), pass it through:
 
 ```bash
-bash the project environment/.agents/skills/confluence/scripts/cql-sanitize.sh '<user-term>'
+bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/cql-sanitize.sh '<user-term>'
 ```
 
 The sanitizer rejects shell metacharacters and CQL statement separators, then escapes backslash + double-quote per the CQL grammar. Use the wrapper's stdout in your CQL. **Never construct CQL by string concatenation with raw user input.**
@@ -65,7 +65,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: result count + projected page list (id + title + space + last-modified). For export, return: file path + record count.
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Gotchas
 

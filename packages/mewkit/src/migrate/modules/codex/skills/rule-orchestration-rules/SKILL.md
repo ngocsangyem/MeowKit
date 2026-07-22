@@ -76,7 +76,7 @@ Five boundary types govern what context crosses between layers. Each row defines
 
 | Boundary | Isolation level | What to pass | What NOT to pass |
 |---|---|---|---|
-| Session → sub-task | Prompt-only | Task desc + file paths + acceptance criteria + plan ref | Session history, prior conversation, CLAUDE.md contents |
+| Session → sub-task | Prompt-only | Task desc + file paths + acceptance criteria + plan ref | Session history, prior conversation, AGENTS.md contents |
 | Orchestrator → Worker | Slim brief | Specific subtask + relevant files + output format | Full plan, other workers' outputs, orchestrator's reasoning chain |
 | Plan → Phase | Phase file | Path to `phase-XX-*.md` | Full `plan.md` + all other phase files |
 | Memory → sub-task | Named files | Specific topic file paths needed for task | Entire `.meowkit/memory/` directory |
@@ -91,7 +91,7 @@ The delegation template is inner-harness–agnostic. Inner harnesses vary along 
 | Capability | Question to answer per harness |
 |---|---|
 | Task / Agent tool surface | Does the harness expose a way to spawn a sub-task? What is the call shape? |
-| Context auto-injection | Which root file (e.g. `CLAUDE.md`, `AGENTS.md`, `gemini.md`) does the harness inject into sub-task context automatically, and what is its byte cap? |
+| Context auto-injection | Which root file (e.g. `AGENTS.md`, `AGENTS.md`, `gemini.md`) does the harness inject into sub-task context automatically, and what is its byte cap? |
 | SubagentStart hook | Is the hook surface available? On most harnesses it is NOT, because hooks fire inside sub-task and infinite-loop. |
 
 Constraints that apply when the inner harness's behavior is unknown or differs from the outer harness:

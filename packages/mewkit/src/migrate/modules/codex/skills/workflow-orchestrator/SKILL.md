@@ -7,15 +7,15 @@ description: "Auto-invoked 7-phase workflow for complex-feature intent. Includes
 
 # Workflow Orchestrator
 
-<!-- Canonical source: .claude/workflow.yaml -->
+<!-- Canonical source: .codex/workflow.yaml -->
 
 **Priority:** CRITICAL — Use for complex feature implementations.
 
-> Only activates on session start for complex-feature intent. If `the cook skill` was explicitly invoked in this session, do not activate — `mk:cook` owns the pipeline. See `.claude/rules/orchestration-rules.md`"Orchestrator Entry Point Rule".
+> Only activates on session start for complex-feature intent. If `the cook skill` was explicitly invoked in this session, do not activate — `mk:cook` owns the pipeline. See `.agents/skills/rule-orchestration-rules.md`"Orchestrator Entry Point Rule".
 
 ## Canonical Lifecycle
 
-`.claude/workflow.yaml` is the sole source for phase sequence, gates, leads, and required outputs. This adapter must not restate phase details. For execution load `references/workflow-phases.md`, which renders that contract.
+`.codex/workflow.yaml` is the sole source for phase sequence, gates, leads, and required outputs. This adapter must not restate phase details. For execution load `references/workflow-phases.md`, which renders that contract.
 
 On a non-trivial task, route to `mk:plan-creator`; proceed only after Gate 1. Fasttrack accepts only a pre-approved spec. Gate 2 remains human approval before an explicit ship request.
 
@@ -35,15 +35,15 @@ On a non-trivial task, route to `mk:plan-creator`; proceed only after Gate 1. Fa
 
 ## Process
 
-See `.claude/rules/phase-contracts.md` for input/output expectations per phase. (Loaded by `mk:agent-detector` Step 0b at session start.)
+See `.agents/skills/rule-phase-contracts.md` for input/output expectations per phase. (Loaded by `mk:agent-detector` Step 0b at session start.)
 
 1. **Run pre-execution checklist** — select lead agent, load memory, show agent banner, verify complexity, challenge requirements.
 
 2. **Detect workflow mode** — check for `fasttrack:` prefix or Agent Teams trigger; if present load `references/fasttrack-and-teams.md`. Otherwise proceed with standard 7-phase flow.
 
-3. **Execute the canonical lifecycle** — load `references/workflow-phases.md` and follow `.claude/workflow.yaml`; do not duplicate or override its phase ordering, TDD rules, required outputs, or gates.
+3. **Execute the canonical lifecycle** — load `references/workflow-phases.md` and follow `.codex/workflow.yaml`; do not duplicate or override its phase ordering, TDD rules, required outputs, or gates.
 
-4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit. Also delegate to `project-manager` after each phase transition per `.claude/rules/post-phase-delegation.md` Rule 1 (background, non-blocking — include "Run in the background" in the prompt). Skipped when `MEOWKIT_PM_AUTO=off`.
+4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit. Also delegate to `project-manager` after each phase transition per `.agents/skills/rule-post-phase-delegation.md` Rule 1 (background, non-blocking — include "Run in the background" in the prompt). Skipped when `MEOWKIT_PM_AUTO=off`.
 
 Only the canonical gates authorize transition. Shipping and reflection require explicit user direction; they do not auto-run after review.
 
@@ -64,8 +64,8 @@ Only the canonical gates authorize transition. Shipping and reflection require e
 
 ## Related Rules
 
-- `.claude/rules/gate-rules.md` — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions enforced by this orchestrator
-- `.claude/rules/injection-rules.md` — DATA vs INSTRUCTIONS boundary; applies to all file/tool output processed during orchestration
+- `.agents/skills/rule-gate-rules.md` — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions enforced by this orchestrator
+- `.agents/skills/rule-injection-rules.md` — DATA vs INSTRUCTIONS boundary; applies to all file/tool output processed during orchestration
 
 ## Gotchas
 

@@ -35,7 +35,7 @@ Angular v20+ patterns — 10 topics consolidated with progressive disclosure.
 
 Read multiple references when task spans topics (e.g., component + signals + forms).
 
-## Gotchas (top 5 — most common Claude mistakes)
+## Gotchas (top 5 — most common Codex mistakes)
 
 1. **Using @Input/@Output decorators**: deprecated in v20+ → use `input()`, `output()` signal functions
 2. **Using *ngIf/*ngFor**: deprecated template syntax → use `@if`, `@for` with `track` expression

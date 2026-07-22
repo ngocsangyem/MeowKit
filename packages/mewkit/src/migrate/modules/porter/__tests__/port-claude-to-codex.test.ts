@@ -12,6 +12,21 @@ describe("neutralize", () => {
 		expect(out).toContain(".meowkit/memory");
 		expect(out).not.toContain("AskUserQuestion");
 	});
+
+	it("leaves NO residual claude token (paths, filenames, env, product wording)", () => {
+		const src = [
+			"See `.claude/rules/gate-rules.md` and `.claude/scripts/bin/x`.",
+			"Read CLAUDE.md. Run $CLAUDE_PROJECT_DIR/x and ${CLAUDE_PLUGIN_ROOT}.",
+			"This is Claude Code; Claude's memory. plain claude and .claude/.env.",
+		].join("\n");
+		const out = neutralize(src);
+		expect(out.toLowerCase()).not.toContain("claude");
+		expect(out).toContain(".agents/skills/rule-gate-rules.md");
+		expect(out).toContain("AGENTS.md");
+		expect(out).toContain("$(git rev-parse --show-toplevel)");
+		expect(out).toContain("PLUGIN_ROOT");
+		expect(out).toContain("Codex");
+	});
 });
 
 describe("portAgent", () => {

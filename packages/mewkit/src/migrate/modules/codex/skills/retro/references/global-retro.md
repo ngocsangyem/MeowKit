@@ -278,7 +278,7 @@ Use the Write tool to save JSON to `.meowkit/memory/retros/global-${today}-${nex
       "commits": 47,
       "insertions": 3200,
       "deletions": 800,
-      "sessions": { "claude_code": 15, "codex": 3, "gemini": 0 }
+      "sessions": { "codex_code": 15, "codex": 3, "gemini": 0 }
     }
   ],
   "totals": {
@@ -287,7 +287,7 @@ Use the Write tool to save JSON to `.meowkit/memory/retros/global-${today}-${nex
     "deletions": 4200,
     "projects": 5,
     "active_days": 6,
-    "sessions": { "claude_code": 48, "codex": 8, "gemini": 3 },
+    "sessions": { "codex_code": 48, "codex": 8, "gemini": 3 },
     "global_streak_days": 52,
     "avg_context_switches_per_day": 2.1
   },

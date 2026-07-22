@@ -13,7 +13,7 @@ Use only for a novel, text-prompt design. Existing design sources belong to `mk:
 
 ## Setup and guard
 
-Set `STITCH_API_KEY` in `.claude/.env`, then install the scripts once:
+Set `STITCH_API_KEY` in `.codex/.env`, then install the scripts once:
 
 ```bash
 cd .agents/skills/stitch/scripts && npm install
@@ -28,7 +28,7 @@ Before any script runs, verify both prerequisites:
 
 ```bash
 # Key gate
-[ -z "$STITCH_API_KEY" ] && { echo "[X] STITCH_API_KEY not set — add to .claude/.env"; exit 1; }
+[ -z "$STITCH_API_KEY" ] && { echo "[X] STITCH_API_KEY not set — add to .codex/.env"; exit 1; }
 
 # tsx gate
 npx tsx --version 2>/dev/null || { echo "[X] tsx not found — run: cd .agents/skills/stitch/scripts && npm install"; exit 1; }
@@ -84,12 +84,12 @@ and the handoff contract are in [references/stitch-operations.md](references/sti
 
 ## Gotchas
 
-- `STITCH_API_KEY` must be in `.claude/.env` — the skill fails closed (exit 1) if unset; no network call is attempted
+- `STITCH_API_KEY` must be in `.codex/.env` — the skill fails closed (exit 1) if unset; no network call is attempted
 - `tsx` must be installed (`npm install` in `scripts/`) — scripts will not run without it; install once per machine
 - Local quota can drift from real Stitch usage (e.g., designs made via the Stitch web UI); if you hit `RATE_LIMITED` despite the tracker showing credits, run `stitch-quota.ts reset`
 - Quota limits and paid-tier availability are volatile; load [quota-management.md](references/quota-management.md) before making a quota-based decision.
 - Screen IDs returned by `generate` are stable (Tool Contract Rule 2); project name auto-detection uses git remote then CWD basename
-- The optional MCP integration stores the API key in `.claude/.mcp.json` — never commit that file; the kit's `.gitignore` covers it
+- The optional MCP integration stores the API key in `.codex/.mcp.json` — never commit that file; the kit's `.gitignore` covers it
 - `stitch-write-output.ts` validates CDN URLs against a Google-domain allowlist; if Stitch changes CDN domains, update `ALLOWED_CDN_SUFFIXES` in that script
 
 ## References

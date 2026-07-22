@@ -58,7 +58,7 @@ Apply these to **every** improvement mapping. Violation = fabrication.
 error rate, file count) or mark `[FILL-IN: <metric>]`.
 
 **Source:** factoryai/prompt-crafting-for-different-models "Universal Prompting
-Principles → Be specific about the outcome"; claude-prompting-best-practices
+Principles → Be specific about the outcome"; codex-prompting-best-practices
 "Be clear and direct".
 
 **Guard:** Do NOT invent a metric. If the user has not stated one, use a placeholder.
@@ -74,7 +74,7 @@ without changing user intent.
 If specifics are unknown, list `[FILL-IN: <description>]` placeholders for each
 missing anchor.
 
-**Source:** claude-prompting-best-practices "Provide context to improve performance";
+**Source:** codex-prompting-best-practices "Provide context to improve performance";
 factoryai "Provide context before instructions".
 
 **Guard:** Do NOT invent file paths or motivations. The user is the source of truth.
@@ -120,7 +120,7 @@ benchmarks and suggest as `[FILL-IN]` reference.
 **Fix:** Add an `OUTPUT FORMAT:` section. Common shapes: "modified files +
 1-line rationale per file", "JSON: { ... }", "5 bullets, no preamble".
 
-**Source:** claude-prompting-best-practices "Control the format of responses";
+**Source:** codex-prompting-best-practices "Control the format of responses";
 factoryai "Be explicit about output format".
 
 **Guard:** Default format is "concise summary + file refs". Do not impose JSON
@@ -136,7 +136,7 @@ or strict schemas unless the user named them.
 **Fix:** For every "Don't X", add an "INSTEAD do Y" line. Negative rules without
 positive direction force the model to invent its own positive interpretation.
 
-**Source:** claude-prompting-best-practices "Tell Claude what to do, not what
+**Source:** codex-prompting-best-practices "Tell Codex what to do, not what
 not to do".
 
 **Guard:** Do NOT invent the INSTEAD action. If the user has not specified what
@@ -180,7 +180,7 @@ Keep the instruction OUTSIDE the fence.
 
 **Guard:** Do NOT modify the data block content. Only add fences. Universal
 kernel only — the default rewrite never emits XML / `<context>` tags or any
-vendor-specific delimiter. Model-specific data-separation idioms (e.g. Claude's
+vendor-specific delimiter. Model-specific data-separation idioms (e.g. Codex's
 `<context>` tags) belong in optional `--analyze` target-notes when the user
 names that target, never in the default rewrite.
 
@@ -190,10 +190,10 @@ names that target, never in the default rewrite.
 
 ### #9 — Wrong section ordering
 
-**Fix:** Move long content to the TOP, instruction to the BOTTOM. Per Claude's
+**Fix:** Move long content to the TOP, instruction to the BOTTOM. Per Codex's
 long-context rule, this can lift quality up to 30%.
 
-**Source:** claude-prompting-best-practices "Long context prompting";
+**Source:** codex-prompting-best-practices "Long context prompting";
 agent-conduct.md B3.
 
 **Guard:** Do NOT split the long content; relocate it as a single block.
@@ -208,20 +208,20 @@ agent-conduct.md B3.
 
 - Replace XML tags (`<context>`, `<task>`, `<requirements>`, `<constraints>`,
   `<examples>`) with plain markdown `CONTEXT:` / `CONSTRAINTS:` / etc. headings.
-- Remove vendor tokens: "think step by step" (Claude pre-4.5 idiom), `apply_patch`
+- Remove vendor tokens: "think step by step" (Codex pre-4.5 idiom), `apply_patch`
   (Codex tool semantics), "Reasoning: low|high" (Gemini parameter), Friendly /
   Pragmatic personality switch (Codex).
 - Replace role-as-XML with a plain-text `[SYSTEM] You are a <role>...` line.
-- Drop hardcoded model names from the persona ("As Claude...", "As GPT-5...");
+- Drop hardcoded model names from the persona ("As Codex...", "As GPT-5...");
   the rewrite must be model-agnostic.
 
 **Source:** synthesis report (what the framework deliberately omits and the
 universal-kernel-only architecture). The synthesis derives this from the
 factoryai filter map, codex-prompt-guide deliberate exclusions, and
-claude-prompting-best-practices universal-vs-Claude-specific filter.
+codex-prompting-best-practices universal-vs-Codex-specific filter.
 
 **Guard:** Do NOT add an overlay for ANY model. The universal kernel works on
-Claude, GPT/Codex, and Gemini without dispatch. Model-tier dispatch lives in
+Codex, GPT/Codex, and Gemini without dispatch. Model-tier dispatch lives in
 `harness-rules.md` Rule 5, not in this skill.
 
 **`--deep` boost:** Not applicable (this is a framing fix, not a content fix).

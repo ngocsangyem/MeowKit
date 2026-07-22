@@ -5,7 +5,7 @@ description: "Experimental/manual harness canary procedure. It records benchmark
 
 # mk:benchmark — Experimental Harness Canary Suite
 
-Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (per `.claude/rules/dead-weight-audit-rules.md`) consumes to make load-bearing decisions about each harness component.
+Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (per `.agents/skills/rule-dead-weight-audit-rules.md`) consumes to make load-bearing decisions about each harness component.
 
 ## When to Use
 
@@ -40,7 +40,7 @@ Skip when:
 ## Tier Layout
 
 ```
-.claude/benchmarks/
+.codex/benchmarks/
 ├── README.md                                  ← how to use + add tasks
 ├── canary/
 │   ├── quick/                                 ← default tier (5 tasks, ≤$5)
@@ -65,7 +65,7 @@ the benchmark skill run
 Outputs:
 - Per-task verdict + score
 - Total cost + duration
-- Run ID written to `.claude/benchmarks/results/{run-id}.json` AND trace-log.jsonl
+- Run ID written to `.codex/benchmarks/results/{run-id}.json` AND trace-log.jsonl
 
 ### Run full tier
 
@@ -95,7 +95,7 @@ Outputs a delta table:
 
 ## Output Schema
 
-Each benchmark run writes a JSON dump to `.claude/benchmarks/results/{run-id}.json`:
+Each benchmark run writes a JSON dump to `.codex/benchmarks/results/{run-id}.json`:
 
 ```json
 {
@@ -104,7 +104,7 @@ Each benchmark run writes a JSON dump to `.claude/benchmarks/results/{run-id}.js
   "started": "2026-04-08T14:30:00Z",
   "ended": "2026-04-08T14:42:00Z",
   "harness_version": "3.0.0",
-  "model": "claude-opus-4-6",
+  "model": "codex-opus-4-6",
   "total_cost_usd": 4.20,
   "total_duration_seconds": 720,
   "tasks": [
@@ -140,7 +140,7 @@ bash .agents/skills/benchmark/scripts/git-index-audit.sh [repo-path]
 bash .agents/skills/benchmark/scripts/git-index-audit.sh <local> <remote>
 ```
 
-**Artifact location:** `.claude/benchmarks/audits/{YYMMDD-HHMMSS}-audit.json` — a SIBLING
+**Artifact location:** `.codex/benchmarks/audits/{YYMMDD-HHMMSS}-audit.json` — a SIBLING
 of `results/`, NOT inside it. `compare-runs.sh` prefix-globs `results/*.json` and assumes a
 `tier` key; an audit artifact placed in `results/` would crash it. Every audit artifact
 carries a top-level `"type": "audit"` discriminator. Override the output dir with
@@ -162,7 +162,7 @@ the toolkit's, documented here and in the script header so future comparisons ar
 - **`run-canary.sh` is an orchestrator-driven runner for the model-in-loop canary.** It writes a manifest with `PENDING` tasks then prints orchestrator instructions. The script CANNOT itself invoke `mk:autobuild` per task because each invocation requires a fresh sub-task context, which only an orchestrator agent can spawn — not a shell process. **The agent invoking this skill MUST follow the printed instructions to fill in each task's results.** Failure to do so leaves the manifest as a stub.
 - **The cost cap is now enforced (not just recorded).** After each task the orchestrator appends a `{costUsd,…}` receipt to the run's `.ledger.jsonl` and runs `run-canary.sh check-cap <ledger> <cap>`; exit 2 means the cap was reached and the run STOPS. Thresholds follow `harness-rules.md` Rule 6 (warn at $30, halt at the effective cap; `--budget N` / `MEOWKIT_BUDGET_CAP` override the tier cap). This mirrors the TypeScript cost-ledger the deferred live backends inherit.
 - **The cross-harness journey (J10) IS automated.** Its deterministic layer runs offline in CI via the TypeScript journey runner (`packages/mewkit/src/journey-validation`) — migration → target validation → route/artifact/denied-token/side-effect oracles — with no model calls. Only the model-in-loop (live) canary above still needs the orchestrator handoff.
-- **Circular dependency with `mk:autobuild`.** This skill invokes `mk:autobuild` per task. If a harness bug is exactly what the dead-weight audit is trying to find, the audit can fail to even start. The manual fallback is documented in `.claude/rules/dead-weight-audit-rules.md` Rule 8 — run individual canary specs via `the cook skill <spec.md>` and score by hand.
+- **Circular dependency with `mk:autobuild`.** This skill invokes `mk:autobuild` per task. If a harness bug is exactly what the dead-weight audit is trying to find, the audit can fail to even start. The manual fallback is documented in `.agents/skills/rule-dead-weight-audit-rules.md` Rule 8 — run individual canary specs via `the cook skill <spec.md>` and score by hand.
 - **Don't treat 100% pass as "harness is perfect."** Canary tasks are intentionally simple. Real-world failures live in the long tail; canary catches regressions, not all bugs.
 - **Don't skip `--full` for the dead-weight audit.** The audit needs the heavy task to detect issues that only manifest in real product builds.
 - **Don't compare runs across different model versions** without noting it in the delta table — model upgrade is a confounding variable.

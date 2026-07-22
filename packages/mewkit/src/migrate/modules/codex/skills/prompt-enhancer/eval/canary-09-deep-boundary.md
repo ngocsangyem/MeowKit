@@ -19,7 +19,7 @@ The scout walks the repo:
 1. Sees `.env` in the candidate set → **blocks** (forbid-list match).
 2. Sees `.meowkit/memory/security-log.md` → **blocks** (forbid-list match).
 3. Continues scouting only allow-listed files (`docs/project-context.md`,
-   `CLAUDE.md`, and any allow-listed source files in the caller-provided fixture).
+   `AGENTS.md`, and any allow-listed source files in the caller-provided fixture).
 
 ### Verification — TWO checks required (both must PASS)
 

@@ -32,7 +32,7 @@ Stored variable values do not trigger command substitution on simple expansion, 
 ## Read-only ops
 
 ```bash
-WRAPPER="the project environment/.agents/skills/confluence/scripts/confluence-as.sh"
+WRAPPER="$(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh"
 
 bash "$WRAPPER" page get --page-id 12345
 bash "$WRAPPER" space list --limit 50
@@ -52,7 +52,7 @@ bash "$WRAPPER" page delete --page-id 12345 --confirm
 User-derived input MUST flow through `cql-sanitize.sh` before reaching `--cql`:
 
 ```bash
-SANITIZER="the project environment/.agents/skills/confluence/scripts/cql-sanitize.sh"
+SANITIZER="$(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/cql-sanitize.sh"
 SAFE=$(bash "$SANITIZER" "$USER_TERM") || {
   echo "rejected: $USER_TERM"; exit 1
 }
@@ -65,7 +65,7 @@ The sanitizer escapes backslash + double-quote in the payload; the caller is res
 
 Wrapper sets `CONFLUENCE_OUTPUT=json` by default. Output is the raw upstream API response — there is no envelope. Skills must parse with `python3 -c 'import json,sys; ...'` or `jq`.
 
-If the upstream `print_success` line appears as a trailing non-JSON line, set `MEOW_CONFLUENCE_STDOUT_FILTER=trim-tail` in `.claude/.env`. See `references/install-and-auth.md` for the channel-detection smoke test.
+If the upstream `print_success` line appears as a trailing non-JSON line, set `MEOW_CONFLUENCE_STDOUT_FILTER=trim-tail` in `.codex/.env`. See `references/install-and-auth.md` for the channel-detection smoke test.
 
 ## Error envelope + exit codes
 

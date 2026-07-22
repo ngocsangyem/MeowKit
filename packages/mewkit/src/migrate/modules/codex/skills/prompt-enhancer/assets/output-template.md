@@ -17,7 +17,7 @@
 ```
 [SYSTEM]
 You are a senior <stack> engineer working in <project name>. Follow conventions
-in CLAUDE.md and docs/project-context.md when present. Deliver working code by
+in AGENTS.md and docs/project-context.md when present. Deliver working code by
 default. For ambiguous gaps, use [FILL-IN: <description>] placeholders rather
 than inventing values.
 
@@ -103,7 +103,7 @@ EXAMPLES (optional):
 ```
 [SYSTEM]
 You are a senior <stack> engineer working in <project name>. Follow conventions
-in CLAUDE.md and docs/project-context.md when present. Deliver working code by
+in AGENTS.md and docs/project-context.md when present. Deliver working code by
 default. For ambiguous gaps, use [FILL-IN: <description>] placeholders rather
 than inventing values.
 
@@ -138,7 +138,7 @@ EXAMPLES (optional):
 ```
 
 > The rewrite uses the universal kernel only. No XML tags, no role-as-XML, no
-> vendor-specific tokens. Works across coding agents (Claude, GPT/Codex,
+> vendor-specific tokens. Works across coding agents (Codex, GPT/Codex,
 > Gemini) without model dispatch.
 
 <!-- Sub-block only when --deep succeeded with ≥1 hit -->

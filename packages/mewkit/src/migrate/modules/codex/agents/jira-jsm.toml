@@ -16,7 +16,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 ## Pre-flight
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
 ```
 
 
@@ -58,7 +58,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: request key + status + queue + SLA next-breach time + URL.
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Gotchas
 

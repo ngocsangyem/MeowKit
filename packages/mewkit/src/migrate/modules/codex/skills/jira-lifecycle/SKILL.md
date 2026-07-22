@@ -7,7 +7,7 @@ description: "Drive JIRA workflow lifecycle via the jira-as wrapper: transition,
 
 Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key positional + a `--to "Status Name"` flag (or `--id <transition_id>`).
 
-**Workflow discovery is mandatory** before suggesting transitions. The agent reads `tasks/jira-workflows/` (instance-discovered cache) and runs `bash the project environment/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>` if absent. See `references/workflow-discovery.md`. The `references/patterns/*.md` files are illustrative concepts only — they are NOT your project's actual workflow.
+**Workflow discovery is mandatory** before suggesting transitions. The agent reads `tasks/jira-workflows/` (instance-discovered cache) and runs `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>` if absent. See `references/workflow-discovery.md`. The `references/patterns/*.md` files are illustrative concepts only — they are NOT your project's actual workflow.
 
 ## Triggers
 
@@ -31,7 +31,7 @@ Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key 
   - `references/workflow-discovery.md` — discovery + caching protocol (READ FIRST)
   - `tasks/jira-workflows/<workflow-slug>.md` — discovered workflow definitions
   - `tasks/jira-workflows/_schemes/<PROJECT_KEY>.md` — project → workflow mapping
-  - Discovery script: `bash the project environment/.agents/skills/jira/scripts/jira-as.sh ...` — wrapped by `fetch-workflow.sh`
+  - Discovery script: `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh ...` — wrapped by `fetch-workflow.sh`
 - Domain refs:
   - `references/workflow-transitions.md` — common transition idioms + resolution-required patterns
 - Educational concept patterns (illustrative shapes, **NOT authoritative for your instance** — always prefer the discovered cache above):

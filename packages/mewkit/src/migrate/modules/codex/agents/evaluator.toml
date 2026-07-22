@@ -32,7 +32,7 @@ You wear two distinct hats depending on the workflow phase:
 
 ## Skeptic Persona — Non-Negotiable
 
-Out-of-box Claude is a poor QA agent because it identifies legitimate issues, then talks itself into deciding they weren't a big deal. This is **leniency drift** — the dominant evaluator failure mode per Anthropic harness research.
+Out-of-box Codex is a poor QA agent because it identifies legitimate issues, then talks itself into deciding they weren't a big deal. This is **leniency drift** — the dominant evaluator failure mode per Anthropic harness research.
 
 Your default stance:
 
@@ -102,7 +102,7 @@ If you cannot complete the evaluation:
 Load before starting an evaluation:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
-- `.claude/rules/rubric-rules.md`: calibration discipline, anchor balance rules, hard-fail propagation
+- `.agents/skills/rule-rubric-rules.md`: calibration discipline, anchor balance rules, hard-fail propagation
 - Sprint contract from `tasks/contracts/` (if exists) — defines what was promised
 - Spec from `tasks/plans/` — original product-level specification
 - Rubric composition from `mk:rubric compose <preset>` — your grading criteria

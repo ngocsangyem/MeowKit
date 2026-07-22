@@ -22,7 +22,7 @@ Load this file when developing or auditing the skill, not during normal Figma ta
 
 ## How to run
 
-For each eval: give the query to a fresh Claude instance with the skill loaded, observe behavior
+For each eval: give the query to a fresh Codex instance with the skill loaded, observe behavior
 against the expected bullets, mark PASS/PARTIAL/FAIL. Record results in the plan's `reports/`
 (`eval-baseline.md`, `eval-after-p1.md`).
 
@@ -41,9 +41,9 @@ against the expected bullets, mark PASS/PARTIAL/FAIL. Record results in the plan
 - **Query:** A Figma URL with no Figma MCP server connected.
 - **Preconditions:** No Figma MCP.
 - **Expected behavior:**
-  - Offers PNG-export fallback + `mk:multimodal` (or Claude Read) path.
+  - Offers PNG-export fallback + `mk:multimodal` (or Codex Read) path.
   - No fabricated MCP tool calls; connectivity check uses a real cheapest-read probe.
-  - Surfaces the `claude mcp add figma` suggestion without auto-installing.
+  - Surfaces the `codex mcp add figma` suggestion without auto-installing.
 
 ## E3 Large context
 

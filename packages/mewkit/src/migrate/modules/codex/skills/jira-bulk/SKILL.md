@@ -39,7 +39,7 @@ Skipping Step 1 is a hard violation. The agent will refuse if asked to skip the 
   - `references/safety-checklist.md` — pre-flight checklist for any bulk operation >50 issues
   - `references/checkpoint-guide.md` — checkpoint + resume strategy for 500+ issue ops
 - **Workflow cache (read for accurate dry-run output)**:
-  - `tasks/jira-workflows/<workflow-slug>.md` — discovered statuses + transitions (run `bash the project environment/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>` if absent; see `../jira-lifecycle/references/workflow-discovery.md`)
+  - `tasks/jira-workflows/<workflow-slug>.md` — discovered statuses + transitions (run `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>` if absent; see `../jira-lifecycle/references/workflow-discovery.md`)
   - For `bulk transition --to "<Status>"`, validate the target status name exists in the cache; for `--id <N>`, validate the transition ID exists. Mismatch → reject before exec.
 - Peer leaves: `mk:jira-search` (JQL author + `bulk-update` overlap — same dry-run discipline), `mk:jira-lifecycle` (single-issue transitions; same cache), `mk:jira-relationships` (`bulk-link` is here)
 

@@ -21,7 +21,7 @@ Replace subjective orchestrator judgment with deterministic, auditable domain-ba
 4. **Layer 2:** Check project context — files present, directory structure, recent git changes
 5. **Layer 3:** Score confidence per domain (HIGH ≥70, MEDIUM 40–69, LOW <40)
 6. **Classify task type** — map signals to one of: `bug_fix`, `feature`, `refactor`, `security`, `devops`, `docs`, `review`, `intake` (load `references/task-type-classification.md`)
-7. **Optional:** Check `.claude/product-areas.yaml` if exists — merge area keywords and paths (see `references/product-area-config.md`)
+7. **Optional:** Check `.codex/product-areas.yaml` if exists — merge area keywords and paths (see `references/product-area-config.md`)
 8. **Output:** `{domain, level, workflow, execution_tier, task_type, suggested_skill, confidence, product_area?}`
 9. **Fallback:** No match → return `unknown`, defer to manual classification
 
@@ -88,7 +88,7 @@ New fields (v2.0):
 | `task_type` | bug_fix, feature, refactor, security, devops, docs, review, intake | Classified task type |
 | `suggested_skill` | mk:fix, mk:cook, mk:cso, mk:review, mk:intake | Recommended skill for this task |
 | `confidence` | HIGH, MEDIUM, LOW | Routing confidence from Layer 3 scoring |
-| `product_area` | string | Area name from `.claude/product-areas.yaml` (omitted if no YAML) |
+| `product_area` | string | Area name from `.codex/product-areas.yaml` (omitted if no YAML) |
 
 New fields (v2.1 — Phase 5 of harness plan, 260408):
 
@@ -118,7 +118,7 @@ For scriptable density selection, callers may invoke `.agents/skills/autobuild/s
 
 - `references/multi-layer-detection.md` — 4-layer detection logic and confidence scoring
 - `references/task-type-classification.md` — 8 task types, signals, and suggested skills
-- `references/product-area-config.md` — Optional `.claude/product-areas.yaml` schema and loading rules
+- `references/product-area-config.md` — Optional `.codex/product-areas.yaml` schema and loading rules
 
 ## Cross-Skill Dependencies
 

@@ -18,8 +18,8 @@ Runs deterministic validation scripts that check for anti-patterns WITHOUT using
 ### Execution Steps
 
 1. **Run validation scripts.** Execute the following Python scripts:
-   - `.claude/scripts/validate.py` — checks for structural anti-patterns, naming convention violations, missing required files, and configuration issues.
-   - `.claude/scripts/security-scan.py` — checks for security anti-patterns using pattern matching (regex-based, not LLM-based).
+   - `.codex/scripts/validate.py` — checks for structural anti-patterns, naming convention violations, missing required files, and configuration issues.
+   - `.codex/scripts/security-scan.py` — checks for security anti-patterns using pattern matching (regex-based, not LLM-based).
 
 2. **Collect results.** Each script outputs machine-verifiable results in a structured format: file path, line number, rule violated, severity.
 

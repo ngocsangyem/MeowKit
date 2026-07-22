@@ -5,8 +5,8 @@ CANONICAL rubric preset and verify overall/score/coverage consistency.
 The verdict file is author-controlled (the evaluator agent writes it), so its
 declared `weighted_score` / `overall` / per-rubric weights are UNTRUSTED. This
 script recomputes the score from:
-  - the preset's weights            (.claude/rubrics/composition-presets/<preset>.md)
-  - each rubric's hard_fail_threshold (.claude/rubrics/<rubric>.md)
+  - the preset's weights            (.codex/rubrics/composition-presets/<preset>.md)
+  - each rubric's hard_fail_threshold (.codex/rubrics/<rubric>.md)
   - the per-rubric VERDICTS parsed from the verdict's "### <name> ... — <VERDICT>" headers
 
 and rejects a verdict whose declared score/overall does not follow from its own
@@ -104,7 +104,7 @@ def parse_verdict_rubrics(text):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("verdict")
-    ap.add_argument("--rubrics-dir", default=".claude/rubrics")
+    ap.add_argument("--rubrics-dir", default=".codex/rubrics")
     args = ap.parse_args()
 
     result = {"ok": False, "reasons": []}

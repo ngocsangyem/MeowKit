@@ -18,7 +18,7 @@ def _env(name: str) -> Optional[str]:
 
 
 def load_env_files():
-    """Load .env files. Priority: shell exports > skill .env > .claude/.env.
+    """Load .env files. Priority: shell exports > skill .env > .codex/.env.
 
     Uses override=False so shell exports always win.
     Loads skill-specific FIRST (higher priority), then central (lower priority).
@@ -30,8 +30,8 @@ def load_env_files():
         return
     script_dir = Path(__file__).parent
     skill_dir = script_dir.parent
-    claude_dir = skill_dir.parent.parent
+    codex_dir = skill_dir.parent.parent
     # Skill .env first (higher priority), then central .env (defaults)
-    for env_path in [skill_dir / '.env', claude_dir / '.env']:
+    for env_path in [skill_dir / '.env', codex_dir / '.env']:
         if env_path.exists():
             load_dotenv(env_path, override=False)

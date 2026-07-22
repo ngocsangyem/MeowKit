@@ -1,4 +1,4 @@
-# Style 6: Claude Official
+# Style 6: Codex Official
 
 ## Contents
 
@@ -7,7 +7,7 @@
 - [Layers and legend](#layer-labels)
 - [Layout and philosophy](#layout-principles)
 
-Inspired by Anthropic's Claude blog technical diagrams — warm, approachable, professional.
+Inspired by Anthropic's Codex blog technical diagrams — warm, approachable, professional.
 s
 
 ```
@@ -59,14 +59,14 @@ font-weight: 600 for node labels, 400 for descriptions, 700 for titles
 
 ```xml
 <defs>
-  <marker id="arrow-claude" markerWidth="8" markerHeight="8"
+  <marker id="arrow-codex" markerWidth="8" markerHeight="8"
           refX="7" refY="4" orient="auto">
     <polygon points="0 0, 8 4, 0 8" fill="#5a5a5a"/>
   </marker>
 </defs>
 
 <!-- Arrow line -->
-<line stroke="#5a5a5a" stroke-width="2" marker-end="url(#arrow-claude)"/>
+<line stroke="#5a5a5a" stroke-width="2" marker-end="url(#arrow-codex)"/>
 
 <!-- Or use simple line without arrowhead for cleaner look -->
 <line stroke="#5a5a5a" stroke-width="2"/>
@@ -85,10 +85,10 @@ Use different arrow styles to convey meaning:
 
 ```xml
 <!-- Solid arrow for reads -->
-<line stroke="#5a5a5a" stroke-width="2" marker-end="url(#arrow-claude)"/>
+<line stroke="#5a5a5a" stroke-width="2" marker-end="url(#arrow-codex)"/>
 
 <!-- Dashed arrow for writes -->
-<line stroke="#5a5a5a" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-claude)"/>
+<line stroke="#5a5a5a" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-codex)"/>
 ```
 
 ## Arrow Labels
@@ -170,7 +170,7 @@ Position: bottom-right, 20px margin from edges.
     }
   </style>
   <defs>
-    <marker id="arrow-claude" markerWidth="8" markerHeight="8"
+    <marker id="arrow-codex" markerWidth="8" markerHeight="8"
             refX="7" refY="4" orient="auto">
       <polygon points="0 0, 8 4, 0 8" fill="#5a5a5a"/>
     </marker>
@@ -196,14 +196,14 @@ Position: bottom-right, 20px margin from edges.
   
   <!-- Edges -->
   <line x1="190" y1="180" x2="190" y2="240" 
-        stroke="#5a5a5a" stroke-width="2" marker-end="url(#arrow-claude)"/>
+        stroke="#5a5a5a" stroke-width="2" marker-end="url(#arrow-codex)"/>
   <text x="210" y="215" fill="#5a5a5a" font-size="13">Publish</text>
 </svg>
 ```
 
 ## Design Philosophy
 
-Claude's official style emphasizes:
+Codex's official style emphasizes:
 - **Warmth**: Cream background, ls
 - ty**: High contrast text, generous spacing
 - **Professionalism**: Consistent stroke weights, aligned elements

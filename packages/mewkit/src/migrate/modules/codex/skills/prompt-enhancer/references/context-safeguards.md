@@ -8,7 +8,7 @@
 > All six safeguards are **model-agnostic by construction**: Anthropic's own
 > research (Effective Context Engineering for AI Agents) states context rot
 > "emerges across all models" — architectural property of transformers, not a
-> Claude artifact.
+> Codex artifact.
 
 ## Contents
 
@@ -33,9 +33,9 @@ Specific enough to guide; flexible enough to allow heuristics.
 - **Context:** enough to ground; no full file dumps if a reference suffices.
 - **Constraints:** hard limits only. Soft preferences belong nowhere — they create false acceptance criteria.
 
-**Validation:** golden-rule clarity test (claude-prompting-best-practices "Be clear and direct"). If a colleague with no project context would be confused, the model will be too. Re-read before sending.
+**Validation:** golden-rule clarity test (codex-prompting-best-practices "Be clear and direct"). If a colleague with no project context would be confused, the model will be too. Re-read before sending.
 
-**Source:** ANT "anatomy" (system prompts); claude-prompting-best-practices; skill-authoring-guidelines (freedom-level matching).
+**Source:** ANT "anatomy" (system prompts); codex-prompting-best-practices; skill-authoring-guidelines (freedom-level matching).
 
 ---
 
@@ -46,7 +46,7 @@ is small (<30 lines) and central to the ask.
 
 Patterns:
 
-- `src/api/products.ts:42` — line reference (universal across Claude/GPT/Codex/Gemini).
+- `src/api/products.ts:42` — line reference (universal across Codex/GPT/Codex/Gemini).
 - `docs/project-context.md` — paged-in by the agent on demand.
 - `[FILL-IN: <description> (suggested: <path>)]` — placeholder when the user can't supply the value (deep-mode adds the suggestion).
 
@@ -101,7 +101,7 @@ Three named bloat sources:
 
 - **Tool sets:** keep minimum viable. Remove tools whose use case is ambiguous (ANT "anatomy/tools": "if a human engineer can't definitively say which tool should be used, an AI agent can't be expected to do better").
 - **System prompt:** load `docs/project-context.md` as on-demand context, not as a permanent system-prompt bullet list. The rewrite should reference, not inline.
-- **CLAUDE.md / agent instructions:** keep evergreen; legacy notes go in a collapsed "old patterns" section (skill-authoring-guidelines). Time-sensitive content erodes signal-to-noise.
+- **AGENTS.md / agent instructions:** keep evergreen; legacy notes go in a collapsed "old patterns" section (skill-authoring-guidelines). Time-sensitive content erodes signal-to-noise.
 
 When the input prompt enumerates 10+ tools or contains a multi-paragraph block
 of "always remember…" rules, flag bloat as detection #7 (laundry-list) and

@@ -54,5 +54,5 @@ data block content is unchanged. Core ask verbatim.
 ### Why this canary matters
 
 Regression guard for the playbook #8 de-coupling: the default data-separation fix
-must be a model-neutral fence, never Claude's `<context>` idiom. Model-specific
+must be a model-neutral fence, never Codex's `<context>` idiom. Model-specific
 delimiters belong in `--analyze` target-notes only.

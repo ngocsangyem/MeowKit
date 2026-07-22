@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # jql-sanitize.sh — Deterministic JQL escaping for user-derived terms
-# Usage: bash .claude/skills/jira/scripts/jql-sanitize.sh '<term>'
+# Usage: bash .agents/skills/jira/scripts/jql-sanitize.sh '<term>'
 # Returns sanitized term safe for JQL queries.
 
 set -euo pipefail

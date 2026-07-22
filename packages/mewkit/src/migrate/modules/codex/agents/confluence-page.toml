@@ -15,12 +15,12 @@ This agent is **A (untrusted page content) + C (Confluence state change via wrap
 
 ## Pre-flight
 
-The parent SessionStart hook validated `.claude/.env` presence + the 3 `MEOW_CONFLUENCE_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
+The parent SessionStart hook validated `.codex/.env` presence + the 3 `MEOW_CONFLUENCE_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
 
 All `confluence-as` invocations MUST go through:
 
 ```bash
-bash the project environment/.agents/skills/confluence/scripts/confluence-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh <args>
 ```
 
 Never call the binary directly. The wrapper handles env translation, JSON-output default, Cloud-only gate, and credential-fallback rejection.
@@ -35,7 +35,7 @@ Use the routed skill and domain reference files for CLI syntax, safety tiers, te
 `confluence-as` retries on POST per upstream config (read-heavy workloads are unaffected; create ops on flaky network may produce duplicates). For `page create`, before retrying a failed POST, list pages with the same title in the target space first:
 
 ```bash
-bash the project environment/.agents/skills/confluence/scripts/confluence-as.sh search --cql 'space = ENG AND title = "..."' --max-results 5
+bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh search --cql 'space = ENG AND title = "..."' --max-results 5
 ```
 
 If `--idempotency-key=auto` flag is available, prefer it on `page create`. Confirm flag presence via `page create --help` before assuming.
@@ -53,14 +53,14 @@ After every successful operation, return:
 3. One-line summary of what changed (incl. version number for updates)
 4. One suggested next action (e.g. "add label via `mk:confluence-collaborate`")
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Failure Handling (confluence-as exit codes → user message)
 
 ```toon
 [5]{exit,action}
 1|Validation — re-read your `--help`, fix the flag, retry
-2|Auth or settings.local.json fallback — wrapper rejected; user moves credentials to `.claude/.env`
+2|Auth or settings.local.json fallback — wrapper rejected; user moves credentials to `.codex/.env`
 3|Cloud-only gate — site URL is non-Cloud; user uses MCP escape hatch per install-and-auth.md
 4|Network / DNS — retry once; check VPN
 5|Permission (401/403) — token may be rotated; user re-runs `the confluence-setup skill`

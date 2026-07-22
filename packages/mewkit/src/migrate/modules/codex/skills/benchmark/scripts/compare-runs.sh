@@ -3,9 +3,9 @@
 #
 # Usage:  compare-runs.sh <run-id-a> <run-id-b>
 # Exit:   0 on success; 1 if either run not found
-# Reqs:   Bash 3.2+, .claude/skills/.venv/bin/python3
+# Reqs:   Bash 3.2+, .agents/skills/.venv/bin/python3
 #
-# Reads .claude/benchmarks/results/{run-id}.json for each run, joins by task name,
+# Reads .codex/benchmarks/results/{run-id}.json for each run, joins by task name,
 # emits a markdown delta table to stdout.
 set -u
 
@@ -17,9 +17,9 @@ fi
 RUN_A="$1"
 RUN_B="$2"
 
-[ -n "${CLAUDE_PROJECT_DIR:-}" ] && cd "$CLAUDE_PROJECT_DIR"
+[ -n "$(git rev-parse --show-toplevel):-}" ] && cd "$(git rev-parse --show-toplevel)"
 
-RESULTS_DIR=".claude/benchmarks/results"
+RESULTS_DIR=".codex/benchmarks/results"
 FILE_A="$RESULTS_DIR/${RUN_A}.json"
 FILE_B="$RESULTS_DIR/${RUN_B}.json"
 
@@ -36,7 +36,7 @@ fi
 [ -f "$FILE_A" ] || { echo "ERROR: run not found: $RUN_A (looked at $FILE_A)" >&2; exit 1; }
 [ -f "$FILE_B" ] || { echo "ERROR: run not found: $RUN_B (looked at $FILE_B)" >&2; exit 1; }
 
-PY=".claude/skills/.venv/bin/python3"
+PY=".agents/skills/.venv/bin/python3"
 [ -x "$PY" ] || PY="python3"
 command -v "$PY" >/dev/null 2>&1 || { echo "ERROR: python3 not found" >&2; exit 1; }
 

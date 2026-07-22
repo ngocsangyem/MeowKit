@@ -5,7 +5,7 @@ description: "rule-harness-rules"
 
 # Harness Rules
 
-<!-- Canonical lifecycle source: .claude/workflow.yaml -->
+<!-- Canonical lifecycle source: .codex/workflow.yaml -->
 <!-- autobuild pipeline steps are Step 0–6 (not Phase N) to avoid clashing with the 7 lifecycle phases. -->
 
 These rules govern the autonomous multi-hour build pipeline (`mk:autobuild`) and the generator/evaluator architecture.
@@ -62,11 +62,11 @@ The harness budget tracker (`mk:autobuild/scripts/budget-tracker.sh`) enforces t
 
 ## Rule 7: Dead-Weight Audit Mandatory on Model Upgrade
 
-Every harness component encodes an assumption about what the model CANNOT do. When a new model tier ships (e.g., Sonnet 4.6, Opus 4.7), the dead-weight audit MUST be run to verify each component is still load-bearing. The audit's cadence, measurement procedure, decision thresholds, and never-prune list are in `.claude/rules/dead-weight-audit-rules.md`.
+Every harness component encodes an assumption about what the model CANNOT do. When a new model tier ships (e.g., Sonnet 4.6, Opus 4.7), the dead-weight audit MUST be run to verify each component is still load-bearing. The audit's cadence, measurement procedure, decision thresholds, and never-prune list are in `.agents/skills/rule-dead-weight-audit-rules.md`.
 
 **WHY:** Model upgrades can turn useful scaffolding into dead weight.
 
-**Detection:** `post-session.sh` attempts to flag this via `MEOWKIT_MODEL_HINT` env var, but on Claude Code, `CLAUDE_MODEL` is NOT exported to hooks (verified 260408). Auto-detection only works if the user sets `export MEOWKIT_MODEL_HINT=opus-4-7` at session start. Otherwise the audit must be triggered manually on a calendar reminder OR by reading session metadata from `~/.claude/projects/`.
+**Detection:** `post-session.sh` attempts to flag this via `MEOWKIT_MODEL_HINT` env var, but on Codex, `the project environment` is NOT exported to hooks (verified 260408). Auto-detection only works if the user sets `export MEOWKIT_MODEL_HINT=opus-4-7` at session start. Otherwise the audit must be triggered manually on a calendar reminder OR by reading session metadata from `~/.codex/projects/`.
 
 Use the audit playbook with measured baselines after model upgrades.
 

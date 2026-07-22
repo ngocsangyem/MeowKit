@@ -287,10 +287,10 @@ Full rules in `mk:frontend-design/references/anti-slop-directives.md`. Quick gut
 
 ## Style preset rotation (persistent state)
 
-To force aesthetic variety between consecutive runs, rotate through palette + typography combinations. State lives in `the project environment/preview/style-rotation.json` per `skill-authoring-rules.md` Rule 2.
+To force aesthetic variety between consecutive runs, rotate through palette + typography combinations. State lives in `${PLUGIN_DATA}/preview/style-rotation.json` per `skill-authoring-rules.md` Rule 2.
 
 ```bash
-ROTATION_DIR="the project environment:-}"
+ROTATION_DIR="${PLUGIN_DATA:-}"
 if [ -n "$ROTATION_DIR" ]; then
   ROTATION_FILE="$ROTATION_DIR/preview/style-rotation.json"
   mkdir -p "$(dirname "$ROTATION_FILE")"
@@ -308,7 +308,7 @@ else
 fi
 ```
 
-When `the project environment` is unset, the deterministic-hash fallback ensures variety across topics without persisting state. This is a graceful degradation, not silent failure.
+When `${PLUGIN_DATA}` is unset, the deterministic-hash fallback ensures variety across topics without persisting state. This is a graceful degradation, not silent failure.
 
 ## Browser auto-open shell
 

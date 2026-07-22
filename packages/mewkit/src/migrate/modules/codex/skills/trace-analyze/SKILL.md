@@ -1,6 +1,6 @@
 ---
 name: "trace-analyze"
-description: "Use when analyzing harness trace logs to surface recurring failure patterns and suggest harness improvements. Scatter-gather pattern across last N runs with mandatory HITL gate before any change is applied. Triggers on /mk:trace-analyze, \"analyze traces\", \"find patterns in harness runs\", or after a model upgrade flagged dead-weight-audit-needed."
+description: "Use when analyzing harness trace logs to surface recurring failure patterns and suggest harness improvements. Scatter-gather pattern across last N runs with mandatory HITL gate before any change is applied. Triggers on the trace-analyze skill, \"analyze traces\", \"find patterns in harness runs\", or after a model upgrade flagged dead-weight-audit-needed."
 ---
 
 # mk:trace-analyze — Scatter-Gather Trace Analysis

@@ -77,7 +77,7 @@ Baseline rules (security, gates, tests, naming, scope, budget) always apply; bel
 
 - **Always (autonomous):** {reversible, in-scope choices the executor may make without asking — e.g. "pick the internal helper name", "choose the test fixture layout"}
 - **Ask first:** {reversible-but-significant choices to surface before acting — e.g. "swap the charting lib", "change the public API response shape", "add a new top-level route"}
-- **Never:** see `.claude/rules/security-rules.md` and `.claude/rules/gate-rules.md` (hard stops — not restated here).
+- **Never:** see `.agents/skills/rule-security-rules.md` and `.agents/skills/rule-gate-rules.md` (hard stops — not restated here).
 ```
 
 #### Conditional: `## User-Confirmed Decisions` (intake packet only)

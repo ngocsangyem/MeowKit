@@ -40,7 +40,7 @@ Complete reference for JIRA custom field types, their use cases, and selection g
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "External ID" --type text
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "External ID" --type text
 ```
 
 ---
@@ -62,7 +62,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields creat
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "Technical Notes" --type textarea
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "Technical Notes" --type textarea
 ```
 
 ---
@@ -84,7 +84,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields creat
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "Effort Hours" --type number
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "Effort Hours" --type number
 ```
 
 ---
@@ -106,7 +106,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields creat
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "Target Date" --type date
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "Target Date" --type date
 ```
 
 ---
@@ -128,7 +128,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields creat
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "Deployment Time" --type datetime
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "Deployment Time" --type datetime
 ```
 
 ---
@@ -150,7 +150,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields creat
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "Severity" --type select
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "Severity" --type select
 ```
 
 **Note:** Configure options in JIRA admin after creation.
@@ -174,7 +174,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields creat
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "Target Platforms" --type multiselect
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "Target Platforms" --type multiselect
 ```
 
 ---
@@ -196,7 +196,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields creat
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "Compliance" --type checkbox
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "Compliance" --type checkbox
 ```
 
 ---
@@ -218,7 +218,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields creat
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "Approval" --type radio
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "Approval" --type radio
 ```
 
 ---
@@ -240,7 +240,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields creat
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "Documentation" --type url
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "Documentation" --type url
 ```
 
 ---
@@ -262,7 +262,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields creat
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "Approver" --type user
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "Approver" --type user
 ```
 
 ---
@@ -284,7 +284,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields creat
 
 **Create command:**
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields create --name "Tech Stack" --type labels
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields create --name "Tech Stack" --type labels
 ```
 
 ---
@@ -336,6 +336,6 @@ Is the value text?
 For Atlassian plugin identifiers used in API calls, jira-as fetches them at runtime:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields list --output json | jq '.[] | {id, name, schema}'
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields list --output json | jq '.[] | {id, name, schema}'
 ```
 

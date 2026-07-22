@@ -15,10 +15,10 @@ This agent is **A (untrusted ticket content) + C (local-FS write of evaluation r
 
 ## Pre-flight
 
-The parent SessionStart hook validated `.claude/.env`. All `jira-as` invocations go through:
+The parent SessionStart hook validated `.codex/.env`. All `jira-as` invocations go through:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
 ```
 
 ## Live vs Mock Check
@@ -28,7 +28,7 @@ Read the `JIRA_MOCK_MODE` env. If `true`, surface "**[MOCK MODE]**" in your outp
 ## Read the Ticket
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all' \\
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all' \\
   | jq '{key, summary: .fields.summary, description: .fields.description, status: .fields.status.name, priority: .fields.priority.name, labels: .fields.labels, components: [.fields.components[].name], comments: [.fields.comment.comments[]?.body], attachments: [.fields.attachment[]?.filename], links: [.fields.issuelinks[]?.outwardIssue.key]}'
 ```
 
@@ -45,7 +45,7 @@ If ticket `description` is null, empty, or whitespace-only:
 For ANY JQL query incorporating user-derived terms, run:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jql-sanitize.sh '<term>'
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jql-sanitize.sh '<term>'
 ```
 
 Use the sanitized output. Never construct JQL from raw ticket text — that's a JQL-injection vector.
@@ -55,7 +55,7 @@ Use the sanitized output. Never construct JQL from raw ticket text — that's a 
 For ANY historical search, cap results to prevent context overflow:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh search query "<sanitized JQL>" --max-results 20
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search query "<sanitized JQL>" --max-results 20
 ```
 
 If results truncate, note "showing top 20 of N" in your output.
@@ -88,7 +88,7 @@ Regression risk|Keywords: "refactor", "migrate", "replace", "breaking change"
 Requirement clarity|Are acceptance criteria present? Measurable? Specific?
 External integration|Third-party APIs, webhooks, async patterns?
 Historical context|Similar closed tickets in same component (JQL search)
-Workflow shape|Read `tasks/jira-workflows/<workflow-slug>.md` (run `bash the project environment/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>` if absent). >5 statuses + parallel review/QA branches signal more handoffs and higher coordination cost.
+Workflow shape|Read `tasks/jira-workflows/<workflow-slug>.md` (run `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>` if absent). >5 statuses + parallel review/QA branches signal more handoffs and higher coordination cost.
 ```
 
 Output: Simple / Medium / Complex + Fibonacci range (e.g., "Complex — likely 8-13pt").
@@ -143,7 +143,7 @@ Persist the evaluation to `tasks/reports/jira-evaluate-{YYMMDD}-{HHMM}-{ISSUE-KE
 
 Naming uses the absolute date stamp (per memory rules: convert relative dates to absolute). Filename slug: `{YY}{MM}{DD}-{HH}{MM}` (e.g. `YYMMDD-HHMM`).
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Memory
 

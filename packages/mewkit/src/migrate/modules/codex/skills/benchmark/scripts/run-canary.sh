@@ -4,10 +4,10 @@
 # Usage:  run-canary.sh [--full] [--budget N]
 #         run-canary.sh check-cap <ledger.jsonl> [cap]   # enforce the cost cap between tasks
 # Exit:   0 all tasks completed / cap not reached; 1 infra failure; 2 cost cap reached (halt)
-# Reqs:   Bash 3.2+, .claude/skills/.venv/bin/python3
+# Reqs:   Bash 3.2+, .agents/skills/.venv/bin/python3
 #
-# Quick tier (default): 5 tasks under .claude/benchmarks/canary/quick/, ≤$5
-# Full tier (--full): quick + 1 heavy task under .claude/benchmarks/canary/full/, ≤$30
+# Quick tier (default): 5 tasks under .codex/benchmarks/canary/quick/, ≤$5
+# Full tier (--full): quick + 1 heavy task under .codex/benchmarks/canary/full/, ≤$30
 # Budget: --budget N or MEOWKIT_BUDGET_CAP override the tier cap (harness-rules Rule 6:
 #         warn at $30, halt at the effective cap — the override may be lower OR higher).
 set -u
@@ -22,7 +22,7 @@ if [ "${1:-}" = "check-cap" ]; then
   LEDGER="${2:-}"
   CAP="${MEOWKIT_BUDGET_CAP:-${3:-100}}"
   [ -f "$LEDGER" ] || { echo "ERROR: ledger not found: $LEDGER" >&2; exit 1; }
-  PY=".claude/skills/.venv/bin/python3"; [ -x "$PY" ] || PY="python3"
+  PY=".agents/skills/.venv/bin/python3"; [ -x "$PY" ] || PY="python3"
   LEDGER="$LEDGER" CAP="$CAP" WARN_USD="$WARN_USD" "$PY" - <<'PYEOF'
 import json, os, sys
 cap = float(os.environ["CAP"]); warn = float(os.environ["WARN_USD"])
@@ -59,13 +59,13 @@ done
 [ -n "${MEOWKIT_BUDGET_CAP:-}" ] && COST_CAP="$MEOWKIT_BUDGET_CAP"
 
 # Resolve project root
-[ -n "${CLAUDE_PROJECT_DIR:-}" ] && cd "$CLAUDE_PROJECT_DIR"
+[ -n "$(git rev-parse --show-toplevel):-}" ] && cd "$(git rev-parse --show-toplevel)"
 
-BENCH_DIR=".claude/benchmarks"
+BENCH_DIR=".codex/benchmarks"
 RESULTS_DIR="$BENCH_DIR/results"
 mkdir -p "$RESULTS_DIR"
 
-PY=".claude/skills/.venv/bin/python3"
+PY=".agents/skills/.venv/bin/python3"
 [ -x "$PY" ] || PY="python3"
 command -v "$PY" >/dev/null 2>&1 || { echo "ERROR: python3 not found" >&2; exit 1; }
 
@@ -101,7 +101,7 @@ echo "════════════════════════�
 
 # Iterate specs and invoke mk:autobuild per spec.
 # NOTE: this script does NOT actually invoke harness here — it emits a manifest the
-# orchestrator picks up. Each invocation requires a fresh subagent context, which is
+# orchestrator picks up. Each invocation requires a fresh sub-task context, which is
 # the orchestrator's job (not a shell script's). The script's role is to enumerate +
 # record results once the orchestrator returns them.
 TASKS_JSON="["
@@ -121,7 +121,7 @@ TASKS_JSON="$TASKS_JSON" \
 RUN_ID="$RUN_ID" \
 TIER="$TIER" \
 STARTED="$STARTED" \
-MODEL="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-unknown}}" \
+MODEL="${MEOWKIT_MODEL_HINT:-the project environment:-unknown}}" \
 COST_CAP="$COST_CAP" \
 RESULT_FILE="$RESULT_FILE" \
 "$PY" -c '
@@ -151,28 +151,28 @@ echo ""
 # store has at least one record per benchmark invocation, even if the orchestrator
 # never finishes filling in per-task results. Links back to the manifest path so
 # mk:trace-analyze can correlate.
-if [ -x ".claude/hooks/append-trace.sh" ]; then
-  RUN_MODEL="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-unknown}}"
-  bash .claude/hooks/append-trace.sh "benchmark_result" \
+if [ -x ".codex/hooks/append-trace.sh" ]; then
+  RUN_MODEL="${MEOWKIT_MODEL_HINT:-the project environment:-unknown}}"
+  bash .codex/hooks/append-trace.sh "benchmark_result" \
     "{\"run_id\":\"$RUN_ID\",\"tier\":\"$TIER\",\"model\":\"$RUN_MODEL\",\"manifest_path\":\"$RESULT_FILE\"}" 2>/dev/null || true
 fi
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "ORCHESTRATOR HANDOFF (this script is intentionally a half-impl —"
-echo "the per-task harness invocation requires fresh subagent contexts"
+echo "the per-task harness invocation requires fresh sub-task contexts"
 echo "which only the orchestrator can spawn). Orchestrator must now:"
 echo "  1. For each PENDING task in $RESULT_FILE:"
 echo "     - Read the spec file"
-echo "     - Invoke /mk:autobuild with the spec content"
+echo "     - Invoke the autobuild skill with the spec content"
 echo "     - Capture the verdict, score, duration, cost"
 echo "     - Update the task entry in $RESULT_FILE"
 echo "     - Append a receipt to the ledger, then enforce the cap BEFORE the next task:"
 echo "         echo '{\"name\":\"<task>\",\"costUsd\":<cost>}' >> $LEDGER_FILE"
-echo "         bash .claude/skills/benchmark/scripts/run-canary.sh check-cap $LEDGER_FILE $COST_CAP"
+echo "         bash .agents/skills/benchmark/scripts/run-canary.sh check-cap $LEDGER_FILE $COST_CAP"
 echo "       (exit 2 = cap reached — STOP the run; do not start further tasks)"
 echo "  2. After all tasks complete, set status='complete', compute summary"
 echo "  3. Append a benchmark_result trace record:"
-echo "     bash .claude/hooks/append-trace.sh benchmark_result \"\$(cat $RESULT_FILE)\""
+echo "     bash .codex/hooks/append-trace.sh benchmark_result \"\$(cat $RESULT_FILE)\""
 echo "═══════════════════════════════════════════════════════════════"
 
 echo "RUN_ID=$RUN_ID"

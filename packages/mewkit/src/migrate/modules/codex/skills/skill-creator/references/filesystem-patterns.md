@@ -15,7 +15,7 @@ assets/       Templates and boilerplate to copy
               Use when: skill generates files from templates
               Examples: output-template.md, config-template.json
 
-lib/          Reusable code for Claude to compose
+lib/          Reusable code for Codex to compose
               Use when: skill has shared logic across multiple operations
               Examples: utils.py, helpers.ts
 

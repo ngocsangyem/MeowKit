@@ -147,7 +147,7 @@ All use circle badge + text abbreviation pattern. Replace `cx`, `cy` with actual
 | Product | Color | Badge Text |
 |---------|-------|-----------|
 | OpenAI / ChatGPT | `#10A37F` | `OAI` |
-| Anthropic / Claude | `#D97757` | `Claude` |
+| Anthropic / Codex | `#D97757` | `Codex` |
 | Google Gemini | `#4285F4` | `Gemini` |
 | Meta LLaMA | `#0467DF` | `LLaMA` |
 | Mistral | `#FF7000` | `Mistral` |

@@ -2,7 +2,7 @@
 """
 robots_cache.py — robots.txt cache and enforcement for mk:web-to-markdown.
 
-Cache file: .claude/cache/web-to-markdown/robots-cache.json
+Cache file: .codex/cache/web-to-markdown/robots-cache.json
 Cache entry format: {host: {fetched_at: ISO8601, robots_txt: <raw text>}}
 TTL: 24 hours.
 
@@ -54,14 +54,14 @@ except ImportError:
 # ---------------------------------------------------------------------------
 
 def _cache_dir() -> Path:
-    """Resolve .claude/cache/web-to-markdown/ relative to project root."""
-    # Walk up from this file to find the project root (contains .claude/)
+    """Resolve .codex/cache/web-to-markdown/ relative to project root."""
+    # Walk up from this file to find the project root (contains .codex/)
     here = Path(__file__).resolve()
     for parent in [here, *here.parents]:
-        if (parent / ".claude").is_dir():
-            return parent / ".claude" / "cache" / "web-to-markdown"
+        if (parent / ".codex").is_dir():
+            return parent / ".codex" / "cache" / "web-to-markdown"
     # Fallback: relative to cwd
-    return Path(".claude") / "cache" / "web-to-markdown"
+    return Path(".codex") / "cache" / "web-to-markdown"
 
 
 def _cache_file() -> Path:

@@ -15,7 +15,7 @@
 # Reqs: Bash 3.2+, awk. No external deps.
 set -u
 
-cost_log="${MEOWKIT_COST_LOG:-.claude/memory/cost-log.json}"
+cost_log="${MEOWKIT_COST_LOG:-.meowkit/memory/cost-log.json}"
 warn_threshold="${MEOWKIT_BUDGET_WARN:-30}"
 block_threshold="${MEOWKIT_BUDGET_BLOCK:-100}"
 user_cap="${MEOWKIT_BUDGET_CAP:-0}"  # 0 = no user cap

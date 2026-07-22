@@ -17,9 +17,9 @@ Local paths MUST be outside the current git root unless `--self` is passed.
 | Flag | Default | Maps to | Notes |
 |------|---------|---------|-------|
 | `--style <type>` | `markdown` | `--style` | `markdown`, `xml`, `json`, `plain` |
-| `--output <path>` | auto-generated | `-o` | Override `.claude/packs/...` default |
+| `--output <path>` | auto-generated | `-o` | Override `.codex/packs/...` default |
 
-Auto-generated output path: `.claude/packs/{YYYYMMDD-HHMM}-{slug}.{ext}` where slug is derived from the source (last URL segment or local dir basename).
+Auto-generated output path: `.codex/packs/{YYYYMMDD-HHMM}-{slug}.{ext}` where slug is derived from the source (last URL segment or local dir basename).
 
 ## File Selection
 
@@ -39,7 +39,7 @@ Auto-generated output path: `.claude/packs/{YYYYMMDD-HHMM}-{slug}.{ext}` where s
 
 ## Not Exposed by This Skill (use raw `npx repomix` if needed)
 
-- `--copy` (clipboard) — On Claude Code, the clipboard isn't reliably exposed to agents
+- `--copy` (clipboard) — On Codex, the clipboard isn't reliably exposed to agents
 - `--token-count-tree` — third-party tokenizer produces approximate counts; not a reliable budget signal inside host-runtime sessions
 - `--split-output` — multi-file output complicates handoff
 - Custom config files (`-c`, `--init`) — out of scope; pass flags directly

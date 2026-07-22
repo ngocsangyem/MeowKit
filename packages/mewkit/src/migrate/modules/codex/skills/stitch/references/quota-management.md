@@ -15,7 +15,7 @@ Each generation = 1 credit. Each variant = 1 credit. Each edit = 1 redesign cred
 
 Stitch SDK has no programmatic quota-check endpoint. The skill tracks locally:
 
-**File:** `the project environment/stitch/.stitch-quota.json` (falls back to a `stitch/` folder under the home-directory plugin-data path when `CLAUDE_PLUGIN_DATA` is unset)
+**File:** `${PLUGIN_DATA}/stitch/.stitch-quota.json` (falls back to a `stitch/` folder under the home-directory plugin-data path when `PLUGIN_DATA` is unset)
 
 ```json
 {

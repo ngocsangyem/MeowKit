@@ -23,7 +23,7 @@ Owner skills:
 - mk:jira-agile sprint add|remove — appends to amendments (with flock)
 - mk:jira-agile sprint close — writes status:closed, delivered, carried_over
 
-Rule body: .claude/rules-conditional/agile-sprint-commitment.md
+Rule body: .agents/skills/rule-agile-sprint-commitment.md
 
 Concurrent-write safety: writers MUST acquire flock(1) on this file before
 any read-modify-write cycle. YAML frontmatter append is non-atomic across

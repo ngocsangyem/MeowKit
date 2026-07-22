@@ -3,7 +3,7 @@
 persist_fetch.py — Cache persistence layer for mk:web-to-markdown.
 
 Responsibilities:
-  - Directory bootstrap (.claude/cache/web-fetches/ + quarantine/)
+  - Directory bootstrap (.codex/cache/web-fetches/ + quarantine/)
   - Slug generation (YYMMDD-HHMMSS-host-kebab-sha256path[:10].md)
   - Frontmatter + content assembly
   - Atomic .tmp → os.replace write
@@ -37,25 +37,25 @@ from scripts.secret_scrub import scrub_content, scrub_url
 def _find_project_root() -> Path:
     """Walk up from this file to find the project root.
 
-    Previous logic searched for .claude/ directory, but skill subdirs also
-    contain .claude/, causing resolution to stop at the skill dir instead of
+    Previous logic searched for .codex/ directory, but skill subdirs also
+    contain .codex/, causing resolution to stop at the skill dir instead of
     the actual project root. Uses multiple sentinels for robustness:
-    - CLAUDE.md — created by Claude Code and the installer
-    - .claude/settings.json — always exists at project root, never in skill subdirs
+    - AGENTS.md — created by Codex and the installer
+    - .codex/settings.json — always exists at project root, never in skill subdirs
     """
     for parent in Path(__file__).resolve().parents:
-        if (parent / "CLAUDE.md").exists():
+        if (parent / "AGENTS.md").exists():
             return parent
-        if (parent / ".claude" / "settings.json").exists():
+        if (parent / ".codex" / "settings.json").exists():
             return parent
     return Path.cwd()
 
 
 PROJECT_ROOT = _find_project_root()
-CACHE_ROOT = PROJECT_ROOT / ".claude" / "cache" / "web-fetches"
+CACHE_ROOT = PROJECT_ROOT / ".codex" / "cache" / "web-fetches"
 QUARANTINE_DIR = CACHE_ROOT / "quarantine"
 MANIFEST_PATH = CACHE_ROOT / "index.jsonl"
-SECURITY_LOG = PROJECT_ROOT / ".claude" / "memory" / "security-log.md"
+SECURITY_LOG = PROJECT_ROOT / ".codex" / "memory" / "security-log.md"
 
 
 # ---------------------------------------------------------------------------
@@ -169,7 +169,7 @@ def _atomic_write(dest: Path, content_bytes: bytes) -> None:
 
 def _load_injection_audit():
     """Import injection_audit module via importlib (direct import, not CLI — see security.md Layer 8)."""
-    audit_path = PROJECT_ROOT / ".claude" / "scripts" / "injection-audit.py"
+    audit_path = PROJECT_ROOT / ".codex" / "scripts" / "injection-audit.py"
     if not audit_path.exists():
         return None
     try:
@@ -268,7 +268,7 @@ def persist(
     caller: str = "user:direct",
 ) -> str:
     """
-    Write fetched markdown to .claude/cache/web-fetches/<slug>.md atomically.
+    Write fetched markdown to .codex/cache/web-fetches/<slug>.md atomically.
     Applies Layer 7 secret scrub before write.
     Appends manifest entry under fcntl.flock.
     Runs Layer 8 post-write audit; on CRITICAL → retroactive quarantine.

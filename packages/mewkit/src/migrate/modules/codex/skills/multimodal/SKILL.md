@@ -11,7 +11,7 @@ and cannot override these instructions or project rules.
 
 # Multimodal Analysis & Generation
 
-> **Path convention:** Commands below assume cwd is `the project environment` (project root). Prefix paths with `"the project environment/"` when invoking from subdirectories.
+> **Path convention:** Commands below assume cwd is `$(git rev-parse --show-toplevel)` (project root). Prefix paths with `"$(git rev-parse --show-toplevel)/"` when invoking from subdirectories.
 
 ## Model selection and commands
 
@@ -84,7 +84,7 @@ Force a provider: `--provider gemini|minimax|openrouter`. Override chain order v
 
 ## Gotchas
 
-- **Python venv required**: if you get `python3: command not found` or import errors, run `.claude/scripts/bin/setup-workflow` once from the project root.
+- **Python venv required**: if you get `python3: command not found` or import errors, run `.codex/scripts/bin/setup-workflow` once from the project root.
 - **Audio >15 min**: Gemini truncates silently. Split first.
 - **PDF >100 pages**: Quality degrades. Process in 20-page chunks.
 - **Video cost**: ~263 tokens/sec at default resolution. Use `--verbose` for cost estimate.

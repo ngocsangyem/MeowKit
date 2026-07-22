@@ -47,7 +47,7 @@ Operation Start
 ### Enable Checkpointing
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh bulk transition \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh bulk transition \
   --jql "project=PROJ" \
   --to "Done" \
   --enable-checkpoint
@@ -56,7 +56,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh bulk transit
 ### List Pending Checkpoints
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh bulk transition --list-checkpoints
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh bulk transition --list-checkpoints
 ```
 
 Output:
@@ -69,7 +69,7 @@ Pending checkpoints:
 ### Resume an Interrupted Operation
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh bulk transition --resume transition-20251226-143022 --to "Done"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh bulk transition --resume transition-20251226-143022 --to "Done"
 ```
 
 ---
@@ -113,7 +113,7 @@ rm ~/.jira-skills/checkpoints/*.json
 For optimal reliability on very large operations:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh bulk transition \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh bulk transition \
   --jql "project=PROJ" \
   --to "Done" \
   --batch-size 200 \

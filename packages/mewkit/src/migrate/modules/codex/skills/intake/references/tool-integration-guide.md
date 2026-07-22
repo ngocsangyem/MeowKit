@@ -19,11 +19,11 @@ Connect mk:intake to your task management tool. Five options — pick the one th
 
 Setup:
 ```bash
-# Install jira-as into the workflow venv (auto-handled by .claude/scripts/bin/setup-workflow)
-.claude/scripts/bin/setup-workflow
+# Install jira-as into the workflow venv (auto-handled by .codex/scripts/bin/setup-workflow)
+.codex/scripts/bin/setup-workflow
 
-# Populate .claude/.env with the three MEOW_JIRA_* vars
-cp .claude/.env.example .claude/.env
+# Populate .codex/.env with the three MEOW_JIRA_* vars
+cp .codex/.env.example .codex/.env
 # Edit MEOW_JIRA_API_TOKEN, MEOW_JIRA_EMAIL, MEOW_JIRA_SITE_URL
 ```
 
@@ -39,10 +39,10 @@ the intake skill
 
 ```bash
 # Linear MCP (official)
-claude mcp add linear
+codex mcp add linear
 
 # Verify connection
-claude mcp list
+codex mcp list
 ```
 
 After connecting:
@@ -69,7 +69,7 @@ gh issue list --search "login timeout" --json number,title,body
 Usage pattern:
 ```bash
 # Pipe issue content to intake
-gh issue view 123 --json title,body | claude -p "analyze ticket: $(cat)"
+gh issue view 123 --json title,body | codex -p "analyze ticket: $(cat)"
 ```
 
 ## Option 4: Manual Paste
@@ -80,7 +80,7 @@ No setup required. Works everywhere.
 the intake skill
 ```
 
-Claude will prompt: "Paste your ticket content below."
+Codex will prompt: "Paste your ticket content below."
 Paste the full ticket (title, description, acceptance criteria, attachments list) and press Enter.
 
 Use this when:
@@ -109,8 +109,8 @@ mk:intake uses only standard MCP tool calls — it does not hardcode any vendor'
 
 After connecting any MCP:
 ```bash
-claude mcp list          # confirm server appears
-claude mcp test <name>   # verify connectivity
+codex mcp list          # confirm server appears
+codex mcp test <name>   # verify connectivity
 ```
 
 ## Fallback Behavior

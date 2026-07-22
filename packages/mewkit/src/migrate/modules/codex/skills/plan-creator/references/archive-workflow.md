@@ -59,7 +59,7 @@ If "Yes": for each selected plan, extract:
 
 Append the entry to the CANONICAL store `.meowkit/memory/architecture-decisions.json` — NOT
 the `.md` view (a `.md` write is invisible to JSON-first readers; see
-`.claude/rules/memory-read-rules.md` → Write Rules). Add to the `patterns` array (create the
+`.agents/skills/rule-memory-read-rules.md` → Write Rules). Add to the `patterns` array (create the
 file with the v2.0.0 skeleton if absent), bump `metadata.last_updated`, leave `version`:
 ```
 id: archive-{plan-name}

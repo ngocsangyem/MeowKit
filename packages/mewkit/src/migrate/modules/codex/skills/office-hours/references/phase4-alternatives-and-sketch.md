@@ -99,7 +99,7 @@ The screenshot file at `/tmp/workflow-sketch.png` can be referenced by downstrea
 
 After the wireframe is approved, offer outside design perspectives via stop and ask the user in chat:
 
-> "Want outside design perspectives on the chosen approach? Two Claude sub-task with fresh context can propose alternative visual theses and design directions."
+> "Want outside design perspectives on the chosen approach? Two Codex sub-task with fresh context can propose alternative visual theses and design directions."
 >
 > A) Yes — get outside design voices
 > B) No — proceed without

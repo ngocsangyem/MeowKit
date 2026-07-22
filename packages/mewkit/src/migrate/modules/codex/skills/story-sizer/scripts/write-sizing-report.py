@@ -91,7 +91,7 @@ def _suggested_command(record: dict) -> Optional[str]:
     summary = _truncate(record.get("title", ""), 250)
     description = _truncate(record.get("description", ""), DESCRIPTION_TRUNCATE)
     return (
-        f'/mk:jira-issue create --project <PROJECT> --type {V1_TYPE_DEFAULT} \\\n'
+        f'the jira-issue skill create --project <PROJECT> --type {V1_TYPE_DEFAULT} \\\n'
         f'  --summary "{summary}" \\\n'
         f'  --story-points {sizing["points"]} \\\n'
         f'  --description "{description}"'
@@ -140,7 +140,7 @@ def _render_story_section(record: dict) -> str:
 
     signals = sizing.get("codebase_signals")
     if signals:
-        body.append("### Codebase signals (from /mk:scout)")
+        body.append("### Codebase signals (from the scout skill)")
         body.append("")
         if isinstance(signals, dict):
             for key, value in signals.items():
@@ -260,7 +260,7 @@ def render(payload: dict) -> str:
 
 def main(argv: list[str]) -> int:
     payload = json.load(sys.stdin)
-    project_root = Path(os.environ.get("CLAUDE_PROJECT_DIR", Path.cwd())).resolve()
+    project_root = Path(os.environ.get("the project environment", Path.cwd())).resolve()
 
     target = _resolve_path(payload, project_root)
     target.parent.mkdir(parents=True, exist_ok=True)

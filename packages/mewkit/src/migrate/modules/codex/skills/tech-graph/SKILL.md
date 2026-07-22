@@ -11,7 +11,7 @@ Generate production-quality SVG technical diagrams, optionally exported as PNG.
 
 - **Choose a diagram type or UML notation:** load [diagram catalog](references/diagram-catalog.md).
 - **Choose semantic shapes, arrow meanings, or layout rules:** load [visual vocabulary and layout](references/visual-vocabulary-and-layout.md).
-- **Choose a style:** load [style matrix](references/style-diagram-matrix.md), then [Style 1](references/style-1-flat-icon.md), [Style 2](references/style-2-dark-terminal.md), [Style 3](references/style-3-blueprint.md), [Style 4](references/style-4-notion-clean.md), [Style 5](references/style-5-glassmorphism.md), [Style 6](references/style-6-claude-official.md), [Style 7](references/style-7-openai.md), or [Style 8](references/style-8-dark-luxury.md); default to Style 1.
+- **Choose a style:** load [style matrix](references/style-diagram-matrix.md), then [Style 1](references/style-1-flat-icon.md), [Style 2](references/style-2-dark-terminal.md), [Style 3](references/style-3-blueprint.md), [Style 4](references/style-4-notion-clean.md), [Style 5](references/style-5-glassmorphism.md), [Style 6](references/style-6-codex-official.md), [Style 7](references/style-7-openai.md), or [Style 8](references/style-8-dark-luxury.md); default to Style 1.
 - **Use product icons:** load [icons](references/icons.md).
 - **Author SVG, prevent syntax errors, or recover from errors:** load [SVG authoring and recovery](references/svg-authoring-and-recovery.md).
 - **Need SVG syntax/layout validation detail:** load [SVG layout best practices](references/svg-layout-best-practices.md).

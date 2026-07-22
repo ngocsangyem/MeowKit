@@ -31,14 +31,14 @@ This skill is a **pure routing layer**. Its sole purpose: identify the right `mk
 
 ## Setup
 
-See `references/install-and-auth.md` for one-time setup (`.claude/scripts/bin/setup-workflow` installs `confluence-assistant-skills` into `.agents/skills/.venv` per `scripts/requirements.txt`; populate `.claude/.env` with the 3 `MEOW_CONFLUENCE_*` vars).
+See `references/install-and-auth.md` for one-time setup (`.codex/scripts/bin/setup-workflow` installs `confluence-assistant-skills` into `.agents/skills/.venv` per `scripts/requirements.txt`; populate `.codex/.env` with the 3 `MEOW_CONFLUENCE_*` vars).
 
 ## Shared Resources (used by leaves)
 
 - `scripts/confluence-as.sh` — env-translating wrapper (`MEOW_CONFLUENCE_*` → `CONFLUENCE_*`, sets `CONFLUENCE_OUTPUT=json`, refuses settings.local.json fallback, gates non-Cloud URLs)
 - `scripts/cql-sanitize.sh` — CQL injection guard for user-derived input
 - `scripts/adf-to-md.sh` + `scripts/adf_to_md.py` — macro-aware ADF→Markdown walker (panel, decisionList/Item, taskList/Item, expand, mention, media, inlineCard preserved with explicit labels)
-- `scripts/requirements.txt` — pip dependency manifest auto-discovered by `.claude/scripts/bin/setup-workflow`
+- `scripts/requirements.txt` — pip dependency manifest auto-discovered by `.codex/scripts/bin/setup-workflow`
 - `scripts/smoke-live.sh` — manual live-creds smoke test
 - `references/install-and-auth.md` — env vars, setup, Cloud-only gate, escape hatch
 - `references/cli-idioms.md` — wrapper invocation patterns + safe-invocation rules + conversion-helper idioms

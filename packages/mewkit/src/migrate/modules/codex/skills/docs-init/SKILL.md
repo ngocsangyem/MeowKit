@@ -25,7 +25,7 @@ Do NOT invoke when: docs already exist and need updating (use `mk:document-relea
 1. **Check existing state** — does `docs/` exist? Are files already populated?
    - If populated docs exist → suggest `mk:document-release` instead, stop.
 2. **Scout codebase** — activate `mk:scout` to analyze project structure.
-   Skip: `.claude/`, `.git/`, `node_modules/`, `__pycache__/`, `dist/`, `build/`
+   Skip: `.codex/`, `.git/`, `node_modules/`, `__pycache__/`, `dist/`, `build/`
 3. **Merge findings** — consolidate scout reports into context for doc generation
 4. **Generate docs** — spawn `documenter` sub-task via Task tool with scout context.
    Output files (adapt to what the project actually has):

@@ -57,7 +57,7 @@ function findCanary(id) {
   const content = fs.readFileSync(path.join(EVAL_DIR, file), "utf8");
   const input = id === "10" ? null : extractSection(content, "Input");
   const inputs = id === "10"
-    ? [...content.matchAll(/```\n(\/mk:prompt-enhancer[^\n]*)\n```/g)].map((match, index) => ({ name: index === 0 ? "default" : "deep", prompt: match[1] }))
+    ? [...content.matchAll(/```\n(\the prompt-enhancer skill[^\n]*)\n```/g)].map((match, index) => ({ name: index === 0 ? "default" : "deep", prompt: match[1] }))
     : [{ name: "primary", prompt: input }];
   if (id === "10" && inputs.length !== 2) throw new Error("Canary 10 requires default and deep prompts");
   if (id === "16") inputs.push({ name: "no-target", prompt: input.replace(" for Codex:", ":") });

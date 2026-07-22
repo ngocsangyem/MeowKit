@@ -6,7 +6,7 @@
 
 ## Latest baseline
 
-### 2026-06-02 — claude-opus-4-8
+### 2026-06-02 — codex-opus-4-8
 
 Fixture path: n/a — codebase-independent canaries only (default #1–#6 + recipe #11–#12)
 Fixture sha: n/a (no `--deep` scout exercised)
@@ -50,7 +50,7 @@ Also re-run #4 (strip-model-coupling) after the playbook #8 de-coupling change.
 Each entry records:
 
 - **Date** (ISO 8601)
-- **Model** (the model used to run the skill, e.g., `claude-opus-4-7`)
+- **Model** (the model used to run the skill, e.g., `codex-opus-4-7`)
 - **Fixture path** (absolute path to the caller-provided fixture)
 - **Fixture sha** (`git rev-parse HEAD` of the caller-provided fixture)
 - **Per-canary verdicts**

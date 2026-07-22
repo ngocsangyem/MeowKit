@@ -1,11 +1,11 @@
 ---
 name: "context-audit"
-description: "Read-only audit of `.claude/` structural overhead. Reports prioritized \"remove X save Y tokens\" recommendations against the model context window. NOT for monetary cost tracking — that's /mk:budget. NOT for transcript size monitoring — long-session continuity defers to Claude Code native compaction. NOT for runtime context decisions (what to read, when to compact) — see mk:context-engineering. Use when planning to add context capacity, diagnosing perceived slowdowns, or auditing health."
+description: "Read-only audit of `.codex/` structural overhead. Reports prioritized \"remove X save Y tokens\" recommendations against the model context window. NOT for monetary cost tracking — that's the budget skill. NOT for transcript size monitoring — long-session continuity defers to Codex native compaction. NOT for runtime context decisions (what to read, when to compact) — see mk:context-engineering. Use when planning to add context capacity, diagnosing perceived slowdowns, or auditing health."
 ---
 
 # the context-audit skill — Context Window Structural Audit
 
-Read-only audit of `.claude/` structural overhead. Surfaces what is loaded into
+Read-only audit of `.codex/` structural overhead. Surfaces what is loaded into
 every host-runtime session and how much of the context window it consumes,
 then recommends the highest-leverage trims.
 
@@ -53,8 +53,8 @@ Output is markdown, printed to terminal. The skill does NOT write any files.
 
 Steps:
 
-1. **Inventory** — `inventory-context.sh` walks `.claude/` and emits raw
-   byte/line counts per category (CLAUDE.md chain, agents, skills, rules,
+1. **Inventory** — `inventory-context.sh` walks `.codex/` and emits raw
+   byte/line counts per category (AGENTS.md chain, agents, skills, rules,
    commands, MCP) as JSON.
 2. **Estimate** — `estimate-tokens.sh` enriches the inventory with
    `estimated_tokens` (chars/4 heuristic, mirrors `budget-tracker.cjs`) and
@@ -100,7 +100,7 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
   is the canonical chars/4 source. Shell scripts inline the same heuristic with
   a citation comment, avoiding a Node bridge that would require `dist/`.
 - **Reads, does not write:** `.meowkit/memory/cost-log.json`,
-  `.claude/`, `.mcp.json`. No file writes anywhere.
+  `.codex/`, `.mcp.json`. No file writes anywhere.
 - **No env vars introduced.** Window size is hard-coded 200K; override deferred
   until a real 1M-context use case appears.
 - **Discovery:** via `keywords:` frontmatter and a cross-reference from
@@ -112,7 +112,7 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
 
 ## Related Rules
 
-- `.claude/rules/skill-authoring-rules.md` — discovery + Gotchas section requirements
-- `.claude/rules/injection-rules.md` Rule 11 — Skill Rule of Two; this skill
+- `.agents/skills/rule-skill-authoring-rules.md` — discovery + Gotchas section requirements
+- `.agents/skills/rule-injection-rules.md` Rule 11 — Skill Rule of Two; this skill
   scores 2 of 3 (untrusted SCAN_ROOT input + filename inventory may surface
   sensitive paths) so paths are canonicalized via `realpath` and never executed.

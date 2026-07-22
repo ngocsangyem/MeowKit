@@ -46,13 +46,13 @@ Variance = Projected Total - Original Estimate
 **Setting estimates:**
 ```bash
 # Set original estimate
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original "2d"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original "2d"
 
 # Set remaining estimate
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --remaining "1d 4h"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --remaining "1d 4h"
 
 # Set both together (recommended due to JRACLOUD-67539)
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original "2d" --remaining "1d 4h"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original "2d" --remaining "1d 4h"
 ```
 
 ---
@@ -104,7 +104,7 @@ Epic: User Authentication (Total: 5d)
 # And team capacity is 200 hours/sprint (5 people x 40h)
 # Then: 1 point = 5 hours
 
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original "2d"  # For a 3-point story
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original "2d"  # For a 3-point story
 ```
 
 **Important:** Track actual conversion over time and adjust based on historical data.
@@ -158,7 +158,7 @@ Map relative sizes to time ranges for quick estimation:
 # Buffer: +30% for new technology
 # Final estimate: 8h * 1.3 = 10.4h -> round to 1d 4h
 
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original "1d 4h"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original "1d 4h"
 ```
 
 ---
@@ -177,24 +177,24 @@ When logging time, control how JIRA updates the remaining estimate:
 **Examples:**
 ```bash
 # Auto-adjust (default) - logged 2h, remaining decreases by 2h
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh time log PROJ-123 --time 2h
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh time log PROJ-123 --time 2h
 
 # Leave unchanged - time logged but estimate stays same
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh time log PROJ-123 --time 2h --adjust-estimate leave
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh time log PROJ-123 --time 2h --adjust-estimate leave
 
 # Set new remaining estimate
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh time log PROJ-123 --time 2h \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh time log PROJ-123 --time 2h \
   --adjust-estimate new --new-estimate 4h
 
 # Reduce by specific amount
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh time log PROJ-123 --time 2h \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh time log PROJ-123 --time 2h \
   --adjust-estimate manual --reduce-by 1h
 ```
 
 **Known Issue (JRACLOUD-67539):** JIRA Cloud has a bug where estimates may not update correctly. Workaround:
 ```bash
 # Set both estimates together
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original "2d" --remaining "1d 4h"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh time estimate PROJ-123 --original "2d" --remaining "1d 4h"
 ```
 
 ---
@@ -205,7 +205,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh time estimat
 
 ```bash
 # Export issues with time tracking
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh search query \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search query \
   "project = PROJ AND originalEstimate IS NOT EMPTY AND status = Done" \
   --output json > completed-issues.json
 
@@ -262,7 +262,7 @@ AND status = Done
 
 ```bash
 # Find issues with significant variance
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh search query \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search query \
   "project = PROJ AND originalEstimate IS NOT EMPTY \
    AND (timespent > originalEstimate * 1.5 OR timespent < originalEstimate * 0.5)"
 ```

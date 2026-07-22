@@ -37,7 +37,7 @@ Read `references/plan-intake-packet.md` and fill its 6-block schema:
 
 ### 0.5c. Persist
 
-Write the packet to `.claude/session-state/plan-creator-intake-packet.md`. Set:
+Write the packet to `.codex/session-state/plan-creator-intake-packet.md`. Set:
 
 - `intake_packet_path` — the path above
 - `intake_sources_count` — number of external artifacts consolidated
@@ -46,20 +46,20 @@ Step-03 later moves the packet into `{plan_dir}/research/plan-intake-packet.md`.
 
 ### 0.5d. Activation Log
 
-Append ONE JSONL line to `the project environment/plan-creator/intake-activations.jsonl`
+Append ONE JSONL line to `${PLUGIN_DATA}/plan-creator/intake-activations.jsonl`
 (evidence for the dead-weight audit and for any future decision to split this into
 its own skill):
 
 ```bash
-if [ -n "the project environment:-}" ]; then
-  mkdir -p "the project environment/plan-creator"
+if [ -n "${PLUGIN_DATA:-}" ]; then
+  mkdir -p "${PLUGIN_DATA}/plan-creator"
   printf '{"date":"%s","sources_count":%d,"mode":"%s","activated":%s}\n' \
     "$(date +%Y-%m-%d)" "{N}" "{planning_mode}" "{true|false}" \
-    >> "the project environment/plan-creator/intake-activations.jsonl"
+    >> "${PLUGIN_DATA}/plan-creator/intake-activations.jsonl"
 fi
 ```
 
-Fail-open: if `CLAUDE_PLUGIN_DATA` is unset or the write fails, print one warning
+Fail-open: if `PLUGIN_DATA` is unset or the write fails, print one warning
 line and continue — logging never blocks planning.
 
 ## Output

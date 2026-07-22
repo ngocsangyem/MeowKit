@@ -1,6 +1,6 @@
 # Service Management Request Workflow Pattern
 
-> **CONCEPT REFERENCE — NOT AUTHORITATIVE.** This file describes a common workflow shape for orientation. **Your project may use different status names + transitions.** Always consult `tasks/jira-workflows/<workflow-slug>.md` (discovered via `bash the project environment/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>`) for the actual workflow. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md`.
+> **CONCEPT REFERENCE — NOT AUTHORITATIVE.** This file describes a common workflow shape for orientation. **Your project may use different status names + transitions.** Always consult `tasks/jira-workflows/<workflow-slug>.md` (discovered via `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>`) for the actual workflow. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md`.
 
 **Use this pattern for:** Customer-facing service requests in JIRA Service Management.
 
@@ -47,27 +47,27 @@ Waiting for Support --> In Progress --> Waiting for Customer --> Resolved --> Cl
 
 ```bash
 # Start working on request
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition REQ-123 --name "In Progress"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition REQ-123 --name "In Progress"
 
 # Need customer information
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition REQ-123 --name "Waiting for Customer" \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition REQ-123 --name "Waiting for Customer" \
   --comment "Please provide your account number for verification"
 
 # Customer responded, resume work
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition REQ-123 --name "In Progress"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition REQ-123 --name "In Progress"
 
 # Resolve the request
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle resolve REQ-123 --resolution "Done" \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle resolve REQ-123 --resolution "Done" \
   --comment "Password reset link sent to registered email"
 
 # Close after customer confirms
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition REQ-123 --name "Closed"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition REQ-123 --name "Closed"
 ```
 
 ### Cancel Request
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition REQ-123 --name "Cancelled" \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition REQ-123 --name "Cancelled" \
   --comment "Customer withdrew request"
 ```
 

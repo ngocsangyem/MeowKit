@@ -58,7 +58,7 @@ LOOP:
   Auto mode only automates the fix loop, not the approval.
 ```
 
-Before presenting Gate 2 (either cycle), the workflow evidence index must be complete: run `validate-gate-2.sh` (authoritative structural guard) AND `node .claude/scripts/validate-workflow-evidence.cjs <path> --phase cook` (completeness mirror). Surface both; neither approves — they gate on structure/completeness only. See `workflow-steps.md` → Workflow Evidence Index.
+Before presenting Gate 2 (either cycle), the workflow evidence index must be complete: run `validate-gate-2.sh` (authoritative structural guard) AND `node .codex/scripts/validate-workflow-evidence.cjs <path> --phase cook` (completeness mirror). Surface both; neither approves — they gate on structure/completeness only. See `workflow-steps.md` → Workflow Evidence Index.
 
 ## Regression Recovery Options
 

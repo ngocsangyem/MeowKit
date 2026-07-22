@@ -1,5 +1,5 @@
-<!-- Aligned to CLAUDE.md 7-phase model (B2-C6 fix) -->
-<!-- Canonical source: .claude/workflow.yaml -->
+<!-- Aligned to AGENTS.md 7-phase model (B2-C6 fix) -->
+<!-- Canonical source: .codex/workflow.yaml -->
 <!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
 
 # 7-Phase Workflow Detail

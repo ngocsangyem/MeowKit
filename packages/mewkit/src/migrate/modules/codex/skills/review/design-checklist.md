@@ -9,7 +9,7 @@ This checklist applies to **source code in the diff** — not rendered output. R
 **Trigger:** Only run this checklist if the diff touches frontend files. Detect via:
 
 ```bash
-source <(.claude/scripts/bin/workflow-diff-scope <base> 2>/dev/null)
+source <(.codex/scripts/bin/workflow-diff-scope <base> 2>/dev/null)
 ```
 
 If `SCOPE_FRONTEND=false`, skip the entire design review silently.

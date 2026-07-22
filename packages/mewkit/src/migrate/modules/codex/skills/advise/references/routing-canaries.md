@@ -19,7 +19,7 @@ One question separates all five:
 
 | Route | What the user wants back |
 |---|---|
-| `mk:grill` | Questions. No answers — they defend, Claude probes. |
+| `mk:grill` | Questions. No answers — they defend, Codex probes. |
 | `mk:office-hours` | Whether the thing should exist at all. |
 | `mk:brainstorming` | Options for a problem they have already validated. |
 | `mk:party` | Several perspectives arguing. |
@@ -40,7 +40,7 @@ One question separates all five:
 | # | Prompt | Why NOT advise |
 |---|---|---|
 | G1 | "Grill me on this migration plan until you find the holes." | Wants interrogation only. Advise would end with a recommendation they didn't ask for. |
-| G2 | "Stress-test my design — I want to defend every decision." | User defends, Claude probes. No verdict is wanted. |
+| G2 | "Stress-test my design — I want to defend every decision." | User defends, Codex probes. No verdict is wanted. |
 
 ### → `mk:brainstorming` (negative)
 

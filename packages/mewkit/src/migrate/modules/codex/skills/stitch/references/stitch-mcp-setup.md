@@ -1,6 +1,6 @@
 # Stitch MCP Server Setup
 
-Optional: connect Stitch as an MCP server for native design context in Claude Code.
+Optional: connect Stitch as an MCP server for native design context in Codex.
 The `mk:stitch` skill works without MCP (via the `npx tsx` scripts). MCP is opt-in.
 
 Three options for connecting.
@@ -16,7 +16,7 @@ Simplest setup. No Google Cloud dependency.
 3. Click "Generate New Key"
 4. Copy the `sk_...` key
 
-### 2. Add to `.claude/.mcp.json`
+### 2. Add to `.codex/.mcp.json`
 
 ```json
 {
@@ -33,11 +33,11 @@ Simplest setup. No Google Cloud dependency.
 ```
 
 Use `${STITCH_API_KEY}` (env-var reference) — never paste the raw key into config.
-`.claude/.mcp.json` is covered by the kit's `.gitignore`; do not commit it.
+`.codex/.mcp.json` is covered by the kit's `.gitignore`; do not commit it.
 
 ### 3. Verify
 
-Restart Claude Code. Stitch tools should appear:
+Restart Codex. Stitch tools should appear:
 - `create_project` — Create new design project
 - `generate_screen` — Generate UI from prompt
 - `export_html` — Export as HTML/Tailwind
@@ -55,7 +55,7 @@ gcloud config set project YOUR_PROJECT_ID
 gcloud beta services mcp enable stitch.googleapis.com
 ```
 
-### 2. Add to `.claude/.mcp.json`
+### 2. Add to `.codex/.mcp.json`
 
 ```json
 {
@@ -84,14 +84,14 @@ npx stitch-mcp-auto
 | Symptom | Fix |
 |---------|-----|
 | `AUTH_FAILED` on startup | Verify API key or re-run `gcloud auth login` |
-| Tools not appearing | Restart Claude Code after config change |
+| Tools not appearing | Restart Codex after config change |
 | Timeout on generation | Stitch is processing; wait 10–30s for complex designs |
 | `RATE_LIMITED` errors | Daily quota exceeded; wait until midnight UTC |
 
 ## MCP Config Location
 
-For Claude Code CLI (per-project): `.claude/.mcp.json` in the project root.
+For Codex CLI (per-project): `.codex/.mcp.json` in the project root.
 
-For Claude Desktop: `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS).
+For Codex Desktop: `~/Library/Application Support/Codex/codex_desktop_config.json` (macOS).
 
 The kit's `mcp.json.example` has a template for common MCP servers.

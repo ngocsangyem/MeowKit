@@ -18,7 +18,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 All invocations through:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
 ```
 
 
@@ -31,14 +31,14 @@ Use the routed skill and domain reference files for CLI syntax, safety tiers, te
 Status names + transition graphs differ per Jira instance. Hardcoded defaults are misleading. Before recommending any `--to "Status Name"` or `--id <id>`, consult the discovered cache:
 
 ```
-the project environment/tasks/jira-workflows/_schemes/<PROJECT_KEY>.md   # project → workflow mapping
-the project environment/tasks/jira-workflows/<workflow-slug>.md          # full statuses + transitions
+$(git rev-parse --show-toplevel)/tasks/jira-workflows/_schemes/<PROJECT_KEY>.md   # project → workflow mapping
+$(git rev-parse --show-toplevel)/tasks/jira-workflows/<workflow-slug>.md          # full statuses + transitions
 ```
 
 If the cache is absent for the target ticket's project, run discovery once:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/fetch-workflow.sh PROJ-123
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh PROJ-123
 ```
 
 The script tries the admin path (`admin workflow for-issue`) first; falls back to non-admin per-state discovery and writes `_partial-<PROJECT>.md` (flagged INCOMPLETE) on 403. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md` for the full protocol + cache layout.
@@ -48,7 +48,7 @@ The script tries the admin path (`admin workflow for-issue`) first; falls back t
 Before exec, sanity-check that cached transitions still match Jira:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transitions PROJ-123 --output json | jq -r '.[] | .id' | sort > /tmp/live-transitions
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transitions PROJ-123 --output json | jq -r '.[] | .id' | sort > /tmp/live-transitions
 ```
 
 Diff against cached IDs from `tasks/jira-workflows/<slug>.md`. If divergent, prompt the user to re-run `fetch-workflow.sh`.
@@ -75,7 +75,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: issue key + new status + new assignee/resolution + atlassian URL + suggested next action.
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Gotchas
 

@@ -30,7 +30,7 @@ Self-update the installed toolkit to the latest version. Preserves learned knowl
 4. **If update is available:**
    - Print: "Update available: vX.Y.Z → vA.B.C"
    - Download the new version.
-   - Replace `.claude/` files with updated versions: commands, modes, rules, skills, scripts, agents, hooks.
+   - Replace `.codex/` files with updated versions: commands, modes, rules, skills, scripts, agents, hooks.
    - **NEVER overwrite `.meowkit/memory/`.** Topic files, cost logs, and learned patterns are preserved across updates.
    - Update version in `the workflow config`.
 
@@ -46,7 +46,7 @@ Self-update the installed toolkit to the latest version. Preserves learned knowl
 ### Safety
 
 - The `.meowkit/memory/` directory is NEVER overwritten. This ensures:
-  - The canonical JSON stores (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`) persist — these are the authoritative curated memory (see `.claude/rules/memory-read-rules.md`)
+  - The canonical JSON stores (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`) persist — these are the authoritative curated memory (see `.agents/skills/rule-memory-read-rules.md`)
   - The matching `.md` files (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`, `security-notes.md`) also persist — these are generated/non-authoritative views; they can be regenerated via `mewkit memory render-views` from the JSON stores
   - `.meowkit/memory/cost-log.json` (cost history) persists
   - Any other accumulated knowledge is preserved

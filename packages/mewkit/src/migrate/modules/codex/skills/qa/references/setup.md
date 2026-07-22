@@ -15,7 +15,7 @@
   - [B5. Verify](#b5-verify)
   - [B5.5. CI/CD pipeline](#b55-cicd-pipeline)
   - [B6. Create TESTING.md](#b6-create-testingmd)
-  - [B7. Update CLAUDE.md](#b7-update-claudemd)
+  - [B7. Update AGENTS.md](#b7-update-codexmd)
   - [B8. Commit](#b8-commit)
 - [Create Output Directories](#create-output-directories)
 - [Test Plan Context](#test-plan-context)
@@ -221,9 +221,9 @@ Write TESTING.md with:
 - Test layers: Unit tests (what, where, when), Integration tests, Smoke tests, E2E tests
 - Conventions: file naming, assertion style, setup/teardown patterns
 
-### B7. Update CLAUDE.md
+### B7. Update AGENTS.md
 
-First check: If CLAUDE.md already has a `## Testing` section → skip. Don't duplicate.
+First check: If AGENTS.md already has a `## Testing` section → skip. Don't duplicate.
 
 Append a `## Testing` section:
 - Run command and test directory
@@ -242,7 +242,7 @@ Append a `## Testing` section:
 git status --porcelain
 ```
 
-Only commit if there are changes. Stage all bootstrap files (config, test directory, TESTING.md, CLAUDE.md, .github/workflows/test.yml if created):
+Only commit if there are changes. Stage all bootstrap files (config, test directory, TESTING.md, AGENTS.md, .github/workflows/test.yml if created):
 `git commit -m "chore: bootstrap test framework ({framework name})"`
 
 ---
@@ -259,7 +259,7 @@ Before falling back to git diff heuristics, check for richer test plan sources:
 
 1. **Project-scoped test plans:** Check `.meowkit/memory/projects/` for recent `*-test-plan-*.md` files for this repo
    ```bash
-   eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)"
+   eval "$(.codex/scripts/bin/workflow-slug 2>/dev/null)"
    ls -t .meowkit/memory/projects/*-test-plan-*.md 2>/dev/null | head -1
    ```
 2. **Conversation context:** Check if a prior `the plan-ceo-review skill` or `the plan-ceo-review skill` produced test plan output in this conversation

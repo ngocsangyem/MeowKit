@@ -53,7 +53,7 @@ OUTPUT: { reconciled: int, unresolved: int, ran_at: ISO-8601 }
 
 3. For each delta:
    a. Grep all plan files for the "before" term using EXACT LITERAL match.
-      The Claude Code Grep tool defaults to ripgrep regex — the sanitize
+      The Codex Grep tool defaults to ripgrep regex — the sanitize
       step above is REQUIRED. Use `-F` semantics where supported.
    b. For each hit:
       - If hit is inside the section the delta originated from: skip.

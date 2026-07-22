@@ -16,7 +16,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 ## Pre-flight
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
 ```
 
 
@@ -39,13 +39,13 @@ Step 3 (only after explicit user "yes"):  invocation without --dry-run (or with 
 For any `bulk transition` op, validate the target status against the discovered workflow cache:
 
 ```
-the project environment/tasks/jira-workflows/<workflow-slug>.md
+$(git rev-parse --show-toplevel)/tasks/jira-workflows/<workflow-slug>.md
 ```
 
 If absent for the target project, run discovery first:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/fetch-workflow.sh <one-ticket-from-target-JQL>
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <one-ticket-from-target-JQL>
 ```
 
 If only `_partial-<PROJ>.md` exists (non-admin discovery), warn the user that the target status may not be reachable from all source states in the JQL result set; recommend a smaller pilot batch first. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md` for the full protocol.
@@ -55,7 +55,7 @@ If only `_partial-<PROJ>.md` exists (non-admin discovery), warn the user that th
 If the bulk JQL incorporates user-derived terms, sanitize first:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jql-sanitize.sh '<term>'
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jql-sanitize.sh '<term>'
 ```
 
 Then build the JQL with the sanitized output. JQL injection at bulk scale = catastrophic blast radius.
@@ -74,7 +74,7 @@ For dry-run: return: impacted-count + sample 5 issues + full `would_*` JSON for 
 
 For exec: return: issues-changed-count + first 5 + last 5 + URL to JQL search reflecting the change.
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Gotchas
 

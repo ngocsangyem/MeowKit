@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-evaluator.sh — Subagent spawn wrapper for mk:evaluate.
+# run-evaluator.sh — sub-task spawn wrapper for mk:evaluate.
 # Usage:  run-evaluator.sh <target> [--rubric-preset NAME] [--no-boot] [--max-criteria N]
 # Exit:   0 if verdict PASS, 1 if WARN, 2 if FAIL, 3 on internal error
 # Reqs:   Bash 3.2+. Tested macOS BSD + GNU coreutils.
@@ -8,16 +8,16 @@
 #   1. Validates arguments
 #   2. Resolves the rubric preset (default by target type if not given)
 #   3. Composes the rubric library output (calls mk:rubric load-rubric.sh)
-#   4. Builds the evaluator subagent prompt with composed rubrics + skeptic persona
+#   4. Builds the evaluator sub-task prompt with composed rubrics + skeptic persona
 #   5. Prints the dispatch instructions for the orchestrator
 #
-# It does NOT spawn the subagent itself — that's the orchestrator's responsibility
+# It does NOT spawn the sub-task itself — that's the orchestrator's responsibility
 # (Task tool with subagent_type=evaluator). This script prepares the inputs.
 set -u
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 repo_root="$(cd "$script_dir/../../../.." && pwd)"
-rubric_loader="$repo_root/.claude/skills/rubric/scripts/load-rubric.sh"
+rubric_loader="$repo_root/.agents/skills/rubric/scripts/load-rubric.sh"
 persona_file="$script_dir/../prompts/skeptic-persona.md"
 
 if [ ! -x "$rubric_loader" ]; then
@@ -125,16 +125,16 @@ cat <<EVAL_DISPATCH_9f3a
 - no_boot: $no_boot
 - max_criteria: $max_criteria
 
-## Subagent Spawn (orchestrator instruction)
+## sub-task Spawn (orchestrator instruction)
 
-The orchestrator should now spawn the evaluator subagent with these inputs:
+The orchestrator should now spawn the evaluator sub-task with these inputs:
 
 \`\`\`
-Task(
+delegate a sub-task (
   subagent_type="evaluator",
   description="Evaluate $target",
   prompt="
-    Read .claude/skills/evaluate/workflow.md and follow it.
+    Read .agents/skills/evaluate/workflow.md and follow it.
 
     Target: $target
     target_type: $target_type
@@ -160,7 +160,7 @@ $composed_rubric
 
 After the evaluator returns, run:
 \`\`\`
-.claude/skills/evaluate/scripts/validate-verdict.sh tasks/reviews/{date}-{slug}-evalverdict.md
+.agents/skills/evaluate/scripts/validate-verdict.sh tasks/reviews/{date}-{slug}-evalverdict.md
 \`\`\`
 
 If validator exits 0 → exit code matches verdict (PASS=0, WARN=1, FAIL=2).

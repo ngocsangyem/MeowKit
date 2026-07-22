@@ -9,13 +9,13 @@ Walk the user through Confluence Cloud credential setup for the `mk:confluence-*
 
 ## Steps
 
-1. Verify `.claude/scripts/bin/setup-workflow` ran and `confluence-as` binary exists at `.agents/skills/.venv/bin/confluence-as`. If not, instruct: `.claude/scripts/bin/setup-workflow`.
+1. Verify `.codex/scripts/bin/setup-workflow` ran and `confluence-as` binary exists at `.agents/skills/.venv/bin/confluence-as`. If not, instruct: `.codex/scripts/bin/setup-workflow`.
 
-2. Ensure `.claude/.env` exists. If absent: create empty file, then `chmod 0600 .claude/.env`.
+2. Ensure `.codex/.env` exists. If absent: create empty file, then `chmod 0600 .codex/.env`.
 
 3. Check whether `MEOW_CONFLUENCE_*` vars are already populated:
    ```bash
-   grep -c '^MEOW_CONFLUENCE_' .claude/.env || true
+   grep -c '^MEOW_CONFLUENCE_' .codex/.env || true
    ```
    If present (count >= 3): ask user whether to overwrite. If overwriting, comment out the old lines (do not delete; user may want to recover).
 
@@ -24,14 +24,14 @@ Walk the user through Confluence Cloud credential setup for the `mk:confluence-*
    - **Email** — Atlassian account email.
    - **API token** — instruction text: "Generate one at https://id.atlassian.com/manage-profile/security/api-tokens then paste here. The token will not be displayed in chat."
 
-5. Append to `.claude/.env` via `>>` Bash redirection (do NOT echo back — keeps token out of transcript):
+5. Append to `.codex/.env` via `>>` Bash redirection (do NOT echo back — keeps token out of transcript):
    ```
    MEOW_CONFLUENCE_SITE_URL=...
    MEOW_CONFLUENCE_EMAIL=...
    MEOW_CONFLUENCE_API_TOKEN=...
    ```
 
-6. Re-run `chmod 0600 .claude/.env`.
+6. Re-run `chmod 0600 .codex/.env`.
 
 7. Validate by running:
    ```bash
@@ -49,6 +49,6 @@ Walk the user through Confluence Cloud credential setup for the `mk:confluence-*
 
 ## Notes
 
-- Does NOT write credentials to `.claude/settings.local.json` (the wrapper rejects that path).
+- Does NOT write credentials to `.codex/settings.local.json` (the wrapper rejects that path).
 - Token never echoed in transcript — use Bash heredoc / `>>` redirection so the token value never appears in chat output.
 - Cloud-only — refuse Server/DC URLs at step 4.

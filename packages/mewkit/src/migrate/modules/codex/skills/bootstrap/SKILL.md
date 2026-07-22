@@ -1,13 +1,13 @@
 ---
 name: "bootstrap"
-description: "Use when creating a new project from scratch — orchestrates the full journey from idea to running code. Research → design → plan → scaffold → implement → docs. Explicit invocation only — never auto-activates. CLI = project infrastructure (.claude/), bootstrap = application code + full pipeline. NOT for autonomous multi-hour builds of specified products (see mk:autobuild); NOT for single-task feature work on existing projects (see mk:cook)."
+description: "Use when creating a new project from scratch — orchestrates the full journey from idea to running code. Research → design → plan → scaffold → implement → docs. Explicit invocation only — never auto-activates. CLI = project infrastructure (.codex/), bootstrap = application code + full pipeline. NOT for autonomous multi-hour builds of specified products (see mk:autobuild); NOT for single-task feature work on existing projects (see mk:cook)."
 ---
 
 # Bootstrap
 
 End-to-end project orchestrator: research → design → **plan → scaffold** → implement → docs.
 
-**CLI boundary:** the installer = project infrastructure. `mk:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
+**CLI boundary:** the installer = project infrastructure. `mk:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.codex/`.
 
 ## When to Use
 
@@ -56,7 +56,7 @@ Optional: invoke `mk:plan-ceo-review` on the plan (Full mode).
 
 - **Scaffolding before planning**: generating files without a plan → plan first, scaffold second
 - **Skipping research on "simple" projects**: hidden complexity → always research unless `--fast`
-- **Duplicating CLI init**: never generate .claude/ files — CLI handles that
+- **Duplicating CLI init**: never generate .codex/ files — CLI handles that
 
 Full list: `references/gotchas.md`
 

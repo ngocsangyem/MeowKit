@@ -56,17 +56,17 @@ task/PROJ-101-database-migration
 
 ```bash
 # Auto-generate from JIRA issue
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh dev branch-name PROJ-123
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh dev branch-name PROJ-123
 # Output: feature/proj-123-fix-login-button
 
 # Auto-detect prefix from issue type
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh dev branch-name PROJ-123 --auto-prefix
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh dev branch-name PROJ-123 --auto-prefix
 
 # Custom prefix
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh dev branch-name PROJ-123 --prefix hotfix
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh dev branch-name PROJ-123 --prefix hotfix
 
 # Generate and checkout in one command
-$(bash the project environment/.agents/skills/jira/scripts/jira-as.sh dev branch-name PROJ-123 --output git)
+$(bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh dev branch-name PROJ-123 --output git)
 ```
 
 ## Git Alias (Optional)

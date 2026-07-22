@@ -69,7 +69,7 @@ Never let a noticed issue silently pass. The whole point is proactive communicat
 
 ## Search Before Building
 
-Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `# Project philosophy — see CLAUDE.md for the full philosophy.
+Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `# Project philosophy — see AGENTS.md for the full philosophy.
 
 **Three layers of knowledge:**
 - **Layer 1** (tried and true — in distribution). Don't reinvent the wheel. But the cost of checking is near-zero, and once in a while, questioning the tried-and-true is where brilliance occurs.
@@ -186,7 +186,7 @@ When you are in plan mode and about to call ExitPlanMode:
 3. If it does NOT — run this command:
 
 ```bash
-.claude/scripts/bin/workflow-review-log
+.codex/scripts/bin/workflow-review-log
 ```
 
 Then write a `## REVIEW REPORT` section to the end of the plan file:
@@ -202,7 +202,7 @@ Then write a `## REVIEW REPORT` section to the end of the plan file:
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `the plan-ceo-review skill` | Scope & strategy | 0 | — | — |
-| Outside Voice | Claude adversarial sub-task | Independent 2nd opinion | 0 | — | — |
+| Outside Voice | Codex adversarial sub-task | Independent 2nd opinion | 0 | — | — |
 | Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
 
 **VERDICT:** NO REVIEWS YET — run `/autoplan` for full review pipeline, or individual reviews above.

@@ -28,7 +28,7 @@ description: "{trigger keywords} + {what it does}"
 ---
 ```
 
-Description must be specific enough for Claude to decide when to delegate. Include trigger phrases the user would say.
+Description must be specific enough for Codex to decide when to delegate. Include trigger phrases the user would say.
 
 ## Step 4: Fill Required Sections
 
@@ -36,7 +36,7 @@ Description must be specific enough for Claude to decide when to delegate. Inclu
 What the skill does + when to use it. Not a marketing pitch — a factual description.
 
 ### When to Invoke
-- Auto-activate patterns (keywords Claude watches for)
+- Auto-activate patterns (keywords Codex watches for)
 - Explicit call syntax: `/mk:{name} [args]`
 - "Do NOT invoke when:" (prevent misuse)
 
@@ -77,4 +77,4 @@ Add to `.agents/skills/SKILLS_ATTRIBUTION.md`:
 - Don't create skills that duplicate existing agent behavior
 - Don't create skills with vague triggers ("when appropriate")
 - Don't create skills over 200 lines without references/
-- Don't create skills that modify files outside .claude/
+- Don't create skills that modify files outside .codex/

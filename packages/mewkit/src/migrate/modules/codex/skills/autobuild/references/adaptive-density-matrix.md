@@ -46,11 +46,11 @@ Density resolves via this priority order:
 The auto-detection step tries these env vars in order and uses the first set:
 
 1. `MEOWKIT_MODEL_HINT` (explicit override)
-2. `CLAUDE_MODEL` (host-runtime legacy)
+2. `the project environment` (host-runtime legacy)
 3. `ANTHROPIC_MODEL` (`Anthropic` SDK)
 4. (none) → defaults to `STANDARD` tier → `FULL` density (safe fallback)
 
-**Known limitation:** On Claude Code, the model id env var is not always exported to sub-task contexts. Users running `the autobuild skill` on Opus 4.6 who want LEAN mode should either:
+**Known limitation:** On Codex, the model id env var is not always exported to sub-task contexts. Users running `the autobuild skill` on Opus 4.6 who want LEAN mode should either:
 - Set `export MEOWKIT_MODEL_HINT=opus-4-6` once in their shell, OR
 - Pass `--tier lean` explicitly on the autobuild invocation, OR
 - Set `export MEOWKIT_AUTOBUILD_MODE=LEAN` for the session
@@ -65,7 +65,7 @@ Per the "dead-weight thesis," every model upgrade is an opportunity to test whet
 2. Re-run the same set on LEAN density
 3. If LEAN performance matches FULL within 5%, downgrade the tier's matrix entry from FULL to LEAN
 4. If LEAN performance exceeds FULL (faster, cheaper, equivalent quality), upgrade aggressively
-5. Log the decision (component, model tier, density choice, measured delta, audit date) in the dead-weight audit registry per `.claude/rules/dead-weight-audit-rules.md` Rule 6
+5. Log the decision (component, model tier, density choice, measured delta, audit date) in the dead-weight audit registry per `.agents/skills/rule-dead-weight-audit-rules.md` Rule 6
 
 The matrix is **not** static. It encodes the current best understanding of "where does scaffolding stop helping and start hurting?" — and that boundary moves with model capability.
 
@@ -80,8 +80,8 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 
 ## See Also
 
-- `.claude/rules/dead-weight-audit-rules.md` — audit cadence, measurement, thresholds, never-prune list
-- `.claude/rules/harness-rules.md` Rule 7 — when the dead-weight audit must be re-run
+- `.agents/skills/rule-dead-weight-audit-rules.md` — audit cadence, measurement, thresholds, never-prune list
+- `.agents/skills/rule-harness-rules.md` Rule 7 — when the dead-weight audit must be re-run
 - `.agents/skills/scale-routing/SKILL.md` Output Schema v2.1 — `autobuild_density` field
 - `.agents/skills/benchmark/` — calibration replay automation
 - Anthropic harness design article (Prithvi Rajasekaran, Labs) <!-- research-citation -->

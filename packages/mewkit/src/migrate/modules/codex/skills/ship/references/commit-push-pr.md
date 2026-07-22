@@ -52,7 +52,7 @@
 git commit -m "$(cat <<'EOF'
 chore: bump version and changelog (vX.Y.Z.W)
 
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Co-Authored-By: Codex Opus 4.6 <noreply@anthropic.com>
 EOF
 )"
 ```
@@ -178,7 +178,7 @@ gh pr create --base <base> --title "<type>: <summary>" --body "$(cat <<'EOF'
 - [x] All Rails tests pass (N runs, 0 failures)
 - [x] All Vitest tests pass (N tests)
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
+🤖 Generated with [Codex](https://codex.com/codex)
 EOF
 )"
 ```
@@ -209,7 +209,7 @@ the document-release workflow.
 Log coverage and plan completion data so `the retro skill` can track trends:
 
 ```bash
-eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/memory/projects
+eval "$(.codex/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/memory/projects
 ```
 
 Append to `.meowkit/memory/projects/$BRANCH-reviews.jsonl`:

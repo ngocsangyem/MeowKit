@@ -33,7 +33,7 @@ elif overhead_p < 25:
 else:
     banner = "Action recommended"
 
-# Essential basenames — hard-coded from CLAUDE.md "Compaction Policy".
+# Essential basenames — hard-coded from AGENTS.md "Compaction Policy".
 ESSENTIAL_BASENAMES = {
     "security-rules.md",
     "injection-rules.md",
@@ -47,8 +47,8 @@ def basename(path_or_name):
 
 # Build flat list of (category, label, path_or_name, tokens) for ranking.
 flat = []
-for entry in d.get("claude_md_chain", []):
-    flat.append(("claude_md", entry["path"], entry["path"], entry["estimated_tokens"]))
+for entry in d.get("codex_md_chain", []):
+    flat.append(("codex_md", entry["path"], entry["path"], entry["estimated_tokens"]))
 for entry in d.get("agents", []):
     flat.append(("agent", entry["name"], entry["name"], entry["estimated_tokens"]))
 for entry in d.get("skills", []):
@@ -75,7 +75,7 @@ def row(label, items, tokens):
     pct = (tokens / window) * 100 if window else 0
     print(f"| {label} | {len(items)} | {tokens:,} | {pct:.2f}% |")
 
-row("CLAUDE.md chain", d.get("claude_md_chain", []), t.get("claude_md_tokens", 0))
+row("AGENTS.md chain", d.get("codex_md_chain", []), t.get("codex_md_tokens", 0))
 row("Agents",          d.get("agents", []),          t.get("agents_tokens", 0))
 row("Skills",          d.get("skills", []),          t.get("skills_tokens", 0))
 row("Rules",           d.get("rules", []),           t.get("rules_tokens", 0))
@@ -119,7 +119,7 @@ for cat, label, path_or_name, toks in flat:
                           f"deprecated commands can be removed."))
     elif cat == "mcp":
         recs.append((toks, f"MCP server `{label}` (~{toks:,} tokens of schema) — disable if not in use."))
-    elif cat == "claude_md":
+    elif cat == "codex_md":
         recs.append((toks, f"`{label}` (~{toks:,} tokens) is loaded into every session. "
                           f"Trims here have the highest leverage."))
 
@@ -136,7 +136,7 @@ print()
 # Footer — boundary disambiguation.
 print("## How to Act")
 print()
-print("- **Cost (USD):** see `/mk:budget`.")
+print("- **Cost (USD):** see `the budget skill`.")
 print("- **Runtime trim:** see `mk:lazy-agent-loader`.")
 print()
 print("All recommendations above are framed as *consider* — the audit reports state,")

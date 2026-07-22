@@ -5,7 +5,7 @@ description: "Resolve an in-progress git merge or rebase conflict end to end: re
 
 # Resolving Merge Conflicts
 
-> **Path convention:** Commands assume cwd is the repo root (`the project environment`).
+> **Path convention:** Commands assume cwd is the repo root (`$(git rev-parse --show-toplevel)`).
 
 **Iron Laws**
 

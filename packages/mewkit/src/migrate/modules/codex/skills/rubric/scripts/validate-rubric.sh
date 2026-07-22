@@ -7,7 +7,7 @@
 set -u
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 repo_root="$(cd "$script_dir/../../../.." && pwd)"
-rubrics_dir="$repo_root/.claude/rubrics"
+rubrics_dir="$repo_root/.codex/rubrics"
 [ -d "$rubrics_dir" ] || { echo "FAIL: rubrics directory not found at $rubrics_dir" >&2; exit 2; }
 fail=0
 pass_count=0

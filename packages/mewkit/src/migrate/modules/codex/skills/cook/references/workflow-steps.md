@@ -34,7 +34,7 @@ All modes share these phases with mode-specific variations.
    - Auth/payments/security → always COMPLEX
    - Feature <5 files → STANDARD
    - Rename/typo/format → TRIVIAL
-3. **Read memory** (if exists): `.meowkit/memory/fixes.json` only for bug-class warnings; `.meowkit/memory/architecture-decisions.json` first for prior architectural decisions — note relevant prior learnings (see `.claude/rules/memory-read-rules.md`)
+3. **Read memory** (if exists): `.meowkit/memory/fixes.json` only for bug-class warnings; `.meowkit/memory/architecture-decisions.json` first for prior architectural decisions — note relevant prior learnings (see `.agents/skills/rule-memory-read-rules.md`)
 4. If mode=code: load plan path, parse phases
 5. **Autonomy Boundaries (advisory):** if the loaded plan.md has an `## Autonomy Boundaries` block (long-horizon plans only), read it once for the whole run and comply **mode-aware**:
    - Interactive / `code` mode: an "Ask first" item → raise an immediate `stop and ask the user in chat` when that decision arises; "Always" items proceed without asking.
@@ -95,7 +95,7 @@ remains **blocking** in auto mode — a failing check routes back to plan-creato
 reaching the human. A passing check does NOT approve the plan; it means the plan is
 well-formed enough to present, and its result is shown as evidence above the prompt. Auto
 mode automates the path *to* Gate 1, never the approval *at* it (see
-`.claude/rules/gate-rules.md` — The Gate Authority Invariant).
+`.agents/skills/rule-gate-rules.md` — The Gate Authority Invariant).
 
 **Output:** `Phase 1: Plan created — [N] phases, Gate 1 approved by human`
 
@@ -146,7 +146,7 @@ sh .codex/hooks/pre-implement.sh "<feature-name>"
 The hook is a no-op unless TDD mode is ON. Mode is ON when:
 
 - `MEOWKIT_TDD=1` env var is set (CI / shell rc), OR
-- `.claude/session-state/tdd-mode` sentinel file contains `on` (written by slash command `--tdd`)
+- `.codex/session-state/tdd-mode` sentinel file contains `on` (written by slash command `--tdd`)
 
 When ON, the hook verifies failing tests exist. If tests pass (no red), implementation is BLOCKED — go back to Phase 2.
 When OFF (default), the hook exits 0 silently and the developer proceeds without the RED-phase gate.
@@ -215,7 +215,7 @@ See `review-cycle.md` for interactive vs auto handling.
 
 ### GATE 2
 
-**Gate 2: human approval mandatory in all modes — see `.claude/rules/gate-rules.md` for the full contract.** Auto mode auto-fixes issues but never auto-approves Gate 2.
+**Gate 2: human approval mandatory in all modes — see `.agents/skills/rule-gate-rules.md` for the full contract.** Auto mode auto-fixes issues but never auto-approves Gate 2.
 
 Present review verdict. Use `stop and ask the user in chat` (header: "Gate 2"):
 
@@ -227,7 +227,7 @@ Max 3 review-fix cycles. After 3: final decision required from user.
 Before presenting for approval, run BOTH structural checks and surface both:
 
 - `.agents/skills/cook/scripts/validate-gate-2.sh` — the authoritative Gate 2 structural guard (no FAIL dimensions, side-effect addendum present).
-- `node .claude/scripts/validate-workflow-evidence.cjs <evidence-path> --phase cook` — evidence-completeness mirror (blocks on missing `cookContract` dims, empty `verification.commands`, `gate2-approved-without-verdict`, side-effects-without-addendum). It MIRRORS the gate script's status; it never replaces it and never approves. Pass `--plan-input` when the cook input was an existing `plan.md` / `phase-*.md` path.
+- `node .codex/scripts/validate-workflow-evidence.cjs <evidence-path> --phase cook` — evidence-completeness mirror (blocks on missing `cookContract` dims, empty `verification.commands`, `gate2-approved-without-verdict`, side-effects-without-addendum). It MIRRORS the gate script's status; it never replaces it and never approves. Pass `--plan-input` when the cook input was an existing `plan.md` / `phase-*.md` path.
 
 **Output:** `Phase 4: Review [score]/10, Gate 2 approved`
 
@@ -336,7 +336,7 @@ delegate a sub-task (subagent_type="planner", prompt="Run full sync-back for [pl
 3. **Memory capture (MUST spawn):**
 
    ```
-   delegate a sub-task (subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Write bug-class patterns to .meowkit/memory/fixes.json (canonical); write architectural decisions to .meowkit/memory/architecture-decisions.json (canonical); write review patterns to .meowkit/memory/review-patterns.json (canonical). After all writes, regenerate the matching .md views via 'mewkit memory render-views' — do NOT hand-write the .md files (see .claude/rules/memory-read-rules.md).", description="Session memory capture")
+   delegate a sub-task (subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Write bug-class patterns to .meowkit/memory/fixes.json (canonical); write architectural decisions to .meowkit/memory/architecture-decisions.json (canonical); write review patterns to .meowkit/memory/review-patterns.json (canonical). After all writes, regenerate the matching .md views via 'mewkit memory render-views' — do NOT hand-write the .md files (see .agents/skills/rule-memory-read-rules.md).", description="Session memory capture")
    ```
 
 4. `TaskUpdate` → mark all session tasks complete after sync-back
@@ -371,7 +371,7 @@ Idempotent: re-running this checkpoint on an unchanged phase produces zero diff 
 
 ## Workflow Evidence Index (traceability — no new gate)
 
-Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist across Phases 0-6 — no extra agent work, no extra user step, no behavior change. The index records pointers + summaries; it **never approves** (Gate 1 / Gate 2 stay human authority) and carries **no score**. The gate scripts (`validate-gate-1.sh`, `validate-gate-2.sh`) remain the structural authority; evidence MIRRORS their result.
+Contract: `.agents/skills/rule-workflow-evidence-rules.md`. Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist across Phases 0-6 — no extra agent work, no extra user step, no behavior change. The index records pointers + summaries; it **never approves** (Gate 1 / Gate 2 stay human authority) and carries **no score**. The gate scripts (`validate-gate-1.sh`, `validate-gate-2.sh`) remain the structural authority; evidence MIRRORS their result.
 
 **Storage path:** `tasks/plans/<plan>/reports/evidence/workflow-evidence.json`.
 
@@ -406,7 +406,7 @@ Where `(4.5?)` = only if `--verify` or `--strict` modifier flag set.
 After reporting, an explicit ship request enters Phase 5; an explicit close request enters
 Phase 6. Neither phase starts automatically.
 
-**Critical:** Gate 2 — see `.claude/rules/gate-rules.md`.
+**Critical:** Gate 2 — see `.agents/skills/rule-gate-rules.md`.
 
 ## Validation
 

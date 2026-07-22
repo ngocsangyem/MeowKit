@@ -44,7 +44,7 @@ comment ~ "SEARCH_TERM" AND updated >= -30d ORDER BY updated DESC
 
 ## Tips
 
-- `currentUser()` resolves to the authenticated user (configured via `MEOW_JIRA_EMAIL` in `.claude/.env`; the wrapper exports it to `JIRA_EMAIL` per call)
+- `currentUser()` resolves to the authenticated user (configured via `MEOW_JIRA_EMAIL` in `.codex/.env`; the wrapper exports it to `JIRA_EMAIL` per call)
 - `openSprints()` returns the currently active sprint(s)
 - Custom field IDs: use `references/field-discovery.md` to find the right ID
 - Chain conditions with `AND`, `OR`, use parentheses for grouping

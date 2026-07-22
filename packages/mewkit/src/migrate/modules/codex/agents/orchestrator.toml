@@ -18,7 +18,7 @@ CSV match OVERRIDES manual classification. See `rules/scale-adaptive-rules.md` f
 After complexity routing, detect TDD mode:
 
 1. Read `MEOWKIT_TDD` env var (or check if user passed `--tdd` on the slash command)
-2. Read `.claude/session-state/tdd-mode` sentinel (written by slash command dispatch when `--tdd` is detected)
+2. Read `.codex/session-state/tdd-mode` sentinel (written by slash command dispatch when `--tdd` is detected)
 3. Print: `TDD mode: ON | OFF` to acknowledge the routing decision
 4. **If ON:** route per the strict TDD pipeline — invoke `tester` for Phase 2 RED before `developer` in Phase 3
 5. **If OFF (default):** Phase 2 is optional — skip `tester` invocation unless explicitly requested or unless the plan's acceptance criteria require test coverage. Route directly from `planner` → `developer` → `reviewer`
@@ -56,9 +56,9 @@ high|COMPLEX (Opus)|Required
    - TDD ON (opt-in): planner → tester → developer → reviewer → shipper → documenter → analyst
    - Architect is inserted after planner when schema, API, or infra changes are involved.
    - Deep security audit is inserted at Phases 2 and 4 for auth, payments, user data, API endpoints, encryption, or other flagged risk surfaces. The deterministic post-write scan runs on every write in all modes.
-   - **Green-field product builds** (signals: "build me a kanban app", "make a retro game maker", "build a SaaS dashboard", "autonomous build", or any prompt asking for a multi-hour autonomous green-field build): route to `mk:autobuild` instead of the standard pipeline. The harness owns its own planner → contract → generator ⇄ evaluator loop with adaptive density. See `mk:autobuild/SKILL.md` and CLAUDE.md preference note.
+   - **Green-field product builds** (signals: "build me a kanban app", "make a retro game maker", "build a SaaS dashboard", "autonomous build", or any prompt asking for a multi-hour autonomous green-field build): route to `mk:autobuild` instead of the standard pipeline. The harness owns its own planner → contract → generator ⇄ evaluator loop with adaptive density. See `mk:autobuild/SKILL.md` and AGENTS.md preference note.
 
-4. **Read scoped memory.** At session start, read only the topic files relevant to routing (see `.claude/rules/memory-read-rules.md` for precedence rule):
+4. **Read scoped memory.** At session start, read only the topic files relevant to routing (see `.agents/skills/rule-memory-read-rules.md` for precedence rule):
    - `.meowkit/memory/fixes.json` first; fall back to `fixes.md` only if the `.json` is absent
    - `.meowkit/memory/review-patterns.json` first; fall back to `review-patterns.md` only if the `.json` is absent
    - `.meowkit/memory/architecture-decisions.json` first; fall back to `architecture-decisions.md` only if the `.json` is absent
@@ -73,11 +73,11 @@ high|COMPLEX (Opus)|Required
 Load before starting any routing decision:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
-- `.meowkit/memory/fixes.json` (canonical); fall back to `fixes.md` if absent — recurring failure classes that affect routing (see `.claude/rules/memory-read-rules.md`)
+- `.meowkit/memory/fixes.json` (canonical); fall back to `fixes.md` if absent — recurring failure classes that affect routing (see `.agents/skills/rule-memory-read-rules.md`)
 - `.meowkit/memory/review-patterns.json` (canonical); fall back to `review-patterns.md` if absent — repeated review outcomes that affect routing
 - `.meowkit/memory/architecture-decisions.json` (canonical); fall back to `architecture-decisions.md` if absent — active architectural constraints
 - `.meowkit/memory/cost-log.json`: budget context for model tier decisions
-- `CLAUDE.md` → Agent Roster table: current agent capabilities and ownership
+- `AGENTS.md` → Agent Roster table: current agent capabilities and ownership
 - `tasks/plans/`: check for in-progress plans (pipeline state) ONLY when the orientation outcome is `none`/absent (new-work routing). When orientation resolved an `active`/`blocked`/`ambiguous`/`corrupt-only` task, act on that injected block instead of scanning — no unconditional plan scan, no all-memory read.
 
 ## Ambiguity Resolution

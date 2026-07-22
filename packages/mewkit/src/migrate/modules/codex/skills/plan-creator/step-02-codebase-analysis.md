@@ -26,7 +26,7 @@ project. If absent, note the gap and continue — do NOT silently skip without l
    **REQUIRED:** If absent, print `WARNING: docs/project-context.md not found — run mk:project-context generate` before proceeding.
 2. `docs/architecture/system-architecture.md` — system structure
 3. `docs/code-standards.md` — coding conventions
-4. `.meowkit/memory/architecture-decisions.json` — recurring architectural patterns (canonical; fall back to `architecture-decisions.md` only if absent — see `.claude/rules/memory-read-rules.md`)
+4. `.meowkit/memory/architecture-decisions.json` — recurring architectural patterns (canonical; fall back to `architecture-decisions.md` only if absent — see `.agents/skills/rule-memory-read-rules.md`)
 
 ### 2c. Check Existing Plans
 

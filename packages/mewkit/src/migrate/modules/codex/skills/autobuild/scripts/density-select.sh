@@ -17,7 +17,7 @@
 #   MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN  (env var, highest priority)
 #   --tier flag                              (cli, second priority)
 #   --model flag                             (cli, supplements tier)
-#   auto-detection from CLAUDE_MODEL env var (fallback)
+#   auto-detection from the project environment env var (fallback)
 set -u
 
 # 1. Highest priority: MEOWKIT_AUTOBUILD_MODE env override
@@ -36,11 +36,11 @@ fi
 
 # 2. Parse args
 tier=""
-# Model id auto-detection — try multiple env var names since Claude Code's
+# Model id auto-detection — try multiple env var names since Codex's
 # canonical env var name has changed across versions and may not be set in all
-# subagent contexts. Order: explicit MEOWKIT_MODEL_HINT > CLAUDE_MODEL > ANTHROPIC_MODEL > empty.
-# (Closes red-team C3 — previously read only $CLAUDE_MODEL which may not be exported.)
-model="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-}}}"
+# sub-task contexts. Order: explicit MEOWKIT_MODEL_HINT > the project environment > ANTHROPIC_MODEL > empty.
+# (Closes red-team C3 — previously read only the project environment which may not be exported.)
+model="${MEOWKIT_MODEL_HINT:-the project environment:-the provider API key:-}}}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --tier)

@@ -56,7 +56,7 @@ For this toolkit itself, the default commands are:
 - `npm run typecheck`
 - `npm test`
 
-For downstream projects, prefer commands documented in that project's `README.md`, `CLAUDE.md`, or `docs/`.
+For downstream projects, prefer commands documented in that project's `README.md`, `AGENTS.md`, or `docs/`.
 
 ### Real implementation only
 

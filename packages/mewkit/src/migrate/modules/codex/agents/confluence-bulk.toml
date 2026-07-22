@@ -16,7 +16,7 @@ This agent is **A (untrusted CQL / page-id list) + C (Confluence state change vi
 ## Pre-flight
 
 ```bash
-bash the project environment/.agents/skills/confluence/scripts/confluence-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh <args>
 ```
 
 
@@ -29,7 +29,7 @@ Use the routed skill and domain reference files for CLI syntax, safety tiers, te
 If the bulk CQL incorporates user-derived terms, sanitize first:
 
 ```bash
-SANITIZED=$(bash the project environment/.agents/skills/confluence/scripts/cql-sanitize.sh '<term>')
+SANITIZED=$(bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/cql-sanitize.sh '<term>')
 ```
 
 Then build the CQL with the sanitized output. CQL injection at bulk scale = catastrophic blast radius.
@@ -63,7 +63,7 @@ A `--cql` query with no result cap may resolve to thousands of pages. Always con
 Bulk ops are NOT transactional. If execution fails partway (rate-limit, network, permission on a subset), the wrapper reports the partial-progress count (X of N completed). Surface this to the user; remediation is a re-run on the remaining set:
 
 ```
-bash the project environment/.agents/skills/confluence/scripts/confluence-as.sh bulk delete \\
+bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh bulk delete \\
   --cql "<original-CQL> AND id NOT IN (<already-completed-ids>)" \\
   --dry-run --max-pages 100
 ```
@@ -78,7 +78,7 @@ For dry-run: return: impacted-count + first 5 affected page titles + the exact c
 
 For exec: return: pages-changed-count + first 5 + last 5 + URL to the CQL search reflecting the change.
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Gotchas
 

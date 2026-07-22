@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # cql-sanitize.sh — Deterministic CQL escaping + shell-metachar defense for user input.
-# Usage: bash .claude/skills/confluence/scripts/cql-sanitize.sh '<term>'
+# Usage: bash .agents/skills/confluence/scripts/cql-sanitize.sh '<term>'
 # Returns sanitized term safe for CQL queries.
 #
 # The confluence-as library does NOT export _escape_cql_string (it lives as a

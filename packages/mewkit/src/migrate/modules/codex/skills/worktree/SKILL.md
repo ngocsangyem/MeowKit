@@ -135,7 +135,7 @@ node .agents/skills/worktree/scripts/worktree.cjs review-pr-cleanup --sweep --dr
 - Worktrees share the same `.git` — force-pushing from a worktree affects the main
   checkout (Safety Rule: NEVER force-push)
 - `.worktrees/` directory must be gitignored — add to `.gitignore` before first parallel run
-- Merge conflicts on `SKILL.md`/`CLAUDE.md` are common in parallel runs — always stop
+- Merge conflicts on `SKILL.md`/`AGENTS.md` are common in parallel runs — always stop
   and report to orchestrator, never auto-resolve
 - `mk:task-queue` ownership must be released before worktree cleanup, or the next agent
   cannot claim that task

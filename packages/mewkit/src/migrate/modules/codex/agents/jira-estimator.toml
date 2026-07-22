@@ -18,7 +18,7 @@ This agent is **A (untrusted ticket content) + C (local-FS write of estimation r
 All `jira-as` invocations through:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
 ```
 
 ## Live vs Mock Check
@@ -28,14 +28,14 @@ Read `JIRA_MOCK_MODE` env. If `true`, surface "**[MOCK MODE]**" in your output h
 ## Read the Ticket
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all' \\
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all' \\
   | jq '{key, summary: .fields.summary, description: .fields.description, storyPoints: .fields.customfield_10016, labels: .fields.labels, components: [.fields.components[].name], links: [.fields.issuelinks[]?.outwardIssue.key]}'
 ```
 
 **Custom field discovery is mandatory before reading or writing story points.** `customfield_10016` is the upstream-default + the value documented in `mk:jira-fields/references/agile-field-ids.md`, `mk:jira-agile/references/agile-field-reference.md`, and `mk:jira-admin/references/voodoo-constants.md`. **Per-instance verification:**
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields list --search "Story Points" \\
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields list --search "Story Points" \\
   | jq '.[] | select(.name == "Story Points") | .id'
 ```
 
@@ -71,7 +71,7 @@ Do not silently ignore existing estimates.
 ## JQL Sanitization
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jql-sanitize.sh '<term>'
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jql-sanitize.sh '<term>'
 ```
 
 Use the sanitized output. Never construct JQL from raw ticket text.
@@ -79,7 +79,7 @@ Use the sanitized output. Never construct JQL from raw ticket text.
 ## JQL Query Limits
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh search query "<sanitized JQL>" --max-results 20
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search query "<sanitized JQL>" --max-results 20
 ```
 
 ## JQL Error Handling
@@ -124,7 +124,7 @@ Auto-flag for human estimation when ANY of these apply:
 ### To apply:
 > Verify this estimate before applying — it is an LLM assessment, not a calibrated prediction.
 
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh issue update {ISSUE-KEY} --custom-fields '{"customfield_10016": {N}}'
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh issue update {ISSUE-KEY} --custom-fields '{"customfield_10016": {N}}'
 ```
 
 ## Output Format (Escalation)
@@ -147,7 +147,7 @@ Run team estimation session for this ticket.
 
 Persist the estimation to `tasks/reports/jira-estimate-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md`. This makes the result durable for `mk:planning-engine` capacity analysis and the `mk:cook` plan-creation input. Use the Write tool. Filename slug uses absolute date stamp (per memory rules).
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Memory
 

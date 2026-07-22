@@ -45,7 +45,7 @@ Between steps: verify no compilation errors before proceeding.
 
 ## What NOT to Generate
 
-- `.claude/` directory (CLI handles this)
+- `.codex/` directory (CLI handles this)
 - `.env` files with real secrets (generate `.env.example` only)
 - Lock files (npm install generates these)
 - Build output directories (dist/, build/)

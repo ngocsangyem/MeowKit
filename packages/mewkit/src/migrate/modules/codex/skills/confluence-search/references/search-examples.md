@@ -21,7 +21,7 @@ creator = currentUser() AND space = ENG AND created >= now("-7d") ORDER BY creat
 
 **Wrapper invocation:**
 ```bash
-bash the project environment/.agents/skills/confluence/scripts/confluence-as.sh search \
+bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh search \
   --cql 'creator = currentUser() AND space = ENG AND created >= now("-7d") ORDER BY created DESC' \
   --max-results 20
 ```
@@ -70,7 +70,7 @@ label = "rfc" AND lastModified >= now("-30d") ORDER BY lastModified DESC
 
 **Export to CSV for sharing:**
 ```bash
-bash the project environment/.agents/skills/confluence/scripts/confluence-as.sh search export \
+bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh search export \
   --cql 'label = "rfc" AND lastModified >= now("-30d") ORDER BY lastModified DESC' \
   --output-file /tmp/recent-rfcs.csv \
   --format csv

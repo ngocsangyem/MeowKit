@@ -2,10 +2,10 @@
 """Validate a plan file and its phase files for required sections and quality.
 
 Dependencies:
-    PyYAML >= 6.0  (parses phase frontmatter; installed via `.claude/scripts/bin/setup-workflow`)
+    PyYAML >= 6.0  (parses phase frontmatter; installed via `.codex/scripts/bin/setup-workflow`)
 
 Usage:
-    .claude/skills/.venv/bin/python3 validate-plan.py <plan.md>
+    .agents/skills/.venv/bin/python3 validate-plan.py <plan.md>
 
 Exit codes: 0 = PLAN_COMPLETE (warnings tolerated); 1 = PLAN_INCOMPLETE (errors).
 """

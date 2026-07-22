@@ -514,7 +514,7 @@ User should be logged in
 Error message appears
 EOF
 )
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh \
   issue create --project PROJ --type Bug --summary "Login error" --description "$DESC"
 ```
 

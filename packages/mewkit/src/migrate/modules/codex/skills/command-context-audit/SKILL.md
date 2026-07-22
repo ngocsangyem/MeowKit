@@ -14,7 +14,7 @@ the context-audit skill <scan-root>
 
 ## Behavior
 
-Read-only audit of `.claude/` structural overhead. Reports prioritized
+Read-only audit of `.codex/` structural overhead. Reports prioritized
 "remove X save Y tokens" recommendations against the model context window.
 
 NOT for monetary cost tracking (see `the budget skill`).

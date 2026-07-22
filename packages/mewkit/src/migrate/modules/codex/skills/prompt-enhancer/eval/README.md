@@ -38,7 +38,7 @@ For deep-mode canaries (#7, #9, #10), the runner MUST provide its own
 git-initialized fixture repo. The fixture should contain at minimum:
 
 - `docs/project-context.md` — fictional project conventions (allow-listed)
-- `CLAUDE.md` — fixture CLAUDE.md (allow-listed)
+- `AGENTS.md` — fixture AGENTS.md (allow-listed)
 - `src/api/products.ts` and `src/lib/redis.ts` — for canary #7 happy path
 - `src/auth/passport.ts` — for canary #9 boundary
 - `.env` (fake values) and `.meowkit/memory/security-log.md` (fake notes) — for canary #9 boundary

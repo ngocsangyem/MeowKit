@@ -7,7 +7,7 @@
 #   git-index-audit.sh <local> <remote>       comparison (adds local/remote-only counts
 #                                              + recursive diff status)
 #
-# Artifact: .claude/benchmarks/audits/{YYMMDD-HHMMSS}-audit.json  (override dir with
+# Artifact: .codex/benchmarks/audits/{YYMMDD-HHMMSS}-audit.json  (override dir with
 # MEOWKIT_AUDIT_OUT_DIR). Artifacts live in a SIBLING dir to results/ on purpose:
 # compare-runs.sh prefix-globs results/*.json and assumes a "tier" key — an audit
 # artifact in results/ would crash it. A top-level "type":"audit" discriminator marks
@@ -59,7 +59,7 @@ require_git_repo "$LOCAL"
 
 RUN_ID="$(date +%y%m%d-%H%M%S)-audit"
 TS="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-OUT_DIR="${MEOWKIT_AUDIT_OUT_DIR:-.claude/benchmarks/audits}"
+OUT_DIR="${MEOWKIT_AUDIT_OUT_DIR:-.codex/benchmarks/audits}"
 mkdir -p "$OUT_DIR"
 OUT_FILE="$OUT_DIR/${RUN_ID}.json"
 
@@ -78,7 +78,7 @@ if [ -n "$REMOTE" ]; then
   if diff -qr --exclude=.git "$LOCAL" "$REMOTE" >/dev/null 2>&1; then DIFF_CLEAN=true; else DIFF_CLEAN=false; fi
 fi
 
-PY=".claude/skills/.venv/bin/python3"
+PY=".agents/skills/.venv/bin/python3"
 [ -x "$PY" ] || PY="python3"
 
 RUN_ID="$RUN_ID" TS="$TS" REPO="$LOCAL" OUT_FILE="$OUT_FILE" \
@@ -118,9 +118,9 @@ print(json.dumps(artifact, separators=(",", ":")))
 PY
 
 # Best-effort trace event — never fail the audit if the trace writer is absent/errors.
-if [ -x ".claude/hooks/append-trace.sh" ]; then
+if [ -x ".codex/hooks/append-trace.sh" ]; then
   TRACE_JSON="$(RUN_ID="$RUN_ID" REPO="$LOCAL" FILE_COUNT="$FILE_COUNT" OUT_FILE="$OUT_FILE" "$PY" -c 'import json,os; print(json.dumps({"run_id":os.environ["RUN_ID"],"repo":os.environ["REPO"],"tracked_file_count":int(os.environ["FILE_COUNT"]),"artifact":os.environ["OUT_FILE"]}))' 2>/dev/null || echo '{}')"
-  bash .claude/hooks/append-trace.sh audit_result "$TRACE_JSON" 2>/dev/null || true
+  bash .codex/hooks/append-trace.sh audit_result "$TRACE_JSON" 2>/dev/null || true
 fi
 
 echo "Audit artifact: $OUT_FILE" >&2

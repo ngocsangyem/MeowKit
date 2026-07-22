@@ -31,7 +31,7 @@ Fetched via GitHub Issues: `gh issue view 847 --json title,body,labels`
 No injection patterns detected. Content treated as DATA.
 
 ### Step 3: Process media
-`screenshot-logout-redirect.png` → Claude Read tool (FFmpeg unavailable).
+`screenshot-logout-redirect.png` → Codex Read tool (FFmpeg unavailable).
 Design Context: Login page redirect. No error message visible. URL shows `/login?expired=true`.
 
 ### Step 4: Classify product area

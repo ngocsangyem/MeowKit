@@ -15,12 +15,12 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 
 ## Pre-flight
 
-The parent SessionStart hook (`jira-env-loader.sh`) already validated `.claude/.env` presence + the 3 `MEOW_JIRA_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
+The parent SessionStart hook (`jira-env-loader.sh`) already validated `.codex/.env` presence + the 3 `MEOW_JIRA_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
 
 All `jira-as` invocations MUST go through:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
 ```
 
 Never call the binary directly. The wrapper handles env translation + JSON-output default.
@@ -43,14 +43,14 @@ After every successful operation, return:
 3. One-line summary of what changed
 4. One suggested next action (e.g. "transition to In Progress with `mk:jira-lifecycle`")
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Failure Handling (jira-as exit codes → user message)
 
 ```toon
 [7]{exit,action}
 1|Validation — re-read your `--help`, fix the flag, retry
-2|Auth — escalate; user updates `.claude/.env`
+2|Auth — escalate; user updates `.codex/.env`
 3|Permission — report; user lacks Jira permission
 4|Not found — confirm the issue/project key exists
 5|Rate limit — backoff + retry once

@@ -18,7 +18,7 @@ When analyzing blocker chains with `get_blockers.py --recursive`:
 
 ```bash
 # Before committing to a story, check blocker depth
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationships get-blockers STORY-100 --recursive --depth 5
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh relationships get-blockers STORY-100 --recursive --depth 5
 
 # Decision criteria:
 # - Depth 0-1: Safe to commit
@@ -39,7 +39,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationship
 ### Detection
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationships get-blockers PROJ-100 --recursive --output tree
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh relationships get-blockers PROJ-100 --recursive --output tree
 # Output shows [CIRCULAR] when cycle detected
 ```
 
@@ -74,7 +74,7 @@ Dependencies should flow as a DAG (Directed Acyclic Graph):
 
 ```bash
 # Bulk link all teams waiting on platform upgrade
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationships bulk-link \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh relationships bulk-link \
   --jql "project IN (TEAM-A, TEAM-B, TEAM-C) AND labels = needs-platform-v2" \
   --is-blocked-by PLATFORM-500
 ```
@@ -110,13 +110,13 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationship
 
 ```bash
 # Fresh start (no historical dependencies)
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationships clone PROJ-100
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh relationships clone PROJ-100
 
 # Preserve structure
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationships clone PROJ-100 --include-links --include-subtasks
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh relationships clone PROJ-100 --include-links --include-subtasks
 
 # Different project
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationships clone PROJ-100 --to-project OTHER
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh relationships clone PROJ-100 --to-project OTHER
 ```
 
 ### Post-Clone Checklist
@@ -146,17 +146,17 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationship
 
 ```bash
 # Too broad - overwhelming
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationships get-dependencies PROJECT-ROOT --output mermaid
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh relationships get-dependencies PROJECT-ROOT --output mermaid
 
 # Better - focused on current sprint
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationships get-dependencies SPRINT-EPIC --output mermaid
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh relationships get-dependencies SPRINT-EPIC --output mermaid
 ```
 
 ### Regular Updates
 
 ```bash
 # Weekly release dependency update
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh relationships get-dependencies RELEASE-EPIC --output dot > weekly-deps.dot
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh relationships get-dependencies RELEASE-EPIC --output dot > weekly-deps.dot
 dot -Tpng weekly-deps.dot -o release-deps-$(date +%Y%m%d).png
 ```
 

@@ -9,7 +9,7 @@ Single source of truth for Agile field identifiers.
 Field IDs vary by JIRA instance. **Always verify with:**
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields list --agile
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields list --agile
 ```
 
 ---
@@ -78,15 +78,15 @@ Field IDs on Server/Data Center installations may differ significantly:
 
 ```bash
 # List all Agile fields
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields list --agile
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields list --agile
 
 # Check specific project
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields check-project PROJ --check-agile
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields check-project PROJ --check-agile
 
 # Search by partial name
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields list --filter "sprint"
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields list --filter "story"
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields list --filter "epic"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields list --filter "sprint"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields list --filter "story"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields list --filter "epic"
 ```
 
 ---

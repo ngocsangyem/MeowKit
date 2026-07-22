@@ -34,7 +34,7 @@ switch (transport) {
 
 ## stdio — default for local agent processes
 
-`Claude Code`, `Cursor`, and similar clients spawn the server as a child process.
+`Codex`, `Cursor`, and similar clients spawn the server as a child process.
 
 ```ts
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";

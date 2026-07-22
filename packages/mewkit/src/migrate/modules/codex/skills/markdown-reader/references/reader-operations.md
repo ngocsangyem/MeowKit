@@ -11,7 +11,7 @@ Allowed-directory validation protects every path. The service only binds localho
 
 ## State, architecture, and recovery
 
-PID files live under `the project environment/markdown-reader/`, falling back to
+PID files live under `${PLUGIN_DATA}/markdown-reader/`, falling back to
 `~/.cache/mewkit/markdown-reader/`, so state survives plugin upgrades. The server combines a
 localhost CLI entry point, dynamic port allocation, PID management, HTTP/path guards, markdown
 rendering with syntax highlighting, and plan navigation. Assets contain the HTML template,

@@ -16,7 +16,7 @@ is unavailable. Support file — load during the prerequisite check or when the 
 
 Installing or configuring an MCP server changes the user's environment — never auto-run it.
 
-- Surface the command to the user; let them run it: `claude mcp add figma`.
+- Surface the command to the user; let them run it: `codex mcp add figma`.
 - Do not configure servers, tokens, or credentials on the user's behalf.
 
 ## Connectivity check
@@ -52,5 +52,5 @@ live server list before qualifying.
 MCP absent or unresponsive:
 
 1. Ask the user to export the target frame/screen as a PNG from Figma.
-2. Analyze the PNG via `mk:multimodal` (or Claude Read for simple cases).
+2. Analyze the PNG via `mk:multimodal` (or Codex Read for simple cases).
 3. Note reduced fidelity: exact spacing/variables are unavailable from a raster image; treat values as approximate.

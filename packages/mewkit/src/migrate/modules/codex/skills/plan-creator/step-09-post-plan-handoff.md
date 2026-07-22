@@ -23,7 +23,7 @@ For risk-tiered routing, invoke via `the cook skill` or `the fix skill`.
 
 ### 9b. Live Risk Re-Scan
 
-Run a single grep pass over `plan.md` and every `phase-XX-*.md` for trigger keywords from `.claude/rules/risk-checklist.md`: `AUTH`, `AUTHZ`, `DATA_MODEL`, `AUDIT_SEC`, `EXT_SYSTEM`. Use literal-string match (no regex).
+Run a single grep pass over `plan.md` and every `phase-XX-*.md` for trigger keywords from `.agents/skills/rule-risk-checklist.md`: `AUTH`, `AUTHZ`, `DATA_MODEL`, `AUDIT_SEC`, `EXT_SYSTEM`. Use literal-string match (no regex).
 
 If any keyword appears that was NOT in the original `matched_flags`, print this advisory and treat the re-scan match as the effective risk set for option ordering:
 
@@ -99,7 +99,7 @@ Print exactly one line matching the selection:
 | Hand off to mk:autobuild | `Run: the autobuild skill {absolute-path-to-plan.md}` |
 | End | (no command line — print "Plan complete. No next command queued.") |
 
-If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.claude/session-state/tdd-mode` surviving a fresh session.
+If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.codex/session-state/tdd-mode` surviving a fresh session.
 
 After the command line, print the Context Reminder block from `references/gate-1-approval.md` with the absolute path substituted.
 

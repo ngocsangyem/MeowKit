@@ -3,7 +3,7 @@
 > Loaded once per session by `mk:agent-detector` at Step 0b (sentinel-cached — read
 > on turn 1, suppressed on turns 2..N of the same session). This table is skill
 > dispatch only; it is NOT needed for agent/model-tier assignment, so it lives here
-> rather than in always-loaded `.claude/rules/agent-routing.md`.
+> rather than in always-loaded `.agents/skills/rule-agent-routing.md`.
 
 The orchestrator routes by skill names:
 

@@ -119,7 +119,7 @@ Transient, noisy, or not reusable (e.g., one-off command output, ephemeral env s
 - **Preserve frequency counts** when merging JSON patterns (sum the frequencies).
 - **Run validation checks** after every consolidation pass.
 - **Log what was changed** — append the summary to the markdown-native `quick-notes.md`
-  (NOT a canonical-store view like `fixes.md`; per `.claude/rules/memory-read-rules.md` →
+  (NOT a canonical-store view like `fixes.md`; per `.agents/skills/rule-memory-read-rules.md` →
   Write Rules, a write to a canonical `.md` view is invisible to JSON-first readers):
   ```
   ## YYYY-MM-DD — mk:memory — consolidation

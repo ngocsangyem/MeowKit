@@ -14,7 +14,7 @@ forbid-list AND match the allow-list to be read.
 
 Usage (stdin JSON):
   echo '{"keywords": ["auth"], "symbols": ["login"], "git_root": "/abs/path"}' \
-    | .claude/skills/.venv/bin/python3 scripts/scout-context.py
+    | .agents/skills/.venv/bin/python3 scripts/scout-context.py
 
 Output (stdout JSON):
   {
@@ -50,10 +50,10 @@ MAX_WALL_CLOCK_SECONDS = 30
 ALLOW_LIST = [
     "docs/project-context.md",
     "docs/*.md",
-    "CLAUDE.md",
     "AGENTS.md",
-    "*/CLAUDE.md",
-    "**/CLAUDE.md",
+    "AGENTS.md",
+    "*/AGENTS.md",
+    "**/AGENTS.md",
     "**/AGENTS.md",
     "README.md",
     "*/README.md",
@@ -74,8 +74,8 @@ SOURCE_EXTENSIONS = {
 
 # Forbid-list. Checked FIRST (default-deny).
 FORBID_LIST = [
-    ".claude/memory/*",
-    ".claude/memory/**",
+    ".meowkit/memory/*",
+    ".meowkit/memory/**",
     ".env",
     ".env.*",
     "tasks/*",
@@ -237,7 +237,7 @@ def _score_candidate(rel_path: str, keywords: list[str], symbols: list[str]) -> 
             score += 2
     if rel_path == "docs/project-context.md":
         score += 5
-    if rel_path == "CLAUDE.md":
+    if rel_path == "AGENTS.md":
         score += 4
     if rel_path == "README.md":
         score += 2
@@ -304,7 +304,7 @@ def _extract_summary(rel_path: str, lines: list[str]) -> str:
 def _scan_for_violations(hits: list[dict[str, Any]]) -> bool:
     """Failsafe: scan output for forbid-list references."""
     forbidden_substrings = [
-        ".claude/memory/",
+        ".meowkit/memory/",
         ".env",
         "id_rsa",
         "id_ed25519",

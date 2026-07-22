@@ -2,11 +2,11 @@
 """Initialize a new skill with proper structure.
 
 Offloads deterministic scaffolding (directory creation, template filling)
-so Claude only needs to review and customize the generated content.
+so Codex only needs to review and customize the generated content.
 
 Usage:
   python3 init-skill.py <skill-name> [--path <path>]
-  python3 init-skill.py mk:my-feature --path .claude/skills
+  python3 init-skill.py mk:my-feature --path .agents/skills
 
 Adapted from open-source upstream (MIT).
 """
@@ -32,7 +32,7 @@ description: "[TODO: Specific trigger keywords + what it does. Include WHEN to u
 ## When to Use
 
 **Auto-activate on:**
-- [TODO: keyword patterns Claude watches for]
+- [TODO: keyword patterns Codex watches for]
 
 **Explicit:** `/mk:{slug} [args]`
 
@@ -136,13 +136,13 @@ def init_skill(skill_name, base_path):
     skill_md = skill_dir / "SKILL.md"
     skill_md.write_text(content, encoding="utf-8")
 
-    # Print summary as JSON-like for Claude to parse
+    # Print summary as JSON-like for Codex to parse
     print(f"Skill scaffolded: {full_name}")
     print(f"  Directory: {skill_dir}")
     print(f"  SKILL.md: {skill_md} ({len(content.splitlines())} lines)")
     print(f"  references/: created (empty)")
     print()
-    print("TODO items for Claude to complete:")
+    print("TODO items for Codex to complete:")
     print("  1. Fill description in frontmatter with specific trigger keywords")
     print("  2. Write Overview section (1-2 sentences)")
     print("  3. Define auto-activate patterns in When to Invoke")
@@ -162,14 +162,14 @@ def main():
         print()
         print("Examples:")
         print("  python3 init-skill.py mk:my-feature")
-        print("  python3 init-skill.py my-feature --path .claude/skills")
-        print("  python3 init-skill.py mk:data-validator --path .claude/skills")
+        print("  python3 init-skill.py my-feature --path .agents/skills")
+        print("  python3 init-skill.py mk:data-validator --path .agents/skills")
         print()
         print("Note: mk: prefix is auto-prepended if missing")
         sys.exit(1)
 
     skill_name = sys.argv[1]
-    base_path = ".claude/skills"
+    base_path = ".agents/skills"
 
     if "--path" in sys.argv:
         idx = sys.argv.index("--path")

@@ -44,7 +44,7 @@ The agent validates paths at the agent boundary AND `confluence-as` validates in
 
 1. **Agent boundary check:**
    - Reject paths containing `..` traversal
-   - Reject absolute paths outside `the project environment` and explicitly allowlisted ephemeral prefixes (`/tmp/conf-*`, `/var/folders/`)
+   - Reject absolute paths outside `$(git rev-parse --show-toplevel)` and explicitly allowlisted ephemeral prefixes (`/tmp/conf-*`, `/var/folders/`)
    - Reject paths to sensitive files (`*.env`, `~/.ssh/*`, `*.pem`, `*credentials*`, `*secret*`) per `injection-rules.md` Rule 4
 
 2. **Wrapper boundary check:** `confluence-as` calls `validate_file_path` which delegates to `assistant_skills_lib`. Treat as defense-in-depth — do not rely on it as the sole gate.
@@ -62,7 +62,7 @@ Conventions for the agent when downloading attachments (e.g. for image analysis 
 Example flow:
 
 ```bash
-bash the project environment/.agents/skills/confluence/scripts/confluence-as.sh attachment download \
+bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh attachment download \
   --attachment-id 9876 --output /tmp/conf-attach-9876.png
 # ... use the file ...
 rm /tmp/conf-attach-9876.png

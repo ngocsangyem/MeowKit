@@ -1,8 +1,8 @@
 # Team Mode Detection
 
-**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+**When:** `the project environment=1` is enabled.
 
-On Claude Code, team mode spawns multiple instances as **teammates** (persistent, peer-to-peer messaging, shared task list) instead of **sub-task** (fire-and-forget, hub-spoke).
+On Codex, team mode spawns multiple instances as **teammates** (persistent, peer-to-peer messaging, shared task list) instead of **sub-task** (fire-and-forget, hub-spoke).
 
 ## Complexity Gate (CRITICAL -- Token Savings)
 

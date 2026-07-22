@@ -6,7 +6,7 @@ The authoritative source for "what statuses + transitions exist in your Jira" is
 
 ```bash
 # Admin path (preferred): full graph
-bash the project environment/.agents/skills/jira/scripts/fetch-workflow.sh PROJ-123
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh PROJ-123
 
 # What it writes
 tasks/jira-workflows/_schemes/PROJ.md          # project → workflow mapping
@@ -83,13 +83,13 @@ The lifecycle agent's pre-flight runs:
 
 ```bash
 # Sanity-check: do the cached transitions still match what Jira returns?
-LIVE=$(bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transitions PROJ-123 --output json | jq -r '.[] | .id' | sort)
+LIVE=$(bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transitions PROJ-123 --output json | jq -r '.[] | .id' | sort)
 CACHED=$(grep '^| [0-9]' tasks/jira-workflows/<slug>.md | awk '{print $2}' | sort)
 
 # If LIVE ⊄ CACHED → cache is stale, re-fetch
 ```
 
-A mismatch surfaces as: "Cache may be stale (live transitions diverge). Re-fetch with `bash the project environment/.agents/skills/jira/scripts/fetch-workflow.sh PROJ-123`?"
+A mismatch surfaces as: "Cache may be stale (live transitions diverge). Re-fetch with `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh PROJ-123`?"
 
 ### Manual invalidation
 
@@ -136,5 +136,5 @@ If you find yourself asking "what statuses does this project use?" — read the 
 
 - `admin workflow for-issue` requires Jira admin. Project-admin sufficiency varies by Atlassian deployment; runtime test only.
 - Workflow `updated` timestamp from Cloud may not propagate immediately on edits; treat as advisory.
-- Multi-tenant Jira (e.g., consulting orgs hopping instances) — cache is per-`CLAUDE_PROJECT_DIR`, so each working dir has its own; no cross-tenant leakage.
+- Multi-tenant Jira (e.g., consulting orgs hopping instances) — cache is per-`the project environment`, so each working dir has its own; no cross-tenant leakage.
 - jira-as version drift: if `admin workflow for-issue` is removed/renamed, `fetch-workflow.sh` falls back to non-admin discovery; agent surfaces the gap.

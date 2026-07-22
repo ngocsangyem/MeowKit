@@ -3,7 +3,7 @@
  * Showcase skill preferences helper.
  * Persists workflow opt-outs (screenshots, publishing, languages) across sessions.
  *
- * State is written to CLAUDE_PLUGIN_DATA/showcase/preferences.json (Rule 2 — stable
+ * State is written to PLUGIN_DATA/showcase/preferences.json (Rule 2 — stable
  * across plugin upgrades). Falls back to ~/.cache/mewkit/showcase/preferences.json.
  *
  * Override path for tests: MK_SHOWCASE_PREFS_PATH env var.
@@ -26,12 +26,12 @@ const VALID_LANGUAGES = new Set(['en', 'vi']);
 
 /**
  * Resolve preferences file path.
- * Priority: MK_SHOWCASE_PREFS_PATH > CLAUDE_PLUGIN_DATA/showcase > fallback cache dir.
+ * Priority: MK_SHOWCASE_PREFS_PATH > PLUGIN_DATA/showcase > fallback cache dir.
  */
 export function resolvePreferencesPath(env = process.env) {
   if (env.MK_SHOWCASE_PREFS_PATH) return path.resolve(env.MK_SHOWCASE_PREFS_PATH);
-  const dataBase = env.CLAUDE_PLUGIN_DATA
-    ? path.join(env.CLAUDE_PLUGIN_DATA, 'showcase')
+  const dataBase = env.PLUGIN_DATA
+    ? path.join(env.PLUGIN_DATA, 'showcase')
     : path.join(os.homedir(), '.cache', 'mewkit', 'showcase');
   return path.join(dataBase, 'preferences.json');
 }

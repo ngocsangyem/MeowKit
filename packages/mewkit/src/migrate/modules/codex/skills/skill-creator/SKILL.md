@@ -7,7 +7,7 @@ description: "Create new skills with proper structure, compliance checks, and re
 
 Create new skills with proper structure, compliance, and registration.
 
-> **Path convention:** Commands below assume cwd is `the project environment` (project root). Prefix paths with `"the project environment/"` when invoking from subdirectories.
+> **Path convention:** Commands below assume cwd is `$(git rev-parse --show-toplevel)` (project root). Prefix paths with `"$(git rev-parse --show-toplevel)/"` when invoking from subdirectories.
 
 ## When to Use
 
@@ -23,7 +23,7 @@ Meta skill — not tied to a specific Phase. Invoked on-demand for skill develop
 
 ## Scripts
 
-**Script-first approach** — Python scripts handle scaffolding and validation. Claude reviews and fills in the content.
+**Script-first approach** — Python scripts handle scaffolding and validation. Codex reviews and fills in the content.
 
 ```bash
 # Scaffold a new skill (creates directory + template SKILL.md)
@@ -37,7 +37,7 @@ Meta skill — not tied to a specific Phase. Invoked on-demand for skill develop
 
 1. **Gather intent** — what should the skill do? When should it trigger? What output format?
 2. **Scaffold** — run `init-skill.py` to create directory + template SKILL.md with TODO markers
-3. **Fill content** — Claude completes each TODO section in the generated template
+3. **Fill content** — Codex completes each TODO section in the generated template
 4. **Add references/** — if skill body would exceed ~100 lines, split into references
 5. **Security boundaries** — load `mk:skill-template-secure` template for trust model if needed
 6. **Validate** — run `validate-skill.py` to check compliance (8-point checklist)
@@ -90,7 +90,7 @@ After generating, check:
 - [ ] Failure handling covers identified failure modes
 - [ ] SKILL.md ≤ 500 lines (per `skill-authoring-rules.md` Rule 3; overflow → references/ or step files)
 - [ ] `## Gotchas` section present (per Rule 1 — mandatory, placeholder acceptable day-1)
-- [ ] No conflict with existing `.claude/rules/`
+- [ ] No conflict with existing `.agents/skills/rule-`
 
 **Score:** X/8 — PASS (≥7) / FAIL (<7)
 
@@ -121,7 +121,7 @@ If FAIL: fix failing items before registering.
 6. **On-demand hooks** — skills can register session-scoped hooks in frontmatter for enforcement during execution.
 7. **config.json for setup** — if skill needs user-specific values, store in config.json. Agent asks on first use.
 8. **Memory strategy** — stateful skills should document what they persist and where.
-9. **Don't state the obvious** — only include knowledge that pushes Claude beyond its defaults.
+9. **Don't state the obvious** — only include knowledge that pushes Codex beyond its defaults.
 10. **One skill type** — classify using the 9-type taxonomy. See `references/skill-types.md`.
 
 ### Mandatory checklist before finalizing any skill
@@ -133,7 +133,7 @@ If FAIL: fix failing items before registering.
 - [ ] Uses filesystem beyond SKILL.md (or documents why not needed)
 <!-- research-citation -->
 - [ ] Classified into one Anthropic skill type
-- [ ] Persistent state (if any) writes to `the project environment`, NOT skill directory (Rule 2)
+- [ ] Persistent state (if any) writes to `${PLUGIN_DATA}`, NOT skill directory (Rule 2)
 
 ## References
 
@@ -155,4 +155,4 @@ If FAIL: fix failing items before registering.
 - **Template must include `## Gotchas` header** — even as a placeholder. `skill-authoring-rules.md` Rule 1 is hard-enforced by `validate-skill.py`. Day-1 skills may use `(none yet — grow from observed failures)` but the header itself is mandatory.
 <!-- research-citation -->
 - **Line cap is 500, not 150** — the canonical threshold comes from `skill-authoring-rules.md` Rule 3 (Anthropic progressive-disclosure guidance). Step-file skills (with `workflow.md`) auto-pass regardless of line count.
-- **Persistent state goes to `the project environment`, not skill directory** — Rule 2 prevents data loss on plugin upgrade. framework-internal paths (`.meowkit/memory/`, `session-state/`) are exempt.
+- **Persistent state goes to `${PLUGIN_DATA}`, not skill directory** — Rule 2 prevents data loss on plugin upgrade. framework-internal paths (`.meowkit/memory/`, `session-state/`) are exempt.

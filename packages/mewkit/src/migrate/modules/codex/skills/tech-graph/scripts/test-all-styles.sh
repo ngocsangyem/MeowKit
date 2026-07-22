@@ -25,7 +25,7 @@ mkdir -p "$TEST_DIR"
 
 # Test configuration
 STYLES=(1 2 3 4 5 6 7)
-STYLE_NAMES=("Flat Icon" "Dark Terminal" "Blueprint" "Notion Clean" "Glassmorphism" "Claude Official" "OpenAI Official")
+STYLE_NAMES=("Flat Icon" "Dark Terminal" "Blueprint" "Notion Clean" "Glassmorphism" "Codex Official" "OpenAI Official")
 
 # Summary counters
 TOTAL=0

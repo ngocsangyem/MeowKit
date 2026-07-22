@@ -70,7 +70,7 @@ Narrative covering:
 Check review JSONL logs for plan completion data from the ship skill runs this period:
 
 ```bash
-eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)"
+eval "$(.codex/scripts/bin/workflow-slug 2>/dev/null)"
 cat .meowkit/memory/projects/*-reviews.jsonl 2>/dev/null | grep '"skill":"ship"' | grep '"plan_items_total"' || echo "NO_PLAN_DATA"
 ```
 
@@ -120,7 +120,7 @@ For each teammate (sorted by commits descending), write a section:
   - "Most commits land in a single burst — spacing work across the day could reduce context-switching fatigue"
   - "All commits land between 1-4am — sustainable pace matters for code quality long-term"
 
-**AI collaboration note:** If many commits have `Co-Authored-By` AI trailers (e.g., Claude, Copilot), note the AI-assisted commit percentage as a team metric. Frame it neutrally — "N% of commits were AI-assisted" — without judgment.
+**AI collaboration note:** If many commits have `Co-Authored-By` AI trailers (e.g., Codex, Copilot), note the AI-assisted commit percentage as a team metric. Frame it neutrally — "N% of commits were AI-assisted" — without judgment.
 
 ### Top 3 Team Wins
 Identify the 3 highest-impact things shipped in the window across the whole team. For each:

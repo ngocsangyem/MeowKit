@@ -29,7 +29,7 @@ Follow these steps strictly in order:
    the invocation arguments before reading any content.
 
 2. **Load persisted preferences** (optional) — read user preferences from
-   `the project environment/showcase/preferences.json`:
+   `${PLUGIN_DATA}/showcase/preferences.json`:
    ```bash
    node .agents/skills/showcase/scripts/preferences.js get
    ```
@@ -107,7 +107,7 @@ node .agents/skills/showcase/scripts/preferences.js set --languages en
 node .agents/skills/showcase/scripts/preferences.js reset
 ```
 
-State is written to `the project environment/showcase/preferences.json` (stable across
+State is written to `${PLUGIN_DATA}/showcase/preferences.json` (stable across
 plugin upgrades). Override path for tests: `MK_SHOWCASE_PREFS_PATH` env var.
 
 ## Capture Script Options

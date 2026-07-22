@@ -20,7 +20,7 @@ After producing the Completion Summary, clean up any handoff notes for this bran
 the review is complete and the context is no longer needed.
 
 ```bash
-eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)"
+eval "$(.codex/scripts/bin/workflow-slug 2>/dev/null)"
 rm -f .meowkit/memory/projects/*-$BRANCH-ceo-handoff-*.md 2>/dev/null || true
 ```
 
@@ -35,7 +35,7 @@ the same pattern. The review dashboard depends on this data. Skipping this
 command breaks the review readiness dashboard in /ship.
 
 ```bash
-.claude/scripts/bin/workflow-review-log '{"skill":"plan-ceo-review","timestamp":"TIMESTAMP","status":"STATUS","unresolved":N,"critical_gaps":N,"mode":"MODE","scope_proposed":N,"scope_accepted":N,"scope_deferred":N,"commit":"COMMIT"}'
+.codex/scripts/bin/workflow-review-log '{"skill":"plan-ceo-review","timestamp":"TIMESTAMP","status":"STATUS","unresolved":N,"critical_gaps":N,"mode":"MODE","scope_proposed":N,"scope_accepted":N,"scope_deferred":N,"commit":"COMMIT"}'
 ```
 
 Before running this command, substitute the placeholder values from the Completion Summary you just produced:
@@ -54,7 +54,7 @@ Before running this command, substitute the placeholder values from the Completi
 After completing the review, read the review log and config to display the dashboard.
 
 ```bash
-.claude/scripts/bin/workflow-review-log
+.codex/scripts/bin/workflow-review-log
 ```
 
 Parse the output. Find the most recent entry for each skill (plan-ceo-review, plan-ceo-review, review, plan-design-review, design-review-lite, adversarial-review, codex-review, codex-plan-review). Ignore entries with timestamps older than 7 days. For the Eng Review row, show whichever is more recent between `review` (diff-scoped pre-landing review) and `plan-ceo-review` (plan-stage architecture review). Append "(DIFF)" or "(PLAN)" to the status to distinguish. For the Adversarial row, show whichever is more recent between `adversarial-review` (new auto-scaled) and `codex-review` (legacy). For Design Review, show whichever is more recent between `plan-design-review` (full visual audit) and `design-review-lite` (code-level check). Append "(FULL)" or "(LITE)" to the status to distinguish. Display:
@@ -79,8 +79,8 @@ Parse the output. Find the most recent entry for each skill (plan-ceo-review, pl
 - **Eng Review (required by default):** The only review that gates shipping. Covers architecture, code quality, tests, performance. Can be disabled globally with `workflow-config set skip_eng_review true` (the "don't bother me" setting).
 - **CEO Review (optional):** Use your judgment. Recommend it for big product/business changes, new user-facing features, or scope decisions. Skip for bug fixes, refactors, infra, and cleanup.
 - **Design Review (optional):** Use your judgment. Recommend it for UI/UX changes. Skip for backend-only, infra, or prompt-only changes.
-- **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get one Claude adversarial pass. Large diffs (200+) get two Claude adversarial passes (attack-surface + failure-mode). No configuration needed.
-- **Outside Voice (optional):** Independent plan review from a Claude adversarial sub-task with fresh context. Offered after all review sections complete in the plan-ceo-review skill. Never gates shipping.
+- **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get one Codex adversarial pass. Large diffs (200+) get two Codex adversarial passes (attack-surface + failure-mode). No configuration needed.
+- **Outside Voice (optional):** Independent plan review from a Codex adversarial sub-task with fresh context. Offered after all review sections complete in the plan-ceo-review skill. Never gates shipping.
 
 **Verdict logic:**
 - **CLEARED**: Eng Review has >= 1 entry within 7 days from either `review` or `plan-ceo-review` with status "clean" (or `skip_eng_review` is `true`)
@@ -132,7 +132,7 @@ Produce this markdown table:
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `the plan-ceo-review skill` | Scope & strategy | {runs} | {status} | {findings} |
-| Outside Voice | Claude adversarial sub-task | Independent 2nd opinion | {runs} | {status} | {findings} |
+| Outside Voice | Codex adversarial sub-task | Independent 2nd opinion | {runs} | {status} | {findings} |
 | Design Review | `/plan-design-review` | UI/UX gaps | {runs} | {status} | {findings} |
 ```
 

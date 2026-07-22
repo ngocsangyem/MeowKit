@@ -64,7 +64,7 @@ When you are in plan mode and about to call ExitPlanMode:
 3. If it does NOT — run this command:
 
 ```bash
-.claude/scripts/bin/workflow-review-log
+.codex/scripts/bin/workflow-review-log
 ```
 
 Then write a `## REVIEW REPORT` section to the end of the plan file:

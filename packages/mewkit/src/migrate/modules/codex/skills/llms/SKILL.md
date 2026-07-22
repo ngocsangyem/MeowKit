@@ -7,7 +7,7 @@ description: "Generate llms.txt files from project documentation following the l
 
 Generate [llms.txt](https://llmstxt.org/) files — LLM-friendly markdown indexes of project documentation.
 
-> **Path convention:** Commands below assume cwd is `the project environment` (project root). Prefix paths with `"the project environment/"` when invoking from subdirectories.
+> **Path convention:** Commands below assume cwd is `$(git rev-parse --show-toplevel)` (project root). Prefix paths with `"$(git rev-parse --show-toplevel)/"` when invoking from subdirectories.
 
 ## When to Use
 
@@ -34,14 +34,14 @@ Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter`
 
 ## Scripts
 
-**Script-first approach** — the Python script handles all deterministic work (scanning, extracting, categorizing, generating). Claude only reviews and improves the output.
+**Script-first approach** — the Python script handles all deterministic work (scanning, extracting, categorizing, generating). Codex only reviews and improves the output.
 
 ```bash
 # Generate llms.txt (script does the heavy lifting)
 .agents/skills/.venv/bin/python3 .agents/skills/llms/scripts/generate-llms-txt.py \
   --source ./docs [--output .] [--base-url https://example.com/docs] [--full]
 
-# Preview metadata first (Claude reviews before generating)
+# Preview metadata first (Codex reviews before generating)
 .agents/skills/.venv/bin/python3 .agents/skills/llms/scripts/generate-llms-txt.py \
   --source ./docs --json
 ```
@@ -94,4 +94,4 @@ Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter`
 
 ## Gotchas
 
-- **Python venv required**: run `.claude/scripts/bin/setup-workflow` once from the project root before invoking this skill. Re-run after upgrading the toolkit.
+- **Python venv required**: run `.codex/scripts/bin/setup-workflow` once from the project root before invoking this skill. Re-run after upgrading the toolkit.

@@ -16,7 +16,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 ## Pre-flight
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
 ```
 
 
@@ -40,7 +40,7 @@ Pipe into `gh pr create --title "$(jira-as ... | jq -r .title)" --body "$(jira-a
 
 ## Handoff — `mk:ship`
 
-`mk:ship` may invoke `bash the project environment/.agents/skills/jira/scripts/jira-as.sh dev branch-name <KEY>` during its branch-creation step (documentation only — no automatic wiring exists today). If `mk:ship` is invoked with a Jira key context, it will surface the suggested branch name; the user accepts or overrides.
+`mk:ship` may invoke `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh dev branch-name <KEY>` during its branch-creation step (documentation only — no automatic wiring exists today). If `mk:ship` is invoked with a Jira key context, it will surface the suggested branch name; the user accepts or overrides.
 
 ## Memory
 
@@ -50,7 +50,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: generated artifact (branch name / PR title + body / commit list) + ready-to-run `git`/`gh` command.
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Gotchas
 

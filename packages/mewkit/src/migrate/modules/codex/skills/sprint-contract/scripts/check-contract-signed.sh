@@ -19,8 +19,8 @@ set -u
 #    MINIMAL (Haiku) = contract skipped, LEAN (Opus 4.6+) = contract optional
 if [ "${MEOWKIT_AUTOBUILD_MODE:-}" = "LEAN" ] || [ "${MEOWKIT_AUTOBUILD_MODE:-}" = "MINIMAL" ]; then
   # Log the bypass for audit (per security considerations) but don't block
-  if [ -d ".claude" ]; then
-    log_file=".claude/memory/lean-bypass.log"
+  if [ -d ".codex" ]; then
+    log_file=".meowkit/memory/lean-bypass.log"
     mkdir -p "$(dirname "$log_file")" 2>/dev/null || true
     echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) MEOWKIT_AUTOBUILD_MODE=LEAN bypassed contract gate" >> "$log_file" 2>/dev/null || true
   fi
@@ -61,7 +61,7 @@ if [ ! -d "tasks/contracts" ]; then
   echo "Phase 4 sprint contract is required for source code edits on plan: $active_plan_dir" >&2
   echo "" >&2
   echo "To proceed, do ONE of:" >&2
-  echo "  1. Run: /mk:sprint-contract propose $slug" >&2
+  echo "  1. Run: the sprint-contract skill propose $slug" >&2
   echo "  2. Set: export MEOWKIT_AUTOBUILD_MODE=LEAN  (skips contract for Opus 4.6 tier)" >&2
   exit 1
 fi
@@ -105,7 +105,7 @@ echo "" >&2
 echo "Phase 4 sprint contract gate requires a signed contract before source edits." >&2
 echo "" >&2
 echo "To proceed, do ONE of:" >&2
-echo "  1. Run: /mk:sprint-contract propose $slug" >&2
-echo "     Then: /mk:sprint-contract sign (after evaluator review)" >&2
+echo "  1. Run: the sprint-contract skill propose $slug" >&2
+echo "     Then: the sprint-contract skill sign (after evaluator review)" >&2
 echo "  2. Set: export MEOWKIT_AUTOBUILD_MODE=LEAN  (Opus 4.6 LEAN mode bypass)" >&2
 exit 1

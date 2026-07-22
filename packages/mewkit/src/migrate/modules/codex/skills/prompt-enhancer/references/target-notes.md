@@ -1,7 +1,7 @@
 # Target-Specific Notes (annotation adapters)
 
 > Loaded by `mk:prompt-enhancer` ONLY when BOTH hold: `--analyze` is active AND
-> the input explicitly names a target model or runtime ("for Claude", "for
+> the input explicitly names a target model or runtime ("for Codex", "for
 > Codex", "targeting Gemini", "Droid/Factory"). It renders one optional
 > **"Target-specific notes"** block after Section 3 of the analysis.
 >
@@ -45,7 +45,7 @@ describe *what to consider*; they do not rewrite the kernel.
 | Adapter | When (input names) | Added techniques (notes only) | Must NOT do | Risk |
 |---|---|---|---|---|
 | **default** | no target | universal kernel; neutral `--- DATA ---` fence | — | none (baseline) |
-| **claude** | Claude / Anthropic | may use XML sections for very complex prompts; long documents near the top, instruction after; explicit tool/safety boundaries | force XML into the default rewrite; add "think step by step"; role-as-XML | Claude-izing a portable enhancer |
+| **codex** | Codex / Anthropic | may use XML sections for very complex prompts; long documents near the top, instruction after; explicit tool/safety boundaries | force XML into the default rewrite; add "think step by step"; role-as-XML | Codex-izing a portable enhancer |
 | **codex** | Codex / OpenAI / GPT | autonomy + persistence; codebase exploration; tool/patch discipline; concise progress updates | inject `apply_patch` / CLI boilerplate into a generic prompt; assume a harness | Harness leakage |
 | **gemini** | Gemini | concise direct instruction; `thinking_level` control; put the long-context question last; state media resolution | low-temperature advice; legacy `thinking_budget`; force chain-of-thought scaffolds | Misprompting Gemini |
 | **droid/factory** | Droid / Factory | structured outcome; explicit acceptance criteria; role/task framing | treat the refiner taxonomy as a mandate; assume one behavior for all models | Over-structuring |

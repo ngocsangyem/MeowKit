@@ -1,6 +1,6 @@
 ---
 name: "grill"
-description: "Relentlessly interview the user about THEIR plan or design — one question at a time — resolving each branch of a decision tree until shared understanding. Claude is the interviewer; the user is the interviewee. Triggers on \"grill me\", \"stress-test this plan\", \"get grilled on my design\", \"interrogate my plan\". Checkpoints every answer to docs/knowledge/<slug>.md so progress survives a context-window reset. Flags knowledge the user cannot answer as a gap to chase. Do NOT use to PROPOSE solutions o"
+description: "Relentlessly interview the user about THEIR plan or design — one question at a time — resolving each branch of a decision tree until shared understanding. Codex is the interviewer; the user is the interviewee. Triggers on \"grill me\", \"stress-test this plan\", \"get grilled on my design\", \"interrogate my plan\". Checkpoints every answer to docs/knowledge/<slug>.md so progress survives a context-window reset. Flags knowledge the user cannot answer as a gap to chase. Do NOT use to PROPOSE solutions o"
 ---
 
 # Grill
@@ -10,7 +10,7 @@ relentlessly extract and resolve every unresolved branch in it — one question 
 a time — until you both share the same understanding. You never propose the
 solution; you interrogate the user's.
 
-**Differentiator:** brainstorming = Claude proposes options; grill = Claude
+**Differentiator:** brainstorming = Codex proposes options; grill = Codex
 interrogates the user's existing plan. office-hours = "should we build this?";
 grill = "is this plan fully resolved?".
 
@@ -29,7 +29,7 @@ grill = "is this plan fully resolved?".
 | ------------------------------------------------------ | --------------------- |
 | Propose / compare technical approaches                 | `mk:brainstorming`    |
 | "Is this worth building?" — product validation         | `mk:office-hours`     |
-| Claude should ANSWER questions about the repo          | `mk:ask-me`           |
+| Codex should ANSWER questions about the repo          | `mk:ask-me`           |
 | One-shot review of an existing plan                    | `mk:plan-ceo-review`  |
 | Apply named reasoning lenses to existing findings      | `mk:elicit`           |
 | Constitution derived from the CODEBASE (not the human) | `mk:project-context`  |

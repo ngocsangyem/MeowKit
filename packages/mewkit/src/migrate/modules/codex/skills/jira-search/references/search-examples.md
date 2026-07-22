@@ -186,11 +186,11 @@ fixVersion in releasedVersions()
 
 ```bash
 # My open issues
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh search query "assignee = currentUser() AND status != Done"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search query "assignee = currentUser() AND status != Done"
 
 # Export overdue issues
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh search export "duedate < now() AND status != Done" --output overdue.csv
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search export "duedate < now() AND status != Done" --output overdue.csv
 
 # Bulk update stale issues
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh search bulk-update "updated <= -30d AND status = Open" --add-labels "stale"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search bulk-update "updated <= -30d AND status = Open" --add-labels "stale"
 ```

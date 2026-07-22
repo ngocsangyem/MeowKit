@@ -33,7 +33,7 @@ echo "$FREEZE_DIR"
 
 ```bash
 FREEZE_DIR="${FREEZE_DIR%/}/"
-STATE_DIR="the project environment:-.meowkit/memory}"
+STATE_DIR="${PLUGIN_DATA:-.meowkit/memory}"
 mkdir -p "$STATE_DIR"
 echo "$FREEZE_DIR" > "$STATE_DIR/freeze-dir.txt"
 echo "Freeze boundary set: $FREEZE_DIR"

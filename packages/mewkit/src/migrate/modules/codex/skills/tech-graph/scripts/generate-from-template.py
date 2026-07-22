@@ -273,7 +273,7 @@ STYLE_PROFILES: Dict[int, Dict[str, object]] = {
         "legend_fill": "#cbd5e1",
     },
     6: {
-        "name": "Claude Official",
+        "name": "Codex Official",
         "font_family": "'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif",
         "background": "#f8f6f3",
         "shadow": False,

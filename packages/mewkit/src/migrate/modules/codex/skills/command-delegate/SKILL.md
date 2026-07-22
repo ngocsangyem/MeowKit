@@ -26,7 +26,7 @@ Use `stop and ask the user in chat` for each field. Always include an `Other` op
 | #   | Field                     | Source                                                          |
 | --- | ------------------------- | --------------------------------------------------------------- |
 | 1   | Task                      | Argument OR ask user                                            |
-| 2   | Work context              | Auto-detect from `CLAUDE_PROJECT_DIR`; user may override        |
+| 2   | Work context              | Auto-detect from `the project environment`; user may override        |
 | 3   | Plan reference            | Auto-detect from `session-state/active-plan`; user may override |
 | 4   | Files to modify           | Ask user (glob patterns)                                        |
 | 5   | Files to read for context | Ask user (specific paths)                                       |
@@ -49,7 +49,7 @@ If any pattern matches: **STOP, highlight the offending field, prompt user to re
 
 ## Output Format
 
-Emit the prompt inside a fenced block with the visible review header. Target: ≤200 tokens (claudekit-engineer's quality bar).
+Emit the prompt inside a fenced block with the visible review header. Target: ≤200 tokens (codexkit-engineer's quality bar).
 
 ```
 ---DELEGATION PROMPT (review before pasting into Task tool)---
@@ -75,7 +75,7 @@ The prompt above passes:
 
 - **NO** session history
 - **NO** prior conversation context
-- **NO** CLAUDE.md content (sub-task inherits via its own SessionStart)
+- **NO** AGENTS.md content (sub-task inherits via its own SessionStart)
 - **NO** orchestrator reasoning chain
 
 The sub-task starts with a clean context containing **only** what was listed above.
@@ -90,5 +90,5 @@ The toolkit's sub-task context isolation is currently prompt-protocol-only. `orc
 
 ## See Also
 
-- `.claude/rules/orchestration-rules.md` — delegation rules, anti-patterns, isolation boundaries, inner-harness compatibility, and rejected patterns
-- `.claude/commands/mk/spawn.md` — parallel-agent launcher (Conductor pattern). DIFFERENT command. Use `mk:spawn` for multi-agent parallel work in isolated worktrees; use `mk:delegate` to assemble a single context-isolated prompt for one sub-task.
+- `.agents/skills/rule-orchestration-rules.md` — delegation rules, anti-patterns, isolation boundaries, inner-harness compatibility, and rejected patterns
+- `.codex/commands/mk/spawn.md` — parallel-agent launcher (Conductor pattern). DIFFERENT command. Use `mk:spawn` for multi-agent parallel work in isolated worktrees; use `mk:delegate` to assemble a single context-isolated prompt for one sub-task.

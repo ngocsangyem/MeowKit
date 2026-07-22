@@ -3,7 +3,7 @@
 Check if the diff touches frontend files using `workflow-diff-scope`:
 
 ```bash
-source <(.claude/scripts/bin/workflow-diff-scope <base> 2>/dev/null)
+source <(.codex/scripts/bin/workflow-diff-scope <base> 2>/dev/null)
 ```
 
 **If `SCOPE_FRONTEND=false`:** Skip design review silently. No output.
@@ -12,14 +12,14 @@ source <(.claude/scripts/bin/workflow-diff-scope <base> 2>/dev/null)
 
 1. **Check for DESIGN.md.** If `DESIGN.md` or `design-system.md` exists in the repo root, read it. All design findings are calibrated against it — patterns blessed in DESIGN.md are not flagged. If not found, use universal design principles.
 
-2. **Load design rubrics from the rubric library** (NOT the deleted `design-checklist.md`). The legacy `design-checklist.md` was removed in a prior cleanup; the design judgment surface now lives in `.claude/rubrics/design-quality.md` and `.claude/rubrics/originality.md`. Load both via:
+2. **Load design rubrics from the rubric library** (NOT the deleted `design-checklist.md`). The legacy `design-checklist.md` was removed in a prior cleanup; the design judgment surface now lives in `.codex/rubrics/design-quality.md` and `.codex/rubrics/originality.md`. Load both via:
 
    ```bash
    .agents/skills/rubric/scripts/load-rubric.sh design-quality
    .agents/skills/rubric/scripts/load-rubric.sh originality
    ```
 
-   **If the rubric library is not yet installed** (i.e., `.claude/rubrics/` does not exist), DO NOT silently skip — emit an explicit warning to the review verdict: `"WARN: design rubrics unavailable, design review degraded to mechanical-only. Install mk:rubric library."` and continue with mechanical CSS checks only. The previous silent-skip behavior masked a real evaluation gap (design review was disabled entirely without notice).
+   **If the rubric library is not yet installed** (i.e., `.codex/rubrics/` does not exist), DO NOT silently skip — emit an explicit warning to the review verdict: `"WARN: design rubrics unavailable, design review degraded to mechanical-only. Install mk:rubric library."` and continue with mechanical CSS checks only. The previous silent-skip behavior masked a real evaluation gap (design review was disabled entirely without notice).
 
 3. **Read each changed frontend file** (full file, not just diff hunks). Frontend files are identified by `.tsx`, `.jsx`, `.vue`, `.svelte`, `.css`, `.scss` extensions plus any path containing `components/`, `pages/`, `app/`, `views/`.
 
@@ -36,18 +36,18 @@ source <(.claude/scripts/bin/workflow-diff-scope <base> 2>/dev/null)
 6. **Log the result** for the Review Readiness Dashboard:
 
 ```bash
-.claude/scripts/bin/workflow-review-log '{"skill":"design-review-lite","timestamp":"TIMESTAMP","status":"STATUS","findings":N,"auto_fixed":M,"commit":"COMMIT"}'
+.codex/scripts/bin/workflow-review-log '{"skill":"design-review-lite","timestamp":"TIMESTAMP","status":"STATUS","findings":N,"auto_fixed":M,"commit":"COMMIT"}'
 ```
 
 Substitute: TIMESTAMP = ISO 8601 datetime, STATUS = "clean" if 0 findings or "issues_found", N = total findings, M = auto-fixed count, COMMIT = output of `git rev-parse --short HEAD`.
 
-7. **Design voice adversarial pass** (optional, Claude sub-task):
+7. **Design voice adversarial pass** (optional, Codex sub-task):
 
-For high-value frontend diffs, dispatch a Claude adversarial sub-task via the Agent tool. sub-task prompt:
+For high-value frontend diffs, dispatch a Codex adversarial sub-task via the Agent tool. sub-task prompt:
 
 "Review the git diff on this branch. Run 7 litmus checks (YES/NO each): 1. Brand/product unmistakable in first screen? 2. One strong visual anchor present? 3. Page understandable by scanning headlines only? 4. Each section has one job? 5. Are cards actually necessary? 6. Does motion improve hierarchy or atmosphere? 7. Would design feel premium with all decorative shadows removed? Flag any hard rejections: Generic SaaS card grid as first impression, beautiful image with weak brand, strong headline with no clear action, busy imagery behind text, sections repeating same mood statement, carousel with no narrative purpose, app UI made of stacked cards instead of layout. Five most important design findings only. Reference file:line."
 
-Present sub-task output under a `DESIGN VOICE (Claude sub-task):` header, merged with the rubric findings above.
+Present sub-task output under a `DESIGN VOICE (Codex sub-task):` header, merged with the rubric findings above.
 
 **Error handling:** If the sub-task fails or times out, skip with a brief note — this pass is optional quality enhancement, not a prerequisite.
 

@@ -155,9 +155,9 @@ On detection of a production context, CRITICAL patterns return `permissionDecisi
 
 ## Gotchas
 
-> Update this section when Claude hits new edge cases in practice.
+> Update this section when Codex hits new edge cases in practice.
 
-- **Shell aliases bypass detection**: if the user has `alias del='rm -rf'`, the hook sees `del` not `rm -rf` → false negative. Document project-specific dangerous aliases in `.claude/rules/`.
+- **Shell aliases bypass detection**: if the user has `alias del='rm -rf'`, the hook sees `del` not `rm -rf` → false negative. Document project-specific dangerous aliases in `.agents/skills/rule-`.
 
 - **Multi-line commands may not match**: a command split across lines as `rm -rf \` + `/data` may not match a single-line regex. The hook should join continuation lines before matching.
 

@@ -19,7 +19,7 @@ The `--format` option controls how your comment body is interpreted:
 ## Plain Text (default)
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Simple plain text comment"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Simple plain text comment"
 ```
 
 - No formatting applied
@@ -31,7 +31,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate 
 ## Markdown
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --format markdown --body "**Bold** and *italic*"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --format markdown --body "**Bold** and *italic*"
 ```
 
 ### Supported Syntax
@@ -52,7 +52,7 @@ bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate 
 ### Multi-line Example
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --format markdown --body "$(cat <<'EOF'
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --format markdown --body "$(cat <<'EOF'
 ## Update
 
 Fixed the issue by:
@@ -71,7 +71,7 @@ EOF
 For complex formatting not supported by Markdown, use raw ADF JSON:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --format adf --body '{
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --format adf --body '{
   "version": 1,
   "type": "doc",
   "content": [
@@ -136,11 +136,11 @@ You never need to construct ADF manually when using the `jira-as` wrapper. Pass 
 
 ```bash
 # Markdown — auto-converted to ADF
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh \
   collaborate comment add PROJ-123 --format markdown --body "**Bold** + *italic*"
 
 # Raw ADF — power user
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh \
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh \
   collaborate comment add PROJ-123 --format adf --body "$(cat adf.json)"
 ```
 

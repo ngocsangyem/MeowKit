@@ -55,7 +55,7 @@ Print this EXACT block (substitute actual path and flag):
 │  💡 Run /clear first to reduce planning-context          │
 │     carryover, then run the cook command above.          │
 │                                                         │
-│  ⏸  Waiting. Claude will not proceed automatically.    │
+│  ⏸  Waiting. Codex will not proceed automatically.    │
 └─────────────────────────────────────────────────────────┘
 ```
 

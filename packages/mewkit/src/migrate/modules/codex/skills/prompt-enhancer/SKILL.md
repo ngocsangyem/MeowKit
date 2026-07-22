@@ -42,7 +42,7 @@ Step detail in `references/decomposition-checklist.md`, `references/playbook.md`
 - Optional: `--analyze` (include decomposition + detected issues + improvement suggestions).
 - Optional: `--score` (add 1–10 quality score on the original prompt; auto-promotes to `--analyze --score` because score requires the rubric components).
 - Optional: `--deep` (opt-in scout against allow-listed sources).
-- Optional: `--save-to <path>` (default: active plan dir if any, else `the project environment/...`).
+- Optional: `--save-to <path>` (default: active plan dir if any, else `${PLUGIN_DATA}/...`).
 
 The skill **does not accept a `--model` flag.** Per the synthesis report
 (`tasks/reports/synthesis-260509-2058-prompting-framework.md`), model
@@ -85,7 +85,7 @@ Default mode (always):
 1. **Preserve user intent verbatim.** Never silently change the core ask.
 2. **Never invent facts.** Unknown values become `[FILL-IN: <description>]` placeholders.
 3. **No padding.** Only emit suggestions for FOUND issues. (Default mode hides suggestions entirely; `--analyze` reveals them.)
-4. **Universal kernel only.** Plain markdown sections (Goal / Context / Constraints / Acceptance Criteria / Output Format). No XML tags, no role-as-XML, no model overlays. If the input prompt contains model-coupled framing, flag it as detection #10 and strip during rewrite. **Why:** the rewrite must stay portable across coding agents (Claude, Codex, Gemini, Droid) — a vendor token optimizes for one and can degrade another. Model-specific tips surface only via `--analyze` target-notes when the user names a target; they never enter the default rewrite.
+4. **Universal kernel only.** Plain markdown sections (Goal / Context / Constraints / Acceptance Criteria / Output Format). No XML tags, no role-as-XML, no model overlays. If the input prompt contains model-coupled framing, flag it as detection #10 and strip during rewrite. **Why:** the rewrite must stay portable across coding agents (Codex, Codex, Gemini, Droid) — a vendor token optimizes for one and can degrade another. Model-specific tips surface only via `--analyze` target-notes when the user names a target; they never enter the default rewrite.
 5. **Default = enhanced prompt only.** Without `--analyze`, emit ONLY the Section 4 code block. No Section 1/2/3 headings, no preamble prose, no score. The rewrite is the deliverable; everything else is diagnostics.
 
 `--analyze` mode (additional):
@@ -96,7 +96,7 @@ Default mode (always):
 
 `--deep` mode (additional):
 
-9. **Allow-list only.** Read only `docs/project-context.md`, `CLAUDE.md`, repo file-tree
+9. **Allow-list only.** Read only `docs/project-context.md`, `AGENTS.md`, repo file-tree
    paths, public docstrings. Default-deny everything else (especially `.meowkit/memory/*`,
    `.env*`, `tasks/`, secrets).
 10. **Suggest, never substitute.** Scout outputs go in `[FILL-IN: <desc> (suggested: <path>)]`
@@ -148,7 +148,7 @@ Detection precedence: explicit user signal > destructive verbs > default to MEDI
 ## Persistence
 
 - Active plan? Save to `{plan-dir}/prompt-enhancer/<YYMMDD-HHMM>-<short-slug>.md`.
-- No active plan? Save to `the project environment/prompt-enhancer/<YYMMDD-HHMM>-<short-slug>.md`.
+- No active plan? Save to `${PLUGIN_DATA}/prompt-enhancer/<YYMMDD-HHMM>-<short-slug>.md`.
 - Never write to the skill directory.
 
 ## Gotchas

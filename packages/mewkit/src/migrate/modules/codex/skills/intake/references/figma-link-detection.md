@@ -26,7 +26,7 @@ Figma URL detected
 Figma MCP available?
     YES → invoke mk:figma analyze [URL] → extract design context
     NO  → ask user: "Export target frames as PNG, then paste or provide path"
-          → invoke mk:multimodal or Claude Read on the exported image
+          → invoke mk:multimodal or Codex Read on the exported image
         ↓
 Add "Design Context" section to output (see template below)
 ```

@@ -2,7 +2,7 @@
 """Generate llms.txt from a docs directory following llmstxt.org specification.
 
 Offloads deterministic work (file scanning, title extraction, categorization)
-so Claude only needs to review and improve the generated output.
+so Codex only needs to review and improve the generated output.
 
 Usage:
   python3 generate-llms-txt.py --source <path> [--output <path>] [--base-url <url>] [--full]
@@ -245,7 +245,7 @@ def main():
     parser.add_argument("--full", action="store_true", help="Also generate llms-full.txt")
     parser.add_argument("--project-name", default="", help="Project name (auto-detected)")
     parser.add_argument("--project-description", default="", help="Project description (auto-detected)")
-    parser.add_argument("--json", action="store_true", help="Output metadata as JSON (for Claude to review)")
+    parser.add_argument("--json", action="store_true", help="Output metadata as JSON (for Codex to review)")
 
     args = parser.parse_args()
     source = Path(args.source).resolve()
@@ -266,7 +266,7 @@ def main():
         print(f"No markdown files found in '{source}'", file=sys.stderr)
         sys.exit(1)
 
-    # JSON mode — output metadata for Claude to review
+    # JSON mode — output metadata for Codex to review
     if args.json:
         meta = {
             "project_name": project_name,

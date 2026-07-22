@@ -82,13 +82,13 @@ Fixes: PROJ-456
 
 ```bash
 # Extract keys from commit message
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh dev parse-commits "PROJ-123: Fix login bug"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh dev parse-commits "PROJ-123: Fix login bug"
 
 # Extract from git log
-git log --oneline -10 | bash the project environment/.agents/skills/jira/scripts/jira-as.sh dev parse-commits --from-stdin
+git log --oneline -10 | bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh dev parse-commits --from-stdin
 
 # Filter by project
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh dev parse-commits "PROJ-123 OTHER-456" --project PROJ
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh dev parse-commits "PROJ-123 OTHER-456" --project PROJ
 ```
 
 ## Next Steps

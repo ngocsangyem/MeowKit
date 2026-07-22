@@ -7,7 +7,7 @@ Jira workflows are project-specific. Always discover available transitions dynam
 Before transitioning, fetch available transitions for the issue via the wrapper:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transitions PROJ-123
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transitions PROJ-123
 ```
 
 (verify the exact verb name with `--help` — older jira-as versions may surface this under a different sub-verb)

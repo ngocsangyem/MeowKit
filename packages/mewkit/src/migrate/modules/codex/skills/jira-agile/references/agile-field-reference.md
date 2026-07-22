@@ -18,7 +18,7 @@ If your JIRA instance uses different field IDs:
 ### Option 1: Use jira-fields Skill
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields list --agile
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields list --agile
 ```
 
 This discovers all Agile-related fields for your instance.
@@ -47,7 +47,7 @@ If your instance uses different IDs, you can:
 
 2. **Script parameters**:
    ```bash
-   bash the project environment/.agents/skills/jira/scripts/jira-as.sh agile epic add --epic PROJ-100 --issues PROJ-101 \
+   bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh agile epic add --epic PROJ-100 --issues PROJ-101 \
      --epic-link-field customfield_10100
    ```
 

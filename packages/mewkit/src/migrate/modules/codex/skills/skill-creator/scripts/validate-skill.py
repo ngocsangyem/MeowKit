@@ -2,11 +2,11 @@
 """Validate a skill against compliance checklist.
 
 Offloads deterministic checks (frontmatter, name format, required sections)
-so Claude only sees the pass/fail summary and fixes what failed.
+so Codex only sees the pass/fail summary and fixes what failed.
 
 Usage:
   python3 validate-skill.py <skill-directory>
-  python3 validate-skill.py .claude/skills/my-feature
+  python3 validate-skill.py .agents/skills/my-feature
 
 Adapted from open-source upstream (MIT).
 """

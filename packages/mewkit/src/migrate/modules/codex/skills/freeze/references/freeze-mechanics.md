@@ -19,7 +19,7 @@ Without the trailing slash, a prefix check would produce false matches on siblin
 The resolved freeze path is persisted to a state file:
 
 ```
-the project environment:-.meowkit/memory}/freeze-dir.txt
+${PLUGIN_DATA:-.meowkit/memory}/freeze-dir.txt
 ```
 
 The hook script reads this file on every Edit and Write invocation. The state persists for
@@ -54,7 +54,7 @@ Freeze only applies to Edit and Write tools. The following are NOT restricted:
 - `Glob` — searches anywhere
 - `Grep` — searches anywhere
 
-This is an intent guardrail, not a security boundary. The freeze prevents accidental Claude-initiated
+This is an intent guardrail, not a security boundary. The freeze prevents accidental Codex-initiated
 edits, but deliberate bash commands can still touch any file.
 
 ## Deactivation
@@ -62,4 +62,4 @@ edits, but deliberate bash commands can still touch any file.
 Freeze is session-scoped. It deactivates when:
 - The conversation ends or a new session starts
 - A new freeze is set with a different path (overwrites state file)
-- The user manually deletes the state file at `the project environment:-.meowkit/memory}/freeze-dir.txt`
+- The user manually deletes the state file at `${PLUGIN_DATA:-.meowkit/memory}/freeze-dir.txt`

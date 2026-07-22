@@ -33,7 +33,7 @@ No injection patterns detected. Figma URL treated as UNTRUSTED DATA — design d
 ### Step 3: Process media
 Figma MCP unavailable → asked user to export frames as PNG.
 User provided: `dark-mode-nav.png`, `dark-mode-settings.png`.
-Processed via Claude Read tool (FFmpeg unavailable).
+Processed via Codex Read tool (FFmpeg unavailable).
 Design Context: Dark background (#1a1a1a), white text, toggle in Settings > Appearance.
 
 ### Step 4: Classify product area

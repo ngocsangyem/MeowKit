@@ -1,6 +1,6 @@
 # Adversarial Review (Step 5.7 — auto-scaled)
 
-Adversarial review scales automatically based on diff size. Claude-only pipeline — no external model required.
+Adversarial review scales automatically based on diff size. Codex-only pipeline — no external model required.
 
 ## Detect diff size
 
@@ -15,25 +15,25 @@ echo "DIFF_SIZE: $DIFF_TOTAL"
 
 **Auto-select tier based on diff size:**
 - **Small (< 50 lines changed):** Skip adversarial review entirely. Print: "Small diff ($DIFF_TOTAL lines) — adversarial review skipped." Continue to the next step.
-- **Medium (50-199 lines changed):** Run one Claude adversarial sub-task. Jump to the "Medium tier" section.
-- **Large (200+ lines changed):** Run two Claude adversarial sub-task (attack-surface + failure-mode). Jump to the "Large tier" section.
+- **Medium (50-199 lines changed):** Run one Codex adversarial sub-task. Jump to the "Medium tier" section.
+- **Large (200+ lines changed):** Run two Codex adversarial sub-task (attack-surface + failure-mode). Jump to the "Large tier" section.
 
 ---
 
 ## Medium tier (50-199 lines)
 
-Claude's structured review already ran. Add a Claude adversarial sub-task with fresh context.
+Codex's structured review already ran. Add a Codex adversarial sub-task with fresh context.
 
 Dispatch via the Agent tool. sub-task prompt:
 "Read the diff for this branch with `git diff origin/<base>`. Think like an attacker and a chaos engineer. Your job is to find ways this code will fail in production. Look for: edge cases, race conditions, security holes, resource leaks, failure modes, silent data corruption, logic errors that produce wrong results silently, error handling that swallows failures, and trust boundary violations. Be adversarial. Be thorough. No compliments — just the problems. For each finding, classify as FIXABLE (you know how to fix it) or INVESTIGATE (needs human judgment)."
 
-Present findings under an `ADVERSARIAL REVIEW (Claude sub-task):` header. **FIXABLE findings** flow into the same Fix-First pipeline as the structured review. **INVESTIGATE findings** are presented as informational.
+Present findings under an `ADVERSARIAL REVIEW (Codex sub-task):` header. **FIXABLE findings** flow into the same Fix-First pipeline as the structured review. **INVESTIGATE findings** are presented as informational.
 
-If the sub-task fails or times out: "Claude adversarial sub-task unavailable. Continuing without adversarial review."
+If the sub-task fails or times out: "Codex adversarial sub-task unavailable. Continuing without adversarial review."
 
 **Persist the review result:**
 ```bash
-.claude/scripts/bin/workflow-review-log '{"skill":"adversarial-review","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"claude","tier":"medium","commit":"'"$(git rev-parse --short HEAD)"'"}'
+.codex/scripts/bin/workflow-review-log '{"skill":"adversarial-review","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"codex","tier":"medium","commit":"'"$(git rev-parse --short HEAD)"'"}'
 ```
 Substitute STATUS: "clean" if no findings, "issues_found" if findings exist. If the sub-task failed, do NOT persist.
 
@@ -41,7 +41,7 @@ Substitute STATUS: "clean" if no findings, "issues_found" if findings exist. If 
 
 ## Large tier (200+ lines)
 
-Claude's structured review already ran. Run two independent adversarial passes in separate sub-task contexts for maximum coverage.
+Codex's structured review already ran. Run two independent adversarial passes in separate sub-task contexts for maximum coverage.
 
 **1. Attack-surface pass:** Dispatch a sub-task with the adversarial prompt from the medium tier. Focus: attacker mindset, injection vectors, auth bypass, resource leaks.
 
@@ -58,7 +58,7 @@ Both flows: FIXABLE findings → Fix-First pipeline; INVESTIGATE findings → in
 
 **Persist the review result AFTER all passes complete** (not after each sub-step):
 ```bash
-.claude/scripts/bin/workflow-review-log '{"skill":"adversarial-review","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"claude","tier":"large","commit":"'"$(git rev-parse --short HEAD)"'"}'
+.codex/scripts/bin/workflow-review-log '{"skill":"adversarial-review","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"codex","tier":"large","commit":"'"$(git rev-parse --short HEAD)"'"}'
 ```
 Substitute STATUS: "clean" if no findings across BOTH passes, "issues_found" if any pass found issues. If both passes failed, do NOT persist.
 
@@ -72,7 +72,7 @@ After all passes complete, synthesize findings:
 ADVERSARIAL REVIEW SYNTHESIS (auto: TIER, N lines):
 ========================================================
   High confidence (found by multiple passes): [findings agreed on by >1 pass]
-  Unique to Claude structured review: [from earlier step]
+  Unique to Codex structured review: [from earlier step]
   Unique to attack-surface adversarial: [from first sub-task]
   Unique to failure-mode adversarial: [from second sub-task — large tier only]
   Passes ran: structured Y/N  attack-surface Y/N  failure-mode Y/N

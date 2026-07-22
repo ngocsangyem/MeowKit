@@ -2,7 +2,7 @@
 
 /**
  * Environment variable loader for mk:docs-finder skill
- * Priority: process.env > skill/.env > skills/.env > .claude/.env
+ * Priority: process.env > skill/.env > skills/.env > .codex/.env
  */
 
 const fs = require('fs');
@@ -44,10 +44,10 @@ function parseEnvFile(content) {
 function loadEnv() {
   const skillDir = path.resolve(__dirname, '../..');
   const skillsDir = path.resolve(skillDir, '..');
-  const claudeDir = path.resolve(skillsDir, '..');
+  const codexDir = path.resolve(skillsDir, '..');
 
   const envPaths = [
-    path.join(claudeDir, '.env'),
+    path.join(codexDir, '.env'),
     path.join(skillsDir, '.env'),
     path.join(skillDir, '.env'),
   ];

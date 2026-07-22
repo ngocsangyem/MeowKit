@@ -45,7 +45,7 @@ The JiraClient automatically retries with exponential backoff on 429 errors.
 
 - Cache metadata (projects, users, fields) for hours
 - Cache issue data for minutes
-- Use cache warming via `bash the project environment/.agents/skills/jira/scripts/jira-as.sh ops cache-warm --project PROJ` (`mk:jira-ops`) to pre-load data
+- Use cache warming via `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh ops cache-warm --project PROJ` (`mk:jira-ops`) to pre-load data
 
 ### 5. Spread Requests Over Time
 
@@ -60,5 +60,5 @@ results = batcher.execute_sync()
 ## See Also
 
 - request batching (not adopted; see jira-as `--help` per verb for built-in batching support)
-- cache warming via `bash the project environment/.agents/skills/jira/scripts/jira-as.sh ops cache-warm --project PROJ` (`mk:jira-ops`)
+- cache warming via `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh ops cache-warm --project PROJ` (`mk:jira-ops`)
 - error handling (see exit-code map in `../jira/references/install-and-auth.md`)

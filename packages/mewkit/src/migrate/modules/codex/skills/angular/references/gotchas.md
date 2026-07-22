@@ -1,7 +1,7 @@
 # Angular Gotchas — Complete Reference
 
 > Consolidated from analogjs/angular-skills (MIT)
-> Update when Claude produces incorrect Angular patterns.
+> Update when Codex produces incorrect Angular patterns.
 
 ## Components
 

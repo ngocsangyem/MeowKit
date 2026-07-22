@@ -1,10 +1,10 @@
 # Jira Awareness — mk:intake Extension
 
-Loaded when the user has the `mk:jira-*` family available (i.e. `jira-as` installed via `.claude/scripts/bin/setup-workflow` and `.claude/.env` populated with `MEOW_JIRA_*`). When unavailable, skip this file entirely — mk:intake operates tool-agnostic.
+Loaded when the user has the `mk:jira-*` family available (i.e. `jira-as` installed via `.codex/scripts/bin/setup-workflow` and `.codex/.env` populated with `MEOW_JIRA_*`). When unavailable, skip this file entirely — mk:intake operates tool-agnostic.
 
 ## Metadata Extraction
 
-Fetch the ticket via `mk:jira-issue` (or directly: `bash the project environment/.agents/skills/jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all'`). Extract these Jira-specific fields before scoring:
+Fetch the ticket via `mk:jira-issue` (or directly: `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all'`). Extract these Jira-specific fields before scoring:
 
 | Field           | Where to find it         | Used for                        |
 | --------------- | ------------------------ | ------------------------------- |

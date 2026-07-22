@@ -16,7 +16,7 @@
 
 **Before running full detection, check if a cached result can be reused.**
 
-Cache file: `.claude/cache/agent-detection-cache.json`
+Cache file: `.codex/cache/agent-detection-cache.json`
 
 ```toon
 cache_check[4]{condition,action}:

@@ -55,4 +55,4 @@ End-to-end default flow + `--scout` extract-or-prompt pattern + filtering rules:
 
 - The `source_hash` recorded in the report header is the SHA-256 of the _exact_ paste body. If you edit the paste locally between sizing and `--auto-create`, the source-consistency check will ABORT — re-paste the modified body and re-run `--paste` to regenerate the report.
 - `--scout` does not auto-invoke `the scout skill`. Run `the scout skill` first when you want codebase signals; otherwise the report carries `[NO_CODEBASE_CONTEXT]`.
-- DoR advisory only appears when `mk:agent-detector` loaded `.claude/rules-conditional/agile-story-gates.md` for the current session.
+- DoR advisory only appears when `mk:agent-detector` loaded `.agents/skills/rule-agile-story-gates.md` for the current session.

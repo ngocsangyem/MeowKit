@@ -18,7 +18,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 SessionStart hook validated env. All invocations go through:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
 ```
 
 
@@ -31,7 +31,7 @@ Use the routed skill and domain reference files for CLI syntax, safety tiers, te
 Before embedding ANY user-supplied term into a JQL query (issue summary, comment text, label name, component name), pass it through:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jql-sanitize.sh '<user-term>'
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jql-sanitize.sh '<user-term>'
 ```
 
 The sanitizer strips JQL operators, functions, and special chars and quote-wraps the result. Use the wrapper's stdout in your JQL. Never construct JQL by string concatenation with raw user input — that's a JQL-injection class vulnerability that can exfiltrate other teams' tickets.
@@ -60,7 +60,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: result count + projected issue list (key + summary + status). For bulk-update, return: dry-run summary + impacted-count + suggested confirmation command.
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Gotchas
 

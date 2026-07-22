@@ -82,71 +82,71 @@ QUESTION: [Clear, specific question]
 
 ```bash
 # Plain text comment
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Comment text"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Comment text"
 
 # Markdown comment
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "**Bold** text" --format markdown
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "**Bold** text" --format markdown
 
 # Internal comment (Administrators only)
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Secret info" --visibility-role Administrators
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Secret info" --visibility-role Administrators
 
 # Group-restricted comment
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Team info" --visibility-group team-name
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Team info" --visibility-group team-name
 ```
 
 ### Attachments
 
 ```bash
 # Upload file
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate attachment upload PROJ-123 --file report.pdf
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate attachment upload PROJ-123 --file report.pdf
 
 # List attachments
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --list
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --list
 
 # Download by name
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --name "screenshot.png"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --name "screenshot.png"
 
 # Download all
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --all --output-dir ./downloads
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --all --output-dir ./downloads
 ```
 
 ### Watchers
 
 ```bash
 # Add watcher
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --add user@company.com
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --add user@company.com
 
 # Remove watcher
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --remove user@company.com
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --remove user@company.com
 
 # List watchers
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --list
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --list
 ```
 
 ### Notifications
 
 ```bash
 # Notify watchers
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --watchers --subject "Update" --body "Text"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --watchers --subject "Update" --body "Text"
 
 # Notify specific users (preview first)
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --users accountId1 --dry-run
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --users accountId1 --dry-run
 
 # Notify assignee and reporter
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --assignee --reporter --subject "Status needed"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --assignee --reporter --subject "Status needed"
 ```
 
 ### Activity
 
 ```bash
 # View activity table
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --format table
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --format table
 
 # Filter by status changes
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --filter status
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --filter status
 
 # Export to JSON
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --format json > history.json
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --format json > history.json
 ```
 
 ---

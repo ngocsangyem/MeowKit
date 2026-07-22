@@ -80,13 +80,13 @@ Use stop and ask the user in chat to confirm. If the user disagrees with a premi
 
 Use stop and ask the user in chat:
 
-> Want a second opinion? A Claude adversarial sub-task will independently review your problem statement, key answers, premises, and any landscape findings from this session. It hasn't seen this conversation — it gets a structured summary. Takes 1-2 minutes.
+> Want a second opinion? A Codex adversarial sub-task will independently review your problem statement, key answers, premises, and any landscape findings from this session. It hasn't seen this conversation — it gets a structured summary. Takes 1-2 minutes.
 > A) Yes, get a second opinion
 > B) No, proceed to alternatives
 
 If B: skip Phase 3.5 entirely. Remember that the second opinion did NOT run (affects design doc, founder signals, and Phase 4 below).
 
-**If A: Dispatch the Claude adversarial sub-task.**
+**If A: Dispatch the Codex adversarial sub-task.**
 
 1. Assemble a structured context block from Phases 1-3:
    - Mode (Startup or Builder)
@@ -107,7 +107,7 @@ If B: skip Phase 3.5 entirely. Remember that the second opinion did NOT run (aff
 3. **Presentation:**
 
 ```
-SECOND OPINION (Claude sub-task):
+SECOND OPINION (Codex sub-task):
 ════════════════════════════════════════════════════════════
 <full sub-task output, verbatim — do not truncate or summarize>
 ════════════════════════════════════════════════════════════

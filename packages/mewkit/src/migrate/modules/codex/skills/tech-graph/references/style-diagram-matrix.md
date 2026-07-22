@@ -17,7 +17,7 @@ Not all styles work equally well for every diagram type. Use this guide to pick 
 | 3 Blueprint | Excellent | Perfect for formal architecture docs |
 | 4 Notion Clean | Good | Minimal, works for inline docs |
 | 5 Glassmorphism | Good | Striking for presentations and product pages |
-| 6 Claude Official | Good | Warm aesthetic, Anthropic-style presentations |
+| 6 Codex Official | Good | Warm aesthetic, Anthropic-style presentations |
 | 7 OpenAI Official | Good | Clean, precise; minimal borders, brand green accents |
 | 8 Dark Luxury *(AI-authored)* | Excellent | Premium editorial; gold-on-black layers stand out for architecture docs |
 
@@ -29,7 +29,7 @@ Not all styles work equally well for every diagram type. Use this guide to pick 
 | 3 Blueprint | Excellent | Best for formal UML documentation |
 | 4 Notion Clean | Excellent | Clean, minimal; ideal for Notion-embedded diagrams |
 | 5 Glassmorphism | Poor | Glass effects distract from structural content |
-| 6 Claude Official | Excellent | Warm, readable; good for documentation |
+| 6 Codex Official | Excellent | Warm, readable; good for documentation |
 | 7 OpenAI Official | Excellent | Minimal aesthetic matches UML precision |
 | 8 Dark Luxury *(AI-authored)* | Fair | Non-standard dark bg for UML; use only for premium editorial contexts |
 
@@ -41,7 +41,7 @@ Not all styles work equally well for every diagram type. Use this guide to pick 
 | 3 Blueprint | Excellent | Formal, technical documentation |
 | 4 Notion Clean | Excellent | Best for Notion-embedded sequence diagrams |
 | 5 Glassmorphism | Poor | Glass effects make lifelines hard to read |
-| 6 Claude Official | Excellent | Ward contrast |
+| 6 Codex Official | Excellent | Ward contrast |
 | 7 OpenAI Official | Excellent | Minimal, precise; ideal for API docs |
 | 8 Dark Luxury *(AI-authored)* | Good | Dramatic contrast; dark lifelines suit developer blogs and premium tech docs |
 
@@ -53,7 +53,7 @@ Not all styles work equally well for every diagram type. Use this guide to pick 
 | 3 Blueprint | Good | Formal process documentation |
 | 4 Notion Clean | Good | Clean for SOPs and inline docs |
 | 5 Glassmorphism | Good | Striking for product demos |
-| 6 Claude Official | Good | Warm aesthetic for presentations |
+| 6 Codex Official | Good | Warm aesthetic for presentations |
 | 7 OpenAI Official | Good | Clean and minimal |
 | 8 Dark Luxury *(AI-authored)* | Good | Striking for premium process documentation |
 
@@ -65,7 +65,7 @@ Not all styles work equally well for every diagram type. Use this guide to pick 
 | 3 Blueprint | Poor | Blueprint grid conflicts with radial layout |
 | 4 Notion Clean | Excellent | Ideal for n brainstorming |
 | 5 Glassmorphism | Excellent | Stunning visual for presentations |
-| 6 Claude Official | Good | Warm, readable |
+| 6 Codex Official | Good | Warm, readable |
 | 7 OpenAI Official | Good | Clean and minimal |
 | 8 Dark Luxury *(AI-authored)* | Excellent | Gold accent branches on black; radial layouts stand out in presentations |
 
@@ -77,7 +77,7 @@ Not all styles work equally well for every diagram type. Use this guide to pick 
 | 3 Blueprint | Excellent | Formal data flow documentation |
 | 4 Notion Clean | Good | Minimal, clean |
 | 5 Glassmorphism | Poor | Distracts from flow semantics |
-| 6 Claude Official | Good | Readable |
+| 6 Codex Official | Good | Readable |
 | 7 OpenAI Official | Good | Precise, minimal |
 | 8 Dark Luxury *(AI-authored)* | Excellent | Color-coded data paths shine against deep black; ideal for data engineering docs |
 
@@ -89,7 +89,7 @@ Not all styles work equally well for every diagram type. Use this guide to pick 
 | 3 rint | Excellent | Classic UML aesthetic |
 | 4 Notion Clean | Excellent | Perfect for product requirement docs |
 | 5 Glassmorphism | Poor | Unnecessary visual noise |
-| 6 Claude Official | Excellent | Warm, professional |
+| 6 Codex Official | Excellent | Warm, professional |
 | 7 OpenAI Official | Excellent | Clean, precise UML |
 | 8 Dark Luxury *(AI-authored)* | Fair | Stick figures less visible on deep black; use cautiously |
 
@@ -101,7 +101,7 @@ Flat Icon | Good | Colorful states |
 | 3 Blueprint | Excellent | Best for formal UML state machines |
 | 4 Notion Clean | Excellent | Clean for documentation |
 | 5 Glassmorphism | Poor | Distracts from state transitions |
-| 6 Claude Official | Excellent | Readable |
+| 6 Codex Official | Excellent | Readable |
 | 7 OpenAI Official | Excellent | Minimal, precise |
 | 8 Dark Luxury *(AI-authored)* | Good | High contrast for state transitions; editorial quality |
 
@@ -113,7 +113,7 @@ Flat Icon | Good | Colorful states |
 | 3 Blueprint | Excellent | Ideal for infrastructure docs |
 | 4 Notion Clean | Good | Clean for IT documentation |
 | 5 Glassmorphism | Good | Striking for presentations |
-| 6 Claude Official | Good | Professional network diagrams |
+| 6 Codex Official | Good | Professional network diagrams |
 | 7 OpenAI Official | Good | Clean infrastructure diagrams |
 | 8 Dark Luxury *(AI-authored)* | Excellent | Deep black classic for infrastructure docs; gold topology lines pop |
 
@@ -125,7 +125,7 @@ Flat Icon | Good | Colorful states |
 | 3 Blor | Grid conflicts with table layout |
 | 4 Notion Clean | Excellent | Perfect for Notion-embedded tables |
 | 5 Glassmorphism | Poor | Distabular data |
-| 6 Claude Official | Excellent | Clean, warm |
+| 6 Codex Official | Excellent | Clean, warm |
 | 7 OpenAI Official | Excellent | Minimal, precise |
 | 8 Dark Luxury *(AI-authored)* | Fair | Dark bg non-standard for comparison tables; use cautiously |
 
@@ -137,7 +137,7 @@ Flat Icon | Good | Colorful states |
 | 3 Blueprint | Good | Formal project plans |
 | 4 Notion Clean | Excellent | Ideal for Notion project docs |
 | 5 Glassmorphism | Good | Striking for keynote presentations |
-| 6 Claude Official | Good | Warm, professional |
+| 6 Codex Official | Good | Warm, professional |
 | 7 OpenAI Official | Good | Clean timeline |
 | 8 Dark Luxury *(AI-authored)* | Good | Premium project roadmaps and keynote presentations |
 
@@ -149,6 +149,6 @@ Flat Icon | Good | Colorful states |
 | 3 Blueprint | Good | Formal AI system documentation |
 | 4 Notion Clean | Good | Clean for AI research notes |
 | 5 Glassmorphism | Excellent | Stunning for AI product presentations |
-| 6 Claude Official | Excellent | Anthropic AI aesthetic |
+| 6 Codex Official | Excellent | Anthropic AI aesthetic |
 | 7 OpenAI Official | Excellent | OpenAI AI aesthetic |
 | 8 Dark Luxury *(AI-authored)* | Excellent | Best for premium AI system docs; champagne gold on deep black |

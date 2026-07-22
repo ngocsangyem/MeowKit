@@ -5,7 +5,7 @@ description: "rule-gate-rules"
 
 # Phase Gate Rules — HARD STOPS
 
-<!-- Canonical source: .claude/workflow.yaml -->
+<!-- Canonical source: .codex/workflow.yaml -->
 
 These are hard stops. No automation may bypass them. No agent may self-approve.
 
@@ -69,7 +69,7 @@ Scale-routing one-shot: When `mk:scale-routing` returns `workflow=one-shot` AND 
 Explicit user override: `the cook skill` may bypass Gate 1 only when the user explicitly says
 to skip planning **and** Phase 0 found zero matched risk flags. The agent records the
 override and rationale in the active plan or security log per
-`.claude/rules/intervention-recording-rules.md`; a keyword match or risk heuristic can
+`.agents/skills/rule-intervention-recording-rules.md`; a keyword match or risk heuristic can
 never grant this exception on its own.
 
 ### Plan Shape
@@ -116,8 +116,8 @@ never ran.
 
 | Change contains | Gate 2 | Enforcement |
 |---|---|---|
-| Any source, config, hook, script, or `.claude/**` file | **Required** | Structural proof or hard block (exit 2) |
-| Only `docs/**`, `tasks/reports/**`, or `*.md` outside `.claude/**` | **N/A** | Allowed, N/A stated explicitly |
+| Any source, config, hook, script, or `.codex/**` file | **Required** | Structural proof or hard block (exit 2) |
+| Only `docs/**`, `tasks/reports/**`, or `*.md` outside `.codex/**` | **N/A** | Allowed, N/A stated explicitly |
 | A mix of the two | **Required** | The source file in it still ships |
 
 ### Classifier
@@ -126,7 +126,7 @@ Only the **no-ship** set is enumerated:
 
 - `docs/**`
 - `tasks/reports/**`
-- `*.md` — but **not** under `.claude/**`, where markdown *is* the product
+- `*.md` — but **not** under `.codex/**`, where markdown *is* the product
 
 Everything else is ship-capable. The list is one-sided on purpose: enumerating
 ship-capable paths instead would be unportable (a consumer project's layout is not this
@@ -171,7 +171,7 @@ Gate 2 approval receipt; designed, not yet enforced).
 gate approval. It is a **floor, not the contract**: it matches a fixed pattern set, and
 any paraphrase walks straight through it.
 
-So at Gate 2, whenever a change touches `.claude/rules/`, `.claude/modes/`,
+So at Gate 2, whenever a change touches `.agents/skills/rule-`, `.agents/skills/mode-`,
 `.agents/skills/cook/`, or `.agents/skills/autobuild/`, the reviewer MUST answer:
 
 > **Does any prose in this change grant approval authority to something that is not a

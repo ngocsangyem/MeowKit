@@ -159,7 +159,7 @@ fi
 #    per-rubric verdicts and the canonical preset weights. This is what closes the forged-PASS
 #    path: a verdict that declares PASS + weighted_score 0.01 (or whose rubric set does not
 #    cover the preset) is rejected even though every field is individually well-formed.
-PY=".claude/skills/.venv/bin/python3"
+PY=".agents/skills/.venv/bin/python3"
 [ -x "$PY" ] || PY="$(command -v python3 || true)"
 recompute_script="$(dirname "$0")/recompute-score.py"
 recomputed_ran=0

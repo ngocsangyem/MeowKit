@@ -4,7 +4,7 @@ One-time setup for the Confluence skill family. Cloud only.
 
 ## Required env vars
 
-Add three lines to `.claude/.env` (chmod 0600 recommended):
+Add three lines to `.codex/.env` (chmod 0600 recommended):
 
 ```
 MEOW_CONFLUENCE_SITE_URL=https://your-tenant.atlassian.net
@@ -14,11 +14,11 @@ MEOW_CONFLUENCE_API_TOKEN=your-api-token
 
 Get an API token at https://id.atlassian.com/manage-profile/security/api-tokens (Atlassian Cloud login required).
 
-The wrapper translates these to `CONFLUENCE_*` at exec time and refuses to load credentials from `.claude/settings.local.json` even if present (security override of upstream default behavior).
+The wrapper translates these to `CONFLUENCE_*` at exec time and refuses to load credentials from `.codex/settings.local.json` even if present (security override of upstream default behavior).
 
 ## Install
 
-`.claude/scripts/bin/setup-workflow` auto-installs from `.agents/skills/confluence/scripts/requirements.txt`:
+`.codex/scripts/bin/setup-workflow` auto-installs from `.agents/skills/confluence/scripts/requirements.txt`:
 
 - `confluence-assistant-skills==0.2.0` — distribution package; ships the `confluence-as` binary
 - `assistant-skills-lib==1.0.1` — transitive infra dep
@@ -41,9 +41,9 @@ The wrapper exits 3 if `MEOW_CONFLUENCE_SITE_URL` does not end in `.atlassian.ne
 | ---- | ------- |
 | 0    | Success |
 | 1    | Sanitizer rejection (CQL) |
-| 2    | Plaintext credential fallback detected — move to `.claude/.env` |
+| 2    | Plaintext credential fallback detected — move to `.codex/.env` |
 | 3    | Non-Cloud URL — Server/DC not supported |
-| 127  | `confluence-as` binary not installed — run `.claude/scripts/bin/setup-workflow` |
+| 127  | `confluence-as` binary not installed — run `.codex/scripts/bin/setup-workflow` |
 | 4-7  | confluence-as runtime errors (network, auth, validation, server) |
 | 130  | SIGINT |
 

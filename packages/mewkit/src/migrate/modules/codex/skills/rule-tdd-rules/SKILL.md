@@ -72,4 +72,4 @@ GUARD: Production-facing code ALWAYS requires TDD regardless of size. When in do
 - "Tests must pass before commit" from `development-rules.md` STILL APPLIES **IF tests exist** — you just don't have to write them first
 - Reviewer may flag missing tests as a WARN at Gate 2; user decides whether to address before ship
 
-**To opt back in:** add `export MEOWKIT_TDD=1` to your shell rc, OR pass `--tdd` per command, OR write `on` to `.claude/session-state/tdd-mode` (the slash command does this when `--tdd` is detected).
+**To opt back in:** add `export MEOWKIT_TDD=1` to your shell rc, OR pass `--tdd` per command, OR write `on` to `.codex/session-state/tdd-mode` (the slash command does this when `--tdd` is detected).

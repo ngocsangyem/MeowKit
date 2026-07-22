@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Test suite for worktree.cjs
- * Run: node meowkit/.claude/skills/worktree/scripts/worktree.test.cjs
+ * Run: node meowkit/.agents/skills/worktree/scripts/worktree.test.cjs
  *
  * All destructive tests use --dry-run; only info/list/status/prune touch live state.
  */

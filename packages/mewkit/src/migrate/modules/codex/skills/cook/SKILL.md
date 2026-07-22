@@ -5,7 +5,7 @@ description: "Orchestrates single-task implementation pipeline: plan → test �
 
 # Cook — Full Implementation Pipeline
 
-Implementation entry adapter. `.claude/workflow.yaml` is the only lifecycle phase-sequence authority; this skill selects a profile, invokes the relevant owners, and presents the required gates. TDD is opt-in via `--tdd`.
+Implementation entry adapter. `.codex/workflow.yaml` is the only lifecycle phase-sequence authority; this skill selects a profile, invokes the relevant owners, and presents the required gates. TDD is opt-in via `--tdd`.
 
 ## Usage
 
@@ -28,10 +28,10 @@ Concrete cost depends on the inner harness, model tier, and target surface; trea
 
 ## TDD mode (`--tdd` flag)
 
-When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.claude/session-state/tdd-mode` via a Bash tool call BEFORE any other workflow step:
+When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.codex/session-state/tdd-mode` via a Bash tool call BEFORE any other workflow step:
 
 ```bash
-mkdir -p .claude/session-state && echo on > .claude/session-state/tdd-mode
+mkdir -p .codex/session-state && echo on > .codex/session-state/tdd-mode
 ```
 
 This sentinel file is read by `pre-implement.sh`, `tdd-detect.sh`, and downstream agents to detect TDD mode. Without `--tdd`, the sentinel is absent and the workflow runs in default mode (Phase 2 optional, no RED-phase gate).
@@ -50,11 +50,11 @@ Do NOT write implementation code until a plan exists and Gate 1 is approved.
 In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): do NOT skip Test RED phase — write failing tests BEFORE implementation.
 In default mode: Phase 2 is optional; the developer may implement directly per the approved plan.
 Exception: `--fast` mode skips research but still requires plan + (in TDD mode) TDD-flavored tests.
-User override: Planning may be skipped only when the user explicitly says "just code it" or "skip planning" **and** Phase 0 found zero matched risk flags. Record the human override and rationale per `.claude/rules/intervention-recording-rules.md`; otherwise explain why Gate 1 still applies.
+User override: Planning may be skipped only when the user explicitly says "just code it" or "skip planning" **and** Phase 0 found zero matched risk flags. Record the human override and rationale per `.agents/skills/rule-intervention-recording-rules.md`; otherwise explain why Gate 1 still applies.
 
 ## Anti-Rationalization
 
-Generic implementation-phase rationalizations live in `.claude/rules/anti-rationalization.md` — read before any non-trivial implementation step. Cook-specific addition (TDD mode):
+Generic implementation-phase rationalizations live in `.agents/skills/rule-anti-rationalization.md` — read before any non-trivial implementation step. Cook-specific addition (TDD mode):
 
 | Thought                | Reality                                                                                                                                  |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -82,7 +82,7 @@ See `references/intent-detection.md` for full detection logic.
 
 ## Lifecycle Adapter
 
-<!-- Canonical source: .claude/workflow.yaml — this diagram renders the same lifecycle; -->
+<!-- Canonical source: .codex/workflow.yaml — this diagram renders the same lifecycle; -->
 <!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
 <!-- the YAML is the machine-readable authority; this Mermaid diagram is the human-facing render. -->
 
@@ -117,7 +117,7 @@ flowchart TD
     H --> I
 ```
 
-The YAML specification is authoritative. This diagram is a convenience rendering only; phase details and transitions live in `.claude/workflow.yaml` and `references/workflow-steps.md`.
+The YAML specification is authoritative. This diagram is a convenience rendering only; phase details and transitions live in `.codex/workflow.yaml` and `references/workflow-steps.md`.
 
 ### Scout-First Contract (Phase 0)
 
@@ -160,7 +160,7 @@ Every clarifying-question option MUST cite scout findings (e.g., file paths). Va
 
 Gate 1 routing, parallelism, and full per-phase progression live in `references/intent-detection.md` (canonical Mode Behaviors table).
 
-**Gate 2: human approval mandatory in all modes — see `.claude/rules/gate-rules.md` for the full contract.** If the reviewer surfaces a regression / side effect / broken workflow, follow the Regression Recovery Options pattern in `references/review-cycle.md` rather than silently patching.
+**Gate 2: human approval mandatory in all modes — see `.agents/skills/rule-gate-rules.md` for the full contract.** If the reviewer surfaces a regression / side effect / broken workflow, follow the Regression Recovery Options pattern in `references/review-cycle.md` rather than silently patching.
 
 ## Required sub-task
 
@@ -203,18 +203,18 @@ If `mk:verify` FAILS after simplify: send back to developer to fix, then re-run 
 
 ## Status Report (Post-Gate 2)
 
-After a Gate 2 verdict PASS, delegate to `project-manager` per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Stop after reporting completion; invoke `mk:ship` only when the user explicitly requests shipping. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
+After a Gate 2 verdict PASS, delegate to `project-manager` per `.agents/skills/rule-post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Stop after reporting completion; invoke `mk:ship` only when the user explicitly requests shipping. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
 
 ## Durable Task State (when an active task record exists)
 
-When this run drives an **active durable task** (a `tasks/active/<id>.json` exists), emit status/step at phase transitions and record each acted-on `mewkit capabilities resolve` outcome (`selected|skipped|unavailable|unsupported`) via `mewkit task-state update` — per `.claude/rules/task-state-emission.md`. Advisory + best-effort: a failed or unavailable command is surfaced but never blocks the pipeline, and one-off work with no record emits nothing.
+When this run drives an **active durable task** (a `tasks/active/<id>.json` exists), emit status/step at phase transitions and record each acted-on `mewkit capabilities resolve` outcome (`selected|skipped|unavailable|unsupported`) via `mewkit task-state update` — per `.agents/skills/rule-task-state-emission.md`. Advisory + best-effort: a failed or unavailable command is surfaced but never blocks the pipeline, and one-off work with no record emits nothing.
 
 ## Related Rules
 
-- `.claude/rules/gate-rules.md` — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions this skill enforces across all modes
-- `.claude/rules/post-phase-delegation.md` — PM delegation fire points and skip conditions
-- `.claude/rules/task-state-emission.md` — when/what/how to emit durable task-state events (advisory; active durable tasks only)
-- `.claude/rules-conditional/workflow-evidence-rules.md` — workflow evidence index (traceability over existing Phase 0-6 outputs; mirrors the gate scripts, never approves). See `references/workflow-steps.md` → Workflow Evidence Index
+- `.agents/skills/rule-gate-rules.md` — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions this skill enforces across all modes
+- `.agents/skills/rule-post-phase-delegation.md` — PM delegation fire points and skip conditions
+- `.agents/skills/rule-task-state-emission.md` — when/what/how to emit durable task-state events (advisory; active durable tasks only)
+- `.agents/skills/rule-workflow-evidence-rules.md` — workflow evidence index (traceability over existing Phase 0-6 outputs; mirrors the gate scripts, never approves). See `references/workflow-steps.md` → Workflow Evidence Index
 
 ## Gotchas
 

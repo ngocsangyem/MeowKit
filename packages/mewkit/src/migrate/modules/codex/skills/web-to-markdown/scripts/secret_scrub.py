@@ -2,7 +2,7 @@
 """
 secret_scrub.py — Secret-scrubbing helpers for mk:web-to-markdown.
 
-Python port of .claude/hooks/lib/secret-scrub.sh regex set.
+Python port of .codex/hooks/lib/secret-scrub.sh regex set.
 Applied to content and URLs BEFORE any disk write (Layer 7).
 
 Exports:

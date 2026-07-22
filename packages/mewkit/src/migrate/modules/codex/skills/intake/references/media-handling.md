@@ -32,7 +32,7 @@ Fallback chain — try each step; move to next if step unavailable:
    → Extracts: layout, components, states, text (OCR), design intent
 
 3. Fallback (always available):
-   → Claude native Read tool on image file
+   → Codex native Read tool on image file
    → Good for: screenshots, mockups, UI layout description
    → Weaker for: precise colors, spacing measurements, small text
 ```
@@ -45,13 +45,13 @@ Fallback chain — try each step; move to next if step unavailable:
      ffmpeg -i demo.mp4 -vf "select='gt(scene,0.3)'" -vsync vfq frame_%03d.jpg
    → Scene change threshold 0.3 = significant visual transitions only
    → Reduces 2-min video (~7200 frames) to 10-20 key frames (99.7% savings)
-   → Feed frames to Gemini (batch) or Claude Read (one by one)
+   → Feed frames to Gemini (batch) or Codex Read (one by one)
 
 2. No FFmpeg?
    → Report to user: "Video attachment detected. FFmpeg required for frame
      extraction but is not installed. Cannot analyze video content."
    → Suggest: "Install FFmpeg: brew install ffmpeg (macOS) or
-     .claude/scripts/bin/setup-workflow --system-deps"
+     .codex/scripts/bin/setup-workflow --system-deps"
    → Continue intake without video content; note gap in output
 ```
 
@@ -70,7 +70,7 @@ Fallback chain — try each step; move to next if step unavailable:
 ## Document Handler (.pdf, .docx)
 
 ```
-1. Claude Read tool handles PDFs natively (up to 20 pages per request)
+1. Codex Read tool handles PDFs natively (up to 20 pages per request)
    → For large PDFs: use pages parameter — pages: "1-10"
    → Extract: requirements, specs, acceptance criteria, diagrams (described)
 

@@ -10,15 +10,15 @@ Every project file belongs to one of these categories:
 | Documentation | `docs/` | Human + AI readable docs, guides, specs |
 | Tasks | `tasks/` | Plans, reviews, templates |
 | Tests | `tests/` or `__tests__/` | Test suites |
-| Scripts | `scripts/` or `.claude/scripts/` | Build, deploy, utility scripts |
+| Scripts | `scripts/` or `.codex/scripts/` | Build, deploy, utility scripts |
 | Assets | `assets/{type}/` | Media, branding, designs |
 | Config | Root or `.config/` | Dotfiles, config files |
-| Kit     | `.claude/` | Agent toolkit (skills, agents, rules, hooks, memory) |
+| Kit     | `.codex/` | Agent toolkit (skills, agents, rules, hooks, memory) |
 
 ### Kit-Specific Paths
 
 ```
-.claude/
+.codex/
 ├── agents/          Agent definitions
 ├── skills/          mk: prefixed skills
 ├── rules/           Enforcement rules
@@ -55,7 +55,7 @@ All filenames use **kebab-case**, self-documenting names.
 2. Test? → tests/ (mirror source structure)
 3. Plan or review? → tasks/plans/ or tasks/reviews/
 4. Documentation? → docs/
-5. Kit config? → .claude/
+5. Kit config? → .codex/
 6. Asset? → assets/{type}/
 7. Script? → scripts/
 8. Config? → root or .config/

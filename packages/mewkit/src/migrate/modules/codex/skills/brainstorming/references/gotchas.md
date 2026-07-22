@@ -1,6 +1,6 @@
 # Gotchas
 
-Update when Claude hits new brainstorming edge cases. Highest-signal content in the skill — keep it sharp.
+Update when Codex hits new brainstorming edge cases. Highest-signal content in the skill — keep it sharp.
 
 - **Premature solutioning** — jumping to "how" before confirming "what". Force problem restatement first; do not generate ideas until the problem is confirmed via `stop and ask the user in chat`.
 - **Anchoring on first idea** — the first idea gets disproportionate attention in evaluation. Generate ALL ideas before scoring any; use `scoring-criteria.md` only after the full list is complete.

@@ -1,6 +1,6 @@
 ---
 name: "context-engineering"
-description: "Runtime router for context decisions during a task — decide read-more / stop / ask / assume / delegate, pick a minimal read-set, and time compaction. Front-page mental model is Write / Select / Compress / Isolate; a lazy pattern index routes to 25 context-engineering patterns, one reference per decision. Use when context is near budget, a long session is degrading, you must choose what to read for a task, or you are deciding /compact vs /clear vs a sub-agent. NOT for structural .claude/ overhead"
+description: "Runtime router for context decisions during a task — decide read-more / stop / ask / assume / delegate, pick a minimal read-set, and time compaction. Front-page mental model is Write / Select / Compress / Isolate; a lazy pattern index routes to 25 context-engineering patterns, one reference per decision. Use when context is near budget, a long session is degrading, you must choose what to read for a task, or you are deciding /compact vs /clear vs a sub-agent. NOT for structural .codex/ overhead"
 ---
 
 # mk:context-engineering — Runtime Context Router
@@ -9,11 +9,11 @@ Decide the next context move for the task in front of you: read more, stop, ask,
 assume, or delegate — then load at most one pattern reference to execute it. This
 skill routes decisions; it does not preload a knowledge library.
 
-**Boundary vs `mk:context-audit`:** that skill audits *structural* `.claude/` overhead
+**Boundary vs `mk:context-audit`:** that skill audits *structural* `.codex/` overhead
 (what is statically loaded every session). This skill decides *runtime* context moves
 for one task. Structural question → context-audit. Runtime question → here. If a request
 is ambiguous between the two (e.g. "this project's context is messy"), ask ONE question —
-structural `.claude/` setup or this session's runtime context? — then route.
+structural `.codex/` setup or this session's runtime context? — then route.
 
 ## When to Use
 
@@ -25,7 +25,7 @@ structural `.claude/` setup or this session's runtime context? — then route.
 
 ## When NOT to Use
 
-- Auditing `.claude/` token overhead → `mk:context-audit`.
+- Auditing `.codex/` token overhead → `mk:context-audit`.
 - Persisting a learning or reading memory topic files → `mk:memory`.
 - Finding *where* code lives → `mk:scout` (or `Read` for one known file).
 - USD run cost → `mk:budget`.
@@ -123,7 +123,7 @@ or I'll proceed with these.`
 
 ## Related Skills
 
-- `mk:context-audit` — use instead for structural `.claude/` overhead (tokens/% statically loaded).
+- `mk:context-audit` — use instead for structural `.codex/` overhead (tokens/% statically loaded).
 - `mk:memory` — use instead to actually read/write canonical `.meowkit/memory/` JSON stores; this skill only decides a write is warranted.
 - `mk:scout` — use instead to discover *where* code lives; this skill decides *how much* to read.
 - `mk:agent-detector` — use the canonical agent inventory for routing and on-demand instruction loading.

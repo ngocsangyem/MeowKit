@@ -56,7 +56,7 @@ For backward compatibility, `--red-only` still forces the RED-phase write-failin
 | `--coverage` | Run tests with coverage report. Show: line coverage %, branch coverage %, uncovered files/lines. |
 | `--watch` | Continuous test mode. Re-run affected tests on every file save. |
 | `--red-only` | Write failing tests but do NOT implement. Used by `the cook skill --tdd` in Phase 2 to generate the RED test suite before Phase 3 implementation. |
-| `--tdd` | Enforce TDD discipline for this invocation. Equivalent to writing the `.claude/session-state/tdd-mode` sentinel. RED-phase rules in `tdd-rules.md` apply. |
+| `--tdd` | Enforce TDD discipline for this invocation. Equivalent to writing the `.codex/session-state/tdd-mode` sentinel. RED-phase rules in `tdd-rules.md` apply. |
 
 ### Output
 

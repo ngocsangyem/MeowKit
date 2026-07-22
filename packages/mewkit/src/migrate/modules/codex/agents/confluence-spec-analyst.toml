@@ -20,7 +20,7 @@ This agent is **A (untrusted page content) + C (bounded local Spec Research Repo
 All invocations through:
 
 ```bash
-bash the project environment/.agents/skills/confluence/scripts/confluence-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh <args>
 ```
 
 Detect `mk:multimodal` skill presence at `.agents/skills/multimodal/`. If absent → image findings section is replaced with `[NO_MULTIMODAL]` flag (does not block analysis).
@@ -39,8 +39,8 @@ Single mode: `analyze`. Flag inputs:
 ### Step 1 — Fetch root page (single call: metadata + ADF body)
 
 ```bash
-WRAPPER="the project environment/.agents/skills/confluence/scripts/confluence-as.sh"
-ADF2MD="the project environment/.agents/skills/confluence/scripts/adf-to-md.sh"
+WRAPPER="$(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh"
+ADF2MD="$(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/adf-to-md.sh"
 
 RAW=$(bash "$WRAPPER" page get --page-id <id> --representation atlas_doc_format)
 META=$(printf '%s' "$RAW" | jq '{id, title, space: .space.key, version: .version.number, author: .history.createdBy.displayName, lastModified: .version.when}')
@@ -153,7 +153,7 @@ After successful run, return to the user:
 3. One-line headline (e.g. `"Spec is mostly complete — 3 gaps in the SLA section need clarification"`)
 4. Suggested next action (e.g. "Run `mk:planning-engine plan --tickets ... --spec <report-path>` once tickets are scoped")
 
-End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
 
 ## Failure Handling
 

@@ -423,7 +423,7 @@ function cmdCreate() {
     }
     if (matches.length > 1) {
       outputError('MULTIPLE_PROJECTS_MATCH', `Multiple projects match "${project}"`, {
-        suggestion: 'Use AskUserQuestion to let user select one',
+        suggestion: 'Use stop and ask the user in chat to let user select one',
         matchingProjects: matches.map(p => ({ name: p.name, path: p.path }))
       });
     }

@@ -29,7 +29,7 @@ code-heavy content and underestimates dense prose.
 
 | Category    | Loaded When                                     | Notes |
 | ----------- | ----------------------------------------------- | ----- |
-| CLAUDE.md   | Every session, at preamble                      | Lives in always-on bundle. Trims here have the highest leverage. |
+| AGENTS.md   | Every session, at preamble                      | Lives in always-on bundle. Trims here have the highest leverage. |
 | agents      | On `Task` invocation; `mk:lazy-agent-loader` defers | Per-agent overhead is realized only when an agent is spawned. Many agent files inflate the static bundle even when unused. |
 | skills      | On skill activation                             | SKILL.md frontmatter is always loaded; body is JIT. Frontmatter bloat is a hidden cost. |
 | rules       | Always-on for `injection-rules.md`, `security-rules.md`, etc. | The 5 essentials are non-negotiable; auxiliary rules can grow without bound. |
@@ -38,7 +38,7 @@ code-heavy content and underestimates dense prose.
 
 ## Window Size
 
-Hard-coded at **200,000 tokens** — Claude's standard context window. There
+Hard-coded at **200,000 tokens** — Codex's standard context window. There
 is no env-var override:
 
 - A 1M-context model is not yet routine for production work.
@@ -74,14 +74,14 @@ before tuning.
 {
   "scan_root": "...",
   "scan_timestamp": "...",
-  "claude_md_chain": [{"path": "...", "bytes": N, "lines": N, "estimated_tokens": N}],
+  "codex_md_chain": [{"path": "...", "bytes": N, "lines": N, "estimated_tokens": N}],
   "agents":          [{"name": "...", "bytes": N, "estimated_tokens": N}],
   "skills":          [{"name": "...", "bytes": N, "frontmatter_bytes": N, "estimated_tokens": N}],
   "rules":           [{"path": "...", "bytes": N, "estimated_tokens": N}],
   "commands":        [{"path": "...", "bytes": N, "estimated_tokens": N}],
   "mcp_servers":     [{"name": "...", "tool_count": N, "estimated_bytes": N, "estimated_tokens": N}],
   "totals": {
-    "claude_md_tokens": N,
+    "codex_md_tokens": N,
     "agents_tokens": N,
     "skills_tokens": N,
     "rules_tokens": N,

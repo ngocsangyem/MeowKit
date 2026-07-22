@@ -21,7 +21,7 @@ Custom fields vary per project and Jira instance. Use this methodology to discov
 Via the `jira-as` wrapper:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh fields list
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh fields list
 ```
 
 Returns all system and custom fields. Custom fields have IDs like `customfield_10016`.

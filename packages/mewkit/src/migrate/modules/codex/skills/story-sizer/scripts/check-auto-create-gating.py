@@ -73,7 +73,7 @@ DEFAULT_PATTERNS = (
 
 
 def _load_patterns(project_root: Path) -> tuple[str, ...]:
-    candidate = project_root / ".claude/skills/story-sizer/references/injection-patterns.md"
+    candidate = project_root / ".agents/skills/story-sizer/references/injection-patterns.md"
     if not candidate.exists():
         return DEFAULT_PATTERNS
     patterns: list[str] = []
@@ -143,7 +143,7 @@ def _check_injection(record: dict, patterns: tuple[str, ...], project_root: Path
 
 
 def _fire_injection_audit(project_root: Path, record: dict, field: str, pattern: str) -> None:
-    auditor = project_root / ".claude/scripts/injection-audit.py"
+    auditor = project_root / ".codex/scripts/injection-audit.py"
     if not auditor.exists():
         return
     try:
@@ -191,7 +191,7 @@ def _check_source_hash(payload: dict) -> dict | None:
         return _abort(
             "SOURCE_MISMATCH",
             "Paste body changed since sizing. Re-paste the original or re-run "
-            "/mk:story-sizer --paste to regenerate the report.",
+            "the story-sizer skill --paste to regenerate the report.",
         )
     return None
 
@@ -251,7 +251,7 @@ def gate(payload: dict, project_root: Path) -> dict:
 
 def main(argv: list[str]) -> int:
     payload = json.load(sys.stdin)
-    project_root = Path(os.environ.get("CLAUDE_PROJECT_DIR", Path.cwd())).resolve()
+    project_root = Path(os.environ.get("the project environment", Path.cwd())).resolve()
     result = gate(payload, project_root)
     print(json.dumps(result, indent=2))
     if result["status"] != "ok":

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Codex UserPromptSubmit capture hook (thin wrapper — reused across providers).
 //
-// Codex delivers the SAME JSON-on-stdin contract as Claude Code: an object with
-// `prompt`, `cwd`, `hook_event_name`, etc. This hook reads that JSON, and ONLY when
+// Codex delivers a JSON-on-stdin hook contract: an object with `prompt`, `cwd`,
+// `hook_event_name`, etc. This hook reads that JSON, and ONLY when
 // the prompt starts with a `##pattern`/`##decision`/`##note` prefix does it route
 // the prompt to `mewkit memory capture`, which writes via the .meowkit/ write
 // contract. A non-prefixed prompt is a fast no-op (exit 0, no state reads, no

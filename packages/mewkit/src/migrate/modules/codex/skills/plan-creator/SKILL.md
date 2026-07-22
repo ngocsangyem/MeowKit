@@ -1,6 +1,6 @@
 ---
 name: "plan-creator"
-description: "Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks exit early, simple tasks get fast plans, complex tasks get full research + phase files + validation. Enforces Gate 1. Activated by /mk:plan or /mk:cook. NOT for ticket complexity analysis against an existing codebase (see mk:planning-engine); NOT for CEO-level scope review of existing plans (see mk:plan-ceo-review)."
+description: "Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks exit early, simple tasks get fast plans, complex tasks get full research + phase files + validation. Enforces Gate 1. Activated by the plan skill or the cook skill. NOT for ticket complexity analysis against an existing codebase (see mk:planning-engine); NOT for CEO-level scope review of existing plans (see mk:plan-ceo-review)."
 ---
 
 # Plan Creator
@@ -167,7 +167,7 @@ tasks/plans/YYMMDD-name/
 | `references/adr-generation.md`                     | Architecture Decision Record generation                                                                                                                                                                              |
 | `references/parallel-mode.md`                      | Ownership matrix template, parallel group rules                                                                                                                                                                      |
 | `references/two-approach-mode.md`                  | Approach file template, trade-off matrix, selection flow                                                                                                                                                             |
-| `scripts/validate-plan.py`                         | Plan completeness validator. **Depends on PyYAML** (installed via `.claude/scripts/bin/setup-workflow` into `.agents/skills/.venv/`). Run via `.agents/skills/.venv/bin/python3 scripts/validate-plan.py <plan.md>`. |
+| `scripts/validate-plan.py`                         | Plan completeness validator. **Depends on PyYAML** (installed via `.codex/scripts/bin/setup-workflow` into `.agents/skills/.venv/`). Run via `.agents/skills/.venv/bin/python3 scripts/validate-plan.py <plan.md>`. |
 | `scripts/check-product-spec.sh`                    | Product-spec structural validator (POSIX bash). Enforces feature count, user stories, forbidden patterns. Used by step-03a and step-04 for `--product-level` mode.                                                   |
 | `references/workflow-models/feature-model.md`      | Workflow template for feature tasks (loaded JIT by step-00)                                                                                                                                                          |
 | `references/workflow-models/bugfix-model.md`       | Workflow template for bug fix tasks (loaded JIT by step-00)                                                                                                                                                          |
@@ -180,9 +180,9 @@ tasks/plans/YYMMDD-name/
 
 ## Related Rules
 
-- `.claude/rules/gate-rules.md` — Gate 1 hard-stop conditions this skill enforces (plan approval before Phase 3)
-- `.claude/rules/orchestration-rules.md` — boundary contract; verification sub-task stay READ-ONLY; sweep stays in planner context (never delegated)
-- `.claude/rules/task-state-emission.md` — when an active durable task record exists, emit status/step via `mewkit task-state update` (advisory; active durable tasks only)
+- `.agents/skills/rule-gate-rules.md` — Gate 1 hard-stop conditions this skill enforces (plan approval before Phase 3)
+- `.agents/skills/rule-orchestration-rules.md` — boundary contract; verification sub-task stay READ-ONLY; sweep stays in planner context (never delegated)
+- `.agents/skills/rule-task-state-emission.md` — when an active durable task record exists, emit status/step via `mewkit task-state update` (advisory; active durable tasks only)
 
 ## Start
 

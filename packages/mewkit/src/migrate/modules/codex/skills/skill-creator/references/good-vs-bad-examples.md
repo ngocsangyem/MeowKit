@@ -2,7 +2,7 @@
 
 ## Description Field
 
-The description is a TRIGGER CONDITION — it tells Claude WHEN to activate the skill.
+The description is a TRIGGER CONDITION — it tells Codex WHEN to activate the skill.
 
 **Bad** (summary — tells what it does):
 ```
@@ -26,7 +26,7 @@ description: "Use when writing unit/integration tests, enforcing TDD red-green-r
 
 ## Gotchas Section
 
-The Gotchas section is the HIGHEST SIGNAL content. It captures what Claude gets wrong by default.
+The Gotchas section is the HIGHEST SIGNAL content. It captures what Codex gets wrong by default.
 
 **Bad** (obvious/generic):
 ```
@@ -54,14 +54,14 @@ The Gotchas section is the HIGHEST SIGNAL content. It captures what Claude gets 
 6. Resolve each conflict manually
 ```
 
-**Good** (outcome-focused — Claude figures out HOW):
+**Good** (outcome-focused — Codex figures out HOW):
 ```
 Cherry-pick the target commit onto a clean branch.
 Resolve any conflicts preserving original intent.
 If it cannot land cleanly, explain why and stop.
 ```
 
-Rule: If Claude can figure out the next step from context, don't spell it out.
+Rule: If Codex can figure out the next step from context, don't spell it out.
 
 ## Progressive Disclosure
 

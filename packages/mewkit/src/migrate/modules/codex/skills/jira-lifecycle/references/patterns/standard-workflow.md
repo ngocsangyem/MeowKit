@@ -1,6 +1,6 @@
 # Standard JIRA Workflow Pattern
 
-> **CONCEPT REFERENCE — NOT AUTHORITATIVE.** This file describes a common workflow shape for orientation. **Your project may use different status names + transitions.** Always consult `tasks/jira-workflows/<workflow-slug>.md` (discovered via `bash the project environment/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>`) for the actual workflow. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md`.
+> **CONCEPT REFERENCE — NOT AUTHORITATIVE.** This file describes a common workflow shape for orientation. **Your project may use different status names + transitions.** Always consult `tasks/jira-workflows/<workflow-slug>.md` (discovered via `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>`) for the actual workflow. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md`.
 
 **Use this pattern for:** Basic issue tracking with simple lifecycle.
 
@@ -42,19 +42,19 @@ To Do --> In Progress --> Done
 
 ```bash
 # Start working on issue
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In Progress"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "In Progress"
 
 # Complete issue
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "Done"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "Done"
 
 # Or with resolution
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle resolve PROJ-123 --resolution Fixed
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle resolve PROJ-123 --resolution Fixed
 
 # Stop working (return to backlog)
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "To Do"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transition PROJ-123 --name "To Do"
 
 # Reopen completed issue
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh lifecycle reopen PROJ-123
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle reopen PROJ-123
 ```
 
 ## When to Use

@@ -243,7 +243,7 @@ async function main() {
     writePidFile(port, process.pid);
     setupShutdownHandlers(port, () => { server.close(); });
 
-    if (args.foreground || args.isChild || process.env.CLAUDE_COMMAND) {
+    if (args.foreground || args.isChild || process.env.the project environment) {
       console.log(JSON.stringify({ success: true, url, path: resolved.path, port, mode: resolved.type }));
     } else {
       console.log(`\nMarkdown Reader`);

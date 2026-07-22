@@ -34,7 +34,7 @@ for record in records:
         for pattern in load_patterns("references/injection-patterns.md"):
             if pattern.lower() in haystack.lower():
                 ABORT with quoted pattern + offending field + story id.
-                If .claude/scripts/injection-audit.py exists, also fire it
+                If .codex/scripts/injection-audit.py exists, also fire it
                 per injection-rules.md Rule 10.
 ```
 

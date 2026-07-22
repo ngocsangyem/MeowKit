@@ -1,4 +1,4 @@
-<!-- Lifecycle canonical source: .claude/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
+<!-- Lifecycle canonical source: .codex/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
 
 # Step 2: Sprint Contract (Conditional)
 

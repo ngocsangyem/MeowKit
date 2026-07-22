@@ -88,7 +88,7 @@ Six blocks, in this order. Target the whole packet at UNDER 120 lines.
 
 ## Output Location
 
-- **Draft (step-00-5):** `.claude/session-state/plan-creator-intake-packet.md`
+- **Draft (step-00-5):** `.codex/session-state/plan-creator-intake-packet.md`
 - **Final (step-03):** moved to `{plan_dir}/research/plan-intake-packet.md` and
   cited by the plan like any research report (`from: research/plan-intake-packet.md`).
 

@@ -3,9 +3,9 @@ name: "rule-model-selection-rules"
 description: "rule-model-selection-rules"
 ---
 
-# Claude Code Model-Selection Adapter
+# Codex Model-Selection Adapter
 
-These rules are the Claude Code adapter for model selection. Generic skills emit provider-neutral task tiers; this adapter maps those tiers to the models available in Claude Code.
+These rules are the Codex adapter for model selection. Generic skills emit provider-neutral task tiers; this adapter maps those tiers to the models available in Codex.
 The orchestrator agent MUST declare the tier before any task begins.
 
 ## Routing Table

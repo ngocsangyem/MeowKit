@@ -30,13 +30,13 @@ import { execSync } from "child_process";
 if (!process.env.STITCH_API_KEY) {
   console.error("[X] STITCH_API_KEY is not set.");
   console.error("[X] Get a key at https://stitch.withgoogle.com/settings/api");
-  console.error("[X] Add to .claude/.env: STITCH_API_KEY=<your-stitch-api-key>");
+  console.error("[X] Add to .codex/.env: STITCH_API_KEY=<your-stitch-api-key>");
   process.exit(1);
 }
 
 // ── Quota helpers ─────────────────────────────────────────────────────────────
-// Quota state persists in CLAUDE_PLUGIN_DATA to survive skill upgrades (skill-authoring-rules Rule 2).
-const PLUGIN_DATA = process.env.CLAUDE_PLUGIN_DATA ?? path.join(os.homedir(), ".meowkit");
+// Quota state persists in PLUGIN_DATA to survive skill upgrades (skill-authoring-rules Rule 2).
+const PLUGIN_DATA = process.env.PLUGIN_DATA ?? path.join(os.homedir(), ".meowkit");
 const QUOTA_DIR = path.join(PLUGIN_DATA, "stitch");
 const QUOTA_FILE = path.join(QUOTA_DIR, ".stitch-quota.json");
 // Stitch free tier: 400 daily credits for generate + variants. No API to fetch real usage.

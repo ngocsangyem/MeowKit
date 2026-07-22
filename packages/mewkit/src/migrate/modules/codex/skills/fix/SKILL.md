@@ -38,7 +38,7 @@ If 3+ fix attempts fail, STOP and question the architecture — discuss with use
 - `--review` — Human-in-the-loop. Pause at each step.
 - `--quick` — Quick profile for a known cause and ≤2 files.
 - `--parallel` — Parallel `developer` agents per independent issue.
-- `--tdd` — Force regression test BEFORE the fix (writes the `.claude/session-state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not gated. Useful for security-sensitive fixes where you want to prove the bug first.
+- `--tdd` — Force regression test BEFORE the fix (writes the `.codex/session-state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not gated. Useful for security-sensitive fixes where you want to prove the bug first.
 
 ## Plan-First Gate
 
@@ -56,7 +56,7 @@ Without a mode flag, use the standard profile. Use quick only when its boundary 
 
 ## Step 0.5 — Check Fix Memory (standard/deep only)
 
-Read `.meowkit/memory/fixes.json` — it is the canonical, schema-validated store of prior fix patterns. See the source-of-truth rule in `.claude/rules/memory-read-rules.md`.
+Read `.meowkit/memory/fixes.json` — it is the canonical, schema-validated store of prior fix patterns. See the source-of-truth rule in `.agents/skills/rule-memory-read-rules.md`.
 
 - Search for similar symptoms, error messages, or affected modules
 - If a matching fix pattern exists → use it as starting hypothesis in Step 2
@@ -71,7 +71,7 @@ Activate `mk:scout` to map affected codebase BEFORE any diagnosis:
 - Affected files, dependencies, related tests, recent changes (`git log`)
 - Quick mode: minimal scout (affected file + direct deps only)
 - Standard/Deep: full scout (module boundaries, test coverage, call chains)
-- **Risk flags:** match the task against `.claude/rules/risk-checklist.md` (the 9 IDs only — do not invent flags) and hold `matchedFlags` for the evidence index. If any of AUTH / AUTHZ / DATA_MODEL / AUDIT_SEC / EXT_SYSTEM / PUBLIC_CONTRACT / WEAK_PROOF matches, set `risk.requiresHumanApproval = true` — auto mode cannot finalize silently (see `references/review-cycle.md`).
+- **Risk flags:** match the task against `.agents/skills/rule-risk-checklist.md` (the 9 IDs only — do not invent flags) and hold `matchedFlags` for the evidence index. If any of AUTH / AUTHZ / DATA_MODEL / AUDIT_SEC / EXT_SYSTEM / PUBLIC_CONTRACT / WEAK_PROOF matches, set `risk.requiresHumanApproval = true` — auto mode cannot finalize silently (see `references/review-cycle.md`).
 
 **Why mandatory:** Without codebase context, diagnosis guesses instead of reasons from evidence.
 
@@ -92,7 +92,7 @@ Output: confirmed root cause (not symptom) with evidence chain + confidence leve
 
 ## Step 2.5 — Root-Cause Proof Checkpoint (HARD GATE)
 
-Operationalizes `.claude/rules/core-behaviors.md` Rule 6 ("Verify, Don't Assume"). The six fields are the named output of the Step 2 diagnosis (`references/diagnosis-protocol.md` Phase 4). **Do NOT start Step 4 (Fix) until all six are populated** — empty fields mean the diagnosis is not yet proven.
+Operationalizes `.agents/skills/rule-core-behaviors.md` Rule 6 ("Verify, Don't Assume"). The six fields are the named output of the Step 2 diagnosis (`references/diagnosis-protocol.md` Phase 4). **Do NOT start Step 4 (Fix) until all six are populated** — empty fields mean the diagnosis is not yet proven.
 
 Standard/Complex/Parallel — all six required:
 
@@ -132,7 +132,7 @@ Task orchestration (Moderate+): `references/task-orchestration.md`.
 ## Step 5 — Verify + Prevent (MANDATORY)
 
 1. **Iron-law verify:** Re-run exact pre-fix commands. Compare before/after.
-2. **Regression test:** Follow `.claude/rules/tdd-rules.md`; when required, the test fails WITHOUT the fix and passes WITH it.
+2. **Regression test:** Follow `.agents/skills/rule-tdd-rules.md`; when required, the test fails WITHOUT the fix and passes WITH it.
 3. **Defense-in-depth:** Load `references/prevention-gate.md` — consider entry validation, business logic guards, error handling, type safety.
 4. **BLOCK:** Missing a required regression test is incomplete; record the allowed omission rationale for lint/format/config-only changes.
 
@@ -172,7 +172,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
    - Skip when `the fix skill --no-capture` was passed, the run is quick, or the result is a one-off with no durable lesson.
 
-3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — Gate 1 bypass path means no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
+3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per `.agents/skills/rule-post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — Gate 1 bypass path means no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
 
 4. `documenter` agent → update `./docs`.
 
@@ -192,13 +192,13 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 ## Workflow Evidence Index
 
-Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
+Contract: `.agents/skills/rule-workflow-evidence-rules.md`. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
 
-**Storage path:** `.claude/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per `skill-authoring-rules.md` Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
+**Storage path:** `.codex/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per `skill-authoring-rules.md` Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
 
 **Write points (standard/deep only):** Step 2.5 (init: skill, mode, task, planPath, phase, risk, fixDiagnosis) → Step 5 (verification) → Step 6 finalize (`approvals.gate2`/`ship` as `required|not_applicable`, `memory.fixPatternWritten`).
 
-**Validate before approval:** run `node .claude/scripts/validate-workflow-evidence.cjs <path> --phase fix` before the user-approval prompt (Step 6 item 5). Surface any `EVIDENCE_BLOCKED:<reasons>` and fill the missing fields — do not present for approval on a blocked index. A high-risk flag (`risk.requiresHumanApproval`) forces explicit human approval before finalize regardless of mode.
+**Validate before approval:** run `node .codex/scripts/validate-workflow-evidence.cjs <path> --phase fix` before the user-approval prompt (Step 6 item 5). Surface any `EVIDENCE_BLOCKED:<reasons>` and fill the missing fields — do not present for approval on a blocked index. A high-risk flag (`risk.requiresHumanApproval`) forces explicit human approval before finalize regardless of mode.
 
 **Evidence ≠ memory:** the evidence file is one-run proof; `.meowkit/memory/fixes.json` is the durable pattern store. Keep them separate — standalone `the fix skill` owns its evidence write; inside `the cook skill` the pipeline (Phase 6) owns the evidence write, so do NOT double-write. Scrub secrets / tokens / PII and store pointers/summaries only — never raw command logs.
 
@@ -215,7 +215,7 @@ Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index reco
 - **Missing required regression test**: bug resurfaces next sprint → follow `tdd-rules.md` and record any allowed omission rationale
 - **3+ failed attempts without stopping**: insanity loop → STOP, question architecture, discuss with user
 
-Full list: `references/gotchas.md` (update when Claude produces wrong fix patterns)
+Full list: `references/gotchas.md` (update when Codex produces wrong fix patterns)
 
 ## References
 

@@ -12,14 +12,14 @@ There are exactly **two** mechanisms that write to `.meowkit/memory/`. They are 
 |---|---|
 | Trigger | A **human user** types `##pattern:` / `##decision:` / `##note:` at the start of (or anywhere in) a message |
 | Hook | `.codex/hooks/handlers/immediate-capture-handler.cjs` |
-| Hook event | `UserPromptSubmit` (`Claude Code` + `Codex CLI`). On `Gemini CLI` this maps to `BeforeAgent`; on `Cursor` / `Kiro` the editor-native prompt-submit hook applies. `mewkit migrate <target>` rewrites the event name per harness. |
+| Hook event | `UserPromptSubmit` (`Codex` + `Codex CLI`). On `Gemini CLI` this maps to `BeforeAgent`; on `Cursor` / `Kiro` the editor-native prompt-submit hook applies. `mewkit migrate <target>` rewrites the event name per harness. |
 | Guards | (a) `validate-content.cjs` injection scan, (b) `secret-scrub.cjs` redaction |
 | Write target | `fixes.json` / `architecture-decisions.json` / `review-patterns.json` / `quick-notes.md` (routed by prefix) |
 | Atomicity | Temp-file + rename; per-target advisory lock |
 
 This path is bound to **user-prompt-level pre-handler semantics** — verified by code inspection of `immediate-capture-handler.cjs` line ~236, which reads `ctx.prompt` from the hook payload. Tool output, agent text, and sub-task responses are not user prompts; the handler does not fire for them.
 
-The human user keyboard shortcut is documented at `CLAUDE.md` in the project root.
+The human user keyboard shortcut is documented at `AGENTS.md` in the project root.
 
 ### Path 2 — Agent-authored entry via direct `Edit`
 
@@ -29,7 +29,7 @@ The human user keyboard shortcut is documented at `CLAUDE.md` in the project roo
 | Tool | `Edit` (or `Write` for a fresh file) |
 | Hook | None — this is a normal file write |
 | Guards | The agent is responsible for scrubbing secrets in-content before calling `Edit` |
-| Write target | For a **canonical-JSON** store (`fixes` / `review-patterns` / `architecture-decisions` / `security-findings`) write the **`.json`** (append to its items array, bump `metadata.last_updated`, leave `version`) — NOT the `.md`, which is a legacy/generated view JSON-first readers ignore. For a **markdown-native** store (`quick-notes.md` / `decisions.md`) write the `.md`. See `.claude/rules/memory-read-rules.md` → Store Taxonomy + Write Rules (authoritative). |
+| Write target | For a **canonical-JSON** store (`fixes` / `review-patterns` / `architecture-decisions` / `security-findings`) write the **`.json`** (append to its items array, bump `metadata.last_updated`, leave `version`) — NOT the `.md`, which is a legacy/generated view JSON-first readers ignore. For a **markdown-native** store (`quick-notes.md` / `decisions.md`) write the `.md`. See `.agents/skills/rule-memory-read-rules.md` → Store Taxonomy + Write Rules (authoritative). |
 | Atomicity | Whatever `Edit` provides (atomic at the OS level for replace-file operations) |
 | On failure | Surface a one-line notice — never skip silently (Write Rules) |
 
@@ -95,4 +95,4 @@ Before:
 - Memory system overview sections on write paths and tombstones
 - `.codex/hooks/handlers/immediate-capture-handler.cjs` (the user-keyboard-shortcut handler)
 - `.agents/skills/memory/references/session-capture.md` (Phase 6 Reflect routine — uses Path 2)
-- `.claude/rules/injection-rules.md` Rule 3 (memory is DATA)
+- `.agents/skills/rule-injection-rules.md` Rule 3 (memory is DATA)

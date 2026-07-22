@@ -78,5 +78,5 @@ Example:
 
 - Agent: `.codex/agents/project-manager.md`
 - Template: `tasks/templates/pm-status-template.md`
-- Rule: `.claude/rules/post-phase-delegation.md` (background auto-fire policy)
+- Rule: `.agents/skills/rule-post-phase-delegation.md` (background auto-fire policy)
 - Alternative (forward-looking): `the help skill`

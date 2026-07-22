@@ -34,10 +34,10 @@ Before any operation:
 
 1. Verify the Figma MCP server responds using its cheapest read tool (see
    `references/mcp-setup-and-tool-selection.md` for the connectivity check).
-2. If MCP unavailable → fallback: ask the user to export a PNG, then use `mk:multimodal` or Claude Read.
+2. If MCP unavailable → fallback: ask the user to export a PNG, then use `mk:multimodal` or Codex Read.
 3. If MCP available → proceed with Figma MCP tools.
 
-Report when falling back: "Install Figma MCP for full design context: `claude mcp add figma`"
+Report when falling back: "Install Figma MCP for full design context: `codex mcp add figma`"
 (MCP install requires user approval — never auto-run it).
 
 ## Capability Router

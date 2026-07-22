@@ -1,9 +1,9 @@
 ---
 name: "autobuild"
-description: "Use when running an autonomous multi-hour build of a green-field product — orchestrates planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density per model tier. Triggers on /mk:autobuild, \"build me a kanban app\", \"build a retro game maker\", \"autonomous build\", or any green-field product spec. NOT for scoped single-task work (see mk:cook); NOT for initial project scaffolding only (see mk:bootstrap)."
+description: "Use when running an autonomous multi-hour build of a green-field product — orchestrates planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density per model tier. Triggers on the autobuild skill, \"build me a kanban app\", \"build a retro game maker\", \"autonomous build\", or any green-field product spec. NOT for scoped single-task work (see mk:cook); NOT for initial project scaffolding only (see mk:bootstrap)."
 ---
 
-<!-- Lifecycle canonical source: .claude/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
+<!-- Lifecycle canonical source: .codex/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
 
 # mk:autobuild — Autonomous Multi-Hour Build Orchestration
 
@@ -31,7 +31,7 @@ Skip when:
 4. **Max 3 iteration rounds** between generator and evaluator before escalating to human (configurable via `--max-iter`)
 5. **Run report mandatory** — every autobuild run produces `tasks/autobuild-runs/YYMMDD-{slug}/run.md` with full audit trail
 6. **Coexists with `mk:cook`** — does not replace it; both route through Gate 1 + Gate 2
-7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.claude/session-state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `harness-rules.md`) is independent of TDD mode and always applies.
+7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.codex/session-state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `harness-rules.md`) is independent of TDD mode and always applies.
 
 ## Workflow
 

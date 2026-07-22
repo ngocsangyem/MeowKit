@@ -24,7 +24,7 @@ Forks to the `jira-ops` agent. Diagnostic surface only.
 `cache-warm` is intentionally NOT exposed as a primary trigger. If a user explicitly needs it, they can invoke directly:
 
 ```bash
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh ops cache-warm --project PROJ
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh ops cache-warm --project PROJ
 ```
 
 ## See also

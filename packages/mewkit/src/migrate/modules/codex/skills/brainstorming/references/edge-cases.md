@@ -1,6 +1,6 @@
 # Edge Cases
 
-Situations where the obvious brainstorming approach is wrong. Pattern adapted from `everything-claude-code/quality-nonconformance`.
+Situations where the obvious brainstorming approach is wrong. Pattern adapted from `everything-codex/quality-nonconformance`.
 
 ## 1. The user says "just brainstorm" but the problem is actually invalidated
 

@@ -48,9 +48,9 @@ WHY: Without an explicit threshold, audits drift toward "keep everything just in
 
 The following classes are exempt from pruning regardless of measured delta:
 
-- **Security defenses** (everything in `.claude/rules/security-rules.md` and `.claude/rules/injection-rules.md`)
+- **Security defenses** (everything in `.agents/skills/rule-security-rules.md` and `.agents/skills/rule-injection-rules.md`)
 - **Active-verification hard gate** for the evaluator (per `harness-rules.md` Rule 8)
-- **Gate 1 / Gate 2 approval flows** (per `.claude/rules/gate-rules.md`)
+- **Gate 1 / Gate 2 approval flows** (per `.agents/skills/rule-gate-rules.md`)
 - The cost of one bypass exceeds all the misses combined
 
 WHY: Security and gate components protect against catastrophic failure modes that measurement cannot capture. Catch-rate is not the right metric for safety nets.
@@ -112,5 +112,5 @@ Two deterministic CLI surfaces feed it (no sub-task, no inner-harness hook, exit
 - `.agents/skills/benchmark/` — the measurement runner
 - `.agents/skills/autobuild/` — adaptive-density decisions consume the audit's output
 - `.agents/skills/trace-analyze/` — field-data complement to the benchmark
-- `.claude/rules/harness-rules.md` Rule 7 — points at this rule for the audit specifics
+- `.agents/skills/rule-harness-rules.md` Rule 7 — points at this rule for the audit specifics
 - Every harness component (per Rule 6, must have a registry entry)

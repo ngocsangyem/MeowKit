@@ -86,9 +86,9 @@ See `references/security.md` for the full threat model, attack surface, and defe
 
 ## Gotchas
 
-- **Playwright is opt-in.** Default is static fetch only. JS-rendered pages return an error pointing to `.claude/scripts/bin/setup-workflow --system-deps`. This is intentional — 200MB Chromium download is not worth the 5% of pages that need it.
+- **Playwright is opt-in.** Default is static fetch only. JS-rendered pages return an error pointing to `.codex/scripts/bin/setup-workflow --system-deps`. This is intentional — 200MB Chromium download is not worth the 5% of pages that need it.
 - **robots.txt is respected with a 24h cache.** Some doc sites disallow scraping; skill honors this. Override requires manual user action.
-- **Fetch persistence grows unbounded in v1.** Manual cleanup via `rm -rf .claude/cache/web-fetches/*`. v2 will add TTL auto-cleanup.
+- **Fetch persistence grows unbounded in v1.** Manual cleanup via `rm -rf .codex/cache/web-fetches/*`. v2 will add TTL auto-cleanup.
 - **Reports may contain PII.** Secret-scrub catches credentials but does NOT catch names, emails, user IDs in page body text. Treat cached reports as sensitive.
 - **Injection STOP has no bypass.** If the scanner halts a fetch, no flag reopens it. The user must manually inspect the quarantine file.
 - **Slug is sha256-hashed path.** Filenames don't carry path-embedded tokens — good for security, annoying for `ls`-based discovery. Use the manifest `index.jsonl` (behind privacy-block) to search.
@@ -113,7 +113,7 @@ See `references/security.md` for the full threat model, attack surface, and defe
 # requests, readability-lxml, html2text, lxml, charset-normalizer
 ```
 
-**JS rendering (opt-in via `.claude/scripts/bin/setup-workflow --system-deps`):**
+**JS rendering (opt-in via `.codex/scripts/bin/setup-workflow --system-deps`):**
 
 ```bash
 .agents/skills/.venv/bin/pip install playwright==1.58.0

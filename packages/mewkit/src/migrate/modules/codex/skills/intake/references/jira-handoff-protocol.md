@@ -7,7 +7,7 @@ Defines how mk:intake passes structured data to the `mk:jira-*` family for execu
 ```
 mk:intake completes analysis
         ↓
-mk:jira-* family available? (jira-as installed + .claude/.env populated)
+mk:jira-* family available? (jira-as installed + .codex/.env populated)
     YES → suggest specific mk:jira-{leaf} commands (see Step 2a)
     NO  → output suggestions as plain text (see Step 2b)
         ↓
@@ -37,13 +37,13 @@ Generate only commands for actions that are actually needed (gaps identified in 
 ## Step 2b — jira-as Not Available: Plain Text Suggestions
 
 ```
-jira-as not installed (or .claude/.env not populated). Apply these changes manually in Jira:
+jira-as not installed (or .codex/.env not populated). Apply these changes manually in Jira:
 - Transition [TICKET-ID] → "In Analysis"
 - Link [TICKET-ID] blocks [BLOCKER-ID]
 - Assign to [username]
 - Set Fix Version to [version]
 
-Or run `.claude/scripts/bin/setup-workflow` then populate .claude/.env from .claude/.env.example to enable the mk:jira-* family.
+Or run `.codex/scripts/bin/setup-workflow` then populate .codex/.env from .codex/.env.example to enable the mk:jira-* family.
 ```
 
 ## Safety Gate

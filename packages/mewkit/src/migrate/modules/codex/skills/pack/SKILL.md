@@ -16,7 +16,7 @@ Pack a repository into a single AI-friendly file for handoff to external tools, 
 
 ## When to Use
 
-- Pasting a third-party library into an external LLM (ChatGPT, Gemini, claude.ai web)
+- Pasting a third-party library into an external LLM (ChatGPT, Gemini, codex.ai web)
 - Security audit of `vendor/library` before adoption — one file for review
 - Research / offline reading of an unfamiliar repo
 - Creating a shareable snapshot for code review or issue filing
@@ -39,7 +39,7 @@ the pack skill /path/to/external/repo --style xml
 the pack skill vercel/ai --compress            # API surface only (Tree-sitter)
 ```
 
-Output lands at `.claude/packs/{YYYYMMDD-HHMM}-{slug}.{ext}`.
+Output lands at `.codex/packs/{YYYYMMDD-HHMM}-{slug}.{ext}`.
 
 `--compress` extracts class/function/interface signatures via Tree-sitter parsing. Use for "what's the API of library X" queries where full-file content would exceed context budgets.
 
@@ -47,7 +47,7 @@ Output lands at `.claude/packs/{YYYYMMDD-HHMM}-{slug}.{ext}`.
 
 1. **Parse source** — classify as remote (`owner/repo`, GitHub URL) or local path.
 2. **Self-pack guard** — run `scripts/self-pack-guard.sh "$source" "$self_flag"`. If the script exits non-zero, stop and show its message to the user.
-3. **Compute output path** — `.claude/packs/$(date +%Y%m%d-%H%M)-<slug>.<ext>` where `<ext>` maps from `--style` (markdown → md, xml → xml, json → json, plain → txt).
+3. **Compute output path** — `.codex/packs/$(date +%Y%m%d-%H%M)-<slug>.<ext>` where `<ext>` maps from `--style` (markdown → md, xml → xml, json → json, plain → txt).
 4. **Invoke repomix** — `npx --yes repomix@^1.11 [computed flags] -o "<output>"`. Use `--remote <source>` for remote inputs; pass the local path directly otherwise.
 5. **Surface secret-scan results** — parse repomix stdout/stderr for security warnings and show them to the user. If `--no-security-check` was passed, emit: "SECURITY SCAN DISABLED — review output manually before sharing."
 6. **Handoff** — print the output path and this reminder: "Do NOT Read this file back into the current host-runtime session — it defeats the purpose. Paste into an external LLM, share with a reviewer, or archive."

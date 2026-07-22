@@ -33,4 +33,4 @@ classify, diagnose, or fix in this command; the skill owns the whole flow.
 
 ## Safety notes
 
-- Gate 1 and Gate 2 are human-approved per `.claude/rules/gate-rules.md`; the skill's own routing decides which apply to a given fix, including the documented complexity=simple Gate 1 bypass.
+- Gate 1 and Gate 2 are human-approved per `.agents/skills/rule-gate-rules.md`; the skill's own routing decides which apply to a given fix, including the documented complexity=simple Gate 1 bypass.

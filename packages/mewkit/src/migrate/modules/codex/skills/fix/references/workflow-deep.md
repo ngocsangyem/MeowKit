@@ -39,7 +39,7 @@ Use planner agent to create implementation plan.
 **Output:** `Step 4: Plan created — [N] phases`
 
 ### Step 5: Implement
-Implement per plan. Follow `.claude/rules/tdd-rules.md` for flag precedence and regression-test requirements; do not restate or weaken that contract here.
+Implement per plan. Follow `.agents/skills/rule-tdd-rules.md` for flag precedence and regression-test requirements; do not restate or weaken that contract here.
 
 **Parallel Verification** after implementation.
 

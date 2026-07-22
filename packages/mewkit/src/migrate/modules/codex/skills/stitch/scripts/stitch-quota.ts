@@ -6,8 +6,8 @@
  *   npx tsx stitch-quota.ts increment   # Bump count after generation
  *   npx tsx stitch-quota.ts reset       # Force reset counter
  *
- * State persists in ${CLAUDE_PLUGIN_DATA}/stitch/.stitch-quota.json
- * (falls back to ~/.meowkit/stitch/ when CLAUDE_PLUGIN_DATA is unset).
+ * State persists in ${PLUGIN_DATA}/stitch/.stitch-quota.json
+ * (falls back to ~/.meowkit/stitch/ when PLUGIN_DATA is unset).
  * Auto-resets when date changes (UTC midnight).
  *
  * Note: STITCH_API_KEY is intentionally NOT read here — this script
@@ -20,8 +20,8 @@ import os from "os";
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-// Quota state persists in CLAUDE_PLUGIN_DATA to survive skill upgrades (skill-authoring-rules Rule 2).
-const PLUGIN_DATA = process.env.CLAUDE_PLUGIN_DATA ?? path.join(os.homedir(), ".meowkit");
+// Quota state persists in PLUGIN_DATA to survive skill upgrades (skill-authoring-rules Rule 2).
+const PLUGIN_DATA = process.env.PLUGIN_DATA ?? path.join(os.homedir(), ".meowkit");
 const QUOTA_DIR = path.join(PLUGIN_DATA, "stitch");
 const QUOTA_FILE = path.join(QUOTA_DIR, ".stitch-quota.json");
 // Stitch free tier: 400 daily credits (generate, variants), 15 redesign credits (edit).

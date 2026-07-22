@@ -1,6 +1,6 @@
 # Skill: Pattern Extraction (Self-Improving Loop)
 
-**Purpose:** After accumulating enough session data, extract high-frequency patterns from split JSON files and propose them as permanent rules in CLAUDE.md.
+**Purpose:** After accumulating enough session data, extract high-frequency patterns from split JSON files and propose them as permanent rules in AGENTS.md.
 
 ## Contents
 
@@ -9,7 +9,7 @@
   - [Step 1: Read Accumulated Patterns from Split JSON Files](#step-1-read-accumulated-patterns-from-split-json-files)
   - [Step 2: Identify Promotion Candidates](#step-2-identify-promotion-candidates)
   - [Step 3: Group by Category](#step-3-group-by-category)
-  - [Step 4: Propose Additions to CLAUDE.md](#step-4-propose-additions-to-claudemd)
+  - [Step 4: Propose Additions to AGENTS.md](#step-4-propose-additions-to-codexmd)
   - [Proposed Rule: [Rule Name]](#proposed-rule-rule-name)
   - [Step 5: Human Approval](#step-5-human-approval)
   - [Step 6: Update Pattern Status](#step-6-update-pattern-status)
@@ -43,11 +43,11 @@ Filter patterns meeting ALL of these criteria:
 1. `frequency >= 3` — appeared across multiple sessions
 2. `severity == "critical"` OR `frequency >= 5` — high impact or very recurrent
 3. **Generalizable** — not so implementation-specific it's useless elsewhere
-4. **Saves ≥30 min** if known in advance — worth the CLAUDE.md context cost
+4. **Saves ≥30 min** if known in advance — worth the AGENTS.md context cost
 
 Sort by frequency (descending), then by lastSeen (most recent first).
 
-**Scope awareness:** Patterns with a `domain` field scoped to a specific subsystem may become package-specific notes rather than project-wide CLAUDE.md entries. Project-wide patterns are the primary CLAUDE.md candidates.
+**Scope awareness:** Patterns with a `domain` field scoped to a specific subsystem may become package-specific notes rather than project-wide AGENTS.md entries. Project-wide patterns are the primary AGENTS.md candidates.
 
 ### Step 3: Group by Category
 
@@ -62,7 +62,7 @@ Group the high-frequency patterns into categories:
 | **Testing** | Test patterns, coverage expectations |
 | **Communication** | Clarification patterns, interaction habits |
 
-### Step 4: Propose Additions to CLAUDE.md
+### Step 4: Propose Additions to AGENTS.md
 
 For each high-frequency pattern, draft a rule:
 
@@ -85,12 +85,12 @@ For each high-frequency pattern, draft a rule:
 ### Step 5: Human Approval
 
 Present all proposed rules to the human. The human decides:
-- **Accept** — add the rule to CLAUDE.md
+- **Accept** — add the rule to AGENTS.md
 - **Modify** — change the wording, then add
 - **Reject** — do not add (pattern may be context-specific)
 - **Defer** — revisit after more sessions
 
-**Do NOT automatically modify CLAUDE.md.** This step requires explicit human approval.
+**Do NOT automatically modify AGENTS.md.** This step requires explicit human approval.
 
 ### Step 6: Update Pattern Status
 
@@ -112,7 +112,7 @@ Sessions → session-capture → topic files (fixes.md, review-patterns.md, etc.
                                   ↓
                          Proposed rules → Human review
                                   ↓
-                         Accepted rules → CLAUDE.md
+                         Accepted rules → AGENTS.md
                                   ↓
                          Future sessions follow new rules
                                   ↓
@@ -124,6 +124,6 @@ Sessions → session-capture → topic files (fixes.md, review-patterns.md, etc.
 - [ ] Only patterns with frequency >= 3 are proposed
 - [ ] Patterns are grouped by category
 - [ ] Each proposal includes source evidence and split file reference
-- [ ] Human approval is required before any CLAUDE.md changes
+- [ ] Human approval is required before any AGENTS.md changes
 - [ ] Split JSON files updated with promoted/rejected status after review
 - [ ] `patterns.json` (deprecated stub) was NOT used as a data source

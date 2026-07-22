@@ -1,6 +1,6 @@
 # mk:fix Gotchas
 
-Common failure patterns when fixing bugs. Update this file when Claude produces wrong fix patterns.
+Common failure patterns when fixing bugs. Update this file when Codex produces wrong fix patterns.
 
 ## Anti-Patterns
 

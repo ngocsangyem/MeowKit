@@ -34,7 +34,7 @@ node .agents/skills/markdown-reader/scripts/server.cjs \
 node .agents/skills/markdown-reader/scripts/server.cjs \
   --dir ./tasks/plans
 
-# Background mode (foreground process for Claude Code task runners)
+# Background mode (foreground process for Codex task runners)
 node .agents/skills/markdown-reader/scripts/server.cjs \
   --file ./README.md \
   --foreground

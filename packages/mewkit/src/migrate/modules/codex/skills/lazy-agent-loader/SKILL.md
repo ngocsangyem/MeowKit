@@ -1,6 +1,6 @@
 ---
 name: "lazy-agent-loader"
-description: "Deprecated compatibility shim. Agent routing reads the canonical inventory under .claude/agents/ directly; do not use this skill for agent selection."
+description: "Deprecated compatibility shim. Agent routing reads the canonical inventory under .codex/agents/ directly; do not use this skill for agent selection."
 ---
 
 # Lazy Agent Loader (Deprecated)

@@ -32,7 +32,7 @@ state_vars[4]{var,purpose,persistence}:
 1. **Detect trigger** — token limit, user command, or session ending
 2. **If handoff** — load `references/handoff-flow.md`, execute save + summary
 3. **If resume** — load `references/resume-and-state.md`, execute load + restore + continue
-4. **If list** — show all saved workflows from `.claude/logs/workflows/`
+4. **If list** — show all saved workflows from `.codex/logs/workflows/`
 
 ## References
 

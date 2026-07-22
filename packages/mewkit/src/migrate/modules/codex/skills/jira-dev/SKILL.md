@@ -23,7 +23,7 @@ Forks to the `jira-dev` agent. Pure artifact generation — the user reviews and
 
 ## Handoff
 
-`mk:ship` may invoke `bash the project environment/.agents/skills/jira/scripts/jira-as.sh dev branch-name <KEY>` during its branch-creation step (documentation-only — no automatic wiring exists today). Users opt in by passing the Jira key context to `mk:ship`.
+`mk:ship` may invoke `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh dev branch-name <KEY>` during its branch-creation step (documentation-only — no automatic wiring exists today). Users opt in by passing the Jira key context to `mk:ship`.
 
 ## See also
 

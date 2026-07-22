@@ -21,7 +21,7 @@ A rapid product-market fit diagnostic. Takes 30-60 minutes. Produces a PMF score
 
 Read these before asking the user any questions:
 - `README.md` — what the product claims to be
-- `CLAUDE.md` or `docs/project-context.md` — how it's built
+- `AGENTS.md` or `docs/project-context.md` — how it's built
 - `package.json` / equivalent — tech stack and dependencies
 - Recent git commits (last 20) — what's been worked on lately
 - Any existing analytics, metrics, or user feedback the user can share

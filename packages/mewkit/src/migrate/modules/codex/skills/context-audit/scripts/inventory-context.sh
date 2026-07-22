@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# inventory-context.sh — Read-only walk of .claude/; emits JSON byte/line counts.
+# inventory-context.sh — Read-only walk of .codex/; emits JSON byte/line counts.
 #
 # Usage: inventory-context.sh [SCAN_ROOT]   # default: $PWD
 # Output: JSON to stdout. No file writes.
@@ -42,8 +42,8 @@ frontmatter_bytes() {
   ' "$1"
 }
 
-# 1. CLAUDE.md chain — root + descendants, exclude vendored/build dirs.
-inventory_claude_md_chain() {
+# 1. AGENTS.md chain — root + descendants, exclude vendored/build dirs.
+inventory_codex_md_chain() {
   local first=1
   printf '['
   while IFS= read -r f; do
@@ -55,13 +55,13 @@ inventory_claude_md_chain() {
       "$(json_escape "$rel")" "$(file_bytes "$f")" "$(file_lines "$f")"
   done < <(find "$SCAN_ROOT" \
     \( -name node_modules -o -name .git -o -name .worktrees -o -name dist -o -name build \) -prune \
-    -o -type f -name 'CLAUDE.md' -print 2>/dev/null)
+    -o -type f -name 'AGENTS.md' -print 2>/dev/null)
   printf ']'
 }
 
-# 2. agents (.claude/agents/*.md)
+# 2. agents (.codex/agents/*.md)
 inventory_agents() {
-  local dir="$SCAN_ROOT/.claude/agents"
+  local dir="$SCAN_ROOT/.codex/agents"
   local first=1
   printf '['
   [ -d "$dir" ] && while IFS= read -r f; do
@@ -74,9 +74,9 @@ inventory_agents() {
   printf ']'
 }
 
-# 3. skills (.claude/skills/*/SKILL.md)
+# 3. skills (.agents/skills/*/SKILL.md)
 inventory_skills() {
-  local dir="$SCAN_ROOT/.claude/skills"
+  local dir="$SCAN_ROOT/.agents/skills"
   local first=1
   printf '['
   [ -d "$dir" ] && while IFS= read -r d; do
@@ -93,9 +93,9 @@ inventory_skills() {
   printf ']'
 }
 
-# 4. rules (.claude/rules/**/*.md)
+# 4. rules (.agents/skills/rule-**/*.md)
 inventory_rules() {
-  local dir="$SCAN_ROOT/.claude/rules"
+  local dir="$SCAN_ROOT/.codex/rules"
   local first=1
   printf '['
   [ -d "$dir" ] && while IFS= read -r f; do
@@ -109,9 +109,9 @@ inventory_rules() {
   printf ']'
 }
 
-# 5. commands (.claude/commands/**/*.md)
+# 5. commands (.codex/commands/**/*.md)
 inventory_commands() {
-  local dir="$SCAN_ROOT/.claude/commands"
+  local dir="$SCAN_ROOT/.codex/commands"
   local first=1
   printf '['
   [ -d "$dir" ] && while IFS= read -r f; do
@@ -167,7 +167,7 @@ ts="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 printf '{'
 printf '"scan_root":"%s",' "$(json_escape "$SCAN_ROOT")"
 printf '"scan_timestamp":"%s",' "$ts"
-printf '"claude_md_chain":'; inventory_claude_md_chain; printf ','
+printf '"codex_md_chain":'; inventory_codex_md_chain; printf ','
 printf '"agents":';          inventory_agents;          printf ','
 printf '"skills":';           inventory_skills;          printf ','
 printf '"rules":';            inventory_rules;           printf ','

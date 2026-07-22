@@ -11,7 +11,7 @@ Reference for `.meowkit/memory/trace-log.jsonl` records. Append-only JSONL writt
 | `event` | string | yes | one of the canonical event types below |
 | `run_id` | string | optional | `MEOWKIT_RUN_ID` env var (set by `mk:autobuild` step-00) |
 | `harness_version` | string | yes | `MEOWKIT_HARNESS_VERSION` env var, default `"3.0.0"` |
-| `model` | string | optional | `MEOWKIT_MODEL_HINT` or `CLAUDE_MODEL` env var |
+| `model` | string | optional | `MEOWKIT_MODEL_HINT` or `the project environment` env var |
 | `density` | string | optional | `MEOWKIT_AUTOBUILD_MODE` env var (`MINIMAL\|FULL\|LEAN`) |
 | `data` | object | yes | event-specific payload (see Event Types below) |
 

@@ -10,7 +10,7 @@ Auto-prompt: "Context budget is nearing the host warning threshold. Would you li
 
 ## Step 2: Save State
 
-**Location:** `.claude/logs/workflows/[workflow-id]/workflow-state.json`
+**Location:** `.codex/logs/workflows/[workflow-id]/workflow-state.json`
 
 ```json
 {
@@ -35,7 +35,7 @@ Output:
 WORKFLOW HANDOFF COMPLETE
 **Workflow ID:** AUTH-123
 **Progress:** Phase 1: Approved, Phase 2: Approved, Phase 3: In Progress
-**State Saved:** .claude/logs/workflows/AUTH-123/workflow-state.json
+**State Saved:** .codex/logs/workflows/AUTH-123/workflow-state.json
 **Key Decisions:** [list]
 **TO RESUME:** Type: `workflow:resume AUTH-123`
 ```

@@ -56,7 +56,7 @@ Step 0: Scope Challenge
          ↓
 Step 0.5: Intake Packet (conditional — ≥2 external artifacts)
     ├── < 2 sources → skip clean (intake_packet_path = none)
-    └── ≥ 2 sources → consolidate into .claude/session-state/plan-creator-intake-packet.md
+    └── ≥ 2 sources → consolidate into .codex/session-state/plan-creator-intake-packet.md
          ↓
 Step 3: Draft Plan
     └── plan.md only (≤80 lines, goal + ACs + constraints + approach)

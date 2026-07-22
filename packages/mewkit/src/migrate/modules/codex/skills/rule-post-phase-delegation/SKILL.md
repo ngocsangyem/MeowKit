@@ -64,7 +64,7 @@ WHY: Skip paths avoid delivery tracking when there is no useful plan/report surf
 
 ## Rule 4: Orchestrator Disambiguation
 
-Per `.claude/rules/orchestration-rules.md`, `mk:cook` and `mk:workflow-orchestrator` are mutually exclusive per session. Refer to that rule for the full disambiguation logic.
+Per `.agents/skills/rule-orchestration-rules.md`, `mk:cook` and `mk:workflow-orchestrator` are mutually exclusive per session. Refer to that rule for the full disambiguation logic.
 
 WHY: Orchestrator mutual exclusion also prevents duplicate PM reports.
 
@@ -91,7 +91,7 @@ WHY: One global knob prevents per-skill opt-out drift.
 
 ## Rule 7: No Hook Dispatch
 
-PM MUST NOT be invoked from hook handlers. On Claude Code, hooks cannot call
+PM MUST NOT be invoked from hook handlers. On Codex, hooks cannot call
 the Agent tool (verified via runtime documentation).
 
 WHY: Hook-based dispatch would loop on PM's own SubagentStop; explicit delegation is auditable.

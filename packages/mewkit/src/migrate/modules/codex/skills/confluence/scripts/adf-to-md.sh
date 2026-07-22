@@ -6,13 +6,13 @@
 #   fetch:  bash adf-to-md.sh --page-id 12345
 
 set -euo pipefail
-ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-PY="$ROOT/.claude/skills/.venv/bin/python3"
-SCRIPT="$ROOT/.claude/skills/confluence/scripts/adf_to_md.py"
-WRAPPER="$ROOT/.claude/skills/confluence/scripts/confluence-as.sh"
+ROOT="$(git rev-parse --show-toplevel):-$(pwd)}"
+PY="$ROOT/.agents/skills/.venv/bin/python3"
+SCRIPT="$ROOT/.agents/skills/confluence/scripts/adf_to_md.py"
+WRAPPER="$ROOT/.agents/skills/confluence/scripts/confluence-as.sh"
 
 if [ ! -x "$PY" ]; then
-  echo "[adf-to-md] venv not found at $PY - run \`.claude/scripts/bin/setup-workflow\` first" >&2
+  echo "[adf-to-md] venv not found at $PY - run \`.codex/scripts/bin/setup-workflow\` first" >&2
   exit 127
 fi
 

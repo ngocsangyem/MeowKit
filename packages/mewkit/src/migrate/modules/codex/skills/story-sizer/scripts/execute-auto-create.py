@@ -3,7 +3,7 @@
 
 Builds the v1-whitelisted command invocations and either:
   - prints them to stdout in plan mode (--plan-only), so the SKILL.md
-    orchestration layer can hand them off to /mk:jira-issue + /mk:jira-collaborate
+    orchestration layer can hand them off to the jira-issue skill + the jira-collaborate skill
   - executes them via a mock invoker (--invoker-mock <path>) for tests
 
 The script does NOT call `jira-as` or any credentialed wrapper itself. The
@@ -77,7 +77,7 @@ def _build_create_command(record: dict, project: str, epic: Optional[str],
     summary = _strip_forbidden_flags(summary)
     description = _strip_forbidden_flags(description)
     parts = [
-        "/mk:jira-issue create",
+        "the jira-issue skill create",
         f'--project {project}',
         f'--type Story',
         f'--summary "{summary}"',
@@ -126,7 +126,7 @@ def _render_comment(template: str, record: dict, report_path: str) -> str:
 def _build_comment_command(new_key: str, body: str) -> str:
     safe_body = body.replace('"', "'")
     return (
-        f'/mk:jira-collaborate add-comment {new_key} '
+        f'the jira-collaborate skill add-comment {new_key} '
         f'--body "{safe_body}" --internal'
     )
 
@@ -274,7 +274,7 @@ def append_to_report(result: dict, report_path: Optional[str]) -> None:
             "",
             f"Reason: {result.get('stopped_reason')}",
             "",
-            "Manual cleanup hint: `/mk:jira-lifecycle delete <KEY>` per ticket above.",
+            "Manual cleanup hint: `the jira-lifecycle skill delete <KEY>` per ticket above.",
         ]
     if result.get("comment_failures"):
         lines += ["", "## Comment Failures", ""]
@@ -293,7 +293,7 @@ def main(argv: list[str]) -> int:
         invoker = argv[idx + 1] if idx + 1 < len(argv) else None
 
     payload = json.load(sys.stdin)
-    project_root = Path(os.environ.get("CLAUDE_PROJECT_DIR", Path.cwd())).resolve()
+    project_root = Path(os.environ.get("the project environment", Path.cwd())).resolve()
 
     result = execute(payload, project_root, plan_only, invoker)
 

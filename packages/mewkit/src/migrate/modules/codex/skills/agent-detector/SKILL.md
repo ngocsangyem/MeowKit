@@ -21,22 +21,22 @@ description: "Detects task agent and complexity tier at Phase 0 orient. Invoked 
 
    If the marker IS present (turns 2..N of the same session): emit
    `Safety baseline: verified (cached)` and SKIP the 5-file Read loop below.
-   The 5 rules remain in context from the inner harness's CLAUDE.md auto-load;
+   The 5 rules remain in context from the inner harness's AGENTS.md auto-load;
    the sentinel only suppresses redundant re-reads.
 
    If the marker is ABSENT (turn 1 of a new session, OR
    `MEOWKIT_SKIP_SAFETY_SENTINEL=off`): `Read` each of the 5 always-on
    safety/baseline rules:
-   - `.claude/rules/security-rules.md`
-   - `.claude/rules/injection-rules.md`
-   - `.claude/rules/gate-rules.md`
-   - `.claude/rules/core-behaviors.md`
-   - `.claude/rules/development-rules.md`
+   - `.agents/skills/rule-security-rules.md`
+   - `.agents/skills/rule-injection-rules.md`
+   - `.agents/skills/rule-gate-rules.md`
+   - `.agents/skills/rule-core-behaviors.md`
+   - `.agents/skills/rule-development-rules.md`
 
    If any `Read` returns "file does not exist" or equivalent, **ABORT IMMEDIATELY** with the exact message:
 
    ```
-   SAFETY BASELINE INCOMPLETE: rule <name> not found at .claude/rules/<name>.md
+   SAFETY BASELINE INCOMPLETE: rule <name> not found at .agents/skills/rule-<name>.md
    Refusing to route any task. Restore the rule (git checkout / the installer) before retrying.
    ```
 
@@ -49,27 +49,27 @@ description: "Detects task agent and complexity tier at Phase 0 orient. Invoked 
    ```
 
    If the marker IS present: emit `Phase-zero rules: verified (cached)` and SKIP the 6-file Read loop. If ABSENT (turn 1 or env-var override), `Read` each phase-zero file. These govern Phase 0 routing and are read once per agent-detector invocation:
-   - `.claude/rules/phase-contracts.md` — what each phase expects/produces
-   - `.claude/rules/agent-routing.md` — agent → role → phase table
-   - `.claude/rules/model-selection-rules.md` — task-type → model-tier mapping
-   - `.claude/rules/scale-adaptive-rules.md` — domain CSV → complexity routing
-   - `.claude/rules/risk-checklist.md` — 9 horizontal-risk flags
+   - `.agents/skills/rule-phase-contracts.md` — what each phase expects/produces
+   - `.agents/skills/rule-agent-routing.md` — agent → role → phase table
+   - `.agents/skills/rule-model-selection-rules.md` — task-type → model-tier mapping
+   - `.agents/skills/rule-scale-adaptive-rules.md` — domain CSV → complexity routing
+   - `.agents/skills/rule-risk-checklist.md` — 9 horizontal-risk flags
    - `.agents/skills/agent-detector/references/skill-domain-routing.md` — intent → skill dispatch table (used at hand-off, Step 5)
 
    If any of the 5 rule `Read`s fails: ABORT with `PHASE-ZERO RULE MISSING: <name>` — same fail-fast semantics as Step 0. These rules drive the routing logic in steps 2–4; without them, detection silently degrades to keyword-only. The skill-domain-routing reference is advisory dispatch guidance (not a routing rule): if it is absent, log `skill-domain-routing reference absent; skill dispatch falls back to inline judgment` and continue — do NOT abort.
 
    **Agile context detection (additive — Agile-only load).** After the 5 phase-zero `Read`s succeed:
 
-   1. **PRE-FLIGHT.** Check that `.claude/rules-conditional/` directory exists. If absent → log `agile rules: rules-conditional/ not deployed; skipping load` and skip steps 2–4. (Defensive: filesystem may lag pruning-plan status doc.)
+   1. **PRE-FLIGHT.** Check that `.agents/skills/rule-` directory exists. If absent → log `agile rules: rules-conditional/ not deployed; skipping load` and skip steps 2–4. (Defensive: filesystem may lag pruning-plan status doc.)
    2. **Detect Agile context — OR-logic, any one match triggers load:**
       - Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
       - Active plan frontmatter has non-empty `jira_tickets:`
       - `MEOW_JIRA_BASE_URL` env var is set
       - Last user message matches `[A-Z]{2,10}-\d+` (Jira-key pattern)
    3. **If Agile context detected, `Read` the 3 conditional rules:**
-      - `.claude/rules-conditional/agile-story-gates.md`
-      - `.claude/rules-conditional/agile-sprint-commitment.md`
-      - `.claude/rules-conditional/agile-feedback-cycle.md`
+      - `.agents/skills/rule-agile-story-gates.md`
+      - `.agents/skills/rule-agile-sprint-commitment.md`
+      - `.agents/skills/rule-agile-feedback-cycle.md`
       Per-file Read failure (file absent inside the directory): log and skip THAT rule; do NOT abort Step 0b. The phase-zero baseline is already loaded.
    4. **Sprint-goal banner.** If a sprint-state contract exists, parse `sprint_goal:` from the newest active sprint-state file (status: active) and surface in the orient banner.
 
@@ -78,7 +78,7 @@ description: "Detects task agent and complexity tier at Phase 0 orient. Invoked 
 1. **Check cache** -- reuse cached result if same workflow and phase > 1. See `references/detection-process.md`
 2. **Score agents** -- analyze task content, extract keywords, check project context across all layers (0-4). See `references/multi-layer-detection.md`, `references/scoring-and-thresholds.md`
 3. **Select model + mode** -- map complexity to model tier, check team mode eligibility. See `references/model-selection.md`, `references/complexity-detection.md`, `references/team-mode.md`
-4. **Evaluate risk flags** -- read `.claude/rules/risk-checklist.md` (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per `rules/model-selection-rules.md` Rule 2 — regardless of `mk:scale-routing` outcome.
+4. **Evaluate risk flags** -- read `.agents/skills/rule-risk-checklist.md` (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per `rules/model-selection-rules.md` Rule 2 — regardless of `mk:scale-routing` outcome.
 5. **Output + hand off** -- show detection banner (including `matched_flags` line if non-empty), load agent instructions, invoke skill. See `references/detection-process.md`, `references/after-detection.md`
 
 ## References

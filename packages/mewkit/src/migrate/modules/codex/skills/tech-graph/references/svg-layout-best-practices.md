@@ -73,7 +73,7 @@ Before finalizing SVG, check:
 - **Arrows**: thin (1.5-2px), filled polygon markers
 - **No shadows**: flat design principle
 
-### Style-6: Claude Official Warm
+### Style-6: Codex Official Warm
 - **Soft shadows**: `<feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#00000008"/>`
 - **Rounded corners**: rx="12" ry="12" (more rounded than Style-1)
 - **Arrows**: medium weight (2px), subtle markers

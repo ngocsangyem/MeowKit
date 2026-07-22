@@ -49,8 +49,8 @@ function buildDelegationCommand(url) {
   // https://x";rm -rf $HOME;echo " would otherwise escape the double-quote boundary.
   const safeUrl = shellEscapeSingleQuote(url);
   return (
-    `.claude/skills/.venv/bin/python3 ` +
-    `.claude/skills/web-to-markdown/scripts/fetch_as_markdown.py ` +
+    `.agents/skills/.venv/bin/python3 ` +
+    `.agents/skills/web-to-markdown/scripts/fetch_as_markdown.py ` +
     `${safeUrl} --wtm-accept-risk --caller mk:docs-finder`
   );
 }

@@ -14,7 +14,7 @@ Analyze a single Jira ticket for implementation feasibility. Produce a Tech Revi
 ## Input
 
 Receive from SKILL.md orchestrator:
-- Ticket data (read via the `mk:jira-*` family wrapper: `bash the project environment/.agents/skills/jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all'`)
+- Ticket data (read via the `mk:jira-*` family wrapper: `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all'`)
 - Optional: scout output (codebase context, passed inline by SKILL.md)
 - Optional: prior mk:jira evaluate/estimate output (if in session or file)
 

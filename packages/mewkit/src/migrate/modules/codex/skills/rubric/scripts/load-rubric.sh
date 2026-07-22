@@ -9,7 +9,7 @@
 #
 # Used by:
 #   - mk:rubric SKILL.md as the implementation of list/load/compose subcommands
-#   - evaluator subagent (via mk:evaluate, shipped Phase 3) to inject rubrics into its grading prompt
+#   - evaluator sub-task (via mk:evaluate, shipped Phase 3) to inject rubrics into its grading prompt
 #
 # Exit: 0 on success, 1 if rubric/preset not found, 2 on usage error
 #
@@ -20,7 +20,7 @@ set -u
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 repo_root="$(cd "$script_dir/../../../.." && pwd)"
-rubrics_dir="$repo_root/.claude/rubrics"
+rubrics_dir="$repo_root/.codex/rubrics"
 presets_dir="$rubrics_dir/composition-presets"
 
 if [ ! -d "$rubrics_dir" ]; then

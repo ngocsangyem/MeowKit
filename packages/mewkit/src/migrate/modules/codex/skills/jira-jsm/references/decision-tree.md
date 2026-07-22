@@ -33,10 +33,10 @@ Standard fields like priority, assignee, status, labels.
 
 ```bash
 # Find high-priority incidents
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh search query "project=SD AND type=Incident AND priority=High"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search query "project=SD AND type=Incident AND priority=High"
 
 # Find SLA breaches
-bash the project environment/.agents/skills/jira/scripts/jira-as.sh search query "project=SD AND 'Time to resolution' breached"
+bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search query "project=SD AND 'Time to resolution' breached"
 ```
 
 ---

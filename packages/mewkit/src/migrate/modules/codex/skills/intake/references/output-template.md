@@ -105,7 +105,7 @@ Causal chain:
 ---
 
 ### Jira Actions
-(Include only if the `mk:jira-*` family is available — jira-as installed + `.claude/.env` populated)
+(Include only if the `mk:jira-*` family is available — jira-as installed + `.codex/.env` populated)
 
 - [ ] Transition [TICKET-ID] to [state]
 - [ ] Link [TICKET-ID] [relationship] [TARGET-ID]
