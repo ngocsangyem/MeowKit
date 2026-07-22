@@ -32,13 +32,18 @@ export const ArtifactManifestEntrySchema = z
 		/** Provider-native install target, relative to the project root. */
 		targetPath: z.string().min(1),
 		provider: ProviderType,
-		/** sha256 of the projected artifact (determinism + reconcile base). */
-		checksum: z.string().min(1),
+		/** sha256 of the projected artifact (determinism + reconcile base). Optional for
+		 *  hand-authored bundles, whose checksum is computed from the file at copy time. */
+		checksum: z.string().min(1).optional(),
 		/** POSIX file mode for the installed artifact (e.g. "0644", "0755" for hooks). */
 		mode: z.string().regex(/^0[0-7]{3}$/).default("0644"),
 		ownership: ArtifactOwnership,
 		mergeBehavior: ArtifactMergeBehavior.default("replace"),
 		scopeTags: z.array(ArtifactScopeTag).default([]),
+		/** Phased-transition control: an authored artifact only replaces converter
+		 *  output once flipped `active`. Lets authored surfaces land one batch at a
+		 *  time (author-first, delete-converters-last) without a broken interim state. */
+		active: z.boolean().default(false),
 	})
 	.superRefine((entry, ctx) => {
 		const touchesUserOwned = entry.scopeTags.some((t) => USER_OWNED_SCOPES.has(t));

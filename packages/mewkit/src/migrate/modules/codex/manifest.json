@@ -1,0 +1,52 @@
+{
+  "version": "1.0",
+  "provider": "codex",
+  "generatedFrom": "hand-authored",
+  "entries": [
+    {
+      "sourcePath": "AGENTS.md",
+      "targetPath": "AGENTS.md",
+      "provider": "codex",
+      "mode": "0644",
+      "ownership": "managed-replace",
+      "scopeTags": ["managed-runtime"],
+      "active": false
+    },
+    {
+      "sourcePath": "config.toml",
+      "targetPath": ".codex/config.toml",
+      "provider": "codex",
+      "mode": "0644",
+      "ownership": "managed-replace",
+      "scopeTags": ["managed-runtime"],
+      "active": false
+    },
+    {
+      "sourcePath": "hooks.json",
+      "targetPath": ".codex/hooks.json",
+      "provider": "codex",
+      "mode": "0644",
+      "ownership": "managed-replace",
+      "scopeTags": ["managed-runtime"],
+      "active": false
+    },
+    {
+      "sourcePath": "agents/planner.toml",
+      "targetPath": ".codex/agents/planner.toml",
+      "provider": "codex",
+      "mode": "0644",
+      "ownership": "managed-replace",
+      "scopeTags": ["managed-runtime"],
+      "active": false
+    },
+    {
+      "sourcePath": "agents/analyst.toml",
+      "targetPath": ".codex/agents/analyst.toml",
+      "provider": "codex",
+      "mode": "0644",
+      "ownership": "managed-replace",
+      "scopeTags": ["managed-runtime"],
+      "active": false
+    }
+  ]
+}

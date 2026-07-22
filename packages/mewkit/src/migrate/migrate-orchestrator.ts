@@ -39,6 +39,7 @@ import type { MigrationDecisionRecord } from "./validation/migration-record-type
 import { discoverEnvKeys } from "./discovery/config-discovery.js";
 import { emitShellEnvPolicyScaffold } from "./providers/codex/shell-env-policy-emitter.js";
 import { getCodexRoot } from "./hooks/codex-path-safety.js";
+import { applyAuthoredCodexBundle } from "./modules/codex-authored-bundle.js";
 import { formatMcpIncludeRerunCommand } from "./migrate-ui-summary.js";
 import { convertMcpJsonToCodexToml } from "./converters/mcp-json-to-codex-toml.js";
 import { installCodexMcpServers } from "./hooks/codex-mcp-installer.js";
@@ -356,6 +357,14 @@ async function runMigrateUnderLock(
 		const hasFailures = executed.results.some((r) => !r.success);
 		if (!hasFailures && manifest) {
 			await updateAppliedManifestVersion(manifest.mewkitVersion);
+		}
+		// Authored-Codex overlay (author-first transition): on a clean codex migration,
+		// copy any authored `modules/codex/` artifacts flipped `active` over the converter
+		// output. Inert while every entry is draft, so today's converter path is unchanged;
+		// each future batch flips a surface live until the converters are retired entirely.
+		if (!hasFailures && targets.includes("codex")) {
+			const applied = applyAuthoredCodexBundle(getCodexRoot({ global: isGlobal }));
+			if (applied.length > 0) console.log(pc.green(`[+] Applied ${applied.length} authored Codex artifact(s)`));
 		}
 		return hasFailures || mcpFailed ? 1 : 0;
 	} finally {

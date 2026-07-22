@@ -1,0 +1,8 @@
+# Authored Codex configuration for the MeowKit harness. Hand-maintained and copied
+# to `.codex/config.toml` in the target project by `mewkit migrate codex`.
+
+[agents.planner]
+config_file = "agents/planner.toml"
+
+[agents.analyst]
+config_file = "agents/analyst.toml"
