@@ -48,7 +48,7 @@ There are **two** write paths. Pick the right one — picking the wrong one mean
 
 ### Path 1 — `mewkit memory capture` (`##prefix:` shortcut)
 
-The **human user** types messages with a `##` prefix. A provider's `UserPromptSubmit` capture hook (a thin wrapper) pipes the prompt to `npx mewkit memory capture`, the single capture authority shared across provider hooks:
+The **human user** types messages with a `##` prefix. Codex's `UserPromptSubmit` capture hook is a thin wrapper that pipes the prompt straight to `npx mewkit memory capture` — the CLI is the single capture authority behind it, so the locking/scrub/scan logic lives in one place instead of being duplicated per provider:
 
 | Prefix | Target |
 |--------|--------|
