@@ -40,20 +40,6 @@ try {
   JSON.parse(fs.readFileSync(manifestPath, "utf8")); // validate JSON
   console.log("Validated release-manifest.json");
 
-  // Generate the native plugin distribution (plugin/ payload + marketplaces).
-  // The CLI is the single source of truth for the manifest version, so build it
-  // first, then run it. `git add -A` in release.sh then stages the generated
-  // plugin + marketplaces into the release commit, keeping manifest versions
-  // aligned with the release by construction.
-  execSync("npm -w packages/mewkit run build:cli", { stdio: "inherit" });
-  execSync("node packages/mewkit/dist/index.js build-plugin", { stdio: "inherit" });
-  for (const required of ["plugin/.claude-plugin/plugin.json", ".claude-plugin/marketplace.json"]) {
-    if (!fs.existsSync(path.join(projectRoot, required))) {
-      throw new Error(`Plugin distribution missing: ${required}`);
-    }
-  }
-  console.log("Generated plugin distribution");
-
   // Step 4: Create zip archive for GitHub Release
   if (!fs.existsSync(distDir)) {
     fs.mkdirSync(distDir, { recursive: true });
@@ -62,16 +48,9 @@ try {
     fs.unlinkSync(archivePath);
   }
 
-  const archiveTargets = [
-    ".claude",
-    "tasks",
-    "CLAUDE.md",
-    "release-manifest.json",
-    // Native plugin distribution (Claude Code + Codex).
-    "plugin",
-    ".claude-plugin",
-    ".agents",
-  ].filter((t) => fs.existsSync(path.join(projectRoot, t)));
+  const archiveTargets = [".claude", "tasks", "CLAUDE.md", "release-manifest.json"].filter((t) =>
+    fs.existsSync(path.join(projectRoot, t)),
+  );
 
   if (archiveTargets.length === 0) {
     throw new Error("No release assets found");

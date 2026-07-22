@@ -153,10 +153,10 @@ describe("ApprovedWrite.issue (write chokepoint)", () => {
 });
 
 // Parity with the .cjs source (risk mitigation: ported patterns must not drift). Skipped when
-// the repo-root plugin/ tree is absent (e.g. an installed downstream project).
+// the repo-root .claude/ tree is absent (e.g. an installed downstream project).
 const here = path.dirname(fileURLToPath(import.meta.url));
-const cjsValidate = path.resolve(here, "../../../../../../plugin/hooks/lib/validate-content.cjs");
-const cjsScrub = path.resolve(here, "../../../../../../plugin/hooks/lib/secret-scrub.cjs");
+const cjsValidate = path.resolve(here, "../../../../../../.claude/hooks/lib/validate-content.cjs");
+const cjsScrub = path.resolve(here, "../../../../../../.claude/hooks/lib/secret-scrub.cjs");
 const require = createRequire(import.meta.url);
 
 describe.skipIf(!existsSync(cjsValidate))("parity with .cjs scanner source", () => {

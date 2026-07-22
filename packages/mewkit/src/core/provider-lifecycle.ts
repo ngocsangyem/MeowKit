@@ -87,14 +87,14 @@ const CLAUDE_CODE_LIFECYCLE: LifecycleMap = {
 	subagent_stop: { status: "supported", gate: false, evidence: "SubagentStop hook in shipped settings.json (observe)" },
 };
 
-/** Claude plugin: the same SessionStart-et-al hooks, propagated into the plugin payload by
- * `build-plugin` — identical lifecycle surface to the flat copy. */
+/** Claude plugin: the same SessionStart-et-al hooks, propagated into the plugin payload during
+ * plugin generation — identical lifecycle surface to the flat copy. */
 const CLAUDE_PLUGIN_LIFECYCLE: LifecycleMap = {
 	...CLAUDE_CODE_LIFECYCLE,
 	session_start: {
 		status: "supported",
 		gate: false,
-		evidence: "SessionStart hook propagated into the plugin payload by build-plugin (observe/inject)",
+		evidence: "SessionStart hook propagated into the plugin payload during plugin generation (observe/inject)",
 	},
 };
 

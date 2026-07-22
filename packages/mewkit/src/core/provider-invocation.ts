@@ -58,7 +58,7 @@ const CLAUDE_PLUGIN_INVOCATION: InvocationShapeMap = {
 		note: "command shipped in the plugin payload",
 	},
 	"lifecycle-hook": {
-		operation: "hook in the plugin payload (via build-plugin)",
+		operation: "hook in the plugin payload (propagated at plugin generation)",
 		support: "supported",
 		note: "propagated hook fires on the mapped event",
 	},

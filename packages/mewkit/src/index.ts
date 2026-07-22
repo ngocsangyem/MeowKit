@@ -26,7 +26,6 @@ import { trace } from "./commands/trace.js";
 // (experimental), so a static import would load SQLite + emit its warning on EVERY command.
 import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
-import { buildPlugin } from "./commands/build-plugin.js";
 import { visualPlan } from "./commands/visual-plan.js";
 import { reviewPrepare } from "./commands/review/prepare.js";
 import { reviewRead } from "./commands/review/read.js";
@@ -71,7 +70,6 @@ ${pc.bold("Commands:")}
   ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
   ${pc.green("query")}      Read-only aggregate queries over the derived index
   ${pc.green("pack")}       Manage install packs (list, add, remove)
-  ${pc.green("build-plugin")} Generate the native plugin distribution (plugin/ + marketplaces)
 
 ${pc.bold("Options:")}
   --help, -h       Show help
@@ -86,7 +84,6 @@ ${pc.bold("Options:")}
   --strict         Validate: treat WARN as failure (exit 1); off by default
   --workflow       Validate: run only the workflow.yaml drift-check (CI scope)
   --gates          Validate: run only the gate-authority contract check (CI scope)
-  --parity         Validate: regenerate the plugin and diff it against the committed tree
   --ownership      Validate: run only the artifact ownership-completeness check
   --agents         Validate: run only declared agent-contract conformance checks
   --packs          Validate: run only the pack-manifest coherence + safety check
@@ -194,7 +191,6 @@ async function main(): Promise<void> {
 			"verbose",
 			"workflow",
 			"gates",
-			"parity",
 			"ownership",
 			"agents",
 			"json",
@@ -302,22 +298,15 @@ async function main(): Promise<void> {
 				strict: args.strict as boolean | undefined,
 				workflow: args.workflow as boolean | undefined,
 				gates: args.gates as boolean | undefined,
-				parity: args.parity as boolean | undefined,
 				ownership: args.ownership as boolean | undefined,
 				agents: args.agents as boolean | undefined,
 				substrate: args.substrate as boolean | undefined,
 				packs: args.packs as boolean | undefined,
 				rules: args.rules as boolean | undefined,
-				plugin: args.plugin as boolean | undefined,
 				capabilities: args.capabilities as boolean | undefined,
 			});
 			break;
 		}
-		case "build-plugin":
-			await buildPlugin({
-				json: args.json as boolean | undefined,
-			});
-			break;
 		case "review": {
 			const sub = args._[1] as string | undefined;
 			if (sub === "prepare") {

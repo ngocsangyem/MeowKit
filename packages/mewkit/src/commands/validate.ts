@@ -15,12 +15,11 @@ import {
 import { findPseudoCapabilities } from "../core/check-pseudo-capabilities.js";
 import { findGenericCoreTokens, summarizeGenericCoreTokens } from "../core/check-generic-core-tokens.js";
 import { checkStaleIndex } from "../core/check-stale-index.js";
-import { checkPluginParity } from "../core/check-plugin-parity.js";
 import { checkOwnership } from "../core/build-inventory.js";
 import { checkAgentConformance } from "../core/check-agent-conformance.js";
 import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
-import { checkPlugin, checkPluginNamespace, checkPluginManifests } from "../core/check-plugin-manifests.js";
+import { checkPluginNamespace } from "../core/namespace-purity.js";
 import { validateCapabilities } from "../core/validate-capabilities.js";
 import { buildCapabilities } from "../core/build-capabilities.js";
 import { capabilityViewDrift } from "../core/generate-capability-view.js";
@@ -62,14 +61,14 @@ export interface CheckResult {
  * Consumer profile for a validate run.
  * - `authoring`: the MeowKit source checkout. Gets the full authoring-coherence
  *   suite (workflow drift, ownership/substrate completeness, pack-manifest
- *   coherence, routing-table breadth, plugin manifests) alongside consumer checks.
+ *   coherence, routing-table breadth) alongside consumer checks.
  * - `flat-copy`: a project that installed `.claude/` by copy. Gets only
  *   consumer-actionable checks; authoring-coherence checks are suppressed because a
  *   consumer legitimately customizes `CLAUDE.md`/`rules` (tripping workflow-drift and
- *   routing-breadth) and has no `plugin/` build output (plugin-manifest N/A), so those
- *   checks would surface as false failures in a healthy consumer install.
- * Provider projection/plugin payloads are validated by adapter-specific paths
- * (e.g. `--portable`, `--plugin`), not by guessing a third mode here.
+ *   routing-breadth), so those checks would surface as false failures in a healthy
+ *   consumer install.
+ * Provider projections are validated by adapter-specific paths (e.g. `--portable`),
+ * not by guessing a third mode here.
  */
 export type ValidateMode = "authoring" | "flat-copy";
 
@@ -82,8 +81,6 @@ interface ValidateOptions {
 	workflow?: boolean;
 	/** Scope the run to the gate-authority contract check only (used by CI). */
 	gates?: boolean;
-	/** Scope the run to the canonical↔plugin parity check only (used by CI). */
-	parity?: boolean;
 	/** Scope the run to the ownership-completeness check only (used by CI). */
 	ownership?: boolean;
 	/** Scope the run to the responsibility-substrate check only (used by CI). */
@@ -92,8 +89,6 @@ interface ValidateOptions {
 	packs?: boolean;
 	/** Scope the run to the routing-table-breadth WARN check only. */
 	rules?: boolean;
-	/** Scope the run to the plugin namespace + manifest guards only (used by CI). */
-	plugin?: boolean;
 	/** Scope the run to the capability-manifest coherence check only (CI-adoptable). */
 	capabilities?: boolean;
 	/** Scope the run to the declared agent-contract conformance check. */
@@ -274,9 +269,8 @@ export function diagnosticToStatus(surfaceStatus: string, severity: "pass" | "wa
  * Two properties, both cheap and both load-bearing:
  *  1. No logical operation leaked into the frontmatter-reachable invocation enum.
  *     That enum's entire value is what it excludes, so erosion is silent and fatal.
- *  2. No unresolved pseudo-capability aliases in the canonical tree. `build-plugin`
- *     already refuses to ship one; surfacing it here means an author sees it at
- *     `validate` time instead of at release time.
+ *  2. No unresolved pseudo-capability aliases in the canonical tree — surfacing it
+ *     here means an author sees it at `validate` time instead of at release time.
  */
 function checkOperationConformance(meowkitDir: string): CheckResult[] {
 	const results: CheckResult[] = [];
@@ -675,8 +669,8 @@ export function checkCapabilityViewDrift(meowkitDir: string, projectRoot: string
  * Assemble the default-run checks for a given mode. Consumer-actionable checks run in
  * both modes; authoring-coherence checks run only in `authoring` mode — in a flat-copy
  * consumer they would be false failures (consumer customization of CLAUDE.md/rules trips
- * drift + routing-breadth; no `plugin/` build makes plugin manifests N/A). Pure and
- * side-effect-free so it can be tested directly against a fixture.
+ * drift + routing-breadth). Pure and side-effect-free so it can be tested directly
+ * against a fixture.
  */
 export async function buildDefaultChecks(
 	meowkitDir: string,
@@ -719,8 +713,6 @@ export async function buildDefaultChecks(
 			...checkAgentConformance(projectRoot),
 			...checkSubstrate(meowkitDir, { missingViewSeverity: "warn" }),
 			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
-			// Manifest contract is N/A until `mewkit build-plugin` has run.
-			...checkPluginManifests(projectRoot),
 			...checkRoutingTableBreadth(meowkitDir),
 			...checkCapabilitiesSection(meowkitDir),
 			...checkCapabilityViewDrift(meowkitDir, projectRoot),
@@ -784,8 +776,6 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = checkWorkflowDrift(projectRoot);
 	} else if (args.gates) {
 		results = [...checkGateAuthority(projectRoot), ...checkCommandDrift(projectRoot)];
-	} else if (args.parity) {
-		results = checkPluginParity(projectRoot);
 	} else if (args.ownership) {
 		results = checkOwnership(meowkitDir);
 	} else if (args.substrate) {
@@ -794,8 +784,6 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = checkPacks(meowkitDir);
 	} else if (args.rules) {
 		results = checkRoutingTableBreadth(meowkitDir);
-	} else if (args.plugin) {
-		results = checkPlugin(meowkitDir, projectRoot);
 	} else if (args.capabilities) {
 		results = checkCapabilitiesSection(meowkitDir);
 	} else if (args.agents) {

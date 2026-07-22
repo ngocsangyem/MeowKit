@@ -8,7 +8,7 @@
 /** Where/how the always-visible bootstrap reaches a provider's instruction surface. */
 export type BootstrapPlacement =
 	| "sessionstart-hook" // Claude Code flat-copy: a SessionStart hook cats the bootstrap file
-	| "sessionstart-hook-via-plugin-build" // Claude plugin: same hook, propagated by `build-plugin`
+	| "sessionstart-hook-via-plugin-build" // Claude plugin: same hook, propagated at plugin generation
 	| "instruction-file" // Codex: a section in the AGENTS instruction surface (no gating hook)
 	| "none"; // no tested projection
 
@@ -49,7 +49,7 @@ export const PROVIDER_PROJECTIONS: Record<string, ProviderProjection> = {
 		bootstrapPlacement: "sessionstart-hook-via-plugin-build",
 		levels: { discoverable: "supported", selectable: "supported", invocable: "supported", enforceable: "supported" },
 		evidence:
-			"Same SessionStart hook, propagated into the plugin payload by `build-plugin`; plugin hooks gate behavior.",
+			"Same SessionStart hook, propagated into the plugin payload at plugin generation; plugin hooks gate behavior.",
 	},
 	codex: {
 		provider: "codex",
