@@ -31,6 +31,15 @@
       "active": false
     },
     {
+      "sourcePath": "hooks/capture.sh",
+      "targetPath": ".codex/hooks/capture.sh",
+      "provider": "codex",
+      "mode": "0755",
+      "ownership": "managed-replace",
+      "scopeTags": ["managed-runtime"],
+      "active": false
+    },
+    {
       "sourcePath": "agents/planner.toml",
       "targetPath": ".codex/agents/planner.toml",
       "provider": "codex",

@@ -5,7 +5,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CODEX_PROJECT_DIR/.codex/hooks/capture.sh\""
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/capture.sh\"",
+            "timeout": 10,
+            "statusMessage": "Capturing memory prefixes"
           }
         ]
       }

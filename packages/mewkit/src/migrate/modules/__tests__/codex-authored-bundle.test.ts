@@ -27,17 +27,32 @@ describe("authored codex bundle", () => {
 		}
 	});
 
-	it("copies every artifact to its native target path with authored content", () => {
+	it("copies every artifact to its native Codex target path with authored content", () => {
 		const copied = copyAuthoredCodexBundle(moduleDir, target); // onlyActive: false
 		expect(copied.map((c) => c.targetPath).sort()).toEqual(
-			[".codex/agents/analyst.toml", ".codex/agents/planner.toml", ".codex/config.toml", ".codex/hooks.json", "AGENTS.md"].sort(),
+			[
+				".codex/agents/analyst.toml",
+				".codex/agents/planner.toml",
+				".codex/config.toml",
+				".codex/hooks.json",
+				".codex/hooks/capture.sh",
+				"AGENTS.md",
+			].sort(),
 		);
 		expect(readFileSync(join(target, "AGENTS.md"), "utf-8")).toContain("Authored Codex instruction surface");
-		expect(readFileSync(join(target, ".codex", "config.toml"), "utf-8")).toContain("[agents.planner]");
+		// Agents follow the real Codex subagent format: name + developer_instructions,
+		// auto-loaded (config.toml does NOT wire them via config_file).
+		const planner = readFileSync(join(target, ".codex", "agents", "planner.toml"), "utf-8");
+		expect(planner).toContain('name = "planner"');
+		expect(planner).toContain("developer_instructions");
+		expect(readFileSync(join(target, ".codex", "config.toml"), "utf-8")).not.toContain("config_file");
 		expect(readFileSync(join(target, ".codex", "agents", "analyst.toml"), "utf-8")).toContain(".meowkit/telemetry/cost-log.json");
 		// Authored content points memory at .meowkit/, never legacy .claude/memory or native .codex/memory.
-		expect(readFileSync(join(target, ".codex", "agents", "planner.toml"), "utf-8")).not.toContain(".claude/memory");
-		expect(statSync(join(target, ".codex", "config.toml")).mode & 0o777).toBe(0o644);
+		expect(planner).not.toContain(".claude/memory");
+		// Hooks resolve the project root via git (Codex exposes no CODEX_PROJECT_DIR).
+		expect(readFileSync(join(target, ".codex", "hooks.json"), "utf-8")).toContain("git rev-parse --show-toplevel");
+		// The capture wrapper is installed executable.
+		expect(statSync(join(target, ".codex", "hooks", "capture.sh")).mode & 0o777).toBe(0o755);
 	});
 
 	it("the copied bundle passes the Codex target validator (no failures)", async () => {
