@@ -5,6 +5,7 @@ import pc from "picocolors";
 import { validateMemory } from "../memory/validate.js";
 import { seedFromMd } from "../memory/seed-from-md.js";
 import { renderViews } from "../memory/render-views.js";
+import { resolveProjectRoot } from "../state/meowkit-root-resolver.js";
 
 interface MemoryArgs {
 	subcommand?: string;
@@ -19,25 +20,34 @@ interface PatternEntry {
 	[key: string]: unknown;
 }
 
-// Walks up at most 5 levels, stopping at a project root sentinel (CLAUDE.md or
-// .claude/settings.json) so `mewkit memory --clear` can't reach a parent
-// project's memory. Accepts optional startDir for testability; defaults to
-// process.cwd().
+// Canonical memory location is the runtime-neutral `.meowkit/memory`, resolved via
+// the CLI-owned project-root resolver (git/project root — never keyed off a provider
+// dir). Returns the path whether or not it exists yet; subcommands create it as
+// needed (seed / render-views). Null only when there is no resolvable project root.
 export function findMemoryDir(startDir?: string): string | null {
-	const PROJECT_ROOT_SENTINELS = ["CLAUDE.md", ".claude/settings.json"];
+	const root = resolveProjectRoot(startDir ?? process.cwd());
+	return root ? path.join(root, ".meowkit", "memory") : null;
+}
+
+// Read-only legacy detection: pre-migration projects still keep memory under
+// `.claude/memory`. Returns that path ONLY when it holds real content and the
+// canonical `.meowkit/memory` does not yet exist — used solely to prompt the user
+// to run `mewkit migrate`, never to read/write legacy memory directly. Walks up
+// with the historical project sentinels so a non-git legacy checkout still resolves.
+export function detectLegacyMemory(startDir?: string): string | null {
+	const PROJECT_ROOT_SENTINELS = ["CLAUDE.md", ".claude/settings.json", ".git"];
 	let current = startDir ?? process.cwd();
 	for (let depth = 0; depth < 5; depth++) {
-		const candidate = path.join(current, ".claude", "memory");
-		if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
-			return candidate;
+		const meowkit = path.join(current, ".meowkit", "memory");
+		if (fs.existsSync(meowkit)) return null; // already migrated at this root
+		const legacy = path.join(current, ".claude", "memory");
+		if (fs.existsSync(legacy) && fs.statSync(legacy).isDirectory()) {
+			const hasContent = fs.readdirSync(legacy).some((f) => f !== ".gitkeep");
+			return hasContent ? legacy : null;
 		}
-		// Stop if we've reached a project root (has CLAUDE.md or .claude/settings.json)
-		const atRoot = PROJECT_ROOT_SENTINELS.some((s) => fs.existsSync(path.join(current, s)));
-		// Sentinel must fire at depth 0 too. If CWD has CLAUDE.md but no memory
-		// dir, the walk must STOP here — not continue into the parent project.
-		if (atRoot) return null;
+		if (PROJECT_ROOT_SENTINELS.some((s) => fs.existsSync(path.join(current, s)))) return null;
 		const parent = path.dirname(current);
-		if (parent === current) return null; // filesystem root
+		if (parent === current) return null;
 		current = parent;
 	}
 	return null;
@@ -314,8 +324,22 @@ export async function memory(args: MemoryArgs): Promise<void> {
 	const memoryDir = findMemoryDir();
 
 	if (!memoryDir) {
-		console.error(pc.red("Could not find .claude/memory/ directory."));
+		console.error(pc.red("Could not find a project root (.git or package.json + .meowkit/) for .meowkit/memory/."));
 		process.exit(1);
+	}
+
+	// Pre-migration guard: if canonical `.meowkit/memory` is absent but legacy
+	// `.claude/memory` still holds content, operating here would silently ignore it.
+	// Prompt the user to migrate instead of reading/writing the wrong location.
+	if (!fs.existsSync(memoryDir)) {
+		const legacy = detectLegacyMemory();
+		if (legacy) {
+			console.error(
+				pc.yellow(`Legacy memory found at ${legacy}.`) +
+					pc.dim("\nRun `mewkit migrate` to move it into .meowkit/memory/, then retry."),
+			);
+			process.exit(1);
+		}
 	}
 
 	console.log(`${pc.dim("Location:")} ${memoryDir}`);
