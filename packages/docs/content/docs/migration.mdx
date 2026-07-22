@@ -1,9 +1,9 @@
 ---
 title: "Migration Guide"
-description: "Export MeowKit to external coding-agent tools (Cursor, Codex, Droid, OpenCode, and more) — and recover when things go sideways."
+description: "Export MeowKit to external coding-agent tools (Cursor, Codex) — and recover when things go sideways."
 ---
 
-The `mewkit migrate` command exports your `.claude/` kit to 15 external coding-agent tools. This page covers when to use it, what each tool accepts, and how to recover when conflicts surface.
+The `mewkit migrate` command exports your `.claude/` kit to 2 external coding-agent tools: Cursor and Codex. This page covers when to use it, what each tool accepts, and how to recover when conflicts surface.
 
 ## When to migrate
 
@@ -11,7 +11,7 @@ The `mewkit migrate` command exports your `.claude/` kit to 15 external coding-a
 |----------|---------|
 | Just ran `mewkit init`, want Cursor to see the kit too | `mewkit migrate cursor` |
 | Set up a fresh project for both Cursor and Codex in one shot | `mewkit init --migrate-to cursor,codex` |
-| Have multiple coding agents installed and want them all in sync | `mewkit migrate --all` |
+| Have both coding agents installed and want them in sync | `mewkit migrate --all` |
 | Just ran `mewkit upgrade`, need to propagate changes to external tools | `mewkit migrate TOOL` (re-runs are idempotent) |
 | Want to check what would happen before writing | `mewkit migrate TOOL --dry-run` |
 
@@ -22,34 +22,20 @@ What each tool can receive from your `.claude/` kit:
 | Tool | Agents | Commands | Skills | Config | Rules | Hooks |
 |------|:------:|:--------:|:------:|:------:|:-----:|:-----:|
 | Claude Code (source) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Cursor | ✓ | — | ✓ | ✓ | ✓ | — |
-| Codex | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Droid | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| OpenCode | ✓ | ✓ | ✓ | ✓ | ✓ | — |
-| Goose | ✓ | — | ✓ | ✓ | ✓ | — |
-| Gemini CLI | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Antigravity | — | ✓ | ✓ | ✓ | ✓ | — |
-| GitHub Copilot | ✓ | — | ✓ | ✓ | ✓ | — |
-| Amp | ✓ | — | ✓ | ✓ | ✓ | — |
-| Kilo Code [unverified] | ✓ | — | ✓ | ✓ | ✓ | — |
-| Kiro IDE | ✓ | — | ✓ | ✓ | ✓ | — |
-| Roo Code | ✓ | — | ✓ | ✓ | ✓ | — |
-| Windsurf | ✓ | ✓ | ✓ | ✓ | ✓ | — |
-| Cline | ✓ | — | ✓ | ✓ | ✓ | — |
-| OpenHands | ✓ | — | ✓ | ✓ | ✓ | — |
+| Cursor | — | — | — | ✓ | ✓ | — |
+| Codex | ✓ | — | ✓ | ✓ | ✓ | ✓ |
 
 ✓ supported · — not supported by tool
 
 **Special cases:**
-- **Antigravity** treats agents as a special case of skills. Your Claude Code agents migrate into Antigravity's skills directory.
 - **Codex commands** migrate as Agent Skills (`.agents/skills/source-command-<name>/SKILL.md`) — Codex custom prompts gave way to skills. Dynamic template syntax (`$ARGUMENTS`, `$1`, <code v-pre>{`{...}`}</code>, `` !`cmd` ``, `@file`) has no skill equivalent; the template migrates verbatim with a manual-adaptation warning.
 - **Capability resolution** adds one generated, bounded instruction block to `AGENTS.md` and writes `.codex/capabilities.json`. The block tells the agent to use `npx mewkit capabilities resolve --intent "..." --provider codex`; the JSON is data-only resolver input, never always-on model context. Re-running migration replaces the managed block without touching user-authored `AGENTS.md` content.
 - **Codex rules** merge into `AGENTS.md` as `## Rule:` sections (native `.rules` files only accept `prefix_rule()` command policies). Orchestration/runtime-only rules are skipped by default; pass `--all-rules` to merge everything. The merged file is checked against Codex's 32 KiB `project_doc_max_bytes` budget — over-budget merges warn with the exact config line to add to `~/.codex/config.toml`, but mewkit never truncates the file or writes to your home config.
 - **`.mcp.json`** converts to `config.toml [mcp_servers]` entries with the opt-in `--include-mcp` flag (Codex only; project-scoped MCP config loads only in trusted projects). When `.mcp.json` exists and the flag is off, the preflight tells you the exact re-run command.
 - **`.claude/.env`** converts to a Codex `[shell_environment_policy]` scaffold from key names only. Values are never copied; secret-like key names are omitted and counted only as an aggregate warning.
-- **Hooks** only migrate to four tools (Claude Code, Codex, Droid, Gemini CLI). For other tools, mewkit skips hooks with a warning. Codex events are version-gated: recent Codex (0.142+) supports 10 events with hooks enabled by default; older versions fall back to the conservative 6-event table.
+- **Hooks** only migrate to Codex. Cursor has no documented hooks surface, so mewkit skips hooks for it with a warning. Codex events are version-gated: recent Codex (0.142+) supports 10 events with hooks enabled by default; older versions fall back to the conservative 6-event table.
 - **Codex shell hooks** (`.sh`) migrate through generated `.cjs` wrappers that execute the copied script inside `.codex/hooks/`. Unsupported shell-family handlers such as `.ps1`, `.bat`, `.cmd`, and `.py` are reported as skipped with a reason.
-- **Kilo Code** entries are ported from upstream but unverified by mewkit. A runtime warning appears when you select it.
+- **Codex agent bundle** — `mewkit migrate codex` copies a hand-authored, Codex-native bundle: agents as `.codex/agents/*.toml` (name/description/developer_instructions), skills/commands/rules/modes as `.agents/skills/*/SKILL.md`, and hooks as `.codex/hooks.json`.
 
 ## Reference rewriting
 
@@ -71,10 +57,10 @@ Every preserved reference appears in the preflight/dry-run report with `file:lin
 # Fresh project, scaffold and export to Cursor in one command
 npx mewkit init --migrate-to cursor
 
-# Multiple tools at once
-npx mewkit init --migrate-to cursor,codex,droid
+# Both tools at once
+npx mewkit init --migrate-to cursor,codex
 
-# All 15 tools (CI-friendly)
+# All supported tools (CI-friendly)
 npx mewkit init --migrate-to all
 ```
 
@@ -158,7 +144,7 @@ mewkit migrate cursor --only=skills
 mewkit migrate cursor --only=skills,rules
 
 # Everything except hooks
-mewkit migrate gemini-cli --skip-hooks
+mewkit migrate cursor --skip-hooks
 
 # Everything except config and rules
 mewkit migrate codex --skip-config --skip-rules
@@ -206,17 +192,7 @@ mewkit init --migrate-to cursor --migrate-global
 
 ## Path collisions
 
-Some tools share install paths. mewkit detects this and emits a banner during the preflight:
-
-```
-[i] Shared target: .agents/skills/ (skills) used by codex + amp + windsurf — each provider writes the same content here
-```
-
-Currently shared paths:
-- `.agents/skills/` — used by Codex, Cursor, Windsurf, Gemini CLI, Amp (5 tools)
-- `~/.agents/skills/` — globally shared between several of the above
-
-When you select multiple sharing providers, mewkit issues distinct install actions per provider, but each writes byte-identical content (same `direct-copy` format) so the final on-disk state is consistent.
+mewkit detects when two selected providers would write the same install path and emits a banner during the preflight before reconciling per-provider install actions. With only Cursor and Codex as targets, and Cursor not migrating a skills surface, there is currently no cross-provider path collision — `.agents/skills/` is written only by Codex. The detection and reconciliation logic stay in place for when a future provider shares an install path.
 
 ## Uninstalling / starting over
 
@@ -248,20 +224,16 @@ If dead, delete the lock manually: `rm .mewkit/.lock`.
 
 ### "Provider detection failed" in `--yes` mode
 
-A `which` probe threw an unexpected error. mewkit refuses to default to "all 15 targets" silently. Pass `--all` or specify a tool explicitly:
+A `which` probe threw an unexpected error. mewkit refuses to default to "all supported targets" silently. Pass `--all` or specify a tool explicitly:
 
 ```bash
 mewkit migrate cursor --yes      # explicit single tool
-mewkit migrate --all --yes       # explicit all 15
+mewkit migrate --all --yes       # explicit both supported tools
 ```
 
 ### Codex hooks require recent Codex version
 
 mewkit probes `codex --version` and picks a version-gated capability table: Codex 0.142+ gets the full 10-event surface (hooks enabled by default), while older or undetectable versions fall back to the conservative 0.124.0-alpha.3 table (6 events, feature flag written). Unsupported events are skipped with a structured warning. Set `MEWKIT_CODEX_COMPAT=optimistic` to assume the newest capabilities, or `MEWKIT_CODEX_COMPAT=strict` to force the conservative table.
-
-### "Kilo Code support is UNVERIFIED"
-
-This warning is informational only — Kilo Code's registry entry is ported from upstream but no mewkit maintainer has tested it on a live install. If migration fails, please [open an issue](https://github.com/ngocsangyem/MeowKit/issues) with the error.
 
 ## Upgrading mewkit itself
 
@@ -278,4 +250,5 @@ After upgrading mewkit, your `.claude/` kit content does NOT change. Run `mewkit
 ## See also
 
 - [CLI Commands Reference](/cli/commands#migrate) — every flag with examples
+- [Memory System](/guide/memory-system#legacy-migration-from-claudememory) — every `mewkit migrate` run also migrates legacy `.claude/memory/` into `.meowkit/`
 - [TDD Optional Migration](/migration/tdd-optional) — older migration guide for the v2.x TDD-optional change

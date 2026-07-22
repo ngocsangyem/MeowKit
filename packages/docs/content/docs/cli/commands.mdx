@@ -63,7 +63,6 @@ npx mewkit validate
 
 | Flag | Description |
 | --- | --- |
-| `--plugin` | Plugin namespace purity + manifest contract + version alignment with the root `package.json`. |
 | `--packs` | Pack-manifest coherence + the exact-path safety invariant. |
 | `--workflow` | Workflow drift-check (CLAUDE.md / phase docs vs `workflow.yaml`). |
 | `--ownership` | Artifact ownership coverage. |
@@ -118,7 +117,7 @@ npx mewkit budget context --profile <core|developer|full> [--fail-over N] [--jso
 
 ## memory
 
-View or manage cross-session memory.
+View or manage cross-session memory, stored under the runtime-neutral `.meowkit/memory/` state root (see [Memory System](/guide/memory-system)).
 
 ```bash
 npx mewkit memory              # Summary (line counts, pattern count)
@@ -126,6 +125,24 @@ npx mewkit memory --show       # Display summary of curated memory stores
 npx mewkit memory --stats      # Sessions captured, patterns learned
 npx mewkit memory --clear      # Clear all memory (with confirmation)
 ```
+
+### memory capture
+
+Route a `##`-prefixed prompt into the right `.meowkit/memory` store through the single validated write contract (schema validation, secret scrubbing, injection scanning, per-store locking, atomic replace). This is the capture authority both the Claude and Codex capture hooks call — hooks stay thin wrappers around this one command.
+
+```bash
+npx mewkit memory capture "##decision: chose X over Y because..."
+echo "##pattern: description" | npx mewkit memory capture
+npx mewkit memory capture "##note: quick reminder"
+```
+
+| Prefix | Target store |
+| --- | --- |
+| `##decision:` | `architecture-decisions.json` |
+| `##pattern:` | `review-patterns.json` |
+| `##note:` | `quick-notes.md` |
+
+Reads the prompt from the first argument, or from stdin when no argument is given. A prompt without a recognized prefix is a silent no-op (exit 0).
 
 ## wiki
 
@@ -263,14 +280,6 @@ npx mewkit context record --task <id> <envelope.json> [--root <boundary>] [--jso
 | `check`    | Re-hash a recorded envelope's evidence and report `fresh` / `stale` / `missing` / `out-of-scope` per path, grouped by owning repo (with its revision). Boundary-scoped: paths outside `--root` are never stat-ed. |
 | `record`   | Merge an envelope's distinct owning repos + evidence paths into an **existing** durable task record (advisory, best-effort). |
 
-## build-plugin
-
-Regenerate the native plugin distribution (`plugin/` payload + Claude/Codex marketplaces) from `.claude/`. Release tooling — run after editing `.claude/` outside a release, then `npx mewkit validate --plugin`.
-
-```bash
-npx mewkit build-plugin [--json]
-```
-
 ## verdict-gate
 
 Gate 2 proof-bundle check. Reads a machine-readable review verdict and exits `0` (PASS / PASS_WITH_RISK or a tolerated legacy markdown-only verdict), `1` (BLOCKED / invalid / missing), or `2` (usage error).
@@ -384,13 +393,13 @@ npx mewkit migrate --all
 npx mewkit migrate                    # interactive multiselect
 ```
 
-**Supported tools:** `cursor`, `codex`, `droid`, `opencode`, `goose`, `gemini-cli`, `antigravity`, `github-copilot`, `amp`, `kilo`, `kiro`, `roo`, `windsurf`, `cline`, `openhands`. (`claude-code` is the source format and is not a valid migration target.)
+**Supported tools:** `cursor`, `codex`. (`claude-code` is the source format and is not a valid migration target. Selecting any other provider name errors with this supported list.)
 
 ### Flags
 
 | Flag                                            | Description                                                                    |
 | ----------------------------------------------- | ------------------------------------------------------------------------------ |
-| `--all`                                         | Migrate to all 15 supported tools in one pass                                  |
+| `--all`                                         | Migrate to all supported tools (`cursor`, `codex`) in one pass                 |
 | `--global`                                      | Install to user's home (`~/.cursor/`, etc.) instead of project-local paths     |
 | `--yes`, `-y`                                   | Non-interactive — auto-confirm prompts                                         |
 | `--dry-run`                                     | Compute and display the plan without writing any files                         |
@@ -421,9 +430,6 @@ The migration maps Claude source tiers (`opus`, `sonnet`, `haiku`) to configured
           "balanced": { "model": "your-codex-balanced-model", "reasoningEffort": "high" },
           "light": { "model": "your-codex-light-model", "reasoningEffort": "medium" }
         }
-      },
-      "opencode": {
-        "default": { "model": "your-provider/your-model" }
       }
     }
   }
@@ -440,48 +446,17 @@ The matrix reflects what `mewkit migrate` actually writes per provider. Each pro
 | ------------------------ | :--------: | :------: | :----: | :----: | :---: | :---: |
 | Cursor                   |     —      |    —     |   —    |   ✓    |   ✓   |   —   |
 | Codex                    |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   ✓   |
-| Droid                    |     ✓      |    ✓     |   ✓    |   ✓    |   —   |   —   |
-| OpenCode                 |     ✓      |    ✓     |   —    |   —    |   —   |   —   |
-| Goose                    |     —      |    —     |   ✓    |   ✓    |   —   |   —   |
-| Gemini CLI               |     —      |    ✓     |   ✓    |   ✓    |   —   |   —   |
-| Antigravity              |     —      |    —     |   —    |   —    |   ✓   |   —   |
-| GitHub Copilot           |     ✓      |    —     |   —    |   ✓    |   ✓   |   —   |
-| Amp                      |     —      |    —     |   —    |   ✓    |   —   |   —   |
-| Kilo Code [unverified]   |     —      |    —     |   —    |   —    |   —   |   —   |
-| Kiro IDE                 |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   —   |
-| Roo Code [deprecated]    |     —      |    —     |   —    |   —    |   —   |   —   |
-| Windsurf                 |     —      |    ✓     |   ✓    |   ✓    |   ✓   |   —   |
-| Cline                    |     —      |    —     |   ✓    |   —    |   ✓   |   —   |
-| OpenHands                |     —      |    —     |   —    |   —    |   —   |   —   |
 
 **Notes:**
 
 - Codex command migration is disabled until OpenAI documents a custom command directory. Codex's documented slash/app commands remain built in to Codex itself.
 - Codex rules in OpenAI's docs are exec-policy `.rules` files. MeowKit behavioral rules migrate into `AGENTS.md`; they are not converted into sandbox exec-policy rules.
-- Hooks: only Codex migrates hooks. Other providers' hook surfaces are documented upstream but currently disabled — see "Known limitations".
+- Hooks: only Codex migrates hooks. Cursor has no documented hooks surface.
 - Shell hooks (`.sh`/`.ps1`/`.bat`) are filtered at discovery — only node-runnable hooks (`.cjs`/`.mjs`/`.js`) migrate.
-- Kilo Code is `[unverified]` — config paths are ported verbatim from upstream but no real install was tested; the contract is empty and migration emits nothing.
-- Roo Code is `[deprecated]` — upstream announced product shutdown effective May 15, 2026; the contract is empty and migration emits nothing even with `--force`.
 
 ### Known limitations
 
-The runtime is **contract-driven, not config-driven**. A provider's `config.ts` may declare file paths and converter formats for a surface, but unless that surface is listed in the provider's `contract.ts` `surfaces` field, the runtime disable loop nulls it before installation. This is intentional — it guarantees that only surfaces with verified first-party documentation are migrated. The trade-off: some surfaces are documented upstream but not yet enabled in the contract.
-
-**Providers whose contracts are intentionally empty (migration emits nothing):**
-
-- **Kilo Code** — config declares modes/skills/rules/instructions paths, but the contract is empty. The adapter is kept for compatibility; converter output has not been verified against a real Kilo install. Migration emits nothing until the contract is populated.
-- **Roo Code** — upstream shut down on May 15, 2026. The contract is empty by design even though `--force` allows selecting Roo as a target.
-- **OpenHands** — config declares paths, but no first-party portable-surface contract has been verified. Migration emits nothing.
-
-**Documented upstream but not yet enabled in the contract:**
-
-- **Gemini CLI hooks** — Gemini documents hooks via `.gemini/settings.json` (`https://github.com/google-gemini/gemini-cli/blob/main/docs/hooks/reference.md`), and a converter (`gemini-hook-event-map.ts`) exists, but the contract currently disables this surface. Hook migration is limited to Codex.
-- **Droid rules and hooks** — Factory documents `.factory/rules/` (`https://docs.factory.ai/guides/power-user/rules-conventions`) and a settings-based hooks system (`https://docs.factory.ai/cli/configuration/hooks-reference`); both surfaces are disabled by contract today.
-- **Kiro IDE hooks** — Kiro documents hooks (`https://kiro.dev/docs/hooks/`); neither `config.ts` nor `contract.ts` currently expose a Kiro hooks path or converter.
-- **Cline hooks and slash-command workflows** — Cline documents hooks (`https://docs.cline.bot/features/hooks/hook-reference`) and slash-command workflows (`https://docs.cline.bot/features/slash-commands/workflows/index`); neither surface has a converter in `config.ts` and both are disabled by contract.
-- **OpenCode config (`AGENTS.md`)** — OpenCode documents config via `AGENTS.md` (`https://opencode.ai/docs/config`); `config.ts` declares the path, but the contract currently exposes only agents and commands.
-
-Filing an issue or PR with a verified converter output is the path to enabling any of the above.
+The runtime is **contract-driven, not config-driven**. A provider's `config.ts` may declare file paths and converter formats for a surface, but unless that surface is listed in the provider's `contract.ts` `surfaces` field, the runtime disable loop nulls it before installation. This is intentional — it guarantees that only surfaces with verified first-party documentation are migrated.
 
 ### Examples
 
@@ -492,10 +467,10 @@ npx mewkit migrate cursor --dry-run
 # Single tool, project scope
 npx mewkit migrate cursor
 
-# Multi-tool batch (uses interactive picker if TTY)
+# Both tools (uses interactive picker if TTY)
 npx mewkit migrate
 
-# All 15 tools, non-interactive (CI-friendly)
+# Both supported tools, non-interactive (CI-friendly)
 npx mewkit migrate --all --yes
 
 # Global install scope
@@ -544,9 +519,9 @@ A PID-based file lock at `SCOPE/.mewkit/.lock` blocks two `mewkit migrate` runs 
 npx mewkit init --migrate
 
 # Pre-set tools, no picker
-npx mewkit init --migrate-to cursor,codex,droid
+npx mewkit init --migrate-to cursor,codex
 
-# All 15 tools
+# Both supported tools
 npx mewkit init --migrate-to all
 
 # Global install scope

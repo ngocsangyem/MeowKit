@@ -11,6 +11,26 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## Unreleased — Runtime-Neutral State Root & Codex-First Migration
+
+Project state moves out of the provider directory into a runtime-neutral `.meowkit/` root, `mewkit migrate` safely relocates any legacy `.claude/memory/` content, and the migration surface is trimmed to the three actively-maintained targets.
+
+### Features
+
+- **Runtime-neutral `.meowkit/` state root** — `memory/`, `telemetry/`, `state/`, `cache/`, `migrations/`. Every structured memory write goes through one validated contract (schema → secret scrub → injection scan → per-store lock → atomic replace). `mewkit memory` now reads/writes `.meowkit/memory`.
+- **Safe legacy-memory migration** — `mewkit migrate` runs a read-only preflight, then a locked, staged, atomic transaction that relocates `.claude/memory/` into `.meowkit/` (unknown files preserved under `memory/legacy/`). Conflicts abort; nothing is overwritten or merged silently; a recoverable archive is kept; `--dry-run` makes zero changes. `mewkit doctor --state` reports post-migration legacy-path drift.
+- **Authored Codex bundle** — `mewkit migrate codex` copies a hand-authored, Codex-native bundle (agents as `.codex/agents/*.toml`; skills/commands/rules/modes as `.agents/skills/*/SKILL.md`; hooks as `.codex/hooks.json`) instead of a runtime transform.
+
+### CLI
+
+- Added `mewkit memory capture` — routes a `##pattern` / `##decision` / `##note` prompt into the right `.meowkit/memory` store through the write contract.
+- Removed `mewkit build-plugin` and `mewkit validate --plugin` / `--parity`.
+
+### Removals
+
+- **Migration targets reduced from 16 to 3** — only `codex` and `cursor` remain as targets (`claude-code` is the source format). Removed: amp, antigravity, cline, droid, gemini-cli, github-copilot, goose, kilo, kiro, openhands, opencode, roo, windsurf.
+- **Native plugin distribution retired** — `plugin/`, the Claude/Codex marketplaces, and `mewkit build-plugin` are gone. Install via `npx mewkit init` (or `npx mewkit upgrade`); there is no marketplace / plugin-install path.
+
 ## 2.14.5 (2026-07-20) — High-Assurance PR Review
 
 The `mewkit` CLI ships alongside this kit as **1.19.1** (see `CLI` below).

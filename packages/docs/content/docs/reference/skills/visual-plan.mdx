@@ -116,4 +116,4 @@ mewkit visual-plan apply-feedback <plan-dir> --batch <id>
 - **Mermaid palette is light (static route)** — the diagram uses `theme: "neutral"` read once at init; toggling dark does not re-skin the SVG.
 - **`.node` collision (static route)** — Mermaid uses `.node` internally; block sentinels use the `vp-*` prefix.
 - **Never hand-edit `plan.html`** — it is generated; edit the plan sources (or the artifact via the studio) and regenerate/export.
-- **`plugin/` is generated** — the shipped copy is produced by `mewkit build-plugin`; author the skill source, then build.
+- **Install via `npx mewkit init`/`upgrade`** — there is no plugin/marketplace build step; author the skill source directly under `.claude/skills/`.
