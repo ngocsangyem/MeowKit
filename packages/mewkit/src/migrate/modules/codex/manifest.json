@@ -4,57 +4,69 @@
   "generatedFrom": "hand-authored + porter (scripts/run-codex-port.ts)",
   "entries": [
     {
-      "sourcePath": "AGENTS.md",
+      "sourcePath": "root/AGENTS.md",
       "targetPath": "AGENTS.md",
       "provider": "codex",
       "mode": "0644",
       "ownership": "managed-replace",
-      "scopeTags": ["managed-runtime"],
+      "scopeTags": [
+        "managed-runtime"
+      ],
       "active": false
     },
     {
-      "sourcePath": "config.toml",
+      "sourcePath": "root/.codex/config.toml",
       "targetPath": ".codex/config.toml",
       "provider": "codex",
       "mode": "0644",
       "ownership": "managed-replace",
-      "scopeTags": ["managed-runtime"],
+      "scopeTags": [
+        "managed-runtime"
+      ],
       "active": false
     },
     {
-      "sourcePath": "hooks.json",
+      "sourcePath": "root/.codex/hooks.json",
       "targetPath": ".codex/hooks.json",
       "provider": "codex",
       "mode": "0644",
       "ownership": "managed-replace",
-      "scopeTags": ["managed-runtime"],
+      "scopeTags": [
+        "managed-runtime"
+      ],
       "active": false
     },
     {
-      "sourcePath": "hooks/capture.cjs",
+      "sourcePath": "root/.codex/hooks/capture.cjs",
       "targetPath": ".codex/hooks/capture.cjs",
       "provider": "codex",
       "mode": "0755",
       "ownership": "managed-replace",
-      "scopeTags": ["managed-runtime"],
+      "scopeTags": [
+        "managed-runtime"
+      ],
       "active": false
     },
     {
-      "sourcePath": "agents",
+      "sourcePath": "root/.codex/agents",
       "targetPath": ".codex/agents",
       "provider": "codex",
       "mode": "0644",
       "ownership": "managed-replace",
-      "scopeTags": ["managed-runtime"],
+      "scopeTags": [
+        "managed-runtime"
+      ],
       "active": false
     },
     {
-      "sourcePath": "skills",
+      "sourcePath": "root/.agents/skills",
       "targetPath": ".agents/skills",
       "provider": "codex",
       "mode": "0644",
       "ownership": "managed-replace",
-      "scopeTags": ["managed-runtime"],
+      "scopeTags": [
+        "managed-runtime"
+      ],
       "active": false
     }
   ]
