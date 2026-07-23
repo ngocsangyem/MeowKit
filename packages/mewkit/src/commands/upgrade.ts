@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import pc from "picocolors";
 import {
@@ -11,6 +12,48 @@ import {
 	resolvePacks,
 } from "../core/index.js";
 import type { ReleaseInfo, UserConfig } from "../core/index.js";
+import { runMigrate } from "../migrate/migrate-orchestrator.js";
+import { resolveCodexModuleDir, copyAuthoredCodexBundle } from "../migrate/modules/codex-authored-bundle.js";
+
+/** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
+const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
+	{ tool: "cursor", dir: ".cursor" },
+	{ tool: "codex", dir: ".codex" },
+];
+
+/** After a `.claude/` upgrade, re-export to any installed downstream provider toolkit
+ *  so the whole install moves together (a bare `mewkit upgrade` no longer leaves
+ *  .cursor/.codex stale). Best-effort: a failing provider is reported, not fatal. */
+async function reMigrateInstalledProviders(projectDir: string): Promise<void> {
+	const installed = PROPAGATABLE_PROVIDERS.filter((p) => existsSync(join(projectDir, p.dir)));
+	if (installed.length === 0) return;
+	console.log(`\n${pc.bold("Propagating upgrade to installed provider toolkits:")} ${installed.map((p) => p.tool).join(", ")}`);
+	for (const { tool } of installed) {
+		try {
+			await runMigrate(
+				{ tool, source: join(projectDir, ".claude"), force: true, yes: true },
+				{ bundledKitDir: join(projectDir, ".claude"), argv: [] },
+			);
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			console.log(pc.yellow(`[!] Re-exporting ${tool} failed (${msg}) — re-run 'mewkit migrate ${tool}'.`));
+		}
+	}
+}
+
+/** A codex-only project (from `init --target codex`) has no `.claude/`; upgrade it by
+ *  re-copying the authored Codex bundle from the installed package. Managed artifacts
+ *  are refreshed (a user-edited AGENTS.md is overwritten — re-run after editing). */
+function upgradeCodexToolkit(projectDir: string): void {
+	console.log(pc.bold("Codex toolkit detected (no .claude/) — refreshing from the installed mewkit bundle."));
+	const moduleDir = resolveCodexModuleDir();
+	if (!existsSync(join(moduleDir, "manifest.json"))) {
+		console.error(pc.red("Codex bundle not found in this install — reinstall the `mewkit` package."));
+		process.exit(1);
+	}
+	const copied = copyAuthoredCodexBundle(moduleDir, projectDir);
+	console.log(pc.green(`Codex toolkit refreshed (${copied.length} artifacts): AGENTS.md, .codex/, .agents/skills/.`));
+}
 
 export interface UpgradeArgs {
 	check?: boolean;
@@ -195,12 +238,23 @@ async function performUpgrade(
 				pc.yellow(`\n  ${stats.userModified.length} user-modified file(s) preserved (use --force to overwrite).`),
 			);
 		}
+
+		// Propagate the upgrade to any installed downstream provider toolkits.
+		await reMigrateInstalledProviders(process.cwd());
 	} finally {
 		cleanupDownload(sourceDir);
 	}
 }
 
 export async function upgrade(args: UpgradeArgs): Promise<void> {
+	// Codex-only project (`init --target codex`): no `.claude/` to update — refresh the
+	// authored Codex bundle instead. (Skip for --check/--list, which are version queries.)
+	const cwd = process.cwd();
+	if (!args.check && !args.list && !existsSync(join(cwd, ".claude")) && existsSync(join(cwd, ".codex"))) {
+		upgradeCodexToolkit(cwd);
+		return;
+	}
+
 	const localVersion = getLocalVersion();
 	const useBeta = args.beta ?? false;
 
