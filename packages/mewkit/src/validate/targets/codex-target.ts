@@ -256,6 +256,30 @@ function checkReferenceGraph(dir: string): CheckResult[] {
 	];
 }
 
+// 4c. Exec-policy rules (experimental): if `.codex/rules/*.rules` exist, each `prefix_rule`
+// must use a valid decision — allow | prompt | forbidden (verified against `codex execpolicy`).
+// Catches invalid values like "reject". Structural only; the CLI validates behavior.
+function checkRules(dir: string): CheckResult[] {
+	const rulesDir = path.join(dir, ".codex", "rules");
+	const files = fs.existsSync(rulesDir) ? listFiles(rulesDir, ".rules") : [];
+	if (files.length === 0) return [];
+	const VALID = new Set(["allow", "prompt", "forbidden"]);
+	const bad: string[] = [];
+	for (const f of files) {
+		const text = fs.readFileSync(f, "utf-8");
+		const decisionRe = /\bdecision\s*=\s*["']([^"']+)["']/g;
+		let m: RegExpExecArray | null;
+		while ((m = decisionRe.exec(text)) !== null) {
+			if (!VALID.has(m[1])) bad.push(`${path.basename(f)}: decision="${m[1]}"`);
+		}
+	}
+	return [
+		bad.length === 0
+			? pass("Codex exec-policy rules valid", `${files.length} .rules file(s); decisions in {allow, prompt, forbidden}`)
+			: fail("Codex exec-policy rules valid", `invalid decision value(s): ${bad.join("; ")}`),
+	];
+}
+
 // 5 + 6. Installed skills: frontmatter parses, runtime is provider-supported (portable), and the
 // body carries no denied tokens (dangling /mk:, .claude/, AskUserQuestion, subagent, …).
 function checkSkills(dir: string): CheckResult[] {
@@ -365,6 +389,7 @@ export const codexTargetProfile: TargetProfile = {
 		results.push(...checkHooks(dir));
 		results.push(...checkAgents(dir));
 		results.push(...checkReferenceGraph(dir));
+		results.push(...checkRules(dir));
 		results.push(...checkSkills(dir));
 		results.push(...checkLegacySurfaces(dir));
 		return results;

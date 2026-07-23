@@ -38,6 +38,7 @@ describe("authored codex bundle", () => {
 				".codex/hooks/capture.cjs",
 				".codex/hooks/gate-enforcement.cjs",
 				".codex/hooks/privacy-block.cjs",
+				".codex/rules/default.rules",
 				"AGENTS.md",
 			].sort(),
 		);

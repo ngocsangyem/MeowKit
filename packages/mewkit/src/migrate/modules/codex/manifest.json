@@ -37,6 +37,17 @@
       "active": false
     },
     {
+      "sourcePath": "root/.codex/rules/default.rules",
+      "targetPath": ".codex/rules/default.rules",
+      "provider": "codex",
+      "mode": "0644",
+      "ownership": "managed-replace",
+      "scopeTags": [
+        "managed-runtime"
+      ],
+      "active": false
+    },
+    {
       "sourcePath": "root/.codex/hooks/capture.cjs",
       "targetPath": ".codex/hooks/capture.cjs",
       "provider": "codex",

@@ -141,6 +141,23 @@ describe("codex target validation", () => {
 		expect(anyFail(rs)).toBe(false);
 	});
 
+	it("a .rules file with an invalid prefix_rule decision → FAIL exec-policy rules valid", async () => {
+		const d = makeTarget();
+		mkdirSync(join(d, ".codex", "rules"), { recursive: true });
+		writeFileSync(join(d, ".codex", "rules", "default.rules"), 'prefix_rule(pattern = ["rm", "-rf"], decision = "reject")\n');
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex exec-policy rules valid")).toBe("fail");
+	});
+
+	it("a .rules file with valid decisions passes", async () => {
+		const d = makeTarget();
+		mkdirSync(join(d, ".codex", "rules"), { recursive: true });
+		writeFileSync(join(d, ".codex", "rules", "default.rules"), 'prefix_rule(pattern = ["rm", "-rf"], decision = "prompt")\n');
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex exec-policy rules valid")).toBe("pass");
+		expect(anyFail(rs)).toBe(false);
+	});
+
 	it("an installed skill with a tool token (/mk:) → FAIL tool-token clean", async () => {
 		const d = makeTarget();
 		writeFileSync(
