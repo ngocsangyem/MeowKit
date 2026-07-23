@@ -11,9 +11,9 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
-## Unreleased — Runtime-Neutral State Root & Codex-First Migration
+## 2.14.6 (2026-07-23) — Runtime-Neutral State Root & Codex-First Migration
 
-Released as **`mewkit` CLI 2.0.0** (major — breaking CLI changes below); the kit content is unchanged (still 2.14.5).
+Ships as kit **2.14.6** and **`mewkit` CLI 2.0.1** (major — breaking CLI changes below). The kit change is the plan-completion lifecycle wiring — agents now archive a finished plan via `npx mewkit plan archive`; the bulk of the release is CLI-side.
 
 Project state moves out of the provider directory into a runtime-neutral `.meowkit/` root, `mewkit migrate` safely relocates any legacy `.claude/memory/` content, and the migration surface is trimmed to the actively-maintained targets (Codex, Cursor).
 
