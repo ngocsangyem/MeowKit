@@ -94,6 +94,20 @@ export function isSkillsTreeEntry(entry: ArtifactManifestEntry): boolean {
 	return entry.targetPath === ".agents/skills";
 }
 
+/**
+ * Warn text when a pack selection's installed skills exceed the Codex discovery budget
+ * (name+description chars), or null when it fits. Codex silently truncates an over-budget
+ * skill catalog — the install path surfaces this instead of letting it happen invisibly.
+ */
+export function packSelectionBudgetWarning(moduleDir: string, selection: PackSelection): string | null {
+	const catalog = loadSkillPackCatalog(moduleDir);
+	if (!catalog) return null;
+	const { packs, skills } = resolvePackSelection(catalog, selection);
+	const chars = packBudgetChars(join(moduleDir, "root", ".agents", "skills"), skills);
+	if (chars <= catalog.budgetChars) return null;
+	return `selected pack(s) [${packs.join(", ")}] total ${chars} skill name+description chars, over Codex's ${catalog.budgetChars}-char discovery budget — Codex may silently truncate the skill list. Install fewer packs, or rely on implicit (description-matched) skill selection.`;
+}
+
 /** name-length + description-length for one skill dir's SKILL.md (the discovery-budget unit). */
 export function skillNameDescChars(skillDir: string): number {
 	const md = join(skillDir, "SKILL.md");

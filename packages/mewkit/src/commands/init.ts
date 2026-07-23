@@ -22,7 +22,7 @@ import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.
 import type { MigrateOptions, ProviderType } from "../migrate/types.js";
 import { providers } from "../migrate/provider-registry.js";
 import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
-import type { PackSelection } from "../migrate/modules/codex-skill-packs.js";
+import { packSelectionBudgetWarning, type PackSelection } from "../migrate/modules/codex-skill-packs.js";
 import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
 
 export interface InitArgs {
@@ -311,6 +311,9 @@ async function initCodexTarget(
 		for (const c of result.conflicts) p.log.message(pc.dim(`  ${c.targetPath}`));
 	}
 	p.log.success(`Codex toolkit ready (${result.writes} written): AGENTS.md, .codex/{config.toml,agents,hooks.json,hooks}, .agents/skills/.`);
+	const budgetWarn = packSelectionBudgetWarning(moduleDir, packs);
+	if (budgetWarn) p.log.warn(budgetWarn);
+	p.log.info("Skill packs are additive: re-run with more `--skill-packs` to add; removing an installed pack is manual (delete its .agents/skills/<name> dirs).");
 	p.outro(pc.green("Codex toolkit installed!"));
 }
 
@@ -351,6 +354,8 @@ async function addCodexBundle(targetDir: string, force: boolean, packs: PackSele
 		p.log.warn(`${result.conflicts.length} existing Codex file(s) left untouched (re-run with --force to overwrite).`);
 	}
 	p.log.success(`Codex toolkit created (${result.writes} written): AGENTS.md, .codex/, .agents/skills/.`);
+	const budgetWarn = packSelectionBudgetWarning(moduleDir, packs);
+	if (budgetWarn) p.log.warn(budgetWarn);
 }
 
 export async function init(args: InitArgs): Promise<void> {

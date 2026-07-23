@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { copyAuthoredCodexBundle, resolveCodexModuleDir } from "../codex-authored-bundle.js";
 import {
 	expandSkillsEntry,
+	packSelectionBudgetWarning,
 	resolvePackSelection,
 	validateSkillPackCatalog,
 	type SkillPackCatalog,
@@ -72,6 +73,12 @@ describe("validateSkillPackCatalog (shipped catalog)", () => {
 		const checks = validateSkillPackCatalog(moduleDir);
 		const coreBudget = checks.find((c) => c.name.includes("budget: core"));
 		expect(coreBudget?.level).toBe("pass");
+	});
+
+	it("the default (core) install warns nothing; a large pack combo warns over-budget", () => {
+		expect(packSelectionBudgetWarning(moduleDir, [])).toBeNull(); // core
+		const warn = packSelectionBudgetWarning(moduleDir, ["integrations"]); // core + integrations
+		expect(warn).toMatch(/over Codex's \d+-char discovery budget/);
 	});
 });
 
