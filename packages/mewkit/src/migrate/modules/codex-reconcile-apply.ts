@@ -25,6 +25,31 @@ import { getReasonCopy, type ReconcileActionType, type ReconcileReason } from ".
 import { meowkitStatePaths } from "../../state/meowkit-state-paths.js";
 import type { ArtifactManifestEntry } from "./artifact-manifest-schema.js";
 import { copyOne, loadCodexBundleManifest, resolveCodexModuleDir } from "./codex-authored-bundle.js";
+import {
+	expandSkillsEntry,
+	isSkillsTreeEntry,
+	loadSkillPackCatalog,
+	resolvePackSelection,
+	type PackSelection,
+} from "./codex-skill-packs.js";
+
+/**
+ * Expand the aggregate `.agents/skills` entry into one per-skill entry for the selected
+ * packs, so the reconciler installs/updates each skill dir independently. When there is
+ * no catalog OR no explicit selection, the aggregate entry is kept unchanged (whole-tree
+ * install — the pre-pack behavior and the full-bundle verification path).
+ */
+function expandSkillsForSelection(
+	entries: ArtifactManifestEntry[],
+	moduleDir: string,
+	packs: PackSelection | undefined,
+): ArtifactManifestEntry[] {
+	if (packs === undefined) return entries;
+	const catalog = loadSkillPackCatalog(moduleDir);
+	if (!catalog) return entries;
+	const { skills } = resolvePackSelection(catalog, packs);
+	return entries.flatMap((e) => (isSkillsTreeEntry(e) ? expandSkillsEntry(e, skills) : [e]));
+}
 
 export interface AppliedEntry {
 	sourcePath: string;
@@ -61,6 +86,11 @@ export interface ReconcileApplyOptions {
 	/** Adopt matching codex rows from the home registry into the project ledger on first
 	 *  run (rollback-safe: home rows are left in place). Default true; skipped on dry-run. */
 	adoptHomeRegistry?: boolean;
+	/** Skill-pack selection for the `.agents/skills` tree: `"all"`, a pack-name list, or
+	 *  `[]` for the catalog default (`core`). Undefined = install the whole skills tree
+	 *  unfiltered (pre-pack behavior). Only skills in the selected packs (+ their
+	 *  `dependsOn`) install; the reconciler tracks each installed skill dir independently. */
+	packs?: PackSelection;
 }
 
 interface Decision {
@@ -186,7 +216,8 @@ export async function reconcileApplyCodexBundle(
 
 	const ledger = await readCodexLedger(ledgerPath);
 	const manifest = loadCodexBundleManifest(moduleDir);
-	const entries = opts.onlyActive ? manifest.entries.filter((e) => e.active) : manifest.entries;
+	const activeEntries = opts.onlyActive ? manifest.entries.filter((e) => e.active) : manifest.entries;
+	const entries = expandSkillsForSelection(activeEntries, moduleDir, opts.packs);
 
 	const results: AppliedEntry[] = [];
 	let ledgerDirty = false;

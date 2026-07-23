@@ -22,6 +22,7 @@ import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.
 import type { MigrateOptions, ProviderType } from "../migrate/types.js";
 import { providers } from "../migrate/provider-registry.js";
 import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
+import type { PackSelection } from "../migrate/modules/codex-skill-packs.js";
 import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
 
 export interface InitArgs {
@@ -45,6 +46,21 @@ export interface InitArgs {
 	 * existing install down to the selected profile.
 	 */
 	profile?: string;
+	/**
+	 * Codex skill-pack selection (only meaningful with a Codex target). Comma-separated
+	 * pack names (e.g. `core,integrations`) or `all`. Omitted = the catalog default
+	 * (`core`). Named `--skill-packs` to avoid the existing boolean `--packs` validate flag.
+	 */
+	skillPacks?: string;
+}
+
+/** Parse the `--skill-packs` value into a PackSelection (default `core` when absent). */
+function parseSkillPacks(raw?: string): PackSelection {
+	if (raw === undefined) return [];
+	const v = raw.trim();
+	if (v === "" ) return [];
+	if (v.toLowerCase() === "all") return "all";
+	return v.split(",").map((s) => s.trim()).filter(Boolean);
 }
 
 /** Profile picker options (stable names; resolution validates against the release manifest). */
@@ -258,7 +274,12 @@ function printSummary(
  * `.codex/{config.toml,agents,hooks.json,hooks}`, `.agents/skills/`). No `.claude/`,
  * no release download, no conversion — the bundle IS the source of truth for Codex.
  */
-async function initCodexTarget(targetDir: string, dryRun: boolean, force: boolean): Promise<void> {
+async function initCodexTarget(
+	targetDir: string,
+	dryRun: boolean,
+	force: boolean,
+	packs: PackSelection = [],
+): Promise<void> {
 	p.intro(pc.bgCyan(pc.black(" meowkit init --target codex ")));
 	const moduleDir = resolveCodexModuleDir();
 	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
@@ -266,12 +287,15 @@ async function initCodexTarget(targetDir: string, dryRun: boolean, force: boolea
 		process.exit(1);
 	}
 	// No fail-closed guard: the reconciler preserves user edits (or surfaces a conflict)
-	// instead of clobbering an existing layout, and makes a re-run idempotent.
+	// instead of clobbering an existing layout, and makes a re-run idempotent. `packs`
+	// selects which skill packs install (default `core`); the whole `.codex/` surface
+	// always installs.
 	if (dryRun) {
 		const plan = await reconcileApplyCodexBundle(moduleDir, targetDir, {
 			force,
 			dryRun: true,
 			projectRoot: targetDir,
+			packs,
 		});
 		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
 		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
@@ -279,7 +303,7 @@ async function initCodexTarget(targetDir: string, dryRun: boolean, force: boolea
 		p.outro(pc.green("Dry-run complete — no files written."));
 		return;
 	}
-	const result = await reconcileApplyCodexBundle(moduleDir, targetDir, { force, projectRoot: targetDir });
+	const result = await reconcileApplyCodexBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
 	if (result.conflicts.length > 0) {
 		p.log.warn(
 			`${result.conflicts.length} existing file(s) differ from the bundle and were left untouched (re-run with --force to overwrite):`,
@@ -316,13 +340,13 @@ async function promptProviders(): Promise<ProviderType[]> {
  * bundle. Non-fatal (warn + skip) so a Codex hiccup never aborts the whole install —
  * unlike `initCodexTarget`, which fails closed because Codex is the ONLY target there.
  */
-async function addCodexBundle(targetDir: string, force: boolean): Promise<void> {
+async function addCodexBundle(targetDir: string, force: boolean, packs: PackSelection = []): Promise<void> {
 	const moduleDir = resolveCodexModuleDir();
 	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
 		p.log.warn("Codex bundle not found in this install — skipping the Codex toolkit.");
 		return;
 	}
-	const result = await reconcileApplyCodexBundle(moduleDir, targetDir, { force, projectRoot: targetDir });
+	const result = await reconcileApplyCodexBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
 	if (result.conflicts.length > 0) {
 		p.log.warn(`${result.conflicts.length} existing Codex file(s) left untouched (re-run with --force to overwrite).`);
 	}
@@ -334,7 +358,7 @@ export async function init(args: InitArgs): Promise<void> {
 
 	// `--target codex` is a distinct, offline path: copy the authored bundle, done.
 	if (args.target === "codex") {
-		return initCodexTarget(targetDir, args.dryRun ?? false, args.force ?? false);
+		return initCodexTarget(targetDir, args.dryRun ?? false, args.force ?? false, parseSkillPacks(args.skillPacks));
 	}
 
 	const mode = detectMode(targetDir);
@@ -361,7 +385,7 @@ export async function init(args: InitArgs): Promise<void> {
 	// Codex (additive, offline bundle) and Cursor (export from .claude/) when picked.
 	if (picked?.includes("codex")) {
 		if (dryRun) p.log.info("Dry-run: would copy the authored Codex bundle (AGENTS.md, .codex/, .agents/skills/).");
-		else await addCodexBundle(targetDir, force);
+		else await addCodexBundle(targetDir, force, parseSkillPacks(args.skillPacks));
 	}
 	if (picked?.includes("cursor")) {
 		if (dryRun) p.log.info("Dry-run: would export .claude/ to .cursor/.");

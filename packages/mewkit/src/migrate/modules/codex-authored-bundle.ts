@@ -12,6 +12,13 @@ import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync, statSync } from
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ArtifactManifestSchema, type ArtifactManifest, type ArtifactManifestEntry } from "./artifact-manifest-schema.js";
+import {
+	expandSkillsEntry,
+	isSkillsTreeEntry,
+	loadSkillPackCatalog,
+	resolvePackSelection,
+	type PackSelection,
+} from "./codex-skill-packs.js";
 
 /** Resolve the authored `modules/codex/` directory (source of truth, in the kit). */
 export function resolveCodexModuleDir(): string {
@@ -32,6 +39,9 @@ export interface CopyBundleOptions {
 	/** Copy only entries flipped `active` (the migrate overlay default). When false,
 	 *  copy every authored entry (used by tests + full-bundle verification). */
 	onlyActive?: boolean;
+	/** Skill-pack selection for the `.agents/skills` tree (`"all"`, a pack list, or `[]`
+	 *  for the catalog default). Undefined = copy the whole skills tree unfiltered. */
+	packs?: PackSelection;
 }
 
 export interface CopiedArtifact {
@@ -47,7 +57,17 @@ export function copyAuthoredCodexBundle(
 	opts: CopyBundleOptions = {},
 ): CopiedArtifact[] {
 	const manifest = loadCodexBundleManifest(moduleDir);
-	const entries = opts.onlyActive ? manifest.entries.filter((e) => e.active) : manifest.entries;
+	const activeEntries = opts.onlyActive ? manifest.entries.filter((e) => e.active) : manifest.entries;
+	// Pack filtering is opt-in: undefined selection keeps the whole-tree entry (backward
+	// compatible). A selection expands `.agents/skills` into per-pack skill sub-entries.
+	let entries = activeEntries;
+	if (opts.packs !== undefined) {
+		const catalog = loadSkillPackCatalog(moduleDir);
+		if (catalog) {
+			const { skills } = resolvePackSelection(catalog, opts.packs);
+			entries = activeEntries.flatMap((e) => (isSkillsTreeEntry(e) ? expandSkillsEntry(e, skills) : [e]));
+		}
+	}
 	const copied: CopiedArtifact[] = [];
 	for (const entry of entries) {
 		copyOne(moduleDir, targetDir, entry);

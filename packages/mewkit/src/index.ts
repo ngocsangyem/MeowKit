@@ -233,6 +233,7 @@ async function main(): Promise<void> {
 			"workspace",
 			"log",
 			"profile",
+			"skill-packs",
 			"fail-over",
 			"friction",
 			"id",
@@ -273,6 +274,7 @@ async function main(): Promise<void> {
 				target: args.target as string | undefined,
 				migrateGlobal: args["migrate-global"] as boolean | undefined,
 				profile: args.profile as string | undefined,
+				skillPacks: args["skill-packs"] as string | undefined,
 			});
 			break;
 		case "upgrade":
