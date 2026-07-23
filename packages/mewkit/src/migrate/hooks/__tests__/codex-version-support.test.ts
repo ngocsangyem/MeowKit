@@ -15,8 +15,8 @@ describe("isCodexVersionSupported", () => {
 		expect(isCodexVersionSupported("1.0.0")).toBe(true);
 	});
 
-	it("rejects the older feature-flag tier and anything below the minimum", () => {
-		expect(isCodexVersionSupported("0.124.0-alpha.3")).toBe(false);
+	it("rejects the pre-stable-hooks fallback anchor and anything below the minimum", () => {
+		expect(isCodexVersionSupported("0.124.0")).toBe(false);
 		expect(isCodexVersionSupported("0.141.9")).toBe(false);
 	});
 
