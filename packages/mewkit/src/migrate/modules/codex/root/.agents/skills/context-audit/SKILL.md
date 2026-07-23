@@ -112,7 +112,7 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
 
 ## Related Rules
 
-- `.agents/skills/rule-skill-authoring-rules.md` — discovery + Gotchas section requirements
-- `.agents/skills/rule-injection-rules.md` Rule 11 — Skill Rule of Two; this skill
+- Skill authoring conventions — discovery + Gotchas section requirements
+- `AGENTS.md` (Data & injection boundary) Rule 11 — Skill Rule of Two; this skill
   scores 2 of 3 (untrusted SCAN_ROOT input + filename inventory may surface
   sensitive paths) so paths are canonicalized via `realpath` and never executed.

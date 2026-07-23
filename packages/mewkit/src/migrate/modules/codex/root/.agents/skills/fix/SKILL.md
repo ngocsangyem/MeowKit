@@ -56,7 +56,7 @@ Without a mode flag, use the standard profile. Use quick only when its boundary 
 
 ## Step 0.5 — Check Fix Memory (standard/deep only)
 
-Read `.meowkit/memory/fixes.json` — it is the canonical, schema-validated store of prior fix patterns. See the source-of-truth rule in `.agents/skills/rule-memory-read-rules.md`.
+Read `.meowkit/memory/fixes.json` — it is the canonical, schema-validated store of prior fix patterns. See the source-of-truth rule in AGENTS.md (Memory).
 
 - Search for similar symptoms, error messages, or affected modules
 - If a matching fix pattern exists → use it as starting hypothesis in Step 2
@@ -71,7 +71,7 @@ Activate `mk:scout` to map affected codebase BEFORE any diagnosis:
 - Affected files, dependencies, related tests, recent changes (`git log`)
 - Quick mode: minimal scout (affected file + direct deps only)
 - Standard/Deep: full scout (module boundaries, test coverage, call chains)
-- **Risk flags:** match the task against `.agents/skills/rule-risk-checklist.md` (the 9 IDs only — do not invent flags) and hold `matchedFlags` for the evidence index. If any of AUTH / AUTHZ / DATA_MODEL / AUDIT_SEC / EXT_SYSTEM / PUBLIC_CONTRACT / WEAK_PROOF matches, set `risk.requiresHumanApproval = true` — auto mode cannot finalize silently (see `references/review-cycle.md`).
+- **Risk flags:** match the task against the risk checklist (the 9 IDs only — do not invent flags) and hold `matchedFlags` for the evidence index. If any of AUTH / AUTHZ / DATA_MODEL / AUDIT_SEC / EXT_SYSTEM / PUBLIC_CONTRACT / WEAK_PROOF matches, set `risk.requiresHumanApproval = true` — auto mode cannot finalize silently (see `references/review-cycle.md`).
 
 **Why mandatory:** Without codebase context, diagnosis guesses instead of reasons from evidence.
 
@@ -92,7 +92,7 @@ Output: confirmed root cause (not symptom) with evidence chain + confidence leve
 
 ## Step 2.5 — Root-Cause Proof Checkpoint (HARD GATE)
 
-Operationalizes `.agents/skills/rule-core-behaviors.md` Rule 6 ("Verify, Don't Assume"). The six fields are the named output of the Step 2 diagnosis (`references/diagnosis-protocol.md` Phase 4). **Do NOT start Step 4 (Fix) until all six are populated** — empty fields mean the diagnosis is not yet proven.
+Operationalizes AGENTS.md (Core behaviors) Rule 6 ("Verify, Don't Assume"). The six fields are the named output of the Step 2 diagnosis (`references/diagnosis-protocol.md` Phase 4). **Do NOT start Step 4 (Fix) until all six are populated** — empty fields mean the diagnosis is not yet proven.
 
 Standard/Complex/Parallel — all six required:
 
@@ -132,7 +132,7 @@ Task orchestration (Moderate+): `references/task-orchestration.md`.
 ## Step 5 — Verify + Prevent (MANDATORY)
 
 1. **Iron-law verify:** Re-run exact pre-fix commands. Compare before/after.
-2. **Regression test:** Follow `.agents/skills/rule-tdd-rules.md`; when required, the test fails WITHOUT the fix and passes WITH it.
+2. **Regression test:** Follow AGENTS.md (Development / TDD); when required, the test fails WITHOUT the fix and passes WITH it.
 3. **Defense-in-depth:** Load `references/prevention-gate.md` — consider entry validation, business logic guards, error handling, type safety.
 4. **BLOCK:** Missing a required regression test is incomplete; record the allowed omission rationale for lint/format/config-only changes.
 
@@ -172,7 +172,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
    - Skip when `the fix skill --no-capture` was passed, the run is quick, or the result is a one-off with no durable lesson.
 
-3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per `.agents/skills/rule-post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — Gate 1 bypass path means no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
+3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per the post-phase-delegation conventions Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — Gate 1 bypass path means no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
 
 4. `documenter` agent → update `./docs`.
 
@@ -192,7 +192,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 ## Workflow Evidence Index
 
-Contract: `.agents/skills/rule-workflow-evidence-rules.md`. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
+Contract: the workflow-evidence conventions. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
 
 **Storage path:** `.codex/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per `skill-authoring-rules.md` Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
 

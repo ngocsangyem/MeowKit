@@ -23,7 +23,7 @@ For risk-tiered routing, invoke via `the cook skill` or `the fix skill`.
 
 ### 9b. Live Risk Re-Scan
 
-Run a single grep pass over `plan.md` and every `phase-XX-*.md` for trigger keywords from `.agents/skills/rule-risk-checklist.md`: `AUTH`, `AUTHZ`, `DATA_MODEL`, `AUDIT_SEC`, `EXT_SYSTEM`. Use literal-string match (no regex).
+Run a single grep pass over `plan.md` and every `phase-XX-*.md` for trigger keywords: `AUTH`, `AUTHZ`, `DATA_MODEL`, `AUDIT_SEC`, `EXT_SYSTEM`. Use literal-string match (no regex).
 
 If any keyword appears that was NOT in the original `matched_flags`, print this advisory and treat the re-scan match as the effective risk set for option ordering:
 

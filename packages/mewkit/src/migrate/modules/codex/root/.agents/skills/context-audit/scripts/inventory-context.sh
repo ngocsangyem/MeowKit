@@ -93,7 +93,7 @@ inventory_skills() {
   printf ']'
 }
 
-# 4. rules (.agents/skills/rule-**/*.md)
+# 4. rules (.codex/rules/**/*.md)
 inventory_rules() {
   local dir="$SCAN_ROOT/.codex/rules"
   local first=1

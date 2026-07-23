@@ -7,7 +7,7 @@ Assess task complexity, select planning mode, early-exit trivial tasks.
 ### 0a. Read Institutional Memory (JSON-first)
 
 1. Read `.meowkit/memory/architecture-decisions.json` **first** — the canonical, schema-validated store of prior architectural decisions and recurring patterns.
-2. Fall back to `.meowkit/memory/architecture-decisions.md` only when the JSON is absent. If both exist and disagree, prefer the JSON and emit a one-line conflict warning (`⚠ architecture-decisions.md has entries not in the JSON — JSON is authoritative; run 'mewkit memory seed-from-md'`). See `.agents/skills/rule-memory-read-rules.md`.
+2. Fall back to `.meowkit/memory/architecture-decisions.md` only when the JSON is absent. If both exist and disagree, prefer the JSON and emit a one-line conflict warning (`⚠ architecture-decisions.md has entries not in the JSON — JSON is authoritative; run 'mewkit memory seed-from-md'`). See AGENTS.md (Memory).
 3. If relevant learnings found, note them for inclusion in plan Context section.
 
 Skip ONLY if `.meowkit/memory/` doesn't exist.

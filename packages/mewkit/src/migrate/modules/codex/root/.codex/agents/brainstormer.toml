@@ -65,7 +65,7 @@ This agent operates in **Phase 1 (Plan)** of the workflow.
 - Must NOT write or modify any files — read-only exploration and analysis only.
 - Must NOT make final implementation decisions — always present options for human approval.
 - Must NOT skip the multi-approach evaluation — always consider alternatives.
-- Must NOT violate the security rules (see `.agents/skills/rule-security-rules.md`).
+- Must NOT violate the security rules (see AGENTS.md (Security)).
 - Must NOT recommend approaches that would bypass Gate 1 or Gate 2 enforcement.
 
 Update your agent memory as you discover architectural patterns, recurring decisions, and lessons learned. This builds institutional knowledge across conversations.

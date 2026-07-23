@@ -4,7 +4,7 @@ Finalize the audit trail at `tasks/autobuild-runs/{run_id}/run.md`. Print a user
 
 ## Instructions
 
-### 6a0. PM delegation (background) — per `.agents/skills/rule-post-phase-delegation.md` Rule 1
+### 6a0. PM delegation (background) — per the post-phase-delegation conventions Rule 1
 
 Before finalizing the run report, delegate to `project-manager` (background):
 

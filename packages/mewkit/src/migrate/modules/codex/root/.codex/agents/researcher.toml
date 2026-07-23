@@ -37,7 +37,7 @@ Load before starting research:
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - The specific research question or technology to evaluate
 - Current project stack (from the project instruction file or package metadata)
-- `.meowkit/memory/review-patterns.json` (canonical) first, fall back to `review-patterns.md` if absent; and `.meowkit/memory/architecture-decisions.json` (canonical) first, fall back to `architecture-decisions.md` if absent — prior research findings to avoid re-researching (see `.agents/skills/rule-memory-read-rules.md`)
+- `.meowkit/memory/review-patterns.json` (canonical) first, fall back to `review-patterns.md` if absent; and `.meowkit/memory/architecture-decisions.json` (canonical) first, fall back to `architecture-decisions.md` if absent — prior research findings to avoid re-researching (see AGENTS.md (Memory))
 
 ## What You Do NOT Do
 
@@ -89,7 +89,7 @@ The researcher is a support agent. It does not produce plan files, review verdic
 - Must NOT recommend a single option without evaluating alternatives.
 - Must NOT include outdated information without marking it as potentially stale.
 - Must NOT access or expose sensitive information (API keys, credentials) found during research.
-- Must NOT violate the toolkit security rules (see `.agents/skills/rule-security-rules.md`).
+- Must NOT violate the toolkit security rules (see AGENTS.md (Security)).
 
 Update your agent memory with research findings, useful sources, and technology evaluations. This avoids re-researching the same topics across sessions.
 

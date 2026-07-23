@@ -67,7 +67,7 @@ workflow:status   → Shows current phase, completed phases, pending tasks
 
 Phase-specific context is loaded from the kit's built-in rules:
 
-- Phase 1: `.agents/skills/rule-gate-rules.md` (Gate 1 approval)
-- Phase 2-3: `.agents/skills/rule-tdd-rules.md` (RED/GREEN enforcement)
-- Phase 4: `.agents/skills/rule-gate-rules.md` (Gate 2 approval) + `.agents/skills/rule-security-rules.md`
-- Phase 5: `.agents/skills/rule-development-rules.md` (pre-commit checks)
+- Phase 1: AGENTS.md (Gates) (Gate 1 approval)
+- Phase 2-3: AGENTS.md (Development / TDD) (RED/GREEN enforcement)
+- Phase 4: AGENTS.md (Gates) (Gate 2 approval) + AGENTS.md (Security)
+- Phase 5: AGENTS.md (Development) (pre-commit checks)

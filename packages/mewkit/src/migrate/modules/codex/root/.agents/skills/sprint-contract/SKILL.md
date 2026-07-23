@@ -145,7 +145,7 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 
 ## Related Rules
 
-- `.agents/skills/rule-gate-rules.md` — Gate 1 contract-signing requirement this skill enforces before source edits are allowed
+- `AGENTS.md` (Gates) — Gate 1 contract-signing requirement this skill enforces before source edits are allowed
 
 ## Start
 

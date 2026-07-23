@@ -11,7 +11,7 @@ Every review MUST evaluate all five (aligned with `mk:review` step-04-verdict.md
 1. **Correctness** — No critical/major bugs. Logic matches requirements. Architecture fits existing patterns.
 2. **Maintainability** — Clean, readable, follows conventions. No `any` types, no unsafe casts. Type safety enforced.
 3. **Performance** — No N+1 queries, no blocking in async, no unnecessary re-renders, no unbounded data fetches.
-4. **Security** — Run security checklist from `.agents/skills/rule-security-rules.md`. Delegate to security agent for deep audit if needed. A security agent BLOCK verdict → automatic FAIL for this dimension.
+4. **Security** — Run security checklist from AGENTS.md (Security). Delegate to security agent for deep audit if needed. A security agent BLOCK verdict → automatic FAIL for this dimension.
 5. **Coverage** — Are tests adequate? All acceptance criteria covered? Edge cases tested? Tests test behavior, not implementation.
    - **In TDD mode (`MEOWKIT_TDD=1` / `--tdd`):** Coverage gaps → FAIL. Missing tests for any acceptance criterion → FAIL. Test ordering (before/after) is not a graded factor — the developer's red-phase gate already enforces it.
    - **In default mode (TDD off):** Coverage gaps → WARN, not FAIL. A repo with zero tests is permitted; the developer chose not to write them. Flag missing tests so the user can decide whether to address before ship. Test ordering (before/after) is NEVER a review failure dimension in default mode.
@@ -49,12 +49,12 @@ excludes `*-evalverdict.md` (evaluator) and `*-security-verdict.md` (security).
 Load before starting review:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
-- `.agents/skills/rule-gate-rules.md`: Gate 2 hard-stop conditions you enforce
+- AGENTS.md (Gates): the Gate 2 hard-stop conditions you enforce
 - Implementation files (via git diff for recent changes)
 - Test files from tester (coverage adequacy check)
 - Plan file from `tasks/plans/`: verify implementation matches plan
 - `docs/architecture/`: ADRs for architecture fit dimension
-- `.agents/skills/rule-security-rules.md`: security dimension checklist
+- AGENTS.md (Security): security dimension checklist
 - `red-team-findings.md` from plan directory (if exists) — plan-level adversarial findings to cross-reference
 - Adversarial-review architecture: see `skills/review/workflow.md` and the `step-02b-*.md` persona-pass files for the full red-team flow used at Gate 2
 

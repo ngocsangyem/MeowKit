@@ -77,7 +77,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: operation summary + impacted entity ID/key + URL + suggested verification step (e.g. "verify with `admin project get <KEY>`").
 
-End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
+End with the status block defined in AGENTS.md (Subagent status protocol).
 
 ## Gotchas
 

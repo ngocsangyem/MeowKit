@@ -180,9 +180,8 @@ tasks/plans/YYMMDD-name/
 
 ## Related Rules
 
-- `.agents/skills/rule-gate-rules.md` — Gate 1 hard-stop conditions this skill enforces (plan approval before Phase 3)
-- `.agents/skills/rule-orchestration-rules.md` — boundary contract; verification sub-task stay READ-ONLY; sweep stays in planner context (never delegated)
-- `.agents/skills/rule-task-state-emission.md` — when an active durable task record exists, emit status/step via `mewkit task-state update` (advisory; active durable tasks only)
+- AGENTS.md (Gates) — Gate 1 hard-stop conditions this skill enforces (plan approval before Phase 3)
+- AGENTS.md (Delegation & subagents) — boundary contract; verification sub-task stay READ-ONLY; sweep stays in planner context (never delegated)
 
 ## Start
 

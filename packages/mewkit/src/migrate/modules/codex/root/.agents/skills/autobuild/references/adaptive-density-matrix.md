@@ -65,7 +65,7 @@ Per the "dead-weight thesis," every model upgrade is an opportunity to test whet
 2. Re-run the same set on LEAN density
 3. If LEAN performance matches FULL within 5%, downgrade the tier's matrix entry from FULL to LEAN
 4. If LEAN performance exceeds FULL (faster, cheaper, equivalent quality), upgrade aggressively
-5. Log the decision (component, model tier, density choice, measured delta, audit date) in the dead-weight audit registry per `.agents/skills/rule-dead-weight-audit-rules.md` Rule 6
+5. Log the decision (component, model tier, density choice, measured delta, audit date) in the dead-weight audit registry per the dead-weight-audit conventions Rule 6
 
 The matrix is **not** static. It encodes the current best understanding of "where does scaffolding stop helping and start hurting?" — and that boundary moves with model capability.
 
@@ -80,8 +80,8 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 
 ## See Also
 
-- `.agents/skills/rule-dead-weight-audit-rules.md` — audit cadence, measurement, thresholds, never-prune list
-- `.agents/skills/rule-harness-rules.md` Rule 7 — when the dead-weight audit must be re-run
+- the dead-weight-audit conventions — audit cadence, measurement, thresholds, never-prune list
+- the harness conventions Rule 7 — when the dead-weight audit must be re-run
 - `.agents/skills/scale-routing/SKILL.md` Output Schema v2.1 — `autobuild_density` field
 - `.agents/skills/benchmark/` — calibration replay automation
 - Anthropic harness design article (Prithvi Rajasekaran, Labs) <!-- research-citation -->

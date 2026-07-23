@@ -76,7 +76,7 @@ Detect multiple features from natural language:
 | no-test     | Yes      | Skip       | Human              | **Human** | No        |
 | code        | Skip     | RED-strict | Skip (plan exists) | **Human** | Per plan  |
 
-**Gate 1 and Gate 2: human approval mandatory in every mode — see `.agents/skills/rule-gate-rules.md` for the full contract.** No mode auto-approves a gate. Auto mode automates the work between gates; validator and evaluator output is evidence presented at a gate, never the approval itself. (`code` mode skips Gate 1 because the plan it executes was already approved at Gate 1 when it was created.)
+**Gate 1 and Gate 2: human approval mandatory in every mode — see AGENTS.md (Gates) for the full contract.** No mode auto-approves a gate. Auto mode automates the work between gates; validator and evaluator output is evidence presented at a gate, never the approval itself. (`code` mode skips Gate 1 because the plan it executes was already approved at Gate 1 when it was created.)
 
 **TDD column:**
 

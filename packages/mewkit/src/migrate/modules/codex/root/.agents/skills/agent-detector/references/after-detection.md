@@ -37,7 +37,7 @@ domain_agents[2]{family,count,list}:
 
 Total: 17 core + 21 domain = 38 agents. Core agents are routed by the orchestrator via the `agent-routing.md` table; domain agents are routed by their hub skill (`mk:jira` / `mk:confluence`) — the orchestrator does NOT score them directly.
 
-See `.agents/skills/rule-agent-routing.md` for the full agent table. Skill dispatch (intent → skill) lives separately in `.agents/skills/agent-detector/references/skill-domain-routing.md`.
+See the agent-routing conventions for the full agent table. Skill dispatch (intent → skill) lives separately in `.agents/skills/agent-detector/references/skill-domain-routing.md`.
 
 ---
 
@@ -53,6 +53,6 @@ User: "Use only tester for this task"
 
 ---
 
-**Agent routing:** `.agents/skills/rule-agent-routing.md` (canonical agent table) and `.codex/agents/orchestrator.md` (orchestrator agent definition). **Skill dispatch:** `.agents/skills/agent-detector/references/skill-domain-routing.md`.
+**Agent routing:** the agent-routing conventions (canonical agent table) and `.codex/agents/orchestrator.md` (orchestrator agent definition). **Skill dispatch:** `.agents/skills/agent-detector/references/skill-domain-routing.md`.
 
 **MANDATORY:** Always show agent banner at start of EVERY response.

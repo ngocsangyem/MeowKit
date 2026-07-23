@@ -62,7 +62,7 @@ Handles BOTH ship-capable actions — `next_action == ship` and
 `next_action == ship_with_warnings`. Every path that reaches a shipper passes through
 this gate; there is no second ship route.
 
-A verdict is **evidence**, not approval. Per `.agents/skills/rule-gate-rules.md` (The Gate
+A verdict is **evidence**, not approval. Per AGENTS.md (Gates) (The Gate
 Authority Invariant), Gate 2 is human-only and has no exceptions — so a verdict routes to
 Gate 2 *presentation*, it does not clear Gate 2. There is no env var or density mode that
 skips this prompt.
@@ -149,7 +149,7 @@ The next session reads `step-03-generate.md` again. step-03 reads the iteration 
 
 When `next_action == escalate`, first surface current delivery state to the user (foreground), then present a 3-option choice via stop and ask the user in chat.
 
-**PM foreground invocation (per `.agents/skills/rule-post-phase-delegation.md` Rule 5 — the only foreground PM call):**
+**PM foreground invocation (per the post-phase-delegation conventions Rule 5 — the only foreground PM call):**
 
 ```
 Delegate to the project-manager agent (foreground):

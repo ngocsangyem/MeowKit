@@ -5,7 +5,7 @@ description: "Experimental/manual harness canary procedure. It records benchmark
 
 # mk:benchmark — Experimental Harness Canary Suite
 
-Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (per `.agents/skills/rule-dead-weight-audit-rules.md`) consumes to make load-bearing decisions about each harness component.
+Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit consumes to make load-bearing decisions about each harness component.
 
 ## When to Use
 
@@ -162,7 +162,7 @@ the toolkit's, documented here and in the script header so future comparisons ar
 - **`run-canary.sh` is an orchestrator-driven runner for the model-in-loop canary.** It writes a manifest with `PENDING` tasks then prints orchestrator instructions. The script CANNOT itself invoke `mk:autobuild` per task because each invocation requires a fresh sub-task context, which only an orchestrator agent can spawn — not a shell process. **The agent invoking this skill MUST follow the printed instructions to fill in each task's results.** Failure to do so leaves the manifest as a stub.
 - **The cost cap is now enforced (not just recorded).** After each task the orchestrator appends a `{costUsd,…}` receipt to the run's `.ledger.jsonl` and runs `run-canary.sh check-cap <ledger> <cap>`; exit 2 means the cap was reached and the run STOPS. Thresholds follow `harness-rules.md` Rule 6 (warn at $30, halt at the effective cap; `--budget N` / `MEOWKIT_BUDGET_CAP` override the tier cap). This mirrors the TypeScript cost-ledger the deferred live backends inherit.
 - **The cross-harness journey (J10) IS automated.** Its deterministic layer runs offline in CI via the TypeScript journey runner (`packages/mewkit/src/journey-validation`) — migration → target validation → route/artifact/denied-token/side-effect oracles — with no model calls. Only the model-in-loop (live) canary above still needs the orchestrator handoff.
-- **Circular dependency with `mk:autobuild`.** This skill invokes `mk:autobuild` per task. If a harness bug is exactly what the dead-weight audit is trying to find, the audit can fail to even start. The manual fallback is documented in `.agents/skills/rule-dead-weight-audit-rules.md` Rule 8 — run individual canary specs via `the cook skill <spec.md>` and score by hand.
+- **Circular dependency with `mk:autobuild`.** This skill invokes `mk:autobuild` per task. If a harness bug is exactly what the dead-weight audit is trying to find, the audit can fail to even start. The manual fallback: run individual canary specs via `the cook skill <spec.md>` and score by hand.
 - **Don't treat 100% pass as "harness is perfect."** Canary tasks are intentionally simple. Real-world failures live in the long tail; canary catches regressions, not all bugs.
 - **Don't skip `--full` for the dead-weight audit.** The audit needs the heavy task to detect issues that only manifest in real product builds.
 - **Don't compare runs across different model versions** without noting it in the delta table — model upgrade is a confounding variable.

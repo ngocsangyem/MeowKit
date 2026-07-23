@@ -4,7 +4,7 @@
 
 ## 1. Regression Test
 
-- Follow `.agents/skills/rule-tdd-rules.md`: a regression test is required when behavior, security, or a public contract can regress. For lint-only, formatting-only, or configuration-only changes, it may be omitted with a recorded rationale. Flaky failures may use a probabilistic reproducer.
+- Follow AGENTS.md (Development / TDD): a regression test is required when behavior, security, or a public contract can regress. For lint-only, formatting-only, or configuration-only changes, it may be omitted with a recorded rationale. Flaky failures may use a probabilistic reproducer.
 - When required, the test MUST fail without the fix and pass with it.
 
 ## 2. Defense-in-Depth (consider for each fix)

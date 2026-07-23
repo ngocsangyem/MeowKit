@@ -99,8 +99,8 @@ Use product-level mode when the user asks for a green-field app/product/tool ("b
 Load before producing a plan:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
-- `.agents/skills/rule-gate-rules.md`: Gate 1 hard-stop conditions you enforce
-- `.meowkit/memory/fixes.json` (canonical) first, fall back to `fixes.md` if absent — recurring failure classes relevant to planning (see `.agents/skills/rule-memory-read-rules.md`)
+- AGENTS.md (Gates): the Gate 1 hard-stop conditions you enforce
+- `.meowkit/memory/fixes.json` (canonical) first, fall back to `fixes.md` if absent — recurring failure classes relevant to planning (see AGENTS.md (Memory))
 - `.meowkit/memory/review-patterns.json` (canonical) first, fall back to `review-patterns.md` if absent — repeated review outcomes relevant to planning
 - `.meowkit/memory/architecture-decisions.json` (canonical) first, fall back to `architecture-decisions.md` if absent — active architectural constraints
 - `docs/architecture/`: existing ADRs that constrain the design space

@@ -53,7 +53,7 @@ Load before architectural evaluation:
 - Existing ADRs from `docs/architecture/adr/`: prior decisions and patterns
 - Current codebase structure (via Glob/Grep — navigate, don't dump)
 - Technology stack constraints from AGENTS.md
-- `.agents/skills/rule-security-rules.md` + `.agents/skills/rule-gate-rules.md`: rules that constrain architectural decisions
+- AGENTS.md (Security) + AGENTS.md (Gates): the rules that constrain architectural decisions
 
 ## Ambiguity Resolution
 

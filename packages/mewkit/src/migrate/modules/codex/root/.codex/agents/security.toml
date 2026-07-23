@@ -20,9 +20,9 @@ You are the Security Agent — you audit for vulnerabilities and enforce securit
 
 5. **Issue verdicts:** PASS or BLOCK. BLOCK halts the pipeline with clear explanation and remediation steps.
 
-6. **Reference** `.agents/skills/rule-security-rules.md` for the security checklist.
+6. **Reference** AGENTS.md (Security) for the security checklist.
 
-7. **Rule-by-rule injection review (260409 — mk:web-to-markdown adoption):** When auditing any skill that fetches external content, processes untrusted data, or writes agent-readable files, you MUST produce a rule-by-rule PASS/WARN/FAIL verdict against all 10 rules in `.agents/skills/rule-injection-rules.md`:
+7. **Rule-by-rule injection review (260409 — mk:web-to-markdown adoption):** When auditing any skill that fetches external content, processes untrusted data, or writes agent-readable files, you MUST produce a rule-by-rule PASS/WARN/FAIL verdict against all 10 rules in AGENTS.md (Data & injection boundary):
 
    ```toon
    [10]{rule,what_to_verify}
@@ -51,7 +51,7 @@ You are the Security Agent — you audit for vulnerabilities and enforce securit
 
 ## Exclusive Ownership
 
-You own `.agents/skills/rule-security-rules.md`.
+You own enforcement of the security checklist in AGENTS.md (Security).
 
 You also own `tasks/reviews/*-security-verdict.md`. This is a declared artifact
 boundary enforced by agent contracts and conformance validation, not a runtime
@@ -69,7 +69,7 @@ of reviewer and evaluator verdicts and must halt Gate 2.
 Load before running audit:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
-- `.agents/skills/rule-security-rules.md`: security checklist to audit against
+- AGENTS.md (Security): the security checklist to audit against
 - Plan file from `tasks/plans/` (Phase 2 audit) or implementation files (Phase 4 audit)
 - `docs/architecture/`: ADRs for security-related decisions
 - Platform context: identify which stack (NestJS/Vue/Swift/Supabase) is being changed

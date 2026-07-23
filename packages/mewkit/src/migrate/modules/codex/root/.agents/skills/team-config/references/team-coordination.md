@@ -1,9 +1,9 @@
 # Team Coordination
 
 > Loaded by `mk:team-config` when team mode activates. This is the team-only detail
-> moved out of always-loaded `.agents/skills/rule-parallel-execution-rules.md` (Rule 7) so it
+> moved out of always-loaded the parallel-execution conventions (Rule 7) so it
 > costs zero context in standard single-session work. Standard sessions use
-> `.agents/skills/rule-orchestration-rules.md`; these rules apply ONLY when a team/worktree
+> AGENTS.md (Delegation & subagents); these rules apply ONLY when a team/worktree
 > workflow is active.
 
 When team mode is active:

@@ -79,7 +79,7 @@ For dry-run: return: impacted-count + first 5 affected page titles + the exact c
 
 For exec: return: pages-changed-count + first 5 + last 5 + URL to the CQL search reflecting the change.
 
-End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
+End with the status block defined in AGENTS.md (Subagent status protocol).
 
 ## Gotchas
 

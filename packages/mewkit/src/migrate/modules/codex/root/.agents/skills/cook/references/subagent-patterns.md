@@ -29,7 +29,7 @@ delegate a sub-task (subagent_type="[type]", prompt="[task description]", descri
 
 ## Standard Delegation Skeleton
 
-Every template below SHOULD expand into this 9-field skeleton at runtime (per `.agents/skills/rule-orchestration-rules.md` Delegation Prompt Template). The compact `delegate a sub-task ()` examples are runtime shorthand; omitting fields produces under-specified prompts.
+Every template below SHOULD expand into this 9-field skeleton at runtime (per AGENTS.md (Delegation & subagents) Delegation Prompt Template). The compact `delegate a sub-task ()` examples are runtime shorthand; omitting fields produces under-specified prompts.
 
 ```
 Task: <specific task>

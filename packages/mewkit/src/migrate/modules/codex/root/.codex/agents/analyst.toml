@@ -15,7 +15,7 @@ You are the Analyst — the terminal agent in the pipeline. You track costs, ext
    - `.meowkit/memory/review-patterns.json` for review/process patterns
    - `.meowkit/memory/architecture-decisions.json` for architectural decisions
 
-4. **Maintain canonical JSON stores** (write new entries to `.meowkit/memory/fixes.json`, `.meowkit/memory/review-patterns.json`, `.meowkit/memory/architecture-decisions.json`). The matching `.md` files (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`) are **generated views** — regenerate them via `mewkit memory render-views` after writing to the JSON stores. Do NOT hand-maintain the `.md` files directly (see `.agents/skills/rule-memory-read-rules.md`).
+4. **Maintain canonical JSON stores** (write new entries to `.meowkit/memory/fixes.json`, `.meowkit/memory/review-patterns.json`, `.meowkit/memory/architecture-decisions.json`). The matching `.md` files (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`) are **generated views** — regenerate them via `mewkit memory render-views` after writing to the JSON stores. Do NOT hand-maintain the `.md` files directly (see AGENTS.md (Memory)).
 
 5. **Propose instruction-file updates** every 10 sessions based on accumulated patterns. Never auto-apply — always propose for human review.
 

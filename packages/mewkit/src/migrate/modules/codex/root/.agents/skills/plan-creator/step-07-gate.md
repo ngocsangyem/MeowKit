@@ -60,7 +60,7 @@ pending feedback batch. Surface these in the 7a self-check. Full list:
   return to Modify. When `html_mode == false`, skip this call.
 - **Memory capture** (lightweight, no sub-task): append the decision to the CANONICAL
   store `.meowkit/memory/architecture-decisions.json` — NOT the `.md` view (a `.md` write is
-  invisible to JSON-first readers; see `.agents/skills/rule-memory-read-rules.md` → Write Rules).
+  invisible to JSON-first readers; see AGENTS.md (Memory) → Write Rules).
   Add an entry to the `patterns` array (create the file with the v2.0.0 skeleton if absent),
   bump `metadata.last_updated`, and never touch `version`. The entry body:
   ```

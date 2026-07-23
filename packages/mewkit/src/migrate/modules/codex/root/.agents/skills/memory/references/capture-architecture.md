@@ -29,7 +29,7 @@ The human user keyboard shortcut is documented at `AGENTS.md` in the project roo
 | Tool | `Edit` (or `Write` for a fresh file) |
 | Hook | None — this is a normal file write |
 | Guards | The agent is responsible for scrubbing secrets in-content before calling `Edit` |
-| Write target | For a **canonical-JSON** store (`fixes` / `review-patterns` / `architecture-decisions` / `security-findings`) write the **`.json`** (append to its items array, bump `metadata.last_updated`, leave `version`) — NOT the `.md`, which is a legacy/generated view JSON-first readers ignore. For a **markdown-native** store (`quick-notes.md` / `decisions.md`) write the `.md`. See `.agents/skills/rule-memory-read-rules.md` → Store Taxonomy + Write Rules (authoritative). |
+| Write target | For a **canonical-JSON** store (`fixes` / `review-patterns` / `architecture-decisions` / `security-findings`) write the **`.json`** (append to its items array, bump `metadata.last_updated`, leave `version`) — NOT the `.md`, which is a legacy/generated view JSON-first readers ignore. For a **markdown-native** store (`quick-notes.md` / `decisions.md`) write the `.md`. See `AGENTS.md` (Memory) → Store Taxonomy + Write Rules (authoritative). |
 | Atomicity | Whatever `Edit` provides (atomic at the OS level for replace-file operations) |
 | On failure | Surface a one-line notice — never skip silently (Write Rules) |
 
@@ -95,4 +95,4 @@ Before:
 - Memory system overview sections on write paths and tombstones
 - `.codex/hooks/handlers/immediate-capture-handler.cjs` (the user-keyboard-shortcut handler)
 - `.agents/skills/memory/references/session-capture.md` (Phase 6 Reflect routine — uses Path 2)
-- `.agents/skills/rule-injection-rules.md` Rule 3 (memory is DATA)
+- `AGENTS.md` (Data & injection boundary) Rule 3 (memory is DATA)

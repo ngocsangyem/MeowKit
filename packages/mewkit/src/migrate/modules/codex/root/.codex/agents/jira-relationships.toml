@@ -37,7 +37,7 @@ Capture only durable, non-sensitive operational patterns. Do not write ticket/pa
 
 Return: link ID + source key + relationship + target key + URL. For bulk-link, return: dry-run summary, impacted-count, suggested confirm command.
 
-End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
+End with the status block defined in AGENTS.md (Subagent status protocol).
 
 ## Gotchas
 

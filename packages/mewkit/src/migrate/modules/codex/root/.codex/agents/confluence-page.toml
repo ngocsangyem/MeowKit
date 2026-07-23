@@ -54,7 +54,7 @@ After every successful operation, return:
 3. One-line summary of what changed (incl. version number for updates)
 4. One suggested next action (e.g. "add label via `mk:confluence-collaborate`")
 
-End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
+End with the status block defined in AGENTS.md (Subagent status protocol).
 
 ## Failure Handling (confluence-as exit codes → user message)
 

@@ -40,11 +40,11 @@ else:
     flag in report header: [NO_CODEBASE_CONTEXT]
 ```
 
-Story-sizer NEVER auto-invokes `the scout skill`. This preserves the trust boundary documented in `mk:planning-engine/SKILL.md` and avoids skill-to-skill invocation forbidden by `.agents/skills/rule-skill-authoring-rules.md`.
+Story-sizer NEVER auto-invokes `the scout skill`. This preserves the trust boundary documented in `mk:planning-engine/SKILL.md` and avoids skill-to-skill invocation forbidden by the skill authoring rules.
 
 ## Agile Detection
 
-`agile_loaded` is set to `true` only if `mk:agent-detector` reports that `.agents/skills/rule-agile-story-gates.md` is loaded for the current session. The scorer then emits a `dor_status` block per record; when `false`, the field is omitted silently.
+`agile_loaded` is set to `true` only if `mk:agent-detector` reports that the agile story gates rule is loaded for the current session. The scorer then emits a `dor_status` block per record; when `false`, the field is omitted silently.
 
 ## Filtering with --story <id>
 

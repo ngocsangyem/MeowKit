@@ -148,7 +148,7 @@ Run team estimation session for this ticket.
 
 Persist the estimation to `tasks/reports/jira-estimate-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md`. This makes the result durable for `mk:planning-engine` capacity analysis and the `mk:cook` plan-creation input. Use the Write tool. Filename slug uses absolute date stamp (per memory rules).
 
-End with the A1 status block exactly as defined in `.agents/skills/rule-agent-conduct.md` (A1).
+End with the status block defined in AGENTS.md (Subagent status protocol).
 
 ## Memory
 
