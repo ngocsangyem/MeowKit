@@ -6,8 +6,8 @@ import {
 	resolveCodexModuleDir,
 	loadCodexBundleManifest,
 	copyAuthoredCodexBundle,
-	applyAuthoredCodexBundle,
 } from "../codex-authored-bundle.js";
+import { applyActiveCodexOverlay } from "../codex-reconcile-apply.js";
 import { codexTargetProfile } from "../../../validate/targets/codex-target.js";
 
 const moduleDir = resolveCodexModuleDir();
@@ -57,10 +57,12 @@ describe("authored codex bundle", () => {
 		expect(fails, `unexpected non-skill failures: ${fails.map((f) => `${f.name} — ${f.detail}`).join("; ")}`).toEqual([]);
 	});
 
-	it("the migrate overlay is inert while every entry is draft (active:false)", () => {
-		// applyAuthoredCodexBundle copies only ACTIVE entries; none are active yet, so
-		// the converter path is untouched during the phased transition.
-		expect(applyAuthoredCodexBundle(target, moduleDir)).toEqual([]);
+	it("the migrate overlay writes nothing while every entry is draft (active:false)", async () => {
+		// The overlay applies only ACTIVE entries; none are active yet, so the converter
+		// path is untouched during the phased transition.
+		const overlay = await applyActiveCodexOverlay(target, { moduleDir });
+		expect(overlay.writes).toBe(0);
+		expect(overlay.entries).toEqual([]);
 		expect(existsSync(join(target, "AGENTS.md"))).toBe(false);
 	});
 });

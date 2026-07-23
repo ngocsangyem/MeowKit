@@ -56,7 +56,7 @@ export function copyAuthoredCodexBundle(
 	return copied;
 }
 
-function copyOne(moduleDir: string, targetDir: string, entry: ArtifactManifestEntry): void {
+export function copyOne(moduleDir: string, targetDir: string, entry: ArtifactManifestEntry): void {
 	const src = join(moduleDir, entry.sourcePath);
 	if (!existsSync(src)) throw new Error(`authored codex artifact missing: ${entry.sourcePath}`);
 	const dest = join(targetDir, entry.targetPath);
@@ -70,13 +70,4 @@ function copyOne(moduleDir: string, targetDir: string, entry: ArtifactManifestEn
 	mkdirSync(dirname(dest), { recursive: true });
 	cpSync(src, dest);
 	chmodSync(dest, Number.parseInt(entry.mode, 8));
-}
-
-/** Overlay the ACTIVE authored codex artifacts onto a freshly-migrated target,
- *  replacing converter output for surfaces that have been flipped live. Inert while
- *  no entry is active (the current transition state), so it never disturbs the
- *  converter path. Returns the artifacts it applied. */
-export function applyAuthoredCodexBundle(targetDir: string, moduleDir = resolveCodexModuleDir()): CopiedArtifact[] {
-	if (!existsSync(join(moduleDir, "manifest.json"))) return [];
-	return copyAuthoredCodexBundle(moduleDir, targetDir, { onlyActive: true });
 }

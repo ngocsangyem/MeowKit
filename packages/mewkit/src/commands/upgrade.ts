@@ -13,7 +13,8 @@ import {
 } from "../core/index.js";
 import type { ReleaseInfo, UserConfig } from "../core/index.js";
 import { runMigrate } from "../migrate/migrate-orchestrator.js";
-import { resolveCodexModuleDir, copyAuthoredCodexBundle } from "../migrate/modules/codex-authored-bundle.js";
+import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
+import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
 
 /** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
 const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
@@ -42,17 +43,25 @@ async function reMigrateInstalledProviders(projectDir: string): Promise<void> {
 }
 
 /** A codex-only project (from `init --target codex`) has no `.claude/`; upgrade it by
- *  re-copying the authored Codex bundle from the installed package. Managed artifacts
- *  are refreshed (a user-edited AGENTS.md is overwritten — re-run after editing). */
-function upgradeCodexToolkit(projectDir: string): void {
+ *  reconciling the authored Codex bundle from the installed package against the project
+ *  ledger. Managed artifacts are refreshed, but a user-edited file is PRESERVED and
+ *  reported as a conflict rather than silently overwritten. */
+async function upgradeCodexToolkit(projectDir: string): Promise<void> {
 	console.log(pc.bold("Codex toolkit detected (no .claude/) — refreshing from the installed mewkit bundle."));
 	const moduleDir = resolveCodexModuleDir();
 	if (!existsSync(join(moduleDir, "manifest.json"))) {
 		console.error(pc.red("Codex bundle not found in this install — reinstall the `mewkit` package."));
 		process.exit(1);
 	}
-	const copied = copyAuthoredCodexBundle(moduleDir, projectDir);
-	console.log(pc.green(`Codex toolkit refreshed (${copied.length} artifacts): AGENTS.md, .codex/, .agents/skills/.`));
+	const result = await reconcileApplyCodexBundle(moduleDir, projectDir, { projectRoot: projectDir });
+	const preserved = result.entries.filter((e) => e.action === "skip" && e.reasonCode === "user-edits-preserved").length;
+	console.log(
+		pc.green(`Codex toolkit refreshed — ${result.writes} updated${preserved > 0 ? `, ${preserved} preserving your edits` : ""}.`),
+	);
+	if (result.conflicts.length > 0) {
+		console.log(pc.yellow(`  ${result.conflicts.length} conflict(s) — both you and mewkit changed these; left untouched:`));
+		for (const c of result.conflicts) console.log(pc.dim(`    ${c.targetPath}`));
+	}
 }
 
 export interface UpgradeArgs {
@@ -251,7 +260,7 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 	// authored Codex bundle instead. (Skip for --check/--list, which are version queries.)
 	const cwd = process.cwd();
 	if (!args.check && !args.list && !existsSync(join(cwd, ".claude")) && existsSync(join(cwd, ".codex"))) {
-		upgradeCodexToolkit(cwd);
+		await upgradeCodexToolkit(cwd);
 		return;
 	}
 

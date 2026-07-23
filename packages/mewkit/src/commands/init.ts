@@ -21,11 +21,8 @@ import { ensureVenv, installPipPackages } from "../core/dependency-installer.js"
 import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.js";
 import type { MigrateOptions, ProviderType } from "../migrate/types.js";
 import { providers } from "../migrate/provider-registry.js";
-import {
-	resolveCodexModuleDir,
-	loadCodexBundleManifest,
-	copyAuthoredCodexBundle,
-} from "../migrate/modules/codex-authored-bundle.js";
+import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
+import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
 
 export interface InitArgs {
 	dryRun?: boolean;
@@ -268,19 +265,28 @@ async function initCodexTarget(targetDir: string, dryRun: boolean, force: boolea
 		p.cancel("Codex bundle not found in this install — reinstall the `mewkit` package (`npx mewkit@latest ...`).");
 		process.exit(1);
 	}
-	// Fail closed rather than clobber an existing Codex layout.
-	if (!force && fs.existsSync(join(targetDir, "AGENTS.md"))) {
-		p.cancel(`AGENTS.md already exists in ${targetDir}. Re-run with --force to overwrite the Codex toolkit.`);
-		process.exit(1);
-	}
+	// No fail-closed guard: the reconciler preserves user edits (or surfaces a conflict)
+	// instead of clobbering an existing layout, and makes a re-run idempotent.
 	if (dryRun) {
-		const manifest = loadCodexBundleManifest(moduleDir);
-		p.log.info(`Dry-run: would create a Codex toolkit (${manifest.entries.length} artifacts) — AGENTS.md, .codex/, .agents/skills/.`);
+		const plan = await reconcileApplyCodexBundle(moduleDir, targetDir, {
+			force,
+			dryRun: true,
+			projectRoot: targetDir,
+		});
+		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
+		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
+		p.log.info(`Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .codex/, .agents/skills/.`);
 		p.outro(pc.green("Dry-run complete — no files written."));
 		return;
 	}
-	const copied = copyAuthoredCodexBundle(moduleDir, targetDir);
-	p.log.success(`Codex toolkit created (${copied.length} artifacts): AGENTS.md, .codex/{config.toml,agents,hooks.json,hooks}, .agents/skills/.`);
+	const result = await reconcileApplyCodexBundle(moduleDir, targetDir, { force, projectRoot: targetDir });
+	if (result.conflicts.length > 0) {
+		p.log.warn(
+			`${result.conflicts.length} existing file(s) differ from the bundle and were left untouched (re-run with --force to overwrite):`,
+		);
+		for (const c of result.conflicts) p.log.message(pc.dim(`  ${c.targetPath}`));
+	}
+	p.log.success(`Codex toolkit ready (${result.writes} written): AGENTS.md, .codex/{config.toml,agents,hooks.json,hooks}, .agents/skills/.`);
 	p.outro(pc.green("Codex toolkit installed!"));
 }
 
@@ -310,18 +316,17 @@ async function promptProviders(): Promise<ProviderType[]> {
  * bundle. Non-fatal (warn + skip) so a Codex hiccup never aborts the whole install —
  * unlike `initCodexTarget`, which fails closed because Codex is the ONLY target there.
  */
-function addCodexBundle(targetDir: string, force: boolean): void {
+async function addCodexBundle(targetDir: string, force: boolean): Promise<void> {
 	const moduleDir = resolveCodexModuleDir();
 	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
 		p.log.warn("Codex bundle not found in this install — skipping the Codex toolkit.");
 		return;
 	}
-	if (!force && fs.existsSync(join(targetDir, "AGENTS.md"))) {
-		p.log.warn("AGENTS.md already exists — skipping the Codex toolkit (re-run with --force to overwrite).");
-		return;
+	const result = await reconcileApplyCodexBundle(moduleDir, targetDir, { force, projectRoot: targetDir });
+	if (result.conflicts.length > 0) {
+		p.log.warn(`${result.conflicts.length} existing Codex file(s) left untouched (re-run with --force to overwrite).`);
 	}
-	const copied = copyAuthoredCodexBundle(moduleDir, targetDir);
-	p.log.success(`Codex toolkit created (${copied.length} artifacts): AGENTS.md, .codex/, .agents/skills/.`);
+	p.log.success(`Codex toolkit created (${result.writes} written): AGENTS.md, .codex/, .agents/skills/.`);
 }
 
 export async function init(args: InitArgs): Promise<void> {
@@ -356,7 +361,7 @@ export async function init(args: InitArgs): Promise<void> {
 	// Codex (additive, offline bundle) and Cursor (export from .claude/) when picked.
 	if (picked?.includes("codex")) {
 		if (dryRun) p.log.info("Dry-run: would copy the authored Codex bundle (AGENTS.md, .codex/, .agents/skills/).");
-		else addCodexBundle(targetDir, force);
+		else await addCodexBundle(targetDir, force);
 	}
 	if (picked?.includes("cursor")) {
 		if (dryRun) p.log.info("Dry-run: would export .claude/ to .cursor/.");

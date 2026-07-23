@@ -1,4 +1,4 @@
-import { mkdtempSync, existsSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, existsSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -38,26 +38,12 @@ describe("init --target codex", () => {
 		expect(existsSync(join(dir, ".codex"))).toBe(false);
 	});
 
-	it("refuses to overwrite an existing AGENTS.md without --force", async () => {
-		writeFileSync(join(dir, "AGENTS.md"), "# existing\n");
-		const exit = viMockExit();
-		await init({ target: "codex" }).catch(() => undefined);
-		expect(exit.code).toBe(1);
-		expect(existsSync(join(dir, ".codex"))).toBe(false); // nothing copied
-		exit.restore();
+	it("preserves an existing user AGENTS.md (adoption-as-conflict), never clobbering it", async () => {
+		writeFileSync(join(dir, "AGENTS.md"), "# existing user content\n");
+		await init({ target: "codex" });
+		// The pre-existing AGENTS.md differs from the bundle and has no ledger baseline,
+		// so it is preserved as a conflict — not overwritten. Other surfaces still install.
+		expect(readFileSync(join(dir, "AGENTS.md"), "utf-8")).toBe("# existing user content\n");
+		expect(existsSync(join(dir, ".codex", "config.toml"))).toBe(true);
 	});
 });
-
-// Capture process.exit without killing the test runner.
-function viMockExit(): { code: number | undefined; restore: () => void } {
-	const original = process.exit;
-	const state: { code: number | undefined; restore: () => void } = { code: undefined, restore: () => undefined };
-	process.exit = ((c?: number) => {
-		state.code = c;
-		throw new Error(`process.exit(${c})`);
-	}) as typeof process.exit;
-	state.restore = () => {
-		process.exit = original;
-	};
-	return state;
-}

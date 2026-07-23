@@ -15,6 +15,10 @@ export interface MeowkitStatePaths {
 	migrateLock: string;
 	/** Directory holding per-store granularity locks that nest under the project lock. */
 	storeLocksDir: string;
+	/** Project-local reconciliation ledger for the authored Codex bundle
+	 *  (PortableRegistryV3-shaped). Per-project storage — the home registry stays
+	 *  the authority for other providers. This is state, not source. */
+	codexLedger: string;
 }
 
 /** Build the taxonomy paths from a resolved `.meowkit/` directory. */
@@ -29,5 +33,6 @@ export function meowkitStatePaths(meowkitRoot: string): MeowkitStatePaths {
 		migrations: join(meowkitRoot, "migrations"),
 		migrateLock: join(state, "migrate.lock"),
 		storeLocksDir: join(state, "locks"),
+		codexLedger: join(state, "codex-ledger.json"),
 	};
 }

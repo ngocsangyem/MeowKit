@@ -21,13 +21,15 @@ afterEach(() => {
 });
 
 describe("upgrade — codex-only project", () => {
-	it("refreshes the authored Codex bundle (no .claude/ release flow)", async () => {
-		// Simulate an existing codex-only toolkit with a stale, hand-modified AGENTS.md.
+	it("refreshes managed surfaces but preserves a hand-edited AGENTS.md (no blind overwrite)", async () => {
+		// Simulate an existing codex-only toolkit with a hand-modified AGENTS.md.
 		mkdirSync(join(dir, ".codex"), { recursive: true });
-		writeFileSync(join(dir, "AGENTS.md"), "# stale\n");
+		writeFileSync(join(dir, "AGENTS.md"), "# stale user edit\n");
 		await upgrade({});
-		// Bundle re-copied: AGENTS.md restored to the authored content, skills present.
-		expect(readFileSync(join(dir, "AGENTS.md"), "utf-8")).toContain("Authored Codex instruction surface");
+		// The hand-edited AGENTS.md has no ledger baseline and differs from the bundle,
+		// so it is PRESERVED (conflict), not clobbered — the whole point of the reconciler.
+		expect(readFileSync(join(dir, "AGENTS.md"), "utf-8")).toBe("# stale user edit\n");
+		// The rest of the bundle still installs.
 		expect(existsSync(join(dir, ".codex", "config.toml"))).toBe(true);
 		expect(existsSync(join(dir, ".agents", "skills"))).toBe(true);
 		// It did NOT create a Claude Code kit.

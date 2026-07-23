@@ -38,8 +38,9 @@ import { buildMigrationReport, writeMigrationReport } from "./validation/migrati
 import type { MigrationDecisionRecord } from "./validation/migration-record-types.js";
 import { discoverEnvKeys } from "./discovery/config-discovery.js";
 import { emitShellEnvPolicyScaffold } from "./providers/codex/shell-env-policy-emitter.js";
+import { homedir } from "node:os";
 import { getCodexRoot } from "./hooks/codex-path-safety.js";
-import { applyAuthoredCodexBundle } from "./modules/codex-authored-bundle.js";
+import { applyActiveCodexOverlay } from "./modules/codex-reconcile-apply.js";
 import { formatMcpIncludeRerunCommand } from "./migrate-ui-summary.js";
 import { convertMcpJsonToCodexToml } from "./converters/mcp-json-to-codex-toml.js";
 import { installCodexMcpServers } from "./hooks/codex-mcp-installer.js";
@@ -358,8 +359,11 @@ async function runMigrateUnderLock(
 		// output. Inert while every entry is draft, so today's converter path is unchanged;
 		// each future batch flips a surface live until the converters are retired entirely.
 		if (!hasFailures && targets.includes("codex")) {
-			const applied = applyAuthoredCodexBundle(getCodexRoot({ global: isGlobal }));
-			if (applied.length > 0) console.log(pc.green(`[+] Applied ${applied.length} authored Codex artifact(s)`));
+			// Overlay onto the SCOPE ROOT (project cwd / home), not the .codex dir — the
+			// manifest targetPaths are scope-root-relative (".codex/config.toml", "AGENTS.md").
+			const scopeRoot = isGlobal ? homedir() : process.cwd();
+			const overlay = await applyActiveCodexOverlay(scopeRoot, { global: isGlobal });
+			if (overlay.writes > 0) console.log(pc.green(`[+] Applied ${overlay.writes} authored Codex artifact(s)`));
 		}
 		return hasFailures || mcpFailed ? 1 : 0;
 	} finally {
