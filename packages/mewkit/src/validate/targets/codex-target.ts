@@ -183,11 +183,16 @@ function checkAgents(dir: string): CheckResult[] {
 	if (files.length === 0) return []; // a target with no agents is valid
 	const broken: string[] = [];
 	const nameless: string[] = [];
+	const missingFields: string[] = [];
 	// Codex identifies a custom agent by its `name` field (the filename is only a
 	// convention), and it AUTO-LOADS every .codex/agents/*.toml — there is no
 	// config.toml wiring. So `name` must be present and unique across the tree, or the
-	// agent selector becomes ambiguous.
+	// agent selector becomes ambiguous. Beyond `name`, Codex requires `description` and
+	// `developer_instructions`; `model`, `model_reasoning_effort`, `sandbox_mode`,
+	// `mcp_servers`, and `skills.config` are optional and left unconstrained (the schema
+	// stays open so a new optional Codex field never trips this gate).
 	const nameToFiles = new Map<string, string[]>();
+	const hasText = (v: unknown): boolean => typeof v === "string" && v.trim().length > 0;
 	for (const f of files) {
 		let parsed: Record<string, unknown>;
 		try {
@@ -202,6 +207,8 @@ function checkAgents(dir: string): CheckResult[] {
 			continue;
 		}
 		nameToFiles.set(name, [...(nameToFiles.get(name) ?? []), path.basename(f)]);
+		const missing = (["description", "developer_instructions"] as const).filter((k) => !hasText(parsed[k]));
+		if (missing.length > 0) missingFields.push(`${path.basename(f)} (${missing.join(", ")})`);
 	}
 
 	const out: CheckResult[] = [
@@ -213,6 +220,11 @@ function checkAgents(dir: string): CheckResult[] {
 		nameless.length === 0
 			? pass("Codex agent name field", "every agent declares a name (auto-load identity)")
 			: fail("Codex agent name field", `missing name field: ${nameless.join(", ")}`),
+	);
+	out.push(
+		missingFields.length === 0
+			? pass("Codex agent required fields", "every agent declares description + developer_instructions")
+			: fail("Codex agent required fields", `missing required field(s): ${missingFields.join("; ")}`),
 	);
 	const dupes = [...nameToFiles.entries()].filter(([, fileList]) => fileList.length > 1);
 	out.push(

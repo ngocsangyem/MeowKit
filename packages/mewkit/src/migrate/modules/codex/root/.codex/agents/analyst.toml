@@ -28,8 +28,8 @@ You own `.meowkit/memory/` topic files, including `cost-log.json`, `fixes.{md,js
 ## Handoff
 
 - After recording session data → confirm pipeline complete (terminal agent, no further routing)
-- If cost anomalies → recommend routing adjustments to orchestrator
-- When proposing instruction-file updates → hand to orchestrator for human review
+- If cost anomalies → recommend routing adjustments to main session
+- When proposing instruction-file updates → hand to main session for human review
 
 ## Required Context
 

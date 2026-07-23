@@ -57,6 +57,47 @@ describe("authored codex bundle", () => {
 		expect(statSync(join(target, ".codex", "hooks", "capture.cjs")).mode & 0o777).toBe(0o755);
 	});
 
+	it("the agent roster is re-authored by execution envelope (orchestrator dropped, effort assigned)", () => {
+		copyAuthoredCodexBundle(moduleDir, target);
+		const agentsDir = join(target, ".codex", "agents");
+		const agentPath = (n: string) => join(agentsDir, `${n}.toml`);
+
+		// Only orchestrator is dropped as an agent — Codex has no router-agent; its routing
+		// responsibility moves to the main session + the cross-toolkit `orchestrate` skill.
+		expect(existsSync(agentPath("orchestrator")), "orchestrator should be dropped (→ orchestrate skill)").toBe(false);
+
+		// Every kept core agent declares a workload-class effort, and none pins xhigh
+		// (gated to codex-max-tier; the shipped default inherits its model, so high is the ceiling).
+		const core = [
+			"advisor",
+			"analyst",
+			"architect",
+			"brainstormer",
+			"developer",
+			"documenter",
+			"evaluator",
+			"git-manager",
+			"journal-writer",
+			"planner",
+			"project-manager",
+			"researcher",
+			"reviewer",
+			"security",
+			"shipper",
+			"tester",
+			"ui-ux-designer",
+		];
+		for (const n of core) {
+			const body = readFileSync(agentPath(n), "utf-8");
+			expect(body, `${n} missing effort`).toMatch(/^model_reasoning_effort = "(low|medium|high)"$/m);
+			expect(body, `${n} must not pin xhigh`).not.toContain("xhigh");
+		}
+
+		// Integration leaf agents remain in the tree (phase 6 conditions their pack install).
+		expect(existsSync(agentPath("jira-issue"))).toBe(true);
+		expect(existsSync(agentPath("confluence-page"))).toBe(true);
+	});
+
 	it("the copied bundle passes the Codex validator's structural checks", async () => {
 		copyAuthoredCodexBundle(moduleDir, target);
 		const results = await codexTargetProfile.check(target);

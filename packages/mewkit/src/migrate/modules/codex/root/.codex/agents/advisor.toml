@@ -1,6 +1,6 @@
 name = "advisor"
-description = "Isolated advisory executor for mk:advise. Interviews one question at a time, confirms a reframing of the user's problem, then delivers a single honest recommendation packet. Invoked ONLY by mk:advise — never routed to directly by the orchestrator, and never as a lifecycle phase owner. Examples: \"What should I do about our slow build?\", \"Advise me on splitting this service.\", \"Am I approaching this migration right?\""
-model_reasoning_effort = "xhigh"
+description = "Isolated advisory executor for mk:advise. Interviews one question at a time, confirms a reframing of the user's problem, then delivers a single honest recommendation packet. Invoked ONLY by mk:advise — never routed to directly by the main session, and never as a lifecycle phase owner. Examples: \"What should I do about our slow build?\", \"Advise me on splitting this service.\", \"Am I approaching this migration right?\""
+model_reasoning_effort = "high"
 developer_instructions = """
 You are an Advisor. You turn a raw idea into one honest recommendation — but only
 after the real problem has been found and confirmed by the person who has it.
@@ -128,7 +128,7 @@ terminating vocabulary — do not invent markers beside it.
 | Advice impossible (missing grounding you cannot ask for) | `BLOCKED`            | What is missing, and why a question cannot resolve it |
 | Advice given, but you doubt a load-bearing input         | `DONE_WITH_CONCERNS` | The packet + the doubt                                |
 
-The orchestrator relays `NEEDS_CONTEXT` payloads to the user verbatim and relays
+The main session relays `NEEDS_CONTEXT` payloads to the user verbatim and relays
 their answer back. It does not answer for them.
 
 ## Input Trust

@@ -23,9 +23,12 @@ function makeTarget(): string {
 	mkdirSync(join(dir, ".codex", "hooks"), { recursive: true });
 	mkdirSync(join(dir, ".agents", "skills", "demo"), { recursive: true });
 	writeFileSync(join(dir, ".codex", "config.toml"), '[agents.demo]\nconfig_file = "agents/demo.toml"\n');
-	// A valid Codex agent declares a `name` (its auto-load identity; the filename is only
-	// a convention).
-	writeFileSync(join(dir, ".codex", "agents", "demo.toml"), 'name = "demo"\ndescription = "demo agent"\n');
+	// A valid Codex agent declares the three required fields: `name` (its auto-load identity;
+	// the filename is only a convention), `description`, and `developer_instructions`.
+	writeFileSync(
+		join(dir, ".codex", "agents", "demo.toml"),
+		'name = "demo"\ndescription = "demo agent"\ndeveloper_instructions = "Be a demo."\n',
+	);
 	const wrapper = join(dir, ".codex", "hooks", "w.cjs");
 	writeFileSync(
 		wrapper,
@@ -117,6 +120,46 @@ describe("codex target validation", () => {
 		writeFileSync(join(d, ".codex", "agents", "dup.toml"), 'name = "demo"\ndescription = "clashes with demo.toml"\n');
 		const rs = await codexTargetProfile.check(d);
 		expect(status(rs, "Codex agent name uniqueness")).toBe("fail");
+	});
+
+	it("an agent TOML missing developer_instructions → FAIL required fields", async () => {
+		const d = makeTarget();
+		writeFileSync(join(d, ".codex", "agents", "thin.toml"), 'name = "thin"\ndescription = "no instructions"\n');
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex agent required fields")).toBe("fail");
+	});
+
+	it("an agent TOML missing description → FAIL required fields", async () => {
+		const d = makeTarget();
+		writeFileSync(
+			join(d, ".codex", "agents", "nodesc.toml"),
+			'name = "nodesc"\ndeveloper_instructions = "instructions but no description"\n',
+		);
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex agent required fields")).toBe("fail");
+	});
+
+	it("an agent TOML carrying the documented optional fields still PASSES (open schema)", async () => {
+		const d = makeTarget();
+		// model_reasoning_effort, sandbox_mode, mcp_servers, skills.config are optional and
+		// must not trip the required-fields gate.
+		writeFileSync(
+			join(d, ".codex", "agents", "full.toml"),
+			[
+				'name = "full"',
+				'description = "fully specified agent"',
+				'model_reasoning_effort = "high"',
+				'sandbox_mode = "read-only"',
+				'mcp_servers = ["fs"]',
+				'developer_instructions = "Do the thing."',
+				"[skills]",
+				'config = "all"',
+				"",
+			].join("\n"),
+		);
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex agent required fields")).toBe("pass");
+		expect(status(rs, "Codex agent name uniqueness")).toBe("pass");
 	});
 
 	it("a dangling .codex/scripts ref in an agent TOML → FAIL reference graph", async () => {
