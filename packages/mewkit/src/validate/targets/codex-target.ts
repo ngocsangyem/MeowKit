@@ -96,7 +96,7 @@ function checkHooks(dir: string): CheckResult[] {
 	const hooksJsonPath = path.join(dir, ".codex", "hooks.json");
 	if (!fs.existsSync(hooksJsonPath))
 		return [warn("Codex hooks.json present", `No hooks.json at ${hooksJsonPath} (target has no hooks)`)];
-	let parsed: { hooks?: Record<string, Array<{ hooks?: Array<{ command?: string }> }>> };
+	let parsed: { hooks?: Record<string, Array<{ hooks?: Array<{ command?: string; commandWindows?: string }> }>> };
 	try {
 		parsed = JSON.parse(fs.readFileSync(hooksJsonPath, "utf-8"));
 	} catch (e) {
@@ -104,18 +104,28 @@ function checkHooks(dir: string): CheckResult[] {
 	}
 	const out: CheckResult[] = [pass("Codex hooks.json parses", "valid JSON")];
 
-	// Every referenced wrapper file must exist + be executable.
+	// Every referenced wrapper file must exist + be executable. Read both the POSIX
+	// `command` and the optional cross-platform `commandWindows`.
 	const commands: string[] = [];
 	for (const groups of Object.values(parsed.hooks ?? {})) {
-		for (const g of groups) for (const h of g.hooks ?? []) if (h.command) commands.push(h.command);
+		for (const g of groups)
+			for (const h of g.hooks ?? []) {
+				if (h.command) commands.push(h.command);
+				if (h.commandWindows) commands.push(h.commandWindows);
+			}
 	}
-	const wrapperPaths = commands
-		.map((c) => c.match(/"([^"]+\.cjs)"/)?.[1] ?? c.match(/(\S+\.cjs)/)?.[1])
-		.filter((p): p is string => Boolean(p))
-		// Real Codex hook commands resolve the project root via `$(git rev-parse
-		// --show-toplevel)` (Codex exposes no project-dir env var). The target being
-		// validated IS that root, so substitute it to resolve the wrapper on disk.
-		.map((p) => p.replace(/\$\(git rev-parse --show-toplevel\)/g, dir));
+	// Extract the `.codex/hooks/<file>.cjs` segment regardless of HOW a command computes
+	// the git root (POSIX `$(git rev-parse …)`, a pure-Node resolver, …). Codex runs a
+	// hook from the session cwd, which may be a subdirectory, so real commands resolve the
+	// git root; the target being validated IS that root, so the wrapper resolves under it.
+	const wrapperPaths = [
+		...new Set(
+			commands
+				.map((c) => c.match(/\.codex[/\\]hooks[/\\][\w.-]+\.cjs/)?.[0])
+				.filter((p): p is string => Boolean(p))
+				.map((p) => path.join(dir, p.replace(/\\/g, "/"))),
+		),
+	];
 	const missing = wrapperPaths.filter((p) => !fs.existsSync(p));
 	const notExec = wrapperPaths.filter((p) => fs.existsSync(p) && !isExecutable(p));
 	if (wrapperPaths.length === 0) {
