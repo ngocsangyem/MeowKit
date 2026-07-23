@@ -112,8 +112,9 @@ ${pc.bold("Init flags:")}
                              (default full). In update mode, trims an install down to the profile.
 
 ${pc.bold("Init flags for post-init migration:")}
+  --target <provider>        Create a provider toolkit: 'codex' copies the authored Codex bundle
+                             (codex-only, no .claude/); 'cursor' unpacks .claude/ then exports to it
   --migrate                  After unpack, prompt for providers to export to (interactive)
-  --migrate-to <csv|all>     After unpack, export to listed providers (e.g. cursor,codex)
   --migrate-global           Use global install paths (~/.cursor/, etc.) instead of project-local
 
 ${pc.bold("visual-plan flags:")}
@@ -225,7 +226,6 @@ async function main(): Promise<void> {
 			"status",
 			"source",
 			"source-version",
-			"migrate-to",
 			"port",
 			"session",
 			"day",
@@ -269,7 +269,7 @@ async function main(): Promise<void> {
 				force: args.force as boolean | undefined,
 				beta: args.beta as boolean | undefined,
 				migrate: args.migrate as boolean | undefined,
-				migrateTo: args["migrate-to"] as string | undefined,
+				target: args.target as string | undefined,
 				migrateGlobal: args["migrate-global"] as boolean | undefined,
 				profile: args.profile as string | undefined,
 			});

@@ -20,6 +20,11 @@ import { getRequirementsSource, formatPackageList } from "../core/skills-depende
 import { ensureVenv, installPipPackages } from "../core/dependency-installer.js";
 import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.js";
 import type { MigrateOptions } from "../migrate/types.js";
+import {
+	resolveCodexModuleDir,
+	loadCodexBundleManifest,
+	copyAuthoredCodexBundle,
+} from "../migrate/modules/codex-authored-bundle.js";
 
 export interface InitArgs {
 	dryRun?: boolean;
@@ -27,8 +32,13 @@ export interface InitArgs {
 	beta?: boolean;
 	/** When true, run interactive provider multiselect after init unpacks. */
 	migrate?: boolean;
-	/** CSV of provider names (e.g., "cursor,codex") or "all". When set, migration runs after init. */
-	migrateTo?: string;
+	/**
+	 * Target provider toolkit to create. `codex` copies the authored Codex bundle
+	 * directly (codex-only project, no `.claude/`). Any other supported provider
+	 * (e.g. `cursor`) unpacks `.claude/` then exports to it. Omitted = the default
+	 * Claude Code kit (`.claude/`). Replaces the old `--migrate-to`.
+	 */
+	target?: string;
 	/** When true, scope the post-init migration globally (~/.cursor/, etc.) instead of per-project. */
 	migrateGlobal?: boolean;
 	/**
@@ -244,8 +254,43 @@ function printSummary(
 	}
 }
 
+/**
+ * `mewkit init --target codex` — create a Codex-native toolkit by copying the
+ * authored Codex bundle shipped with the package into the project (AGENTS.md,
+ * `.codex/{config.toml,agents,hooks.json,hooks}`, `.agents/skills/`). No `.claude/`,
+ * no release download, no conversion — the bundle IS the source of truth for Codex.
+ */
+async function initCodexTarget(targetDir: string, dryRun: boolean, force: boolean): Promise<void> {
+	p.intro(pc.bgCyan(pc.black(" meowkit init --target codex ")));
+	const moduleDir = resolveCodexModuleDir();
+	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
+		p.cancel("Codex bundle not found in this install — reinstall the `mewkit` package (`npx mewkit@latest ...`).");
+		process.exit(1);
+	}
+	// Fail closed rather than clobber an existing Codex layout.
+	if (!force && fs.existsSync(join(targetDir, "AGENTS.md"))) {
+		p.cancel(`AGENTS.md already exists in ${targetDir}. Re-run with --force to overwrite the Codex toolkit.`);
+		process.exit(1);
+	}
+	if (dryRun) {
+		const manifest = loadCodexBundleManifest(moduleDir);
+		p.log.info(`Dry-run: would create a Codex toolkit (${manifest.entries.length} artifacts) — AGENTS.md, .codex/, .agents/skills/.`);
+		p.outro(pc.green("Dry-run complete — no files written."));
+		return;
+	}
+	const copied = copyAuthoredCodexBundle(moduleDir, targetDir);
+	p.log.success(`Codex toolkit created (${copied.length} artifacts): AGENTS.md, .codex/{config.toml,agents,hooks.json,hooks}, .agents/skills/.`);
+	p.outro(pc.green("Codex toolkit installed!"));
+}
+
 export async function init(args: InitArgs): Promise<void> {
 	const targetDir = process.cwd();
+
+	// `--target codex` is a distinct, offline path: copy the authored bundle, done.
+	if (args.target === "codex") {
+		return initCodexTarget(targetDir, args.dryRun ?? false, args.force ?? false);
+	}
+
 	const mode = detectMode(targetDir);
 	const dryRun = args.dryRun ?? false;
 	const force = args.force ?? false;
@@ -441,8 +486,11 @@ export async function init(args: InitArgs): Promise<void> {
 		// Step 9: Summary
 		printSummary(stats, dryRun);
 
-		// Step 10: Optional migration to external tools
-		if (!dryRun && (args.migrate || args.migrateTo)) {
+		// Step 10: Optional migration to external tools. `--target <provider>` (e.g.
+		// cursor) exports to that provider after unpacking `.claude/`; `--migrate` runs
+		// the interactive picker. (`--target codex` never reaches here — it's handled
+		// by the offline bundle path above.)
+		if (!dryRun && (args.migrate || args.target)) {
 			await runPostInitMigrate(args, targetDir);
 		}
 
@@ -461,21 +509,15 @@ async function runPostInitMigrate(args: InitArgs, projectDir: string): Promise<v
 
 	const migrateOptions: MigrateOptions = {
 		global: args.migrateGlobal ?? false,
-		yes: !!args.migrateTo, // CSV/all → non-interactive; bare --migrate stays interactive
+		yes: !!args.target, // explicit --target → non-interactive; bare --migrate stays interactive
 		source: join(projectDir, ".claude"),
 		force: true,
 	};
 
-	if (args.migrateTo) {
-		const trimmed = args.migrateTo.trim();
-		if (trimmed === "all") {
-			migrateOptions.all = true;
-		} else {
-			migrateOptions.tools = trimmed
-				.split(",")
-				.map((t) => t.trim())
-				.filter(Boolean);
-		}
+	if (args.target) {
+		const trimmed = args.target.trim();
+		if (trimmed === "all") migrateOptions.all = true;
+		else migrateOptions.tools = [trimmed];
 	}
 
 	try {
