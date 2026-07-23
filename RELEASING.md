@@ -7,42 +7,30 @@ Complete guide to building, tagging, and publishing MeowKit releases.
 ```
 Source of truth (.claude/, tasks/, CLAUDE.md)
     ↓
-prepare-release-assets.cjs
-    ├─→ dist/meowkit-release.zip              (flat-copy distribution)
-    └─→ mewkit build-plugin                   (native-plugin distribution)
-          → plugin/                           (transformed .claude payload)
-          → .claude-plugin/marketplace.json   (Claude Code marketplace)
-          → .agents/plugins/marketplace.json  (Codex marketplace)
+prepare-release-assets.cjs → dist/meowkit-release.zip   (flat-copy distribution)
     ↓
-GitHub Release (tag + zip asset) + release commit (staged plugin/ + marketplaces)
+GitHub Release (tag + zip asset) + release commit
     ↓
-flat-copy: mewkit CLI fetches zip at npx mewkit init
-native plugin: claude/codex plugin install mk@meowkit (reads the tracked marketplaces)
+mewkit CLI fetches the zip at `npx mewkit init` / `npx mewkit upgrade`
 ```
 
-**Two distributions, one source.** `.claude/` is the only source of truth. The flat-copy zip ships it as-is; the native plugin is a GENERATED variant (`plugin/`) produced by `mewkit build-plugin` — it namespaces agent references to `mk:<agent>`, renames the `mk-loop` skill dir to `loop`, and translates `settings.json` hooks into `plugin/hooks/hooks.json`. Never hand-edit `plugin/`, `.claude-plugin/`, or `.agents/` — they are regenerated.
+**One distribution, one source.** `.claude/` is the source of truth; the release zip ships it as-is, and `npx mewkit init` downloads and unpacks it. The Codex-native toolkit is a separate, package-shipped bundle (`packages/mewkit/src/migrate/modules/codex/`) that `mewkit migrate codex` / `init --target codex` copy — see step 1e.
 
-**Key insight (flat-copy):** `mewkit` CLI downloads `meowkit-release.zip` from GitHub Releases at runtime. If the release has no zip asset, the CLI cannot find it and falls back to an older version.
+**Key insight (flat-copy):** the `mewkit` CLI downloads `meowkit-release.zip` from GitHub Releases at runtime. If the release has no zip asset, the CLI cannot find it and falls back to an older version.
 
-**Key insight (plugin):** the plugin manifests carry `version` = the **root** `package.json` version. `mewkit validate --plugin` fails the build if that version drifts from the root version, or if an agent name is non-bare / a skill name is non-`mk:` / a manifest is malformed. Regenerate after any change so the committed `plugin/` stays aligned.
-
-## Version Independence — kit/plugin vs npm CLI
+## Version Independence — kit vs npm CLI
 
 There are **two independently versioned things** in this repo, and they are
 deliberately not synchronized:
 
 | Version field | What it versions |
 | --- | --- |
-| root `package.json` → `version` | The **kit**: `.claude/` content, and the generated `plugin/` + marketplace manifests that carry it |
-| `packages/mewkit/package.json` → `version` | The **npm CLI** (`mewkit`) — the installer/validator binary |
+| root `package.json` → `version` | The **kit**: `.claude/` content (2.14.x cadence) |
+| `packages/mewkit/package.json` → `version` | The **npm CLI** (`mewkit`) — the installer/validator/migrator binary |
 
 Read the current numbers from those files, never from this page — a version
 pasted into prose is stale the next time either is bumped, and the two are bumped
 on different cadences by design.
-
-The plugin manifests intentionally track the **root** version (see the Architecture
-key-insight above); `mewkit validate --plugin` fails if they drift from it. That
-is the one binding, and it exists because the plugin *is* the kit.
 
 **Do not synchronize the two version fields.** They answer different questions:
 "which harness content am I running" and "which binary installed it". A user can
@@ -54,8 +42,8 @@ independent.
 
 Bump each **only** for its own change:
 
-- Kit content changed (`.claude/`, rules, skills, agents) → bump the **root** version, regenerate `plugin/`.
-- CLI code changed (`packages/mewkit/src/`) → bump the **CLI** version.
+- Kit content changed (`.claude/`, rules, skills, agents) → bump the **root** version.
+- CLI code changed (`packages/mewkit/src/`) → bump the **CLI** version. (When the CLI change also touches the authored Codex bundle, re-run `run-codex-port.ts` — see step 1e.)
 - Both changed → bump both, independently, in the same release. Not to the same number.
 
 A version-field change is a release decision. Never edit one to make the other
@@ -389,13 +377,8 @@ This creates:
 
 - `release-manifest.json` — SHA-256 checksums for all files
 - `dist/meowkit-release.zip` — the flat-copy release package (`.claude/` + `tasks/` + `CLAUDE.md` + manifest)
-- `plugin/` — the native plugin payload (generated via `mewkit build-plugin`)
-- `.claude-plugin/marketplace.json` + `.agents/plugins/marketplace.json` — Claude Code + Codex marketplaces
-- The plugin payload + marketplaces are also added to the release zip and staged into the release commit by `git add -A` in `release.sh`, keeping the plugin manifest version aligned with the release by construction.
 
 > **Note:** This script does NOT write `.claude/metadata.json` — the `mewkit` CLI writes it on install/upgrade, and `prepare-release-assets.cjs` explicitly excludes it from the zip. The shipped release version lives in `release-manifest.json`.
->
-> **Plugin version:** the generated plugin manifests take their `version` from the root `package.json` (NOT `packages/mewkit`). Because the manifests are regenerated here and staged into the same commit, the plugin version never lags the release.
 
 Verify the zip:
 
@@ -541,14 +524,12 @@ Push to `main` or `dev` triggers `.github/workflows/release.yml`:
 
 1. Semantic-release analyzes conventional commits → determines version bump
 2. `sync-package-versions.cjs` syncs version across both packages
-3. `prepare-release-assets.cjs` builds zip + manifest AND regenerates the plugin distribution (`plugin/` + marketplaces) at the release version
+3. `prepare-release-assets.cjs` builds the zip + manifest at the release version
 4. `@semantic-release/github` creates GitHub Release with zip asset
 5. `@semantic-release/exec` publishes both packages to npm
-6. `@semantic-release/git` commits version files (and the regenerated `plugin/` + marketplaces) back to repo
+6. `@semantic-release/git` commits version files back to repo
 
 **Note:** Automated releases do NOT update `packages/docs/content/docs/changelog.mdx` or affected guide/reference pages. Those must be done manually before the release commit. Root `CHANGELOG.md` is a stub and is never updated per-release.
-
-**Plugin guard:** `.github/workflows/ci.yml` runs `mewkit validate --plugin` on every PR — it fails closed if an agent name is non-bare, a skill name is non-`mk:`, a `subagent_type` ref is unknown, a plugin manifest is malformed, or the committed plugin version drifts from the root `package.json`. Keep the committed `plugin/` regenerated (`npx mewkit build-plugin`) so this stays green.
 
 ### Conventional commits → version bumps
 
@@ -576,8 +557,8 @@ For CLI changes inside `packages/mewkit/src/`:
 | --------------------------------------- | ------------------------------------------------------------------------------- |
 | `scripts/sync-package-versions.cjs`     | Sync version across both npm packages                                           |
 | `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files                                |
-| `scripts/prepare-release-assets.cjs`    | Build manifest + dist/meowkit-release.zip; regenerate plugin/ + marketplaces (`mewkit build-plugin`) and include them in the zip |
-| `mewkit build-plugin`                   | CLI command: generate the native plugin distribution (`plugin/` payload + Claude/Codex marketplaces) from `.claude/` |
+| `scripts/prepare-release-assets.cjs`    | Build the release manifest + dist/meowkit-release.zip                            |
+| `packages/mewkit/scripts/run-codex-port.ts` | Re-port `.claude/` → the authored Codex bundle (`modules/codex/`) — see step 1e |
 | `scripts/release.sh`                    | Automated release: bump → build → assets → commit → tag → push → GitHub Release |
 
 ## Release History
@@ -700,20 +681,8 @@ gh release upload v<version> dist/meowkit-release.zip --clobber
 
 No `feat:` or `fix:` commits since last release. Add a commit with the right prefix, or use `--force` on the workflow dispatch.
 
-### `mewkit validate --plugin` fails on version alignment
+### `mewkit migrate codex` produces stale output after editing `.claude/`
 
-**Cause:** the committed `plugin/` manifests carry an older version than the root `package.json` — the plugin was not regenerated after the version bump.
+**Cause:** the authored Codex bundle (`packages/mewkit/src/migrate/modules/codex/`) was not re-ported after the `.claude/` change.
 
-**Fix:** `npx mewkit build-plugin` then commit the regenerated `plugin/` + marketplaces. (A normal `release.sh` run does this automatically before tagging.)
-
-### `mewkit validate --plugin` fails on namespace
-
-**Cause:** an agent `name:` is non-bare (would double-prefix under the plugin), a skill `name:` is not `mk:`-scoped, or a `subagent_type` ref points at an unknown agent.
-
-**Fix:** keep agent `name:` bare and skill `name:` `mk:`-prefixed in `.claude/`; fix any typo'd `subagent_type` ref to a real kit agent or a built-in (`Explore`/`Bash`/`general-purpose`/`Plan`).
-
-### Plugin install resolves the wrong slash command (e.g. `/mk:mk-loop`)
-
-**Cause:** a skill directory name diverges from its `mk:`-slug. The plugin derives the slash command from the directory name, so `skills/mk-foo/` with `name: mk:foo` resolves as `/mk:mk-foo` under the plugin.
-
-**Fix:** keep `directory == slug`. The builder auto-renames the one historical case (`mk-loop` → `loop`); do not introduce new mismatches.
+**Fix:** re-run `npx tsx packages/mewkit/scripts/run-codex-port.ts`, then verify `grep -rli claude packages/mewkit/src/migrate/modules/codex` returns nothing — see step 1e.
