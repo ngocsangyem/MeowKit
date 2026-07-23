@@ -1,6 +1,6 @@
 ---
 name: "validate-plan"
-description: "Validates an approved plan against 8 dimensions before Phase 3 begins. Catches incomplete acceptance criteria, missing dependencies, and unresolved risks. Use after Gate 1 approval and before Phase 2 (Test). Produces a validation report with pass/fail per dimension."
+description: "Validates an approved plan across 8 dimensions before build — incomplete acceptance criteria, missing dependencies, unresolved risks. Use after Gate 1, before Test."
 ---
 
 # Plan Validation — 8-Dimension Quality Check

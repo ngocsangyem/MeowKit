@@ -1,6 +1,6 @@
 ---
 name: "memory"
-description: "JSON-canonical session memory. Use when capturing session learnings, extracting patterns, or tracking costs — persists to .meowkit/memory JSON stores; matching Markdown files are generated views. Activates during Phase 0 (Orient) to load context and Phase 6 (Reflect) to persist it. NOT for weekly-cadence engineering retrospectives (see mk:retro); NOT for arbitrary file storage."
+description: "JSON-canonical session memory in .meowkit/memory (Markdown is a generated view). Capture learnings, patterns, costs; loads at Orient, persists at Reflect. NOT for retrospectives (mk:retro)."
 ---
 
 # Memory System Toolkit

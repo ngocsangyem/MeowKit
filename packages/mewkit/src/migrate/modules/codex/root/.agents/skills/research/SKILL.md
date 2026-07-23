@@ -1,6 +1,6 @@
 ---
 name: "research"
-description: "Use when a decision needs deep multi-source technical research with cited evidence — technology evaluation, ecosystem comparison, standards/spec fact-finding, \"how do others solve X\". Triggers on \"research X\", \"deep dive on X\", \"evaluate X vs Y\", \"find best practices for X\". NOT for library/API doc lookup (see mk:docs-finder); NOT for one-shot URL fetch (see mk:web-to-markdown); NOT for internal codebase discovery (see mk:scout); NOT for project-only Q&A (see mk:ask-me); NOT for comparing soluti"
+description: "Deep multi-source technical research with citations — tech evaluation, ecosystem/standards comparison. NOT for API docs (mk:docs-finder), codebase discovery (mk:scout), or project Q&A (mk:ask-me)."
 ---
 
 # Research

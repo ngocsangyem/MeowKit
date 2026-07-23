@@ -1,6 +1,6 @@
 ---
 name: "ship"
-description: "Ship workflow with explicit scopes: prepare stages and commits locally; release pushes and creates a PR; publish manages issues and versioning. Use when asked to \"ship\", \"deploy\", \"push to main\", \"create a PR\", or \"merge and push\". Proactively suggest when the user says code is ready or asks about deploying. Supports official (→ main) and beta (→ dev/develop) ship modes with auto-detection."
+description: "Ship workflow: prepare stages/commits locally; release pushes + opens a PR; publish handles issues + versioning. Use for 'ship', 'push', 'create a PR'. Official (→main) and beta (→dev) modes."
 ---
 
 # Ship Workflow

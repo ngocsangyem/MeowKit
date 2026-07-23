@@ -1,6 +1,6 @@
 ---
 name: "development"
-description: "Use when implementing features or writing code. TDD enforcement is opt-in via --tdd / MEOWKIT_TDD=1. Provides code patterns, skill loading, and coding standards."
+description: "Implementing features or writing code. TDD is opt-in via --tdd / MEOWKIT_TDD=1. Provides code patterns, skill loading, and coding standards."
 ---
 
 # Development Toolkit

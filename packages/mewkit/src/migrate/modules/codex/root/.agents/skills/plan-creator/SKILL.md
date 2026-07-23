@@ -1,6 +1,6 @@
 ---
 name: "plan-creator"
-description: "Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks exit early, simple tasks get fast plans, complex tasks get full research + phase files + validation. Enforces Gate 1. Activated by the plan skill or the cook skill. NOT for ticket complexity analysis against an existing codebase (see mk:planning-engine); NOT for CEO-level scope review of existing plans (see mk:plan-ceo-review)."
+description: "Structured multi-file implementation plans before build; scope-aware, enforces Gate 1. NOT for ticket sizing (mk:planning-engine) or plan CEO-review (mk:plan-ceo-review)."
 ---
 
 # Plan Creator

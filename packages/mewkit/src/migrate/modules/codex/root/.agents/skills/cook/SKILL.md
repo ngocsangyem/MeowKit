@@ -1,6 +1,6 @@
 ---
 name: "cook"
-description: "Orchestrates single-task implementation pipeline: plan → test → build → review. Shipping is an explicit follow-up. Use for feature work, plan execution, or fixes scoped to a single task. NOT for green-field product builds (see mk:autobuild); NOT for auto-invoked workflow orchestration (see mk:workflow-orchestrator)."
+description: "Single-task pipeline: plan → test → build → review (ship separately). Use for a feature or scoped fix. NOT for green-field builds (mk:autobuild) or auto-orchestration (mk:workflow-orchestrator)."
 ---
 
 # Cook — Full Implementation Pipeline

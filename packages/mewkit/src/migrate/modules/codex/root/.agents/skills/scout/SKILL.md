@@ -1,6 +1,6 @@
 ---
 name: "scout"
-description: "Fast parallel codebase scouting. Spawns multiple Explore sub-task to search directories simultaneously, returning a consolidated file map with architecture fingerprint, complexity estimates, and routing suggestions. Use before planning, debugging, or any task spanning multiple directories. NOT for reading a single known file in depth (use Read directly); NOT for semantic find-usages or go-to-definition."
+description: "Fast parallel codebase scouting — searches many directories at once, returning a file map + architecture fingerprint. Use before planning or cross-dir work. NOT for deep single-file reads."
 ---
 
 # Scout

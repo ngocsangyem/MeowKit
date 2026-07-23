@@ -1,6 +1,6 @@
 ---
 name: "docs-init"
-description: "Use when a project has no docs/ directory or needs initial documentation generated from codebase analysis. Triggers on \"init docs\", \"create documentation\", \"generate docs\", \"docs init\", or when docs/ is empty. Do NOT use for updating existing docs (use mk:document-release)."
+description: "Generate initial docs/ from codebase analysis when a project has none. Triggers on 'init docs', 'create/generate documentation'. NOT for updating existing docs (mk:document-release)."
 ---
 
 # Docs Init

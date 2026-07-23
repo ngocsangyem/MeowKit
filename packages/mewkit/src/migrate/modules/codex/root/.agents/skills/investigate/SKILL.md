@@ -1,6 +1,6 @@
 ---
 name: "investigate"
-description: "Systematic debugging with root cause investigation. Produces a diagnostic report; mk:fix owns remediation and mk:build-fix owns compile/build failures. Use when asked to \"debug this\", \"fix this bug\", \"why is this broken\", \"investigate this error\", or \"root cause analysis\". Proactively suggest when the user reports errors, unexpected behavior, or is troubleshooting why something stopped working. NOT for applying fixes without investigation (see mk:fix); NOT for step-by-step evidence-based reasoni"
+description: "Systematic root-cause debugging that produces a diagnostic report (mk:fix applies the fix; mk:build-fix owns compile failures). Use for 'debug this', 'why is this broken', 'root cause'."
 ---
 
 <!-- Split for progressive disclosure (checklist #11, #14): 497 → ~65 lines -->

@@ -1,6 +1,6 @@
 ---
 name: "simplify"
-description: "Post-implementation simplification pass. Reduces complexity without changing behavior. Use after Phase 3 (Build GREEN) and before Phase 4 (Review). Catches dead code, unnecessary abstractions, over-engineering, and redundant patterns. Triggers on \"simplify\", \"clean up\", \"reduce complexity\", \"too complex\". NOT for style/convention enforcement (see mk:clean-code); NOT for reviewing diffs or PRs (see mk:review)."
+description: "Post-build pass reducing complexity without changing behavior. Catches dead code, needless abstractions, over-engineering. NOT for style (mk:clean-code) or diff review (mk:review)."
 ---
 
 # Code Simplification

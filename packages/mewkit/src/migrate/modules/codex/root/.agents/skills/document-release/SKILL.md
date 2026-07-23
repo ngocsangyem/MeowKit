@@ -1,6 +1,6 @@
 ---
 name: "document-release"
-description: "Post-ship documentation update. Reads all project docs, cross-references the diff, updates README/ARCHITECTURE/CONTRIBUTING/AGENTS.md to match what shipped, polishes CHANGELOG voice, cleans up TODOS, and optionally bumps VERSION. Use when asked to \"update the docs\", \"sync documentation\", or \"post-ship docs\". Proactively suggest after a PR is created and before it merges."
+description: "Post-ship docs sync: cross-reference the diff and update README/ARCHITECTURE/CONTRIBUTING/AGENTS.md + CHANGELOG to match what shipped. Use on 'update/sync docs'; suggest after a PR opens."
 ---
 
 # Document Release: Post-Ship Documentation Update

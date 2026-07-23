@@ -1,6 +1,6 @@
 ---
 name: "brainstorming"
-description: "Generate or compare multiple technical approaches for one validated decision. Do not use for product discovery or an existing plan."
+description: "Generate or compare multiple technical approaches for one validated decision. NOT for product discovery or refining an existing plan."
 ---
 
 # Brainstorming

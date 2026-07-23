@@ -1,6 +1,6 @@
 ---
 name: "project-context"
-description: "Generate or update docs/project-context.md — the single source of truth for project conventions, tech stack, and anti-patterns. Loaded by all agents as a \"constitution\" to ensure consistent behavior."
+description: "Generate or update docs/project-context.md — the source of truth for conventions, tech stack, and anti-patterns, loaded by all agents as a constitution."
 ---
 
 # Project Context Generator

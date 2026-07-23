@@ -1,6 +1,6 @@
 ---
 name: "testing"
-description: "Use when writing tests, running validation scripts, or (in TDD mode) enforcing red-green-refactor cycle. Activates during Phase 2 (Test) and Phase 3 (Build). NOT for coverage gap mapping (see mk:nyquist); NOT for sprint contract negotiation (see mk:sprint-contract)."
+description: "Writing tests, running validation, and (TDD mode) red-green-refactor. Active in Test + Build phases. NOT for coverage-gap mapping (mk:nyquist) or sprint contracts (mk:sprint-contract)."
 ---
 
 # Testing Toolkit

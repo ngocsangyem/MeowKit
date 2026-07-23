@@ -1,6 +1,6 @@
 ---
 name: "review"
-description: "Multi-pass structural code review with adversarial analysis, scope-aware dispatch, adversarial persona passes, and forced-finding protocol. Supports input modes: branch diff (default), PR number (#123), commit hash, pending changes (--pending). Use when asked to \"review this PR\", \"code review\", \"pre-landing review\", \"check my diff\", or \"review #123\". Proactively suggest when the user is about to merge or land code changes. NOT for behavioral verification against a running build (see mk:evaluate)"
+description: "Multi-pass structural code review with adversarial personas. Input: branch diff (default), PR #123, commit, --pending. Use for 'review this PR/diff'. NOT for behavioral verification (mk:evaluate)."
 ---
 
 # Pre-Landing Code Review

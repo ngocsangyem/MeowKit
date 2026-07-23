@@ -1,6 +1,6 @@
 ---
 name: "sequential-thinking"
-description: "Use when a problem requires structured step-by-step reasoning before acting. Prevents jumping to conclusions or guessing root causes without evidence. Triggers on complex debugging, multi-step analysis, hypothesis verification, or when mk:fix invokes diagnosis phase. NOT for being stuck on approach (too many implementations, forced assumptions, innovation block) — use mk:problem-solving instead."
+description: "Structured step-by-step reasoning before acting, to avoid guessing. For complex debugging, multi-step analysis, hypothesis checks. NOT for being stuck on approach (mk:problem-solving)."
 ---
 
 # Sequential Thinking

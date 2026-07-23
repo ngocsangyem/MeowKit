@@ -1,6 +1,6 @@
 ---
 name: "agent-detector"
-description: "Detects task agent and complexity tier at Phase 0 orient. Invoked first in every workflow. Provider adapters select any model/runtime policy. NOT for runtime agent routing inside a single skill (see orchestration-rules.md)."
+description: "Detects the right agent and complexity tier at Phase 0 orient; runs first in every workflow. NOT for runtime agent routing inside a single skill."
 ---
 
 # Agent Detector

@@ -1,6 +1,6 @@
 ---
 name: "project-organization"
-description: "Use when creating files and need the correct path, organizing project layout, or enforcing naming conventions. Two modes: advisory (return path) and organize (restructure)."
+description: "Correct file paths, project layout, and naming conventions. Two modes: advisory (return a path) and organize (restructure)."
 ---
 
 # Project Organization

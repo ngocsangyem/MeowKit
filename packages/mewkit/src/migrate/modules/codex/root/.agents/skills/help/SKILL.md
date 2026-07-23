@@ -1,6 +1,6 @@
 ---
 name: "help"
-description: "Workflow navigation assistant. Scans project state (plans, reviews, tests, git) and recommends the next step in the 7-phase pipeline. Use when asked \"what should I do next?\", \"where am I?\", \"help\", or at session start. NOT for domain complexity routing (see mk:scale-routing); NOT for skill discovery (descriptions handle that automatically)."
+description: "Workflow navigator: scans project state (plans, reviews, tests, git) and recommends the next pipeline step. Use for 'what next?' or 'where am I?'. NOT for complexity routing (mk:scale-routing)."
 ---
 
 # Navigation Help
