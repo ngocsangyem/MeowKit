@@ -229,6 +229,33 @@ function checkAgents(dir: string): CheckResult[] {
 	return out;
 }
 
+// 4b. Reference graph: bundle-internal OPERATIONAL paths referenced by AGENTS.md, hooks.json,
+// and agent TOMLs (`.codex/hooks/*`, `.codex/scripts/*`) must resolve in the target. This
+// catches dangling hook/script references. External CLIs (jira-as.sh, mewkit, git, node) and
+// runtime paths (tasks/, .meowkit/) are NOT bundle files and are intentionally not checked.
+function checkReferenceGraph(dir: string): CheckResult[] {
+	const sources: string[] = [];
+	for (const rel of ["AGENTS.md", path.join(".codex", "hooks.json")]) {
+		const p = path.join(dir, rel);
+		if (fs.existsSync(p)) sources.push(fs.readFileSync(p, "utf-8"));
+	}
+	for (const f of listFiles(path.join(dir, ".codex", "agents"), ".toml")) sources.push(fs.readFileSync(f, "utf-8"));
+
+	const refRe = /\.codex\/(?:hooks|scripts)\/[\w.-]+/g;
+	const refs = new Set<string>();
+	for (const text of sources) {
+		let m: RegExpExecArray | null;
+		while ((m = refRe.exec(text)) !== null) refs.add(m[0]);
+	}
+	if (refs.size === 0) return [];
+	const dangling = [...refs].filter((r) => !fs.existsSync(path.join(dir, r)));
+	return [
+		dangling.length === 0
+			? pass("Codex root reference graph", `${refs.size} bundle-internal operational ref(s) resolve`)
+			: fail("Codex root reference graph", `dangling reference(s): ${dangling.join(", ")}`),
+	];
+}
+
 // 5 + 6. Installed skills: frontmatter parses, runtime is provider-supported (portable), and the
 // body carries no denied tokens (dangling /mk:, .claude/, AskUserQuestion, subagent, …).
 function checkSkills(dir: string): CheckResult[] {
@@ -337,6 +364,7 @@ export const codexTargetProfile: TargetProfile = {
 		results.push(...checkConfig(dir));
 		results.push(...checkHooks(dir));
 		results.push(...checkAgents(dir));
+		results.push(...checkReferenceGraph(dir));
 		results.push(...checkSkills(dir));
 		results.push(...checkLegacySurfaces(dir));
 		return results;

@@ -119,6 +119,28 @@ describe("codex target validation", () => {
 		expect(status(rs, "Codex agent name uniqueness")).toBe("fail");
 	});
 
+	it("a dangling .codex/scripts ref in an agent TOML → FAIL reference graph", async () => {
+		const d = makeTarget();
+		writeFileSync(
+			join(d, ".codex", "agents", "demo.toml"),
+			'name = "demo"\ndescription = "x"\ndeveloper_instructions = "run .codex/scripts/missing.py"\n',
+		);
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex root reference graph")).toBe("fail");
+	});
+
+	it("does not flag external CLI references (jira-as.sh, mewkit, git)", async () => {
+		const d = makeTarget();
+		writeFileSync(
+			join(d, ".codex", "agents", "demo.toml"),
+			'name = "demo"\ndescription = "x"\ndeveloper_instructions = "call jira-as.sh and mewkit validate; git status"\n',
+		);
+		const rs = await codexTargetProfile.check(d);
+		// External CLIs are not .codex/hooks|scripts bundle paths → they never fail the graph.
+		expect(status(rs, "Codex root reference graph")).not.toBe("fail");
+		expect(anyFail(rs)).toBe(false);
+	});
+
 	it("an installed skill with a tool token (/mk:) → FAIL tool-token clean", async () => {
 		const d = makeTarget();
 		writeFileSync(
