@@ -52,7 +52,9 @@ function checkConfig(dir: string): CheckResult[] {
 	}
 	const out: CheckResult[] = [pass("Codex config.toml parses", "valid TOML")];
 
-	// [agents.X] config_file refs must resolve under .codex/.
+	// Agents AUTO-LOAD from .codex/agents/*.toml (see checkAgents); config.toml needs no
+	// [agents.X] wiring. But if a config DOES declare an optional [agents.X].config_file,
+	// a dangling ref is still a defect, so validate any that are present.
 	const agents = (parsed.agents as Record<string, { config_file?: string }> | undefined) ?? {};
 	const names = Object.keys(agents);
 	if (names.length > 0) {
@@ -63,10 +65,10 @@ function checkConfig(dir: string): CheckResult[] {
 		out.push(
 			dangling.length === 0
 				? pass(
-						"Codex config.toml agent wiring",
-						`${names.length} agent entr${names.length === 1 ? "y" : "ies"}, all config_file refs resolve`,
+						"Codex config.toml agent refs",
+						`${names.length} optional [agents] entr${names.length === 1 ? "y" : "ies"} resolve (auto-load needs no wiring)`,
 					)
-				: fail("Codex config.toml agent wiring", `config_file missing for: ${dangling.join(", ")}`),
+				: fail("Codex config.toml agent refs", `config_file missing for: ${dangling.join(", ")}`),
 		);
 	}
 
@@ -170,18 +172,51 @@ function checkAgents(dir: string): CheckResult[] {
 	const files = listFiles(agentsDir, ".toml");
 	if (files.length === 0) return []; // a target with no agents is valid
 	const broken: string[] = [];
+	const nameless: string[] = [];
+	// Codex identifies a custom agent by its `name` field (the filename is only a
+	// convention), and it AUTO-LOADS every .codex/agents/*.toml — there is no
+	// config.toml wiring. So `name` must be present and unique across the tree, or the
+	// agent selector becomes ambiguous.
+	const nameToFiles = new Map<string, string[]>();
 	for (const f of files) {
+		let parsed: Record<string, unknown>;
 		try {
-			TOML.parse(fs.readFileSync(f, "utf-8"));
+			parsed = TOML.parse(fs.readFileSync(f, "utf-8")) as Record<string, unknown>;
 		} catch {
 			broken.push(path.basename(f));
+			continue;
 		}
+		const name = typeof parsed.name === "string" ? parsed.name.trim() : "";
+		if (!name) {
+			nameless.push(path.basename(f));
+			continue;
+		}
+		nameToFiles.set(name, [...(nameToFiles.get(name) ?? []), path.basename(f)]);
 	}
-	return [
+
+	const out: CheckResult[] = [
 		broken.length === 0
 			? pass("Codex agent TOMLs parse", `${files.length} agent file(s) parse`)
 			: fail("Codex agent TOMLs parse", `parse errors in: ${broken.join(", ")}`),
 	];
+	out.push(
+		nameless.length === 0
+			? pass("Codex agent name field", "every agent declares a name (auto-load identity)")
+			: fail("Codex agent name field", `missing name field: ${nameless.join(", ")}`),
+	);
+	const dupes = [...nameToFiles.entries()].filter(([, fileList]) => fileList.length > 1);
+	out.push(
+		dupes.length === 0
+			? pass(
+					"Codex agent name uniqueness",
+					`${nameToFiles.size} unique auto-loaded agent name(s); no config.toml wiring needed`,
+				)
+			: fail(
+					"Codex agent name uniqueness",
+					`duplicate agent name(s): ${dupes.map(([n, fl]) => `"${n}" in ${fl.join(", ")}`).join("; ")}`,
+				),
+	);
+	return out;
 }
 
 // 5 + 6. Installed skills: frontmatter parses, runtime is provider-supported (portable), and the

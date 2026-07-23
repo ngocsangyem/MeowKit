@@ -23,7 +23,9 @@ function makeTarget(): string {
 	mkdirSync(join(dir, ".codex", "hooks"), { recursive: true });
 	mkdirSync(join(dir, ".agents", "skills", "demo"), { recursive: true });
 	writeFileSync(join(dir, ".codex", "config.toml"), '[agents.demo]\nconfig_file = "agents/demo.toml"\n');
-	writeFileSync(join(dir, ".codex", "agents", "demo.toml"), 'description = "demo agent"\n');
+	// A valid Codex agent declares a `name` (its auto-load identity; the filename is only
+	// a convention).
+	writeFileSync(join(dir, ".codex", "agents", "demo.toml"), 'name = "demo"\ndescription = "demo agent"\n');
 	const wrapper = join(dir, ".codex", "hooks", "w.cjs");
 	writeFileSync(
 		wrapper,
@@ -96,11 +98,25 @@ describe("codex target validation", () => {
 		expect(anyFail(rs)).toBe(false);
 	});
 
-	it("a dangling config_file agent ref → FAIL agent wiring", async () => {
+	it("a dangling optional config_file agent ref → FAIL agent refs", async () => {
 		const d = makeTarget();
 		writeFileSync(join(d, ".codex", "config.toml"), '[agents.gone]\nconfig_file = "agents/gone.toml"\n');
 		const rs = await codexTargetProfile.check(d);
-		expect(status(rs, "Codex config.toml agent wiring")).toBe("fail");
+		expect(status(rs, "Codex config.toml agent refs")).toBe("fail");
+	});
+
+	it("an agent TOML with no name field → FAIL agent name field (auto-load identity)", async () => {
+		const d = makeTarget();
+		writeFileSync(join(d, ".codex", "agents", "nameless.toml"), 'description = "no name"\n');
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex agent name field")).toBe("fail");
+	});
+
+	it("two agent TOMLs sharing a name → FAIL agent name uniqueness (ambiguous selector)", async () => {
+		const d = makeTarget();
+		writeFileSync(join(d, ".codex", "agents", "dup.toml"), 'name = "demo"\ndescription = "clashes with demo.toml"\n');
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex agent name uniqueness")).toBe("fail");
 	});
 
 	it("an installed skill with a tool token (/mk:) → FAIL tool-token clean", async () => {
