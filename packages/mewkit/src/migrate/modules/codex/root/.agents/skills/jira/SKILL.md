@@ -1,5 +1,5 @@
 ---
-name: "jira"
+name: "mk-jira"
 description: "Routing skill — recommends the correct mk:jira-* leaf for any Jira task. Triggers: 'jira', 'jira ticket', ambiguous Jira intent. NOT an executor — every actual operation forks via a leaf skill."
 ---
 

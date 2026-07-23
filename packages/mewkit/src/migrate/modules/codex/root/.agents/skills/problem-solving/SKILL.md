@@ -1,6 +1,6 @@
 ---
-name: "problem-solving"
-description: "Use when stuck on approach (not debugging). Strategic unsticking via 7 non-default techniques: simplification cascades, collision-zone thinking, meta-pattern recognition, inversion, scale game, first principles, via negativa. Triggers on complexity spiraling, innovation block, recurring patterns across domains, forced-assumption solutions, scale uncertainty, told-it's-impossible, or bloated systems needing subtraction. For evidence-based root-cause debugging, use mk:sequential-thinking instead."
+name: "mk-problem-solving"
+description: "Use when stuck on approach, not debugging. Unstick via 7 techniques: simplification, collision-zone thinking, inversion, first principles, via negativa. For debugging use mk:sequential-thinking."
 ---
 
 # Problem-Solving — Strategic Unsticking

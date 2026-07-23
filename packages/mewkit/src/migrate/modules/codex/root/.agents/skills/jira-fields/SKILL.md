@@ -1,6 +1,6 @@
 ---
-name: "jira-fields"
-description: "JIRA custom field discovery + configuration via the jira-as wrapper. Triggers: 'field ID for X', 'list custom fields', 'check fields for project PROJ', 'configure agile fields for board'. Read ops are open; create/configure-agile require admin. NOT for setting per-issue field values (mk:jira-issue update)."
+name: "mk-jira-fields"
+description: "JIRA custom field discovery + configuration via jira-as. Create/configure-agile need admin. NOT setting per-issue field values (mk:jira-issue update)."
 ---
 
 # mk:jira-fields

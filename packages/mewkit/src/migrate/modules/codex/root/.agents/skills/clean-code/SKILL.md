@@ -1,6 +1,6 @@
 ---
-name: "clean-code"
-description: "Enforces KISS/DRY/YAGNI during authoring and ad-hoc quality reviews. Pragmatic standards: concise, direct, no unnecessary comments. NOT for post-hoc diff/PR review (see mk:review); NOT for behavior-preserving simplification passes (see mk:simplify)."
+name: "mk-clean-code"
+description: "Enforces KISS/DRY/YAGNI during authoring and ad-hoc reviews: concise, direct, no unneeded comments. NOT for post-hoc diff/PR review (mk:review); NOT for simplification passes (mk:simplify)."
 ---
 
 # Clean Code — Pragmatic AI Coding Standards

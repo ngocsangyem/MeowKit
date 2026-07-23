@@ -1,6 +1,6 @@
 ---
-name: "agent-browser"
-description: "Browser automation CLI for AI agents using agent-browser. Use for navigating websites, clicking/filling pages, screenshots, data extraction, web app testing, exploratory QA, dogfooding, Electron apps, Slack automation, Vercel Sandbox browser runs, AWS AgentCore cloud browsers, auth-heavy flows, and long autonomous browser sessions. Prefer over generic browser tools when a fresh/tool-managed Chrome session is fine. NOT for the user's real Chrome cookies/profile (see mk:chrome-profile); NOT for re"
+name: "mk-agent-browser"
+description: "Browser automation CLI for agents: navigate, click/fill, screenshot, extract data, test apps, Electron/Slack, cloud browsers. NOT for the user's real Chrome profile/cookies (mk:chrome-profile)."
 ---
 
 # agent-browser

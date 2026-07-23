@@ -1,6 +1,6 @@
 ---
-name: "confluence-search"
-description: "Confluence CQL search + space list + saved-filter + export via the confluence-as wrapper. Triggers: 'search confluence', 'find pages where X', 'cql for ...', 'export search results', 'list spaces', 'manage saved filters'. CQL injection-safe via the shared sanitizer. NOT for single-page CRUD (mk:confluence-page); NOT for bulk write ops (mk:confluence-bulk)."
+name: "mk-confluence-search"
+description: "Confluence CQL search, space list, saved filters, export via confluence-as; CQL injection-safe. NOT single-page CRUD (mk:confluence-page) or bulk writes (mk:confluence-bulk)."
 ---
 
 # mk:confluence-search

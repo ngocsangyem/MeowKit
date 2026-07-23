@@ -1,5 +1,5 @@
 ---
-name: "lint-and-validate"
+name: "mk-lint-and-validate"
 description: "Linting and static analysis after code edits. Triggers on lint, format, check, validate, types. NOT for full build verification (mk:verify) or test coverage (mk:testing)."
 ---
 

@@ -1,6 +1,6 @@
 ---
-name: "jira-search"
-description: "JIRA search + filter management via the jira-as wrapper. Triggers: 'search jira', 'find issues where X', 'jql for ...', 'export search results', 'manage saved filters'. JQL injection-safe via the shared sanitizer. NOT for single-issue CRUD (mk:jira-issue); NOT for bulk write ops (mk:jira-bulk)."
+name: "mk-jira-search"
+description: "JIRA search + filter management via jira-as; JQL injection-safe. NOT single-issue CRUD (mk:jira-issue) or bulk writes (mk:jira-bulk)."
 ---
 
 # mk:jira-search

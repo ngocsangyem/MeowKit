@@ -1,6 +1,6 @@
 ---
-name: "mermaidjs-v11"
-description: "Create inline Mermaid v11 diagram blocks — flowcharts, sequence, class, ER, Gantt, state, timeline, user-journey, and 20+ other types — rendered in markdown files and browser environments. Zero external dependencies; mmdc is optional for CLI export."
+name: "mk-mermaidjs-v11"
+description: "Create inline Mermaid v11 diagrams -- flowcharts, sequence, class, ER, Gantt, state, timeline, and more -- for markdown and browser. Zero deps; mmdc optional for CLI export."
 ---
 
 # Mermaid.js v11

@@ -1,6 +1,6 @@
 ---
-name: "office-hours"
-description: "YC Office Hours — product validation for a new product, feature, or side-project concept. Startup mode tests demand; Builder mode develops an unvalidated product idea. Use when the user asks whether something is worth building or has an idea whose problem/value is not yet validated. Proactively suggest when the user describes a new product idea or is exploring whether something is worth building — before any code is written. Use BEFORE a plan exists. For reviewing an existing plan, use the plan- skill"
+name: "mk-office-hours"
+description: "YC Office Hours-style validation for a new idea before code exists: tests demand (Startup mode) or develops an unvalidated idea (Builder mode). For reviewing an existing plan use mk:plan-ceo-review."
 ---
 
 # YC Office Hours

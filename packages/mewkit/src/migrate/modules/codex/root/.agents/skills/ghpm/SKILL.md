@@ -1,6 +1,6 @@
 ---
-name: "ghpm"
-description: "GitHub project management via the gh CLI — create and triage issues, manage GitHub Projects v2 boards (add items, update status fields), manage labels and milestones, and generate handoff-status summaries. Use when \"create a GitHub issue\", \"add to project board\", \"update sprint status\", \"create label/milestone\", or \"give me a handoff summary of open work\". NOT for code review (see mk:review-pr); NOT for PR creation (see mk:ship); NOT for git operations (see mk:ship / mk:resolving-merge-conflicts"
+name: "mk-ghpm"
+description: "GitHub project management via gh CLI: issues, Projects v2 boards, labels, milestones, handoff summaries. NOT for code review (mk:review-pr), PR creation, or git ops (mk:resolving-merge-conflicts)."
 ---
 
 # GitHub Project Management

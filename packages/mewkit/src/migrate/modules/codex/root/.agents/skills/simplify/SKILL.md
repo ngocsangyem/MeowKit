@@ -1,5 +1,5 @@
 ---
-name: "simplify"
+name: "mk-simplify"
 description: "Post-build pass reducing complexity without changing behavior. Catches dead code, needless abstractions, over-engineering. NOT for style (mk:clean-code) or diff review (mk:review)."
 ---
 

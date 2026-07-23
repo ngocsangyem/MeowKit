@@ -1,5 +1,5 @@
 ---
-name: "plan-creator"
+name: "mk-plan-creator"
 description: "Structured multi-file implementation plans before build; scope-aware, enforces Gate 1. NOT for ticket sizing (mk:planning-engine) or plan CEO-review (mk:plan-ceo-review)."
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: "document-release"
+name: "mk-document-release"
 description: "Post-ship docs sync: cross-reference the diff and update README/ARCHITECTURE/CONTRIBUTING/AGENTS.md + CHANGELOG to match what shipped. Use on 'update/sync docs'; suggest after a PR opens."
 ---
 

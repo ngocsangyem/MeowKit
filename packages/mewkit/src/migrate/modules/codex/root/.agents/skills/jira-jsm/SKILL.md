@@ -1,6 +1,6 @@
 ---
-name: "jira-jsm"
-description: "JIRA Service Management via the jira-as wrapper: service desks, request types, requests, customers, organizations, queues, SLAs, approvals (8 sub-domains). Triggers: 'create JSM request', 'list service desks', 'SLA status for KEY', 'approve request KEY', 'list queue NAME'. Requires JSM-licensed tenant + agent role. NOT for core Jira issue ops (mk:jira-issue); NOT for project admin (mk:jira-admin)."
+name: "mk-jira-jsm"
+description: "JIRA Service Management via jira-as: service desks, requests, customers, orgs, queues, SLAs, approvals. Requires JSM tenant + agent role. NOT core issue ops (mk:jira-issue) or admin (mk:jira-admin)."
 ---
 
 # mk:jira-jsm

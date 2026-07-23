@@ -1,5 +1,5 @@
 ---
-name: "project-organization"
+name: "mk-project-organization"
 description: "Correct file paths, project layout, and naming conventions. Two modes: advisory (return a path) and organize (restructure)."
 ---
 

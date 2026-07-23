@@ -1,6 +1,6 @@
 ---
-name: "figma"
-description: "Read-first Figma gateway via Figma MCP: analyze designs, implement Figma-to-code for 1–3 screens, extract design tokens, produce a Figma Evidence Packet for planning handoff, screenshot fallback. Advanced operations (Code Connect, canvas writes, design-system/library patterns) are gated references loaded only on explicit intent. Triggers: 'figma', 'design link', 'implement this design', 'design tokens', 'produce a Figma Evidence Packet'."
+name: "mk-figma"
+description: "Read-first Figma gateway via Figma MCP: analyze designs, implement 1-3 screens, extract tokens, produce Evidence Packet. Advanced ops gated on explicit intent. Use for 'figma', 'design tokens'."
 ---
 
 # mk:figma — Figma Design Analysis & Implementation

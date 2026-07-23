@@ -1,6 +1,6 @@
 ---
-name: "bootstrap"
-description: "Use when creating a new project from scratch — orchestrates the full journey from idea to running code. Research → design → plan → scaffold → implement → docs. Explicit invocation only — never auto-activates. CLI = project infrastructure (.codex/), bootstrap = application code + full pipeline. NOT for autonomous multi-hour builds of specified products (see mk:autobuild); NOT for single-task feature work on existing projects (see mk:cook)."
+name: "mk-bootstrap"
+description: "Bootstraps a new project end to end: research, design, plan, scaffold, implement, docs. Explicit invocation only. NOT for autonomous builds (mk:autobuild); NOT for existing-repo work (mk:cook)."
 ---
 
 # Bootstrap

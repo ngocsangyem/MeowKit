@@ -1,6 +1,6 @@
 ---
-name: "confluence-spec-analyst"
-description: "Deep spec analysis on a Confluence page. Reads page (+ children) via the confluence-as wrapper, produces a structured Spec Research Report with requirements, acceptance criteria, gaps, ambiguities, and suggested user stories for human review. Read-only — does NOT create Jira tickets. Triggers: 'analyze spec for PAGE-ID', 'extract requirements from confluence page', 'spec research on URL'. NOT for raw page CRUD (mk:confluence-page); NOT for ticket complexity scoring (mk:planning-engine)."
+name: "mk-confluence-spec-analyst"
+description: "Read-only spec analysis on a Confluence page (+children): requirements, acceptance criteria, gaps, user stories report. NOT page CRUD (mk:confluence-page) or ticket scoring (mk:planning-engine)."
 ---
 
 # mk:confluence-spec-analyst

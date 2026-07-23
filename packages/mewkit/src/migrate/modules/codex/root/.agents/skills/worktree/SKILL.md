@@ -1,6 +1,6 @@
 ---
-name: "worktree"
-description: "Manages git worktrees for parallel agent isolation. Creates isolated worktrees for parallel agents on parallel/{name}-{timestamp} branches, merges results with conflict detection, prunes stale metadata, and reports health status. NOT for user-initiated feature branches — use git worktree directly for that."
+name: "mk-worktree"
+description: "Manages git worktrees for parallel agent isolation: creates parallel/{name}-{timestamp} branches, merges with conflict detection. NOT for user feature branches (use git worktree directly)."
 ---
 
 # Git Worktree Manager

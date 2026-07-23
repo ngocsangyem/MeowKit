@@ -1,6 +1,6 @@
 ---
-name: "loop"
-description: "Use when autonomously improving a measurable scalar metric through bounded, git-tracked iterations: modify one scoped change, verify, keep or revert. Triggers on the loop skill, 'optimize coverage/bundle size/lint count', 'iterate until the metric improves'. NOT for subjective cleanup (see mk:cook), known-root-cause bugs (see mk:fix), behavioral grading (see mk:evaluate), or shipping (see mk:ship)."
+name: "mk-loop"
+description: "Autonomously improve one measurable metric via bounded, git-tracked iterations: one scoped change, verify, keep or revert. NOT for cleanup (mk:cook), known-cause bugs (mk:fix), or shipping (mk:ship)."
 ---
 
 # mk:loop — Bounded Optimization Loop

@@ -1,6 +1,6 @@
 ---
-name: "jira-admin"
-description: "JIRA project / user / group / scheme / automation administration via the jira-as wrapper (11 sub-domains, ~65 verbs). Triggers: 'create JIRA project', 'list users', 'delete user USERNAME', 'list permission schemes', 'create group NAME'. Requires admin role. Destructive ops (project/user/group delete) require 2-step token confirmation. NOT for per-issue ops (mk:jira-issue / mk:jira-lifecycle); NOT for JSM admin (mk:jira-jsm)."
+name: "mk-jira-admin"
+description: "JIRA project/user/group/scheme/automation admin via jira-as. Requires admin role; destructive ops need 2-step confirm. NOT per-issue ops (mk:jira-issue/lifecycle) or JSM admin (mk:jira-jsm)."
 ---
 
 # mk:jira-admin

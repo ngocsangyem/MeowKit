@@ -1,6 +1,6 @@
 ---
-name: "confluence"
-description: "Routing skill — recommends the correct mk:confluence-* leaf for any Confluence Cloud task. Triggers: 'confluence', 'wiki page', 'spec page', ambiguous Confluence intent. NOT an executor — every actual operation forks via a leaf skill."
+name: "mk-confluence"
+description: "Routes Confluence Cloud tasks to the right mk:confluence-* leaf skill. Use for 'confluence', 'wiki page', 'spec page', or ambiguous intent. NOT an executor -- forks to a leaf skill."
 ---
 
 # mk:confluence — Routing Skill

@@ -1,6 +1,6 @@
 ---
-name: "jira-lifecycle"
-description: "Drive JIRA workflow lifecycle via the jira-as wrapper: transition, assign, resolve, reopen, manage versions and components. Triggers: 'transition KEY to Status', 'mark KEY as Done', 'assign KEY to user', 'reopen KEY', 'release version', 'create component'. NOT for issue CRUD (mk:jira-issue); NOT for bulk transitions (mk:jira-bulk)."
+name: "mk-jira-lifecycle"
+description: "Drive JIRA workflow lifecycle via jira-as: transition, assign, resolve, reopen, versions, components. NOT issue CRUD (mk:jira-issue) or bulk transitions (mk:jira-bulk)."
 ---
 
 # mk:jira-lifecycle

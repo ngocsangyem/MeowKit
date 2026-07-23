@@ -1,5 +1,5 @@
 ---
-name: "development"
+name: "mk-development"
 description: "Implementing features or writing code. TDD is opt-in via --tdd / MEOWKIT_TDD=1. Provides code patterns, skill loading, and coding standards."
 ---
 

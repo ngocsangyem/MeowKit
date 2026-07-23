@@ -1,5 +1,5 @@
 ---
-name: "typescript"
+name: "mk-typescript"
 description: "Use when writing TypeScript code, fixing type errors, or configuring strict type safety. Auto-activates on .ts/.tsx files. Covers null handling, utility types, and ESLint."
 ---
 

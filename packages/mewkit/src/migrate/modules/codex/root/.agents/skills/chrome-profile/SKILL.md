@@ -1,6 +1,6 @@
 ---
-name: "chrome-profile"
-description: "Target a specific Google Chrome user profile for browser automation via CDP. Discovers installed profiles from the Chrome Local State file, launches Chrome with the requested profile attached to a debug port, and connects agent-browser via `agent-browser connect <port>`. Use when \"automate using my Work/Personal Chrome\", \"open site with my saved session\", or \"use Chrome profile named <name>\". NOT for headless scraping without an existing user profile (use mk:agent-browser directly); NOT for impo"
+name: "mk-chrome-profile"
+description: "Target a specific Chrome profile for browser automation via CDP: discovers profiles, launches on a debug port, connects agent-browser. NOT for headless scraping without a profile (mk:agent-browser)."
 ---
 
 # Chrome Profile Targeting

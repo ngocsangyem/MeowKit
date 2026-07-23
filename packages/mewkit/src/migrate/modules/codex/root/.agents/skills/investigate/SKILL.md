@@ -1,5 +1,5 @@
 ---
-name: "investigate"
+name: "mk-investigate"
 description: "Systematic root-cause debugging that produces a diagnostic report (mk:fix applies the fix; mk:build-fix owns compile failures). Use for 'debug this', 'why is this broken', 'root cause'."
 ---
 

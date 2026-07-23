@@ -1,5 +1,5 @@
 ---
-name: "memory"
+name: "mk-memory"
 description: "JSON-canonical session memory in .meowkit/memory (Markdown is a generated view). Capture learnings, patterns, costs; loads at Orient, persists at Reflect. NOT for retrospectives (mk:retro)."
 ---
 

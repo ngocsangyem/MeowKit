@@ -1,6 +1,6 @@
 ---
-name: "confluence-collaborate"
-description: "Manage Confluence collaboration surface via the confluence-as wrapper: comments, attachments, labels, watchers. Triggers: 'add comment to page 12345', 'upload attachment to page 12345', 'label page 12345 as urgent', 'watch page 12345'. Inline-vs-footer comment safety enforced. NOT for page CRUD (mk:confluence-page); NOT for bulk ops (mk:confluence-bulk)."
+name: "mk-confluence-collaborate"
+description: "Confluence comments, attachments, labels, watchers via confluence-as. Inline-vs-footer safety enforced. NOT page CRUD (mk:confluence-page) or bulk ops (mk:confluence-bulk)."
 ---
 
 # mk:confluence-collaborate

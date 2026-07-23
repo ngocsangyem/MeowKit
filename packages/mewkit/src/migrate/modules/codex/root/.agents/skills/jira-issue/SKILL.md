@@ -1,6 +1,6 @@
 ---
-name: "jira-issue"
-description: "JIRA issue CRUD via the jira-as wrapper. Triggers: 'create bug/task/story', 'show me PROJ-123', 'get/view/look up issue', 'update PROJ-123', 'delete PROJ-123'. NOT for transitions (mk:jira-lifecycle); NOT for comments/attachments (mk:jira-collaborate); NOT for bulk ops (mk:jira-bulk); NOT for issue links (mk:jira-relationships); NOT for time logging (mk:jira-time); NOT for sprint/epic (mk:jira-agile)."
+name: "mk-jira-issue"
+description: "JIRA issue CRUD via jira-as. NOT lifecycle (mk:jira-lifecycle), comments (mk:jira-collaborate), bulk (mk:jira-bulk), links (mk:jira-relationships), or time/sprint (mk:jira-time/agile)."
 ---
 
 # mk:jira-issue

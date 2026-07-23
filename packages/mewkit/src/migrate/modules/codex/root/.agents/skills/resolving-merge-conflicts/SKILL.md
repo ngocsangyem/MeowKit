@@ -1,6 +1,6 @@
 ---
-name: "resolving-merge-conflicts"
-description: "Resolve an in-progress git merge or rebase conflict end to end: read the conflict state, recover each side's original intent, resolve every hunk, run the project's checks, and prepare the merge/rebase for an explicitly approved finish. Use when asked to \"resolve merge conflicts\", \"fix this rebase\", \"finish the merge\", or when `git status` shows conflicted (unmerged) paths. NOT for the full ship pipeline that merges the base branch first (see mk:ship); NOT for debugging a runtime bug or test fail"
+name: "mk-resolving-merge-conflicts"
+description: "Resolves an in-progress git merge/rebase conflict: reads conflict state, recovers each side's intent, resolves hunks, runs checks. NOT for the ship pipeline (mk:ship); NOT for bug debugging (mk:fix)."
 ---
 
 # Resolving Merge Conflicts

@@ -1,6 +1,6 @@
 ---
-name: "pack"
-description: "Pack an EXTERNAL repository into a single AI-friendly file (markdown/xml/json). Use for third-party library analysis, security audits, or handoff to external LLMs. Do NOT use to pack the current project for inbound context — the host runtime already reads files lazily. Triggers: 'pack this repo', 'snapshot of X', 'export codebase', 'repomix'."
+name: "mk-pack"
+description: "Pack an EXTERNAL repository into one AI-friendly file (markdown/xml/json) for third-party analysis, security audits, or handoff. Do NOT use for the current project — it's already read lazily."
 ---
 
 <!-- SECURITY ANCHOR

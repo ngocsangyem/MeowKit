@@ -1,6 +1,6 @@
 ---
-name: "preview"
-description: "Use when generating visual artifacts — explanations, diagrams, slides, or diff visualizations. Triggers on \"explain X visually\", \"diagram this\", \"show as slides\", \"diff against main\". NOT for rendering a plan as HTML (see mk:visual-plan), live media generation (see mk:multimodal), browser QA (see mk:qa), or plan critique (see mk:plan-ceo-review)."
+name: "mk-preview"
+description: "Generate visual artifacts: explanations, diagrams, slides, diff views. NOT plan-as-HTML (mk:visual-plan), live media gen (mk:multimodal), or browser QA (mk:qa)."
 ---
 
 # mk:preview

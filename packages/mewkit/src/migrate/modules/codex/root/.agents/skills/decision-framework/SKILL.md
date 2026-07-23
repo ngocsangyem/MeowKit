@@ -1,5 +1,5 @@
 ---
-name: "decision-framework"
+name: "mk-decision-framework"
 description: "Operational decision frameworks: triage, escalation, case management, billing ops. Use for 'how to handle X cases', 'build triage', 'escalation protocol'."
 ---
 

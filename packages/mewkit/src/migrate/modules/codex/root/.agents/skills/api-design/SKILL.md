@@ -1,5 +1,5 @@
 ---
-name: "api-design"
+name: "mk-api-design"
 description: "REST/GraphQL API design: resource naming, HTTP methods, status codes, pagination, versioning, error formats. Use for 'design API', 'endpoint patterns'."
 ---
 

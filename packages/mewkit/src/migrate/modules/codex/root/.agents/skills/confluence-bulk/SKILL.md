@@ -1,6 +1,6 @@
 ---
-name: "confluence-bulk"
-description: "Bulk Confluence operations on 10+ pages via the confluence-as wrapper: bulk-label / bulk-move / bulk-delete. Dry-run is MANDATORY first. Triggers: 'bulk update N pages', 'mass label', 'delete all pages matching CQL', 'bulk-move pages to PARENT'. NOT for single-page ops (mk:confluence-page); NOT for comment/attachment ops (mk:confluence-collaborate)."
+name: "mk-confluence-bulk"
+description: "Bulk Confluence ops (10+ pages): bulk-label/move/delete via confluence-as; dry-run mandatory. NOT single-page (mk:confluence-page) or comments/attachments (mk:confluence-collaborate)."
 ---
 
 # mk:confluence-bulk

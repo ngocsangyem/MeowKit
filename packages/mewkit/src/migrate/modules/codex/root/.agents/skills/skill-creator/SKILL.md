@@ -1,6 +1,6 @@
 ---
-name: "skill-creator"
-description: "Create new skills with proper structure, compliance checks, and registration. Use when asked to create a skill, build a new skill, or scaffold a skill template. Enforces mk: prefix, sub-agents.md structure, and context engineering principles."
+name: "mk-skill-creator"
+description: "Creates new skills with proper structure, compliance checks, and registration. Enforces mk: prefix, sub-agents.md structure, and context-engineering principles. Use to scaffold a new skill."
 ---
 
 # Skill Creator

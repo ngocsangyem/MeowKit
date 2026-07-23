@@ -1,6 +1,6 @@
 ---
-name: "context-audit"
-description: "Read-only audit of `.codex/` structural overhead. Reports prioritized \"remove X save Y tokens\" recommendations against the model context window. NOT for monetary cost tracking — that's the budget skill. NOT for transcript size monitoring — long-session continuity defers to Codex native compaction. NOT for runtime context decisions (what to read, when to compact) — see mk:context-engineering. Use when planning to add context capacity, diagnosing perceived slowdowns, or auditing health."
+name: "mk-context-audit"
+description: "Read-only audit of .codex/ structural overhead: 'remove X save Y tokens' vs the context window. NOT for cost tracking (budget skill); NOT for runtime read/compact decisions (mk:context-engineering)."
 ---
 
 # the context-audit skill — Context Window Structural Audit

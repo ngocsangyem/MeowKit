@@ -1,6 +1,6 @@
 ---
-name: "henshin"
-description: "Use when transforming existing code into agent-consumable surfaces — CLI (npm-publishable), MCP server (stdio/SSE/Streamable HTTP), and a companion skill. Triggers on 'agentize', 'henshin', 'expose as MCP', 'wrap as CLI', 'publish to npm', 'make LLM-accessible', 'turn into agent tool', 'expose feature as tool'. Runs when the user has existing code and wants to ship it to agents. NOT for building new code from scratch (see mk:bootstrap); NOT for reviewing or verifying existing code (see mk:review"
+name: "mk-henshin"
+description: "Convert existing code into agent-consumable CLI/MCP server + companion skill. Use for 'agentize', 'expose as MCP', 'wrap as CLI'. NOT new code from scratch (mk:bootstrap) or review (mk:review)."
 ---
 
 <!-- SECURITY ANCHOR

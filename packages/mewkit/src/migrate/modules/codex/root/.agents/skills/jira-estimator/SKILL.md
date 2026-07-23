@@ -1,6 +1,6 @@
 ---
-name: "jira-estimator"
-description: "Heuristic story-point estimation for a single Jira ticket via the jira-estimator agent. Read-only. Triggers: 'estimate KEY', 'story points for KEY', 'how complex is KEY'. NOT for complexity-only analysis (mk:jira-evaluator); NOT for full RCA (mk:jira-analyst)."
+name: "mk-jira-estimator"
+description: "Heuristic read-only story-point estimation for one Jira ticket via jira-estimator agent. NOT complexity analysis (mk:jira-evaluator) or full RCA (mk:jira-analyst)."
 ---
 
 # mk:jira-estimator

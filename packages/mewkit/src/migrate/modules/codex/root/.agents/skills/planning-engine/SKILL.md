@@ -1,6 +1,6 @@
 ---
-name: "planning-engine"
-description: "Analyzes ticket complexity and maps dependencies against an existing codebase before sprint planning. Triggers on 'how complex is this ticket', 'what should we work on first', 'can we fit this in the sprint', 'tech review before planning', 'plan the sprint'. NOT for writing implementation plans (see mk:plan-creator); NOT for scope/ambition review (see mk:plan-ceo-review)."
+name: "mk-planning-engine"
+description: "Analyzes ticket complexity and dependencies against the codebase before sprint planning. NOT for writing plans (mk:plan-creator); NOT for scope review (mk:plan-ceo-review)."
 ---
 
 # mk:planning-engine — Tech Review & Sprint Planning Analysis

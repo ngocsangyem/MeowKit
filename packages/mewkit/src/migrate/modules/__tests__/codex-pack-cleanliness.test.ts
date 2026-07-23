@@ -13,7 +13,7 @@ import { scanDeniedTokens } from "../../denied-token-scan.js";
 
 // Packs whose skills have completed the native authoring pass (descriptions shrunk to
 // the discovery-budget cap, bodies denied-token clean). Grow this as packs are authored.
-const COMPLETED_PACKS = ["core"];
+const COMPLETED_PACKS = ["core", "development", "review", "product", "operations", "integrations", "media"];
 
 const DESCRIPTION_CAP = 200;
 

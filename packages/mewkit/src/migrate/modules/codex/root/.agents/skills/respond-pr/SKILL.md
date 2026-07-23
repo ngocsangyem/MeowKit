@@ -1,6 +1,6 @@
 ---
-name: "respond-pr"
-description: "Triage reviewer comments on a GitHub PR with receiving-code-review discipline — verify each against the codebase, then accept/push-back/clarify, and optionally reply in-thread. Use when responding to received PR feedback. NOT for giving a review (see mk:review-pr); NOT for implementing the fixes (hand off to mk:fix)."
+name: "mk-respond-pr"
+description: "Triages reviewer comments on a GitHub PR: verifies each against the codebase, then accepts/pushes back/clarifies, replies in-thread. NOT for reviewing (mk:review-pr); NOT for fixes (mk:fix)."
 ---
 
 # Respond to PR Review Comments

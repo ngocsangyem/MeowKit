@@ -1,6 +1,6 @@
 ---
-name: "task-queue"
-description: "Task claiming and ownership tracking for parallel agent execution. Agents claim tasks from a shared queue with file ownership enforcement. Use during parallel execution phases when multiple agents work simultaneously."
+name: "mk-task-queue"
+description: "Task claiming and file-ownership tracking for parallel execution: agents claim tasks from a shared queue with ownership enforced. Use during parallel phases with multiple simultaneous agents."
 ---
 
 # Task Queue & Ownership Tracker

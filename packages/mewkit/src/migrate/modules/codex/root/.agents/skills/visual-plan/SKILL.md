@@ -1,6 +1,6 @@
 ---
-name: "visual-plan"
-description: "Use when a plan directory (plan.md + phase-*.md) needs a visual review. By DEFAULT this drives the STRUCTURED visual-plan artifact (visual-plan/plan.json) via the mewkit visual-plan CLI — generate if absent, validate, open the local studio (view/edit), and export plan.html from the approved artifact. Pass --static for the legacy prompt-only single-file plan.html template render. Triggers on \"render this plan\", \"visualize the plan\", \"open the plan studio\", \"make a shareable plan page\", \"plan.html"
+name: "mk-visual-plan"
+description: "Render a plan directory (plan.md + phase-*.md) as a visual: generates/validates visual-plan/plan.json, opens a studio to view/edit, exports plan.html. Pass --static for a legacy single-file render."
 ---
 
 # mk:visual-plan

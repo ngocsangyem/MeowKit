@@ -1,5 +1,5 @@
 ---
-name: "database"
+name: "mk-database"
 description: "Database patterns: schema design, migrations, query optimization, indexing. PostgreSQL primary. Use for 'database schema', 'migration', 'SQL optimization'."
 ---
 

@@ -1,6 +1,6 @@
 ---
-name: "context-engineering"
-description: "Runtime router for context decisions during a task — decide read-more / stop / ask / assume / delegate, pick a minimal read-set, and time compaction. Front-page mental model is Write / Select / Compress / Isolate; a lazy pattern index routes to 25 context-engineering patterns, one reference per decision. Use when context is near budget, a long session is degrading, you must choose what to read for a task, or you are deciding /compact vs /clear vs a sub-agent. NOT for structural .codex/ overhead"
+name: "mk-context-engineering"
+description: "Runtime router for context decisions: read-more/stop/ask/assume/delegate, minimal read-set, compaction timing. Model: Write/Select/Compress/Isolate. NOT for .codex/ overhead audit (mk:context-audit)."
 ---
 
 # mk:context-engineering — Runtime Context Router

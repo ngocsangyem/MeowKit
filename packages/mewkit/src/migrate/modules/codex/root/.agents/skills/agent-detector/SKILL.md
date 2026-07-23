@@ -1,5 +1,5 @@
 ---
-name: "agent-detector"
+name: "mk-agent-detector"
 description: "Detects the right agent and complexity tier at Phase 0 orient; runs first in every workflow. NOT for runtime agent routing inside a single skill."
 ---
 

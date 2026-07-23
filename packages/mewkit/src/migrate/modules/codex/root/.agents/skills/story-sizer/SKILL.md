@@ -1,6 +1,6 @@
 ---
-name: "story-sizer"
-description: "Pre-ticket Fibonacci sizing for a paste-mode batch of user stories. Default mode is advisory-only (writes a Story Sizing Report). Opt-in `--auto-create` delegates ticket creation to mk:jira-issue + mk:jira-collaborate with mandatory dry-run + single batch confirmation gate. NOT for single-ticket estimation (mk:jira-estimator); NOT for sprint capacity (mk:planning-engine)."
+name: "mk-story-sizer"
+description: "Pre-ticket Fibonacci sizing for pasted stories; advisory by default, writes a Sizing Report. Opt-in auto-create adds a confirm gate. NOT for single-ticket sizing (mk:jira-estimator)."
 ---
 
 # mk:story-sizer

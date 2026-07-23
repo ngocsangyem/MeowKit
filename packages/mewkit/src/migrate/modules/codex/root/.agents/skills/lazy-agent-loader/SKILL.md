@@ -1,5 +1,5 @@
 ---
-name: "lazy-agent-loader"
+name: "mk-lazy-agent-loader"
 description: "Deprecated compatibility shim. Agent routing reads the canonical inventory under .codex/agents/ directly; do not use this skill for agent selection."
 ---
 

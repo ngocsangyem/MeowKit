@@ -1,6 +1,6 @@
 ---
-name: "web-to-markdown"
-description: "Fetch a URL and return clean markdown. Use when the agent needs an arbitrary external page (blog, RFC, GitHub issue, vendor doc) not covered by mk:docs-finder. Triggers on URLs in chat. Static-only by default; opt-in JS rendering available."
+name: "mk-web-to-markdown"
+description: "Fetch a URL and return clean markdown, for arbitrary external pages (blog, RFC, GitHub issue, vendor doc) not covered by mk:docs-finder. Static-only by default; opt-in JS rendering available."
 ---
 
 <!--

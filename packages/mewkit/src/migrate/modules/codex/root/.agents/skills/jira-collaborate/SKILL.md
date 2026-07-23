@@ -1,6 +1,6 @@
 ---
-name: "jira-collaborate"
-description: "Manage JIRA collaboration surface via the jira-as wrapper: comments, attachments, watchers, notify. Triggers: 'comment on KEY', 'add attachment to KEY', 'watch KEY', 'notify KEY watchers'. Internal-vs-public comment safety enforced. NOT for issue CRUD (mk:jira-issue); NOT for issue links (mk:jira-relationships)."
+name: "mk-jira-collaborate"
+description: "JIRA comments, attachments, watchers, notify via jira-as. Internal-vs-public comment safety enforced. NOT issue CRUD (mk:jira-issue) or issue links (mk:jira-relationships)."
 ---
 
 # mk:jira-collaborate

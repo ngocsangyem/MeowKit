@@ -1,5 +1,5 @@
 ---
-name: "validate-plan"
+name: "mk-validate-plan"
 description: "Validates an approved plan across 8 dimensions before build — incomplete acceptance criteria, missing dependencies, unresolved risks. Use after Gate 1, before Test."
 ---
 

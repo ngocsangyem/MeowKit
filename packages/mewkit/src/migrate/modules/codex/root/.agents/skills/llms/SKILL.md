@@ -1,6 +1,6 @@
 ---
-name: "llms"
-description: "Generate llms.txt files from project documentation following the llmstxt.org spec. Use when asked to create AI-friendly documentation indexes, generate llms.txt, or make a project discoverable by AI assistants."
+name: "mk-llms"
+description: "Generate llms.txt files from project docs per the llmstxt.org spec, for AI-friendly documentation indexes and discoverability. Use to create or update llms.txt for AI assistants."
 ---
 
 # llms.txt Generator

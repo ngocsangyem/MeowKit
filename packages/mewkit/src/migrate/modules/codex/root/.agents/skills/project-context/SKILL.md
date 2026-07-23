@@ -1,5 +1,5 @@
 ---
-name: "project-context"
+name: "mk-project-context"
 description: "Generate or update docs/project-context.md — the source of truth for conventions, tech stack, and anti-patterns, loaded by all agents as a constitution."
 ---
 

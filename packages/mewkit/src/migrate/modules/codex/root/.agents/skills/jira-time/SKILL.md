@@ -1,6 +1,6 @@
 ---
-name: "jira-time"
-description: "JIRA time tracking via the jira-as wrapper: log work, list/update/delete worklogs, set estimates, generate reports, bulk-log. Triggers: 'log 2h on KEY', 'show worklog for KEY', 'time report for sprint', 'bulk-log 30m to JQL'. Worklog edit/delete loses data — agent confirms. NOT for sprint capacity (mk:jira-agile)."
+name: "mk-jira-time"
+description: "JIRA time tracking via jira-as: log work, worklogs, estimates, reports, bulk-log. Edit/delete confirms first (data loss). NOT sprint capacity (mk:jira-agile)."
 ---
 
 # mk:jira-time

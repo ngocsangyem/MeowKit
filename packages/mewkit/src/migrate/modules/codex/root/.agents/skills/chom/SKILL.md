@@ -1,6 +1,6 @@
 ---
-name: "chom"
-description: "Use when copy-catting, replicating, or adapting features from external systems, repos, apps, or ideas into the current project. Triggers on 'copy this from', 'replicate', 'clone this feature', 'how does X do Y', 'chom', 'like how X does it', 'port from', 'build like', '1:1 copy'. NOT for packing the current project (see mk:pack); NOT for one-shot URL-to-markdown fetches (see mk:web-to-markdown)."
+name: "mk-chom"
+description: "Copies or adapts features from external repos/apps into this project. Triggers on 'copy this from', 'replicate'. NOT for packing this project (mk:pack); NOT for URL fetches (mk:web-to-markdown)."
 ---
 
 <!-- SECURITY ANCHOR

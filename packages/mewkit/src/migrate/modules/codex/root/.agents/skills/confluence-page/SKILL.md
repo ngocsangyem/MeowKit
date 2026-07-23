@@ -1,6 +1,6 @@
 ---
-name: "confluence-page"
-description: "Confluence page CRUD via the confluence-as wrapper. Triggers: 'create page in SPACE', 'show me page 12345', 'update title of page 12345', 'delete page 12345', 'page hierarchy under 12345', 'copy page 12345 to SPACE'. NOT for bulk ops on 10+ pages (mk:confluence-bulk); NOT for spec analysis (mk:confluence-spec-analyst); NOT for comments/attachments/labels (mk:confluence-collaborate)."
+name: "mk-confluence-page"
+description: "Confluence page CRUD via confluence-as: create/show/update/delete, hierarchy, copy. NOT bulk (mk:confluence-bulk), spec analysis (mk:confluence-spec-analyst), or comments (mk:confluence-collaborate)."
 ---
 
 # mk:confluence-page

@@ -1,6 +1,6 @@
 ---
-name: "html-video"
-description: "Render an HTML/CSS/JS template to a local MP4 video by capturing frames with headless Chromium (via Playwright) and encoding them with ffmpeg. Use when \"render my animation as a video\", \"export HTML to MP4\", \"make a video from my web template\", or \"capture CSS animation as MP4\". NOT for recording live browser interactions (use `agent-browser record start`); NOT for screen recording; NOT for AI video generation (use mk:multimodal)."
+name: "mk-html-video"
+description: "Render an HTML/CSS/JS template to local MP4 via headless Chromium (Playwright) + ffmpeg. NOT live browser recording, screen recording, or AI video gen (mk:multimodal)."
 ---
 
 # HTML → MP4 Render Pipeline

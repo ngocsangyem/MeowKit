@@ -1,5 +1,5 @@
 ---
-name: "ship"
+name: "mk-ship"
 description: "Ship workflow: prepare stages/commits locally; release pushes + opens a PR; publish handles issues + versioning. Use for 'ship', 'push', 'create a PR'. Official (→main) and beta (→dev) modes."
 ---
 

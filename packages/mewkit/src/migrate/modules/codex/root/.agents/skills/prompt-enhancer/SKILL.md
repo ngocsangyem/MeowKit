@@ -1,6 +1,6 @@
 ---
-name: "prompt-enhancer"
-description: "Use when refining a draft user prompt before sending it to a coding agent. Decomposes goal/context/constraints/acceptance/output-format, detects ambiguity and model-coupled framing, then emits a model-agnostic rewrite. Supports --analyze, --score, and --deep. NOT for prompts from scratch (mk:brainstorming), plans/reviews (mk:elicit), implementation plans (mk:plan-creator), or general codebase scouting (mk:scout)."
+name: "mk-prompt-enhancer"
+description: "Refine a draft prompt before sending to a coding agent: decomposes goal/context/constraints, flags ambiguity, emits a model-agnostic rewrite. NOT for prompts from scratch (mk:brainstorming)."
 ---
 
 # mk:prompt-enhancer

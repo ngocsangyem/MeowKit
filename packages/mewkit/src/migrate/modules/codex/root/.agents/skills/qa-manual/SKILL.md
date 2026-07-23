@@ -1,6 +1,6 @@
 ---
-name: "qa-manual"
-description: "Spec-driven manual QA testing and Playwright E2E code generation. Orchestrates browser skills to navigate apps like a human tester, producing structured test reports or production-ready .spec.ts files. Always prompts user for credentials — never guesses or stores auth. Use for QA testing, E2E generation, login flow testing, or exploratory testing from a URL. NOT for AI-autonomous flows (see mk:agent-browser)."
+name: "mk-qa-manual"
+description: "Spec-driven manual QA and Playwright E2E generation: navigates apps like a human tester, producing reports or .spec.ts files. Prompts for credentials. NOT for autonomous flows (mk:agent-browser)."
 ---
 
 <!-- Design decisions:

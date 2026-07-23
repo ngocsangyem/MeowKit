@@ -1,6 +1,6 @@
 ---
-name: "retro"
-description: "Weekly-cadence engineering retrospective. Analyzes commit history, work patterns, and code quality metrics with persistent history and trend tracking. Team-aware: breaks down per-person contributions with praise and growth areas. Use when asked to \"weekly retro\", \"what did we ship\", or \"engineering retrospective\". Proactively suggest at the end of a work week or sprint. NOT for per-session or per-task reflection (see mk:memory / Phase 6 Reflect)."
+name: "mk-retro"
+description: "Weekly engineering retrospective from commit history, work patterns, and code-quality metrics, with trend tracking and per-person breakdown. NOT for per-session reflection (mk:memory / Phase 6)."
 ---
 
 # the retro skill — Weekly Engineering Retrospective

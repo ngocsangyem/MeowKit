@@ -1,5 +1,5 @@
 ---
-name: "research"
+name: "mk-research"
 description: "Deep multi-source technical research with citations — tech evaluation, ecosystem/standards comparison. NOT for API docs (mk:docs-finder), codebase discovery (mk:scout), or project Q&A (mk:ask-me)."
 ---
 

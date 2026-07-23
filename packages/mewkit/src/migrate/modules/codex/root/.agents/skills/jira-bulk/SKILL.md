@@ -1,6 +1,6 @@
 ---
-name: "jira-bulk"
-description: "Bulk JIRA operations on 10+ issues via the jira-as wrapper: bulk transition / assign / set-priority / clone / delete. Dry-run is MANDATORY first. Triggers: 'bulk update N issues', 'mass transition', 'transition 50+ issues to Done', 'bulk-clone', 'bulk-delete'. NOT for single-issue ops (mk:jira-issue / mk:jira-lifecycle)."
+name: "mk-jira-bulk"
+description: "Bulk JIRA ops (10+ issues): transition/assign/priority/clone/delete via jira-as; dry-run mandatory. NOT single-issue ops (mk:jira-issue, mk:jira-lifecycle)."
 ---
 
 # mk:jira-bulk

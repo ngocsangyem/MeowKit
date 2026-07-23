@@ -1,6 +1,6 @@
 ---
-name: "wiki"
-description: "Capture, gate, query, and render long-term project knowledge through the gated `mewkit wiki` subsystem. Use to create a wiki, propose/approve candidates (scanner-gated), hand off a skill's terminal artifact as a scanned candidate, recall context, search the FTS index, or list pages. Agents may only PROPOSE candidates; canonical pages are written only via human approve. NOT for short-lived JSON memory (see mk:memory); NOT for fetching external sources (see mk:wiki-research); NOT for HTML snapshot"
+name: "mk-wiki"
+description: "Capture, gate, and query long-term project knowledge via the gated wiki subsystem: propose candidates, recall, or search; agents propose, humans approve. NOT for short-lived memory (mk:memory)."
 ---
 
 # mk:wiki

@@ -1,6 +1,6 @@
 ---
-name: "advise"
-description: "Turn a raw idea into ONE honest recommendation: interview one question at a time until the problem, requirements, goals, non-goals, and constraints are CONFIRMED, then deliver a single verdict — do, don't, cheaper alternatives, trade-offs, ordered checklist, success metrics. Required: the user wants exactly ONE recommendation — not options, not a debate — and their framing is open to challenge (advise may answer a different question than the one asked). Triggers on \"what should I do about X\", \"a"
+name: "mk-advise"
+description: "Turn a raw idea into ONE honest recommendation: interview one question at a time until confirmed, then give a verdict with trade-offs and a checklist. Not for options or debate."
 ---
 
 # Advise

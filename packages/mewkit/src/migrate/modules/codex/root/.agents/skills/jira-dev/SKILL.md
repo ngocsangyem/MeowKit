@@ -1,6 +1,6 @@
 ---
-name: "jira-dev"
-description: "Generate developer artifacts from Jira tickets via the jira-as wrapper: branch names, PR descriptions, parsed commits, commit/PR-to-issue links. Triggers: 'branch name for KEY', 'PR description for KEY', 'parse commits for issue keys', 'link PR to KEY'. NOT for executing git/gh commands directly (mk:ship); NOT for issue CRUD (mk:jira-issue)."
+name: "mk-jira-dev"
+description: "Generate dev artifacts from Jira tickets via jira-as: branch names, PR descriptions, parsed commits, PR-to-issue links. NOT running git/gh (mk:ship) or issue CRUD (mk:jira-issue)."
 ---
 
 # mk:jira-dev

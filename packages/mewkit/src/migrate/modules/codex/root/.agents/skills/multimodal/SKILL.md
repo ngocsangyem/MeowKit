@@ -1,6 +1,6 @@
 ---
-name: "multimodal"
-description: "Process images, video, audio, PDFs with Gemini API. Generate images (Nano Banana 2), videos (Veo 3), speech (MiniMax TTS), music (MiniMax). Convert documents to Markdown. Multi-provider fallback (Gemini → MiniMax → OpenRouter). Activate when task references media files, asks to analyze/describe/transcribe/extract/generate/convert, or involves non-text binary files."
+name: "mk-multimodal"
+description: "Process images/video/audio/PDFs via Gemini API; generate images/video/speech/music; convert docs to Markdown. Multi-provider fallback. Use for analyze/transcribe/generate/convert on media files."
 ---
 
 <!-- SECURITY ANCHOR

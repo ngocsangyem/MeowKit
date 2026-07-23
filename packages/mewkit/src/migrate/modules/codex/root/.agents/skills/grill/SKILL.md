@@ -1,6 +1,6 @@
 ---
-name: "grill"
-description: "Relentlessly interview the user about THEIR plan or design — one question at a time — resolving each branch of a decision tree until shared understanding. Codex is the interviewer; the user is the interviewee. Triggers on \"grill me\", \"stress-test this plan\", \"get grilled on my design\", \"interrogate my plan\". Checkpoints every answer to docs/knowledge/<slug>.md so progress survives a context-window reset. Flags knowledge the user cannot answer as a gap to chase. Do NOT use to PROPOSE solutions o"
+name: "mk-grill"
+description: "Relentlessly interview the user about THEIR plan, one question at a time, until shared understanding. Checkpoints answers so progress survives a reset. Do NOT use to propose solutions."
 ---
 
 # Grill

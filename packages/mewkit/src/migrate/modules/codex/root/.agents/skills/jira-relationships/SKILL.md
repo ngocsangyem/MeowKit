@@ -1,6 +1,6 @@
 ---
-name: "jira-relationships"
-description: "Manage JIRA issue relationships via the jira-as wrapper: link, unlink, blockers, dependencies, clone, bulk-link. Triggers: 'link KEY blocks KEY', 'what blocks KEY', 'clone KEY', 'unlink KEY from KEY'. NOT for sprint/epic relationships (mk:jira-agile)."
+name: "mk-jira-relationships"
+description: "Manage JIRA issue relationships via jira-as: link, unlink, blockers, dependencies, clone, bulk-link. NOT sprint/epic relationships (mk:jira-agile)."
 ---
 
 # mk:jira-relationships

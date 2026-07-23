@@ -1,5 +1,5 @@
 ---
-name: "benchmark"
+name: "mk-benchmark"
 description: "Experimental/manual harness canary procedure. It records benchmark manifests and scores but does not provide a fully automated runner."
 ---
 

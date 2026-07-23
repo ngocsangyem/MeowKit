@@ -1,6 +1,6 @@
 ---
-name: "jira-evaluator"
-description: "Evaluate Jira ticket complexity + inconsistencies via the jira-evaluator agent. Read-only. Triggers: 'evaluate KEY', 'analyze ticket complexity for KEY', 'check ticket quality for KEY'. NOT for estimation (mk:jira-estimator); NOT for full RCA (mk:jira-analyst)."
+name: "mk-jira-evaluator"
+description: "Evaluate Jira ticket complexity and inconsistencies via jira-evaluator agent, read-only. NOT estimation (mk:jira-estimator) or full RCA (mk:jira-analyst)."
 ---
 
 # mk:jira-evaluator

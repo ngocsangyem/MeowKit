@@ -1,6 +1,6 @@
 ---
-name: "docs-finder"
-description: "Retrieve up-to-date library, framework, and project documentation using scripts + MCP tools (Context7, Context Hub) with intelligent fallback. Use this skill whenever the user or agent needs documentation for any library, framework, API, SDK, or internal project spec. Triggers on \"docs for [X]\", \"how does [library] work\", \"find documentation\", \"API reference for\", \"look up [feature] in [library]\", \"latest docs\", \"what's the API for\", \"find our [internal spec]\", or any request that requires curre"
+name: "mk-docs-finder"
+description: "Retrieve current library, framework, and API docs via Context7, Context Hub, and web fallback. Use whenever docs are needed for a library, SDK, or internal spec instead of stale training data."
 ---
 
 <!-- SECURITY ANCHOR

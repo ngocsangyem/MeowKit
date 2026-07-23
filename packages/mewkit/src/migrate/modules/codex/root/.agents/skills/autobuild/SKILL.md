@@ -1,6 +1,6 @@
 ---
-name: "autobuild"
-description: "Use when running an autonomous multi-hour build of a green-field product — orchestrates planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density per model tier. Triggers on the autobuild skill, \"build me a kanban app\", \"build a retro game maker\", \"autonomous build\", or any green-field product spec. NOT for scoped single-task work (see mk:cook); NOT for initial project scaffolding only (see mk:bootstrap)."
+name: "mk-autobuild"
+description: "Runs autonomous multi-hour green-field builds: planner, contract, generator/evaluator loop, scaffolding density per model tier. NOT for scoped tasks (mk:cook); NOT for scaffolding only (mk:bootstrap)."
 ---
 
 <!-- Lifecycle canonical source: .codex/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->

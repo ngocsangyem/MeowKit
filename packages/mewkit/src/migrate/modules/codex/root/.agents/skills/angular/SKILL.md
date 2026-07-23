@@ -1,6 +1,6 @@
 ---
-name: "angular"
-description: "Use when working with Angular code — components, signals, services, forms, routing, HTTP, testing, SSR, or tooling. Targets Angular v20+ modern patterns. Auto-activates on .ts files in Angular projects (detected via angular.json)."
+name: "mk-angular"
+description: "Angular v20+ patterns: components, signals, services, forms, routing, HTTP, testing, SSR. Auto-activates on .ts files in Angular projects (angular.json detected)."
 ---
 
 # Angular

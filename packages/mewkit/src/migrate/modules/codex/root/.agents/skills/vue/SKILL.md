@@ -1,6 +1,6 @@
 ---
-name: "vue"
-description: "Use when writing, reviewing, or refactoring Vue 3 code — components, composables, reactivity, Pinia state, Pinia Colada data-fetching, file-based routing, and forms. Targets Composition API + <script setup> + TypeScript. Auto-activates on .vue files. For deep best-practices review/recommendations or the full ordered workflow (built-in components, animations, performance pass), use mk:vue-best-practices."
+name: "mk-vue"
+description: "Vue 3 authoring/review: components, composables, reactivity, Pinia, Pinia Colada, file routing, forms. Composition API + script setup. Auto-activates on .vue files. Deep review: mk:vue-best-practices."
 ---
 
 # Vue 3

@@ -1,5 +1,5 @@
 ---
-name: "verify"
+name: "mk-verify"
 description: "Unified verification: build → lint → test → type-check → coverage. Use for 'is it green' / 'run all checks'; auto-called by mk:cook. NOT for lint only (mk:lint-and-validate)."
 ---
 

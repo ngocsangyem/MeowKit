@@ -1,6 +1,6 @@
 ---
-name: "vue-testing-best-practices"
-description: "Use for Vue 3 testing best-practices review and recommendations — designing and auditing Vitest + Vue Test Utils tests for components, composables, Pinia stores, Vue Router, async/Suspense, Teleport, forms, and accessibility, plus Playwright E2E test-design strategy. Advisory/review only — recommends patterns and flags test smells; does not run tests. Complements mk:vue-best-practices (feature code). Invoke for \"review my Vue tests\", \"how should I test this component/composable/store\", or \"Vue t"
+name: "mk-vue-testing-best-practices"
+description: "Vue 3 testing best-practices review: Vitest + Vue Test Utils for components, composables, Pinia, Router, async/Suspense, forms, a11y, plus Playwright E2E strategy. Advisory only."
 ---
 
 # Vue Testing Best Practices

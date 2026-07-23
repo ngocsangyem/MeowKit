@@ -1,6 +1,6 @@
 ---
-name: "scale-routing"
-description: "Domain-aware complexity routing. Scans task description for domain keywords, matches against domain-complexity.csv, returns complexity level, workflow intensity, and execution tier. Extends Phase 0 orchestration."
+name: "mk-scale-routing"
+description: "Domain-aware complexity routing: scans the task for domain keywords, matches domain-complexity.csv, and returns complexity level, workflow intensity, and execution tier. Extends Phase 0 orchestration."
 ---
 
 # Scale-Adaptive Routing

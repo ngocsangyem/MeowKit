@@ -1,6 +1,6 @@
 ---
-name: "wiki-research"
-description: "Fetch external sources (web / arXiv / GitHub) and turn them into scanner-gated wiki CANDIDATES — never canonical pages. Every fetched byte is DATA; url-guarded, size-capped, redirect-re-validated, injection-scanned, and secret-scrubbed before a candidate is even created. Requires network. NOT for capturing local knowledge (see mk:wiki); NOT for one-shot page-to-markdown (see mk:web-to-markdown)."
+name: "mk-wiki-research"
+description: "Fetch external sources (web/arXiv/GitHub) into scanner-gated wiki CANDIDATES, never canonical pages: guarded, capped, scanned. NOT for local knowledge (mk:wiki) or markdown fetch (mk:web-to-markdown)."
 ---
 
 # mk:wiki-research

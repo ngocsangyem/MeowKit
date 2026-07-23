@@ -1,5 +1,5 @@
 ---
-name: "workflow-orchestrator"
+name: "mk-workflow-orchestrator"
 description: "Auto-invoked 7-phase workflow for complex-feature intent; fasttrack mode for pre-approved specs. NOT for explicit single tasks (mk:cook), green-field builds (mk:autobuild), or simple fixes (mk:fix)."
 ---
 

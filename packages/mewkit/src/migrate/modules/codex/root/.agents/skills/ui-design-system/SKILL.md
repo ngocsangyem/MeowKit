@@ -1,6 +1,6 @@
 ---
-name: "ui-design-system"
-description: "Use when designing UI components, creating design systems, reviewing visual design, or checking accessibility compliance. Triggers on \"design system\", \"UI review\", \"color palette\", \"font pairing\", \"accessibility audit\", \"responsive design\", \"WCAG check\". Auto-activates when ui-ux-designer agent is working. Data-driven: 160 palettes, 73 font pairings, 161 product types, 98 UX guidelines, 25 chart types."
+name: "mk-ui-design-system"
+description: "Design UI components/design systems, review visual design, check accessibility. Triggers: design system, color palette, font pairing, WCAG check. Data-driven: palettes, fonts, UX guidelines."
 ---
 
 # UI Design System

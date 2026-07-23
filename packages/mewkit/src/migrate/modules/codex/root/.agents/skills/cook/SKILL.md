@@ -1,5 +1,5 @@
 ---
-name: "cook"
+name: "mk-cook"
 description: "Single-task pipeline: plan → test → build → review (ship separately). Use for a feature or scoped fix. NOT for green-field builds (mk:autobuild) or auto-orchestration (mk:workflow-orchestrator)."
 ---
 

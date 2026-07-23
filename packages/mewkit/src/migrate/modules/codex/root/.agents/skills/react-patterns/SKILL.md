@@ -1,6 +1,6 @@
 ---
-name: "react-patterns"
-description: "Use when writing, reviewing, or optimizing React/Next.js code. Triggers on .tsx/.jsx files, React component work, Next.js routes, bundle optimization, re-render issues, or performance improvements. Auto-activates alongside mk:typescript when React project detected."
+name: "mk-react-patterns"
+description: "React/Next.js authoring, review, and optimization: components, routes, bundle size, re-renders, performance. Auto-activates on .tsx/.jsx files alongside mk:typescript in React projects."
 ---
 
 # React Patterns

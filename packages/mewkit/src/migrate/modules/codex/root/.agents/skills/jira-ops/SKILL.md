@@ -1,6 +1,6 @@
 ---
-name: "jira-ops"
-description: "JIRA-side cache + project-context discovery via the jira-as wrapper. Triggers: 'jira cache status', 'clear jira cache', 'discover project context for PROJ'. Diagnostic-only — no Atlassian state changes. NOT for issue CRUD; NOT for project admin (mk:jira-admin)."
+name: "mk-jira-ops"
+description: "JIRA-side cache + project-context discovery via jira-as, diagnostic-only, no Atlassian state changes. NOT issue CRUD or project admin (mk:jira-admin)."
 ---
 
 # mk:jira-ops

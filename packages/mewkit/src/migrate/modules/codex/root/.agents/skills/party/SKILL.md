@@ -1,6 +1,6 @@
 ---
-name: "party"
-description: "Multi-agent collaboration session. Brings 2-4 agent perspectives into one discussion for architecture decisions and trade-off analysis. Use when asked \"should we X or Y?\", \"let's discuss\", or \"design review\"."
+name: "mk-party"
+description: "Multi-agent collaboration bringing 2-4 perspectives into one discussion for architecture decisions and trade-off analysis. Use for 'should we X or Y', design review, or debate before deciding."
 ---
 
 # Party Mode — Multi-Agent Collaboration

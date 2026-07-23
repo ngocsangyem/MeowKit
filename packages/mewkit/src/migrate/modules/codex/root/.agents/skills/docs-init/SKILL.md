@@ -1,5 +1,5 @@
 ---
-name: "docs-init"
+name: "mk-docs-init"
 description: "Generate initial docs/ from codebase analysis when a project has none. Triggers on 'init docs', 'create/generate documentation'. NOT for updating existing docs (mk:document-release)."
 ---
 

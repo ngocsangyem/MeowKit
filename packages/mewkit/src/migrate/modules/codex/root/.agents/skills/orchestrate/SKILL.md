@@ -1,6 +1,6 @@
 ---
-name: "orchestrate"
-description: "Coordinates staged or parallel jobs across live-verified coding-agent runtimes (Claude Code, Codex, Cursor, and other installed CLIs) and in-session toolkit subagents. Routes each job by capability and risk tier, isolates parallel writers in git worktrees, captures redacted output, resumes interrupted runs, and blocks completion until an independent arbiter verifies the results. Use when work should be split across multiple runtimes or subagents, run as staged or parallel jobs, and reviewed before handoff. NOT for a single-agent task or the in-session 7-phase flow (use mk:cook / mk:workflow-orchestrator)."
+name: "mk-orchestrate"
+description: "Coordinate staged or parallel jobs across coding-agent runtimes and subagents: routes by capability/risk, isolates writers in worktrees, arbitrates results. NOT for a single-agent task (mk:cook)."
 ---
 
 # Orchestrate

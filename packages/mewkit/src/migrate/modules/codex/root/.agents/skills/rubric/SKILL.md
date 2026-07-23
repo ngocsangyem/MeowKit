@@ -1,6 +1,6 @@
 ---
-name: "rubric"
-description: "Use when loading, listing, composing, or validating graded evaluation rubrics — PASS/WARN/FAIL grading with weighted criteria and balanced PASS/FAIL anchor examples. Triggers on the rubric skill, \"load rubric\", \"compose rubric preset\", \"validate rubric\", or evaluator-style code review that needs anchor-grounded judgments."
+name: "mk-rubric"
+description: "Loads, lists, composes, or validates graded evaluation rubrics: PASS/WARN/FAIL grading with weighted criteria and balanced anchor examples for evaluator-style review."
 ---
 
 # Rubric Library API

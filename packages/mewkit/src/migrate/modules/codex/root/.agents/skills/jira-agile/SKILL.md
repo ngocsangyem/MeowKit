@@ -1,6 +1,6 @@
 ---
-name: "jira-agile"
-description: "JIRA agile via the jira-as wrapper: epics, sprints, backlog, ranking, story points, subtasks, velocity. Triggers: 'create sprint', 'add KEY to sprint', 'set story points on KEY', 'rank KEY before KEY', 'velocity for board', 'epic add'. Board ID ≠ project key. NOT for issue CRUD (mk:jira-issue); NOT for time tracking (mk:jira-time)."
+name: "mk-jira-agile"
+description: "JIRA agile via jira-as: epics, sprints, backlog, ranking, story points, velocity. Board ID != project key. NOT issue CRUD (mk:jira-issue) or time tracking (mk:jira-time)."
 ---
 
 # mk:jira-agile

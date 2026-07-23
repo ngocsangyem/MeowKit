@@ -1,5 +1,5 @@
 ---
-name: "frontend-design"
+name: "mk-frontend-design"
 description: "Use when designing UI components, reviewing visual design, building design systems, or checking accessibility. Auto-activates on frontend design tasks and UI reviews."
 ---
 

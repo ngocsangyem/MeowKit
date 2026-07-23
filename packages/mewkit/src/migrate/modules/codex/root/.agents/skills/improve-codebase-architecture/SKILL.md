@@ -1,6 +1,6 @@
 ---
-name: "improve-codebase-architecture"
-description: "Use when surfacing architectural friction and proposing deepening refactors (shallow modules → deep modules) for testability and AI-navigability. Triggers on \"improve architecture\", \"find deepening opportunities\", \"where is this codebase shallow\", \"architecture review\". Emits structured candidates + precise patches; delegates ALL rendering to mk:preview. NOT for diagram/HTML rendering (see mk:preview); NOT for trade-off deliberation (see mk:party); NOT for plan critique (see mk:plan-ceo-review)."
+name: "mk-improve-codebase-architecture"
+description: "Surfaces architectural friction and proposes deepening refactors (shallow to deep modules). Renders via mk:preview. NOT for debate (mk:party); NOT for plan critique (mk:plan-ceo-review)."
 ---
 
 # mk:improve-codebase-architecture

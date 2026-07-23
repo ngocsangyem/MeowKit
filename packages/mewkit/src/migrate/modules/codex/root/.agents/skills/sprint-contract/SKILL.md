@@ -1,6 +1,6 @@
 ---
-name: "sprint-contract"
-description: "Use when negotiating a file-based sprint contract between the generator (developer) and evaluator before code is written. Translates a product-level spec into testable acceptance criteria with rubric tie-ins. Triggers on the sprint-contract skill, \"draft a sprint contract\", \"negotiate scope for sprint\", or before any harness-driven sprint kicks off."
+name: "mk-sprint-contract"
+description: "Negotiates a file-based sprint contract between generator and evaluator before code is written: turns a spec into testable acceptance criteria with rubric tie-ins."
 ---
 
 # mk:sprint-contract — File-Based Sprint Contract Protocol

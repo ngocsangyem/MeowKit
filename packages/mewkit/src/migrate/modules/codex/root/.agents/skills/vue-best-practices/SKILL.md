@@ -1,6 +1,6 @@
 ---
-name: "vue-best-practices"
-description: "Use for deep Vue 3 best-practices review, recommendations, and the full ordered authoring workflow — built-in components (Teleport, Suspense, KeepAlive, Transition, TransitionGroup), animation techniques, slots, fallthrough attrs, custom directives, async components, render functions, plugins, and the post-functionality performance pass. Complements mk:vue (the everyday Composition API quick-reference). Invoke for \"review my Vue\", \"Vue best practices\", \"recommend improvements\", or non-trivial fe"
+name: "mk-vue-best-practices"
+description: "Deep Vue 3 best-practices review and authoring workflow: built-in components (Teleport, Suspense, KeepAlive, Transition), animations, slots, directives, render fns, perf pass. Complements mk:vue."
 ---
 
 # Vue 3 Best Practices

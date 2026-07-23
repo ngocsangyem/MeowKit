@@ -1,5 +1,5 @@
 ---
-name: "skill-template-secure"
+name: "mk-skill-template-secure"
 description: "Secure skill template with prompt injection defenses. Copy this template when creating new skills."
 ---
 

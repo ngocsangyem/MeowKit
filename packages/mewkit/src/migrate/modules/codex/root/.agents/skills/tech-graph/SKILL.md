@@ -1,6 +1,6 @@
 ---
-name: "tech-graph"
-description: "Generate publish-grade SVG+PNG technical diagrams — architecture, data flow, flowchart, sequence, agent-memory, class, ER, state-machine, comparison, timeline, and more — across 8 visual styles. Writes output to tasks/visuals/ or an active plan's visuals/ directory. Requires rsvg-convert (librsvg) for PNG export; degrades gracefully to SVG-only when absent."
+name: "mk-tech-graph"
+description: "Generate publish-grade SVG+PNG technical diagrams (architecture, data flow, sequence, ER, state-machine, etc.) in 8 styles. Writes to tasks/visuals/. Needs rsvg-convert for PNG; else SVG-only."
 ---
 
 # Tech Graph

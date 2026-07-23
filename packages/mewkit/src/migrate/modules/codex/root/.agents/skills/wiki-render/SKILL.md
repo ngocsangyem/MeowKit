@@ -1,6 +1,6 @@
 ---
-name: "wiki-render"
-description: "Render a wiki into ONE self-contained HTML snapshot (pages + provenance) that opens offline — no CDN, no remote assets, page content HTML-escaped. Use to share or review accumulated wiki knowledge as a static page. NOT for capturing/approving knowledge (see mk:wiki); NOT for generic code/diagram visuals (see mk:preview)."
+name: "mk-wiki-render"
+description: "Render a wiki into ONE self-contained, offline HTML snapshot (pages + provenance) for sharing or reviewing wiki knowledge. NOT for capturing knowledge (mk:wiki) or generic diagrams (mk:preview)."
 ---
 
 # mk:wiki-render

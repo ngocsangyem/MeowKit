@@ -1,6 +1,6 @@
 ---
-name: "showcase"
-description: "Create a self-contained, visually polished HTML showcase page for a topic or set of artifacts. Supply a mission (topic summary) and optional artifact paths explicitly — the skill never auto-scans the repo. Writes output to assets/showcase/<mission>/. Screenshots are optional (requires Puppeteer). Publishing is local-only by default; publish requests without a configured path fail clearly."
+name: "mk-showcase"
+description: "Create a self-contained polished HTML showcase page for a topic/artifacts; mission + paths given explicitly, never auto-scans repo. Writes to assets/showcase/<mission>/. Screenshots need Puppeteer."
 ---
 
 # mk:showcase

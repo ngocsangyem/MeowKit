@@ -1,6 +1,6 @@
 ---
-name: "jira-analyst"
-description: "Full Jira ticket context analysis via the jira-analyst agent — including media (attached images / PDFs / screenshots) and linked issues. Produces structured findings suitable for posting back as a Jira comment. Read-only. Triggers: 'analyze KEY', 'rca for KEY', 'describe KEY with media'. NOT for complexity scoring (mk:jira-evaluator); NOT for story-point estimation (mk:jira-estimator)."
+name: "mk-jira-analyst"
+description: "Read-only full Jira ticket analysis incl. media + linked issues via jira-analyst agent; produces comment-ready findings. NOT complexity scoring (mk:jira-evaluator) or estimation (mk:jira-estimator)."
 ---
 
 # mk:jira-analyst

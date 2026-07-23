@@ -1,6 +1,6 @@
 ---
-name: "build-fix"
-description: "Build error triage: detect language, load fix patterns, auto-retry. Use for 'build failed', 'fix compilation', 'type error'. Chains into mk:verify. NOT for runtime errors (see mk:fix); NOT for architectural debugging (see mk:investigate)."
+name: "mk-build-fix"
+description: "Build error triage: detect language, load fix patterns, auto-retry. Chains into mk:verify. NOT for runtime errors (mk:fix); NOT for architecture debugging (mk:investigate)."
 ---
 
 # Build Fix — Universal Build Error Resolver
