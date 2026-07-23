@@ -10,7 +10,6 @@ describe("denied-token-scan", () => {
 		expect(labels("read .claude/rules/x.md")).toContain(".claude path");
 		expect(labels("see CLAUDE.md")).toContain("CLAUDE.md reference");
 		expect(labels("call Task( to spawn")).toContain("Task( tool call");
-		expect(labels("spawn a subagent")).toContain("subagent primitive");
 		expect(labels("$CLAUDE_PROJECT_DIR")).toContain("Claude env var");
 		expect(labels("$ANTHROPIC_API_KEY")).toContain("Anthropic env var");
 	});
@@ -24,6 +23,8 @@ describe("denied-token-scan", () => {
 	it("does not false-positive on incidental words", () => {
 		// "task" (lowercase, no paren) and "claude" in prose are not denied tokens.
 		expect(hasDeniedTokens("this is a task about claude models")).toBe(false);
+		// "subagent" is native Codex vocabulary (.codex/agents/*.toml), not Claude-bound.
+		expect(hasDeniedTokens("delegate the work to a specialized subagent")).toBe(false);
 	});
 });
 

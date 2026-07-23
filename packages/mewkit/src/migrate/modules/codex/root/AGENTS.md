@@ -20,6 +20,7 @@ they are validated, secret-scrubbed, and injection-scanned.
 
 ## Agents
 
-Specialized agents are defined under `.codex/agents/*.toml` and wired in
-`.codex/config.toml`. Delegate a sub-task to the agent whose description matches
-the work; do not inline work an agent owns.
+Specialized agents are defined under `.codex/agents/*.toml` and auto-loaded by
+Codex — there is no `config.toml` wiring, and each agent's `name` field (not its
+filename) is the source of truth. Delegate a sub-task to the agent whose
+description matches the work; do not inline work an agent owns.
