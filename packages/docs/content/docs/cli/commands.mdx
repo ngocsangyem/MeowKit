@@ -335,6 +335,27 @@ npx mewkit status
 
 Shows: MeowKit version with channel indicator (stable/beta), project config from `.claude/meowkit.config.json`.
 
+## plan
+
+Plan lifecycle. `status` / `check` are read-only (the plan Markdown stays the sole authority); `approve` / `archive` are the two mutating subcommands and live in their own modules so the read-only path imports no write API.
+
+```bash
+npx mewkit plan status <plan-dir>       # checkbox progress across plan.md + phase files
+npx mewkit plan check <phase-file>      # required-section + checklist report for one phase
+npx mewkit plan approve <plan-dir>      # stamp the Gate 1 approval receipt (after a human approves)
+npx mewkit plan archive <plan-dir>      # mark completed + move to tasks/plans/archive/
+npx mewkit plan archive <plan-dir> --dry-run
+```
+
+`plan archive` finishes a plan in one step:
+
+- Stamps `status: completed` in `plan.md` frontmatter, every `phase-*.md` frontmatter, and every `phases[*].status` in `.plan-state.json` (the plan-creator checkpoint).
+- Preserves the CLI-managed `.plan-state.json` `visual` block and leaves `visual-plan/plan.json` untouched — both are lifecycle-agnostic and travel with the directory.
+- Clears a dangling active-task pointer that still points at the plan.
+- Moves the whole directory into `tasks/plans/archive/<name>/` — fail-closed if the destination exists, no-op if already archived.
+
+Agents run it automatically at the end of a completed plan (cook Phase 6). `--dry-run` previews with zero writes.
+
 ## visual-plan
 
 Structured visual review for UI-bearing plans. The canonical artifact

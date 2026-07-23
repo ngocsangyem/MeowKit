@@ -78,7 +78,7 @@ Already `[x]` items → skip.
 1. Mark session tasks complete via `TaskUpdate`
 2. Update phase files: `[ ]` → `[x]` for completed items
 3. Update plan.md status table
-4. If every non-abandoned phase todo is checked and at least one todo exists, set plan frontmatter `status: completed` and move the plan directory to `tasks/plans/archive/{plan-name}/`
+4. If every non-abandoned phase todo is checked and at least one todo exists, archive the plan with `npx mewkit plan archive {plan-dir}` (stamps `status: completed` across plan.md + phase files + `.plan-state.json`, then moves the directory to `tasks/plans/archive/{plan-name}/`)
 5. Project-manager agent sweeps all phase files
 
 ## Sync-Back Protocol (Executed by Cook's Finalize Step)
@@ -126,7 +126,7 @@ if new_status != current_status:
 2. For each phase file: apply the algorithm above to derive `new_status` and rewrite frontmatter
 3. Regenerate the Overview mirror lines from frontmatter values
 4. Update plan.md Phases table status column from checkpoint
-5. Run the completion lifecycle check: if all task checkboxes across non-abandoned phase files are checked, set `plan.md` frontmatter `status: completed` and move the entire plan directory to `tasks/plans/archive/{plan-name}/`
+5. Run the completion lifecycle check: if all task checkboxes across non-abandoned phase files are checked, archive the plan with `npx mewkit plan archive {plan-dir}` (stamps `status: completed` across plan.md + phase files + `.plan-state.json`, then moves the entire plan directory to `tasks/plans/archive/{plan-name}/`)
 6. project-manager sub-task sweeps all phase-XX files for cross-file consistency
 7. Git commit captures state transition
 

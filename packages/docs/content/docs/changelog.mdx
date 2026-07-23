@@ -26,6 +26,7 @@ Project state moves out of the provider directory into a runtime-neutral `.meowk
 
 ### CLI
 
+- Added `mewkit plan archive <plan-dir>` — finishes a plan: stamps `status: completed` across `plan.md` + every phase file and `.plan-state.json` (preserving its `visual` block; `visual-plan/plan.json` untouched), clears a dangling active-task pointer, then moves the directory into `tasks/plans/archive/`. Fail-closed on collision, `--dry-run` supported. Agents call it at the end of a completed plan (cook Phase 6). A mutating sibling to `plan approve`; read-only `plan status`/`check` are unchanged.
 - Added `mewkit memory capture` — routes a `##pattern` / `##decision` / `##note` prompt into the right `.meowkit/memory` store through the write contract.
 - Added `mewkit init --target <provider>` — `--target codex` creates a Codex-only project by copying the authored Codex bundle shipped in the package (no `.claude/`, no conversion); other providers unpack `.claude/` then export. Replaces the old `--migrate-to`.
 - **`mewkit init` provider multiselect** — a fresh install without `--target` now opens a picker (**Claude Code** preselected, **Codex**, **Cursor**) and provisions each selected toolkit: Claude Code → `.claude/`, Codex → authored bundle, Cursor → `.claude/` + export. Codex-only selection yields a codex-only project (no release download). Shown on new installs only; `--target` bypasses it.

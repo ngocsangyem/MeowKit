@@ -78,10 +78,10 @@ Ask via `AskUserQuestion`. Header: "Archive Action". Question: "How to handle th
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
-| Move to .archive/ | Plan may be useful later for reference, audit, or replay | Moves to `tasks/plans/.archive/{plan-name}/`; preserves history in git |
+| Archive | Plan may be useful later for reference, audit, or replay | Runs `npx mewkit plan archive`; preserves history in git |
 | Delete | Plan is throwaway / sensitive / consumes repo space without value | Removes plan directories permanently (confirm before running rm) |
 
-If "Move": `mv tasks/plans/{plan-name} tasks/plans/.archive/{plan-name}`
+If "Archive": for each selected plan run `npx mewkit plan archive tasks/plans/{plan-name}` — it stamps `status: completed` across plan.md + every phase file and `.plan-state.json` (preserving the visual block), then moves the directory to `tasks/plans/archive/{plan-name}/`.
 If "Delete": `rm -rf tasks/plans/{plan-name}` (confirm with user first)
 
 ### A5. Summary
@@ -92,7 +92,7 @@ Print summary table:
 Archived {N} plans:
 | Plan | Status | Action | Journal |
 |------|--------|--------|---------|
-| {name} | completed | moved to .archive/ | yes |
+| {name} | completed | moved to archive/ | yes |
 ```
 
 ### A6. Optional Commit
@@ -103,5 +103,5 @@ Ask if user wants to commit the archival changes.
 
 - NEVER touch plans with status `draft`, `in-progress`, or `pending`
 - The manual `/mk:plan archive` subcommand never archives without user confirmation. Completion-driven lifecycle archiving is separate and runs only after every plan todo is checked.
-- ALWAYS create `.archive/` directory if it doesn't exist (on move action)
+- `npx mewkit plan archive` creates `tasks/plans/archive/` if absent and fails closed if the destination already exists
 - Journal capture is optional — respect user choice

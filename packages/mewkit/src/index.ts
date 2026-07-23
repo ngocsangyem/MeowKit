@@ -21,6 +21,7 @@ import { task } from "./commands/task.js";
 import { inventory } from "./commands/inventory.js";
 import { plan } from "./commands/plan.js";
 import { planApprove } from "./commands/plan-approve.js";
+import { planArchive } from "./commands/plan-archive.js";
 import { trace } from "./commands/trace.js";
 // NOTE: index-command is imported lazily inside its case — it pulls in `node:sqlite`
 // (experimental), so a static import would load SQLite + emit its warning on EVERY command.
@@ -64,7 +65,7 @@ ${pc.bold("Commands:")}
   ${pc.green("visual-plan")} Visual plan contracts: validate|status|approve --revision <n>|rehash|export --format html|prepare-feedback --ops <f>|apply-feedback --batch <id> [--check|--receipt <f>]|patch --op <f>|edit|view <plan-dir> [--json]
   ${pc.green("review")}     High-assurance PR review ('review prepare <pr>' → session; 'review read --session <id> --as <role> <path>' → observed read; 'review coverage --session <id>' → gap gate)
   ${pc.green("inventory")}  List harness artifacts with governance metadata
-  ${pc.green("plan")}       Read-only plan inspection (status <plan-dir> | check <phase-file>)
+  ${pc.green("plan")}       Plan lifecycle: status <plan-dir> | check <phase-file> (read-only); approve <plan-dir> | archive <plan-dir> (mutating; archive marks completed + moves to tasks/plans/archive/)
   ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
   ${pc.green("wiki")}       Long-term project knowledge ('wiki context "<keywords>" [--max-pages N] [--include-content] [--json]' | init|propose|approve|search|reindex)
   ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
@@ -379,10 +380,11 @@ async function main(): Promise<void> {
 				lifecycle: args.lifecycle as boolean | undefined,
 			});
 			break;
-		case "plan":
-			// `approve` MUTATES (stamps the receipt) — route it to the separate
-			// plan-approve module so the read-only `plan` command stays write-free.
-			if ((args._[1] as string | undefined) === "approve") {
+		case "plan": {
+			// `approve` and `archive` MUTATE — route them to their own modules so the
+			// read-only `plan` command (status/check) stays write-free by construction.
+			const planSub = args._[1] as string | undefined;
+			if (planSub === "approve") {
 				await planApprove({
 					target: args._[2] as string | undefined,
 					by: args.by as string | undefined,
@@ -390,14 +392,20 @@ async function main(): Promise<void> {
 					noActivate: args.activate === false,
 					cliVersion: VERSION,
 				});
+			} else if (planSub === "archive") {
+				await planArchive({
+					target: args._[2] as string | undefined,
+					dryRun: args["dry-run"] as boolean | undefined,
+				});
 			} else {
 				await plan({
-					subcommand: args._[1] as string | undefined,
+					subcommand: planSub,
 					target: args._[2] as string | undefined,
 					json: args.json as boolean | undefined,
 				});
 			}
 			break;
+		}
 		case "inventory":
 			await inventory({
 				json: args.json as boolean | undefined,
