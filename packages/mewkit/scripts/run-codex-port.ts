@@ -8,7 +8,6 @@
 // a fresh mechanical port. It exits non-zero unless MEWKIT_PORTER_UNFREEZE=1 is set,
 // so an accidental run cannot clobber authored content. The porter is deleted only
 // after the authored bundle passes its cutover gates.
-// Context: plans/260723-1701-codex-native-bundle-implementation.
 import { rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,7 +16,7 @@ import { portAll } from "../src/migrate/modules/porter/port-claude-to-codex.js";
 if (process.env.MEWKIT_PORTER_UNFREEZE !== "1") {
 	console.error(
 		"porter frozen — the Codex bundle is hand-authored; regenerating it would overwrite authored agents/ and skills/ content.\n" +
-			"See plans/260723-1701-codex-native-bundle-implementation. Set MEWKIT_PORTER_UNFREEZE=1 to override.",
+			"Set MEWKIT_PORTER_UNFREEZE=1 to override.",
 	);
 	process.exit(1);
 }

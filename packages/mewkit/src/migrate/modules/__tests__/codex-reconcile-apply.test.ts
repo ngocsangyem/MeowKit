@@ -184,3 +184,62 @@ describe("reconcileApplyCodexBundle (integration)", () => {
 		}
 	});
 });
+
+// A manifest entry can be a whole directory (agents/, skills/) reconciled as one unit
+// via a tree checksum. These exercise that path end-to-end (the file-entry fixture above
+// never touches computeTreeChecksum through the apply).
+function makeDirModule(dir: string): void {
+	mkdirSync(join(dir, "root", ".agents", "skills", "fix"), { recursive: true });
+	mkdirSync(join(dir, "root", ".agents", "skills", "plan"), { recursive: true });
+	writeFileSync(join(dir, "root", ".agents", "skills", "fix", "SKILL.md"), "# fix\n");
+	writeFileSync(join(dir, "root", ".agents", "skills", "plan", "SKILL.md"), "# plan\n");
+	const manifest = {
+		version: "1.0",
+		provider: "codex",
+		generatedFrom: "test",
+		entries: [
+			{ sourcePath: "root/.agents/skills", targetPath: ".agents/skills", provider: "codex", mode: "0644", ownership: "managed-replace", scopeTags: ["managed-runtime"], active: false },
+		],
+	};
+	writeFileSync(join(dir, "manifest.json"), JSON.stringify(manifest, null, 2));
+}
+
+describe("reconcileApplyCodexBundle — directory (tree-hashed) entries", () => {
+	let moduleDir: string;
+	let target: string;
+	const opts = { adoptHomeRegistry: false as const };
+
+	beforeEach(() => {
+		moduleDir = mkdtempSync(join(tmpdir(), "codex-dmod-"));
+		target = mkdtempSync(join(tmpdir(), "codex-dtgt-"));
+		makeDirModule(moduleDir);
+	});
+	afterEach(() => {
+		rmSync(moduleDir, { recursive: true, force: true });
+		rmSync(target, { recursive: true, force: true });
+	});
+
+	it("installs the whole tree, then a second run writes nothing (tree checksum is stable)", async () => {
+		const first = await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
+		expect(first.writes).toBe(1);
+		expect(existsSync(join(target, ".agents", "skills", "fix", "SKILL.md"))).toBe(true);
+		expect(existsSync(join(target, ".agents", "skills", "plan", "SKILL.md"))).toBe(true);
+
+		const second = await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
+		expect(second.writes).toBe(0);
+		expect(second.entries[0]).toMatchObject({ action: "skip", reasonCode: "no-changes" });
+	});
+
+	it("preserves a user edit to a file INSIDE the installed tree (dir entry not re-copied)", async () => {
+		await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
+		writeFileSync(join(target, ".agents", "skills", "fix", "SKILL.md"), "# MY EDIT inside the tree\n");
+
+		const rerun = await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
+		expect(rerun.entries[0]).toMatchObject({ action: "skip", reasonCode: "user-edits-preserved" });
+		expect(readFileSync(join(target, ".agents", "skills", "fix", "SKILL.md"), "utf-8")).toBe("# MY EDIT inside the tree\n");
+
+		const forced = await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target, force: true });
+		expect(forced.entries[0]?.wrote).toBe(true);
+		expect(readFileSync(join(target, ".agents", "skills", "fix", "SKILL.md"), "utf-8")).toBe("# fix\n");
+	});
+});
