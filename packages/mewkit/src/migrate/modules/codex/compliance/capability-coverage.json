@@ -14,8 +14,8 @@
   },
   "ownerEnum": ["AGENTS.md", "skill", "agent", "hook", "rules", "config", ".meowkit", "cli", "omitted"],
   "concerns": [
-    { "concern": "safety-gate enforcement (gate-enforcement, privacy-block)", "owner": "hook", "status": "pending", "resolvedIn": "phase-4", "note": "Deny-capable command handlers; CLI gate remains authoritative." },
-    { "concern": "session context injection (SessionStart)", "owner": "hook", "status": "pending", "resolvedIn": "phase-4" },
+    { "concern": "safety-gate enforcement (gate-enforcement, privacy-block)", "owner": "hook", "status": "authored", "resolvedIn": "phase-4", "note": "Authored as native Codex PreToolUse deny hooks (root/.codex/hooks/{privacy-block,gate-enforcement}.cjs): privacy-block denies Bash access to sensitive files (R4); gate-enforcement denies source edits without an approved plan (Gate 1 presence; approval-receipt layer is a follow-on). Deny via hookSpecificOutput.permissionDecision. Defense-in-depth: per-hook-trust means not reliably enforced — the CLI gate stays authoritative." },
+    { "concern": "session context injection (SessionStart)", "owner": "omitted", "status": "dispositioned", "resolvedIn": "phase-4", "note": "Intentionally omitted: AGENTS.md is auto-loaded by Codex and already carries the working agreement + read-memory-at-task-start invariant, so a SessionStart re-injector would be redundant (dead-weight thesis). Revisit if a genuinely DYNAMIC per-session context need appears." },
     { "concern": "behavioral invariants / security constitution", "owner": "AGENTS.md", "status": "pending", "resolvedIn": "phase-4" },
     { "concern": "project settings, MCP servers, features", "owner": "config", "status": "pending", "resolvedIn": "phase-4" },
     { "concern": "shell prefix allow/deny policy", "owner": "rules", "status": "pending", "resolvedIn": "phase-4", "note": "Experimental, capability-gated, never sole enforcement." },

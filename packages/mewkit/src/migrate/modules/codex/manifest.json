@@ -48,6 +48,28 @@
       "active": false
     },
     {
+      "sourcePath": "root/.codex/hooks/privacy-block.cjs",
+      "targetPath": ".codex/hooks/privacy-block.cjs",
+      "provider": "codex",
+      "mode": "0755",
+      "ownership": "managed-replace",
+      "scopeTags": [
+        "managed-runtime"
+      ],
+      "active": false
+    },
+    {
+      "sourcePath": "root/.codex/hooks/gate-enforcement.cjs",
+      "targetPath": ".codex/hooks/gate-enforcement.cjs",
+      "provider": "codex",
+      "mode": "0755",
+      "ownership": "managed-replace",
+      "scopeTags": [
+        "managed-runtime"
+      ],
+      "active": false
+    },
+    {
       "sourcePath": "root/.codex/agents",
       "targetPath": ".codex/agents",
       "provider": "codex",

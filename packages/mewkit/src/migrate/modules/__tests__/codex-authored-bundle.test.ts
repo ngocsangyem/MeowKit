@@ -30,7 +30,16 @@ describe("authored codex bundle", () => {
 	it("copies every artifact (files + agents/skills trees) to its native Codex target path", () => {
 		const copied = copyAuthoredCodexBundle(moduleDir, target); // onlyActive: false
 		expect(copied.map((c) => c.targetPath).sort()).toEqual(
-			[".agents/skills", ".codex/agents", ".codex/config.toml", ".codex/hooks.json", ".codex/hooks/capture.cjs", "AGENTS.md"].sort(),
+			[
+				".agents/skills",
+				".codex/agents",
+				".codex/config.toml",
+				".codex/hooks.json",
+				".codex/hooks/capture.cjs",
+				".codex/hooks/gate-enforcement.cjs",
+				".codex/hooks/privacy-block.cjs",
+				"AGENTS.md",
+			].sort(),
 		);
 		expect(readFileSync(join(target, "AGENTS.md"), "utf-8")).toContain("Authored Codex instruction surface");
 		// Agent dir copied recursively; agents follow the real Codex subagent format
