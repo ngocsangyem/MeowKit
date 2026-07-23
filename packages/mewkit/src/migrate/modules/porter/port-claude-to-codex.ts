@@ -88,6 +88,20 @@ function tomlMultiline(body: string): string {
 	return body.replace(/\\/g, "\\\\").replace(/"{3,}/g, (m) => m.replace(/"/g, '\\"'));
 }
 
+// Codex reasoning-effort per source Claude `model:` tier. This mirrors each agent's
+// Claude model assignment into Codex's per-agent knob: Claude selects a model id
+// (opus/sonnet/haiku/fable), Codex model ids are deployment-specific so we do NOT
+// emit one, but the reasoning-effort ladder IS portable. `inherit` (and any unmapped
+// value) omits the key so the agent inherits Codex's configured default. The
+// `.claude/agents/*.md` `model:` field is the single source — re-porting reproduces
+// these values, so hand-edits to the bundle are unnecessary and would be overwritten.
+const CODEX_EFFORT_BY_MODEL: Record<string, string> = {
+	opus: "xhigh",
+	fable: "xhigh",
+	sonnet: "high",
+	haiku: "medium",
+};
+
 /** Port one `.claude/agents/<name>.md` to a Codex agent TOML. Returns null for a
  *  markdown file that is not an agent (no `name:` frontmatter — e.g. an index doc). */
 export function portAgent(srcMd: string): { name: string; toml: string } | null {
@@ -98,9 +112,8 @@ export function portAgent(srcMd: string): { name: string; toml: string } | null 
 	const description = neutralize(flattenDescription(fm.description));
 	const di = neutralize(body.trim());
 	const lines = [`name = ${JSON.stringify(name)}`, `description = ${JSON.stringify(description)}`];
-	const crit = String(fm.criticality ?? "");
-	if (crit === "high") lines.push(`model_reasoning_effort = "high"`);
-	else if (crit === "low") lines.push(`model_reasoning_effort = "low"`);
+	const effort = CODEX_EFFORT_BY_MODEL[String(fm.model ?? "").trim().toLowerCase()];
+	if (effort) lines.push(`model_reasoning_effort = ${JSON.stringify(effort)}`);
 	lines.push(`developer_instructions = """\n${tomlMultiline(di)}\n"""`);
 	return { name, toml: `${lines.join("\n")}\n` };
 }

@@ -30,12 +30,12 @@ describe("neutralize", () => {
 });
 
 describe("portAgent", () => {
-	it("emits a real Codex agent TOML (name/description/developer_instructions)", () => {
+	it("emits a real Codex agent TOML with effort derived from the model tier", () => {
 		const md = [
 			"---",
 			"name: researcher",
 			"description: Research agent for libraries.",
-			"criticality: high",
+			"model: opus",
 			"runtime: claude-code",
 			"---",
 			"",
@@ -47,10 +47,19 @@ describe("portAgent", () => {
 		expect(name).toBe("researcher");
 		expect(toml).toContain('name = "researcher"');
 		expect(toml).toContain('description = "Research agent for libraries."');
-		expect(toml).toContain('model_reasoning_effort = "high"');
+		// model tier → Codex reasoning effort: opus/fable → xhigh, sonnet → high, haiku → medium.
+		expect(toml).toContain('model_reasoning_effort = "xhigh"');
 		expect(toml).toContain("developer_instructions = \"\"\"");
 		expect(toml).toContain(".meowkit/memory"); // memory path rewritten
 		expect(toml).not.toContain(".claude/memory");
+	});
+
+	it("omits reasoning effort for an `inherit` agent (inherits Codex's default)", () => {
+		const md = ["---", "name: planner", "description: Plans work.", "model: inherit", "---", "", "You plan."].join(
+			"\n",
+		);
+		const toml = portAgent(md)!.toml;
+		expect(toml).not.toContain("model_reasoning_effort");
 	});
 });
 

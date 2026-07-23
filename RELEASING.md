@@ -157,7 +157,7 @@ surface against the source of truth before porting:
 
 | `.claude/` surface | Codex shape | Notes |
 | --- | --- | --- |
-| `agents/*.md` | `.codex/agents/<name>.toml` | `name` + `description` + `developer_instructions` (+ optional `model_reasoning_effort`, `sandbox_mode`); Codex auto-loads them — NO `config.toml` `config_file` wiring |
+| `agents/*.md` | `.codex/agents/<name>.toml` | `name` + `description` + `developer_instructions`; `model_reasoning_effort` is DERIVED from the agent's `model:` tier (opus/fable → `xhigh`, sonnet → `high`, haiku → `medium`; `inherit` omits it) — do NOT hand-edit it, the porter regenerates it. Codex auto-loads them — NO `config.toml` `config_file` wiring |
 | `skills/<name>/` | `.agents/skills/<name>/SKILL.md` | Codex uses the SAME `SKILL.md` (name + description frontmatter); references/scripts copied |
 | `commands/**` | `.agents/skills/command-<name>/` | Codex has no command surface → represented as skills |
 | `rules/*`, `rules-conditional/*` | `.agents/skills/rule-<name>/` | Codex native `.rules` are Starlark command policies, NOT markdown guidance → guidance rules become skills |

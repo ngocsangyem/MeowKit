@@ -42,7 +42,7 @@ npx mewkit task new --type feature "Add user authentication"
 ## How it works
 
 `npx mewkit init` is a **scaffold + update** tool:
-- **First run:** copies the full MeowKit system (agents, skills, hooks, rules, commands, modes, scripts) into `.claude/`
-- **Subsequent runs:** smart update — overwrites unchanged core files, skips user-modified files, adds new files
+- **First run:** opens a toolkit picker (Claude Code / Codex / Cursor, Claude Code preselected), then copies the full MeowKit system (agents, skills, hooks, rules, commands, modes, scripts) into `.claude/` for each selected provider. `--target <provider>` skips the picker.
+- **Subsequent runs:** smart update — overwrites unchanged core files, skips user-modified files, adds new files (no picker)
 
 `mewkit` is a **runtime toolbox** for daily use — diagnostics, setup, task management, and cost tracking with session/day filtering in `budget`.

@@ -13,6 +13,17 @@ The orchestrator classifies every task by complexity before work begins. `mk:sca
 | Standard | Sonnet | Feature (\<5 files), bug fix, test writing |
 | Complex | Opus | Architecture, security audit, auth, payments |
 
+## Per-agent routing (subagents)
+
+The table above governs the **session** model by task complexity. **Subagents** instead carry a fixed model assignment in their definition, and each provider expresses it natively:
+
+| Provider | Where | How |
+|---|---|---|
+| Claude Code | `.claude/agents/<name>.md` frontmatter | `model:` — `opus` / `sonnet` / `haiku` / `fable` / `inherit` |
+| Codex | `.codex/agents/<name>.toml` | `model_reasoning_effort`, derived from the agent's Claude `model:` tier: opus/fable → `xhigh`, sonnet → `high`, haiku → `medium`; `inherit` omits it and inherits Codex's default |
+
+The Codex value is derived from `model:` at migration time (`.claude/agents/*.md` is the single source), so the two providers stay in sync. Codex model **ids** are deployment-specific and are never hardcoded — only the portable reasoning-effort ladder is written.
+
 ## Escalation rules
 
 - **Always Complex:** authentication, payment processing, database schema, security audit

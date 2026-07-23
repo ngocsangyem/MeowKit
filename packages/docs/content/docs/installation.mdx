@@ -16,30 +16,34 @@ description: "Install MeowKit and get it running in your project."
 npx mewkit init
 ```
 
-The CLI asks two optional questions then generates a `.claude/` directory with everything configured.
+On a fresh install, `mewkit init` first asks which toolkits to set up — a multiselect of **Claude Code** (preselected), **Codex**, and **Cursor** — then provisions each: Claude Code generates the `.claude/` directory, Codex copies the authored Codex bundle, Cursor installs `.claude/` and exports it to `.cursor/`. Selecting only Codex yields a codex-only project.
 
 ### Interactive setup
 
-The CLI asks two questions:
+On a fresh install the CLI prompts, in order:
 
-| Question | Default |
-|----------|---------|
+| Prompt | Default |
+|--------|---------|
+| Toolkits — multiselect (Claude Code / Codex / Cursor) | Claude Code preselected |
+| Install profile | `full` |
 | Project description (optional) | skipped |
 | Gemini API key (optional) | skipped |
 
-All other settings use fixed defaults: cost tracking enabled, memory enabled, mode set to `balanced`. Stack detection is not performed.
+All other settings use fixed defaults: cost tracking enabled, memory enabled, mode set to `balanced`. Stack detection is not performed. In **update mode** (an existing `.claude/`), the toolkit picker is skipped and init just refreshes `.claude/`.
 
 ### CLI flags
 
 Skip the interactive prompts with flags:
 
 ```bash
-npx mewkit init -- --mode strict     # Set mode directly
-npx mewkit init -- --no-memory        # Disable memory
-npx mewkit init -- --force            # Overwrite existing .claude/
-npx mewkit init -- --dry-run          # Preview without writing
-npx mewkit init -- --global           # Install as global config
+npx mewkit init --target codex     # Skip the picker — Codex-only toolkit
+npx mewkit init --target cursor    # Skip the picker — .claude/ + export to Cursor
+npx mewkit init --force            # Overwrite existing .claude/
+npx mewkit init --dry-run          # Preview without writing
+npx mewkit init --profile core     # Install a right-sized profile subset
 ```
+
+Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that flow directly.
 
 ## What gets generated
 
