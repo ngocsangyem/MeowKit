@@ -10,7 +10,7 @@ The `mewkit migrate` command exports your `.claude/` kit to 2 external coding-ag
 | Scenario | Command |
 |----------|---------|
 | Just ran `mewkit init`, want Cursor to see the kit too | `mewkit migrate cursor` |
-| Set up a fresh project for both Cursor and Codex in one shot | `mewkit init --migrate-to cursor,codex` |
+| Create a Codex-only toolkit (from the authored bundle, no `.claude/`) | `mewkit init --target codex` |
 | Have both coding agents installed and want them in sync | `mewkit migrate --all` |
 | Just ran `mewkit upgrade`, need to propagate changes to external tools | `mewkit migrate TOOL` (re-runs are idempotent) |
 | Want to check what would happen before writing | `mewkit migrate TOOL --dry-run` |
@@ -54,14 +54,11 @@ Every preserved reference appears in the preflight/dry-run report with `file:lin
 ### One-shot scaffold + export
 
 ```bash
-# Fresh project, scaffold and export to Cursor in one command
-npx mewkit init --migrate-to cursor
+# Codex-only toolkit — copies the authored Codex bundle, no .claude/
+npx mewkit init --target codex
 
-# Both tools at once
-npx mewkit init --migrate-to cursor,codex
-
-# All supported tools (CI-friendly)
-npx mewkit init --migrate-to all
+# Cursor toolkit — unpack .claude/, then export to Cursor
+npx mewkit init --target cursor
 ```
 
 ### Standalone after init
@@ -185,7 +182,7 @@ mewkit migrate cursor
 mewkit migrate cursor --global
 
 # Init + migrate to global
-mewkit init --migrate-to cursor --migrate-global
+mewkit init --target cursor --migrate-global
 ```
 
 **Rule of thumb:** project scope keeps the kit confined to one repo. Global scope is for users who want every project on their machine to share the same Cursor/Codex config.
@@ -245,7 +242,7 @@ npx mewkit upgrade --beta    # latest beta
 npx mewkit upgrade --check   # show available without installing
 ```
 
-After upgrading mewkit, your `.claude/` kit content does NOT change. Run `mewkit init` (in a fresh dir) or `mewkit upgrade` (to refresh the kit) — both flows can chain `--migrate-to TOOL` to update external tools.
+`mewkit upgrade` refreshes the `.claude/` kit **and** automatically re-exports to any installed provider toolkit it detects (`.cursor/`, `.codex/`), so a single `upgrade` moves the whole install together. In a codex-only project (`init --target codex`, no `.claude/`), `upgrade` refreshes the authored Codex bundle instead. To scaffold a provider toolkit fresh, use `mewkit init --target <provider>`.
 
 ## See also
 

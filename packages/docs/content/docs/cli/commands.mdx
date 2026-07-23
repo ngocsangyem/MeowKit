@@ -512,30 +512,31 @@ A PID-based file lock at `SCOPE/.mewkit/.lock` blocks two `mewkit migrate` runs 
 
 ## init --migrate (one-shot scaffold + export)
 
-`mewkit init` accepts three migrate-related flags so you can scaffold AND export in a single command.
+`mewkit init` accepts `--target` so you can scaffold a provider toolkit directly, plus an interactive picker.
 
 ```bash
-# Interactive picker after kit unpacks
+# Codex-only toolkit — copies the authored Codex bundle (no .claude/)
+npx mewkit init --target codex
+
+# Cursor toolkit — unpacks .claude/ then exports to Cursor
+npx mewkit init --target cursor
+
+# Interactive picker after the kit unpacks
 npx mewkit init --migrate
 
-# Pre-set tools, no picker
-npx mewkit init --migrate-to cursor,codex
-
-# Both supported tools
-npx mewkit init --migrate-to all
-
 # Global install scope
-npx mewkit init --migrate-to cursor --migrate-global
+npx mewkit init --target cursor --migrate-global
 ```
 
-| Flag                      | Description                                                                   |
-| ------------------------- | ----------------------------------------------------------------------------- |
-| `--migrate`               | After unpack, prompt for providers via interactive multiselect (TTY required) |
-| `--migrate-to <csv\|all>` | After unpack, export to listed providers (`cursor,codex` or `all`)            |
-| `--migrate-global`        | Use global install paths (`~/.cursor/`, etc.) instead of project-local        |
+| Flag                  | Description                                                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--target <provider>` | Create a provider toolkit. `codex` copies the authored Codex bundle (codex-only, no `.claude/`); any other provider (e.g. `cursor`) unpacks `.claude/` then exports to it |
+| `--migrate`           | After unpack, prompt for providers via interactive multiselect (TTY required)                                                                     |
+| `--migrate-global`    | Use global install paths (`~/.cursor/`, etc.) instead of project-local                                                                            |
 
 **Behavior:**
 
-- Migration runs after kit unpacks successfully — failures don't roll back the kit install. If migration fails, init still completes; re-run `mewkit migrate` to retry.
+- `--target codex` is offline: it copies the Codex bundle shipped in the package — no release download, no `.claude/`, no conversion. It fails closed if `AGENTS.md` already exists (re-run with `--force`).
+- For non-codex targets, export runs after the kit unpacks; failures don't roll back the kit install — re-run `mewkit migrate` to retry.
 - Init uses the same orchestrator, registry, and reconciler as the standalone `migrate` command. Idempotent re-runs work the same way.
-- `--migrate-to` implies `--yes` (non-interactive), so it's safe to use in CI scripts.
+- `--target` implies `--yes` (non-interactive) for the export step, so it's safe in CI scripts.

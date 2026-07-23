@@ -24,7 +24,9 @@ Project state moves out of the provider directory into a runtime-neutral `.meowk
 ### CLI
 
 - Added `mewkit memory capture` — routes a `##pattern` / `##decision` / `##note` prompt into the right `.meowkit/memory` store through the write contract.
-- Removed `mewkit build-plugin` and `mewkit validate --plugin` / `--parity`.
+- Added `mewkit init --target <provider>` — `--target codex` creates a Codex-only project by copying the authored Codex bundle shipped in the package (no `.claude/`, no conversion); other providers unpack `.claude/` then export. Replaces the old `--migrate-to`.
+- `mewkit upgrade` now propagates to installed provider toolkits (`.cursor/`, `.codex/`) after refreshing `.claude/`, and refreshes the authored bundle in a codex-only project.
+- Removed `mewkit build-plugin`, `mewkit validate --plugin` / `--parity`, and `init --migrate-to`.
 
 ### Removals
 
