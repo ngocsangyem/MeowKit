@@ -99,9 +99,12 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 		expect(configToml).not.toContain("sk-do-not-leak-phase7");
 		expect(configToml).not.toContain("JIRA_API_TOKEN");
 
+		// No modelRouting override mechanism: a known source tier has no target model
+		// id (deployment-specific), so the converter discloses it as a commented hint
+		// and the target inherits its own configured default.
 		const plannerToml = readFileSync(join(env.projectDir, ".codex", "agents", "planner.toml"), "utf-8");
-		expect(plannerToml).toContain('model = "codex-heavy"');
-		expect(plannerToml).toContain('model_reasoning_effort = "xhigh"');
+		expect(plannerToml).toContain('# model = "opus"');
+		expect(plannerToml).not.toContain('model_reasoning_effort');
 		expect(readReport().header.secretKeysOmitted).toBe(1);
 	});
 

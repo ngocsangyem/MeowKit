@@ -111,10 +111,10 @@ ${pc.bold("Init flags:")}
   --profile <name>           Install a subset: core|developer|product|atlassian|security|research|full
                              (default full). In update mode, trims an install down to the profile.
 
-${pc.bold("Init flags for post-init migration:")}
-  --target <provider>        Create a provider toolkit: 'codex' copies the authored Codex bundle
-                             (codex-only, no .claude/); 'cursor' unpacks .claude/ then exports to it
-  --migrate                  After unpack, prompt for providers to export to (interactive)
+${pc.bold("Init flags (a bare fresh 'init' shows a Claude Code / Codex / Cursor picker):")}
+  --target <provider>        Skip the picker; create one toolkit: 'codex' copies the authored Codex
+                             bundle (codex-only, no .claude/); 'cursor' unpacks .claude/ then exports
+  --migrate                  Skip the picker; after unpack, prompt for export targets (interactive)
   --migrate-global           Use global install paths (~/.cursor/, etc.) instead of project-local
 
 ${pc.bold("visual-plan flags:")}

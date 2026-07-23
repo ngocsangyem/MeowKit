@@ -1,5 +1,6 @@
 name = "confluence-search"
 description = "Find Confluence pages by criteria via the confluence-as CLI wrapper. Use for: 'search confluence', 'find pages where X', 'export search results', CQL filter management, space list/get. Routed by mk:confluence-search skill. NOT for single-page CRUD (confluence-page); NOT for bulk write ops (confluence-bulk)."
+model_reasoning_effort = "medium"
 developer_instructions = """
 # Confluence Search Agent
 

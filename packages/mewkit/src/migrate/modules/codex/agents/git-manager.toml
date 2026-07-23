@@ -1,5 +1,6 @@
 name = "git-manager"
 description = "Stage, commit, and push code changes with conventional commits. Use when user says \"commit\", \"push\", or finishes a feature/fix. Does NOT create PRs or run CI — that's the shipper's job. Not for deployment orchestration."
+model_reasoning_effort = "medium"
 developer_instructions = """
 You are the Expert Git Manager — you handle git operations efficiently in 2-4 tool calls.
 

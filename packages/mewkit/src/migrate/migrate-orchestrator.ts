@@ -55,7 +55,6 @@ import { installSkillDirectory } from "./skill-directory-installer.js";
 import { buildInstalledBackRef, type InstalledBackRef } from "../core/install-metadata-backref.js";
 import { installCodexAgents, mergeHooksSettings } from "./hooks/index.js";
 import { installCodexCapabilityProjection } from "./capability-bootstrap-projection.js";
-import { loadModelRoutingConfig } from "./model-routing-config.js";
 import { printActionDetails, printFinalSummary, printPreflight, printReportPath } from "./migrate-ui-summary.js";
 import {
 	collectProviderContractDiagnostics,
@@ -90,7 +89,6 @@ export async function runMigrate(options: MigrateOptions, ctx: RunMigrateContext
 	const targets = await selectProviders(options);
 	warnUnverifiedProviders(targets);
 	const isGlobal = await selectScope(options);
-	const modelRouting = await loadModelRoutingConfig();
 
 	const lockResult = await acquireMigrationLock({ scope: isGlobal ? "global" : "project" });
 	if (!lockResult.acquired) {
@@ -99,7 +97,7 @@ export async function runMigrate(options: MigrateOptions, ctx: RunMigrateContext
 	}
 
 	try {
-		return await runMigrateUnderLock(options, ctx, scope, targets, isGlobal, modelRouting.warnings);
+		return await runMigrateUnderLock(options, ctx, scope, targets, isGlobal);
 	} finally {
 		await releaseMigrationLock(lockResult.lockPath);
 	}
@@ -111,7 +109,6 @@ async function runMigrateUnderLock(
 	scope: ReturnType<typeof resolveMigrationScope>,
 	targets: ProviderType[],
 	isGlobal: boolean,
-	modelRoutingWarnings: string[],
 ): Promise<number> {
 	const spinner = process.stdout.isTTY ? p.spinner() : null;
 	spinner?.start("Discovering portable items...");
@@ -218,7 +215,6 @@ async function runMigrateUnderLock(
 		(c) =>
 			`Shared target: ${c.path} (${c.portableType}) used by ${c.providers.join(" + ")} — each provider writes the same content here`,
 	);
-	const modelRoutingBanners = modelRoutingWarnings.map((warning) => `Model routing: ${warning}`);
 	const manifestCleanupCount = portabilityFiltered.plan.actions.filter(
 		(action) => action.reasonCode === "renamed-cleanup" || action.reasonCode === "path-migrated-cleanup",
 	).length;
@@ -241,7 +237,6 @@ async function runMigrateUnderLock(
 		skippedShellHooks: discovered.skippedShellHooks.length,
 		bannerExtras: [
 			...collisionBanners,
-			...modelRoutingBanners,
 			...manifestBanners,
 			...mcpBanners,
 			...portabilityFiltered.skipMessages,

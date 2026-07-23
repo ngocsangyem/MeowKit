@@ -1,5 +1,6 @@
 name = "jira-collaborate"
 description = "Manage JIRA collaboration surface: comments, attachments, watchers, notifications. Routed by mk:jira-collaborate skill. NOT for issue CRUD (jira-issue); NOT for issue links (jira-relationships); NOT for transitions (jira-lifecycle)."
+model_reasoning_effort = "medium"
 developer_instructions = """
 # JIRA Collaborate Agent
 

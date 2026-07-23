@@ -24,11 +24,11 @@ const SOURCE_TIER_MAP: Record<string, ModelTier> = {
  * ORTHOGONAL to `ModelTier`.
  *
  * Why not a tier: a tier answers "how much capability does this task need",
- * and every consumer maps the closed `ModelTier` union exhaustively
- * (`Record<ModelTier, …>` in model-routing-config.ts). Growing that union to
- * express "this specific model" would compile-break every such map and conflate
- * two different questions. A profile answers "this named model specifically" —
- * so it resolves first and leaves the tier ladder untouched.
+ * and a consumer that mapped the closed `ModelTier` union exhaustively
+ * (`Record<ModelTier, …>`) would compile-break if the union grew to express
+ * "this specific model" — conflating two different questions. A profile answers
+ * "this named model specifically" — so it resolves first and leaves the tier
+ * ladder untouched.
  *
  * Why not `if (model === "fable")` next to resolveModel: a one-off branch is a
  * parallel schema that the next named profile has to copy. A table means the
@@ -37,10 +37,8 @@ const SOURCE_TIER_MAP: Record<string, ModelTier> = {
 export interface ModelProfile {
 	/** The verified runtime identifier on providers that support it. */
 	identifier: string;
-	/** Providers that resolve this profile natively. Everything else falls back. */
+	/** Providers that resolve this profile natively. Everything else inherits its own default. */
 	supportedProviders: readonly string[];
-	/** Tier used for the DISCLOSED fallback on unsupported providers. */
-	fallbackTier: ModelTier;
 	/** How `identifier` was verified — so a rename is traceable, not archaeology. */
 	evidence: string;
 }
@@ -58,7 +56,6 @@ const NAMED_PROFILES: Record<string, ModelProfile> = {
 		// ProviderType is a different vendor's host: asserting they can run a
 		// Claude model would be an over-claim, so they take the disclosed fallback.
 		supportedProviders: ["claude-code"],
-		fallbackTier: "heavy",
 		evidence: "claude-api skill model table (cached 2026-06-24) + its shared/models.md — exact id, no date suffix",
 	},
 };
@@ -67,39 +64,21 @@ const NAMED_PROFILES: Record<string, ModelProfile> = {
  * Resolve a named profile for a target provider.
  *
  * Two honest outcomes, never a third: the provider supports the profile and gets
- * the verified identifier, or it does not and gets a fallback that SAYS SO.
- * Silently substituting a different model would mean a skill that asked for a
- * specific model quietly ran on another one.
+ * the verified identifier, or it does not and inherits its own configured default
+ * with a disclosed note. Silently substituting a different model would mean a skill
+ * that asked for a specific model quietly ran on another one.
  */
 function resolveNamedProfile(name: string, profile: ModelProfile, targetProvider: string): ModelResolveResult {
 	if (profile.supportedProviders.includes(targetProvider)) {
 		return { resolved: { model: profile.identifier } };
 	}
 
-	const fallback = userOverrides?.[targetProvider]?.[profile.fallbackTier];
-	if (fallback) {
-		return {
-			resolved: fallback,
-			warning:
-				`Model profile "${name}" (${profile.identifier}) is not available on ${targetProvider} — ` +
-				`falling back to the configured "${profile.fallbackTier}" model "${fallback.model}". ` +
-				`This is a substitution, not an equivalent.`,
-		};
-	}
-
 	return {
 		resolved: null,
 		warning:
-			`Model profile "${name}" (${profile.identifier}) is not available on ${targetProvider}, ` +
-			`and no "${profile.fallbackTier}" model is configured for it — the target will inherit its default. ` +
-			`To pin one, set modelRouting.providers.${targetProvider}.tiers.${profile.fallbackTier} in .meowkit.config.json.`,
+			`Model profile "${name}" (${profile.identifier}) is not available on ${targetProvider} — ` +
+			`the target inherits its own configured default model. Edit the generated agent file to pin one.`,
 	};
-}
-
-let userOverrides: Record<string, Record<string, ResolvedModel>> | undefined;
-
-export function setTaxonomyOverrides(overrides: Record<string, Record<string, ResolvedModel>> | undefined): void {
-	userOverrides = overrides;
 }
 
 export function resolveModel(sourceModel: string | undefined, targetProvider: string): ModelResolveResult {
@@ -125,12 +104,8 @@ export function resolveModel(sourceModel: string | undefined, targetProvider: st
 		return { resolved: null, warning: `Unknown model "${trimmed}" — not in taxonomy, commented out` };
 	}
 
-	const overrideMap = userOverrides?.[targetProvider];
-	if (overrideMap) {
-		const override = overrideMap[tier];
-		if (override) return { resolved: override };
-	}
-
+	// The source tier is known, but target model ids are provider- and
+	// deployment-specific, so the target inherits its own configured default.
 	return {
 		resolved: null,
 		warning: `No configured ${targetProvider} model for source tier "${trimmed}" — target will inherit its default`,
@@ -145,10 +120,6 @@ export function listModelProfiles(): ReadonlyArray<{ name: string; profile: Mode
 /** True when `targetProvider` resolves `name` natively (vs. taking a disclosed fallback). */
 export function providerSupportsProfile(name: string, targetProvider: string): boolean {
 	return NAMED_PROFILES[name]?.supportedProviders.includes(targetProvider) ?? false;
-}
-
-export function resolveProviderDefaultModel(targetProvider: string): ResolvedModel | null {
-	return userOverrides?.[targetProvider]?.default ?? null;
 }
 
 export function rewriteConfiguredModelReferences(content: string, targetProvider: string): string {

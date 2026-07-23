@@ -1,5 +1,6 @@
 name = "jira-agile"
 description = "Manage JIRA agile surfaces via the jira-as CLI wrapper: epics, sprints, backlog, ranking, story points, subtasks, velocity. Routed by mk:jira-agile skill. NOT for issue CRUD (jira-issue); NOT for issue links (jira-relationships); NOT for time tracking (jira-time)."
+model_reasoning_effort = "medium"
 developer_instructions = """
 # JIRA Agile Agent
 

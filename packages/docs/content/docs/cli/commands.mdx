@@ -412,29 +412,15 @@ npx mewkit migrate                    # interactive multiselect
 
 ### Model routing
 
-`mewkit migrate` reads model routing from project config before converting agents and commands:
+Model routing is **per agent**, not a central config block. The Codex authored bundle bakes
+`model_reasoning_effort` into each `.codex/agents/*.toml`, derived from the source Claude tier
+(`opus`/`fable` → `xhigh`, `sonnet` → `high`, `haiku` → `medium`; `inherit` agents omit it and
+inherit Codex's default). `model` is left unset because Codex model ids are deployment-specific —
+pin one by editing the agent TOML or via a Codex config profile.
 
-1. `.meowkit.config.json`
-2. `.claude/meowkit.config.json` (legacy fallback)
-3. Target-agent defaults when no config is present
-
-The migration maps Claude source tiers (`opus`, `sonnet`, `haiku`) to configured target tiers (`heavy`, `balanced`, `light`). It does not ship target model IDs in code. If a provider/tier is missing, the migrated item inherits the target agent's default model.
-
-```json
-{
-  "modelRouting": {
-    "providers": {
-      "codex": {
-        "tiers": {
-          "heavy": { "model": "your-codex-heavy-model", "reasoningEffort": "xhigh" },
-          "balanced": { "model": "your-codex-balanced-model", "reasoningEffort": "high" },
-          "light": { "model": "your-codex-light-model", "reasoningEffort": "medium" }
-        }
-      }
-    }
-  }
-}
-```
+`mewkit migrate` maps Claude source tiers (`opus`, `sonnet`, `haiku`) but ships no target model
+IDs in code. When a tier has no Codex model id, the converted agent discloses the source model as
+a commented hint and inherits the target agent's default.
 
 ### Capability matrix
 
@@ -510,19 +496,22 @@ A `mewkit upgrade` followed by `mewkit migrate cursor` propagates kit updates to
 
 A PID-based file lock at `SCOPE/.mewkit/.lock` blocks two `mewkit migrate` runs from racing on the same registry. Stale locks (dead PID) are auto-cleared after 60 seconds.
 
-## init --migrate (one-shot scaffold + export)
+## init — provider selection & one-shot export
 
-`mewkit init` accepts `--target` so you can scaffold a provider toolkit directly, plus an interactive picker.
+On a **fresh install** with no provider flag, `mewkit init` opens a provider multiselect —
+**Claude Code** (checked by default), **Codex**, **Cursor** — and provisions each picked
+toolkit. Any explicit provider intent (`--target <provider>` or `--migrate`) skips the picker
+and keeps its own flow.
 
 ```bash
-# Codex-only toolkit — copies the authored Codex bundle (no .claude/)
+# Fresh install → provider multiselect (Claude Code preselected)
+npx mewkit init
+
+# Skip the picker — Codex-only toolkit (copies the authored Codex bundle, no .claude/)
 npx mewkit init --target codex
 
-# Cursor toolkit — unpacks .claude/ then exports to Cursor
+# Skip the picker — Cursor toolkit (unpacks .claude/ then exports to Cursor)
 npx mewkit init --target cursor
-
-# Interactive picker after the kit unpacks
-npx mewkit init --migrate
 
 # Global install scope
 npx mewkit init --target cursor --migrate-global
@@ -530,9 +519,17 @@ npx mewkit init --target cursor --migrate-global
 
 | Flag                  | Description                                                                                                                                        |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--target <provider>` | Create a provider toolkit. `codex` copies the authored Codex bundle (codex-only, no `.claude/`); any other provider (e.g. `cursor`) unpacks `.claude/` then exports to it |
-| `--migrate`           | After unpack, prompt for providers via interactive multiselect (TTY required)                                                                     |
+| `--target <provider>` | Skip the picker and create one provider toolkit. `codex` copies the authored Codex bundle (codex-only, no `.claude/`); any other provider (e.g. `cursor`) unpacks `.claude/` then exports to it |
+| `--migrate`           | After unpack, prompt for export targets via the standalone migrate multiselect (TTY required)                                                     |
 | `--migrate-global`    | Use global install paths (`~/.cursor/`, etc.) instead of project-local                                                                            |
+
+**Provider multiselect** (fresh install, no `--target`):
+
+- **Claude Code** → installs the `.claude/` kit from the latest release (today's behavior).
+- **Codex** → copies the authored Codex bundle (`AGENTS.md`, `.codex/`, `.agents/skills/`); non-fatal if it can't (warns and continues).
+- **Cursor** → installs `.claude/` (needed as the export source) then exports to `.cursor/`.
+- Selecting **only Codex** yields a codex-only project — no release download, no `.claude/`.
+- The picker is shown for **new installs only** and only when no provider flag is passed. In update mode (existing `.claude/`), init refreshes `.claude/` without prompting; use `mewkit upgrade` to propagate to installed provider toolkits.
 
 **Behavior:**
 

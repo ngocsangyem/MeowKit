@@ -1,5 +1,6 @@
 name = "jira-dev"
 description = "Generate developer artifacts from JIRA tickets via the jira-as CLI wrapper: branch names, PR descriptions, parsed commits, commit/PR-to-issue links. Routed by mk:jira-dev skill. NOT for executing git/gh commands (mk:ship); NOT for issue CRUD (jira-issue)."
+model_reasoning_effort = "medium"
 developer_instructions = """
 # JIRA Dev Agent
 

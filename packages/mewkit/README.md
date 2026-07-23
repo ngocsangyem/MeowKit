@@ -5,8 +5,8 @@ CLI for [MeowKit](https://github.com/ngocsangyem/MeowKit) — scaffold, migrate,
 ## Install
 
 ```bash
-npx mewkit init                  # scaffold the Claude Code kit (.claude/) here
-npx mewkit init --target codex   # scaffold a Codex-native toolkit instead
+npx mewkit init                  # provider picker (Claude Code / Codex / Cursor), then scaffold
+npx mewkit init --target codex   # skip the picker — scaffold a Codex-native toolkit
 npx mewkit <command>             # runtime commands (see below)
 ```
 
@@ -31,7 +31,7 @@ npx mewkit <command>             # runtime commands (see below)
 
 ## Init & targets
 
-`mewkit init` installs the Claude Code kit (`.claude/`, `tasks/`, `CLAUDE.md`) from the latest GitHub release.
+On a fresh install, `mewkit init` opens a provider multiselect — **Claude Code** (preselected), **Codex**, **Cursor** — and provisions each picked toolkit (Claude Code installs `.claude/` from the latest GitHub release). `--target` skips the picker.
 
 - **`mewkit init --target codex`** — create a Codex-only project by copying the authored Codex bundle (`AGENTS.md`, `.codex/{config.toml,agents,hooks.json,hooks}`, `.agents/skills/`). No `.claude/`, no conversion.
 - **`mewkit init --target cursor`** — unpack `.claude/`, then export to Cursor.

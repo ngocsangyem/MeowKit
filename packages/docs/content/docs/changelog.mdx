@@ -22,11 +22,13 @@ Project state moves out of the provider directory into a runtime-neutral `.meowk
 - **Runtime-neutral `.meowkit/` state root** — `memory/`, `telemetry/`, `state/`, `cache/`, `migrations/`. Every structured memory write goes through one validated contract (schema → secret scrub → injection scan → per-store lock → atomic replace). `mewkit memory` now reads/writes `.meowkit/memory`.
 - **Safe legacy-memory migration** — `mewkit migrate` runs a read-only preflight, then a locked, staged, atomic transaction that relocates `.claude/memory/` into `.meowkit/` (unknown files preserved under `memory/legacy/`). Conflicts abort; nothing is overwritten or merged silently; a recoverable archive is kept; `--dry-run` makes zero changes. `mewkit doctor --state` reports post-migration legacy-path drift.
 - **Authored Codex bundle** — `mewkit migrate codex` copies a hand-authored, Codex-native bundle (agents as `.codex/agents/*.toml`; skills/commands/rules/modes as `.agents/skills/*/SKILL.md`; hooks as `.codex/hooks.json`) instead of a runtime transform.
+- **Per-agent Codex model routing** — every authored `.codex/agents/*.toml` now carries `model_reasoning_effort` derived from the source Claude tier (opus/fable → `xhigh`, sonnet → `high`, haiku → `medium`; `inherit` agents omit it and inherit Codex's default), mirroring how each `.claude/agents/*.md` declares its `model:`. `model` is left unset (Codex model ids are deployment-specific).
 
 ### CLI
 
 - Added `mewkit memory capture` — routes a `##pattern` / `##decision` / `##note` prompt into the right `.meowkit/memory` store through the write contract.
 - Added `mewkit init --target <provider>` — `--target codex` creates a Codex-only project by copying the authored Codex bundle shipped in the package (no `.claude/`, no conversion); other providers unpack `.claude/` then export. Replaces the old `--migrate-to`.
+- **`mewkit init` provider multiselect** — a fresh install without `--target` now opens a picker (**Claude Code** preselected, **Codex**, **Cursor**) and provisions each selected toolkit: Claude Code → `.claude/`, Codex → authored bundle, Cursor → `.claude/` + export. Codex-only selection yields a codex-only project (no release download). Shown on new installs only; `--target` bypasses it.
 - `mewkit upgrade` now propagates to installed provider toolkits (`.cursor/`, `.codex/`) after refreshing `.claude/`, and refreshes the authored bundle in a codex-only project.
 - Removed `mewkit build-plugin`, `mewkit validate --plugin` / `--parity`, and `init --migrate-to`.
 
@@ -34,6 +36,7 @@ Project state moves out of the provider directory into a runtime-neutral `.meowk
 
 - **Migration targets reduced from 16 to 3** — only `codex` and `cursor` remain as targets (`claude-code` is the source format). Removed: amp, antigravity, cline, droid, gemini-cli, github-copilot, goose, kilo, kiro, openhands, opencode, roo, windsurf.
 - **Native plugin distribution retired** — `plugin/`, the Claude/Codex marketplaces, and `mewkit build-plugin` are gone. Install via `npx mewkit init` (or `npx mewkit upgrade`); there is no marketplace / plugin-install path.
+- **`modelRouting` config removed** — the unused root-config block and the migrate per-provider model-override mechanism (`.meowkit.config.json` → `modelRouting.providers.<tool>.tiers`) are gone. Model routing is now per agent: Claude Code via each agent's `model:` frontmatter, Codex via each agent TOML's baked `model_reasoning_effort`. The authored bundle is the single source; edit an agent TOML or use a Codex config profile to pin a model.
 
 ## 2.14.5 (2026-07-20) — High-Assurance PR Review
 

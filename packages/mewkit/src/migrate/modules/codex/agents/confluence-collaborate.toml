@@ -1,5 +1,6 @@
 name = "confluence-collaborate"
 description = "Manage Confluence collaboration surface: comments, attachments, labels, watchers. Routed by mk:confluence-collaborate skill. NOT for page CRUD (confluence-page); NOT for bulk ops (confluence-bulk)."
+model_reasoning_effort = "medium"
 developer_instructions = """
 # Confluence Collaborate Agent
 

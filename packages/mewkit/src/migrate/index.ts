@@ -6,7 +6,6 @@ export * from "./provider-registry-utils.js";
 export * from "./provider-overrides.js";
 export * from "./provider-documentation-contracts.js";
 export * from "./model-taxonomy.js";
-export * from "./model-routing-config.js";
 export * from "./codex-capabilities.js";
 export * as ir from "./ir/index.js";
 export * as discovery from "./discovery/index.js";

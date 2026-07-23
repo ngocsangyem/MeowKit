@@ -19,7 +19,8 @@ import { promptAndInstallSystemDeps } from "./setup.js";
 import { getRequirementsSource, formatPackageList } from "../core/skills-dependencies.js";
 import { ensureVenv, installPipPackages } from "../core/dependency-installer.js";
 import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.js";
-import type { MigrateOptions } from "../migrate/types.js";
+import type { MigrateOptions, ProviderType } from "../migrate/types.js";
+import { providers } from "../migrate/provider-registry.js";
 import {
 	resolveCodexModuleDir,
 	loadCodexBundleManifest,
@@ -283,6 +284,46 @@ async function initCodexTarget(targetDir: string, dryRun: boolean, force: boolea
 	p.outro(pc.green("Codex toolkit installed!"));
 }
 
+/**
+ * Fresh-install provider picker. Multi-select with Claude Code checked by default.
+ * Each choice maps to a distinct provisioning path handled by the init orchestrator:
+ * Claude Code → `.claude/`, Codex → authored bundle, Cursor → `.claude/` + export.
+ * Shown only when no `--target` is passed and this is a new install.
+ */
+async function promptProviders(): Promise<ProviderType[]> {
+	const choice = await p.multiselect({
+		message: "Select the toolkits to set up",
+		options: [
+			{ value: "claude-code" as const, label: providers["claude-code"].displayName, hint: "installs .claude/ (default)" },
+			{ value: "codex" as const, label: providers.codex.displayName, hint: "copies the authored Codex bundle" },
+			{ value: "cursor" as const, label: providers.cursor.displayName, hint: "exports .claude/ to .cursor/" },
+		],
+		initialValues: ["claude-code"],
+		required: true,
+	});
+	cancelCheck(choice);
+	return choice as ProviderType[];
+}
+
+/**
+ * Add the Codex toolkit alongside a multi-provider install by copying the authored
+ * bundle. Non-fatal (warn + skip) so a Codex hiccup never aborts the whole install —
+ * unlike `initCodexTarget`, which fails closed because Codex is the ONLY target there.
+ */
+function addCodexBundle(targetDir: string, force: boolean): void {
+	const moduleDir = resolveCodexModuleDir();
+	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
+		p.log.warn("Codex bundle not found in this install — skipping the Codex toolkit.");
+		return;
+	}
+	if (!force && fs.existsSync(join(targetDir, "AGENTS.md"))) {
+		p.log.warn("AGENTS.md already exists — skipping the Codex toolkit (re-run with --force to overwrite).");
+		return;
+	}
+	const copied = copyAuthoredCodexBundle(moduleDir, targetDir);
+	p.log.success(`Codex toolkit created (${copied.length} artifacts): AGENTS.md, .codex/, .agents/skills/.`);
+}
+
 export async function init(args: InitArgs): Promise<void> {
 	const targetDir = process.cwd();
 
@@ -300,6 +341,49 @@ export async function init(args: InitArgs): Promise<void> {
 	if (dryRun) p.log.warn("Dry-run mode — no files will be written.");
 	if (mode === "update") p.log.info("Existing .claude/ detected — running in update mode.");
 
+	// The provider multiselect is the default ONLY for a bare fresh `init` — any explicit
+	// provider intent (`--target`, `--migrate`) bypasses it and keeps its own flow. Update
+	// mode keeps today's behavior (refresh .claude/); use `mewkit upgrade` to propagate.
+	const picked = !args.target && !args.migrate && mode === "new" ? await promptProviders() : null;
+	// Cursor migrates FROM .claude/, so it also requires the base kit. No picker
+	// (update mode, --target, or --migrate) ⇒ base install as today.
+	const installClaudeKit = picked ? picked.includes("claude-code") || picked.includes("cursor") : true;
+
+	if (installClaudeKit) {
+		await runClaudeKitInstall(args, targetDir, mode, dryRun, force);
+	}
+
+	// Codex (additive, offline bundle) and Cursor (export from .claude/) when picked.
+	if (picked?.includes("codex")) {
+		if (dryRun) p.log.info("Dry-run: would copy the authored Codex bundle (AGENTS.md, .codex/, .agents/skills/).");
+		else addCodexBundle(targetDir, force);
+	}
+	if (picked?.includes("cursor")) {
+		if (dryRun) p.log.info("Dry-run: would export .claude/ to .cursor/.");
+		else await runPostInitMigrate({ ...args, target: "cursor" }, targetDir);
+	}
+
+	// Legacy explicit paths: `--target <provider>` / `--migrate` (never active with the picker).
+	if (!dryRun && !picked && (args.migrate || args.target)) {
+		await runPostInitMigrate(args, targetDir);
+	}
+
+	p.outro(pc.green(mode === "new" ? "MeowKit installed!" : "MeowKit updated!"));
+}
+
+/**
+ * Base Claude Code kit install: fetch releases, pick version, prompt config,
+ * download, apply via smart update, validate, and install optional dependencies.
+ * Owns the downloaded-source lifecycle (cleaned up in its finally). Post-install
+ * provider export and the final outro are owned by the `init` orchestrator.
+ */
+async function runClaudeKitInstall(
+	args: InitArgs,
+	targetDir: string,
+	mode: "new" | "update",
+	dryRun: boolean,
+	force: boolean,
+): Promise<void> {
 	// Step 1: Fetch releases
 	const releaseSpinner = p.spinner();
 	releaseSpinner.start("Fetching available releases...");
@@ -485,16 +569,6 @@ export async function init(args: InitArgs): Promise<void> {
 
 		// Step 9: Summary
 		printSummary(stats, dryRun);
-
-		// Step 10: Optional migration to external tools. `--target <provider>` (e.g.
-		// cursor) exports to that provider after unpacking `.claude/`; `--migrate` runs
-		// the interactive picker. (`--target codex` never reaches here — it's handled
-		// by the offline bundle path above.)
-		if (!dryRun && (args.migrate || args.target)) {
-			await runPostInitMigrate(args, targetDir);
-		}
-
-		p.outro(pc.green(mode === "new" ? "MeowKit installed!" : "MeowKit updated!"));
 	} finally {
 		cleanupDownload(sourceDir);
 	}
