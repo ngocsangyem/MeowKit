@@ -78,11 +78,15 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 		expect(skillMd).toContain("> Ported from external-org/agent-kit — .claude/skills/demo-skill/SKILL.md");
 	});
 
-	it("writes codex agents TOML and merges the managed config block with neutral sentinels", () => {
+	it("writes codex agents TOML; authored config.toml carries the base with no agent-wiring block", () => {
 		const agentToml = readFileSync(join(env.projectDir, ".codex", "agents", "planner.toml"), "utf-8");
 		expect(agentToml).toContain('name = "planner"');
 		const configToml = readFileSync(join(env.projectDir, ".codex", "config.toml"), "utf-8");
-		expect(configToml).toContain("# --- managed-agents-start ---");
+		// Phase-9 flip: config.toml is the authored base (+ the dynamic injectors merged on top).
+		// Codex auto-loads agents from .codex/agents/*.toml, so the authored config intentionally
+		// omits the converter's managed [agents.X] wiring block (verified redundant by the validator).
+		expect(configToml).toContain("project_doc_max_bytes"); // authored base preserved
+		expect(configToml).not.toContain("# --- managed-agents-start ---"); // no converter agent-wiring
 		expect(configToml).not.toContain("mewkit-managed");
 	});
 

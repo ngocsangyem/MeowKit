@@ -1,6 +1,6 @@
-# MeowKit starter exec-policy rules for Codex (EXPERIMENTAL — the rules feature may change).
+# the toolkit starter exec-policy rules for Codex (EXPERIMENTAL — the rules feature may change).
 #
-# Defense-in-depth ONLY. These are never the sole enforcement: the MeowKit CLI gate and
+# Defense-in-depth ONLY. These are never the sole enforcement: the toolkit CLI gate and
 # the PreToolUse hooks remain authoritative. Project-local rules load only when the
 # project `.codex/` layer is trusted, so an untrusted or older Codex simply ignores this
 # file (graceful fallback). Each rule PROMPTS (requires approval) before a high-impact

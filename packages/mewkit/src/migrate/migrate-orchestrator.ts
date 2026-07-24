@@ -314,6 +314,21 @@ async function runMigrateUnderLock(
 			sink,
 		);
 
+		// Authored-Codex overlay (author-first transition) runs HERE — after the converter
+		// writes its base artifacts, but BEFORE the dynamic injectors below (capability
+		// bootstrap, shell-env, MCP). The overlay copies each `active` authored artifact over
+		// the converter output; for a flipped merge-surface (config.toml / AGENTS.md) it writes
+		// the authored BASE, and the idempotent injectors then merge their per-project content
+		// onto it. Gated on converter success (the injectors run regardless — non-fatal, recorded).
+		// Inert while every entry is draft, so today's converter path is otherwise unchanged.
+		if (targets.includes("codex") && !executed.results.some((r) => !r.success)) {
+			// Overlay onto the SCOPE ROOT (project cwd / home), not the .codex dir — the manifest
+			// targetPaths are scope-root-relative (".codex/config.toml", "AGENTS.md").
+			const scopeRoot = isGlobal ? homedir() : process.cwd();
+			const overlay = await applyActiveCodexOverlay(scopeRoot, { global: isGlobal });
+			if (overlay.writes > 0) console.log(pc.green(`[+] Applied ${overlay.writes} authored Codex artifact(s)`));
+		}
+
 		// This projection is not a migrated source artifact. It is CLI-owned trusted context
 		// plus data-only manifest snapshot, so it is installed after normal AGENTS.md merging.
 		// A Codex project can then resolve capabilities even when `.claude/` is not retained.
@@ -353,17 +368,6 @@ async function runMigrateUnderLock(
 		const hasFailures = executed.results.some((r) => !r.success);
 		if (!hasFailures && manifest) {
 			await updateAppliedManifestVersion(manifest.mewkitVersion);
-		}
-		// Authored-Codex overlay (author-first transition): on a clean codex migration,
-		// copy any authored `modules/codex/` artifacts flipped `active` over the converter
-		// output. Inert while every entry is draft, so today's converter path is unchanged;
-		// each future batch flips a surface live until the converters are retired entirely.
-		if (!hasFailures && targets.includes("codex")) {
-			// Overlay onto the SCOPE ROOT (project cwd / home), not the .codex dir — the
-			// manifest targetPaths are scope-root-relative (".codex/config.toml", "AGENTS.md").
-			const scopeRoot = isGlobal ? homedir() : process.cwd();
-			const overlay = await applyActiveCodexOverlay(scopeRoot, { global: isGlobal });
-			if (overlay.writes > 0) console.log(pc.green(`[+] Applied ${overlay.writes} authored Codex artifact(s)`));
 		}
 		return hasFailures || mcpFailed ? 1 : 0;
 	} finally {

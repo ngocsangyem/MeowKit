@@ -108,26 +108,28 @@ describe("authored codex bundle", () => {
 		expect(fails, `unexpected failures: ${fails.map((f) => `${f.name} — ${f.detail}`).join("; ")}`).toEqual([]);
 	});
 
-	it("the migrate overlay writes the active surfaces (hooks + agents + skills); draft surfaces stay converter-owned", async () => {
-		// Phase-9 flips 1-3: hooks, agents, and the skills tree are active, so the overlay writes
-		// exactly those six entries and leaves the still-draft surfaces (AGENTS.md, config) to the
-		// converter path during the transition.
+	it("the migrate overlay writes every active surface; only the still-draft AGENTS.md stays converter-owned", async () => {
+		// Phase-9: all surfaces except AGENTS.md are active (hooks, agents, skills, config.toml,
+		// rules). The overlay writes those eight entries; AGENTS.md remains converter-owned until
+		// its own flip (it carries converter-baked source-rules merges handled in a later batch).
 		const overlay = await applyActiveCodexOverlay(target, { moduleDir });
 		const written = overlay.entries.map((e) => e.targetPath).sort();
 		expect(written).toEqual(
 			[
 				".agents/skills",
 				".codex/agents",
+				".codex/config.toml",
 				".codex/hooks.json",
 				".codex/hooks/capture.cjs",
 				".codex/hooks/gate-enforcement.cjs",
 				".codex/hooks/privacy-block.cjs",
+				".codex/rules/default.rules",
 			].sort(),
 		);
-		expect(overlay.writes).toBe(6);
-		expect(existsSync(join(target, ".codex", "hooks.json"))).toBe(true);
-		expect(existsSync(join(target, ".codex", "agents", "planner.toml"))).toBe(true); // authored agent
+		expect(overlay.writes).toBe(8);
+		expect(existsSync(join(target, ".codex", "config.toml"))).toBe(true); // authored config base
+		expect(existsSync(join(target, ".codex", "rules", "default.rules"))).toBe(true); // authored rules
 		expect(existsSync(join(target, ".agents", "skills", "fix", "SKILL.md"))).toBe(true); // authored skill
-		expect(existsSync(join(target, "AGENTS.md"))).toBe(false); // inactive surface stays draft
+		expect(existsSync(join(target, "AGENTS.md"))).toBe(false); // AGENTS.md still draft
 	});
 });

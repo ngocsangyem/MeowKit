@@ -23,7 +23,7 @@
       "scopeTags": [
         "managed-runtime"
       ],
-      "active": false
+      "active": true
     },
     {
       "sourcePath": "root/.codex/hooks.json",
@@ -45,7 +45,7 @@
       "scopeTags": [
         "managed-runtime"
       ],
-      "active": false
+      "active": true
     },
     {
       "sourcePath": "root/.codex/hooks/capture.cjs",
