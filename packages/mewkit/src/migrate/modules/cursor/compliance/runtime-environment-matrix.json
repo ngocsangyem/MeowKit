@@ -1,0 +1,109 @@
+{
+	"_description": "Per-runtime-environment support map for Cursor surfaces (ide-local / cli-headless / cloud / tab), authored alongside the Phase 5 doctor environment diagnostics that render it (doctor-cursor-environment.ts). Complements compliance/native-surface-matrix.json (a per-SURFACE view) with a per-ENVIRONMENT view: which hook events fire, where skills/agents/rules are discovered from, which MCP transports work, and what a cloud-exposed project loses. `documented` = the official doc source states this for that environment; `undocumented` = the docs are silent and no live test has closed the gap — treated as authority-propagation risk, default deny-by-omission; `not-applicable` = this environment structurally does not have the concept.",
+	"_sources": [
+		"https://cursor.com/docs/agent/hooks",
+		"https://cursor.com/docs/context/mcp",
+		"https://cursor.com/docs/cloud-agent/capabilities",
+		"https://cursor.com/docs/context/skills",
+		"https://cursor.com/docs/agent/subagents",
+		"https://cursor.com/docs/cli/overview",
+		"plans/reports/researcher-260724-2125-cursor-official-docs-verification.md"
+	],
+	"verified": "2026-07-25",
+	"environments": [
+		{
+			"environment": "ide-local",
+			"hookEventsActive": {
+				"status": "documented",
+				"events": [
+					"sessionStart", "sessionEnd", "preToolUse", "postToolUse", "postToolUseFailure",
+					"subagentStart", "subagentStop", "beforeShellExecution", "afterShellExecution",
+					"beforeMCPExecution", "afterMCPExecution", "beforeReadFile", "afterFileEdit",
+					"beforeSubmitPrompt", "preCompact", "stop", "afterAgentResponse", "afterAgentThought",
+					"beforeTabFileRead", "afterTabFileEdit", "workspaceOpen"
+				]
+			},
+			"skillsDiscoveryPaths": {
+				"status": "documented",
+				"paths": [".agents/skills/", "~/.agents/skills/", ".cursor/skills/", "~/.cursor/skills/"]
+			},
+			"agentsDiscoveryPaths": { "status": "documented", "paths": [".cursor/agents/", "~/.cursor/agents/"] },
+			"rulesDiscoveryPaths": { "status": "documented", "paths": [".cursor/rules/*.mdc", "AGENTS.md (nested, deeper wins)"] },
+			"mcpTransportsSupported": { "status": "documented", "transports": ["stdio", "sse", "streamable-http"] },
+			"sandboxRunModeGuidance": "https://cursor.com/docs/agent/hooks",
+			"cloudCompatibilitySummary": "n/a — this IS the local IDE environment."
+		},
+		{
+			"environment": "cli-headless",
+			"hookEventsActive": {
+				"status": "documented",
+				"events": [
+					"sessionStart", "sessionEnd", "preToolUse", "postToolUse", "postToolUseFailure",
+					"subagentStart", "subagentStop", "beforeShellExecution", "afterShellExecution",
+					"beforeMCPExecution", "afterMCPExecution", "beforeReadFile", "afterFileEdit",
+					"beforeSubmitPrompt", "preCompact", "stop", "afterAgentResponse", "afterAgentThought"
+				]
+			},
+			"skillsDiscoveryPaths": {
+				"status": "undocumented",
+				"paths": [".agents/skills/", ".cursor/skills/"],
+				"note": "A community forum bug report (not official docs) claims the Cursor CLI does not load ~/.agents/skills/ (only the GUI does) — unverified, needs a live smoke test before relying on it."
+			},
+			"agentsDiscoveryPaths": { "status": "undocumented", "paths": [".cursor/agents/"] },
+			"rulesDiscoveryPaths": { "status": "undocumented", "paths": [".cursor/rules/*.mdc", "AGENTS.md"] },
+			"mcpTransportsSupported": { "status": "documented", "transports": ["stdio", "sse", "streamable-http"] },
+			"sandboxRunModeGuidance": "https://cursor.com/docs/cli/overview",
+			"cloudCompatibilitySummary": "n/a — headless CLI is a local execution mode, distinct from Cloud Agents."
+		},
+		{
+			"environment": "cloud",
+			"hookEventsActive": {
+				"status": "documented",
+				"events": [
+					"beforeShellExecution", "afterShellExecution", "beforeReadFile", "afterFileEdit",
+					"preToolUse", "postToolUse", "postToolUseFailure", "subagentStart", "subagentStop",
+					"beforeSubmitPrompt", "preCompact", "afterAgentResponse", "afterAgentThought", "stop"
+				],
+				"unsupportedEvents": {
+					"status": "documented",
+					"events": [
+						"sessionStart", "sessionEnd", "beforeMCPExecution", "afterMCPExecution",
+						"beforeTabFileRead", "afterTabFileEdit", "workspaceOpen"
+					],
+					"note": "beforeMCPExecution/afterMCPExecution are the enforcement gap this phase's --allow-cloud-mcp gate and doctor hard-FAIL exist to cover — an MCP tool call in a Cloud Agent has NO local hook enforcement equivalent. User-level ~/.cursor/hooks.json is also NOT loaded in cloud (project/team/enterprise hook config is)."
+				}
+			},
+			"skillsDiscoveryPaths": {
+				"status": "undocumented",
+				"paths": [],
+				"note": "Cloud Agent support for custom skills specifically is not directly confirmed in the source research pass — treated as undocumented, not assumed working."
+			},
+			"agentsDiscoveryPaths": { "status": "undocumented", "paths": [] },
+			"rulesDiscoveryPaths": { "status": "undocumented", "paths": [] },
+			"mcpTransportsSupported": {
+				"status": "documented",
+				"transports": ["stdio", "streamable-http"],
+				"unsupportedTransports": ["sse", "mcp-remote"],
+				"note": "stdio servers depend on the cloud VM and cannot be pre-verified before agent launch; HTTP MCP credentials (refresh tokens/headers) are never present in the cloud VM."
+			},
+			"sandboxRunModeGuidance": "https://cursor.com/docs/cloud-agent/capabilities",
+			"cloudCompatibilitySummary": "Hooks: most local hooks run except session/tab/workspace-lifecycle and prompt-type hooks; user-level hook config is excluded. MCP: stdio + HTTP only (no SSE/mcp-remote), no local beforeMCPExecution enforcement — this is why applying an MCP profile to a cloud-exposed project requires the explicit --allow-cloud-mcp opt-in, and why doctor reports a hard FAIL (not a note) for an installed profile in a cloud-exposed project."
+		},
+		{
+			"environment": "tab",
+			"hookEventsActive": { "status": "documented", "events": ["beforeTabFileRead", "afterTabFileEdit"] },
+			"skillsDiscoveryPaths": { "status": "not-applicable", "paths": [] },
+			"agentsDiscoveryPaths": { "status": "not-applicable", "paths": [] },
+			"rulesDiscoveryPaths": { "status": "not-applicable", "paths": [] },
+			"mcpTransportsSupported": { "status": "not-applicable", "transports": [] },
+			"sandboxRunModeGuidance": "https://cursor.com/docs/agent/hooks",
+			"cloudCompatibilitySummary": "n/a — Tab is an IDE-only autocomplete surface, never runs in Cloud."
+		}
+	],
+	"openQuestions": [
+		"MCP config precedence across project/user/team levels — undocumented on the pages fetched (docs report Q3).",
+		"Subagent MCP inheritance (does a subagent see the parent's configured MCP servers?) — undocumented (docs report Q4).",
+		"Cloud Agent support for custom agents/subagents, skills, and rules specifically — not directly confirmed; only hooks + MCP are confirmed cloud-side.",
+		"Whether the Cursor CLI loads ~/.agents/skills/ — sourced from an unverified community forum report, needs a live smoke test."
+	]
+}

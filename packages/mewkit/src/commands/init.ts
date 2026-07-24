@@ -36,6 +36,8 @@ import {
 	detectCursorVersion,
 	isCursorVersionSupported,
 } from "../migrate/providers/cursor/capabilities.js";
+import { loadMcpProfileCatalog, type McpProfileSelection } from "../migrate/modules/cursor-mcp-profile-catalog.js";
+import { applyMcpProfiles, isCloudExposedProject } from "../migrate/modules/cursor-mcp-profiles.js";
 
 export interface InitArgs {
 	dryRun?: boolean;
@@ -65,6 +67,22 @@ export interface InitArgs {
 	 * (`core`). Named `--skill-packs` to avoid the existing boolean `--packs` validate flag.
 	 */
 	skillPacks?: string;
+	/**
+	 * Cursor MCP profile selection (only meaningful with a Cursor target). Comma-separated
+	 * profile names (e.g. `github-context`) or `all`. Omitted = an interactive multiselect
+	 * prompt (default: none selected) when not a dry-run, or no MCP config at all in a
+	 * dry-run. Fresh install NEVER writes `.cursor/mcp.json` on its own — this flag/prompt
+	 * is the only path to MCP authority.
+	 */
+	mcpProfiles?: string;
+	/**
+	 * Second, explicit opt-in required to apply an MCP profile selection to a project that
+	 * may run as a Cursor Cloud Agent (has a git remote configured) — `beforeMCPExecution`
+	 * has no local enforcement equivalent in Cloud Agents. Omitted ⇒ an interactive confirm
+	 * prompt covers the same acknowledgement when a profile was selected and the project is
+	 * cloud-exposed.
+	 */
+	allowCloudMcp?: boolean;
 }
 
 /** Parse the `--skill-packs` value into a PackSelection (default `core` when absent). */
@@ -77,6 +95,122 @@ function parseSkillPacks(raw?: string): PackSelection {
 		.split(",")
 		.map((s) => s.trim())
 		.filter(Boolean);
+}
+
+/** Parse the `--mcp-profiles` value into a `McpProfileSelection`. Unlike skill packs, an
+ *  OMITTED flag never falls back to a catalog default — MCP is deny-by-default, so an absent
+ *  flag is resolved by `resolveMcpSelection` (interactive prompt, still defaulting to none)
+ *  rather than by this parser. */
+function parseMcpProfiles(raw: string): McpProfileSelection {
+	const v = raw.trim();
+	if (v === "") return [];
+	if (v.toLowerCase() === "all") return "all";
+	return v
+		.split(",")
+		.map((s) => s.trim())
+		.filter(Boolean);
+}
+
+/** Resolve the MCP profile selection for one Cursor install. An explicit `--mcp-profiles`
+ *  flag (including an empty string, meaning "none") is authoritative and skips the prompt
+ *  entirely. Otherwise, in a KNOWN-interactive session (the fresh multi-provider picker path,
+ *  which already ran its own prompt to get here) and outside a dry-run, offer an opt-in
+ *  multiselect defaulting to nothing selected — deny-by-default survives the interactive path
+ *  too. The explicit `--target cursor` entrypoint is used by scripts/CI as well as humans, so
+ *  it NEVER prompts on its own (`interactive=false`) — an omitted flag there resolves to
+ *  "none" silently rather than blocking on stdin. No catalog (pre-Phase-5 bundle) or zero
+ *  shipped profiles ⇒ resolve to "none" without prompting either way. */
+async function resolveMcpSelection(
+	moduleDir: string,
+	explicit: string | undefined,
+	dryRun: boolean,
+	interactive: boolean,
+): Promise<McpProfileSelection> {
+	if (explicit !== undefined) return parseMcpProfiles(explicit);
+	if (dryRun || !interactive) return [];
+	const catalog = loadMcpProfileCatalog(moduleDir);
+	if (!catalog || Object.keys(catalog.profiles).length === 0) return [];
+	const choice = await p.multiselect({
+		message: "Select Cursor MCP profile(s) to enable (opt-in — default: none)",
+		options: Object.entries(catalog.profiles).map(([name, profile]) => ({
+			value: name,
+			label: name,
+			hint: profile.description || undefined,
+		})),
+		required: false,
+		initialValues: [],
+	});
+	return p.isCancel(choice) ? [] : (choice as string[]);
+}
+
+/** Resolve the second cloud-gate opt-in. A project without a git remote is never treated as
+ *  cloud-exposed, so the gate is a no-op there regardless of the flag. An explicit `true`
+ *  flag always satisfies the gate. Otherwise, a cloud-exposed project with a non-empty
+ *  selection needs a decision: in a known-interactive session it gets one confirm prompt;
+ *  outside one (the explicit `--target cursor` entrypoint, scripts/CI) there is no one to ask,
+ *  so it fails closed (blocked) rather than hanging on stdin or silently applying MCP to a
+ *  project with no local enforcement equivalent. */
+async function resolveAllowCloudMcp(
+	targetDir: string,
+	explicit: boolean | undefined,
+	selection: McpProfileSelection,
+	dryRun: boolean,
+	interactive: boolean,
+): Promise<boolean> {
+	if (explicit) return true;
+	const hasSelection = selection === "all" || selection.length > 0;
+	if (!hasSelection || dryRun || !isCloudExposedProject(targetDir)) return true;
+	if (!interactive) return false;
+	const confirm = await p.confirm({
+		message:
+			"This project has a git remote and may run as a Cursor Cloud Agent, where MCP tool calls have NO local " +
+			"hook enforcement (beforeMCPExecution is not supported in Cloud Agents). Apply the selected MCP profile(s) anyway?",
+		initialValue: false,
+	});
+	return !p.isCancel(confirm) && confirm === true;
+}
+
+/** Resolve + apply the Cursor MCP profile selection for one install, after the authored
+ *  bundle itself has already been written. Never runs during a dry-run (no prompt, no write).
+ *  `interactive` MUST be true only for a call site that is already guaranteed to be running in
+ *  an interactive session (today: the fresh multi-provider picker path) — the explicit
+ *  `--target cursor` entrypoint always passes `false` since it is also used non-interactively
+ *  by scripts/CI/tests. Non-fatal: a lint failure or an unknown profile name is reported and
+ *  skipped rather than aborting the whole install — MCP is an optional, additive surface. */
+async function applySelectedMcpProfiles(
+	targetDir: string,
+	moduleDir: string,
+	mcpProfilesArg: string | undefined,
+	allowCloudMcpArg: boolean | undefined,
+	dryRun: boolean,
+	interactive: boolean,
+): Promise<void> {
+	if (dryRun) return;
+	const selection = await resolveMcpSelection(moduleDir, mcpProfilesArg, dryRun, interactive);
+	if (selection !== "all" && selection.length === 0) return;
+
+	const allowCloudMcp = await resolveAllowCloudMcp(targetDir, allowCloudMcpArg, selection, dryRun, interactive);
+	try {
+		const result = await applyMcpProfiles(moduleDir, targetDir, selection, { allowCloudMcp, projectRoot: targetDir });
+		if (result.blockedByCloudGate) {
+			p.log.warn(
+				"MCP profile selection BLOCKED: this project may run as a Cursor Cloud Agent (a git remote is configured) " +
+					"and beforeMCPExecution has no cloud enforcement equivalent. Re-run with --allow-cloud-mcp to accept the residual risk.",
+			);
+			return;
+		}
+		if (!result.applied) return;
+		const conflictNote =
+			result.conflictServers.length > 0
+				? `, ${result.conflictServers.length} conflict(s) left untouched (your existing server config wins): ${result.conflictServers.join(", ")}`
+				: "";
+		p.log.success(
+			`Cursor MCP profile(s) merged into .cursor/mcp.json: ${result.addedServers.length} server(s) added${conflictNote}.`,
+		);
+	} catch (err) {
+		const msg = err instanceof Error ? err.message : String(err);
+		p.log.warn(`MCP profile selection skipped: ${msg}`);
+	}
 }
 
 /** Profile picker options (stable names; resolution validates against the release manifest). */
@@ -380,7 +514,13 @@ function hintLegacyMemoryForCodex(targetDir: string): void {
  * Mirrors `initCodexTarget` structurally; the two stay independent so a change to one
  * provider's install flow never silently ripples into the other.
  */
-async function initCursorTarget(targetDir: string, dryRun: boolean, force: boolean): Promise<void> {
+async function initCursorTarget(
+	targetDir: string,
+	dryRun: boolean,
+	force: boolean,
+	mcpProfiles?: string,
+	allowCloudMcp?: boolean,
+): Promise<void> {
 	p.intro(pc.bgCyan(pc.black(" meowkit init --target cursor ")));
 	const moduleDir = resolveCursorModuleDir();
 	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
@@ -394,6 +534,7 @@ async function initCursorTarget(targetDir: string, dryRun: boolean, force: boole
 		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
 		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
 		p.log.info(`Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .meowkit/README.md.`);
+		p.log.info("Dry-run: MCP profiles are never applied or prompted for during a dry-run.");
 		p.outro(pc.green("Dry-run complete — no files written."));
 		return;
 	}
@@ -407,6 +548,8 @@ async function initCursorTarget(targetDir: string, dryRun: boolean, force: boole
 	p.log.success(`Cursor toolkit ready (${result.writes} written): AGENTS.md, .meowkit/README.md.`);
 	await warnBelowMinCursor();
 	hintLegacyMemoryForCursor(targetDir);
+	// `--target cursor` is used by scripts/CI as well as humans — never prompt on its own.
+	await applySelectedMcpProfiles(targetDir, moduleDir, mcpProfiles, allowCloudMcp, dryRun, false);
 	p.outro(pc.green("Cursor toolkit installed!"));
 }
 
@@ -493,7 +636,12 @@ async function addCodexBundle(targetDir: string, force: boolean, packs: PackSele
  * bundle. Non-fatal (warn + skip) so a Cursor hiccup never aborts the whole install —
  * unlike `initCursorTarget`, which fails closed because Cursor is the ONLY target there.
  */
-async function addCursorBundle(targetDir: string, force: boolean): Promise<void> {
+async function addCursorBundle(
+	targetDir: string,
+	force: boolean,
+	mcpProfiles?: string,
+	allowCloudMcp?: boolean,
+): Promise<void> {
 	const moduleDir = resolveCursorModuleDir();
 	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
 		p.log.warn("Cursor bundle not found in this install — skipping the Cursor toolkit.");
@@ -508,6 +656,9 @@ async function addCursorBundle(targetDir: string, force: boolean): Promise<void>
 	p.log.success(`Cursor toolkit created (${result.writes} written): AGENTS.md, .meowkit/README.md.`);
 	await warnBelowMinCursor();
 	hintLegacyMemoryForCursor(targetDir);
+	// Reached only via the fresh multi-provider picker, which already ran an interactive
+	// prompt to get here — safe to prompt again for the MCP profile selection.
+	await applySelectedMcpProfiles(targetDir, moduleDir, mcpProfiles, allowCloudMcp, false, true);
 }
 
 export async function init(args: InitArgs): Promise<void> {
@@ -519,7 +670,7 @@ export async function init(args: InitArgs): Promise<void> {
 		return initCodexTarget(targetDir, args.dryRun ?? false, args.force ?? false, parseSkillPacks(args.skillPacks));
 	}
 	if (args.target === "cursor") {
-		return initCursorTarget(targetDir, args.dryRun ?? false, args.force ?? false);
+		return initCursorTarget(targetDir, args.dryRun ?? false, args.force ?? false, args.mcpProfiles, args.allowCloudMcp);
 	}
 
 	const mode = detectMode(targetDir);
@@ -552,7 +703,7 @@ export async function init(args: InitArgs): Promise<void> {
 	}
 	if (picked?.includes("cursor")) {
 		if (dryRun) p.log.info("Dry-run: would copy the authored Cursor bundle (AGENTS.md, .meowkit/README.md).");
-		else await addCursorBundle(targetDir, force);
+		else await addCursorBundle(targetDir, force, args.mcpProfiles, args.allowCloudMcp);
 	}
 
 	// Legacy explicit paths: `--target <provider>` / `--migrate` (never active with the picker).

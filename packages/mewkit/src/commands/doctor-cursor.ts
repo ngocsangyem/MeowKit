@@ -6,6 +6,7 @@ import { readCursorLedger } from "../migrate/reconcile/cursor-ledger.js";
 import { meowkitStatePaths } from "../state/meowkit-state-paths.js";
 import { resolveCursorModuleDir } from "../migrate/modules/cursor-authored-bundle.js";
 import { CURSOR_MIN_SUPPORTED_VERSION, detectCursorVersion, isCursorVersionSupported } from "../migrate/providers/cursor/capabilities.js";
+import { checkCursorEnvironment } from "./doctor-cursor-environment.js";
 
 // Single-file Cursor doctor (env checks join it in Phase 5). Validates the
 // installed `.cursor/hooks.json`, the installed Cursor IDE version against the
@@ -165,7 +166,10 @@ function killSwitchHint(dir: string): DiagResult {
 /** Full read-only Cursor doctor pass for a generated target directory `dir`.
  *  Empty when there is no `.cursor/hooks.json` (nothing to check). A hooks.json
  *  parse failure short-circuits to JUST that failure — every downstream check
- *  assumes a parseable hooks.json. */
+ *  assumes a parseable hooks.json. Phase 5 environment diagnostics (per-environment
+ *  runtime-support rows + MCP profile health, doctor-cursor-environment.ts) join here
+ *  unconditionally — they read read-only compliance data and the project's own
+ *  `.cursor/mcp.json`/ledger, so they run even when hooks.json's own checks are clean. */
 export async function checkCursor(dir: string, moduleDir: string = resolveCursorModuleDir()): Promise<DiagResult[]> {
 	const hooksJsonPath = path.join(dir, ".cursor", "hooks.json");
 	if (!fs.existsSync(hooksJsonPath)) return [];
@@ -176,5 +180,6 @@ export async function checkCursor(dir: string, moduleDir: string = resolveCursor
 		await checkVersionGate(),
 		...(await checkBundleChecksums(dir, moduleDir)),
 		killSwitchHint(dir),
+		...(await checkCursorEnvironment(dir, moduleDir)),
 	];
 }

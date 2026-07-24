@@ -149,8 +149,10 @@ export async function doctor(args?: {
 	}
 
 	// Honest Cursor doctor pass (hooks.json shape, version gate, bundle-checksum
-	// re-verification, kill-switch hint) — same "runs regardless of --providers,
-	// no-op on a non-cursor dir" contract as the codex hook-trust check above.
+	// re-verification, kill-switch hint, PLUS Phase 5 per-runtime-environment rows —
+	// ide-local / cli-headless / cloud / tab, never a single support flag — and MCP
+	// profile health) — same "runs regardless of --providers, no-op on a non-cursor
+	// dir" contract as the codex hook-trust check above.
 	if (TARGET_PROFILES.cursor?.detect(process.cwd())) {
 		results.push(...(await checkCursor(process.cwd())));
 	}

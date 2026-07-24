@@ -1,5 +1,19 @@
 {
-	"_description": "Cursor bundle MCP profile catalog skeleton. MCP is opt-in only — no profile carries default authority. Profiles populate as native MCP integrations are authored.",
-	"verified": "2026-07-24",
-	"profiles": {}
+	"_description": "Cursor bundle MCP profile catalog. MCP is opt-in only — no profile carries default authority; a profile takes effect ONLY when a user explicitly selects it (`mewkit init --target cursor --mcp-profiles <name>` / `--mcp-profiles all`, or the equivalent interactive prompt). Applying a profile MERGES into `.cursor/mcp.json` — user server keys always win, conflicts are reported and never overwritten, and nothing is ever removed. Every string value below resolves through Cursor's documented interpolation vars only (`${env:NAME}`, `${workspaceFolder}`, `${workspaceFolderBasename}`, `${userHome}`, `${pathSeparator}`) — no literal secret value is ever stored in this file; the secret-emission lint in cursor-mcp-profiles.ts enforces this at apply time.",
+	"verified": "2026-07-25",
+	"profiles": {
+		"github-context": {
+			"description": "Read access to GitHub issues, PRs, and repo content via the official GitHub MCP server (stdio, npx-launched). Requires a GitHub personal access token to already be exported in the calling environment as GITHUB_PERSONAL_ACCESS_TOKEN — this profile never stores the token value itself, only a reference to the env var name.",
+			"transport": "stdio",
+			"mcpServers": {
+				"github": {
+					"command": "npx",
+					"args": ["-y", "@modelcontextprotocol/server-github"],
+					"env": {
+						"GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+					}
+				}
+			}
+		}
+	}
 }
