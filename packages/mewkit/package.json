@@ -18,6 +18,7 @@
     "build:web": "npm run build:web:visual-plan",
     "build:web:visual-plan": "npx tsc -p tsconfig.visual-plan-web.json --noEmit && npx vite build --config vite.config.visual-plan-web.ts && node scripts/check-visual-plan-bundle-budget.cjs",
     "test": "vitest run",
+    "test:live-cursor": "vitest run --config vitest.live-cursor.config.ts",
     "lint": "npx tsc -p tsconfig.visual-plan-web.json --noEmit",
     "build:capability-matrix": "node scripts/build-provider-capability-matrix.mjs",
     "prepublishOnly": "npm run build",

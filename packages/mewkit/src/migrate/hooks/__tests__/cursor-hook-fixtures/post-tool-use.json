@@ -1,0 +1,11 @@
+{
+	"hook_event_name": "postToolUse",
+	"conversation_id": "conv-abc123",
+	"tool_name": "edit_file",
+	"tool_input": { "path": "src/index.ts" },
+	"tool_output": "ok",
+	"duration": 120,
+	"cwd": "/Users/example/project",
+	"user_email": "dev@example.com",
+	"transcript_path": "/Users/example/.cursor/transcripts/conv-abc123.json"
+}

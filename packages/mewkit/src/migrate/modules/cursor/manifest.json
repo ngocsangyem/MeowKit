@@ -47,6 +47,24 @@
 			"ownership": "managed-replace",
 			"scopeTags": ["managed-runtime"],
 			"active": true
+		},
+		{
+			"sourcePath": "root/.cursor/hooks.json",
+			"targetPath": ".cursor/hooks.json",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.cursor/hooks",
+			"targetPath": ".cursor/hooks",
+			"provider": "cursor",
+			"mode": "0755",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
 		}
 	]
 }

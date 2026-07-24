@@ -11,5 +11,13 @@ authored provider bundle (Codex, Cursor, ...), not just this one.
 - `telemetry/` — local hook/run telemetry.
 - `cache/` — disposable, rebuildable cache data.
 
-`state/` and `telemetry/` are gitignored by default: they are machine-local, and the
-ledger is a trust anchor that should never be hand-edited or committed.
+`state/` and `telemetry/` are machine-local and should be gitignored — the ledger is a
+trust anchor that should never be hand-edited or committed. `mewkit init --target cursor`
+does NOT write a `.gitignore` for you; add the two lines below yourself, or run
+`mewkit setup` in this project (it appends the standard MeowKit `.gitignore` block,
+including these two paths, if one isn't already present):
+
+```
+.meowkit/state/
+.meowkit/telemetry/
+```

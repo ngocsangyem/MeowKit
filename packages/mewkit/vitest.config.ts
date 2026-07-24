@@ -22,6 +22,12 @@ export default defineConfig({
 			"src/**/__tests__/**/*.test.{ts,tsx}",
 			"visual-plan-web/**/__tests__/**/*.test.{ts,tsx}",
 		],
+		// Live-Cursor integration tests (real IDE/CLI, only runnable when Cursor is
+		// installed) live in their own `*.live.test.ts` files and run via the
+		// separate `npm run test:live-cursor` command (vitest.live-cursor.config.ts)
+		// — never in this serialized unit suite, so a hanging live fixture can never
+		// stall it.
+		exclude: ["**/*.live.test.ts"],
 		environmentMatchGlobs: [
 			["src/**/__tests__/**/*.test.tsx", "jsdom"],
 			["visual-plan-web/**/__tests__/**/*.test.tsx", "jsdom"],

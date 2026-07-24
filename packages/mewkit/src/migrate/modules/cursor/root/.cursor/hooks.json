@@ -1,0 +1,141 @@
+{
+	"version": 1,
+	"hooks": {
+		"sessionStart": [
+			{
+				"command": "node .cursor/hooks/session-context.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			}
+		],
+		"beforeReadFile": [
+			{
+				"command": "node .cursor/hooks/privacy-read-gate.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": true
+			}
+		],
+		"beforeShellExecution": [
+			{
+				"command": "node .cursor/hooks/shell-gate.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": true
+			}
+		],
+		"beforeMCPExecution": [
+			{
+				"command": "node .cursor/hooks/mcp-gate.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": true
+			}
+		],
+		"preToolUse": [
+			{
+				"matcher": "^(?:write|edit|create|delete|remove|apply_patch|str_replace|update)",
+				"command": "node .cursor/hooks/tool-gate.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": true
+			},
+			{
+				"matcher": "^(?:read|search|grep|glob|list|find|view)",
+				"command": "node .cursor/hooks/tool-gate.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			},
+			{
+				"matcher": ".*",
+				"command": "node .cursor/hooks/tool-gate.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": true
+			}
+		],
+		"postToolUse": [
+			{
+				"command": "node .cursor/hooks/telemetry-observers.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			}
+		],
+		"postToolUseFailure": [
+			{
+				"command": "node .cursor/hooks/telemetry-observers.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			}
+		],
+		"afterFileEdit": [
+			{
+				"command": "node .cursor/hooks/telemetry-observers.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			}
+		],
+		"afterShellExecution": [
+			{
+				"command": "node .cursor/hooks/telemetry-observers.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			}
+		],
+		"afterMCPExecution": [
+			{
+				"command": "node .cursor/hooks/telemetry-observers.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			}
+		],
+		"preCompact": [
+			{
+				"command": "node .cursor/hooks/telemetry-observers.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			}
+		],
+		"beforeSubmitPrompt": [
+			{
+				"command": "node .cursor/hooks/prompt-capture.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			}
+		],
+		"subagentStart": [
+			{
+				"command": "node .cursor/hooks/subagent-lifecycle.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			}
+		],
+		"subagentStop": [
+			{
+				"command": "node .cursor/hooks/subagent-lifecycle.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			}
+		],
+		"stop": [
+			{
+				"command": "node .cursor/hooks/stop-followup.cjs",
+				"type": "command",
+				"timeout": 10,
+				"loop_limit": 5,
+				"failClosed": false
+			}
+		]
+	}
+}

@@ -21,6 +21,7 @@ import {
 import { checkMemoryHealth } from "./doctor-memory-checks.js";
 import { checkHardGates } from "./doctor-hard-gates.js";
 import { checkCodexHookTrust } from "./doctor-codex-hook-trust.js";
+import { checkCursor } from "./doctor-cursor.js";
 import {
 	collectProviderContractDiagnostics,
 	summarizeProviderContractDiagnostics,
@@ -145,6 +146,13 @@ export async function doctor(args?: {
 	// --providers so a codex project always sees it; a non-codex dir is a no-op).
 	if (TARGET_PROFILES.codex?.detect(process.cwd())) {
 		results.push(...checkCodexHookTrust(process.cwd()));
+	}
+
+	// Honest Cursor doctor pass (hooks.json shape, version gate, bundle-checksum
+	// re-verification, kill-switch hint) — same "runs regardless of --providers,
+	// no-op on a non-cursor dir" contract as the codex hook-trust check above.
+	if (TARGET_PROFILES.cursor?.detect(process.cwd())) {
+		results.push(...(await checkCursor(process.cwd())));
 	}
 
 	if (args?.state) {

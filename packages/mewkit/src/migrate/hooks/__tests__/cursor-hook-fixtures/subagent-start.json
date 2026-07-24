@@ -1,0 +1,12 @@
+{
+	"hook_event_name": "subagentStart",
+	"conversation_id": "conv-abc123",
+	"subagent_id": "sub-1",
+	"subagent_type": "fullstack-developer",
+	"task": "Implement phase 4",
+	"parent_conversation_id": "conv-abc123",
+	"tool_call_id": "call-9",
+	"subagent_model": "composer-2",
+	"is_parallel_worker": false,
+	"git_branch": "fix/cursor-support-contract-correction"
+}

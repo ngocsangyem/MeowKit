@@ -1,0 +1,6 @@
+{
+	"hook_event_name": "beforeShellExecution",
+	"conversation_id": "conv-abc123",
+	"command": "rm -rf / --no-preserve-root",
+	"cwd": "/Users/example/project"
+}

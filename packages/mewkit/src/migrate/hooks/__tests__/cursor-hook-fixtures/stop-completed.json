@@ -1,0 +1,6 @@
+{
+	"hook_event_name": "stop",
+	"conversation_id": "conv-abc123",
+	"status": "completed",
+	"loop_count": 0
+}

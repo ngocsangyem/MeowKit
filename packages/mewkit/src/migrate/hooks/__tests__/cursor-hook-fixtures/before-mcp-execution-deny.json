@@ -1,0 +1,7 @@
+{
+	"hook_event_name": "beforeMCPExecution",
+	"conversation_id": "conv-abc123",
+	"tool_name": "mcp__unapproved-server__run",
+	"tool_input": {},
+	"cwd": "/Users/example/project"
+}

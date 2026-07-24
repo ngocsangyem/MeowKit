@@ -1,0 +1,8 @@
+{
+	"hook_event_name": "preToolUse",
+	"conversation_id": "conv-abc123",
+	"tool_name": "edit_file",
+	"tool_input": { "path": ".meowkit/state/cursor-ledger.json" },
+	"tool_use_id": "call-6",
+	"cwd": "/Users/example/project"
+}

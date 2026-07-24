@@ -1,0 +1,8 @@
+{
+	"hook_event_name": "preToolUse",
+	"conversation_id": "conv-abc123",
+	"tool_name": "write_file",
+	"tool_input": { "path": ".ssh/authorized_keys" },
+	"tool_use_id": "call-2",
+	"cwd": "/Users/example/project"
+}

@@ -1,0 +1,11 @@
+{
+	"hook_event_name": "preCompact",
+	"conversation_id": "conv-abc123",
+	"trigger": "auto",
+	"context_usage_percent": 92,
+	"context_tokens": 184000,
+	"context_window_size": 200000,
+	"message_count": 220,
+	"messages_to_compact": 150,
+	"is_first_compaction": true
+}

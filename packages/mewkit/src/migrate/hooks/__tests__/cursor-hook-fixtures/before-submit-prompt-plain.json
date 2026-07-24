@@ -1,0 +1,6 @@
+{
+	"hook_event_name": "beforeSubmitPrompt",
+	"conversation_id": "conv-abc123",
+	"prompt": "Add a health-check endpoint to the API.",
+	"attachments": []
+}

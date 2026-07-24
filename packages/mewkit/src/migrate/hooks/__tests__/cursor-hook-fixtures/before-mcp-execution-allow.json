@@ -1,0 +1,7 @@
+{
+	"hook_event_name": "beforeMCPExecution",
+	"conversation_id": "conv-abc123",
+	"tool_name": "mcp__context7__resolve-library-id",
+	"tool_input": { "libraryName": "react" },
+	"cwd": "/Users/example/project"
+}

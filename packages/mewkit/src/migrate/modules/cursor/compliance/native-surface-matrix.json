@@ -150,6 +150,46 @@
 					}
 				}
 			]
+		},
+		{
+			"surface": "hooks",
+			"maturity": "stable",
+			"meowkitPolicy": "primary enforcement layer — security-critical gates (beforeReadFile, beforeShellExecution, beforeMCPExecution, file-mutation preToolUse) declare failClosed:true; observational events fail open; state/telemetry under .meowkit/, PII scrubbed; kill-switch downgrades gates to warn-and-allow",
+			"claims": [
+				{
+					"claim": "hooks.json schema version 1: lifecycle events invoke `node` command hooks; security gates return { permission: allow|deny|ask }; exit 0 + JSON stdout, exit 2 blocks. Events used: sessionStart, beforeReadFile, beforeShellExecution, beforeMCPExecution, preToolUse, postToolUse, postToolUseFailure, afterFileEdit, afterShellExecution, afterMCPExecution, beforeSubmitPrompt, subagentStart, subagentStop, preCompact, stop.",
+					"source": "https://cursor.com/docs/agent/hooks",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "documented",
+						"cloud": "undocumented",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "beforeMCPExecution is not enforced in the Cloud Agent environment (docs report §5): applying an MCP profile to a cloud-exposed project has no local hook enforcement, so it is gated behind an explicit --allow-cloud-mcp opt-in (Phase 5) and doctor FAILs when an active profile lacks a cloud enforcement equivalent — a control, not a label.",
+					"source": "plans/reports/researcher-260724-2125-cursor-official-docs-verification.md",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "documented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "Fail-closed semantics are MeowKit-authored, not a Cursor guarantee: security-critical gates deny on crash / timeout / invalid-JSON / unknown-critical schema; a documented kill-switch (env MEWKIT_CURSOR_HOOKS_KILL_SWITCH or flag file .meowkit/state/cursor-hooks-kill-switch) downgrades gates to warn-and-allow to recover from schema-drift brick. Per-event intro versions are moot below the 3.11 floor (validation V2); doctor-cursor gates on the installed binary, IDE semver and CLI calendar tracked independently (minimum-version-matrix.json).",
+					"source": "https://cursor.com/docs/agent/hooks",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "documented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				}
+			]
 		}
 	],
 	"openQuestions": [
