@@ -34,7 +34,7 @@
       "scopeTags": [
         "managed-runtime"
       ],
-      "active": false
+      "active": true
     },
     {
       "sourcePath": "root/.codex/rules/default.rules",
@@ -56,7 +56,7 @@
       "scopeTags": [
         "managed-runtime"
       ],
-      "active": false
+      "active": true
     },
     {
       "sourcePath": "root/.codex/hooks/privacy-block.cjs",
@@ -67,7 +67,7 @@
       "scopeTags": [
         "managed-runtime"
       ],
-      "active": false
+      "active": true
     },
     {
       "sourcePath": "root/.codex/hooks/gate-enforcement.cjs",
@@ -78,7 +78,7 @@
       "scopeTags": [
         "managed-runtime"
       ],
-      "active": false
+      "active": true
     },
     {
       "sourcePath": "root/.codex/agents",

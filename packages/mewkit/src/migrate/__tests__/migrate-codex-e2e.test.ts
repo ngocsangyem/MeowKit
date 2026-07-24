@@ -116,7 +116,15 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 			const content = readFileSync(file, "utf-8")
 				.replace(/npx mewkit capabilities resolve --intent/g, "")
 				.replace(/npx mewkit orient/g, "");
-			expect(content, file).not.toMatch(/MeowKit|mewkit|meowkit/);
+			if (file.includes("/.codex/hooks/")) {
+				// Authored hook wrappers are provider-neutral CODE that MUST invoke the `mewkit`
+				// CLI and reference the `.meowkit/` state dir — allowed as CLI tokens/namespace
+				// (skill-authoring Rule 7). Forbid only the capitalized marketing brand here; the
+				// nuanced narrative-brand policy is enforced by the brand-prose lint.
+				expect(content, file).not.toMatch(/MeowKit/);
+			} else {
+				expect(content, file).not.toMatch(/MeowKit|mewkit|meowkit/);
+			}
 		}
 		expect(existsSync(join(env.projectDir, ".mewkit"))).toBe(false);
 	});

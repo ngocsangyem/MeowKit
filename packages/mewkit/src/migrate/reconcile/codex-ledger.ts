@@ -61,12 +61,15 @@ export function findCodexLedgerRowByPath(
 	return registry.installations.find((i) => resolve(i.path) === wanted);
 }
 
-/** Upsert a row by (item, type, provider, global) identity, mutating `registry`. */
+/** Upsert a row by (item, type, provider, global) identity, mutating `registry`. Updates an
+ *  existing row IN PLACE (stable order) so a re-run does not reshuffle the ledger — reordering
+ *  would break byte-identical idempotency and churn `.meowkit/state` needlessly. */
 export function upsertCodexLedgerRow(registry: PortableRegistryV3, row: PortableInstallationV3): void {
-	registry.installations = registry.installations.filter(
-		(i) => !(i.item === row.item && i.type === row.type && i.provider === row.provider && i.global === row.global),
+	const idx = registry.installations.findIndex(
+		(i) => i.item === row.item && i.type === row.type && i.provider === row.provider && i.global === row.global,
 	);
-	registry.installations.push(row);
+	if (idx >= 0) registry.installations[idx] = row;
+	else registry.installations.push(row);
 }
 
 /** Is `childAbsPath` inside (or equal to) `parentAbsPath`? */

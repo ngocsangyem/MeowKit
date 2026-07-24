@@ -62,15 +62,24 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 		);
 	});
 
-	it("accounts for all 22 source hook registrations with runnable, single-root commands", () => {
+	it("emits the authored Codex hook set (runnable, single-root) and still accounts for every source hook", () => {
 		const commands = hookCommands();
-		expect(commands).toHaveLength(22);
+		// Phase-9 flip: the hooks surface is authored. hooks.json declares the 3 native Codex
+		// safety+capture hooks (capture, privacy-block, gate-enforcement) — NOT a 1:1 map of the
+		// 22 source Claude hooks. Each resolves its wrapper via the git root (Codex exposes no
+		// project-dir env), single-root, runnable.
+		expect(commands).toHaveLength(3);
 		for (const command of commands) {
 			expect(command).not.toContain(`${env.projectDir}/${env.projectDir}`);
-			const wrapperPath = command.replace(/^node\s+/, "").replace(/^"|"$/g, "");
-			expect(existsSync(wrapperPath), command).toBe(true);
+			expect(command).toContain("git rev-parse --show-toplevel");
+			expect(command).toMatch(/\.codex\/hooks\/(capture|privacy-block|gate-enforcement)\.cjs/);
+		}
+		for (const name of ["capture", "privacy-block", "gate-enforcement"]) {
+			expect(existsSync(join(env.projectDir, ".codex", "hooks", `${name}.cjs`)), name).toBe(true);
 		}
 
+		// The migration report still accounts for every source hook — none silently dropped —
+		// and the safety hooks are recorded migrated.
 		const hookRecords = readReport().artifacts.filter((a) => a.type === "hooks");
 		const migratedOrSkipped = hookRecords.filter((a) => a.status === "migrated" || a.status === "skipped");
 		expect(migratedOrSkipped.length).toBe(22);
@@ -132,7 +141,7 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 		const report = readReport();
 		const { counts } = report.header;
 		expect(counts.migrated + counts.skipped + counts.failed + counts.narrowed).toBe(counts.total);
-		expect(hookCommands()).toHaveLength(22);
+		expect(hookCommands()).toHaveLength(3); // authored hook set (phase-9 flip), idempotent on re-run
 		const agentsMd = readFileSync(join(env.projectDir, "AGENTS.md"), "utf-8");
 		expect(agentsMd.match(/GENERATED:capability-bootstrap START/g)).toHaveLength(1);
 	});

@@ -181,16 +181,22 @@ function makeLedgerRow(
 	targetAbsPath: string,
 	global: boolean,
 	srcChecksum: string,
+	existingRow?: PortableInstallationV3,
 ): PortableInstallationV3 {
 	// After a write (or an adopt of an identical target), target content == source, so
-	// both checksums are the source checksum.
+	// both checksums are the source checksum. Preserve the original install time when the
+	// source content is unchanged (an idempotent force re-affirm — e.g. the migrate overlay
+	// re-overwriting converter output every run) so a no-content-change re-run stays
+	// byte-identical; only a genuine source change re-stamps the timestamp.
+	const installedAt =
+		existingRow && existingRow.sourceChecksum === srcChecksum ? existingRow.installedAt : new Date().toISOString();
 	return {
 		item: entry.targetPath,
 		type: entryLedgerType(entry),
 		provider: "codex",
 		global,
 		path: targetAbsPath,
-		installedAt: new Date().toISOString(),
+		installedAt,
 		sourcePath: entry.sourcePath,
 		sourceChecksum: srcChecksum,
 		targetChecksum: srcChecksum,
@@ -252,7 +258,7 @@ export async function reconcileApplyCodexBundle(
 			wrote = true;
 		}
 		if (decision.recordLedger && !opts.dryRun) {
-			upsertCodexLedgerRow(ledger, makeLedgerRow(entry, tgtAbs, !!opts.global, srcChecksum));
+			upsertCodexLedgerRow(ledger, makeLedgerRow(entry, tgtAbs, !!opts.global, srcChecksum, row));
 			ledgerDirty = true;
 		}
 

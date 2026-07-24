@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Codex PreToolUse privacy guard (Bash matcher).
 //
-// Ports MeowKit's privacy-block policy (injection-rules R4) to the native Codex hook
+// Ports the toolkit's privacy-block policy (injection-rules R4) to the native Codex hook
 // contract: a Bash tool call whose command references a sensitive file — .env*, *.pem,
 // *.key, *.keystore, credentials, an *.ssh/* path, or an SSH private key — is DENIED so
 // a secret cannot be read or exfiltrated without explicit user approval.

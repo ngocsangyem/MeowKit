@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Codex PreToolUse gate guard (file-edit matcher: apply_patch / Edit / Write).
 //
-// Ports MeowKit's Gate 1 (gate-rules.md) to the native Codex hook contract: a source-code
+// Ports the toolkit's Gate 1 (gate-rules.md) to the native Codex hook contract: a source-code
 // edit is DENIED unless an approved plan exists under tasks/plans/. Non-source files (plan,
 // review, contract, docs, .claude/.codex/.agents/.meowkit trees, and test files) are always
 // allowed; backup/legacy paths are rejected. This is the faithful PRESENCE gate. The
