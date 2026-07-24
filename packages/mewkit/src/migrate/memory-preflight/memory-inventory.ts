@@ -8,8 +8,9 @@ import { createHash } from "node:crypto";
 import { createReadStream, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { classifyMemoryFile } from "./memory-classification-rules.js";
+import { looksBinary, scanTextForSecrets, MAX_SCAN_BYTES, type SecretFinding } from "./secret-scan.js";
 import type { DiscoveredFile } from "./legacy-memory-discovery.js";
-import type { InventoryEntry, PreflightAction } from "./preflight-types.js";
+import type { InventoryEntry, PreflightAction, ValidationState } from "./preflight-types.js";
 import type { StoreSpec } from "../../memory/schemas.js";
 
 /** Streamed sha256 so a huge legacy dir is never loaded whole into memory. */
@@ -30,6 +31,45 @@ function isValidCurated(absPath: string, spec: StoreSpec): boolean {
 	} catch {
 		return false;
 	}
+}
+
+/** Read + scan a text file for secret-like content. Binary/oversized files return [].
+ *  Guards the size cap BEFORE the read so an oversized blob is never materialized in memory. */
+function scanFileForSecrets(absPath: string, byteSize: number): SecretFinding[] {
+	if (byteSize > MAX_SCAN_BYTES) return []; // too large — skip without reading
+	let content: string;
+	try {
+		content = readFileSync(absPath, "utf-8");
+	} catch {
+		return []; // unreadable — nothing to scan, checksum/reconcile still runs
+	}
+	if (looksBinary(content)) return [];
+	return scanTextForSecrets(content);
+}
+
+/** Redirect a file to `memory/legacy/` (quarantine): preserved, never published as canonical.
+ *  Shared by the invalid-curated-JSON and secret-detected paths so both behave identically. */
+async function buildQuarantineEntry(
+	file: DiscoveredFile,
+	meowkitRoot: string,
+	checksum: string,
+	extra: { validationState: ValidationState; note: string; secretFindings?: SecretFinding[] },
+): Promise<InventoryEntry> {
+	const legacyRel = join("memory", "legacy", file.relPath).split("\\").join("/");
+	const targetAbs = join(meowkitRoot, legacyRel);
+	const base = await reconcile(targetAbs, checksum);
+	return {
+		relPath: file.relPath,
+		sourcePath: file.absPath,
+		targetClass: "legacy",
+		targetRelPath: legacyRel,
+		size: file.size,
+		checksum,
+		validationState: extra.validationState,
+		action: base === "stage" ? "quarantine" : base,
+		note: extra.note,
+		...(extra.secretFindings ? { secretFindings: extra.secretFindings } : {}),
+	};
 }
 
 /** Compare a staged source checksum against an existing target on disk. */
@@ -78,24 +118,29 @@ export async function buildEntry(file: DiscoveredFile, meowkitRoot: string): Pro
 
 	const checksum = await sha256File(file.absPath);
 
+	// Secret scan (text files only; binary caches skipped). A hit quarantines the file to
+	// memory/legacy/ and reports it — never deletes, never publishes it as a canonical store.
+	if (cls.targetClass !== "cache") {
+		const secretFindings = scanFileForSecrets(file.absPath, file.size);
+		if (secretFindings.length > 0) {
+			// The scan short-circuits BEFORE schema validation, so a curated store quarantined for
+			// a secret was never schema-checked — report "unchecked", never a fabricated "valid".
+			return buildQuarantineEntry(file, meowkitRoot, checksum, {
+				validationState: "unchecked",
+				note: `secret-like content detected (${secretFindings.length}) — quarantined, not published`,
+				secretFindings,
+			});
+		}
+	}
+
 	// Curated JSON: invalid content is quarantined into memory/legacy/, never
 	// published as a canonical store.
 	if (cls.curatedStore) {
 		if (!isValidCurated(file.absPath, cls.curatedStore)) {
-			const legacyRel = join("memory", "legacy", file.relPath).split("\\").join("/");
-			const targetAbs = join(meowkitRoot, legacyRel);
-			const base = await reconcile(targetAbs, checksum);
-			return {
-				relPath: file.relPath,
-				sourcePath: file.absPath,
-				targetClass: "legacy",
-				targetRelPath: legacyRel,
-				size: file.size,
-				checksum,
+			return buildQuarantineEntry(file, meowkitRoot, checksum, {
 				validationState: "invalid",
-				action: base === "stage" ? "quarantine" : base,
 				note: "curated JSON failed schema — quarantined, not published",
-			};
+			});
 		}
 	}
 

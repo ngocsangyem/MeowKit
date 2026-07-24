@@ -30,6 +30,7 @@ export function preflightToJson(result: PreflightResult): unknown {
 			conflict: result.conflicts.length,
 			skip: result.inventory.filter((e) => e.action === "skip").length,
 			noop: result.inventory.filter((e) => e.action === "noop").length,
+			secretFlagged: result.inventory.filter((e) => (e.secretFindings?.length ?? 0) > 0).length,
 		},
 		inventory: result.inventory.map((e) => ({
 			relPath: e.relPath,
@@ -40,6 +41,7 @@ export function preflightToJson(result: PreflightResult): unknown {
 			validationState: e.validationState,
 			action: e.action,
 			...(e.note ? { note: e.note } : {}),
+			...(e.secretFindings?.length ? { secretFindings: e.secretFindings } : {}),
 		})),
 	};
 }
@@ -68,6 +70,15 @@ export function renderPreflightReport(result: PreflightResult): string {
 	);
 	if (result.conflicts.length > 0) {
 		lines.push(pc.red("Conflicts must be resolved before migrating — nothing is overwritten or merged automatically."));
+	}
+	const flagged = result.inventory.filter((e) => (e.secretFindings?.length ?? 0) > 0);
+	if (flagged.length > 0) {
+		lines.push("");
+		lines.push(pc.yellow(`⚠ ${flagged.length} file(s) contain secret-like content — quarantined to memory/legacy/ (not published, not deleted). Review and remove the secret, then re-run:`));
+		for (const e of flagged) {
+			const types = [...new Set((e.secretFindings ?? []).map((f) => f.type))].join(", ");
+			lines.push(pc.yellow(`    ${e.relPath} (${types})`));
+		}
 	}
 	return lines.join("\n");
 }

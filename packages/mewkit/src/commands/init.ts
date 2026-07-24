@@ -24,6 +24,11 @@ import { providers } from "../migrate/provider-registry.js";
 import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
 import { packSelectionBudgetWarning, type PackSelection } from "../migrate/modules/codex-skill-packs.js";
 import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
+import {
+	CODEX_MIN_SUPPORTED_VERSION,
+	detectCodexVersion,
+	isCodexVersionSupported,
+} from "../migrate/providers/codex/capabilities.js";
 
 export interface InitArgs {
 	dryRun?: boolean;
@@ -314,7 +319,40 @@ async function initCodexTarget(
 	const budgetWarn = packSelectionBudgetWarning(moduleDir, packs);
 	if (budgetWarn) p.log.warn(budgetWarn);
 	p.log.info("Skill packs are additive: re-run with more `--skill-packs` to add; removing an installed pack is manual (delete its .agents/skills/<name> dirs).");
+	await warnBelowMinCodex();
+	hintLegacyMemoryForCodex(targetDir);
 	p.outro(pc.green("Codex toolkit installed!"));
+}
+
+/**
+ * Warn-and-degrade version gate for the Codex install. The authored bundle is inert config
+ * until Codex runs it, and its gated surfaces (deny-capable hooks, `.codex/rules`) degrade
+ * gracefully on an older/untrusted Codex — so a below-minimum version never hard-fails the
+ * install. It only warns, so the user knows those surfaces may be ignored and that the
+ * MeowKit CLI gate stays authoritative. No warning when the version can't be detected
+ * (codex absent / compat env override) — do not nag on an unknown.
+ */
+async function warnBelowMinCodex(): Promise<void> {
+	const version = await detectCodexVersion();
+	if (version && !isCodexVersionSupported(version)) {
+		p.log.warn(
+			`Codex ${version} < ${CODEX_MIN_SUPPORTED_VERSION}: deny-capable hooks (gate-enforcement, privacy-block) and .codex/rules may be ignored by this version. Install proceeds; the MeowKit CLI gate stays authoritative. Upgrade Codex to enforce them.`,
+		);
+	}
+}
+
+/**
+ * Codex install copies the authored bundle but does NOT run the legacy `.claude/memory/`
+ * → `.meowkit/` import (that lives in the `mewkit migrate` flow). If a repo carries legacy
+ * memory, surface a hint instead of silently leaving it behind — the user runs the import
+ * explicitly so it stays an opt-in, conflict-aware transaction.
+ */
+function hintLegacyMemoryForCodex(targetDir: string): void {
+	if (fs.existsSync(join(targetDir, ".claude", "memory"))) {
+		p.log.info(
+			"Legacy .claude/memory/ detected — import it into .meowkit/ with: mewkit migrate codex (loss-aware, conflict-safe; not run automatically).",
+		);
+	}
 }
 
 /**
@@ -356,6 +394,8 @@ async function addCodexBundle(targetDir: string, force: boolean, packs: PackSele
 	p.log.success(`Codex toolkit created (${result.writes} written): AGENTS.md, .codex/, .agents/skills/.`);
 	const budgetWarn = packSelectionBudgetWarning(moduleDir, packs);
 	if (budgetWarn) p.log.warn(budgetWarn);
+	await warnBelowMinCodex();
+	hintLegacyMemoryForCodex(targetDir);
 }
 
 export async function init(args: InitArgs): Promise<void> {

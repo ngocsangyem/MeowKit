@@ -1,0 +1,41 @@
+{
+  "_description": "Phase-8 compatibility-matrix + packaged-canary dispositions for the authored Codex bundle. Two independent proofs that never mask each other: a deterministic STRUCTURAL lane (CI-blocking) and a best-effort LIVE Codex lane, plus a MANUAL model-in-loop canary. Records what runs where and why the minimum-version pin is where it is.",
+  "verified": "2026-07-24",
+  "phase": 8,
+  "minimumVersion": {
+    "operationalFloor": "0.142.0",
+    "minCandidate": "0.124.0",
+    "justification": "Hooks became stable (no [features] flag, inline config.toml) at Codex 0.124.0 — the min-candidate. The operational floor stays 0.142.0 (CODEX_MIN_SUPPORTED_VERSION in providers/codex/capabilities.ts) until the packaged-install lane confirms the bundle's actually-used surfaces work at 0.124.0. Lowering the floor requires installing 0.124.0 in the lane, which is not available in the current environment, so the floor is held at 0.142.0 (conservative, not hand-waved).",
+    "policyBelowFloor": "warn-and-degrade, never hard-fail. migrate codex warns via hooks-settings-merger (deny-capable hooks may be ignored); init --target codex warns via warnBelowMinCodex (bundle still installs; gated surfaces degrade at runtime; MeowKit CLI gate stays authoritative). No warning when the version is undetectable (codex absent / MEWKIT_CODEX_COMPAT override) — do not nag on unknown."
+  },
+  "lanes": [
+    {
+      "lane": "structural canary",
+      "blocking": true,
+      "runsIn": "CI (validate job, ubuntu) + Windows job (windows-latest) + local",
+      "mechanism": "scripts/codex-compat-check.mjs: `init --target codex` into a temp dir, then `validate --target codex` (codexTargetProfile) on the RESULT. Deterministic, no Codex CLI or login required. A broken authored bundle fails a named structural check.",
+      "distParity": "src/migrate/modules/codex/__tests__/packaged-bundle-parity.test.ts (rides in npm test): manifest-integrity (every sourcePath exists) + recursive-copy completeness (zero drops, exec bits preserved) + package.json files includes dist. Closes the verified gap that copy-codex-bundle.cjs had no test."
+    },
+    {
+      "lane": "live Codex canary",
+      "blocking": "best-effort — non-blocking when codex is absent; blocking only for a present-CLI execpolicy LOAD failure",
+      "runsIn": "local + any CI runner that has the codex binary (none today)",
+      "mechanism": "scripts/codex-compat-check.mjs live layer: `codex --version` + `codex execpolicy check --rules default.rules git push --force` (real, no-auth policy-load proof). A full `codex --strict-config` run needs an authenticated session and is reported SKIP, not omitted.",
+      "lastVerified": "codex-cli 0.144.6 — structural pass, execpolicy load pass (force-push resolves to prompt), strict-config skipped (auth). Recorded in minimum-version-matrix.json compatLane."
+    },
+    {
+      "lane": "model-in-loop canary",
+      "blocking": false,
+      "runsIn": "manual only (never CI)",
+      "mechanism": "scripts/codex-model-canary.mjs: a documented human scenario driving a real authenticated Codex session (skill routing, agent spawn, hook fire). Failures file issues; they never gate the structural lane (approved separation)."
+    }
+  ],
+  "doctorTrustStates": {
+    "status": "verified",
+    "note": "doctor-codex-hook-trust.ts (wired at doctor.ts, tested by doctor-codex-hook-trust.test.ts) reports the four states distinctly: configured=yes (present in hooks.json), trusted=unverified (Codex per-hook-hash trust via /hooks, not inspectable here), executed=not-observed (no documented Codex execution-log surface), enforced=no (command hooks are defense-in-depth + per-hook-trust-gated; CLI gate authoritative)."
+  },
+  "windows": {
+    "status": "in-scope",
+    "job": "ci.yml codex-windows (windows-latest): npm ci + npm run build + the structural canary + parity/version-support unit tests. Node-only steps (no bash) verify the bundle installs and validates on Windows; the authored hook commands carry a commandWindows variant so the install makes no POSIX-shell assumption."
+  }
+}

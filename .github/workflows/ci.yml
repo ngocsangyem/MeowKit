@@ -147,6 +147,13 @@ jobs:
       - name: Validate pack manifest coherence + safety invariant
         run: node packages/mewkit/dist/index.js validate --packs
 
+      # Structural Codex compatibility canary: install the authored bundle via
+      # `init --target codex` into a temp dir and run structural validation on the
+      # RESULT. No Codex CLI in CI, so the live execpolicy/version checks skip
+      # gracefully; the structural proof is blocking (a broken bundle fails here).
+      - name: Codex bundle compatibility lane (structural)
+        run: node packages/mewkit/scripts/codex-compat-check.mjs
+
       - name: Validate responsibility substrate (tagging + view drift)
         run: node packages/mewkit/dist/index.js validate --substrate
 
@@ -222,3 +229,28 @@ jobs:
           name: skill-eval-results
           path: ${{ runner.temp }}/skill-eval-results.md
           if-no-files-found: error
+
+  # Windows is a supported Codex target (user decision). This job proves the authored
+  # bundle installs and structurally validates on windows-latest — the authored hook
+  # commands carry a `commandWindows` variant, so the install must not assume a POSIX
+  # shell. Node-only steps (no bash) keep the job cross-platform. Codex CLI is absent,
+  # so the canary's live checks skip; the structural install + validate is the proof.
+  codex-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - run: npm ci
+
+      - name: Build packages
+        run: npm run build
+
+      - name: Codex bundle structural canary (Windows)
+        run: node packages/mewkit/scripts/codex-compat-check.mjs
+
+      - name: Codex bundle parity + version-support unit tests
+        run: npx vitest run packages/mewkit/src/migrate/modules/codex/__tests__/packaged-bundle-parity.test.ts packages/mewkit/src/migrate/hooks/__tests__/codex-version-support.test.ts

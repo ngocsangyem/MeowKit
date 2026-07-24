@@ -79,6 +79,9 @@ describe("transaction — happy path + idempotency", () => {
 		expect(res.reason).toBe("conflicts");
 		expect(readFileSync(meowkitPath("memory/fixes.json"), "utf-8")).toBe(original);
 		expect(runDirs()).toEqual([]);
+		// Pre-state intact: the legacy source stays live (never archived on an abort).
+		expect(existsSync(legacyPath("fixes.json"))).toBe(true);
+		expect(readFileSync(legacyPath("fixes.json"), "utf-8")).toBe(validFixes("legacy version"));
 	});
 });
 

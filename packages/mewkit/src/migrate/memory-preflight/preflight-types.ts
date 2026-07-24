@@ -2,6 +2,7 @@
 // plan). Pure planning: nothing here or downstream mutates the filesystem; the
 // transaction that acts on this plan lives in phase 3.
 import type { StoreSpec } from "../../memory/schemas.js";
+import type { SecretFinding } from "./secret-scan.js";
 
 /** Runtime-neutral taxonomy classes + the lossless catch-all (`legacy`) and the
  *  `retain` marker for tracked files (`.gitkeep`) that stay in `.claude/memory/`. */
@@ -35,6 +36,8 @@ export interface InventoryEntry {
 	validationState: ValidationState;
 	action: PreflightAction;
 	note?: string;
+	/** Secret-like hits found in this file's content; present ⇒ quarantined, never published. */
+	secretFindings?: SecretFinding[];
 }
 
 export interface PreflightResult {

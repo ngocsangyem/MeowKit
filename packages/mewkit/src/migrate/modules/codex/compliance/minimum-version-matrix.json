@@ -59,5 +59,32 @@
       "note": "Upper bound with every surface flipped. The e2e branding failure means the CURRENT authored AGENTS.md/agents/skills content still carries toolkit-brand strings the brand-free gate rejects — a real cleanup item for the native re-authoring in phases 4-6."
     },
     "interpretation": "Measured displacement is far below the 41-test estimate BECAUSE today's authored bundle is still porter-generated and therefore byte-similar to converter output, so most converter-shaped assertions still pass on flip. The 41 is the POPULATION of converter-shaped test blocks at risk; actual failures grow as phases 4-6 hand-author content that diverges from converter output. Phase-9 flip staging should re-measure per surface after each surface is re-authored, not rely on this floor. The inert-guard test itself must be rewritten (or its assertion inverted) as the first surface flips active."
+  },
+  "compatLane": {
+    "ranAt": "2026-07-24T01:51:00.930Z",
+    "codexVersion": "0.144.6",
+    "structural": "pass",
+    "checks": [
+      {
+        "name": "init --target codex",
+        "status": "pass"
+      },
+      {
+        "name": "validate --target codex",
+        "status": "pass"
+      },
+      {
+        "name": "codex CLI",
+        "status": "pass"
+      },
+      {
+        "name": "codex execpolicy load",
+        "status": "pass"
+      },
+      {
+        "name": "codex --strict-config full run",
+        "status": "skip"
+      }
+    ]
   }
 }
