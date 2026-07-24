@@ -380,7 +380,7 @@ async function promptProviders(): Promise<ProviderType[]> {
 				hint: "installs .claude/ (default)",
 			},
 			{ value: "codex" as const, label: providers.codex.displayName, hint: "copies the authored Codex bundle" },
-			{ value: "cursor" as const, label: providers.cursor.displayName, hint: "exports .claude/ to .cursor/" },
+			{ value: "cursor" as const, label: providers.cursor.displayName, hint: "legacy export of .claude/ to .cursor/ (native bundle pending)" },
 		],
 		initialValues: ["claude-code"],
 		required: true,
