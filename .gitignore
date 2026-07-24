@@ -5,6 +5,11 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Next.js / Fumadocs (packages/docs)
+packages/docs/.next/
+packages/docs/.source/
+packages/docs/next-env.d.ts
+
 # OS files
 .DS_Store
 Thumbs.db

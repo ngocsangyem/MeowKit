@@ -1,9 +1,12 @@
-import { mkdtemp, mkdir, rm, writeFile, cp } from "node:fs/promises";
+import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { findPseudoCapabilities, scanForPseudoCapabilities } from "../check-pseudo-capabilities.js";
-import { generatePluginPayload } from "../plugin-payload.js";
+import {
+	findPseudoCapabilities,
+	formatPseudoCapabilityError,
+	scanForPseudoCapabilities,
+} from "../check-pseudo-capabilities.js";
 
 const tempDirs: string[] = [];
 
@@ -74,54 +77,42 @@ describe("scanForPseudoCapabilities", () => {
 	});
 });
 
-describe("build-plugin rejects a seeded alias", () => {
-	/** Minimal but real source tree the payload generator accepts. */
-	async function sourceTree(extra: Record<string, string> = {}): Promise<string> {
-		return treeWith({
+describe("findPseudoCapabilities + formatPseudoCapabilityError", () => {
+	it("returns no findings for a clean tree", async () => {
+		const root = await treeWith({
 			"agents/dev.md": "---\nname: developer\n---\n\nDeveloper agent.\n",
 			"skills/demo/SKILL.md": "---\nname: mk:demo\n---\n\nA clean skill.\n",
-			"settings.json": JSON.stringify({ hooks: {} }),
-			...extra,
 		});
-	}
-
-	it("builds a clean tree without throwing", async () => {
-		const src = await sourceTree();
-		const out = await mkdtemp(join(tmpdir(), "plugin-out-"));
-		tempDirs.push(out);
-		expect(() => generatePluginPayload({ sourceDir: src, outDir: out })).not.toThrow();
+		expect(findPseudoCapabilities(root)).toEqual([]);
 	});
 
-	// Mutation test — the success criterion: seeding the defect must fail the build.
-	// A build that ships prose telling an agent to use a thing that does not exist
-	// is shipping a broken instruction; the payload is the last place to catch it.
-	it("throws with file:line when an alias is seeded", async () => {
-		const src = await sourceTree({
+	// Mutation test — the success criterion: seeding the defect must surface a finding
+	// whose formatted error names the offending file:line. This is the same check a
+	// build step would run before shipping a payload built from this tree.
+	it("finds a seeded alias with file:line and a formatted error", async () => {
+		const root = await treeWith({
 			"skills/demo/references/how-to.md": "# How to\n\nFirst, use `manage_plan capability` to record the plan.\n",
 		});
-		const out = await mkdtemp(join(tmpdir(), "plugin-out-"));
-		tempDirs.push(out);
+		const findings = findPseudoCapabilities(root);
+		expect(findings).toHaveLength(1);
+		expect(findings[0].file).toContain("how-to.md");
+		expect(findings[0].line).toBe(3);
 
-		expect(() => generatePluginPayload({ sourceDir: src, outDir: out })).toThrow(/manage_plan capability/);
-		expect(() => generatePluginPayload({ sourceDir: src, outDir: out })).toThrow(/how-to\.md:3/);
+		const message = formatPseudoCapabilityError(findings);
+		expect(message).toMatch(/manage_plan capability/);
+		expect(message).toMatch(/how-to\.md:3/);
 	});
 
 	it("names every offending location, not just the first", async () => {
-		const src = await sourceTree({
+		const root = await treeWith({
 			"skills/demo/references/a.md": "use `ask_user capability`",
 			"skills/demo/references/b.md": "use `run_shell capability`",
 		});
-		const out = await mkdtemp(join(tmpdir(), "plugin-out-"));
-		tempDirs.push(out);
-		try {
-			generatePluginPayload({ sourceDir: src, outDir: out });
-			expect.unreachable("expected the build to reject the seeded aliases");
-		} catch (err) {
-			const msg = String(err);
-			expect(msg).toMatch(/a\.md:1/);
-			expect(msg).toMatch(/b\.md:1/);
-			expect(msg).toMatch(/2 place\(s\)/);
-		}
+		const findings = findPseudoCapabilities(root);
+		const message = formatPseudoCapabilityError(findings);
+		expect(message).toMatch(/a\.md:1/);
+		expect(message).toMatch(/b\.md:1/);
+		expect(message).toMatch(/2 place\(s\)/);
 	});
 });
 

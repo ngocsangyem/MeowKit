@@ -83,7 +83,11 @@ describe("skill directory installer", () => {
 		expect(migratedSkill).toContain("AGENTS.md");
 		expect(migratedSkill).not.toContain("/mk:review");
 		expect(migratedSkill).not.toContain(".claude/");
-		expect(migratedRef).toContain(".codex/agents");
+		// Codex agents conversion is nulled (toolkit agents ship via the native
+		// authored bundle) — an agents/ reference degrades to the generic
+		// no-provider-equivalent placeholder instead of a .codex/agents path.
+		expect(migratedRef).toContain("project subagents directory/reviewer");
+		expect(migratedRef).not.toContain(".claude/");
 		expect(migratedRef).not.toContain("CLAUDE.md");
 	});
 

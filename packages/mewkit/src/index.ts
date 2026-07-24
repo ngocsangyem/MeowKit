@@ -21,12 +21,12 @@ import { task } from "./commands/task.js";
 import { inventory } from "./commands/inventory.js";
 import { plan } from "./commands/plan.js";
 import { planApprove } from "./commands/plan-approve.js";
+import { planArchive } from "./commands/plan-archive.js";
 import { trace } from "./commands/trace.js";
 // NOTE: index-command is imported lazily inside its case — it pulls in `node:sqlite`
 // (experimental), so a static import would load SQLite + emit its warning on EVERY command.
 import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
-import { buildPlugin } from "./commands/build-plugin.js";
 import { visualPlan } from "./commands/visual-plan.js";
 import { reviewPrepare } from "./commands/review/prepare.js";
 import { reviewRead } from "./commands/review/read.js";
@@ -65,13 +65,12 @@ ${pc.bold("Commands:")}
   ${pc.green("visual-plan")} Visual plan contracts: validate|status|approve --revision <n>|rehash|export --format html|prepare-feedback --ops <f>|apply-feedback --batch <id> [--check|--receipt <f>]|patch --op <f>|edit|view <plan-dir> [--json]
   ${pc.green("review")}     High-assurance PR review ('review prepare <pr>' → session; 'review read --session <id> --as <role> <path>' → observed read; 'review coverage --session <id>' → gap gate)
   ${pc.green("inventory")}  List harness artifacts with governance metadata
-  ${pc.green("plan")}       Read-only plan inspection (status <plan-dir> | check <phase-file>)
+  ${pc.green("plan")}       Plan lifecycle: status <plan-dir> | check <phase-file> (read-only); approve <plan-dir> | archive <plan-dir> (mutating; archive marks completed + moves to tasks/plans/archive/)
   ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
   ${pc.green("wiki")}       Long-term project knowledge ('wiki context "<keywords>" [--max-pages N] [--include-content] [--json]' | init|propose|approve|search|reindex)
   ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
   ${pc.green("query")}      Read-only aggregate queries over the derived index
   ${pc.green("pack")}       Manage install packs (list, add, remove)
-  ${pc.green("build-plugin")} Generate the native plugin distribution (plugin/ + marketplaces)
 
 ${pc.bold("Options:")}
   --help, -h       Show help
@@ -86,7 +85,6 @@ ${pc.bold("Options:")}
   --strict         Validate: treat WARN as failure (exit 1); off by default
   --workflow       Validate: run only the workflow.yaml drift-check (CI scope)
   --gates          Validate: run only the gate-authority contract check (CI scope)
-  --parity         Validate: regenerate the plugin and diff it against the committed tree
   --ownership      Validate: run only the artifact ownership-completeness check
   --agents         Validate: run only declared agent-contract conformance checks
   --packs          Validate: run only the pack-manifest coherence + safety check
@@ -114,9 +112,10 @@ ${pc.bold("Init flags:")}
   --profile <name>           Install a subset: core|developer|product|atlassian|security|research|full
                              (default full). In update mode, trims an install down to the profile.
 
-${pc.bold("Init flags for post-init migration:")}
-  --migrate                  After unpack, prompt for providers to export to (interactive)
-  --migrate-to <csv|all>     After unpack, export to listed providers (e.g. cursor,codex)
+${pc.bold("Init flags (a bare fresh 'init' shows a Claude Code / Codex / Cursor picker):")}
+  --target <provider>        Skip the picker; create one toolkit: 'codex' copies the authored Codex
+                             bundle (codex-only, no .claude/); 'cursor' unpacks .claude/ then exports
+  --migrate                  Skip the picker; after unpack, prompt for export targets (interactive)
   --migrate-global           Use global install paths (~/.cursor/, etc.) instead of project-local
 
 ${pc.bold("visual-plan flags:")}
@@ -194,7 +193,6 @@ async function main(): Promise<void> {
 			"verbose",
 			"workflow",
 			"gates",
-			"parity",
 			"ownership",
 			"agents",
 			"json",
@@ -229,13 +227,13 @@ async function main(): Promise<void> {
 			"status",
 			"source",
 			"source-version",
-			"migrate-to",
 			"port",
 			"session",
 			"day",
 			"workspace",
 			"log",
 			"profile",
+			"skill-packs",
 			"fail-over",
 			"friction",
 			"id",
@@ -273,9 +271,10 @@ async function main(): Promise<void> {
 				force: args.force as boolean | undefined,
 				beta: args.beta as boolean | undefined,
 				migrate: args.migrate as boolean | undefined,
-				migrateTo: args["migrate-to"] as string | undefined,
+				target: args.target as string | undefined,
 				migrateGlobal: args["migrate-global"] as boolean | undefined,
 				profile: args.profile as string | undefined,
+				skillPacks: args["skill-packs"] as string | undefined,
 			});
 			break;
 		case "upgrade":
@@ -302,22 +301,15 @@ async function main(): Promise<void> {
 				strict: args.strict as boolean | undefined,
 				workflow: args.workflow as boolean | undefined,
 				gates: args.gates as boolean | undefined,
-				parity: args.parity as boolean | undefined,
 				ownership: args.ownership as boolean | undefined,
 				agents: args.agents as boolean | undefined,
 				substrate: args.substrate as boolean | undefined,
 				packs: args.packs as boolean | undefined,
 				rules: args.rules as boolean | undefined,
-				plugin: args.plugin as boolean | undefined,
 				capabilities: args.capabilities as boolean | undefined,
 			});
 			break;
 		}
-		case "build-plugin":
-			await buildPlugin({
-				json: args.json as boolean | undefined,
-			});
-			break;
 		case "review": {
 			const sub = args._[1] as string | undefined;
 			if (sub === "prepare") {
@@ -390,10 +382,11 @@ async function main(): Promise<void> {
 				lifecycle: args.lifecycle as boolean | undefined,
 			});
 			break;
-		case "plan":
-			// `approve` MUTATES (stamps the receipt) — route it to the separate
-			// plan-approve module so the read-only `plan` command stays write-free.
-			if ((args._[1] as string | undefined) === "approve") {
+		case "plan": {
+			// `approve` and `archive` MUTATE — route them to their own modules so the
+			// read-only `plan` command (status/check) stays write-free by construction.
+			const planSub = args._[1] as string | undefined;
+			if (planSub === "approve") {
 				await planApprove({
 					target: args._[2] as string | undefined,
 					by: args.by as string | undefined,
@@ -401,14 +394,20 @@ async function main(): Promise<void> {
 					noActivate: args.activate === false,
 					cliVersion: VERSION,
 				});
+			} else if (planSub === "archive") {
+				await planArchive({
+					target: args._[2] as string | undefined,
+					dryRun: args["dry-run"] as boolean | undefined,
+				});
 			} else {
 				await plan({
-					subcommand: args._[1] as string | undefined,
+					subcommand: planSub,
 					target: args._[2] as string | undefined,
 					json: args.json as boolean | undefined,
 				});
 			}
 			break;
+		}
 		case "inventory":
 			await inventory({
 				json: args.json as boolean | undefined,
@@ -494,6 +493,7 @@ async function main(): Promise<void> {
 				stats: args.stats as boolean | undefined,
 				strict: args.strict as boolean | undefined,
 				check: args.check as boolean | undefined,
+				promptArgs: args._.slice(2).map(String),
 			});
 			break;
 		case "verdict-gate":

@@ -1,0 +1,77 @@
+---
+title: "jira-analyst"
+description: "Jira ticket analyst — performs full context analysis including attached media (images, PDFs, screenshots) and linked issues for root cause investigation."
+---
+
+The jira-analyst agent performs the deepest level of Jira ticket analysis. Unlike the evaluator and estimator, the analyst processes attached media — screenshots, PDFs, images — and follows linked issue chains to build a complete picture. Its findings are structured for posting back to Jira as a comment, making analysis results accessible to the entire team.
+
+## Cognitive Framing
+
+> *"The full story is in the attachments and links, not just the description. Analyze everything."*
+
+The jira-analyst agent is a read-only analysis agent that produces comprehensive findings. It processes ticket descriptions, acceptance criteria, attached media, and linked issues to perform root cause analysis. Its output is structured as a Jira comment, ready to post back to the issue.
+
+## Key Facts
+
+| | |
+|---|---|
+| **Type** | Domain (Jira) |
+| **Phase** | On-demand |
+| **Model** | haiku |
+| **Color** | indigo |
+| **Safety** | Read-only — never modifies Jira state |
+| **Never does** | Modify issues, skip media analysis when attachments exist, estimate story points (jira-estimator), score complexity only (jira-evaluator) |
+
+## When to Use
+
+- When you need **full root cause analysis** for a bug or incident ticket.
+- When a ticket has **attached screenshots or PDFs** that contain critical context.
+- When you need to **follow linked issue chains** to understand the full dependency picture.
+- When you need structured findings that can be **posted back to Jira as a comment**.
+
+## Key Capabilities
+
+- **Media analysis** — processes attached images, PDFs, and screenshots to extract context not present in the text description.
+- **Linked issue traversal** — follows issue links (blocks, is blocked by, relates to) to build a complete dependency picture.
+- **Root cause analysis** — identifies the root cause of bugs and incidents based on all available evidence.
+- **Structured findings** — produces analysis formatted for Jira comment posting, accessible to the entire team.
+- **Cross-reference** — correlates information across the ticket description, acceptance criteria, attachments, and linked issues.
+
+## Behavioral Checklist
+
+- [x] Analyzes all attached media when present — never skips attachments
+- [x] Follows linked issue chains to build complete context
+- [x] Produces structured findings suitable for Jira comment posting
+- [x] Identifies root causes with supporting evidence
+- [x] Correlates information across all available ticket data
+- [x] Never modifies Jira state — analysis only
+
+## Common Use Cases
+
+| Scenario | What the agent does |
+|---|---|
+| "Analyze PROJ-123" | Reads description, processes attachments, follows links, produces structured findings |
+| "RCA for PROJ-456" | Performs root cause analysis using all available evidence including screenshots |
+| "Describe PROJ-789 with media" | Produces comprehensive description incorporating attached images and PDFs |
+| "What's the full context for this bug?" | Follows linked issues and analyzes attachments to build complete picture |
+
+## Pro Tips
+
+### Attach Screenshots to Bug Reports
+
+The analyst's media analysis capability means that screenshots attached to bug reports are not just visual aids — they are data sources. Error messages visible in screenshots, UI state information, and environmental context all contribute to more accurate root cause analysis.
+
+### Use Analyst Output as Jira Comments
+
+The analyst's structured findings are formatted for posting back to Jira via jira-collaborate. This makes the analysis visible to the entire team, not just the person who requested it, and creates a permanent record of the investigation.
+
+## Key Takeaway
+
+The jira-analyst agent provides the deepest level of ticket analysis by processing media attachments and linked issue chains that other agents skip. When a ticket's full story is hidden in screenshots and dependency networks, the analyst finds it.
+
+## Related Agents
+
+- **[jira-evaluator](/reference/agents/jira-evaluator)** — scores complexity (shallower analysis, no media)
+- **[jira-estimator](/reference/agents/jira-estimator)** — estimates story points (uses evaluator, not analyst depth)
+- **[jira-collaborate](/reference/agents/jira-collaborate)** — posts analyst findings back to Jira as comments
+- **[jira-issue](/reference/agents/jira-issue)** — provides ticket data for analysis

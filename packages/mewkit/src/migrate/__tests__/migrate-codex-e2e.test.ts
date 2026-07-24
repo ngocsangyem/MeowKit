@@ -1,10 +1,10 @@
 // End-to-end: fresh migrate of the fixture corpus into a temp project for the
-// codex target. Asserts the plan-level contract: commands emitted as skills,
-// rules merged into AGENTS.md, zero unexplained source references, zero
-// toolkit branding, and no persistent toolkit files in the target project.
+// codex target. Asserts the plan-level contract: skills direct-copy, rules
+// merged into AGENTS.md, a custom (non-toolkit) agent NOT auto-ported, zero
+// unexplained source references, zero toolkit branding, and no persistent
+// toolkit files in the target project.
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { setupMigrateE2e, type MigrateE2eEnv } from "./helpers/migrate-e2e-harness.js";
@@ -24,13 +24,7 @@ function collectFiles(dir: string): string[] {
 
 beforeAll(async () => {
 	env = await setupMigrateE2e("target-codex-e2e");
-	// Opt-in surface: .mcp.json at the project root.
-	await writeFile(
-		join(env.projectDir, ".mcp.json"),
-		JSON.stringify({ mcpServers: { context7: { command: "npx", args: ["-y", "@upstash/context7-mcp"] } } }),
-		"utf-8",
-	);
-	exitCode = await env.run({ includeMcp: true });
+	exitCode = await env.run({});
 }, 60_000);
 
 afterAll(async () => {
@@ -40,15 +34,6 @@ afterAll(async () => {
 describe("migrate fixture corpus → codex (fresh install)", () => {
 	it("succeeds", () => {
 		expect(exitCode).toBe(0);
-	});
-
-	it("emits the command as an Agent Skill with frontmatter and adaptation guidance", () => {
-		const skillPath = join(env.projectDir, ".agents", "skills", "source-command-mk-fix", "SKILL.md");
-		expect(existsSync(skillPath)).toBe(true);
-		const content = readFileSync(skillPath, "utf-8");
-		expect(content).toContain("name: source-command-mk-fix");
-		expect(content).toContain("$ARGUMENTS");
-		expect(content).toContain("## Usage guidance");
 	});
 
 	it("merges config and portable rules into AGENTS.md without a branded header", () => {
@@ -78,29 +63,27 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 		expect(skillMd).toContain("> Ported from external-org/agent-kit — .claude/skills/demo-skill/SKILL.md");
 	});
 
-	it("writes codex agents TOML and merges the managed config block with neutral sentinels", () => {
+	it("writes codex agents TOML; authored config.toml carries the base with no agent-wiring block", () => {
 		const agentToml = readFileSync(join(env.projectDir, ".codex", "agents", "planner.toml"), "utf-8");
 		expect(agentToml).toContain('name = "planner"');
 		const configToml = readFileSync(join(env.projectDir, ".codex", "config.toml"), "utf-8");
-		expect(configToml).toContain("# --- managed-agents-start ---");
+		// Phase-9 flip: config.toml is the authored base (+ the dynamic injectors merged on top).
+		// Codex auto-loads agents from .codex/agents/*.toml, so the authored config intentionally
+		// omits the converter's managed [agents.X] wiring block (verified redundant by the validator).
+		expect(configToml).toContain("project_doc_max_bytes"); // authored base preserved
+		expect(configToml).not.toContain("# --- managed-agents-start ---"); // no converter agent-wiring
 		expect(configToml).not.toContain("mewkit-managed");
 	});
 
-	it("rewrites the agent TOML fenced ref to a migrated skill script, preserving only out-of-set refs", () => {
-		const agentToml = readFileSync(join(env.projectDir, ".codex", "agents", "planner.toml"), "utf-8");
-		// demo-skill IS in the migration set → the fenced script ref is rewritten to
-		// the provider target (previously blanket-preserved because migratedRefs was dropped).
-		expect(agentToml).toContain("python3 .agents/skills/demo-skill/scripts/run.py");
-		// No .claude/skills reference to a migrated asset survives in the agent TOML.
-		expect(agentToml).not.toContain(".claude/skills/demo-skill");
-		// A genuinely out-of-set runtime ref (no provider surface) still preserves — fail-closed.
-		expect(agentToml).toContain("node .claude/scripts/validate-docs.cjs");
-	});
-
-	it("merges the opted-in MCP servers into config.toml", () => {
-		const configToml = readFileSync(join(env.projectDir, ".codex", "config.toml"), "utf-8");
-		expect(configToml).toContain("[mcp_servers.context7]");
-		expect(configToml).toContain('command = "npx"');
+	it("does not auto-port a non-roster user agent (custom-helper) — agents conversion is nulled", () => {
+		// The old converter path (fm-to-codex-toml) would have written
+		// .codex/agents/custom_helper.toml with fenced-ref rewriting applied. Agents
+		// conversion is nulled now — toolkit agents ship via the authored bundle
+		// (planner.toml, still written by the overlay) and a project's own custom
+		// agents are not auto-ported (the migrate summary emits a one-line advisory
+		// pointing the user at manual porting instead).
+		expect(existsSync(join(env.projectDir, ".codex", "agents", "custom_helper.toml"))).toBe(false);
+		expect(existsSync(join(env.projectDir, ".codex", "agents", "planner.toml"))).toBe(true);
 	});
 
 	it("leaves zero toolkit branding and no toolkit files in the target project", () => {
@@ -110,13 +93,18 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 		);
 		expect(generated.length).toBeGreaterThan(0);
 		for (const file of generated) {
-			// The bounded bootstrap intentionally names documented CLI invocations (allowed as
-			// literal CLI tokens per skill-authoring Rule 7). Strip those exact trusted operations
-			// before asserting no narrative/toolkit branding remains.
-			const content = readFileSync(file, "utf-8")
-				.replace(/npx mewkit capabilities resolve --intent/g, "")
-				.replace(/npx mewkit orient/g, "");
-			expect(content, file).not.toMatch(/MeowKit|mewkit|meowkit/);
+			// Forbid the capitalized PRODUCT brand `MeowKit` — the marketing form that only appears
+			// in narrative prose and would pollute the user's project. The lowercase functional
+			// tokens are all legitimate per skill-authoring Rule 7 and intentionally allowed here:
+			// the `mewkit` CLI (hooks invoke it), the `.meowkit/` state-dir namespace (agents read
+			// its memory store; hook path-guards match it), and `MEOWKIT_*` env vars.
+			//
+			// NOTE ON COVERAGE: a lowercase narrative "meowkit" prose leak in an AUTHORED codex file
+			// (.codex/agents/*.toml, hooks, AGENTS.md) is NOT caught by any automated check today —
+			// the repo brand lint scans `.claude/` (capitalized-only, *.md), not this authored tree —
+			// so authored content is kept brand-clean by manual review. Converter-PATH lowercase
+			// stripping (of user source content) stays unit-covered by codex-output-brand-free.test.ts.
+			expect(readFileSync(file, "utf-8"), file).not.toMatch(/MeowKit/);
 		}
 		expect(existsSync(join(env.projectDir, ".mewkit"))).toBe(false);
 	});

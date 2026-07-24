@@ -1,0 +1,57 @@
+# Expected Figma Evidence Packet — interaction-modal fixture.
+# Schema oracle. Exercises prototype_flow_summary + linked flow artifacts.
+# Paths use the toolkit convention (tasks/plans, tasks/reports).
+schema_version: figma-evidence-packet/v1
+source:
+  figma_url: "https://www.figma.com/design/FIX0MODAL/meowkit-fixtures?node-id=30-2"
+  file_key: FIX0MODAL
+  node_ids: ["30:2", "30:10", "30:20", "30:21", "30:22", "30:23", "30:30"]
+  figma_version_or_last_modified: "2026-07-05T09:20:00Z"
+  extracted_at: "<ISO-8601>"
+scope:
+  target_frames: ["Members", "InviteModal", "SuccessToast"]
+  frame_sizes:
+    - { node_id: "30:2", width: 1440, height: 900 }
+    - { node_id: "30:20", width: 480, height: 420 }
+intent_summary:
+  hierarchy:
+    - "Members screen → Invite button → InviteModal (email, role select, submit)"
+  layout_constraints:
+    - "modal is overlay 480×420; role select variants Admin/Member/Viewer"
+  tokens: "colors(surface/overlay/accent/danger/ok); type 18/13/14; spacing 8/12/16/24; radii modal16/input8/button8"
+  assets: []
+  variants_and_states: "invite:default/hover/focus/disabled; email:default/focus/error; submit:default/loading/disabled; role:default/open (all explicit)"
+prototype_flow_summary:
+  availability: partial          # extracted for open-modal; submit outcome not wired
+  confidence: medium
+  flow_starting_points:
+    - { name: "Invite → InviteModal", node_id: "30:10" }
+  critical_actions_count: 1       # Submit (server mutation)
+  blocked_or_needs_answer_count: 1
+  prototype_flow_artifacts:
+    report_md: "tasks/plans/<active-plan>/research/prototype-flow-report.md"
+    graph_json: "tasks/plans/<active-plan>/research/prototype-flow.json"
+    explorer_html: "optional, only when plan --html is requested"
+implementation_hints:
+  component_candidates: ["InviteModal (30:20)", "RoleSelect (30:22)"]
+  code_connect_refs: []
+validation_contract:
+  required_viewports: [desktop]
+  required_states: [default, hover, focus, disabled, loading, error, open]
+  pixel_tolerance: "advisory only"
+  a11y_expectations: "modal focus trap + Escape close; error field aria-invalid + described-by; role select is a listbox"
+risks:
+  ambiguity: ["submit outcome not wired in prototype (toast frame exists, no edge)"]
+  missing_states: ["success/empty states of the list after invite not shown"]
+  permission_limits: []
+provenance:
+  generated_by: mk:figma
+  tool_surface: "Figma MCP | screenshot fallback"
+  artifact_paths:
+    - "tasks/plans/<active-plan>/research/figma-evidence-packet.md"
+    - "tasks/plans/<active-plan>/research/prototype-flow-report.md"
+    - "tasks/plans/<active-plan>/research/prototype-flow.json"
+artifact_policy:
+  active_plan_location: "tasks/plans/<active-plan>/research/"
+  standalone_location: "tasks/reports/"
+  artifact_paths_only_in_context: true

@@ -1,0 +1,241 @@
+{
+	"_description": "Codex native surface × maturity × MeowKit policy. Each row is a verified claim about a Codex surface with its source and verification date. Authored from official docs (developers.openai.com/codex → learn.chatgpt.com/docs) and the codex-cli changelog; cross-checked against the local codex-cli 0.144.6 install.",
+	"_verifiedAgainstCli": "codex-cli 0.144.6",
+	"surfaces": [
+		{
+			"surface": "hooks",
+			"maturity": "stable",
+			"meowkitPolicy": "primary — command handlers only; deny-capable safety hooks migrate as exit-2 wrappers",
+			"claims": [
+				{
+					"claim": "10 hook events: SessionStart, SubagentStart, UserPromptSubmit, PreToolUse, PostToolUse, PermissionRequest, PreCompact, PostCompact, SubagentStop, Stop",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/hooks",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Hooks enabled by default (no [features] flag) and support inline config.toml since Codex 0.124.0 stable",
+					"status": "verified",
+					"source": "openai/codex changelog announcement (0.124.0)",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "SessionStart matchers: startup, resume, clear, compact",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/hooks",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "PreToolUse/PostToolUse/PermissionRequest tool matchers include Bash, apply_patch, Edit, Write, update_plan, and the mcp__<server>__<tool> pattern (e.g. mcp__filesystem__read_file)",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/hooks",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Agent-spawn matchers named Agent and spawn_agent",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/hooks",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Only type:\"command\" handlers execute today; prompt and agent handler types are parsed but skipped",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/hooks",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Non-managed (project-local) command hooks require explicit per-hook-definition user review/trust before running; managed hooks (system/MDM/requirements.toml) bypass",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/hooks",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Schema: JSON on stdin (session_id, cwd, hook_event_name, tool_name, ...); exit 0 = success, exit 2 = block (stderr = reason); output supports hookSpecificOutput.additionalContext and permissionDecision",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/hooks",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Claude-Code hook parity is a design similarity, not an OpenAI-documented compatibility promise (open GitHub issue #19385)",
+					"status": "partial",
+					"source": "github.com/openai/codex/issues/19385",
+					"verified": "2026-07-23"
+				}
+			]
+		},
+		{
+			"surface": "skills",
+			"maturity": "stable",
+			"meowkitPolicy": "primary — reusable workflows; mk- prefix + unique names; pack-organized; default core pack within discovery budget",
+			"claims": [
+				{
+					"claim": "Location .agents/skills/<name>/SKILL.md, discovered walking CWD → repo root",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/build-skills",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Discovery budget: at most 2% of the model context window, or 8,000 characters when the window is unknown",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/build-skills",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Duplicate skill names are NOT merged — both appear in skill selectors",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/build-skills",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "agents/openai.yaml is optional: UI metadata, allow_implicit_invocation (default true), MCP/tool dependency declarations",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/build-skills",
+					"verified": "2026-07-23"
+				}
+			]
+		},
+		{
+			"surface": "agents-md",
+			"maturity": "stable",
+			"meowkitPolicy": "primary — short behavioral invariants only; no workflow dumps (those become skills)",
+			"claims": [
+				{
+					"claim": "Hierarchy global (~/.codex/AGENTS.override.md then ~/.codex/AGENTS.md) then project (git root → CWD, AGENTS.override.md then AGENTS.md at each level); concatenated root-down, closer-to-CWD = higher precedence",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Default budget project_doc_max_bytes = 32 KiB (config.toml); once combined size hits limit, further files are silently truncated",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+					"verified": "2026-07-23"
+				}
+			]
+		},
+		{
+			"surface": "subagents",
+			"maturity": "stable",
+			"meowkitPolicy": "primary — .codex/agents/*.toml auto-loaded; name field authoritative; roster re-authored by execution envelope",
+			"claims": [
+				{
+					"claim": ".codex/agents/*.toml (project) or ~/.codex/agents/*.toml (personal) auto-loaded; no config.toml wiring needed",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Agent identified by its name field (source of truth); matching filename is a convention, not a requirement",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Required fields name, description, developer_instructions; optional model, model_reasoning_effort, sandbox_mode, mcp_servers, skills.config",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Model inheritance: explicit spawn value → agent-file default → [agents] config default → parent session value",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+					"verified": "2026-07-23"
+				}
+			]
+		},
+		{
+			"surface": "config",
+			"maturity": "stable",
+			"meowkitPolicy": "primary — project .codex/config.toml; MCP servers via env-secret refs only; NO legacy [profiles.x] sections",
+			"claims": [
+				{
+					"claim": "Project override via .codex/config.toml, loaded walking project-root → CWD, closest file wins",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/config-file/config-advanced",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Legacy [profiles.profile-name] TOML sections deprecated since 0.134.0 — replaced by standalone ~/.codex/<name>.config.toml files",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/config-file/config-advanced",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "--strict-config flag exists (Stable): errors when config.toml contains fields this Codex version does not recognize; supported by codex, exec, review, resume, fork, app-server, mcp-server, exec-server",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/developer-commands",
+					"verified": "2026-07-23"
+				}
+			]
+		},
+		{
+			"surface": "rules",
+			"maturity": "experimental",
+			"meowkitPolicy": "optional/experimental — capability+version-gated with fallback; never sole enforcement (defense-in-depth only)",
+			"claims": [
+				{
+					"claim": "Rules are experimental and may change",
+					"status": "verified",
+					"source": "https://developers.openai.com/codex/rules",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Location ~/.codex/rules/*.rules (Starlark), prefix_rule(pattern, decision=\"allow\"), most-restrictive-wins (forbidden > prompt > allow); no filesystem side effects by design",
+					"status": "verified",
+					"source": "https://developers.openai.com/codex/rules",
+					"verified": "2026-07-23"
+				},
+				{
+					"claim": "codex execpolicy check tests a rule against a command",
+					"status": "verified",
+					"source": "https://developers.openai.com/codex/exec-policy",
+					"verified": "2026-07-23"
+				}
+			]
+		},
+		{
+			"surface": "memories",
+			"maturity": "experimental",
+			"meowkitPolicy": "omitted — no dual-write; .meowkit/memory stays separate; $CODEX_HOME/memories not synced",
+			"claims": [
+				{
+					"claim": "Stored under $CODEX_HOME/memories/ (default ~/.codex/memories/); base memories are preview, several sub-features (memory/reset, paginated thread history) explicitly experimental; Chronicle experimental (macOS + ChatGPT Pro only)",
+					"status": "verified",
+					"source": "https://developers.openai.com/codex/memories",
+					"verified": "2026-07-23"
+				}
+			]
+		},
+		{
+			"surface": "mcp",
+			"maturity": "stable",
+			"meowkitPolicy": "primary — STDIO + Streamable HTTP; secrets referenced via env vars, never inlined",
+			"claims": [
+				{
+					"claim": "Two server types: STDIO (command + args + env map) and Streamable HTTP (url + bearer_token_env_var); secrets are env-var-referenced",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/extend/mcp",
+					"verified": "2026-07-23"
+				}
+			]
+		},
+		{
+			"surface": "custom-prompts",
+			"maturity": "deprecated",
+			"meowkitPolicy": "omitted — deprecated; skills are the documented successor",
+			"claims": [
+				{
+					"claim": "Custom prompts are deprecated; use skills for reusable instructions Codex can invoke explicitly or implicitly",
+					"status": "verified",
+					"source": "https://developers.openai.com/codex/custom-prompts",
+					"verified": "2026-07-23"
+				}
+			]
+		}
+	],
+	"openQuestions": [
+		"Per-feature maturity table on the feature-maturity page could not be extracted via automated fetch (tool summarized away the table body); maturity labels above are inferred from individual feature pages + changelog, not a single authoritative table row.",
+		"Exact hook-event surface present at 0.124.0 vs 0.145.0 not separately verified; the live capability table treats any supported version as the full verified surface."
+	]
+}

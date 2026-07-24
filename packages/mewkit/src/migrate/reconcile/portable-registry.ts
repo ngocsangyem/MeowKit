@@ -32,7 +32,7 @@ const PortableInstallationSchemaV3 = z.object({
 });
 export type PortableInstallationV3 = z.infer<typeof PortableInstallationSchemaV3>;
 
-const PortableRegistrySchemaV3 = z.object({
+export const PortableRegistrySchemaV3 = z.object({
 	version: z.literal("3.0"),
 	installations: z.array(PortableInstallationSchemaV3),
 	lastReconciled: z.string().optional(),

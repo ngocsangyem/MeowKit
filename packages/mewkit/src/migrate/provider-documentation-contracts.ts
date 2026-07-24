@@ -10,21 +10,8 @@
 
 import type { PortableType, ProviderType } from "./types.js";
 import { claudeCodeContract } from "./providers/claude-code/contract.js";
-import { opencodeContract } from "./providers/opencode/contract.js";
-import { githubCopilotContract } from "./providers/github-copilot/contract.js";
 import { codexContract } from "./providers/codex/contract.js";
-import { droidContract } from "./providers/droid/contract.js";
 import { cursorContract } from "./providers/cursor/contract.js";
-import { rooContract } from "./providers/roo/contract.js";
-import { kiloContract } from "./providers/kilo/contract.js";
-import { kiroContract } from "./providers/kiro/contract.js";
-import { windsurfContract } from "./providers/windsurf/contract.js";
-import { gooseContract } from "./providers/goose/contract.js";
-import { geminiCliContract } from "./providers/gemini-cli/contract.js";
-import { ampContract } from "./providers/amp/contract.js";
-import { antigravityContract } from "./providers/antigravity/contract.js";
-import { clineContract } from "./providers/cline/contract.js";
-import { openhandsContract } from "./providers/openhands/contract.js";
 
 export type {
 	ProviderSupportStatus,
@@ -41,21 +28,8 @@ import type {
 
 export const providerCapabilityRegistry: Record<ProviderType, ProviderCapabilityRegistryEntry> = {
 	"claude-code": claudeCodeContract,
-	opencode: opencodeContract,
-	"github-copilot": githubCopilotContract,
 	codex: codexContract,
-	droid: droidContract,
 	cursor: cursorContract,
-	roo: rooContract,
-	kilo: kiloContract,
-	kiro: kiroContract,
-	windsurf: windsurfContract,
-	goose: gooseContract,
-	"gemini-cli": geminiCliContract,
-	amp: ampContract,
-	antigravity: antigravityContract,
-	cline: clineContract,
-	openhands: openhandsContract,
 };
 
 export const providerDocumentationContracts = providerCapabilityRegistry;

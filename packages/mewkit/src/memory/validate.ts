@@ -1,9 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import { createRequire } from "node:module";
 import { CURATED_STORES, type StoreSpec } from "./schemas.js";
-
-const require = createRequire(import.meta.url);
+import { validateContent } from "../state/injection-scanner.js";
 
 export type IssueLevel = "error" | "warn";
 
@@ -29,18 +27,12 @@ export interface ContentValidator {
 	(text: string): { valid: boolean; pattern?: string; match?: string };
 }
 
-// Load the real validate-content.cjs (DRY — never reimplement the injection
-// patterns) from the project that owns this memory dir. Absent → recheck skipped.
-export function loadContentValidator(memoryDir: string): ContentValidator | null {
-	const projectRoot = path.resolve(memoryDir, "..", "..");
-	const libPath = path.join(projectRoot, ".claude", "hooks", "lib", "validate-content.cjs");
-	if (!fs.existsSync(libPath)) return null;
-	try {
-		const mod = require(libPath) as { validateContent?: ContentValidator };
-		return typeof mod.validateContent === "function" ? mod.validateContent : null;
-	} catch {
-		return null;
-	}
+// Injection recheck uses the package-internal scanner (single canonical source in
+// `state/injection-scanner.ts`) — no dynamic require of a project-controlled hook
+// file. The parameter is retained for call-site compatibility but unused; the
+// scanner is always available so this never returns null.
+export function loadContentValidator(_memoryDir?: string): ContentValidator {
+	return validateContent;
 }
 
 // Count `## ` section headings in a topic MD file — proxy for entry count, used

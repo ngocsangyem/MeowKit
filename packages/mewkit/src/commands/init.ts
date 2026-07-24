@@ -19,7 +19,16 @@ import { promptAndInstallSystemDeps } from "./setup.js";
 import { getRequirementsSource, formatPackageList } from "../core/skills-dependencies.js";
 import { ensureVenv, installPipPackages } from "../core/dependency-installer.js";
 import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.js";
-import type { MigrateOptions } from "../migrate/types.js";
+import type { MigrateOptions, ProviderType } from "../migrate/types.js";
+import { providers } from "../migrate/provider-registry.js";
+import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
+import { packSelectionBudgetWarning, type PackSelection } from "../migrate/modules/codex-skill-packs.js";
+import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
+import {
+	CODEX_MIN_SUPPORTED_VERSION,
+	detectCodexVersion,
+	isCodexVersionSupported,
+} from "../migrate/providers/codex/capabilities.js";
 
 export interface InitArgs {
 	dryRun?: boolean;
@@ -27,8 +36,13 @@ export interface InitArgs {
 	beta?: boolean;
 	/** When true, run interactive provider multiselect after init unpacks. */
 	migrate?: boolean;
-	/** CSV of provider names (e.g., "cursor,codex") or "all". When set, migration runs after init. */
-	migrateTo?: string;
+	/**
+	 * Target provider toolkit to create. `codex` copies the authored Codex bundle
+	 * directly (codex-only project, no `.claude/`). Any other supported provider
+	 * (e.g. `cursor`) unpacks `.claude/` then exports to it. Omitted = the default
+	 * Claude Code kit (`.claude/`). Replaces the old `--migrate-to`.
+	 */
+	target?: string;
 	/** When true, scope the post-init migration globally (~/.cursor/, etc.) instead of per-project. */
 	migrateGlobal?: boolean;
 	/**
@@ -37,6 +51,24 @@ export interface InitArgs {
 	 * existing install down to the selected profile.
 	 */
 	profile?: string;
+	/**
+	 * Codex skill-pack selection (only meaningful with a Codex target). Comma-separated
+	 * pack names (e.g. `core,integrations`) or `all`. Omitted = the catalog default
+	 * (`core`). Named `--skill-packs` to avoid the existing boolean `--packs` validate flag.
+	 */
+	skillPacks?: string;
+}
+
+/** Parse the `--skill-packs` value into a PackSelection (default `core` when absent). */
+function parseSkillPacks(raw?: string): PackSelection {
+	if (raw === undefined) return [];
+	const v = raw.trim();
+	if (v === "") return [];
+	if (v.toLowerCase() === "all") return "all";
+	return v
+		.split(",")
+		.map((s) => s.trim())
+		.filter(Boolean);
 }
 
 /** Profile picker options (stable names; resolution validates against the release manifest). */
@@ -244,8 +276,149 @@ function printSummary(
 	}
 }
 
+/**
+ * `mewkit init --target codex` — create a Codex-native toolkit by copying the
+ * authored Codex bundle shipped with the package into the project (AGENTS.md,
+ * `.codex/{config.toml,agents,hooks.json,hooks}`, `.agents/skills/`). No `.claude/`,
+ * no release download, no conversion — the bundle IS the source of truth for Codex.
+ */
+async function initCodexTarget(
+	targetDir: string,
+	dryRun: boolean,
+	force: boolean,
+	packs: PackSelection = [],
+): Promise<void> {
+	p.intro(pc.bgCyan(pc.black(" meowkit init --target codex ")));
+	const moduleDir = resolveCodexModuleDir();
+	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
+		p.cancel("Codex bundle not found in this install — reinstall the `mewkit` package (`npx mewkit@latest ...`).");
+		process.exit(1);
+	}
+	// No fail-closed guard: the reconciler preserves user edits (or surfaces a conflict)
+	// instead of clobbering an existing layout, and makes a re-run idempotent. `packs`
+	// selects which skill packs install (default `core`); the whole `.codex/` surface
+	// always installs.
+	if (dryRun) {
+		const plan = await reconcileApplyCodexBundle(moduleDir, targetDir, {
+			force,
+			dryRun: true,
+			projectRoot: targetDir,
+			packs,
+		});
+		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
+		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
+		p.log.info(
+			`Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .codex/, .agents/skills/.`,
+		);
+		p.outro(pc.green("Dry-run complete — no files written."));
+		return;
+	}
+	const result = await reconcileApplyCodexBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
+	if (result.conflicts.length > 0) {
+		p.log.warn(
+			`${result.conflicts.length} existing file(s) differ from the bundle and were left untouched (re-run with --force to overwrite):`,
+		);
+		for (const c of result.conflicts) p.log.message(pc.dim(`  ${c.targetPath}`));
+	}
+	p.log.success(
+		`Codex toolkit ready (${result.writes} written): AGENTS.md, .codex/{config.toml,agents,hooks.json,hooks}, .agents/skills/.`,
+	);
+	const budgetWarn = packSelectionBudgetWarning(moduleDir, packs);
+	if (budgetWarn) p.log.warn(budgetWarn);
+	p.log.info(
+		"Skill packs are additive: re-run with more `--skill-packs` to add; removing an installed pack is manual (delete its .agents/skills/<name> dirs).",
+	);
+	await warnBelowMinCodex();
+	hintLegacyMemoryForCodex(targetDir);
+	p.outro(pc.green("Codex toolkit installed!"));
+}
+
+/**
+ * Warn-and-degrade version gate for the Codex install. The authored bundle is inert config
+ * until Codex runs it, and its gated surfaces (deny-capable hooks, `.codex/rules`) degrade
+ * gracefully on an older/untrusted Codex — so a below-minimum version never hard-fails the
+ * install. It only warns, so the user knows those surfaces may be ignored and that the
+ * MeowKit CLI gate stays authoritative. No warning when the version can't be detected
+ * (codex absent / compat env override) — do not nag on an unknown.
+ */
+async function warnBelowMinCodex(): Promise<void> {
+	const version = await detectCodexVersion();
+	if (version && !isCodexVersionSupported(version)) {
+		p.log.warn(
+			`Codex ${version} < ${CODEX_MIN_SUPPORTED_VERSION}: deny-capable hooks (gate-enforcement, privacy-block) and .codex/rules may be ignored by this version. Install proceeds; the MeowKit CLI gate stays authoritative. Upgrade Codex to enforce them.`,
+		);
+	}
+}
+
+/**
+ * Codex install copies the authored bundle but does NOT run the legacy `.claude/memory/`
+ * → `.meowkit/` import (that lives in the `mewkit migrate` flow). If a repo carries legacy
+ * memory, surface a hint instead of silently leaving it behind — the user runs the import
+ * explicitly so it stays an opt-in, conflict-aware transaction.
+ */
+function hintLegacyMemoryForCodex(targetDir: string): void {
+	if (fs.existsSync(join(targetDir, ".claude", "memory"))) {
+		p.log.info(
+			"Legacy .claude/memory/ detected — import it into .meowkit/ with: mewkit migrate codex (loss-aware, conflict-safe; not run automatically).",
+		);
+	}
+}
+
+/**
+ * Fresh-install provider picker. Multi-select with Claude Code checked by default.
+ * Each choice maps to a distinct provisioning path handled by the init orchestrator:
+ * Claude Code → `.claude/`, Codex → authored bundle, Cursor → `.claude/` + export.
+ * Shown only when no `--target` is passed and this is a new install.
+ */
+async function promptProviders(): Promise<ProviderType[]> {
+	const choice = await p.multiselect({
+		message: "Select the toolkits to set up",
+		options: [
+			{
+				value: "claude-code" as const,
+				label: providers["claude-code"].displayName,
+				hint: "installs .claude/ (default)",
+			},
+			{ value: "codex" as const, label: providers.codex.displayName, hint: "copies the authored Codex bundle" },
+			{ value: "cursor" as const, label: providers.cursor.displayName, hint: "exports .claude/ to .cursor/" },
+		],
+		initialValues: ["claude-code"],
+		required: true,
+	});
+	cancelCheck(choice);
+	return choice as ProviderType[];
+}
+
+/**
+ * Add the Codex toolkit alongside a multi-provider install by copying the authored
+ * bundle. Non-fatal (warn + skip) so a Codex hiccup never aborts the whole install —
+ * unlike `initCodexTarget`, which fails closed because Codex is the ONLY target there.
+ */
+async function addCodexBundle(targetDir: string, force: boolean, packs: PackSelection = []): Promise<void> {
+	const moduleDir = resolveCodexModuleDir();
+	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
+		p.log.warn("Codex bundle not found in this install — skipping the Codex toolkit.");
+		return;
+	}
+	const result = await reconcileApplyCodexBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
+	if (result.conflicts.length > 0) {
+		p.log.warn(`${result.conflicts.length} existing Codex file(s) left untouched (re-run with --force to overwrite).`);
+	}
+	p.log.success(`Codex toolkit created (${result.writes} written): AGENTS.md, .codex/, .agents/skills/.`);
+	const budgetWarn = packSelectionBudgetWarning(moduleDir, packs);
+	if (budgetWarn) p.log.warn(budgetWarn);
+	await warnBelowMinCodex();
+	hintLegacyMemoryForCodex(targetDir);
+}
+
 export async function init(args: InitArgs): Promise<void> {
 	const targetDir = process.cwd();
+
+	// `--target codex` is a distinct, offline path: copy the authored bundle, done.
+	if (args.target === "codex") {
+		return initCodexTarget(targetDir, args.dryRun ?? false, args.force ?? false, parseSkillPacks(args.skillPacks));
+	}
+
 	const mode = detectMode(targetDir);
 	const dryRun = args.dryRun ?? false;
 	const force = args.force ?? false;
@@ -255,6 +428,49 @@ export async function init(args: InitArgs): Promise<void> {
 	if (dryRun) p.log.warn("Dry-run mode — no files will be written.");
 	if (mode === "update") p.log.info("Existing .claude/ detected — running in update mode.");
 
+	// The provider multiselect is the default ONLY for a bare fresh `init` — any explicit
+	// provider intent (`--target`, `--migrate`) bypasses it and keeps its own flow. Update
+	// mode keeps today's behavior (refresh .claude/); use `mewkit upgrade` to propagate.
+	const picked = !args.target && !args.migrate && mode === "new" ? await promptProviders() : null;
+	// Cursor migrates FROM .claude/, so it also requires the base kit. No picker
+	// (update mode, --target, or --migrate) ⇒ base install as today.
+	const installClaudeKit = picked ? picked.includes("claude-code") || picked.includes("cursor") : true;
+
+	if (installClaudeKit) {
+		await runClaudeKitInstall(args, targetDir, mode, dryRun, force);
+	}
+
+	// Codex (additive, offline bundle) and Cursor (export from .claude/) when picked.
+	if (picked?.includes("codex")) {
+		if (dryRun) p.log.info("Dry-run: would copy the authored Codex bundle (AGENTS.md, .codex/, .agents/skills/).");
+		else await addCodexBundle(targetDir, force, parseSkillPacks(args.skillPacks));
+	}
+	if (picked?.includes("cursor")) {
+		if (dryRun) p.log.info("Dry-run: would export .claude/ to .cursor/.");
+		else await runPostInitMigrate({ ...args, target: "cursor" }, targetDir);
+	}
+
+	// Legacy explicit paths: `--target <provider>` / `--migrate` (never active with the picker).
+	if (!dryRun && !picked && (args.migrate || args.target)) {
+		await runPostInitMigrate(args, targetDir);
+	}
+
+	p.outro(pc.green(mode === "new" ? "MeowKit installed!" : "MeowKit updated!"));
+}
+
+/**
+ * Base Claude Code kit install: fetch releases, pick version, prompt config,
+ * download, apply via smart update, validate, and install optional dependencies.
+ * Owns the downloaded-source lifecycle (cleaned up in its finally). Post-install
+ * provider export and the final outro are owned by the `init` orchestrator.
+ */
+async function runClaudeKitInstall(
+	args: InitArgs,
+	targetDir: string,
+	mode: "new" | "update",
+	dryRun: boolean,
+	force: boolean,
+): Promise<void> {
 	// Step 1: Fetch releases
 	const releaseSpinner = p.spinner();
 	releaseSpinner.start("Fetching available releases...");
@@ -440,13 +656,6 @@ export async function init(args: InitArgs): Promise<void> {
 
 		// Step 9: Summary
 		printSummary(stats, dryRun);
-
-		// Step 10: Optional migration to external tools
-		if (!dryRun && (args.migrate || args.migrateTo)) {
-			await runPostInitMigrate(args, targetDir);
-		}
-
-		p.outro(pc.green(mode === "new" ? "MeowKit installed!" : "MeowKit updated!"));
 	} finally {
 		cleanupDownload(sourceDir);
 	}
@@ -461,21 +670,15 @@ async function runPostInitMigrate(args: InitArgs, projectDir: string): Promise<v
 
 	const migrateOptions: MigrateOptions = {
 		global: args.migrateGlobal ?? false,
-		yes: !!args.migrateTo, // CSV/all → non-interactive; bare --migrate stays interactive
+		yes: !!args.target, // explicit --target → non-interactive; bare --migrate stays interactive
 		source: join(projectDir, ".claude"),
 		force: true,
 	};
 
-	if (args.migrateTo) {
-		const trimmed = args.migrateTo.trim();
-		if (trimmed === "all") {
-			migrateOptions.all = true;
-		} else {
-			migrateOptions.tools = trimmed
-				.split(",")
-				.map((t) => t.trim())
-				.filter(Boolean);
-		}
+	if (args.target) {
+		const trimmed = args.target.trim();
+		if (trimmed === "all") migrateOptions.all = true;
+		else migrateOptions.tools = [trimmed];
 	}
 
 	try {

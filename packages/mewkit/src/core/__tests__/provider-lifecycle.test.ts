@@ -29,7 +29,7 @@ describe("getLifecycleMap", () => {
 		expect(gatingEvents("claude-code").sort()).toEqual(["pre_tool", "stop"].sort());
 	});
 
-	it("claude-plugin mirrors claude-code (same hooks, propagated by build-plugin)", () => {
+	it("claude-plugin mirrors claude-code (same hooks, propagated at plugin generation)", () => {
 		const plugin = getLifecycleMap("claude-plugin");
 		for (const e of LIFECYCLE_EVENTS) {
 			expect(plugin[e].status, e).toBe("supported");

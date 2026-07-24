@@ -4,23 +4,10 @@
 import type { ProviderType } from "../types.js";
 
 /** Conversion format used to transform source files */
-export type ConversionFormat =
-	| "direct-copy"
-	| "fm-to-fm"
-	| "fm-to-yaml"
-	| "fm-strip"
-	| "fm-to-json"
-	| "md-to-toml"
-	| "skill-md"
-	| "md-strip"
-	| "md-to-mdc"
-	| "md-to-kiro-steering"
-	| "fm-to-codex-toml"
-	| "command-to-codex-skill";
+export type ConversionFormat = "direct-copy" | "fm-to-fm" | "md-strip" | "md-to-mdc";
 
 /** Write strategy for target files */
-export type WriteStrategy =
-	"per-file" | "merge-single" | "json-merge" | "yaml-merge" | "single-file" | "codex-toml" | "codex-hooks";
+export type WriteStrategy = "per-file" | "merge-single" | "single-file";
 
 /** Provider path configuration for a specific portable type */
 export interface ProviderPathConfig {

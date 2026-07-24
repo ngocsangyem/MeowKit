@@ -75,6 +75,32 @@ The release ships ONE full tarball; install size is controlled at install time, 
 - **Pack-aware `upgrade`**: reads `metadata.packs` (corrupt/absent ⇒ full); a partial install upgrades only its packs, removed packs stay removed.
 - **Guardrails**: `mewkit validate --packs` (manifest coherence, completeness, the exact-path safety invariant) and `mewkit budget context --profile <p> [--fail-over N]` (loadable-context estimator) — both wired into CI. The safety invariant is enforced by an explicit exact-path assertion (not by registering dispatched files in the inventory, which would collide with the Phase-2 ownership check).
 
+## Migration Targets (`mewkit migrate`)
+
+`mewkit` exports the Claude-format kit to two external coding-agent tools, maintained on
+opposite models — know which applies before editing.
+
+- **Codex — hand-authored bundle** (`packages/mewkit/src/migrate/modules/codex/`). NOT a
+  runtime transform: a Codex-native tree (`root/`) + a per-surface `manifest.json`
+  (`active` flags) + `catalog/skill-packs.json` (7 install packs, char-budgeted) +
+  `compliance/` evidence. `migrate codex` / `init --target codex` copy the bundle through
+  the reconciler (`codex-reconcile-apply.ts`) against a project-local ledger
+  (`.meowkit/state/codex-ledger.json`); a second run converges to zero drift and
+  user-edited managed files are preserved or reported as an explicit conflict, never
+  silently overwritten. Adding a `.claude/` skill/agent/rule/command/hook means
+  hand-authoring the matching Codex-native file(s) — see `RELEASING.md` step 1e.
+- **Cursor — runtime converter** (no bundle). `migrate cursor` converts `.claude/` on the
+  fly: `agents/*.md` → `.cursor/rules/*.mdc` (fm-to-fm), rules + config → `.mdc`
+  (md-to-mdc), `skills/` direct-copied; Cursor has no command or hook surface. New
+  `.claude/` content reaches Cursor automatically.
+
+The semantic porter and the generic Codex converter pipeline were removed in CLI 2.1.0
+once all Codex surfaces were authored, so `migrate codex` no longer converts a project's
+own custom agents/commands/hooks (toolkit agents ship in the bundle); the only kept Codex
+converter is the opt-in `--include-mcp` `.mcp.json` → `config.toml [mcp_servers]` merge.
+The shared converters (`converters/{md-strip,fm-to-fm,md-to-mdc,direct-copy}.ts`) + the
+reference-rewriter family still serve Cursor and the surviving Codex config/rules path.
+
 ## Wiki Subsystem (`mewkit wiki`)
 
 Long-term, gated, FTS-searchable project knowledge, built on clean layering under `packages/mewkit/src/wiki/`. The dependency direction is strictly inward: **interface → application → infrastructure → domain**.

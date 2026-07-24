@@ -1,0 +1,91 @@
+---
+title: "mk:vue-testing-best-practices"
+description: "Vue 3 testing best-practices review and recommendations — designing and auditing Vitest + Vue Test Utils tests for components, composables, Pinia stores, Vue Router, async/Suspense, Teleport, forms, and accessibility, plus Playwright E2E test-design strategy. Advisory/review only — recommends patterns and flags test smells; does not run tests. Complements mk:vue-best-practices."
+---
+
+## What This Skill Does
+
+A Vue-specific **test-design advisor and test-code reviewer**. It recommends how to
+test Vue 3 components, composables, Pinia stores, Vue Router, async/Suspense,
+Teleport, forms, and accessibility — and audits existing Vitest + Vue Test Utils
+tests for smells, gaps, and coverage risk.
+
+It is read-only: it advises and reviews; it never runs, generates, or fixes tests.
+This skill is to `mk:testing` what `mk:vue-best-practices` is to `mk:vue` — a
+domain-specialized advisory you invoke deliberately.
+
+## When to Use
+
+- `/mk:vue-testing-best-practices [test file or component]` (explicit).
+- "review my Vue tests", "how should I test this component/composable/store".
+- "Vitest or Jest for this Vue app?", "are my async component tests correct?".
+
+## When NOT to Use
+
+| Need | Use this instead |
+|---|---|
+| Actually run tests / TDD red-green / non-Vue tests | `mk:testing` |
+| Diff/PR review or test-**existence** gap detection | `mk:review` |
+| Map test coverage → requirements | `mk:nyquist` |
+| QA a running app + fix bugs | `mk:qa` |
+| Generate or run Playwright `.spec.ts` E2E | `mk:qa-manual` |
+| Drive a live browser | `mk:agent-browser` / `mk:playwright-cli` |
+| Write Vue feature code | `mk:vue` / `mk:vue-best-practices` |
+
+## Usage
+
+```bash
+# Review an existing Vue test file
+/mk:vue-testing-best-practices tests/SearchBar.spec.ts
+
+# Ask how to design tests for a component
+/mk:vue-testing-best-practices how should I test this Pinia-backed UserProfile?
+```
+
+**Argument hint:** `[test file | component/composable/store | tooling question]`
+
+## Disambiguation vs mk:vue-best-practices
+
+The seam is **authoring** vs **test-setup**:
+
+- How a component *uses* Teleport (when to use it, the API, the fallback boundary)
+  → `mk:vue-best-practices`.
+- How a *test* stubs Teleport (`teleport` stub, `attachTo: document.body`, querying
+  portalled content) → **this skill**.
+
+## Workflow
+
+A read-only advisory lifecycle — classify the surface, load the matching reference
+just-in-time, evaluate against the smell rubric, emit a bounded review:
+
+1. **Input** — intent plus the Vue test file(s) under review, or the
+   component/composable/store to design tests for.
+2. **Classify the surface** — component / composable / store / router / form /
+   async / Suspense / Teleport / E2E-design.
+3. **Evaluate** — blackbox vs implementation-coupled, async awaited
+   (`flushPromises`/`nextTick`), Pinia configured, Suspense/Teleport set up, snapshot
+   policy, accessibility queries, brittle locators.
+4. **Detect gaps** — missing error/async/edge/a11y scenarios and Vue-specific
+   coverage risks.
+5. **Recommend** — concrete pattern fixes, tooling advice, and handoff notes.
+
+## Output Contract
+
+A single **Vue Testing Review**, omitting empty sections:
+
+1. **Verdict** — `PASS` / `NEEDS-WORK` + a one-sentence why.
+2. **Test Smells** — `[severity] · file:line · smell · fix`.
+3. **Missing Scenarios** — untested behaviors (error, async/loading, edge, a11y).
+4. **Coverage Risks** — Vue-specific blind spots (Teleport, Suspense fallback, store
+   actions, router guards).
+5. **Tooling Recommendations** — Vitest / runner / library / Playwright-vs-Cypress,
+   each with a one-line rationale.
+6. **Handoffs** — execute → `mk:testing`, E2E generation → `mk:qa-manual`, coverage
+   map → `mk:nyquist`.
+
+## Relationship to the Vue Skills
+
+- `mk:vue` — everyday Composition API quick-reference.
+- `mk:vue-best-practices` — feature-code review + ordered authoring workflow.
+- **`mk:vue-testing-best-practices`** — this skill: the test-design and test-code
+  counterpart.

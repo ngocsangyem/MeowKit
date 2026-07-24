@@ -52,7 +52,9 @@ function checkConfig(dir: string): CheckResult[] {
 	}
 	const out: CheckResult[] = [pass("Codex config.toml parses", "valid TOML")];
 
-	// [agents.X] config_file refs must resolve under .codex/.
+	// Agents AUTO-LOAD from .codex/agents/*.toml (see checkAgents); config.toml needs no
+	// [agents.X] wiring. But if a config DOES declare an optional [agents.X].config_file,
+	// a dangling ref is still a defect, so validate any that are present.
 	const agents = (parsed.agents as Record<string, { config_file?: string }> | undefined) ?? {};
 	const names = Object.keys(agents);
 	if (names.length > 0) {
@@ -63,10 +65,10 @@ function checkConfig(dir: string): CheckResult[] {
 		out.push(
 			dangling.length === 0
 				? pass(
-						"Codex config.toml agent wiring",
-						`${names.length} agent entr${names.length === 1 ? "y" : "ies"}, all config_file refs resolve`,
+						"Codex config.toml agent refs",
+						`${names.length} optional [agents] entr${names.length === 1 ? "y" : "ies"} resolve (auto-load needs no wiring)`,
 					)
-				: fail("Codex config.toml agent wiring", `config_file missing for: ${dangling.join(", ")}`),
+				: fail("Codex config.toml agent refs", `config_file missing for: ${dangling.join(", ")}`),
 		);
 	}
 
@@ -94,7 +96,7 @@ function checkHooks(dir: string): CheckResult[] {
 	const hooksJsonPath = path.join(dir, ".codex", "hooks.json");
 	if (!fs.existsSync(hooksJsonPath))
 		return [warn("Codex hooks.json present", `No hooks.json at ${hooksJsonPath} (target has no hooks)`)];
-	let parsed: { hooks?: Record<string, Array<{ hooks?: Array<{ command?: string }> }>> };
+	let parsed: { hooks?: Record<string, Array<{ hooks?: Array<{ command?: string; commandWindows?: string }> }>> };
 	try {
 		parsed = JSON.parse(fs.readFileSync(hooksJsonPath, "utf-8"));
 	} catch (e) {
@@ -102,14 +104,28 @@ function checkHooks(dir: string): CheckResult[] {
 	}
 	const out: CheckResult[] = [pass("Codex hooks.json parses", "valid JSON")];
 
-	// Every referenced wrapper file must exist + be executable.
+	// Every referenced wrapper file must exist + be executable. Read both the POSIX
+	// `command` and the optional cross-platform `commandWindows`.
 	const commands: string[] = [];
 	for (const groups of Object.values(parsed.hooks ?? {})) {
-		for (const g of groups) for (const h of g.hooks ?? []) if (h.command) commands.push(h.command);
+		for (const g of groups)
+			for (const h of g.hooks ?? []) {
+				if (h.command) commands.push(h.command);
+				if (h.commandWindows) commands.push(h.commandWindows);
+			}
 	}
-	const wrapperPaths = commands
-		.map((c) => c.match(/"([^"]+\.cjs)"/)?.[1] ?? c.match(/(\S+\.cjs)/)?.[1])
-		.filter((p): p is string => Boolean(p));
+	// Extract the `.codex/hooks/<file>.cjs` segment regardless of HOW a command computes
+	// the git root (POSIX `$(git rev-parse …)`, a pure-Node resolver, …). Codex runs a
+	// hook from the session cwd, which may be a subdirectory, so real commands resolve the
+	// git root; the target being validated IS that root, so the wrapper resolves under it.
+	const wrapperPaths = [
+		...new Set(
+			commands
+				.map((c) => c.match(/\.codex[/\\]hooks[/\\][\w.-]+\.cjs/)?.[0])
+				.filter((p): p is string => Boolean(p))
+				.map((p) => path.join(dir, p.replace(/\\/g, "/"))),
+		),
+	];
 	const missing = wrapperPaths.filter((p) => !fs.existsSync(p));
 	const notExec = wrapperPaths.filter((p) => fs.existsSync(p) && !isExecutable(p));
 	if (wrapperPaths.length === 0) {
@@ -166,17 +182,113 @@ function checkAgents(dir: string): CheckResult[] {
 	const files = listFiles(agentsDir, ".toml");
 	if (files.length === 0) return []; // a target with no agents is valid
 	const broken: string[] = [];
+	const nameless: string[] = [];
+	const missingFields: string[] = [];
+	// Codex identifies a custom agent by its `name` field (the filename is only a
+	// convention), and it AUTO-LOADS every .codex/agents/*.toml — there is no
+	// config.toml wiring. So `name` must be present and unique across the tree, or the
+	// agent selector becomes ambiguous. Beyond `name`, Codex requires `description` and
+	// `developer_instructions`; `model`, `model_reasoning_effort`, `sandbox_mode`,
+	// `mcp_servers`, and `skills.config` are optional and left unconstrained (the schema
+	// stays open so a new optional Codex field never trips this gate).
+	const nameToFiles = new Map<string, string[]>();
+	const hasText = (v: unknown): boolean => typeof v === "string" && v.trim().length > 0;
 	for (const f of files) {
+		let parsed: Record<string, unknown>;
 		try {
-			TOML.parse(fs.readFileSync(f, "utf-8"));
+			parsed = TOML.parse(fs.readFileSync(f, "utf-8")) as Record<string, unknown>;
 		} catch {
 			broken.push(path.basename(f));
+			continue;
 		}
+		const name = typeof parsed.name === "string" ? parsed.name.trim() : "";
+		if (!name) {
+			nameless.push(path.basename(f));
+			continue;
+		}
+		nameToFiles.set(name, [...(nameToFiles.get(name) ?? []), path.basename(f)]);
+		const missing = (["description", "developer_instructions"] as const).filter((k) => !hasText(parsed[k]));
+		if (missing.length > 0) missingFields.push(`${path.basename(f)} (${missing.join(", ")})`);
 	}
-	return [
+
+	const out: CheckResult[] = [
 		broken.length === 0
 			? pass("Codex agent TOMLs parse", `${files.length} agent file(s) parse`)
 			: fail("Codex agent TOMLs parse", `parse errors in: ${broken.join(", ")}`),
+	];
+	out.push(
+		nameless.length === 0
+			? pass("Codex agent name field", "every agent declares a name (auto-load identity)")
+			: fail("Codex agent name field", `missing name field: ${nameless.join(", ")}`),
+	);
+	out.push(
+		missingFields.length === 0
+			? pass("Codex agent required fields", "every agent declares description + developer_instructions")
+			: fail("Codex agent required fields", `missing required field(s): ${missingFields.join("; ")}`),
+	);
+	const dupes = [...nameToFiles.entries()].filter(([, fileList]) => fileList.length > 1);
+	out.push(
+		dupes.length === 0
+			? pass(
+					"Codex agent name uniqueness",
+					`${nameToFiles.size} unique auto-loaded agent name(s); no config.toml wiring needed`,
+				)
+			: fail(
+					"Codex agent name uniqueness",
+					`duplicate agent name(s): ${dupes.map(([n, fl]) => `"${n}" in ${fl.join(", ")}`).join("; ")}`,
+				),
+	);
+	return out;
+}
+
+// 4b. Reference graph: bundle-internal OPERATIONAL paths referenced by AGENTS.md, hooks.json,
+// and agent TOMLs (`.codex/hooks/*`, `.codex/scripts/*`) must resolve in the target. This
+// catches dangling hook/script references. External CLIs (jira-as.sh, mewkit, git, node) and
+// runtime paths (tasks/, .meowkit/) are NOT bundle files and are intentionally not checked.
+function checkReferenceGraph(dir: string): CheckResult[] {
+	const sources: string[] = [];
+	for (const rel of ["AGENTS.md", path.join(".codex", "hooks.json")]) {
+		const p = path.join(dir, rel);
+		if (fs.existsSync(p)) sources.push(fs.readFileSync(p, "utf-8"));
+	}
+	for (const f of listFiles(path.join(dir, ".codex", "agents"), ".toml")) sources.push(fs.readFileSync(f, "utf-8"));
+
+	const refRe = /\.codex\/(?:hooks|scripts)\/[\w.-]+/g;
+	const refs = new Set<string>();
+	for (const text of sources) {
+		let m: RegExpExecArray | null;
+		while ((m = refRe.exec(text)) !== null) refs.add(m[0]);
+	}
+	if (refs.size === 0) return [];
+	const dangling = [...refs].filter((r) => !fs.existsSync(path.join(dir, r)));
+	return [
+		dangling.length === 0
+			? pass("Codex root reference graph", `${refs.size} bundle-internal operational ref(s) resolve`)
+			: fail("Codex root reference graph", `dangling reference(s): ${dangling.join(", ")}`),
+	];
+}
+
+// 4c. Exec-policy rules (experimental): if `.codex/rules/*.rules` exist, each `prefix_rule`
+// must use a valid decision — allow | prompt | forbidden (verified against `codex execpolicy`).
+// Catches invalid values like "reject". Structural only; the CLI validates behavior.
+function checkRules(dir: string): CheckResult[] {
+	const rulesDir = path.join(dir, ".codex", "rules");
+	const files = fs.existsSync(rulesDir) ? listFiles(rulesDir, ".rules") : [];
+	if (files.length === 0) return [];
+	const VALID = new Set(["allow", "prompt", "forbidden"]);
+	const bad: string[] = [];
+	for (const f of files) {
+		const text = fs.readFileSync(f, "utf-8");
+		const decisionRe = /\bdecision\s*=\s*["']([^"']+)["']/g;
+		let m: RegExpExecArray | null;
+		while ((m = decisionRe.exec(text)) !== null) {
+			if (!VALID.has(m[1])) bad.push(`${path.basename(f)}: decision="${m[1]}"`);
+		}
+	}
+	return [
+		bad.length === 0
+			? pass("Codex exec-policy rules valid", `${files.length} .rules file(s); decisions in {allow, prompt, forbidden}`)
+			: fail("Codex exec-policy rules valid", `invalid decision value(s): ${bad.join("; ")}`),
 	];
 }
 
@@ -251,6 +363,31 @@ function checkSkills(dir: string): CheckResult[] {
 	return out;
 }
 
+// 7. Reject legacy / disallowed Codex surfaces. MeowKit never writes native Codex
+// memory (`.codex/memory` — memory lives in the runtime-neutral `.meowkit/` store,
+// and native memories stay opt-in/user-local), and it represents deprecated custom
+// prompts as Agent Skills rather than emitting a `.codex/prompts` surface. A generated
+// target that contains either is a defect, not a valid output.
+function checkLegacySurfaces(dir: string): CheckResult[] {
+	const out: CheckResult[] = [];
+	const memoryDir = path.join(dir, ".codex", "memory");
+	out.push(
+		fs.existsSync(memoryDir)
+			? fail("Codex no native memory surface", "`.codex/memory` present — MeowKit must never write native Codex memory")
+			: pass("Codex no native memory surface", "no `.codex/memory` (memory stays in `.meowkit/`)"),
+	);
+	const promptsDir = path.join(dir, ".codex", "prompts");
+	out.push(
+		fs.existsSync(promptsDir)
+			? fail(
+					"Codex no legacy prompts surface",
+					"`.codex/prompts` present — deprecated custom prompts must be Agent Skills",
+				)
+			: pass("Codex no legacy prompts surface", "no deprecated `.codex/prompts` surface"),
+	);
+	return out;
+}
+
 export const codexTargetProfile: TargetProfile = {
 	name: "codex",
 	detect(dir: string): boolean {
@@ -266,7 +403,10 @@ export const codexTargetProfile: TargetProfile = {
 		results.push(...checkConfig(dir));
 		results.push(...checkHooks(dir));
 		results.push(...checkAgents(dir));
+		results.push(...checkReferenceGraph(dir));
+		results.push(...checkRules(dir));
 		results.push(...checkSkills(dir));
+		results.push(...checkLegacySurfaces(dir));
 		return results;
 	},
 };

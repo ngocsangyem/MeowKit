@@ -1,0 +1,24 @@
+import { notFound } from 'next/navigation';
+import { source } from '@/lib/source';
+import { getLLMText } from '@/lib/get-llm-text';
+
+export const revalidate = false;
+
+// Per-page raw Markdown. next.config.mjs rewrites /:path*.md here so any doc
+// URL + `.md` returns its Markdown source for AI agents.
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ slug?: string[] }> },
+) {
+  const { slug } = await params;
+  const page = source.getPage(slug);
+  if (!page) notFound();
+
+  return new Response(await getLLMText(page), {
+    headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+  });
+}
+
+export function generateStaticParams() {
+  return source.generateParams();
+}

@@ -1,0 +1,236 @@
+---
+title: "Hooks"
+description: "MeowKit's lifecycle hooks — what they enforce, when they run."
+---
+
+MeowKit uses lifecycle hooks to enforce discipline at the tool level. Some hooks are registered in `.claude/settings.json` (automatic), others are invoked by skills.
+
+## Registered hooks (automatic)
+
+These run automatically via Claude Code's hook system:
+
+| Hook                   | Type        | Trigger     | What it does                                                                              | Blocks?      |
+| ---------------------- | ----------- | ----------- | ----------------------------------------------------------------------------------------- | ------------ |
+| `post-write.sh`        | PostToolUse | Edit, Write | Security scan: secrets, `any` type, SQL injection, XSS, destructive patterns              | Yes (exit 2) |
+| `learning-observer.sh` | PostToolUse | Edit, Write | Detect churn patterns (file edited 3+ times); feeds into post-session retroactive capture | No           |
+| `post-session.sh`      | Stop        | Session end | Capture session data to `.claude/memory/`                                                 | No           |
+| `ensure-skills-venv.sh` | SessionStart | Session start | Idempotent bootstrap — creates `.claude/skills/.venv` if absent                         | No           |
+| `tdd-flag-detector.sh`  | UserPromptSubmit | Prompt submit | Detects `--tdd` flag in user prompts, writes sentinel to `session-state/tdd-mode`      | No           |
+| `gate-enforcement.sh`   | PreToolUse     | Edit, Write  | Blocks code writes before Gate 1 (plan approval) and sprint contract sign; validates contract file edits against schema | Yes (exit 1) |
+| `privacy-block.sh`      | PreToolUse     | Read, Edit, Write, Bash | Blocks reads/writes of sensitive files (.env, keys, credentials, SSH) and SSRF-vulnerable web fetches | Yes (exit 2) |
+| `project-context-loader.sh` | SessionStart | Session start | Loads project context, directory listing, tool availability, package scripts, preferences, and agent readiness score | No           |
+
+## Skill-embedded hooks
+
+These are registered in SKILL.md frontmatter and run when those skills are active:
+
+| Hook               | Skill        | Trigger     | What it does                                      |
+| ------------------ | ------------ | ----------- | ------------------------------------------------- |
+| `check-freeze.sh`  | mk:freeze  | Edit, Write | Block edits outside frozen directory              |
+| `check-careful.sh` | mk:careful | Bash        | Warn on destructive commands (rm -rf, DROP TABLE) |
+
+## Skill-invoked scripts
+
+These run when specific skills call them:
+
+| Script              | Phase     | What it does                       | Blocks?                  |
+| ------------------- | --------- | ---------------------------------- | ------------------------ |
+| `pre-task-check.sh` | Any       | Prompt injection pattern detection | Yes (BLOCK on injection) |
+| `pre-implement.sh`  | Phase 2-3 | TDD gate — opt-in (see note below) | Only when TDD enabled    |
+| `pre-ship.sh`       | Phase 5   | Test + lint + typecheck            | Yes                      |
+| `append-trace.sh`   | Any       | Append JSONL trace record to `.claude/memory/trace-log.jsonl` (secret-scrubbed, atomic, auto-rotates at 50MB) | No                       |
+
+### `pre-implement.sh` invocation model
+
+`pre-implement.sh` is **NOT** wired to a Claude Code `PreToolUse` event. It is invoked manually by the cook skill via a Bash tool call (see `mk:cook/references/workflow-steps.md` Phase 3 pre-check). This is **behavioral enforcement**, not mechanical — if a different workflow doc is followed, the hook is not invoked.
+
+The hook is a no-op unless TDD mode is ON via:
+
+- `MEOWKIT_TDD=1` env var (CI / shell rc, highest precedence)
+- `.claude/session-state/tdd-mode` sentinel file containing `on` (written by slash command `--tdd`)
+- (legacy) `MEOW_PROFILE=fast` still bypasses with a deprecation warning, removed in next major
+
+When TDD is OFF (the default), the hook exits 0 silently. When ON, it requires a failing test to exist for the feature being implemented and blocks otherwise. Bypass mechanisms: drop `--tdd`, unset `MEOWKIT_TDD`.
+
+## Telemetry probes
+
+These hooks are telemetry-only — they log event fires to verify Claude Code supports the corresponding hook event types. They never block and always exit 0. Replace with real handlers once event support is confirmed.
+
+| Probe                         | Event               | Purpose                                                                 |
+| ----------------------------- | ------------------- | ----------------------------------------------------------------------- |
+| `control-probe.sh`            | Stop                | Control signal — confirms Stop event fires reliably, providing a baseline for comparing PreCompact/PostToolUseFailure probe fire rates |
+| `posttoolfailure-probe.sh`    | PostToolUseFailure  | Logs PostToolUseFailure hook fires to verify CC supports the event      |
+
+### `precompact-probe.sh` — safety-baseline re-arm
+
+`precompact-probe.sh` (PreCompact) is no longer telemetry-only. It still logs the event fire, then appends a re-arm marker to `session-state/session-sentinels.jsonl` for the active session. Compaction drops the safety-baseline rule text from context but leaves the per-session "verified" marker intact, so the re-arm marker invalidates that cached verification and the next turn re-reads the safety baseline. The cached-skip resumes only once a genuine re-read writes a newer verification. The hook never blocks (exit 0 on all paths) and no-ops when no session id is present.
+
+## Hook runtime profiling
+
+The `MEOW_HOOK_PROFILE` environment variable controls which hooks are active. Set it in your `.env` file or shell before starting a Claude Code session.
+
+| Profile    | Hooks Active                                                                | Use When                              |
+| ---------- | --------------------------------------------------------------------------- | ------------------------------------- |
+| `strict`   | All hooks                                                                   | COMPLEX tasks, security-critical work |
+| `standard` | All except `post-session.sh`                                                | Default — everyday development        |
+| `fast`     | `gate-enforcement.sh`, `privacy-block.sh`, `project-context-loader.sh` only | Rapid iteration, prototyping          |
+
+```bash
+# Set in .env or shell
+MEOW_HOOK_PROFILE=fast
+```
+
+### Per-hook profile classification
+
+| Hook                        | strict | standard | fast |
+| --------------------------- | :----: | :------: | :--: |
+| `gate-enforcement.sh`       |   ✅   |    ✅    |  ✅  |
+| `privacy-block.sh`          |   ✅   |    ✅    |  ✅  |
+| `project-context-loader.sh` |   ✅   |    ✅    |  ✅  |
+| `post-write.sh`             |   ✅   |    ✅    |  ❌  |
+| `pre-ship.sh`               |   ✅   |    ✅    |  ❌  |
+| `pre-task-check.sh`         |   ✅   |    ✅    |  ❌  |
+| `pre-implement.sh`          |   ✅   |    ✅    |  ❌  |
+| `post-session.sh`           |   ✅   |    ❌    |  ❌  |
+| `learning-observer.sh`      |   ✅   |    ✅    |  ❌  |
+
+:::warning Safety-critical hooks never skip
+`gate-enforcement.sh` and `privacy-block.sh` are active in **all** profiles, including `fast`. These enforce the two hard gates and sensitive file protection — they cannot be disabled by profile selection.
+:::
+
+## Hook configuration
+
+Hooks are registered in `.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/post-write.sh \"$TOOL_INPUT_FILE_PATH\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/learning-observer.sh \"$TOOL_INPUT_FILE_PATH\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "sh .claude/hooks/post-session.sh" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## JSON-on-stdin Convention (260408 Migration)
+
+All meowkit hooks now read input as JSON on stdin (per [Claude Code hook docs](https://code.claude.com/docs/en/hooks)), parsed via the shared shim `lib/read-hook-input.sh`. The shim exports `HOOK_TOOL_NAME`, `HOOK_FILE_PATH`, `HOOK_COMMAND`, `HOOK_SESSION_ID`, `HOOK_EVENT_NAME`, `HOOK_TRANSCRIPT_PATH`, and other fields. Hooks also honor legacy `$1` positional args for back-compat — both forms coexist safely.
+
+Phase 7 of the harness plan migrated all 10 pre-existing hooks and added 4 new middleware hooks to this convention.
+
+## Shared Hook Libraries
+
+Sourceable libraries in `.claude/hooks/lib/` — not hooks themselves:
+
+- `lib/read-hook-input.sh` — JSON-on-stdin parser. Source with `. lib/read-hook-input.sh`; never execute directly. Requires Bash 3.2+. Falls back to system `python3` if venv unavailable. Gracefully degrades (empty vars + warning) if no Python found.
+- `lib/secret-scrub.sh` — shared secret redaction. Exports a `scrub_secrets()` function covering Anthropic/OpenAI/AWS/GH/GL/Slack/JWT/PEM patterns. Sourced by hooks that persist content (`append-trace.sh`).
+
+## Middleware Hooks (Phase 7)
+
+### `build-verify` (handler)
+
+Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Classifies the written file by extension (`ts/tsx` → `tsc --noEmit\|eslint`; `js` → `eslint`; `py` → `ruff check\|mypy`; `go` → `go build ./...`; `rs` → `cargo check`; `rb` → `ruby -c\|rubocop`). Errors emitted to stdout as `@@BUILD_VERIFY_ERROR@@ … @@END_BUILD_VERIFY@@` blocks (fed back to agent). Results cached by file content hash — unchanged files are skipped. Skips `node_modules/`, `vendor/`, `dist/`, `tasks/`, `docs/`, `.claude/`, test files, and map/lock files.
+
+- **Opt-out:** `MEOWKIT_BUILD_VERIFY=off`
+- **Timeout override:** `MEOWKIT_BUILD_VERIFY_TIMEOUT=N` (default 30s for TS; 35s hook registration timeout)
+- **Density:** runs in LEAN; skipped in MINIMAL (`MEOWKIT_AUTOBUILD_MODE=MINIMAL`)
+- **Source:** `handlers/build-verify.cjs` (dispatched via `dispatch.cjs`)
+
+### `loop-detection` (handler)
+
+Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Counts per-file edits keyed `{session_id}:{realpath}` in `session-state/edit-counts.json`. Warns at N≥4 (`@@LOOP_DETECT_WARN@@`) and escalates at N≥8 (`@@LOOP_DETECT_ESCALATE@@`) — doom-loop prevention per LangChain harness research. Never blocks; messages are fed back via stdout.
+
+- **Opt-out:** `MEOWKIT_LOOP_DETECT=off`
+- **Timeout:** 3s
+- **Source:** `handlers/loop-detection.cjs` (dispatched via `dispatch.cjs`)
+
+### `pre-completion-check.sh`
+
+Fires on the **Stop** event (not SubagentStop). Hard gate: if no verification evidence exists (no evaluator verdict file, no signed sprint contract, no test-pass markers in the trace log), emits `{"decision":"block","reason":"…"}` JSON to block session close. 3-attempt re-entry guard per active plan slug via `session-state/precompletion-attempts.json`; after 3 attempts soft-nudges and allows stop to prevent infinite loop. LEAN density mode: soft nudge only. MINIMAL: skipped entirely.
+
+- **Opt-out:** `MEOWKIT_PRECOMPLETION=off`
+- **Density:** `MEOWKIT_AUTOBUILD_MODE=LEAN` → soft nudge; `MEOWKIT_AUTOBUILD_MODE=MINIMAL` → skip
+- **Timeout:** 5s
+- **Source:** `.claude/hooks/pre-completion-check.sh`
+
+## Node.js Dispatch System (v2.3.0)
+
+`dispatch.cjs` is a central Node.js dispatcher registered in `settings.json` alongside existing shell hooks. It reads `handlers.json` at runtime and dispatches to handler modules sequentially for each event.
+
+**Usage in settings.json:**
+```
+node dispatch.cjs <EventName> [Matcher]
+```
+
+**Graceful degradation:** if `handlers.json` is missing or a handler throws, `dispatch.cjs` exits 0 — it never blocks Claude Code.
+
+**Security note:** `gate-enforcement.sh` and `privacy-block.sh` are intentionally outside the dispatcher. They stay as independent entries in `settings.json`.
+
+### Handler Modules
+
+| Handler | File | Event | Matcher | Stdin Fields Used | Output |
+|---------|------|-------|---------|-------------------|--------|
+| model-detector | `handlers/model-detector.cjs` | SessionStart | — | `model` | Writes `session-state/detected-model.json`; stdout model tier line |
+| orientation-ritual | `handlers/orientation-ritual.cjs` | SessionStart | — | — | Resumes from checkpoint if exists |
+| build-verify | `handlers/build-verify.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Runs compile/lint; cached by file hash |
+| loop-detection | `handlers/loop-detection.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Warns at 4 edits, escalates at 8 |
+| budget-tracker | `handlers/budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | `tool_input`, `tool_response` | Estimates cost; warns $30, blocks $100 |
+| auto-checkpoint | `handlers/auto-checkpoint.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Checkpoint every 20 calls |
+| checkpoint-writer | `handlers/checkpoint-writer.cjs` | Stop | — | — | Sequenced checkpoint with git state |
+| immediate-capture | `handlers/immediate-capture-handler.cjs` | UserPromptSubmit | — | `prompt` | Detects ##decision:, ##pattern:, ##note: prefixes; routes to memory files |
+
+> **Note:** The `memory-loader.cjs` handler was removed in v2.4.1. Memory is now loaded on-demand by consumer skills — there is no per-turn auto-injection.
+
+### Shared Libraries
+
+| Library | File | Purpose |
+|---------|------|---------|
+| parse-stdin | `lib/parse-stdin.cjs` | Parses Claude Code JSON-on-stdin once; `dispatch.cjs` passes result to all handlers |
+| shared-state | `lib/shared-state.cjs` | In-process state bag for cross-handler state sharing |
+| checkpoint-utils | `lib/checkpoint-utils.cjs` | Read/write checkpoint files; shared by orientation-ritual and checkpoint-writer |
+
+## State Files Table
+
+| File                                        | Writer                                           | Purpose                                                        |
+| ------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------- |
+| `session-state/edit-counts.json`            | `handlers/loop-detection.cjs`                    | Per-file edit counter, keyed `{session_id}:{realpath}`         |
+| `session-state/precompletion-attempts.json` | `pre-completion-check.sh`                        | Pre-completion re-entry guard per plan slug                    |
+| `session-state/build-verify-cache.json`     | `handlers/build-verify.cjs`                      | File-content-hash cache for skip-on-unchanged                  |
+| `session-state/learning-observer.jsonl`     | `learning-observer.sh`                           | Churn pattern log                                              |
+| `session-state/active-plan`                 | `mk:autobuild`, `mk:plan-creator`              | Currently active plan slug (read by `pre-completion-check.sh`) |
+| `session-state/last-session-id`             | `project-context-loader.sh`                      | Session change detection                                       |
+
+## Env Var Bypasses
+
+| Var                              | Effect                                                                |
+| -------------------------------- | --------------------------------------------------------------------- |
+| `MEOWKIT_BUILD_VERIFY=off`       | Skip `build-verify` handler                                            |
+| `MEOWKIT_LOOP_DETECT=off`        | Skip `loop-detection` handler                                          |
+| `MEOWKIT_PRECOMPLETION=off`      | Skip `pre-completion-check.sh`                                        |
+| `MEOWKIT_AUTOBUILD_MODE=LEAN`      | PreCompletion falls back to soft nudge; BuildVerify still runs        |
+| `MEOWKIT_AUTOBUILD_MODE=MINIMAL`   | Skip BuildVerify + PreCompletion entirely                             |
+| `MEOW_HOOK_PROFILE=fast`         | Skip `pre-ship`, `post-session`, `learning-observer` (speed)          |

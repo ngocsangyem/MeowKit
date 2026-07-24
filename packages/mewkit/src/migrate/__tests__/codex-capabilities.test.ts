@@ -20,15 +20,15 @@ describe("codex capabilities", () => {
 				"UserPromptSubmit",
 			].sort(),
 		);
-		expect(head.events.SessionStart.allowedMatchers).toEqual(["startup", "resume"]);
+		expect(head.events.SessionStart.allowedMatchers).toEqual(["startup", "resume", "clear", "compact"]);
 		expect(head.events.PreToolUse.allowedMatchers).toEqual(["Bash"]);
 	});
 
-	it("keeps the conservative v0.124.0-alpha.3 entry as the unknown-version fallback", () => {
+	it("keeps the conservative v0.124.0 entry as the unknown-version fallback", () => {
 		const fallback = CODEX_CAPABILITY_TABLE[CODEX_CAPABILITY_TABLE.length - 1];
-		expect(fallback.version).toBe("0.124.0-alpha.3");
+		expect(fallback.version).toBe("0.124.0");
 		expect(fallback.requiresFeatureFlag).toBe(true);
-		expect(fallback.sessionStartMatchersOnly).toEqual(["startup", "resume"]);
+		expect(fallback.sessionStartMatchersOnly).toEqual(["startup", "resume", "clear", "compact"]);
 		expect(fallback.events.SubagentStart).toBeUndefined();
 	});
 });

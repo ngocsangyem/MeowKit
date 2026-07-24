@@ -23,7 +23,12 @@ function makeTarget(): string {
 	mkdirSync(join(dir, ".codex", "hooks"), { recursive: true });
 	mkdirSync(join(dir, ".agents", "skills", "demo"), { recursive: true });
 	writeFileSync(join(dir, ".codex", "config.toml"), '[agents.demo]\nconfig_file = "agents/demo.toml"\n');
-	writeFileSync(join(dir, ".codex", "agents", "demo.toml"), 'description = "demo agent"\n');
+	// A valid Codex agent declares the three required fields: `name` (its auto-load identity;
+	// the filename is only a convention), `description`, and `developer_instructions`.
+	writeFileSync(
+		join(dir, ".codex", "agents", "demo.toml"),
+		'name = "demo"\ndescription = "demo agent"\ndeveloper_instructions = "Be a demo."\n',
+	);
 	const wrapper = join(dir, ".codex", "hooks", "w.cjs");
 	writeFileSync(
 		wrapper,
@@ -96,11 +101,110 @@ describe("codex target validation", () => {
 		expect(anyFail(rs)).toBe(false);
 	});
 
-	it("a dangling config_file agent ref → FAIL agent wiring", async () => {
+	it("a dangling optional config_file agent ref → FAIL agent refs", async () => {
 		const d = makeTarget();
 		writeFileSync(join(d, ".codex", "config.toml"), '[agents.gone]\nconfig_file = "agents/gone.toml"\n');
 		const rs = await codexTargetProfile.check(d);
-		expect(status(rs, "Codex config.toml agent wiring")).toBe("fail");
+		expect(status(rs, "Codex config.toml agent refs")).toBe("fail");
+	});
+
+	it("an agent TOML with no name field → FAIL agent name field (auto-load identity)", async () => {
+		const d = makeTarget();
+		writeFileSync(join(d, ".codex", "agents", "nameless.toml"), 'description = "no name"\n');
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex agent name field")).toBe("fail");
+	});
+
+	it("two agent TOMLs sharing a name → FAIL agent name uniqueness (ambiguous selector)", async () => {
+		const d = makeTarget();
+		writeFileSync(join(d, ".codex", "agents", "dup.toml"), 'name = "demo"\ndescription = "clashes with demo.toml"\n');
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex agent name uniqueness")).toBe("fail");
+	});
+
+	it("an agent TOML missing developer_instructions → FAIL required fields", async () => {
+		const d = makeTarget();
+		writeFileSync(join(d, ".codex", "agents", "thin.toml"), 'name = "thin"\ndescription = "no instructions"\n');
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex agent required fields")).toBe("fail");
+	});
+
+	it("an agent TOML missing description → FAIL required fields", async () => {
+		const d = makeTarget();
+		writeFileSync(
+			join(d, ".codex", "agents", "nodesc.toml"),
+			'name = "nodesc"\ndeveloper_instructions = "instructions but no description"\n',
+		);
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex agent required fields")).toBe("fail");
+	});
+
+	it("an agent TOML carrying the documented optional fields still PASSES (open schema)", async () => {
+		const d = makeTarget();
+		// model_reasoning_effort, sandbox_mode, mcp_servers, skills.config are optional and
+		// must not trip the required-fields gate.
+		writeFileSync(
+			join(d, ".codex", "agents", "full.toml"),
+			[
+				'name = "full"',
+				'description = "fully specified agent"',
+				'model_reasoning_effort = "high"',
+				'sandbox_mode = "read-only"',
+				'mcp_servers = ["fs"]',
+				'developer_instructions = "Do the thing."',
+				"[skills]",
+				'config = "all"',
+				"",
+			].join("\n"),
+		);
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex agent required fields")).toBe("pass");
+		expect(status(rs, "Codex agent name uniqueness")).toBe("pass");
+	});
+
+	it("a dangling .codex/scripts ref in an agent TOML → FAIL reference graph", async () => {
+		const d = makeTarget();
+		writeFileSync(
+			join(d, ".codex", "agents", "demo.toml"),
+			'name = "demo"\ndescription = "x"\ndeveloper_instructions = "run .codex/scripts/missing.py"\n',
+		);
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex root reference graph")).toBe("fail");
+	});
+
+	it("does not flag external CLI references (jira-as.sh, mewkit, git)", async () => {
+		const d = makeTarget();
+		writeFileSync(
+			join(d, ".codex", "agents", "demo.toml"),
+			'name = "demo"\ndescription = "x"\ndeveloper_instructions = "call jira-as.sh and mewkit validate; git status"\n',
+		);
+		const rs = await codexTargetProfile.check(d);
+		// External CLIs are not .codex/hooks|scripts bundle paths → they never fail the graph.
+		expect(status(rs, "Codex root reference graph")).not.toBe("fail");
+		expect(anyFail(rs)).toBe(false);
+	});
+
+	it("a .rules file with an invalid prefix_rule decision → FAIL exec-policy rules valid", async () => {
+		const d = makeTarget();
+		mkdirSync(join(d, ".codex", "rules"), { recursive: true });
+		writeFileSync(
+			join(d, ".codex", "rules", "default.rules"),
+			'prefix_rule(pattern = ["rm", "-rf"], decision = "reject")\n',
+		);
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex exec-policy rules valid")).toBe("fail");
+	});
+
+	it("a .rules file with valid decisions passes", async () => {
+		const d = makeTarget();
+		mkdirSync(join(d, ".codex", "rules"), { recursive: true });
+		writeFileSync(
+			join(d, ".codex", "rules", "default.rules"),
+			'prefix_rule(pattern = ["rm", "-rf"], decision = "prompt")\n',
+		);
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex exec-policy rules valid")).toBe("pass");
+		expect(anyFail(rs)).toBe(false);
 	});
 
 	it("an installed skill with a tool token (/mk:) → FAIL tool-token clean", async () => {
@@ -141,5 +245,27 @@ describe("codex target validation", () => {
 		const bare = mkdtempSync(join(tmpdir(), "bare-"));
 		expect(codexTargetProfile.detect(bare)).toBe(false);
 		rmSync(bare, { recursive: true, force: true });
+	});
+
+	it("a clean target passes the legacy-surface checks", async () => {
+		const rs = await codexTargetProfile.check(makeTarget());
+		expect(status(rs, "Codex no native memory surface")).toBe("pass");
+		expect(status(rs, "Codex no legacy prompts surface")).toBe("pass");
+	});
+
+	it("a `.codex/memory` surface → FAIL (memory must stay in .meowkit/)", async () => {
+		const d = makeTarget();
+		mkdirSync(join(d, ".codex", "memory"), { recursive: true });
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex no native memory surface")).toBe("fail");
+		expect(anyFail(rs)).toBe(true);
+	});
+
+	it("a deprecated `.codex/prompts` surface → FAIL (must be Agent Skills)", async () => {
+		const d = makeTarget();
+		mkdirSync(join(d, ".codex", "prompts"), { recursive: true });
+		const rs = await codexTargetProfile.check(d);
+		expect(status(rs, "Codex no legacy prompts surface")).toBe("fail");
+		expect(anyFail(rs)).toBe(true);
 	});
 });

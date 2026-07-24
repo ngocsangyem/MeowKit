@@ -20,6 +20,7 @@ import {
 } from "./doctor-checks.js";
 import { checkMemoryHealth } from "./doctor-memory-checks.js";
 import { checkHardGates } from "./doctor-hard-gates.js";
+import { checkCodexHookTrust } from "./doctor-codex-hook-trust.js";
 import {
 	collectProviderContractDiagnostics,
 	summarizeProviderContractDiagnostics,
@@ -139,6 +140,12 @@ export async function doctor(args?: {
 	}
 
 	results.push(...(await checkMetadataHealth(root)));
+
+	// Honest per-hook trust-state report for a generated Codex target (runs regardless of
+	// --providers so a codex project always sees it; a non-codex dir is a no-op).
+	if (TARGET_PROFILES.codex?.detect(process.cwd())) {
+		results.push(...checkCodexHookTrust(process.cwd()));
+	}
 
 	if (args?.state) {
 		results.push(...checkStateTaxonomy(root));

@@ -1,0 +1,30 @@
+{
+  "root": true,
+  "title": "Workflows",
+  "pages": [
+    "index",
+    "new-project",
+    "add-feature",
+    "autonomous-build",
+    "fix-bug",
+    "code-review",
+    "ship-code",
+    "security-audit",
+    "refactoring",
+    "writing-tests",
+    "qa-testing",
+    "documentation",
+    "retrospective",
+    "agile-scrum",
+    "architecture",
+    "frontend",
+    "research",
+    "maintenance",
+    "prd-intake",
+    "ticket-with-media",
+    "ticket-evaluation",
+    "spec-to-sprint",
+    "ticket-to-code",
+    "spec-to-pr-walkthrough"
+  ]
+}

@@ -18,7 +18,7 @@ import { providers } from "../provider-registry.js";
 import type { ProviderType } from "../types.js";
 
 const fixtureRoot = fileURLToPath(new URL("./fixtures/codex-full-surface/.claude", import.meta.url));
-const PROVIDERS: ProviderType[] = ["codex", "cursor", "gemini-cli", "opencode"];
+const PROVIDERS: ProviderType[] = ["codex", "cursor", "claude-code"];
 
 function collectMarkdownFiles(dir: string): string[] {
 	const files: string[] = [];

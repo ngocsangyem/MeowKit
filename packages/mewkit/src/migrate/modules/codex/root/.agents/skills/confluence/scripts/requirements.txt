@@ -1,0 +1,13 @@
+# Confluence skills — pip dependencies (auto-discovered by `.codex/scripts/bin/setup-workflow`)
+#
+# Verified empirically (260510-1640) via pip install in a throwaway venv:
+#   pip install confluence-assistant-skills==0.2.0
+#     → installs binary: confluence-as
+#     → pulls transitive: assistant-skills-lib==1.0.1
+#
+# The `confluence-as` PyPI package does NOT exist (pip show returns "not found").
+# Both upstream READMEs that document `confluence` as the binary name are wrong.
+# Empirical install is the ground truth; re-verify on every version bump.
+
+confluence-assistant-skills==0.2.0
+assistant-skills-lib==1.0.1

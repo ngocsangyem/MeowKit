@@ -29,24 +29,22 @@ describe("reference target registry", () => {
 	});
 
 	it("resolves non-directory targets to the bare target path", () => {
-		// codex agents merge into TOML; codex rules merge into AGENTS.md —
-		// neither target is a per-file directory.
+		// codex rules merge into AGENTS.md — not a per-file directory.
 		const table = buildReferenceRewriteTable("codex");
-		expect(resolveReferenceTarget(table, ".claude/agents/planner.md")).toBe(".codex/agents");
 		expect(resolveReferenceTarget(table, ".claude/rules/security-rules.md")).toBe("AGENTS.md");
 	});
 
-	it("resolves codex command references through the skill-directory special case", () => {
-		const table = buildReferenceRewriteTable("codex");
-		expect(resolveReferenceTarget(table, ".claude/commands/mk/fix.md")).toBe(
-			".agents/skills/source-command-mk-fix/SKILL.md",
-		);
-	});
-
 	it("returns null for types the provider does not support", () => {
-		expect(getReferenceTarget("goose", "commands")).toBeNull();
-		const table = buildReferenceRewriteTable("goose");
-		expect(resolveReferenceTarget(table, ".claude/commands/mk/fix.md")).toBeNull();
+		// Codex agents/commands/hooks conversion is nulled — toolkit agents/commands
+		// ship via the native authored bundle, not the generic runtime converter.
+		expect(getReferenceTarget("codex", "agents")).toBeNull();
+		expect(getReferenceTarget("codex", "commands")).toBeNull();
+		expect(getReferenceTarget("cursor", "commands")).toBeNull();
+		const codexTable = buildReferenceRewriteTable("codex");
+		expect(resolveReferenceTarget(codexTable, ".claude/agents/planner.md")).toBeNull();
+		expect(resolveReferenceTarget(codexTable, ".claude/commands/mk/fix.md")).toBeNull();
+		const cursorTable = buildReferenceRewriteTable("cursor");
+		expect(resolveReferenceTarget(cursorTable, ".claude/commands/mk/fix.md")).toBeNull();
 	});
 
 	it("returns null for unmapped runtime paths", () => {

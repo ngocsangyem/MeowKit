@@ -83,23 +83,6 @@ export async function setupKitInstallMigrateE2e(
 		JSON.stringify({ mcpServers: { context7: { command: "npx", args: ["-y", "@upstash/context7-mcp"] } } }),
 		"utf-8",
 	);
-	await writeFile(
-		join(env.projectDir, ".meowkit.config.json"),
-		JSON.stringify({
-			modelRouting: {
-				providers: {
-					codex: {
-						tiers: {
-							heavy: { model: "codex-heavy" },
-							balanced: { model: "codex-balanced" },
-							light: { model: "codex-light" },
-						},
-					},
-				},
-			},
-		}),
-		"utf-8",
-	);
 	await writeFile(join(env.sourceDir, ".env"), "MY_REGION=eu-west-1\nJIRA_API_TOKEN=sk-do-not-leak-phase7\n", "utf-8");
 	await writeFile(
 		join(env.sourceDir, "rules", "large-budget-rules.md"),

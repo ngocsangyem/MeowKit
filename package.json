@@ -6,6 +6,7 @@
   ],
   "scripts": {
     "build": "npm -w packages/mewkit run build",
+    "docs:build": "npm run build -w packages/docs",
     "lint": "eslint packages/*/src/**/*.ts",
     "typecheck": "tsc --noEmit -p packages/mewkit/tsconfig.json",
     "format": "npx prettier --write \"packages/*/src/**/*.{ts,js,json}\"",
@@ -41,8 +42,9 @@
   "engines": {
     "node": ">=24"
   },
+  "packageManager": "pnpm@10.17.1",
   "license": "MIT",
-  "version": "2.14.5",
+  "version": "2.14.6",
   "overrides": {
     "npm": "^11.14.1"
   }

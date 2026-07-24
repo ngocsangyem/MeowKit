@@ -1,0 +1,49 @@
+# Expected Figma Evidence Packet — static-card fixture.
+# Schema oracle: the packet mk:figma emits must match THIS field set (values may vary in
+# wording; keys and shape must match). Paths use the toolkit convention (tasks/plans, tasks/reports).
+schema_version: figma-evidence-packet/v1
+source:
+  figma_url: "https://www.figma.com/design/FIX0STATIC/meowkit-fixtures?node-id=10-2"
+  file_key: FIX0STATIC
+  node_ids: ["10:2", "10:3", "10:4"]
+  figma_version_or_last_modified: "2026-07-05T09:00:00Z"
+  extracted_at: "<ISO-8601>"
+scope:
+  target_frames: ["Notifications"]
+  frame_sizes:
+    - { node_id: "10:2", width: 1440, height: 900 }
+intent_summary:
+  hierarchy:
+    - "Notifications screen → NotificationList → NotificationCard (avatar, text, timestamp)"
+  layout_constraints:
+    - "single column, vertical auto-layout, 24px gap"
+  tokens: "colors(surface/border/text/muted/accent); type 16/14/12; spacing 4/8/16/24; radii card12/avatar-full; shadow 0 1px 2px"
+  assets: []
+  variants_and_states: "default only (explicit)"
+prototype_flow_summary:
+  availability: unavailable
+  confidence: unknown
+  flow_starting_points: []
+  critical_actions_count: 0
+  blocked_or_needs_answer_count: 0
+  prototype_flow_artifacts: null   # none — no interactions in the file
+implementation_hints:
+  component_candidates: ["NotificationCard (evidence: node 10:4)"]
+  code_connect_refs: []
+validation_contract:
+  required_viewports: [desktop]
+  required_states: [default]
+  pixel_tolerance: "advisory only"
+  a11y_expectations: "list semantics; card is a list item; avatar has alt/label"
+risks:
+  ambiguity: []
+  missing_states: ["no hover/focus/disabled variants defined — not invented"]
+  permission_limits: []
+provenance:
+  generated_by: mk:figma
+  tool_surface: "Figma MCP | screenshot fallback"
+  artifact_paths: ["tasks/plans/<active-plan>/research/figma-evidence-packet.md"]
+artifact_policy:
+  active_plan_location: "tasks/plans/<active-plan>/research/"
+  standalone_location: "tasks/reports/"
+  artifact_paths_only_in_context: true

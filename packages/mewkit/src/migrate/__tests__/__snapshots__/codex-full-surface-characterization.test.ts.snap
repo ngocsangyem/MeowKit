@@ -1,49 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`codex full-surface characterization: codex-only surfaces > pins codex agent TOML conversion (fenced .claude refs survive inside developer_instructions) > fm-to-codex-toml-planner 1`] = `
-"name = "planner"
-description = "Planning agent for implementation plans"
-# model = "opus"
-sandbox_mode = "read-only"
-
-developer_instructions = """
-# Planner
-
-<!-- ref: inline-mapped-asset -->
-Read the rules in AGENTS.md before planning.
-
-<!-- ref: inline-unmapped-runtime -->
-Cost data lives in project runtime data/memory/cost-log.json.
-
-<!-- ref: inline-code-span -->
-Store plans following the \`.codex/agents\` conventions.
-
-<!-- ref: fenced-runtime-command -->
-\`\`\`bash
-node .claude/scripts/validate-docs.cjs --strict
-python3 .claude/skills/demo-skill/scripts/run.py
-\`\`\`
-
-<!-- ref: fenced-illustrative-example -->
-\`\`\`text
-project/
-└── .claude/
-    └── agents/planner.md
-\`\`\`
-
-<!-- ref: citation -->
-> Source: anthropics/claude-code — .claude/agents/planner.md
-
-<!-- ref: claude-md-token-prose -->
-Keep AGENTS.md up to date after each milestone.
-
-<!-- ref: claude-md-token-command -->
-\`\`\`bash
-cat CLAUDE.md
-\`\`\`
-""""
-`;
-
 exports[`codex full-surface characterization: direct-copy > never fabricates provider paths: fenced refs without migration proof are preserved + warned > direct-copy-skill-md-codex 1`] = `
 "---
 name: demo-skill
@@ -69,6 +25,37 @@ node .claude/scripts/validate-docs.cjs
 
 <!-- ref: inline-mapped-asset + inline-code-span -->
 Read \`references/usage.md\` and .agents/skills/demo-skill/references/usage.md.
+
+<!-- ref: citation -->
+> Ported from external-org/agent-kit — .claude/skills/demo-skill/SKILL.md
+"
+`;
+
+exports[`codex full-surface characterization: direct-copy > pins per-provider direct-copy output for skill markdown > direct-copy-skill-md-claude-code 1`] = `
+"---
+name: demo-skill
+runtime: portable
+description: Demonstration skill exercising reference categories
+---
+
+# Demo Skill
+
+<!-- ref: fenced-runtime-command (mapped, target migrates with this skill) -->
+Run the bundled script:
+
+\`\`\`bash
+python3 .claude/skills/demo-skill/scripts/run.py --input data.json
+\`\`\`
+
+<!-- ref: fenced-runtime-command (unmapped runtime) -->
+Validate docs before shipping:
+
+\`\`\`bash
+node .claude/scripts/validate-docs.cjs
+\`\`\`
+
+<!-- ref: inline-mapped-asset + inline-code-span -->
+Read \`references/usage.md\` and .claude/skills/demo-skill/references/usage.md.
 
 <!-- ref: citation -->
 > Ported from external-org/agent-kit — .claude/skills/demo-skill/SKILL.md
@@ -137,68 +124,6 @@ Read \`references/usage.md\` and .agents/skills/demo-skill/references/usage.md.
 "
 `;
 
-exports[`codex full-surface characterization: direct-copy > pins per-provider direct-copy output for skill markdown > direct-copy-skill-md-gemini-cli 1`] = `
-"---
-name: demo-skill
-runtime: portable
-description: Demonstration skill exercising reference categories
----
-
-# Demo Skill
-
-<!-- ref: fenced-runtime-command (mapped, target migrates with this skill) -->
-Run the bundled script:
-
-\`\`\`bash
-python3 .claude/skills/demo-skill/scripts/run.py --input data.json
-\`\`\`
-
-<!-- ref: fenced-runtime-command (unmapped runtime) -->
-Validate docs before shipping:
-
-\`\`\`bash
-node .claude/scripts/validate-docs.cjs
-\`\`\`
-
-<!-- ref: inline-mapped-asset + inline-code-span -->
-Read \`references/usage.md\` and .gemini/skills/demo-skill/references/usage.md.
-
-<!-- ref: citation -->
-> Ported from external-org/agent-kit — .claude/skills/demo-skill/SKILL.md
-"
-`;
-
-exports[`codex full-surface characterization: direct-copy > pins per-provider direct-copy output for skill markdown > direct-copy-skill-md-opencode 1`] = `
-"---
-name: demo-skill
-runtime: portable
-description: Demonstration skill exercising reference categories
----
-
-# Demo Skill
-
-<!-- ref: fenced-runtime-command (mapped, target migrates with this skill) -->
-Run the bundled script:
-
-\`\`\`bash
-python3 .claude/skills/demo-skill/scripts/run.py --input data.json
-\`\`\`
-
-<!-- ref: fenced-runtime-command (unmapped runtime) -->
-Validate docs before shipping:
-
-\`\`\`bash
-node .claude/scripts/validate-docs.cjs
-\`\`\`
-
-<!-- ref: inline-mapped-asset + inline-code-span -->
-Read \`references/usage.md\` and .claude/skills/demo-skill/references/usage.md.
-
-<!-- ref: citation -->
-> Ported from external-org/agent-kit — .claude/skills/demo-skill/SKILL.md
-"
-`;
-
 exports[`codex full-surface characterization: direct-copy > treats non-markdown sources as runnable content: refs preserved unless a real file target exists > direct-copy-hook-cjs-codex 1`] = `
 "#!/usr/bin/env node
 // Validates that docs referenced from .claude/ files exist on disk.
@@ -208,6 +133,43 @@ const { join } = require("node:path");
 const target = join(process.cwd(), ".claude/rules/security-rules.md");
 process.exit(existsSync(target) ? 0 : 1);
 "
+`;
+
+exports[`codex full-surface characterization: markdown stripping > pins per-provider stripClaudeRefs output for the agent body > strip-claude-refs-claude-code 1`] = `
+"# Planner
+
+<!-- ref: inline-mapped-asset -->
+Read the rules in .claude/rules/security-rules.md before planning.
+
+<!-- ref: inline-unmapped-runtime -->
+Cost data lives in project runtime data/memory/cost-log.json.
+
+<!-- ref: inline-code-span -->
+Store plans following the \`.claude/agents/planner.md\` conventions.
+
+<!-- ref: fenced-runtime-command -->
+\`\`\`bash
+node .claude/scripts/validate-docs.cjs --strict
+python3 .claude/skills/demo-skill/scripts/run.py
+\`\`\`
+
+<!-- ref: fenced-illustrative-example -->
+\`\`\`text
+project/
+└── .claude/
+    └── agents/planner.md
+\`\`\`
+
+<!-- ref: citation -->
+> Source: anthropics/claude-code — .claude/agents/planner.md
+
+<!-- ref: claude-md-token-prose -->
+Keep CLAUDE.md up to date after each milestone.
+
+<!-- ref: claude-md-token-command -->
+\`\`\`bash
+cat CLAUDE.md
+\`\`\`"
 `;
 
 exports[`codex full-surface characterization: markdown stripping > pins per-provider stripClaudeRefs output for the agent body > strip-claude-refs-codex 1`] = `
@@ -220,7 +182,7 @@ Read the rules in AGENTS.md before planning.
 Cost data lives in project runtime data/memory/cost-log.json.
 
 <!-- ref: inline-code-span -->
-Store plans following the \`.codex/agents\` conventions.
+Store plans following the \`project subagents directory/planner.md\` conventions.
 
 <!-- ref: fenced-runtime-command -->
 \`\`\`bash
@@ -277,80 +239,6 @@ project/
 
 <!-- ref: claude-md-token-prose -->
 Keep .cursor/rules/project-config.mdc up to date after each milestone.
-
-<!-- ref: claude-md-token-command -->
-\`\`\`bash
-cat CLAUDE.md
-\`\`\`"
-`;
-
-exports[`codex full-surface characterization: markdown stripping > pins per-provider stripClaudeRefs output for the agent body > strip-claude-refs-gemini-cli 1`] = `
-"# Planner
-
-<!-- ref: inline-mapped-asset -->
-Read the rules in GEMINI.md before planning.
-
-<!-- ref: inline-unmapped-runtime -->
-Cost data lives in project runtime data/memory/cost-log.json.
-
-<!-- ref: inline-code-span -->
-Store plans following the \`AGENTS.md\` conventions.
-
-<!-- ref: fenced-runtime-command -->
-\`\`\`bash
-node .claude/scripts/validate-docs.cjs --strict
-python3 .claude/skills/demo-skill/scripts/run.py
-\`\`\`
-
-<!-- ref: fenced-illustrative-example -->
-\`\`\`text
-project/
-└── .claude/
-    └── agents/planner.md
-\`\`\`
-
-<!-- ref: citation -->
-> Source: anthropics/claude-code — .claude/agents/planner.md
-
-<!-- ref: claude-md-token-prose -->
-Keep GEMINI.md up to date after each milestone.
-
-<!-- ref: claude-md-token-command -->
-\`\`\`bash
-cat CLAUDE.md
-\`\`\`"
-`;
-
-exports[`codex full-surface characterization: markdown stripping > pins per-provider stripClaudeRefs output for the agent body > strip-claude-refs-opencode 1`] = `
-"# Planner
-
-<!-- ref: inline-mapped-asset -->
-Read the rules in AGENTS.md before planning.
-
-<!-- ref: inline-unmapped-runtime -->
-Cost data lives in project runtime data/memory/cost-log.json.
-
-<!-- ref: inline-code-span -->
-Store plans following the \`.opencode/agents/planner.md\` conventions.
-
-<!-- ref: fenced-runtime-command -->
-\`\`\`bash
-node .claude/scripts/validate-docs.cjs --strict
-python3 .claude/skills/demo-skill/scripts/run.py
-\`\`\`
-
-<!-- ref: fenced-illustrative-example -->
-\`\`\`text
-project/
-└── .claude/
-    └── agents/planner.md
-\`\`\`
-
-<!-- ref: citation -->
-> Source: anthropics/claude-code — .claude/agents/planner.md
-
-<!-- ref: claude-md-token-prose -->
-Keep AGENTS.md up to date after each milestone.
 
 <!-- ref: claude-md-token-command -->
 \`\`\`bash

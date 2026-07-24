@@ -28,7 +28,7 @@ beforeAll(async () => {
 	// This fixture covers the documented 0.142 hook surface. The fallback tier
 	// intentionally omits newer events when no Codex binary is available.
 	env = await setupKitInstallMigrateE2e("target-codex-acceptance", "optimistic");
-	exitCode = await env.run({ includeMcp: true });
+	exitCode = await env.run({});
 }, 60_000);
 
 afterAll(async () => {
@@ -62,27 +62,43 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 		);
 	});
 
-	it("accounts for all 22 source hook registrations with runnable, single-root commands", () => {
+	it("emits the authored Codex hook set (runnable, single-root) and still accounts for every source hook", () => {
 		const commands = hookCommands();
-		expect(commands).toHaveLength(22);
+		// Phase-9 flip: the hooks surface is authored. hooks.json declares the 3 native Codex
+		// safety+capture hooks (capture, privacy-block, gate-enforcement) — NOT a 1:1 map of the
+		// 22 source Claude hooks. Each resolves its wrapper via the git root (Codex exposes no
+		// project-dir env), single-root, runnable.
+		expect(commands).toHaveLength(3);
 		for (const command of commands) {
 			expect(command).not.toContain(`${env.projectDir}/${env.projectDir}`);
-			const wrapperPath = command.replace(/^node\s+/, "").replace(/^"|"$/g, "");
-			expect(existsSync(wrapperPath), command).toBe(true);
+			expect(command).toContain("git rev-parse --show-toplevel");
+			expect(command).toMatch(/\.codex\/hooks\/(capture|privacy-block|gate-enforcement)\.cjs/);
+		}
+		for (const name of ["capture", "privacy-block", "gate-enforcement"]) {
+			expect(existsSync(join(env.projectDir, ".codex", "hooks", `${name}.cjs`)), name).toBe(true);
 		}
 
+		// The migration report still accounts for every source hook — none silently
+		// dropped. Codex hooks conversion is nulled (the 3 native hooks above ship via
+		// the authored bundle, not this reporting path), so every source .claude hook
+		// is now uniformly recorded "skipped" rather than converted/"migrated" —
+		// including the safety-critical ones, which the native bundle installs
+		// directly instead.
 		const hookRecords = readReport().artifacts.filter((a) => a.type === "hooks");
 		const migratedOrSkipped = hookRecords.filter((a) => a.status === "migrated" || a.status === "skipped");
 		expect(migratedOrSkipped.length).toBe(22);
-		expect(hookRecords.find((a) => a.sourcePath === "gate-enforcement.sh")?.status).toBe("migrated");
-		expect(hookRecords.find((a) => a.sourcePath === "privacy-block.sh")?.status).toBe("migrated");
+		expect(hookRecords.find((a) => a.sourcePath === "gate-enforcement.sh")?.status).toBe("skipped");
+		expect(hookRecords.find((a) => a.sourcePath === "privacy-block.sh")?.status).toBe("skipped");
 	});
 
-	it("rewrites migrated skill refs while preserving genuinely out-of-set refs", () => {
-		const agentToml = readFileSync(join(env.projectDir, ".codex", "agents", "planner.toml"), "utf-8");
-		expect(agentToml).toContain("python3 .agents/skills/demo-skill/scripts/run.py");
-		expect(agentToml).not.toContain(".claude/skills/demo-skill");
-		expect(agentToml).toContain("node .claude/scripts/validate-docs.cjs");
+	it("does not auto-port a non-roster user agent (custom-helper) — agents conversion is nulled", () => {
+		// Agents conversion is nulled for Codex: the toolkit's own agents ship via the
+		// authored bundle overlay (planner.toml, still written), but a project's own
+		// custom agent (custom-helper.md) is no longer converted at all — no
+		// custom_helper.toml is written. Ref-rewriting itself stays covered by the
+		// reference-target-registry and skill-directory-installer suites.
+		expect(existsSync(join(env.projectDir, ".codex", "agents", "custom_helper.toml"))).toBe(false);
+		expect(existsSync(join(env.projectDir, ".codex", "agents", "planner.toml"))).toBe(true);
 	});
 
 	it("installs previously audit-sensitive skill content with annotated env rewrites", () => {
@@ -92,16 +108,14 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 	});
 
 	it("emits config completeness surfaces without leaking source env secrets", () => {
+		// MCP conversion (--include-mcp) is removed along with the rest of the
+		// generic runtime converter pipeline; only the native shell-env-policy
+		// scaffold survives as a config completeness surface for Codex.
 		const configToml = readFileSync(join(env.projectDir, ".codex", "config.toml"), "utf-8");
-		expect(configToml).toContain("[mcp_servers.context7]");
 		expect(configToml).toContain("[shell_environment_policy]");
 		expect(configToml).toContain("MY_REGION");
 		expect(configToml).not.toContain("sk-do-not-leak-phase7");
 		expect(configToml).not.toContain("JIRA_API_TOKEN");
-
-		const plannerToml = readFileSync(join(env.projectDir, ".codex", "agents", "planner.toml"), "utf-8");
-		expect(plannerToml).toContain('model = "codex-heavy"');
-		expect(plannerToml).toContain('model_reasoning_effort = "xhigh"');
 		expect(readReport().header.secretKeysOmitted).toBe(1);
 	});
 
@@ -125,11 +139,11 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 	});
 
 	it("is idempotent on a second run over the generated output", async () => {
-		expect(await env.run({ includeMcp: true })).toBe(0);
+		expect(await env.run({})).toBe(0);
 		const report = readReport();
 		const { counts } = report.header;
 		expect(counts.migrated + counts.skipped + counts.failed + counts.narrowed).toBe(counts.total);
-		expect(hookCommands()).toHaveLength(22);
+		expect(hookCommands()).toHaveLength(3); // authored hook set (phase-9 flip), idempotent on re-run
 		const agentsMd = readFileSync(join(env.projectDir, "AGENTS.md"), "utf-8");
 		expect(agentsMd.match(/GENERATED:capability-bootstrap START/g)).toHaveLength(1);
 	});

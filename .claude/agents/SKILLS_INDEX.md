@@ -208,7 +208,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ### Cross-Cutting (Any Phase)
 
 ```toon
-[16]{skill,owner,trigger}
+[17]{skill,owner,trigger}
 `mk:ask-me`|any agent|Evidence-grounded project Q&A — "how does X work here", claim-checks, constraint summaries — answered with cited `file:line` sources. Read-only; redirects ideation/decisions/debugging/review to the owning specialist skill.
 `mk:research`|researcher (delegated)|Deep multi-source technical research producing one cited report — technology evaluation, ecosystem comparison, standards fact-finding, "how do others solve X". Delegates to researcher subagent(s) under primary-source discipline + a retrieval-call cap; optional editorial HTML via `--html`. NOT single-library docs (see mk:docs-finder); NOT project-only Q&A (see mk:ask-me).
 `mk:careful`|any agent|Before destructive commands
@@ -225,6 +225,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:resolving-merge-conflicts`|git-manager|Resolve an in-progress git merge/rebase conflict — read state, recover each side's intent, resolve hunks, run checks, finish the merge/rebase. Most often during ship; always resolves (never --abort); NOT the full ship pipeline (see mk:ship)
 `mk:improve-codebase-architecture`|architect / any agent|Review codebase for deepening opportunities (shallow→deep modules), emit structured candidates for mk:preview to render, then grill a pick into a type-safe patch. Analysis + patch emission only; rendering delegated; NOT trade-off debate (see mk:party); NOT plan critique (see mk:plan-ceo-review)
 `mk:context-engineering`|orchestrator / any agent|Runtime router for context decisions — read-more/stop/ask/assume/delegate, minimal read-set, compaction timing. Routes to one of 25 context patterns per decision via a lazy index. NOT structural .claude/ overhead audit (see mk:context-audit); NOT persistence itself (see mk:memory)
+`mk:orchestrate`|orchestrator|Coordinate staged or parallel jobs across live-verified coding-agent runtimes (Claude Code, Codex, Cursor, other CLIs) and in-session subagents — capability/risk routing, worktree-isolated parallel writers, resumable runs, arbiter verification before handoff. NOT single-agent work or the in-session 7-phase flow (see mk:cook / mk:workflow-orchestrator)
 ```
 
 ## Summary
@@ -240,12 +241,12 @@ Deployment|2
 Documentation|4
 Memory|2
 Utility|12
-Cross-Cutting|8
+Cross-Cutting|9
 Diagram|2
 HTML/Browser-Packaging|2
 External-Service-Design|1
 Knowledge/Wiki|3
-**Total**|**125**
+**Total**|**126**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

@@ -34,10 +34,18 @@ export interface CodexCapabilities {
 	requiresFeatureFlag: boolean;
 }
 
-// Minimum Codex version this migration targets. Below this the hook surface is
-// the 0.124-alpha feature-flag tier — deny-capable hooks (gate-enforcement,
-// privacy-block) may be silently ignored, so the merger emits a hard WARN and
-// records the minimum in the run report. No feature-flag path is built below it.
+// Minimum Codex version this migration currently targets. Below this the hook
+// surface is treated as the conservative pre-stable-hooks tier — deny-capable
+// hooks (gate-enforcement, privacy-block) may be silently ignored, so the merger
+// emits a hard WARN and records the minimum in the run report. No feature-flag
+// path is built below it.
+//
+// Evidence anchors (verified 2026-07-23, developers.openai.com/codex → learn.chatgpt.com/docs):
+//   - Hooks became stable (no [features] flag, inline config.toml) at Codex 0.124.0.
+//   - Current stable Codex CLI is 0.145.0 (released 2026-07-21).
+// The min-version pin below is the tentative operational floor; the min-candidate
+// (0.124.0) is confirmed against the packaged-install compatibility lane before
+// the floor is lowered. See compliance/minimum-version-matrix.json.
 export const CODEX_MIN_SUPPORTED_VERSION = "0.142.0";
 
 // Deny protocol (documented at https://developers.openai.com/codex/hooks):
@@ -76,14 +84,19 @@ export async function detectCodexVersion(): Promise<string | null> {
 export const CODEX_CAPABILITY_TABLE: CodexCapabilities[] = [
 	{
 		// Hook surface as documented at developers.openai.com/codex/hooks
-		// (verified 2026-07): 10 events, command handlers only, hooks enabled by
-		// default (no [features] flag required).
+		// (verified 2026-07-23): 10 events, command handlers only (prompt/agent
+		// handler types are parsed but skipped), hooks enabled by default (no
+		// [features] flag required). Full verified tool-matcher set for
+		// PreToolUse/PostToolUse/PermissionRequest (apply_patch, Edit, Write,
+		// update_plan, mcp__<server>__<tool>, Agent/spawn_agent) is recorded in
+		// compliance/native-surface-matrix.json; the live table keeps the Bash
+		// matcher the converter narrows to until the authored hook surface lands.
 		version: "0.142.0",
 		events: {
 			SessionStart: {
 				supported: true,
 				supportsAdditionalContext: true,
-				allowedMatchers: ["startup", "resume"],
+				allowedMatchers: ["startup", "resume", "clear", "compact"],
 			},
 			SubagentStart: {
 				supported: true,
@@ -127,16 +140,20 @@ export const CODEX_CAPABILITY_TABLE: CodexCapabilities[] = [
 				supportsAdditionalContext: false,
 			},
 		},
-		sessionStartMatchersOnly: ["startup", "resume"],
+		sessionStartMatchersOnly: ["startup", "resume", "clear", "compact"],
 		requiresFeatureFlag: false,
 	},
 	{
-		version: "0.124.0-alpha.3",
+		// Conservative pre-stable-hooks fallback for unknown / below-minimum Codex
+		// versions. Anchored at 0.124.0 (the verified hooks-stable milestone); the
+		// reduced 6-event surface + feature-flag assumption is intentionally
+		// pessimistic for versions the detector cannot positively identify.
+		version: "0.124.0",
 		events: {
 			SessionStart: {
 				supported: true,
 				supportsAdditionalContext: true,
-				allowedMatchers: ["startup", "resume"],
+				allowedMatchers: ["startup", "resume", "clear", "compact"],
 			},
 			UserPromptSubmit: {
 				supported: true,
@@ -164,7 +181,7 @@ export const CODEX_CAPABILITY_TABLE: CodexCapabilities[] = [
 				supportsAdditionalContext: false,
 			},
 		},
-		sessionStartMatchersOnly: ["startup", "resume"],
+		sessionStartMatchersOnly: ["startup", "resume", "clear", "compact"],
 		requiresFeatureFlag: true,
 	},
 ];

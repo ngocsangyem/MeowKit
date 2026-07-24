@@ -2,7 +2,6 @@
 // Helpers split from the data table; the registry data lives in provider-registry.ts.
 
 import { join } from "node:path";
-import { codexCommandSkillRelativePath } from "./references/codex-command-skill-path.js";
 import { providers } from "./provider-registry.js";
 import type { ProviderConfig, ProviderType } from "./types.js";
 
@@ -53,13 +52,8 @@ export function getPortableInstallPath(
 	if (!basePath) return null;
 
 	const ws = pathConfig.writeStrategy;
-	if (ws === "merge-single" || ws === "yaml-merge" || ws === "json-merge" || ws === "single-file") {
+	if (ws === "merge-single" || ws === "single-file") {
 		return basePath;
-	}
-
-	// Codex commands install as Agent Skills: one directory + SKILL.md per command.
-	if (pathConfig.format === "command-to-codex-skill") {
-		return join(basePath, codexCommandSkillRelativePath(itemName));
 	}
 
 	return join(basePath, `${itemName}${pathConfig.fileExtension}`);

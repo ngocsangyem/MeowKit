@@ -7,42 +7,30 @@ Complete guide to building, tagging, and publishing MeowKit releases.
 ```
 Source of truth (.claude/, tasks/, CLAUDE.md)
     ↓
-prepare-release-assets.cjs
-    ├─→ dist/meowkit-release.zip              (flat-copy distribution)
-    └─→ mewkit build-plugin                   (native-plugin distribution)
-          → plugin/                           (transformed .claude payload)
-          → .claude-plugin/marketplace.json   (Claude Code marketplace)
-          → .agents/plugins/marketplace.json  (Codex marketplace)
+prepare-release-assets.cjs → dist/meowkit-release.zip   (flat-copy distribution)
     ↓
-GitHub Release (tag + zip asset) + release commit (staged plugin/ + marketplaces)
+GitHub Release (tag + zip asset) + release commit
     ↓
-flat-copy: mewkit CLI fetches zip at npx mewkit init
-native plugin: claude/codex plugin install mk@meowkit (reads the tracked marketplaces)
+mewkit CLI fetches the zip at `npx mewkit init` / `npx mewkit upgrade`
 ```
 
-**Two distributions, one source.** `.claude/` is the only source of truth. The flat-copy zip ships it as-is; the native plugin is a GENERATED variant (`plugin/`) produced by `mewkit build-plugin` — it namespaces agent references to `mk:<agent>`, renames the `mk-loop` skill dir to `loop`, and translates `settings.json` hooks into `plugin/hooks/hooks.json`. Never hand-edit `plugin/`, `.claude-plugin/`, or `.agents/` — they are regenerated.
+**One distribution, one source.** `.claude/` is the source of truth; the release zip ships it as-is, and `npx mewkit init` downloads and unpacks it. The Codex-native toolkit is a separate, package-shipped bundle (`packages/mewkit/src/migrate/modules/codex/`) that `mewkit migrate codex` / `init --target codex` copy — see step 1e.
 
-**Key insight (flat-copy):** `mewkit` CLI downloads `meowkit-release.zip` from GitHub Releases at runtime. If the release has no zip asset, the CLI cannot find it and falls back to an older version.
+**Key insight (flat-copy):** the `mewkit` CLI downloads `meowkit-release.zip` from GitHub Releases at runtime. If the release has no zip asset, the CLI cannot find it and falls back to an older version.
 
-**Key insight (plugin):** the plugin manifests carry `version` = the **root** `package.json` version. `mewkit validate --plugin` fails the build if that version drifts from the root version, or if an agent name is non-bare / a skill name is non-`mk:` / a manifest is malformed. Regenerate after any change so the committed `plugin/` stays aligned.
-
-## Version Independence — kit/plugin vs npm CLI
+## Version Independence — kit vs npm CLI
 
 There are **two independently versioned things** in this repo, and they are
 deliberately not synchronized:
 
 | Version field | What it versions |
 | --- | --- |
-| root `package.json` → `version` | The **kit**: `.claude/` content, and the generated `plugin/` + marketplace manifests that carry it |
-| `packages/mewkit/package.json` → `version` | The **npm CLI** (`mewkit`) — the installer/validator binary |
+| root `package.json` → `version` | The **kit**: `.claude/` content (2.14.x cadence) |
+| `packages/mewkit/package.json` → `version` | The **npm CLI** (`mewkit`) — the installer/validator/migrator binary |
 
 Read the current numbers from those files, never from this page — a version
 pasted into prose is stale the next time either is bumped, and the two are bumped
 on different cadences by design.
-
-The plugin manifests intentionally track the **root** version (see the Architecture
-key-insight above); `mewkit validate --plugin` fails if they drift from it. That
-is the one binding, and it exists because the plugin *is* the kit.
 
 **Do not synchronize the two version fields.** They answer different questions:
 "which harness content am I running" and "which binary installed it". A user can
@@ -54,8 +42,8 @@ independent.
 
 Bump each **only** for its own change:
 
-- Kit content changed (`.claude/`, rules, skills, agents) → bump the **root** version, regenerate `plugin/`.
-- CLI code changed (`packages/mewkit/src/`) → bump the **CLI** version.
+- Kit content changed (`.claude/`, rules, skills, agents) → bump the **root** version.
+- CLI code changed (`packages/mewkit/src/`) → bump the **CLI** version. (When the CLI change also touches the authored Codex bundle, hand-author the affected surfaces — see step 1e.)
 - Both changed → bump both, independently, in the same release. Not to the same number.
 
 A version-field change is a release decision. Never edit one to make the other
@@ -82,7 +70,7 @@ Example:
 ./scripts/release.sh 2.3.2 "The Agent-Skills Integration Release"
 ```
 
-The script automates steps 3-9 below: bump version → build/lint/typecheck/test → prepare release assets → VitePress build check → commit + tag → push → create GitHub Release with zip. Stops on any failure, warns on uncommitted changes.
+The script automates steps 3-9 below: bump version → build/lint/typecheck/test → prepare release assets → docs build check → commit + tag → push → create GitHub Release with zip. Stops on any failure, warns on uncommitted changes.
 
 **Before running the script:** Complete step 2 (update CHANGELOG) manually. If the release affects guide/reference pages, complete step 1a as well. If a new agent or skill landed, complete step 1b (routing surfaces) too. If the release changes the database/wiki schema or bumps `SCHEMA_VERSION`, complete step 1f (schema touchpoints).
 
@@ -94,7 +82,7 @@ The script automates steps 3-9 below: bump version → build/lint/typecheck/test
 
 Update the changelog and any affected guide/reference pages BEFORE tagging.
 
-**Patch releases:** Only update `website/changelog.md` (step 2). Skip the doc update step below unless a guide page documents behavior that changed.
+**Patch releases:** Only update `packages/docs/content/docs/changelog.mdx` (step 2). Skip the doc update step below unless a guide page documents behavior that changed.
 
 #### 1a. Update affected guide pages
 
@@ -120,16 +108,16 @@ When a release adds a new agent or skill, update the routing surfaces so the orc
 | `.claude/rules/agent-routing.md`                                | New core/support agent — add to the 17-row table; new domain agent → add to the hub-skill family row                        |
 | `.claude/skills/agent-detector/references/lifecycle-routing.md` | New skill that maps to a user signal — add a Discovery Tree row                                                             |
 | `.claude/skills/scale-routing/data/domain-complexity.csv`       | New domain match (fintech, healthcare, etc.) — add a row with signals + level + workflow                                    |
-| `website/.vitepress/config.ts`                                  | New skill or agent — add to the matching sidebar group under `reference/skills/*` or `reference/agents/*`                   |
-| `website/reference/skills/<name>.md`                            | New skill — create the reference page (use an existing skill page as a template; keep it under 800 lines per `docs.maxLoc`) |
-| `website/reference/agents/<name>.md`                            | New agent — create the reference page                                                                                       |
+| `packages/docs/content/docs/reference/meta.json`                                  | New skill or agent — add to the matching group in `packages/docs/content/docs/reference/meta.json`                   |
+| `packages/docs/content/docs/reference/skills/<name>.mdx`                            | New skill — create the reference page (use an existing skill page as a template; keep it under 800 lines per `docs.maxLoc`) |
+| `packages/docs/content/docs/reference/agents/<name>.mdx`                            | New agent — create the reference page                                                                                       |
 
 Skip rows that don't apply to the current release. The matrix is a checklist, not a mandate to edit every file.
 
-#### 1c. Verify VitePress builds
+#### 1c. Verify docs build
 
 ```bash
-cd website && npx vitepress build
+npm run build -w packages/docs
 ```
 
 Must complete with no errors. Chunk size warnings are normal.
@@ -145,28 +133,91 @@ Check `packages/mewkit/portable-manifest.json` whenever a release moves source f
 - Do not copy `portable-manifest.json` into `.claude/`. It is an npm package artifact shipped with `packages/mewkit`, not part of the project kit that `npx mewkit init` scaffolds.
 - If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `tasks/`, `CLAUDE.md`, and `release-manifest.json`.
 
-#### 1e. Regenerate the native plugin distribution (when `.claude/` content changes)
+#### 1e. Update the authored Codex bundle + Cursor export (when `.claude/` content changes)
 
-The native plugin (`plugin/` + `.claude-plugin/marketplace.json` + `.agents/plugins/marketplace.json`) is a GENERATED mirror of `.claude/`. The release script (`prepare-release-assets.cjs`) regenerates it automatically, so a normal `./scripts/release.sh` run keeps it current. Regenerate manually after editing `.claude/` outside a release:
+The Codex and Cursor migration targets are maintained very differently — know which
+one you are touching:
+
+- **Codex — HAND-AUTHORED bundle** at `packages/mewkit/src/migrate/modules/codex/`.
+  There is **no porter** (the `run-codex-port.ts` transform was removed in CLI 2.1.0
+  once every surface was authored). `mewkit migrate codex` / `init --target codex` copy
+  this bundle verbatim through the reconciler. When a release adds or changes any
+  **skill, agent, rule, command, or hook** in `.claude/`, author the matching
+  Codex-native file(s) **by hand** so the bundle stays consistent.
+- **Cursor — RUNTIME converter** (no bundle). `mewkit migrate cursor` converts `.claude/`
+  on the fly, so a new `.claude/` skill / agent / rule reaches Cursor **automatically**
+  with no manual step (see the Cursor note at the end of this section).
+
+**Codex bundle layout** (author under `root/`, then wire the two catalogs):
+
+| Path | What it is | When you touch it |
+| --- | --- | --- |
+| `modules/codex/root/` | The Codex-native tree copied verbatim: `.codex/agents/*.toml`, `.agents/skills/<name>/SKILL.md`, `.codex/hooks.json` + `.codex/hooks/*`, `.codex/rules/`, `AGENTS.md`, `.codex/config.toml` | Author the new/changed file(s) here by hand |
+| `modules/codex/manifest.json` | One `active` entry per **top-level surface** (agents dir, skills dir, hooks.json, config.toml, AGENTS.md, rules, …) | Only when adding a NEW top-level surface — a new skill/agent does NOT need an entry (the dir is one entry) |
+| `modules/codex/catalog/skill-packs.json` | Pack membership for the 7 packs (`core` is `defaultPack`) | Add the new skill's name to the right pack's `skills[]`; keep `core` under `budgetChars` |
+| `modules/codex/compliance/*.json` | Evidence (surface matrix, version matrix, cutover gates) | Update if a surface's support/version claim changed |
+
+**Always check the official Codex docs FIRST** — the formats change, so verify each
+surface against the source of truth before authoring:
+
+- Subagents (agents): https://learn.chatgpt.com/docs/agent-configuration/subagents
+- Rules: https://learn.chatgpt.com/docs/agent-configuration/rules
+- Environment variables: https://learn.chatgpt.com/docs/config-file/environment-variables
+- AGENTS.md: https://learn.chatgpt.com/docs/agent-configuration/agents-md
+- Config (advanced): https://learn.chatgpt.com/docs/config-file/config-advanced
+- Config (basic): https://learn.chatgpt.com/docs/config-file/config-basic
+- Hooks: https://learn.chatgpt.com/docs/hooks
+- Skills: https://learn.chatgpt.com/docs/build-skills
+
+**Surface mapping (authoring reference — hand-write these shapes, per the docs above):**
+
+| `.claude/` surface | Codex shape (author by hand) | Notes |
+| --- | --- | --- |
+| `agents/*.md` | `.codex/agents/<name>.toml` | `name` + `description` + `developer_instructions`. Set `model_reasoning_effort` to match the source agent's `model:` tier (opus/fable → `xhigh`, sonnet → `high`, haiku → `medium`; `inherit` omits it). Codex auto-loads agents — NO `config.toml` `config_file` wiring |
+| `skills/<name>/` | `.agents/skills/<name>/SKILL.md` | Same `SKILL.md` (name + description frontmatter); copy references/scripts; then add the skill name to a pack in `catalog/skill-packs.json` |
+| `commands/**` | `.agents/skills/command-<name>/` | Codex has no command surface → author as a skill |
+| `rules/*`, `rules-conditional/*` | `.agents/skills/rule-<name>/` | Codex native `.rules` are Starlark command policies, NOT markdown guidance → guidance rules become skills (native `.codex/rules/` holds only prefix_rule() policies) |
+| `modes/*` | `.agents/skills/mode-<name>/` | guidance → skills |
+| `settings.json` hooks | `.codex/hooks.json` (+ `.codex/hooks/*`) | same JSON schema; resolve the project root via `$(git rev-parse --show-toplevel)` — Codex exposes no `CLAUDE_PROJECT_DIR` |
+
+Index files (`agents/AGENTS_INDEX.md` / `SKILLS_INDEX.md`, no `name:` frontmatter) are
+NOT agents; do not author agent TOMLs for them.
+
+**Neutralize Claude-isms by hand** (there is no porter to do it): the authored bundle
+must carry zero product/Claude self-references — memory paths use `.meowkit/`, `CLAUDE.md`
+→ `AGENTS.md`, `CLAUDE_PROJECT_DIR` → `$(git rev-parse --show-toplevel)`,
+`CLAUDE_PLUGIN_ROOT/DATA` → Codex's `PLUGIN_ROOT/DATA`, product wording → "the toolkit" /
+"the harness", tool/invocation tokens in Codex-native form.
+
+**Verify (Node 24, from the repo ROOT):**
 
 ```bash
-npx mewkit build-plugin     # rewrites plugin/ + both marketplaces from .claude/
-npx mewkit validate --plugin # namespace purity + manifest contract + version alignment
+export PATH="/opt/homebrew/opt/node@24/bin:$PATH"   # tests need node:sqlite (Node 24)
+
+# dist parity: copy-codex-bundle stages the bundle into dist (also runs in `npm run build`)
+node packages/mewkit/scripts/copy-codex-bundle.cjs
+
+# Codex bundle structural + pack + parity gates:
+npx vitest run $(grep -rl codex packages/mewkit/src --include='*.test.ts')
+
+# Pack-catalog coherence (every catalog skill resolves, budget respected):
+npx mewkit validate --packs
 ```
 
-What stays correct automatically (do NOT hand-edit the generated tree):
+The brand-prose lint runs in CI in **diff-mode (blocking)** — any authored file you change
+must be brand-clean. There is no longer a `grep -rli claude` porter-output gate; the
+`codex-output-brand-free` test covers brand-freedom of the authored surface.
 
-- **New skill** — appears under `plugin/skills/<dir>/` and resolves as `/mk:<dir>` (the plugin derives the slash command from the DIRECTORY name). A skill whose `name:` slug differs from its directory will resolve wrong in plugin mode — keep `dir == slug` (the lone historical exception, `mk-loop` → `mk:loop`, is auto-renamed to `loop` by the builder; do not add new mismatches).
-- **New agent** — keep its `name:` frontmatter BARE (e.g. `name: developer`). The plugin runtime auto-prefixes the plugin name, so a bare `developer` registers as `mk:developer`. A `name: mk:developer` would double-prefix to `mk:mk:developer` and break — `mewkit validate --plugin` blocks this.
-- **New `subagent_type` reference to a kit agent** — write it BARE in `.claude/` (matches flat-copy). The builder rewrites it to `mk:<agent>` in the plugin payload. Built-ins (`Explore`, `Bash`, `general-purpose`, `Plan`) stay bare.
-- **New hook** — wire it in `.claude/settings.json` as usual (`$CLAUDE_PROJECT_DIR/.claude/...`). The builder translates it into `plugin/hooks/hooks.json` with `${CLAUDE_PLUGIN_ROOT}/...` paths. Hook scripts and `handlers.json` travel unchanged.
-- **Index files** — `agents/AGENTS_INDEX.md` / `SKILLS_INDEX.md` (no `name:` frontmatter) are pruned from the plugin payload so they are not registered as agents.
+**Cursor (runtime converter — usually no work):** `mewkit migrate cursor` converts `.claude/`
+at runtime — `agents/*.md` → `.cursor/rules/*.mdc` (fm-to-fm), `rules` + config → `.mdc`
+(md-to-mdc), `skills/` direct-copied; Cursor has **no command or hook surface**. A new
+`.claude/` skill / agent / rule is exported to Cursor automatically. Only touch the
+converters (`src/migrate/converters/{fm-to-fm,md-to-mdc,direct-copy}.ts`) if a NEW source
+shape needs a conversion rule.
 
-When to act manually:
-
-- After adding/removing/renaming any skill, agent, hook, or rule outside a `release.sh` run → `npx mewkit build-plugin` and commit the regenerated `plugin/` + marketplaces.
-- If `mewkit validate --plugin` reports a version mismatch → the committed `plugin/` is stale; regenerate it (the release script does this before tagging).
-- Plugin install commands for docs / release notes: `claude plugin marketplace add ngocsangyem/MeowKit` + `claude plugin install mk@meowkit`; Codex equivalents with `codex plugin`.
+> **MCP servers → Codex:** `mewkit migrate codex --include-mcp` still merges a project's
+> `.mcp.json` into `.codex/config.toml [mcp_servers]` (opt-in). This is the only codex
+> converter kept after the cutover — it converts the user's own config, not toolkit content.
 
 #### 1f. Update when the derived index or wiki schema changes
 
@@ -203,7 +254,7 @@ Every file above lives under `packages/mewkit/src/`, so a schema change ALWAYS t
 - Attribution / provenance metadata (e.g. `SKILLS_ATTRIBUTION.md`, skill `attribution:` frontmatter) — legitimate credit.
 - Real path / string literals the code depends on (`~/.meowkit/...`, `"meowkit-default"`, `meowkit:` frontmatter keys).
 
-**Scope:** this rule applies ONLY to shipped surfaces — `.claude/`, `tasks/`, and the shipped `CLAUDE.md`. The source repo's `website/`, `packages/`, `docs/`, and `README` are the product's own surfaces and SHOULD use the brand.
+**Scope:** this rule applies ONLY to shipped surfaces — `.claude/`, `tasks/`, and the shipped `CLAUDE.md`. The source repo's `packages/`, `docs/`, and `README` are the product's own surfaces and SHOULD use the brand.
 
 **Check before release.** Scope the grep to the context-loaded prose surfaces (skill / agent / command / rule `.md`) and exclude the functional refs above — expect **zero** hits:
 
@@ -214,9 +265,9 @@ grep -rinE 'meowkit' .claude/skills .claude/agents .claude/commands .claude/rule
 
 A broader `grep -ri meowkit .claude tasks` also surfaces functional hits — config identity (`metadata.json` `"name": "meowkit"`), filenames (`gitignore.meowkit`), hook log prefixes (`[meowkit]`), generated views (`harness-substrate.md`), and the kit's own `memory/` dev log. Those are expected; only **new prose** that names the product as a subject needs neutralizing.
 
-### 2. Update CHANGELOG (`website/changelog.md`)
+### 2. Update CHANGELOG (`packages/docs/content/docs/changelog.mdx`)
 
-> **Note:** The ONLY changelog file you edit is `website/changelog.md` — the VitePress source that renders to https://docs.meowkit.dev/changelog. Root `CHANGELOG.md` is a permanent stub that just refers readers to that published page; never add release notes to it.
+> **Note:** The ONLY changelog file you edit is `packages/docs/content/docs/changelog.mdx` — the Fumadocs source that renders to https://docs.meowkit.dev/changelog. Root `CHANGELOG.md` is a permanent stub that just refers readers to that published page; never add release notes to it.
 
 Add a new version section at the **top** (just below the `## Upgrade` block). Use the schema below — only include sections that have content. Empty sections are dropped, not stubbed.
 
@@ -304,7 +355,7 @@ would want it.
 
 #### When to bump
 
-Only bump `packages/mewkit` when the release ships **changes inside `packages/mewkit/src/`**. Edits to `.claude/`, `tasks/`, `CLAUDE.md`, the website, or rules do NOT require a CLI version bump — those ride out via the release zip and `npx mewkit upgrade`.
+Only bump `packages/mewkit` when the release ships **changes inside `packages/mewkit/src/`**. Edits to `.claude/`, `tasks/`, `CLAUDE.md`, the docs site, or rules do NOT require a CLI version bump — those ride out via the release zip and `npx mewkit upgrade`.
 
 ```bash
 # Decide first — does this release touch CLI code?
@@ -352,13 +403,8 @@ This creates:
 
 - `release-manifest.json` — SHA-256 checksums for all files
 - `dist/meowkit-release.zip` — the flat-copy release package (`.claude/` + `tasks/` + `CLAUDE.md` + manifest)
-- `plugin/` — the native plugin payload (generated via `mewkit build-plugin`)
-- `.claude-plugin/marketplace.json` + `.agents/plugins/marketplace.json` — Claude Code + Codex marketplaces
-- The plugin payload + marketplaces are also added to the release zip and staged into the release commit by `git add -A` in `release.sh`, keeping the plugin manifest version aligned with the release by construction.
 
 > **Note:** This script does NOT write `.claude/metadata.json` — the `mewkit` CLI writes it on install/upgrade, and `prepare-release-assets.cjs` explicitly excludes it from the zip. The shipped release version lives in `release-manifest.json`.
->
-> **Plugin version:** the generated plugin manifests take their `version` from the root `package.json` (NOT `packages/mewkit`). Because the manifests are regenerated here and staged into the same commit, the plugin version never lags the release.
 
 Verify the zip:
 
@@ -453,11 +499,11 @@ Copy this checklist for each release:
 - [ ] Updated affected guide/reference pages (step 1a)
 - [ ] If a new agent or skill landed: updated routing surfaces (step 1b — `SKILLS_INDEX.md`, `AGENTS_INDEX.md`, `agent-routing.md`, `lifecycle-routing.md`, sidebar config, reference page)
 - [ ] No product-brand leakage in shipped `.claude/` / `tasks/` (step 1g — brand grep shows only functional/attribution hits)
-- [ ] VitePress build passes (`npx vitepress build`)
+- [ ] Docs build passes (`npm run build -w packages/docs`)
 
 ### Changelog
 
-- [ ] Added v<version> section to `website/changelog.md` (NOT root `CHANGELOG.md` — it is a stub, leave it untouched)
+- [ ] Added v<version> section to `packages/docs/content/docs/changelog.mdx` (NOT root `CHANGELOG.md` — it is a stub, leave it untouched)
 
 ### Version
 
@@ -485,8 +531,7 @@ Copy this checklist for each release:
 
 - [ ] `prepare-release-assets.cjs` ran successfully
 - [ ] `dist/meowkit-release.zip` exists with expected size
-- [ ] Plugin distribution regenerated: `plugin/` + `.claude-plugin/marketplace.json` + `.agents/plugins/marketplace.json` present and staged
-- [ ] `npx mewkit validate --plugin` passes (namespace purity + manifest contract + version alignment)
+- [ ] Codex bundle hand-authored when `.claude/` changed (step 1e): new/changed surfaces authored under `modules/codex/root/`; new skill added to a pack in `catalog/skill-packs.json`; codex suite + `mewkit validate --packs` green; `copy-codex-bundle.cjs` staged to dist. (Cursor export is automatic — no manual step.)
 - [ ] Committed and tagged
 - [ ] Pushed to GitHub (commits + tag)
 - [ ] GitHub Release created with zip asset
@@ -505,14 +550,12 @@ Push to `main` or `dev` triggers `.github/workflows/release.yml`:
 
 1. Semantic-release analyzes conventional commits → determines version bump
 2. `sync-package-versions.cjs` syncs version across both packages
-3. `prepare-release-assets.cjs` builds zip + manifest AND regenerates the plugin distribution (`plugin/` + marketplaces) at the release version
+3. `prepare-release-assets.cjs` builds the zip + manifest at the release version
 4. `@semantic-release/github` creates GitHub Release with zip asset
 5. `@semantic-release/exec` publishes both packages to npm
-6. `@semantic-release/git` commits version files (and the regenerated `plugin/` + marketplaces) back to repo
+6. `@semantic-release/git` commits version files back to repo
 
-**Note:** Automated releases do NOT update `website/changelog.md` or affected guide/reference pages. Those must be done manually before the release commit. Root `CHANGELOG.md` is a stub and is never updated per-release.
-
-**Plugin guard:** `.github/workflows/ci.yml` runs `mewkit validate --plugin` on every PR — it fails closed if an agent name is non-bare, a skill name is non-`mk:`, a `subagent_type` ref is unknown, a plugin manifest is malformed, or the committed plugin version drifts from the root `package.json`. Keep the committed `plugin/` regenerated (`npx mewkit build-plugin`) so this stays green.
+**Note:** Automated releases do NOT update `packages/docs/content/docs/changelog.mdx` or affected guide/reference pages. Those must be done manually before the release commit. Root `CHANGELOG.md` is a stub and is never updated per-release.
 
 ### Conventional commits → version bumps
 
@@ -540,8 +583,8 @@ For CLI changes inside `packages/mewkit/src/`:
 | --------------------------------------- | ------------------------------------------------------------------------------- |
 | `scripts/sync-package-versions.cjs`     | Sync version across both npm packages                                           |
 | `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files                                |
-| `scripts/prepare-release-assets.cjs`    | Build manifest + dist/meowkit-release.zip; regenerate plugin/ + marketplaces (`mewkit build-plugin`) and include them in the zip |
-| `mewkit build-plugin`                   | CLI command: generate the native plugin distribution (`plugin/` payload + Claude/Codex marketplaces) from `.claude/` |
+| `scripts/prepare-release-assets.cjs`    | Build the release manifest + dist/meowkit-release.zip                            |
+| `packages/mewkit/scripts/copy-codex-bundle.cjs` | Stage the authored Codex bundle (`modules/codex/`) into `dist/` — runs in `npm run build`; see step 1e |
 | `scripts/release.sh`                    | Automated release: bump → build → assets → commit → tag → push → GitHub Release |
 
 ## Release History
@@ -664,20 +707,8 @@ gh release upload v<version> dist/meowkit-release.zip --clobber
 
 No `feat:` or `fix:` commits since last release. Add a commit with the right prefix, or use `--force` on the workflow dispatch.
 
-### `mewkit validate --plugin` fails on version alignment
+### `mewkit migrate codex` is missing a skill/agent/rule after editing `.claude/`
 
-**Cause:** the committed `plugin/` manifests carry an older version than the root `package.json` — the plugin was not regenerated after the version bump.
+**Cause:** the authored Codex bundle (`packages/mewkit/src/migrate/modules/codex/`) is hand-maintained — a new `.claude/` surface does not appear in the bundle until it is authored there. (There is no porter; `run-codex-port.ts` was removed in CLI 2.1.0.)
 
-**Fix:** `npx mewkit build-plugin` then commit the regenerated `plugin/` + marketplaces. (A normal `release.sh` run does this automatically before tagging.)
-
-### `mewkit validate --plugin` fails on namespace
-
-**Cause:** an agent `name:` is non-bare (would double-prefix under the plugin), a skill `name:` is not `mk:`-scoped, or a `subagent_type` ref points at an unknown agent.
-
-**Fix:** keep agent `name:` bare and skill `name:` `mk:`-prefixed in `.claude/`; fix any typo'd `subagent_type` ref to a real kit agent or a built-in (`Explore`/`Bash`/`general-purpose`/`Plan`).
-
-### Plugin install resolves the wrong slash command (e.g. `/mk:mk-loop`)
-
-**Cause:** a skill directory name diverges from its `mk:`-slug. The plugin derives the slash command from the directory name, so `skills/mk-foo/` with `name: mk:foo` resolves as `/mk:mk-foo` under the plugin.
-
-**Fix:** keep `directory == slug`. The builder auto-renames the one historical case (`mk-loop` → `loop`); do not introduce new mismatches.
+**Fix:** author the Codex-native file(s) under `modules/codex/root/`, add a new skill to a pack in `catalog/skill-packs.json`, then re-run the codex suite + `mewkit validate --packs` — see step 1e. Cursor export is automatic and needs no such step.

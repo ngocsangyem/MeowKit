@@ -1,0 +1,27 @@
+{
+  "title": "Guide",
+  "pages": [
+    "---Getting Started---",
+    "introduction",
+    "why-meowkit",
+    "installation",
+    "quick-start",
+    "---Core Concepts---",
+    "core-concepts/how-it-works",
+    "guide/philosophy",
+    "guide/workflow-phases",
+    "core-concepts/plan-creator-modes-and-flags",
+    "guide/model-routing",
+    "guide/memory-system",
+    "guide/session-state-vs-resume",
+    "guide/agent-skill-architecture",
+    "guide/task-system",
+    "guide/harness-architecture",
+    "guide/adaptive-density",
+    "guide/rubric-library",
+    "guide/middleware-layer",
+    "guide/trace-and-benchmark",
+    "guide/using-meowkit-productively",
+    "..."
+  ]
+}

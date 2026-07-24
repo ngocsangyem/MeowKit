@@ -107,9 +107,12 @@ function renderCheck(file: string): number {
 const USAGE = `Usage:
   mewkit plan status <plan-dir>    Progress across plan.md + phase files (read-only)
   mewkit plan check <phase-file>   Required-section + checklist report for one phase (read-only)
+  mewkit plan approve <plan-dir>   Stamp the Gate 1 approval receipt (mutating)
+  mewkit plan archive <plan-dir>   Mark statuses completed + move to tasks/plans/archive/ (mutating)
 
-Read-only by design: the plan Markdown stays the sole authority. There is no
-scaffold/edit subcommand — HTML rendering lives in \`mewkit visual-plan\`.`;
+status/check are read-only by design: the plan Markdown stays the sole authority
+here, and this module imports no write API. The mutating siblings (approve,
+archive) live in their own modules. HTML rendering lives in \`mewkit visual-plan\`.`;
 
 export async function plan(args: PlanArgs): Promise<void> {
 	const { subcommand, target } = args;

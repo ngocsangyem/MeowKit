@@ -1,0 +1,89 @@
+{
+	"_description": "Codex CLI version support matrix for the MeowKit codex bundle. min-candidate is the tentative supported floor; latest-verified is the current stable release the bundle is validated against. Confirmed against the packaged-install compatibility lane before the operational floor (CODEX_MIN_SUPPORTED_VERSION) is lowered.",
+	"minCandidate": "0.124.0",
+	"minCandidateBasis": "Hooks became stable (no [features] flag, inline config.toml) at Codex 0.124.0 per the openai/codex changelog announcement.",
+	"operationalFloor": "0.142.0",
+	"operationalFloorNote": "CODEX_MIN_SUPPORTED_VERSION in providers/codex/capabilities.ts. Kept above the min-candidate until the packaged-install compatibility lane confirms the bundle's actually-used surfaces work at 0.124.0; the floor is lowered only after that confirmation.",
+	"latestVerified": "0.145.0",
+	"latestVerifiedReleased": "2026-07-21",
+	"verifiedAgainstCli": "codex-cli 0.144.6",
+	"verified": "2026-07-23",
+	"sources": ["https://learn.chatgpt.com/docs/changelog", "https://developers.openai.com/codex/changelog"],
+	"features": [
+		{
+			"feature": "hooks",
+			"minVersion": "0.124.0",
+			"note": "Stable, inline config.toml support since 0.124.0. Hooks enabled by default.",
+			"status": "verified"
+		},
+		{
+			"feature": "config-profiles",
+			"note": "Legacy [profiles.x] TOML sections deprecated since 0.134.0 — standalone ~/.codex/<name>.config.toml is the current mechanism. Bundle installs NO [profiles.x] sections.",
+			"status": "verified"
+		},
+		{
+			"feature": "strict-config",
+			"note": "--strict-config is Stable; used by the compatibility lane to reject config fields a version does not recognize.",
+			"status": "verified"
+		},
+		{
+			"feature": "rules",
+			"note": "Experimental. Capability/version-gated install with fallback; never sole enforcement.",
+			"status": "verified"
+		},
+		{
+			"feature": "model_reasoning_effort",
+			"note": "Only high and xhigh are officially documented (xhigh is codex-max-tier-only, for non-latency-sensitive tasks). Full enum (none/minimal/low/medium/high/xhigh) is NOT officially enumerated on a single page. CLI does not validate the value: `codex exec --strict-config -c model_reasoning_effort=bogus` accepted 'bogus' and did not error (override layer bypasses strict-config validation). Phase-5 agent effort values are therefore gated to the documented set: use `high` as the deep-class ceiling; `xhigh` only if a shipped default model is confirmed codex-max-tier.",
+			"status": "unverified-cli-enum",
+			"documentedValues": ["high", "xhigh"]
+		}
+	],
+	"displacementSpike": {
+		"_note": "Test-displacement spike measured 2026-07-23 (Node 24, `vitest run codex`, 127-test baseline all green). Records how many tests FAIL when bundle manifest entries are flipped active, so the cutover flip sequence plans against measured numbers instead of the 41-test estimate.",
+		"measuredDate": "2026-07-23",
+		"baseline": "127 tests / 23 files, all green",
+		"hooksJsonActiveOnly": {
+			"failed": 1,
+			"tests": [
+				"codex-authored-bundle.test.ts > the migrate overlay is inert while every entry is draft (active:false)"
+			],
+			"note": "Only the intentional inert-guard failed. ZERO of the converter-shaped migrate tests (acceptance/e2e/characterization/agents-md-budget) failed at the hooks.json flip."
+		},
+		"allEntriesActive": {
+			"failed": 2,
+			"tests": [
+				"codex-authored-bundle.test.ts > the migrate overlay is inert while every entry is draft (active:false)",
+				"migrate-codex-e2e.test.ts > leaves zero toolkit branding and no toolkit files in the target project"
+			],
+			"note": "Upper bound with every surface flipped. The e2e branding failure means the CURRENT authored AGENTS.md/agents/skills content still carries toolkit-brand strings the brand-free gate rejects — a real cleanup item for the native re-authoring in phases 4-6."
+		},
+		"interpretation": "Measured displacement is far below the 41-test estimate BECAUSE today's authored bundle is still porter-generated and therefore byte-similar to converter output, so most converter-shaped assertions still pass on flip. The 41 is the POPULATION of converter-shaped test blocks at risk; actual failures grow as phases 4-6 hand-author content that diverges from converter output. Phase-9 flip staging should re-measure per surface after each surface is re-authored, not rely on this floor. The inert-guard test itself must be rewritten (or its assertion inverted) as the first surface flips active."
+	},
+	"compatLane": {
+		"ranAt": "2026-07-24T01:51:00.930Z",
+		"codexVersion": "0.144.6",
+		"structural": "pass",
+		"checks": [
+			{
+				"name": "init --target codex",
+				"status": "pass"
+			},
+			{
+				"name": "validate --target codex",
+				"status": "pass"
+			},
+			{
+				"name": "codex CLI",
+				"status": "pass"
+			},
+			{
+				"name": "codex execpolicy load",
+				"status": "pass"
+			},
+			{
+				"name": "codex --strict-config full run",
+				"status": "skip"
+			}
+		]
+	}
+}

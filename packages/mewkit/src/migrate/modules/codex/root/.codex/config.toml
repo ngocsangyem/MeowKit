@@ -1,0 +1,6 @@
+# Authored Codex project config, copied to `.codex/config.toml` (project override).
+# Subagents are NOT wired here — Codex auto-loads them from `.codex/agents/*.toml`
+# (filename = agent name). This file carries only project-scoped settings.
+
+# Cap the merged AGENTS.md guidance Codex ingests (bytes). Codex default is 32 KiB.
+project_doc_max_bytes = 32768

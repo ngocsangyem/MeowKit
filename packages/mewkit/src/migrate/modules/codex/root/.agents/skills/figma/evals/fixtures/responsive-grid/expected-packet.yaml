@@ -1,0 +1,50 @@
+# Expected Figma Evidence Packet — responsive-grid fixture.
+# Schema oracle. Paths use the toolkit convention (tasks/plans, tasks/reports).
+schema_version: figma-evidence-packet/v1
+source:
+  figma_url: "https://www.figma.com/design/FIX0GRID/meowkit-fixtures?node-id=20-2"
+  file_key: FIX0GRID
+  node_ids: ["20:2", "20:20", "20:40", "20:5"]
+  figma_version_or_last_modified: "2026-07-05T09:10:00Z"
+  extracted_at: "<ISO-8601>"
+scope:
+  target_frames: ["Dashboard / Desktop", "Dashboard / Tablet", "Dashboard / Mobile"]
+  frame_sizes:
+    - { node_id: "20:2", width: 1440, height: 1024 }
+    - { node_id: "20:20", width: 834, height: 1112 }
+    - { node_id: "20:40", width: 390, height: 844 }
+intent_summary:
+  hierarchy:
+    - "Dashboard → responsive grid of StatCard (label, big-number, delta chip)"
+  layout_constraints:
+    - "desktop 4-col/24 gutter; tablet 2-col/20; mobile 1-col/16; StatCard fills column"
+  tokens: "colors(surface/bg/text/pos/neg); type 13/28/12; spacing 8/16/20/24; radii card16; shadow 0 1px 3px"
+  assets: []
+  variants_and_states: "default only; delta chip pos/neg is data-driven color, not a state"
+prototype_flow_summary:
+  availability: unavailable
+  confidence: unknown
+  flow_starting_points: []
+  critical_actions_count: 0
+  blocked_or_needs_answer_count: 0
+  prototype_flow_artifacts: null
+implementation_hints:
+  component_candidates: ["StatCard (evidence: node 20:5, reused across viewports)"]
+  code_connect_refs: []
+validation_contract:
+  required_viewports: [desktop, tablet, mobile]
+  required_states: [default]
+  pixel_tolerance: "advisory only"
+  a11y_expectations: "grid/list semantics; delta chip conveys sign by text+icon, not color alone"
+risks:
+  ambiguity: []
+  missing_states: ["no interaction states defined — layout-only design"]
+  permission_limits: []
+provenance:
+  generated_by: mk:figma
+  tool_surface: "Figma MCP | screenshot fallback"
+  artifact_paths: ["tasks/plans/<active-plan>/research/figma-evidence-packet.md"]
+artifact_policy:
+  active_plan_location: "tasks/plans/<active-plan>/research/"
+  standalone_location: "tasks/reports/"
+  artifact_paths_only_in_context: true

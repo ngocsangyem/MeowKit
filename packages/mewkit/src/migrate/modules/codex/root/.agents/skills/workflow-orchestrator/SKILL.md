@@ -1,0 +1,73 @@
+---
+name: "mk-workflow-orchestrator"
+description: "Auto-invoked 7-phase workflow for complex-feature intent; fasttrack mode for pre-approved specs. NOT for explicit single tasks (mk:cook), green-field builds (mk:autobuild), or simple fixes (mk:fix)."
+---
+
+<!-- Split for progressive disclosure (checklist #11, #14): 463 → ~75 lines -->
+
+# Workflow Orchestrator
+
+<!-- Canonical source: .codex/workflow.yaml -->
+
+**Priority:** CRITICAL — Use for complex feature implementations.
+
+> Only activates on session start for complex-feature intent. If `the cook skill` was explicitly invoked in this session, do not activate — `mk:cook` owns the pipeline. See AGENTS.md (Delegation & subagents)"Orchestrator Entry Point Rule".
+
+## Canonical Lifecycle
+
+`.codex/workflow.yaml` is the sole source for phase sequence, gates, leads, and required outputs. This adapter must not restate phase details. For execution load `references/workflow-phases.md`, which renders that contract.
+
+On a non-trivial task, route to `mk:plan-creator`; proceed only after Gate 1. Fasttrack accepts only a pre-approved spec. Gate 2 remains human approval before an explicit ship request.
+
+## When to Use
+
+**USE for:** New features, complex implementations, tasks >2 hours, multi-file changes, tasks requiring TDD.
+
+**DON'T use for:** Bug fixes → `mk:fix`, quick refactors → direct edit, config changes → direct edit, simple questions → just answer.
+
+## Pre-Execution Checklist
+
+1. **agent-detector** → Select lead agent (MANDATORY)
+2. **Load context** → Read canonical `.meowkit/memory/fixes.json` + `.meowkit/memory/architecture-decisions.json` (Phase 0 Orient; fall back to matching `.md` views only when JSON is absent)
+3. **Show agent banner** at start of response
+4. **Verify task complexity** — if simple, suggest lighter approach
+5. **Challenge requirements** → Ask clarifying questions before Phase 1
+
+## Process
+
+See the phase-contract conventions for input/output expectations per phase. (Loaded by `mk:agent-detector` Step 0b at session start.)
+
+1. **Run pre-execution checklist** — select lead agent, load memory, show agent banner, verify complexity, challenge requirements.
+
+2. **Detect workflow mode** — check for `fasttrack:` prefix or Agent Teams trigger; if present load `references/fasttrack-and-teams.md`. Otherwise proceed with standard 7-phase flow.
+
+3. **Execute the canonical lifecycle** — load `references/workflow-phases.md` and follow `.codex/workflow.yaml`; do not duplicate or override its phase ordering, TDD rules, required outputs, or gates.
+
+4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit. Also delegate to `project-manager` after each phase transition per the post-phase-delegation conventions Rule 1 (background, non-blocking — include "Run in the background" in the prompt). Skipped when `MEOWKIT_PM_AUTO=off`.
+
+Only the canonical gates authorize transition. Shipping and reflection require explicit user direction; they do not auto-run after review.
+
+## References
+
+| Reference                                                         | When to load                                     | Content                                                                     |
+| ----------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------- |
+| **[workflow-phases.md](./references/workflow-phases.md)**         | Steps 2-6 — executing phases                     | Phase details, transition rules, approval gates, token budgets, TDD rules   |
+| **[fasttrack-and-teams.md](./references/fasttrack-and-teams.md)** | Only if fasttrack trigger or Agent Teams enabled | Fast-track mode, spec validation, Agent Teams composition, state management |
+
+## Key Rules
+
+- **TDD is OPT-IN** (post-migration): default mode skips Phase 2 RED gate; enable with `--tdd` or `MEOWKIT_TDD=1`. In TDD mode the cycle is RED → GREEN → REFACTOR.
+- **KISS:** Simple over complex, standard patterns over custom
+- **Token budget:** Target ≤30K for full workflow. Warn at 75%, handoff at 90%.
+- **State:** `workflow:handoff` saves, `workflow:resume <id>` continues
+- **ALWAYS show what's next** after each phase
+
+## Related Rules
+
+- AGENTS.md (Gates) — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions enforced by this orchestrator
+- AGENTS.md (Data & injection boundary) — DATA vs INSTRUCTIONS boundary; applies to all file/tool output processed during orchestration
+
+## Gotchas
+
+- **Parallel agents editing same file**: Two sub-task modify the same source file simultaneously → Define exclusive file ownership before spawning parallel agents
+- **Token budget exceeded mid-workflow**: Complex 7-phase workflow runs out of context → Check remaining context at each phase boundary; escalate if < 20% remaining

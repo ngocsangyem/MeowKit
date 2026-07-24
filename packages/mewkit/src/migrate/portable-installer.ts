@@ -1,5 +1,4 @@
-// Per-action installer. Handles the 5 main write strategies (per-file, single-file,
-// merge-single, yaml-merge, json-merge). codex-toml + codex-hooks delegated to Phase 8 mergers.
+// Per-action installer. Handles the 3 write strategies (per-file, single-file, merge-single).
 // Path-safety helpers extracted to portable-installer-path-safety.ts.
 
 import { existsSync } from "node:fs";
@@ -20,7 +19,7 @@ import {
 	getMergeSectionKey,
 	parseMergedSections,
 } from "./config-merger/merge-single-sections.js";
-import { buildMergedAgentsMd, buildClineModesJson, buildYamlModesFile } from "./converters/index.js";
+import { buildMergedAgentsMd } from "./converters/index.js";
 
 export interface InstallResult {
 	action: ReconcileAction;
@@ -62,15 +61,6 @@ export async function executeInstallAction(action: ReconcileAction, ctx: Install
 
 	const ws = pathConfig.writeStrategy;
 
-	// Codex special paths (delegated to Phase 8 hook/toml installers)
-	if (ws === "codex-hooks" || ws === "codex-toml") {
-		return {
-			action,
-			success: true,
-			error: `[deferred] ${ws} install pipeline lives in Phase 8 hook/toml installer`,
-		};
-	}
-
 	const conversion = convertItem(sourceItem, pathConfig.format, provider, { migratedRefs: ctx.migratedRefs });
 	if (conversion.error) return { action, success: false, error: conversion.error };
 
@@ -109,10 +99,6 @@ export async function executeInstallAction(action: ReconcileAction, ctx: Install
 			await atomicWrite(action.targetPath, conversion.content);
 		} else if (ws === "merge-single") {
 			installWarnings.push(...(await mergeSingleWrite(action, items, sourceItem, provider, conversion.content)));
-		} else if (ws === "yaml-merge") {
-			await yamlMergeWrite(action, items, provider);
-		} else if (ws === "json-merge") {
-			await jsonMergeWrite(action, items, provider);
 		}
 
 		const targetChecksum = computeContentChecksum(conversion.content);
@@ -245,8 +231,8 @@ function withMergeTitle(provider: ProviderType, preamble: string): string {
  *
  * Codex-scoped: only Codex reorders, because Codex truncates the COMBINED instruction chain
  * at project_doc_max_bytes (https://developers.openai.com/codex/guides/agents-md) so section
- * ORDER determines what survives at runtime. Other providers get an identity ordering, so
- * merge-single semantics stay unchanged for gemini-cli and the generic handler.
+ * ORDER determines what survives at runtime. Other merge-single providers get an identity
+ * ordering, so their merge-single semantics stay unchanged.
  */
 const CODEX_SECTION_PRIORITY: readonly string[] = [
 	"config",
@@ -345,32 +331,6 @@ export function codexBudgetRaiseGuidance(provider: ProviderType, size: number, b
 		`Codex applies this cap to the combined instruction chain, so splitting into nested AGENTS.md files would not help. ` +
 		`To load the full file, add \`project_doc_max_bytes = ${suggested}\` to your ~/.codex/config.toml (guidance only — not written for you).`
 	);
-}
-
-async function yamlMergeWrite(action: ReconcileAction, items: PortableItem[], provider: ProviderType): Promise<void> {
-	const allItems = items.filter((i) => i.type === action.type);
-	const entries: string[] = [];
-	for (const item of allItems) {
-		const result = convertItem(item, "fm-to-yaml", provider);
-		if (!result.error) entries.push(result.content);
-	}
-	await atomicWrite(action.targetPath, buildYamlModesFile(entries));
-}
-
-async function jsonMergeWrite(action: ReconcileAction, items: PortableItem[], provider: ProviderType): Promise<void> {
-	const allItems = items.filter((i) => i.type === action.type);
-	const modes: import("./converters/index.js").ClineCustomMode[] = [];
-	for (const item of allItems) {
-		const result = convertItem(item, "fm-to-json", provider);
-		if (!result.error) {
-			try {
-				modes.push(JSON.parse(result.content));
-			} catch {
-				// Skip malformed entries
-			}
-		}
-	}
-	await atomicWrite(action.targetPath, buildClineModesJson(modes));
 }
 
 export async function executeDeleteAction(action: ReconcileAction): Promise<InstallResult> {

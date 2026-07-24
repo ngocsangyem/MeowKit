@@ -1,0 +1,88 @@
+{
+	"version": "1.0",
+	"provider": "codex",
+	"generatedFrom": "hand-authored + porter (scripts/run-codex-port.ts)",
+	"entries": [
+		{
+			"sourcePath": "root/AGENTS.md",
+			"targetPath": "AGENTS.md",
+			"provider": "codex",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.codex/config.toml",
+			"targetPath": ".codex/config.toml",
+			"provider": "codex",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.codex/hooks.json",
+			"targetPath": ".codex/hooks.json",
+			"provider": "codex",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.codex/rules/default.rules",
+			"targetPath": ".codex/rules/default.rules",
+			"provider": "codex",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.codex/hooks/capture.cjs",
+			"targetPath": ".codex/hooks/capture.cjs",
+			"provider": "codex",
+			"mode": "0755",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.codex/hooks/privacy-block.cjs",
+			"targetPath": ".codex/hooks/privacy-block.cjs",
+			"provider": "codex",
+			"mode": "0755",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.codex/hooks/gate-enforcement.cjs",
+			"targetPath": ".codex/hooks/gate-enforcement.cjs",
+			"provider": "codex",
+			"mode": "0755",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.codex/agents",
+			"targetPath": ".codex/agents",
+			"provider": "codex",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.agents/skills",
+			"targetPath": ".agents/skills",
+			"provider": "codex",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		}
+	]
+}

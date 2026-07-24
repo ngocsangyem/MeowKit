@@ -1,7 +1,9 @@
 // Partial-failure robustness: when a converter/installer throws mid-run, the
 // migration report MUST still be written (write-what-happened) AND the ORIGINAL
 // exception must propagate — a failed run is never masked, and a failed report
-// write never masks the run. Here we force the codex agents installer to throw.
+// write never masks the run. Here we force the skill directory installer to
+// throw (codex agents/commands/hooks installers no longer run at all — those
+// surfaces ship via the native authored bundle, not the migrate converter).
 
 import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { cp, mkdir, rm } from "node:fs/promises";
@@ -12,13 +14,15 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 const INSTALLER_BOOM = "forced installer failure (test)";
 
-// Mock the hooks barrel so the codex agents installer throws, but keep every other
-// export real (mergeHooksSettings, path-safety helpers, …).
-vi.mock("../hooks/index.js", async () => {
-	const actual = await vi.importActual<typeof import("../hooks/index.js")>("../hooks/index.js");
+// Mock the skill-directory installer module so the codex skill install throws,
+// but keep every other export real.
+vi.mock("../skill-directory-installer.js", async () => {
+	const actual = await vi.importActual<typeof import("../skill-directory-installer.js")>(
+		"../skill-directory-installer.js",
+	);
 	return {
 		...actual,
-		installCodexAgents: vi.fn(async () => {
+		installSkillDirectory: vi.fn(async () => {
 			throw new Error(INSTALLER_BOOM);
 		}),
 	};

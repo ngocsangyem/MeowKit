@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import pc from "picocolors";
 import {
@@ -11,6 +12,63 @@ import {
 	resolvePacks,
 } from "../core/index.js";
 import type { ReleaseInfo, UserConfig } from "../core/index.js";
+import { runMigrate } from "../migrate/migrate-orchestrator.js";
+import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
+import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
+
+/** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
+const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
+	{ tool: "cursor", dir: ".cursor" },
+	{ tool: "codex", dir: ".codex" },
+];
+
+/** After a `.claude/` upgrade, re-export to any installed downstream provider toolkit
+ *  so the whole install moves together (a bare `mewkit upgrade` no longer leaves
+ *  .cursor/.codex stale). Best-effort: a failing provider is reported, not fatal. */
+async function reMigrateInstalledProviders(projectDir: string): Promise<void> {
+	const installed = PROPAGATABLE_PROVIDERS.filter((p) => existsSync(join(projectDir, p.dir)));
+	if (installed.length === 0) return;
+	console.log(
+		`\n${pc.bold("Propagating upgrade to installed provider toolkits:")} ${installed.map((p) => p.tool).join(", ")}`,
+	);
+	for (const { tool } of installed) {
+		try {
+			await runMigrate(
+				{ tool, source: join(projectDir, ".claude"), force: true, yes: true },
+				{ bundledKitDir: join(projectDir, ".claude"), argv: [] },
+			);
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			console.log(pc.yellow(`[!] Re-exporting ${tool} failed (${msg}) — re-run 'mewkit migrate ${tool}'.`));
+		}
+	}
+}
+
+/** A codex-only project (from `init --target codex`) has no `.claude/`; upgrade it by
+ *  reconciling the authored Codex bundle from the installed package against the project
+ *  ledger. Managed artifacts are refreshed, but a user-edited file is PRESERVED and
+ *  reported as a conflict rather than silently overwritten. */
+async function upgradeCodexToolkit(projectDir: string): Promise<void> {
+	console.log(pc.bold("Codex toolkit detected (no .claude/) — refreshing from the installed mewkit bundle."));
+	const moduleDir = resolveCodexModuleDir();
+	if (!existsSync(join(moduleDir, "manifest.json"))) {
+		console.error(pc.red("Codex bundle not found in this install — reinstall the `mewkit` package."));
+		process.exit(1);
+	}
+	const result = await reconcileApplyCodexBundle(moduleDir, projectDir, { projectRoot: projectDir });
+	const preserved = result.entries.filter((e) => e.action === "skip" && e.reasonCode === "user-edits-preserved").length;
+	console.log(
+		pc.green(
+			`Codex toolkit refreshed — ${result.writes} updated${preserved > 0 ? `, ${preserved} preserving your edits` : ""}.`,
+		),
+	);
+	if (result.conflicts.length > 0) {
+		console.log(
+			pc.yellow(`  ${result.conflicts.length} conflict(s) — both you and mewkit changed these; left untouched:`),
+		);
+		for (const c of result.conflicts) console.log(pc.dim(`    ${c.targetPath}`));
+	}
+}
 
 export interface UpgradeArgs {
 	check?: boolean;
@@ -195,12 +253,23 @@ async function performUpgrade(
 				pc.yellow(`\n  ${stats.userModified.length} user-modified file(s) preserved (use --force to overwrite).`),
 			);
 		}
+
+		// Propagate the upgrade to any installed downstream provider toolkits.
+		await reMigrateInstalledProviders(process.cwd());
 	} finally {
 		cleanupDownload(sourceDir);
 	}
 }
 
 export async function upgrade(args: UpgradeArgs): Promise<void> {
+	// Codex-only project (`init --target codex`): no `.claude/` to update — refresh the
+	// authored Codex bundle instead. (Skip for --check/--list, which are version queries.)
+	const cwd = process.cwd();
+	if (!args.check && !args.list && !existsSync(join(cwd, ".claude")) && existsSync(join(cwd, ".codex"))) {
+		await upgradeCodexToolkit(cwd);
+		return;
+	}
+
 	const localVersion = getLocalVersion();
 	const useBeta = args.beta ?? false;
 

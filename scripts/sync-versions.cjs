@@ -3,10 +3,9 @@
  * Single-source version sync for the KIT (harness) version.
  *
  * Source of truth: root `package.json` `version`. This script stamps that version into the kit's
- * tracked identity file `.claude/meowkit.config.json` (which `mewkit build-plugin` MIRRORS into
- * `plugin/meowkit.config.json`) and into `release-manifest.json`, and records the CLI package
- * version (`packages/mewkit/package.json`, a SEPARATE semver track) into the manifest as
- * `cliVersion` (recorded, never overwritten to match the kit).
+ * tracked identity file `.claude/meowkit.config.json` and into `release-manifest.json`, and
+ * records the CLI package version (`packages/mewkit/package.json`, a SEPARATE semver track) into
+ * the manifest as `cliVersion` (recorded, never overwritten to match the kit).
  *
  * Field-level only: it touches `version` / `cliVersion`, never the manifest's `files[]` (that is
  * regenerated at release time by `generate-release-manifest.cjs`), so it is safe to run anytime.
@@ -21,8 +20,7 @@ const path = require("path");
 const root = path.join(__dirname, "..");
 const ROOT_PKG = path.join(root, "package.json");
 const CLI_PKG = path.join(root, "packages", "mewkit", "package.json");
-const CLAUDE_CONFIG = path.join(root, ".claude", "meowkit.config.json"); // source; build-plugin mirrors it
-const PLUGIN_CONFIG = path.join(root, "plugin", "meowkit.config.json"); // generated mirror (checked, not stamped)
+const CLAUDE_CONFIG = path.join(root, ".claude", "meowkit.config.json");
 const RELEASE_MANIFEST = path.join(root, "release-manifest.json");
 
 const write = process.argv.includes("--write");
@@ -38,13 +36,11 @@ const kitVersion = readJson(ROOT_PKG).version;
 const cliVersion = readJson(CLI_PKG).version;
 
 // Each target: the file, the field, the expected value, whether --write stamps it, and whether it
-// is optional. `stamp: false` = a generated mirror (plugin config), verified not stamped, so a
-// stale mirror surfaces here AND in the plugin-drift gate. `optional: true` = a gitignored,
-// release-time artifact (release-manifest.json) that may be absent on a fresh clone — absent is
-// N/A, not a mismatch (it is regenerated at release by generate-release-manifest.cjs).
+// is optional. `optional: true` = a gitignored, release-time artifact (release-manifest.json)
+// that may be absent on a fresh clone — absent is N/A, not a mismatch (it is regenerated at
+// release by generate-release-manifest.cjs).
 const targets = [
 	{ file: CLAUDE_CONFIG, field: "version", expected: kitVersion, stamp: true, optional: false },
-	{ file: PLUGIN_CONFIG, field: "version", expected: kitVersion, stamp: false, optional: false },
 	{ file: RELEASE_MANIFEST, field: "version", expected: kitVersion, stamp: true, optional: true },
 	{ file: RELEASE_MANIFEST, field: "cliVersion", expected: cliVersion, stamp: true, optional: true },
 ];
@@ -62,22 +58,20 @@ for (const t of targets) {
 		obj[t.field] = t.expected;
 		writeJson(t.file, obj);
 		console.log(`  stamped ${path.relative(root, t.file)} ${t.field}: ${actual ?? "(none)"} -> ${t.expected}`);
-	} else if (write) {
-		console.log(`  (mirror) ${path.relative(root, t.file)} ${t.field} is ${actual ?? "(none)"} — run \`mewkit build-plugin\` to refresh`);
 	} else {
 		mismatches.push(`${path.relative(root, t.file)} ${t.field} is ${actual ?? "(none)"}, expected ${t.expected}`);
 	}
 }
 
 if (write) {
-	console.log(`Synced kit surfaces to v${kitVersion} (CLI recorded as v${cliVersion}); run \`mewkit build-plugin\` to mirror into plugin/.`);
+	console.log(`Synced kit surfaces to v${kitVersion} (CLI recorded as v${cliVersion}).`);
 	process.exit(0);
 }
 
 if (mismatches.length > 0) {
 	console.error(`Version mismatch (root package.json is the source of truth, kit v${kitVersion}):`);
 	for (const m of mismatches) console.error(`  - ${m}`);
-	console.error("Run `node scripts/sync-versions.cjs --write`, then `mewkit build-plugin`, then rebuild the release manifest.");
+	console.error("Run `node scripts/sync-versions.cjs --write`, then rebuild the release manifest.");
 	process.exit(1);
 }
 console.log(`Versions consistent: kit v${kitVersion}, CLI v${cliVersion}.`);

@@ -21,7 +21,8 @@ export const DENIED_TOKENS: readonly DeniedToken[] = [
 	{ label: ".claude path", pattern: /\.claude\// },
 	{ label: "CLAUDE.md reference", pattern: /\bCLAUDE\.md\b/ },
 	{ label: "Task( tool call", pattern: /\bTask\(/ },
-	{ label: "subagent primitive", pattern: /\bsubagent\b/i },
+	// NOTE: "subagent" is NOT denied — it is native Codex vocabulary (custom agents
+	// live in .codex/agents/*.toml). Flagging it was a false positive.
 	{ label: "Claude env var", pattern: /\$\{?CLAUDE_[A-Z0-9_]+/ },
 	{ label: "Anthropic env var", pattern: /\$\{?ANTHROPIC_[A-Z0-9_]+/ },
 ];

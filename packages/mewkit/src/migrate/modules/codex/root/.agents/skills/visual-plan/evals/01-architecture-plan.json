@@ -1,0 +1,14 @@
+{
+	"skills": ["visual-plan"],
+	"query": "Render the architecture-heavy plan at the given plan directory with --static as a single shareable plan.html so a reviewer can see the phases, the system architecture, the key decisions and risks, and the files each phase touches without reading prose.",
+	"files": ["tasks/plans/<architecture-plan-slug>/plan.md", "tasks/plans/<architecture-plan-slug>/phase-01-*.md"],
+	"expected_behavior": [
+		"Writes exactly one plan.html at the plan-directory root, beside plan.md, not under a visuals/ subdirectory",
+		"Renders a phase-timeline block where each phase card shows its title, status, priority, dependencies, and effort drawn from the phase frontmatter, so phase order and blocking are glanceable",
+		"Renders an architecture-diagram block as a client-side Mermaid diagram from each phase Architecture section, and embeds the Mermaid source in a visible <pre> fallback so the diagram content survives when the CDN is unreachable",
+		"Renders a decision/risk-cards block that surfaces Risk Map, Red Team Review, Key Insights, and Security Considerations as scannable cards rather than buried prose",
+		"Uses only the shared --wf-* theme tokens (no raw hex in block content) so the page reads consistently in light and dark mode",
+		"HTML-entity-encodes all plan-sourced text placed in the DOM; a plan containing <script> or on*= attributes renders it as literal text, not executable markup",
+		"A reviewer can identify the phases, the architecture, and the top decisions from the rendered page in under 30 seconds without reading paragraphs"
+	]
+}

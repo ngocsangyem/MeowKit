@@ -16,21 +16,8 @@ import type { ProviderManifest } from "./manifest-types.js";
 export type { ProviderManifest } from "./manifest-types.js";
 
 import { claudeCodeManifest } from "./claude-code/index.js";
-import { opencodeManifest } from "./opencode/index.js";
-import { githubCopilotManifest } from "./github-copilot/index.js";
 import { codexManifest } from "./codex/index.js";
-import { droidManifest } from "./droid/index.js";
 import { cursorManifest } from "./cursor/index.js";
-import { rooManifest } from "./roo/index.js";
-import { kiloManifest } from "./kilo/index.js";
-import { kiroManifest } from "./kiro/index.js";
-import { windsurfManifest } from "./windsurf/index.js";
-import { gooseManifest } from "./goose/index.js";
-import { geminiCliManifest } from "./gemini-cli/index.js";
-import { ampManifest } from "./amp/index.js";
-import { antigravityManifest } from "./antigravity/index.js";
-import { clineManifest } from "./cline/index.js";
-import { openhandsManifest } from "./openhands/index.js";
 
 const PORTABLE_SURFACES: readonly PortableType[] = ["agent", "command", "skill", "config", "rules", "hooks"];
 
@@ -48,24 +35,7 @@ const SURFACE_FIELDS = {
  * Order matches the `providers` object in provider-registry.ts so that
  * getAllProviderTypes() iteration order is preserved.
  */
-export const manifestRegistry: ProviderManifest[] = [
-	claudeCodeManifest,
-	opencodeManifest,
-	githubCopilotManifest,
-	codexManifest,
-	droidManifest,
-	cursorManifest,
-	rooManifest,
-	kiloManifest,
-	kiroManifest,
-	windsurfManifest,
-	gooseManifest,
-	geminiCliManifest,
-	ampManifest,
-	antigravityManifest,
-	clineManifest,
-	openhandsManifest,
-];
+export const manifestRegistry: ProviderManifest[] = [claudeCodeManifest, codexManifest, cursorManifest];
 
 function cloneConfig(config: ProviderConfig): ProviderConfig {
 	const { detect, ...rest } = config;
@@ -133,7 +103,7 @@ export function buildProvidersRaw(
 		const config = cloneConfig(manifest.config);
 		applyOverrides(config, manifest.overrides);
 		// Deliberately skips disableUndocumentedSurfaces — applyMewkitOverrides()
-		// handles that step for all 16 providers uniformly after construction.
+		// handles that step for all providers uniformly after construction.
 		out[manifest.id as ProviderType] = config;
 	}
 	return out;

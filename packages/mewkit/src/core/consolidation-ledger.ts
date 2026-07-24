@@ -31,7 +31,7 @@ export interface ConsolidationCandidate {
 	transitionBehavior: string;
 	/** How to roll back if the transition regresses. */
 	rollback: string;
-	/** Aspire-local + plugin-payload verification status. */
+	/** Aspire-local + plugin payload verification status. */
 	verification: string;
 	/** LITERAL false for every entry — Phase 7 removes nothing; the type forbids scheduling one. */
 	deletionThisPhase: false;

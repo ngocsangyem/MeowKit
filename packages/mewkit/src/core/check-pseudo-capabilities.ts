@@ -77,7 +77,7 @@ function collectProse(root: string, dir: string, acc: string[] = []): string[] {
 
 /**
  * Scan a projected tree. Returns every finding; the caller decides severity —
- * `build-plugin` throws, `validate` reports.
+ * a plugin build step throws, `validate` reports.
  */
 export function findPseudoCapabilities(root: string, scanDirs: string[] = ["."]): PseudoCapabilityFinding[] {
 	return scanDirs.flatMap((dir) => collectProse(root, dir)).flatMap((rel) => scanForPseudoCapabilities(root, rel));

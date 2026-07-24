@@ -1,0 +1,5 @@
+# Auto-installed into .agents/skills/.venv by `.codex/scripts/bin/setup-workflow` / the installer
+# (discovery: packages/cli/src/core/skills-dependencies.ts findRequirementsFiles)
+# Validated by SAFE_PKG_RE before install.
+jira-as
+jira-as[keyring]
