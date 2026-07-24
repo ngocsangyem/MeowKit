@@ -20,6 +20,10 @@ keywords:
   - job-spec
   - cross-toolkit
 when_to_use: 'Invoke when a task benefits from splitting across multiple headless CLI runtimes or in-session subagents — staged dependencies, parallel isolated writers, runtime/model diversity, or independent arbiter review. NOT for single-agent work or the standard in-session pipeline (mk:cook).'
+owner: lifecycle
+criticality: medium
+status: active
+runtime: claude-code
 ---
 
 # Orchestrate

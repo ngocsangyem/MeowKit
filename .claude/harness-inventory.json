@@ -344,6 +344,13 @@
       "runtime": "claude-code",
       "responsibility": "task-specification"
     },
+    "commands/mk/orchestrate.md": {
+      "owner": "lifecycle",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "task-state"
+    },
     "commands/mk/retro.md": {
       "owner": "docs",
       "criticality": "medium",

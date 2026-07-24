@@ -11,7 +11,7 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 | Context selection | ✅ covered | 5 | 5 | context-budget-rules, step-file-rules, context-audit |
 | Tool access | ✅ covered | 5 | 5 | skill-authoring-rules, confluence-setup, upgrade |
 | Project memory | ✅ covered | 7 | 7 | mk:wiki, mk:wiki-render, mk:wiki-research |
-| Task state | ✅ covered | 8 | 8 | agent-conduct, orchestration-rules, parallel-execution-rules |
+| Task state | ✅ covered | 9 | 9 | agent-conduct, orchestration-rules, parallel-execution-rules |
 | Observability | ✅ covered | 12 | 12 | post-phase-delegation, workflow-evidence-rules, budget |
 | Failure attribution | ✅ covered | 2 | 2 | fix, posttoolfailure-probe |
 | Verification | ✅ covered | 7 | 7 | development-rules, rubric-rules, tdd-rules |
@@ -21,4 +21,4 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 | Gate enforcement *(kit)* | ✅ covered | 12 | 12 | gate-rules, harness-rules, agile-story-gates |
 
 **Coverage:** 12/12 responsibilities have active artifacts.
-**Untagged:** 0 registry + 162 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).
+**Untagged:** 0 registry + 163 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).
