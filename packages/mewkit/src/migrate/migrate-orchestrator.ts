@@ -303,9 +303,10 @@ async function runMigrateUnderLock(
 	const sink: ExecutePlanSink = { results: [], outcomes: new Map<string, RunOutcome>(), phaseRecords: [] };
 
 	try {
+		const installCtx = { allItems: itemsByT, installedBackRef, migratedRefs };
 		const executed = await executePlan(
 			portabilityFiltered.plan.actions,
-			{ allItems: itemsByT, installedBackRef, migratedRefs },
+			installCtx,
 			portableSkills.skillsByProvider,
 			targets,
 			isGlobal,
@@ -327,6 +328,34 @@ async function runMigrateUnderLock(
 			const scopeRoot = isGlobal ? homedir() : process.cwd();
 			const overlay = await applyActiveCodexOverlay(scopeRoot, { global: isGlobal });
 			if (overlay.writes > 0) console.log(pc.green(`[+] Applied ${overlay.writes} authored Codex artifact(s)`));
+		}
+
+		// Codex config + rules merge-single (AGENTS.md), deferred from executePlan to run HERE —
+		// after the overlay, before the capability-bootstrap injector. When AGENTS.md is flipped
+		// authored, the overlay wrote its base and these sections merge onto it; when draft, the
+		// overlay is inert and they build AGENTS.md exactly as the inline loop used to. Always
+		// installs (executeInstallAction ignores action.action), so a re-run re-merges onto the
+		// force-overwritten base — idempotent (merge-single strips-prior-by-key + re-ranks).
+		if (targets.includes("codex")) {
+			for (const action of executed.deferredCodexAgentsMdActions) {
+				try {
+					const result = await executeInstallAction(action, installCtx);
+					executed.results.push(result);
+					sink.phaseRecords.push(...(result.records ?? []));
+					recordOutcome(
+						sink.outcomes,
+						action.type,
+						action.item,
+						result.success
+							? { outcome: "migrated", target: action.targetPath }
+							: { outcome: "failed", error: result.error },
+					);
+				} catch (err) {
+					const message = err instanceof Error ? err.message : String(err);
+					executed.results.push({ action, success: false, error: message });
+					recordOutcome(sink.outcomes, action.type, action.item, { outcome: "failed", error: message, internalError: true });
+				}
+			}
 		}
 
 		// This projection is not a migrated source artifact. It is CLI-owned trusted context
@@ -469,6 +498,12 @@ export interface ExecutePlanResult {
 	outcomes: Map<string, RunOutcome>;
 	/** Structured Phase 1-3 records surfaced on install results (skills, hooks). */
 	phaseRecords: MigrationDecisionRecord[];
+	/** Codex config/rules merge-single actions (they target AGENTS.md), captured out of the main
+	 *  loop so the orchestrator installs them AFTER the authored-bundle overlay. The overlay may
+	 *  write the authored AGENTS.md base first; these sections then merge onto it. Captured
+	 *  regardless of reconcile action (install/skip/conflict) — the overlay force-overwrites AGENTS.md
+	 *  every run, so the sections must ALWAYS be re-merged (never left "skipped") to stay idempotent. */
+	deferredCodexAgentsMdActions: ReconcileAction[];
 }
 
 function recordOutcome(
@@ -510,6 +545,7 @@ async function executePlan(
 	const phaseRecords = sink.phaseRecords;
 	const codexAgentActions = new Set<string>();
 	const codexHookActions = new Set<string>();
+	const codexAgentsMdActions: ReconcileAction[] = [];
 	const hookTargetPathsByProvider = new Map<ProviderType, Map<string, string>>();
 	for (const target of targets) {
 		if (target === "codex" || !providers[target].hooks) continue;
@@ -522,6 +558,14 @@ async function executePlan(
 	}
 
 	for (const action of actions) {
+		// Codex config + rules both merge-single into AGENTS.md. Capture them here — BEFORE the
+		// skip/conflict handlers — so EVERY non-delete one defers to the post-overlay pass (the
+		// overlay force-overwrites AGENTS.md each run, so a "skip" must still re-merge to stay
+		// idempotent). Delete actions fall through to normal handling.
+		if (action.provider === "codex" && (action.type === "config" || action.type === "rules") && action.action !== "delete") {
+			codexAgentsMdActions.push(action);
+			continue;
+		}
 		if (action.action === "skip") {
 			// A no-op skip means the artifact is already present on the target — it is
 			// migrated (installed), not absent. Only a user-deleted-respected skip
@@ -673,7 +717,7 @@ async function executePlan(
 		}
 	}
 
-	return { results, outcomes, phaseRecords };
+	return { results, outcomes, phaseRecords, deferredCodexAgentsMdActions: codexAgentsMdActions };
 }
 
 /**

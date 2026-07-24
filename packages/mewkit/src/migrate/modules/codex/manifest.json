@@ -12,7 +12,7 @@
       "scopeTags": [
         "managed-runtime"
       ],
-      "active": false
+      "active": true
     },
     {
       "sourcePath": "root/.codex/config.toml",

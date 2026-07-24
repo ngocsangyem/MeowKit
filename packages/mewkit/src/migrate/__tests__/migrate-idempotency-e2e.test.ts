@@ -83,4 +83,22 @@ describe("migrate idempotency and conflict handling", () => {
 		expect(await env.run({ force: true })).toBe(0);
 		expect(readFileSync(skillPath, "utf-8")).not.toContain("user customization");
 	});
+
+	it("AGENTS.md is a managed authored surface — a hand-edited rule section is re-applied from source on re-migrate (no --force)", async () => {
+		const agentsPath = join(env.projectDir, "AGENTS.md");
+		const before = readFileSync(agentsPath, "utf-8");
+		expect(before).toContain("## Rule: tool-rules"); // sanity: a source rule merged in
+		expect(before).toContain("Authored Codex instruction surface"); // authored base present
+		await writeFile(agentsPath, before.replace("## Rule: tool-rules", "## Rule: tool-rules\n<!-- user hand-edit -->"), "utf-8");
+
+		// Unlike a per-file skill (kept by default), AGENTS.md is an AUTHORED/managed surface post-cutover:
+		// the overlay force-rewrites its base and the source rules re-merge onto it every run, so a
+		// direct hand-edit is NOT preserved — consistent with config.toml and every other flipped surface.
+		// Users customize AGENTS.md by editing their source `.claude/rules/`, not AGENTS.md itself.
+		expect(await env.run({})).toBe(0);
+		const after = readFileSync(agentsPath, "utf-8");
+		expect(after).not.toContain("user hand-edit"); // hand-edit overwritten (managed)
+		expect(after).toContain("## Rule: tool-rules"); // section re-merged from source
+		expect(after).toContain("Authored Codex instruction surface"); // authored base intact
+	});
 });

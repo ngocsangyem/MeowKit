@@ -93,6 +93,11 @@ export async function adoptHomeRegistryCodexRows(ledgerPath: string, projectRoot
 	let adopted = 0;
 	for (const row of home.installations) {
 		if (row.provider !== "codex") continue;
+		// Skip converter config-merger install-back-refs (they carry `ownedSections` and are
+		// reconciled via the home registry) — the project codex-ledger tracks only authored-bundle
+		// entries. Adopting them drifts byte-identical idempotency (their home-registry write races
+		// the overlay's adoption depending on the AGENTS.md merge-single ordering).
+		if (row.ownedSections && row.ownedSections.length > 0) continue;
 		if (!isInsideProject(projectRoot, row.path)) continue;
 		if (existingPaths.has(resolve(row.path))) continue;
 		ledger.installations.push(row);

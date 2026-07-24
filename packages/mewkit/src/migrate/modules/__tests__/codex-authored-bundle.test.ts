@@ -108,14 +108,16 @@ describe("authored codex bundle", () => {
 		expect(fails, `unexpected failures: ${fails.map((f) => `${f.name} — ${f.detail}`).join("; ")}`).toEqual([]);
 	});
 
-	it("the migrate overlay writes every active surface; only the still-draft AGENTS.md stays converter-owned", async () => {
-		// Phase-9: all surfaces except AGENTS.md are active (hooks, agents, skills, config.toml,
-		// rules). The overlay writes those eight entries; AGENTS.md remains converter-owned until
-		// its own flip (it carries converter-baked source-rules merges handled in a later batch).
+	it("the migrate overlay writes EVERY authored surface (cutover complete — all 9 entries active)", async () => {
+		// Phase-9 cutover complete: all nine manifest entries are active, so the overlay writes the
+		// full authored tree. For AGENTS.md the overlay writes the authored BASE; the source-rules
+		// merge-single (config/rules) then merges onto it in the full migrate flow (not exercised by
+		// this direct-overlay test), and the capability-bootstrap injector adds its block.
 		const overlay = await applyActiveCodexOverlay(target, { moduleDir });
 		const written = overlay.entries.map((e) => e.targetPath).sort();
 		expect(written).toEqual(
 			[
+				"AGENTS.md",
 				".agents/skills",
 				".codex/agents",
 				".codex/config.toml",
@@ -126,10 +128,9 @@ describe("authored codex bundle", () => {
 				".codex/rules/default.rules",
 			].sort(),
 		);
-		expect(overlay.writes).toBe(8);
+		expect(overlay.writes).toBe(9);
+		expect(existsSync(join(target, "AGENTS.md"))).toBe(true); // authored AGENTS.md base
 		expect(existsSync(join(target, ".codex", "config.toml"))).toBe(true); // authored config base
-		expect(existsSync(join(target, ".codex", "rules", "default.rules"))).toBe(true); // authored rules
 		expect(existsSync(join(target, ".agents", "skills", "fix", "SKILL.md"))).toBe(true); // authored skill
-		expect(existsSync(join(target, "AGENTS.md"))).toBe(false); // AGENTS.md still draft
 	});
 });
