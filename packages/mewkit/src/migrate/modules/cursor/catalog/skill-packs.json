@@ -1,7 +1,41 @@
 {
-	"_description": "Cursor bundle skill-pack catalog skeleton. No native skills are authored yet — packs populate as skills are added under `.agents/skills/` in the bundle.",
-	"verified": "2026-07-24",
+	"_description": "Cursor bundle skill-pack catalog. Each shipped skill maps to exactly one pack. `core` installs by default; other packs are explicit (--packs) or --all. Budget: default-install (core skills + the 3 core agents) name+description <= budgetChars. Extended packs are intentionally empty for now (Phase 3 ships core only); a later phase adds development/review/product/operations/integrations/media skills adapted from the codex bundle.",
+	"verified": "2026-07-25",
 	"budgetChars": 8000,
 	"defaultPack": "core",
-	"packs": {}
+	"packs": {
+		"core": {
+			"description": "Always-on lifecycle kernel: orient, plan, implement, test, verify, review, ship, and session/orchestration helpers installed by default.",
+			"dependsOn": [],
+			"skills": [
+				"mk-agent-detector",
+				"mk-brainstorming",
+				"mk-cook",
+				"mk-development",
+				"mk-docs-init",
+				"mk-document-release",
+				"mk-fix",
+				"mk-help",
+				"mk-investigate",
+				"mk-lint-and-validate",
+				"mk-memory",
+				"mk-plan-creator",
+				"mk-project-context",
+				"mk-project-organization",
+				"mk-research",
+				"mk-review",
+				"mk-scout",
+				"mk-sequential-thinking",
+				"mk-ship",
+				"mk-simplify",
+				"mk-testing",
+				"mk-validate-plan",
+				"mk-verify",
+				"mk-workflow-orchestrator"
+			]
+		}
+	},
+	"budgetReport": {
+		"core": 4534
+	}
 }

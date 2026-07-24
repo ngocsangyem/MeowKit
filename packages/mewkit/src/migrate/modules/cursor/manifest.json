@@ -20,6 +20,33 @@
 			"ownership": "managed-replace",
 			"scopeTags": ["managed-runtime"],
 			"active": true
+		},
+		{
+			"sourcePath": "root/.cursor/agents",
+			"targetPath": ".cursor/agents",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.cursor/rules",
+			"targetPath": ".cursor/rules",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.agents/skills",
+			"targetPath": ".agents/skills",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
 		}
 	]
 }

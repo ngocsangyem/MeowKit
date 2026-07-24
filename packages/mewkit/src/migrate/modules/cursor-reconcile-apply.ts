@@ -32,6 +32,34 @@ import { meowkitStatePaths } from "../../state/meowkit-state-paths.js";
 import type { ArtifactManifestEntry } from "./artifact-manifest-schema.js";
 import { copyOneAtomic, loadCursorBundleManifest } from "./cursor-authored-bundle.js";
 import { decideCodexEntryAction } from "./codex-reconcile-apply.js";
+import {
+	expandSkillsEntry,
+	isSkillsTreeEntry,
+	loadSkillPackCatalog,
+	resolvePackSelection,
+	type PackSelection,
+} from "./codex-skill-packs.js";
+
+/**
+ * Expand the aggregate `.agents/skills` entry into one per-skill entry for the selected
+ * packs, so the reconciler installs/updates each skill dir independently. Mirrors
+ * `expandSkillsForSelection` in codex-reconcile-apply.ts — the pack-resolution primitives
+ * are provider-agnostic (they only reason about a manifest entry's target path and a
+ * catalog's pack/skill mapping), so this reuses them against the cursor moduleDir instead
+ * of re-deriving the logic. When there is no catalog OR no explicit selection, the
+ * aggregate entry is kept unchanged (whole-tree install — the pre-pack behavior).
+ */
+function expandSkillsForSelection(
+	entries: ArtifactManifestEntry[],
+	moduleDir: string,
+	packs: PackSelection | undefined,
+): ArtifactManifestEntry[] {
+	if (packs === undefined) return entries;
+	const catalog = loadSkillPackCatalog(moduleDir);
+	if (!catalog) return entries;
+	const { skills } = resolvePackSelection(catalog, packs);
+	return entries.flatMap((e) => (isSkillsTreeEntry(e) ? expandSkillsEntry(e, skills) : [e]));
+}
 
 export interface AppliedEntry {
 	sourcePath: string;
@@ -66,6 +94,11 @@ export interface ReconcileApplyOptions {
 	/** Adopt matching cursor rows from the home registry into the project ledger on first run
 	 *  (rollback-safe: home rows are left in place). Default true; skipped on dry-run. */
 	adoptHomeRegistry?: boolean;
+	/** Skill-pack selection for the `.agents/skills` tree: `"all"`, a pack-name list, or
+	 *  `[]` for the catalog default (`core`). Undefined = install the whole skills tree
+	 *  unfiltered (pre-pack behavior). Only skills in the selected packs (+ their
+	 *  `dependsOn`) install; the reconciler tracks each installed skill dir independently. */
+	packs?: PackSelection;
 }
 
 /** Map a manifest entry to a ledger `type`. Cosmetic for identity (rows key on
@@ -124,7 +157,8 @@ export async function reconcileApplyCursorBundle(
 
 	const ledger = await readCursorLedger(ledgerPath);
 	const manifest = loadCursorBundleManifest(moduleDir);
-	const entries = opts.onlyActive ? manifest.entries.filter((e) => e.active) : manifest.entries;
+	const activeEntries = opts.onlyActive ? manifest.entries.filter((e) => e.active) : manifest.entries;
+	const entries = expandSkillsForSelection(activeEntries, moduleDir, opts.packs);
 
 	const results: AppliedEntry[] = [];
 

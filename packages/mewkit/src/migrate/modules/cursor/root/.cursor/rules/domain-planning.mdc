@@ -1,0 +1,22 @@
+---
+description: Planning and architecture guidance for scoping a non-trivial change — read before proposing an approach, an architecture decision, or a phased implementation breakdown.
+alwaysApply: false
+---
+
+<!-- Agent Requested: planning guidance is only useful while a plan is actually being
+formed, and the description above lets the model pull it in for that situation instead
+of carrying it in every context. Always Apply would spend context on tasks that never
+touch planning; Auto Attached (globs) does not fit because "planning" is an activity,
+not a file type. -->
+
+# Planning guidance
+
+- State the goal as one outcome-focused sentence before describing how to reach it.
+- Name at least one alternative approach considered and the concrete tradeoff that
+  decided between them — a plan with only one option considered has not actually
+  compared anything.
+- List affected files and any public contract the change must not silently break.
+- Surface ambiguity instead of resolving it silently: if scope or acceptance criteria
+  are unclear, say so and ask, rather than picking an interpretation and proceeding.
+- Prefer the smallest change that satisfies the accepted scope over a more general
+  solution nobody asked for.
