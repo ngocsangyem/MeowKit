@@ -1,0 +1,6 @@
+{
+	"_description": "Cursor bundle agent-pack catalog skeleton. No native agents are authored yet — packs populate as `.cursor/agents/*.md` custom agents are added to the bundle.",
+	"verified": "2026-07-24",
+	"defaultPack": "core",
+	"packs": {}
+}

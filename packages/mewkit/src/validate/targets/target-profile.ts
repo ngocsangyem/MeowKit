@@ -18,10 +18,12 @@ export interface TargetProfile {
 }
 
 import { codexTargetProfile } from "./codex-target.js";
+import { cursorTargetProfile } from "./cursor-target.js";
 
 /** All registered target profiles, keyed by provider. Add a provider ⇒ add a row here. */
 export const TARGET_PROFILES: Readonly<Record<string, TargetProfile>> = {
 	codex: codexTargetProfile,
+	cursor: cursorTargetProfile,
 };
 
 export function getTargetProfile(provider: string): TargetProfile | null {

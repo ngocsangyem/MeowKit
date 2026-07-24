@@ -1,0 +1,5 @@
+{
+	"_description": "Cursor bundle MCP profile catalog skeleton. MCP is opt-in only — no profile carries default authority. Profiles populate as native MCP integrations are authored.",
+	"verified": "2026-07-24",
+	"profiles": {}
+}

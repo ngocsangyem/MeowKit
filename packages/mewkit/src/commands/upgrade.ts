@@ -15,6 +15,9 @@ import type { ReleaseInfo, UserConfig } from "../core/index.js";
 import { runMigrate } from "../migrate/migrate-orchestrator.js";
 import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
 import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
+import { resolveCursorModuleDir } from "../migrate/modules/cursor-authored-bundle.js";
+import { reconcileApplyCursorBundle } from "../migrate/modules/cursor-reconcile-apply.js";
+import { meowkitStatePaths } from "../state/meowkit-state-paths.js";
 
 /** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
 const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
@@ -22,11 +25,55 @@ const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
 	{ tool: "codex", dir: ".codex" },
 ];
 
+/** True when `projectDir` has an AUTHORED Cursor install — the cursor reconciliation ledger
+ *  exists. This is the disambiguation signal (not `.cursor/` dir presence): a legacy
+ *  `.claude/` → `.cursor/` converter export also creates a `.cursor/` dir, so dir presence
+ *  alone cannot tell an authored bundle apart from a legacy export. */
+function hasCursorLedger(projectDir: string): boolean {
+	return existsSync(meowkitStatePaths(join(projectDir, ".meowkit")).cursorLedger);
+}
+
+/** Refresh the authored Cursor bundle in place (reconciled — user edits preserved or
+ *  reported as conflicts, never blind-overwritten). Shared by `upgradeCursorToolkit`
+ *  (cursor-only project) and `reMigrateInstalledProviders` (mixed project). */
+async function refreshCursorBundle(projectDir: string): Promise<void> {
+	const moduleDir = resolveCursorModuleDir();
+	if (!existsSync(join(moduleDir, "manifest.json"))) {
+		console.error(pc.red("Cursor bundle not found in this install — reinstall the `mewkit` package."));
+		return;
+	}
+	const result = await reconcileApplyCursorBundle(moduleDir, projectDir, { projectRoot: projectDir });
+	const preserved = result.entries.filter((e) => e.action === "skip" && e.reasonCode === "user-edits-preserved").length;
+	console.log(
+		pc.green(
+			`Cursor toolkit refreshed — ${result.writes} updated${preserved > 0 ? `, ${preserved} preserving your edits` : ""}.`,
+		),
+	);
+	if (result.conflicts.length > 0) {
+		console.log(
+			pc.yellow(`  ${result.conflicts.length} conflict(s) — both you and mewkit changed these; left untouched:`),
+		);
+		for (const c of result.conflicts) console.log(pc.dim(`    ${c.targetPath}`));
+	}
+}
+
 /** After a `.claude/` upgrade, re-export to any installed downstream provider toolkit
  *  so the whole install moves together (a bare `mewkit upgrade` no longer leaves
- *  .cursor/.codex stale). Best-effort: a failing provider is reported, not fatal. */
+ *  .cursor/.codex stale). Best-effort: a failing provider is reported, not fatal.
+ *
+ *  Cursor is special-cased: a mixed `.claude/` + authored `.cursor/` project (the ledger
+ *  exists) must NEVER re-run the legacy `.claude/` → `.cursor/` converter — that converter
+ *  regenerates `.cursor/` content from `.claude/` from scratch and has no notion of the
+ *  authored bundle's ledger, so it would clobber authored files. The authored bundle is
+ *  refreshed via the reconciler instead (`refreshCursorBundle`), same as `upgradeCursorToolkit`. */
 async function reMigrateInstalledProviders(projectDir: string): Promise<void> {
-	const installed = PROPAGATABLE_PROVIDERS.filter((p) => existsSync(join(projectDir, p.dir)));
+	const cursorLedgerPresent = hasCursorLedger(projectDir);
+	if (cursorLedgerPresent) await refreshCursorBundle(projectDir);
+
+	const installed = PROPAGATABLE_PROVIDERS.filter(({ tool, dir }) => {
+		if (tool === "cursor" && cursorLedgerPresent) return false;
+		return existsSync(join(projectDir, dir));
+	});
 	if (installed.length === 0) return;
 	console.log(
 		`\n${pc.bold("Propagating upgrade to installed provider toolkits:")} ${installed.map((p) => p.tool).join(", ")}`,
@@ -68,6 +115,24 @@ async function upgradeCodexToolkit(projectDir: string): Promise<void> {
 		);
 		for (const c of result.conflicts) console.log(pc.dim(`    ${c.targetPath}`));
 	}
+}
+
+/** A cursor-only project (from `init --target cursor`) has no `.claude/`; upgrade it by
+ *  reconciling the authored Cursor bundle from the installed package against the project
+ *  ledger. Gated on the ledger's presence (not `.cursor/` dir), since a `.cursor/` dir alone
+ *  cannot tell an authored install apart from a legacy converter export. */
+async function upgradeCursorToolkit(projectDir: string): Promise<void> {
+	console.log(pc.bold("Cursor toolkit detected (no .claude/) — refreshing from the installed mewkit bundle."));
+	// Fail closed as the solo entrypoint (parity with upgradeCodexToolkit): a cursor-only
+	// project whose install is corrupt must not silently exit 0 having done nothing. The
+	// shared refreshCursorBundle stays best-effort for the mixed-project reMigrate path,
+	// where one broken provider must not abort propagation to the others.
+	const moduleDir = resolveCursorModuleDir();
+	if (!existsSync(join(moduleDir, "manifest.json"))) {
+		console.error(pc.red("Cursor bundle not found in this install — reinstall the `mewkit` package."));
+		process.exit(1);
+	}
+	await refreshCursorBundle(projectDir);
 }
 
 export interface UpgradeArgs {
@@ -262,12 +327,20 @@ async function performUpgrade(
 }
 
 export async function upgrade(args: UpgradeArgs): Promise<void> {
-	// Codex-only project (`init --target codex`): no `.claude/` to update — refresh the
-	// authored Codex bundle instead. (Skip for --check/--list, which are version queries.)
+	// Provider-only project(s) (`init --target codex` / `init --target cursor`): no
+	// `.claude/` to update — refresh whichever authored bundle(s) are present instead of the
+	// release flow. A project can have more than one provider-only bundle installed with no
+	// claude-code kit; refresh every one present rather than returning after the first match.
+	// (Skip for --check/--list, which are version queries.)
 	const cwd = process.cwd();
-	if (!args.check && !args.list && !existsSync(join(cwd, ".claude")) && existsSync(join(cwd, ".codex"))) {
-		await upgradeCodexToolkit(cwd);
-		return;
+	if (!args.check && !args.list && !existsSync(join(cwd, ".claude"))) {
+		const hasCodex = existsSync(join(cwd, ".codex"));
+		const hasCursor = hasCursorLedger(cwd);
+		if (hasCodex || hasCursor) {
+			if (hasCodex) await upgradeCodexToolkit(cwd);
+			if (hasCursor) await upgradeCursorToolkit(cwd);
+			return;
+		}
 	}
 
 	const localVersion = getLocalVersion();

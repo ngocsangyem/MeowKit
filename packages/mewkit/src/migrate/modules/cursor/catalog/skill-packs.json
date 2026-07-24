@@ -1,0 +1,7 @@
+{
+	"_description": "Cursor bundle skill-pack catalog skeleton. No native skills are authored yet — packs populate as skills are added under `.agents/skills/` in the bundle.",
+	"verified": "2026-07-24",
+	"budgetChars": 8000,
+	"defaultPack": "core",
+	"packs": {}
+}

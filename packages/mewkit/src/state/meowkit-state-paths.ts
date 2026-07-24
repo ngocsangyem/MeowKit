@@ -19,6 +19,9 @@ export interface MeowkitStatePaths {
 	 *  (PortableRegistryV3-shaped). Per-project storage — the home registry stays
 	 *  the authority for other providers. This is state, not source. */
 	codexLedger: string;
+	/** Project-local reconciliation ledger for the authored Cursor bundle. Same
+	 *  PortableRegistryV3 shape and per-project storage rationale as `codexLedger`. */
+	cursorLedger: string;
 }
 
 /** Build the taxonomy paths from a resolved `.meowkit/` directory. */
@@ -34,5 +37,6 @@ export function meowkitStatePaths(meowkitRoot: string): MeowkitStatePaths {
 		migrateLock: join(state, "migrate.lock"),
 		storeLocksDir: join(state, "locks"),
 		codexLedger: join(state, "codex-ledger.json"),
+		cursorLedger: join(state, "cursor-ledger.json"),
 	};
 }

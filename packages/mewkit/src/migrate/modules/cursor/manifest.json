@@ -1,0 +1,25 @@
+{
+	"version": "1.0",
+	"provider": "cursor",
+	"generatedFrom": "hand-authored (native Cursor bundle)",
+	"entries": [
+		{
+			"sourcePath": "root/AGENTS.md",
+			"targetPath": "AGENTS.md",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.meowkit/README.md",
+			"targetPath": ".meowkit/README.md",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		}
+	]
+}

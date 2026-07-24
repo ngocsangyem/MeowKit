@@ -29,6 +29,13 @@ import {
 	detectCodexVersion,
 	isCodexVersionSupported,
 } from "../migrate/providers/codex/capabilities.js";
+import { resolveCursorModuleDir } from "../migrate/modules/cursor-authored-bundle.js";
+import { reconcileApplyCursorBundle } from "../migrate/modules/cursor-reconcile-apply.js";
+import {
+	CURSOR_MIN_SUPPORTED_VERSION,
+	detectCursorVersion,
+	isCursorVersionSupported,
+} from "../migrate/providers/cursor/capabilities.js";
 
 export interface InitArgs {
 	dryRun?: boolean;
@@ -37,10 +44,11 @@ export interface InitArgs {
 	/** When true, run interactive provider multiselect after init unpacks. */
 	migrate?: boolean;
 	/**
-	 * Target provider toolkit to create. `codex` copies the authored Codex bundle
-	 * directly (codex-only project, no `.claude/`). Any other supported provider
-	 * (e.g. `cursor`) unpacks `.claude/` then exports to it. Omitted = the default
-	 * Claude Code kit (`.claude/`). Replaces the old `--migrate-to`.
+	 * Target provider toolkit to create. `codex` and `cursor` each copy their own
+	 * authored bundle directly (a provider-only project, no `.claude/`). Any other
+	 * supported provider unpacks `.claude/` then exports to it via the legacy
+	 * converter. Omitted = the default Claude Code kit (`.claude/`). Replaces the
+	 * old `--migrate-to`.
 	 */
 	target?: string;
 	/** When true, scope the post-init migration globally (~/.cursor/, etc.) instead of per-project. */
@@ -365,6 +373,75 @@ function hintLegacyMemoryForCodex(targetDir: string): void {
 }
 
 /**
+ * `mewkit init --target cursor` — create a Cursor-native toolkit by reconciling the
+ * authored Cursor bundle shipped with the package into the project (AGENTS.md,
+ * `.meowkit/README.md`; more surfaces land as the bundle is authored). No `.claude/`,
+ * no release download, no conversion — the bundle IS the source of truth for Cursor.
+ * Mirrors `initCodexTarget` structurally; the two stay independent so a change to one
+ * provider's install flow never silently ripples into the other.
+ */
+async function initCursorTarget(targetDir: string, dryRun: boolean, force: boolean): Promise<void> {
+	p.intro(pc.bgCyan(pc.black(" meowkit init --target cursor ")));
+	const moduleDir = resolveCursorModuleDir();
+	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
+		p.cancel("Cursor bundle not found in this install — reinstall the `mewkit` package (`npx mewkit@latest ...`).");
+		process.exit(1);
+	}
+	// No fail-closed guard: the reconciler preserves user edits (or surfaces a conflict)
+	// instead of clobbering an existing layout, and makes a re-run idempotent.
+	if (dryRun) {
+		const plan = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, dryRun: true, projectRoot: targetDir });
+		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
+		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
+		p.log.info(`Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .meowkit/README.md.`);
+		p.outro(pc.green("Dry-run complete — no files written."));
+		return;
+	}
+	const result = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, projectRoot: targetDir });
+	if (result.conflicts.length > 0) {
+		p.log.warn(
+			`${result.conflicts.length} existing file(s) differ from the bundle and were left untouched (re-run with --force to overwrite):`,
+		);
+		for (const c of result.conflicts) p.log.message(pc.dim(`  ${c.targetPath}`));
+	}
+	p.log.success(`Cursor toolkit ready (${result.writes} written): AGENTS.md, .meowkit/README.md.`);
+	await warnBelowMinCursor();
+	hintLegacyMemoryForCursor(targetDir);
+	p.outro(pc.green("Cursor toolkit installed!"));
+}
+
+/**
+ * Warn-and-degrade version gate for the Cursor install. The authored bundle is inert
+ * content this phase (no version-gated surface yet), so a below-minimum IDE never
+ * hard-fails the install — it only warns, so the user knows to upgrade before richer
+ * surfaces (hooks, native agents) land in later phases. No warning when the version
+ * can't be detected (the `cursor` CLI shim usually isn't on PATH) — do not nag on an
+ * unknown, and the CLI's calendar versioning is never compared against this floor.
+ */
+async function warnBelowMinCursor(): Promise<void> {
+	const version = await detectCursorVersion();
+	if (version && !isCursorVersionSupported(version)) {
+		p.log.warn(
+			`Cursor ${version} < ${CURSOR_MIN_SUPPORTED_VERSION}: some authored surfaces may be ignored by this version. Install proceeds; the MeowKit CLI gate stays authoritative. Upgrade Cursor to enforce them.`,
+		);
+	}
+}
+
+/**
+ * Cursor install copies the authored bundle but does NOT run the legacy `.claude/memory/`
+ * → `.meowkit/` import (that lives in the `mewkit migrate` flow). If a repo carries legacy
+ * memory, surface a hint instead of silently leaving it behind. Mirrors
+ * `hintLegacyMemoryForCodex`.
+ */
+function hintLegacyMemoryForCursor(targetDir: string): void {
+	if (fs.existsSync(join(targetDir, ".claude", "memory"))) {
+		p.log.info(
+			"Legacy .claude/memory/ detected — import it into .meowkit/ with: mewkit migrate cursor (loss-aware, conflict-safe; not run automatically).",
+		);
+	}
+}
+
+/**
  * Fresh-install provider picker. Multi-select with Claude Code checked by default.
  * Each choice maps to a distinct provisioning path handled by the init orchestrator:
  * Claude Code → `.claude/`, Codex → authored bundle, Cursor → `.claude/` + export.
@@ -380,7 +457,7 @@ async function promptProviders(): Promise<ProviderType[]> {
 				hint: "installs .claude/ (default)",
 			},
 			{ value: "codex" as const, label: providers.codex.displayName, hint: "copies the authored Codex bundle" },
-			{ value: "cursor" as const, label: providers.cursor.displayName, hint: "legacy export of .claude/ to .cursor/ (native bundle pending)" },
+			{ value: "cursor" as const, label: providers.cursor.displayName, hint: "copies the authored Cursor bundle" },
 		],
 		initialValues: ["claude-code"],
 		required: true,
@@ -411,12 +488,38 @@ async function addCodexBundle(targetDir: string, force: boolean, packs: PackSele
 	hintLegacyMemoryForCodex(targetDir);
 }
 
+/**
+ * Add the Cursor toolkit alongside a multi-provider install by reconciling the authored
+ * bundle. Non-fatal (warn + skip) so a Cursor hiccup never aborts the whole install —
+ * unlike `initCursorTarget`, which fails closed because Cursor is the ONLY target there.
+ */
+async function addCursorBundle(targetDir: string, force: boolean): Promise<void> {
+	const moduleDir = resolveCursorModuleDir();
+	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
+		p.log.warn("Cursor bundle not found in this install — skipping the Cursor toolkit.");
+		return;
+	}
+	const result = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, projectRoot: targetDir });
+	if (result.conflicts.length > 0) {
+		p.log.warn(
+			`${result.conflicts.length} existing Cursor file(s) left untouched (re-run with --force to overwrite).`,
+		);
+	}
+	p.log.success(`Cursor toolkit created (${result.writes} written): AGENTS.md, .meowkit/README.md.`);
+	await warnBelowMinCursor();
+	hintLegacyMemoryForCursor(targetDir);
+}
+
 export async function init(args: InitArgs): Promise<void> {
 	const targetDir = process.cwd();
 
-	// `--target codex` is a distinct, offline path: copy the authored bundle, done.
+	// `--target codex` / `--target cursor` are distinct, offline paths: reconcile the
+	// authored bundle, done. No `.claude/`, no release download, no legacy converter.
 	if (args.target === "codex") {
 		return initCodexTarget(targetDir, args.dryRun ?? false, args.force ?? false, parseSkillPacks(args.skillPacks));
+	}
+	if (args.target === "cursor") {
+		return initCursorTarget(targetDir, args.dryRun ?? false, args.force ?? false);
 	}
 
 	const mode = detectMode(targetDir);
@@ -432,22 +535,24 @@ export async function init(args: InitArgs): Promise<void> {
 	// provider intent (`--target`, `--migrate`) bypasses it and keeps its own flow. Update
 	// mode keeps today's behavior (refresh .claude/); use `mewkit upgrade` to propagate.
 	const picked = !args.target && !args.migrate && mode === "new" ? await promptProviders() : null;
-	// Cursor migrates FROM .claude/, so it also requires the base kit. No picker
-	// (update mode, --target, or --migrate) ⇒ base install as today.
-	const installClaudeKit = picked ? picked.includes("claude-code") || picked.includes("cursor") : true;
+	// Codex and Cursor are both additive, offline authored-bundle installs — picking either
+	// (without also picking claude-code) never forces the base kit. No picker (update mode,
+	// `--target`, or `--migrate`) ⇒ base install as today.
+	const installClaudeKit = picked ? picked.includes("claude-code") : true;
 
 	if (installClaudeKit) {
 		await runClaudeKitInstall(args, targetDir, mode, dryRun, force);
 	}
 
-	// Codex (additive, offline bundle) and Cursor (export from .claude/) when picked.
+	// Codex and Cursor are both additive, offline authored-bundle copies when picked — neither
+	// depends on the base kit or the legacy converter.
 	if (picked?.includes("codex")) {
 		if (dryRun) p.log.info("Dry-run: would copy the authored Codex bundle (AGENTS.md, .codex/, .agents/skills/).");
 		else await addCodexBundle(targetDir, force, parseSkillPacks(args.skillPacks));
 	}
 	if (picked?.includes("cursor")) {
-		if (dryRun) p.log.info("Dry-run: would export .claude/ to .cursor/.");
-		else await runPostInitMigrate({ ...args, target: "cursor" }, targetDir);
+		if (dryRun) p.log.info("Dry-run: would copy the authored Cursor bundle (AGENTS.md, .meowkit/README.md).");
+		else await addCursorBundle(targetDir, force);
 	}
 
 	// Legacy explicit paths: `--target <provider>` / `--migrate` (never active with the picker).

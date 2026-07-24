@@ -53,6 +53,8 @@ const DEFAULT_GITIGNORE = `# MeowKit
 .claude/.env
 .claude/memory/
 .claude/logs/
+.meowkit/state/
+.meowkit/telemetry/
 \n`;
 
 /** Setup Python virtual environment for MeowKit skill scripts */
