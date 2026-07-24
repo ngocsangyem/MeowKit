@@ -194,8 +194,8 @@ must carry zero product/Claude self-references — memory paths use `.meowkit/`,
 ```bash
 export PATH="/opt/homebrew/opt/node@24/bin:$PATH"   # tests need node:sqlite (Node 24)
 
-# dist parity: copy-codex-bundle stages the bundle into dist (also runs in `npm run build`)
-node packages/mewkit/scripts/copy-codex-bundle.cjs
+# dist parity: copy-provider-bundles stages the authored bundles (codex + cursor) into dist (also runs in `npm run build`)
+node packages/mewkit/scripts/copy-provider-bundles.cjs
 
 # Codex bundle structural + pack + parity gates:
 npx vitest run $(grep -rl codex packages/mewkit/src --include='*.test.ts')
@@ -531,7 +531,7 @@ Copy this checklist for each release:
 
 - [ ] `prepare-release-assets.cjs` ran successfully
 - [ ] `dist/meowkit-release.zip` exists with expected size
-- [ ] Codex bundle hand-authored when `.claude/` changed (step 1e): new/changed surfaces authored under `modules/codex/root/`; new skill added to a pack in `catalog/skill-packs.json`; codex suite + `mewkit validate --packs` green; `copy-codex-bundle.cjs` staged to dist. (Cursor export is automatic — no manual step.)
+- [ ] Codex bundle hand-authored when `.claude/` changed (step 1e): new/changed surfaces authored under `modules/codex/root/`; new skill added to a pack in `catalog/skill-packs.json`; codex suite + `mewkit validate --packs` green; `copy-provider-bundles.cjs` staged to dist. (Cursor authored-bundle content lands in a later phase; legacy `.claude/`→`.cursor/` export remains automatic.)
 - [ ] Committed and tagged
 - [ ] Pushed to GitHub (commits + tag)
 - [ ] GitHub Release created with zip asset
@@ -584,7 +584,7 @@ For CLI changes inside `packages/mewkit/src/`:
 | `scripts/sync-package-versions.cjs`     | Sync version across both npm packages                                           |
 | `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files                                |
 | `scripts/prepare-release-assets.cjs`    | Build the release manifest + dist/meowkit-release.zip                            |
-| `packages/mewkit/scripts/copy-codex-bundle.cjs` | Stage the authored Codex bundle (`modules/codex/`) into `dist/` — runs in `npm run build`; see step 1e |
+| `packages/mewkit/scripts/copy-provider-bundles.cjs` | Stage the authored provider bundles (`modules/codex/`, `modules/cursor/`) into `dist/` — runs in `npm run build`; see step 1e |
 | `scripts/release.sh`                    | Automated release: bump → build → assets → commit → tag → push → GitHub Release |
 
 ## Release History
